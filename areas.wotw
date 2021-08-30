@@ -5104,7 +5104,6 @@ anchor LowerReach.East at -223, -3967:  # To the right side outside the teleport
 
 anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ice wall
   refill Checkpoint
-  # could be considered moving this anchor to the left, closer to the teleporter, if it gets important on higher difficulties
 
   state LowerReach.TPLantern:  # The slug despawns from the nearby checkpoint
     moki: Grenade=1, Combat=WeakSlug OR Bash
@@ -5131,15 +5130,15 @@ anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ic
     moki: LowerReach.RolledSnowball, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Damage=20
     gorlek: LowerReach.RolledSnowball, Burrow  # Dash in the snow before exiting the burrow section to get momentum
 
-  conn LowerReach.Teleporter:
-    moki, LowerReach.TPLantern:
+  conn LowerReach.East:
+    moki:
       Combat=WeakSlug, DoubleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek, LowerReach.TPLantern:
+    gorlek:
       Bash, Grenade=1
       Sword OR Hammer
-    unsafe, LowerReach.TPLantern:
+    unsafe:
       Bash  # Bash glide the slime
       Sentry=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Spear=1
   conn LowerReach.SoupMoki: free
