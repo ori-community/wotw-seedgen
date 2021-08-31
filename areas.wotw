@@ -4916,7 +4916,7 @@ anchor LowerReach.Teleporter at -259, -3962:
     gorlek: SentryBurn=1
   conn LowerReach.SoupMoki:
     moki: LowerReach.TPLantern
-  conn LowerReach.East:
+  conn LowerReach.Snowball:
     moki, LowerReach.TPLantern:
       Bash, Grenade=2, DoubleJump OR Dash OR Glide  # The first Grenade may hit the enemy
       Launch
@@ -5067,21 +5067,44 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
     unsafe: free
   conn LowerReach.East:
     moki:
-      Bash, Grenade=2, DoubleJump, Dash
+      Bash, Grenade=1, DoubleJump, Dash
       Launch
     gorlek:
-      SentryJump=2, DoubleJump, TripleJump, Grenade=1 OR Spear=1  # drop the slime for leniency
-      SentryJump=2, DoubleJump, Dash, Grenade=1 OR Spear=1  # drop the slime for leniency
-      Bash, Grenade=2, DoubleJump, TripleJump
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash
+      Bash, Grenade=1, Damage=20, DoubleJump, Glide OR Sword
+      SentryJump=1, DoubleJump, TripleJump OR Dash
+      SentryJump=1, Damage=20, DoubleJump, Glide OR Sword
     unsafe:
       Bash, Grenade=1  # Bash the slime
-      SentryJump=2
+      SentryJump=1
       DoubleJump, TripleJump, Dash OR Sword  # climb the wall near the moki, dash then triple jump to the wall to reset your jumps and dash + triple jump to reach the plant. With sword, pogo the fire, triple jump + upslash to reach the wall to reset your jumps then sword jump to the plant
-  # TODO connect to teleporter + relatedly TPLantern
 
-anchor LowerReach.East at -182, -3968:  # Right of the Lantern opening the Tp room
+anchor LowerReach.East at -223, -3967:  # To the right side outside the teleporter
+  refill Full:  # use the teleporter
+    moki: LowerReach.TPLantern
+
+  state LowerReach.TPLantern:  # Most paths redundant with Snowball
+    gorlek: Grenade=1, DoubleJump
+    unsafe: Grenade=1
+
+  conn LowerReach.Teleporter:
+    moki: LowerReach.TPLantern
+  conn LowerReach.Snowball:
+    moki:
+      Bash, Grenade=1, DoubleJump, Dash OR Glide
+      Launch
+    gorlek:
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      SentryJump=1, DoubleJump, TripleJump, Grenade=1 OR Spear=1  # drop the slime for leniency
+      SentryJump=1, DoubleJump, Dash, Grenade=1 OR Spear=1  # drop the slime for leniency
+    unsafe:
+      Bash  # Bash the slime
+      SentryJump=1
+      DoubleJump, TripleJump
+  conn LowerReach.SoupMoki: free
+
+anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ice wall
   refill Checkpoint
-  # could be considered moving this anchor to the left, closer to the teleporter, if it gets important on higher difficulties
 
   state LowerReach.TPLantern:  # The slug despawns from the nearby checkpoint
     moki: Grenade=1, Combat=WeakSlug OR Bash
@@ -5108,15 +5131,15 @@ anchor LowerReach.East at -182, -3968:  # Right of the Lantern opening the Tp ro
     moki: LowerReach.RolledSnowball, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Damage=20
     gorlek: LowerReach.RolledSnowball, Burrow  # Dash in the snow before exiting the burrow section to get momentum
 
-  conn LowerReach.Teleporter:
-    moki, LowerReach.TPLantern:
+  conn LowerReach.East:
+    moki:
       Combat=WeakSlug, DoubleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek, LowerReach.TPLantern:
+    gorlek:
       Bash, Grenade=1
       Sword OR Hammer
-    unsafe, LowerReach.TPLantern:
+    unsafe:
       Bash  # Bash glide the slime
       Sentry=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Spear=1
   conn LowerReach.SoupMoki: free
@@ -5200,7 +5223,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       DoubleJump, TripleJump  # Need to get a really precise wall jump to get to the plants
       Bash, Grenade=1, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR LowerReach.HeatEastFurnace  # Need to walljump on the wall above the 2nd plant then dash, get a reset by touching the ceilin and dash a second time
     # shuriken break note: this wall has 20 health
-  conn LowerReach.East:
+  conn LowerReach.Snowball:
     moki, LowerReach.RolledSnowball:
       LowerReach.CentralFurnace, Combat=Lizard OR Bash
       Launch
