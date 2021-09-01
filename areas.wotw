@@ -4170,7 +4170,7 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   conn WoodsEntry.TwoKeystoneRoom:
     moki: Combat=2xBalloon, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Combat=2xBalloon, Sword OR Hammer
-    kii: Combat=2xBallon, Shuriken=3
+    kii: Combat=2xBalloon, Shuriken=3
     unsafe: 
       Launch
       Sentry=2 OR Blaze=2
