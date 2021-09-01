@@ -1169,20 +1169,32 @@ anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
   pickup MidnightBurrows.LeftKS:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer OR Damage=15
+    kii: Shuriken=1 OR Flash=1 OR Sentry=1 OR Blaze=1
   pickup MidnightBurrows.LupoMap:
     moki: SpiritLight=50, Launch  # paths coming from the right side are on that anchor
     gorlek, SpiritLight=50:
       Bash  # bait some shots
       DoubleJump, TripleJump
       DoubleJump, Dash, Sword OR Hammer
-
+    kii, SpiritLight=50:
+      Dash, DoubleJump OR Hammer
+      Dash, Sword, Shuriken=1
+      DoubleJump, Hammer, Spear=1 OR Shuriken=1 OR Flash=1
+      DoubleJump, Spear=1, Shuriken=1
+    unsafe, SpiritLight=50: free  # jump into the portal and wait until you get enough height. That's it.
+      # Dash, Sword, Flash=1 OR Sentry=1
+      # DoubleJump, Hammer, Sentry=1
+      # Dash, Sword  # Dash ramp using the ramp inside the portal
+      # Sentry=2, Shuriken=1, DoubleJump  # Sentry->djump->shuriken->sentry
+  
   conn Teleporters: free
   conn MidnightBurrows.Central:
     moki: DoubleJump OR Launch
     gorlek: Dash OR Bash OR Glide OR Sword OR Hammer
-    unsafe:
-      Damage=15   # Land on spikes to go into the lower left portal
-      Grenade=1   # Grenade while in right Teleporter to get to the left ceiling
+    kii: Sentry=1 OR Flash=1 OR Shuriken=1 OR Damage=15   # Land on spikes to go into the lower left portal
+    unsafe: free # jump into the portal and wait until you get enough height. That's it.
+      #Blaze=1
+      #Grenade=1   # Grenade while in right Teleporter to get to the left ceiling
   conn MarshSpawn.BurrowsEntry:
     moki, MarshSpawn.BurrowsOpen:
       Launch
@@ -1190,8 +1202,11 @@ anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
     gorlek, MarshSpawn.BurrowsOpen:
       Bash, DoubleJump
       SentryJump=3, DoubleJump, Damage=15
+    kii, MarshSpawn.BurrowsOpen:
+      Bash, Dash OR Glide  # Bait shots from the spider
+      Bash, Grenade=1, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1  # bait shots from the spider, land where the mortar is, bait it, grenade, bash the mortar to reach your grenade
     unsafe, MarshSpawn.BurrowsOpen:
-      Bash, Dash OR Glide OR Grenade=1
+      #Bash, Grenade=1
       Bash  # using the projectiles efficiently
 
 anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big portal room
@@ -1201,10 +1216,11 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
     moki, Keystone=4:
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek: Keystone=4, Bash OR SentryJump=2
-    unsafe:
-      Keystone=4, DoubleJump, TripleJump, Damage=15
-      Keystone=4, Grenade=1  # Grenade while in right Teleporter to get to the left ceiling, use vSpeed to get to KS.Door
+    gorlek, Keystone=4: Bash OR SentryJump=2
+    kii, Keystone=4: DoubleJump, TripleJump, Damage=30 OR Sword  # with sword, pogo the mortar
+    unsafe, Keystone=4:
+      DoubleJump, Damage=15, TripleJump OR Sword
+      Grenade=1  # Grenade while in right Teleporter to get to the left ceiling, use vSpeed to get to KS.Door
   state MidnightBurrows.Lever:
     moki:
       Glide
@@ -1216,19 +1232,35 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
       DoubleJump, Hammer OR TripleJump
       Dash, Hammer
       Launch
+    kii:
+      Dash  # Reset dash with ceiling
       Sword
+      Sentry=3
+      Damage=30
+      Damage=15, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1
+      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
+      DoubleJump, Flash=1 OR Blaze=1 OR Shuriken=1
+      Bash, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1 OR Spear=1 OR Damage=15
+    unsafe:
+      DoubleJump, Sentry=1
+      Bash  # Bash the lantern once to the right then bash it again
+      Damage=15
+      Shuriken=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1  # extend corner boost with shuriken
 
   quest MidnightBurrows.TabletQI:
     moki, MidnightBurrows.KeystoneDoor:
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek: MidnightBurrows.KeystoneDoor, Bash OR SentryJump=2
-    unsafe: MidnightBurrows.KeystoneDoor, DoubleJump, TripleJump, Damage=15
+    gorlek, MidnightBurrows.KeystoneDoor: Bash OR SentryJump=2
+    kii, MidnightBurrows.KeystoneDoor: DoubleJump, TripleJump, Damage=30 OR Sword  # with sword, pogo the mortar
+    unsafe, MidnightBurrows.KeystoneDoor:
+      DoubleJump, Damage=15, TripleJump OR Sword
+      Grenade=1
 
   pickup MidnightBurrows.LupoMap:
     moki: SpiritLight=50, DoubleJump OR Dash OR Glide
     gorlek: SpiritLight=50
-  pickup MidnightBurrows.DeflectorShard:
+  pickup MidnightBurrows.DeflectorShard:  # The slug isn't here if you respawn from the checkpoint
     moki:
       Launch
       MidnightBurrows.Lever, DoubleJump, Dash OR Glide
@@ -1236,11 +1268,19 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
       DoubleJump, TripleJump
       MidnightBurrows.Lever, DoubleJump, Sword OR Hammer
       MidnightBurrows.Lever, Dash OR Glide
+    kii:
+      DoubleJump, Damage=15, Sword OR Hammer OR Flash=1 OR Spear=1
+      Bash, Dash, Grenade=1, Damage=15
+      Bash, DoubleJump, Grenade=1
+      MidnightBurrows.Lever, DoubleJump OR Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
+      MidnightBurrows.Lever, Damage=15, Spear=1 OR Blaze=1
     unsafe:
-      DoubleJump, Damage=15, Sword OR Hammer
-      MidnightBurrows.Lever, DoubleJump
-      MidnightBurrows.Lever, Damage=15, Sword OR Hammer
-  pickup MidnightBurrows.LowerKS:
+      #DoubleJump, Sentry=1, Damage=15
+      #DoubleJump, Sentry=2
+      DoubleJump
+      Dash, Bash
+      MidnightBurrows.Lever, Damage=15
+  pickup MidnightBurrows.LowerKS:  # Have to solve with MidnightBurrows.Lever as well so it doesn't softlock 
     moki:
       DoubleJump, Dash OR Glide
       Dash, Glide
@@ -1254,18 +1294,37 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
       Dash, Sword OR Hammer
       SentryJump=1  # use the sword for movement as well
       Launch
+    kii:
+      Dash  # Reset dash with ceiling
+      Sword  # need to kill you speed before entering the portal with a slash. Add a dboost otherwise.
+      Sentry=6  # 3 sentries in order to reach the lever, wait until the sentries are gone then 3 more sentries to reach the pickup
+      Sentry=4, Damage=15  # 1 sentry+dboost in order to reach the lever, wait until the sentry is destroyed then 3 more to reach the pickup
+      Sentry=3, Damage=15, Flash=1 OR Shuriken=1  # reach the lever with dboost+flash/shuriken then 3 sentries to reach the pickup. First dboost possible with blaze as well but blaze cost as much energy as sentry so it's basically sentry=4, damage=15
+      Damage=15, Damage=15, Sentry=3 OR Shuriken=2 OR Blaze=4  # weapon+dboost in order to reach the lever then weapon+dboost  
+      Damage=30, Damage=15, Sentry=2 OR Shuriken=1 OR Blaze=3 # 2 dboost in order to reach the lever then weapon energy + dboost for the pickup
+      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
+      DoubleJump, Damage=15, Flash=1 OR Blaze=1 OR Shuriken=1
+      DoubleJump, Flash=2 OR Blaze=2 OR Shuriken=2
+      Bash, Grenade=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1 OR Spear=1 OR Damage=15
+      Bash, Sentry=4
+      Bash, Sentry=3, Damage=15
+      Bash, Sentry=2, Damage=15, Damage=15
     unsafe:
+      DoubleJump, Damage=15, Sentry=1
+      DoubleJump, Sentry=2
+      Damage=15, Damage=15, Blaze=3
       Sword
-  conn MidnightBurrows.BelowUpperKS:
+  conn MidnightBurrows.BelowUpperKS:  # @validator keeping the MidnightBurrows.Lever requirement but most movement requirement for this path also solve the MidnightBurrows.Lever state so I guess the state is useless in most cases?
     moki: MidnightBurrows.Lever, Launch  # paths coming from the right side are on that anchor
     gorlek:
       MidnightBurrows.Lever, SentryJump=2, Dash OR DoubleJump OR Glide
       Launch
+    kii:
+      MidnightBurrows.Lever, DoubleJump, Damage=15, Hammer OR TripleJump  # Can be done without MidnightBurrows.Lever with one more dboost but tjump also solve MidnightBurrows.Lever
+      MidnightBurrows.Lever, DoubleJump, Bash  # use the slime then bait the spider
     unsafe:
       MidnightBurrows.Lever, SentryJump=2
       MidnightBurrows.Lever, SentryJump=1, DoubleJump, Damage=15
-      MidnightBurrows.Lever, DoubleJump, Bash  # use the slime
-      Bash, Grenade=2, DoubleJump, TripleJump OR Damage=15  # resolves for both states / with MidnightBurrows.Lever bash the slime next to the last teleporter to get above it
       MidnightBurrows.Lever, DoubleJump, Sword OR Damage=15
       MidnightBurrows.Lever, Bash
 
@@ -1278,8 +1337,13 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
     gorlek:
       Bash, Grenade=1  # bash the lantern to reach the lever, grenade bash from there
       SentryJump=1  # use the sword to hover to the lever
+    kii:
+      MidnightBurrows.Lever, Sword OR Hammer
+      MidnightBurrows.Lever, Shuriken=2, Combat=SneezeSlug
+      MidnightBurrows.Lever, Shuriken=1, Bash
     unsafe:
-      MidnightBurrows.Lever, Sword OR Hammer OR Bash
+      MidnightBurrows.Lever, Bash
+      MidnightBurrows.Lever, Combat=SneezeSlug, Sentry=1 OR Blaze=1 OR Flash=1 OR Shuriken=1 OR Spear=1
 
 # checkpoint at -685, -4616
 # checkpoint at -707, -4588
@@ -1298,14 +1362,24 @@ anchor MidnightBurrows.East at -597, -4549:  # At the wall connecting to Den
       Combat=WeakSlug, DoubleJump, Dash, Damage=15
       Launch, DoubleJump OR Dash OR Glide OR Damage=15
     gorlek:
-      Glide, Combat=WeakSlug OR DoubleJump OR Dash
+      Glide, Combat=WeakSlug OR DoubleJump OR Dash OR Bash
       Launch
       Sword, Damage=15
       DoubleJump, Dash OR Sword OR Hammer OR TripleJump
       Dash, Sword OR Hammer
-    unsafe:
+    kii:
       DoubleJump
-      Damage=15, Dash OR Hammer
+      Combat=WeakSlug, Damage=60
+      Combat=WeakSlug, Damage=45, Sentry=1 OR Shuriken=1 OR Blaze=1 OR Flash=1
+      Combat=WeakSlug, Damage=30, Sentry=3 OR Blaze=4
+      Bash, Damage=45  # Bash the slime
+      Dash, Blaze=1 OR Shuriken=1 OR Spear=1 OR Damage=15  # use your weapon to slow you down. Make it easier to avoid the dboost
+    unsafe:
+      Dash
+      Blaze=5, Combat=WeakSlug, Damage=15
+      Hammer, Damage=15
+      Spear=1, Combat=WeakSlug, Damage=45
+      #free # Sometimes you can just walk under the portals and I have no idea how this works?
   conn HowlsDen.DoubleJumpTreeArea:
     moki: MidnightBurrows.HowlsDenShortcut
 
@@ -1313,6 +1387,7 @@ anchor MidnightBurrows.BelowUpperKS at -724, -4524:  # Just bellow the keystone,
   pickup MidnightBurrows.UpperKS: free
   conn MidnightBurrows.Central: free
   # I believe connections up to here and then to the right would be always redundant currently?
+  # ^ Might want to look at that for fully random spawn
 
 region WestHollow:
   moki: Danger=20
