@@ -4101,8 +4101,6 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
     gorlek: Water, Bash, Damage=10  # bit hard but important for random spawn
     kii: Water, Spear=1
     unsafe: Water, Bash OR Grenade=1 OR Sentry=1  # redirect the projectile (sentry is way harder than the others). Also works with sword+deflector
-  conn WoodsEntry.Teleporter:  # Paths that go up directly and aren't redundant with BelowTeleporter
-    kii: Bash, Grenade=2, DoubleJump, TripleJump OR Hammer
 
 anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death mud
   refill Checkpoint
@@ -4128,26 +4126,21 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
   conn WoodsEntry.ShriekMeet:
     moki: Combat=Balloon, Combat=Tentacle OR Bash OR Launch
     gorlek: Combat=Tentacle OR Bash OR Launch OR Damage=10
+  conn WoodsEntry.Teleporter:  # Paths that go up directly and aren't redundant with BelowTeleporter
+    unsafe: Bash  # Use the tentacle
 
 # checkpoint at 525, -4205
 
 anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   refill Checkpoint
 
-  conn WoodsEntry.FirstMud:
-    moki:
-      Combat=Balloon, Bash, DoubleJump, Dash OR Glide
-      Combat=Balloon, Bash, Launch
-    gorlek:
-      Combat=Tentacle, DoubleJump, TripleJump OR Dash OR Glide OR Sword
-      Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword
-      Damage=10, DoubleJump, TripleJump OR Dash OR Glide OR Sword
-      Launch
+  conn WoodsEntry.FirstMud:  # check for redundancies with Teleporter
+    moki: Combat=Balloon, Bash, DoubleJump, Dash OR Glide
+    gorlek: DoubleJump, TripleJump OR Dash OR Glide  # If you struggle with the tentacle and die, it'll despawn
     kii:
-      DoubleJump, Shuriken=1, Sword # bounce on bubble onto the wall then slide off, double jump, shuriken and upslash onto the wall with spikes
-    unsafe:
-      Dash, Sword OR Hammer  # Jump on the first bubble, dash into the corner, dash again then up slash
-      Glide, Sword OR Hammer  # Jump on the first bubble, glide then up slash near the 2nd bubble (not too close, you can pop the bubble with an upslash)
+      DoubleJump, Sword OR Hammer
+      Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1  # You can use a dash refresh on the ceiling for more lenience. Or instead of grabbing the hanging log you can go below and aim for the bubble.
+    unsafe: Glide, Sword OR Hammer  # Jump on the first bubble, glide then up slash near the 2nd bubble (not too close, you can pop the bubble with an upslash)
   conn WoodsEntry.Teleporter:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -4156,12 +4149,14 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
     gorlek:
       Grapple, Sword
       Grapple, Hammer, Bash, Damage=15  # Bash because the plant can be a bit awkward
+      Bash, Grenade=1, Sword OR Damage=15
       SwordSJump=1
       HammerSJump=1, Bash, Damage=15  # again mildly awkward
     kii:
-      Grapple, Hammer
-      Grapple, Sentry=2
-      DoubleJump, TripleJump, Sentry=1 OR Flash=1 OR Shuriken=1
+      Grapple, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=15
+      Grapple, Sentry=2, Damage=15
+      Grapple, Sentry=4
+      DoubleJump, TripleJump, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
       Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Damage=15  # Use the tentacle, note that it despawns if you die and respawn on this anchor
     unsafe:
       DoubleJump, TripleJump
@@ -4170,10 +4165,13 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   conn WoodsEntry.TwoKeystoneRoom:
     moki: Combat=2xBalloon, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Combat=2xBalloon, Sword OR Hammer
-    kii: Combat=2xBalloon, Shuriken=3
-    unsafe: 
-      Launch
-      Sentry=2 OR Blaze=2
+    kii:
+      Combat=2xBalloon, Shuriken=3 OR Sentry=3 OR Spear=3
+      Combat=2xBalloon, Bash, Grenade=1, Flash=2
+      Combat=2xBalloon, Bash, Grenade=2, Spear=1
+      Damage=20, Damage=20, DoubleJump OR Glide  # tank the balloons
+      Launch  # by refreshing on the ceiling you can maneuver around the balloons
+    unsafe: Sentry=2 OR Blaze=2
 
 anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   refill Full
@@ -4191,18 +4189,31 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
     moki:
       Glide, DoubleJump OR Launch
       Bash, Grenade=1, Glide OR Launch
-      DoubleJump, Dash, Launch  # coming from below you'd just need Launch
+      DoubleJump, Dash, Launch
     gorlek:
       Glide, Dash
       DoubleJump, TripleJump, Dash, Sword OR Hammer
       SentryJump=1, DoubleJump, Dash  # Dash after the apex of the sjump then sword's full combo + up slash
       Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
       Bash, Grenade=1, Dash
+      # launch paths from gorlek onwards are redundant with walking below it and launching up
     kii:
+      Glide, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      DoubleJump, TripleJump, Dash, Shuriken=1 OR Sentry=2 OR Flash=1
+      DoubleJump, TripleJump, Sword, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Sentry=2
+      DoubleJump, Dash, Sword, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, Dash, Hammer, Shuriken=1 OR Sentry=2
       Bash, Grenade=1, DoubleJump OR Sword
+      Bash, Grenade=1, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
+    unsafe:
+      Glide  # No Glide jump, just start from the higher ground
+      DoubleJump, Sword
 
   conn Teleporters: free
-  conn WoodsEntry.ShriekMeet: free
+  conn WoodsEntry.ShriekMeet:
+    gorlek: free
+  conn WoodsEntry.FirstMud: free
   conn WoodsEntry.BelowTeleporter: free
 
 anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone door
@@ -4216,26 +4227,22 @@ anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone doo
   pickup WoodsEntry.LowerKS:
     moki: DoubleJump OR Dash OR Glide  # Launch is awful
     gorlek: Launch OR Sword OR Hammer  # different ways to solve
-    kii: Sentry=2
-    unsafe: free  # Jump on the first bubble just before it disappears
+    kii: free  # It's possible to get back to safety but also you can just teleport out
   pickup WoodsEntry.UpperKS:
     moki: DoubleJump OR Launch
     gorlek:
       Hammer, Dash
       Bash, Grenade=1
-    kii:
-      Hammer # upslash + slash to get on the left wall
-    unsafe:
-      SentryJump=1
+    unsafe: Sword OR Hammer
 
   conn WoodsMain.AfterKuMeet:
     moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: WoodsEntry.KeystoneDoor, Damage=10
   conn WoodsEntry.BelowTeleporter:
     moki: Combat=2xBalloon, DoubleJump OR Glide OR Launch
-    gorlek: DoubleJump OR Dash OR Sword
-    kii: Shuriken=2 OR Flash=2 OR Sentry=2
-    unsafe: Hammer OR Flash=1 OR Sentry=1 OR Shuriken=1
+    gorlek: DoubleJump OR Dash OR Glide OR Sword
+    kii: Launch OR Hammer OR Shuriken=1 OR Sentry=2  # If you struggle and die, the first balloon will despawm
+    unsafe: Sentry=1 OR Flash=1
 
 region WoodsMain:
   moki: Danger=40, Regenerate
