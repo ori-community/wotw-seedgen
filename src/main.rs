@@ -237,6 +237,7 @@ fn parse_difficulty(difficulty: &str) -> Result<Difficulty, String> {
     match &difficulty.to_lowercase()[..] {
         "moki" => Ok(Difficulty::Moki),
         "gorlek" => Ok(Difficulty::Gorlek),
+        "kii" => Ok(Difficulty::Kii),
         "unsafe" => Ok(Difficulty::Unsafe),
         _ => Err(format!("Unknown difficulty {}", difficulty)),
     }
