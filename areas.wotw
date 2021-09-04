@@ -1161,6 +1161,7 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
 region MidnightBurrows:
   moki: Danger=25
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
@@ -1395,6 +1396,7 @@ anchor MidnightBurrows.BelowUpperKS at -724, -4524:  # Just below the upper keys
 region WestHollow:
   moki: Danger=20
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor WestHollow.Entrance at -303, -4238:  # At Twillen
@@ -1783,6 +1785,7 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
 region EastHollow:
   moki: Danger=20
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
@@ -2746,6 +2749,7 @@ anchor GladesTown.ReachPath at -140, -4096:  # At the soup
 region WestGlades:
   moki: Danger=20
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor WestGlades.Lower at -545, -4113:  # The right edge of the first pool past glades
@@ -3040,6 +3044,7 @@ anchor GladesShrine at -635, -4020:
 region OuterWellspring:
   moki: Danger=25
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where you enter the first room
@@ -3517,6 +3522,7 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
 region InnerWellspring:
   moki: Danger=25
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where you enter the first room
@@ -4088,6 +4094,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
 region WoodsEntry:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through the Hollow connection
@@ -4250,6 +4257,7 @@ anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone doo
 region WoodsMain:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to the room after finding Ku
@@ -4680,6 +4688,7 @@ anchor WoodsShrine at 1361, -4068:
 region LowerReach:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor LowerReach.Entry at -390, -4025:  # Behind Baur
@@ -5592,6 +5601,7 @@ anchor LowerReach.Trial at 64, -4046:  # At trial start
 region UpperReach:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor UpperReach.KeystoneRoom at -298, -3919:  # At Tokk
@@ -5857,6 +5867,7 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
 region UpperDepths:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the entrance
@@ -6349,6 +6360,7 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
 region LowerDepths:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
@@ -6637,6 +6649,7 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
 region PoolsApproach:
   moki: Danger=25
   gorlek: free
+  kii: free
   unsafe: free
 
 anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfway between Mill Approach and Mill Path (added mostly because the paths through here reached ridiculous complexity otherwise)
@@ -6847,6 +6860,7 @@ anchor PoolsApproach.LeftOfWheel at -995, -4184:  # The leftmost platform of the
 region EastPools:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor EastPools.Entry at -1122, -4166:  # At the Voice dialogue
@@ -7213,6 +7227,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
 region UpperPools:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 # checkpoint at -1425, -4144
@@ -7609,6 +7624,7 @@ anchor UpperPools.BubbleSpamRoom at -1586, -4053:  # To the right of where all t
 region WestPools:
   moki: Danger=40, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor WestPools at -1656, -4171:  # the west Pools TP
@@ -7660,6 +7676,7 @@ anchor KwolokFight at -1650, -4125:
 region LowerWastes:
   moki: Danger=50, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
@@ -8143,6 +8160,7 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
 region UpperWastes:
   moki: Danger=50, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone door
@@ -8506,6 +8524,7 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
 region WeepingRidge:
   moki: Danger=60, Regenerate
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weeping ridge
@@ -8602,6 +8621,7 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
 region WillowsEnd:
   moki: Danger=60, Regenerate  # need more than 6 health and Regen to do ANYTHING in willow
   gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
