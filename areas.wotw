@@ -5698,12 +5698,8 @@ anchor UpperReach.KeystoneRoom at -298, -3919:  # At Tokk
       UpperReach.HeatFurnace:
         Bash, Glide, DoubleJump OR Grenade=1  # use the tongue plant
         DoubleJump, Grapple
-        Bash, Grenade=2, Dash  # bashgrenade at the waterfall
-        Water, Bash, Grenade=1, Dash  # also bashgrenade at waterfall
-        Water, Bash, Grenade=2  # still bashgrenade at waterfall
     gorlek:
       DoubleJump, TripleJump
-      DoubleJump, Dash  # from UpperReach.OutsideTreeRoom. djump solves it if the furnace isn't active.
       Bash, Grenade=1  # grenade, bash the gorlek to reach the grenade and go through the hidden area bellow the soup
       SentryJump=1, DoubleJump  # pass through the hidden area bellow the soup
       UpperReach.HeatFurnace, DoubleJump, WaterDash, Water OR Damage=20
@@ -5717,19 +5713,25 @@ anchor UpperReach.KeystoneRoom at -298, -3919:  # At Tokk
       SentryJump=1
       DoubleJump, Sword, Hammer  # Pogo the gorlek, wall jump under the hidden passage and djump+hammer upslash. You need to not use any forwards slashes with sword in order to have your hammer upslash available
       UpperReach.HeatFurnace:
-        DoubleJump, Glide  # the doublejump+glide to catch the wall above the floating platform is precise
         WaterDash, Sword, Water OR Damage=20  # water dash to get on the wall above the floating platform. wjump + precise upslash to get under the energy crystal
         WaterDash, Hammer, Water OR Damage=20  # water dash to get on the wall above the floating platform. wjump + precise upslash to get under the energy crystal
-  conn UpperReach.OutsideTreeRoom:
+  conn UpperReach.OutsideTreeRoom:  # Don't use the floating platform unless in unsafe since it's just not here most of the time. Make sure it's not redundant with the conncetion to UpperReach.UpperSoup since UpperReach.UpperSoup->UpperReach.OutsideTreeRoom is free
     moki, UpperReach.HeatFurnace:
-      DoubleJump, Dash OR Grapple
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
-      Water, Combat=ShieldMiner OR DoubleJump OR Bash OR Launch
-      Launch
+      DoubleJump, Dash, Glide
+      Water, Combat=ShieldMiner OR DoubleJump OR Bash
     gorlek, UpperReach.HeatFurnace:
-      DoubleJump OR Dash OR Grapple OR Sword OR Glide OR Damage=20
-      Bash, Grenade=1
-    kii, UpperReach.HeatFurnace: Sentry=1 OR Flash=1 OR Shuriken=1
+      WaterDash, Damage=20, Combat=ShieldMiner OR Bash
+      DoubleJump, Dash OR Damage=20
+      DoubleJump, TripleJump, Glide OR Sword OR Hammer
+      Grapple, DoubleJump
+      Grapple, Combat=ShieldMiner, Dash OR Damage=20
+    kii, UpperReach.HeatFurnace:
+      Dash, Sword OR Hammer
+      Grapple, Sword OR Hammer OR Glide
+      Water OR Damage=20
+      DoubleJump, Hammer OR Sword OR Glide
+    unsafe, UpperReach.HeatFurnace:
+      DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Grapple OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1  # QTM near the waterfall to make a floating platform appear
   conn LowerReach.OutsideTPRoom: free
 
 anchor UpperReach.LifeForceArea at -415, -3877:  # Next to the SL container, under the shard
@@ -5811,6 +5813,8 @@ anchor UpperReach.UpperSoup at -215, -3877:  # At the soup checkpoint
   pickup UpperReach.SoupOre: free
 
   conn UpperReach.KeystoneRoom: free
+  conn UpperReach.OutsideTreeRoom:
+    moki: UpperReach.HeatFurnace
 
 anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone door
   refill Checkpoint
@@ -5838,6 +5842,15 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
       SentryJump=1, DoubleJump OR Dash OR Glide
       Launch
       
+  conn UpperReach.UpperSoup:  # Make sure these paths aren't redundant with the one from UpperReach.KeystoneRoom
+    moki, UpperReach.HeatFurnace:
+      Bash, Grenade=1, DoubleJump
+    gorlek, UpperReach.HeatFurnace:
+      DoubleJump, Dash
+    kii, UpperReach.HeatFurnace:
+      DoubleJump, Glide OR Hammer OR Sword OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
+      Grapple, Sword OR Hammer OR Sentry=4   # With sentry, 2 sentries to reach the left wall then 1 more o reach the wall above the grapple plant and a 4th one to avoid the spikes near the soup
+      Grapple, Sentry=3, Damage=20
   conn UpperReach.TreeRoom:
     moki: UpperReach.KeystoneDoor
   # backwards connection can't get through the Icefall
