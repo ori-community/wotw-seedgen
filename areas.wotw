@@ -4999,31 +4999,52 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
     unsafe:
       LowerReach.CentralFurnace, Bash  # stand beside the spitter, bash off it once it shoots, then again off the projectile
       SentryJump=1
+      DoubleJump, TripleJump, Damage=20  # jump onto the spikes then up to the snaptrap. Jump on the tongue, let ori slide down then double jump again and go for the right wall
       Bash, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Glide  # jump on the tongue, let ori slide down then double jump again and go for the right wall with dash/up slashes/glide, climb it, grab the tongue again and jump out of it
-      DoubleJump, Damage=20, TripleJump OR Sentry=1 OR Flash=1  # jump onto the spikes then up to the snaptrap. Jump on the tongue, let ori slide down then double jump again and go for the right wall
-      
+
   conn LowerReach.SecondSoup: free
   conn LowerReach.Central:
     moki: DoubleJump OR Dash OR Bash OR Glide OR Launch OR Hammer OR Spear=1
     gorlek: free
+  conn LowerReach.BelowTokk:
+    moki:
+      DoubleJump, Dash, Bash  # bash the squonkey
+      DoubleJump, Bash, Grenade=1  # bash the squonkey
+      Launch
+    gorlek:
+      SentryJump=1, DoubleJump  # use weapon stall as well
+      Bash, Grenade=1, Dash OR Glide  # use the spitter projectile to get a higher bash off your grenade
+    unsafe:
+      DoubleJump, Damage=40
+      # !!!never tested for this connection, moved from 'conn UpperReach.KeystoneRoom'!!!
+      # Bash, Dash OR DoubleJump OR Sword OR Hammer  # juggle the mortar shot than bash the squonkey
+      # Bash, Grenade=1 OR DoubleJump OR Dash
+      # DoubleJump, TripleJump  # Need to start jumping just under the energy cristal to get to the first snaptrap
+      # SentryJump=1, DoubleJump, LowerReach.CentralFurnace  # djump+dash from the frozen snaptrap / bait the last snaptrap and double jump + use weapon to stall in the air
+      # HammerSJump=1, DoubleJump, Glide  # double jump+upslash from the plant to get near the burrow section, climb it then glide to the right
+
+anchor LowerReach.BelowTokk at -296, -3944:
+  refill Checkpoint
+
+  conn LowerReach.OutsideTPRoom: free
   conn UpperReach.KeystoneRoom:
     moki:
       DoubleJump, Dash, Bash  # bash the squonkey
-      DoubleJump, Bash, Grenade=2  # bash the squonkey
+      DoubleJump, Bash, Grenade=1  # bash the squonkey
       Launch
     gorlek:
-      SentryJump=2, DoubleJump  # use weapon stall as well
-      SentryJump=1, DoubleJump, Dash  # djump+dash from the frozen snaptrap
-      Bash, Grenade=1, Dash OR Glide OR DoubleJump  # use the spitter projectile to get a higher bash off your grenade
-    unsafe:
-      Bash, Dash OR DoubleJump OR Sword OR Hammer  # juggle the mortar shot than bash the squonkey
-      Bash, Grenade=1 OR DoubleJump OR Dash
-      DoubleJump, TripleJump OR Sentry=3  # Need to start jumping just under the energy cristal to get to the first snaptrap
-      SentryJump=1, DoubleJump, LowerReach.CentralFurnace  # djump+dash from the frozen snaptrap / bait the last snaptrap and double jump + use weapon to stall in the air
-      HammerSJump=1, DoubleJump, Glide  # double jump+upslash from the plant to get near the burrow section, climb it then glide to the right
-  conn LowerReach.Teleporter:
-    moki: Grenade=1
-    gorlek: SentryBurn=1
+      SentryJump=1, DoubleJump
+      DoubleJump, Dash
+      Bash, Dash OR Glide OR DoubleJump  # bash the squonkey
+  conn UpperReach.BurrowArea:
+    moki, Burrow:
+      DoubleJump, Dash, Bash  # bash the squonkey
+      DoubleJump, Bash, Grenade=1  # bash the squonkey
+      Launch
+    gorlek, Burrow:
+      SentryJump=1, DoubleJump
+      DoubleJump, TripleJump
+      Bash, Dash OR Glide OR DoubleJump  # bash the squonkey
 
 anchor LowerReach.Teleporter at -259, -3962:
   refill Full
@@ -5604,63 +5625,9 @@ region UpperReach:
   kii: Regenerate
   unsafe: free
 
-anchor UpperReach.KeystoneRoom at -298, -3919:  # At Tokk
-  refill Checkpoint
-  # the crystal is evil
-
-  state UpperReach.HeatFurnace:
-    moki:
-      Grenade=1  # this makes grenadebash paths meaningless
-      Flap, Bash, DoubleJump OR Launch
-    gorlek: Flap, Bash, SentryJump=1
-    kii: Flap, Bash, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Sentry=1 OR Flash=1 # Walljump on the left wall to reach the frozen waterfall
-  state UpperReach.CoolFurnace:  # need this because the player might have to refreeze the waterfall
-    moki: Flap
-
-  pickup UpperReach.LowerKS:
-    moki:
-      Launch
-      UpperReach.HeatFurnace, DoubleJump
-      UpperReach.HeatFurnace, Bash, Grenade=1
-      UpperReach.HeatFurnace, Water, WaterDash
-    gorlek:
-      SwordSJump=1, DoubleJump
-      UpperReach.HeatFurnace, Bash, Glide OR Sword OR Hammer OR Dash  # use the gorlek
-    kii:
-      UpperReach.HeatFurnace, WaterDash, Damage=20  # @validator I could see this being gorlek
-      Bash, Grenade=1  # use the gorlek to get a higher bash on your grenade
-      UpperReach.HeatFurnace, Bash, Sentry=1 OR Flash=1 OR Shuriken=1  # bash the gorlek
-      UpperReach.HeatFurnace, Hammer OR Sword  # with sword, pogo the gorlek
-    unsafe:
-      SentryJump=1  # need a decently high one
-  pickup UpperReach.MiddleLeftKS:
-    moki:
-      Launch, DoubleJump OR Dash OR Glide
-      UpperReach.HeatFurnace:
-        DoubleJump, Bash, Grapple OR Glide
-        Dash, Bash, Grenade=1, Glide
-        Dash, Bash, Water, WaterDash, Glide
-    gorlek:
-      Launch, Bash
-      Bash, Damage=20, Grenade=1 OR Flap OR Dash OR DoubleJump OR Glide  # start at the soup, may need to weapon stall to land further left on the spikes
-      Bash, Grenade
-    kii:
-      Launch
-      UpperReach.HeatFurnace, Bash, Glide
-      UpperReach.HeatFurnace, Bash, Grapple, Dash OR Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1  # Bash the gorlek to reach the plant
-      UpperReach.HeatFurnace, Bash, WaterDash, Grapple, Water OR Damage=20
-  pickup UpperReach.SwimEX:
-    moki: UpperReach.HeatFurnace, Water, Combat=ShieldMiner OR DoubleJump OR Bash OR Launch
-    gorlek: UpperReach.HeatFurnace, Water  # You can trigger the plant from the left if you stick to it from bellow
-    kii: 
-      UpperReach.HeatFurnace, Damage=60, WaterDash
-      UpperReach.HeatFurnace, Damage=120
-    unsafe:
-      UpperReach.HeatFurnace, Damage=40, WaterDash
-      UpperReach.HeatFurnace, Damage=100
-
-  conn Tokk: free
-  conn UpperReach.LifeForceArea:  # intended path omitted in moki
+anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
+  # This anchor was newly added, none of the pickups have actually been pathfound but copied from an old connection
+  pickup UpperReach.LifeForceEX:
     moki:
       Burrow, Launch
     gorlek:
@@ -5688,144 +5655,420 @@ anchor UpperReach.KeystoneRoom at -298, -3919:  # At Tokk
       Burrow, DoubleJump, Damage=20  # dboost in the spikes near the mantis to reach the burrow section then precise angle from under UpperReach.LifeForceEX
       Burrow, DoubleJump, Sentry=1 OR Flash=1 OR Shuriken=1  # Precise djump from the frozen muncher. Can make it easier by standing on the right of the muncher first so the left side is a bit higher.
       Burrow, Sword, Damage=20  # Pogo the mantis, precise angle to land into the spikes under UpperReach.LifeForceEX, precise walljump into upslash to land next to the pickup. Blame Wolf who made me realize it was possible
-      Burrow, DoubleJump, Dash, LowerReach.CentralFurnace
-  conn UpperReach.UpperSoup:
-    moki:
-      Launch
-      UpperReach.CoolFurnace:
-        DoubleJump
-        Bash, Grenade=1
-      UpperReach.HeatFurnace:
-        Bash, Glide, DoubleJump OR Grenade=1  # use the tongue plant
-        DoubleJump, Grapple
-    gorlek:
-      DoubleJump, TripleJump
-      Bash, Grenade=1  # grenade, bash the gorlek to reach the grenade and go through the hidden area bellow the soup
-      SentryJump=1, DoubleJump  # pass through the hidden area bellow the soup
-      UpperReach.HeatFurnace, DoubleJump, WaterDash, Water OR Damage=20
-    kii:
-      DoubleJump, Hammer OR Sword OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1  # from UpperReach.OutsideTreeRoom. djump solves it if the furnace isn't active.
-      UpperReach.CoolFurnace, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Sentry=1 OR Flash=1 
-      UpperReach.HeatFurnace, Grapple, Sword OR Sentry=4
-      UpperReach.HeatFurnace, Grapple, Sentry=3, Damage=20
-      UpperReach.HeatFurnace, Grapple, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
-    unsafe:
-      SentryJump=1
-      DoubleJump, Sword, Hammer  # Pogo the gorlek, wall jump under the hidden passage and djump+hammer upslash. You need to not use any forwards slashes with sword in order to have your hammer upslash available
-      UpperReach.HeatFurnace:
-        WaterDash, Sword, Water OR Damage=20  # water dash to get on the wall above the floating platform. wjump + precise upslash to get under the energy crystal
-        WaterDash, Hammer, Water OR Damage=20  # water dash to get on the wall above the floating platform. wjump + precise upslash to get under the energy crystal
-  conn UpperReach.OutsideTreeRoom:  # Don't use the floating platform unless in unsafe since it's just not here most of the time. Make sure it's not redundant with the conncetion to UpperReach.UpperSoup since UpperReach.UpperSoup->UpperReach.OutsideTreeRoom is free
-    moki, UpperReach.HeatFurnace:
-      DoubleJump, Dash, Glide
-      Water, Combat=ShieldMiner OR DoubleJump OR Bash
-    gorlek, UpperReach.HeatFurnace:
-      WaterDash, Damage=20, Combat=ShieldMiner OR Bash
-      DoubleJump, Dash OR Damage=20
-      DoubleJump, TripleJump, Glide OR Sword OR Hammer
-      Grapple, DoubleJump
-      Grapple, Combat=ShieldMiner, Dash OR Damage=20
-    kii, UpperReach.HeatFurnace:
-      Dash, Sword OR Hammer
-      Grapple, Sword OR Hammer OR Glide
-      Water OR Damage=20
-      DoubleJump, Hammer OR Sword OR Glide
-    unsafe, UpperReach.HeatFurnace:
-      DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Grapple OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1  # QTM near the waterfall to make a floating platform appear
-  conn LowerReach.OutsideTPRoom: free
-
-anchor UpperReach.LifeForceArea at -415, -3877:  # Next to the SL container, under the shard
-# This anchor is exclusively because paths to these two pickups are the same. This anchor let you write them only once (connection from UpperReach.KeystoneRoom).
-# Because of that, it doesn't need any backward connection (might want to do them in the future for fully random spawn)
-  pickup UpperReach.LifeForceEX: free
   pickup UpperReach.LifeForceShard:
     moki:
       Burrow, Launch
     gorlek:
-      Launch
-      Burrow, DoubleJump OR Dash OR Glide
+      Burrow, Bash, Grenade=1, DoubleJump OR Dash OR Glide
+      Burrow, DoubleJump, TripleJump, Bash
+      Burrow, DoubleJump, TripleJump, Dash, Glide
     kii:
-      Burrow, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+      Burrow, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Burrow, Bash, Sentry=3  # One sentry in order to reach the second crumbling platfom then 2 to reach the lantern
+      Burrow, Sword, Dash OR DoubleJump  # Precise burrow angle bellow UpperReach.LifeForceEX then full sword combo + movement option
+      Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath UpperReach.LifeForceEX then land next to the pickup
+      Burrow, DoubleJump, Combat=Mantis, Damage=20, Sentry=2 OR Flash=2  # dboost in the spikes under the first burrow section. precise angle underneath UpperReach.LifeForceEX then land next to the pickup
+      Burrow, DoubleJump, Combat=Mantis, Damage=40, Sentry=1 OR Flash=1  # dboost in the spikes under the first burrow section. precise angle underneath UpperReach.LifeForceEX then land next to the pickup
+      Burrow, DoubleJump, Dash, LowerReach.CentralFurnace, Glide OR Sentry=1 OR Flash=1 OR Damage=20  # without glide, go to UpperReach.LifeForceEX first
+      Burrow, DoubleJump, LowerReach.CentralFurnace, Sentry=2 OR Flash=2  # precise angle underneath UpperReach.LifeForceEX then land next to the pickup
+      Burrow, DoubleJump, LowerReach.CentralFurnace, Damage=20, Shuriken=1 OR Sentry=1 OR Flash=1  # precise angle underneath UpperReach.LifeForceEX then land next to the pickup
+      Burrow, Bash, Grenade=1  # grenade from under the pickup, burrow to reach it it then land near the pickup
+    unsafe:
+      Burrow, SwordSJump=2  # Running sjump from under LifeForceEX
+      Burrow, SentryJump=1, Glide OR Damage=20  # sjump to enter the burrow section. There is a small safespot in the right spikes below the sand after the bashable plant. Use weapon to stall in the air.
+      Burrow, SwordSJump=1, Dash  # Need a precise angle to exit the burrow section under LifeForceEX. Use sword for air stalling.
+      Burrow, HammerSJump=1, Dash, Damage=20  # Need a precise angle to exit the burrow section under LifeForceEX. Use sword for air stalling.
+      Burrow, Bash, Damage=20, Spear=2 OR Shuriken=2 OR Blaze=2 OR Sentry=2 OR Flash=2
+      Burrow, Sword, Sentry=2 OR Flash=2  # Pogo the mantis, before the lantern get a good burrow angle then sentry->sword hover->up slash->sentry to reach the crumbling platform. Same with flash but you have to disable flash during your sword hover so you get a second hop.
+      Burrow, DoubleJump, Damage=20  # dboost in the spikes near the mantis to reach the burrow section then precise angle from under UpperReach.LifeForceEX
+      Burrow, DoubleJump, Sentry=1 OR Flash=1 OR Shuriken=1  # Precise djump from the frozen muncher. Can make it easier by standing on the right of the muncher first so the left side is a bit higher.
+      Burrow, Sword, Damage=20  # Pogo the mantis, precise angle to land into the spikes under UpperReach.LifeForceEX, precise walljump into upslash to land next to the pickup. Blame Wolf who made me realize it was possible
+
+  conn LowerReach.BelowTokk:
+    moki: Burrow
+
+anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four keystone room before Grenade tree
+  refill Checkpoint
+
+  # This entire room can be in two mutually exclusive states: Frozen or Thawed.
+  # Additionally, you can only change the state if you have access to the furnace.
+  # This is important, because you have to avoid writing logic that requires a frozen furnace on its first half and a thawed furnace on its second half.
+  # To account for this, anchors in this room have up to three different variants:
+  # - Main Variant ("UpperReach.[name]"):
+  #     Paths to this anchor have to work with both furnace states! Outgoing connections can use either furnace state.
+  # - Frozen Variant ("UpperReach.[name]Frozen):
+  #     Paths to this anchor have to use the frozen furnace state! Outgoing connections cannot use the thawed furnace state.
+  #     Outgoing anchor connections may only connect to frozen variants, unless they light the furnace, in which case they may connect to thawed variants.
+  # - Thawed Variant ("UpperReach.[name]Thawed):
+  #     Paths to this anchor have to use the thawed furnace state! Outgoing connections cannot use the frozen furnace state.
+  #     Outgoing anchor connections may only connect to frozen variants
+  # This would however create countless redundancies, which is why additionally there's a counterpart for each variant:
+  # These counterparts may not connect to any other anchors that have variants dependant on the same furnace, unless explicitely to connect into another furnace state.
+  # - Main Paths ("UpperReach.[name]Paths"):
+  #     All three variants connect to this anchor. Outgoing connections have to work with both furnace states.
+  # - Frozen Paths ("UpperReach.[name]FrozenPaths"):
+  #     The Main and Frozen variants connect to this anchor. Outgoing connections have to use the frozen furnace state.
+  # - Thawed Paths ("UpperReach.[name]ThawedPaths"):
+  #     The Main and Thawed variants connect to this anchor. Outgoing connections have to use the thawed furnace state.
+
+  state UpperReach.ThawFurnace:  # mirror of the paths to UpperSoupFrozen, but without the freeze furnace state since that is guaranteed when trying to thaw it
+    moki:
+      Grenade=1  # this makes grenadebash paths meaningless
+      Flap, Bash, DoubleJump OR Launch
+    gorlek: Flap, Bash, Sword OR Hammer
+    kii: Flap, Bash, Dash OR Glide OR Shuriken=1 OR Sentry=1 OR Flash=1
+    unsafe: Flap, Bash, Blaze=1 OR Spear=1
+  state UpperReach.FreezeFurnace:  # refreezing the waterfall can be valuable
+    moki: Flap
+
+  pickup UpperReach.LowerKS:
+    moki:
+      UpperReach.ThawFurnace, DoubleJump
+      UpperReach.ThawFurnace, Bash, Grenade=1
+      UpperReach.ThawFurnace, Water, WaterDash
+      Launch
+    gorlek:
+      UpperReach.ThawFurnace, WaterDash, Damage=20
+      UpperReach.ThawFurnace, SentryJump=1
+      SentryJump=1, DoubleJump, TripleJump
+    kii:
+      UpperReach.ThawFurnace, Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2  # bash the gorlek
+      UpperReach.ThawFurnace, Hammer OR Sword  # with sword, pogo the gorlek
+    unsafe:
+      UpperReach.ThawFurnace, Spear=1
+      UpperReach.ThawFurnace, Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1
+      SentryJump=1  # need a decently high one
+  pickup UpperReach.SwimEX:  # dirty water paths using the damage advantage over starting from the right
+    kii, UpperReach.ThawFurnace:
+      Damage=80, WaterDash
+      Damage=120
+    unsafe, UpperReach.ThawFurnace:
+      Damage=40, WaterDash
+      Damage=100
+
+  conn Tokk: free
+  conn UpperReach.UpperSoup:  # check for redundancies with OutsideTreeRoom and KeystoneSnapPlant
+    moki:
+      # these paths go through the hidden area below the soup
+      Combat=ShieldMiner, Bash, Grenade=1, DoubleJump
+      Launch
+      # these paths work with both furnace states (even though sometimes through different routes)
+      # paths that go to the right if the furnace is lit
+      Water, DoubleJump, Grapple
+      Water, DoubleJump, Bash, Grenade=1
+      DoubleJump, Dash, Glide, Grapple
+      # paths that go above if the furnace is lit
+      DoubleJump, Bash, Glide
+      DoubleJump, Bash, Grapple, Dash
+      Bash, Grenade=1, Dash, Glide
+    gorlek:
+      # these paths go through the hidden area below the soup
+      Bash, Grenade=1, DoubleJump OR Sword OR Hammer
+      SentryJump=1, DoubleJump
+      # these paths work with both furnace states (even though sometimes through different routes)
+      # paths that go to the right if the furnace is lit
+      DoubleJump, TripleJump OR Grapple
+      DoubleJump, Dash, Water OR Glide OR Sword OR Hammer OR Damage=20
+      Dash, Grapple, Glide, Combat=ShieldMiner, Sword OR Hammer
+      Dash, Grapple, Glide, Bash, Grenade=1 OR Sword OR Hammer
+      Water, Dash, Grapple, Combat=ShieldMiner, Sword OR Hammer
+      Water, Dash, Grapple, Bash, Sword OR Hammer
+      Water, WaterDash, Dash, Grapple, Sword  # go up to get over the enemy
+      Water, WaterDash, Dash, Grapple, Glide, Hammer  # go up to get over the enemy
+      Damage=20, Dash, Grapple, Combat=ShieldMiner, Sword OR Hammer
+      Damage=20, Dash, Grapple, Bash, Sword OR Hammer
+      Bash, Grenade=1, Dash, Water OR Damage=20
+      Water, Bash, Grenade=1, Damage=20, Glide OR Sword OR Hammer
+      # paths that go above if the furnace is lit
+      Bash, DoubleJump, Dash OR Sword OR Hammer OR Damage=20
+      Bash, Grenade=1, Glide
+      Bash, Water, WaterDash, Glide, Sword OR Hammer
+      Bash, Water, WaterDash, Grapple, Sword
+      Bash, Damage=20, WaterDash, Glide, Sword OR Hammer
+      Bash, Damage=20, WaterDash, Grapple, Sword
+      Bash, SentryJump=1, Glide
+      Bash, SwordSJump=1, Grapple
+      Bash, HammerSJump=1, Grapple, Dash
+      Bash, HammerSJump=1, Grapple, Damage=20, Sword
+    kii:
+      # these paths go through the hidden area below the soup
+      Bash, Grenade=1, Dash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Bash, Grenade=2
+      # these paths work with both furnace states (even though sometimes through different routes)
+      # paths that go to the right if the furnace is lit
+      DoubleJump, Dash OR Sword OR Hammer OR Sentry=4
+      Grapple, Dash OR Sword OR Hammer
+      Grapple, Glide, Sentry=4
+      Grapple, Glide, Sentry=3, Damage=20
+      Grapple, Sentry=6
+      Water, DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Damage=20, DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Grapple, Sentry=4, Water OR Damage=20
+      Grapple, Sentry=3, Damage=20, Water OR Damage=20
+      Bash, Grenade=1, Damage=20, Water OR Damage=20
+      # paths that go above if the furnace is lit
+      Bash, Glide
+      Bash, DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Damage=20
+      Bash, WaterDash, Grapple, Shuriken=2, Damage=20, Water OR Damage=20
+      Bash, Grapple, Sentry=5
+      Bash, Grapple, Damage=20, Shuriken=3
+      Bash, Grapple, Damage=40, Shuriken=2
+    unsafe:
+      SentryJump=1
+      DoubleJump, Sword, Hammer  # Pogo the gorlek, wall jump under the hidden passage and djump+hammer upslash. You need to not use any forwards slashes with sword in order to have your hammer upslash available
+  conn UpperReach.UpperSoupFrozen:
+    moki, UpperReach.FreezeFurnace:
+      DoubleJump
+      Bash, Grenade=1
+    gorlek: UpperReach.FreezeFurnace, Sword OR Hammer
+    kii: UpperReach.FreezeFurnace, Dash OR Glide OR Shuriken=1 OR Sentry=1 OR Flash=1
+    unsafe: UpperReach.FreezeFurnace, Blaze=1 OR Spear=1
+  conn UpperReach.UpperSoupThawed:
+    unsafe, UpperReach.ThawFurnace:
+      WaterDash, Sword, Water OR Damage=20
+      WaterDash, Hammer, Water OR Damage=20
+      WaterDash, Dash, Water OR Damage=20  # dive launch
+  conn UpperReach.OutsideTreeRoom:  # when changing or adding paths, keep in mind that there are derived paths to UpperSoup
+    # The floating platform in the water only spawns if you reload from menu nearby.
+    moki, UpperReach.ThawFurnace:
+      Water, Combat=ShieldMiner OR DoubleJump OR Bash
+      DoubleJump, Dash, Glide
+    gorlek, UpperReach.ThawFurnace:
+      Water, WaterDash, Glide OR Sword  # go up to get over the enemy
+      Damage=20, WaterDash, Combat=ShieldMiner OR DoubleJump OR Bash
+      DoubleJump, TripleJump OR Damage=20
+      DoubleJump, Dash, Sword OR Hammer
+      Combat=ShieldMiner, Damage=20, Dash OR Glide OR Sword OR Hammer
+      Bash, Damage=20, Dash OR Glide OR Sword OR Hammer
+      Grapple, DoubleJump
+      Grapple, Dash, Glide, Combat=ShieldMiner OR Bash
+      Grapple, Damage=20, Combat=ShieldMiner OR Bash
+    kii, UpperReach.ThawFurnace:
+      Water OR Damage=20
+      DoubleJump, Dash OR Glide OR Sword OR Hammer OR Sentry=3
+      Dash, Sword OR Hammer
+      Grapple, Dash OR Glide OR Sword OR Hammer OR Sentry=2
+    unsafe, UpperReach.ThawFurnace:
+      DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Grapple OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1  # QTM near the waterfall to make a floating platform appear
+  conn UpperReach.KeystoneSnapPlant:  # when changing or adding paths, keep in mind that there are derived paths to UpperSoup
+    gorlek: Launch
+    kii: Bash, DoubleJump, TripleJump
+  conn UpperReach.KeystoneSnapPlantThawed:
+    moki, UpperReach.ThawFurnace:
+      Bash, DoubleJump, Grapple OR Glide
+      Bash, Water, WaterDash, Dash, Glide
+      Bash, Grenade=1, Dash, Glide
+      Bash, Launch
+    gorlek, UpperReach.ThawFurnace:
+      Bash, DoubleJump
+      Bash, WaterDash, Glide, Water OR Damage=20
+      Bash, Water, WaterDash, Grapple, Dash OR Sword OR Damage=20
+      Bash, Damage=20, WaterDash, Grapple, Dash OR Sword
+      Bash, Grenade=1, Glide
+      Bash, Grenade=1, Grapple, Dash OR Sword OR Damage=20
+      Bash, SentryJump=1, Glide
+      Bash, SwordSJump=1, Grapple
+      Bash, HammerSJump=1, Grapple, Dash OR Damage=20
+    kii, UpperReach.ThawFurnace:
+      Bash, Glide  # Bash the gorlek to reach the plant
+      Bash, WaterDash, Grapple, Water OR Damage=20
+      Bash, Grapple, Dash OR Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
+      Bash, Grapple, Damage=20, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+    unsafe, UpperReach.ThawFurnace:
+      Sword, Damage=20
+  conn LowerReach.BelowTokk: free
 
 # checkpoint at -369, -3917
 # checkpoint at -216, -3895
-# checkpoint at -216, -3877
 
-anchor UpperReach.UpperSoup at -215, -3877:  # At the soup checkpoint
-  pickup UpperReach.LowerKS:
+anchor UpperReach.KeystoneSnapPlant at -231, -3865:  # At the snap plant with MiddleLeftKS in its mouth
+  conn UpperReach.KeystoneSnapPlantPaths: free
+  conn UpperReach.KeystoneSnapPlantThawedPaths:
+    moki: UpperReach.ThawFurnace
+  conn UpperReach.UpperSoup:  # mirrored in thawed variant
     moki:
-      UpperReach.HeatFurnace, Glide
+      Glide OR Launch
+      DoubleJump, Dash
     gorlek:
-      Glide, DoubleJump, TripleJump
+      Sword
+      DoubleJump, TripleJump OR Hammer OR Damage=20
+      Dash, Hammer OR Damage=20
+    kii:
+      DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
+      Sentry=3
+      Damage=20, Shuriken=1 OR Sentry=2
+    unsafe:
+      Damage=40
+
+anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
+  conn UpperReach.KeystoneSnapPlantPaths: free
+  conn UpperReach.KeystoneSnapPlantThawedPaths: free
+  conn UpperReach.UpperSoupThawed:  # mirrored in main variant
+    moki:
+      Glide OR Launch
+      DoubleJump, Dash
+    gorlek:
+      Sword
+      DoubleJump, TripleJump OR Hammer OR Damage=20
+      Dash, Hammer OR Damage=20
+    kii:
+      DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
+      Sentry=3
+      Damage=20, Shuriken=1 OR Sentry=2
+    unsafe:
+      Damage=40
+
+anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
+  pickup UpperReach.MiddleLeftKS: free
+  pickup UpperReach.LowerKS:
+    gorlek: DoubleJump, TripleJump
+    kii: DoubleJump
+    unsafe: Sword
+
+  conn UpperReach.KeystoneRoom:  # check for redundancies with UpperSoup
+    moki: DoubleJump OR Dash
+    gorlek: Hammer OR Damage=20
+    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+
+anchor UpperReach.KeystoneSnapPlantThawedPaths at -231, -3865:
+  pickup UpperReach.LowerKS:
+    moki: Glide
+    gorlek:
+      Sword
+      Dash, Bash OR Grapple OR Damage=10
+      Hammer, Bash OR Grapple OR Damage=10
+      Dash, Hammer
+      Damage=20, Grapple
+    kii: Dash OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2 OR Damage=20
+    unsafe: free
+
+anchor UpperReach.UpperSoup at -215, -3877:  # At the soup
+  conn UpperReach.UpperSoupPaths: free
+  conn UpperReach.UpperSoupFrozenPaths:
+    moki: UpperReach.FreezeFurnace
+  conn UpperReach.UpperSoupThawedPaths:
+    moki: UpperReach.ThawFurnace
+
+anchor UpperReach.UpperSoupFrozen at -215, -3877:
+  conn UpperReach.UpperSoupPaths: free
+  conn UpperReach.UpperSoupFrozenPaths: free
+
+anchor UpperReach.UpperSoupThawed at -215, -3877:
+  conn UpperReach.UpperSoupPaths: free
+  conn UpperReach.UpperSoupThawedPaths: free
+
+anchor UpperReach.UpperSoupPaths at -215, -3877:
+  refill Checkpoint
+
+  pickup UpperReach.SoupOre: free
+  pickup UpperReach.LowerKS:  # check for redundancies with KeystoneSnapPlant
+    gorlek: DoubleJump, TripleJump, Glide
     kii:
       DoubleJump, TripleJump
       Flap, Bash  # Use the soup projectile. Bash the gorlek first so you get enough height from it.
       Glide, DoubleJump, Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
-      UpperReach.HeatFurnace, Dash OR Sentry=2 OR Blaze=4
     unsafe:
       DoubleJump, Dash OR Hammer OR Sentry=1
-      UpperReach.HeatFurnace, Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2
-  pickup UpperReach.MiddleLeftKS:
-    kii:
-      DoubleJump, Damage=20, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2
-      Damage=40, DoubleJump OR Dash
-      Dash, Hammer, Damage=20
-      Dash, Sword, Damage=40
-    unsafe:
-      DoubleJump, Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1
-      SwordSJump=1, Damage=20  # start at the soup, need to weapon stall to land further left on the spikes
-      Damage=20, Grenade=1, Sword OR Hammer OR DoubleJump OR Dash OR Glide  # GrenadeJump=1 start at the soup, need to land further left on the spikes
+      Sword, Damage=20, Damage=20  # go through the mortar room
   pickup UpperReach.UpperKS:
     moki:
       DoubleJump, Bash
       Launch
-    kii:
-      Bash
-    unsafe:
-      SwordSJump=1, Damage=20, DoubleJump OR Hammer OR UpperReach.CoolFurnace  # dboost in the spike at the right of the enemy and sjump from here
-  pickup UpperReach.MiddleRightKS:
-    moki, UpperReach.HeatFurnace:
-      DoubleJump
-      Bash, Grenade=1
-      Launch
-    gorlek, UpperReach.HeatFurnace:
-      Bash
-      SentryJump=1
-    kii, UpperReach.HeatFurnace: Hammer OR Spear=1
-    unsafe, UpperReach.HeatFurnace:
-      Damage=20
-      Dash, Sword, Damage=10  # upslash+dash in the icy part of the pole
+    gorlek: Bash
+    unsafe: SwordSJump=1, Damage=20, DoubleJump OR Hammer  # dboost in the spike at the right of the enemy and sjump from here
   pickup UpperReach.SwingPoleEX:
     moki:
       DoubleJump
       Bash, Grenade=1
       Launch
     gorlek:
-      Bash
+      Bash OR Hammer
       SentryJump=1
-      UpperReach.CoolFurnace, Dash OR Glide OR Sword OR Hammer  # wall jump on the frozen waterfall
-    kii: 
-      Hammer OR Spear=1
-      UpperReach.CoolFurnace, Sentry=1 OR Flash=1 OR Shuriken=1
-    unsafe:
-      UpperReach.CoolFurnace
-      Dash, Sword, Damage=10  # upslash+dash in the icy part of the pole
-  pickup UpperReach.SoupOre: free
+    kii: Spear=1
+    unsafe:  # Since the cooled state solves by itself, all paths can use the heated state implicitely without any risk of softlocking
+      Sword
+      Damage=20
+      # Dash, Sword, Damage=10  # upslash+dash in the icy part of the pole
 
   conn UpperReach.KeystoneRoom: free
-  conn UpperReach.OutsideTreeRoom:
-    moki: UpperReach.HeatFurnace
+  conn UpperReach.KeystoneSnapPlant:
+    moki: Launch, DoubleJump OR Dash OR Glide
+    gorlek: Damage=20, DoubleJump, TripleJump
+    kii:
+      Damage=20, DoubleJump, Dash OR Sword OR Hammer OR Sentry=2
+      Damage=40, DoubleJump OR Dash
+      Dash, Hammer, Damage=20
+      Dash, Sword, Damage=40
+    unsafe:
+      DoubleJump, TripleJump
+      DoubleJump, Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1
+      SwordSJump=1, Damage=20  # start at the soup, need to weapon stall to land further left on the spikes
+      Damage=20, Grenade=1, Sword OR Hammer OR DoubleJump OR Dash OR Glide  # GrenadeJump=1 start at the soup, need to land further left on the spikes
+
+anchor UpperReach.UpperSoupFrozenPaths at -215, -3877:
+  refill Checkpoint
+
+  pickup UpperReach.UpperKS:
+    unsafe: SwordSJump=1, Damage=20  # dboost in the spike at the right of the enemy and sjump from here
+  pickup UpperReach.SwingPoleEX:
+    gorlek: Dash OR Sword
+    kii: Glide OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+    unsafe: free
+
+  conn UpperReach.UpperSoupThawedPaths:  # light the furnace without dropping down
+    unsafe:
+      Grenade=1
+      Flap, Bash
+
+anchor UpperReach.UpperSoupThawedPaths at -215, -3877:
+  refill Checkpoint
+
+  pickup UpperReach.LowerKS:
+    moki: Glide
+    gorlek:
+      Sword
+      Dash, Hammer
+    kii: Dash OR Sentry=2 OR Blaze=4
+    unsafe: Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2
+  pickup UpperReach.MiddleRightKS:
+    moki:
+      DoubleJump
+      Bash, Grenade=1
+      Launch
+    gorlek:
+      Bash OR Hammer
+      SentryJump=1
+    kii: Spear=1
+    unsafe:
+      Sword
+      Damage=20
+      # Dash, Sword, Damage=10  # upslash+dash in the icy part of the pole
+
+  conn UpperReach.OutsideTreeRoom: free
 
 anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone door
   refill Checkpoint
   refill Energy=3:
-    moki, UpperReach.HeatFurnace, BreakCrystal:
+    moki, UpperReach.ThawFurnace, BreakCrystal:
       Water, Grapple, DoubleJump OR Dash OR Glide
       Launch
+    gorlek, UpperReach.ThawFurnace:
+      BreakCrystal, Grapple, DoubleJump OR Dash
+      BreakCrystal, DoubleJump, TripleJump OR Dash
+      Water, BreakCrystal, Bow OR Spear
+      Water, Grapple, BreakCrystal, Sword OR Hammer
+    kii, UpperReach.ThawFurnace:
+      Water, BreakCrystal, Grenade
 
   state UpperReach.KeystoneDoor:
     moki: Keystone=4
 
+  pickup UpperReach.SwimEX:
+    moki: UpperReach.ThawFurnace, Water
   pickup UpperReach.TreeOre:
     moki, UpperReach.KeystoneDoor:
       DoubleJump, Bash, Grenade=1, Dash OR Glide
@@ -5841,16 +6084,22 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
     unsafe, UpperReach.KeystoneDoor:
       SentryJump=1, DoubleJump OR Dash OR Glide
       Launch
-      
-  conn UpperReach.UpperSoup:  # Make sure these paths aren't redundant with the one from UpperReach.KeystoneRoom
-    moki, UpperReach.HeatFurnace:
+
+  conn UpperReach.UpperSoup:
+    moki, UpperReach.ThawFurnace:
+      Grapple, DoubleJump
       Bash, Grenade=1, DoubleJump
-    gorlek, UpperReach.HeatFurnace:
-      DoubleJump, Dash
-    kii, UpperReach.HeatFurnace:
-      DoubleJump, Glide OR Hammer OR Sword OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
-      Grapple, Sword OR Hammer OR Sentry=4   # With sentry, 2 sentries to reach the left wall then 1 more o reach the wall above the grapple plant and a 4th one to avoid the spikes near the soup
+    gorlek, UpperReach.ThawFurnace:
+      Grapple, Dash
+      DoubleJump, TripleJump OR Dash
+      Bash, Grenade=1, Dash
+      Bash, Grenade=1, Damage=20, Glide OR Sword OR Hammer
+    kii, UpperReach.ThawFurnace:
+      DoubleJump, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Grapple, Sword OR Hammer OR Sentry=4
       Grapple, Sentry=3, Damage=20
+      Bash, Grenade=1, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
+    unsafe: UpperReach.ThawFurnace, DoubleJump, Glide
   conn UpperReach.TreeRoom:
     moki: UpperReach.KeystoneDoor
   # backwards connection can't get through the Icefall
