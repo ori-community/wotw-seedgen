@@ -6069,21 +6069,6 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
 
   pickup UpperReach.SwimEX:
     moki: UpperReach.ThawFurnace, Water
-  pickup UpperReach.TreeOre:
-    moki, UpperReach.KeystoneDoor:
-      DoubleJump, Bash, Grenade=1, Dash OR Glide
-      Dash, Bash, Grenade=1, Glide
-      Launch, DoubleJump OR Dash OR Glide
-    gorlek, UpperReach.KeystoneDoor:
-      SentryJump=1, DoubleJump, Dash OR Glide
-      Launch, Sword OR Hammer
-      Launch, Bash, Grenade=1
-    kii, UpperReach.KeystoneDoor:
-      Bash, Grenade=1, Dash OR DoubleJump OR Glide OR Sword OR Hammer OR Sentry=2
-      Bash, Grenade=1, Shuriken=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
-    unsafe, UpperReach.KeystoneDoor:
-      SentryJump=1, DoubleJump OR Dash OR Glide
-      Launch
 
   conn UpperReach.UpperSoup:
     moki, UpperReach.ThawFurnace:
@@ -6100,13 +6085,40 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
       Grapple, Sentry=3, Damage=20
       Bash, Grenade=1, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
     unsafe: UpperReach.ThawFurnace, DoubleJump, Glide
-  conn UpperReach.TreeRoom:
+  conn UpperReach.TreeRoomLedge:
     moki: UpperReach.KeystoneDoor
   # backwards connection can't get through the Icefall
 
-# checkpoint at anchor below; the door of the house autosaves
+anchor UpperReach.TreeRoomLedge at -136, -3911:  # On the ledge to the left and above the tree
+  state UpperReach.KeystoneDoor:
+    moki: Keystone=4
+
+  pickup UpperReach.TreeOre:
+    moki:
+      Bash, Grenade=1, DoubleJump, Dash OR Glide
+      Bash, Grenade=1, Dash, Glide
+      Launch, DoubleJump OR Dash OR Glide
+    gorlek:
+      Bash, Grenade=1, Glide
+      Bash, Grenade=1, DoubleJump, Sword OR Hammer
+      Bash, Grenade=1, Dash, Sword OR Hammer
+      Launch, Sword OR Hammer
+      Launch, Bash, Grenade=1
+      SentryJump=1, DoubleJump, Dash OR Glide
+    kii:
+      Bash, Grenade=1, Dash OR Sword OR Sentry=3
+      Bash, Grenade=1, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
+    unsafe:
+      Bash, Grenade=1, Hammer
+      SentryJump=1, DoubleJump OR Dash OR Glide
+      Launch
+
+  conn UpperReach.TreeRoom: free
+  # backwards connection can't get through the Icefall
 
 anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
+  refill Checkpoint:  # the hut door saves
+    unsafe: free
   refill Energy=4:  # fast respawning crystal
     moki: BreakCrystal
 
@@ -6119,12 +6131,25 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
   pickup UpperReach.HiddenEX:
     moki: Grenade=1
     gorlek: SentryBurn=1  # Use sentry to melt the ice
-  pickup UpperReach.TreeOre:  # Most paths are redundant with UpperReach.OutsideTreeRoom->UpperReach.TreeOre
+  pickup UpperReach.TreeOre:
+    gorlek: Bash, Grenade=1, DoubleJump, TripleJump
+    kii:
+      Bash, Grenade=1, DoubleJump
+      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Sentry=2  # Climb the right wall
+
+  conn UpperReach.TreeRoomLedge:
+    moki:
+      Bash, Grenade=3
+      Launch
     gorlek:
-      DoubleJump, TripleJump, Bash, Grenade=1
-    unsafe:
-      DoubleJump, TripleJump, Glide OR Sword  # Climb the right wall then triplejump + glide (or sword combo + upslash)
-    # backwards connection can't get through the Icefall
+      Bash, Grenade=1, DoubleJump, TripleJump
+      SentryJump=1, Grenade=2
+      SentryJump=2, SentryBurn=2
+    kii:
+      DoubleJump, TripleJump
+      Bash, Grenade=2, DoubleJump  # go up to the ore
+      Bash, Grenade=1, DoubleJump, Dash OR Glide OR Sword  # go up to the ore
+      Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1  # go up to the ore
 
 region UpperDepths:
   moki: Danger=40, Regenerate
