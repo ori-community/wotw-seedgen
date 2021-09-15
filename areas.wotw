@@ -8016,13 +8016,14 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
   conn LowerWastes.Shovel:
     moki:  # I think this is fine without Combat?
       Grapple, DoubleJump OR Dash OR Glide
-      DoubleJump, Bash, Grenade=1  # Does require double jump to the grenade, and then double jump after bash to clear grapple section
+      Bash, Grenade=1, DoubleJump, Dash
       Launch  # Pretty free. Only difficulty is wall jumping pre-Launch to go over the grapples.
     gorlek:
       Grapple  # Hope that the camera likes you
-      Bash, Grenade=1  # can either bash off the gorlek, then the grenade - or climb the wall to get additional height out of the bashgrenade
-      SwordSJump=1, DoubleJump,Dash OR Glide OR Damage=30
+      Bash, Grenade=1, DoubleJump
+      SwordSJump=1, DoubleJump, Dash OR Glide OR Damage=30
       HammerSJump=1, DoubleJump
+    kii: Bash, Grenade=1  # can either bash off the gorlek, then the grenade - or climb the wall to get additional height out of the bashgrenade
     unsafe:
       SentryJump=1, DoubleJump OR Dash
       Bash, DoubleJump, TripleJump  # bash the gorlek's projectile
@@ -8499,8 +8500,9 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
       Launch
     gorlek:
       Burrow, Bash, Glide
-      Bash, Grenade=1  # use the miner as well
+      Bash, Grenade=1, DoubleJump
       Combat=MaceMiner, SentryJump=1, DoubleJump
+    kii: Bash, Grenade=1  # use the miner as well
     unsafe:
       Burrow, Bash
       SentryJump=1
