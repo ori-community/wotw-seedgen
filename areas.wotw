@@ -5741,8 +5741,8 @@ anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
       Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath UpperReach.LifeForceEX then land next to the pickup
       Burrow, DoubleJump, Damage=20  # dboost in the spikes under the pickup
       Burrow, DoubleJump, Sentry=1 OR Flash=1  # precise angle underneath UpperReach.LifeForceEX then land next to the pickup
-      Burrow, Bash, Grenade=1, Damage=20  # grenade from under the pickup, burrow to reach it it then land near the pickup | damage because of the 2nd sand platform
-      Burrow, Dash, Glide  # go to shard first
+      Burrow, Bash, Grenade=1, Damage=20  # grenade from under the pickup, burrow to reach it then land near the pickup. Damage because of the 2nd sand platform
+      Burrow, Dash, Glide  # go to UpperReach.LifeForceShard first
     unsafe:
       Burrow, SwordSJump=2  # Running sjump from under LifeForceEX
       Burrow, SentryJump=1, Glide OR Damage=20  # sjump to enter the burrow section. There is a small safespot in the right spikes below the sand after the bashable plant. Use weapon to stall in the air.
@@ -5758,10 +5758,10 @@ anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
       Burrow, Launch, Bash
     gorlek:
       Launch
-      Burrow, Bash, DoubleJump, Dash OR Glide OR TripleJump
+      Burrow, Bash, DoubleJump, TripleJump OR Dash OR Glide
       Burrow, DoubleJump, TripleJump, Dash, Glide
     kii:
-      Burrow, Bash, Sword OR Hammer
+      Burrow, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       Burrow, Bash, Sentry=3  # One sentry in order to reach the second crumbling platfom then 2 to reach the lantern
       Burrow, Sword, Dash, DoubleJump  # "Precise" burrow angle bellow UpperReach.LifeForceEX then full sword combo + movement option
       Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath UpperReach.LifeForceEX then land next to the pickup, then go to shard
