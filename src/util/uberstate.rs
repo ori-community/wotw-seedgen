@@ -114,6 +114,11 @@ impl UberState {
     pub fn is_shop(&self) -> bool {
         self.identifier.uber_group == 1 ||
         self.identifier.uber_group == 2 ||
+        self.identifier.uber_group == 48248 && matches!(self.identifier.uber_id, 19396 | 57987 | 41666)
+    }
+    pub fn is_purchasable(&self) -> bool {
+        self.identifier.uber_group == 1 ||
+        self.identifier.uber_group == 2 ||
         self.identifier.uber_group == 48248 && matches!(self.identifier.uber_id, 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045 | 19396 | 57987 | 41666)
     }
 }
