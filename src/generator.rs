@@ -633,7 +633,7 @@ where
     if node.uber_state().map_or(false, UberState::is_shop) || !origin_world_context.random_spirit_light.sample(context.rng) {
         let target_world_index = context.rng.gen_range(0..context.world_count);
 
-        if origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.items.len() {
+        if origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.item_count() {
             let target_world_context = &mut world_contexts[target_world_index];
 
             if let Some(item) = target_world_context.world.pool.choose_random(origin_world_index != target_world_index, context.rng) {
