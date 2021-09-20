@@ -1904,12 +1904,17 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
       Launch
       SentryJump=1, DoubleJump, TripleJump
       EastHollow.BeetleDefeated, DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer  # Dont make the third jump too quick if you have just Hammer
+    kii:
+      DoubleJump, TripleJump, Sword  # Pogo
+      Bash  # baiting the skeeto can be annoying
+      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash
+      DoubleJump, Sword  # Pogo + upslash
       Hammer, DoubleJump                 # HammerJump
       DoubleJump, Sentry=3 OR Grenade=2  # Use Sentry hops to boost the height or GrenadeJumps
-      Bash, DoubleJump OR Dash OR Sword OR Hammer
-
+      EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear
+      EastHollow.BeetleDefeated, DoubleJump, Sentry=4  # Djump+3 sentries from the vine, ceiling jump + sentry to access to the pickup
+      
   conn Teleporters: free
   conn BeetleFight: free
   conn EastHollow.AboveBash:  # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
@@ -1918,8 +1923,9 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
       EastHollow.BeetleDefeated OR Launch
       Bash, DoubleJump OR Dash OR Glide
       SentryJump=1, DoubleJump OR Dash OR Glide  # Go down to the pit, do SentryJump and the use Sword or Hammer to get to the rope
+    kii:
+      Bash  # need to bait the skeeto all the way on the right which can be annoying
     unsafe:
-      Bash                                       # lure the skeeto to the rope
       Hammer, DoubleJump                         # HammerJump
       # WaveDash, DoubleJump                     # wavedash off the teleporter
   conn EastHollow.MapMoki:
@@ -1929,10 +1935,12 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
     gorlek, EastHollow.VoiceDoor:
       Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       Launch
-    unsafe, EastHollow.VoiceDoor:
+    kii, EastHollow.VoiceDoor:
       Bash
+      DoubleJump, TripleJump, Sword  # Pogo 
+    unsafe, EastHollow.VoiceDoor:
+      DoubleJump, Sword  # Pogo
       Hammer, DoubleJump  # HammerJump
-      # Bash, Grenade=1
   conn WestHollow.InFrontPurpleDoor:
     moki: WestHollow.PurpleDoorOpen
 
@@ -1951,7 +1959,11 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
   pickup EastHollow.GladesApproachOre:
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Bash
-
+    kii:
+      Deflector, Sword, Launch
+      Deflector, Sword, DoubleJump, TripleJump OR Hammer OR Spear=1 OR Damage=10  # from the right wall or take a dboost in the left spieks
+    unsafe:
+      Deflector, Hammer, Launch OR DoubleJump
   conn EastHollow.OutsideGlades:
     moki:
       DoubleJump, Bash
@@ -1960,13 +1972,16 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
       Bash, Grenade=1, Dash
       Bash, SentryJump=1, Dash
       Bash, Damage=10
+    kii:
+      DoubleJump, TripleJump OR Spear=2 OR Damage=20
+      DoubleJump, Damage=10, Hammer OR Spear=1  # either take a dboost to reach the first pole or climb from the right wall and take a dboost to refresh hammer's up slash
+      Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash, Grenade=1
-      SentryJump=1, DoubleJump, TripleJump
-      # Bash, EastHollow.BeetleDefeated, Sword  # Long Squonkey Lure using Bash Climbing
+      Bash, Grenade=1  # land near the second pole, throw a grenade, jump on the pole and immediatly jump to the grenade. Avoiding spikes damage is a bit hard.
       Grenade=5, Damage=10, EastHollow.BeetleDefeated    # Grenade Redirect and Grenade Jumps
-  # backwards connections can't cross the door; having Voice should always imply an easier way of getting on the other side
-
+      DoubleJump, Hammer, Deflector  # break the wall to GladesApproachOre so you can refresh your upslash without taking a dboost
+      DoubleJump, Damage=10, Sentry=1
+      DoubleJump, Sword, Damage=10  # climb the left wall, pogo the mortar 
   conn EastHollow.Teleporter:
     moki: EastHollow.VoiceDoor, DoubleJump OR Dash OR Glide OR Bash OR Launch
     gorlek: EastHollow.VoiceDoor
