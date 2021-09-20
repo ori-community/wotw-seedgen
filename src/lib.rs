@@ -6,7 +6,7 @@ pub mod headers;
 pub mod util;
 
 use std::{
-    collections::{HashSet, HashMap},
+    collections::HashMap,
     path::PathBuf,
 };
 
@@ -144,14 +144,15 @@ type Names = HashMap<String, String>;
 fn parse_headers<R>(world: &mut World, headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names), String>
 where R: Rng + ?Sized
 {
+    let mut header_block = String::new();
+
     let mut dependencies = settings.header_list.clone();
+    dependencies.sort();
     for dependency in &mut dependencies {
         dependency.set_extension("wotwrh");
     }
-
-    let mut header_block = String::new();
     let mut context = HeaderContext {
-        dependencies: dependencies.into_iter().collect::<HashSet<_>>(),
+        dependencies,
         ..HeaderContext::default()
     };
 
@@ -185,20 +186,17 @@ where R: Rng + ?Sized
         header_block += &header;
     }
 
-    let mut parsed = HashSet::new();
+    let mut parsed = Vec::new();
     loop {
-        let unparsed = context.dependencies.difference(&parsed).cloned().collect::<Vec<_>>();
-        if unparsed.is_empty() { break; }
+        context.dependencies.retain(|header| !parsed.contains(header));
+        if context.dependencies.is_empty() { break; }
 
-        parsed = context.dependencies.clone();
-
-        for mut path in unparsed {
-            path.set_extension("wotwrh");
-
+        while let Some(path) = context.dependencies.pop() {
             log::trace!("Parsing header {}", path.display());
             let header = util::read_file(&path, "headers")?;
             let header = headers::parser::parse_header(&path, &header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in header {}", err, path.display()))?;
 
+            parsed.push(path);
             header_block += &header;
         }
     }

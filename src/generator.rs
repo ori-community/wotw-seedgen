@@ -226,23 +226,21 @@ where
     R: Rng,
     I: Iterator<Item=usize>,
 {
-    let mut world_relic_locations = HashMap::with_capacity(RELIC_ZONES.len());
+    let mut world_relic_locations = Vec::with_capacity(RELIC_ZONES.len());
+    for zone in RELIC_ZONES {
+        world_relic_locations.push((zone, Vec::with_capacity(60)));
+    }
 
     for world_index in 0..context.world_count {
-        for zone in RELIC_ZONES {
-            world_relic_locations.insert(zone, Vec::with_capacity(60));
-        }
-
         let world_context = &world_contexts[world_index];
 
         for node in &world_context.world.graph.nodes {
             if let Some(zone) = node.zone() {
                 let uber_state = node.uber_state().unwrap();
 
-                if RELIC_ZONES.contains(&zone)
-                && !world_context.world.preplacements.contains_key(uber_state)
-                && !world_context.placements.iter().any(|placement| &placement.uber_state == uber_state) {
-                    if let Some(zone_relic_locations) = world_relic_locations.get_mut(&zone) {
+                if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(&relic_zone, _)| zone == relic_zone) {
+                    if !world_context.world.preplacements.contains_key(uber_state)
+                    && !world_context.placements.iter().any(|placement| &placement.uber_state == uber_state) {
                         zone_relic_locations.push(node);
                     }
                 }
@@ -254,9 +252,11 @@ where
                 log::trace!("({}): Placing Relic in {}", world_contexts[world_index].player_name, zone);
 
                 if let Some(&location) = relic_locations.choose(context.rng) {
-                    place_item(world_index, world_index, location, false, Item::Relic(*zone), world_contexts, context)?;
+                    place_item(world_index, world_index, location, false, Item::Relic(zone), world_contexts, context)?;
                 }
             }
+
+            relic_locations.clear();
         }
     }
 

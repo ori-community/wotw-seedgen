@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashSet, HashMap},
+    collections::HashMap,
     path::{Path, PathBuf},
     str::FromStr,
 };
@@ -792,10 +792,10 @@ fn apply_parameters(line: &mut String, parameters: &HashMap<String, String>) -> 
 }
 
 #[inline]
-fn include_command(include: &str, dependencies: &mut HashSet<PathBuf>) {
+fn include_command(include: &str, dependencies: &mut Vec<PathBuf>) {
     let mut path = PathBuf::from(include);
     path.set_extension("wotwrh");
-    dependencies.insert(path);
+    dependencies.push(path);
 }
 #[inline]
 fn exclude_command(name: &Path, exclude: &str, excludes: &mut HashMap<String, String>) {
@@ -977,7 +977,7 @@ fn if_command(comparison: &str, parameters: &HashMap<String, String>) -> Result<
 
 #[derive(Debug, Default)]
 pub struct HeaderContext {
-    pub dependencies: HashSet<PathBuf>,
+    pub dependencies: Vec<PathBuf>,
     pub excludes: HashMap<String, String>,
     pub flags: Vec<String>,
     pub names: HashMap<String, String>,
