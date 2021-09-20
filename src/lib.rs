@@ -187,18 +187,17 @@ where R: Rng + ?Sized
     }
 
     let mut parsed = Vec::new();
-    loop {
-        context.dependencies.retain(|header| !parsed.contains(header));
-        if context.dependencies.is_empty() { break; }
-
-        while let Some(path) = context.dependencies.pop() {
-            log::trace!("Parsing header {}", path.display());
-            let header = util::read_file(&path, "headers")?;
-            let header = headers::parser::parse_header(&path, &header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in header {}", err, path.display()))?;
-
-            parsed.push(path);
-            header_block += &header;
+    while let Some(path) = context.dependencies.pop() {
+        if parsed.contains(&path) {
+            continue;
         }
+
+        log::trace!("Parsing header {}", path.display());
+        let header = util::read_file(&path, "headers")?;
+        let header = headers::parser::parse_header(&path, &header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in header {}", err, path.display()))?;
+
+        parsed.push(path);
+        header_block += &header;
     }
 
     for header in context.dependencies {
