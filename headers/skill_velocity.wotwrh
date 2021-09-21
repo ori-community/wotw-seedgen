@@ -5,6 +5,8 @@
 !!include bonus_core
 //// How many Skill Velocities to shuffle in
 !!parameter count int:5
+!!name 8|9|5|int|+1 Skill Velocity
+!!add $PARAM(count)x 8|9|5|int|+1
 
 // skip-validate
 9|0=199|4|17|9|109|1|8|9|0|int|200      // Add wheel toggle
@@ -18,8 +20,6 @@
 
 9|999=400|6|#Skill Velocity x$(9|5)#    // display name
 
-!!add $PARAM(count)x 8|9|5|int|+1
-!!name 8|9|5|int|+1 Skill Velocity
 9|5=1|8|9|110|bool|true                 // set to default enabled
 9|5=1|8|9|109|bool|true                 // subscribe to bonus core
 9|5|4|18|9|5|100|8|9|5|int|100|skip=1   // cap at 100

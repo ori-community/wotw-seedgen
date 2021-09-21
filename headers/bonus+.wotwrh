@@ -2,20 +2,24 @@
 ///
 /// Break the game with overpowered Bonus Upgrades
 !!exclude bonus_items
+!!include skill_velocity
+!!include jumpgrades
+!!include rapid_smash_core
+!!include rapid_sword_core
 
-!!add 4x 10|35  // Extra Double Jumps
-!!add 2x 10|36  // Extra Air Dashes
-!!add 3x 11|0   // Rapid Hammers
-!!add 3x 11|1   // Rapid Swords
-// TODO toggle sword/hammer upgrades
-!!add 2x 11|2   // Blaze Efficiency
-!!add 2x 11|3   // Spike Efficiency
-!!add 2x 11|4   // Shuriken Efficiency
-!!add 2x 11|5   // Sentry Efficiency
-!!add 2x 11|6   // Bow Efficiency
-!!add 2x 11|7   // Regeneration Efficiency
-!!add 2x 11|8   // Flash Efficiency
-!!add 2x 11|9   // Grenade Efficiency
+!!add 4x 10|35              // Extra Double Jumps
+!!add 2x 10|36              // Extra Air Dashes
+!!add 2x 11|2               // Blaze Efficiency
+!!add 2x 11|3               // Spike Efficiency
+!!add 2x 11|4               // Shuriken Efficiency
+!!add 2x 11|5               // Sentry Efficiency
+!!add 2x 11|6               // Bow Efficiency
+!!add 2x 11|7               // Regeneration Efficiency
+!!add 2x 11|8               // Flash Efficiency
+!!add 2x 11|9               // Grenade Efficiency
+
+!!add 3x 8|4|50|byte|+1     // Rapid Smashes
+!!add 3x 8|4|50|byte|+1     // Rapid Swords
 
 // Melting Upgrades
 !!add 8|4|71|bool|true
