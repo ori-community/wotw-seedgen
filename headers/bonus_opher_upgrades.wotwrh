@@ -4,6 +4,7 @@
 !!include rapid_smash_core
 
 1|74|11|3               // Spike Efficiency from OpherShop.Spike
+1|98|6|f=0|#Rapid Smash#
 1|98|8|4|50|byte|+1     // Rapid Smash from OpherShop.SpiritSmash
 1|106|11|4              // Star Efficiency from OpherShop.SpiritStar
 1|115|11|2              // Blaze Efficiency from OpherShop.Blaze
