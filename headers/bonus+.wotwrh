@@ -19,7 +19,7 @@
 !!add 2x 11|9               // Grenade Efficiency
 
 !!add 3x 8|4|50|byte|+1     // Rapid Smashes
-!!add 3x 8|4|50|byte|+1     // Rapid Swords
+!!add 3x 8|4|51|byte|+1     // Rapid Swords
 
 // Melting Upgrades
 !!add 8|4|71|bool|true

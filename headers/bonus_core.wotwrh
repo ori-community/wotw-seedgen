@@ -24,28 +24,6 @@
 9|0=199|16|4|0|10|0|16|6|1
 9|0=199|16|4|0|10|1|8|9|0|int|48
 
-// Update on subscription
-// skip-validate
-9|109|8|9|0|int|199
-// skip-validate
-9|111|8|9|0|int|199
-// skip-validate
-9|113|8|9|0|int|199
-// skip-validate
-9|115|8|9|0|int|199
-// skip-validate
-9|117|8|9|0|int|199
-// skip-validate
-9|119|8|9|0|int|199
-// skip-validate
-9|121|8|9|0|int|199
-// skip-validate
-9|123|8|9|0|int|199
-// skip-validate
-9|125|8|9|0|int|199
-// skip-validate
-9|127|8|9|0|int|199
-
 // Toggle All
 9|0=48|8|9|0|int|48|skip=1                              // sum up all status booleans to check if any are enabled
 9|0=48|8|9|0|int|+$(9|110)|skip=1
@@ -176,6 +154,28 @@
 9|125|4|17|9|7|0|8|9|7|int|9|skip=1
 // skip-validate
 9|127|4|17|9|7|0|8|9|7|int|10|skip=1
+
+// Update on subscription
+// skip-validate
+9|109|8|9|0|int|199
+// skip-validate
+9|111|8|9|0|int|199
+// skip-validate
+9|113|8|9|0|int|199
+// skip-validate
+9|115|8|9|0|int|199
+// skip-validate
+9|117|8|9|0|int|199
+// skip-validate
+9|119|8|9|0|int|199
+// skip-validate
+9|121|8|9|0|int|199
+// skip-validate
+9|123|8|9|0|int|199
+// skip-validate
+9|125|8|9|0|int|199
+// skip-validate
+9|127|8|9|0|int|199
 
 // Toggle
 3|6|8|9|0|int|50|skip=1                                 // split by current selection
