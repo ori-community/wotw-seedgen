@@ -1932,9 +1932,11 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
 
   quest EastHollow.ForestsVoice: free
-
   quest EastHollow.KwolokAmuletQuest:
     moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
+
+  state GladesTown.TuleySpawned:
+    moki: InnerWellspring.WaterEscape
 
   pickup EastHollow.RightKwolokEX:
     moki: Bash OR Launch
@@ -4004,6 +4006,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Launch
       Grapple, DoubleJump
       Grapple, Dash
+
   pickup InnerWellspring.EscapeRevisitEX:
     moki: InnerWellspring.WaterEscape
 
