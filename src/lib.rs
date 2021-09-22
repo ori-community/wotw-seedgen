@@ -200,7 +200,7 @@ where R: Rng + ?Sized
         header_block += &header;
     }
 
-    for header in context.dependencies {
+    for header in parsed {
         let name = header.file_stem().unwrap().to_string_lossy().to_string();
 
         if let Some(incompability) = context.excludes.get(&name) {
