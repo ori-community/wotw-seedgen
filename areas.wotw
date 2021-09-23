@@ -3791,10 +3791,11 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
       Grapple
       Bash, Grenade=1, Launch
     gorlek:
-      Bash, DoubleJump, TripleJump  # entertain the mantis
+      Bash, Grenade=1, DoubleJump, TripleJump
       SentryJump=1, DoubleJump, TripleJump  # solvable through wraparound if you don't sjump well
       Launch
     unsafe:
+      Bash, DoubleJump, TripleJump  # entertain the mantis
       Hammer, DoubleJump, TripleJump
       SentryJump=1
 
