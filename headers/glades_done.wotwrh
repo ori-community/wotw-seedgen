@@ -1,6 +1,7 @@
 /// Glades Done
 ///
 /// start with glades rebuilt and regrown
+!!include spawn_tuley
 
 // Block placements
 3|0|8|14019|44578|int|2     // GladesTown.RebuildTheGlades
@@ -12,7 +13,6 @@
 3|0|8|42178|47651|byte|3    // Lightcatcher
 3|0|8|42178|16254|byte|3    // Sela Flowers
 3|0|8|42178|40006|byte|3    // Last Seed
-3|0|8|937|34641|int|4       // Hi Tuley
 // Build Stuff
 3|0|8|42178|51230|byte|3    // Dwelling Repairs
 3|0|8|42178|23607|byte|3    // Roofs Over Heads

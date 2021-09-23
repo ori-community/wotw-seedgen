@@ -137,30 +137,33 @@ where
     let uber_state = node.uber_state().unwrap();
     let is_shop = uber_state.is_shop();
 
-    if is_shop {
-        let (_, _, price_uber_state) = SHOP_PRICES.iter()
-            .find(|(_, location, _)| &uber_state.identifier == location)
-            .ok_or_else(|| format!("({}): Uber State {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_player_name, node))?;
-
-        let mut price = item.shop_price();
-        if item.random_shop_price() {
-            let modified_price = f32::from(price) * context.price_range.sample(context.rng);
-            price = u16::try_from(modified_price as i32).map_err(|_| format!("({}): Overflowed shop price for {} after adding a random amount to it", origin_player_name, item))?;
-        }
-
-        let price_setter = UberState {
-            identifier: price_uber_state.clone(),
-            value: price.to_string(),
-        }.to_item(UberType::Int);
-
-        log::trace!("({}): Placing {} at Spawn as price for the item below", origin_player_name, price_setter);
-
+    if uber_state.is_purchasable() {
         origin_world_context.shop_slots -= 1;
-        origin_world_context.placements.push(Placement {
-            node: None,
-            uber_state: UberState::load(),
-            item: price_setter,
-        });
+
+        if is_shop {
+            let (_, _, price_uber_state) = SHOP_PRICES.iter()
+                .find(|(_, location, _)| &uber_state.identifier == location)
+                .ok_or_else(|| format!("({}): Uber State {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_player_name, node))?;
+
+            let mut price = item.shop_price();
+            if item.random_shop_price() {
+                let modified_price = f32::from(price) * context.price_range.sample(context.rng);
+                price = u16::try_from(modified_price as i32).map_err(|_| format!("({}): Overflowed shop price for {} after adding a random amount to it", origin_player_name, item))?;
+            }
+
+            let price_setter = UberState {
+                identifier: price_uber_state.clone(),
+                value: price.to_string(),
+            }.to_item(UberType::Int);
+
+            log::trace!("({}): Placing {} at Spawn as price for the item below", origin_player_name, price_setter);
+
+            origin_world_context.placements.push(Placement {
+                node: None,
+                uber_state: UberState::load(),
+                item: price_setter,
+            });
+        }
     }
 
     let code = item.code();
@@ -226,35 +229,37 @@ where
     R: Rng,
     I: Iterator<Item=usize>,
 {
-    let relic_locations = world_contexts.iter()
-        .map(|world_context| {
-            let mut world_relic_locations = world_context.world.graph.nodes.iter()
-                .filter_map(|node| {
-                    if let Some(zone) = node.zone() {
-                        if !world_context.world.preplacements.contains_key(node.uber_state().unwrap()) && RELIC_ZONES.contains(&zone) {
-                            return Some((zone, node));
-                        }
-                    }
-                    None
-                }).collect::<Vec<_>>();
-
-            world_relic_locations.shuffle(context.rng);
-
-            world_relic_locations
-        }).collect::<Vec<_>>();
-
+    let mut world_relic_locations = Vec::with_capacity(RELIC_ZONES.len());
     for zone in RELIC_ZONES {
-        for target_world_index in 0..context.world_count {
-            if context.rng.gen_bool(0.8) {
-                log::trace!("({}): Placing Relic in {}", world_contexts[target_world_index].player_name, zone);
+        world_relic_locations.push((zone, Vec::with_capacity(60)));
+    }
 
-                // let origin_world_index = context.rng.gen_range(0..context.world_count);
-                let origin_world_index = target_world_index;
+    for world_index in 0..context.world_count {
+        let world_context = &world_contexts[world_index];
 
-                if let Some(&(_, location)) = relic_locations[origin_world_index].iter().find(|(location_zone, _)| location_zone == zone) {
-                    place_item(origin_world_index, target_world_index, location, false, Item::Relic(*zone), world_contexts, context)?;
+        for node in &world_context.world.graph.nodes {
+            if let Some(zone) = node.zone() {
+                let uber_state = node.uber_state().unwrap();
+
+                if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(&relic_zone, _)| zone == relic_zone) {
+                    if !world_context.world.preplacements.contains_key(uber_state)
+                    && !world_context.placements.iter().any(|placement| &placement.uber_state == uber_state) {
+                        zone_relic_locations.push(node);
+                    }
                 }
             }
+        }
+
+        for (&zone, relic_locations) in &mut world_relic_locations {
+            if context.rng.gen_bool(0.8) {
+                log::trace!("({}): Placing Relic in {}", world_contexts[world_index].player_name, zone);
+
+                if let Some(&location) = relic_locations.choose(context.rng) {
+                    place_item(world_index, world_index, location, false, Item::Relic(zone), world_contexts, context)?;
+                }
+            }
+
+            relic_locations.clear();
         }
     }
 
@@ -345,7 +350,7 @@ where
     if matches!(item, Item::SpiritLight(_)) {
         let mut skipped_slots = Vec::new();
 
-        while node.1.uber_state().unwrap().is_shop() {
+        while node.1.uber_state().unwrap().is_purchasable() {
             skipped_slots.push((node.0, node.1));
 
             node = choose_node()?;
@@ -424,23 +429,23 @@ I: Iterator<Item=usize>,
     let weight = |inventory: &Inventory| -> Result<f32, String> {
         let mut newly_reached = 0;
 
-        // TODO what?
-        for world_index in 0..context.world_count {
-            let world_context = &world_contexts[world_index];
+        let target_world_context = &world_contexts[target_world_index];
 
-            let lookahead_player = Player {
-                inventory: world_context.world.player.inventory.merge(inventory),
-                ..world_context.world.player.clone()
-            };
-            let mut lookahead_reachable = world_context.world.graph.reached_locations(&lookahead_player, world_context.spawn, &world_context.world.uber_states)?;
-            lookahead_reachable.retain(|&node| node.can_place());
+        let lookahead_player = Player {
+            inventory: target_world_context.world.player.inventory.merge(inventory),
+            ..target_world_context.world.player.clone()
+        };
+        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(&lookahead_player, target_world_context.spawn, &target_world_context.world.uber_states)?;
+        lookahead_reachable.retain(|&node| node.can_place());
 
-            newly_reached += lookahead_reachable.len().saturating_sub(reach_context.reachable_counts[world_index]);
-            // Resource tracking can result in reaching less locations with an added teleporter, so prevent any overflows.
-            // This is very rare and usually means the granted teleporter doesn't actually lead anywhere new, so 0 newly reached is accurate enough.
-        }
+        newly_reached += lookahead_reachable.len().saturating_sub(reach_context.reachable_counts[target_world_index]);
+        // Resource tracking can result in reaching less locations with an added teleporter, so prevent any overflows.
+        // This is very rare and usually means the granted teleporter doesn't actually lead anywhere new, so 0 newly reached is accurate enough.
 
-        if slots < 4 && newly_reached == 0 {
+        lookahead_reachable.retain(|&node| node.uber_state().map_or(false, |reached| target_world_context.world.preplacements.keys().any(|preplaced| reached == preplaced)));
+        let preplaced_reached = lookahead_reachable.len();
+
+        if slots - inventory.item_count() < 3 && newly_reached <= preplaced_reached {
             return Ok(0.000001);
         }
 
@@ -479,7 +484,7 @@ where
         let mut amount_placed = 0;
 
         while &amount_placed < amount {
-            let stacked_amount = world_contexts[world_index].spirit_light_rng.sample(context.rng)?;
+            let stacked_amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
             amount_placed += stacked_amount;
             spirit_light_items.push(Item::SpiritLight(stacked_amount));
         }
@@ -628,10 +633,10 @@ where
 {
     let origin_world_context = &mut world_contexts[origin_world_index];
 
-    if node.uber_state().map_or(false, UberState::is_shop) || !origin_world_context.random_spirit_light.sample(context.rng) {
+    if node.uber_state().map_or(false, UberState::is_purchasable) || !origin_world_context.random_spirit_light.sample(context.rng) {
         let target_world_index = context.rng.gen_range(0..context.world_count);
 
-        if origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.items.len() {
+        if origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.item_count() {
             let target_world_context = &mut world_contexts[target_world_index];
 
             if let Some(item) = target_world_context.world.pool.choose_random(origin_world_index != target_world_index, context.rng) {
@@ -649,7 +654,7 @@ where
 
     let origin_world_context = &mut world_contexts[origin_world_index];
 
-    let amount = origin_world_context.spirit_light_rng.sample(context.rng)?;
+    let amount = origin_world_context.spirit_light_rng.sample(context.rng);
     let item = Item::SpiritLight(amount);
 
     origin_world_context.world.pool.remove(&item, 1);
@@ -733,7 +738,7 @@ impl SpiritLightAmounts {
             index: 0,
         }
     }
-    fn sample<R>(&mut self, rng: &mut R) -> Result<u16, String>
+    fn sample<R>(&mut self, rng: &mut R) -> u16
     where
         R: Rng + ?Sized
     {
@@ -742,7 +747,7 @@ impl SpiritLightAmounts {
         self.index += 1;
 
         #[allow(clippy::cast_possible_truncation)]
-        u16::try_from(amount as i32).map_err(|_| format!("Tried to place {} Spirit Light which is more than one item can hold", amount))
+        u16::try_from(amount as i32).unwrap_or(u16::MAX)
     }
 }
 
@@ -757,7 +762,7 @@ where
         let world_context = &mut world_contexts[world_index];
 
         world_context.placeholders.retain(|&node| {
-            if node.uber_state().unwrap().is_shop() {
+            if node.uber_state().unwrap().is_purchasable() {
                 shop_placeholders[world_index].push(node);
                 false
             } else { true }
@@ -820,7 +825,7 @@ where
         log::trace!("({}): Placed all items from the pool, placing Spirit Light", world_contexts[world_index].player_name);
 
         while let Some(placeholder) = world_contexts[world_index].placeholders.pop() {
-            let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng)?;
+            let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
             let item = Item::SpiritLight(amount);
 
             place_item(world_index, world_index, placeholder, true, item, world_contexts, context)?;
@@ -830,10 +835,10 @@ where
             log::trace!("({}): Filling unreachable locations", world_contexts[world_index].player_name);
         }
         while let Some(unreachable) = world_contexts[world_index].unreachable_locations.pop() {
-            let item = if unreachable.uber_state().map_or(false, UberState::is_shop) {
+            let item = if unreachable.uber_state().map_or(false, UberState::is_purchasable) {
                 Item::Resource(Resource::Ore)
             } else {
-                let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng)?;
+                let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
                 Item::SpiritLight(amount)
             };
 
@@ -991,14 +996,18 @@ where
                 !world.preplacements.contains_key(node.uber_state().unwrap())
             })
             .count() - 1;  // 1 will be 1xp
-        let mut spirit_light_slots = world_slots - world.pool.inventory.item_count();
+        let mut spirit_light_slots = world_slots.saturating_sub(world.pool.inventory.item_count());
         if world_tour { spirit_light_slots -= 10; }
         log::trace!("({}): Estimated {}/{} slots for Spirit Light", player_name, spirit_light_slots, world_slots);
 
         let spirit_light_rng = SpiritLightAmounts::new(f32::from(world.pool.spirit_light), spirit_light_slots as f32, 0.75, 1.25);
         let random_spirit_light = Bernoulli::new(spirit_light_slots as f64 / world_slots as f64).unwrap();
 
-        let shop_slots = world.graph.nodes.iter().filter(|&node| node.uber_state().map_or(false, UberState::is_shop)).count();
+        let shop_slots = world.graph.nodes.iter().filter(|&node|
+            node.uber_state().map_or(false, |uber_state|
+                uber_state.is_purchasable()
+                && !world.preplacements.contains_key(uber_state)
+        )).count();
 
         Ok(WorldContext {
             world,
@@ -1029,11 +1038,11 @@ where
     };
 
     one_xp(&mut world_contexts, &mut context)?;
-    spawn_progressions(&mut world_contexts, &mut context)?;
-
     if world_tour {
         place_relics(&mut world_contexts, &mut context)?;
     }
+
+    spawn_progressions(&mut world_contexts, &mut context)?;
 
     let mut reserved_slots = Vec::with_capacity(RESERVE_SLOTS);
 

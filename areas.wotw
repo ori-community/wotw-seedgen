@@ -2112,9 +2112,11 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
 
   quest EastHollow.ForestsVoice: free
-
   quest EastHollow.KwolokAmuletQuest:
     moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
+
+  state GladesTown.TuleySpawned:
+    moki: InnerWellspring.WaterEscape
 
   pickup EastHollow.RightKwolokEX:
     moki: Bash OR Launch
@@ -3972,10 +3974,11 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
       Grapple
       Bash, Grenade=1, Launch
     gorlek:
-      Bash, DoubleJump, TripleJump  # entertain the mantis
+      Bash, Grenade=1, DoubleJump, TripleJump
       SentryJump=1, DoubleJump, TripleJump  # solvable through wraparound if you don't sjump well
       Launch
     unsafe:
+      Bash, DoubleJump, TripleJump  # entertain the mantis
       Hammer, DoubleJump, TripleJump
       SentryJump=1
 
@@ -4187,6 +4190,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Launch
       Grapple, DoubleJump
       Grapple, Dash
+
   pickup InnerWellspring.EscapeRevisitEX:
     moki: InnerWellspring.WaterEscape
 
