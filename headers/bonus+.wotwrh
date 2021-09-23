@@ -48,3 +48,7 @@
 !!add 2x 8|4|10|float|-0.4
 !!name 8|4|10|float|-0.4 Quickshot Upgrade
 4|10|6|#Quickshot Upgrade#
+// Spear Upgrade
+!!add 2x 8|4|11|float|-0.4
+!!name 8|4|11|float|-0.4 Rapid Spear
+4|11|6|#Rapid Spear#
