@@ -600,9 +600,11 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
     gorlek:
       Bash, Grenade=1 OR Damage=10    # Bash off the enemy to get to the vine, then jump right. Dboost the last gap
       SentryJump=1                    # SentryJump to get over the initial jump, then jump right, use sword or hammer to get over last gap
+    kii:
+      Bash, Glide OR Grenade=1 OR Sword OR Hammer OR Damage=10
+      Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1 # use the abillity to get on the wall to the right and use shuriken to get onto the vine
+      Sword, Sentry=1 OR Hammer OR Flash=1, Spear=1 # pogo off the enemy
     unsafe:
-      Bash, Sword OR Hammer           # Bash off the enemy to get to the vine, then jump right. Sword/hammer upslash to cross the last gap
-      Bash, Glide                     # Bash off the enemy to get to the vine, then jump right. Glide/Bash+Grenade over the last gap
       Grenade=1, Damage=10            # Grenade jump to get to the vine, then jump right. Dboost the last gap.
       Grenade=2                       # Grenade jump to get to the vine, then jump right. Grenade jump the last gap.
       Sword                           # With upslash on the right wall, jump off it close to the ceiling and slash sword
@@ -625,7 +627,6 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
       Bash, Grenade=1, Sword OR Hammer               # As above, but sword/hammer upslash to cross the last gap
       Grenade=2, DoubleJump            # Grenade jump to get to the vine, then jump right. Dboost the last gap. Grenade jump to EC.
       Dash, Sword, Regenerate OR Blaze  # wavedash
-      DoubleJump, Hammer              # HammerJump
   pickup MarshSpawn.RecklessShard:
     moki, MarshSpawn.HowlBurnt, BreakWall=10:
       DoubleJump OR Launch
@@ -633,13 +634,11 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
     gorlek, MarshSpawn.HowlBurnt, BreakWall=10:
       SentryJump=1
       Dash
+    kii, MarshSpawn.HowlBurnt, BreakWall=10:
+      Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1
     unsafe, MarshSpawn.HowlBurnt, BreakWall=10:
       Bash                            # Long distance lure
-      Spear=1                         # Uses small hitrise from spear to make the jump
-      Sentry=1                        # As above but uses sentry
       Grenade=1                       # Grenade jump to get over initial gap
-      Sword                           # Validator moved from Gorlek to unsafe due to precision
-      Hammer                          # Validator moved from Gorlek to unsafe due to precision
   pickup HowlsDen.UpperEX:
     moki: MarshSpawn.HowlBurnt
 
@@ -652,13 +651,16 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
     gorlek, MarshSpawn.HowlBurnt:
       SentryJump=2
       Dash, Bash                      # Dash for first jump, bash off fronkey for second
+    kii:
+      Hammer # upslash -> upslash
+      Sword # upslash for the first gap, then pogo off the mantis for the second gap
+      Spear=1, Dash # use spear to get close to the ledge and use little hop to dash on the platform
+      Bash, Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1 #hop to the first ledge and then bash the mantis
     unsafe, MarshSpawn.HowlBurnt:
+      Sword, Shuriken=1 #downslash on a shuriken 
       Bash                            # Long distance lure for the first jump, simple lure for second
-      Dash, Sword OR Hammer           # Dash then upslash to gain the extra height needed on second jump
-      Dash, Spear=1                   # Uses the small hitrise from spear to make the second jump
       Dash, Sentry=1                  # As above but uses sentry
       Grenade=2                       # Grenade jump to get over both gaps
-      Hammer
 
 # checkpoint at -298, -4388
 
@@ -670,8 +672,8 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
     gorlek:
       DoubleJump, TripleJump
       Bash, Grenade=1
-    unsafe:
-      Bash  # use the slime
+    kii:
+      Bash
 
   conn HowlsDen.UpperLoopEntrance: free
   conn HowlsDen.Entrance:
@@ -679,6 +681,8 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
     gorlek, MarshSpawn.HowlBurnt:
       DoubleJump, TripleJump
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword
+    kii, MarshSpawn.HowlBurnt:
+      Bash, Hammer OR DoubleJump OR Dash OR Sword OR Glide OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
     unsafe, MarshSpawn.HowlBurnt:
       Bash, DoubleJump OR Dash OR Glide OR Sword  # use the slime
       Bash  # use the slime, tight coyote jump
@@ -704,6 +708,8 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
     gorlek:
       Launch
       DoubleJump, TripleJump
+    kii:
+      DoubleJump, Hammer # kinda pointless with hammer but a path is a path
   conn HowlsDen.UpperLoopExit:
     moki:
       BreakWall=16, BreakWall=16, Combat=Slug, DoubleJump OR Dash
@@ -712,7 +718,10 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
       BreakWall=16, BreakWall=16, DoubleJump OR Dash
       BreakWall=16, BreakWall=16, Glide, Combat=Slug OR Bash
       BreakWall=16, BreakWall=16, Sword OR HammerSJump=1
-      BreakWall=16, BreakWall=16, WaterDash
+      BreakWall=16, BreakWall=16, WaterDash, Water  # @Validator added water
+    kii:
+      BreakWall=16, BreakWall=16, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
+      BreakWall=16, BreakWall=16, WaterDash, Damage=10
 
 anchor HowlsDen.UpperLoopExit at -407, -4434:  # Checkpoint inside the bone door where you exit the loop with right hc (you can walk out)
   refill Checkpoint
@@ -720,11 +729,13 @@ anchor HowlsDen.UpperLoopExit at -407, -4434:  # Checkpoint inside the bone door
   pickup HowlsDen.UpperEX:
     moki: DoubleJump OR Dash
     gorlek: Glide OR Sword
+    kii: Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
     unsafe: free
 
   conn HowlsDen.Entrance:
     moki: MarshSpawn.HowlBurnt, DoubleJump OR Dash
     gorlek: MarshSpawn.HowlBurnt, Glide OR Sword
+    kii: MarshSpawn.HowlBurnt, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Hammer
     unsafe: MarshSpawn.HowlBurnt  # tight jumps
 
   conn HowlsDen.AboveBoneBridge: free
@@ -748,14 +759,14 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Dash
       Bash, Damage=10  # Bash off the fronkey or slime to get to the unstable platform wall jump for the other two jumps
       SentryJump=1  # SentryJump onto the unstable platform, hammer/sword stall to left wall, wall jump to pickup
+    kii:
+      Sword OR Hammer OR Bash OR Sentry=3 OR Shuriken=3
     unsafe:
       Grenade=2  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
-      Sword OR Hammer  # Upslash to reach the left wall, air combo to reach the floating platform, upslash again to the left wall, wjump from thereto the pickup
-      Bash  # Bash on the left wall above the spikes
   pickup HowlsDen.SwordTree: free
   pickup HowlsDen.MagnetShard:
     moki: BreakWall=10, BreakWall=16 OR Launch
-    unsafe: BreakWall=10, DoubleJump, TripleJump
+    kii: BreakWall=10, DoubleJump, TripleJump
   pickup HowlsDen.AboveTPEX:
     moki: HowlsDen.BoneBarrier, BreakWall=10
 
@@ -766,7 +777,10 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     unsafe: DoubleJump, Sword  # Door skip
   conn HowlsDen.SecretRoom:
     moki: HowlsDen.KeystoneDoor, BreakWall=20, Water OR DoubleJump OR Dash OR Glide OR Launch
-    gorlek: HowlsDen.KeystoneDoor, Sword OR Hammer  # weapon breaks the wall
+    gorlek, HowlsDen.KeystoneDoor:
+      Sword OR Hammer  # weapon breaks the wall
+      BreakWall=20, Damage=10  # @Validator added this path
+    kii: HowlsDen.KeystoneDoor, BreakWall=20, Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Spear=1 
   conn HowlsDen.AboveBoneBridge:
     moki, HowlsDen.KeystoneDoor:
       BreakWall=16, DoubleJump, Combat=2xSlug OR Bash
@@ -784,7 +798,10 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       HammerSJump=1, Glide  # weapon breaks the wall
       SentryJump=3, Hammer, Damage=10  # hammer breaks the wall
       Water, WaterDash, HammerSJump=2, Damage=10  # hammer breaks the wall
-    unsafe, HowlsDen.KeystoneDoor, Sword OR Hammer
+    kii, HowlsDen.KeystoneDoor:
+      Sword OR Hammer
+      BreakWall=16, Damage=10, Shuriken=5 OR Sentry=5 OR Flash=5 # one jump is kinda hard
+      BreakWall=16, Sentry=6 # two sentries in the air to avoid the spikes
   conn HowlsDen.Teleporter:
     moki: HowlsDen.BoneBarrier
 
@@ -800,8 +817,10 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
       DoubleJump OR Dash
       Glide, Combat=SneezeSlug OR Bash  # hold glide before jumping from the moss
       Sword, Damage=10  # just safety damage
+    kii:
+      Sword OR Hammer OR Sentry=4 OR Flash=4 OR Shuriken=4
+      Spear=4, Damage=10
     unsafe:
-      Sword OR Hammer
       Grenade=1, Damage=50  # 30dmg get to slime, 10dmg set-up grenade jump, 10mg close gap to HC
   # could add backwards connections someday
 
@@ -824,20 +843,21 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       DoubleJump OR Launch
       Bash  # bash the slime
     gorlek: BreakWall=10, SentryJump=1
+    kii, BreakWall=10:
+      Sword OR Dash OR Hammer # pogo on the slime for sword, upslash for hammer
+      Spear=1, Glide 
     unsafe, BreakWall=10:
-      Dash
       Grenade=1              # Grenade jump to platform
-      Hammer                 # Very precise hammer upslash
-      Sword
   pickup HowlsDen.LaserKS:
     moki:
       DoubleJump OR Dash OR Launch
       Bash, Grenade=1
     gorlek:
       SentryJump=1
+    kii:
+      Sword OR Hammer OR Bash OR Shuriken=1
+      Glide, Sentry=1 OR Flash=1 OR Spear=1
     unsafe:
-      Sword OR Hammer         # Can reach lever with air combos
-      Bash                    # Luring or bashing the slime near the lever then bashing to the lever
       Grenade=1               # Grenade jump to platform
   # if someone manages to lower the platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
   pickup HowlsDen.DoubleJumpEX:
@@ -848,12 +868,13 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     moki: Hammer OR Spear=1
   conn HowlsDen.DoubleJumpTreeArea:
     moki: Combat=Mantis+Lizard OR DoubleJump OR Dash OR Glide OR Launch
+    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
   conn HowlsDen.BoneBridge:
     moki, HowlsDen.BoneBarrier:
       DoubleJump OR Launch
       Bash, Grenade=1
     gorlek: HowlsDen.BoneBarrier, Bash OR SentryJump=1
-    unsafe: HowlsDen.BoneBarrier, Sword OR Hammer
+    kii: HowlsDen.BoneBarrier, Sword OR Hammer
 
 anchor DenShrine at -328, -4569:
   refill Full
@@ -880,6 +901,8 @@ anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
       Launch
     gorlek:
       SentryJump=1                    # Sword combo from sticky shard to get over the initial gap
+    kii:
+      Dash, DoubleJump, TripleJump # hugging the ceiling from the sticky shard platform
     unsafe:
       DoubleJump, TripleJump          # Triple jump from the right wall
       Grenade=2
@@ -893,10 +916,9 @@ anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
       Launch
     gorlek:
       SentryJump=1                    # Sword combo from sticky shard to get over the initial gap
+    kii:
+      Sword OR Hammer OR Dash OR Glide OR Sentry=2 OR Shuriken=1 
     unsafe:
-      Sword OR Hammer                 # combo from sticky shard to get over the initial gap
-      Dash                            # As above but use Dash
-      Glide                           # As above but use Glide
       Grenade=1                       # Grenade jump to get over initial gap
 
   conn MidnightBurrows.DenConnection:
