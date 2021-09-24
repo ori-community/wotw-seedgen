@@ -1917,7 +1917,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
       
   conn Teleporters: free
   conn BeetleFight: free
-  conn EastHollow.AboveBash:  # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
+  conn EastHollow.AfterBeetleFight:  # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
     moki: EastHollow.BeetleDefeated, DoubleJump OR Bash OR Launch
     gorlek:
       EastHollow.BeetleDefeated OR Launch
@@ -1997,7 +1997,7 @@ anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
     moki: GladesTown.GromsWall
   conn EastHollow.MapMoki: free
 
-anchor EastHollow.AboveBash at -28, -4233:  # At the breakable floor to Bash tree
+anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to Bash tree
   refill Checkpoint
 
   state EastHollow.DepthsLever:
@@ -2059,48 +2059,7 @@ anchor EastHollow.AboveBash at -28, -4233:  # At the breakable floor to Bash tre
       SentryJump=4
       # SentryJump=3, DoubleJump
       # Grapple, Dash, DoubleJump, TripleJump
-  pickup EastHollow.BashEC:
-    moki:
-      Bash, DoubleJump, Dash
-      Bash, Grenade=1
-      Launch
-    gorlek:
-      Bash, DoubleJump
-      DoubleJump, TripleJump, Dash
-      SwordSJump=1
-      HammerSJump=1, DoubleJump OR Dash OR Glide OR Bash
-    kii:
-      Bash, Dash
-      DoubleJump, TripleJump OR Hammer OR Spear=1
-      DoubleJump, Dash, Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      HammerSJump=1
-      DoubleJump, Dash
-      Bash
-      # Bash, Dash OR Glide
-  pickup EastHollow.BashTree:
-    moki:
-      Combat=2xSneezeSlug, DoubleJump OR Dash
-      Bash, DoubleJump OR Dash  # just Bash is treacherous
-      Glide OR Launch
-    gorlek: DoubleJump OR Dash OR Bash OR Damage=10
-    kii: free
-  pickup EastHollow.BashEX:
-    moki:
-      DoubleJump, Bash
-      Launch
-    gorlek:
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-      SentryJump=1, DoubleJump, TripleJump
-    kii:
-      Bash, Grenade=1 OR Sword OR Hammer OR Flash=2 OR Sentry=2
-      Bash, Glide OR Dash:
-        Flash=1 OR Sentry=1
-      DoubleJump, TripleJump
-    unsafe:
-      SentryJump=1, DoubleJump OR Dash
-      DoubleJump, Dash OR Hammer
-
+  
   conn BeetleFight: free
   conn EastHollow.Teleporter:  # so far this seemed to cover all paths going towards glades
     moki, EastHollow.BeetleDefeated:
@@ -2126,13 +2085,6 @@ anchor EastHollow.AboveBash at -28, -4233:  # At the breakable floor to Bash tre
       DoubleJump, TripleJump
       DoubleJump, Sword  # sword jumps
       # DoubleJump, Sword, Shuriken=1
-  conn EastHollow.AboveDepths:
-    moki, EastHollow.DepthsLever:
-      Combat=2xSneezeSlug, DoubleJump OR Dash
-      Bash, DoubleJump OR Dash  # just Bash is treacherous
-      Glide OR Launch
-    gorlek: EastHollow.DepthsLever, DoubleJump OR Dash OR Bash OR Sword OR Hammer OR Damage=10
-    kii: EastHollow.DepthsLever
   conn EastHollow.Kwolok:
     moki:
       Bash, DoubleJump OR Dash OR Glide OR Launch
@@ -2153,6 +2105,83 @@ anchor EastHollow.AboveBash at -28, -4233:  # At the breakable floor to Bash tre
 
 # checkpoint at 21, -4220
 
+anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floot after the beetle arena
+  pickup EastHollow.BashEC:
+    moki:
+      Bash, DoubleJump, Dash
+      Bash, Grenade=1
+      Launch
+    gorlek:
+      Bash, DoubleJump
+      DoubleJump, TripleJump, Dash
+      SwordSJump=1
+      HammerSJump=1, DoubleJump OR Dash OR Glide OR Bash
+    kii:
+      Bash, Dash
+      DoubleJump, TripleJump OR Hammer OR Spear=1
+      DoubleJump, Dash, Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      HammerSJump=1
+      DoubleJump, Dash
+      Bash
+      # Bash, Dash OR Glide
+      
+  conn EastHollow.BashTreeCheckpoint:
+    moki:
+      Combat=2xSneezeSlug, DoubleJump OR Dash
+      Bash, DoubleJump OR Dash  # just Bash is treacherous
+      Glide OR Launch
+    gorlek: DoubleJump OR Dash OR Bash OR Damage=10
+    kii: free
+  conn EastHollow.AboveDepths:
+    moki, EastHollow.DepthsLever:
+      Combat=2xSneezeSlug, DoubleJump OR Dash
+      Bash, DoubleJump OR Dash  # just Bash is treacherous
+      Glide OR Launch
+    gorlek: EastHollow.DepthsLever, DoubleJump OR Dash OR Bash OR Sword OR Hammer OR Damage=10
+    kii: EastHollow.DepthsLever
+  conn EastHollow.AfterBeetleFight: # Mortar break the ceiling for you
+  # If you don't collect bash's tree, the camera is stuck. These paths ignore this issue.
+    moki: Launch OR Bash
+    gorlek:
+      SentryJump=1
+      DoubleJump, TripleJump
+    kii: DoubleJump
+    
+anchor EastHollow.BashTreeCheckpoint at -7,-327:  # Checkpoint at Bash tree
+  refill Checkpoint
+  
+  pickup EastHollow.BashTree: free
+  pickup EastHollow.BashEX:
+    moki:
+      DoubleJump, Bash
+      Launch
+    gorlek:
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      SentryJump=1, DoubleJump, TripleJump
+    kii:
+      Bash, Grenade=1 OR Sword OR Hammer OR Flash=2 OR Sentry=2
+      Bash, Glide, Flash=1 OR Sentry=1
+      Bash, Dash, Flash=1 OR Sentry=1
+      DoubleJump, TripleJump
+    unsafe:
+      SentryJump=1, DoubleJump OR Dash
+      DoubleJump, Dash OR Hammer
+  
+  conn EastHollow.AboveBash:
+    moki:
+      Launch, Bash OR Hammer OR Spear=1
+      Bash, Dash OR DoubleJump OR Glide
+    gorlek:
+      Launch  # The mortar will break the ceiling for you
+      Bash, Sword
+      Bash, Grenade=1, Damage=10  # Bash the slug to reach the first lantern, dboost in the spikes, grenade bash from the ledge
+    kii:
+      Bash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      Bash, Grenade=1  # Make the slug near the door shoot at you. Bash the projectile to reach your grenade
+    unsafe:
+      Bash  # Bash the lantern next to the door and bait the slug to shoot at you so you can bash its projectile
+  
 anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
 
@@ -2193,7 +2222,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
     kii: DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
     unsafe: Dash
 
-  conn EastHollow.AboveBash:
+  conn EastHollow.AfterBeetleFight:
     moki:  # since the ability bottleneck is right at the start, most paths to the pickups on the way are covered in this connection
       Bash, DoubleJump OR Dash OR Glide
       DoubleJump, Dash OR Glide
@@ -2260,6 +2289,7 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
     gorlek:
       SentryJump=2, DoubleJump, TripleJump
       SentryJump=3
+    kii: DoubleJump, TripleJump, Hammer, Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, TripleJump, Hammer  # Hammer upswing to gain mor hight
   pickup EastHollow.SplinterShard: free
@@ -2269,22 +2299,24 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
       Bash, Grenade=1, Launch
       SentryJump=1, Launch
       Launch, DoubleJump OR Dash  # Jump to the left wall and then go to right or you can go from the ledge next to the entry if you have DoubleJump
-    unsafe:
+      Bash, Grenade=1, DoubleJump, TripleJump
+    kii:
       Launch
+      Bash, Grenade=1, DoubleJump  # Bait the mantis
+    unsafe:
+      Glide, DoubleJump, TripleJump
+      Bash, Grenade=1  # Bait the mantis
+
   conn UpperDepths.Entry:
     moki: EastHollow.DepthsOpen
-  conn EastHollow.AboveBash:  # If you don't collect bash's tree, the camera is stuck. These paths ignore this issue.
-    moki, EastHollow.DepthsLever:
-      Launch, Bash OR Hammer OR Spear=1
-      Bash, Dash OR DoubleJump OR Glide
+  conn EastHollow.BashTreeCheckpoint:
+    moki, EastHollow.DepthsOpen: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
+    gorlek, EastHollow.DepthsOpen: Damage=5
+    kii: EastHollow.DepthsOpen
+  conn EastHollow.AboveBash:  # Make sure it's not redundant with paths from EastHollow.BashTreeCheckpoint
     gorlek, EastHollow.DepthsLever:
-      Launch  # The mortar will break the ceiling for you
       SwordSJump=5, Dash OR Glide  # The mortar will break the ceiling for you
       SwordSJump=4, DoubleJump  # The mortar will break the ceiling for you
-      Bash, Sword
-      Bash, Grenade=1, Damage=10  # Bash the slug to reach the first lantern, dboost in the spikes, grenade bash from the ledge
-    unsafe, EastHollow.DepthsLever:
-      Bash  # Bash the lantern next to the door and bait the slug to shoot at you so you can bash its projectile
 
 anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   refill Full
