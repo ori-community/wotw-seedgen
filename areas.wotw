@@ -2083,6 +2083,7 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
       # Grapple, Dash, DoubleJump, TripleJump
   
   conn BeetleFight: free
+  conn EastHollow.AboveBash: free
   conn EastHollow.Teleporter:  # so far this seemed to cover all paths going towards glades
     moki, EastHollow.BeetleDefeated:
       DoubleJump, Dash
