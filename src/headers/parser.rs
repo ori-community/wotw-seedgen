@@ -597,7 +597,7 @@ where P: Iterator<Item=&'a str>
     let icon_id = icon_parts.next().ok_or_else(|| String::from("invalid wheel icon syntax"))?;
     let icon_id: u16 = icon_id.parse().map_err(|_| String::from("invalid wheel icon id"))?;
     let icon = match icon_type {
-        "spirit_shard" => Icon::Shard(icon_id),
+        "shard" => Icon::Shard(icon_id),
         "spell" => Icon::Spell(icon_id),
         _ => return Err(String::from("invalid wheel icon type")),
     };
@@ -1427,27 +1427,8 @@ pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &Settings) 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::*;
 
     use util::*;
-    use inventory::Inventory;
-
-    #[test]
-    fn header_parsing() {
-        let graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &Settings::default(), false).unwrap();
-        let mut world = World::new(&graph);
-        let header = util::read_file(&PathBuf::from("bonus_items.wotwrh"), "headers").unwrap();
-        let mut context = HeaderContext::default();
-        parse_header(&PathBuf::from("test header"), &header, &mut world, &mut context, &HashMap::default(), &mut rand::thread_rng()).unwrap();
-        let mut expected = Inventory::default();
-        expected.grant(Item::BonusItem(BonusItem::ExtraDoubleJump), 1);
-        expected.grant(Item::BonusItem(BonusItem::ExtraAirDash), 1);
-        expected.grant(Item::BonusItem(BonusItem::EnergyRegen), 3);
-        expected.grant(Item::BonusItem(BonusItem::HealthRegen), 3);
-        assert_eq!(world.pool.inventory, expected);
-        assert!(world.preplacements.contains_key(&UberState::from_parts("1", "106").unwrap()));
-        assert!(!world.preplacements.contains_key(&UberState::from_parts("1", "105").unwrap()));
-    }
 
     #[test]
     fn pickup_parsing() {

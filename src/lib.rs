@@ -374,3 +374,53 @@ pub fn generate_seed(graph: &Graph, settings: Settings, headers: &[String], seed
 
     Ok((seeds, spoilers))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn some_seeds() {
+        let mut settings = Settings::default();
+        let mut graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+
+        generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
+
+        settings.hard = true;
+        generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
+
+        settings.hard = false;
+        settings.difficulty = Difficulty::Unsafe;
+        graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
+
+        settings.difficulty = Difficulty::Gorlek;
+        graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        settings.presets = vec![PathBuf::from("gorlek")];
+        generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
+
+        settings.presets.push(PathBuf::from("rspawn"));
+        settings.header_list = vec![
+            PathBuf::from("3_line_bingo"),
+            PathBuf::from("bonus+"),
+            PathBuf::from("glades_done"),
+            PathBuf::from("launch_fragments"),
+            PathBuf::from("launch_from_bingo"),
+            PathBuf::from("no_combat"),
+            PathBuf::from("no_ks_doors"),
+            PathBuf::from("no_quests"),
+            PathBuf::from("no_willow_hearts"),
+            PathBuf::from("open_mode"),
+            PathBuf::from("spawn_with_sword"),
+            PathBuf::from("util_twillen"),
+            PathBuf::from("vanilla_opher_upgrades"),
+            PathBuf::from("bonus_opher_upgrades"),
+        ];
+        generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
+
+        settings = Settings::default();
+        graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        settings.worlds = 5;
+        generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
+    }
+}

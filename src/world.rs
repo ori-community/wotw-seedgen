@@ -157,10 +157,14 @@ mod tests {
 
     #[test]
     fn reach_check() {
-        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &Settings::default(), false).unwrap();
+        let mut settings = Settings::default();
+        settings.difficulty = Difficulty::Gorlek;
+
+        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
         let mut world = World::new(graph);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
+        world.player.apply_settings(&settings);
 
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
         let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).unwrap();

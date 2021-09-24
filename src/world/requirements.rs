@@ -546,7 +546,7 @@ mod tests {
         player.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
         player.difficulty = Difficulty::Moki;
-        player.inventory.grant(Item::Resource(Resource::Energy), 2);
+        player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
 
         player = Player::default();

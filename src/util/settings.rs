@@ -342,7 +342,7 @@ mod tests {
         let mut rng = rand::thread_rng();
         let mut slugs = FxHashSet::default();
 
-        for _ in 0..10000 {
+        for _ in 0..1000 {
             let mut settings = Settings::default();
 
             let goalmodes = vec![GoalMode::Wisps,GoalMode::Trees,GoalMode::Quests,GoalMode::Relics];
