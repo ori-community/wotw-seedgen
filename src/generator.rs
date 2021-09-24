@@ -18,7 +18,7 @@ use crate::world::{
 use crate::inventory::{Inventory, Item};
 use crate::util::{
     self,
-    Resource, Skill, Teleporter, GoalMode,
+    Resource, Skill, Teleporter, GoalMode, ShopCommand,
     settings::Settings,
     uberstate::{UberState, UberType},
     constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
@@ -163,6 +163,19 @@ where
                 uber_state: UberState::load(),
                 item: price_setter,
             });
+
+            if let Some(icon) = item.icon() {
+                let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
+                    uber_state: uber_state.clone(),
+                    icon,
+                });
+
+                origin_world_context.placements.push(Placement {
+                    node: None,
+                    uber_state: UberState::load(),
+                    item: icon_setter,
+                });
+            }
         }
     }
 

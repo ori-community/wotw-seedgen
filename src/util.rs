@@ -165,6 +165,34 @@ impl Skill {
         }
     }
 
+    pub fn icon(self) -> Option<Icon> {
+        match self {
+            Skill::Bash => Some(Icon::Spell(3000)),
+            Skill::WallJump => None,
+            Skill::DoubleJump => Some(Icon::Spell(4001)),
+            Skill::Launch => Some(Icon::Spell(2019)),
+            Skill::Glide => Some(Icon::Spell(4002)),
+            Skill::WaterBreath => None,
+            Skill::Grenade => Some(Icon::Spell(2010)),
+            Skill::Grapple => Some(Icon::Spell(3001)),
+            Skill::Flash => Some(Icon::Spell(2004)),
+            Skill::Spear => Some(Icon::Spell(2012)),
+            Skill::Regenerate => Some(Icon::Spell(2013)),
+            Skill::Bow => Some(Icon::Spell(1001)),
+            Skill::Hammer => Some(Icon::Spell(1000)),
+            Skill::Sword => Some(Icon::Spell(1002)),
+            Skill::Burrow => Some(Icon::Spell(3002)),
+            Skill::Dash => Some(Icon::Spell(4000)),
+            Skill::WaterDash => Some(Icon::Spell(4004)),
+            Skill::Shuriken => Some(Icon::Spell(2015)),
+            Skill::Seir => Some(Icon::Spell(2018)),
+            Skill::Blaze => Some(Icon::Spell(2016)),
+            Skill::Sentry => Some(Icon::Spell(2011)),
+            Skill::Flap => Some(Icon::Spell(3005)),
+            Skill::AncestralLight => Some(Icon::Spell(4008)),
+        }
+    }
+
     pub fn energy_cost(self) -> f32 {
         match self {
             Skill::Bow => 0.25,
@@ -352,6 +380,10 @@ impl Shard {
             Shard::Fracture => 46,
             Shard::Arcing => 47,
         }
+    }
+
+    pub fn icon(self) -> Option<Icon> {
+        Some(Icon::Shard(self.to_id()))
     }
 }
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -760,7 +792,7 @@ impl fmt::Display for SysMessage {
 pub enum WheelCommand {
     SetName { wheel: u16, position: u8, name: String },
     SetDescription { wheel: u16, position: u8, description: String },
-    SetIcon { wheel: u16, position: u8, icon: WheelIcon },
+    SetIcon { wheel: u16, position: u8, icon: Icon },
     SetColor { wheel: u16, position: u8, r: u8, g: u8, b: u8, a: u8 },
     SetPickup { wheel: u16, position: u8, bind: WheelBind, pickup: Box<Item> },
     SetSticky { wheel: u16, sticky: bool },
@@ -785,15 +817,15 @@ impl fmt::Display for WheelCommand {
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum WheelIcon {
+pub enum Icon {
     Shard(u16),
     Spell(u16),
 }
-impl fmt::Display for WheelIcon {
+impl fmt::Display for Icon {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            WheelIcon::Shard(id) => write!(f, "spirit_shard:{}", id),
-            WheelIcon::Spell(id) => write!(f, "spell:{}", id),
+            Icon::Shard(id) => write!(f, "shard:{}", id),
+            Icon::Spell(id) => write!(f, "spell:{}", id),
         }
     }
 }
@@ -811,6 +843,18 @@ impl fmt::Display for WheelBind {
             WheelBind::Ability1 => write!(f, "1"),
             WheelBind::Ability2 => write!(f, "2"),
             WheelBind::Ability3 => write!(f, "3"),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+pub enum ShopCommand {
+    SetIcon { uber_state: UberState, icon: Icon }
+}
+impl fmt::Display for ShopCommand {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ShopCommand::SetIcon { uber_state, icon } => write!(f, "0|{}|{}", uber_state, icon),
         }
     }
 }

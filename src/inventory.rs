@@ -4,7 +4,7 @@ use rustc_hash::FxHashMap;
 
 use crate::headers;
 use crate::util::{
-    Difficulty, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Zone, Command, SysMessage, WheelCommand,
+    Difficulty, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Zone, Command, SysMessage, WheelCommand, ShopCommand, Icon,
     uberstate::{UberIdentifier, UberType},
 };
 
@@ -32,6 +32,7 @@ pub enum Item {
     Relic(Zone),
     SysMessage(SysMessage),
     WheelCommand(WheelCommand),
+    ShopCommand(ShopCommand),
 }
 impl fmt::Display for Item {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -88,7 +89,8 @@ impl fmt::Display for Item {
             },
             Item::Relic(zone) => write!(f, "{} Relic", zone),
             Item::SysMessage(message) => write!(f, "{}", message),
-            Item::WheelCommand(command) => write!(f, "{}", command),
+            Item::WheelCommand(command) => write!(f, "16|{}", command),
+            Item::ShopCommand(command) => write!(f, "17|{}", command),
         }
     }
 }
@@ -284,6 +286,15 @@ impl Item {
                     _ => format!("15|{}", message.to_id()),
                 },
             Item::WheelCommand(command) => format!("16|{}", command),
+            Item::ShopCommand(command) => format!("17|{}", command),
+        }
+    }
+
+    pub fn icon(&self) -> Option<Icon> {
+        match self {
+            Item::Skill(skill) => skill.icon(),
+            Item::Shard(shard) => shard.icon(),
+            _ => None,
         }
     }
 }

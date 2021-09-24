@@ -13,7 +13,7 @@ use crate::world::{
 };
 use crate::inventory::{Inventory, Item, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary};
 use crate::util::{
-    self, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Command, ToggleCommand, Zone, ZoneHintType, SysMessage, WheelCommand, WheelIcon, WheelBind,
+    self, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Command, ToggleCommand, Zone, ZoneHintType, SysMessage, WheelCommand, Icon, WheelBind,
     settings::Settings,
     uberstate::{UberState, UberType, UberIdentifier},
 };
@@ -597,8 +597,8 @@ where P: Iterator<Item=&'a str>
     let icon_id = icon_parts.next().ok_or_else(|| String::from("invalid wheel icon syntax"))?;
     let icon_id: u16 = icon_id.parse().map_err(|_| String::from("invalid wheel icon id"))?;
     let icon = match icon_type {
-        "spirit_shard" => WheelIcon::Shard(icon_id),
-        "spell" => WheelIcon::Spell(icon_id),
+        "spirit_shard" => Icon::Shard(icon_id),
+        "spell" => Icon::Spell(icon_id),
         _ => return Err(String::from("invalid wheel icon type")),
     };
 
