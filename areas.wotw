@@ -2070,7 +2070,7 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
       Launch
     gorlek: Bash
     kii:
-      DoubleJump, TripleJump, Dash, Sword OR Hammer OR Spear=1 Damage=10  # refresh dash on ceiling. Pogo the mortar or dboost on the left wall to get to the pickup
+      DoubleJump, TripleJump, Dash, Sword OR Hammer OR Spear=1 OR Damage=10  # refresh dash on ceiling. Pogo the mortar or dboost on the left wall to get to the pickup
       Grapple, DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # Grapple, tjump, upslash, one horizontal attack, energy weapon
     unsafe:
       DoubleJump, TripleJump, Dash  # using the walls and ceilings
@@ -2102,7 +2102,7 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
       DoubleJump, Sword, Glide  # Pogo the mantis
       DoubleJump, Sword, Spear=1  # djump+spear to reach the tp from the beetle arena
       DoubleJump, Hammer, Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 Or Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, TripleJump
       DoubleJump, Sword  # sword jumps
@@ -2293,7 +2293,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
     unsafe:
       Water, Grapple, Sentry=3
       Water, Grapple, Shuriken=2, Combat=Balloon OR Damage=20
-      Water, Grapple, DoubleJump, # Cancel grapple with djump
+      Water, Grapple, DoubleJump # Cancel grapple with djump
       Water, DoubleJump, TripleJump
       Water, WaterDash, Dash, Damage=10  # coyote jump from the ledge under the grappable plant
       # Water, Grapple, SwordSJump=1                       # standing on the ledge below grapple plant. Holding right during SJump. Swordcombo to go right. Lure balloon into water first
