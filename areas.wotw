@@ -4508,8 +4508,17 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
       DoubleJump, Sword  # many others work, but this lines up so beautifully oriGlow
       Dash, Sword OR Hammer
       SwordSJump=1  # sjump then full sword combo
+    kii:
+      Dash  # coyote dash
+      Sentry=3
+      Sword, Damage=10  # Sword hover->pogo->upslash. Damage can de avoided but you'll most likely get hit.
+      Combat=Tentacle, RangedWeapon, Sword
+      Combat=Tentacle, RangedWeapon, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Combat=Tentacle, RangedWeapon, DoubleJump, TripleJump OR Dash OR Hammer  #@validator Probably gorlek
+      Combat=Tentacle, RangedWeapon, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Dash  # Dash close to the edge, coyote jump, dash again; or triple dash
+      Sword  # Pogo the projectiles
+      Hammer, DoubleJump  # upslash to protect yourself from projectiles then double jump
   conn WoodsEntry.TwoKeystoneRoom:
     moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: WoodsEntry.KeystoneDoor, Damage=10
@@ -4534,12 +4543,16 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       SwordSJump=1, DoubleJump, Bash  # bash the plant above and sword hover
       Damage=20, Bash, Grenade=2, DoubleJump OR Dash OR Glide
       Damage=20, Launch
+    kii:
+      DoubleJump, Sword, Combat=Balloon OR Damage=20  # Pogo the first balloon
+      DoubleJump, Combat=2xBalloon, Damage=15, TripleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=35, TripleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      DoubleJump, Dash  # Perform wrap-around double jumps on the far right wall under the ore
-      DoubleJump, SentryJump=1  # DoubleJump + full sword combo + up slash from the breakable wall to reach the left platform
-      DoubleJump, TripleJump, Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=15
-      DoubleJump, Dash, Bash OR Glide OR Sword OR Hammer OR Damage=15
-      Launch  # Bait an enemy near the wall then launch away to avoid damage thanks to launch invincibility
+      DoubleJump, Sword  # Pogo the first balloon, avoid the second one and kill it with a pogo
+      DoubleJump, HammerSJump=1  # DoubleJump + full sword combo + up slash from the breakable wall to reach the left platform
+      DoubleJump, TripleJump, Combat=2xBalloon OR Damage=20
+      DoubleJump, Dash
+      Launch  # use launch invincibility to avoid dboost from balloons
   conn WoodsMain.AfterKuMeet:
     moki:
       Bash, Grenade=2, Damage=10  # uses the enemy
@@ -4549,22 +4562,26 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       Bash, DoubleJump, TripleJump
       Bash, Grenade=1 OR SentryJump=1
       Launch, Sword OR Hammer
-    unsafe:
+    kii:
+      DoubleJump, Bash
       DoubleJump, Sword  # Keep hitting the tentacle with sword to reset your double jump
-      Launch  # precise angle
+      DoubleJump, TripleJump, Dash
+      Combat=Tentacle, RangedWeapon, DoubleJump, TripleJump, Glide OR Hammer OR Sentry=2
+      Combat=Tentacle, RangedWeapon, DoubleJump, Dash, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Bash
+      Combat=Tentacle, RangedWeapon, DoubleJump, TripleJump, Shuriken=2
 
 anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the wall being broken - paths would be complicated otherwise
   pickup WoodsMain.BehindWallOre:
     moki: BreakWall=20
-  pickup WoodsMain.BelowKeystonesEX:
+  pickup WoodsMain.BelowKeystonesEX:  # Be sure it's not redundant with FourKeystoneRoom->BelowKeystonesEX
     moki:
       Glide, DoubleJump
       Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
-      DoubleJump, TripleJump OR Dash
       Glide, Dash OR Sword OR Hammer  # for the weapons, glide below and use the up attack
     unsafe:
-      Damage=15, DoubleJump OR Dash  # slides off the wall, take a damage boost and djump/dash when near the pickup
       Dash  # Dash against the wall to reset it
   pickup WoodsMain.LowerKS:
     gorlek:
@@ -4581,6 +4598,10 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
     gorlek:
       DoubleJump, TripleJump OR Dash
       Bash, Grenade=1, Dash  # Shoot a grenade from the breakable wall. Dash to reach the grenade and bash it to get on the left platform
+    kii:
+      Bash, Grenade=1, DoubleJump
+      DoubleJump, Sword OR Hammer OR Shuriken=1 # with sword, breaking the wall makes it way easier than jumping from the small ledge.
+    unsafe: DoubleJump, Flash=1 OR Sentry=1
   conn WoodsMain.AfterKuMeet:  # paths gliding to the left, either from above or below
     gorlek:
       Glide, DoubleJump, TripleJump
@@ -4604,6 +4625,7 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Bash  # so many skeeto friends oriGlow
       SentryJump=1
       DoubleJump, TripleJump
+    kii: DoubleJump, Sword  # bait a skeeto and pogo it
     unsafe: DoubleJump  # Climb the left wall to get on the right wall, let ori slide slowly then double jump and quickly turn around to catch the other side of the wall
   pickup WoodsMain.UpperKS:
     moki, BreakWall=3:
@@ -4615,16 +4637,25 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       BreakWall=3, Combat=3xSkeeto, SwordSJump=1
       BreakWall=3, Combat=3xSkeeto, HammerSJump=1, DoubleJump OR Dash
       BreakWall=3, Bash, Grenade=1 OR DoubleJump OR Dash
-    unsafe: BreakWall=3, DoubleJump OR Bash OR SentryJump=2  # start your double jump from the higher floor near the spikes / bash the mosquitos / sjump from the platform next to the door to reach the platformtform above the door, sjump from there and sword combo + up slash
+    kii:
+      BreakWall=3, DoubleJump OR Bash
+      BreakWall=3, Sword, Dash  # Pogo the skeetos
+      Flash=1, Glide OR DoubleJump OR Bash  # Use flash to kill the balloon near the bulb
+      Damage=20, Glide OR DoubleJump OR Bash  # lure the balloon
+    unsafe:
+      Hammer, Combat=Balloon  # seems like there is a micro ledge on the wall bellow the pickup which reset your upslash
+      BreakWall=3, SentryJump=1  # start your double jump from the higher floor near the spikes / bash the mosquitos / sjump from the platform next to the door to reach the platformtform above the door, sjump from there and sword combo + up slash
   pickup WoodsMain.LeftKS:
     moki: Combat=Balloon, Glide
     gorlek, Combat=Balloon:
       Damage=15, DoubleJump, TripleJump OR Dash
       Launch
+    kii:
+      DoubleJump, Combat=Balloon, Damage=15
+      DoubleJump, Damage=20
     unsafe:
-      DoubleJump, Damage=15  # Doublejump as far as possible, take a damage boost then wall jump + doublejump to get the key and return to safety
       DoubleJump, TripleJump  # tjump on the wall above
-  pickup WoodsMain.LowerKS:
+  pickup WoodsMain.LowerKS:  # All path reaching that pickup without breaking the yellow wall are from WallOreLedge
     moki, Flap:  # Flap being the casual way of breaking the yellow barrier
       Glide OR Launch
       DoubleJump, Dash
@@ -4633,7 +4664,17 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       DoubleJump OR Dash OR Sword
       Hammer, Bash
     unsafe: Flap, Bash, Damage=15  # Flap to break the yellow wall, precise jump to avoid damage in the first spikes, fall in the last spikes. Bash glide from the bashable plant to the platform before the pickup (~20° angle)
-
+  pickup WoodsMain.BelowKeystonesEX:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesEX
+    gorlek:
+      Launch
+      DoubleJump, TripleJump OR Dash
+    kii:
+      DoubleJump, Sword, Damage=15  # Pogo the plant
+      Dash  # reset dash on the wall
+    unsafe:
+      DoubleJump, Sword  # djump->upslash->downslash
+      DoubleJump, Damage=15  #Slide on the wall, take a dboost, djump to the pickup
+  
   conn WoodsMain.GiantSkull:
     moki: WoodsMain.KeystoneDoor
   conn WoodsMain.WallOreLedge:
