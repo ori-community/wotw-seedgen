@@ -13,7 +13,7 @@ use crate::world::{
 };
 use crate::inventory::{Inventory, Item, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary};
 use crate::util::{
-    self, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Command, ToggleCommand, Zone, ZoneHintType, SysMessage, WheelCommand, Icon, WheelBind,
+    self, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Command, ToggleCommand, Zone, ZoneHintType, SysMessage, WheelCommand, Icon, WheelBind, ShopCommand,
     settings::Settings,
     uberstate::{UberState, UberType, UberIdentifier},
 };
@@ -556,6 +556,43 @@ where P: Iterator<Item=&'a str>
 
     Ok(Item::SysMessage(message))
 }
+fn parse_icon(icon: &str) -> Result<Icon, String> {
+    let mut icon_parts = icon.splitn(2, ':');
+
+    let icon_type = icon_parts.next().unwrap();
+    let icon_id = icon_parts.next().ok_or_else(|| String::from("invalid wheel icon syntax"))?;
+
+    let icon = if icon_type == "file" {
+        Icon::File(icon_id.to_owned())
+    } else {
+        let icon_id: u16 = icon_id.parse().map_err(|_| String::from("invalid wheel icon id"))?;
+        match icon_type {
+            "shard" => Icon::Shard(icon_id),
+            "spell" => Icon::Spell(icon_id),
+            "map" => {
+                if let Some(variant) = icon_parts.next() {
+                    match variant {
+                        "active" => Icon::Map(icon_id),
+                        "inactive" => Icon::MapInactive(icon_id),
+                        "special" => Icon::MapSpecial(icon_id),
+                        _ => return Err(String::from("invalid wheel icon variant")),
+                    }
+                } else {
+                    Icon::Map(icon_id)
+                }
+            },
+            "opher" => Icon::Opher(icon_id),
+            "lupo" => Icon::Lupo(icon_id),
+            "grom" => Icon::Grom(icon_id),
+            "tuley" => Icon::Tuley(icon_id),
+            _ => return Err(String::from("invalid wheel icon type")),
+        }
+    };
+
+    end_of_pickup(icon_parts)?;
+
+    Ok(icon)
+}
 fn parse_wheel_item_position<'a, P>(parts: &mut P) -> Result<(u16, u8), String>
 where P: Iterator<Item=&'a str>
 {
@@ -589,18 +626,8 @@ where P: Iterator<Item=&'a str>
 {
     let (wheel, position) = parse_wheel_item_position(&mut parts)?;
     let icon = parts.next().ok_or_else(|| String::from("missing icon"))?;
+    let icon = parse_icon(icon)?;
     end_of_pickup(parts)?;
-
-    let mut icon_parts = icon.splitn(2, ':');
-
-    let icon_type = icon_parts.next().unwrap();
-    let icon_id = icon_parts.next().ok_or_else(|| String::from("invalid wheel icon syntax"))?;
-    let icon_id: u16 = icon_id.parse().map_err(|_| String::from("invalid wheel icon id"))?;
-    let icon = match icon_type {
-        "shard" => Icon::Shard(icon_id),
-        "spell" => Icon::Spell(icon_id),
-        _ => return Err(String::from("invalid wheel icon type")),
-    };
 
     Ok(Item::WheelCommand(WheelCommand::SetIcon { wheel, position, icon }))
 }
@@ -691,6 +718,31 @@ where P: Iterator<Item=&'a str>
         _ => Err(String::from("invalid wheel command type")),
     }
 }
+fn parse_shop_set_icon<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
+    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
+    let uber_state = UberState {
+        identifier: UberIdentifier::from_parts(uber_group, uber_id)?,
+        value: String::new(),
+    };
+
+    let icon = parts.next().ok_or_else(|| String::from("missing icon"))?;
+    let icon = parse_icon(icon)?;
+    end_of_pickup(parts)?;
+
+    Ok(Item::ShopCommand(ShopCommand::SetIcon { uber_state, icon }))
+}
+fn parse_shopcommand<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let command_type = parts.next().ok_or_else(|| String::from("missing shop command type"))?;
+    match command_type {
+        "0" => parse_shop_set_icon(parts),
+        _ => Err(String::from("invalid shop command type")),
+    }
+}
 
 pub fn parse_pickup(pickup: &str) -> Result<Item, String> {
     let pickup = pickup.trim();
@@ -714,6 +766,7 @@ pub fn parse_pickup(pickup: &str) -> Result<Item, String> {
         "14" => parse_relic(parts),
         "15" => parse_sysmessage(parts),
         "16" => parse_wheelcommand(parts),
+        "17" => parse_shopcommand(parts),
         _ => Err(String::from("invalid pickup type")),
     }.map_err(|err| format!("{} in pickup {}", err, pickup))
 }

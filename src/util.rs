@@ -172,22 +172,22 @@ impl Skill {
             Skill::DoubleJump => Some(Icon::Spell(4001)),
             Skill::Launch => Some(Icon::Spell(2019)),
             Skill::Glide => Some(Icon::Spell(4002)),
-            Skill::WaterBreath => None,
+            Skill::WaterBreath => Some(Icon::Opher(10)),
             Skill::Grenade => Some(Icon::Spell(2010)),
             Skill::Grapple => Some(Icon::Spell(3001)),
             Skill::Flash => Some(Icon::Spell(2004)),
-            Skill::Spear => Some(Icon::Spell(2012)),
+            Skill::Spear => Some(Icon::Opher(6)),
             Skill::Regenerate => Some(Icon::Spell(2013)),
             Skill::Bow => Some(Icon::Spell(1001)),
-            Skill::Hammer => Some(Icon::Spell(1000)),
+            Skill::Hammer => Some(Icon::Opher(2)),
             Skill::Sword => Some(Icon::Spell(1002)),
             Skill::Burrow => Some(Icon::Spell(3002)),
             Skill::Dash => Some(Icon::Spell(4000)),
             Skill::WaterDash => Some(Icon::Spell(4004)),
-            Skill::Shuriken => Some(Icon::Spell(2015)),
+            Skill::Shuriken => Some(Icon::Opher(4)),
             Skill::Seir => Some(Icon::Spell(2018)),
-            Skill::Blaze => Some(Icon::Spell(2016)),
-            Skill::Sentry => Some(Icon::Spell(2011)),
+            Skill::Blaze => Some(Icon::Opher(8)),
+            Skill::Sentry => Some(Icon::Opher(0)),
             Skill::Flap => Some(Icon::Spell(3005)),
             Skill::AncestralLight => Some(Icon::Spell(4008)),
         }
@@ -268,6 +268,16 @@ impl Resource {
             Resource::Keystone => 3,
             Resource::ShardSlot => 4,
         }
+    }
+
+    pub fn icon(self) -> Option<Icon> {
+        Some(Icon::Map(match self {
+            Resource::Health => 33,
+            Resource::Energy => 34,
+            Resource::Ore => 29,
+            Resource::Keystone => 0,
+            Resource::ShardSlot => 27,
+        }))
     }
 }
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -820,12 +830,28 @@ impl fmt::Display for WheelCommand {
 pub enum Icon {
     Shard(u16),
     Spell(u16),
+    Map(u16),
+    MapInactive(u16),
+    MapSpecial(u16),
+    Opher(u16),
+    Lupo(u16),
+    Grom(u16),
+    Tuley(u16),
+    File(String),
 }
 impl fmt::Display for Icon {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Icon::Shard(id) => write!(f, "shard:{}", id),
             Icon::Spell(id) => write!(f, "spell:{}", id),
+            Icon::Map(id) => write!(f, "map:{}", id),
+            Icon::MapInactive(id) => write!(f, "map:{}:inactive", id),
+            Icon::MapSpecial(id) => write!(f, "map:{}:special", id),
+            Icon::Opher(id) => write!(f, "opher:{}", id),
+            Icon::Lupo(id) => write!(f, "lupo:{}", id),
+            Icon::Grom(id) => write!(f, "grom:{}", id),
+            Icon::Tuley(id) => write!(f, "tuley:{}", id),
+            Icon::File(path) => write!(f, "file:{}", path),
         }
     }
 }

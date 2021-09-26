@@ -21,6 +21,7 @@
 48248|19396|8|9|0|int|36
 9|0=36|6|$[(9|999=6)]
 3|1|8|48248|19397|int|200               // Price for Glades Zone Hint
+3|1|17|0|48248|19396|lupo:2             // Icon for Glades Zone Hint
 48248|1590|6|$[(9|999=9)]               // Wellspring Zone Hint from LupoMap.Wellspring
 48248|1557|6|$[(9|999=12)]              // Pools Zone Hint from LupoMap.Pools
 48248|45538|6|$[(9|999=15)]             // Burrows Zone Hint from LupoMap.Burrows
@@ -29,6 +30,7 @@
 48248|57987|8|9|0|int|37
 9|0=37|6|$[(9|999=21)]
 3|1|8|48248|57988|int|200               // Price for Woods Zone Hint
+3|1|17|0|48248|57987|lupo:2             // Icon for Woods Zone Hint
 48248|48423|6|$[(9|999=24)]             // Depths Zone Hint from LupoMap.Depths
 48248|61146|6|$[(9|999=27)]             // Wastes Zone Hint from LupoMap.Wastes
 48248|4045|6|$[(9|999=33)]              // Willow Zone Hint from LupoMap.Willow
