@@ -4512,10 +4512,10 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
       Dash  # coyote dash
       Sentry=3
       Sword, Damage=10  # Sword hover->pogo->upslash. Damage can de avoided but you'll most likely get hit.
-      Combat=Tentacle, RangedWeapon, Sword
-      Combat=Tentacle, RangedWeapon, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Combat=Tentacle, RangedWeapon, DoubleJump, TripleJump OR Dash OR Hammer  #@validator Probably gorlek
-      Combat=Tentacle, RangedWeapon, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Combat=Tentacle, Sword
+      Combat=Tentacle, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Combat=Tentacle, DoubleJump, TripleJump OR Dash OR Hammer  #@validator Probably gorlek
+      Combat=Tentacle, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Sword  # Pogo the projectiles
       Hammer, DoubleJump  # upslash to protect yourself from projectiles then double jump
@@ -4566,29 +4566,35 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       DoubleJump, Bash
       DoubleJump, Sword  # Keep hitting the tentacle with sword to reset your double jump
       DoubleJump, TripleJump, Dash
-      Combat=Tentacle, RangedWeapon, DoubleJump, TripleJump, Glide OR Hammer OR Sentry=2
-      Combat=Tentacle, RangedWeapon, DoubleJump, Dash, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=Tentacle, DoubleJump, TripleJump, Glide OR Hammer OR Sentry=2
+      Combat=Tentacle, DoubleJump, Dash, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
-      Combat=Tentacle, RangedWeapon, DoubleJump, TripleJump, Shuriken=2
+      Combat=Tentacle, DoubleJump, TripleJump, Shuriken=2
 
 anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the wall being broken - paths would be complicated otherwise
   pickup WoodsMain.BehindWallOre:
     moki: BreakWall=20
-  pickup WoodsMain.BelowKeystonesEX:  # Be sure it's not redundant with FourKeystoneRoom->BelowKeystonesEX
+  pickup WoodsMain.BelowKeystonesEX:  # Paths that can get to the pickup but can't go to FourKeystoneRoom
     moki:
       Glide, DoubleJump
       Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
       Glide, Dash OR Sword OR Hammer  # for the weapons, glide below and use the up attack
+    kii:
+      Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      BreakWall=20, Dash  # Breakwall so you have more space for a coyote dash. Reset dash on the left wall
     unsafe:
-      Dash  # Dash against the wall to reset it
-  pickup WoodsMain.LowerKS:
+      Dash  # Coyote dash. Reset dash on the left wall
+  pickup WoodsMain.LowerKS:  # All paths that aren't breaking the yellow wall
     gorlek:
       Launch  # launch on the wall near WoodsMain.BelowKeystonesEX then launch again
       Glide, Bash  # glide above the tentacle and bash its projectiles to reach the floating platform
       Glide, DoubleJump, TripleJump  # glide and triple jump to reach the floating platform
       Glide, Dash, DoubleJump, Sword OR Hammer  # glide, dash when just bellow the pickup, double jump and up slash to reach the floating platform
+    kii:
+      Bash, DoubleJump, TripleJump
+      Glide, DoubleJump, Hammer, Dash OR Shuriken=1 OR Flash=1 OR Sentry=1  #  glide und er the pickup then djump-> upslash -> dash/energy to get on the floasting platform
 
   conn WoodsMain.BelowFourKeystoneRoom: free
   conn WoodsMain.FourKeystoneRoom:
@@ -4663,24 +4669,44 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
     gorlek, Flap:
       DoubleJump OR Dash OR Sword
       Hammer, Bash
-    unsafe: Flap, Bash, Damage=15  # Flap to break the yellow wall, precise jump to avoid damage in the first spikes, fall in the last spikes. Bash glide from the bashable plant to the platform before the pickup (~20° angle)
+    kii:
+      # moki/gorlek paths but bait the balloon near the wall instead of using flap
+      Combat=Balloon, Glide OR Launch OR DoubleJump OR Dash OR Sword OR Hammer
+      Damage=20, Glide OR Launch OR DoubleJump OR Dash OR Sword OR Hammer
+      # new paths
+      Bash, Combat=Balloon, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
+      Bash, Damage=20, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
+      Flap OR Combat=Balloon OR Damage=20:  # energy management is fun
+        Spear=3 OR Shuriken=3 OR Sentry=3 OR Blaze=4 OR Flash=3 OR Sentry=3
+        Damage=15, Spear=2 OR Shuriken=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Damage=30, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Bash, Flap OR Combat=Balloon OR Damage=20  # precise jump to avoid damage in the first spikes. Bash glide from the bashable plant to the platform before the pickup
+      Flap OR Combat=Balloon OR Damage=20:  # friendly spikes
+        Spear=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Damage=15, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # fiendly spikes and slide from the ceiling to the platform
+      Flap OR Combat=Balloon OR Damage=20:
+        Shuriken=1 OR Damage=15
   pickup WoodsMain.BelowKeystonesEX:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesEX
     gorlek:
       Launch
       DoubleJump, TripleJump OR Dash
     kii:
+      Bash
+      DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Sword, Damage=15  # Pogo the plant
       Dash  # reset dash on the wall
     unsafe:
-      DoubleJump, Sword  # djump->upslash->downslash
-      DoubleJump, Damage=15  #Slide on the wall, take a dboost, djump to the pickup
+      DoubleJump  # get a wall jump after dropping down
   
   conn WoodsMain.GiantSkull:
     moki: WoodsMain.KeystoneDoor
   conn WoodsMain.WallOreLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer
-    unsafe: Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1 OR Spear=1 OR Grenade=1 OR Bow=1
+    kii: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 
+    unsafe: Grenade=1 OR Bow=1
   conn WoodsMain.BelowFourKeystoneRoom: free
 
 anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
