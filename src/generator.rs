@@ -716,7 +716,9 @@ where
         let world_context = &world_contexts[world_index];
 
         if let Some(node) = world_context.world.graph.nodes.iter()
-            .filter(|&node| node.can_place())
+            .filter(|&node|
+                node.can_place() &&
+                node.uber_state().map_or(true, |uber_state| !world_context.world.preplacements.contains_key(uber_state)))
             .choose(context.rng)
         {
             place_item(world_index, world_index, node, false, Item::SpiritLight(1), world_contexts, context)?;
