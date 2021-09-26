@@ -6628,7 +6628,7 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       PoolsApproach.WheelFreed OR DoubleJump OR Grapple OR Launch
       Bash, Grenade=1
     gorlek: free
-  conn EastPools.Entry:
+  conn EastPools.LeverRoom:
     moki:
       Glide, Launch
       Bash, Grenade=1, Launch, DoubleJump OR Dash
@@ -6669,7 +6669,7 @@ anchor PoolsApproach.LeftOfWheel at -995, -4184:  # The leftmost platform of the
       PoolsApproach.WheelFreed, Water
       DoubleJump OR Launch
     gorlek: Dash, Hammer  # the first for the moving wheel, the latter for the still one
-  conn EastPools.Entry:
+  conn EastPools.LeverRoom:
     moki: Water, Launch
     gorlek:
       Water, WaterDash, DoubleJump, TripleJump OR Damage=20
@@ -6688,53 +6688,9 @@ region EastPools:
   gorlek: Regenerate
   unsafe: free
 
-anchor EastPools.Entry at -1122, -4166:  # At the Voice dialogue
-  refill Checkpoint
-  refill Health=1
-
-  state EastPools.EntryBubblesFree:  # these spawn once you have Flap
-    moki: Flap
-
-  pickup EastPools.TwoCrushersEX:
-    moki: Water, WaterDash
-    unsafe:
-      Water
-      WaterDash, Damage=60  # 80 is more likely
-
-  conn EastPools.LeverRoom:
-    moki:
-      EastPools.EntryBubblesFree OR Launch
-      Bash, Grenade=1
-    gorlek:
-      SentryJump=1
-      WaterDash, DoubleJump, Water OR Damage=20
-    unsafe:
-      WaterDash, Hammer, Water OR Damage=20
-      Water, WaterDash, Sword, Damage=20
-      Hammer, TripleJump  #TripleHammerJump
-  conn PoolsApproach.LeftOfWheel:  # should be fair to assume that if the wheel is spinning, the player has Water
-    moki:
-      Water
-      Bash, Grenade=1, Glide
-      Glide, Launch
-      DoubleJump, Dash, Launch
-      Bash, Grenade=1, Launch, DoubleJump OR Dash
-    gorlek:  # Try with the spinning wheel if there is a damage boost that seems unnecessary
-      DoubleJump, Damage=20, TripleJump OR Dash OR Sword
-      DoubleJump, TripleJump, Dash, Sword
-      Bash, Grenade=1, Launch
-      Bash, Grenade=1, Damage=20, Dash OR DoubleJump
-      Bash, Grenade=1, Dash, DoubleJump
-      Glide, DoubleJump OR Dash OR SentryJump=1 OR Damage=20
-      WaterDash, Damage=20, DoubleJump OR Dash OR Glide
-      Launch, DoubleJump OR Dash OR Damage=20
-      SentryJump=1, Damage=20, Dash, DoubleJump
-      SentryJump=1, Launch  # Use weapon to stall before and after the launch
-    unsafe:
-      Launch, Hammer, Sword  # climb the left wall
-
 anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   refill Checkpoint
+  refill Health=1
 
   state EastPools.EntryLever:
     moki:
@@ -6758,6 +6714,11 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
   quest EastPools.KwolokAmuletQI: free
 
+  pickup EastPools.TwoCrushersEX:
+    moki: Water, WaterDash
+    unsafe:
+      Water
+      WaterDash, Damage=60  # 80 is more likely
   pickup EastPools.RightOre:
     moki:
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, Dash OR Glide  # Need to flap from the green spot so the bubble don't go too far to the right
@@ -6820,7 +6781,26 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
       DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
       Bash, Grenade=2
-  conn EastPools.Entry: free
+  conn PoolsApproach.LeftOfWheel:  # should be fair to assume that if the wheel is spinning, the player has Water
+    moki:
+      Water
+      Bash, Grenade=1, Glide
+      Glide, Launch
+      DoubleJump, Dash, Launch
+      Bash, Grenade=1, Launch, DoubleJump OR Dash
+    gorlek:  # Try with the spinning wheel if there is a damage boost that seems unnecessary
+      DoubleJump, Damage=20, TripleJump OR Dash OR Sword
+      DoubleJump, TripleJump, Dash, Sword
+      Bash, Grenade=1, Launch
+      Bash, Grenade=1, Damage=20, Dash OR DoubleJump
+      Bash, Grenade=1, Dash, DoubleJump
+      Glide, DoubleJump OR Dash OR SentryJump=1 OR Damage=20
+      WaterDash, Damage=20, DoubleJump OR Dash OR Glide
+      Launch, DoubleJump OR Dash OR Damage=20
+      SentryJump=1, Damage=20, Dash, DoubleJump
+      SentryJump=1, Launch  # Use weapon to stall before and after the launch
+    unsafe:
+      Launch, Hammer, Sword  # climb the left wall
 
 # checkpoint at -1278, -4158
 
