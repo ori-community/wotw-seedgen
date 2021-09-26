@@ -4527,8 +4527,8 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
   pickup WoodsMain.LowerLeafPileEX:
     moki: Flap
   pickup WoodsMain.BehindWallOre:
-    moki: Flap, Glide  # Lure the balloon
-
+    gorlek: Flap, Glide  # Lure the balloon
+    
   conn WoodsMain.FourKeystoneRoom:
     moki: Combat=2xBalloon, Flap, Glide
     gorlek: Flap, Glide  # Flap kills these
@@ -4724,15 +4724,29 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
     gorlek, Combat=Balloon:
       SentryJump=1
       DoubleJump, Glide, TripleJump OR Sword OR Hammer
+    kii:
+      # Moki/gorlek paths ignoring the balloon
+      Bash OR Launch
+      Glide, DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # New paths
+      DoubleJump, TripleJump, Sword  # Pogo the balloon
+      Glide, Dash, Hammer OR Shuriken=1
     unsafe:
       Glide, DoubleJump  # need a really precise vertical boost from the wind
-
+      Glide, Dash, Sword  # dash->upslash->downslash
+      Glide, Dash, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn WoodsMain.BalloonLure:
     moki: Combat=Balloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
     gorlek, Combat=Balloon:
       Bash, Sword
       Bash, HammerSJump=1
-    unsafe: Launch
+    kii:
+      # Moki/gorlek paths ignoring the balloon
+      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Damage=15
+      # new paths
+      Launch OR Glide
+      Combat=Tentacle, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=15
+    unsafe: Bash
   conn WoodsMain.FourKeystoneRoom:
     moki: WoodsMain.KeystoneDoor
 
@@ -4741,25 +4755,31 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
 
   pickup WoodsMain.YellowWallEX:
     moki: BreakWall=3, Flap, Glide
-    gorlek:
-      BreakWall=3, Launch, Flap OR Damage=20
-      Glide, Damage=20, Flap  # lure the balloon
+    gorlek: BreakWall=3, Flap, Launch
+    kii:
+      Glide OR Launch:  # no combat=balloon, Damage=20 variation because I'm assuming BreakWall=3 is less restrictive than Combat=Balloon
+        Combat=Balloon, BreakWall=3
+        Damage=20, Damage=20 OR BreakWall=3  # dboost on the balloon when it's close to the corruption/wall
+      BreakWall=3, DoubleJump, TripleJump, Flap OR Combat=Balloon OR Damage=20
     unsafe:
+      DoubleJump, TripleJump, Damage=20, Flap OR Combat=Balloon OR Damage=20  # dboost on the balloon to break the corruption
       BreakWall=3, DoubleJump, Dash, Bash, Grenade=1  # Bait the enemy by jumping and imediately dashing against the left wall, double wall off the wall to  get to the edge near the spikes and bash grenade. Launch the grenade near the right edge and bash it to get to the left edge. If you are too slow, the enemy will die from the explosion after your bash
-      Launch, Damage=20, Damage=20
+      Launch  # Use launch invulnerability to protect you from balloon's explosions
 
   conn WoodsMain.BelowHiddenOre:
     moki: BreakWall=3, Glide
-    gorlek:
-      BreakWall=3, Launch
-      Glide, Damage=20  # lure the balloon
-    unsafe, BreakWall=3:
-      DoubleJump, Bash, Grenade=1  # land on the ledge near the spikes bellow the breakable wall
-      DoubleJump, SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
-      Dash, Bash, Grenade=2
-      Bash, Grenade=3  # bash grenade to get on the skull, bash a tentacle projectile and the bashable plant to get to the blowing enemy level, 2nd bash grenade to get near the spikes and last one to reach the connection
-      SentryJump=3  # jump + sword combo to reach the skull, sword combo to reach the tentacle. use your sjumps to get to the connection
-    unsafe: Launch, Damage=20
+    gorlek: BreakWall=3, Launch
+    kii:
+      Damage=20, Glide OR Launch
+      BreakWall=3, DoubleJump, TripleJump, Combat=Balloon OR Damage=20  # Don't need the balloon for anything but he's really annoying to avoid
+    unsafe:
+      DoubleJump, TripleJump, Damage=20
+      BreakWall=3:
+        DoubleJump, Bash, Grenade=1  # land on the ledge near the spikes bellow the breakable wall
+        DoubleJump, SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
+        Dash, Bash, Grenade=2
+        Bash, Grenade=3  # bash grenade to get on the skull, bash a tentacle projectile and the bashable plant to get to the blowing enemy level, 2nd bash grenade to get near the spikes and last one to reach the connection
+        SentryJump=3  # jump + sword combo to reach the skull, sword combo to reach the tentacle. use your sjumps to get to the connection
   conn WoodsMain.GiantSkull:
     moki:
       Glide OR Launch
@@ -4767,13 +4787,18 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
     gorlek:
       DoubleJump, TripleJump OR Sword
       Bash, DoubleJump OR Dash
-
+    kii:
+      Dash
+      DoubleJump, Hammer OR Damage=15
+      Bash, Hammer OR Shuriken=1 OR Sentry=2
+      
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   pickup WoodsMain.HiddenOre:
     moki: Flap, Glide
     gorlek:
       Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
       DoubleJump, TripleJump, Bash, Damage=15  # can either use the plant or the skeeto
+    kii: DoubleJump, Bash  # bash the plant and the skeeto, wall jump on the right wall
     unsafe:
       SentryJump=1, DoubleJump, TripleJump, Damage=15  # sjump from a micro ledge at very edge of the fire pit
       Sword, DoubleJump, TripleJump, Damage=15 # double jump onto the wall, then double sword jump into the spikes.
@@ -4781,7 +4806,12 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
   conn WoodsMain.PetrifiedHowl:
     moki: Glide
     gorlek: Launch  # launch on the wall just bellow the ceiling's spikes, wall jump and lauch again to get to the right wall after the ceiling's spikes
-    unsafe: DoubleJump, TripleJump, Hammer, Damage=15  # Triple jump to get to the wall just bellow the ceiling's spikes, wall jump and triplejump, land on the spikes. Triple jump and up slash to get to the wall on the right.
+    kii:
+      DoubleJump, Damage=45
+      DoubleJump, Damage=15, TripleJump OR Bash  # With bash, bait the skeeto
+    unsafe:
+      DoubleJump, Damage=30
+      DoubleJump, Damage=15, Shuriken=2 OR Flash=2 OR Sentry=2
   conn WoodsMain.BalloonLure:
     moki:
       Combat=Tentacle, Sword OR Hammer
@@ -4797,13 +4827,6 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
 
   pickup WoodsMain.PetrifiedHowlEX: free
 
-  conn WoodsMain.TrialStart:
-    moki: BreakWall=3, Bash, Glide
-    gorlek:
-      BreakWall=3, Glide, Damage=10  # just easy to catch a projectile
-      BreakWall=3, DoubleJump, Bash, Damage=15  # different ways to solve
-      Bash, DoubleJump, TripleJump
-      Dash, DoubleJump, TripleJump, Damage=10  # just easy to catch a projectile
   conn WoodsMain.AboveHowl:
     moki: Launch, DoubleJump OR Dash OR Bash OR Glide  # if you don't think of going straight up, these can also carry you through the way around
     gorlek:
@@ -4811,13 +4834,33 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       Bash, Grenade=1  # it's a checkpoint, you have retries to figure it out
       SentryJump=1, DoubleJump, TripleJump
       SentryJump=1, DoubleJump, Dash
+    kii: DoubleJump, Bash  # Bash the tentacle projectile
+    unsafe:
+      Bash
+      DoubleJump, TripleJump
+  conn WoodsMain.TrialStart:  # Be carefull that it's not redundant with the AboveHowl connection
+    moki: BreakWall=3, Bash, Glide
+    gorlek:
+      BreakWall=3, Glide, Damage=10  # just easy to catch a projectile
+      BreakWall=3, DoubleJump, Bash, Damage=15  # different ways to solve
+      Bash, DoubleJump, TripleJump
+      Dash, DoubleJump, TripleJump, Damage=10  # just easy to catch a projectile
+    kii:
+      BreakWall=3, Glide
+      DoubleJump, Sword  # pogo the tentacles
+      Dash, DoubleJump, TripleJump
   conn WoodsMain.BelowHiddenOre:
     moki:
       Glide
       Launch, DoubleJump OR Dash
     gorlek:
-      DoubleJump OR Dash OR Sword OR Launch  # just holding right works so nicely
-      Hammer, Damage=15  # if you swing too much you'll take the damage
+      DoubleJump OR Dash OR Launch  # just holding right works so nicely
+    kii:
+      Sword OR Hammer OR Sentry=3
+      Blaze=3, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Damage=15, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # Friendly spikes truly are the best friends of rando players
 
 # checkpoint at 824, -4068
 
