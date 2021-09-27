@@ -149,6 +149,9 @@ struct SeedSettings {
     /// hides spoilers
     #[structopt(short, long)]
     race: bool,
+    /// prevent using the in-game logic map
+    #[structopt(short = "l", long)]
+    disable_logic_filter: bool,
     /// required for coop and bingo
     #[structopt(short, long)]
     multiplayer: bool,
@@ -288,6 +291,7 @@ fn parse_settings(settings: SeedSettings) -> Result<Settings, String> {
         difficulty,
         glitches,
         race,
+        disable_logic_filter,
         mut multiplayer,
         hard,
         spawn,
@@ -314,7 +318,8 @@ fn parse_settings(settings: SeedSettings) -> Result<Settings, String> {
         players: names,
         difficulty,
         glitches,
-        spoilers: !race,
+        race,
+        disable_logic_filter,
         goalmodes,
         web_conn: multiplayer,
         spawn_loc: spawn,
@@ -396,7 +401,7 @@ fn generate_seeds(mut args: SeedArgs, tostdout: bool) -> Result<(), String> {
     }
 
     let worlds = settings.worlds;
-    let race = !settings.spoilers;
+    let race = settings.race;
     let players = settings.players.clone();
     let (seeds, spoilers) = seedgen::generate_seed(&graph, settings, &args.headers, seed).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {

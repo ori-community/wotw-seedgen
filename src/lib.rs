@@ -245,13 +245,13 @@ where R: Rng
 }
 
 #[inline]
-fn format_placements(world_placements: Vec<Placement>, custom_names: &HashMap<String, String>, spoilers: bool) -> String {
+fn format_placements(world_placements: Vec<Placement>, custom_names: &HashMap<String, String>, race: bool) -> String {
     let mut placement_block = String::with_capacity(world_placements.len() * 20);
 
     for placement in world_placements {
         let mut placement_line = format!("{}", placement);
 
-        if spoilers {
+        if !race {
             let location = placement.node.map_or_else(
                 || placement.uber_state.to_string(),
                 |node| {
@@ -340,13 +340,13 @@ pub fn generate_seed(graph: &Graph, settings: Settings, headers: &[String], seed
         Ok(String::new())
     }).collect::<Result<Vec<_>, String>>()?;
 
-    let spoiler_blocks = if !settings.spoilers {
+    let spoiler_blocks = if settings.race {
         Some(placements.iter()
             .map(|world_placements| format_placements(world_placements.clone(), &custom_names, true))
             .collect::<Vec<_>>())
     } else { None };
     let placement_blocks = placements.into_iter()
-        .map(|world_placements| format_placements(world_placements, &custom_names, settings.spoilers))
+        .map(|world_placements| format_placements(world_placements, &custom_names, settings.race))
         .collect::<Vec<_>>();
 
     let slug_line = format!("// Slug: {}", slug);
@@ -361,7 +361,8 @@ pub fn generate_seed(graph: &Graph, settings: Settings, headers: &[String], seed
     let spoilers = spoiler_blocks.map_or_else::<Result<_, String>, _, _>(
         || Ok(Vec::new()),
         |spoiler_blocks| {
-            settings.spoilers = true;
+            settings.race = false;
+            settings.disable_logic_filter = false;
             let spoiler_config = settings.write()?;
             let spoiler_config_line = format!("// Config: {}", spoiler_config);
 
