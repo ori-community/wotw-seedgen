@@ -1124,6 +1124,17 @@ where R: Rng + ?Sized
         } else if let Some(ignored) = line.strip_prefix('!') {
             processed += ignored;
             processed.push('\n');
+        } else if let Some(timer) = line.strip_prefix("timer:") {
+            let timer = timer.trim();
+            let mut parts = timer.split('|');
+            parse_uber_state(&mut parts).map_err(|err| format!("malformed timer declaration {}: {}", line, err))?;
+            parse_uber_state(&mut parts).map_err(|err| format!("malformed timer declaration {}: {}", line, err))?;
+            if parts.next().is_some() {
+                return Err(format!("Too many parts in timer declaration {}", line));
+            }
+
+            processed += &line;
+            processed.push('\n');
         } else {
             if !trimmed.is_empty() {
                 let mut parts = trimmed.splitn(3, '|');
@@ -1198,7 +1209,7 @@ pub fn validate_header(name: &Path, contents: &str) -> Result<(Vec<UberState>, H
             if trimmed.starts_with('#') { continue; }
         }
 
-        if line.starts_with("Flags: ") {
+        if line.starts_with("Flags:") || line.starts_with("timer:") {
             continue;
         }
 
@@ -1322,7 +1333,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
         }
         line = line.trim();
 
-        if line.is_empty() || line.starts_with("Flags") || line.starts_with("Spawn") {
+        if line.is_empty() || line.starts_with("Flags:") || line.starts_with("Spawn:") || line.starts_with("timer:") {
             continue;
         }
 
@@ -1372,7 +1383,7 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
         }
         line = line.trim();
 
-        if line.is_empty() || line.starts_with("Flags") || line.starts_with("Spawn") {
+        if line.is_empty() || line.starts_with("Flags:") || line.starts_with("Spawn:") || line.starts_with("timer:") {
             continue;
         }
 
