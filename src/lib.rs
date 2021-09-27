@@ -142,7 +142,7 @@ pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter) -> 
 
 type Flags = Vec<String>;
 type Names = HashMap<String, String>;
-fn parse_headers<R>(world: &mut World, headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names), String>
+fn parse_headers<R>(world: &mut World, inline_headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names), String>
 where R: Rng + ?Sized
 {
     let mut header_block = String::new();
@@ -179,7 +179,7 @@ where R: Rng + ?Sized
         }
     }
 
-    for header in headers {
+    for header in inline_headers {
         log::trace!("Parsing inline header");
 
         let header = headers::parser::parse_header(&PathBuf::from("inline header"), header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in inline header", err))?;
@@ -279,7 +279,7 @@ fn format_placements(world_placements: Vec<Placement>, custom_names: &HashMap<St
 
 type Seeds = Vec<String>;
 type Spoilers = Vec<String>;
-pub fn generate_seed(graph: &Graph, settings: Settings, headers: &[String], seed: Option<String>) -> Result<(Seeds, Spoilers), String> {
+pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String], seed: Option<String>) -> Result<(Seeds, Spoilers), String> {
     let mut settings = settings.apply_presets()?;
 
     let seed = seed.unwrap_or_else(|| {
@@ -306,7 +306,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, headers: &[String], seed
     world.pool = Pool::preset();
     world.player.spawn(&settings);
 
-    let (header_block, custom_flags, custom_names) = parse_headers(&mut world, headers, &settings, &mut rng)?;
+    let (header_block, custom_flags, custom_names) = parse_headers(&mut world, inline_headers, &settings, &mut rng)?;
 
     let flag_line = write_flags(&settings, custom_flags);
 

@@ -99,7 +99,8 @@ struct SeedArgs {
     #[structopt(flatten)]
     settings: SeedSettings,
     /// inline headers
-    headers: Vec<String>
+    #[structopt(short, long = "inline")]
+    inline_headers: Vec<String>
 }
 
 #[derive(StructOpt)]
@@ -397,13 +398,13 @@ fn generate_seeds(mut args: SeedArgs, tostdout: bool) -> Result<(), String> {
 
     let header = read_header();
     if !header.is_empty() {
-        args.headers.push(header)
+        args.inline_headers.push(header)
     }
 
     let worlds = settings.worlds;
     let race = settings.race;
     let players = settings.players.clone();
-    let (seeds, spoilers) = seedgen::generate_seed(&graph, settings, &args.headers, seed).map_err(|err| format!("Error generating seed: {}", err))?;
+    let (seeds, spoilers) = seedgen::generate_seed(&graph, settings, &args.inline_headers, seed).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
