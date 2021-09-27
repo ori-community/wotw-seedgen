@@ -4870,19 +4870,6 @@ anchor WoodsMain.TrialStart at 848, -4052:  # At the collapsing petrified Owl
   # state WoodsMain.TrialActivation:
   #   this would just be on an anchor with the shard...
 
-  pickup WoodsMain.OverflowShard:
-    moki:
-      DoubleJump, Bash, Grapple, Burrow, Dash OR Glide
-      Launch, Grapple, Bash, DoubleJump OR Dash OR Glide
-    gorlek:
-      Launch, DoubleJump OR Dash OR Bash OR Glide
-      Launch, Damage=15, Sword OR Hammer OR Burrow
-      DoubleJump, Bash, Grapple, Burrow, TripleJump OR Sword
-      DoubleJump, Bash, Grapple, Burrow, Hammer, Damage=15
-      DoubleJump, Bash, Grapple, Grenade=2, Damage=15, TripleJump OR Dash OR Glide OR Sword  # You can either damage boost at the first sand ball or grenade bash from below
-    unsafe:
-      Launch
-
   conn WoodsMain.AboveHowl:
     moki:
       DoubleJump OR Launch
@@ -4891,25 +4878,80 @@ anchor WoodsMain.TrialStart at 848, -4052:  # At the collapsing petrified Owl
       Dash, Damage=15
       Bash OR SentryJump=1
       Grapple, Glide
+    kii:
+      Dash OR Sword OR Hammer OR Damage=15  # With sword, pogo the skeeto
+      Grapple, Sentry=3 OR Blaze=5
+    unsafe: Grapple, Shuriken=3
+  conn WoodsMain.MidwayTrial:
+    moki:
+      DoubleJump, Bash, Grapple, Dash OR Glide
+      Launch, Grapple, Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch, DoubleJump OR Dash OR Glide
+      DoubleJump, Bash, Grapple
+    kii:
+      Launch
+      DoubleJump, TripleJump, Grapple OR Damage=15
+    unsafe:
+      Hammer, DoubleJump, Grapple  # either djump+upslash to get a walljump just under the checkpoint or upslash+one slash to land on the branch
+      Sword, DoubleJump, Grapple  # upslash+downslash to pass through the semi solid branch at the checkpoint
+    
+anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first sand bag
+# This anchor is purely to make WoodsMain.TrialStart->WoodsMain.OverflowShard less painful to pathfind
+  refill Checkpoint
+  
+  pickup WoodsMain.OverflowShard:
+    moki:
+      DoubleJump, Bash, Burrow, Dash OR Glide
+      Launch, Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch, DoubleJump OR Dash OR Bash OR Glide
+      Launch, Damage=15, Sword OR Hammer OR Burrow
+      DoubleJump, Bash, Burrow, TripleJump OR Sword
+      DoubleJump, Bash, Burrow, Hammer, Damage=15
+      DoubleJump, Bash, Grenade=2, Damage=15, TripleJump OR Dash OR Glide OR Sword  # You can either damage boost at the first sand ball or grenade bash from below
+    kii:
+      Launch
+      DoubleJump, Bash, Burrow OR Grenade=2
+      DoubleJump, Burrow, Damage=30
+    unsafe:
+      DoubleJump, TripleJump, Damage=30
+  
+  conn WoodsMain.AboveHowl:
+    gorlek: free  # Jump and hold right
+  
 
 anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced Howl
   pickup WoodsMain.HiddenEX: free
 
+  conn WoodsMain.PetrifiedHowl: free
   conn WoodsMain.Teleporter:
     moki:
-      Combat=4xBalloon, DoubleJump OR Launch
-      Combat=4xBalloon, Bash, Grenade=1
+      Combat=4xBalloon, BreakWall=3, DoubleJump OR Launch
+      Combat=4xBalloon, BreakWall=3, Bash, Grenade=1
     gorlek: SentryJump=1, Combat=Balloon OR Dash OR Damage=20
-  conn WoodsMain.PetrifiedHowl: free
-  conn WoodsMain.TrialStart: free
+    kii:
+      Sword  # Pogo the skeeto twice
+      Bash, BreakWall=3
+      BreakWall=3, DoubleJump OR Launch  # Ignore the balloons
+      Hammer, Glide OR Dash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+  conn WoodsMain.TrialStart:
+    moki: Launch OR DoubleJump OR Bash
+    gorlek: Hammer OR SentryJump=1
+    kii: Sword  # Pogo a skeeto
+    unsafe: free  #Touch the checkpoint then die or qtm
   conn WoodsMain.OrangeTree:  # pass over the tree
-    gorlek:
+    gorlek, Combat=Balloon:
       Launch
       DoubleJump, Bash, Grenade=1
       DoubleJump, SentryJump=1
       Bash, Grenade=2
+    kii:
+      Launch
+      DoubleJump, Bash, Grenade=1
+    unsafe:
+      Bash, Grenade=2  # You can kill the balloon with your first grenade
 
-# checkpoint at 873, -3980
 # checkpoint at 868, -3952
 # checkpoint at 980, -4015
 
