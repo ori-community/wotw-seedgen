@@ -11,7 +11,7 @@ use world::*;
 use requirements::*;
 use player::*;
 use pool::*;
-use inventory::*;
+use item::*;
 use util::*;
 use settings::*;
 

@@ -15,12 +15,12 @@ use crate::world::{
     graph::{self, Node},
     player::Player,
 };
-use crate::inventory::{Inventory, Item};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Teleporter, ShopCommand};
+use crate::settings::Settings;
 use crate::util::{
     self,
-    Resource, Skill, Teleporter, GoalMode, ShopCommand,
-    settings::Settings,
-    uberstate::{UberState, UberType},
+    GoalMode, UberState, UberType,
     constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
 };
 

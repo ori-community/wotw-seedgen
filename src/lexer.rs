@@ -6,7 +6,8 @@ use std::path::Path;
 
 use parser::ParseError;
 use crate::world::graph::Graph;
-use crate::util::{self, settings::Settings};
+use crate::settings::Settings;
+use crate::util;
 
 fn trace_parse_error(areas: &Path, position: usize) -> String {
     let input = util::read_file(areas, "logic").unwrap();

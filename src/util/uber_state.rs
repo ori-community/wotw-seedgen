@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::inventory::{Item, UberStateItem, UberStateOperator};
+use crate::item::{Item, UberStateItem, UberStateOperator};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum UberType {

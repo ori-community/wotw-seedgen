@@ -2,8 +2,9 @@ use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use super::player::Player;
-use crate::inventory::{Inventory, Item};
-use crate::util::{Difficulty, Resource, Skill, Shard, Teleporter, Enemy, orbs::{self, Orbs}};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard, Teleporter};
+use crate::util::{Difficulty, Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
 
@@ -474,7 +475,7 @@ impl Requirement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::util::settings::Settings;
+    use crate::settings::Settings;
 
     #[test]
     fn is_met() {

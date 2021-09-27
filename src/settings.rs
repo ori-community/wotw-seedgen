@@ -8,7 +8,8 @@ use std::{
 use rustc_hash::FxHashSet;
 use serde::{Serialize, Deserialize};
 
-use super::{
+use crate::util::{
+    self,
     Difficulty, Glitch, GoalMode,
     constants::{DEFAULT_SPAWN, SLUGSTRINGS}
 };
@@ -225,7 +226,7 @@ impl Settings {
     }
     pub fn from_preset(mut preset: PathBuf) -> Result<Settings, String> {
         preset.set_extension("json");
-        let content = super::read_file(&preset, "presets")?;
+        let content = util::read_file(&preset, "presets")?;
         Settings::compability_parse(&content)
     }
     pub fn write(&self) -> Result<String, String> {

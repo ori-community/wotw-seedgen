@@ -11,12 +11,11 @@ use crate::world::{
     World,
     graph::Graph,
 };
-use crate::inventory::{Inventory, Item, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary};
-use crate::util::{
-    self, Resource, Skill, Shard, Teleporter, BonusItem, BonusUpgrade, Hint, Command, ToggleCommand, Zone, ZoneHintType, SysMessage, WheelCommand, Icon, WheelBind, ShopCommand,
-    settings::Settings,
-    uberstate::{UberState, UberType, UberIdentifier},
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, Hint, ToggleCommand, ZoneHintType, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary
 };
+use crate::settings::Settings;
+use crate::util::{self, Zone, Icon, UberState, UberType, UberIdentifier};
 
 fn end_of_pickup<'a, I>(mut parts: I) -> Result<(), String>
 where

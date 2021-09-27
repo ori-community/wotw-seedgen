@@ -8,12 +8,8 @@ use rustc_hash::FxHashMap;
 use graph::Graph;
 use pool::Pool;
 use player::Player;
-use crate::inventory::{Item, UberStateOperator, UberStateRangeBoundary};
-use crate::util::{
-    Resource,
-    uberstate::{UberState, UberIdentifier, UberType},
-    constants::WISP_STATES,
-};
+use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
+use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
 pub struct World<'a> {
@@ -150,6 +146,7 @@ mod tests {
     use super::*;
     use super::super::*;
     use world::pool::Pool;
+    use item::*;
     use util::*;
     use rustc_hash::FxHashSet;
 

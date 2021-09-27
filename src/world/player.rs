@@ -2,11 +2,12 @@ use std::convert::TryFrom;
 
 use smallvec::{SmallVec, smallvec};
 
-use crate::inventory::{Inventory, Item};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard};
+use crate::settings::Settings;
 use crate::util::{
-    Difficulty, Resource, Skill, Shard,
+    Difficulty,
     orbs::{self, Orbs},
-    settings::Settings
 };
 
 #[derive(Debug, Default, Clone)]
@@ -319,6 +320,7 @@ impl Player {
 mod tests {
     use super::*;
 
+    use crate::item::BonusItem;
     use crate::util::*;
 
     #[test]

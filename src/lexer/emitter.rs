@@ -5,9 +5,10 @@ use crate::world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
 };
+use crate::item::Skill;
+use crate::settings::Settings;
 use crate::util::{
-    Difficulty, Glitch, Skill, Position, Zone,
-    settings::Settings,
+    Difficulty, Glitch, Position, Zone,
 };
 
 struct EmitterContext<'a> {

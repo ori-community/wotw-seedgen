@@ -5,9 +5,8 @@ use smallvec::{SmallVec, smallvec};
 
 use super::{player::Player, requirements::Requirement};
 use crate::util::{
-    RefillType, NodeType, Position, Zone,
+    RefillType, NodeType, Position, Zone, UberState, UberIdentifier,
     orbs::{self, Orbs},
-    uberstate::{UberState, UberIdentifier},
     constants::TP_ANCHOR,
 };
 

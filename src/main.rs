@@ -15,19 +15,16 @@ use bugsalot::debugger;
 use rustc_hash::FxHashSet;
 use log::LevelFilter;
 
-use seedgen::{self, lexer, inventory, world, headers, util};
+use seedgen::{self, lexer, item, world, headers, settings, util};
 
-use inventory::Item;
+use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
     World,
     graph::Graph,
 };
 use headers::parser::HeaderContext;
-use util::{
-    Difficulty, Glitch, GoalMode, Resource, Skill, Teleporter, Shard,
-    settings::{Settings, Spawn},
-    uberstate::UberState,
-};
+use settings::{Settings, Spawn};
+use util::{Difficulty, Glitch, GoalMode, UberState};
 
 #[derive(StructOpt)]
 /// Generate seeds for the Ori 2 randomizer.
@@ -487,7 +484,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         }
     }
 
-    let spawn = util::settings::read_spawn(&contents)?;
+    let spawn = settings::read_spawn(&contents)?;
     let spawn = world.graph.find_spawn(&spawn)?;
 
     let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).expect("Invalid Reach Check");
