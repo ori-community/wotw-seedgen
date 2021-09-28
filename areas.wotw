@@ -4950,7 +4950,7 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
       Launch
       DoubleJump, Bash, Grenade=1
     unsafe:
-      Bash, Grenade=2  # You can kill the balloon with your first grenade
+      Bash, Grenade=2  # You can kill the balloon with your first bashgrenade
 
 # checkpoint at 868, -3952
 # checkpoint at 980, -4015
@@ -4959,37 +4959,49 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
 
   conn Teleporters: free
-  conn WoodsMain.AbovePit:
+  conn WoodsMain.AbovePit:  # So far, this also cover the OrangeTree connection
     moki:
       Glide
       DoubleJump, Bash, Launch  # :)
     gorlek: Launch, Damage=15
-    unsafe: DoubleJump, TripleJump, Hammer, Damage=15  # climb the right wall, triple jump in the spikes, triple jump + up slash to climb the right wall
-  conn WoodsMain.AboveHowl:  # moki paths are solved with the AbovePit - OrangeTree connection
+    kii:
+      Launch
+      DoubleJump, TripleJump, Damage=45
+      DoubleJump, TripleJump, Bash, Damage=15
+    unsafe:
+      DoubleJump, Damage=45, Dash OR Shuriken=2
+      DoubleJump, Damage=15, TripleJump OR Bash
+  conn WoodsMain.AboveHowl:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->AboveHowl
     gorlek, Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1:  # these can break the corruption from behind
       DoubleJump, Combat=2xBalloon, Hammer OR Sword OR TripleJump
       DoubleJump, Dash
       SentryJump=1, Combat=2xBalloon OR Dash
       Bash, Grenade=1, Combat=2xBalloon OR Dash
       Launch
+    kii, Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1:
+      Combat=Balloon, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # only need to kill the first balloon
+      Damage=20, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost on the first balloon to kill it
+    unsafe, ShurikenBreak=3 OR Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1:
+      DoubleJump 
+      SentryJump=1, Combat=2xBalloon OR Dash
+      Bash, Grenade=1, Combat=2xBalloon OR Dash
 
 anchor WoodsMain.OrangeTree at 1030, -4010:  # At the right of the tree above the teleporter
-    conn WoodsMain.Teleporter:
-      moki: Glide
-      gorlek: DoubleJump OR Dash OR Launch OR Sword
-    conn WoodsMain.AbovePit:
-      moki: Bash OR Glide OR Launch
-      gorlek:
-        DoubleJump
-        Dash
-      unsafe:
-        Sword  # Pogo the plant
-    conn WoodsMain.AboveHowl:
-      moki:
-        Launch
-      gorlek:
-        SentryJump=1, DoubleJump
-        DoubleJump, Bash, Grenade=1
+# Conenction to teleporter are handled through AbovePit. And even then, going to the teleporter is only allowing you to either go back to AbovePit or go AboveHowl, making going to the teleporter pointless in the first place
+  conn WoodsMain.AbovePit:
+    moki: Bash OR Glide OR Launch
+    gorlek:
+      DoubleJump
+      Dash
+    kii: Sword  # Pogo the plant
+    unsafe: Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+  conn WoodsMain.AboveHowl:
+    moki:
+      Launch
+    gorlek:
+      SentryJump=1, DoubleJump
+      DoubleJump, Bash, Grenade=1
+    kii: Bash
 
 # checkpoint at the anchor below, could split another anchor off for the crystal and move it over
 
@@ -4999,16 +5011,19 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
 
   conn WoodsMain.Teleporter:  # a dead end in moki
     gorlek: DoubleJump OR Dash OR Glide OR Launch OR Sword OR Damage=15
+    kii: 
+      Hammer OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2 OR Damage=15
+      Bash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn WoodsMain.OrangeTree:
     moki: Bash OR Glide OR Launch
     gorlek:
       DoubleJump, Dash OR TripleJump OR Damage=15
       Dash, Damage=15
-    unsafe:
+    kii:
+      Damage=30
       Sword  # Pogo the plant
-      Hammer, DoubleJump
-      Dash, Sword OR Hammer  # dash+upslash. Easier if you wall jump on the right wall instead of jumping directly towards the pit
-
+      Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Hammer, DoubleJump OR Dash
   conn WoodsMain.FeedingGrounds:
     moki:
       DoubleJump, Dash OR Bash
@@ -5018,8 +5033,15 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
       DoubleJump, Hammer
       Bash, Dash OR Hammer
       Sword
-  conn WoodsShrine:  # in moki these are covered by the feeding grounds connection
+    kii:
+      Dash OR DoubleJump OR Hammer OR Blaze=4 OR Sentry=2
+      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+  conn WoodsShrine:  # Make sure this isn't redundant with AbovePit->FeedingGrounds->WoodsShrine
     gorlek: Damage=15, DoubleJump OR Dash
+    kii:
+      Blaze=4 OR Sentry=2
+      Damage=15, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe: free
 
 anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feeding grounds
   refill Checkpoint
@@ -5032,6 +5054,10 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Glide OR Launch
       DoubleJump, Dash
     gorlek: Damage=15, DoubleJump OR Dash
+    kii:
+      DoubleJump OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
+      Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free
   conn LowerWastes.WestTP:
     moki:
       Grapple, Glide, DoubleJump OR Dash OR Launch  # this solves with Seir as well
@@ -5051,6 +5077,17 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
         Bash, Grenade=1, Grapple
         Bash, Grenade=2, Dash  # Dash to get in bash range on the 2nd grenade to get on the grappable surface
         Bash, Grenade=1, DoubleJump, TripleJump, Dash OR Sword OR Hammer
+    kii:
+      DoubleJump, TripleJump
+      Glide, Dash, DoubleJump, Sword OR Hammer
+      Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Dash, DoubleJump, Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      WindtornRuins.Seir:  # these wouldn't solve without Seir
+        Glide, Bash, Grenade=1, DoubleJump OR Dash
+        Bash, Grenade=2, DoubleJump
+    unsafe:
+      DoubleJump, Bash, Grenade=1
   conn WoodsMain.AbovePit:
     moki:
       DoubleJump, Bash
@@ -5058,6 +5095,10 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
     gorlek:
       Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
       SentryJump=1, DoubleJump OR Dash OR Glide
+    kii:
+      Bash, Grenade=1
+      Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: DoubleJump  # fall then good old glide skip
 
 anchor WoodsShrine at 1361, -4068:
