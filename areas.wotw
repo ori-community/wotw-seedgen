@@ -2990,19 +2990,14 @@ anchor WestGlades.Lower at -545, -4113:  # The right edge of the first pool past
     moki, BreakCrystal:
       DoubleJump, Dash OR Glide
       Launch
-#     gorlek:
-#       Water, RangedWeapon OR Sentry=1  # break the crystal from afar and jump into the water to get the energy
-#       DoubleJump, TripleJump, RangedWeapon OR Sentry=1 OR Blaze=1  # break the crystal from afar and use triple jump to collect the energy midair
-#       Launch, RangedWeapon OR Sentry=1 OR Blaze=1  # launch up to the crystal. Note that breaking the crystal with launch causes the energy crystals to go very far out of bounds.
-#       SentryJump=1
-#     unsafe:
-#       Dash, RangedWeapon OR Sentry=1
-#       DoubleJump, RangedWeapon OR Sentry=1 OR Bash
-#       Glide, RangedWeapon OR Sentry=1
-#       Sword, RangedWeapon OR Sentry=1  # Sword Float over then back
-#       Hammer, Sentry=2
-#       Hammer, RangedWeapon, Sentry=1  # Midair Hammer Sentry
-# procrastinating these a bit //TODO
+#@validator everything beside moki paths need validation
+    gorlek, BreakCrystal:
+      Water, Bow OR Spear OR Shuriken OR Grenade OR Sentry  # break the crystal from afar and jump into the water to get the energy
+      DoubleJump, TripleJump, Bow OR Spear OR Shuriken OR Grenade OR Blaze OR Sentry  # break the crystal from afar and use triple jump to collect the energy midair
+      Launch, Bow OR Spear OR Shuriken OR Grenade OR Blaze OR Sentry  # launch up to the crystal. Note that breaking the crystal with launch causes the energy crystals to go very far out of bounds.
+    kii, BreakCrystal:
+      Bow OR Spear OR Shuriken OR Grenade OR Sentry:  #Ranged Weapons
+        DoubleJump OR Dash OR Glide OR Hammer OR Sword
 
   state GladesTown.GromsWall:
     unsafe: Bash, Launch
@@ -3015,10 +3010,18 @@ anchor WestGlades.Lower at -545, -4113:  # The right edge of the first pool past
       DoubleJump, TripleJump
       Bash, DoubleJump, Dash
       SentryJump=1
+    kii:
+      Bash, Dash OR DoubleJump OR Sword
+      Bash, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, WaterDash, Water, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, WaterDash, Damage=20, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, Hammer
     unsafe:
+      Dash, Sword  # pogo the projectile
+      DoubleJump, Spear=1
       Grenade=1  # grenade jump
       Bash:
-        Dash OR Bow=2                   # Bow to aggro the tentacle
+        Glide OR Bow=1                   # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
         WaterDash, Water OR Damage=20
         Glide, Water OR Damage=20
   pickup WestGlades.AbovePlantEX:
@@ -3029,17 +3032,32 @@ anchor WestGlades.Lower at -545, -4113:  # The right edge of the first pool past
       Launch
     gorlek:
       Bash, DoubleJump OR Dash OR Grenade=1
-      Bash, WaterDash, Damage=20
+      Bash, WaterDash, Water OR Damage=20
       Bash, SentryJump=1, Glide
       SentryJump=1, Combat=Tentacle, DoubleJump OR Dash OR Water
       SentryJump=1, Combat=Tentacle, WaterDash, Damage=20
       SentryJump=2, Glide, Combat=Tentacle
-    unsafe:
-      SwordSJump=1, Damage=20  # defeating the enemy. Should replace with Combat= once applicable
+    kii:
+      Bash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Glide, Water OR Damage=20
+      DoubleJump, TripleJump, Sword  # reset jumps with sword 
+      Combat=Tentacle, DoubleJump, TripleJump, Hammer OR Spear=1
+    unsafe:
+      Bash, Glide OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
+      DoubleJump, Sword
+      Combat=Tentacle, SwordSJump=1
+      Combat=Tentacle, Glide, DoubleJump  # Glide jump
+      Combat=Tentacle, DoubleJump, Spear=2  # extend jumps momentum with spears
       # DiveLaunch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Flap OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup WestGlades.LowerPoolEX:
     moki: Water
+    kii:
+      Damage=80
+      Damage=60, Launch OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      WaterDash, Damage=40
+    unsafe:
+      Damage=60, Flash=1 OR Sentry=1
+      Damage=60, Bash, Bow=1  # aggro the tentacule
   pickup WestGlades.SwimEC:
     moki: Water
   pickup WestGlades.LeftOre:
