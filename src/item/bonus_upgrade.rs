@@ -75,7 +75,7 @@ impl BonusUpgrade {
             BonusUpgrade::ShurikenEfficiency => Some(Icon::File(String::from("assets/icons/bonus/shurikenefficiency.png"))),
             BonusUpgrade::SentryEfficiency => Some(Icon::File(String::from("assets/icons/bonus/sentryefficiency.png"))),
             BonusUpgrade::BowEfficiency => Some(Icon::File(String::from("assets/icons/bonus/bowefficiency.png"))),
-            BonusUpgrade::RegenerationEfficiency => Some(Icon::File(String::from("assets/icons/bonus/regenerationefficiency.png"))),
+            BonusUpgrade::RegenerationEfficiency => Some(Icon::File(String::from("assets/icons/bonus/regenerateefficiency.png"))),
             BonusUpgrade::FlashEfficiency => Some(Icon::File(String::from("assets/icons/bonus/flashefficiency.png"))),
             BonusUpgrade::GrenadeEfficiency => Some(Icon::File(String::from("assets/icons/bonus/grenadeefficiency.png"))),
             BonusUpgrade::ExplodingSpike => Some(Icon::Opher(7)),
