@@ -44,11 +44,11 @@ impl Resource {
 
     pub fn icon(self) -> Option<Icon> {
         Some(match self {
-            Resource::Health => Icon::File(String::from("assets/icons/healthfragment.png")),
-            Resource::Energy => Icon::File(String::from("assets/icons/energyfragment.png")),
-            Resource::Ore => Icon::File(String::from("assets/icons/gorlekore.png")),
-            Resource::Keystone => Icon::File(String::from("assets/icons/keystone.png")),
-            Resource::ShardSlot => Icon::File(String::from("assets/icons/shardslot.png")),
+            Resource::Health => Icon::File(String::from("assets/icons/game/healthfragment.png")),
+            Resource::Energy => Icon::File(String::from("assets/icons/game/energyfragment.png")),
+            Resource::Ore => Icon::File(String::from("assets/icons/game/gorlekore.png")),
+            Resource::Keystone => Icon::File(String::from("assets/icons/game/keystone.png")),
+            Resource::ShardSlot => Icon::File(String::from("assets/icons/game/shardslot.png")),
         })
     }
 }

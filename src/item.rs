@@ -315,16 +315,16 @@ impl Item {
 
     pub fn icon(&self) -> Option<Icon> {
         match self {
-            Item::SpiritLight(_) => Some(Icon::File(String::from("assets/icons/experience.png"))),
+            Item::SpiritLight(_) => Some(Icon::File(String::from("assets/icons/game/experience.png"))),
             Item::Resource(resource) => resource.icon(),
             Item::Skill(skill) => skill.icon(),
             Item::Shard(shard) => shard.icon(),
-            Item::Teleporter(_) => Some(Icon::File(String::from("assets/icons/teleporter.png"))),
-            Item::Message(_) => Some(Icon::File(String::from("assets/icons/message.png"))),
-            Item::Water => Some(Icon::File(String::from("assets/icons/water.png"))),
+            Item::Teleporter(_) => Some(Icon::File(String::from("assets/icons/game/teleporter.png"))),
+            Item::Message(_) => Some(Icon::File(String::from("assets/icons/game/message.png"))),
+            Item::Water => Some(Icon::File(String::from("assets/icons/game/water.png"))),
             Item::BonusItem(bonus_item) => bonus_item.icon(),
             Item::BonusUpgrade(bonus_upgrade) => bonus_upgrade.icon(),
-            Item::Relic(_) => Some(Icon::File(String::from("assets/icons/relic.png"))),
+            Item::Relic(_) => Some(Icon::File(String::from("assets/icons/game/relic.png"))),
             _ => None,
         }
     }
