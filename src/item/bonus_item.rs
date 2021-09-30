@@ -42,11 +42,11 @@ impl BonusItem {
 
     pub fn icon(self) -> Option<Icon> {
         match self {
-            BonusItem::Relic => Some(Icon::File(String::from("icons/relic.png"))),
-            BonusItem::HealthRegen => Some(Icon::File(String::from("icons/healthregeneration.png"))),
-            BonusItem::EnergyRegen => Some(Icon::File(String::from("icons/energyregeneration.png"))),
-            BonusItem::ExtraDoubleJump => Some(Icon::File(String::from("icons/extradoublejump.png"))),
-            BonusItem::ExtraAirDash => Some(Icon::File(String::from("icons/extraairdash.png"))),
+            BonusItem::Relic => Some(Icon::File(String::from("assets/icons/relic.png"))),
+            BonusItem::HealthRegen => Some(Icon::File(String::from("assets/icons/healthregeneration.png"))),
+            BonusItem::EnergyRegen => Some(Icon::File(String::from("assets/icons/energyregeneration.png"))),
+            BonusItem::ExtraDoubleJump => Some(Icon::File(String::from("assets/icons/extradoublejump.png"))),
+            BonusItem::ExtraAirDash => Some(Icon::File(String::from("assets/icons/extraairdash.png"))),
         }
     }
 }
