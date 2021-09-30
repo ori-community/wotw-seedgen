@@ -3225,7 +3225,10 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
 
   pickup WestGlades.UpperPoolEX:
     moki: Water
-  pickup WestGlades.RightOre:
+    unsafe:
+      Damage=180
+      WaterDash, Damage=80
+  pickup WestGlades.RightOre:  # Be carefull it's not redundant with paths from WestGlades.Center
     moki:
       Glide, DoubleJump OR Dash
       DoubleJump, Dash
@@ -3233,10 +3236,15 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       DoubleJump, TripleJump OR Sword OR Hammer
       Dash, Sword OR Hammer
       Glide, Combat=Tentacle, SentryJump=1
+    kii:
+      Sword OR Dash OR Sentry=6
+      DoubleJump, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, Combat=Tentacle, Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       Bash
-      Glide, Shuriken=1 OR Sword OR Hammer OR Flash OR Sentry=1
-      # Sword     # Swordhover to the log, pogo the tentacle
+      Glide  # Glide jump
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
   conn WestGlades.Center: free
   conn LowerReach.Entry:
@@ -3251,34 +3259,28 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       DoubleJump, TripleJump, Dash OR Glide OR Sword
       WaterDash, Damage=20
       SentryJump=1
+    kii:
+      Dash, DoubleJump, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Hammer, Shuriken
     unsafe:
       Grenade=1  # grenade jump
-
-anchor WestGlades.ShrineArea at -664, -4026:
-  refill Checkpoint
-
-  pickup WestGlades.ShrineHC:
-    moki:
-      Grapple, DoubleJump, Dash OR Glide
-      Bash, Grenade=1
-      Launch
-    gorlek:
-      Grapple, DoubleJump, TripleJump
-      SentryJump=1
-    unsafe:
-      # Bash, DoubleJump OR Dash OR Glide OR Sword  # use the shrine enemies
-      Bash                                          # using shrine enemies (crab and bee)
-      DoubleJump, TripleJump
-      Grapple, Hammer, Dash                         # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
-
-  conn GladesShrine: free
-  conn WestGlades.MillApproach: free
+      Dash, DoubleJump, Blaze=1
 
 anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room opening up to Wellspring
   refill Checkpoint
   refill Health=1
-
-  # any paths to the ore above would be redundant with connection to outerentrance so far
+  
+  pickup OuterWellspring.SwimOre:
+    moki, Water: Grapple OR WaterDash OR Launch
+    gorlek, Water:
+      Bash, Grenade=1          # stand on the spinny wheel and bash-grenade up
+      SentryJump=1             # ooooor use a SentryJump
+      DoubleJump, TripleJump   # ooooor just some regular jumps!
+      DoubleJump, Sword OR Hammer  # oooooooooooor double jump then upslash
+    kii, Water: DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+    unsafe: 
+      Water, DoubleJump               # or just be a madman
+      Water, Glide  # Glide jump
 
   conn WestGlades.ShrineArea:
     moki:
@@ -3291,12 +3293,12 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Grapple, Dash OR Glide OR Sword
       SentryJump=1, DoubleJump, TripleJump
       Launch
+    kii:
+      Grapple, Hammer OR Shuriken=1 OR Sentry=2
+      Bash, Grenade=1  # Bash the mortar so you can reach your grenade from higher
     unsafe:
       Bash
-      Grapple, Hammer
       DoubleJump, TripleJump, Sword
-      # Bash, Grenade=1           # Throw Grenade, Bash mortar and then Bash Grenade
-      # Bash, Grenade=1, Grapple  # Grenadebash
   conn WestGlades.Upper:
     moki:  # realizing the semisolid not considered for moki
       Bash, DoubleJump OR Dash OR Glide OR Grenade=1
@@ -3307,10 +3309,11 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
     gorlek:
       Water OR DoubleJump OR Dash OR Glide OR Sword OR Damage=20  # wall jump through the semisolid
       Hammer, Bash OR SwordSJump=1 OR Grapple
+    kii:
+      Bash OR Hammer OR Sentry=2
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash
       Grenade=1, Sentry=1 OR Flash OR Blaze=1 OR Shuriken=1
-      Sentry=2
   conn OuterWellspring.EntranceDoor:
     moki:
       Launch OR Water
@@ -3324,28 +3327,66 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Bash, Grenade=2
       SentryJump=2 OR SwordSJump=1  # Air stall with hammer or sword
       HammerSJump=1, Glide OR Damage=20
-      # Other Grapple options don't seem very consistent
+    kii:
+      Sword
+      Damage=20, Hammer OR Sentry=2 OR Damage=20
+      Bash, Grenade=1, Hammer OR Sentry=2
+      Hammer, Glide OR Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash, Grenade=1, Grapple  # requires holding up, good for kii
-      Glide OR Sword
+      Bash, Grenade=1, Grapple  # requires holding up
+      Glide
       Grenade=2, Hammer  # grenade jumps and hammer floats
-      Grapple, Sentry=1 OR Flash OR Spear=1 OR Shuriken=1
-  conn PoolsApproach.MillPathCheckpoint:  # this makes more sense here than at OuterWellspring
-    moki:
-      Damage=15, Water, Grapple, DoubleJump, Dash OR Glide  # you can make this path harder on yourself by not using the wall, but really the fail case is you taking 15 damage
-      Water, Grapple, WaterDash OR Launch
-      Water, Launch, DoubleJump, Dash
-      Water, Launch, Glide
-    gorlek:  # hopefully didn't go too far for gorlek?
-      Water, Grapple, DoubleJump OR Dash OR Bash OR Damage=15  # non-damage variants pretty risky
-      Water, WaterDash, DoubleJump, TripleJump
-      Water, WaterDash, Dash OR Glide OR Sword OR Damage=15
-      Water, Bash, DoubleJump, TripleJump
-      Water, Bash, Dash OR Glide OR Sword OR Damage=15
-      Water, Launch, DoubleJump OR Dash OR Bash OR WaterDash OR Sword OR Hammer OR Damage=15
+  conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
+    kii:
+      Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Bash, Grenade=1
+  conn PoolsApproach.MillPathCheckpoint:
+    moki, Water:
+      Damage=15, Grapple, DoubleJump, Dash OR Glide  # you can make this path harder on yourself by not using the wall, but really the fail case is you taking 15 damage
+      Grapple, WaterDash OR Launch
+      Launch, DoubleJump, Dash
+      Launch, Glide
+    gorlek, Water:  # hopefully didn't go too far for gorlek?
+      Grapple, DoubleJump OR Dash OR Bash OR Damage=15  # non-damage variants pretty risky
+      WaterDash, DoubleJump, TripleJump
+      WaterDash, Dash OR Glide OR Sword OR Damage=15
+      Bash, DoubleJump, TripleJump
+      Bash, Dash OR Glide OR Sword OR Damage=15
+      Launch, DoubleJump OR Dash OR Bash OR WaterDash OR Sword OR Hammer OR Damage=15
+    kii, Water:
+      WaterDash, Bash
+      WaterDash, DoubleJump OR Hammer OR Sentry=2
+      Bash, DoubleJump OR Hammer OR Sentry=2
+      Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Water, Launch
       Water, Bash, Hammer OR DoubleJump
-      Water, WaterDash, Hammer OR DoubleJump
+      Water, Grapple, Sword
+      Water, WaterDash, DoubleJump
+      Water, Sword, DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Pogo the tentacle's projectile
+
+anchor WestGlades.ShrineArea at -664, -4026:
+  refill Checkpoint
+
+  pickup WestGlades.ShrineHC:
+    moki:
+      Grapple, DoubleJump, Dash OR Glide
+      Bash, Grenade=1
+      Launch
+    gorlek:
+      Grapple, DoubleJump, TripleJump
+      SentryJump=1
+    kii:
+      Bash  # Use the ennemies from the shrine
+      DoubleJump, TripleJump
+      Grapple, DoubleJump, Hammer OR Sword OR Sentry=2
+    unsafe:
+      Grapple, DoubleJump, Shuriken=2
+      Grapple, Hammer, Dash                         # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
+
+  conn GladesShrine: free
+  conn WestGlades.MillApproach: free
 
 anchor GladesShrine at -635, -4020:
   refill Full
@@ -3437,17 +3478,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       DoubleJump, TripleJump
   pickup OuterWellspring.SwimEX:
     moki: Water
-  pickup OuterWellspring.SwimOre:
-    moki:
-      Water, Grapple OR WaterDash OR Launch
-    gorlek:
-      Water, Bash, Grenade=1          # stand on the spinny wheel and bash-grenade up
-      Water, SentryJump=1             # ooooor use a SentryJump
-      Water, DoubleJump, TripleJump   # ooooor just some regular jumps!
-      Water, DoubleJump, Sword OR Hammer  # oooooooooooor double jump then upslash
-    unsafe:
-      Water, DoubleJump               # or just be a madman
-
+  
   conn InnerWellspring.EntranceDoor:
     moki: OuterWellspring.EntranceDoorOpen
   conn OuterWellspring.AboveEntranceDoor:
