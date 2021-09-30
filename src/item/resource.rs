@@ -43,12 +43,12 @@ impl Resource {
     }
 
     pub fn icon(self) -> Option<Icon> {
-        Some(Icon::Map(match self {
-            Resource::Health => 33,
-            Resource::Energy => 34,
-            Resource::Ore => 29,
-            Resource::Keystone => 0,
-            Resource::ShardSlot => 27,
-        }))
+        Some(match self {
+            Resource::Health => Icon::File(String::from("icons/healthfragment.png")),
+            Resource::Energy => Icon::File(String::from("icons/energyfragment.png")),
+            Resource::Ore => Icon::File(String::from("icons/gorlekore.png")),
+            Resource::Keystone => Icon::File(String::from("icons/keystone.png")),
+            Resource::ShardSlot => Icon::File(String::from("icons/shardslot.png")),
+        })
     }
 }

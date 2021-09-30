@@ -315,12 +315,12 @@ impl Item {
 
     pub fn icon(&self) -> Option<Icon> {
         match self {
-            Item::SpiritLight(_) => Some(Icon::Map(17)),
+            Item::SpiritLight(_) => Some(Icon::File(String::from("icons/experience.png"))),
             Item::Resource(resource) => resource.icon(),
             Item::Skill(skill) => skill.icon(),
             Item::Shard(shard) => shard.icon(),
-            Item::Teleporter(_) => Some(Icon::Map(13)),
-            Item::Message(_) => Some(Icon::Map(25)),
+            Item::Teleporter(_) => Some(Icon::File(String::from("icons/teleporter.png"))),
+            Item::Message(_) => Some(Icon::File(String::from("icons/message.png"))),
             Item::Water => Some(Icon::File(String::from("icons/water.png"))),
             Item::BonusItem(bonus_item) => bonus_item.icon(),
             Item::BonusUpgrade(bonus_upgrade) => bonus_upgrade.icon(),
