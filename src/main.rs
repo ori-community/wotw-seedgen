@@ -44,12 +44,6 @@ enum SeedGenCommand {
     Seed {
         #[structopt(flatten)]
         args: SeedArgs,
-        /// create a generator.log with verbose output about the generation process
-        #[structopt(short, long)]
-        verbose: bool,
-        /// write the seed to stdout instead of a file
-        #[structopt(long)]
-        tostdout: bool,
     },
     /// Play the most recent generated seed
     Play,
@@ -93,9 +87,18 @@ struct SeedArgs {
     /// the input file representing state namings
     #[structopt(parse(from_os_str), default_value = "state_data.csv", long)]
     uber_states: PathBuf,
+    /// create a generator.log with verbose output about the generation process
+    #[structopt(short, long)]
+    verbose: bool,
     /// skip validating the input files for a slight performance gain
     #[structopt(short, long)]
     trust: bool,
+    /// write the seed to stdout instead of a file
+    #[structopt(long)]
+    tostdout: bool,
+    /// launch the seed after generating
+    #[structopt(short, long)]
+    launch: bool,
     #[structopt(flatten)]
     settings: SeedSettings,
     /// inline headers
@@ -151,7 +154,7 @@ struct SeedSettings {
     #[structopt(short, long)]
     race: bool,
     /// prevent using the in-game logic map
-    #[structopt(short = "l", long)]
+    #[structopt(short = "L", long)]
     disable_logic_filter: bool,
     /// required for coop and bingo
     #[structopt(short, long)]
@@ -383,7 +386,7 @@ fn write_seeds_to_stdout(seeds: Vec<String>) {
     println!("{}", seeds.join("\n======= END SEED =======\n"));
 }
 
-fn generate_seeds(mut args: SeedArgs, tostdout: bool) -> Result<(), String> {
+fn generate_seeds(mut args: SeedArgs) -> Result<(), String> {
     let now = Instant::now();
 
     let seed = args.seed.as_ref().map_or_else(
@@ -411,7 +414,7 @@ fn generate_seeds(mut args: SeedArgs, tostdout: bool) -> Result<(), String> {
         log::info!("Generated {} worlds in {:?}", worlds, now.elapsed());
     }
 
-    if tostdout {
+    if args.tostdout {
         write_seeds_to_stdout(seeds);
         if race {
             println!("\n======= SPOILERS =======\n");
@@ -421,6 +424,14 @@ fn generate_seeds(mut args: SeedArgs, tostdout: bool) -> Result<(), String> {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
         write_seeds_to_files(&seeds, &spoilers, filename, args.seed_folder, &players, race).unwrap_or_else(|err| log::error!("{}", err));
+    }
+
+    if args.launch {
+        if args.tostdout {
+            log::warn!("Can't launch a seed that has been written to stdout");
+        } else {
+            play_last_seed()?;
+        }
     }
 
     Ok(())
@@ -537,11 +548,11 @@ fn main() {
     }
 
     match args.command {
-        SeedGenCommand::Seed { args, verbose, tostdout } => {
-            let use_file = if verbose { Some("generator.log") } else { None };
+        SeedGenCommand::Seed { args } => {
+            let use_file = if args.verbose { Some("generator.log") } else { None };
             seedgen::initialize_log(use_file, LevelFilter::Info).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            generate_seeds(args, tostdout).unwrap_or_else(|err| {
+            generate_seeds(args).unwrap_or_else(|err| {
               log::error!("{}", err);
               process::exit(2);
             });
