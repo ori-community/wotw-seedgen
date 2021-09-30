@@ -17,8 +17,8 @@
 3|1|8|1|10115|int|300
 3|1|8|1|10116|int|600
 // Set icons
-3|1|17|0|1|74|file:icons/spearefficiency
-3|1|17|0|1|98|file:icons/rapidsmash
-3|1|17|0|1|106|file:icons/starefficiency
-3|1|17|0|1|115|file:icons/blazeefficiency
-3|1|17|0|1|116|file:icons/sentryfficiency
+3|1|17|0|1|74|file:icons/spearefficiency.png
+3|1|17|0|1|98|file:icons/rapidsmash.png
+3|1|17|0|1|106|file:icons/shurikenefficiency.png
+3|1|17|0|1|115|file:icons/blazeefficiency.png
+3|1|17|0|1|116|file:icons/sentryefficiency.png

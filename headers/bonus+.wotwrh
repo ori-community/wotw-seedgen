@@ -41,6 +41,7 @@
 4|42|6|#Uncharged Bashgrenades#
 !!add 8|4|40|byte|+1
 !!name 8|4|40|byte|+1 #Extra Grenade#
+!!icon 8|4|40|byte|+1 file:icons/extragrenade.png
 4|40|6|#Extra Grenade x$(4|40)#
 !!add 8|4|45|byte|+2
 !!name 8|4|45|byte|+2 #Splinter Grenade#
