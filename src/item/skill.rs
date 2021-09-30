@@ -114,7 +114,7 @@ impl Skill {
             Skill::Blaze => Some(Icon::Opher(8)),
             Skill::Sentry => Some(Icon::Opher(0)),
             Skill::Flap => Some(Icon::Spell(3005)),
-            Skill::AncestralLight => Some(Icon::Spell(4008)),
+            Skill::AncestralLight => Some(Icon::File(String::from("assets/icons/game/ancestrallight1.png"))),
         }
     }
 
