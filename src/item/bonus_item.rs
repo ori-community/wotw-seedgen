@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::util::auto_display;
+use crate::util::{Icon, auto_display};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum BonusItem {
@@ -37,6 +37,16 @@ impl BonusItem {
             BonusItem::EnergyRegen => 31,
             BonusItem::ExtraDoubleJump => 35,
             BonusItem::ExtraAirDash => 36,
+        }
+    }
+
+    pub fn icon(self) -> Option<Icon> {
+        match self {
+            BonusItem::Relic => Some(Icon::File(String::from("icons/relic.png"))),
+            BonusItem::HealthRegen => Some(Icon::File(String::from("icons/healthregeneration.png"))),
+            BonusItem::EnergyRegen => Some(Icon::File(String::from("icons/energyregeneration.png"))),
+            BonusItem::ExtraDoubleJump => Some(Icon::File(String::from("icons/extradoublejump.png"))),
+            BonusItem::ExtraAirDash => Some(Icon::File(String::from("icons/extraairdash.png"))),
         }
     }
 }

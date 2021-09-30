@@ -23,32 +23,40 @@
 
 // Melting Upgrades
 !!add 8|4|71|bool|true
-!!name 8|4|71|bool|true Melting Blaze
+!!name 8|4|71|bool|true #Melting Blaze#
+!!icon 8|4|71|bool|true file:icons/meltingblaze.png
 4|71|6|#Melting Blaze#
 !!add 8|4|72|bool|true
-!!name 8|4|72|bool|true Melting Sword
+!!name 8|4|72|bool|true #Melting Sword#
+!!icon 8|4|72|bool|true file:icons/meltingsword.png
 4|72|6|#Melting Sword#
 !!add 8|4|75|bool|true
-!!name 8|4|75|bool|true Melting Shuriken
+!!name 8|4|75|bool|true #Melting Shuriken#
+!!icon 8|4|75|bool|true file:icons/meltingshuriken.png
 4|75|6|#Melting Shuriken#
 // Grenade Upgrades
 !!add 8|4|42|bool|true
-!!name 8|4|42|bool|true Uncharged Bashgrenades
+!!name 8|4|42|bool|true #Uncharged Bashgrenades#
+!!icon 8|4|42|bool|true file:icons/unchargedbashgrenade.png
 4|42|6|#Uncharged Bashgrenades#
 !!add 8|4|40|byte|+1
-!!name 8|4|40|byte|+1 Extra Grenade
+!!name 8|4|40|byte|+1 #Extra Grenade#
 4|40|6|#Extra Grenade x$(4|40)#
 !!add 8|4|45|byte|+2
-!!name 8|4|45|byte|+2 Splinter Grenade
+!!name 8|4|45|byte|+2 #Splinter Grenade#
+!!icon 8|4|45|byte|+2 file:icons/splintergrenade.png
 4|45|6|#Splinter Grenade#
 !!add 2x 8|4|44|float|-0.5
-!!name 8|4|44|float|-0.5 Rapid Grenade
+!!name 8|4|44|float|-0.5 #Rapid Grenade#
+!!icon 8|4|44|float|-0.5 file:icons/rapidgrenade.png
 4|44|6|#Rapid Grenade#
 // Bow Upgrade
 !!add 2x 8|4|10|float|-0.4
-!!name 8|4|10|float|-0.4 Quickshot Upgrade
+!!name 8|4|10|float|-0.4 #Quickshot Upgrade#
+!!icon 8|4|10|float|-0.4 file:icons/rapidquickshot.png
 4|10|6|#Quickshot Upgrade#
 // Spear Upgrade
 !!add 2x 8|4|11|float|-0.4
-!!name 8|4|11|float|-0.4 Rapid Spear
+!!name 8|4|11|float|-0.4 #Rapid Spear#
+!!icon 8|4|11|float|-0.4 file:icons/rapidspear.png
 4|11|6|#Rapid Spear#

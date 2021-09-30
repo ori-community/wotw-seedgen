@@ -20,7 +20,7 @@ use crate::item::{Item, Resource, Skill, Teleporter, ShopCommand};
 use crate::settings::Settings;
 use crate::util::{
     self,
-    GoalMode, UberState, UberType,
+    GoalMode, UberState, UberType, Icon,
     constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
 };
 
@@ -65,6 +65,7 @@ where
     world_count: usize,
     total_reachable_count: usize,
     custom_names: &'b HashMap<String, String>,
+    custom_icons: &'b HashMap<String, Icon>,
     multiworld_state_index: I,
     price_range: Uniform<f32>,
     random_progression: Bernoulli,
@@ -137,6 +138,8 @@ where
     let uber_state = node.uber_state().unwrap();
     let is_shop = uber_state.is_shop();
 
+    let code = item.code();
+
     if uber_state.is_purchasable() {
         origin_world_context.shop_slots -= 1;
 
@@ -164,7 +167,7 @@ where
                 item: price_setter,
             });
 
-            if let Some(icon) = item.icon() {
+            if let Some(icon) = context.custom_icons.get(&code).cloned().or_else(|| item.icon()) {
                 let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
                     uber_state: uber_state.clone(),
                     icon,
@@ -179,7 +182,6 @@ where
         }
     }
 
-    let code = item.code();
     let custom_name = context.custom_names.get(&code).cloned();
     let item_display = custom_name.clone().unwrap_or_else(|| format!("{}", item));
 
@@ -943,7 +945,7 @@ where
     Ok(())
 }
 
-pub fn generate_placements<'a, R>(worlds: Vec<World<'a>>, spawns: &[&'a Node], spawn_pickup_node: &'a Node, custom_names: &HashMap<String, String>, settings: &Settings, rng: &mut R) -> Result<Vec<Vec<Placement<'a>>>, String>
+pub fn generate_placements<'a, R>(worlds: Vec<World<'a>>, spawns: &[&'a Node], spawn_pickup_node: &'a Node, custom_names: &HashMap<String, String>, custom_icons: &HashMap<String, Icon>, settings: &Settings, rng: &mut R) -> Result<Vec<Vec<Placement<'a>>>, String>
 where
     R: Rng,
 {
@@ -1048,6 +1050,7 @@ where
         world_count: settings.worlds,
         total_reachable_count,
         custom_names,
+        custom_icons,
         multiworld_state_index: 0..,
         price_range,
         random_progression: Bernoulli::new(RANDOM_PROGRESSION).unwrap(),

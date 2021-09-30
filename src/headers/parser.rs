@@ -895,6 +895,18 @@ fn name_command(naming: &str, names: &mut HashMap<String, String>) -> Result<(),
     Ok(())
 }
 #[inline]
+fn icon_command(icon: &str, icons: &mut HashMap<String, Icon>) -> Result<(), String> {
+    let mut parts = icon.splitn(2, ' ');
+    let pickup = parts.next().unwrap();
+    parse_pickup(pickup)?;
+    let icon = parts.next().ok_or_else(|| String::from("Missing icon"))?;
+    let icon = parse_icon(icon)?;
+
+    icons.insert(pickup.to_string(), icon);
+
+    Ok(())
+}
+#[inline]
 fn parameter_command(parameter: &str, parameters: &mut HashMap<String, String>, param_values: &HashMap<&str, &str>) -> Result<(), String> {
     let mut parts = parameter.splitn(2, ' ');
     let identifier = parts.next().unwrap();
@@ -1033,6 +1045,7 @@ pub struct HeaderContext {
     pub excludes: HashMap<String, String>,
     pub flags: Vec<String>,
     pub names: HashMap<String, String>,
+    pub icons: HashMap<String, Icon>,
     pub negative_inventory: Inventory,
 }
 
@@ -1098,6 +1111,8 @@ where R: Rng + ?Sized
                 remove_command(pickup.trim(), world, &mut context.negative_inventory).map_err(|err| format!("{} in remove command {}", err, line))?;
             } else if let Some(naming) = command.strip_prefix("name ") {
                 name_command(naming.trim(), &mut context.names).map_err(|err| format!("{} in name command {}", err, line))?;
+            } else if let Some(icon) = command.strip_prefix("icon ") {
+                icon_command(icon.trim(), &mut context.icons).map_err(|err| format!("{} in icon command {}", err, line))?;
             } else if let Some(parameter) = command.strip_prefix("parameter ") {
                 parameter_command(parameter.trim(), &mut parameters, header_param_values).map_err(|err| format!("{} in parameter command {}", err, line))?;
             } else if let Some(string) = command.strip_prefix("pool ") {

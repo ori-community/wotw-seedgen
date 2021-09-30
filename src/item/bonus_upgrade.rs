@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::util::auto_display;
+use crate::util::{Icon, auto_display};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum BonusUpgrade {
@@ -63,6 +63,26 @@ impl BonusUpgrade {
             BonusUpgrade::StaticStar => 47,
             BonusUpgrade::ChargeBlaze => 48,
             BonusUpgrade::RapidSentry => 49,
+        }
+    }
+
+    pub fn icon(self) -> Option<Icon> {
+        match self {
+            BonusUpgrade::RapidHammer => Some(Icon::File(String::from("icons/rapidsmash.png"))),
+            BonusUpgrade::RapidSword => Some(Icon::File(String::from("icons/rapidsword.png"))),
+            BonusUpgrade::BlazeEfficiency => Some(Icon::File(String::from("icons/blazeefficiency.png"))),
+            BonusUpgrade::SpearEfficiency => Some(Icon::File(String::from("icons/spearefficiency.png"))),
+            BonusUpgrade::ShurikenEfficiency => Some(Icon::File(String::from("icons/shurikenefficiency.png"))),
+            BonusUpgrade::SentryEfficiency => Some(Icon::File(String::from("icons/sentryefficiency.png"))),
+            BonusUpgrade::BowEfficiency => Some(Icon::File(String::from("icons/bowefficiency.png"))),
+            BonusUpgrade::RegenerationEfficiency => Some(Icon::File(String::from("icons/regenerationefficiency.png"))),
+            BonusUpgrade::FlashEfficiency => Some(Icon::File(String::from("icons/flashefficiency.png"))),
+            BonusUpgrade::GrenadeEfficiency => Some(Icon::File(String::from("icons/grenadeefficiency.png"))),
+            BonusUpgrade::ExplodingSpike => Some(Icon::Opher(7)),
+            BonusUpgrade::ShockSmash => Some(Icon::Opher(3)),
+            BonusUpgrade::StaticStar => Some(Icon::Opher(5)),
+            BonusUpgrade::ChargeBlaze => Some(Icon::Opher(9)),
+            BonusUpgrade::RapidSentry => Some(Icon::Opher(1)),
         }
     }
 }

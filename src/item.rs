@@ -321,10 +321,10 @@ impl Item {
             Item::Shard(shard) => shard.icon(),
             Item::Teleporter(_) => Some(Icon::Map(13)),
             Item::Message(_) => Some(Icon::Map(25)),
-            Item::Water => None,
-            Item::BonusItem(_) => None,
-            Item::BonusUpgrade(_) => None,
-            Item::Relic(_) => None,
+            Item::Water => Some(Icon::File(String::from("icons/water.png"))),
+            Item::BonusItem(bonus_item) => bonus_item.icon(),
+            Item::BonusUpgrade(bonus_upgrade) => bonus_upgrade.icon(),
+            Item::Relic(_) => Some(Icon::File(String::from("icons/relic.png"))),
             _ => None,
         }
     }
