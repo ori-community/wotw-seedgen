@@ -8767,35 +8767,55 @@ anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
       SentryJump=1, Damage=30 OR DoubleJump OR Dash
       SwordSJump=2
       HammerSJump=2, Glide
+    kii:
+      DoubleJump, Hammer OR Sword  # djump+upslash to climb the wall
+      Burrow, Dash OR Hammer OR Shuriken=2
+      Burrow, Damage=30, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Burrow, Glide, Sword OR Flash=2 OR Sentry=2
+      Burrow, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # upslash then energy weapon to pass over the spikes
+      Grapple, Hammer
+      Grapple, Sentry=2, Shuriken=1 OR Damage=30
+      Grapple, Glide, Sword OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Grapple, Glide, Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # upslash then energy weapon to pass over the spikes
     unsafe:
       DoubleJump  # precise....? This is another rough path. Can turn it to triple jump to make it freeTM, or can add weapons
       Burrow, Damage=30  # This is a pretty rough path. Might be too tricky. Sticky makes it a bit easier though?
-      Grapple, Glide, Sword OR Hammer  # kicked out of gorlek for combining too many abilities
-      DoubleJump, Sword # swordjump off the wall on the right
+      Burrow, Sword OR Sentry=3
+      Grapple, Glide, Spear=2 OR Blaze=2
+      Grapple, Shuriken=3 OR Sentry=4
   conn WoodsMain.FeedingGrounds:
     moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow
-  conn WeepingRidge.Bottom:
-    moki, WindtornRuins.Seir:  # Seir to make it a safe path
-      Burrow, DoubleJump, Glide, Grapple
-      Burrow, DoubleJump, Bash, Grenade=1, Grapple
-      Burrow, Launch
-    gorlek, WindtornRuins.Seir:  # these are paths that rely on the wind, which you don't have if you remove the killplane
-      Burrow, Grapple, Glide
-      Burrow, DoubleJump, TripleJump, Glide
-      Burrow, Bash, Grenade=1, Dash, Glide
-    gorlek, RemoveKillPlane OR WindtornRuins.Seir:  # these paths work no matter whether you actually have Seir or just removed the killplane
-      Burrow, SentryJump=1, Grapple
-      Burrow, SentryJump=1, DoubleJump, TripleJump
-      Burrow, Bash, Grenade=1, Grapple
-      Burrow, Bash, Grenade=1, DoubleJump, TripleJump
-      Burrow, Bash, Grenade=2, Dash
+  conn WeepingRidge.Bottom:  # These paths need to be solvable after cat and mouse, since there is less platforms at that point and you can't pass above the teleporter
+    moki, Burrow, WindtornRuins.Seir:  # Seir to make it a safe path
+      DoubleJump, Glide, Grapple
+      DoubleJump, Bash, Grenade=1, Grapple
+      Launch
+    gorlek, Burrow, WindtornRuins.Seir:  # these are paths that rely on the wind, which you don't have if you remove the killplane
+      Grapple, Glide
+      DoubleJump, TripleJump, Glide
+      Bash, Grenade=1, Dash, Glide
+    gorlek, Burrow, RemoveKillPlane OR WindtornRuins.Seir:  # these paths work no matter whether you actually have Seir or just removed the killplane
+      SentryJump=1, Grapple
+      SentryJump=1, DoubleJump, TripleJump
+      Bash, Grenade=1, Grapple
+      Bash, Grenade=1, DoubleJump, TripleJump
+      Bash, Grenade=2, Dash
+    kii, Burrow, WindtornRuins.Seir:  # these are paths that rely on the wind, which you don't have if you remove the killplane
+      Glide, Dash, DoubleJump, Sword OR Hammer
+      Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Bash, Grenade=1, DoubleJump
+    kii, Burrow, RemoveKillPlane OR WindtornRuins.Seir:  # these paths work no matter whether you actually have Seir or just removed the killplane
+      Launch  # @validator this should probably be gorlek
+      Bash, Grenade=1, Dash, DoubleJump, Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=2, DoubleJump
     unsafe, WindtornRuins.Seir:
       Burrow, DoubleJump, TripleJump  # deemed too precise
       Burrow, HammerSJump=1, DoubleJump, Dash, Hammer  # Pretty tight
       Burrow, SentryJump=2, DoubleJump, TripleJump OR Dash OR Glide  # moving SentryJump
       Burrow, SentryJump=2, Dash OR Glide  # moving SentryJump
-      Burrow, Glide, DoubleJump, Dash, Hammer  # Pretty tight
 
 # checkpoint at 1509, -3987
 
