@@ -8830,11 +8830,11 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
   conn LowerWastes.WestTP:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Damage=30 OR Sword OR Hammer  # Multiple side slashes, not difficult
+    kii:
+      Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Grenade=1  # deemed too obscure
-      Sentry=1 OR Flash=1 OR Shuriken=1
       Blaze=1  # This is a little tight
-      Spear=1  # Not sure if this is Gorlek, have to aim right and then after throwing move left. Not obvious at all
   conn LowerWastes.Shovel:
     moki:  # I think this is fine without Combat?
       Grapple, DoubleJump OR Dash OR Glide
@@ -8845,16 +8845,19 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
       Bash, Grenade=1, DoubleJump
       SwordSJump=1, DoubleJump, Dash OR Glide OR Damage=30
       HammerSJump=1, DoubleJump
-    kii: Bash, Grenade=1  # can either bash off the gorlek, then the grenade - or climb the wall to get additional height out of the bashgrenade
+    kii:
+      Bash, Grenade=1  # can either bash off the gorlek, then the grenade - or climb the wall to get additional height out of the bashgrenade
+      Bash, DoubleJump  # Bash the gorlek's projectile
     unsafe:
       SentryJump=1, DoubleJump OR Dash
-      Bash, DoubleJump, TripleJump  # bash the gorlek's projectile
+      Bash  # bash the gorlek then its projectile
 
 anchor LowerWastes.Shovel at 1634, -3981:  # On the ground to the left of the Sand Bridge
   refill Energy=3:
     moki, BreakCrystal:
       DoubleJump OR Launch
       Bash, Grenade=1
+    kii: BreakCrystal
 
   quest LowerWastes.EerieGemQI:
     moki: Burrow
@@ -8864,6 +8867,7 @@ anchor LowerWastes.Shovel at 1634, -3981:  # On the ground to the left of the Sa
   conn LowerWastes.SunsetView:
     moki: Combat=MaceMiner OR Bash OR Grapple OR Launch
     gorlek: Glide
+    kii: DoubleJump OR Dash 
     unsafe: free
   conn LowerWastes.TreeArea:
     moki: Burrow
@@ -8884,6 +8888,7 @@ anchor LowerWastes.MuncherTunnel at 1681, -4002:  # Above the sand/muncher tunne
     gorlek:
       Damage=30 OR Dash OR SentryJump=1
       Bash, Glide OR Sword OR Hammer  # lure the mantis
+    kii: Bash OR Hammer OR Sword  # with sword, bait the mantis and pogo
   conn LowerWastes.SandPot:
     moki:
       Combat=Mantis+ShieldSlug
@@ -8891,6 +8896,10 @@ anchor LowerWastes.MuncherTunnel at 1681, -4002:  # Above the sand/muncher tunne
       Bash, DoubleJump OR Burrow OR Grenade=1
       Launch
     gorlek: DoubleJump OR Dash OR Burrow OR Sword  # slash the enemy off the wall
+    kii:
+      Combat=ShieldSlug OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash  # use the mantis
+    unsafe: Blaze=1
 
 anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
   refill Checkpoint
@@ -8903,18 +8912,24 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
       Burrow  # mostly just hold left
       SentryJump=1
       DoubleJump, TripleJump OR Sword OR Hammer  # just something to help
-    unsafe: DoubleJump
+    kii:
+      DoubleJump
+      Bash, Hammer OR Spear=1 OR Grenade=1  # Break the slime's shell in order to bash it
   pickup LowerWastes.SandPotEX:
-    moki:
-      Burrow, Dash, Grapple, DoubleJump OR Glide
-      Burrow, Bash, Grenade=1
-      Burrow, Launch
-    gorlek:
-      Burrow, DoubleJump, TripleJump  # either evade the coal damage or burrow on top of the sand pot
-      Burrow, Dash, DoubleJump OR Grapple
-      Burrow, Damage=30, DoubleJump
-      Burrow, Damage=30, Grapple, Glide OR Sword
-      Burrow, SentryJump=1
+    moki, Burrow:
+      Dash, Grapple, DoubleJump OR Glide
+      Bash, Grenade=1
+      Launch
+    gorlek, Burrow:
+      DoubleJump, TripleJump  # either evade the coal damage or burrow on top of the sand pot
+      Dash, DoubleJump OR Grapple
+      Damage=30, DoubleJump
+      Damage=30, Grapple, Glide OR Sword
+      SentryJump=1
+    kii, Burrow:
+      DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Glide OR Blaze=3
+    unsafe: Burrow
 
   conn LowerWastes.MuncherTunnel:
     moki: Combat=Mantis OR Bash OR Launch
@@ -8939,62 +8954,105 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
       Bash, Grenade=1, Sword, Damage=30
       Bash, Grenade=1, Grapple, Sword OR Hammer OR Damage=30
       Bash, Grenade=2, Sword OR Hammer OR Damage=30
-    unsafe:
+    kii:
+      Sword
+      Hammer, Glide OR Dash OR DoubleJump OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=30
       DoubleJump, TripleJump OR Grapple OR Damage=30
-      Grapple, Damage=30
-      Sword OR Glide   # climb on the sand pot from the right then hover
-      Hammer, Dash OR DoubleJump OR Damage=30
-      Bash, Grenade=1  # Damageless with a bashglide.
+      Grapple, DoubleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=30
+      Bash, Grenade=1
+      Bash, Hammer OR Spear=2  # break the slime's shell and bash it
+      Dash, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Dash, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Hammer, Spear=1
+      Bash, Spear=1  # break the slime's shell and bash it
+      Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=30
+      Dash, Burrow  # burrow in the sand pot so you can dash into the ceiling to reset your dash
+      Glide   # climb on the sand pot from the right then hover
 
 anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitEX
   refill Checkpoint
 
-  pickup LowerWastes.SandPotEX:
-    moki:
-      Burrow, Grapple, DoubleJump OR Glide
-      Burrow, Grapple, Bash, Grenade=1
-      Burrow, Bash, Grenade=1, DoubleJump, Dash OR Glide
-      Burrow, Launch
-    # gorlek can already connect between the sides of the sand pot for free, no further paths needed
+  pickup LowerWastes.SandPotEX:  # Make sure it's not redundant with paths doing WoodenBridge->SandPot->SandPotEX. Kii and above make going from one side of the pot to the other free so it doesn't need any paths
+    moki, Burrow:
+      Grapple, DoubleJump OR Glide
+      Grapple, Bash, Grenade=1
+      Bash, Grenade=1, DoubleJump, Dash OR Glide
+    gorlek, Burrow:  #@validator this need validation as well
+      DoubleJump, Glide OR Sword OR Hammer OR Damage=30
+      Grapple, Sword OR Hammer
   pickup LowerWastes.MuncherPitEX:
     moki:
       DoubleJump OR Launch  # Slightly precise to land on the sand sphere.
       Burrow, Glide
     gorlek: Burrow OR Hammer
-    unsafe: Sentry=1 OR Spear=1  # Pretty sure that other spells _should_ work here, but they're unsafe paths so cbf checking now lol
-  pickup LowerWastes.BottomRightHC:  # free to get to from here
-    gorlek: ShurikenBreak=20, Combat=MaceMiner OR DoubleJump OR Bash OR Launch  # dance with the gorlek
+    kii:
+      Spear=1
+      Glide, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1  # Could add Grapple so you can retry more easily or Damage=30 so the gliding section is less precise
+    unsafe:
+      Sword OR Flash=1 OR Sentry=1  # Make the sphere swing by wall jumping on it
+      Dash  # Dash when falling 
 
   conn LowerWastes.SandPot:
     moki:
-      Dash, DoubleJump OR Grapple
+      Grapple, DoubleJump OR Glide OR Dash
+      Dash, DoubleJump
       Bash, Grenade=1, Grapple
       Bash, Grenade=1, DoubleJump, Glide
       Launch
     gorlek:
-      Grapple
+      Grapple, Glide OR Sword OR Hammer
       DoubleJump, TripleJump OR Glide
       Damage=30, DoubleJump OR Dash OR Glide  # extra abilities just for convenience
+    kii:
+      Damage=60
+      Damage=30, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Damage=30
-      Bash, Grenade=1, Damage=30  # too fun for gorlek
-      SentryJump=1, Damage=30  # Maybe too dumb. Gotta do a sentry jump in the spikes, and even then it can be close
+      #SentryJump=1, Damage=30  # Maybe too dumb. Gotta do a sentry jump in the spikes, and even then it can be close
   conn LowerWastes.LeverArea:
     moki: DoubleJump OR Burrow OR Launch
     gorlek:
       Dash OR SentryJump=1
       Bash, Grenade=1  # either find a place where you can throw a grenade or do the bash-only path
+    kii:
+      Sword OR Hammer  # With sword, pogo the gorlek
+      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  #Possible with only one of each but the last jump into the bridge feels really weird
+      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Glide  # Glide jump
       Bash  # Sorta janky but seems to work most of the time. Doesn't _look_ like it should work though
-      Shuriken=1  # Just as janky as Bash
-      Sentry=1
-  conn LowerWastes.MinesEntrance:  # guess this wasn't that bad after all
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+  conn LowerWastes.BeforeMinesEntrance:
+    gorlek: ShurikenBreak=20, Combat=MaceMiner OR DoubleJump OR Bash OR Launch
+    kii: ShurikenBreak=20
+
+anchor LowerWastes.BeforeMinesEntrance at 1846, -3986:  # To the right of the breakable wall leading to the Wooden Bridge
+  pickup LowerWastes.BottomRightHC: free
+  
+  conn LowerWastes.MinesEntrance:
+    moki:
+      Combat=MaceMiner+Mantis, DoubleJump OR Dash OR Glide OR Grapple
+      Bash, DoubleJump OR Dash OR Glide OR Grapple
+      Launch
     gorlek:
-      ShurikenBreak=20, Combat=MaceMiner, Dash OR Glide OR Grapple OR Damage=30
-      ShurikenBreak=20, Bash, Dash OR Glide OR Grapple OR Damage=30
-      ShurikenBreak=20, DoubleJump OR Launch
-    unsafe:
-      ShurikenBreak=20, Bash, Grenade=1
+      Damage=30, Combat=MaceMiner+Mantis OR Bash
+      DoubleJump
+    kii: Bash, Grenade=1
+  conn LowerWastes.WoodenBridge:
+    moki, BreakWall=20: Combat=MaceMiner OR Bash OR Launch
+    gorlek, BreakWall=20: DoubleJump
+    kii: BreakWall=20
+  conn LowerWastes.LeverArea:  # make sure it's not redundant with BeforeMinesEntrance->WoodenBridge->LeverArea
+    gorlek:
+      DoubleJump, TripleJump
+      Launch
+    kii:
+      DoubleJump
+      Bash, Grenade=1
+    unsafe: free
 
 anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the lower breakable wall
   pickup LowerWastes.BottomRightEX:
@@ -9006,10 +9064,12 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the lower bre
       DoubleJump, TripleJump, Hammer
       SentryJump=1  # can either jump good or use the right wall and weapon float
       Bash, Grenade=1 OR DoubleJump OR Glide
+    kii:
+      Grapple  # Can probably be 
     unsafe:
       Bash  # Requires you not to kill anything and hopefully not have ultra bash or whatever equipped
       DoubleJump, TripleJump, Sentry=1 OR Flash=1
-  pickup LowerWastes.BottomRightHC:
+  pickup LowerWastes.BottomRightHC:  # Make sure it's not redundant with conn LowerWastes.BeforeMinesEntrance
     moki:
       Combat=MaceMiner+Mantis, Grapple  # Use both Grapple points
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
@@ -9018,19 +9078,29 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the lower bre
       Damage=30, Combat=MaceMiner+Mantis OR Bash
       DoubleJump, TripleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
-
-  conn LowerWastes.WoodenBridge:
-    moki, BreakWall=20:
+    kii:
+      Grapple  #@validator could be gorlek
+      Damage=40  #dboost in the spikes and the gorlek
+      DoubleJump, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2
+      Bash, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2
+    unsafe: Combat=MaceMiner, Bash  # bash glide from the mantis
+    
+  conn LowerWastes.BeforeMinesEntrance:  # Make sure it solves with and without the Ruins wall
+    moki:
       Combat=MaceMiner+Mantis, DoubleJump, Grapple
       Bash, DoubleJump, Grapple
       Launch, DoubleJump OR Dash OR Grapple
-    # in gorlek, all paths would be redundant with just going up to lever area, which doesn't require breaking the wall
-  conn LowerWastes.LeverArea:  # paths function for both cases of having destroyed or kept the wall
     gorlek:
       SentryJump=1, DoubleJump, TripleJump, Dash OR Glide
-      Bash, DoubleJump, TripleJump  # Utilise the enemies to bashglide across. I don't think its softlockable because there's no autosave here.
+      Bash, DoubleJump, TripleJump, Dash 
       Grapple, Dash, Combat=MaceMiner+Mantis OR Bash  # Pretty straightforward. Rest of these paths you're able to avoid enemies so Combat isnt included.
       Launch
+    kii:
+      Grapple, Dash OR DoubleJump OR Sword OR Hammer
+      Grapple, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, DoubleJump, TripleJump OR Dash  # Bash glide from the gorlek's projectile
+    unsafe:
+      Grapple, Glide, Spear=1
   conn WindtornRuins.LowerRuins:
     gorlek: ShurikenBreak=20, Burrow
 
@@ -9050,7 +9120,6 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
       SentryJump=1, Glide
       Bash, Grenade=1, Glide
 
-  pickup LowerWastes.BottomRightHC: free
   pickup LowerWastes.LastStandShard:
     moki:  # for the puzzle, it is considered solvable in moki with one of doublejump, dash or burrow.
       Bash, Grenade=1, DoubleJump
@@ -9091,6 +9160,7 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
       LowerWastes.SandPlatformLever, Burrow, Grapple, Dash OR Glide
 
   conn LowerWastes.WoodenBridge: free
+  conn LowerWastes.BeforeMinesEntrance: free
   conn LowerWastes.TreeArea:
     moki:
       DoubleJump, Grapple, Bash, Grenade=1
@@ -9105,16 +9175,6 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
       LowerWastes.SandPlatformLever, Burrow, Grapple, Dash OR Glide OR Sword
       Launch, DoubleJump, TripleJump # Can do it with just double jump but the timing is tight
     unsafe: Launch # Assumes you know you can land on the wall directly to the left when you come into the spike corridor
-  conn LowerWastes.MinesEntrance:
-    moki:
-      Combat=MaceMiner+Mantis, DoubleJump OR Dash OR Glide OR Grapple
-      Bash, DoubleJump OR Dash OR Glide OR Grapple
-      Launch
-    gorlek:
-      Combat=MaceMiner+Mantis, Dash OR Glide OR Grapple OR Damage=30
-      Bash, Dash OR Glide OR Grapple OR Damage=30
-      DoubleJump OR Launch
-      Bash, Grenade=1
   conn LowerWastes.EastTP:
     moki: Burrow
 
