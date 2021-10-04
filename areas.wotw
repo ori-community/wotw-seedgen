@@ -9054,7 +9054,7 @@ anchor LowerWastes.BeforeMinesEntrance at 1846, -3986:  # To the right of the br
       Bash, Grenade=1
     unsafe: free
 
-anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the lower breakable wall
+anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins breakable wall
   pickup LowerWastes.BottomRightEX:
     moki:
       Combat=MaceMiner+Mantis, Grapple
@@ -9064,10 +9064,13 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the lower bre
       DoubleJump, TripleJump, Hammer
       SentryJump=1  # can either jump good or use the right wall and weapon float
       Bash, Grenade=1 OR DoubleJump OR Glide
+      Bash, Dash OR Sword OR Hammer #@Validator seems like thay are missing. Climb the right wall above the breakable wall
     kii:
-      Grapple  # Can probably be 
+      Grapple  #@validator Can probably be gorlek
+      Bash  # Bash the gorlek to reach the mntis when it jumps
+      Sword, DoubleJump  # pogo
+      Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
-      Bash  # Requires you not to kill anything and hopefully not have ultra bash or whatever equipped
       DoubleJump, TripleJump, Sentry=1 OR Flash=1
   pickup LowerWastes.BottomRightHC:  # Make sure it's not redundant with conn LowerWastes.BeforeMinesEntrance
     moki:
