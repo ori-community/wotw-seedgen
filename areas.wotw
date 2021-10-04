@@ -9239,54 +9239,40 @@ anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
   #     Dash, Bash, Grenade=4  # yes, good
   #     Launch
 
-  quest LowerWastes.HandToHandMapstone:
-    moki, GladesTown.HandToHandCanteen:
-      DoubleJump OR Burrow OR Launch
-      Bash, Grenade=2  # literally never going to get used but you can do it
-    gorlek, GladesTown.HandToHandCanteen:
-      SentryJump=2
-      SentryJump=1, Bash OR Grapple
-      Bash, Grapple
-    unsafe, GladesTown.HandToHandCanteen:
-      DoubleJump, Sword  # origlow
-
   pickup LowerWastes.SkeetoHiveEX:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow
-  pickup LowerWastes.LupoMap:
-    moki, SpiritLight=150:
-      Burrow OR Launch
-      Bash, Grenade=4  # literally never going to get used but you can do it
-    gorlek, SpiritLight=150:
-      Bash, Grenade=3
-      Bash, Grenade=2, Grapple
-      SentryJump=4
-      SentryJump=3, Bash OR Grapple
-      SentryJump=2, Bash, Grapple
-      DoubleJump, TripleJump, Hammer
-    unsafe: SpiritLight=150, DoubleJump, TripleJump, Sword  # requires advanced knowlegde
-  pickup LowerWastes.BurrowTree:
+  
+  conn LowerWastes.ThirstyGorlek:
     moki:
       DoubleJump OR Burrow OR Launch
       Bash, Grenade=2  # literally never going to get used but you can do it
     gorlek:
-      Bash, Grenade=1
       SentryJump=2
       SentryJump=1, Bash OR Grapple
-      Bash, Grapple
-  pickup LowerWastes.BurrowTreeEX:
-    moki: Burrow
-
+      Bash, Grapple OR Grenade=1
+    kii:
+      Bash
+      Sword, Grapple  #Pogo a skeeto
+    unsafe:
+      Sword, Damage=30  # Pogo a skeeto, wait for another one to reach the sand bag level and pogo it as well
+      Hammer, Damage=30  # wall jumping of the sand restore your upslash for some reason
   conn LowerWastes.Shovel:
     moki: Burrow
   conn LowerWastes.UpperPath:
-    moki:
-      Burrow, DoubleJump OR Launch
-      Burrow, Bash, Grenade=1  # literally never going to get used but you can do it
-    gorlek:
-      Burrow, Dash OR Bash OR Grapple
-      Burrow, SentryJump=1
-    unsafe: Burrow, Glide  # bit precise
+    moki, Burrow:
+      DoubleJump OR Launch
+      Bash, Grenade=1  # literally never going to get used but you can do it
+    gorlek, Burrow:
+      Bash
+      Grapple, Dash
+      SentryJump=1
+    kii, Burrow:
+      Hammer OR Spear=1
+      Sword  # pogo a skeeto. Skeeto can be kinda hard to manipulate, adding dash makes it easier if necessary
+      Grapple, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Burrow  # "daulphin jump" from the ground to reach the floating sand platform
+      # Burrow, Glide OR Dash OR Grapple
   conn LowerWastes.LeverArea:
     moki:
       Grapple, Launch
@@ -9294,9 +9280,40 @@ anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
     gorlek:
       Grapple, DoubleJump OR Dash
       Launch, DoubleJump OR Dash OR Glide OR Sword OR Damage=30
+    kii:
+      Launch
+      Bash, Damage=60, DoubleJump OR Dash  # bash glide a skeeto
+      DoubleJump, Damage=30, Dash OR TripleJump OR Sword 
+      DoubleJump, Glide, Damage=30, Hammer OR Shuriken=1
+      Bash, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Grapple, Sword OR Hammer  # Land on the friendly spikes between the 1st and 2nd muncher. Upslash + grapple from there
+      Grapple, Damage=30, Shuriken=2 OR Sentry=3
+      Grapple, Damage=60, Shuriken=1 OR Sentry=2
+      DoubleJump, Glide, Damage=30  # glide jump
 
-# checkpoint at 1681, -3923
-
+anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the way to the tree
+  refill Checkpoint
+  
+  quest LowerWastes.HandToHandMapstone:
+    moki: GladesTown.HandToHandCanteen
+  
+  pickup LowerWastes.BurrowTree: free
+  pickup LowerWastes.BurrowTreeEX:
+    moki: Burrow
+  pickup LowerWastes.LupoMap:
+    moki, SpiritLight=150:
+      Burrow OR Launch
+      Bash, Grenade=2  # literally never going to get used but you can do it
+    gorlek, SpiritLight=150:
+      SentryJump=2
+      DoubleJump, TripleJump, Hammer
+    kii, SpiritLight=150:
+      DoubleJump, TripleJump, Sword, Bash, Grenade=1
+      DoubleJump, TripleJump, Spear=2
+    unsafe, SpiritLight=150:
+      DoubleJump, TripleJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1  # land on the wood structure on the left of the sand bag. Make the sand bag swing to reach the wood structure with just tjump.
+    
 anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path connecting tree and east teleporter
   refill Checkpoint
   refill Energy=3:
@@ -9307,9 +9324,10 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
   pickup LowerWastes.UpperPathEX:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow, Sword OR Hammer OR Damage=30
-    unsafe: Burrow
+    kii: Burrow  # you can reenter the sand right after taking the pickup or just tp out
   pickup LowerWastes.UpperPathHiddenEX:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
+    kii: Burrow, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Shuriken=1  # extra ability so you don't have to do the wall jump on th hidden wall
     unsafe: Burrow  # precise maneuver
 
   conn LowerWastes.TreeArea:
@@ -9330,6 +9348,9 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
     gorlek, BreakWall=20:
       DoubleJump OR SentryJump=1
       Bash, Grenade=1, Sword OR Hammer
+    unsafe, BreakWall=20:
+      Dash, Damage=60, Spear=1 OR Flash=1 OR Sentry=1
+      Dash, Damage=30, Sword OR Hammer OR Spear=2
   pickup LowerWastes.UpperPathHC:
     moki: Burrow
 
@@ -9339,16 +9360,17 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
       DoubleJump OR Burrow OR Launch
       Bash, Grenade=1
     gorlek: Sword OR Hammer
+    kii: Spear=1 OR Flash=1 OR Sentry=1
   conn LowerWastes.LeverArea:
     moki: Burrow
   conn LowerWastes.UpperPath:
     moki: Burrow, DoubleJump OR Dash OR Launch
     gorlek: Burrow, Glide OR Sword OR Hammer
-    unsafe: Burrow  # hard to actually get, but the weird autosave placement can save you
+    kii: Burrow
   conn UpperWastes.KeystoneRoom:
     moki: Burrow, DoubleJump OR Dash OR Launch
     gorlek: Burrow, Glide OR Sword OR Damage=30
-    unsafe: Burrow
+    kii: Burrow
 
 region UpperWastes:
   moki: Danger=50, Regenerate
