@@ -9122,67 +9122,112 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
       SentryJump=2
       SentryJump=1, Glide
       Bash, Grenade=1, Glide
-
-  pickup LowerWastes.LastStandShard:
-    moki:  # for the puzzle, it is considered solvable in moki with one of doublejump, dash or burrow.
-      Bash, Grenade=1, DoubleJump
-      Launch, DoubleJump OR Dash OR Burrow
-      LowerWastes.SandPlatformLever, DoubleJump, Dash OR Glide OR Burrow  # If the double jump is too tight this makes it free
-    gorlek:  # some amount of puzzle knowledge is assumed
-      SentryJump=1, DoubleJump
-      Launch
-      LowerWastes.SandPlatformLever:
-        DoubleJump
-        Burrow, Dash OR Glide OR Sword
-        Bash, Grenade=1, Dash OR Glide OR Burrow OR Hammer  # maybe nontrivial lure. The platform helps a little, and it also enables an alternate solution jumping on top of the sand. Assisting abilities mostly for the puzzle
-        SentryJump=1, Dash OR Glide
-    unsafe:
-      SentryJump=1  # might have been gorlek
-      LowerWastes.SandPlatformLever, Dash OR Burrow  # burrow through the sand below to get a boost
-  pickup LowerWastes.LastStandEX:
-    moki:
-      Burrow, DoubleJump, Bash, Grenade=1
-      Burrow, Launch
-      LowerWastes.SandPlatformLever, Burrow, DoubleJump  # Requires a vertical burrow through a vertical sand platform
-    gorlek:
-      Burrow, SentryJump=1, DoubleJump
-      LowerWastes.SandPlatformLever, Burrow, Dash OR Glide
-      LowerWastes.SandPlatformLever, Burrow, Sword, Damage=30
-    unsafe:
-      LowerWastes.SandPlatformLever, Burrow, Bash, Grenade=1  # maybe nontrivial lure. The platform helps a little, and it also enables an alternate solution jumping on top of the sand.
-  pickup LowerWastes.MuncherClimbEX:
-    moki:
-      DoubleJump, Grapple, Bash, Grenade=1
-      Grapple, Launch
-      LowerWastes.SandPlatformLever, DoubleJump, Grapple, Dash OR Glide OR Burrow  # If the double jump is too tight this makes it free
-    gorlek:
-      Bash, Grenade=1, Grapple, DoubleJump OR Dash
-      SentryJump=1, Grapple, DoubleJump OR Dash
-      Launch
-      LowerWastes.SandPlatformLever, DoubleJump, Grapple
-      LowerWastes.SandPlatformLever, Burrow, Grapple, Dash OR Glide
-
+    kii: Bash, Grenade=1
+    unsafe: free  # wall jump on the right wall so you can jump on top of the first crumbling sand wall
+      #Sword  # Pogo the energy crystal
+      #Sentry=3
+  
   conn LowerWastes.WoodenBridge: free
   conn LowerWastes.BeforeMinesEntrance: free
-  conn LowerWastes.TreeArea:
-    moki:
-      DoubleJump, Grapple, Bash, Grenade=1
-      Grapple, Launch
-      LowerWastes.SandPlatformLever, DoubleJump, Grapple, Dash OR Glide OR Burrow  # If the double jump is too tight this makes it free
-      LowerWastes.SandPlatformLever, Grapple, Dash, Glide, Burrow  # This path is fun. Glide is just to make it moki-safe
-    gorlek:
-      Bash, Grenade=1, Grapple, DoubleJump OR Dash OR Glide OR Sword
-      SwordSJump=1, Grapple
-      HammerSJump=1, Grapple, DoubleJump OR Dash OR Glide
-      LowerWastes.SandPlatformLever, DoubleJump, Grapple
-      LowerWastes.SandPlatformLever, Burrow, Grapple, Dash OR Glide OR Sword
-      Launch, DoubleJump, TripleJump # Can do it with just double jump but the timing is tight
-    unsafe: Launch # Assumes you know you can land on the wall directly to the left when you come into the spike corridor
   conn LowerWastes.EastTP:
     moki: Burrow
+  conn LowerWastes.MuncherClimb:
+    moki:
+      Bash, Grenade=1
+      Launch
+      LowerWastes.SandPlatformLever, DoubleJump, Dash OR Glide OR Burrow  # If the double jump is too tight this makes it free
+      LowerWastes.SandPlatformLever, Dash, Burrow
+    gorlek:
+      SentryJump=1
+      LowerWastes.SandPlatformLever, DoubleJump
+      LowerWastes.SandPlatformLever, Burrow, Glide OR Sword
+    unsafe:
+      LowerWastes.SandPlatformLever, Dash
+  conn LowerWastes.LastStandArea:  # Every solutions which needs to land on th left edge should originate from MuncherClimb
+    moki: Bash, Grenade=1, DoubleJump
+    gorlek:  # some amount of puzzle knowledge is assumed
+      SentryJump=1, DoubleJump
+      LowerWastes.SandPlatformLever:
+        Burrow, Glide OR Sword
+        Bash, Grenade=1, Glide OR Burrow OR Hammer
+    kii:
+      Bash, Grenade=1, LowerWastes.SandPlatformLever OR Hammer OR Spear=1
+      LowerWastes.SandPlatformLever, Burrow, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Bash, Grenade=1  # Aggro the mantis with a bashnade then bash it when it jumps. Path isn't from MuncherClimb because the mantis doesn't spawn if you respawn at that checkpoint.
+      SentryJump=1  # might have been gorlek
+      LowerWastes.SandPlatformLever, Burrow  # burrow through the sand below to get a boost
 
-# checkpoint at 1791, -3953
+anchor LowerWastes.MuncherClimb at 1791, -3953:  # Checkpoint before the munchers on the way to the tree
+  refill Checkpoint
+  
+  pickup LowerWastes.MuncherClimbEX:
+    moki: Grapple, Launch OR DoubleJump
+    gorlek:
+      Grapple, Dash
+      Launch, DoubleJump, TripleJump
+      Launch, Damage=30
+    kii:
+      Launch
+      Grapple, Hammer OR Sentry=2  # With sentry, easier from a wall jump instead of jumping from the muncher
+      Grapple, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Grapple, Sword  # Upslash->Downslash to get the pickup
+      Grapple, Glide, Spear=1
+      DoubleJump, TripleJump, Damage=30  # really precise wall jump toa void getting one more dboost
+  
+  conn LowerWastes.LeverArea: free
+  conn LowerWastes.LastStandArea:  # Make sure it's not redundant with paths from LeverArea
+    moki: 
+      Launch
+      LowerWastes.SandPlatformLever, DoubleJump
+    gorlek:
+      DoubleJump, TripleJump
+      LowerWastes.SandPlatformLever, Dash
+    kii:
+      DoubleJump
+      LowerWastes.SandPlatformLever, Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Sentry=2
+    unsafe:
+      Hammer OR Spear=1
+      LowerWastes.SandPlatformLever, Burrow  # Way harder on keyboard
+  conn LowerWastes.TreeArea:
+    moki:
+      Grapple, DoubleJump OR Launch
+      Grapple, Dash, Glide  # This path is fun. Glide is just to make it moki-safe
+    gorlek:
+      Grapple, Dash OR Glide
+      Launch, DoubleJump, TripleJump # Can do it with just double jump but the timing is tight
+    kii:
+      Grapple, Sword OR Sentry=3 OR Damage=90  # With sword, you have to delay a bit your sword hover after the last muncher or you'll target the sand platform
+      Grapple, Damage=30, Hammer OR Spear=2 OR Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2
+      Grapple, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # energy between the 3rd and 4th muncher
+      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30
+    unsafe:
+      Launch
+      Grapple, Hammer OR Shuriken=2 OR Sentry=2 OR Damage=30  # There's friendly spikes on the ground between the 3rd and 4th muncher. Grab the 4th muncher from there.
+      Grapple, Damage=30, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Damage=30  # really precise wall jump toa void getting one more dboost
 
+anchor LowerWastes.LastStandArea at 1794, -3938:  # next to the projectile spawner above the wooden bridge 
+  pickup LowerWastes.LastStandShard:
+    moki: DoubleJump OR Dash OR Burrow # for the puzzle, it is considered solvable in moki with one of doublejump, dash or burrow.
+    gorlek: Launch OR Glide # some amount of puzzle knowledge is assumed
+    kii: free  # just wall jump on the purple wall until the shot arrives
+  pickup LowerWastes.LastStandEX:
+    moki: Burrow, Launch OR DoubleJump
+    gorlek:
+      Burrow, Glide
+      Burrow, Damage=30, Dash OR Sword
+    kii: Burrow, Dash OR Sword OR Hammer  OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30
+    unsafe: Burrow  # friendly spikes
+    
+  conn LowerWastes.LeverArea: free
+  conn LowerWastes.MuncherClimb:  #Make sure it's not redundant with paths fromLeverArea
+    moki: Glide OR DoubleJump OR Dash OR LowerWastes.SandPlatformLever
+    gorlek: Sword OR Hammer
+    kii: free
+      
 anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
   refill Checkpoint
 
