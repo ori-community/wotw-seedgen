@@ -9520,7 +9520,7 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
   pickup UpperWastes.PurpleWallHC:
     moki: Burrow
 
-  conn UpperWastes.RuinsApproach:  # this covers all connections to the pickups in the spinning lasers.
+  conn UpperWastes.NorthTP:  # this covers all connections to the pickups in the spinning lasers.
     moki, Burrow:
       Bash, DoubleJump, Dash OR Glide  # dash or glide to make the lasers better
       DoubleJump, Dash  # you can retry the burrow with DoubleJump, so I think this is fine
@@ -9538,26 +9538,8 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
 
 # checkpoint at 2037, -3751
 
-anchor UpperWastes.NorthTP at 2044, -3679:  # North Wastes teleporter
+anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
-
-  conn Teleporters: free
-  conn UpperWastes.RuinsApproach: free
-
-# checkpoint at anchor below if you have burrow
-
-anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on top of the sand
-  refill Full:  # use the teleporter
-    moki:
-      DoubleJump, Bash
-      Burrow OR Launch
-    gorlek:
-      Bash
-      Combat=MaceMiner+Mantis, DoubleJump, TripleJump
-      Combat=MaceMiner+Mantis, SentryJump=1
-    unsafe:
-      DoubleJump, Combat=Mantis
-  # checkpoint refill would be redundant with teleporter refill
 
   quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
@@ -9585,9 +9567,15 @@ anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on t
       Burrow, Bash, DoubleJump OR Dash  # Bash the Mantis
       Burrow, Bash, Damage=30, Glide OR Sword OR Hammer  # Bash the Mantis
       Burrow, SentryJump=1, DoubleJump OR Dash OR Damage=30  # Kill the Mantis
+    kii:
+      Burrow, Dash
+      Burrow, Bash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Burrow, DoubleJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Burrow, Glide, Hammer OR Shuriken=1
+      Burrow, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Burrow, Dash, Glide  # probably too precise for gorlek
-      Burrow, Bash  # Bash the Mantis to reach the wall under the pickup, then use the higher triple jump to bash the mantis again
+      Burrow, Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after abashing the mantis a second time
+      Burrow, Sword OR Shuriken=3
   # paths to WallOre which can't reach the ruins not considered for moki/gorlek
 
   conn UpperWastes.MissilePuzzleRight:
@@ -9596,10 +9584,12 @@ anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on t
       Burrow, SwordSJump=1
       Burrow, HammerSJump=1, Dash OR Glide
       Burrow, Dash, Damage=30
-    unsafe:
-      Burrow, Glide  # start gliding from UpperWastes.SpinLasersRightEX
-      Burrow, Bash  # Have to bash the mantis when the lasers are deactivated, might be too hard for gorlek
-      Burrow, Damage=10  # Damage boost of the Mantis shockwave rather than the spikes
+    kii:
+      Burrow, Bash OR Glide OR Dash OR Hammer
+      Burrow, Sword, Shuriken=1
+    unsafe: Burrow  # friendly spikes between the lasers
+      # Burrow, Sword  # pogo the mantis
+      # Burrow, Damage=10  # Damage boost of the Mantis shockwave rather than the spikes
   conn UpperWastes.OutsideRuins:
     moki:
       Bash, Launch
@@ -9616,12 +9606,28 @@ anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on t
       Launch, DoubleJump, Combat=MaceMiner
       Launch, DoubleJump, TripleJump OR Dash  # go from the ledge above the teleporter
       Launch, Bash OR Burrow
+    kii:
+      Launch  # climb the left wall
+      Burrow, DoubleJump, TripleJump, Damage=30
+      Burrow, DoubleJump, TripleJump, Hammer, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Burrow, Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Damage=30
+      Burrow, Bash, Dash, Glide OR Sword OR Hammer OR Damage=30
+      Bash, Grenade=1, DoubleJump, Burrow OR TripleJump OR Dash OR Hammer 
+      Bash, Grenade=1, DoubleJump, Damage=30, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # dboost in the spikes before the sand pot and in the spikes above the first sand bag
+      Bash, Grenade=1, DoubleJump, Glide, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # dboost in the spikes above the first sand bag
+      Bash, Grenade=1, DoubleJump, Sentry=4, Damage=30
+      Bash, Grenade=1, DoubleJump, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=2, DoubleJump, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
+      Bash, Grenade=1, DoubleJump, Glide OR Sword OR Shuriken=1 OR Sentry=2 OR Damage=30
+      Bash, Grenade=2, DoubleJump, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Bash, SentryJump=2, Damage=30, DoubleJump  # dboost in the spikes and sjump to the seed (use djump+upslash as well), sjump again to reach the lantern, djump on the sand ball, djump on the wall above and djump + use weapon to air stall to the pickup
-      Launch, Combat=MaceMiner OR Damage=10  # Climb the left wall
+      Bash, DoubleJump, TripleJump  # bash the mantis when it does its third jump
       Burrow, Bash, Sword OR Hammer  # Bash the gorlek when the Mantis is jumping above it. Bash it as well, air stall using weapons
       Burrow, Dash, Damage=30
-  # teleporter is a dead end
+      Burrow, DoubleJump, Dash, Damage=30
+      Burrow, Bash, DoubleJump  # bash the lantern then a gorlek's projectile
+      Burrow, DoubleJump, TripleJump, Hammer
 
 anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
   refill Checkpoint
@@ -9647,7 +9653,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
 
   conn WindtornRuins.UpperRuinsDoor:
     moki: EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
-  conn UpperWastes.RuinsApproach:
+  conn UpperWastes.NorthTP:
     moki: Combat=MaceMiner+Mantis OR Bash OR Launch
 
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
