@@ -9445,6 +9445,9 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
 
 anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right of the sand after the keystone door
   refill Checkpoint
+  
+  state UpperWastes.KeystoneDoor:
+    moki, Keystone=2: Burrow
 
   pickup UpperWastes.LedgeEC:
     moki:
