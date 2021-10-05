@@ -9438,9 +9438,9 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
       Burrow, Sword OR Hammer
       Combat=ShieldSlug, Bash, Grenade=1
       SentryJump=1
-    kii, Keystone=2:
+    kii:
       Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1
+      Bash, Grenade=1 OR Sword OR Hammer OR Spear=1  # either bash grenade or break the slug's shell in order to bash it
       Bash, DoubleJump, TripleJump # Bash the gorlek's projectile
       DoubleJump, TripleJump, Damage=30
     unsafe:
