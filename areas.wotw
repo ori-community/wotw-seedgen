@@ -9389,9 +9389,15 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     gorlek, Keystone=2:
       Burrow, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # can either avoid or deal with the shield slug
       SentryJump=2
+    kii, Keystone=2:
+      Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Burrow  #@validator probably gorlek, could be moki with some Combat requirementz
+      Bash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 # Bash the gorlek's projectile to reach the sand bag. tjump + upslash/spear from here
     unsafe, Keystone=2:
       Burrow
-      DoubleJump, TripleJump, Sword OR Hammer  # sword jump + upslash to climb the right wall
+      #Burrow, Bash  # Break the slug shell with gorlek's projectile
+      DoubleJump, TripleJump, Sword OR Hammer OR Damage=30  # tjump+upslash from right wall, tjump+dboost from left wall
+      Bash, DoubleJump, TripleJump  # bash the gorlek projectile then stupid wall jump you won't see how to do without debug renderer
       Bash, SentryJump=1  # Remove the shell of the ShieldSlug and bash it twice to reach the pickup
       Bash, DoubleJump, SentryJump=1  # Bash the gorlek's projectile
       DoubleJump, TripleJump, Damage=30  # you can refresh your tjump on the ^ mark in the ceiling above the sandbag
@@ -9403,19 +9409,26 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     gorlek:
       Burrow OR Launch
       DoubleJump, TripleJump
+    kii: Damage=30
     unsafe: free  # TP out after getting the pickup
   pickup UpperWastes.UpperKS:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow  # land on the right platform, burrow the sandbag from there
   pickup UpperWastes.TurmoilShard:
-    moki: Burrow, Bash, Launch  # intended path omitted in moki
-    gorlek:
-      Burrow, Bash, DoubleJump, Dash OR TripleJump
-      Burrow, Launch, DoubleJump
-      Burrow, Launch, Damage=30, Dash OR Glide OR Sword OR Hammer
-    unsafe:
-      Burrow, DoubleJump, Bash, SentryJump=1, Damage=30  # sjump in the spikes below the 3rd projectile
-      Burrow, DoubleJump, TripleJump, Dash, Damage=30, Hammer OR Sword  # tjump + upslash, immediatly dash and start air combo. Precise tjump to get a walljump, tjump in the spikes above.
+    moki, Burrow: Bash, Launch  # intended path omitted in moki
+    gorlek, Burrow:
+      Bash, DoubleJump, Dash OR TripleJump
+      Launch, DoubleJump
+      Launch, Damage=30, Dash OR Glide OR Sword OR Hammer
+    kii, Burrow:
+      Launch, Damage=30  # refresh launch on ceiling at the first turret
+      DoubleJump, TripleJump, Damage=120
+    unsafe,  Burrow:
+      Launch
+      Bash, Dash OR DoubleJump
+      DoubleJump, TripleJump, Damage=36  # dboost between 1st and 2nd turrets then precise wall jump and take a dboost on the projectile to reach the sand platform
+      DoubleJump, Bash, SentryJump=1, Damage=30  # sjump in the spikes below the 3rd projectile
+      DoubleJump, TripleJump, Dash, Damage=6, Hammer OR Sword  # tjump + upslash, immediatly dash and start air combo. Precise tjump to get a walljump, dboost on the projectile in order to walk in the spikes above.
   pickup UpperWastes.KSDoorEX:
     moki:
       Burrow, DoubleJump OR Dash OR Glide
@@ -9425,23 +9438,30 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
       Burrow, Sword OR Hammer
       Combat=ShieldSlug, Bash, Grenade=1
       SentryJump=1
+    kii:
+      Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1 OR Sword OR Hammer OR Spear=1  # either bash grenade or break the slug's shell in order to bash it
+      Bash, DoubleJump, TripleJump # Bash the gorlek's projectile
+      DoubleJump, TripleJump, Damage=30
     unsafe:
+      Bash  # Break slug's shell with a gorlek's projectile
       Burrow
       DoubleJump, TripleJump, Dash, Sword  # tjump+upslash+dash to climb the right wall (can also just sword jump + upslash to remove the requirement of dash)
-      Bash, Spear=1 OR Hammer OR Sword OR Grenade=1  # Remove the shell of the ShieldSlug and bash it twice to reach the pickup
-      Bash, DoubleJump  # Bash the gorlek's projectile
 
   conn LowerWastes.EastTP:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow, Sword OR Hammer OR Damage=30
-    unsafe: Burrow
+    kii: Burrow
   conn UpperWastes.MissilePuzzleLeft:
-    moki, UpperWastes.KeystoneDoor:
-      Burrow, Bash, DoubleJump OR Dash OR Glide
-      Burrow, Combat=ShieldSlug, DoubleJump OR Dash OR Glide
-      Burrow, Launch
-    gorlek: UpperWastes.KeystoneDoor, Burrow, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-    unsafe: UpperWastes.KeystoneDoor, Burrow
+    moki, UpperWastes.KeystoneDoor, Burrow:
+      Bash, DoubleJump OR Dash OR Glide
+      Combat=ShieldSlug, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek, UpperWastes.KeystoneDoor, Burrow: DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    kii, UpperWastes.KeystoneDoor, Burrow:
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  #@validator probably gorlek, could be moki with some Combat requirementz
+    unsafe, UpperWastes.KeystoneDoor: Burrow
 
 anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right of the sand after the keystone door
   refill Checkpoint
@@ -9449,6 +9469,9 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
   state UpperWastes.KeystoneDoor:
     moki, Keystone=2: Burrow
 
+  state UpperWastes.KeystoneDoor:
+    moki, Keystone=2: Burrow
+  
   pickup UpperWastes.LedgeEC:
     moki:
       Burrow, Bash, DoubleJump OR Dash
@@ -9457,9 +9480,13 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
       Burrow, Bash, Glide
       Bash, Grenade=1, DoubleJump
       Combat=MaceMiner, SentryJump=1, DoubleJump
-    kii: Bash, Grenade=1  # use the miner as well
-    unsafe:
+    kii:
+      Bash, Grenade=1  # use the miner as well
+      DoubleJump, TripleJump, Sword  # tjump->pogo->tjump->upslash
       Burrow, Bash
+      Burrow, DoubleJump, TripleJump, Hammer OR Spear=1
+      Burrow, DoubleJump, Sword  # pogo the torpedo
+    unsafe:
       SentryJump=1
       Bash, DoubleJump, TripleJump  # Lure the miner on higher ground to the left
   pickup UpperWastes.MissileSpawnEX:
@@ -9488,7 +9515,7 @@ anchor UpperWastes.MissilePuzzleMiddle at 2005, -3802:  # On top of the sand ben
 
   conn UpperWastes.MissilePuzzleLeft:  # for better random spawn
     gorlek: Burrow, Bash
-    unsafe: Burrow, Damage=14
+    kii: Burrow 
   conn UpperWastes.MissilePuzzleRight:
     moki: UpperWastes.LeverDoor, Burrow
 
@@ -9497,51 +9524,26 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
     moki: Burrow
 
   conn UpperWastes.RuinsApproach:  # this covers all connections to the pickups in the spinning lasers.
-    moki:
-      Burrow, Bash, DoubleJump, Dash OR Glide  # dash or glide to make the lasers better
-      Burrow, DoubleJump, Dash  # you can retry the burrow with DoubleJump, so I think this is fine
-      Burrow, Launch
-    gorlek:
-      Burrow, Dash, Bash OR SentryJump=1 OR Damage=30  # Dash gets the player past the lasers pretty well; for sentryjump the tools to kill the slime are there
-      Burrow, Glide, DoubleJump OR Bash OR SentryJump=1 OR Damage=30  # same as above
-      Burrow, DoubleJump, TripleJump OR Dash OR Glide
+    moki, Burrow:
+      Bash, DoubleJump, Dash OR Glide  # dash or glide to make the lasers better
+      DoubleJump, Dash  # you can retry the burrow with DoubleJump, so I think this is fine
+      Launch
+    gorlek, Burrow:
+      Dash, Bash OR SentryJump=1 OR Damage=30  # Dash gets the player past the lasers pretty well; for sentryjump the tools to kill the slime are there
+      Glide, DoubleJump OR Bash OR SentryJump=1 OR Damage=30  # same as above
+      DoubleJump, TripleJump OR Dash OR Glide
+    kii, Burrow:
+      Dash OR DoubleJump OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Damage=60
+      Damage=30, Bash OR Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Blaze=1
     unsafe: Burrow
   conn UpperWastes.MissilePuzzleMiddle:  # for better random spawn
     moki: UpperWastes.LeverDoor, Burrow
 
 # checkpoint at 2037, -3751
 
-anchor UpperWastes.NorthTP at 2044, -3679:  # North Wastes teleporter
-  refill Full
-
-  conn Teleporters: free
-  conn UpperWastes.RuinsApproach: free
-
-# checkpoint at anchor below if you have burrow
-
-anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on top of the sand
-  refill Full:  # use the teleporter
-    moki:
-      DoubleJump, Bash
-      Burrow OR Launch
-    gorlek:
-      Bash
-      Combat=MaceMiner+Mantis, DoubleJump, TripleJump
-      Combat=MaceMiner+Mantis, SentryJump=1
-    unsafe:
-      DoubleJump, Combat=Mantis
-  # checkpoint refill would be redundant with teleporter refill
-
-  quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
-    gorlek:
-      Burrow, Bash, DoubleJump OR Dash
-      Burrow, Bash, Dash, Grenade=1 OR SentryJump=1 OR Damage=30  # Dash wasn't considered gorlek to climb the last part up to ruins
-      Burrow, DoubleJump, TripleJump, Damage=30, Dash OR SentryJump=1
-      Burrow, SentryJump=1, DoubleJump, TripleJump, Dash
-      Burrow, SentryJump=2, DoubleJump, TripleJump
-      Launch, SentryJump=1  # weapon + launch allows you to kill the enemies
-    unsafe: SentryJump=1, Damage=30, DoubleJump  # dboost in the spikes and sjump to the seed (use djump+upslash as well), sjump again to reach the lantern, djump on the sand ball, djump on the wall above and djump + use weapon to air stall to the pickup
-
+anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser spinner
+  refill Checkpoint
+  
   pickup UpperWastes.SpinLasersRightEX:
     moki: Burrow
   pickup UpperWastes.SpinLasersMiddleEX:
@@ -9558,21 +9560,64 @@ anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on t
       Burrow, Bash, DoubleJump OR Dash  # Bash the Mantis
       Burrow, Bash, Damage=30, Glide OR Sword OR Hammer  # Bash the Mantis
       Burrow, SentryJump=1, DoubleJump OR Dash OR Damage=30  # Kill the Mantis
+    kii:
+      Burrow, Dash
+      Burrow, Bash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Burrow, DoubleJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Burrow, Glide, Hammer OR Shuriken=1
+      Burrow, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Burrow, Dash, Glide  # probably too precise for gorlek
-      Burrow, Bash  # Bash the Mantis to reach the wall under the pickup, then use the higher triple jump to bash the mantis again
-  # paths to WallOre which can't reach the ruins not considered for moki/gorlek
-
+      Burrow, Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after abashing the mantis a second time
+      Burrow, Sword OR Shuriken=3
+      
+  conn UpperWastes.NorthTP:
+    moki: Burrow
   conn UpperWastes.MissilePuzzleRight:
     moki: Burrow, DoubleJump OR Launch
     gorlek:
       Burrow, SwordSJump=1
       Burrow, HammerSJump=1, Dash OR Glide
       Burrow, Dash, Damage=30
+    kii:
+      Burrow, Bash OR Glide OR Dash OR Hammer
+      Burrow, Sword, Shuriken=1
+    unsafe: Burrow  # friendly spikes between the lasers
+      # Burrow, Sword  # pogo the mantis
+      # Burrow, Damage=10  # Damage boost of the Mantis shockwave rather than the spikes
+
+anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
+  refill Full
+
+  quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
+    gorlek:
+      Burrow, Bash, DoubleJump OR Dash
+      Burrow, Bash, Dash, Grenade=1 OR SentryJump=1 OR Damage=30  # Dash wasn't considered gorlek to climb the last part up to ruins
+      Burrow, DoubleJump, TripleJump, Damage=30, Dash OR SentryJump=1
+      Burrow, SentryJump=1, DoubleJump, TripleJump, Dash
+      Burrow, SentryJump=2, DoubleJump, TripleJump
+      Launch, SentryJump=1  # weapon + launch allows you to kill the enemies
+    kii:
+      Bash, Grenade=1, DoubleJump, Glide OR Sword OR Sentry=2 OR Damage=30
+      Bash, Grenade=2, DoubleJump
     unsafe:
-      Burrow, Glide  # start gliding from UpperWastes.SpinLasersRightEX
-      Burrow, Bash  # Have to bash the mantis when the lasers are deactivated, might be too hard for gorlek
-      Burrow, Damage=10  # Damage boost of the Mantis shockwave rather than the spikes
+      SentryJump=1, Damage=30, DoubleJump  # dboost in the spikes and sjump to the seed (use djump+upslash as well), sjump again to reach the lantern, djump on the sand ball, djump on the wall above and djump + use weapon to air stall to the pickup
+      Bash, Grenade=1, DoubleJump, Shuriken=1
+
+  pickup UpperWastes.WallOre:  # Most paths here would be redundant with the connection upwards. Paths to WallOre which can't reach the ruins not considered for moki/gorlek
+    kii:
+      # Use a bashnade to reach the sand bag above the sand pot. All the following paths are combination of different variations in order to optimize energy and health. Key parts are:
+      # 1.a Take a dboost in the spikes on the way to the sand pot
+      # 1.b Avoid the spikes on the way to the sand pot
+      # 2.a Reach the bashable lantern, take a dboost in the spikes under the 2nd sand bag in order to reach it
+      # 2.b Use a bashnade in order to land on the ledge above the sand bag and simply djump to the 2nd sand bag
+      # Then Bashnade + djump to reach the ore 
+      Bash, Grenade=2, DoubleJump, Damage=30, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.a + 2.a
+      Bash, Grenade=2, DoubleJump, Glide, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b (with glide) + 2.a
+      Bash, Grenade=2, DoubleJump, Sentry=3, Damage=30  # 1.b (2 sentries) + 2.a
+      Bash, Grenade=3, DoubleJump, Damage=30  # 1.a + 2.b
+      Bash, Grenade=3, DoubleJump, Glide OR Sentry=2  # 1.b + 2.b
+      Bash, Grenade=4, DoubleJump  # 1.b (bashnade near the spikes) + 2.b
+
   conn UpperWastes.OutsideRuins:
     moki:
       Bash, Launch
@@ -9589,12 +9634,45 @@ anchor UpperWastes.RuinsApproach at 2002, -3684:  # Left of the teleporter, on t
       Launch, DoubleJump, Combat=MaceMiner
       Launch, DoubleJump, TripleJump OR Dash  # go from the ledge above the teleporter
       Launch, Bash OR Burrow
+    kii:
+      Launch  # climb the left wall
+      Burrow, DoubleJump, TripleJump, Damage=30
+      Burrow, DoubleJump, TripleJump, Hammer, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Burrow, Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Damage=30
+      Burrow, Bash, Dash, Glide OR Sword OR Hammer OR Damage=30
+      # Use a bashnade to reach the sand bag above the sand pot. All the following paths are combination of different variations in order to optimize energy and health. Key parts are:
+      # 1.a Take a dboost in the spikes on the way to the sand pot
+      # 1.b Avoid the spikes on the way to the sand pot
+      # 2.a Reach the bashable lantern, take a dboost in the spikes under the 2nd sand bag in order to reach it
+      # 2.b Use a bashnade in order to land on the ledge above the sand bag and simply djump to the 2nd sand bag
+      # 3.a Reach the second lantern and reach OutsideRuins from there
+      # 3.b Use a bashnade to land in the spikes above the sand bag and djump from there to OutsideRuins
+      Bash, Grenade=1, DoubleJump, Burrow OR TripleJump OR Dash OR Hammer  # 1.b + 2.a (but you can avoid the dboost) + 3.a
+      Bash, Grenade=1, DoubleJump, Damage=30, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # 1.a + 2.a + 3.a
+      Bash, Grenade=1, DoubleJump, Glide, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # 1.b (with glide) + 2.a + 3.a
+      Bash, Grenade=1, DoubleJump, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b (with sword) + 2.a (energy to reach the lantern, avoid the dboost with an upslash) + 3.a (upslash to reach the lantern)
+      Bash, Grenade=1, DoubleJump, Sentry=4, Damage=30  # 1.b (2 sentries) + 2.a + 3.a
+      Bash, Grenade=2, DoubleJump, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.a + 2.b + 3.a 
+      Bash, Grenade=2, DoubleJump, Sword  # 1.b + 2.b + 3.a
+      Bash, Grenade=2, DoubleJump, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b + 2.b + 3.a
+      Bash, Grenade=2, DoubleJump, Sentry=3  # 1.b (2 sentries) + 2.b + 3.a
+      Bash, Grenade=3, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b (bashnade near the spikes) + 2.b + 3.a
+      Bash, Grenade=3, DoubleJump, Damage=30, Damage=30  # 1.a + 2.b + 3.b
+      Bash, Grenade=3, DoubleJump, Glide  # 1.b + 2.b + 3.b (but you can avoid the dboost with glide)
+      Bash, Grenade=3, DoubleJump, Sentry=2, Damage=30  # 1.b (2 sentries) + 2.b + 3.b
+      Bash, Grenade=4, DoubleJump, Damage=30  # 1.b (bashnade near the spikes) + 2.b + 3.b
     unsafe:
+      Bash, Grenade=1, DoubleJump, Glide OR Sword OR Shuriken=1 OR Sentry=2 OR Damage=30
+      Bash, Grenade=2, DoubleJump, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Bash, SentryJump=2, Damage=30, DoubleJump  # dboost in the spikes and sjump to the seed (use djump+upslash as well), sjump again to reach the lantern, djump on the sand ball, djump on the wall above and djump + use weapon to air stall to the pickup
-      Launch, Combat=MaceMiner OR Damage=10  # Climb the left wall
+      Bash, DoubleJump, TripleJump  # bash the mantis when it does its third jump
       Burrow, Bash, Sword OR Hammer  # Bash the gorlek when the Mantis is jumping above it. Bash it as well, air stall using weapons
       Burrow, Dash, Damage=30
-  # teleporter is a dead end
+      Burrow, DoubleJump, Dash, Damage=30
+      Burrow, Bash, DoubleJump  # bash the lantern then a gorlek's projectile
+      Burrow, DoubleJump, TripleJump, Hammer
+  conn UpperWastes.RuinsApproach:
+    moki: Burrow
 
 anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
   refill Checkpoint
@@ -9614,15 +9692,18 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       Bash, Grenade=1, DoubleJump OR Dash OR Glide  # can either Bashglide or use the sand ball as ground
       SentryJump=1, Glide
       Launch
-    unsafe:
-      Burrow, DoubleJump
-      Bash, Grenade=1, Dash OR DoubleJump  # Bash glide
+    kii:
+      Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=2
+      Burrow, DoubleJump OR Sentry=3
+      Damage=30, DoubleJump
 
+  # Connection to NorthTP is useless since this anchor have the same conn/pickup but they need more skills than from OutsideRuins
   conn WindtornRuins.UpperRuinsDoor:
     moki: EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
   conn UpperWastes.RuinsApproach:
-    moki: Combat=MaceMiner+Mantis OR Bash OR Launch
-
+    moki: Burrow
+  
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
   refill Checkpoint
   refill Energy=3:
