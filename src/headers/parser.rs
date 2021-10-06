@@ -298,6 +298,28 @@ where P: Iterator<Item=&'a str>
 
     Ok(Item::Command(Command::DisableSync { uber_state }))
 }
+fn parse_create_warp<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let id = parts.next().ok_or_else(|| String::from("missing warp id"))?;
+    let id: u8 = id.parse().map_err(|_| String::from("invalid warp id"))?;
+    let x = parts.next().ok_or_else(|| String::from("missing x position"))?;
+    let x: i16 = x.parse().map_err(|_| String::from("invalid x position"))?;
+    let y = parts.next().ok_or_else(|| String::from("missing y position"))?;
+    let y: i16 = y.parse().map_err(|_| String::from("invalid y position"))?;
+    end_of_pickup(parts)?;
+
+    Ok(Item::Command(Command::CreateWarp { id, x, y }))
+}
+fn parse_destroy_warp<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let id = parts.next().ok_or_else(|| String::from("missing warp id"))?;
+    let id: u8 = id.parse().map_err(|_| String::from("invalid warp id"))?;
+    end_of_pickup(parts)?;
+
+    Ok(Item::Command(Command::DestroyWarp { id }))
+}
 fn parse_command<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
@@ -325,6 +347,8 @@ where P: Iterator<Item=&'a str>
         "19" => parse_if_less(parts),
         "20" => parse_disable_sync(parts),
         "21" => parse_enable_sync(parts),
+        "22" => parse_create_warp(parts),
+        "23" => parse_destroy_warp(parts),
         _ => Err(String::from("invalid command type")),
     }
 }

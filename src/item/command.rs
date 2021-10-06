@@ -27,6 +27,8 @@ pub enum Command {
     IfLess { uber_state: UberState, item: Box<Item> },
     DisableSync { uber_state: UberState },
     EnableSync { uber_state: UberState },
+    CreateWarp { id: u8, x: i16, y: i16 },
+    DestroyWarp { id: u8 },
 }
 impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -53,6 +55,8 @@ impl fmt::Display for Command {
             Command::IfLess { uber_state, item } => write!(f, "19|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
             Command::DisableSync { uber_state } => write!(f, "20|{}", uber_state.identifier),
             Command::EnableSync { uber_state } => write!(f, "21|{}", uber_state.identifier),
+            Command::CreateWarp { id, x, y } => write!(f, "22|{}|{}|{}", id, x, y),
+            Command::DestroyWarp { id } => write!(f, "23|{}", id),
         }
     }
 }

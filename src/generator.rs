@@ -16,11 +16,11 @@ use crate::world::{
     player::Player,
 };
 use crate::inventory::Inventory;
-use crate::item::{Item, Resource, Skill, Teleporter, ShopCommand};
+use crate::item::{Item, Resource, Skill, Teleporter, Command, ShopCommand};
 use crate::settings::Settings;
 use crate::util::{
     self,
-    GoalMode, UberState, UberType, Icon,
+    GoalMode, UberState, UberType, Icon, Position,
     constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
 };
 
@@ -953,6 +953,8 @@ where
     let price_range = Uniform::new_inclusive(0.75, 1.25);
     let world_tour = settings.goalmodes.contains(&GoalMode::Relics);
 
+    let mut has_warned_about_tp_refill = false;
+
     let mut world_contexts = worlds.into_iter().enumerate().map(|(world_index, mut world)| {
         let player_name = settings.players.get(world_index).cloned().unwrap_or_else(|| format!("Player {}", world_index + 1));
 
@@ -961,7 +963,8 @@ where
         let mut placements = Vec::with_capacity(450);
         let mut spawn_slots = Vec::new();
 
-        let spawn_identifier = spawns[world_index].identifier();
+        let spawn = spawns[world_index];
+        let spawn_identifier = spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
             for _ in 0..3 {
                 spawn_slots.push(spawn_pickup_node);
@@ -973,6 +976,7 @@ where
             });
         }
 
+        let mut spawn_is_tp = false;
         // Remove spawn tp from the pool
         if let Some(spawn_tp) = match spawn_identifier {
             "MarshSpawn.Main" => Some(Item::Teleporter(Teleporter::Marsh)),
@@ -993,7 +997,32 @@ where
             "WindtornRuins.RuinsTP" => Some(Item::Teleporter(Teleporter::InnerRuins)),
             "WillowsEnd.InnerTP" => Some(Item::Teleporter(Teleporter::Willow)),
             _ => None,
-        } { world.pool.inventory.remove(&spawn_tp, 1); }
+        } {
+            spawn_is_tp = true;
+            world.pool.inventory.remove(&spawn_tp, 1);
+        }
+
+        let spawn = spawns[world_index];
+        // Add a teleport icon for fully random spawn
+        if !spawn_is_tp {
+            if !has_warned_about_tp_refill && !settings.header_list.iter().any(|header|
+                header.file_stem().map_or(false, |stem|
+                    stem.to_str().map_or(false, |stem|
+                        stem == "tp_refill"
+            ))) {
+                log::warn!("Spawning on non-teleporter locations without the tp_refill header is not recommended!");
+                has_warned_about_tp_refill = true;
+            }
+
+            let Position { x, y } = *spawn.position().unwrap();
+            let item = Item::Command(Command::CreateWarp { id: 0, x, y });
+
+            placements.push(Placement {
+                node: None,
+                uber_state: UberState::load(),
+                item,
+            });
+        }
 
         let reachable_locations = total_reach_check(&world, &player_name)?;
 
@@ -1031,7 +1060,7 @@ where
         Ok(WorldContext {
             world,
             player_name,
-            spawn: spawns[world_index],
+            spawn,
             placements,
             placeholders: Vec::with_capacity(300),
             collected_preplacements: Vec::new(),
