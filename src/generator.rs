@@ -20,7 +20,7 @@ use crate::item::{Item, Resource, Skill, Teleporter, Command, ShopCommand};
 use crate::settings::Settings;
 use crate::util::{
     self,
-    GoalMode, UberState, UberType, Icon, Position,
+    GoalMode, UberState, UberType, Icon, Position, Difficulty,
     constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
 };
 
@@ -1034,7 +1034,9 @@ where
             ).collect::<Vec<_>>();
         if !unreachable_locations.is_empty() {
             let identifiers = unreachable_locations.iter().map(|&node| node.identifier()).collect::<Vec<_>>();
-            log::warn!("({}): {} locations are unreachable on these settings! These will only hold Spirit Light.", player_name, identifiers.len());
+            if !(unreachable_locations.len() == 1 && settings.difficulty == Difficulty::Moki) {  // moki always has one unreachable pickup
+                log::warn!("({}): {} locations are unreachable on these settings! These will only hold Spirit Light.", player_name, identifiers.len());
+            }
             log::trace!("({}): Unreachable locations on these settings: {}", player_name, format_identifiers(identifiers));
         }
 
