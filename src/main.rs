@@ -26,7 +26,7 @@ use headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{Difficulty, Glitch, GoalMode, UberState};
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 /// Generate seeds for the Ori 2 randomizer.
 ///
 /// Type seedgen.exe seed --help for further instructions
@@ -38,7 +38,7 @@ struct SeedGen {
     command: SeedGenCommand,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 enum SeedGenCommand {
     /// Generate a seed
     Seed {
@@ -67,7 +67,7 @@ enum SeedGenCommand {
     },
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 struct SeedArgs {
     /// the seed's name and name of the file it will be written to. The name also seeds the rng.
     #[structopt()]
@@ -106,7 +106,7 @@ struct SeedArgs {
     inline_headers: Vec<String>
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 struct PresetArgs {
     /// name of the preset
     ///
@@ -117,7 +117,7 @@ struct PresetArgs {
     settings: SeedSettings,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 struct SeedSettings {
     /// derive the settings from one or more presets
     ///
@@ -170,7 +170,7 @@ struct SeedSettings {
     header_args: Vec<String>,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 struct ReachCheckArgs {
     /// the seed file for which logical reach should be checked
     #[structopt(parse(from_os_str))]
@@ -198,7 +198,7 @@ struct ReachCheckArgs {
     items: Vec<String>,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 enum HeaderCommand {
     /// Check header compability
     Validate {
@@ -587,7 +587,8 @@ fn main() {
             }
         },
         SeedGenCommand::ReachCheck { args } => {
-            seedgen::initialize_log(Some("reach_log.txt"), LevelFilter::Info).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            seedgen::initialize_log(Some("reach.log"), LevelFilter::Off).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            log::info!("reach check invoked with: {:?}", args);
 
             match reach_check(args) {
                 Ok(reached) => println!("{}", reached),
