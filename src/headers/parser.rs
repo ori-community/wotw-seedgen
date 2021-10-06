@@ -568,18 +568,6 @@ fn parse_icon(icon: &str) -> Result<Icon, String> {
         match icon_type {
             "shard" => Icon::Shard(icon_id),
             "spell" => Icon::Spell(icon_id),
-            "map" => {
-                if let Some(variant) = icon_parts.next() {
-                    match variant {
-                        "active" => Icon::Map(icon_id),
-                        "inactive" => Icon::MapInactive(icon_id),
-                        "special" => Icon::MapSpecial(icon_id),
-                        _ => return Err(String::from("invalid wheel icon variant")),
-                    }
-                } else {
-                    Icon::Map(icon_id)
-                }
-            },
             "opher" => Icon::Opher(icon_id),
             "lupo" => Icon::Lupo(icon_id),
             "grom" => Icon::Grom(icon_id),

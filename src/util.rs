@@ -139,9 +139,6 @@ impl Zone {
 pub enum Icon {
     Shard(u16),
     Spell(u16),
-    Map(u16),
-    MapInactive(u16),
-    MapSpecial(u16),
     Opher(u16),
     Lupo(u16),
     Grom(u16),
@@ -153,9 +150,6 @@ impl fmt::Display for Icon {
         match self {
             Icon::Shard(id) => write!(f, "shard:{}", id),
             Icon::Spell(id) => write!(f, "spell:{}", id),
-            Icon::Map(id) => write!(f, "map:{}", id),
-            Icon::MapInactive(id) => write!(f, "map:{}:inactive", id),
-            Icon::MapSpecial(id) => write!(f, "map:{}:special", id),
             Icon::Opher(id) => write!(f, "opher:{}", id),
             Icon::Lupo(id) => write!(f, "lupo:{}", id),
             Icon::Grom(id) => write!(f, "grom:{}", id),
