@@ -4,8 +4,8 @@
 /// if a "Game Saved" message appears as a text box, you can reload from the menu to have the current cutscene skipped
 !!include header_core
 
-timer: 9|106|9|1
-timer: 9|107|9|4
+timer: 9|102|9|1
+timer: 9|103|9|4
 
 9|0=1|6|f=0  // manual wisp
 !9|0=1|1|0
@@ -13,18 +13,18 @@ timer: 9|107|9|4
 !9|0=1|1|1
 !9|0=1|1|1
 // timed autosaves
-9|1|8|9|106|bool|true
+9|1|8|9|102|bool|true
 9|1=1000|6|Game Saved!
 9|1=1000|4|0
-9|1=1000|8|9|106|bool|false
+9|1=1000|8|9|102|bool|false
 // timed checkpoints
 9|1=2000|4|2
-9|1=2000|8|9|106|bool|false
+9|1=2000|8|9|102|bool|false
 // skips
 !46462|59806|8|937|6778|bool|true   // voice door
 42178|18751=3|8|42178|16586|byte|1  // cave project
 42178|18751=3|8|14019|33776|int|1
-!37858|12379|8|9|1|int|670          // water cleaned
+!37858|12379|8|9|1|int|600          // water cleaned
 !37858|12379|8|937|34641|int|3
 6|1014|8|18793|25789|bool|true      // depths gate
 18793|26713=1|6|f=0                 // mora start
@@ -55,9 +55,9 @@ timer: 9|107|9|4
 9|106|8|14019|54675|int|6
 9|106|8|10289|22102|bool|true
 9|106|8|9|0|int|1
-16155|47278=5|8|9|107|bool|true     // final cutscene
+16155|47278=5|8|9|103|bool|true     // final cutscene
 16155|47278=5|8|34543|11226|bool|true
 9|4=2|6|f=0
 9|4=2|4|8|-3537|-5881
 9|4=240|4|16|warpCredits
-9|4=240|8|9|107|bool|false
+9|4=240|8|9|103|bool|false
