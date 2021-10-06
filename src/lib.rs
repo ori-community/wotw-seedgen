@@ -26,7 +26,11 @@ use log4rs::{
         console::{ConsoleAppender, Target},
         file::FileAppender,
     },
-    encode::pattern::PatternEncoder,
+    encode::{
+        Encode,
+        pattern::PatternEncoder,
+        json::JsonEncoder,
+    },
     config::{Appender, Config, Root},
     filter::threshold::ThresholdFilter,
 };
@@ -99,10 +103,16 @@ struct SpawnLoc {
     position: Position,
 }
 
-pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter) -> Result<(), String> {
+pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, json: bool) -> Result<(), String> {
+    let encoder: Box<dyn Encode> = if json {
+        Box::new(JsonEncoder::new())
+    } else {
+        Box::new(PatternEncoder::new("{h({l}):5}  {m}{n}"))
+    };
+
     let stderr = ConsoleAppender::builder()
         .target(Target::Stderr)
-        .encoder(Box::new(PatternEncoder::new("{h({l}):5}  {m}{n}")))
+        .encoder(encoder)
         .build();
 
     let log_config = if let Some(path) = use_file {
