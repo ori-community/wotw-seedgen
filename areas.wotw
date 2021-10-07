@@ -9839,15 +9839,23 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
       Bash, Grenade=1
       Launch
     gorlek: Combat=2xCrystalMiner+2xShieldCrystalMiner, DoubleJump OR SentryJump=1
-    unsafe: Combat=2xCrystalMiner+2xShieldCrystalMiner, Dash OR Hammer
+    kii:
+      Combat=2xCrystalMiner+2xShieldCrystalMiner, Dash OR Hammer
+      Combat=2xCrystalMiner+2xShieldCrystalMiner, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Combat=2xCrystalMiner+2xShieldCrystalMiner, Sword  # upslash+downslash
+      Combat=2xCrystalMiner+2xShieldCrystalMiner, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
 
   conn WeepingRidge.LaunchArea:
     moki, WeepingRidge.ElevatorFightCompleted:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
       Launch
-    gorlek: WeepingRidge.ElevatorFightCompleted, DoubleJump OR SentryJump=1
-    unsafe: WeepingRidge.ElevatorFightCompleted, Dash OR Glide OR Hammer
+    gorlek, WeepingRidge.ElevatorFightCompleted: DoubleJump OR SentryJump=1
+    kii, WeepingRidge.ElevatorFightCompleted:
+      Dash OR Hammer
+      Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: WeepingRidge.ElevatorFightCompleted, Glide OR Sword
   conn LowerWastes.WestTP:  # covers connections into woods
     moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
@@ -9855,15 +9863,19 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
 anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of the elevator
   refill Checkpoint
   refill Health=1
+  
   pickup WeepingRidge.Ore:
     moki: Launch, Bash, DoubleJump OR Dash OR Glide
     gorlek:
       Launch, DoubleJump OR Dash OR Bash OR Glide
       Launch, Sword, Damage=20
+    kii:  # launch path is redundant with AboveTree->Ore
+      Bash, DoubleJump OR Dash
+      DoubleJump, TripleJump, Sword
     unsafe:
       SentryJump=2, DoubleJump, Bow=1, Damage=40
       SentryJump=2, DoubleJump, TripleJump OR Dash OR Glide  # Use weapon stall to reach the edge below the portal
-      Bash, Glide OR DoubleJump OR Dash  # wait on the left wall until the elemental gives you a shot to bash
+      Bash, Glide # wait on the left wall until the elemental gives you a shot to bash
       DoubleJump, TripleJump
       DoubleJump, Sword, Damage=40, Bow=1  # Reset your jump by slashing the elemental, pogo him to reach the wall above the portal, djump + upslash from under the Mine to reach the spikes
 
@@ -9878,6 +9890,11 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Bash, DoubleJump, TripleJump
       Bash, DoubleJump, Bow=1, Sword OR Hammer
       DoubleJump, TripleJump, Sword OR Hammer OR Dash
+    kii:
+      Launch
+      Damage=40, DoubleJump OR Dash
+      Bash, Dash
+      Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Damage=40, Sword OR Hammer
       DoubleJump, Bash OR Sword  # Use sword on elemental to reset your djump
@@ -9889,8 +9906,21 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Launch
       SentryJump=3, DoubleJump, TripleJump, Dash
       Bash, Grenade=3, DoubleJump, TripleJump
-  # connection downwards can't pass the elevator
-
+  conn WeepingRidge.Bottom:
+    moki, WeepingRidge.ElevatorFightCompleted:
+      Launch
+      Bash, Grenade=1, DoubleJump
+      DoubleJump, Dash, Glide 
+    gorlek, WeepingRidge.ElevatorFightCompleted:
+      SwordSJump=1
+      DoubleJump, TripleJump OR Dash OR Glide
+    kii, WeepingRidge.ElevatorFightCompleted:
+      Glide OR Sword OR Hammer OR Sentry=5
+      Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=2
+    unsafe, WeepingRidge.ElevatorFightCompleted:
+      Dash OR Shuriken=3 OR Sentry=3
+      
 anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
   refill Checkpoint
 
