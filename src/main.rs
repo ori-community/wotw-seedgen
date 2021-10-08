@@ -460,6 +460,20 @@ fn create_preset(mut args: PresetArgs) -> Result<(), String> {
 }
 
 fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
+    let command = format!("reach-check {} --areas {} --locations {} --uber-states {} {} {} {} {} {} {}",
+        args.seed_file.display(),
+        args.areas.display(),
+        args.locations.display(),
+        args.uber_states.display(),
+        args.health,
+        args.energy,
+        args.keystones,
+        args.ore,
+        args.spirit_light,
+        args.items.join(" "),
+    );
+    log::info!("{}", command);
+
     args.seed_file.set_extension("wotwr");
     let contents = util::read_file(&args.seed_file, "seeds")?;
 
@@ -507,13 +521,22 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let spawn = settings::read_spawn(&contents)?;
     let spawn = world.graph.find_spawn(&spawn)?;
 
-    let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).expect("Invalid Reach Check");
-    let reached = reached.iter()
-        .filter(|&&node| node.can_place())
-        .filter_map(|&node| node.uber_state())
-        .map(|uber_state| format!("{}", uber_state))
-        .collect::<Vec<_>>();
-    Ok(reached.join(", "))
+    let mut reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).expect("Invalid Reach Check");
+    reached.retain(|&node| node.can_place());
+
+    let identifiers = reached.iter()
+        .map(|&node| node.identifier())
+        .collect::<Vec<_>>()
+        .join(", ");
+    log::info!("reachable locations: {}", identifiers);
+
+    let reached = reached.into_iter()
+        .filter_map(|node| node.uber_state())
+        .map(|uber_state| uber_state.to_string())
+        .collect::<Vec<_>>()
+        .join(", ");
+
+    Ok(reached)
 }
 
 fn compile_seed(mut path: PathBuf) -> Result<(), String> {
@@ -591,7 +614,6 @@ fn main() {
         },
         SeedGenCommand::ReachCheck { args } => {
             seedgen::initialize_log(Some("reach.log"), LevelFilter::Off, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
-            log::info!("reach check invoked with: {:?}", args);
 
             match reach_check(args) {
                 Ok(reached) => println!("{}", reached),
