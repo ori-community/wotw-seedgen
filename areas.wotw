@@ -9895,17 +9895,21 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Damage=40, DoubleJump OR Dash
       Bash, Dash
       Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Sword, DoubleJump OR Dash # Use sword on elemental to reset your djump/dash
+      DoubleJump, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Damage=40, Sword OR Hammer
-      DoubleJump, Bash OR Sword  # Use sword on elemental to reset your djump
-      Dash, Sword OR Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
+      Dash, Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
   conn WillowsEnd.Entry:
-    moki: WeepingRidge.ElevatorFightCompleted, Launch, DoubleJump, Dash OR Glide
-    gorlek: WeepingRidge.ElevatorFightCompleted, Launch, DoubleJump OR Dash
+    moki, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump, Dash OR Glide
+    gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
+    kii, WeepingRidge.ElevatorFightCompleted:
+      Launch, Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
+      Bash, Grenade=3, DoubleJump, TripleJump
     unsafe, WeepingRidge.ElevatorFightCompleted:
       Launch
       SentryJump=3, DoubleJump, TripleJump, Dash
-      Bash, Grenade=3, DoubleJump, TripleJump
+      Bash, Grenade=3, DoubleJump
   conn WeepingRidge.Bottom:
     moki, WeepingRidge.ElevatorFightCompleted:
       Launch
@@ -9927,26 +9931,47 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
   pickup WeepingRidge.LaunchTree: free
   pickup WeepingRidge.PortalEX:
     moki: Launch
-    unsafe: SwordSJump=2, Damage=40
+    unsafe:
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40  # take a dboost in the left spikes
+      SwordSJump=2, Damage=40
+      DoubleJump, TripleJump, Damage=40, Damage=80
   pickup WeepingRidge.SpikeClimbEX:
     moki: Launch, DoubleJump, Bow=2
     gorlek:
       Launch, Bow=1 OR Spear=1 OR Grenade=1 OR Damage=20
       Bash, Grenade=2, DoubleJump, TripleJump, Damage=40
       SentryJump=2, DoubleJump, TripleJump, Damage=40
+    kii:
+      Launch
+      Bash, Grenade=2, DoubleJump, TripleJump
+      Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Sword, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree
     unsafe:  # may be inaccurate after moving paths to this anchor
-      Bash, Grenade=3, DoubleJump, Bow=1
+      Bash, Grenade=3, DoubleJump
       SentryJump=3, DoubleJump, Bash OR Sword OR Damage=40
       SentryJump=2, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform
   pickup WeepingRidge.Ore:
     moki: Launch, DoubleJump OR Dash OR Bash OR Glide
     gorlek: Launch
+    kii:
+      Bash, Grenade=2, DoubleJump OR Dash
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
+    unsafe:
+      DoubleJump, TripleJump, Sword  # pogo the mines
+      DoubleJump, TripleJump, Hammer, Damage=40
 
   conn WeepingRidge.LaunchArea:
     moki: Launch, Bash, Glide  # Glide is the only ability that really helps you outwait the laser attack
     gorlek:
       Launch, Bash
       Launch, DoubleJump, Dash  # this gives you good mobility to avoid the enemies
+    kii:
+      Launch, DoubleJump OR Dash OR Damage=20  # dboost on the mine inbetween the two elementals
+    unsafe:
+      Launch
+      DoubleJump, TripleJump, Sword, Damage=40
+      Bash, Grenade=2, DoubleJump, TripleJump
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
 
 region WillowsEnd:
   moki: Danger=60, Regenerate  # need more than 6 health and Regen to do ANYTHING in willow
