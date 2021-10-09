@@ -259,8 +259,7 @@ where P: Iterator<Item=&'a str>
     let uber_id = format!("{}={}", uber_id, value);
     let uber_state = UberState::from_parts(uber_group, &uber_id)?;
 
-    let item = parts.collect::<Vec<_>>().join("|");
-    let item = parse_pickup(&item)?;
+    let item = parse_pickup_parts(parts)?;
 
     Ok((uber_state, item))
 }
@@ -332,32 +331,28 @@ where P: Iterator<Item=&'a str>
     let y2 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
     let y2: i16 = y2.parse().map_err(|_| format!("invalid boundary coordinate {}", y2))?;
 
-    let item = parts.collect::<Vec<_>>().join("|");
-    let item = Box::new(parse_pickup(&item)?);
+    let item = Box::new(parse_pickup_parts(parts)?);
 
     Ok(Item::Command(Command::IfBox { x1, y1, x2, y2, item }))
 }
 fn parse_if_self_equal<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
-    let item = parts.collect::<Vec<_>>().join("|");
-    let item = Box::new(parse_pickup(&item)?);
+    let item = Box::new(parse_pickup_parts(parts)?);
 
     Ok(Item::Command(Command::IfSelfEqual { item }))
 }
 fn parse_if_self_greater<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
-    let item = parts.collect::<Vec<_>>().join("|");
-    let item = Box::new(parse_pickup(&item)?);
+    let item = Box::new(parse_pickup_parts(parts)?);
 
     Ok(Item::Command(Command::IfSelfGreater { item }))
 }
 fn parse_if_self_less<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
-    let item = parts.collect::<Vec<_>>().join("|");
-    let item = Box::new(parse_pickup(&item)?);
+    let item = Box::new(parse_pickup_parts(parts)?);
 
     Ok(Item::Command(Command::IfSelfLess { item }))
 }
@@ -593,8 +588,8 @@ where P: Iterator<Item=&'a str>
 
     let mut hinted_items = Vec::new();
     for part in parts {
-        let pickup_parts = part.split('-').collect::<Vec<_>>();
-        let pickup = parse_pickup(&pickup_parts.join("|"))?;
+        let pickup_parts = part.split('-');
+        let pickup = parse_pickup_parts(pickup_parts)?;
         if pickup.is_checkable() {
             hinted_items.push(pickup)
         }
@@ -717,8 +712,7 @@ where P: Iterator<Item=&'a str>
         _ => return Err(String::from("invalid bind")),
     };
 
-    let pickup = parts.collect::<Vec<_>>().join("|");
-    let pickup = Box::new(parse_pickup(&pickup)?);
+    let pickup = Box::new(parse_pickup_parts(parts)?);
 
     Ok(Item::WheelCommand(WheelCommand::SetPickup { wheel, position, bind, pickup }))
 }
@@ -800,10 +794,9 @@ where P: Iterator<Item=&'a str>
     }
 }
 
-pub fn parse_pickup(pickup: &str) -> Result<Item, String> {
-    let pickup = pickup.trim();
-    let mut parts = pickup.split('|');
-
+fn parse_pickup_parts<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
     let pickup_type = parts.next().unwrap_or("tried to parse empty pickup");
     match pickup_type {
         "0" => parse_spirit_light(parts),
@@ -824,7 +817,12 @@ pub fn parse_pickup(pickup: &str) -> Result<Item, String> {
         "16" => parse_wheelcommand(parts),
         "17" => parse_shopcommand(parts),
         _ => Err(String::from("invalid pickup type")),
-    }.map_err(|err| format!("{} in pickup {}", err, pickup))
+    }
+}
+pub fn parse_pickup(pickup: &str) -> Result<Item, String> {
+    let parts = pickup.trim().split('|');
+
+    parse_pickup_parts(parts).map_err(|err| format!("{} in pickup {}", err, pickup))
 }
 
 fn parse_count(pickup: &mut &str) -> u16 {
