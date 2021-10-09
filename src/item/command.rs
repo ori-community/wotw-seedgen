@@ -30,9 +30,9 @@ pub enum Command {
     CreateWarp { id: u8, x: i16, y: i16 },
     DestroyWarp { id: u8 },
     IfBox { x1: i16, y1: i16, x2: i16, y2: i16, item: Box<Item> },
-    IfSelfEqual { item: Box<Item> },
-    IfSelfGreater { item: Box<Item> },
-    IfSelfLess { item: Box<Item> },
+    IfSelfEqual { value: String, item: Box<Item> },
+    IfSelfGreater { value: String, item: Box<Item> },
+    IfSelfLess { value: String, item: Box<Item> },
 }
 impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -62,9 +62,9 @@ impl fmt::Display for Command {
             Command::CreateWarp { id, x, y } => write!(f, "22|{}|{}|{}", id, x, y),
             Command::DestroyWarp { id } => write!(f, "23|{}", id),
             Command::IfBox { x1, y1, x2, y2, item } => write!(f, "24|{}|{}|{}|{}|{}", x1, y1, x2, y2, item.code()),
-            Command::IfSelfEqual { item } => write!(f, "25|{}", item.code()),
-            Command::IfSelfGreater { item } => write!(f, "26|{}", item.code()),
-            Command::IfSelfLess { item } => write!(f, "27|{}", item.code()),
+            Command::IfSelfEqual { value, item } => write!(f, "25|{}|{}", value, item.code()),
+            Command::IfSelfGreater { value, item } => write!(f, "26|{}|{}", value, item.code()),
+            Command::IfSelfLess { value, item } => write!(f, "27|{}|{}", value, item.code()),
         }
     }
 }

@@ -249,7 +249,7 @@ where P: Iterator<Item=&'a str>
 
     Ok(Item::Command(Command::AhkSignal { signal: signal.to_string() }))
 }
-fn parse_if<'a, P>(mut parts: P) -> Result<(UberState, Item), String>
+fn parse_if<'a, P>(mut parts: P) -> Result<(UberState, Box<Item>), String>
 where P: Iterator<Item=&'a str>
 {
     let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
@@ -259,7 +259,7 @@ where P: Iterator<Item=&'a str>
     let uber_id = format!("{}={}", uber_id, value);
     let uber_state = UberState::from_parts(uber_group, &uber_id)?;
 
-    let item = parse_item_parts(parts)?;
+    let item = Box::new(parse_item_parts(parts)?);
 
     Ok((uber_state, item))
 }
@@ -267,19 +267,19 @@ fn parse_if_equal<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let (uber_state, item) = parse_if(parts)?;
-    Ok(Item::Command(Command::IfEqual { uber_state, item: Box::new(item) }))
+    Ok(Item::Command(Command::IfEqual { uber_state, item }))
 }
 fn parse_if_greater<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let (uber_state, item) = parse_if(parts)?;
-    Ok(Item::Command(Command::IfGreater { uber_state, item: Box::new(item) }))
+    Ok(Item::Command(Command::IfGreater { uber_state, item }))
 }
 fn parse_if_less<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let (uber_state, item) = parse_if(parts)?;
-    Ok(Item::Command(Command::IfLess { uber_state, item: Box::new(item) }))
+    Ok(Item::Command(Command::IfLess { uber_state, item }))
 }
 fn parse_disable_sync<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
@@ -335,26 +335,32 @@ where P: Iterator<Item=&'a str>
 
     Ok(Item::Command(Command::IfBox { x1, y1, x2, y2, item }))
 }
+fn parse_if_self<'a, P>(mut parts: P) -> Result<(String, Box<Item>), String>
+where P: Iterator<Item=&'a str>
+{
+    let value = parts.next().ok_or_else(|| String::from("missing uber value"))?;
+    let value = value.to_owned();
+    let item = Box::new(parse_item_parts(parts)?);
+
+    Ok((value, item))
+}
 fn parse_if_self_equal<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok(Item::Command(Command::IfSelfEqual { item }))
+    let (value, item) = parse_if_self(parts)?;
+    Ok(Item::Command(Command::IfSelfEqual { value, item }))
 }
 fn parse_if_self_greater<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok(Item::Command(Command::IfSelfGreater { item }))
+    let (value, item) = parse_if_self(parts)?;
+    Ok(Item::Command(Command::IfSelfGreater { value, item }))
 }
 fn parse_if_self_less<'a, P>(parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok(Item::Command(Command::IfSelfLess { item }))
+    let (value, item) = parse_if_self(parts)?;
+    Ok(Item::Command(Command::IfSelfLess { value, item }))
 }
 fn parse_command<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
