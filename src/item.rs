@@ -92,9 +92,9 @@ impl fmt::Display for Item {
                     }
                     if end_index == 0 { break; }
 
-                    let pickup = &message[after_bracket..end_index];
-                    if let Ok(pickup) = headers::parser::parse_pickup(pickup) {
-                        message.replace_range(start_index..=end_index, &pickup.to_string());
+                    let item = &message[after_bracket..end_index];
+                    if let Ok(item) = headers::parser::parse_item(item) {
+                        message.replace_range(start_index..=end_index, &item.to_string());
                     } else { last_index = end_index; } // if nothing ends up getting replaced, move on
                 }
 

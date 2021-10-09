@@ -916,7 +916,7 @@ where
     R: Rng,
     I: Iterator<Item=usize>,
 {
-    log::trace!("Got stuck. Trying to flush uberState pickups from the item pool to recover...");
+    log::trace!("Got stuck. Trying to flush uberState items from the item pool to recover...");
 
     for target_world_index in 0..context.world_count {
         let uber_state_items = world_contexts[target_world_index].world.pool.inventory.items.iter()
