@@ -356,26 +356,26 @@ WillowsEnd.WindSpinOre, Willows End, Resource, Ore, willowsEndGroup, 16155, gorl
 WillowsEnd.RedirectEX, Willows End, SpiritLight, 200, willowsEndGroup, 16155, xpOrbA, 55446, 654, -3780
 WillowsEnd.UpperLeftEX, Willows End, SpiritLight, 200, corruptedPeakGroup, 36153, expOrbA, 23902, 434, -3640
 WillowsEnd.UpperRightEX, Willows End, SpiritLight, 200, corruptedPeakGroup, 36153, expOrbB, 3662, 540, -3655
-TwillenShop.Overcharge, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, Overcharge, 1, 0, 0
-TwillenShop.TripleJump, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, TripleJump, 2, 0, 0
-TwillenShop.Wingclip, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, Wingclip, 3, 0, 0
-TwillenShop.Swap, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, Swap, 5, 0, 0
-TwillenShop.LightHarvest, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, LightHarvest, 19, 0, 0
-TwillenShop.Vitality, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, Vitality, 22, 0, 0
-TwillenShop.Energy, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, Energy, 26, 0, 0
-TwillenShop.Finesse, Wellspring Glades, Shop, TwillenShard, twillenShopDontWorry, 2, Finesse, 40, 0, 0
-OpherShop.WaterBreath, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, WaterBreath, 23, 0, 0
-OpherShop.Spike, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, Spike, 74, 0, 0
-OpherShop.SpiritSmash, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, SpiritSmash, 98, 0, 0
-OpherShop.Teleport, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, Teleport, 105, 0, 0
-OpherShop.SpiritStar, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, SpiritStar, 106, 0, 0
-OpherShop.Blaze, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, Blaze, 115, 0, 0
-OpherShop.Sentry, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, Sentry, 116, 0, 0
-OpherShop.ExplodingSpike, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, ExplodingSpike, 1074, 0, 0
-OpherShop.ShockSmash, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, ShockSmash, 1098, 0, 0
-OpherShop.StaticStar, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, StaticStar, 1106, 0, 0
-OpherShop.ChargeBlaze, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, ChargeBlaze, 1115, 0, 0
-OpherShop.RapidSentry, Wellspring Glades, Shop, OpherWeapon, opherShopDontWorry, 1, RapidSentry, 1116, 0, 0
-LupoShop.HCMapIcon, Wellspring Glades, Shop, LupoMap, npcsStateGroup, 48248, HCMapIcon, 19396, 0, 0
-LupoShop.ECMapIcon, Wellspring Glades, Shop, LupoMap, npcsStateGroup, 48248, ECMapIcon, 57987, 0, 0
-LupoShop.ShardMapIcon, Wellspring Glades, Shop, LupoMap, npcsStateGroup, 48248, ShardMapIcon, 41666, 0, 0
+TwillenShop.Overcharge, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Overcharge, 1, 0, 0
+TwillenShop.TripleJump, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, TripleJump, 2, 0, 0
+TwillenShop.Wingclip, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Wingclip, 3, 0, 0
+TwillenShop.Swap, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Swap, 5, 0, 0
+TwillenShop.LightHarvest, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, LightHarvest, 19, 0, 0
+TwillenShop.Vitality, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Vitality, 22, 0, 0
+TwillenShop.Energy, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Energy, 26, 0, 0
+TwillenShop.Finesse, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Finesse, 40, 0, 0
+OpherShop.WaterBreath, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, WaterBreath, 23, 0, 0
+OpherShop.Spike, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Spike, 74, 0, 0
+OpherShop.SpiritSmash, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, SpiritSmash, 98, 0, 0
+OpherShop.Teleport, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Teleport, 105, 0, 0
+OpherShop.SpiritStar, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, SpiritStar, 106, 0, 0
+OpherShop.Blaze, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Blaze, 115, 0, 0
+OpherShop.Sentry, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Sentry, 116, 0, 0
+OpherShop.ExplodingSpike, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, ExplodingSpike, 1074, 0, 0
+OpherShop.ShockSmash, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, ShockSmash, 1098, 0, 0
+OpherShop.StaticStar, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, StaticStar, 1106, 0, 0
+OpherShop.ChargeBlaze, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, ChargeBlaze, 1115, 0, 0
+OpherShop.RapidSentry, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, RapidSentry, 1116, 0, 0
+LupoShop.HCMapIcon, Shop, Shop, LupoMap, npcsStateGroup, 48248, HCMapIcon, 19396, 0, 0
+LupoShop.ECMapIcon, Shop, Shop, LupoMap, npcsStateGroup, 48248, ECMapIcon, 57987, 0, 0
+LupoShop.ShardMapIcon, Shop, Shop, LupoMap, npcsStateGroup, 48248, ShardMapIcon, 41666, 0, 0

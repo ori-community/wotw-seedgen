@@ -218,7 +218,9 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             "Windswept Wastes" => Zone::Wastes,
             "Windtorn Ruins" => Zone::Ruins,
             "Willows End" => Zone::Willow,
-            _ => Zone::Void,
+            "Shop" => Zone::Shop,
+            "Void" => Zone::Void,
+            _ => return Err(format!("invalid zone {} in loc_data", location.zone)),
         };
 
         if metadata.quests.contains(name) {
