@@ -320,6 +320,47 @@ where P: Iterator<Item=&'a str>
 
     Ok(Item::Command(Command::DestroyWarp { id }))
 }
+fn parse_if_box<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let x1 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
+    let x1: i16 = x1.parse().map_err(|_| format!("invalid boundary coordinate {}", x1))?;
+    let y1 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
+    let y1: i16 = y1.parse().map_err(|_| format!("invalid boundary coordinate {}", y1))?;
+    let x2 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
+    let x2: i16 = x2.parse().map_err(|_| format!("invalid boundary coordinate {}", x2))?;
+    let y2 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
+    let y2: i16 = y2.parse().map_err(|_| format!("invalid boundary coordinate {}", y2))?;
+
+    let item = parts.collect::<Vec<_>>().join("|");
+    let item = Box::new(parse_pickup(&item)?);
+
+    Ok(Item::Command(Command::IfBox { x1, y1, x2, y2, item }))
+}
+fn parse_if_self_equal<'a, P>(parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let item = parts.collect::<Vec<_>>().join("|");
+    let item = Box::new(parse_pickup(&item)?);
+
+    Ok(Item::Command(Command::IfSelfEqual { item }))
+}
+fn parse_if_self_greater<'a, P>(parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let item = parts.collect::<Vec<_>>().join("|");
+    let item = Box::new(parse_pickup(&item)?);
+
+    Ok(Item::Command(Command::IfSelfGreater { item }))
+}
+fn parse_if_self_less<'a, P>(parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let item = parts.collect::<Vec<_>>().join("|");
+    let item = Box::new(parse_pickup(&item)?);
+
+    Ok(Item::Command(Command::IfSelfLess { item }))
+}
 fn parse_command<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
@@ -349,6 +390,10 @@ where P: Iterator<Item=&'a str>
         "21" => parse_enable_sync(parts),
         "22" => parse_create_warp(parts),
         "23" => parse_destroy_warp(parts),
+        "24" => parse_if_box(parts),
+        "25" => parse_if_self_equal(parts),
+        "26" => parse_if_self_greater(parts),
+        "27" => parse_if_self_less(parts),
         _ => Err(String::from("invalid command type")),
     }
 }
