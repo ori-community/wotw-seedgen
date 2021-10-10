@@ -664,8 +664,12 @@ fn parse_wheel_set_name<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-    let name = parts.next().ok_or_else(|| String::from("missing name"))?.to_owned();
-    end_of_item(parts)?;
+
+    let parts = parts.collect::<Vec<&str>>();
+    if parts.is_empty() {
+        return Err(String::from("missing name"));
+    }
+    let name = parts.join("|");
 
     Ok(Item::WheelCommand(WheelCommand::SetName { wheel, position, name }))
 }
@@ -673,8 +677,12 @@ fn parse_wheel_set_description<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-    let description = parts.next().ok_or_else(|| String::from("missing description"))?.to_owned();
-    end_of_item(parts)?;
+
+    let parts = parts.collect::<Vec<&str>>();
+    if parts.is_empty() {
+        return Err(String::from("missing description"));
+    }
+    let description = parts.join("|");
 
     Ok(Item::WheelCommand(WheelCommand::SetDescription { wheel, position, description }))
 }
@@ -1336,10 +1344,11 @@ pub fn validate_header(name: &Path, contents: &str) -> Result<(Vec<UberState>, H
 
                     match command.operator {
                         UberStateOperator::Value(mut value) => {
+                            if value == "false" || value == "0" {
+                                continue;
+                            }
                             if value == "true" {
                                 value = String::from("1");
-                            } else if value == "false" {
-                                value = String::from("0");
                             }
 
                             let uber_state = UberState {
