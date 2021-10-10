@@ -65,6 +65,7 @@ where
     world_count: usize,
     total_reachable_count: usize,
     custom_names: &'b HashMap<String, String>,
+    custom_prices: &'b HashMap<String, u16>,
     custom_icons: &'b HashMap<String, Icon>,
     multiworld_state_index: I,
     price_range: Uniform<f32>,
@@ -148,7 +149,8 @@ where
                 .find(|(_, location, _)| &uber_state.identifier == location)
                 .ok_or_else(|| format!("({}): Uber State {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_player_name, node))?;
 
-            let mut price = item.shop_price();
+            let mut price = context.custom_prices.get(&code).cloned().unwrap_or_else(|| item.shop_price());
+
             if item.random_shop_price() {
                 let modified_price = f32::from(price) * context.price_range.sample(context.rng);
                 price = u16::try_from(modified_price as i32).map_err(|_| format!("({}): Overflowed shop price for {} after adding a random amount to it", origin_player_name, item))?;
@@ -945,7 +947,16 @@ where
     Ok(())
 }
 
-pub fn generate_placements<'a, R>(worlds: Vec<World<'a>>, spawns: &[&'a Node], spawn_pickup_node: &'a Node, custom_names: &HashMap<String, String>, custom_icons: &HashMap<String, Icon>, settings: &Settings, rng: &mut R) -> Result<Vec<Vec<Placement<'a>>>, String>
+pub fn generate_placements<'a, R>(
+    worlds: Vec<World<'a>>,
+    spawns: &[&'a Node],
+    spawn_pickup_node: &'a Node,
+    custom_names: &HashMap<String, String>,
+    custom_prices: &HashMap<String, u16>,
+    custom_icons: &HashMap<String, Icon>,
+    settings: &Settings,
+    rng: &mut R
+) -> Result<Vec<Vec<Placement<'a>>>, String>
 where
     R: Rng,
 {
@@ -1081,6 +1092,7 @@ where
         world_count: settings.worlds,
         total_reachable_count,
         custom_names,
+        custom_prices,
         custom_icons,
         multiworld_state_index: 0..,
         price_range,

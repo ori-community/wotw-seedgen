@@ -964,6 +964,18 @@ fn name_command(naming: &str, names: &mut HashMap<String, String>) -> Result<(),
     Ok(())
 }
 #[inline]
+fn price_command(price: &str, prices: &mut HashMap<String, u16>) -> Result<(), String> {
+    let mut parts = price.splitn(2, ' ');
+    let item = parts.next().unwrap();
+    parse_item(item)?;
+    let price = parts.next().ok_or_else(|| String::from("Missing price"))?;
+    let price: u16 = price.parse().map_err(|_| format!("invalid price {}", price))?;
+
+    prices.insert(item.to_string(), price);
+
+    Ok(())
+}
+#[inline]
 fn icon_command(icon: &str, icons: &mut HashMap<String, Icon>) -> Result<(), String> {
     let mut parts = icon.splitn(2, ' ');
     let item = parts.next().unwrap();
@@ -1114,6 +1126,7 @@ pub struct HeaderContext {
     pub excludes: HashMap<String, String>,
     pub flags: Vec<String>,
     pub names: HashMap<String, String>,
+    pub prices: HashMap<String, u16>,
     pub icons: HashMap<String, Icon>,
     pub negative_inventory: Inventory,
 }
@@ -1180,6 +1193,8 @@ where R: Rng + ?Sized
                 remove_command(item.trim(), world, &mut context.negative_inventory).map_err(|err| format!("{} in remove command {}", err, line))?;
             } else if let Some(naming) = command.strip_prefix("name ") {
                 name_command(naming.trim(), &mut context.names).map_err(|err| format!("{} in name command {}", err, line))?;
+            } else if let Some(price) = command.strip_prefix("price ") {
+                price_command(price.trim(), &mut context.prices).map_err(|err| format!("{} in price command {}", err, line))?;
             } else if let Some(icon) = command.strip_prefix("icon ") {
                 icon_command(icon.trim(), &mut context.icons).map_err(|err| format!("{} in icon command {}", err, line))?;
             } else if let Some(parameter) = command.strip_prefix("parameter ") {

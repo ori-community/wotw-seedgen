@@ -152,8 +152,9 @@ pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, jso
 
 type Flags = Vec<String>;
 type Names = HashMap<String, String>;
+type Prices = HashMap<String, u16>;
 type Icons = HashMap<String, Icon>;
-fn parse_headers<R>(world: &mut World, inline_headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names, Icons), String>
+fn parse_headers<R>(world: &mut World, inline_headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names, Prices, Icons), String>
 where R: Rng + ?Sized
 {
     let mut header_block = String::new();
@@ -224,10 +225,19 @@ where R: Rng + ?Sized
         world.pool.inventory.remove(&item, amount);
     }
 
-    Ok((header_block, context.flags, context.names, context.icons))
+    Ok((header_block, context.flags, context.names, context.prices, context.icons))
 }
 
-fn generate_placements<'a, R>(graph: &'a Graph, worlds: Vec<World<'a>>, settings: &Settings, spawn_pickup_node: &'a Node, custom_names: &HashMap<String, String>, custom_icons: &HashMap<String, Icon>, rng: &mut R) -> Result<(Vec<Vec<Placement<'a>>>, Vec<&'a Node>), String>
+fn generate_placements<'a, R>(
+    graph: &'a Graph,
+    worlds: Vec<World<'a>>,
+    settings: &Settings,
+    spawn_pickup_node: &'a Node,
+    custom_names: &HashMap<String, String>,
+    custom_prices: &HashMap<String, u16>,
+    custom_icons: &HashMap<String, Icon>,
+    rng: &mut R
+) -> Result<(Vec<Vec<Placement<'a>>>, Vec<&'a Node>), String>
 where R: Rng
 {
     let mut index = 0;
@@ -238,7 +248,7 @@ where R: Rng
         let identifiers = spawn_locs.iter().map(|spawn_loc| spawn_loc.identifier()).collect::<Vec<_>>();
         log::trace!("Spawning on {}", identifiers.join(", "));
 
-        match generator::generate_placements(worlds.clone(), &spawn_locs, spawn_pickup_node, custom_names, custom_icons, settings, rng) {
+        match generator::generate_placements(worlds.clone(), &spawn_locs, spawn_pickup_node, custom_names, custom_prices, custom_icons, settings, rng) {
             Ok(seed) => {
                 if index > 0 {
                     log::info!("Generated seed after {} tries{}", index + 1, if index < RETRIES / 2 { "" } else { " (phew)" });
@@ -317,7 +327,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
     world.pool = Pool::preset();
     world.player.spawn(&settings);
 
-    let (header_block, custom_flags, custom_names, custom_icons) = parse_headers(&mut world, inline_headers, &settings, &mut rng)?;
+    let (header_block, custom_flags, custom_names, custom_prices, custom_icons) = parse_headers(&mut world, inline_headers, &settings, &mut rng)?;
 
     let flag_line = write_flags(&settings, custom_flags);
 
@@ -334,7 +344,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
         position: Position { x: 0, y: 0 },
     });
 
-    let (placements, spawn_locs) = generate_placements(graph, worlds, &settings, &spawn_pickup_node, &custom_names, &custom_icons, &mut rng)?;
+    let (placements, spawn_locs) = generate_placements(graph, worlds, &settings, &spawn_pickup_node, &custom_names, &custom_prices, &custom_icons, &mut rng)?;
 
     let spawn_lines = spawn_locs.into_iter().map(|spawn_loc| {
         let identifier = spawn_loc.identifier();
