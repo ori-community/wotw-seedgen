@@ -113,7 +113,8 @@ impl Zone {
             9 => Some(Zone::Wastes),
             10 => Some(Zone::Ruins),
             11 => Some(Zone::Willow),
-            12 => Some(Zone::Void),
+            12 => Some(Zone::Shop),
+            13 => Some(Zone::Void),
             _ => None,
         }
     }
@@ -131,7 +132,8 @@ impl Zone {
             Zone::Wastes => 9,
             Zone::Ruins => 10,
             Zone::Willow => 11,
-            Zone::Spawn | Zone::Shop | Zone::Void => 12,
+            Zone::Shop => 12,
+            Zone::Spawn | Zone::Void => 13,
         }
     }
 }
