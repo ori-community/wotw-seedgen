@@ -5,8 +5,6 @@
 !!include header_core
 //// Greatly reduces the cost of black market keystones
 !!parameter cheap bool:false
-//// Adds access to the black market through the wheel
-// !!parameter wheel bool:false
 
 3|1|4|20|1|105                          // Add OpherShop.Teleport to the unsyncable list
 1|105|6|Black Market Keystone|mute|f=0  // Black Market Keystones from OpherShop.Teleport
@@ -35,35 +33,3 @@
 9|0=6|4|18|9|3|7|8|1|10105|int|500      // ...up to 500
 !!endif
 3|1|17|0|1|105|file:assets/icons/game/keystone.png  // Set icon
-!!if wheel true
-3|1|16|0|0|4|Black Market Keystone
-3|1|16|1|0|4|$(1|10105)<icon>X</>\n[Ability1]Buy
-3|1|16|2|0|4|file:assets/icons/game/keystone.png
-3|1|8|9|0|int|7                         // update icon
-6|3|8|9|0|int|7
-6|4|8|9|0|int|7
-1|10105|8|9|0|int|7
-9|0=7|8|9|0|int|8
-9|0=8|8|9|0|int|$(6|3)|skip=1           // determine current spirit light
-9|0=8|8|9|0|int|-$(6|4)|skip=1
-9|0=8|8|9|0|int|-$(1|10105)|skip=1      // compare to current price
-9|0=7|4|19|9|0|0|16|3|0|4|128|128|128|128  // change color
-9|0=7|8|9|0|int|0
-3|1|16|4|0|4|0|8|9|0|int|9
-9|0=9|8|9|0|int|8
-9|0=9|4|27|0|6|instant|Not enough Spirit Light
-9|0=9|4|27|0|8|9|0|int|0
-9|0=9|4|26|-1|6|f=0
-9|0=9|4|26|-1|4|17|1|10105|100|0|-100   // pay current price
-9|0=9|4|26|-1|4|17|1|10105|150|0|-150
-9|0=9|4|26|-1|4|17|1|10105|200|0|-200
-9|0=9|4|26|-1|4|17|1|10105|250|0|-250
-9|0=9|4|26|-1|4|17|1|10105|300|0|-300
-9|0=9|4|26|-1|4|17|1|10105|350|0|-350
-9|0=9|4|26|-1|4|17|1|10105|400|0|-400
-9|0=9|4|26|-1|4|17|1|10105|450|0|-450
-9|0=9|4|26|-1|4|17|1|10105|500|0|-500
-9|0=9|4|26|-1|4|17|1|10105|600|0|-600
-9|0=9|4|26|-1|4|17|1|10105|800|0|-800
-9|0=9|4|26|-1|4|17|1|10105|1000|0|-1000
-9|0=9|4|26|-1|8|9|0|int|5
