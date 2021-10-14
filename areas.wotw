@@ -2338,9 +2338,9 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
   conn UpperDepths.Entry:
     moki: EastHollow.DepthsOpen
   conn EastHollow.BashTreeCheckpoint:
-    moki, EastHollow.DepthsOpen: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
-    gorlek, EastHollow.DepthsOpen: Damage=5
-    kii: EastHollow.DepthsOpen
+    moki, EastHollow.DepthsLever: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
+    gorlek, EastHollow.DepthsLever: Damage=5
+    kii: EastHollow.DepthsLever
   conn EastHollow.AboveBash:  # Make sure it's not redundant with paths from EastHollow.BashTreeCheckpoint
     gorlek, EastHollow.DepthsLever:
       SwordSJump=5, Dash OR Glide  # The mortar will break the ceiling for you
