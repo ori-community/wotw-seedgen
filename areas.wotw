@@ -75,6 +75,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   state MarshSpawn.ToOpherBarrier:
     moki: BreakWall=16
     kii: MarshSpawn.RainLifted, Bash, Damage=10  # lure the mantis
+  state NonGladesTeleporter: free
 
   pickup MarshSpawn.RockHC: free
   pickup MarshSpawn.FirstPickupEX: free
@@ -840,6 +841,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       SentryBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
+  state NonGladesTeleporter: free
 
   pickup HowlsDen.AboveTPEX:
     moki, BreakWall=10:
@@ -1917,6 +1919,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
 
   state EastHollow.VoiceDoor:
     moki: EastHollow.ForestsVoice
+  state NonGladesTeleporter: free
 
   pickup EastHollow.HornBeetleFightEX:
     moki, EastHollow.BeetleDefeated:
@@ -2496,7 +2499,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Water, Grenade=2  # Grenade Water Jumps
       Water, DoubleJump
   pickup GladesTown.CaveBurrowEX:
-    unsafe: free  # heehee
+    unsafe: NonGladesTeleporter  # heehee
 
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
@@ -4374,6 +4377,8 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
 anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
   refill Full
 
+  state NonGladesTeleporter: free
+
   quest InnerWellspring.BlueMoonSeed:
     moki:
       DoubleJump, Dash
@@ -4533,6 +4538,8 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
 
 anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   refill Full
+
+  state NonGladesTeleporter: free
 
   quest WoodsEntry.LastTreeBranch: free
   quest WoodsEntry.DollQI:
@@ -5071,6 +5078,8 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
+
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn WoodsMain.AbovePit:  # So far, this also cover the OrangeTree connection
@@ -5699,6 +5708,8 @@ anchor LowerReach.BelowTokk at -296, -3944:
       LowerReach.CentralFurnace, Combat=Mantis, Dash, Spear=1 
 anchor LowerReach.Teleporter at -259, -3962:
   refill Full
+
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn LowerReach.OutsideTPRoom:
@@ -7179,6 +7190,8 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
 anchor UpperDepths.Teleporter at 513, -4361:  # The spirit well
   refill Full
 
+  state NonGladesTeleporter: free
+
   pickup UpperDepths.TeleporterEX: free  # just a few steps away in the darkness
 
   conn Teleporters: free
@@ -8159,6 +8172,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   refill Full
 
   state EastPools.LowerWaterDrained: free  # this is, uh... correct, I suppose xD
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn EastPools.TPArea: free
@@ -8694,6 +8708,8 @@ region WestPools:
 anchor WestPools at -1656, -4171:  # the west Pools TP
   refill Full
 
+  state NonGladesTeleporter: free
+
   pickup WestPools.TpEX:
     moki:
       Water, WaterDash, DoubleJump, Dash  # hard on keyboard, but I guess this is intended, and no other ability would even help
@@ -8745,6 +8761,8 @@ region LowerWastes:
 
 anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
   refill Full
+
+  state NonGladesTeleporter: free
 
   pickup LowerWastes.WestTPOre:
     moki: Burrow
@@ -9340,6 +9358,8 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
 anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
   refill Full
 
+  state NonGladesTeleporter: free
+
   pickup LowerWastes.EastTPOre:
     moki, BreakWall=20:
       Burrow OR Launch
@@ -9588,6 +9608,8 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
 anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
 
+  state NonGladesTeleporter: free
+
   quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
       Burrow, Bash, DoubleJump OR Dash
@@ -9747,6 +9769,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
 
   state WindtornRuins.HeartBarrier:  # Barrier next to the teleporter that stops you from getting the Heart.
     moki: BreakWall=16
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn WindtornRuins.Escape:  # connection FROM tp TO escape
@@ -10119,6 +10142,8 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
+
+  state NonGladesTeleporter: free
 
   pickup WillowsEnd.LupoMap:
     moki: DoubleJump OR Dash OR Launch OR Bow=1
