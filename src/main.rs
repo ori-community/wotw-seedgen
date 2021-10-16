@@ -472,7 +472,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         args.spirit_light,
         args.items.join(" "),
     );
-    log::info!("{}", command);
+    log::trace!("{}", command);
 
     args.seed_file.set_extension("wotwr");
     let contents = util::read_file(&args.seed_file, "seeds")?;
@@ -522,6 +522,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         if let Some(sets) = line.strip_prefix("// Sets: ") {
             for identifier in sets.split(",").map(str::trim) {
                 let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
+                log::trace!("Setting state {}", identifier);
                 world.sets.push(node.index());
             }
 
