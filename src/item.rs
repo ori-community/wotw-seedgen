@@ -333,8 +333,6 @@ impl Item {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hint::ZoneHintType;
-    use crate::util::Zone;
 
     #[test]
     fn item_display() {
@@ -347,7 +345,6 @@ mod tests {
         assert_eq!(Item::Water.code(), "9|0");
         assert_eq!(Item::BonusItem(BonusItem::Relic).code(), "10|20");
         assert_eq!(Item::BonusUpgrade(BonusUpgrade::ShurikenEfficiency).code(), "11|4");
-        assert_eq!(Item::Hint(Hint { zone: Zone::Void, hint_type: ZoneHintType::Skills }).code(), "12|12|1");
         assert_eq!(Item::Message(String::from("8|0|9|7")).code(), "6|8|0|9|7");
     }
 }
