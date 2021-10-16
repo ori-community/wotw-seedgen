@@ -76,12 +76,13 @@ impl Settings {
         })
     }
     pub fn from_seed(seed: &str) -> Result<Settings, String> {
-        let mut settings = Settings::default();
         for line in seed.lines() {
             if let Some(config) = line.strip_prefix("// Config: ") {
-                settings = Settings::compability_parse(&config)?;
+                let settings = Settings::compability_parse(&config)?;
+                return Ok(settings);
             }
         }
+        let settings = Settings::default();
         Ok(settings)
     }
     pub fn from_preset(mut preset: PathBuf) -> Result<Settings, String> {

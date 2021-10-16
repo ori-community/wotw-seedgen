@@ -1093,17 +1093,13 @@ fn flush_command(pool: &mut Vec<String>) {
     pool.clear();
 }
 #[inline]
-fn set_command(identifier: &str, world: &mut World) -> Result<(), String> {
+fn set_command(identifier: &str, world: &mut World, sets: &mut Vec<String>) -> Result<(), String> {
     if world.graph.nodes.is_empty() { return Ok(()); }  // Pass if not actually generating a seed
 
     let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
-    if let Some(uber_state) = node.uber_state() {
-        let uber_state = uber_state.clone();
-        log::trace!("Universally setting state {}", uber_state);
-        world.uber_states.insert(uber_state.identifier, uber_state.value);
-    } else {
-        return Err(format!("{} is not a valid target", identifier));
-    }
+    log::trace!("Universally setting state {}", identifier);
+    sets.push(identifier.to_owned());
+    world.sets.push(node.index());
 
     Ok(())
 }
@@ -1128,6 +1124,7 @@ pub struct HeaderContext {
     pub names: HashMap<String, String>,
     pub prices: HashMap<String, u16>,
     pub icons: HashMap<String, Icon>,
+    pub sets: Vec<String>,
     pub negative_inventory: Inventory,
 }
 
@@ -1206,7 +1203,7 @@ where R: Rng + ?Sized
             } else if command.trim_end() == "flush" {
                 flush_command(&mut pool);
             } else if let Some(identifier) = command.strip_prefix("set ") {
-                set_command(identifier.trim(), world).map_err(|err| format!("{} in set command {}", err, line))?;
+                set_command(identifier.trim(), world, &mut context.sets).map_err(|err| format!("{} in set command {}", err, line))?;
             } else if let Some(comparison) = command.strip_prefix("if ") {
                 if !if_command(comparison.trim(), &parameters).map_err(|err| format!("{} in if command {}", err, line))? {
                     skip_until = depth;

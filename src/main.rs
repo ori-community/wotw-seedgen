@@ -518,10 +518,21 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         }
     }
 
+    for line in contents.lines() {
+        if let Some(sets) = line.strip_prefix("// Sets: ") {
+            for identifier in sets.split(",").map(str::trim) {
+                let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
+                world.sets.push(node.index());
+            }
+
+            break;
+        }
+    }
+
     let spawn = settings::read_spawn(&contents)?;
     let spawn = world.graph.find_spawn(&spawn)?;
 
-    let mut reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).expect("Invalid Reach Check");
+    let mut reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).expect("Invalid Reach Check");
     reached.retain(|&node| node.can_place());
 
     let identifiers = reached.iter()

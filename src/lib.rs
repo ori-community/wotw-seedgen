@@ -154,7 +154,8 @@ type Flags = Vec<String>;
 type Names = HashMap<String, String>;
 type Prices = HashMap<String, u16>;
 type Icons = HashMap<String, Icon>;
-fn parse_headers<R>(world: &mut World, inline_headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names, Prices, Icons), String>
+type Sets = Vec<String>;
+fn parse_headers<R>(world: &mut World, inline_headers: &[String], settings: &Settings, rng: &mut R) -> Result<(String, Flags, Names, Prices, Icons, Sets), String>
 where R: Rng + ?Sized
 {
     let mut header_block = String::new();
@@ -225,7 +226,7 @@ where R: Rng + ?Sized
         world.pool.inventory.remove(&item, amount);
     }
 
-    Ok((header_block, context.flags, context.names, context.prices, context.icons))
+    Ok((header_block, context.flags, context.names, context.prices, context.icons, context.sets))
 }
 
 fn generate_placements<'a, R>(
@@ -327,7 +328,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
     world.pool = Pool::preset();
     world.player.spawn(&settings);
 
-    let (header_block, custom_flags, custom_names, custom_prices, custom_icons) = parse_headers(&mut world, inline_headers, &settings, &mut rng)?;
+    let (header_block, custom_flags, custom_names, custom_prices, custom_icons, sets) = parse_headers(&mut world, inline_headers, &settings, &mut rng)?;
 
     let flag_line = write_flags(&settings, custom_flags);
 
@@ -372,10 +373,11 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
 
     let slug_line = format!("// Slug: {}", slug);
     let seed_line = format!("// Seed: {}", seed);
+    let set_line = format!("// Sets: {}", sets.join(", "));
     let config_line = format!("// Config: {}", config);
 
     let mut seeds = (0..settings.worlds).map(|index| {
-        format!("{}{}\n{}\n{}{}\n{}\n{}", flag_line, &spawn_lines[index], &placement_blocks[index], &header_block, &slug_line, &seed_line, &config_line)
+        format!("{}{}\n{}\n{}{}\n{}\n{}\n{}", flag_line, spawn_lines[index], placement_blocks[index], header_block, slug_line, seed_line, set_line, config_line)
     }).collect::<Vec<_>>();
     headers::parser::postprocess(&mut seeds, graph, &settings)?;
 
@@ -388,7 +390,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
             let spoiler_config_line = format!("// Config: {}", spoiler_config);
 
             let mut spoiler_seeds = (0..settings.worlds).map(|index| {
-                format!("{}{}\n{}\n{}{}\n{}\n{}", flag_line, &spawn_lines[index], &spoiler_blocks[index], &header_block, &slug_line, &seed_line, &spoiler_config_line)
+                format!("{}{}\n{}\n{}{}\n{}\n{}\n{}", flag_line, spawn_lines[index], spoiler_blocks[index], header_block, slug_line, seed_line, set_line, spoiler_config_line)
             }).collect::<Vec<_>>();
             headers::parser::postprocess(&mut spoiler_seeds, graph, &settings)?;
 
