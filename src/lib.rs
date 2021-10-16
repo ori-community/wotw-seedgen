@@ -373,7 +373,11 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
 
     let slug_line = format!("// Slug: {}", slug);
     let seed_line = format!("// Seed: {}", seed);
-    let set_line = format!("// Sets: {}", sets.join(", "));
+    let set_line = if sets.is_empty() {
+        String::new()
+    } else {
+        format!("// Sets: {}", sets.join(", "))
+    };
     let config_line = format!("// Config: {}", config);
 
     let mut seeds = (0..settings.worlds).map(|index| {
