@@ -6,6 +6,7 @@
 !!include jumpgrades
 !!include rapid_smash_core
 !!include rapid_sword_core
+!!include rapid_spear_core
 
 !!add 4x 10|35              // Extra Double Jumps
 !!add 2x 10|36              // Extra Air Dashes
@@ -20,6 +21,7 @@
 
 !!add 3x 8|4|50|byte|+1     // Rapid Smashes
 !!add 3x 8|4|51|byte|+1     // Rapid Swords
+!!add 2x 8|9|12|byte|+1     // Rapid Spears
 
 // Melting Upgrades
 !!add 8|4|71|bool|true
@@ -56,8 +58,3 @@
 !!name 8|4|10|float|-0.4 #Quickshot Upgrade#
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
 4|10|6|#Quickshot Upgrade#
-// Spear Upgrade
-!!add 2x 8|4|11|float|-0.4
-!!name 8|4|11|float|-0.4 #Rapid Spear#
-!!icon 8|4|11|float|-0.4 file:assets/icons/bonus/rapidspear.png
-4|11|6|#Rapid Spear#
