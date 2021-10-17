@@ -1,7 +1,7 @@
 /// Jumpgrades
 ///
 /// Adds Jumpgrades into the item pool that make you jump higher
-/// Use Ctrl+Alt+5 to toggle this on or off
+/// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
 //// How many Jumpgrades to shuffle in
 !!parameter count int:3
@@ -14,7 +14,7 @@
 9|0=201|16|0|1|1|Toggle Jumpgrades
 9|0=201|4|17|9|112|1|16|1|1|1|[Ability1]Toggle off
 9|0=201|4|17|9|112|0|16|1|1|1|[Ability1]Toggle on
-9|0=201|16|2|1|1|spell:2019
+9|0=201|16|2|1|1|file:assets/icons/bonus/jumpgrade.png
 9|0=201|4|17|9|112|1|16|3|1|1|255|255|255|255
 9|0=201|4|17|9|112|0|16|3|1|1|128|128|128|196
 9|0=201|16|4|1|1|0|8|9|0|int|52

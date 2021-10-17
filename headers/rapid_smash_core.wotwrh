@@ -2,7 +2,7 @@
 /// Rapid Smash Core
 ///
 /// Adds support for toggleable Rapid Smash
-/// Use Ctrl+Alt+5 to toggle this on or off
+/// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
 !!name 8|4|50|byte|+1 Rapid Smash
 !!icon 8|4|50|byte|+1 file:assets/icons/bonus/rapidsmash.png
@@ -12,7 +12,7 @@
 9|0=202|16|0|1|2|Toggle Rapid Smash
 9|0=202|4|17|9|114|1|16|1|1|2|[Ability1]Toggle off
 9|0=202|4|17|9|114|0|16|1|1|2|[Ability1]Toggle on
-9|0=202|16|2|1|2|spell:1000
+9|0=202|16|2|1|2|file:assets/icons/bonus/rapidsmash.png
 9|0=202|4|17|9|114|1|16|3|1|2|255|255|255|255
 9|0=202|4|17|9|114|0|16|3|1|2|128|128|128|196
 9|0=202|16|4|1|2|0|8|9|0|int|53
