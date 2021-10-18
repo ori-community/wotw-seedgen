@@ -4108,9 +4108,10 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Water OR DoubleJump OR Grapple OR Launch  # bit of a weird pickup
       Bash, Grenade=1  # seems fine
     gorlek: Dash OR Bash OR Glide OR Damage=20
+    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: free
 
-  conn InnerWellspring.DrainAreaExit:
+  conn InnerWellspring.DrainAreaEX:
     moki:  # the skeetos just want to be bashed here
       DoubleJump, Water OR Bash
       Dash, Bash, Grenade=1
@@ -4121,12 +4122,21 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Bash, Dash, Sword OR Hammer
       Bash, Grenade=1, Water OR Dash OR Damage=20
       Bash, SentryJump=1, Water OR Damage=20
-    unsafe: Dash, Hammer, Damage=20  # Technically possible without damage
+      Water, WaterDash, Dash, Sword OR Hammer  # @validator Added path. Gorlek might want some variation of this.
+    kii:
+      Dash, Hammer OR Sword
+      Dash, Bash, Spear=1 OR Flash=1 OR Sentry=1  # use energy weapon to reach the wall at the left of the lever
+      Dash, Water, Combat=2xWeakSlug, WaterDash OR Spear=1 OR Flash=1 OR Sentry=1
+      Dash, Damage=20, Combat=2xWeakSlug, Spear=1 OR Flash=1 OR Sentry=1
+      Dash, Damage=20, Damage=20, Combat=2xWeakSlug, WaterDash
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Sword 
+    unsafe:
+      Dash, Combat=2xWeakSlug
+      Water, WaterDash, Glide  # glide jump from the wheel to the sl container
+      Bash, Grenade=1, Shuriken=1
 
-# checkpoint at -1093, -3950
-# checkpoint at the drained room below somewhere
-
-anchor InnerWellspring.DrainAreaExit at -1064, -3961:  # At DrainEX
+anchor InnerWellspring.DrainAreaEX at -1064, -3961:  # At DrainEX
   pickup InnerWellspring.DrainEX: free
   pickup InnerWellspring.DrainHC:
     moki: Water OR Launch
@@ -4134,7 +4144,41 @@ anchor InnerWellspring.DrainAreaExit at -1064, -3961:  # At DrainEX
       DoubleJump, TripleJump
       DoubleJump, Dash, Sword
       Bash, DoubleJump OR Dash  # luring the skeetos with other abilities seems tricky
+    kii:
+      Damage=40, Bash OR Damage=20
+      Damage=20, Damage=20, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # use energy weapon the two floating logs
+      Damage=20, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      WaterDash, Damage=20, Bash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Dash, DoubleJump OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      DoubleJump
+      WaterDash, Damage=20
 
+  conn InnerWellspring.DrainAreaExit:
+    moki, BreakWall=10:
+      DoubleJump OR Dash OR Launch
+      Bash, Grenade=1
+    gorlek, BreakWall=10: Glide OR Sword
+    kii, BreakWall=10: Bash OR Hammer OR Shuriken=2 OR Sentry=2  # no flash here because you can't diasble flash while holding the pole
+    unsafe, BreakWall=10: Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    
+anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in the breakable wall
+  refill Checkpoint
+  
+  conn InnerWellspring.DrainAreaEX: free
+  conn InnerWellspring.DrainRoomCenter:
+    moki, BreakWall=10:
+      DoubleJump OR Launch
+      Dash, Bash, Grenade=2
+      Bash, Grenade=3
+    gorlek, BreakWall=10:
+      Dash
+      Glide, Grapple OR SentryJump=1 OR Damage=15
+      Sword, Grapple OR SentryJump=1 OR Damage=15
+      Bash, Grenade=1, Grapple OR Glide OR Sword OR Damage=15
+      Bash, Grenade=2
+      SentryJump=2, Grapple OR Damage=15
+      SentryJump=3
   conn InnerWellspring.DrainRoom:
     moki, BreakWall=10:
       DoubleJump, Dash OR Glide OR Grapple
@@ -4154,19 +4198,6 @@ anchor InnerWellspring.DrainAreaExit at -1064, -3961:  # At DrainEX
       Water, Bash, Grenade=2
       Water, Bash, Grenade=1, Damage=15
       BreakWall=10, Water, Grapple, Damage=15, Bash OR Hammer
-  conn InnerWellspring.DrainRoomCenter:
-    moki, BreakWall=10:
-      DoubleJump OR Launch
-      Dash, Bash, Grenade=2
-      Bash, Grenade=3
-    gorlek, BreakWall=10:
-      Dash
-      Glide, Grapple OR SentryJump=1 OR Damage=15
-      Sword, Grapple OR SentryJump=1 OR Damage=15
-      Bash, Grenade=1, Grapple OR Glide OR Sword OR Damage=15
-      Bash, Grenade=2
-      SentryJump=2, Grapple OR Damage=15
-      SentryJump=3
 
 # checkpoint at the anchor below, just hard to reach
 
@@ -4188,7 +4219,7 @@ anchor InnerWellspring.DrainRoomCenter at -1116, -3924:  # Standing on the wheel
     unsafe: Bash, Grenade=1  # could've been gorlek maybe, just seems a bit awkward
   conn InnerWellspring.DrainAreaEntrance:
     moki: InnerWellspring.DrainLever
-  conn InnerWellspring.DrainAreaExit:
+  conn InnerWellspring.DrainAreaEX:
     gorlek: ShurikenBreak=10
   conn InnerWellspring.DrainRoomTop:
     moki: InnerWellspring.DrainRoomTopWheel OR Grapple OR Launch
