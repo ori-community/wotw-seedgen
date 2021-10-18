@@ -75,7 +75,6 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   state MarshSpawn.ToOpherBarrier:
     moki: BreakWall=16
     kii: MarshSpawn.RainLifted, Bash, Damage=10  # lure the mantis
-  state NonGladesTeleporter: free
 
   pickup MarshSpawn.RockHC: free
   pickup MarshSpawn.FirstPickupEX: free
@@ -841,7 +840,6 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       SentryBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
-  state NonGladesTeleporter: free
 
   pickup HowlsDen.AboveTPEX:
     moki, BreakWall=10:
@@ -1919,7 +1917,6 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
 
   state EastHollow.VoiceDoor:
     moki: EastHollow.ForestsVoice
-  state NonGladesTeleporter: free
 
   pickup EastHollow.HornBeetleFightEX:
     moki, EastHollow.BeetleDefeated:
@@ -2341,9 +2338,9 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
   conn UpperDepths.Entry:
     moki: EastHollow.DepthsOpen
   conn EastHollow.BashTreeCheckpoint:
-    moki, EastHollow.DepthsLever: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
-    gorlek, EastHollow.DepthsLever: Damage=5
-    kii: EastHollow.DepthsLever
+    moki, EastHollow.DepthsOpen: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
+    gorlek, EastHollow.DepthsOpen: Damage=5
+    kii: EastHollow.DepthsOpen
   conn EastHollow.AboveBash:  # Make sure it's not redundant with paths from EastHollow.BashTreeCheckpoint
     gorlek, EastHollow.DepthsLever:
       SwordSJump=5, Dash OR Glide  # The mortar will break the ceiling for you
@@ -2499,7 +2496,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Water, Grenade=2  # Grenade Water Jumps
       Water, DoubleJump
   pickup GladesTown.CaveBurrowEX:
-    unsafe: NonGladesTeleporter  # heehee
+    unsafe: free  # heehee
 
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
@@ -3879,48 +3876,9 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
   refill Energy=3:
     moki: BreakCrystal
 
-  state InnerWellspring.ShortCutWheel:
-    moki:
-      Grapple, DoubleJump OR Dash OR Glide
-      Launch
-    gorlek:
-      DoubleJump, TripleJump, Damage=15  # bit tricky
-      Grapple, Damage=15  # bit tricky
-      Grapple, Sword OR Hammer
   state InnerWellspring.ThreeWheels:
     moki: BreakWall=3
 
-  pickup InnerWellspring.ThornShard:
-    moki:
-      Grapple, DoubleJump OR Dash OR Glide
-      DoubleJump, Bash, Grenade=1
-      Launch
-      InnerWellspring.ThreeWheels, DoubleJump OR Dash OR Glide
-    gorlek:
-      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer  # Bash grenade up right side, jump to left side vines, use abilities to reach platform
-      SentryJump=1                      # As above but use sentry jump on right side, then use sword/hammer to reach platform
-      DoubleJump, TripleJump
-      Grapple, Sword OR Hammer
-    unsafe:
-      DoubleJump, Hammer, Dash OR Glide
-      Grapple  # seems like a fun kii path
-  pickup InnerWellspring.ThornEX:
-    moki:
-      Grapple, DoubleJump, Dash OR Glide
-      Launch
-    gorlek:
-      Bash, Grenade=1, DoubleJump, TripleJump  # two working grenade angles to solve
-      Bash, Grenade=2, DoubleJump, Damage=15, Dash OR Glide  # two working grenade angles to solve
-      DoubleJump, TripleJump, Damage=15
-      SentryJump=1, DoubleJump, TripleJump, Dash OR Glide
-      SentryJump=2, Damage=15, DoubleJump, Dash OR Glide
-      SentryJump=2, Damage=15, Dash, Glide
-      Grapple, Damage=15, DoubleJump OR Dash OR Glide OR Sword
-      Grapple, DoubleJump, Sword OR Hammer
-      Grapple, Dash, Glide OR Sword OR Hammer
-    unsafe:
-      Dash, DoubleJump, Sword OR Hammer
-      SwordSJump=2, Damage=15
   pickup InnerWellspring.ThreeWheelsEX:
     moki:
       Bash, Grenade=1
@@ -3933,8 +3891,22 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       Grenade=1
   pickup InnerWellspring.WaterSwitchEX:
     moki: Water, WaterDash
+    unsafe: WaterDash, Damage=40, Damage=60
 
   conn OuterWellspring.EntranceDoor: free
+  conn InnerWellspring.ThornShardArea:
+    moki:
+      Grapple, DoubleJump OR Dash OR Glide
+      InnerWellspring.ThreeWheels, DoubleJump OR Dash OR Glide
+      DoubleJump, Bash, Grenade=1
+      Launch
+    gorlek:
+      Grapple, Sword OR Hammer
+      InnerWellspring.ThreeWheels, Sword OR Hammer
+      SentryJump=1  # sentry jump on right side, then use sword/hammer to reach platform
+      DoubleJump, TripleJump
+    kii:
+      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer  # Bash grenade up right side, climb on the first wheel to reach yourgrenade (whih isn't gorlek), jump to left side vines, use abilities to reach platform
   conn InnerWellspring.DrainRoom:
     moki:
       DoubleJump OR Dash OR Glide OR Launch
@@ -3942,21 +3914,92 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       InnerWellspring.ThreeWheels, Bash, Grenade=1
     gorlek:
       Sword OR Hammer
-      Bash, Grenade=1, Damage=15  # kii would do this damageless
+      Bash, Grenade=1, Damage=15
       InnerWellspring.ThreeWheels, Damage=15
-  conn InnerWellspring.WestDoor:
-    moki:  # this in combination with the ShortCutWheel state accounts for all paths to the EX in the wheel
+    kii:
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Damage=15, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # possible damageless but InnerWellspring.ThreeWheels makes it way harder
+      InnerWellspring.ThreeWheels, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2
+    unsafe:
+      Bash, Grenade=1
+      InnerWellspring.ThreeWheels
+  conn InnerWellspring.ShortcutLever:
+    moki:
+      Grapple, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek:
+      DoubleJump, TripleJump, Damage=15  # bit tricky
+      Grapple, Damage=15  # bit tricky
+      Grapple, Sword OR Hammer
+    kii: Grapple
+    unsafe:
+      InnerWellspring.ThreeWheels, Damage=30, DoubleJump
+      InnerWellspring.ThreeWheels, Damage=45, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      InnerWellspring.ThreeWheels, Damage=60, Spear=1 OR Blaze=1
+
+# checkpoint at -1336, -3943
+
+anchor InnerWellspring.ThornShardArea at -1317, -3933:  # on top of the wall at the left of the entrance
+  refill Checkpoint
+  
+  pickup InnerWellspring.ThornShard: free
+  pickup InnerWellspring.ThornEX:  # Having Clean Water change the position of the grapplable plant. Make sure it solves with both states?
+    moki:
       Grapple, DoubleJump, Dash OR Glide
-      Grapple, Dash, Glide
       Launch
     gorlek:
       DoubleJump, TripleJump, Damage=15
-      Grapple, DoubleJump OR Dash  # pretty tight
-      Grapple, Damage=15, Glide OR Sword OR Hammer
+      SentryJump=1, DoubleJump, TripleJump, Dash OR Glide
+      SentryJump=1, Damage=15, DoubleJump, Dash OR Glide OR TripleJump
+      SentryJump=1, Damage=15, Dash, Glide
+      Grapple, Damage=15, DoubleJump OR Dash OR Glide OR Sword
+      Grapple, DoubleJump, TripleJump OR Sword OR Hammer
+      Grapple, Dash, Glide OR Sword OR Hammer
+    kii:
+      Bash, Grenade=1, Dash OR DoubleJump OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Dash OR DoubleJump  # with djump, walljump on the wall above the grappable plant
+      Grapple, Sword, Glide OR Hammer OR Spear=1 OR Shuriken=1
+      Grapple, Hammer, Shuriken=1 OR Sentry=2 OR Damage=15
+      Dash, DoubleJump, TripleJump OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=15
+      Dash, Damage=15, Sword OR Hammer
+      Dash, Glide, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Sentry=2, Damage=15
     unsafe:
-      Grapple, Hammer, Glide
-
-# checkpoint at -1336, -3943
+      SwordSJump=1, Damage=15
+      Grapple, Sword
+      Dash, Shuriken=2, Damage=15
+      
+  conn InnerWellspring.EntranceDoor: free
+  conn InnerWellspring.ShortcutLever:  # for fully rspawn. Make sure it's not redundant with paths from EntranceDoor
+    unsafe:
+      Damage=30, DoubleJump
+      Damage=45, Dash OR Sword OR Hammer OR Shuriken=3 OR Flash=3 OR Sentry=3
+      Damage=60, Spear=3
+  
+anchor InnerWellspring.ShortcutLever at -1264, -3907:  # At the lever on top of the entrance door
+  state InnerWellspring.ShortCutWheel: free
+  
+  # InnerWellspring.ShortcutWheelEX paths are redundant with InnerWellspring.WestDoor
+  
+  conn InnerWellspring.EntranceDoor:
+    moki: Grapple OR Launch OR DoubleJump
+    gorlek: free
+  conn InnerWellspring.WestDoor:
+    moki, InnerWellspring.ShortCutWheel:
+      DoubleJump, Dash OR Glide
+      Dash, Glide
+      Launch
+    gorlek, InnerWellspring.ShortCutWheel:
+      DoubleJump OR Dash  # pretty tight
+      Damage=15, Glide OR Sword OR Hammer
+    kii, InnerWellspring.ShortCutWheel:
+      Sword OR Damage=15
+      Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, InnerWellspring.ShortCutWheel:
+      Hammer OR Sentry=2  # friendly spikes when you slide off the wheel
+      Shuriken=2
 
 anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can drain
   refill Checkpoint
@@ -4377,8 +4420,6 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
 anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
   refill Full
 
-  state NonGladesTeleporter: free
-
   quest InnerWellspring.BlueMoonSeed:
     moki:
       DoubleJump, Dash
@@ -4538,8 +4579,6 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
 
 anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   refill Full
-
-  state NonGladesTeleporter: free
 
   quest WoodsEntry.LastTreeBranch: free
   quest WoodsEntry.DollQI:
@@ -5078,8 +5117,6 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
-
-  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn WoodsMain.AbovePit:  # So far, this also cover the OrangeTree connection
@@ -5708,8 +5745,6 @@ anchor LowerReach.BelowTokk at -296, -3944:
       LowerReach.CentralFurnace, Combat=Mantis, Dash, Spear=1 
 anchor LowerReach.Teleporter at -259, -3962:
   refill Full
-
-  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn LowerReach.OutsideTPRoom:
@@ -7190,8 +7225,6 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
 anchor UpperDepths.Teleporter at 513, -4361:  # The spirit well
   refill Full
 
-  state NonGladesTeleporter: free
-
   pickup UpperDepths.TeleporterEX: free  # just a few steps away in the darkness
 
   conn Teleporters: free
@@ -8172,7 +8205,6 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   refill Full
 
   state EastPools.LowerWaterDrained: free  # this is, uh... correct, I suppose xD
-  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn EastPools.TPArea: free
@@ -8708,8 +8740,6 @@ region WestPools:
 anchor WestPools at -1656, -4171:  # the west Pools TP
   refill Full
 
-  state NonGladesTeleporter: free
-
   pickup WestPools.TpEX:
     moki:
       Water, WaterDash, DoubleJump, Dash  # hard on keyboard, but I guess this is intended, and no other ability would even help
@@ -8761,8 +8791,6 @@ region LowerWastes:
 
 anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
   refill Full
-
-  state NonGladesTeleporter: free
 
   pickup LowerWastes.WestTPOre:
     moki: Burrow
@@ -9358,8 +9386,6 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
 anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
   refill Full
 
-  state NonGladesTeleporter: free
-
   pickup LowerWastes.EastTPOre:
     moki, BreakWall=20:
       Burrow OR Launch
@@ -9608,8 +9634,6 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
 anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
 
-  state NonGladesTeleporter: free
-
   quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
       Burrow, Bash, DoubleJump OR Dash
@@ -9769,7 +9793,6 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
 
   state WindtornRuins.HeartBarrier:  # Barrier next to the teleporter that stops you from getting the Heart.
     moki: BreakWall=16
-  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn WindtornRuins.Escape:  # connection FROM tp TO escape
@@ -10142,8 +10165,6 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
-
-  state NonGladesTeleporter: free
 
   pickup WillowsEnd.LupoMap:
     moki: DoubleJump OR Dash OR Launch OR Bow=1
