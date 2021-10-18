@@ -4006,6 +4006,8 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
   refill Energy=3:
     moki: BreakCrystal
 
+  # breaking the wheel to the right free only require InnerWellspring.ThreeWheels, not worth adding another state
+
   conn InnerWellspring.EntranceDoor:
     moki:
       DoubleJump OR Dash OR Grapple OR Glide OR Launch
@@ -4016,8 +4018,8 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
       DoubleJump, Glide
       Grapple OR Launch
       Glide, Bash, Grenade=2
-      InnerWellspring.ThreeWheels, BreakWall=16, DoubleJump  # break the wheel to the right free - threewheels state is free enough that alternatives don't seem worth noting
-      InnerWellspring.ThreeWheels, BreakWall=16, Dash, Bash, Grenade=1  # break the wheel to the right free - threewheels state is free enough that alternatives don't seem worth noting
+      InnerWellspring.ThreeWheels, BreakWall=16, DoubleJump  # break the wheel to the right free
+      InnerWellspring.ThreeWheels, BreakWall=16, Dash, Bash, Grenade=1  # break the wheel to the right free
       Water, DoubleJump  # if you drained the water, you can use the bottom of the wheel instead
       Water, WaterDash, Dash, Bash, Grenade=1  # if you drained the water, you can use the bottom of the wheel instead
     gorlek:
@@ -4027,41 +4029,78 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
       Glide, Damage=15
       Bash, Grenade=1, DoubleJump OR Glide
       SentryJump=1, Glide
-      InnerWellspring.ThreeWheels, BreakWall=16:  # break the wheel to the right free - threewheels state is free enough that alternatives don't seem worth noting
+      InnerWellspring.ThreeWheels, BreakWall=16:  # break the wheel to the right free
         Dash
         Damage=15, Sword OR Hammer
         Bash, Grenade=1, Sword OR Hammer
         SentryJump=1
       Water, Dash  # if you drained the water, you can use the bottom of the wheel instead
       Water, Bash, Grenade=4  # if you drained the water, you can use the bottom of the wheel instead
+    kii:
+      DoubleJump, Blaze=5 OR Sentry=3
+      Dash, Blaze=3 OR Sentry=2
+      Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      InnerWellspring.ThreeWheels, BreakWall=16, Sword OR Hammer OR Shuriken=4 OR Sentry=4   # break the wheel to the right free
+      Damage=60, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      Damage=60, Bash, Grenade=3  # dboost in dirty water water. If you drained the water, you can go bellow the wheel instead
+      WaterDash, Damage=40, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      WaterDash, Damage=40, Bash, Grenade=4  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      InnerWellspring.DrainLever:  # @validator confused about why no paths are using this state in gorlek/moki
+        DoubleJump OR Dash
+        Bash, Grenade=3
+      # if you have a non-energy weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
+      # Sword, InnerWellspring.DrainLever OR Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # Hammer, DoubleJump OR Dash OR Sentry=3
+      # Hammer, InnerWellspring.DrainLever, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Damage=15, DoubleJump OR Dash OR Sword
-      Water, WaterDash, Bash, Grenade=3, BreakWall=10  # if you drained the water, you can go through through the drained room instead
-      Water, WaterDash, Bash, Grenade=2, Damage=15, BreakWall=10  # if you drained the water, you can go through through the drained room instead
-      InnerWellspring.ThreeWheels, BreakWall=16, Bash, Grenade=4  # not hard, but grenades can vanish on rotating objects sometimes
+      DoubleJump  # climb the right wall
+      Glide
+      Sword, Spear=1 OR Blaze=1
+      Shuriken=2, Dash OR Hammer
+      Damage=15, Dash OR Sword
+      WaterDash, Bash, Grenade=3, BreakWall=10, Water OR Damage=20  # if you drained the water, you can go through through the drained room instead
+      WaterDash, Bash, Grenade=2, Damage=15, BreakWall=10, Water OR Damage=20  # if you drained the water, you can go through through the drained room instead
+      InnerWellspring.ThreeWheels, BreakWall=16, Shuriken=3 OR Blaze=5 OR Flash=3 OR Sentry=3 
+      InnerWellspring.ThreeWheels, BreakWall=16, Bash, Grenade=2  # not hard, but grenades can vanish on rotating objects sometimes
   conn InnerWellspring.DrainAreaEntrance:
     moki: InnerWellspring.DrainLever, DoubleJump OR Dash OR Grapple OR Glide OR Launch
     gorlek, InnerWellspring.DrainLever:
       Sword OR Hammer OR Damage=15
       Bash, Grenade=1
-    unsafe: InnerWellspring.DrainLever
+    kii: InnerWellspring.DrainLever
   conn InnerWellspring.DrainAreaExit:
-    gorlek:
+    gorlek, ShurikenBreak=10:
       # if you have a weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
-      ShurikenBreak=10:  # cross the gap going over
-        Grapple OR Glide OR Launch
-        DoubleJump, TripleJump
-        Bash, Grenade=1, DoubleJump, Dash
-      InnerWellspring.DrainLever, ShurikenBreak=10:  # use the bottom of the wheel, don't have to free it
+      # cross the gap going over
+      Grapple OR Glide OR Launch
+      DoubleJump, TripleJump
+      Bash, Grenade=1, DoubleJump, Dash
+      InnerWellspring.DrainLever:  # use the bottom of the wheel, don't have to free it
         DoubleJump OR Dash
         Bash, Grenade=2
-      InnerWellspring.ThreeWheels, BreakWall=16, ShurikenBreak=10, DoubleJump OR Dash OR Sword OR Hammer  # break the wheel to the right free - threewheels state is free enough that alternatives don't seem worth noting
-      ShurikenBreak=10, Water, DoubleJump OR Dash  # if you drained the water, you can use the bottom of the wheel instead
-      ShurikenBreak=10, Water, Bash, Grenade=1, Damage=15  # if you drained the water, you can go through through the drained room instead
-      ShurikenBreak=10, Water, Bash, Grenade=2  # if you drained the water, you can go through through the drained room instead
-    unsafe:
-      ShurikenBreak=10, Damage=15, DoubleJump OR Dash  # cross the gap going over
-      InnerWellspring.ThreeWheels, BreakWall=16, ShurikenBreak=10, Bash, Grenade=2  # not hard, but grenades can vanish on rotating objects sometimes
+      InnerWellspring.ThreeWheels, BreakWall=16, DoubleJump OR Dash OR Sword OR Hammer  # break the wheel to the right free - threewheels state is free enough that alternatives don't seem worth noting
+      Water, DoubleJump OR Dash  # if you drained the water, you can use the bottom of the wheel instead
+      Water, Bash, Grenade=1, Damage=15  # if you drained the water, you can go through through the drained room instead
+      Water, Bash, Grenade=2  # if you drained the water, you can go through through the drained room instead
+    kii, ShurikenBreak=10:
+      DoubleJump, Blaze=5 OR Sentry=3
+      Dash, Blaze=3 OR Sentry=2
+      InnerWellspring.ThreeWheels, BreakWall=16, Shuriken=4 OR Sentry=4   # break the wheel to the right free
+      Damage=60, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      Damage=60, Bash, Grenade=1  # dboost in dirty water water. If you drained the water, you can use the bellow the wheel instead
+      WaterDash, Damage=40, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      WaterDash, Damage=40, Bash, Grenade=4  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      InnerWellspring.DrainLever:  # @validator confused about why no paths are using this state in gorlek/moki
+        DoubleJump OR Dash
+        Bash, Grenade=4
+      # if you have a non-energy weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
+      # Sword, InnerWellspring.DrainLever OR Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # Hammer, DoubleJump OR Dash OR Sentry=3
+      # Hammer, InnerWellspring.DrainLever, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, ShurikenBreak=10:
+      DoubleJump
+      Dash, Damage=15  # cross the gap going over
+      InnerWellspring.ThreeWheels, BreakWall=16, Bash, Grenade=2  # not hard, but grenades can vanish on rotating objects sometimes
 
 anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after dropping through the gate draining the water
   pickup InnerWellspring.DrainHC:
