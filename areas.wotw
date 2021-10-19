@@ -9893,7 +9893,8 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Launch, DoubleJump OR Dash OR Bash OR Glide
       Launch, Sword, Damage=20
     kii:  # launch path is redundant with AboveTree->Ore
-      Bash, DoubleJump OR Dash
+      Bash, Dash
+      Bash, DoubleJump, Damage=20, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Damage is for weird laser patterns
       DoubleJump, TripleJump, Sword
     unsafe:
       SentryJump=2, DoubleJump, Bow=1, Damage=40
@@ -9917,8 +9918,8 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Launch
       Damage=40, DoubleJump OR Dash
       Bash, Dash
-      Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Sword, DoubleJump OR Dash # Use sword on elemental to reset your djump/dash
+      Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Sword, DoubleJump OR Dash # Use sword on elemental to reset your djump/dash (don't use portal with dash)
       DoubleJump, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Damage=40, Sword OR Hammer
@@ -9928,6 +9929,7 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
     gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
     kii, WeepingRidge.ElevatorFightCompleted:
       Launch, Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
+      Launch, Bash, Grenade=1
       Bash, Grenade=3, DoubleJump, TripleJump
     unsafe, WeepingRidge.ElevatorFightCompleted:
       Launch
@@ -9942,11 +9944,12 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       SwordSJump=1
       DoubleJump, TripleJump OR Dash OR Glide
     kii, WeepingRidge.ElevatorFightCompleted:
-      Glide OR Sword OR Hammer OR Sentry=5
-      Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Glide OR Dash OR DoubleJump
+      Sword OR Hammer
+      Sentry=5
       Bash, Grenade=2
     unsafe, WeepingRidge.ElevatorFightCompleted:
-      Dash OR Shuriken=3 OR Sentry=3
+      Shuriken=3 OR Sentry=3
       
 anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
   refill Checkpoint
@@ -9968,17 +9971,17 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       Launch
       Bash, Grenade=2, DoubleJump, TripleJump
       Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Sword, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree
     unsafe:  # may be inaccurate after moving paths to this anchor
       Bash, Grenade=3, DoubleJump
       SentryJump=3, DoubleJump, Bash OR Sword OR Damage=40
       SentryJump=2, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform
+      DoubleJump, TripleJump, Sword, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree | wasn't consistent enough for kii
   pickup WeepingRidge.Ore:
     moki: Launch, DoubleJump OR Dash OR Bash OR Glide
     gorlek: Launch
     kii:
-      Bash, Grenade=2, DoubleJump OR Dash
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
+      Bash, Grenade=2, Damage=20, DoubleJump OR Dash  # Damage for wonky lasers
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=60  # 20 of the damage for wonky lasers
     unsafe:
       DoubleJump, TripleJump, Sword  # pogo the mines
       DoubleJump, TripleJump, Hammer, Damage=40
