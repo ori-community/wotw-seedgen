@@ -1544,6 +1544,9 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       DoubleJump, Glide, Damage=10
       SwordSJump=1
       HammerSJump=1, Bow=1 OR DoubleJump OR Dash OR Glide
+    kii:
+      Dash, Sword OR Hammer  # you can dash underneath the bomb slug and kill the other slimes
+      DoubleJump, Sentry=2, Damage=10  # damage because of friendly spikes
     unsafe:
       HammerSJump=1
   state WestHollow.PurpleDoorOpen:
@@ -1555,6 +1558,9 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Bow=1, SentryJump=1, DoubleJump
       Bow=1, DoubleJump, TripleJump
       Bow=1, Glide, DoubleJump OR Dash
+    kii, WestHollow.UpperDrainLeverPulled:
+      Bow=1, Dash, Sword OR Hammer
+      Bow=1, Dash, Sentry=2
     unsafe, WestHollow.UpperDrainLeverPulled:
       Bow=1, DoubleJump, Sword OR Hammer
 
