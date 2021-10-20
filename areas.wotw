@@ -1528,41 +1528,33 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
   refill Energy=3:
     moki: BreakCrystal
 
-  state WestHollow.UpperDrainLeverPulled:  # Lever that drains the first section of the hollow
+  state WestHollow.UpperDrainLeverPulled:  # Lever that drains the first section of the hollow. Paths who cross the first bridge originate from InFrontPurpleDoor. Make sure it's not redundant with Entrance->InFrontPurpleDoor->UpperDrainLeverPulled
     moki:
-      Combat=2xSlug+BombSlug, Bow=3, DoubleJump OR Dash  # the camera only reliably moves to the tongues if you can kill the slugs
       Bash, Combat=BombSlug, Bow=1  # bashing up with the slug
       Bash, Combat=BombSlug, DoubleJump, Dash OR Glide  # bashing up with the slug
-      Combat=BombSlug, DoubleJump, Dash, Glide
-      Launch
     gorlek:
-      Bow=2, DoubleJump OR Dash OR Glide OR Sword  # deal with the weird camera
-      Bow=3, Damage=10  # deal with the weird camera
       Bash, Bow=1 OR DoubleJump OR Dash OR Glide OR Sword  # bait the bombslug
-      DoubleJump, Sword  # Pogo the slime to get to the upper part or go the casual way using Sword slashes
-      DoubleJump, TripleJump OR Dash
-      DoubleJump, Glide, Damage=10
       SwordSJump=1
       HammerSJump=1, Bow=1 OR DoubleJump OR Dash OR Glide
     kii:
-      Dash, Sword OR Hammer  # you can dash underneath the bomb slug and kill the other slimes
-      DoubleJump, Sentry=2, Damage=10  # damage because of friendly spikes
+      Bash, Hammer OR Sentry=2
     unsafe:
       HammerSJump=1
-  state WestHollow.PurpleDoorOpen:
-    moki, WestHollow.UpperDrainLeverPulled:
-      Bow=1, DoubleJump, Dash
-      Bow=1, Launch
-      Bow=1, Bash, Grenade=1
-    gorlek, WestHollow.UpperDrainLeverPulled:
-      Bow=1, SentryJump=1, DoubleJump
-      Bow=1, DoubleJump, TripleJump
-      Bow=1, Glide, DoubleJump OR Dash
-    kii, WestHollow.UpperDrainLeverPulled:
-      Bow=1, Dash, Sword OR Hammer
-      Bow=1, Dash, Sentry=2
-    unsafe, WestHollow.UpperDrainLeverPulled:
-      Bow=1, DoubleJump, Sword OR Hammer
+      Bash, Shuriken=2
+  state WestHollow.PurpleDoorOpen:  # Path who drop from the frog statue originate from InFrontPurpleDoor
+    moki, WestHollow.UpperDrainLeverPulled, Bow=1:
+      DoubleJump, Dash
+      Launch
+      Bash, Grenade=1
+    gorlek, WestHollow.UpperDrainLeverPulled, Bow=1:
+      SentryJump=1, DoubleJump
+      DoubleJump, TripleJump
+      Glide, DoubleJump OR Dash  # Glide from the slime's position
+    kii, WestHollow.UpperDrainLeverPulled, Bow=1:
+      Dash, Hammer
+      Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # Glide from the slime's position
+      Bash  # Bash the slime
+    unsafe, WestHollow.UpperDrainLeverPulled, Bow=1: Glide, Blaze=1
 
   pickup WestHollow.CrusherHC: free
 
@@ -1573,9 +1565,9 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Bash, Grenade=1
     gorlek, MarshPastOpher.EyestoneDoor:
       Dash OR Glide OR Sword OR Hammer OR Damage=10  # Go through the lower part
+    kii, MarshPastOpher.EyestoneDoor: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: MarshPastOpher.EyestoneDoor  # (free with tight platforming)
-      # Bash  # putting this here for now
-  conn WestHollow.InFrontPurpleDoor:
+  conn WestHollow.InFrontPurpleDoor:  # do not relly on the dirty water. If you need the water, it would be a softlockable path once you drained the water
     moki:
       Combat=2xSlug, Bow=1, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
       DoubleJump, Dash OR Glide
@@ -1586,40 +1578,68 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       DoubleJump, TripleJump OR Sword OR Hammer
       SentryJump=1  # Go up to the moki, then poles and then jump down
       Bash  # bash the slime to get up
+    kii:
+      Bow=1, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash
+      Glide, Sword OR Hammer  # with sword, pogo the slime
     unsafe:
-      Dash, Sword  # Easier with upslash
-      Hammer, DoubleJump OR Dash OR Glide  # use upslash
+      Glide  # glide jump
+      DoubleJump  # this one is really precise
   conn WestHollow.HollowDrainMiddle:
     moki: WestHollow.UpperDrainLeverPulled
+    unsafe:
+      #Dash swim
+      Damage=60
+      WaterDash, Damage=20
 
 anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple door, before the TP
-  state WestHollow.PurpleDoorOpen:
-    unsafe: Bow=1  # Drop shot
-  state WestHollow.UpperDrainLeverPulled:  # Lever that drains the first section of the hollow
+  state WestHollow.UpperDrainLeverPulled:  # Lever that drains the first section of the hollow. Make sure it's not redundant with paths from Entrance
     moki:
       Combat=Slug, Bow=3, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
       Combat=BombSlug, DoubleJump, Dash, Glide
       Launch
     gorlek:
       Bow=2
-      DoubleJump, Dash
-      Combat=BombSlug, DoubleJump, TripleJump
-      Combat=BombSlug, DoubleJump, Damage=10, Glide OR Sword OR Hammer
+      Bow=1, DoubleJump OR Dash OR Glide OR Sword
+      DoubleJump, TripleJump OR Dash
       SentryJump=1, DoubleJump
       Bash, Grenade=1, DoubleJump
-    unsafe:
+    kii:
+      Bow=1, Hammer OR Sentry=2
+      Dash, Sword OR Hammer
+      DoubleJump, Hammer OR Shuriken=1
+      DoubleJump, Glide, Sword OR Flash=1 OR Sentry=1
+      DoubleJump, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # djump->upslash->energy weapon
+      DoubleJump, Damage=10, Sword OR Glide OR Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Damage is easy to avoid (beside with blaze) but you'll land in friendly spikes
       Bash, Grenade=1  # Bash the slime to the platform, throw Grenade, bash from slime then Grenade
+    unsafe:
       SentryJump=1
-      Dash, Sword OR Hammer      # Upslash between dashes to gain a bit more hight
+      DoubleJump, Sword OR Glide OR Spear=1 OR Flash=1 OR Sentry=1 # Could be kii but you will touch friendly spikes 
+      DoubleJump, Damage=10
+  state WestHollow.PurpleDoorOpen:  # Be carefull it's not redundant with paths from Entrance
+    kii, WestHollow.UpperDrainLeverPulled, Bow=1: 
+      Dash, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Sword OR Hammer OR Sentry=2
+      Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Bow=1  # Drop shot
+      # Bow=1, DoubleJump, Shuriken=1
+      # Bow=1, Sword, Hammer
+  
   conn WestHollow.Entrance:
     moki:
       Combat=2xSlug, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide OR Bow=1
       Bash, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide OR Bow=1 OR Grenade=1
       Launch
     gorlek: WestHollow.UpperDrainLeverPulled OR Bow=1 OR DoubleJump OR Dash OR Glide OR Sword OR Damage=20
-    unsafe: Sentry=2 OR Hammer OR Bash
+    kii: Bash OR Hammer OR Sentry=2
+    unsafe: Shuriken=1
   conn WestHollow.HollowDrainMiddle:
     moki: WestHollow.UpperDrainLeverPulled
+    unsafe:
+      #Dash swim
+      Damage=60
+      WaterDash, Damage=20
   conn EastHollow.Teleporter:
     moki: WestHollow.PurpleDoorOpen
 
