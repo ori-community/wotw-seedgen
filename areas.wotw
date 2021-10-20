@@ -4593,10 +4593,24 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Grapple, DoubleJump, Dash  # bit spicy
       Bash, Grapple, DoubleJump OR Dash OR Glide
       Launch, Dash OR Glide OR Damage=15  # Assumes at least one damage is taken in the final grapple section, probably possible without
+    kii:
+      Launch, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1  # condition for the final grapple section
+      Grapple, Dash OR Glide  # final wheel is pretty hard, you need to avoid touching it as much as possible (which could be viewed as area specific knowledge?)
+      Grapple, DoubleJump, TripleJump OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2  # condition for before and after the falling wheel. 1 blaze before and 2 after the wheel.
+      Grapple, Bash, Sword
+      Grapple, Bash, WaterDash:
+        Water, Sentry=2 OR Damage=15  # two sentries to avoid the spikes before the falling wheel
+        Damage=95
+        Damage=60, Sentry=2  # two sentries before the falling wheel
+        # condition for energy management, since flash and shuriken cost less enegy than sentry
+        Damage=40, Sentry=2, Sentry=1 OR Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
+        Damage=20, Sentry=2, Sentry=2 OR Shuriken=2 OR Flash=2  # same as above but use both options
+        Sentry=4, Sentry=2 OR Shuriken=2 OR Flash=2  # same as above but use 2 sentries to make the first jump
     unsafe:
       Launch
+      Grapple, Bash, WaterDash, Damage=80
+      Grapple, Bash, Hammer
       Grapple, DoubleJump
-      Grapple, Dash
 
   pickup InnerWellspring.EscapeRevisitEX:
     moki: InnerWellspring.WaterEscape
