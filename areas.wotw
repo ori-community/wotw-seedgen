@@ -1692,6 +1692,7 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       Bash, Grenade=1
     gorlek, WestHollow.UpperDrainLeverPulled:
       Sword OR Hammer  # Hammer is a bit particular; you can use upslash and horizontal slashes instead
+    kii, WestHollow.UpperDrainLeverPulled: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Damage=60
       Damage=40, DoubleJump OR Dash OR Sword
@@ -1756,12 +1757,21 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20, DoubleJump, Bow=1  # use the bow path if the water is gone
       WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20, Dash, Bash, Grenade=1  # use the bashnade path if the water is gone
       WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20, Dash, SentryJump=1  # use the sjump path if the water is gone
+    kii:
+      WestHollow.UpperDrainLeverPulled, DoubleJump, Hammer # djump+upslash to the eye
+      WestHollow.FullyDrained, Bow=3:  # 2 arrows for the eyes, one for the slime
+        Dash OR Hammer
+        Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+        Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # have to walljump on the second eye to avoid a dboost
     unsafe:
       WestHollow.UpperDrainLeverPulled, Dash, DoubleJump
       WestHollow.UpperDrainLeverPulled, Sword    # pogo on the energy crystal
   conn WestHollow.HollowDrainLower:
     moki: WestHollow.FullyDrained
-
+    unsafe:
+      Damage=80
+      WaterDash, Damage=40  # Possible with only 30 damage without draining the water at all but that would softlock if you drain the upper part
+      
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
   refill Energy=3:  # fast respawning crystal
     moki: BreakCrystal
@@ -1777,12 +1787,19 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       Bow=1, Bash, Grenade=1
       Bow=2, Sword OR Hammer
       DoubleJump, TripleJump  # Jump off the eye to the left
-      DoubleJump, Damage=10, Dash  # You can jump on the top of the eye on the left and use BashGrenade
+      DoubleJump, Damage=10, Dash
       Damage=20, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # these paths aren't meaningful anymore if the water is gone, so this does not softlock
+    kii:
+      Bow=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bow=1, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=20, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump
+      Dash, Damage=10, Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Dash, Damage=20, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, WestHollow.UpperDrainLeverPulled:
       DoubleJump, Dash
-      DoubleJump, Bash, Grenade=1         # BashGrenade and dj to the right wall
-      # DoubleJump, Bash, Grenade=2       # BashGrenade on to the eye and then BashGrenade up
+      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # precise bash grenade to wall jump on the right wall. Other option to jump to the lever
+      Dash, Damage=10, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # DoubleJump, Dash, SentryJump=1    # SentryJump on the eye
 
   pickup WestHollow.FarLeftEX:
@@ -1793,9 +1810,14 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=10
       Bow=1, Dash OR DoubleJump  # there are more options, this was the most lenient
       SentryJump=1
+    kii, WestHollow.FullyDrained:
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bow=1, Glide OR Hammer
+      Bow=1, Sentry=2, Shuriken=1 OR Flash=1 OR  Sentry=1
+      Sword  # Pogo the slug. Baiting it under the pickup is pretty awful
     unsafe:
       WestHollow.FullyDrained:
-        Bow=1, Glide OR Sword
+        Bow=1, Shuriken=3
         Sword     # Pogo the shot of the slug
   # backwards connection blocked by the door
 
