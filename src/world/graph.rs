@@ -5,9 +5,8 @@ use smallvec::{SmallVec, smallvec};
 
 use super::{player::Player, requirements::Requirement};
 use crate::util::{
-    RefillType, NodeType, Position, Zone,
+    RefillType, NodeType, Position, Zone, UberState, UberIdentifier,
     orbs::{self, Orbs},
-    uberstate::{UberState, UberIdentifier},
     constants::TP_ANCHOR,
 };
 
@@ -238,7 +237,7 @@ impl Graph {
         }
     }
 
-    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, String>) -> FxHashSet<usize> {
+    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> FxHashSet<usize> {
         let mut states = FxHashSet::default();
 
         for node in &self.nodes {
@@ -257,6 +256,11 @@ impl Graph {
             }
         }
 
+        states.reserve(sets.len());
+        for set in sets {
+            states.insert(*set);
+        }
+
         states
     }
 
@@ -267,11 +271,11 @@ impl Graph {
         Ok(entry)
     }
 
-    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>) -> Result<Reached<'a>, String> {
+    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> Result<Reached<'a>, String> {
         let mut context = ReachContext {
             player,
             progression_check: false,
-            states: self.collect_extra_states(extra_states),
+            states: self.collect_extra_states(extra_states, sets),
             state_progressions: FxHashMap::default(),
             world_state: FxHashMap::default(),
         };
@@ -280,11 +284,11 @@ impl Graph {
 
         Ok(reached)
     }
-    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>) -> Result<(Reached<'a>, Progressions<'a>), String> {
+    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> Result<(Reached<'a>, Progressions<'a>), String> {
         let mut context = ReachContext {
             player,
             progression_check: true,
-            states: self.collect_extra_states(extra_states),
+            states: self.collect_extra_states(extra_states, sets),
             state_progressions: FxHashMap::default(),
             world_state: FxHashMap::default(),
         };

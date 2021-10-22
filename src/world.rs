@@ -8,12 +8,8 @@ use rustc_hash::FxHashMap;
 use graph::Graph;
 use pool::Pool;
 use player::Player;
-use crate::inventory::{Item, UberStateOperator, UberStateRangeBoundary};
-use crate::util::{
-    Resource,
-    uberstate::{UberState, UberIdentifier, UberType},
-    constants::WISP_STATES,
-};
+use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
+use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
 pub struct World<'a> {
@@ -22,6 +18,7 @@ pub struct World<'a> {
     pub pool: Pool,
     pub preplacements: FxHashMap<UberState, Vec<Item>>,
     pub uber_states: FxHashMap<UberIdentifier, String>,
+    pub sets: Vec<usize>,
 }
 impl<'a> World<'a> {
     pub fn new(graph: &Graph) -> World {
@@ -31,6 +28,7 @@ impl<'a> World<'a> {
             pool: Pool::default(),
             preplacements: FxHashMap::default(),
             uber_states: FxHashMap::default(),
+            sets: Vec::default(),
         }
     }
 
@@ -150,6 +148,7 @@ mod tests {
     use super::*;
     use super::super::*;
     use world::pool::Pool;
+    use item::*;
     use util::*;
     use rustc_hash::FxHashSet;
 
@@ -157,13 +156,17 @@ mod tests {
 
     #[test]
     fn reach_check() {
-        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &Settings::default(), false).unwrap();
+        let mut settings = Settings::default();
+        settings.difficulty = Difficulty::Gorlek;
+
+        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
         let mut world = World::new(graph);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
+        world.player.apply_settings(&settings);
 
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
         let reached: FxHashSet<_> = reached.iter()
             .filter_map(|node| {
                 if node.node_type() == NodeType::State { None }
@@ -194,7 +197,7 @@ mod tests {
         world.player.inventory.grant(Item::Shard(Shard::TripleJump), 1);
 
         let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
         let reached: Vec<_> = reached.iter().filter_map(|node| node.uber_state()).cloned().collect();
         assert_eq!(reached, vec![UberState::from_parts("42178", "63404").unwrap(), UberState::from_parts("42178", "42762").unwrap(), UberState::from_parts("23987", "14014").unwrap(), UberState::from_parts("42178", "6117").unwrap()]);
     }

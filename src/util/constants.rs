@@ -1,8 +1,5 @@
-use super::{
-    Zone, Teleporter,
-    uberstate::UberIdentifier,
-};
-use crate::inventory::Item;
+use super::{Zone, UberIdentifier};
+use crate::item::{Item, Teleporter};
 
 use ansi_term::Colour;
 

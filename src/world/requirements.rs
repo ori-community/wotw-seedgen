@@ -2,8 +2,9 @@ use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use super::player::Player;
-use crate::inventory::{Inventory, Item};
-use crate::util::{Difficulty, Resource, Skill, Shard, Teleporter, Enemy, orbs::{self, Orbs}};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard, Teleporter};
+use crate::util::{Difficulty, Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
 
@@ -474,7 +475,7 @@ impl Requirement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::util::settings::Settings;
+    use crate::settings::Settings;
 
     #[test]
     fn is_met() {
@@ -546,7 +547,7 @@ mod tests {
         player.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
         player.difficulty = Difficulty::Moki;
-        player.inventory.grant(Item::Resource(Resource::Energy), 2);
+        player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
 
         player = Player::default();

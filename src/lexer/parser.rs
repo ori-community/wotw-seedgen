@@ -4,7 +4,8 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::SmallVec;
 
 use super::tokenizer::{Token, TokenType};
-use crate::util::{self, Difficulty, Glitch, Skill, Resource, Shard, Teleporter, RefillType, NodeType, Enemy, Position, uberstate::UberState};
+use crate::item::{Resource, Skill, Shard, Teleporter};
+use crate::util::{self, Difficulty, Glitch, RefillType, NodeType, Enemy, Position, UberState};
 
 pub struct ParseError {
     pub description: String,

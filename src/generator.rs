@@ -15,12 +15,12 @@ use crate::world::{
     graph::{self, Node},
     player::Player,
 };
-use crate::inventory::{Inventory, Item};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Teleporter, Command, ShopCommand};
+use crate::settings::Settings;
 use crate::util::{
     self,
-    Resource, Skill, Teleporter, GoalMode,
-    settings::Settings,
-    uberstate::{UberState, UberType},
+    GoalMode, UberState, UberType, Icon, Position, Difficulty,
     constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
 };
 
@@ -65,6 +65,8 @@ where
     world_count: usize,
     total_reachable_count: usize,
     custom_names: &'b HashMap<String, String>,
+    custom_prices: &'b HashMap<String, u16>,
+    custom_icons: &'b HashMap<String, Icon>,
     multiworld_state_index: I,
     price_range: Uniform<f32>,
     random_progression: Bernoulli,
@@ -104,7 +106,7 @@ where
     let mut unmet = Vec::new();
 
     for world_context in world_contexts {
-        let (world_reachable, world_unmet) = world_context.world.graph.reached_and_progressions(&world_context.world.player, world_context.spawn, &world_context.world.uber_states)?;
+        let (world_reachable, world_unmet) = world_context.world.graph.reached_and_progressions(&world_context.world.player, world_context.spawn, &world_context.world.uber_states, &world_context.world.sets)?;
         reachable_states.push(world_reachable.iter().filter(|&&node| !node.can_place()).cloned().collect::<Vec<_>>());
         reachable.push(world_reachable);
         unmet.push(world_unmet);
@@ -137,6 +139,8 @@ where
     let uber_state = node.uber_state().unwrap();
     let is_shop = uber_state.is_shop();
 
+    let code = item.code();
+
     if uber_state.is_purchasable() {
         origin_world_context.shop_slots -= 1;
 
@@ -145,7 +149,8 @@ where
                 .find(|(_, location, _)| &uber_state.identifier == location)
                 .ok_or_else(|| format!("({}): Uber State {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_player_name, node))?;
 
-            let mut price = item.shop_price();
+            let mut price = context.custom_prices.get(&code).cloned().unwrap_or_else(|| item.shop_price());
+
             if item.random_shop_price() {
                 let modified_price = f32::from(price) * context.price_range.sample(context.rng);
                 price = u16::try_from(modified_price as i32).map_err(|_| format!("({}): Overflowed shop price for {} after adding a random amount to it", origin_player_name, item))?;
@@ -163,10 +168,22 @@ where
                 uber_state: UberState::load(),
                 item: price_setter,
             });
+
+            if let Some(icon) = context.custom_icons.get(&code).cloned().or_else(|| item.icon()) {
+                let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
+                    uber_state: uber_state.clone(),
+                    icon,
+                });
+
+                origin_world_context.placements.push(Placement {
+                    node: None,
+                    uber_state: UberState::load(),
+                    item: icon_setter,
+                });
+            }
         }
     }
 
-    let code = item.code();
     let custom_name = context.custom_names.get(&code).cloned();
     let item_display = custom_name.clone().unwrap_or_else(|| format!("{}", item));
 
@@ -435,7 +452,7 @@ I: Iterator<Item=usize>,
             inventory: target_world_context.world.player.inventory.merge(inventory),
             ..target_world_context.world.player.clone()
         };
-        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(&lookahead_player, target_world_context.spawn, &target_world_context.world.uber_states)?;
+        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(&lookahead_player, target_world_context.spawn, &target_world_context.world.uber_states, &target_world_context.world.sets)?;
         lookahead_reachable.retain(|&node| node.can_place());
 
         newly_reached += lookahead_reachable.len().saturating_sub(reach_context.reachable_counts[target_world_index]);
@@ -633,10 +650,12 @@ where
 {
     let origin_world_context = &mut world_contexts[origin_world_index];
 
-    if node.uber_state().map_or(false, UberState::is_purchasable) || !origin_world_context.random_spirit_light.sample(context.rng) {
+    let is_purchasable = node.uber_state().map_or(false, UberState::is_purchasable);
+
+    if is_purchasable || !origin_world_context.random_spirit_light.sample(context.rng) {
         let target_world_index = context.rng.gen_range(0..context.world_count);
 
-        if origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.item_count() {
+        if is_purchasable || origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.item_count() {
             let target_world_context = &mut world_contexts[target_world_index];
 
             if let Some(item) = target_world_context.world.pool.choose_random(origin_world_index != target_world_index, context.rng) {
@@ -703,7 +722,9 @@ where
         let world_context = &world_contexts[world_index];
 
         if let Some(node) = world_context.world.graph.nodes.iter()
-            .filter(|&node| node.can_place())
+            .filter(|&node|
+                node.can_place() &&
+                node.uber_state().map_or(true, |uber_state| !world_context.world.preplacements.contains_key(uber_state)))
             .choose(context.rng)
         {
             place_item(world_index, world_index, node, false, Item::SpiritLight(1), world_contexts, context)?;
@@ -868,7 +889,7 @@ fn total_reach_check<'a>(world: &World<'a>, player_name: &str) -> Result<Vec<&'a
     let spawn = finished_world.graph.find_spawn(DEFAULT_SPAWN)?;
 
     loop {
-        let mut reachable_locations = finished_world.graph.reached_locations(&finished_world.player, spawn, &finished_world.uber_states)?;
+        let mut reachable_locations = finished_world.graph.reached_locations(&finished_world.player, spawn, &finished_world.uber_states, &finished_world.sets)?;
         let new_reachable_count = reachable_locations.len();
 
         if new_reachable_count > total_reachable_count {
@@ -897,7 +918,7 @@ where
     R: Rng,
     I: Iterator<Item=usize>,
 {
-    log::trace!("Got stuck. Trying to flush uberState pickups from the item pool to recover...");
+    log::trace!("Got stuck. Trying to flush uberState items from the item pool to recover...");
 
     for target_world_index in 0..context.world_count {
         let uber_state_items = world_contexts[target_world_index].world.pool.inventory.items.iter()
@@ -926,13 +947,24 @@ where
     Ok(())
 }
 
-pub fn generate_placements<'a, R>(worlds: Vec<World<'a>>, spawns: &[&'a Node], spawn_pickup_node: &'a Node, custom_names: &HashMap<String, String>, settings: &Settings, rng: &mut R) -> Result<Vec<Vec<Placement<'a>>>, String>
+pub fn generate_placements<'a, R>(
+    worlds: Vec<World<'a>>,
+    spawns: &[&'a Node],
+    spawn_pickup_node: &'a Node,
+    custom_names: &HashMap<String, String>,
+    custom_prices: &HashMap<String, u16>,
+    custom_icons: &HashMap<String, Icon>,
+    settings: &Settings,
+    rng: &mut R
+) -> Result<Vec<Vec<Placement<'a>>>, String>
 where
     R: Rng,
 {
     // TODO enforce a max total price for shops
     let price_range = Uniform::new_inclusive(0.75, 1.25);
     let world_tour = settings.goalmodes.contains(&GoalMode::Relics);
+
+    let mut has_warned_about_tp_refill = false;
 
     let mut world_contexts = worlds.into_iter().enumerate().map(|(world_index, mut world)| {
         let player_name = settings.players.get(world_index).cloned().unwrap_or_else(|| format!("Player {}", world_index + 1));
@@ -942,7 +974,8 @@ where
         let mut placements = Vec::with_capacity(450);
         let mut spawn_slots = Vec::new();
 
-        let spawn_identifier = spawns[world_index].identifier();
+        let spawn = spawns[world_index];
+        let spawn_identifier = spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
             for _ in 0..3 {
                 spawn_slots.push(spawn_pickup_node);
@@ -954,6 +987,7 @@ where
             });
         }
 
+        let mut spawn_is_tp = false;
         // Remove spawn tp from the pool
         if let Some(spawn_tp) = match spawn_identifier {
             "MarshSpawn.Main" => Some(Item::Teleporter(Teleporter::Marsh)),
@@ -974,7 +1008,32 @@ where
             "WindtornRuins.RuinsTP" => Some(Item::Teleporter(Teleporter::InnerRuins)),
             "WillowsEnd.InnerTP" => Some(Item::Teleporter(Teleporter::Willow)),
             _ => None,
-        } { world.pool.inventory.remove(&spawn_tp, 1); }
+        } {
+            spawn_is_tp = true;
+            world.pool.inventory.remove(&spawn_tp, 1);
+        }
+
+        let spawn = spawns[world_index];
+        // Add a teleport icon for fully random spawn
+        if !spawn_is_tp {
+            if !has_warned_about_tp_refill && !settings.header_list.iter().any(|header|
+                header.file_stem().map_or(false, |stem|
+                    stem.to_str().map_or(false, |stem|
+                        stem == "tp_refill"
+            ))) {
+                log::warn!("Spawning on non-teleporter locations without the tp_refill header is not recommended!");
+                has_warned_about_tp_refill = true;
+            }
+
+            let Position { x, y } = *spawn.position().unwrap();
+            let item = Item::Command(Command::CreateWarp { id: 0, x, y });
+
+            placements.push(Placement {
+                node: None,
+                uber_state: UberState::load(),
+                item,
+            });
+        }
 
         let reachable_locations = total_reach_check(&world, &player_name)?;
 
@@ -986,7 +1045,9 @@ where
             ).collect::<Vec<_>>();
         if !unreachable_locations.is_empty() {
             let identifiers = unreachable_locations.iter().map(|&node| node.identifier()).collect::<Vec<_>>();
-            log::warn!("({}): {} locations are unreachable on these settings! These will only hold Spirit Light.", player_name, identifiers.len());
+            if !(unreachable_locations.len() == 1 && settings.difficulty == Difficulty::Moki) {  // moki always has one unreachable pickup
+                log::warn!("({}): {} locations are unreachable on these settings! These will only hold Spirit Light.", player_name, identifiers.len());
+            }
             log::trace!("({}): Unreachable locations on these settings: {}", player_name, format_identifiers(identifiers));
         }
 
@@ -1012,7 +1073,7 @@ where
         Ok(WorldContext {
             world,
             player_name,
-            spawn: spawns[world_index],
+            spawn,
             placements,
             placeholders: Vec::with_capacity(300),
             collected_preplacements: Vec::new(),
@@ -1031,6 +1092,8 @@ where
         world_count: settings.worlds,
         total_reachable_count,
         custom_names,
+        custom_prices,
+        custom_icons,
         multiworld_state_index: 0..,
         price_range,
         random_progression: Bernoulli::new(RANDOM_PROGRESSION).unwrap(),

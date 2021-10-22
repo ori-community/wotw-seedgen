@@ -6,6 +6,7 @@
 !!include jumpgrades
 !!include rapid_smash_core
 !!include rapid_sword_core
+!!include rapid_spear_core
 
 !!add 4x 10|35              // Extra Double Jumps
 !!add 2x 10|36              // Extra Air Dashes
@@ -20,35 +21,40 @@
 
 !!add 3x 8|4|50|byte|+1     // Rapid Smashes
 !!add 3x 8|4|51|byte|+1     // Rapid Swords
+!!add 2x 8|9|12|byte|+1     // Rapid Spears
 
 // Melting Upgrades
 !!add 8|4|71|bool|true
-!!name 8|4|71|bool|true Melting Blaze
+!!name 8|4|71|bool|true #Melting Blaze#
+!!icon 8|4|71|bool|true file:assets/icons/bonus/meltingblaze.png
 4|71|6|#Melting Blaze#
 !!add 8|4|72|bool|true
-!!name 8|4|72|bool|true Melting Sword
+!!name 8|4|72|bool|true #Melting Sword#
+!!icon 8|4|72|bool|true file:assets/icons/bonus/meltingsword.png
 4|72|6|#Melting Sword#
 !!add 8|4|75|bool|true
-!!name 8|4|75|bool|true Melting Shuriken
+!!name 8|4|75|bool|true #Melting Shuriken#
+!!icon 8|4|75|bool|true file:assets/icons/bonus/meltingshuriken.png
 4|75|6|#Melting Shuriken#
 // Grenade Upgrades
 !!add 8|4|42|bool|true
-!!name 8|4|42|bool|true Uncharged Bashgrenades
+!!name 8|4|42|bool|true #Uncharged Bashgrenades#
+!!icon 8|4|42|bool|true file:assets/icons/bonus/unchargedbashgrenade.png
 4|42|6|#Uncharged Bashgrenades#
 !!add 8|4|40|byte|+1
-!!name 8|4|40|byte|+1 Extra Grenade
+!!name 8|4|40|byte|+1 #Extra Grenade#
+!!icon 8|4|40|byte|+1 file:assets/icons/bonus/extragrenade.png
 4|40|6|#Extra Grenade x$(4|40)#
 !!add 8|4|45|byte|+2
-!!name 8|4|45|byte|+2 Splinter Grenade
+!!name 8|4|45|byte|+2 #Splinter Grenade#
+!!icon 8|4|45|byte|+2 file:assets/icons/bonus/splintergrenade.png
 4|45|6|#Splinter Grenade#
 !!add 2x 8|4|44|float|-0.5
-!!name 8|4|44|float|-0.5 Rapid Grenade
+!!name 8|4|44|float|-0.5 #Rapid Grenade#
+!!icon 8|4|44|float|-0.5 file:assets/icons/bonus/rapidgrenade.png
 4|44|6|#Rapid Grenade#
 // Bow Upgrade
 !!add 2x 8|4|10|float|-0.4
-!!name 8|4|10|float|-0.4 Quickshot Upgrade
+!!name 8|4|10|float|-0.4 #Quickshot Upgrade#
+!!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
 4|10|6|#Quickshot Upgrade#
-// Spear Upgrade
-!!add 2x 8|4|11|float|-0.4
-!!name 8|4|11|float|-0.4 Rapid Spear
-4|11|6|#Rapid Spear#

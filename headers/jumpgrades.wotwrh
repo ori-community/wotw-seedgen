@@ -1,11 +1,12 @@
 /// Jumpgrades
 ///
 /// Adds Jumpgrades into the item pool that make you jump higher
-/// Use Ctrl+Alt+5 to toggle this on or off
+/// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
 //// How many Jumpgrades to shuffle in
 !!parameter count int:3
 !!name 8|9|8|int|+1 Jumpgrade
+!!icon 8|9|8|int|+1 file:assets/icons/bonus/jumpgrade.png
 !!add $PARAM(count)x 8|9|8|int|+1
 
 // skip-validate
@@ -13,24 +14,24 @@
 9|0=201|16|0|1|1|Toggle Jumpgrades
 9|0=201|4|17|9|112|1|16|1|1|1|[Ability1]Toggle off
 9|0=201|4|17|9|112|0|16|1|1|1|[Ability1]Toggle on
-9|0=201|16|2|1|1|spell:2019
+9|0=201|16|2|1|1|file:assets/icons/bonus/jumpgrade.png
 9|0=201|4|17|9|112|1|16|3|1|1|255|255|255|255
 9|0=201|4|17|9|112|0|16|3|1|1|128|128|128|196
 9|0=201|16|4|1|1|0|8|9|0|int|52
 
 9|999=401|6|#Jumpgrade x$(9|8)#         // display name
 
-9|8=1|8|9|112|bool|true                 // set to default enabled
-9|8=1|8|9|111|bool|true                 // subscribe to bonus core
-9|8|4|18|9|8|100|8|9|8|int|100|skip=1   // cap at 100
+9|8|4|25|1|8|9|112|bool|true            // set to default enabled
+9|8|4|26|100|8|9|8|int|100|skip=1       // cap at 100
 9|8|6|$[(9|999=401)]
-9|8|4|17|9|112|0|8|9|9|int|1            // grant on pickup if enabled
+9|8|4|17|9|112|1|8|9|9|int|1            // grant on pickup if enabled
+9|8=1|8|9|111|bool|true                 // subscribe to bonus core
 
 9|0=102|8|9|9|int|$(9|8)                // enable callback
 9|0=103|8|9|9|int|101|skip=1            // disable callback
 9|0=103|8|9|9|int|+$(9|8)
 // Apply speed factors in a loop
-9|9|4|19|9|9|101|8|4|87|float|+0.33
-9|9|4|18|9|9|101|8|4|87|float|-0.33
-9|9|4|17|9|9|101|8|9|9|int|0
+9|9|4|27|101|8|4|87|float|+0.33
+9|9|4|26|101|8|4|87|float|-0.33
+9|9|4|25|101|8|9|9|int|0
 9|9|8|9|9|int|-1

@@ -1,8 +1,8 @@
 use rand::{Rng, seq::SliceRandom};
 use rustc_hash::FxHashMap;
 
-use crate::inventory::{Inventory, Item};
-use crate::util::{Resource, Skill, Shard, BonusUpgrade};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard, BonusUpgrade};
 
 #[derive(Default, Debug, Clone)]
 pub struct Pool {
