@@ -121,6 +121,7 @@ impl fmt::Display for Node {
 pub type Reached<'a> = Vec<&'a Node>;
 pub type Progressions<'a> = Vec<(&'a Requirement, SmallVec<[Orbs; 3]>)>;
 
+#[derive(Debug)]
 struct ReachContext<'a, 'b> {
     player: &'b Player,
     progression_check: bool,
