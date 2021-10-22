@@ -1615,10 +1615,6 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       Bash, Grenade=1  # Bash the slime to the platform, throw Grenade, bash from slime then Grenade
     unsafe:
       SentryJump=1
-<<<<<<< HEAD
-      Dash, Sword OR Hammer  # Upslash between dashes to gain a bit more hight
-
-=======
       DoubleJump, Sword OR Glide OR Spear=1 OR Flash=1 OR Sentry=1 # Could be kii but you will touch friendly spikes 
       DoubleJump, Damage=10
   state WestHollow.PurpleDoorOpen:  # Be carefull it's not redundant with paths from Entrance
@@ -1630,7 +1626,6 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       # Bow=1, DoubleJump, Shuriken=1
       # Bow=1, Sword, Hammer
   
->>>>>>> kii-pathfinding/west-hollow
   conn WestHollow.Entrance:
     moki:
       Combat=2xSlug, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide OR Bow=1
@@ -1666,16 +1661,6 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       DoubleJump, Dash
       Glide OR Launch
       # fully drained paths seem kind of irrelevant?
-<<<<<<< HEAD
-    gorlek, WestHollow.UpperDrainLeverPulled:
-      Bow=2, Sword OR Hammer
-      DoubleJump, TripleJump OR Sword OR Hammer
-      Dash, Sword OR Hammer
-      Damage=20  # dboost on the water if it's there and on the spikes of not
-    unsafe, WestHollow.UpperDrainLeverPulled:
-      Sword OR Hammer
-      DoubleJump  # Jump from the ledge left to the spikes
-=======
     gorlek:
       WestHollow.UpperDrainLeverPulled:
         Bow=2, Sword OR Hammer
@@ -1696,7 +1681,6 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       # You can't pull the WestHollow.FullyDrained lever when its underwater.
       # Damage=80
       # WaterDash, Damage=20
->>>>>>> kii-pathfinding/west-hollow
   conn WestHollow.HollowDrainLower:
     moki: WestHollow.FullyDrained
     unsafe:
@@ -1833,13 +1817,8 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       Sword  # Pogo the slug. Baiting it under the pickup is pretty awful
     unsafe:
       WestHollow.FullyDrained:
-<<<<<<< HEAD
-        Bow=1, Glide OR Sword
-        Sword  # Pogo the shot of the slug
-=======
         Bow=1, Shuriken=3
         Sword     # Pogo the shot of the slug
->>>>>>> kii-pathfinding/west-hollow
   # backwards connection blocked by the door
 
 # checkpoint at -356, -4306
@@ -1888,11 +1867,6 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     unsafe:
       DoubleJump
       Damage=10, SwordSJump=1
-<<<<<<< HEAD
-      Dash, Sword OR Hammer
-      DoubleJump, Sword  # swordjump
-=======
->>>>>>> kii-pathfinding/west-hollow
       Hammer    # upswing to get onto the right side of the spikes (you can touch them)
       Dash      # max jump without hitting the spike hitbox, dash to the small ledge
 
@@ -1915,13 +1889,8 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       WestHollow.FullyDrained, Combat=Slug+2xSkeeto, Shuriken=2 OR Blaze=3
   conn WestHollow.DashApproach:
     moki: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
-<<<<<<< HEAD
-    unsafe: free
-      # Dash  # putting it here for now
-=======
     gorlek: Dash
     kii: free
->>>>>>> kii-pathfinding/west-hollow
   # no backwards connection through the water
 
 anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle, at the bottom of the shaft next to trial start
@@ -1945,11 +1914,7 @@ anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle
       Damage=10, Combat=Slug, Spear=4 OR Shuriken=4 OR Blaze=4 OR Flash=4 OR Sentry=4
       Damage=10, Damage=10, Combat=Slug, Spear=3 OR Shuriken=3 OR Blaze=3 OR Flash=3 OR Sentry=3
     unsafe:
-<<<<<<< HEAD
-      Sword OR Hammer OR Bash  # Sword or hammer movement to avoid damage; Bash using the slug
-=======
       Hammer OR Bash       # Sword or hammer movement to avoid damage; Bash using the slug
->>>>>>> kii-pathfinding/west-hollow
       Damage=10, Combat=Slug
   conn WestHollow.HollowDrainLower:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki: WestHollow.FullyDrained
