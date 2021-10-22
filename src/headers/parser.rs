@@ -12,7 +12,7 @@ use crate::world::{
     graph::Graph,
 };
 use crate::inventory::Inventory;
-use crate::item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, Hint, ToggleCommand, ZoneHintType, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary
+use crate::item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary
 };
 use crate::settings::Settings;
 use crate::util::{self, Zone, Icon, UberState, UberType, UberIdentifier};
@@ -559,49 +559,11 @@ where P: Iterator<Item=&'a str>
     let bonus = BonusUpgrade::from_id(bonus_type).ok_or_else(|| String::from("invalid bonus upgrade type"))?;
     Ok(Item::BonusUpgrade(bonus))
 }
-fn parse_zone_hint<'a, P>(mut parts: P) -> Result<Item, String>
-where P: Iterator<Item=&'a str>
-{
-    let zone = parts.next().ok_or_else(|| String::from("missing hint zone"))?;
-    let zone: u8 = zone.parse().map_err(|_| String::from("invalid hint zone"))?;
-    let zone = Zone::from_id(zone).ok_or_else(|| String::from("invalid hint zone"))?;
-
-    let hint_type = parts.next().map_or_else::<Result<ZoneHintType, String>, _, _>(|| Ok(ZoneHintType::default()), |hint_type| {
-        let hint_type: u8 = hint_type.parse().map_err(|_| String::from("invalid hint type"))?;
-        ZoneHintType::from_id(hint_type).ok_or_else(|| String::from("invalid hint type"))
-    })?;
-
-    end_of_item(parts)?;
-
-    let hint = Hint {
-        zone,
-        hint_type,
-    };
-
-    Ok(Item::Hint(hint))
+fn parse_zone_hint() -> Result<Item, String> {
+    Err(String::from("Hint Items are deprecated"))
 }
-fn parse_checkable_hint<'a, P>(mut parts: P) -> Result<Item, String>
-where P: Iterator<Item=&'a str>
-{
-    let hint_parts = parts.next().ok_or_else(|| String::from("missing hint descriptor"))?;
-    end_of_item(parts)?;
-
-    let mut parts = hint_parts.split(',');
-    let base_price = parts.next().ok_or_else(|| String::from("missing base price"))?;
-    let base_price = base_price.parse::<u16>().map_err(|_| String::from("invalid base price"))?;
-    let price_modifier = parts.next().ok_or_else(|| String::from("missing price modifier"))?;
-    let price_modifier = price_modifier.parse::<u16>().map_err(|_| String::from("invalid price modifier"))?;
-
-    let mut hinted_items = Vec::new();
-    for part in parts {
-        let item_parts = part.split('-');
-        let item = parse_item_parts(item_parts)?;
-        if item.is_checkable() {
-            hinted_items.push(item)
-        }
-    }
-
-    Ok(Item::CheckableHint(base_price, price_modifier, hinted_items))
+fn parse_checkable_hint() -> Result<Item, String> {
+    Err(String::from("Hint Items are deprecated"))
 }
 fn parse_relic<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
@@ -824,8 +786,8 @@ where P: Iterator<Item=&'a str>
         "9" => parse_world_event(parts),
         "10" => parse_bonus_item(parts),
         "11" => parse_bonus_upgrade(parts),
-        "12" => parse_zone_hint(parts),
-        "13" => parse_checkable_hint(parts),
+        "12" => parse_zone_hint(),
+        "13" => parse_checkable_hint(),
         "14" => parse_relic(parts),
         "15" => parse_sysmessage(parts),
         "16" => parse_wheelcommand(parts),
@@ -1621,7 +1583,5 @@ mod tests {
         assert!(parse_item("0||400").is_err());
         assert!(parse_item("7|3").is_err());
         assert!(parse_item("-0|65").is_err());
-        assert_eq!(parse_item("12|11|10"), Ok(Item::Hint(Hint { zone: Zone::Willow, hint_type: ZoneHintType::All })));
-        assert_eq!(parse_item("12|11"), Ok(Item::Hint(Hint { zone: Zone::Willow, hint_type: ZoneHintType::Skills })));
     }
 }

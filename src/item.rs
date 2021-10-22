@@ -50,8 +50,6 @@ pub enum Item {
     RemoveWater,
     BonusItem(BonusItem),
     BonusUpgrade(BonusUpgrade),
-    Hint(Hint),
-    CheckableHint(u16, u16, Vec<Item>),
     Relic(Zone),
     SysMessage(SysMessage),
     WheelCommand(WheelCommand),
@@ -105,11 +103,6 @@ impl fmt::Display for Item {
             Item::RemoveWater => write!(f, "Remove Clean Water"),
             Item::BonusItem(bonus_item) => write!(f, "{}", bonus_item),
             Item::BonusUpgrade(bonus_upgrade) => write!(f, "{}", bonus_upgrade),
-            Item::Hint(hint) => write!(f, "{}", hint),
-            Item::CheckableHint(_, _, hints) => {
-                let hints = hints.iter().map(|hint| hint.to_string()).collect::<Vec<_>>();
-                write!(f, "{}", hints.join(", "))
-            },
             Item::Relic(zone) => write!(f, "{} Relic", zone),
             Item::SysMessage(message) => write!(f, "{}", message),
             Item::WheelCommand(command) => write!(f, "16|{}", command),
@@ -255,12 +248,6 @@ impl Item {
             Item::BonusUpgrade(BonusUpgrade::SentryEfficiency) |
             Item::BonusUpgrade(BonusUpgrade::RapidHammer) => 600,
             Item::BonusUpgrade(_) => 300,
-            Item::Hint(hint) => match hint.zone {
-                Zone::Burrows | Zone::Willow => 50,
-                Zone::Hollow | Zone::Wellspring | Zone::Woods | Zone::Reach | Zone::Depths | Zone::Pools | Zone::Wastes | Zone::Ruins => 150,
-                Zone::Marsh | Zone::Glades => 200,
-                _ => 150,
-            },
             _ => 200,
         }
     }
@@ -274,8 +261,7 @@ impl Item {
             Item::Water |
             Item::Teleporter(_) |
             Item::Shard(_) |
-            Item::BonusItem(_) |
-            Item::Hint(_) => true,
+            Item::BonusItem(_) => true,
             _ => false,
         }
     }
@@ -298,11 +284,6 @@ impl Item {
             Item::RemoveWater => String::from("9|-0"),
             Item::BonusItem(bonus) => format!("10|{}", bonus.to_id()),
             Item::BonusUpgrade(bonus) => format!("11|{}", bonus.to_id()),
-            Item::Hint(hint) => format!("12|{}|{}", hint.zone.to_id(), hint.hint_type.to_id()),
-            Item::CheckableHint(base_price, price_modifier, hint) => {
-                let hint = hint.iter().map(|item| str::replace(&item.code(), '-', "|")).collect::<Vec<_>>();
-                format!("13|{}|{}|{}", base_price, price_modifier, hint.join(","))
-            },
             Item::Relic(zone) => format!("14|{}", zone.to_id()),
             Item::SysMessage(message) => match message {
                     SysMessage::MapRelicList(zone) => format!("15|{}|{}", zone.to_id(), message.to_id()),
