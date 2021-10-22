@@ -1826,17 +1826,19 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
 anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left of Lupo
   refill Checkpoint
 
-  pickup WestHollow.QuickshotShard:
-    moki, WestHollow.FullyDrained:  # middle water state can softlock this, so you have to be able to fully lower the water. DoubleJump is for lenience on the bowshot
+  pickup WestHollow.QuickshotShard:  # middle water state can softlock this, so you have to be able to fully lower the water.
+    moki, WestHollow.FullyDrained:  # DoubleJump is for lenience on the bowshot
       DoubleJump, Bow=1, Dash, Combat=2xSkeeto OR Bash
       DoubleJump, Bow=1, Launch
-    gorlek, WestHollow.FullyDrained:  # middle water state can softlock this, so you have to be able to fully lower the water.
+    gorlek, WestHollow.FullyDrained:  
       Bow=1, Dash OR Launch
-      Bow=1, Water, WaterDash  # opted against writing the equivalent dboost path because it would be more obscure
-    unsafe, WestHollow.FullyDrained:
-      Bow=1  # Lower each crusher from above the previous one
+    kii, WestHollow.FullyDrained: Bow=1  # bait the first crusher, us it as an elevator to the eye then bait it again and jump from it to the left
   pickup WestHollow.SwimEC:
     moki: Water
+    unsafe:
+      Damage=215  # 200 from water, 5 from fish, 10 from spikes
+      Bash, Damage=160
+      WaterDash, Damage=100
   pickup WestHollow.LupoMap:
     moki, SpiritLight=150:  # All the path options here include a way to get past the enemy
       DoubleJump, Dash
@@ -1845,18 +1847,26 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     gorlek, SpiritLight=150:  # All the path options here include a way to get past the enemy
       DoubleJump, TripleJump OR Sword OR Hammer  # all have alternate paths from the right or from below
       SentryJump=1
-    unsafe: SpiritLight=150, Sword  # Pogo the slug
+    kii, SpiritLight=150:
+      Sword  # Pogo the slug
+      DoubleJump, Glide OR Shuriken=1 OR Sentry=2
+      Dash, Hammer OR Shuriken=1
+    unsafe, SpiritLight=150:
+      DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      Dash, Spear=1 OR Flash=1 OR Sentry=1
   pickup WestHollow.BelowLupoEX:
     moki:  # All the path options here include a way to get past the enemies
       DoubleJump, Dash
       Launch
     gorlek:  # All the path options here include a way to get past the enemies
       DoubleJump, TripleJump OR Sword OR Hammer OR Damage=10
+    kii:
+      DoubleJump, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump
       Damage=10, SwordSJump=1
-      Dash, Sword OR Hammer
-      DoubleJump, Sword # swordjump
       Hammer    # upswing to get onto the right side of the spikes (you can touch them)
       Dash      # max jump without hitting the spike hitbox, dash to the small ledge
 
@@ -1872,10 +1882,15 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       Combat=Slug+2xSkeeto, DoubleJump OR Dash OR Glide OR Sword
       Bash  # bash off the skeetos
       SentryJump=1
+    kii, WestHollow.FullyDrained:
+      Hammer
+      Combat=Slug+2xSkeeto, Sentry=2
+    unsafe:
+      WestHollow.FullyDrained, Combat=Slug+2xSkeeto, Shuriken=2 OR Blaze=3
   conn WestHollow.DashApproach:
     moki: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
-    unsafe: free
-      # Dash    # putting it here for now
+    gorlek: Dash
+    kii: free
   # no backwards connection through the water
 
 anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle, at the bottom of the shaft next to trial start
@@ -1891,8 +1906,15 @@ anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle
       Bash, DoubleJump OR Dash
       Damage=10, Sword OR Hammer  # Sword or hammer solve combat requirements and easier movement
       Damage=10, Glide, Combat=Slug OR Bash
+    kii:
+      Sword
+      Hammer, Bash OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # kill the slime with your hammer, fall to the ground again then use your energy weapons to preserrve your upslash for the third jump
+      Glide, Bash
+      Glide, Combat=Slug, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=10, Combat=Slug, Spear=4 OR Shuriken=4 OR Blaze=4 OR Flash=4 OR Sentry=4
+      Damage=10, Damage=10, Combat=Slug, Spear=3 OR Shuriken=3 OR Blaze=3 OR Flash=3 OR Sentry=3
     unsafe:
-      Sword OR Hammer OR Bash       # Sword or hammer movement to avoid damage; Bash using the slug
+      Hammer OR Bash       # Sword or hammer movement to avoid damage; Bash using the slug
       Damage=10, Combat=Slug
 
   conn WestHollow.HollowDrainLower:
@@ -1921,6 +1943,8 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
     gorlek:
       DoubleJump OR Dash OR Bash
       Combat=Skeeto+2xLizard+Hornbug, Glide OR Sword OR HammerSJump=1
+    kii:
+      Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Hammer
 
   conn WestHollow.HollowDrainLower:
@@ -1932,9 +1956,16 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
       SentryJump=3  # Possible with 2 SentryJumps
       Combat=Slug, DoubleJump, TripleJump OR Glide OR Sword OR Hammer  # Take the vanilla path up, but use Sword or Hammer slashes as a substitute to Dash/DoubleJump
       Bash, Grenade=2, Damage=10, Glide OR Sword
+    kii:
+      Combat=Slug, DoubleJump, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=3  # either bash the mantis or bait the skeeto
+      Bash, Grenade=1, Damage=10, Glide OR Flash=3 OR Sentry=3
+      Bash, Grenade=1, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Sword OR Hammer
     unsafe:
-      Dash, Sword OR Hammer           # Take the vanilla path up, but use Sword or Hammer slashes as a substitute to Dash/DoubleJump
+      Bash  # Take your skeeto friend for a trip
       Dash                            # avoiding slugs is hard and might take patience
+      Sword
       DoubleJump, Damage=10 OR Glide  # Jump into the first spike wall or glide over it and then avoid the slugs
   conn WestHollow.DashArea:
     moki: WestHollow.DoorLever
@@ -1943,49 +1974,106 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
   refill Checkpoint
 
   pickup WestHollow.DashTree: free
+  pickup WestHollow.AboveDashEX:  # Paths going above the tree. Path passing through the crushers originate from DashCrushers. Make sure they aren't redundant.
+    gorlek:  # Launch would be redundant with going the long way around
+      DoubleJump, Bash, Grenade=1  # There are two ledges above the tree, stand on the right one, throw Grenade from there
+      SentryJump=1
+    kii:
+      Bash  # Bash the slug twice
+      DoubleJump, TripleJump  # Jump from where the door was. Can wall jump from it if it's still closed
+      WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis
+
+  conn WestHollow.DashApproach:
+    moki: WestHollow.DoorLever
+  conn WestHollow.DashCrushers:
+    moki: Dash OR Launch
+    kii: Bash, Grenade=1
+    unsafe: free
+  conn WestHollow.AboveDashTree:  # Paths going above the tree. Path passing through the crushers originate from DashCrushers. Make sure they aren't redundant.
+    kii: DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from the ledge right next to the spikes
+    unsafe: WestHollow.DoorLever, Bash  # Bash the slime on the log above, use the mantis to go there too. Precise bash angle to send the slime in the spikes and bash it again after it dies. Also, the skeeto can come in the spikes area, making that path waaaaay easier
+
+anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at dash tree
+  refill Checkpoint
+  
   pickup WestHollow.CrusherEX:
-    moki: Dash
-    gorlek: Launch, Burrow OR WaterDash  # hmmmmm
+    # No moki path because the need for dash/burrow/waterdash in order to drop through the log is too obscure
+    gorlek: Dash
+    unsafe: Burrow OR WaterDash  # hmmmmm
+  
+  conn WestHollow.DashArea:  # Make sure it's not redundant with AboveDashTree->DashArea
+    moki: Dash, Bash, Grenade=1
+    gorlek: Dash, SentryJump=1
     unsafe:
-        Burrow OR WaterDash
-        # Bash, Grenade=1, Burrow OR WaterDash  # Bash to the platform
-  pickup WestHollow.DashRightEX:
+      SentryJump=1
+      Bash, Grenade=1
+  conn WestHollow.AboveDashTree:
     moki:
       DoubleJump, Dash
       Launch
     gorlek:
-      Dash, Bash, Grenade=2, Glide OR Sword OR Hammer OR Damage=10  # around the right
+      DoubleJump, TripleJump OR Glide OR Sword
+      Dash, Bash, Grenade=1, Glide OR Sword OR Hammer OR Damage=10  # around the right
+    kii:
+      Bash, Grenade=2  # Bash the mantis in order to reach your grenade from higher. Bash grenade from the hanging log.
+      DoubleJump, Hammer
+      DoubleJump, Damage=10, Bash OR Shuriken=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Sword OR Hammer
     unsafe:
-      WestHollow.DoorLever, DoubleJump, TripleJump, Sword  # Lure and pogo the jumper / swordjumping through the path above the tree
-      WestHollow.DoorLever, DoubleJump, TripleJump, Bash, Damage=10 OR Hammer  # Lure the mantis
-      DoubleJump, TripleJump, SentryJump=1
-      DoubleJump, TripleJump, Bash, Grenade=1, Damage=10 OR Hammer  # There are two ledges above the tree, stand on the right one, throw Grenade from there
-      Damage=10, SentryJump=2, Dash
-      SentryJump=2, DoubleJump, Damage=10  # Go up with the first SentryJump, then jump into spikes, SentryJump over and continue
-      DoubleJump, Damage=10 OR TripleJump    # lower the crusher from above the previous one
+      Sword 
+      Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 
       Bash, Grenade=1           # using the enemies to bash onto the hanging log
-  pickup WestHollow.AboveDashEX:
-    moki:  # there's some funny Bashgrenade paths here, but they're not moki-safe
-      DoubleJump, Dash
+  
+anchor WestHollow.AboveDashTree at -21, -4411:  # Top right of dash tree room
+  refill Checkpoint
+  
+  pickup WestHollow.DashRightEX:
+    moki:
+      DoubleJump, Dash, Combat=WeakSlug OR Bash
       Launch
     gorlek:
-      DoubleJump, Bash, Grenade=1  # There are two ledges above the tree, stand on the right one, throw Grenade from there
-      SentryJump=1
-      Dash, Bash, Grenade=1, Glide OR Sword OR Hammer OR Damage=10  # around the right
+      DoubleJump, Sword
+      DoubleJump, Bash, TripleJump OR Glide
+      DoubleJump, Combat=WeakSlug, TripleJump OR Glide
+    kii:
+      Bash
+      DoubleJump, Hammer
+      DoubleJump, Combat=WeakSlug, Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Combat=WeakSlug, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Dash, Sword OR Hammer  # Take the path right from the Dash tree
-      WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis
-      WestHollow.DoorLever, DoubleJump, TripleJump, Sword # swordjump from the doorframe
-      WestHollow.DoorLever, Bash  # Lure the mantis
-      DoubleJump, Damage=10 OR TripleJump    # lower the crusher from above the previous one
-      Bash, Grenade=1  # There are two ledges above the tree, stand on the right one, throw Grenade from there
-      # Bash    # Bash the slug twice
-
-  conn WestHollow.DashApproach:
-    moki: WestHollow.DoorLever
-
-# checkpoint at -21, -4411
-
+      DoubleJump, Combat=WeakSlug
+      Glide, Combat=WeakSlug, Sentry=2
+  pickup WestHollow.AboveDashEX:
+    moki:
+      Glide, Combat=Hornbug+Skeeto OR Bash
+      DoubleJump, Dash OR Glide
+      Launch
+    gorlek:
+      DoubleJump OR Dash OR Hammer
+      Bash, Sword OR Damage=10
+      Combat=Hornbug, Sword OR  Damage=10
+    kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
+    unsafe: Bash OR Shuriken=2
+      
+  conn WestHollow.DashCrushers:
+    moki: Bash OR Glide OR Launch OR DoubleJump OR Dash
+    gorlek: Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    unsafe: free
+  conn WestHollow.DashArea:  # same paths as WestHollow.AboveDashEX
+    moki:
+      Glide, Combat=Hornbug+Skeeto OR Bash
+      DoubleJump, Dash OR Glide
+      Launch
+    gorlek:
+      DoubleJump OR Dash OR Hammer
+      Bash, Sword OR Damage=10
+      Combat=Hornbug, Sword OR  Damage=10
+    kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
+    unsafe: Bash OR Shuriken=2
+  
 region EastHollow:
   moki: Danger=20
   gorlek: free
