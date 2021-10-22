@@ -11,7 +11,7 @@
 // Overview
 3|1|16|0|0|0|Progress Summary
 3|1|16|1|0|0|[Ability1]View Progress
-3|1|16|2|0|0|file:assets/icons/game/message.png
+3|1|16|2|0|0|file:assets/icons/wheel/progress_summary.blue.png
 3|1|16|4|0|0|0|4|16|ShowProgressWithHints
 
 9|0=10|15|2
@@ -149,8 +149,7 @@
 // Trees Helper
 3|1|16|0|0|1|Tree Progress
 3|1|16|1|0|1|[Ability1]View Progress
-3|1|16|2|0|1|shard:12
-3|1|16|3|0|1|128|255|64|255
+3|1|16|2|0|1|file:assets/icons/wheel/tree_progress.blue.png
 3|1|16|4|0|1|0|8|9|0|int|25
 3|2|8|9|0|int|25
 
@@ -246,7 +245,7 @@
 // Wisp Helper
 3|1|16|0|0|2|Wisp Progress
 3|1|16|1|0|2|[Ability1]View Progress
-3|1|16|2|0|2|spell:2018
+3|1|16|2|0|2|file:assets/icons/wheel/wisps_progress.blue.png
 3|1|16|4|0|2|0|8|9|0|int|26
 3|3|8|9|0|int|26
 
@@ -288,8 +287,7 @@
 // Quest Helper
 3|1|16|0|0|3|Quest Progress
 3|1|16|1|0|3|[Ability1]View Progress
-3|1|16|2|0|3|shard:10
-3|1|16|3|0|3|255|64|128|255
+3|1|16|2|0|3|file:assets/icons/wheel/quests_progress.blue.png
 3|1|16|4|0|3|0|8|9|0|int|27
 3|4|8|9|0|int|27
 
