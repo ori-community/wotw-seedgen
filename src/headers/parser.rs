@@ -1178,7 +1178,7 @@ where R: Rng + ?Sized
                 depth -= 1;
             } else {
                 return Err(format!("Unknown command {}", command));
-            } // TODO !!price command?
+            }
         } else if let Some(ignored) = line.strip_prefix('!') {
             processed += ignored;
             processed.push('\n');
