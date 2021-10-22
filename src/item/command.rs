@@ -33,6 +33,7 @@ pub enum Command {
     IfSelfEqual { value: String, item: Box<Item> },
     IfSelfGreater { value: String, item: Box<Item> },
     IfSelfLess { value: String, item: Box<Item> },
+    UnEquip { ability: u16 },
 }
 impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -65,6 +66,7 @@ impl fmt::Display for Command {
             Command::IfSelfEqual { value, item } => write!(f, "25|{}|{}", value, item.code()),
             Command::IfSelfGreater { value, item } => write!(f, "26|{}|{}", value, item.code()),
             Command::IfSelfLess { value, item } => write!(f, "27|{}|{}", value, item.code()),
+            Command::UnEquip { ability } => write!(f, "28|{}", ability),
         }
     }
 }
