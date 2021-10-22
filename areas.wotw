@@ -946,6 +946,9 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
       Sword OR Hammer  # Horizontal slash combo
       BreakWall=20, Damage=10
     unsafe: BreakWall=20, Sentry=1  # Use Sentry instead of DoubleJump
+  pickup MarshPastOpher.SpiritTrial:
+    moki: MarshPastOpher.TrialActivation, DoubleJump, Dash, Grapple
+    gorlek: MarshPastOpher.TrialActivation, Dash, Grapple
   pickup MarshSpawn.BridgeEX:  # paths that can't get to Main
     moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
     gorlek, MarshSpawn.ToOpherBarrier:
@@ -976,17 +979,17 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
 # checkpoint at -603, -4316
 # checkpoint at -573, -4339
 
-anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the shrine
+anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
   refill Checkpoint
   refill Health=1:  # right below
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: free
 
-  # state MarshPastOpher.TrialActivation:
-  #   moki: Grapple, Dash OR Glide OR Launch
-  #   gorlek: Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=10
-  #            Launch, DoubleJump OR Dash OR Damage=10
-  #    unsafe: DoubleJump, TripleJump, Damage=10, Sword OR Glide  # Double Jump from the right wall to the small ledge under the spikes, then dmg boost to the wall on the left
+  state MarshPastOpher.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki:
+      Combat=SneezeSlug+Mantis, Grapple, Dash OR Glide
+      Bash, Grapple, Dash OR Glide
+    gorlek: Grapple, DoubleJump OR Dash OR Glide OR Damage=10
 
   pickup MarshPastOpher.TrialLeftEX:
     moki:
@@ -1779,15 +1782,15 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       Hammer    # upswing to get onto the right side of the spikes (you can touch them)
       Dash      # max jump without hitting the spike hitbox, dash to the small ledge
 
-  conn WestHollow.TrialApproach:
-    moki, WestHollow.FullyDrained:  # middle water state can softlock this, so you have to be able to fully lower the water.
+  conn WestHollow.TrialApproach:  # middle water state can softlock this, so you have to be able to fully lower the water.
+    moki, WestHollow.FullyDrained:
       Combat=Slug+2xSkeeto, DoubleJump, Dash OR Glide
       Combat=Slug+2xSkeeto+Hornbug, Dash, Glide
       Bash, Damage=10, DoubleJump OR Dash OR Glide  # bash off the skeetos
       Water, WaterDash, Combat=Slug, Combat=Hornbug OR DoubleJump
       Water, WaterDash, Bash
       Launch
-    gorlek, WestHollow.FullyDrained:  # middle water state can softlock this, so you have to be able to fully lower the water.
+    gorlek, WestHollow.FullyDrained:
       Combat=Slug+2xSkeeto, DoubleJump OR Dash OR Glide OR Sword
       Bash  # bash off the skeetos
       SentryJump=1
@@ -1800,12 +1803,12 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
 anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle, at the bottom of the shaft next to trial start
   refill Checkpoint
 
-  pickup WestHollow.TrialHC:
-    moki:  # middle water state can softlock this, so you have to be able to fully lower the water.
+  conn WestHollow.TrialStart:
+    moki:
       Combat=Slug, DoubleJump, Dash OR Glide
       DoubleJump, Bash  # bash off the slug
       Launch
-    gorlek:  # middle water state can softlock this, so you have to be able to fully lower the water.
+    gorlek:
       Combat=Slug, DoubleJump OR Dash
       Bash, DoubleJump OR Dash
       Damage=10, Sword OR Hammer  # Sword or hammer solve combat requirements and easier movement
@@ -1813,9 +1816,18 @@ anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle
     unsafe:
       Sword OR Hammer OR Bash       # Sword or hammer movement to avoid damage; Bash using the slug
       Damage=10, Combat=Slug
-
-  conn WestHollow.HollowDrainLower:
+  conn WestHollow.HollowDrainLower:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki: WestHollow.FullyDrained
+
+anchor WestHollow.TrialStart at -120, -4260:  # At the Spirit Trial start
+  refill Checkpoint
+
+  pickup WestHollow.TrialHC: free
+  pickup WestHollow.SpiritTrial:  # middle water state can softlock this, so you have to be able to fully lower the water.
+    moki: WestHollow.TrialActivation, WestHollow.FullyDrained, DoubleJump, Dash
+    gorlek: WestHollow.TrialActivation, WestHollow.FullyDrained, Dash
+
+  conn WestHollow.TrialApproach: free
 
 # checkpoint at -124, -4377
 
@@ -1824,13 +1836,9 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
   refill Energy=3:
     moki: BreakCrystal
 
-  # state WestHollow.TrialActivation:
-  #   moki, Combat=Slug:
-  #     DoubleJump OR Dash OR Launch
-  #     Bash, Grenade=1
-  #   gorlek:
-  #     Glide OR Sword OR Hammer
-  #     SentryJump=1
+  state WestHollow.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: DoubleJump OR Dash
+    gorlek: Glide
   state WestHollow.DoorLever:  # The door blocking Dash area
     moki:
       Combat=Skeeto+Mantis+2xLizard+Hornbug, DoubleJump OR Dash
@@ -3731,12 +3739,9 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
   conn OuterWellspring.AboveEntranceDoor: free
 
 anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to the teleporter
-  # state OuterWellspring.TrialActivation:
-  #   moki:
-  #     DoubleJump, Grapple, Dash OR Glide
-  #     DoubleJump, Grapple, Bash, Grenade=1
-  #     Bash, Grenade=2
-  #     Launch
+  state OuterWellspring.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: Grapple, DoubleJump, Dash OR Glide
+    gorlek: Grapple, Dash, Glide
 
   pickup OuterWellspring.UltraGrappleShard:
     moki:
@@ -3853,7 +3858,7 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
   refill Energy=1:
     moki: BreakCrystal
 
-  pickup OuterWellspring.TrialOre:
+  conn OuterWellspring.TrialStart:
     moki:
       Grapple, DoubleJump
       Launch
@@ -3861,8 +3866,26 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
       Dash OR Glide
       DoubleJump, Sword OR Hammer
     unsafe: DoubleJump
-
   conn OuterWellspring.TrialApproach: free
+
+anchor OuterWellspring.TrialStart at -665, -3937:
+  refill Checkpoint
+
+  pickup OuterWellspring.TrialOre: free
+  pickup OuterWellspring.SpiritTrial:
+    moki: OuterWellspring.TrialActivation, DoubleJump, Dash, Grapple
+    gorlek: OuterWellspring.TrialActivation, Dash, Grapple, Glide
+
+  conn OuterWellspring.TrialRoom:
+    moki:
+      DoubleJump, Dash OR Glide
+      Grapple, Glide
+      Launch
+    gorlek:
+      DoubleJump, TripleJump OR Sword
+      Dash, Sword OR Hammer
+      Glide
+      Grapple, DoubleJump OR Dash OR Sword OR Hammer
 
 region InnerWellspring:
   moki: Danger=25
@@ -5156,8 +5179,8 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
 anchor WoodsMain.TrialStart at 848, -4052:  # At the collapsing petrified Owl
   refill Checkpoint
 
-  # state WoodsMain.TrialActivation:
-  #   this would just be on an anchor with the shard...
+  pickup WoodsMain.SpiritTrial:
+    moki: WoodsMain.TrialActivation, DoubleJump, Dash, Bash, Grapple, Burrow
 
   conn WoodsMain.AboveHowl:
     moki:
@@ -5189,7 +5212,7 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
 # This anchor is purely to make WoodsMain.TrialStart->WoodsMain.OverflowShard less painful to pathfind
   refill Checkpoint
   
-  pickup WoodsMain.OverflowShard:
+  conn WoodsMain.TrialEnd:
     moki:
       DoubleJump, Bash, Burrow, Dash OR Glide
       Launch, Bash, DoubleJump OR Dash OR Glide
@@ -5205,10 +5228,26 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
       DoubleJump, Burrow, Damage=30
     unsafe:
       DoubleJump, TripleJump, Damage=30
-  
   conn WoodsMain.AboveHowl:
     gorlek: free  # Jump and hold right
   
+anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
+  refill Checkpoint
+
+  pickup WoodsMain.OverflowShard:
+    moki:
+      DoubleJump, Dash OR Glide
+      Launch
+    gorlek: DoubleJump OR Dash OR Glide
+  state WoodsMain.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: DoubleJump, Dash
+    gorlek: DoubleJump, TripleJump OR Glide
+
+  conn WoodsMain.AboveHowl:
+    moki:
+      DoubleJump, Dash OR Bash OR Glide
+      Launch
+    gorlek: DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer
 
 anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced Howl
   pickup WoodsMain.HiddenEX: free
@@ -5241,7 +5280,6 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
     unsafe:
       Bash, Grenade=2  # You can kill the balloon with your first bashgrenade
 
-# checkpoint at 868, -3952
 # checkpoint at 980, -4015
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
@@ -6302,7 +6340,7 @@ anchor LowerReach.ArenaArea at 44, -3992:  # To the left of the combat arena
     moki: Regenerate, Damage=40, Combat=3xShieldMiner+Hornbug+2xBee
     unsafe: Combat=3xShieldMiner+Hornbug+2xBee
 
-  conn LowerReach.Trial:
+  conn LowerReach.TrialStart:
     moki: LowerReach.ArenaBeaten
   conn LowerReach.LowerWispPath:
     moki, LowerReach.ArenaBeaten: Glide
@@ -6486,7 +6524,7 @@ anchor LowerReach.SnowEscape at 79, -3733:
 
 anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
   conn GladesTown.ReachPath: free
-  conn LowerReach.Trial:
+  conn LowerReach.TrialStart:
     moki:
       Glide
     gorlek:
@@ -6502,14 +6540,16 @@ anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
       Launch, DoubleJump, Dash OR TripleJump
       Launch, Damage=20  # Launch on the wall at the start of the wind cave
 
-anchor LowerReach.Trial at 64, -4046:  # At trial start
+anchor LowerReach.TrialStart at 64, -4046:  # At trial start
   refill Checkpoint
 
   state LowerReach.KeystoneDoor:
     moki: Keystone=4
-  # state LowerReach.TrialActivation:
-  #   moki: LowerReach.KeystoneDoor
+  state LowerReach.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: LowerReach.KeystoneDoor
 
+  pickup LowerReach.SpiritTrial:
+    moki: LowerReach.TrialActivation, Dash, Glide
   pickup LowerReach.RightKS:
     moki:
       Glide
@@ -6528,7 +6568,6 @@ anchor LowerReach.Trial at 64, -4046:  # At trial start
       Launch, DoubleJump, TripleJump, Damage=30  # dboost in the spikes+ dboost on the slime next to the keystone
       DoubleJump, TripleJump, Combat=BombSlug, Damage=80
     unsafe: Launch, DoubleJump, TripleJump, Damage=20  # Launch against the walls. When on the wall above GladesTown.ReachPath, first use triple jump then lauch, triple jump again to take a damage boost to refresh launch then launch and triple jump again to take the pickup and tp out
-  
   pickup LowerReach.MiddleLeftKS:
     moki: Glide
     kii:  # TP out after taking the pickup
@@ -7713,6 +7752,9 @@ anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
       DepthsLight, DoubleJump
       DepthsLight, Grapple, Sword OR Hammer OR Dash OR Glide  # grapple the light after using the jumpad to reach the platform above
 
+  pickup LowerDepths.SpiritTrial:
+    moki: LowerDepths.TrialActivation, DoubleJump, Dash, Bash, Grapple
+
   conn LowerDepths.East:
     moki:
       Bash, DoubleJump, Dash OR Glide
@@ -7756,13 +7798,8 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DoubleJump, TripleJump OR Dash OR Glide OR Sword
     unsafe: DoubleJump, Hammer
 
-  # state LowerDepths.TrialActivation:
-  #   moki:
-  #     DoubleJump, Bash, Grenade=3
-  #     DoubleJump, Bash, Grenade=2, Grapple
-  #     DoubleJump, Dash, Bash, Grapple
-  #     Bash, Grapple, Glide
-  #     Launch
+  state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: DoubleJump, Bash, Grapple
 
   pickup LowerDepths.SpiritSurgeShard:
     moki:
@@ -8366,7 +8403,6 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
     unsafe: Water
-
   state EastPools.LupoPurpleFloor:
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
@@ -8392,6 +8428,8 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   pickup EastPools.BehindCrusherEX:
     moki: Water, WaterBreath
     gorlek: Water
+  pickup EastPools.SpiritTrial:
+    moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
 
   conn EastPools.CentralRoom:
     moki: EastPools.CentralRoomPurpleWall, Water
@@ -8586,8 +8624,9 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
 
   state UpperPools.KeystoneDoor:
     moki: Keystone=4
-  # state UpperPools.TrialActivation:
-  #   moki: DoubleJump OR Grapple OR Launch
+  state UpperPools.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: Grapple
+    gorlek: DoubleJump
 
   pickup UpperPools.UpperMidKS:
     moki: DoubleJump OR Dash OR Glide
@@ -8981,6 +9020,9 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
   pickup LowerWastes.PurpleWallEX:
     moki: Burrow, Bash
     unsafe: Burrow  # didn't want to be mean
+  pickup LowerWastes.SpiritTrial:
+    moki: LowerWastes.TrialActivation, Burrow, DoubleJump, Dash, Grapple
+    gorlek: LowerWastes.TrialActivation, Burrow, Dash, Grapple
 
   conn LowerWastes.WestTP:
     moki: DoubleJump OR Dash OR Glide OR Launch
@@ -9386,14 +9428,6 @@ anchor LowerWastes.LastStandArea at 1794, -3938:  # next to the projectile spawn
 anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
   refill Checkpoint
 
-  # state LowerWastes.TrialActivation:
-  #   moki:
-  #     Burrow, DoubleJump OR Dash OR Glide
-  #     Burrow, Bash, Grenade=1
-  #     DoubleJump, Bash, Grenade=2
-  #     Dash, Bash, Grenade=4  # yes, good
-  #     Launch
-
   pickup LowerWastes.SkeetoHiveEX:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow
@@ -9450,6 +9484,9 @@ anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
 anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the way to the tree
   refill Checkpoint
   
+  state LowerWastes.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: Burrow, DoubleJump OR Dash OR Glide
+
   quest LowerWastes.HandToHandMapstone:
     moki: GladesTown.HandToHandCanteen
   
