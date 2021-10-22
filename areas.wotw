@@ -9667,8 +9667,6 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
 
   state UpperWastes.KeystoneDoor:
     moki, Keystone=2: Burrow
-  state UpperWastes.KeystoneDoor:
-    moki, Keystone=2: Burrow
 
   pickup UpperWastes.LedgeEC:
     moki:
