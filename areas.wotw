@@ -21,6 +21,10 @@
 # SentryBreak=x: A wall with x Health is broken from behind using Sentry
 # HammerBreak: A wall with is broken from behind using Hammer
 # SpearBreak: A wall with is broken from behind using one Spear
+# LaunchSwap: Use Launch and cancel it through the weapon wheel
+# FlashSwap: Use Flash and cancel it through the weapon wheel
+# SentrySwap=x: Use Sentry and cancel it through the weapon wheel x times
+# BlazeSwap=x: Use Blaze and cancel it through the weapon wheel x times
 
 # requirement macros. must go at the top of the file!
 

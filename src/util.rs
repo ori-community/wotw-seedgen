@@ -34,6 +34,10 @@ pub enum Glitch {
     SpearBreak,         // Breaking Walls from behind with Spear
     SentryBurn,         // Melting Ice using Sentries
     RemoveKillPlane,    // Removing Shriek's Killplane at Feeding Grounds
+    LaunchSwap,         // Using the weapon wheel to cancel Launch
+    SentrySwap,         // Using the weapon wheel to cancel Sentry
+    FlashSwap,          // Using the weapon wheel to cancel Flash
+    BlazeSwap,          // Using the weapon wheel to cancel Blaze
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

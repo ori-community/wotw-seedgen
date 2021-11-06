@@ -40,6 +40,10 @@ pub enum Requirement<'a> {
     SwordSentryJump(u16),
     HammerSentryJump(u16),
     SentryBurn(u16),
+    LaunchSwap,
+    SentrySwap(u16),
+    FlashSwap,
+    BlazeSwap(u16),
 }
 #[derive(Debug)]
 pub struct Line<'a> {
@@ -161,6 +165,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             };
             match keyword {
                 "Blaze" => Ok(Requirement::EnergySkill(Skill::Blaze, amount)),
+                "BlazeSwap" => Ok(Requirement::BlazeSwap(amount)),
                 "Boss" => Ok(Requirement::Boss(amount)),
                 "Bow" => Ok(Requirement::EnergySkill(Skill::Bow, amount)),
                 "BreakWall" => Ok(Requirement::BreakWall(amount)),
@@ -178,6 +183,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
                 "HammerSJump" => Ok(Requirement::HammerSentryJump(amount)),
                 "SentryBreak" => Ok(Requirement::SentryBreak(amount)),
                 "SentryBurn" => Ok(Requirement::SentryBurn(amount)),
+                "SentrySwap" => Ok(Requirement::SentrySwap(amount)),
                 "ShardSlot" => Ok(Requirement::Resource(Resource::ShardSlot, amount)),
                 "Shuriken" => Ok(Requirement::EnergySkill(Skill::Shuriken, amount)),
                 "ShurikenBreak" => Ok(Requirement::ShurikenBreak(amount)),
@@ -206,6 +212,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             "EnergyHarvest" => Ok(Requirement::Shard(Shard::EnergyHarvest)),
             "Flap" => Ok(Requirement::Skill(Skill::Flap)),
             "Flash" => Ok(Requirement::Skill(Skill::Flash)),
+            "FlashSwap" => Ok(Requirement::FlashSwap),
             "Fracture" => Ok(Requirement::Shard(Shard::Fracture)),
             "free" => Ok(Requirement::Free),
             "GladesTP" => Ok(Requirement::Teleporter(Teleporter::Glades)),
@@ -219,6 +226,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             "InnerRuinsTP" => Ok(Requirement::Teleporter(Teleporter::InnerRuins)),
             "kii" => Ok(Requirement::Difficulty(Difficulty::Kii)),
             "Launch" => Ok(Requirement::Skill(Skill::Launch)),
+            "LaunchSwap" => Ok(Requirement::LaunchSwap),
             "LifeHarvest" => Ok(Requirement::Shard(Shard::LifeHarvest)),
             "Magnet" => Ok(Requirement::Shard(Shard::Magnet)),
             "MarshTP" => Ok(Requirement::Teleporter(Teleporter::Marsh)),
@@ -252,7 +260,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             "WillowTP" => Ok(Requirement::Teleporter(Teleporter::Willow)),
             _ if metadata.definitions.contains(keyword) => Ok(Requirement::Definition(keyword)),
             _ if metadata.states.contains(keyword) || metadata.quests.contains(keyword) => Ok(Requirement::State(keyword)),
-            "Combat" | "Boss" | "BreakWall" | "Damage" | "Danger" | "Energy" | "Health" | "Keystone" | "Ore" | "SentryBreak" | "SentryBurn" | "SentryJump"| "SwordSJump" | "HammerSJump" | "ShardSlot" | "ShurikenBreak" | "SpiritLight"
+            "BlazeSwap" | "Boss" | "BreakWall" | "Combat" | "Damage" | "Danger" | "Energy" | "Health" | "Keystone" | "Ore" | "SentryBreak" | "SentryBurn" | "SentryJump"| "SentrySwap" | "SwordSJump" | "HammerSJump" | "ShardSlot" | "ShurikenBreak" | "SpiritLight"
                 => Err(wrong_amount(token)),
             _ => Err(wrong_requirement(token))
         }

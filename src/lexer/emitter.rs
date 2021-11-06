@@ -139,6 +139,30 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
             } else {
                 Requirement::Impossible
             },
+        parser::Requirement::LaunchSwap =>
+            if context.settings.glitches.contains(&Glitch::LaunchSwap) {
+                Requirement::Skill(Skill::Launch)
+            } else {
+                Requirement::Impossible
+            },
+        parser::Requirement::SentrySwap(amount) =>
+            if context.settings.glitches.contains(&Glitch::SentrySwap) {
+                Requirement::EnergySkill(Skill::Sentry, (*amount).into())
+            } else {
+                Requirement::Impossible
+            },
+        parser::Requirement::FlashSwap =>
+            if context.settings.glitches.contains(&Glitch::FlashSwap) {
+                Requirement::NonConsumingEnergySkill(Skill::Flash)
+            } else {
+                Requirement::Impossible
+            },
+        parser::Requirement::BlazeSwap(amount) =>
+            if context.settings.glitches.contains(&Glitch::BlazeSwap) {
+                Requirement::EnergySkill(Skill::Blaze, (*amount).into())
+            } else {
+                Requirement::Impossible
+            },
     }
 }
 
