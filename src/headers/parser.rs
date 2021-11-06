@@ -476,13 +476,19 @@ where P: Iterator<Item=&'a str>
         remaining = &remaining[1..];
     }
 
-    // TODO simulate suppress
+    let mut skip = false;
     if let Some(last) = remaining.rfind('|') {
         let mut last_part = &remaining[last + 1..];
         if let Some(skip) = last_part.strip_prefix("skip=") {
             last_part = skip;
         }
-        if last_part.parse::<u32>().is_ok() {
+        if let Ok(skip_amount) = last_part.parse::<u8>() {
+            if skip_amount > 0 {
+                if skip_amount > 1 {
+                    log::warn!("An UberState pickup is skipping the next {} triggers, note that this will not be correctly simulated during seed generation.", last_part);
+                }
+                skip = true;
+            }
             remaining = &remaining[..last];
         }
     }
@@ -534,6 +540,7 @@ where P: Iterator<Item=&'a str>
         signed,
         sign,
         operator,
+        skip,
     }))
 }
 fn parse_world_event<'a, P>(mut parts: P) -> Result<Item, String>

@@ -47,8 +47,6 @@ impl<'a> World<'a> {
                     }.to_owned();
 
                     let entry = self.uber_states.entry(command.uber_identifier.to_owned()).or_insert_with(|| String::from("0"));
-                    if !command.signed && entry == &uber_value { return Ok(()); }
-
                     let uber_value = match command.uber_type {
                         UberType::Bool | UberType::Teleporter => uber_value.to_string(),
                         UberType::Byte | UberType::Int => {
@@ -82,14 +80,19 @@ impl<'a> World<'a> {
                             }
                         },
                     };
-                    *entry = uber_value;
+                    if uber_value == "false" || uber_value == "0" || uber_value == *entry { return Ok(()); }
 
-                    if entry == "false" || entry == "0" { return Ok(()); }
+                    *entry = uber_value;
 
                     let uber_state = UberState {
                         identifier: command.uber_identifier.to_owned(),
                         value: entry.clone(),
                     };
+
+                    if command.skip {
+                        log::trace!("Skipped granting UberState {}", uber_state);
+                        return Ok(());
+                    }
 
                     log::trace!("Granting player UberState {}", uber_state);
                     self.collect_preplacements(&uber_state);
