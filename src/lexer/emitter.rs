@@ -113,6 +113,12 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::Requirement::SentrySwap(amount) => build_glitch_requirement(&Glitch::SentrySwap, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
         parser::Requirement::FlashSwap => build_glitch_requirement(&Glitch::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
         parser::Requirement::BlazeSwap(amount) => build_glitch_requirement(&Glitch::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
+        parser::Requirement::WaveDash => build_glitch_requirement(&Glitch::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
+        parser::Requirement::GrenadeJump => build_glitch_requirement(&Glitch::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
+        parser::Requirement::HammerJump => build_glitch_requirement(&Glitch::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::SwordJump => build_glitch_requirement(&Glitch::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Glitch::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
+        parser::Requirement::SentryRedirect(amount) => build_glitch_requirement(&Glitch::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
     }
 }
 

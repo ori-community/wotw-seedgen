@@ -38,6 +38,13 @@ pub enum Glitch {
     SentrySwap,         // Using the weapon wheel to cancel Sentry
     FlashSwap,          // Using the weapon wheel to cancel Flash
     BlazeSwap,          // Using the weapon wheel to cancel Blaze
+    WaveDash,           // Gaining speed off a wall with Regenerate and Dash
+    GrenadeJump,        // Preserving jump momentum with Grenade
+    HammerJump,         // Preserving Double Jump momentum with Hammer
+    SwordJump,          // Preserving Double Jump momentum with Sword
+    GrenadeRedirect,    // Redirecting projectiles with Grenade
+    SentryRedirect,     // Redirecting projectiles with Sentry
+    PauseHover,         // Cancelling falling momentum through the pause menu
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
