@@ -139,7 +139,7 @@ struct SeedSettings {
     difficulty: String,
     /// glitches you may be required to use
     ///
-    /// glitches are swordsjump, hammersjump, shurikenbreak, hammerbreak, sentryburn, removekillplane
+    /// glitches are shurikenbreak, sentrybreak, hammerbreak, spearbreak, swordsjump, hammersjump, sentryburn, removekillplane, launchswap, sentryswap, flashswap, blazeswap, wavedash, grenadejump, hammerjump, swordjump, grenaderedirect, sentryredirect, pausehover
     #[structopt(short = "G", long)]
     glitches: Vec<String>,
     /// which goal modes to use
@@ -262,7 +262,18 @@ fn parse_glitches(names: &[String]) -> Vec<Glitch> {
             "hammersjump" | "hammersentryjump" => glitches.push(Glitch::HammerSentryJump),
             "sentryburn" => glitches.push(Glitch::SentryBurn),
             "removekillplane" => glitches.push(Glitch::RemoveKillPlane),
-            other => log::warn!("Unknown pathset {}", other),
+            "launchswap" => glitches.push(Glitch::LaunchSwap),
+            "sentryswap" => glitches.push(Glitch::SentrySwap),
+            "flashswap" => glitches.push(Glitch::FlashSwap),
+            "blazeswap" => glitches.push(Glitch::BlazeSwap),
+            "wavedash" => glitches.push(Glitch::WaveDash),
+            "grenadejump" => glitches.push(Glitch::GrenadeJump),
+            "hammerjump" => glitches.push(Glitch::HammerJump),
+            "swordjump" => glitches.push(Glitch::SwordJump),
+            "grenaderedirect" => glitches.push(Glitch::GrenadeRedirect),
+            "sentryredirect" => glitches.push(Glitch::SentryRedirect),
+            "pausehover" => glitches.push(Glitch::PauseHover),
+            other => log::warn!("Unknown glitch {}", other),
         }
     }
 
