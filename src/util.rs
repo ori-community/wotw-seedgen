@@ -36,12 +36,12 @@ pub enum Glitch {
     RemoveKillPlane,    // Removing Shriek's Killplane at Feeding Grounds
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum GoalMode {
     Wisps,
     Trees,
     Quests,
-    Relics,
+    Relics(f64),
 }
 impl fmt::Display for GoalMode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -49,7 +49,7 @@ impl fmt::Display for GoalMode {
             GoalMode::Wisps => write!(f, "ForceWisps"),
             GoalMode::Trees => write!(f, "ForceTrees"),
             GoalMode::Quests => write!(f, "ForceQuests"),
-            GoalMode::Relics => write!(f, "WorldTour"),
+            GoalMode::Relics(_) => write!(f, "WorldTour"),
         }
     }
 }
