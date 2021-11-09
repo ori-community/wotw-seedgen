@@ -34,14 +34,25 @@ pub enum Glitch {
     SpearBreak,         // Breaking Walls from behind with Spear
     SentryBurn,         // Melting Ice using Sentries
     RemoveKillPlane,    // Removing Shriek's Killplane at Feeding Grounds
+    LaunchSwap,         // Using the weapon wheel to cancel Launch
+    SentrySwap,         // Using the weapon wheel to cancel Sentry
+    FlashSwap,          // Using the weapon wheel to cancel Flash
+    BlazeSwap,          // Using the weapon wheel to cancel Blaze
+    WaveDash,           // Gaining speed off a wall with Regenerate and Dash
+    GrenadeJump,        // Preserving jump momentum with Grenade
+    HammerJump,         // Preserving Double Jump momentum with Hammer
+    SwordJump,          // Preserving Double Jump momentum with Sword
+    GrenadeRedirect,    // Redirecting projectiles with Grenade
+    SentryRedirect,     // Redirecting projectiles with Sentry
+    PauseHover,         // Cancelling falling momentum through the pause menu
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum GoalMode {
     Wisps,
     Trees,
     Quests,
-    Relics,
+    Relics(f64),
 }
 impl fmt::Display for GoalMode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -49,7 +60,7 @@ impl fmt::Display for GoalMode {
             GoalMode::Wisps => write!(f, "ForceWisps"),
             GoalMode::Trees => write!(f, "ForceTrees"),
             GoalMode::Quests => write!(f, "ForceQuests"),
-            GoalMode::Relics => write!(f, "WorldTour"),
+            GoalMode::Relics(_) => write!(f, "WorldTour"),
         }
     }
 }

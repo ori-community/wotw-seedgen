@@ -14,6 +14,7 @@ pub enum Requirement {
     Impossible,
     Skill(Skill),
     EnergySkill(Skill, f32),
+    NonConsumingEnergySkill(Skill),
     SpiritLight(u16),
     Resource(Resource, u16),
     Shard(Shard),
@@ -44,6 +45,15 @@ impl Requirement {
             }
         ])} else { None }
     }
+    fn nonconsuming_cost_is_met(cost: f32, player: &Player, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
+        if orbs.energy >= cost || (
+            player.difficulty >= Difficulty::Unsafe &&
+            player.inventory.has(&Item::Shard(Shard::LifePact), 1) &&
+            orbs.energy + orbs.health > cost
+        ) {
+            Some(smallvec![Orbs::default()])
+        } else { None }
+    }
 
     pub fn is_met(&self, player: &Player, states: &FxHashSet<usize>, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
         match self {
@@ -55,6 +65,11 @@ impl Requirement {
                 if player.inventory.has(&Item::Skill(*skill), 1) {
                     let cost = player.use_cost(*skill) * *amount;
                     return Requirement::cost_is_met(cost, player, orbs);
+                }
+            Requirement::NonConsumingEnergySkill(skill) =>
+                if player.inventory.has(&Item::Skill(*skill), 1) {
+                    let cost = player.use_cost(*skill);
+                    return Requirement::nonconsuming_cost_is_met(cost, player, orbs);
                 }
             Requirement::SpiritLight(amount) =>
                 if player.inventory.has(&Item::SpiritLight(1), *amount) { return Some(smallvec![Orbs::default()]); },
@@ -286,6 +301,13 @@ impl Requirement {
             Requirement::Skill(skill) => vec![(Inventory::from(Item::Skill(*skill)), Orbs::default())],
             Requirement::EnergySkill(skill, amount) => {
                 let cost = player.use_cost(*skill) * *amount;
+                let mut itemsets = Requirement::needed_for_cost(cost, player);
+                Requirement::combine_itemset_item(&mut itemsets, &Item::Skill(*skill));
+
+                itemsets
+            },
+            Requirement::NonConsumingEnergySkill(skill) => {
+                let cost = player.use_cost(*skill);
                 let mut itemsets = Requirement::needed_for_cost(cost, player);
                 Requirement::combine_itemset_item(&mut itemsets, &Item::Skill(*skill));
 

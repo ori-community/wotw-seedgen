@@ -8,7 +8,8 @@ pub struct UberStateItem {
     pub uber_type: UberType,
     pub signed: bool,
     pub sign: bool,
-    pub operator: UberStateOperator
+    pub operator: UberStateOperator,
+    pub skip: bool,
 }
 impl fmt::Display for UberStateItem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

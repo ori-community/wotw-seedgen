@@ -12,7 +12,6 @@ use std::{
 use structopt::StructOpt;
 use bugsalot::debugger;
 
-use rustc_hash::FxHashSet;
 use log::LevelFilter;
 
 use seedgen::{self, lexer, item, world, headers, settings, util};
@@ -140,12 +139,12 @@ struct SeedSettings {
     difficulty: String,
     /// glitches you may be required to use
     ///
-    /// glitches are swordsjump, hammersjump, shurikenbreak, hammerbreak, sentryburn, removekillplane
+    /// glitches are shurikenbreak, sentrybreak, hammerbreak, spearbreak, swordsjump, hammersjump, sentryburn, removekillplane, launchswap, sentryswap, flashswap, blazeswap, wavedash, grenadejump, hammerjump, swordjump, grenaderedirect, sentryredirect, pausehover
     #[structopt(short = "G", long)]
     glitches: Vec<String>,
     /// which goal modes to use
     /// 
-    /// goal modes are trees, wisps, quests, relics
+    /// goal modes are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
     #[structopt(short, long)]
     goals: Vec<String>,
     /// where to spawn the player
@@ -263,26 +262,53 @@ fn parse_glitches(names: &[String]) -> Vec<Glitch> {
             "hammersjump" | "hammersentryjump" => glitches.push(Glitch::HammerSentryJump),
             "sentryburn" => glitches.push(Glitch::SentryBurn),
             "removekillplane" => glitches.push(Glitch::RemoveKillPlane),
-            other => log::warn!("Unknown pathset {}", other),
+            "launchswap" => glitches.push(Glitch::LaunchSwap),
+            "sentryswap" => glitches.push(Glitch::SentrySwap),
+            "flashswap" => glitches.push(Glitch::FlashSwap),
+            "blazeswap" => glitches.push(Glitch::BlazeSwap),
+            "wavedash" => glitches.push(Glitch::WaveDash),
+            "grenadejump" => glitches.push(Glitch::GrenadeJump),
+            "hammerjump" => glitches.push(Glitch::HammerJump),
+            "swordjump" => glitches.push(Glitch::SwordJump),
+            "grenaderedirect" => glitches.push(Glitch::GrenadeRedirect),
+            "sentryredirect" => glitches.push(Glitch::SentryRedirect),
+            "pausehover" => glitches.push(Glitch::PauseHover),
+            other => log::warn!("Unknown glitch {}", other),
         }
     }
 
     glitches
 }
-fn parse_goalmodes(names: &[String]) -> FxHashSet<GoalMode> {
-    let mut goalmodes = FxHashSet::default();
+fn parse_goalmodes(names: &[String]) -> Result<Vec<GoalMode>, String> {
+    let mut goalmodes = Vec::new();
 
     for goalmode in names {
-        match &goalmode.to_lowercase()[..] {
-            "t" | "trees" => { goalmodes.insert(GoalMode::Trees); },
-            "w" | "wisps" => { goalmodes.insert(GoalMode::Wisps); },
-            "q" | "quests" => { goalmodes.insert(GoalMode::Quests); },
-            "r" | "relics" => { goalmodes.insert(GoalMode::Relics); },
+        let mut parts = goalmode.split(':');
+        let identifier = parts.next().unwrap();
+
+        match identifier {
+            "t" | "trees" => { goalmodes.push(GoalMode::Trees); },
+            "w" | "wisps" => { goalmodes.push(GoalMode::Wisps); },
+            "q" | "quests" => { goalmodes.push(GoalMode::Quests); },
+            "r" | "relics" => {
+                let chance = if let Some(details) = parts.next() {
+                    let chance = details.strip_suffix('%').ok_or_else(|| format!("Expected % expression in details string for goal mode {}", goalmode))?;
+                    let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal mode {}", goalmode))?;
+                    if chance < 0.0 || chance > 100.0 { return Err(format!("Invalid chance in details string for goal mode {}", goalmode)); }
+                    chance / 100.0
+                } else { 0.6 };
+
+                goalmodes.push(GoalMode::Relics(chance));
+            },
             other => log::warn!("Unknown goal mode {}", other),
+        }
+
+        if parts.next().is_some() {
+            return Err(format!("Unexpected details string in goal mode {}", goalmode));
         }
     }
 
-    goalmodes
+    Ok(goalmodes)
 }
 fn parse_spawn(spawn: String) -> Spawn {
     match &spawn.to_lowercase()[..] {
@@ -310,7 +336,7 @@ fn parse_settings(settings: SeedSettings) -> Result<Settings, String> {
 
     let difficulty = parse_difficulty(&difficulty)?;
     let glitches = parse_glitches(&glitches);
-    let goalmodes = parse_goalmodes(&goals);
+    let goalmodes = parse_goalmodes(&goals)?;
     let spawn = parse_spawn(spawn);
 
     if worlds == 0 {

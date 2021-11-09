@@ -6,6 +6,7 @@ use std::{
 };
 
 use rustc_hash::FxHashSet;
+
 use serde::{Serialize, Deserialize};
 
 use crate::util::{
@@ -36,7 +37,7 @@ pub struct Settings {
     pub players: Vec<String>,
     pub difficulty: Difficulty,
     pub glitches: Vec<Glitch>,
-    pub goalmodes: FxHashSet<GoalMode>,
+    pub goalmodes: Vec<GoalMode>,
     pub spawn_loc: Spawn,
     pub race: bool,
     pub disable_logic_filter: bool,
@@ -54,7 +55,7 @@ impl Default for Settings {
             players: Vec::default(),
             difficulty: Difficulty::default(),
             glitches: Vec::default(),
-            goalmodes: FxHashSet::default(),
+            goalmodes: Vec::default(),
             spawn_loc: Spawn::default(),
             race: false,
             disable_logic_filter: false,
@@ -68,9 +69,11 @@ impl Default for Settings {
 impl Settings {
     pub fn compability_parse(json: &str) -> Result<Settings, String> {
         serde_json::from_str(&json).or_else(|err| {  // current
-            read_pre_1_0_0(&json).or_else(|_| {  // < 1.0.0
-                read_pre_0_13_2(&json).or_else(|_| {  // < 0.13.2
-                    read_pre_rustgen(&json).map_err(|_| format!("Failed to read settings: {}", err))  // javagen
+            read_pre_1_0_10(&json).or_else(|_| {  // < 1.0.10
+                read_pre_1_0_0(&json).or_else(|_| {  // < 1.0.0
+                    read_pre_0_13_2(&json).or_else(|_| {  // < 0.13.2
+                        read_pre_rustgen(&json).map_err(|_| format!("Failed to read settings: {}", err))  // javagen
+                    })
                 })
             })
         })
@@ -262,11 +265,11 @@ fn read_pre_rustgen(json: &str) -> Result<Settings, io::Error> {
 
     let spawn_loc = if old_settings.flags.random_spawn { Spawn::Random } else { Spawn::Set(old_settings.spawn_loc) };
 
-    let mut goalmodes = FxHashSet::default();
-    if old_settings.flags.force_wisps { goalmodes.insert(GoalMode::Wisps); }
-    if old_settings.flags.force_trees { goalmodes.insert(GoalMode::Trees); }
-    if old_settings.flags.force_quests { goalmodes.insert(GoalMode::Quests); }
-    if old_settings.flags.world_tour { goalmodes.insert(GoalMode::Relics); }
+    let mut goalmodes = Vec::new();
+    if old_settings.flags.force_wisps { goalmodes.push(GoalMode::Wisps); }
+    if old_settings.flags.force_trees { goalmodes.push(GoalMode::Trees); }
+    if old_settings.flags.force_quests { goalmodes.push(GoalMode::Quests); }
+    if old_settings.flags.world_tour { goalmodes.push(GoalMode::Relics(80.0)); }
 
     Ok(Settings {
         difficulty,
@@ -288,7 +291,7 @@ pub struct Pre0_13_2Settings {
     pub worlds: usize,
     pub players: Vec<String>,
     pub pathsets: Vec<String>,
-    pub goalmodes: FxHashSet<GoalMode>,
+    pub goalmodes: Vec<GoalMode>,
     pub spawn_loc: Spawn,
     pub spoilers: bool,
     pub web_conn: bool,
@@ -346,7 +349,7 @@ pub struct Pre1_0_0Settings {
     pub players: Vec<String>,
     pub difficulty: Difficulty,
     pub glitches: Vec<Glitch>,
-    pub goalmodes: FxHashSet<GoalMode>,
+    pub goalmodes: Vec<GoalMode>,
     pub spawn_loc: Spawn,
     pub spoilers: bool,
     pub web_conn: bool,
@@ -375,10 +378,66 @@ fn read_pre_1_0_0(json: &str) -> Result<Settings, io::Error> {
     })
 }
 
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum Pre1_0_10GoalMode {
+    Wisps,
+    Trees,
+    Quests,
+    Relics,
+}
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Pre1_0_10Settings {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+    pub presets: Vec<PathBuf>,
+    pub worlds: usize,
+    pub players: Vec<String>,
+    pub difficulty: Difficulty,
+    pub glitches: Vec<Glitch>,
+    pub goalmodes: FxHashSet<Pre1_0_10GoalMode>,
+    pub spawn_loc: Spawn,
+    pub race: bool,
+    pub disable_logic_filter: bool,
+    pub web_conn: bool,
+    pub hard: bool,
+    pub header_list: Vec<PathBuf>,
+    pub header_args: Vec<String>,
+}
+fn read_pre_1_0_10(json: &str) -> Result<Settings, io::Error> {
+    let old_settings: Pre1_0_10Settings = serde_json::from_str(json)?;
+    let goalmodes = old_settings.goalmodes.into_iter().map(|goalmode|
+        match goalmode {
+            Pre1_0_10GoalMode::Wisps => GoalMode::Wisps,
+            Pre1_0_10GoalMode::Trees => GoalMode::Trees,
+            Pre1_0_10GoalMode::Quests => GoalMode::Quests,
+            Pre1_0_10GoalMode::Relics => GoalMode::Relics(0.8),
+        }
+    ).collect();
+
+    Ok(Settings {
+        version: old_settings.version,
+        presets: old_settings.presets,
+        worlds: old_settings.worlds,
+        players: old_settings.players,
+        difficulty: old_settings.difficulty,
+        glitches: old_settings.glitches,
+        goalmodes: goalmodes,
+        spawn_loc: old_settings.spawn_loc,
+        race: old_settings.race,
+        disable_logic_filter: old_settings.disable_logic_filter,
+        web_conn: old_settings.web_conn,
+        hard: old_settings.hard,
+        header_list: old_settings.header_list,
+        header_args: old_settings.header_args,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    use rustc_hash::FxHashSet;
     use rand::{
         Rng,
         distributions::{Distribution, Alphanumeric},
@@ -392,10 +451,10 @@ mod tests {
         for _ in 0..1000 {
             let mut settings = Settings::default();
 
-            let goalmodes = vec![GoalMode::Wisps,GoalMode::Trees,GoalMode::Quests,GoalMode::Relics];
+            let goalmodes = vec![GoalMode::Wisps, GoalMode::Trees, GoalMode::Quests, GoalMode::Relics(80.0)];
             for goalmode in goalmodes {
                 if rng.gen_bool(0.25) {
-                    settings.goalmodes.insert(goalmode);
+                    settings.goalmodes.push(goalmode);
                 }
             }
 

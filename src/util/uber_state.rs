@@ -87,6 +87,7 @@ impl UberState {
             signed: false,
             sign: false,
             operator: UberStateOperator::Value(value),
+            skip: false,
         })
     }
 

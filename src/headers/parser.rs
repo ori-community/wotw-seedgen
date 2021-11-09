@@ -362,6 +362,15 @@ where P: Iterator<Item=&'a str>
     let (value, item) = parse_if_self(parts)?;
     Ok(Item::Command(Command::IfSelfLess { value, item }))
 }
+fn parse_unequip<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let ability = parts.next().ok_or_else(|| String::from("missing ability to unequip"))?;
+    let ability: u16 = ability.parse().map_err(|_| String::from("invalid ability to unequip"))?;
+    end_of_item(parts)?;
+
+    Ok(Item::Command(Command::UnEquip { ability }))
+}
 fn parse_command<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
@@ -395,6 +404,7 @@ where P: Iterator<Item=&'a str>
         "25" => parse_if_self_equal(parts),
         "26" => parse_if_self_greater(parts),
         "27" => parse_if_self_less(parts),
+        "28" => parse_unequip(parts),
         _ => Err(String::from("invalid command type")),
     }
 }
@@ -466,13 +476,19 @@ where P: Iterator<Item=&'a str>
         remaining = &remaining[1..];
     }
 
-    // TODO simulate suppress
+    let mut skip = false;
     if let Some(last) = remaining.rfind('|') {
         let mut last_part = &remaining[last + 1..];
         if let Some(skip) = last_part.strip_prefix("skip=") {
             last_part = skip;
         }
-        if last_part.parse::<u32>().is_ok() {
+        if let Ok(skip_amount) = last_part.parse::<u8>() {
+            if skip_amount > 0 {
+                if skip_amount > 1 {
+                    log::warn!("An UberState pickup is skipping the next {} triggers, note that this will not be correctly simulated during seed generation.", last_part);
+                }
+                skip = true;
+            }
             remaining = &remaining[..last];
         }
     }
@@ -524,6 +540,7 @@ where P: Iterator<Item=&'a str>
         signed,
         sign,
         operator,
+        skip,
     }))
 }
 fn parse_world_event<'a, P>(mut parts: P) -> Result<Item, String>

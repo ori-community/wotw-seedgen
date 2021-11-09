@@ -11,9 +11,9 @@
 # Gorlek and above:
 # BreakCrystal: An energy crystal is broken with Sword, Hammer, Bow, Shuriken or Grenade
 # ShurikenBreak=x: A wall with x Health is broken from behind using Shuriken
-# SentryJump=x: Short for Sentry=1, Sword OR Hammer
-# SwordSJump=x: Short for Sentry=1, Sword
-# HammerSJump=x: Short for Sentry=1, Hammer
+# SentryJump=x: Extends to Sentry=1, Sword OR Hammer
+# SwordSJump=x: Extends to Sentry=1, Sword
+# HammerSJump=x: Extends to Sentry=1, Hammer
 # SentryBurn=x: Use x Sentries to melt ice or light lanterns
 # RemoveKillPlane: Remove the kill plane at feeding grounds
 # Unsafe:
@@ -21,6 +21,17 @@
 # SentryBreak=x: A wall with x Health is broken from behind using Sentry
 # HammerBreak: A wall with is broken from behind using Hammer
 # SpearBreak: A wall with is broken from behind using one Spear
+# LaunchSwap: Extends to Launch
+# FlashSwap: Extends to Flash and having energy to use it
+# SentrySwap=x: Extends to Sentry=x
+# BlazeSwap=x: Extends to Blaze=x
+# WaveDash: Extends to Dash, Regenerate and having energy to use it
+# GrenadeJump: Extends to Grenade and having energy to use it
+# HammerJump: Extends to Hammer, DoubleJump
+# SwordJump: Extends to Sword, DoubleJump
+# GrenadeRedirect=x: Extends to Grenade=x
+# SentryRedirect=x: Extends to Sentry=x
+# PauseFloat: Use the pause menu to cancel falling speed
 
 # requirement macros. must go at the top of the file!
 
@@ -9846,8 +9857,6 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
 anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right of the sand after the keystone door
   refill Checkpoint
 
-  state UpperWastes.KeystoneDoor:
-    moki, Keystone=2: Burrow
   state UpperWastes.KeystoneDoor:
     moki, Keystone=2: Burrow
 
