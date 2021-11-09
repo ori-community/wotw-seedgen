@@ -7,9 +7,9 @@
 //// How many Launch Fragments are required to get Launch
 !!parameter required int:3
 
-!!name 8|9|2|int|+1 Launch Fragment
+!!name 8|9|2|int|+1 *Launch Fragment*
+!!display 8|9|2|int|+1 $[(9|999=200)]
 !!add $PARAM(count)x 8|9|2|int|+1                                                       // Scatter fragments
-9|2|6|$[(9|999=200)]                                                                    // Show message
 !9|2|4|17|9|2|$PARAM(required)|2|8                                                      // Give Launch (out of logic)
 9|2=$PARAM(count)|6|f=0
 9|2=$PARAM(count)|2|8                                                                   // Give logical Launch

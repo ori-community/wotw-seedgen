@@ -7,15 +7,17 @@ use std::{
 use rand::Rng;
 use regex::Regex;
 
-use crate::world::{
-    World,
-    graph::Graph,
+use crate::{
+    ItemDetails,
+    world::{
+        World,
+        graph::Graph,
+    },
+    inventory::Inventory,
+    item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary},
+    settings::Settings,
+    util::{self, Zone, Icon, UberState, UberType, UberIdentifier},
 };
-use crate::inventory::Inventory;
-use crate::item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary
-};
-use crate::settings::Settings;
-use crate::util::{self, Zone, Icon, UberState, UberType, UberIdentifier};
 
 fn end_of_item<'a, I>(mut parts: I) -> Result<(), String>
 where
@@ -932,37 +934,52 @@ fn remove_command(mut item: &str, world: &mut World, negative_inventory: &mut In
     Ok(())
 }
 #[inline]
-fn name_command(naming: &str, names: &mut HashMap<String, String>) -> Result<(), String> {
+fn name_command(naming: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = naming.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
     let name = parts.next().ok_or_else(|| String::from("Missing name"))?;
 
-    names.insert(item.to_string(), name.to_string());
+    let entry = custom_items.entry(item.to_owned()).or_default();
+    entry.name = Some(name.to_owned());
 
     Ok(())
 }
 #[inline]
-fn price_command(price: &str, prices: &mut HashMap<String, u16>) -> Result<(), String> {
+fn display_command(display: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
+    let mut parts = display.splitn(2, ' ');
+    let item = parts.next().unwrap();
+    parse_item(item)?;
+    let display = parts.next().ok_or_else(|| String::from("Missing display name"))?;
+
+    let entry = custom_items.entry(item.to_owned()).or_default();
+    entry.display = Some(display.to_owned());
+
+    Ok(())
+}
+#[inline]
+fn price_command(price: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = price.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
     let price = parts.next().ok_or_else(|| String::from("Missing price"))?;
     let price: u16 = price.parse().map_err(|_| format!("invalid price {}", price))?;
 
-    prices.insert(item.to_string(), price);
+    let entry = custom_items.entry(item.to_owned()).or_default();
+    entry.price = Some(price);
 
     Ok(())
 }
 #[inline]
-fn icon_command(icon: &str, icons: &mut HashMap<String, Icon>) -> Result<(), String> {
+fn icon_command(icon: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = icon.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
     let icon = parts.next().ok_or_else(|| String::from("Missing icon"))?;
     let icon = parse_icon(icon)?;
 
-    icons.insert(item.to_string(), icon);
+    let entry = custom_items.entry(item.to_owned()).or_default();
+    entry.icon = Some(icon);
 
     Ok(())
 }
@@ -1100,9 +1117,7 @@ pub struct HeaderContext {
     pub dependencies: Vec<PathBuf>,
     pub excludes: HashMap<String, String>,
     pub flags: Vec<String>,
-    pub names: HashMap<String, String>,
-    pub prices: HashMap<String, u16>,
-    pub icons: HashMap<String, Icon>,
+    pub custom_items: HashMap<String, ItemDetails>,
     pub sets: Vec<String>,
     pub negative_inventory: Inventory,
 }
@@ -1168,11 +1183,13 @@ where R: Rng + ?Sized
             } else if let Some(item) = command.strip_prefix("remove ") {
                 remove_command(item.trim(), world, &mut context.negative_inventory).map_err(|err| format!("{} in remove command {}", err, line))?;
             } else if let Some(naming) = command.strip_prefix("name ") {
-                name_command(naming.trim(), &mut context.names).map_err(|err| format!("{} in name command {}", err, line))?;
+                name_command(naming.trim(), &mut context.custom_items).map_err(|err| format!("{} in name command {}", err, line))?;
+            } else if let Some(display) = command.strip_prefix("display ") {
+                display_command(display.trim(), &mut context.custom_items).map_err(|err| format!("{} in display command {}", err, line))?;
             } else if let Some(price) = command.strip_prefix("price ") {
-                price_command(price.trim(), &mut context.prices).map_err(|err| format!("{} in price command {}", err, line))?;
+                price_command(price.trim(), &mut context.custom_items).map_err(|err| format!("{} in price command {}", err, line))?;
             } else if let Some(icon) = command.strip_prefix("icon ") {
-                icon_command(icon.trim(), &mut context.icons).map_err(|err| format!("{} in icon command {}", err, line))?;
+                icon_command(icon.trim(), &mut context.custom_items).map_err(|err| format!("{} in icon command {}", err, line))?;
             } else if let Some(parameter) = command.strip_prefix("parameter ") {
                 parameter_command(parameter.trim(), &mut parameters, header_param_values).map_err(|err| format!("{} in parameter command {}", err, line))?;
             } else if let Some(string) = command.strip_prefix("pool ") {
