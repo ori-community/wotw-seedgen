@@ -2990,22 +2990,22 @@ region WestGlades:
   kii: free
   unsafe: free
 
-anchor WestGlades.PastTown at -545, -4113:  # The right edge of the first pool past glades
+anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool in WestGlades
   refill Checkpoint
   refill Energy=3:
     moki, BreakCrystal:
       DoubleJump, Dash OR Glide
       Launch
-#@validator everything beside moki paths need validation
-    gorlek, BreakCrystal, Bow OR Grenade:
-      Water OR Glide  # break the crystal from afar and jump into the water to get the energy
-      DoubleJump, TripleJump  # break the crystal from afar and use triple jump to collect the energy midair
-    kii, BreakCrystal:
-      Bow OR Shuriken OR Grenade:  #Ranged Weapons
+    gorlek, Bow=1 OR Grenade=1:
+        Water  # break the crystal from afar and jump into the water to get the energy
+        Glide  # break the crystal from afar and use glide to collect the energy midair
+        DoubleJump, TripleJump  # break the crystal from afar and use triple jump to collect the energy midair
+    kii:
+      Bow=1 OR Shuriken=1 OR Grenade=1:
         Water OR DoubleJump OR Dash OR Glide OR Hammer OR Sword
-      Sword, Water OR Glide
-      Hammer, Water, DoubleJump OR Dash
-      Hammer, Glide, DoubleJump OR Dash
+      Water OR Glide:
+        Sword
+        Hammer, DoubleJump OR Dash
 
   state GladesTown.GromsWall:
     unsafe: Bash, Launch
@@ -3028,6 +3028,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the first pool p
       Dash, Sword  # pogo the projectile
       DoubleJump, Spear=1
       Grenade=1  # grenade jump
+      Glide, DoubleJump  # GlideJump
       Bash:
         Glide OR Bow=1                   # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
         WaterDash, Water OR Damage=20
@@ -3047,7 +3048,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the first pool p
       SentryJump=2, Glide, Combat=Tentacle
     kii:
       Bash, Sword OR Hammer
-      Bash, Glide, Water OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
       DoubleJump, TripleJump, Sword  # reset jumps with sword 
       Combat=Tentacle, DoubleJump, TripleJump, Hammer OR Spear=1
     unsafe:
@@ -3105,16 +3106,21 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the first pool p
       DoubleJump, Damage=10, Glide OR Sword
       SwordSJump=1
       HammerSJump=1, DoubleJump OR Dash OR Glide OR Damage=10
-    kii:  # @validator dboost paths don't actually require a dboost but you'll land in friendly spikes most of the time
+    kii:  # dboosts because of friendly spikes
       Sword, DoubleJump
       Sword, Dash, Spear=1 OR Shuriken=1 OR Damage=10
-      Hammer, DoubleJump OR Dash
+      Hammer, Damage=10, DoubleJump OR Dash
       Hammer, Glide, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       HammerSJump=1
       DoubleJump, Glide  # verified damageless
+      Glide  # GlideJump
+      # kii paths without the friendly spikes dboosts
+      Sword, Dash
+      Hammer, DoubleJump OR Dash
+      Hammer, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
-anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the first pool past glades
+anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool in WestGlades
   pickup WestGlades.LeftOre:
     moki: Grapple, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
@@ -3125,12 +3131,13 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the first pool p
     kii:
       DoubleJump, TripleJump, Bash OR Damage=20  # With Bash, use a tentacle projectile
       DoubleJump, TripleJump, Damage=10, Dash OR Glide OR Sword OR Hammer
-      DoubleJump, Damage=20, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Damage=30, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Grapple, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, DoubleJump
-      Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Grapple, Spear=1 OR Blaze=1 OR Damage=20
       Bash, Glide, SwordSJump=1
-      DoubleJump, TripleJump, Glide OR Sword OR Hammer OR Damage=10
+      DoubleJump, TripleJump, Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
   pickup WestGlades.SwimEC:
     moki: Water
     kii:
@@ -3151,12 +3158,13 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the first pool p
     kii:
       Bash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
       Grapple, DoubleJump, TripleJump, Dash OR Sword
-      Grapple, DoubleJump, TripleJump, Glide, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, DoubleJump, TripleJump, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
       SwordSJump=2, Damage=20  # defeating the enemy and sword floating
       DoubleJump, TripleJump, Grapple, Hammer  # Upswing at the end of the glide
-      WaterDash, DoubleJump  # I'm so sorry to whoever have to do it in a real seed https://discord.com/channels/116250700685508615/682188898100838440/847119511651483659
+      Grapple, DoubleJump, TripleJump, Glide, Spear=1  # too hard for kii
+      WaterDash, DoubleJump  # I'm so sorry to whoever have to do it in a real seed https://youtu.be/DI62eNkF18Y
   conn WestGlades.PastTown:
     moki:
       Water OR Launch
@@ -3166,12 +3174,10 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the first pool p
       Bash
       Combat=Tentacle, Sword OR Hammer
       Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-    kii:  # Damage=30 is for one dboost in dirty water (20) + a dboost on the tentacle (10)
-      Damage=20, Damage=30
-      Combat=Tentacle, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
-      Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      WaterDash, Damage=30
-      WaterDash, Combat=Tentacle, Damage=20
+    kii:
+      Combat=Tentacle OR Damage=10:
+        Damage=40 OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Damage=20, WaterDash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
 anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper and lower Glades
   refill Checkpoint
@@ -3192,7 +3198,10 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
       SentryJump=1, Dash
     kii:
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      DoubleJump, TripleJump, Sword, Damage=10  # kill the tentacle while hitting it with sword to keep reseting your jumps
+      Combat=Tentacle, Damage=10:
+        DoubleJump, Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
+        DoubleJump, Damage=10, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
+        Damage=40, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
     unsafe:
       DoubleJump, Sword, Damage=10
       SentryJump=1   # pogo on tentacle
@@ -3200,7 +3209,6 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
   pickup WestGlades.LowerPoolEX:  # This path is strictly because of energy/health management 
     kii:
       Damage=60
-      WaterDash, Damage=40
 
   conn WestGlades.Upper:
     moki:
@@ -3209,15 +3217,19 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
     gorlek:
       Bash
       SentryJump=1, DoubleJump
-    kii: DoubleJump, TripleJump, Sword, Damage=10  # kill the tentacle while hitting it with sword to keep reseting your jumps
+    kii, Combat=Tentacle, Damage=20:
+      DoubleJump, Dash OR Sword
+      DoubleJump, TripleJump, Flash=1 OR Sentry=1 OR Shuriken=1
+      DoubleJump, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
+      Dash, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
+      Damage=30, Dash, Sword
   conn WestGlades.LowerPool:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide OR Bash
-    gorlek: Sword OR Hammer OR Damage=20
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    gorlek: free
   conn WestGlades.PastTown:  # This connection is strictly because of energy/health management
     kii:
-      Damage=30  # one dboost in dirty water (20) + a dboost on the tentacle (10)
-      Combat=Tentacle, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Damage=10 OR Combat=Tentacle:
+        Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
 
 anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions to Wellspring, Reach, and Pools
   refill Checkpoint
@@ -3247,6 +3259,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     unsafe:
       Bash
       Glide  # Glide jump
+      Glide, Spear=1 OR Blaze=1  # too difficult for kii
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
   conn WestGlades.Center: free
@@ -3263,11 +3276,11 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       WaterDash, Damage=20
       SentryJump=1
     kii:
-      Dash, DoubleJump, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Dash, Hammer, Shuriken
+      Dash, DoubleJump, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
+      Dash, Hammer, Shuriken=1
     unsafe:
       Grenade=1  # grenade jump
-      Dash, DoubleJump, Blaze=1
+      Dash, DoubleJump
 
 anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room opening up to Wellspring
   refill Checkpoint
@@ -3301,7 +3314,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Bash, Grenade=1  # Bash the mortar so you can reach your grenade from higher
     unsafe:
       Bash
-      DoubleJump, TripleJump, Sword
+      DoubleJump, TripleJump, Sword OR Hammer
   conn WestGlades.Upper:
     moki:  # realizing the semisolid not considered for moki
       Bash, DoubleJump OR Dash OR Glide OR Grenade=1
@@ -3311,12 +3324,12 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Water, WaterDash
     gorlek:
       Water OR DoubleJump OR Dash OR Glide OR Sword OR Damage=20  # wall jump through the semisolid
-      Hammer, Bash OR SwordSJump=1 OR Grapple
+      Hammer, Bash OR Grapple
     kii:
       Bash OR Hammer OR Sentry=2
-      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Spear=2
     unsafe:
-      Grenade=1, Sentry=1 OR Flash OR Blaze=1 OR Shuriken=1
+      Grenade=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1  # GrenadeJump
   conn OuterWellspring.EntranceDoor:
     moki:
       Launch OR Water
@@ -3338,6 +3351,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Grenade=1, Grapple  # requires holding up
+      Sentry=5  # may be kii
       Glide
       Grenade=2, Hammer  # grenade jumps and hammer floats
   conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
@@ -3352,10 +3366,9 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Launch, Glide
     gorlek, Water:  # hopefully didn't go too far for gorlek?
       Grapple, DoubleJump OR Dash OR Bash OR Damage=15  # non-damage variants pretty risky
-      WaterDash, DoubleJump, TripleJump
-      WaterDash, Dash OR Glide OR Sword OR Damage=15
-      Bash, DoubleJump, TripleJump
-      Bash, Dash OR Glide OR Sword OR Damage=15
+      WaterDash OR Bash:
+        DoubleJump, TripleJump
+        Dash OR Glide OR Sword OR Damage=15
       Launch, DoubleJump OR Dash OR Bash OR WaterDash OR Sword OR Hammer OR Damage=15
     kii, Water:
       WaterDash, Bash
@@ -3381,7 +3394,7 @@ anchor WestGlades.ShrineArea at -664, -4026:
       Grapple, DoubleJump, TripleJump
       SentryJump=1
     kii:
-      Bash  # Use the ennemies from the shrine
+      Bash  # Use the enemies from the shrine
       DoubleJump, TripleJump
       Grapple, DoubleJump, Hammer OR Sword OR Sentry=2
     unsafe:
@@ -9902,6 +9915,7 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Bash, Glide # wait on the left wall until the elemental gives you a shot to bash
       DoubleJump, TripleJump
       DoubleJump, Sword, Damage=40, Bow=1  # Reset your jump by slashing the elemental, pogo him to reach the wall above the portal, djump + upslash from under the Mine to reach the spikes
+      Bash, DoubleJump
 
   conn WeepingRidge.AboveTree:
     moki:
@@ -9924,6 +9938,7 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
     unsafe:
       Damage=40, Sword OR Hammer
       Dash, Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
+      Bash, DoubleJump, Blaze=1
   conn WillowsEnd.Entry:
     moki, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump, Dash OR Glide
     gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
@@ -9985,6 +10000,8 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
     unsafe:
       DoubleJump, TripleJump, Sword  # pogo the mines
       DoubleJump, TripleJump, Hammer, Damage=40
+      Bash, Grenade=2, DoubleJump OR Dash
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
 
   conn WeepingRidge.LaunchArea:
     moki: Launch, Bash, Glide  # Glide is the only ability that really helps you outwait the laser attack
