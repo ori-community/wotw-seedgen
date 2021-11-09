@@ -7,11 +7,11 @@
 9|999=3|4|17|48248|3638|1|6|Hollow Skills - $HOWMANY(1, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=6|4|17|48248|19396|1|6|Glades Skills - $HOWMANY(2, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=9|4|17|48248|1590|1|6|Wellspring Skills - $HOWMANY(3, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
-9|999=12|4|17|48248|1557|1|6|Pools Skills - $HOWMANY(4, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
+9|999=12|4|17|48248|1557|1|6|Luma Skills - $HOWMANY(4, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=15|4|17|48248|45538|1|6|Burrows Skills - $HOWMANY(5, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=18|4|17|48248|29604|1|6|Reach Skills - $HOWMANY(6, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=21|4|17|48248|57987|1|6|Woods Skills - $HOWMANY(7, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
-9|999=24|4|17|48248|48423|1|6|Depths Skills - $HOWMANY(8, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
+9|999=24|4|17|48248|48423|1|6|Mouldwood Skills - $HOWMANY(8, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=27|4|17|48248|61146|1|6|Wastes Skills - $HOWMANY(9, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=33|4|17|48248|4045|1|6|Willow Skills - $HOWMANY(11, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 
@@ -21,6 +21,7 @@
 48248|19396|8|9|0|int|36
 9|0=36|6|$[(9|999=6)]
 3|1|8|48248|19397|int|200               // Price for Glades Zone Hint
+3|1|17|0|48248|19396|lupo:1             // Icon for Glades Zone Hint
 48248|1590|6|$[(9|999=9)]               // Wellspring Zone Hint from LupoMap.Wellspring
 48248|1557|6|$[(9|999=12)]              // Pools Zone Hint from LupoMap.Pools
 48248|45538|6|$[(9|999=15)]             // Burrows Zone Hint from LupoMap.Burrows
@@ -29,6 +30,7 @@
 48248|57987|8|9|0|int|37
 9|0=37|6|$[(9|999=21)]
 3|1|8|48248|57988|int|200               // Price for Woods Zone Hint
+3|1|17|0|48248|57987|lupo:0             // Icon for Woods Zone Hint
 48248|48423|6|$[(9|999=24)]             // Depths Zone Hint from LupoMap.Depths
 48248|61146|6|$[(9|999=27)]             // Wastes Zone Hint from LupoMap.Wastes
 48248|4045|6|$[(9|999=33)]              // Willow Zone Hint from LupoMap.Willow

@@ -2,8 +2,9 @@ use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use super::player::Player;
-use crate::inventory::{Inventory, Item};
-use crate::util::{Difficulty, Resource, Skill, Shard, Teleporter, Enemy, orbs::{self, Orbs}};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard, Teleporter};
+use crate::util::{Difficulty, Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
 
@@ -13,6 +14,7 @@ pub enum Requirement {
     Impossible,
     Skill(Skill),
     EnergySkill(Skill, f32),
+    NonConsumingEnergySkill(Skill),
     SpiritLight(u16),
     Resource(Resource, u16),
     Shard(Shard),
@@ -43,6 +45,15 @@ impl Requirement {
             }
         ])} else { None }
     }
+    fn nonconsuming_cost_is_met(cost: f32, player: &Player, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
+        if orbs.energy >= cost || (
+            player.difficulty >= Difficulty::Unsafe &&
+            player.inventory.has(&Item::Shard(Shard::LifePact), 1) &&
+            orbs.energy + orbs.health > cost
+        ) {
+            Some(smallvec![Orbs::default()])
+        } else { None }
+    }
 
     pub fn is_met(&self, player: &Player, states: &FxHashSet<usize>, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
         match self {
@@ -54,6 +65,11 @@ impl Requirement {
                 if player.inventory.has(&Item::Skill(*skill), 1) {
                     let cost = player.use_cost(*skill) * *amount;
                     return Requirement::cost_is_met(cost, player, orbs);
+                }
+            Requirement::NonConsumingEnergySkill(skill) =>
+                if player.inventory.has(&Item::Skill(*skill), 1) {
+                    let cost = player.use_cost(*skill);
+                    return Requirement::nonconsuming_cost_is_met(cost, player, orbs);
                 }
             Requirement::SpiritLight(amount) =>
                 if player.inventory.has(&Item::SpiritLight(1), *amount) { return Some(smallvec![Orbs::default()]); },
@@ -290,6 +306,13 @@ impl Requirement {
 
                 itemsets
             },
+            Requirement::NonConsumingEnergySkill(skill) => {
+                let cost = player.use_cost(*skill);
+                let mut itemsets = Requirement::needed_for_cost(cost, player);
+                Requirement::combine_itemset_item(&mut itemsets, &Item::Skill(*skill));
+
+                itemsets
+            },
             Requirement::SpiritLight(amount) => vec![(Inventory::from((Item::SpiritLight(1), *amount)), Orbs::default())],
             Requirement::Resource(resource, amount) => vec![(Inventory::from((Item::Resource(*resource), *amount)), Orbs::default())],
             Requirement::Shard(shard) => vec![(Inventory::from(Item::Shard(*shard)), Orbs::default())],
@@ -474,7 +497,7 @@ impl Requirement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::util::settings::Settings;
+    use crate::settings::Settings;
 
     #[test]
     fn is_met() {
@@ -546,7 +569,7 @@ mod tests {
         player.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
         player.difficulty = Difficulty::Moki;
-        player.inventory.grant(Item::Resource(Resource::Energy), 2);
+        player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
 
         player = Player::default();

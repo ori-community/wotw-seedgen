@@ -5,9 +5,10 @@ use crate::world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
 };
+use crate::item::Skill;
+use crate::settings::Settings;
 use crate::util::{
-    Difficulty, Glitch, Skill, Position, Zone,
-    settings::Settings,
+    Difficulty, Glitch, Position, Zone,
 };
 
 struct EmitterContext<'a> {
@@ -16,6 +17,14 @@ struct EmitterContext<'a> {
     validate: bool,
     node_map: FxHashMap<&'a str, usize>,
     used_states: FxHashSet<&'a str>,
+}
+
+fn build_glitch_requirement<'a>(glitch: &Glitch, out: Requirement, context: &mut EmitterContext<'a>) -> Requirement {
+    if context.settings.glitches.contains(glitch) {
+        out
+    } else {
+        Requirement::Impossible
+    }
 }
 
 fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
@@ -34,12 +43,7 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
             } else {
                 Requirement::Impossible
             },
-        parser::Requirement::Glitch(glitch) =>
-            if context.settings.glitches.contains(glitch) {
-                Requirement::Free
-            } else {
-                Requirement::Impossible
-            },
+        parser::Requirement::Glitch(glitch) => build_glitch_requirement(glitch, Requirement::Free, context),
         parser::Requirement::Skill(skill) => Requirement::Skill(*skill),
         parser::Requirement::EnergySkill(skill, amount) => Requirement::EnergySkill(*skill, (*amount).into()),
         parser::Requirement::SpiritLight(amount) => Requirement::SpiritLight(*amount),
@@ -71,30 +75,10 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
             }
             Requirement::Or(allowed_weapons)
         },
-        parser::Requirement::ShurikenBreak(health) =>
-            if context.settings.glitches.contains(&Glitch::ShurikenBreak) {
-                Requirement::ShurikenBreak(f32::from(*health))
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::SentryBreak(health) =>
-            if context.settings.glitches.contains(&Glitch::SentryBreak) {
-                Requirement::SentryBreak(f32::from(*health))
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::HammerBreak =>
-            if context.settings.glitches.contains(&Glitch::HammerBreak) {
-                Requirement::Skill(Skill::Hammer)
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::SpearBreak =>
-            if context.settings.glitches.contains(&Glitch::SpearBreak) {
-                Requirement::Skill(Skill::Spear)
-            } else {
-                Requirement::Impossible
-            },
+        parser::Requirement::ShurikenBreak(health) => build_glitch_requirement(&Glitch::ShurikenBreak, Requirement::ShurikenBreak(f32::from(*health)), context),
+        parser::Requirement::SentryBreak(health) => build_glitch_requirement(&Glitch::SentryBreak, Requirement::SentryBreak(f32::from(*health)), context),
+        parser::Requirement::HammerBreak => build_glitch_requirement(&Glitch::HammerBreak, Requirement::Skill(Skill::Hammer), context),
+        parser::Requirement::SpearBreak => build_glitch_requirement(&Glitch::SpearBreak, Requirement::EnergySkill(Skill::Spear, 1.0), context),
         parser::Requirement::SentryJump(amount) => {
             let mut allowed_weapons = Vec::new();
             if context.settings.glitches.contains(&Glitch::SwordSentryJump) { allowed_weapons.push(Requirement::Skill(Skill::Sword)); }
@@ -114,30 +98,27 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
                 Requirement::Impossible
             }
         },
-        parser::Requirement::SwordSentryJump(amount) =>
-            if context.settings.glitches.contains(&Glitch::SwordSentryJump) {
-                Requirement::And(vec![
-                    Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
-                    Requirement::Skill(Skill::Sword),
-                ])
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::HammerSentryJump(amount) =>
-            if context.settings.glitches.contains(&Glitch::HammerSentryJump) {
-                Requirement::And(vec![
-                    Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
-                    Requirement::Skill(Skill::Hammer),
-                ])
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::SentryBurn(amount) =>
-            if context.settings.glitches.contains(&Glitch::SentryBurn) {
-                Requirement::EnergySkill(Skill::Sentry, (*amount).into())
-            } else {
-                Requirement::Impossible
-            },
+        parser::Requirement::SwordSentryJump(amount) => build_glitch_requirement(&Glitch::SwordSentryJump,
+            Requirement::And(vec![
+                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::Skill(Skill::Sword),
+            ]), context),
+        parser::Requirement::HammerSentryJump(amount) => build_glitch_requirement(&Glitch::HammerSentryJump,
+            Requirement::And(vec![
+                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::Skill(Skill::Hammer),
+            ]), context),
+        parser::Requirement::SentryBurn(amount) => build_glitch_requirement(&Glitch::SentryBurn, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::LaunchSwap => build_glitch_requirement(&Glitch::LaunchSwap, Requirement::Skill(Skill::Launch), context),
+        parser::Requirement::SentrySwap(amount) => build_glitch_requirement(&Glitch::SentrySwap, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::FlashSwap => build_glitch_requirement(&Glitch::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
+        parser::Requirement::BlazeSwap(amount) => build_glitch_requirement(&Glitch::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
+        parser::Requirement::WaveDash => build_glitch_requirement(&Glitch::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
+        parser::Requirement::GrenadeJump => build_glitch_requirement(&Glitch::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
+        parser::Requirement::HammerJump => build_glitch_requirement(&Glitch::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::SwordJump => build_glitch_requirement(&Glitch::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Glitch::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
+        parser::Requirement::SentryRedirect(amount) => build_glitch_requirement(&Glitch::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
     }
 }
 
@@ -217,7 +198,9 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             "Windswept Wastes" => Zone::Wastes,
             "Windtorn Ruins" => Zone::Ruins,
             "Willows End" => Zone::Willow,
-            _ => Zone::Void,
+            "Shop" => Zone::Shop,
+            "Void" => Zone::Void,
+            _ => return Err(format!("invalid zone {} in loc_data", location.zone)),
         };
 
         if metadata.quests.contains(name) {
