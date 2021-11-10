@@ -8,6 +8,8 @@
 !!include rapid_sword_core
 !!include rapid_spear_core
 
+!!add 3x 10|30              // Health Regen
+!!add 3x 10|31              // Energy Regen
 !!add 4x 10|35              // Extra Double Jumps
 !!add 2x 10|36              // Extra Air Dashes
 !!add 2x 11|2               // Blaze Efficiency
