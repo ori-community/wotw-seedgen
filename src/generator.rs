@@ -186,10 +186,10 @@ where
 
     let custom_name =  details.and_then(|details| details.name.clone());
     let display =  details.and_then(|details| details.display.clone());
-    let debug_name = custom_name.clone().unwrap_or_else(|| format!("{}", item));
+    let generic_name = custom_name.clone().unwrap_or_else(|| format!("{}", item));
 
     if origin_world_index == target_world_index {
-        log::trace!("({}): Placed {} at {}", origin_player_name, debug_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!("({}): Placed {} at {}", origin_player_name, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         origin_world_context.placements.push(Placement {
             node: Some(node),
@@ -197,7 +197,15 @@ where
             item,
         });
 
-        if let Some(display) = display.or(custom_name) {
+        if is_shop {
+            if let Some(name) = custom_name {
+                origin_world_context.placements.push(Placement {
+                    node: Some(node),
+                    uber_state: uber_state.clone(),
+                    item: Item::Message(name),
+                });
+            }
+        } else if let Some(display) = display.or(custom_name) {
             origin_world_context.placements.push(Placement {
                 node: Some(node),
                 uber_state: uber_state.clone(),
@@ -205,7 +213,7 @@ where
             });
         }
     } else {
-        log::trace!("({}): Placed {}'s {} at {}", origin_player_name, target_player_name, debug_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!("({}): Placed {}'s {} at {}", origin_player_name, target_player_name, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         let state_index = context.multiworld_state_index.next().unwrap();
 
