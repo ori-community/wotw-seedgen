@@ -244,17 +244,7 @@ impl Item {
     }
     #[inline]
     pub fn random_shop_price(&self) -> bool {
-        #[allow(clippy::match_same_arms)]
-        match self {
-            Item::Resource(_) => true,
-            Item::Skill(Skill::Blaze) => false,
-            Item::Skill(_) |
-            Item::Water |
-            Item::Teleporter(_) |
-            Item::Shard(_) |
-            Item::BonusItem(_) => true,
-            _ => false,
-        }
+        !matches!(self, Item::Skill(Skill::Blaze))
     }
 
     pub fn code(&self) -> String {
