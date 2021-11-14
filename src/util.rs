@@ -45,6 +45,9 @@ pub enum Glitch {
     GrenadeRedirect,    // Redirecting projectiles with Grenade
     SentryRedirect,     // Redirecting projectiles with Sentry
     PauseHover,         // Cancelling falling momentum through the pause menu
+    GlideJump,          // Storing a grounded jump into the air with Glide
+    GlideHammerJump,    // Preserving Glide Jump momentum with Hammer
+    SpearJump,          // Storing a grounded jump into the air with Spear
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

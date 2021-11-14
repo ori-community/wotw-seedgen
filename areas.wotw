@@ -31,6 +31,9 @@
 # GrenadeRedirect=x: Extends to Grenade=x
 # SentryRedirect=x: Extends to Sentry=x
 # PauseFloat: Use the pause menu to cancel falling speed
+# GlideJump: Extends to Glide
+# GlideHammerJump: Extends to Glide, Hammer
+# SpearJump: Extends to Spear
 
 # requirement macros. must go at the top of the file!
 

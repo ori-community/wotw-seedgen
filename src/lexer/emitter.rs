@@ -120,6 +120,9 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::Requirement::SwordJump => build_glitch_requirement(&Glitch::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Glitch::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
         parser::Requirement::SentryRedirect(amount) => build_glitch_requirement(&Glitch::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::GlideJump => build_glitch_requirement(&Glitch::GlideJump, Requirement::Skill(Skill::Glide), context),
+        parser::Requirement::GlideHammerJump => build_glitch_requirement(&Glitch::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
+        parser::Requirement::SpearJump => build_glitch_requirement(&Glitch::SpearJump, Requirement::Skill(Skill::Spear), context),
     }
 }
 

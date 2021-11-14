@@ -51,6 +51,9 @@ pub enum Requirement<'a> {
     SwordJump,
     GrenadeRedirect(u16),
     SentryRedirect(u16),
+    GlideJump,
+    GlideHammerJump,
+    SpearJump,
 }
 #[derive(Debug)]
 pub struct Line<'a> {
@@ -226,6 +229,8 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             "free" => Ok(Requirement::Free),
             "GladesTP" => Ok(Requirement::Teleporter(Teleporter::Glades)),
             "Glide" => Ok(Requirement::Skill(Skill::Glide)),
+            "GlideHammerJump" => Ok(Requirement::GlideHammerJump),
+            "GlideJump" => Ok(Requirement::GlideJump),
             "gorlek" => Ok(Requirement::Difficulty(Difficulty::Gorlek)),
             "Grapple" => Ok(Requirement::Skill(Skill::Grapple)),
             "Grenade" => Ok(Requirement::Skill(Skill::Grenade)),
@@ -255,6 +260,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             "Shuriken" => Ok(Requirement::Skill(Skill::Shuriken)),
             "Spear" => Ok(Requirement::Skill(Skill::Spear)),
             "SpearBreak" => Ok(Requirement::SpearBreak),
+            "SpearJump" => Ok(Requirement::SpearJump),
             "Sticky" => Ok(Requirement::Shard(Shard::Sticky)),
             "Sword" => Ok(Requirement::Skill(Skill::Sword)),
             "SwordJump" => Ok(Requirement::SwordJump),

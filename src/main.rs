@@ -273,6 +273,9 @@ fn parse_glitches(names: &[String]) -> Vec<Glitch> {
             "grenaderedirect" => glitches.push(Glitch::GrenadeRedirect),
             "sentryredirect" => glitches.push(Glitch::SentryRedirect),
             "pausehover" => glitches.push(Glitch::PauseHover),
+            "glidejump" => glitches.push(Glitch::GlideJump),
+            "glidehammerjump" => glitches.push(Glitch::GlideHammerJump),
+            "spearjump" => glitches.push(Glitch::SpearJump),
             other => log::warn!("Unknown glitch {}", other),
         }
     }
