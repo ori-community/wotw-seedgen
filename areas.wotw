@@ -30,7 +30,7 @@
 # SwordJump: Extends to Sword, DoubleJump
 # GrenadeRedirect=x: Extends to Grenade=x
 # SentryRedirect=x: Extends to Sentry=x
-# PauseFloat: Use the pause menu to cancel falling speed
+# PauseHover: Use the pause menu to cancel falling speed
 # GlideJump: Extends to Glide
 # GlideHammerJump: Extends to Glide, Hammer
 # SpearJump: Extends to Spear
