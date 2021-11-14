@@ -52,7 +52,8 @@ pub enum GoalMode {
     Wisps,
     Trees,
     Quests,
-    Relics(f64),
+    Relics(usize),
+    RelicChance(f64),
 }
 impl fmt::Display for GoalMode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -60,7 +61,7 @@ impl fmt::Display for GoalMode {
             GoalMode::Wisps => write!(f, "ForceWisps"),
             GoalMode::Trees => write!(f, "ForceTrees"),
             GoalMode::Quests => write!(f, "ForceQuests"),
-            GoalMode::Relics(_) => write!(f, "WorldTour"),
+            GoalMode::Relics(_) | GoalMode::RelicChance(_) => write!(f, "WorldTour"),
         }
     }
 }

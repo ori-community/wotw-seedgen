@@ -248,26 +248,25 @@ where
     Ok(())
 }
 
-fn place_relics<'a, R, I>(chance: f64, world_contexts: &mut [WorldContext<'a>], context: &mut GeneratorContext<'_, '_, R, I>) -> Result<(), String>
+fn place_relics<'a, R, I>(amount: usize, world_contexts: &mut [WorldContext<'a>], context: &mut GeneratorContext<'_, '_, R, I>) -> Result<(), String>
 where
     R: Rng,
     I: Iterator<Item=usize>,
 {
-    if chance == 0.0 { return Ok(()); }
+    let mut relic_zones = RELIC_ZONES.to_vec();
+    relic_zones.shuffle(context.rng);
+    relic_zones.truncate(amount);
 
-    let mut world_relic_locations = Vec::with_capacity(RELIC_ZONES.len());
-    for zone in RELIC_ZONES {
-        world_relic_locations.push((zone, Vec::with_capacity(60)));
-    }
+    let mut world_relic_locations = relic_zones.into_iter().map(|zone| (zone, Vec::with_capacity(60))).collect::<Vec<_>>();
 
     for world_index in 0..context.world_count {
         let world_context = &world_contexts[world_index];
 
         for node in &world_context.world.graph.nodes {
             if let Some(zone) = node.zone() {
-                let uber_state = node.uber_state().unwrap();
+                if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(relic_zone, _)| zone == *relic_zone) {
+                    let uber_state = node.uber_state().unwrap();
 
-                if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(&relic_zone, _)| zone == relic_zone) {
                     if !world_context.world.preplacements.contains_key(uber_state)
                     && !world_context.placements.iter().any(|placement| &placement.uber_state == uber_state) {
                         zone_relic_locations.push(node);
@@ -276,18 +275,11 @@ where
             }
         }
 
-        let mut placed_relic = false;
+        for (zone, relic_locations) in &mut world_relic_locations {
+            log::trace!("({}): Placing Relic in {}", world_contexts[world_index].player_name, zone);
 
-        while !placed_relic {
-            for (&zone, relic_locations) in &mut world_relic_locations {
-                if context.rng.gen_bool(chance) {
-                    log::trace!("({}): Placing Relic in {}", world_contexts[world_index].player_name, zone);
-                    placed_relic = true;
-
-                    if let Some(&location) = relic_locations.choose(context.rng) {
-                        place_item(world_index, world_index, location, false, Item::Relic(zone), world_contexts, context)?;
-                    }
-                }
+            if let Some(&location) = relic_locations.choose(context.rng) {
+                place_item(world_index, world_index, location, false, Item::Relic(*zone), world_contexts, context)?;
             }
         }
     }
@@ -970,9 +962,19 @@ where
     // TODO enforce a max total price for shops
     let price_range = Uniform::new_inclusive(0.75, 1.25);
     let world_tour = settings.goalmodes.iter().find_map(|goalmode|
-        if let GoalMode::Relics(chance) = goalmode {
-            Some(*chance)
-        } else { None }
+        match *goalmode {
+            GoalMode::Relics(amount) => Some(amount),
+            GoalMode::RelicChance(chance) => {
+                if chance == 0.0 { return Some(0); }
+                loop {
+                    let amount = (0..11).filter(|_| rng.gen_bool(chance)).count();
+                    if amount > 0 {
+                        return Some(amount);
+                    }
+                }
+            },
+            _ => None,
+        }
     );
 
     let mut has_warned_about_tp_refill = false;
@@ -1069,7 +1071,7 @@ where
             })
             .count() - 1;  // 1 will be 1xp
         let mut spirit_light_slots = world_slots.saturating_sub(world.pool.inventory.item_count());
-        if let Some(chance) = world_tour { spirit_light_slots -= (10.0 * chance) as usize; }
+        if let Some(amount) = world_tour { spirit_light_slots -= amount; }
         log::trace!("({}): Estimated {}/{} slots for Spirit Light", player_name, spirit_light_slots, world_slots);
 
         let spirit_light_rng = SpiritLightAmounts::new(f32::from(world.pool.spirit_light), spirit_light_slots as f32, 0.75, 1.25);
@@ -1110,8 +1112,8 @@ where
     };
 
     one_xp(&mut world_contexts, &mut context)?;
-    if let Some(chance) = world_tour {
-        place_relics(chance, &mut world_contexts, &mut context)?;
+    if let Some(amount) = world_tour {
+        place_relics(amount, &mut world_contexts, &mut context)?;
     }
 
     spawn_progressions(&mut world_contexts, &mut context)?;
