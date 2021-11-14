@@ -226,17 +226,19 @@ impl Item {
         match self {
             Item::Resource(Resource::Health) => 200,
             Item::Resource(Resource::Energy) => 150,
-            Item::Resource(Resource::Ore) |
-            Item::Resource(Resource::Keystone) => 100,
-            Item::Resource(Resource::ShardSlot) => 400,
-            Item::Skill(Skill::Blaze) => 420,
-            Item::Skill(_) => 500,
-            Item::Water => 400,
-            Item::Teleporter(_) => 250,
-            Item::Shard(_) |
+            Item::Resource(Resource::Ore | Resource::Keystone) => 100,
+            Item::Resource(Resource::ShardSlot) => 250,
+            Item::Skill(skill) => match skill {
+                Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
+                Skill::AncestralLight => 300,
+                Skill::Blaze => 420,
+                Skill::Launch => 800,
+                _ => 500,
+            },
+            Item::Water => 500,
+            Item::Teleporter(_) | Item::Shard(_) => 250,
             Item::BonusItem(_) => 300,
-            Item::BonusUpgrade(BonusUpgrade::SentryEfficiency) |
-            Item::BonusUpgrade(BonusUpgrade::RapidHammer) => 600,
+            Item::BonusUpgrade(BonusUpgrade::SentryEfficiency | BonusUpgrade::RapidHammer) => 600,
             Item::BonusUpgrade(_) => 300,
             _ => 200,
         }
