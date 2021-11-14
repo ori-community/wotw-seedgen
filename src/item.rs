@@ -193,15 +193,6 @@ impl Item {
             Item::UberState(_) | Item::Command(_) | Item::Message(_)
         )
     }
-    #[inline]
-    pub fn is_checkable(&self) -> bool {
-        matches!(self,
-            Item::Skill(_) |
-            Item::Shard(_) |
-            Item::Teleporter(_) |
-            Item::Water
-        )
-    }
 
     #[inline]
     pub fn cost(&self) -> u16 {
