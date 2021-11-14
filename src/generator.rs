@@ -354,8 +354,6 @@ where
                     return Ok((origin_world_index, node, true));
                 }
             }
-
-            return Err(format!("({}): Not enough slots to place forced progression {}", world_contexts[target_world_index].player_name, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
         } else {
             if let Some((index, _)) = reserved_slots.iter().enumerate().find(|(_, (world_index, _))| world_index == &target_world_index) {
                 let (_, node) = reserved_slots.remove(index);
@@ -368,9 +366,8 @@ where
                 let node = placeholders.remove(index);
                 return Ok((target_world_index, node, true));
             }
-
-            return Err(format!("({}): Not enough slots to place forced progression {}", world_contexts[target_world_index].player_name, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
         }
+        return Err(format!("({}): Not enough slots to place forced progression {}", world_contexts[target_world_index].player_name, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
     };
 
     let mut node = choose_node()?;

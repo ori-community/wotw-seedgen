@@ -31,7 +31,6 @@ pub use self::{
     shop_command::ShopCommand,
 };
 
-#[allow(clippy::pub_enum_variant_names)]
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Item {
     SpiritLight(u16),

@@ -203,10 +203,10 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             _ => return Err(format!("invalid zone {} in loc_data", location.zone)),
         };
 
-        if metadata.quests.contains(name) {
-            let index = graph.len();
-            add_entry(&mut node_map, &location.name, index)?;
+        let index = graph.len();
+        add_entry(&mut node_map, &location.name, index)?;
 
+        if metadata.quests.contains(name) {
             graph.push(Node::Quest(graph::Quest {
                 identifier: location.name.clone(),
                 zone,
@@ -215,9 +215,6 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 position: location.position.clone(),
             }));
         } else {
-            let index = graph.len();
-            add_entry(&mut node_map, &location.name, index)?;
-
             graph.push(Node::Pickup(graph::Pickup {
                 identifier: location.name.clone(),
                 zone,
@@ -263,7 +260,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
         let region = areas.regions.get(region);
         let mut region_requirement = None;
         if let Some(group) = region {
-            region_requirement = Some(build_requirement_group(&group, true, &mut context));
+            region_requirement = Some(build_requirement_group(group, true, &mut context));
         }
 
         let refills: Vec<graph::Refill> = anchor.refills.iter().map(|refill| {

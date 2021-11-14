@@ -213,7 +213,7 @@ impl Graph {
                 if is_spawn {
                     if let Some(tp_anchor) = self.nodes.iter().find(|&node| node.identifier() == TP_ANCHOR) {
                         if !anchor.connections.iter().any(|connection| connection.to == tp_anchor.index()) {
-                            let (mut tp_reached, mut tp_progressions) = self.reach_recursion(&tp_anchor, false, best_orbs, context);
+                            let (mut tp_reached, mut tp_progressions) = self.reach_recursion(tp_anchor, false, best_orbs, context);
                             reached.append(&mut tp_reached);
                             progressions.append(&mut tp_progressions);
                         }

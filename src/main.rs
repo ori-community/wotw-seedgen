@@ -294,7 +294,7 @@ fn parse_goalmodes(names: &[String]) -> Result<Vec<GoalMode>, String> {
                 let chance = if let Some(details) = parts.next() {
                     let chance = details.strip_suffix('%').ok_or_else(|| format!("Expected % expression in details string for goal mode {}", goalmode))?;
                     let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal mode {}", goalmode))?;
-                    if chance < 0.0 || chance > 100.0 { return Err(format!("Invalid chance in details string for goal mode {}", goalmode)); }
+                    if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal mode {}", goalmode)); }
                     chance / 100.0
                 } else { 0.6 };
 
@@ -548,7 +548,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     for line in contents.lines() {
         if let Some(sets) = line.strip_prefix("// Sets: ") {
             if !sets.is_empty() {
-                for identifier in sets.split(",").map(str::trim) {
+                for identifier in sets.split(',').map(str::trim) {
                     let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
                     log::trace!("Setting state {}", identifier);
                     world.sets.push(node.index());

@@ -33,7 +33,7 @@ where
     let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
     let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
 
-    Ok(UberState::from_parts(uber_group, uber_id)?)
+    UberState::from_parts(uber_group, uber_id)
 }
 
 fn parse_spirit_light<'a, P>(mut parts: P) -> Result<Item, String>
@@ -438,7 +438,7 @@ where P: Iterator<Item=&'a str>
 }
 fn parse_pointer(str: &str) -> Option<Result<UberIdentifier, String>> {
     if let Some(str) = str.strip_prefix("$(") {
-        if let Some(pointer) = str.strip_suffix(")") {
+        if let Some(pointer) = str.strip_suffix(')') {
             let mut parts = pointer.splitn(2, '|');
             let uber_group = parts.next().unwrap();
             if let Some(uber_id) = parts.next() {
@@ -509,7 +509,7 @@ where P: Iterator<Item=&'a str>
         if let Some(range) = range.strip_suffix(']') {
             let mut parts = range.splitn(2, ',');
             let start = parts.next().unwrap().trim();
-            let end = parts.next().ok_or_else(|| format!("missing range end"))?.trim();
+            let end = parts.next().ok_or("missing range end")?.trim();
 
             let parse_boundary = |value: &str| -> Result<UberStateRangeBoundary, String> {
                 if let Some(uber_identifier) = parse_pointer(value) {
@@ -1286,6 +1286,8 @@ pub fn validate_header(name: &Path, contents: &str) -> Result<(Vec<UberState>, H
     let mut parameters = HashMap::new();
     let param_values = HashMap::new();
     let mut rng = rand::thread_rng();
+    let graph = Graph::default();
+    let mut world = World::new(&graph);
 
     let mut first_line = true;
     let mut skip_line = false;
@@ -1310,7 +1312,7 @@ pub fn validate_header(name: &Path, contents: &str) -> Result<(Vec<UberState>, H
             if trimmed[index..].contains("skip-validate") {
                 skip_line = true;
             }
-            trimmed = &trimmed[..index].trim();
+            trimmed = trimmed[..index].trim();
         }
 
         if trimmed.is_empty() {
@@ -1327,12 +1329,13 @@ pub fn validate_header(name: &Path, contents: &str) -> Result<(Vec<UberState>, H
             } else if let Some(string) = command.strip_prefix("pool ") {
                 // TODO determinate validation would be nice?
                 pool_command(string, &mut pool)?;
-            } else if let Some(_) = command.strip_prefix("addpool ") {
+            } else if let Some(amount) = command.strip_prefix("addpool ") {
+                addpool_command(amount.trim(), &mut world, &mut pool, &mut rng)?;
             } else if command.trim() == "flush" {
                 flush_command(&mut pool);
             }
         } else {
-            if let Some(ignored) = trimmed.strip_prefix("!") {
+            if let Some(ignored) = trimmed.strip_prefix('!') {
                 trimmed = ignored;
             }
             let mut parts = trimmed.splitn(3, '|');

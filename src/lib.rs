@@ -247,7 +247,7 @@ where R: Rng
     let mut index = 0;
     loop {
         let spawn_locs = (0..settings.worlds)
-            .map(|_| pick_spawn(graph, &settings, rng))
+            .map(|_| pick_spawn(graph, settings, rng))
             .collect::<Result<Vec<_>, String>>()?;
         let identifiers = spawn_locs.iter().map(|spawn_loc| spawn_loc.identifier()).collect::<Vec<_>>();
         log::trace!("Spawning on {}", identifiers.join(", "));
