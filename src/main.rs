@@ -316,15 +316,17 @@ fn parse_goalmodes(names: &[String]) -> Result<Vec<GoalMode>, String> {
         }
     }
 
-    goalmodes.sort_unstable_by_key(GoalMode::to_string);
+    if !goalmodes.is_empty() {
+        goalmodes.sort_unstable_by_key(GoalMode::to_string);
 
-    let mut key = goalmodes[0].to_string();
-    for index in 1..goalmodes.len() {
-        let a = key;
-        key = goalmodes[index].to_string();
+        let mut key = goalmodes[0].to_string();
+        for index in 1..goalmodes.len() {
+            let a = key;
+            key = goalmodes[index].to_string();
 
-        if a == key {
-            return Err(format!("Duplicate goalmode {}", key));
+            if a == key {
+                return Err(format!("Duplicate goalmode {}", key));
+            }
         }
     }
 
