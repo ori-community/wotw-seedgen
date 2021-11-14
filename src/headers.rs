@@ -154,7 +154,7 @@ pub fn inspect(headers: Vec<PathBuf>) -> Result<(), String> {
     Ok(())
 }
 
-pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
+pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
     let mut output = String::new();
 
     let headers = match path {
@@ -257,7 +257,8 @@ pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
     }
 
     let failed_length = failed.len();
-    if failed_length > 0 {
+    let valid = failed_length == 0;
+    if !valid {
         output += &format!("{}", Colour::Red.paint(format!("\n{}/{} failed\n", failed_length, length)));
 
         for failed in failed {
@@ -274,5 +275,13 @@ pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
     }
 
     println!("{}", output);
-    Ok(())
+    Ok(valid)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn validate() {
+        assert!(super::validate(None).unwrap());
+    }
 }

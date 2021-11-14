@@ -639,7 +639,7 @@ fn main() {
 
             match subcommand {
                 Some(HeaderCommand::Validate { path }) => {
-                    headers::validate(path).unwrap_or_else(|err| log::error!("{}", err));
+                    if let Err(err) = headers::validate(path) { log::error!("{}", err) }
                 },
                 Some(HeaderCommand::Parse { path }) => {
                     compile_seed(path).unwrap_or_else(|err| log::error!("{}", err));
