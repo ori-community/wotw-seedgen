@@ -111,9 +111,9 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       Grapple, Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
       # Glitched:
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
-      HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseFloat  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
-      Grapple, PauseFloat OR GrenadeJump OR BlazeSwap
-      HammerJump, TripleJump, Dash OR PauseFloat  # Jumping along the ceiling, starting above the LongSwimEX
+      HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseHover  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
+      Grapple, PauseHover OR GrenadeJump OR BlazeSwap
+      HammerJump, TripleJump, Dash OR PauseHover  # Jumping along the ceiling, starting above the LongSwimEX
       FlashSwap  # hehe
   pickup MarshSpawn.BridgeEX: # not a free pickup because you could break the log and softlock yourself
     moki:
@@ -128,7 +128,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe:
       Spear=1  # Using drop-down
       # Glitched:
-      PauseFloat OR FlashSwap
+      PauseHover OR FlashSwap
   pickup MarshSpawn.LongSwimEX:
     moki: Water
     unsafe:
@@ -151,7 +151,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
         Water OR Damage=20
         Damage=10, WaterDash
       # Glitched:
-      PauseFloat OR FlashSwap OR SentrySwap=1 OR BlazeSwap=2:
+      PauseHover OR FlashSwap OR SentrySwap=1 OR BlazeSwap=2:
         Water OR Damage=20
         Damage=10, WaterDash
   pickup MarshSpawn.LifepactShard:
@@ -182,7 +182,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
         Water OR Damage=20
         Damage=10, WaterDash
       # Glitched:
-      PauseFloat OR FlashSwap:  # every other glitch can be avoided with the non-glitch variants above
+      PauseHover OR FlashSwap:  # every other glitch can be avoided with the non-glitch variants above
         Water OR Damage=20
         Damage=10, WaterDash
 
@@ -211,7 +211,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
         Water OR Damage=20
         Damage=10, WaterDash
       # Glitched:
-      PauseFloat OR FlashSwap:  # other glitches can be avoided
+      PauseHover OR FlashSwap:  # other glitches can be avoided
         Water OR Damage=20
         Damage=10, WaterDash
   conn MarshPastOpher.MillView:
@@ -235,7 +235,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
       # Glitched
       LaunchSwap  # refresh launch on ceiling and then LaunchSwap through all of the spiked area or land on the turret and get a second LaunchSwap
-      FlashSwap, PauseFloat  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseFloat for "easier" execution
+      FlashSwap, PauseHover  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseHover for "easier" execution
 
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
@@ -6091,7 +6091,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2
       Bash, Grenade=1  # from the ledge next to breakable floor, might be good for gorlek
     unsafe: 
-      PauseFloat
+      PauseHover
       GrenadeJump
       Bash
   pickup LowerReach.HiddenOre:
