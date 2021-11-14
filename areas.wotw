@@ -6,10 +6,9 @@
 # Special Syntax:
 # Moki and above:
 # BreakWall=x: A wall or corruption with x Health is broken
-# BreakCrystal: An energy crystal is broken with Sword, Hammer or Bow
+# BreakCrystal: An energy crystal is broken (In moki this will allow using Sword, Hammer or Bow, in gorlek additionally Shuriken or Grenade, in unsafe additionally Spear)
 # Combat=x: An enemy has to be defeated. For a list of enemies visit https://docs.google.com/spreadsheets/d/1AE_ctym6WAwltGK-r6w58ARq0ym2MU4MzFiwg328kjM/view?usp=sharing
 # Gorlek and above:
-# BreakCrystal: An energy crystal is broken with Sword, Hammer, Bow, Shuriken or Grenade
 # ShurikenBreak=x: A wall with x Health is broken from behind using Shuriken
 # SentryJump=x: Extends to Sentry=1, Sword OR Hammer
 # SwordSJump=x: Extends to Sentry=1, Sword
@@ -17,7 +16,6 @@
 # SentryBurn=x: Use x Sentries to melt ice or light lanterns
 # RemoveKillPlane: Remove the kill plane at feeding grounds
 # Unsafe:
-# BreakCrystal: An energy crystal is broken with Sword, Hammer, Bow, Shuriken, Grenade or Spear
 # SentryBreak=x: A wall with x Health is broken from behind using Sentry
 # HammerBreak: A wall with is broken from behind using Hammer
 # SpearBreak: A wall with is broken from behind using one Spear
@@ -27,11 +25,15 @@
 # BlazeSwap=x: Extends to Blaze=x
 # WaveDash: Extends to Dash, Regenerate and having energy to use it
 # GrenadeJump: Extends to Grenade and having energy to use it
+# GrenadeCancel: Extends to Grenade and having energy to use it
 # HammerJump: Extends to Hammer, DoubleJump
 # SwordJump: Extends to Sword, DoubleJump
 # GrenadeRedirect=x: Extends to Grenade=x
 # SentryRedirect=x: Extends to Sentry=x
-# PauseFloat: Use the pause menu to cancel falling speed
+# PauseHover: Use the pause menu to cancel falling speed
+# GlideJump: Extends to Glide
+# GlideHammerJump: Extends to Glide, Hammer
+# SpearJump: Extends to Spear
 
 # requirement macros. must go at the top of the file!
 

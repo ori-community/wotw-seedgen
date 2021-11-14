@@ -4,7 +4,8 @@
 /// Adds support for toggleable Rapid Smash
 /// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
-!!name 8|4|50|byte|+1 Rapid Smash
+!!name 8|4|50|byte|+1 #Rapid Smash#
+!!display 8|4|50|byte|+1 $[(9|999=402)]
 !!icon 8|4|50|byte|+1 file:assets/icons/bonus/rapidsmash.png
 
 // skip-validate
@@ -21,7 +22,6 @@
 
 4|50|4|25|1|8|9|114|bool|true           // set to default enabled
 4|50|4|26|100|8|4|50|byte|100|skip=1    // cap at 100
-4|50|6|$[(9|999=402)]
 4|50|4|17|9|114|1|8|9|10|int|1          // grant on pickup if enabled
 4|50=1|8|9|113|bool|true                // subscribe to bonus core
 

@@ -10,18 +10,19 @@ use rand::{
     distributions::{Distribution, Uniform, Bernoulli},
 };
 
-use crate::world::{
-    World,
-    graph::{self, Node},
-    player::Player,
-};
-use crate::inventory::Inventory;
-use crate::item::{Item, Resource, Skill, Teleporter, Command, ShopCommand};
-use crate::settings::Settings;
-use crate::util::{
-    self,
-    GoalMode, UberState, UberType, Icon, Position, Difficulty,
-    constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
+use crate::{
+    ItemDetails,
+    inventory::Inventory,
+    item::{Item, Resource, Skill, Teleporter, Command, ShopCommand},
+    settings::Settings, util::{
+        self,
+        GoalMode, UberState, UberType, Position, Difficulty,
+        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
+    }, world::{
+        World,
+        graph::{self, Node},
+        player::Player,
+    }
 };
 
 #[derive(Debug, Clone)]
@@ -64,9 +65,7 @@ where
 {
     world_count: usize,
     total_reachable_count: usize,
-    custom_names: &'b HashMap<String, String>,
-    custom_prices: &'b HashMap<String, u16>,
-    custom_icons: &'b HashMap<String, Icon>,
+    custom_items: &'b HashMap<String, ItemDetails>,
     multiworld_state_index: I,
     price_range: Uniform<f32>,
     random_progression: Bernoulli,
@@ -140,6 +139,7 @@ where
     let is_shop = uber_state.is_shop();
 
     let code = item.code();
+    let details = context.custom_items.get(&code);
 
     if uber_state.is_purchasable() {
         origin_world_context.shop_slots -= 1;
@@ -149,7 +149,7 @@ where
                 .find(|(_, location, _)| &uber_state.identifier == location)
                 .ok_or_else(|| format!("({}): Uber State {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_player_name, node))?;
 
-            let mut price = context.custom_prices.get(&code).cloned().unwrap_or_else(|| item.shop_price());
+            let mut price = details.and_then(|details| details.price).unwrap_or_else(|| item.shop_price());
 
             if item.random_shop_price() {
                 let modified_price = f32::from(price) * context.price_range.sample(context.rng);
@@ -169,7 +169,7 @@ where
                 item: price_setter,
             });
 
-            if let Some(icon) = context.custom_icons.get(&code).cloned().or_else(|| item.icon()) {
+            if let Some(icon) = details.and_then(|details| details.icon.clone()).or_else(|| item.icon()) {
                 let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
                     uber_state: uber_state.clone(),
                     icon,
@@ -184,11 +184,12 @@ where
         }
     }
 
-    let custom_name = context.custom_names.get(&code).cloned();
-    let item_display = custom_name.clone().unwrap_or_else(|| format!("{}", item));
+    let custom_name =  details.and_then(|details| details.name.clone());
+    let display =  details.and_then(|details| details.display.clone());
+    let generic_name = custom_name.clone().unwrap_or_else(|| format!("{}", item));
 
     if origin_world_index == target_world_index {
-        log::trace!("({}): Placed {} at {}", origin_player_name, item_display, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!("({}): Placed {} at {}", origin_player_name, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         origin_world_context.placements.push(Placement {
             node: Some(node),
@@ -197,70 +198,75 @@ where
         });
 
         if is_shop {
-            if let Some(custom_name) = custom_name {
+            if let Some(name) = custom_name {
                 origin_world_context.placements.push(Placement {
                     node: Some(node),
                     uber_state: uber_state.clone(),
-                    item: Item::Message(format!("f=0|{}", custom_name)),
+                    item: Item::Message(name),
                 });
             }
+        } else if let Some(display) = display.or(custom_name) {
+            origin_world_context.placements.push(Placement {
+                node: Some(node),
+                uber_state: uber_state.clone(),
+                item: Item::Message(display),
+            });
         }
     } else {
-        log::trace!("({}): Placed {}'s {} at {}", origin_player_name, target_player_name, item_display, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!("({}): Placed {}'s {} at {}", origin_player_name, target_player_name, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         let state_index = context.multiworld_state_index.next().unwrap();
 
-        let item_name = custom_name.unwrap_or_else(|| format!("$[{}]", code));
-        let origin_message = Item::Message(format!("{}'s {}", target_player_name, item_name));
+        let custom_name = custom_name.unwrap_or_else(|| format!("$[{}]", code));
+        let origin_message = Item::Message(format!("{}'s {}", target_player_name, custom_name));
         let send_item = UberState::from_parts("12" , &state_index.to_string())?.to_item(UberType::Bool);
-        let target_message = Item::Message(format!("{} from {}|mute", item_name, origin_player_name));
+        let target_message = Item::Message(format!("{} from {}|mute", display.unwrap_or(custom_name), origin_player_name));
         let target_uber_state = UberState::from_parts("12", &state_index.to_string())?;
 
         origin_world_context.placements.push(Placement {
             node: Some(node),
             uber_state: node.uber_state().unwrap().clone(),
-            item: origin_message,
+            item: send_item,
         });
         origin_world_context.placements.push(Placement {
             node: Some(node),
             uber_state: node.uber_state().unwrap().clone(),
-            item: send_item,
+            item: origin_message,
         });
         world_contexts[target_world_index].placements.push(Placement {
             node: None,
             uber_state: target_uber_state.clone(),
-            item: target_message,
+            item,
         });
         world_contexts[target_world_index].placements.push(Placement {
             node: None,
             uber_state: target_uber_state,
-            item,
+            item: target_message,
         });
     }
 
     Ok(())
 }
 
-fn place_relics<'a, R, I>(chance: f64, world_contexts: &mut [WorldContext<'a>], context: &mut GeneratorContext<'_, '_, R, I>) -> Result<(), String>
+fn place_relics<'a, R, I>(amount: usize, world_contexts: &mut [WorldContext<'a>], context: &mut GeneratorContext<'_, '_, R, I>) -> Result<(), String>
 where
     R: Rng,
     I: Iterator<Item=usize>,
 {
-    if chance == 0.0 { return Ok(()); }
+    let mut relic_zones = RELIC_ZONES.to_vec();
+    relic_zones.shuffle(context.rng);
+    relic_zones.truncate(amount);
 
-    let mut world_relic_locations = Vec::with_capacity(RELIC_ZONES.len());
-    for zone in RELIC_ZONES {
-        world_relic_locations.push((zone, Vec::with_capacity(60)));
-    }
+    let mut world_relic_locations = relic_zones.into_iter().map(|zone| (zone, Vec::with_capacity(60))).collect::<Vec<_>>();
 
     for world_index in 0..context.world_count {
         let world_context = &world_contexts[world_index];
 
         for node in &world_context.world.graph.nodes {
             if let Some(zone) = node.zone() {
-                let uber_state = node.uber_state().unwrap();
+                if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(relic_zone, _)| zone == *relic_zone) {
+                    let uber_state = node.uber_state().unwrap();
 
-                if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(&relic_zone, _)| zone == relic_zone) {
                     if !world_context.world.preplacements.contains_key(uber_state)
                     && !world_context.placements.iter().any(|placement| &placement.uber_state == uber_state) {
                         zone_relic_locations.push(node);
@@ -269,18 +275,11 @@ where
             }
         }
 
-        let mut placed_relic = false;
+        for (zone, relic_locations) in &mut world_relic_locations {
+            log::trace!("({}): Placing Relic in {}", world_contexts[world_index].player_name, zone);
 
-        while !placed_relic {
-            for (&zone, relic_locations) in &mut world_relic_locations {
-                if context.rng.gen_bool(chance) {
-                    log::trace!("({}): Placing Relic in {}", world_contexts[world_index].player_name, zone);
-                    placed_relic = true;
-
-                    if let Some(&location) = relic_locations.choose(context.rng) {
-                        place_item(world_index, world_index, location, false, Item::Relic(zone), world_contexts, context)?;
-                    }
-                }
+            if let Some(&location) = relic_locations.choose(context.rng) {
+                place_item(world_index, world_index, location, false, Item::Relic(*zone), world_contexts, context)?;
             }
         }
     }
@@ -347,8 +346,6 @@ where
                     return Ok((origin_world_index, node, true));
                 }
             }
-
-            return Err(format!("({}): Not enough slots to place forced progression {}", world_contexts[target_world_index].player_name, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
         } else {
             if let Some((index, _)) = reserved_slots.iter().enumerate().find(|(_, (world_index, _))| world_index == &target_world_index) {
                 let (_, node) = reserved_slots.remove(index);
@@ -361,9 +358,8 @@ where
                 let node = placeholders.remove(index);
                 return Ok((target_world_index, node, true));
             }
-
-            return Err(format!("({}): Not enough slots to place forced progression {}", world_contexts[target_world_index].player_name, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
         }
+        return Err(format!("({}): Not enough slots to place forced progression {}", world_contexts[target_world_index].player_name, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
     };
 
     let mut node = choose_node()?;
@@ -956,9 +952,7 @@ pub fn generate_placements<'a, R>(
     worlds: Vec<World<'a>>,
     spawns: &[&'a Node],
     spawn_pickup_node: &'a Node,
-    custom_names: &HashMap<String, String>,
-    custom_prices: &HashMap<String, u16>,
-    custom_icons: &HashMap<String, Icon>,
+    custom_items: &HashMap<String, ItemDetails>,
     settings: &Settings,
     rng: &mut R
 ) -> Result<Vec<Vec<Placement<'a>>>, String>
@@ -968,9 +962,19 @@ where
     // TODO enforce a max total price for shops
     let price_range = Uniform::new_inclusive(0.75, 1.25);
     let world_tour = settings.goalmodes.iter().find_map(|goalmode|
-        if let GoalMode::Relics(chance) = goalmode {
-            Some(*chance)
-        } else { None }
+        match *goalmode {
+            GoalMode::Relics(amount) => Some(amount),
+            GoalMode::RelicChance(chance) => {
+                if chance == 0.0 { return Some(0); }
+                loop {
+                    let amount = (0..11).filter(|_| rng.gen_bool(chance)).count();
+                    if amount > 0 {
+                        return Some(amount);
+                    }
+                }
+            },
+            _ => None,
+        }
     );
 
     let mut has_warned_about_tp_refill = false;
@@ -1067,7 +1071,7 @@ where
             })
             .count() - 1;  // 1 will be 1xp
         let mut spirit_light_slots = world_slots.saturating_sub(world.pool.inventory.item_count());
-        if let Some(chance) = world_tour { spirit_light_slots -= (10.0 * chance) as usize; }
+        if let Some(amount) = world_tour { spirit_light_slots -= amount; }
         log::trace!("({}): Estimated {}/{} slots for Spirit Light", player_name, spirit_light_slots, world_slots);
 
         let spirit_light_rng = SpiritLightAmounts::new(f32::from(world.pool.spirit_light), spirit_light_slots as f32, 0.75, 1.25);
@@ -1100,9 +1104,7 @@ where
     let mut context = GeneratorContext {
         world_count: settings.worlds,
         total_reachable_count,
-        custom_names,
-        custom_prices,
-        custom_icons,
+        custom_items,
         multiworld_state_index: 0..,
         price_range,
         random_progression: Bernoulli::new(RANDOM_PROGRESSION).unwrap(),
@@ -1110,8 +1112,8 @@ where
     };
 
     one_xp(&mut world_contexts, &mut context)?;
-    if let Some(chance) = world_tour {
-        place_relics(chance, &mut world_contexts, &mut context)?;
+    if let Some(amount) = world_tour {
+        place_relics(amount, &mut world_contexts, &mut context)?;
     }
 
     spawn_progressions(&mut world_contexts, &mut context)?;

@@ -115,10 +115,14 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::Requirement::BlazeSwap(amount) => build_glitch_requirement(&Glitch::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
         parser::Requirement::WaveDash => build_glitch_requirement(&Glitch::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
         parser::Requirement::GrenadeJump => build_glitch_requirement(&Glitch::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
+        parser::Requirement::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
         parser::Requirement::HammerJump => build_glitch_requirement(&Glitch::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::Requirement::SwordJump => build_glitch_requirement(&Glitch::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Glitch::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
         parser::Requirement::SentryRedirect(amount) => build_glitch_requirement(&Glitch::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::GlideJump => build_glitch_requirement(&Glitch::GlideJump, Requirement::Skill(Skill::Glide), context),
+        parser::Requirement::GlideHammerJump => build_glitch_requirement(&Glitch::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
+        parser::Requirement::SpearJump => build_glitch_requirement(&Glitch::SpearJump, Requirement::Skill(Skill::Spear), context),
     }
 }
 
@@ -203,10 +207,10 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             _ => return Err(format!("invalid zone {} in loc_data", location.zone)),
         };
 
-        if metadata.quests.contains(name) {
-            let index = graph.len();
-            add_entry(&mut node_map, &location.name, index)?;
+        let index = graph.len();
+        add_entry(&mut node_map, &location.name, index)?;
 
+        if metadata.quests.contains(name) {
             graph.push(Node::Quest(graph::Quest {
                 identifier: location.name.clone(),
                 zone,
@@ -215,9 +219,6 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 position: location.position.clone(),
             }));
         } else {
-            let index = graph.len();
-            add_entry(&mut node_map, &location.name, index)?;
-
             graph.push(Node::Pickup(graph::Pickup {
                 identifier: location.name.clone(),
                 zone,
@@ -263,7 +264,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
         let region = areas.regions.get(region);
         let mut region_requirement = None;
         if let Some(group) = region {
-            region_requirement = Some(build_requirement_group(&group, true, &mut context));
+            region_requirement = Some(build_requirement_group(group, true, &mut context));
         }
 
         let refills: Vec<graph::Refill> = anchor.refills.iter().map(|refill| {
