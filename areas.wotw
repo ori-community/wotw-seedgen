@@ -112,7 +112,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       # Glitched:
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
       HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseHover  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
-      Grapple, PauseHover OR GrenadeJump OR BlazeSwap
+      Grapple, PauseHover OR GrenadeJump OR BlazeSwap=1
       HammerJump, TripleJump, Dash OR PauseHover  # Jumping along the ceiling, starting above the LongSwimEX
       FlashSwap  # hehe
   pickup MarshSpawn.BridgeEX: # not a free pickup because you could break the log and softlock yourself
