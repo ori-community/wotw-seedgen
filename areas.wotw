@@ -25,6 +25,7 @@
 # BlazeSwap=x: Extends to Blaze=x
 # WaveDash: Extends to Dash, Regenerate and having energy to use it
 # GrenadeJump: Extends to Grenade and having energy to use it
+# GrenadeCancel: Extends to Grenade and having energy to use it
 # HammerJump: Extends to Hammer, DoubleJump
 # SwordJump: Extends to Sword, DoubleJump
 # GrenadeRedirect=x: Extends to Grenade=x
