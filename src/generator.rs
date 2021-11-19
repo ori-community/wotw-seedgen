@@ -262,7 +262,7 @@ where
     for world_index in 0..context.world_count {
         let world_context = &world_contexts[world_index];
 
-        for node in &world_context.world.graph.nodes {
+        for &node in &world_context.reachable_locations {
             if let Some(zone) = node.zone() {
                 if let Some((_, zone_relic_locations)) = world_relic_locations.iter_mut().find(|(relic_zone, _)| zone == *relic_zone) {
                     let uber_state = node.uber_state().unwrap();
