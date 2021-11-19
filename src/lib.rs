@@ -415,6 +415,8 @@ mod tests {
 
     #[test]
     fn some_seeds() {
+        initialize_log(Some("generator.log"), LevelFilter::Off, false).unwrap();
+
         let mut settings = Settings::default();
         let mut graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
 

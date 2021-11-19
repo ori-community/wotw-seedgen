@@ -8,7 +8,7 @@ use std::{
     fmt,
     fs,
     io::{self, Write},
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 use serde::{Serialize, Deserialize};
@@ -369,4 +369,11 @@ pub fn with_leading_spaces(string: &str, target_length: usize) -> String {
     }
     out += string;
     out
+}
+
+pub fn float_to_int(float: f32) -> Result<u16, String> {
+    if float < u16::MIN.into() || float > u16::MAX.into() {
+        return Err(format!("Failed to convert float to int: {}", float));
+    }
+    return Ok(float as u16);
 }
