@@ -387,10 +387,10 @@ impl Requirement {
                 } else { smallvec![Skill::Sword] };
                 let ranged_weapons = if ranged {
                     player.ranged_progression_weapons()
-                } else { smallvec![Skill::Bow] };
+                } else { smallvec![Skill::Spear] };
                 let shield_weapons = if shielded {
                     player.shield_progression_weapons()
-                } else { smallvec![Skill::Hammer] };
+                } else { smallvec![Skill::Spear] };
                 let use_burrow: SmallVec<[_; 2]> = if burrow {
                     if player.difficulty < Difficulty::Unsafe || player.inventory.has(&Item::Skill(Skill::Burrow), 1) {
                         smallvec![true]
@@ -399,44 +399,56 @@ impl Requirement {
                     }
                 } else { smallvec![false] };
 
-                // TODO there are redundancies here...
-                for weapon in weapons {
-                    for ranged_weapon in &ranged_weapons {
-                        for shield_weapon in &shield_weapons {
-                            for burrow in &use_burrow {
-                                let (mut cost, mut highest_cost) = (0.0, 0.0);
-
-                                for (enemy, amount) in enemies {
-                                    if let Enemy::EnergyRefill = enemy {
-                                        if cost > highest_cost { highest_cost = cost; }
-                                        cost = 0_f32.max(cost - f32::from(*amount));
-                                        continue;
-                                    }
-
-                                    if enemy == &Enemy::Sandworm && *burrow { continue; }
-
-                                    if enemy.shielded() {
-                                        cost += player.use_cost(*shield_weapon) * f32::from(*amount);
-                                    }
-                                    let armor_mod = if enemy.armored() && player.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
-
-                                    let used_weapon = if enemy.ranged() { ranged_weapon } else { &weapon };
-
-                                    cost += player.destroy_cost(enemy.health(), *used_weapon, enemy.flying()) * f32::from(*amount) * armor_mod;
-                                }
-                                if cost > highest_cost { highest_cost = cost; }
-
-                                let mut itemset = Requirement::needed_for_cost(highest_cost, player);
-                                for (inventory, _) in &mut itemset {
-                                    if melee { inventory.grant(Item::Skill(weapon), 1) }
-                                    if ranged { inventory.grant(Item::Skill(*ranged_weapon), 1) }
-                                    if shielded && !inventory.has(&Item::Skill(*shield_weapon), 1) { inventory.grant(Item::Skill(*shield_weapon), 1) }
-                                    if *burrow { inventory.grant(Item::Skill(Skill::Burrow), 1) }
-                                }
-
-                                itemsets.append(&mut itemset);
-                            }
+                // Filter combinations of weapons for redundancies
+                let weapons_len = weapons.len();
+                let mut weapon_combinations = Vec::<SmallVec<[_; 3]>>::with_capacity(weapons_len * ranged_weapons.len() * shield_weapons.len());
+                for ranged_weapon in ranged_weapons {
+                    for &shield_weapon in &shield_weapons {
+                        let weapon_position = weapons.iter()
+                            .position(|&weapon| weapon == ranged_weapon || weapon == shield_weapon)
+                            .map_or(weapons_len, |index| (index + 1).min(weapons_len));
+                        for weapon in &weapons[0..weapon_position] {
+                            weapon_combinations.push(smallvec![*weapon, ranged_weapon, shield_weapon]);
                         }
+                    }
+                }
+
+                for weapons in weapon_combinations {
+                    let weapon = weapons[0];
+                    let ranged_weapon = weapons[1];
+                    let shield_weapon = weapons[2];
+                    for &burrow in &use_burrow {
+                        let (mut cost, mut highest_cost) = (0.0, 0.0);
+
+                        for (enemy, amount) in enemies {
+                            if let Enemy::EnergyRefill = enemy {
+                                if cost > highest_cost { highest_cost = cost; }
+                                cost = 0_f32.max(cost - f32::from(*amount));
+                                continue;
+                            }
+
+                            if enemy == &Enemy::Sandworm && burrow { continue; }
+
+                            if enemy.shielded() {
+                                cost += player.use_cost(shield_weapon) * f32::from(*amount);
+                            }
+                            let armor_mod = if enemy.armored() && player.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
+
+                            let used_weapon = if enemy.ranged() { ranged_weapon } else { weapon };
+
+                            cost += player.destroy_cost(enemy.health(), used_weapon, enemy.flying()) * f32::from(*amount) * armor_mod;
+                        }
+                        if cost > highest_cost { highest_cost = cost; }
+
+                        let mut itemset = Requirement::needed_for_cost(highest_cost, player);
+                        for (inventory, _) in &mut itemset {
+                            if melee { inventory.grant(Item::Skill(weapon), 1) }
+                            if ranged { inventory.grant(Item::Skill(ranged_weapon), 1) }
+                            if shielded && !inventory.has(&Item::Skill(shield_weapon), 1) { inventory.grant(Item::Skill(shield_weapon), 1) }
+                            if burrow { inventory.grant(Item::Skill(Skill::Burrow), 1) }
+                        }
+
+                        itemsets.append(&mut itemset);
                     }
                 }
 
