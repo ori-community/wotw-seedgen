@@ -5861,40 +5861,45 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
     moki: LowerReach.BearSneezed  # the game behaves weird when dropping the rock on Baur
   state LowerReach.LeftFurnace:
     moki:
-      Grenade=1, Bash, DoubleJump OR Dash OR Glide  # Grenade to light the furnace
-      Grenade=1, Launch  # Grenade to light the furnace
-      Grenade=1, Grapple, DoubleJump  # Grenade to light the furnace
+      Grenade=1, Bash, DoubleJump OR Dash OR Glide
+      Grenade=1, Combat=Nest, Grapple, DoubleJump OR Dash
+      Grenade=1, Launch, Combat=Nest OR Bash
     gorlek:
       Grenade=1, Bash
-      Grenade=1, Grapple, Dash OR Glide OR Sword OR Hammer  # Weapon stall after grabing the plant. Use sword/hammer to combat the Bees as well
-      Grenade=1, SentryJump=1, Combat=Nest
+      Grenade=1, Combat=Nest, Grapple, Glide OR Sword
+      Grenade=1, Damage=10, Grapple, DoubleJump OR Dash OR Glide OR Sword  # Grapple past the enemies, might get hit
+      Grenade=1, DoubleJump, TripleJump
+      Grenade=1, Combat=Nest, SentryJump=1
+      Grenade=1, Launch
     kii:
-      Grenade=1, Combat=Nest, Damage=20  # Damage boost on the spikes on the frozen waterfall
-      Grenade=1, DoubleJump, TripleJump, Combat=Nest  # @validator Might be ok for gorlek
-      Grenade=1, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grenade=1, Damage=20, Combat=Nest OR DoubleJump  # Damage boost on the spikes on the frozen waterfall
+      Grenade=1, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
-      Grenade=1, DoubleJump, Combat=Nest
+      Grenade=1, DoubleJump
+      Grenade=1, Grapple, Spear=1
 
   pickup LowerReach.IcefallOre:
     moki, LowerReach.LeftFurnace:
-      Bash, Grapple OR Launch  # bash the enemies
-      Combat=2xSlug, Grapple, Damage=10, DoubleJump OR Dash  # grapple past the enemies and probably get hit by them
-      Water, Launch  # swim past the enemies
+      Bash, Grapple, DoubleJump OR Dash OR Glide  # bash the enemies
+      Bash, Launch
+      Combat=Nest, Grapple, DoubleJump OR Dash
     gorlek, LowerReach.LeftFurnace:
+      Bash, DoubleJump OR Dash
+      Combat=Nest, Grapple, Glide OR Sword
+      Damage=10, Grapple, DoubleJump OR Dash OR Glide OR Sword
       Water, WaterDash, DoubleJump, TripleJump
-      Bash
-      Grapple, Damage=10, Sword OR Hammer OR DoubleJump OR Dash OR Glide  # weapon stall needed, probably get hit by wasps
-      Launch, Damage=10
+      Water, Launch
     kii, LowerReach.LeftFurnace:
-      Launch
-      Grapple, Sword OR Hammer OR DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      WaterDash, DoubleJump, Water, Sword OR Hammer OR Spear=1
-      WaterDash, DoubleJump, Damage=20, TripleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # @validator the tjump variation should be fine for gorlek
-      DoubleJump, TripleJump, Sword OR Hammer  # land on the snaptrap and tjump+upslash from there. Sword/Hammer can deal with the combat. With sword, you can make the path easier by pogoing a fish or hitting mosquitos but it's not mandatory.
-      DoubleJump, Dash, Sword OR Hammer  # can hit the skeetos/nest with sword to reset djump but not mandatory.
-      DoubleJump, TripleJump, Dash, Combat=Nest  # bait the second snaptrap, coyote dash+dash+tjump from there
-      DoubleJump, TripleJump, Combat=Nest, Sentry=3 OR Shuriken=2  # bait the second snaptrap, tjump+energy weapon from there
-      DoubleJump, TripleJump, Glide, Combat=Nest, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Water OR Damage=20
+      Bash OR Launch
+      Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Water, WaterDash, DoubleJump, Hammer
+      Damage=20, WaterDash, DoubleJump, TripleJump OR Hammer
+      DoubleJump, TripleJump, Sword  # Using the skeetos is by far the easiest way, but not mandatory
+      Combat=Nest, DoubleJump, TripleJump, Dash OR Shuriken=2 OR Sentry=3  # go from the second snaptrap
+      Combat=Nest, DoubleJump, TripleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Water OR Damage=20
+      Combat=Nest, Water, DoubleJump, TripleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Combat=Nest, Damage=20, DoubleJump, TripleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Combat=Nest, Hammer, DoubleJump, TripleJump OR Dash  # Upswing for lenience
     unsafe, LowerReach.LeftFurnace:
       # DoubleJump, Glide, Sword  # pogo the fish, land on the snaptrap. from the second snaptrap, glide+djump+upslash
       DoubleJump, Sword  # reset your djump by hitting the nest with sword
@@ -5905,37 +5910,35 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
   pickup LowerReach.IcefallEX:
     moki, LowerReach.LeftFurnace:
       DoubleJump, Bash  # bash the enemies
-      Combat=2xSlug, DoubleJump, Grapple, Damage=10  # grapple past the enemies and probably get hit by them
-      Combat=2xSlug, Water, DoubleJump, WaterDash  # swim past the enemies
-      Launch
+      DoubleJump, Water, WaterDash  # swim past the enemies
+      DoubleJump, Combat=Nest, Grapple  # kill the enemies
+      Launch, Combat=Nest OR Bash
+      Launch, Water, WaterDash
     gorlek, LowerReach.LeftFurnace:
-      Water, WaterDash, DoubleJump
-      Water, DoubleJump, TripleJump
-      DoubleJump, TripleJump, Damage=20  # dboost in the poisonous water
-      WaterDash, DoubleJump, Damage=20
-      Grapple, DoubleJump
+      DoubleJump, TripleJump, Water OR Damage=20
+      DoubleJump, TripleJump, Dash, Combat=Nest
+      DoubleJump, WaterDash, Damage=20
+      DoubleJump, Grapple, Damage=10  # Grapple past the enemies, might get hit
+      Launch
     kii, LowerReach.LeftFurnace:
-      DoubleJump, TripleJump, Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # @validator dash variation might be gorlek
+      DoubleJump, Grapple
+      DoubleJump, TripleJump, Dash OR Shuriken=1 OR Sentry=2
+      DoubleJump, TripleJump, Glide, Sentry=1 OR Flash=1 OR Spear=1
+      DoubleJump, TripleJump, Combat=Nest, Hammer
+      DoubleJump, Combat=Nest, Dash, Hammer
+      DoubleJump, Sword, TripleJump OR Dash  # Pogo a fish or use the skeetos
       DoubleJump, Damage=40  # dboost in poisonous water and spikes to reach snaptrap
       DoubleJump, Water, Damage=20  # dboost in spikes to reach the snaptraps
-      DoubleJump, Dash, Hammer
-      DoubleJump, Dash, Sword, Spear=1 OR Damage=20
-      Grapple, Hammer
-      Grapple, Damage=20, Dash OR Glide OR Sword OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # dboost to get the pickup
-      Grapple, Spear=1, Dash OR Glide OR Sword OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # Spear to reach the pickup
-      Grapple, Spear=3
-      WaterDash, Hammer, Damage=20 OR Water
-      Water, WaterDash, Spear=1 OR Damage=20
-      WaterDash, Damage=20, Spear=1 OR Damage=20  # dboost or spear to reach the pickup
-      # Pogo a fish
-      Sword, Water, Hammer OR Spear=1 OR Damage=20
-      Sword, Damage=20, Hammer OR Spear=1 OR Damage=20
-      Sword, DoubleJump
-      Sword, Dash, Hammer OR Spear OR Damage=20
+      Hammer, Bash
+      Hammer, Grapple, Combat=Nest OR Dash
+      Hammer, WaterDash, Damage=20 OR Water
     unsafe, LowerReach.LeftFurnace:
       Combat=Nest, SwordSJump=1, DoubleJump OR Dash OR Glide
       Combat=Nest, SentryJump=1, Glide, Dash OR DoubleJump
       Combat=Nest, SentryJump=1, Dash, DoubleJump
+      Grapple, Damage=20, Dash OR Glide OR Sword OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # dboost to get the pickup
+      Grapple, Spear=1, Dash OR Glide OR Sword OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # Spear to reach the pickup
+      Grapple, Spear=3
       Grapple, Dash OR Glide:
         Blaze=1 OR Sentry=1 OR Flash=1  # bait the snaptrap, jump of it so it returns to its highest point then jump again+energy to reach the pickup
       Bash
@@ -5949,9 +5952,8 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
   conn LowerReach.AboveEntry:
     moki: LowerReach.HeatBaurFurnace OR DoubleJump OR Launch
     gorlek: Dash
-    kii:
-      Glide OR Sword OR Hammer OR Sentry=3  # From the same height as the water
-      Bash  # Bait a skeeto
+    kii: Glide OR Sword OR Hammer OR Sentry=3  # From the same height as the water
+    unsafe: Bash  # Bait a skeeto
   conn LowerReach.Entry: free
 
 anchor LowerReach.Central at -335, -4010:  # After the lever door
