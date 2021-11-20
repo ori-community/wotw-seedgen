@@ -5732,15 +5732,17 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
       Bash, Grenade=1
       Launch
     gorlek, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
+      DoubleJump, TripleJump, Dash
       SentryJump=1
-      Dash, DoubleJump, TripleJump
     kii, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash
-      DoubleJump, TripleJump, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Dash, DoubleJump, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1  # without hmmaer/sword, you only get one shot at these else you have to return to the anchor from a teleporter
+      DoubleJump, TripleJump, Hammer OR Shuriken=1
+      DoubleJump, TripleJump, Glide, Sword OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, Dash, Hammer
     unsafe, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
-      Grenade=1  # GrenadeJump=1
-      Dash, DoubleJump, Blaze=1
+      DoubleJump, TripleJump, Sword OR Sentry=1 OR Flash=1 OR Spear=1
+      DoubleJump, Dash, Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      GrenadeJump
 
   conn LowerReach.AboveEntry:
     moki:
@@ -5752,12 +5754,13 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
       Bash, Glide, Damage=20
       SentryJump=1, DoubleJump OR Bash
     kii:
-      Bash, Damage=20, Sword OR Hammer OR Sentry=2 OR Shuriken=2 OR Flash=2
+      Bash, Damage=20, Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
     unsafe:
       SentryJump=1
       Bash  # can be done damageless, but damage is likely. Keep jumping at the right wall until you go over it and bash the first latern at just the right angle to reach the second
       DoubleJump, TripleJump, Sentry=3, Damage=20  # https://streamable.com/1rus0h except you can use some friendly spikes to avoid the first dboost
-      DoubleJump, Hammer, Damage=20  # Hammer jumps
+      DoubleJump, TripleJump, Sword
+      HammerJump, Damage=20
   conn LowerReach.Icefall:
     unsafe: DoubleJump, TripleJump, Hammer  # climb the left wall. Yes this is horrible after doing the escape
   conn WestGlades.Upper:
@@ -5772,19 +5775,19 @@ anchor LowerReach.AboveEntry at -401, -4000:  # On the platform above Baur insid
       LowerReach.HeatBaurFurnace, DoubleJump
     gorlek:
       LowerReach.HeatBaurFurnace, Dash
-      LowerReach.HeatBaurFurnace, Bash, Grenade=1
     kii:
-      DoubleJump, TripleJump, Damage=20
-      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2  # @validator djump/dash might be good enough for gorlek
+      DoubleJump, TripleJump, Damage=20, Sword OR Hammer
+      Bash, Grenade=1, LowerReach.HeatBaurFurnace OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
       LowerReach.HeatBaurFurnace, Sword OR Sentry=2
       LowerReach.HeatBaurFurnace, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
-      LowerReach.HeatBaurFurnace, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      LowerReach.HeatBaurFurnace, Glide, Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
       # LowerReach.HeatBaurFurnace, Glide, Spear=1
-      LowerReach.HeatBaurFurnace, Sword OR Hammer OR Glide
-      Bash, Grenade=1, Glide  # Use the plant as a platform
+      LowerReach.HeatBaurFurnace, Hammer OR Glide OR Sentry=2
+      Bash, Grenade=1, Glide OR Spear=2  # Use the plant as a platform
       SentryJump=1  # you actually want a weaker jump to land on top of the plant, a strong one will send you sailing over it. Weapon stalls from there
       Bash, Sword OR Hammer OR DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Damage=20  # be careful the slightly moving spike platform isn't at the top when going over
       DoubleJump, TripleJump, Sword OR Hammer  # you first need to get on the plant on the left
       Dash, DoubleJump, Damage=20, Hammer OR Sword  # djump+upslash+ dash in the spikes, grab the plant then djump + upslash to reach the left wall. Sword much harder, need to get a ramp
 
@@ -5799,54 +5802,61 @@ anchor LowerReach.AboveEntry at -401, -4000:  # On the platform above Baur insid
       SentryJump=2
     kii:
       DoubleJump, TripleJump  # Climbing frozen tongue with TripleJump, tjump from the left wall into the xp
-      LowerReach.HeatBaurFurnace, Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      LowerReach.HeatBaurFurnace, DoubleJump, Dash OR Sword OR Hammer OR Sentry=2
+      LowerReach.HeatBaurFurnace, Bash, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2 OR Spear=1
+      LowerReach.HeatBaurFurnace, DoubleJump, Dash, Sword  # Either use the left wall or pogo the mortar
     unsafe:
       SentryJump=1, DoubleJump  # sjump, climb the left wall then djump + up slash + weapon stall to reach the xp
       Bash  # jump repeatedly under the left side of the snaptrap to aggro the spitter. yes, really.
       DoubleJump, Dash  # From the left of the frozen tongue, dash ramp+doublejump+dash. Jump off the tongue asap, djump+dash. Climb the left wall then djump + dash
       LowerReach.HeatBaurFurnace, Sword, Hammer, Sentry=2, Damage=20  # pogo the mortar, climb the left wall then sentry+hammer upslash (you'll get a dboost there). Land on the ledge then jump, hammer upslash, sword hover+sentry at the end
+      LowerReach.HeatBaurFurnace, DoubleJump, Dash OR Sword OR Hammer OR Sentry=2
       LowerReach.HeatBaurFurnace, Dash, Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mortar once to go to the left wall and a second time to climb the wall. upslash+dash+energy from there
   pickup LowerReach.AboveBaurUpperEX:
-    moki:
+    moki, LowerReach.HeatBaurFurnace:
       Launch
-      LowerReach.HeatBaurFurnace, DoubleJump, Dash, Bash
+      DoubleJump, Dash, Bash
     gorlek:
+      Launch
       LowerReach.HeatBaurFurnace, DoubleJump, Bash
-    kii:
-      LowerReach.HeatBaurFurnace, DoubleJump, TripleJump OR Sword OR Hammer
-      LowerReach.HeatBaurFurnace, Bash, Damage=20, Sword OR Hammer OR Glide OR Dash OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # land in the spikes near the mortar before it shoots then bash it and its projectile
+    kii, LowerReach.HeatBaurFurnace:
+      DoubleJump, TripleJump
+      DoubleJump, Dash, Sword  # Either use the left wall or pogo the mortar
     unsafe:
       DoubleJump, TripleJump  # I hope you'll hate that path as much as I do so it can stay in unsafe for ever
-      LowerReach.HeatBaurFurnace, SentryJump=2, DoubleJump OR Damage=20  # First jump into the spikes near the shooter, can use lower jump to snaptrap - wall - weapon stall to spikes, then sentry up from spikes to the tongue plant
-      LowerReach.HeatBaurFurnace, SwordSJump=2  # Pogo the shooter to make it to the left wall, move a bit away from it then sjump+upslash to reach the tongue
-      LowerReach.HeatBaurFurnace, SentryJump=1, Dash  # up slash + dash to reach the left wall. Move a bit away from it, sjump to reach the tongue
-      LowerReach.HeatBaurFurnace, Bash  # jump repeated under the left side of the snaptrap to aggro the spitter. On the second snaptrap, bash the projectile upwards then jump to it and bash to AboveBaurLowerEX. If you stayed long enough on the snaptrap, the shooter should shot a new projectile which you can use to grab the tongue.
-      LowerReach.HeatBaurFurnace, Dash, Sword, Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2  # pogo the mortar once to go to the left wall and a second time to climb the wall. upslash+dash+energy from there
+      LowerReach.HeatBaurFurnace:
+        DoubleJump, Dash OR Sword OR Hammer
+        SentryJump=2, DoubleJump OR Damage=20  # First jump into the spikes near the shooter, can use lower jump to snaptrap - wall - weapon stall to spikes, then sentry up from spikes to the tongue plant
+        SwordSJump=2  # Pogo the shooter to make it to the left wall, move a bit away from it then sjump+upslash to reach the tongue
+        SentryJump=1, Dash  # up slash + dash to reach the left wall. Move a bit away from it, sjump to reach the tongue
+        Bash  # Look up below and to the left of the snap plant. Then, bash the mortar -> its projectile in succession to get up
+        Dash, Sword, Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2  # pogo the mortar once to go to the left wall and a second time to climb the wall. upslash+dash+energy from there
 
   conn LowerReach.Icefall:
     moki: LowerReach.HeatBaurFurnace OR DoubleJump OR Launch
     gorlek: Dash
     kii:
-      Bash, Grenade=1  # @validator might be ok for gorlek
-      Sword OR Hammer OR Sentry=2 OR Shuriken=2  # with hammer/sword: upslash before grabing the frozen tongue, jump out of it then weapon stall
+      Bash, Grenade=1
+      Sword OR Hammer OR Shuriken=2 OR Sentry=2  # with hammer/sword: upslash before grabing the frozen tongue, jump out of it then weapon stall
     unsafe:
-      Bash  # jump to aggro the spitter (or use grenade) and catch high up on the frozen tongue, then jump off quickly
+      Bash  # jump to aggro the spitter and catch high up on the frozen tongue, then jump off quickly
   conn LowerReach.Central:
     moki, LowerReach.Lever:
       Bash, DoubleJump OR Dash OR Glide
       Launch
     gorlek, LowerReach.Lever:
-      DoubleJump, TripleJump OR Dash
-      Glide, DoubleJump OR Dash
+      Bash, Sword OR Hammer
+      DoubleJump, TripleJump OR Dash OR Glide
+      Dash, Glide
     kii, LowerReach.Lever:
-      Sword, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=20
-      Hammer, Shuriken=1, Damage=20
-      Bash, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=20
-      Glide, Sword OR Hammer OR Damage=20
-      Dash, Sword OR Hammer OR Sentry=2 OR Damage=20
-      DoubleJump, Sword OR Sentry=2 OR Damage=20
+      Bash, Shuriken=1 OR Sentry=2 OR Blaze=3 OR Damage=20
+      DoubleJump, Sword OR Hammer OR Sentry=2 OR Damage=20
+      Dash, Sword OR Hammer
+      Dash, Damage=20, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Glide, Hammer OR Damage=20
+      Sword, Shuriken=1 OR Sentry=2 OR Damage=20
+      Hammer, Damage=20, Shuriken=1 OR Sentry=1
     unsafe, LowerReach.Lever:
+      Bash, Sentry=1 OR Flash=1
       Hammer, Damage=20, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, Spear=1 OR Sentry=1 OR Shuriken=1 OR Flash=1
       Dash, Shuriken=1 OR Sentry=2  # Dash on the small wall from the branch where the lantern is attached, dash again then stall with sentry/shuriken
@@ -5858,7 +5868,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
     moki: BreakCrystal
 
   state LowerReach.BearBridgeBroken:
-    moki: LowerReach.BearSneezed  # the game behaves weird when dropping the rock on Baur
+    moki: LowerReach.BearSneezed  # the bear blocks the rock
   state LowerReach.LeftFurnace:
     moki:
       Grenade=1, Bash, DoubleJump OR Dash OR Glide
@@ -7281,7 +7291,7 @@ anchor UpperReach.UpperSoupFrozenPaths at -215, -3877:
     unsafe: SwordSJump=1, Damage=20  # dboost in the spike at the right of the enemy and sjump from here
   pickup UpperReach.SwingPoleEX:
     gorlek: Dash OR Sword
-    kii: Glide OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+    kii: Glide OR Sentry=1 OR Flash=1 OR Shuriken=1
     unsafe: free
 
   conn UpperReach.UpperSoupThawedPaths:  # light the furnace without dropping down
