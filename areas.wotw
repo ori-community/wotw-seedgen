@@ -5894,7 +5894,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
       Bash, Launch
       Combat=Nest, Grapple, DoubleJump OR Dash
     gorlek, LowerReach.LeftFurnace:
-      Bash, DoubleJump OR Dash
+      Bash, DoubleJump OR Dash OR Grapple OR Glide
       Combat=Nest, Grapple, Glide OR Sword
       Damage=10, Grapple, DoubleJump OR Dash OR Glide OR Sword
       Water, WaterDash, DoubleJump, TripleJump
