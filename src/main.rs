@@ -143,12 +143,12 @@ struct SeedSettings {
     #[structopt(short = "G", long)]
     glitches: Vec<String>,
     /// which goal modes to use
-    /// 
+    ///
     /// goal modes are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
     #[structopt(short, long)]
     goals: Vec<String>,
     /// where to spawn the player
-    /// 
+    ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
     #[structopt(short, long, default_value = "MarshSpawn.Main")]
     spawn: String,
@@ -167,7 +167,9 @@ struct SeedSettings {
     /// paths to headers stored in files which will be added to the seed
     #[structopt(parse(from_os_str), short, long = "headers")]
     header_paths: Vec<PathBuf>,
-    /// configuration variables for headers in the format <headername>.<variablename>
+    /// configuration parameters for headers
+    ///
+    /// format for one parameter: <headername>.<parametername>=<value>
     #[structopt(short = "a", long = "args")]
     header_args: Vec<String>,
 }
