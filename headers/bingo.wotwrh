@@ -4,10 +4,10 @@
 /// (remember to enable netcode in options when rolling the seed)
 !!include header_core
 //// How many lines you need to complete the game
-!!parameter line int:3
+!!parameter lines int:3
 
 10|1|6|$(10|1) line(s) completed!                               // announce line completion
-10|1|4|25|$PARAM(line)|8|9|104|bool|true
-10|1|4|26|$PARAM(line)|8|9|104|bool|true
+10|1|4|25|$PARAM(lines)|8|9|104|bool|true
+10|1|4|26|$PARAM(lines)|8|9|104|bool|true
 9|104|8|34543|11226|bool|true                                   // set game complete uberstate
 9|104|6|Bingo goal achieved! Press alt+c to warp to credits     // announce victory
