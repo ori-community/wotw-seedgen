@@ -3672,31 +3672,15 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
   refill Checkpoint
   refill Health=1:
     gorlek: Combat=Slug
-    unsafe: free  # barely out of sight, also past an enemy...
+    kii: free  # barely out of sight, also past an enemy...
   refill Energy=3:
     unsafe: BreakCrystal  # pretty far to the left
 
   # ommited a lot of paths in moki including most bash-related paths because of how complex this place is to navigate (as in, more paths were omitted than were taken into moki...)
-  state OuterWellspring.EntranceDoorOpen:
-    moki, BreakWall=16:
-      DoubleJump, Dash OR Glide
-      Dash, Glide
-      Grapple, Bash, DoubleJump OR Dash
-      Grapple, Glide
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide
-      Launch
-    gorlek, BreakWall=16:
-      DoubleJump, TripleJump OR Sword OR Hammer
-      Dash, Sword OR Hammer OR Damage=15
-      Grapple, Sword
-      Grapple, Damage=15, DoubleJump OR Hammer
-      Bash, DoubleJump OR Dash OR Glide OR Sword  # different ways to solve using the many bash targets around
-      SwordSJump=1
-      HammerSJump=1, Damage=15
-    unsafe, BreakWall=16:
-      Damage=15, Sword
-      Dash OR Bash OR Glide
-
+  
+  state OuterWellspring.EntranceDoorOpen:  # This state normaly origin from OuterWellspring.Basement. This path is a it specific because it can break the corruption but can't reach the anchor
+    kii: BreakWall=16, Water, Damage=15, Bow OR Spear OR Shuriken OR Grenade OR Blaze  # dboost on the wheel above OuterWellspring.BasementEC and use a ranged weapon to break the corruption
+  
   pickup OuterWellspring.EntranceRoofEX:
     moki:
       DoubleJump, Grapple, Dash OR Glide
@@ -3705,31 +3689,21 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Grapple, DoubleJump, TripleJump
       Grapple, Dash, Sword OR Hammer  # upswing into the pickup
       Launch, Bash, Grenade=1  # other launch paths are covered from the anchor above
+    kii:
+      Grapple, DoubleJump
+      Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Sword, Spear=1
+    unsafe:
+      Grapple, Dash OR Sword
   pickup OuterWellspring.WheelEX:
     moki: OuterWellspring.EntranceDoorOpen
   pickup OuterWellspring.BasementEC:
-    moki:
-      Water:  # mirror of the entrancedooropen paths
-        DoubleJump, Dash OR Glide
-        Dash, Glide
-        Grapple, Bash, DoubleJump OR Dash
-        Grapple, Glide
-        Bash, Grenade=1, DoubleJump OR Dash OR Glide
-        Launch
-      OuterWellspring.EntranceDoorOpen  # casual strat I guess?
-    gorlek:
-      Damage=15, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer  # go around the moss wheel
-      Water:  # mirror of the entrancedooropen paths
-        DoubleJump, TripleJump OR Sword OR Hammer
-        Dash, Sword OR Hammer OR Damage=15
-        Grapple, Sword
-        Grapple, Damage=15, DoubleJump OR Hammer
-        Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=15  # different ways to solve using the many bash targets around
-        SwordSJump=1
-        HammerSJump=1, Damage=15
-      Bash, Glide, DoubleJump, TripleJump OR Grapple  # bashglide
-      Bash, DoubleJump, TripleJump, Grapple
-      Bash, Launch, DoubleJump OR Glide
+    moki: OuterWellspring.EntranceDoorOpen  # casual strat I guess?
+    gorlek: Damage=15, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer  # go around the moss wheel
+    kii:
+      Damage=45
+      Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Damage=10  # let the bee hit you and use the iframes to pass through the spikes
   pickup OuterWellspring.LifeHarvestShard:
     moki, BreakWall=20:
       DoubleJump, Bash
@@ -3738,14 +3712,51 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       SentryJump=1, DoubleJump OR Dash OR Glide OR Damage=15
       Bash, Dash  # other options are somewhere on the border between difficulties
       Bash, Grenade=1  # this would be in moki if the camera didn’t put ori right at the top of the screen, making it hard to aim/catch the grenade
+    kii, BreakWall=20:
+      Bash, Glide OR Sword OR Hammer
+      Bash, Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
     unsafe, BreakWall=20:
-      Bash, Hammer  # not gorlek due to a non trivial combo attack
+      Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918247805364088832
       DoubleJump, TripleJump
   pickup OuterWellspring.SwimEX:
     moki: Water
-
+    unsafe:
+      Damage=180
+      WaterDash, Damage=80
+      Bash, Damage=120
   conn InnerWellspring.EntranceDoor:
     moki: OuterWellspring.EntranceDoorOpen
+  conn OuterWellspring.Basement:
+    moki:
+      DoubleJump, Dash OR Glide
+      Dash, Glide
+      Grapple, Bash, DoubleJump OR Dash
+      Grapple, Glide
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek:
+      DoubleJump, TripleJump OR Sword OR Hammer
+      Dash, Sword OR Hammer OR Damage=15
+      Grapple, Sword
+      Grapple, Damage=15, DoubleJump OR Hammer
+      Bash, DoubleJump OR Dash OR Glide OR Sword  # different ways to solve using the many bash targets around
+      SwordSJump=1
+      HammerSJump=1, Damage=15
+    kii:
+      Dash OR Bash # refresh dash on ceiling after the wheel
+      Glide, Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
+      Sword, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15  # full combo to reach the pole, second requirement for the jump from the wheel
+      Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
+      Grapple, Hammer OR Blaze=4 OR Sentry=2 OR Damage=15  #jump from the wheel, stall in the air then grapple the wheel on the left before hitting the spikes
+      Water, Damage=15, WaterDash OR Sword OR Hammer  # you can land on the platform without any skills but there's a weird collision so adding another skill to land on that platform
+      Damage=55, WaterDash
+    unsafe:
+      Glide OR Sword OR Shuriken=5
+      Grapple, Shuriken=2
+      Water, Damage=15  # dboost on the wheel above OuterWellspring.BasementEC
+      Damage=95  # dboost on the wheel above OuterWellspring.BasementEC
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump, Grapple  # save all the other ways for gorlek...
     gorlek:
@@ -3790,12 +3801,21 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
 
 # checkpoint at -978, -4042
 
+anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openning the entrance
+  state OuterWellspring.EntranceDoorOpen:
+    moki: BreakWall=16
+    
+  pickup OuterWellspring.BasementEC:
+    moki: Water
+    gorlek: Bash, DoubleJump, TripleJump, Grapple
+
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
   refill Energy=3:
     moki: BreakCrystal
 
   pickup OuterWellspring.EntranceRoofEX:
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    unsafe: Launch
   pickup OuterWellspring.RightWallEC:
     gorlek: BreakWall=20, DoubleJump, TripleJump, Damage=15  # go above the wheel to the right, damage not mandatory
 
