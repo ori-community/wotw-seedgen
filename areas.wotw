@@ -3680,7 +3680,9 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
   
   state OuterWellspring.EntranceDoorOpen:  # This state normaly origin from OuterWellspring.Basement. This path is a it specific because it can break the corruption but can't reach the anchor
     kii: BreakWall=16, Water, Damage=15, Bow OR Spear OR Shuriken OR Grenade OR Blaze  # dboost on the wheel above OuterWellspring.BasementEC and use a ranged weapon to break the corruption
-  
+  state OuterWellspring.FallingWheel:
+    unsafe: BreakWall=16, Bow  # Master Sniper
+    
   pickup OuterWellspring.EntranceRoofEX:
     moki:
       DoubleJump, Grapple, Dash OR Glide
@@ -3692,7 +3694,6 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
     kii:
       Grapple, DoubleJump
       Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Grapple, Sword, Spear=1
     unsafe:
       Grapple, Dash OR Sword
   pickup OuterWellspring.WheelEX:
@@ -3701,7 +3702,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
     moki: OuterWellspring.EntranceDoorOpen  # casual strat I guess?
     gorlek: Damage=15, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer  # go around the moss wheel
     kii:
-      Damage=45
+      Damage=35
       Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Damage=10  # let the bee hit you and use the iframes to pass through the spikes
   pickup OuterWellspring.LifeHarvestShard:
@@ -3724,6 +3725,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Damage=180
       WaterDash, Damage=80
       Bash, Damage=120
+      
   conn InnerWellspring.EntranceDoor:
     moki: OuterWellspring.EntranceDoorOpen
   conn OuterWellspring.Basement:
@@ -3750,13 +3752,15 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
       Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
       Grapple, Hammer OR Blaze=4 OR Sentry=2 OR Damage=15  #jump from the wheel, stall in the air then grapple the wheel on the left before hitting the spikes
-      Water, Damage=15, WaterDash OR Sword OR Hammer  # you can land on the platform without any skills but there's a weird collision so adding another skill to land on that platform
+      Water, Damage=15, WaterDash OR Hammer  # dboost on the wheel above OuterWellspring.BasementEC. You can land on the platform without any skills but there's a weird collision so adding another skill
       Damage=55, WaterDash
+      Damage=95, Hammer
     unsafe:
       Glide OR Sword OR Shuriken=5
       Grapple, Shuriken=2
       Water, Damage=15  # dboost on the wheel above OuterWellspring.BasementEC
       Damage=95  # dboost on the wheel above OuterWellspring.BasementEC
+      Damage=75, Hammer # dboost on the wheel above OuterWellspring.BasementEC
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump, Grapple  # save all the other ways for gorlek...
     gorlek:
@@ -3766,17 +3770,39 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Bash, Grenade=2, DoubleJump OR Dash             # Go up the left side; works for either wheel state
       Bash, Grenade=1, Damage=15, DoubleJump OR Dash  # As above but damage boost to get to the pole
       Bash, Grenade=3, Glide OR Damage=15             # As above but Glide needs an extra bashnade in case the wheel is down
+    kii:
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Use the slime on the way to the basement to reach the slime on the wooden platform. Launch a grenade straught up, bash the slime to reach it.
+      Bash, DoubleJump, TripleJump  # Bait the mantis on the wheel, bash it upwards and bash it again to grab the other wheel
+      DoubleJump, TripleJump, Sword  # Climb the left wall. Sword to prevent softlock after breaking the wall towards the shard.
+      OuterWellspring.FallingWheel, Bash OR Damage=15:  # Damage depends on where you land in the spikes
+        DoubleJump OR Dash OR Sword OR Hammer
+        Glide, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      OuterWellspring.FallingWheel, DoubleJump, Sword  # Reset djump by hitting the bee
+      OuterWellspring.FallingWheel, DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      OuterWellspring.FallingWheel, DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      OuterWellspring.FallingWheel, Dash, Sword  # sword hover then dash to pass the spikes
+      OuterWellspring.FallingWheel, Dash, Hammer, Glide OR Shuriken=1
     unsafe:
-      SentryJump=1, Bash, Grenade=1                   # Throw the greande, sentry jump to it, then bash off it, on right side (do a small lure on bottom slime to get to platform)
+      DoubleJump, TripleJump, Hammer  # Climb the left wall. Hammer to prevent softlock after breaking the wall towards the shard. You have to upslash before jumpîng
+      Bash                                            # https://youtu.be/IhPJ6NdIu8I
+      #SentryJump=1, Bash, Grenade=1                  # Throw the greande, sentry jump to it, then bash off it, on right side (do a small lure on bottom slime to get to platform)
       SentryJump=1, Damage=15, Dash OR Glide          # Slightly different methods needed for hammer vs sentry, hammer is similar to above, sword goes left side
       SwordSJump=2
       HammerSJump=2, Dash OR Glide OR Damage=15
+      OuterWellspring.FallingWheel, Glide, Damage=10  # Glide jump
+      OuterWellspring.FallingWheel, Damage=15, Shuriken=5 OR Sentry=5
+      OuterWellspring.FallingWheel, Dash, Sword
   conn OuterWellspring.WestDoor:  # going directly up the left wall
     gorlek:
       Bash, Grenade=2, DoubleJump, Dash OR Glide
       Bash, Grenade=3, DoubleJump
       Launch
-  # connections using the left wall wheel would be pointless
+    kii:
+      Grapple
+      Bash, DoubleJump, TripleJump OR Grenade=2
+      DoubleJump, TripleJump, Sword
+    unsafe:
+      DoubleJump, Bash OR OuterWellspring.FallingWheel
   conn WestGlades.MillApproach:
     moki:
       DoubleJump, Dash, Glide
@@ -3793,11 +3819,15 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       HammerSJump=2, DoubleJump OR Dash OR Glide OR Damage=20
       Bash, Grenade=1, Glide
       Bash, Grenade=2, Sword OR Damage=20
+    kii:
+      Damage=20, Bash OR DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Damage=20
+      DoubleJump, Hammer
+      Dash, Sword OR Hammer
+      Dash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Glide  # Bash glide from the slime on the wooden platform
     unsafe:
-      Bash, Glide
-      Bash, DoubleJump, Sword
-      Bash, DoubleJump, Hammer, Damage=20
-      Bash, SentryJump=1, DoubleJump OR Dash
+      Dash, Glide
+      Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918944477215866900
 
 # checkpoint at -978, -4042
 
