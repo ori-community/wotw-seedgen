@@ -3678,7 +3678,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
 
   # ommited a lot of paths in moki including most bash-related paths because of how complex this place is to navigate (as in, more paths were omitted than were taken into moki...)
   
-  state OuterWellspring.EntranceDoorOpen:  # This state normaly origin from OuterWellspring.Basement. This path is a it specific because it can break the corruption but can't reach the anchor
+  state OuterWellspring.EntranceDoorOpen:  # This state normaly origin from OuterWellspring.Basement. This path is a bit specific because it can break the corruption but can't reach the anchor
     kii: BreakWall=16, Water, Damage=15, Bow OR Spear OR Shuriken OR Grenade OR Blaze  # dboost on the wheel above OuterWellspring.BasementEC and use a ranged weapon to break the corruption
   state OuterWellspring.FallingWheel:
     unsafe: BreakWall=16, Bow  # Master Sniper
@@ -3838,7 +3838,44 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openni
   pickup OuterWellspring.BasementEC:
     moki: Water
     gorlek: Bash, DoubleJump, TripleJump, Grapple
-
+    kii:
+      Damage=80
+      Damage=40, WaterDash OR DoubleJump OR Dash
+      Bash, Damage=20, DoubleJump OR Glide
+      Bash, Grapple, Damage=20, Dash OR Sword
+      Dash, Grapple, Damage=20, DoubleJump OR Glide OR Sword OR Hammer
+      Bash, Grapple, Glide
+      Bash, DoubleJump, TripleJump, Grapple OR Glide OR Dash
+      Bash, DoubleJump, TripleJump, Sword # Pogo the second fish
+      Bash, DoubleJump, TripleJump, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Bash, Damage=20
+      Dash, Grapple, Damage=20
+      Dash, Grapple, DoubleJump, Sword
+      Bash, DoubleJump, Glide OR Sword
+      Bash, DoubleJump, TripleJump, Hammer OR Shuriken=1
+  
+  conn OuterWellspring.EntranceDoor:
+    moki:
+      Launch, DoubleJump OR Dash OR Glide OR Bash OR Grapple
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, Grapple OR Dash OR Glide
+      # Use the wheel above BasementEC
+      OuterWellspring.EntranceDoorOpen, Launch, Water
+      OuterWellspring.EntranceDoorOpen, Water, Grapple, Combat=WeakSlug OR Bash
+      OuterWellspring.EntranceDoorOpen, Water, WaterDash, Combat=WeakSlug OR Bash
+    gorlek:
+      Launch
+      OuterWellspring.EntranceDoorOpen, Grapple, DoubleJump OR Dash OR Sword  # Pass inside the wheel with the SL container
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, TripleJump OR Sword
+      OuterWellspring.EntranceDoorOpen, Bash, Damage=15, DoubleJump OR Dash # Can be done without damage by bashing the bee but it can just decide to hit spikes
+    kii:
+      DoubleJump, TripleJump, Grapple, Combat=2xWeakSlug
+      DoubleJump, TripleJump, Bash, Grenade=1
+    unsafe:
+      Grapple, DoubleJump, Combat=WeakSlug OR Bash
+      OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
+      Damage=15, Water, WaterDash OR Bash OR SwordSJump=1  # Use the wheel above BasementEC. walljump after the damage to regrab the wheel and use the iframes to pass the spikes.
+      
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
   refill Energy=3:
     moki: BreakCrystal
