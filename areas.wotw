@@ -3872,10 +3872,18 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openni
     kii:
       DoubleJump, TripleJump, Grapple, Combat=2xWeakSlug
       DoubleJump, TripleJump, Bash, Grenade=1
+      OuterWellspring.EntranceDoorOpen, Grapple, Combat=WeakSlug
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      OuterWellspring.EntranceDoorOpen, Water, Bash  # Bash the fish to grab the wheel above Basement EC
+      OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Water OR Damage=20:
+        Damage=15, DoubleJump OR Dash OR Sword OR Hammer
+        DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+        Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+        Glide, Hammer
     unsafe:
       Grapple, DoubleJump, Combat=WeakSlug OR Bash
-      OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
       Damage=15, Water, WaterDash OR Bash OR SwordSJump=1  # Use the wheel above BasementEC. walljump after the damage to regrab the wheel and use the iframes to pass the spikes.
+      OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
       
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
   refill Energy=3:
