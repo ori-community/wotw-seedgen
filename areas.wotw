@@ -3545,6 +3545,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
     unsafe:
       Water, DoubleJump               # or just be a madman
       Water, Glide  # Glide jump
+      Water, Bash  # https://discord.com/channels/116250700685508615/845415952790454272/919589633543766037
 
   conn WestGlades.ShrineArea:
     moki:
