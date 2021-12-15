@@ -3892,17 +3892,19 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
   pickup OuterWellspring.EntranceRoofEX:
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     unsafe: Launch
-  pickup OuterWellspring.RightWallEC:
+  pickup OuterWellspring.RightWallEC:  # Be carefull it's not redundant with AboveEntranceDoor->EastDoor->RightWallEC
     gorlek: BreakWall=20, DoubleJump, TripleJump, Damage=15  # go above the wheel to the right, damage not mandatory
-
+    kii: BreakWall=20, DoubleJump, TripleJump
+    
   conn OuterWellspring.EastDoor:  # going to the right
     moki:
       Grapple, DoubleJump, Dash OR Glide
       Launch
     gorlek: Grapple, DoubleJump, TripleJump OR Sword OR Hammer
+    kii:  # Grapple paths are covered by AboveEntranceDoor->RightWallMidpoint->TrialApproach->EastDoor
+      DoubleJump, TripleJump, Bash
     unsafe:
-      Grapple
-      DoubleJump, TripleJump, Damage=15, Sword OR Hammer
+      Bash, DoubleJump
       SentryJump=1, DoubleJump, Damage=15, Dash OR Glide
       SentryJump=1, Bash, Grenade=1, DoubleJump
       SentryJump=2, Bash, Grenade=1, Glide, Dash
@@ -3917,6 +3919,12 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       Bash, Grenade=1, DoubleJump, Dash, Glide
       Bash, Grenade=2, DoubleJump, Dash OR Glide
       Bash, Grenade=3, DoubleJump
+    kii:
+      Grapple, Hammer OR Blaze=4 OR Sentry=2
+      Bash, Grenade=1, DoubleJump
+    unsafe:
+      Grapple, Shuriken=2
+      DoubleJump, Bash OR Dash
   conn OuterWellspring.RightWallMidpoint:
     moki: Grapple
     gorlek:
@@ -3928,9 +3936,18 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       SentryJump=2, Glide
       SwordSJump=2, DoubleJump OR Dash
       SentryJump=1, Dash, Glide
-    unsafe: Glide
+    kii:
+      Bash, Grenade=1
+      DoubleJump, Sword OR TripleJump
+      DoubleJump, Hammer, Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Bash OR Glide OR Sword OR Blaze=6 OR Sentry=4
+      Dash, Hammer, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      Glide
+      Sword, Shuriken=1  # Pogo the energy cristal to grab the wheel
   conn WestGlades.MillApproach:
-    gorlek: Grapple OR Glide
+    gorlek: Glide
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you exit the first room
@@ -4153,7 +4170,8 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
       Launch
   conn OuterWellspring.TrialApproach:  # no moki path because the camera makes the connection hard to see
     gorlek: Grapple, Combat=Bee OR Bash  # Launch is redundant with EntranceDoor -> AboveEntranceDoor -> EastDoor
-
+    kii: Grapple
+    
 anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towards the trial room
   refill Checkpoint
 
