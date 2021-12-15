@@ -4038,14 +4038,20 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
       Glide OR Launch
       Grapple, DoubleJump OR Dash
       Grapple, Bash, Grenade=1
-    gorlek:
-      BreakWall=20, DoubleJump, TripleJump
-      DoubleJump, Sword
+    gorlek, BreakWall=20:
+      DoubleJump, TripleJump OR Sword
       Grapple, Sword OR Hammer
-      BreakWall=20, Bash, Grenade=1, DoubleJump OR Dash
-      Bash, Grenade=1, Sword OR Hammer
-      BreakWall=20, Bash, Grenade=2
-    unsafe: DoubleJump, Hammer, Damage=15
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer
+      Bash, Grenade=2
+    kii, BreakWall=20:
+      Dash, Damage=15  # Coyote dash then dash again to grab the whell on the right
+      DoubleJump, Bash OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # With energy weapon, grab the wheel on the right.
+      Grapple, Shuriken=1 OR Blaze=2 OR Sentry=2
+      Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe, BreakWall=20:
+      Dash
+      DoubleJump, Shuriken=1 OR Blaze=1
+      Bash, Grenade=1, Damage=15
 
   conn InnerWellspring.EastDoor:
     moki: InnerWellspring.MiddleDoorsOpen
@@ -4062,6 +4068,13 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
         Bash, Grenade=1, Hammer, Damage=10
       Bash, Grenade=1, DoubleJump, TripleJump
       Bash, Grenade=1, Grapple
+    kii:
+      InnerWellspring.TopDoorOpen, Bash, Grenade=1, Hammer OR Blaze=4 OR Sentry=2
+      DoubleJump, Grapple
+    unsafe:
+      InnerWellspring.TopDoorOpen, Bash, Grenade=1, Damage=25
+      InnerWellspring.TopDoorOpen, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # These aren't kii because it's easy to get stuck in those spikes
+      Grapple, Damage=15
   conn OuterWellspring.WestDoor:
     moki: DoubleJump OR Dash OR Launch
     gorlek: Glide OR Sword OR Hammer
@@ -4069,23 +4082,36 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
   conn OuterWellspring.TrialApproach:
     moki: Grapple OR Launch
     gorlek:
-      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Damage=10
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=15  # Dmage depends on where you land in the spikes
       DoubleJump, TripleJump, Bash, Grenade=1
-      DoubleJump, Dash, Glide OR Sword OR Hammer OR Damage=10
+      DoubleJump, Dash, Sword OR Hammer OR Damage=15  # Damage depends on where you land in the spikes
       DoubleJump, Dash, Bash, Grenade=1
       DoubleJump, Glide
       SentryJump=2  # follow up the second sentryjump with a weapon hover
       Bash, Grenade=2, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    kii:
+      DoubleJump, Dash OR Sword
+      DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Dash, Damage=15, Glide OR Sword OR Hammer OR Sentry=2 OR Damage=15  # Coyote dash then dash again to grab the whell on the right
+      DoubleJump, Damage=15, Hammer OR Spear=2 OR Flash=2 OR Sentry=2  # Djump+your other movement option to grab the wheel. Using 2 energy weapons because dependaing on where you land in the spikes, the knockbak might make you fall
+      DoubleJump, Damage=15, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # Same as above but more energy efficient
+      Bash, Grenade=1, Damage=15, Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
+      Bash, Grenade=1, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
+      Bash, Grenade=1, Damage=15, Sentry=3  # Same as above but take the second dboost
+      Bash, Grenade=2
+    unsafe:
+      Dash  # There's a little friendly spike area on the very edge of the platform
+      Glide  # Glide jumps
+      DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # There's a little friendly spike area on the very edge of the platform
+      Bash, Grenade=1, Sentry=2, Damage=10
   conn OuterWellspring.RightWallMidpoint:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Damage=15
   conn OuterWellspring.AboveEntranceDoor: free
-  conn WestGlades.MillApproach:
-    gorlek:
-      DoubleJump OR Dash OR Sword OR Damage=20
-      Bash, Grenade=1
 
 anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing over west door
   refill Energy=3:
