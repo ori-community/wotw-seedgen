@@ -3890,6 +3890,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
     moki: BreakCrystal
 
   pickup OuterWellspring.EntranceRoofEX:
+    moki: DoubleJump, Launch, Dash OR Glide
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     unsafe: Launch
   pickup OuterWellspring.RightWallEC:  # Be carefull it's not redundant with AboveEntranceDoor->EastDoor->RightWallEC
@@ -3959,7 +3960,12 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
     gorlek, BreakWall=3, Bow OR Spear OR Shuriken OR Grenade OR Blaze OR Grapple:  # // TODO account for this kind of syntax
       Bash, Grenade=1
       SentryJump=1
-      Grapple, Damage=15, DoubleJump, TripleJump OR Dash  # go up on the left to get into range and then grapple to the corruption
+    kii, BreakWall=3:
+      Bash, Grenade=1
+      DoubleJump, TripleJump, Grapple  # grapple the plant on the left  then tjump to the right to be in range of the plnt inside the corruption
+    unsafe, BreakWall=3:
+      Bow
+      DoubleJump, Grapple  # grapple the plant on the left, hold up to make it appear on screen
 
   pickup OuterWellspring.HiddenHC:
     moki, OuterWellspring.WestDoorBlueMoonFree:
@@ -3976,33 +3982,41 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       Grapple, SentryJump=1, Damage=15, Dash OR Glide
       Bash, Grenade=1, Launch
       SentryJump=1, Launch
+    kii:
+      Grapple, Launch  # @Validator should probably be moki/gorlek (path from moki require WestDoorBlueMoonFree as well)
+      Grapple, DoubleJump, TripleJump
+      Grapple, Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer
+      Grapple, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Bash, OuterWellspring.WestDoorBlueMoonFree, DoubleJump OR Dash OR Sword OR Hammer
+      Grapple, Bash, OuterWellspring.WestDoorBlueMoonFree, Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
+      Grapple, DoubleJump  # grapple the plant on the left, hold up to make it appear on screen
+      Grapple, Bash, Grenade=1, Glide OR Sentry=2
       Bash, Grenade=1, SentryJump=1, DoubleJump, TripleJump
-  pickup OuterWellspring.EntranceRoofEX:
-    moki: DoubleJump, Launch, Dash OR Glide
 
   # this tokk disappears after the needle quest
   conn InnerWellspring.WestDoor:
     moki: InnerWellspring.MiddleDoorsOpen
-  conn OuterWellspring.EastDoor:
-    moki:
-      Bash, Grenade=1, DoubleJump, Dash OR Glide
-      Bash, Grenade=1, Launch
-      Launch, DoubleJump OR Dash OR Glide
-      OuterWellspring.WestDoorBlueMoonFree, Grapple, DoubleJump, Dash OR Glide
-      OuterWellspring.WestDoorBlueMoonFree, Grapple, Launch
+  conn OuterWellspring.EastDoor:  # Grapple / Launch paths are redundant with WestDoor->AboveEntranceDoor->EastDoor
+    moki: Bash, Grenade=1, DoubleJump, Dash OR Glide
     gorlek:
       Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
       SentryJump=1, DoubleJump
-      Launch, Sword OR Hammer OR Damage=15
-      OuterWellspring.WestDoorBlueMoonFree, Grapple, DoubleJump, TripleJump OR Sword OR Hammer
-      Grapple, Damage=15, DoubleJump, TripleJump OR Dash  # mirror from breaking the blue moon free since you don't need wall breakage to perform this
+    kii:
+      Bash, Grenade=1, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Hammer, Shuriken=2
+    unsafe: Bash, Grenade=1, Dash OR DoubleJump  # on the pole, stick to the wheel. You should get a nice curve when jumping, letting you reach the platform with your mobility option
   conn OuterWellspring.AboveEntranceDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
       DoubleJump, Dash, Glide
       Launch
+    kii:
+      Grapple  # Fall from the left
+      Damage=30  # hold right, dboost on the wheel then on the spikes bellow. Should only require Damage=25 but damage depend on where you land in the spikes.
+    unsafe: free  # tap right to avoid the dboost on the wheel then grab the pole while falling
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to the spin puzzle
