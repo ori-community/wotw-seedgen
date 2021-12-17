@@ -137,7 +137,7 @@ fn tokenize_identifier(input: &str, context: &mut TokenContext, keyword: &str, n
     let identifier = &input[keyword.len()..];
     let delimiter = identifier.find(|c: char| c.is_whitespace() || c == ':' || c == '#')?;
     let mut consume_colon = 0;
-    if identifier.bytes().nth(delimiter)? == b':' {
+    if *identifier.as_bytes().get(delimiter)? == b':' {
         consume_colon = 1;
     }
     let identifier = &identifier[..delimiter];

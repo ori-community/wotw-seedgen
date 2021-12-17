@@ -4,7 +4,8 @@
 /// Adds support for toggleable Rapid Spear
 /// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
-!!name 8|9|12|byte|+1 Rapid Spear
+!!name 8|9|12|byte|+1 #Rapid Spear#
+!!display 8|9|12|byte|+1 $[(9|999=404)]
 !!icon 8|9|12|byte|+1 file:assets/icons/bonus/rapidspear.png
 
 // skip-validate
@@ -21,7 +22,6 @@
 
 9|12|4|25|1|8|9|118|bool|true           // set to default enabled
 9|12|4|26|100|8|9|12|byte|100|skip=1    // cap at 100
-9|12|6|$[(9|999=404)]
 9|12|4|17|9|118|1|8|9|13|int|1          // grant on pickup if enabled
 9|12=1|8|9|117|bool|true                // subscribe to bonus core
 
