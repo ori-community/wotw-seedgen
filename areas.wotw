@@ -3904,6 +3904,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
     gorlek: Grapple, DoubleJump, TripleJump OR Sword OR Hammer
     kii:  # Grapple paths are covered by AboveEntranceDoor->RightWallMidpoint->TrialApproach->EastDoor
       DoubleJump, TripleJump, Bash
+      Bash, Grenade=2
     unsafe:
       Bash, DoubleJump
       SentryJump=1, DoubleJump, Damage=15, Dash OR Glide
@@ -4105,7 +4106,7 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
       DoubleJump, Damage=15, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # Same as above but more energy efficient
       Bash, Grenade=1, Damage=15, Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
       Bash, Grenade=1, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
-      Bash, Grenade=1, Damage=15, Sentry=3  # Same as above but take the second dboost
+      Bash, Grenade=1, Damage=30, Sentry=3  # Same as above but take the second dboost
       Bash, Grenade=2
     unsafe:
       Dash  # There's a little friendly spike area on the very edge of the platform
@@ -4224,9 +4225,11 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
     moki: Grapple OR Glide  # Others are redundant with EntranceDoor
     gorlek:
       Sword OR Damage=20
-      HammerSJump=1, DoubleJump OR Dash OR Damage=20
-      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Damage=20
-    unsafe: DoubleJump OR Dash OR Hammer
+      HammerSJump=1, DoubleJump OR Dash
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword
+    kii:
+      DoubleJump OR Dash OR Hammer OR Blaze=2 OR Sentry=2
+      Bash, Grenade=1
   conn OuterWellspring.EntranceDoor:
     moki: Water OR Glide OR Launch  # Grapple paths are redundant with AboveEntranceDoor
     gorlek:
@@ -4234,7 +4237,7 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
       Dash, Sword OR Hammer
       Damage=20 OR SentryJump=1
       Bash, Grenade=1
-    unsafe: DoubleJump OR Dash OR Hammer
+    kii: DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
   conn OuterWellspring.AboveEntranceDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide OR Launch
@@ -4247,13 +4250,20 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
       SentryJump=1, Glide
       SwordSJump=1, DoubleJump, TripleJump OR Dash  # Weapon hover
       HammerSJump=1, DoubleJump, TripleJump, Dash  # Weapon hover
-    unsafe:
-      DoubleJump, TripleJump, Dash
-      Bash, Grenade=1, Sword OR Hammer OR DoubleJump
-      Launch
+    kii:
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
+  conn OuterWellspring.EastDoor:  # Most paths from this anchor should be redundant with going to AboveEntranceDoor then EastDoor
+    kii: Bash, Grenade=2  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
   conn OuterWellspring.TrialApproach:  # no moki path because the camera makes the connection hard to see
     gorlek: Grapple, Combat=Bee OR Bash  # Launch is redundant with EntranceDoor -> AboveEntranceDoor -> EastDoor
-    kii: Grapple
+    kii:
+      Grapple
+      Bash, Grenade=3  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
+      Bash, Grenade=2  Damage=15, DoubleJump OR Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
+      Bash, Grenade=2, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
+      Bash, Grenade=2, Damage=30, Sentry=3  # Same as above but take the second dboost
     
 anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towards the trial room
   refill Checkpoint
