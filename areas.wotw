@@ -4261,7 +4261,7 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
     kii:
       Grapple
       Bash, Grenade=3  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
-      Bash, Grenade=2  Damage=15, DoubleJump OR Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
+      Bash, Grenade=2, Damage=15, DoubleJump OR Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
       Bash, Grenade=2, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
       Bash, Grenade=2, Damage=30, Sentry=3  # Same as above but take the second dboost
     
@@ -4277,17 +4277,23 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Grapple, DoubleJump, TripleJump
       SentryJump=1, DoubleJump OR Dash OR Glide
       Bash, Grenade=1, Dash OR Glide
+    kii:
+      Grapple, DoubleJump OR Dash OR Glide OR Sword
+      Bash, Grenade=1 OR DoubleJump OR Sword OR Hammer  # wall jump on the wall next to the SL container. Without grenade, use the 
     unsafe:
-      Grapple, Dash, Glide  # Might be a bit tight for gorlek
+      Grapple  # https://youtu.be/vI511KFMZWI
   pickup OuterWellspring.RightWallEC:
     moki, BreakWall=20:
       DoubleJump, Dash
       Glide OR Launch
       Grapple, DoubleJump OR Dash
-    gorlek:
-      BreakWall=20, DoubleJump OR Dash
-      Sword OR Hammer
-
+    gorlek, BreakWall=20: DoubleJump OR Dash OR Sword OR Hammer
+    kii, BreakWall=20:
+      Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Damage=15, Spear=1 OR Blaze=1
+      Damage=15, Bash  #land in the spikes to jump on the wheel then bash glide of the bee
+    unsafe, BreakWall=20: Bash OR Spear=1 OR Blaze=1  # land on the friendly spikes, at the very edge of the spikes
+  
   conn OuterWellspring.TrialRoom:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -4296,6 +4302,9 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Grapple
       SentryJump=1
       Bash, Grenade=1
+    kii:
+      Bash  # Bash the beetle
+      DoubleJump, TripleJump
   conn OuterWellspring.EastDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -4306,6 +4315,12 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       DoubleJump, TripleJump OR Dash OR Sword
       DoubleJump, Hammer, Damage=15
       SentryJump=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1
+      DoubleJump, Hammer OR Sentry=2 OR Damage=15
+      Dash, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
+      Damage=15, Sentry=2
+    unsafe: DoubleJump
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
@@ -4313,6 +4328,8 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Bash, Grenade=1
       SentryJump=1
       Damage=15
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free
   conn OuterWellspring.RightWallMidpoint:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek: free
@@ -4330,7 +4347,10 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
     gorlek:
       Dash OR Glide
       DoubleJump, Sword OR Hammer
-    unsafe: DoubleJump
+    kii:
+      DoubleJump, TripleJump  # @validator Probably should be gorlek
+      Sword OR Sentry=3
+    unsafe: DoubleJump OR Shuriken=2 OR Sentry=2
   conn OuterWellspring.TrialApproach: free
 
 anchor OuterWellspring.TrialStart at -665, -3937:
@@ -4340,6 +4360,7 @@ anchor OuterWellspring.TrialStart at -665, -3937:
   pickup OuterWellspring.SpiritTrial:
     moki: OuterWellspring.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: OuterWellspring.TrialActivation, Dash, Grapple, Glide
+    kii: OuterWellspring.TrialActivation, Grapple, Glide
 
   conn OuterWellspring.TrialRoom:
     moki:
@@ -4351,6 +4372,12 @@ anchor OuterWellspring.TrialStart at -665, -3937:
       Dash, Sword OR Hammer
       Glide
       Grapple, DoubleJump OR Dash OR Sword OR Hammer
+    kii:
+      Dash OR Sword
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, Hammer  # @validator probably should be gorlek
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Damage=30 OR DoubleJump
 
 region InnerWellspring:
   moki: Danger=25
