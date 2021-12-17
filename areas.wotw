@@ -6,10 +6,9 @@
 # Special Syntax:
 # Moki and above:
 # BreakWall=x: A wall or corruption with x Health is broken
-# BreakCrystal: An energy crystal is broken with Sword, Hammer or Bow
+# BreakCrystal: An energy crystal is broken (In moki this will allow using Sword, Hammer or Bow, in gorlek additionally Shuriken or Grenade, in unsafe additionally Spear)
 # Combat=x: An enemy has to be defeated. For a list of enemies visit https://docs.google.com/spreadsheets/d/1AE_ctym6WAwltGK-r6w58ARq0ym2MU4MzFiwg328kjM/view?usp=sharing
 # Gorlek and above:
-# BreakCrystal: An energy crystal is broken with Sword, Hammer, Bow, Shuriken or Grenade
 # ShurikenBreak=x: A wall with x Health is broken from behind using Shuriken
 # SentryJump=x: Extends to Sentry=1, Sword OR Hammer
 # SwordSJump=x: Extends to Sentry=1, Sword
@@ -17,7 +16,6 @@
 # SentryBurn=x: Use x Sentries to melt ice or light lanterns
 # RemoveKillPlane: Remove the kill plane at feeding grounds
 # Unsafe:
-# BreakCrystal: An energy crystal is broken with Sword, Hammer, Bow, Shuriken, Grenade or Spear
 # SentryBreak=x: A wall with x Health is broken from behind using Sentry
 # HammerBreak: A wall with is broken from behind using Hammer
 # SpearBreak: A wall with is broken from behind using one Spear
@@ -27,11 +25,15 @@
 # BlazeSwap=x: Extends to Blaze=x
 # WaveDash: Extends to Dash, Regenerate and having energy to use it
 # GrenadeJump: Extends to Grenade and having energy to use it
+# GrenadeCancel: Extends to Grenade and having energy to use it
 # HammerJump: Extends to Hammer, DoubleJump
 # SwordJump: Extends to Sword, DoubleJump
 # GrenadeRedirect=x: Extends to Grenade=x
 # SentryRedirect=x: Extends to Sentry=x
-# PauseFloat: Use the pause menu to cancel falling speed
+# PauseHover: Use the pause menu to cancel falling speed
+# GlideJump: Extends to Glide
+# GlideHammerJump: Extends to Glide, Hammer
+# SpearJump: Extends to Spear
 
 # requirement macros. must go at the top of the file!
 
@@ -86,6 +88,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   state MarshSpawn.ToOpherBarrier:
     moki: BreakWall=16
     kii: MarshSpawn.RainLifted, Bash, Damage=10  # lure the mantis
+  state NonGladesTeleporter: free
 
   pickup MarshSpawn.RockHC: free
   pickup MarshSpawn.FirstPickupEX: free
@@ -111,9 +114,9 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       MarshSpawn.RainLifted, Bash, DoubleJump, TripleJump  # Bash the slime from across the broken log to the mantis underneath the pickup and juggle him high, bash off both
       # Glitched:
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
-      HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseFloat  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
-      Grapple, PauseFloat OR GrenadeJump OR BlazeSwap
-      HammerJump, TripleJump, Dash OR PauseFloat  # Jumping along the ceiling, starting above the LongSwimEX
+      HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseHover  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
+      Grapple, PauseHover OR GrenadeJump OR BlazeSwap=1
+      HammerJump, TripleJump, Dash OR PauseHover  # Jumping along the ceiling, starting above the LongSwimEX
       FlashSwap  # hehe
   pickup MarshSpawn.BridgeEX: # not a free pickup because you could break the log and softlock yourself
     moki:
@@ -128,7 +131,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe:
       Spear=1  # Using drop-down
       # Glitched:
-      PauseFloat OR FlashSwap
+      PauseHover OR FlashSwap
   pickup MarshSpawn.LongSwimEX:
     moki: Water
     unsafe:
@@ -150,7 +153,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
         Water OR Damage=20
         Damage=10, WaterDash
       # Glitched:
-      PauseFloat OR FlashSwap OR SentrySwap=1 OR BlazeSwap=2:
+      PauseHover OR FlashSwap OR SentrySwap=1 OR BlazeSwap=2:
         Water OR Damage=20
         Damage=10, WaterDash
   conn Teleporters: free
@@ -196,7 +199,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
       # Glitched
       LaunchSwap  # refresh launch on ceiling and then LaunchSwap through all of the spiked area or land on the turret and get a second LaunchSwap
-      FlashSwap, PauseFloat  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseFloat for "easier" execution
+      FlashSwap, PauseHover  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseHover for "easier" execution
 
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
@@ -896,6 +899,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       SentryBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
+  state NonGladesTeleporter: free
 
   pickup HowlsDen.AboveTPEX:
     moki, BreakWall=10:
@@ -1350,6 +1354,8 @@ region MidnightBurrows:
 
 anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
   refill Full
+
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn MidnightBurrows.BelowLupo:
@@ -2150,6 +2156,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
 
   state EastHollow.VoiceDoor:
     moki: EastHollow.ForestsVoice
+  state NonGladesTeleporter: free
 
   pickup EastHollow.HornBeetleFightEX:
     moki, EastHollow.BeetleDefeated:
@@ -2573,9 +2580,9 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
   conn UpperDepths.Entry:
     moki: EastHollow.DepthsOpen
   conn EastHollow.BashTreeCheckpoint:
-    moki, EastHollow.DepthsOpen: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
-    gorlek, EastHollow.DepthsOpen: Damage=5
-    kii: EastHollow.DepthsOpen
+    moki, EastHollow.DepthsLever: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
+    gorlek, EastHollow.DepthsLever: Damage=5
+    kii: EastHollow.DepthsLever
   conn EastHollow.AboveBash:  # Make sure it's not redundant with paths from EastHollow.BashTreeCheckpoint
     gorlek, EastHollow.DepthsLever:
       SwordSJump=5, Dash OR Glide  # The mortar will break the ceiling for you
@@ -2731,7 +2738,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Water, Grenade=2  # Grenade Water Jumps
       Water, DoubleJump
   pickup GladesTown.CaveBurrowEX:
-    unsafe: free  # heehee
+    unsafe: NonGladesTeleporter  # heehee
 
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
@@ -3529,6 +3536,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
     unsafe:
       Water, DoubleJump               # or just be a madman
       Water, Glide  # Glide jump
+      Water, Bash  # https://discord.com/channels/116250700685508615/845415952790454272/919589633543766037
 
   conn WestGlades.ShrineArea:
     moki:
@@ -3656,31 +3664,17 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
   refill Checkpoint
   refill Health=1:
     gorlek: Combat=Slug
-    unsafe: free  # barely out of sight, also past an enemy...
+    kii: free  # barely out of sight, also past an enemy...
   refill Energy=3:
     unsafe: BreakCrystal  # pretty far to the left
 
   # ommited a lot of paths in moki including most bash-related paths because of how complex this place is to navigate (as in, more paths were omitted than were taken into moki...)
-  state OuterWellspring.EntranceDoorOpen:
-    moki, BreakWall=16:
-      DoubleJump, Dash OR Glide
-      Dash, Glide
-      Grapple, Bash, DoubleJump OR Dash
-      Grapple, Glide
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide
-      Launch
-    gorlek, BreakWall=16:
-      DoubleJump, TripleJump OR Sword OR Hammer
-      Dash, Sword OR Hammer OR Damage=15
-      Grapple, Sword
-      Grapple, Damage=15, DoubleJump OR Hammer
-      Bash, DoubleJump OR Dash OR Glide OR Sword  # different ways to solve using the many bash targets around
-      SwordSJump=1
-      HammerSJump=1, Damage=15
-    unsafe, BreakWall=16:
-      Damage=15, Sword
-      Dash OR Bash OR Glide
-
+  
+  state OuterWellspring.EntranceDoorOpen:  # This state normaly origin from OuterWellspring.Basement. This path is a bit specific because it can break the corruption but can't reach the anchor
+    kii: BreakWall=16, Water, Damage=15, Bow OR Spear OR Shuriken OR Grenade OR Blaze  # dboost on the wheel above OuterWellspring.BasementEC and use a ranged weapon to break the corruption
+  state OuterWellspring.FallingWheel:
+    unsafe: BreakWall=16, Bow  # Master Sniper
+    
   pickup OuterWellspring.EntranceRoofEX:
     moki:
       DoubleJump, Grapple, Dash OR Glide
@@ -3689,31 +3683,20 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Grapple, DoubleJump, TripleJump
       Grapple, Dash, Sword OR Hammer  # upswing into the pickup
       Launch, Bash, Grenade=1  # other launch paths are covered from the anchor above
+    kii:
+      Grapple, DoubleJump
+      Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Grapple, Dash OR Sword
   pickup OuterWellspring.WheelEX:
     moki: OuterWellspring.EntranceDoorOpen
   pickup OuterWellspring.BasementEC:
-    moki:
-      Water:  # mirror of the entrancedooropen paths
-        DoubleJump, Dash OR Glide
-        Dash, Glide
-        Grapple, Bash, DoubleJump OR Dash
-        Grapple, Glide
-        Bash, Grenade=1, DoubleJump OR Dash OR Glide
-        Launch
-      OuterWellspring.EntranceDoorOpen  # casual strat I guess?
-    gorlek:
-      Damage=15, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer  # go around the moss wheel
-      Water:  # mirror of the entrancedooropen paths
-        DoubleJump, TripleJump OR Sword OR Hammer
-        Dash, Sword OR Hammer OR Damage=15
-        Grapple, Sword
-        Grapple, Damage=15, DoubleJump OR Hammer
-        Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=15  # different ways to solve using the many bash targets around
-        SwordSJump=1
-        HammerSJump=1, Damage=15
-      Bash, Glide, DoubleJump, TripleJump OR Grapple  # bashglide
-      Bash, DoubleJump, TripleJump, Grapple
-      Bash, Launch, DoubleJump OR Glide
+    moki: OuterWellspring.EntranceDoorOpen  # casual strat I guess?
+    gorlek: Damage=15, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer  # go around the moss wheel
+    kii:
+      Damage=35
+      Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Damage=10  # let the bee hit you and use the iframes to pass through the spikes
   pickup OuterWellspring.LifeHarvestShard:
     moki, BreakWall=20:
       DoubleJump, Bash
@@ -3722,14 +3705,54 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       SentryJump=1, DoubleJump OR Dash OR Glide OR Damage=15
       Bash, Dash  # other options are somewhere on the border between difficulties
       Bash, Grenade=1  # this would be in moki if the camera didn’t put ori right at the top of the screen, making it hard to aim/catch the grenade
+    kii, BreakWall=20:
+      Bash, Glide OR Sword OR Hammer
+      Bash, Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
     unsafe, BreakWall=20:
-      Bash, Hammer  # not gorlek due to a non trivial combo attack
+      Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918247805364088832
       DoubleJump, TripleJump
   pickup OuterWellspring.SwimEX:
     moki: Water
-
+    unsafe:
+      Damage=180
+      WaterDash, Damage=80
+      Bash, Damage=120
+      
   conn InnerWellspring.EntranceDoor:
     moki: OuterWellspring.EntranceDoorOpen
+  conn OuterWellspring.Basement:
+    moki:
+      DoubleJump, Dash OR Glide
+      Dash, Glide
+      Grapple, Bash, DoubleJump OR Dash
+      Grapple, Glide
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek:
+      DoubleJump, TripleJump OR Sword OR Hammer
+      Dash, Sword OR Hammer OR Damage=15
+      Grapple, Sword
+      Grapple, Damage=15, DoubleJump OR Hammer
+      Bash, DoubleJump OR Dash OR Glide OR Sword  # different ways to solve using the many bash targets around
+      SwordSJump=1
+      HammerSJump=1, Damage=15
+    kii:
+      Dash OR Bash # refresh dash on ceiling after the wheel
+      Glide, Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
+      Sword, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15  # full combo to reach the pole, second requirement for the jump from the wheel
+      Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
+      Grapple, Hammer OR Blaze=4 OR Sentry=2 OR Damage=15  #jump from the wheel, stall in the air then grapple the wheel on the left before hitting the spikes
+      Water, Damage=15, WaterDash OR Hammer  # dboost on the wheel above OuterWellspring.BasementEC. You can land on the platform without any skills but there's a weird collision so adding another skill
+      Damage=55, WaterDash
+      Damage=95, Hammer
+    unsafe:
+      Glide OR Sword OR Shuriken=5
+      Grapple, Shuriken=2
+      Water, Damage=15  # dboost on the wheel above OuterWellspring.BasementEC
+      Damage=95  # dboost on the wheel above OuterWellspring.BasementEC
+      Damage=75, Hammer # dboost on the wheel above OuterWellspring.BasementEC
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump, Grapple  # save all the other ways for gorlek...
     gorlek:
@@ -3739,17 +3762,39 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Bash, Grenade=2, DoubleJump OR Dash             # Go up the left side; works for either wheel state
       Bash, Grenade=1, Damage=15, DoubleJump OR Dash  # As above but damage boost to get to the pole
       Bash, Grenade=3, Glide OR Damage=15             # As above but Glide needs an extra bashnade in case the wheel is down
+    kii:
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Use the slime on the way to the basement to reach the slime on the wooden platform. Launch a grenade straught up, bash the slime to reach it.
+      Bash, DoubleJump, TripleJump  # Bait the mantis on the wheel, bash it upwards and bash it again to grab the other wheel
+      DoubleJump, TripleJump, Sword  # Climb the left wall. Sword to prevent softlock after breaking the wall towards the shard.
+      OuterWellspring.FallingWheel, Bash OR Damage=15:  # Damage depends on where you land in the spikes
+        DoubleJump OR Dash OR Sword OR Hammer
+        Glide, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      OuterWellspring.FallingWheel, DoubleJump, Sword  # Reset djump by hitting the bee
+      OuterWellspring.FallingWheel, DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      OuterWellspring.FallingWheel, DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      OuterWellspring.FallingWheel, Dash, Sword  # sword hover then dash to pass the spikes
+      OuterWellspring.FallingWheel, Dash, Hammer, Glide OR Shuriken=1
     unsafe:
-      SentryJump=1, Bash, Grenade=1                   # Throw the greande, sentry jump to it, then bash off it, on right side (do a small lure on bottom slime to get to platform)
+      DoubleJump, TripleJump, Hammer  # Climb the left wall. Hammer to prevent softlock after breaking the wall towards the shard. You have to upslash before jumpîng
+      Bash                                            # https://youtu.be/IhPJ6NdIu8I
+      #SentryJump=1, Bash, Grenade=1                  # Throw the greande, sentry jump to it, then bash off it, on right side (do a small lure on bottom slime to get to platform)
       SentryJump=1, Damage=15, Dash OR Glide          # Slightly different methods needed for hammer vs sentry, hammer is similar to above, sword goes left side
       SwordSJump=2
       HammerSJump=2, Dash OR Glide OR Damage=15
+      OuterWellspring.FallingWheel, Glide, Damage=10  # Glide jump
+      OuterWellspring.FallingWheel, Damage=15, Shuriken=5 OR Sentry=5
+      OuterWellspring.FallingWheel, Dash, Sword
   conn OuterWellspring.WestDoor:  # going directly up the left wall
     gorlek:
       Bash, Grenade=2, DoubleJump, Dash OR Glide
       Bash, Grenade=3, DoubleJump
       Launch
-  # connections using the left wall wheel would be pointless
+    kii:
+      Grapple
+      Bash, DoubleJump, TripleJump OR Grenade=2
+      DoubleJump, TripleJump, Sword
+    unsafe:
+      DoubleJump, Bash OR OuterWellspring.FallingWheel
   conn WestGlades.MillApproach:
     moki:
       DoubleJump, Dash, Glide
@@ -3766,31 +3811,93 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       HammerSJump=2, DoubleJump OR Dash OR Glide OR Damage=20
       Bash, Grenade=1, Glide
       Bash, Grenade=2, Sword OR Damage=20
+    kii:
+      Damage=20, Bash OR DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Damage=20
+      DoubleJump, Hammer
+      Dash, Sword OR Hammer
+      Dash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Glide  # Bash glide from the slime on the wooden platform
     unsafe:
-      Bash, Glide
-      Bash, DoubleJump, Sword
-      Bash, DoubleJump, Hammer, Damage=20
-      Bash, SentryJump=1, DoubleJump OR Dash
+      Dash, Glide
+      Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918944477215866900
 
 # checkpoint at -978, -4042
 
+anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openning the entrance
+  state OuterWellspring.EntranceDoorOpen:
+    moki: BreakWall=16
+    
+  pickup OuterWellspring.BasementEC:
+    moki: Water
+    gorlek: Bash, DoubleJump, TripleJump, Grapple
+    kii:
+      Damage=80
+      Damage=40, WaterDash OR DoubleJump OR Dash
+      Bash, Damage=20, DoubleJump OR Glide
+      Bash, Grapple, Damage=20, Dash OR Sword
+      Dash, Grapple, Damage=20, DoubleJump OR Glide OR Sword OR Hammer
+      Bash, Grapple, Glide
+      Bash, DoubleJump, TripleJump, Grapple OR Glide OR Dash
+      Bash, DoubleJump, TripleJump, Sword # Pogo the second fish
+      Bash, DoubleJump, TripleJump, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Bash, Damage=20
+      Dash, Grapple, Damage=20
+      Dash, Grapple, DoubleJump, Sword
+      Bash, DoubleJump, Glide OR Sword
+      Bash, DoubleJump, TripleJump, Hammer OR Shuriken=1
+  
+  conn OuterWellspring.EntranceDoor:
+    moki:
+      Launch, DoubleJump OR Dash OR Glide OR Bash OR Grapple
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, Grapple OR Dash OR Glide
+      # Use the wheel above BasementEC
+      OuterWellspring.EntranceDoorOpen, Launch, Water
+      OuterWellspring.EntranceDoorOpen, Water, Grapple, Combat=WeakSlug OR Bash
+      OuterWellspring.EntranceDoorOpen, Water, WaterDash, Combat=WeakSlug OR Bash
+    gorlek:
+      Launch
+      OuterWellspring.EntranceDoorOpen, Grapple, DoubleJump OR Dash OR Sword  # Pass inside the wheel with the SL container
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, TripleJump OR Sword
+      OuterWellspring.EntranceDoorOpen, Bash, Damage=15, DoubleJump OR Dash # Can be done without damage by bashing the bee but it can just decide to hit spikes
+    kii:
+      DoubleJump, TripleJump, Grapple, Combat=2xWeakSlug
+      DoubleJump, TripleJump, Bash, Grenade=1
+      OuterWellspring.EntranceDoorOpen, Grapple, Combat=WeakSlug
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      OuterWellspring.EntranceDoorOpen, Water, Bash  # Bash the fish to grab the wheel above Basement EC
+      OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Water OR Damage=20:
+        Damage=15, DoubleJump OR Dash OR Sword OR Hammer
+        DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+        Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+        Glide, Hammer
+    unsafe:
+      Grapple, DoubleJump, Combat=WeakSlug OR Bash
+      Damage=15, Water, WaterDash OR Bash OR SwordSJump=1  # Use the wheel above BasementEC. walljump after the damage to regrab the wheel and use the iframes to pass the spikes.
+      OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
+      
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
   refill Energy=3:
     moki: BreakCrystal
 
   pickup OuterWellspring.EntranceRoofEX:
+    moki: DoubleJump, Launch, Dash OR Glide
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-  pickup OuterWellspring.RightWallEC:
+    unsafe: Launch
+  pickup OuterWellspring.RightWallEC:  # Be carefull it's not redundant with AboveEntranceDoor->EastDoor->RightWallEC
     gorlek: BreakWall=20, DoubleJump, TripleJump, Damage=15  # go above the wheel to the right, damage not mandatory
-
+    kii: BreakWall=20, DoubleJump, TripleJump
+    
   conn OuterWellspring.EastDoor:  # going to the right
     moki:
       Grapple, DoubleJump, Dash OR Glide
       Launch
     gorlek: Grapple, DoubleJump, TripleJump OR Sword OR Hammer
+    kii:  # Grapple paths are covered by AboveEntranceDoor->RightWallMidpoint->TrialApproach->EastDoor
+      DoubleJump, TripleJump, Bash
+      Bash, Grenade=2
     unsafe:
-      Grapple
-      DoubleJump, TripleJump, Damage=15, Sword OR Hammer
+      Bash, DoubleJump
       SentryJump=1, DoubleJump, Damage=15, Dash OR Glide
       SentryJump=1, Bash, Grenade=1, DoubleJump
       SentryJump=2, Bash, Grenade=1, Glide, Dash
@@ -3805,6 +3912,12 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       Bash, Grenade=1, DoubleJump, Dash, Glide
       Bash, Grenade=2, DoubleJump, Dash OR Glide
       Bash, Grenade=3, DoubleJump
+    kii:
+      Grapple, Hammer OR Blaze=4 OR Sentry=2
+      Bash, Grenade=1, DoubleJump
+    unsafe:
+      Grapple, Shuriken=2
+      DoubleJump, Bash OR Dash
   conn OuterWellspring.RightWallMidpoint:
     moki: Grapple
     gorlek:
@@ -3816,9 +3929,18 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       SentryJump=2, Glide
       SwordSJump=2, DoubleJump OR Dash
       SentryJump=1, Dash, Glide
-    unsafe: Glide
+    kii:
+      Bash, Grenade=1
+      DoubleJump, Sword OR TripleJump
+      DoubleJump, Hammer, Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Bash OR Glide OR Sword OR Blaze=6 OR Sentry=4
+      Dash, Hammer, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      Glide
+      Sword, Shuriken=1  # Pogo the energy cristal to grab the wheel
   conn WestGlades.MillApproach:
-    gorlek: Grapple OR Glide
+    gorlek: Glide
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you exit the first room
@@ -3830,7 +3952,12 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
     gorlek, BreakWall=3, Bow OR Spear OR Shuriken OR Grenade OR Blaze OR Grapple:  # // TODO account for this kind of syntax
       Bash, Grenade=1
       SentryJump=1
-      Grapple, Damage=15, DoubleJump, TripleJump OR Dash  # go up on the left to get into range and then grapple to the corruption
+    kii, BreakWall=3:
+      Bash, Grenade=1
+      DoubleJump, TripleJump, Grapple  # grapple the plant on the left  then tjump to the right to be in range of the plnt inside the corruption
+    unsafe, BreakWall=3:
+      Bow
+      DoubleJump, Grapple  # grapple the plant on the left, hold up to make it appear on screen
 
   pickup OuterWellspring.HiddenHC:
     moki, OuterWellspring.WestDoorBlueMoonFree:
@@ -3847,33 +3974,49 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       Grapple, SentryJump=1, Damage=15, Dash OR Glide
       Bash, Grenade=1, Launch
       SentryJump=1, Launch
+    kii:
+      Grapple, Launch  # @Validator should probably be moki/gorlek (path from moki require WestDoorBlueMoonFree as well)
+      Grapple, DoubleJump, TripleJump
+      Grapple, Bash, Grenade=1, Sword
+      Grapple, Bash, Grenade=1, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Bash, Grenade=1, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      Grapple, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, Sword
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
+      Grapple, DoubleJump  # grapple the plant on the left, hold up to make it appear on screen
+      Grapple, Dash, OuterWellspring.WestDoorBlueMoonFree
+      Grapple, Bash, Grenade=1, Dash
+      Grapple, Bash, Grenade=1, Glide OR Sentry=2
       Bash, Grenade=1, SentryJump=1, DoubleJump, TripleJump
-  pickup OuterWellspring.EntranceRoofEX:
-    moki: DoubleJump, Launch, Dash OR Glide
 
   # this tokk disappears after the needle quest
   conn InnerWellspring.WestDoor:
     moki: InnerWellspring.MiddleDoorsOpen
-  conn OuterWellspring.EastDoor:
-    moki:
-      Bash, Grenade=1, DoubleJump, Dash OR Glide
-      Bash, Grenade=1, Launch
-      Launch, DoubleJump OR Dash OR Glide
-      OuterWellspring.WestDoorBlueMoonFree, Grapple, DoubleJump, Dash OR Glide
-      OuterWellspring.WestDoorBlueMoonFree, Grapple, Launch
+  conn OuterWellspring.EastDoor:  # Grapple / Launch paths are redundant with WestDoor->AboveEntranceDoor->EastDoor
+    moki: Bash, Grenade=1, DoubleJump, Dash OR Glide
     gorlek:
       Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
       SentryJump=1, DoubleJump
-      Launch, Sword OR Hammer OR Damage=15
-      OuterWellspring.WestDoorBlueMoonFree, Grapple, DoubleJump, TripleJump OR Sword OR Hammer
-      Grapple, Damage=15, DoubleJump, TripleJump OR Dash  # mirror from breaking the blue moon free since you don't need wall breakage to perform this
+    kii:
+      Bash, Grenade=1, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Hammer, Shuriken=2
+    unsafe: Bash, Grenade=1, Dash OR DoubleJump  # on the pole, stick to the wheel. You should get a nice curve when jumping, letting you reach the platform with your mobility option
   conn OuterWellspring.AboveEntranceDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
       DoubleJump, Dash, Glide
       Launch
+    kii:
+      Grapple  # Fall from the left
+      Damage=30  # hold right, dboost on the wheel then on the spikes bellow. Should only require Damage=25 but damage depend on where you land in the spikes.
+    unsafe: free  # tap right to avoid the dboost on the wheel then grab the pole while falling
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to the spin puzzle
@@ -3895,14 +4038,20 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
       Glide OR Launch
       Grapple, DoubleJump OR Dash
       Grapple, Bash, Grenade=1
-    gorlek:
-      BreakWall=20, DoubleJump, TripleJump
-      DoubleJump, Sword
+    gorlek, BreakWall=20:
+      DoubleJump, TripleJump OR Sword
       Grapple, Sword OR Hammer
-      BreakWall=20, Bash, Grenade=1, DoubleJump OR Dash
-      Bash, Grenade=1, Sword OR Hammer
-      BreakWall=20, Bash, Grenade=2
-    unsafe: DoubleJump, Hammer, Damage=15
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer
+      Bash, Grenade=2
+    kii, BreakWall=20:
+      Dash, Damage=15  # Coyote dash then dash again to grab the whell on the right
+      DoubleJump, Bash OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # With energy weapon, grab the wheel on the right.
+      Grapple, Shuriken=1 OR Blaze=2 OR Sentry=2
+      Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe, BreakWall=20:
+      Dash
+      DoubleJump, Shuriken=1 OR Blaze=1
+      Bash, Grenade=1, Damage=15
 
   conn InnerWellspring.EastDoor:
     moki: InnerWellspring.MiddleDoorsOpen
@@ -3919,6 +4068,13 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
         Bash, Grenade=1, Hammer, Damage=10
       Bash, Grenade=1, DoubleJump, TripleJump
       Bash, Grenade=1, Grapple
+    kii:
+      InnerWellspring.TopDoorOpen, Bash, Grenade=1, Hammer OR Blaze=4 OR Sentry=2
+      DoubleJump, Grapple
+    unsafe:
+      InnerWellspring.TopDoorOpen, Bash, Grenade=1, Damage=25
+      InnerWellspring.TopDoorOpen, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # These aren't kii because it's easy to get stuck in those spikes
+      Grapple, Damage=15
   conn OuterWellspring.WestDoor:
     moki: DoubleJump OR Dash OR Launch
     gorlek: Glide OR Sword OR Hammer
@@ -3926,23 +4082,36 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
   conn OuterWellspring.TrialApproach:
     moki: Grapple OR Launch
     gorlek:
-      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Damage=10
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=15  # Dmage depends on where you land in the spikes
       DoubleJump, TripleJump, Bash, Grenade=1
-      DoubleJump, Dash, Glide OR Sword OR Hammer OR Damage=10
+      DoubleJump, Dash, Sword OR Hammer OR Damage=15  # Damage depends on where you land in the spikes
       DoubleJump, Dash, Bash, Grenade=1
       DoubleJump, Glide
       SentryJump=2  # follow up the second sentryjump with a weapon hover
       Bash, Grenade=2, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    kii:
+      DoubleJump, Dash OR Sword
+      DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Dash, Damage=15, Glide OR Sword OR Hammer OR Sentry=2 OR Damage=15  # Coyote dash then dash again to grab the whell on the right
+      DoubleJump, Damage=15, Hammer OR Spear=2 OR Flash=2 OR Sentry=2  # Djump+your other movement option to grab the wheel. Using 2 energy weapons because dependaing on where you land in the spikes, the knockbak might make you fall
+      DoubleJump, Damage=15, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # Same as above but more energy efficient
+      Bash, Grenade=1, Damage=15, Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
+      Bash, Grenade=1, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
+      Bash, Grenade=1, Damage=30, Sentry=3  # Same as above but take the second dboost
+      Bash, Grenade=2
+    unsafe:
+      Dash  # There's a little friendly spike area on the very edge of the platform
+      Glide  # Glide jumps
+      DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # There's a little friendly spike area on the very edge of the platform
+      Bash, Grenade=1, Sentry=2, Damage=10
   conn OuterWellspring.RightWallMidpoint:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Damage=15
   conn OuterWellspring.AboveEntranceDoor: free
-  conn WestGlades.MillApproach:
-    gorlek:
-      DoubleJump OR Dash OR Sword OR Damage=20
-      Bash, Grenade=1
 
 anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing over west door
   refill Energy=3:
@@ -3959,6 +4128,22 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
       DoubleJump, TripleJump, Dash, Glide OR Sword
       DoubleJump, TripleJump, Glide, Damage=15
       Launch, Sword OR Damage=15
+    kii:
+      Grapple, Sword 
+      Grapple, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      Grapple, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Sword  # horizontal sword combo first then tjump then upslash
+      DoubleJump, TripleJump, Dash, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      DoubleJump, TripleJump, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Damage=15
+      Bash, Grenade=1, DoubleJump, TripleJump
+    unsafe:
+      Grapple, DoubleJump OR Dash
+      DoubleJump, TripleJump OR Dash
+      Bash, Grenade=1, DoubleJump OR Dash  # wall jump on the small wall at the edge of where the pickup is
+      Launch
 
   conn OuterWellspring.TopDoor:
     moki:
@@ -3967,9 +4152,15 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
     gorlek:
       Bash OR SentryJump=1
       InnerWellspring.TopDoorOpen, DoubleJump
+    kii:
+      InnerWellspring.TopDoorOpen, Dash, Sword OR Hammer 
+      InnerWellspring.TopDoorOpen, Spear=1
+    unsafe:
+      InnerWellspring.TopDoorOpen, Sword OR Dash # Pogo the energy cristal or dash ramp
   conn OuterWellspring.WestDoor:
     moki: Combat=Miner OR DoubleJump OR Dash OR Grapple OR Glide OR Launch
     gorlek: Sword OR Hammer OR Damage=15
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn OuterWellspring.EastDoor:  # paths with top door open seem rather pointless?
     moki:
       DoubleJump, Dash
@@ -3978,12 +4169,18 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
       Damage=15, DoubleJump OR Dash OR Sword OR Hammer
       DoubleJump, TripleJump
       Dash, Sword OR Hammer
+    kii:
+      Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=3
+      Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Blaze=3 OR Sentry=2
   conn OuterWellspring.AboveEntranceDoor: free
 
 anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to the teleporter
   state OuterWellspring.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: Grapple, DoubleJump, Dash OR Glide
     gorlek: Grapple, Dash, Glide
+    kii: Grapple, Glide
 
   pickup OuterWellspring.UltraGrappleShard:
     moki:
@@ -3995,7 +4192,14 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
       Grapple, DoubleJump, TripleJump OR Sword
       Grapple, Dash, Sword
       Grapple, Glide
-
+    kii:
+      Grapple, Dash, Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, DoubleJump, Hammer OR Sentry=2
+      Grapple, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Hammer, Sentry=2
+    unsafe:
+      Grapple, DoubleJump, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Not kii because it's hard to exit the spikes
+      Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
   conn InnerWellspring.Teleporter:
     moki: InnerWellspring.TopDoorOpen
   conn OuterWellspring.EastDoor: free
@@ -4012,9 +4216,11 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
     moki: Grapple OR Glide  # Others are redundant with EntranceDoor
     gorlek:
       Sword OR Damage=20
-      HammerSJump=1, DoubleJump OR Dash OR Damage=20
-      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Damage=20
-    unsafe: DoubleJump OR Dash OR Hammer
+      HammerSJump=1, DoubleJump OR Dash
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword
+    kii:
+      DoubleJump OR Dash OR Hammer OR Blaze=2 OR Sentry=2
+      Bash, Grenade=1
   conn OuterWellspring.EntranceDoor:
     moki: Water OR Glide OR Launch  # Grapple paths are redundant with AboveEntranceDoor
     gorlek:
@@ -4022,7 +4228,7 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
       Dash, Sword OR Hammer
       Damage=20 OR SentryJump=1
       Bash, Grenade=1
-    unsafe: DoubleJump OR Dash OR Hammer
+    kii: DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
   conn OuterWellspring.AboveEntranceDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide OR Launch
@@ -4035,13 +4241,21 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
       SentryJump=1, Glide
       SwordSJump=1, DoubleJump, TripleJump OR Dash  # Weapon hover
       HammerSJump=1, DoubleJump, TripleJump, Dash  # Weapon hover
-    unsafe:
-      DoubleJump, TripleJump, Dash
-      Bash, Grenade=1, Sword OR Hammer OR DoubleJump
-      Launch
+    kii:
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
+  conn OuterWellspring.EastDoor:  # Most paths from this anchor should be redundant with going to AboveEntranceDoor then EastDoor
+    kii: Bash, Grenade=2  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
   conn OuterWellspring.TrialApproach:  # no moki path because the camera makes the connection hard to see
     gorlek: Grapple, Combat=Bee OR Bash  # Launch is redundant with EntranceDoor -> AboveEntranceDoor -> EastDoor
-
+    kii:
+      Grapple
+      Bash, Grenade=3  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
+      Bash, Grenade=2, Damage=15, DoubleJump OR Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
+      Bash, Grenade=2, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
+      Bash, Grenade=2, Damage=30, Sentry=3  # Same as above but take the second dboost
+    
 anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towards the trial room
   refill Checkpoint
 
@@ -4054,17 +4268,23 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Grapple, DoubleJump, TripleJump
       SentryJump=1, DoubleJump OR Dash OR Glide
       Bash, Grenade=1, Dash OR Glide
+    kii:
+      Grapple, DoubleJump OR Dash OR Glide OR Sword
+      Bash, Grenade=1 OR DoubleJump OR Sword OR Hammer  # wall jump on the wall next to the SL container. Without grenade, use the 
     unsafe:
-      Grapple, Dash, Glide  # Might be a bit tight for gorlek
+      Grapple  # https://youtu.be/vI511KFMZWI
   pickup OuterWellspring.RightWallEC:
     moki, BreakWall=20:
       DoubleJump, Dash
       Glide OR Launch
       Grapple, DoubleJump OR Dash
-    gorlek:
-      BreakWall=20, DoubleJump OR Dash
-      Sword OR Hammer
-
+    gorlek, BreakWall=20: DoubleJump OR Dash OR Sword OR Hammer
+    kii, BreakWall=20:
+      Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Damage=15, Spear=1 OR Blaze=1
+      Damage=15, Bash  #land in the spikes to jump on the wheel then bash glide of the bee
+    unsafe, BreakWall=20: Bash OR Spear=1 OR Blaze=1  # land on the friendly spikes, at the very edge of the spikes
+  
   conn OuterWellspring.TrialRoom:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -4073,6 +4293,9 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Grapple
       SentryJump=1
       Bash, Grenade=1
+    kii:
+      Bash  # Bash the beetle
+      DoubleJump, TripleJump
   conn OuterWellspring.EastDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -4083,6 +4306,12 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       DoubleJump, TripleJump OR Dash OR Sword
       DoubleJump, Hammer, Damage=15
       SentryJump=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1
+      DoubleJump, Hammer OR Sentry=2 OR Damage=15
+      Dash, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
+      Damage=15, Sentry=2
+    unsafe: DoubleJump
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
@@ -4090,6 +4319,8 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Bash, Grenade=1
       SentryJump=1
       Damage=15
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free
   conn OuterWellspring.RightWallMidpoint:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek: free
@@ -4107,7 +4338,10 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
     gorlek:
       Dash OR Glide
       DoubleJump, Sword OR Hammer
-    unsafe: DoubleJump
+    kii:
+      DoubleJump, TripleJump  # @validator Probably should be gorlek
+      Sword OR Sentry=3
+    unsafe: DoubleJump OR Shuriken=2 OR Sentry=2
   conn OuterWellspring.TrialApproach: free
 
 anchor OuterWellspring.TrialStart at -665, -3937:
@@ -4117,6 +4351,7 @@ anchor OuterWellspring.TrialStart at -665, -3937:
   pickup OuterWellspring.SpiritTrial:
     moki: OuterWellspring.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: OuterWellspring.TrialActivation, Dash, Grapple, Glide
+    kii: OuterWellspring.TrialActivation, Grapple, Glide
 
   conn OuterWellspring.TrialRoom:
     moki:
@@ -4128,6 +4363,12 @@ anchor OuterWellspring.TrialStart at -665, -3937:
       Dash, Sword OR Hammer
       Glide
       Grapple, DoubleJump OR Dash OR Sword OR Hammer
+    kii:
+      Dash OR Sword
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, Hammer  # @validator probably should be gorlek
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Damage=30 OR DoubleJump
 
 region InnerWellspring:
   moki: Danger=25
@@ -4787,6 +5028,8 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
 
 anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
   refill Full
+  
+  state NonGladesTeleporter: free
 
   quest InnerWellspring.BlueMoonSeed:
     moki:
@@ -4974,6 +5217,8 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
 
 anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   refill Full
+
+  state NonGladesTeleporter: free
 
   quest WoodsEntry.LastTreeBranch: free
   quest WoodsEntry.DollQI:
@@ -5531,6 +5776,8 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
 
+  state NonGladesTeleporter: free
+
   conn Teleporters: free
   conn WoodsMain.AbovePit:  # So far, this also cover the OrangeTree connection
     moki:
@@ -5710,15 +5957,17 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
       Bash, Grenade=1
       Launch
     gorlek, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
+      DoubleJump, TripleJump, Dash
       SentryJump=1
-      Dash, DoubleJump, TripleJump
     kii, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash
-      DoubleJump, TripleJump, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Dash, DoubleJump, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1  # without hmmaer/sword, you only get one shot at these else you have to return to the anchor from a teleporter
+      DoubleJump, TripleJump, Hammer OR Shuriken=1
+      DoubleJump, TripleJump, Glide, Sword OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, Dash, Hammer
     unsafe, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
-      Grenade=1  # GrenadeJump=1
-      Dash, DoubleJump, Blaze=1
+      DoubleJump, TripleJump, Sword OR Sentry=1 OR Flash=1 OR Spear=1
+      DoubleJump, Dash, Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      GrenadeJump
 
   conn LowerReach.AboveEntry:
     moki:
@@ -5730,12 +5979,13 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
       Bash, Glide, Damage=20
       SentryJump=1, DoubleJump OR Bash
     kii:
-      Bash, Damage=20, Sword OR Hammer OR Sentry=2 OR Shuriken=2 OR Flash=2
+      Bash, Damage=20, Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
     unsafe:
       SentryJump=1
       Bash  # can be done damageless, but damage is likely. Keep jumping at the right wall until you go over it and bash the first latern at just the right angle to reach the second
       DoubleJump, TripleJump, Sentry=3, Damage=20  # https://streamable.com/1rus0h except you can use some friendly spikes to avoid the first dboost
-      DoubleJump, Hammer, Damage=20  # Hammer jumps
+      DoubleJump, TripleJump, Sword
+      HammerJump, Damage=20
   conn LowerReach.Icefall:
     unsafe: DoubleJump, TripleJump, Hammer  # climb the left wall. Yes this is horrible after doing the escape
   conn WestGlades.Upper:
@@ -5750,19 +6000,19 @@ anchor LowerReach.AboveEntry at -401, -4000:  # On the platform above Baur insid
       LowerReach.HeatBaurFurnace, DoubleJump
     gorlek:
       LowerReach.HeatBaurFurnace, Dash
-      LowerReach.HeatBaurFurnace, Bash, Grenade=1
     kii:
-      DoubleJump, TripleJump, Damage=20
-      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2  # @validator djump/dash might be good enough for gorlek
+      DoubleJump, TripleJump, Damage=20, Sword OR Hammer
+      Bash, Grenade=1, LowerReach.HeatBaurFurnace OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
       LowerReach.HeatBaurFurnace, Sword OR Sentry=2
       LowerReach.HeatBaurFurnace, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
-      LowerReach.HeatBaurFurnace, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      LowerReach.HeatBaurFurnace, Glide, Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
       # LowerReach.HeatBaurFurnace, Glide, Spear=1
-      LowerReach.HeatBaurFurnace, Sword OR Hammer OR Glide
-      Bash, Grenade=1, Glide  # Use the plant as a platform
+      LowerReach.HeatBaurFurnace, Hammer OR Glide OR Sentry=2
+      Bash, Grenade=1, Glide OR Spear=2  # Use the plant as a platform
       SentryJump=1  # you actually want a weaker jump to land on top of the plant, a strong one will send you sailing over it. Weapon stalls from there
       Bash, Sword OR Hammer OR DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Damage=20  # be careful the slightly moving spike platform isn't at the top when going over
       DoubleJump, TripleJump, Sword OR Hammer  # you first need to get on the plant on the left
       Dash, DoubleJump, Damage=20, Hammer OR Sword  # djump+upslash+ dash in the spikes, grab the plant then djump + upslash to reach the left wall. Sword much harder, need to get a ramp
 
@@ -5777,54 +6027,61 @@ anchor LowerReach.AboveEntry at -401, -4000:  # On the platform above Baur insid
       SentryJump=2
     kii:
       DoubleJump, TripleJump  # Climbing frozen tongue with TripleJump, tjump from the left wall into the xp
-      LowerReach.HeatBaurFurnace, Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      LowerReach.HeatBaurFurnace, DoubleJump, Dash OR Sword OR Hammer OR Sentry=2
+      LowerReach.HeatBaurFurnace, Bash, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2 OR Spear=1
+      LowerReach.HeatBaurFurnace, DoubleJump, Dash, Sword  # Either use the left wall or pogo the mortar
     unsafe:
       SentryJump=1, DoubleJump  # sjump, climb the left wall then djump + up slash + weapon stall to reach the xp
       Bash  # jump repeatedly under the left side of the snaptrap to aggro the spitter. yes, really.
       DoubleJump, Dash  # From the left of the frozen tongue, dash ramp+doublejump+dash. Jump off the tongue asap, djump+dash. Climb the left wall then djump + dash
       LowerReach.HeatBaurFurnace, Sword, Hammer, Sentry=2, Damage=20  # pogo the mortar, climb the left wall then sentry+hammer upslash (you'll get a dboost there). Land on the ledge then jump, hammer upslash, sword hover+sentry at the end
+      LowerReach.HeatBaurFurnace, DoubleJump, Dash OR Sword OR Hammer OR Sentry=2
       LowerReach.HeatBaurFurnace, Dash, Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mortar once to go to the left wall and a second time to climb the wall. upslash+dash+energy from there
   pickup LowerReach.AboveBaurUpperEX:
-    moki:
+    moki, LowerReach.HeatBaurFurnace:
       Launch
-      LowerReach.HeatBaurFurnace, DoubleJump, Dash, Bash
+      DoubleJump, Dash, Bash
     gorlek:
+      Launch
       LowerReach.HeatBaurFurnace, DoubleJump, Bash
-    kii:
-      LowerReach.HeatBaurFurnace, DoubleJump, TripleJump OR Sword OR Hammer
-      LowerReach.HeatBaurFurnace, Bash, Damage=20, Sword OR Hammer OR Glide OR Dash OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # land in the spikes near the mortar before it shoots then bash it and its projectile
+    kii, LowerReach.HeatBaurFurnace:
+      DoubleJump, TripleJump
+      DoubleJump, Dash, Sword  # Either use the left wall or pogo the mortar
     unsafe:
       DoubleJump, TripleJump  # I hope you'll hate that path as much as I do so it can stay in unsafe for ever
-      LowerReach.HeatBaurFurnace, SentryJump=2, DoubleJump OR Damage=20  # First jump into the spikes near the shooter, can use lower jump to snaptrap - wall - weapon stall to spikes, then sentry up from spikes to the tongue plant
-      LowerReach.HeatBaurFurnace, SwordSJump=2  # Pogo the shooter to make it to the left wall, move a bit away from it then sjump+upslash to reach the tongue
-      LowerReach.HeatBaurFurnace, SentryJump=1, Dash  # up slash + dash to reach the left wall. Move a bit away from it, sjump to reach the tongue
-      LowerReach.HeatBaurFurnace, Bash  # jump repeated under the left side of the snaptrap to aggro the spitter. On the second snaptrap, bash the projectile upwards then jump to it and bash to AboveBaurLowerEX. If you stayed long enough on the snaptrap, the shooter should shot a new projectile which you can use to grab the tongue.
-      LowerReach.HeatBaurFurnace, Dash, Sword, Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2  # pogo the mortar once to go to the left wall and a second time to climb the wall. upslash+dash+energy from there
+      LowerReach.HeatBaurFurnace:
+        DoubleJump, Dash OR Sword OR Hammer
+        SentryJump=2, DoubleJump OR Damage=20  # First jump into the spikes near the shooter, can use lower jump to snaptrap - wall - weapon stall to spikes, then sentry up from spikes to the tongue plant
+        SwordSJump=2  # Pogo the shooter to make it to the left wall, move a bit away from it then sjump+upslash to reach the tongue
+        SentryJump=1, Dash  # up slash + dash to reach the left wall. Move a bit away from it, sjump to reach the tongue
+        Bash  # Look up below and to the left of the snap plant. Then, bash the mortar -> its projectile in succession to get up
+        Dash, Sword, Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2  # pogo the mortar once to go to the left wall and a second time to climb the wall. upslash+dash+energy from there
 
   conn LowerReach.Icefall:
     moki: LowerReach.HeatBaurFurnace OR DoubleJump OR Launch
     gorlek: Dash
     kii:
-      Bash, Grenade=1  # @validator might be ok for gorlek
-      Sword OR Hammer OR Sentry=2 OR Shuriken=2  # with hammer/sword: upslash before grabing the frozen tongue, jump out of it then weapon stall
+      Bash, Grenade=1
+      Sword OR Hammer OR Shuriken=2 OR Sentry=2  # with hammer/sword: upslash before grabing the frozen tongue, jump out of it then weapon stall
     unsafe:
-      Bash  # jump to aggro the spitter (or use grenade) and catch high up on the frozen tongue, then jump off quickly
+      Bash  # jump to aggro the spitter and catch high up on the frozen tongue, then jump off quickly
   conn LowerReach.Central:
     moki, LowerReach.Lever:
       Bash, DoubleJump OR Dash OR Glide
       Launch
     gorlek, LowerReach.Lever:
-      DoubleJump, TripleJump OR Dash
-      Glide, DoubleJump OR Dash
+      Bash, Sword OR Hammer
+      DoubleJump, TripleJump OR Dash OR Glide
+      Dash, Glide
     kii, LowerReach.Lever:
-      Sword, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=20
-      Hammer, Shuriken=1, Damage=20
-      Bash, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=20
-      Glide, Sword OR Hammer OR Damage=20
-      Dash, Sword OR Hammer OR Sentry=2 OR Damage=20
-      DoubleJump, Sword OR Sentry=2 OR Damage=20
+      Bash, Shuriken=1 OR Sentry=2 OR Blaze=3 OR Damage=20
+      DoubleJump, Sword OR Hammer OR Sentry=2 OR Damage=20
+      Dash, Sword OR Hammer
+      Dash, Damage=20, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Glide, Hammer OR Damage=20
+      Sword, Shuriken=1 OR Sentry=2 OR Damage=20
+      Hammer, Damage=20, Shuriken=1 OR Sentry=1
     unsafe, LowerReach.Lever:
+      Bash, Sentry=1 OR Flash=1
       Hammer, Damage=20, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, Spear=1 OR Sentry=1 OR Shuriken=1 OR Flash=1
       Dash, Shuriken=1 OR Sentry=2  # Dash on the small wall from the branch where the lantern is attached, dash again then stall with sentry/shuriken
@@ -5836,43 +6093,48 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
     moki: BreakCrystal
 
   state LowerReach.BearBridgeBroken:
-    moki: LowerReach.BearSneezed  # the game behaves weird when dropping the rock on Baur
+    moki: LowerReach.BearSneezed  # the bear blocks the rock
   state LowerReach.LeftFurnace:
     moki:
-      Grenade=1, Bash, DoubleJump OR Dash OR Glide  # Grenade to light the furnace
-      Grenade=1, Launch  # Grenade to light the furnace
-      Grenade=1, Grapple, DoubleJump  # Grenade to light the furnace
+      Grenade=1, Bash, DoubleJump OR Dash OR Glide
+      Grenade=1, Combat=Nest, Grapple, DoubleJump OR Dash
+      Grenade=1, Launch, Combat=Nest OR Bash
     gorlek:
       Grenade=1, Bash
-      Grenade=1, Grapple, Dash OR Glide OR Sword OR Hammer  # Weapon stall after grabing the plant. Use sword/hammer to combat the Bees as well
-      Grenade=1, SentryJump=1, Combat=Nest
+      Grenade=1, Combat=Nest, Grapple, Glide OR Sword
+      Grenade=1, Damage=10, Grapple, DoubleJump OR Dash OR Glide OR Sword  # Grapple past the enemies, might get hit
+      Grenade=1, DoubleJump, TripleJump
+      Grenade=1, Combat=Nest, SentryJump=1
+      Grenade=1, Launch
     kii:
-      Grenade=1, Combat=Nest, Damage=20  # Damage boost on the spikes on the frozen waterfall
-      Grenade=1, DoubleJump, TripleJump, Combat=Nest  # @validator Might be ok for gorlek
-      Grenade=1, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grenade=1, Damage=20, Combat=Nest OR DoubleJump  # Damage boost on the spikes on the frozen waterfall
+      Grenade=1, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
-      Grenade=1, DoubleJump, Combat=Nest
+      Grenade=1, DoubleJump
+      Grenade=1, Grapple, Spear=1
 
   pickup LowerReach.IcefallOre:
     moki, LowerReach.LeftFurnace:
-      Bash, Grapple OR Launch  # bash the enemies
-      Combat=2xSlug, Grapple, Damage=10, DoubleJump OR Dash  # grapple past the enemies and probably get hit by them
-      Water, Launch  # swim past the enemies
+      Bash, Grapple, DoubleJump OR Dash OR Glide  # bash the enemies
+      Bash, Launch
+      Combat=Nest, Grapple, DoubleJump OR Dash
     gorlek, LowerReach.LeftFurnace:
+      Bash, DoubleJump OR Dash OR Grapple OR Glide
+      Combat=Nest, Grapple, Glide OR Sword
+      Damage=10, Grapple, DoubleJump OR Dash OR Glide OR Sword
       Water, WaterDash, DoubleJump, TripleJump
-      Bash
-      Grapple, Damage=10, Sword OR Hammer OR DoubleJump OR Dash OR Glide  # weapon stall needed, probably get hit by wasps
-      Launch, Damage=10
+      Water, Launch
     kii, LowerReach.LeftFurnace:
-      Launch
-      Grapple, Sword OR Hammer OR DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      WaterDash, DoubleJump, Water, Sword OR Hammer OR Spear=1
-      WaterDash, DoubleJump, Damage=20, TripleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # @validator the tjump variation should be fine for gorlek
-      DoubleJump, TripleJump, Sword OR Hammer  # land on the snaptrap and tjump+upslash from there. Sword/Hammer can deal with the combat. With sword, you can make the path easier by pogoing a fish or hitting mosquitos but it's not mandatory.
-      DoubleJump, Dash, Sword OR Hammer  # can hit the skeetos/nest with sword to reset djump but not mandatory.
-      DoubleJump, TripleJump, Dash, Combat=Nest  # bait the second snaptrap, coyote dash+dash+tjump from there
-      DoubleJump, TripleJump, Combat=Nest, Sentry=3 OR Shuriken=2  # bait the second snaptrap, tjump+energy weapon from there
-      DoubleJump, TripleJump, Glide, Combat=Nest, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Water OR Damage=20
+      Bash OR Launch
+      Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Water, WaterDash, DoubleJump, Hammer
+      Damage=20, WaterDash, DoubleJump, TripleJump OR Hammer
+      DoubleJump, TripleJump, Sword  # Using the skeetos is by far the easiest way, but not mandatory
+      Combat=Nest, DoubleJump, TripleJump, Dash OR Shuriken=2 OR Sentry=3  # go from the second snaptrap
+      Combat=Nest, DoubleJump, TripleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Water OR Damage=20
+      Combat=Nest, Water, DoubleJump, TripleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Combat=Nest, Damage=20, DoubleJump, TripleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Combat=Nest, Hammer, DoubleJump, TripleJump OR Dash  # Upswing for lenience
     unsafe, LowerReach.LeftFurnace:
       # DoubleJump, Glide, Sword  # pogo the fish, land on the snaptrap. from the second snaptrap, glide+djump+upslash
       DoubleJump, Sword  # reset your djump by hitting the nest with sword
@@ -5883,37 +6145,35 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
   pickup LowerReach.IcefallEX:
     moki, LowerReach.LeftFurnace:
       DoubleJump, Bash  # bash the enemies
-      Combat=2xSlug, DoubleJump, Grapple, Damage=10  # grapple past the enemies and probably get hit by them
-      Combat=2xSlug, Water, DoubleJump, WaterDash  # swim past the enemies
-      Launch
+      DoubleJump, Water, WaterDash  # swim past the enemies
+      DoubleJump, Combat=Nest, Grapple  # kill the enemies
+      Launch, Combat=Nest OR Bash
+      Launch, Water, WaterDash
     gorlek, LowerReach.LeftFurnace:
-      Water, WaterDash, DoubleJump
-      Water, DoubleJump, TripleJump
-      DoubleJump, TripleJump, Damage=20  # dboost in the poisonous water
-      WaterDash, DoubleJump, Damage=20
-      Grapple, DoubleJump
+      DoubleJump, TripleJump, Water OR Damage=20
+      DoubleJump, TripleJump, Dash, Combat=Nest
+      DoubleJump, WaterDash, Damage=20
+      DoubleJump, Grapple, Damage=10  # Grapple past the enemies, might get hit
+      Launch
     kii, LowerReach.LeftFurnace:
-      DoubleJump, TripleJump, Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # @validator dash variation might be gorlek
+      DoubleJump, Grapple
+      DoubleJump, TripleJump, Dash OR Shuriken=1 OR Sentry=2
+      DoubleJump, TripleJump, Glide, Sentry=1 OR Flash=1 OR Spear=1
+      DoubleJump, TripleJump, Combat=Nest, Hammer
+      DoubleJump, Combat=Nest, Dash, Hammer
+      DoubleJump, Sword, TripleJump OR Dash  # Pogo a fish or use the skeetos
       DoubleJump, Damage=40  # dboost in poisonous water and spikes to reach snaptrap
       DoubleJump, Water, Damage=20  # dboost in spikes to reach the snaptraps
-      DoubleJump, Dash, Hammer
-      DoubleJump, Dash, Sword, Spear=1 OR Damage=20
-      Grapple, Hammer
-      Grapple, Damage=20, Dash OR Glide OR Sword OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # dboost to get the pickup
-      Grapple, Spear=1, Dash OR Glide OR Sword OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # Spear to reach the pickup
-      Grapple, Spear=3
-      WaterDash, Hammer, Damage=20 OR Water
-      Water, WaterDash, Spear=1 OR Damage=20
-      WaterDash, Damage=20, Spear=1 OR Damage=20  # dboost or spear to reach the pickup
-      # Pogo a fish
-      Sword, Water, Hammer OR Spear=1 OR Damage=20
-      Sword, Damage=20, Hammer OR Spear=1 OR Damage=20
-      Sword, DoubleJump
-      Sword, Dash, Hammer OR Spear OR Damage=20
+      Hammer, Bash
+      Hammer, Grapple, Combat=Nest OR Dash
+      Hammer, WaterDash, Damage=20 OR Water
     unsafe, LowerReach.LeftFurnace:
       Combat=Nest, SwordSJump=1, DoubleJump OR Dash OR Glide
       Combat=Nest, SentryJump=1, Glide, Dash OR DoubleJump
       Combat=Nest, SentryJump=1, Dash, DoubleJump
+      Grapple, Damage=20, Dash OR Glide OR Sword OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # dboost to get the pickup
+      Grapple, Spear=1, Dash OR Glide OR Sword OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # Spear to reach the pickup
+      Grapple, Spear=3
       Grapple, Dash OR Glide:
         Blaze=1 OR Sentry=1 OR Flash=1  # bait the snaptrap, jump of it so it returns to its highest point then jump again+energy to reach the pickup
       Bash
@@ -5927,9 +6187,8 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
   conn LowerReach.AboveEntry:
     moki: LowerReach.HeatBaurFurnace OR DoubleJump OR Launch
     gorlek: Dash
-    kii:
-      Glide OR Sword OR Hammer OR Sentry=3  # From the same height as the water
-      Bash  # Bait a skeeto
+    kii: Glide OR Sword OR Hammer OR Sentry=3  # From the same height as the water
+    unsafe: Bash  # Bait a skeeto
   conn LowerReach.Entry: free
 
 anchor LowerReach.Central at -335, -4010:  # After the lever door
@@ -6069,7 +6328,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2
       Bash, Grenade=1  # from the ledge next to breakable floor, might be good for gorlek
     unsafe: 
-      PauseFloat
+      PauseHover
       GrenadeJump
       Bash
   pickup LowerReach.HiddenOre:
@@ -6161,6 +6420,8 @@ anchor LowerReach.BelowTokk at -296, -3944:
 
 anchor LowerReach.Teleporter at -259, -3962:
   refill Full
+
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn LowerReach.OutsideTPRoom:
@@ -7255,7 +7516,7 @@ anchor UpperReach.UpperSoupFrozenPaths at -215, -3877:
     unsafe: SwordSJump=1, Damage=20  # dboost in the spike at the right of the enemy and sjump from here
   pickup UpperReach.SwingPoleEX:
     gorlek: Dash OR Sword
-    kii: Glide OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+    kii: Glide OR Sentry=1 OR Flash=1 OR Shuriken=1
     unsafe: free
 
   conn UpperReach.UpperSoupThawedPaths:  # light the furnace without dropping down
@@ -7640,6 +7901,8 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
 
 anchor UpperDepths.Teleporter at 513, -4361:  # The spirit well
   refill Full
+  
+  state NonGladesTeleporter: free
 
   pickup UpperDepths.TeleporterEX: free  # just a few steps away in the darkness
 
@@ -8599,6 +8862,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   refill Full
 
   state EastPools.LowerWaterDrained: free  # this is, uh... correct, I suppose xD
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn EastPools.TPArea: free
@@ -9135,6 +9399,8 @@ region WestPools:
 
 anchor WestPools at -1656, -4171:  # the west Pools TP
   refill Full
+  
+  state NonGladesTeleporter: free
 
   pickup WestPools.TpEX:
     moki:
@@ -9188,6 +9454,8 @@ region LowerWastes:
 
 anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
   refill Full
+  
+  state NonGladesTeleporter: free
 
   pickup LowerWastes.WestTPOre:
     moki: Burrow
@@ -9781,6 +10049,8 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
 anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
   refill Full
 
+  state NonGladesTeleporter: free
+
   pickup LowerWastes.EastTPOre:
     moki, BreakWall=20:
       Burrow OR Launch
@@ -10026,6 +10296,8 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
 anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
 
+  state NonGladesTeleporter: free
+
   quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
       Burrow, Bash, DoubleJump OR Dash
@@ -10186,6 +10458,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
 
   state WindtornRuins.HeartBarrier:  # Barrier next to the teleporter that stops you from getting the Heart.
     moki: BreakWall=16
+  state NonGladesTeleporter: free
 
   conn Teleporters: free
   conn WindtornRuins.Escape:  # connection FROM tp TO escape
@@ -10565,6 +10838,8 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
+
+  state NonGladesTeleporter: free
 
   pickup WillowsEnd.LupoMap:
     moki: DoubleJump OR Dash OR Launch OR Bow=1

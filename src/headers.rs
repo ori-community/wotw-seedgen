@@ -65,7 +65,7 @@ fn summarize_headers(headers: &[PathBuf]) -> Result<String, String> {
         let mut name = header.file_stem().unwrap().to_string_lossy().into_owned();
         let header = fs::read_to_string(header).map_err(|err| format!("Error reading header from {:?}: {}", header, err))?;
 
-        let mut description = "no description";
+        let mut description = None;
 
         for line in header.lines() {
             if let Some(desc) = line.trim_start().strip_prefix("///") {
@@ -73,10 +73,9 @@ fn summarize_headers(headers: &[PathBuf]) -> Result<String, String> {
                 if desc.is_empty() {
                     continue;
                 }
-                if description == "no description" {
-                    description = desc;
-                } else {
-                    description = desc;
+                let first = description.is_none();
+                description = Some(desc);
+                if !first {
                     break;
                 }
             }
@@ -84,7 +83,7 @@ fn summarize_headers(headers: &[PathBuf]) -> Result<String, String> {
 
         util::add_trailing_spaces(&mut name, HEADER_INDENT);
 
-        output += &format!("{}  {}\n", NAME_COLOUR.paint(name), description);
+        output += &format!("{}  {}\n", NAME_COLOUR.paint(name), description.unwrap_or("no description"));
     }
 
     Ok(output)
@@ -155,7 +154,7 @@ pub fn inspect(headers: Vec<PathBuf>) -> Result<(), String> {
     Ok(())
 }
 
-pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
+pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
     let mut output = String::new();
 
     let headers = match path {
@@ -258,7 +257,8 @@ pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
     }
 
     let failed_length = failed.len();
-    if failed_length > 0 {
+    let valid = failed_length == 0;
+    if !valid {
         output += &format!("{}", Colour::Red.paint(format!("\n{}/{} failed\n", failed_length, length)));
 
         for failed in failed {
@@ -275,5 +275,13 @@ pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
     }
 
     println!("{}", output);
-    Ok(())
+    Ok(valid)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn validate() {
+        assert!(super::validate(None).unwrap());
+    }
 }

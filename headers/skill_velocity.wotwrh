@@ -5,7 +5,8 @@
 !!include bonus_core
 //// How many Skill Velocities to shuffle in
 !!parameter count int:5
-!!name 8|9|5|int|+1 Skill Velocity
+!!name 8|9|5|int|+1 #Skill Velocity#
+!!display 8|9|5|int|+1 $[(9|999=400)]
 !!icon 8|9|5|int|+1 file:assets/icons/bonus/skillvelocity.png
 !!add $PARAM(count)x 8|9|5|int|+1
 
@@ -23,7 +24,6 @@
 
 9|5|4|25|1|8|9|110|bool|true            // set to default enabled
 9|5|4|26|100|8|9|5|int|100|skip=1       // cap at 100
-9|5|6|$[(9|999=400)]
 9|5|4|17|9|110|1|8|9|6|int|1            // grant on pickup if enabled
 9|5=1|8|9|109|bool|true                 // subscribe to bonus core
 

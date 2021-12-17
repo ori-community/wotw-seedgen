@@ -68,11 +68,11 @@ impl Default for Settings {
 }
 impl Settings {
     pub fn compability_parse(json: &str) -> Result<Settings, String> {
-        serde_json::from_str(&json).or_else(|err| {  // current
-            read_pre_1_0_10(&json).or_else(|_| {  // < 1.0.10
-                read_pre_1_0_0(&json).or_else(|_| {  // < 1.0.0
-                    read_pre_0_13_2(&json).or_else(|_| {  // < 0.13.2
-                        read_pre_rustgen(&json).map_err(|_| format!("Failed to read settings: {}", err))  // javagen
+        serde_json::from_str(json).or_else(|err| {  // current
+            read_pre_1_0_10(json).or_else(|_| {  // < 1.0.10
+                read_pre_1_0_0(json).or_else(|_| {  // < 1.0.0
+                    read_pre_0_13_2(json).or_else(|_| {  // < 0.13.2
+                        read_pre_rustgen(json).map_err(|_| format!("Failed to read settings: {}", err))  // javagen
                     })
                 })
             })
@@ -81,7 +81,7 @@ impl Settings {
     pub fn from_seed(seed: &str) -> Result<Settings, String> {
         for line in seed.lines() {
             if let Some(config) = line.strip_prefix("// Config: ") {
-                let settings = Settings::compability_parse(&config)?;
+                let settings = Settings::compability_parse(config)?;
                 return Ok(settings);
             }
         }
@@ -269,7 +269,7 @@ fn read_pre_rustgen(json: &str) -> Result<Settings, io::Error> {
     if old_settings.flags.force_wisps { goalmodes.push(GoalMode::Wisps); }
     if old_settings.flags.force_trees { goalmodes.push(GoalMode::Trees); }
     if old_settings.flags.force_quests { goalmodes.push(GoalMode::Quests); }
-    if old_settings.flags.world_tour { goalmodes.push(GoalMode::Relics(80.0)); }
+    if old_settings.flags.world_tour { goalmodes.push(GoalMode::RelicChance(80.0)); }
 
     Ok(Settings {
         difficulty,
@@ -411,7 +411,7 @@ fn read_pre_1_0_10(json: &str) -> Result<Settings, io::Error> {
             Pre1_0_10GoalMode::Wisps => GoalMode::Wisps,
             Pre1_0_10GoalMode::Trees => GoalMode::Trees,
             Pre1_0_10GoalMode::Quests => GoalMode::Quests,
-            Pre1_0_10GoalMode::Relics => GoalMode::Relics(0.8),
+            Pre1_0_10GoalMode::Relics => GoalMode::RelicChance(0.8),
         }
     ).collect();
 
@@ -422,7 +422,7 @@ fn read_pre_1_0_10(json: &str) -> Result<Settings, io::Error> {
         players: old_settings.players,
         difficulty: old_settings.difficulty,
         glitches: old_settings.glitches,
-        goalmodes: goalmodes,
+        goalmodes,
         spawn_loc: old_settings.spawn_loc,
         race: old_settings.race,
         disable_logic_filter: old_settings.disable_logic_filter,
@@ -451,7 +451,7 @@ mod tests {
         for _ in 0..1000 {
             let mut settings = Settings::default();
 
-            let goalmodes = vec![GoalMode::Wisps, GoalMode::Trees, GoalMode::Quests, GoalMode::Relics(80.0)];
+            let goalmodes = vec![GoalMode::Wisps, GoalMode::Trees, GoalMode::Quests, GoalMode::RelicChance(0.8)];
             for goalmode in goalmodes {
                 if rng.gen_bool(0.25) {
                     settings.goalmodes.push(goalmode);

@@ -273,6 +273,9 @@ fn parse_glitches(names: &[String]) -> Vec<Glitch> {
             "grenaderedirect" => glitches.push(Glitch::GrenadeRedirect),
             "sentryredirect" => glitches.push(Glitch::SentryRedirect),
             "pausehover" => glitches.push(Glitch::PauseHover),
+            "glidejump" => glitches.push(Glitch::GlideJump),
+            "glidehammerjump" => glitches.push(Glitch::GlideHammerJump),
+            "spearjump" => glitches.push(Glitch::SpearJump),
             other => log::warn!("Unknown glitch {}", other),
         }
     }
@@ -291,20 +294,39 @@ fn parse_goalmodes(names: &[String]) -> Result<Vec<GoalMode>, String> {
             "w" | "wisps" => { goalmodes.push(GoalMode::Wisps); },
             "q" | "quests" => { goalmodes.push(GoalMode::Quests); },
             "r" | "relics" => {
-                let chance = if let Some(details) = parts.next() {
-                    let chance = details.strip_suffix('%').ok_or_else(|| format!("Expected % expression in details string for goal mode {}", goalmode))?;
-                    let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal mode {}", goalmode))?;
-                    if chance < 0.0 || chance > 100.0 { return Err(format!("Invalid chance in details string for goal mode {}", goalmode)); }
-                    chance / 100.0
-                } else { 0.6 };
+                let goal = if let Some(details) = parts.next() {
+                    if let Some(chance) = details.strip_suffix('%') {
+                        let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal mode {}", goalmode))?;
+                        if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal mode {}", goalmode)); }
+                        GoalMode::RelicChance(chance / 100.0)
+                    } else {
+                        let amount = details.parse().map_err(|_| format!("expected amount or % expression in details string for goal mode {}", goalmode))?;
+                        if !(0..=11).contains(&amount) { return Err(format!("Invalid amount in details string for goal mode {}", goalmode)); }
+                        GoalMode::Relics(amount)
+                    }
+                } else { GoalMode::RelicChance(0.6) };
 
-                goalmodes.push(GoalMode::Relics(chance));
+                goalmodes.push(goal);
             },
             other => log::warn!("Unknown goal mode {}", other),
         }
 
         if parts.next().is_some() {
             return Err(format!("Unexpected details string in goal mode {}", goalmode));
+        }
+    }
+
+    if !goalmodes.is_empty() {
+        goalmodes.sort_unstable_by_key(GoalMode::to_string);
+
+        let mut key = goalmodes[0].to_string();
+        for index in 1..goalmodes.len() {
+            let a = key;
+            key = goalmodes[index].to_string();
+
+            if a == key {
+                return Err(format!("Duplicate goalmode {}", key));
+            }
         }
     }
 
@@ -548,7 +570,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     for line in contents.lines() {
         if let Some(sets) = line.strip_prefix("// Sets: ") {
             if !sets.is_empty() {
-                for identifier in sets.split(",").map(str::trim) {
+                for identifier in sets.split(',').map(str::trim) {
                     let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
                     log::trace!("Setting state {}", identifier);
                     world.sets.push(node.index());
@@ -639,7 +661,7 @@ fn main() {
 
             match subcommand {
                 Some(HeaderCommand::Validate { path }) => {
-                    headers::validate(path).unwrap_or_else(|err| log::error!("{}", err));
+                    if let Err(err) = headers::validate(path) { log::error!("{}", err) }
                 },
                 Some(HeaderCommand::Parse { path }) => {
                     compile_seed(path).unwrap_or_else(|err| log::error!("{}", err));

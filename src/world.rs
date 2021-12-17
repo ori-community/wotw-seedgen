@@ -39,10 +39,10 @@ impl<'a> World<'a> {
                     let default = String::from("0");
                     let uber_value = match &command.operator {
                         UberStateOperator::Value(value) => value,
-                        UberStateOperator::Pointer(uber_identifier) => self.uber_states.get(&uber_identifier).unwrap_or(&default),
+                        UberStateOperator::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
                         UberStateOperator::Range(range) => match &range.start {
                             UberStateRangeBoundary::Value(value) => value,
-                            UberStateRangeBoundary::Pointer(uber_identifier) => self.uber_states.get(&uber_identifier).unwrap_or(&default),
+                            UberStateRangeBoundary::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
                         },
                     }.to_owned();
 
