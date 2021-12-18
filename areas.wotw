@@ -9409,14 +9409,20 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     gorlek:
       Water, WaterDash, DoubleJump, TripleJump
       Damage=20, WaterDash, DoubleJump, Dash OR TripleJump
+    kii:  # note that only one wheel ability should be used since you can only use the 3rd ability
+      Water, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Damage=20, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, TripleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1 OR Shuriken=1  # jump from the right wall (no climbing it since it is too obscure)
     unsafe:
       Bash, Grenade=1  # Stand on the left of the TP, launch the grenade with a curve so it won't touch the ceiling and bash it when it falls down
       WaterDash, Dash, Hammer, Water OR Damage=20  # Already hard with analog swimming but it's a nightmare on keyboard
-      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # wall jump from the right wall. With weapons, climb the right wall then djump+ upslash. TripleJump might be Gorlek
+      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # wall jump from the right wall. With weapons, climb the right wall then djump+ upslash.
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
+    kii: Damage=40, Burrow
   pickup WestPools.BurrowOre:  # intended path omitted in moki
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
+    kii: WestPools.ForestsStrength, Damage=100, Damage=60, Damage=80, WaterDash, Burrow
     unsafe: WestPools.ForestsStrength, Water, Burrow
   pickup WestPools.EscapeRevisitEX:
     moki, WestPools.ForestsStrength:
@@ -9426,14 +9432,22 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     gorlek, WestPools.ForestsStrength:
       Water, WaterDash, Combat=Crab+SpinCrab OR DoubleJump OR Damage=10
       Water, Bash OR Launch
+    kii, WestPools.ForestsStrength:
+      Damage=100, WaterDash, Damage=80, Combat=Crab+SpinCrab OR DoubleJump OR Damage=10 OR Bash OR Launch
 
   conn Teleporters: free
   conn KwolokFight:
     moki: Water, WaterBreath, DoubleJump OR Dash OR Launch
     gorlek: Water
+    kii: 
+      Damage=100, WaterDash
+      Damage=220
+    unsafe:
+      Damage=200, Burrow, Blaze=1, DoubleJump OR Launch
   conn EastPools.CentralRoom:
     moki: Water, WaterBreath, WaterDash
     gorlek: Water, WaterDash
+    kii: Damage=160, WaterDash
     unsafe: Water, WaterBreath
   conn UpperPools.KeystoneRoomEntrance:
     moki: WestPools.ForestsStrength, Water, WaterBreath, WaterDash
@@ -9444,7 +9458,9 @@ anchor KwolokFight at -1650, -4125:
 
   quest WestPools.ForestsStrength:
     moki: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
-    unsafe: Boss=250, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
+    kii: 
+      Boss=250, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
+      Boss=250, Damage=80, WaterDash, Bash, DoubleJump, Dash OR Launch
 
 region LowerWastes:
   moki: Danger=50, Regenerate
