@@ -94,22 +94,22 @@ where D: fmt::Debug
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
 #[repr(u8)]
 pub enum Zone {
-    Marsh,
-    Hollow,
-    Glades,
-    Wellspring,
-    Woods,
-    Reach,
-    Depths,
-    Pools,
-    Wastes,
-    Ruins,
-    Willow,
-    Burrows,
-    Spawn,
-    Shop,
+    Marsh = 0,
+    Hollow = 1,
+    Glades = 2,
+    Wellspring = 3,
+    Woods = 7,
+    Reach = 6,
+    Depths = 8,
+    Pools = 4,
+    Wastes = 9,
+    Ruins = 10,
+    Willow = 11,
+    Burrows = 5,
+    Spawn = 14,
+    Shop = 12,
     #[num_enum(default)]
-    Void,
+    Void = 13,
 }
 impl fmt::Display for Zone {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

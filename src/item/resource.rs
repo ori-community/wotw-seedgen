@@ -7,11 +7,11 @@ use crate::util::Icon;
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Resource {
-    Health,
-    Energy,
-    Ore,
-    Keystone,
-    ShardSlot,
+    Health = 0,
+    Energy = 1,
+    Ore = 2,
+    Keystone = 3,
+    ShardSlot = 4,
 }
 impl fmt::Display for Resource {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

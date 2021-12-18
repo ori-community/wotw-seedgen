@@ -7,21 +7,21 @@ use crate::util::{Icon, auto_display};
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum BonusUpgrade {
-    RapidHammer,
-    RapidSword,
-    BlazeEfficiency,
-    SpearEfficiency,
-    ShurikenEfficiency,
-    SentryEfficiency,
-    BowEfficiency,
-    RegenerationEfficiency,
-    FlashEfficiency,
-    GrenadeEfficiency,
+    RapidHammer = 0,
+    RapidSword = 1,
+    BlazeEfficiency = 2,
+    SpearEfficiency = 3,
+    ShurikenEfficiency = 4,
+    SentryEfficiency = 5,
+    BowEfficiency = 6,
+    RegenerationEfficiency = 7,
+    FlashEfficiency = 8,
+    GrenadeEfficiency = 9,
     ExplodingSpike = 45,
-    ShockSmash,
-    StaticStar,
-    ChargeBlaze,
-    RapidSentry,
+    ShockSmash = 46,
+    StaticStar = 47,
+    ChargeBlaze = 48,
+    RapidSentry = 49,
 }
 impl fmt::Display for BonusUpgrade {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

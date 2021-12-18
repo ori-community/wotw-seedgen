@@ -7,7 +7,7 @@ use crate::util::{Difficulty, Icon, auto_display};
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Skill {
-    Bash,
+    Bash = 0,
     WallJump = 3,
     DoubleJump = 5,
     Launch = 8,
@@ -19,15 +19,15 @@ pub enum Skill {
     Spear = 74,
     Regenerate = 77,
     Bow = 97,
-    Hammer,
+    Hammer = 98,
     Sword = 100,
-    Burrow,
-    Dash,
+    Burrow = 101,
+    Dash = 102,
     WaterDash = 104,
     Shuriken = 106,
     Seir = 108,
     Blaze = 115,
-    Sentry,
+    Sentry = 116,
     Flap = 118,
     #[num_enum(alternatives = [121])]
     AncestralLight = 120,

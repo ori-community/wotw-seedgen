@@ -8,7 +8,7 @@ use crate::util::Zone;
 #[repr(u8)]
 pub enum ZoneHintType {
     Skills = 1,
-    Warps,
+    Warps = 2,
     All = 10,
 }
 impl fmt::Display for ZoneHintType {

@@ -9,9 +9,9 @@ use crate::util::{Icon, auto_display};
 pub enum BonusItem {
     Relic = 20,
     HealthRegen = 30,
-    EnergyRegen,
+    EnergyRegen = 31,
     ExtraDoubleJump = 35,
-    ExtraAirDash,
+    ExtraAirDash = 36,
 }
 impl fmt::Display for BonusItem {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
