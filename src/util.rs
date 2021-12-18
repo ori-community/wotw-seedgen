@@ -2,6 +2,7 @@ pub mod orbs;
 pub mod uber_state;
 pub mod constants;
 
+use num_enum::FromPrimitive;
 pub use uber_state::{UberState, UberIdentifier, UberType};
 
 use std::{
@@ -90,7 +91,8 @@ where D: fmt::Debug
     debug
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
+#[repr(u8)]
 pub enum Zone {
     Marsh,
     Hollow,
@@ -106,50 +108,12 @@ pub enum Zone {
     Burrows,
     Spawn,
     Shop,
+    #[num_enum(default)]
     Void,
 }
 impl fmt::Display for Zone {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", auto_display(self))
-    }
-}
-impl Zone {
-    pub fn from_id(id: u8) -> Option<Zone> {
-        match id {
-            0 => Some(Zone::Marsh),
-            1 => Some(Zone::Hollow),
-            2 => Some(Zone::Glades),
-            3 => Some(Zone::Wellspring),
-            4 => Some(Zone::Pools),
-            5 => Some(Zone::Burrows),
-            6 => Some(Zone::Reach),
-            7 => Some(Zone::Woods),
-            8 => Some(Zone::Depths),
-            9 => Some(Zone::Wastes),
-            10 => Some(Zone::Ruins),
-            11 => Some(Zone::Willow),
-            12 => Some(Zone::Shop),
-            13 => Some(Zone::Void),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            Zone::Marsh => 0,
-            Zone::Hollow => 1,
-            Zone::Glades => 2,
-            Zone::Wellspring => 3,
-            Zone::Pools => 4,
-            Zone::Burrows => 5,
-            Zone::Reach => 6,
-            Zone::Woods => 7,
-            Zone::Depths => 8,
-            Zone::Wastes => 9,
-            Zone::Ruins => 10,
-            Zone::Willow => 11,
-            Zone::Shop => 12,
-            Zone::Spawn | Zone::Void => 13,
-        }
     }
 }
 

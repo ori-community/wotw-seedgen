@@ -1,14 +1,17 @@
 use std::fmt;
 
+use num_enum::TryFromPrimitive;
+
 use crate::util::{Icon, auto_display};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[repr(u8)]
 pub enum BonusItem {
-    HealthRegen,
+    Relic = 20,
+    HealthRegen = 30,
     EnergyRegen,
-    ExtraDoubleJump,
+    ExtraDoubleJump = 35,
     ExtraAirDash,
-    Relic,
 }
 impl fmt::Display for BonusItem {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -20,26 +23,6 @@ impl fmt::Display for BonusItem {
     }
 }
 impl BonusItem {
-    pub fn from_id(id: u8) -> Option<BonusItem> {
-        match id {
-            20 => Some(BonusItem::Relic),
-            30 => Some(BonusItem::HealthRegen),
-            31 => Some(BonusItem::EnergyRegen),
-            35 => Some(BonusItem::ExtraDoubleJump),
-            36 => Some(BonusItem::ExtraAirDash),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            BonusItem::Relic => 20,
-            BonusItem::HealthRegen => 30,
-            BonusItem::EnergyRegen => 31,
-            BonusItem::ExtraDoubleJump => 35,
-            BonusItem::ExtraAirDash => 36,
-        }
-    }
-
     pub fn icon(self) -> Option<Icon> {
         match self {
             BonusItem::Relic => Some(Icon::File(String::from("assets/icons/game/relic.png"))),

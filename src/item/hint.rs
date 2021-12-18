@@ -1,29 +1,15 @@
 use std::fmt;
 
+use num_enum::TryFromPrimitive;
+
 use crate::util::Zone;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[repr(u8)]
 pub enum ZoneHintType {
-    Skills,
+    Skills = 1,
     Warps,
-    All,
-}
-impl ZoneHintType {
-    pub fn from_id(id: u8) -> Option<ZoneHintType> {
-        match id {
-            1 => Some(ZoneHintType::Skills),
-            2 => Some(ZoneHintType::Warps),
-            10 => Some(ZoneHintType::All),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            ZoneHintType::Skills => 1,
-            ZoneHintType::Warps => 2,
-            ZoneHintType::All => 10,
-        }
-    }
+    All = 10,
 }
 impl fmt::Display for ZoneHintType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

@@ -1,8 +1,11 @@
 use std::fmt;
 
+use num_enum::TryFromPrimitive;
+
 use crate::util::{Icon, auto_display};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[repr(u8)]
 pub enum BonusUpgrade {
     RapidHammer,
     RapidSword,
@@ -14,7 +17,7 @@ pub enum BonusUpgrade {
     RegenerationEfficiency,
     FlashEfficiency,
     GrenadeEfficiency,
-    ExplodingSpike,
+    ExplodingSpike = 45,
     ShockSmash,
     StaticStar,
     ChargeBlaze,
@@ -26,46 +29,6 @@ impl fmt::Display for BonusUpgrade {
     }
 }
 impl BonusUpgrade {
-    pub fn from_id(id: u8) -> Option<BonusUpgrade> {
-        match id {
-            0 => Some(BonusUpgrade::RapidHammer),
-            1 => Some(BonusUpgrade::RapidSword),
-            2 => Some(BonusUpgrade::BlazeEfficiency),
-            3 => Some(BonusUpgrade::SpearEfficiency),
-            4 => Some(BonusUpgrade::ShurikenEfficiency),
-            5 => Some(BonusUpgrade::SentryEfficiency),
-            6 => Some(BonusUpgrade::BowEfficiency),
-            7 => Some(BonusUpgrade::RegenerationEfficiency),
-            8 => Some(BonusUpgrade::FlashEfficiency),
-            9 => Some(BonusUpgrade::GrenadeEfficiency),
-            45 => Some(BonusUpgrade::ExplodingSpike),
-            46 => Some(BonusUpgrade::ShockSmash),
-            47 => Some(BonusUpgrade::StaticStar),
-            48 => Some(BonusUpgrade::ChargeBlaze),
-            49 => Some(BonusUpgrade::RapidSentry),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            BonusUpgrade::RapidHammer => 0,
-            BonusUpgrade::RapidSword => 1,
-            BonusUpgrade::BlazeEfficiency => 2,
-            BonusUpgrade::SpearEfficiency => 3,
-            BonusUpgrade::ShurikenEfficiency => 4,
-            BonusUpgrade::SentryEfficiency => 5,
-            BonusUpgrade::BowEfficiency => 6,
-            BonusUpgrade::RegenerationEfficiency => 7,
-            BonusUpgrade::FlashEfficiency => 8,
-            BonusUpgrade::GrenadeEfficiency => 9,
-            BonusUpgrade::ExplodingSpike => 45,
-            BonusUpgrade::ShockSmash => 46,
-            BonusUpgrade::StaticStar => 47,
-            BonusUpgrade::ChargeBlaze => 48,
-            BonusUpgrade::RapidSentry => 49,
-        }
-    }
-
     pub fn icon(self) -> Option<Icon> {
         match self {
             BonusUpgrade::RapidHammer => Some(Icon::File(String::from("assets/icons/bonus/rapidsmash.png"))),

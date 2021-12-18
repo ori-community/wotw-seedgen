@@ -544,15 +544,15 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     for item in args.items {
         if let Some(skill) = item.strip_prefix("s:") {
             let id: u8 = skill.parse().map_err(|_| format!("expected numeric skill id in {}", item))?;
-            world.player.inventory.grant(Item::Skill(Skill::from_id(id).ok_or_else(|| format!("{} is not a valid skill id", id))?), 1);
+            world.player.inventory.grant(Item::Skill(Skill::try_from(id).map_err(|_| format!("{} is not a valid skill id", id))?), 1);
         }
         else if let Some(teleporter) = item.strip_prefix("t:") {
             let id: u8 = teleporter.parse().map_err(|_| format!("expected numeric teleporter id in {}", item))?;
-            world.player.inventory.grant(Item::Teleporter(Teleporter::from_id(id).ok_or_else(|| format!("{} is not a valid teleporter id", id))?), 1);
+            world.player.inventory.grant(Item::Teleporter(Teleporter::try_from(id).map_err(|_| format!("{} is not a valid teleporter id", id))?), 1);
         }
         else if let Some(shard) = item.strip_prefix("sh:") {
             let id: u8 = shard.parse().map_err(|_| format!("expected numeric shard id in {}", item))?;
-            world.player.inventory.grant(Item::Shard(Shard::from_id(id).ok_or_else(|| format!("{} is not a valid shard id", id))?), 1);
+            world.player.inventory.grant(Item::Shard(Shard::try_from(id).map_err(|_| format!("{} is not a valid shard id", id))?), 1);
         }
         else if let Some(world_event) = item.strip_prefix("w:") {
             let id: u8 = world_event.parse().map_err(|_| format!("expected numeric world event id in {}", item))?;

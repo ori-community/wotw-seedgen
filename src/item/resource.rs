@@ -1,8 +1,11 @@
 use std::fmt;
 
+use num_enum::TryFromPrimitive;
+
 use crate::util::Icon;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[repr(u8)]
 pub enum Resource {
     Health,
     Energy,
@@ -22,26 +25,6 @@ impl fmt::Display for Resource {
     }
 }
 impl Resource {
-    pub fn from_id(id: u8) -> Option<Resource> {
-        match id {
-            0 => Some(Resource::Health),
-            1 => Some(Resource::Energy),
-            2 => Some(Resource::Ore),
-            3 => Some(Resource::Keystone),
-            4 => Some(Resource::ShardSlot),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            Resource::Health => 0,
-            Resource::Energy => 1,
-            Resource::Ore => 2,
-            Resource::Keystone => 3,
-            Resource::ShardSlot => 4,
-        }
-    }
-
     pub fn icon(self) -> Option<Icon> {
         Some(match self {
             Resource::Health => Icon::File(String::from("assets/icons/game/healthfragment.png")),

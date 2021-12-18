@@ -437,7 +437,7 @@ mod tests {
 
         settings.presets.push(PathBuf::from("rspawn"));
         settings.header_list = vec![
-            PathBuf::from("3_line_bingo"),
+            PathBuf::from("bingo"),
             PathBuf::from("bonus+"),
             PathBuf::from("glades_done"),
             PathBuf::from("launch_fragments"),

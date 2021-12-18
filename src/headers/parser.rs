@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
-    str::FromStr,
+    str::FromStr, convert::TryFrom,
 };
 
 use rand::Rng;
@@ -55,7 +55,7 @@ where P: Iterator<Item=&'a str>
     let resource_type = parts.next().ok_or_else(|| String::from("missing resource type"))?;
     end_of_item(parts)?;
     let resource_type: u8 = resource_type.parse().map_err(|_| String::from("invalid resource type"))?;
-    let resource = Resource::from_id(resource_type).ok_or_else(|| String::from("invalid resource type"))?;
+    let resource = Resource::try_from(resource_type).map_err(|_| String::from("invalid resource type"))?;
     Ok(Item::Resource(resource))
 }
 fn parse_skill<'a, P>(mut parts: P) -> Result<Item, String>
@@ -65,11 +65,11 @@ where P: Iterator<Item=&'a str>
     end_of_item(parts)?;
     if let Some(skill_type) = skill_type.strip_prefix('-') {
         let skill_type: u8 = skill_type.parse().map_err(|_| String::from("invalid skill type"))?;
-        let skill = Skill::from_id(skill_type).ok_or_else(|| String::from("invalid skill type"))?;
+        let skill = Skill::try_from(skill_type).map_err(|_| String::from("invalid skill type"))?;
         Ok(Item::RemoveSkill(skill))
     } else {
         let skill_type: u8 = skill_type.parse().map_err(|_| String::from("invalid skill type"))?;
-        let skill = Skill::from_id(skill_type).ok_or_else(|| String::from("invalid skill type"))?;
+        let skill = Skill::try_from(skill_type).map_err(|_| String::from("invalid skill type"))?;
         Ok(Item::Skill(skill))
     }
 }
@@ -80,11 +80,11 @@ where P: Iterator<Item=&'a str>
     end_of_item(parts)?;
     if let Some(shard_type) = shard_type.strip_prefix('-') {
         let shard_type: u8 = shard_type.parse().map_err(|_| String::from("invalid shard type"))?;
-        let shard = Shard::from_id(shard_type).ok_or_else(|| String::from("invalid shard type"))?;
+        let shard = Shard::try_from(shard_type).map_err(|_| String::from("invalid shard type"))?;
         Ok(Item::RemoveShard(shard))
     } else {
         let shard_type: u8 = shard_type.parse().map_err(|_| String::from("invalid shard type"))?;
-        let shard = Shard::from_id(shard_type).ok_or_else(|| String::from("invalid shard type"))?;
+        let shard = Shard::try_from(shard_type).map_err(|_| String::from("invalid shard type"))?;
         Ok(Item::Shard(shard))
     }
 }
@@ -99,7 +99,7 @@ where P: Iterator<Item=&'a str>
 {
     let resource = parts.next().ok_or_else(|| String::from("missing resource type"))?;
     let resource: u8 = resource.parse().map_err(|_| String::from("invalid resource type"))?;
-    let resource = Resource::from_id(resource).ok_or_else(|| String::from("invalid resource type"))?;
+    let resource = Resource::try_from(resource).map_err(|_| String::from("invalid resource type"))?;
     let amount = parts.next().ok_or_else(|| String::from("missing resource amount"))?;
     let amount: i16 = amount.parse().map_err(|_| String::from("invalid resource type"))?;
     end_of_item(parts)?;
@@ -151,7 +151,7 @@ where P: Iterator<Item=&'a str>
 {
     let toggle_type = parts.next().ok_or_else(|| String::from("missing toggle command type"))?;
     let toggle_type: u8 = toggle_type.parse().map_err(|_| String::from("invalid toggle command type"))?;
-    let toggle_type = ToggleCommand::from_id(toggle_type).ok_or_else(|| String::from("invalid toggle command type"))?;
+    let toggle_type = ToggleCommand::try_from(toggle_type).map_err(|_| String::from("invalid toggle command type"))?;
     let on = parts.next().ok_or_else(|| String::from("missing toggle command value"))?;
     let on = match on {
         "0" => false,
@@ -417,11 +417,11 @@ where P: Iterator<Item=&'a str>
     end_of_item(parts)?;
     if let Some(teleporter_type) = teleporter_type.strip_prefix('-') {
         let teleporter_type: u8 = teleporter_type.parse().map_err(|_| String::from("invalid teleporter type"))?;
-        let teleporter = Teleporter::from_id(teleporter_type).ok_or_else(|| String::from("invalid teleporter type"))?;
+        let teleporter = Teleporter::try_from(teleporter_type).map_err(|_| String::from("invalid teleporter type"))?;
         Ok(Item::RemoveTeleporter(teleporter))
     } else {
         let teleporter_type: u8 = teleporter_type.parse().map_err(|_| String::from("invalid teleporter type"))?;
-        let teleporter = Teleporter::from_id(teleporter_type).ok_or_else(|| String::from("invalid teleporter type"))?;
+        let teleporter = Teleporter::try_from(teleporter_type).map_err(|_| String::from("invalid teleporter type"))?;
         Ok(Item::Teleporter(teleporter))
     }
 }
@@ -566,7 +566,7 @@ where P: Iterator<Item=&'a str>
     let bonus_type = parts.next().ok_or_else(|| String::from("missing bonus item type"))?;
     end_of_item(parts)?;
     let bonus_type: u8 = bonus_type.parse().map_err(|_| String::from("invalid bonus item type"))?;
-    let bonus = BonusItem::from_id(bonus_type).ok_or_else(|| String::from("invalid bonus item type"))?;
+    let bonus = BonusItem::try_from(bonus_type).map_err(|_| String::from("invalid bonus item type"))?;
     Ok(Item::BonusItem(bonus))
 }
 fn parse_bonus_upgrade<'a, P>(mut parts: P) -> Result<Item, String>
@@ -575,7 +575,7 @@ where P: Iterator<Item=&'a str>
     let bonus_type = parts.next().ok_or_else(|| String::from("missing bonus upgrade type"))?;
     end_of_item(parts)?;
     let bonus_type: u8 = bonus_type.parse().map_err(|_| String::from("invalid bonus upgrade type"))?;
-    let bonus = BonusUpgrade::from_id(bonus_type).ok_or_else(|| String::from("invalid bonus upgrade type"))?;
+    let bonus = BonusUpgrade::try_from(bonus_type).map_err(|_| String::from("invalid bonus upgrade type"))?;
     Ok(Item::BonusUpgrade(bonus))
 }
 fn parse_zone_hint() -> Result<Item, String> {
@@ -591,7 +591,7 @@ where P: Iterator<Item=&'a str>
     end_of_item(parts)?;
 
     let zone: u8 = zone.parse().map_err(|_| String::from("invalid relic zone"))?;
-    let zone = Zone::from_id(zone).ok_or_else(|| String::from("invalid relic zone"))?;
+    let zone = Zone::try_from(zone).map_err(|_| String::from("invalid relic zone"))?;
 
     Ok(Item::Relic(zone))
 }
@@ -1562,7 +1562,7 @@ pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &Settings) 
                     let mut args = seed[after_bracket..end_index].splitn(2, ',');
                     let zone = args.next().unwrap().trim();
                     let zone: u8 = zone.parse().map_err(|_| format!("expected numeric zone, got {}", zone))?;
-                    let zone = Zone::from_id(zone).ok_or_else(|| format!("invalid zone {}", zone))?;
+                    let zone = Zone::try_from(zone).map_err(|_| format!("invalid zone {}", zone))?;
                     let pattern = args.next().unwrap_or("").trim();
 
                     let locations = how_many(pattern, zone, world_index, &clone, graph)?;
