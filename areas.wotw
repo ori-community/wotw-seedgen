@@ -10813,11 +10813,14 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Bash, Grenade=2, DoubleJump, TripleJump, Damage=40 OR WillowsEnd.PortalShortcut  # Bash the elemental, tjump, bash its projectiles
       Bash, Grenade=3, DoubleJump, TripleJump
     kii:
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40, Glide OR Dash OR Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Glide OR Dash OR Sword OR Hammer
+      Bash, Grenade=2, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer
       Launch, Sword OR Damage=40  # refresh your launch on the wall under Lupo. With sword, hit the elemental to refresh your launch. Dboost in the spikes otherwise
       Launch, Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Grenade=1, DoubleJump, TripleJump, Grenade=1 OR Dash OR WillowsEnd.PortalShortcut OR Damage=40
-      DoubleJump, TripleJump, Damage=20, WillowsEnd.PortalShortcut  # dboost an the mine so you can stand on the lava thingy and jump from it to the floating platform
+      DoubleJump, TripleJump, Damage=20, WillowsEnd.PortalShortcut  # dboost on the mine so you can stand on the lava thingy and jump from it to the floating platform
       DoubleJump, TripleJump, Bash, Damage=20, Dash OR Grenade=1 OR Damage=40
   conn WillowsEnd.BoulderHeartPath:
     moki:
@@ -10866,7 +10869,7 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       SentryJump=1, DoubleJump, Damage=20  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
       Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
 
-anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
+anchor WillowsEnd.BoulderHeartPath at 335, -3887:  # Checkpoint on the way to the lower left heart
 # Not a really usefull anchor but will make pathfinding less of a pain
  refill Checkpoint
  refill Health=1
@@ -10983,6 +10986,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Grapple, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2  # jump from the wall on the left and not the wheel directly
     unsafe:
       Grapple, DoubleJump, TripleJump, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
+  
   conn WillowsEnd.Entry:
     moki: DoubleJump OR Dash OR Launch
     gorlek:
@@ -10991,6 +10995,16 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
     kii:
       Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash= OR Sentry=2 OR Damage=80
       Bash, Grenade=1, Damage=40
+  conn WillowsEnd.InnerTP:
+    kii:
+      Grapple, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      Grapple, DoubleJump, TripleJump, Bash, Grenade=1, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      Grapple, DoubleJump, TripleJump, Bash, Damage=40, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+    unsafe:
+      Grapple, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Grapple, DoubleJump, TripleJump, Bash, Grenade=1, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Grapple, DoubleJump, TripleJump, Bash, Damage=40, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Grapple, DoubleJump, TripleJump, Bash, Glide OR Dash OR Sword OR Hammer
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
