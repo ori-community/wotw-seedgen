@@ -10869,7 +10869,7 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       SentryJump=1, DoubleJump, Damage=20  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
       Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
 
-anchor WillowsEnd.BoulderHeartPath at 335, -3887:  # Checkpoint on the way to the lower left heart
+anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
 # Not a really usefull anchor but will make pathfinding less of a pain
  refill Checkpoint
  refill Health=1
@@ -10993,7 +10993,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Glide OR Sword OR Hammer
       Bash, Grenade=2
     kii:
-      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash= OR Sentry=2 OR Damage=80
+      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR Damage=80
       Bash, Grenade=1, Damage=40
   conn WillowsEnd.InnerTP:
     kii:
@@ -11010,6 +11010,9 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
 
   state NonGladesTeleporter: free
+  state WillowsEnd.PortalShortcut:
+    moki, BreakWall=20: DoubleJump OR Dash OR Launch OR Bow=1
+    gorlek: BreakWall=20
 
   pickup WillowsEnd.LupoMap:
     moki: DoubleJump OR Dash OR Launch OR Bow=1
@@ -11018,13 +11021,18 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   conn Teleporters: free
   conn WillowsEnd.Entry:
     moki:
-      BreakWall=20, DoubleJump OR Dash OR Launch OR Bow=1  # open the portal shortcut
+      WillowsEnd.PortalShortcut, DoubleJump OR Dash OR Launch OR Bow=1  # open the portal shortcut
       DoubleJump, Dash
       Glide OR Launch
-    gorlek:
-      BreakWall=20  # jump to trigger the mine, back off to avoid taking damages
+    gorlek:  # No paths using Sword/Hammer because they solve PortalShortcut
+      WillowsEnd.PortalShortcut  # jump to trigger the mine, back off to avoid taking damages
       Bash, Damage=40, DoubleJump OR Dash
       DoubleJump, TripleJump, Damage=40
+    kii:
+      Dash  # Reset dash on ceiling
+      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # touch the wall bellow Lupo
+      Bash, DoubleJump OR Damage=40
+    unsafe: Bash OR DoubleJump
   conn WillowsEnd.AboveInnerTP:
     moki:
       DoubleJump, Bash, Grenade=1, Dash OR Glide
@@ -11036,10 +11044,12 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
       Bash, Grenade=1, Dash, Damage=40
       SentryJump=1, Combat=CrystalMiner, DoubleJump, Dash OR Glide  # you can break the wall with the weapon
       SentryJump=1, Combat=CrystalMiner, Damage=40, DoubleJump OR Dash  # you can break the wall with the weapon
+    kii:
+      Launch  # wjump on the shortcut's breakable wall or launch from the the ground next to the portal if the barrier is broken
+      Bash, Grenade=1  # wjump on the shortcut's breakable wall or bashnade from the ground next to the portal if the barrier is broken
     unsafe:
-      Launch  # wjump on the shortcut's breakable wall or launch from the other side
-      Bash, Grenade=1, BreakWall=20
-      DoubleJump, TripleJump, Dash, Damage=40, Combat=CrystalMiner  # if the shortcut is open, tjump + dash in the spikes
+      SwordSJump=1, Damage=40
+      #DoubleJump, TripleJump, Dash, Damage=40, Combat=CrystalMiner #I don't think this work anymore? # if the shortcut is open, tjump + dash in the spikes
 
 anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puzzle
   refill Checkpoint
