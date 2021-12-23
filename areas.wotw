@@ -11057,9 +11057,14 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
     moki:
       BreakCrystal, Launch
       Bow=1, Combat=CrystalMiner OR Bash
+    kii:
+      Spear=1 OR Grenade=1 OR Sentry=1
+      Shuriken=1, DoubleJump OR Sword OR Hammer
+      DoubleJump, Blaze=1, TripleJump OR Hammer
 
   conn WillowsEnd.InnerTP:
     moki: Combat=CrystalMiner OR Bash OR Launch
+    kii: Damage=10  # @validaotr should probably be gorlek. Dboost on the gorlek.
     unsafe: free  # reload to despawn the gorlek
   conn WillowsEnd.East:
     moki:
@@ -11074,47 +11079,18 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
       Bash, SwordSJump=1, DoubleJump OR Dash
       Bash, HammerSJump=1, DoubleJump, Dash
       Bash, SentryJump=1, Glide
+    kii:
+      Launch  # Reset your launch on the walls
+      Bash, Grenade=1
+      Bash, DoubleJump OR Glide OR Sword OR Hammer # Bash glide from the gorlek to the elemental 
+      Bash, Dash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Sword, Dash  # slash the element to reset your jumps, pogo it then tjump+upslash to reach the wall above it
     unsafe:
-      Bash, DoubleJump OR Dash OR Glide  # Bash CrystalMiner to reach the wall before the elemental
-      DoubleJump, TripleJump, Sword  # slash the element to reset your jumps, pogo it then sword jump + up slash to reach the left wall
-      Launch
-
+      Bash, Dash  # Bash glide from the gorlek to the elemental 
+      DoubleJump, TripleJump, Sword  # slash the element to reset your jumps, pogo it then tjump + up slash to reach the left wall
+  # So far, connection towards RedirectHeartPath are handled by going to East first
+    
 anchor WillowsEnd.East at 547, -3805:  # To the left of the redirect puzzle
-  refill Checkpoint:  # at the redirect heart room
-    moki: Launch
-  refill Health=1:
-    moki:
-      Bash, DoubleJump OR Dash OR Glide
-      Launch
-    gorlek:
-      Bash
-      DoubleJump, TripleJump
-    unsafe: Damage=20, Glide OR Dash OR Sword OR Hammer  # dboost through the laser
-  refill Energy=4:
-    moki:
-      BreakCrystal, Bash, DoubleJump OR Glide
-      Bow=1, Bash, Dash
-      BreakCrystal, Launch
-    gorlek:
-      BreakCrystal, Bash
-      BreakCrystal, DoubleJump, TripleJump
-    unsafe:
-      Damage=20, Sword OR Hammer
-      Damage=20, Glide, Bow=1 OR Spear=1 OR Sentry=1 OR Shuriken=1 OR Grenade=1  # dboost through the laser
-      Damage=20, Dash, Bow=1 OR Spear=1 OR Sentry=1 OR Shuriken=1 OR Grenade=1  # dboost through the laser
-
-  # state WillowsEnd.RedirectHeart:
-  #   moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
-
-  pickup WillowsEnd.RedirectEX:
-    moki:
-      BreakWall=10, Bash, Launch, DoubleJump OR Dash OR Glide
-      Bash, Grenade=1, Launch
-    gorlek:
-      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-      Glide, DoubleJump, TripleJump, Bash, Damage=20, Sword OR Hammer  # redirect the projectile so it pass under the pickup, dboost in the double lasser at the left so you can re-entre the top portal. Glide under the pickup then bash. Upslash can help if needed
-    unsafe: Launch
-
   conn WillowsEnd.AboveInnerTP:
     moki:
       Glide
@@ -11128,15 +11104,74 @@ anchor WillowsEnd.East at 547, -3805:  # To the left of the redirect puzzle
     unsafe:
       DoubleJump, Sword
       Dash, Bash OR Sword
+  conn WillowsEnd.RedirectHeartPath:
+    moki:
+      Launch
+      Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      Bash
+      DoubleJump, TripleJump
+    kii: Damage=20, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost through the laser
+    unsafe: DoubleJump
   conn WillowsEnd.Upper:
     moki: Bash, Launch  # some other paths would be possible, but with how far back the last checkpoint is...
     gorlek:
       Launch
       Bash, DoubleJump
     unsafe:
+      Bash
       SwordSJump=1, DoubleJump, TripleJump, Damage=20  # sjump+ tjump to rech the right wall. dboost in the laser. tjump+ sword combo to reach the right wall. Pogo the elemental+tjump
 
 # checkpoint at 614, -3836
+
+anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energy refill on the way to the redirect heart
+  refill Health=1
+  refill Energy=4:  # these paths need to be able to return to the starting point
+    moki:
+      BreakCrystal, Launch OR DoubleJump OR Glide
+      Bow=1, Dash
+    gorlek, BreakCrystal:  # break the crystal, collect the energy on the ground then bash grenade to get back up
+      Bash, Grenade=1
+      SentryJump=1  # same as above
+      DoubleJump, TripleJump, Damage=40
+    kii, BreakCrystal: DoubleJump, Damage=40
+    unsafe, BreakCrystal: DoubleJump, Sword  # Pogo the mine
+  refill Checkpoint:  # these paths need to be able to return to the starting point
+    moki:
+      Bash, Grenade=1
+      Launch
+    gorlek:
+      SentryJump=1
+      DoubleJump, TripleJump, Damage=40
+    kii: DoubleJump, Damage=40
+    unsafe: DoubleJump, Sword  # pogo the mine
+      
+  # state WillowsEnd.RedirectHeart:
+  #   moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
+
+  pickup WillowsEnd.RedirectEX:
+    moki:
+      BreakWall=10, Bash, Launch, DoubleJump OR Dash OR Glide
+      Bash, Grenade=1, Launch
+    gorlek:
+      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Glide, DoubleJump, TripleJump, Bash, Damage=20, Sword OR Hammer  # redirect the projectile so it pass under the pickup, dboost in the double lasser at the left so you can re-entre the top portal. Glide under the pickup then bash. Upslash can help if needed
+    kii:
+      Bash, Grenade=1, DoubleJump  # @validator tjump variant should probably be gorlek
+      # redirect the projectile so it pass under the pickup
+      Bash, DoubleJump, TripleJump, BreakWall=10, Glide OR Sword OR Damage=40
+      Bash, DoubleJump, TripleJump, BreakWall=10, Dash, Hammer OR Sentry=2 OR Blaze=4
+      Bash, Grenade=1, Glide, BreakWall=10 # use a second projectile so you can land on the edge above the double laser then throw a grenade and bash from the 1st projectile in order to reach your grenade
+    unsafe:
+      Launch
+      Bash, Grenade=1, BreakWall=10, Damage=160
+  
+  conn WillowsEnd.East:
+    moki: Launch OR DoubleJump OR Dash OR Glide
+    gorlek: Bash OR Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself don before entering the portal
+    unsafe: PauseHover
+  # connection towards AboveInnerTP are handled by going to East first
 
 anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
   refill Checkpoint
