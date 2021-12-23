@@ -33,7 +33,7 @@
 # PauseHover: Use the pause menu to cancel falling speed
 # GlideJump: Extends to Glide
 # GlideHammerJump: Extends to Glide, Hammer
-# SpearJump: Extends to Spear
+# SpearJump=x: Extends to Spear=x
 
 # requirement macros. must go at the top of the file!
 
