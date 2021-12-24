@@ -1,5 +1,7 @@
 use std::fmt;
 
+use num_enum::TryFromPrimitive;
+
 use super::{Item, Resource};
 use crate::util::{UberIdentifier, UberState};
 
@@ -39,7 +41,7 @@ impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Command::Autosave => write!(f, "0"),
-            Command::Resource { resource, amount } => write!(f, "1|{}|{}", resource.to_id(), amount),
+            Command::Resource { resource, amount } => write!(f, "1|{}|{}", *resource as u8, amount),
             Command::Checkpoint => write!(f, "2"),
             Command::Magic => write!(f, "3"),
             Command::StopEqual { uber_state } => write!(f, "4|{}|{}", uber_state.identifier, uber_state.value),
@@ -71,7 +73,8 @@ impl fmt::Display for Command {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[repr(u8)]
 pub enum ToggleCommand {
     KwolokDoor,
     Rain,
@@ -83,23 +86,6 @@ impl fmt::Display for ToggleCommand {
             ToggleCommand::KwolokDoor => write!(f, "0"),
             ToggleCommand::Rain => write!(f, "1"),
             ToggleCommand::Howl => write!(f, "2"),
-        }
-    }
-}
-impl ToggleCommand {
-    pub fn from_id(id: u8) -> Option<ToggleCommand> {
-        match id {
-            0 => Some(ToggleCommand::KwolokDoor),
-            1 => Some(ToggleCommand::Rain),
-            2 => Some(ToggleCommand::Howl),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            ToggleCommand::KwolokDoor => 0,
-            ToggleCommand::Rain => 1,
-            ToggleCommand::Howl => 2,
         }
     }
 }

@@ -1,11 +1,10 @@
-use std::convert::TryFrom;
-
 use smallvec::{SmallVec, smallvec};
 
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard};
 use crate::settings::Settings;
 use crate::util::{
+    self,
     Difficulty,
     orbs::{self, Orbs},
 };
@@ -260,7 +259,7 @@ impl Player {
 
         if orbs.health <= 0.0 {
             #[allow(clippy::cast_possible_truncation)]
-            let health_fragments = u16::try_from(((-orbs.health + 0.1) / 5.0).ceil() as i32).unwrap();
+            let health_fragments = util::float_to_int(((-orbs.health + 0.1) / 5.0).ceil()).unwrap();
             inventories.push(Inventory::from((Item::Resource(Resource::Health), health_fragments)));
 
             let max_heal = self.max_health() - current_orbs.health;
@@ -279,12 +278,12 @@ impl Player {
 
                     if regen_orbs.health <= 0.0 {
                         #[allow(clippy::cast_possible_truncation)]
-                        let health_fragments = u16::try_from(((-regen_orbs.health + 0.1) / 5.0).ceil() as i32).unwrap();
+                        let health_fragments = util::float_to_int(((-regen_orbs.health + 0.1) / 5.0).ceil()).unwrap();
                         regen_inventory.grant(Item::Resource(Resource::Health), health_fragments);
                     }
                     if regen_orbs.energy < 0.0 {
                         #[allow(clippy::cast_possible_truncation)]
-                        let energy_fragments = u16::try_from((-regen_orbs.energy * 2.0).ceil() as i32).unwrap();
+                        let energy_fragments = util::float_to_int((-regen_orbs.energy * 2.0).ceil()).unwrap();
                         regen_inventory.grant(Item::Resource(Resource::Energy), energy_fragments);
                     }
 
@@ -299,7 +298,7 @@ impl Player {
 
         if orbs.energy < 0.0 {
             #[allow(clippy::cast_possible_truncation)]
-            let energy_fragments = u16::try_from((-orbs.energy * 2.0).ceil() as i32).unwrap();
+            let energy_fragments = util::float_to_int((-orbs.energy * 2.0).ceil()).unwrap();
 
             for inventory in &mut inventories {
                 inventory.grant(Item::Resource(Resource::Energy), energy_fragments);

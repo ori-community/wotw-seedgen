@@ -143,12 +143,12 @@ struct SeedSettings {
     #[structopt(short = "G", long)]
     glitches: Vec<String>,
     /// which goal modes to use
-    /// 
+    ///
     /// goal modes are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
     #[structopt(short, long)]
     goals: Vec<String>,
     /// where to spawn the player
-    /// 
+    ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
     #[structopt(short, long, default_value = "MarshSpawn.Main")]
     spawn: String,
@@ -167,7 +167,9 @@ struct SeedSettings {
     /// paths to headers stored in files which will be added to the seed
     #[structopt(parse(from_os_str), short, long = "headers")]
     header_paths: Vec<PathBuf>,
-    /// configuration variables for headers in the format <headername>.<variablename>
+    /// configuration parameters for headers
+    ///
+    /// format for one parameter: <headername>.<parametername>=<value>
     #[structopt(short = "a", long = "args")]
     header_args: Vec<String>,
 }
@@ -534,7 +536,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
 
     world.player.inventory.grant(Item::Resource(Resource::Health), args.health / 5);
     #[allow(clippy::cast_possible_truncation)]
-    world.player.inventory.grant(Item::Resource(Resource::Energy), u16::try_from((args.energy * 2.0) as i32).map_err(|_| format!("Invalid energy parameter {}", args.energy))?);
+    world.player.inventory.grant(Item::Resource(Resource::Energy), util::float_to_int(args.energy * 2.0).map_err(|_| format!("Invalid energy parameter {}", args.energy))?);
     world.player.inventory.grant(Item::Resource(Resource::Keystone), args.keystones);
     world.player.inventory.grant(Item::Resource(Resource::Ore), args.ore);
     world.player.inventory.grant(Item::SpiritLight(1), u16::try_from(args.spirit_light).unwrap_or(u16::MAX));  // Higher amounts of Spirit Light are irrelevant, just want to accept high values in case the player has that much);
@@ -542,15 +544,15 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     for item in args.items {
         if let Some(skill) = item.strip_prefix("s:") {
             let id: u8 = skill.parse().map_err(|_| format!("expected numeric skill id in {}", item))?;
-            world.player.inventory.grant(Item::Skill(Skill::from_id(id).ok_or_else(|| format!("{} is not a valid skill id", id))?), 1);
+            world.player.inventory.grant(Item::Skill(Skill::try_from(id).map_err(|_| format!("{} is not a valid skill id", id))?), 1);
         }
         else if let Some(teleporter) = item.strip_prefix("t:") {
             let id: u8 = teleporter.parse().map_err(|_| format!("expected numeric teleporter id in {}", item))?;
-            world.player.inventory.grant(Item::Teleporter(Teleporter::from_id(id).ok_or_else(|| format!("{} is not a valid teleporter id", id))?), 1);
+            world.player.inventory.grant(Item::Teleporter(Teleporter::try_from(id).map_err(|_| format!("{} is not a valid teleporter id", id))?), 1);
         }
         else if let Some(shard) = item.strip_prefix("sh:") {
             let id: u8 = shard.parse().map_err(|_| format!("expected numeric shard id in {}", item))?;
-            world.player.inventory.grant(Item::Shard(Shard::from_id(id).ok_or_else(|| format!("{} is not a valid shard id", id))?), 1);
+            world.player.inventory.grant(Item::Shard(Shard::try_from(id).map_err(|_| format!("{} is not a valid shard id", id))?), 1);
         }
         else if let Some(world_event) = item.strip_prefix("w:") {
             let id: u8 = world_event.parse().map_err(|_| format!("expected numeric world event id in {}", item))?;

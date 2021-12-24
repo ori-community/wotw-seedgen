@@ -1,32 +1,36 @@
 use std::fmt;
 
+use num_enum::TryFromPrimitive;
+
 use crate::util::{Difficulty, Icon, auto_display};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[repr(u8)]
 pub enum Skill {
-    Bash,
-    WallJump,
-    DoubleJump,
-    Launch,
-    Glide,
-    WaterBreath,
-    Grenade,
-    Grapple,
-    Flash,
-    Spear,
-    Regenerate,
-    Bow,
-    Hammer,
-    Sword,
-    Burrow,
-    Dash,
-    WaterDash,
-    Shuriken,
-    Seir,
-    Blaze,
-    Sentry,
-    Flap,
-    AncestralLight,
+    Bash = 0,
+    WallJump = 3,
+    DoubleJump = 5,
+    Launch = 8,
+    Glide = 14,
+    WaterBreath = 23,
+    Grenade = 51,
+    Grapple = 57,
+    Flash = 62,
+    Spear = 74,
+    Regenerate = 77,
+    Bow = 97,
+    Hammer = 98,
+    Sword = 100,
+    Burrow = 101,
+    Dash = 102,
+    WaterDash = 104,
+    Shuriken = 106,
+    Seir = 108,
+    Blaze = 115,
+    Sentry = 116,
+    Flap = 118,
+    #[num_enum(alternatives = [121])]
+    AncestralLight = 120,
 }
 impl fmt::Display for Skill {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -34,62 +38,6 @@ impl fmt::Display for Skill {
     }
 }
 impl Skill {
-    pub fn from_id(id: u8) -> Option<Skill> {
-        match id {
-            0 => Some(Skill::Bash),
-            3 => Some(Skill::WallJump),
-            5 => Some(Skill::DoubleJump),
-            8 => Some(Skill::Launch),
-            14 => Some(Skill::Glide),
-            23 => Some(Skill::WaterBreath),
-            51 => Some(Skill::Grenade),
-            57 => Some(Skill::Grapple),
-            62 => Some(Skill::Flash),
-            74 => Some(Skill::Spear),
-            77 => Some(Skill::Regenerate),
-            97 => Some(Skill::Bow),
-            98 => Some(Skill::Hammer),
-            100 => Some(Skill::Sword),
-            101 => Some(Skill::Burrow),
-            102 => Some(Skill::Dash),
-            104 => Some(Skill::WaterDash),
-            106 => Some(Skill::Shuriken),
-            108 => Some(Skill::Seir),
-            115 => Some(Skill::Blaze),
-            116 => Some(Skill::Sentry),
-            118 => Some(Skill::Flap),
-            120 | 121 => Some(Skill::AncestralLight),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            Skill::Bash => 0,
-            Skill::WallJump => 3,
-            Skill::DoubleJump => 5,
-            Skill::Launch => 8,
-            Skill::Glide => 14,
-            Skill::WaterBreath => 23,
-            Skill::Grenade => 51,
-            Skill::Grapple => 57,
-            Skill::Flash => 62,
-            Skill::Spear => 74,
-            Skill::Regenerate => 77,
-            Skill::Bow => 97,
-            Skill::Hammer => 98,
-            Skill::Sword => 100,
-            Skill::Burrow => 101,
-            Skill::Dash => 102,
-            Skill::WaterDash => 104,
-            Skill::Shuriken => 106,
-            Skill::Seir => 108,
-            Skill::Blaze => 115,
-            Skill::Sentry => 116,
-            Skill::Flap => 118,
-            Skill::AncestralLight => 120,
-        }
-    }
-
     pub fn icon(self) -> Option<Icon> {
         match self {
             Skill::Bash => Some(Icon::Spell(3000)),

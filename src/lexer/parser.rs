@@ -53,7 +53,7 @@ pub enum Requirement<'a> {
     SentryRedirect(u16),
     GlideJump,
     GlideHammerJump,
-    SpearJump,
+    SpearJump(u16),
 }
 #[derive(Debug)]
 pub struct Line<'a> {
@@ -199,6 +199,7 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
                 "Shuriken" => Ok(Requirement::EnergySkill(Skill::Shuriken, amount)),
                 "ShurikenBreak" => Ok(Requirement::ShurikenBreak(amount)),
                 "Spear" => Ok(Requirement::EnergySkill(Skill::Spear, amount)),
+                "SpearJump" => Ok(Requirement::SpearJump(amount)),
                 "SpiritLight" => Ok(Requirement::SpiritLight(amount)),
                 "SwordSJump" => Ok(Requirement::SwordSentryJump(amount)),
                 _ => Err(wrong_requirement(token))
@@ -260,7 +261,6 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
             "Shuriken" => Ok(Requirement::Skill(Skill::Shuriken)),
             "Spear" => Ok(Requirement::Skill(Skill::Spear)),
             "SpearBreak" => Ok(Requirement::SpearBreak),
-            "SpearJump" => Ok(Requirement::SpearJump),
             "Sticky" => Ok(Requirement::Shard(Shard::Sticky)),
             "Sword" => Ok(Requirement::Skill(Skill::Sword)),
             "SwordJump" => Ok(Requirement::SwordJump),

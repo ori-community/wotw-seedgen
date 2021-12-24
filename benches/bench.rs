@@ -77,7 +77,8 @@ fn requirements(c: &mut Criterion) {
         (Enemy::Lizard, 2),
         (Enemy::Mantis, 2),
     ]);
-    c.bench_function("long combat", |b| b.iter(|| req.is_met(&player, &states, player.max_orbs())));
+    let states = Vec::default();
+    c.bench_function("long combat progression", |b| b.iter(|| req.items_needed(&player, &states)));
 }
 
 fn reach_checking(c: &mut Criterion) {

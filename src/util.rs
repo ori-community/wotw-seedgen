@@ -2,13 +2,14 @@ pub mod orbs;
 pub mod uber_state;
 pub mod constants;
 
+use num_enum::FromPrimitive;
 pub use uber_state::{UberState, UberIdentifier, UberType};
 
 use std::{
     fmt,
     fs,
     io::{self, Write},
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 use serde::{Serialize, Deserialize};
@@ -90,66 +91,29 @@ where D: fmt::Debug
     debug
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
+#[repr(u8)]
 pub enum Zone {
-    Marsh,
-    Hollow,
-    Glades,
-    Wellspring,
-    Woods,
-    Reach,
-    Depths,
-    Pools,
-    Wastes,
-    Ruins,
-    Willow,
-    Burrows,
-    Spawn,
-    Shop,
-    Void,
+    Marsh = 0,
+    Hollow = 1,
+    Glades = 2,
+    Wellspring = 3,
+    Woods = 7,
+    Reach = 6,
+    Depths = 8,
+    Pools = 4,
+    Wastes = 9,
+    Ruins = 10,
+    Willow = 11,
+    Burrows = 5,
+    Spawn = 14,
+    Shop = 12,
+    #[num_enum(default)]
+    Void = 13,
 }
 impl fmt::Display for Zone {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", auto_display(self))
-    }
-}
-impl Zone {
-    pub fn from_id(id: u8) -> Option<Zone> {
-        match id {
-            0 => Some(Zone::Marsh),
-            1 => Some(Zone::Hollow),
-            2 => Some(Zone::Glades),
-            3 => Some(Zone::Wellspring),
-            4 => Some(Zone::Pools),
-            5 => Some(Zone::Burrows),
-            6 => Some(Zone::Reach),
-            7 => Some(Zone::Woods),
-            8 => Some(Zone::Depths),
-            9 => Some(Zone::Wastes),
-            10 => Some(Zone::Ruins),
-            11 => Some(Zone::Willow),
-            12 => Some(Zone::Shop),
-            13 => Some(Zone::Void),
-            _ => None,
-        }
-    }
-    pub fn to_id(self) -> u16 {
-        match self {
-            Zone::Marsh => 0,
-            Zone::Hollow => 1,
-            Zone::Glades => 2,
-            Zone::Wellspring => 3,
-            Zone::Pools => 4,
-            Zone::Burrows => 5,
-            Zone::Reach => 6,
-            Zone::Woods => 7,
-            Zone::Depths => 8,
-            Zone::Wastes => 9,
-            Zone::Ruins => 10,
-            Zone::Willow => 11,
-            Zone::Shop => 12,
-            Zone::Spawn | Zone::Void => 13,
-        }
     }
 }
 
@@ -369,4 +333,11 @@ pub fn with_leading_spaces(string: &str, target_length: usize) -> String {
     }
     out += string;
     out
+}
+
+pub fn float_to_int(float: f32) -> Result<u16, String> {
+    if float < u16::MIN.into() || float > u16::MAX.into() {
+        return Err(format!("Failed to convert float to int: {}", float));
+    }
+    return Ok(float as u16);
 }
