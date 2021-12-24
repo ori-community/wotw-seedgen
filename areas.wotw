@@ -2150,7 +2150,7 @@ anchor WestHollow.AboveDashTree at -21, -4411:  # Top right of dash tree room
     gorlek:
       DoubleJump OR Dash OR Hammer
       Bash, Sword OR Damage=10
-      Combat=Hornbug, Sword OR  Damage=10
+      Combat=Hornbug, Sword OR Damage=10
     kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
     unsafe: Bash OR Shuriken=2
   
