@@ -1888,7 +1888,7 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
     kii, WestHollow.FullyDrained:
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bow=1, Glide OR Hammer
-      Bow=1, Sentry=2, Shuriken=1 OR Flash=1 OR  Sentry=1
+      Bow=1, Sentry=2, Shuriken=1 OR Flash=1 OR Sentry=1
       Sword  # Pogo the slug. Baiting it under the pickup is pretty awful
     unsafe:
       WestHollow.FullyDrained:
@@ -2133,7 +2133,7 @@ anchor WestHollow.AboveDashTree at -21, -4411:  # Top right of dash tree room
     gorlek:
       DoubleJump OR Dash OR Hammer
       Bash, Sword OR Damage=10
-      Combat=Hornbug, Sword OR  Damage=10
+      Combat=Hornbug, Sword OR Damage=10
     kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
     unsafe: Bash OR Shuriken=2
       
