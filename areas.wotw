@@ -2254,7 +2254,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, WaterDash OR Launch
       Combat=Balloon, Water, DoubleJump, TripleJump, Damage=10
       Water, DoubleJump, TripleJump, Damage=20
-    kii:  Water, DoubleJump, TripleJump, Damage=10  # Balloon will go for a swim on its own as long as you aggro it
+    kii: Water, DoubleJump, TripleJump, Damage=10  # Balloon will go for a swim on its own as long as you aggro it
     unsafe: Water, Damage=10, DoubleJump OR SentryJump=1
   pickup EastHollow.KwolokSwimOre:
     moki: Water, Bash OR Damage=10  # enemy in the way
@@ -9456,7 +9456,7 @@ anchor LowerWastes.LastStandArea at 1794, -3938:  # next to the projectile spawn
     gorlek:
       Burrow, Glide
       Burrow, Damage=30, Dash OR Sword
-    kii: Burrow, Dash OR Sword OR Hammer  OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30
+    kii: Burrow, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30
     unsafe: Burrow  # friendly spikes
 
   conn LowerWastes.LeverArea: free
@@ -9657,7 +9657,7 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     kii, Burrow:
       Launch, Damage=30  # refresh launch on ceiling at the first turret
       DoubleJump, TripleJump, Damage=120
-    unsafe,  Burrow:
+    unsafe, Burrow:
       Launch
       Bash, Dash OR DoubleJump
       DoubleJump, TripleJump, Damage=36  # dboost between 1st and 2nd turrets then precise wall jump and take a dboost on the projectile to reach the sand platform
