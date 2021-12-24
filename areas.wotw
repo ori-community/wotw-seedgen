@@ -11180,6 +11180,10 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Bash OR Launch
       Combat=CrystalMiner, SentryJump=1
       Combat=CrystalMiner, DoubleJump, TripleJump
+    kii, BreakCrystal:
+      DoubleJump, Sword OR Hammer
+      Dash, Sword  # Pogo the gorlek
+      Combat=CrystalMiner, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
 
   # state WillowsEnd.BurrowHeart:
   #   moki, BreakWall=30:
@@ -11195,16 +11199,20 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Combat=CrystalMiner, DoubleJump OR Dash OR Glide
       Bash OR Launch
     gorlek: Damage=10, DoubleJump OR Dash OR Glide
-    unsafe: Sword OR Hammer  # use weapon to combat the crystal miner
+    kii: Combat=CrystalMiner, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
   conn WillowsEnd.West:
     moki: Launch
     gorlek:
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=20  # damage because the lasers are hard
       Bash, Grenade=2, DoubleJump, Damage=20
       SentryJump=1, DoubleJump, TripleJump, Damage=20
+    kii:
+      Damage=90, Combat=CrystalMiner
+      Bash, Grenade=1
     unsafe:
-      Damage=90
-      Bash, Grenade=1, DoubleJump, Dash
+      DoubleJump, TripleJump, Sword  # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
+      DoubleJump, TripleJump, Dash  # Dash ramp from the left side + tjump in order to touch a small wall in the ceilling. Then tjump+dash toward the portal
+      Damage=90  # That checkpoint box is really big so you don't have to bother with the CrystalMiner
   conn WillowsEnd.UpperHeartPath:
     moki:
       Bash, Grenade=1, DoubleJump, Bow=1
@@ -11213,9 +11221,10 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     gorlek:
       SentryJump=1, DoubleJump
       Bash, Grenade=1, DoubleJump
+    kii: Bash, Grenade=1
     unsafe:
       SentryJump=1
-      DoubleJump, TripleJump, Dash OR Hammer OR Sword  # tjump+dash/upslash on the left wall to start climbing it
+      DoubleJump, TripleJump  # tjump on the left wall to start climbing it
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
@@ -11226,8 +11235,7 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   #   moki: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
 
   conn WillowsEnd.InnerTP:
-    moki: BreakWall=20, Combat=MaceMiner OR Bash
-    moki: BreakWall=20, Launch
+    moki: BreakWall=20, Combat=MaceMiner OR Bash OR Launch
   conn WillowsEnd.Upper:  # this works because the portal wheel drops if you step below
     moki, BreakWall=10:
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
@@ -11239,11 +11247,13 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
       Bash, SentryJump=1, DoubleJump
       Bash, SentryJump=2
       SentryJump=1, DoubleJump, TripleJump
+    kii, BreakWall=10:
+      Bash, Grenade=1 OR Damage=40  # bashnade to aovid dboost on the falling wheel
+      Bash, DoubleJump, Hammer  # djump+upslash to avoid dboost on the falling wheel
+      DoubleJump, Sword  # Pogo the Crystal Miner then djump+upslash to avoid dboost on the falling wheel
     unsafe:
       BreakWall=10:
         Combat=MaceMiner, DoubleJump, TripleJump OR Damage=40  # get a wjump on the energy crystal
-        Bash, DoubleJump, Hammer OR Sword OR Damage=40  # djump+upslash to avoid dboost on the boulder portal
-        Bash, Hammer, Damage=40
       SentryJump=2
       Launch
   conn WillowsEnd.GlideRooms:
@@ -11251,7 +11261,7 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
     gorlek:
       DoubleJump, Dash, Glide
       Damage=20
-    unsafe: free
+    kii: free
 
 anchor WillowsEnd.GlideHeartPath at 374, -3824:  # one room before the first wind
   refill Checkpoint
@@ -11263,20 +11273,25 @@ anchor WillowsEnd.GlideHeartPath at 374, -3824:  # one room before the first win
       Launch
       DoubleJump, TripleJump
       Combat=Mantis, SentryJump=1, DoubleJump OR Damage=20
+    kii: DoubleJump, Hammer # djump+upslash to land on the platform in the wheel
+    unsafe: free  # https://youtu.be/rWO35ruudfw
+      # Bash  # stun-lock the mantis by bashing it so it doesn't jump on the wheel
   conn WillowsEnd.West: free  # :D
 
 anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
   refill Checkpoint
   refill Energy=4:
     moki:
-      BreakCrystal, Launch
+      BreakCrystal, Launch OR Glide
       Bow=1
+    kii: Spear=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1
 
   # state WillowsEnd.GlideHeart:
   #   moki: BreakWall=30, DoubleJump, Glide, Launch
 
   pickup WillowsEnd.WindSpinOre:
     moki: Glide
+    kii: Launch, DoubleJump, Damage=40, Damage=80  # dboost on the first wheel, dboost twice on the second one
     unsafe: Launch, DoubleJump, TripleJump
 
   conn WillowsEnd.GlideHeartPath: free  # :D
@@ -11296,29 +11311,23 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       BreakCrystal, Launch
       Bow=1
 
-  state WillowsEnd.SpinPortalsHeart:
-    moki, BreakWall=30:
-      Bash, Grapple, Launch, DoubleJump, Dash
-      Bash, Grapple, Launch, Glide
-    gorlek, BreakWall=30:
-      Launch, Grapple, Bash
-      Launch, DoubleJump, TripleJump, Damage=40, Grapple OR Bash OR Glide
-    unsafe, BreakWall=30:
-      Launch, Damage=40, Bash OR Grapple
-      Launch, DoubleJump
-      DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard
-
   pickup WillowsEnd.UpperLeftEX:
     moki: Grapple, Launch, DoubleJump OR Dash OR Glide
     gorlek:
       Launch, Grapple
       Launch, DoubleJump, TripleJump
       WillowsEnd.SpinPortalsHeart, Launch, DoubleJump, Glide, Bash
+    kii:
+      Launch, Damage=80
+      Launch, Damage=40, Bash OR Sword # bash/pogo the elemental, dboost in the spike bellow UpperLeftEX
+      DoubleJump, TripleJump, Grapple, Damage=60  # dboost on the laser at the second room then dboost on the wheel next to the pickup
+      WillowsEnd.SpinPortalsHeart, Launch, Bash  # bash the first elemental then bash one of its projectile in order to reach the 2nd elemental
     unsafe:
-      Launch, Bash, Damage=40
-      Launch, DoubleJump
+      Launch
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard, bash glide from the elemental after that
-  pickup WillowsEnd.UpperRightEX:
+
+  conn WillowsEnd.Upper: free
+  conn WillowsEnd.UpperHeartCheckpoint:
     moki:
       Bash, Grapple, Launch, DoubleJump, Dash
       Bash, Grapple, Launch, Glide
@@ -11327,12 +11336,43 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       Launch, DoubleJump, TripleJump, Damage=40, Grapple OR Bash OR Glide
       WillowsEnd.SpinPortalsHeart, Launch, Bash
       WillowsEnd.SpinPortalsHeart, Launch, DoubleJump, TripleJump
+    kii:
+      Launch, Damage=160  # one dboost at the first elemental, a second one under UpperLeftEX then two dboost on the way to the last portal
+      Launch, Damage=120, DoubleJump OR Dash # one dboost at the first elemental, a second one under UpperLeftEX, another one before the last portal
+      Launch, Damage=80:
+        Glide  # one dboost at the first elemental, a second one under UpperLeftEX
+        Grapple  # dboost twice in the spikes before the last portal
+      Launch, Damage=40:
+        Bash OR Sword  # dboost in the spikes bellow UpperLeftEX
+        DoubleJump, Glide OR Dash  # dboost in the spikes bellow UpperLeftEX
+      Launch, Grapple, Sword  # reset your launch by hitting elemental with your sword
+      Launch, DoubleJump, TripleJump OR Sword 
+      DoubleJump, TripleJump, Grapple, Bash, Damage=100  # dboost on the laser before the 2nd wheel (20) then on spikes before the last portal (40). Since it's hard to avoid taking a dboost on the wheel when entering the portal under UpperLeftEX, adding an extra dboost (40)
+      WillowsEnd.SpinPortalsHeart, Launch, DoubleJump OR Dash OR Sword OR Hammer
+      WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, DoubleJump
     unsafe:
-      Launch, Grapple, Damage=40
-      Launch, DoubleJump
+      Launch, DoubleJump OR Damage=40
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard
-
-  conn WillowsEnd.Upper: free
+  
+anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the upper heart
+  refill Checkpoint
+  
+  state WillowsEnd.SpinPortalsHeart:
+    moki: BreakWall=30
+    
+  pickup WillowsEnd.UpperRightEX:
+    moki: Launch
+    kii:
+      DoubleJump, TripleJump
+      Bash, Grenade=1
+    unsafe: DoubleJump
+  pickup WillowsEnd.UpperLeftEX:  # So far, paths using WillowsEnd.SpinPortalsHeart are the same as going to UpperHeartPath first
+    gorlek: Launch, DoubleJump, Glide, Bash
+    kii: Launch, Bash
+    
+  conn WillowsEnd.UpperHeartPath:
+    moki: WillowsEnd.SpinPortalsHeart
+    # backward connection without this state has some weird spot, saving it for higher difficulties
 
 anchor Tokk:  # Tokk's talks
   quest GladesTown.HandToHandPouch:
