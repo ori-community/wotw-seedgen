@@ -11,25 +11,25 @@
 //// How many Energy Regen to shuffle in
 !!parameter energyRegen int:3
 //// How many Extra Jumps to shuffle in
-!!parameter extraJumps int:1
+!!parameter extraJumps int:4
 //// How many Extra Air Dashes to shuffle in
-!!parameter extraDashes int:1
+!!parameter extraDashes int:2
 //// How many Blaze Efficiency to shuffle in
-!!parameter blazeEfficiency int:1
+!!parameter blazeEfficiency int:2
 //// How many Spike Efficiency to shuffle in
-!!parameter spikeEfficiency int:1
+!!parameter spikeEfficiency int:2
 //// How many Shuriken Efficiency to shuffle in
-!!parameter shurikenEfficiency int:1
+!!parameter shurikenEfficiency int:2
 //// How many Sentry Efficiency to shuffle in
-!!parameter sentryEfficiency int:1
-//// How many Grenade Efficiency to shuffle in
-!!parameter grenadeEfficiency int:1
+!!parameter sentryEfficiency int:2
 //// How many Bow Efficiency to shuffle in
 !!parameter bowEfficiency int:2
 //// How many Regenerate Efficiency to shuffle in
 !!parameter regenEfficiency int:2
 //// How many Flash Efficiency to shuffle in
 !!parameter flashEfficiency int:2
+//// How many Grenade Efficiency to shuffle in
+!!parameter grenadeEfficiency int:2
 //// How many Rapid Smashes to shuffle in
 !!parameter rapidSmashes int:3
 //// How many Rapid Swords to shuffle in
@@ -40,18 +40,18 @@
 !!parameter rapidGrenade int:2
 //// How many Quickshot upgrade to shuffle in
 !!parameter quickshotUpgrade int:2
-//// Add Melting Blaze to the item pool
-!!parameter meltingBlaze bool:true
-//// Add Melting Sword to the item pool
-!!parameter meltingSword bool:true
-//// Add Melting Shuriken to the item pool
-!!parameter meltingShuriken bool:true
-//// Add Uncharged Bashgrenades to the item pool
-!!parameter unchargedBashnades bool:true
-//// Add Extra Grenade to the item pool
-!!parameter extraGrenade bool:true
-//// Add Splinter Grenade to the item pool
-!!parameter splinterGrenade bool:true
+//// How many Melting Blaze to shuffle in
+!!parameter meltingBlaze int:1
+//// How many Melting Sword to shuffle in
+!!parameter meltingSword int:1
+//// How many Melting Shuriken to shuffle in
+!!parameter meltingShuriken int:1
+//// How many Uncharged Bashgrenades to shuffle in
+!!parameter unchargedBashnades int:1
+//// How many Extra Grenade to shuffle in
+!!parameter extraGrenade int:1
+//// How many Splinter Grenade to shuffle in
+!!parameter splinterGrenade int:1
 
 !!add $PARAM(healthRegen)x 10|30            // Health Regen
 !!add $PARAM(energyRegen)x 10|31            // Energy Regen
@@ -61,49 +61,37 @@
 !!add $PARAM(spikeEfficiency)x 11|3         // Spike Efficiency
 !!add $PARAM(shurikenEfficiency)x 11|4      // Shuriken Efficiency
 !!add $PARAM(sentryEfficiency)x 11|5        // Sentry Efficiency
-!!add $PARAM(grenadeEfficiency)x 11|9       // Grenade Efficiency
 !!add $PARAM(bowEfficiency)x 11|6           // Bow Efficiency
 !!add $PARAM(regenEfficiency)x 11|7         // Regeneration Efficiency
 !!add $PARAM(flashEfficiency)x 11|8         // Flash Efficiency
+!!add $PARAM(grenadeEfficiency)x 11|9       // Grenade Efficiency
 
 !!add $PARAM(rapidSmashes)x 8|4|50|byte|+1  // Rapid Smashes
 !!add $PARAM(rapidSwords)x 8|4|51|byte|+1   // Rapid Swords
 !!add $PARAM(rapidSpears)x 8|9|12|byte|+1   // Rapid Spears
 
 // Melting Upgrades
-!!if meltingBlaze true
-!!add 8|4|71|bool|true
+!!add $PARAM(meltingBlaze)x 8|4|71|bool|true
 !!name 8|4|71|bool|true #Melting Blaze#
 !!icon 8|4|71|bool|true file:assets/icons/bonus/meltingblaze.png
-!!endif
-!!if meltingSword true
-!!add 8|4|72|bool|true
+!!add $PARAM(meltingSword)x 8|4|72|bool|true
 !!name 8|4|72|bool|true #Melting Sword#
 !!icon 8|4|72|bool|true file:assets/icons/bonus/meltingsword.png
-!!endif
-!!if meltingShuriken true
-!!add 8|4|75|bool|true
+!!add $PARAM(meltingShuriken)x 8|4|75|bool|true
 !!name 8|4|75|bool|true #Melting Shuriken#
 !!icon 8|4|75|bool|true file:assets/icons/bonus/meltingshuriken.png
-!!endif
 
 // Grenade Upgrades
-!!if unchargedBashnades true
-!!add 8|4|42|bool|true
+!!add $PARAM(unchargedBashnades)x 8|4|42|bool|true
 !!name 8|4|42|bool|true #Uncharged Bashgrenades#
 !!icon 8|4|42|bool|true file:assets/icons/bonus/unchargedbashgrenade.png
-!!endif
-!!if extraGrenade true
-!!add 8|4|40|byte|+1
+!!add $PARAM(extraGrenade)x 8|4|40|byte|+1
 !!name 8|4|40|byte|+1 #Extra Grenade#
 !!display 8|4|40|byte|+1 #Extra Grenade x$(4|40)#
 !!icon 8|4|40|byte|+1 file:assets/icons/bonus/extragrenade.png
-!!endif
-!!if splinterGrenade true
-!!add 8|4|45|byte|+2
+!!add $PARAM(splinterGrenade)x 8|4|45|byte|+2
 !!name 8|4|45|byte|+2 #Splinter Grenade#
 !!icon 8|4|45|byte|+2 file:assets/icons/bonus/splintergrenade.png
-!!endif
 !!add $PARAM(rapidGrenade)x 8|4|44|float|-0.5
 !!name 8|4|44|float|-0.5 #Rapid Grenade#
 !!icon 8|4|44|float|-0.5 file:assets/icons/bonus/rapidgrenade.png
