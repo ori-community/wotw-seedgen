@@ -394,7 +394,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
     moki: 
       Water, Burrow, Bash, DoubleJump, Dash OR Glide
       Water, Burrow, Bash, Launch
-    gorlek:  Water, Burrow, DoubleJump OR Dash OR Launch
+    gorlek: Water, Burrow, DoubleJump OR Dash OR Launch
     kii:
       Burrow, Damage=40, DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1
       Burrow, WaterDash, Damage=20, DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1
