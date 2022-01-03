@@ -1,8 +1,6 @@
-use std::fmt;
-
 use num_enum::TryFromPrimitive;
 
-use crate::util::{Icon, auto_display};
+use crate::{util::Icon, auto_display};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
@@ -39,11 +37,7 @@ pub enum Shard {
     Fracture = 46,
     Arcing = 47,
 }
-impl fmt::Display for Shard {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", auto_display(self))
-    }
-}
+auto_display!(Shard);
 impl Shard {
     pub fn icon(self) -> Option<Icon> {
         Some(Icon::Shard(self as u16))

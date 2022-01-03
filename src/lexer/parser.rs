@@ -1,15 +1,24 @@
 use std::path::Path;
 
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
+use serde::Deserialize;
 use smallvec::SmallVec;
 
-use super::tokenizer::{Token, TokenType};
+use super::tokenizer::{Token, TokenType, Metadata};
 use crate::item::{Resource, Skill, Shard, Teleporter};
-use crate::util::{self, Difficulty, Glitch, RefillType, NodeType, Enemy, Position, UberState};
+use crate::util::{Difficulty, Glitch, RefillType, NodeType, Enemy, Position, UberState};
 
 pub struct ParseError {
     pub description: String,
     pub position: usize,
+}
+impl ParseError {
+    fn new(position: usize, description: String) -> ParseError {
+        ParseError {
+            description,
+            position,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -55,7 +64,7 @@ pub enum Requirement<'a> {
     GlideHammerJump,
     SpearJump(u16),
 }
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Line<'a> {
     pub ands: Vec<Requirement<'a>>,
     pub ors: Vec<Requirement<'a>>,
@@ -74,12 +83,13 @@ pub struct Refill<'a> {
 pub struct Connection<'a> {
     pub name: NodeType,
     pub identifier: &'a str,
-    pub requirements: Option<Group<'a>>,
+    pub requirements: Group<'a>,
 }
 #[derive(Debug)]
 pub struct Anchor<'a> {
     pub identifier: &'a str,
     pub position: Option<(i16, i16)>,
+    pub can_spawn: bool,
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
 }
@@ -90,28 +100,61 @@ pub struct AreaTree<'a> {
     pub anchors: Vec<Anchor<'a>>,
 }
 
-#[derive(Debug)]
-struct ParseContext {
-    position: usize,
-}
-#[derive(Debug)]
-pub struct Metadata<'a> {
-    definitions: FxHashSet<&'a str>,
-    pub states: FxHashSet<&'a str>,
-    pub quests: FxHashSet<&'a str>,
-}
-
-fn eat(tokens: &[Token], context: &mut ParseContext, expected_token_type: TokenType) -> Result<bool, ParseError> {
-    let token_type = tokens[context.position].name;
-    if token_type == expected_token_type {
-        context.position += 1;
-        Ok(true)
-    } else {
-        Err(wrong_token(&tokens[context.position], &format!("{:?}", expected_token_type)))
+macro_rules! __expected_variants {
+    ($expected:expr) => {
+        $expected
+    };
+    ($expected:expr, $($more:expr),+) => {
+        format!("{} or {}", $expected, __expected_variants!($($more),+))
     }
 }
 
-fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requirement<'a>, ParseError> {
+macro_rules! wrong_token {
+    ($token:expr, $($expected:expr),+) => {
+        return Err(ParseError::new($token.position, format!("Expected {} at line {}, instead found {}", __expected_variants!($($expected),+), $token.line, $token.name)))
+    };
+}
+macro_rules! missing_token {
+    ($($expected:expr),+) => {
+        return Err(ParseError {
+            description: format!("File ended abruptly, expected {}", __expected_variants!($($expected),+)),
+            position: usize::MAX,
+        })
+    }
+}
+
+fn wrong_amount(token: &Token) -> ParseError {
+    ParseError::new(token.position, format!("Failed to parse amount at line {}", token.line))
+}
+fn wrong_requirement(token: &Token) -> ParseError {
+    ParseError::new(token.position, format!("Failed to parse requirement at line {}", token.line))
+}
+fn not_int(token: &Token) -> ParseError {
+    ParseError::new(token.position, format!("Need an integer in {} at line {}", token.name, token.line))
+}
+
+macro_rules! next_token {
+    ($tokens:expr, $position:expr, $($expected:expr),+) => {
+        if let Some(token) = $tokens.get($position) {
+            $position += 1;
+            token
+        } else {
+            missing_token!($($expected),+);
+        }
+    };
+}
+
+#[inline]
+fn eat<'a>(tokens: &[Token<'a>], position: &mut usize, expected: TokenType) -> Result<(), ParseError> {
+    let token = next_token!(tokens, *position, expected);
+    if token.name == expected {
+        Ok(())
+    } else {
+        wrong_token!(token, expected)
+    }
+}
+
+fn parse_requirement<'a>(token: &Token<'a>, metadata: &Metadata) -> Result<Requirement<'a>, ParseError> {
     let mut parts = token.value.split('=');
     let keyword = parts.next().unwrap();
     let amount = parts.next();
@@ -288,345 +331,209 @@ fn parse_requirement<'a>(token: &'a Token, metadata: &Metadata) -> Result<Requir
     }
 }
 
-fn parse_free(tokens: &[Token], context: &mut ParseContext) -> Result<(), ParseError> {
-    context.position += 1;
-    match tokens[context.position].name {
-        TokenType::Newline => context.position += 1,
-        TokenType::Dedent => {},
-        _ => return Err(wrong_token(&tokens[context.position], "new line after inline 'free'")),
-    }
-    Ok(())
-}
-
-#[inline]
-fn parse_line<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Line<'a>, ParseError> {
-    let mut ands = Vec::<Requirement>::new();
-    let mut ors = Vec::<Requirement>::new();
+fn parse_line<'a>(tokens: &[Token<'a>], position: &mut usize, metadata: &Metadata) -> Result<Line<'a>, ParseError> {
+    let mut ands = Vec::new();
+    let mut ors = Vec::new();
     let mut group = None;
     loop {
-        let token = &tokens[context.position];
+        let token = next_token!(tokens, *position, TokenType::Requirement, TokenType::Free);
+        let requirement = match token.name {
+            TokenType::Requirement => parse_requirement(token, metadata)?,
+            TokenType::Free => Requirement::Free,
+            _ => wrong_token!(token, TokenType::Requirement, TokenType::Free),
+        };
+
+        let token = next_token!(tokens, *position, TokenType::And, TokenType::Or, TokenType::Newline, TokenType::Group);
         match token.name {
-            TokenType::Requirement => {
-                context.position += 1;
-                match tokens[context.position].name {
-                    TokenType::And => {
-                        context.position += 1;
-                        ands.push(parse_requirement(token, metadata)?);
-                    },
-                    TokenType::Or => {
-                        context.position += 1;
-                        ors.push(parse_requirement(token, metadata)?);
-                    },
-                    TokenType::Newline => {
-                        context.position += 1;
-                        if ors.is_empty() {
-                            ands.push(parse_requirement(token, metadata)?);
-                        } else {
-                            ors.push(parse_requirement(token, metadata)?);
-                        }
-                        break;
-                    },
-                    TokenType::Dedent => {
-                        if ors.is_empty() {
-                            ands.push(parse_requirement(token, metadata)?);
-                        } else {
-                            ors.push(parse_requirement(token, metadata)?);
-                        }
-                        break;
-                    },
-                    TokenType::Group => {
-                        context.position += 1;
-                        ands.push(parse_requirement(token, metadata)?);
-                        if let TokenType::Indent = tokens[context.position].name {
-                            context.position += 1;
-                            group = Some(parse_group(tokens, context, metadata)?);
-                            break;
-                        }
-                    },
-                    _ => return Err(wrong_token(&tokens[context.position], "separator or end of line")),
-                }
-            }
-            TokenType::Free => {
-                parse_free(tokens, context)?;
+            TokenType::And => ands.push(requirement),
+            TokenType::Or => ors.push(requirement),
+            TokenType::Newline => {
+                ors.push(requirement);
                 break;
             },
-            _ => return Err(wrong_token(token, "requirement")),
+            TokenType::Group => {
+                if tokens.get(*position).map_or(false, |token| token.name == TokenType::Requirement) {
+                    ands.push(requirement);
+                } else {
+                    ors.push(requirement);
+                    group = Some(parse_group(tokens, position, metadata)?);
+                    break;
+                }
+            },
+            _ => wrong_token!(token, TokenType::And, TokenType::Or, TokenType::Newline, TokenType::Group),
         }
     }
-    Ok(Line {
-        ands,
-        ors,
-        group,
-    })
+
+    Ok(Line { ands, ors, group })
 }
 
-fn parse_group<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Group<'a>, ParseError> {
-    let mut lines = Vec::<Line>::new();
-    loop {
-        match tokens[context.position].name {
-            TokenType::Requirement => lines.push(parse_line(tokens, context, metadata)?),
-            TokenType::Dedent => break,
-            _ => return Err(wrong_token(&tokens[context.position], "requirement or end of group")),
-        }
-    }
-    // consume the dedent
-    context.position += 1;
-    Ok(Group {
-        lines,
-    })
-}
+fn parse_group<'a>(tokens: &[Token<'a>], position: &mut usize, metadata: &Metadata) -> Result<Group<'a>, ParseError> {
+    let mut lines = Vec::new();
 
-#[inline]
-fn parse_refill<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Refill<'a>, ParseError> {
-    let identifier = &tokens[context.position].value;
-    context.position += 1;
-
-    let name;
-    let mut requirements = None;
-    match tokens[context.position].name {
-        TokenType::Newline => context.position += 1,
-        TokenType::Free => parse_free(tokens, context)?,
-        TokenType::Indent => {
-            context.position += 1;
-            requirements = Some(parse_group(tokens, context, metadata)?)
+    let token = next_token!(tokens, *position, TokenType::Free, TokenType::Indent);
+    match token.name {
+        TokenType::Free => {
+            eat(tokens, position, TokenType::Newline)?;
+            lines.push(Line {
+                ands: vec![Requirement::Free],
+                ..Line::default()
+            });
         },
-        _ => return Err(wrong_token(&tokens[context.position], "requirements or end of line")),
+        TokenType::Indent => {
+            loop {
+                lines.push(parse_line(tokens, position, metadata)?);
+                if tokens.get(*position).map_or(true, |token| token.name == TokenType::Dedent) {
+                    *position += 1;
+                    break;
+                }
+            }
+        }
+        _ => wrong_token!(token, TokenType::Free, TokenType::Indent),
     }
 
-    if identifier == "Checkpoint" {
-        name = RefillType::Checkpoint;
+    Ok(Group { lines })
+}
+
+fn parse_refill<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &str, metadata: &Metadata) -> Result<Refill<'a>, ParseError> {
+    let mut requirements = None;
+
+    let token = next_token!(tokens, *position, TokenType::Group, TokenType::Newline);
+    match token.name {
+        TokenType::Group => requirements = Some(parse_group(tokens, position, metadata)?),
+        TokenType::Newline => {},
+        _ => wrong_token!(token, TokenType::Group, TokenType::Newline),
+    }
+
+    let name = if identifier == "Checkpoint" {
+        RefillType::Checkpoint
     } else if identifier == "Full" {
-        name = RefillType::Full;
+        RefillType::Full
     } else if let Some(amount) = identifier.strip_prefix("Health=") {
         let amount: u16 = match amount.parse() {
             Ok(result) => result,
-            Err(_) => return Err(not_int(&tokens[context.position - 1])),
+            Err(_) => return Err(not_int(&tokens[*position - 2])),
         };
-        name = RefillType::Health(f32::from(amount));
+        RefillType::Health(f32::from(amount))
     } else if identifier == "Health" {
-        name = RefillType::Health(1.0);
+        RefillType::Health(1.0)
     } else if let Some(amount) = identifier.strip_prefix("Energy=") {
         let amount: u16 = match amount.parse() {
             Ok(result) => result,
-            Err(_) => return Err(not_int(&tokens[context.position - 1])),
+            Err(_) => return Err(not_int(&tokens[*position - 2])),
         };
-        name = RefillType::Energy(f32::from(amount));
+        RefillType::Energy(f32::from(amount))
     } else {
-        return Err(wrong_token(&tokens[context.position], "'Checkpoint', 'Full', 'Health' or 'Energy'"));
-    }
+        wrong_token!(tokens[*position - 2], "Checkpoint", "Full", "Health", "Energy");
+    };
 
     Ok(Refill {
         name,
         requirements,
     })
 }
-fn parse_connection<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata, name: NodeType) -> Result<Connection<'a>, ParseError> {
-    let identifier = &tokens[context.position].value;
-    let mut requirements = None;
+#[inline]
+fn parse_connection<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata, name: NodeType) -> Result<Connection<'a>, ParseError> {
+    eat(tokens, position, TokenType::Group)?;
+    let requirements = parse_group(tokens, position, metadata)?;
 
-    context.position += 1;
-    match tokens[context.position].name {
-        TokenType::Indent => {
-            context.position += 1;
-            requirements = Some(parse_group(tokens, context, metadata)?)
-        },
-        TokenType::Free => parse_free(tokens, context)?,
-        _ => return Err(wrong_token(&tokens[context.position], "indent or 'free'")),
-    }
-    Ok(Connection {
-        name,
-        identifier,
-        requirements,
-    })
+    Ok(Connection { name, identifier, requirements })
 }
-#[inline]
-fn parse_state<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, context, metadata, NodeType::State)
+fn parse_state<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
+    parse_connection(tokens, position, identifier, metadata, NodeType::State)
 }
-#[inline]
-fn parse_quest<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, context, metadata, NodeType::Quest)
+fn parse_quest<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
+    parse_connection(tokens, position, identifier, metadata, NodeType::Quest)
 }
-#[inline]
-fn parse_pickup<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, context, metadata, NodeType::Pickup)
+fn parse_pickup<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
+    parse_connection(tokens, position, identifier, metadata, NodeType::Pickup)
 }
-#[inline]
-fn parse_anchor_connection<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, context, metadata, NodeType::Anchor)
+fn parse_anchor_connection<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
+    parse_connection(tokens, position, identifier, metadata, NodeType::Anchor)
 }
 
-fn parse_named_group<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<(&'a str, Group<'a>), ParseError> {
-    let identifier = &tokens[context.position].value;
-    let requirements;
-    context.position += 1;
-    match tokens[context.position].name {
-        TokenType::Indent => {
-            context.position += 1;
-            requirements = parse_group(tokens, context, metadata)?;
-        },
-        _ => return Err(wrong_token(&tokens[context.position], "indent")),
-    }
+fn parse_anchor<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Anchor<'a>, ParseError> {
+    let mut token = next_token!(tokens, *position, TokenType::Position, TokenType::Group);
 
-    Ok((
-        identifier,
-        requirements,
-    ))
-}
+    let mut anchor_position = None;
+    if token.name == TokenType::Position {
+        let mut coords = token.value.split(',');
+        let x = coords.next().unwrap().trim().parse::<i16>().map_err(|_| not_int(token))?;
+        let y = if let Some(y) = coords.next() {
+            y.trim().parse::<i16>().map_err(|_| not_int(token))?
+        } else {
+            return Err(not_int(token));
+        };
+        anchor_position = Some((x, y));
 
-#[inline]
-fn parse_region<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<(&'a str, Group<'a>), ParseError> {
-    let (identifier, requirements) = parse_named_group(tokens, context, metadata)?;
-    Ok((
-        identifier,
-        requirements,
-    ))
-}
-#[inline]
-fn parse_definition<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<(&'a str, Group<'a>), ParseError> {
-    let (identifier, requirements) = parse_named_group(tokens, context, metadata)?;
-    Ok((
-        identifier,
-        requirements,
-    ))
-}
-#[inline]
-fn parse_anchor<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<Anchor<'a>, ParseError> {
-    let identifier = &tokens[context.position].value;
-    let mut position = None;
-    context.position += 1;
-    {
-        let token = &tokens[context.position];
-        if let TokenType::Position = token.name {
-            let mut coords = token.value.split(',');
-            let x: i16 = match coords.next().unwrap().parse() {
-                Ok(result) => result,
-                Err(_) => return Err(not_int(token)),
-            };
-            let y: i16 = match coords.next().unwrap().parse() {
-                Ok(result) => result,
-                Err(_) => return Err(not_int(token)),
-            };
-            position = Some((x, y));
-            context.position += 1;
+        if let Some(next) = tokens.get(*position) {
+            *position += 1;
+            token = next;
+        } else {
+            missing_token!(TokenType::Group)
         }
     }
 
-    let mut refills = Vec::<Refill>::new();
-    let mut connections = Vec::<Connection>::new();
+    if token.name != TokenType::Group {
+        wrong_token!(token, TokenType::Group);
+    }
+    eat(tokens, position, TokenType::Indent)?;
 
-    eat(tokens, context, TokenType::Indent)?;
+    token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::NoSpawn, TokenType::Dedent);
+    let can_spawn = if token.name == TokenType::NoSpawn {
+        eat(tokens, position, TokenType::Newline)?;
+        token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
+        false
+    } else { true };
+
+    let mut refills = Vec::new();
+    let mut connections = Vec::new();
 
     loop {
-        match tokens[context.position].name {
-            TokenType::Refill => refills.push(parse_refill(tokens, context, metadata)?),
-            TokenType::State => connections.push(parse_state(tokens, context, metadata)?),
-            TokenType::Quest => connections.push(parse_quest(tokens, context, metadata)?),
-            TokenType::Pickup => connections.push(parse_pickup(tokens, context, metadata)?),
-            TokenType::Connection => connections.push(parse_anchor_connection(tokens, context, metadata)?),
-            TokenType::Dedent => {
-                context.position += 1;
-                break;
-            },
-            _ => return Err(wrong_token(&tokens[context.position], "refill, state, quest, pickup, connection or end of anchor")),
-        }
-    }
-    Ok(Anchor {
-        identifier,
-        position,
-        refills,
-        connections,
-    })
-}
-
-fn wrong_token(token: &Token, description: &str) -> ParseError {
-    ParseError {
-        description: format!("Expected {} at line {}, instead found {:?}", description, token.line, token.name),
-        position: token.position,
-    }
-}
-fn wrong_amount(token: &Token) -> ParseError {
-    ParseError {
-        description: format!("Failed to parse amount at line {}", token.line),
-        position: token.position,
-    }
-}
-fn wrong_requirement(token: &Token) -> ParseError {
-    ParseError {
-        description: format!("Failed to parse requirement at line {}", token.line),
-        position: token.position,
-    }
-}
-fn not_int(token: &Token) -> ParseError {
-    ParseError {
-        description: format!("Need an integer in {:?} at line {}", token.name, token.line),
-        position: token.position,
-    }
-}
-
-fn preprocess<'a>(tokens: &'a [Token], context: &mut ParseContext) -> Metadata<'a> {
-    // Find all states so we can differentiate states from pathsets.
-    let end = tokens.len();
-    let mut definitions = FxHashSet::default();
-    let mut states = FxHashSet::default();
-    states.reserve(end / 500);
-    let mut quests = FxHashSet::default();
-    quests.reserve(end / 1000);
-
-    while context.position < end {
-        let token = &tokens[context.position];
         match token.name {
-            TokenType::Definition => { definitions.insert(&token.value[..]); },
-            TokenType::Quest => { quests.insert(&token.value[..]); },
-            TokenType::State => { states.insert(&token.value[..]); },
-            _ => {},
+            TokenType::Refill => refills.push(parse_refill(tokens, position, token.value, metadata)?),
+            TokenType::State => connections.push(parse_state(tokens, position, token.value, metadata)?),
+            TokenType::Quest => connections.push(parse_quest(tokens, position, token.value, metadata)?),
+            TokenType::Pickup => connections.push(parse_pickup(tokens, position, token.value, metadata)?),
+            TokenType::Connection => connections.push(parse_anchor_connection(tokens, position, token.value, metadata)?),
+            TokenType::Dedent => return Ok(Anchor { identifier, position: anchor_position, can_spawn, refills, connections }),
+            _ => wrong_token!(token, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent),
         }
-
-        context.position += 1;
-    }
-
-    Metadata {
-        definitions,
-        states,
-        quests,
+        token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
     }
 }
 
-fn process<'a>(tokens: &'a [Token], context: &mut ParseContext, metadata: &Metadata) -> Result<AreaTree<'a>, ParseError> {
+pub fn parse_areas<'a>(tokens: Vec<Token<'a>>, metadata: &Metadata) -> Result<AreaTree<'a>, ParseError> {
     let end = tokens.len();
     let mut definitions = FxHashMap::default();
     let mut regions = FxHashMap::default();
     regions.reserve(20);
-    let mut anchors = Vec::<Anchor>::new();
-    anchors.reserve(end / 200);
+    let mut anchors = Vec::with_capacity(end / 200);
 
-    if let TokenType::Newline = tokens[context.position].name { context.position += 1 }
+    let mut position = 0;
 
-    while context.position < end {
-        let token = &tokens[context.position];
+    while let Some(token) = tokens.get(position) {
+        position += 1;
         match token.name {
             TokenType::Definition => {
-                let (key, value) = parse_definition(tokens, context, metadata)?;
-                if definitions.insert(key, value).is_some() {
-                    return Err(ParseError {
-                        description: format!("Requirement name {} already in use at line {}", key, token.line),
-                        position: token.position,
-                    });
+                eat(&tokens, &mut position, TokenType::Group)?;
+                let requirements = parse_group(&tokens, &mut position, metadata)?;
+                if definitions.insert(token.value, requirements).is_some() {
+                    return Err(ParseError::new(token.position, format!("Requirement name {} already in use at line {}", token.value, token.line)));
                 }
             },
             TokenType::Region => {
-                let (key, value) = parse_region(tokens, context, metadata)?;
-                if regions.insert(key, value).is_some() {
-                    return Err(ParseError {
-                        description: format!("Region name {} already in use at line {}", key, token.line),
-                        position: token.position,
-                    });
+                eat(&tokens, &mut position, TokenType::Group)?;
+                let requirements = parse_group(&tokens, &mut position, metadata)?;
+                if regions.insert(token.value, requirements).is_some() {
+                    return Err(ParseError::new(token.position, format!("Region name {} already in use at line {}", token.value, token.line)));
                 }
             },
-            TokenType::Anchor => anchors.push(parse_anchor(tokens, context, metadata)?),
-            _ => return Err(wrong_token(&tokens[context.position], "definition or anchor")),
+            TokenType::Anchor => anchors.push(parse_anchor(&tokens, &mut position, token.value, metadata)?),
+            TokenType::Newline => {},
+            _ => wrong_token!(token, TokenType::Definition, TokenType::Anchor),
         }
     }
+
     Ok(AreaTree {
         definitions,
         regions,
@@ -641,52 +548,37 @@ pub struct Location {
     pub uber_state: UberState,
     pub position: Position,
 }
-
-fn empty_field(name: &str, index: usize, line: &str) -> String {
-    format!("Required field {} was empty at line {}: {}", name, index + 1, line)
+#[derive(Debug, Deserialize)]
+struct LocationEntry {
+    name: String,
+    zone: String,
+    kind: String,
+    variant: String,
+    uber_group_name: String,
+    uber_group: String,
+    uber_id_name: String,
+    uber_id: String,
+    x: i16,
+    y: i16,
 }
 
-pub fn parse_locations(path: &Path, validate: bool) -> Result<Vec<Location>, String> {
-    let input = util::read_file(path, "logic")?;
-    let mut locations = Vec::with_capacity(input.lines().count());
+pub fn parse_locations<P: AsRef<Path>>(path: P) -> Result<Vec<Location>, String> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(false)
+        .trim(csv::Trim::All)
+        .from_path(&path)
+        .map_err(|err| err.to_string())?;
 
-    for (index, line) in input.lines().enumerate() {
-        let parts: SmallVec<[_; 10]> = line.split(',').collect();
-        if validate && parts.len() != 10 {
-            return Err(format!("Each line must have 10 fields, found {} at line {}: {}", parts.len(), index + 1, line));
-        }
+    let mut locations = Vec::with_capacity(389);
 
-        let (name, zone, uber_group, uber_id, x, y) = (parts[0].trim(), parts[1].trim(), parts[5].trim(), parts[7].trim(), parts[8].trim(), parts[9].trim());
-        if validate {
-            if name.is_empty() {
-                return Err(empty_field("name", index, line));
-            }
-            if zone.is_empty() {
-                return Err(empty_field("zone", index, line));
-            }
-            if uber_group.is_empty() {
-                return Err(empty_field("group_id", index, line));
-            }
-            if uber_id.is_empty() {
-                return Err(empty_field("uber_id", index, line));
-            }
-            if x.is_empty() {
-                return Err(empty_field("x position", index, line));
-            }
-            if y.is_empty() {
-                return Err(empty_field("y position", index, line));
-            }
-        }
+    for result in reader.deserialize() {
+        let record: LocationEntry = result.map_err(|err| err.to_string())?;
 
-        let x: i16 = x.parse().map_err(|_| format!("Invalid x position at line {}: {}", index, line))?;
-        let y: i16 = y.parse().map_err(|_| format!("Invalid y position at line {}: {}", index, line))?;
+        let uber_state = UberState::from_parts(&record.uber_group, &record.uber_id)?;
+        let position = Position { x: record.x, y: record.y };
+        let location = Location { name: record.name, zone: record.zone, uber_state, position };
 
-        locations.push(Location {
-            name: name.to_string(),
-            zone: zone.to_string(),
-            uber_state: UberState::from_parts(uber_group, uber_id)?,
-            position: Position { x, y },
-        })
+        locations.push(location);
     }
 
     Ok(locations)
@@ -697,46 +589,30 @@ pub struct NamedState {
     pub name: String,
     pub uber_state: UberState,
 }
+#[derive(Debug, Deserialize)]
+struct StateEntry {
+    name: String,
+    uber_group: String,
+    uber_id: String,
+}
 
-pub fn parse_states(path: &Path, validate: bool) -> Result<Vec<NamedState>, String> {
-    let input = util::read_file(path, "logic")?;
-    let mut states = Vec::with_capacity(input.lines().count());
+pub fn parse_states<P: AsRef<Path>>(path: P) -> Result<Vec<NamedState>, String> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(false)
+        .trim(csv::Trim::All)
+        .from_path(&path)
+        .map_err(|err| err.to_string())?;
 
-    for (index, line) in input.lines().enumerate() {
-        let parts: SmallVec<[_; 3]> = line.split(',').collect();
-        if validate && parts.len() != 3 {
-            return Err(format!("Each line must have 3 fields, found {} at line {}: {}", parts.len(), index + 1, line))
-        }
+    let mut states = Vec::with_capacity(97);
 
-        let (name, uber_group, uber_id) = (parts[0].trim(), parts[1].trim(), parts[2].trim());
-        if validate {
-            if name.is_empty() {
-                return Err(empty_field("name", index, line))
-            }
-            if uber_group.is_empty() {
-                return Err(empty_field("group_id", index, line))
-            }
-            if uber_id.is_empty() {
-                return Err(empty_field("uber_id", index, line))
-            }
-        }
+    for result in reader.deserialize() {
+        let record: StateEntry = result.map_err(|err| err.to_string())?;
 
-        states.push(NamedState {
-            name: name.to_string(),
-            uber_state: UberState::from_parts(uber_group, uber_id)?,
-        })
+        let uber_state = UberState::from_parts(&record.uber_group, &record.uber_id)?;
+        let state = NamedState { name: record.name, uber_state };
+
+        states.push(state);
     }
 
     Ok(states)
-}
-
-pub fn parse_areas(tokens: &[Token]) -> Result<(AreaTree, Metadata), ParseError> {
-    let mut context = ParseContext {
-        position: 0,
-    };
-    let metadata = preprocess(tokens, &mut context);
-    context.position = 0;
-
-    let tree = process(tokens, &mut context, &metadata)?;
-    Ok((tree, metadata))
 }

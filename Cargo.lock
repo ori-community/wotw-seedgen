@@ -793,6 +793,7 @@ dependencies = [
  "atty",
  "bugsalot",
  "criterion",
+ "csv",
  "log",
  "log4rs",
  "num_enum",

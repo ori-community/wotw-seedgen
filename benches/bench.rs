@@ -1,7 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use std::path::PathBuf;
-
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 
@@ -16,24 +14,21 @@ use util::*;
 use settings::*;
 
 fn parsing(c: &mut Criterion) {
-    let areas = PathBuf::from("areas.wotw");
-    let locations = PathBuf::from("loc_data.csv");
-    let states = PathBuf::from("state_data.csv");
+    let input = read_file("areas.wotw", "logic").unwrap();
+    c.bench_function("tokenize", |b| b.iter(|| tokenizer::tokenize(&input)));
+    let (tokens, metadata) = tokenizer::tokenize(&input).unwrap();
 
-    c.bench_function("tokenize", |b| b.iter(|| tokenizer::tokenize(&areas)));
-    let tokens = tokenizer::tokenize(&areas).unwrap();
-
-    c.bench_function("parse areas", |b| b.iter(|| parser::parse_areas(&tokens)));
-    let (areas, metadata) = match parser::parse_areas(&tokens) {
+    c.bench_function("parse areas", |b| b.iter(|| parser::parse_areas(tokens.clone(), &metadata)));
+    let areas = match parser::parse_areas(tokens, &metadata) {
         Ok(areas) => areas,
         _ => panic!(),
     };
 
-    c.bench_function("parse locations", |b| b.iter(|| parser::parse_locations(&locations, false)));
-    let locations = parser::parse_locations(&locations, false).unwrap();
+    c.bench_function("parse locations", |b| b.iter(|| parser::parse_locations("loc_data.csv")));
+    let locations = parser::parse_locations("loc_data.csv").unwrap();
 
-    c.bench_function("parse states", |b| b.iter(|| parser::parse_states(&states, false)));
-    let states = parser::parse_states(&states, false).unwrap();
+    c.bench_function("parse states", |b| b.iter(|| parser::parse_states("state_data.csv")));
+    let states = parser::parse_states("state_data.csv").unwrap();
 
     let mut settings = Settings::default();
     settings.difficulty = Difficulty::Unsafe;
@@ -82,7 +77,7 @@ fn requirements(c: &mut Criterion) {
 }
 
 fn reach_checking(c: &mut Criterion) {
-    let graph = parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &Settings::default(), false).unwrap();
+    let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &Settings::default(), false).unwrap();
 
     c.bench_function("short reach check", |b| b.iter(|| {
         let mut player = Player::default();
@@ -114,14 +109,14 @@ fn generation(c: &mut Criterion) {
     let mut settings = Settings::default();
 
     c.bench_function("singleplayer", |b| b.iter(|| {
-        let graph = parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
     }));
 
     settings.worlds = 2;
 
     c.bench_function("two worlds", |b| b.iter(|| {
-        let graph = parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
     }));
 }
@@ -131,4 +126,4 @@ criterion_group!(only_parsing, parsing);
 criterion_group!(only_requirements, requirements);
 criterion_group!(only_reach_checking, reach_checking);
 criterion_group!(only_generation, generation);
-criterion_main!(only_generation);  // put any of the group names in here
+criterion_main!(only_parsing);  // put any of the group names in here

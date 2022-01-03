@@ -1,8 +1,6 @@
-use std::fmt;
-
 use num_enum::TryFromPrimitive;
 
-use crate::util::{Icon, auto_display};
+use crate::{util::Icon, auto_display};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
@@ -23,11 +21,8 @@ pub enum BonusUpgrade {
     ChargeBlaze = 48,
     RapidSentry = 49,
 }
-impl fmt::Display for BonusUpgrade {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", auto_display(self))
-    }
-}
+auto_display!(BonusUpgrade);
+
 impl BonusUpgrade {
     pub fn icon(self) -> Option<Icon> {
         match self {

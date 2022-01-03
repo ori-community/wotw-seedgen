@@ -7,10 +7,7 @@ pub mod generator;
 pub mod headers;
 pub mod util;
 
-use std::{
-    collections::HashMap,
-    path::PathBuf,
-};
+use std::collections::HashMap;
 
 use rand_seeder::Seeder;
 use rand::{
@@ -44,7 +41,7 @@ use generator::Placement;
 use headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{
-    Difficulty, NodeType, Position, Zone, UberState, Icon,
+    Difficulty, Position, Zone, UberState, Icon,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
 
@@ -52,10 +49,7 @@ fn pick_spawn<'a, R>(graph: &'a Graph, settings: &Settings, rng: &mut R) -> Resu
 where
     R: Rng
 {
-    let mut valid = graph.nodes.iter().filter(|&node| {
-        if let Node::Anchor(anchor) = node { anchor.position.is_some() }
-        else { false }
-    });
+    let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
     let spawn = match &settings.spawn_loc {
         Spawn::Random => valid
             .filter(|&node| {
@@ -67,11 +61,10 @@ where
                 }
             })
             .choose(rng)
-            .ok_or_else(|| String::from("Tried to generate a seed on an empty logic graph."))?,
+            .ok_or_else(|| String::from("No valid spawn locations available"))?,
         Spawn::FullyRandom => valid
-            .filter(|&node| node.node_type() == NodeType::Anchor)
             .choose(rng)
-            .ok_or_else(|| String::from("Tried to generate a seed on an empty logic graph."))?,
+            .ok_or_else(|| String::from("No valid spawn locations available"))?,
         Spawn::Set(spawn_loc) => valid
             .find(|&node| node.identifier() == spawn_loc)
             .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?
@@ -200,7 +193,7 @@ where R: Rng + ?Sized
     for header in inline_headers {
         log::trace!("Parsing inline header");
 
-        let header = headers::parser::parse_header(&PathBuf::from("inline header"), header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in inline header", err))?;
+        let header = headers::parser::parse_header("inline header".as_ref(), header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in inline header", err))?;
 
         header_block += &header;
     }
@@ -411,6 +404,8 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::*;
 
     #[test]
@@ -418,7 +413,7 @@ mod tests {
         initialize_log(Some("generator.log"), LevelFilter::Off, false).unwrap();
 
         let mut settings = Settings::default();
-        let mut graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        let mut graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
 
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
@@ -427,11 +422,11 @@ mod tests {
 
         settings.hard = false;
         settings.difficulty = Difficulty::Unsafe;
-        graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
         settings.difficulty = Difficulty::Gorlek;
-        graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         settings.presets = vec![PathBuf::from("gorlek")];
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
@@ -455,7 +450,7 @@ mod tests {
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
         settings = Settings::default();
-        graph = lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         settings.worlds = 5;
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
     }
