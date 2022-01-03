@@ -1,10 +1,10 @@
 use rustc_hash::{FxHashSet, FxHashMap};
 
 use super::{parser::{self, AreaTree, Location, NamedState}, tokenizer::Metadata};
-use crate::world::{
+use crate::{world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
-};
+}, util::NodeType};
 use crate::item::Skill;
 use crate::settings::Settings;
 use crate::util::{
@@ -316,6 +316,9 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 if connection.name != expected_type {
                     return Err(format!("Anchor {} connects to {:?} {} which is actually a {:?}", anchor.identifier, connection.name, connection.identifier, expected_type));
                 }
+            }
+            if !anchor.connections.iter().any(|connection| connection.name == NodeType::Anchor) && anchor.position.is_some() && anchor.can_spawn {
+                log::trace!("Anchor {} has no outgoing anchor connections, maybe mark it as nospawn?", anchor.identifier);
             }
         }
 

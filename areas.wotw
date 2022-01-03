@@ -949,6 +949,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     kii: HowlsDen.BoneBarrier, Sword OR Hammer
 
 anchor DenShrine at -328, -4569:
+  nospawn
   refill Full
 
   pickup HowlsDen.CombatShrine:
@@ -1101,6 +1102,7 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
       Launch
 
 anchor MarshShrine at -382, -4341:
+  nospawn
   refill Full
 
   pickup MarshPastOpher.CombatShrine:
@@ -2219,6 +2221,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
     moki: WestHollow.PurpleDoorOpen
 
 anchor BeetleFight at -81, -4243:
+  nospawn
   refill Full
 
   state EastHollow.BeetleDefeated:
@@ -3654,6 +3657,7 @@ anchor WestGlades.ShrineArea at -664, -4026:
   conn WestGlades.MillApproach: free
 
 anchor GladesShrine at -635, -4020:
+  nospawn
   refill Full
 
   pickup WestGlades.CombatShrine:
@@ -5099,6 +5103,7 @@ anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
 # checkpoint at -1249, -3641
 
 anchor InnerWellspring.EscapeSequence at -1240, -3642:
+  nospawn
   refill Full
 
   quest InnerWellspring.WaterEscape:
@@ -5931,6 +5936,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
     unsafe: DoubleJump  # fall then good old glide skip
 
 anchor WoodsShrine at 1361, -4068:
+  nospawn
   refill Full
 
   pickup WoodsMain.ShrineEX: free
@@ -6201,6 +6207,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
   conn LowerReach.Entry: free
 
 anchor LowerReach.CentralEnemyPaths at -335, -4009:  # Enemy path counterpart for LowerReach.Central
+  nospawn
   # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
   # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
   refill Checkpoint
@@ -6673,6 +6680,7 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
     kii: LowerReach.FreezeCentralFurnace, Bash, Grenade=1
 
 anchor LowerReach.EastEnemyPaths at -223, -3967:  # Enemy path counterpart for LowerReach.East
+  nospawn
   # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
   # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
   refill Full:  # use the teleporter
@@ -6708,6 +6716,7 @@ anchor LowerReach.East at -223, -3967:  # To the right side outside the teleport
   conn LowerReach.SoupMoki: free
 
 anchor LowerReach.SnowballEnemyPaths at -182, -3968:  # Enemy path counterpart for LowerReach.Snowball
+  nospawn
   # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
   # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
   refill Checkpoint
@@ -7071,6 +7080,7 @@ anchor LowerReach.BridgeWispPath at 67, -3808:  # At the bridge checkpoint, next
     gorlek: free
 
 anchor LowerReach.SnowEscape at 79, -3733:
+  nospawn
   refill Full
 
   quest LowerReach.ForestsMemory:  # currently based on the requirements of getting here to simplify
@@ -7493,6 +7503,7 @@ anchor UpperReach.KeystoneSnapPlant at -231, -3865:  # At the snap plant with Mi
       Damage=40
 
 anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
+  nospawn
   conn UpperReach.KeystoneSnapPlantPaths: free
   conn UpperReach.KeystoneSnapPlantThawedPaths: free
   conn UpperReach.UpperSoupThawed:  # mirrored in main variant
@@ -7513,6 +7524,7 @@ anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
       Damage=40
 
 anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
+  nospawn
   pickup UpperReach.MiddleLeftKS: free
   pickup UpperReach.LowerKS:
     gorlek: DoubleJump, TripleJump
@@ -7525,6 +7537,7 @@ anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
     kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
 
 anchor UpperReach.KeystoneSnapPlantThawedPaths at -231, -3865:
+  nospawn
   pickup UpperReach.LowerKS:
     moki: Glide
     gorlek:
@@ -7544,14 +7557,17 @@ anchor UpperReach.UpperSoup at -215, -3877:  # At the soup
     moki: UpperReach.ThawFurnace
 
 anchor UpperReach.UpperSoupFrozen at -215, -3877:
+  nospawn
   conn UpperReach.UpperSoupPaths: free
   conn UpperReach.UpperSoupFrozenPaths: free
 
 anchor UpperReach.UpperSoupThawed at -215, -3877:
+  nospawn
   conn UpperReach.UpperSoupPaths: free
   conn UpperReach.UpperSoupThawedPaths: free
 
 anchor UpperReach.UpperSoupPaths at -215, -3877:
+  nospawn
   refill Checkpoint
 
   pickup UpperReach.SoupOre: free
@@ -7600,6 +7616,7 @@ anchor UpperReach.UpperSoupPaths at -215, -3877:
       Damage=20, Grenade=1, Sword OR Hammer OR DoubleJump OR Dash OR Glide  # GrenadeJump=1 start at the soup, need to land further left on the spikes
 
 anchor UpperReach.UpperSoupFrozenPaths at -215, -3877:
+  nospawn
   refill Checkpoint
 
   pickup UpperReach.UpperKS:
@@ -7615,6 +7632,7 @@ anchor UpperReach.UpperSoupFrozenPaths at -215, -3877:
       Flap, Bash
 
 anchor UpperReach.UpperSoupThawedPaths at -215, -3877:
+  nospawn
   refill Checkpoint
 
   pickup UpperReach.LowerKS:
@@ -8160,6 +8178,7 @@ anchor UpperDepths.OutsideMoraFight at 595, -4376:  # Directly left of Mora's la
     gorlek: free
 
 anchor MoraFight at 674, -4385:
+  nospawn
   refill Full
 
   quest UpperDepths.ForestsEyes:
@@ -8331,6 +8350,7 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
       DoubleJump, Sword
 
 anchor DepthsShrine at 213, -4515:
+  nospawn
   refill Full
 
   pickup LowerDepths.CombatShrine:
@@ -9530,6 +9550,7 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     gorlek: WestPools.ForestsStrength, Water, WaterDash
 
 anchor KwolokFight at -1650, -4125:
+  nospawn
   refill Full
 
   quest WestPools.ForestsStrength:
@@ -10611,6 +10632,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
       Burrow, Hammer, Spear=1 OR Blaze=1
 
 anchor WindtornRuins.Escape at 2021, -4026:
+  nospawn
   refill Full
 
   # After you complete the escape, there's a gap in the floor to its right, making the location unreachable with skillsets
@@ -11484,6 +11506,8 @@ anchor OpherShop:  # Opher's offers
     moki: InnerWellspring.WaterEscape, SpiritLight=1200
 
 anchor TuleyShop at -173, -4139:
+  nospawn
+
   quest GladesTown.RegrowTheGlades:
     moki: TuleyShop.SelaFlowers, TuleyShop.StickyGrass, TuleyShop.Lightcatchers, TuleyShop.BlueMoon, TuleyShop.SpringPlants, TuleyShop.LastTree
 
