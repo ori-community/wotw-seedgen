@@ -104,11 +104,14 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
         Bash, Launch, Dash
     kii:
       Launch, Damage=10, DoubleJump OR Dash  # Jump off the wall next to the ceiling plant (possible w/o dmg by refreshing abilities on the left wall from the spikes)
-      MarshSpawn.RainLifted, Bash, DoubleJump, TripleJump  # Bash the slime from across the broken log to the mantis underneath the pickup and juggle him high, bash off both (may be unsafe)
+      Launch, DoubleJump, Dash  # Jump off the wall next to the ceiling plant and refresh abilities on the left wall from the spikes
+      Grapple, Sentry=1 OR Shuriken=1 OR Flash=1
+      MarshSpawn.RainLifted, Launch, Sword  # pogo the mantis between launches
     unsafe:
       Launch  # Launching along the ceiling, starting above the LongSwimEX
       Grapple, Bash, Grenade=1
-      Grapple, Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
+      Grapple, Spear=1
+      MarshSpawn.RainLifted, Bash, DoubleJump, TripleJump  # Bash the slime from across the broken log to the mantis underneath the pickup and juggle him high, bash off both
       # Glitched:
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
       HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseHover  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
@@ -134,14 +137,13 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe:
       Damage=90  # dropping down the right drop-down and holding directions for x dboosts: down-right=2, right=3, down-right=1, right=1, up-right=2 and u can see ori again
       Damage=40, WaterDash # dropping down the right drop-down and waterdashing in direction x times: down-right=1, right=2, down-right=1, right=1, up-right=2 and u can see ori again
-  pickup MarshSpawn.BurrowOre:
+  pickup MarshSpawn.BurrowOre:  # @validator make sure its not redundant with -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
     moki:
-      Water, Burrow, Bash, DoubleJump OR Glide OR Launch  # Bash for the exploding enemy
+      Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
       Water, Burrow, Bash, Grenade=1, Dash
     gorlek: Water, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=10
     kii:
-      Damage=20, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
-      Damage=20, Burrow, Sentry=2 OR Blaze=3 OR Shuriken=1
+      Damage=20, Burrow, Hammer OR Sentry=2 OR Blaze=3 OR Shuriken=1
       WaterDash, Damage=10, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
       WaterDash, Damage=10, Burrow, Sentry=2 OR Blaze=3 OR Shuriken=1
       Damage=30, Burrow
@@ -154,66 +156,28 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       PauseHover OR FlashSwap OR SentrySwap=1 OR BlazeSwap=2:
         Water OR Damage=20
         Damage=10, WaterDash
-  pickup MarshSpawn.LifepactShard:
-    moki, Regenerate, Damage=40, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug:
-      Water, Burrow, DoubleJump OR Launch
-      Water, Burrow, Dash, Bash, Grenade=1
-    kii, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug:
-      # @validator I think that some paths don't take into account that you need to get to the pickup after finishing the gauntlet (look into unsafe for possible adaptions)
-      # @validator Water paths are missing for the energy weapons
-      Damage=20, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
-      Damage=20, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
-      WaterDash, Damage=10, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
-      WaterDash, Damage=10, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
-      Damage=30, Burrow
-      WaterDash, Damage=20, Burrow
-      Water, Burrow, DoubleJump OR Launch
-      Water, Burrow, Dash, Bash, Grenade=1
-    unsafe, Burrow, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug:
-      # Bow and Grenade for cancelling vertical momentum
-      # Combat=Slug and then you can stand on the very right of the spikes right to the gauntlet. if u don't kill the slug, u don't have enough time to not take damage (it is probably possible)
-      # there are redundancies but it is easier to understand it like this and saves some loc because of Combat=Slug
-      Damage=10 OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1 OR Spear=1 OR Bow=1 OR Grenade=1:  # burrow -> combat gauntlet
-        Damage=10 OR Combat=Slug OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1 OR Spear=1 OR Bow=1 OR Grenade=1:  # gauntlet -> pickup itself
-          # -> burrow
-          Water OR Damage=20
-          Damage=10, WaterDash
-      Bash:  # After burrow, bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to gauntlet  # Bash slug to get to pickup
-        Water OR Damage=20
-        Damage=10, WaterDash
-      # Glitched:
-      PauseHover OR FlashSwap:  # every other glitch can be avoided with the non-glitch variants above
-        Water OR Damage=20
-        Damage=10, WaterDash
-
   conn Teleporters: free
-  conn MarshSpawn.BrokenBridge: free
-  conn MarshSpawn.PoolsBurrowsSignpost:
+  conn MarshSpawn.BrokenBridge:  # although it is free, it doesn't make much sense to not use this state
+    moki: MarshSpawn.LogBroken
+  conn MarshSpawn.BurrowFightArena:
     moki:
       Water, Burrow, DoubleJump OR Glide OR Launch
       Water, Burrow, Dash, Bash, Grenade=1
-    gorlek: Water, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=10
-    kii:  # @validator Water paths are missing for the energy weapons
+    gorlek: Water, Burrow, Dash OR Sword OR Hammer OR Damage=10
+    kii:
       Damage=20, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
       Damage=20, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
       WaterDash, Damage=10, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
       WaterDash, Damage=10, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
+      Water, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
       Damage=30, Burrow
       WaterDash, Damage=20, Burrow
-    unsafe, Burrow:
-      Bash:  # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
-        Water OR Damage=20
-        Damage=10, WaterDash
-      Bow=1 OR Grenade=1:  # cancel the vertical momentum out of the burrow with bow (or Grenade) [syntax needed]
-        Water OR Damage=20
-        Damage=10, WaterDash
-      Blaze=1 OR Spear=1:
-        Water OR Damage=20
-        Damage=10, WaterDash
-      # Glitched:
-      PauseHover OR FlashSwap:  # other glitches can be avoided
-        Water OR Damage=20
-        Damage=10, WaterDash
+    unsafe:
+      # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
+      # cancel the vertical momentum out of the burrow with bow (or Grenade) [syntax needed]
+      Burrow, Water, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=20, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=10, WaterDash, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
   conn MarshPastOpher.MillView:
     moki: MarshSpawn.ToOpherBarrier
   conn MarshSpawn.PoolsPath:
@@ -392,6 +356,53 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
 
 # checkpoint at -845, -4438
 
+anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
+  refill Health=1
+
+  state MarshSpawn.LifepactDoor:  # opening the door to MarshSpawn.LifepactShard by fighting the bad guys
+    moki: Regenerate, Damage=40, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug
+    kii: Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug
+
+  pickup MarshSpawn.LifepactShard:
+    moki, MarshSpawn.LifepactDoor:
+      DoubleJump OR Launch OR Dash OR Glide
+    gorlek, MarshSpawn.LifepactDoor:
+      Sword OR Hammer
+    kii, MarshSpawn.LifepactDoor:
+      Bash OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
+    unsafe, MarshSpawn.LifepactDoor:
+      Bow=1 OR Grenade=1 OR PauseHover OR FlashSwap OR GrenadeJump # Bow and Grenade for cancelling vertical momentum
+  pickup MarshSpawn.BurrowOre: 
+    moki:
+      Burrow, DoubleJump, Bash, Dash OR Glide OR Grenade=1
+      Burrow, Bash, Launch
+    gorlek:
+      Burrow, DoubleJump OR Dash OR Launch
+      # could do a sentryjump into bashgrenade, but I heard that kind of thing is unwelcome ;P
+    kii:
+      Burrow, Bash, Glide  # Use slime and bashgliding
+      Burrow, Sword
+      Burrow, Hammer, Damage=10
+
+  conn MarshSpawn.PoolsBurrowsSignpost:
+    moki: Bash, DoubleJump OR Dash OR Launch OR Glide
+    gorlek: 
+      Bash OR Launch
+      Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    kii: free
+  conn MarshSpawn.Main:
+    moki: 
+      Water, Burrow, Bash, DoubleJump, Dash OR Glide
+      Water, Burrow, Bash, Launch
+    gorlek: Water, Burrow, DoubleJump OR Dash OR Launch
+    kii:
+      Burrow, Damage=40, DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1
+      Burrow, WaterDash, Damage=20, DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1
+      Burrow, Water, Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1
+    unsafe:
+      Burrow, Damage=30, DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1  # kii path but with 10 less damage
+      Burrow, SwordSJump=1, Damage=20, Blaze  # https://lowkey.gg/v/259b4cf4-af46-4225-b647-91adf4a02d34
+
 anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between pools, burrows and marsh
   refill Checkpoint
   refill Energy=1:
@@ -406,24 +417,9 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
     gorlek:
       SentryJump=1
     kii:
-      Sentry=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer OR Dash
+      Sentry=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer
     unsafe:
-      Sword, Shuriken=1  # downslash on a shuriken
-  pickup MarshSpawn.BurrowOre:
-    moki:
-      Burrow, DoubleJump, Bash, Dash OR Glide OR Grenade=1
-      Burrow, Bash, Launch
-    gorlek:
-      Burrow, Combat=Bat, DoubleJump OR Dash
-      Burrow, Damage=10, DoubleJump OR Dash
-      Burrow, Launch
-      # could do a sentryjump into bashgrenade, but I heard that kind of thing is unwelcome ;P
-    kii:
-      Burrow, Dash
-      Burrow, Sword
-      Burrow, Hammer, Damage=10
-  pickup MarshSpawn.LifepactShard:
-    moki: Regenerate, Damage=40, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug, Bash, DoubleJump OR Launch
+      Dash OR Glide  # GlideJump
   pickup MarshSpawn.BurrowsApproachLedgeEX:
     moki: Bash, DoubleJump OR Launch
     gorlek:
@@ -459,17 +455,12 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Damage=10, Sentry=3 OR Shuriken=3
       Bash, Damage=30
   conn MarshSpawn.Cave: free
-  conn MarshSpawn.Main:
-    moki:
-      Water, Burrow, Bash, DoubleJump, Dash OR Glide
-      Water, Burrow, Bash, Launch
+  conn MarshSpawn.BurrowFightArena:
+    moki: Bash, DoubleJump OR Dash OR Launch OR Glide
     gorlek:
-      Water, Burrow, Combat=Bat, DoubleJump OR Dash
-      Water, Burrow, Damage=10, DoubleJump OR Dash
-    kii:
-      Burrow, Damage=40, Sword OR Hammer OR DoubleJump OR Dash  # big damage number because you can take a lot of damage in the dirty water
-    unsafe:
-      Water, Burrow, Sword OR Hammer
+      Combat=Bat, DoubleJump OR Dash
+      Damage=10, DoubleJump OR Dash
+    kii: Sword OR Hammer OR DoubleJump OR Dash
 
 # checkpoint at -954, -4355
 # checkpoint at -1004, -4497
@@ -9520,14 +9511,20 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     gorlek:
       Water, WaterDash, DoubleJump, TripleJump
       Damage=20, WaterDash, DoubleJump, Dash OR TripleJump
+    kii:  # note that only one wheel ability should be used since you can only use the 3rd ability
+      Water, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Damage=20, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, TripleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1 OR Shuriken=1  # jump from the right wall (no climbing it since it is too obscure)
     unsafe:
       Bash, Grenade=1  # Stand on the left of the TP, launch the grenade with a curve so it won't touch the ceiling and bash it when it falls down
       WaterDash, Dash, Hammer, Water OR Damage=20  # Already hard with analog swimming but it's a nightmare on keyboard
-      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # wall jump from the right wall. With weapons, climb the right wall then djump+ upslash. TripleJump might be Gorlek
+      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # wall jump from the right wall. With weapons, climb the right wall then djump+ upslash.
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
+    kii: Damage=40, Burrow
   pickup WestPools.BurrowOre:  # intended path omitted in moki
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
+    kii: WestPools.ForestsStrength, Damage=100, Damage=60, Damage=80, WaterDash, Burrow
     unsafe: WestPools.ForestsStrength, Water, Burrow
   pickup WestPools.EscapeRevisitEX:
     moki, WestPools.ForestsStrength:
@@ -9537,14 +9534,22 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     gorlek, WestPools.ForestsStrength:
       Water, WaterDash, Combat=Crab+SpinCrab OR DoubleJump OR Damage=10
       Water, Bash OR Launch
+    kii, WestPools.ForestsStrength:
+      Damage=100, WaterDash, Damage=80, Combat=Crab+SpinCrab OR DoubleJump OR Damage=10 OR Bash OR Launch
 
   conn Teleporters: free
   conn KwolokFight:
     moki: Water, WaterBreath, DoubleJump OR Dash OR Launch
     gorlek: Water
+    kii: 
+      Damage=100, WaterDash
+      Damage=220
+    unsafe:
+      Damage=200, Burrow, Blaze=1, DoubleJump OR Launch
   conn EastPools.CentralRoom:
     moki: Water, WaterBreath, WaterDash
     gorlek: Water, WaterDash
+    kii: Damage=160, WaterDash
     unsafe: Water, WaterBreath
   conn UpperPools.KeystoneRoomEntrance:
     moki: WestPools.ForestsStrength, Water, WaterBreath, WaterDash
@@ -9556,7 +9561,9 @@ anchor KwolokFight at -1650, -4125:
 
   quest WestPools.ForestsStrength:
     moki: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
-    unsafe: Boss=250, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
+    kii: 
+      Boss=250, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
+      Boss=250, Damage=80, WaterDash, Bash, DoubleJump, Dash OR Launch
 
 region LowerWastes:
   moki: Danger=50, Regenerate
