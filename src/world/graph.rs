@@ -26,6 +26,7 @@ pub struct Connection {
 pub struct Anchor {
     pub identifier: String,
     pub position: Option<Position>,
+    pub can_spawn: bool,
     pub index: usize,
     pub refills: Vec<Refill>,
     pub connections: Vec<Connection>,
@@ -110,6 +111,11 @@ impl Node {
     }
     pub fn can_place(&self) -> bool {
         matches!(self, Node::Pickup(_) | Node::Quest(_))
+    }
+    pub fn can_spawn(&self) -> bool {
+        if let Node::Anchor(anchor) = self {
+            anchor.position.is_some() && anchor.can_spawn
+        } else { false }
     }
 }
 impl fmt::Display for Node {

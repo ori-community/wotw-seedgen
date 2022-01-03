@@ -302,6 +302,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
         graph.push(Node::Anchor(graph::Anchor {
             identifier: anchor.identifier.to_string(),
             position,
+            can_spawn: anchor.can_spawn,
             index: graph.len(),
             refills,
             connections,

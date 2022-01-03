@@ -41,7 +41,7 @@ use generator::Placement;
 use headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{
-    Difficulty, NodeType, Position, Zone, UberState, Icon,
+    Difficulty, Position, Zone, UberState, Icon,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
 
@@ -49,10 +49,7 @@ fn pick_spawn<'a, R>(graph: &'a Graph, settings: &Settings, rng: &mut R) -> Resu
 where
     R: Rng
 {
-    let mut valid = graph.nodes.iter().filter(|&node| {
-        if let Node::Anchor(anchor) = node { anchor.position.is_some() }
-        else { false }
-    });
+    let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
     let spawn = match &settings.spawn_loc {
         Spawn::Random => valid
             .filter(|&node| {
@@ -64,11 +61,10 @@ where
                 }
             })
             .choose(rng)
-            .ok_or_else(|| String::from("Tried to generate a seed on an empty logic graph."))?,
+            .ok_or_else(|| String::from("No valid spawn locations available"))?,
         Spawn::FullyRandom => valid
-            .filter(|&node| node.node_type() == NodeType::Anchor)
             .choose(rng)
-            .ok_or_else(|| String::from("Tried to generate a seed on an empty logic graph."))?,
+            .ok_or_else(|| String::from("No valid spawn locations available"))?,
         Spawn::Set(spawn_loc) => valid
             .find(|&node| node.identifier() == spawn_loc)
             .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?

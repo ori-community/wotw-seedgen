@@ -25,6 +25,7 @@ pub enum TokenType {
     Group,
     And,
     Or,
+    NoSpawn,
 }
 auto_display!(TokenType);
 
@@ -200,11 +201,14 @@ fn tokenize_definition<'a>(context: &mut TokenContext<'a>) -> Option<Token<'a>> 
 fn tokenize_free<'a>(context: &mut TokenContext<'a>) -> Option<Token<'a>> {
     tokenize_blank("free", TokenType::Free, context)
 }
+fn tokenize_nospawn<'a>(context: &mut TokenContext<'a>) -> Option<Token<'a>> {
+    tokenize_blank("nospawn", TokenType::NoSpawn, context)
+}
 fn tokenize_requirement<'a>(context: &mut TokenContext<'a>) -> Option<Token<'a>> {
     tokenize_by_delimiter(TokenType::Requirement, |c: char| c.is_whitespace() || c == ',' || c == ':' || c == '#', context)
 }
 
-const TOKENIZERS: [for<'a> fn(&mut TokenContext<'a>) -> Option<Token<'a>>; 14] = [
+const TOKENIZERS: [for<'a> fn(&mut TokenContext<'a>) -> Option<Token<'a>>; 15] = [
     tokenize_and,           // 8511 occurences
     tokenize_or,            // 5676
     tokenize_group,         // 4301
@@ -218,6 +222,7 @@ const TOKENIZERS: [for<'a> fn(&mut TokenContext<'a>) -> Option<Token<'a>>; 14] =
     tokenize_quest,         // 47
     tokenize_region,        // 20
     tokenize_definition,    // 1
+    tokenize_nospawn,       // 0
     tokenize_requirement,
 ];
 

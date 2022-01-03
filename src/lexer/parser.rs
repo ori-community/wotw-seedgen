@@ -89,6 +89,7 @@ pub struct Connection<'a> {
 pub struct Anchor<'a> {
     pub identifier: &'a str,
     pub position: Option<(i16, i16)>,
+    pub can_spawn: bool,
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
 }
@@ -451,49 +452,54 @@ fn parse_anchor_connection<'a>(tokens: &[Token<'a>], position: &mut usize, ident
 }
 
 fn parse_anchor<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Anchor<'a>, ParseError> {
-    if let Some(mut token) = tokens.get(*position) {
-        *position += 1;
-        let mut anchor_position = None;
-        if token.name == TokenType::Position {
-            let mut coords = token.value.split(',');
-            let x = coords.next().unwrap().trim().parse::<i16>().map_err(|_| not_int(token))?;
-            let y = if let Some(y) = coords.next() {
-                y.trim().parse::<i16>().map_err(|_| not_int(token))?
-            } else {
-                return Err(not_int(token));
-            };
-            anchor_position = Some((x, y));
+    let mut token = next_token!(tokens, *position, TokenType::Position, TokenType::Group);
 
-            if let Some(next) = tokens.get(*position) {
-                *position += 1;
-                token = next;
-            } else {
-                missing_token!(TokenType::Group)
-            }
-        }
+    let mut anchor_position = None;
+    if token.name == TokenType::Position {
+        let mut coords = token.value.split(',');
+        let x = coords.next().unwrap().trim().parse::<i16>().map_err(|_| not_int(token))?;
+        let y = if let Some(y) = coords.next() {
+            y.trim().parse::<i16>().map_err(|_| not_int(token))?
+        } else {
+            return Err(not_int(token));
+        };
+        anchor_position = Some((x, y));
 
-        if token.name != TokenType::Group {
-            wrong_token!(token, TokenType::Group);
-        }
-        eat(tokens, position, TokenType::Indent)?;
-
-        let mut refills = Vec::new();
-        let mut connections = Vec::new();
-
-        loop {
-            let token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
-            match token.name {
-                TokenType::Refill => refills.push(parse_refill(tokens, position, token.value, metadata)?),
-                TokenType::State => connections.push(parse_state(tokens, position, token.value, metadata)?),
-                TokenType::Quest => connections.push(parse_quest(tokens, position, token.value, metadata)?),
-                TokenType::Pickup => connections.push(parse_pickup(tokens, position, token.value, metadata)?),
-                TokenType::Connection => connections.push(parse_anchor_connection(tokens, position, token.value, metadata)?),
-                TokenType::Dedent => return Ok(Anchor { identifier, position: anchor_position, refills, connections }),
-                _ => wrong_token!(token, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent),
-            }
+        if let Some(next) = tokens.get(*position) {
+            *position += 1;
+            token = next;
+        } else {
+            missing_token!(TokenType::Group)
         }
     }
-    missing_token!(TokenType::Position, TokenType::Group);
+
+    if token.name != TokenType::Group {
+        wrong_token!(token, TokenType::Group);
+    }
+    eat(tokens, position, TokenType::Indent)?;
+
+    token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::NoSpawn, TokenType::Dedent);
+    let can_spawn = if token.name == TokenType::NoSpawn {
+        eat(tokens, position, TokenType::Newline)?;
+        token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
+        false
+    } else { true };
+
+    let mut refills = Vec::new();
+    let mut connections = Vec::new();
+
+    loop {
+        match token.name {
+            TokenType::Refill => refills.push(parse_refill(tokens, position, token.value, metadata)?),
+            TokenType::State => connections.push(parse_state(tokens, position, token.value, metadata)?),
+            TokenType::Quest => connections.push(parse_quest(tokens, position, token.value, metadata)?),
+            TokenType::Pickup => connections.push(parse_pickup(tokens, position, token.value, metadata)?),
+            TokenType::Connection => connections.push(parse_anchor_connection(tokens, position, token.value, metadata)?),
+            TokenType::Dedent => return Ok(Anchor { identifier, position: anchor_position, can_spawn, refills, connections }),
+            _ => wrong_token!(token, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent),
+        }
+        token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
+    }
 }
 
 pub fn parse_areas<'a>(tokens: Vec<Token<'a>>, metadata: &Metadata) -> Result<AreaTree<'a>, ParseError> {
