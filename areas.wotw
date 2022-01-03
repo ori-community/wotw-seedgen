@@ -2603,12 +2603,12 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   conn OpherShop: free
   conn Tokk: free
   conn TuleyShop:
-    moki, InnerWellspring.WaterEscape:
+    moki, GladesTown.TuleySpawned:
       DoubleJump OR Launch
       Flap, Glide
       Bash, Grenade=1
-    gorlek: InnerWellspring.WaterEscape, SentryJump=1 OR Burrow OR Dash
-    unsafe: InnerWellspring.WaterEscape, Shuriken=1 OR Sword OR Hammer OR Grenade=1 OR Sentry=1 OR Flash OR Spear=1
+    gorlek: GladesTown.TuleySpawned, SentryJump=1 OR Burrow OR Dash
+    unsafe: GladesTown.TuleySpawned, Shuriken=1 OR Sword OR Hammer OR Grenade=1 OR Sentry=1 OR Flash OR Spear=1
     # seed paths tbd if ever Necessary
   conn EastHollow.OutsideGlades:
     moki: GladesTown.GromsWall
@@ -2957,8 +2957,8 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
       TuleyShop.StickyGrass, Grapple, Sword OR Hammer OR Blaze=1 OR Shuriken=1 OR Sentry=1 OR Flash
       DoubleJump, Glide
   conn TuleyShop:
-    moki: InnerWellspring.WaterEscape, Dash OR Glide  # seed paths tbd if ever necessary
-    gorlek: InnerWellspring.WaterEscape, Sword OR Hammer  # getting up there with just a weapon from below is not written in gorlek. The weapon floats from hole hut, however, are probably gorlek difficulty.
+    moki: GladesTown.TuleySpawned, Dash OR Glide  # seed paths tbd if ever necessary
+    gorlek: GladesTown.TuleySpawned, Sword OR Hammer  # getting up there with just a weapon from below is not written in gorlek. The weapon floats from hole hut, however, are probably gorlek difficulty.
     # everything else is redundant
   conn GladesTown.Teleporter: free
 
@@ -2993,7 +2993,7 @@ anchor GladesTown.ReachPath at -140, -4096:  # At the soup
     gorlek: free  # free if you know the whole branch is semisolid, but you probably don't as a moki player
   conn GladesTown.Teleporter: free
   conn TuleyShop:
-    moki: InnerWellspring.WaterEscape
+    moki: GladesTown.TuleySpawned
   conn LowerReach.TownEntry:
     moki:
       Bash, Flap OR Grenade=1  # may need to juggle the soupgrenade once
