@@ -2003,6 +2003,7 @@ anchor WestHollow.TrialStart at -120, -4260:  # At the Spirit Trial start
   pickup WestHollow.SpiritTrial:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki: WestHollow.TrialActivation, WestHollow.FullyDrained, DoubleJump, Dash
     gorlek: WestHollow.TrialActivation, WestHollow.FullyDrained, Dash
+    unsafe: WestHollow.TrialActivation, WestHollow.FullyDrained  # Need a good corner boost in order to avoid the last pound https://youtu.be/oNV8tD0h_LQ
 
   conn WestHollow.TrialApproach: free
 
