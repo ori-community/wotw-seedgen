@@ -8554,24 +8554,35 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
   refill Checkpoint
 
   conn WestGlades.MillApproach:
-    moki:
-      Water, Grapple, DoubleJump, Dash OR Glide
-      Water, Grapple, Bash, Grenade=1, Dash, Glide
-      Water, Launch, DoubleJump OR Dash OR Grapple OR Glide  # go up the left wall
-    gorlek:
-      Water, Grapple, DoubleJump, TripleJump OR Sword OR Damage=15
-      Water, Grapple, Dash, Glide OR Sword OR Hammer OR Damage=15
-      Water, Grapple, Glide, Sword OR Damage=15
-      Water, Grapple, Sword, Damage=15
-      Water, Bash, Grenade=1, Launch
-      Water, Launch, Sword OR Damage=15
+    moki, Water:
+      Grapple, DoubleJump, Dash OR Glide
+      Grapple, Bash, Grenade=1, Dash, Glide
+      Launch, DoubleJump OR Dash OR Grapple OR Glide  # go up the left wall
+    gorlek, Water:
+      Grapple, DoubleJump, TripleJump OR Sword OR Damage=15
+      Grapple, Dash, Glide OR Sword OR Hammer OR Damage=15
+      Grapple, Glide, Sword OR Damage=15
+      Grapple, Sword, Damage=15
+      Bash, Grenade=1, Launch
+      Launch, Sword OR Damage=15
+    kii, Water:
+      Grapple, DoubleJump OR Dash OR Sword 
+      Grapple, Glide, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15  # wall jump from the right wall and use your energy weapon to reah the left wall
+      Grapple, Bash, Grenade=1, Glide
+      Grapple, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      Grapple, Sentry=4 # wall jump from the right wall and use 2 sentries to reach the left wall
+      Grapple, Sentry=2, Damage=15  # dboost in the first spikes then use two sentries to reach the water
+      Grapple, Bash, Grenade=1, Sentry=2
+      Grapple, Damage=30, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Grapple, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Launch
+      DoubleJump, TripleJump, Damage=15
     unsafe:
-      Water, Grapple, Dash OR Glide OR Sword OR DoubleJump  # grapple the plant then let you fall under it and regrapple it from bellow to have more height
-      Water, Grapple, Hammer, Damage=15
-      Water, Launch
-      Water, DoubleJump, TripleJump, Sword  # Sword hover. Possible without an upslash too.
+      Water, Grapple, Glide OR Damage=45  # grapple the plant then let you fall under it and regrapple it from bellow to have more height
+      Water, DoubleJump, TripleJump  # walljumps on the wall in the ceiling
       Water, DoubleJump, Sword, Damage=15  # Sword jumps
-      Water, DoubleJump, Hammer  # Hammer jumps
+      Water, DoubleJump, Hammer, Damage=15
+      Water, HammerJump
   conn PoolsApproach.MillPath:
     moki, Damage=20:  # severe enemy spam
       Bash, Grapple OR Launch  # this is probably actually closest to how you'd traverse this naturally
@@ -8579,12 +8590,18 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
       Bash, Grapple, DoubleJump OR Dash  # go through the gap from above, you can use Grapple to reset if you fall
       Launch, DoubleJump OR Grapple
     gorlek:
-      Combat=Crab+2xSmallSkeeto, Grapple, Glide OR Sword OR Hammer
+      Combat=2xSmallSkeeto, Grapple, Glide OR Sword OR Hammer
       Bash, Grapple, Glide OR Sword OR Hammer OR Grenade=1
-      Combat=Crab+2xSmallSkeeto, SentryJump=1, DoubleJump, TripleJump
+      Combat=2xSmallSkeeto, SentryJump=1, DoubleJump, TripleJump
       Bash, Grenade=1, DoubleJump
+    kii:
+      Combat=2xSmallSkeeto, Grapple, Shuriken=1
+      Bash, Grapple OR Grenade=1
+      Launch, Bash OR DoubleJump OR Grapple # @validator should probably be in gorlek (not redundant with moki since moki has extra damage)
+      Launch, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash  # Bash the ennemies but they don't really like being on the right position for you to bash them
+      Launch OR Bash  # Bash the ennemies but they don't really like being on the right position for you to bash them
+      Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=20
       DoubleJump, Hammer, Dash OR TripleJump  # Hammer jumps
       DoubleJump, TripleJump, Sword  # Reset your jumps by hitting/pogoing the ennemies
 
@@ -8601,14 +8618,22 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Bash, Water OR Glide  # there's a variety of solutions for this with the enemies around
       DoubleJump, TripleJump  # gives some room to maneuver around the corrupted slug
       Combat=SpinCrab+CorruptSlug, DoubleJump, Grapple OR Glide OR Sword OR Hammer
-    unsafe:
+    kii:
       Bash
-      SwordSJump=1
+      DoubleJump, Sword  # either pogo the crab or djump toward the left wall and upslash to make the slime fall (which reset your djump)
       Combat=SpinCrab+CorruptSlug, DoubleJump
-      Combat=SpinCrab+CorruptSlug, Glide, Dash  # Glide jump
-      Dash, Sword OR Hammer OR Grapple  # Dash upslash / grapple the right plant, and spam dash to reach the wall where the slime is
+      Combat=SpinCrab+CorruptSlug, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=CorruptSlug, Grapple, Glide, Dash OR DoubleJump
+    unsafe:
+      SwordSJump=1
+      Sword, Damage=5 OR Combat=CorruptSlug
+      Combat=SpinCrab+CorruptSlug, Dash  # Dash ramp
+      Combat=CorruptSlug, Dash, Grapple  # grapple the right plant, and spam dash to reach the wall where the slime is
   pickup PoolsApproach.MillPathEC:
     moki: Water  # again not really a reason to even use Bash
+    kii:
+      Damage=120
+      WaterDash, Damage=60
 
   conn PoolsApproach.MillPathCheckpoint:
     moki, Damage=20:  # severe enemy spam
@@ -8630,7 +8655,11 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
   conn PoolsApproach.RightOfWheel:
     moki: Water, Combat=SpinCrab OR DoubleJump OR Bash OR Launch  # bashing to break the wall on the way is much harder than just swimming at it and letting it happen, so didn't make Bash a requirement.
     gorlek: Water
-
+    kii:
+      Damage=320
+      WaterDash, Damage=200
+    unsafe:
+      Bash, Damage=260
 anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of the static wheel
   refill Checkpoint:
     moki: Water  # right below in the water
