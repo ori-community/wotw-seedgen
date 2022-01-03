@@ -175,9 +175,9 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe:
       # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
       # cancel the vertical momentum out of the burrow with bow (or Grenade) [syntax needed]
-      Burrow, Water, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseFloat OR FlashSwap
-      Burrow, Damage=20, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseFloat OR FlashSwap
-      Burrow, Damage=10, WaterDash, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseFloat OR FlashSwap
+      Burrow, Water, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=20, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=10, WaterDash, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
   conn MarshPastOpher.MillView:
     moki: MarshSpawn.ToOpherBarrier
   conn MarshSpawn.PoolsPath:
@@ -371,7 +371,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
     kii, MarshSpawn.LifepactDoor:
       Bash OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
     unsafe, MarshSpawn.LifepactDoor:
-      Bow=1 OR Grenade=1 OR PauseFloat OR FlashSwap OR GrenadeJump # Bow and Grenade for cancelling vertical momentum
+      Bow=1 OR Grenade=1 OR PauseHover OR FlashSwap OR GrenadeJump # Bow and Grenade for cancelling vertical momentum
   pickup MarshSpawn.BurrowOre: 
     moki:
       Burrow, DoubleJump, Bash, Dash OR Glide OR Grenade=1
