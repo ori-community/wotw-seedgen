@@ -1,8 +1,6 @@
-use std::fmt;
-
 use num_enum::TryFromPrimitive;
 
-use crate::util::{Difficulty, Icon, auto_display};
+use crate::{util::{Difficulty, Icon}, auto_display};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
@@ -32,11 +30,7 @@ pub enum Skill {
     #[num_enum(alternatives = [121])]
     AncestralLight = 120,
 }
-impl fmt::Display for Skill {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", auto_display(self))
-    }
-}
+auto_display!(Skill);
 impl Skill {
     pub fn icon(self) -> Option<Icon> {
         match self {

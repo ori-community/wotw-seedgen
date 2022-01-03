@@ -1,6 +1,6 @@
 use rustc_hash::{FxHashSet, FxHashMap};
 
-use super::parser::{self, AreaTree, Metadata, Location, NamedState};
+use super::{parser::{self, AreaTree, Location, NamedState}, tokenizer::Metadata};
 use crate::world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
@@ -154,21 +154,21 @@ fn build_or(mut ors: Vec<Requirement>) -> Requirement {
 }
 
 fn build_requirement_group<'a>(group: &parser::Group<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
-    let lines: Vec<Requirement> = group.lines.iter().map(|line| {
+    let lines = group.lines.iter().map(|line| {
         let mut parts = vec![];
         if !line.ands.is_empty() {
-            let ands: Vec<Requirement> = line.ands.iter().map(|and| build_requirement(and, region, context)).collect();
+            let ands = line.ands.iter().map(|and| build_requirement(and, region, context)).collect::<Vec<_>>();
             parts.push(build_and(ands));
         }
         if !line.ors.is_empty() {
-            let ors: Vec<Requirement> = line.ors.iter().map(|or| build_requirement(or, region, context)).collect();
+            let ors = line.ors.iter().map(|or| build_requirement(or, region, context)).collect::<Vec<_>>();
             parts.push(build_or(ors));
         }
         if let Some(subgroup) = &line.group {
             parts.push(build_requirement_group(subgroup, region, context));
         }
         build_and(parts)
-    }).collect();
+    }).collect::<Vec<_>>();
     build_or(lines)
 }
 
@@ -267,7 +267,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             region_requirement = Some(build_requirement_group(group, true, &mut context));
         }
 
-        let refills: Vec<graph::Refill> = anchor.refills.iter().map(|refill| {
+        let refills = anchor.refills.iter().map(|refill| {
             let mut requirement = Requirement::Free;
             if let Some(group) = &refill.requirements {
                 requirement = build_requirement_group(group, false, &mut context);
@@ -276,14 +276,11 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 name: refill.name,
                 requirement,
             }
-        }).collect();
+        }).collect::<Vec<_>>();
 
-        let mut connections = Vec::<graph::Connection>::with_capacity(anchor.connections.len());
+        let mut connections = Vec::with_capacity(anchor.connections.len());
         for connection in &anchor.connections {
-            let mut requirement = connection.requirements.as_ref().map_or(
-                Requirement::Free,
-                |group| build_requirement_group(group, false, &mut context)
-            );
+            let mut requirement = build_requirement_group(&connection.requirements, false, &mut context);
             if let Some(region_requirement) = &region_requirement {
                 requirement = build_and(vec![region_requirement.clone(), requirement]);
             }

@@ -155,14 +155,12 @@ mod tests {
     use util::*;
     use rustc_hash::FxHashSet;
 
-    use std::path::PathBuf;
-
     #[test]
     fn reach_check() {
         let mut settings = Settings::default();
         settings.difficulty = Difficulty::Gorlek;
 
-        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        let graph = &lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         let mut world = World::new(graph);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
@@ -177,7 +175,7 @@ mod tests {
             })
             .cloned().collect();
 
-        let locations = lexer::parser::parse_locations(&PathBuf::from("loc_data.csv"), false).unwrap();
+        let locations = lexer::parser::parse_locations("loc_data.csv").unwrap();
         let locations: FxHashSet<_> = locations.iter().map(|location| &location.uber_state).cloned().collect();
 
         if !(reached == locations) {
@@ -190,7 +188,7 @@ mod tests {
         let mut settings = Settings::default();
         settings.difficulty = Difficulty::Gorlek;
 
-        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        let graph = &lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         let mut world = World::new(graph);
 
         world.player.difficulty = Difficulty::Unsafe;

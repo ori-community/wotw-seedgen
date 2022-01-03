@@ -322,9 +322,9 @@ fn parse_goalmodes(names: &[String]) -> Result<Vec<GoalMode>, String> {
         goalmodes.sort_unstable_by_key(GoalMode::to_string);
 
         let mut key = goalmodes[0].to_string();
-        for index in 1..goalmodes.len() {
+        for goalmode in goalmodes.iter().skip(1) {
             let a = key;
-            key = goalmodes[index].to_string();
+            key = goalmode.to_string();
 
             if a == key {
                 return Err(format!("Duplicate goalmode {}", key));
@@ -624,7 +624,7 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
     let compiled = format!("{}{}", flag_line, header_block);
 
     path.set_extension("wotwr");
-    let path = util::create_file(&PathBuf::from(path.file_name().unwrap()), &compiled, "target", false)?;
+    let path = util::create_file(path.file_name().unwrap(), &compiled, "target", false)?;
     log::info!("Compiled to {}", path.display());
 
     Ok(())

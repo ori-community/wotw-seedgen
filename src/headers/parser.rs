@@ -1606,7 +1606,7 @@ mod tests {
         assert_eq!(parse_item("9|0"), Ok(Item::Water));
         assert_eq!(parse_item("9|-0"), Ok(Item::RemoveWater));
         assert_eq!(parse_item("11|0"), Ok(Item::BonusUpgrade(BonusUpgrade::RapidHammer)));
-        assert_eq!(parse_item("10|31"), Ok(Item::BonusItem(BonusItem::EnergyRegen)));
+        assert_eq!(parse_item("10|31"), Ok(Item::BonusItem(BonusItem::EnergyRegeneration)));
         assert!(parse_item("8|5|3|6").is_err());
         assert!(parse_item("8||||").is_err());
         assert!(parse_item("8|5|3|in|3").is_err());

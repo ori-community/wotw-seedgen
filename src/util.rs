@@ -71,9 +71,7 @@ impl fmt::Display for GoalMode {
 }
 
 #[inline]
-pub fn auto_display<D>(debug: D) -> String
-where D: fmt::Debug
-{
+pub fn auto_display<D: fmt::Debug>(debug: D) -> String {
     let mut debug = format!("{:?}", debug);
 
     let mut indices = Vec::new();
@@ -89,6 +87,17 @@ where D: fmt::Debug
     }
 
     debug
+}
+
+#[macro_export]
+macro_rules! auto_display {
+    ($type:ty) => {
+        impl std::fmt::Display for $type {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                write!(f, "{}", $crate::util::auto_display(self))
+            }
+        }
+    };
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
@@ -111,11 +120,7 @@ pub enum Zone {
     #[num_enum(default)]
     Void = 13,
 }
-impl fmt::Display for Zone {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", auto_display(self))
-    }
-}
+auto_display!(Zone);
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Icon {
@@ -233,9 +238,8 @@ impl fmt::Display for Position {
     }
 }
 
-fn in_folder<P>(file: &Path, folder: P) -> Result<Option<PathBuf>, String>
-where P: AsRef<Path>
-{
+fn in_folder<P1: AsRef<Path>, P2: AsRef<Path>>(file: P1, folder: P2) -> Result<Option<PathBuf>, String> {
+    let file = file.as_ref();
     let file_name = file.file_name().ok_or_else(|| format!("Invalid file path {}", file.display()))?;
     let file_location = file.parent().ok_or_else(|| format!("Invalid file path {}", file.display()))?;
 
@@ -252,18 +256,17 @@ where P: AsRef<Path>
     Ok(Some(in_folder))
 }
 
-pub fn read_file<P>(file: &Path, default_folder: P) -> Result<String, String>
-where P: AsRef<Path>
-{
-    in_folder(file, default_folder)?.map_or_else(
-        || fs::read_to_string(file).map_err(|err| format!("Failed to read file {}: {}", file.display(), err)),
+pub fn read_file<P1: AsRef<Path>, P2: AsRef<Path>>(file: P1, default_folder: P2) -> Result<String, String> {
+    in_folder(&file, default_folder)?.map_or_else(
+        || fs::read_to_string(&file).map_err(|err| format!("Failed to read file {}: {}", file.as_ref().display(), err)),
         |in_folder| fs::read_to_string(in_folder).or_else(|_| {
-            fs::read_to_string(file).map_err(|err| format!("Failed to read file {}: {}", file.display(), err))
+            fs::read_to_string(&file).map_err(|err| format!("Failed to read file {}: {}", file.as_ref().display(), err))
         })
     )
 }
 
-fn create_in_folder(file: &Path, contents: &str, create_new: bool) -> Result<PathBuf, io::Error> {
+fn create_in_folder<P: AsRef<Path>>(file: P, contents: &str, create_new: bool) -> Result<PathBuf, io::Error> {
+    let file = file.as_ref();
     let mut index = 0;
     loop {
         let mut filename = file.file_stem().unwrap().to_os_string();
@@ -289,17 +292,16 @@ fn create_in_folder(file: &Path, contents: &str, create_new: bool) -> Result<Pat
             }
     }
 }
-pub fn create_file<P>(file: &Path, contents: &str, default_folder: P, create_new: bool) -> Result<PathBuf, String>
-where P: AsRef<Path>
-{
-    in_folder(file, default_folder)?.map_or_else(
-        || create_in_folder(file, contents, create_new).map_err(|err| format!("Failed to create {}: {}", file.display(), err)),
+pub fn create_file<P1: AsRef<Path>, P2: AsRef<Path>>(file: P1, contents: &str, default_folder: P2, create_new: bool) -> Result<PathBuf, String> {
+    in_folder(&file, default_folder)?.map_or_else(
+        || create_in_folder(&file, contents, create_new).map_err(|err| format!("Failed to create {}: {}", file.as_ref().display(), err)),
         |in_folder| create_in_folder(&in_folder, contents, create_new).or_else(|_| {
-            create_in_folder(file, contents, create_new).map_err(|err| format!("Failed to create {}: {}", file.display(), err))
+            create_in_folder(&file, contents, create_new).map_err(|err| format!("Failed to create {}: {}", file.as_ref().display(), err))
         })
     )
 }
-pub fn create_folder(file: &Path) -> Result<PathBuf, io::Error> {
+pub fn create_folder<P: AsRef<Path>>(file: P) -> Result<PathBuf, io::Error> {
+    let file = file.as_ref();
     let mut index = 0;
     loop {
         let mut filename = file.file_stem().unwrap().to_os_string();
@@ -339,5 +341,5 @@ pub fn float_to_int(float: f32) -> Result<u16, String> {
     if float < u16::MIN.into() || float > u16::MAX.into() {
         return Err(format!("Failed to convert float to int: {}", float));
     }
-    return Ok(float as u16);
+    Ok(float as u16)
 }
