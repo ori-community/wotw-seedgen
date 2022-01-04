@@ -8566,7 +8566,7 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
       Bash, Grenade=1, Launch
       Launch, Sword OR Damage=15
     kii, Water:
-      Grapple, DoubleJump OR Dash OR Sword 
+      Grapple, DoubleJump OR Dash OR Sword
       Grapple, Glide, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15  # wall jump from the right wall and use your energy weapon to reah the left wall
       Grapple, Bash, Grenade=1, Glide
       Grapple, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
@@ -8634,6 +8634,7 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
     kii:
       Damage=120
       WaterDash, Damage=60
+  pickup PoolsApproach.MillPathHC:  # For dirty water paths, since going directly to there would cost less HP than going to the wheel first
 
   conn PoolsApproach.MillPathCheckpoint:
     moki, Damage=20:  # severe enemy spam
@@ -8642,24 +8643,35 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Combat=Crab+2xSmallSkeeto, Bash, Grenade=2, Grapple, Dash OR Glide  # clear the space to bashnade
       Combat=Crab+2xSmallSkeeto, DoubleJump, Grapple, Dash OR Glide
       Launch, DoubleJump OR Dash OR Bash OR Glide
-    gorlek:
-      Bash, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer
+    gorlek:  # @validator this should probably have more combat requirement
+      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       Grapple, DoubleJump OR SentryJump=1
       DoubleJump, TripleJump, Combat=CorruptSlug OR SentryJump=1  # climb the wall bellow the checkpoint
       Launch
+    kii:
+      Grapple, Sword OR Hammer
+      Combat=Crab+SmallSkeeto, Grapple, Dash
+      Combat=Crab+SmallSkeeto, Grapple, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Combat=Crab+SmallSkeeto, Grapple, Spear=1, Blaze=1  # More energy efficient than 2 spears
+      Combat=Crab+SmallSkeeto+CorruptSlug, Grapple, Damage=20, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # kill the first corrupted slime so you can climb the wall in order to have th grappable plant in range
+      Combat=Crab+SmallSkeeto, Grapple, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Sword  # Use Sword to kill everything. Pogo on the last corrupted slime.
+      Bash, Grenade=1 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # bash glide a grenade where the crab is or dboost in the spikes or use energy weapon to avoid the dboost (possible with just Bash but require some specific enemies positions)
     unsafe:
-      Dash, Grapple, Combat=Crab
-      DoubleJump, Hammer OR Sword
+      Bash
+      DoubleJump, Hammer
       DoubleJump, Glide, Combat=CorruptSlug  # kill the first CorruptSlug then wall jump to the left wall. Climbing that wall is a bit precise. Can make it easier with a glide jump, which means killing the second CorruptSlug
       Grenade=1, Grapple, Combat=Crab, Sword OR Hammer OR Glide OR Damage=20  # Grenade jump from
   conn PoolsApproach.RightOfWheel:
     moki: Water, Combat=SpinCrab OR DoubleJump OR Bash OR Launch  # bashing to break the wall on the way is much harder than just swimming at it and letting it happen, so didn't make Bash a requirement.
     gorlek: Water
-    kii:
-      Damage=320
-      WaterDash, Damage=200
+    # dboosts are with the wall still here
+    kii: WaterDash, Damage=200  # Possible with either vitality or resilience
     unsafe:
+      Damage=320  # With fully upgraded vitality and resilience, you'll survive
       Bash, Damage=260
+  conn MarshPastOpher.PoolsPathWest:  # For dirty water paths, since going directly to there would cost less HP than going to the wheel first
+  
 anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of the static wheel
   refill Checkpoint:
     moki: Water  # right below in the water
