@@ -8671,6 +8671,27 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Damage=320  # With fully upgraded vitality and resilience, you'll survive
       Bash, Damage=260
   conn MarshPastOpher.PoolsPathWest:  # For dirty water paths, since going directly to there would cost less HP than going to the wheel first
+    kii, BreakWall=20:
+      Damage=180:  # Take 9 dboosts in dirty water
+        Launch, Grapple OR DoubleJump OR Glide
+        Launch, Dash, Sword OR Hammer 
+      Damage=200:  # Take 9 dboosts in dirty water + one dboost in the spikes (180+20)
+        Launch
+      WaterDash, Damage=160:  # Take 8 dboost in dirty water
+        Launch, Grapple OR DoubleJump OR Glide
+        Grapple, Glide
+      WaterDash, Damage=180:  # Take 8 dboost in dirty water + one dboost in the spikes (160+20)
+        Launch
+        Grapple, DoubleJump OR Dash OR Sword OR Hammer  # with sword, land in the dirty water before the breakable wall then wdash+upslash. With hammer land in the spikes before the water and upslash+horizontal slashes
+        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer  # with glide, you need wjump off the right wall bellow the last chunk of spikesin order to reset your djump
+    unsafe, BreakWall=20:
+      Damage=180:
+        Launch
+        DoubleJump, Hammer, Grapple OR Glide
+      Damage=200:
+        DoubleJump, Hammer, Dash OR TripleJump
+      WaterDash, Damage=160:
+        Launch
   
 anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of the static wheel
   refill Checkpoint:
