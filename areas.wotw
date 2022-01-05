@@ -8607,6 +8607,15 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
 
 anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three paths merge
   refill Checkpoint
+  
+  state PoolsApproach.UnderwaterWallBroken:
+    moki: Water  # bashing to break the wall on the way is much harder than just swimming at it and letting it happen, so didn't make Bash a requirement.
+    kii:  # need enough health in order to exit the water so you can tp out 
+      Damage=180
+      WaterDash, Damage=160
+    unsafe:
+      Bash, Damage=160
+      WaterDash, Bash, Damage=140
 
   pickup PoolsApproach.MillPathEX:
     moki:
@@ -8634,7 +8643,37 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
     kii:
       Damage=120
       WaterDash, Damage=60
-  pickup PoolsApproach.MillPathHC:  # For dirty water paths, since going directly to there would cost less HP than going to the wheel first
+  pickup PoolsApproach.MillPathHC:  # For dirty water paths. Paths using clean water originate from PoolsApproach.RightOfWheel
+    kii, PoolsApproach.UnderwaterWallBroken:
+      Launch, Damage=120, Damage=80, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=5 OR Sentry=3  # Take 6 dboost in dirty water, Regen at the breakable wall then 4 dboost in water to reach the pickup
+      Launch, Damage=140, Damage=80  # Take 6 dboosts in dirty water + one dboost in the spikes (120+20) Regen at the breakable wall then 4 dboost in water to reach the pickup
+      WaterDash, Damage=60, Damage=60:  # Take 3 dboost in dirty water, regen near the breakable wall then 2 dboost in the water+1 in the spike to reach the pickup
+        Launch, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=5 OR Sentry=3
+        Grapple, Glide OR DoubleJump OR Sword  # With Sword, grab the plant a second time
+        Grapple, Dash, Hammer OR Blaze=3 OR Sentry=2
+        Grapple, Hammer, Sentry=2
+      WaterDash, Damage=80, Damage=60:  # Take 3 dboost in dirty water + one dboost in the spikes (60+20)
+        Launch
+        Grapple, Dash OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2 # with sword/flash, land in the dirty water before the breakable wall instead of the spikes
+        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # with glide/energy weapons, you need wjump off the right wall bellow the last chunk of spikesin order to reset your djump
+      WaterDash, Damage=100, Damage=60:  # 3 dboost in dirty water + 2 dboost in spikes
+        DoubleJump
+        Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # jumping in the water can be easier than taking a second dboost in the spikes
+        Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Sword, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=120, Damage=60, Grapple OR Dash OR Glide OR Sword OR Hammer  # 3 dboost in dirty water + 3 dboost in spikes
+    unsafe, PoolsApproach.UnderwaterWallBroken:
+      Damage=120, Damage=80:
+        Launch
+        DoubleJump, Hammer, Grapple OR Glide
+      Damage=140, Damage=80:
+        DoubleJump, Hammer, Dash OR TripleJump
+      WaterDash, Damage=60, Damage=60:
+        Launch
+        Grapple, Sentry=3  # Nedd to grapple the plant multiple time so you get a better angle
+      WaterDash, Damage=80, Damage=60, Grapple, Blaze=3
+      WaterDash, Damage=100, Damage=60, Sword OR Blaze=1
+      Bash, Damage=200, Damage=100, Grapple, DoubleJump
 
   conn PoolsApproach.MillPathCheckpoint:
     moki, Damage=20:  # severe enemy spam
@@ -8663,39 +8702,52 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       DoubleJump, Glide, Combat=CorruptSlug  # kill the first CorruptSlug then wall jump to the left wall. Climbing that wall is a bit precise. Can make it easier with a glide jump, which means killing the second CorruptSlug
       Grenade=1, Grapple, Combat=Crab, Sword OR Hammer OR Glide OR Damage=20  # Grenade jump from
   conn PoolsApproach.RightOfWheel:
-    moki: Water, Combat=SpinCrab OR DoubleJump OR Bash OR Launch  # bashing to break the wall on the way is much harder than just swimming at it and letting it happen, so didn't make Bash a requirement.
-    gorlek: Water
-    # dboosts are with the wall still here
-    kii: WaterDash, Damage=200  # Possible with either vitality or resilience
-    unsafe:
-      Damage=320  # With fully upgraded vitality and resilience, you'll survive
-      Bash, Damage=260
-  conn MarshPastOpher.PoolsPathWest:  # For dirty water paths, since going directly to there would cost less HP than going to the wheel first
-    kii, BreakWall=20:
-      Damage=180:  # Take 9 dboosts in dirty water
-        Launch, Grapple OR DoubleJump OR Glide
-        Launch, Dash, Sword OR Hammer 
-      Damage=200:  # Take 9 dboosts in dirty water + one dboost in the spikes (180+20)
+    moki, PoolsApproach.UnderwaterWallBroken: Water, Combat=SpinCrab OR DoubleJump OR Bash OR Launch
+    gorlek, PoolsApproach.UnderwaterWallBroken: Water
+    kii, PoolsApproach.UnderwaterWallBroken: WaterDash, Damage=100
+    unsafe, PoolsApproach.UnderwaterWallBroken:
+      Damage=240  # Require more health than possible in kii. Possible by upgrading resilience and vitality.
+      Bash, Damage=200
+  conn MarshPastOpher.PoolsPathWest:  # For dirty water paths. Paths using clean water originate from PoolsApproach.RightOfWheel
+    kii, PoolsApproach.UnderwaterWallBroken, BreakWall=20:
+      Launch, Damage=120, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=5 OR Sentry=3  # Take 6 dboost in dirty water
+      Launch, Damage=140  # Take 6 dboosts in dirty water + one dboost in the spikes (120+20)
+      WaterDash, Damage=60:  # Take 3 dboost in dirty water
+        Launch, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=5 OR Sentry=3
+        Grapple, Glide OR DoubleJump OR Sword  # With Sword, grab the plant a second time
+        Grapple, Dash, Hammer OR Blaze=3 OR Sentry=2
+        Grapple, Hammer, Sentry=2
+      WaterDash, Damage=80:  # Take 3 dboost in dirty water + one dboost in the spikes (60+20)
         Launch
-      WaterDash, Damage=160:  # Take 8 dboost in dirty water
-        Launch, Grapple OR DoubleJump OR Glide
-        Grapple, Glide
-      WaterDash, Damage=180:  # Take 8 dboost in dirty water + one dboost in the spikes (160+20)
-        Launch
-        Grapple, DoubleJump OR Dash OR Sword OR Hammer  # with sword, land in the dirty water before the breakable wall then wdash+upslash. With hammer land in the spikes before the water and upslash+horizontal slashes
-        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer  # with glide, you need wjump off the right wall bellow the last chunk of spikesin order to reset your djump
-    unsafe, BreakWall=20:
-      Damage=180:
+        Grapple, Dash OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2 # with sword/flash, land in the dirty water before the breakable wall instead of the spikes
+        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # with glide/energy weapons, you need wjump off the right wall bellow the last chunk of spikesin order to reset your djump
+      WaterDash, Damage=100:  # 3 dboost in dirty water + 2 dboost in spikes
+        DoubleJump
+        Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # jumping in the water can be easier than taking a second dboost in the spikes
+        Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Sword, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=120, Grapple OR Dash OR Glide OR Sword OR Hammer  # 3 dboost in dirty water + 3 dboost in spikes
+    unsafe, PoolsApproach.UnderwaterWallBroken, BreakWall=20:
+      Damage=120:
         Launch
         DoubleJump, Hammer, Grapple OR Glide
-      Damage=200:
+      Damage=140:
         DoubleJump, Hammer, Dash OR TripleJump
-      WaterDash, Damage=160:
+      WaterDash, Damage=60:
         Launch
+        Grapple, Sentry=3  # Nedd to grapple the plant multiple time so you get a better angle
+      WaterDash, Damage=80, Grapple, Blaze=3
+      WaterDash, Damage=100, Sword OR Blaze=1
+      Bash, Damage=200, Grapple, DoubleJump
   
 anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of the static wheel
   refill Checkpoint:
     moki: Water  # right below in the water
+    
+  state PoolsApproach.UnderwaterWallBroken:
+    moki: Water, Bash
+    kii: Water, Spear=1
+    unsafe: Water, Grenade=1  # grenade redirect
 
   pickup PoolsApproach.AboveWheelEX:  # grenadebashes here don't work as well when the wheel spins
     moki:
@@ -8730,8 +8782,8 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Water, DoubleJump, Hammer, Damage=20, Dash OR TripleJump  # Hammer jumps
       Water, DoubleJump, Hammer, Grapple OR Glide  # Hammer jumps
   pickup PoolsApproach.MillPathEC:
-    moki: Water, Bash, Damage=10
-    gorlek: Water, Bash
+    moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
+    gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash
 
   conn MarshPastOpher.PoolsPathWest:
     moki, BreakWall=20:
@@ -8784,11 +8836,11 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       PoolsApproach.WheelFreed, Bash, Grenade=1, Dash, DoubleJump, TripleJump OR Sword OR Hammer
       DoubleJump, Sword  # please don't put this in a supported difficulty thank you
   conn PoolsApproach.MillPath:
-    moki:
+    moki, PoolsApproach.UnderwaterWallBroken:
       Water, Bash, Damage=10, Grapple, DoubleJump, Dash OR Glide
       Water, Bash, WaterDash
       Water, Bash, Damage=10, Launch
-    gorlek: Water, Bash  # Bash the projectile and use it to bash the crab thing to reach the connection
+    gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash  # Bash the projectile and use it to bash the crab thing to reach the connection
 
 anchor PoolsApproach.LeftOfWheel at -995, -4184:  # The leftmost platform of the static wheel
   state PoolsApproach.WheelFreed:
