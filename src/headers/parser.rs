@@ -916,20 +916,23 @@ fn add_command(mut item: &str, world: &mut World) -> Result<(), String> {
     Ok(())
 }
 #[inline]
-fn remove_command(mut item: &str, world: &mut World, negative_inventory: &mut Inventory) -> Result<(), String> {
-    let count = parse_count(&mut item);
-    let mut item = parse_item(item)?;
-
-    log::trace!("removing {}{} from the item pool", if count == 1 { String::new() } else { format!("{}x ", count) }, item);
-
-    let negative = world.pool.remove(&item, count);
+fn remove_from_pool(mut item: &Item, amount: u16, world: &mut World, negative_inventory: &mut Inventory) {
+    let negative = world.pool.remove(item, amount);
     if negative > 0 {
         if matches!(item, Item::SpiritLight(_)) {
-            item = Item::SpiritLight(1);
+            item = &Item::SpiritLight(1);
         }
 
-        negative_inventory.grant(item, negative);
+        negative_inventory.grant(item.clone(), negative);
     }
+}
+#[inline]
+fn remove_command(mut item: &str, world: &mut World, negative_inventory: &mut Inventory) -> Result<(), String> {
+    let count = parse_count(&mut item);
+    let item = parse_item(item)?;
+
+    log::trace!("removing {}{} from the item pool", if count == 1 { String::new() } else { format!("{}x ", count) }, item);
+    remove_from_pool(&item, count, world, negative_inventory);
 
     Ok(())
 }
@@ -1259,7 +1262,7 @@ where R: Rng + ?Sized
                     }
                 }
 
-                world.pool.remove(&item, 1);
+                remove_from_pool(&item, 1, world, &mut context.negative_inventory);
 
                 world.preplace(uber_state, item);
             }
