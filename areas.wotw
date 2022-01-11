@@ -8788,7 +8788,7 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Launch, Dash, Sword OR Hammer OR Damage=20
       Launch, Damage=20, WaterDash OR Bash
     kii:  # OK look I'm sorry, I probably hate this connection as much as you do
-      Water, Launch, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=5 OR Sentry=3 OR Damage=20
+      Water, Launch, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2 OR Damage=20
       Water, WaterDash:
         Grapple, Dash OR Damage=40  # Dash is the only skill which cancel WaterDash, making avoiding the muncher possible even on keyboard swimming
         Damage=20, Grapple, Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost in the muncher bellow the pickup. Possible to avoid the dboost but it's hard on keyboard swimming.
@@ -8801,6 +8801,8 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
         Damage=40, Damage=20, Sword OR Hammer  # @validator Not sure if sword should be Damage=60 or not because you need to know how to reset your upslash underwater in order to reach the breakable wall where you can regen
         Damage=60, Glide  # 2 dboost in spikes + 1 in munchers
         Damage=100
+        Damage=80, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # same as above but avoid a dboost with one energy weapon
+        Damage=60, Shuriken=2 OR Sentry=3  # same as above but avoid even more dboosts. With sentry: dboost->1 sentry->dboost->2 sentris->water
       Water, Bash:
         Grapple, DoubleJump
         Damage=20, Grapple, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost in the muncher bellow the pickup
@@ -8813,6 +8815,8 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
         Damage=60, Dash
         Damage=60, Glide OR Sword OR Hammer
         Damage=100
+        Damage=80, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # same as above but avoid a dboost with one energy weapon
+        Damage=60, Shuriken=2 OR Sentry=3  # same as above but avoid even more dboosts. With sentry: dboost->1 sentry->dboost->2 sentris->water
       Damage=80, Damage=60, WaterDash:  # 4 dboosts before the spikes, regen near the breakable wall then 2 dboost in dirty water + 1 in the munchers
         Launch, Grapple OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Blaze=5 OR Sentry=3
         Grapple, Glide OR DoubleJump OR Sword  # With Sword, grab the plant a second time
@@ -8870,14 +8874,101 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Launch, DoubleJump OR Grapple OR Glide
       Launch, Dash, Sword OR Hammer OR Damage=20
       Launch, Damage=20, WaterDash OR Bash
+    kii, BreakWall=20:
+      Water, Launch, Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2 OR Damage=20
+      Water, WaterDash:
+        Grapple, Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+        Grapple, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
+        Damage=20, Grapple, Spear=1  # dboost in the spikes after grappling the plant then wdash+spear to reach to wall
+        Damage=20, Dash, Glide OR Sword OR Hammer OR Sentry=2
+        Damage=20, DoubleJump, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+        Damage=20, Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
+        Damage=40, Hammer, Glide OR Sword OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # @validator Not sure if this should be Damage=40/add more one more energy weapon or not because you need to know how to reset your upslash underwater in order to reach the breakable wall
+        Damage=40, Dash OR DoubleJump OR Sword
+        Damage=40, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # land in the water after 2 dboosts in spikes and use waterdash+energy weapon to reach the breakable wall
+        Damage=60, Hammer
+        Damage=100  # 4 dboost ion the spikes bellow the grappable plant then land in the water and another dboost next to the breakable wall
+        Damage=80, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # land in the water after 4 dboosts in spikes and use waterdash+energy weapon to reach the breakable wall
+        Damage=60, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # same as above but avoid a dboost with one energy weapon
+        Damage=60, Spear=1, Blaze=1  # Same as above but more energy efficient. Use Blaze to avoid a dboost and Spear to reach the wall.
+        Damage=40, Shuriken=3 OR Sentry=4  # same as above but avoid even more dboosts. With sentry: dboost->1 sentry->dboost->2 sentris->water->1 sentry        
+      Water, Bash:
+        Grapple, Glide
+        Grapple, Dash, Sword OR Hammer OR Blaze=3 OR Sentry=2 OR Damage=20
+        Grapple, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Grapple, Hammer, DoubleJump OR Damage=20
+        Damage=20, Grapple, Shuriken=2 OR Sentry=2  # dboost in the spikes before the water. Also works with flash but the cd make it weird
+        Damage=20, DoubleJump, Dash OR Glide OR Sword OR Hammer 
+        Damage=20, Hammer, Dash
+        Damage=40, DoubleJump
+        Damage=40, Dash, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+        Damage=40, Sword, Glide
+        Damage=40, Hammer, Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Damage=60, Grapple OR Dash OR Sword OR Hammer
+        Damage=80, Glide
+      Damage=80, WaterDash:  # 4 dboosts in dirty water
+        Launch, Grapple OR Glide
+        Launch, DoubleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 Or Flash=1 OR Sentry=1
+        Launch, Dash, Sword OR Hammer OR Blaze=4 OR Sentry=2
+        Launch, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Launch, Hammer, Sentry=2
+        Grapple, Glide
+        Grapple, DoubleJump, Dash OR Sword OR Hammer OR Blaze=3 OR Sentry=2
+        Grapple, Dash, Hammer OR Blaze=3 OR Sentry=2
+        Grapple, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Grapple, Hammer, Shuriken=1
+      Damage=100, WaterDash:  # Take 4 dboost in dirty water + one dboost in the spikes
+        Launch
+        Grapple, DoubleJump OR Dash OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2 # with sword/flash, land in the dirty water before the breakable wall instead of the spikes
+        DoubleJump, TripleJump OR Dash OR Hammer
+        DoubleJump, Glide, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
+        DoubleJump, Sword, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=120, WaterDash:  # 4 dboost in dirty water + 2 dboost in spikes
+        DoubleJump
+        Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # jumping in the water can be easier than taking a second dboost in the spikes
+        Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+        Sword, Glide OR Hammer OR Shuriken=1
+      Damage=140, WaterDash, Grapple OR Dash OR Glide OR Sword OR Hammer  # 4 dboost in dirty water + 3 dboost in spikes
+      Damage=180, WaterDash
+      Damage=200, Bash:  # 10 dboost before the spikes, regen near the breakable wall then 8 dbosts in the water + 1 in the muncher. The muncher one is avoidable with some skills but since you are on a clock, it's better to acount for an extra dboost.
+        Grapple, Glide
+        Grapple, DoubleJump, Dash OR Sword OR Hammer OR Blaze=3 OR Sentry=2
+        Grapple, Dash, Hammer OR Blaze=3 OR Sentry=2
+        Grapple, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Grapple, Hammer, Shuriken=1
+      Damage=220, Bash:
+        Grapple, DoubleJump OR Dash OR Sword OR Hammer
+        DoubleJump, TripleJump OR Dash OR Hammer
+        DoubleJump, Glide, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
+        DoubleJump, Sword, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=160, Launch:
+        Grapple OR Glide # 8 in dirty water
+        Launch, DoubleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 Or Flash=1 OR Sentry=1
+        Launch, Dash, Sword OR Hammer OR Blaze=4 OR Sentry=2
+        Launch, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Launch, Hammer, Sentry=2
+      Damage=180, Launch  # same as above but take an additional dboost in the spieks to reach the breakable wall
     unsafe, BreakWall=20:
-      Water, WaterDash, DoubleJump, Damage=20, Glide OR Sword
-      Water, Bash, DoubleJump, Damage=20, Glide OR Sword
+      Water, WaterDash, Grapple, Hammer
+      Water, WaterDash, Hammer, Damage=20, Glide OR Sword OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  
+      Water, WaterDash, Sword, Glide, Damage=20
+      Water, Bash, Grapple, DoubleJump
+      Water, Bash, Grapple, Flash=2, Damage=20
+      Water, Bash, Dash, Damage=40
+      Water, Bash, Damage=100
+      Water, Launch  # reset launch with ceiling
+      Water, DoubleJump, Damage=20, WaterDash OR Bash
       Water, Grapple, WaterDash, Sword OR Hammer  # Need an upslash but you can't refill it anywhere near
       Water, Grapple, Bash, Sword OR Hammer  # Need an upslash but you can't refill it anywhere near
-      Water, Launch  # Launch boost on the ceiling
       Water, DoubleJump, Hammer, Damage=20, Dash OR TripleJump  # Hammer jumps
       Water, DoubleJump, Hammer, Grapple OR Glide  # Hammer jumps
+      Damage=60, WaterDash, Launch
+      Damage=80, WaterDash, DoubleJump, Glide OR Sword OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # walljump of the wall bellow the spikes at the end
+      Damage=100, WaterDash, Dash, Spear=1 OR Blaze=1
+      Damage=100, WaterDash, Sword, Flash=1 OR Sentry=1
+      Damage=160, Bash, Grapple, DoubleJump OR Sword
+      Damage=180, Bash, Grapple, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Damage=160, Launch
   conn PoolsApproach.LeftOfWheel:
     moki:
       PoolsApproach.WheelFreed OR DoubleJump OR Grapple OR Launch
