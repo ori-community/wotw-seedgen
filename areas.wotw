@@ -6921,7 +6921,7 @@ anchor LowerReach.ArenaArea at 44, -3992:  # To the left of the combat arena
 
   conn LowerReach.TrialStart:
     moki: LowerReach.ArenaBeaten
-  conn LowerReach.LowerWispPath:
+  conn LowerReach.WindSpinners:
     moki, LowerReach.ArenaBeaten: Glide
     gorlek, LowerReach.ArenaBeaten: Launch, DoubleJump OR Dash OR Damage=20
     kii, LowerReach.ArenaBeaten:
@@ -7648,7 +7648,7 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
   pickup UpperReach.SwimEX:
     moki: UpperReach.ThawFurnace, Water
 
-  conn UpperReach.UpperSoup:
+  conn UpperReach.UpperSoupThawed:
     moki, UpperReach.ThawFurnace:
       Grapple, DoubleJump
       Bash, Grenade=1, DoubleJump
@@ -10461,7 +10461,7 @@ anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
       Grapple, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: Burrow  # "daulphin jump" from the ground to reach the floating sand platform
       # Burrow, Glide OR Dash OR Grapple
-  conn LowerWastes.LeverArea:
+  conn LowerWastes.MuncherClimb:
     moki:
       Grapple, Launch
       Grapple, DoubleJump, Dash  # still sort of tight
