@@ -6364,6 +6364,9 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
   conn LowerReach.CentralEnemyPaths:
     moki: DoubleJump OR Dash OR Bash OR Glide OR Launch OR Hammer OR Spear=1
     gorlek: free
+  conn LowerReach.Teleporter:
+    moki: Grenade=1
+    gorlek: SentryBurn=1
   conn LowerReach.BelowTokk:
     moki:
       DoubleJump, Dash, Bash
@@ -10509,7 +10512,7 @@ anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the wa
     moki: Burrow
     kii: Launch, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: DoubleJump, TripleJump, Sword OR Hammer  # upslash from the ground
-      
+
 anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path connecting tree and east teleporter
   refill Checkpoint
   refill Energy=3:
