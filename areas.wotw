@@ -8621,7 +8621,8 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
     kii:
       Damage=120
       WaterDash, Damage=60
-  #There will probably be dirty water paths towards PoolsApproach.MillPathHC in future difficulty. Paths using clean water originate from PoolsApproach.RightOfWheel. Make sure it's not redundant with going to PoolsApproach.MillPathCheckpoint first
+  pickup PoolsApproach.MillPathHC:  # Paths using clean water originate from PoolsApproach.RightOfWheel. Make sure it's not redundant with going to PoolsApproach.MillPathCheckpoint first
+    kii: Damage=220, WaterDash
   
   conn PoolsApproach.MillPathCheckpoint:
     moki, Damage=20:  # severe enemy spam
@@ -8797,6 +8798,7 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       DoubleJump, Damage=200, TripleJump OR Dash
       DoubleJump, Sword, Hammer, Damage=200
     unsafe:
+      Water, BreakWall=20, Bash, Grenade=1, Dash, DoubleJump OR Glide OR Sword OR Hammer OR Damage=20
       Water, DoubleJump, Damage=40
       Water, Launch
   conn PoolsApproach.MillPath:  # dirty swims only. Clean water paths originate from RightOfWheel
@@ -8805,32 +8807,24 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
         Grapple, Glide OR Sword OR Hammer
         Launch, Glide OR DoubleJump OR Dash OR Sword
         Launch, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-      #Damage=60, Bash, Launch:
-      #  Glide OR DoubleJump OR Dash OR Sword
-      #  Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-      #Damage=70, Launch:
-      #  Glide OR DoubleJump OR Dash OR Sword
-      #  Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-      #Damage=80, Bash, Launch:
-      #Damage=90:
-      #  DoubleJump, TripleJump OR Dash
-      #  DoubleJump, Sword, Hammer
-      #Damage=130, DoubleJump OR Dash OR Hammer
-      #Damage=150, Sword
-      
-      
-    moki, PoolsApproach.UnderwaterWallBroken:
-      Water, Bash, Damage=10, Grapple, DoubleJump, Dash OR Glide
-      Water, Bash, WaterDash
-      Water, Bash, Damage=10, Launch
-    gorlek, PoolsApproach.UnderwaterWallBroken:
-      Water, Bash  # Bash the projectile and use it to bash the crab thing to reach the connection
-      Water, Damage=10, Launch
-      Water, WaterDash, Launch OR DoubleJump OR Combat=SpinCrab  # pass over the crab. No dboost because it can knock you back into the water
-    kii, PoolsApproach.UnderwaterWallBroken:
-      Damage=120, WaterDash, Launch OR DoubleJump OR Bash
-      Water, Grapple, Damage=10, Combat=SpinCrab, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
-      Water, Grapple, Damage=10, Combat=SpinCrab, Dash
+        Launch, Bash, Grenade=1
+      Damage=80, WaterDash:
+        Launch
+        DoubleJump, TripleJump OR Dash
+        DoubleJump, Sword, Hammer
+      Damage=120, Bash, Launch:
+        Grenade=1 OR Glide OR DoubleJump OR Dash OR Sword
+        Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=130, Launch:  # same as above but take a dboost on the tentacle
+        Glide OR DoubleJump OR Dash OR Sword
+        Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=140, Bash, Launch:
+       DoubleJump, TripleJump OR Dash
+       DoubleJump, Sword, Hammer
+      Damage=160, Bash, Grapple, Glide OR Sword OR Hammer
+      Damage=180, WaterDash, Bash, DoubleJump OR Dash OR Hammer
+      Damage=190, WaterDash, DoubleJump
+      Damage=200, WaterDash, Bash, Sword
 
 anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of the static wheel
   refill Checkpoint:
