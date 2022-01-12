@@ -1783,7 +1783,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       Combat=Skeeto+Slug, Bow=1, Glide OR Sword
       SentryJump=1
       DoubleJump, Combat=Slug OR Damage=10  # Jump to the left wall and wrap around to the top
-    kii:
+    kii, WestHollow.UpperDrainLeverPulled, WestHollow.RockPuzzleSolved:
       Bow=1, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump
       Sword  # Pogo the skeeto
