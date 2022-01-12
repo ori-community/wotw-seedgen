@@ -10065,7 +10065,7 @@ anchor LowerWastes.Shovel at 1634, -3981:  # On the ground to the left of the Sa
     gorlek: Glide
     kii: DoubleJump OR Dash
     unsafe: free
-  conn LowerWastes.TreeArea:
+  conn LowerWastes.SkeetoHive:
     moki: Burrow
   conn LowerWastes.MuncherTunnel: free
 
@@ -10387,7 +10387,7 @@ anchor LowerWastes.MuncherClimb at 1791, -3953:  # Checkpoint before the muncher
     unsafe:
       Hammer OR Spear=1
       LowerWastes.SandPlatformLever, Burrow  # Way harder on keyboard
-  conn LowerWastes.TreeArea:
+  conn LowerWastes.SkeetoHive:
     moki:
       Grapple, DoubleJump OR Launch
       Grapple, Dash, Glide  # This path is fun. Glide is just to make it moki-safe
@@ -10424,7 +10424,7 @@ anchor LowerWastes.LastStandArea at 1794, -3938:  # next to the projectile spawn
     gorlek: Sword OR Hammer
     kii: free
 
-anchor LowerWastes.TreeArea at 1715, -3936:  # The ledge right of SkeetoHive
+anchor LowerWastes.SkeetoHive at 1715, -3936:  # The ledge right of SkeetoHive on the way to the tree
   refill Checkpoint
 
   pickup LowerWastes.SkeetoHiveEX:
@@ -10505,6 +10505,11 @@ anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the wa
     unsafe, SpiritLight=150:
       DoubleJump, TripleJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1  # land on the wood structure on the left of the sand bag. Make the sand bag swing to reach the wood structure with just tjump.
 
+  conn LowerWastes.SkeetoHive:
+    moki: Burrow
+    kii: Launch, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: DoubleJump, TripleJump, Sword OR Hammer  # upslash from the ground
+      
 anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path connecting tree and east teleporter
   refill Checkpoint
   refill Energy=3:
@@ -10521,7 +10526,7 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
     kii: Burrow, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Shuriken=1  # extra ability so you don't have to do the wall jump on th hidden wall
     unsafe: Burrow  # precise maneuver
 
-  conn LowerWastes.TreeArea:
+  conn LowerWastes.SkeetoHive:
     moki: Burrow
   conn LowerWastes.EastTP:
     moki: Burrow
