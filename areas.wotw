@@ -4923,18 +4923,16 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
       Grapple, DoubleJump OR Dash
       Grapple, Bash, Grenade=1
       Launch
-    gorlek, InnerWellspring.SpinArena:
-      Grapple, Glide OR Sword OR Hammer
-      Water, DoubleJump OR Grapple OR SentryJump=1
-      Water, Bash, Grenade=1
-      Water, Damage=15, Dash OR Sword
+    gorlek, InnerWellspring.SpinArena: Grapple, Glide OR Sword OR Hammer
     kii, InnerWellspring.SpinArena:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Water, Dash OR Hammer OR Damage=30
+      Water, DoubleJump OR Grapple OR Dash OR Hammer OR Damage=30
+      Water, Bash, Grenade=1
+      Water, Damage=15, Sword
       DoubleJump, TripleJump
     unsafe, InnerWellspring.SpinArena:
       Grapple
-      Water, Spear=1 OR Damage=15
+      Water, Spear=1 OR SentryJump=1 OR Damage=15
 
   quest InnerWellspring.HandToHandHerbs:
     moki: GladesTown.HandToHandPouch
@@ -4976,8 +4974,51 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
 
 anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting the spin puzzle room
   refill Checkpoint
+  
+  state InnerWellspring.SpinPuzzleSolved:  # Having Water changes this room (not considered in moki)
+    kii, Water:  # Water is required because lasers are blocking your way if you pulled at least one lever and return to the anchor before solving the puzzle
+      Grapple OR Launch
+      DoubleJump OR Dash OR Hammer OR Damage=30
+      Bash, Grenade=1
+      Damage=15, Sword
+    unsafe:
+      Water, Spear=1 OR SentryJump=1 OR Damage=15
+      
+  pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
+    moki, InnerWellspring.SpinPuzzleSolved:
+      Launch OR DoubleJump OR Glide
+      Grapple, Dash
+    gorlek, InnerWellspring.SpinPuzzleSolved: Dash OR Damage=15
+    kii, InnerWellspring.SpinPuzzleSolved: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: InnerWellspring.SpinPuzzleSolved
+  pickup InnerWellspring.RotateRoomOre:  # blocked off until you fully solve the puzzle
+    moki, InnerWellspring.SpinPuzzleSolved:
+      Launch OR DoubleJump OR Glide
+      Grapple, Dash
+    gorlek, InnerWellspring.SpinPuzzleSolved: Dash OR Damage=15
+    kii, InnerWellspring.SpinPuzzleSolved: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: InnerWellspring.SpinPuzzleSolved
 
-  conn InnerWellspring.TopSecondRoom:
+  conn InnerWellspring.AboveSpinPuzzle:
+    moki:
+      Launch
+      Grapple, Combat=Miner, DoubleJump OR Dash OR Glide
+      Grapple, Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      Grapple, Combat=Miner OR Bash OR Damage=10
+      DoubleJump, TripleJump, Damage=15, Combat=Miner OR Bash  # dboost in the spikes at the first laser
+      DoubleJump, SentryJump=2  # use weapon to kill the Miner
+      SentryJump=3  # Use weapon to kill the Miner
+    kii: DoubleJump, Damage=15, Combat=Miner OR Bash OR Damage=10  # wjump of the right wall to grab the first wheel then dboost at the first laser
+    unsafe:  # You can bait the Miner to make them fall into spikes
+      DoubleJump OR Hammer OR Sentry=2
+      Sword, Sentry=1
+  # backwards connections is not relevant here because you need to solve InnerWellspring.SpinArena, which is impossible without already having a way to reach InnerWellspring.EastDoor
+
+anchor InnerWellspring.AboveSpinPuzzle at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
+  refill Checkpoint
+  
+  conn InnerWellspring.TopSecondRoom:  
     moki:
       Grapple, DoubleJump, Dash OR Glide
       Grapple, Dash, Glide
@@ -4993,11 +5034,18 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
       Launch, DoubleJump, Dash OR Glide OR Sword OR Hammer OR Sentry=3
       WaterDash, Launch, Water OR Damage=20
     unsafe:
-      Launch, Water OR Damage=20
-      Launch, DoubleJump, Shuriken=2
-  # backwards connections would be cool here someday
-
-# checkpoint at -1103, -3725
+      Launch  # https://youtu.be/wbz2cLfuFOk
+  conn InnerWellspring.PastSpinPuzzle:  # Camera doesn't show the lower wheel when you are on the top one, making it difficult to rely on them in lower difficulties 
+    moki:
+      Glide, Combat=Miner, Grapple OR DoubleJump OR Dash OR Water
+      Glide, Bash, Grapple OR DoubleJump OR Dash
+      Glide, Launch
+    gorlek:
+      Glide OR Launch 
+      Grapple, DoubleJump OR Dash OR Sword OR Damage=20
+    kii:
+      Grapple OR Damage=35  # Possible without any damage but this account for the worst case scenario of dbosting on both the laser and the spikes
+    unsafe: free
 
 anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption which oppen the third room
   state InnerWellspring.TopDoorOpen:
@@ -5008,6 +5056,26 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
 
   conn InnerWellspring.EastDoor:
     moki: InnerWellspring.TopDoorOpen
+  conn InnerWellspring.AboveSpinPuzzle:
+    moki: 
+      Glide, Combat=Miner, Grapple OR Launch OR DoubleJump OR Dash OR Water
+      Glide, Bash, Grapple OR Launch OR DoubleJump OR Dash OR Water
+      Launch, Water
+    gorlek:
+      Glide, Combat=Miner OR Bash OR Damage=10
+      Water, Combat=Miner, DoubleJump OR Dash OR Sword OR Hammer OR Damage=15
+      Water, Bash, DoubleJump OR Dash OR Sword OR Hammer OR Damage=15
+      Water, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
+      Grapple, Launch
+    kii:
+      Damage=75, Combat=Miner OR Bash
+      Damage=85
+      Water, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+        Combat=Miner OR Bash OR Damage=10
+      Damage=60, Combat=Miner, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=60, Bash, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=70, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
 
 anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
   refill Full
