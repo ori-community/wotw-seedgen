@@ -6,7 +6,7 @@ use std::{
     io::{self, Read},
     time::Instant,
     collections::HashMap,
-    process,
+    process, env,
 };
 
 use structopt::StructOpt;
@@ -511,18 +511,7 @@ fn create_preset(mut args: PresetArgs) -> Result<(), String> {
 }
 
 fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
-    let command = format!("reach-check {} --areas {} --locations {} --uber-states {} {} {} {} {} {} {}",
-        args.seed_file.display(),
-        args.areas.display(),
-        args.locations.display(),
-        args.uber_states.display(),
-        args.health,
-        args.energy,
-        args.keystones,
-        args.ore,
-        args.spirit_light,
-        args.items.join(" "),
-    );
+    let command = env::args().collect::<Vec<_>>().join(" ");
     log::trace!("{}", command);
 
     args.seed_file.set_extension("wotwr");
