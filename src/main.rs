@@ -14,14 +14,13 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, lexer, item, world, headers, settings, util};
+use seedgen::{self, item, world, settings, util, languages::{headers::{self, parser::HeaderContext}, self}};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
     World,
     graph::Graph,
 };
-use headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{Difficulty, Glitch, GoalMode, UberState};
 
@@ -450,7 +449,7 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), String> {
 
     let settings = parse_settings(args.settings)?.apply_presets()?;
 
-    let graph = lexer::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
+    let graph = languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let header = read_header();
@@ -518,7 +517,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let contents = util::read_file(&args.seed_file, "seeds")?;
 
     let settings = Settings::from_seed(&contents)?;
-    let graph = &lexer::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
+    let graph = &languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
     let mut world = World::new(graph);
 
     world.player.apply_settings(&settings);

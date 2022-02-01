@@ -1,10 +1,9 @@
-pub mod lexer;
+pub mod languages;
 pub mod world;
 pub mod inventory;
 pub mod item;
 pub mod settings;
 pub mod generator;
-pub mod headers;
 pub mod util;
 
 use std::collections::HashMap;
@@ -38,12 +37,14 @@ use world::{
     pool::Pool
 };
 use generator::Placement;
-use headers::parser::HeaderContext;
+use languages::headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{
     Difficulty, Position, Zone, UberState, Icon,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
+
+use crate::languages::headers;
 
 fn pick_spawn<'a, R>(graph: &'a Graph, settings: &Settings, rng: &mut R) -> Result<&'a Node, String>
 where
@@ -413,7 +414,7 @@ mod tests {
         initialize_log(Some("generator.log"), LevelFilter::Off, false).unwrap();
 
         let mut settings = Settings::default();
-        let mut graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        let mut graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
 
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
@@ -422,11 +423,11 @@ mod tests {
 
         settings.hard = false;
         settings.difficulty = Difficulty::Unsafe;
-        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
         settings.difficulty = Difficulty::Gorlek;
-        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         settings.presets = vec![PathBuf::from("gorlek")];
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
@@ -450,7 +451,7 @@ mod tests {
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
         settings = Settings::default();
-        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         settings.worlds = 5;
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
     }

@@ -13,7 +13,7 @@ mod shop_command;
 
 use std::fmt;
 
-use crate::headers;
+use crate::languages::headers;
 use crate::util::{Difficulty, Zone, Icon};
 
 pub use self::{

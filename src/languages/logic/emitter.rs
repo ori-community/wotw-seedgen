@@ -1,6 +1,6 @@
 use rustc_hash::{FxHashSet, FxHashMap};
 
-use super::{parser::{self, AreaTree, Location, NamedState}, tokenizer::Metadata};
+use super::{parser::{self, AreaTree}, tokenizer::Metadata, Location, NamedState};
 use crate::world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
