@@ -28,9 +28,11 @@ where
         format!("Error parsing areas.wotw: {}: {}", description, line)
     })?;
 
-    let locations = parser::parse_locations(&locations).map_err(|err| format!("Error parsing locations from {}: {}", locations.as_ref().display(), err))?;
+    let input = util::read_file(&locations, "logic")?;
+    let locations = parser::parse_locations(&input).map_err(|err| format!("Error parsing locations from {}: {}", locations.as_ref().display(), err))?;
 
-    let state_map = parser::parse_states(&states).map_err(|err| format!("Error parsing states from {}: {}", states.as_ref().display(), err))?;
+    let input = util::read_file(&states, "logic")?;
+    let state_map = parser::parse_states(&input).map_err(|err| format!("Error parsing states from {}: {}", states.as_ref().display(), err))?;
 
     emitter::emit(&areas, &metadata, &locations, &state_map, settings, validate).map_err(|err| format!("Error building the logic: {}", err))
 }

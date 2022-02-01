@@ -175,7 +175,8 @@ mod tests {
             })
             .cloned().collect();
 
-        let locations = lexer::parser::parse_locations("loc_data.csv").unwrap();
+        let input = util::read_file("loc_data.csv", "logic").unwrap();
+        let locations = lexer::parser::parse_locations(&input).unwrap();
         let locations: FxHashSet<_> = locations.iter().map(|location| &location.uber_state).cloned().collect();
 
         if !(reached == locations) {

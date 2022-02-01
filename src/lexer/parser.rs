@@ -1,5 +1,6 @@
-use std::path::Path;
+use std::convert::TryFrom;
 
+use decorum::R32;
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
 use smallvec::SmallVec;
@@ -8,6 +9,7 @@ use super::tokenizer::{Token, TokenType, Metadata};
 use crate::item::{Resource, Skill, Shard, Teleporter};
 use crate::util::{Difficulty, Glitch, RefillType, NodeType, Enemy, Position, UberState};
 
+#[derive(Debug)]
 pub struct ParseError {
     pub description: String,
     pub position: usize,
@@ -88,7 +90,7 @@ pub struct Connection<'a> {
 #[derive(Debug)]
 pub struct Anchor<'a> {
     pub identifier: &'a str,
-    pub position: Option<(i16, i16)>,
+    pub position: Option<Position>,
     pub can_spawn: bool,
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
@@ -457,13 +459,13 @@ fn parse_anchor<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a 
     let mut anchor_position = None;
     if token.name == TokenType::Position {
         let mut coords = token.value.split(',');
-        let x = coords.next().unwrap().trim().parse::<i16>().map_err(|_| not_int(token))?;
+        let x = coords.next().unwrap().trim().parse::<R32>().map_err(|_| not_int(token))?;
         let y = if let Some(y) = coords.next() {
-            y.trim().parse::<i16>().map_err(|_| not_int(token))?
+            y.trim().parse::<R32>().map_err(|_| not_int(token))?
         } else {
             return Err(not_int(token));
         };
-        anchor_position = Some((x, y));
+        anchor_position = Some(Position { x, y });
 
         if let Some(next) = tokens.get(*position) {
             *position += 1;
@@ -549,34 +551,36 @@ pub struct Location {
     pub position: Position,
 }
 #[derive(Debug, Deserialize)]
-struct LocationEntry {
-    name: String,
-    zone: String,
-    kind: String,
-    variant: String,
-    uber_group_name: String,
-    uber_group: String,
-    uber_id_name: String,
-    uber_id: String,
-    x: i16,
-    y: i16,
+struct LocationEntry<'a> {
+    name: &'a str,
+    zone: &'a str,
+    kind: &'a str,
+    variant: &'a str,
+    uber_group_name: &'a str,
+    uber_group: &'a str,
+    uber_id_name: &'a str,
+    uber_id: &'a str,
+    x: f32,
+    y: f32,
 }
 
-pub fn parse_locations<P: AsRef<Path>>(path: P) -> Result<Vec<Location>, String> {
+pub fn parse_locations(input: &str) -> Result<Vec<Location>, String> {
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(false)
         .trim(csv::Trim::All)
-        .from_path(&path)
-        .map_err(|err| err.to_string())?;
+        .from_reader(input.as_bytes());
 
     let mut locations = Vec::with_capacity(389);
 
-    for result in reader.deserialize() {
-        let record: LocationEntry = result.map_err(|err| err.to_string())?;
+    let mut record = csv::StringRecord::new();
+    while reader.read_record(&mut record).map_err(|err| err.to_string())? {
+        let record: LocationEntry = record.deserialize(None).map_err(|err| err.to_string())?;
 
-        let uber_state = UberState::from_parts(&record.uber_group, &record.uber_id)?;
-        let position = Position { x: record.x, y: record.y };
-        let location = Location { name: record.name, zone: record.zone, uber_state, position };
+        let uber_state = UberState::from_parts(record.uber_group, record.uber_id)?;
+        let x = R32::try_from(record.x).map_err(|err| format!("Invalid coordinate {}: {}", record.x, err))?;
+        let y = R32::try_from(record.y).map_err(|err| format!("Invalid coordinate {}: {}", record.y, err))?;
+        let position = Position { x, y };
+        let location = Location { name: record.name.to_owned(), zone: record.zone.to_owned(), uber_state, position };
 
         locations.push(location);
     }
@@ -596,12 +600,11 @@ struct StateEntry {
     uber_id: String,
 }
 
-pub fn parse_states<P: AsRef<Path>>(path: P) -> Result<Vec<NamedState>, String> {
+pub fn parse_states(input: &str) -> Result<Vec<NamedState>, String> {
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(false)
         .trim(csv::Trim::All)
-        .from_path(&path)
-        .map_err(|err| err.to_string())?;
+        .from_reader(input.as_bytes());
 
     let mut states = Vec::with_capacity(97);
 

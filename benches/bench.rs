@@ -19,16 +19,13 @@ fn parsing(c: &mut Criterion) {
     let (tokens, metadata) = tokenizer::tokenize(&input).unwrap();
 
     c.bench_function("parse areas", |b| b.iter(|| parser::parse_areas(tokens.clone(), &metadata)));
-    let areas = match parser::parse_areas(tokens, &metadata) {
-        Ok(areas) => areas,
-        _ => panic!(),
-    };
+    let areas = parser::parse_areas(tokens, &metadata).unwrap();
 
-    c.bench_function("parse locations", |b| b.iter(|| parser::parse_locations("loc_data.csv")));
-    let locations = parser::parse_locations("loc_data.csv").unwrap();
-
-    c.bench_function("parse states", |b| b.iter(|| parser::parse_states("state_data.csv")));
-    let states = parser::parse_states("state_data.csv").unwrap();
+    let input = read_file("loc_data.csv", "logic").unwrap();
+    c.bench_function("parse locations", |b| b.iter(|| parser::parse_locations(&input)));
+    let locations = parser::parse_locations(&input).unwrap();
+    let input = read_file("state_data.csv", "logic").unwrap();
+    let states = parser::parse_states(&input).unwrap();
 
     let mut settings = Settings::default();
     settings.difficulty = Difficulty::Unsafe;

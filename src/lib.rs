@@ -340,7 +340,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
         zone: Zone::Spawn,
         index: usize::MAX,
         uber_state: UberState::spawn(),
-        position: Position { x: 0, y: 0 },
+        position: Position::default(),
     });
 
     let (placements, spawn_locs) = generate_placements(graph, worlds, &settings, &spawn_pickup_node, &custom_items, &mut rng)?;

@@ -8,7 +8,7 @@ use crate::world::{
 use crate::item::Skill;
 use crate::settings::Settings;
 use crate::util::{
-    Difficulty, Glitch, Position, Zone,
+    Difficulty, Glitch, Zone,
 };
 
 struct EmitterContext<'a> {
@@ -240,7 +240,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
         }
 
         graph.push(Node::State(graph::State {
-            identifier: state.to_string(),
+            identifier: state.to_owned(),
             index,
             uber_state,
         }));
@@ -293,15 +293,9 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             });
         }
 
-        let position = if let Some((x, y)) = anchor.position {
-            Some(Position { x, y })
-        } else {
-            None
-        };
-
         graph.push(Node::Anchor(graph::Anchor {
-            identifier: anchor.identifier.to_string(),
-            position,
+            identifier: anchor.identifier.to_owned(),
+            position: anchor.position.clone(),
             can_spawn: anchor.can_spawn,
             index: graph.len(),
             refills,

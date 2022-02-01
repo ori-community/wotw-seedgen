@@ -4,6 +4,7 @@ use std::{
     str::FromStr, convert::TryFrom,
 };
 
+use decorum::R32;
 use rand::Rng;
 use regex::Regex;
 
@@ -16,7 +17,7 @@ use crate::{
     inventory::Inventory,
     item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary},
     settings::Settings,
-    util::{self, Zone, Icon, UberState, UberType, UberIdentifier},
+    util::{self, Zone, Icon, UberState, UberType, UberIdentifier, Position},
 };
 
 fn end_of_item<'a, I>(mut parts: I) -> Result<(), String>
@@ -101,7 +102,7 @@ where P: Iterator<Item=&'a str>
     let resource: u8 = resource.parse().map_err(|_| String::from("invalid resource type"))?;
     let resource = Resource::try_from(resource).map_err(|_| String::from("invalid resource type"))?;
     let amount = parts.next().ok_or_else(|| String::from("missing resource amount"))?;
-    let amount: i16 = amount.parse().map_err(|_| String::from("invalid resource type"))?;
+    let amount: i16 = amount.parse().map_err(|_| String::from("invalid resource amount"))?;
     end_of_item(parts)?;
     Ok(Item::Command(Command::Resource { resource, amount }))
 }
@@ -166,12 +167,14 @@ fn parse_warp<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let x = parts.next().ok_or_else(|| String::from("missing x coordinate"))?;
-    let x: i16 = x.parse().map_err(|_| String::from("invalid x coordinate"))?;
+    let x: R32 = x.parse().map_err(|_| String::from("invalid x coordinate"))?;
     let y = parts.next().ok_or_else(|| String::from("missing x coordinate"))?;
-    let y: i16 = y.parse().map_err(|_| String::from("invalid x coordinate"))?;
+    let y: R32 = y.parse().map_err(|_| String::from("invalid x coordinate"))?;
     end_of_item(parts)?;
 
-    Ok(Item::Command(Command::Warp { x, y }))
+    let position = Position { x, y };
+
+    Ok(Item::Command(Command::Warp { position }))
 }
 fn parse_timer<'a, P>(mut parts: P) -> Result<UberIdentifier, String>
 where P: Iterator<Item=&'a str>
@@ -305,12 +308,14 @@ where P: Iterator<Item=&'a str>
     let id = parts.next().ok_or_else(|| String::from("missing warp id"))?;
     let id: u8 = id.parse().map_err(|_| String::from("invalid warp id"))?;
     let x = parts.next().ok_or_else(|| String::from("missing x position"))?;
-    let x: i16 = x.parse().map_err(|_| String::from("invalid x position"))?;
+    let x: R32 = x.parse().map_err(|_| String::from("invalid x position"))?;
     let y = parts.next().ok_or_else(|| String::from("missing y position"))?;
-    let y: i16 = y.parse().map_err(|_| String::from("invalid y position"))?;
+    let y: R32 = y.parse().map_err(|_| String::from("invalid y position"))?;
     end_of_item(parts)?;
 
-    Ok(Item::Command(Command::CreateWarp { id, x, y }))
+    let position = Position { x, y };
+
+    Ok(Item::Command(Command::CreateWarp { id, position }))
 }
 fn parse_destroy_warp<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
@@ -325,17 +330,20 @@ fn parse_if_box<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let x1 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
-    let x1: i16 = x1.parse().map_err(|_| format!("invalid boundary coordinate {}", x1))?;
+    let x1: R32 = x1.parse().map_err(|_| format!("invalid boundary coordinate {}", x1))?;
     let y1 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
-    let y1: i16 = y1.parse().map_err(|_| format!("invalid boundary coordinate {}", y1))?;
+    let y1: R32 = y1.parse().map_err(|_| format!("invalid boundary coordinate {}", y1))?;
     let x2 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
-    let x2: i16 = x2.parse().map_err(|_| format!("invalid boundary coordinate {}", x2))?;
+    let x2: R32 = x2.parse().map_err(|_| format!("invalid boundary coordinate {}", x2))?;
     let y2 = parts.next().ok_or_else(|| String::from("missing boundary coordinates"))?;
-    let y2: i16 = y2.parse().map_err(|_| format!("invalid boundary coordinate {}", y2))?;
+    let y2: R32 = y2.parse().map_err(|_| format!("invalid boundary coordinate {}", y2))?;
 
     let item = Box::new(parse_item_parts(parts)?);
 
-    Ok(Item::Command(Command::IfBox { x1, y1, x2, y2, item }))
+    let position1 = Position { x: x1, y: y1 };
+    let position2 = Position { x: x2, y: y2 };
+
+    Ok(Item::Command(Command::IfBox { position1, position2, item }))
 }
 fn parse_if_self<'a, P>(mut parts: P) -> Result<(String, Box<Item>), String>
 where P: Iterator<Item=&'a str>
@@ -500,7 +508,7 @@ where P: Iterator<Item=&'a str>
             UberType::Bool | UberType::Teleporter => { value.parse::<bool>().map_err(|_| format!("failed to parse {} as boolean", value))?; },
             UberType::Byte => { value.parse::<u8>().map_err(|_| format!("failed to parse {} as byte", value))?; },
             UberType::Int => { value.parse::<i32>().map_err(|_| format!("failed to parse {} as integer", value))?; },
-            UberType::Float => { value.parse::<f32>().map_err(|_| format!("failed to parse {} as floating point", value))?; },
+            UberType::Float => { value.parse::<R32>().map_err(|_| format!("failed to parse {} as floating point", value))?; },
         }
         Ok(())
     };
@@ -1004,7 +1012,7 @@ fn parameter_command(parameter: &str, parameters: &mut HashMap<String, String>, 
     match parameter_type {
         "bool" => { value.parse::<bool>().map_err(|_| format!("Invalid value {} for boolean {}", value, identifier))?; },
         "int" => { value.parse::<i64>().map_err(|_| format!("Invalid value {} for integer {}", value, identifier))?; },
-        "float" => { value.parse::<f32>().map_err(|_| format!("Invalid value {} for float {}", value, identifier))?; },
+        "float" => { value.parse::<R32>().map_err(|_| format!("Invalid value {} for float {}", value, identifier))?; },
         "string" => {},
         _ => return Err(format!("Invalid parameter type {}", parameter_type)),
     }
