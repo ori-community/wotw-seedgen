@@ -8335,11 +8335,11 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
     gorlek: EastPools.LowerWaterDrained, Water, Bash
     unsafe: EastPools.LowerWaterDrained, Water  # move a bit on the side when the torpedo is getting close to the wall
   pickup EastPools.FightRoomHC:
-    moki, EastPools.FightArenas, WaterDash:  # The HC only gets unlocked if you finish the alternate WaterDash arena; FightArenas doesn't have WaterDash as requirement included for reasons explained above, so it's needed here
+    moki, EastPools.LowerWaterDrained, EastPools.FightArenas, WaterDash:  # The HC only gets unlocked if you finish the alternate WaterDash arena; FightArenas doesn't have WaterDash as requirement included for reasons explained above, so it's needed here
       DoubleJump, Dash OR Grapple
       Bash, Grenade=1
       Launch
-    gorlek: EastPools.FightArenas, WaterDash, Water OR Damage=20  # WaterDash on the bubble
+    gorlek: EastPools.LowerWaterDrained, EastPools.FightArenas, WaterDash, Water OR Damage=20  # WaterDash on the bubble
   pickup EastPools.LupoEX:
     gorlek: Water, ShurikenBreak=20
   pickup EastPools.LupoMap:
@@ -8360,10 +8360,10 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
     unsafe:
       Bash, Grenade=1
       Grapple, Damage=40
-  conn EastPools.MissilePuzzle:  # EastPools.FightArenas also include breaking the purple ceiling before the fight arena
-    moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide
-    gorlek: EastPools.FightArenas, Sword OR Damage=20
-    unsafe: EastPools.FightArenas  # jump on the bubble to avoid a dboost in dirty water
+  conn EastPools.MissilePuzzle:
+    moki: EastPools.LowerWaterDrained, EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide
+    gorlek: EastPools.LowerWaterDrained, EastPools.FightArenas, Sword OR Damage=20
+    unsafe: EastPools.LowerWaterDrained, EastPools.FightArenas  # jump on the bubble to avoid a dboost in dirty water
   conn EastPools.LeverRoom:
     moki, EastPools.EntryLever:
       Combat=Crab, DoubleJump OR Dash OR Glide  # go above
