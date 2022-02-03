@@ -7271,9 +7271,11 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
     moki: DepthsLight, Combat=Spiderling OR DoubleJump OR Bash OR Launch
     gorlek: DepthsLight
   pickup UpperDepths.SwimEC:
-    moki: DepthsLight, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch
+    moki:
+      Flash=1, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch
+      UpperDepths.ForestsEyes, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch
     gorlek:
-      DepthsLight, Water
+      Water, UpperDepths.ForestsEyes OR Flash=1
       DepthsLight, ShurikenBreak=20, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30
 
   conn UpperDepths.FirstFirefly:
