@@ -7,6 +7,7 @@
 !!include rapid_smash_core
 !!include rapid_sword_core
 !!include rapid_spear_core
+//// How many Health Regen to shuffle in
 !!parameter healthRegen int:3
 //// How many Energy Regen to shuffle in
 !!parameter energyRegen int:3
