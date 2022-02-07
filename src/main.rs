@@ -414,9 +414,8 @@ fn write_seeds_to_files(seeds: &[String], spoilers: &[String], mut filename: Str
         if race {
             let spoiler = &spoilers[index];
 
-            let spoiler_filename = format!("{}.spoiler", file.with_extension("").file_name().unwrap().to_string_lossy());
+            let spoiler_filename = format!("{}.spoiler.wotwr", file.file_stem().unwrap().to_string_lossy());
             path.set_file_name(spoiler_filename);
-            path.set_extension("wotwr");
 
             let file = util::create_file(&path, spoiler, "", true)?;
             log::info!("Wrote spoiler for {} to {}", player, file.display());

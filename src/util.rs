@@ -280,8 +280,8 @@ fn create_in_folder<P: AsRef<Path>>(file: P, contents: &str, create_new: bool) -
         if index > 0 {
             filename.push(format!("_{}", index));
         }
-        let mut path = file.with_file_name(filename);
-        path.set_extension(file.extension().unwrap());
+        filename.push(format!(".{}", file.extension().unwrap().to_string_lossy()));
+        let path = file.with_file_name(filename);
 
         match fs::OpenOptions::new()
             .write(true)
