@@ -363,7 +363,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
 
     let spoiler_blocks = if settings.race {
         Some(placements.iter()
-            .map(|world_placements| format_placements(world_placements.clone(), &custom_items, true))
+            .map(|world_placements| format_placements(world_placements.clone(), &custom_items, false))
             .collect::<Vec<_>>())
     } else { None };
     let placement_blocks = placements.into_iter()
