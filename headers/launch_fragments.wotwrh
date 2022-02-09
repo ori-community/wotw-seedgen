@@ -1,6 +1,7 @@
 /// Launch Fragments
 ///
 /// Five Launch Fragments are scattered around the world. The third gives Launch.
+Flags: Launch Fragments
 !!include header_core
 //// How many Launch Fragments to shuffle in
 !!parameter count int:5

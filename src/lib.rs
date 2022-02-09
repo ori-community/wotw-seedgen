@@ -74,21 +74,21 @@ where
 }
 
 pub fn write_flags(settings: &Settings, mut flags: Vec<String>) -> String {
+    let mut settings_flags = Vec::new();
+
     for flag in settings.goalmodes.iter().map(|goal| format!("{}", goal)) {
-        flags.push(flag);
+        settings_flags.push(flag);
     }
 
-    if matches!(settings.spawn_loc, Spawn::Random | Spawn::FullyRandom) { flags.push(String::from("RandomSpawn")); }
+    if matches!(settings.spawn_loc, Spawn::Random | Spawn::FullyRandom) { settings_flags.push(String::from("RandomSpawn")); }
 
-    let flags = flags.join(", ");
+    settings_flags.append(&mut flags);
 
-    log::trace!("Derived Flags from Settings: {}", flags);
-
-    if flags.is_empty() {
-        return String::default();
+    if settings_flags.is_empty() {
+        String::default()
+    } else {
+        format!("Flags: {}\n", settings_flags.join(", "))
     }
-
-    format!("Flags: {}\n", flags)
 }
 
 #[derive(Debug, Default, Clone)]

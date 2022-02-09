@@ -2,6 +2,7 @@
 ///
 /// Skip all combat heavy parts. Shrine have their pickup floating above them before the fight
 /// all the arenas start as completed and all boss' combat phases are skipped
+Flags: No Combat
 
 //// Skip Combat Shrines
 !!parameter shrine bool:true
