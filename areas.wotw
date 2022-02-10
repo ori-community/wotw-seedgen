@@ -9205,8 +9205,11 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       DoubleJump, Damage=10, Sword OR Hammer  # tank the explosion damage from the slug
       Dash, Damage=20, Combat=CorruptSlug OR Bash
     unsafe:
-      Bash  # Bash the skeeto, bash the slime twice
+      Bash  # Bash the skeeto, bash the slime twice. Could be kii but the slime explode when you bash it if you touched it too soon ater the bash on the moskito
       SentryJump=1, DoubleJump  # wait for another bubble when on the right upper wall. Use weapon stall
+  state EastPools.BelowEntryLeverBubble:
+    moki: Hammer OR Spear=1
+    unsafe: Sword, Flap  # You'll love this, I swear https://youtu.be/i5HqEsRt5SI
   state EastPools.BelowTokkBubbleFree:
     moki: EastPools.EntryLever, Water, Bash
     gorlek: EastPools.EntryLever, Water, WaterDash
@@ -9239,11 +9242,10 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
-      Hammer, DoubleJump OR Dash OR Glide
-      Spear=1, DoubleJump OR Dash OR Glide
+      EastPools.BelowEntryLeverBubble, DoubleJump OR Dash OR Glide
       Launch
     gorlek:
-      Spear=1 OR Hammer
+      EastPools.BelowEntryLeverBubble
       Bash, DoubleJump, TripleJump
     unsafe:
       DoubleJump, TripleJump, Combat=CorruptSlug  # kill the slug on the left wall, tjump from this wall into the spikes under the pickup
