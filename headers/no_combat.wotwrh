@@ -10,7 +10,7 @@ Flags: No Combat
 !!parameter arena bool:true
 //// Skip Demi-Bosses (Howl, Beetle, Rockboss)
 !!parameter demiBoss bool:true
-//// Skip Bosses (More, Kwolok, Shriek)
+//// Skip Bosses (Mora, Kwolok, Shriek)
 !!parameter boss bool:true
 
 !!if shrine true
