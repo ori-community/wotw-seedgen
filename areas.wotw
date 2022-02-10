@@ -3671,6 +3671,8 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Grapple, Dash OR Sword
+      Bash, Glide  # bash the mantis upwards and buffer glide (over and over and over)
+      Bash, DoubleJump  # bash the mantis upwards and djump immediately after (over and over and over)
   pickup OuterWellspring.WheelEX:
     moki: OuterWellspring.EntranceDoorOpen
   pickup OuterWellspring.BasementEC:
@@ -3694,6 +3696,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
     unsafe, BreakWall=20:
       Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918247805364088832
       DoubleJump, TripleJump
+      FlashSwap
   pickup OuterWellspring.SwimEX:
     moki: Water
     unsafe:
@@ -5093,7 +5096,7 @@ anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
     kii:
       Dash, Hammer
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # double jump can solve it by itself but the branch you are jumping from can be a bit janky
-    unsafe: Dash OR DoubleJump
+    unsafe: Dash OR DoubleJump OR FlashSwap
 
   pickup InnerWellspring.LibraryEX: free
   pickup InnerWellspring.AboveTpEX:
@@ -5111,6 +5114,7 @@ anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
       DoubleJump, Hammer            # uses the wall to the left of tp
       Dash, Hammer                   # path from the right, tight combos to reach the platform
       Shuriken=2, DoubleJump OR Dash OR Glide
+      FlashSwap
   pickup InnerWellspring.SwimOre:
     moki: Water
     unsafe:  # Enemies aren't here if you don't have Clean Water
