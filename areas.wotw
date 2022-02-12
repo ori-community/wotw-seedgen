@@ -8495,7 +8495,7 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   conn EastPools.CentralRoom:
     moki: EastPools.CentralRoomPurpleWall, Water
   conn EastPools.WaterdashArena:
-    moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide
+    moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: EastPools.FightArenas
   conn EastPools.TPArea:
     moki: EastPools.LupoPurpleFloor, Water, BreakWall=20
