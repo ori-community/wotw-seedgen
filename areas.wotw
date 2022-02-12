@@ -8293,6 +8293,8 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
 anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   refill Checkpoint
+  refill Full:  # use the teleporter
+    moki: EastPools.LowerWaterDrained
 
   state EastPools.BelowTokkBubbleFree:
     moki: Water, Bash
@@ -8370,7 +8372,7 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
 anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining the water
   refill Full
 
-  state EastPools.LowerWaterDrained: free  # this is, uh... correct, I suppose xD
+  state EastPools.LowerWaterDrained: free  # the randomizer drains the water if you aquire the teleporter, and for non-teleporter connections this anchor is strictly locked behind already having the state
   state NonGladesTeleporter: free
   state EastPools.ArenaWall:
     moki: EastPools.LowerWaterDrained, Water, Bash
@@ -8427,7 +8429,7 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
       Bash, DoubleJump  # Bash the slime
       Bash, Grenade=1, WaterDash, Water OR Damage=20
 
-anchor EastPools.WaterdashArena at -1348, -4139:  # Chackpoint at the right of the pools arena
+anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of the pools arena
   refill Checkpoint
   
   # There are two Arenas here: you get one if you enter without WaterDash and another if you enter with it.
@@ -8490,9 +8492,11 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   pickup EastPools.SpiritTrial:
     moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
 
-  # connection to EastPools.WaterdashArena is pointless because you need to defeat the arena for that connection and you can only do this if you already have another access to EastPools.WaterdashArena
   conn EastPools.CentralRoom:
     moki: EastPools.CentralRoomPurpleWall, Water
+  conn EastPools.WaterdashArena:
+    moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide
+    gorlek: EastPools.FightArenas
   conn EastPools.TPArea:
     moki: EastPools.LupoPurpleFloor, Water, BreakWall=20
 
