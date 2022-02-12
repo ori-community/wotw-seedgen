@@ -8293,8 +8293,6 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
 anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   refill Checkpoint
-  refill Full:  # use the teleporter
-    moki: EastPools.LowerWaterDrained
 
   state EastPools.BelowTokkBubbleFree:
     moki: Water, Bash
@@ -8305,18 +8303,10 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   state EastPools.LowerWaterDrained:
     moki: Water, WaterBreath
     gorlek: Water
-    unsafe: DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20  # puzzle skip
-  # There are two Arenas here: you get one if you enter without WaterDash and another if you enter with it.
-  # This path is assuming the worse case of getting the strictly harder WaterDash arena, but doesn't list WaterDash explicitly because you don't need it unless you have it.
-  # And any other way would lock basically all of Pools behind WaterDash. So it makes sense, right?
-  # Also, for now this state includes breaking the purple wall before the arena because everything else would be dumb
-  state EastPools.FightArenas:
-    moki: EastPools.LowerWaterDrained, Regenerate, Damage=20, Water, WaterBreath, Combat=4xCrab+Tentacle+2xSkeeto, Bash
-    gorlek: EastPools.LowerWaterDrained, Regenerate, Damage=20, Water, Combat=4xCrab+Tentacle+2xSkeeto, Bash
-    unsafe: EastPools.LowerWaterDrained, Water, Combat=4xCrab+Tentacle+2xSkeeto, Launch OR Dash OR Damage=20  # Land on the left then jump under the purple wall to correct the torpedo angle. launch in order to avoid the blast damage
-  state EastPools.LupoPurpleFloor:
-    unsafe: Water, Bash, Dash, ShurikenBreak=20
-
+    unsafe:
+      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20  # puzzle skip. Need the different skills because even if you have to die and can survive the 20 damage at the start since you spawn with 30 health, thiese spieks deals 40 damage in hard
+      Bash, Grenade=1  # puzzle skip.
+  
   pickup EastPools.AboveDoorOre:
     moki:
       EastPools.BelowTokkBubbleFree, Grapple, Flap, DoubleJump OR Dash
@@ -8332,23 +8322,14 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
       Sword, Bash       # Hit slug with sword to hit it off the ceiling and then bash it
   pickup EastPools.LupoOre:
     moki: Water
-  pickup EastPools.UltraBashShard:
-    moki: EastPools.LowerWaterDrained, Water, WaterBreath, Bash
-    gorlek: EastPools.LowerWaterDrained, Water, Bash
-    unsafe: EastPools.LowerWaterDrained, Water  # move a bit on the side when the torpedo is getting close to the wall
-  pickup EastPools.FightRoomHC:
-    moki, EastPools.LowerWaterDrained, EastPools.FightArenas, WaterDash:  # The HC only gets unlocked if you finish the alternate WaterDash arena; FightArenas doesn't have WaterDash as requirement included for reasons explained above, so it's needed here
-      DoubleJump, Dash OR Grapple
-      Bash, Grenade=1
-      Launch
-    gorlek: EastPools.LowerWaterDrained, EastPools.FightArenas, WaterDash, Water OR Damage=20  # WaterDash on the bubble
   pickup EastPools.LupoEX:
     gorlek: Water, ShurikenBreak=20
   pickup EastPools.LupoMap:
     gorlek: SpiritLight=150, Water, ShurikenBreak=20
 
   # this Tokk disappears after Kwolok's death
-  # the teleporter is a logical dead end
+  conn EastPools.Teleporter:
+    moki: EastPools.LowerWaterDrained
   conn EastPools.FishingPool:
     moki:
       Grapple, DoubleJump OR Dash
@@ -8362,10 +8343,13 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
     unsafe:
       Bash, Grenade=1
       Grapple, Damage=40
-  conn EastPools.MissilePuzzle:
-    moki: EastPools.LowerWaterDrained, EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide
-    gorlek: EastPools.LowerWaterDrained, EastPools.FightArenas, Sword OR Damage=20
-    unsafe: EastPools.LowerWaterDrained, EastPools.FightArenas  # jump on the bubble to avoid a dboost in dirty water
+  conn EastPools.WaterdashArena:
+    moki, EastPools.ArenaWall:
+      Water
+      EastPools.LowerWaterDrained, DoubleJump OR Dash OR Glide OR Launch
+    gorlek, EastPools.ArenaWall:
+      EastPools.LowerWaterDrained, Sword OR Damage=20
+    unsafe, EastPools.ArenaWall: EastPools.LowerWaterDrained  # jump on the bubble to avoid a dboost in dirty water
   conn EastPools.LeverRoom:
     moki, EastPools.EntryLever:
       Combat=Crab, DoubleJump OR Dash OR Glide  # go above
@@ -8383,12 +8367,22 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
       Damage=20, Combat=Crab OR Bash OR Spear=1
       Grapple, Damage=10  # go below, get hit by the crab
 
-anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining the water - this is to specify the refill and randos behaviour of draining the water if you grab the tp pickup
+anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining the water
   refill Full
 
   state EastPools.LowerWaterDrained: free  # this is, uh... correct, I suppose xD
   state NonGladesTeleporter: free
-
+  state EastPools.ArenaWall:
+    moki: EastPools.LowerWaterDrained, Water, Bash
+    unsafe: EastPools.LowerWaterDrained, Water, Launch OR Dash OR Damage=20
+  state EastPools.LupoPurpleFloor:
+    unsafe, EastPools.LowerWaterDrained: Water, Bash, Dash, ShurikenBreak=20
+  
+  pickup EastPools.UltraBashShard:
+    moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
+    gorlek, EastPools.LowerWaterDrained: Water, Bash
+    unsafe, EastPools.LowerWaterDrained: Water  # move a bit on the side when the torpedo is getting close to the wall
+  
   conn Teleporters: free
   conn EastPools.TPArea: free
 
@@ -8433,6 +8427,34 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
       Bash, DoubleJump  # Bash the slime
       Bash, Grenade=1, WaterDash, Water OR Damage=20
 
+anchor EastPools.WaterdashArena at -1348, -4139:  # Chackpoint at the right of the pools arena
+  refill Checkpoint
+  
+  # There are two Arenas here: you get one if you enter without WaterDash and another if you enter with it.
+  # This path is assuming the worse case of getting the strictly harder WaterDash arena, but doesn't list WaterDash explicitly because you don't need it unless you have it.
+  # And any other way would lock basically all of Pools behind WaterDash. So it makes sense, right?
+  state EastPools.FightArenas:
+    moki: Regenerate, Damage=20, Water, WaterBreath, Combat=4xCrab+Tentacle+2xSkeeto, Bash
+    gorlek: Regenerate, Damage=20, Water, Combat=4xCrab+Tentacle+2xSkeeto, Bash
+    unsafe: Water, Combat=4xCrab+Tentacle+2xSkeeto, Launch OR Dash OR Damage=20  # Land on the left then jump under the purple wall to correct the torpedo angle. launch in order to avoid the blast damage
+  
+  pickup EastPools.FightRoomHC:  # The HC only gets unlocked if you finish the alternate WaterDash arena; FightArenas doesn't have WaterDash as requirement included for reasons explained above, so it's needed here
+    moki, EastPools.FightArenas, WaterDash:
+      DoubleJump, Dash OR Grapple
+      Bash, Grenade=1
+      Launch
+    gorlek, EastPools.FightArenas, WaterDash: Water OR Damage=20  # WaterDash on the bubble
+  
+  conn EastPools.TPArea:
+    moki, EastPools.ArenaWall:
+      Water
+      EastPools.LowerWaterDrained, DoubleJump OR Dash OR Launch OR Glide
+    gorlek, EastPools.ArenaWall: EastPools.LowerWaterDrained, Sword OR Hammer OR Damage=20
+  conn EastPools.MissilePuzzle:
+    moki, EastPools.FightArenas: Water OR DoubleJump OR Dash OR Glide OR Launch 
+    gorlek, EastPools.FightArenas: Sword OR Hammer OR Damage=20
+    unsafe: EastPools.FightArenas OR Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
+
 anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   refill Checkpoint
 
@@ -8468,6 +8490,7 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   pickup EastPools.SpiritTrial:
     moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
 
+  # connection to EastPools.WaterdashArena is pointless because you need to defeat the arena for that connection and you can only do this if you already have another access to EastPools.WaterdashArena
   conn EastPools.CentralRoom:
     moki: EastPools.CentralRoomPurpleWall, Water
   conn EastPools.TPArea:
