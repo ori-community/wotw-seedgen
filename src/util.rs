@@ -2,6 +2,7 @@ pub mod orbs;
 pub mod uber_state;
 pub mod constants;
 
+use decorum::R32;
 use num_enum::FromPrimitive;
 pub use uber_state::{UberState, UberIdentifier, UberType};
 
@@ -227,11 +228,17 @@ pub enum NodeType {
     Quest,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Hash, Clone)]
 pub struct Position {
-    pub x: i16,
-    pub y: i16,
+    pub x: R32,
+    pub y: R32,
 }
+impl Position {
+    pub fn code(&self) -> String {
+        format!("{}|{}", self.x, self.y)
+    }
+}
+
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}, {}", self.x, self.y)
@@ -273,8 +280,8 @@ fn create_in_folder<P: AsRef<Path>>(file: P, contents: &str, create_new: bool) -
         if index > 0 {
             filename.push(format!("_{}", index));
         }
-        let mut path = file.with_file_name(filename);
-        path.set_extension(file.extension().unwrap());
+        filename.push(format!(".{}", file.extension().unwrap().to_string_lossy()));
+        let path = file.with_file_name(filename);
 
         match fs::OpenOptions::new()
             .write(true)

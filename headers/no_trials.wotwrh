@@ -1,6 +1,7 @@
 /// No Trials
 ///
 /// Trials will give no rewards
+Flags: No Trials
 
 3|0|8|44964|45951|int|2  // Inkwater Marsh
 3|0|8|44964|25545|int|2  // Kwolok's Hollow

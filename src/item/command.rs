@@ -3,7 +3,7 @@ use std::fmt;
 use num_enum::TryFromPrimitive;
 
 use super::{Item, Resource};
-use crate::util::{UberIdentifier, UberState};
+use crate::util::{UberIdentifier, UberState, Position};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Command {
@@ -15,7 +15,7 @@ pub enum Command {
     StopGreater { uber_state: UberState },
     StopLess { uber_state: UberState },
     Toggle { target: ToggleCommand, on: bool },
-    Warp { x: i16, y: i16 },
+    Warp { position: Position },
     StartTimer { identifier: UberIdentifier },
     StopTimer { identifier: UberIdentifier },
     StateRedirect { intercept: i32, set: i32 },
@@ -29,9 +29,9 @@ pub enum Command {
     IfLess { uber_state: UberState, item: Box<Item> },
     DisableSync { uber_state: UberState },
     EnableSync { uber_state: UberState },
-    CreateWarp { id: u8, x: i16, y: i16 },
+    CreateWarp { id: u8, position: Position },
     DestroyWarp { id: u8 },
-    IfBox { x1: i16, y1: i16, x2: i16, y2: i16, item: Box<Item> },
+    IfBox { position1: Position, position2: Position, item: Box<Item> },
     IfSelfEqual { value: String, item: Box<Item> },
     IfSelfGreater { value: String, item: Box<Item> },
     IfSelfLess { value: String, item: Box<Item> },
@@ -48,7 +48,7 @@ impl fmt::Display for Command {
             Command::StopGreater { uber_state } => write!(f, "5|{}|{}", uber_state.identifier, uber_state.value),
             Command::StopLess { uber_state } => write!(f, "6|{}|{}", uber_state.identifier, uber_state.value),
             Command::Toggle { target, on } => write!(f, "7|{}|{}", target, u8::from(*on)),
-            Command::Warp { x, y } => write!(f, "8|{}|{}", x, y),
+            Command::Warp { position } => write!(f, "8|{}", position.code()),
             Command::StartTimer { identifier } => write!(f, "9|{}", identifier),
             Command::StopTimer { identifier } => write!(f, "10|{}", identifier),
             Command::StateRedirect { intercept, set } => write!(f, "11|{}|{}", intercept, set),
@@ -62,9 +62,9 @@ impl fmt::Display for Command {
             Command::IfLess { uber_state, item } => write!(f, "19|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
             Command::DisableSync { uber_state } => write!(f, "20|{}", uber_state.identifier),
             Command::EnableSync { uber_state } => write!(f, "21|{}", uber_state.identifier),
-            Command::CreateWarp { id, x, y } => write!(f, "22|{}|{}|{}", id, x, y),
+            Command::CreateWarp { id, position } => write!(f, "22|{}|{}", id, position.code()),
             Command::DestroyWarp { id } => write!(f, "23|{}", id),
-            Command::IfBox { x1, y1, x2, y2, item } => write!(f, "24|{}|{}|{}|{}|{}", x1, y1, x2, y2, item.code()),
+            Command::IfBox { position1, position2, item } => write!(f, "24|{}|{}|{}", position1.code(), position2.code(), item.code()),
             Command::IfSelfEqual { value, item } => write!(f, "25|{}|{}", value, item.code()),
             Command::IfSelfGreater { value, item } => write!(f, "26|{}|{}", value, item.code()),
             Command::IfSelfLess { value, item } => write!(f, "27|{}|{}", value, item.code()),

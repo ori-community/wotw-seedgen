@@ -2,6 +2,7 @@
 ///
 /// prints updates on line completion; sets the "game complete" state once you have enough lines (3 by default)
 /// (remember to enable netcode in options when rolling the seed)
+Flags: Bingo
 !!include header_core
 //// How many lines you need to complete the game
 !!parameter lines int:3
