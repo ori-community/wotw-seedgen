@@ -1,14 +1,14 @@
 use rustc_hash::{FxHashSet, FxHashMap};
 
-use super::{parser::{self, AreaTree, Location, NamedState}, tokenizer::Metadata};
-use crate::{world::{
+use super::{parser::{self, AreaTree}, tokenizer::Metadata, Location, NamedState};
+use crate::world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
-}, util::NodeType};
+};
 use crate::item::Skill;
 use crate::settings::Settings;
 use crate::util::{
-    Difficulty, Glitch, Position, Zone,
+    Difficulty, Glitch, Zone,
 };
 
 struct EmitterContext<'a> {
@@ -240,7 +240,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
         }
 
         graph.push(Node::State(graph::State {
-            identifier: state.to_string(),
+            identifier: state.to_owned(),
             index,
             uber_state,
         }));
@@ -293,15 +293,9 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             });
         }
 
-        let position = if let Some((x, y)) = anchor.position {
-            Some(Position { x, y })
-        } else {
-            None
-        };
-
         graph.push(Node::Anchor(graph::Anchor {
-            identifier: anchor.identifier.to_string(),
-            position,
+            identifier: anchor.identifier.to_owned(),
+            position: anchor.position.clone(),
             can_spawn: anchor.can_spawn,
             index: graph.len(),
             refills,
@@ -316,9 +310,6 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 if connection.name != expected_type {
                     return Err(format!("Anchor {} connects to {:?} {} which is actually a {:?}", anchor.identifier, connection.name, connection.identifier, expected_type));
                 }
-            }
-            if !anchor.connections.iter().any(|connection| connection.name == NodeType::Anchor) && anchor.position.is_some() && anchor.can_spawn {
-                log::trace!("Anchor {} has no outgoing anchor connections, maybe mark it as nospawn?", anchor.identifier);
             }
         }
 

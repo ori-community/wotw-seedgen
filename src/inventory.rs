@@ -27,19 +27,19 @@ impl Inventory {
         }
     }
     pub fn remove(&mut self, item: &Item, amount: u16) -> u16 {
-        let mut remove = false;
-        let mut negative = 0;
-        self.items.entry(item.clone()).and_modify(|prior|
-            if amount >= *prior {
-                // remove zero and smaller entries to support randomly picking from the map's keys
-                remove = true;
-                negative = amount - *prior;
-            } else {
-                *prior -= amount;
-            }
-        );
-        if remove { self.items.remove(item); }
-        negative
+        match self.items.get_mut(item) {
+            Some(prior) => {
+                if amount >= *prior {
+                    let negative = amount - *prior;
+                    self.items.remove(item);
+                    negative
+                } else {
+                    *prior -= amount;
+                    0
+                }
+            },
+            None => amount,
+        }
     }
 
     pub fn has(&self, item: &Item, amount: u16) -> bool {

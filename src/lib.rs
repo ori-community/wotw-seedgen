@@ -1,10 +1,9 @@
-pub mod lexer;
+pub mod languages;
 pub mod world;
 pub mod inventory;
 pub mod item;
 pub mod settings;
 pub mod generator;
-pub mod headers;
 pub mod util;
 
 use std::collections::HashMap;
@@ -38,12 +37,14 @@ use world::{
     pool::Pool
 };
 use generator::Placement;
-use headers::parser::HeaderContext;
+use languages::headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{
     Difficulty, Position, Zone, UberState, Icon,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
+
+use crate::languages::headers;
 
 fn pick_spawn<'a, R>(graph: &'a Graph, settings: &Settings, rng: &mut R) -> Result<&'a Node, String>
 where
@@ -73,21 +74,21 @@ where
 }
 
 pub fn write_flags(settings: &Settings, mut flags: Vec<String>) -> String {
+    let mut settings_flags = Vec::new();
+
     for flag in settings.goalmodes.iter().map(|goal| format!("{}", goal)) {
-        flags.push(flag);
+        settings_flags.push(flag);
     }
 
-    if matches!(settings.spawn_loc, Spawn::Random | Spawn::FullyRandom) { flags.push(String::from("RandomSpawn")); }
+    if matches!(settings.spawn_loc, Spawn::Random | Spawn::FullyRandom) { settings_flags.push(String::from("RandomSpawn")); }
 
-    let flags = flags.join(", ");
+    settings_flags.append(&mut flags);
 
-    log::trace!("Derived Flags from Settings: {}", flags);
-
-    if flags.is_empty() {
-        return String::default();
+    if settings_flags.is_empty() {
+        String::default()
+    } else {
+        format!("Flags: {}\n", settings_flags.join(", "))
     }
-
-    format!("Flags: {}\n", flags)
 }
 
 #[derive(Debug, Default, Clone)]
@@ -340,7 +341,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
         zone: Zone::Spawn,
         index: usize::MAX,
         uber_state: UberState::spawn(),
-        position: Position { x: 0, y: 0 },
+        position: Position::default(),
     });
 
     let (placements, spawn_locs) = generate_placements(graph, worlds, &settings, &spawn_pickup_node, &custom_items, &mut rng)?;
@@ -362,7 +363,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings, inline_headers: &[String
 
     let spoiler_blocks = if settings.race {
         Some(placements.iter()
-            .map(|world_placements| format_placements(world_placements.clone(), &custom_items, true))
+            .map(|world_placements| format_placements(world_placements.clone(), &custom_items, false))
             .collect::<Vec<_>>())
     } else { None };
     let placement_blocks = placements.into_iter()
@@ -413,7 +414,7 @@ mod tests {
         initialize_log(Some("generator.log"), LevelFilter::Off, false).unwrap();
 
         let mut settings = Settings::default();
-        let mut graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        let mut graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
 
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
@@ -422,11 +423,11 @@ mod tests {
 
         settings.hard = false;
         settings.difficulty = Difficulty::Unsafe;
-        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
         settings.difficulty = Difficulty::Gorlek;
-        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         settings.presets = vec![PathBuf::from("gorlek")];
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
@@ -450,7 +451,7 @@ mod tests {
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
 
         settings = Settings::default();
-        graph = lexer::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         settings.worlds = 5;
         generate_seed(&graph, settings.clone(), &Vec::new(), None).unwrap();
     }
