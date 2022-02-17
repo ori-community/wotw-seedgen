@@ -956,7 +956,8 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     gorlek:
       Sword OR Hammer  # Horizontal slash combo
       BreakWall=20, Damage=10
-    unsafe: BreakWall=20, Sentry=1  # Use Sentry instead of DoubleJump
+    kii, BreakWall=20:
+       Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
   pickup MarshPastOpher.SpiritTrial:
     moki: MarshPastOpher.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: MarshPastOpher.TrialActivation, Dash, Grapple
@@ -964,7 +965,9 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
     gorlek, MarshSpawn.ToOpherBarrier:
       MarshSpawn.RainLifted, Bash  # jump the jumper
-      Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
+      Sword OR Hammer # Long jump, upslash and neutral slashes are enough with both weapons
+    kii, MarshSpawn.ToOpherBarrier:
+      Sentry=2 OR Shuriken=1 OR Blaze=3
 
   conn OpherShop: free
   conn MarshPastOpher.TrialArea:
@@ -977,12 +980,18 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     moki, MarshSpawn.ToOpherBarrier:
       DoubleJump OR Launch
       Bash, Grenade=1
-    gorlek: MarshSpawn.ToOpherBarrier, SentryJump=1
+    gorlek: 
+      MarshSpawn.ToOpherBarrier, SentryJump=1
+    kii, MarshSpawn.ToOpherBarrier:
+      Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer
   conn MarshSpawn.BrokenBridge:
     moki: MarshSpawn.ToOpherBarrier
   conn MarshPastOpher.PoolsPathEast:
     gorlek:
       Water, Bash, Launch  # the enemies appear once you have water
+    kii:
+      Launch, DoubleJump 
+      Launch, Bash, Bow=2 OR Spear=2 #bow and spear for breaking the blobs # long way around //to be moved to the bow approach anchor ori shy
     unsafe:
       Launch
       SentryJump=2  # first one maxheight
