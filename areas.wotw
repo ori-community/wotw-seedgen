@@ -9312,8 +9312,23 @@ anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by E
     unsafe:
       Sword, Bash, Hammer              # hammer upswing to get below slug, hit it off the ceiling with sword and then bash it (hammer kill the slime with both ancestral light in easy)
   
+  conn EastPools.BelowTokk:
+  conn EastPools.LeverRoom:  # gorlek/kii could dboost but since you need to wait for the bubble, it's beter to have a way to deal with the crab directly 
+    moki, EastPools.EntryLever: Combat=Crab OR Bash OR Launch OR EastPools.BelowEntryLeverBubble
+    unsafe: EastPools.EntryLever
+
+anchor EastPools.BelowTokk at -1278, -4158:  # at the checkpoint where you do puzzle skip, between Tokk and the slime
+  refill Checkpoint
+  
+  state EastPools.BelowTokkBubbleFree:
+  state EastPools.LowerWaterDrained:  # Puzzle skip
+    unsafe:
+      DoubleJump OR Dash OR Hammer OR Damage=20  # Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 is hard, which can kill you if you only have 30 HP
+      Bash, Grenade=1
+  
+  conn EastPools.BehindEntryDoor:
   conn EastPools.TPArea:
-    moki, EastPools.EntryLever:
+    moki:
       EastPools.BelowTokkBubbleFree, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
       EastPools.BelowTokkBubbleFree, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
       DoubleJump, Bash, Grenade=1  # bashgrenade above
@@ -9321,7 +9336,7 @@ anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by E
       Bash, Grenade=2, Dash OR Glide  # bashgrenade above
       Bash, Grenade=2, EastPools.BelowTokkBubbleFree OR Water  # bashgrenade below
       Launch
-    gorlek, EastPools.EntryLever:
+    gorlek:
       EastPools.BelowTokkBubbleFree, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
       EastPools.BelowTokkBubbleFree, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
       SentryJump=2, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
@@ -9330,16 +9345,13 @@ anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by E
       Bash, Grenade=2, Sword OR Hammer OR Damage=20
       Bash, Grenade=3
       Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
-    unsafe, EastPools.EntryLever:
+    unsafe:
       EastPools.BelowTokkBubbleFree, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
       Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
       DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
       Bash, Grenade=2
-  conn EastPools.LeverRoom:  # gorlek/kii could dboost but since you need to wait for the bubble, it's beter to have a way to deal with the crab directly 
-    moki, EastPools.EntryLever: Combat=Crab OR Bash OR Launch OR EastPools.BelowEntryLeverBubble
-    unsafe: EastPools.EntryLever
-
-# checkpoint at -1278, -4158
+  conn EastPools.Teleporter:  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can do puzzle skip again to activate the checkpoint on the teleporter
+    unsafe, EastPools.LowerWaterDrained: DoubleJump OR Dash OR Hammer OR Damage=20
 
 anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   refill Checkpoint
@@ -9355,9 +9367,7 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   state EastPools.LowerWaterDrained:
     moki: Water, WaterBreath
     gorlek: Water
-    unsafe:
-      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20  # puzzle skip. Need the different skills because even if you have to die and can survive the 20 damage at the start since you spawn with 30 health, thiese spieks deals 40 damage in hard
-      Bash, Grenade=1  # puzzle skip.
+    unsafe: Glide OR Sword # puzzle skip. Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 is hard, which can kill you if you only have 30 HP
   
   pickup EastPools.AboveDoorOre:
     moki:
