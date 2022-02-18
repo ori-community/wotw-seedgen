@@ -9206,41 +9206,49 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
       DoubleJump, Damage=10, Sword OR Hammer  # tank the explosion damage from the slug
       Dash, Damage=20, Combat=CorruptSlug OR Bash
+    kii:
+      Combat=CorruptSlug OR Bash OR Damage=10:  # with damage: touch the slime to start the explosion countdown then fall and wait for the explosion
+        Dash
+        DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Sword
+      Bash, Damage=20, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash  # Bash the skeeto, bash the slime twice. Could be kii but the slime explode when you bash it if you touched it too soon ater the bash on the moskito
-      SentryJump=1, DoubleJump  # wait for another bubble when on the right upper wall. Use weapon stall
+      Sword  # https://youtu.be/i5HqEsRt5SI
+      DoubleJump  #jump on the ledge above where the right slime is to avoid the combat requirement
+      #SentryJump=1, DoubleJump  # wait for another bubble when on the right upper wall. Use weapon stall
   state EastPools.BelowEntryLeverBubble:
     moki: Hammer OR Spear=1
     unsafe: Sword, Flap  # You'll love this, I swear https://youtu.be/i5HqEsRt5SI
-  state EastPools.BelowTokkBubbleFree:
-    moki: EastPools.EntryLever, Water, Bash
-    gorlek: EastPools.EntryLever, Water, WaterDash
-    unsafe, EastPools.EntryLever:
-      Water, Bow=1 OR Grenade=1
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
-
+  
   quest EastPools.KwolokAmuletQI: free
 
   pickup EastPools.TwoCrushersEX:
     moki: Water, WaterDash
+    kii, WaterDash, Damage=80
     unsafe:
       Water
-      WaterDash, Damage=60  # 80 is more likely
+      WaterDash, Damage=60
   pickup EastPools.RightOre:
     moki:
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, Dash OR Glide  # Need to flap from the green spot so the bubble don't go too far to the right
       Launch, Grapple
     gorlek:
+      Launch  # Jump on the bubble before using launch
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, TripleJump OR Sword OR Hammer OR Damage=20  # Need to flap from the green spot so the bubble don't go too far to the right
-      Launch, Flap  # Flap makes the bubbles spawn
-      Launch, Bash, Grenade=1
+    kii:
+      DoubleJump, Grapple, Flap, TripleJump OR Damage=30  # avoid the slime or one dboost in the spikes + one the the slime
+      DoubleJump, Grapple, Flap, Bash, Dash OR Glide OR Sword OR Hammer OR Damage=20  # @validator not sure why those aren't in gorlek
+      DoubleJump, Grapple, Flap, Damage=10, Dash OR Glide OR Sword OR Hammer
+      DoubleJump, Grapple, Flap, Combat=CorruptSlug, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Not adding the energy options to the bash/dboost variant because autoaim can screw you pretty hard because of the slime explosion
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=20  # can jump on the bubble but not mandatory
     unsafe:
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=20
-      Flap, Bash, Grenade=1, DoubleJump, Combat=CorruptSlug, TripleJump OR Sword OR Hammer  # Flap makes the bubble spawn. Use it to reach your grenade
-      Dash, Grapple, Flap  # Need to flap from the green spot so the bubble don't go too far to the right
-      Launch  # Turnaround Launch
+      Grapple, Flap, Dash OR DoubleJump  # precise jump from the right wall to barely reach the left wall without taking damage. Then wait for the slime to be in a position where you can avoid it
+      Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
   pickup EastPools.CurrentEX:
     moki: Water, WaterDash
+    kii, WaterDash, Damage=80
+    unsafe: WaterDash, Damage=60
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
@@ -9249,21 +9257,61 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     gorlek:
       EastPools.BelowEntryLeverBubble
       Bash, DoubleJump, TripleJump
+    kii: Bash  # Bait the skeeto, bash it when it's under the hole
     unsafe:
       DoubleJump, TripleJump, Combat=CorruptSlug  # kill the slug on the left wall, tjump from this wall into the spikes under the pickup
       SentryJump=1, DoubleJump OR Damage=20  # The tree is swinging a bit. sjump from the left (Ori should almost fall) when the tree is swinging to the left
-      Bash  # Bait the skeeto, bash it when it's under the hole
+
+  conn EastPools.BehindEntryDoor:
+    moki: EastPools.EntryLever
+  conn PoolsApproach.LeftOfWheel:  # make sure it's possible with the rotating wheel as well
+    moki:
+      Water
+      Bash, Grenade=1, Glide
+      Glide, Launch
+      DoubleJump, Dash, Launch
+      Bash, Grenade=1, Launch, DoubleJump OR Dash
+    gorlek:
+      DoubleJump, Damage=20, TripleJump OR Dash OR Sword
+      DoubleJump, TripleJump, Dash, Sword
+      Bash, Grenade=1, Launch
+      Bash, Grenade=1, Damage=20, Dash OR DoubleJump
+      Bash, Grenade=1, Dash, DoubleJump
+      Glide, DoubleJump OR Dash OR SentryJump=1 OR Damage=20
+      WaterDash, Damage=20, DoubleJump OR Dash OR Glide
+      Launch, DoubleJump OR Dash OR Damage=20
+      SentryJump=1, Damage=20, Dash, DoubleJump
+      SentryJump=1, Launch  # Use weapon to stall before and after the launch
+    kii:
+      Damage=100
+      WaterDash, Damage=40
+    unsafe:
+      Damage=60
+      Launch, Hammer, Sword  # climb the left wall
+
+anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by EastPools.EntryLever
+  refill Checkpoint
+  
+  state EastPools.BelowTokkBubbleFree:
+    moki: Water, Bash
+    gorlek: Water, WaterDash
+    unsafe:
+      Water, Bow=1 OR Grenade=1
+      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
+  state EastPools.BelowEntryLeverBubble:
+    moki, EastPools.EntryLever: Hammer OR Spear=1
+  
   pickup EastPools.AboveDoorOre:  # some paths that aren't redundant with the paths coming from Tokk
-    moki, EastPools.EntryLever:
+    moki:
       Bash, Grenade=2
       Bash, Grenade=1, DoubleJump OR Grapple
-    gorlek, EastPools.EntryLever:
+    gorlek:
       SentryJump=2, Damage=20  # damage if you sjump into the spikes
       Bash, Grenade=1, SentryJump=1
       SentryJump=1, DoubleJump OR Grapple
-    unsafe, EastPools.EntryLever:
-      Hammer, Bash              # using upswing to get below slug, hit it off the ceiling and then bash it
-
+    unsafe:
+      Sword, Bash, Hammer              # hammer upswing to get below slug, hit it off the ceiling with sword and then bash it (hammer kill the slime with both ancestral light in easy)
+  
   conn EastPools.TPArea:
     moki, EastPools.EntryLever:
       EastPools.BelowTokkBubbleFree, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
@@ -9287,26 +9335,9 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
       DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
       Bash, Grenade=2
-  conn PoolsApproach.LeftOfWheel:  # should be fair to assume that if the wheel is spinning, the player has Water
-    moki:
-      Water
-      Bash, Grenade=1, Glide
-      Glide, Launch
-      DoubleJump, Dash, Launch
-      Bash, Grenade=1, Launch, DoubleJump OR Dash
-    gorlek:  # Try with the spinning wheel if there is a damage boost that seems unnecessary
-      DoubleJump, Damage=20, TripleJump OR Dash OR Sword
-      DoubleJump, TripleJump, Dash, Sword
-      Bash, Grenade=1, Launch
-      Bash, Grenade=1, Damage=20, Dash OR DoubleJump
-      Bash, Grenade=1, Dash, DoubleJump
-      Glide, DoubleJump OR Dash OR SentryJump=1 OR Damage=20
-      WaterDash, Damage=20, DoubleJump OR Dash OR Glide
-      Launch, DoubleJump OR Dash OR Damage=20
-      SentryJump=1, Damage=20, Dash, DoubleJump
-      SentryJump=1, Launch  # Use weapon to stall before and after the launch
-    unsafe:
-      Launch, Hammer, Sword  # climb the left wall
+  conn EastPools.LeverRoom:  # gorlek/kii could dboost but since you need to wait for the bubble, it's beter to have a way to deal with the crab directly 
+    moki, EastPools.EntryLever: Combat=Crab OR Bash OR Launch OR EastPools.BelowEntryLeverBubble
+    unsafe: EastPools.EntryLever
 
 # checkpoint at -1278, -4158
 
