@@ -1019,7 +1019,13 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
     gorlek:
       DoubleJump
       Damage=10, Dash OR Glide OR Sword OR Hammer
+    kii:
+      Damage=10, Sentry=1 OR Shuriken=1 OR Flash=1 OR Blaze=1 
+      Glide, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 # upslash to avoid the spikes
+      Dash # doubledash from the pole
+      Sword # may be a little bit too precise
     unsafe:
+      Grenade=1, Bash # standing on a piece of wood on the edge of the spikes
       Sentry=1, Damage=10
       Damage=20
   pickup MarshPastOpher.TrialOre: free
@@ -1028,17 +1034,23 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
     gorlek:
       Sword  # Horizontal slashes
       Hammer, Damage=10
+    kii:
+      Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Damage=10, Spear=1 OR Blaze=1
+      Damage=20 #lenient option
     unsafe:
-      Hammer OR Sentry=1
       Grenade=1, Bash  # Throw Grenade up at the lower jumppad (right side and aim up ori facing right), use it and then bash
       Damage=10
   pickup MarshPastOpher.TrialHC:
     moki: Hammer OR Spear=1
-    unsafe: free  # lure stomp
+    kii: free #manits lure
   pickup MarshPastOpher.TrialRightEX:
     moki: DoubleJump OR Bash OR Launch  # bash uses the enemy
     gorlek: SentryJump=1
-    unsafe: Dash OR Sword OR Hammer OR Grenade=1  # Sword: pogo on enemy, Hammer: upswing to reach ledge
+    kii: 
+      Dash #normal coyote (may be too precise)
+      Sword #pogo on the enemy
+    unsafe: Dash OR Sword OR Hammer OR Grenade=1 OR Spear=1 # Sword: pogo on enemy, Hammer: upswing to reach ledge
 
   conn MarshShrine: free
   conn MarshPastOpher.BowPath:
@@ -1050,6 +1062,8 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
       Bash, Grenade=1
       Combat=Mantis+SneezeSlug, Sword OR Hammer
       Launch
+    kii, BreakWall=20:
+      Shuriken=3 OR Sentry=4 OR Blaze=6 #OMEGALUL
 
 anchor MarshShrine at -382, -4341:
   refill Full
