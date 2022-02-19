@@ -9227,7 +9227,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     moki: Water, WaterDash
     kii, WaterDash, Damage=80
     unsafe:
-      Water
+      Water OR Damage=200
       WaterDash, Damage=60
   pickup EastPools.RightOre:
     moki:
@@ -9248,7 +9248,9 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   pickup EastPools.CurrentEX:
     moki: Water, WaterDash
     kii, WaterDash, Damage=80
-    unsafe: WaterDash, Damage=60
+    unsafe:
+      Bash, Grenade=1, Water OR Damage=180
+      WaterDash, Damage=60
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
@@ -9293,64 +9295,97 @@ anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by E
   refill Checkpoint
   
   state EastPools.BelowTokkBubbleFree:
+    moki: Water, Bash OR WaterDash
+    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:
     moki: Water, Bash
-    gorlek: Water, WaterDash
-    unsafe:
-      Water, Bow=1 OR Grenade=1
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
+    kii: Water  # bait the torpedo into touching the wall
+    unsafe: Bash  # bash the corrupted slime to blow the wall
   state EastPools.BelowEntryLeverBubble:
     moki, EastPools.EntryLever: Hammer OR Spear=1
   
   pickup EastPools.AboveDoorOre:  # some paths that aren't redundant with the paths coming from Tokk
     moki:
+      Launch
       Bash, Grenade=2
       Bash, Grenade=1, DoubleJump OR Grapple
+      EastPools.BelowTokkBubbleFree, Grapple, Flap, DoubleJump OR Dash
     gorlek:
       SentryJump=2, Damage=20  # damage if you sjump into the spikes
-      Bash, Grenade=1, SentryJump=1
       SentryJump=1, DoubleJump OR Grapple
+      EastPools.BelowTokkBubbleFree, Grapple, Flap
     unsafe:
-      Sword, Bash, Hammer              # hammer upswing to get below slug, hit it off the ceiling with sword and then bash it (hammer kill the slime with both ancestral light in easy)
+      Sword, Bash, Hammer OR Grapple OR Dash  # hammer upswing + swod upswing + sword pogo to get below slime. With dash, either dash ramp if the door is opened or wall jump off the door. Hit the slime off the ceiling with sword and then bash it (hammer kill the slime with both ancestral light in easy).
+      DoubleJump, Bash  # Bash the slug when its at the right of the ceiling
   
   conn EastPools.BelowTokk:
-  conn EastPools.LeverRoom:  # gorlek/kii could dboost but since you need to wait for the bubble, it's beter to have a way to deal with the crab directly 
+    moki: 
+      DoubleJump OR Launch
+      Grapple, Dash OR Glide
+      Bash, Grenade=1, Dash OR Glide
+      Bash, Grenade=1, Water  # bash grenade from below
+      Bash, Grenade=1, EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall
+    gorlek:
+      Grapple, Sword OR Hammer OR Damage=20
+      SentryJump=1, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
+      Bash, Grenade=1, Sword OR Hammer OR Damage=20
+      Bash, Grenade=2  # bash grenade from under AboveDoorOre and bash the slime to reach the anchor
+    kii:
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  # bash grenade from below 
+    unsafe:
+      Grapple, Spear=1 OR Blaze=1
+      Dash  # either dash ramp if the door is opened or wall jump off the door
+  conn EastPools.LeverRoom:
     moki, EastPools.EntryLever: Combat=Crab OR Bash OR Launch OR EastPools.BelowEntryLeverBubble
+    gorlek, EastPools.EntryLever: Water, Damage=10  # dboost on the crab then wait for the bubble in the water
     unsafe: EastPools.EntryLever
 
 anchor EastPools.BelowTokk at -1278, -4158:  # at the checkpoint where you do puzzle skip, between Tokk and the slime
   refill Checkpoint
   
-  state EastPools.BelowTokkBubbleFree:
+  state EastPools.BelowTokkBubbleFree:  # Be sure it's not redundant with going to EastPools.BehindEntryDoor first 
+    moki: Water, Bash OR WaterDash
+    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:  # Be sure it's not redundant with going to EastPools.BehindEntryDoor first
+    moki: Water, Bash
+    kii: Water
   state EastPools.LowerWaterDrained:  # Puzzle skip
     unsafe:
       DoubleJump OR Dash OR Hammer OR Damage=20  # Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 is hard, which can kill you if you only have 30 HP
       Bash, Grenade=1
   
-  conn EastPools.BehindEntryDoor:
+  conn EastPools.BehindEntryDoor:  # Make sure it's not redundant with paths comming from EastPools.TPArea
+    moki:
+      Launch OR Grapple  # with grapple, go below
+      Bash, Grenade=1  # either go below or bash the slime after bashing your grenade if going above
+      DoubleJump, Dash OR Glide
+    gorlek: DoubleJump OR SentryJump=1 OR Damage=20  # sjump from below. Use your weapon to kill the crab
+    kii:
+      Bash  # Go below
+      Combat=CorruptSlug, Hammer  # if you hit the slug it gets weird because you can hit it again which makes it explodes so it's better to kill it before going over the spikes
   conn EastPools.TPArea:
     moki:
-      EastPools.BelowTokkBubbleFree, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
-      EastPools.BelowTokkBubbleFree, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
-      DoubleJump, Bash, Grenade=1  # bashgrenade above
-      Grapple, Bash, Grenade=1, Dash OR Glide  # bashgrenade above
-      Bash, Grenade=2, Dash OR Glide  # bashgrenade above
-      Bash, Grenade=2, EastPools.BelowTokkBubbleFree OR Water  # bashgrenade below
       Launch
+      Bash, Grenade=1
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide      
     gorlek:
-      EastPools.BelowTokkBubbleFree, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
-      EastPools.BelowTokkBubbleFree, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
-      SentryJump=2, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
-      SentryJump=1, DoubleJump OR Grapple
-      Grapple, Bash, Grenade=1, Sword OR Hammer OR Damage=20  # bashgrenade above
-      Bash, Grenade=2, Sword OR Hammer OR Damage=20
-      Bash, Grenade=3
+      SentryJump=1
       Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
+    kii:
+      Bash, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
+      DoubleJump, TripleJump, Sword  # tjump, hit the slime then tjump+upslash
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      EastPools.BelowTokkBubbleFree, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
-      Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Bash OR Combat=Crab:  # Push the bubble by jumping on it rather than using flap
+        DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Bash, DoubleJump  # Bash the slug to the left of the spike, bash it again to reach tokk
       DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
-      Bash, Grenade=2
-  conn EastPools.Teleporter:  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can do puzzle skip again to activate the checkpoint on the teleporter
+  conn EastPools.Teleporter:  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can die at the same spot as usual to activate the checkpoint (you won't have the cutscene) then QTM/die to respawn on the teleporter
     unsafe, EastPools.LowerWaterDrained: DoubleJump OR Dash OR Hammer OR Damage=20
 
 anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
@@ -9358,30 +9393,17 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   refill Full:  # use the teleporter
     moki: EastPools.LowerWaterDrained
 
-  state EastPools.BelowTokkBubbleFree:
-    moki: Water, Bash
-    gorlek: Water, WaterDash
-    unsafe:
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
-      Water, Bow=1 OR Grenade=1
   state EastPools.LowerWaterDrained:
     moki: Water, WaterBreath
     gorlek: Water
     unsafe: Glide OR Sword # puzzle skip. Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 is hard, which can kill you if you only have 30 HP
   
   pickup EastPools.AboveDoorOre:
-    moki:
-      EastPools.BelowTokkBubbleFree, Grapple, Flap, DoubleJump OR Dash
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
-      Bash, Grenade=2
-      Launch
+    moki: Bash, Grenade=1, Dash OR Glide
     gorlek:
-      EastPools.BelowTokkBubbleFree, Grapple, Flap
       Bash, Grenade=1, Sword OR Hammer OR Damage=20
       SentryJump=1  # Weapon stall above the spikes
-    unsafe:
-      DoubleJump, Bash  # Bash the slug when its at the right of the ceiling
-      Sword, Bash       # Hit slug with sword to hit it off the ceiling and then bash it
+    unsafe: Sword, Bash       # Hit slug with sword to hit it off the ceiling and then bash it
   pickup EastPools.LupoOre:
     moki: Water
   pickup EastPools.LupoEX:
