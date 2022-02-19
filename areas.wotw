@@ -1085,6 +1085,8 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Launch  # it's notably harder to get without taking a hit. Up and/or Side combos with sword or hammer can make it to the horizontal branch from the launch pad.
       Bash, Grenade=1
+    kii:
+      Sentry=2 OR Blaze=3
     unsafe:
       Bash  # the mantis disappears if you die
       Damage=10, Grenade=1  # GrenadeJump onto the pole; may be possible without taking damage
@@ -1094,6 +1096,11 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       Dash
       Bash, Grenade=2
+    kii:
+      Sword OR Hammer
+      Sentry=3
+      Sentry=2, Shuriken=1 OR Flash=1
+      Blaze=3, Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
       Sword OR Hammer OR Sentry=1
       Grenade=2, Damage=10
@@ -1104,8 +1111,10 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
+    kii:
+      Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2 OR Spear=1
+      Bash #you can kite a mantis but it disappears when you die or just bash a slime
     unsafe:
-      Bash  # befriend the slug
       Grenade=1  # Running GrenadeJump
   conn MarshPastOpher.TrialArea:
     moki:
