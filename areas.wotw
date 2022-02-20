@@ -1151,6 +1151,9 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Spear=3. Bash, DoubleJump, TripleJump OR Dash OR Glide
       Bow=2, Bash, DoubleJump, Hammer OR Sword #its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
       Spear=3, Bash, DoubleJump, Hammer OR Sword
+      Launch, Sword OR Hammer
+      Launch, Sentry=2 OR Flash=2 OR Shuriken=2 # you can do it with one sentry but the second one is for leniency with the last jump from the platform to the anchor
+      Glide, DoubleJump, Bash, BreakWall=12 
     unsafe:
       Launch, Bash  # You can bash the lanterns without freeing them from the blob
       Dash, Regenerate, DoubleJump, TripleJump, SentryJump=1 OR Damage=20  # wavedash off health plant
@@ -1175,6 +1178,8 @@ anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit wi
       Combat=Skeeto, Bow=2, Dash OR Glide OR Sword OR Hammer
       Bash, Bow=2, Dash OR Glide OR Sword OR Hammer
       Bash, Grenade=2
+    kii:
+      Bow=2, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Sword OR Hammer OR Dash OR Glide
     unsafe:
       Bash  # Repositioning the Skeeto
       Bow=2, Sticky  # maybe possible without Sticky
@@ -1185,7 +1190,7 @@ anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit wi
       DoubleJump OR Dash OR Launch
       Combat=Skeeto, Bow=1
     gorlek: Bash OR Sword OR Damage=10
-    unsafe: Glide OR Hammer
+    kii: Glide OR Hammer OR Sentry=2 OR Shuriken=1
 
 anchor MarshPastOpher.UpperBowArea at -437, -4211:  # Between the eyestones
   refill Checkpoint
@@ -1222,8 +1227,10 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       Bash, Grenade=1, Dash OR Sword OR Hammer
       SwordSJump=1
       HammerSJump=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1, Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
+      Bash, Dash #coyote, may be too precise 
     unsafe:
-      Bash, Dash              # Pretty precise to do without damage
       Bash              # Repositioning the squonkey: squonkey respawns when u jump off to the east and back on the ledge
 
   conn MarshPastOpher.PoolsPathMiddle:  # the squonkey doesn't reappear if you respawn on this checkpoint
@@ -1231,6 +1238,9 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
     gorlek:
       Bash, Dash  # the bat is weird
       Combat=Bat, Launch, DoubleJump OR Dash
+    kii:
+      Bash, Sword OR Hammer # the bat is very weird
+      Bash, Sentry=2 OR Shuriken=2 #very weird
     unsafe:
       Bash
       Combat=Bat, Launch  # About a 45° angle from under the second bat to avoid a damage boost
@@ -1250,6 +1260,8 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       Dash, Glide OR Sword OR Hammer
       Bash
       Combat=SpinCrab, SentryJump=1
+    kii:
+      Glide OR Sword OR Sentry=3 OR DoubleJump
 
   conn MarshPastOpher.PoolsPathWest:  # the squonkey doesn't reappear if you respawn on this checkpoint
     moki: Bash, DoubleJump OR Launch
@@ -1261,6 +1273,12 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       ShurikenBreak=20, DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword OR Hammer
       ShurikenBreak=20, DoubleJump, TripleJump, Dash, Glide OR Sword  # enough tools to allow multiple approaches
       ShurikenBreak=20, Launch, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=10
+    kii:
+      Bash, Sword #jump from the right wall and stall with full combo + upslash to avoid the dmg
+      Bash, Water, WaterDash, Damage=30 #wdash over the spikes, bash to get up and then dmg boost to the anchor
+      Water, WaterDash, Hammer, DoubleJump, TripleJump, Damage=20 #dmg boosing through the last spikes
+      Bash, Sentry=5 # 2 sentries to jump over the spikes falling from the left door and then 3 sentries to get over the last spikes
+      Bash, Shuriken=2, Damage=20 #can be weird to get over the spikes 
     unsafe:
       ShurikenBreak=20, Launch
       Hammer, Bash                    # Fairly precise air combos needed
@@ -1272,7 +1290,8 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
     gorlek:
       Glide, DoubleJump OR Dash OR Launch
       Damage=10  # more other paths would exist, but seem difficult to do damageless themselves
-    unsafe: DoubleJump OR Dash OR Glide OR Launch
+    kii:
+      Glide OR DoubleJump OR Dash OR Launch
 
 # checkpoint at -740, -4168
 
@@ -1312,8 +1331,18 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
         Launch  # Reset Launch by hitting the ceiling
       Glide, DoubleJump, Hammer OR Spear=1  # go below and break the floor
       Glide, Dash, Hammer OR Spear=1  # go below and break the floor
+    kii:
+      BreakWall=20, Damage=20, Sentry=3
+      BreakWall=20, DoubleJump, Shuriken=1, Damage=10
+      BreakWall=20, Bash, Damage=20
+      BreakWall=20, Bash, Damage=10, Glide
+      BreakWall=20, Damage=10, Dash OR Sword
+      Dash, Damage=10, Hammer OR Spear=1 #from the below
+      DoubleJump, TripleJump, Damage=10, Hammer OR Spear=1 #from the below
+      Glide, Damage=10, Hammer OR Spear=1 #from the below, hammer upslash to avoid the damage
+      Water, WaterDash, Damage=40, Hammer OR Spear=1
     unsafe:
-      BreakWall=20, Damage=10, DoubleJump OR Sword OR Dash
+      BreakWall=20, Damage=10, DoubleJump
       BreakWall=20, Damage=10, Glide, Hammer
       BreakWall=20, Damage=10, Bash
       BreakWall=20, Bash, Grenade=1  # bash grenade near the spikes, bash glide of the lantern
