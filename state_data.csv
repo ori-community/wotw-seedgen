@@ -69,6 +69,7 @@ UpperDepths.LightPuzzle, 18793, 21994
 LowerDepths.TrialActivation, 44964, 28552=1
 PoolsApproach.WheelFreed, 945, 12852
 EastPools.BelowTokkBubbleFree, 5377, 35751
+EastPools.BelowTokkPurpleWall, 5377, 26170
 EastPools.EntryLever, 5377, 14488
 EastPools.ArenaWall, 5377, 22978
 EastPools.FightArenas, 5377, 53480=4

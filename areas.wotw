@@ -8260,9 +8260,10 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   state EastPools.BelowTokkBubbleFree:
     moki: EastPools.EntryLever, Water, Bash
     gorlek: EastPools.EntryLever, Water, WaterDash
-    unsafe, EastPools.EntryLever:
-      Water, Bow=1 OR Grenade=1
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
+    unsafe, EastPools.EntryLever: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:
+    moki: Water, Bash
+    unsafe: Water OR Bash  # bash the corrupted slime to blow the wall
 
   quest EastPools.KwolokAmuletQI: free
 
@@ -8312,16 +8313,17 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
   conn EastPools.TPArea:
     moki, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
-      EastPools.BelowTokkBubbleFree, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
       DoubleJump, Bash, Grenade=1  # bashgrenade above
       Grapple, Bash, Grenade=1, Dash OR Glide  # bashgrenade above
       Bash, Grenade=2, Dash OR Glide  # bashgrenade above
-      Bash, Grenade=2, EastPools.BelowTokkBubbleFree OR Water  # bashgrenade below
+      Bash, Grenade=2, EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall  # bashgrenade below
+      Bash, Grenade=2, Water # bashgrenade below
       Launch
     gorlek, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
-      EastPools.BelowTokkBubbleFree, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
       SentryJump=2, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
       SentryJump=1, DoubleJump OR Grapple
       Grapple, Bash, Grenade=1, Sword OR Hammer OR Damage=20  # bashgrenade above
@@ -8329,7 +8331,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, Grenade=3
       Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
     unsafe, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
       Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
       DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
       Bash, Grenade=2
@@ -8364,9 +8366,10 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   state EastPools.BelowTokkBubbleFree:
     moki: Water, Bash
     gorlek: Water, WaterDash
-    unsafe:
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
-      Water, Bow=1 OR Grenade=1
+    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:
+    moki: Water, Bash
+    unsafe: Water OR Bash  # bash the corrupted slime to blow the wall
   state EastPools.LowerWaterDrained:
     moki: Water, WaterBreath
     gorlek: Water
@@ -8376,12 +8379,12 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   
   pickup EastPools.AboveDoorOre:
     moki:
-      EastPools.BelowTokkBubbleFree, Grapple, Flap, DoubleJump OR Dash
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap, DoubleJump OR Dash
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
       Bash, Grenade=2
       Launch
     gorlek:
-      EastPools.BelowTokkBubbleFree, Grapple, Flap
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap
       Bash, Grenade=1, Sword OR Hammer OR Damage=20
       SentryJump=1  # Weapon stall above the spikes
     unsafe:
