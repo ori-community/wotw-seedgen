@@ -9605,12 +9605,18 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   state EastPools.CentralRoomPurpleWall:
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
-    unsafe: Water
+    kii: Water
+    unsafe:
+      Damage=200, Bash
+      Damage=140, Bash, WaterDash
   state EastPools.LupoPurpleFloor:
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
-    unsafe: Water
-
+    kii: Water
+    unsafe:
+      Damage=300, Bash
+      Damage=200, Bash, WaterDash
+  
   pickup EastPools.EnergyHarvestShard:
     moki:
       Water, WaterDash, DoubleJump
@@ -9620,33 +9626,70 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
       Damage=20, WaterDash, DoubleJump
       Water, Bash, DoubleJump OR WaterDash  # Use the torpedo
       SentryJump=1
+    kii:
+      WaterDash, Hammer, Water OR Damage=20
+      DoubleJump, TripleJump, Hammer  # tjump + upslash from the left wall
     unsafe:
-      DoubleJump, TripleJump, Sword OR Hammer  # tjump + upslash from the left wall
-      Water, Bash  # Bash the torpedo out of the water (near the floor so you don't get too much speed), go out of the water and bash it again
+      WaterDash, Sword, Water OR Damage=20
+      DoubleJump, TripleJump, Sword  # tjump + upslash from the left wall
+      Bash, Water OR Damage=220  # Bash the torpedo out of the water (near the floor so you don't get too much speed), go out of the water and bash it again
   pickup EastPools.LupoEX:
-    moki: EastPools.LupoPurpleFloor, Water
+    moki, EastPools.LupoPurpleFloor: Water
+    kii, EastPools.LupoPurpleFloor:
+      Damage=100
+      Damage=60, WaterDash
   pickup EastPools.LupoMap:
-    moki: SpiritLight=150, EastPools.LupoPurpleFloor, Water
-    gorlek: SpiritLight=150, EastPools.LupoPurpleFloor, Water
+    moki, SpiritLight=150, EastPools.LupoPurpleFloor: Water
+    kii, SpiritLight=150, EastPools.LupoPurpleFloor:
+      Damage=100
+      Damage=60, WaterDash
+  pickup EastPools.LupoOre:
+    kii, EastPools.LupoPurpleFloor, BreakWall=20:
+      Damage=100
+      WaterDash, Damage=40
   pickup EastPools.BehindCrusherEX:
     moki: Water, WaterBreath
     gorlek: Water
+    kii:
+      EastPools.LupoPurpleFloor, Damage=200
+      EastPools.LupoPurpleFloor, WaterDash, Damage=120
+      WaterDash, Damage=140
+    unsafe:
+      Damage=220
+      WaterDash, Damage=100
   pickup EastPools.SpiritTrial:
     moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
-
+    kii:
+      UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, DoubleJump
+      UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, Glide, Dash
+    unsafe: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, Glide OR Dash
+    
   conn EastPools.CentralRoom:
-    moki: EastPools.CentralRoomPurpleWall, Water
+    moki, EastPools.CentralRoomPurpleWall: Water
+    kii, EastPools.CentralRoomPurpleWall:
+      Damage=180
+      WaterDash, Damage=80
   conn EastPools.WaterdashArena:
     moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: EastPools.FightArenas
+    unsafe:  # die to open the door if it's closed
+      Water OR Damage=60
+      WaterDash, Damage=20
   conn EastPools.TPArea:
     moki: EastPools.LupoPurpleFloor, Water, BreakWall=20
+    kii, EastPools.LupoPurpleFloor, BreakWall=20:
+      Damage=100, Damage=160
+      WaterDash, Damage=40, Damage=80
+  conn EastPools.Teleporter:
+    kii, EastPools.LupoPurpleFloor, BreakWall=20:
+      Damage=100, Damage=100
+      WaterDash, Damage=40, Damage=40
 
 anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok when he's still fine
   refill Checkpoint
 
   state EastPools.CentralRoomPurpleWall:
-    unsafe: Water
+    kii: Water OR Damage=180  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
 
   quest EastPools.GrassSeed:
     moki:
