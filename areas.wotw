@@ -991,7 +991,6 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
       Water, Bash, Launch  # the enemies appear once you have water
     kii:
       Launch, DoubleJump 
-      Launch, Bash, Bow=2 OR Spear=2 #bow and spear for breaking the blobs # long way around //to be moved to the bow approach anchor ori shy
     unsafe:
       Launch
       SentryJump=2  # first one maxheight
@@ -1136,6 +1135,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=1
     gorlek: Sword OR Hammer OR Damage=10
+    kii: Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2
   conn MarshPastOpher.MillView:
     moki: Bash, Grenade=1  # this is the only non-redundant connection that will ever exist.
   conn MarshPastOpher.PoolsPathEast:
@@ -1146,8 +1146,12 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Bow=2, Bash, Launch  # the moki path, but without safety energy
       Bow=2, DoubleJump, Bash, TripleJump OR Dash OR Glide
       Launch, DoubleJump OR Dash OR Glide  # For the last part reset your Launch on the wall above the lantern
+    kii:
+      Spear=3, Bash, Launch # the gorlek path, but with a spear (3rd spear because the slime in the middle of the ceiling can steal the spear)
+      Spear=3. Bash, DoubleJump, TripleJump OR Dash OR Glide
+      Bow=2, Bash, DoubleJump, Hammer OR Sword #its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
+      Spear=3, Bash, DoubleJump, Hammer OR Sword
     unsafe:
-      Bow=2, Bash, DoubleJump, Sword OR Hammer
       Launch, Bash  # You can bash the lanterns without freeing them from the blob
       Dash, Regenerate, DoubleJump, TripleJump, SentryJump=1 OR Damage=20  # wavedash off health plant
       Dash, Regenerate, DoubleJump, Glide, SentryJump=1 OR Damage=40  # wavedash off health plant
