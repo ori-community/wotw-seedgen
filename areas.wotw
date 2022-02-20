@@ -9523,13 +9523,24 @@ anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
       WaterDash, Dash, Sword, Water OR Damage=20  # upslash makes it easier to reach the wall above the water
       Bash, Grenade=1, Dash
       SentryJump=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1, Sword OR Hammer
+      Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      WaterDash, Water, Sword
+      WaterDash, Water, Hammer, Glide OR Shuriken=2  # Would be possible with 2 sentries/flash but this makes the slime explodes which knock you back down
+      WaterDash, Water, Glide, Shuriken=2  # Would be possible with 2 sentries/flash but this makes the slime explodes which knock you back down
     unsafe:
+      Bash, Grenade=1
+      WaterDash, Hammer, Water OR Damage=20
       DoubleJump, TripleJump  # ceiling jump on the wall above the fishing pond
   conn EastPools.TPArea: free
 
 anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
   pickup EastPools.AboveTpEX:  # this needs water to not softlock when the player drains the upper water
     moki: Water
+    kii:  # dirty swim 
+      Damage=80
+      WaterDash, Damage=40
   pickup EastPools.PurpleWallHC:  # paths using the slime to break the purple wall
     unsafe:
       Bash, Launch OR SentryJump=1 OR Grenade=1
@@ -9543,11 +9554,13 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
     gorlek, UpperPools.UpperWaterDrained:
       Bash, Grenade=2
       SentryJump=1, DoubleJump
-    unsafe, UpperPools.UpperWaterDrained:
-      WaterDash, DoubleJump, TripleJump, Water, Dash OR Sword OR Hammer
-      DoubleJump, TripleJump, Damage=20  # climb the left wall
+    kii, UpperPools.UpperWaterDrained:
+      Water, WaterDash, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=20, WaterDash, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, DoubleJump  # Bash the slime
       Bash, Grenade=1, WaterDash, Water OR Damage=20
+    unsafe, UpperPools.UpperWaterDrained:
+      DoubleJump, TripleJump, Damage=20  # climb the left wall
 
 anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of the pools arena
   refill Checkpoint
@@ -9566,16 +9579,25 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
       Bash, Grenade=1
       Launch
     gorlek, EastPools.FightArenas, WaterDash: Water OR Damage=20  # WaterDash on the bubble
-  
+    kii, EastPools.FightArenas, WaterDash: DoubleJump  #@validator that might be gorlek? gorlek for sure with tjump
+    unsafe, EastPools.FightArenas, WaterDash:
+      Hammer  #Jump on the bubble then stall until a new one spawn
+      Dash OR Glide OR Sword # jump on the bubble, wait on the left wall by wall jumping then go back to jump on a new bubble
+
   conn EastPools.TPArea:
-    moki, EastPools.ArenaWall:
-      Water
-      EastPools.LowerWaterDrained, DoubleJump OR Dash OR Launch OR Glide
-    gorlek, EastPools.ArenaWall: EastPools.LowerWaterDrained, Sword OR Hammer OR Damage=20
+    moki, EastPools.ArenaWall: Water
+    kii, EastPools.ArenaWall:
+      Damage=80
+      WaterDash, Damage=40
+  conn EastPools.Teleporter:
+    moki, EastPools.ArenaWall, EastPools.LowerWaterDrained: DoubleJump OR Dash OR Launch OR Glide
+    gorlek, EastPools.ArenaWall, EastPools.LowerWaterDrained: Sword OR Hammer OR Damage=20
+    gorlek, EastPools.ArenaWall, EastPools.LowerWaterDrained: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn EastPools.MissilePuzzle:
     moki, EastPools.FightArenas: Water OR DoubleJump OR Dash OR Glide OR Launch 
     gorlek, EastPools.FightArenas: Sword OR Hammer OR Damage=20
-    unsafe: EastPools.FightArenas OR Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
+    kii: EastPools.FightArenas
+    unsafe: Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
 
 anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   refill Checkpoint
