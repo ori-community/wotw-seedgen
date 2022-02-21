@@ -1006,7 +1006,8 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     gorlek:
       Sword OR Hammer  # Horizontal slash combo
       BreakWall=20, Damage=10
-    unsafe: BreakWall=20, Sentry=1  # Use Sentry instead of DoubleJump
+    kii, BreakWall=20:
+       Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
   pickup MarshPastOpher.SpiritTrial:
     moki: MarshPastOpher.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: MarshPastOpher.TrialActivation, Dash, Grapple
@@ -1014,7 +1015,9 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
     gorlek, MarshSpawn.ToOpherBarrier:
       MarshSpawn.RainLifted, Bash  # jump the jumper
-      Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
+      Sword OR Hammer # Long jump, upslash and neutral slashes are enough with both weapons
+    kii, MarshSpawn.ToOpherBarrier:
+      Sentry=2 OR Shuriken=1 OR Blaze=3
 
   conn OpherShop: free
   conn MarshPastOpher.TrialArea:
@@ -1027,12 +1030,17 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     moki, MarshSpawn.ToOpherBarrier:
       DoubleJump OR Launch
       Bash, Grenade=1
-    gorlek: MarshSpawn.ToOpherBarrier, SentryJump=1
+    gorlek: 
+      MarshSpawn.ToOpherBarrier, SentryJump=1
+    kii, MarshSpawn.ToOpherBarrier:
+      Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer
   conn MarshSpawn.BrokenBridge:
     moki: MarshSpawn.ToOpherBarrier
   conn MarshPastOpher.PoolsPathEast:
     gorlek:
       Water, Bash, Launch  # the enemies appear once you have water
+    kii:
+      Launch, DoubleJump 
     unsafe:
       Launch
       SentryJump=2  # first one maxheight
@@ -1060,7 +1068,13 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
     gorlek:
       DoubleJump
       Damage=10, Dash OR Glide OR Sword OR Hammer
+    kii:
+      Damage=10, Sentry=1 OR Shuriken=1 OR Flash=1 OR Blaze=1 
+      Glide, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 # upslash to avoid the spikes
+      Dash # doubledash from the pole
+      Sword # may be a little bit too precise
     unsafe:
+      Grenade=1, Bash # standing on a piece of wood on the edge of the spikes
       Sentry=1, Damage=10
       Damage=20
   pickup MarshPastOpher.TrialOre: free
@@ -1069,17 +1083,23 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
     gorlek:
       Sword  # Horizontal slashes
       Hammer, Damage=10
+    kii:
+      Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Damage=10, Spear=1 OR Blaze=1
+      Damage=20 #lenient option
     unsafe:
-      Hammer OR Sentry=1
       Grenade=1, Bash  # Throw Grenade up at the lower jumppad (right side and aim up ori facing right), use it and then bash
       Damage=10
   pickup MarshPastOpher.TrialHC:
     moki: Hammer OR Spear=1
-    unsafe: free  # lure stomp
+    kii: free #manits lure
   pickup MarshPastOpher.TrialRightEX:
     moki: DoubleJump OR Bash OR Launch  # bash uses the enemy
     gorlek: SentryJump=1
-    unsafe: Dash OR Sword OR Hammer OR Grenade=1  # Sword: pogo on enemy, Hammer: upswing to reach ledge
+    kii: 
+      Dash #normal coyote (may be too precise)
+      Sword #pogo on the enemy
+    unsafe: Dash OR Sword OR Hammer OR Grenade=1 OR Spear=1 # Sword: pogo on enemy, Hammer: upswing to reach ledge
 
   conn MarshShrine: free
   conn MarshPastOpher.BowPath:
@@ -1091,6 +1111,8 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
       Bash, Grenade=1
       Combat=Mantis+SneezeSlug, Sword OR Hammer
       Launch
+    kii, BreakWall=20:
+      Shuriken=3 OR Sentry=4 OR Blaze=6 #OMEGALUL
 
 anchor MarshShrine at -382, -4341:
   nospawn
@@ -1113,6 +1135,8 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Launch  # it's notably harder to get without taking a hit. Up and/or Side combos with sword or hammer can make it to the horizontal branch from the launch pad.
       Bash, Grenade=1
+    kii:
+      Sentry=2 OR Blaze=3
     unsafe:
       Bash  # the mantis disappears if you die
       Damage=10, Grenade=1  # GrenadeJump onto the pole; may be possible without taking damage
@@ -1122,6 +1146,11 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       Dash
       Bash, Grenade=2
+    kii:
+      Sword OR Hammer
+      Sentry=3
+      Sentry=2, Shuriken=1 OR Flash=1
+      Blaze=3, Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
       Sword OR Hammer OR Sentry=1
       Grenade=2, Damage=10
@@ -1132,8 +1161,10 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
+    kii:
+      Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2 OR Spear=1
+      Bash #you can kite a mantis but it disappears when you die or just bash a slime
     unsafe:
-      Bash  # befriend the slug
       Grenade=1  # Running GrenadeJump
   conn MarshPastOpher.TrialArea:
     moki:
@@ -1155,6 +1186,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=1
     gorlek: Sword OR Hammer OR Damage=10
+    kii: Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2
   conn MarshPastOpher.MillView:
     moki: Bash, Grenade=1  # this is the only non-redundant connection that will ever exist.
   conn MarshPastOpher.PoolsPathEast:
@@ -1165,8 +1197,15 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Bow=2, Bash, Launch  # the moki path, but without safety energy
       Bow=2, DoubleJump, Bash, TripleJump OR Dash OR Glide
       Launch, DoubleJump OR Dash OR Glide  # For the last part reset your Launch on the wall above the lantern
+    kii:
+      Spear=3, Bash, Launch # the gorlek path, but with a spear (3rd spear because the slime in the middle of the ceiling can steal the spear)
+      Spear=3, Bash, DoubleJump, TripleJump OR Dash OR Glide
+      Bow=2, Bash, DoubleJump, Hammer OR Sword #its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
+      Spear=3, Bash, DoubleJump, Hammer OR Sword
+      Launch, Sword OR Hammer
+      Launch, Sentry=2 OR Flash=2 OR Shuriken=2 # you can do it with one sentry but the second one is for leniency with the last jump from the platform to the anchor
+      Glide, DoubleJump, Bash, BreakWall=12 
     unsafe:
-      Bow=2, Bash, DoubleJump, Sword OR Hammer
       Launch, Bash  # You can bash the lanterns without freeing them from the blob
       Dash, Regenerate, DoubleJump, TripleJump, SentryJump=1 OR Damage=20  # wavedash off health plant
       Dash, Regenerate, DoubleJump, Glide, SentryJump=1 OR Damage=40  # wavedash off health plant
@@ -1190,6 +1229,8 @@ anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit wi
       Combat=Skeeto, Bow=2, Dash OR Glide OR Sword OR Hammer
       Bash, Bow=2, Dash OR Glide OR Sword OR Hammer
       Bash, Grenade=2
+    kii:
+      Bow=2, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Sword OR Hammer OR Dash OR Glide
     unsafe:
       Bash  # Repositioning the Skeeto
       Bow=2, Sticky  # maybe possible without Sticky
@@ -1200,7 +1241,7 @@ anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit wi
       DoubleJump OR Dash OR Launch
       Combat=Skeeto, Bow=1
     gorlek: Bash OR Sword OR Damage=10
-    unsafe: Glide OR Hammer
+    kii: Glide OR Hammer OR Sentry=2 OR Shuriken=1
 
 anchor MarshPastOpher.UpperBowArea at -437, -4211:  # Between the eyestones
   refill Checkpoint
@@ -1237,8 +1278,10 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       Bash, Grenade=1, Dash OR Sword OR Hammer
       SwordSJump=1
       HammerSJump=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1, Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
+      Bash, Dash #coyote, may be too precise 
     unsafe:
-      Bash, Dash              # Pretty precise to do without damage
       Bash              # Repositioning the squonkey: squonkey respawns when u jump off to the east and back on the ledge
 
   conn MarshPastOpher.PoolsPathMiddle:  # the squonkey doesn't reappear if you respawn on this checkpoint
@@ -1246,6 +1289,9 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
     gorlek:
       Bash, Dash  # the bat is weird
       Combat=Bat, Launch, DoubleJump OR Dash
+    kii:
+      Bash, Sword OR Hammer # the bat is very weird
+      Bash, Sentry=2 OR Shuriken=2 #very weird
     unsafe:
       Bash
       Combat=Bat, Launch  # About a 45° angle from under the second bat to avoid a damage boost
@@ -1265,6 +1311,8 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       Dash, Glide OR Sword OR Hammer
       Bash
       Combat=SpinCrab, SentryJump=1
+    kii:
+      Glide OR Sword OR Sentry=3 OR DoubleJump
 
   conn MarshPastOpher.PoolsPathWest:  # the squonkey doesn't reappear if you respawn on this checkpoint
     moki: Bash, DoubleJump OR Launch
@@ -1276,6 +1324,12 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       ShurikenBreak=20, DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword OR Hammer
       ShurikenBreak=20, DoubleJump, TripleJump, Dash, Glide OR Sword  # enough tools to allow multiple approaches
       ShurikenBreak=20, Launch, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=10
+    kii:
+      Bash, Sword #jump from the right wall and stall with full combo + upslash to avoid the dmg
+      Bash, Water, WaterDash, Damage=30 #wdash over the spikes, bash to get up and then dmg boost to the anchor
+      Water, WaterDash, Hammer, DoubleJump, TripleJump, Damage=20 #dmg boosing through the last spikes
+      Bash, Sentry=5 # 2 sentries to jump over the spikes falling from the left door and then 3 sentries to get over the last spikes
+      Bash, Shuriken=2, Damage=20 #can be weird to get over the spikes 
     unsafe:
       ShurikenBreak=20, Launch
       Hammer, Bash                    # Fairly precise air combos needed
@@ -1287,7 +1341,8 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
     gorlek:
       Glide, DoubleJump OR Dash OR Launch
       Damage=10  # more other paths would exist, but seem difficult to do damageless themselves
-    unsafe: DoubleJump OR Dash OR Glide OR Launch
+    kii:
+      Glide OR DoubleJump OR Dash OR Launch
 
 # checkpoint at -740, -4168
 
@@ -1316,8 +1371,18 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
         Launch  # Reset Launch by hitting the ceiling
       Glide, DoubleJump, Hammer OR Spear=1  # go below and break the floor
       Glide, Dash, Hammer OR Spear=1  # go below and break the floor
+    kii:
+      BreakWall=20, Damage=20, Sentry=3
+      BreakWall=20, DoubleJump, Shuriken=1, Damage=10
+      BreakWall=20, Bash, Damage=20
+      BreakWall=20, Bash, Damage=10, Glide
+      BreakWall=20, Damage=10, Dash OR Sword
+      Dash, Damage=10, Hammer OR Spear=1 #from the below
+      DoubleJump, TripleJump, Damage=10, Hammer OR Spear=1 #from the below
+      Glide, Damage=10, Hammer OR Spear=1 #from the below, hammer upslash to avoid the damage
+      Water, WaterDash, Damage=40, Hammer OR Spear=1
     unsafe:
-      BreakWall=20, Damage=10, DoubleJump OR Sword OR Dash
+      BreakWall=20, Damage=10, DoubleJump
       BreakWall=20, Damage=10, Glide, Hammer
       BreakWall=20, Damage=10, Bash
       BreakWall=20, Bash, Grenade=1  # bash grenade near the spikes, bash glide of the lantern
@@ -9212,9 +9277,10 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   state EastPools.BelowTokkBubbleFree:
     moki: EastPools.EntryLever, Water, Bash
     gorlek: EastPools.EntryLever, Water, WaterDash
-    unsafe, EastPools.EntryLever:
-      Water, Bow=1 OR Grenade=1
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
+    unsafe, EastPools.EntryLever: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:
+    moki: Water, Bash
+    unsafe: Water OR Bash  # bash the corrupted slime to blow the wall
 
   quest EastPools.KwolokAmuletQI: free
 
@@ -9264,16 +9330,17 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
   conn EastPools.TPArea:
     moki, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
-      EastPools.BelowTokkBubbleFree, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
       DoubleJump, Bash, Grenade=1  # bashgrenade above
       Grapple, Bash, Grenade=1, Dash OR Glide  # bashgrenade above
       Bash, Grenade=2, Dash OR Glide  # bashgrenade above
-      Bash, Grenade=2, EastPools.BelowTokkBubbleFree OR Water  # bashgrenade below
+      Bash, Grenade=2, EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall  # bashgrenade below
+      Bash, Grenade=2, Water # bashgrenade below
       Launch
     gorlek, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
-      EastPools.BelowTokkBubbleFree, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
       SentryJump=2, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
       SentryJump=1, DoubleJump OR Grapple
       Grapple, Bash, Grenade=1, Sword OR Hammer OR Damage=20  # bashgrenade above
@@ -9281,7 +9348,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, Grenade=3
       Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
     unsafe, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
       Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
       DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
       Bash, Grenade=2
@@ -9316,9 +9383,10 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   state EastPools.BelowTokkBubbleFree:
     moki: Water, Bash
     gorlek: Water, WaterDash
-    unsafe:
-      Bash, Bow=1 OR Grenade=1  # Use the Corrupted Slime to blow the wall then bow or grenade to free the bubble
-      Water, Bow=1 OR Grenade=1
+    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:
+    moki: Water, Bash
+    unsafe: Water OR Bash  # bash the corrupted slime to blow the wall
   state EastPools.LowerWaterDrained:
     moki: Water, WaterBreath
     gorlek: Water
@@ -9328,12 +9396,12 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   
   pickup EastPools.AboveDoorOre:
     moki:
-      EastPools.BelowTokkBubbleFree, Grapple, Flap, DoubleJump OR Dash
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap, DoubleJump OR Dash
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
       Bash, Grenade=2
       Launch
     gorlek:
-      EastPools.BelowTokkBubbleFree, Grapple, Flap
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap
       Bash, Grenade=1, Sword OR Hammer OR Damage=20
       SentryJump=1  # Weapon stall above the spikes
     unsafe:
