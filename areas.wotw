@@ -291,13 +291,15 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
   state MarshSpawn.TokkBarrier:
     gorlek: ShurikenBreak=16
     unsafe: HammerBreak OR SpearBreak
+  state MarshSpawn.CaveFight:
+    Combat=3xLizard  # (at day there's two extra lizards)
 
   quest MarshSpawn.CaveKS:
     moki:
       DoubleJump, Dash OR Grapple
       Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
       Launch
-      Combat=3xLizard  # go through the fight room (at day there's two extra lizards)
+      MarshSpawn.CaveFight  # go through the fight room
     gorlek: DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
     kii:
       Sword  # Pogo on the slime and slash to the left
@@ -319,18 +321,18 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       Bash, DoubleJump OR Dash
       Bash, Grenade=1, Glide OR Grapple
       Launch
-      Combat=3xLizard, DoubleJump OR Dash OR Launch  # go through the fight room
-      Combat=3xLizard, Bash, Grenade=1  # go through the fight room
+      MarshSpawn.CaveFight, DoubleJump OR Dash OR Launch  # go through the fight room
+      MarshSpawn.CaveFight, Bash, Grenade=1  # go through the fight room
     gorlek:
       DoubleJump
       Bash, Grenade=1
-      Combat=3xLizard, SentryJump=1  # go through the fight room, makes other sentryjump paths unnecessary
+      MarshSpawn.CaveFight, SentryJump=1  # go through the fight room, makes other sentryjump paths unnecessary
       # weapon floats maybe too precise for gorlek
     kii:
       Sword  # Pogo on the slime and slash to the left, Upslash to reach the branch
       Hammer  # weapon floats
       Bash  # use slimes
-      Combat=3xLizard, Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1  # maybe
+      MarshSpawn.CaveFight, Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1  # maybe
 
 # checkpoint at -845, -4438
 
@@ -850,6 +852,8 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       SentryBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
+  state HowlsDen.DoubleJumpTreeCombat:
+    moki: Combat=Mantis+Lizard  # the game puts this before regen. It's why all the enemies drop tons of health
   state NonGladesTeleporter: free
 
   pickup HowlsDen.AboveTPEX:
@@ -875,13 +879,13 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       Grenade=1               # Grenade jump to platform
   # if someone manages to lower the platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
   pickup HowlsDen.DoubleJumpEX:
-    moki: Combat=Mantis+Lizard  # the game puts this before regen. It's why all the enemies drop tons of health
+    moki: HowlsDen.DoubleJumpTreeCombat
 
   conn Teleporters: free
   conn DenShrine:
     moki: Hammer OR Spear=1
   conn HowlsDen.DoubleJumpTreeArea:
-    moki: Combat=Mantis+Lizard OR DoubleJump OR Dash OR Glide OR Launch
+    moki: HowlsDen.DoubleJumpTreeCombat OR DoubleJump OR Dash OR Glide OR Launch
     kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
   conn HowlsDen.BoneBridge:
     moki, HowlsDen.BoneBarrier:
@@ -893,11 +897,14 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
 anchor DenShrine at -328, -4569:
   refill Full
 
-  pickup HowlsDen.CombatShrine:
+  state HowlsDen.CombatShrineCompleted:
     moki, Regenerate, Combat=Mantis+2xLizard+4xEnergyRefill+2xSneezeSlug+Mantis+Skeeto+4xEnergyRefill+7xSmallSkeeto+2xSkeeto+4xEnergyRefill+2xLizard+2xMantis:
       Damage=60
       Damage=40, Dash OR Bash OR Launch  # much better if you have good evasion
     unsafe: Combat=Mantis+2xLizard+4xEnergyRefill+2xSneezeSlug+Mantis+Skeeto+4xEnergyRefill+7xSmallSkeeto+2xSkeeto+4xEnergyRefill+2xLizard+2xMantis
+
+  pickup HowlsDen.CombatShrine:
+    moki: HowlsDen.CombatShrineCompleted
 
 # checkpoint at -514, -4549
 
@@ -1045,9 +1052,12 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
 anchor MarshShrine at -382, -4341:
   refill Full
 
-  pickup MarshPastOpher.CombatShrine:
+  state MarshPastOpher.CombatShrineCompleted:
     moki: Regenerate, Damage=20, Combat=2xSkeeto+2xEnergyRefill+Mantis+4xSmallSkeeto+2xEnergyRefill+Mantis+Skeeto
     unsafe: Combat=2xSkeeto+2xEnergyRefill+Mantis+4xSmallSkeeto+2xEnergyRefill+Mantis+Skeeto
+
+  pickup MarshPastOpher.CombatShrine:
+    moki: MarshPastOpher.CombatShrineCompleted
 
 anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow tree
   refill Checkpoint
@@ -3416,12 +3426,15 @@ anchor WestGlades.ShrineArea at -664, -4026:
 anchor GladesShrine at -635, -4020:
   refill Full
 
-  pickup WestGlades.CombatShrine:
+  state WestGlades.CombatShrineCompleted:
     moki, Regenerate, Combat=2xCrab+Bee+3xEnergyRefill+Hornbug+2xTentacle+3xEnergyRefill+2xSpinCrab+2xBee+3xEnergyRefill+2xMantis+Tentacle+SpinCrab:
       Damage=65                     # the crabs are terrifying!
       Damage=55, DoubleJump OR Dash  # these can help
       Damage=30, Launch             # if you're op, nothing's terrifying
     unsafe: Combat=2xCrab+Bee+3xEnergyRefill+Hornbug+2xTentacle+3xEnergyRefill+2xSpinCrab+2xBee+3xEnergyRefill+2xMantis+Tentacle+SpinCrab
+
+  pickup WestGlades.CombatShrine:
+    moki: WestGlades.CombatShrineCompleted
 
 region OuterWellspring:
   moki: Danger=25
@@ -5460,13 +5473,16 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
 anchor WoodsShrine at 1361, -4068:
   refill Full
 
-  pickup WoodsMain.ShrineEX: free
-  pickup WoodsMain.CombatShrine:
+  state WoodsMain.CombatShrineCompleted:
     moki, Regenerate, Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill+9xBalloon+4xEnergyRefill+4xMantis+Bat:  # this one has it all -_-
       Damage=80
       Damage=65, DoubleJump OR Dash
       Damage=50, Launch
     unsafe: Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill+9xBalloon+4xEnergyRefill+4xMantis+Bat
+
+  pickup WoodsMain.ShrineEX: free
+  pickup WoodsMain.CombatShrine:
+    moki: WoodsMain.CombatShrineCompleted
 
 region LowerReach:
   moki: Danger=40, Regenerate
@@ -7768,11 +7784,14 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
 anchor DepthsShrine at 213, -4515:
   refill Full
 
-  pickup LowerDepths.CombatShrine:
+  state LowerDepths.CombatShrineCompleted:
     moki, Regenerate, Combat=3xBat+4xEnergyRefill+2xSneezeSlug+2xTentacle+4xEnergyRefill+2xBat+2xTentacle+4xEnergyRefill+Bat+SneezeSlug:
       Damage=65
       Damage=60, DoubleJump OR Dash
       Damage=50, Launch
+
+  pickup LowerDepths.CombatShrine:
+    moki: LowerDepths.CombatShrineCompleted
 
 anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
   refill Checkpoint

@@ -5,10 +5,14 @@ MarshSpawn.LogBroken, 21786, 59922
 MarshSpawn.BurrowsOpen, 24922, 13349
 MarshSpawn.ToOpherBarrier, 21786, 23177
 MarshSpawn.TokkBarrier, 21786, 35166
+MarshSpawn.CaveFight, 21786, 35598
 HowlsDen.BoneBarrier, 21786, 53932
 HowlsDen.KeystoneDoor, 21786, 47445
+HowlsDen.DoubleJumpTreeCombat, 9593, 25130=3
+HowlsDen.CombatShrineCompleted, 24922, 45011
 MarshPastOpher.TrialActivation, 44964, 45951=1
 MarshPastOpher.EyestoneDoor, 937, 64003
+MarshPastOpher.CombatShrineCompleted, 21786, 2869
 EastHollow.BeetleDefeated, 937, 53122
 EastHollow.VoiceDoor, 937, 6778
 EastHollow.DepthsLever, 937, 22419
@@ -26,6 +30,7 @@ GladesTown.ClearThorns, 42178, 18751=3
 GladesTown.OnwardsAndUpwards, 42178, 40448=3
 GladesTown.RoofsOverHeads, 42178, 23607=3
 GladesTown.TuleySpawned, 6, 300
+WestGlades.CombatShrineCompleted, 44310, 58796
 TuleyShop.BlueMoon, 42178, 33011=3
 TuleyShop.LastTree, 42178, 40006=3
 TuleyShop.LastTreeBranchRejected, 14019, 59708=2
@@ -52,6 +57,7 @@ OuterWellspring.TrialActivation, 44964, 11512=1
 WoodsEntry.KeystoneDoor, 58674, 21500
 WoodsMain.KeystoneDoor, 18793, 41544
 WoodsMain.TrialActivation, 44964, 22703=1
+WoodsMain.CombatShrineCompleted, 58674, 56043
 LowerReach.ArenaBeaten, 28895, 42209
 LowerReach.BearBridgeBroken, 28895, 49329
 LowerReach.BearSneezed, 28895, 29098=1
@@ -67,6 +73,7 @@ UpperDepths.CentralKeystoneDoor, 18793, 10758
 UpperDepths.EntryKeystoneDoor, 21786, 59990
 UpperDepths.LightPuzzle, 18793, 21994
 LowerDepths.TrialActivation, 44964, 28552=1
+LowerDepths.CombatShrineCompleted, 18793, 12512
 PoolsApproach.WheelFreed, 945, 12852
 EastPools.BelowTokkBubbleFree, 5377, 35751
 EastPools.BelowTokkPurpleWall, 5377, 26170
