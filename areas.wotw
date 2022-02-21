@@ -1148,7 +1148,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Launch, DoubleJump OR Dash OR Glide  # For the last part reset your Launch on the wall above the lantern
     kii:
       Spear=3, Bash, Launch # the gorlek path, but with a spear (3rd spear because the slime in the middle of the ceiling can steal the spear)
-      Spear=3. Bash, DoubleJump, TripleJump OR Dash OR Glide
+      Spear=3, Bash, DoubleJump, TripleJump OR Dash OR Glide
       Bow=2, Bash, DoubleJump, Hammer OR Sword #its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
       Spear=3, Bash, DoubleJump, Hammer OR Sword
       Launch, Sword OR Hammer
