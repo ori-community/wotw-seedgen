@@ -9690,11 +9690,20 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
 
   state EastPools.CentralRoomPurpleWall:
     kii: Water OR Damage=180  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
+  state EastPools.CentralRoomBubbleFree:
+    moki: Water, Bash OR WaterDash
+    kii:
+      Damage=160, Bash
+      Damage=80, WaterDash
+    unsafe:
+      Water, Deflector, Sword
+      Water, Bow=1
+      Water, Grenade=1, Fracture
 
   quest EastPools.GrassSeed:
     moki:
       Water, WaterDash
-      Water, Bash, DoubleJump OR Dash OR Glide
+      EastPools.CentralRoomBubbleFree, DoubleJump OR Dash OR Glide
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
       Launch
     gorlek:
@@ -9704,31 +9713,56 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Bash, DoubleJump, Glide OR Sword
       Bash, Dash, Glide OR Sword
       DoubleJump, TripleJump, Glide
+    kii:
+      EastPools.CentralRoomBubbleFree, Water OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # possible with blaze but the aoe breaking the bubble is annoying
+      Damage=100, Bash  # Use the tentacle's projectile
+      Bash, Grenade=1, EastPools.CentralRoomBubbleFree OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1  # possible with as little as 1 blaze but might be too precise for kii?
+      Bash, DoubleJump OR Glide  # Bashglide from the lantern
+      Bash, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Hammer, Sentry=3  # bashglide from the lantern then one hammer swing and 3 sentries
+      DoubleJump, Glide, Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash, DoubleJump, TripleJump OR Hammer
+      EastPools.CentralRoomBubbleFree
+      Bash, Grenade=1, Spear=1 OR Blaze=1
+      Bash, Sword  # hover to reach the lantern, extend bash glide with upslash then hover again
+      DoubleJump, Glide
 
   conn UpperPools.KeystoneRoomEntrance:
     moki:
-      Water, Bash, DoubleJump, Dash OR Glide
-      Water, Bash, Launch
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Dash OR Glide
+      EastPools.CentralRoomBubbleFree, Bash, Launch
     gorlek:
-      DoubleJump, TripleJump, Dash, Glide, WaterDash  # wdash to free the bubbles
-      Water, DoubleJump, TripleJump, Bash OR WaterDash
-      Water, Bash, Grenade=1, DoubleJump
-      Water, WaterDash, Launch  # activate the bubbles with waterdash. Launch on a bubble to reach the top
-      Water, WaterDash, SentryJump=1, DoubleJump, TripleJump OR Dash OR Glide  # sjump from EastPools.GrassSeed
-      Launch, DoubleJump OR Dash OR Glide
-    # unsafe note: you can use sword deflector to free the bubble without bash or wdash
+      EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump, Dash, Glide
+      EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump, Bash
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1, DoubleJump
+      EastPools.CentralRoomBubbleFree, SentryJump=1, DoubleJump, TripleJump OR Dash OR Glide  # sjump from EastPools.GrassSeed
+      Launch, DoubleJump OR Dash OR Glide OR EastPools.CentralRoomBubbleFree
+    kii:
+      Launch
+      EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump  # from the seed, jump on a bubble to reach the wall near the lantern and wait for another bubble from there
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # with sword/hammer, hover before jumping to avoid touching the bubble
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1, Grenade=1 OR Water OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Damage=20   # bashnade from the seed to jump on the bubble then wait another bubble
+    unsafe:
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Blaze=1
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1  # bashnade from the seed to jump on the bubble then wait another bubble
   conn WestPools:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Water, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=20
+    kii:
+      WaterDash, Water, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=160, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=180
     unsafe:
       Water, WaterBreath, Launch
       Water, WaterBreath, DoubleJump, Grenade OR Hammer  # greande/hammer jumps. With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
       Water, WaterBreath, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
   conn EastPools.MissilePuzzle:
-    moki: EastPools.CentralRoomPurpleWall, Water
+    moki, EastPools.CentralRoomPurpleWall: Water
+    kii, EastPools.CentralRoomPurpleWall:
+      Damage=180
+      WaterDash, Damage=80
 
 region UpperPools:
   moki: Danger=40, Regenerate
