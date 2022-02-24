@@ -555,6 +555,9 @@ anchor MarshSpawn.BurrowsEntry at -931, -4494:  # At the bells puzzle
 anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of spawn
   refill Checkpoint
 
+  state PoolsApproach.WheelFreed:  # Make sure it's not redundant with going to PoolsApproach.OnTopOfWheel first
+    moki: Water, Bash
+
   pickup MarshSpawn.PoolsPathEX:
     moki:
       DoubleJump, Bash, Glide
@@ -569,8 +572,12 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
     unsafe:
       DoubleJump, Deflector
 
-  conn PoolsApproach.LeftOfWheel:
-    moki: Water
+  conn PoolsApproach.OnTopOfWheel:
+    moki, Water:
+      PoolsApproach.WheelFreed OR DoubleJump OR Launch
+      Bash, Grenade=1
+    gorlek, Water: Hammer OR SentryJump=1
+    unsafe: Water  # Precise wall jump where the tentacle is grabbing the wheel
   conn MarshSpawn.Main:
     moki:
       Water, WaterDash OR Launch
@@ -8754,7 +8761,7 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
     kii:
       Damage=120
       WaterDash, Damage=60
-  pickup PoolsApproach.MillPathHC:  # Paths using clean water originate from PoolsApproach.RightOfWheel. Make sure it's not redundant with going to PoolsApproach.MillPathCheckpoint first
+  pickup PoolsApproach.MillPathHC:  # Paths using clean water originate from PoolsApproach.OnTopOfWheel. Make sure it's not redundant with going to PoolsApproach.MillPathCheckpoint first
     kii: Damage=220, WaterDash
   
   conn PoolsApproach.MillPathCheckpoint:
@@ -8783,14 +8790,21 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       DoubleJump, Hammer
       DoubleJump, Glide, Combat=CorruptSlug  # kill the first CorruptSlug then wall jump to the left wall. Climbing that wall is a bit precise. Can make it easier with a glide jump, which means killing the second CorruptSlug
       Grenade=1, Grapple, Combat=Crab, Sword OR Hammer OR Glide OR Damage=20  # Grenade jump from
-  conn PoolsApproach.RightOfWheel:
-    moki, PoolsApproach.UnderwaterWallBroken: Water, Combat=SpinCrab OR DoubleJump OR Bash OR Launch
-    gorlek, PoolsApproach.UnderwaterWallBroken: Water
-    kii, PoolsApproach.UnderwaterWallBroken: WaterDash, Damage=100
+  conn PoolsApproach.OnTopOfWheel:
+    moki, PoolsApproach.UnderwaterWallBroken, Water:
+      Launch
+      DoubleJump, Dash
+      Grapple, Combat=SpinCrab OR DoubleJump OR Bash
+      PoolsApproach.WheelFreed, Combat=SpinCrab OR DoubleJump OR Bash
+    gorlek, PoolsApproach.UnderwaterWallBroken, Water: DoubleJump OR SentryJump=1
+    kii, PoolsApproach.UnderwaterWallBroken:
+      Water, Hammer
+      WaterDash, Damage=100, Launch OR Grapple OR DoubleJump OR Hammer OR SentryJump=1 OR PoolsApproach.WheelFreed
     unsafe, PoolsApproach.UnderwaterWallBroken:
       Damage=240  # Require more health than possible in kii. Possible by upgrading resilience and vitality.
       Bash, Damage=200
-  conn PoolsApproach.MarshBreakableWall:  # For dirty water paths. Paths using clean water originate from PoolsApproach.RightOfWheel
+      WaterDash, Damage=100
+  conn PoolsApproach.MarshBreakableWall:  # For dirty water paths. Paths using clean water originate from PoolsApproach.OnTopOfWheel
     kii, PoolsApproach.UnderwaterWallBroken:
       Launch, Damage=120:  # Take 6 dboost in dirty water
         Grapple OR Glide
@@ -8839,7 +8853,7 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
 anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall on the way to MarshPastOpher
 # This anchor helps with pathfinding for PoolsApproach.MillPathHC, especially in kii and above because of dirty swims, spikes dboosts and regen
   
-  state PoolsApproach.UnderwaterWallBroken:  # Only for dirty swims, clean water one originate from RightOfWheel
+  state PoolsApproach.UnderwaterWallBroken:  # Only for dirty swims, clean water one originate from OnTopOfWheel
     kii:
       Spear=1, Damage=20:
         Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer
@@ -8893,11 +8907,11 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
   
   conn MarshPastOpher.PoolsPathWest:
     moki: BreakWall=20
-  conn PoolsApproach.RightOfWheel:
+  conn PoolsApproach.OnTopOfWheel:
     moki, Water:
       Grapple, Launch
-      Grapple, DoubleJump, Dash OR Glide
       Launch, Glide, DoubleJump OR Dash
+      Grapple, DoubleJump, Dash OR Glide
     gorlek, Water:
       Grapple, DoubleJump OR Dash
       Grapple, Damage=20, Glide OR Sword
@@ -8914,9 +8928,10 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       Water:
         DoubleJump, Damage=20, TripleJump OR Dash
         DoubleJump, Sword, Hammer, Damage=20
-        Damage=60, DoubleJump OR Dash OR Hammer
-        Damage=80, Sword
-        Damage=100
+        Damage=60, DoubleJump OR Hammer
+        Damage=60, Dash, PoolsApproach.WheelFreed
+        Damage=80, Sword, PoolsApproach.WheelFreed
+        Damage=100, PoolsApproach.WheelFreed
       WaterDash, Damage=80:
         Grapple, Glide OR Sword OR Hammer
         Launch, Glide OR DoubleJump OR Dash OR Sword
@@ -8924,9 +8939,11 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       WaterDash, Damage=100:
         DoubleJump, TripleJump OR Dash
         DoubleJump, Sword, Hammer
-      WaterDash, Damage=140, DoubleJump OR Dash OR Hammer
-      WaterDash, Damage=160, Sword
-      WaterDash, Damage=180
+      WaterDash, Damage=140:
+        DoubleJump OR Hammer
+        Dash, PoolsApproach.WheelFreed
+      WaterDash, Damage=160, Sword, PoolsApproach.WheelFreed
+      WaterDash, Damage=180, PoolsApproach.WheelFreed
       Damage=180, Grapple, DoubleJump OR Dash
       DoubleJump, Damage=200, TripleJump OR Dash
       DoubleJump, Sword, Hammer, Damage=200
@@ -8934,7 +8951,12 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       Water, BreakWall=20, Bash, Grenade=1, Dash, DoubleJump OR Glide OR Sword OR Hammer OR Damage=20
       Water, DoubleJump, Damage=40
       Water, Launch
-  conn PoolsApproach.MillPath:  # dirty swims only. Clean water paths originate from RightOfWheel
+      Water, Damage=80, Sword
+      Water, Damage=100
+      WaterDash, Damage=140, Dash
+      WaterDash, Damage=160, Sword
+      WaterDash, Damage=180
+  conn PoolsApproach.MillPath:  # dirty swims only. Clean water paths originate from OnTopOfWheel
     kii, PoolsApproach.UnderwaterWallBroken:
       Damage=60, WaterDash, Launch OR Bash OR DoubleJump:
         Grapple, Glide OR Sword OR Hammer
@@ -8958,12 +8980,21 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       Damage=180, WaterDash, Bash, DoubleJump OR Dash OR Hammer
       Damage=190, WaterDash, DoubleJump
       Damage=200, WaterDash, Bash, Sword
-
-anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of the static wheel
-  refill Checkpoint:
-    moki: Water  # right below in the water
-    kii: Damage=20
+      
+anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
+  refill Checkpoint:  # Need skills to get back to the anchor coordinates
+    moki, Water:
+      Launch OR Grapple OR PoolsApproach.WheelFreed
+      DoubleJump, Dash
+    gorlek, Water: DoubleJump OR SentryJump=1
+    kii:
+      Water, Hammer
+      Damage=20, Launch OR Grapple OR DoubleJump OR Hammer OR SentryJump=1 OR PoolsApproach.WheelFreed
+    unsafe: Water OR Damage=20
     
+  state PoolsApproach.WheelFreed:
+    moki: Water, Bash
+    unsafe: Spear=1
   state PoolsApproach.UnderwaterWallBroken:
     moki: Water, Bash
     kii:
@@ -8975,25 +9006,34 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Damage=180, Bash
       Damage=160, Spear=1
       Grenade=1, Water OR Damage=180  # grenade redirect
-
-  pickup PoolsApproach.AboveWheelEX:  # grenadebashes here don't work as well when the wheel spins
+  
+  pickup PoolsApproach.AboveWheelEX:
     moki:
-      PoolsApproach.WheelFreed, DoubleJump
       Launch
+      Bash, Grenade=1, DoubleJump, Dash  # solve when the wheel is spinning by using the path bellow
+      PoolsApproach.WheelFreed, DoubleJump, Dash
     gorlek:
       DoubleJump, Hammer, Dash  # djump + upswing then dash to the wall
-      DoubleJump, TripleJump
-      SentryJump=1, DoubleJump
+      DoubleJump, TripleJump OR SentryJump=1 OR PoolsApproach.WheelFreed
+      Bash, Grenade=1, DoubleJump  # If the wheel is spinning, this is solved by just using double jump
+      PoolsApproach.WheelFreed, DoubleJump
     kii:
       DoubleJump, Dash, Spear=1
-      Bash, Grenade=1, DoubleJump  # If the wheel is spinning, this is solved by just using double jump
       Bash, Grenade=1, Dash, Hammer  # if the wheel is spinning, it's solving with the path on the next line
       PoolsApproach.WheelFreed, Dash, Hammer
     unsafe:
-      Bash, Grenade=1, SentryJump=1 OR PoolsApproach.WheelFreed
-      Glide, Hammer OR DoubleJump  # Glide jumps
-      DoubleJump, Sword  #  Sword jumps
-      Grenade=3  #  2 gjump then cancel the second on and start a grenade float (which you al need to cancel so you can wjump)
+      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      SwordJump
+      GrenadeJump, GrenadeCancel  # gjump to reach the platform then cancel second one to the pickup, cancel it and grenade float (which you also need to cancel so you can wjump)
+  pickup PoolsApproach.MillPathEC:
+    moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
+    gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash OR Damage=10  # dboost on the tentacle
+    kii, PoolsApproach.UnderwaterWallBroken:
+      WaterDash, Water OR Damage=180
+    unsafe:
+      PoolsApproach.UnderwaterWallBroken, Water
+      PoolsApproach.UnderwaterWallBroken, Bash, Damage=300
+      PoolsApproach.UnderwaterWallBroken, WaterDash, Damage=140
   pickup PoolsApproach.MillPathHC:
     moki, Water:
       DoubleJump, Dash, WaterDash, Grapple
@@ -9030,16 +9070,7 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Water, DoubleJump, Hammer, Damage=20, Dash OR TripleJump  # Hammer jumps
       Water, DoubleJump, Hammer, Grapple OR Glide  # Hammer jumps
       Water, Bash, Damage=20, Hammer, Sword
-  pickup PoolsApproach.MillPathEC:
-    moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
-    gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash OR Damage=10  # dboost on the tentacle
-    kii, PoolsApproach.UnderwaterWallBroken:
-      WaterDash, Water OR Damage=180
-    unsafe:
-      PoolsApproach.UnderwaterWallBroken, Water
-      PoolsApproach.UnderwaterWallBroken, Bash, Damage=300
-      PoolsApproach.UnderwaterWallBroken, WaterDash, Damage=140
-
+      
   conn PoolsApproach.MarshBreakableWall:
     moki, Water:
       WaterDash, DoubleJump, Grapple  # maybe not obvious?
@@ -9151,14 +9182,9 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Damage=160, Bash, Grapple, DoubleJump OR Sword
       Damage=180, Bash, Grapple, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Damage=160, Launch
-  conn PoolsApproach.LeftOfWheel:
-    moki:
-      PoolsApproach.WheelFreed OR DoubleJump OR Grapple OR Launch
-      Bash, Grenade=1
-    gorlek: free
   conn EastPools.LeverRoom:
     moki:
-      Glide, Launch
+      Launch, Glide OR Water
       Bash, Grenade=1, Launch, DoubleJump OR Dash
       DoubleJump, Dash, Launch, Damage=20
       PoolsApproach.WheelFreed, DoubleJump, Glide
@@ -9171,15 +9197,16 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
       Launch, Dash, Sword
       PoolsApproach.WheelFreed, Glide, Dash
       PoolsApproach.WheelFreed, Glide, Damage=20, Sword OR Hammer  # weapon not necessary, but you can use an upswing to make the jump off the wheel easier
+      Water, WaterDash, DoubleJump, TripleJump OR Damage=20
+      WaterDash, Damage=20, DoubleJump, TripleJump, Dash OR Sword OR Hammer  # touch the dirty water
+      Launch, SentryJump=1, DoubleJump OR Dash  # use the weapons to float over the spikes at the end
+      Launch, Damage=20, DoubleJump OR Dash OR Sword OR Hammer OR WaterDash  # touch the dirty water
     kii:
-      Launch, Sword OR Blaze=9
-      Launch, Blaze=8, Damage=20
+      Launch, Sword OR Blaze=9 OR Damage=20  # dboost in dirty water
       Launch, Bash, Grenade=1
       Launch, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
       Launch, DoubleJump, TripleJump OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
-      Launch, DoubleJump, Damage=20, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Launch, Hammer, Shuriken=1 OR Blaze=3 OR Sentry=2
-      Launch, Hammer, Damage=20, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, Dash, Spear=1, Glide
       Bash, Grenade=1, Glide
       PoolsApproach.WheelFreed, Glide
@@ -9190,9 +9217,17 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
         DoubleJump OR Sword OR Hammer OR Spear=2 OR Blaze=3 OR Sentry=2
         Damage=20, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, DoubleJump, Dash, TripleJump OR Hammer OR Spear=1
+      Water, WaterDash, Hammer, DoubleJump OR Damage=20
+      Water, WaterDash, DoubleJump, Hammer  # water dash straight up, double jump, upslash
+      WaterDash, Damage=60, DoubleJump OR Hammer # 2 dboost in dirty water
+      WaterDash, DoubleJump, Damage=40, TripleJump OR Dash OR Sword
+      WaterDash, Hammer, Dash, Damage=40  # 1 dboost in dirty water
     unsafe:
       Launch  # https://youtu.be/uWfkQOtjX5Y
       DoubleJump, Sword  # please don't put this in a supported difficulty thank you
+      Water, WaterDash, DoubleJump, Dash, Hammer  # water dash straight up, double jump, upslash, dash
+      WaterDash, Water OR Damage=20  # :3
+      Water, DoubleJump, TripleJump, Hammer  # Hammer jumps
   conn PoolsApproach.MillPath:
     moki, PoolsApproach.UnderwaterWallBroken:
       Water, Bash, Damage=10, Grapple, DoubleJump, Dash OR Glide
@@ -9209,47 +9244,9 @@ anchor PoolsApproach.RightOfWheel at -948, -4184:  # The rightmost platform of t
     unsafe:
       PoolsApproach.UnderwaterWallBroken, Damage=100, WaterDash
       PoolsApproach.UnderwaterWallBroken, Water, Grapple, Dash
-
-anchor PoolsApproach.LeftOfWheel at -995, -4184:  # The leftmost platform of the static wheel
-  state PoolsApproach.WheelFreed:
-    moki: Water, Bash
-    unsafe: Spear=1
-
-  pickup PoolsApproach.CurrentEX:
-    moki: Water, WaterDash
-    kii: Damage=80, WaterDash
-
-  conn PoolsApproach.RightOfWheel:  # grenadebash doesn't work when the wheel spins
-    moki:
-      PoolsApproach.WheelFreed, Water
-      DoubleJump OR Launch
-    gorlek: Dash, Hammer  # the first for the moving wheel, the latter for the still one
-    kii:
-      PoolsApproach.WheelFreed, Damage=180
-      PoolsApproach.WheelFreed, Damage=80, WaterDash
-    unsafe:
-      Sword 
-  conn EastPools.LeverRoom:
-    moki: Water, Launch
-    gorlek:
-      Water, WaterDash, DoubleJump, TripleJump OR Damage=20
-      WaterDash, Damage=20, DoubleJump, TripleJump, Dash OR Sword OR Hammer  # touch the dirty water
-      Launch, SentryJump=1, DoubleJump OR Dash  # use the weapons to float over the spikes at the end
-      Launch, Damage=20, DoubleJump OR Dash OR Sword OR Hammer OR WaterDash  # touch the dirty water
-    kii:
-      Water, WaterDash, Hammer, DoubleJump OR Damage=20
-      Water, WaterDash, DoubleJump, Hammer  # water dash straight up, double jump, upslash
-      Launch, Damage=20
-      WaterDash, Damage=60, DoubleJump OR Hammer # 2 dboost in dirty water
-      WaterDash, DoubleJump, Damage=40, TripleJump OR Dash OR Sword
-      WaterDash, Hammer, Dash, Damage=40  # 1 dboost in dirty water
-    unsafe:
-      Water, WaterDash, DoubleJump, Dash, Hammer  # water dash straight up, double jump, upslash, dash
-      WaterDash, Water OR Damage=20  # :3
-      Water, DoubleJump, TripleJump, Hammer  # Hammer jumps
   conn MarshSpawn.PoolsPath:
     moki: Water, WaterDash  # <3
-    unsafe: WaterDash, Damage=160  # 'u'
+    unsafe: WaterDash, Damage=180  # 'u'
 
 region EastPools:
   moki: Danger=40, Regenerate
@@ -9271,148 +9268,248 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
       DoubleJump, Damage=10, Sword OR Hammer  # tank the explosion damage from the slug
       Dash, Damage=20, Combat=CorruptSlug OR Bash
+    kii:
+      Combat=CorruptSlug OR Bash OR Damage=10:  # with damage: touch the slime to start the explosion countdown then fall and wait for the explosion
+        Dash
+        DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Sword
+      Bash, Damage=20, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash  # Bash the skeeto, bash the slime twice
-      SentryJump=1, DoubleJump  # wait for another bubble when on the right upper wall. Use weapon stall
-  state EastPools.BelowTokkBubbleFree:
-    moki: EastPools.EntryLever, Water, Bash
-    gorlek: EastPools.EntryLever, Water, WaterDash
-    unsafe, EastPools.EntryLever: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
-  state EastPools.BelowTokkPurpleWall:
+      Bash  # Bash the skeeto, bash the slime twice. Could be kii but the slime explode when you bash it if you touched it too soon ater the bash on the moskito
+      Sword  # https://youtu.be/i5HqEsRt5SI
+      DoubleJump  #jump on the ledge above where the right slime is to avoid the combat requirement
+      #SentryJump=1, DoubleJump  # wait for another bubble when on the right upper wall. Use weapon stall
+  state EastPools.BelowEntryLeverBubble:
+    moki: Hammer OR Spear=1
+    unsafe: Sword, Flap  # You'll love this, I swear https://youtu.be/i5HqEsRt5SI
+  state PoolsApproach.WheelFreed:
     moki: Water, Bash
-    unsafe: Water OR Bash  # bash the corrupted slime to blow the wall
-
+    unsafe:
+      Damage=60, Spear=1
+      WaterDash, Damage=40, Spear=1
+  
   quest EastPools.KwolokAmuletQI: free
 
   pickup EastPools.TwoCrushersEX:
     moki: Water, WaterDash
+    kii, WaterDash, Damage=80
     unsafe:
-      Water
-      WaterDash, Damage=60  # 80 is more likely
+      Water OR Damage=200
+      WaterDash, Damage=60
   pickup EastPools.RightOre:
     moki:
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, Dash OR Glide  # Need to flap from the green spot so the bubble don't go too far to the right
       Launch, Grapple
     gorlek:
+      Launch  # Jump on the bubble before using launch
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, TripleJump OR Sword OR Hammer OR Damage=20  # Need to flap from the green spot so the bubble don't go too far to the right
-      Launch, Flap  # Flap makes the bubbles spawn
-      Launch, Bash, Grenade=1
+    kii:
+      DoubleJump, Grapple, Flap, TripleJump OR Damage=30  # avoid the slime or one dboost in the spikes + one the the slime
+      DoubleJump, Grapple, Flap, Bash, Dash OR Glide OR Sword OR Hammer OR Damage=20  # @validator not sure why those aren't in gorlek
+      DoubleJump, Grapple, Flap, Damage=10, Dash OR Glide OR Sword OR Hammer
+      DoubleJump, Grapple, Flap, Combat=CorruptSlug, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Not adding the energy options to the bash/dboost variant because autoaim can screw you pretty hard because of the slime explosion
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=20  # can jump on the bubble but not mandatory
     unsafe:
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=20
-      Flap, Bash, Grenade=1, DoubleJump, Combat=CorruptSlug, TripleJump OR Sword OR Hammer  # Flap makes the bubble spawn. Use it to reach your grenade
-      Dash, Grapple, Flap  # Need to flap from the green spot so the bubble don't go too far to the right
-      Launch  # Turnaround Launch
+      Grapple, Flap, Dash OR DoubleJump  # precise jump from the right wall to barely reach the left wall without taking damage. Then wait for the slime to be in a position where you can avoid it
+      Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
   pickup EastPools.CurrentEX:
     moki: Water, WaterDash
+    kii, WaterDash, Damage=80
+    unsafe:
+      Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
+      WaterDash, Damage=60
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
-      Hammer, DoubleJump OR Dash OR Glide
-      Spear=1, DoubleJump OR Dash OR Glide
+      EastPools.BelowEntryLeverBubble, DoubleJump OR Dash OR Glide
       Launch
     gorlek:
-      Spear=1 OR Hammer
+      EastPools.BelowEntryLeverBubble
       Bash, DoubleJump, TripleJump
+    kii: Bash  # Bait the skeeto, bash it when it's under the hole
     unsafe:
       DoubleJump, TripleJump, Combat=CorruptSlug  # kill the slug on the left wall, tjump from this wall into the spikes under the pickup
       SentryJump=1, DoubleJump OR Damage=20  # The tree is swinging a bit. sjump from the left (Ori should almost fall) when the tree is swinging to the left
-      Bash  # Bait the skeeto, bash it when it's under the hole
-  pickup EastPools.AboveDoorOre:  # some paths that aren't redundant with the paths coming from Tokk
-    moki, EastPools.EntryLever:
-      Bash, Grenade=2
-      Bash, Grenade=1, DoubleJump OR Grapple
-    gorlek, EastPools.EntryLever:
-      SentryJump=2, Damage=20  # damage if you sjump into the spikes
-      Bash, Grenade=1, SentryJump=1
-      SentryJump=1, DoubleJump OR Grapple
-    unsafe, EastPools.EntryLever:
-      Hammer, Bash              # using upswing to get below slug, hit it off the ceiling and then bash it
 
-  conn EastPools.TPArea:
-    moki, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide
-      DoubleJump, Bash, Grenade=1  # bashgrenade above
-      Grapple, Bash, Grenade=1, Dash OR Glide  # bashgrenade above
-      Bash, Grenade=2, Dash OR Glide  # bashgrenade above
-      Bash, Grenade=2, EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall  # bashgrenade below
-      Bash, Grenade=2, Water # bashgrenade below
-      Launch
-    gorlek, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
-      SentryJump=2, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
-      SentryJump=1, DoubleJump OR Grapple
-      Grapple, Bash, Grenade=1, Sword OR Hammer OR Damage=20  # bashgrenade above
-      Bash, Grenade=2, Sword OR Hammer OR Damage=20
-      Bash, Grenade=3
-      Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
-    unsafe, EastPools.EntryLever:
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
-      Bash, DoubleJump  # Bash the slug at the left of the spike, bash it to reach tokk
-      DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
-      Bash, Grenade=2
-  conn PoolsApproach.LeftOfWheel:  # should be fair to assume that if the wheel is spinning, the player has Water
+  conn EastPools.BehindEntryDoor:
+    moki: EastPools.EntryLever
+  conn PoolsApproach.OnTopOfWheel:  # make sure it's possible with both states of the wheel
     moki:
-      Water
-      Bash, Grenade=1, Glide
+      Water, PoolsApproach.WheelFreed OR DoubleJump OR Launch
+      Water, Bash, Grenade=1  # if the wheel is rotating, this solve with the line above
+      Bash, Grenade=2, Glide
+      Bash, Grenade=1, Glide, DoubleJump
       Glide, Launch
       DoubleJump, Dash, Launch
       Bash, Grenade=1, Launch, DoubleJump OR Dash
-    gorlek:  # Try with the spinning wheel if there is a damage boost that seems unnecessary
-      DoubleJump, Damage=20, TripleJump OR Dash OR Sword
-      DoubleJump, TripleJump, Dash, Sword
+    gorlek:
+      Water, Hammer OR SentryJump=1
+      DoubleJump, Damage=20, TripleJump OR Dash
       Bash, Grenade=1, Launch
-      Bash, Grenade=1, Damage=20, Dash OR DoubleJump
-      Bash, Grenade=1, Dash, DoubleJump
-      Glide, DoubleJump OR Dash OR SentryJump=1 OR Damage=20
-      WaterDash, Damage=20, DoubleJump OR Dash OR Glide
-      Launch, DoubleJump OR Dash OR Damage=20
+      Bash, Grenade=1, Damage=20, DoubleJump
+      Glide, DoubleJump, TripleJump OR Dash OR Damage=20
+      WaterDash, Damage=20, DoubleJump, Sword OR Hammer
+      Launch, DoubleJump, TripleJump OR Sword OR Hammer
+      Launch, Dash, Sword OR Hammer
       SentryJump=1, Damage=20, Dash, DoubleJump
       SentryJump=1, Launch  # Use weapon to stall before and after the launch
+    kii:
+      Water, Sword, Dash
+      Water, Spear=1
+      WaterDash, Damage=100, PoolsApproach.WheelFreed OR DoubleJump OR Hammer
+      DoubleJump, Damage=20, Sword OR Shuriken=2 OR Blaze=5 OR Sentry=3
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Damage=20, Dash, Hammer  # hammer for the static wheel, damage for the rotatin wheel
+      Glide, Dash, Sword OR Hammer OR Shuriken=1 OR Damage=20
+      Glide, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=3 OR Blaze=3 OR Sentry=3  # climb the left wall
     unsafe:
-      Launch, Hammer, Sword  # climb the left wall
+      Water  # Precise wall jump where the tentacle is grabbing the wheel
+      Damage=240  # Only require 60 damage if the wheel isn't spinning but has to also work when the wheel is spinning
+      Launch  # climb the left wall then ceiling boost
+  conn MarshSpawn.PoolsPath:
+    moki: Water, WaterDash  # <3
+    unsafe: WaterDash, Damage=160  # 'u'
 
-# checkpoint at -1278, -4158
+anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by EastPools.EntryLever
+  refill Checkpoint
+  
+  state EastPools.BelowTokkBubbleFree:
+    moki: Water, Bash OR WaterDash
+    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:
+    moki: Water, Bash
+    kii: Water  # bait the torpedo into touching the wall
+    unsafe: Bash  # bash the corrupted slime to blow the wall
+  state EastPools.BelowEntryLeverBubble:
+    moki, EastPools.EntryLever: Hammer OR Spear=1
+  
+  pickup EastPools.AboveDoorOre:  # some paths that aren't redundant with the paths coming from Tokk
+    moki:
+      Launch
+      Bash, Grenade=2
+      Bash, Grenade=1, DoubleJump OR Grapple
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap, DoubleJump OR Dash
+    gorlek:
+      SentryJump=2, Damage=20  # damage if you sjump into the spikes
+      SentryJump=1, DoubleJump OR Grapple
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap, Sword OR Hammer
+    kii: EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap, Combat=Crab OR Bash OR Damage=10
+    unsafe:
+      Sword, Bash, Hammer OR Grapple OR Dash  # hammer upswing + swod upswing + sword pogo to get below slime. With dash, either dash ramp if the door is opened or wall jump off the door. Hit the slime off the ceiling with sword and then bash it (hammer kill the slime with both ancestral light in easy).
+      DoubleJump, Bash  # Bash the slug when its at the right of the ceiling
+  
+  conn EastPools.BelowTokk:
+    moki: 
+      DoubleJump OR Launch
+      Grapple, Dash OR Glide
+      Bash, Grenade=1, Dash OR Glide
+      Bash, Grenade=1, Water  # bash grenade from below
+      Bash, Grenade=1, EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall
+    gorlek:
+      Grapple, Sword OR Hammer OR Damage=20
+      SentryJump=1, Damage=20  # weapon stall under the slug, damage is if you sjump into the spikes
+      Bash, Grenade=1, Sword OR Hammer OR Damage=20
+      Bash, Grenade=2  # bash grenade from under AboveDoorOre and bash the slime to reach the anchor
+    kii:
+      Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  # bash grenade from below 
+    unsafe:
+      Grapple, Spear=1 OR Blaze=1
+      Dash  # either dash ramp if the door is opened or wall jump off the door
+  conn EastPools.LeverRoom:
+    moki, EastPools.EntryLever: Combat=Crab OR Bash OR Launch OR EastPools.BelowEntryLeverBubble
+    gorlek, EastPools.EntryLever: Water, Damage=10  # dboost on the crab then wait for the bubble in the water
+    unsafe: EastPools.EntryLever
+
+anchor EastPools.BelowTokk at -1278, -4158:  # at the checkpoint where you do puzzle skip, between Tokk and the slime
+  refill Checkpoint
+
+  state EastPools.BelowTokkBubbleFree:  # Be sure it's not redundant with going to EastPools.BehindEntryDoor first 
+    moki: Water, Bash OR WaterDash
+    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+  state EastPools.BelowTokkPurpleWall:  # Be sure it's not redundant with going to EastPools.BehindEntryDoor first
+    moki: Water, Bash
+    kii: Water
+  state EastPools.LowerWaterDrained:  # Puzzle skip
+    unsafe:
+      DoubleJump OR Dash OR Hammer OR Damage=20  # Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 is hard, which can kill you if you only have 30 HP
+      Bash, Grenade=1
+
+  pickup EastPools.AboveDoorOre:  # Make sure it's not redundant with paths comming from EastPools.BehindEntryDoor
+    gorlek:
+      Bash, Grenade=1, Damage=20
+      SentryJump=1, Damage=20
+
+  conn EastPools.BehindEntryDoor:
+    moki:
+      Launch OR Grapple  # with grapple, go below
+      Bash, Grenade=1  # either go below or bash the slime after bashing your grenade if going above
+      DoubleJump, Dash OR Glide
+    gorlek: DoubleJump OR SentryJump=1 OR Damage=20  # sjump from below. Use your weapon to kill the crab
+    kii:
+      Bash  # Go below
+      Combat=CorruptSlug, Hammer  # if you hit the slug it gets weird because you can hit it again which makes it explodes so it's better to kill it before going over the spikes
+  conn EastPools.TPArea:
+    moki:
+      Launch
+      Bash, Grenade=1
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide      
+    gorlek:
+      SentryJump=1
+      Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
+    kii:
+      Bash, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
+      DoubleJump, TripleJump, Sword  # tjump, hit the slime then tjump+upslash
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Bash OR Combat=Crab:  # Push the bubble by jumping on it rather than using flap
+        DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Bash, DoubleJump  # Bash the slug to the left of the spike, bash it again to reach tokk
+      DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
+  conn EastPools.Teleporter:  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can die at the same spot as usual to activate the checkpoint (you won't have the cutscene) then QTM/die to respawn on the teleporter
+    unsafe, EastPools.LowerWaterDrained: DoubleJump OR Dash OR Hammer OR Damage=20
 
 anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   refill Checkpoint
   refill Full:  # use the teleporter
     moki: EastPools.LowerWaterDrained
 
-  state EastPools.BelowTokkBubbleFree:
-    moki: Water, Bash
-    gorlek: Water, WaterDash
-    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
-  state EastPools.BelowTokkPurpleWall:
-    moki: Water, Bash
-    unsafe: Water OR Bash  # bash the corrupted slime to blow the wall
   state EastPools.LowerWaterDrained:
     moki: Water, WaterBreath
     gorlek: Water
-    unsafe:
-      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20  # puzzle skip. Need the different skills because even if you have to die and can survive the 20 damage at the start since you spawn with 30 health, thiese spieks deals 40 damage in hard
-      Bash, Grenade=1  # puzzle skip.
-  
-  pickup EastPools.AboveDoorOre:
-    moki:
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap, DoubleJump OR Dash
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
-      Bash, Grenade=2
-      Launch
+    kii: WaterDash, Damage=120
+    unsafe:  # Puzzle Skip. Dirty water swim is redundant with doing puzzle skip which need way less health
+      Glide OR Sword OR Bash OR Shuriken=1 OR Sentry=2  # Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 is hard, which can kill you if you only have 30 HP
+      Blaze=1, Damage=10  # hit the slime with blaze and get hit by the explosion to make it across
+      Spear=1, Blaze=2 OR Flash=1  # hitting the slime while hovering can make it explode so kill with Spear beforehand
+      Grenade=1, Blaze=2 OR Flash=1  # hitting the slime while hovering can make it explode so kill with Grenade beforehand
+
+  pickup EastPools.AboveDoorOre:  # Make sure it's not redundant with paths from EastPools.BehindEntryDoor and EastPools.BelowTokk
+    moki: Bash, Grenade=1, Dash OR Glide
     gorlek:
-      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Flap
-      Bash, Grenade=1, Sword OR Hammer OR Damage=20
+      Bash, Grenade=1, Sword OR Hammer
       SentryJump=1  # Weapon stall above the spikes
-    unsafe:
-      DoubleJump, Bash  # Bash the slug when its at the right of the ceiling
-      Sword, Bash       # Hit slug with sword to hit it off the ceiling and then bash it
+    unsafe: Sword, Bash       # Hit slug with sword to hit it off the ceiling and then bash it
   pickup EastPools.LupoOre:
     moki: Water
+    kii:
+      Damage=140
+      WaterDash, Damage=60
   pickup EastPools.LupoEX:
-    gorlek: Water, ShurikenBreak=20
+    gorlek, ShurikenBreak=20: Water
+    kii, ShurikenBreak=20:
+      Damage=140
+      WaterDash, Damage=60
   pickup EastPools.LupoMap:
-    gorlek: SpiritLight=150, Water, ShurikenBreak=20
+    gorlek, SpiritLight=150, ShurikenBreak=20: Water
+    kii, SpiritLight=150, ShurikenBreak=20:
+      Damage=140
+      WaterDash, Damage=60
 
   # this Tokk disappears after Kwolok's death
   conn EastPools.Teleporter:
@@ -9427,32 +9524,25 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
       SentryJump=1, DoubleJump
       Bash, Grenade=1, Dash OR Sword OR Hammer
       DoubleJump, TripleJump, Dash  # climb the left wall, dash then tjump to reach the wall above the grapple plant
-    unsafe:
+    kii:
       Bash, Grenade=1
+      Grapple, Shuriken=1 OR Sentry=2
+      DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # climb the left wall, tjump to get under the wall above the grapple plant and energy weapon to get the extra mobility needed
+      DoubleJump, Dash, Hammer
+    unsafe:
       Grapple, Damage=40
+      DoubleJump, TripleJump
   conn EastPools.WaterdashArena:
-    moki, EastPools.ArenaWall:
-      Water
-      EastPools.LowerWaterDrained, DoubleJump OR Dash OR Glide OR Launch
-    gorlek, EastPools.ArenaWall:
-      EastPools.LowerWaterDrained, Sword OR Damage=20
-    unsafe, EastPools.ArenaWall: EastPools.LowerWaterDrained  # jump on the bubble to avoid a dboost in dirty water
-  conn EastPools.LeverRoom:
-    moki, EastPools.EntryLever:
-      Combat=Crab, DoubleJump OR Dash OR Glide  # go above
-      Bash, DoubleJump OR Dash OR Glide  # go above
-      Bash, Grenade=1  # go above
-      Launch  # go above
-      Hammer, Glide  # this doesn't solve through combat, but you can break the bubble free to get over the crab
-      Spear=1, DoubleJump OR Dash OR Glide  # break the bubble free to get over the crab
-      Grapple, Combat=Crab OR Bash  # go below
-    gorlek, EastPools.EntryLever:
-      SwordSJump=1
-      Sword, Combat=Crab OR Bash OR Spear=1  # with spear you can break the bubble free to get over the crab
-      Hammer  # float over the spikes, break the bubble free to get over the crab
-      Damage=10, DoubleJump OR Dash OR Glide OR Sword  # get hit by the crab
-      Damage=20, Combat=Crab OR Bash OR Spear=1
-      Grapple, Damage=10  # go below, get hit by the crab
+    moki, EastPools.ArenaWall: Water
+  conn EastPools.BelowTokk: free
+  conn EastPools.BehindEntryDoor:
+    moki: DoubleJump OR Dash OR Glide  # go above
+    gorlek:
+      Spear=1, Sword OR Hammer  # hitting the slime while hovering can make it explode so kill with Spear beforehand
+      Grenade=1, Sword OR Hammer  # hitting the slime while hovering can make it explode so kill with Grenade beforehand
+    kii:
+      Spear=1, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # hitting the slime while hovering can make it explode so kill with Spear beforehand
+      Grenade=1, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # hitting the slime while hovering can make it explode so kill with Grenade beforehand
 
 anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining the water
   refill Full
@@ -9460,18 +9550,43 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   state EastPools.LowerWaterDrained: free  # the randomizer drains the water if you aquire the teleporter, and for non-teleporter connections this anchor is strictly locked behind already having the state
   state NonGladesTeleporter: free
   state EastPools.ArenaWall:
-    moki: EastPools.LowerWaterDrained, Water, Bash
-    unsafe: EastPools.LowerWaterDrained, Water, Launch OR Dash OR Damage=20
+    moki, EastPools.LowerWaterDrained: Water, Bash
+    kii, EastPools.LowerWaterDrained: Water, Damage=20
+    unsafe, EastPools.LowerWaterDrained:
+      Water, Launch OR Dash
+      Bash, Damage=300
   state EastPools.LupoPurpleFloor:
     unsafe, EastPools.LowerWaterDrained: Water, Bash, Dash, ShurikenBreak=20
   
   pickup EastPools.UltraBashShard:
     moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
     gorlek, EastPools.LowerWaterDrained: Water, Bash
-    unsafe, EastPools.LowerWaterDrained: Water  # move a bit on the side when the torpedo is getting close to the wall
+    kii, EastPools.LowerWaterDrained: Water  # move a bit on the side when the torpedo is getting close to the wall
+    unsafe, EastPools.LowerWaterDrained:
+      Damage=240
+      Bash, Damage=220
+  pickup EastPools.LupoOre:
+    kii, EastPools.LowerWaterDrained:
+      Damage=100
+      WaterDash, Damage=40
+  pickup EastPools.LupoEX:
+    kii, EastPools.LowerWaterDrained, ShurikenBreak=20:
+      Damage=100
+      WaterDash, Damage=40
+  pickup EastPools.LupoMap:
+    kii, EastPools.LowerWaterDrained, SpiritLight=150, ShurikenBreak=20:
+      Damage=100
+      WaterDash, Damage=40
   
-  conn Teleporters: free
-  conn EastPools.TPArea: free
+  conn Teleporters:
+    moki: EastPools.LowerWaterDrained
+  conn EastPools.TPArea:
+    moki: EastPools.LowerWaterDrained OR Water
+  conn EastPools.WaterdashArena:
+    moki, EastPools.ArenaWall, EastPools.LowerWaterDrained: DoubleJump OR Dash OR Glide OR Launch
+    gorlek, EastPools.ArenaWall, EastPools.LowerWaterDrained: Sword OR Damage=20
+    kii, EastPools.ArenaWall, EastPools.LowerWaterDrained: Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, EastPools.ArenaWall: EastPools.LowerWaterDrained  # jump on the bubble to avoid a dboost in dirty water
 
 anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
   quest EastPools.HandToHandSpyglass:
@@ -9488,13 +9603,24 @@ anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
       WaterDash, Dash, Sword, Water OR Damage=20  # upslash makes it easier to reach the wall above the water
       Bash, Grenade=1, Dash
       SentryJump=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1, Sword OR Hammer
+      Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      WaterDash, Water, Sword
+      WaterDash, Water, Hammer, Glide OR Shuriken=2  # Would be possible with 2 sentries/flash but this makes the slime explodes which knock you back down
+      WaterDash, Water, Glide, Shuriken=2  # Would be possible with 2 sentries/flash but this makes the slime explodes which knock you back down
     unsafe:
+      Bash, Grenade=1
+      WaterDash, Hammer, Water OR Damage=20
       DoubleJump, TripleJump  # ceiling jump on the wall above the fishing pond
   conn EastPools.TPArea: free
 
 anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
   pickup EastPools.AboveTpEX:  # this needs water to not softlock when the player drains the upper water
     moki: Water
+    kii:  # dirty swim 
+      Damage=80
+      WaterDash, Damage=40
   pickup EastPools.PurpleWallHC:  # paths using the slime to break the purple wall
     unsafe:
       Bash, Launch OR SentryJump=1 OR Grenade=1
@@ -9508,11 +9634,13 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
     gorlek, UpperPools.UpperWaterDrained:
       Bash, Grenade=2
       SentryJump=1, DoubleJump
-    unsafe, UpperPools.UpperWaterDrained:
-      WaterDash, DoubleJump, TripleJump, Water, Dash OR Sword OR Hammer
-      DoubleJump, TripleJump, Damage=20  # climb the left wall
+    kii, UpperPools.UpperWaterDrained:
+      Water, WaterDash, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=20, WaterDash, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, DoubleJump  # Bash the slime
       Bash, Grenade=1, WaterDash, Water OR Damage=20
+    unsafe, UpperPools.UpperWaterDrained:
+      DoubleJump, TripleJump, Damage=20  # climb the left wall
 
 anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of the pools arena
   refill Checkpoint
@@ -9531,16 +9659,25 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
       Bash, Grenade=1
       Launch
     gorlek, EastPools.FightArenas, WaterDash: Water OR Damage=20  # WaterDash on the bubble
-  
+    kii, EastPools.FightArenas, WaterDash: DoubleJump  #@validator that might be gorlek? gorlek for sure with tjump
+    unsafe, EastPools.FightArenas, WaterDash:
+      Hammer  #Jump on the bubble then stall until a new one spawn
+      Dash OR Glide OR Sword # jump on the bubble, wait on the left wall by wall jumping then go back to jump on a new bubble
+
   conn EastPools.TPArea:
-    moki, EastPools.ArenaWall:
-      Water
-      EastPools.LowerWaterDrained, DoubleJump OR Dash OR Launch OR Glide
-    gorlek, EastPools.ArenaWall: EastPools.LowerWaterDrained, Sword OR Hammer OR Damage=20
+    moki, EastPools.ArenaWall: Water
+    kii, EastPools.ArenaWall:
+      Damage=80
+      WaterDash, Damage=40
+  conn EastPools.Teleporter:
+    moki, EastPools.ArenaWall, EastPools.LowerWaterDrained: DoubleJump OR Dash OR Launch OR Glide
+    gorlek, EastPools.ArenaWall, EastPools.LowerWaterDrained: Sword OR Hammer OR Damage=20
+    gorlek, EastPools.ArenaWall, EastPools.LowerWaterDrained: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn EastPools.MissilePuzzle:
     moki, EastPools.FightArenas: Water OR DoubleJump OR Dash OR Glide OR Launch 
     gorlek, EastPools.FightArenas: Sword OR Hammer OR Damage=20
-    unsafe: EastPools.FightArenas OR Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
+    kii: EastPools.FightArenas
+    unsafe: Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
 
 anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   refill Checkpoint
@@ -9548,12 +9685,18 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   state EastPools.CentralRoomPurpleWall:
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
-    unsafe: Water
+    kii: Water
+    unsafe:
+      Damage=200, Bash
+      Damage=140, Bash, WaterDash
   state EastPools.LupoPurpleFloor:
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
-    unsafe: Water
-
+    kii: Water
+    unsafe:
+      Damage=300, Bash
+      Damage=200, Bash, WaterDash
+  
   pickup EastPools.EnergyHarvestShard:
     moki:
       Water, WaterDash, DoubleJump
@@ -9563,38 +9706,84 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
       Damage=20, WaterDash, DoubleJump
       Water, Bash, DoubleJump OR WaterDash  # Use the torpedo
       SentryJump=1
+    kii:
+      WaterDash, Hammer, Water OR Damage=20
+      DoubleJump, TripleJump, Hammer  # tjump + upslash from the left wall
     unsafe:
-      DoubleJump, TripleJump, Sword OR Hammer  # tjump + upslash from the left wall
-      Water, Bash  # Bash the torpedo out of the water (near the floor so you don't get too much speed), go out of the water and bash it again
+      WaterDash, Sword, Water OR Damage=20
+      DoubleJump, TripleJump, Sword  # tjump + upslash from the left wall
+      Bash, Water OR Damage=220  # Bash the torpedo out of the water (near the floor so you don't get too much speed), go out of the water and bash it again
   pickup EastPools.LupoEX:
-    moki: EastPools.LupoPurpleFloor, Water
+    moki, EastPools.LupoPurpleFloor: Water
+    kii, EastPools.LupoPurpleFloor:
+      Damage=100
+      Damage=60, WaterDash
   pickup EastPools.LupoMap:
-    moki: SpiritLight=150, EastPools.LupoPurpleFloor, Water
-    gorlek: SpiritLight=150, EastPools.LupoPurpleFloor, Water
+    moki, SpiritLight=150, EastPools.LupoPurpleFloor: Water
+    kii, SpiritLight=150, EastPools.LupoPurpleFloor:
+      Damage=100
+      Damage=60, WaterDash
+  pickup EastPools.LupoOre:
+    kii, EastPools.LupoPurpleFloor, BreakWall=20:
+      Damage=100
+      WaterDash, Damage=40
   pickup EastPools.BehindCrusherEX:
     moki: Water, WaterBreath
     gorlek: Water
+    kii:
+      EastPools.LupoPurpleFloor, Damage=200
+      EastPools.LupoPurpleFloor, WaterDash, Damage=120
+      WaterDash, Damage=140
+    unsafe:
+      Damage=220
+      WaterDash, Damage=100
   pickup EastPools.SpiritTrial:
     moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
-
+    kii:
+      UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, DoubleJump
+      UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, Glide, Dash
+    unsafe: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, Glide OR Dash
+    
   conn EastPools.CentralRoom:
-    moki: EastPools.CentralRoomPurpleWall, Water
+    moki, EastPools.CentralRoomPurpleWall: Water
+    kii, EastPools.CentralRoomPurpleWall:
+      Damage=180
+      WaterDash, Damage=80
   conn EastPools.WaterdashArena:
     moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: EastPools.FightArenas
+    unsafe:  # die to open the door if it's closed
+      Water OR Damage=60
+      WaterDash, Damage=20
   conn EastPools.TPArea:
     moki: EastPools.LupoPurpleFloor, Water, BreakWall=20
+    kii, EastPools.LupoPurpleFloor, BreakWall=20:
+      Damage=100, Damage=160
+      WaterDash, Damage=40, Damage=80
+  conn EastPools.Teleporter:
+    kii, EastPools.LupoPurpleFloor, BreakWall=20:
+      Damage=100, Damage=100
+      WaterDash, Damage=40, Damage=40
 
 anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok when he's still fine
   refill Checkpoint
 
   state EastPools.CentralRoomPurpleWall:
-    unsafe: Water
+    kii: Water OR Damage=180  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
+  state EastPools.CentralRoomBubbleFree:
+    moki: Water, Bash OR WaterDash
+    kii:
+      Damage=160, Bash
+      Damage=80, WaterDash
+    unsafe:
+      Water, Deflector, Sword
+      Water, Bow=1
+      Water, Grenade=1, Fracture
 
   quest EastPools.GrassSeed:
     moki:
       Water, WaterDash
-      Water, Bash, DoubleJump OR Dash OR Glide
+      EastPools.CentralRoomBubbleFree, DoubleJump OR Dash OR Glide
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
       Launch
     gorlek:
@@ -9604,31 +9793,56 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Bash, DoubleJump, Glide OR Sword
       Bash, Dash, Glide OR Sword
       DoubleJump, TripleJump, Glide
+    kii:
+      EastPools.CentralRoomBubbleFree, Water OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # possible with blaze but the aoe breaking the bubble is annoying
+      Damage=100, Bash  # Use the tentacle's projectile
+      Bash, Grenade=1, EastPools.CentralRoomBubbleFree OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1  # possible with as little as 1 blaze but might be too precise for kii?
+      Bash, DoubleJump OR Glide  # Bashglide from the lantern
+      Bash, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Hammer, Sentry=3  # bashglide from the lantern then one hammer swing and 3 sentries
+      DoubleJump, Glide, Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash, DoubleJump, TripleJump OR Hammer
+      EastPools.CentralRoomBubbleFree
+      Bash, Grenade=1, Spear=1 OR Blaze=1
+      Bash, Sword  # hover to reach the lantern, extend bash glide with upslash then hover again
+      DoubleJump, Glide
 
   conn UpperPools.KeystoneRoomEntrance:
     moki:
-      Water, Bash, DoubleJump, Dash OR Glide
-      Water, Bash, Launch
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Dash OR Glide
+      EastPools.CentralRoomBubbleFree, Bash, Launch
     gorlek:
-      DoubleJump, TripleJump, Dash, Glide, WaterDash  # wdash to free the bubbles
-      Water, DoubleJump, TripleJump, Bash OR WaterDash
-      Water, Bash, Grenade=1, DoubleJump
-      Water, WaterDash, Launch  # activate the bubbles with waterdash. Launch on a bubble to reach the top
-      Water, WaterDash, SentryJump=1, DoubleJump, TripleJump OR Dash OR Glide  # sjump from EastPools.GrassSeed
-      Launch, DoubleJump OR Dash OR Glide
-    # unsafe note: you can use sword deflector to free the bubble without bash or wdash
+      EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump, Dash, Glide
+      EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump, Bash
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1, DoubleJump
+      EastPools.CentralRoomBubbleFree, SentryJump=1, DoubleJump, TripleJump OR Dash OR Glide  # sjump from EastPools.GrassSeed
+      Launch, DoubleJump OR Dash OR Glide OR EastPools.CentralRoomBubbleFree
+    kii:
+      Launch
+      EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump  # from the seed, jump on a bubble to reach the wall near the lantern and wait for another bubble from there
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # with sword/hammer, hover before jumping to avoid touching the bubble
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1, Grenade=1 OR Water OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Damage=20   # bashnade from the seed to jump on the bubble then wait another bubble
+    unsafe:
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Blaze=1
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1  # bashnade from the seed to jump on the bubble then wait another bubble
   conn WestPools:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Water, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=20
+    kii:
+      WaterDash, Water, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=160, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=180
     unsafe:
       Water, WaterBreath, Launch
       Water, WaterBreath, DoubleJump, Grenade OR Hammer  # greande/hammer jumps. With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
       Water, WaterBreath, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
   conn EastPools.MissilePuzzle:
-    moki: EastPools.CentralRoomPurpleWall, Water
+    moki, EastPools.CentralRoomPurpleWall: Water
+    kii, EastPools.CentralRoomPurpleWall:
+      Damage=180
+      WaterDash, Damage=80
 
 region UpperPools:
   moki: Danger=40, Regenerate
