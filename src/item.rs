@@ -13,7 +13,7 @@ mod shop_command;
 
 use std::fmt;
 
-use crate::headers;
+use crate::languages::headers;
 use crate::util::{Difficulty, Zone, Icon};
 
 pub use self::{
@@ -199,19 +199,17 @@ impl Item {
         match self {
             Item::SpiritLight(amount) => *amount,
             Item::Resource(Resource::Ore) => 20,
-            Item::Resource(Resource::Health) => 240,
+            Item::Resource(Resource::Energy | Resource::Health) => 120,
             Item::Resource(Resource::Keystone) => 320,
-            Item::Resource(Resource::Energy) => 320,
             Item::Resource(Resource::ShardSlot) => 480,
-            Item::Skill(Skill::Regenerate) | Item::Skill(Skill::WaterBreath) => 200,  // Quality-of-Life Skills
-            Item::Skill(Skill::Sword) | Item::Skill(Skill::Hammer) => 600,  // Essential Weapons
-            Item::Skill(Skill::WallJump) | Item::Skill(Skill::DoubleJump) | Item::Skill(Skill::Dash) => 1200,  // Essential Movement
-            Item::Skill(Skill::Glide) | Item::Skill(Skill::Grapple) => 1400,  // Feel-Good Finds
-            Item::Skill(Skill::Bow) | Item::Skill(Skill::Shuriken) => 1600,  // Secondary Weapons
-            Item::Skill(Skill::Burrow) | Item::Skill(Skill::Bash) | Item::Skill(Skill::Flap) | Item::Skill(Skill::WaterDash) |
-            Item::Skill(Skill::Grenade) | Item::Skill(Skill::Flash) | Item::Skill(Skill::Seir) | Item::Water => 1800,  // Key Skills
-            Item::Skill(Skill::Blaze) | Item::Skill(Skill::Sentry) | Item::Skill(Skill::Spear) => 2800,  // Tedious Weapons
+            Item::Skill(Skill::Regenerate | Skill::WaterBreath) => 200,  // Quality-of-Life Skills
+            Item::Skill(Skill::WallJump | Skill::DoubleJump | Skill::Dash) => 1200,  // Essential Movement
+            Item::Skill(Skill::Glide | Skill::Grapple) => 1400,  // Feel-Good Finds
+            Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600,  // Basic Weapons
+            Item::Skill(Skill::Burrow | Skill::Bash | Skill::Flap | Skill::WaterDash | Skill::Grenade | Skill::Flash | Skill::Seir) | Item::Water => 1800,  // Key Skills
+            Item::Skill(Skill::Blaze | Skill::Sentry) => 2800,  // Tedious Weapons
             Item::Skill(Skill::AncestralLight) => 3000,  // Unhinted Skill
+            Item::Skill(Skill::Spear) => 4000,  // No
             Item::Skill(Skill::Launch) => 40000,  // Absolutely Broken
             Item::Shard(_) => 1000,
             Item::Teleporter(Teleporter::Marsh) => 30000,

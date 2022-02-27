@@ -6,7 +6,7 @@ use std::{
     io::{self, Read},
     time::Instant,
     collections::HashMap,
-    process,
+    process, env,
 };
 
 use structopt::StructOpt;
@@ -14,14 +14,13 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, lexer, item, world, headers, settings, util};
+use seedgen::{self, item, world, settings, util, languages::{headers::{self, parser::HeaderContext}, self}};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
     World,
     graph::Graph,
 };
-use headers::parser::HeaderContext;
 use settings::{Settings, Spawn};
 use util::{Difficulty, Glitch, GoalMode, UberState};
 
@@ -415,9 +414,8 @@ fn write_seeds_to_files(seeds: &[String], spoilers: &[String], mut filename: Str
         if race {
             let spoiler = &spoilers[index];
 
-            let spoiler_filename = format!("{}_spoiler", file.with_extension("").file_name().unwrap().to_string_lossy());
+            let spoiler_filename = format!("{}.spoiler.wotwr", file.file_stem().unwrap().to_string_lossy());
             path.set_file_name(spoiler_filename);
-            path.set_extension("wotwr");
 
             let file = util::create_file(&path, spoiler, "", true)?;
             log::info!("Wrote spoiler for {} to {}", player, file.display());
@@ -450,7 +448,7 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), String> {
 
     let settings = parse_settings(args.settings)?.apply_presets()?;
 
-    let graph = lexer::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
+    let graph = languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let header = read_header();
@@ -511,25 +509,14 @@ fn create_preset(mut args: PresetArgs) -> Result<(), String> {
 }
 
 fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
-    let command = format!("reach-check {} --areas {} --locations {} --uber-states {} {} {} {} {} {} {}",
-        args.seed_file.display(),
-        args.areas.display(),
-        args.locations.display(),
-        args.uber_states.display(),
-        args.health,
-        args.energy,
-        args.keystones,
-        args.ore,
-        args.spirit_light,
-        args.items.join(" "),
-    );
+    let command = env::args().collect::<Vec<_>>().join(" ");
     log::trace!("{}", command);
 
     args.seed_file.set_extension("wotwr");
     let contents = util::read_file(&args.seed_file, "seeds")?;
 
     let settings = Settings::from_seed(&contents)?;
-    let graph = &lexer::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
+    let graph = &languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
     let mut world = World::new(graph);
 
     world.player.apply_settings(&settings);

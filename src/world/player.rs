@@ -183,6 +183,10 @@ impl Player {
             weapons.push(Skill::Grenade);
             weapons.push(Skill::Shuriken);
         }
+        if self.difficulty >= Difficulty::Unsafe {
+            weapons.push(Skill::Flash);
+            weapons.push(Skill::Blaze);
+        }
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
         weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.difficulty) * 10.0) as u16);

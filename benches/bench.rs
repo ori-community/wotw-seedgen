@@ -4,7 +4,8 @@ use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 
 use seedgen::*;
-use lexer::*;
+use languages::*;
+use logic::*;
 use world::*;
 use requirements::*;
 use player::*;
@@ -18,17 +19,14 @@ fn parsing(c: &mut Criterion) {
     c.bench_function("tokenize", |b| b.iter(|| tokenizer::tokenize(&input)));
     let (tokens, metadata) = tokenizer::tokenize(&input).unwrap();
 
-    c.bench_function("parse areas", |b| b.iter(|| parser::parse_areas(tokens.clone(), &metadata)));
-    let areas = match parser::parse_areas(tokens, &metadata) {
-        Ok(areas) => areas,
-        _ => panic!(),
-    };
+    c.bench_function("parse areas", |b| b.iter(|| logic::parser::parse_areas(tokens.clone(), &metadata)));
+    let areas = logic::parser::parse_areas(tokens, &metadata).unwrap();
 
-    c.bench_function("parse locations", |b| b.iter(|| parser::parse_locations("loc_data.csv")));
-    let locations = parser::parse_locations("loc_data.csv").unwrap();
-
-    c.bench_function("parse states", |b| b.iter(|| parser::parse_states("state_data.csv")));
-    let states = parser::parse_states("state_data.csv").unwrap();
+    let input = read_file("loc_data.csv", "logic").unwrap();
+    c.bench_function("parse locations", |b| b.iter(|| logic::parse_locations(&input)));
+    let locations = logic::parse_locations(&input).unwrap();
+    let input = read_file("state_data.csv", "logic").unwrap();
+    let states = logic::parse_states(&input).unwrap();
 
     let mut settings = Settings::default();
     settings.difficulty = Difficulty::Unsafe;

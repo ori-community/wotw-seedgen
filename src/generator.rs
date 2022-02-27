@@ -15,7 +15,7 @@ use crate::{
     item::{Item, Resource, Skill, Teleporter, Command, ShopCommand},
     settings::Settings, util::{
         self,
-        GoalMode, UberState, UberType, Position, Difficulty,
+        GoalMode, UberState, UberType, Difficulty,
         constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
     }, world::{
         World,
@@ -1037,8 +1037,8 @@ where
                 has_warned_about_tp_refill = true;
             }
 
-            let Position { x, y } = *spawn.position().unwrap();
-            let item = Item::Command(Command::CreateWarp { id: 0, x, y });
+            let position = spawn.position().unwrap().clone();
+            let item = Item::Command(Command::CreateWarp { id: 0, position });
 
             placements.push(Placement {
                 node: None,
