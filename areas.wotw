@@ -670,9 +670,9 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
       Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1  # use the abillity to get on the wall to the right and use shuriken to get onto the vine
       Sword, Sentry=1 OR Hammer OR Flash=1, Spear=1  # pogo off the enemy
     unsafe:
-      Grenade=1, Damage=10            # Grenade jump to get to the vine, then jump right. Dboost the last gap.
-      Grenade=2                       # Grenade jump to get to the vine, then jump right. Grenade jump the last gap.
+      GrenadeJump OR GlideJump
       Sword                           # With upslash on the right wall, jump off it close to the ceiling and slash sword
+      Dash  # Dashramp
   quest MarshSpawn.MokkFangQuest:
     moki: MarshSpawn.HowlBurnt, MarshSpawn.FangQI
 
@@ -689,8 +689,16 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
     unsafe:
       Bash, Grenade=1, DoubleJump OR Dash OR Glide   # Bash up off the enemy and Dash/Djump/Glide to the fang. Grenade+bash up from the fang
       Bash, Grenade=1, Sword OR Hammer               # As above, but sword/hammer upslash to cross the last gap
-      Grenade=2, DoubleJump            # Grenade jump to get to the vine, then jump right. Dboost the last gap. Grenade jump to EC.
-      Dash, Sword, Regenerate OR Blaze  # wavedash
+      WaveDash, Sword  # wavedash with regen
+      Dash, BlazeSwap=1 OR SentrySwap=1
+      DoubleJump, BlazeSwap=2 OR SentrySwap=2
+      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
+      Bash, Glide, Dash  # use the enemy for everything
+      HammerJump OR GlideHammerJump
+      GrenadeJump, DoubleJump OR Sentry=1 OR Spear=1 OR Flash=1
+      SwordJump
+      Dash, PauseHover
+
   pickup MarshSpawn.RecklessShard:
     moki, MarshSpawn.HowlBurnt, BreakWall=10:
       DoubleJump OR Launch
@@ -700,9 +708,10 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
       Dash
     kii, MarshSpawn.HowlBurnt, BreakWall=10:
       Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1
-    unsafe, MarshSpawn.HowlBurnt, BreakWall=10:
-      Bash                            # Long distance lure
-      Grenade=1                       # Grenade jump to get over initial gap
+    unsafe, MarshSpawn.HowlBurnt:
+      Bash, BreakWall=10  # long distance lure
+      Bash, MarshSpawn.RainLifted, Damage=20  # + using mantis as wall breakage
+      BreakWall=10, GrenadeJump                       # Grenade jump to get over initial gap
   pickup HowlsDen.UpperEX:
     moki: MarshSpawn.HowlBurnt
 
@@ -836,7 +845,11 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     gorlek:
       Launch
       Bash, Grenade=1, DoubleJump, TripleJump
-    unsafe: DoubleJump, Sword  # Door skip
+    unsafe: 
+      DoubleJump, Sword  # Door skip
+      DoubleJump, TripleJump
+      Bash, Grenade=1, Grapple  # Zoomie off the mantis
+      GrenadeJump, DoubleJump
   conn HowlsDen.SecretRoom:
     moki: HowlsDen.KeystoneDoor, BreakWall=20, Water OR DoubleJump OR Dash OR Glide OR Launch
     gorlek, HowlsDen.KeystoneDoor:
@@ -864,6 +877,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Sword OR Hammer
       BreakWall=16, Damage=10, Shuriken=5 OR Sentry=5 OR Flash=5  # one jump is kinda hard
       BreakWall=16, Sentry=6  # two sentries in the air to avoid the spikes
+    unsafe: Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
   conn HowlsDen.Teleporter:
     moki: HowlsDen.BoneBarrier
 
@@ -6395,7 +6409,8 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
 
   pickup LowerReach.AboveDoorEX:
     moki: Bash OR Hammer OR Spear=1
-    unsafe: Sentry=1  # Sentry redirect
+    unsafe: 
+      SentryRedirect OR GrenadeRedirect
   pickup LowerReach.LupoMap:
     moki: SpiritLight=150, DoubleJump OR Dash OR Glide OR Launch
     gorlek: SpiritLight=150  # not too hard to do damageless, slide down the tongue plant and land on the little wall
@@ -6429,6 +6444,10 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1  # jump on the tongue, let ori slide down then double jump again and go for the right wall; difficulty varies depending on the method of limiting framerate
       DoubleJump, Damage=20, TripleJump OR Sword  # jump onto the spikes then up to the snaptrap. Jump on the tongue, let ori slide down then double jump again and go for the right wall
       SentryJump=1
+      Bash, Glide  # bash mortar and stack 2 projectiles, bash one upwards and bash both for enough height
+      DoubleJump, TripleJump  # Jump from the snap traps on the way to tokk
+      HammerJump
+      GlideHammerJump  # between tokk and this anchor, store your glidejump and use it to the left of the tongue  # or do 2 GlideHammerJumps directly underneath the pickup (one form teh ground and one from the snaptrap)
       # LowerReach.ThawCentralFurnace, Bash, Blaze=1
       LowerReach.ThawCentralFurnace, Bash  # stand beside the spitter, bash off it once it shoots, then again off the projectile
 
