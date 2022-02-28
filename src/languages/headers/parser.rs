@@ -797,10 +797,10 @@ where P: Iterator<Item=&'a str>
         value: String::new(),
     };
 
-    let title = parts.next().ok_or_else(|| String::from("missing title"))?;
+    let title = parts.next().map(String::from);
     end_of_item(parts)?;
 
-    Ok(Item::ShopCommand(ShopCommand::SetTitle { uber_state, title: String::from(title)}))
+    Ok(Item::ShopCommand(ShopCommand::SetTitle { uber_state, title }))
 }
 fn parse_shop_set_description<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
@@ -812,10 +812,10 @@ where P: Iterator<Item=&'a str>
         value: String::new(),
     };
 
-    let description = parts.next().ok_or_else(|| String::from("missing description"))?;
+    let description = parts.next().map(String::from);
     end_of_item(parts)?;
 
-    Ok(Item::ShopCommand(ShopCommand::SetDescription { uber_state, description: String::from(description) }))
+    Ok(Item::ShopCommand(ShopCommand::SetDescription { uber_state, description }))
 }
 fn parse_shop_set_locked<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
