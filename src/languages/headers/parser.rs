@@ -797,7 +797,7 @@ where P: Iterator<Item=&'a str>
         value: String::new(),
     };
 
-    let title = parts.next().map(String::from);
+    let title = parts.next().map(str::to_owned);
     end_of_item(parts)?;
 
     Ok(Item::ShopCommand(ShopCommand::SetTitle { uber_state, title }))
@@ -812,7 +812,7 @@ where P: Iterator<Item=&'a str>
         value: String::new(),
     };
 
-    let description = parts.next().map(String::from);
+    let description = parts.next().map(str::to_owned);
     end_of_item(parts)?;
 
     Ok(Item::ShopCommand(ShopCommand::SetDescription { uber_state, description }))
