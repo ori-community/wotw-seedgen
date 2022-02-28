@@ -9855,47 +9855,98 @@ region UpperPools:
 anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entrance to the keystone room
   refill Checkpoint
 
+  state UpperPools.KeystoneRoomBubbleFree:
+    kii:
+      Combat=SpinCrab, Bow=1 OR Grenade=1 OR Spear=1
+      Bash, Bow=1 OR Grenade=1 OR Spear=1
+
   quest EastPools.GrassSeed:
     moki:
       Combat=SpinCrab OR Bash OR Launch
       DoubleJump, Dash
     gorlek: Dash OR Glide OR Damage=10
-    unsafe: free
+    kii: free
 
   pickup UpperPools.LowerKS:
     moki:
       Water, DoubleJump, Bash
       Water, WaterDash OR Launch
     gorlek: Water, Bash, Hammer
-    unsafe: Water, Bash  # just need proper timing
+    kii:
+      Damage=60, WaterDash
+      Damage=120, Launch
+      Damage=160, Bash, DoubleJump OR Sword OR Hammer OR Spear=1
+      Bash, Water OR Damage=180  # wall jump on the left wall above the spikes
+    unsafe:
+      Water, DoubleJump, TripleJump, Damage=20
+      Damage=120, DoubleJump, TripleJump
+      Damage=40, WaterDash
+      Damage=100, Launch
+      Damage=140, Bash
 
   conn EastPools.CentralRoom:
     moki:
       Combat=SpinCrab OR Bash OR Launch
       DoubleJump, Dash
     gorlek: Dash OR Glide OR Damage=10
-    unsafe: free
+    kii: free
   conn UpperPools.KeystoneRoomBubbleSpawner:
     moki:
       Water OR Launch
       DoubleJump, Glide
     gorlek:
       Damage=20
-      DoubleJump, TripleJump OR Dash OR Sword
-      Dash, Glide OR Sword
+      DoubleJump, TripleJump OR Dash OR Sword OR UpperPools.KeystoneRoomBubbleFree
+      Dash, Glide OR Sword OR UpperPools.KeystoneRoomBubbleFree
       Bash, DoubleJump OR Dash OR Glide  # bashes interfere with weapons weirdly; it can easily happen in this scenario
+    kii:
+      Bash
+      Sword  # pogo the crab 
+      DoubleJump, Hammer OR Shuriken=1 OR Sentry=2
+      Dash, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Hammer OR Shuriken=1 OR Sentry=2
+      Hammer, Sentry=2
+      UpperPools.KeystoneRoomBubbleFree, Glide OR Sword OR Hammer OR Sentry=2
+    unsafe:
+      Dash OR GlideJump
+      DoubleJump, Flash=1 OR Sentry=1
+  conn UpperPools.KeystoneRoom:
+    kii: Bash  # bash the crab
+  conn WestPools: 
+    unsafe:  # Glitch the crushers so you don't need Water Breath
+      Water, Launch
+      Water, DoubleJump, Grenade OR Hammer  # greande/hammer jumps. With grenade jumps, start a grenade jump while in the water then use your doublejump
+      Water, DoubleJump, TripleJump, Damage=20
+      Water, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+  
 
 anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubble spawner and the bounce pad
   refill Checkpoint
 
   state UpperPools.KeystoneRoomBubbleFree:
     moki: Water, WaterDash OR Bash
-    unsafe: Grenade=1 OR Spear=1 OR Shuriken=1 OR Bow=1
+    kii:
+      Grenade=1 OR Spear=1 OR Bow=1 
+      Shuriken=1, Water OR Damage=20
+      Sentry=1, Water OR Damage=20
+    #unsafe: ChargeBlaze=1
 
   pickup UpperPools.UpperLeftKS:  # connections using the bubble have to start from here, others use the higher anchor
     moki: UpperPools.KeystoneRoomBubbleFree, Flap, DoubleJump
     gorlek: UpperPools.KeystoneRoomBubbleFree, Flap, Dash OR Glide
+    kii: UpperPools.KeystoneRoomBubbleFree, Flap, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: UpperPools.KeystoneRoomBubbleFree, Damage=20  # pretty cute
+  pickup UpperPools.LowerKS:  # Dirty water only. Paths with clean water originate from UpperPools.KeystoneRoomEntrance
+    kii:
+      Damage=60, WaterDash
+      Damage=120, Launch
+      Damage=160, Bash, DoubleJump OR Sword OR Hammer OR Spear=1
+      Damage=180, Bash  # wall jump on the left wall above the spikes
+    unsafe:
+      Damage=120, DoubleJump, TripleJump
+      Damage=40, WaterDash
+      Damage=100, Launch
+      Damage=140, Bash
 
   conn UpperPools.KeystoneRoom:
     moki:
@@ -9904,8 +9955,8 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
     gorlek:
       Dash OR Glide
       Water, WaterDash, Bash  # use the missile
-    unsafe:
-      Water, Bash
+    kii:  # No dirty water path for the bash+torpedo path because using the crab from UpperPools.KeystoneRoomBubbleSpawner is just way less damage
+      Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.KeystoneRoomBubbleFree, WaterDash, Flap, Water OR Damage=20
   conn UpperPools.BubbleSpamRoom:  # connections using the bubble have to start from here, others use the higher anchor
     moki: UpperPools.KeystoneRoomBubbleFree, Flap, DoubleJump, Dash, Grapple  # seems to be the intended strat
@@ -9920,6 +9971,10 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
       Dash, Glide
     gorlek:  # almost always easier to go over the top
       Damage=20, Bash OR Sword OR Hammer  # the enemy likes to get in the way
+    kii:
+      Damage=30
+      Damage=20, Combat=SpinCrab
+    unsafe: UpperPools.KeystoneRoomBubbleFree
 
 anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper left keystones
   refill Checkpoint
