@@ -7,7 +7,8 @@ pub enum ShopCommand {
     SetIcon { uber_state: UberState, icon: Icon },
     SetTitle { uber_state: UberState, title: String },
     SetDescription { uber_state: UberState, description: String },
-    SetLockedAndVisible { uber_state: UberState, locked: bool, visible: bool },
+    SetLocked { uber_state: UberState, locked: bool },
+    SetVisible { uber_state: UberState, visible: bool },
 }
 impl fmt::Display for ShopCommand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -15,7 +16,8 @@ impl fmt::Display for ShopCommand {
             ShopCommand::SetIcon { uber_state, icon } => write!(f, "0|{}|{}", uber_state, icon),
             ShopCommand::SetTitle { uber_state, title } => write!(f, "1|{}|{}", uber_state, title),
             ShopCommand::SetDescription { uber_state, description } => write!(f, "2|{}|{}", uber_state, description),
-            ShopCommand::SetLockedAndVisible { uber_state, locked, visible } => write!(f, "3|{}|{}|{}", uber_state, locked, visible),
+            ShopCommand::SetLocked { uber_state, locked } => write!(f, "3|{}|{}", uber_state, locked),
+            ShopCommand::SetVisible { uber_state, visible } => write!(f, "4|{}|{}", uber_state, visible),
         }
     }
 }
