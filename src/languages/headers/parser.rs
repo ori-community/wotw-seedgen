@@ -776,10 +776,7 @@ where P: Iterator<Item=&'a str>
 {
     let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
     let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
-    let uber_state = UberState {
-        identifier: UberIdentifier::from_parts(uber_group, uber_id)?,
-        value: String::new(),
-    };
+    let uber_state = UberState::from_parts(uber_group, uber_id)?;
 
     let icon = parts.next().ok_or_else(|| String::from("missing icon"))?;
     let icon = parse_icon(icon)?;
@@ -787,12 +784,66 @@ where P: Iterator<Item=&'a str>
 
     Ok(Item::ShopCommand(ShopCommand::SetIcon { uber_state, icon }))
 }
+fn parse_shop_set_title<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
+    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
+    let uber_state = UberState::from_parts(uber_group, uber_id)?;
+
+    let title = parts.next().map(str::to_owned);
+    end_of_item(parts)?;
+
+    Ok(Item::ShopCommand(ShopCommand::SetTitle { uber_state, title }))
+}
+fn parse_shop_set_description<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
+    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
+    let uber_state = UberState::from_parts(uber_group, uber_id)?;
+
+    let description = parts.next().map(str::to_owned);
+    end_of_item(parts)?;
+
+    Ok(Item::ShopCommand(ShopCommand::SetDescription { uber_state, description }))
+}
+fn parse_shop_set_locked<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
+    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
+    let uber_state = UberState::from_parts(uber_group, uber_id)?;
+
+    let locked_str = parts.next().ok_or_else(|| String::from("missing locked"))?;
+    let locked = locked_str.parse::<bool>().map_err(|_| format!("Invalid value {} for boolean locked", locked_str))?;
+    end_of_item(parts)?;
+
+    Ok(Item::ShopCommand(ShopCommand::SetLocked { uber_state, locked }))
+}
+fn parse_shop_set_visible<'a, P>(mut parts: P) -> Result<Item, String>
+where P: Iterator<Item=&'a str>
+{
+    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
+    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
+    let uber_state = UberState::from_parts(uber_group, uber_id)?;
+
+    let visible_str = parts.next().ok_or_else(|| String::from("missing visible"))?;
+    let visible = visible_str.parse::<bool>().map_err(|_| format!("Invalid value {} for boolean visible", visible_str))?;
+    end_of_item(parts)?;
+
+    Ok(Item::ShopCommand(ShopCommand::SetVisible { uber_state, visible }))
+}
 fn parse_shopcommand<'a, P>(mut parts: P) -> Result<Item, String>
 where P: Iterator<Item=&'a str>
 {
     let command_type = parts.next().ok_or_else(|| String::from("missing shop command type"))?;
     match command_type {
         "0" => parse_shop_set_icon(parts),
+        "1" => parse_shop_set_title(parts),
+        "2" => parse_shop_set_description(parts),
+        "3" => parse_shop_set_locked(parts),
+        "4" => parse_shop_set_visible(parts),
         _ => Err(String::from("invalid shop command type")),
     }
 }

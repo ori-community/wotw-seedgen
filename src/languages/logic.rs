@@ -46,15 +46,16 @@ pub struct Location {
     pub uber_state: UberState,
     pub position: Position,
 }
+
 #[derive(Debug, Deserialize)]
 struct LocationEntry<'a> {
     name: &'a str,
     zone: &'a str,
-    kind: &'a str,
-    variant: &'a str,
-    uber_group_name: &'a str,
+    _kind: &'a str,
+    _variant: &'a str,
+    _uber_group_name: &'a str,
     uber_group: &'a str,
-    uber_id_name: &'a str,
+    _uber_id_name: &'a str,
     uber_id: &'a str,
     x: f32,
     y: f32,
