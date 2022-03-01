@@ -9044,7 +9044,7 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       SwordJump
       GrenadeJump, GrenadeCancel  # gjump to reach the platform then cancel second one to the pickup, cancel it and grenade float (which you also need to cancel so you can wjump)
-  pickup EastPools.CurrentEX:
+  pickup PoolsApproach.CurrentEX:
     moki: Water, WaterDash
     kii: Damage=100, WaterDash
   pickup PoolsApproach.MillPathEC:
@@ -9352,6 +9352,11 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     unsafe:
       DoubleJump, TripleJump, Combat=CorruptSlug  # kill the slug on the left wall, tjump from this wall into the spikes under the pickup
       SentryJump=1, DoubleJump OR Damage=20  # The tree is swinging a bit. sjump from the left (Ori should almost fall) when the tree is swinging to the left
+  pickup PoolsApproach.CurrentEX:
+    moki: Water, WaterDash
+    kii: WaterDash, Damage=80
+    unsafe:
+      Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
 
   conn EastPools.BehindEntryDoor:
     moki: EastPools.EntryLever
