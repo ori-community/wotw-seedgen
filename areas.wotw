@@ -9025,6 +9025,9 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       SwordJump
       GrenadeJump, GrenadeCancel  # gjump to reach the platform then cancel second one to the pickup, cancel it and grenade float (which you also need to cancel so you can wjump)
+  pickup EastPools.CurrentEX:
+    moki: Water, WaterDash
+    kii: Damage=100, WaterDash
   pickup PoolsApproach.MillPathEC:
     moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
     gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash OR Damage=10  # dboost on the tentacle
@@ -9314,7 +9317,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
   pickup EastPools.CurrentEX:
     moki: Water, WaterDash
-    kii, WaterDash, Damage=80
+    kii: WaterDash, Damage=80
     unsafe:
       Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
       WaterDash, Damage=60
