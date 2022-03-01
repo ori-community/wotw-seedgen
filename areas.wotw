@@ -6482,7 +6482,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
   pickup LowerReach.AboveDoorEX:
     moki: Bash OR Hammer OR Spear=1
     unsafe: 
-      SentryRedirect OR GrenadeRedirect
+      SentryRedirect=1 OR GrenadeRedirect=1
   pickup LowerReach.LupoMap:
     moki: SpiritLight=150, DoubleJump OR Dash OR Glide OR Launch
     gorlek: SpiritLight=150  # not too hard to do damageless, slide down the tongue plant and land on the little wall
