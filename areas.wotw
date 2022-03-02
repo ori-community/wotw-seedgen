@@ -2999,11 +2999,12 @@ anchor GladesTown.ReachPath at -140, -4096:  # At the soup
       Bash, Flap OR Grenade=1  # may need to juggle the soupgrenade once
       Launch
     gorlek:
-      DoubleJump, Sword OR Hammer OR TripleJump  # Wall jump from the wall near the ceiling
+      DoubleJump, TripleJump, Glide OR Dash OR Sword
       SentryJump=1
     unsafe:
       Dash, Glide, Sword  # Needs a ramp on the left side corner of the platform near the cauldron
-      DoubleJump, Glide  # Wall jump from the wall near the ceiling
+      DoubleJump, Glide OR Sword OR Hammer # Wall jump from the wall near the ceiling
+      DoubleJump, TripleJump  # climb the wall underneath the anchor
 
 region WestGlades:
   moki: Danger=20
