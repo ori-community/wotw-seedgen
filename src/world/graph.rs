@@ -177,13 +177,14 @@ impl Graph {
                 for refill in &anchor.refills {
                     for orbs in &best_orbs {
                         if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
-                            best_orbs = orbs::both(&best_orbs, &orbcost);
+                            let mut refill_orbs = orbs::both(&best_orbs, &orbcost);
                             match refill.name {
-                                RefillType::Full => best_orbs = smallvec![context.player.max_orbs()],
-                                RefillType::Checkpoint => best_orbs = context.player.checkpoint_orbs(&best_orbs),
-                                RefillType::Health(amount) => best_orbs = context.player.health_orbs(&best_orbs, amount),
-                                RefillType::Energy(amount) => best_orbs = context.player.energy_orbs(&best_orbs, amount),
+                                RefillType::Full => refill_orbs = smallvec![context.player.max_orbs()],
+                                RefillType::Checkpoint => refill_orbs = context.player.checkpoint_orbs(&refill_orbs),
+                                RefillType::Health(amount) => refill_orbs = context.player.health_orbs(&refill_orbs, amount),
+                                RefillType::Energy(amount) => refill_orbs = context.player.energy_orbs(&refill_orbs, amount),
                             }
+                            best_orbs = orbs::either(&best_orbs, &refill_orbs);
                             break;
                         }
                     }
