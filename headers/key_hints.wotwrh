@@ -52,8 +52,8 @@
 3|1|17|0|1|23|lupo:2                                            // set icon
 3|1|4|17|37858|12379|0|17|4|1|23|false                          // hide if watermill escape is not done
 3|1|4|17|37858|12379|0|17|2|1|23|Finish the Wellspring escape to unlock  // set description if watermill escape is not done
-37858|12379|17|4|1|23|true                                      // show if the player finishes watermill escape
-37858|12379|17|2|1|23                                           // set description to default if the player finishes watermill escape
+!37858|12379|17|4|1|23|true                                      // show if the player finishes watermill escape
+!37858|12379|17|2|1|23                                           // set description to default if the player finishes watermill escape
 
 2|2|6|f=0|Bash, Bow hint                                        // key skill hint from TwillenShop.TripleJump
 2|2|8|9|0|int|35
