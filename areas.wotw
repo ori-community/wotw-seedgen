@@ -9989,13 +9989,21 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       SentryJump=1
       DoubleJump, TripleJump, Hammer  # Can either reach the left or right wall; for the right wall you can even do it starting from a grounded upswing
       WaterDash, DoubleJump, TripleJump, Water OR Damage=20
+    kii:
+      DoubleJump, TripleJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1
+      WaterDash, DoubleJump, Water, Dash OR Glide OR Sword OR Hammer OR Flash=1 OR Sentry=1
+      WaterDash, DoubleJump, Damage=20, Dash OR Glide OR Sword OR Hammer OR Flash=1 OR Sentry=1
+    unsafe:
+      WaterDash, DoubleJump, Water OR Damage=20
   pickup UpperPools.UpperMidKS:  # the majority of paths will go through connections around the top
     gorlek:
       DoubleJump, WaterDash, Water OR Damage=20  # wdash to reach the right wall
       Bash, Grenade=1, DoubleJump
       Bash, Grenade=1, Dash, Damage=20
-    unsafe:
-      Water, WaterDash, Hammer, Damage=20  # wdash+upslash to reach the left wall, wjump in the spikes and upslash to get the key
+    kii:
+      Bash, Grenade=1, Damage=20
+      WaterDash, Water, Damage=20, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1   # wdash+upslash/energy weapon to reach the left wall, wjump in the spikes to get the key
+      WaterDash, Damage=40, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1   # wdash+upslash/energy weapon to reach the left wall, wjump in the spikes to get the key
   pickup UpperPools.UpperRightKS:
     moki:
       Bash, Grenade=1, Water OR DoubleJump OR Dash OR Glide
@@ -10004,13 +10012,16 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       Launch
     gorlek:
       SentryJump=1
-      Bash, Grenade=1, Sword OR Damage=20  # sword/damage boost to reach the platform below he pickup
+      Bash, Grenade=1, Sword OR Damage=20  # sword/damage boost to reach the platform below the pickup
       WaterDash, Water OR Damage=20
       Grapple, Sword
       Grapple, Hammer, Water OR Damage=20
       DoubleJump, TripleJump OR Sword OR Hammer OR Bash  # Bash the crab enemy
-    unsafe:
-      Grapple, Water OR Damage=20  # grapple the plant to make it swing. When the plant is swinging at the left, grapple it with a good angle to grab the keystone
+    kii:
+      Bash, Grenade=1, Grenade=1 OR Hammer OR Shuriken=1 OR Flash=1  # also possile with sentry but that's redundant with a second grenade
+      Grapple, Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # djump+energy weapon from where the crabs are
+    unsafe: Grapple, Water OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # grapple the plant to make it swing. When the plant is swinging at the left, grapple it with a good angle to grab the keystone
 
   conn UpperPools.KeystoneRoomEntrance: free
   conn UpperPools.KeystoneRoomBubbleSpawner: free
@@ -10033,7 +10044,18 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       SentryJump=1, Bash, WaterDash, Water OR Damage=20
       SwordSJump=2, Bash OR Damage=10
       HammerSJump=2, Bash, Water OR Dash OR Glide OR Damage=20
-
+    kii:
+      WaterDash, Bash, Water OR Damage=20  # bash the crab upward then jump and bash it again to reach the wooden platform or the door directly.
+      Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Grenade=1 OR Water OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Damage=20  # bash the crab upward then jump and bash it again to reach the wooden platform or the door directly. Possible with sentry as well but 1 grenade+1 sentry is redundant with 2 grenade
+      DoubleJump, TripleJump, Hammer  # wjump from UpperRightKS
+      DoubleJump, Sword # Pogo the crab. Have to jump from the small edge under the spikes to get enough height.
+    unsafe:
+      Bash, Grenade=1  # https://youtu.be/LJNUBDzZ_oU
+      WaterDash, Damage=20, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Similar to the bashnade path
+      WaterDash, Water, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Similar to the bashnade path
+      Dash, Hammer, Bash
+      
 anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door blocking waterdash tree
   refill Checkpoint
   refill Health=1:
