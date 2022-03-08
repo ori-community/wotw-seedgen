@@ -7,26 +7,26 @@
 !!include header_core
 !!include progress_helper
 
-48248|41666|6|f=0|Burrow, Water Dash, Light Burst, Flash hint   // key skill hint from LupoHint.Shards
+48248|41666|6|f=0|Burrow, Water Dash, Grenade, Flash hint   // key skill hint from LupoHint.Shards
 48248|41666|8|9|0|int|33
 9|0=33|6|$[(9|999=205)]
 9|999=205|4|17|48248|41666|1|4|17|6|1101|0|6|Burrow: $WHEREIS(2\|101), <\>
 9|999=205|4|17|48248|41666|1|4|17|6|1101|1|6|$Burrow: $WHEREIS(2\|101)$, <\>
 9|999=205|4|17|48248|41666|1|4|17|6|1104|0|6|Water Dash: $WHEREIS(2\|104), <\>
 9|999=205|4|17|48248|41666|1|4|17|6|1104|1|6|$Water Dash: $WHEREIS(2\|104)$, <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1051|0|6|Light Burst: $WHEREIS(2\|51), <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1051|1|6|$Light Burst: $WHEREIS(2\|51)$, <\>
+9|999=205|4|17|48248|41666|1|4|17|6|1051|0|6|Grenade: $WHEREIS(2\|51), <\>
+9|999=205|4|17|48248|41666|1|4|17|6|1051|1|6|$Grenade: $WHEREIS(2\|51)$, <\>
 9|999=205|4|17|48248|41666|1|4|17|6|1062|0|6|Flash: $WHEREIS(2\|62)
 9|999=205|4|17|48248|41666|1|4|17|6|1062|1|6|$Flash: $WHEREIS(2\|62)$
 3|1|8|9|0|int|30                                                // set price on load
 6|1101|8|9|0|int|30                                             // set price on Burrow find
 6|1104|8|9|0|int|30                                             // set price on Water Dash find
-6|1051|8|9|0|int|30                                             // set price on Light Burst find
+6|1051|8|9|0|int|30                                             // set price on Grenade find
 6|1062|8|9|0|int|30                                             // set price on Flash find
 9|0=30|8|48248|41667|int|4000                                   // base price
 9|0=30|4|17|6|1101|1|8|48248|41667|int|-500                     // reduce for Burrow
 9|0=30|4|17|6|1104|1|8|48248|41667|int|-500                     // reduce for Water Dash
-9|0=30|4|17|6|1051|1|8|48248|41667|int|-500                     // reduce for Light Burst
+9|0=30|4|17|6|1051|1|8|48248|41667|int|-500                     // reduce for Grenade
 9|0=30|4|17|6|1062|1|8|48248|41667|int|-500                     // reduce for Flash
 9|0=30|4|17|48248|41667|2000|8|48248|41667|int|0                // set price to zero with nothing left to hint
 3|1|17|0|48248|41666|lupo:2                                     // set icon
