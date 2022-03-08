@@ -10,7 +10,7 @@
 //// Let Twillen sell Gorlek Ore
 !!parameter ores bool:false
 
-//// Greatly reduces the cost of black market keystones
+//// Greatly reduces the cost of black market items
 !!parameter cheap bool:false
 
 !!if keystones
