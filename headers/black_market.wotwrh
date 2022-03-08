@@ -13,7 +13,7 @@
 //// Greatly reduces the cost of black market items
 !!parameter cheap bool:false
 
-!!if keystones
+!!if keystones true
 3|1|4|20|1|105                          // Add OpherShop.Teleport to the unsyncable list
 1|105|6|Black Market Keystone|mute|f=0  // Black Market Keystones from OpherShop.Teleport
 1|105|8|1|105|bool|false                // Never lock purchase
@@ -43,7 +43,7 @@
 3|1|17|0|1|105|file:assets/icons/game/keystone.png  // Set icon
 !!endif
 
-!!if ores
+!!if ores true
 3|1|4|20|2|19                           // Add TwillenShop.LightHarvest to the unsyncable list
 2|19|6|Black Market Ore|mute|f=0  	    // Black Market Ores from TwillenShop.LightHarvest
 2|19|8|2|19|bool|false                  // Never lock purchase
