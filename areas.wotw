@@ -10067,17 +10067,25 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
   state UpperPools.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: Grapple
     gorlek: DoubleJump
+    unsafe: Dash
 
   pickup UpperPools.UpperMidKS:
     moki: DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer OR Damage=20
+    kii:
+      Bash, Grenade=1
+      Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: free
   pickup UpperPools.UpperLeftKS:
     gorlek: DoubleJump, TripleJump
-
+    kii: DoubleJump, Dash OR Glide OR Sword 
+    unsafe: DoubleJump, Hammer OR Flash=1 OR Sentry=1
+      
   conn UpperPools.TreeRoomEntrance:
     moki: UpperPools.KeystoneDoor
-  conn UpperPools.KeystoneRoom: free
+  conn UpperPools.KeystoneRoom:
+    moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
+    gorlek: free
   conn UpperPools.BubbleSpamRoom:
     moki:
       DoubleJump, Bash, Grenade=1
@@ -10088,8 +10096,11 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
       Bash, Grenade=1, Dash OR Glide OR Sword
       Bash, Grenade=1, Hammer, Damage=20
       DoubleJump, TripleJump, Dash OR Damage=20  # you can come from the trial start and complete this path with just triple jump, the extra abilities allow alternatives to make it more likely that the player finds this path
+    kii:
+      Bash, Grenade=1, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=40
+      Bash, Grenade=1, Spear=1, Damage=20
+      DoubleJump, TripleJump OR Dash  # From the trial's activation
     unsafe:
-      DoubleJump, TripleJump  # come from the trial start
       Bash, Grenade=1  # Bash grenade to reach the slime, bash glide from it
 
 anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of Waterdash tree
@@ -10100,38 +10111,66 @@ anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of 
   state UpperPools.TreeRoomLeftBubbleFree:
     unsafe: Bow=1 OR Grenade=1 OR Spear=1
 
+  pickup UpperPools.RoofEX:  # only for paths using the bubble all the way
+    unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash
+
   conn UpperPools.BeforeKeystoneDoor:
     moki: UpperPools.KeystoneDoor
   conn UpperPools.TreeRoom:
     moki: Water OR DoubleJump OR Dash OR Glide
     gorlek: free
+  conn UpperPools.AboveTree:  # paths using the bubbles originate from here
+    moki, UpperPools.TreeRoomLeftBubbleFree: 
+      Flap, DoubleJump
+      Launch
+    gorlek, UpperPools.TreeRoomLeftBubbleFree:
+      Flap, Dash
+      Flap, Glide, Damage=20
+      DoubleJump, TripleJump, Dash, Damage=20  # free the bubble, jump on it and tjump to the wall above the tree
+    kii, UpperPools.TreeRoomLeftBubbleFree:
+      Flap, Hammer
+      Flap, Glide, Shuriken=1
+      Bash, Grenade=1  # Throw a grenade and jump on the bubble to reach your grenade
+      DoubleJump, TripleJump, Damage=20  # jump on the bubble and dboost in the spikes above
+    unsafe, UpperPools.TreeRoomLeftBubbleFree:
+      Flap  # https://youtu.be/qKgm-Cyus-g
+      Dash  # https://youtu.be/rpaRDaJj8sY
 
 anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
   state UpperPools.TreeRoomLeftBubbleFree:
     moki: Water, WaterDash
-    unsafe: Bow=1 OR Grenade=1 OR Spear=1
+    kii:
+      WaterDash, Damage=40
+      Bow=1 OR Grenade=1 OR Spear=1
+      Shuriken=1, Water OR Damage=20  # also possible with sentry but it can target the ennemy instead
+    unsafe:
+      Shuriken=1 OR Sentry=1 # tp before hitting the water
+      WaterDash, Damage=20
+  state UpperPools.TreeRoomRightBubbleFree:
+    moki: Water, WaterDash
+    kii:
+      Bow=1 OR Grenade=1 OR Spear=1
+      WaterDash, Damage=40
+      Shuriken, Water OR Damage=20  # also possible with sentry but it usually target the fish instead
+    unsafe:
+      Shuriken=1 OR Sentry=1 # tp before hitting the water
+      WaterDash, Damage=20
   state UpperPools.ButtonDoorAboveTree:
     moki: Water, WaterDash
+    kii: WaterDash, Damage=80
+    unsafe: WaterDash, Damage=60
 
   pickup UpperPools.SwimDashTree: free
   pickup UpperPools.CurrentEX:
     moki: Water, WaterDash
-  pickup UpperPools.RoofEX:  # only for paths using the bubble all the way
-    unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash
+    kii: WaterDash, Damage=60
 
-  conn UpperPools.AboveTree:
-    moki, UpperPools.TreeRoomLeftBubbleFree:
-      Flap, DoubleJump
-      Launch
+  conn UpperPools.AboveTree:  # paths using the bubbles originate from UpperPools.TreeRoomEntrance
     gorlek:
-      UpperPools.TreeRoomLeftBubbleFree:
-        Flap, Dash
-        Flap, Glide, Damage=20
-        DoubleJump, TripleJump, Dash, Damage=20  # free the bubble, jump on it and tjump to the wall above the tree
       Bash, Grenade=1, DoubleJump, TripleJump, Dash, Damage=20  # bash grenade to reach the wall above the tree
       SentryJump=1, DoubleJump, TripleJump, Dash, Damage=20  # same path as above, replace bash grenade by sentry jump
-      Launch  # use the small bubbles for a launch reset or use the wall above the trees
-    unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash, DoubleJump OR Damage=20  # Dash on the bubble
+      Launch  # use the small bubbles for a launch reset or use the wall above the tree
+    kii: Bash, Grenade=1, DoubleJump, Damage=20, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1   # bash grenade to reach the wall above the tree
   conn UpperPools.TreeRoomEntrance:
     moki:
       Launch
@@ -10141,29 +10180,43 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
       SwordSJump=1  # Weapon hover as well
       HammerSJump=1, DoubleJump OR Dash OR Glide
       Bash, Grenade=1
+      WaterDash, Damage=20  # dboost in water
       UpperPools.TreeRoomLeftBubbleFree
+    kii: DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: DoubleJump, TripleJump
   conn UpperPools.DrainPuzzleEntrance:
     moki, UpperPools.ButtonDoorAboveTree:
-      Water, WaterDash, DoubleJump
+      UpperPools.TreeRoomRightBubbleFree, Water, WaterDash, DoubleJump
+      UpperPools.TreeRoomRightBubbleFree, Launch
+    gorlek, UpperPools.ButtonDoorAboveTree:
       Launch
-    gorlek: UpperPools.ButtonDoorAboveTree, Water, WaterDash, Sword OR Hammer
-    unsafe, UpperPools.ButtonDoorAboveTree:
-      Bow=1 OR Grenade=1 OR Spear=1  # free the bubbles, let one bubble go out of the water, jump on the next one and use it to land on the first bubble
-      HammerSJump=1
+      UpperPools.TreeRoomRightBubbleFree, Water, WaterDash, Sword OR Hammer
+      UpperPools.TreeRoomRightBubbleFree, Damage=20, WaterDash, DoubleJump OR Sword OR Hammer
+      UpperPools.TreeRoomRightBubbleFree, Bash, Grenade=1, DoubleJump OR Sword OR Hammer
+    kii, UpperPools.ButtonDoorAboveTree:
+      Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      UpperPools.TreeRoomRightBubbleFree  # let one bubble go out of the water, jump on the next one and use it to land on the first bubble
+    unsafe, UpperPools.ButtonDoorAboveTree: HammerSJump=1
 
 anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup above swimdash tree
   pickup UpperPools.RoofEX:
     moki:
+      Launch
       Water, WaterDash
       Bash, Grenade=1
     gorlek:
       Damage=20, WaterDash
       SentryJump=1
-
+    kii:
+      DoubleJump, Combat=CorruptSlug, TripleJump OR Dash OR Glide
+      DoubleJump, TripleJump, Hammer OR Spear=1
+    unsafe: DoubleJump, Combat=CorruptSlug, Sword
+    
   conn UpperPools.TreeRoom: free
   conn UpperPools.TreeRoomEntrance:
     moki: DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
 anchor UpperPools.DrainPuzzleEntrance at -1313, -4083:  # At the right of the door opened by the water dash button in the tree room
   refill Checkpoint
