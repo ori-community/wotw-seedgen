@@ -69,25 +69,25 @@ timer: 9|103|9|151
 9|151|4|26|4|8|9|103|bool|false
 
 // Static cutscene skips
-3|0|8|51018|21786|bool|true     // swampStateGroup.powlTeaseTriggered
-3|0|8|2108|28895|bool|true      // baursReachGroup.powlTeaseTriggered
-3|0|8|23225|37858|bool|true     // waterMillStateGroupDescriptor.playedNaruGumoCutaway
-3|0|8|32922|16155|bool|true     // willowsEndGroup.introPlayed
-3|0|8|4220|11666|bool|true      // howlsDenGRoup.hasOriUsedSavePedestal
-3|0|8|41644|58674|bool|true     // _petrifiedForestGroup.mokiFoulWaterVignetteTriggered
-3|0|8|37811|58674|bool|true     // _petrifiedForestGroup.mokiCleanWaterVignetteTriggered
-3|0|8|35023|5377|bool|true      // lumaPoolsStateGroup.playedMokiVignette
-3|0|8|3846|48248|bool|true      // npcsStateGroup.stenchTease
-3|0|8|9367|945|bool|true        // lagoonStateGroup.wispSequencePlayedOut
-3|0|8|40451|48248|bool|true     // npcsStateGroup.baurReachWispIntro
-3|0|8|37364|48248|bool|true     // npcsStateGroup.mouldwoodDepthsWisptIntro
-3|0|8|55196|20120|bool|true     // windsweptWastesGroupDescriptor.wispSequencePlayedOut
-3|0|8|45740|24922|bool|true     // howlsOriginGroup.interactedWithTokk
-3|0|8|25031|37858|bool|true     // waterMillStateGroupDescriptor.rescuedOpher
-3|0|8|21700|5377|bool|true      // lumaPoolsStateGroup.talkedToKwolok
-3|0|8|48794|14019|bool|true     // questUberStateGroup.findToadQuestUberState
-3|0|8|34641|937|bool|true       // kwolokGroupDescriptor.cleanseWellspringQuestUberState
-3|0|8|3621|10289|bool|true      // windtornRuinsGroup.ruinsVisited
+3|0|8|21786|51018|bool|true     // swampStateGroup.powlTeaseTriggered
+3|0|8|28895|2108|bool|true      // baursReachGroup.powlTeaseTriggered
+3|0|8|37858|23225|bool|true     // waterMillStateGroupDescriptor.playedNaruGumoCutaway
+3|0|8|16155|32922|bool|true     // willowsEndGroup.introPlayed
+3|0|8|11666|4220|bool|true      // howlsDenGRoup.hasOriUsedSavePedestal
+3|0|8|58674|41644|bool|true     // _petrifiedForestGroup.mokiFoulWaterVignetteTriggered
+3|0|8|58674|37811|bool|true     // _petrifiedForestGroup.mokiCleanWaterVignetteTriggered
+3|0|8|5377|35023|bool|true      // lumaPoolsStateGroup.playedMokiVignette
+3|0|8|48248|3846|bool|true      // npcsStateGroup.stenchTease
+3|0|8|945|9367|bool|true        // lagoonStateGroup.wispSequencePlayedOut
+3|0|8|48248|40451|bool|true     // npcsStateGroup.baurReachWispIntro
+3|0|8|48248|37364|bool|true     // npcsStateGroup.mouldwoodDepthsWisptIntro
+3|0|8|20120|55196|bool|true     // windsweptWastesGroupDescriptor.wispSequencePlayedOut
+3|0|8|24922|45740|bool|true     // howlsOriginGroup.interactedWithTokk
+3|0|8|37858|25031|bool|true     // waterMillStateGroupDescriptor.rescuedOpher
+3|0|8|5377|21700|bool|true      // lumaPoolsStateGroup.talkedToKwolok
+3|0|8|14019|48794|int|1         // questUberStateGroup.findToadQuestUberState
+3|0|8|937|34641|int|2           // kwolokGroupDescriptor.cleanseWellspringQuestUberState
+3|0|8|10289|3621|bool|true      // windtornRuinsGroup.ruinsVisited
 
 // Dialogue skips
 3|0|8|48248|5982|bool|true      // npcsStateGroup.metOpherHubAfterWatermill
