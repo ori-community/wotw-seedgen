@@ -106,7 +106,7 @@ timer: 9|103|9|151
 3|0|8|48248|46471|bool|true     // npcsStateGroup.gromTalkedAboutMouldwoodGate
 3|0|8|48248|7321|bool|true      // npcsStateGroup.gromTalkedAboutBaur
 3|0|8|48248|30073|bool|true     // npcsStateGroup.gromTalkedAboutLagoon
-3|0|8|48248|10337|int|2      // npcsStateGroup.talkedInHub
+3|0|8|48248|10337|int|2         // npcsStateGroup.talkedInHub
 3|0|8|48248|8985|bool|true      // npcsStateGroup.willowsEndSeirExitCutscene
 3|0|8|48248|56448|bool|true     // npcsStateGroup.metOpherHub
 3|0|8|48248|5186|bool|true      // npcsStateGroup.gromMentionedOre
