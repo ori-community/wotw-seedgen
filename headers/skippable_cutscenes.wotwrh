@@ -7,6 +7,7 @@
 timer: 9|102|9|150
 timer: 9|103|9|151
 
+// Interactive cutscene skips
 9|0=1|6|f=0  // manual wisp
 !9|0=1|1|0
 !9|0=1|1|0
@@ -66,3 +67,59 @@ timer: 9|103|9|151
 9|107|4|8|-3537|-5881
 9|151|4|26|4|4|16|warpCredits
 9|151|4|26|4|8|9|103|bool|false
+
+// Static cutscene skips
+3|0|8|51018|21786|bool|true     // swampStateGroup.powlTeaseTriggered
+3|0|8|2108|28895|bool|true      // baursReachGroup.powlTeaseTriggered
+3|0|8|23225|37858|bool|true     // waterMillStateGroupDescriptor.playedNaruGumoCutaway
+3|0|8|32922|16155|bool|true     // willowsEndGroup.introPlayed
+3|0|8|4220|11666|bool|true      // howlsDenGRoup.hasOriUsedSavePedestal
+3|0|8|41644|58674|bool|true     // _petrifiedForestGroup.mokiFoulWaterVignetteTriggered
+3|0|8|37811|58674|bool|true     // _petrifiedForestGroup.mokiCleanWaterVignetteTriggered
+3|0|8|35023|5377|bool|true      // lumaPoolsStateGroup.playedMokiVignette
+3|0|8|3846|48248|bool|true      // npcsStateGroup.stenchTease
+3|0|8|9367|945|bool|true        // lagoonStateGroup.wispSequencePlayedOut
+3|0|8|40451|48248|bool|true     // npcsStateGroup.baurReachWispIntro
+3|0|8|37364|48248|bool|true     // npcsStateGroup.mouldwoodDepthsWisptIntro
+3|0|8|55196|20120|bool|true     // windsweptWastesGroupDescriptor.wispSequencePlayedOut
+3|0|8|45740|24922|bool|true     // howlsOriginGroup.interactedWithTokk
+3|0|8|25031|37858|bool|true     // waterMillStateGroupDescriptor.rescuedOpher
+3|0|8|21700|5377|bool|true      // lumaPoolsStateGroup.talkedToKwolok
+3|0|8|48794|14019|bool|true     // questUberStateGroup.findToadQuestUberState
+3|0|8|34641|937|bool|true       // kwolokGroupDescriptor.cleanseWellspringQuestUberState
+3|0|8|3621|10289|bool|true      // windtornRuinsGroup.ruinsVisited
+
+// Dialogue skips
+3|0|8|48248|5982|bool|true      // npcsStateGroup.metOpherHubAfterWatermill
+3|0|8|48248|55122|bool|true     // npcsStateGroup.metOpherHubBeforeWatermill
+3|0|8|48248|46745|bool|true     // npcsStateGroup.opherMentiodedWatermill
+3|0|8|48248|25267|int|2         // npcsStateGroup.twillenKwolokDialogState
+3|0|8|48248|12799|int|3         // npcsStateGroup.twillenHubDialogState
+3|0|8|48248|34756|bool|true     // npcsStateGroup.twillenMournedKu
+3|0|8|48248|6194|bool|true      // npcsStateGroup.twillenGaveRumor
+3|0|8|48248|9394|bool|true      // npcsStateGroup.metGrom
+3|0|8|14019|57552|int|2         // questUberStateGroup.desertRumorState
+3|0|8|42178|50418|bool|true     // hubUberStateGroup.gromIntroSequencePlayed
+3|0|8|48248|7646|bool|true      // npcsStateGroup.gromGaveWarning
+3|0|8|48248|45751|bool|true     // npcsStateGroup.gromTalkedAboutDesert
+3|0|8|48248|54806|bool|true     // npcsStateGroup.gromTalkedAboutWatermill
+3|0|8|48248|46471|bool|true     // npcsStateGroup.gromTalkedAboutMouldwoodGate
+3|0|8|48248|7321|bool|true      // npcsStateGroup.gromTalkedAboutBaur
+3|0|8|48248|30073|bool|true     // npcsStateGroup.gromTalkedAboutLagoon
+3|0|8|48248|10337|int|2      // npcsStateGroup.talkedInHub
+3|0|8|48248|8985|bool|true      // npcsStateGroup.willowsEndSeirExitCutscene
+3|0|8|48248|56448|bool|true     // npcsStateGroup.metOpherHub
+3|0|8|48248|5186|bool|true      // npcsStateGroup.gromMentionedOre
+3|0|8|58674|58268|bool|true     // _petrifiedForestGroup.wispCutscenePlayed
+3|0|8|3440|20131|bool|true      // playerUberStateGroupDescriptor.playerPurchasedWeaponMasterUpgrade
+3|0|8|14019|16509|int|2         // questUberStateGroup.wellspringShrineRumorState
+3|0|8|14019|30596|int|2         // questUberStateGroup.gardenerHutRumorState
+3|0|8|48248|7160|bool|true      // npcsStateGroup.desertRuinsLoreWispA
+3|0|8|48248|15833|bool|true     // npcsStateGroup.desertRuinsLoreWispB
+3|0|8|48248|52065|bool|true     // npcsStateGroup.desertRuinsLoreWispC
+3|0|8|48248|13320|bool|true     // npcsStateGroup.desertRuinsLoreWispD
+3|0|8|48248|5269|bool|true      // npcsStateGroup.desertRuinsLoreWispE
+3|0|8|14019|24683|int|5         // questUberStateGroup.luposMapQuest
+// These partially complete quests so we check their current value to be safe
+3|0|4|17|14019|44578|0|8|14019|44578|int|1      // questUberStateGroup.rebuildGladesQuest
+3|0|4|17|42178|51230|0|8|42178|51230|byte|1     // hubUberStateGroup.builderProjectHouses
