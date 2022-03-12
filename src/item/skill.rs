@@ -1,6 +1,6 @@
 use num_enum::TryFromPrimitive;
 
-use crate::{util::{Difficulty, Icon}, auto_display};
+use crate::{util::Icon, auto_display, settings::Difficulty};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]

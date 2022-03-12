@@ -29,7 +29,7 @@ fn parsing(c: &mut Criterion) {
     let states = logic::parse_states(&input).unwrap();
 
     let mut settings = Settings::default();
-    settings.difficulty = Difficulty::Unsafe;
+    settings.world_settings[0].difficulty = Difficulty::Unsafe;
 
     c.bench_function("emit", |b| b.iter(|| emitter::emit(&areas, &metadata, &locations, &states, &settings, false)));
 }
@@ -108,14 +108,14 @@ fn generation(c: &mut Criterion) {
 
     c.bench_function("singleplayer", |b| b.iter(|| {
         let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
+        seedgen::generate_seed(&graph, settings.clone()).unwrap();
     }));
 
-    settings.worlds = 2;
+    settings.world_settings.extend_from_within(..);
 
     c.bench_function("two worlds", |b| b.iter(|| {
         let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
+        seedgen::generate_seed(&graph, settings.clone()).unwrap();
     }));
 }
 

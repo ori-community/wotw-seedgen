@@ -13,64 +13,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use serde::{Serialize, Deserialize};
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Serialize, Deserialize)]
-pub enum Difficulty {
-    Moki,
-    Gorlek,
-    Kii,
-    Unsafe,
-}
-impl Default for Difficulty {
-    fn default() -> Difficulty { Difficulty::Moki }
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, Deserialize)]
-pub enum Glitch {
-    SwordSentryJump,    // Grounded Sentry Jumps with Sword
-    HammerSentryJump,   // Grounded Sentry Jump with Hammer
-    ShurikenBreak,      // Breaking Walls from behind with Shuriken
-    SentryBreak,        // Breaking Walls from behind with Sentry
-    HammerBreak,        // Breaking Walls from behind with Hammer
-    SpearBreak,         // Breaking Walls from behind with Spear
-    SentryBurn,         // Melting Ice using Sentries
-    RemoveKillPlane,    // Removing Shriek's Killplane at Feeding Grounds
-    LaunchSwap,         // Using the weapon wheel to cancel Launch
-    SentrySwap,         // Using the weapon wheel to cancel Sentry
-    FlashSwap,          // Using the weapon wheel to cancel Flash
-    BlazeSwap,          // Using the weapon wheel to cancel Blaze
-    WaveDash,           // Gaining speed off a wall with Regenerate and Dash
-    GrenadeJump,        // Preserving jump momentum with Grenade
-    HammerJump,         // Preserving Double Jump momentum with Hammer
-    SwordJump,          // Preserving Double Jump momentum with Sword
-    GrenadeRedirect,    // Redirecting projectiles with Grenade
-    SentryRedirect,     // Redirecting projectiles with Sentry
-    PauseHover,         // Cancelling falling momentum through the pause menu
-    GlideJump,          // Storing a grounded jump into the air with Glide
-    GlideHammerJump,    // Preserving Glide Jump momentum with Hammer
-    SpearJump,          // Storing a grounded jump into the air with Spear
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum GoalMode {
-    Wisps,
-    Trees,
-    Quests,
-    Relics(usize),
-    RelicChance(f64),
-}
-impl fmt::Display for GoalMode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            GoalMode::Wisps => write!(f, "ForceWisps"),
-            GoalMode::Trees => write!(f, "ForceTrees"),
-            GoalMode::Quests => write!(f, "ForceQuests"),
-            GoalMode::Relics(_) | GoalMode::RelicChance(_) => write!(f, "WorldTour"),
-        }
-    }
-}
-
 #[inline]
 pub fn auto_display<D: fmt::Debug>(debug: D) -> String {
     let mut debug = format!("{:?}", debug);
@@ -349,4 +291,15 @@ pub fn float_to_int(float: f32) -> Result<u16, String> {
         return Err(format!("Failed to convert float to int: {}", float));
     }
     Ok(float as u16)
+}
+
+/// Read the spawn location from a generated seed
+/// 
+/// This reads the final spawn location, e.g. if the settings declared a random spawn, this will read the spawn that was chosen
+/// Returns `None` if the seed contains no information about the spawn location
+pub fn spawn_from_seed(input: &str) -> Option<String> {
+    input.lines()
+        .find_map(|line| line.strip_prefix("Spawn: ")
+        .and_then(|spawn| spawn.split_once("//")
+        .map(|(_, identifier)| identifier.trim().to_string())))
 }

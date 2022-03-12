@@ -13,15 +13,15 @@ use crate::{
     ItemDetails,
     inventory::Inventory,
     item::{Item, Resource, Skill, Teleporter, Command, ShopCommand},
-    settings::Settings, util::{
+    settings::{Difficulty, Goal}, util::{
         self,
-        GoalMode, UberState, UberType, Difficulty,
+        UberState, UberType,
         constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION},
     }, world::{
         World,
         graph::{self, Node},
         player::Player,
-    }
+    }, Settings
 };
 
 #[derive(Debug, Clone)]
@@ -960,10 +960,10 @@ where
 {
     // TODO enforce a max total price for shops
     let price_range = Uniform::new_inclusive(0.75, 1.25);
-    let world_tour = settings.goalmodes.iter().find_map(|goalmode|
-        match *goalmode {
-            GoalMode::Relics(amount) => Some(amount),
-            GoalMode::RelicChance(chance) => {
+    let world_tour = settings.world().goals.iter().find_map(|goal|
+        match *goal {
+            Goal::Relics(amount) => Some(amount),
+            Goal::RelicChance(chance) => {
                 if chance == 0.0 { return Some(0); }
                 loop {
                     let amount = (0..11).filter(|_| rng.gen_bool(chance)).count();
@@ -979,7 +979,7 @@ where
     let mut has_warned_about_tp_refill = false;
 
     let mut world_contexts = worlds.into_iter().enumerate().map(|(world_index, mut world)| {
-        let player_name = settings.players.get(world_index).cloned().unwrap_or_else(|| format!("Player {}", world_index + 1));
+        let player_name = settings.get_world_name(world_index);
 
         world.collect_preplacements(&UberState::spawn());
 
@@ -1028,11 +1028,7 @@ where
         let spawn = spawns[world_index];
         // Add a teleport icon for fully random spawn
         if !spawn_is_tp {
-            if !has_warned_about_tp_refill && !settings.header_list.iter().any(|header|
-                header.file_stem().map_or(false, |stem|
-                    stem.to_str().map_or(false, |stem|
-                        stem == "tp_refill"
-            ))) {
+            if !has_warned_about_tp_refill && !settings.world().headers.iter().any(|header| header == "tp_refill") {
                 log::warn!("Spawning on non-teleporter locations without the tp_refill header is not recommended!");
                 has_warned_about_tp_refill = true;
             }
@@ -1057,7 +1053,7 @@ where
             ).collect::<Vec<_>>();
         if !unreachable_locations.is_empty() {
             let identifiers = unreachable_locations.iter().map(|&node| node.identifier()).collect::<Vec<_>>();
-            if !(unreachable_locations.len() == 1 && settings.difficulty == Difficulty::Moki) {  // moki always has one unreachable pickup
+            if !(unreachable_locations.len() == 1 && settings.world().difficulty == Difficulty::Moki) {  // moki always has one unreachable pickup
                 log::warn!("({}): {} locations are unreachable on these settings! These will only hold Spirit Light.", player_name, identifiers.len());
             }
             log::trace!("({}): Unreachable locations on these settings: {}", player_name, format_identifiers(identifiers));
@@ -1101,7 +1097,7 @@ where
     let total_reachable_count: usize = world_contexts.iter().map(|world_context| world_context.reachable_locations.len()).sum();
 
     let mut context = GeneratorContext {
-        world_count: settings.worlds,
+        world_count: settings.world_count(),
         total_reachable_count,
         custom_items,
         multiworld_state_index: 0..,

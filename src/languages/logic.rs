@@ -8,7 +8,7 @@ use decorum::R32;
 use parser::ParseError;
 use serde::Deserialize;
 use crate::world::graph::Graph;
-use crate::settings::Settings;
+use crate::Settings;
 use crate::util::{self, UberState, Position};
 
 pub fn parse_logic<P1, P2, P3>(areas: P1, locations: P2, states: P3, settings: &Settings, validate: bool) -> Result<Graph, String>

@@ -1,11 +1,11 @@
 use smallvec::{SmallVec, smallvec};
 
+use crate::Settings;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard};
-use crate::settings::Settings;
+use crate::settings::Difficulty;
 use crate::util::{
     self,
-    Difficulty,
     orbs::{self, Orbs},
 };
 
@@ -23,8 +23,8 @@ impl Player {
     }
 
     pub fn apply_settings(&mut self, settings: &Settings) {
-        self.difficulty = settings.difficulty;
-        self.hard = settings.hard;
+        self.difficulty = settings.world().difficulty;
+        self.hard = settings.world().hard;
     }
 
     pub fn max_energy(&self) -> f32 {
@@ -324,7 +324,6 @@ mod tests {
     use super::*;
 
     use crate::item::BonusItem;
-    use crate::util::*;
 
     #[test]
     fn inventory() {

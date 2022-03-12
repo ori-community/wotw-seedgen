@@ -1,18 +1,19 @@
 [package]
 name = "seedgen"
 description = "Command line interface to generate seeds for the Ori and the Will of the Wisps Randomizer"
-version = "1.0.10"
+version = "2.0.0"
 authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/sparkle-preference/OriWotwRandomizerClient/tree/master/projects/SeedGenCli"
 publish = false
 
 [dependencies]
+seedgen_derive = { path = "seedgen_derive" }
 atty = "0.2.14"
 bugsalot = "0.1.4"
 structopt = "0.3.13"
 serde = { version = "1.0.124", features = ["derive"] }
-serde_json = "1.0.64"
+serde_json = "1.0"
 csv = "1.1"
 rustc-hash = "1.1.0"
 rand = { version = "0.8.3", features = ["std_rng", "alloc"] }

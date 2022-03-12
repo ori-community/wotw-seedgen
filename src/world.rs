@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn reach_check() {
         let mut settings = Settings::default();
-        settings.difficulty = Difficulty::Gorlek;
+        settings.world_mut().difficulty = Difficulty::Gorlek;
 
         let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         let mut world = World::new(graph);
@@ -189,7 +189,7 @@ mod tests {
         assert_eq!(reached, locations);
 
         let mut settings = Settings::default();
-        settings.difficulty = Difficulty::Gorlek;
+        settings.world_mut().difficulty = Difficulty::Gorlek;
 
         let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         let mut world = World::new(graph);

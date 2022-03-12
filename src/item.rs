@@ -14,7 +14,8 @@ mod shop_command;
 use std::fmt;
 
 use crate::languages::headers;
-use crate::util::{Difficulty, Zone, Icon};
+use crate::settings::Difficulty;
+use crate::util::{Zone, Icon};
 
 pub use self::{
     resource::Resource,

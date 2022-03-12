@@ -4,7 +4,8 @@ use smallvec::SmallVec;
 
 use super::tokenizer::{Token, TokenType, Metadata};
 use crate::item::{Resource, Skill, Shard, Teleporter};
-use crate::util::{Difficulty, Glitch, RefillType, NodeType, Enemy, Position};
+use crate::settings::{Difficulty, Trick};
+use crate::util::{RefillType, NodeType, Enemy, Position};
 
 #[derive(Debug)]
 pub struct ParseError {
@@ -25,7 +26,7 @@ pub enum Requirement<'a> {
     Free,
     Definition(&'a str),
     Difficulty(Difficulty),
-    Glitch(Glitch),
+    Trick(Trick),
     Skill(Skill),
     EnergySkill(Skill, u16),
     SpiritLight(u16),
@@ -298,9 +299,9 @@ fn parse_requirement<'a>(token: &Token<'a>, metadata: &Metadata) -> Result<Requi
             "moki" => Ok(Requirement::Difficulty(Difficulty::Moki)),
             "OuterRuinsTP" => Ok(Requirement::Teleporter(Teleporter::OuterRuins)),
             "Overflow" => Ok(Requirement::Shard(Shard::Overflow)),
-            "PauseHover" => Ok(Requirement::Glitch(Glitch::PauseHover)),
+            "PauseHover" => Ok(Requirement::Trick(Trick::PauseHover)),
             "ReachTP" => Ok(Requirement::Teleporter(Teleporter::Reach)),
-            "RemoveKillPlane" => Ok(Requirement::Glitch(Glitch::RemoveKillPlane)),
+            "RemoveKillPlane" => Ok(Requirement::Trick(Trick::RemoveKillPlane)),
             "Regenerate" => Ok(Requirement::Skill(Skill::Regenerate)),
             "Seir" => Ok(Requirement::Skill(Skill::Seir)),
             "Sentry" => Ok(Requirement::Skill(Skill::Sentry)),

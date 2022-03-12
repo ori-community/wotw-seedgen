@@ -174,7 +174,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
         let contents = util::read_file(&header, "headers")?;
         let mut name = header.file_stem().unwrap().to_string_lossy().into_owned();
 
-        match parser::validate_header(&header, &contents) {
+        match parser::validate_header(&name, &contents) {
             Ok((occupied, excludes)) => {
                 occupation_map.push((name, occupied, excludes));
             },

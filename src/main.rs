@@ -6,7 +6,7 @@ use std::{
     io::{self, Read},
     time::Instant,
     collections::HashMap,
-    process, env,
+    process, env, error::Error,
 };
 
 use structopt::StructOpt;
@@ -14,15 +14,14 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings, util, languages::{headers::{self, parser::HeaderContext}, self}};
+use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal}, util, languages::{headers::{self, parser::HeaderContext}, self}, preset::WorldPreset, Preset, Settings};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
     World,
     graph::Graph,
 };
-use settings::{Settings, Spawn};
-use util::{Difficulty, Glitch, GoalMode, UberState};
+use util::UberState;
 
 #[derive(StructOpt, Debug)]
 /// Generate seeds for the Ori 2 randomizer.
@@ -67,15 +66,12 @@ enum SeedGenCommand {
 
 #[derive(StructOpt, Debug)]
 struct SeedArgs {
-    /// the seed's name and name of the file it will be written to. The name also seeds the rng.
+    /// the seed's name and name of the file it will be written to. The name also seeds the rng if no seed is given.
     #[structopt()]
     filename: Option<String>,
     /// which folder to write the seed into
     #[structopt(parse(from_os_str), default_value = "seeds", long = "seeddir")]
     seed_folder: PathBuf,
-    /// seed the rng; without this flag it will be seeded from the filename instead
-    #[structopt(long)]
-    seed: Option<String>,
     /// the input file representing the logic
     #[structopt(parse(from_os_str), default_value = "areas.wotw", long)]
     areas: PathBuf,
@@ -89,7 +85,7 @@ struct SeedArgs {
     #[structopt(short, long)]
     verbose: bool,
     /// skip validating the input files for a slight performance gain
-    #[structopt(short, long)]
+    #[structopt(long)]
     trust: bool,
     /// write the seed to stdout instead of a file
     #[structopt(long)]
@@ -100,11 +96,13 @@ struct SeedArgs {
     /// launch the seed after generating
     #[structopt(short, long)]
     launch: bool,
+    /// Seed the random number generator
+    /// 
+    /// Without this flag, the rng seed will be randomly generated
+    #[structopt(long)]
+    seed: Option<String>,
     #[structopt(flatten)]
     settings: SeedSettings,
-    /// inline headers
-    #[structopt(short, long = "inline")]
-    inline_headers: Vec<String>
 }
 
 #[derive(StructOpt, Debug)]
@@ -123,54 +121,131 @@ struct SeedSettings {
     /// derive the settings from one or more presets
     ///
     /// presets later in the list override earlier ones, and flags from the command override any preset
-    #[structopt(parse(from_os_str), short, long)]
-    preset: Vec<PathBuf>,
-    /// How many (multi)worlds to generate
-    #[structopt(short, long, default_value = "1")]
-    worlds: usize,
-    /// Player names in multiworld
     #[structopt(short, long)]
-    names: Vec<String>,
-    /// difficulty of execution you may be required to perform
-    ///
-    /// one of moki, gorlek, unsafe
-    #[structopt(short, long, default_value = "moki")]
-    difficulty: String,
-    /// glitches you may be required to use
-    ///
-    /// glitches are shurikenbreak, sentrybreak, hammerbreak, spearbreak, swordsjump, hammersjump, sentryburn, removekillplane, launchswap, sentryswap, flashswap, blazeswap, wavedash, grenadejump, hammerjump, swordjump, grenaderedirect, sentryredirect, pausehover
-    #[structopt(short = "G", long)]
-    glitches: Vec<String>,
-    /// which goal modes to use
-    ///
-    /// goal modes are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
+    presets: Option<Vec<String>>,
+    /// World names in multiworld
+    /// 
+    /// Usually the names of the players or teams playing in a world
+    /// This also determines how many worlds to generate the seed with
+    /// Without this flag, one world with a default name will be generated
     #[structopt(short, long)]
-    goals: Vec<String>,
-    /// where to spawn the player
+    world_names: Option<Vec<String>>,
+    /// Spawn destination
     ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
-    #[structopt(short, long, default_value = "MarshSpawn.Main")]
-    spawn: String,
-    /// hides spoilers
+    #[structopt(short, long, parse(from_str = parse_spawn))]
+    spawn: Option<Spawn>,
+    /// Logically expected difficulty of execution you may be required to perform
+    ///
+    /// One of "moki", "gorlek", "unsafe"
     #[structopt(short, long)]
-    race: bool,
-    /// prevent using the in-game logic map
-    #[structopt(short = "L", long)]
-    disable_logic_filter: bool,
-    /// required for coop and bingo
+    difficulty: Option<Difficulty>,
+    /// Logically expected tricks you may have to use
+    ///
+    /// Available tricks are shurikenbreak, sentrybreak, hammerbreak, spearbreak, swordsjump, hammersjump, sentryburn, removekillplane, launchswap, sentryswap, flashswap, blazeswap, wavedash, grenadejump, hammerjump, swordjump, grenaderedirect, sentryredirect, pausehover
     #[structopt(short, long)]
-    multiplayer: bool,
-    /// play this seed on hard (in-game) difficulty
+    tricks: Option<Vec<Trick>>,
+    /// Logically assume hard in-game difficulty
     #[structopt(long)]
     hard: bool,
-    /// paths to headers stored in files which will be added to the seed
-    #[structopt(parse(from_os_str), short, long = "headers")]
-    header_paths: Vec<PathBuf>,
-    /// configuration parameters for headers
+    /// Goal Requirements before finishing the game
     ///
-    /// format for one parameter: <headername>.<parametername>=<value>
-    #[structopt(short = "a", long = "args")]
-    header_args: Vec<String>,
+    /// Available goals are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
+    #[structopt(short, long, parse(try_from_str = parse_goal))]
+    goals: Option<Vec<Goal>>,
+    /// Names of headers that will be used when generating the seed
+    /// 
+    /// The headers will be searched as .wotwrh files in the current and /headers child directory
+    #[structopt(short, long)]
+    headers: Option<Vec<String>>,
+    /// Configuration parameters to pass to headers
+    ///
+    /// Format for one parameter: <headername>.<parametername>=<value>
+    #[structopt(short = "c", long)]
+    header_config: Option<Vec<String>>,
+    /// Inline header syntax
+    #[structopt(short, long = "inline")]
+    inline_headers: Option<Vec<String>>,
+    /// Don't write spoiler comments into the seed
+    /// 
+    /// This will create a separate copy of the seed with spoilers included
+    #[structopt(short, long)]
+    no_spoilers: bool,
+    /// Disallow the use of the In-Logic filter while playing the seed
+    #[structopt(short = "L", long)]
+    disable_logic_filter: bool,
+    /// Require an online connection to play the seed
+    /// 
+    /// This is needed for Co-op, Multiworld and Bingo
+    #[structopt(short, long)]
+    online: bool,
+}
+
+impl SeedSettings {
+    fn to_preset(self) -> Preset {
+        let Self {
+            presets,
+            world_names,
+            difficulty,
+            tricks,
+            no_spoilers,
+            disable_logic_filter,
+            online,
+            hard,
+            spawn,
+            goals,
+            headers,
+            header_config,
+            inline_headers,
+        } = self;
+
+        let hard = if hard { Some(true) } else { None };
+        let no_spoilers = if no_spoilers { Some(true) } else { None };
+        let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
+        let online = if online { Some(true) } else { None };
+        let inline_header = inline_headers.map(|inline_headers| inline_headers.join("\n"));
+
+        let world_presets = if let Some(world_names) = world_names {
+            Some(world_names.into_iter().map(|world_name| WorldPreset {
+                world_name: Some(world_name),
+                spawn: spawn.clone(),
+                difficulty,
+                tricks: tricks.clone(),
+                goals: goals.clone(),
+                hard,
+                headers: headers.clone(),
+                header_config: header_config.clone(),
+                inline_header: inline_header.clone(),
+            }).collect())
+        } else {
+            let world_preset = WorldPreset {
+                world_name: None,
+                spawn: spawn.clone(),
+                difficulty,
+                tricks: tricks.clone(),
+                goals: goals.clone(),
+                hard,
+                headers: headers.clone(),
+                header_config: header_config.clone(),
+                inline_header: inline_header.clone(),
+            };
+
+            if world_preset == WorldPreset::default() {
+                None
+            } else {
+                Some(vec![world_preset])
+            }
+        };
+
+        Preset {
+            presets,
+            world_presets,
+            no_spoilers,
+            disable_logic_filter,
+            online,
+            create_game: None,
+        }
+    }
 }
 
 #[derive(StructOpt, Debug)]
@@ -217,10 +292,56 @@ enum HeaderCommand {
     }
 }
 
-fn read_header() -> String {
+fn parse_goal(goal: &str) -> Result<Goal, String> {
+    let (identifier, details) = goal.split_once(':').unwrap_or((goal, ""));
+
+    let goal = match identifier {
+        "t" | "trees" => Goal::Trees,
+        "w" | "wisps" => Goal::Wisps,
+        "q" | "quests" => Goal::Quests,
+        "r" | "relics" => {
+            if !details.is_empty() {
+                if let Some(chance) = details.strip_suffix('%') {
+                    let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal {}", goal))?;
+                    if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal {}", goal)); }
+                    Goal::RelicChance(chance / 100.0)
+                } else {
+                    let amount = details.parse().map_err(|_| format!("expected amount or % expression in details string for goal {}", goal))?;
+                    if !(0..=11).contains(&amount) { return Err(format!("Invalid amount in details string for goal {}", goal)); }
+                    Goal::Relics(amount)
+                }
+            } else { Goal::RelicChance(0.6) }
+        },
+        other => return Err(format!("Unknown goal {}", other)),
+    };
+
+    Ok(goal)
+}
+fn parse_spawn(spawn: &str) -> Spawn {
+    match &spawn.to_lowercase()[..] {
+        "r" | "random" => Spawn::Random,
+        "f" | "fullyrandom" => Spawn::FullyRandom,
+        _ => Spawn::Set(spawn.to_string()),
+    }
+}
+
+fn parse_settings(seed: Option<String>, settings: SeedSettings) -> Result<Settings, Box<dyn Error>> {
+    let preset = settings.to_preset();
+
+    let mut settings = Settings::default();
+    settings.apply_preset(preset)?;
+
+    if let Some(seed) = seed {
+        settings.seed = seed;
+    }
+
+    Ok(settings)
+}
+
+fn read_header() -> Result<String, String> {
     // If we do not have input, skip.
     if atty::is(atty::Stream::Stdin) {
-        return String::new();
+        return Ok(String::new());
     }
 
     let stdin = io::stdin();
@@ -229,161 +350,15 @@ fn read_header() -> String {
 
     // Could also `match` on the `Result` if you wanted to handle `Err` 
     loop {
-        let result = stdin.read_to_string(&mut output).expect("failed to read standard input");
+        let result = stdin.read_to_string(&mut output).map_err(|err| format!("failed to read standard input: {err}"))?;
         if result == 0 {
             break;
         }
 
-        output += "\n";
+        output.push('\n');
     }
 
-    output
-}
-
-fn parse_difficulty(difficulty: &str) -> Result<Difficulty, String> {
-    match &difficulty.to_lowercase()[..] {
-        "moki" => Ok(Difficulty::Moki),
-        "gorlek" => Ok(Difficulty::Gorlek),
-        "kii" => Ok(Difficulty::Kii),
-        "unsafe" => Ok(Difficulty::Unsafe),
-        _ => Err(format!("Unknown difficulty {}", difficulty)),
-    }
-}
-
-fn parse_glitches(names: &[String]) -> Vec<Glitch> {
-    let mut glitches = Vec::default();
-
-    for glitch in names {
-        match &glitch.to_lowercase()[..] {
-            "shurikenbreak" => glitches.push(Glitch::ShurikenBreak),
-            "sentrybreak" => glitches.push(Glitch::SentryBreak),
-            "hammerbreak" => glitches.push(Glitch::HammerBreak),
-            "spearbreak" => glitches.push(Glitch::SpearBreak),
-            "swordsjump" | "swordsentryjump" => glitches.push(Glitch::SwordSentryJump),
-            "hammersjump" | "hammersentryjump" => glitches.push(Glitch::HammerSentryJump),
-            "sentryburn" => glitches.push(Glitch::SentryBurn),
-            "removekillplane" => glitches.push(Glitch::RemoveKillPlane),
-            "launchswap" => glitches.push(Glitch::LaunchSwap),
-            "sentryswap" => glitches.push(Glitch::SentrySwap),
-            "flashswap" => glitches.push(Glitch::FlashSwap),
-            "blazeswap" => glitches.push(Glitch::BlazeSwap),
-            "wavedash" => glitches.push(Glitch::WaveDash),
-            "grenadejump" => glitches.push(Glitch::GrenadeJump),
-            "hammerjump" => glitches.push(Glitch::HammerJump),
-            "swordjump" => glitches.push(Glitch::SwordJump),
-            "grenaderedirect" => glitches.push(Glitch::GrenadeRedirect),
-            "sentryredirect" => glitches.push(Glitch::SentryRedirect),
-            "pausehover" => glitches.push(Glitch::PauseHover),
-            "glidejump" => glitches.push(Glitch::GlideJump),
-            "glidehammerjump" => glitches.push(Glitch::GlideHammerJump),
-            "spearjump" => glitches.push(Glitch::SpearJump),
-            other => log::warn!("Unknown glitch {}", other),
-        }
-    }
-
-    glitches
-}
-fn parse_goalmodes(names: &[String]) -> Result<Vec<GoalMode>, String> {
-    let mut goalmodes = Vec::new();
-
-    for goalmode in names {
-        let mut parts = goalmode.split(':');
-        let identifier = parts.next().unwrap();
-
-        match identifier {
-            "t" | "trees" => { goalmodes.push(GoalMode::Trees); },
-            "w" | "wisps" => { goalmodes.push(GoalMode::Wisps); },
-            "q" | "quests" => { goalmodes.push(GoalMode::Quests); },
-            "r" | "relics" => {
-                let goal = if let Some(details) = parts.next() {
-                    if let Some(chance) = details.strip_suffix('%') {
-                        let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal mode {}", goalmode))?;
-                        if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal mode {}", goalmode)); }
-                        GoalMode::RelicChance(chance / 100.0)
-                    } else {
-                        let amount = details.parse().map_err(|_| format!("expected amount or % expression in details string for goal mode {}", goalmode))?;
-                        if !(0..=11).contains(&amount) { return Err(format!("Invalid amount in details string for goal mode {}", goalmode)); }
-                        GoalMode::Relics(amount)
-                    }
-                } else { GoalMode::RelicChance(0.6) };
-
-                goalmodes.push(goal);
-            },
-            other => log::warn!("Unknown goal mode {}", other),
-        }
-
-        if parts.next().is_some() {
-            return Err(format!("Unexpected details string in goal mode {}", goalmode));
-        }
-    }
-
-    if !goalmodes.is_empty() {
-        goalmodes.sort_unstable_by_key(GoalMode::to_string);
-
-        let mut key = goalmodes[0].to_string();
-        for goalmode in goalmodes.iter().skip(1) {
-            let a = key;
-            key = goalmode.to_string();
-
-            if a == key {
-                return Err(format!("Duplicate goalmode {}", key));
-            }
-        }
-    }
-
-    Ok(goalmodes)
-}
-fn parse_spawn(spawn: String) -> Spawn {
-    match &spawn.to_lowercase()[..] {
-        "r" | "random" => Spawn::Random,
-        "f" | "fullyrandom" => Spawn::FullyRandom,
-        _ => Spawn::Set(spawn),
-    }
-}
-fn parse_settings(settings: SeedSettings) -> Result<Settings, String> {
-    let SeedSettings {
-        preset,
-        worlds,
-        names,
-        difficulty,
-        glitches,
-        race,
-        disable_logic_filter,
-        mut multiplayer,
-        hard,
-        spawn,
-        goals,
-        header_paths,
-        header_args,
-    } = settings;
-
-    let difficulty = parse_difficulty(&difficulty)?;
-    let glitches = parse_glitches(&glitches);
-    let goalmodes = parse_goalmodes(&goals)?;
-    let spawn = parse_spawn(spawn);
-
-    if worlds == 0 {
-        return Err(String::from("Tried to create a seed with zero worlds"));
-    } else if worlds > 1 {
-        multiplayer = true;
-    }
-
-    Ok(Settings {
-        version: Some(env!("CARGO_PKG_VERSION").to_string()),
-        presets: preset,
-        worlds,
-        players: names,
-        difficulty,
-        glitches,
-        race,
-        disable_logic_filter,
-        goalmodes,
-        web_conn: multiplayer,
-        spawn_loc: spawn,
-        hard,
-        header_list: header_paths,
-        header_args,
-    })
+    Ok(output)
 }
 
 fn write_seeds_to_files(seeds: &[String], spoilers: &[String], mut filename: String, mut folder: PathBuf, players: &[String], race: bool) -> Result<(), String> {
@@ -438,28 +413,27 @@ fn write_seeds_to_stdout(seeds: Vec<String>) {
     println!("{}", seeds.join("\n======= END SEED =======\n"));
 }
 
-fn generate_seeds(mut args: SeedArgs) -> Result<(), String> {
+fn generate_seeds(mut args: SeedArgs) -> Result<(), Box<dyn Error>> {
     let now = Instant::now();
 
-    let seed = args.seed.as_ref().map_or_else(
-        || args.filename.as_ref(),
-        |seed| Some(seed),
-    ).cloned();
+    let header = read_header()?;
+    if !header.is_empty() {
+        if let Some(inline_headers) = &mut args.settings.inline_headers {
+            inline_headers.push(header);
+        } else {
+            args.settings.inline_headers = Some(vec![header]);
+        }
+    }
 
-    let settings = parse_settings(args.settings)?.apply_presets()?;
+    let settings = parse_settings(args.seed, args.settings)?;
 
     let graph = languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
-    let header = read_header();
-    if !header.is_empty() {
-        args.inline_headers.push(header)
-    }
-
-    let worlds = settings.worlds;
-    let race = settings.race;
-    let players = settings.players.clone();
-    let (seeds, spoilers) = seedgen::generate_seed(&graph, settings, &args.inline_headers, seed).map_err(|err| format!("Error generating seed: {}", err))?;
+    let worlds = settings.world_count();
+    let no_spoilers = settings.no_spoilers;
+    let players = settings.world_settings.iter().map(|world_settings| world_settings.world_name.clone()).collect::<Vec<_>>();
+    let (seeds, spoilers) = seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -468,14 +442,14 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), String> {
 
     if args.tostdout {
         write_seeds_to_stdout(seeds);
-        if race {
+        if no_spoilers {
             println!("\n======= SPOILERS =======\n");
             write_seeds_to_stdout(spoilers);
         }
     } else {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
-        write_seeds_to_files(&seeds, &spoilers, filename, args.seed_folder, &players, race).unwrap_or_else(|err| log::error!("{}", err));
+        write_seeds_to_files(&seeds, &spoilers, filename, args.seed_folder, &players, no_spoilers).unwrap_or_else(|err| log::error!("{}", err));
     }
 
     if args.launch {
@@ -496,18 +470,18 @@ fn play_last_seed() -> Result<(), String> {
     Ok(())
 }
 
-fn create_preset(mut args: PresetArgs) -> Result<(), String> {
-    let settings = parse_settings(args.settings)?;
-    let settings = settings.write()?;
-
+fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
+    let preset = args.settings.to_preset();
+    let preset = preset.to_json();
     args.name.set_extension("json");
 
-    let path = util::create_file(&args.name, &settings, "presets", false)?;
+    let path = util::create_file(&args.name, &preset, "presets", false)?;
     log::info!("Created preset {}", path.display());
 
     Ok(())
 }
 
+// TODO some of this logic probably belongs in the library
 fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let command = env::args().collect::<Vec<_>>().join(" ");
     log::trace!("{}", command);
@@ -515,7 +489,11 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     args.seed_file.set_extension("wotwr");
     let contents = util::read_file(&args.seed_file, "seeds")?;
 
-    let settings = Settings::from_seed(&contents)?;
+    let settings = Settings::from_seed(&contents).unwrap_or_else(|| {
+        log::trace!("No settings found in seed, using default settings");
+        Ok(Settings::default())
+    }).map_err(|err| format!("Error reading settings: {}", err))?;
+
     let graph = &languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
     let mut world = World::new(graph);
 
@@ -570,7 +548,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         }
     }
 
-    let spawn = settings::read_spawn(&contents)?;
+    let spawn = util::spawn_from_seed(&contents).ok_or_else(|| "Failed to read spawn location from seed".to_string())?;
     let spawn = world.graph.find_spawn(&spawn)?;
 
     let mut reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).expect("Invalid Reach Check");
@@ -605,7 +583,8 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
 
     let mut context = HeaderContext::default();
 
-    let header_block = headers::parser::parse_header(&path, &header, &mut world, &mut context, &HashMap::default(), &mut rng)?;
+    let name = path.file_stem().unwrap().to_string_lossy().into_owned();
+    let header_block = headers::parser::parse_header(&name, &header, &mut world, &mut context, &HashMap::default(), &mut rng)?;
     let flag_line = seedgen::write_flags(&settings, context.flags);
 
     let compiled = format!("{}{}", flag_line, header_block);

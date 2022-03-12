@@ -1,6 +1,5 @@
 use std::{
     collections::HashMap,
-    path::{Path, PathBuf},
     str::FromStr, convert::TryFrom,
 };
 
@@ -16,7 +15,7 @@ use crate::{
     },
     inventory::Inventory,
     item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary},
-    settings::Settings,
+    Settings,
     util::{self, Zone, Icon, UberState, UberType, UberIdentifier, Position},
 };
 
@@ -953,15 +952,12 @@ fn apply_parameters(line: &mut String, parameters: &HashMap<String, String>) -> 
 }
 
 #[inline]
-fn include_command(include: &str, dependencies: &mut Vec<PathBuf>) {
-    let mut path = PathBuf::from(include);
-    path.set_extension("wotwrh");
-    dependencies.push(path);
+fn include_command(include: &str, dependencies: &mut Vec<String>) {
+    dependencies.push(include.to_string());
 }
 #[inline]
-fn exclude_command(name: &Path, exclude: &str, excludes: &mut HashMap<String, String>) {
-    let name = name.file_stem().unwrap().to_string_lossy().to_string();
-    excludes.insert(exclude.to_string(), name);
+fn exclude_command(name: &str, exclude: &str, excludes: &mut HashMap<String, String>) {
+    excludes.insert(exclude.to_string(), name.to_string());
 }
 #[inline]
 fn add_command(mut item: &str, world: &mut World) -> Result<(), String> {
@@ -1176,7 +1172,7 @@ fn if_command(comparison: &str, parameters: &HashMap<String, String>) -> Result<
 
 #[derive(Debug, Default)]
 pub struct HeaderContext {
-    pub dependencies: Vec<PathBuf>,
+    pub dependencies: Vec<String>,
     pub excludes: HashMap<String, String>,
     pub flags: Vec<String>,
     pub custom_items: HashMap<String, ItemDetails>,
@@ -1184,7 +1180,7 @@ pub struct HeaderContext {
     pub negative_inventory: Inventory,
 }
 
-pub fn parse_header<R>(name: &Path, header: &str, world: &mut World, context: &mut HeaderContext, param_values: &HashMap<&str, HashMap<&str, &str>>, rng: &mut R) -> Result<String, String>
+pub fn parse_header<R>(name: &str, header: &str, world: &mut World, context: &mut HeaderContext, param_values: &HashMap<&str, HashMap<&str, &str>>, rng: &mut R) -> Result<String, String>
 where R: Rng + ?Sized
 {
     let mut processed = String::with_capacity(header.len());
@@ -1195,7 +1191,7 @@ where R: Rng + ?Sized
     let mut first_line = true;
 
     let default = HashMap::default();
-    let header_param_values = param_values.get(&name.file_stem().unwrap().to_string_lossy().to_string()[..]).unwrap_or(&default);
+    let header_param_values = param_values.get(name).unwrap_or(&default);
 
     for line in header.lines() {
         let mut line = apply_take_commands(line, &mut pool, rng)?;
@@ -1335,11 +1331,12 @@ where R: Rng + ?Sized
     Ok(processed)
 }
 
-pub fn validate_header(name: &Path, contents: &str) -> Result<(Vec<UberState>, HashMap<String, String>), String> {
+pub fn validate_header(name: &str, contents: &str) -> Result<(Vec<UberState>, HashMap<String, String>), String> {
     let mut context = HeaderContext::default();
     parse_header(name, contents, &mut World::new(&Graph::default()), &mut context, &HashMap::default(), &mut rand::thread_rng())?;
 
-    for dependency in context.dependencies {
+    for mut dependency in context.dependencies {
+        dependency.push_str(".wotwrh");
         util::read_file(&dependency, "headers")?;
     }
 
@@ -1510,7 +1507,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
                 for other_world_index in other_worlds {
                     let actual_zone = where_is(&actual_item, other_world_index, seeds, graph, settings)?;
                     if &actual_zone != "Unknown" {
-                        let player_name = settings.players.get(other_world_index).cloned().unwrap_or_else(|| format!("Player {}", other_world_index + 1));
+                        let player_name = settings.get_world_name(other_world_index);
 
                         return Ok(format!("{}'s {}", player_name, actual_zone));
                     }

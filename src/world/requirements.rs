@@ -4,7 +4,8 @@ use smallvec::{SmallVec, smallvec};
 use super::player::Player;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard, Teleporter};
-use crate::util::{Difficulty, Enemy, orbs::{self, Orbs}};
+use crate::settings::Difficulty;
+use crate::util::{Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
 
@@ -509,7 +510,7 @@ impl Requirement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::Settings;
+    use crate::Settings;
 
     #[test]
     fn is_met() {
