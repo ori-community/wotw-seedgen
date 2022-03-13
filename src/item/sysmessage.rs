@@ -1,8 +1,6 @@
-use std::fmt;
+use crate::util::Zone;
 
-use crate::util::{Zone, auto_display};
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum SysMessage {
     RelicList,
     MapRelicList(Zone),
@@ -25,14 +23,6 @@ impl SysMessage {
             SysMessage::MapRelicList(_) => 1,
             SysMessage::PickupCount => 2,
             SysMessage::GoalProgress => 3,
-        }
-    }
-}
-impl fmt::Display for SysMessage {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            SysMessage::MapRelicList(zone) => write!(f, "{} {}", zone, auto_display(self)),
-            _ => write!(f, "{}", auto_display(self)),
         }
     }
 }

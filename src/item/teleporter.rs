@@ -1,10 +1,6 @@
-use std::fmt;
-
 use num_enum::TryFromPrimitive;
 
-use crate::util::auto_display;
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Teleporter {
     Marsh = 16,
@@ -25,9 +21,4 @@ pub enum Teleporter {
     InnerRuins = 14,
     Willow = 12,
     Shriek = 15,
-}
-impl fmt::Display for Teleporter {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} TP", auto_display(self))
-    }
 }

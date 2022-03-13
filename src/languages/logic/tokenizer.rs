@@ -3,9 +3,7 @@ use std::cmp::Ordering;
 use rustc_hash::FxHashSet;
 use smallvec::SmallVec;
 
-use crate::auto_display;
-
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, seedgen_derive::Display, Copy, Clone, PartialEq)]
 pub enum TokenType {
     Whitespace,
     Definition,
@@ -27,7 +25,6 @@ pub enum TokenType {
     Or,
     NoSpawn,
 }
-auto_display!(TokenType);
 
 #[derive(Debug, Clone)]
 pub struct Token<'a> {

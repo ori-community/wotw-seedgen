@@ -1,8 +1,8 @@
 use num_enum::TryFromPrimitive;
 
-use crate::{util::Icon, auto_display, settings::Difficulty};
+use crate::{util::Icon, settings::Difficulty};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Skill {
     Bash = 0,
@@ -30,7 +30,6 @@ pub enum Skill {
     #[num_enum(alternatives = [121])]
     AncestralLight = 120,
 }
-auto_display!(Skill);
 impl Skill {
     pub fn icon(self) -> Option<Icon> {
         match self {

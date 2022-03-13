@@ -67,8 +67,8 @@ impl fmt::Display for Item {
             Item::Shard(shard) => write!(f, "{}", shard),
             Item::RemoveShard(shard) => write!(f, "Remove {}", shard),
             Item::Command(command) => write!(f, "4|{}", command),
-            Item::Teleporter(teleporter) => write!(f, "{}", teleporter),
-            Item::RemoveTeleporter(teleporter) => write!(f, "Remove {}", teleporter),
+            Item::Teleporter(teleporter) => write!(f, "{} TP", teleporter),
+            Item::RemoveTeleporter(teleporter) => write!(f, "Remove {} TP", teleporter),
             Item::Message(message) => {
                 let mut message = message.clone();
                 let mut last_index = 0;

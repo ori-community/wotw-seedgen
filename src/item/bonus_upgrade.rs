@@ -1,8 +1,8 @@
 use num_enum::TryFromPrimitive;
 
-use crate::{util::Icon, auto_display};
+use crate::util::Icon;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum BonusUpgrade {
     RapidHammer = 0,
@@ -21,7 +21,6 @@ pub enum BonusUpgrade {
     ChargeBlaze = 48,
     RapidSentry = 49,
 }
-auto_display!(BonusUpgrade);
 
 impl BonusUpgrade {
     pub fn icon(self) -> Option<Icon> {

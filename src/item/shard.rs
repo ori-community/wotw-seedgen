@@ -1,8 +1,8 @@
 use num_enum::TryFromPrimitive;
 
-use crate::{util::Icon, auto_display};
+use crate::util::Icon;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Shard {
     Overcharge = 1,
@@ -37,7 +37,6 @@ pub enum Shard {
     Fracture = 46,
     Arcing = 47,
 }
-auto_display!(Shard);
 impl Shard {
     pub fn icon(self) -> Option<Icon> {
         Some(Icon::Shard(self as u16))

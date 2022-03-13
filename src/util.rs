@@ -13,37 +13,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[inline]
-pub fn auto_display<D: fmt::Debug>(debug: D) -> String {
-    let mut debug = format!("{:?}", debug);
-
-    let mut indices = Vec::new();
-
-    for (index, _) in debug.match_indices(char::is_uppercase) {
-        if index > 0 {
-            indices.push(index);
-        }
-    }
-    indices.reverse();
-    for index in indices {
-        debug.insert(index, ' ');
-    }
-
-    debug
-}
-
-#[macro_export]
-macro_rules! auto_display {
-    ($type:ty) => {
-        impl std::fmt::Display for $type {
-            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-                write!(f, "{}", $crate::util::auto_display(self))
-            }
-        }
-    };
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
 #[repr(u8)]
 pub enum Zone {
     Marsh = 0,
@@ -63,7 +33,6 @@ pub enum Zone {
     #[num_enum(default)]
     Void = 13,
 }
-auto_display!(Zone);
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Icon {
