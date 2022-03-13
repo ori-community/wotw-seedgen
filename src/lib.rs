@@ -386,7 +386,7 @@ pub fn generate_seed(graph: &Graph, mut settings: Settings) -> Result<(Seeds, Sp
 
 #[cfg(test)]
 mod tests {
-    use crate::preset::WorldPreset;
+    use crate::preset::PresetWorldSettings;
 
     use super::*;
 
@@ -426,7 +426,7 @@ mod tests {
         }
 
         let preset = Preset {
-            world_presets: Some(vec![WorldPreset::default(); 2]),
+            world_settings: Some(vec![PresetWorldSettings::default(); 2]),
             ..Preset::default()
         };
         settings.apply_preset(preset).unwrap();

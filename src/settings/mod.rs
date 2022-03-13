@@ -9,7 +9,7 @@ use std::{error::Error, fmt, iter, collections::hash_map::DefaultHasher, hash::H
 use rand::distributions::{Distribution, Uniform};
 use serde::{Serialize, Deserialize};
 
-use crate::{Preset, preset::WorldPreset};
+use crate::{Preset, preset::PresetWorldSettings};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -117,26 +117,26 @@ impl Settings {
 
     /// Inner method to memorize nested presets to prevent cyclic patterns
     fn apply_preset_guarded(&mut self, preset: Preset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
-        if let Some(presets) = preset.presets {
-            for nested_preset in presets {
+        if let Some(includes) = preset.includes {
+            for nested_preset in includes {
                 self.apply_nested_preset(nested_preset, already_applied)?;
             }
         }
 
         let setting_worlds = self.world_count();
 
-        if let Some(world_presets) = preset.world_presets {
-            let preset_worlds = world_presets.len();
+        if let Some(preset_world_settings) = preset.world_settings {
+            let preset_worlds = preset_world_settings.len();
 
             if preset_worlds == 0 {
                 // do nothing
             } else if setting_worlds == preset_worlds {
-                for (world_settings, world_preset) in self.world_settings.iter_mut().zip(world_presets.into_iter()) {
-                    world_settings.apply_world_preset(world_preset);
+                for (world_settings, preset_world_settings) in self.world_settings.iter_mut().zip(preset_world_settings.into_iter()) {
+                    world_settings.apply_world_settings(preset_world_settings);
                 }
             } else if preset_worlds == 1 {
                 for world_settings in self.world_settings.iter_mut() {
-                    world_settings.apply_world_preset(world_presets[0].clone());
+                    world_settings.apply_world_settings(preset_world_settings[0].clone());
                 }
             } else if setting_worlds == 1 {
                 let diff = preset_worlds - setting_worlds;
@@ -303,7 +303,7 @@ impl WorldSettings {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
     }
 
-    fn apply_world_preset(&mut self, preset: WorldPreset) {
+    fn apply_world_settings(&mut self, preset: PresetWorldSettings) {
         if let Some(world_name) = preset.world_name {
             self.world_name = world_name;
         }

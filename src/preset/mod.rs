@@ -14,15 +14,15 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 /// 
 /// ```
 /// # use seedgen::Preset;
-/// use seedgen::preset::WorldPreset;
+/// use seedgen::preset::PresetWorldSettings;
 /// use seedgen::settings::Difficulty;
 /// 
 /// let mut preset = Preset::default();
-/// let mut world_preset = WorldPreset::default();
-/// world_preset.difficulty = Some(Difficulty::Gorlek);
-/// preset.world_presets = Some(vec![world_preset]);
+/// let mut world_settings = PresetWorldSettings::default();
+/// world_settings.difficulty = Some(Difficulty::Gorlek);
+/// preset.world_settings = Some(vec![world_settings]);
 /// 
-/// let json = "{\"worldPresets\":[{\"difficulty\":\"Gorlek\"}]}".to_string();
+/// let json = "{\"worldSettings\":[{\"difficulty\":\"Gorlek\"}]}".to_string();
 /// 
 /// assert_eq!(preset.to_json(), json);
 /// assert_eq!(preset, Preset::parse(&json).unwrap());
@@ -37,7 +37,7 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 /// 
 /// let mut settings = Settings::default();
 /// 
-/// let preset = Preset::parse("{\"worldPresets\":[{\"spawn\":\"Random\"}]}").unwrap();
+/// let preset = Preset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
 /// 
 /// settings.apply_preset(preset);
 /// assert_eq!(settings.world_settings[0].spawn, Spawn::Random);
@@ -49,10 +49,10 @@ pub struct Preset {
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub presets: Option<Vec<String>>,
+    pub includes: Option<Vec<String>>,
     /// The individual settings for each world of the seed
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub world_presets: Option<Vec<WorldPreset>>,
+    pub world_settings: Option<Vec<PresetWorldSettings>>,
     /// Don't write spoiler comments into the seed
     /// 
     /// This will create a separate copy of the seed with spoilers included
@@ -94,7 +94,7 @@ impl Preset {
 
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct WorldPreset {
+pub struct PresetWorldSettings {
     /// The name of this world (usually the name of the player or co-op team)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub world_name: Option<String>,

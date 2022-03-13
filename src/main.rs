@@ -14,7 +14,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal}, util, languages::{headers::{self, parser::HeaderContext}, self}, preset::WorldPreset, Preset, Settings};
+use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal}, util, languages::{headers::{self, parser::HeaderContext}, self}, preset::PresetWorldSettings, Preset, Settings};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
@@ -205,8 +205,8 @@ impl SeedSettings {
         let online = if online { Some(true) } else { None };
         let inline_header = inline_headers.map(|inline_headers| inline_headers.join("\n"));
 
-        let world_presets = if let Some(world_names) = world_names {
-            Some(world_names.into_iter().map(|world_name| WorldPreset {
+        let world_settings = if let Some(world_names) = world_names {
+            Some(world_names.into_iter().map(|world_name| PresetWorldSettings {
                 world_name: Some(world_name),
                 spawn: spawn.clone(),
                 difficulty,
@@ -218,7 +218,7 @@ impl SeedSettings {
                 inline_header: inline_header.clone(),
             }).collect())
         } else {
-            let world_preset = WorldPreset {
+            let world_settings = PresetWorldSettings {
                 world_name: None,
                 spawn: spawn.clone(),
                 difficulty,
@@ -230,16 +230,16 @@ impl SeedSettings {
                 inline_header: inline_header.clone(),
             };
 
-            if world_preset == WorldPreset::default() {
+            if world_settings == PresetWorldSettings::default() {
                 None
             } else {
-                Some(vec![world_preset])
+                Some(vec![world_settings])
             }
         };
 
         Preset {
-            presets,
-            world_presets,
+            includes: presets,
+            world_settings,
             no_spoilers,
             disable_logic_filter,
             online,
