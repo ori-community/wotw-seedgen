@@ -1,0 +1,31 @@
+/// Knowledge Hints
+///
+/// Interactively displays useful hints on niche randomizer knowledge while playing the seed
+!!include update_loop
+
+9|150|4|24|128|-4278|175|-4254|4|17|18793|25789|0|8|9|129|bool|true  // Mouldwood Entrance
+9|129|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe moki will only open the entrance once you find $[2|14].
+9|150|4|24|-527|-4015|-459|-3977|4|17|28895|29098|0|8|9|130|bool|true  // Baur the Bear
+9|130|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe bear will only wake if you use $[2|118].
+9|150|4|24|-44|-4444|-32|-4431|4|17|6|1102|0|8|9|131|bool|true  // Dash Tree Platform
+9|150|4|24|-44|-4444|-32|-4431|4|17|6|1101|0|8|9|131|bool|true
+9|150|4|24|-44|-4444|-32|-4431|4|17|6|1104|0|8|9|131|bool|true
+9|131|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe semisolid platform will remain solid until you find $[2|102], $[2|101] or $[2|104].
+15|200|4|26|5|4|17|6|1077|0|8|9|132|bool|true  // Regenerate in late areas
+9|132|6|instant|noclear|p=-2|f=300|#Motay's Note#\nEntering zones after #The Wellspring# won't be logically required until you find $[2|77].
+28895|54235|4|17|6|1118|0|8|9|133|bool|true  // Flap for Reach TP
+9|133|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|4] won't be logically required until you find $[2|118].
+18793|38871|4|17|6|1014|0|8|9|134|bool|true  // Glide for Mouldwood TP
+9|134|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|6] won't be logically required until you find $[2|14].
+945|58183|4|17|6|2000|0|8|9|135|bool|true  // Water for East Luma TP
+9|135|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|2] won't be logically required until you find $[9|0].
+945|1370|4|17|6|2000|0|8|9|136|bool|true  // Water for West Luma TP
+9|136|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|13] won't be logically required until you find $[9|0].
+20120|49994|4|17|6|1101|0|8|9|137|bool|true  // Burrow for East Wastes TP
+9|137|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|10] won't be logically required until you find $[2|101].
+20120|41398|4|17|6|1101|0|8|9|138|bool|true  // Burrow for Outer Ruins TP
+9|138|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|11] won't be logically required until you find $[2|101].
+10289|4928|4|17|6|1101|0|8|9|139|bool|true  // Burrow for Inner Ruins TP
+9|139|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|14] won't be logically required until you find $[2|101].
+16155|41465|4|17|6|1101|0|8|9|140|bool|true  // Burrow for Willow's End TP
+9|140|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|12] won't be logically required until you find $[2|101].
