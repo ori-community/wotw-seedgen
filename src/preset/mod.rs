@@ -53,11 +53,6 @@ pub struct Preset {
     /// The individual settings for each world of the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub world_settings: Option<Vec<PresetWorldSettings>>,
-    /// Don't write spoiler comments into the seed
-    /// 
-    /// This will create a separate copy of the seed with spoilers included
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub no_spoilers: Option<bool>,
     /// Disallow the use of the In-Logic filter while playing the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_logic_filter: Option<bool>,

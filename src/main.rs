@@ -166,11 +166,6 @@ struct SeedSettings {
     /// Inline header syntax
     #[structopt(short, long = "inline")]
     inline_headers: Option<Vec<String>>,
-    /// Don't write spoiler comments into the seed
-    /// 
-    /// This will create a separate copy of the seed with spoilers included
-    #[structopt(short, long)]
-    no_spoilers: bool,
     /// Disallow the use of the In-Logic filter while playing the seed
     #[structopt(short = "L", long)]
     disable_logic_filter: bool,
@@ -188,7 +183,6 @@ impl SeedSettings {
             world_names,
             difficulty,
             tricks,
-            no_spoilers,
             disable_logic_filter,
             online,
             hard,
@@ -200,7 +194,6 @@ impl SeedSettings {
         } = self;
 
         let hard = if hard { Some(true) } else { None };
-        let no_spoilers = if no_spoilers { Some(true) } else { None };
         let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
         let online = if online { Some(true) } else { None };
         let inline_header = inline_headers.map(|inline_headers| inline_headers.join("\n"));
@@ -240,7 +233,6 @@ impl SeedSettings {
         Preset {
             includes: presets,
             world_settings,
-            no_spoilers,
             disable_logic_filter,
             online,
             create_game: None,
@@ -361,7 +353,7 @@ fn read_header() -> Result<String, String> {
     Ok(output)
 }
 
-fn write_seeds_to_files(seeds: &[String], spoilers: &[String], mut filename: String, mut folder: PathBuf, players: &[String], race: bool) -> Result<(), String> {
+fn write_seeds_to_files(seeds: &[String], mut filename: String, mut folder: PathBuf, players: &[String]) -> Result<(), String> {
     let seed_count = seeds.len();
     let multiworld = seed_count > 1;
 
@@ -385,16 +377,6 @@ fn write_seeds_to_files(seeds: &[String], spoilers: &[String], mut filename: Str
 
         let file = util::create_file(&path, seed, "", true)?;
         log::info!("Wrote seed for {} to {}", player, file.display());
-
-        if race {
-            let spoiler = &spoilers[index];
-
-            let spoiler_filename = format!("{}.spoiler.wotwr", file.file_stem().unwrap().to_string_lossy());
-            path.set_file_name(spoiler_filename);
-
-            let file = util::create_file(&path, spoiler, "", true)?;
-            log::info!("Wrote spoiler for {} to {}", player, file.display());
-        }
 
         if first {
             first = false;
@@ -431,9 +413,8 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), Box<dyn Error>> {
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
-    let no_spoilers = settings.no_spoilers;
     let players = settings.world_settings.iter().map(|world_settings| world_settings.world_name.clone()).collect::<Vec<_>>();
-    let (seeds, spoilers) = seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let seeds = seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -442,14 +423,10 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), Box<dyn Error>> {
 
     if args.tostdout {
         write_seeds_to_stdout(seeds);
-        if no_spoilers {
-            println!("\n======= SPOILERS =======\n");
-            write_seeds_to_stdout(spoilers);
-        }
     } else {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
-        write_seeds_to_files(&seeds, &spoilers, filename, args.seed_folder, &players, no_spoilers).unwrap_or_else(|err| log::error!("{}", err));
+        write_seeds_to_files(&seeds, filename, args.seed_folder, &players).unwrap_or_else(|err| log::error!("{}", err));
     }
 
     if args.launch {

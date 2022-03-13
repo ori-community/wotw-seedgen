@@ -65,10 +65,6 @@ pub struct Settings {
     /// 
     /// This is assumed never to be empty
     pub world_settings: Vec<WorldSettings>,
-    /// Don't write spoiler comments into the seed
-    /// 
-    /// This will create a separate copy of the seed with spoilers included
-    pub no_spoilers: bool,
     /// Disallow the use of the In-Logic filter while playing the seed
     pub disable_logic_filter: bool,
     /// Require an online connection to play the seed
@@ -145,9 +141,6 @@ impl Settings {
                 let message = format!("Cannot apply preset with {preset_worlds} worlds to settings with {setting_worlds} worlds");
                 return Err(Box::new(ApplyPresetError { message }));
             }
-        }
-        if let Some(no_spoilers) = preset.no_spoilers {
-            self.no_spoilers = no_spoilers;
         }
         if let Some(disable_logic_filter) = preset.disable_logic_filter {
             self.disable_logic_filter = disable_logic_filter;
@@ -240,7 +233,6 @@ impl Default for Settings {
         Settings {
             seed: Self::random_seed(),
             world_settings: vec![WorldSettings::default()],
-            no_spoilers: false,
             disable_logic_filter: false,
             online: false,
             create_game: CreateGame::default(),
