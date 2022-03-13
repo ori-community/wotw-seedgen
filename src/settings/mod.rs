@@ -376,8 +376,6 @@ impl Default for Difficulty {
 /// This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-// Note: when changing this enum, be sure to update the CLI documentation comment on available tricks
-// TODO some things seem outdated, look what needs to be updated
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, seedgen_derive::FromStr)]
 #[ParseFromIdentifier]
 pub enum Trick {

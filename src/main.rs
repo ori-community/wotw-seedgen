@@ -137,12 +137,12 @@ struct SeedSettings {
     spawn: Option<Spawn>,
     /// Logically expected difficulty of execution you may be required to perform
     ///
-    /// One of "moki", "gorlek", "unsafe"
+    /// Available difficulties are "moki", "gorlek", "unsafe"
     #[structopt(short, long)]
     difficulty: Option<Difficulty>,
     /// Logically expected tricks you may have to use
     ///
-    /// Available tricks are shurikenbreak, sentrybreak, hammerbreak, spearbreak, swordsjump, hammersjump, sentryburn, removekillplane, launchswap, sentryswap, flashswap, blazeswap, wavedash, grenadejump, hammerjump, swordjump, grenaderedirect, sentryredirect, pausehover
+    /// Available tricks are "swordsentryjump", "hammersentryjump", "shurikenbreak", "sentrybreak", "hammerbreak", "spearbreak", "sentryburn", "removekillplane", "launchswap", "sentryswap", "flashswap", "blazeswap", "wavedash", "grenadejump", "hammerjump", "swordjump", "grenaderedirect", "sentryredirect", "pausehover", "glidejump", "glidehammerjump", "spearjump"
     #[structopt(short, long)]
     tricks: Option<Vec<Trick>>,
     /// Logically assume hard in-game difficulty

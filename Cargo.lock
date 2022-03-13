@@ -829,6 +829,7 @@ dependencies = [
  "serde_json",
  "smallvec",
  "structopt",
+ "syn",
 ]
 
 [[package]]
