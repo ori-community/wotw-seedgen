@@ -49,7 +49,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeader\":\"\"}],\"noSpoilers\":false,\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
+/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeader\":\"\"}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
