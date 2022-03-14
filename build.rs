@@ -12,7 +12,7 @@ fn main() {
     let trick_enum = find_enum(&syntax, "Trick").expect("failed to locate Trick enum in settings source");
     let trick_list = list_variants(trick_enum);
 
-    let preset = format!("{{\"worldSettings\":[{{\"tricks\":[{}]}}]}}", trick_list.join(","));
+    let preset = format!("{{\"tricks\":[{}]}}", trick_list.join(","));
     fs::write("presets/glitches.json", preset).expect("failed to write glitches preset");
 
     let mut source = fs::read_to_string("src/main.rs").expect("failed to read src/main.rs");

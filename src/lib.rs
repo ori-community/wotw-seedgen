@@ -361,7 +361,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
 
 #[cfg(test)]
 mod tests {
-    use crate::preset::PresetWorldSettings;
+    use crate::preset::WorldPreset;
 
     use super::*;
 
@@ -396,12 +396,12 @@ mod tests {
         ];
 
         for preset in ["gorlek", "rspawn"] {
-            let preset = Preset::read_file(preset.to_string()).unwrap();
-            settings.apply_preset(preset).unwrap();
+            let preset = WorldPreset::read_file(preset.to_string()).unwrap();
+            settings.world_mut().apply_world_preset(preset).unwrap();
         }
 
         let preset = Preset {
-            world_settings: Some(vec![PresetWorldSettings::default(); 2]),
+            world_settings: Some(vec![WorldPreset::default(); 2]),
             ..Preset::default()
         };
         settings.apply_preset(preset).unwrap();

@@ -1,1 +1,1 @@
-{"includes":["gorlek","rspawn"],"worldSettings":[{"goals":["Trees"],"headers":["tp_zone_hints","no_rain"]}],"noSpoilers":true}
+{"includes":["gorlek","rspawn"],"goals":["Trees"],"headers":["tp_zone_hints","no_rain"]}

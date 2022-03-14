@@ -10,15 +10,15 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 /// 
 /// # Examples
 /// 
-/// Presets can be serialized and deserialized
+/// `Preset`s can be serialized and deserialized
 /// 
 /// ```
 /// # use seedgen::Preset;
-/// use seedgen::preset::PresetWorldSettings;
+/// use seedgen::preset::WorldPreset;
 /// use seedgen::settings::Difficulty;
 /// 
 /// let mut preset = Preset::default();
-/// let mut world_settings = PresetWorldSettings::default();
+/// let mut world_settings = WorldPreset::default();
 /// world_settings.difficulty = Some(Difficulty::Gorlek);
 /// preset.world_settings = Some(vec![world_settings]);
 /// 
@@ -28,7 +28,7 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 /// assert_eq!(preset, Preset::parse(&json).unwrap());
 /// ```
 /// 
-/// Use `Settings::apply_preset` to merge a Preset into existing Settings
+/// Use `Settings::apply_preset` to merge a `Preset` into existing `Settings`
 /// 
 /// ```
 /// # use seedgen::Preset;
@@ -45,14 +45,14 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Preset {
-    /// Names of further presets to use
+    /// Names of further `Preset`s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<Vec<String>>,
     /// The individual settings for each world of the seed
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub world_settings: Option<Vec<PresetWorldSettings>>,
+    pub world_settings: Option<Vec<WorldPreset>>,
     /// Disallow the use of the In-Logic filter while playing the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_logic_filter: Option<bool>,
@@ -67,29 +67,67 @@ pub struct Preset {
 }
 
 impl Preset {
-    /// Parse a preset from json
-    pub fn parse(input: &str) -> Result<Preset, serde_json::Error> {
+    /// Parse a `Preset` from json
+    pub fn parse(input: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(input)
     }
-    /// Serialize the preset into json format
+    /// Serialize the `Preset` into json format
     pub fn to_json(&self) -> String {
         // This is safe because the preset struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
     }
 
-    /// Find and read a preset with the given name
+    /// Find and read a `Preset` with the given name
     /// 
-    /// The preset will be searched as .json file in the current and /presets child directory
-    pub fn read_file(mut name: String) -> Result<Preset, Box<dyn Error>> {
+    /// The `Preset` will be searched as .json file in the current and /presets child directory
+    pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
         name.push_str(".json");
         let input = util::read_file(name, "presets")?;
         Ok(Self::parse(&input)?)
     }
 }
 
+/// A collection of settings that can be applied to one world of the existing settings
+/// 
+/// # Examples
+/// 
+/// `WorldPreset`s can be serialized and deserialized
+/// 
+/// ```
+/// # use seedgen::preset::WorldPreset;
+/// use seedgen::settings::Difficulty;
+/// 
+/// let mut world_preset = WorldPreset::default();
+/// world_preset.difficulty = Some(Difficulty::Gorlek);
+/// 
+/// let json = "{\"difficulty\":\"Gorlek\"}".to_string();
+/// 
+/// assert_eq!(world_preset.to_json(), json);
+/// assert_eq!(world_preset, WorldPreset::parse(&json).unwrap());
+/// ```
+/// 
+/// Use `WorldSettings::apply_world_preset` to merge a `WorldPreset` into existing `WorldSettings`
+/// 
+/// ```
+/// # use seedgen::preset::WorldPreset;
+/// use seedgen::settings::WorldSettings;
+/// use seedgen::settings::Spawn;
+/// 
+/// let mut world_settings = WorldSettings::default();
+/// 
+/// let world_preset = WorldPreset::parse("{\"spawn\":\"Random\"}").unwrap();
+/// 
+/// world_settings.apply_world_preset(world_preset);
+/// assert_eq!(world_settings.spawn, Spawn::Random);
+/// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct PresetWorldSettings {
+pub struct WorldPreset {
+    /// Names of further `WorldPreset`s to use
+    /// 
+    /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub includes: Option<Vec<String>>,
     /// The name of this world (usually the name of the player or co-op team)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub world_name: Option<String>,
@@ -121,4 +159,25 @@ pub struct PresetWorldSettings {
     /// Inline header syntax
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inline_header: Option<String>,
+}
+
+impl WorldPreset {
+    /// Parse a preset from json
+    pub fn parse(input: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(input)
+    }
+    /// Serialize the preset into json format
+    pub fn to_json(&self) -> String {
+        // This is safe because the preset struct is known to serialize successfully
+        serde_json::to_string(&self).unwrap()
+    }
+
+    /// Find and read a preset with the given name
+    /// 
+    /// The preset will be searched as .json file in the current and /presets child directory
+    pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
+        name.push_str(".json");
+        let input = util::read_file(name, "presets")?;
+        Ok(Self::parse(&input)?)
+    }
 }

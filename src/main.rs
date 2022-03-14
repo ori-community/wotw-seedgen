@@ -14,7 +14,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal}, util, languages::{headers::{self, parser::HeaderContext}, self}, preset::PresetWorldSettings, Preset, Settings};
+use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal}, util, languages::{headers::{self, parser::HeaderContext}, self}, preset::WorldPreset, Preset, Settings};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
@@ -211,6 +211,11 @@ enum SeedGenCommand {
         #[structopt(flatten)]
         args: PresetArgs,
     },
+    /// Create a world preset of the given settings
+    WorldPreset {
+        #[structopt(flatten)]
+        args: WorldPresetArgs,
+    },
     /// Check which locations are in logic
     ReachCheck {
         #[structopt(flatten)]
@@ -268,23 +273,17 @@ struct SeedArgs {
 }
 
 #[derive(StructOpt)]
-struct PresetArgs {
-    /// name of the preset
-    ///
-    /// later you can run seed -p <preset-name> to use this preset
-    #[structopt(parse(from_os_str))]
-    name: PathBuf,
-    #[structopt(flatten)]
-    settings: SeedSettings,
-}
-
-#[derive(StructOpt)]
 struct SeedSettings {
-    /// derive the settings from one or more presets
+    /// Derive the settings from one or more presets
     ///
-    /// presets later in the list override earlier ones, and flags from the command override any preset
-    #[structopt(short, long)]
+    /// Presets later in the list override earlier ones, and flags from the command override any preset
+    #[structopt(short = "P", long)]
     presets: Option<Vec<String>>,
+    /// Derive the settings for individual worlds from one or more presets
+    ///
+    /// Presets later in the list override earlier ones, and flags from the command override any preset
+    #[structopt(short = "p", long)]
+    world_presets: Vec<WorldOpt<String>>,
     /// World names in multiworld
     /// 
     /// Usually the names of the players or teams playing in a world
@@ -323,6 +322,7 @@ struct SeedSettings {
     /// Configuration parameters to pass to headers
     ///
     /// Format for one parameter: <headername>.<parametername>=<value>
+    // TODO parse these into a struct
     #[structopt(short = "c", long)]
     header_config: Vec<WorldOpt<String>>,
     /// Inline header syntax
@@ -346,6 +346,7 @@ impl SeedSettings {
     fn into_preset(self) -> Result<Preset, String> {
         let Self {
             presets,
+            world_presets,
             world_names,
             spawn,
             difficulty,
@@ -362,6 +363,7 @@ impl SeedSettings {
         let has_world_names = world_names.is_some();
         let internal_world_names = world_names.unwrap_or_else(|| vec!["World".to_string()]);
 
+        let world_presets = resolve_world_opts(world_presets, &internal_world_names)?;
         let world_spawns = resolve_nonduplicate_world_opts(spawn, &internal_world_names)?;
         let world_difficulties = resolve_nonduplicate_world_opts(difficulty, &internal_world_names)?;
         let world_tricks = resolve_world_opts(tricks, &internal_world_names)?;
@@ -375,6 +377,7 @@ impl SeedSettings {
         let online = if online { Some(true) } else { None };
 
         let yes_fun = internal_world_names.into_iter()
+            .zip(world_presets)
             .zip(world_spawns)
             .zip(world_difficulties)
             .zip(world_tricks)
@@ -383,11 +386,12 @@ impl SeedSettings {
             .zip(world_headers)
             .zip(world_header_configs)
             .zip(world_inline_headers)
-            .map(|((((((((world_name, spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
+            .map(|(((((((((world_name, world_presets), spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
                 let world_name = if has_world_names { Some(world_name) } else { None };
                 let inline_header = if inline_headers.is_empty() { None } else { Some(inline_headers.join("\n")) };
 
-                PresetWorldSettings {
+                WorldPreset {
+                    includes: vec_in_option(world_presets),
                     world_name,
                     spawn: spawn.map(SpawnOpt::into_inner),
                     difficulty,
@@ -407,6 +411,108 @@ impl SeedSettings {
             online,
             create_game: None,
         })
+    }
+}
+
+#[derive(StructOpt)]
+struct PresetArgs {
+    /// name of the preset
+    ///
+    /// later you can run seed -p <preset-name> to use this preset
+    #[structopt(parse(from_os_str))]
+    name: PathBuf,
+    #[structopt(flatten)]
+    settings: SeedSettings,
+}
+
+#[derive(StructOpt)]
+struct WorldPresetArgs {
+    /// Name of the preset
+    ///
+    /// Later you can run seed -p <preset-name> to use this preset
+    #[structopt(parse(from_os_str))]
+    name: PathBuf,
+    #[structopt(flatten)]
+    settings: WorldPresetSettings,
+}
+
+#[derive(StructOpt)]
+struct WorldPresetSettings {
+    /// Include further world presets
+    ///
+    /// Presets later in the list override earlier ones, and flags from the command override any preset
+    #[structopt(short = "p", long)]
+    includes: Option<Vec<String>>,
+    /// World name in multiworld
+    /// 
+    /// Usually the name of the player or team playing in the world
+    #[structopt(short, long)]
+    world_name: Option<String>,
+    /// Spawn destination
+    ///
+    /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
+    #[structopt(short, long)]
+    spawn: Option<SpawnOpt>,
+    /// Logically expected difficulty of execution you may be required to perform
+    ///
+    /// Available difficulties are "moki", "gorlek", "unsafe"
+    #[structopt(short, long)]
+    difficulty: Option<Difficulty>,
+    /// Logically expected tricks you may have to use
+    ///
+    /// Available tricks are "swordsentryjump", "hammersentryjump", "shurikenbreak", "sentrybreak", "hammerbreak", "spearbreak", "sentryburn", "removekillplane", "launchswap", "sentryswap", "flashswap", "blazeswap", "wavedash", "grenadejump", "hammerjump", "swordjump", "grenaderedirect", "sentryredirect", "pausehover", "glidejump", "glidehammerjump", "spearjump"
+    #[structopt(short, long)]
+    tricks: Option<Vec<Trick>>,
+    /// Logically assume hard in-game difficulty
+    #[structopt(long)]
+    hard: bool,
+    /// Goal Requirements before finishing the game
+    ///
+    /// Available goals are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
+    #[structopt(short, long)]
+    goals: Option<Vec<GoalsOpt>>,
+    /// Names of headers that will be used when generating the seed
+    /// 
+    /// The headers will be searched as .wotwrh files in the current and /headers child directory
+    #[structopt(short, long)]
+    headers: Option<Vec<String>>,
+    /// Configuration parameters to pass to headers
+    ///
+    /// Format for one parameter: <headername>.<parametername>=<value>
+    #[structopt(short = "c", long)]
+    header_config: Option<Vec<String>>,
+    /// Inline header syntax
+    #[structopt(short, long = "inline")]
+    inline_headers: Option<Vec<String>>,
+}
+
+impl WorldPresetSettings {
+    fn into_world_preset(self) -> WorldPreset {
+        let Self {
+            includes,
+            world_name,
+            spawn,
+            difficulty,
+            tricks,
+            hard,
+            goals,
+            headers,
+            header_config,
+            inline_headers,
+        } = self;
+
+        WorldPreset {
+            includes,
+            world_name,
+            spawn: spawn.map(SpawnOpt::into_inner),
+            difficulty,
+            tricks,
+            hard: if hard { Some(true) } else { None },
+            goals: goals.map(|goals| goals.into_iter().map(GoalsOpt::into_inner).collect()),
+            headers,
+            header_config,
+            inline_header: inline_headers.map(|inline| inline.join("\n")),
+        }
     }
 }
 
@@ -595,6 +701,17 @@ fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> {
+    let preset = args.settings.into_world_preset();
+    let preset = preset.to_json();
+    args.name.set_extension("json");
+
+    let path = util::create_file(&args.name, &preset, "presets", false)?;
+    log::info!("Created preset {}", path.display());
+
+    Ok(())
+}
+
 // TODO some of this logic probably belongs in the library
 fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let command = env::args().collect::<Vec<_>>().join(" ");
@@ -737,6 +854,11 @@ fn main() {
             seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             create_preset(args).unwrap_or_else(|err| log::error!("{}", err));
+        },
+        SeedGenCommand::WorldPreset { args } => {
+            seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+
+            create_world_preset(args).unwrap_or_else(|err| log::error!("{}", err));
         },
         SeedGenCommand::Headers { headers, subcommand } => {
             seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));

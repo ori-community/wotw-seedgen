@@ -9,7 +9,7 @@ use std::{error::Error, fmt, iter, collections::hash_map::DefaultHasher, hash::H
 use rand::distributions::{Distribution, Uniform};
 use serde::{Serialize, Deserialize};
 
-use crate::{Preset, preset::PresetWorldSettings};
+use crate::{Preset, preset::WorldPreset};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -113,7 +113,15 @@ impl Settings {
 
     /// Inner method to memorize nested presets to prevent cyclic patterns
     fn apply_preset_guarded(&mut self, preset: Preset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
-        if let Some(includes) = preset.includes {
+        let Preset {
+            includes,
+            world_settings,
+            disable_logic_filter,
+            online,
+            create_game,
+        } = preset;
+
+        if let Some(includes) = includes {
             for nested_preset in includes {
                 self.apply_nested_preset(nested_preset, already_applied)?;
             }
@@ -121,37 +129,37 @@ impl Settings {
 
         let setting_worlds = self.world_count();
 
-        if let Some(preset_world_settings) = preset.world_settings {
+        if let Some(preset_world_settings) = world_settings {
             let preset_worlds = preset_world_settings.len();
 
             if preset_worlds == 0 {
                 // do nothing
             } else if setting_worlds == preset_worlds {
                 for (world_settings, preset_world_settings) in self.world_settings.iter_mut().zip(preset_world_settings) {
-                    world_settings.apply_world_settings(preset_world_settings);
+                    world_settings.apply_world_preset(preset_world_settings)?;
                 }
             } else if preset_worlds == 1 {
                 for world_settings in self.world_settings.iter_mut() {
-                    world_settings.apply_world_settings(preset_world_settings[0].clone());
+                    world_settings.apply_world_preset(preset_world_settings[0].clone())?;
                 }
             } else if setting_worlds == 1 {
                 let diff = preset_worlds - setting_worlds;
                 self.world_settings.extend(iter::repeat(self.world_settings[0].clone()).take(diff));
                 for (world_settings, preset_world_settings) in self.world_settings.iter_mut().zip(preset_world_settings) {
-                    world_settings.apply_world_settings(preset_world_settings);
+                    world_settings.apply_world_preset(preset_world_settings)?;
                 }
             } else {
                 let message = format!("Cannot apply preset with {preset_worlds} worlds to settings with {setting_worlds} worlds");
                 return Err(Box::new(ApplyPresetError { message }));
             }
         }
-        if let Some(disable_logic_filter) = preset.disable_logic_filter {
+        if let Some(disable_logic_filter) = disable_logic_filter {
             self.disable_logic_filter = disable_logic_filter;
         }
-        if let Some(online) = preset.online {
+        if let Some(online) = online {
             self.online = online;
         }
-        if let Some(create_game) = preset.create_game {
+        if let Some(create_game) = create_game {
             self.create_game = create_game;
         }
 
@@ -298,34 +306,78 @@ impl WorldSettings {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
     }
 
-    fn apply_world_settings(&mut self, preset: PresetWorldSettings) {
-        if let Some(world_name) = preset.world_name {
+    /// Apply the settings from a world preset
+    /// 
+    /// This follows various rules to retain all unrelated parts of the existing Settings:
+    /// - Any [`None`] values of the preset will be ignored
+    /// - [`Vec`]s will be appended to the current contents
+    /// - Other values will be overwritten
+    /// - Nested presets will be applied before the parent preset
+    pub fn apply_world_preset(&mut self, preset: WorldPreset) -> Result<(), Box<dyn Error>> {
+        self.apply_world_preset_guarded(preset, &mut vec![])
+    }
+
+    /// Inner method to memorize nested presets to prevent cyclic patterns
+    fn apply_world_preset_guarded(&mut self, preset: WorldPreset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
+        let WorldPreset {
+            includes,
+            world_name,
+            difficulty,
+            tricks,
+            goals,
+            spawn,
+            hard,
+            headers,
+            header_config,
+            inline_header,
+        } = preset;
+
+        if let Some(includes) = includes {
+            for nested_preset in includes {
+                self.apply_nested_preset(nested_preset, already_applied)?;
+            }
+        }
+
+        if let Some(world_name) = world_name {
             self.world_name = world_name;
         }
-        if let Some(difficulty) = preset.difficulty {
+        if let Some(difficulty) = difficulty {
             self.difficulty = difficulty;
         }
-        if let Some(mut tricks) = preset.tricks {
+        if let Some(mut tricks) = tricks {
             self.tricks.append(&mut tricks);
         }
-        if let Some(mut goals) = preset.goals {
+        if let Some(mut goals) = goals {
             self.goals.append(&mut goals);
         }
-        if let Some(spawn) = preset.spawn {
+        if let Some(spawn) = spawn {
             self.spawn = spawn;
         }
-        if let Some(hard) = preset.hard {
+        if let Some(hard) = hard {
             self.hard = hard;
         }
-        if let Some(mut headers) = preset.headers {
+        if let Some(mut headers) = headers {
             self.headers.append(&mut headers);
         }
-        if let Some(mut header_config) = preset.header_config {
+        if let Some(mut header_config) = header_config {
             self.header_config.append(&mut header_config);
         }
-        if let Some(inline_header) = preset.inline_header {
+        if let Some(inline_header) = inline_header {
             self.inline_header = inline_header;
         }
+
+        Ok(())
+    }
+
+    /// Find and apply nested presets
+    fn apply_nested_preset(&mut self, preset: String, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
+        // Prevent cyclic patterns
+        if already_applied.contains(&preset) {
+            return Ok(());
+        }
+        already_applied.push(preset.clone());
+        let preset = WorldPreset::read_file(preset)?;
+        self.apply_world_preset_guarded(preset, already_applied)
     }
 }
 
