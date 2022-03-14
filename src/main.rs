@@ -23,7 +23,169 @@ use world::{
 };
 use util::UberState;
 
-#[derive(StructOpt, Debug)]
+/// For CLI flags that contain a mixture of world specifiers and flag values
+struct WorldOpt<T> {
+    source: String,
+    inner: WorldOptInner<T>,
+}
+impl<T: FromStr> FromStr for WorldOpt<T> {
+    type Err = T::Err;
+
+    fn from_str(s: &str) -> Result<Self, T::Err> {
+        let inner = if let Some(world) = s.strip_prefix(':') {
+            WorldOptInner::World(WorldIdentifier::from(world))
+        } else {
+            WorldOptInner::Opt(T::from_str(s)?)
+        };
+        let source = s.to_string();
+        Ok(WorldOpt { source, inner })
+    }
+}
+
+enum WorldOptInner<T> {
+    World(WorldIdentifier),
+    Opt(T),
+}
+
+enum WorldIdentifier {
+    Index(usize),
+    Name(String),
+}
+impl From<&str> for WorldIdentifier {
+    fn from(s: &str) -> Self {
+        s.parse::<usize>().map_or_else(
+            |_| WorldIdentifier::Name(s.to_string()),
+            WorldIdentifier::Index
+        )
+    }
+}
+
+fn resolve_world_identifier(identifier: WorldIdentifier, world_names: &[String]) -> Result<usize, String> {
+    match identifier {
+        WorldIdentifier::Index(index) => Ok(index),
+        WorldIdentifier::Name(name) => world_names.iter().enumerate()
+            .find(|(_, world_name)| &&name == world_name)
+            .map(|t| t.0)
+            .ok_or(format!("Unknown world name {name}")),
+    }
+}
+
+fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_names: &[String]) -> Result<Vec<Vec<T>>, String> {
+    let mut world_values: Vec<Vec<T>> = world_names.iter().map(|_| vec![]).collect();
+    let mut current_world = None;
+
+    for world_opt in world_opts {
+        match world_opt.inner {
+            WorldOptInner::World(identifier) => current_world = Some(resolve_world_identifier(identifier, world_names)?),
+            WorldOptInner::Opt(value) => {
+                if let Some(index) = current_world {
+                    world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?.push(value);
+                } else {
+                    for world in &mut world_values {
+                        world.push(value.clone());
+                    }
+                }
+            },
+        }
+    }
+
+    Ok(world_values)
+}
+
+fn assign_nonduplicate<T>(assign: T, current_world_entry: &mut Option<(T, String)>, source: String) -> Result<(), String> {
+    match current_world_entry {
+        Some((_, prior_source)) => Err(format!("Provided multiple values for the same world: {source} and {prior_source}")),
+        None => {
+            *current_world_entry = Some((assign, source));
+            Ok(())
+        },
+    }
+}
+fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_names: &[String]) -> Result<Vec<Option<T>>, String> {
+    let mut world_values: Vec<Option<(T, String)>> = world_names.iter().map(|_| None).collect();
+    let mut current_world = None;
+
+    for world_opt in world_opts {
+        match world_opt.inner {
+            WorldOptInner::World(identifier) => current_world = Some(resolve_world_identifier(identifier, world_names)?),
+            WorldOptInner::Opt(value) => {
+                if let Some(index) = current_world {
+                    let current_world_entry = world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?;
+                    assign_nonduplicate(value, current_world_entry, world_opt.source)?;
+                } else {
+                    for current_world_entry in &mut world_values {
+                        assign_nonduplicate(value.clone(), current_world_entry, world_opt.source.clone())?;
+                    }
+                }
+            },
+        }
+    }
+
+    let world_values = world_values.into_iter().map(|current_world_value| current_world_value.map(|t| t.0)).collect();
+    Ok(world_values)
+}
+
+type CannotError = String;
+
+/// Newtype to parse spawn flag
+#[derive(Clone)]
+struct SpawnOpt(Spawn);
+impl SpawnOpt {
+    fn into_inner(self) -> Spawn {
+        self.0
+    }
+}
+impl FromStr for SpawnOpt {
+    type Err = CannotError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let spawn = match &s.to_lowercase()[..] {
+            "r" | "random" => Spawn::Random,
+            "f" | "fullyrandom" => Spawn::FullyRandom,
+            _ => Spawn::Set(s.to_string()),
+        };
+        Ok(SpawnOpt(spawn))
+    }
+}
+/// Newtype to parse goals flag
+#[derive(Clone)]
+struct GoalsOpt(Goal);
+impl GoalsOpt {
+    fn into_inner(self) -> Goal {
+        self.0
+    }
+}
+impl FromStr for GoalsOpt {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (identifier, details) = s.split_once(':').unwrap_or((s, ""));
+
+        let goal = match identifier {
+            "t" | "trees" => Goal::Trees,
+            "w" | "wisps" => Goal::Wisps,
+            "q" | "quests" => Goal::Quests,
+            "r" | "relics" => {
+                if !details.is_empty() {
+                    if let Some(chance) = details.strip_suffix('%') {
+                        let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal {s}"))?;
+                        if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal {s}")); }
+                        Goal::RelicChance(chance / 100.0)
+                    } else {
+                        let amount = details.parse().map_err(|_| format!("expected amount or % expression in details string for goal {s}"))?;
+                        if !(0..=11).contains(&amount) { return Err(format!("Invalid amount in details string for goal {s}")); }
+                        Goal::Relics(amount)
+                    }
+                } else { Goal::RelicChance(0.6) }
+            },
+            other => return Err(format!("Unknown goal {other}")),
+        };
+
+        Ok(GoalsOpt(goal))
+    }
+}
+
+#[derive(StructOpt)]
 /// Generate seeds for the Ori 2 randomizer.
 ///
 /// Type seedgen.exe seed --help for further instructions
@@ -35,7 +197,7 @@ struct SeedGen {
     command: SeedGenCommand,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt)]
 enum SeedGenCommand {
     /// Generate a seed
     Seed {
@@ -64,7 +226,7 @@ enum SeedGenCommand {
     },
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt)]
 struct SeedArgs {
     /// the seed's name and name of the file it will be written to. The name also seeds the rng if no seed is given.
     #[structopt()]
@@ -105,7 +267,7 @@ struct SeedArgs {
     settings: SeedSettings,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt)]
 struct PresetArgs {
     /// name of the preset
     ///
@@ -116,7 +278,7 @@ struct PresetArgs {
     settings: SeedSettings,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt)]
 struct SeedSettings {
     /// derive the settings from one or more presets
     ///
@@ -133,39 +295,39 @@ struct SeedSettings {
     /// Spawn destination
     ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
-    #[structopt(short, long, parse(from_str = parse_spawn))]
-    spawn: Option<Spawn>,
+    #[structopt(short, long)]
+    spawn: Vec<WorldOpt<SpawnOpt>>,
     /// Logically expected difficulty of execution you may be required to perform
     ///
     /// Available difficulties are "moki", "gorlek", "unsafe"
     #[structopt(short, long)]
-    difficulty: Option<Difficulty>,
+    difficulty: Vec<WorldOpt<Difficulty>>,
     /// Logically expected tricks you may have to use
     ///
     /// Available tricks are "swordsentryjump", "hammersentryjump", "shurikenbreak", "sentrybreak", "hammerbreak", "spearbreak", "sentryburn", "removekillplane", "launchswap", "sentryswap", "flashswap", "blazeswap", "wavedash", "grenadejump", "hammerjump", "swordjump", "grenaderedirect", "sentryredirect", "pausehover", "glidejump", "glidehammerjump", "spearjump"
     #[structopt(short, long)]
-    tricks: Option<Vec<Trick>>,
+    tricks: Vec<WorldOpt<Trick>>,
     /// Logically assume hard in-game difficulty
     #[structopt(long)]
-    hard: bool,
+    hard: Vec<WorldOpt<bool>>,
     /// Goal Requirements before finishing the game
     ///
     /// Available goals are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
-    #[structopt(short, long, parse(try_from_str = parse_goal))]
-    goals: Option<Vec<Goal>>,
+    #[structopt(short, long)]
+    goals: Vec<WorldOpt<GoalsOpt>>,
     /// Names of headers that will be used when generating the seed
     /// 
     /// The headers will be searched as .wotwrh files in the current and /headers child directory
     #[structopt(short, long)]
-    headers: Option<Vec<String>>,
+    headers: Vec<WorldOpt<String>>,
     /// Configuration parameters to pass to headers
     ///
     /// Format for one parameter: <headername>.<parametername>=<value>
     #[structopt(short = "c", long)]
-    header_config: Option<Vec<String>>,
+    header_config: Vec<WorldOpt<String>>,
     /// Inline header syntax
     #[structopt(short, long = "inline")]
-    inline_headers: Option<Vec<String>>,
+    inline_headers: Vec<WorldOpt<String>>,
     /// Disallow the use of the In-Logic filter while playing the seed
     #[structopt(short = "L", long)]
     disable_logic_filter: bool,
@@ -176,71 +338,79 @@ struct SeedSettings {
     online: bool,
 }
 
+fn vec_in_option<T>(vector: Vec<T>) -> Option<Vec<T>> {
+    if vector.is_empty() { None } else { Some(vector) }
+}
+
 impl SeedSettings {
-    fn to_preset(self) -> Preset {
+    fn into_preset(self) -> Result<Preset, String> {
         let Self {
             presets,
             world_names,
+            spawn,
             difficulty,
             tricks,
-            disable_logic_filter,
-            online,
             hard,
-            spawn,
             goals,
             headers,
             header_config,
             inline_headers,
+            disable_logic_filter,
+            online,
         } = self;
 
-        let hard = if hard { Some(true) } else { None };
+        let has_world_names = world_names.is_some();
+        let internal_world_names = world_names.unwrap_or_else(|| vec!["World".to_string()]);
+
+        let world_spawns = resolve_nonduplicate_world_opts(spawn, &internal_world_names)?;
+        let world_difficulties = resolve_nonduplicate_world_opts(difficulty, &internal_world_names)?;
+        let world_tricks = resolve_world_opts(tricks, &internal_world_names)?;
+        let world_hard_flags = resolve_nonduplicate_world_opts(hard, &internal_world_names)?;
+        let world_goals = resolve_world_opts(goals, &internal_world_names)?;
+        let world_headers = resolve_world_opts(headers, &internal_world_names)?;
+        let world_header_configs = resolve_world_opts(header_config, &internal_world_names)?;
+        let world_inline_headers = resolve_world_opts(inline_headers, &internal_world_names)?;
+
         let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
         let online = if online { Some(true) } else { None };
-        let inline_header = inline_headers.map(|inline_headers| inline_headers.join("\n"));
 
-        let world_settings = if let Some(world_names) = world_names {
-            Some(world_names.into_iter().map(|world_name| PresetWorldSettings {
-                world_name: Some(world_name),
-                spawn: spawn.clone(),
-                difficulty,
-                tricks: tricks.clone(),
-                goals: goals.clone(),
-                hard,
-                headers: headers.clone(),
-                header_config: header_config.clone(),
-                inline_header: inline_header.clone(),
-            }).collect())
-        } else {
-            let world_settings = PresetWorldSettings {
-                world_name: None,
-                spawn: spawn.clone(),
-                difficulty,
-                tricks: tricks.clone(),
-                goals: goals.clone(),
-                hard,
-                headers: headers.clone(),
-                header_config: header_config.clone(),
-                inline_header: inline_header.clone(),
-            };
+        let yes_fun = internal_world_names.into_iter()
+            .zip(world_spawns)
+            .zip(world_difficulties)
+            .zip(world_tricks)
+            .zip(world_hard_flags)
+            .zip(world_goals)
+            .zip(world_headers)
+            .zip(world_header_configs)
+            .zip(world_inline_headers)
+            .map(|((((((((world_name, spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
+                let world_name = if has_world_names { Some(world_name) } else { None };
+                let inline_header = if inline_headers.is_empty() { None } else { Some(inline_headers.join("\n")) };
 
-            if world_settings == PresetWorldSettings::default() {
-                None
-            } else {
-                Some(vec![world_settings])
-            }
-        };
+                PresetWorldSettings {
+                    world_name,
+                    spawn: spawn.map(SpawnOpt::into_inner),
+                    difficulty,
+                    tricks: vec_in_option(tricks),
+                    goals: vec_in_option(goals.into_iter().map(GoalsOpt::into_inner).collect()),
+                    hard,
+                    headers: vec_in_option(headers),
+                    header_config: vec_in_option(header_config),
+                    inline_header,
+                }
+            }).collect::<Vec<_>>();
 
-        Preset {
+        Ok(Preset {
             includes: presets,
-            world_settings,
+            world_settings: Some(yes_fun),
             disable_logic_filter,
             online,
             create_game: None,
-        }
+        })
     }
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt)]
 struct ReachCheckArgs {
     /// the seed file for which logical reach should be checked
     #[structopt(parse(from_os_str))]
@@ -268,7 +438,7 @@ struct ReachCheckArgs {
     items: Vec<String>,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt)]
 enum HeaderCommand {
     /// Check header compability
     Validate {
@@ -284,47 +454,18 @@ enum HeaderCommand {
     }
 }
 
-fn parse_goal(goal: &str) -> Result<Goal, String> {
-    let (identifier, details) = goal.split_once(':').unwrap_or((goal, ""));
-
-    let goal = match identifier {
-        "t" | "trees" => Goal::Trees,
-        "w" | "wisps" => Goal::Wisps,
-        "q" | "quests" => Goal::Quests,
-        "r" | "relics" => {
-            if !details.is_empty() {
-                if let Some(chance) = details.strip_suffix('%') {
-                    let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal {}", goal))?;
-                    if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal {}", goal)); }
-                    Goal::RelicChance(chance / 100.0)
-                } else {
-                    let amount = details.parse().map_err(|_| format!("expected amount or % expression in details string for goal {}", goal))?;
-                    if !(0..=11).contains(&amount) { return Err(format!("Invalid amount in details string for goal {}", goal)); }
-                    Goal::Relics(amount)
-                }
-            } else { Goal::RelicChance(0.6) }
-        },
-        other => return Err(format!("Unknown goal {}", other)),
-    };
-
-    Ok(goal)
-}
-fn parse_spawn(spawn: &str) -> Spawn {
-    match &spawn.to_lowercase()[..] {
-        "r" | "random" => Spawn::Random,
-        "f" | "fullyrandom" => Spawn::FullyRandom,
-        _ => Spawn::Set(spawn.to_string()),
-    }
-}
-
 fn parse_settings(seed: Option<String>, settings: SeedSettings) -> Result<Settings, Box<dyn Error>> {
-    let preset = settings.to_preset();
+    let has_world_names = settings.world_names.is_some();
+    let preset = settings.into_preset()?;
 
     let mut settings = Settings::default();
     settings.apply_preset(preset)?;
 
     if let Some(seed) = seed {
         settings.seed = seed;
+    }
+    if !has_world_names {
+        settings.world_settings[0].world_name = "World".to_string();
     }
 
     Ok(settings)
@@ -364,8 +505,7 @@ fn write_seeds_to_files(seeds: &[String], mut filename: String, mut folder: Path
     }
 
     let mut first = true;
-    for index in 0..seed_count {
-        let seed = &seeds[index];
+    for (index, seed) in seeds.iter().enumerate() {
         let player = players.get(index).cloned().unwrap_or_else(|| format!("Player {}", index + 1));
 
         if multiworld {
@@ -400,11 +540,8 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), Box<dyn Error>> {
 
     let header = read_header()?;
     if !header.is_empty() {
-        if let Some(inline_headers) = &mut args.settings.inline_headers {
-            inline_headers.push(header);
-        } else {
-            args.settings.inline_headers = Some(vec![header]);
-        }
+        // TODO how do these address worlds?
+        args.settings.inline_headers.insert(0, WorldOpt::from_str(&header)?);
     }
 
     let settings = parse_settings(args.seed, args.settings)?;
@@ -448,7 +585,7 @@ fn play_last_seed() -> Result<(), String> {
 }
 
 fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
-    let preset = args.settings.to_preset();
+    let preset = args.settings.into_preset()?;
     let preset = preset.to_json();
     args.name.set_extension("json");
 
