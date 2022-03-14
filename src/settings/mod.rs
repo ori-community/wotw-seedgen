@@ -93,7 +93,7 @@ impl Settings {
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
     pub fn from_seed(input: &str) -> Option<Result<Settings, serde_json::Error>> {
-        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(|settings| serde_json::from_str(settings)))
+        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
     }
 
     /// Apply the settings from a preset
@@ -127,7 +127,7 @@ impl Settings {
             if preset_worlds == 0 {
                 // do nothing
             } else if setting_worlds == preset_worlds {
-                for (world_settings, preset_world_settings) in self.world_settings.iter_mut().zip(preset_world_settings.into_iter()) {
+                for (world_settings, preset_world_settings) in self.world_settings.iter_mut().zip(preset_world_settings) {
                     world_settings.apply_world_settings(preset_world_settings);
                 }
             } else if preset_worlds == 1 {
@@ -137,6 +137,9 @@ impl Settings {
             } else if setting_worlds == 1 {
                 let diff = preset_worlds - setting_worlds;
                 self.world_settings.extend(iter::repeat(self.world_settings[0].clone()).take(diff));
+                for (world_settings, preset_world_settings) in self.world_settings.iter_mut().zip(preset_world_settings) {
+                    world_settings.apply_world_settings(preset_world_settings);
+                }
             } else {
                 let message = format!("Cannot apply preset with {preset_worlds} worlds to settings with {setting_worlds} worlds");
                 return Err(Box::new(ApplyPresetError { message }));

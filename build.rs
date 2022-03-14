@@ -1,14 +1,12 @@
 use std::fs;
 
-use syn;
-
 const SETTINGS_PATH: &str = "src/settings/mod.rs";
 
 // very hacky yes
 fn main() {
     println!("cargo:rerun-if-changed={SETTINGS_PATH}");
 
-    let source = fs::read_to_string(SETTINGS_PATH).expect(&format!("failed to read {SETTINGS_PATH}"));
+    let source = fs::read_to_string(SETTINGS_PATH).unwrap_or_else(|_| panic!("failed to read {}", SETTINGS_PATH));
     let syntax = syn::parse_file(&source).expect("failed to parse settings source");
 
     let trick_enum = find_enum(&syntax, "Trick").expect("failed to locate Trick enum in settings source");
@@ -30,13 +28,13 @@ fn main() {
 fn find_enum<'a>(syntax: &'a syn::File, ident: &str) -> Option<&'a syn::ItemEnum> {
     syntax.items.iter().find_map(|item| {
         if let syn::Item::Enum(item_enum) = item {
-            if item_enum.ident.to_string() == ident {
+            if item_enum.ident == ident {
                 return Some(item_enum);
             }
         }
         None
     })
 }
-fn list_variants<'a>(item_enum: &'a syn::ItemEnum) -> Vec<String> {
+fn list_variants(item_enum: &syn::ItemEnum) -> Vec<String> {
     item_enum.variants.iter().map(|variant| format!("\"{}\"", variant.ident)).collect()
 }
