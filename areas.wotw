@@ -9958,13 +9958,15 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
     kii:  # No dirty water path for the bash+torpedo path because using the crab from UpperPools.KeystoneRoomBubbleSpawner is just way less damage
       Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.KeystoneRoomBubbleFree, WaterDash, Flap, Water OR Damage=20
-  conn UpperPools.BubbleSpamRoom:  # connections using the bubble have to start from here, others use the higher anchor
-    moki: UpperPools.KeystoneRoomBubbleFree, Flap, DoubleJump, Dash, Grapple  # seems to be the intended strat
-    gorlek, UpperPools.KeystoneRoomBubbleFree:
-      Flap, Grapple, DoubleJump OR Dash
-      Flap, SentryJump=2  # guide the bubble to the anchor then sjump on it
-      Flap, DoubleJump, TripleJump, Dash OR Glide OR Sword  # guide the bubble to the anchor then tjump on it. wjump from the left wall to reach to right wall
-    unsafe: UpperPools.KeystoneRoomBubbleFree, Dash  # I'm so sorry
+  conn UpperPools.BeforeKeystoneDoor:  # connections using the bubble have to start from here, others originate from UpperPools.KeystoneRoom
+    gorlek, UpperPools.KeystoneRoomBubbleFree: Flap, DoubleJump, TripleJump  # guide the bubble to UpperPools.KeystoneRoom then jump on it
+    unsafe, UpperPools.KeystoneRoomBubbleFree: Flap, SwordSJump=1
+  conn UpperPools.BubbleSpamRoom:  # connections using the bubble have to start from here, others originate from BeforeKeystoneDoor
+    moki, UpperPools.KeystoneRoomBubbleFree: Flap, DoubleJump, Dash, Grapple  # seems to be the intended strat
+    gorlek, UpperPools.KeystoneRoomBubbleFree: Flap, Grapple, DoubleJump OR Dash
+    unsafe, UpperPools.KeystoneRoomBubbleFree:
+      Dash  # I'm so sorry
+      Flap, Grapple, Sword OR Hammer OR Shuriken=3  # flap from the far left of the platform after the bouncepad so the bubble get slowed down by the ceiling
   conn UpperPools.KeystoneRoomEntrance:
     moki:  # with at least Double Jump it's easier to go over the top
       Water
@@ -10095,7 +10097,7 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
       HammerSJump=1, DoubleJump OR Dash OR Glide OR Bash OR Damage=20
       Bash, Grenade=1, Dash OR Glide OR Sword
       Bash, Grenade=1, Hammer, Damage=20
-      DoubleJump, TripleJump, Dash OR Damage=20  # you can come from the trial start and complete this path with just triple jump, the extra abilities allow alternatives to make it more likely that the player finds this path
+      DoubleJump, TripleJump, Dash OR Glide  # you can come from the trial start and complete this path with just triple jump, the extra abilities allow alternatives to make it more likely that the player finds this path
     kii:
       Bash, Grenade=1, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=40
       Bash, Grenade=1, Spear=1, Damage=20
@@ -10233,11 +10235,24 @@ anchor UpperPools.DrainPuzzleEntrance at -1313, -4083:  # At the right of the do
       Water, Launch, Damage=20, DoubleJump OR Dash OR Glide
       Water, WaterDash, Launch, DoubleJump OR Dash OR Sword OR Damage=20
     kii:
-      Water, Launch, Damage=20
+      Water, WaterDash, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Water, Grapple, DoubleJump, Dash OR Hammer OR Spear=1  # with dash, land on the left platform after triggering the first anemone and dash+djump to the wall. Use Hammer/Spear to reach the wall from the water.
+      Water, Launch, WaterDash OR Damage=20
+      Damage=120, Grapple, DoubleJump, TripleJump OR Dash OR Hammer OR Spear=1
+      Damage=140, Launch
+      Damage=80, WaterDash, Launch
+      Damage=80, WaterDash, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Water, Grapple, DoubleJump, Sentry=1
+      Water, Launch, Dash
+      Water, WaterDash, DoubleJump, TripleJump, Damage=40
       Water, DoubleJump, Sword, Damage=20
-      Water, DoubleJump, Dash, Grapple
-      Water, Launch  # Break the purple wall, do the right side then the left side
+      Damage=100, Grapple, DoubleJump, TripleJump OR Dash OR Hammer OR Spear=1 OR Sentry=1
+      Damage=100, Launch, Dash
+      Damage=120, Launch
+      Damage=60, WaterDash, Launch
+      Damage=60, WaterDash, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=100, WaterDash, DoubleJump, TripleJump
 
   pickup UpperPools.WaterfallEC:  # have to solve with and without the water drained so it doesn't softlock
     moki:
@@ -10330,9 +10345,14 @@ anchor UpperPools.DrainPuzzleRight at -1324, -4060:  # On the ground next to the
     kii:
       Damage=100, Bash
       WaterDash, Damage=80, Bash
+    unsafe: Water, Launch
   state UpperPools.UpperWaterDrained:
     gorlek: Water, Launch, UpperPools.DrainRoomPurpleWall  # Break the purple wall, do the right side then the left side
-  
+    kii: UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, DoubleJump, Water OR Damage=60
+    unsafe:
+      UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, Water, Sword OR Hammer OR Spear=1 OR GlideJump
+      UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, Damage=60, Sword OR Hammer OR Spear=1 OR GlideJump
+
   conn UpperPools.DrainPuzzleExit:
     moki, UpperPools.UpperWaterDrained: Water OR Glide OR DoubleJump OR Launch OR Dash
     gorlek: UpperPools.UpperWaterDrained
@@ -10376,11 +10396,9 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
   # This is inside a rock, but you can just walk out of it so it's not a problem
   # Keep in mind that for all paths involving the puzzle room you have to consider both states of the water being drained or not
 
-  state UpperPools.DrainRoomPurpleWall:
-    moki: Bash, Water, WaterDash OR Launch
-    gorlek:
-      Water, Bash
-      UpperPools.UpperWaterDrained, Bash, Launch, Damage=20
+  state UpperPools.DrainRoomPurpleWall:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
+    moki: Bash, Water, WaterDash
+    gorlek: Water, Bash
     kii:
       Damage=100, Bash
       WaterDash, Damage=80, Bash
@@ -10410,12 +10428,13 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
       UpperPools.UpperWaterDrained OR Water:
         Launch
         Bash, Grenade=1, DoubleJump
-      Water, Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
+      Water, Bash, DoubleJump, WaterDash OR TripleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
       Launch, Damage=60  # UpperPools.UpperWaterDrained OR Water OR Damage=60
       Bash, Grenade=1, DoubleJump, Damage=60  # UpperPools.UpperWaterDrained OR Water OR Damage=60
       Bash, DoubleJump, Water OR Damage=60  # Possible with only 40 damage but it also need to solve for before darining the water
       Bash, Grenade=1, Dash, UpperPools.UpperWaterDrained OR Water OR Damage=60
+      Bash, WaterDash, Water OR Damage=60
   conn UpperPools.DrainPuzzleEntrance:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
     gorlek:
       UpperPools.DrainRoomPurpleWall, Water OR UpperPools.UpperWaterDrained:  # If you haven't drained the water, you need clean water to avoid the damage
