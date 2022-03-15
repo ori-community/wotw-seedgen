@@ -182,14 +182,6 @@ impl Settings {
         self.world_settings.len()
     }
 
-    /// Returns the name of the world at `index`, or a default name
-    pub fn get_world_name(&self, index: usize) -> String {
-        self.world_settings.get(index).map_or_else(
-            || format!("Player {}", index + 1),
-            |world_settings| world_settings.world_name.clone(),
-        )
-    }
-
     /// Returns a slug unique to these settings
     pub fn slugify(&self) -> String {
         // this is safe because the Settings struct is known to serialize successfully
@@ -223,19 +215,36 @@ impl Settings {
         iter::repeat_with(|| numeric.sample(&mut rng)).take(16).collect()
     }
 
-    /// Returns a reference to the first world
+    /// Returns the highest [`Difficulty`] present among all [`WorldSettings`]s
     /// 
-    /// This exists because settings only supported one world for everything except player names in the past
-    /// It will be deleted once split-world settings are fully implemented
-    pub(crate) fn world(&self) -> &WorldSettings {
-        &self.world_settings[0]
+    /// # Panics
+    /// 
+    /// Panics if the [`Settings`] contain no worlds
+    pub fn highest_difficulty(&self) -> Difficulty {
+        // world_settings is assumed not to be empty
+        self.world_settings.iter().map(|world| world.difficulty).max().unwrap()
     }
-    /// Returns a mutable reference to the first world
+    /// Returns the lowest [`Difficulty`] present among all [`WorldSettings`]s
     /// 
-    /// This exists because settings only supported one world for everything except player names in the past
-    /// It will be deleted once split-world settings are fully implemented
-    pub(crate) fn world_mut(&mut self) -> &mut WorldSettings {
-        &mut self.world_settings[0]
+    /// # Panics
+    /// 
+    /// Panics if the [`Settings`] contain no worlds
+    pub fn lowest_difficulty(&self) -> Difficulty {
+        // world_settings is assumed not to be empty
+        self.world_settings.iter().map(|world| world.difficulty).min().unwrap()
+    }
+    /// Checks if any of the [`WorldSettings`]s have the [`Difficulty`]
+    pub fn any_have_difficulty(&self, difficulty: Difficulty) -> bool {
+        self.world_settings.iter().any(|world| world.difficulty == difficulty)
+    }
+
+    /// Checks if any of the [`WorldSettings`]s contain the [`Trick`]
+    pub fn any_contain_trick(&self, trick: &Trick) -> bool {
+        self.world_settings.iter().any(|world| world.tricks.contains(trick))
+    }
+    /// Checks if all of the [`WorldSettings`]s contain the [`Trick`]
+    pub fn all_contain_trick(&self, trick: &Trick) -> bool {
+        self.world_settings.iter().all(|world| world.tricks.contains(trick))
     }
 }
 
@@ -406,7 +415,7 @@ impl Default for Spawn {
 /// Difficulties don't include glitches by default, these can be toggled through the Trick settings
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Serialize, Deserialize, seedgen_derive::FromStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, seedgen_derive::FromStr)]
 #[ParseFromIdentifier]
 pub enum Difficulty {
     Moki,

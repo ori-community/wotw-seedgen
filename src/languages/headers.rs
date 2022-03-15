@@ -1,5 +1,7 @@
 pub mod parser;
 
+pub use parser::parse_header;
+
 use std::{
     fs,
     io::{BufRead, BufReader},

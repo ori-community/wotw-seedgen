@@ -2,6 +2,8 @@ pub mod orbs;
 pub mod uber_state;
 pub mod constants;
 
+pub use orbs::Orbs;
+
 use decorum::R32;
 use num_enum::FromPrimitive;
 pub use uber_state::{UberState, UberIdentifier, UberType};
@@ -265,7 +267,7 @@ pub fn float_to_int(float: f32) -> Result<u16, String> {
 /// Read the spawn location from a generated seed
 /// 
 /// This reads the final spawn location, e.g. if the settings declared a random spawn, this will read the spawn that was chosen
-/// Returns `None` if the seed contains no information about the spawn location
+/// Returns [`None`] if the seed contains no information about the spawn location
 pub fn spawn_from_seed(input: &str) -> Option<String> {
     input.lines()
         .find_map(|line| line.strip_prefix("Spawn: ")

@@ -1,150 +1,236 @@
 use smallvec::{SmallVec, smallvec};
 
-use crate::Settings;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard};
-use crate::settings::Difficulty;
-use crate::util::{
-    self,
-    orbs::{self, Orbs},
-};
+use crate::settings::{Difficulty, WorldSettings};
+use crate::util::{self, Orbs};
 
-#[derive(Debug, Default, Clone)]
+/// A logical representation of the in-game player
+#[derive(Debug, Clone)]
 pub struct Player {
     pub inventory: Inventory,
-    pub difficulty: Difficulty,
-    pub hard: bool,
+    pub settings: WorldSettings,
 }
 impl Player {
-    pub fn spawn(&mut self, settings: &Settings) {
-        self.inventory.grant(Item::Resource(Resource::Health), 6);
-        self.inventory.grant(Item::Resource(Resource::Energy), 6);
-        self.apply_settings(settings);
+    /// Returns an instance of [`Player`] with the given [`WorldSettings`]
+    /// 
+    /// The [`Player`] will have an empty Inventory. Use [`Player::spawn`] to create a player with starting health and energy like in-game
+    pub fn new(settings: WorldSettings) -> Player {
+        let inventory = Inventory::default();
+        Player { inventory, settings }
+    }
+    /// Returns an instance of [`Player`] with the given [`WorldSettings`]
+    /// 
+    /// The [`Player`] will have six Health and Energy fragments - these are the resources a player spawns with in-game
+    pub fn spawn(settings: WorldSettings) -> Player {
+        let mut inventory = Inventory::default();
+        inventory.grant(Item::Resource(Resource::Health), 6);
+        inventory.grant(Item::Resource(Resource::Energy), 6);
+        Player { inventory, settings }
     }
 
-    pub fn apply_settings(&mut self, settings: &Settings) {
-        self.difficulty = settings.world().difficulty;
-        self.hard = settings.world().hard;
-    }
-
-    pub fn max_energy(&self) -> f32 {
-        let mut energy = f32::from(self.inventory.get(&Item::Resource(Resource::Energy))) * 0.5;
-        if self.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
-        energy
-    }
+    /// Returns the maximum health
+    /// 
+    /// One visual orb in the game represents 10 health
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use seedgen::world::Player;
+    /// use seedgen::settings::WorldSettings;
+    /// 
+    /// let player = Player::spawn(WorldSettings::default());
+    /// assert_eq!(player.max_health(), 30.0);
+    /// ```
     pub fn max_health(&self) -> f32 {
         let mut health = f32::from(self.inventory.get(&Item::Resource(Resource::Health)) * 5);
-        if self.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
+        if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
         health
     }
+    /// Returns the maximum energy
+    /// 
+    /// One visual orb in the game represents 1 energy
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use seedgen::world::Player;
+    /// use seedgen::settings::WorldSettings;
+    /// 
+    /// let player = Player::spawn(WorldSettings::default());
+    /// assert_eq!(player.max_energy(), 3.0);
+    /// ```
+    pub fn max_energy(&self) -> f32 {
+        let mut energy = f32::from(self.inventory.get(&Item::Resource(Resource::Energy))) * 0.5;
+        if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
+        energy
+    }
+    /// Returns the maximum health and energy
     pub fn max_orbs(&self) -> Orbs {
         Orbs {
             energy: self.max_energy(),
             health: self.max_health(),
         }
     }
-    fn cap_orbs(&self, mut orbs: SmallVec<[Orbs; 3]>, checkpoint: bool) -> SmallVec<[Orbs; 3]>{
+    /// Reduces the [`Orbs`] to the maximum health and energy of this [`Player`] if they exceed it
+    /// 
+    /// This follows the in-game rules when adding health or energy to the in-game player
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use seedgen::world::Player;
+    /// use seedgen::settings::WorldSettings;
+    /// use seedgen::util::Orbs;
+    /// 
+    /// let player = Player::spawn(WorldSettings::default());
+    /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
+    /// 
+    /// player.cap_orbs(&mut orbs, false);
+    /// 
+    /// assert_eq!(orbs, player.max_orbs());
+    /// ```
+    /// 
+    /// `checkpoint` represents whether the Orbs are a result of the player respawning on a checkpoint, in which case special rules apply
+    /// 
+    /// ```
+    /// # use seedgen::world::Player;
+    /// # use seedgen::settings::WorldSettings;
+    /// # use seedgen::util::Orbs;
+    /// use seedgen::Item;
+    /// use seedgen::item::Shard;
+    /// use seedgen::settings::Difficulty;
+    /// 
+    /// let mut player = Player::spawn(WorldSettings::default());
+    /// player.inventory.grant(Item::Shard(Shard::Vitality), 1);
+    /// player.settings.difficulty = Difficulty::Gorlek;
+    /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
+    /// 
+    /// player.cap_orbs(&mut orbs, false);
+    /// assert_eq!(orbs, Orbs { health: 40.0, energy: 1.0 });
+    /// 
+    /// player.cap_orbs(&mut orbs, true);
+    /// assert_eq!(orbs, Orbs { health: 30.0, energy: 1.0 });
+    /// ```
+    pub fn cap_orbs(&self, orbs: &mut Orbs, checkpoint: bool) {
+        // checkpoints don't refill health given by the Vitality shard
         let max_health = if checkpoint {
-            f32::from(self.inventory.get(&Item::Resource(Resource::Health)) * 5)  // checkpoint don't fill orbs given by the Vitality shard (but they do energy from the energy shard...)
+            f32::from(self.inventory.get(&Item::Resource(Resource::Health)) * 5)
         } else {
             self.max_health()
         };
+        // (but they do refill energy from the Energy shard...)
         let max_energy = self.max_energy();
 
-        if self.difficulty >= Difficulty::Unsafe && self.inventory.has(&Item::Shard(Shard::Overflow), 1) {
-            for orbs in &mut orbs {
-                if orbs.health > max_health {
-                    orbs.energy += orbs.health - max_health;
-                } else if orbs.energy > max_energy {
-                    orbs.health += orbs.energy - max_energy;
-                }
-            }
-        }
-
-        for orbs in &mut orbs {
+        if self.settings.difficulty >= Difficulty::Unsafe && self.inventory.has(&Item::Shard(Shard::Overflow), 1) {
             if orbs.health > max_health {
-                orbs.health = max_health;
-            }
-            if orbs.energy > max_energy {
-                orbs.energy = max_energy;
+                orbs.energy += orbs.health - max_health;
+            } else if orbs.energy > max_energy {
+                orbs.health += orbs.energy - max_energy;
             }
         }
 
-        orbs
+        orbs.health = orbs.health.min(max_health);
+        orbs.energy = orbs.energy.min(max_energy);
     }
-    #[inline]
-    pub fn checkpoint_orbs(&self, prior: &[Orbs]) -> SmallVec<[Orbs; 3]> {
-        let max_health = self.max_health();
-        let health_refill = 40_f32.max(((max_health / 5.0) / 0.6685 + 1.0).floor());
 
-        let max_energy = self.max_energy();
-        let energy_refill = 10.0 * (max_energy / 50.0 + 1.0);
+    /// Returns the [`Orbs`] after respawning on a checkpoint
+    /// 
+    /// This follows the in-game rules when respawning on a checkpoint
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use seedgen::world::Player;
+    /// use seedgen::settings::WorldSettings;
+    /// use seedgen::util::Orbs;
+    /// use seedgen::Item;
+    /// use seedgen::item::Resource;
+    /// 
+    /// let mut player = Player::spawn(WorldSettings::default());
+    /// assert_eq!(player.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
+    /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
+    /// 
+    /// player.inventory.grant(Item::Resource(Resource::Health), 22);
+    /// player.inventory.grant(Item::Resource(Resource::Energy), 24);
+    /// assert_eq!(player.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
+    /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
+    /// ```
+    pub fn checkpoint_orbs(&self) -> Orbs {
+        let health_refill = (self.max_health() * 0.3).ceil().max(40.0);
+        let energy_refill = (self.max_energy() * 0.2).ceil().max(1.0);
 
-        let orbs = Orbs {
+        let mut orbs = Orbs {
             health: health_refill,
             energy: energy_refill,
         };
-        let orbs = orbs::either_single(prior, orbs);
 
-        self.cap_orbs(orbs, true)
+        self.cap_orbs(&mut orbs, true);
+        orbs
     }
-    #[inline]
-    pub fn health_orbs(&self, prior: &[Orbs], amount: f32) -> SmallVec<[Orbs; 3]> {
-        let max_health = self.max_health();
-
-        let mut moon_why = max_health;
-        let why_moon = (moon_why + 15.0) % 60.0;
-        if why_moon < 5.0 {
-            moon_why += 5.0 - why_moon;
+    /// Returns how many health orbs plants will drop
+    /// 
+    /// This follows the in-game rules when opening a health plant
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use seedgen::world::Player;
+    /// use seedgen::settings::WorldSettings;
+    /// use seedgen::util::Orbs;
+    /// use seedgen::Item;
+    /// use seedgen::item::Resource;
+    /// 
+    /// let mut player = Player::spawn(WorldSettings::default());
+    /// assert_eq!(player.health_plant_drops(), 1.0);
+    /// 
+    /// player.inventory.grant(Item::Resource(Resource::Health), 8);
+    /// assert_eq!(player.health_plant_drops(), 2.0);
+    /// 
+    /// player.inventory.grant(Item::Resource(Resource::Health), 18);
+    /// assert_eq!(player.health_plant_drops(), 5.0);
+    /// ```
+    pub fn health_plant_drops(&self) -> f32 {
+        let value = self.max_health() / 30.0;
+        // the game rounds to even
+        if value % 1. == 0.5 && value as u8 % 2 == 0 {
+            value.floor()
+        } else {
+            value.round()
         }
-        let health_refill = 10_f32.max((amount * (moon_why + 10.0) / 30.0).floor() * 10.0);
-
-        let orbs = Orbs {
-            health: health_refill,
-            ..Orbs::default()
-        };
-        let orbs = orbs::both_single(prior, orbs);
-
-        self.cap_orbs(orbs, false)
-    }
-    #[inline]
-    pub fn energy_orbs(&self, prior: &[Orbs], amount: f32) -> SmallVec<[Orbs; 3]> {
-        let orbs = Orbs {
-            energy: amount,
-            ..Orbs::default()
-        };
-        let orbs = orbs::both_single(prior, orbs);
-
-        self.cap_orbs(orbs, false)
     }
 
     pub fn damage_mod(&self, flying_target: bool, bow: bool) -> f32 {
-        let is_unsafe = self.difficulty >= Difficulty::Unsafe;
         let mut damage_mod = 1.0;
 
-        damage_mod += 0.25 * f32::from(self.inventory.get(&Item::Skill(Skill::AncestralLight)));
+        if self.settings.difficulty >= Difficulty::Gorlek {
+            damage_mod += 0.25 * f32::from(self.inventory.get(&Item::Skill(Skill::AncestralLight)));
+        }
 
-        let mut slots = self.inventory.get(&Item::Resource(Resource::ShardSlot));
-        let mut splinter = false;
+        if self.settings.difficulty >= Difficulty::Unsafe {
+            let mut slots = self.inventory.get(&Item::Resource(Resource::ShardSlot));
+            let mut splinter = false;
 
-        if flying_target && slots > 0 && is_unsafe && self.inventory.has(&Item::Shard(Shard::Wingclip), 1) { damage_mod += 1.0; slots -= 1; }
-        if slots > 0 && is_unsafe && bow && self.inventory.has(&Item::Shard(Shard::Splinter), 1) { splinter = true; slots -= 1; }
-        if slots > 0 && is_unsafe && self.inventory.has(&Item::Shard(Shard::SpiritSurge), 1) { damage_mod += f32::from(self.inventory.get(&Item::SpiritLight(1)) / 10000); slots -= 1; }
-        if slots > 0 && is_unsafe && self.inventory.has(&Item::Shard(Shard::LastStand), 1) { damage_mod += 0.2; slots -= 1; }
-        if slots > 0 && is_unsafe && self.inventory.has(&Item::Shard(Shard::Reckless), 1) { damage_mod += 0.15; slots -= 1; }
-        if slots > 0 && is_unsafe && self.inventory.has(&Item::Shard(Shard::Lifeforce), 1) { damage_mod += 0.1; slots -= 1; }
-        if slots > 0 && is_unsafe && self.inventory.has(&Item::Shard(Shard::Finesse), 1) { damage_mod += 0.05; }
-        if splinter { damage_mod *= 1.5; }  // The splinter debuff stacks multiplicatively even though other buffs stack additively
+            if flying_target && slots > 0 && self.inventory.has(&Item::Shard(Shard::Wingclip), 1) { damage_mod += 1.0; slots -= 1; }
+            if slots > 0 && bow && self.inventory.has(&Item::Shard(Shard::Splinter), 1) { splinter = true; slots -= 1; }
+            if slots > 0 && self.inventory.has(&Item::Shard(Shard::SpiritSurge), 1) { damage_mod += f32::from(self.inventory.get(&Item::SpiritLight(1)) / 10000); slots -= 1; }
+            if slots > 0 && self.inventory.has(&Item::Shard(Shard::LastStand), 1) { damage_mod += 0.2; slots -= 1; }
+            if slots > 0 && self.inventory.has(&Item::Shard(Shard::Reckless), 1) { damage_mod += 0.15; slots -= 1; }
+            if slots > 0 && self.inventory.has(&Item::Shard(Shard::Lifeforce), 1) { damage_mod += 0.1; slots -= 1; }
+            if slots > 0 && self.inventory.has(&Item::Shard(Shard::Finesse), 1) { damage_mod += 0.05; }
+            if splinter { damage_mod *= 1.5; }  // Splinter stacks multiplicatively where other buffs stack additively
+        }
+
         damage_mod
     }
     pub fn defense_mod(&self) -> f32 {
-        let mut defense_mod = if self.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Resilience), 1) { 0.9 } else { 1.0 };
-        if self.hard { defense_mod *= 2.0; }
+        let mut defense_mod = if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Resilience), 1) { 0.9 } else { 1.0 };
+        if self.settings.hard { defense_mod *= 2.0; }
         defense_mod
     }
     pub fn energy_mod(&self) -> f32 {
         let mut energy_mod = 1.0;
-        if self.difficulty < Difficulty::Unsafe { energy_mod *= 2.0; }
+        if self.settings.difficulty < Difficulty::Unsafe { energy_mod *= 2.0; }
         else if self.inventory.has(&Item::Shard(Shard::Overcharge), 1) { energy_mod *= 0.5; }
         energy_mod
     }
@@ -168,10 +254,10 @@ impl Player {
             Skill::Spear,
         ];
         if !wall { weapons.push(Skill::Flash); }
-        if self.difficulty >= Difficulty::Unsafe { weapons.push(Skill::Sentry); }
+        if self.settings.difficulty >= Difficulty::Unsafe { weapons.push(Skill::Sentry); }
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.difficulty) * 10.0) as u16);
+        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.settings.difficulty) * 10.0) as u16);
         weapons
     }
     fn ranged_weapons_by_dpe(&self) -> SmallVec<[Skill; 2]> {
@@ -179,17 +265,17 @@ impl Player {
             Skill::Bow,
             Skill::Spear,
         ];
-        if self.difficulty >= Difficulty::Gorlek {
+        if self.settings.difficulty >= Difficulty::Gorlek {
             weapons.push(Skill::Grenade);
             weapons.push(Skill::Shuriken);
         }
-        if self.difficulty >= Difficulty::Unsafe {
+        if self.settings.difficulty >= Difficulty::Unsafe {
             weapons.push(Skill::Flash);
             weapons.push(Skill::Blaze);
         }
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.difficulty) * 10.0) as u16);
+        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.settings.difficulty) * 10.0) as u16);
         weapons
     }
     fn shield_weapons_by_dpe(&self) -> SmallVec<[Skill; 4]> {
@@ -201,7 +287,7 @@ impl Player {
         ];
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.difficulty) * 10.0) as u16);
+        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.settings.difficulty) * 10.0) as u16);
         weapons
     }
 
@@ -327,7 +413,7 @@ mod tests {
 
     #[test]
     fn inventory() {
-        let mut player = Player::default();
+        let mut player = Player::new(WorldSettings::default());
         player.inventory.grant(Item::BonusItem(BonusItem::Relic), 2);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         assert!(player.inventory.has(&Item::BonusItem(BonusItem::Relic), 1));
@@ -338,13 +424,13 @@ mod tests {
 
     #[test]
     fn weapon_preference() {
-        let mut player = Player::default();
+        let mut player = Player::new(WorldSettings::default());
         assert_eq!(player.preferred_weapon(true), None);
         assert_eq!(player.preferred_ranged_weapon(), None);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         assert_eq!(player.preferred_weapon(true), Some(Skill::Shuriken));
         assert_eq!(player.preferred_ranged_weapon(), None);
-        player.difficulty = Difficulty::Gorlek;
+        player.settings.difficulty = Difficulty::Gorlek;
         assert_eq!(player.preferred_ranged_weapon(), Some(Skill::Shuriken));
         player.inventory.grant(Item::Skill(Skill::Spear), 1);
         assert_eq!(player.preferred_weapon(true), Some(Skill::Shuriken));
@@ -352,7 +438,7 @@ mod tests {
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
         assert_eq!(player.preferred_weapon(true), Some(Skill::Sword));
 
-        player = Player::default();
+        player = Player::new(WorldSettings::default());
         let weapons: SmallVec<[_; 8]> = smallvec![
             Skill::Sword,
             Skill::Hammer,
@@ -373,7 +459,7 @@ mod tests {
             Skill::Shuriken,
         ];
         assert_eq!(player.progression_weapons(false), weapons);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         let weapons: SmallVec<[_; 5]> = smallvec![
             Skill::Sword,
             Skill::Hammer,
@@ -386,23 +472,23 @@ mod tests {
 
     #[test]
     fn max_energy() {
-        let mut player = Player::default();
+        let mut player = Player::new(WorldSettings::default());
         assert_eq!(player.max_energy(), 0.0);
         for _ in 0..10 { player.inventory.grant(Item::Resource(Resource::Energy), 1); }
         player.inventory.grant(Item::Shard(Shard::Energy), 1);
         assert_eq!(player.max_energy(), 5.0);
-        player.difficulty = Difficulty::Gorlek;
+        player.settings.difficulty = Difficulty::Gorlek;
         assert_eq!(player.max_energy(), 6.0);
     }
 
     #[test]
     fn destroy_cost() {
-        let mut player = Player::default();
+        let mut player = Player::new(WorldSettings::default());
         assert_eq!(player.destroy_cost(10.0, Skill::Bow, false), 1.5);
         assert_eq!(player.destroy_cost(10.0, Skill::Spear, true), 4.0);
         assert_eq!(player.destroy_cost(0.0, Skill::Spear, false), 0.0);
         player.inventory.grant(Item::Skill(Skill::AncestralLight), 2);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         player.inventory.grant(Item::Shard(Shard::Wingclip), 1);
         player.inventory.grant(Item::Resource(Resource::ShardSlot), 1);
         assert_eq!(player.destroy_cost(10.0, Skill::Bow, true), 0.25);
@@ -411,64 +497,36 @@ mod tests {
 
     #[test]
     fn refill_orbs() {
-        let mut player = Player::default();
-        let orbs = Orbs::default();
+        let mut player = Player::spawn(WorldSettings::default());
 
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![orbs];
-        assert_eq!(player.checkpoint_orbs(&[orbs]), orbvec);
+        let expected = [30.,35.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,41.,42.,44.,45.,47.,48.,50.,52.,53.,55.,56.,58.,59.,61.,62.,64.,65.,66.,68.,69.];
+        for health in expected {
+            assert_eq!(player.checkpoint_orbs().health, health);
+            player.inventory.grant(Item::Resource(Resource::Health), 1);
+        }
 
-        player.inventory.grant(Item::Resource(Resource::Energy), 6);
-        player.inventory.grant(Item::Resource(Resource::Health), 6);
+        player = Player::new(WorldSettings::default());
 
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { energy: 3.0, health: 30.0}];
-        assert_eq!(player.checkpoint_orbs(&[orbs]), orbvec);
+        let expected = [0.,0.,0.,0.,1.,1.,1.,1.,1.,2.,2.,2.,2.,2.,2.,2.,3.,3.,3.,3.,3.,4.,4.,4.,4.,4.,4.,4.,5.,5.,5.,5.,5.,6.,6.,6.,6.,6.,6.,6.,7.,7.,7.,7.,7.,8.,8.];
+        for drops in expected {
+            assert_eq!(player.health_plant_drops(), drops);
+            player.inventory.grant(Item::Resource(Resource::Health), 1);
+        }
 
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 10.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player.inventory.grant(Item::Resource(Resource::Health), 2);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 10.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player.inventory.grant(Item::Resource(Resource::Health), 1);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 20.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player.inventory.grant(Item::Resource(Resource::Health), 11);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 30.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player.inventory.grant(Item::Resource(Resource::Health), 1);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 40.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player.inventory.grant(Item::Resource(Resource::Health), 6);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 40.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player.inventory.grant(Item::Resource(Resource::Health), 1);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 50.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-
-        player = Player::default();
-        player.difficulty = Difficulty::Gorlek;
+        player = Player::new(WorldSettings::default());
+        player.settings.difficulty = Difficulty::Gorlek;
 
         player.inventory.grant(Item::Shard(Shard::Energy), 1);
         player.inventory.grant(Item::Shard(Shard::Vitality), 1);
 
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { energy: 1.0, ..orbs }];
-        assert_eq!(player.checkpoint_orbs(&[orbs]), orbvec);
+        assert_eq!(player.checkpoint_orbs(), Orbs { energy: 1.0, health: 0.0 });
 
         player.inventory.grant(Item::Resource(Resource::Health), 7);
 
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 20.0, ..orbs }];
-        assert_eq!(player.health_orbs(&[orbs], 1.0), orbvec);
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 35.0, energy: 1.0 }];
-        assert_eq!(player.checkpoint_orbs(&[orbs]), orbvec);
+        assert_eq!(player.checkpoint_orbs(), Orbs { health: 35.0, energy: 1.0 });
 
         player.inventory.grant(Item::Resource(Resource::Health), 21);
 
-        let orbvec: SmallVec<[Orbs; 3]> = smallvec![Orbs { health: 45.0, energy: 1.0 }];
-        assert_eq!(player.checkpoint_orbs(&[orbs]), orbvec);
+        assert_eq!(player.checkpoint_orbs(), Orbs { health: 45.0, energy: 1.0 });
     }
 }

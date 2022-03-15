@@ -185,9 +185,12 @@ impl Graph {
                                 }
                                 let mut refill_orbs = orbs::both(&best_orbs, &orbcost);
                                 match refill.name {
-                                    RefillType::Checkpoint => refill_orbs = context.player.checkpoint_orbs(&refill_orbs),
-                                    RefillType::Health(amount) => refill_orbs = context.player.health_orbs(&refill_orbs, amount),
-                                    RefillType::Energy(amount) => refill_orbs = context.player.energy_orbs(&refill_orbs, amount),
+                                    RefillType::Checkpoint => refill_orbs = orbs::either_single(&refill_orbs, context.player.checkpoint_orbs()),
+                                    RefillType::Health(amount) => {
+                                        let amount = amount * context.player.health_plant_drops();
+                                        refill_orbs.iter_mut().for_each(|orbs| orbs.heal(amount, context.player));
+                                    },
+                                    RefillType::Energy(amount) => refill_orbs.iter_mut().for_each(|orbs| orbs.recharge(amount, context.player)),
                                     RefillType::Full => unreachable!(),
                                 }
                                 best_orbs = orbs::either(&best_orbs, &refill_orbs);

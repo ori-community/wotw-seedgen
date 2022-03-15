@@ -1,4 +1,4 @@
-pub mod languages;
+mod languages;
 pub mod world;
 pub mod inventory;
 pub mod item;
@@ -7,10 +7,15 @@ pub mod settings;
 pub mod generator;
 pub mod util;
 
-pub use settings::Settings;
+pub use languages::logic;
+pub use languages::headers;
+pub use world::World;
+pub use inventory::Inventory;
+pub use item::Item;
 pub use preset::Preset;
+pub use settings::Settings;
 
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 
 use rand_seeder::Seeder;
 use rand::{
@@ -35,30 +40,27 @@ use log4rs::{
 };
 
 use world::{
-    World,
     graph::{Graph, Node, Pickup},
     pool::Pool
 };
 use generator::Placement;
 use languages::headers::parser::HeaderContext;
-use settings::{Spawn, Difficulty, Goal};
+use settings::{Spawn, Difficulty, Goal, WorldSettings};
 use util::{
     Position, Zone, UberState, Icon,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
 
-use crate::languages::headers;
-
-fn pick_spawn<'a, R>(graph: &'a Graph, settings: &Settings, rng: &mut R) -> Result<&'a Node, String>
+fn pick_spawn<'a, R>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut R) -> Result<&'a Node, String>
 where
     R: Rng
 {
     let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
-    let spawn = match &settings.world().spawn {
+    let spawn = match &world_settings.spawn {
         Spawn::Random => valid
             .filter(|&node| {
                 let identifier = node.identifier();
-                if settings.world().difficulty >= Difficulty::Gorlek {
+                if world_settings.difficulty >= Difficulty::Gorlek {
                     GORLEK_SPAWNS.contains(&identifier)
                 } else {
                     MOKI_SPAWNS.contains(&identifier)
@@ -76,14 +78,14 @@ where
     Ok(spawn)
 }
 
-pub fn write_flags(settings: &Settings, mut flags: Vec<String>) -> String {
+pub fn write_flags(world_settings: &WorldSettings, mut flags: Vec<String>) -> String {
     let mut settings_flags = Vec::new();
 
-    for flag in settings.world().goals.iter().map(Goal::flag_name) {
+    for flag in world_settings.goals.iter().map(Goal::flag_name) {
         settings_flags.push(flag.to_string());
     }
 
-    if settings.world().is_random_spawn() { settings_flags.push("RandomSpawn".to_string()); }
+    if world_settings.is_random_spawn() { settings_flags.push("RandomSpawn".to_string()); }
 
     settings_flags.append(&mut flags);
 
@@ -141,7 +143,7 @@ pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, jso
     Ok(())
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct ItemDetails {
     name: Option<String>,
     display: Option<String>,
@@ -151,44 +153,44 @@ pub struct ItemDetails {
 
 type Flags = Vec<String>;
 type Sets = Vec<String>;
-fn parse_headers<R>(world: &mut World, settings: &Settings, rng: &mut R) -> Result<(String, Flags, HashMap<String, ItemDetails>, Sets), String>
+fn parse_headers<R>(world: &mut World, rng: &mut R) -> Result<(String, Flags, FxHashMap<String, ItemDetails>, Sets), String>
 where R: Rng + ?Sized
 {
     let mut header_block = String::new();
 
-    let mut dependencies = settings.world().headers.clone();
+    let mut dependencies = world.player.settings.headers.clone();
     dependencies.sort();
     let mut context = HeaderContext {
         dependencies,
         ..HeaderContext::default()
     };
 
-    let mut param_values = HashMap::new();
+    let mut param_values = FxHashMap::default();
 
-    for header_arg in &settings.world().header_config {
+    for header_arg in &world.player.settings.header_config {
         let mut parts = header_arg.splitn(2, '=');
         let identifier = parts.next().unwrap();
         let mut identifier_parts = identifier.splitn(2, '.');
         let header = identifier_parts.next().unwrap();
-        let identifier = identifier_parts.next().ok_or_else(|| format!("Expected <header>.<parameter> in header arg {}", header_arg))?;
+        let identifier = identifier_parts.next().ok_or_else(|| format!("Expected <header>.<parameter> in header arg {header_arg}"))?;
         let value = parts.next().unwrap_or("true");
 
-        let prior = param_values.entry(header).or_insert_with(HashMap::new);
-        if let Some(lost) = prior.insert(identifier, value) {
-            log::warn!("Overwriting duplicate header argument {}", lost);
+        let entry = param_values.entry(header.to_string()).or_insert_with(FxHashMap::default);
+        if let Some(prior) = entry.insert(identifier.to_string(), value.to_string()) {
+            log::warn!("Overwriting duplicate header argument {prior}");
         }
     }
 
-    for &header_with_parameters in param_values.keys() {
-        if !settings.world().headers.iter().any(|header| header == header_with_parameters) {
-            log::warn!("The header {} referenced in a header argument isn't active", header_with_parameters);
+    for header_with_parameters in param_values.keys() {
+        if !world.player.settings.headers.iter().any(|header| header == header_with_parameters) {
+            log::warn!("The header {header_with_parameters} referenced in a header argument isn't active");
         }
     }
 
-    if !settings.world().inline_header.is_empty() {
+    if !world.player.settings.inline_header.is_empty() {
         log::trace!("Parsing inline header");
 
-        let header = headers::parser::parse_header("inline header", &settings.world().inline_header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in inline header", err))?;
+        let header = headers::parser::parse_header("inline header", &world.player.settings.inline_header.clone(), world, &mut context, &param_values, rng).map_err(|err| format!("{} in inline header", err))?;
 
         header_block += &header;
     }
@@ -224,23 +226,21 @@ where R: Rng + ?Sized
 
 fn generate_placements<'a, R>(
     graph: &'a Graph,
-    worlds: Vec<World<'a>>,
-    settings: &Settings,
+    worlds: &[World<'a>],
     spawn_pickup_node: &'a Node,
-    custom_items: &HashMap<String, ItemDetails>,
     rng: &mut R
 ) -> Result<(Vec<Vec<Placement<'a>>>, Vec<&'a Node>), String>
 where R: Rng
 {
     let mut index = 0;
     loop {
-        let spawn_locs = (0..settings.world_count())
-            .map(|_| pick_spawn(graph, settings, rng))
+        let spawn_locs = worlds.iter()
+            .map(|world| pick_spawn(graph, &world.player.settings, rng))
             .collect::<Result<Vec<_>, String>>()?;
         let identifiers = spawn_locs.iter().map(|spawn_loc| spawn_loc.identifier()).collect::<Vec<_>>();
         log::trace!("Spawning on {}", identifiers.join(", "));
 
-        match generator::generate_placements(worlds.clone(), &spawn_locs, spawn_pickup_node, custom_items, settings, rng) {
+        match generator::generate_placements(worlds.to_vec(), &spawn_locs, spawn_pickup_node, rng) {
             Ok(seed) => {
                 if index > 0 {
                     log::info!("Generated seed after {} tries{}", index + 1, if index < RETRIES / 2 { "" } else { " (phew)" });
@@ -258,7 +258,7 @@ where R: Rng
 }
 
 #[inline]
-fn format_placements(world_placements: Vec<Placement>, custom_items: &HashMap<String, ItemDetails>) -> String {
+fn format_placements(world_placements: Vec<Placement>, custom_items: &FxHashMap<String, ItemDetails>) -> String {
     let mut placement_block = String::with_capacity(world_placements.len() * 20);
 
     for placement in world_placements {
@@ -299,18 +299,23 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
     let mut rng: StdRng = Seeder::from(&settings.seed).make_rng();
     log::trace!("Seeded RNG with {}", settings.seed);
 
-    let mut world = World::new(graph);
-    world.pool = Pool::preset();
-    world.player.spawn(&settings);
+    let (worlds, world_data): (Vec<_>, Vec<_>) = settings.world_settings.into_iter().enumerate().map(|(index, world_settings)| {
+        let mut world = World::new(graph, world_settings);
+        world.pool = Pool::preset();
 
-    let (header_block, custom_flags, custom_items, sets) = parse_headers(&mut world, &settings, &mut rng)?;
+        let (header_block, custom_flags, custom_items, sets) = parse_headers(&mut world, &mut rng)?;
+        world.custom_items = custom_items;
 
-    let flag_line = write_flags(&settings, custom_flags);
+        let flag_line = write_flags(&world.player.settings, custom_flags);
+        let set_line = if sets.is_empty() {
+            String::new()
+        } else {
+            format!("// Sets: {}\n", sets.join(", "))
+        };
+        let world_line = format!("// This World: {index}\n");
 
-    let mut worlds = vec![world];
-    for _ in 1..settings.world_count() {
-        worlds.push(worlds[0].clone());
-    }
+        Ok((world, (flag_line, header_block, set_line, world_line)))
+    }).collect::<Result<Vec<_>, String>>()?.into_iter().unzip();
 
     let spawn_pickup_node = Node::Pickup(Pickup {
         identifier: String::from("Spawn"),
@@ -320,7 +325,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
         position: Position::default(),
     });
 
-    let (placements, spawn_locs) = generate_placements(graph, worlds, &settings, &spawn_pickup_node, &custom_items, &mut rng)?;
+    let (placements, spawn_locs) = generate_placements(graph, &worlds, &spawn_pickup_node, &mut rng)?;
 
     let spawn_lines = spawn_locs.into_iter().map(|spawn_loc| {
         let identifier = spawn_loc.identifier();
@@ -332,29 +337,25 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
             }
 
             let position = spawn_loc.position().ok_or_else(|| format!("Tried to spawn on {} which has no specified coordinates", identifier))?;
-            return Ok(format!("Spawn: {}  // {}\n{}", position, identifier, spawn_item));
+            return Ok(format!("Spawn: {position}  // {identifier}\n{spawn_item}"));
         }
         Ok(String::new())
     }).collect::<Result<Vec<_>, String>>()?;
 
-    let placement_blocks = placements.into_iter()
-        .map(|world_placements| format_placements(world_placements, &custom_items))
-        .collect::<Vec<_>>();
+    let target_line = "// Target: ^2.0\n";
+    let version_line = format!("// Generator Version: {}\n", env!("CARGO_PKG_VERSION"));
+    let slug_line = format!("// Slug: {slug}\n");
+    let config_line = format!("// Config: {config}\n");
 
-    let target_line = "// Target: ^2.0";
-    let version_line = format!("// Generator Version: {}", env!("CARGO_PKG_VERSION"));
-    let slug_line = format!("// Slug: {}", slug);
-    let set_line = if sets.is_empty() {
-        String::new()
-    } else {
-        format!("\n// Sets: {}", sets.join(", "))
-    };
-    let config_line = format!("// Config: {}", config);
+    let mut seeds = placements.into_iter()
+        .zip(worlds.iter().map(|world| &world.custom_items))
+        .map(|(world_placements, custom_items)| format_placements(world_placements, custom_items))
+        .zip(world_data).zip(spawn_lines)
+        .map(|((placement_block, (flag_line, header_block, set_line, world_line)), spawn_line)| {
+            format!("{flag_line}{spawn_line}\n{placement_block}\n{header_block}\n{target_line}{version_line}{slug_line}{set_line}{world_line}{config_line}")
+        }).collect::<Vec<_>>();
 
-    let mut seeds = (0..settings.world_count()).map(|index| {
-        format!("{}{}\n{}\n{}{}\n{}\n{}{}\n{}", flag_line, spawn_lines[index], placement_blocks[index], header_block, target_line, version_line, slug_line, set_line, config_line)
-    }).collect::<Vec<_>>();
-    headers::parser::postprocess(&mut seeds, graph, &settings)?;
+    headers::parser::postprocess(&mut seeds, graph, &worlds.iter().map(|world| &world.player.settings).collect::<Vec<_>>())?;
 
     Ok(seeds)
 }
@@ -367,18 +368,18 @@ mod tests {
 
     #[test]
     fn some_seeds() {
-        initialize_log(Some("generator.log"), LevelFilter::Off, false).unwrap();
+        // initialize_log(Some("generator.log"), LevelFilter::Trace, false).unwrap();
 
         let mut settings = Settings::default();
         let mut graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
 
         generate_seed(&graph, settings.clone()).unwrap();
 
-        settings.world_mut().difficulty = Difficulty::Unsafe;
+        settings.world_settings[0].difficulty = Difficulty::Unsafe;
         graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         generate_seed(&graph, settings.clone()).unwrap();
 
-        settings.world_mut().headers = vec![
+        settings.world_settings[0].headers = vec![
             "bingo".to_string(),
             "bonus+".to_string(),
             "glades_done".to_string(),
@@ -397,7 +398,7 @@ mod tests {
 
         for preset in ["gorlek", "rspawn"] {
             let preset = WorldPreset::read_file(preset.to_string()).unwrap();
-            settings.world_mut().apply_world_preset(preset).unwrap();
+            settings.world_settings[0].apply_world_preset(preset).unwrap();
         }
 
         let preset = Preset {

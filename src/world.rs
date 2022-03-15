@@ -3,12 +3,16 @@ pub mod pool;
 pub mod player;
 pub mod requirements;
 
+pub use graph::Graph;
+pub use pool::Pool;
+pub use player::Player;
+pub use requirements::Requirement;
+
 use rustc_hash::FxHashMap;
 
-use graph::Graph;
-use pool::Pool;
-use player::Player;
+use crate::ItemDetails;
 use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
+use crate::settings::WorldSettings;
 use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
@@ -19,16 +23,18 @@ pub struct World<'a> {
     pub preplacements: FxHashMap<UberState, Vec<Item>>,
     pub uber_states: FxHashMap<UberIdentifier, String>,
     pub sets: Vec<usize>,
+    pub custom_items: FxHashMap<String, ItemDetails>,
 }
 impl<'a> World<'a> {
-    pub fn new(graph: &Graph) -> World {
+    pub fn new(graph: &Graph, settings: WorldSettings) -> World {
         World {
             graph,
-            player: Player::default(),
+            player: Player::spawn(settings),
             pool: Pool::default(),
             preplacements: FxHashMap::default(),
             uber_states: FxHashMap::default(),
             sets: Vec::default(),
+            custom_items: FxHashMap::default(),
         }
     }
 
@@ -109,7 +115,7 @@ impl<'a> World<'a> {
                 self.player.inventory.grant(Item::SpiritLight(1), amount * stacked_amount);
             }
             item => {
-                if item.is_progression(self.player.difficulty) {
+                if item.is_progression(self.player.settings.difficulty) {
                     log::trace!("Granting player {}{}", if amount == 1 { String::new() } else { format!("{} ", amount) }, item);
 
                     self.player.inventory.grant(item, amount);
@@ -160,13 +166,12 @@ mod tests {
     #[test]
     fn reach_check() {
         let mut settings = Settings::default();
-        settings.world_mut().difficulty = Difficulty::Gorlek;
+        settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
         let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        let mut world = World::new(graph);
+        let mut world = World::new(graph, settings.world_settings[0].clone());
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
-        world.player.apply_settings(&settings);
 
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
         let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
@@ -189,12 +194,12 @@ mod tests {
         assert_eq!(reached, locations);
 
         let mut settings = Settings::default();
-        settings.world_mut().difficulty = Difficulty::Gorlek;
+        settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
         let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        let mut world = World::new(graph);
+        let mut world = World::new(graph, settings.world_settings[0].clone());
 
-        world.player.difficulty = Difficulty::Unsafe;
+        world.player.settings.difficulty = Difficulty::Unsafe;
         world.player.inventory.grant(Item::Resource(Resource::Health), 7);
         world.player.inventory.grant(Item::Resource(Resource::Energy), 6);
         world.player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);

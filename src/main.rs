@@ -14,7 +14,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal}, util, languages::{headers::{self, parser::HeaderContext}, self}, preset::WorldPreset, Preset, Settings};
+use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, WorldSettings}, util, headers::{self, parser::HeaderContext}, preset::WorldPreset, Preset, Settings, logic};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
@@ -587,7 +587,6 @@ fn read_header() -> Result<String, String> {
     let mut stdin = stdin.lock(); // locking is optional
     let mut output = String::new();
 
-    // Could also `match` on the `Result` if you wanted to handle `Err` 
     loop {
         let result = stdin.read_to_string(&mut output).map_err(|err| format!("failed to read standard input: {err}"))?;
         if result == 0 {
@@ -652,7 +651,7 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), Box<dyn Error>> {
 
     let settings = parse_settings(args.seed, args.settings)?;
 
-    let graph = languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
+    let graph = logic::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
@@ -715,7 +714,7 @@ fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> 
 // TODO some of this logic probably belongs in the library
 fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let command = env::args().collect::<Vec<_>>().join(" ");
-    log::trace!("{}", command);
+    log::trace!("{command}");
 
     args.seed_file.set_extension("wotwr");
     let contents = util::read_file(&args.seed_file, "seeds")?;
@@ -723,12 +722,16 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let settings = Settings::from_seed(&contents).unwrap_or_else(|| {
         log::trace!("No settings found in seed, using default settings");
         Ok(Settings::default())
-    }).map_err(|err| format!("Error reading settings: {}", err))?;
+    }).map_err(|err| format!("Error reading settings: {err}"))?;
 
-    let graph = &languages::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
-    let mut world = World::new(graph);
+    let world_index = contents.lines().find_map(|line| line.strip_prefix("// This World: ").map(str::parse)).unwrap_or_else(|| {
+        log::trace!("No current world information found in seed, using first world");
+        Ok(0)
+    }).map_err(|err| format!("Error reading current world: {err}"))?;
 
-    world.player.apply_settings(&settings);
+    let graph = &logic::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
+    let world_settings = settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
+    let mut world = World::new(graph, world_settings);
 
     world.player.inventory.grant(Item::Resource(Resource::Health), args.health / 5);
     #[allow(clippy::cast_possible_truncation)]
@@ -808,15 +811,14 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
     let header = fs::read_to_string(path.clone()).map_err(|err| format!("Failed to read {}: {}", path.display(), err))?;
 
     let graph = Graph::default();
-    let mut world = World::new(&graph);
-    let settings = Settings::default();
+    let mut world = World::new(&graph, WorldSettings::default());
     let mut rng = rand::thread_rng();
 
     let mut context = HeaderContext::default();
 
     let name = path.file_stem().unwrap().to_string_lossy().into_owned();
     let header_block = headers::parser::parse_header(&name, &header, &mut world, &mut context, &HashMap::default(), &mut rng)?;
-    let flag_line = seedgen::write_flags(&settings, context.flags);
+    let flag_line = seedgen::write_flags(&world.player.settings, context.flags);
 
     let compiled = format!("{}{}", flag_line, header_block);
 

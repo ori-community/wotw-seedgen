@@ -10,7 +10,7 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 /// 
 /// # Examples
 /// 
-/// `Preset`s can be serialized and deserialized
+/// [`Preset`]s can be serialized and deserialized
 /// 
 /// ```
 /// # use seedgen::Preset;
@@ -28,7 +28,7 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 /// assert_eq!(preset, Preset::parse(&json).unwrap());
 /// ```
 /// 
-/// Use `Settings::apply_preset` to merge a `Preset` into existing `Settings`
+/// Use [`Settings::apply_preset`](crate::Settings::apply_preset) to merge a [`Preset`] into existing [`Settings`](crate::Settings)
 /// 
 /// ```
 /// # use seedgen::Preset;
@@ -45,7 +45,7 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Preset {
-    /// Names of further `Preset`s to use
+    /// Names of further [`Preset`]s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,19 +67,19 @@ pub struct Preset {
 }
 
 impl Preset {
-    /// Parse a `Preset` from json
+    /// Parse a [`Preset`] from json
     pub fn parse(input: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(input)
     }
-    /// Serialize the `Preset` into json format
+    /// Serialize the [`Preset`] into json format
     pub fn to_json(&self) -> String {
         // This is safe because the preset struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
     }
 
-    /// Find and read a `Preset` with the given name
+    /// Find and read a [`Preset`] with the given name
     /// 
-    /// The `Preset` will be searched as .json file in the current and /presets child directory
+    /// The [`Preset`] will be searched as .json file in the current and /presets child directory
     pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
         name.push_str(".json");
         let input = util::read_file(name, "presets")?;
@@ -91,7 +91,7 @@ impl Preset {
 /// 
 /// # Examples
 /// 
-/// `WorldPreset`s can be serialized and deserialized
+/// [`WorldPreset`]s can be serialized and deserialized
 /// 
 /// ```
 /// # use seedgen::preset::WorldPreset;
@@ -106,7 +106,7 @@ impl Preset {
 /// assert_eq!(world_preset, WorldPreset::parse(&json).unwrap());
 /// ```
 /// 
-/// Use `WorldSettings::apply_world_preset` to merge a `WorldPreset` into existing `WorldSettings`
+/// Use [`WorldSettings::apply_world_preset`](crate::settings::WorldSettings::apply_world_preset) to merge a [`WorldPreset`] into existing [`WorldSettings`](crate::settings::WorldSettings)
 /// 
 /// ```
 /// # use seedgen::preset::WorldPreset;
@@ -123,7 +123,7 @@ impl Preset {
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct WorldPreset {
-    /// Names of further `WorldPreset`s to use
+    /// Names of further [`WorldPreset`]s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]

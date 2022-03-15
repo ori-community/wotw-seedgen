@@ -6,6 +6,7 @@ use std::{
 use decorum::R32;
 use rand::Rng;
 use regex::Regex;
+use rustc_hash::FxHashMap;
 
 use crate::{
     ItemDetails,
@@ -15,8 +16,7 @@ use crate::{
     },
     inventory::Inventory,
     item::{Item, Resource, Skill, Shard, Command, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, WheelCommand, WheelBind, ShopCommand, UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary},
-    Settings,
-    util::{self, Zone, Icon, UberState, UberType, UberIdentifier, Position},
+    util::{self, Zone, Icon, UberState, UberType, UberIdentifier, Position}, settings::WorldSettings,
 };
 
 fn end_of_item<'a, I>(mut parts: I) -> Result<(), String>
@@ -992,7 +992,7 @@ fn remove_command(mut item: &str, world: &mut World, negative_inventory: &mut In
     Ok(())
 }
 #[inline]
-fn name_command(naming: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
+fn name_command(naming: &str, custom_items: &mut FxHashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = naming.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
@@ -1004,7 +1004,7 @@ fn name_command(naming: &str, custom_items: &mut HashMap<String, ItemDetails>) -
     Ok(())
 }
 #[inline]
-fn display_command(display: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
+fn display_command(display: &str, custom_items: &mut FxHashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = display.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
@@ -1016,7 +1016,7 @@ fn display_command(display: &str, custom_items: &mut HashMap<String, ItemDetails
     Ok(())
 }
 #[inline]
-fn price_command(price: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
+fn price_command(price: &str, custom_items: &mut FxHashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = price.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
@@ -1029,7 +1029,7 @@ fn price_command(price: &str, custom_items: &mut HashMap<String, ItemDetails>) -
     Ok(())
 }
 #[inline]
-fn icon_command(icon: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
+fn icon_command(icon: &str, custom_items: &mut FxHashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = icon.splitn(2, ' ');
     let item = parts.next().unwrap();
     parse_item(item)?;
@@ -1042,7 +1042,7 @@ fn icon_command(icon: &str, custom_items: &mut HashMap<String, ItemDetails>) -> 
     Ok(())
 }
 #[inline]
-fn parameter_command(parameter: &str, parameters: &mut HashMap<String, String>, param_values: &HashMap<&str, &str>) -> Result<(), String> {
+fn parameter_command(parameter: &str, parameters: &mut HashMap<String, String>, param_values: &FxHashMap<String, String>) -> Result<(), String> {
     let mut parts = parameter.splitn(2, ' ');
     let identifier = parts.next().unwrap();
     let default = parts.next().ok_or_else(|| String::from("Missing default value"))?;
@@ -1175,12 +1175,12 @@ pub struct HeaderContext {
     pub dependencies: Vec<String>,
     pub excludes: HashMap<String, String>,
     pub flags: Vec<String>,
-    pub custom_items: HashMap<String, ItemDetails>,
+    pub custom_items: FxHashMap<String, ItemDetails>,
     pub sets: Vec<String>,
     pub negative_inventory: Inventory,
 }
 
-pub fn parse_header<R>(name: &str, header: &str, world: &mut World, context: &mut HeaderContext, param_values: &HashMap<&str, HashMap<&str, &str>>, rng: &mut R) -> Result<String, String>
+pub fn parse_header<R>(name: &str, header: &str, world: &mut World, context: &mut HeaderContext, param_values: &FxHashMap<String, FxHashMap<String, String>>, rng: &mut R) -> Result<String, String>
 where R: Rng + ?Sized
 {
     let mut processed = String::with_capacity(header.len());
@@ -1333,7 +1333,7 @@ where R: Rng + ?Sized
 
 pub fn validate_header(name: &str, contents: &str) -> Result<(Vec<UberState>, HashMap<String, String>), String> {
     let mut context = HeaderContext::default();
-    parse_header(name, contents, &mut World::new(&Graph::default()), &mut context, &HashMap::default(), &mut rand::thread_rng())?;
+    parse_header(name, contents, &mut World::new(&Graph::default(), WorldSettings::default()), &mut context, &HashMap::default(), &mut rand::thread_rng())?;
 
     for mut dependency in context.dependencies {
         dependency.push_str(".wotwrh");
@@ -1343,10 +1343,10 @@ pub fn validate_header(name: &str, contents: &str) -> Result<(Vec<UberState>, Ha
     let mut occupied_states = Vec::new();
     let mut pool = Vec::new();
     let mut parameters = HashMap::new();
-    let param_values = HashMap::new();
+    let param_values = FxHashMap::default();
     let mut rng = rand::thread_rng();
     let graph = Graph::default();
-    let mut world = World::new(&graph);
+    let mut world = World::new(&graph, WorldSettings::default());
 
     let mut first_line = true;
     let mut skip_line = false;
@@ -1479,7 +1479,7 @@ pub fn validate_header(name: &str, contents: &str) -> Result<(Vec<UberState>, Ha
     Ok((occupied_states, context.excludes))
 }
 
-fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, settings: &Settings) -> Result<String, String> {
+fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, settings: &[&WorldSettings]) -> Result<String, String> {
     let re = Regex::new(&format!(r"^({})$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))?;
 
     for mut line in seeds[world_index].lines() {
@@ -1507,7 +1507,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
                 for other_world_index in other_worlds {
                     let actual_zone = where_is(&actual_item, other_world_index, seeds, graph, settings)?;
                     if &actual_zone != "Unknown" {
-                        let player_name = settings.get_world_name(other_world_index);
+                        let player_name = &settings[other_world_index].world_name;
 
                         return Ok(format!("{}'s {}", player_name, actual_zone));
                     }
@@ -1585,7 +1585,7 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
     Ok(locations)
 }
 
-pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &Settings) -> Result<(), String> {
+pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &[&WorldSettings]) -> Result<(), String> {
     let clone = seeds.clone();
 
     for (world_index, seed) in seeds.iter_mut().enumerate() {

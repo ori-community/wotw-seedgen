@@ -16,9 +16,44 @@ struct EmitterContext<'a> {
     used_states: FxHashSet<&'a str>,
 }
 
-fn build_glitch_requirement<'a>(glitch: &Trick, out: Requirement, context: &mut EmitterContext<'a>) -> Requirement {
-    if context.settings.world().tricks.contains(glitch) {
-        out
+fn build_trick_requirement(trick: &Trick, out: Requirement, context: &mut EmitterContext) -> Requirement {
+    if context.settings.any_contain_trick(trick) {
+        if context.settings.all_contain_trick(trick) {
+            out
+        } else {
+            build_and(vec![
+                Requirement::Trick(*trick),
+                out
+            ])
+        }
+    } else {
+        Requirement::Impossible
+    }
+}
+
+fn build_difficulty_requirement(difficulty: Difficulty, out: Requirement, region: bool, context: &mut EmitterContext) -> Requirement {
+    if region {
+        if context.settings.any_have_difficulty(difficulty) {
+            if context.settings.lowest_difficulty() >= difficulty {
+                out
+            } else {
+                build_and(vec![
+                    Requirement::Difficulty(difficulty),
+                    out
+                ])
+            }
+        } else {
+            Requirement::Impossible
+        }
+    } else if context.settings.highest_difficulty() >= difficulty {
+        if context.settings.lowest_difficulty() >= difficulty {
+            out
+        } else {
+            build_and(vec![
+                Requirement::Difficulty(difficulty),
+                out
+            ])
+        }
     } else {
         Requirement::Impossible
     }
@@ -28,19 +63,8 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
     match requirement {
         parser::Requirement::Free => Requirement::Free,
         parser::Requirement::Definition(identifier) => build_requirement_group(&context.definitions[identifier], region, context),
-        parser::Requirement::Difficulty(difficulty) =>
-            if region {
-                if context.settings.world().difficulty == *difficulty {
-                    Requirement::Free
-                } else {
-                    Requirement::Impossible
-                }
-            } else if context.settings.world().difficulty >= *difficulty {
-                Requirement::Free
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::Trick(glitch) => build_glitch_requirement(glitch, Requirement::Free, context),
+        parser::Requirement::Difficulty(difficulty) => build_difficulty_requirement(*difficulty, Requirement::Free, region, context),
+        parser::Requirement::Trick(glitch) => build_trick_requirement(glitch, Requirement::Free, context),
         parser::Requirement::Skill(skill) => Requirement::Skill(*skill),
         parser::Requirement::EnergySkill(skill, amount) => Requirement::EnergySkill(*skill, (*amount).into()),
         parser::Requirement::SpiritLight(amount) => Requirement::SpiritLight(*amount),
@@ -57,69 +81,52 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::Requirement::Combat(enemies) => Requirement::Combat(enemies.clone()),
         parser::Requirement::Boss(health) => Requirement::Boss(f32::from(*health)),
         parser::Requirement::BreakWall(health) => Requirement::BreakWall(f32::from(*health)),
-        parser::Requirement::BreakCrystal => {
-            let mut allowed_weapons = vec![
+        parser::Requirement::BreakCrystal =>
+            build_or(vec![
                 Requirement::Skill(Skill::Sword),
                 Requirement::Skill(Skill::Hammer),
                 Requirement::EnergySkill(Skill::Bow, 1.0),
-            ];
-            if context.settings.world().difficulty >= Difficulty::Gorlek {
-                allowed_weapons.push(Requirement::EnergySkill(Skill::Shuriken, 1.0));
-                allowed_weapons.push(Requirement::EnergySkill(Skill::Grenade, 1.0));
-            }
-            if context.settings.world().difficulty >= Difficulty::Unsafe {
-                allowed_weapons.push(Requirement::EnergySkill(Skill::Spear, 1.0));
-            }
-            Requirement::Or(allowed_weapons)
-        },
-        parser::Requirement::ShurikenBreak(health) => build_glitch_requirement(&Trick::ShurikenBreak, Requirement::ShurikenBreak(f32::from(*health)), context),
-        parser::Requirement::SentryBreak(health) => build_glitch_requirement(&Trick::SentryBreak, Requirement::SentryBreak(f32::from(*health)), context),
-        parser::Requirement::HammerBreak => build_glitch_requirement(&Trick::HammerBreak, Requirement::Skill(Skill::Hammer), context),
-        parser::Requirement::SpearBreak => build_glitch_requirement(&Trick::SpearBreak, Requirement::EnergySkill(Skill::Spear, 1.0), context),
-        parser::Requirement::SentryJump(amount) => {
-            let mut allowed_weapons = Vec::new();
-            if context.settings.world().tricks.contains(&Trick::SwordSentryJump) { allowed_weapons.push(Requirement::Skill(Skill::Sword)); }
-            if context.settings.world().tricks.contains(&Trick::HammerSentryJump) { allowed_weapons.push(Requirement::Skill(Skill::Hammer)); }
-
-            if allowed_weapons.len() > 1 {
-                Requirement::And(vec![
-                    Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
-                    Requirement::Or(allowed_weapons),
-                ])
-            } else if let Some(single) = allowed_weapons.pop() {
-                Requirement::And(vec![
-                    Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
-                    single,
-                ])
-            } else {
-                Requirement::Impossible
-            }
-        },
-        parser::Requirement::SwordSentryJump(amount) => build_glitch_requirement(&Trick::SwordSentryJump,
+                build_difficulty_requirement(Difficulty::Gorlek, Requirement::EnergySkill(Skill::Shuriken, 1.0), false, context),
+                build_difficulty_requirement(Difficulty::Gorlek, Requirement::EnergySkill(Skill::Grenade, 1.0), false, context),
+                build_difficulty_requirement(Difficulty::Unsafe, Requirement::EnergySkill(Skill::Spear, 1.0), false, context),
+            ]),
+        parser::Requirement::ShurikenBreak(health) => build_trick_requirement(&Trick::ShurikenBreak, Requirement::ShurikenBreak(f32::from(*health)), context),
+        parser::Requirement::SentryBreak(health) => build_trick_requirement(&Trick::SentryBreak, Requirement::SentryBreak(f32::from(*health)), context),
+        parser::Requirement::HammerBreak => build_trick_requirement(&Trick::HammerBreak, Requirement::Skill(Skill::Hammer), context),
+        parser::Requirement::SpearBreak => build_trick_requirement(&Trick::SpearBreak, Requirement::EnergySkill(Skill::Spear, 1.0), context),
+        parser::Requirement::SentryJump(amount) => 
+            build_and(vec![
+                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                build_or(vec![
+                    build_trick_requirement(&Trick::SwordSentryJump, Requirement::Skill(Skill::Sword), context),
+                    build_trick_requirement(&Trick::HammerSentryJump, Requirement::Skill(Skill::Hammer), context),
+                ]),
+            ]),
+        parser::Requirement::SwordSentryJump(amount) => build_trick_requirement(&Trick::SwordSentryJump,
             Requirement::And(vec![
                 Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
                 Requirement::Skill(Skill::Sword),
             ]), context),
-        parser::Requirement::HammerSentryJump(amount) => build_glitch_requirement(&Trick::HammerSentryJump,
+        parser::Requirement::HammerSentryJump(amount) => build_trick_requirement(&Trick::HammerSentryJump,
             Requirement::And(vec![
                 Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
                 Requirement::Skill(Skill::Hammer),
             ]), context),
-        parser::Requirement::SentryBurn(amount) => build_glitch_requirement(&Trick::SentryBurn, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
-        parser::Requirement::LaunchSwap => build_glitch_requirement(&Trick::LaunchSwap, Requirement::Skill(Skill::Launch), context),
-        parser::Requirement::SentrySwap(amount) => build_glitch_requirement(&Trick::SentrySwap, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
-        parser::Requirement::FlashSwap => build_glitch_requirement(&Trick::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
-        parser::Requirement::BlazeSwap(amount) => build_glitch_requirement(&Trick::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
-        parser::Requirement::WaveDash => build_glitch_requirement(&Trick::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
-        parser::Requirement::GrenadeJump => build_glitch_requirement(&Trick::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
+        parser::Requirement::SentryBurn(amount) => build_trick_requirement(&Trick::SentryBurn, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::LaunchSwap => build_trick_requirement(&Trick::LaunchSwap, Requirement::Skill(Skill::Launch), context),
+        parser::Requirement::SentrySwap(amount) => build_trick_requirement(&Trick::SentrySwap, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::FlashSwap => build_trick_requirement(&Trick::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
+        parser::Requirement::BlazeSwap(amount) => build_trick_requirement(&Trick::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
+        parser::Requirement::WaveDash => build_trick_requirement(&Trick::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
+        parser::Requirement::GrenadeJump => build_trick_requirement(&Trick::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
         parser::Requirement::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
-        parser::Requirement::HammerJump => build_glitch_requirement(&Trick::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
-        parser::Requirement::SwordJump => build_glitch_requirement(&Trick::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
-        parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Trick::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
-        parser::Requirement::SentryRedirect(amount) => build_glitch_requirement(&Trick::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
-        parser::Requirement::GlideJump => build_glitch_requirement(&Trick::GlideJump, Requirement::Skill(Skill::Glide), context),
-        parser::Requirement::GlideHammerJump => build_glitch_requirement(&Trick::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
-        parser::Requirement::SpearJump(amount) => build_glitch_requirement(&Trick::SpearJump, Requirement::EnergySkill(Skill::Spear, (*amount).into()), context),
+        parser::Requirement::HammerJump => build_trick_requirement(&Trick::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::SwordJump => build_trick_requirement(&Trick::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::GrenadeRedirect(amount) => build_trick_requirement(&Trick::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
+        parser::Requirement::SentryRedirect(amount) => build_trick_requirement(&Trick::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::GlideJump => build_trick_requirement(&Trick::GlideJump, Requirement::Skill(Skill::Glide), context),
+        parser::Requirement::GlideHammerJump => build_trick_requirement(&Trick::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
+        parser::Requirement::SpearJump(amount) => build_trick_requirement(&Trick::SpearJump, Requirement::EnergySkill(Skill::Spear, (*amount).into()), context),
     }
 }
 

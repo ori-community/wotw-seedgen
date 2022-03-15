@@ -4,7 +4,7 @@ use smallvec::{SmallVec, smallvec};
 use super::player::Player;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard, Teleporter};
-use crate::settings::Difficulty;
+use crate::settings::{Difficulty, Trick};
 use crate::util::{Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
@@ -13,6 +13,8 @@ type Itemset = Vec<(Inventory, Orbs)>;
 pub enum Requirement {
     Free,
     Impossible,
+    Difficulty(Difficulty),
+    Trick(Trick),
     Skill(Skill),
     EnergySkill(Skill, f32),
     NonConsumingEnergySkill(Skill),
@@ -39,7 +41,7 @@ impl Requirement {
                 energy: -cost,
                 ..Orbs::default()
             }
-        ])} else if player.difficulty >= Difficulty::Unsafe && player.inventory.has(&Item::Shard(Shard::LifePact), 1) && orbs.energy + orbs.health > cost { Some(smallvec![
+        ])} else if player.settings.difficulty >= Difficulty::Unsafe && player.inventory.has(&Item::Shard(Shard::LifePact), 1) && orbs.energy + orbs.health > cost { Some(smallvec![
             Orbs {
                 health: cost - orbs.energy,
                 energy: -orbs.energy,
@@ -48,7 +50,7 @@ impl Requirement {
     }
     fn nonconsuming_cost_is_met(cost: f32, player: &Player, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
         if orbs.energy >= cost || (
-            player.difficulty >= Difficulty::Unsafe &&
+            player.settings.difficulty >= Difficulty::Unsafe &&
             player.inventory.has(&Item::Shard(Shard::LifePact), 1) &&
             orbs.energy + orbs.health > cost
         ) {
@@ -60,6 +62,11 @@ impl Requirement {
         match self {
             Requirement::Free => return Some(smallvec![Orbs::default()]),
             Requirement::Impossible => return None,
+            Requirement::Difficulty(difficulty) =>{
+                //log::info!("checking difficulty requirement: {:?} >= {:?}", player.settings.difficulty, difficulty);
+                if player.settings.difficulty >= *difficulty { return Some(smallvec![Orbs::default()]); }
+            }Requirement::Trick(trick) =>
+                if player.settings.tricks.contains(trick) { return Some(smallvec![Orbs::default()]); }
             Requirement::Skill(skill) =>
                 if player.inventory.has(&Item::Skill(*skill), 1) { return Some(smallvec![Orbs::default()]); },
             Requirement::EnergySkill(skill, amount) =>
@@ -153,10 +160,10 @@ impl Requirement {
 
                         if enemy.aerial() { aerial = true; }
                         if enemy.dangerous() { dangerous = true; }
-                        if player.difficulty < Difficulty::Unsafe && enemy == &Enemy::Bat && !player.inventory.has(&Item::Skill(Skill::Bash), 1) { return None; }
+                        if player.settings.difficulty < Difficulty::Unsafe && enemy == &Enemy::Bat && !player.inventory.has(&Item::Skill(Skill::Bash), 1) { return None; }
                         if enemy == &Enemy::Sandworm {
                             if player.inventory.has(&Item::Skill(Skill::Burrow), 1) { continue; }
-                            else if player.difficulty < Difficulty::Unsafe { return None; }
+                            else if player.settings.difficulty < Difficulty::Unsafe { return None; }
                         }
 
                         if enemy.shielded() {
@@ -164,7 +171,7 @@ impl Requirement {
                                 energy -= player.use_cost(weapon) * f32::from(*amount);
                             } else { return None; }
                         }
-                        let armor_mod = if enemy.armored() && player.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
+                        let armor_mod = if enemy.armored() && player.settings.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
 
                         let ranged = enemy.ranged();
                         if ranged && ranged_weapon.is_none() { return None; }
@@ -173,12 +180,12 @@ impl Requirement {
                         energy -= player.destroy_cost(enemy.health(), used_weapon, enemy.flying()) * f32::from(*amount) * armor_mod;
                     }
 
-                    if player.difficulty < Difficulty::Unsafe && aerial && !(
+                    if player.settings.difficulty < Difficulty::Unsafe && aerial && !(
                         player.inventory.has(&Item::Skill(Skill::DoubleJump), 1) ||
                         player.inventory.has(&Item::Skill(Skill::Launch), 1) ||
-                        player.difficulty >= Difficulty::Gorlek && player.inventory.has(&Item::Skill(Skill::Bash), 1)
+                        player.settings.difficulty >= Difficulty::Gorlek && player.inventory.has(&Item::Skill(Skill::Bash), 1)
                     ) { return None; }
-                    if player.difficulty < Difficulty::Unsafe && dangerous && !(
+                    if player.settings.difficulty < Difficulty::Unsafe && dangerous && !(
                         player.inventory.has(&Item::Skill(Skill::DoubleJump), 1) ||
                         player.inventory.has(&Item::Skill(Skill::Dash), 1) ||
                         player.inventory.has(&Item::Skill(Skill::Bash), 1) ||
@@ -191,7 +198,7 @@ impl Requirement {
             },
             Requirement::ShurikenBreak(health) =>
                 if player.inventory.has(&Item::Skill(Skill::Shuriken), 1) {
-                    let clip_mod = if player.difficulty >= Difficulty::Unsafe { 2.0 } else { 3.0 };
+                    let clip_mod = if player.settings.difficulty >= Difficulty::Unsafe { 2.0 } else { 3.0 };
                     let cost = player.destroy_cost(*health, Skill::Shuriken, false) * clip_mod;
                     return Requirement::cost_is_met(cost, player, orbs);
                 },
@@ -250,7 +257,7 @@ impl Requirement {
     fn needed_for_cost(cost: f32, player: &Player) -> Itemset {
         let mut itemsets = vec![(Inventory::default(), Orbs{ energy: -cost, ..Orbs::default() })];
 
-        if player.difficulty >= Difficulty::Unsafe && cost > 0.0 && !player.inventory.has(&Item::Shard(Shard::Overcharge), 1) {
+        if player.settings.difficulty >= Difficulty::Unsafe && cost > 0.0 && !player.inventory.has(&Item::Shard(Shard::Overcharge), 1) {
             itemsets.push((Inventory::from(Item::Shard(Shard::Overcharge)), Orbs{ energy: -cost / 2.0, ..Orbs::default() }));
         }
 
@@ -298,7 +305,7 @@ impl Requirement {
     pub fn items_needed(&self, player: &Player, states: &[usize]) -> Itemset {
         match self {
             Requirement::Free => vec![(Inventory::default(), Orbs::default())],
-            Requirement::Impossible => vec![],
+            Requirement::Impossible | Requirement::Difficulty(_) | Requirement::Trick(_) => vec![],
             Requirement::Skill(skill) => vec![(Inventory::from(Item::Skill(*skill)), Orbs::default())],
             Requirement::EnergySkill(skill, amount) => {
                 let cost = player.use_cost(*skill) * *amount;
@@ -328,7 +335,7 @@ impl Requirement {
 
                 itemsets.push((Inventory::default(), Orbs { health: -cost, ..Orbs::default() }));
 
-                if player.difficulty >= Difficulty::Gorlek && !player.inventory.has(&Item::Shard(Shard::Resilience), 1) {
+                if player.settings.difficulty >= Difficulty::Gorlek && !player.inventory.has(&Item::Shard(Shard::Resilience), 1) {
                     let resilience_cost = cost * 0.9;
 
                     itemsets.push((Inventory::from(Item::Shard(Shard::Resilience)), Orbs { health: -resilience_cost, ..Orbs::default() }));
@@ -358,7 +365,7 @@ impl Requirement {
                 itemsets
             },
             Requirement::ShurikenBreak(health) => {
-                let clip_mod = if player.difficulty >= Difficulty::Unsafe { 2.0 } else { 3.0 };
+                let clip_mod = if player.settings.difficulty >= Difficulty::Unsafe { 2.0 } else { 3.0 };
                 let cost = player.destroy_cost(*health, Skill::Shuriken, false) * clip_mod;
                 Requirement::needed_for_weapon(Skill::Shuriken, cost, player)
             },
@@ -378,7 +385,7 @@ impl Requirement {
                     if enemy.ranged() { ranged = true; }
                     else { melee = true; }
                     if enemy.shielded() { shielded = true; }
-                    if player.difficulty < Difficulty::Unsafe && enemy == &Enemy::Bat { bash = true; }
+                    if player.settings.difficulty < Difficulty::Unsafe && enemy == &Enemy::Bat { bash = true; }
                     if enemy == &Enemy::Sandworm { burrow = true; }
                 }
 
@@ -393,7 +400,7 @@ impl Requirement {
                     player.shield_progression_weapons()
                 } else { smallvec![Skill::Spear] };
                 let use_burrow: SmallVec<[_; 2]> = if burrow {
-                    if player.difficulty < Difficulty::Unsafe || player.inventory.has(&Item::Skill(Skill::Burrow), 1) {
+                    if player.settings.difficulty < Difficulty::Unsafe || player.inventory.has(&Item::Skill(Skill::Burrow), 1) {
                         smallvec![true]
                     } else {
                         smallvec![true, false]
@@ -433,7 +440,7 @@ impl Requirement {
                             if enemy.shielded() {
                                 cost += player.use_cost(shield_weapon) * f32::from(*amount);
                             }
-                            let armor_mod = if enemy.armored() && player.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
+                            let armor_mod = if enemy.armored() && player.settings.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
 
                             let used_weapon = if enemy.ranged() { ranged_weapon } else { weapon };
 
@@ -453,18 +460,18 @@ impl Requirement {
                     }
                 }
 
-                if player.difficulty < Difficulty::Unsafe && aerial {
+                if player.settings.difficulty < Difficulty::Unsafe && aerial {
                     let mut ranged_skills = vec![
                         Item::Skill(Skill::DoubleJump),
                         Item::Skill(Skill::Launch),
                     ];
-                    if player.difficulty >= Difficulty::Gorlek { ranged_skills.push(Item::Skill(Skill::Bash)); }
+                    if player.settings.difficulty >= Difficulty::Gorlek { ranged_skills.push(Item::Skill(Skill::Bash)); }
 
                     if !ranged_skills.iter().any(|skill| player.inventory.has(skill, 1)) {
                         itemsets = Requirement::combine_itemset_items(itemsets, &ranged_skills);
                     }
                 }
-                if player.difficulty < Difficulty::Unsafe && dangerous {
+                if player.settings.difficulty < Difficulty::Unsafe && dangerous {
                     let evasion_skills = [
                         Item::Skill(Skill::DoubleJump),
                         Item::Skill(Skill::Dash),
@@ -476,7 +483,7 @@ impl Requirement {
                         itemsets = Requirement::combine_itemset_items(itemsets, &evasion_skills);
                     }
                 }
-                if player.difficulty < Difficulty::Unsafe && bash && !player.inventory.has(&Item::Skill(Skill::Bash), 1) {
+                if player.settings.difficulty < Difficulty::Unsafe && bash && !player.inventory.has(&Item::Skill(Skill::Bash), 1) {
                     Requirement::combine_itemset_item(&mut itemsets, &Item::Skill(Skill::Bash));
                 }
 
@@ -510,11 +517,13 @@ impl Requirement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Settings;
+    use crate::settings::WorldSettings;
 
     #[test]
     fn is_met() {
-        let mut player = Player::default();
+        let mut player = Player::new(WorldSettings::default());
+        let empty_player = player.clone();
+
         player.inventory.grant(Item::Resource(Resource::Health), 1);
         let mut states = FxHashSet::default();
         let orbs = Orbs::default();
@@ -533,9 +542,9 @@ mod tests {
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
 
@@ -563,60 +572,60 @@ mod tests {
         let req = Requirement::Danger(60.0);
         assert_eq!(req.is_met(&player, &states, Orbs { health: 30.0, energy: player.max_energy() }), Some(smallvec![Orbs { health: 30.0, energy: -1.0 }]));
 
-        player = Player::default();
+        player = empty_player.clone();
         let req = Requirement::BreakWall(12.0);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { ..orbs }]));
-        player = Player::default();
+        player = empty_player.clone();
         player.inventory.grant(Item::Skill(Skill::Grenade), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 3);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
-        player = Player::default();
+        player = empty_player.clone();
         let req = Requirement::BreakWall(16.0);
         player.inventory.grant(Item::Skill(Skill::Grenade), 1);
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
 
-        player = Player::default();
+        player = empty_player.clone();
         let req = Requirement::ShurikenBreak(12.0);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 4);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
         player.inventory.grant(Item::Resource(Resource::Energy), 6);
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -6.0, ..orbs }]));
 
-        player = Player::default();
+        player = empty_player.clone();
         let req = Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]);
         player.inventory.grant(Item::Skill(Skill::Bow), 1);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 7);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -3.25, ..orbs }]));
         player.inventory.grant(Item::Resource(Resource::Energy), 6);
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -6.5, ..orbs }]));
-        player = Player::default();
+        player = empty_player.clone();
         let req = Requirement::Combat(smallvec![(Enemy::Sandworm, 1), (Enemy::Bat, 1), (Enemy::EnergyRefill, 99), (Enemy::ShieldMiner, 2), (Enemy::EnergyRefill, 1), (Enemy::Balloon, 4)]);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         player.inventory.grant(Item::Skill(Skill::Spear), 1);
         player.inventory.grant(Item::Resource(Resource::Energy), 27);
-        player.difficulty = Difficulty::Gorlek;
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Gorlek;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -14.0, ..orbs }]));
@@ -624,26 +633,26 @@ mod tests {
         player.inventory.grant(Item::Skill(Skill::Bash), 1);
         player.inventory.grant(Item::Skill(Skill::Launch), 1);
         player.inventory.grant(Item::Skill(Skill::Burrow), 1);
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -33.0, ..orbs }]));
-        player = Player::default();
+        player = empty_player.clone();
         let req = Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]);
         player.inventory.grant(Item::Skill(Skill::Spear), 1);
         player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         player.inventory.grant(Item::Resource(Resource::Energy), 4);
-        player.difficulty = Difficulty::Gorlek;
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Gorlek;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 11);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -8.0, ..orbs }]));
 
-        player = Player::default();
+        player = empty_player.clone();
         let a = Requirement::EnergySkill(Skill::Blaze, 2.0);
         let b = Requirement::Damage(20.0);
         let c = Requirement::EnergySkill(Skill::Blaze, 1.0);
@@ -652,7 +661,7 @@ mod tests {
         player.inventory.grant(Item::Resource(Resource::Energy), 4);
         player.inventory.grant(Item::Resource(Resource::Health), 5);
         let req = Requirement::And(vec![c.clone(), d.clone()]);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { health: -10.0, energy: -1.0 }]));
         let req = Requirement::Or(vec![a.clone(), b.clone()]);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }, Orbs { health: -20.0, ..orbs }]));
@@ -669,8 +678,8 @@ mod tests {
         let req = Requirement::Or(vec![b.clone(), Requirement::Free]);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs::default()]));
 
-        player = Player::default();
-        player.difficulty = Difficulty::Unsafe;
+        player = empty_player.clone();
+        player.settings.difficulty = Difficulty::Unsafe;
         player.inventory.grant(Item::Resource(Resource::Health), 7);
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         let req = Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]);
@@ -687,8 +696,7 @@ mod tests {
 
     #[test]
     fn items_needed() {
-        let mut player = Player::default();
-        player.spawn(&Settings::default());
+        let mut player = Player::new(WorldSettings::default());
         let states = Vec::default();
         let orbs = Orbs::default();
 
@@ -710,12 +718,12 @@ mod tests {
 
         let req = Requirement::EnergySkill(Skill::Grenade, 2.0);
         assert_eq!(req.items_needed(&player, &states), vec![(Inventory::from(Item::Skill(Skill::Grenade)), Orbs { energy: -4.0, ..orbs })]);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::from(Item::Skill(Skill::Grenade)), Orbs { energy: -2.0, ..orbs }),
             (Inventory::from(vec![Item::Skill(Skill::Grenade), Item::Shard(Shard::Overcharge)]), Orbs { energy: -1.0, ..orbs }),
         ]);
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
 
         let req = Requirement::Resource(Resource::ShardSlot, 3);
         assert_eq!(req.items_needed(&player, &states), vec![(Inventory::from((Item::Resource(Resource::ShardSlot), 3)), orbs)]);
@@ -728,12 +736,12 @@ mod tests {
 
         let req = Requirement::Damage(36.0);
         assert_eq!(req.items_needed(&player, &states), vec![(Inventory::default(), Orbs { health: -36.0, ..orbs })]);
-        player.difficulty = Difficulty::Gorlek;
+        player.settings.difficulty = Difficulty::Gorlek;
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::default(), Orbs { health: -36.0, ..orbs }),
             (Inventory::from(Item::Shard(Shard::Resilience)), Orbs { health: -36.0 * 0.9, ..orbs }),
         ]);
-        player.difficulty = Difficulty::Moki;
+        player.settings.difficulty = Difficulty::Moki;
 
         let req = Requirement::BreakWall(12.0);
         assert_eq!(req.items_needed(&player, &states), vec![
@@ -745,7 +753,7 @@ mod tests {
             (Inventory::from(Item::Skill(Skill::Blaze)), Orbs { energy: -2.0, ..orbs }),
             (Inventory::from(Item::Skill(Skill::Spear)), Orbs { energy: -4.0, ..orbs }),
         ]);
-        player.difficulty = Difficulty::Unsafe;
+        player.settings.difficulty = Difficulty::Unsafe;
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::from(Item::Skill(Skill::Sword)), orbs),
             (Inventory::from(Item::Skill(Skill::Hammer)), orbs),
@@ -771,7 +779,7 @@ mod tests {
         ]);
 
         let req = Requirement::Combat(smallvec![(Enemy::Slug, 1)]);
-        player = Player::default();
+        player = Player::new(WorldSettings::default());
 
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::from(Item::Skill(Skill::Sword)), orbs),
