@@ -9961,7 +9961,7 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
   conn UpperPools.BeforeKeystoneDoor:  # connections using the bubble have to start from here, others originate from UpperPools.KeystoneRoom
     gorlek, UpperPools.KeystoneRoomBubbleFree: Flap, DoubleJump, TripleJump  # guide the bubble to UpperPools.KeystoneRoom then jump on it
     unsafe, UpperPools.KeystoneRoomBubbleFree: Flap, SwordSJump=1
-  conn UpperPools.BubbleSpamRoom:  # connections using the bubble have to start from here, others originate from BeforeKeystoneDoor
+  conn UpperPools.RightBubbleSpamRoom:  # connections using the bubble have to start from here, others originate from BeforeKeystoneDoor
     moki, UpperPools.KeystoneRoomBubbleFree: Flap, DoubleJump, Dash, Grapple  # seems to be the intended strat
     gorlek, UpperPools.KeystoneRoomBubbleFree: Flap, Grapple, DoubleJump OR Dash
     unsafe, UpperPools.KeystoneRoomBubbleFree:
@@ -10088,7 +10088,7 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
   conn UpperPools.KeystoneRoom:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek: free
-  conn UpperPools.BubbleSpamRoom:
+  conn UpperPools.RightBubbleSpamRoom:
     moki:
       DoubleJump, Bash, Grenade=1
       Launch
@@ -10444,12 +10444,32 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
         Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.DrainRoomPurpleWall, Damage=60, Damage=20, Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
-anchor UpperPools.BubbleSpamRoom at -1586, -4053:  # To the right of where all the bubbles rise
+anchor UpperPools.RightBubbleSpamRoom at -1586, -4053:  # To the right of where all the bubbles rise
   refill Checkpoint
+
+  state UpperPools.BubbleSpamLever:
+    moki:
+      Combat=Bee+Skeeto, DoubleJump, Dash OR Glide
+      Bash, DoubleJump, Dash OR Glide
+      Launch, DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch OR Bash
+      Combat=Bee+Skeeto, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+    kii:
+      Combat=Bee+Skeeto, DoubleJump OR Dash
+    unsafe:
+      Sword OR Hammer OR DoubleJump
+      Combat=Bee+Skeeto, Shuriken=1 OR Sentry=2
 
   pickup UpperPools.FishPoolEX:
     moki: Water, Bash OR WaterDash OR Damage=10  # just in case someone's troubled by the fish
     gorlek: Water
+    kii:
+      Damage=40
+      WaterDash, Damage=20
+    unsafe:
+      Damage=25  # dboost on a fish to avoid one water dboost
+      Bash  # You can bash the fishes before entering the water
   pickup UpperPools.FishPoolOre:
     moki:
       DoubleJump, Bash, Dash OR Glide
@@ -10458,35 +10478,60 @@ anchor UpperPools.BubbleSpamRoom at -1586, -4053:  # To the right of where all t
     gorlek:
       SentryJump=1
       DoubleJump, Bash, TripleJump OR Sword
+    kii:
+      Bash  # Juggle the exploding enemy
+    unsafe: Dash  # walljump on the bubbles by dashing into them
+  pickup UpperPools.RightBubblesEX:  # paths using the torpedo originate from LeftBubbleSpamRoom 
+    moki: Water, WaterDash
+    kii: WaterDash, Damage=100
     unsafe:
-      Bash  # Juggle the exploding enemyq
-  pickup UpperPools.LeftBubblesEX:  # beautiful autosave placement right there
-    moki: Water
-  pickup UpperPools.RightBubblesEX:
-    moki:
-      Water, WaterBreath, Bash, DoubleJump OR Launch
-      Water, WaterDash
-    gorlek:
-      Water, Bash, Grenade=1 OR DoubleJump OR Launch
-    unsafe:  # The torpedo won't hit you if you are touching the breakable wall
-      Water, Grenade=1
-      Water, DoubleJump, TripleJump, Sword OR Hammer
-      Water, SwordSJump=1  # sword combo before hitting the spikes
-      Water, Launch, Damage=20
+      Grenade=1, Water OR Damage=140
+      WaterDash, Damage=80
   pickup UpperPools.BubblesEC:
-    moki:
-      Combat=Bee+Skeeto, DoubleJump, Dash OR Glide
-      Bash, DoubleJump, Dash OR Glide
-      Launch, DoubleJump OR Dash OR Glide
-    gorlek:
-      Combat=Bee+Skeeto, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
-      Bash, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
-      Bash, Dash OR Glide OR Sword  # Bash the mosquitos
-      Bash, Hammer, Damage=20
-      Launch
+    moki: UpperPools.BubbleSpamLever, DoubleJump OR Dash OR Glide OR Launch
+    gorlek: UpperPools.BubbleSpamLever
 
   conn UpperPools.BeforeKeystoneDoor: free
+  conn UpperPools.LeftBubbleSpamRoom:
+    moki: Water  # Don't actually need anything, Water is just in case you missed a bubble
+    gorlek: free
 
+anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on top of the torpedo  
+  refill Checkpoint
+  
+  pickup UpperPools.LeftBubblesEX:  # beautiful autosave placement right there
+    moki: Water
+    kii:
+      Damage=140
+      WaterDash, Damage=60
+  pickup UpperPools.RightBubblesEX:  # These paths use the torpedo to break the wall. Paths using another solution for the wall originate from UpperPools.RightBubbleSpamRoom
+    moki:
+      Water, Bash, WaterBreath, DoubleJump OR Launch
+      Water, Bash, WaterDash
+    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
+    kii:  # bait the torpedo into the wall. No dirty swim path because you can't afford to stay in the water
+      Water, Launch
+      Water, DoubleJump, TripleJump  # Climb the anemone wall once it's closed again
+    unsafe:
+      Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the porpedo and activating the anemone
+      Bash, Damage=120, Damage=140, Launch OR SwordSJump=1  # bash the torpedo when it spawns then regen and use the bubbles to return safely to the other side
+      Water, DoubleJump, Sword OR Hammer  # Climb the anemone wall once it's closed again
+  
+  conn UpperPools.RightBubbleSpamRoom:
+    moki:
+      Water, Bash, WaterBreath, DoubleJump OR Launch
+      Water, Bash, WaterDash
+    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
+    kii:
+      Launch, Water OR Damage=80
+      DoubleJump, TripleJump, Water OR Damage=80
+      Water, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
+      Damage=60, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
+    unsafe:
+      WaterDash, Sword, Water OR Damage=120  # Pogo the torpedo
+      Water, Launch OR SwordSJump=1
+      Damage=60, Launch OR SwordSJump=1
+      
 # checkpoint at -1386, -4062
 
 region WestPools:
