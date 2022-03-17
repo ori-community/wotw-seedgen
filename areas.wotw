@@ -321,7 +321,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       Bash, DoubleJump OR Dash
       Bash, Grenade=1, Glide OR Grapple
       Launch
-      MarshSpawn.CaveFight, DoubleJump OR Dash OR Launch  # go through the fight room
+      MarshSpawn.CaveFight, DoubleJump OR Dash  # go through the fight room
       MarshSpawn.CaveFight, Bash, Grenade=1  # go through the fight room
     gorlek:
       DoubleJump
@@ -332,7 +332,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       Sword  # Pogo on the slime and slash to the left, Upslash to reach the branch
       Hammer  # weapon floats
       Bash  # use slimes
-      MarshSpawn.CaveFight, Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1  # maybe
+      MarshSpawn.CaveFight, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
 
 # checkpoint at -845, -4438
 
@@ -341,8 +341,11 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
   refill Energy=1:
     unsafe: BreakCrystal  # slightly out of sight
 
-  quest MarshSpawn.CaveKS: free
+  state MarshSpawn.BurrowArena:
+    moki: Regenerate, Damage=40, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug, Bash, DoubleJump OR Launch
 
+  quest MarshSpawn.CaveKS: free
+  
   pickup MarshSpawn.CaveOre:
     moki:
       DoubleJump OR Launch
@@ -351,8 +354,6 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       SentryJump=1
     kii:
       Sentry=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer OR Dash
-    unsafe:
-      Sword, Shuriken=1  # downslash on a shuriken
   pickup MarshSpawn.BurrowOre:
     moki:
       Burrow, DoubleJump, Bash, Dash OR Glide OR Grenade=1
@@ -367,7 +368,19 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Burrow, Sword
       Burrow, Hammer, Damage=10
   pickup MarshSpawn.LifepactShard:
-    moki: Regenerate, Damage=40, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug, Bash, DoubleJump OR Launch
+    moki, MarshSpawn.BurrowArena:
+      Combat=Bat+WeakSlug, DoubleJump OR Dash OR Launch
+      Bash, DoubleJump OR Dash OR Launch
+    gorlek, MarshSpawn.BurrowArena:
+      Damage=10, Sword  # Use sword to combat slug/bat
+      Damage=10, Glide, Combat=Bat+WeakSlug OR Bash
+    kii, MarshSpawn.BurrowArena:
+      Sword OR Hammer  # Use weapon to combat slug/bat
+      Glide, Combat=Bat+WeakSlug OR Bash
+      Combat=Bat+WeakSlug, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      Bash, Grenade=1 OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    unsafe, MarshSpawn.BurrowArena: Bash  # small ledge near the first spikes to avoid a dboost
+      
   pickup MarshSpawn.BurrowsApproachLedgeEX:
     moki: Bash, DoubleJump OR Launch
     gorlek:
@@ -853,7 +866,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
   state HowlsDen.DoubleJumpTreeCombat:
-    moki: Combat=Mantis+Lizard  # the game puts this before regen. It's why all the enemies drop tons of health
+    moki: Combat=Mantis+2xLizard+SmallSkeeto  # the game puts this before regen. It's why all the enemies drop tons of health. There's more enemy here once you get Bash.
   state NonGladesTeleporter: free
 
   pickup HowlsDen.AboveTPEX:
@@ -4481,24 +4494,26 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
   refill Energy=4:
     moki: BreakCrystal
 
-  state InnerWellspring.SpinArena:  # finishing the arena and destroying the corruption that open the door to spin puzzle
+  state InnerWellspring.SpinArena:  # finishing the arena
     moki: Combat=2xLizard+3xMantis+Miner, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Combat=2xLizard+3xMantis+Miner  # different ways to solve
+  state InnerWellspring.SpinningRoomOpen:  # Breaking the corruption which opens the spinning room
+    moki: InnerWellspring.SpinArena, BreakWall=16
   state InnerWellspring.SpinPuzzleSolved:  # Having Water changes this room (not considered in moki)
-    moki, InnerWellspring.SpinArena:
+    moki, InnerWellspring.SpinningRoomOpen:
       Grapple, DoubleJump OR Dash
       Grapple, Bash, Grenade=1
       Launch
-    gorlek, InnerWellspring.SpinArena:
+    gorlek, InnerWellspring.SpinningRoomOpen:
       Grapple, Glide OR Sword OR Hammer
       Water, DoubleJump OR Grapple OR SentryJump=1
       Water, Bash, Grenade=1
       Water, Damage=15, Dash OR Sword
-    kii, InnerWellspring.SpinArena:
+    kii, InnerWellspring.SpinningRoomOpen:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Water, Dash OR Hammer OR Damage=30
       DoubleJump, TripleJump
-    unsafe, InnerWellspring.SpinArena:
+    unsafe, InnerWellspring.SpinningRoomOpen:
       Grapple
       Water, Spear=1 OR Damage=15
 
@@ -4529,16 +4544,16 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
       DoubleJump, TripleJump
     unsafe: DoubleJump
   pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
-    moki: InnerWellspring.SpinArena, InnerWellspring.SpinPuzzleSolved
+    moki: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved
   pickup InnerWellspring.RotateRoomOre:  # blocked off until you fully solve the puzzle
-    moki: InnerWellspring.SpinArena, InnerWellspring.SpinPuzzleSolved
+    moki: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved
 
   conn OuterWellspring.EastDoor: free
   conn InnerWellspring.PastSpinPuzzle:  # while there are abilitysets to get through the spinning room regardless of state, they are more expensive than just solving the puzzle
-    moki: InnerWellspring.SpinArena, InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
-    gorlek: InnerWellspring.SpinArena, InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
-    kii: InnerWellspring.SpinArena, InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
-    unsafe: InnerWellspring.SpinArena, InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
+    moki: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
+    gorlek: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
+    kii: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
+    unsafe: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
 
 anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting the spin puzzle room
   refill Checkpoint

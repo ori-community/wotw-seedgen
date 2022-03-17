@@ -6,6 +6,7 @@ MarshSpawn.BurrowsOpen, 24922, 13349
 MarshSpawn.ToOpherBarrier, 21786, 23177
 MarshSpawn.TokkBarrier, 21786, 35166
 MarshSpawn.CaveFight, 21786, 35598
+MarshSpawn.BurrowArena, 9593, 59418
 HowlsDen.BoneBarrier, 21786, 53932
 HowlsDen.KeystoneDoor, 21786, 47445
 HowlsDen.DoubleJumpTreeCombat, 9593, 25130=3
@@ -47,6 +48,7 @@ InnerWellspring.DrainRoomTopWheel, 37858, 60716
 InnerWellspring.MiddleDoorsOpen, 37858, 9487
 InnerWellspring.ShortCutWheel, 37858, 34433
 InnerWellspring.SpinArena, 37858, 8487=2
+InnerWellspring.SpinningRoomOpen, 37858, 8487=5
 InnerWellspring.SpinPuzzleSolved, 37858, 36070=3
 InnerWellspring.ThreeWheels, 37858, 64055
 InnerWellspring.TopDoorOpen, 37858, 31962
