@@ -9,6 +9,11 @@
 !!include header_core
 
 // Overview
+3|1|16|0|0|0|Progress Summary
+3|1|16|1|0|0|[Ability1]View Progress
+3|1|16|2|0|0|file:assets/icons/wheel/progress_summary.blue.png
+3|1|16|4|0|0|0|4|16|ShowProgressWithHints
+
 9|0=10|15|2
 9|0=10|15|3
 9|0=10|15|0
@@ -142,11 +147,10 @@
 13|112|6|$[(9|0=11)]
 
 // Trees Helper
-3|1|16|0|0|0|Tree Progress
-3|1|16|1|0|0|[Ability1]View Progress
-3|1|16|2|0|0|spirit_shard:12
-3|1|16|3|0|0|128|255|64|255
-3|1|16|4|0|0|0|8|9|0|int|25
+3|1|16|0|0|1|Tree Progress
+3|1|16|1|0|1|[Ability1]View Progress
+3|1|16|2|0|1|file:assets/icons/wheel/tree_progress.blue.png
+3|1|16|4|0|1|0|8|9|0|int|25
 3|2|8|9|0|int|25
 
 9|0=25|8|9|101|bool|false
@@ -239,10 +243,10 @@
 9|0=25|4|17|9|101|0|6|None<\>
 
 // Wisp Helper
-3|1|16|0|0|1|Wisp Progress
-3|1|16|1|0|1|[Ability1]View Progress
-3|1|16|2|0|1|spell:2018
-3|1|16|4|0|1|0|8|9|0|int|26
+3|1|16|0|0|2|Wisp Progress
+3|1|16|1|0|2|[Ability1]View Progress
+3|1|16|2|0|2|file:assets/icons/wheel/wisps_progress.png
+3|1|16|4|0|2|0|8|9|0|int|26
 3|3|8|9|0|int|26
 
 9|0=26|8|9|101|bool|false
@@ -281,11 +285,10 @@
 9|0=26|4|17|9|101|0|6|None<\>
 
 // Quest Helper
-3|1|16|0|0|2|Quest Progress
-3|1|16|1|0|2|[Ability1]View Progress
-3|1|16|2|0|2|spirit_shard:10
-3|1|16|3|0|2|255|64|128|255
-3|1|16|4|0|2|0|8|9|0|int|27
+3|1|16|0|0|3|Quest Progress
+3|1|16|1|0|3|[Ability1]View Progress
+3|1|16|2|0|3|file:assets/icons/wheel/quests_progress.blue.png
+3|1|16|4|0|3|0|8|9|0|int|27
 3|4|8|9|0|int|27
 
 9|0=27|6|instant|p=2

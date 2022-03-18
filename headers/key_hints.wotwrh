@@ -7,38 +7,39 @@
 !!include header_core
 !!include progress_helper
 
-48248|41666|6|f=0|Burrow, Water Dash, Light Burst, Flash hint   // key skill hint from LupoHint.Shards
-48248|41666|8|9|0|int|33
+48248|41666|6|f=0|$[2|101], $[2|104], $[2|51], $[2|62] hint     // Burrow, Water Dash, Grenade, Flash hint
+48248|41666|8|9|0|int|33                                        // key skill hint from LupoHint.Shards
 9|0=33|6|$[(9|999=205)]
-9|999=205|4|17|48248|41666|1|4|17|6|1101|0|6|Burrow: $WHEREIS(2\|101), <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1101|1|6|$Burrow: $WHEREIS(2\|101)$, <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1104|0|6|Water Dash: $WHEREIS(2\|104), <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1104|1|6|$Water Dash: $WHEREIS(2\|104)$, <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1051|0|6|Light Burst: $WHEREIS(2\|51), <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1051|1|6|$Light Burst: $WHEREIS(2\|51)$, <\>
-9|999=205|4|17|48248|41666|1|4|17|6|1062|0|6|Flash: $WHEREIS(2\|62)
-9|999=205|4|17|48248|41666|1|4|17|6|1062|1|6|$Flash: $WHEREIS(2\|62)$
+9|999=205|4|17|48248|41666|1|4|17|6|1101|0|6|$[2|101:nocolor]: $WHEREIS(2\|101), <\>     // Burrow Hint
+9|999=205|4|17|48248|41666|1|4|17|6|1101|1|6|$$[2|101:nocolor]: $WHEREIS(2\|101)$, <\>   // Burrow Found
+9|999=205|4|17|48248|41666|1|4|17|6|1104|0|6|$[2|104:nocolor]: $WHEREIS(2\|104), <\>     // Water Dash Hint
+9|999=205|4|17|48248|41666|1|4|17|6|1104|1|6|$$[2|104:nocolor]: $WHEREIS(2\|104)$, <\>   // Water Dash Found
+9|999=205|4|17|48248|41666|1|4|17|6|1051|0|6|$[2|51:nocolor]: $WHEREIS(2\|51), <\>       // Grenade Hint
+9|999=205|4|17|48248|41666|1|4|17|6|1051|1|6|$$[2|51:nocolor]: $WHEREIS(2\|51)$, <\>     // Grenade Found
+9|999=205|4|17|48248|41666|1|4|17|6|1062|0|6|$[2|62:nocolor]: $WHEREIS(2\|62)            // Flash Hint
+9|999=205|4|17|48248|41666|1|4|17|6|1062|1|6|$$[2|62:nocolor]: $WHEREIS(2\|62)$          // Flash Found
 3|1|8|9|0|int|30                                                // set price on load
 6|1101|8|9|0|int|30                                             // set price on Burrow find
 6|1104|8|9|0|int|30                                             // set price on Water Dash find
-6|1051|8|9|0|int|30                                             // set price on Light Burst find
+6|1051|8|9|0|int|30                                             // set price on Grenade find
 6|1062|8|9|0|int|30                                             // set price on Flash find
 9|0=30|8|48248|41667|int|4000                                   // base price
 9|0=30|4|17|6|1101|1|8|48248|41667|int|-500                     // reduce for Burrow
 9|0=30|4|17|6|1104|1|8|48248|41667|int|-500                     // reduce for Water Dash
-9|0=30|4|17|6|1051|1|8|48248|41667|int|-500                     // reduce for Light Burst
+9|0=30|4|17|6|1051|1|8|48248|41667|int|-500                     // reduce for Grenade
 9|0=30|4|17|6|1062|1|8|48248|41667|int|-500                     // reduce for Flash
 9|0=30|4|17|48248|41667|2000|8|48248|41667|int|0                // set price to zero with nothing left to hint
+3|1|17|0|48248|41666|lupo:2                                     // set icon
 
-1|23|6|f=0|Clean Water, Flap, Glide hint                        // key skill hint from OpherShop.WaterBreath
-1|23|8|9|0|int|34
+1|23|6|f=0|$[9|0], $[2|118], $[2|14] hint                       // Clean Water, Flap, Glide hint
+1|23|8|9|0|int|34                                               // key skill hint from OpherShop.WaterBreath
 9|0=34|6|$[(9|999=206)]
-9|999=206|4|17|1|23|1|4|17|6|2000|0|6|Clean Water: $WHEREIS(9\|0), <\>
-9|999=206|4|17|1|23|1|4|17|6|2000|1|6|$Clean Water: $WHEREIS(9\|0)$, <\>
-9|999=206|4|17|1|23|1|4|17|6|1118|0|6|Flap: $WHEREIS(2\|118), <\>
-9|999=206|4|17|1|23|1|4|17|6|1118|1|6|$Flap: $WHEREIS(2\|118)$, <\>
-9|999=206|4|17|1|23|1|4|17|6|1014|0|6|Glide: $WHEREIS(2\|14)
-9|999=206|4|17|1|23|1|4|17|6|1014|1|6|$Glide: $WHEREIS(2\|14)$
+9|999=206|4|17|1|23|1|4|17|6|2000|0|6|$[9|0:nocolor]: $WHEREIS(9\|0), <\>                // Clean Water Hint
+9|999=206|4|17|1|23|1|4|17|6|2000|1|6|$$[9|0:nocolor]: $WHEREIS(9\|0)$, <\>              // Clean Water Found
+9|999=206|4|17|1|23|1|4|17|6|1118|0|6|$[2|118:nocolor]: $WHEREIS(2\|118), <\>            // Flap Hint
+9|999=206|4|17|1|23|1|4|17|6|1118|1|6|$$[2|118:nocolor]: $WHEREIS(2\|118)$, <\>          // Flap Found
+9|999=206|4|17|1|23|1|4|17|6|1014|0|6|$[2|14:nocolor]: $WHEREIS(2\|14)                   // Glide Hint
+9|999=206|4|17|1|23|1|4|17|6|1014|1|6|$$[2|14:nocolor]: $WHEREIS(2\|14)$                 // Glide Found
 3|1|8|9|0|int|31                                                // set price on load
 6|2000|8|9|0|int|31                                             // set price on Clean Water find
 6|1118|8|9|0|int|31                                             // set price on Flap find
@@ -48,14 +49,19 @@
 9|0=31|4|17|6|1118|1|8|1|10023|int|-500                         // reduce for Flap
 9|0=31|4|17|6|1014|1|8|1|10023|int|-500                         // reduce for Glide
 9|0=31|4|17|1|10023|1000|8|1|10023|int|0                        // set price to zero with nothing left to hint
+3|1|17|0|1|23|lupo:2                                            // set icon
+3|1|4|17|37858|12379|0|17|4|1|23|false                          // hide if watermill escape is not done
+3|1|4|17|37858|12379|0|17|2|1|23|Finish the Wellspring escape to unlock  // set description if watermill escape is not done
+!37858|12379|17|4|1|23|true                                     // show if the player finishes watermill escape
+!37858|12379|17|2|1|23                                          // set description to default if the player finishes watermill escape
 
-2|2|6|f=0|Bash, Bow hint                                        // key skill hint from TwillenShop.TripleJump
-2|2|8|9|0|int|35
+2|2|6|f=0|$[2|0], $[2|97] hint                                  // Bash, Bow hint
+2|2|8|9|0|int|35                                                // key skill hint from TwillenShop.TripleJump
 9|0=35|6|$[(9|999=207)]
-9|999=207|4|17|2|2|1|4|17|6|1000|0|6|Bash: $WHEREIS(2\|0), <\>
-9|999=207|4|17|2|2|1|4|17|6|1000|1|6|$Bash: $WHEREIS(2\|0)$, <\>
-9|999=207|4|17|2|2|1|4|17|6|1097|0|6|Bow: $WHEREIS(2\|97)
-9|999=207|4|17|2|2|1|4|17|6|1097|1|6|$Bow: $WHEREIS(2\|97)$
+9|999=207|4|17|2|2|1|4|17|6|1000|0|6|$[2|0:nocolor]: $WHEREIS(2\|0), <\>                 // Bash Hint
+9|999=207|4|17|2|2|1|4|17|6|1000|1|6|$$[2|0:nocolor]: $WHEREIS(2\|0)$, <\>               // Bash Found
+9|999=207|4|17|2|2|1|4|17|6|1097|0|6|$[2|97:nocolor]: $WHEREIS(2\|97)                    // Bow Hint
+9|999=207|4|17|2|2|1|4|17|6|1097|1|6|$$[2|97:nocolor]: $WHEREIS(2\|97)$                  // Bow Found
 3|1|8|9|0|int|32                                                // set price on load
 6|1000|8|9|0|int|32                                             // set price on Bash find
 6|1097|8|9|0|int|32                                             // set price on Bow find
@@ -63,3 +69,4 @@
 9|0=32|4|17|6|1000|1|8|2|102|int|-500                           // reduce for Clean Water
 9|0=32|4|17|6|1097|1|8|2|102|int|-500                           // reduce for Flap
 9|0=32|4|17|2|102|500|8|2|102|int|0                             // set price to zero with nothing left to hint
+3|1|17|0|2|2|lupo:2                                             // set icon

@@ -8,12 +8,8 @@ use rustc_hash::FxHashMap;
 use graph::Graph;
 use pool::Pool;
 use player::Player;
-use crate::inventory::{Item, UberStateOperator, UberStateRangeBoundary};
-use crate::util::{
-    Resource,
-    uberstate::{UberState, UberIdentifier, UberType},
-    constants::WISP_STATES,
-};
+use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
+use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
 pub struct World<'a> {
@@ -22,6 +18,7 @@ pub struct World<'a> {
     pub pool: Pool,
     pub preplacements: FxHashMap<UberState, Vec<Item>>,
     pub uber_states: FxHashMap<UberIdentifier, String>,
+    pub sets: Vec<usize>,
 }
 impl<'a> World<'a> {
     pub fn new(graph: &Graph) -> World {
@@ -31,6 +28,7 @@ impl<'a> World<'a> {
             pool: Pool::default(),
             preplacements: FxHashMap::default(),
             uber_states: FxHashMap::default(),
+            sets: Vec::default(),
         }
     }
 
@@ -41,16 +39,14 @@ impl<'a> World<'a> {
                     let default = String::from("0");
                     let uber_value = match &command.operator {
                         UberStateOperator::Value(value) => value,
-                        UberStateOperator::Pointer(uber_identifier) => self.uber_states.get(&uber_identifier).unwrap_or(&default),
+                        UberStateOperator::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
                         UberStateOperator::Range(range) => match &range.start {
                             UberStateRangeBoundary::Value(value) => value,
-                            UberStateRangeBoundary::Pointer(uber_identifier) => self.uber_states.get(&uber_identifier).unwrap_or(&default),
+                            UberStateRangeBoundary::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
                         },
                     }.to_owned();
 
                     let entry = self.uber_states.entry(command.uber_identifier.to_owned()).or_insert_with(|| String::from("0"));
-                    if !command.signed && entry == &uber_value { return Ok(()); }
-
                     let uber_value = match command.uber_type {
                         UberType::Bool | UberType::Teleporter => uber_value.to_string(),
                         UberType::Byte | UberType::Int => {
@@ -84,14 +80,19 @@ impl<'a> World<'a> {
                             }
                         },
                     };
-                    *entry = uber_value;
+                    if uber_value == "false" || uber_value == "0" || uber_value == *entry { return Ok(()); }
 
-                    if entry == "false" || entry == "0" { return Ok(()); }
+                    *entry = uber_value;
 
                     let uber_state = UberState {
                         identifier: command.uber_identifier.to_owned(),
                         value: entry.clone(),
                     };
+
+                    if command.skip {
+                        log::trace!("Skipped granting UberState {}", uber_state);
+                        return Ok(());
+                    }
 
                     log::trace!("Granting player UberState {}", uber_state);
                     self.collect_preplacements(&uber_state);
@@ -147,23 +148,28 @@ impl<'a> World<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::languages::logic;
+
     use super::*;
     use super::super::*;
     use world::pool::Pool;
+    use item::*;
     use util::*;
     use rustc_hash::FxHashSet;
 
-    use std::path::PathBuf;
-
     #[test]
     fn reach_check() {
-        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &Settings::default(), false).unwrap();
+        let mut settings = Settings::default();
+        settings.difficulty = Difficulty::Gorlek;
+
+        let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         let mut world = World::new(graph);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
+        world.player.apply_settings(&settings);
 
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
         let reached: FxHashSet<_> = reached.iter()
             .filter_map(|node| {
                 if node.node_type() == NodeType::State { None }
@@ -171,7 +177,8 @@ mod tests {
             })
             .cloned().collect();
 
-        let locations = lexer::parser::parse_locations(&PathBuf::from("loc_data.csv"), false).unwrap();
+        let input = util::read_file("loc_data.csv", "logic").unwrap();
+        let locations = logic::parse_locations(&input).unwrap();
         let locations: FxHashSet<_> = locations.iter().map(|location| &location.uber_state).cloned().collect();
 
         if !(reached == locations) {
@@ -184,7 +191,7 @@ mod tests {
         let mut settings = Settings::default();
         settings.difficulty = Difficulty::Gorlek;
 
-        let graph = &lexer::parse_logic(&PathBuf::from("areas.wotw"), &PathBuf::from("loc_data.csv"), &PathBuf::from("state_data.csv"), &settings, false).unwrap();
+        let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
         let mut world = World::new(graph);
 
         world.player.difficulty = Difficulty::Unsafe;
@@ -194,7 +201,7 @@ mod tests {
         world.player.inventory.grant(Item::Shard(Shard::TripleJump), 1);
 
         let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
         let reached: Vec<_> = reached.iter().filter_map(|node| node.uber_state()).cloned().collect();
         assert_eq!(reached, vec![UberState::from_parts("42178", "63404").unwrap(), UberState::from_parts("42178", "42762").unwrap(), UberState::from_parts("23987", "14014").unwrap(), UberState::from_parts("42178", "6117").unwrap()]);
     }

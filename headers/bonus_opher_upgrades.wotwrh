@@ -1,6 +1,7 @@
 /// Bonus Opher Upgrades
 ///
 /// Opher sells five weapon upgrades unique to the randomizer
+Flags: Bonus Opher Upgrades
 !!include rapid_smash_core
 
 1|74|11|3               // Spike Efficiency from OpherShop.Spike
@@ -16,3 +17,9 @@
 3|1|8|1|10106|int|300
 3|1|8|1|10115|int|300
 3|1|8|1|10116|int|600
+// Set icons
+3|1|17|0|1|74|file:assets/icons/bonus/spearefficiency.png
+3|1|17|0|1|98|file:assets/icons/bonus/rapidsmash.png
+3|1|17|0|1|106|file:assets/icons/bonus/shurikenefficiency.png
+3|1|17|0|1|115|file:assets/icons/bonus/blazeefficiency.png
+3|1|17|0|1|116|file:assets/icons/bonus/sentryefficiency.png

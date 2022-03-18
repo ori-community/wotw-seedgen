@@ -5,9 +5,8 @@ use smallvec::{SmallVec, smallvec};
 
 use super::{player::Player, requirements::Requirement};
 use crate::util::{
-    RefillType, NodeType, Position, Zone,
+    RefillType, NodeType, Position, Zone, UberState, UberIdentifier,
     orbs::{self, Orbs},
-    uberstate::{UberState, UberIdentifier},
     constants::TP_ANCHOR,
 };
 
@@ -27,6 +26,7 @@ pub struct Connection {
 pub struct Anchor {
     pub identifier: String,
     pub position: Option<Position>,
+    pub can_spawn: bool,
     pub index: usize,
     pub refills: Vec<Refill>,
     pub connections: Vec<Connection>,
@@ -112,6 +112,11 @@ impl Node {
     pub fn can_place(&self) -> bool {
         matches!(self, Node::Pickup(_) | Node::Quest(_))
     }
+    pub fn can_spawn(&self) -> bool {
+        if let Node::Anchor(anchor) = self {
+            anchor.position.is_some() && anchor.can_spawn
+        } else { false }
+    }
 }
 impl fmt::Display for Node {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
@@ -122,6 +127,7 @@ impl fmt::Display for Node {
 pub type Reached<'a> = Vec<&'a Node>;
 pub type Progressions<'a> = Vec<(&'a Requirement, SmallVec<[Orbs; 3]>)>;
 
+#[derive(Debug)]
 struct ReachContext<'a, 'b> {
     player: &'b Player,
     progression_check: bool,
@@ -168,17 +174,25 @@ impl Graph {
         context.world_state.insert(entry.index(), best_orbs.clone());
         match entry {
             Node::Anchor(anchor) => {
-                for refill in &anchor.refills {
-                    for orbs in &best_orbs {
-                        if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
-                            best_orbs = orbs::both(&best_orbs, &orbcost);
-                            match refill.name {
-                                RefillType::Full => best_orbs = smallvec![context.player.max_orbs()],
-                                RefillType::Checkpoint => best_orbs = context.player.checkpoint_orbs(&best_orbs),
-                                RefillType::Health(amount) => best_orbs = context.player.health_orbs(&best_orbs, amount),
-                                RefillType::Energy(amount) => best_orbs = context.player.energy_orbs(&best_orbs, amount),
+                let max_orbs = context.player.max_orbs();
+                if best_orbs.get(0).map_or(true, |first_orbs| first_orbs != &max_orbs) {
+                    for refill in &anchor.refills {
+                        for orbs in &best_orbs {
+                            if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
+                                if matches!(refill.name, RefillType::Full) {
+                                    best_orbs = smallvec![max_orbs];
+                                    break;
+                                }
+                                let mut refill_orbs = orbs::both(&best_orbs, &orbcost);
+                                match refill.name {
+                                    RefillType::Checkpoint => refill_orbs = context.player.checkpoint_orbs(&refill_orbs),
+                                    RefillType::Health(amount) => refill_orbs = context.player.health_orbs(&refill_orbs, amount),
+                                    RefillType::Energy(amount) => refill_orbs = context.player.energy_orbs(&refill_orbs, amount),
+                                    RefillType::Full => unreachable!(),
+                                }
+                                best_orbs = orbs::either(&best_orbs, &refill_orbs);
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -213,7 +227,7 @@ impl Graph {
                 if is_spawn {
                     if let Some(tp_anchor) = self.nodes.iter().find(|&node| node.identifier() == TP_ANCHOR) {
                         if !anchor.connections.iter().any(|connection| connection.to == tp_anchor.index()) {
-                            let (mut tp_reached, mut tp_progressions) = self.reach_recursion(&tp_anchor, false, best_orbs, context);
+                            let (mut tp_reached, mut tp_progressions) = self.reach_recursion(tp_anchor, false, best_orbs, context);
                             reached.append(&mut tp_reached);
                             progressions.append(&mut tp_progressions);
                         }
@@ -237,7 +251,7 @@ impl Graph {
         }
     }
 
-    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, String>) -> FxHashSet<usize> {
+    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> FxHashSet<usize> {
         let mut states = FxHashSet::default();
 
         for node in &self.nodes {
@@ -256,6 +270,11 @@ impl Graph {
             }
         }
 
+        states.reserve(sets.len());
+        for set in sets {
+            states.insert(*set);
+        }
+
         states
     }
 
@@ -266,11 +285,11 @@ impl Graph {
         Ok(entry)
     }
 
-    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>) -> Result<Reached<'a>, String> {
+    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> Result<Reached<'a>, String> {
         let mut context = ReachContext {
             player,
             progression_check: false,
-            states: self.collect_extra_states(extra_states),
+            states: self.collect_extra_states(extra_states, sets),
             state_progressions: FxHashMap::default(),
             world_state: FxHashMap::default(),
         };
@@ -279,11 +298,11 @@ impl Graph {
 
         Ok(reached)
     }
-    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>) -> Result<(Reached<'a>, Progressions<'a>), String> {
+    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> Result<(Reached<'a>, Progressions<'a>), String> {
         let mut context = ReachContext {
             player,
             progression_check: true,
-            states: self.collect_extra_states(extra_states),
+            states: self.collect_extra_states(extra_states, sets),
             state_progressions: FxHashMap::default(),
             world_state: FxHashMap::default(),
         };

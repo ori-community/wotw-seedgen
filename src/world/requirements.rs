@@ -2,8 +2,9 @@ use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use super::player::Player;
-use crate::inventory::{Inventory, Item};
-use crate::util::{Difficulty, Resource, Skill, Shard, Teleporter, Enemy, orbs::{self, Orbs}};
+use crate::inventory::Inventory;
+use crate::item::{Item, Resource, Skill, Shard, Teleporter};
+use crate::util::{Difficulty, Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
 
@@ -13,6 +14,7 @@ pub enum Requirement {
     Impossible,
     Skill(Skill),
     EnergySkill(Skill, f32),
+    NonConsumingEnergySkill(Skill),
     SpiritLight(u16),
     Resource(Resource, u16),
     Shard(Shard),
@@ -43,6 +45,15 @@ impl Requirement {
             }
         ])} else { None }
     }
+    fn nonconsuming_cost_is_met(cost: f32, player: &Player, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
+        if orbs.energy >= cost || (
+            player.difficulty >= Difficulty::Unsafe &&
+            player.inventory.has(&Item::Shard(Shard::LifePact), 1) &&
+            orbs.energy + orbs.health > cost
+        ) {
+            Some(smallvec![Orbs::default()])
+        } else { None }
+    }
 
     pub fn is_met(&self, player: &Player, states: &FxHashSet<usize>, orbs: Orbs) -> Option<SmallVec<[Orbs; 3]>> {
         match self {
@@ -54,6 +65,11 @@ impl Requirement {
                 if player.inventory.has(&Item::Skill(*skill), 1) {
                     let cost = player.use_cost(*skill) * *amount;
                     return Requirement::cost_is_met(cost, player, orbs);
+                }
+            Requirement::NonConsumingEnergySkill(skill) =>
+                if player.inventory.has(&Item::Skill(*skill), 1) {
+                    let cost = player.use_cost(*skill);
+                    return Requirement::nonconsuming_cost_is_met(cost, player, orbs);
                 }
             Requirement::SpiritLight(amount) =>
                 if player.inventory.has(&Item::SpiritLight(1), *amount) { return Some(smallvec![Orbs::default()]); },
@@ -290,6 +306,13 @@ impl Requirement {
 
                 itemsets
             },
+            Requirement::NonConsumingEnergySkill(skill) => {
+                let cost = player.use_cost(*skill);
+                let mut itemsets = Requirement::needed_for_cost(cost, player);
+                Requirement::combine_itemset_item(&mut itemsets, &Item::Skill(*skill));
+
+                itemsets
+            },
             Requirement::SpiritLight(amount) => vec![(Inventory::from((Item::SpiritLight(1), *amount)), Orbs::default())],
             Requirement::Resource(resource, amount) => vec![(Inventory::from((Item::Resource(*resource), *amount)), Orbs::default())],
             Requirement::Shard(shard) => vec![(Inventory::from(Item::Shard(*shard)), Orbs::default())],
@@ -364,10 +387,10 @@ impl Requirement {
                 } else { smallvec![Skill::Sword] };
                 let ranged_weapons = if ranged {
                     player.ranged_progression_weapons()
-                } else { smallvec![Skill::Bow] };
+                } else { smallvec![Skill::Spear] };
                 let shield_weapons = if shielded {
                     player.shield_progression_weapons()
-                } else { smallvec![Skill::Hammer] };
+                } else { smallvec![Skill::Spear] };
                 let use_burrow: SmallVec<[_; 2]> = if burrow {
                     if player.difficulty < Difficulty::Unsafe || player.inventory.has(&Item::Skill(Skill::Burrow), 1) {
                         smallvec![true]
@@ -376,44 +399,56 @@ impl Requirement {
                     }
                 } else { smallvec![false] };
 
-                // TODO there are redundancies here...
-                for weapon in weapons {
-                    for ranged_weapon in &ranged_weapons {
-                        for shield_weapon in &shield_weapons {
-                            for burrow in &use_burrow {
-                                let (mut cost, mut highest_cost) = (0.0, 0.0);
-
-                                for (enemy, amount) in enemies {
-                                    if let Enemy::EnergyRefill = enemy {
-                                        if cost > highest_cost { highest_cost = cost; }
-                                        cost = 0_f32.max(cost - f32::from(*amount));
-                                        continue;
-                                    }
-
-                                    if enemy == &Enemy::Sandworm && *burrow { continue; }
-
-                                    if enemy.shielded() {
-                                        cost += player.use_cost(*shield_weapon) * f32::from(*amount);
-                                    }
-                                    let armor_mod = if enemy.armored() && player.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
-
-                                    let used_weapon = if enemy.ranged() { ranged_weapon } else { &weapon };
-
-                                    cost += player.destroy_cost(enemy.health(), *used_weapon, enemy.flying()) * f32::from(*amount) * armor_mod;
-                                }
-                                if cost > highest_cost { highest_cost = cost; }
-
-                                let mut itemset = Requirement::needed_for_cost(highest_cost, player);
-                                for (inventory, _) in &mut itemset {
-                                    if melee { inventory.grant(Item::Skill(weapon), 1) }
-                                    if ranged { inventory.grant(Item::Skill(*ranged_weapon), 1) }
-                                    if shielded && !inventory.has(&Item::Skill(*shield_weapon), 1) { inventory.grant(Item::Skill(*shield_weapon), 1) }
-                                    if *burrow { inventory.grant(Item::Skill(Skill::Burrow), 1) }
-                                }
-
-                                itemsets.append(&mut itemset);
-                            }
+                // Filter combinations of weapons for redundancies
+                let weapons_len = weapons.len();
+                let mut weapon_combinations = Vec::<SmallVec<[_; 3]>>::with_capacity(weapons_len * ranged_weapons.len() * shield_weapons.len());
+                for ranged_weapon in ranged_weapons {
+                    for &shield_weapon in &shield_weapons {
+                        let weapon_position = weapons.iter()
+                            .position(|&weapon| weapon == ranged_weapon || weapon == shield_weapon)
+                            .map_or(weapons_len, |index| (index + 1).min(weapons_len));
+                        for weapon in &weapons[0..weapon_position] {
+                            weapon_combinations.push(smallvec![*weapon, ranged_weapon, shield_weapon]);
                         }
+                    }
+                }
+
+                for weapons in weapon_combinations {
+                    let weapon = weapons[0];
+                    let ranged_weapon = weapons[1];
+                    let shield_weapon = weapons[2];
+                    for &burrow in &use_burrow {
+                        let (mut cost, mut highest_cost) = (0.0, 0.0);
+
+                        for (enemy, amount) in enemies {
+                            if let Enemy::EnergyRefill = enemy {
+                                if cost > highest_cost { highest_cost = cost; }
+                                cost = 0_f32.max(cost - f32::from(*amount));
+                                continue;
+                            }
+
+                            if enemy == &Enemy::Sandworm && burrow { continue; }
+
+                            if enemy.shielded() {
+                                cost += player.use_cost(shield_weapon) * f32::from(*amount);
+                            }
+                            let armor_mod = if enemy.armored() && player.difficulty < Difficulty::Unsafe { 2.0 } else { 1.0 };
+
+                            let used_weapon = if enemy.ranged() { ranged_weapon } else { weapon };
+
+                            cost += player.destroy_cost(enemy.health(), used_weapon, enemy.flying()) * f32::from(*amount) * armor_mod;
+                        }
+                        if cost > highest_cost { highest_cost = cost; }
+
+                        let mut itemset = Requirement::needed_for_cost(highest_cost, player);
+                        for (inventory, _) in &mut itemset {
+                            if melee { inventory.grant(Item::Skill(weapon), 1) }
+                            if ranged { inventory.grant(Item::Skill(ranged_weapon), 1) }
+                            if shielded && !inventory.has(&Item::Skill(shield_weapon), 1) { inventory.grant(Item::Skill(shield_weapon), 1) }
+                            if burrow { inventory.grant(Item::Skill(Skill::Burrow), 1) }
+                        }
+
+                        itemsets.append(&mut itemset);
                     }
                 }
 
@@ -474,7 +509,7 @@ impl Requirement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::util::settings::Settings;
+    use crate::settings::Settings;
 
     #[test]
     fn is_met() {
@@ -546,7 +581,7 @@ mod tests {
         player.difficulty = Difficulty::Unsafe;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
         player.difficulty = Difficulty::Moki;
-        player.inventory.grant(Item::Resource(Resource::Energy), 2);
+        player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
 
         player = Player::default();

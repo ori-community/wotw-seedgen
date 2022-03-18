@@ -1,13 +1,14 @@
 use rustc_hash::{FxHashSet, FxHashMap};
 
-use super::parser::{self, AreaTree, Metadata, Location, NamedState};
+use super::{parser::{self, AreaTree}, tokenizer::Metadata, Location, NamedState};
 use crate::world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
 };
+use crate::item::Skill;
+use crate::settings::Settings;
 use crate::util::{
-    Difficulty, Glitch, Skill, Position, Zone,
-    settings::Settings,
+    Difficulty, Glitch, Zone,
 };
 
 struct EmitterContext<'a> {
@@ -16,6 +17,14 @@ struct EmitterContext<'a> {
     validate: bool,
     node_map: FxHashMap<&'a str, usize>,
     used_states: FxHashSet<&'a str>,
+}
+
+fn build_glitch_requirement<'a>(glitch: &Glitch, out: Requirement, context: &mut EmitterContext<'a>) -> Requirement {
+    if context.settings.glitches.contains(glitch) {
+        out
+    } else {
+        Requirement::Impossible
+    }
 }
 
 fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
@@ -34,12 +43,7 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
             } else {
                 Requirement::Impossible
             },
-        parser::Requirement::Glitch(glitch) =>
-            if context.settings.glitches.contains(glitch) {
-                Requirement::Free
-            } else {
-                Requirement::Impossible
-            },
+        parser::Requirement::Glitch(glitch) => build_glitch_requirement(glitch, Requirement::Free, context),
         parser::Requirement::Skill(skill) => Requirement::Skill(*skill),
         parser::Requirement::EnergySkill(skill, amount) => Requirement::EnergySkill(*skill, (*amount).into()),
         parser::Requirement::SpiritLight(amount) => Requirement::SpiritLight(*amount),
@@ -71,30 +75,10 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
             }
             Requirement::Or(allowed_weapons)
         },
-        parser::Requirement::ShurikenBreak(health) =>
-            if context.settings.glitches.contains(&Glitch::ShurikenBreak) {
-                Requirement::ShurikenBreak(f32::from(*health))
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::SentryBreak(health) =>
-            if context.settings.glitches.contains(&Glitch::SentryBreak) {
-                Requirement::SentryBreak(f32::from(*health))
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::HammerBreak =>
-            if context.settings.glitches.contains(&Glitch::HammerBreak) {
-                Requirement::Skill(Skill::Hammer)
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::SpearBreak =>
-            if context.settings.glitches.contains(&Glitch::SpearBreak) {
-                Requirement::Skill(Skill::Spear)
-            } else {
-                Requirement::Impossible
-            },
+        parser::Requirement::ShurikenBreak(health) => build_glitch_requirement(&Glitch::ShurikenBreak, Requirement::ShurikenBreak(f32::from(*health)), context),
+        parser::Requirement::SentryBreak(health) => build_glitch_requirement(&Glitch::SentryBreak, Requirement::SentryBreak(f32::from(*health)), context),
+        parser::Requirement::HammerBreak => build_glitch_requirement(&Glitch::HammerBreak, Requirement::Skill(Skill::Hammer), context),
+        parser::Requirement::SpearBreak => build_glitch_requirement(&Glitch::SpearBreak, Requirement::EnergySkill(Skill::Spear, 1.0), context),
         parser::Requirement::SentryJump(amount) => {
             let mut allowed_weapons = Vec::new();
             if context.settings.glitches.contains(&Glitch::SwordSentryJump) { allowed_weapons.push(Requirement::Skill(Skill::Sword)); }
@@ -114,30 +98,31 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
                 Requirement::Impossible
             }
         },
-        parser::Requirement::SwordSentryJump(amount) =>
-            if context.settings.glitches.contains(&Glitch::SwordSentryJump) {
-                Requirement::And(vec![
-                    Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
-                    Requirement::Skill(Skill::Sword),
-                ])
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::HammerSentryJump(amount) =>
-            if context.settings.glitches.contains(&Glitch::HammerSentryJump) {
-                Requirement::And(vec![
-                    Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
-                    Requirement::Skill(Skill::Hammer),
-                ])
-            } else {
-                Requirement::Impossible
-            },
-        parser::Requirement::SentryBurn(amount) =>
-            if context.settings.glitches.contains(&Glitch::SentryBurn) {
-                Requirement::EnergySkill(Skill::Sentry, (*amount).into())
-            } else {
-                Requirement::Impossible
-            },
+        parser::Requirement::SwordSentryJump(amount) => build_glitch_requirement(&Glitch::SwordSentryJump,
+            Requirement::And(vec![
+                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::Skill(Skill::Sword),
+            ]), context),
+        parser::Requirement::HammerSentryJump(amount) => build_glitch_requirement(&Glitch::HammerSentryJump,
+            Requirement::And(vec![
+                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::Skill(Skill::Hammer),
+            ]), context),
+        parser::Requirement::SentryBurn(amount) => build_glitch_requirement(&Glitch::SentryBurn, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::LaunchSwap => build_glitch_requirement(&Glitch::LaunchSwap, Requirement::Skill(Skill::Launch), context),
+        parser::Requirement::SentrySwap(amount) => build_glitch_requirement(&Glitch::SentrySwap, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::FlashSwap => build_glitch_requirement(&Glitch::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
+        parser::Requirement::BlazeSwap(amount) => build_glitch_requirement(&Glitch::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
+        parser::Requirement::WaveDash => build_glitch_requirement(&Glitch::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
+        parser::Requirement::GrenadeJump => build_glitch_requirement(&Glitch::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
+        parser::Requirement::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
+        parser::Requirement::HammerJump => build_glitch_requirement(&Glitch::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::SwordJump => build_glitch_requirement(&Glitch::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Glitch::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
+        parser::Requirement::SentryRedirect(amount) => build_glitch_requirement(&Glitch::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
+        parser::Requirement::GlideJump => build_glitch_requirement(&Glitch::GlideJump, Requirement::Skill(Skill::Glide), context),
+        parser::Requirement::GlideHammerJump => build_glitch_requirement(&Glitch::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
+        parser::Requirement::SpearJump(amount) => build_glitch_requirement(&Glitch::SpearJump, Requirement::EnergySkill(Skill::Spear, (*amount).into()), context),
     }
 }
 
@@ -169,21 +154,21 @@ fn build_or(mut ors: Vec<Requirement>) -> Requirement {
 }
 
 fn build_requirement_group<'a>(group: &parser::Group<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
-    let lines: Vec<Requirement> = group.lines.iter().map(|line| {
+    let lines = group.lines.iter().map(|line| {
         let mut parts = vec![];
         if !line.ands.is_empty() {
-            let ands: Vec<Requirement> = line.ands.iter().map(|and| build_requirement(and, region, context)).collect();
+            let ands = line.ands.iter().map(|and| build_requirement(and, region, context)).collect::<Vec<_>>();
             parts.push(build_and(ands));
         }
         if !line.ors.is_empty() {
-            let ors: Vec<Requirement> = line.ors.iter().map(|or| build_requirement(or, region, context)).collect();
+            let ors = line.ors.iter().map(|or| build_requirement(or, region, context)).collect::<Vec<_>>();
             parts.push(build_or(ors));
         }
         if let Some(subgroup) = &line.group {
             parts.push(build_requirement_group(subgroup, region, context));
         }
         build_and(parts)
-    }).collect();
+    }).collect::<Vec<_>>();
     build_or(lines)
 }
 
@@ -217,13 +202,15 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             "Windswept Wastes" => Zone::Wastes,
             "Windtorn Ruins" => Zone::Ruins,
             "Willows End" => Zone::Willow,
-            _ => Zone::Void,
+            "Shop" => Zone::Shop,
+            "Void" => Zone::Void,
+            _ => return Err(format!("invalid zone {} in loc_data", location.zone)),
         };
 
-        if metadata.quests.contains(name) {
-            let index = graph.len();
-            add_entry(&mut node_map, &location.name, index)?;
+        let index = graph.len();
+        add_entry(&mut node_map, &location.name, index)?;
 
+        if metadata.quests.contains(name) {
             graph.push(Node::Quest(graph::Quest {
                 identifier: location.name.clone(),
                 zone,
@@ -232,9 +219,6 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 position: location.position.clone(),
             }));
         } else {
-            let index = graph.len();
-            add_entry(&mut node_map, &location.name, index)?;
-
             graph.push(Node::Pickup(graph::Pickup {
                 identifier: location.name.clone(),
                 zone,
@@ -256,7 +240,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
         }
 
         graph.push(Node::State(graph::State {
-            identifier: state.to_string(),
+            identifier: state.to_owned(),
             index,
             uber_state,
         }));
@@ -276,14 +260,14 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
     };
 
     for anchor in &areas.anchors {
-        let region = anchor.identifier.splitn(2, '.').next().unwrap();
+        let region = anchor.region();
         let region = areas.regions.get(region);
         let mut region_requirement = None;
         if let Some(group) = region {
-            region_requirement = Some(build_requirement_group(&group, true, &mut context));
+            region_requirement = Some(build_requirement_group(group, true, &mut context));
         }
 
-        let refills: Vec<graph::Refill> = anchor.refills.iter().map(|refill| {
+        let refills = anchor.refills.iter().map(|refill| {
             let mut requirement = Requirement::Free;
             if let Some(group) = &refill.requirements {
                 requirement = build_requirement_group(group, false, &mut context);
@@ -292,14 +276,11 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
                 name: refill.name,
                 requirement,
             }
-        }).collect();
+        }).collect::<Vec<_>>();
 
-        let mut connections = Vec::<graph::Connection>::with_capacity(anchor.connections.len());
+        let mut connections = Vec::with_capacity(anchor.connections.len());
         for connection in &anchor.connections {
-            let mut requirement = connection.requirements.as_ref().map_or(
-                Requirement::Free,
-                |group| build_requirement_group(group, false, &mut context)
-            );
+            let mut requirement = build_requirement_group(&connection.requirements, false, &mut context);
             if let Some(region_requirement) = &region_requirement {
                 requirement = build_and(vec![region_requirement.clone(), requirement]);
             }
@@ -312,15 +293,10 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             });
         }
 
-        let position = if let Some((x, y)) = anchor.position {
-            Some(Position { x, y })
-        } else {
-            None
-        };
-
         graph.push(Node::Anchor(graph::Anchor {
-            identifier: anchor.identifier.to_string(),
-            position,
+            identifier: anchor.identifier.to_owned(),
+            position: anchor.position.clone(),
+            can_spawn: anchor.can_spawn,
             index: graph.len(),
             refills,
             connections,
@@ -337,8 +313,8 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             }
         }
 
-        for region in areas.regions.keys() {
-            if !areas.anchors.iter().any(|anchor| anchor.identifier.splitn(2, '.').next().unwrap() == *region) {
+        for &region in areas.regions.keys() {
+            if !areas.anchors.iter().any(|anchor| anchor.region() == region) {
                 log::warn!("Region {} has no anchors with a matching name.", region);
             }
         }
