@@ -166,6 +166,8 @@ fn parse_header(
     config_map: &mut FxHashMap::<String, FxHashMap<String, String>>,
     rng: &mut impl Rng
 ) -> Result<(), String> {
+    log::trace!("Parsing header {header_name}");
+
     let header_config = config_map.remove(header_name).unwrap_or_default();
 
     let header = util::read_file(format!("{header_name}.wotwrh"), "headers")?;
@@ -229,8 +231,6 @@ where R: Rng
     let mut state_sets = vec![];
 
     let header_names = headers.into_iter().map(|(header_name, mut header)| {
-        log::trace!("Parsing header {header_name}");
-
         for exclude in header.excludes {
             excludes.insert(exclude, header_name.clone());
         }

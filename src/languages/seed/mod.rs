@@ -36,6 +36,6 @@ pub struct Pickup {
 
 impl Pickup {
     pub fn code(&self) -> String {
-        format!("{}|{}", self.trigger, self.item)
+        format!("{}|{}", self.trigger, self.item.code())
     }
 }
