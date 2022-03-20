@@ -26,19 +26,13 @@ impl Inventory {
             *prior += amount;
         }
     }
-    pub fn remove(&mut self, item: &Item, amount: u32) -> u32 {
-        match self.items.get_mut(item) {
-            Some(prior) => {
-                if amount >= *prior {
-                    let negative = amount - *prior;
-                    self.items.remove(item);
-                    negative
-                } else {
-                    *prior -= amount;
-                    0
-                }
-            },
-            None => amount,
+    pub fn remove(&mut self, item: &Item, amount: u32) {
+        if let Some(prior) = self.items.get_mut(item) {
+            if amount >= *prior {
+                self.items.remove(item);
+            } else {
+                *prior -= amount;
+            }
         }
     }
 

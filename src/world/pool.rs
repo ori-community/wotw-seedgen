@@ -92,18 +92,12 @@ impl Pool {
             self.inventory.grant(item, amount);
         }
     }
-    pub fn remove(&mut self, item: &Item, amount: u32) -> u32 {
+    pub fn remove(&mut self, item: &Item, amount: u32) {
         if let Item::SpiritLight(stacked_amount) = item {
             let amount = amount * stacked_amount;
-            if self.spirit_light > amount {
-                self.spirit_light -= amount;
-                0
-            } else {
-                self.spirit_light = 0;
-                amount - self.spirit_light
-            }
+            self.spirit_light = self.spirit_light.saturating_sub(amount);
         } else {
-            self.inventory.remove(item, amount)
+            self.inventory.remove(item, amount);
         }
     }
 
