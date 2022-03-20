@@ -188,7 +188,7 @@ fn parse_header(
 
 fn block_spawn_sets(preplacement: &seed::Pickup, world: &mut World) {
     if let Item::UberState(uber_state_item) = &preplacement.item {
-        if uber_state_item.uber_identifier == UberState::spawn().identifier {
+        if preplacement.trigger.identifier == UberState::spawn().identifier {
             if let UberStateOperator::Value(value) = &uber_state_item.operator {
                 let target = UberState {
                     identifier: uber_state_item.uber_identifier.clone(),
