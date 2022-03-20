@@ -7,15 +7,14 @@ pub mod settings;
 pub mod generator;
 pub mod util;
 
-pub use languages::logic;
-pub use languages::headers;
+pub use languages::{logic, header::{self, Header}, seed};
 pub use world::World;
 pub use inventory::Inventory;
-pub use item::Item;
+pub use item::{Item, VItem};
 pub use preset::Preset;
 pub use settings::Settings;
 
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 use rand_seeder::Seeder;
 use rand::{
@@ -44,12 +43,14 @@ use world::{
     pool::Pool
 };
 use generator::Placement;
-use languages::headers::parser::HeaderContext;
-use settings::{Spawn, Difficulty, Goal, WorldSettings};
+use header::{HeaderBuild, ItemDetails};
+use settings::{Spawn, Difficulty, Goal, WorldSettings, HeaderConfig};
 use util::{
-    Position, Zone, UberState, Icon,
+    Position, Zone, UberState,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
+
+use crate::item::UberStateOperator;
 
 fn pick_spawn<'a, R>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut R) -> Result<&'a Node, String>
 where
@@ -143,85 +144,149 @@ pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, jso
     Ok(())
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct ItemDetails {
-    name: Option<String>,
-    display: Option<String>,
-    price: Option<u16>,
-    icon: Option<Icon>,
-}
+fn build_config_map(header_config: &[HeaderConfig]) -> Result<FxHashMap::<String, FxHashMap<String, String>>, String> {
+    let mut config_map = FxHashMap::<String, FxHashMap<_, _>>::default();
 
-type Flags = Vec<String>;
-type Sets = Vec<String>;
-fn parse_headers<R>(world: &mut World, rng: &mut R) -> Result<(String, Flags, FxHashMap<String, ItemDetails>, Sets), String>
-where R: Rng + ?Sized
-{
-    let mut header_block = String::new();
-
-    let mut dependencies = world.player.settings.headers.clone();
-    dependencies.sort();
-    let mut context = HeaderContext {
-        dependencies,
-        ..HeaderContext::default()
-    };
-
-    let mut param_values = FxHashMap::default();
-
-    for header_arg in &world.player.settings.header_config {
-        let mut parts = header_arg.splitn(2, '=');
-        let identifier = parts.next().unwrap();
-        let mut identifier_parts = identifier.splitn(2, '.');
-        let header = identifier_parts.next().unwrap();
-        let identifier = identifier_parts.next().ok_or_else(|| format!("Expected <header>.<parameter> in header arg {header_arg}"))?;
-        let value = parts.next().unwrap_or("true");
-
-        let entry = param_values.entry(header.to_string()).or_insert_with(FxHashMap::default);
-        if let Some(prior) = entry.insert(identifier.to_string(), value.to_string()) {
-            log::warn!("Overwriting duplicate header argument {prior}");
+    for config in header_config {
+        if let Some(prior) = config_map.entry(config.header_name.clone())
+            .or_default()
+            .insert(config.config_name.clone(), config.config_value.clone())
+        {
+            return Err(format!("provided multiple values for configuration parameter {} for header {} ({} and {})", config.config_name, config.header_name, prior, config.config_value));
         }
     }
 
-    for header_with_parameters in param_values.keys() {
-        if !world.player.settings.headers.iter().any(|header| header == header_with_parameters) {
-            log::warn!("The header {header_with_parameters} referenced in a header argument isn't active");
+    Ok(config_map)
+}
+
+fn parse_header(
+    header_name: &String,
+    headers: &mut Vec<(String, HeaderBuild)>,
+    includes: &mut FxHashSet<String>,
+    config_map: &mut FxHashMap::<String, FxHashMap<String, String>>,
+    rng: &mut impl Rng
+) -> Result<(), String> {
+    let header_config = config_map.remove(header_name).unwrap_or_default();
+
+    let header = util::read_file(format!("{header_name}.wotwrh"), "headers")?;
+    let header = Header::parse(header, rng)
+        .map_err(|err| format!("{err} in header {header_name}"))?
+        .build(header_config)?;
+
+    for include in &header.includes {
+        if !includes.insert(include.clone()) {
+            parse_header(include, headers, includes, config_map, rng)?;
         }
+    }
+
+    headers.push((header_name.clone(), header));
+
+    Ok(())
+}
+
+fn block_spawn_sets(preplacement: &seed::Pickup, world: &mut World) {
+    if let Item::UberState(uber_state_item) = &preplacement.item {
+        if uber_state_item.uber_identifier == UberState::spawn().identifier {
+            if let UberStateOperator::Value(value) = &uber_state_item.operator {
+                let target = UberState {
+                    identifier: uber_state_item.uber_identifier.clone(),
+                    value: if value == "true" { String::new() } else { value.clone() },
+                };
+
+                if world.graph.nodes.iter().any(|node| node.can_place() && node.uber_state().map_or(false, |uber_state| uber_state == &target)) {
+                    log::trace!("adding an empty pickup at {uber_state_item} to prevent placements");
+                    let null_item = Item::Message("6|f=0|quiet|noclear".to_string());
+                    world.preplace(target, null_item);
+                }
+            }
+        }
+    }
+}
+
+fn parse_headers<R>(world: &mut World, rng: &mut R) -> Result<String, String>
+where R: Rng
+{
+    let mut config_map = build_config_map(&world.player.settings.header_config)?;
+
+    let mut headers = vec![];
+    let mut includes = FxHashSet::default();
+
+    for header_name in &world.player.settings.headers {
+        parse_header(header_name, &mut headers, &mut includes, &mut config_map, rng)?;
     }
 
     if !world.player.settings.inline_header.is_empty() {
         log::trace!("Parsing inline header");
-
-        let header = headers::parser::parse_header("inline header", &world.player.settings.inline_header.clone(), world, &mut context, &param_values, rng).map_err(|err| format!("{} in inline header", err))?;
-
-        header_block += &header;
+        let inline_header = Header::parse(world.player.settings.inline_header.clone(), rng)
+            .map_err(|err| format!("{err} in inline header"))?
+            .build(FxHashMap::default())?;
+        headers.push(("##INLINE_HEADER##".to_string(), inline_header));
     }
 
-    let mut parsed = Vec::new();
-    while let Some(name) = context.dependencies.pop() {
-        if parsed.contains(&name) {
-            continue;
+    let mut excludes = FxHashMap::default();
+    let mut seed_contents = String::new();
+    let mut flags = vec![];
+    let mut state_sets = vec![];
+
+    let header_names = headers.into_iter().map(|(header_name, mut header)| {
+        log::trace!("Parsing header {header_name}");
+
+        for exclude in header.excludes {
+            excludes.insert(exclude, header_name.clone());
         }
 
-        log::trace!("Parsing header {}", name);
+        seed_contents.push_str(&header.seed_content);
+        seed_contents.push('\n');
 
-        let path = name.clone() + ".wotwrh";
-        let header = util::read_file(&path, "headers")?;
-        let header = headers::parser::parse_header(&name, &header, world, &mut context, &param_values, rng).map_err(|err| format!("{} in header {}", err, name))?;
+        flags.append(&mut header.flags);
 
-        parsed.push(name);
-        header_block += &header;
+        for preplacement in header.preplacements {
+            block_spawn_sets(&preplacement, world);
+            header.item_pool_changes.entry(preplacement.item.clone()).and_modify(|prior| *prior -= 1).or_insert(-1);
+            world.preplace(preplacement.trigger, preplacement.item);
+        }
+
+        for (item, amount) in header.item_pool_changes {
+            if amount > 0 {
+                world.pool.grant(item, amount as u32);
+            } else if amount < 0 {
+                world.pool.remove(&item, (-amount) as u32);
+            }
+        }
+
+        for (item, details) in header.item_details {
+            let display = item.to_string();
+            if world.custom_items.insert(item, details).is_some() {
+                return Err(format!("multiple headers tried to customize the item {display}"));
+            }
+        }
+
+        state_sets.append(&mut header.state_sets);
+
+        Ok(header_name)
+    }).collect::<Result<Vec<_>, _>>()?;
+
+    for header_name in &header_names {
+        if let Some(other) = excludes.get(header_name) {
+            return Err(format!("headers {other} and {header_name} are incompatible"));
+        }
     }
-
-    for header in parsed {
-        if let Some(incompability) = context.excludes.get(&header) {
-            return Err(format!("{} and {} are incompatible", header, incompability));
+    for header_with_parameters in config_map.keys() {
+        if !header_names.iter().any(|header| header == header_with_parameters) {
+            log::warn!("The header {header_with_parameters} referenced in a header argument isn't active");
         }
     }
 
-    for (item, amount) in context.negative_inventory.items {
-        world.pool.inventory.remove(&item, amount);
+    for flag in world.player.settings.goals.iter().map(Goal::flag_name) {
+        flags.push(flag.to_string());
     }
+    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
 
-    Ok((header_block, context.flags, context.custom_items, context.sets))
+    let flags = if flags.is_empty() { String::new() } else { format!("Flags: {}\n", flags.join(", ")) };
+    let state_sets = if state_sets.is_empty() { String::new() } else { format!("// Sets: {}\n", state_sets.join(", ")) };
+    let header_block = format!("{flags}{seed_contents}{state_sets}");
+
+    Ok(header_block)
 }
 
 fn generate_placements<'a, R>(
@@ -258,7 +323,7 @@ where R: Rng
 }
 
 #[inline]
-fn format_placements(world_placements: Vec<Placement>, custom_items: &FxHashMap<String, ItemDetails>) -> String {
+fn format_placements(world_placements: Vec<Placement>, custom_items: &FxHashMap<Item, ItemDetails>) -> String {
     let mut placement_block = String::with_capacity(world_placements.len() * 20);
 
     for placement in world_placements {
@@ -276,16 +341,16 @@ fn format_placements(world_placements: Vec<Placement>, custom_items: &FxHashMap<
         );
 
         util::add_trailing_spaces(&mut placement_line, 46);
-        let item = custom_items.get(&placement.item.code())
+        let item = custom_items.get(&placement.item)
             .and_then(|details| details.name.clone())
             .unwrap_or_else(|| placement.item.to_string());
         let item = util::with_leading_spaces(&item, 36);
 
-        placement_line += &format!("  // {} from {}", item, location);
-
-        placement_line.push('\n');
+        placement_line += &format!("  // {} from {}\n", item, location);
         placement_block.push_str(&placement_line);
     }
+
+    placement_block.push('\n');
 
     placement_block
 }
@@ -303,18 +368,11 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
         let mut world = World::new(graph, world_settings);
         world.pool = Pool::preset();
 
-        let (header_block, custom_flags, custom_items, sets) = parse_headers(&mut world, &mut rng)?;
-        world.custom_items = custom_items;
+        let mut header_block = parse_headers(&mut world, &mut rng)?;
+        let world_line = format!("\n// This World: {index}\n");
+        header_block.push_str(&world_line);
 
-        let flag_line = write_flags(&world.player.settings, custom_flags);
-        let set_line = if sets.is_empty() {
-            String::new()
-        } else {
-            format!("// Sets: {}\n", sets.join(", "))
-        };
-        let world_line = format!("// This World: {index}\n");
-
-        Ok((world, (flag_line, header_block, set_line, world_line)))
+        Ok((world, header_block))
     }).collect::<Result<Vec<_>, String>>()?.into_iter().unzip();
 
     let spawn_pickup_node = Node::Pickup(Pickup {
@@ -337,7 +395,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
             }
 
             let position = spawn_loc.position().ok_or_else(|| format!("Tried to spawn on {} which has no specified coordinates", identifier))?;
-            return Ok(format!("Spawn: {position}  // {identifier}\n{spawn_item}"));
+            return Ok(format!("Spawn: {position}  // {identifier}\n{spawn_item}\n\n"));
         }
         Ok(String::new())
     }).collect::<Result<Vec<_>, String>>()?;
@@ -351,11 +409,11 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
         .zip(worlds.iter().map(|world| &world.custom_items))
         .map(|(world_placements, custom_items)| format_placements(world_placements, custom_items))
         .zip(world_data).zip(spawn_lines)
-        .map(|((placement_block, (flag_line, header_block, set_line, world_line)), spawn_line)| {
-            format!("{flag_line}{spawn_line}\n{placement_block}\n{header_block}\n{target_line}{version_line}{slug_line}{set_line}{world_line}{config_line}")
+        .map(|((placement_block, header_block), spawn_line)| {
+            format!("{spawn_line}{placement_block}{header_block}{target_line}{version_line}{slug_line}{config_line}")
         }).collect::<Vec<_>>();
 
-    headers::parser::postprocess(&mut seeds, graph, &worlds.iter().map(|world| &world.player.settings).collect::<Vec<_>>())?;
+    header::parser::postprocess(&mut seeds, graph, &worlds.iter().map(|world| &world.player.settings).collect::<Vec<_>>())?;
 
     Ok(seeds)
 }

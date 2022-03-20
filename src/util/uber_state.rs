@@ -1,6 +1,9 @@
 use std::fmt;
 
+use seedgen_derive::VVariant;
+
 use crate::item::{Item, UberStateItem, UberStateOperator};
+use crate::header::{V, VResolve};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum UberType {
@@ -56,17 +59,21 @@ impl fmt::Display for UberIdentifier {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord, VVariant)]
 pub struct UberState {
     pub identifier: UberIdentifier,
+    #[VWrap]
     pub value: String,
 }
 impl UberState {
     pub fn from_parts(group: &str, id: &str) -> Result<UberState, String> {
-        let uber_group: u16 = group.parse().map_err(|_| format!("invalid uber group {}", group))?;
+        let uber_group = group.parse().map_err(|_| format!("invalid uber group {group}"))?;
         let mut id_parts = id.splitn(2, '=');
-        let uber_id: u16 = id_parts.next().unwrap().parse().map_err(|_| format!("invalid uber id {}", id))?;
+        let uber_id = id_parts.next().unwrap().parse().map_err(|_| format!("invalid uber id {id}"))?;
         let value = id_parts.next().unwrap_or("");
+        if !value.is_empty() {
+            value.parse::<f32>().map_err(|_| format!("invalid uber value {value}"))?;
+        }
         Ok(UberState {
             identifier: UberIdentifier {
                 uber_group,

@@ -1,16 +1,19 @@
 use std::fmt;
 
-use super::Item;
-use crate::util::Icon;
+use seedgen_derive::VVariant;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+use super::{Item, VItem};
+use crate::util::Icon;
+use crate::header::{V, VResolve, VString};
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum WheelCommand {
-    SetName { wheel: u16, position: u8, name: String },
-    SetDescription { wheel: u16, position: u8, description: String },
+    SetName { wheel: u16, position: u8, #[VType] name: String },
+    SetDescription { wheel: u16, position: u8, #[VType] description: String },
     SetIcon { wheel: u16, position: u8, icon: Icon },
-    SetColor { wheel: u16, position: u8, r: u8, g: u8, b: u8, a: u8 },
-    SetItem { wheel: u16, position: u8, bind: WheelBind, item: Box<Item> },
-    SetSticky { wheel: u16, sticky: bool },
+    SetColor { wheel: u16, position: u8, #[VWrap] r: u8, #[VWrap] g: u8, #[VWrap] b: u8, #[VWrap] a: u8 },
+    SetItem { wheel: u16, position: u8, bind: WheelBind, #[VType] item: Box<Item> },
+    SetSticky { wheel: u16, #[VWrap] sticky: bool },
     SwitchWheel { wheel: u16 },
     RemoveItem { wheel: u16, position: u8 },
     ClearAll,

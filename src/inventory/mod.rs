@@ -6,10 +6,10 @@ use crate::item::Item;
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Inventory {
-    pub items: FxHashMap<Item, u16>,
+    pub items: FxHashMap<Item, u32>,
 }
 impl Inventory {
-    pub fn grant(&mut self, mut item: Item, mut amount: u16) {
+    pub fn grant(&mut self, mut item: Item, mut amount: u32) {
         let single_instance = item.is_single_instance();
         if single_instance && amount > 1 {
             log::warn!("Granted {} more than once, but that item can only be aquired once...", item);
@@ -26,7 +26,7 @@ impl Inventory {
             *prior += amount;
         }
     }
-    pub fn remove(&mut self, item: &Item, amount: u16) -> u16 {
+    pub fn remove(&mut self, item: &Item, amount: u32) -> u32 {
         match self.items.get_mut(item) {
             Some(prior) => {
                 if amount >= *prior {
@@ -42,13 +42,13 @@ impl Inventory {
         }
     }
 
-    pub fn has(&self, item: &Item, amount: u16) -> bool {
+    pub fn has(&self, item: &Item, amount: u32) -> bool {
         if let Some(owned) = self.items.get(item) {
             return *owned >= amount;
         }
         false
     }
-    pub fn get(&self, item: &Item) -> u16 {
+    pub fn get(&self, item: &Item) -> u32 {
         *self.items.get(item).unwrap_or(&0)
     }
 
@@ -62,7 +62,7 @@ impl Inventory {
             }
         }
 
-        count.into()
+        count as usize
     }
     pub fn world_item_count(&self) -> usize {
         let mut count = 0;
@@ -74,7 +74,7 @@ impl Inventory {
             }
         }
 
-        count.into()
+        count as usize
     }
 
     pub fn cost(&self) -> f32 {
@@ -83,7 +83,7 @@ impl Inventory {
             cost += item.cost() * self.items[item];
         }
 
-        cost.into()
+        cost as f32
     }
 
     pub fn contains(&self, other: &Inventory) -> bool {
@@ -124,8 +124,8 @@ impl From<Item> for Inventory {
         inventory
     }
 }
-impl From<(Item, u16)> for Inventory {
-    fn from(item_amount: (Item, u16)) -> Inventory {
+impl From<(Item, u32)> for Inventory {
+    fn from(item_amount: (Item, u32)) -> Inventory {
         let mut inventory = Inventory::default();
         let (item, amount) = item_amount;
         inventory.grant(item, amount);
@@ -141,8 +141,8 @@ impl From<Vec<Item>> for Inventory {
         inventory
     }
 }
-impl From<Vec<(Item, u16)>> for Inventory {
-    fn from(items: Vec<(Item, u16)>) -> Inventory {
+impl From<Vec<(Item, u32)>> for Inventory {
+    fn from(items: Vec<(Item, u32)>) -> Inventory {
         let mut inventory = Inventory::default();
         for (item, amount) in items {
             inventory.grant(item, amount);

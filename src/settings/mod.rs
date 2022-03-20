@@ -302,9 +302,9 @@ pub struct WorldSettings {
     /// When generating a seed with these settings, the headers will be searched as .wotwrh files in the current and /headers child directory
     pub headers: Vec<String>,
     /// Configuration parameters to pass to headers
-    ///
+    /// 
     /// Format for one parameter: <headername>.<parametername>=<value>
-    pub header_config: Vec<String>,
+    pub header_config: Vec<HeaderConfig>,
     /// Inline header syntax
     pub inline_header: String,
 }
@@ -518,9 +518,9 @@ impl Goal {
     }
 }
 
+/// Different types of online games that can be automatically created when generating the seed
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, seedgen_derive::FromStr)]
 #[ParseFromIdentifier]
-/// Different types of online games that can be automatically created when generating the seed^
 pub enum CreateGame {
     /// Don't create an online game
     None,
@@ -538,6 +538,17 @@ impl Default for CreateGame {
     fn default() -> CreateGame {
         CreateGame::None
     }
+}
+
+/// Configuration parameter for a header
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+pub struct HeaderConfig {
+    /// The name of the header
+    pub header_name: String,
+    /// The name of the configuration parameter
+    pub config_name: String,
+    /// The value to use for the configuration parameter
+    pub config_value: String,
 }
 
 #[cfg(test)]

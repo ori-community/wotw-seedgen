@@ -10,7 +10,7 @@ pub use requirements::Requirement;
 
 use rustc_hash::FxHashMap;
 
-use crate::ItemDetails;
+use crate::header::ItemDetails;
 use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
 use crate::settings::WorldSettings;
 use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
@@ -23,7 +23,7 @@ pub struct World<'a> {
     pub preplacements: FxHashMap<UberState, Vec<Item>>,
     pub uber_states: FxHashMap<UberIdentifier, String>,
     pub sets: Vec<usize>,
-    pub custom_items: FxHashMap<String, ItemDetails>,
+    pub custom_items: FxHashMap<Item, ItemDetails>,
 }
 impl<'a> World<'a> {
     pub fn new(graph: &Graph, settings: WorldSettings) -> World {
@@ -38,7 +38,7 @@ impl<'a> World<'a> {
         }
     }
 
-    pub fn grant_player(&mut self, item: Item, amount: u16) -> Result<(), String> {
+    pub fn grant_player(&mut self, item: Item, amount: u32) -> Result<(), String> {
         match item {
             Item::UberState(command) => {
                 for _ in 0..amount {
@@ -127,8 +127,7 @@ impl<'a> World<'a> {
     }
 
     pub fn preplace(&mut self, uber_state: UberState, item: Item) {
-        let preplacement = self.preplacements.entry(uber_state).or_insert_with(Vec::default);
-        preplacement.push(item);
+        self.preplacements.entry(uber_state).or_default().push(item);
     }
     pub fn collect_preplacements(&mut self, reached: &UberState) -> bool {
         if let Some(items) = self.preplacements.get(reached) {

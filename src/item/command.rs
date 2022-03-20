@@ -1,40 +1,42 @@
 use std::fmt;
 
 use num_enum::TryFromPrimitive;
+use seedgen_derive::VVariant;
 
-use super::{Item, Resource};
-use crate::util::{UberIdentifier, UberState, Position};
+use super::{Item, VItem, Resource};
+use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool};
+use crate::header::{V, VResolve};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum Command {
     Autosave,
-    Resource { resource: Resource, amount: i16 },
+    Resource { resource: Resource, #[VWrap] amount: i16 },
     Checkpoint,
     Magic,
-    StopEqual { uber_state: UberState },
-    StopGreater { uber_state: UberState },
-    StopLess { uber_state: UberState },
-    Toggle { target: ToggleCommand, on: bool },
-    Warp { position: Position },
+    StopEqual { #[VType] uber_state: UberState },
+    StopGreater { #[VType] uber_state: UberState },
+    StopLess { #[VType] uber_state: UberState },
+    Toggle { target: ToggleCommand, #[VWrap] on: NumericBool },
+    Warp { #[VType] position: Position },
     StartTimer { identifier: UberIdentifier },
     StopTimer { identifier: UberIdentifier },
     StateRedirect { intercept: i32, set: i32 },
-    SetHealth { amount: i16 },
-    SetEnergy { amount: i16 },
-    SetSpiritLight { amount: i16 },
-    Equip { slot: u8, ability: u16 },
+    SetHealth { #[VWrap] amount: i16 },
+    SetEnergy { #[VWrap] amount: i16 },
+    SetSpiritLight { #[VWrap] amount: i16 },
+    Equip { #[VWrap] slot: EquipSlot, ability: u16 },
     AhkSignal { signal: String },
-    IfEqual { uber_state: UberState, item: Box<Item> },
-    IfGreater { uber_state: UberState, item: Box<Item> },
-    IfLess { uber_state: UberState, item: Box<Item> },
+    IfEqual { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
+    IfGreater { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
+    IfLess { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
     DisableSync { uber_state: UberState },
     EnableSync { uber_state: UberState },
-    CreateWarp { id: u8, position: Position },
+    CreateWarp { id: u8, #[VType] position: Position },
     DestroyWarp { id: u8 },
-    IfBox { position1: Position, position2: Position, item: Box<Item> },
-    IfSelfEqual { value: String, item: Box<Item> },
-    IfSelfGreater { value: String, item: Box<Item> },
-    IfSelfLess { value: String, item: Box<Item> },
+    IfBox { #[VType] position1: Position, #[VType] position2: Position, #[VType] item: Box<Item> },
+    IfSelfEqual { #[VWrap] value: String, #[VType] item: Box<Item> },
+    IfSelfGreater { #[VWrap] value: String, #[VType] item: Box<Item> },
+    IfSelfLess { #[VWrap] value: String, #[VType] item: Box<Item> },
     UnEquip { ability: u16 },
 }
 impl fmt::Display for Command {
@@ -47,7 +49,7 @@ impl fmt::Display for Command {
             Command::StopEqual { uber_state } => write!(f, "4|{}|{}", uber_state.identifier, uber_state.value),
             Command::StopGreater { uber_state } => write!(f, "5|{}|{}", uber_state.identifier, uber_state.value),
             Command::StopLess { uber_state } => write!(f, "6|{}|{}", uber_state.identifier, uber_state.value),
-            Command::Toggle { target, on } => write!(f, "7|{}|{}", target, u8::from(*on)),
+            Command::Toggle { target, on } => write!(f, "7|{}|{}", target, *on as u8),
             Command::Warp { position } => write!(f, "8|{}", position.code()),
             Command::StartTimer { identifier } => write!(f, "9|{}", identifier),
             Command::StopTimer { identifier } => write!(f, "10|{}", identifier),
@@ -55,7 +57,7 @@ impl fmt::Display for Command {
             Command::SetHealth { amount } => write!(f, "12|{}", amount),
             Command::SetEnergy { amount } => write!(f, "13|{}", amount),
             Command::SetSpiritLight { amount } => write!(f, "14|{}", amount),
-            Command::Equip { slot, ability } => write!(f, "15|{}|{}", slot, ability),
+            Command::Equip { slot, ability } => write!(f, "15|{}|{}", *slot as u8, ability),
             Command::AhkSignal { signal } => write!(f, "16|{}", signal),
             Command::IfEqual { uber_state, item } => write!(f, "17|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
             Command::IfGreater { uber_state, item } => write!(f, "18|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
@@ -88,4 +90,12 @@ impl fmt::Display for ToggleCommand {
             ToggleCommand::Howl => write!(f, "2"),
         }
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, seedgen_derive::FromStr)]
+#[repr(u8)]
+pub enum EquipSlot {
+    Ability1,
+    Ability2,
+    Ability3,
 }

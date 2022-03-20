@@ -1,7 +1,3 @@
-pub mod parser;
-
-pub use parser::parse_header;
-
 use std::{
     fs,
     io::{BufRead, BufReader},
@@ -9,11 +5,14 @@ use std::{
 };
 
 use ansi_term::{Style, Colour};
+use rustc_hash::FxHashMap;
 
-use crate::util::{
+use crate::{util::{
     self,
-    constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR},
-};
+    constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR}, UberState,
+}, Header, Item, item::{UberStateOperator, Command}};
+
+use super::{HeaderContent, VResolve};
 
 fn is_hidden(header: &Path) -> Result<bool, String> {
     let file = fs::File::open(header).map_err(|err| format!("Failed to open header from {:?}: {}", header, err))?;
@@ -176,7 +175,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
         let contents = util::read_file(&header, "headers")?;
         let mut name = header.file_stem().unwrap().to_string_lossy().into_owned();
 
-        match parser::validate_header(&name, &contents) {
+        match validate_header(&contents) {
             Ok((occupied, excludes)) => {
                 occupation_map.push((name, occupied, excludes));
             },
@@ -193,7 +192,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
 
         'outer: for uber_state in occupied {
             for (other_header, other_occupied, _) in &occupation_map {
-                if header == other_header || excludes.contains_key(other_header) {
+                if header == other_header || excludes.contains(other_header) {
                     continue;
                 }
                 if let Some(collision) = other_occupied.iter().find(|&other| {
@@ -278,6 +277,81 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
 
     println!("{}", output);
     Ok(valid)
+}
+
+pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), String> {
+    let mut default_parameters = FxHashMap::default();
+
+    let header = Header::parse(contents.to_string(), &mut rand::thread_rng())?;
+    header.fill_parameters(&mut default_parameters)?;
+    let build = header.clone().build(default_parameters.clone())?;
+
+    let mut occupied_states = vec![];
+
+    for content in header.contents {
+        match content {
+            HeaderContent::Timer(timer) => {
+                occupied_states.push(UberState {
+                    identifier: timer.timer,
+                    value: "++".to_string(),  // represent a timer so that the sort will put it alongside + and - commands
+                });
+            },
+            HeaderContent::Pickup(pickup) => {
+                if pickup.skip_validation { continue }
+
+                let pickup = pickup.resolve(&default_parameters)?;
+                if pickup.trigger.identifier.uber_group == 9 {
+                    occupied_states.push(pickup.trigger.clone());
+                }
+
+                match pickup.item {
+                    Item::UberState(uber_state_item) if uber_state_item.uber_identifier.uber_group == 9 => {
+                        if let UberStateOperator::Value(mut value) = uber_state_item.operator {
+                            if value == "false" || value == "0" { continue }
+                            if value == "true" { value = String::from("1"); }
+
+                            occupied_states.push(UberState {
+                                identifier: uber_state_item.uber_identifier,
+                                value,
+                            });
+                        }
+                    },
+                    Item::Command(Command::StopEqual { uber_state }) |
+                    Item::Command(Command::StopGreater { uber_state }) |
+                    Item::Command(Command::StopLess { uber_state }) => {
+                        if pickup.trigger.identifier.uber_group == 9 {
+                            if uber_state.identifier.uber_group == 9 {
+                                occupied_states.push(uber_state);
+                            }
+                        } else {
+                            return Err(format!("stop command on {} stops a multipickup outside of uber group 9. This may interact unpredictably with other headers.", pickup.trigger));
+                        }
+                    }
+                    _ => {},
+                }
+            },
+            _ => {},
+        }
+    }
+
+    occupied_states.sort_unstable();
+    occupied_states.dedup();
+
+    // remove redundancies, the sort beforehand put all timers, + and - commands in front
+    let mut index = 0;
+    while let Some(current) = occupied_states.get_mut(index) {
+        if current.value.starts_with(&['+', '-'][..]) || current.value.is_empty() {
+            current.value = String::new();
+            let clone = current.clone();
+
+            occupied_states.retain(|other| other == &clone || other.identifier != clone.identifier);
+        }
+        index += 1;
+    }
+
+    occupied_states.dedup();
+
+    Ok((occupied_states, build.excludes))
 }
 
 #[cfg(test)]

@@ -5,22 +5,19 @@ use std::{
     convert::TryFrom,
     io::{self, Read},
     time::Instant,
-    collections::HashMap,
     process, env, error::Error,
 };
 
+use rustc_hash::FxHashMap;
 use structopt::StructOpt;
 use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, WorldSettings}, util, headers::{self, parser::HeaderContext}, preset::WorldPreset, Preset, Settings, logic};
+use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig}, util, header, preset::WorldPreset, Preset, Settings, logic, Header};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
-use world::{
-    World,
-    graph::Graph,
-};
+use world::World;
 use util::UberState;
 
 /// For CLI flags that contain a mixture of world specifiers and flag values
@@ -184,6 +181,30 @@ impl FromStr for GoalsOpt {
         Ok(GoalsOpt(goal))
     }
 }
+/// Newtype to parse header config
+#[derive(Clone)]
+struct HeaderConfigOpt(HeaderConfig);
+impl HeaderConfigOpt {
+    fn into_inner(self) -> HeaderConfig {
+        self.0
+    }
+}
+impl FromStr for HeaderConfigOpt {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (identifier, config_value) = s.split_once('=').unwrap_or((s, "true"));
+        let (header_name, config_name) = identifier.split_once('.').ok_or_else(|| format!("Expected <header>.<parameter> in header configuration parameter {s}"))?;
+
+        let header_config = HeaderConfig {
+            header_name: header_name.to_string(),
+            config_name: config_name.to_string(),
+            config_value: config_value.to_string(),
+        };
+
+        Ok(HeaderConfigOpt(header_config))
+    }
+}
 
 #[derive(StructOpt)]
 /// Generate seeds for the Ori 2 randomizer.
@@ -322,9 +343,8 @@ struct SeedSettings {
     /// Configuration parameters to pass to headers
     ///
     /// Format for one parameter: <headername>.<parametername>=<value>
-    // TODO parse these into a struct
     #[structopt(short = "c", long)]
-    header_config: Vec<WorldOpt<String>>,
+    header_config: Vec<WorldOpt<HeaderConfigOpt>>,
     /// Inline header syntax
     #[structopt(short, long = "inline")]
     inline_headers: Vec<WorldOpt<String>>,
@@ -399,7 +419,7 @@ impl SeedSettings {
                     goals: vec_in_option(goals.into_iter().map(GoalsOpt::into_inner).collect()),
                     hard,
                     headers: vec_in_option(headers),
-                    header_config: vec_in_option(header_config),
+                    header_config: vec_in_option(header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
                     inline_header,
                 }
             }).collect::<Vec<_>>();
@@ -480,7 +500,7 @@ struct WorldPresetSettings {
     ///
     /// Format for one parameter: <headername>.<parametername>=<value>
     #[structopt(short = "c", long)]
-    header_config: Option<Vec<String>>,
+    header_config: Option<Vec<HeaderConfigOpt>>,
     /// Inline header syntax
     #[structopt(short, long = "inline")]
     inline_headers: Option<Vec<String>>,
@@ -510,7 +530,7 @@ impl WorldPresetSettings {
             hard: if hard { Some(true) } else { None },
             goals: goals.map(|goals| goals.into_iter().map(GoalsOpt::into_inner).collect()),
             headers,
-            header_config,
+            header_config: header_config.map(|header_config| header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
             inline_header: inline_headers.map(|inline| inline.join("\n")),
         }
     }
@@ -531,13 +551,13 @@ struct ReachCheckArgs {
     #[structopt(parse(from_os_str), default_value = "state_data.csv", short, long)]
     uber_states: PathBuf,
     /// player health (one orb is 10 health)
-    health: u16,
+    health: u32,
     /// player energy (one orb is 1 energy)
     energy: f32,
     /// player keystones
-    keystones: u16,
+    keystones: u32,
     /// player ore
-    ore: u16,
+    ore: u32,
     /// player spirit light
     spirit_light: u32,
     /// any additional player items in the format s:<skill id>, t:<teleporter id>, sh:<shard id>, w:<world event id> or u:<ubergroup>,<uberid>
@@ -738,7 +758,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     world.player.inventory.grant(Item::Resource(Resource::Energy), util::float_to_int(args.energy * 2.0).map_err(|_| format!("Invalid energy parameter {}", args.energy))?);
     world.player.inventory.grant(Item::Resource(Resource::Keystone), args.keystones);
     world.player.inventory.grant(Item::Resource(Resource::Ore), args.ore);
-    world.player.inventory.grant(Item::SpiritLight(1), u16::try_from(args.spirit_light).unwrap_or(u16::MAX));  // Higher amounts of Spirit Light are irrelevant, just want to accept high values in case the player has that much);
+    world.player.inventory.grant(Item::SpiritLight(1), args.spirit_light);
 
     for item in args.items {
         if let Some(skill) = item.strip_prefix("s:") {
@@ -810,20 +830,12 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
 
     let header = fs::read_to_string(path.clone()).map_err(|err| format!("Failed to read {}: {}", path.display(), err))?;
 
-    let graph = Graph::default();
-    let mut world = World::new(&graph, WorldSettings::default());
     let mut rng = rand::thread_rng();
 
-    let mut context = HeaderContext::default();
-
-    let name = path.file_stem().unwrap().to_string_lossy().into_owned();
-    let header_block = headers::parser::parse_header(&name, &header, &mut world, &mut context, &HashMap::default(), &mut rng)?;
-    let flag_line = seedgen::write_flags(&world.player.settings, context.flags);
-
-    let compiled = format!("{}{}", flag_line, header_block);
+    let header = Header::parse(header, &mut rng)?.build(FxHashMap::default())?;
 
     path.set_extension("wotwr");
-    let path = util::create_file(path.file_name().unwrap(), &compiled, "target", false)?;
+    let path = util::create_file(path.file_name().unwrap(), &header.seed_content, "target", false)?;
     log::info!("Compiled to {}", path.display());
 
     Ok(())
@@ -867,16 +879,16 @@ fn main() {
 
             match subcommand {
                 Some(HeaderCommand::Validate { path }) => {
-                    if let Err(err) = headers::validate(path) { log::error!("{}", err) }
+                    if let Err(err) = header::validate(path) { log::error!("{}", err) }
                 },
                 Some(HeaderCommand::Parse { path }) => {
                     compile_seed(path).unwrap_or_else(|err| log::error!("{}", err));
                 },
                 None => {
                     if headers.is_empty() {
-                        headers::list().unwrap_or_else(|err| log::error!("{}", err));
+                        header::list().unwrap_or_else(|err| log::error!("{}", err));
                     } else {
-                        headers::inspect(headers).unwrap_or_else(|err| log::error!("{}", err));
+                        header::inspect(headers).unwrap_or_else(|err| log::error!("{}", err));
                     }
                 },
             }

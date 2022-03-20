@@ -13,7 +13,9 @@ mod shop_command;
 
 use std::fmt;
 
-use crate::languages::headers;
+use seedgen_derive::VVariant;
+
+use crate::header::{V, VResolve, VString};
 use crate::settings::Difficulty;
 use crate::util::{Zone, Icon};
 
@@ -21,39 +23,39 @@ pub use self::{
     resource::Resource,
     skill::Skill,
     shard::Shard,
-    command::{Command, ToggleCommand},
+    command::{Command, VCommand, ToggleCommand, EquipSlot},
     teleporter::Teleporter,
-    uber_state::{UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary},
+    uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary},
     bonus_item::BonusItem,
     bonus_upgrade::BonusUpgrade,
     hint::{Hint, ZoneHintType},
     sysmessage::SysMessage,
-    wheel_command::{WheelCommand, WheelBind},
-    shop_command::ShopCommand,
+    wheel_command::{WheelCommand, VWheelCommand, WheelBind},
+    shop_command::{ShopCommand, VShopCommand},
 };
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum Item {
-    SpiritLight(u16),
-    RemoveSpiritLight(u16),
+    SpiritLight(#[VWrap] u32),
+    RemoveSpiritLight(#[VWrap] u32),
     Resource(Resource),
     Skill(Skill),
     RemoveSkill(Skill),
     Shard(Shard),
     RemoveShard(Shard),
-    Command(Command),
+    Command(#[VType] Command),
     Teleporter(Teleporter),
     RemoveTeleporter(Teleporter),
-    Message(String),
-    UberState(UberStateItem),
+    Message(#[VType] String),
+    UberState(#[VType] UberStateItem),
     Water,
     RemoveWater,
     BonusItem(BonusItem),
     BonusUpgrade(BonusUpgrade),
     Relic(Zone),
     SysMessage(SysMessage),
-    WheelCommand(WheelCommand),
-    ShopCommand(ShopCommand),
+    WheelCommand(#[VType] WheelCommand),
+    ShopCommand(#[VType] ShopCommand),
 }
 impl fmt::Display for Item {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -91,7 +93,7 @@ impl fmt::Display for Item {
                     if end_index == 0 { break; }
 
                     let item = &message[after_bracket..end_index];
-                    if let Ok(item) = headers::parser::parse_item(item) {
+                    if let Ok(item) = Item::parse(item) {
                         message.replace_range(start_index..=end_index, &item.to_string());
                     } else { last_index = end_index; } // if nothing ends up getting replaced, move on
                 }
@@ -195,7 +197,7 @@ impl Item {
     }
 
     #[inline]
-    pub fn cost(&self) -> u16 {
+    pub fn cost(&self) -> u32 {
         #[allow(clippy::match_same_arms)]
         match self {
             Item::SpiritLight(amount) => *amount,
@@ -220,7 +222,7 @@ impl Item {
     }
 
     #[inline]
-    pub fn shop_price(&self) -> u16 {
+    pub fn shop_price(&self) -> u32 {
         #[allow(clippy::match_same_arms)]
         match self {
             Item::Resource(Resource::Health) => 200,

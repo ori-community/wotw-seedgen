@@ -133,7 +133,7 @@ where
     let is_shop = uber_state.is_shop();
 
     let code = item.code();
-    let origin_details = origin_world_context.world.custom_items.get(&code);
+    let origin_details = origin_world_context.world.custom_items.get(&item);
 
     if uber_state.is_purchasable() {
         origin_world_context.shop_slots -= 1;
@@ -146,7 +146,7 @@ where
             let mut price = origin_details.and_then(|details| details.price).unwrap_or_else(|| item.shop_price());
 
             if item.random_shop_price() {
-                let modified_price = f32::from(price) * context.price_range.sample(context.rng);
+                let modified_price = price as f32 * context.price_range.sample(context.rng);
                 price = util::float_to_int(modified_price).map_err(|_| format!("({}): Overflowed shop price for {} after adding a random amount to it", origin_player_name, item))?;
             }
 
@@ -165,7 +165,7 @@ where
 
             if let Some(icon) = origin_details.and_then(|details| details.icon.clone()).or_else(|| item.icon()) {
                 let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
-                    uber_state: uber_state.clone(),
+                    uber_state: uber_state.identifier.clone(),
                     icon,
                 });
 
@@ -210,7 +210,7 @@ where
         log::trace!("({}): Placed {}'s {} at {}", origin_player_name, target_player_name, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         let target_world_context = &mut world_contexts[target_world_index];
-        let target_details = target_world_context.world.custom_items.get(&code);
+        let target_details = target_world_context.world.custom_items.get(&item);
         let target_display = target_details.and_then(|details| details.display.clone());
 
         let state_index = context.multiworld_state_index.next().unwrap();
@@ -298,7 +298,7 @@ where
         let placed_keystones = world_context.world.player.inventory.get(&Item::Resource(Resource::Keystone));
         if placed_keystones < 2 { return Ok(()); }
 
-        let required_keystones: u16 = reachable_states[target_world_index].iter()
+        let required_keystones: u32 = reachable_states[target_world_index].iter()
             .filter_map(|&node| {
                 if let Some((_, keystones)) = KEYSTONE_DOORS.iter().find(|&&(identifier, _)| identifier == node.identifier()) {
                     return Some(*keystones);
@@ -489,7 +489,7 @@ I: Iterator<Item=usize>,
     Ok(progression)
 }
 
-fn split_progression_item<'a, R, I>(world_index: usize, item: &Item, amount: &u16, world_contexts: &mut [WorldContext<'a>], context: &mut GeneratorContext<'_, R, I>) -> Result<Vec<Item>, String>
+fn split_progression_item<'a, R, I>(world_index: usize, item: &Item, amount: &u32, world_contexts: &mut [WorldContext<'a>], context: &mut GeneratorContext<'_, R, I>) -> Result<Vec<Item>, String>
 where
     R: Rng,
     I: Iterator<Item=usize>,
@@ -506,7 +506,7 @@ where
 
         spirit_light_items
     } else {
-        vec![item.clone(); (*amount).into()]
+        vec![item.clone(); *amount as usize]
     })
 }
 
@@ -757,7 +757,7 @@ impl SpiritLightAmounts {
             index: 0,
         }
     }
-    fn sample<R>(&mut self, rng: &mut R) -> u16
+    fn sample<R>(&mut self, rng: &mut R) -> u32
     where
         R: Rng + ?Sized
     {
@@ -766,7 +766,7 @@ impl SpiritLightAmounts {
         self.index += 1;
 
         #[allow(clippy::cast_possible_truncation)]
-        util::float_to_int(amount).unwrap_or(u16::MAX)
+        util::float_to_int(amount).unwrap_or(u32::MAX)
     }
 }
 
@@ -794,7 +794,7 @@ where
 
     for target_world_index in 0..context.world_count {
         let mut remaining = world_contexts[target_world_index].world.pool.inventory.items.drain()
-            .flat_map(|(item, amount)| vec![item; amount.into()])
+            .flat_map(|(item, amount)| vec![item; amount as usize])
             .collect::<Vec<_>>();
         log::trace!("({}): Placing the remaining {} items randomly", world_contexts[target_world_index].world.player.settings.world_name, remaining.len());
 
@@ -921,7 +921,7 @@ where
     for target_world_index in 0..context.world_count {
         let uber_state_items = world_contexts[target_world_index].world.pool.inventory.items.iter()
             .filter(|(item, _)| matches!(item, Item::UberState(_)))
-            .flat_map(|(item, amount)| vec![item.clone(); (*amount).into()])
+            .flat_map(|(item, amount)| vec![item.clone(); *amount as usize])
             .collect::<Vec<_>>();
 
         'outer: for item in uber_state_items {
@@ -1063,7 +1063,7 @@ where
         if let Some(amount) = world_tour { spirit_light_slots -= amount; }
         log::trace!("({}): Estimated {}/{} slots for Spirit Light", world.player.settings.world_name, spirit_light_slots, world_slots);
 
-        let spirit_light_rng = SpiritLightAmounts::new(f32::from(world.pool.spirit_light), spirit_light_slots as f32, 0.75, 1.25);
+        let spirit_light_rng = SpiritLightAmounts::new(world.pool.spirit_light as f32, spirit_light_slots as f32, 0.75, 1.25);
         let random_spirit_light = Bernoulli::new(spirit_light_slots as f64 / world_slots as f64).unwrap();
 
         let shop_slots = world.graph.nodes.iter().filter(|&node|

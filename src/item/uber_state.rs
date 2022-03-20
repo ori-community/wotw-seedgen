@@ -1,13 +1,17 @@
 use std::fmt;
 
-use crate::util::{UberIdentifier, UberType};
+use seedgen_derive::VVariant;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+use crate::util::{UberIdentifier, UberType};
+use crate::header::{V, VResolve};
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub struct UberStateItem {
     pub uber_identifier: UberIdentifier,
     pub uber_type: UberType,
     pub signed: bool,
     pub sign: bool,
+    #[VType]
     pub operator: UberStateOperator,
     pub skip: bool,
 }
@@ -21,11 +25,11 @@ impl fmt::Display for UberStateItem {
         )
     }
 }
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum UberStateOperator {
-    Value(String),
+    Value(#[VWrap] String),
     Pointer(UberIdentifier),
-    Range(UberStateRange)
+    Range(#[VType] UberStateRange)
 }
 impl fmt::Display for UberStateOperator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -36,9 +40,11 @@ impl fmt::Display for UberStateOperator {
         }
     }
 }
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub struct UberStateRange {
+    #[VType]
     pub start: UberStateRangeBoundary,
+    #[VType]
     pub end: UberStateRangeBoundary,
 }
 impl fmt::Display for UberStateRange {
@@ -46,9 +52,9 @@ impl fmt::Display for UberStateRange {
         write!(f, "[{},{}]", self.start, self.end)
     }
 }
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum UberStateRangeBoundary {
-    Value(String),
+    Value(#[VWrap] String),
     Pointer(UberIdentifier),
 }
 impl fmt::Display for UberStateRangeBoundary {

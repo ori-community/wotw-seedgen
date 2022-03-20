@@ -1,7 +1,7 @@
 pub mod logic;
-pub mod headers;
+pub mod header;
+pub mod seed;
 
 pub use self::{
     logic::parse_logic,
-    headers::parser::parse_header,
 };

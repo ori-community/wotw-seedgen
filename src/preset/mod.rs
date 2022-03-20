@@ -4,7 +4,7 @@ use std::error::Error;
 
 use serde::{Serialize, Deserialize};
 
-use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame}, util};
+use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig}, util};
 
 /// A collection of settings that can be applied to existing settings
 /// 
@@ -152,10 +152,8 @@ pub struct WorldPreset {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<Vec<String>>,
     /// Configuration parameters to pass to headers
-    ///
-    /// format for one parameter: <headername>.<parametername>=<value>
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub header_config: Option<Vec<String>>,
+    pub header_config: Option<Vec<HeaderConfig>>,
     /// Inline header syntax
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inline_header: Option<String>,

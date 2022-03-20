@@ -7,7 +7,7 @@ use crate::item::{Item, Resource, Skill, Shard, BonusUpgrade};
 #[derive(Default, Debug, Clone)]
 pub struct Pool {
     pub inventory: Inventory,
-    pub spirit_light: u16,
+    pub spirit_light: u32,
 }
 impl Pool {
     pub fn preset() -> Pool {
@@ -85,14 +85,14 @@ impl Pool {
         }
     }
 
-    pub fn grant(&mut self, item: Item, amount: u16) {
+    pub fn grant(&mut self, item: Item, amount: u32) {
         if let Item::SpiritLight(amount) = item {
             self.spirit_light += amount;
         } else {
             self.inventory.grant(item, amount);
         }
     }
-    pub fn remove(&mut self, item: &Item, amount: u16) -> u16 {
+    pub fn remove(&mut self, item: &Item, amount: u32) -> u32 {
         if let Item::SpiritLight(stacked_amount) = item {
             let amount = amount * stacked_amount;
             if self.spirit_light > amount {

@@ -43,7 +43,7 @@ pub const RELIC_ZONES: &[Zone] = &[
     Zone::Willow,
     Zone::Burrows,
 ];
-pub const KEYSTONE_DOORS: &[(&str, u16)] = &[
+pub const KEYSTONE_DOORS: &[(&str, u32)] = &[
     ("MarshSpawn.KeystoneDoor", 2),
     ("HowlsDen.KeystoneDoor", 2),
     ("MarshPastOpher.EyestoneDoor", 2),

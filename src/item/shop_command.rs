@@ -1,14 +1,17 @@
 use std::fmt;
 
-use crate::util::{UberState, Icon};
+use seedgen_derive::VVariant;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+use crate::util::{UberIdentifier, Icon};
+use crate::header::{V, VResolve, VString};
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum ShopCommand {
-    SetIcon { uber_state: UberState, icon: Icon },
-    SetTitle { uber_state: UberState, title: Option<String> },
-    SetDescription { uber_state: UberState, description: Option<String> },
-    SetLocked { uber_state: UberState, locked: bool },
-    SetVisible { uber_state: UberState, visible: bool },
+    SetIcon { uber_state: UberIdentifier, icon: Icon },
+    SetTitle { uber_state: UberIdentifier, #[VType] title: Option<String> },
+    SetDescription { uber_state: UberIdentifier, #[VType] description: Option<String> },
+    SetLocked { uber_state: UberIdentifier, #[VWrap] locked: bool },
+    SetVisible { uber_state: UberIdentifier, #[VWrap] visible: bool },
 }
 impl fmt::Display for ShopCommand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

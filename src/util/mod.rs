@@ -1,12 +1,14 @@
 pub mod orbs;
 pub mod uber_state;
 pub mod constants;
+pub(crate) mod extensions;
 
 pub use orbs::Orbs;
+pub use uber_state::{UberState, VUberState, UberIdentifier, UberType};
 
 use decorum::R32;
-use num_enum::FromPrimitive;
-pub use uber_state::{UberState, UberIdentifier, UberType};
+use num_enum::{FromPrimitive, TryFromPrimitive};
+use seedgen_derive::VVariant;
 
 use std::{
     fmt,
@@ -14,6 +16,15 @@ use std::{
     io::{self, Write},
     path::{Path, PathBuf},
 };
+
+use crate::header::{V, VResolve};
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, seedgen_derive::FromStr)]
+#[repr(u8)]
+pub enum NumericBool {
+    False,
+    True,
+}
 
 #[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
 #[repr(u8)]
@@ -141,9 +152,11 @@ pub enum NodeType {
     Quest,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Hash, Clone, VVariant)]
 pub struct Position {
+    #[VWrap]
     pub x: R32,
+    #[VWrap]
     pub y: R32,
 }
 impl Position {
@@ -151,7 +164,6 @@ impl Position {
         format!("{}|{}", self.x, self.y)
     }
 }
-
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}, {}", self.x, self.y)
@@ -257,11 +269,11 @@ pub fn with_leading_spaces(string: &str, target_length: usize) -> String {
     out
 }
 
-pub fn float_to_int(float: f32) -> Result<u16, String> {
-    if float < u16::MIN.into() || float > u16::MAX.into() {
-        return Err(format!("Failed to convert float to int: {}", float));
+pub fn float_to_int(float: f32) -> Result<u32, String> {
+    if float < u32::MIN as f32  || float > u32::MAX as f32 {
+        return Err(format!("Failed to convert float to int: {float}"));
     }
-    Ok(float as u16)
+    Ok(float as u32)
 }
 
 /// Read the spawn location from a generated seed

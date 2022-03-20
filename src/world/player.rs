@@ -43,7 +43,7 @@ impl Player {
     /// assert_eq!(player.max_health(), 30.0);
     /// ```
     pub fn max_health(&self) -> f32 {
-        let mut health = f32::from(self.inventory.get(&Item::Resource(Resource::Health)) * 5);
+        let mut health = (self.inventory.get(&Item::Resource(Resource::Health)) * 5) as f32;
         if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
         health
     }
@@ -61,7 +61,7 @@ impl Player {
     /// assert_eq!(player.max_energy(), 3.0);
     /// ```
     pub fn max_energy(&self) -> f32 {
-        let mut energy = f32::from(self.inventory.get(&Item::Resource(Resource::Energy))) * 0.5;
+        let mut energy = self.inventory.get(&Item::Resource(Resource::Energy)) as f32 * 0.5;
         if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
         energy
     }
@@ -115,7 +115,7 @@ impl Player {
     pub fn cap_orbs(&self, orbs: &mut Orbs, checkpoint: bool) {
         // checkpoints don't refill health given by the Vitality shard
         let max_health = if checkpoint {
-            f32::from(self.inventory.get(&Item::Resource(Resource::Health)) * 5)
+            (self.inventory.get(&Item::Resource(Resource::Health)) * 5) as f32
         } else {
             self.max_health()
         };
@@ -204,7 +204,7 @@ impl Player {
         let mut damage_mod = 1.0;
 
         if self.settings.difficulty >= Difficulty::Gorlek {
-            damage_mod += 0.25 * f32::from(self.inventory.get(&Item::Skill(Skill::AncestralLight)));
+            damage_mod += 0.25 * self.inventory.get(&Item::Skill(Skill::AncestralLight)) as f32;
         }
 
         if self.settings.difficulty >= Difficulty::Unsafe {
@@ -213,7 +213,7 @@ impl Player {
 
             if flying_target && slots > 0 && self.inventory.has(&Item::Shard(Shard::Wingclip), 1) { damage_mod += 1.0; slots -= 1; }
             if slots > 0 && bow && self.inventory.has(&Item::Shard(Shard::Splinter), 1) { splinter = true; slots -= 1; }
-            if slots > 0 && self.inventory.has(&Item::Shard(Shard::SpiritSurge), 1) { damage_mod += f32::from(self.inventory.get(&Item::SpiritLight(1)) / 10000); slots -= 1; }
+            if slots > 0 && self.inventory.has(&Item::Shard(Shard::SpiritSurge), 1) { damage_mod += (self.inventory.get(&Item::SpiritLight(1)) / 10000) as f32; slots -= 1; }
             if slots > 0 && self.inventory.has(&Item::Shard(Shard::LastStand), 1) { damage_mod += 0.2; slots -= 1; }
             if slots > 0 && self.inventory.has(&Item::Shard(Shard::Reckless), 1) { damage_mod += 0.15; slots -= 1; }
             if slots > 0 && self.inventory.has(&Item::Shard(Shard::Lifeforce), 1) { damage_mod += 0.1; slots -= 1; }
