@@ -176,7 +176,7 @@ fn parse_header(
         .build(header_config)?;
 
     for include in &header.includes {
-        if !includes.insert(include.clone()) {
+        if includes.insert(include.clone()) {
             parse_header(include, headers, includes, config_map, rng)?;
         }
     }
@@ -212,6 +212,7 @@ where R: Rng
 
     let mut headers = vec![];
     let mut includes = FxHashSet::default();
+    includes.extend(world.player.settings.headers.iter().cloned());
 
     for header_name in &world.player.settings.headers {
         parse_header(header_name, &mut headers, &mut includes, &mut config_map, rng)?;
