@@ -44,7 +44,7 @@ impl Requirement {
             }
         ])} else if player.settings.difficulty >= Difficulty::Unsafe && player.inventory.has(&Item::Shard(Shard::LifePact), 1) && orbs.energy + orbs.health > cost { Some(smallvec![
             Orbs {
-                health: cost - orbs.energy,
+                health: (cost - orbs.energy) * player.defense_mod(),
                 energy: -orbs.energy,
             }
         ])} else { None }
