@@ -952,7 +952,9 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     moki: Hammer OR Spear=1
   conn HowlsDen.DoubleJumpTreeArea:
     moki: Combat=Mantis+Lizard OR DoubleJump OR Dash OR Glide OR Launch
-    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+    kii:
+      Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+      Bash, Grenade=1
   conn HowlsDen.BoneBridge:
     moki, HowlsDen.BoneBarrier:
       DoubleJump OR Launch
