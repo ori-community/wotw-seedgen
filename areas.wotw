@@ -7804,6 +7804,7 @@ anchor DepthsShrine at 213, -4515:
       Damage=65
       Damage=60, DoubleJump OR Dash
       Damage=50, Launch
+    unsafe: Combat=3xBat+4xEnergyRefill+2xSneezeSlug+2xTentacle+4xEnergyRefill+2xBat+2xTentacle+4xEnergyRefill+Bat+SneezeSlug
 
   pickup LowerDepths.CombatShrine:
     moki: LowerDepths.CombatShrineCompleted
