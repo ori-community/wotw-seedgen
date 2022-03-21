@@ -59,6 +59,26 @@ fn build_difficulty_requirement(difficulty: Difficulty, out: Requirement, region
     }
 }
 
+const HARD_BOSS_HEALTH_MULTIPLIER: f32 = 1.8;
+
+fn build_boss_requirement(health: u16, context: &EmitterContext) -> Requirement {
+    if context.settings.any_play_hard() {
+        if context.settings.all_play_hard() {
+            Requirement::Boss(f32::from(health) * HARD_BOSS_HEALTH_MULTIPLIER)
+        } else {
+            Requirement::Or(vec![
+                Requirement::And(vec![
+                    Requirement::NormalGameDifficulty,
+                    Requirement::Boss(f32::from(health)),
+                ]),
+                Requirement::Boss(f32::from(health) * HARD_BOSS_HEALTH_MULTIPLIER),
+            ])
+        }
+    } else {
+        Requirement::Boss(f32::from(health))
+    }
+}
+
 fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
     match requirement {
         parser::Requirement::Free => Requirement::Free,
@@ -79,7 +99,7 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::Requirement::Damage(amount) => Requirement::Damage(f32::from(*amount)),
         parser::Requirement::Danger(amount) => Requirement::Danger(f32::from(*amount)),
         parser::Requirement::Combat(enemies) => Requirement::Combat(enemies.clone()),
-        parser::Requirement::Boss(health) => Requirement::Boss(f32::from(*health)),
+        parser::Requirement::Boss(health) => build_boss_requirement(*health, context),
         parser::Requirement::BreakWall(health) => Requirement::BreakWall(f32::from(*health)),
         parser::Requirement::BreakCrystal =>
             build_or(vec![
@@ -332,4 +352,42 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
     Ok(Graph {
         nodes: graph,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn boss_scaling() {
+        let context = EmitterContext {
+            definitions: &FxHashMap::default(),
+            settings: &Settings::default(),
+            validate: false,
+            node_map: FxHashMap::default(),
+            used_states: FxHashSet::default(),
+        };
+
+        let requirement = build_boss_requirement(100, &context);
+        match requirement {
+            Requirement::Boss(health) if health == 100.0 => {},
+            _ => panic!(),
+        }
+
+        let mut settings = Settings::default();
+        settings.world_settings[0].hard = true;
+        let context = EmitterContext {
+            definitions: &FxHashMap::default(),
+            settings: &settings,
+            validate: false,
+            node_map: FxHashMap::default(),
+            used_states: FxHashSet::default(),
+        };
+
+        let requirement = build_boss_requirement(100, &context);
+        match requirement {
+            Requirement::Boss(health) if health == 100.0 * 1.7999999523162841796875 => {},
+            _ => panic!(),
+        }
+    }
 }

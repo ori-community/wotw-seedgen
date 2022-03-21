@@ -14,6 +14,7 @@ pub enum Requirement {
     Free,
     Impossible,
     Difficulty(Difficulty),
+    NormalGameDifficulty,
     Trick(Trick),
     Skill(Skill),
     EnergySkill(Skill, f32),
@@ -62,10 +63,10 @@ impl Requirement {
         match self {
             Requirement::Free => return Some(smallvec![Orbs::default()]),
             Requirement::Impossible => return None,
-            Requirement::Difficulty(difficulty) =>{
-                //log::info!("checking difficulty requirement: {:?} >= {:?}", player.settings.difficulty, difficulty);
+            Requirement::Difficulty(difficulty) =>
                 if player.settings.difficulty >= *difficulty { return Some(smallvec![Orbs::default()]); }
-            }Requirement::Trick(trick) =>
+            Requirement::NormalGameDifficulty => if !player.settings.hard { return Some(smallvec![Orbs::default()]); }
+            Requirement::Trick(trick) =>
                 if player.settings.tricks.contains(trick) { return Some(smallvec![Orbs::default()]); }
             Requirement::Skill(skill) =>
                 if player.inventory.has(&Item::Skill(*skill), 1) { return Some(smallvec![Orbs::default()]); },
@@ -305,7 +306,7 @@ impl Requirement {
     pub fn items_needed(&self, player: &Player, states: &[usize]) -> Itemset {
         match self {
             Requirement::Free => vec![(Inventory::default(), Orbs::default())],
-            Requirement::Impossible | Requirement::Difficulty(_) | Requirement::Trick(_) => vec![],
+            Requirement::Impossible | Requirement::Difficulty(_) | Requirement::NormalGameDifficulty | Requirement::Trick(_) => vec![],
             Requirement::Skill(skill) => vec![(Inventory::from(Item::Skill(*skill)), Orbs::default())],
             Requirement::EnergySkill(skill, amount) => {
                 let cost = player.use_cost(*skill) * *amount;

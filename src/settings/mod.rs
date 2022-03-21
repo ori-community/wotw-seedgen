@@ -246,6 +246,15 @@ impl Settings {
     pub fn all_contain_trick(&self, trick: &Trick) -> bool {
         self.world_settings.iter().all(|world| world.tricks.contains(trick))
     }
+
+    /// Checks if any of the [`WorldSettings`]s play on hard in-game difficulty
+    pub fn any_play_hard(&self) -> bool {
+        self.world_settings.iter().any(|world| world.hard)
+    }
+    /// Checks if any of the [`WorldSettings`]s play on hard in-game difficulty
+    pub fn all_play_hard(&self) -> bool {
+        self.world_settings.iter().all(|world| world.hard)
+    }
 }
 
 impl Default for Settings {
