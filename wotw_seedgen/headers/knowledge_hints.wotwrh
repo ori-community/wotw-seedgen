@@ -29,3 +29,5 @@
 9|139|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|14] won't be logically required until you find $[2|101].
 16155|41465|4|17|6|1101|0|8|9|140|bool|true  // Burrow for Willow's End TP
 9|140|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|12] won't be logically required until you find $[2|101].
+24922|42531|4|17|6|1000|0|8|9|141|bool|true  // Bash for Midnight Burrows TP
+9|141|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|0] won't be logically required until you find $[2|0].
