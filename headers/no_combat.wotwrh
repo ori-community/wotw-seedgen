@@ -45,8 +45,11 @@ Flags: No Combat
 945|58403=3|8|945|58403|int|6          // Skip Kwolok's fight
 945|58403=3|6|f=0                      // -
 945|58403=3|4|8|-1958|-4067            // -
+!!set SkipKwolok
 18793|26713=2|8|18793|26713|int|4      // Skip Mora's fight
 18793|26713=5|8|18793|26713|int|7      // -
+!!set SkipMora1
+!!set SkipMora2
 16155|47278=1|8|16155|47278|byte|2     // Skip Shriek's fight
 16155|47278=3|8|16155|47278|byte|5     // -
 16155|47278=3|8|34543|11226|bool|true  // -

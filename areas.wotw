@@ -42,6 +42,14 @@ requirement DepthsLight:
   gorlek: Bow=3  # should be good, right?
   # unsafe: Grenade=3  # probably enough
 
+anchor HeaderStates:  # States you need to resolve by using the !!set command in headers and that you can't resolve through playing
+  state SkipKwolok:  # Used to logically support skipping Kwolok's fight
+    moki: Impossible
+  state SkipMora1:  # Used to logically support skipping Mora's first combat phase
+    moki: Impossible
+  state SkipMora2:  # Used to logically support skipping Mora's second combat phase
+    moki: Impossible
+
 anchor Teleporters:  # teleporter access
   conn MidnightBurrows.Teleporter:
     moki: BurrowsTP, Bash, Keystone=2
@@ -7614,7 +7622,7 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
 anchor UpperDepths.OutsideMoraFight at 595, -4376:  # Directly left of Mora's lair
   refill Checkpoint
 
-  conn MoraFight: free
+  conn MoraFirstPhase: free
   conn UpperDepths.Teleporter:
     moki, BreakWall=20:
       DoubleJump OR Launch
@@ -7625,12 +7633,49 @@ anchor UpperDepths.OutsideMoraFight at 595, -4376:  # Directly left of Mora's la
     moki: DepthsLight, DoubleJump OR Dash OR Glide
     gorlek: free
 
-anchor MoraFight at 674, -4385:
+anchor MoraFirstPhase at 674, -4385:
+  nospawn
   refill Full
+  
+  conn MoraEscape:
+    moki:
+      SkipMora1  # Impossible state used to logically support skipping Mora through headers
+      Boss=165, Regenerate, Damage=50, Bash, Grapple, DoubleJump OR Dash OR Launch
+    kii: Boss=165, Regenerate, Damage=50, DoubleJump OR Dash OR Launch
+    unsafe: Boss=165
+
+anchor MoraEscape at 712, -4482:
+  nospawn
+  refill Checkpoint
+  
+  conn MoraSecondPhase:  # Abilities needed for the escape part
+    moki:
+      Bash, Launch
+      Bash, Grapple, Glide OR DoubleJump OR Dash
+    gorlek:
+      Bash, Grapple, Sword OR Hammer
+      Launch, DoubleJump, TripleJump
+      Launch, SentryJump=2
+      Launch, SentryJump=1, DoubleJump OR Grapple
+    kii:
+      Bash, Grapple
+      Launch, DoubleJump  # Multiple solutions: refresh your launch on the right ceiling, jump when the ground is moving up or use the right platform before the rock starts falling on it
+    unsafe: Launch
+  
+anchor MoraSecondPhase at 690, -4386:
+  nospawn
+  refill Checkpoint
+  refill Energy=3:
+    moki: BreakCrystal
 
   quest UpperDepths.ForestsEyes:
-    moki: Boss=330, Regenerate, Damage=85, Flash, Bash, Grapple, DoubleJump OR Dash OR Launch
-    unsafe: Boss=330, Flash, Bash, Grapple, DoubleJump OR Dash OR Launch
+    moki:
+      SkipMora2  # Impossible state used to logically support skipping Mora through headers
+      Boss=165, Regenerate, Damage=60, Bash, Flash, DoubleJump OR Dash OR Launch
+    kii:
+      Boss=165, Regenerate, Damage=60, DepthsLight, Launch
+      Boss=165, Regenerate, Damage=60, DepthsLight, Bash, DoubleJump OR Dash
+    unsafe: Boss=165
 
 anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left of the second keystone door
   refill Checkpoint
@@ -9018,7 +9063,7 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
       Water, Bash OR Launch
 
   conn Teleporters: free
-  conn KwolokFight:
+  conn KwolokEscape:
     moki: Water, WaterBreath, DoubleJump OR Dash OR Launch
     gorlek: Water
   conn EastPools.CentralRoom:
@@ -9029,12 +9074,41 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     moki: WestPools.ForestsStrength, Water, WaterBreath, WaterDash
     gorlek: WestPools.ForestsStrength, Water, WaterDash
 
-anchor KwolokFight at -1650, -4125:
+anchor KwolokEscape at -1650, -4125:
+  nospawn
   refill Full
 
+  conn KwolokFight:  # Abilities needed for the escape part
+    moki, Water, WaterDash:
+      Bash, DoubleJump, Dash OR Launch
+      Dash, Launch
+    gorlek, Water:
+      Dash, Launch, Bash OR Damage=10  # damage for the fishes at the end of the escape
+      Bash, Dash, WaterDash
+      Launch, WaterDash
+    kii:
+      Launch, Water
+      Launch, Bash, Damage=180  # Bash the fish at the end of the escape. You don't need to abuse bash iframes
+      Launch, WaterDash, Damage=100
+      Dash, WaterDash, Water OR Damage=120  # water dash to reach the wall at the start
+    unsafe:
+      Launch, Damage=160
+      Dash, DoubleJump, TripleJump, Water OR Damage=160
+      WaterDash, Bash, DoubleJump, Grenade=1, Water OR Damage=100
+    
+anchor KwolokFight at -1978, -4135:
+  nospawn
+  refill Checkpoint
+  refill Energy=3:
+    moki: BreakCrystal
+
   quest WestPools.ForestsStrength:
-    moki: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
-    unsafe: Boss=250, Water, WaterDash, Bash, DoubleJump, Dash OR Launch
+    moki:
+      SkipKwolok  # Impossible state used to logically support skipping Kwolok's fight through headers
+      Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Launch OR Dash
+    gorlek: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump OR Launch OR Dash
+    kii: Boss=250, Regenerate, Damage=85, Water, WaterDash, DoubleJump OR Launch OR Dash
+    unsafe: Boss=250
 
 region LowerWastes:
   moki: Danger=50, Regenerate
