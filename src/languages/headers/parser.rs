@@ -1659,8 +1659,8 @@ mod tests {
         assert!(parse_item("1|-2").is_err());
         assert!(parse_item("1|5").is_err());
         assert_eq!(parse_item("2|8"), Ok(Item::Skill(Skill::Launch)));
-        assert_eq!(parse_item("2|120"), Ok(Item::Skill(Skill::AncestralLight)));
-        assert_eq!(parse_item("2|121"), Ok(Item::Skill(Skill::AncestralLight)));
+        assert_eq!(parse_item("2|120"), Ok(Item::Skill(Skill::AncestralLight1)));
+        assert_eq!(parse_item("2|121"), Ok(Item::Skill(Skill::AncestralLight2)));
         assert!(parse_item("2|25").is_err());
         assert!(parse_item("2|-9").is_err());
         assert_eq!(parse_item("3|28"), Ok(Item::Shard(Shard::LastStand)));

@@ -27,8 +27,8 @@ pub enum Skill {
     Blaze = 115,
     Sentry = 116,
     Flap = 118,
-    #[num_enum(alternatives = [121])]
-    AncestralLight = 120,
+    AncestralLight1 = 120,
+    AncestralLight2 = 121,
 }
 auto_display!(Skill);
 impl Skill {
@@ -56,7 +56,8 @@ impl Skill {
             Skill::Blaze => Some(Icon::Opher(8)),
             Skill::Sentry => Some(Icon::Opher(0)),
             Skill::Flap => Some(Icon::Spell(3005)),
-            Skill::AncestralLight => Some(Icon::File(String::from("assets/icons/game/ancestrallight1.png"))),
+            Skill::AncestralLight1 => Some(Icon::File(String::from("assets/icons/game/ancestrallight1.png"))),
+            Skill::AncestralLight2 => Some(Icon::File(String::from("assets/icons/game/ancestrallight2.png"))),
         }
     }
 

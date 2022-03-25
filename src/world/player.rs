@@ -122,7 +122,8 @@ impl Player {
         let is_unsafe = self.difficulty >= Difficulty::Unsafe;
         let mut damage_mod = 1.0;
 
-        damage_mod += 0.25 * f32::from(self.inventory.get(&Item::Skill(Skill::AncestralLight)));
+        if self.inventory.has(&Item::Skill(Skill::AncestralLight1), 1) { damage_mod += 0.25; }
+        if self.inventory.has(&Item::Skill(Skill::AncestralLight2), 1) { damage_mod += 0.25; }
 
         let mut slots = self.inventory.get(&Item::Resource(Resource::ShardSlot));
         let mut splinter = false;
@@ -402,7 +403,8 @@ mod tests {
         assert_eq!(player.destroy_cost(10.0, Skill::Bow, false), 1.5);
         assert_eq!(player.destroy_cost(10.0, Skill::Spear, true), 4.0);
         assert_eq!(player.destroy_cost(0.0, Skill::Spear, false), 0.0);
-        player.inventory.grant(Item::Skill(Skill::AncestralLight), 2);
+        player.inventory.grant(Item::Skill(Skill::AncestralLight1), 1);
+        player.inventory.grant(Item::Skill(Skill::AncestralLight2), 1);
         player.difficulty = Difficulty::Unsafe;
         player.inventory.grant(Item::Shard(Shard::Wingclip), 1);
         player.inventory.grant(Item::Resource(Resource::ShardSlot), 1);
