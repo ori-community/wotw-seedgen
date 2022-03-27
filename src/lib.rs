@@ -44,7 +44,7 @@ use world::{
 };
 use generator::Placement;
 use header::{HeaderBuild, ItemDetails};
-use settings::{Spawn, Difficulty, Goal, WorldSettings, HeaderConfig};
+use settings::{Spawn, Difficulty, Goal, WorldSettings, HeaderConfig, InlineHeader};
 use util::{
     Position, Zone, UberState,
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
@@ -160,7 +160,8 @@ fn build_config_map(header_config: &[HeaderConfig]) -> Result<FxHashMap::<String
 }
 
 fn parse_header(
-    header_name: &String,
+    header_name: String,
+    header: String,
     headers: &mut Vec<(String, HeaderBuild)>,
     includes: &mut FxHashSet<String>,
     config_map: &mut FxHashMap::<String, FxHashMap<String, String>>,
@@ -168,20 +169,20 @@ fn parse_header(
 ) -> Result<(), String> {
     log::trace!("Parsing header {header_name}");
 
-    let header_config = config_map.remove(header_name).unwrap_or_default();
+    let header_config = config_map.remove(&header_name).unwrap_or_default();
 
-    let header = util::read_file(format!("{header_name}.wotwrh"), "headers")?;
     let header = Header::parse(header, rng)
         .map_err(|err| format!("{err} in header {header_name}"))?
         .build(header_config)?;
 
     for include in &header.includes {
         if includes.insert(include.clone()) {
-            parse_header(include, headers, includes, config_map, rng)?;
+            let header = util::read_file(format!("{include}.wotwrh"), "headers")?;
+            parse_header(include.clone(), header, headers, includes, config_map, rng)?;
         }
     }
 
-    headers.push((header_name.clone(), header));
+    headers.push((header_name, header));
 
     Ok(())
 }
@@ -205,9 +206,24 @@ fn block_spawn_sets(preplacement: &seed::Pickup, world: &mut World) {
     }
 }
 
+/// verifies that inline headers don't claim names already in use
+fn validate_header_names(headers: &[String], inline_headers: &[InlineHeader]) -> Result<(), String> {
+    for inline_header in inline_headers {
+        if let Some(name) = &inline_header.name {
+            if headers.contains(name) {
+                return Err(format!("Ambiguous name: {name} used both as a file header and an inline header"));
+            }
+        }
+    }
+
+    Ok(())
+}
+
 fn parse_headers<R>(world: &mut World, rng: &mut R) -> Result<String, String>
 where R: Rng
 {
+    validate_header_names(&world.player.settings.headers, &world.player.settings.inline_headers)?;
+
     let mut config_map = build_config_map(&world.player.settings.header_config)?;
 
     let mut headers = vec![];
@@ -215,15 +231,14 @@ where R: Rng
     includes.extend(world.player.settings.headers.iter().cloned());
 
     for header_name in &world.player.settings.headers {
-        parse_header(header_name, &mut headers, &mut includes, &mut config_map, rng)?;
+        let header = util::read_file(format!("{header_name}.wotwrh"), "headers")?;
+        parse_header(header_name.clone(), header, &mut headers, &mut includes, &mut config_map, rng)?;
     }
 
-    if !world.player.settings.inline_header.is_empty() {
-        log::trace!("Parsing inline header");
-        let inline_header = Header::parse(world.player.settings.inline_header.clone(), rng)
-            .map_err(|err| format!("{err} in inline header"))?
-            .build(FxHashMap::default())?;
-        headers.push(("##INLINE_HEADER##".to_string(), inline_header));
+    for inline_header in &world.player.settings.inline_headers {
+        let header_name = inline_header.name.as_ref().cloned().unwrap_or_else(|| "Anonymous Header".to_string());
+        let header = inline_header.content.clone();
+        parse_header(header_name, header, &mut headers, &mut includes, &mut config_map, rng)?;
     }
 
     let mut excludes = FxHashMap::default();

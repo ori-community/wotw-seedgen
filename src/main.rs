@@ -14,7 +14,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig}, util, header, preset::WorldPreset, Preset, Settings, logic, Header};
+use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::WorldPreset, Preset, Settings, logic, Header};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
@@ -205,6 +205,25 @@ impl FromStr for HeaderConfigOpt {
         Ok(HeaderConfigOpt(header_config))
     }
 }
+/// Newtype to parse inline headers
+#[derive(Clone)]
+struct InlineHeaderOpt(InlineHeader);
+impl InlineHeaderOpt {
+    fn into_inner(self) -> InlineHeader {
+        self.0
+    }
+}
+impl FromStr for InlineHeaderOpt {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let inline_header = InlineHeader {
+            name: None,
+            content: s.to_string(),
+        };
+        Ok(InlineHeaderOpt(inline_header))
+    }
+}
 
 #[derive(StructOpt)]
 /// Generate seeds for the Ori 2 randomizer.
@@ -343,11 +362,11 @@ struct SeedSettings {
     /// Configuration parameters to pass to headers
     ///
     /// Format for one parameter: <headername>.<parametername>=<value>
-    #[structopt(short = "c", long)]
+    #[structopt(short = "c", long = "config")]
     header_config: Vec<WorldOpt<HeaderConfigOpt>>,
     /// Inline header syntax
     #[structopt(short, long = "inline")]
-    inline_headers: Vec<WorldOpt<String>>,
+    inline_headers: Vec<WorldOpt<InlineHeaderOpt>>,
     /// Disallow the use of the In-Logic filter while playing the seed
     #[structopt(short = "L", long)]
     disable_logic_filter: bool,
@@ -408,7 +427,6 @@ impl SeedSettings {
             .zip(world_inline_headers)
             .map(|(((((((((world_name, world_presets), spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
                 let world_name = if has_world_names { Some(world_name) } else { None };
-                let inline_header = if inline_headers.is_empty() { None } else { Some(inline_headers.join("\n")) };
 
                 WorldPreset {
                     includes: vec_in_option(world_presets),
@@ -420,7 +438,7 @@ impl SeedSettings {
                     hard,
                     headers: vec_in_option(headers),
                     header_config: vec_in_option(header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
-                    inline_header,
+                    inline_headers: vec_in_option(inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
                 }
             }).collect::<Vec<_>>();
 
@@ -499,11 +517,11 @@ struct WorldPresetSettings {
     /// Configuration parameters to pass to headers
     ///
     /// Format for one parameter: <headername>.<parametername>=<value>
-    #[structopt(short = "c", long)]
+    #[structopt(short = "c", long = "config")]
     header_config: Option<Vec<HeaderConfigOpt>>,
     /// Inline header syntax
     #[structopt(short, long = "inline")]
-    inline_headers: Option<Vec<String>>,
+    inline_headers: Option<Vec<InlineHeaderOpt>>,
 }
 
 impl WorldPresetSettings {
@@ -531,7 +549,7 @@ impl WorldPresetSettings {
             goals: goals.map(|goals| goals.into_iter().map(GoalsOpt::into_inner).collect()),
             headers,
             header_config: header_config.map(|header_config| header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
-            inline_header: inline_headers.map(|inline| inline.join("\n")),
+            inline_headers: inline_headers.map(|inline_headers| inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
         }
     }
 }
@@ -580,11 +598,10 @@ enum HeaderCommand {
     }
 }
 
-fn parse_settings(seed: Option<String>, settings: SeedSettings) -> Result<Settings, Box<dyn Error>> {
-    let has_world_names = settings.world_names.is_some();
-    let preset = settings.into_preset()?;
+fn parse_settings(seed: Option<String>, args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
+    let has_world_names = args.world_names.is_some();
+    let preset = args.into_preset()?;
 
-    let mut settings = Settings::default();
     settings.apply_preset(preset)?;
 
     if let Some(seed) = seed {
@@ -594,10 +611,10 @@ fn parse_settings(seed: Option<String>, settings: SeedSettings) -> Result<Settin
         settings.world_settings[0].world_name = "World".to_string();
     }
 
-    Ok(settings)
+    Ok(())
 }
 
-fn read_header() -> Result<String, String> {
+fn read_stdin() -> Result<String, String> {
     // If we do not have input, skip.
     if atty::is(atty::Stream::Stdin) {
         return Ok(String::new());
@@ -660,16 +677,18 @@ fn write_seeds_to_stdout(seeds: Vec<String>) {
     println!("{}", seeds.join("\n======= END SEED =======\n"));
 }
 
-fn generate_seeds(mut args: SeedArgs) -> Result<(), Box<dyn Error>> {
+fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     let now = Instant::now();
 
-    let header = read_header()?;
-    if !header.is_empty() {
-        // TODO how do these address worlds?
-        args.settings.inline_headers.insert(0, WorldOpt::from_str(&header)?);
+    let mut settings = Settings::default();
+
+    let stdin = read_stdin()?;
+    if !stdin.is_empty() {
+        let preset = serde_json::from_str(&stdin)?;
+        settings.apply_preset(preset)?;
     }
 
-    let settings = parse_settings(args.seed, args.settings)?;
+    parse_settings(args.seed, args.settings, &mut settings)?;
 
     let graph = logic::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());

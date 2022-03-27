@@ -49,7 +49,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeader\":\"\"}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
+/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
@@ -314,8 +314,8 @@ pub struct WorldSettings {
     /// 
     /// Format for one parameter: <headername>.<parametername>=<value>
     pub header_config: Vec<HeaderConfig>,
-    /// Inline header syntax
-    pub inline_header: String,
+    /// Fully qualified header syntax
+    pub inline_headers: Vec<InlineHeader>,
 }
 
 impl WorldSettings {
@@ -347,7 +347,7 @@ impl WorldSettings {
             hard,
             headers,
             header_config,
-            inline_header,
+            inline_headers,
         } = preset;
 
         if let Some(includes) = includes {
@@ -380,8 +380,8 @@ impl WorldSettings {
         if let Some(mut header_config) = header_config {
             self.header_config.append(&mut header_config);
         }
-        if let Some(inline_header) = inline_header {
-            self.inline_header = inline_header;
+        if let Some(mut inline_headers) = inline_headers {
+            self.inline_headers.append(&mut inline_headers);
         }
 
         Ok(())
@@ -558,6 +558,15 @@ pub struct HeaderConfig {
     pub config_name: String,
     /// The value to use for the configuration parameter
     pub config_value: String,
+}
+
+/// Headers passed through explicit syntax
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct InlineHeader {
+    /// The name of the header
+    pub name: Option<String>,
+    /// Contained header syntax
+    pub content: String,
 }
 
 #[cfg(test)]
