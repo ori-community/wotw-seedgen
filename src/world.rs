@@ -109,10 +109,15 @@ impl<'a> World<'a> {
                 self.player.inventory.grant(Item::SpiritLight(1), amount * stacked_amount);
             }
             item => {
+                let triggered_state = item.triggered_state();
                 if item.is_progression(self.player.difficulty) {
                     log::trace!("Granting player {}{}", if amount == 1 { String::new() } else { format!("{} ", amount) }, item);
 
                     self.player.inventory.grant(item, amount);
+                }
+                if let Some(uber_state) = triggered_state {
+                    self.uber_states.insert(uber_state.identifier.clone(), "true".to_string());
+                    self.collect_preplacements(&uber_state);
                 }
             },
         }
