@@ -50,8 +50,10 @@ Flags: No Combat
 18793|26713=5|8|18793|26713|int|7      // -
 !!set SkipMora1
 !!set SkipMora2
-16155|47278=1|8|16155|47278|byte|2     // Skip Shriek's fight
-16155|47278=3|8|16155|47278|byte|5     // -
+16155|47278=1|8|16155|47278|byte|2     // Skip Shriek's first phase
+16155|47278=1|4|12|230                 // Regen when starting Shriek
+16155|47278=1|4|13|20                  // Regen when starting Shriek
+16155|47278=3|8|16155|47278|byte|5     // Finish the game when reaching the end of Shriek's escape sequence
 16155|47278=3|8|34543|11226|bool|true  // -
 16155|47278=3|4|16|WarpCredits         // -
 !!endif
