@@ -2712,7 +2712,9 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   pickup GladesTown.LupoSwimLeftEX:
     moki, GladesTown.ClearThorns: Water, WaterDash OR Launch
     gorlek, GladesTown.ClearThorns: Water, DoubleJump, TripleJump
-    kii, GladesTown.ClearThorns: Water, Bash, Grenade=1
+    kii, GladesTown.ClearThorns:
+      Water, Bash, Grenade=1
+      Water, DoubleJump, Hammer  # wjump+djump+hammer. Possible from both walls
     unsafe, GladesTown.ClearThorns:
       Bash, Grenade=1, Water OR Damage=100
       GrenadeJump, Water OR Damage=100
@@ -2722,9 +2724,10 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
   pickup GladesTown.AboveCaveEX:
     moki: GladesTown.ClearThorns
-  pickup GladesTown.UpdraftCeilingEX:
-    gorlek: HammerSJump=1  # horiontal slashes to get the pickup. this is more energy efficient than going to AboveOpher first
-
+  pickup GladesTown.UpdraftCeilingEX:  # paths that can't get to AboveOpher but can get the pickup
+    moki: TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple  # @validator I don't think getting that pickup with just bash should be in moki?
+    gorlek: TuleyShop.BlueMoon, Grapple, Hammer
+  
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
   conn GladesTown.CaveEntrance:
@@ -2741,8 +2744,6 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       TuleyShop.BlueMoon, Grapple:
         SentryJump=1
         TuleyShop.Lightcatchers, Bash
-    kii:
-      TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       SwordSJump=2  # Midair Sentry Jumps
       TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
@@ -2759,54 +2760,54 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     gorlek:
       DoubleJump, TripleJump
       TuleyShop.Lightcatchers, Bash:
-        Flap, Glide  # use the wind column then glide to the other side (above the tp)
         SentryJump=1
-        TuleyShop.BlueMoon, Grapple, Dash OR Glide
-        TuleyShop.SpringPlants, Dash OR Glide
+    kii:
+      TuleyShop.StickyGrass, Grapple, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # get on the platform above the tp then djump+other option to rech the wall above 
+      Bash, Grenade=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # same as above but with bashnade
+      Bash, Grenade=2, Dash  # throw your grenade at like 45° and dash to catch it
+      TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Dash
     unsafe:
       DoubleJump, Sword  # equip sword on slot 3 so you can upslash
       Bash, Grenade=2
-      #Bash, Grenade=2, Sword OR DoubleJump OR Dash
-      Grenade=3, DoubleJump                   # Midair Grenade Jumps
-      SwordSJump=2                            # Midair Sentry Jumps
-      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E
-      TuleyShop.StickyGrass, Grapple, DoubleJump  # hard jump
-      TuleyShop.Lightcatchers, Bash:
-        Dash, Regenerate  # wavedash from the right
-        TuleyShop.BlueMoon, Grapple
+      #Bash, Grenade=2, Glide OR Sword OR DoubleJump
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
+      SwordSJump=1  # high sjump to reach the wall on the lef t of the bridge then wall jump and upslash+downslash
+      TuleyShop.StickyGrass, Grapple, DoubleJump  # ceiling jump
   conn GladesTown.AboveOpher:
     moki:
       Launch OR TuleyShop.SpringPlants
       Flap, Glide
       Bash, Grenade=1
       TuleyShop.BlueMoon, DoubleJump, Grapple
-      TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple
+      TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple, Dash
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump
-      TuleyShop.BlueMoon, Grapple
-    kii: DoubleJump, Glide OR Dash OR Sword OR Hammer OR Sentry=2  # from where Tuley is. Building the second house makes it harder but still possible
+      TuleyShop.BlueMoon, Grapple, Dash OR Glide OR Sword
+    kii:
+      TuleyShop.BlueMoon, Grapple, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Glide OR Dash OR Sword OR Hammer OR Sentry=2  # from where Tuley is. Building the second house makes it harder but still possible
     unsafe:
       Grenade=1, Sword  # Grenade Pogos. I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
       GrenadeJump
-      WaveDash  # wavedash from where Tuley is then coyote dash to get the pickup. If the second house is built, you have to jump out of your wavedash.
+      WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
       Dash, GlideJump OR Hammer  # coyote dash form where Tuley. Could be kii but building the second house makes it way harder
       Dash, Burrow  # I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
-  
-  conn GladesTown.ReachPath:
-    moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
   conn GladesTown.LupoHouse:
     moki: Burrow OR Water
+    unsafe:
+      Damage=160
+      WaterDash, Damage=80
   conn OpherShop: free
   conn Tokk: free
-  conn TuleyShop:
+  conn TuleyShop:  
     moki, GladesTown.TuleySpawned:
-      DoubleJump OR Launch
+      DoubleJump OR Launch OR TuleyShop.SpringPlants
       Flap, Glide
       Bash, Grenade=1
     gorlek, GladesTown.TuleySpawned: SentryJump=1 OR Burrow OR Dash
-    unsafe, GladesTown.TuleySpawned: Shuriken=1 OR Sword OR Hammer OR Grenade=1 OR Sentry=1 OR Flash OR Spear=1
-    # seed paths tbd if ever Necessary
+    kii, GladesTown.TuleySpawned:  Sword R Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.TuleySpawned: GrenadeJump OR GlideJump
   conn EastHollow.OutsideGlades:
     moki: GladesTown.GromsWall
 
@@ -2921,8 +2922,6 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Dash                                  # late coyote
       Sword                                 # high jump, full combo, upslash and then downslash (all while holding right)
       # Dash, Glide OR Sword OR Hammer
-  pickup WestGlades.GrappleEX:
-    unsafe: SwordSJump=1, Damage=10
 
   conn WestGlades.PastTown:
     moki:
@@ -2942,7 +2941,8 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       SwordSJump=1, Damage=10
       HammerSJump=1, Damage=20
       Dash, Hammer
-      Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
+      #Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
+      Sword, Damage=10
       DoubleJump, Damage=10, TripleJump OR Dash  # damage for avoiding slimes
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
@@ -3164,7 +3164,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       TuleyShop.Lightcatchers, Bash  # @validator this was there before I create this anchor and I don't think this should?
       TuleyShop.SpringPlants, Dash OR Glide
     gorlek:
-      SentryJump=1 OR Hammer
+      Hammer OR SentryJump=1
       TuleyShop.SpringPlants, Sword
     kii:
       Dash OR Spear=1  # coyote dash or spear under the pickup
@@ -3175,6 +3175,8 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       TuleyShop.SpringPlants, PauseHover
   
   conn GladesTown.Teleporter: free
+  conn GladesTown.ReachPath:
+    moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
   conn GladesTown.HoleHut:
     moki:
       Launch
@@ -3217,6 +3219,11 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
       Bash, Grenade=2
       GrenadeJump
+  conn GladesTown.BellowBountyShard:
+    gorlek: TuleyShop.Lightcatchers, Bash, Glide OR Dash  # @validator the Dash path got validated before but I don't think it should be gorlek
+    unsafe:
+      TuleyShop.Lightcatchers, Bash
+      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
   pickup GladesTown.LupoSoupEX: free
