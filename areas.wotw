@@ -2759,8 +2759,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
         TuleyShop.SpringPlants, DoubleJump
     gorlek:
       DoubleJump, TripleJump
-      TuleyShop.Lightcatchers, Bash:
-        SentryJump=1
+      TuleyShop.Lightcatchers, Bash, SentryJump=1
     kii:
       TuleyShop.StickyGrass, Grapple, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # get on the platform above the tp then djump+other option to rech the wall above 
       Bash, Grenade=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # same as above but with bashnade
@@ -2956,15 +2955,21 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Combat=2xWeakSlug, DoubleJump, Dash
       Combat=2xWeakSlug, DoubleJump, TripleJump  # can either wrap around or grab the bottom of the last wall
       DoubleJump, Sword, Damage=10
+    kii:
+      Bash, Sword OR Hammer
+      Bash, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
+      Dash, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=2xWeakSlug, DoubleJump, Damage=20, Blaze=1 OR Damage=10
+      Combat=2xWeakSlug, DoubleJump, Damage=10, Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Combat=2xWeakSlug, DoubleJump, Glide, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash, Damage=10, Hammer
       Combat=2xWeakSlug, DoubleJump, Damage=20
-      Bash, Sword OR Hammer  # weapon floating, yes verified with hammer
       SwordSJump=1, Damage=10
       HammerSJump=1, Damage=20
       Dash, Hammer
       #Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
-      Sword, Damage=10
+      Damage=10, Bash OR Sword 
       DoubleJump, Damage=10, TripleJump OR Dash  # damage for avoiding slimes
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
@@ -2973,6 +2978,10 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       TuleyShop.BlueMoon, Grapple
       TuleyShop.StickyGrass, Grapple, Glide
     gorlek: TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
+    kii:
+      GladesTown.BuildHuts, Dash, Sword
+      GladesTown.BuildHuts, Dash, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      GladesTown.BuildHuts, Sword, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
   conn GladesTown.UpperWest:
     moki:
       TuleyShop.StickyGrass, Launch
@@ -3005,14 +3014,25 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
         Bash, Grenade=1, Dash, Glide OR Sword
         SentryJump=1, DoubleJump, TripleJump OR Dash
+    kii:
+      TuleyShop.Lightcatchers, Bash, Flash=1, DoubleJump OR Dash  # Would be possible with other weapons but the second plant can be destroyed
+      TuleyShop.BlueMoon, Grapple
+      TuleyShop.StickyGrass:
+        DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # condition for reaching the bridge
+        Grapple, DoubleJump, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 Or Flash=1 OR Sentry=1
+      GladesTown.BuildHuts:
+        Bash, Grenade=1, DoubleJump, Shuriken=1  # more energy efficient the grenade=2
+        Bash, Grenade=1, Dash, Hammer OR Shuriken=1 OR Flash=1
+        Bash, Grenade=1, Sword, Hammer OR Shuriken=1 OR Flash=1
+        Bash, Grenade=1, Hammer, Glide, Shuriken=1 OR Flash=1
     unsafe:
       Grenade=2, DoubleJump, Sword  # Midair Grenade Pogo
-      TuleyShop.BlueMoon, Grapple
-      TuleyShop.Lightcatchers, Bash, Glide OR Grenade=1  # Bash Gliding
+      TuleyShop.Lightcatchers, Bash  # Use the slimes to reach the plant above Motay then bash glide to the bridge
+      TuleyShop.StickyGrass, DoubleJump, TripleJump
       GladesTown.BuildHuts:
-        Bash, Grenade=1  # Grenade Jump that auto-cancels by entering the hut
-        Grenade=1, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
-        SentryJump=1, Dash                  # Downslash at the Bridge
+        Bash, Grenade=1, GrenadeJump
+        GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
+        SwordSJump=1, Dash  # Dash + Sword to land at the hut then sjump and dash.
         TuleyShop.Lightcatchers, Bash, Sword OR Hammer
   # all other paths should be redundant with the connection to tp
 
