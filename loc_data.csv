@@ -97,7 +97,6 @@ EastHollow.DepthsExteriorEX, Kwoloks Hollow, SpiritLight, 100, mouldwoodDepthsGr
 GladesTown.HandToHandPouch, Wellspring Glades, Quest, Pouch, questUberStateGroup, 14019, tradeSequenceQuest, 26318=2, -282, -4155
 GladesTown.HandToHandLantern, Wellspring Glades, Quest, Lantern, questUberStateGroup, 14019, tradeSequenceQuest, 26318=6, -426, -4155
 GladesTown.HandToHandCanteen, Wellspring Glades, Quest, Canteen, questUberStateGroup, 14019, tradeSequenceQuest, 26318=9, -410, -4142
-GladesTown.HandToHandSoup, Wellspring Glades, Quest, Soup, questUberStateGroup, 14019, tradeSequenceQuest, 26318=4, -110, -4090
 GladesTown.FamilyReunionKey, Wellspring Glades, Quest, Key, questUberStateGroup, 14019, familyReunionQuest, 27804=2, -385, -4161
 GladesTown.AcornQI, Wellspring Glades, Quest, Acorn, questUberStateGroup, 14019, darkCaveQuestItemCollected, 2782, -10, -4551
 GladesTown.MokiAcornQuest, Wellspring Glades, Quest, SL500, questUberStateGroup, 14019, darkCaveQuest, 33776=3, -358, -4185
@@ -271,6 +270,7 @@ LowerReach.BottomLeftKS, Baurs Reach, Resource, Keystone, baursReachGroup, 28895
 LowerReach.TrialEX, Baurs Reach, SpiritLight, 100, baursReachGroup, 28895, mediumExpOrb, 22761, -39, -4018
 LowerReach.SpiritTrial, Baurs Reach, SpiritLight, 1000, raceGroup, 44964, baursReachWindTunnelRace, 23661=2, 75, -4046
 LowerReach.CatalystShard, Baurs Reach, Shard, Catalyst, pickupsGroup, 23987, hollowEnergyShardPickup, 897, -90, -4097
+LowerReach.HandToHandSoup, Baurs Reach, Quest, Soup, questUberStateGroup, 14019, tradeSequenceQuest, 26318=4, -110, -4090
 UpperReach.LifeForceShard, Baurs Reach, Shard, Lifeforce, pickupsGroup, 23987, untouchableShardPickup, 19630, -400, -3861
 UpperReach.LifeForceEX, Baurs Reach, SpiritLight, 100, winterForestGroupDescriptor, 28287, mediumExpA, 32414, -423, -3876
 UpperReach.LowerKS, Baurs Reach, Resource, Keystone, baursReachGroup, 28895, keystoneB, 1053, -248, -3891
