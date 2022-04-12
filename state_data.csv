@@ -52,6 +52,10 @@ OuterWellspring.FallingWheel, 37858, 16604
 OuterWellspring.TrialActivation, 44964, 11512=1
 WoodsEntry.KeystoneDoor, 58674, 21500
 WoodsMain.KeystoneDoor, 18793, 41544
+WoodsMain.KSRoomYellowBarrierBroken, 58674, 54686
+WoodsMain.BalloonLureBlobDestroyed, 58674, 902
+WoodsMain.BalloonLureYellowBarrierBroken, 58674, 29622
+WoodsMain.LogBlobDestroyed, 58674, 48394
 WoodsMain.TrialActivation, 44964, 22703=1
 LowerReach.ArenaBeaten, 28895, 42209
 LowerReach.BearBridgeBroken, 28895, 49329
