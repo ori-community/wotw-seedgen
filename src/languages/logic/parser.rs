@@ -23,6 +23,7 @@ impl ParseError {
 #[derive(Debug)]
 pub enum Requirement<'a> {
     Free,
+    Impossible,
     Definition(&'a str),
     Difficulty(Difficulty),
     Glitch(Glitch),
@@ -283,6 +284,7 @@ fn parse_requirement<'a>(token: &Token<'a>, metadata: &Metadata) -> Result<Requi
             "HammerBreak" => Ok(Requirement::HammerBreak),
             "HammerJump" => Ok(Requirement::HammerJump),
             "HollowTP" => Ok(Requirement::Teleporter(Teleporter::Hollow)),
+            "Impossible" => Ok(Requirement::Impossible),
             "InnerRuinsTP" => Ok(Requirement::Teleporter(Teleporter::InnerRuins)),
             "kii" => Ok(Requirement::Difficulty(Difficulty::Kii)),
             "Launch" => Ok(Requirement::Skill(Skill::Launch)),

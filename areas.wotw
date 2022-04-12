@@ -952,7 +952,9 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     moki: Hammer OR Spear=1
   conn HowlsDen.DoubleJumpTreeArea:
     moki: Combat=Mantis+Lizard OR DoubleJump OR Dash OR Glide OR Launch
-    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+    kii:
+      Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+      Bash, Grenade=1
   conn HowlsDen.BoneBridge:
     moki, HowlsDen.BoneBarrier:
       DoubleJump OR Launch
@@ -2685,131 +2687,51 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   #       TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
   #       TuleyShop.SpringPlants, Bash, Grenade=1
 
-  # silent woods map quest doesn't exactly make sense
   quest GladesTown.RebuildTheGlades:
-    moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
+    moki: Ore=40
 
-  pickup GladesTown.UpdraftCeilingEX:
-    moki:
-      Flap, Glide
-      Bash, Grenade=1, DoubleJump
-      Launch
-      TuleyShop.Lightcatchers, Bash, Grenade=1
-      TuleyShop.BlueMoon, DoubleJump, Grapple
-      TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple
-      TuleyShop.SpringPlants, DoubleJump OR Dash OR Glide
-      TuleyShop.SpringPlants, TuleyShop.Lightcatchers, Bash
-    gorlek:
-      DoubleJump, TripleJump
-      Bash, Grenade=1, Hammer
-      SentryJump=2 OR HammerSJump=1
-      SwordSJump=1, DoubleJump
-      TuleyShop.Lightcatchers, Bash, SentryJump=1
-      TuleyShop.BlueMoon, Grapple, Hammer OR SwordSJump=1
-      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Grapple  # go up on bridge then drop down
-      TuleyShop.SpringPlants, Sword OR Hammer
-    unsafe:
-      Bash, Grenade=2  # for kii
-      SwordSJump=1         # sentry jump into the exp
-      Grenade=1, Sword     # Grenade Pogos
-      Grenade=2            # Grenade Jumps
-      TuleyShop.SpringPlants, Grenade=1 OR Sword
-      TuleyShop.BlueMoon, Grapple, Sword
-      DoubleJump, Glide
-      Dash:
-        Sword OR Hammer
-        Regenerate  # Wavedash from the right
-        Burrow
-  pickup GladesTown.AboveTpEX:
-    moki:
-      Launch  # probably fine?
-      TuleyShop.Lightcatchers, Bash:
-        Grenade=1
-        DoubleJump, Flap, Glide
-        TuleyShop.StickyGrass, Grapple
-        TuleyShop.BlueMoon, DoubleJump, Grapple
-        TuleyShop.SpringPlants, DoubleJump
-    gorlek:
-      DoubleJump, TripleJump
-      TuleyShop.Lightcatchers, Bash:
-        Flap, Glide  # bashglide over to the other side
-        SentryJump=1
-        TuleyShop.BlueMoon, Grapple, Dash OR Glide
-        TuleyShop.SpringPlants, Dash OR Glide
-    unsafe:
-      DoubleJump, Sword
-      Bash, Grenade=2, Sword OR DoubleJump    # hard strat
-      Bash, Grenade=2, Dash                   # completely different strat, hence separation from Bash Grenade=2 Sword
-      Grenade=3, DoubleJump                   # Midair Grenade Jumps
-      SwordSJump=2                            # Midair Sentry Jumps
-      TuleyShop.StickyGrass, Grapple, DoubleJump  # hard jump
-      # Bash, Grenade=2                       # its possible
-      TuleyShop.Lightcatchers, Bash:
-        Dash, Regenerate  # wavedash from the right
-        TuleyShop.BlueMoon, Grapple
-  pickup GladesTown.BountyShard:
-    moki:
-      Launch  # probably fine?
-      TuleyShop.Lightcatchers, Bash:
-        Grenade=1
-        DoubleJump, Flap, Glide
-        TuleyShop.StickyGrass, Grapple
-        TuleyShop.BlueMoon, DoubleJump, Grapple
-        TuleyShop.SpringPlants, DoubleJump
-    gorlek:
-      DoubleJump, TripleJump
-      TuleyShop.Lightcatchers, Bash:  # paths are the exact same because you can get up to the shard using the lightcatcher on the right and nothing else
-        Flap, Glide  # bashglide over to the other side
-        SentryJump=1
-        TuleyShop.BlueMoon, Grapple, Dash OR Glide
-        TuleyShop.SpringPlants, Dash OR Glide
-    unsafe:
-      DoubleJump, Sword
-      Bash, Grenade=2, DoubleJump
-      Bash, Grenade=3, Sword    # hard strat
-      Bash, Grenade=3, Dash     # completely different strat, hence separation from Bash Grenade=3 Sword
-      Grenade=3, DoubleJump     # Midair Grenade Jumps
-      SwordSJump=3              # Midair Sentry Jumps
-      TuleyShop.StickyGrass, Grapple, DoubleJump  # hard jump
-      TuleyShop.Lightcatchers, Bash, Dash, Regenerate  # wavedash from the right, tight jump to the top
   pickup GladesTown.ArcingShard:
     moki, GladesTown.ClearThorns:
-      Bash, Grenade=1  # probably fine?
+      Bash, Grenade=1
       Launch
       TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
     gorlek, GladesTown.ClearThorns:
       SentryJump=1, DoubleJump, TripleJump
-      TuleyShop.Lightcatchers, Bash  # bashglide
-    unsafe, GladesTown.ClearThorns:
-      Grenade=1  # Grenade Jump
-      DoubleJump, TripleJump
       TuleyShop.Lightcatchers, Bash
-  pickup GladesTown.LupoSoupEX:
-    moki: Water OR Burrow
-  pickup LupoShop.HCMapIcon:
-    moki: SpiritLight=1200, Water OR Burrow
-  pickup LupoShop.ECMapIcon:
-    moki: SpiritLight=1200, Water OR Burrow
-  pickup LupoShop.ShardMapIcon:
-    moki: SpiritLight=1200, Water OR Burrow
-  pickup GladesTown.LupoSwimHC:
-    moki: Water, Burrow
+    kii, GladesTown.ClearThorns:
+      DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.ClearThorns:
+      GrenadeJump
+      DoubleJump, TripleJump
   pickup GladesTown.LupoSwimMiddleEX:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
-    unsafe: Water  # just wall jump between both walls. not hard.
+    unsafe:
+      Water OR Damage=60 # just wall jump between both walls
+      WaterDash, Damage=40
   pickup GladesTown.LupoSwimLeftEX:
-    moki: GladesTown.ClearThorns, Water, WaterDash OR Launch
-    gorlek: GladesTown.ClearThorns, Water, DoubleJump, TripleJump
+    moki, GladesTown.ClearThorns: Water, WaterDash OR Launch
+    gorlek, GladesTown.ClearThorns: Water, DoubleJump, TripleJump
+    kii, GladesTown.ClearThorns:
+      Water, Bash, Grenade=1
+      Water, DoubleJump, Hammer  # wjump+djump+hammer. Possible from both walls
     unsafe, GladesTown.ClearThorns:
-      Water, Bash, Grenade=1  # unsafe because of precision. Good for kii.
-      Water, Grenade=2  # Grenade Water Jumps
-      Water, DoubleJump
+      Bash, Grenade=1, Water OR Damage=100
+      GrenadeJump, Water OR Damage=100
+      DoubleJump, Water OR Damage=100
+      WaterDash, Damage=40
   pickup GladesTown.CaveBurrowEX:
-    unsafe: NonGladesTeleporter  # heehee
-
+    unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
+  pickup GladesTown.AboveCaveEX:
+    moki: GladesTown.ClearThorns
+  pickup GladesTown.UpdraftCeilingEX:  # paths that can't get to AboveOpher but can get the pickup
+    moki: TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple  # @validator I don't think getting that pickup with just bash should be in moki?
+    gorlek: TuleyShop.BlueMoon, Grapple, Hammer
+  
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
+  conn GladesTown.MokiAcorn:
+    moki: GladesTown.ClearThorns
   conn GladesTown.UpperWest:
     moki:
       Launch, DoubleJump OR Dash OR Glide
@@ -2825,76 +2747,65 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     unsafe:
       SwordSJump=2  # Midair Sentry Jumps
       TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
-      GladesTown.ClearThorns, DoubleJump, TripleJump  # hardcore parkour
-  conn GladesTown.HoleHut:
+      DoubleJump, TripleJump  # hardcore parkour
+  conn GladesTown.BellowBountyShard:
     moki:
-      Flap, Glide:
-        DoubleJump
-        Bash, Grenade=1
-        Grapple, TuleyShop.BlueMoon OR TuleyShop.StickyGrass
-        TuleyShop.SpringPlants
       Launch
       TuleyShop.Lightcatchers, Bash:
-        Grenade=2
-        Grenade=1, DoubleJump
-        TuleyShop.BlueMoon, Grapple, DoubleJump OR Dash
-        TuleyShop.BlueMoon, Grapple, Grenade=1, Glide
-        TuleyShop.StickyGrass, Grapple, DoubleJump, Dash OR Glide
-        TuleyShop.StickyGrass, Grapple, Grenade=1, DoubleJump OR Dash OR Glide
-        TuleyShop.SpringPlants
-      TuleyShop.SpringPlants, DoubleJump
-      GladesTown.RoofsOverHeads:
-        Bash, Grenade=3
-        DoubleJump, Bash, Grenade=2
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump OR Dash
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=2, Glide
-        TuleyShop.StickyGrass, Grapple, Bash, Grenade=2, Dash OR Glide
-        TuleyShop.SpringPlants, Bash, Grenade=1
+        Grenade=1
+        TuleyShop.StickyGrass, Grapple
+        TuleyShop.BlueMoon, DoubleJump, Grapple
+        TuleyShop.SpringPlants, DoubleJump
     gorlek:
-      Flap, Glide, SwordSJump=1 OR Hammer
       DoubleJump, TripleJump
-      SentryJump=2:
-        DoubleJump OR SwordSJump=1 OR Hammer
-        TuleyShop.BlueMoon, Grapple
-        TuleyShop.StickyGrass, Grapple, Dash OR Glide
-      TuleyShop.Lightcatchers, Bash:
-        SentryJump=2
-        SentryJump=1, DoubleJump
-        TuleyShop.BlueMoon, Grapple, Grenade=1 OR SentryJump=1
-        TuleyShop.BlueMoon, Grapple, Glide OR Sword OR Hammer  # uphammer harder than upslash
-        TuleyShop.StickyGrass, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-        TuleyShop.StickyGrass, Grapple, Grenade=1, Sword OR Hammer
-        TuleyShop.StickyGrass, Grapple, SentryJump=1
-        TuleyShop.SpringPlants
-      TuleyShop.SpringPlants, SwordSJump=1 OR Hammer
-      GladesTown.RoofsOverHeads:
-        Bash, Grenade=2, Hammer
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Glide OR Sword OR Hammer
-        TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, DoubleJump, Dash OR Glide OR Sword OR Hammer
-        TuleyShop.StickyGrass, Grapple, Bash, Grenade=2, Sword
+      TuleyShop.Lightcatchers, Bash, SentryJump=1
+    kii:
+      TuleyShop.StickyGrass, Grapple, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # get on the platform above the tp then djump+other option to rech the wall above 
+      Bash, Grenade=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # same as above but with bashnade
+      Bash, Grenade=2, Dash  # throw your grenade at like 45° and dash to catch it
+      TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Dash
     unsafe:
-      Flap, Glide, Sword OR Hammer OR Grenade=1  # grenade jump, upslash, uphammer
-      TuleyShop.SpringPlants, Sword OR Grenade=1  # increased height bounces
-      TuleyShop.SpringPlants, Sentry=1 OR Flash  # sentry and flash short hops give you juuuuuust enough height to get up using the springboard by the hut with the crates
-      TuleyShop.Lightcatchers, Bash, TuleyShop.BlueMoon, Grapple
-      TuleyShop.Lightcatchers, Bash:
-        DoubleJump, Sword OR Glide OR Dash OR Grenade=2
-        Dash, Regenerate  # wavedash
-        Burrow, Dash OR DoubleJump OR Sword OR Hammer
-      Burrow, Grenade=1, Dash OR DoubleJump OR Sword OR Hammer
-      Bash, Grenade=3
-  conn GladesTown.ReachPath:
-    moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
-  conn OpherShop: free
-  conn Tokk: free
-  conn TuleyShop:
-    moki, GladesTown.TuleySpawned:
-      DoubleJump OR Launch
+      DoubleJump, Sword  # equip sword on slot 3 so you can upslash
+      Bash, Grenade=2
+      #Bash, Grenade=2, Glide OR Sword OR DoubleJump
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
+      SwordSJump=1  # high sjump to reach the wall on the lef t of the bridge then wall jump and upslash+downslash
+      TuleyShop.StickyGrass, Grapple, DoubleJump  # ceiling jump
+  conn GladesTown.AboveOpher:
+    moki:
+      Launch OR TuleyShop.SpringPlants
       Flap, Glide
       Bash, Grenade=1
-    gorlek: GladesTown.TuleySpawned, SentryJump=1 OR Burrow OR Dash
-    unsafe: GladesTown.TuleySpawned, Shuriken=1 OR Sword OR Hammer OR Grenade=1 OR Sentry=1 OR Flash OR Spear=1
-    # seed paths tbd if ever Necessary
+      TuleyShop.BlueMoon, DoubleJump, Grapple
+      TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple, Dash
+    gorlek:
+      SentryJump=1
+      DoubleJump, TripleJump
+      TuleyShop.BlueMoon, Grapple, Dash OR Glide OR Sword
+    kii:
+      TuleyShop.BlueMoon, Grapple, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Glide OR Dash OR Sword OR Hammer OR Sentry=2  # from where Tuley is. Building the second house makes it harder but still possible
+    unsafe:
+      Grenade=1, Sword  # Grenade Pogos. I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
+      GrenadeJump
+      WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
+      Dash, GlideJump OR Hammer  # coyote dash form where Tuley. Could be kii but building the second house makes it way harder
+      Dash, Burrow  # I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
+  conn GladesTown.LupoHouse:
+    moki: Burrow OR Water
+    unsafe:
+      Damage=160
+      WaterDash, Damage=80
+  conn OpherShop: free
+  conn Tokk: free
+  conn TuleyShop:  
+    moki, GladesTown.TuleySpawned:
+      DoubleJump OR Launch OR TuleyShop.SpringPlants
+      Flap, Glide
+      Bash, Grenade=1
+    gorlek, GladesTown.TuleySpawned: SentryJump=1 OR Burrow OR Dash
+    kii, GladesTown.TuleySpawned: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.TuleySpawned: GrenadeJump OR GlideJump
   conn EastHollow.OutsideGlades:
     moki: GladesTown.GromsWall
 
@@ -2907,39 +2818,6 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     moki: LowerReach.HandToHandHat
   quest GladesTown.FamilyReunionKey:
     moki: GladesTown.BuildHuts
-  quest GladesTown.AcornQI:
-    moki, GladesTown.ClearThorns, GladesTown.CaveEntrance:
-      Flash, Water, Glide
-      Flash, Water, DoubleJump, Dash
-      Flash, Bash, Grenade=1
-      Flash, Launch
-    gorlek, GladesTown.ClearThorns, GladesTown.CaveEntrance:
-      Flash:
-        Water, DoubleJump OR Dash OR Sword OR Hammer
-        SentryJump=1
-      Bow=4:  # bow refills light
-        Launch
-        Bash, Grenade=1
-        SentryJump=1
-    unsafe, GladesTown.ClearThorns, GladesTown.CaveEntrance:
-      Flash:
-        # Water, Sentry=2 OR Damage=10  # use the flash hop to make it across the first spikes (good for kii)
-        # Water, Sword  # difficult sword float (good for kii)
-        Water  # double flash hop (not good for kii)
-        Grenade=1  # grenade jump
-        DoubleJump, TripleJump  # off the left wall
-      Bow=2:
-        Launch
-        Bash, Grenade=1
-        SentryJump=1
-        Grenade=1  # grenade jump
-        DoubleJump, TripleJump  # off the left wall
-        Water, WaterDash, Damage=10 OR DoubleJump OR Glide
-      # Grenade=4  # grenade jumps and light refills, very nasty strat
-      DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
-      DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
-  quest GladesTown.MokiAcornQuest:
-    moki: GladesTown.ClearThorns, GladesTown.AcornQI
 
   pickup GladesTown.LowerOre:
     moki:
@@ -2949,14 +2827,10 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     gorlek:
       Hammer  # hammer float
       Spear=1, Sword OR Damage=10  # sword float
+    kii: Spear=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Spear=1  # tricky jump over the coals damageless
-  pickup GladesTown.AboveCaveEX:
-    moki: GladesTown.ClearThorns
-  pickup GladesTown.CaveBurrowEX:
-    moki: GladesTown.ClearThorns, Burrow, DoubleJump OR Launch
-    gorlek: GladesTown.ClearThorns, Burrow  # Burrow Dash out of the sand
   pickup GladesTown.KeyMokiHutEX:
-    moki: GladesTown.BuildHuts, WoodsEntry.DollQI  # changed RoofsOverHeads to BuildHuts
+    moki: GladesTown.BuildHuts, WoodsEntry.DollQI
   pickup GladesTown.DamageTree:
     moki: TuleyShop.LastTree
 
@@ -2970,16 +2844,17 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
       SentryJump=1
       TuleyShop.SpringPlants, Sword OR Hammer  # upslash or uphammer
       TuleyShop.Lightcatchers, Bash
+    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: free
-      # Grenade=1
   conn GladesTown.Teleporter:
     moki:
       Bash, Grenade=1
       GladesTown.ClearThorns OR DoubleJump OR Launch
     gorlek: SentryJump=1
-    unsafe: Hammer OR Sword OR Dash OR Damage=10
+    kii: Hammer OR Spear=1
+    unsafe: Sword OR Dash OR Damage=10 OR GlideJump OR GrenadeJump
 
-anchor GladesTown.West at -430, -4135:  # At Motay
+anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twillen
   refill Checkpoint
 
   quest GladesTown.HandToHandCanteen:
@@ -3023,13 +2898,28 @@ anchor GladesTown.West at -430, -4135:  # At Motay
           SentryJump=2
           SwordSJump=1  # hammer mildly inconsistent
           TuleyShop.Lightcatchers, Bash
+    kii:
+      TuleyShop.Lightcatchers, Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
+      TuleyShop.StickyGrass:
+        DoubleJump, TripleJump
+        Bash, Grenade=1, Dash
+        Bash, Grenade=1, Sword, Spear=1 OR Shuriken=1
+        TuleyShop.Lightcatchers, Bash, Sword
+        TuleyShop.Lightcatchers, Bash, Hammer, Flash  # Possible with other energy weapons but you need to be careful about not damaging the plant
+      GladesTown.BuildHuts, TuleyShop.BlueMoon, Grapple, Bash, Grenade=1:  # go to Motay's house and grapple the right plant to reach the house above
+        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
+        Dash, Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       SentryJump=2  # Midairs
-      GladesTown.BuildHuts, TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
-      GladesTown.BuildHuts, Grenade=3  # Grenade Jumps
-      TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # Grenadebash
+      GladesTown.BuildHuts:
+        GrenadeJump
+        Bash  # use both slimes
+        TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
+        DoubleJump, TripleJump, GlideJump
+        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover # go to Motay's house and grapple the right plant to reach the house above
+      TuleyShop.Lightcatchers, Bash, Grenade=1
       DoubleJump, TripleJump, Dash OR Glide     # using the ceiling from the left
-      GladesTown.BuildHuts, Bash                # use both slimes
+      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Hammer
   pickup GladesTown.MotayHutEX:
     moki, GladesTown.BuildHuts:
       DoubleJump, Dash OR Glide
@@ -3040,15 +2930,18 @@ anchor GladesTown.West at -430, -4135:  # At Motay
     gorlek, GladesTown.BuildHuts:
       SentryJump=1
       DoubleJump, TripleJump OR Sword OR Hammer
+    kii, GladesTown.BuildHuts:
+      DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.BuildHuts:
-      Grenade=1  # grenade jumps
+      GrenadeJump
       Bash  # slime lure
       TuleyShop.SpringPlants, Hammer, Dash  # uphammer bounce
       Dash                                  # late coyote
       Sword                                 # high jump, full combo, upslash and then downslash (all while holding right)
       # Dash, Glide OR Sword OR Hammer
-  pickup WestGlades.GrappleEX:
-    unsafe: SwordSJump=1, Damage=10
 
   conn WestGlades.PastTown:
     moki:
@@ -3061,14 +2954,21 @@ anchor GladesTown.West at -430, -4135:  # At Motay
       Combat=2xWeakSlug, DoubleJump, Dash
       Combat=2xWeakSlug, DoubleJump, TripleJump  # can either wrap around or grab the bottom of the last wall
       DoubleJump, Sword, Damage=10
+    kii:
+      Bash, Sword OR Hammer
+      Bash, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
+      Dash, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=2xWeakSlug, DoubleJump, Damage=20, Blaze=1 OR Damage=10
+      Combat=2xWeakSlug, DoubleJump, Damage=10, Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Combat=2xWeakSlug, DoubleJump, Glide, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash, Damage=10, Hammer
       Combat=2xWeakSlug, DoubleJump, Damage=20
-      Bash, Sword OR Hammer  # weapon floating, yes verified with hammer
       SwordSJump=1, Damage=10
       HammerSJump=1, Damage=20
       Dash, Hammer
-      Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
+      #Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
+      Damage=10, Bash OR Sword 
       DoubleJump, Damage=10, TripleJump OR Dash  # damage for avoiding slimes
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
@@ -3077,7 +2977,10 @@ anchor GladesTown.West at -430, -4135:  # At Motay
       TuleyShop.BlueMoon, Grapple
       TuleyShop.StickyGrass, Grapple, Glide
     gorlek: TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
-    # kii will probably have a free conection from TwillenHome, not needing any paths here
+    kii:
+      GladesTown.BuildHuts, Dash, Sword
+      GladesTown.BuildHuts, Dash, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      GladesTown.BuildHuts, Sword, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
   conn GladesTown.UpperWest:
     moki:
       TuleyShop.StickyGrass, Launch
@@ -3110,34 +3013,48 @@ anchor GladesTown.West at -430, -4135:  # At Motay
         Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
         Bash, Grenade=1, Dash, Glide OR Sword
         SentryJump=1, DoubleJump, TripleJump OR Dash
+    kii:
+      TuleyShop.Lightcatchers, Bash, Flash=1, DoubleJump OR Dash  # Would be possible with other weapons but the second plant can be destroyed
+      TuleyShop.BlueMoon, Grapple
+      TuleyShop.StickyGrass:
+        DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # condition for reaching the bridge
+        Grapple, DoubleJump, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      GladesTown.BuildHuts:
+        Bash, Grenade=1, DoubleJump, Shuriken=1  # more energy efficient the grenade=2
+        Bash, Grenade=1, Dash, Hammer OR Shuriken=1 OR Flash=1
+        Bash, Grenade=1, Sword, Hammer OR Shuriken=1 OR Flash=1
+        Bash, Grenade=1, Hammer, Glide, Shuriken=1 OR Flash=1
     unsafe:
       Grenade=2, DoubleJump, Sword  # Midair Grenade Pogo
-      TuleyShop.BlueMoon, Grapple
-      TuleyShop.Lightcatchers, Bash, Glide OR Grenade=1  # Bash Gliding
+      TuleyShop.Lightcatchers, Bash  # Use the slimes to reach the plant above Motay then bash glide to the bridge
+      TuleyShop.StickyGrass, DoubleJump, TripleJump
       GladesTown.BuildHuts:
-        Bash, Grenade=1  # Grenade Jump that auto-cancels by entering the hut
-        Grenade=1, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
-        SentryJump=1, Dash                  # Downslash at the Bridge
+        Bash, Grenade=1, GrenadeJump
+        GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
+        SwordSJump=1, Dash  # Dash + Sword to land at the hut then sjump and dash.
         TuleyShop.Lightcatchers, Bash, Sword OR Hammer
   # all other paths should be redundant with the connection to tp
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
+  refill Checkpoint:
+    moki: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
+
   pickup GladesTown.ArcingShard:
     moki, GladesTown.ClearThorns:
       DoubleJump OR Dash OR Glide OR Launch
       TuleyShop.Lightcatchers, Bash  # somehow I don't think this path is very relevant
       TuleyShop.BlueMoon, Grapple
     gorlek: GladesTown.ClearThorns, Sword OR Hammer
-    unsafe, GladesTown.ClearThorns:
-      Sentry=2
-      Shuriken=1
+    kii, GladesTown.ClearThorns: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup GladesTown.BraveMokiHutEX:
     moki: GladesTown.OnwardsAndUpwards, DoubleJump OR Launch
     gorlek: GladesTown.OnwardsAndUpwards, SentryJump=1
+    kii, GladesTown.OnwardsAndUpwards:
+      Bash, Grenade=1  # drop through the floor before throwing your grenade
+      Hammer
     unsafe, GladesTown.OnwardsAndUpwards:
-      Sword OR Hammer  # upslash or uphammer
-      Grenade=1  # grenade jump
-      Bash, Spear=1  # spearbash off of the pots
+      Sword OR Spear=1 # upslash+downslash
+      GrenadeJump  # grenade jump
   pickup GladesTown.UpperLeftEX:
     moki:
       Bash, Grenade=1
@@ -3146,11 +3063,12 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump
-      TuleyShop.StickyGrass, Grapple
-    unsafe:
-      DoubleJump
-      Sword, Grenade=1 OR Shuriken=2  # pogo
-      TuleyShop.BlueMoon, Grapple
+      TuleyShop.StickyGrass, Grapple, Dash
+    kii: TuleyShop.StickyGrass, Grapple, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # https://youtu.be/3rxIf0qIUNc
+      #DoubleJump
+      #Sword, Grenade=1 OR Shuriken=2  # pogo
+      #TuleyShop.BlueMoon, Grapple
   pickup GladesTown.AboveGromHC:
     moki:
       DoubleJump, Bash, Grenade=1
@@ -3158,7 +3076,8 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       TuleyShop.StickyGrass, Grapple
     gorlek:
       DoubleJump, SentryJump=1
-      DoubleJump, TripleJump OR Dash OR Glide  # just assisting abilities
+      DoubleJump, TripleJump
+    kii: Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # grenade bash under GladesTown.UpperLeftEX
     unsafe:
       DoubleJump
       Bash, Grenade=1
@@ -3172,24 +3091,28 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     gorlek, GladesTown.BuildHuts:
       Sword OR Hammer  # Weapon Float
       TuleyShop.StickyGrass, Grapple
-    unsafe: GladesTown.BuildHuts, Sentry=1 OR Spear=1 OR Flash OR Blaze=1
+    kii, GladesTown.BuildHuts: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup GladesTown.UpperOre:
     moki: GladesTown.BuildHuts, Bash, Grenade=2, Dash OR Glide
-    gorlek, GladesTown.BuildHuts:
+    gorlek:
       TuleyShop.StickyGrass, Grapple
-      TuleyShop.StickyGrass, SentryJump=1
-      SentryJump=2
-      SwordSJump=1, DoubleJump, TripleJump OR Dash
-    unsafe: GladesTown.BuildHuts, Grenade=2, Sentry=1 OR Spear=1 OR Flash OR Blaze=1 OR Sword OR Hammer OR Dash OR DoubleJump OR Glide
+      GladesTown.BuildHuts:
+        TuleyShop.StickyGrass, SentryJump=1
+        TuleyShop.StickyGrass, Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
+        SentryJump=2
+        SwordSJump=1, DoubleJump, TripleJump OR Dash
+    kii:
+      GladesTown.BuildHuts, TuleyShop.StickyGrass, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      GladesTown.BuildHuts, Bash, Grenade=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
-  conn GladesTown.West:
+  conn GladesTown.West:  # Make sure it's not redundant with going to GladesTown.TwillenHome first
     moki:
       Dash OR Glide
       TuleyShop.BlueMoon, Grapple
     gorlek:
       Sword OR Hammer
       TuleyShop.StickyGrass, Grapple
-    unsafe: GladesTown.BuildHuts, Sentry=1 OR Spear=1 OR Flash OR Blaze=1
+    kii: GladesTown.BuildHuts,  Blaze=1
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
     moki:
@@ -3197,27 +3120,224 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       TuleyShop.Lightcatchers, Bash
       TuleyShop.BlueMoon, Grapple
     gorlek: Sword OR Hammer
-    unsafe: Grenade=1 OR Sentry=1 OR Flash OR Blaze=1 OR Spear=1 OR Shuriken=1
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 
+    unsafe: free
+    
+anchor GladesTown.MokiAcorn at -347, -4182:  # At the moki near the cave
+  refill Checkpoint:
+    moki: GladesTown.CaveEntrance  # Enter the cave for a refill
+  refill Energy=4:
+    moki: GladesTown.CaveEntrance, BreakCrystal
+
+  quest GladesTown.AcornQI:
+    moki, GladesTown.CaveEntrance:
+      Flash, Water, Glide
+      Flash, Water, DoubleJump, Dash
+      Flash, Bash, Grenade=1
+      Flash, Launch
+    gorlek, GladesTown.CaveEntrance:
+      Flash:
+        Water, DoubleJump OR Dash OR Sword OR Hammer
+        SentryJump=1
+      Bow=4:  # bow refills light
+        Launch
+        Bash, Grenade=1
+        SentryJump=1
+    kii, GladesTown.CaveEntrance:
+      Flash:
+        DoubleJump, TripleJump
+        Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2 #That partcular water only deals 4 damage per tic
+        WaterDash, Damage=16, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
+        Water, Damage=10, Damage=10
+        Damage=10, Damage=42
+        WaterDash, Damage=10, Damage=26
+      Bow=4, DoubleJump, TripleJump
+    unsafe, GladesTown.CaveEntrance:
+      Flash:
+        Water # use Flash for mobility as well
+        GrenadeJump
+      Bow=2:
+        Launch
+        Bash, Grenade=1
+        SentryJump=1
+        GrenadeJump
+        DoubleJump, TripleJump  # off the left wall
+        Water, WaterDash, Damage=10 OR DoubleJump OR Glide
+      # Grenade=4  # grenade jumps and light refills, very nasty strat
+      DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
+      DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
+  quest GladesTown.MokiAcornQuest:
+    moki: GladesTown.AcornQI
+  
+  pickup GladesTown.AboveCaveEX:
+    moki:
+      Launch OR DoubleJump
+      Bash, Grenade=1
+      TuleyShop.SpringPlants, Damage=10  # can avoid the dboost but just in case
+    gorlek:
+      SentryJump=1, Damage=10 OR GladesTown.ClearThorns
+      Hammer, Dash
+      TuleyShop.SpringPlants
+    kii: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Dash
+  pickup GladesTown.CaveBurrowEX:
+    moki: Burrow, DoubleJump OR Launch
+    gorlek: Burrow  # Burrow Dash out of the sand
+
+  conn GladesTown.Teleporter:  # only usefull for GladesDone
+    moki, GladesTown.ClearThorns:
+      Launch OR DoubleJump
+      Bash, Grenade=1, Dash  # can't see the exit from the ground so accounting for landing near GladesTown.AboveCaveEX
+      TuleyShop.SpringPlants
+    gorlek, GladesTown.ClearThorns:
+      Bash, Grenade=1
+      Hammer, Dash
+      SentryJump=1
+    kii, GladesTown.ClearThorns: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.ClearThorns: Dash
+
+anchor GladesTown.BellowBountyShard at -247, -4121:  # Bridge bellow the bounty shard 
+  pickup GladesTown.AboveTpEX: free
+  pickup GladesTown.BountyShard:
+    moki:
+      Launch
+      Bash, Grenade=1 OR TuleyShop.Lightcatchers
+      TuleyShop.StickyGrass, Grapple
+    gorlek:
+      DoubleJump, TripleJump OR TuleyShop.StickyGrass
+      SentryJump=1
+    kii:
+      DoubleJump, Hammer OR Spear=1
+    unsafe:
+      DoubleJump
+      GrenadeJump
+  pickup GladesTown.UpdraftCeilingEX:
+    moki: TuleyShop.Lightcatchers, Bash, Glide OR Dash
+    gorlek: TuleyShop.Lightcatchers, Bash
+    kii: Sentry=2, Spear=1  # More energy efficient than going to GladesTown.AboveOpher first
+  
+  conn GladesTown.Teleporter: free
+  conn GladesTown.AboveOpher:
+    moki:
+      DoubleJump, Glide OR Dash
+      TuleyShop.Lightcatchers, Bash, DoubleJump
+    gorlek:
+      DoubleJump OR Dash OR Glide  # Sword is possible but TuleyShop.Lightcatchers makes is awkward
+      TuleyShop.Lightcatchers, Bash, Sword
+    kii:
+      Sword OR Hammer OR Sentry=3
+      Sentry=2, Shuriken=1 OR Flash=1  # More energy efficient than 3 sentries
+
+anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
+  refill Checkpoint:
+    moki: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
+
+  pickup GladesTown.UpdraftCeilingEX:
+    moki:
+      DoubleJump OR Launch
+      Flap, Glide  # activate the updraft below
+      TuleyShop.Lightcatchers, Bash  # @validator this was there before I create this anchor and I don't think this should?
+      TuleyShop.SpringPlants, Dash OR Glide
+    gorlek:
+      Hammer OR SentryJump=1
+      TuleyShop.SpringPlants, Sword
+    kii:
+      Dash OR Spear=1  # coyote dash or spear under the pickup
+      Bash, Grenade=1
+      TuleyShop.SpringPlants, Sentry=2
+    unsafe:
+      Sword OR GrenadeJump OR GlideJump
+      TuleyShop.SpringPlants, PauseHover
+  
+  conn GladesTown.Teleporter: free
+  conn GladesTown.ReachPath:
+    moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
+  conn GladesTown.HoleHut:
+    moki:
+      Launch
+      Flap, Glide:  # Activate the updraft below
+        DoubleJump
+        Bash, Grenade=1
+        Grapple, TuleyShop.BlueMoon OR TuleyShop.StickyGrass  # @validator I don't think stickygrass is a good fit for moki
+        TuleyShop.SpringPlants
+      TuleyShop.Lightcatchers, Bash:
+        Grenade=1 OR DoubleJump
+        TuleyShop.BlueMoon, Grapple, Dash OR Glide
+        TuleyShop.SpringPlants
+      TuleyShop.SpringPlants, DoubleJump
+      GladesTown.RoofsOverHeads:
+        Bash, Grenade=2
+        DoubleJump, Bash, Grenade=1
+        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash OR Glide
+        TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Dash OR Glide  # @validator I don't think stickygrass is a good fit for moki
+        TuleyShop.SpringPlants, Bash, Grenade=1
+    gorlek:
+      Flap, Glide, Hammer OR SwordSJump=1
+      DoubleJump, TripleJump
+      SentryJump=1:
+        DoubleJump OR Hammer OR SwordSJump=1
+        TuleyShop.BlueMoon, Grapple
+        TuleyShop.StickyGrass, Grapple, Dash OR Glide
+      TuleyShop.Lightcatchers, Bash:
+        Hammer OR SentryJump=1
+        TuleyShop.BlueMoon, Grapple
+      TuleyShop.SpringPlants, Hammer OR Sword
+      GladesTown.RoofsOverHeads:
+        Bash, Grenade=1, Hammer
+        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
+        TuleyShop.StickyGrass, Grapple, DoubleJump, Dash OR Glide OR Sword OR Hammer
+        TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Sword
+    kii:
+      Bash, Grenade=2
+      Bash, Grenade=1, DoubleJump OR Hammer
+      TuleyShop.SpringPlants, Spear=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      SwordJump OR GrenadeJump
+      Flap, Glide, Sword OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
+      TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounces
+      TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
+  conn GladesTown.BellowBountyShard:
+    moki: TuleyShop.Lightcatchers, Bash, DoubleJump
+    gorlek: TuleyShop.Lightcatchers, Bash, Glide OR Dash  # @validator the Dash path got validated before but I don't think it should be gorlek
+    kii: TuleyShop.Lightcatchers, Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      TuleyShop.Lightcatchers, Bash
+      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E
+
+anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
+  pickup GladesTown.LupoSoupEX: free
+  pickup LupoShop.HCMapIcon:
+    moki: SpiritLight=1200
+  pickup LupoShop.ECMapIcon:
+    moki: SpiritLight=1200
+  pickup LupoShop.ShardMapIcon:
+    moki: SpiritLight=1200
+  pickup GladesTown.LupoSwimHC:
+    moki: Water, Burrow
+  pickup GladesTown.LupoSwimMiddleEX:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
+    unsafe:
+      Damage=1000 # just wall jump between both walls
+      WaterDash, Damage=40
+  
+  conn GladesTown.Teleporter:
+    moki: Water OR Burrow
+    unsafe:
+      Damage=180
+      WaterDash, Damage=60
 
 anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
   pickup GladesTown.BelowHoleHutEX: free
-  pickup GladesTown.HoleHutEX:
-    moki, GladesTown.RoofsOverHeads:
-      Bash, Grenade=1
-      TuleyShop.SpringPlants OR DoubleJump OR Dash OR Launch
-    gorlek: GladesTown.RoofsOverHeads, Glide OR HammerSJump=1 OR Sword
-    unsafe, GladesTown.RoofsOverHeads:
-      Grenade=1  # grenade jump
-      Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
-  pickup GladesTown.HoleHutEC:
-    moki, GladesTown.RoofsOverHeads:
-      Bash, Grenade=1
-      TuleyShop.SpringPlants OR DoubleJump OR Dash OR Launch
-    gorlek: GladesTown.RoofsOverHeads, Glide OR HammerSJump=1 OR Sword
-    unsafe, GladesTown.RoofsOverHeads:
-      Grenade=1  # grenade jump
-      Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+  pickup GladesTown.UpdraftCeilingEX:
+    gorlek: Dash OR Glide
+    kii: Sword
 
+  conn GladesTown.HoleHutEntrance:
+    moki, GladesTown.RoofsOverHeads:
+      Bash, Grenade=1
+      TuleyShop.SpringPlants OR DoubleJump OR Dash OR Launch
+    gorlek, GladesTown.RoofsOverHeads: Glide OR Sword OR HammerSJump=1
+    kii, GladesTown.RoofsOverHeads: Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.RoofsOverHeads: GrenadeJump
   conn GladesTown.ReachPath:
   # Sword, Dash, Glide, DoubleJump, Lightcatchers Bash, Grenade, Hammer, Blaze, Shuriken, Sentry, and Flash can all individually get you from branch to reachpath
     moki:
@@ -3234,10 +3354,13 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
       SentryJump=1  # Weapon Float, works from a standing sjump on the ledge
       TuleyShop.BlueMoon, Grapple, Glide OR Sword OR Hammer
       TuleyShop.StickyGrass, Grapple, Glide OR Sword
+    kii:
+      DoubleJump, Hammer
+      TuleyShop.BlueMoon, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      TuleyShop.StickyGrass, Grapple, Hammer OR Shuriken=3 OR Flash=3 OR Sentry=3
+      TuleyShop.SpringPlants, TuleyShop.StickyGrass, Grapple, Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
-      Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Blaze=1 OR Shuriken=1 OR Sentry=1 OR Flash
-      Grenade=2
-      TuleyShop.Lightcatchers, Bash, Grenade=1
+      GrenadeJump
       TuleyShop.SpringPlants, Hammer  # Uphammer Bounce
       TuleyShop.StickyGrass, Grapple, Sword OR Hammer OR Blaze=1 OR Shuriken=1 OR Sentry=1 OR Flash
       DoubleJump, Glide
@@ -3246,6 +3369,17 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
     gorlek: GladesTown.TuleySpawned, Sword OR Hammer  # getting up there with just a weapon from below is not written in gorlek. The weapon floats from hole hut, however, are probably gorlek difficulty.
     # everything else is redundant
   conn GladesTown.Teleporter: free
+  
+anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup house
+  refill Checkpoint:
+    moki: GladesTown.RoofsOverHeads
+  
+  pickup GladesTown.HoleHutEX:
+    moki: GladesTown.RoofsOverHeads
+  pickup GladesTown.HoleHutEC:
+    moki: GladesTown.RoofsOverHeads
+  
+  conn GladesTown.HoleHut: free
 
 anchor GladesTown.ReachPath at -140, -4096:  # At the soup
   refill Checkpoint
@@ -3264,19 +3398,23 @@ anchor GladesTown.ReachPath at -140, -4096:  # At the soup
     moki:
       Water, Bash, Flap  # seems to be a casual strat the game suggests you to do
       Water, Grenade=1
-  # unsafe: Water, Flap, Sentry=2  # theoretical double redirect, still in testing
-  pickup GladesTown.UpdraftCeilingEX:
-    moki: DoubleJump  # other (non-redundant) paths exist, but this has free retries, otherwise you'd have to go through entire reach to get another attempt
-    gorlek: Dash OR Glide OR Sword OR Hammer  # weapon float woo
-    unsafe: Grenade=1
-
+    kii:
+      Damage=80, Grenade=1
+      Damage=80, Bash, Flap
+      WaterDash, Damage=60, Grenade=1
+      WaterDash, Damage=60, Bash, Flap
+    unsafe:
+      WaterDash, Damage=40, Grenade=1
+      WaterDash, Damage=40, Bash, Flap
+      #Water, Flap, Sentry=2  # theoretical double redirect, still in testing
+  
   conn GladesTown.HoleHut:
     moki:
       DoubleJump OR Dash OR Glide OR Launch
       TuleyShop.BlueMoon, TuleyShop.SpringPlants, Grapple
       TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
     gorlek: free  # free if you know the whole branch is semisolid, but you probably don't as a moki player
-  conn GladesTown.Teleporter: free
+  conn GladesTown.AboveOpher: free
   conn TuleyShop:
     moki: GladesTown.TuleySpawned
   conn LowerReach.TownEntry:
@@ -3284,11 +3422,13 @@ anchor GladesTown.ReachPath at -140, -4096:  # At the soup
       Bash, Flap OR Grenade=1  # may need to juggle the soupgrenade once
       Launch
     gorlek:
-      DoubleJump, Sword OR Hammer OR TripleJump  # Wall jump from the wall near the ceiling
+      DoubleJump, TripleJump, Glide OR Dash OR Sword
       SentryJump=1
+    kii: DoubleJump, TripleJump  # climb the wall above the gorlek 
     unsafe:
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
       Dash, Glide, Sword  # Needs a ramp on the left side corner of the platform near the cauldron
-      DoubleJump, Glide  # Wall jump from the wall near the ceiling
+      DoubleJump, Glide OR Sword OR Hammer # Jump on the floating platform next to the soup then wall jump from the wall above it
 
 region WestGlades:
   moki: Danger=20
@@ -9154,6 +9294,9 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       SwordJump
       GrenadeJump, GrenadeCancel  # gjump to reach the platform then cancel second one to the pickup, cancel it and grenade float (which you also need to cancel so you can wjump)
+  pickup PoolsApproach.CurrentEX:
+    moki: Water, WaterDash
+    kii: Damage=100, WaterDash
   pickup PoolsApproach.MillPathEC:
     moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
     gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash OR Damage=10  # dboost on the tentacle
@@ -9443,7 +9586,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
   pickup EastPools.CurrentEX:
     moki: Water, WaterDash
-    kii, WaterDash, Damage=80
+    kii: WaterDash, Damage=80
     unsafe:
       Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
       WaterDash, Damage=60
@@ -9459,6 +9602,11 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     unsafe:
       DoubleJump, TripleJump, Combat=CorruptSlug  # kill the slug on the left wall, tjump from this wall into the spikes under the pickup
       SentryJump=1, DoubleJump OR Damage=20  # The tree is swinging a bit. sjump from the left (Ori should almost fall) when the tree is swinging to the left
+  pickup PoolsApproach.CurrentEX:
+    moki: Water, WaterDash
+    kii: WaterDash, Damage=80
+    unsafe:
+      Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
 
   conn EastPools.BehindEntryDoor:
     moki: EastPools.EntryLever
@@ -9984,47 +10132,98 @@ region UpperPools:
 anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entrance to the keystone room
   refill Checkpoint
 
+  state UpperPools.KeystoneRoomBubbleFree:
+    kii:
+      Combat=SpinCrab, Bow=1 OR Grenade=1 OR Spear=1
+      Bash, Bow=1 OR Grenade=1 OR Spear=1
+
   quest EastPools.GrassSeed:
     moki:
       Combat=SpinCrab OR Bash OR Launch
       DoubleJump, Dash
     gorlek: Dash OR Glide OR Damage=10
-    unsafe: free
+    kii: free
 
   pickup UpperPools.LowerKS:
     moki:
       Water, DoubleJump, Bash
       Water, WaterDash OR Launch
     gorlek: Water, Bash, Hammer
-    unsafe: Water, Bash  # just need proper timing
+    kii:
+      Damage=60, WaterDash
+      Damage=120, Launch
+      Damage=160, Bash, DoubleJump OR Sword OR Hammer OR Spear=1
+      Bash, Water OR Damage=180  # wall jump on the left wall above the spikes
+    unsafe:
+      Water, DoubleJump, TripleJump, Damage=20
+      Damage=120, DoubleJump, TripleJump
+      Damage=40, WaterDash
+      Damage=100, Launch
+      Damage=140, Bash
 
   conn EastPools.CentralRoom:
     moki:
       Combat=SpinCrab OR Bash OR Launch
       DoubleJump, Dash
     gorlek: Dash OR Glide OR Damage=10
-    unsafe: free
+    kii: free
   conn UpperPools.KeystoneRoomBubbleSpawner:
     moki:
       Water OR Launch
       DoubleJump, Glide
     gorlek:
       Damage=20
-      DoubleJump, TripleJump OR Dash OR Sword
-      Dash, Glide OR Sword
+      DoubleJump, TripleJump OR Dash OR Sword OR UpperPools.KeystoneRoomBubbleFree
+      Dash, Glide OR Sword OR UpperPools.KeystoneRoomBubbleFree
       Bash, DoubleJump OR Dash OR Glide  # bashes interfere with weapons weirdly; it can easily happen in this scenario
+    kii:
+      Bash
+      Sword  # pogo the crab 
+      DoubleJump, Hammer OR Shuriken=1 OR Sentry=2
+      Dash, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Hammer OR Shuriken=1 OR Sentry=2
+      Hammer, Sentry=2
+      UpperPools.KeystoneRoomBubbleFree, Glide OR Sword OR Hammer OR Sentry=2
+    unsafe:
+      Dash OR GlideJump
+      DoubleJump, Flash=1 OR Sentry=1
+  conn UpperPools.KeystoneRoom:
+    kii: Bash  # bash the crab
+  conn WestPools: 
+    unsafe:  # Glitch the crushers so you don't need Water Breath
+      Water, Launch
+      Water, DoubleJump, Grenade OR Hammer  # greande/hammer jumps. With grenade jumps, start a grenade jump while in the water then use your doublejump
+      Water, DoubleJump, TripleJump, Damage=20
+      Water, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+  
 
 anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubble spawner and the bounce pad
   refill Checkpoint
 
   state UpperPools.KeystoneRoomBubbleFree:
     moki: Water, WaterDash OR Bash
-    unsafe: Grenade=1 OR Spear=1 OR Shuriken=1 OR Bow=1
+    kii:
+      Grenade=1 OR Spear=1 OR Bow=1 
+      Shuriken=1, Water OR Damage=20
+      Sentry=1, Water OR Damage=20
+    #unsafe: ChargeBlaze=1
 
   pickup UpperPools.UpperLeftKS:  # connections using the bubble have to start from here, others use the higher anchor
     moki: UpperPools.KeystoneRoomBubbleFree, Flap, DoubleJump
     gorlek: UpperPools.KeystoneRoomBubbleFree, Flap, Dash OR Glide
+    kii: UpperPools.KeystoneRoomBubbleFree, Flap, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: UpperPools.KeystoneRoomBubbleFree, Damage=20  # pretty cute
+  pickup UpperPools.LowerKS:  # Dirty water only. Paths with clean water originate from UpperPools.KeystoneRoomEntrance
+    kii:
+      Damage=60, WaterDash
+      Damage=120, Launch
+      Damage=160, Bash, DoubleJump OR Sword OR Hammer OR Spear=1
+      Damage=180, Bash  # wall jump on the left wall above the spikes
+    unsafe:
+      Damage=120, DoubleJump, TripleJump
+      Damage=40, WaterDash
+      Damage=100, Launch
+      Damage=140, Bash
 
   conn UpperPools.KeystoneRoom:
     moki:
@@ -10033,22 +10232,28 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
     gorlek:
       Dash OR Glide
       Water, WaterDash, Bash  # use the missile
-    unsafe:
-      Water, Bash
+    kii:  # No dirty water path for the bash+torpedo path because using the crab from UpperPools.KeystoneRoomBubbleSpawner is just way less damage
+      Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.KeystoneRoomBubbleFree, WaterDash, Flap, Water OR Damage=20
-  conn UpperPools.BubbleSpamRoom:  # connections using the bubble have to start from here, others use the higher anchor
-    moki: UpperPools.KeystoneRoomBubbleFree, Flap, DoubleJump, Dash, Grapple  # seems to be the intended strat
-    gorlek, UpperPools.KeystoneRoomBubbleFree:
-      Flap, Grapple, DoubleJump OR Dash
-      Flap, SentryJump=2  # guide the bubble to the anchor then sjump on it
-      Flap, DoubleJump, TripleJump, Dash OR Glide OR Sword  # guide the bubble to the anchor then tjump on it. wjump from the left wall to reach to right wall
-    unsafe: UpperPools.KeystoneRoomBubbleFree, Dash  # I'm so sorry
+  conn UpperPools.BeforeKeystoneDoor:  # connections using the bubble have to start from here, others originate from UpperPools.KeystoneRoom
+    gorlek, UpperPools.KeystoneRoomBubbleFree: Flap, DoubleJump, TripleJump  # guide the bubble to UpperPools.KeystoneRoom then jump on it
+    unsafe, UpperPools.KeystoneRoomBubbleFree: Flap, SwordSJump=1
+  conn UpperPools.RightBubbleSpamRoom:  # connections using the bubble have to start from here, others originate from BeforeKeystoneDoor
+    moki, UpperPools.KeystoneRoomBubbleFree: Flap, DoubleJump, Dash, Grapple  # seems to be the intended strat
+    gorlek, UpperPools.KeystoneRoomBubbleFree: Flap, Grapple, DoubleJump OR Dash
+    unsafe, UpperPools.KeystoneRoomBubbleFree:
+      Dash  # I'm so sorry
+      Flap, Grapple, Sword OR Hammer OR Shuriken=3  # flap from the far left of the platform after the bouncepad so the bubble get slowed down by the ceiling
   conn UpperPools.KeystoneRoomEntrance:
     moki:  # with at least Double Jump it's easier to go over the top
       Water
       Dash, Glide
     gorlek:  # almost always easier to go over the top
       Damage=20, Bash OR Sword OR Hammer  # the enemy likes to get in the way
+    kii:
+      Damage=30
+      Damage=20, Combat=SpinCrab
+    unsafe: UpperPools.KeystoneRoomBubbleFree
 
 anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper left keystones
   refill Checkpoint
@@ -10063,13 +10268,21 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       SentryJump=1
       DoubleJump, TripleJump, Hammer  # Can either reach the left or right wall; for the right wall you can even do it starting from a grounded upswing
       WaterDash, DoubleJump, TripleJump, Water OR Damage=20
+    kii:
+      DoubleJump, TripleJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1
+      WaterDash, DoubleJump, Water, Dash OR Glide OR Sword OR Hammer OR Flash=1 OR Sentry=1
+      WaterDash, DoubleJump, Damage=20, Dash OR Glide OR Sword OR Hammer OR Flash=1 OR Sentry=1
+    unsafe:
+      WaterDash, DoubleJump, Water OR Damage=20
   pickup UpperPools.UpperMidKS:  # the majority of paths will go through connections around the top
     gorlek:
       DoubleJump, WaterDash, Water OR Damage=20  # wdash to reach the right wall
       Bash, Grenade=1, DoubleJump
       Bash, Grenade=1, Dash, Damage=20
-    unsafe:
-      Water, WaterDash, Hammer, Damage=20  # wdash+upslash to reach the left wall, wjump in the spikes and upslash to get the key
+    kii:
+      Bash, Grenade=1, Damage=20
+      WaterDash, Water, Damage=20, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1   # wdash+upslash/energy weapon to reach the left wall, wjump in the spikes to get the key
+      WaterDash, Damage=40, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1   # wdash+upslash/energy weapon to reach the left wall, wjump in the spikes to get the key
   pickup UpperPools.UpperRightKS:
     moki:
       Bash, Grenade=1, Water OR DoubleJump OR Dash OR Glide
@@ -10078,13 +10291,16 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       Launch
     gorlek:
       SentryJump=1
-      Bash, Grenade=1, Sword OR Damage=20  # sword/damage boost to reach the platform below he pickup
+      Bash, Grenade=1, Sword OR Damage=20  # sword/damage boost to reach the platform below the pickup
       WaterDash, Water OR Damage=20
       Grapple, Sword
       Grapple, Hammer, Water OR Damage=20
       DoubleJump, TripleJump OR Sword OR Hammer OR Bash  # Bash the crab enemy
-    unsafe:
-      Grapple, Water OR Damage=20  # grapple the plant to make it swing. When the plant is swinging at the left, grapple it with a good angle to grab the keystone
+    kii:
+      Bash, Grenade=1, Grenade=1 OR Hammer OR Shuriken=1 OR Flash=1  # also possile with sentry but that's redundant with a second grenade
+      Grapple, Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # djump+energy weapon from where the crabs are
+    unsafe: Grapple, Water OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # grapple the plant to make it swing. When the plant is swinging at the left, grapple it with a good angle to grab the keystone
 
   conn UpperPools.KeystoneRoomEntrance: free
   conn UpperPools.KeystoneRoomBubbleSpawner: free
@@ -10107,7 +10323,18 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       SentryJump=1, Bash, WaterDash, Water OR Damage=20
       SwordSJump=2, Bash OR Damage=10
       HammerSJump=2, Bash, Water OR Dash OR Glide OR Damage=20
-
+    kii:
+      WaterDash, Bash, Water OR Damage=20  # bash the crab upward then jump and bash it again to reach the wooden platform or the door directly.
+      Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Grenade=1 OR Water OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Damage=20  # bash the crab upward then jump and bash it again to reach the wooden platform or the door directly. Possible with sentry as well but 1 grenade+1 sentry is redundant with 2 grenade
+      DoubleJump, TripleJump, Hammer  # wjump from UpperRightKS
+      DoubleJump, Sword # Pogo the crab. Have to jump from the small edge under the spikes to get enough height.
+    unsafe:
+      Bash, Grenade=1  # https://youtu.be/LJNUBDzZ_oU
+      WaterDash, Damage=20, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Similar to the bashnade path
+      WaterDash, Water, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Similar to the bashnade path
+      Dash, Hammer, Bash
+      
 anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door blocking waterdash tree
   refill Checkpoint
   refill Health=1:
@@ -10119,18 +10346,26 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
   state UpperPools.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: Grapple
     gorlek: DoubleJump
+    unsafe: Dash
 
   pickup UpperPools.UpperMidKS:
     moki: DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer OR Damage=20
+    kii:
+      Bash, Grenade=1
+      Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: free
   pickup UpperPools.UpperLeftKS:
     gorlek: DoubleJump, TripleJump
-
+    kii: DoubleJump, Dash OR Glide OR Sword 
+    unsafe: DoubleJump, Hammer OR Flash=1 OR Sentry=1
+      
   conn UpperPools.TreeRoomEntrance:
     moki: UpperPools.KeystoneDoor
-  conn UpperPools.KeystoneRoom: free
-  conn UpperPools.BubbleSpamRoom:
+  conn UpperPools.KeystoneRoom:
+    moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
+    gorlek: free
+  conn UpperPools.RightBubbleSpamRoom:
     moki:
       DoubleJump, Bash, Grenade=1
       Launch
@@ -10139,9 +10374,12 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
       HammerSJump=1, DoubleJump OR Dash OR Glide OR Bash OR Damage=20
       Bash, Grenade=1, Dash OR Glide OR Sword
       Bash, Grenade=1, Hammer, Damage=20
-      DoubleJump, TripleJump, Dash OR Damage=20  # you can come from the trial start and complete this path with just triple jump, the extra abilities allow alternatives to make it more likely that the player finds this path
+      DoubleJump, TripleJump, Dash OR Glide  # you can come from the trial start and complete this path with just triple jump, the extra abilities allow alternatives to make it more likely that the player finds this path
+    kii:
+      Bash, Grenade=1, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=40
+      Bash, Grenade=1, Spear=1, Damage=20
+      DoubleJump, TripleJump OR Dash  # From the trial's activation
     unsafe:
-      DoubleJump, TripleJump  # come from the trial start
       Bash, Grenade=1  # Bash grenade to reach the slime, bash glide from it
 
 anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of Waterdash tree
@@ -10152,38 +10390,66 @@ anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of 
   state UpperPools.TreeRoomLeftBubbleFree:
     unsafe: Bow=1 OR Grenade=1 OR Spear=1
 
+  pickup UpperPools.RoofEX:  # only for paths using the bubble all the way
+    unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash
+
   conn UpperPools.BeforeKeystoneDoor:
     moki: UpperPools.KeystoneDoor
   conn UpperPools.TreeRoom:
     moki: Water OR DoubleJump OR Dash OR Glide
     gorlek: free
+  conn UpperPools.AboveTree:  # paths using the bubbles originate from here
+    moki, UpperPools.TreeRoomLeftBubbleFree: 
+      Flap, DoubleJump
+      Launch
+    gorlek, UpperPools.TreeRoomLeftBubbleFree:
+      Flap, Dash
+      Flap, Glide, Damage=20
+      DoubleJump, TripleJump, Dash, Damage=20  # free the bubble, jump on it and tjump to the wall above the tree
+    kii, UpperPools.TreeRoomLeftBubbleFree:
+      Flap, Hammer
+      Flap, Glide, Shuriken=1
+      Bash, Grenade=1  # Throw a grenade and jump on the bubble to reach your grenade
+      DoubleJump, TripleJump, Damage=20  # jump on the bubble and dboost in the spikes above
+    unsafe, UpperPools.TreeRoomLeftBubbleFree:
+      Flap  # https://youtu.be/qKgm-Cyus-g
+      Dash  # https://youtu.be/rpaRDaJj8sY
 
 anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
   state UpperPools.TreeRoomLeftBubbleFree:
     moki: Water, WaterDash
-    unsafe: Bow=1 OR Grenade=1 OR Spear=1
+    kii:
+      WaterDash, Damage=40
+      Bow=1 OR Grenade=1 OR Spear=1
+      Shuriken=1, Water OR Damage=20  # also possible with sentry but it can target the ennemy instead
+    unsafe:
+      Shuriken=1 OR Sentry=1 # tp before hitting the water
+      WaterDash, Damage=20
+  state UpperPools.TreeRoomRightBubbleFree:
+    moki: Water, WaterDash
+    kii:
+      Bow=1 OR Grenade=1 OR Spear=1
+      WaterDash, Damage=40
+      Shuriken, Water OR Damage=20  # also possible with sentry but it usually target the fish instead
+    unsafe:
+      Shuriken=1 OR Sentry=1 # tp before hitting the water
+      WaterDash, Damage=20
   state UpperPools.ButtonDoorAboveTree:
     moki: Water, WaterDash
+    kii: WaterDash, Damage=80
+    unsafe: WaterDash, Damage=60
 
   pickup UpperPools.SwimDashTree: free
   pickup UpperPools.CurrentEX:
     moki: Water, WaterDash
-  pickup UpperPools.RoofEX:  # only for paths using the bubble all the way
-    unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash
+    kii: WaterDash, Damage=60
 
-  conn UpperPools.AboveTree:
-    moki, UpperPools.TreeRoomLeftBubbleFree:
-      Flap, DoubleJump
-      Launch
+  conn UpperPools.AboveTree:  # paths using the bubbles originate from UpperPools.TreeRoomEntrance
     gorlek:
-      UpperPools.TreeRoomLeftBubbleFree:
-        Flap, Dash
-        Flap, Glide, Damage=20
-        DoubleJump, TripleJump, Dash, Damage=20  # free the bubble, jump on it and tjump to the wall above the tree
       Bash, Grenade=1, DoubleJump, TripleJump, Dash, Damage=20  # bash grenade to reach the wall above the tree
       SentryJump=1, DoubleJump, TripleJump, Dash, Damage=20  # same path as above, replace bash grenade by sentry jump
-      Launch  # use the small bubbles for a launch reset or use the wall above the trees
-    unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash, DoubleJump OR Damage=20  # Dash on the bubble
+      Launch  # use the small bubbles for a launch reset or use the wall above the tree
+    kii: Bash, Grenade=1, DoubleJump, Damage=20, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1   # bash grenade to reach the wall above the tree
   conn UpperPools.TreeRoomEntrance:
     moki:
       Launch
@@ -10193,29 +10459,43 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
       SwordSJump=1  # Weapon hover as well
       HammerSJump=1, DoubleJump OR Dash OR Glide
       Bash, Grenade=1
+      WaterDash, Damage=20  # dboost in water
       UpperPools.TreeRoomLeftBubbleFree
+    kii: DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: DoubleJump, TripleJump
   conn UpperPools.DrainPuzzleEntrance:
     moki, UpperPools.ButtonDoorAboveTree:
-      Water, WaterDash, DoubleJump
+      UpperPools.TreeRoomRightBubbleFree, Water, WaterDash, DoubleJump
+      UpperPools.TreeRoomRightBubbleFree, Launch
+    gorlek, UpperPools.ButtonDoorAboveTree:
       Launch
-    gorlek: UpperPools.ButtonDoorAboveTree, Water, WaterDash, Sword OR Hammer
-    unsafe, UpperPools.ButtonDoorAboveTree:
-      Bow=1 OR Grenade=1 OR Spear=1  # free the bubbles, let one bubble go out of the water, jump on the next one and use it to land on the first bubble
-      HammerSJump=1
+      UpperPools.TreeRoomRightBubbleFree, Water, WaterDash, Sword OR Hammer
+      UpperPools.TreeRoomRightBubbleFree, Damage=20, WaterDash, DoubleJump OR Sword OR Hammer
+      UpperPools.TreeRoomRightBubbleFree, Bash, Grenade=1, DoubleJump OR Sword OR Hammer
+    kii, UpperPools.ButtonDoorAboveTree:
+      Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      UpperPools.TreeRoomRightBubbleFree  # let one bubble go out of the water, jump on the next one and use it to land on the first bubble
+    unsafe, UpperPools.ButtonDoorAboveTree: HammerSJump=1
 
 anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup above swimdash tree
   pickup UpperPools.RoofEX:
     moki:
+      Launch
       Water, WaterDash
       Bash, Grenade=1
     gorlek:
       Damage=20, WaterDash
       SentryJump=1
-
+    kii:
+      DoubleJump, Combat=CorruptSlug, TripleJump OR Dash OR Glide
+      DoubleJump, TripleJump, Hammer OR Spear=1
+    unsafe: DoubleJump, Combat=CorruptSlug, Sword
+    
   conn UpperPools.TreeRoom: free
   conn UpperPools.TreeRoomEntrance:
     moki: DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
 anchor UpperPools.DrainPuzzleEntrance at -1313, -4083:  # At the right of the door opened by the water dash button in the tree room
   refill Checkpoint
@@ -10230,12 +10510,26 @@ anchor UpperPools.DrainPuzzleEntrance at -1313, -4083:  # At the right of the do
       Water, WaterDash, Grapple, Glide OR Sword OR Hammer
       Water, Grapple, DoubleJump, TripleJump
       Water, Launch, Damage=20, DoubleJump OR Dash OR Glide
-      Water, Launch, Bash OR Damage=14  # Break the purple wall, do the right side then the left side
       Water, WaterDash, Launch, DoubleJump OR Dash OR Sword OR Damage=20
+    kii:
+      Water, WaterDash, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Water, Grapple, DoubleJump, Dash OR Hammer OR Spear=1  # with dash, land on the left platform after triggering the first anemone and dash+djump to the wall. Use Hammer/Spear to reach the wall from the water.
+      Water, Launch, WaterDash OR Damage=20
+      Damage=120, Grapple, DoubleJump, TripleJump OR Dash OR Hammer OR Spear=1
+      Damage=140, Launch
+      Damage=80, WaterDash, Launch
+      Damage=80, WaterDash, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Water, Grapple, DoubleJump, Sentry=1
+      Water, Launch, Dash
+      Water, WaterDash, DoubleJump, TripleJump, Damage=40
       Water, DoubleJump, Sword, Damage=20
-      Water, DoubleJump, Dash, Grapple
-      Water, Launch  # Break the purple wall, do the right side then the left side
+      Damage=100, Grapple, DoubleJump, TripleJump OR Dash OR Hammer OR Spear=1 OR Sentry=1
+      Damage=100, Launch, Dash
+      Damage=120, Launch
+      Damage=60, WaterDash, Launch
+      Damage=60, WaterDash, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=100, WaterDash, DoubleJump, TripleJump
 
   pickup UpperPools.WaterfallEC:  # have to solve with and without the water drained so it doesn't softlock
     moki:
@@ -10248,43 +10542,143 @@ anchor UpperPools.DrainPuzzleEntrance at -1313, -4083:  # At the right of the do
       Bash, Grenade=1, Grapple, Dash OR Sword
       SentryJump=1, Grapple, Dash OR Glide
       SwordSJump=1, Grapple
+    kii:
+      Grapple, DoubleJump
+      Grapple, Dash, Sword OR Hammer
+      Grapple, Hammer, Sword OR Shuriken=1  # With sword, use both upslashes in order to reach the wall
+      Bash, Grenade=1, Grapple  # Bash the slime after grappling the plant 
     unsafe:
-      SentryJump=1, Grapple
+      Grapple, Hammer
+      Grapple, Dash, Spear=1
+      Bash, Grenade=2
+      SwordSJump=1
+      HammerSJump=1, HammerSJump=1 OR Grapple
 
   conn UpperPools.TreeRoom:
     moki: UpperPools.ButtonDoorAboveTree
-  conn UpperPools.DrainPuzzleExit:
-    moki, UpperPools.UpperWaterDrained:
+  conn UpperPools.DrainPuzzleRight:  # have to solve with and without the water drained so it doesn't softlock
+    moki:
       DoubleJump, Dash, Grapple
       Bash, Grenade=1, Grapple, DoubleJump OR Dash OR Glide
-      Launch, DoubleJump OR Dash OR Glide OR Grapple
-      UpperPools.DrainRoomPurpleWall:
-        DoubleJump, Dash OR Glide
-        Dash, Glide
-        Water, Bash, Grenade=1  # Fall at the puddle at the end of the waterfall
-        Launch
-    gorlek, UpperPools.UpperWaterDrained:
+      Bash, Grenade=1, Launch
+      Launch, DoubleJump OR Dash OR Glide OR Grapple OR UpperPools.DrainRoomPurpleWall
+      UpperPools.DrainRoomPurpleWall, DoubleJump, Dash OR Glide
+    gorlek:
       DoubleJump, Grapple, TripleJump OR Glide OR Sword OR Hammer
-      Bash, Grenade=1, Grapple, Water OR Sword OR Hammer OR Damage=20
+      Bash, Grenade=1, Grapple, Sword OR Hammer
       Bash, Grenade=1, DoubleJump, Damage=20, TripleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, Dash, Glide OR Sword OR Hammer
       SentryJump=1, Grapple
       SentryJump=1, DoubleJump, TripleJump, Dash, Glide, Damage=20
       Launch
+      UpperPools.DrainRoomPurpleWall, DoubleJump, TripleJump OR Sword OR Hammer
+    kii:
+      Grapple, DoubleJump
+      Grapple, Dash, Hammer
+      Grapple, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Bash, Grenade=1, Damage=120
+      Bash, Grenade=1, Dash, Damage=60
+      Bash, Grenade=1, DoubleJump, Damage=20
+      Bash, Grenade=1, DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      UpperPools.DrainRoomPurpleWall, DoubleJump OR Dash
+      UpperPools.DrainRoomPurpleWall, Sword, Hammer OR Spear=1 OR Shuriken=1
+      UpperPools.DrainRoomPurpleWall, Hammer, Water OR UpperPools.UpperWaterDrained OR Damage=20:  # If the water is drained, you can walljump. Otherwise, you'll land in the water
+        Shuriken=1 OR Flash=1 OR Sentry=1
+      UpperPools.DrainRoomPurpleWall, Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
+    unsafe:
+      Grapple, Hammer  # just need to upslash to be in range for grappling the plant
+      Grapple, Bash, Grenade=1
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash
+      Bash, Grenade=1, Damage=80
+      Bash, Grenade=2, Damage=20
+      UpperPools.DrainRoomPurpleWall, Sword OR GlideJump
+      UpperPools.DrainRoomPurpleWall, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      UpperPools.DrainRoomPurpleWall, UpperPools.UpperWaterDrained, Bash, Grenade=2  # micro ledge on the left of the muncher after the breakable wall
+  conn UpperPools.DrainPuzzleExit:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
+    moki, UpperPools.UpperWaterDrained:
+      UpperPools.DrainRoomPurpleWall, Dash, Glide
+      UpperPools.DrainRoomPurpleWall, Water, Bash, Grenade=1  # Fall at the puddle at the end of the waterfall
+    gorlek, UpperPools.UpperWaterDrained:
+      Bash, Grenade=1, Grapple, Water OR Damage=20
       UpperPools.DrainRoomPurpleWall, DoubleJump OR Dash OR Glide OR Sword OR HammerSJump=1
-    unsafe, UpperPools.UpperWaterDrained:
+    kii, UpperPools.UpperWaterDrained:
       UpperPools.DrainRoomPurpleWall, Hammer
+      UpperPools.DrainRoomPurpleWall, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40
+    unsafe, UpperPools.UpperWaterDrained:
+      UpperPools.DrainRoomPurpleWall, Bash, Grenade=1, Damage=20
 
-anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Puzzle, on the ledge before dropping down
-  refill Checkpoint
-
-  # This is inside a rock, but you can just kinda walk out of it so it's not a problem
-  # Keep in mind that for all paths involving the puzzle room you have to consider both states of the water being drained or not
-
+anchor UpperPools.DrainPuzzleRight at -1324, -4060:  # On the ground next to the energy cristal
+  refill Energy=3:
+     moki: BreakCrystal
+  refill Health=1
+     
   state UpperPools.DrainRoomPurpleWall:
     moki: Bash, Water, WaterDash OR Launch
     gorlek:
       Water, Bash
       UpperPools.UpperWaterDrained, Bash, Launch, Damage=20
+    kii:
+      Damage=100, Bash
+      WaterDash, Damage=80, Bash
+    unsafe: Water, Launch
+  state UpperPools.UpperWaterDrained:
+    gorlek: Water, Launch, UpperPools.DrainRoomPurpleWall  # Break the purple wall, do the right side then the left side
+    kii: UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, DoubleJump, Water OR Damage=60
+    unsafe:
+      UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, Water, Sword OR Hammer OR Spear=1 OR GlideJump
+      UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, Damage=60, Sword OR Hammer OR Spear=1 OR GlideJump
+
+  conn UpperPools.DrainPuzzleExit:
+    moki, UpperPools.UpperWaterDrained: Water OR Glide OR DoubleJump OR Launch OR Dash
+    gorlek: UpperPools.UpperWaterDrained
+  conn UpperPools.DrainPuzzleEntrance:
+    moki:
+      Launch, Grapple OR UpperPools.DrainRoomPurpleWall
+      Launch, DoubleJump, Dash OR Glide
+      Launch, Dash, Glide
+      Launch, Bash, Grenade=1
+      Bash, Grenade=1, Grapple, Dash OR Glide OR DoubleJump
+      Bash, Grenade=1, DoubleJump, Glide
+      UpperPools.DrainRoomPurpleWall, DoubleJump, Dash
+    gorlek:
+      Launch, Glide OR Damage=20
+      Launch, DoubleJump, Sword OR Hammer
+      Launch, Dash, Sword OR Hammer
+      Bash, Grenade=1, Damage=20, Glide OR DoubleJump OR Dash OR Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      Bash, Grenade=1, DoubleJump, Dash, Sword OR Hammer
+      Bash, Grenade=1, Grapple, Sword OR Hammer
+      UpperPools.DrainRoomPurpleWall, DoubleJump, TripleJump
+      UpperPools.DrainRoomPurpleWall, Water OR UpperPools.UpperWaterDrained OR Damage=20:  # If the water is drained, you can walljump. Otherwise, you'll land in the water
+        DoubleJump, Glide OR Sword OR Hammer
+        Dash, Glide OR Sword
+    kii:
+      Launch, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=3  # wall jump on the wall after the spikes
+      Bash, Grenade=1, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # with energy weapons, wall jump on the wall after the spikes
+      UpperPools.DrainRoomPurpleWall, DoubleJump, Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      UpperPools.DrainRoomPurpleWall, Dash, Sword OR Hammer
+      UpperPools.DrainRoomPurpleWall, Water OR UpperPools.UpperWaterDrained OR Damage=20:  # If the water is drained, you can walljump. Otherwise, you'll land in the water
+        Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # wall jump from the wall above the energy cristal then launch, use you energy weapon and wall jump of the wall under the spikes
+      Bash, Grenade=1, DoubleJump OR Dash OR GlideJump
+      UpperPools.DrainRoomPurpleWall, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1 # wall jump on the wall after the spikes
+
+anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Puzzle, on the ledge before dropping down
+  refill Checkpoint
+
+  # This is inside a rock, but you can just walk out of it so it's not a problem
+  # Keep in mind that for all paths involving the puzzle room you have to consider both states of the water being drained or not
+
+  state UpperPools.DrainRoomPurpleWall:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
+    moki: Bash, Water, WaterDash
+    gorlek: Water, Bash
+    kii:
+      Damage=100, Bash
+      WaterDash, Damage=80, Bash
 
   pickup EastPools.PurpleWallHC:
     moki, UpperPools.UpperWaterDrained:
@@ -10293,45 +10687,66 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
     gorlek, UpperPools.UpperWaterDrained:
       Water, Bash, Dash OR Sword OR Grenade=1
       Water, Bash, DoubleJump, Hammer
+    kii, UpperPools.UpperWaterDrained:
+      Damage=60, Bash, Launch OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Grenade=1 OR Sentry=2
+      Damage=60, Damage=60, Bash  # bash a torpedo to break the wall then bash glide another one to reach the pickup
+      Water, Bash  # bash a torpedo to break the wall then bash glide another one to reach the pickup
     unsafe, UpperPools.UpperWaterDrained:  # You can manipulate the torpedo enemy in a way that it hits the purple wall without needing any skills
       Water, DoubleJump OR Dash OR Glide OR Bash OR Launch OR Sword OR Hammer OR Shuriken=2
       Damage=20, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=2
-      Damage=40, Bash
+      Damage=20, Damage=20, Bash  # bash a torpedo to break the wall then bash glide another one to reach the pickup
 
   conn EastPools.AboveFishingPool: free
-  conn UpperPools.DrainPuzzleEntrance:
+  conn UpperPools.DrainPuzzleRight:  # have to solve with and without the water drained so it doesn't softlock
     moki:
-      UpperPools.UpperWaterDrained OR Water:  # These paths have to cross Water unless you drained it already
-        Launch, DoubleJump, Dash OR Glide
-        Launch, Dash, Glide
-      Water, Launch, Grapple
-      UpperPools.DrainRoomPurpleWall:
-        Water, Launch
-        Water, WaterDash, DoubleJump, Dash
+      Water, Launch
+      Water, WaterDash, DoubleJump, Dash
     gorlek:
-      UpperPools.UpperWaterDrained OR Water:  # These paths have to cross Water unless you drained it already
-        Launch, Glide OR Damage=20
-        Launch, DoubleJump, Sword OR Hammer
-        Launch, Dash, Sword OR Hammer
-        UpperPools.DrainRoomPurpleWall:
-          Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Damage=20
-          Bash, Grenade=1, Dash, Glide OR Sword OR Damage=20
-          Bash, Grenade=1, Hammer, Damage=20, DoubleJump OR Dash
-          Launch
-      UpperPools.UpperWaterDrained:  # For these paths the Water variants would be redundant
-        Launch, Grapple
-        Bash, Grenade=1, DoubleJump, Glide OR Damage=20
-        Bash, Grenade=1, DoubleJump, Dash, Sword OR Hammer
-      UpperPools.DrainRoomPurpleWall:
-        Water, Bash, DoubleJump, Dash OR TripleJump OR Glide OR Sword
-        Water, Bash, DoubleJump, Hammer, Damage=20
+      UpperPools.UpperWaterDrained OR Water:
+        Launch
+        Bash, Grenade=1, DoubleJump
+      Water, Bash, DoubleJump, WaterDash OR TripleJump OR Dash OR Glide OR Sword OR Hammer
+    kii:
+      Launch, Damage=60  # UpperPools.UpperWaterDrained OR Water OR Damage=60
+      Bash, Grenade=1, DoubleJump, Damage=60  # UpperPools.UpperWaterDrained OR Water OR Damage=60
+      Bash, DoubleJump, Water OR Damage=60  # Possible with only 40 damage but it also need to solve for before darining the water
+      Bash, Grenade=1, Dash, UpperPools.UpperWaterDrained OR Water OR Damage=60
+      Bash, WaterDash, Water OR Damage=60
+  conn UpperPools.DrainPuzzleEntrance:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
+    gorlek:
+      UpperPools.DrainRoomPurpleWall, Water OR UpperPools.UpperWaterDrained:  # If you haven't drained the water, you need clean water to avoid the damage
+        Bash, Grenade=1, Dash, Glide OR Sword
+    kii:
+      UpperPools.DrainRoomPurpleWall, Water OR UpperPools.UpperWaterDrained:  # If the water is drained, you can walljump. Otherwise, you'll land in the water
+        Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      UpperPools.DrainRoomPurpleWall, Damage=60, Damage=20, Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
-anchor UpperPools.BubbleSpamRoom at -1586, -4053:  # To the right of where all the bubbles rise
+anchor UpperPools.RightBubbleSpamRoom at -1586, -4053:  # To the right of where all the bubbles rise
   refill Checkpoint
+
+  state UpperPools.BubbleSpamLever:
+    moki:
+      Combat=Bee+Skeeto, DoubleJump, Dash OR Glide
+      Bash, DoubleJump, Dash OR Glide
+      Launch, DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch OR Bash
+      Combat=Bee+Skeeto, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+    kii:
+      Combat=Bee+Skeeto, DoubleJump OR Dash
+    unsafe:
+      Sword OR Hammer OR DoubleJump
+      Combat=Bee+Skeeto, Shuriken=1 OR Sentry=2
 
   pickup UpperPools.FishPoolEX:
     moki: Water, Bash OR WaterDash OR Damage=10  # just in case someone's troubled by the fish
     gorlek: Water
+    kii:
+      Damage=40
+      WaterDash, Damage=20
+    unsafe:
+      Damage=25  # dboost on a fish to avoid one water dboost
+      Bash  # You can bash the fishes before entering the water
   pickup UpperPools.FishPoolOre:
     moki:
       DoubleJump, Bash, Dash OR Glide
@@ -10340,35 +10755,60 @@ anchor UpperPools.BubbleSpamRoom at -1586, -4053:  # To the right of where all t
     gorlek:
       SentryJump=1
       DoubleJump, Bash, TripleJump OR Sword
+    kii:
+      Bash  # Juggle the exploding enemy
+    unsafe: Dash  # walljump on the bubbles by dashing into them
+  pickup UpperPools.RightBubblesEX:  # paths using the torpedo originate from LeftBubbleSpamRoom 
+    moki: Water, WaterDash
+    kii: WaterDash, Damage=100
     unsafe:
-      Bash  # Juggle the exploding enemyq
-  pickup UpperPools.LeftBubblesEX:  # beautiful autosave placement right there
-    moki: Water
-  pickup UpperPools.RightBubblesEX:
-    moki:
-      Water, WaterBreath, Bash, DoubleJump OR Launch
-      Water, WaterDash
-    gorlek:
-      Water, Bash, Grenade=1 OR DoubleJump OR Launch
-    unsafe:  # The torpedo won't hit you if you are touching the breakable wall
-      Water, Grenade=1
-      Water, DoubleJump, TripleJump, Sword OR Hammer
-      Water, SwordSJump=1  # sword combo before hitting the spikes
-      Water, Launch, Damage=20
+      Grenade=1, Water OR Damage=140
+      WaterDash, Damage=80
   pickup UpperPools.BubblesEC:
-    moki:
-      Combat=Bee+Skeeto, DoubleJump, Dash OR Glide
-      Bash, DoubleJump, Dash OR Glide
-      Launch, DoubleJump OR Dash OR Glide
-    gorlek:
-      Combat=Bee+Skeeto, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
-      Bash, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
-      Bash, Dash OR Glide OR Sword  # Bash the mosquitos
-      Bash, Hammer, Damage=20
-      Launch
+    moki: UpperPools.BubbleSpamLever, DoubleJump OR Dash OR Glide OR Launch
+    gorlek: UpperPools.BubbleSpamLever
 
   conn UpperPools.BeforeKeystoneDoor: free
+  conn UpperPools.LeftBubbleSpamRoom:
+    moki: Water  # Don't actually need anything, Water is just in case you missed a bubble
+    gorlek: free
 
+anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on top of the torpedo  
+  refill Checkpoint
+  
+  pickup UpperPools.LeftBubblesEX:  # beautiful autosave placement right there
+    moki: Water
+    kii:
+      Damage=140
+      WaterDash, Damage=60
+  pickup UpperPools.RightBubblesEX:  # These paths use the torpedo to break the wall. Paths using another solution for the wall originate from UpperPools.RightBubbleSpamRoom
+    moki:
+      Water, Bash, WaterBreath, DoubleJump OR Launch
+      Water, Bash, WaterDash
+    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
+    kii:  # bait the torpedo into the wall. No dirty swim path because you can't afford to stay in the water
+      Water, Launch
+      Water, DoubleJump, TripleJump  # Climb the anemone wall once it's closed again
+    unsafe:
+      Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the porpedo and activating the anemone
+      Bash, Damage=120, Damage=140, Launch OR SwordSJump=1  # bash the torpedo when it spawns then regen and use the bubbles to return safely to the other side
+      Water, DoubleJump, Sword OR Hammer  # Climb the anemone wall once it's closed again
+  
+  conn UpperPools.RightBubbleSpamRoom:
+    moki:
+      Water, Bash, WaterBreath, DoubleJump OR Launch
+      Water, Bash, WaterDash
+    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
+    kii:
+      Launch, Water OR Damage=80
+      DoubleJump, TripleJump, Water OR Damage=80
+      Water, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
+      Damage=60, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
+    unsafe:
+      WaterDash, Sword, Water OR Damage=120  # Pogo the torpedo
+      Water, Launch OR SwordSJump=1
+      Damage=60, Launch OR SwordSJump=1
+      
 # checkpoint at -1386, -4062
 
 region WestPools:
