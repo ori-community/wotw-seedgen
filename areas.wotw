@@ -5919,9 +5919,10 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
   pickup WoodsMain.HiddenOre:
     moki: Flap, Glide
     gorlek:
-      Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
       DoubleJump, TripleJump, Bash, Damage=15  # can either use the plant or the skeeto
-    kii: DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
+    kii: 
+      DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
+      Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
     unsafe:
       SentryJump=1, DoubleJump, TripleJump, Damage=15  # sjump from a micro ledge at very edge of the fire pit
       Sword, DoubleJump, TripleJump, Damage=15  # double jump onto the wall, then double sword jump into the spikes.
