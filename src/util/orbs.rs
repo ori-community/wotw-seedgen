@@ -75,9 +75,9 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> SmallVec<[Orbs; 3]> {
                 }
             }
         }
-        product.clone().into_iter().filter(|orbs| {
+        product.iter().filter(|orbs| {
             !product.iter().any(|other| other.energy > orbs.energy && other.health >= orbs.health || other.energy >= orbs.energy && other.health > orbs.health)
-        }).collect()
+        }).cloned().collect()
     }
 }
 pub fn both_single(a: &[Orbs], b: Orbs) -> SmallVec<[Orbs; 3]> {
@@ -91,9 +91,9 @@ pub fn both_single(a: &[Orbs], b: Orbs) -> SmallVec<[Orbs; 3]> {
                 product.push(orbs);
             }
         }
-        product.clone().into_iter().filter(|orbs| {
+        product.iter().filter(|orbs| {
             !product.iter().any(|other| other.energy > orbs.energy && other.health >= orbs.health || other.energy >= orbs.energy && other.health > orbs.health)
-        }).collect()
+        }).cloned().collect()
     }
 }
 

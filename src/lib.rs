@@ -91,12 +91,6 @@ pub fn write_flags(settings: &Settings, mut flags: Vec<String>) -> String {
     }
 }
 
-#[derive(Debug, Default, Clone)]
-struct SpawnLoc {
-    identifier: String,
-    position: Position,
-}
-
 pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, json: bool) -> Result<(), String> {
     let encoder: Box<dyn Encode> = if json {
         Box::new(JsonEncoder::new())

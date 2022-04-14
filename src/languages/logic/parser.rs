@@ -93,6 +93,11 @@ pub struct Anchor<'a> {
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
 }
+impl<'a> Anchor<'a> {
+    pub fn region(&self) -> &'a str {
+        self.identifier.split_once('.').map_or(self.identifier, |parts| parts.0)
+    }
+}
 #[derive(Debug)]
 pub struct AreaTree<'a> {
     pub definitions: FxHashMap<&'a str, Group<'a>>,
