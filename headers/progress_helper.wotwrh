@@ -25,7 +25,7 @@
 // Willow: 9|999=33, 9|999=34, 9|999=35
 // Void: 9|999=36, 9|999=37, 9|999=38
 // Note that all the message slots are pseudolocations and will not actually be granted.
-// If you need more complicated logic that requires actually granting a pickup, you can use string storage pickups and put them on 9|0=999. This will always be triggered before any progress is displayed.
+// IN FUTURE VERSIONS: If you need more complicated logic that requires actually granting a pickup, you can use string storage pickups and put them on 9|0=999. This will always be triggered before any progress is displayed.
 
 // Overview
 3|1|16|0|0|0|Progress Summary
