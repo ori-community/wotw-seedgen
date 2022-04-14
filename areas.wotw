@@ -3149,7 +3149,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     gorlek:
       Sword OR Hammer
       TuleyShop.StickyGrass, Grapple
-    kii: GladesTown.BuildHuts,  Blaze=1
+    kii: GladesTown.BuildHuts, Blaze=1
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
     moki:
