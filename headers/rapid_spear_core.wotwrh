@@ -6,6 +6,7 @@
 !!include bonus_core
 !!name 8|9|12|byte|+1 #Rapid Spear#
 !!display 8|9|12|byte|+1 $[(9|999=404)]
+!!description 8|9|12|byte|+1 Spear attacks are faster
 !!icon 8|9|12|byte|+1 file:assets/icons/bonus/rapidspear.png
 
 // skip-validate

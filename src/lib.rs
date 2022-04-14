@@ -142,6 +142,7 @@ pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, jso
 pub struct ItemDetails {
     name: Option<String>,
     display: Option<String>,
+    description: Option<String>,
     price: Option<u16>,
     icon: Option<Icon>,
 }

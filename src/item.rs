@@ -273,6 +273,14 @@ impl Item {
         }
     }
 
+    pub fn description(&self) -> Option<String> {
+        match self {
+            Item::BonusItem(bonus_item) => bonus_item.description(),
+            Item::BonusUpgrade(bonus_upgrade) => bonus_upgrade.description(),
+            _ => None,
+        }
+    }
+
     pub fn icon(&self) -> Option<Icon> {
         match self {
             Item::SpiritLight(_) => Some(Icon::File(String::from("assets/icons/game/experience.png"))),

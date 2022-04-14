@@ -17,6 +17,12 @@ Flags: Bonus Opher Upgrades
 3|1|8|1|10106|int|300
 3|1|8|1|10115|int|300
 3|1|8|1|10116|int|600
+// Set descriptions
+3|1|17|2|1|74|Reduce Spear Cost by 50%
+3|1|17|2|1|98|Spirit Smash attacks are faster
+3|1|17|2|1|106|Reduce Shuriken Cost by 50%
+3|1|17|2|1|115|Reduce Blaze Cost by 50%
+3|1|17|2|1|116|Reduce Sentry Cost by 50%
 // Set icons
 3|1|17|0|1|74|file:assets/icons/bonus/spearefficiency.png
 3|1|17|0|1|98|file:assets/icons/bonus/rapidsmash.png

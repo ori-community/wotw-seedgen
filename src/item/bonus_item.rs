@@ -14,6 +14,16 @@ pub enum BonusItem {
 auto_display!(BonusItem);
 
 impl BonusItem {
+    pub fn description(self) -> Option<String> {
+        match self {
+            BonusItem::Relic => None,
+            BonusItem::HealthRegeneration => Some("Replenish Health over time".to_string()),
+            BonusItem::EnergyRegeneration => Some("Replenish Energy over time".to_string()),
+            BonusItem::ExtraDoubleJump => Some("Jump an additional time mid-air before landing".to_string()),
+            BonusItem::ExtraAirDash => Some("Dash an additional time mid-air before landing".to_string()),
+        }
+    }
+
     pub fn icon(self) -> Option<Icon> {
         match self {
             BonusItem::Relic => Some(Icon::File(String::from("assets/icons/game/relic.png"))),

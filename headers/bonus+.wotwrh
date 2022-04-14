@@ -75,29 +75,37 @@ Flags: Bonus+
 // Melting Upgrades
 !!add $PARAM(meltingBlaze)x 8|4|71|bool|true
 !!name 8|4|71|bool|true #Melting Blaze#
+!!description 8|4|71|bool|true Blaze melts ice and ignites lanterns
 !!icon 8|4|71|bool|true file:assets/icons/bonus/meltingblaze.png
 !!add $PARAM(meltingSword)x 8|4|72|bool|true
 !!name 8|4|72|bool|true #Melting Sword#
+!!description 8|4|72|bool|true Sword melts ice and ignites lanterns
 !!icon 8|4|72|bool|true file:assets/icons/bonus/meltingsword.png
 !!add $PARAM(meltingShuriken)x 8|4|75|bool|true
 !!name 8|4|75|bool|true #Melting Shuriken#
+!!description 8|4|75|bool|true Shuriken melts ice and ignites lanterns
 !!icon 8|4|75|bool|true file:assets/icons/bonus/meltingshuriken.png
 
 // Grenade Upgrades
 !!add $PARAM(unchargedBashnades)x 8|4|42|bool|true
 !!name 8|4|42|bool|true #Uncharged Bashgrenades#
+!!description 8|4|42|bool|true Bash your Grenades without charging them first on the ground
 !!icon 8|4|42|bool|true file:assets/icons/bonus/unchargedbashgrenade.png
 !!add $PARAM(extraGrenade)x 8|4|40|byte|+1
 !!name 8|4|40|byte|+1 #Extra Grenade#
 !!display 8|4|40|byte|+1 #Extra Grenade x$(4|40)#
+!!description 8|4|40|byte|+1 Throw multiple Grenades without exploding the prior one
 !!icon 8|4|40|byte|+1 file:assets/icons/bonus/extragrenade.png
 !!add $PARAM(splinterGrenade)x 8|4|45|byte|+2
 !!name 8|4|45|byte|+2 #Splinter Grenade#
+!!description 8|4|45|byte|+2 Throw 2 additional Grenades
 !!icon 8|4|45|byte|+2 file:assets/icons/bonus/splintergrenade.png
 !!add $PARAM(rapidGrenade)x 8|4|44|float|-0.5
 !!name 8|4|44|float|-0.5 #Rapid Grenade#
+!!description 8|4|44|float|-0.5 Grenade attacks are faster
 !!icon 8|4|44|float|-0.5 file:assets/icons/bonus/rapidgrenade.png
 // Bow Upgrade
 !!add $PARAM(quickshotUpgrade)x 8|4|10|float|-0.4
 !!name 8|4|10|float|-0.4 #Quickshot Upgrade#
+!!description 8|4|10|float|-0.4 Bow attacks with Quickshot are faster
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png

@@ -1020,6 +1020,18 @@ fn display_command(display: &str, custom_items: &mut HashMap<String, ItemDetails
     Ok(())
 }
 #[inline]
+fn description_command(description: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
+    let mut parts = description.splitn(2, ' ');
+    let item = parts.next().unwrap();
+    parse_item(item)?;
+    let description = parts.next().ok_or_else(|| String::from("Missing description"))?;
+
+    let entry = custom_items.entry(item.to_owned()).or_default();
+    entry.description = Some(description.to_owned());
+
+    Ok(())
+}
+#[inline]
 fn price_command(price: &str, custom_items: &mut HashMap<String, ItemDetails>) -> Result<(), String> {
     let mut parts = price.splitn(2, ' ');
     let item = parts.next().unwrap();
@@ -1248,6 +1260,8 @@ where R: Rng + ?Sized
                 name_command(naming.trim(), &mut context.custom_items).map_err(|err| format!("{} in name command {}", err, line))?;
             } else if let Some(display) = command.strip_prefix("display ") {
                 display_command(display.trim(), &mut context.custom_items).map_err(|err| format!("{} in display command {}", err, line))?;
+            } else if let Some(description) = command.strip_prefix("description ") {
+                description_command(description.trim(), &mut context.custom_items).map_err(|err| format!("{} in description command {}", err, line))?;
             } else if let Some(price) = command.strip_prefix("price ") {
                 price_command(price.trim(), &mut context.custom_items).map_err(|err| format!("{} in price command {}", err, line))?;
             } else if let Some(icon) = command.strip_prefix("icon ") {
