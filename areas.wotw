@@ -300,14 +300,14 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     gorlek: ShurikenBreak=16
     unsafe: HammerBreak OR SpearBreak
   state MarshSpawn.CaveFight:
-    Combat=3xLizard  # (at day there's two extra lizards)
+    Combat=3xLizard  # at day there's two extra lizards
 
   quest MarshSpawn.CaveKS:
     moki:
       DoubleJump, Dash OR Grapple
       Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
       Launch
-      MarshSpawn.CaveFight  # go through the fight room
+      MarshSpawn.CaveFight
     gorlek: DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
     kii:
       Sword  # Pogo on the slime and slash to the left
@@ -329,12 +329,12 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       Bash, DoubleJump OR Dash
       Bash, Grenade=1, Glide OR Grapple
       Launch
-      MarshSpawn.CaveFight, DoubleJump OR Dash  # go through the fight room
-      MarshSpawn.CaveFight, Bash, Grenade=1  # go through the fight room
+      MarshSpawn.CaveFight, DoubleJump OR Dash
+      MarshSpawn.CaveFight, Bash, Grenade=1
     gorlek:
       DoubleJump
       Bash, Grenade=1
-      MarshSpawn.CaveFight, SentryJump=1  # go through the fight room, makes other sentryjump paths unnecessary
+      MarshSpawn.CaveFight, SentryJump=1  # makes other sentryjump paths unnecessary
       # weapon floats maybe too precise for gorlek
     kii:
       Sword  # Pogo on the slime and slash to the left, Upslash to reach the branch
@@ -376,13 +376,8 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Burrow, Sword
       Burrow, Hammer, Damage=10
   pickup MarshSpawn.LifepactShard:
-    moki, MarshSpawn.BurrowArena:
-      Combat=Bat+WeakSlug, DoubleJump OR Dash OR Launch
-      Bash, DoubleJump OR Dash OR Launch
-    gorlek, MarshSpawn.BurrowArena:
-      Damage=10, Sword  # Use sword to combat slug/bat
-      Damage=10, Glide, Combat=Bat+WeakSlug OR Bash
-    kii, MarshSpawn.BurrowArena:
+    moki: MarshSpawn.BurrowArena, Bash, DoubleJump OR Dash OR Launch
+    kii, MarshSpawn.BurrowArena:  # stalling kii validation for the kii branch
       Sword OR Hammer  # Use weapon to combat slug/bat
       Glide, Combat=Bat+WeakSlug OR Bash
       Combat=Bat+WeakSlug, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
@@ -864,6 +859,7 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
 # checkpoint at -476, -4441
 
 anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
+  # if someone manages to lower the elevator platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
   refill Full
 
   state HowlsDen.BoneBarrier:
@@ -873,8 +869,8 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       SentryBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
       SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
-  state HowlsDen.DoubleJumpTreeCombat:
-    moki: Combat=Mantis+2xLizard+SmallSkeeto  # the game puts this before regen. It's why all the enemies drop tons of health. There's more enemy here once you get Bash.
+  state HowlsDen.DoubleJumpTreeCombat:  # the game puts this before regen. It's why all the enemies drop tons of health
+    moki: Combat=Mantis+2xLizard+SmallSkeeto  # The SmallSkeeto spawns in this arena if the player has Bash.
   state NonGladesTeleporter: free
 
   pickup HowlsDen.AboveTPEX:
@@ -898,15 +894,16 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       Glide, Sentry=1 OR Flash=1 OR Spear=1
     unsafe:
       Grenade=1               # Grenade jump to platform
-  # if someone manages to lower the platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
-  pickup HowlsDen.DoubleJumpEX:
+  pickup HowlsDen.DoubleJumpEX:  # paths going through the fight arena; other paths go through DoubleJumpTreeLedge
     moki: HowlsDen.DoubleJumpTreeCombat
+    kii: Combat=Mantis+2xLizard  # The arena state requires fighting an additional skeeto in case the player has Bash. In kii Bash solves by going around though, so kii can omit the added enemy for this pickup
 
   conn Teleporters: free
   conn DenShrine:
     moki: Hammer OR Spear=1
-  conn HowlsDen.DoubleJumpTreeArea:
+  conn HowlsDen.DoubleJumpTreeLedge:
     moki: HowlsDen.DoubleJumpTreeCombat OR DoubleJump OR Dash OR Glide OR Launch
+    gorlek: Sword OR Hammer
     kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
   conn HowlsDen.BoneBridge:
     moki, HowlsDen.BoneBarrier:
@@ -927,7 +924,29 @@ anchor DenShrine at -328, -4569:
   pickup HowlsDen.CombatShrine:
     moki: HowlsDen.CombatShrineCompleted
 
-# checkpoint at -514, -4549
+anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Double Jump Tree
+  refill Checkpoint
+
+  pickup HowlsDen.DoubleJumpEX:
+    moki: Launch
+    gorlek: SentryJump=1
+    kii:
+      Bash
+      Dash, DoubleJump, TripleJump  # hugging the ceiling from the sticky shard platform
+    unsafe:
+      DoubleJump, TripleJump          # Triple jump from the right wall
+      DoubleJump, Sword               # Jump/Sword combo or pogo on the enemy
+      GrenadeJump
+
+  conn HowlsDen.DoubleJumpTreeArea: free
+  conn HowlsDen.Teleporter:
+    moki:
+      DoubleJump
+      Bash, Grenade=1, Dash OR Glide
+      Launch
+    gorlek: SentryJump=1  # Also use weapon stalls
+    kii: Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+    unsafe: free
 
 anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
   state HowlsDen.BoneBarrier:
@@ -937,32 +956,16 @@ anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
 
   pickup HowlsDen.DoubleJumpTree: free
   pickup HowlsDen.StickyShard: free  # origlow
-  pickup HowlsDen.DoubleJumpEX:
-    moki:
-      DoubleJump, Bash  # not the most cooperative enemy, which is why there are assisting abilities
-      Bash, Grenade=1, Dash OR Glide  # not the most cooperative enemy, which is why there are assisting abilities
-      Launch
-    gorlek:
-      SentryJump=1                    # Sword combo from sticky shard to get over the initial gap
-    kii:
-      Dash, DoubleJump, TripleJump  # hugging the ceiling from the sticky shard platform
-    unsafe:
-      DoubleJump, TripleJump          # Triple jump from the right wall
-      Grenade=2
-      Bash
-      DoubleJump, Sword               # Jump/Sword combo or pogo on the enemy
 
-  conn HowlsDen.Teleporter:
+  conn HowlsDen.DoubleJumpTreeLedge:
     moki:
-      DoubleJump
-      Bash, Grenade=1, Dash OR Glide
-      Launch
-    gorlek:
-      SentryJump=1                    # Sword combo from sticky shard to get over the initial gap
+      DoubleJump OR Glide OR Launch
+      Bash, Grenade=1
+    gorlek: Sword OR HammerSJump=1
     kii:
-      Sword OR Hammer OR Dash OR Glide OR Sentry=2 OR Shuriken=1
-    unsafe:
-      Grenade=1                       # Grenade jump to get over initial gap
+      Dash OR Sentry=2
+      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+    unsafe: Hammer
   conn MidnightBurrows.DenConnection:
     moki: MidnightBurrows.HowlsDenShortcut
 
@@ -4506,7 +4509,8 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
     moki: Combat=2xLizard+3xMantis+Miner, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Combat=2xLizard+3xMantis+Miner  # different ways to solve
   state InnerWellspring.SpinningRoomOpen:  # Breaking the corruption which opens the spinning room
-    moki: InnerWellspring.SpinArena, BreakWall=16
+    moki: InnerWellspring.SpinArena, BreakWall=16, DoubleJump OR Dash OR Glide OR Launch
+    gorlek: InnerWellspring.SpinArena, BreakWall=16
   state InnerWellspring.SpinPuzzleSolved:  # Having Water changes this room (not considered in moki)
     moki, InnerWellspring.SpinningRoomOpen:
       Grapple, DoubleJump OR Dash
@@ -7649,18 +7653,18 @@ anchor MoraEscape at 712, -4482:
   refill Checkpoint
   
   conn MoraSecondPhase:  # Abilities needed for the escape part
-    moki:
-      Bash, Launch
-      Bash, Grapple, Glide OR DoubleJump OR Dash
+    moki: Bash, Grapple, DoubleJump OR Launch
     gorlek:
-      Bash, Grapple, Sword OR Hammer
+      Bash, Grapple, Dash
+      Bash, Launch
       Launch, DoubleJump, TripleJump
-      Launch, SentryJump=2
       Launch, SentryJump=1, DoubleJump OR Grapple
     kii:
-      Bash, Grapple
+      Bash, Grapple, Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
       Launch, DoubleJump  # Multiple solutions: refresh your launch on the right ceiling, jump when the ground is moving up or use the right platform before the rock starts falling on it
-    unsafe: Launch
+    unsafe:
+      Bash, Grapple
+      Launch
   
 anchor MoraSecondPhase at 690, -4386:
   nospawn
@@ -9079,13 +9083,13 @@ anchor KwolokEscape at -1650, -4125:
   refill Full
 
   conn KwolokFight:  # Abilities needed for the escape part
-    moki, Water, WaterDash:
-      Bash, DoubleJump, Dash OR Launch
-      Dash, Launch
-    gorlek, Water:
-      Dash, Launch, Bash OR Damage=10  # damage for the fishes at the end of the escape
-      Bash, Dash, WaterDash
-      Launch, WaterDash
+    moki:
+      Water, WaterDash, Bash, DoubleJump, Dash OR Launch
+      Water, WaterDash, Dash, Launch
+    gorlek:
+      Water, WaterDash, Dash, Bash
+      Water, WaterDash, Launch
+      Water, Launch, Dash, Bash
     kii:
       Launch, Water
       Launch, Bash, Damage=180  # Bash the fish at the end of the escape. You don't need to abuse bash iframes
