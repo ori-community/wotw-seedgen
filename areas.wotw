@@ -5583,6 +5583,14 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
     moki: Keystone=2, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: Keystone=2, Damage=10
 
+  pickup WoodsMain.LowerKS:
+    kii: 
+      Bash, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
+      Launch
+    unsafe:
+      Sword, Deflector, DoubleJump, TripleJump OR Glide  # pogo/slash the projectiles
+      DoubleJump, Bash  # Using the Skeeto from the left
+
   conn WoodsMain.BelowFourKeystoneRoom:
     moki:
       DoubleJump, Dash
@@ -5591,20 +5599,29 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
       DoubleJump, Sword  # many others work, but this lines up so beautifully oriGlow
       Dash, Sword OR Hammer
       SwordSJump=1  # sjump then full sword combo
+      Combat=Tentacle, DoubleJump, TripleJump
     kii:
       Dash  # coyote dash
       Sentry=3
       Sword, Damage=10  # Sword hover->pogo->upslash. Damage can de avoided but you'll most likely get hit.
       Combat=Tentacle, Sword
       Combat=Tentacle, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Combat=Tentacle, DoubleJump, TripleJump OR Dash OR Hammer  # @validator Probably gorlek
-      Combat=Tentacle, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Combat=Tentacle, DoubleJump, Hammer  
+      Combat=Tentacle, DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Sword  # Pogo the projectiles
       Hammer, DoubleJump  # upslash to protect yourself from projectiles then double jump
+      Combat=Tentacle, DoubleJump, Spear=1 OR Blaze=1
   conn WoodsEntry.TwoKeystoneRoom:
     moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: WoodsEntry.KeystoneDoor, Damage=10
+  conn WoodsMain.FourKeystoneRoom:
+    kii, WoodsMain.KSRoomYellowBarrierBroken: 
+      Bash, Damage=15, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
+      Launch, Damage=15 OR DoubleJump OR Bash OR Dash
+    unsafe, WoodsMain.KSRoomYellowBarrierBroken:
+      Sword, Deflector, DoubleJump, TripleJump OR Glide  # pogo/slash the projectiles
+      DoubleJump, Bash, Damage=15  # Using the Skeeto from the left
 
 anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile after meeting Ku
   pickup WoodsMain.LowerLeafPileEX:
@@ -5628,7 +5645,7 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       Damage=20, Launch
     kii:
       DoubleJump, Sword, Combat=Balloon OR Damage=20  # Pogo the first balloon
-      DoubleJump, Combat=2xBalloon, Damage=15, TripleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Combat=2xBalloon, Damage=15, Glide OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Damage=35, TripleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, Sword  # Pogo the first balloon, avoid the second one and kill it with a pogo
@@ -5648,11 +5665,11 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
     kii:
       DoubleJump, Bash
       DoubleJump, Sword  # Keep hitting the tentacle with sword to reset your double jump
-      DoubleJump, TripleJump, Dash
-      Combat=Tentacle, DoubleJump, TripleJump, Glide OR Hammer OR Sentry=2
-      Combat=Tentacle, DoubleJump, Dash, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=Tentacle, DoubleJump, TripleJump, Dash OR Glide OR Hammer OR Sentry=2
+      Combat=Tentacle, DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
+      Combat=Tentacle, DoubleJump, Dash, Spear=1
       Combat=Tentacle, DoubleJump, TripleJump, Shuriken=2
 
 anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the wall being broken - paths would be complicated otherwise
@@ -5666,8 +5683,8 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
       Glide, Dash OR Sword OR Hammer  # for the weapons, glide below and use the up attack
     kii:
       Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      BreakWall=20, Dash  # Breakwall so you have more space for a coyote dash. Reset dash on the left wall
     unsafe:
+      # BreakWall=20, Dash  # Breakwall so you have more space for a coyote dash. Reset dash on the left wall
       Dash  # Coyote dash. Reset dash on the left wall
   pickup WoodsMain.LowerKS:  # All paths that aren't breaking the yellow wall
     gorlek:
@@ -5677,7 +5694,7 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
       Glide, Dash, DoubleJump, Sword OR Hammer  # glide, dash when just bellow the pickup, double jump and up slash to reach the floating platform
     kii:
       Bash, DoubleJump, TripleJump
-      Glide, DoubleJump, Hammer, Dash OR Shuriken=1 OR Flash=1 OR Sentry=1  #  glide und er the pickup then djump-> upslash -> dash/energy to get on the floasting platform
+      Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # glide under the pickup then djump-> upslash -> energy to get on the floasting platform (with sentry or flash you can get onto the ks platform instead)
 
   conn WoodsMain.BelowFourKeystoneRoom: free
   conn WoodsMain.FourKeystoneRoom:
@@ -5704,6 +5721,13 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
   state WoodsMain.KeystoneDoor:
     moki: Keystone=4
 
+  state WoodsMain.KSRoomYellowBarrierBroken:  # Flap being the casual way of breaking the yellow barrier
+    moki:  # getting assisting abilities to deal with Skeetos and positioning of Balloon
+      Combat=3xSkeeto, Flap, DoubleJump OR Glide
+      Bash, Flap, DoubleJump OR Glide
+    gorlek: Flap  # casual way without assist
+    kii: Combat=Balloon OR Damage=20  # killing balloon at the right time or letting it explode inside of you
+
   pickup WoodsMain.MiddleLeafPileEX:
     moki: Flap
   pickup WoodsMain.RightKS:
@@ -5714,7 +5738,7 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Bash  # so many skeeto friends oriGlow
       SentryJump=1
       DoubleJump, TripleJump
-    kii: DoubleJump, Sword  # bait a skeeto and pogo it
+    kii: DoubleJump, Sword  # bait a skeeto and pogo it (is one way of doing it)
     unsafe: DoubleJump  # Climb the left wall to get on the right wall, let ori slide slowly then double jump and quickly turn around to catch the other side of the wall
   pickup WoodsMain.UpperKS:
     moki, BreakWall=3:
@@ -5729,7 +5753,7 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
     kii:
       BreakWall=3, DoubleJump OR Bash
       BreakWall=3, Sword, Dash  # Pogo the skeetos
-      Flash=1, Glide OR DoubleJump OR Bash  # Use flash to kill the balloon near the bulb
+      Combat=Balloon, Glide OR DoubleJump OR Bash  # kill the balloon near the bulb
       Damage=20, Glide OR DoubleJump OR Bash  # lure the balloon
     unsafe:
       Hammer, Combat=Balloon  # seems like there is a micro ledge on the wall bellow the pickup which reset your upslash
@@ -5742,42 +5766,35 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
     kii:
       DoubleJump, Combat=Balloon, Damage=15
       DoubleJump, Damage=20
+      Bash, Dash, Combat=Balloon  # bait the skeetos
     unsafe:
       DoubleJump, TripleJump  # tjump on the wall above
   pickup WoodsMain.LowerKS:  # All path reaching that pickup without breaking the yellow wall are from WallOreLedge
-    moki, Flap:  # Flap being the casual way of breaking the yellow barrier
+    moki, WoodsMain.KSRoomYellowBarrierBroken:
       Glide OR Launch
       DoubleJump, Dash
       Bash, DoubleJump OR Dash
-    gorlek, Flap:
+    gorlek, WoodsMain.KSRoomYellowBarrierBroken:
       DoubleJump OR Dash OR Sword
       Hammer, Bash
-    kii:
-      # moki/gorlek paths but bait the balloon near the wall instead of using flap
-      Combat=Balloon, Glide OR Launch OR DoubleJump OR Dash OR Sword OR Hammer
-      Damage=20, Glide OR Launch OR DoubleJump OR Dash OR Sword OR Hammer
-      # new paths
-      Bash, Combat=Balloon, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
-      Bash, Damage=20, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
-      Flap OR Combat=Balloon OR Damage=20:  # energy management is fun
-        Spear=3 OR Shuriken=3 OR Sentry=3 OR Blaze=4 OR Flash=3 OR Sentry=3
-        Damage=15, Spear=2 OR Shuriken=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
-        Damage=30, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Bash, Flap OR Combat=Balloon OR Damage=20  # precise jump to avoid damage in the first spikes. Bash glide from the bashable plant to the platform before the pickup
-      Flap OR Combat=Balloon OR Damage=20:  # friendly spikes
-        Spear=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
-        Damage=15, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    kii, WoodsMain.KSRoomYellowBarrierBroken:
+      Bash  # baiting 1 or 2 Skeetos
+      Spear=3 OR Shuriken=3 OR Sentry=3 OR Blaze=4 OR Flash=3 OR Sentry=3
+      Damage=15, Spear=2 OR Shuriken=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Damage=25, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe, WoodsMain.KSRoomYellowBarrierBroken:
+      # Bash, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15 # was in kii but only Bash is kii aswell
+      Spear=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Damage=15, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # fiendly spikes and slide from the ceiling to the platform
-      Flap OR Combat=Balloon OR Damage=20:
-        Shuriken=1 OR Damage=15
+      Shuriken=1 OR Damage=15
   pickup WoodsMain.BelowKeystonesEX:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesEX
     gorlek:
       Launch
       DoubleJump, TripleJump OR Dash
     kii:
       Bash
-      DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Sword, Damage=15  # Pogo the plant
       Dash  # reset dash on the wall
     unsafe:
@@ -5788,8 +5805,8 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
   conn WoodsMain.WallOreLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer
-    kii: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Grenade=1 OR Bow=1
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Bash OR Grenade=1 OR Bow=1
   conn WoodsMain.BelowFourKeystoneRoom: free
 
 anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
@@ -5810,14 +5827,15 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
     kii:
       # Moki/gorlek paths ignoring the balloon
       Bash OR Launch
-      Glide, DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Glide, DoubleJump, Dash OR TripleJump OR Sword OR Hammer
       # New paths
       DoubleJump, TripleJump, Sword  # Pogo the balloon
-      Glide, Dash, Hammer OR Shuriken=1
+      Glide, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Glide, Dash, Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Glide, Dash, Sword  # pogo the plant
     unsafe:
       Glide, DoubleJump  # need a really precise vertical boost from the wind
-      Glide, Dash, Sword  # dash->upslash->downslash
-      Glide, Dash, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Glide, Dash, Spear=1 OR Blaze=1
 
   conn WoodsMain.BalloonLure:
     moki: Combat=Balloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
@@ -5826,44 +5844,58 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
       Bash, HammerSJump=1
     kii:
       # Moki/gorlek paths ignoring the balloon
-      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Damage=15
+      Bash, DoubleJump OR Dash OR Glide OR Sword
       # new paths
+      Bash, Hammer OR Shuriken=1 OR Damage=15
       Launch OR Glide
-      Combat=Tentacle, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=15
-    unsafe: Bash
+      Combat=Tentacle, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    unsafe: 
+      Bash
+      Combat=Tentacle, Damage=15
   conn WoodsMain.FourKeystoneRoom:
     moki: WoodsMain.KeystoneDoor
 
 anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you lure a balloon through to break a yellow wall - mostly exists for the lure specifically since paths for it would otherwise be awkward
   refill Checkpoint
 
-  pickup WoodsMain.YellowWallEX:
-    moki: BreakWall=3, Flap, Glide
-    gorlek: BreakWall=3, Flap, Launch
-    kii:
-      Glide OR Launch:  # no combat=balloon, Damage=20 variation because I'm assuming BreakWall=3 is less restrictive than Combat=Balloon
-        Combat=Balloon, BreakWall=3
-        Damage=20, Damage=20 OR BreakWall=3  # dboost on the balloon when it's close to the corruption/wall
-      BreakWall=3, DoubleJump, TripleJump, Flap OR Combat=Balloon OR Damage=20
-    unsafe:
-      DoubleJump, TripleJump, Damage=20, Flap OR Combat=Balloon OR Damage=20  # dboost on the balloon to break the corruption
-      BreakWall=3, DoubleJump, Dash, Bash, Grenade=1  # Bait the enemy by jumping and imediately dashing against the left wall, double wall off the wall to  get to the edge near the spikes and bash grenade. Launch the grenade near the right edge and bash it to get to the left edge. If you are too slow, the enemy will die from the explosion after your bash
-      Launch  # Use launch invulnerability to protect you from balloon's explosions
-
-  conn WoodsMain.BelowHiddenOre:
+  state WoodsMain.BalloonLureBlobDestroyed:
     moki: BreakWall=3, Glide
     gorlek: BreakWall=3, Launch
     kii:
+      Combat=Balloon, Glide OR Launch
       Damage=20, Glide OR Launch
-      BreakWall=3, DoubleJump, TripleJump, Combat=Balloon OR Damage=20  # Don't need the balloon for anything but he's really annoying to avoid
+      DoubleJump, BreakWall=3
+      DoubleJump, Damage=20, TripleJump OR Dash
     unsafe:
-      DoubleJump, TripleJump, Damage=20
-      BreakWall=3:
-        DoubleJump, Bash, Grenade=1  # land on the ledge near the spikes bellow the breakable wall
-        DoubleJump, SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
-        Dash, Bash, Grenade=2
-        Bash, Grenade=3  # bash grenade to get on the skull, bash a tentacle projectile and the bashable plant to get to the blowing enemy level, 2nd bash grenade to get near the spikes and last one to reach the connection
-        SentryJump=3  # jump + sword combo to reach the skull, sword combo to reach the tentacle. use your sjumps to get to the connection
+      DoubleJump, Combat=Balloon, Dash OR TripleJump
+      Launch  # Use launch invulnerability to protect you from balloon's explosions
+  state WoodsMain.BalloonLureYellowBarrierBroken:
+    moki: WoodsMain.BalloonLureBlobDestroyed, Flap, Glide
+    gorlek: WoodsMain.BalloonLureBlobDestroyed, Flap, Launch
+    kii, WoodsMain.BalloonLureBlobDestroyed:
+      Combat=Balloon, Glide OR Launch
+      Damage=20, Glide OR Launch
+      DoubleJump, TripleJump, Flap OR Damage=20 OR Combat=Balloon
+    unsafe, WoodsMain.BalloonLureBlobDestroyed:
+      Launch  # Use launch invulnerability to protect you from balloon's explosions
+      DoubleJump, Dash, Bash, Grenade=1  # Bait the enemy by jumping and imediately dashing against the left wall, double wall off the wall to  get to the edge near the spikes and bash grenade. Launch the grenade near the right edge and bash it to get to the left edge. If you are too slow, the enemy will die from the explosion after your bash
+
+  # WoodsMain.YellowWallEX now accessible with conn BelowHiddenOre: pickup WoodsMain.YellowWallEX
+
+  conn WoodsMain.BelowHiddenOre:
+    moki: WoodsMain.BalloonLureBlobDestroyed, Glide
+    gorlek: WoodsMain.BalloonLureBlobDestroyed, Launch
+    kii, WoodsMain.BalloonLureBlobDestroyed:
+      DoubleJump, TripleJump, Combat=Balloon OR Damage=20  # Don't need the balloon for anything but he's really annoying to avoid
+      DoubleJump, Dash, Sword  # pogo the balloon
+    unsafe, WoodsMain.BalloonLureBlobDestroyed:
+      DoubleJump, TripleJump
+      DoubleJump, Sword  # pogo the balloon
+      DoubleJump, Bash, Grenade=1  # land on the ledge near the spikes bellow the breakable wall
+      DoubleJump, SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
+      Dash, Bash, Grenade=2
+      Bash, Grenade=3  # bash grenade to get on the skull, bash a tentacle projectile and the bashable plant to get to the blowing enemy level, 2nd bash grenade to get near the spikes and last one to reach the connection
+      SentryJump=3  # jump + sword combo to reach the skull, sword combo to reach the tentacle. use your sjumps to get to the connection
   conn WoodsMain.GiantSkull:
     moki:
       Glide OR Launch
@@ -5873,19 +5905,29 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
       Bash, DoubleJump OR Dash
     kii:
       Dash
-      DoubleJump, Hammer OR Damage=15
+      DoubleJump, Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Damage=15
       Bash, Hammer OR Shuriken=1 OR Sentry=2
+      Grenade=1, Bash
 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
+  state WoodsMain.BalloonLureBlobDestroyed:
+    moki:
+      Sword OR Hammer
+      BreakWall=3, Grenade OR Blaze
+    unsafe: ShurikenBreak=3 OR Sentry=1
+
   pickup WoodsMain.HiddenOre:
     moki: Flap, Glide
     gorlek:
-      Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
       DoubleJump, TripleJump, Bash, Damage=15  # can either use the plant or the skeeto
-    kii: DoubleJump, Bash  # bash the plant and the skeeto, wall jump on the right wall
+    kii: 
+      DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
+      Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
     unsafe:
       SentryJump=1, DoubleJump, TripleJump, Damage=15  # sjump from a micro ledge at very edge of the fire pit
       Sword, DoubleJump, TripleJump, Damage=15  # double jump onto the wall, then double sword jump into the spikes.
+  pickup WoodsMain.YellowWallEX:
+    moki: WoodsMain.BalloonLureYellowBarrierBroken
 
   conn WoodsMain.PetrifiedHowl:
     moki: Glide
@@ -5897,13 +5939,8 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
       DoubleJump, Damage=30
       DoubleJump, Damage=15, Shuriken=2 OR Flash=2 OR Sentry=2
   conn WoodsMain.BalloonLure:
-    moki:
-      Combat=Tentacle, Sword OR Hammer
-      Combat=Tentacle, BreakWall=3, Grenade OR Blaze
-      Bash, Sword OR Hammer
-      Bash, BreakWall=3, Grenade OR Blaze
-    unsafe:
-      ShurikenBreak=3 OR Sentry=1
+    moki: WoodsMain.BalloonLureBlobDestroyed, Combat=Tentacle OR Bash
+    unsafe: WoodsMain.BalloonLureBlobDestroyed
 
 anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
   refill Checkpoint
@@ -5922,7 +5959,7 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
     unsafe:
       Bash
       DoubleJump, TripleJump
-  conn WoodsMain.TrialStart:  # Be carefull that it's not redundant with the AboveHowl connection
+  conn WoodsMain.BrokenOwl:  # Be carefull that it's not redundant with the AboveHowl connection
     moki: BreakWall=3, Bash, Glide
     gorlek:
       BreakWall=3, Glide, Damage=10  # just easy to catch a projectile
@@ -5948,11 +5985,8 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
 
 # checkpoint at 824, -4068
 
-anchor WoodsMain.TrialStart at 848, -4052:  # At the collapsing petrified Owl
+anchor WoodsMain.BrokenOwl at 848, -4058:  # At the collapsing petrified Owl
   refill Checkpoint
-
-  pickup WoodsMain.SpiritTrial:
-    moki: WoodsMain.TrialActivation, DoubleJump, Dash, Bash, Grapple, Burrow
 
   conn WoodsMain.AboveHowl:
     moki:
@@ -5961,11 +5995,23 @@ anchor WoodsMain.TrialStart at 848, -4052:  # At the collapsing petrified Owl
     gorlek:
       Dash, Damage=15
       Bash OR SentryJump=1
-      Grapple, Glide
     kii:
-      Dash OR Sword OR Hammer OR Damage=15  # With sword, pogo the skeeto
-      Grapple, Sentry=3 OR Blaze=5
-    unsafe: Grapple, Shuriken=3
+      Damage=15, Hammer OR Sword
+    unsafe:
+      Dash OR Sword OR Damage=15  # With sword, pogo the skeeto
+
+  conn WoodsMain.TrialStart:
+    moki: DoubleJump OR Launch
+    gorlek: Hammer OR SwordSJump=1
+    unsafe: free  # just die/reload
+
+anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
+  refill Checkpoint  # not sure about this one, might be a different kind of refill
+
+  pickup WoodsMain.SpiritTrial:
+    moki: WoodsMain.TrialActivation, DoubleJump, Dash, Bash, Grapple, Burrow
+
+  conn WoodsMain.BrokenOwl: free
   conn WoodsMain.MidwayTrial:
     moki:
       DoubleJump, Bash, Grapple, Dash OR Glide
@@ -5979,9 +6025,13 @@ anchor WoodsMain.TrialStart at 848, -4052:  # At the collapsing petrified Owl
     unsafe:
       Hammer, DoubleJump, Grapple  # either djump+upslash to get a walljump just under the checkpoint or upslash+one slash to land on the branch
       Sword, DoubleJump, Grapple  # upslash+downslash to pass through the semi solid branch at the checkpoint
-
+  conn WoodsMain.AboveHowl:  # make sure it's not redundant with ->BrokenOwl->AboveHowl
+    gorlek: Grapple, Glide
+    kii: Grapple, Sentry=3 OR Blaze=5
+    unsafe: Grapple, Shuriken=3
+    
 anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first sand bag
-# This anchor is purely to make WoodsMain.TrialStart->WoodsMain.OverflowShard less painful to pathfind
+  # This anchor is purely to make WoodsMain.TrialStart->WoodsMain.OverflowShard less painful to pathfind
   refill Checkpoint
 
   conn WoodsMain.TrialEnd:
@@ -5997,9 +6047,19 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
     kii:
       Launch
       DoubleJump, Bash, Burrow OR Grenade=2
-      DoubleJump, Burrow, Damage=30
+      DoubleJump, Burrow, Damage=45
     unsafe:
       DoubleJump, TripleJump, Damage=30
+  conn WoodsMain.BeforeLog:
+    gorlek: Glide  # Jump and hold right while gliding
+    kii: Dash  # coyote + normal dash
+    unsafe: Burrow, Damage=15
+  conn WoodsMain.OrangeTree:
+    gorlek: 
+      Burrow, Glide  # Burrow and hold right while gliding
+      Burrow, DoubleJump, TripleJump  # get to the most right sandball, burrow through it and go right
+    kii:  
+      Burrow, DoubleJump OR Dash  # get to the most right sandball, burrow through it and go right
   conn WoodsMain.AboveHowl:
     gorlek: free  # Jump and hold right
 
@@ -6015,50 +6075,90 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
       DoubleJump, Dash OR Glide
       Launch
     gorlek: DoubleJump OR Dash OR Glide
+    kii: 
+      Sentry=2
+      Sword, Sentry=1 OR Shuriken=1 OR Flash=1
+      Hammer, Sentry=1 OR Shuriken=1 OR Flash=1
 
-  conn WoodsMain.AboveHowl:
+  conn WoodsMain.AboveHowl:  # make sure it's not redundant with ->BeforeLog->AboveHowl
+    moki:
+      Launch
+      DoubleJump, Dash OR Bash OR Glide
+  conn WoodsMain.BeforeLog:
     moki:
       DoubleJump, Dash OR Bash OR Glide
-      Launch
-    gorlek: DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer
+      Launch, Combat=Balloon OR Dash OR DoubleJump
+    gorlek: DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Launch
+    kii: Sentry=2 OR Shuriken=1
+  conn WoodsMain.OrangeTree:  # make sure it's not redundant with ->BeforeLog->OrangeTree
+    gorlek: 
+      Glide
+      DoubleJump, Dash, Burrow
+    kii:
+      Burrow, DoubleJump OR Dash OR Sentry=5
+    unsafe:
+      Burrow, Shuriken=4  # not in kii cause you use 2 shurikens in a row
+      Burrow, Sword
 
 anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced Howl
   pickup WoodsMain.HiddenEX: free
 
   conn WoodsMain.PetrifiedHowl: free
-  conn WoodsMain.Teleporter:
+  conn WoodsMain.BrokenOwl: free
+  conn WoodsMain.BeforeLog:
     moki:
-      Combat=4xBalloon, BreakWall=3, DoubleJump OR Launch
-      Combat=4xBalloon, BreakWall=3, Bash, Grenade=1
+      Combat=Balloon, DoubleJump OR Launch
+      Combat=Balloon, Bash, Grenade=1
     gorlek: SentryJump=1, Combat=Balloon OR Dash OR Damage=20
     kii:
-      Sword  # Pogo the skeeto twice
-      Bash, BreakWall=3
-      BreakWall=3, DoubleJump OR Launch  # Ignore the balloons
-      Hammer, Glide OR Dash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-  conn WoodsMain.TrialStart:
-    moki: Launch OR DoubleJump OR Bash
-    gorlek: Hammer OR SentryJump=1
+      DoubleJump OR Launch
+      Bash
+      Hammer, Glide OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      SentryJump=1
+      Sword  # pogo the skeeto twice (enemy behaviour not easily readable, therefore not kii)
+      Hammer, Spear=1 OR Blaze=1
+  conn WoodsMain.TrialStart:  # make sure its not redundant with BrokenOwl -> TrialStart
     kii: Sword  # Pogo a skeeto
-    unsafe: free  # Touch the checkpoint then die or qtm
-  conn WoodsMain.OrangeTree:  # pass over the tree
-    gorlek, Combat=Balloon:
+
+anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (where shriek chases you and ku)
+  refill Checkpoint:  # at 980, -4015
+    moki: Combat=Balloon
+    gorlek: Dash OR Damage=20
+    kii: free
+
+  state WoodsMain.LogBlobDestroyed:
+    moki: Combat=Balloon, BreakWall=3
+    gorlek: BreakWall=3
+    kii: Combat=Balloon OR Damage=20
+    unsafe: free  # tp anywhere while blob wants to explode inside of you
+
+  conn WoodsMain.Teleporter:
+    moki: WoodsMain.LogBlobDestroyed, Combat=3xBalloon
+    gorlek: WoodsMain.LogBlobDestroyed, Combat=Balloon OR Dash OR Damage=20
+    kii: WoodsMain.LogBlobDestroyed
+  conn WoodsMain.AboveHowl:
+    moki: 
+      Combat=2xBalloon
+      Combat=Balloon, Dash OR Launch
+    gorlek: free
+  conn WoodsMain.OrangeTree:
+    gorlek:
       Launch
       DoubleJump, Bash, Grenade=1
       DoubleJump, SentryJump=1
-      Bash, Grenade=2
-    kii:
-      Launch
-      DoubleJump, Bash, Grenade=1
     unsafe:
-      Bash, Grenade=2  # You can kill the balloon with your first bashgrenade
-
-# checkpoint at 980, -4015
+      Bash, Grenade=1  # too precise
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
 
   state NonGladesTeleporter: free
+  state WoodsMain.LogBlobDestroyed:  # these can break the corruption from behind
+    gorlek: Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1
+    unsafe: 
+      ShurikenBreak=3
+      DoubleJump, Glide, Damage=20  # use the balloon
 
   conn Teleporters: free
   conn WoodsMain.AbovePit:  # So far, this also cover the OrangeTree connection
@@ -6068,28 +6168,27 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
     gorlek: Launch, Damage=15
     kii:
       Launch
+      DoubleJump, TripleJump, Damage=60
+      DoubleJump, TripleJump, Bash, Damage=30
+    unsafe:
       DoubleJump, TripleJump, Damage=45
       DoubleJump, TripleJump, Bash, Damage=15
-    unsafe:
       DoubleJump, Damage=45, Dash OR Shuriken=2
       DoubleJump, Damage=15, TripleJump OR Bash
-  conn WoodsMain.AboveHowl:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->AboveHowl
-    gorlek, Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1:  # these can break the corruption from behind
+  conn WoodsMain.BeforeLog:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->BeforeLog
+    gorlek, WoodsMain.LogBlobDestroyed:
       DoubleJump, Combat=2xBalloon, Hammer OR Sword OR TripleJump
       DoubleJump, Dash
       SentryJump=1, Combat=2xBalloon OR Dash
       Bash, Grenade=1, Combat=2xBalloon OR Dash
       Launch
-    kii, Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1:
+    kii, WoodsMain.LogBlobDestroyed:
       Combat=Balloon, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # only need to kill the first balloon
       Damage=20, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost on the first balloon to kill it
-    unsafe, ShurikenBreak=3 OR Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1:
+    unsafe, WoodsMain.LogBlobDestroyed:
       DoubleJump
-      SentryJump=1, Combat=2xBalloon OR Dash
-      Bash, Grenade=1, Combat=2xBalloon OR Dash
 
 anchor WoodsMain.OrangeTree at 1030, -4010:  # At the right of the tree above the teleporter
-# Conenction to teleporter are handled through AbovePit. And even then, going to the teleporter is only allowing you to either go back to AbovePit or go AboveHowl, making going to the teleporter pointless in the first place
   conn WoodsMain.AbovePit:
     moki: Bash OR Glide OR Launch
     gorlek:
@@ -6097,13 +6196,17 @@ anchor WoodsMain.OrangeTree at 1030, -4010:  # At the right of the tree above th
       Dash
     kii: Sword  # Pogo the plant
     unsafe: Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-  conn WoodsMain.AboveHowl:
+  conn WoodsMain.BeforeLog:
     moki:
       Launch
     gorlek:
       SentryJump=1, DoubleJump
       DoubleJump, Bash, Grenade=1
     kii: Bash
+  conn WoodsMain.Teleporter:  # make sure it's not redundant with ->AbovePit->Teleporter and also make sure that it is necessary, since you can only get to BeforeLog or AbovePit with this, which both already have their respective connections from this anchor
+    kii:
+      Sentry=3
+      Damage=15, Sentry=1 OR Shuriken=1
 
 # checkpoint at the anchor below, could split another anchor off for the crystal and move it over
 
@@ -6122,17 +6225,19 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
       DoubleJump, Dash OR TripleJump OR Damage=15
       Dash, Damage=15
     kii:
-      Damage=30
+      Damage=45
       Sword  # Pogo the plant
-      Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Hammer, DoubleJump OR Dash
+    unsafe:
+      Damage=30
   conn WoodsMain.FeedingGrounds:
     moki:
       DoubleJump, Dash OR Bash
       Glide OR Launch
       Bash, Grenade=1
     gorlek:
-      DoubleJump, Hammer
+      DoubleJump, Hammer OR TripleJump
       Bash, Dash OR Hammer
       Sword
     kii:
@@ -6160,7 +6265,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       DoubleJump OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
       Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: free
-  conn LowerWastes.WestTP:
+  conn LowerWastes.WestTP:  # every path needs to be possible while having Seir
     moki:
       Grapple, Glide, DoubleJump OR Dash OR Launch  # this solves with Seir as well
       WindtornRuins.Seir:  # these wouldn't solve without Seir
@@ -6178,18 +6283,22 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
         SentryJump=1, DoubleJump, TripleJump  # tjump+up slash to reach the grappable surface
         Bash, Grenade=1, Grapple
         Bash, Grenade=2, Dash  # Dash to get in bash range on the 2nd grenade to get on the grappable surface
+        Glide, Bash, Grenade=1, Dash  # ^ but it's only one grenade because of glide
         Bash, Grenade=1, DoubleJump, TripleJump, Dash OR Sword OR Hammer
     kii:
-      DoubleJump, TripleJump
       Glide, Dash, DoubleJump, Sword OR Hammer
-      Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, DoubleJump, Hammer, Flash=1 OR Sentry=1
       Bash, Grenade=1, Dash, DoubleJump, Sword OR Hammer
-      Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump, Hammer, Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump, TripleJump  # if you are doing the escape, use the hiding spot. if you have seir, use a bashnade
       WindtornRuins.Seir:  # these wouldn't solve without Seir
         Glide, Bash, Grenade=1, DoubleJump OR Dash
         Bash, Grenade=2, DoubleJump
     unsafe:
+      DoubleJump, TripleJump, Damage=30  # damage for when you get seir
       DoubleJump, Bash, Grenade=1
+      Glide, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
+      Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
   conn WoodsMain.AbovePit:
     moki:
       DoubleJump, Bash
@@ -6199,9 +6308,11 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       SentryJump=1, DoubleJump OR Dash OR Glide
     kii:
       Bash, Grenade=1
-      Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: DoubleJump  # fall then good old glide skip
+      Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Dash, DoubleJump, TripleJump, Shuriken=1  # too precise for kii
+      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # too precise for kii
+      DoubleJump  # fall then good old glide skip
 
 anchor WoodsShrine at 1361, -4068:
   nospawn
