@@ -30,6 +30,7 @@ fn build_glitch_requirement<'a>(glitch: &Glitch, out: Requirement, context: &mut
 fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
     match requirement {
         parser::Requirement::Free => Requirement::Free,
+        parser::Requirement::Impossible => Requirement::Impossible,
         parser::Requirement::Definition(identifier) => build_requirement_group(&context.definitions[identifier], region, context),
         parser::Requirement::Difficulty(difficulty) =>
             if region {
