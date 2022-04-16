@@ -33,7 +33,7 @@ Flags: No Quests
 // Reveal items behind quests
 3|0|8|937|34641|int|4                   // Silent Teeth -> Tuley
 3|0|8|42178|40006|byte|3                // Planting the Last Tree
-3|0|8|42178|16586|byte|1                // Unlock building the Cave
+42178|18751=3|8|42178|16586|byte|1      // Unlock building the Cave when removing the thorns
 3|0|8|58674|14313|bool|true             // Family Murder -> Doll
 42178|51230=3|8|42178|36609|bool|true   // Family Murder -> SL inside father hut
 // Quests that just kind of exist

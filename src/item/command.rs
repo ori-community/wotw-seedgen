@@ -38,6 +38,8 @@ pub enum Command {
     IfSelfGreater { #[VWrap] value: String, #[VType] item: Box<Item> },
     IfSelfLess { #[VWrap] value: String, #[VType] item: Box<Item> },
     UnEquip { ability: u16 },
+    SaveString { id: i32, string: String },
+    AppendString { id: i32, string: String },
 }
 impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -71,6 +73,8 @@ impl fmt::Display for Command {
             Command::IfSelfGreater { value, item } => write!(f, "26|{}|{}", value, item.code()),
             Command::IfSelfLess { value, item } => write!(f, "27|{}|{}", value, item.code()),
             Command::UnEquip { ability } => write!(f, "28|{}", ability),
+            Command::SaveString { id, string } => write!(f, "29|{}|{}", id, string),
+            Command::AppendString { id, string } => write!(f, "30|{}|{}", id, string),
         }
     }
 }

@@ -82,6 +82,7 @@ fn build_boss_requirement(health: u16, context: &EmitterContext) -> Requirement 
 fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
     match requirement {
         parser::Requirement::Free => Requirement::Free,
+        parser::Requirement::Impossible => Requirement::Impossible,
         parser::Requirement::Definition(identifier) => build_requirement_group(&context.definitions[identifier], region, context),
         parser::Requirement::Difficulty(difficulty) => build_difficulty_requirement(*difficulty, Requirement::Free, region, context),
         parser::Requirement::Trick(glitch) => build_trick_requirement(glitch, Requirement::Free, context),

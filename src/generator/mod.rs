@@ -163,6 +163,20 @@ where
                 item: price_setter,
             });
 
+            let description = origin_details.and_then(|details| details.description.clone()).or_else(|| item.description());
+            if description.is_some() {
+                let description_setter = Item::ShopCommand(ShopCommand::SetDescription {
+                    uber_state: uber_state.identifier.clone(),
+                    description,
+                });
+
+                origin_world_context.placements.push(Placement {
+                    node: None,
+                    uber_state: UberState::load(),
+                    item: description_setter,
+                });
+            }
+
             if let Some(icon) = origin_details.and_then(|details| details.icon.clone()).or_else(|| item.icon()) {
                 let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
                     uber_state: uber_state.identifier.clone(),

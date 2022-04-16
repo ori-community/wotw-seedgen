@@ -122,7 +122,7 @@ impl Item {
                 Resource::Health | Resource::Energy | Resource::Ore | Resource::Keystone => true,
             },
             Item::Skill(skill) => match skill {
-                Skill::AncestralLight => difficulty >= Difficulty::Unsafe,
+                Skill::AncestralLight1 | Skill::AncestralLight2 => difficulty >= Difficulty::Unsafe,
                 Skill::Shuriken | Skill::Blaze | Skill::Sentry => difficulty >= Difficulty::Gorlek,
                 Skill::Seir | Skill::WallJump => false,
                 Skill::Bash |
@@ -190,7 +190,6 @@ impl Item {
         !matches!(self,
             Item::SpiritLight(_) | Item::RemoveSpiritLight(_) |
             Item::Resource(_) |
-            Item::Skill(Skill::AncestralLight) |
             Item::BonusItem(_) | Item::BonusUpgrade(_) |
             Item::UberState(_) | Item::Command(_) | Item::Message(_)
         )
@@ -211,7 +210,7 @@ impl Item {
             Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600,  // Basic Weapons
             Item::Skill(Skill::Burrow | Skill::Bash | Skill::Flap | Skill::WaterDash | Skill::Grenade | Skill::Flash | Skill::Seir) | Item::Water => 1800,  // Key Skills
             Item::Skill(Skill::Blaze | Skill::Sentry) => 2800,  // Tedious Weapons
-            Item::Skill(Skill::AncestralLight) => 3000,  // Unhinted Skill
+            Item::Skill(Skill::AncestralLight1 | Skill::AncestralLight2) => 3000,  // Unhinted Skill
             Item::Skill(Skill::Spear) => 4000,  // No
             Item::Skill(Skill::Launch) => 40000,  // Absolutely Broken
             Item::Shard(_) => 1000,
@@ -231,7 +230,7 @@ impl Item {
             Item::Resource(Resource::ShardSlot) => 250,
             Item::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
-                Skill::AncestralLight => 300,
+                Skill::AncestralLight1 | Skill::AncestralLight2 => 300,
                 Skill::Blaze => 420,
                 Skill::Launch => 800,
                 _ => 500,
@@ -277,6 +276,14 @@ impl Item {
         }
     }
 
+    pub fn description(&self) -> Option<String> {
+        match self {
+            Item::BonusItem(bonus_item) => bonus_item.description(),
+            Item::BonusUpgrade(bonus_upgrade) => bonus_upgrade.description(),
+            _ => None,
+        }
+    }
+
     pub fn icon(&self) -> Option<Icon> {
         match self {
             Item::SpiritLight(_) => Some(Icon::File(String::from("assets/icons/game/experience.png"))),
@@ -303,7 +310,7 @@ mod tests {
         assert_eq!(Item::SpiritLight(45).code(), "0|45");
         assert_eq!(Item::Resource(Resource::Keystone).code(), "1|3");
         assert_eq!(Item::Skill(Skill::Launch).code(), "2|8");
-        assert_eq!(Item::Skill(Skill::AncestralLight).code(), "2|120");
+        assert_eq!(Item::Skill(Skill::AncestralLight1).code(), "2|120");
         assert_eq!(Item::Shard(Shard::Magnet).code(), "3|8");
         assert_eq!(Item::Teleporter(Teleporter::Marsh).code(), "5|16");
         assert_eq!(Item::Water.code(), "9|0");

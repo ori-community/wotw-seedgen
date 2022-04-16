@@ -6,6 +6,7 @@
 !!include bonus_core
 !!name 8|4|50|byte|+1 #Rapid Smash#
 !!display 8|4|50|byte|+1 $[(9|999=402)]
+!!description 8|4|50|byte|+1 Spirit Smash attacks are faster
 !!icon 8|4|50|byte|+1 file:assets/icons/bonus/rapidsmash.png
 
 // skip-validate

@@ -204,7 +204,8 @@ impl Player {
         let mut damage_mod = 1.0;
 
         if self.settings.difficulty >= Difficulty::Gorlek {
-            damage_mod += 0.25 * self.inventory.get(&Item::Skill(Skill::AncestralLight)) as f32;
+            if self.inventory.has(&Item::Skill(Skill::AncestralLight1), 1) { damage_mod += 0.25; }
+            if self.inventory.has(&Item::Skill(Skill::AncestralLight2), 1) { damage_mod += 0.25; }
         }
 
         if self.settings.difficulty >= Difficulty::Unsafe {
@@ -487,7 +488,8 @@ mod tests {
         assert_eq!(player.destroy_cost(10.0, Skill::Bow, false), 1.5);
         assert_eq!(player.destroy_cost(10.0, Skill::Spear, true), 4.0);
         assert_eq!(player.destroy_cost(0.0, Skill::Spear, false), 0.0);
-        player.inventory.grant(Item::Skill(Skill::AncestralLight), 2);
+        player.inventory.grant(Item::Skill(Skill::AncestralLight1), 1);
+        player.inventory.grant(Item::Skill(Skill::AncestralLight2), 1);
         player.settings.difficulty = Difficulty::Unsafe;
         player.inventory.grant(Item::Shard(Shard::Wingclip), 1);
         player.inventory.grant(Item::Resource(Resource::ShardSlot), 1);

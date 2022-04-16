@@ -191,6 +191,15 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
         let mut collision_message = String::new();
 
         'outer: for uber_state in occupied {
+            // special cases because this system is not holding up to modern header logic
+            if uber_state.identifier.uber_group == 9 && (
+                uber_state.identifier.uber_id == 0 && ["250", "251", "999"].contains(&&uber_state.value[..])
+                || uber_state.identifier.uber_id == 999 && uber_state.value == "200"
+                || uber_state.identifier.uber_id == 150
+            ) {
+                continue;
+            }
+
             for (other_header, other_occupied, _) in &occupation_map {
                 if header == other_header || excludes.contains(other_header) {
                     continue;
@@ -274,6 +283,44 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
             output += &passed;
         }
     }
+
+    let mut check_free = |description, range, condition: fn(&UberState, i32) -> bool |
+    {
+        let mut first = None;
+        for index in range {
+            let occupied = occupation_map.iter().any(|(_, states, _)| states.iter().any(|state| condition(state, index)));
+            if occupied {
+                if let Some(first_value) = first {
+                    let last = index - 1;
+                    output += &format!("Free {description}: {first_value}..{last}\n");
+                    first = None;
+                }
+            } else if first.is_none() {
+                first = Some(index);
+            }
+        }
+        if let Some(first_value) = first {
+            output += &format!("Free {description}: {first_value}..\n");
+        }
+    };
+
+    check_free("9|0", 1..1000, |state: &UberState, index: i32|
+        state.identifier.uber_group == 9
+        && state.identifier.uber_id == 0
+        && state.value == index.to_string()
+    );
+    check_free("integer", 1..100, |state: &UberState, index: i32|
+        state.identifier.uber_group == 9
+        && state.identifier.uber_id as i32 == index
+    );
+    check_free("boolean", 100..150, |state: &UberState, index: i32|
+        state.identifier.uber_group == 9
+        && state.identifier.uber_id as i32 == index
+    );
+    check_free("float", 150..175, |state: &UberState, index: i32|
+        state.identifier.uber_group == 9
+        && state.identifier.uber_id as i32 == index
+    );
 
     println!("{}", output);
     Ok(valid)

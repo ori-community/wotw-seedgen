@@ -6,6 +6,7 @@
 !!include bonus_core
 !!name 8|4|51|byte|+1 #Rapid Sword#
 !!display 8|4|51|byte|+1 $[(9|999=403)]
+!!description 8|4|51|byte|+1 Sword attacks are faster
 !!icon 8|4|51|byte|+1 file:assets/icons/bonus/rapidsword.png
 
 // skip-validate
