@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::{VItem, util::Icon};
 
-use crate::header::{HeaderCommand, ParameterDefault, V};
+use crate::header::{HeaderCommand, ParameterDefault, V, VString};
 
 fn parse_amount(item: &mut &str) -> V<i32> {
     if let Some(index) = item.find("x ") {
@@ -46,7 +46,7 @@ fn name_command(naming: &str) -> Result<HeaderCommand, String> {
     let (item, name) = naming.split_once(' ').ok_or_else(|| "missing name".to_string())?;
     let item = VItem::parse(item)?;
     let name = non_empty(name).ok_or_else(|| "missing display name".to_string())?;
-    let name = V::wrap(&name);
+    let name = VString(name);
 
     Ok(HeaderCommand::Name { item, name })
 }
@@ -54,7 +54,7 @@ fn display_command(display: &str) -> Result<HeaderCommand, String> {
     let (item, name) = display.split_once(' ').ok_or_else(|| "missing display name".to_string())?;
     let item = VItem::parse(item)?;
     let name = non_empty(name).ok_or_else(|| "missing display name".to_string())?;
-    let name = V::wrap(&name);
+    let name = VString(name);
 
     Ok(HeaderCommand::Display { item, name })
 }
@@ -62,7 +62,7 @@ fn description_command(description: &str) -> Result<HeaderCommand, String> {
     let (item, description) = description.split_once(' ').ok_or_else(|| "missing description".to_string())?;
     let item = VItem::parse(item)?;
     let description = non_empty(description).ok_or_else(|| "missing description".to_string())?;
-    let description = V::wrap(&description);
+    let description = VString(description);
 
     Ok(HeaderCommand::Description { item, description })
 }

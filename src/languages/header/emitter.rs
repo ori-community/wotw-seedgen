@@ -4,7 +4,7 @@ use rustc_hash::FxHashMap;
 
 use crate::{Item, VItem, seed::{Pickup, VPickup}, util::Icon};
 
-use super::{HeaderContent, V, VResolve, HeaderCommand};
+use super::{HeaderContent, V, VResolve, VString, HeaderCommand};
 
 /// Configurable details for how to treat an [`Item`] during seed generation
 #[derive(Debug, Clone, Default)]
@@ -84,7 +84,7 @@ fn build_pickup(pickup: VPickup, lines: &mut Vec<String>, preplacements: &mut Ve
     Ok(())
 }
 
-fn build_flags(flag_string: Vec<V<String>>, flags: &[String], parameters: &FxHashMap<String, String>) -> Result<Vec<String>, String> {
+fn build_flags(flag_string: Vec<VString>, flags: &[String], parameters: &FxHashMap<String, String>) -> Result<Vec<String>, String> {
     if !flags.is_empty() {
         return Err("Duplicate flagline".to_string());
     }
@@ -140,14 +140,22 @@ fn change_item_pool(item: VItem, amount: i32, item_pool_changes: &mut FxHashMap<
     Ok(())
 }
 
-macro_rules! details {
-    ($fn_ident:ident $field_ident:ident $field_name:literal V<$ty:ty>) => {
-        fn $fn_ident(item: VItem, $field_ident: V<$ty>, item_details: &mut FxHashMap<Item, ItemDetails>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+macro_rules! __vdetails {
+    ($fn_ident:ident $field_ident:ident $field_name:literal $ty:ty) => {
+        fn $fn_ident(item: VItem, $field_ident: $ty, item_details: &mut FxHashMap<Item, ItemDetails>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
             let $field_ident = $field_ident.resolve(parameters)?;
             let item = item.resolve(parameters)?;
             let detail = &mut item_details.entry(item).or_default().$field_ident;
             change_item_details($field_ident, detail, $field_name)
         }
+    };
+}
+macro_rules! details {
+    ($fn_ident:ident $field_ident:ident $field_name:literal V<$ty:ty>) => {
+        __vdetails!($fn_ident $field_ident $field_name V<$ty>);
+    };
+    ($fn_ident:ident $field_ident:ident $field_name:literal VString) => {
+        __vdetails!($fn_ident $field_ident $field_name VString);
     };
     ($fn_ident:ident $field_ident:ident $field_name:literal $ty:ty) => {
         fn $fn_ident(item: VItem, $field_ident: $ty, item_details: &mut FxHashMap<Item, ItemDetails>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
@@ -157,9 +165,9 @@ macro_rules! details {
         }
     };
 }
-details!(build_name name "name" V<String>);
-details!(build_display display "display" V<String>);
-details!(build_description description "description" V<String>);
+details!(build_name name "name" VString);
+details!(build_display display "display" VString);
+details!(build_description description "description" VString);
 details!(build_price price "price" V<u32>);
 details!(build_icon icon "icon" Icon);
 

@@ -226,7 +226,7 @@ pub struct HeaderDocumentation {
 /// One statement in a header
 pub enum HeaderContent {
     /// A List of Flags to add to the resulting seed
-    Flags(Vec<V<String>>),
+    Flags(Vec<VString>),
     /// A header command to be applied at generation time
     Command(HeaderCommand),
     /// A timer definition to add to the resulting seed
@@ -242,9 +242,9 @@ pub enum HeaderCommand {
     Exclude { name: String },
     Add { item: VItem, amount: V<i32> },
     Remove { item: VItem, amount: V<i32> },
-    Name { item: VItem, name: V<String> },
-    Display { item: VItem, name: V<String> },
-    Description { item: VItem, description: V<String> },
+    Name { item: VItem, name: VString },
+    Display { item: VItem, name: VString },
+    Description { item: VItem, description: VString },
     Price { item: VItem, price: V<u32> },
     Icon { item: VItem, icon: Icon },
     Parameter { identifier: String, default: ParameterDefault },

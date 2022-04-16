@@ -16,7 +16,7 @@ use crate::{
     seed::parser::{parse_uber_identifier, parse_uber_state},
 };
 
-use super::{HeaderCommand, Annotation, HeaderDocumentation, HeaderContent, TimerDefinition, VPickup, V};
+use super::{HeaderCommand, Annotation, HeaderDocumentation, HeaderContent, TimerDefinition, VPickup, V, VString};
 
 fn trim_comment(input: &str) -> &str {
     input.find("//").map_or(input, |index| &input[..index]).trim_end()
@@ -149,7 +149,7 @@ fn parse_flags(flags: &str) -> Result<HeaderContent, String> {
     if flags.is_empty() {
         return Err("empty flagline".to_string());
     }
-    let flags = flags.split(',').map(|flag| V::wrap(flag.trim())).collect();
+    let flags = flags.split(',').map(|flag| VString(flag.trim().to_string())).collect();
     Ok(HeaderContent::Flags(flags))
 }
 
