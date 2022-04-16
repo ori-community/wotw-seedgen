@@ -58,6 +58,14 @@ fn display_command(display: &str) -> Result<HeaderCommand, String> {
 
     Ok(HeaderCommand::Display { item, name })
 }
+fn description_command(description: &str) -> Result<HeaderCommand, String> {
+    let (item, description) = description.split_once(' ').ok_or_else(|| "missing description".to_string())?;
+    let item = VItem::parse(item)?;
+    let description = non_empty(description).ok_or_else(|| "missing description".to_string())?;
+    let description = V::wrap(&description);
+
+    Ok(HeaderCommand::Description { item, description })
+}
 fn price_command(price: &str) -> Result<HeaderCommand, String> {
     let (item, price) = price.split_once(' ').ok_or_else(|| "missing price".to_string())?;
     let item = VItem::parse(item)?;
@@ -110,6 +118,8 @@ impl HeaderCommand {
             name_command(naming.trim()).map_err(|err| format!("{err} in name command {command}"))?
         } else if let Some(display) = command.strip_prefix("display ") {
             display_command(display.trim()).map_err(|err| format!("{err} in display command {command}"))?
+        } else if let Some(description) = command.strip_prefix("description ") {
+            description_command(description.trim()).map_err(|err| format!("{err} in description command {command}"))?
         } else if let Some(price) = command.strip_prefix("price ") {
             price_command(price.trim()).map_err(|err| format!("{err} in price command {command}"))?
         } else if let Some(icon) = command.strip_prefix("icon ") {

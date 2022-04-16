@@ -198,8 +198,8 @@ mod tests {
         assert!(Item::parse("1|-2").is_err());
         assert!(Item::parse("1|5").is_err());
         assert_eq!(Item::parse("2|8"), Ok(Item::Skill(Skill::Launch)));
-        assert_eq!(Item::parse("2|120"), Ok(Item::Skill(Skill::AncestralLight)));
-        assert_eq!(Item::parse("2|121"), Ok(Item::Skill(Skill::AncestralLight)));
+        assert_eq!(Item::parse("2|120"), Ok(Item::Skill(Skill::AncestralLight1)));
+        assert_eq!(Item::parse("2|121"), Ok(Item::Skill(Skill::AncestralLight2)));
         assert!(Item::parse("2|25").is_err());
         assert!(Item::parse("2|-9").is_err());
         assert_eq!(Item::parse("3|28"), Ok(Item::Shard(Shard::LastStand)));

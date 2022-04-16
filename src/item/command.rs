@@ -5,7 +5,7 @@ use seedgen_derive::VVariant;
 
 use super::{Item, VItem, Resource};
 use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool};
-use crate::header::{V, VResolve};
+use crate::header::{V, VResolve, VString};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum Command {
@@ -38,8 +38,8 @@ pub enum Command {
     IfSelfGreater { #[VWrap] value: String, #[VType] item: Box<Item> },
     IfSelfLess { #[VWrap] value: String, #[VType] item: Box<Item> },
     UnEquip { ability: u16 },
-    SaveString { id: i32, string: String },
-    AppendString { id: i32, string: String },
+    SaveString { id: i32, #[VType] string: String },
+    AppendString { id: i32, #[VType] string: String },
 }
 impl fmt::Display for Command {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

@@ -244,6 +244,7 @@ pub enum HeaderCommand {
     Remove { item: VItem, amount: V<i32> },
     Name { item: VItem, name: V<String> },
     Display { item: VItem, name: V<String> },
+    Description { item: VItem, description: V<String> },
     Price { item: VItem, price: V<u32> },
     Icon { item: VItem, icon: Icon },
     Parameter { identifier: String, default: ParameterDefault },

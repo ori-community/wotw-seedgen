@@ -13,6 +13,8 @@ pub struct ItemDetails {
     pub name: Option<String>,
     /// The display of this item, which the player will see when collecting it
     pub display: Option<String>,
+    /// The description of this item, which will be visible in shops
+    pub description: Option<String>,
     /// The average price of this item when placing it in a shop
     pub price: Option<u32>,
     /// The icon to use when placing this item in a shop
@@ -99,6 +101,7 @@ fn build_command(command: HeaderCommand, header_build: &mut HeaderBuild, if_stac
         HeaderCommand::Remove { item, amount } => build_remove(item, amount, &mut header_build.item_pool_changes, parameters)?,
         HeaderCommand::Name { item, name } => build_name(item, name, &mut header_build.item_details, parameters)?,
         HeaderCommand::Display { item, name } => build_display(item, name, &mut header_build.item_details, parameters)?,
+        HeaderCommand::Description { item, description } => build_description(item, description, &mut header_build.item_details, parameters)?,
         HeaderCommand::Price { item, price } => build_price(item, price, &mut header_build.item_details, parameters)?,
         HeaderCommand::Icon { item, icon } => build_icon(item, icon, &mut header_build.item_details, parameters)?,
         HeaderCommand::Parameter { .. } => { /* Skip, parameters have been processed earlier */ },
@@ -156,6 +159,7 @@ macro_rules! details {
 }
 details!(build_name name "name" V<String>);
 details!(build_display display "display" V<String>);
+details!(build_description description "description" V<String>);
 details!(build_price price "price" V<u32>);
 details!(build_icon icon "icon" Icon);
 

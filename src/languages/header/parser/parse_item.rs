@@ -354,6 +354,28 @@ where P: Iterator<Item=&'a str>
 
     Ok(VItem::Command(VCommand::UnEquip { ability }))
 }
+fn parse_save_string<'a, P>(mut parts: P) -> Result<VItem, String>
+where P: Iterator<Item=&'a str>
+{
+    let id = parts.next().ok_or_else(|| String::from("missing database id"))?;
+    let id = id.parse().map_err(|_| String::from("invalid database id"))?;
+    let string = parts.next().ok_or_else(|| String::from("missing string"))?;
+    let string = VString(string.to_owned());
+    end_of_item(parts)?;
+
+    Ok(VItem::Command(VCommand::SaveString { id, string }))
+}
+fn parse_append_string<'a, P>(mut parts: P) -> Result<VItem, String>
+where P: Iterator<Item=&'a str>
+{
+    let id = parts.next().ok_or_else(|| String::from("missing database id"))?;
+    let id = id.parse().map_err(|_| String::from("invalid database id"))?;
+    let string = parts.next().ok_or_else(|| String::from("missing string"))?;
+    let string = VString(string.to_owned());
+    end_of_item(parts)?;
+
+    Ok(VItem::Command(VCommand::AppendString { id, string }))
+}
 fn parse_command<'a, P>(mut parts: P) -> Result<VItem, String>
 where P: Iterator<Item=&'a str>
 {
@@ -388,6 +410,8 @@ where P: Iterator<Item=&'a str>
         "26" => parse_if_self_greater(parts),
         "27" => parse_if_self_less(parts),
         "28" => parse_unequip(parts),
+        "29" => parse_save_string(parts),
+        "30" => parse_append_string(parts),
         _ => Err(format!("invalid command type {command_type}")),
     }
 }
