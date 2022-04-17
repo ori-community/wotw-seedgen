@@ -2579,7 +2579,9 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Combat=Balloon, Water, DoubleJump, TripleJump, Damage=10
       Water, DoubleJump, TripleJump, Damage=20
     kii: Water, DoubleJump, TripleJump, Damage=10  # Balloon will go for a swim on its own as long as you aggro it
-    unsafe: Water, Damage=10, DoubleJump OR SentryJump=1
+    unsafe:
+      Water, Damage=10, DoubleJump OR SentryJump=1
+      Water, Bash, Damage=20  # Theorically possible with less damage but I don't want to check https://youtu.be/DsYMP004WTs
   pickup EastHollow.KwolokSwimOre:
     moki: Water, Bash OR Damage=10  # enemy in the way
     gorlek: Water
