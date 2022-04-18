@@ -7596,6 +7596,7 @@ anchor LowerReach.TrialStart at 64, -4046:  # At trial start
 
   pickup LowerReach.SpiritTrial:
     moki: LowerReach.TrialActivation, Dash, Glide
+    unsafe: LowerReach.TrialActivation, Glide
   pickup LowerReach.RightKS:
     moki:
       Glide
