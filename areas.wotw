@@ -2082,7 +2082,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       Hammer    # upswing to get onto the right side of the spikes (you can touch them)
       Dash      # max jump without hitting the spike hitbox, dash to the small ledge
 
-  conn WestHollow.SubmergedPlatform:
+  conn WestHollow.SubmergedPlatform:  # Underwater in both water states. Opting to not use it for dirty swims, since it doesn't have a checkpoint.
     unsafe, WestHollow.FullyDrained:  # TODO: other difficulties
       Bow=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR DoubleJump OR Dash OR Bash OR GlideJump OR Damage=10 OR PauseHover  # this is extremely difficult and not fun if you can't fight the enemies. There's a small safe spot on the left of the spikes under the tongue that is useful for a lot of these paths. If you've already destroyed the rock wall, you'll have to jump on the tongue as it's extending. The tongue saves its state, so you can shoot it once to close it and then leave to refill energy. The Bash path requires you to get a slime onto the tongue and then lure a Skeeto up to follow.
       Bash, Grenade=1 OR Damage=10  # the IFrames from the spikes allow you to bash the bomb slug
@@ -2093,26 +2093,26 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
   conn WestHollow.HollowDrainMiddle:  # paths which don't use SubmergedPlatform
     unsafe:  # TODO: other difficulties
       WestHollow.FullyDrained, Bow=1, Bash, Grenade=1
-      WestHollow.FullyDrained, Bow=2, Dash OR GrenadeJump OR PauseHover
-      WestHollow.FullyDrained, Bow=2, Shuriken=1, Blaze OR Spear=1 OR Glide
+      WestHollow.FullyDrained, Bow=1, Dash OR GrenadeJump OR PauseHover
+      WestHollow.FullyDrained, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
       WestHollow.FullyDrained, BlazeSwap=4 OR FlashSwap  # I'm not good at swaps, there's probably room for improvement.
       WestHollow.FullyDrained, DoubleJump, Bash, TripleJump OR Glide  # juggle the slime
-      # Dirty Swims, incomplete. All of the following contain duplicates of other paths for the purposes of softlock prevention.
-      WestHollow.UpperDrainLeverPulled, Damage=90, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # Use the spikes to gain IFrames.
-      WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Bash, Grenade=1  # The tongue saves its state incorrectly if you die while it is extending, so shoot it, die, swim back up, and then climb on it.
-      WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Dash OR GrenadeJump OR PauseHover
-      WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
-      WestHollow.UpperDrainLeverPulled, Damage=90, BlazeSwap=4 OR FlashSwap
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # This is doable with just Water Dash, but that could cause softlocks.
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Bash, Grenade=1
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Dash OR GrenadeJump OR PauseHover
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, BlazeSwap=4 OR FlashSwap
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, DoubleJump, Bash, TripleJump OR Glide
-  conn WestHollow.RockPuzzle:  # Dirty Swim paths, since they can't use SubmergedPlatform. All of these paths assume that both tongues are out; there may be room for improvement.
-    unsafe, WestHollow.UpperDrainLeverPulled:
+      # Dirty Swims, incomplete. All of the following contain duplicates of other paths for the purposes of softlock prevention. Middle state swim deals the most damage, so calculate damage according to that.
+      Damage=90, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # Use the spikes to gain IFrames.
+      Damage=90, Bow=1, Bash, Grenade=1  # The tongue saves its state incorrectly if you die while it is extending, so shoot it, die, swim back up, and then climb on it.
+      Damage=90, Bow=1, Dash OR GrenadeJump OR PauseHover
+      Damage=90, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
+      Damage=90, BlazeSwap=4 OR FlashSwap
+      Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # This is doable with just Water Dash, but that could cause softlocks.
+      Damage=40, WaterDash, Bow=1, Bash, Grenade=1
+      Damage=40, WaterDash, Bow=1, Dash OR GrenadeJump OR PauseHover
+      Damage=40, WaterDash, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
+      Damage=40, WaterDash, BlazeSwap=4 OR FlashSwap
+      Damage=40, WaterDash, DoubleJump, Bash, TripleJump OR Glide
+  conn WestHollow.RockPuzzle:  # Dirty Swim paths, since they can't use SubmergedPlatform. All of these paths assume that both tongues are out, just in case; there may be room for improvement.
+    unsafe:
       Damage=90, Launch  # Use the spikes to gain IFrames.
-      Damage=90, Dash, HammerJump OR SwordSJump=1 OR HammerSJump=1  # the sentry jump paths actually just use the sentries for movement, but sentry jumps are needed to prevent softlocks.
+      Damage=90, Dash, HammerJump OR SwordSJump=1 OR HammerSJump=1  # the sentry jump paths actually just use the sentries for movement, but sentry jumps are needed to prevent softlocks.  In the initial water state, dash onto SubmergedPlatform before swimming.
       Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # the sentry jump paths don't actually use the sentries, but sentry jumps are needed to prevent softlocks.
       Damage=60, Bow=1, WaterDash
   conn WestHollow.TrialApproach:  # middle water state can softlock this, so you have to be able to fully lower the water.
