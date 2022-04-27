@@ -2084,7 +2084,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
 
   conn WestHollow.SubmergedPlatform:  # Underwater in both water states. Opting to not use it for dirty swims, since it doesn't have a checkpoint.
     unsafe, WestHollow.FullyDrained:  # TODO: other difficulties
-      Bow=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR DoubleJump OR Dash OR Bash OR GlideJump OR Damage=10 OR PauseHover  # this is extremely difficult and not fun if you can't fight the enemies. There's a small safe spot on the left of the spikes under the tongue that is useful for a lot of these paths. If you've already destroyed the rock wall, you'll have to jump on the tongue as it's extending. The tongue saves its state, so you can shoot it once to close it and then leave to refill energy. The Bash path requires you to get a slime onto the tongue and then lure a Skeeto up to follow.
+      Bow=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR DoubleJump OR Dash OR Bash OR GlideJump OR Damage=10 OR PauseHover  # this is extremely difficult and not fun if you can't fight the enemies. There's a small safe spot on the left of the spikes under the tongue that is useful for a lot of these paths. If you've already destroyed the rock wall, you'll have to jump on the tongue as it's extending, or do an extremely precise wall jump from below it. The tongue saves its state, so you can shoot it once to close it and then leave to refill energy. The Bash path requires you to get a slime onto the tongue and then lure a Skeeto up to follow.
       Bash, Grenade=1 OR Damage=10  # the IFrames from the spikes allow you to bash the bomb slug
       GrenadeJump, DoubleJump OR Dash OR PauseHover  # Grenade Jump from next to the spikes
       DoubleJump, Bash, TripleJump OR Glide  # juggle the slime
@@ -2093,7 +2093,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
   conn WestHollow.HollowDrainMiddle:  # paths which don't use SubmergedPlatform
     unsafe:  # TODO: other difficulties
       WestHollow.FullyDrained, Bow=1, Bash, Grenade=1
-      WestHollow.FullyDrained, Bow=1, Dash OR GrenadeJump OR PauseHover
+      WestHollow.FullyDrained, Bow=1, Dash OR GrenadeJump OR PauseHover  # If you've already destroyed the rock wall and you need to use the Bow shot for the upper tongue, you can do a ridiculously precise wall jump onto the lower one after it's extended.
       WestHollow.FullyDrained, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
       WestHollow.FullyDrained, BlazeSwap=4 OR FlashSwap  # I'm not good at swaps, there's probably room for improvement.
       WestHollow.FullyDrained, DoubleJump, Bash, TripleJump OR Glide  # juggle the slime
