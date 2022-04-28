@@ -2,7 +2,7 @@ use std::fmt;
 
 use num_enum::TryFromPrimitive;
 
-use crate::util::auto_display;
+use crate::util::{auto_display, UberIdentifier, UberState};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
 #[repr(u8)]
@@ -29,5 +29,34 @@ pub enum Teleporter {
 impl fmt::Display for Teleporter {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} TP", auto_display(self))
+    }
+}
+
+impl Teleporter {
+    pub(crate) fn triggered_state(&self) -> UberState {
+        let identifier = match self {
+            Teleporter::Marsh => UberIdentifier { uber_group: 21786, uber_id: 10185 },
+            Teleporter::Den => UberIdentifier { uber_group: 11666, uber_id: 61594 },
+            Teleporter::Hollow => UberIdentifier { uber_group: 937, uber_id: 26601 },
+            Teleporter::Glades => UberIdentifier { uber_group: 42178, uber_id: 42096 },
+            Teleporter::Wellspring => UberIdentifier { uber_group: 53632, uber_id: 18181 },
+            Teleporter::Burrows => UberIdentifier { uber_group: 24922, uber_id: 42531 },
+            Teleporter::WestWoods => UberIdentifier { uber_group: 58674, uber_id: 7071 },
+            Teleporter::EastWoods => UberIdentifier { uber_group: 58674, uber_id: 1965 },
+            Teleporter::Reach => UberIdentifier { uber_group: 28895, uber_id: 54235 },
+            Teleporter::Depths => UberIdentifier { uber_group: 18793, uber_id: 38871 },
+            Teleporter::EastLuma => UberIdentifier { uber_group: 945, uber_id: 58183 },
+            Teleporter::WestLuma => UberIdentifier { uber_group: 945, uber_id: 1370 },
+            Teleporter::WestWastes => UberIdentifier { uber_group: 58674, uber_id: 10029 },
+            Teleporter::EastWastes => UberIdentifier { uber_group: 20120, uber_id: 49994 },
+            Teleporter::OuterRuins => UberIdentifier { uber_group: 20120, uber_id: 41398 },
+            Teleporter::InnerRuins => UberIdentifier { uber_group: 10289, uber_id: 4928 },
+            Teleporter::Willow => UberIdentifier { uber_group: 16155, uber_id: 41465 },
+            Teleporter::Shriek => UberIdentifier { uber_group: 16155, uber_id: 50867 },
+        };
+        UberState {
+            identifier,
+            value: String::new(),
+        }
     }
 }

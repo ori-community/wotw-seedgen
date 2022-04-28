@@ -2632,7 +2632,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
         Burrow, Dash OR DoubleJump OR Sword OR Hammer
       Burrow, Grenade=1, Dash OR DoubleJump OR Sword OR Hammer
       Bash, Grenade=3
-  conn GladesTown.ReachPath:
+  conn LowerReach.VeralHome:
     moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
   conn OpherShop: free
   conn Tokk: free
@@ -2967,7 +2967,7 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
       Grenade=1  # grenade jump
       Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
 
-  conn GladesTown.ReachPath:
+  conn LowerReach.VeralHome:
   # Sword, Dash, Glide, DoubleJump, Lightcatchers Bash, Grenade, Hammer, Blaze, Shuriken, Sentry, and Flash can all individually get you from branch to reachpath
     moki:
       Launch, DoubleJump OR Dash OR Glide  # Can go either to the right wall or through the semisolid branch
@@ -2996,7 +2996,7 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
     # everything else is redundant
   conn GladesTown.Teleporter: free
 
-anchor GladesTown.ReachPath at -140, -4096:  # At the soup
+anchor LowerReach.VeralHome at -140, -4096:  # At the soup
   refill Checkpoint
 
   # state GladesTown.RatherPlay:  # talking to the Moki that allows to build decoration
@@ -3004,7 +3004,7 @@ anchor GladesTown.ReachPath at -140, -4096:  # At the soup
   #     DoubleJump OR Dash OR Glide OR Launch
   #     TuleyShop.BlueMoon, Grapple
 
-  quest GladesTown.HandToHandSoup:
+  quest LowerReach.HandToHandSoup:
     moki: InnerWellspring.HandToHandHerbs
 
   pickup GladesTown.LeafPileEX:
@@ -6135,7 +6135,7 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
     moki: BreakCrystal
 
   quest LowerReach.HandToHandHat:
-    moki: GladesTown.HandToHandSoup
+    moki: LowerReach.HandToHandSoup
 
   pickup LowerReach.WindHiddenEX:
     moki:
@@ -6600,7 +6600,7 @@ anchor LowerReach.SnowEscape at 79, -3733:
     moki: LowerReach.ForestsMemory
 
 anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
-  conn GladesTown.ReachPath: free
+  conn LowerReach.VeralHome: free
   conn LowerReach.TrialStart:
     moki:
       Glide
@@ -6644,14 +6644,14 @@ anchor LowerReach.TrialStart at 64, -4046:  # At trial start
     kii:  # TP out after taking the pickup
       Launch, DoubleJump, TripleJump, Damage=30  # dboost in the spikes+ dboost on the slime next to the keystone
       DoubleJump, TripleJump, Combat=BombSlug, Damage=80
-    unsafe: Launch, DoubleJump, TripleJump, Damage=20  # Launch against the walls. When on the wall above GladesTown.ReachPath, first use triple jump then lauch, triple jump again to take a damage boost to refresh launch then launch and triple jump again to take the pickup and tp out
+    unsafe: Launch, DoubleJump, TripleJump, Damage=20  # Launch against the walls. When on the wall above LowerReach.VeralHome, first use triple jump then lauch, triple jump again to take a damage boost to refresh launch then launch and triple jump again to take the pickup and tp out
   pickup LowerReach.MiddleLeftKS:
     moki: Glide
     kii:  # TP out after taking the pickup
       DoubleJump, TripleJump, Damage=60
       Launch, Damage=40
       Launch, DoubleJump, Damage=20, TripleJump OR Dash
-    unsafe: Launch, Damage=20, DoubleJump OR Dash  # Launch against the walls. When on the wall above GladesTown.ReachPath, first use djump/dash then lauch, reuse your mobility option, take a damage boost to refresh launch, take the pickup and TP out
+    unsafe: Launch, Damage=20, DoubleJump OR Dash  # Launch against the walls. When on the wall above LowerReach.VeralHome, first use djump/dash then lauch, reuse your mobility option, take a damage boost to refresh launch, take the pickup and TP out
   pickup LowerReach.BottomLeftKS:
     moki: Glide
     kii:  # TP out after taking the pickup

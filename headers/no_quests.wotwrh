@@ -22,7 +22,7 @@ Flags: No Quests
 3|0|8|14019|26318|int|1                 // EastHollow.HandToHandMap
 3|0|8|14019|26318|int|2                 // GladesTown.HandToHandPouch
 3|0|8|14019|26318|int|3                 // InnerWellspring.HandToHandHerbs
-3|0|8|14019|26318|int|4                 // GladesTown.HandToHandSoup
+3|0|8|14019|26318|int|4                 // LowerReach.HandToHandSoup
 3|0|8|14019|26318|int|5                 // LowerReach.HandToHandHat
 3|0|8|14019|26318|int|6                 // GladesTown.HandToHandLantern
 3|0|8|14019|26318|int|7                 // LowerDepths.HandToHandSilk

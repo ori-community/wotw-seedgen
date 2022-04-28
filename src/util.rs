@@ -188,8 +188,9 @@ impl Enemy {
             Enemy::Nest => 25.0,
             Enemy::Mantis | Enemy::SneezeSlug | Enemy::Bat | Enemy::Crab | Enemy::SpinCrab => 32.0,
             Enemy::Hornbug | Enemy::Miner => 40.0,
+            Enemy::ShieldCrystalMiner => 50.0,
             Enemy::MaceMiner | Enemy::ShieldMiner => 60.0,
-            Enemy::CrystalMiner | Enemy::ShieldCrystalMiner => 80.0,
+            Enemy::CrystalMiner => 80.0,
             _ => 0.0,
         }
     }
