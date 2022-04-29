@@ -1855,8 +1855,8 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       # Damage=80
       # WaterDash, Damage=20
   conn WestHollow.SubmergedPlatform:  # TODO: other difficulties
-    moki, WestHollow.FullyDrained, Bow=1
-    unsafe, WestHollow.FullyDrained, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR GrenadeCancel OR Blaze=1 OR Flash=1 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR Launch OR Damage=10 OR PauseHover  # This assumes the tongue is out, since I'm not confident it can't softlock otherwise. The gap is really small, it might be free with some wierder trick.
+    moki: WestHollow.FullyDrained, Bow=1
+    unsafe: WestHollow.FullyDrained, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR GrenadeCancel OR Blaze=1 OR Flash=1 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR Launch OR Damage=10 OR PauseHover  # This assumes the tongue is out, since I'm not confident it can't softlock otherwise. The gap is really small, it might be free with some wierder trick.
   conn WestHollow.HollowDrainLower:
     moki: WestHollow.FullyDrained
     unsafe:
