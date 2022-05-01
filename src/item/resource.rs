@@ -1,10 +1,11 @@
 use std::fmt;
 
 use num_enum::TryFromPrimitive;
+use seedgen_derive::FromStr;
 
 use crate::util::Icon;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Resource {
     Health = 0,

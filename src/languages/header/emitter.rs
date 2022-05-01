@@ -2,9 +2,9 @@ use std::fmt::Display;
 
 use rustc_hash::FxHashMap;
 
-use crate::{Item, VItem, seed::{Pickup, VPickup}, util::Icon};
+use crate::{Item, VItem, util::Icon};
 
-use super::{HeaderContent, V, VResolve, VString, HeaderCommand};
+use super::{HeaderContent, V, VResolve, VString, HeaderCommand, Pickup, VPickup};
 
 /// Configurable details for how to treat an [`Item`] during seed generation
 #[derive(Debug, Clone, Default)]
@@ -52,6 +52,7 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
     for content in contents {
         if if_stack.last().copied().unwrap_or(true) {
             match content {
+                HeaderContent::OuterDocumentation(_) | HeaderContent::InnerDocumentation(_) => {},
                 HeaderContent::Flags(flag_string) => header_build.flags = build_flags(flag_string, &header_build.flags, parameters)?,
                 HeaderContent::Command(command) => build_command(command, &mut header_build, &mut if_stack, parameters)?,
                 HeaderContent::Timer(timer) => lines.push(format!("timer: {}", timer.code())),

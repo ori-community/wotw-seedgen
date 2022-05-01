@@ -7,7 +7,7 @@ pub mod settings;
 pub mod generator;
 pub mod util;
 
-pub use languages::{logic, header::{self, Header}, seed};
+pub use languages::{logic, header::{self, Header}};
 pub use world::World;
 pub use inventory::Inventory;
 pub use item::{Item, VItem};
@@ -50,7 +50,7 @@ use util::{
     constants::{DEFAULT_SPAWN, MOKI_SPAWNS, GORLEK_SPAWNS, SPAWN_GRANTS, RETRIES},
 };
 
-use crate::item::UberStateOperator;
+use crate::item::{UberStateOperator, Message};
 
 fn pick_spawn<'a, R>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut R) -> Result<&'a Node, String>
 where
@@ -187,7 +187,7 @@ fn parse_header(
     Ok(())
 }
 
-fn block_spawn_sets(preplacement: &seed::Pickup, world: &mut World) {
+fn block_spawn_sets(preplacement: &header::Pickup, world: &mut World) {
     if let Item::UberState(uber_state_item) = &preplacement.item {
         if preplacement.trigger.identifier == UberState::spawn().identifier {
             if let UberStateOperator::Value(value) = &uber_state_item.operator {
@@ -198,7 +198,11 @@ fn block_spawn_sets(preplacement: &seed::Pickup, world: &mut World) {
 
                 if world.graph.nodes.iter().any(|node| node.can_place() && node.uber_state().map_or(false, |uber_state| uber_state == &target)) {
                     log::trace!("adding an empty pickup at {uber_state_item} to prevent placements");
-                    let null_item = Item::Message("6|f=0|quiet|noclear".to_string());
+                    let mut message = Message::new(String::new());
+                    message.frames = Some(0);
+                    message.quiet = true;
+                    message.noclear = true;
+                    let null_item = Item::Message(message);
                     world.preplace(target, null_item);
                 }
             }

@@ -41,8 +41,24 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
                         panic!("Expected unit variant");
                     }
 
+                    let mut custom_ident = None;
+                    for attribute in variant.attrs {
+                        if let Ok(meta) = attribute.parse_meta() {
+                            if let syn::Meta::NameValue(name_value) = meta {
+                                if name_value.path.is_ident("Ident") {
+                                    if let syn::Lit::Str(str) = name_value.lit {
+                                        custom_ident = Some(str.value());
+                                    } else {
+                                        panic!("Expected string literal in Ident attribute")
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+
                     let variant = variant.ident;
-                    let variant_string = variant.to_string().to_lowercase();
+                    let variant_string = custom_ident.unwrap_or_else(|| variant.to_string().to_lowercase());
 
                     quote! {
                         #variant_string => #name::#variant

@@ -8,7 +8,7 @@ pub use uber_state::{UberState, VUberState, UberIdentifier, UberType};
 
 use decorum::R32;
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use seedgen_derive::VVariant;
+use seedgen_derive::{VVariant, FromStr};
 
 use std::{
     fmt,
@@ -17,16 +17,14 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::header::{V, VResolve};
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, seedgen_derive::FromStr)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum NumericBool {
     False,
     True,
 }
 
-#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Zone {
     Marsh = 0,

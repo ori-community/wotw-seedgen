@@ -3,7 +3,6 @@ use std::fmt;
 use seedgen_derive::VVariant;
 
 use crate::util::{UberIdentifier, UberType};
-use crate::header::{V, VResolve};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub struct UberStateItem {

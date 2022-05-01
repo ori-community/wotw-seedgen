@@ -21,16 +21,15 @@ pub fn display_impl(input: syn::DeriveInput) -> TokenStream {
                 }
 
                 let fields = match variant.fields {
-                    syn::Fields::Named(fields) => fields.named,
+                    syn::Fields::Named(_) => return quote! { #name::#identifier { .. } => #display },
                     syn::Fields::Unnamed(fields) => fields.unnamed,
                     syn::Fields::Unit => return quote! { #name::#identifier => #display },
                 };
-                let field_storage = fields.iter().enumerate()
-                    .map(|(index, _)| syn::Ident::new(&format!("field_{}", index), quote::__private::Span::call_site()))
+                let eat_fields = iter::repeat("_")
+                    .take(fields.len())
                     .collect::<Vec<_>>();
-                let format_literal = format!("{} ({})", display, iter::repeat("{}").take(field_storage.len()).collect::<Vec<_>>().join(", "));
                 quote! {
-                    #name::#identifier(#(#field_storage),*) => return write!(f, #format_literal, #(#field_storage),*)
+                    #name::#identifier(#(#eat_fields),*) => #display
                 }
             }).collect::<Vec<_>>()
         },

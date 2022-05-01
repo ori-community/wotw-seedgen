@@ -7,6 +7,7 @@ mod slugstrings;
 use std::{error::Error, fmt, iter, collections::hash_map::DefaultHasher, hash::Hasher};
 
 use rand::distributions::{Distribution, Uniform};
+use seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize};
 
 use crate::{Preset, preset::WorldPreset};
@@ -424,7 +425,7 @@ impl Default for Spawn {
 /// Difficulties don't include glitches by default, these can be toggled through the Trick settings
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, seedgen_derive::FromStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, FromStr)]
 #[ParseFromIdentifier]
 pub enum Difficulty {
     Moki,
@@ -441,7 +442,7 @@ impl Default for Difficulty {
 /// This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, seedgen_derive::FromStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, FromStr)]
 #[ParseFromIdentifier]
 pub enum Trick {
     /// Grounded Sentry Jumps with Sword
@@ -528,7 +529,7 @@ impl Goal {
 }
 
 /// Different types of online games that can be automatically created when generating the seed
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, seedgen_derive::FromStr)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromStr)]
 #[ParseFromIdentifier]
 pub enum CreateGame {
     /// Don't create an online game

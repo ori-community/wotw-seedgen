@@ -1,8 +1,9 @@
 use num_enum::TryFromPrimitive;
+use seedgen_derive::FromStr;
 
 use crate::{util::Icon, settings::Difficulty};
 
-#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Skill {
     Bash = 0,

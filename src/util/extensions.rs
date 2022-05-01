@@ -1,6 +1,9 @@
 use std::{iter::FusedIterator, ops::Range};
 
 pub(crate) trait StrExtension {
+    /// Returns an iterator over the lines of a string, as [`Range`]s to index into the string
+    /// 
+    /// Unlike the `lines` method on [`str`], this will include trailing newlines
     fn line_ranges(&self) -> LineRanges;
 }
 impl StrExtension for str {

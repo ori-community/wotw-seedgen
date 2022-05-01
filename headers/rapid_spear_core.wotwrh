@@ -4,22 +4,22 @@
 /// Adds support for toggleable Rapid Spear
 /// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
-!!name 8|9|12|byte|+1 #Rapid Spear#
-!!display 8|9|12|byte|+1 $[(9|999=404)]
-!!description 8|9|12|byte|+1 Spear attacks are faster
-!!icon 8|9|12|byte|+1 file:assets/icons/bonus/rapidspear.png
+!!name 8|9|12|byte|+1 "#Rapid Spear#"
+!!display 8|9|12|byte|+1 "$[(9|999=404)]"
+!!description 8|9|12|byte|+1 "Spear attacks are faster"
+!!icon 8|9|12|byte|+1 file:"assets/icons/bonus/rapidspear.png"
 
 // skip-validate
 9|0=199|4|17|9|117|1|8|9|0|int|204      // Add wheel toggle
-9|0=204|16|0|1|4|Toggle Rapid Spear
-9|0=204|4|17|9|118|1|16|1|1|4|[Ability1]Toggle off
-9|0=204|4|17|9|118|0|16|1|1|4|[Ability1]Toggle on
-9|0=204|16|2|1|4|file:assets/icons/bonus/rapidspear.png
+9|0=204|16|0|1|4|"Toggle Rapid Spear"
+9|0=204|4|17|9|118|1|16|1|1|4|"[Ability1]Toggle off"
+9|0=204|4|17|9|118|0|16|1|1|4|"[Ability1]Toggle on"
+9|0=204|16|2|1|4|file:"assets/icons/bonus/rapidspear.png"
 9|0=204|4|17|9|118|1|16|3|1|4|255|255|255|255
 9|0=204|4|17|9|118|0|16|3|1|4|128|128|128|196
 9|0=204|16|4|1|4|0|8|9|0|int|55
 
-9|999=404|6|#Rapid Spear x$(9|12)#      // display name
+9|999=404|6|"#Rapid Spear x$(9|12)#"      // display name
 
 9|12|4|25|1|8|9|118|bool|true           // set to default enabled
 9|12|4|26|100|8|9|12|byte|100|skip=1    // cap at 100

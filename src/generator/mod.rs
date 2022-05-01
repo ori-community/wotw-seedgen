@@ -8,7 +8,7 @@ use rand::{
 
 use crate::{
     inventory::Inventory,
-    item::{Item, Resource, Skill, Teleporter, Command, ShopCommand},
+    item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message},
     settings::{Difficulty, Goal}, util::{
         self,
         UberState, UberType,
@@ -166,7 +166,7 @@ where
             let description = origin_details.and_then(|details| details.description.clone()).or_else(|| item.description());
             if description.is_some() {
                 let description_setter = Item::ShopCommand(ShopCommand::SetDescription {
-                    uber_state: uber_state.identifier.clone(),
+                    uber_identifier: uber_state.identifier.clone(),
                     description,
                 });
 
@@ -179,7 +179,7 @@ where
 
             if let Some(icon) = origin_details.and_then(|details| details.icon.clone()).or_else(|| item.icon()) {
                 let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
-                    uber_state: uber_state.identifier.clone(),
+                    uber_identifier: uber_state.identifier.clone(),
                     icon,
                 });
 
@@ -210,14 +210,14 @@ where
                 origin_world_context.placements.push(Placement {
                     node: Some(node),
                     uber_state: uber_state.clone(),
-                    item: Item::Message(name),
+                    item: Item::Message(Message::new(name)),
                 });
             }
         } else if let Some(display) = display.or(custom_name) {
             origin_world_context.placements.push(Placement {
                 node: Some(node),
                 uber_state: uber_state.clone(),
-                item: Item::Message(display),
+                item: Item::Message(Message::new(display)),
             });
         }
     } else {
@@ -230,9 +230,9 @@ where
         let state_index = context.multiworld_state_index.next().unwrap();
 
         let custom_name = custom_name.unwrap_or_else(|| format!("$[{}]", code));
-        let origin_message = Item::Message(format!("{}'s {}", target_player_name, custom_name));
+        let origin_message = Item::Message(Message::new(format!("{}'s {}", target_player_name, custom_name)));
         let send_item = UberState::from_parts("12" , &state_index.to_string())?.to_item(UberType::Bool);
-        let target_message = Item::Message(format!("{} from {}|mute", target_display.unwrap_or(custom_name), origin_player_name));
+        let target_message = Item::Message(Message::new(format!("{} from {}|mute", target_display.unwrap_or(custom_name), origin_player_name)));
         let target_uber_state = UberState::from_parts("12", &state_index.to_string())?;
 
         target_world_context.placements.push(Placement {
@@ -984,10 +984,13 @@ where
             for _ in 0..3 {
                 spawn_slots.push(spawn_pickup_node);
             }
+            let mut message = Message::new(String::new());
+            message.frames = Some(420);
+            message.instant = true;
             placements.push(Placement {
                 node: Some(spawn_pickup_node),
                 uber_state: UberState::spawn(),
-                item: Item::Message(String::from("f=420|instant")),
+                item: Item::Message(message),
             });
         }
 

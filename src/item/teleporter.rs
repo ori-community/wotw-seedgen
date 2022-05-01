@@ -1,6 +1,7 @@
 use num_enum::TryFromPrimitive;
+use seedgen_derive::FromStr;
 
-#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Teleporter {
     Marsh = 16,

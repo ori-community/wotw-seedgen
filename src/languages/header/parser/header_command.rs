@@ -1,140 +1,177 @@
 use std::str::FromStr;
 
-use crate::{VItem, util::Icon};
+use seedgen_derive::FromStr;
 
-use crate::header::{HeaderCommand, ParameterDefault, V, VString};
+use crate::VItem;
 
-fn parse_amount(item: &mut &str) -> V<i32> {
-    if let Some(index) = item.find("x ") {
-        let amount = item[..index].trim();
+use crate::header::{HeaderCommand, ParameterDefault, V, VString, ParameterType};
+use crate::header::tokenizer::TokenKind;
 
-        if let Ok(amount) = V::try_wrap(amount) {
-            *item = &item[index + 1..];
-            return amount;
-        }
-    }
-    V::Literal(1)
-}
-fn non_empty(s: &str) -> Option<String> {
-    if s.is_empty() {
-        return None;
-    }
-    Some(s.to_string())
-}
+use super::{Parser, ParseError, parse_ident, parse_number, parse_v_number, parse_string, parse_icon};
 
-fn include_command(include: &str) -> Result<HeaderCommand, String> {
-    let name = non_empty(include).ok_or_else(|| "missing name in include command".to_string())?;
-    Ok(HeaderCommand::Include { name })
-}
-fn exclude_command(exclude: &str) -> Result<HeaderCommand, String> {
-    let name = non_empty(exclude).ok_or_else(|| "missing name in exclude command".to_string())?;
-    Ok(HeaderCommand::Exclude { name })
-}
-fn add_command(mut item: &str) -> Result<HeaderCommand, String> {
-    let amount = parse_amount(&mut item);
-    let item = VItem::parse(item)?;
-
-    Ok(HeaderCommand::Add { item, amount })
-}
-fn remove_command(mut item: &str) -> Result<HeaderCommand, String> {
-    let amount = parse_amount(&mut item);
-    let item = VItem::parse(item)?;
-
-    Ok(HeaderCommand::Remove { item, amount })
-}
-fn name_command(naming: &str) -> Result<HeaderCommand, String> {
-    let (item, name) = naming.split_once(' ').ok_or_else(|| "missing name".to_string())?;
-    let item = VItem::parse(item)?;
-    let name = non_empty(name).ok_or_else(|| "missing display name".to_string())?;
-    let name = VString(name);
-
-    Ok(HeaderCommand::Name { item, name })
-}
-fn display_command(display: &str) -> Result<HeaderCommand, String> {
-    let (item, name) = display.split_once(' ').ok_or_else(|| "missing display name".to_string())?;
-    let item = VItem::parse(item)?;
-    let name = non_empty(name).ok_or_else(|| "missing display name".to_string())?;
-    let name = VString(name);
-
-    Ok(HeaderCommand::Display { item, name })
-}
-fn description_command(description: &str) -> Result<HeaderCommand, String> {
-    let (item, description) = description.split_once(' ').ok_or_else(|| "missing description".to_string())?;
-    let item = VItem::parse(item)?;
-    let description = non_empty(description).ok_or_else(|| "missing description".to_string())?;
-    let description = VString(description);
-
-    Ok(HeaderCommand::Description { item, description })
-}
-fn price_command(price: &str) -> Result<HeaderCommand, String> {
-    let (item, price) = price.split_once(' ').ok_or_else(|| "missing price".to_string())?;
-    let item = VItem::parse(item)?;
-    let price = V::try_wrap(price).map_err(|_| format!("invalid price {price}"))?;
-
-    Ok(HeaderCommand::Price { item, price })
-}
-fn icon_command(icon: &str) -> Result<HeaderCommand, String> {
-    let (item, icon) = icon.split_once(' ').ok_or_else(|| "missing icon".to_string())?;
-    let item = VItem::parse(item)?;
-    let icon = Icon::parse(icon)?;
-
-    Ok(HeaderCommand::Icon { item, icon })
-}
-fn parameter_command(parameter: &str) -> Result<HeaderCommand, String> {
-    let (identifier, default) = parameter.split_once(' ').ok_or_else(|| "missing default value".to_string())?;
-    let identifier = non_empty(identifier).ok_or_else(|| "missing identifier".to_string())?;
-
-    let default = ParameterDefault::from_str(default)?;
-
-    Ok(HeaderCommand::Parameter { identifier, default })
-}
-fn set_command(identifier: &str) -> Result<HeaderCommand, String> {
-    let state = non_empty(identifier).ok_or_else(|| "missing identifier".to_string())?;
-
-    Ok(HeaderCommand::Set { state })
-}
-fn if_command(comparison: &str) -> Result<HeaderCommand, String> {
-    let (parameter, value) = comparison.split_once(' ').ok_or_else(|| "missing default value".to_string())?;
-    let parameter = non_empty(parameter).ok_or_else(|| "missing parameter".to_string())?;
-    let value = non_empty(value).ok_or_else(|| "missing value".to_string())?;
-
-    Ok(HeaderCommand::If { parameter, value })
-}
-fn endif_command() -> HeaderCommand {
-    HeaderCommand::EndIf
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum HeaderCommandKind {
+    Include,
+    Exclude,
+    Add,
+    Remove,
+    Name,
+    Display,
+    Description,
+    Price,
+    Icon,
+    Parameter,
+    Set,
+    #[Ident = "if"] StartIf,
+    EndIf,
 }
 
 impl HeaderCommand {
-    pub fn parse(command: &str) -> Result<HeaderCommand, String> {
-        let command = if let Some(include) = command.strip_prefix("include ") {
-            include_command(include.trim())?
-        } else if let Some(exclude) = command.strip_prefix("exclude ") {
-            exclude_command(exclude.trim())?
-        } else if let Some(item) = command.strip_prefix("add ") {
-            add_command(item.trim()).map_err(|err| format!("{err} in add command {command}"))?
-        } else if let Some(item) = command.strip_prefix("remove ") {
-            remove_command(item.trim()).map_err(|err| format!("{err} in remove command {command}"))?
-        } else if let Some(naming) = command.strip_prefix("name ") {
-            name_command(naming.trim()).map_err(|err| format!("{err} in name command {command}"))?
-        } else if let Some(display) = command.strip_prefix("display ") {
-            display_command(display.trim()).map_err(|err| format!("{err} in display command {command}"))?
-        } else if let Some(description) = command.strip_prefix("description ") {
-            description_command(description.trim()).map_err(|err| format!("{err} in description command {command}"))?
-        } else if let Some(price) = command.strip_prefix("price ") {
-            price_command(price.trim()).map_err(|err| format!("{err} in price command {command}"))?
-        } else if let Some(icon) = command.strip_prefix("icon ") {
-            icon_command(icon.trim()).map_err(|err| format!("{err} in icon command {command}"))?
-        } else if let Some(parameter) = command.strip_prefix("parameter ") {
-            parameter_command(parameter.trim()).map_err(|err| format!("{err} in parameter command {command}"))?
-        } else if let Some(identifier) = command.strip_prefix("set ") {
-            set_command(identifier.trim()).map_err(|err| format!("{err} in set command {command}"))?
-        } else if let Some(comparison) = command.strip_prefix("if ") {
-            if_command(comparison.trim()).map_err(|err| format!("{err} in if command {command}"))?
-        } else if command.trim_end() == "endif" {
-            endif_command()
-        } else {
-            return Err(format!("Unknown command {command}"));
-        };
-        Ok(command)
+    pub fn parse(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+        let kind = parse_ident!(parser, "header command");
+        match kind {
+            HeaderCommandKind::Include => parse_include(parser),
+            HeaderCommandKind::Exclude => parse_exclude(parser),
+            HeaderCommandKind::Add => parse_add(parser),
+            HeaderCommandKind::Remove => parse_remove(parser),
+            HeaderCommandKind::Name => parse_name(parser),
+            HeaderCommandKind::Display => parse_display(parser),
+            HeaderCommandKind::Description => parse_description(parser),
+            HeaderCommandKind::Price => parse_price(parser),
+            HeaderCommandKind::Icon => parse_icon_command(parser),
+            HeaderCommandKind::Parameter => parse_parameter(parser),
+            HeaderCommandKind::Set => parse_set(parser),
+            HeaderCommandKind::StartIf => parse_if(parser),
+            HeaderCommandKind::EndIf => Ok(HeaderCommand::EndIf),
+        }
     }
+}
+impl FromStr for HeaderCommand {
+    type Err = String;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let mut parser = Parser::new(input);
+        let command = HeaderCommand::parse(&mut parser).map_err(|err| parser.error_display(err))?;
+        let remaining = parser.remaining();
+        if remaining.is_empty() {
+            Ok(command)
+        } else {
+            Err(format!("Input left after parsing command: \"{remaining}\""))
+        }
+    }
+}
+
+fn parse_item_amount(parser: &mut Parser) -> Result<V<i32>, ParseError> {
+    if match parser.current_token().kind {
+        TokenKind::Number => {
+            let peeked = parser.peek_token();
+            if peeked.kind == TokenKind::Ident {
+                let range = peeked.range.clone();
+                parser.read(range) == "x"
+            } else { false }
+        },
+        TokenKind::Dollar => true,
+        _ => false,
+    } {
+        let amount = parse_v_number!(parser, "amount");
+        parser.next_token();
+        parser.skip(TokenKind::Whitespace);
+        return Ok(amount);
+    }
+    Ok(V::Literal(1))
+}
+
+fn parse_include(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let name = parse_ident!(parser, "");
+    Ok(HeaderCommand::Include { name })
+}
+fn parse_exclude(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let name = parse_ident!(parser, "");
+    Ok(HeaderCommand::Exclude { name })
+}
+fn parse_add(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let amount = parse_item_amount(parser)?;
+    let item = VItem::parse(parser)?;
+    Ok(HeaderCommand::Add { item, amount })
+}
+fn parse_remove(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let amount = parse_item_amount(parser)?;
+    let item = VItem::parse(parser)?;
+    Ok(HeaderCommand::Remove { item, amount })
+}
+fn parse_name(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let item = VItem::parse(parser)?;
+    parser.eat(TokenKind::Whitespace)?;
+    let name = VString(parse_string(parser)?.to_owned());
+    Ok(HeaderCommand::Name { item, name })
+}
+fn parse_display(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let item = VItem::parse(parser)?;
+    parser.eat(TokenKind::Whitespace)?;
+    let name = VString(parse_string(parser)?.to_owned());
+    Ok(HeaderCommand::Display { item, name })
+}
+fn parse_description(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let item = VItem::parse(parser)?;
+    parser.eat(TokenKind::Whitespace)?;
+    let description = VString(parse_string(parser)?.to_owned());
+    Ok(HeaderCommand::Description { item, description })
+}
+fn parse_price(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let item = VItem::parse(parser)?;
+    parser.eat(TokenKind::Whitespace)?;
+    let price = parse_v_number!(parser, "price");
+    Ok(HeaderCommand::Price { item, price })
+}
+fn parse_icon_command(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let item = VItem::parse(parser)?;
+    parser.eat(TokenKind::Whitespace)?;
+    let icon = parse_icon(parser)?;
+    Ok(HeaderCommand::Icon { item, icon })
+}
+fn parse_parameter(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let identifier = parse_ident!(parser, "");
+    parser.eat(TokenKind::Whitespace)?;
+    let parameter_type = parse_ident!(parser, "parameter type");
+    parser.eat(TokenKind::Colon)?;
+    let default = match parameter_type {
+        ParameterType::Bool => ParameterDefault::Bool(parse_ident!(parser, "default value")),
+        ParameterType::Int => ParameterDefault::Int(parse_number!(parser, "default value")),
+        ParameterType::Float => ParameterDefault::Float(parse_number!(parser, "default value")),
+        ParameterType::String => ParameterDefault::String(parse_string(parser)?.to_owned()),
+    };
+    Ok(HeaderCommand::Parameter { identifier, default })
+}
+fn parse_set(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let mut state = String::new();
+    loop {
+        let token = parser.eat(TokenKind::Ident)?;
+        state.push_str(parser.read_token(&token));
+        if parser.current_token().kind == TokenKind::Dot {
+            state.push('.');
+            parser.next_token();
+        } else {
+            break;
+        }
+    }
+    Ok(HeaderCommand::Set { state })
+}
+fn parse_if(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat(TokenKind::Whitespace)?;
+    let parameter = parse_ident!(parser, "");
+    parser.eat(TokenKind::Whitespace)?;
+    let token = parser.next_token();
+    let value = parser.read_token(&token).to_owned();
+    Ok(HeaderCommand::If { parameter, value })
 }

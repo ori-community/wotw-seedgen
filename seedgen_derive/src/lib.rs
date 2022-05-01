@@ -7,7 +7,7 @@ mod v;
 use proc_macro::TokenStream;
 use syn;
 
-#[proc_macro_derive(FromStr, attributes(ParseFromIdentifier))]
+#[proc_macro_derive(FromStr, attributes(ParseFromIdentifier, Ident))]
 pub fn from_str_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse_macro_input!(input);
     from_str::from_str_impl(ast)

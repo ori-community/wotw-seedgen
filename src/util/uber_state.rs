@@ -3,7 +3,6 @@ use std::fmt;
 use seedgen_derive::VVariant;
 
 use crate::item::{Item, UberStateItem, UberStateOperator};
-use crate::header::{V, VResolve};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum UberType {

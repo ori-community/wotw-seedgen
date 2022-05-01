@@ -1,20 +1,20 @@
 /// Launch Fragments
 ///
 /// Five Launch Fragments are scattered around the world. The third gives Launch.
-Flags: Launch Fragments
+Flags: "Launch Fragments"
 !!include header_core
 //// How many Launch Fragments to shuffle in
 !!parameter count int:5
 //// How many Launch Fragments are required to get Launch
 !!parameter required int:3
 
-!!name 8|9|2|int|+1 *Launch Fragment*
-!!display 8|9|2|int|+1 $[(9|999=200)]
-!!icon 8|9|2|int|+1 file:assets/icons/bonus/launchfragment.png
+!!name 8|9|2|int|+1 "*Launch Fragment*"
+!!display 8|9|2|int|+1 "$[(9|999=200)]"
+!!icon 8|9|2|int|+1 file:"assets/icons/bonus/launchfragment.png"
 !!add $PARAM(count)x 8|9|2|int|+1                                                       // Scatter fragments
 !9|2|4|17|9|2|$PARAM(required)|2|8                                                      // Give Launch (out of logic)
-9|2=$PARAM(count)|6|f=0
+9|2=$PARAM(count)|6|""|f=0
 9|2=$PARAM(count)|2|8                                                                   // Give logical Launch
-9|999=200|4|19|9|2|$PARAM(required)|6|*Launch Fragments* ($(9|2)/$PARAM(required))      // Progress message
-9|999=200|4|18|9|2|$PARAM(required)|6|*Launch Fragments* $($(9|2)/$PARAM(required))$    // Show it in green if the player found enough
-9|999=200|4|17|9|2|$PARAM(required)|6|*Launch Fragments* $($PARAM(required)/$PARAM(required))$
+9|999=200|4|19|9|2|$PARAM(required)|6|"*Launch Fragments* ($(9|2)/$PARAM(required))"      // Progress message
+9|999=200|4|18|9|2|$PARAM(required)|6|"*Launch Fragments* $($(9|2)/$PARAM(required))$"    // Show it in green if the player found enough
+9|999=200|4|17|9|2|$PARAM(required)|6|"*Launch Fragments* $($PARAM(required)/$PARAM(required))$"

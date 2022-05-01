@@ -1,846 +1,694 @@
-use std::{str::FromStr, convert::TryFrom};
-
-use decorum::R32;
+use num_enum::TryFromPrimitive;
+use seedgen_derive::FromStr;
 
 use crate::{
     VItem,
-    item::{Resource, Skill, Shard, VCommand, Teleporter, BonusItem, BonusUpgrade, ToggleCommand, SysMessage, VWheelCommand, WheelBind, VShopCommand, VUberStateItem, VUberStateOperator, VUberStateRange, VUberStateRangeBoundary},
-    util::{Zone, Icon, VUberState, UberType, UberIdentifier, VPosition, NumericBool},
-    header::{V, VString},
+    item::{VCommand, SysMessage, VWheelCommand, VShopCommand, VUberStateItem, VUberStateOperator, VUberStateRange, VUberStateRangeBoundary, VMessage, WheelItemPosition},
+    util::{VUberState, UberType, UberIdentifier, VPosition},
+    header::{V, VString, tokenizer::TokenKind},
 };
 
-use super::{parse_uber_identifier, parse_uber_state};
-
-fn parse_v_uber_state_condition<'a, P>(parts: &mut P) -> Result<VUberState, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
-    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
-    let identifier = UberIdentifier::from_parts(uber_group, uber_id)?;
-
-    let value = parts.next().ok_or_else(|| String::from("missing uber value"))?;
-    let value = V::wrap(value);
-
-    Ok(VUberState { identifier, value })
-}
-fn parse_v_position<'a, P>(parts: &mut P) -> Result<VPosition, String>
-where P: Iterator<Item=&'a str>
-{
-    let x = parts.next().ok_or_else(|| String::from("missing x coordinate"))?;
-    let x = V::try_wrap(x).map_err(|_| format!("invalid x coordinate {x}"))?;
-    let y = parts.next().ok_or_else(|| String::from("missing y coordinate"))?;
-    let y = V::try_wrap(y).map_err(|_| format!("invalid y coordinate {y}"))?;
-
-    Ok(VPosition { x, y })
-}
-
-fn end_of_item<'a, I>(mut parts: I) -> Result<(), String>
-where
-    I: Iterator<Item = &'a str>,
-{
-    if parts.next().is_some() { return Err(String::from("too many parts")); }
-    Ok(())
-}
-
-fn parse_spirit_light<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let spirit_light = parts.next().ok_or_else(|| String::from("missing spirit light amount"))?;
-    end_of_item(parts)?;
-    if let Some(spirit_light) = spirit_light.strip_prefix('-') {
-        let spirit_light = V::try_wrap(spirit_light).map_err(|_| format!("invalid spirit light amount {spirit_light}"))?;
-        Ok(VItem::RemoveSpiritLight(spirit_light))
-    } else {
-        let spirit_light = V::try_wrap(spirit_light).map_err(|_| format!("invalid spirit light amount {spirit_light}"))?;
-        Ok(VItem::SpiritLight(spirit_light))
-    }
-}
-fn parse_resource<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let resource_type = parts.next().ok_or_else(|| String::from("missing resource type"))?;
-    end_of_item(parts)?;
-    let resource_type: u8 = resource_type.parse().map_err(|_| format!("invalid resource type {resource_type}"))?;
-    let resource = Resource::try_from(resource_type).map_err(|_| format!("invalid resource type {resource_type}"))?;
-    Ok(VItem::Resource(resource))
-}
-fn parse_skill<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let skill_type = parts.next().ok_or_else(|| String::from("missing skill type"))?;
-    end_of_item(parts)?;
-    if let Some(skill_type) = skill_type.strip_prefix('-') {
-        let skill_type: u8 = skill_type.parse().map_err(|_| format!("invalid skill type {skill_type}"))?;
-        let skill = Skill::try_from(skill_type).map_err(|_| format!("invalid skill type {skill_type}"))?;
-        Ok(VItem::RemoveSkill(skill))
-    } else {
-        let skill_type: u8 = skill_type.parse().map_err(|_| format!("invalid skill type {skill_type}"))?;
-        let skill = Skill::try_from(skill_type).map_err(|_| format!("invalid skill type {skill_type}"))?;
-        Ok(VItem::Skill(skill))
-    }
-}
-fn parse_shard<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let shard_type = parts.next().ok_or_else(|| String::from("missing shard type"))?;
-    end_of_item(parts)?;
-    if let Some(shard_type) = shard_type.strip_prefix('-') {
-        let shard_type: u8 = shard_type.parse().map_err(|_| format!("invalid shard type {shard_type}"))?;
-        let shard = Shard::try_from(shard_type).map_err(|_| format!("invalid shard type {shard_type}"))?;
-        Ok(VItem::RemoveShard(shard))
-    } else {
-        let shard_type: u8 = shard_type.parse().map_err(|_| format!("invalid shard type {shard_type}"))?;
-        let shard = Shard::try_from(shard_type).map_err(|_| format!("invalid shard type {shard_type}"))?;
-        Ok(VItem::Shard(shard))
-    }
-}
-fn parse_autosave<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    end_of_item(parts)?;
-    Ok(VItem::Command(VCommand::Autosave))
-}
-fn parse_set_resource<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let resource = parts.next().ok_or_else(|| String::from("missing resource type"))?;
-    let resource: u8 = resource.parse().map_err(|_| format!("invalid resource type {resource}"))?;
-    let resource = Resource::try_from(resource).map_err(|_| format!("invalid resource type {resource}"))?;
-    let amount = parts.next().ok_or_else(|| String::from("missing resource amount"))?;
-    let amount = V::try_wrap(amount).map_err(|_| format!("invalid resource amount {amount}"))?;
-    end_of_item(parts)?;
-    Ok(VItem::Command(VCommand::Resource { resource, amount }))
-}
-fn parse_checkpoint<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    end_of_item(parts)?;
-    Ok(VItem::Command(VCommand::Checkpoint))
-}
-fn parse_magic<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    end_of_item(parts)?;
-    Ok(VItem::Command(VCommand::Magic))
-}
-fn parse_stop<'a, P>(mut parts: P) -> Result<VUberState, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_v_uber_state_condition(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(uber_state)
-}
-fn parse_stop_equal<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_stop(parts)?;
-    Ok(VItem::Command(VCommand::StopEqual { uber_state }))
-}
-fn parse_stop_greater<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_stop(parts)?;
-    Ok(VItem::Command(VCommand::StopGreater { uber_state }))
-}
-fn parse_stop_less<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_stop(parts)?;
-    Ok(VItem::Command(VCommand::StopLess { uber_state }))
-}
-fn parse_toggle<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let toggle_type = parts.next().ok_or_else(|| String::from("missing toggle command type"))?;
-    let toggle_type: u8 = toggle_type.parse().map_err(|_| format!("invalid toggle command type {toggle_type}"))?;
-    let toggle_type = ToggleCommand::try_from(toggle_type).map_err(|_| format!("invalid toggle command type {toggle_type}"))?;
-    let on = parts.next().ok_or_else(|| String::from("missing toggle command value"))?;
-    let on = V::<NumericBool>::try_wrap(on).map_err(|_| format!("invalid toggle command value {on}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::Toggle { target: toggle_type, on }))
-}
-fn parse_warp<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let position = parse_v_position(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::Warp { position }))
-}
-fn parse_timer<'a, P>(mut parts: P) -> Result<UberIdentifier, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_identifier = parse_uber_identifier(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(uber_identifier)
-}
-fn parse_start_timer<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let identifier = parse_timer(parts)?;
-    Ok(VItem::Command(VCommand::StartTimer { identifier }))
-}
-fn parse_stop_timer<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let identifier = parse_timer(parts)?;
-    Ok(VItem::Command(VCommand::StopTimer { identifier }))
-}
-fn parse_intercept<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let intercept = parts.next().ok_or_else(|| String::from("missing intercept"))?;
-    let intercept = intercept.parse().map_err(|_| format!("invalid intercept {intercept}"))?;
-    let set = parts.next().ok_or_else(|| String::from("missing set"))?;
-    let set = set.parse().map_err(|_| format!("invalid set {set}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::StateRedirect { intercept, set }))
-}
-fn parse_set_player<'a, P>(mut parts: P) -> Result<V<i16>, String>
-where P: Iterator<Item=&'a str>
-{
-    let amount = parts.next().ok_or_else(|| String::from("missing amount"))?;
-    let amount = V::try_wrap(amount).map_err(|_| format!("invalid amount {amount}"))?;
-    end_of_item(parts)?;
-
-    Ok(amount)
-}
-fn parse_set_health<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let amount = parse_set_player(parts)?;
-    Ok(VItem::Command(VCommand::SetHealth { amount }))
-}
-fn parse_set_energy<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let amount = parse_set_player(parts)?;
-    Ok(VItem::Command(VCommand::SetEnergy { amount }))
-}
-fn parse_set_spirit_light<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let amount = parse_set_player(parts)?;
-    Ok(VItem::Command(VCommand::SetSpiritLight { amount }))
-}
-fn parse_equip<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let slot = parts.next().ok_or_else(|| String::from("missing equip slot"))?;
-    let slot = V::try_wrap(slot).map_err(|_| format!("invalid equip slot {slot}"))?;
-    let ability = parts.next().ok_or_else(|| String::from("missing ability to equip"))?;
-    let ability: u16 = ability.parse().map_err(|_| format!("invalid ability to equip {ability}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::Equip { slot, ability }))
-}
-fn parse_ahk_signal<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let signal = parts.next().ok_or_else(|| String::from("missing ahk signal specifier"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::AhkSignal { signal: signal.to_string() }))
-}
-fn parse_if<'a, P>(mut parts: P) -> Result<(VUberState, Box<VItem>), String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_v_uber_state_condition(&mut parts)?;
-
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok((uber_state, item))
-}
-fn parse_if_equal<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (uber_state, item) = parse_if(parts)?;
-    Ok(VItem::Command(VCommand::IfEqual { uber_state, item }))
-}
-fn parse_if_greater<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (uber_state, item) = parse_if(parts)?;
-    Ok(VItem::Command(VCommand::IfGreater { uber_state, item }))
-}
-fn parse_if_less<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (uber_state, item) = parse_if(parts)?;
-    Ok(VItem::Command(VCommand::IfLess { uber_state, item }))
-}
-fn parse_disable_sync<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_state(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::DisableSync { uber_state }))
-}
-fn parse_enable_sync<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_state(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::DisableSync { uber_state }))
-}
-fn parse_create_warp<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let id = parts.next().ok_or_else(|| String::from("missing warp id"))?;
-    let id = id.parse().map_err(|_| format!("invalid warp id {id}"))?;
-    let position = parse_v_position(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::CreateWarp { id, position }))
-}
-fn parse_destroy_warp<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let id = parts.next().ok_or_else(|| String::from("missing warp id"))?;
-    let id = id.parse().map_err(|_| format!("invalid warp id {id}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::DestroyWarp { id }))
-}
-fn parse_if_box<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let position1 = parse_v_position(&mut parts)?;
-    let position2 = parse_v_position(&mut parts)?;
-
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok(VItem::Command(VCommand::IfBox { position1, position2, item }))
-}
-fn parse_if_self<'a, P>(mut parts: P) -> Result<(V<String>, Box<VItem>), String>
-where P: Iterator<Item=&'a str>
-{
-    let value = parts.next().ok_or_else(|| String::from("missing uber value"))?;
-    let value = V::wrap(value);
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok((value, item))
-}
-fn parse_if_self_equal<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (value, item) = parse_if_self(parts)?;
-    Ok(VItem::Command(VCommand::IfSelfEqual { value, item }))
-}
-fn parse_if_self_greater<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (value, item) = parse_if_self(parts)?;
-    Ok(VItem::Command(VCommand::IfSelfGreater { value, item }))
-}
-fn parse_if_self_less<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (value, item) = parse_if_self(parts)?;
-    Ok(VItem::Command(VCommand::IfSelfLess { value, item }))
-}
-fn parse_unequip<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let ability = parts.next().ok_or_else(|| String::from("missing ability to unequip"))?;
-    let ability: u16 = ability.parse().map_err(|_| format!("invalid ability to unequip {ability}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::UnEquip { ability }))
-}
-fn parse_save_string<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let id = parts.next().ok_or_else(|| String::from("missing database id"))?;
-    let id = id.parse().map_err(|_| String::from("invalid database id"))?;
-    let string = parts.next().ok_or_else(|| String::from("missing string"))?;
-    let string = VString(string.to_owned());
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::SaveString { id, string }))
-}
-fn parse_append_string<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let id = parts.next().ok_or_else(|| String::from("missing database id"))?;
-    let id = id.parse().map_err(|_| String::from("invalid database id"))?;
-    let string = parts.next().ok_or_else(|| String::from("missing string"))?;
-    let string = VString(string.to_owned());
-    end_of_item(parts)?;
-
-    Ok(VItem::Command(VCommand::AppendString { id, string }))
-}
-fn parse_command<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let command_type = parts.next().ok_or_else(|| String::from("missing command item type"))?;
-    match command_type {
-        "0" => parse_autosave(parts),
-        "1" => parse_set_resource(parts),
-        "2" => parse_checkpoint(parts),
-        "3" => parse_magic(parts),
-        "4" => parse_stop_equal(parts),
-        "5" => parse_stop_greater(parts),
-        "6" => parse_stop_less(parts),
-        "7" => parse_toggle(parts),
-        "8" => parse_warp(parts),
-        "9" => parse_start_timer(parts),
-        "10" => parse_stop_timer(parts),
-        "11" => parse_intercept(parts),
-        "12" => parse_set_health(parts),
-        "13" => parse_set_energy(parts),
-        "14" => parse_set_spirit_light(parts),
-        "15" => parse_equip(parts),
-        "16" => parse_ahk_signal(parts),
-        "17" => parse_if_equal(parts),
-        "18" => parse_if_greater(parts),
-        "19" => parse_if_less(parts),
-        "20" => parse_disable_sync(parts),
-        "21" => parse_enable_sync(parts),
-        "22" => parse_create_warp(parts),
-        "23" => parse_destroy_warp(parts),
-        "24" => parse_if_box(parts),
-        "25" => parse_if_self_equal(parts),
-        "26" => parse_if_self_greater(parts),
-        "27" => parse_if_self_less(parts),
-        "28" => parse_unequip(parts),
-        "29" => parse_save_string(parts),
-        "30" => parse_append_string(parts),
-        _ => Err(format!("invalid command type {command_type}")),
-    }
-}
-fn parse_teleporter<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let teleporter_type = parts.next().ok_or_else(|| String::from("missing teleporter type"))?;
-    end_of_item(parts)?;
-    if let Some(teleporter_type) = teleporter_type.strip_prefix('-') {
-        let teleporter_type: u8 = teleporter_type.parse().map_err(|_| format!("invalid teleporter type {teleporter_type}"))?;
-        let teleporter = Teleporter::try_from(teleporter_type).map_err(|_| format!("invalid teleporter type {teleporter_type}"))?;
-        Ok(VItem::RemoveTeleporter(teleporter))
-    } else {
-        let teleporter_type: u8 = teleporter_type.parse().map_err(|_| format!("invalid teleporter type {teleporter_type}"))?;
-        let teleporter = Teleporter::try_from(teleporter_type).map_err(|_| format!("invalid teleporter type {teleporter_type}"))?;
-        Ok(VItem::Teleporter(teleporter))
-    }
-}
-fn parse_message<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let parts = parts.collect::<Vec<&str>>();
-    if parts.is_empty() {
-        return Err(String::from("missing message"));
-    }
-
-    let message = VString(parts.join("|"));
-    Ok(VItem::Message(message))
-}
-fn parse_pointer(str: &str) -> Option<Result<UberIdentifier, String>> {
-    if let Some(str) = str.strip_prefix("$(") {
-        if let Some(pointer) = str.strip_suffix(')') {
-            let mut parts = pointer.splitn(2, '|');
-            let uber_group = parts.next().unwrap();
-            if let Some(uber_id) = parts.next() {
-                return Some(UberIdentifier::from_parts(uber_group, uber_id));
-            } else {
-                return Some(Err(format!("Invalid uber identifier in pointer {pointer}")));
-            }
-        } else {
-            return Some(Err(String::from("unmatched brackets")))
-        }
-    }
-
-    None
-}
-fn parse_set_uber_state<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_group = parts.next().ok_or_else(|| String::from("missing uber group"))?;
-    let uber_id = parts.next().ok_or_else(|| String::from("missing uber id"))?;
-    let uber_identifier = UberIdentifier::from_parts(uber_group, uber_id)?;
-
-    let uber_type = parts.next().ok_or_else(|| String::from("missing uber state type"))?;
-    let uber_type = UberType::from_str(uber_type)?;
-
-    let mut remaining = &parts.into_iter().collect::<Vec<_>>().join("|")[..];
-
-    let mut signed = false;
-    let mut sign = false;
-    if remaining.starts_with('+') {
-        signed = true;
-        sign = true;
-    } else if remaining.starts_with('-') {
-        signed = true;
-    }
-    if signed {
-        if matches!(uber_type, UberType::Bool) { return Err(String::from("can't math with bools")); }
-        remaining = &remaining[1..];
-    }
-
-    let mut skip = false;
-    if let Some(last) = remaining.rfind('|') {
-        let mut last_part = &remaining[last + 1..];
-        if let Some(skip) = last_part.strip_prefix("skip=") {
-            last_part = skip;
-        }
-        if let Ok(skip_amount) = last_part.parse::<u8>() {
-            if skip_amount > 0 {
-                if skip_amount > 1 {
-                    log::warn!("An UberState pickup is skipping the next {last_part} triggers, note that this will not be correctly simulated during seed generation.");
-                }
-                skip = true;
-            }
-            remaining = &remaining[..last];
-        }
-    }
-
-    let parse_by_value = |value: &str| -> Result<(), String> {
-        match uber_type {
-            UberType::Bool | UberType::Teleporter => { value.parse::<bool>().map_err(|_| format!("invalid value {value} as boolean"))?; },
-            UberType::Byte => { value.parse::<u8>().map_err(|_| format!("invalid value {value} as byte"))?; },
-            UberType::Int => { value.parse::<i32>().map_err(|_| format!("invalid value {value} as integer"))?; },
-            UberType::Float => { value.parse::<R32>().map_err(|_| format!("invalid value {value} as floating point"))?; },
-        }
-        Ok(())
-    };
-
-    let operator = if let Some(range) = remaining.strip_prefix('[') {
-        if let Some(range) = range.strip_suffix(']') {
-            let mut parts = range.splitn(2, ',');
-            let start = parts.next().unwrap().trim();
-            let end = parts.next().ok_or("missing range end")?.trim();
-
-            let parse_boundary = |value| -> Result<_, String> {
-                if let Some(uber_identifier) = parse_pointer(value) {
-                    Ok(VUberStateRangeBoundary::Pointer(uber_identifier?))
-                } else {
-                    parse_by_value(value)?;
-                    Ok(VUberStateRangeBoundary::Value(V::wrap(value)))
-                }
-            };
-
-            let start = parse_boundary(start)?;
-            let end = parse_boundary(end)?;
-            Ok(VUberStateOperator::Range(VUberStateRange {
-                start,
-                end,
-            }))
-        } else {
-            Err(String::from("unmatched brackets"))
-        }
-    } else if let Some(pointer) = parse_pointer(remaining) {
-        Ok(VUberStateOperator::Pointer(pointer?))
-    } else {
-        parse_by_value(remaining)?;
-        Ok(VUberStateOperator::Value(V::wrap(remaining)))
-    }?;
-
-    Ok(VItem::UberState(VUberStateItem {
-        uber_identifier,
-        uber_type,
-        signed,
-        sign,
-        operator,
-        skip,
-    }))
-}
-fn parse_world_event<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let world_event_type = parts.next().ok_or_else(|| String::from("missing world event type"))?;
-    end_of_item(parts)?;
-    if let Some(world_event_type) = world_event_type.strip_prefix('-') {
-        let world_event_type: u8 = world_event_type.parse().map_err(|_| format!("invalid world event type {world_event_type}"))?;
-        if world_event_type != 0 { return Err(format!("invalid world event type {world_event_type}")); }
-        Ok(VItem::RemoveWater)
-    } else {
-        let world_event_type: u8 = world_event_type.parse().map_err(|_| format!("invalid world event type {world_event_type}"))?;
-        if world_event_type != 0 { return Err(format!("invalid world event type {world_event_type}")); }
-        Ok(VItem::Water)
-    }
-}
-fn parse_bonus_item<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let bonus_type = parts.next().ok_or_else(|| String::from("missing bonus item type"))?;
-    end_of_item(parts)?;
-    let bonus_type: u8 = bonus_type.parse().map_err(|_| format!("invalid bonus item type {bonus_type}"))?;
-    let bonus = BonusItem::try_from(bonus_type).map_err(|_| format!("invalid bonus item type {bonus_type}"))?;
-    Ok(VItem::BonusItem(bonus))
-}
-fn parse_bonus_upgrade<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let bonus_type = parts.next().ok_or_else(|| String::from("missing bonus upgrade type"))?;
-    end_of_item(parts)?;
-    let bonus_type: u8 = bonus_type.parse().map_err(|_| format!("invalid bonus upgrade type {bonus_type}"))?;
-    let bonus = BonusUpgrade::try_from(bonus_type).map_err(|_| format!("invalid bonus upgrade type {bonus_type}"))?;
-    Ok(VItem::BonusUpgrade(bonus))
-}
-fn parse_zone_hint() -> Result<VItem, String> {
-    Err(String::from("Hint Items are deprecated"))
-}
-fn parse_checkable_hint() -> Result<VItem, String> {
-    Err(String::from("Hint Items are deprecated"))
-}
-fn parse_relic<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let zone = parts.next().ok_or_else(|| String::from("missing relic zone"))?;
-    end_of_item(parts)?;
-
-    let zone: u8 = zone.parse().map_err(|_| format!("invalid relic zone {zone}"))?;
-    let zone = Zone::try_from(zone).map_err(|_| format!("invalid relic zone {zone}"))?;
-
-    Ok(VItem::Relic(zone))
-}
-fn parse_sysmessage<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let message = parts.next().ok_or_else(|| String::from("missing sysmessage type"))?;
-    end_of_item(parts)?;
-
-    let message: u8 = message.parse().map_err(|_| format!("invalid sysmessage type {message}"))?;
-    let message = SysMessage::from_id(message).ok_or_else(|| format!("invalid sysmessage type {message}"))?;
-
-    Ok(VItem::SysMessage(message))
-}
-fn parse_wheel_item_position<'a, P>(parts: &mut P) -> Result<(u16, u8), String>
-where P: Iterator<Item=&'a str>
-{
-    let wheel = parts.next().ok_or_else(|| String::from("missing wheel id"))?;
-    let wheel = wheel.parse().map_err(|_| format!("invalid wheel id {wheel}"))?;
-    let position = parts.next().ok_or_else(|| String::from("missing wheel item position"))?;
-    let position = position.parse().map_err(|_| format!("invalid wheel item position {position}"))?;
-
-    Ok((wheel, position))
-}
-fn parse_wheel_set_name<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-
-    let parts = parts.collect::<Vec<&str>>();
-    if parts.is_empty() {
-        return Err(String::from("missing name"));
-    }
-    let name = VString(parts.join("|"));
-
-    Ok(VItem::WheelCommand(VWheelCommand::SetName { wheel, position, name }))
-}
-fn parse_wheel_set_description<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-
-    let parts = parts.collect::<Vec<&str>>();
-    if parts.is_empty() {
-        return Err(String::from("missing description"));
-    }
-    let description = VString(parts.join("|"));
-
-    Ok(VItem::WheelCommand(VWheelCommand::SetDescription { wheel, position, description }))
-}
-fn parse_wheel_set_icon<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-    let icon = parts.next().ok_or_else(|| String::from("missing icon"))?;
-    let icon = Icon::parse(icon)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::WheelCommand(VWheelCommand::SetIcon { wheel, position, icon }))
-}
-fn parse_wheel_set_color<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-    let r = parts.next().ok_or_else(|| String::from("missing red channel"))?;
-    let r = V::try_wrap(r).map_err(|_| format!("invalid red channel {r}"))?;
-    let g = parts.next().ok_or_else(|| String::from("missing green channel"))?;
-    let g = V::try_wrap(g).map_err(|_| format!("invalid green channel {g}"))?;
-    let b = parts.next().ok_or_else(|| String::from("missing blue channel"))?;
-    let b = V::try_wrap(b).map_err(|_| format!("invalid blue channel {b}"))?;
-    let a = parts.next().ok_or_else(|| String::from("missing alpha channel"))?;
-    let a = V::try_wrap(a).map_err(|_| format!("invalid alpha channel {a}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::WheelCommand(VWheelCommand::SetColor { wheel, position, r, g, b, a }))
-
-}
-fn parse_wheel_set_item<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-    let bind = parts.next().ok_or_else(|| String::from("missing bind"))?;
-    let bind = match bind {
-        "0" => WheelBind::All,
-        "1" => WheelBind::Ability1,
-        "2" => WheelBind::Ability2,
-        "3" => WheelBind::Ability3,
-        _ => return Err(format!("invalid bind {bind}")),
-    };
-
-    let item = Box::new(parse_item_parts(parts)?);
-
-    Ok(VItem::WheelCommand(VWheelCommand::SetItem { wheel, position, bind, item }))
-}
-fn parse_wheel_set_sticky<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let wheel = parts.next().ok_or_else(|| String::from("missing wheel id"))?;
-    let wheel = wheel.parse().map_err(|_| format!("invalid wheel id {wheel}"))?;
-    let sticky = parts.next().ok_or_else(|| String::from("missing sticky boolean"))?;
-    let sticky = V::try_wrap(sticky).map_err(|_| format!("invalid sticky boolean {sticky}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::WheelCommand(VWheelCommand::SetSticky { wheel, sticky }))
-}
-fn parse_wheel_switch_wheel<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let wheel = parts.next().ok_or_else(|| String::from("missing wheel id"))?;
-    let wheel = wheel.parse().map_err(|_| format!("invalid wheel id {wheel}"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::WheelCommand(VWheelCommand::SwitchWheel { wheel }))
-}
-fn parse_wheel_remove_item<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let (wheel, position) = parse_wheel_item_position(&mut parts)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::WheelCommand(VWheelCommand::RemoveItem { wheel, position }))
-}
-fn parse_wheel_clear_all<'a, P>(parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    end_of_item(parts)?;
-
-    Ok(VItem::WheelCommand(VWheelCommand::ClearAll))
-}
-fn parse_wheelcommand<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let command_type = parts.next().ok_or_else(|| String::from("missing wheel command type"))?;
-    match command_type {
-        "0" => parse_wheel_set_name(parts),
-        "1" => parse_wheel_set_description(parts),
-        "2" => parse_wheel_set_icon(parts),
-        "3" => parse_wheel_set_color(parts),
-        "4" => parse_wheel_set_item(parts),
-        "5" => parse_wheel_set_sticky(parts),
-        "6" => parse_wheel_switch_wheel(parts),
-        "7" => parse_wheel_remove_item(parts),
-        "8" => parse_wheel_clear_all(parts),
-        _ => Err(format!("invalid wheel command type {command_type}")),
-    }
-}
-fn parse_shop_set_icon<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_identifier(&mut parts)?;
-
-    let icon = parts.next().ok_or_else(|| String::from("missing icon"))?;
-    let icon = Icon::parse(icon)?;
-    end_of_item(parts)?;
-
-    Ok(VItem::ShopCommand(VShopCommand::SetIcon { uber_state, icon }))
-}
-fn parse_shop_set_title<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_identifier(&mut parts)?;
-
-    let title = parts.next().map(str::to_owned).map(VString);
-    end_of_item(parts)?;
-
-    Ok(VItem::ShopCommand(VShopCommand::SetTitle { uber_state, title }))
-}
-fn parse_shop_set_description<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_identifier(&mut parts)?;
-
-    let description = parts.next().map(str::to_owned).map(VString);
-    end_of_item(parts)?;
-
-    Ok(VItem::ShopCommand(VShopCommand::SetDescription { uber_state, description }))
-}
-fn parse_shop_set_locked<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_identifier(&mut parts)?;
-
-    let locked = parts.next().ok_or_else(|| String::from("missing locked"))?;
-    let locked = V::try_wrap(locked).map_err(|_| format!("Invalid value {locked} for boolean locked"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::ShopCommand(VShopCommand::SetLocked { uber_state, locked }))
-}
-fn parse_shop_set_visible<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let uber_state = parse_uber_identifier(&mut parts)?;
-
-    let visible = parts.next().ok_or_else(|| String::from("missing visible"))?;
-    let visible = V::try_wrap(visible).map_err(|_| format!("Invalid value {visible} for boolean visible"))?;
-    end_of_item(parts)?;
-
-    Ok(VItem::ShopCommand(VShopCommand::SetVisible { uber_state, visible }))
-}
-fn parse_shopcommand<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let command_type = parts.next().ok_or_else(|| String::from("missing shop command type"))?;
-    match command_type {
-        "0" => parse_shop_set_icon(parts),
-        "1" => parse_shop_set_title(parts),
-        "2" => parse_shop_set_description(parts),
-        "3" => parse_shop_set_locked(parts),
-        "4" => parse_shop_set_visible(parts),
-        _ => Err(format!("invalid shop command type {command_type}")),
-    }
-}
-
-fn parse_item_parts<'a, P>(mut parts: P) -> Result<VItem, String>
-where P: Iterator<Item=&'a str>
-{
-    let item_type = parts.next().unwrap_or("tried to parse empty item");
-    match item_type {
-        "0" => parse_spirit_light(parts),
-        "1" => parse_resource(parts),
-        "2" => parse_skill(parts),
-        "3" => parse_shard(parts),
-        "4" => parse_command(parts),
-        "5" => parse_teleporter(parts),
-        "6" => parse_message(parts),
-        "8" => parse_set_uber_state(parts),
-        "9" => parse_world_event(parts),
-        "10" => parse_bonus_item(parts),
-        "11" => parse_bonus_upgrade(parts),
-        "12" => parse_zone_hint(),
-        "13" => parse_checkable_hint(),
-        "14" => parse_relic(parts),
-        "15" => parse_sysmessage(parts),
-        "16" => parse_wheelcommand(parts),
-        "17" => parse_shopcommand(parts),
-        _ => Err(format!("invalid item type {item_type}")),
-    }
-}
+use super::{Parser, ParseError, parse_string, parse_number, parse_removable_number, parse_value, parse_ident, parse_v_ident, parse_v_number, parse_v_removable_number, parse_uber_identifier, parse_icon};
 
 impl VItem {
     /// Parse item syntax
-    pub fn parse(item: &str) -> Result<VItem, String> {
-        let parts = item.trim().split('|');
-
-        parse_item_parts(parts).map_err(|err| format!("{err} in item {item}"))
+    pub(crate) fn parse(parser: &mut Parser) -> Result<VItem, ParseError> {
+        parse_item(parser)
     }
+}
+
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum ItemKind {
+    SpiritLight = 0,
+    Resource = 1,
+    Skill = 2,
+    Shard = 3,
+    Command = 4,
+    Teleporter = 5,
+    Message = 6,
+    UberState = 8,
+    Water = 9,
+    BonusItem = 10,
+    BonusUpgrade = 11,
+    Relic = 14,
+    SysMessage = 15,
+    WheelCommand = 16,
+    ShopCommand = 17,
+}
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum CommandKind {
+    Autosave = 0,
+    Resource = 1,
+    Checkpoint = 2,
+    Magic = 3,
+    StopEqual = 4,
+    StopGreater = 5,
+    StopLess = 6,
+    Toggle = 7,
+    Warp = 8,
+    StartTimer = 9,
+    StopTimer = 10,
+    StateRedirect = 11,
+    SetHealth = 12,
+    SetEnergy = 13,
+    SetSpiritLight = 14,
+    Equip = 15,
+    AhkSignal = 16,
+    IfEqual = 17,
+    IfGreater = 18,
+    IfLess = 19,
+    DisableSync = 20,
+    EnableSync = 21,
+    CreateWarp = 22,
+    DestroyWarp = 23,
+    IfBox = 24,
+    IfSelfEqual = 25,
+    IfSelfGreater = 26,
+    IfSelfLess = 27,
+    UnEquip = 28,
+    SaveString = 29,
+    AppendString = 30,
+}
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum WorldEventKind {
+    Water = 0,
+}
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum SysMessageKind {
+    RelicList = 0,
+    MapRelicList = 1,
+    PickupCount = 2,
+    GoalProgress = 3,
+}
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum WheelCommandKind {
+    SetName = 0,
+    SetDescription = 1,
+    SetIcon = 2,
+    SetColor = 3,
+    SetItem = 4,
+    SetSticky = 5,
+    SwitchWheel = 6,
+    RemoveItem = 7,
+    ClearAll = 8,
+}
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum ShopCommandKind {
+    SetIcon = 0,
+    SetTitle = 1,
+    SetDescription = 2,
+    SetLocked = 3,
+    SetVisible = 4,
+}
+
+fn parse_v_uber_state_condition(parser: &mut Parser) -> Result<VUberState, ParseError> {
+    let identifier = parse_uber_identifier(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let value = parse_v_number!(parser, "");
+    Ok(VUberState { identifier, value })
+}
+
+fn parse_v_position(parser: &mut Parser) -> Result<VPosition, ParseError> {
+    let x = parse_v_number!(parser, "x coordinate");
+    parser.eat(TokenKind::Separator)?;
+    let y = parse_v_number!(parser, "y coordinate");
+    Ok(VPosition { x, y })
+}
+
+fn parse_item(parser: &mut Parser) -> Result<VItem, ParseError> {
+    let kind = parse_number!(parser, "item kind");
+    match kind {
+        ItemKind::SpiritLight => parse_spirit_light(parser),
+        ItemKind::Resource => parse_resource(parser),
+        ItemKind::Skill => parse_skill(parser),
+        ItemKind::Shard => parse_shard(parser),
+        ItemKind::Command => parse_command(parser),
+        ItemKind::Teleporter => parse_teleporter(parser),
+        ItemKind::Message => parse_message(parser),
+        ItemKind::UberState => parse_set_uber_state(parser),
+        ItemKind::Water => parse_water(parser),
+        ItemKind::BonusItem => parse_bonus_item(parser),
+        ItemKind::BonusUpgrade => parse_bonus_upgrade(parser),
+        ItemKind::Relic => parse_relic(parser),
+        ItemKind::SysMessage => parse_sys_message(parser),
+        ItemKind::WheelCommand => parse_wheel_command(parser),
+        ItemKind::ShopCommand => parse_shop_command(parser),
+    }
+}
+
+fn parse_spirit_light(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let (amount, remove) = parse_v_removable_number!(parser, "spirit light amount");
+    let item = if remove {
+        VItem::RemoveSpiritLight(amount)
+    } else {
+        VItem::SpiritLight(amount)
+    };
+    Ok(item)
+}
+fn parse_resource(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let resource = parse_number!(parser, "resource");
+    Ok(VItem::Resource(resource))
+}
+fn parse_skill(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let (skill, remove) = parse_removable_number!(parser, "skill");
+    let item = if remove {
+        VItem::RemoveSkill(skill)
+    } else {
+        VItem::Skill(skill)
+    };
+    Ok(item)
+}
+fn parse_shard(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let (shard, remove) = parse_removable_number!(parser, "shard");
+    let item = if remove {
+        VItem::RemoveShard(shard)
+    } else {
+        VItem::Shard(shard)
+    };
+    Ok(item)
+}
+fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let kind = parse_number!(parser, "command kind");
+    let command = match kind {
+        CommandKind::Autosave => Ok(VCommand::Autosave),
+        CommandKind::Resource => parse_set_resource(parser),
+        CommandKind::Checkpoint => Ok(VCommand::Checkpoint),
+        CommandKind::Magic => Ok(VCommand::Magic),
+        CommandKind::StopEqual => parse_stop_equal(parser),
+        CommandKind::StopGreater => parse_stop_greater(parser),
+        CommandKind::StopLess => parse_stop_less(parser),
+        CommandKind::Toggle => parse_toggle(parser),
+        CommandKind::Warp => parse_warp(parser),
+        CommandKind::StartTimer => parse_start_timer(parser),
+        CommandKind::StopTimer => parse_stop_timer(parser),
+        CommandKind::StateRedirect => parse_intercept(parser),
+        CommandKind::SetHealth => parse_set_health(parser),
+        CommandKind::SetEnergy => parse_set_energy(parser),
+        CommandKind::SetSpiritLight => parse_set_spirit_light(parser),
+        CommandKind::Equip => parse_equip(parser),
+        CommandKind::AhkSignal => parse_ahk_signal(parser),
+        CommandKind::IfEqual => parse_if_equal(parser),
+        CommandKind::IfGreater => parse_if_greater(parser),
+        CommandKind::IfLess => parse_if_less(parser),
+        CommandKind::DisableSync => parse_disable_sync(parser),
+        CommandKind::EnableSync => parse_enable_sync(parser),
+        CommandKind::CreateWarp => parse_create_warp(parser),
+        CommandKind::DestroyWarp => parse_destroy_warp(parser),
+        CommandKind::IfBox => parse_if_box(parser),
+        CommandKind::IfSelfEqual => parse_if_self_equal(parser),
+        CommandKind::IfSelfGreater => parse_if_self_greater(parser),
+        CommandKind::IfSelfLess => parse_if_self_less(parser),
+        CommandKind::UnEquip => parse_unequip(parser),
+        CommandKind::SaveString => parse_save_string(parser),
+        CommandKind::AppendString => parse_append_string(parser),
+    }?;
+    Ok(VItem::Command(command))
+}
+fn parse_set_resource(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let resource = parse_number!(parser, "resource");
+    parser.eat(TokenKind::Separator)?;
+    let amount = parse_v_number!(parser, "resource amount");
+    Ok(VCommand::Resource { resource, amount })
+}
+fn parse_stop_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_state = parse_v_uber_state_condition(parser)?;
+    Ok(VCommand::StopEqual { uber_state })
+}
+fn parse_stop_greater(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_state = parse_v_uber_state_condition(parser)?;
+    Ok(VCommand::StopGreater { uber_state })
+}
+fn parse_stop_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_state = parse_v_uber_state_condition(parser)?;
+    Ok(VCommand::StopLess { uber_state })
+}
+fn parse_toggle(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let target = parse_number!(parser, "toggle command kind");
+    parser.eat(TokenKind::Separator)?;
+    let on = parse_v_number!(parser, "toggle command value");
+    Ok(VCommand::Toggle { target, on })
+}
+fn parse_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let position = parse_v_position(parser)?;
+    Ok(VCommand::Warp { position })
+}
+fn parse_start_timer(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let identifier = parse_uber_identifier(parser)?;
+    Ok(VCommand::StartTimer { identifier })
+}
+fn parse_stop_timer(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let identifier = parse_uber_identifier(parser)?;
+    Ok(VCommand::StopTimer { identifier })
+}
+fn parse_intercept(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let intercept = parse_number!(parser, "intercept");
+    parser.eat(TokenKind::Separator)?;
+    let set = parse_number!(parser, "set");
+    Ok(VCommand::StateRedirect { intercept, set })
+}
+fn parse_set_health(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let amount = parse_v_number!(parser, "health amount");
+    Ok(VCommand::SetHealth { amount })
+}
+fn parse_set_energy(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let amount = parse_v_number!(parser, "health amount");
+    Ok(VCommand::SetEnergy { amount })
+}
+fn parse_set_spirit_light(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let amount = parse_v_number!(parser, "health amount");
+    Ok(VCommand::SetSpiritLight { amount })
+}
+fn parse_equip(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let slot = parse_v_number!(parser, "equip slot");
+    parser.eat(TokenKind::Separator)?;
+    let ability = parse_number!(parser, "equipment");
+    Ok(VCommand::Equip { slot, ability })
+}
+fn parse_ahk_signal(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let token = parser.eat(TokenKind::Ident)?;
+    let signal = parser.read_token(&token).to_string();
+    Ok(VCommand::AhkSignal { signal })
+}
+fn parse_if_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_state = parse_v_uber_state_condition(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfEqual { uber_state, item })
+}
+fn parse_if_greater(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_state = parse_v_uber_state_condition(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfGreater { uber_state, item })
+}
+fn parse_if_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_state = parse_v_uber_state_condition(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfLess { uber_state, item })
+}
+fn parse_disable_sync(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_identifier = parse_uber_identifier(parser)?;
+    Ok(VCommand::DisableSync { uber_identifier })
+}
+fn parse_enable_sync(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_identifier = parse_uber_identifier(parser)?;
+    Ok(VCommand::EnableSync { uber_identifier })
+}
+fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let id = parse_number!(parser, "warp id");
+    parser.eat(TokenKind::Separator)?;
+    let position = parse_v_position(parser)?;
+    Ok(VCommand::CreateWarp { id, position })
+}
+fn parse_destroy_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let id = parse_number!(parser, "warp id");
+    Ok(VCommand::DestroyWarp { id })
+}
+fn parse_if_box(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let position1 = parse_v_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let position2 = parse_v_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfBox { position1, position2, item })
+}
+fn parse_if_self_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let value = parse_v_number!(parser, "");
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfSelfEqual { value, item })
+}
+fn parse_if_self_greater(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let value = parse_v_number!(parser, "");
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfSelfGreater { value, item })
+}
+fn parse_if_self_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let value = parse_v_number!(parser, "");
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VCommand::IfSelfLess { value, item })
+}
+fn parse_unequip(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let ability = parse_number!(parser, "equipment");
+    Ok(VCommand::UnEquip { ability })
+}
+fn parse_save_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let id = parse_number!(parser, "string id");
+    parser.eat(TokenKind::Separator)?;
+    let token = parser.eat(TokenKind::Number)?;
+    let string = VString(parser.read_token(&token).to_string());
+    Ok(VCommand::SaveString { id, string })
+}
+fn parse_append_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let id = parse_number!(parser, "string id");
+    parser.eat(TokenKind::Separator)?;
+    let token = parser.eat(TokenKind::Number)?;
+    let string = VString(parser.read_token(&token).to_string());
+    Ok(VCommand::AppendString { id, string })
+}
+fn parse_teleporter(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let (teleporter, remove) = parse_removable_number!(parser, "teleporter");
+    let item = if remove {
+        VItem::RemoveTeleporter(teleporter)
+    } else {
+        VItem::Teleporter(teleporter)
+    };
+    Ok(item)
+}
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum MessageFlag {
+    Mute,
+    F,
+    Instant,
+    Quiet,
+    P,
+    NoClear,
+}
+fn parse_message(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let message = VString(parse_string(parser)?.to_owned());
+    let mut message = VMessage::new(message);
+    while parser.current_token().kind == TokenKind::Separator {
+        let peeked = parser.peek_token();
+        if peeked.kind == TokenKind::Ident {
+            let range = peeked.range.clone();
+            if let Ok(flag) = parser.read(range).parse() {
+                parser.next_token();
+                parser.next_token();
+                match flag {
+                    MessageFlag::Mute => message.mute = true,
+                    MessageFlag::F => message.frames = Some(parse_value!(parser, "frames")),
+                    MessageFlag::Instant => message.instant = true,
+                    MessageFlag::Quiet => message.quiet = true,
+                    MessageFlag::P => message.pos = Some(parse_value!(parser, "position")),
+                    MessageFlag::NoClear => message.noclear = true,
+                }
+            } else { break }
+        } else { break }
+    }
+    Ok(VItem::Message(message))
+}
+fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let uber_identifier = parse_uber_identifier(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let uber_type = parse_ident!(parser, "uber state type");
+    parser.eat(TokenKind::Separator)?;
+
+    let (signed, sign) = match parser.current_token().kind {
+        TokenKind::Plus => {
+            parser.next_token();
+            (true, true)
+        },
+        TokenKind::Minus => {
+            parser.next_token();
+            (true, false)
+        },
+        _ => (false, false),
+    };
+
+    let token = parser.current_token().clone();
+    let operator = match token.kind {
+        TokenKind::OpenBracket => {
+            let start = parse_boundary(parser, &uber_type)?;
+            parser.eat(TokenKind::Comma)?;
+            let end = parse_boundary(parser, &uber_type)?;
+            parser.eat(TokenKind::CloseBracket)?;
+            VUberStateOperator::Range(VUberStateRange { start, end })
+        },
+        TokenKind::Dollar if parser.peek_token().kind == TokenKind::OpenParen => {
+            parser.next_token();
+            let identifier = parse_pointer(parser)?;
+            VUberStateOperator::Pointer(identifier)
+        },
+        TokenKind::Dollar | TokenKind::Number | TokenKind::Ident => {
+            let value = match uber_type {
+                UberType::Bool | UberType::Teleporter => { parse_v_ident!(parser, "boolean") },
+                UberType::Byte => { parse_v_number!(parser, "byte") },
+                UberType::Int => { parse_v_number!(parser, "integer") },
+                UberType::Float => { parse_v_number!(parser, "float") },
+            };
+            VUberStateOperator::Value(value)
+        },
+        _ => return Err(ParseError::new("expected uber state operator", token.range)),
+    };
+
+    let skip = if parser.current_token().kind == TokenKind::Separator {
+        let peeked = parser.peek_token();
+        loop {
+            let range = peeked.range.clone();
+            let should_consume_eq = match peeked.kind.clone() {
+                TokenKind::Ident if parser.read(range) == "skip" => true,
+                TokenKind::Number => false,
+                _ => { break 0 },
+            };
+            parser.next_token();
+            parser.next_token();
+            if should_consume_eq {
+                parser.eat(TokenKind::Eq)?;
+            }
+            let skip = parse_number!(parser, "skip amount");
+            break skip;
+        }
+    } else { 0 };
+
+    assert!(skip < 2);  // TODO decide on this
+    let skip = skip > 0;
+
+    Ok(VItem::UberState(VUberStateItem { uber_identifier, uber_type, signed, sign, operator, skip }))
+}
+fn parse_boundary(parser: &mut Parser, uber_type: &UberType) -> Result<VUberStateRangeBoundary, ParseError> {
+    let token = parser.current_token().clone();
+    let boundary = match token.kind {
+        TokenKind::Dollar if parser.peek_token().kind == TokenKind::OpenParen => {
+            parser.next_token();
+            let identifier = parse_pointer(parser)?;
+            VUberStateRangeBoundary::Pointer(identifier)
+        },
+        TokenKind::Dollar | TokenKind::Number | TokenKind::Ident => {
+            let value = match uber_type {
+                UberType::Bool | UberType::Teleporter => { parse_v_ident!(parser, "boolean") },
+                UberType::Byte => { parse_v_number!(parser, "byte") },
+                UberType::Int => { parse_v_number!(parser, "integer") },
+                UberType::Float => { parse_v_number!(parser, "float") },
+            };
+            VUberStateRangeBoundary::Value(value)
+        },
+        _ => return Err(ParseError::new("expected value or pointer", token.range)),
+    };
+    Ok(boundary)
+}
+fn parse_pointer(parser: &mut Parser) -> Result<UberIdentifier, ParseError> {
+    parser.eat(TokenKind::OpenParen)?;
+    let identifier = parse_uber_identifier(parser)?;
+    parser.eat(TokenKind::CloseParen)?;
+    Ok(identifier)
+}
+fn parse_water(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let (_, remove): (WorldEventKind, bool) = parse_removable_number!(parser, "world event");
+    let item = if remove {
+        VItem::RemoveWater
+    } else {
+        VItem::Water
+    };
+    Ok(item)
+}
+fn parse_bonus_item(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let bonus_item = parse_number!(parser, "bonus item");
+    Ok(VItem::BonusItem(bonus_item))
+}
+fn parse_bonus_upgrade(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let bonus_upgrade = parse_number!(parser, "bonus upgrade");
+    Ok(VItem::BonusUpgrade(bonus_upgrade))
+}
+fn parse_relic(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let zone = parse_number!(parser, "zone");
+    Ok(VItem::Relic(zone))
+}
+fn parse_sys_message(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let kind = parse_number!(parser, "system message kind");
+    let sys_message = match kind {
+        SysMessageKind::RelicList => SysMessage::RelicList,
+        SysMessageKind::MapRelicList => {
+            parser.eat(TokenKind::Separator)?;
+            let zone = parse_number!(parser, "zone");
+            SysMessage::MapRelicList(zone)
+        },
+        SysMessageKind::PickupCount => SysMessage::PickupCount,
+        SysMessageKind::GoalProgress => SysMessage::GoalProgress,
+    };
+    Ok(VItem::SysMessage(sys_message))
+}
+fn parse_wheel_command(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let kind = parse_number!(parser, "command kind");
+    let command = match kind {
+        WheelCommandKind::SetName => parse_wheel_set_name(parser),
+        WheelCommandKind::SetDescription => parse_wheel_set_description(parser),
+        WheelCommandKind::SetIcon => parse_wheel_set_icon(parser),
+        WheelCommandKind::SetColor => parse_wheel_set_color(parser),
+        WheelCommandKind::SetItem => parse_wheel_set_item(parser),
+        WheelCommandKind::SetSticky => parse_wheel_set_sticky(parser),
+        WheelCommandKind::SwitchWheel => parse_wheel_switch_wheel(parser),
+        WheelCommandKind::RemoveItem => parse_wheel_remove_item(parser),
+        WheelCommandKind::ClearAll => Ok(VWheelCommand::ClearAll),
+    }?;
+    Ok(VItem::WheelCommand(command))
+}
+fn parse_wheel_item_position(parser: &mut Parser) -> Result<(u32, WheelItemPosition), ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let wheel = parse_number!(parser, "wheel identifier");
+    parser.eat(TokenKind::Separator)?;
+    let position = parse_number!(parser, "wheel item position");
+    Ok((wheel, position))
+}
+fn parse_wheel_set_name(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    let (wheel, position) = parse_wheel_item_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let name = VString(parse_string(parser)?.to_owned());
+    Ok(VWheelCommand::SetName { wheel, position, name })
+}
+fn parse_wheel_set_description(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    let (wheel, position) = parse_wheel_item_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let description = VString(parse_string(parser)?.to_owned());
+    Ok(VWheelCommand::SetDescription { wheel, position, description })
+}
+fn parse_wheel_set_icon(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    let (wheel, position) = parse_wheel_item_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let icon = parse_icon(parser)?;
+    Ok(VWheelCommand::SetIcon { wheel, position, icon })
+}
+fn parse_wheel_set_color(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    let (wheel, position) = parse_wheel_item_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let r = parse_v_number!(parser, "red color channel");
+    parser.eat(TokenKind::Separator)?;
+    let g = parse_v_number!(parser, "red color channel");
+    parser.eat(TokenKind::Separator)?;
+    let b = parse_v_number!(parser, "red color channel");
+    parser.eat(TokenKind::Separator)?;
+    let a = parse_v_number!(parser, "red color channel");
+    Ok(VWheelCommand::SetColor { wheel, position, r, g, b, a })
+}
+fn parse_wheel_set_item(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    let (wheel, position) = parse_wheel_item_position(parser)?;
+    parser.eat(TokenKind::Separator)?;
+    let bind = parse_number!(parser, "wheel bind");
+    parser.eat(TokenKind::Separator)?;
+    let item = Box::new(parse_item(parser)?);
+    Ok(VWheelCommand::SetItem { wheel, position, bind, item })
+}
+fn parse_wheel_set_sticky(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let wheel = parse_number!(parser, "wheel identifier");
+    parser.eat(TokenKind::Separator)?;
+    let sticky = parse_v_ident!(parser, "sticky value");
+    Ok(VWheelCommand::SetSticky { wheel, sticky })
+}
+fn parse_wheel_switch_wheel(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let wheel = parse_number!(parser, "wheel identifier");
+    Ok(VWheelCommand::SwitchWheel { wheel })
+}
+fn parse_wheel_remove_item(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
+    let (wheel, position) = parse_wheel_item_position(parser)?;
+    Ok(VWheelCommand::RemoveItem { wheel, position })
+}
+fn parse_shop_command(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let kind = parse_number!(parser, "command kind");
+    parser.eat(TokenKind::Separator)?;
+    let uber_identifier = parse_uber_identifier(parser)?;
+    let command = match kind {
+        ShopCommandKind::SetIcon => parse_shop_set_icon(parser, uber_identifier),
+        ShopCommandKind::SetTitle => parse_shop_set_title(parser, uber_identifier),
+        ShopCommandKind::SetDescription => parse_shop_set_description(parser, uber_identifier),
+        ShopCommandKind::SetLocked => parse_shop_set_locked(parser, uber_identifier),
+        ShopCommandKind::SetVisible => parse_shop_set_visible(parser, uber_identifier),
+    }?;
+    Ok(VItem::ShopCommand(command))
+}
+fn parse_optional_string(parser: &mut Parser) -> Result<Option<VString>, ParseError> {
+    let string = if parser.current_token().kind == TokenKind::Separator {
+        if matches!(parser.peek_token().kind, TokenKind::String { .. }) {
+            parser.next_token();
+            let string = VString(parse_string(parser)?.to_owned());
+            Some(string)
+        } else { None }
+    } else { None };
+    Ok(string)
+}
+fn parse_shop_set_icon(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let icon = parse_icon(parser)?;
+    Ok(VShopCommand::SetIcon { uber_identifier, icon })
+}
+fn parse_shop_set_title(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
+    let title = parse_optional_string(parser)?;
+    Ok(VShopCommand::SetTitle { uber_identifier, title })
+}
+fn parse_shop_set_description(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
+    let description = parse_optional_string(parser)?;
+    Ok(VShopCommand::SetDescription { uber_identifier, description })
+}
+fn parse_shop_set_locked(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let locked = parse_v_ident!(parser, "sticky value");
+    Ok(VShopCommand::SetLocked { uber_identifier, locked })
+}
+fn parse_shop_set_visible(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
+    parser.eat(TokenKind::Separator)?;
+    let visible = parse_v_ident!(parser, "visible value");
+    Ok(VShopCommand::SetVisible { uber_identifier, visible })
 }

@@ -1,7 +1,7 @@
 /// No Willow Hearts
 ///
 /// Start with the final door in Willow's End open
-Flags: No Willow Hearts
+Flags: "No Willow Hearts"
 
 3|0|8|16155|42976|bool|true  // WillowsEnd.GlideHeart
 3|0|8|16155|54940|bool|true  // WillowsEnd.SpinLasersHeart

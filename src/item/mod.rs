@@ -3,6 +3,7 @@ mod skill;
 mod shard;
 mod command;
 mod teleporter;
+mod message;
 mod uber_state;
 mod bonus_item;
 mod bonus_upgrade;
@@ -12,10 +13,13 @@ mod wheel_command;
 mod shop_command;
 
 use std::fmt;
+use std::str::FromStr;
 
+use rustc_hash::FxHashMap;
 use seedgen_derive::VVariant;
 
-use crate::header::{V, VResolve, VString};
+use crate::header::parser::Parser;
+use crate::header::VResolve;
 use crate::settings::Difficulty;
 use crate::util::{Zone, Icon};
 
@@ -25,12 +29,13 @@ pub use self::{
     shard::Shard,
     command::{Command, VCommand, ToggleCommand, EquipSlot},
     teleporter::Teleporter,
+    message::{Message, VMessage},
     uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary},
     bonus_item::BonusItem,
     bonus_upgrade::BonusUpgrade,
     hint::{Hint, ZoneHintType},
     sysmessage::SysMessage,
-    wheel_command::{WheelCommand, VWheelCommand, WheelBind},
+    wheel_command::{WheelCommand, VWheelCommand, WheelItemPosition, WheelBind},
     shop_command::{ShopCommand, VShopCommand},
 };
 
@@ -46,7 +51,7 @@ pub enum Item {
     Command(#[VType] Command),
     Teleporter(Teleporter),
     RemoveTeleporter(Teleporter),
-    Message(#[VType] String),
+    Message(#[VType] Message),
     UberState(#[VType] UberStateItem),
     Water,
     RemoveWater,
@@ -71,35 +76,7 @@ impl fmt::Display for Item {
             Item::Command(command) => write!(f, "4|{}", command),
             Item::Teleporter(teleporter) => write!(f, "{} TP", teleporter),
             Item::RemoveTeleporter(teleporter) => write!(f, "Remove {} TP", teleporter),
-            Item::Message(message) => {
-                let mut message = message.clone();
-                let mut last_index = 0;
-
-                while let Some(mut start_index) = message[last_index..].find("$[") {
-                    start_index += last_index;
-                    last_index = start_index;
-                    let after_bracket = start_index + 2;
-                    let mut end_index = 0;
-
-                    let mut depth = 1;
-                    for (index, byte) in message[after_bracket..].bytes().enumerate() {
-                        if byte == b'[' { depth += 1; }
-                        if byte == b']' { depth -= 1; }
-                        if depth == 0 {
-                            end_index = after_bracket + index;
-                            break;
-                        }
-                    }
-                    if end_index == 0 { break; }
-
-                    let item = &message[after_bracket..end_index];
-                    if let Ok(item) = Item::parse(item) {
-                        message.replace_range(start_index..=end_index, &item.to_string());
-                    } else { last_index = end_index; } // if nothing ends up getting replaced, move on
-                }
-
-                write!(f, "{}", message)
-            },
+            Item::Message(message) => write!(f, "{message}"),
             Item::UberState(command) => write!(f, "8|{}", command),
             Item::Water => write!(f, "Clean Water"),
             Item::RemoveWater => write!(f, "Remove Clean Water"),
@@ -109,6 +86,21 @@ impl fmt::Display for Item {
             Item::SysMessage(message) => write!(f, "{}", message),
             Item::WheelCommand(command) => write!(f, "16|{}", command),
             Item::ShopCommand(command) => write!(f, "17|{}", command),
+        }
+    }
+}
+impl FromStr for Item {
+    type Err = String;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let mut parser = Parser::new(input);
+        let item = VItem::parse(&mut parser)
+            .map_err(|err| parser.error_display(err))?
+            .resolve(&FxHashMap::default())?;
+        let remaining = parser.remaining();
+        if remaining.is_empty() {
+            Ok(item)
+        } else {
+            Err(format!("Input left after parsing item: \"{remaining}\""))
         }
     }
 }
@@ -260,7 +252,7 @@ impl Item {
             Item::Command(command) => format!("4|{}", command),
             Item::Teleporter(teleporter) => format!("5|{}", *teleporter as u8),
             Item::RemoveTeleporter(teleporter) => format!("5|-{}", *teleporter as u8),
-            Item::Message(message) => format!("6|{}", message),
+            Item::Message(message) => format!("6|{}", message.code()),
             Item::UberState(command) => format!("8|{}", command),
             Item::Water => String::from("9|0"),
             Item::RemoveWater => String::from("9|-0"),
@@ -316,6 +308,6 @@ mod tests {
         assert_eq!(Item::Water.code(), "9|0");
         assert_eq!(Item::BonusItem(BonusItem::Relic).code(), "10|20");
         assert_eq!(Item::BonusUpgrade(BonusUpgrade::ShurikenEfficiency).code(), "11|4");
-        assert_eq!(Item::Message(String::from("8|0|9|7")).code(), "6|8|0|9|7");
+        assert_eq!(Item::Message(Message::new(String::from("8|0|9|7"))).code(), "6|8|0|9|7");
     }
 }

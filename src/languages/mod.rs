@@ -1,6 +1,6 @@
 pub mod logic;
 pub mod header;
-pub mod seed;
+mod cursor;
 
 pub use self::{
     logic::parse_logic,

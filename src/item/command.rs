@@ -1,11 +1,11 @@
 use std::fmt;
 
 use num_enum::TryFromPrimitive;
-use seedgen_derive::VVariant;
+use seedgen_derive::{VVariant, FromStr};
 
 use super::{Item, VItem, Resource};
 use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool};
-use crate::header::{V, VResolve, VString};
+use crate::header::VString;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum Command {
@@ -29,8 +29,8 @@ pub enum Command {
     IfEqual { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
     IfGreater { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
     IfLess { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
-    DisableSync { uber_state: UberState },
-    EnableSync { uber_state: UberState },
+    DisableSync { uber_identifier: UberIdentifier },
+    EnableSync { uber_identifier: UberIdentifier },
     CreateWarp { id: u8, #[VType] position: Position },
     DestroyWarp { id: u8 },
     IfBox { #[VType] position1: Position, #[VType] position2: Position, #[VType] item: Box<Item> },
@@ -64,8 +64,8 @@ impl fmt::Display for Command {
             Command::IfEqual { uber_state, item } => write!(f, "17|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
             Command::IfGreater { uber_state, item } => write!(f, "18|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
             Command::IfLess { uber_state, item } => write!(f, "19|{}|{}|{}", uber_state.identifier, uber_state.value, item.code()),
-            Command::DisableSync { uber_state } => write!(f, "20|{}", uber_state.identifier),
-            Command::EnableSync { uber_state } => write!(f, "21|{}", uber_state.identifier),
+            Command::DisableSync { uber_identifier } => write!(f, "20|{}", uber_identifier),
+            Command::EnableSync { uber_identifier } => write!(f, "21|{}", uber_identifier),
             Command::CreateWarp { id, position } => write!(f, "22|{}|{}", id, position.code()),
             Command::DestroyWarp { id } => write!(f, "23|{}", id),
             Command::IfBox { position1, position2, item } => write!(f, "24|{}|{}|{}", position1.code(), position2.code(), item.code()),
@@ -79,7 +79,7 @@ impl fmt::Display for Command {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum ToggleCommand {
     KwolokDoor,
@@ -96,7 +96,7 @@ impl fmt::Display for ToggleCommand {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, seedgen_derive::FromStr)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum EquipSlot {
     Ability1,

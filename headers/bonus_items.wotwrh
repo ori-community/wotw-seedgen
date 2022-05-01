@@ -1,7 +1,7 @@
 /// Bonus Items
 ///
 /// Shuffles items unique to the randomizer into the world
-Flags: Bonus Items
+Flags: "Bonus Items"
 //// How many Health Regen to shuffle in
 !!parameter healthRegen int:3
 //// How many Energy Regen to shuffle in

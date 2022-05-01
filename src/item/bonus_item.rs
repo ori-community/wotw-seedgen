@@ -1,8 +1,9 @@
 use num_enum::TryFromPrimitive;
+use seedgen_derive::FromStr;
 
 use crate::util::Icon;
 
-#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive)]
+#[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum BonusItem {
     Relic = 20,
