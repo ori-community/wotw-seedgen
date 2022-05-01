@@ -7,7 +7,6 @@ mod message;
 mod uber_state;
 mod bonus_item;
 mod bonus_upgrade;
-mod hint;
 mod sysmessage;
 mod wheel_command;
 mod shop_command;
@@ -33,7 +32,6 @@ pub use self::{
     uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary},
     bonus_item::BonusItem,
     bonus_upgrade::BonusUpgrade,
-    hint::{Hint, ZoneHintType},
     sysmessage::SysMessage,
     wheel_command::{WheelCommand, VWheelCommand, WheelItemPosition, WheelBind},
     shop_command::{ShopCommand, VShopCommand},
