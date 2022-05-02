@@ -11885,6 +11885,7 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
     moki: UpperWastes.LeverDoor, Burrow
 
 # checkpoint at 2037, -3751
+# Should there be an anchor here?
 
 anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser spinner
   refill Checkpoint
@@ -11914,6 +11915,7 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
     unsafe:
       Burrow, Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after abashing the mantis a second time
       Burrow, Sword OR Shuriken=3
+      Burrow, SentryJump=1
 
   conn UpperWastes.NorthTP:
     moki: Burrow
