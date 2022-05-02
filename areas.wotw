@@ -9986,6 +9986,7 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
     unsafe:
       Grapple, Damage=40
       DoubleJump, TripleJump
+      SentryJump=1
   conn EastPools.WaterdashArena:
     moki, EastPools.ArenaWall: Water
   conn EastPools.BelowTokk: free
@@ -10067,6 +10068,7 @@ anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
       Bash, Grenade=1
       WaterDash, Hammer, Water OR Damage=20
       DoubleJump, TripleJump  # ceiling jump on the wall above the fishing pond
+      SentryJump=1
   conn EastPools.TPArea: free
 
 anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
@@ -10679,7 +10681,7 @@ anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup 
     gorlek: Sword OR Hammer
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
-anchor UpperPools.DrainPuzzleEntrance at -1313, -4083:  # At the right of the door opened by the water dash button in the tree room
+anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the door opened by the water dash button in the tree room
   refill Checkpoint
 
   # Be careful because solving that puzzle room is a huuuge negative that has to be taken into account
