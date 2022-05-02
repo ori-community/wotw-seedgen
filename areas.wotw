@@ -10253,6 +10253,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Bash, Grenade=1, Spear=1 OR Blaze=1
       Bash, Sword  # hover to reach the lantern, extend bash glide with upslash then hover again
       DoubleJump, Glide
+      SentryJump=1
 
   conn UpperPools.KeystoneRoomEntrance:
     moki:
