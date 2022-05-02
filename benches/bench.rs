@@ -98,8 +98,6 @@ fn reach_checking(c: &mut Criterion) {
 }
 
 fn generation(c: &mut Criterion) {
-    // seedgen::initialize_log(false, log::LevelFilter::Off).unwrap();
-
     let mut settings = Settings::default();
 
     c.bench_function("singleplayer", |b| b.iter(|| {

@@ -1,3 +1,6 @@
+mod log_init;
+use log_init::initialize_log;
+
 use std::{
     fs,
     str::FromStr,

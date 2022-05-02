@@ -23,21 +23,6 @@ use rand::{
     seq::IteratorRandom
 };
 
-use log::LevelFilter;
-use log4rs::{
-    append::{
-        console::{ConsoleAppender, Target},
-        file::FileAppender,
-    },
-    encode::{
-        Encode,
-        pattern::PatternEncoder,
-        json::JsonEncoder,
-    },
-    config::{Appender, Config, Root},
-    filter::threshold::ThresholdFilter,
-};
-
 use world::{
     graph::{Graph, Node, Pickup},
     pool::Pool
@@ -95,53 +80,6 @@ pub fn write_flags(world_settings: &WorldSettings, mut flags: Vec<String>) -> St
     } else {
         format!("Flags: {}\n", settings_flags.join(", "))
     }
-}
-
-pub fn initialize_log(use_file: Option<&str>, stderr_log_level: LevelFilter, json: bool) -> Result<(), String> {
-    let encoder: Box<dyn Encode> = if json {
-        Box::new(JsonEncoder::new())
-    } else {
-        Box::new(PatternEncoder::new("{h({l}):5}  {m}{n}"))
-    };
-
-    let stderr = ConsoleAppender::builder()
-        .target(Target::Stderr)
-        .encoder(encoder)
-        .build();
-
-    let log_config = if let Some(path) = use_file {
-        let log_file = FileAppender::builder()
-        .append(false)
-        .encoder(Box::new(PatternEncoder::new("{l:5}  {m}{n}")))
-        .build(path)
-        .map_err(|err| format!("Failed to create log file: {}", err))?;
-
-        Config::builder()
-            .appender(Appender::builder().build("log_file", Box::new(log_file)))
-            .appender(
-                Appender::builder()
-                    .filter(Box::new(ThresholdFilter::new(stderr_log_level)))
-                    .build("stderr", Box::new(stderr))
-            )
-            .build(
-                Root::builder()
-                    .appender("stderr")
-                    .appender("log_file")
-                    .build(LevelFilter::Trace)
-            )
-            .map_err(|err| format!("Failed to configure logger: {}", err))?
-    } else {
-        Config::builder()
-            .appender(Appender::builder().build("stderr", Box::new(stderr)))
-            .build(Root::builder().appender("stderr").build(stderr_log_level))
-            .map_err(|err| format!("Failed to configure logger: {}", err))?
-    };
-
-    log4rs::init_config(log_config).map_err(|err| format!("Failed to initialize logger: {}", err))?;
-    #[cfg(target_os = "windows")]
-    ansi_term::enable_ansi_support().unwrap_or_else(|err| log::warn!("Failed to enable ansi support: {}", err));
-
-    Ok(())
 }
 
 fn build_config_map(header_config: &[HeaderConfig]) -> Result<FxHashMap::<String, FxHashMap<String, String>>, String> {
@@ -446,8 +384,6 @@ mod tests {
 
     #[test]
     fn some_seeds() {
-        // initialize_log(Some("generator.log"), LevelFilter::Trace, false).unwrap();
-
         let mut settings = Settings::default();
         let mut graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
 

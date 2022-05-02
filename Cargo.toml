@@ -16,7 +16,6 @@ rustc-hash = "1.1.0"
 rand = { version = "0.8.3", features = ["std_rng", "alloc"] }
 rand_seeder = "0.2.2"
 log = "0.4"
-log4rs = "1.1"
 ansi_term = "0.12.1"
 smallvec = "1.6.1"
 regex = "1"
