@@ -22,12 +22,12 @@
 9|999=402|6|"#Rapid Smash x$(4|50)#"      // display name
 
 4|50|4|25|1|8|9|114|bool|true           // set to default enabled
-4|50|4|26|100|8|4|50|byte|100|skip=1    // cap at 100
+4|50|4|26|100|8|4|50|byte|100|skip    // cap at 100
 4|50|4|17|9|114|1|8|9|10|int|1          // grant on pickup if enabled
 4|50=1|8|9|113|bool|true                // subscribe to bonus core
 
 9|0=104|8|9|10|int|$(4|50)              // enable callback
-9|0=105|8|9|10|int|101|skip=1           // disable callback
+9|0=105|8|9|10|int|101|skip           // disable callback
 9|0=105|8|9|10|int|+$(4|50)
 // Apply speed factors in a loop
 9|10|4|27|101|8|4|0|float|+0.25

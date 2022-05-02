@@ -22,12 +22,12 @@
 9|999=403|6|"#Rapid Sword x$(4|51)#"      // display name
 
 4|51|4|25|1|8|9|116|bool|true           // set to default enabled
-4|51|4|26|100|8|4|51|byte|100|skip=1    // cap at 100
+4|51|4|26|100|8|4|51|byte|100|skip    // cap at 100
 4|51|4|17|9|116|1|8|9|11|int|1          // grant on pickup if enabled
 4|51=1|8|9|115|bool|true                // subscribe to bonus core
 
 9|0=106|8|9|11|int|$(4|51)              // enable callback
-9|0=107|8|9|11|int|101|skip=1           // disable callback
+9|0=107|8|9|11|int|101|skip           // disable callback
 9|0=107|8|9|11|int|+$(4|51)
 // Apply speed factors in a loop
 9|11|4|27|101|8|4|1|float|+0.25

@@ -477,27 +477,18 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
         _ => return Err(ParseError::new("expected uber state operator", token.range)),
     };
 
-    let skip = if parser.current_token().kind == TokenKind::Separator {
+    let mut skip = false;
+    if parser.current_token().kind == TokenKind::Separator {
         let peeked = parser.peek_token();
-        loop {
+        if peeked.kind == TokenKind::Ident {
             let range = peeked.range.clone();
-            let should_consume_eq = match peeked.kind.clone() {
-                TokenKind::Ident if parser.read(range) == "skip" => true,
-                TokenKind::Number => false,
-                _ => { break 0 },
-            };
-            parser.next_token();
-            parser.next_token();
-            if should_consume_eq {
-                parser.eat(TokenKind::Eq)?;
+            if parser.read(range) == "skip" {
+                parser.next_token();
+                parser.next_token();
+                skip = true
             }
-            let skip = parse_number!(parser, "skip amount");
-            break skip;
         }
-    } else { 0 };
-
-    assert!(skip < 2);  // TODO decide on this
-    let skip = skip > 0;
+    }
 
     Ok(VItem::UberState(VUberStateItem { uber_identifier, uber_type, signed, sign, operator, skip }))
 }

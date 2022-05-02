@@ -24,12 +24,12 @@
 9|999=400|6|"#Skill Velocity x$(9|5)#"    // display name
 
 9|5|4|25|1|8|9|110|bool|true            // set to default enabled
-9|5|4|26|100|8|9|5|int|100|skip=1       // cap at 100
+9|5|4|26|100|8|9|5|int|100|skip       // cap at 100
 9|5|4|17|9|110|1|8|9|6|int|1            // grant on pickup if enabled
 9|5=1|8|9|109|bool|true                 // subscribe to bonus core
 
 9|0=100|8|9|6|int|$(9|5)                // enable callback
-9|0=101|8|9|6|int|101|skip=1            // disable callback
+9|0=101|8|9|6|int|101|skip            // disable callback
 9|0=101|8|9|6|int|+$(9|5)
 // Apply speed factors in a loop
 9|6|4|27|101|8|4|80|float|+0.25
