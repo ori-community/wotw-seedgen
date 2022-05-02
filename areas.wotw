@@ -10275,6 +10275,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       EastPools.CentralRoomBubbleFree, Bash, Grenade=1  # bashnade from the seed to jump on the bubble then wait another bubble
       EastPools.CentralRoomBubbleFree, SentryJump=1  # sjump from GrassSeed
       EastPools.CentralRoomBubbleFree, GrenadeJump, DoubleJump OR Glide  # grenade jump on the bubble, use the other ability to stall, repeat until at the top
+      EastPools.CentralRoomBubbleFree, PauseHover  # Pause float spam is just barely enough stall to gain height. This is just as much fun as it sounds.
       SentryJump=2  # sjump to GrassSeed, sjump from GrassSeed
   conn WestPools:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
