@@ -2729,6 +2729,13 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, Grapple, DoubleJump  # Cancel grapple with djump
       Water, DoubleJump, TripleJump
       Water, WaterDash, Dash, Damage=10  # coyote jump from the ledge under the grappable plant
+      Water, SwordSJump=1  # probably doable with hammer as well, but it's much harder
+      # Dirty Swims, probably incomplete. Stand in shallow water on the side of the first air pocket to regen. Teleport out after breaking the wall.
+      WaterDash, Damage=60, Damage=110, Launch
+      WaterDash, Damage=60, Damage=110, Grapple, Sentry=3 OR DoubleJump OR Dash
+      WaterDash, Damage=60, Damage=110, DoubleJump, TripleJump
+      WaterDash, Damage=60, Damage=110, SwordSJump=1
+      WaterDash, Damage=60, Damage=110, Damage=20, Grapple, Sword  # extra damage from the balloon, regen spot below the grapple plant
       # Water, Grapple, SwordSJump=1                       # standing on the ledge below grapple plant. Holding right during SJump. Swordcombo to go right. Lure balloon into water first
       # Water, Grapple, SwordSJump=1, DoubleJump OR Glide  # standing on the ledge below grapple plant. Holding right during SJump
 # checkpoint at -8, -4327
