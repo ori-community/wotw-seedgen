@@ -2473,7 +2473,8 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
       DoubleJump, TripleJump, Dash
       Bash  # Go to the right to make the mantis spawn if it's not here
     unsafe:
-      DoubleJump, SentryJump=1 OR Dash
+      DoubleJump, SentryJump=1 OR Dash  # @validator How does dash work here?
+      SentryJump=2  # dodge the spikes with the weapon you use to sjump
   pickup EastHollow.SecretRoofEX:
     moki:
       Bash OR Launch
