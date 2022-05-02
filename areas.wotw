@@ -3709,6 +3709,8 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
       Grapple, Spear=1 OR Blaze=1 OR Damage=20
       Bash, Glide, SwordSJump=1
       DoubleJump, TripleJump, Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
+      GrenadeJump, DoubleJump OR Dash OR SentryJump=1 OR Damage=10
+      SentryJump=2
   pickup WestGlades.SwimEC:
     moki: Water
     kii:
