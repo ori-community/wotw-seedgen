@@ -2826,7 +2826,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.ClearThorns:
       GrenadeJump
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump OR Dash
   pickup GladesTown.LupoSwimMiddleEX:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
@@ -2869,9 +2869,10 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
         SentryJump=1
         TuleyShop.Lightcatchers, Bash
     unsafe:
-      SwordSJump=2  # Midair Sentry Jumps
+      SentryJump=2  # from directly below the bridge
       TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
       DoubleJump, TripleJump  # hardcore parkour
+      GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
   conn GladesTown.BellowBountyShard:
     moki:
       Launch
