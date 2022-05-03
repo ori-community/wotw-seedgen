@@ -7,6 +7,7 @@ mod tools;
 pub use emitter::{HeaderBuild, ItemDetails};
 use seedgen_derive::{FromStr, VVariant};
 pub use v::{VResolve, V, VString};
+pub(crate) use v::vdisplay;
 pub use tools::{list, inspect, validate};
 
 use std::{fmt, str::FromStr};

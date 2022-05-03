@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 
 use rustc_hash::FxHashMap;
@@ -14,7 +15,14 @@ pub enum V<T: FromStr> {
     Literal(T),
     Parameter(String),
 }
-
+impl<T: FromStr + fmt::Display> fmt::Display for V<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Literal(t) => t.fmt(f),
+            Self::Parameter(identifier) => write!(f, "(configuration value {identifier})"),
+        }
+    }
+}
 impl<T: FromStr> VResolve<T> for V<T> {
     fn resolve(self, parameters: &FxHashMap<String, String>) -> Result<T, String> {
         match self {
@@ -26,10 +34,20 @@ impl<T: FromStr> VResolve<T> for V<T> {
     }
 }
 
+macro_rules! vdisplay {
+    (
+        $vty:ty,
+        impl $($($(::)?std::)?fmt::)?Display for $ty:ty { $impl:item }
+    ) => {
+        impl ::std::fmt::Display for $ty { $impl }
+        impl ::std::fmt::Display for $vty { $impl }
+    };
+}
+pub(crate) use vdisplay;
+
 /// [`String`] with possibly contained [`V`]s
 #[derive(Debug, Clone)]
 pub struct VString(pub String);
-
 impl VResolve<String> for VString {
     fn resolve(mut self, parameters: &FxHashMap<String, String>) -> Result<String, String> {
         while let Some(range) = self.0.find("$PARAM(")
@@ -42,6 +60,11 @@ impl VResolve<String> for VString {
         }
 
         Ok(self.0)
+    }
+}
+impl fmt::Display for VString {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
     }
 }
 

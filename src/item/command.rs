@@ -5,7 +5,7 @@ use seedgen_derive::{VVariant, FromStr, Display};
 
 use super::{Item, VItem, Resource};
 use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool, Spell};
-use crate::header::VString;
+use crate::header::{VString, vdisplay};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum Command {
@@ -78,40 +78,43 @@ impl Command {
         }
     }
 }
-impl fmt::Display for Command {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Command::Autosave => write!(f, "Autosave"),
-            Command::Resource { resource, amount } => write!(f, "Set {resource} to {amount}"),
-            Command::Checkpoint => write!(f, "Checkpoint"),
-            Command::Magic => write!(f, "✨Magic✨"),
-            Command::StopEqual { uber_state } => write!(f, "Stop the multipickup if {} is {}", uber_state.identifier, uber_state.value),
-            Command::StopGreater { uber_state } => write!(f, "Stop the multipickup if {} is greater than {}", uber_state.identifier, uber_state.value),
-            Command::StopLess { uber_state } => write!(f, "Stop the multipickup if {} is less than {}", uber_state.identifier, uber_state.value),
-            Command::Toggle { target, on } => write!(f, "Toggle the {target} {}", if *on as u8 == 0 { "on" } else { "off" }),
-            Command::Warp { position } => write!(f, "Warp to {position}"),
-            Command::StartTimer { identifier } => write!(f, "Start a timer on {identifier}"),
-            Command::StopTimer { identifier } => write!(f, "Stop any timer on {identifier}"),
-            Command::StateRedirect { intercept, set } => write!(f, "Override state applier {intercept} with {set}"),
-            Command::SetHealth { amount } => write!(f, "Set current health to {amount}"),
-            Command::SetEnergy { amount } => write!(f, "Set current energy to {amount}"),
-            Command::SetSpiritLight { amount } => write!(f, "Set current spirit light to {amount}"),
-            Command::Equip { slot, ability } => write!(f, "Equip {ability} to slot {slot}"),
-            Command::AhkSignal { signal } => write!(f, "Trigger the \"{signal}\" keybind"),
-            Command::IfEqual { uber_state, item } => write!(f, "Grant this item if {} is {}: {}", uber_state.identifier, uber_state.value, item),
-            Command::IfGreater { uber_state, item } => write!(f, "Grant this item if {} is greater than {}: {}", uber_state.identifier, uber_state.value, item),
-            Command::IfLess { uber_state, item } => write!(f, "Grant this item if {} is less than {}: {}", uber_state.identifier, uber_state.value, item),
-            Command::DisableSync { uber_identifier } => write!(f, "Disable multiplayer sync for {uber_identifier}"),
-            Command::EnableSync { uber_identifier } => write!(f, "Enable multiplayer sync for {uber_identifier}"),
-            Command::CreateWarp { id, position, label } => write!(f, "Create a warp icon with identifier {id} at {position}{}", label.iter().map(|label| format!(" labelled \"{label}\"")).collect::<String>()),
-            Command::DestroyWarp { id } => write!(f, "Destroy the warp icon with identifier {id}"),
-            Command::IfBox { position1, position2, item } => write!(f, "Grant this item if Ori is within the rectangle defined by {position1}/{position2}: {item}"),
-            Command::IfSelfEqual { value, item } => write!(f, "Grant this item if the trigger state's value is {value}: {item}"),
-            Command::IfSelfGreater { value, item } => write!(f, "Grant this item if the trigger state's value is greater than {value}: {item}"),
-            Command::IfSelfLess { value, item } => write!(f, "Grant this item if the trigger state's value is less than {value}: {item}"),
-            Command::UnEquip { ability } => write!(f, "Unequip {ability}"),
-            Command::SaveString { id, string } => write!(f, "Stores the string \"{string}\" under the identifier {id}"),
-            Command::AppendString { id, string } => write!(f, "Appends the string \"{string}\" to the current value stored under the identifier {id}"),
+vdisplay! {
+    VCommand,
+    impl fmt::Display for Command {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                Self::Autosave => write!(f, "Autosave"),
+                Self::Resource { resource, amount } => write!(f, "Set {resource} to {amount}"),
+                Self::Checkpoint => write!(f, "Checkpoint"),
+                Self::Magic => write!(f, "✨Magic✨"),
+                Self::StopEqual { uber_state } => write!(f, "Stop the multipickup if {} is {}", uber_state.identifier, uber_state.value),
+                Self::StopGreater { uber_state } => write!(f, "Stop the multipickup if {} is greater than {}", uber_state.identifier, uber_state.value),
+                Self::StopLess { uber_state } => write!(f, "Stop the multipickup if {} is less than {}", uber_state.identifier, uber_state.value),
+                Self::Toggle { target, on } => write!(f, "Sets the {target} to {on}"),
+                Self::Warp { position } => write!(f, "Warp to {position}"),
+                Self::StartTimer { identifier } => write!(f, "Start a timer on {identifier}"),
+                Self::StopTimer { identifier } => write!(f, "Stop any timer on {identifier}"),
+                Self::StateRedirect { intercept, set } => write!(f, "Override state applier {intercept} with {set}"),
+                Self::SetHealth { amount } => write!(f, "Set current health to {amount}"),
+                Self::SetEnergy { amount } => write!(f, "Set current energy to {amount}"),
+                Self::SetSpiritLight { amount } => write!(f, "Set current spirit light to {amount}"),
+                Self::Equip { slot, ability } => write!(f, "Equip {ability} to slot {slot}"),
+                Self::AhkSignal { signal } => write!(f, "Trigger the \"{signal}\" keybind"),
+                Self::IfEqual { uber_state, item } => write!(f, "Grant this item if {} is {}: {}", uber_state.identifier, uber_state.value, item),
+                Self::IfGreater { uber_state, item } => write!(f, "Grant this item if {} is greater than {}: {}", uber_state.identifier, uber_state.value, item),
+                Self::IfLess { uber_state, item } => write!(f, "Grant this item if {} is less than {}: {}", uber_state.identifier, uber_state.value, item),
+                Self::DisableSync { uber_identifier } => write!(f, "Disable multiplayer sync for {uber_identifier}"),
+                Self::EnableSync { uber_identifier } => write!(f, "Enable multiplayer sync for {uber_identifier}"),
+                Self::CreateWarp { id, position, label } => write!(f, "Create a warp icon with identifier {id} at {position}{}", label.iter().map(|label| format!(" labelled \"{label}\"")).collect::<String>()),
+                Self::DestroyWarp { id } => write!(f, "Destroy the warp icon with identifier {id}"),
+                Self::IfBox { position1, position2, item } => write!(f, "Grant this item if Ori is within the rectangle defined by {position1}/{position2}: {item}"),
+                Self::IfSelfEqual { value, item } => write!(f, "Grant this item if the trigger state's value is {value}: {item}"),
+                Self::IfSelfGreater { value, item } => write!(f, "Grant this item if the trigger state's value is greater than {value}: {item}"),
+                Self::IfSelfLess { value, item } => write!(f, "Grant this item if the trigger state's value is less than {value}: {item}"),
+                Self::UnEquip { ability } => write!(f, "Unequip {ability}"),
+                Self::SaveString { id, string } => write!(f, "Stores the string \"{string}\" under the identifier {id}"),
+                Self::AppendString { id, string } => write!(f, "Appends the string \"{string}\" to the current value stored under the identifier {id}"),
+            }
         }
     }
 }

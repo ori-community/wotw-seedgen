@@ -3,7 +3,7 @@ use std::fmt;
 use seedgen_derive::VVariant;
 
 use crate::util::{UberIdentifier, Icon};
-use crate::header::VString;
+use crate::header::{VString, vdisplay};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum ShopCommand {
@@ -24,14 +24,17 @@ impl ShopCommand {
         }
     }
 }
-impl fmt::Display for ShopCommand {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ShopCommand::SetIcon { uber_identifier, icon } => write!(f, "Sets the shop icon of {uber_identifier} to the {icon}"),
-            ShopCommand::SetTitle { uber_identifier, title } => write!(f, "Sets the shop title of {uber_identifier} to {}", title.clone().map_or_else(|| "the default".to_string(), |title| format!("\"{title}\""))),
-            ShopCommand::SetDescription { uber_identifier, description } => write!(f, "Sets the shop description of {uber_identifier} to {}", description.clone().map_or_else(|| "the default".to_string(), |description| format!("\"{description}\""))),
-            ShopCommand::SetLocked { uber_identifier, locked } => write!(f, "{}ocks the shop item at {uber_identifier}", if *locked { "L" } else { "Unl" }),
-            ShopCommand::SetVisible { uber_identifier, visible } => write!(f, "Turns the shop item at {uber_identifier} {}visible", if *visible { "" } else { "in" }),
+vdisplay! {
+    VShopCommand,
+    impl fmt::Display for ShopCommand {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                Self::SetIcon { uber_identifier, icon } => write!(f, "Sets the shop icon of {uber_identifier} to the {icon}"),
+                Self::SetTitle { uber_identifier, title } => write!(f, "Sets the shop title of {uber_identifier} to {}", title.clone().map_or_else(|| "the default".to_string(), |title| format!("\"{title}\""))),
+                Self::SetDescription { uber_identifier, description } => write!(f, "Sets the shop description of {uber_identifier} to {}", description.clone().map_or_else(|| "the default".to_string(), |description| format!("\"{description}\""))),
+                Self::SetLocked { uber_identifier, locked } => write!(f, "Sets the locked state of the shop item at {uber_identifier} to be {locked}"),
+                Self::SetVisible { uber_identifier, visible } => write!(f, "Sets the visible state of the shop item at {uber_identifier} to be {visible}"),
+            }
         }
     }
 }

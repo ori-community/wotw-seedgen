@@ -62,31 +62,41 @@ impl VMessage {
 
 impl fmt::Display for Message {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut parser = Parser::new(&self.message);
-        let mut replacements = vec![];
-        loop {
-            parser.skip_while(|kind| kind != TokenKind::Dollar);
-            let token = parser.next_token();
-            if token.kind == TokenKind::Eof { break }
-            let start = token.range.start;
-            let token = parser.next_token();
-            if token.kind != TokenKind::OpenBracket { continue }
-            if let Ok(item) = VItem::parse(&mut parser) {
-                if let Ok(item) = item.resolve(&FxHashMap::default()) {
-                    let token = parser.next_token();
-                    if token.kind == TokenKind::CloseBracket {
-                        let end = token.range.end;
-                        replacements.push((start..end, item.to_string()));
-                    }
+        let mut message = self.message.clone();
+        replace_item_syntax(&mut message);
+        write!(f, "{message}")
+    }
+}
+impl fmt::Display for VMessage {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut message = self.message.0.clone();
+        replace_item_syntax(&mut message);
+        write!(f, "{message}")
+    }
+}
+
+fn replace_item_syntax(message: &mut String) {
+    let mut parser = Parser::new(message);
+    let mut replacements = vec![];
+    loop {
+        parser.skip_while(|kind| kind != TokenKind::Dollar);
+        let token = parser.next_token();
+        if token.kind == TokenKind::Eof { break }
+        let start = token.range.start;
+        let token = parser.next_token();
+        if token.kind != TokenKind::OpenBracket { continue }
+        if let Ok(item) = VItem::parse(&mut parser) {
+            if let Ok(item) = item.resolve(&FxHashMap::default()) {
+                let token = parser.next_token();
+                if token.kind == TokenKind::CloseBracket {
+                    let end = token.range.end;
+                    replacements.push((start..end, item.to_string()));
                 }
             }
         }
+    }
 
-        let mut message = self.message.clone();
-        for (range, replace_with) in replacements {
-            message.replace_range(range, &replace_with);
-        }
-
-        write!(f, "{message}")
+    for (range, replace_with) in replacements {
+        message.replace_range(range, &replace_with);
     }
 }

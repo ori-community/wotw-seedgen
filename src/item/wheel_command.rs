@@ -5,7 +5,7 @@ use seedgen_derive::{VVariant, FromStr, Display};
 
 use super::{Item, VItem};
 use crate::util::Icon;
-use crate::header::VString;
+use crate::header::{VString, vdisplay};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub enum WheelCommand {
@@ -34,18 +34,21 @@ impl WheelCommand {
         }
     }
 }
-impl fmt::Display for WheelCommand {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            WheelCommand::SetName { wheel, position, name } => write!(f, "Set the name of the {position} item in wheel {wheel} to \"{name}\""),
-            WheelCommand::SetDescription { wheel, position, description } => write!(f, "Set the description of the {position} item in wheel {wheel} to \"{description}\""),
-            WheelCommand::SetIcon { wheel, position, icon } => write!(f, "Set the icon of the {position} item in wheel {wheel} to the {icon}"),
-            WheelCommand::SetColor { wheel, position, r, g, b, a } => write!(f, "Set the icon color of the {position} item in wheel {wheel} to (rgba) {r}, {g}, {b}, {a}"),
-            WheelCommand::SetItem { wheel, position, bind, item } => write!(f, "Set the action bound to {bind} of the {position} item in wheel {wheel} to this item: {item}"),
-            WheelCommand::SetSticky { wheel, sticky } => write!(f, "Set wheel {wheel} to be {}", if *sticky { "sticky" } else { "not sticky" }),
-            WheelCommand::SwitchWheel { wheel } => write!(f, "Switch to wheel {wheel}"),
-            WheelCommand::RemoveItem { wheel, position } => write!(f, "Remove the {position} item in wheel {wheel}"),
-            WheelCommand::ClearAll => write!(f, "Clear all wheels"),
+vdisplay! {
+    VWheelCommand,
+    impl fmt::Display for WheelCommand {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                Self::SetName { wheel, position, name } => write!(f, "Set the name of the {position} item in wheel {wheel} to \"{name}\""),
+                Self::SetDescription { wheel, position, description } => write!(f, "Set the description of the {position} item in wheel {wheel} to \"{description}\""),
+                Self::SetIcon { wheel, position, icon } => write!(f, "Set the icon of the {position} item in wheel {wheel} to the {icon}"),
+                Self::SetColor { wheel, position, r, g, b, a } => write!(f, "Set the icon color of the {position} item in wheel {wheel} to (rgba) {r}, {g}, {b}, {a}"),
+                Self::SetItem { wheel, position, bind, item } => write!(f, "Set the action bound to {bind} of the {position} item in wheel {wheel} to this item: {item}"),
+                Self::SetSticky { wheel, sticky } => write!(f, "Set the sticky value of wheel {wheel} to {sticky}"),
+                Self::SwitchWheel { wheel } => write!(f, "Switch to wheel {wheel}"),
+                Self::RemoveItem { wheel, position } => write!(f, "Remove the {position} item in wheel {wheel}"),
+                Self::ClearAll => write!(f, "Clear all wheels"),
+            }
         }
     }
 }

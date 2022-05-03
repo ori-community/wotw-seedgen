@@ -18,7 +18,7 @@ use rustc_hash::FxHashMap;
 use seedgen_derive::VVariant;
 
 use crate::header::parser::Parser;
-use crate::header::VResolve;
+use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
 use crate::util::{Zone, Icon};
 
@@ -60,30 +60,32 @@ pub enum Item {
     WheelCommand(#[VType] WheelCommand),
     ShopCommand(#[VType] ShopCommand),
 }
-impl fmt::Display for Item {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Item::SpiritLight(1) => write!(f, "Spirit Light"),
-            Item::SpiritLight(amount) => write!(f, "{amount} Spirit Light"),
-            Item::RemoveSpiritLight(amount) => write!(f, "Remove {amount} Spirit Light"),
-            Item::Resource(resource) => write!(f, "{resource}"),
-            Item::Skill(skill) => write!(f, "{skill}"),
-            Item::RemoveSkill(skill) => write!(f, "Remove {skill}"),
-            Item::Shard(shard) => write!(f, "{shard}"),
-            Item::RemoveShard(shard) => write!(f, "Remove {shard}"),
-            Item::Command(command) => write!(f, "{command}"),
-            Item::Teleporter(teleporter) => write!(f, "{teleporter} TP"),
-            Item::RemoveTeleporter(teleporter) => write!(f, "Remove {teleporter} TP"),
-            Item::Message(message) => write!(f, "Display \"{message}\""),
-            Item::UberState(command) => write!(f, "{command}"),
-            Item::Water => write!(f, "Clean Water"),
-            Item::RemoveWater => write!(f, "Remove Clean Water"),
-            Item::BonusItem(bonus_item) => write!(f, "{bonus_item}"),
-            Item::BonusUpgrade(bonus_upgrade) => write!(f, "{bonus_upgrade}"),
-            Item::Relic(zone) => write!(f, "{zone} Relic"),
-            Item::SysMessage(message) => write!(f, "{message}"),
-            Item::WheelCommand(command) => write!(f, "{command}"),
-            Item::ShopCommand(command) => write!(f, "{command}"),
+vdisplay! {
+    VItem,
+    impl fmt::Display for Item {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            match self {
+                Self::SpiritLight(amount) => write!(f, "{amount} Spirit Light"),
+                Self::RemoveSpiritLight(amount) => write!(f, "Remove {amount} Spirit Light"),
+                Self::Resource(resource) => write!(f, "{resource}"),
+                Self::Skill(skill) => write!(f, "{skill}"),
+                Self::RemoveSkill(skill) => write!(f, "Remove {skill}"),
+                Self::Shard(shard) => write!(f, "{shard}"),
+                Self::RemoveShard(shard) => write!(f, "Remove {shard}"),
+                Self::Command(command) => write!(f, "{command}"),
+                Self::Teleporter(teleporter) => write!(f, "{teleporter} TP"),
+                Self::RemoveTeleporter(teleporter) => write!(f, "Remove {teleporter} TP"),
+                Self::Message(message) => write!(f, "Display \"{message}\""),
+                Self::UberState(command) => write!(f, "{command}"),
+                Self::Water => write!(f, "Clean Water"),
+                Self::RemoveWater => write!(f, "Remove Clean Water"),
+                Self::BonusItem(bonus_item) => write!(f, "{bonus_item}"),
+                Self::BonusUpgrade(bonus_upgrade) => write!(f, "{bonus_upgrade}"),
+                Self::Relic(zone) => write!(f, "{zone} Relic"),
+                Self::SysMessage(message) => write!(f, "{message}"),
+                Self::WheelCommand(command) => write!(f, "{command}"),
+                Self::ShopCommand(command) => write!(f, "{command}"),
+            }
         }
     }
 }

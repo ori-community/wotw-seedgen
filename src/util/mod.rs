@@ -19,11 +19,13 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+use crate::header::vdisplay;
+
+#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum NumericBool {
-    False,
-    True,
+    False = 0,
+    True = 1,
 }
 
 #[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
@@ -187,9 +189,12 @@ impl Position {
         format!("{}|{}", self.x, self.y)
     }
 }
-impl fmt::Display for Position {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}, {}", self.x, self.y)
+vdisplay! {
+    VPosition,
+    impl fmt::Display for Position {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}, {}", self.x, self.y)
+        }
     }
 }
 

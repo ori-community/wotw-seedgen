@@ -2,7 +2,7 @@ use std::fmt;
 
 use seedgen_derive::VVariant;
 
-use crate::item::{Item, UberStateItem, UberStateOperator};
+use crate::{item::{Item, UberStateItem, UberStateOperator}, header::V};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum UberType {
@@ -132,6 +132,18 @@ impl UberState {
 impl fmt::Display for UberState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.value.is_empty() {
+            write!(f, "{}", self.identifier)
+        } else {
+            write!(f, "{}={}", self.identifier, self.value)
+        }
+    }
+}
+impl fmt::Display for VUberState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let bare = if let V::Literal(value) = &self.value {
+            value.is_empty()
+        } else { false };
+        if bare {
             write!(f, "{}", self.identifier)
         } else {
             write!(f, "{}={}", self.identifier, self.value)
