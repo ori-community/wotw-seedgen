@@ -209,9 +209,9 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
                     uber_state == other || (generic && uber_state.identifier == other.identifier)
                 }) {
                     collision_message = format!("Collision between used state {} and {} using {}",
-                        UBERSTATE_COLOUR.paint(format!("{}", uber_state)),
+                        UBERSTATE_COLOUR.paint(format!("{}", uber_state.code())),
                         NAME_COLOUR.paint(other_header),
-                        UBERSTATE_COLOUR.paint(format!("{}", collision))
+                        UBERSTATE_COLOUR.paint(format!("{}", collision.code()))
                     );
                     break 'outer;
                 }
@@ -242,7 +242,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
                     range = false;
                 }
 
-                occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(format!("{}", uber_state)));
+                occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(format!("{}", uber_state.code())));
             }
 
             for _ in 0..2 { occupied_summary.pop(); }
@@ -372,7 +372,7 @@ pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), 
                                 occupied_states.push(uber_state);
                             }
                         } else {
-                            return Err(format!("stop command on {} stops a multipickup outside of uber group 9. This may interact unpredictably with other headers.", pickup.trigger));
+                            return Err(format!("stop command on {} stops a multipickup outside of uber group 9. This may interact unpredictably with other headers.", pickup.trigger.code()));
                         }
                     }
                     _ => {},

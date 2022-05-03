@@ -13,7 +13,7 @@ pub(crate) enum TokenKind {
     /// `1`, `-999`, `345.67`
     Number,
     /// `header_core`, `opher`, `int`
-    Ident,
+    Identifier,
     /// `"Greetings Hello"`
     String { terminated: bool },
     /// `|`
@@ -176,7 +176,7 @@ impl Cursor<'_> {
     }
     fn ident(&mut self) -> TokenKind {
         self.eat_while(is_ident_char);
-        TokenKind::Ident
+        TokenKind::Identifier
     }
     fn string(&mut self) -> TokenKind {
         self.eat_while(|c| c != '"');

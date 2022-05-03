@@ -1,5 +1,3 @@
-use std::fmt;
-
 use rand::{
     Rng,
     seq::{SliceRandom, IteratorRandom},
@@ -26,9 +24,9 @@ pub struct Placement<'a> {
     pub uber_state: UberState,
     pub item: Item,
 }
-impl fmt::Display for Placement<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}|{}", self.uber_state, self.item.code())
+impl Placement<'_> {
+    pub fn code(&self) -> String {
+        format!("{}|{}", self.uber_state.code(), self.item.code())
     }
 }
 

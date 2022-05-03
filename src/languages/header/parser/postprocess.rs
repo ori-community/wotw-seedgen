@@ -163,7 +163,7 @@ pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &[&WorldSet
                     let pattern = args.next().unwrap_or("").trim();
 
                     let locations = how_many(pattern, zone, world_index, &clone, graph)?;
-                    let locations = locations.into_iter().map(|uber_state| uber_state.to_string()).collect::<Vec<_>>();
+                    let locations = locations.into_iter().map(|uber_state| uber_state.code()).collect::<Vec<_>>();
                     let locations = locations.join(",").replace('|', ",");
 
                     let sysmessage = format!("$[15|4|{}]", locations);

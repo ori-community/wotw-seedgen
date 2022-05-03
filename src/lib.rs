@@ -285,7 +285,7 @@ fn format_placements(world_placements: Vec<Placement>, custom_items: &FxHashMap<
     let mut placement_block = String::with_capacity(world_placements.len() * 20);
 
     for placement in world_placements {
-        let mut placement_line = format!("{}", placement);
+        let mut placement_line = placement.code();
 
         let location = placement.node.map_or_else(
             || placement.uber_state.to_string(),
@@ -349,7 +349,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
         if identifier != DEFAULT_SPAWN {
             let mut spawn_item = String::new();
             if let Some(spawn_grant) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == identifier { Some(item) } else { None }) {
-                spawn_item = format!("{}|{}|mute\n", UberState::spawn(), spawn_grant.code());
+                spawn_item = format!("{}|{}|mute\n", UberState::spawn().code(), spawn_grant.code());
             }
 
             let position = spawn_loc.position().ok_or_else(|| format!("Tried to spawn on {} which has no specified coordinates", identifier))?;

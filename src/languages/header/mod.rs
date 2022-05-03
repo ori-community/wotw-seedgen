@@ -26,7 +26,7 @@ pub struct TimerDefinition {
 }
 impl TimerDefinition {
     pub fn code(&self) -> String {
-        format!("{}|{}", self.toggle, self.timer)
+        format!("{}|{}", self.toggle.code(), self.timer.code())
     }
 }
 
@@ -46,7 +46,7 @@ pub struct Pickup {
 }
 impl Pickup {
     pub fn code(&self) -> String {
-        format!("{}|{}", self.trigger, self.item.code())
+        format!("{}|{}", self.trigger.code(), self.item.code())
     }
 }
 

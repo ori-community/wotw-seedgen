@@ -1,3 +1,6 @@
+mod game_data;
+mod rando_data;
+
 use std::fmt;
 
 use seedgen_derive::VVariant;
@@ -52,9 +55,22 @@ impl UberIdentifier {
         })
     }
 }
+impl UberIdentifier {
+    pub fn code(&self) -> String {
+        format!("{}|{}", self.uber_group, self.uber_id)
+    }
+}
 impl fmt::Display for UberIdentifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}|{}", self.uber_group, self.uber_id)
+        rando_data::NAMED_UBER_STATES.iter()
+            .find(|(_, identifier)| self == identifier)
+            .map(|(name, _)| name.to_string())
+            .unwrap_or_else(||
+                game_data::UBER_STATES.iter()
+                    .find(|(_, identifier)| self == identifier)
+                    .map(|(name, _)| name.to_string())
+                    .unwrap_or_else(|| self.code())
+            ).fmt(f)
     }
 }
 
@@ -129,6 +145,15 @@ impl UberState {
         self.identifier.uber_group == 48248 && matches!(self.identifier.uber_id, 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045 | 19396 | 57987 | 41666)
     }
 }
+impl UberState {
+    pub fn code(&self) -> String {
+        if self.value.is_empty() {
+            format!("{}", self.identifier.code())
+        } else {
+            format!("{}={}", self.identifier.code(), self.value)
+        }
+    }
+}
 impl fmt::Display for UberState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.value.is_empty() {
@@ -170,9 +195,9 @@ mod tests {
     #[test]
     fn uber_states() {
         let uber_state = UberState::from_parts("25432", "7854").unwrap();
-        assert_eq!(format!("{}", uber_state), "25432|7854");
+        assert_eq!(format!("{}", uber_state.code()), "25432|7854");
         let uber_state = UberState::from_parts("25432", "65195=11").unwrap();
-        assert_eq!(format!("{}", uber_state), "25432|65195=11");
+        assert_eq!(format!("{}", uber_state.code()), "25432|65195=11");
         assert!(UberState::from_parts("", "3").is_err());
         assert!(UberState::from_parts("a", "3").is_err());
     }

@@ -16,11 +16,11 @@ pub enum ShopCommand {
 impl ShopCommand {
     pub fn code(&self) -> String {
         match self {
-            ShopCommand::SetIcon { uber_identifier, icon } => format!("0|{}|{}", uber_identifier, icon.code()),
-            ShopCommand::SetTitle { uber_identifier, title } => format!("1|{}{}", uber_identifier, title.iter().map(|title| format!("|{title}")).collect::<String>()),
-            ShopCommand::SetDescription { uber_identifier, description } => format!("2|{}{}", uber_identifier, description.iter().map(|description| format!("|{description}")).collect::<String>()),
-            ShopCommand::SetLocked { uber_identifier, locked } => format!("3|{}|{}", uber_identifier, locked),
-            ShopCommand::SetVisible { uber_identifier, visible } => format!("4|{}|{}", uber_identifier, visible),
+            ShopCommand::SetIcon { uber_identifier, icon } => format!("0|{}|{}", uber_identifier.code(), icon.code()),
+            ShopCommand::SetTitle { uber_identifier, title } => format!("1|{}{}", uber_identifier.code(), title.iter().map(|title| format!("|{title}")).collect::<String>()),
+            ShopCommand::SetDescription { uber_identifier, description } => format!("2|{}{}", uber_identifier.code(), description.iter().map(|description| format!("|{description}")).collect::<String>()),
+            ShopCommand::SetLocked { uber_identifier, locked } => format!("3|{}|{}", uber_identifier.code(), locked),
+            ShopCommand::SetVisible { uber_identifier, visible } => format!("4|{}|{}", uber_identifier.code(), visible),
         }
     }
 }

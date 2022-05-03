@@ -17,7 +17,7 @@ pub struct UberStateItem {
 impl UberStateItem {
     pub fn code(&self) -> String {
         format!("{}|{}|{}{}",
-            self.uber_identifier,
+            self.uber_identifier.code(),
             self.uber_type.code(),
             if self.signed { if self.sign { "+" } else { "-" } } else { "" },
             self.operator.code()
@@ -102,7 +102,7 @@ impl UberStateRangeBoundary {
     pub fn code(&self) -> String {
         match self {
             Self::Value(value) => format!("{value}"),
-            Self::Pointer(uber_identifier) => format!("$({uber_identifier})"),
+            Self::Pointer(identifier) => format!("$({})", identifier.code()),
         }
     }
 }
