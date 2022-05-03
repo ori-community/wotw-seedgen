@@ -33,8 +33,8 @@ impl Icon {
 impl fmt::Display for Icon {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Icon::Shard(shard) => write!(f, "{shard} Shard"),
-            Icon::Spell(spell) => write!(f, "{spell} Spell"),
+            Icon::Shard(shard) => write!(f, "{shard} Shard Icon"),
+            Icon::Spell(spell) => write!(f, "{spell} Spell Icon"),
             Icon::Opher(opher) => write!(f, "{opher} Opher Icon"),
             Icon::Lupo(lupo) => write!(f, "{lupo} Lupo Icon"),
             Icon::Grom(grom) => write!(f, "{grom} Grom Icon"),

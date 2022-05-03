@@ -12,15 +12,15 @@ pub enum UberType {
     Int,
     Float,
 }
-impl fmt::Display for UberType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl UberType {
+    pub fn code(&self) -> String {
         match self {
-            UberType::Bool => write!(f, "bool"),
-            UberType::Teleporter => write!(f, "teleporter"),
-            UberType::Byte => write!(f, "byte"),
-            UberType::Int => write!(f, "int"),
-            UberType::Float => write!(f, "float"),
-        }
+            UberType::Bool => "bool",
+            UberType::Teleporter => "teleporter",
+            UberType::Byte => "byte",
+            UberType::Int => "int",
+            UberType::Float => "float",
+        }.to_string()
     }
 }
 impl std::str::FromStr for UberType {

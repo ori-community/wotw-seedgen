@@ -330,7 +330,15 @@ fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     let id = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
     let position = parse_v_position(parser)?;
-    Ok(VCommand::CreateWarp { id, position })
+    let label = if parser.current_token().kind == TokenKind::Separator {
+        let peeked = parser.peek_token();
+        if matches!(peeked.kind, TokenKind::String { .. }) {
+            parser.next_token();
+            let label = parse_string(parser)?.to_owned();
+            Some(label)
+        } else { None }
+    } else { None };
+    Ok(VCommand::CreateWarp { id, position, label })
 }
 fn parse_destroy_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;

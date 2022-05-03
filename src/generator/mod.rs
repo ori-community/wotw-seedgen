@@ -1029,7 +1029,8 @@ where
             }
 
             let position = spawn.position().unwrap().clone();
-            let item = Item::Command(Command::CreateWarp { id: 0, position });
+            let label = Some("Warp to Spawn".to_string());
+            let item = Item::Command(Command::CreateWarp { id: 0, position, label });
 
             placements.push(Placement {
                 node: None,

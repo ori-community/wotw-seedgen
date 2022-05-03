@@ -135,7 +135,7 @@ fn block_spawn_sets(preplacement: &header::Pickup, world: &mut World) {
                 };
 
                 if world.graph.nodes.iter().any(|node| node.can_place() && node.uber_state().map_or(false, |uber_state| uber_state == &target)) {
-                    log::trace!("adding an empty pickup at {uber_state_item} to prevent placements");
+                    log::trace!("adding an empty pickup at {target} to prevent placements");
                     let mut message = Message::new(String::new());
                     message.frames = Some(0);
                     message.quiet = true;

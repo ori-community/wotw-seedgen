@@ -58,7 +58,7 @@ impl<'a> World<'a> {
                         UberType::Byte | UberType::Int => {
                             if command.signed {
                                 let uber_value = uber_value.parse::<i32>().unwrap();
-                                let mut prior = entry.parse::<i32>().map_err(|_| format!("Failed to apply uberState command {} because the current state ({}) doesn't match the specified type", command, entry))?;
+                                let mut prior = entry.parse::<i32>().map_err(|_| format!("Failed to apply uberState command {} because the current state ({}) doesn't match the specified type", command.code(), entry))?;
 
                                 if command.sign {
                                     prior += uber_value;
@@ -73,7 +73,7 @@ impl<'a> World<'a> {
                         UberType::Float => {
                             if command.signed {
                                 let uber_value = uber_value.parse::<f32>().unwrap();
-                                let mut prior = entry.parse::<f32>().map_err(|_| format!("Failed to apply uberState command {} because the current state ({}) doesn't match the specified type", command, entry))?;
+                                let mut prior = entry.parse::<f32>().map_err(|_| format!("Failed to apply uberState command {} because the current state ({}) doesn't match the specified type", command.code(), entry))?;
 
                                 if command.sign {
                                     prior += uber_value;
