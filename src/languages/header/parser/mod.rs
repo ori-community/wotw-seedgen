@@ -5,16 +5,16 @@ mod header_command;
 
 pub(super) use preprocess::preprocess;
 pub use postprocess::postprocess;
-use seedgen_derive::FromStr;
+use seedgen_derive::{FromStr, Display};
 
-use std::{str::FromStr, iter::Peekable, ops::Range, fmt, error::Error, slice::SliceIndex};
+use std::{str::FromStr, iter::Peekable, ops::Range, fmt::{self, Display, Debug}, error::Error, slice::SliceIndex};
 
 use crate::{
     VItem,
     util::{VUberState, extensions::StrExtension, UberIdentifier, Icon},
 };
 
-use super::{HeaderCommand, Annotation, HeaderContent, TimerDefinition, VPickup, V, VString, tokenizer::{TokenStream, Token, TokenKind, tokenize, CommentKind}};
+use super::{HeaderCommand, HeaderContent, TimerDefinition, VPickup, V, VString, tokenizer::{TokenStream, Token, TokenKind, tokenize, CommentKind}};
 
 pub struct Parser<'a> {
     input: &'a str,
@@ -36,8 +36,11 @@ impl<'a> Parser<'a> {
     /// Expects the current [`Token`] to match the [`TokenKind`], returns it and steps to the next [`Token`]
     pub(crate) fn eat(&mut self, kind: TokenKind) -> Result<Token, ParseError> {
         let token = self.next_token();
-        expect!(token, kind);
-        Ok(token)
+        if token.kind == kind {
+            Ok(token)
+        } else {
+            Err(self.error(format!("Expected {kind}"), token.range))
+        }
     }
     /// If the current [`Token`] matches the [`TokenKind`], steps to the next [`Token`]
     pub(crate) fn skip(&mut self, kind: TokenKind) {
@@ -82,41 +85,55 @@ impl<'a> Parser<'a> {
         &self.input[start..]
     }
 
-    /// Returns a multiline visual representation of a [`ParseError`]
-    /// 
-    /// # Panics
-    /// 
-    /// Panics if the [`ParseError`] is out of bounds of the [`Parser`]s input string
-    pub(crate) fn error_display(&self, err: ParseError) -> String {
-        if self.input.is_empty() { return format!("{}\n(input was empty)", err.message) }
-        let (line_number, line_range) = self.input.line_ranges()
-            .enumerate()
-            .find(|(_, line_range)| line_range.end >= err.range.end)
-            .expect("Error range out of bounds");
-        let message = err.message;
-        let line_number = format!("line {}", line_number + 1);
-        let indent = " ".repeat(line_number.len());
-        let err_offset = " ".repeat(err.range.start - line_range.start);
-        let err_underline = "^".repeat(err.range.len());
-        let line = &self.input[line_range];
-        let newline = if line.ends_with('\n') { "" } else { "\n" };
-        format!("\
-            {message}\n\
-            {line_number}: {line}{newline}\
-            {indent}  {err_offset}{err_underline}\
-        ")
+    /// Returns a [`ParseError`] with the given message and error range
+    pub(crate) fn error(&self, message: impl AsRef<str>, range: Range<usize>) -> ParseError {
+        ParseError::new(message, self.input, range)
     }
 }
 
 #[derive(Debug)]
 pub struct ParseError {
     message: String,
-    range: Range<usize>,
+    source: String,
+    pub range: Range<usize>,
+    pub completion: Option<String>,
 }
 impl ParseError {
-    fn new(message: impl AsRef<str>, range: Range<usize>) -> Self {
+    pub(crate) fn new(message: impl AsRef<str>, source: impl AsRef<str>, range: Range<usize>) -> Self {
         let message = message.as_ref().to_string();
-        Self { message, range }
+        let source = source.as_ref().to_string();
+        Self { message, source, range, completion: None }
+    }
+
+    /// Adds the completion to this [`ParseError`]
+    pub(crate) fn with_completion(mut self, completion: impl Display) -> Self {
+        self.completion = Some(completion.to_string());
+        self
+    }
+
+    /// Returns a multiline visual representation of this [`ParseError`]
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if the [`ParseError`] is out of bounds of its source string
+    pub fn verbose_display(&self) -> String {
+        if self.source.is_empty() { return format!("{}\n(input was empty)", self.message) }
+        let (line_number, line_range) = self.source.line_ranges()
+            .enumerate()
+            .find(|(_, line_range)| line_range.end >= self.range.end)
+            .expect("Error range out of bounds");
+        let message = &self.message;
+        let line_number = format!("line {}", line_number + 1);
+        let indent = " ".repeat(line_number.len());
+        let err_offset = " ".repeat(self.range.start - line_range.start);
+        let err_underline = "^".repeat(self.range.len());
+        let line = &self.source[line_range];
+        let newline = if line.ends_with('\n') { "" } else { "\n" };
+        format!("\
+            {message}\n\
+            {line_number}: {line}{newline}\
+            {indent}  {err_offset}{err_underline}\
+        ")
     }
 }
 impl fmt::Display for ParseError {
@@ -132,39 +149,31 @@ enum InterpolationCommand {
     PARAM,
 }
 
-macro_rules! expect {
-    ($token:ident, $expected:expr) => {
-        if $token.kind != $expected {
-            return Err($crate::header::parser::ParseError::new(format!("Expected {}", $expected), $token.range));
-        }
-    };
-}
-use expect;
 macro_rules! invalid {
-    ($token:ident, $expected:expr) => {
-        |err| $crate::header::parser::ParseError::new(format!("Invalid {}: {}", $expected, err), $token.range)
+    ($token:ident, $parser:expr, $expected:path) => {
+        |err| $parser.error(format!("Invalid {}: {}", $expected, err), $token.range).with_completion($expected)
     };
 }
 use invalid;
 
 macro_rules! parse_token {
-    ($token_kind:path, $parser:expr, $description:expr) => {
+    ($token_kind:path, $parser:expr, $expected:path) => {
         {
             let token = $parser.eat($token_kind)?;
             let string = $parser.read_token(&token);
-            string.parse().map_err($crate::header::parser::invalid!(token, $description))?
+            string.parse().map_err($crate::header::parser::invalid!(token, $parser, $expected))?
         }
     };
 }
 use parse_token;
 macro_rules! parse_number {
-    ($parser:expr, $description:expr) => {
-        $crate::header::parser::parse_token!($crate::header::tokenizer::TokenKind::Number, $parser, $description)
+    ($parser:expr, $expected:path) => {
+        $crate::header::parser::parse_token!($crate::header::tokenizer::TokenKind::Number, $parser, $expected)
     };
 }
 use parse_number;
 macro_rules! parse_removable_number {
-    ($parser:expr, $description:expr) => {
+    ($parser:expr, $expected:path) => {
         {
             let token = $parser.eat($crate::header::tokenizer::TokenKind::Number)?;
             let mut string = $parser.read_token(&token);
@@ -172,24 +181,24 @@ macro_rules! parse_removable_number {
                 string = remove;
                 true
             } else { false };
-            let parsed = string.parse().map_err($crate::header::parser::invalid!(token, $description))?;
+            let parsed = string.parse().map_err($crate::header::parser::invalid!(token, $parser, $expected))?;
             (parsed, remove)
         }
     };
 }
 use parse_removable_number;
 macro_rules! parse_value {
-    ($parser:expr, $description:expr) => {
+    ($parser:expr, $expected:path) => {
         {
             $parser.eat($crate::header::tokenizer::TokenKind::Eq)?;
-            $crate::header::parser::parse_number!($parser, $description)
+            $crate::header::parser::parse_number!($parser, $expected)
         }
     };
 }
 use parse_value;
 macro_rules! parse_ident {
-    ($parser:expr, $description:expr) => {
-        $crate::header::parser::parse_token!($crate::header::tokenizer::TokenKind::Ident, $parser, $description)
+    ($parser:expr, $expected:path) => {
+        $crate::header::parser::parse_token!($crate::header::tokenizer::TokenKind::Ident, $parser, $expected)
     };
 }
 use parse_ident;
@@ -197,10 +206,10 @@ fn parse_string<'a>(parser: &'a mut Parser) -> Result<&'a str, ParseError> {
     let token = parser.next_token();
     if let TokenKind::String { terminated } = token.kind {
         if !terminated {
-            return Err(ParseError::new("Unterminated string", token.range));
+            return Err(parser.error("Unterminated string", token.range));
         }
     } else {
-        return Err(ParseError::new("Expected string", token.range));
+        return Err(parser.error("Expected string", token.range));
     }
     let content_range = token.range.start + 1..token.range.end - 1;
     Ok(parser.read(content_range))
@@ -213,49 +222,49 @@ fn parse_v_param<T: FromStr>(parser: &mut Parser) -> Result<V<T>, ParseError> {
     Ok(V::Parameter(param))
 }
 macro_rules! parse_v {
-    ($parser:expr, $token:ident, $description:expr) => {
+    ($parser:expr, $token:ident, $expected:path) => {
         match $token.kind {
             $crate::header::tokenizer::TokenKind::Dollar => {
-                let command = $crate::header::parser::parse_ident!($parser, "interpolation command");
+                let command = $crate::header::parser::parse_ident!($parser, $crate::header::parser::Expectation::InterpolationCommand);
                 match command {
                     $crate::header::parser::InterpolationCommand::PARAM => $crate::header::parser::parse_v_param($parser)?,
                 }
             },
-            _ => return Err($crate::header::parser::ParseError::new(format!("Expected {}", $description), $token.range)),
+            _ => return Err($parser.error(format!("Expected {}", $expected), $token.range).with_completion($expected)),
         }
     };
 }
 use parse_v;
 macro_rules! parse_v_or_kind {
-    ($parser:expr, $description:expr, $kind:pat) => {
+    ($parser:expr, $expected:path, $kind:pat) => {
         {
             let token = $parser.next_token();
             match token.kind {
                 $kind => {
                     let string = $parser.read_token(&token);
-                    let literal = string.parse().map_err($crate::header::parser::invalid!(token, $description))?;
+                    let literal = string.parse().map_err($crate::header::parser::invalid!(token, $parser, $expected))?;
                     $crate::header::V::Literal(literal)
                 },
-                _ => $crate::header::parser::parse_v!($parser, token, $description)
+                _ => $crate::header::parser::parse_v!($parser, token, $expected)
             }
         }
     };
 }
 use parse_v_or_kind;
 macro_rules! parse_v_ident {
-    ($parser:expr, $description:expr) => {
-        $crate::header::parser::parse_v_or_kind!($parser, $description, $crate::header::tokenizer::TokenKind::Ident)
+    ($parser:expr, $expected:path) => {
+        $crate::header::parser::parse_v_or_kind!($parser, $expected, $crate::header::tokenizer::TokenKind::Ident)
     };
 }
 use parse_v_ident;
 macro_rules! parse_v_number {
-    ($parser:expr, $description:expr) => {
-        $crate::header::parser::parse_v_or_kind!($parser, $description, $crate::header::tokenizer::TokenKind::Number)
+    ($parser:expr, $expected:path) => {
+        $crate::header::parser::parse_v_or_kind!($parser, $expected, $crate::header::tokenizer::TokenKind::Number)
     };
 }
 use parse_v_number;
 macro_rules! parse_v_removable_number {
-    ($parser:expr, $description:expr) => {
+    ($parser:expr, $expected:path) => {
         {
             let token = $parser.next_token();
             match token.kind {
@@ -265,13 +274,13 @@ macro_rules! parse_v_removable_number {
                         string = remove;
                         true
                     } else { false };
-                    let parsed = string.parse().map_err($crate::header::parser::invalid!(token, $description))?;
+                    let parsed = string.parse().map_err($crate::header::parser::invalid!(token, $parser, $expected))?;
                     (V::Literal(parsed), remove)
                 },
                 $crate::header::tokenizer::TokenKind::Minus => {
-                    ($crate::header::parser::parse_v_number!($parser, $description), true)
+                    ($crate::header::parser::parse_v_number!($parser, $expected), true)
                 },
-                _ => ($crate::header::parser::parse_v!($parser, token, $description), false)
+                _ => ($crate::header::parser::parse_v!($parser, token, $expected), false)
             }
         }
     };
@@ -282,10 +291,54 @@ fn trim_comment(input: &str) -> &str {
     input.find("//").map_or(input, |index| &input[..index]).trim_end()
 }
 
+#[derive(Display)]
+enum Expectation {
+    UberGroup,
+    UberId,
+    UberTriggerValue,
+    Integer,
+    Float,
+    Boolean,
+    NumericBoolean,
+    Identifier,
+    IconKind,
+    ShardIcon,
+    SpellIcon,
+    OpherIcon,
+    LupoIcon,
+    GromIcon,
+    TuleyIcon,
+    Annotation,
+    Expression,
+    InterpolationCommand,
+    UberConditionValue,
+    ItemKind,
+    Resource,
+    Skill,
+    Shard,
+    CommandKind,
+    ToggleCommandKind,
+    EquipSlot,
+    Spell,
+    Teleporter,
+    UberType,
+    WorldEvent,
+    BonusItem,
+    BonusUpgrade,
+    Zone,
+    SysMessageKind,
+    WheelCommandKind,
+    WheelItemPosition,
+    WheelBind,
+    ShopCommandKind,
+    HeaderCommand,
+    ParameterType,
+}
+
 fn parse_uber_identifier(parser: &mut Parser) -> Result<UberIdentifier, ParseError> {
-    let uber_group = parse_number!(parser, "uber group");
+    let uber_group = parse_number!(parser, Expectation::UberGroup);
     parser.eat(TokenKind::Separator)?;
-    let uber_id = parse_number!(parser, "uber id");
+    let uber_id = parse_number!(parser, Expectation::UberId);
     Ok(UberIdentifier { uber_group, uber_id })
 }
 #[derive(PartialEq, FromStr)]
@@ -300,47 +353,18 @@ enum IconKind {
     File,
 }
 fn parse_icon(parser: &mut Parser) -> Result<Icon, ParseError> {
-    let kind = parse_ident!(parser, "icon kind");
+    let kind = parse_ident!(parser, Expectation::IconKind);
     parser.eat(TokenKind::Colon)?;
-    let icon = if kind == IconKind::File {
-        let path = parse_string(parser)?.to_owned();
-        Icon::File(path)
-    } else {
-        let id = parse_number!(parser, "icon identifier");
-        match kind {
-            IconKind::Shard => Icon::Shard(id),
-            IconKind::Spell => Icon::Spell(id),
-            IconKind::Opher => Icon::Opher(id),
-            IconKind::Lupo => Icon::Lupo(id),
-            IconKind::Grom => Icon::Grom(id),
-            IconKind::Tuley => Icon::Tuley(id),
-            IconKind::File => unreachable!(),
-        }
+    let icon = match kind {
+        IconKind::Shard => Icon::Shard(parse_number!(parser, Expectation::ShardIcon)),
+        IconKind::Spell => Icon::Spell(parse_number!(parser, Expectation::SpellIcon)),
+        IconKind::Opher => Icon::Opher(parse_number!(parser, Expectation::OpherIcon)),
+        IconKind::Lupo => Icon::Lupo(parse_number!(parser, Expectation::LupoIcon)),
+        IconKind::Grom => Icon::Grom(parse_number!(parser, Expectation::GromIcon)),
+        IconKind::Tuley => Icon::Tuley(parse_number!(parser, Expectation::TuleyIcon)),
+        IconKind::File => Icon::File(parse_string(parser)?.to_owned()),
     };
     Ok(icon)
-}
-
-/// Returns the annotations of a header and removes them from the input string
-pub(super) fn parse_annotations(input: &mut String) -> Result<Vec<Annotation>, String> {
-    let mut annotations = vec![];
-    let mut after_annotations = input.len();
-
-    for range in input.line_ranges() {
-        let range_start = range.start;
-        let line = &input[range];
-        if let Some(annotation) = line.strip_prefix('#') {
-            let annotation = trim_comment(annotation);
-            let annotation = Annotation::from_str(annotation)?;
-            annotations.push(annotation);
-        } else if !line.is_empty() {
-            after_annotations = range_start;
-            break;
-        }
-    }
-
-    input.replace_range(0..after_annotations, "");
-
-    Ok(annotations)
 }
 
 struct ParseContext<'a, 'b> {
@@ -420,7 +444,7 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
     let current_token = parser.current_token();
     match current_token.kind {
         TokenKind::Ident => {
-            let kind = parse_ident!(parser, "expression");
+            let kind = parse_ident!(parser, Expectation::Expression);
             parser.eat(TokenKind::Colon)?;
             parser.skip(TokenKind::Whitespace);
             match kind {
@@ -438,7 +462,11 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
             }
         },
         TokenKind::Number | TokenKind::Dollar => parse_pickup(context, false),
-        _ => Err(ParseError::new("expected expression", current_token.range.clone())),
+        TokenKind::Pound => {
+            parser.next_token();
+            parse_annotation(parser)
+        },
+        _ => Err(parser.error("expected expression", current_token.range.clone())),
     }
 }
 fn parse_flags(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
@@ -473,7 +501,7 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
     let identifier = parse_uber_identifier(parser)?;
     let value = if parser.current_token().kind == TokenKind::Eq {
         parser.next_token();
-        parse_v_number!(parser, "")
+        parse_v_number!(parser, Expectation::UberTriggerValue)
     } else { V::Literal(String::new()) };
     let trigger = VUberState { identifier, value };
 
@@ -484,6 +512,10 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
 
     let pickup = VPickup { trigger, item, ignore, skip_validation };
     Ok(HeaderContent::Pickup(pickup))
+}
+fn parse_annotation(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
+    let annotation = parse_ident!(parser, Expectation::Annotation);
+    Ok(HeaderContent::Annotation(annotation))
 }
 
 #[cfg(test)]

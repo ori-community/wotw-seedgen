@@ -8,7 +8,7 @@ use crate::{
     header::{V, VString, tokenizer::TokenKind},
 };
 
-use super::{Parser, ParseError, parse_string, parse_number, parse_removable_number, parse_value, parse_ident, parse_v_ident, parse_v_number, parse_v_removable_number, parse_uber_identifier, parse_icon};
+use super::{Parser, ParseError, parse_string, parse_number, parse_removable_number, parse_value, parse_ident, parse_v_ident, parse_v_number, parse_v_removable_number, parse_uber_identifier, parse_icon, Expectation};
 
 impl VItem {
     /// Parse item syntax
@@ -110,19 +110,19 @@ enum ShopCommandKind {
 fn parse_v_uber_state_condition(parser: &mut Parser) -> Result<VUberState, ParseError> {
     let identifier = parse_uber_identifier(parser)?;
     parser.eat(TokenKind::Separator)?;
-    let value = parse_v_number!(parser, "");
+    let value = parse_v_number!(parser, Expectation::UberConditionValue);
     Ok(VUberState { identifier, value })
 }
 
 fn parse_v_position(parser: &mut Parser) -> Result<VPosition, ParseError> {
-    let x = parse_v_number!(parser, "x coordinate");
+    let x = parse_v_number!(parser, Expectation::Float);
     parser.eat(TokenKind::Separator)?;
-    let y = parse_v_number!(parser, "y coordinate");
+    let y = parse_v_number!(parser, Expectation::Float);
     Ok(VPosition { x, y })
 }
 
 fn parse_item(parser: &mut Parser) -> Result<VItem, ParseError> {
-    let kind = parse_number!(parser, "item kind");
+    let kind = parse_number!(parser, Expectation::ItemKind);
     match kind {
         ItemKind::SpiritLight => parse_spirit_light(parser),
         ItemKind::Resource => parse_resource(parser),
@@ -144,7 +144,7 @@ fn parse_item(parser: &mut Parser) -> Result<VItem, ParseError> {
 
 fn parse_spirit_light(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let (amount, remove) = parse_v_removable_number!(parser, "spirit light amount");
+    let (amount, remove) = parse_v_removable_number!(parser, Expectation::Integer);
     let item = if remove {
         VItem::RemoveSpiritLight(amount)
     } else {
@@ -154,12 +154,12 @@ fn parse_spirit_light(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_resource(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let resource = parse_number!(parser, "resource");
+    let resource = parse_number!(parser, Expectation::Resource);
     Ok(VItem::Resource(resource))
 }
 fn parse_skill(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let (skill, remove) = parse_removable_number!(parser, "skill");
+    let (skill, remove) = parse_removable_number!(parser, Expectation::Skill);
     let item = if remove {
         VItem::RemoveSkill(skill)
     } else {
@@ -169,7 +169,7 @@ fn parse_skill(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_shard(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let (shard, remove) = parse_removable_number!(parser, "shard");
+    let (shard, remove) = parse_removable_number!(parser, Expectation::Shard);
     let item = if remove {
         VItem::RemoveShard(shard)
     } else {
@@ -179,7 +179,7 @@ fn parse_shard(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let kind = parse_number!(parser, "command kind");
+    let kind = parse_number!(parser, Expectation::CommandKind);
     let command = match kind {
         CommandKind::Autosave => Ok(VCommand::Autosave),
         CommandKind::Resource => parse_set_resource(parser),
@@ -217,9 +217,9 @@ fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_set_resource(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let resource = parse_number!(parser, "resource");
+    let resource = parse_number!(parser, Expectation::Resource);
     parser.eat(TokenKind::Separator)?;
-    let amount = parse_v_number!(parser, "resource amount");
+    let amount = parse_v_number!(parser, Expectation::Integer);
     Ok(VCommand::Resource { resource, amount })
 }
 fn parse_stop_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -239,9 +239,9 @@ fn parse_stop_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_toggle(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let target = parse_number!(parser, "toggle command kind");
+    let target = parse_number!(parser, Expectation::ToggleCommandKind);
     parser.eat(TokenKind::Separator)?;
-    let on = parse_v_number!(parser, "toggle command value");
+    let on = parse_v_number!(parser, Expectation::NumericBoolean);
     Ok(VCommand::Toggle { target, on })
 }
 fn parse_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -261,31 +261,31 @@ fn parse_stop_timer(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_intercept(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let intercept = parse_number!(parser, "intercept");
+    let intercept = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
-    let set = parse_number!(parser, "set");
+    let set = parse_number!(parser, Expectation::Integer);
     Ok(VCommand::StateRedirect { intercept, set })
 }
 fn parse_set_health(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let amount = parse_v_number!(parser, "health amount");
+    let amount = parse_v_number!(parser, Expectation::Integer);
     Ok(VCommand::SetHealth { amount })
 }
 fn parse_set_energy(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let amount = parse_v_number!(parser, "health amount");
+    let amount = parse_v_number!(parser, Expectation::Integer);
     Ok(VCommand::SetEnergy { amount })
 }
 fn parse_set_spirit_light(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let amount = parse_v_number!(parser, "health amount");
+    let amount = parse_v_number!(parser, Expectation::Integer);
     Ok(VCommand::SetSpiritLight { amount })
 }
 fn parse_equip(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let slot = parse_v_number!(parser, "equip slot");
+    let slot = parse_v_number!(parser, Expectation::EquipSlot);
     parser.eat(TokenKind::Separator)?;
-    let ability = parse_number!(parser, "equipment");
+    let ability = parse_number!(parser, Expectation::Spell);
     Ok(VCommand::Equip { slot, ability })
 }
 fn parse_ahk_signal(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -327,14 +327,14 @@ fn parse_enable_sync(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let id = parse_number!(parser, "warp id");
+    let id = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
     let position = parse_v_position(parser)?;
     Ok(VCommand::CreateWarp { id, position })
 }
 fn parse_destroy_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let id = parse_number!(parser, "warp id");
+    let id = parse_number!(parser, Expectation::Integer);
     Ok(VCommand::DestroyWarp { id })
 }
 fn parse_if_box(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -348,33 +348,33 @@ fn parse_if_box(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_if_self_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let value = parse_v_number!(parser, "");
+    let value = parse_v_number!(parser, Expectation::UberConditionValue);
     parser.eat(TokenKind::Separator)?;
     let item = Box::new(parse_item(parser)?);
     Ok(VCommand::IfSelfEqual { value, item })
 }
 fn parse_if_self_greater(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let value = parse_v_number!(parser, "");
+    let value = parse_v_number!(parser, Expectation::UberConditionValue);
     parser.eat(TokenKind::Separator)?;
     let item = Box::new(parse_item(parser)?);
     Ok(VCommand::IfSelfGreater { value, item })
 }
 fn parse_if_self_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let value = parse_v_number!(parser, "");
+    let value = parse_v_number!(parser, Expectation::UberConditionValue);
     parser.eat(TokenKind::Separator)?;
     let item = Box::new(parse_item(parser)?);
     Ok(VCommand::IfSelfLess { value, item })
 }
 fn parse_unequip(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let ability = parse_number!(parser, "equipment");
+    let ability = parse_number!(parser, Expectation::Spell);
     Ok(VCommand::UnEquip { ability })
 }
 fn parse_save_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let id = parse_number!(parser, "string id");
+    let id = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
     let token = parser.eat(TokenKind::Number)?;
     let string = VString(parser.read_token(&token).to_string());
@@ -382,7 +382,7 @@ fn parse_save_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_append_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let id = parse_number!(parser, "string id");
+    let id = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
     let token = parser.eat(TokenKind::Number)?;
     let string = VString(parser.read_token(&token).to_string());
@@ -390,7 +390,7 @@ fn parse_append_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_teleporter(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let (teleporter, remove) = parse_removable_number!(parser, "teleporter");
+    let (teleporter, remove) = parse_removable_number!(parser, Expectation::Teleporter);
     let item = if remove {
         VItem::RemoveTeleporter(teleporter)
     } else {
@@ -421,10 +421,10 @@ fn parse_message(parser: &mut Parser) -> Result<VItem, ParseError> {
                 parser.next_token();
                 match flag {
                     MessageFlag::Mute => message.mute = true,
-                    MessageFlag::F => message.frames = Some(parse_value!(parser, "frames")),
+                    MessageFlag::F => message.frames = Some(parse_value!(parser, Expectation::Integer)),
                     MessageFlag::Instant => message.instant = true,
                     MessageFlag::Quiet => message.quiet = true,
-                    MessageFlag::P => message.pos = Some(parse_value!(parser, "position")),
+                    MessageFlag::P => message.pos = Some(parse_value!(parser, Expectation::Float)),
                     MessageFlag::NoClear => message.noclear = true,
                 }
             } else { break }
@@ -436,7 +436,7 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
     let uber_identifier = parse_uber_identifier(parser)?;
     parser.eat(TokenKind::Separator)?;
-    let uber_type = parse_ident!(parser, "uber state type");
+    let uber_type = parse_ident!(parser, Expectation::UberType);
     parser.eat(TokenKind::Separator)?;
 
     let (signed, sign) = match parser.current_token().kind {
@@ -467,14 +467,14 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
         },
         TokenKind::Dollar | TokenKind::Number | TokenKind::Ident => {
             let value = match uber_type {
-                UberType::Bool | UberType::Teleporter => { parse_v_ident!(parser, "boolean") },
-                UberType::Byte => { parse_v_number!(parser, "byte") },
-                UberType::Int => { parse_v_number!(parser, "integer") },
-                UberType::Float => { parse_v_number!(parser, "float") },
+                UberType::Bool | UberType::Teleporter => { parse_v_ident!(parser, Expectation::Boolean) },
+                UberType::Byte => { parse_v_number!(parser, Expectation::Integer) },
+                UberType::Int => { parse_v_number!(parser, Expectation::Integer) },
+                UberType::Float => { parse_v_number!(parser, Expectation::Float) },
             };
             VUberStateOperator::Value(value)
         },
-        _ => return Err(ParseError::new("expected uber state operator", token.range)),
+        _ => return Err(parser.error("expected uber state operator", token.range)),
     };
 
     let mut skip = false;
@@ -502,14 +502,14 @@ fn parse_boundary(parser: &mut Parser, uber_type: &UberType) -> Result<VUberStat
         },
         TokenKind::Dollar | TokenKind::Number | TokenKind::Ident => {
             let value = match uber_type {
-                UberType::Bool | UberType::Teleporter => { parse_v_ident!(parser, "boolean") },
-                UberType::Byte => { parse_v_number!(parser, "byte") },
-                UberType::Int => { parse_v_number!(parser, "integer") },
-                UberType::Float => { parse_v_number!(parser, "float") },
+                UberType::Bool | UberType::Teleporter => { parse_v_ident!(parser, Expectation::Boolean) },
+                UberType::Byte => { parse_v_number!(parser, Expectation::Integer) },
+                UberType::Int => { parse_v_number!(parser, Expectation::Integer) },
+                UberType::Float => { parse_v_number!(parser, Expectation::Float) },
             };
             VUberStateRangeBoundary::Value(value)
         },
-        _ => return Err(ParseError::new("expected value or pointer", token.range)),
+        _ => return Err(parser.error("expected value or pointer", token.range)),
     };
     Ok(boundary)
 }
@@ -521,7 +521,7 @@ fn parse_pointer(parser: &mut Parser) -> Result<UberIdentifier, ParseError> {
 }
 fn parse_water(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let (_, remove): (WorldEventKind, bool) = parse_removable_number!(parser, "world event");
+    let (_, remove): (WorldEventKind, bool) = parse_removable_number!(parser, Expectation::WorldEvent);
     let item = if remove {
         VItem::RemoveWater
     } else {
@@ -531,27 +531,27 @@ fn parse_water(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_bonus_item(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let bonus_item = parse_number!(parser, "bonus item");
+    let bonus_item = parse_number!(parser, Expectation::BonusItem);
     Ok(VItem::BonusItem(bonus_item))
 }
 fn parse_bonus_upgrade(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let bonus_upgrade = parse_number!(parser, "bonus upgrade");
+    let bonus_upgrade = parse_number!(parser, Expectation::BonusUpgrade);
     Ok(VItem::BonusUpgrade(bonus_upgrade))
 }
 fn parse_relic(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let zone = parse_number!(parser, "zone");
+    let zone = parse_number!(parser, Expectation::Zone);
     Ok(VItem::Relic(zone))
 }
 fn parse_sys_message(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let kind = parse_number!(parser, "system message kind");
+    let kind = parse_number!(parser, Expectation::SysMessageKind);
     let sys_message = match kind {
         SysMessageKind::RelicList => SysMessage::RelicList,
         SysMessageKind::MapRelicList => {
             parser.eat(TokenKind::Separator)?;
-            let zone = parse_number!(parser, "zone");
+            let zone = parse_number!(parser, Expectation::Zone);
             SysMessage::MapRelicList(zone)
         },
         SysMessageKind::PickupCount => SysMessage::PickupCount,
@@ -561,7 +561,7 @@ fn parse_sys_message(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_wheel_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let kind = parse_number!(parser, "command kind");
+    let kind = parse_number!(parser, Expectation::WheelCommandKind);
     let command = match kind {
         WheelCommandKind::SetName => parse_wheel_set_name(parser),
         WheelCommandKind::SetDescription => parse_wheel_set_description(parser),
@@ -577,9 +577,9 @@ fn parse_wheel_command(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_wheel_item_position(parser: &mut Parser) -> Result<(u32, WheelItemPosition), ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let wheel = parse_number!(parser, "wheel identifier");
+    let wheel = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
-    let position = parse_number!(parser, "wheel item position");
+    let position = parse_number!(parser, Expectation::WheelItemPosition);
     Ok((wheel, position))
 }
 fn parse_wheel_set_name(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
@@ -603,33 +603,33 @@ fn parse_wheel_set_icon(parser: &mut Parser) -> Result<VWheelCommand, ParseError
 fn parse_wheel_set_color(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     let (wheel, position) = parse_wheel_item_position(parser)?;
     parser.eat(TokenKind::Separator)?;
-    let r = parse_v_number!(parser, "red color channel");
+    let r = parse_v_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
-    let g = parse_v_number!(parser, "red color channel");
+    let g = parse_v_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
-    let b = parse_v_number!(parser, "red color channel");
+    let b = parse_v_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
-    let a = parse_v_number!(parser, "red color channel");
+    let a = parse_v_number!(parser, Expectation::Integer);
     Ok(VWheelCommand::SetColor { wheel, position, r, g, b, a })
 }
 fn parse_wheel_set_item(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     let (wheel, position) = parse_wheel_item_position(parser)?;
     parser.eat(TokenKind::Separator)?;
-    let bind = parse_number!(parser, "wheel bind");
+    let bind = parse_number!(parser, Expectation::WheelBind);
     parser.eat(TokenKind::Separator)?;
     let item = Box::new(parse_item(parser)?);
     Ok(VWheelCommand::SetItem { wheel, position, bind, item })
 }
 fn parse_wheel_set_sticky(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let wheel = parse_number!(parser, "wheel identifier");
+    let wheel = parse_number!(parser, Expectation::Integer);
     parser.eat(TokenKind::Separator)?;
-    let sticky = parse_v_ident!(parser, "sticky value");
+    let sticky = parse_v_ident!(parser, Expectation::Boolean);
     Ok(VWheelCommand::SetSticky { wheel, sticky })
 }
 fn parse_wheel_switch_wheel(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let wheel = parse_number!(parser, "wheel identifier");
+    let wheel = parse_number!(parser, Expectation::Integer);
     Ok(VWheelCommand::SwitchWheel { wheel })
 }
 fn parse_wheel_remove_item(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
@@ -638,7 +638,7 @@ fn parse_wheel_remove_item(parser: &mut Parser) -> Result<VWheelCommand, ParseEr
 }
 fn parse_shop_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let kind = parse_number!(parser, "command kind");
+    let kind = parse_number!(parser, Expectation::ShopCommandKind);
     parser.eat(TokenKind::Separator)?;
     let uber_identifier = parse_uber_identifier(parser)?;
     let command = match kind {
@@ -675,11 +675,11 @@ fn parse_shop_set_description(parser: &mut Parser, uber_identifier: UberIdentifi
 }
 fn parse_shop_set_locked(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let locked = parse_v_ident!(parser, "sticky value");
+    let locked = parse_v_ident!(parser, Expectation::Boolean);
     Ok(VShopCommand::SetLocked { uber_identifier, locked })
 }
 fn parse_shop_set_visible(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
     parser.eat(TokenKind::Separator)?;
-    let visible = parse_v_ident!(parser, "visible value");
+    let visible = parse_v_ident!(parser, Expectation::Boolean);
     Ok(VShopCommand::SetVisible { uber_identifier, visible })
 }

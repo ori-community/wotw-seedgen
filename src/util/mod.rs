@@ -1,14 +1,16 @@
 pub mod orbs;
 pub mod uber_state;
 pub mod constants;
+pub mod icon;
 pub(crate) mod extensions;
 
 pub use orbs::Orbs;
+pub use icon::Icon;
 pub use uber_state::{UberState, VUberState, UberIdentifier, UberType};
 
 use decorum::R32;
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use seedgen_derive::{VVariant, FromStr};
+use seedgen_derive::{VVariant, FromStr, Display};
 
 use std::{
     fmt,
@@ -22,6 +24,53 @@ use std::{
 pub enum NumericBool {
     False,
     True,
+}
+
+#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[repr(u16)]
+pub enum Spell {
+    Hammer = 1000,
+    Bow = 1001,
+    Sword = 1002,
+    Torch = 1003,
+    Swordstaff = 1004,
+    Chainsword = 1005,
+    Shot = 2000,
+    HomingMissiles = 2001,
+    Wave = 2002,
+    Whirl = 2003,
+    Glow = 2004,
+    LockOn = 2005,
+    Shield = 2006,
+    Invisibility = 2007,
+    LifeAbsorb = 2008,
+    Shards = 2009,
+    Grenade = 2010,
+    Sentry = 2011,
+    Spear = 2012,
+    Regenerate = 2013,
+    Teleport = 2014,
+    Shuriken = 2015,
+    Blaze = 2016,
+    Turret = 2017,
+    Sein = 2018,
+    Launch = 2019,
+    Bash = 3000,
+    Grapple = 3001,
+    Burrow = 3002,
+    Drill = 3003,
+    DoubleJump = 3004,
+    Flap = 3005,
+    Dash = 4000,
+    Bounce = 4001,
+    Glide = 4002,
+    ChargeJump = 4003,
+    WaterDash = 4004,
+    Climb = 4005,
+    WeaponCharge = 4006,
+    DamageUpgradeA = 4007,
+    DamageUpgradeB = 4008,
+    WaterBreath = 4009,
 }
 
 #[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive, FromStr)]
@@ -43,30 +92,6 @@ pub enum Zone {
     Shop = 12,
     #[num_enum(default)]
     Void = 13,
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum Icon {
-    Shard(u16),
-    Spell(u16),
-    Opher(u16),
-    Lupo(u16),
-    Grom(u16),
-    Tuley(u16),
-    File(String),
-}
-impl fmt::Display for Icon {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Icon::Shard(id) => write!(f, "shard:{}", id),
-            Icon::Spell(id) => write!(f, "spell:{}", id),
-            Icon::Opher(id) => write!(f, "opher:{}", id),
-            Icon::Lupo(id) => write!(f, "lupo:{}", id),
-            Icon::Grom(id) => write!(f, "grom:{}", id),
-            Icon::Tuley(id) => write!(f, "tuley:{}", id),
-            Icon::File(path) => write!(f, "file:{}", path),
-        }
-    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]

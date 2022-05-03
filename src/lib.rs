@@ -110,7 +110,7 @@ fn parse_header(
     let header_config = config_map.remove(&header_name).unwrap_or_default();
 
     let header = Header::parse(header, rng)
-        .map_err(|err| format!("{err} in header {header_name}"))?
+        .map_err(|err| format!("{} in header {}", err[0], header_name))?
         .build(header_config)?;
 
     for include in &header.includes {

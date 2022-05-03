@@ -329,7 +329,8 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
 pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), String> {
     let mut default_parameters = FxHashMap::default();
 
-    let header = Header::parse(contents.to_string(), &mut rand::thread_rng())?;
+    let header = Header::parse(contents.to_string(), &mut rand::thread_rng())
+        .map_err(|errors| errors.into_iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?;
     header.fill_parameters(&mut default_parameters)?;
     let build = header.clone().build(default_parameters.clone())?;
 

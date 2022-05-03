@@ -92,7 +92,7 @@ impl FromStr for Item {
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let mut parser = Parser::new(input);
         let item = VItem::parse(&mut parser)
-            .map_err(|err| parser.error_display(err))?
+            .map_err(|err| err.verbose_display())?
             .resolve(&FxHashMap::default())?;
         let remaining = parser.remaining();
         if remaining.is_empty() {

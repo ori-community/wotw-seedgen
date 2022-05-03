@@ -4,7 +4,7 @@ use num_enum::TryFromPrimitive;
 use seedgen_derive::{VVariant, FromStr};
 
 use super::{Item, VItem, Resource};
-use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool};
+use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool, Spell};
 use crate::header::VString;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
@@ -24,7 +24,7 @@ pub enum Command {
     SetHealth { #[VWrap] amount: i16 },
     SetEnergy { #[VWrap] amount: i16 },
     SetSpiritLight { #[VWrap] amount: i16 },
-    Equip { #[VWrap] slot: EquipSlot, ability: u16 },
+    Equip { #[VWrap] slot: EquipSlot, ability: Spell },
     AhkSignal { signal: String },
     IfEqual { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
     IfGreater { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
@@ -37,7 +37,7 @@ pub enum Command {
     IfSelfEqual { #[VWrap] value: String, #[VType] item: Box<Item> },
     IfSelfGreater { #[VWrap] value: String, #[VType] item: Box<Item> },
     IfSelfLess { #[VWrap] value: String, #[VType] item: Box<Item> },
-    UnEquip { ability: u16 },
+    UnEquip { ability: Spell },
     SaveString { id: i32, #[VType] string: String },
     AppendString { id: i32, #[VType] string: String },
 }

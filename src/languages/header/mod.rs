@@ -16,7 +16,7 @@ use crate::{util::{Icon, UberState, VUberState, UberIdentifier}, VItem, Item};
 use rustc_hash::FxHashMap;
 use rand::Rng;
 
-use parser::{Parser, parse_header_contents};
+use parser::{Parser, ParseError, parse_header_contents};
 
 #[derive(Debug, Clone)]
 pub struct TimerDefinition {
@@ -52,8 +52,6 @@ impl Pickup {
 #[derive(Debug, Clone)]
 /// Abstract representation of a header file
 pub struct Header {
-    /// Top level annotations such as `#hide`
-    pub annotations: Vec<Annotation>,
     /// Contents of the header
     pub contents: Vec<HeaderContent>,
 }
@@ -62,17 +60,12 @@ impl Header {
     /// Parse complete header syntax
     /// 
     /// All `!!pool`, `!!flush` and `!!take` syntax will be evaluated at this time, using the provided rng
-    pub fn parse<R: Rng>(mut input: String, rng: &mut R) -> Result<Header, String> {
-        let annotations = parser::parse_annotations(&mut input)?;
-        parser::preprocess(&mut input, rng)?;
+    pub fn parse<R: Rng>(mut input: String, rng: &mut R) -> Result<Header, Vec<ParseError>> {
+        // TODO not actually parsing pool means anything using pool gets wrong errors
+        parser::preprocess(&mut input, rng).map_err(|err| vec![ParseError::new(format!("Error preprocessing: {err}"), "", 0..0)])?;
         let mut parser = Parser::new(&input);
-        let contents = parse_header_contents(&mut parser).map_err(|errors|
-            errors.into_iter()
-                .map(|err| parser.error_display(err))
-                .collect::<Vec<_>>()
-                .join("\n")
-        )?;
-        Ok(Header { annotations, contents })
+        let contents = parse_header_contents(&mut parser)?;
+        Ok(Header { contents })
     }
 
     /// Evaluates the header based on the provided parameters and returns the desired changes to seed generation
@@ -107,6 +100,29 @@ impl Header {
         }
 
         Ok(())
+    }
+
+    /// Returns the annotations of this header
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use seedgen::Header;
+    /// use seedgen::header::Annotation;
+    /// 
+    /// let input = "#hide\n9|0|8|9|0|int|0".to_string();
+    /// 
+    /// let header = Header::parse(input, &mut rand::thread_rng()).unwrap();
+    /// let annotations = header.annotations();
+    /// 
+    /// assert_eq!(annotations, vec![&Annotation::Hide]);
+    /// ```
+    pub fn annotations(&self) -> Vec<&Annotation> {
+        self.contents.iter().filter_map(|content|
+            if let HeaderContent::Annotation(annotation) = content {
+                Some(annotation)
+            } else { None }
+        ).collect()
     }
 
     /// Returns the configuration parameters for this header
@@ -189,7 +205,7 @@ impl Header {
     /// # use seedgen::Header;
     /// use seedgen::header::Annotation;
     /// 
-    /// let input = "#hide\n9|0|8|9|0|int|0".to_string();
+    /// let input = "#hide\n9|0|8|9|0|int|0";
     /// 
     /// let annotations = Header::parse_annotations(input).unwrap();
     /// 
@@ -201,12 +217,24 @@ impl Header {
     /// ```
     /// # use seedgen::Header;
     /// # 
-    /// let input = "#hide\n3|6|\"This isn't even valid header syntax!\"".to_string();
+    /// let input = "#hide\n3|6|\"This isn't even valid header syntax!\"";
     /// 
     /// assert!(Header::parse_annotations(input).is_ok());
     /// ```
-    pub fn parse_annotations(mut input: String) -> Result<Vec<Annotation>, String> {
-        parser::parse_annotations(&mut input)
+    pub fn parse_annotations(input: &str) -> Result<Vec<Annotation>, String> {
+        let mut annotations = vec![];
+
+        for line in input.lines() {
+            if let Some(annotation) = line.strip_prefix('#') {
+                let end = annotation.find(|c: char| c == '/' || c.is_whitespace()).unwrap_or_else(|| annotation.len());
+                let annotation = annotation[..end].parse()?;
+                annotations.push(annotation);
+            } else if !line.is_empty() {
+                break;
+            }
+        }
+
+        Ok(annotations)
     }
 
     /// Returns the name and description of a given header syntax
@@ -338,6 +366,8 @@ pub enum HeaderContent {
     OuterDocumentation(String),
     /// Documentation for contained configuration parameters
     InnerDocumentation(String),
+    /// Meta annotations
+    Annotation(Annotation),
     /// A List of Flags to add to the resulting seed
     Flags(Vec<VString>),
     /// A header command to be applied at generation time

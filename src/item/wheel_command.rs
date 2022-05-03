@@ -24,7 +24,7 @@ impl fmt::Display for WheelCommand {
         match self {
             WheelCommand::SetName { wheel, position, name } => write!(f, "0|{}|{}|{}", wheel, *position as u8, name),
             WheelCommand::SetDescription { wheel, position, description } => write!(f, "1|{}|{}|{}", wheel, *position as u8, description),
-            WheelCommand::SetIcon { wheel, position, icon } => write!(f, "2|{}|{}|{}", wheel, *position as u8, icon),
+            WheelCommand::SetIcon { wheel, position, icon } => write!(f, "2|{}|{}|{}", wheel, *position as u8, icon.code()),
             WheelCommand::SetColor { wheel, position, r, g, b, a } => write!(f, "3|{}|{}|{}|{}|{}|{}", wheel, *position as u8, r, g, b, a),
             WheelCommand::SetItem { wheel, position, bind, item } => write!(f, "4|{}|{}|{}|{}", wheel, *position as u8, *bind as u8, item),
             WheelCommand::SetSticky { wheel, sticky } => write!(f, "5|{}|{}", wheel, sticky),

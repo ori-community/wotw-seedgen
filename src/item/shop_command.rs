@@ -16,7 +16,7 @@ pub enum ShopCommand {
 impl fmt::Display for ShopCommand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ShopCommand::SetIcon { uber_identifier, icon } => write!(f, "0|{}|{}", uber_identifier, icon),
+            ShopCommand::SetIcon { uber_identifier, icon } => write!(f, "0|{}|{}", uber_identifier, icon.code()),
             ShopCommand::SetTitle { uber_identifier, title } => {
                 match title {
                     None => write!(f, "1|{}", uber_identifier),

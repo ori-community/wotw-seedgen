@@ -1,7 +1,9 @@
 use num_enum::TryFromPrimitive;
 use seedgen_derive::FromStr;
 
-use crate::{util::Icon, settings::Difficulty};
+use crate::util::icon::OpherIcon;
+use crate::util::{Icon, Spell};
+use crate::settings::Difficulty;
 
 #[derive(Debug, seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
@@ -33,32 +35,33 @@ pub enum Skill {
 }
 impl Skill {
     pub fn icon(self) -> Option<Icon> {
-        match self {
-            Skill::Bash => Some(Icon::Spell(3000)),
-            Skill::WallJump => None,
-            Skill::DoubleJump => Some(Icon::Spell(4001)),
-            Skill::Launch => Some(Icon::Spell(2019)),
-            Skill::Glide => Some(Icon::Spell(4002)),
-            Skill::WaterBreath => Some(Icon::Opher(10)),
-            Skill::Grenade => Some(Icon::Spell(2010)),
-            Skill::Grapple => Some(Icon::Spell(3001)),
-            Skill::Flash => Some(Icon::Spell(2004)),
-            Skill::Spear => Some(Icon::Opher(6)),
-            Skill::Regenerate => Some(Icon::Spell(2013)),
-            Skill::Bow => Some(Icon::Spell(1001)),
-            Skill::Hammer => Some(Icon::Opher(2)),
-            Skill::Sword => Some(Icon::Spell(1002)),
-            Skill::Burrow => Some(Icon::Spell(3002)),
-            Skill::Dash => Some(Icon::Spell(4000)),
-            Skill::WaterDash => Some(Icon::Spell(4004)),
-            Skill::Shuriken => Some(Icon::Opher(4)),
-            Skill::Seir => Some(Icon::Spell(2018)),
-            Skill::Blaze => Some(Icon::Opher(8)),
-            Skill::Sentry => Some(Icon::Opher(0)),
-            Skill::Flap => Some(Icon::Spell(3005)),
-            Skill::AncestralLight1 => Some(Icon::File(String::from("assets/icons/game/ancestrallight1.png"))),
-            Skill::AncestralLight2 => Some(Icon::File(String::from("assets/icons/game/ancestrallight2.png"))),
-        }
+        let icon = match self {
+            Skill::Bash => Icon::Spell(Spell::Bash),
+            Skill::WallJump => return None,
+            Skill::DoubleJump => Icon::Spell(Spell::Bounce),
+            Skill::Launch => Icon::Spell(Spell::Launch),
+            Skill::Glide => Icon::Spell(Spell::Glide),
+            Skill::WaterBreath => Icon::Opher(OpherIcon::WaterBreath),
+            Skill::Grenade => Icon::Spell(Spell::Grenade),
+            Skill::Grapple => Icon::Spell(Spell::Grapple),
+            Skill::Flash => Icon::Spell(Spell::Glow),
+            Skill::Spear => Icon::Opher(OpherIcon::Spear),
+            Skill::Regenerate => Icon::Spell(Spell::Regenerate),
+            Skill::Bow => Icon::Spell(Spell::Bow),
+            Skill::Hammer => Icon::Opher(OpherIcon::Hammer),
+            Skill::Sword => Icon::Spell(Spell::Sword),
+            Skill::Burrow => Icon::Spell(Spell::Burrow),
+            Skill::Dash => Icon::Spell(Spell::Dash),
+            Skill::WaterDash => Icon::Spell(Spell::WaterDash),
+            Skill::Shuriken => Icon::Opher(OpherIcon::Shuriken),
+            Skill::Seir => Icon::Spell(Spell::Sein),
+            Skill::Blaze => Icon::Opher(OpherIcon::Blaze),
+            Skill::Sentry => Icon::Opher(OpherIcon::Sentry),
+            Skill::Flap => Icon::Spell(Spell::Flap),
+            Skill::AncestralLight1 => Icon::File(String::from("assets/icons/game/ancestrallight1.png")),
+            Skill::AncestralLight2 => Icon::File(String::from("assets/icons/game/ancestrallight2.png")),
+        };
+        Some(icon)
     }
 
     pub fn energy_cost(self) -> f32 {

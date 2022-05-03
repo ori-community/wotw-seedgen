@@ -52,7 +52,7 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
     for content in contents {
         if if_stack.last().copied().unwrap_or(true) {
             match content {
-                HeaderContent::OuterDocumentation(_) | HeaderContent::InnerDocumentation(_) => {},
+                HeaderContent::OuterDocumentation(_) | HeaderContent::InnerDocumentation(_) | HeaderContent::Annotation(_) => {},
                 HeaderContent::Flags(flag_string) => header_build.flags = build_flags(flag_string, &header_build.flags, parameters)?,
                 HeaderContent::Command(command) => build_command(command, &mut header_build, &mut if_stack, parameters)?,
                 HeaderContent::Timer(timer) => lines.push(format!("timer: {}", timer.code())),
