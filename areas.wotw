@@ -775,6 +775,8 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
       Bash, Grenade=1
     kii:
       Bash
+    unsafe:
+      SentryJump=1
 
   conn HowlsDen.UpperLoopEntrance: free
   conn HowlsDen.Entrance:
@@ -787,6 +789,7 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
     unsafe, MarshSpawn.HowlBurnt:
       Bash, DoubleJump OR Dash OR Glide OR Sword  # use the slime
       Bash  # use the slime, tight coyote jump
+      SentryJump=1
   conn HowlsDen.SecretRoom:
     gorlek: ShurikenBreak=16, BreakWall=20
     unsafe:
@@ -810,6 +813,7 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
       DoubleJump, TripleJump
     kii:
       DoubleJump, Hammer  # kinda pointless with hammer but a path is a path
+    # If you can sentry jump, you can take the normal path
   conn HowlsDen.UpperLoopExit:
     moki:
       BreakWall=16, BreakWall=16, Combat=Slug, DoubleJump OR Dash
@@ -905,7 +909,9 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Sword OR Hammer
       BreakWall=16, Damage=10, Shuriken=5 OR Sentry=5 OR Flash=5  # one jump is kinda hard
       BreakWall=16, Sentry=6  # two sentries in the air to avoid the spikes
-    unsafe: Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
+    unsafe:
+      Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
+      SentryJump=2
   conn HowlsDen.Teleporter:
     moki: HowlsDen.BoneBarrier
 
@@ -9471,8 +9477,9 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       PoolsApproach.WheelFreed, Dash, Hammer
     unsafe:
       GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      SwordJump
+      SwordJump OR HammerJump
       GrenadeJump, GrenadeCancel  # gjump to reach the platform then cancel second one to the pickup, cancel it and grenade float (which you also need to cancel so you can wjump)
+      SentryJump=1
   pickup PoolsApproach.CurrentEX:
     moki: Water, WaterDash
     kii: Damage=100, WaterDash
