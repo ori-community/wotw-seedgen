@@ -12067,16 +12067,17 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       SentryJump=1, Glide
       Launch
     kii:
-      Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Burrow
       Bash, Grenade=2
       Burrow, DoubleJump OR Sentry=3
       Damage=30, DoubleJump
 
-  # Connection to NorthTP is useless since this anchor have the same conn/pickup but they need more skills than from OutsideRuins
   conn WindtornRuins.UpperRuinsDoor:
     moki: EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
   conn UpperWastes.RuinsApproach:
     moki: Burrow
+  conn UpperWastes.NorthTP:  # Not logic relevant outside of unsafe, only needed for the NonGladesTeleporter state. If there's ever another reason to get this teleporter, this will need to be checked for difficulty.
+    unsafe: free  # Precise wall jumping required. Lure the mantis onto the platform to get it out of the way.
 
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
   refill Checkpoint
