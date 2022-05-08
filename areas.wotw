@@ -2564,7 +2564,7 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
 
 # checkpoint at 21, -4220
 
-anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floot after the beetle arena
+anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after the beetle arena
   pickup EastHollow.BashEC:
     moki:
       Bash, DoubleJump, Dash
@@ -2583,7 +2583,8 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floot after th
       HammerSJump=1
       DoubleJump, Dash
       Bash
-      # Bash, Dash OR Glide
+      Sword, Shuriken=1, Dash OR Shuriken=1  # shuriken pogo. Probably a lot more possibilities for the condition, such as double jump
+      # Bash, Glide
 
   conn EastHollow.BashTreeCheckpoint:
     moki:
@@ -2616,7 +2617,7 @@ anchor EastHollow.BashTreeCheckpoint at -7,-327:  # Checkpoint at Bash tree
       DoubleJump, Bash
       Launch
     gorlek:
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
       SentryJump=1, DoubleJump, TripleJump
     kii:
       Bash, Grenade=1 OR Sword OR Hammer OR Flash=2 OR Sentry=2
