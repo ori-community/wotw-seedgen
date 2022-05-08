@@ -6063,8 +6063,18 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
       DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
       Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
     unsafe:
-      SentryJump=1, DoubleJump, TripleJump, Damage=15  # sjump from a micro ledge at very edge of the fire pit
-      Sword, DoubleJump, TripleJump, Damage=15  # double jump onto the wall, then double sword jump into the spikes.
+      SwordSJump=1  # Sjump onto the wall, use the sword for movement. It looks possible with Hammer, but I can't get it to work.
+      HammerSJump=2  # Sword sjump paths are redundant with the above
+      HammerSJump=1, Shuriken=1 OR BlazeSwap=1 OR DoubleJump OR Dash OR Glide OR Damage=15 OR PauseHover  # Sjump from a micro ledge at very edge of the fire pit. The damage path requires jumping onto the left wall and climbing up. This is doable with sjump+sentry, but why would you do that when you could just sjump twice?
+      Sword, DoubleJump, TripleJump, Damage=15  # Double jump onto the wall, then double sword jump into the spikes.
+      DoubleJump, GrenadeJump  # Micro ledge at the right edge of the fire pit, micro ledge at the right edge of the spikes. Use both.
+      Bash  # The skeeto is uncooperative, but it's doable.
+      BlazeSwap=6 OR FlashSwap  # Probably room for improvement, I'm not good at swaps
+      HammerJump  # This can be done without Triple Jump, but it's really difficult: 
+        # 1. Jump to the right from the micro ledge on the fire pit, and do an extended hammer jump. You need to reach the small climable wall on the ceiling, next to the spikes above the corruption.
+        # 2. Wall jump to the left, and do an extended hammer jump onto the micro ledge next to the spikes in the hidden area. Do the hammer jump late so that you don't hit the ceiling.
+        # 3. Hammer jump onto the wall, and hammer jump again to reach the ore. Teleport out.
+        # 4. Take a vacation in Luma Pools. You deserve it.
   pickup WoodsMain.YellowWallEX:
     moki: WoodsMain.BalloonLureYellowBarrierBroken
 
