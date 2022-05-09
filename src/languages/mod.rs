@@ -1,7 +1,8 @@
 pub mod logic;
 pub mod header;
 mod cursor;
-
-pub use self::{
-    logic::parse_logic,
-};
+use cursor::Cursor;
+mod token;
+pub(crate) use token::{Token, TokenKind, CommentKind};
+mod parser;
+pub(crate) use parser::{Parser, ParseError};

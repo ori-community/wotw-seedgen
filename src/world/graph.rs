@@ -5,14 +5,14 @@ use smallvec::{SmallVec, smallvec};
 
 use super::{player::Player, requirements::Requirement};
 use crate::util::{
-    RefillType, NodeType, Position, Zone, UberState, UberIdentifier,
+    RefillValue, NodeKind, Position, Zone, UberState, UberIdentifier,
     orbs::{self, Orbs},
     constants::TP_ANCHOR,
 };
 
 #[derive(Debug)]
 pub struct Refill {
-    pub name: RefillType,
+    pub value: RefillValue,
     pub requirement: Requirement,
 }
 
@@ -62,12 +62,12 @@ pub enum Node {
     Quest(Quest),
 }
 impl Node {
-    pub fn node_type(&self) -> NodeType {
+    pub fn node_kind(&self) -> NodeKind {
         match self {
-            Node::Anchor(_) => NodeType::Anchor,
-            Node::Pickup(_) => NodeType::Pickup,
-            Node::State(_) => NodeType::State,
-            Node::Quest(_) => NodeType::Quest,
+            Node::Anchor(_) => NodeKind::Anchor,
+            Node::Pickup(_) => NodeKind::Pickup,
+            Node::State(_) => NodeKind::State,
+            Node::Quest(_) => NodeKind::Quest,
         }
     }
     pub fn identifier(&self) -> &str {
@@ -179,19 +179,19 @@ impl Graph {
                     for refill in &anchor.refills {
                         for orbs in &best_orbs {
                             if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
-                                if matches!(refill.name, RefillType::Full) {
+                                if matches!(refill.value, RefillValue::Full) {
                                     best_orbs = smallvec![max_orbs];
                                     break;
                                 }
                                 let mut refill_orbs = orbs::both(&best_orbs, &orbcost);
-                                match refill.name {
-                                    RefillType::Checkpoint => refill_orbs = orbs::either_single(&refill_orbs, context.player.checkpoint_orbs()),
-                                    RefillType::Health(amount) => {
+                                match refill.value {
+                                    RefillValue::Checkpoint => refill_orbs = orbs::either_single(&refill_orbs, context.player.checkpoint_orbs()),
+                                    RefillValue::Health(amount) => {
                                         let amount = amount * context.player.health_plant_drops();
                                         refill_orbs.iter_mut().for_each(|orbs| orbs.heal(amount, context.player));
                                     },
-                                    RefillType::Energy(amount) => refill_orbs.iter_mut().for_each(|orbs| orbs.recharge(amount, context.player)),
-                                    RefillType::Full => unreachable!(),
+                                    RefillValue::Energy(amount) => refill_orbs.iter_mut().for_each(|orbs| orbs.recharge(amount, context.player)),
+                                    RefillValue::Full => unreachable!(),
                                 }
                                 best_orbs = orbs::either(&best_orbs, &refill_orbs);
                                 break;
@@ -284,7 +284,7 @@ impl Graph {
     #[inline]
     pub fn find_spawn(&self, spawn: &str) -> Result<&Node, String> {
         let entry = self.nodes.iter().find(|&node| node.identifier() == spawn).ok_or_else(|| format!("Spawn {} not found", spawn))?;
-        if !matches!(entry, Node::Anchor(_)) { return Err(format!("Spawn has to be an anchor, {} is a {:?}", spawn, entry.node_type())); }
+        if !matches!(entry, Node::Anchor(_)) { return Err(format!("Spawn has to be an anchor, {} is a {:?}", spawn, entry.node_kind())); }
         Ok(entry)
     }
 

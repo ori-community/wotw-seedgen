@@ -28,17 +28,32 @@ impl<'a> Cursor<'a> {
     pub(super) fn first(&self) -> char {
         self.chars.clone().next().unwrap_or(EOF_CHAR)
     }
+    /// Peeks the second next symbol from the input stream without consuming it.
+    /// If requested position doesn't exist, `EOF_CHAR` is returned.
+    /// However, getting `EOF_CHAR` doesn't always mean actual end of file,
+    /// it should be checked with `is_eof` method.
+    pub(super) fn second(&self) -> char {
+        self.chars.clone().nth(1).unwrap_or(EOF_CHAR)
+    }
 
     /// Checks if there is nothing more to consume.
     pub(super) fn is_eof(&self) -> bool {
         self.chars.as_str().is_empty()
     }
 
-    /// Returns range of consumed symbols since the last time calling this function.
+    /// Returns range of consumed symbols since the last time calling this function
+    pub(super) fn reset_consumed_range(&mut self) -> Range<usize> {
+        let range = self.consumed_range();
+        self.offset = range.end;
+        range
+    }
+    /// Returns range of consumed symbols since the last time calling `reset_consumed_range`
     pub(super) fn consumed_range(&mut self) -> Range<usize> {
-        let prior = self.offset;
-        self.offset = self.initial_len - self.chars.as_str().len();
-        prior..self.offset
+        self.offset..self.initial_len - self.chars.as_str().len()
+    }
+    /// Returns count of consumed symbols since the last time calling `reset_consumed_range`
+    pub(super) fn consumed_count(&mut self) -> usize {
+        self.consumed_range().len()
     }
 
     /// Moves to the next character.

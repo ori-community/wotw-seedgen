@@ -96,7 +96,8 @@ pub enum Zone {
     Void = 13,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, FromStr)]
+#[ParseFromIdentifier]
 pub enum Enemy {
     Mantis,
     Slug,
@@ -163,14 +164,14 @@ impl Enemy {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum RefillType {
+pub enum RefillValue {
     Full,
     Checkpoint,
     Health(f32),
     Energy(f32),
 }
-#[derive(Debug, PartialEq)]
-pub enum NodeType {
+#[derive(Debug, Clone, PartialEq, Display)]
+pub enum NodeKind {
     Anchor,
     Pickup,
     State,
@@ -185,6 +186,14 @@ pub struct Position {
     pub y: R32,
 }
 impl Position {
+    /// Returns a new [`Position`] with th egiven coordinates
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if either coordinate is not a real number
+    pub fn new(x: f32, y: f32) -> Position {
+        Position { x: x.into(), y: y.into() }
+    }
     pub fn code(&self) -> String {
         format!("{}|{}", self.x, self.y)
     }
@@ -302,6 +311,13 @@ pub fn float_to_int(float: f32) -> Result<u32, String> {
         return Err(format!("Failed to convert float to int: {float}"));
     }
     Ok(float as u32)
+}
+
+pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
+    match float.is_finite() {
+        true => Ok(float.into()),
+        false => Err(format!("Expected finite number, found {float}")),
+    }
 }
 
 /// Read the spawn location from a generated seed

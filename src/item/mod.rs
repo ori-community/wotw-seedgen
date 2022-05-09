@@ -17,7 +17,7 @@ use std::str::FromStr;
 use rustc_hash::FxHashMap;
 use seedgen_derive::VVariant;
 
-use crate::header::parser::Parser;
+use crate::header::parser;
 use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
 use crate::util::{Zone, Icon};
@@ -92,7 +92,7 @@ vdisplay! {
 impl FromStr for Item {
     type Err = String;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let mut parser = Parser::new(input);
+        let mut parser = parser::new(input);
         let item = VItem::parse(&mut parser)
             .map_err(|err| err.verbose_display())?
             .resolve(&FxHashMap::default())?;

@@ -693,7 +693,10 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
 
     parse_settings(args.seed, args.settings, &mut settings)?;
 
-    let graph = logic::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, !args.trust)?;
+    let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
+    let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
+    let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
+    let graph = logic::parse_logic(&areas, &locations, &states, &settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
@@ -771,9 +774,12 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         Ok(0)
     }).map_err(|err| format!("Error reading current world: {err}"))?;
 
-    let graph = &logic::parse_logic(&args.areas, &args.locations, &args.uber_states, &settings, false)?;
+    let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
+    let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
+    let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
+    let graph = logic::parse_logic(&areas, &locations, &states, &settings, false)?;
     let world_settings = settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
-    let mut world = World::new(graph, world_settings);
+    let mut world = World::new(&graph, world_settings);
 
     world.player.inventory.grant(Item::Resource(Resource::Health), args.health / 5);
     #[allow(clippy::cast_possible_truncation)]
@@ -854,7 +860,9 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
 
     let mut rng = rand::thread_rng();
 
-    let header = Header::parse(header, &mut rng)?.build(FxHashMap::default())?;
+    let header = Header::parse(header, &mut rng)
+        .map_err(|errors| errors.into_iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?
+        .build(FxHashMap::default())?;
 
     path.set_extension("wotwr");
     let path = util::create_file(path.file_name().unwrap(), &header.seed_content, "target", false)?;

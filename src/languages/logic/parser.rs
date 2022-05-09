@@ -1,92 +1,42 @@
-use decorum::R32;
-use rustc_hash::FxHashMap;
+use std::convert::TryFrom;
+use std::ops::Range;
+use std::str::FromStr;
+
+use seedgen_derive::{FromStr, Display};
 use smallvec::SmallVec;
 
-use super::tokenizer::{Token, TokenType, Metadata};
-use crate::item::{Resource, Skill, Shard, Teleporter};
+use crate::item;
+use crate::languages::parser::{parse_ident, read_ident, parse_value, parse_number, ParseErrorCollection};
+use crate::languages::{ParseError, TokenKind};
 use crate::settings::{Difficulty, Trick};
-use crate::util::{RefillType, NodeType, Enemy, Position};
+use crate::util::{RefillValue, NodeKind, Enemy, Position};
 
-#[derive(Debug)]
-pub struct ParseError {
-    pub description: String,
-    pub position: usize,
-}
-impl ParseError {
-    fn new(position: usize, description: String) -> ParseError {
-        ParseError {
-            description,
-            position,
-        }
-    }
-}
+use super::tokenizer::{tokenize, TokenStream};
 
-#[derive(Debug)]
-pub enum Requirement<'a> {
-    Free,
-    Impossible,
-    Definition(&'a str),
-    Difficulty(Difficulty),
-    Trick(Trick),
-    Skill(Skill),
-    EnergySkill(Skill, u16),
-    SpiritLight(u32),
-    Resource(Resource, u32),
-    Shard(Shard),
-    Teleporter(Teleporter),
-    Water,
-    State(&'a str),
-    Damage(u16),
-    Danger(u16),
-    Combat(SmallVec<[(Enemy, u8); 12]>),
-    Boss(u16),
-    BreakWall(u16),
-    BreakCrystal,
-    ShurikenBreak(u16),
-    SentryBreak(u16),
-    HammerBreak,
-    SpearBreak,
-    SentryJump(u16),
-    SwordSentryJump(u16),
-    HammerSentryJump(u16),
-    SentryBurn(u16),
-    LaunchSwap,
-    SentrySwap(u16),
-    FlashSwap,
-    BlazeSwap(u16),
-    WaveDash,
-    GrenadeJump,
-    GrenadeCancel,
-    HammerJump,
-    SwordJump,
-    GrenadeRedirect(u16),
-    SentryRedirect(u16),
-    GlideJump,
-    GlideHammerJump,
-    SpearJump(u16),
+type Parser<'a> = crate::languages::Parser<'a, TokenStream<'a>>;
+fn new(input: &str) -> Parser { crate::languages::Parser::new(input, tokenize(input)) }
+
+/// Syntax Tree representing an areas file
+/// 
+/// This is one needed component that has to be passed to [`logic::build`]
+/// 
+/// Use [`Areas::parse`] to parse a string into this format
+#[derive(Debug, Clone)]
+pub struct Areas<'a> {
+    pub(super) contents: Vec<AreaContent<'a>>,
 }
-#[derive(Debug, Default)]
-pub struct Line<'a> {
-    pub ands: Vec<Requirement<'a>>,
-    pub ors: Vec<Requirement<'a>>,
-    pub group: Option<Group<'a>>,
+#[derive(Debug, Clone)]
+pub enum AreaContent<'a> {
+    Requirement(NamedGroup<'a>),
+    Region(NamedGroup<'a>),
+    Anchor(Anchor<'a>),
 }
-#[derive(Debug)]
-pub struct Group<'a> {
-    pub lines: Vec<Line<'a>>
+#[derive(Debug, Clone)]
+pub struct NamedGroup<'a> {
+    pub name: &'a str,
+    pub group: Group<'a>,
 }
-#[derive(Debug)]
-pub struct Refill<'a> {
-    pub name: RefillType,
-    pub requirements: Option<Group<'a>>,
-}
-#[derive(Debug)]
-pub struct Connection<'a> {
-    pub name: NodeType,
-    pub identifier: &'a str,
-    pub requirements: Group<'a>,
-}
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Anchor<'a> {
     pub identifier: &'a str,
     pub position: Option<Position>,
@@ -94,452 +44,645 @@ pub struct Anchor<'a> {
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
 }
+#[derive(Debug, Clone)]
+pub struct Refill<'a> {
+    pub value: RefillValue,
+    pub requirements: Option<Group<'a>>,
+}
+#[derive(Debug, Clone)]
+pub struct Connection<'a> {
+    pub kind: NodeKind,
+    pub identifier: &'a str,
+    pub requirements: Group<'a>,
+}
+#[derive(Debug, Clone)]
+pub struct Group<'a> {
+    pub lines: Vec<Line<'a>>
+}
+#[derive(Debug, Clone)]
+pub struct Line<'a> {
+    pub ands: Vec<Requirement<'a>>,
+    pub ors: Vec<Requirement<'a>>,
+    pub group: Option<Group<'a>>,
+}
+#[derive(Debug, Clone)]
+pub struct Requirement<'a> {
+    pub value: RequirementValue<'a>,
+    pub range: Range<usize>,
+}
+#[derive(Debug, Clone)]
+pub enum RequirementValue<'a> {
+    Free,
+    Impossible,
+    Macro(&'a str),
+    Difficulty(Difficulty),
+    Trick(Trick),
+    Skill(Skill),
+    UseSkill(Skill, u32),
+    SpiritLight(u32),
+    Resource(Resource, u32),
+    Shard(Shard),
+    Teleporter(Teleporter),
+    Water,
+    State(&'a str),
+    Damage(u32),
+    Danger(u32),
+    Combat(SmallVec<[(Enemy, u8); 12]>),
+    Boss(u32),
+    BreakWall(u32),
+    BreakCrystal,
+    ShurikenBreak(u32),
+    SentryBreak(u32),
+    HammerBreak,
+    SpearBreak,
+    SentryJump(u32),
+    SwordSentryJump(u32),
+    HammerSentryJump(u32),
+    SentryBurn(u32),
+    LaunchSwap,
+    SentrySwap(u32),
+    FlashSwap,
+    BlazeSwap(u32),
+    WaveDash,
+    GrenadeJump,
+    GrenadeCancel,
+    HammerJump,
+    SwordJump,
+    GrenadeRedirect(u32),
+    SentryRedirect(u32),
+    GlideJump,
+    GlideHammerJump,
+    SpearJump(u32),
+}
+
+impl<'a> Areas<'a> {
+    /// Parses the input string into the [`Areas`] representation
+    pub fn parse(input: &'a str) -> Result<Areas<'a>, ParseErrorCollection> {
+        let mut contents = Vec::new();
+        let mut errors = ParseErrorCollection::new();
+        let mut parser = new(input);
+        loop {
+            parser.skip_while(|kind| kind == TokenKind::Newline || kind == TokenKind::Whitespace);
+            if parser.current_token().kind == TokenKind::Eof { break }
+            match parse_content(&mut parser) {
+                Ok(content) => contents.push(content),
+                Err(err) => errors.push(err),
+            }
+        }
+
+        fill_macros_and_states(&mut contents, &parser).unwrap_or_else(|err| errors.push(err));
+
+        match errors.is_empty() {
+            true => Ok(Self { contents }),
+            false => Err(errors),
+        }
+    }
+}
+
 impl<'a> Anchor<'a> {
     pub fn region(&self) -> &'a str {
         self.identifier.split_once('.').map_or(self.identifier, |parts| parts.0)
     }
 }
-#[derive(Debug)]
-pub struct AreaTree<'a> {
-    pub definitions: FxHashMap<&'a str, Group<'a>>,
-    pub regions: FxHashMap<&'a str, Group<'a>>,
-    pub anchors: Vec<Anchor<'a>>,
+
+#[derive(Display)]
+enum Suggestion {
+    Content,
+    Identifier,
+    Integer,
+    Float,
+    Requirement,
+    Enemy,
+    AnchorContent,
+    Refill,
 }
 
-macro_rules! __expected_variants {
-    ($expected:expr) => {
-        $expected
-    };
-    ($expected:expr, $($more:expr),+) => {
-        format!("{} or {}", $expected, __expected_variants!($($more),+))
-    }
-}
-
-macro_rules! wrong_token {
-    ($token:expr, $($expected:expr),+) => {
-        return Err(ParseError::new($token.position, format!("Expected {} at line {}, instead found {}", __expected_variants!($($expected),+), $token.line, $token.name)))
-    };
-}
-macro_rules! missing_token {
-    ($($expected:expr),+) => {
-        return Err(ParseError {
-            description: format!("File ended abruptly, expected {}", __expected_variants!($($expected),+)),
-            position: usize::MAX,
-        })
-    }
-}
-
-fn wrong_amount(token: &Token) -> ParseError {
-    ParseError::new(token.position, format!("Failed to parse amount at line {}", token.line))
-}
-fn wrong_requirement(token: &Token) -> ParseError {
-    ParseError::new(token.position, format!("Failed to parse requirement at line {}", token.line))
-}
-fn not_int(token: &Token) -> ParseError {
-    ParseError::new(token.position, format!("Need an integer in {} at line {}", token.name, token.line))
-}
-
-macro_rules! next_token {
-    ($tokens:expr, $position:expr, $($expected:expr),+) => {
-        if let Some(token) = $tokens.get($position) {
-            $position += 1;
-            token
-        } else {
-            missing_token!($($expected),+);
-        }
-    };
-}
-
-#[inline]
-fn eat<'a>(tokens: &[Token<'a>], position: &mut usize, expected: TokenType) -> Result<(), ParseError> {
-    let token = next_token!(tokens, *position, expected);
-    if token.name == expected {
-        Ok(())
-    } else {
-        wrong_token!(token, expected)
-    }
-}
-
-fn parse_requirement<'a>(token: &Token<'a>, metadata: &Metadata) -> Result<Requirement<'a>, ParseError> {
-    let mut parts = token.value.split('=');
-    let keyword = parts.next().unwrap();
-    let amount = parts.next();
-    if parts.next().is_some() {
-        return Err(wrong_amount(token));
-    }
-    match amount {
-        Some(amount) => {
-            if keyword == "Combat" {
-                let mut enemies = SmallVec::new();
-                for enemy in amount.split('+') {
-                    let mut parts = enemy.split('x');
-                    let amount = parts.next().ok_or_else(|| wrong_requirement(token))?;
-                    let (enemy, amount) = match parts.next() {
-                        Some(enemy) => (enemy, amount),
-                        None => (amount, "1"),
-                    };
-                    if parts.next().is_some() {
-                        return Err(wrong_requirement(token));
-                    }
-                    let amount: u8 = match amount.parse() {
-                        Ok(result) => result,
-                        Err(_) => return Err(not_int(token)),
-                    };
-                    let enemy = match enemy {
-                        "Mantis" => Ok(Enemy::Mantis),
-                        "Slug" => Ok(Enemy::Slug),
-                        "WeakSlug" => Ok(Enemy::WeakSlug),
-                        "BombSlug" => Ok(Enemy::BombSlug),
-                        "CorruptSlug" => Ok(Enemy::CorruptSlug),
-                        "SneezeSlug" => Ok(Enemy::SneezeSlug),
-                        "ShieldSlug" => Ok(Enemy::ShieldSlug),
-                        "Lizard" => Ok(Enemy::Lizard),
-                        "Bat" => Ok(Enemy::Bat),
-                        "Hornbug" => Ok(Enemy::Hornbug),
-                        "Skeeto" => Ok(Enemy::Skeeto),
-                        "SmallSkeeto" => Ok(Enemy::SmallSkeeto),
-                        "Bee" => Ok(Enemy::Bee),
-                        "Nest" => Ok(Enemy::Nest),
-                        "Crab" => Ok(Enemy::Crab),
-                        "SpinCrab" => Ok(Enemy::SpinCrab),
-                        "Tentacle" => Ok(Enemy::Tentacle),
-                        "Balloon" => Ok(Enemy::Balloon),
-                        "Miner" => Ok(Enemy::Miner),
-                        "MaceMiner" => Ok(Enemy::MaceMiner),
-                        "ShieldMiner" => Ok(Enemy::ShieldMiner),
-                        "CrystalMiner" => Ok(Enemy::CrystalMiner),
-                        "ShieldCrystalMiner" => Ok(Enemy::ShieldCrystalMiner),
-                        "Sandworm" => Ok(Enemy::Sandworm),
-                        "Spiderling" => Ok(Enemy::Spiderling),
-                        "EnergyRefill" => Ok(Enemy::EnergyRefill),
-                        _ => Err(wrong_requirement(token)),
-                    }?;
-                    enemies.push((enemy, amount));
-                }
-                return Ok(Requirement::Combat(enemies));
-            }
-            match keyword {
-                "Blaze" => Ok(Requirement::EnergySkill(Skill::Blaze, amount.parse().map_err(|_| not_int(token))?)),
-                "BlazeSwap" => Ok(Requirement::BlazeSwap(amount.parse().map_err(|_| not_int(token))?)),
-                "Boss" => Ok(Requirement::Boss(amount.parse().map_err(|_| not_int(token))?)),
-                "Bow" => Ok(Requirement::EnergySkill(Skill::Bow, amount.parse().map_err(|_| not_int(token))?)),
-                "BreakWall" => Ok(Requirement::BreakWall(amount.parse().map_err(|_| not_int(token))?)),
-                "Damage" => Ok(Requirement::Damage(amount.parse().map_err(|_| not_int(token))?)),
-                "Danger" => Ok(Requirement::Danger(amount.parse().map_err(|_| not_int(token))?)),
-                "Energy" => Ok(Requirement::Resource(Resource::Energy, amount.parse().map_err(|_| not_int(token))?)),
-                "Flash" => Ok(Requirement::EnergySkill(Skill::Flash, amount.parse().map_err(|_| not_int(token))?)),
-                "Grenade" => Ok(Requirement::EnergySkill(Skill::Grenade, amount.parse().map_err(|_| not_int(token))?)),
-                "GrenadeRedirect" => Ok(Requirement::GrenadeRedirect(amount.parse().map_err(|_| not_int(token))?)),
-                "HammerSJump" => Ok(Requirement::HammerSentryJump(amount.parse().map_err(|_| not_int(token))?)),
-                "Health" => Ok(Requirement::Resource(Resource::Health, amount.parse().map_err(|_| not_int(token))?)),
-                "Keystone" => Ok(Requirement::Resource(Resource::Keystone, amount.parse().map_err(|_| not_int(token))?)),
-                "Ore" => Ok(Requirement::Resource(Resource::Ore, amount.parse().map_err(|_| not_int(token))?)),
-                "Sentry" => Ok(Requirement::EnergySkill(Skill::Sentry, amount.parse().map_err(|_| not_int(token))?)),
-                "SentryBreak" => Ok(Requirement::SentryBreak(amount.parse().map_err(|_| not_int(token))?)),
-                "SentryBurn" => Ok(Requirement::SentryBurn(amount.parse().map_err(|_| not_int(token))?)),
-                "SentryJump" => Ok(Requirement::SentryJump(amount.parse().map_err(|_| not_int(token))?)),
-                "SentryRedirect" => Ok(Requirement::SentryRedirect(amount.parse().map_err(|_| not_int(token))?)),
-                "SentrySwap" => Ok(Requirement::SentrySwap(amount.parse().map_err(|_| not_int(token))?)),
-                "ShardSlot" => Ok(Requirement::Resource(Resource::ShardSlot, amount.parse().map_err(|_| not_int(token))?)),
-                "Shuriken" => Ok(Requirement::EnergySkill(Skill::Shuriken, amount.parse().map_err(|_| not_int(token))?)),
-                "ShurikenBreak" => Ok(Requirement::ShurikenBreak(amount.parse().map_err(|_| not_int(token))?)),
-                "Spear" => Ok(Requirement::EnergySkill(Skill::Spear, amount.parse().map_err(|_| not_int(token))?)),
-                "SpearJump" => Ok(Requirement::SpearJump(amount.parse().map_err(|_| not_int(token))?)),
-                "SpiritLight" => Ok(Requirement::SpiritLight(amount.parse().map_err(|_| not_int(token))?)),
-                "SwordSJump" => Ok(Requirement::SwordSentryJump(amount.parse().map_err(|_| not_int(token))?)),
-                _ => Err(wrong_requirement(token))
-            }
-        }
-        None => match keyword {
-            "Arcing" => Ok(Requirement::Shard(Shard::Arcing)),
-            "Bash" => Ok(Requirement::Skill(Skill::Bash)),
-            "Blaze" => Ok(Requirement::Skill(Skill::Blaze)),
-            "Bow" => Ok(Requirement::Skill(Skill::Bow)),
-            "BreakCrystal" => Ok(Requirement::BreakCrystal),
-            "Burrow" => Ok(Requirement::Skill(Skill::Burrow)),
-            "BurrowsTP" => Ok(Requirement::Teleporter(Teleporter::Burrows)),
-            "Catalyst" => Ok(Requirement::Shard(Shard::Catalyst)),
-            "Dash" => Ok(Requirement::Skill(Skill::Dash)),
-            "Deflector" => Ok(Requirement::Shard(Shard::Deflector)),
-            "DenTP" => Ok(Requirement::Teleporter(Teleporter::Den)),
-            "DepthsTP" => Ok(Requirement::Teleporter(Teleporter::Depths)),
-            "DoubleJump" => Ok(Requirement::Skill(Skill::DoubleJump)),
-            "EastPoolsTP" => Ok(Requirement::Teleporter(Teleporter::EastLuma)),
-            "EastWastesTP" => Ok(Requirement::Teleporter(Teleporter::EastWastes)),
-            "EastWoodsTP" => Ok(Requirement::Teleporter(Teleporter::EastWoods)),
-            "EnergyHarvest" => Ok(Requirement::Shard(Shard::EnergyHarvest)),
-            "Flap" => Ok(Requirement::Skill(Skill::Flap)),
-            "Flash" => Ok(Requirement::Skill(Skill::Flash)),
-            "FlashSwap" => Ok(Requirement::FlashSwap),
-            "Fracture" => Ok(Requirement::Shard(Shard::Fracture)),
-            "free" => Ok(Requirement::Free),
-            "GladesTP" => Ok(Requirement::Teleporter(Teleporter::Glades)),
-            "Glide" => Ok(Requirement::Skill(Skill::Glide)),
-            "GlideHammerJump" => Ok(Requirement::GlideHammerJump),
-            "GlideJump" => Ok(Requirement::GlideJump),
-            "gorlek" => Ok(Requirement::Difficulty(Difficulty::Gorlek)),
-            "Grapple" => Ok(Requirement::Skill(Skill::Grapple)),
-            "Grenade" => Ok(Requirement::Skill(Skill::Grenade)),
-            "GrenadeCancel" => Ok(Requirement::GrenadeCancel),
-            "GrenadeJump" => Ok(Requirement::GrenadeJump),
-            "Hammer" => Ok(Requirement::Skill(Skill::Hammer)),
-            "HammerBreak" => Ok(Requirement::HammerBreak),
-            "HammerJump" => Ok(Requirement::HammerJump),
-            "HollowTP" => Ok(Requirement::Teleporter(Teleporter::Hollow)),
-            "Impossible" => Ok(Requirement::Impossible),
-            "InnerRuinsTP" => Ok(Requirement::Teleporter(Teleporter::InnerRuins)),
-            "kii" => Ok(Requirement::Difficulty(Difficulty::Kii)),
-            "Launch" => Ok(Requirement::Skill(Skill::Launch)),
-            "LaunchSwap" => Ok(Requirement::LaunchSwap),
-            "LifeHarvest" => Ok(Requirement::Shard(Shard::LifeHarvest)),
-            "Magnet" => Ok(Requirement::Shard(Shard::Magnet)),
-            "MarshTP" => Ok(Requirement::Teleporter(Teleporter::Marsh)),
-            "moki" => Ok(Requirement::Difficulty(Difficulty::Moki)),
-            "OuterRuinsTP" => Ok(Requirement::Teleporter(Teleporter::OuterRuins)),
-            "Overflow" => Ok(Requirement::Shard(Shard::Overflow)),
-            "PauseHover" => Ok(Requirement::Trick(Trick::PauseHover)),
-            "ReachTP" => Ok(Requirement::Teleporter(Teleporter::Reach)),
-            "RemoveKillPlane" => Ok(Requirement::Trick(Trick::RemoveKillPlane)),
-            "Regenerate" => Ok(Requirement::Skill(Skill::Regenerate)),
-            "Seir" => Ok(Requirement::Skill(Skill::Seir)),
-            "Sentry" => Ok(Requirement::Skill(Skill::Sentry)),
-            "ShriekTP" => Ok(Requirement::Teleporter(Teleporter::Shriek)),
-            "Shuriken" => Ok(Requirement::Skill(Skill::Shuriken)),
-            "Spear" => Ok(Requirement::Skill(Skill::Spear)),
-            "SpearBreak" => Ok(Requirement::SpearBreak),
-            "Sticky" => Ok(Requirement::Shard(Shard::Sticky)),
-            "Sword" => Ok(Requirement::Skill(Skill::Sword)),
-            "SwordJump" => Ok(Requirement::SwordJump),
-            "TripleJump" => Ok(Requirement::Shard(Shard::TripleJump)),
-            "Thorn" => Ok(Requirement::Shard(Shard::Thorn)),
-            "UltraBash" => Ok(Requirement::Shard(Shard::UltraBash)),
-            "UltraGrapple" => Ok(Requirement::Shard(Shard::UltraGrapple)),
-            "unsafe" => Ok(Requirement::Difficulty(Difficulty::Unsafe)),
-            "WallJump" => Ok(Requirement::Skill(Skill::WallJump)),
-            "WaterBreath" => Ok(Requirement::Skill(Skill::WaterBreath)),
-            "WaterDash" => Ok(Requirement::Skill(Skill::WaterDash)),
-            "Water" => Ok(Requirement::Water),
-            "WaveDash" => Ok(Requirement::WaveDash),
-            "WellspringTP" => Ok(Requirement::Teleporter(Teleporter::Wellspring)),
-            "WestPoolsTP" => Ok(Requirement::Teleporter(Teleporter::WestLuma)),
-            "WestWastesTP" => Ok(Requirement::Teleporter(Teleporter::WestWastes)),
-            "WestWoodsTP" => Ok(Requirement::Teleporter(Teleporter::WestWoods)),
-            "WillowTP" => Ok(Requirement::Teleporter(Teleporter::Willow)),
-            _ if metadata.definitions.contains(keyword) => Ok(Requirement::Definition(keyword)),
-            _ if metadata.states.contains(keyword) || metadata.quests.contains(keyword) => Ok(Requirement::State(keyword)),
-            "BlazeSwap" | "Boss" | "BreakWall" | "Combat" | "Damage" | "Danger" | "Energy" | "GrenadeRedirect" | "Health" | "Keystone" | "Ore" | "SentryBreak" | "SentryBurn" | "SentryJump"| "SentryRedirect" | "SentrySwap" | "SwordSJump" | "HammerSJump" | "ShardSlot" | "ShurikenBreak" | "SpiritLight"
-                => Err(wrong_amount(token)),
-            _ => Err(wrong_requirement(token))
-        }
-    }
-}
-
-fn parse_line<'a>(tokens: &[Token<'a>], position: &mut usize, metadata: &Metadata) -> Result<Line<'a>, ParseError> {
-    let mut ands = Vec::new();
-    let mut ors = Vec::new();
-    let mut group = None;
+fn recover(parser: &mut Parser, recover_if: fn(TokenKind) -> bool) {
+    let mut depth = 0;
     loop {
-        let token = next_token!(tokens, *position, TokenType::Requirement, TokenType::Free);
-        let requirement = match token.name {
-            TokenType::Requirement => parse_requirement(token, metadata)?,
-            TokenType::Free => Requirement::Free,
-            _ => wrong_token!(token, TokenType::Requirement, TokenType::Free),
-        };
+        let token = parser.current_token();
+        if token.kind == TokenKind::Eof { break }
+        if token.kind == TokenKind::Indent { depth += 1 }
+        if depth > 0 {
+            if matches!(token.kind, TokenKind::Dedent { .. }) { depth -= 1 }
+        } else if recover_if(token.kind) { break }
+        parser.next_token();
+    }
+}
+fn check_dedent(parser: &mut Parser) -> Result<bool, ParseError> {
+    let token = parser.current_token();
+    match token.kind {
+        TokenKind::Dedent { matching } => {
+            let token = parser.next_token();
+            match matching {
+                true => Ok(true),
+                false => Err(parser.error("malformed Indent", token.range))
+            }
+        },
+        _ => Ok(false),
+    }
+}
 
-        let token = next_token!(tokens, *position, TokenType::And, TokenType::Or, TokenType::Newline, TokenType::Group);
-        match token.name {
-            TokenType::And => ands.push(requirement),
-            TokenType::Or => ors.push(requirement),
-            TokenType::Newline => {
-                ors.push(requirement);
-                break;
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum ContentKind {
+    Requirement,
+    Region,
+    Anchor,
+}
+fn parse_content<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseError> {
+    let content_kind = parse_ident!(parser, Suggestion::Content)?;
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::Content)?;
+    match content_kind {
+        ContentKind::Requirement => parse_macro(parser),
+        ContentKind::Region => parse_region(parser),
+        ContentKind::Anchor => parse_anchor(parser),
+    }
+}
+fn parse_macro<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseError> {
+    let name = read_ident!(parser, Suggestion::Identifier)?;
+    let group = parse_group(parser)?;
+    Ok(AreaContent::Requirement(NamedGroup { name, group }))
+}
+fn parse_region<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseError> {
+    let name = read_ident!(parser, Suggestion::Identifier)?;
+    let group = parse_group(parser)?;
+    Ok(AreaContent::Region(NamedGroup { name, group }))
+}
+fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseError> {
+    let identifier = read_ident!(parser, Suggestion::Identifier)?;
+    parser.skip(TokenKind::Whitespace);
+    let position = parse_anchor_position(parser)?;
+    parser.skip(TokenKind::Whitespace);
+    parser.eat(TokenKind::Indent)?;
+
+    let mut can_spawn = true;
+    let mut refills = Vec::new();
+    let mut connections = Vec::new();
+
+    loop {
+        if check_dedent(parser)? { break }
+
+        match parse_anchor_content(parser) {
+            Ok(content) => match content {
+                AnchorContent::NoSpawn => can_spawn = false,
+                AnchorContent::Refill(refill) => refills.push(refill),
+                AnchorContent::Connection(connection) => connections.push(connection),
             },
-            TokenType::Group => {
-                if tokens.get(*position).map_or(false, |token| token.name == TokenType::Requirement) {
-                    ands.push(requirement);
-                } else {
-                    ors.push(requirement);
-                    group = Some(parse_group(tokens, position, metadata)?);
-                    break;
-                }
-            },
-            _ => wrong_token!(token, TokenType::And, TokenType::Or, TokenType::Newline, TokenType::Group),
+            Err(err) => {
+                recover(parser, |kind| matches!(kind, TokenKind::Dedent { .. }));
+                check_dedent(parser)?;
+                return Err(err);
+            }
         }
     }
 
-    Ok(Line { ands, ors, group })
+    Ok(AreaContent::Anchor(Anchor { identifier, position, can_spawn, refills, connections }))
+}
+fn parse_anchor_position(parser: &mut Parser) -> Result<Option<Position>, ParseError> {
+    let token = parser.next_token();
+    let position = match token.kind {
+        TokenKind::Identifier if parser.read_token(&token) == "at" => {
+            parser.eat(TokenKind::Whitespace)?;
+            let x = parse_number!(parser, Suggestion::Float)?;
+            parser.eat(TokenKind::Comma)?;
+            parser.skip(TokenKind::Whitespace);
+            let y = parse_number!(parser, Suggestion::Float)?;
+            parser.eat_or_suggest(TokenKind::Colon, Suggestion::Float)?;
+            Some(Position { x, y })
+        },
+        TokenKind::Colon => None,
+        _ => return Err(parser.error("Expected Colon or at", token.range)),
+    };
+    Ok(position)
+}
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum AnchorContentKind {
+    NoSpawn,
+    Refill,
+    State,
+    Quest,
+    Pickup,
+    Conn,
+}
+enum AnchorContent<'a> {
+    NoSpawn,
+    Refill(Refill<'a>),
+    Connection(Connection<'a>),
+}
+fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>, ParseError> {
+    let kind = parse_ident!(parser, Suggestion::AnchorContent)?;
+    let content = match kind {
+        AnchorContentKind::NoSpawn => {
+            parser.skip(TokenKind::Whitespace);
+            parser.eat_or_suggest(TokenKind::Newline, Suggestion::AnchorContent)?;
+            AnchorContent::NoSpawn
+        },
+        AnchorContentKind::Refill => AnchorContent::Refill(parse_anchor_refill(parser)?),
+        AnchorContentKind::State => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::State)?),
+        AnchorContentKind::Quest => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Quest)?),
+        AnchorContentKind::Pickup => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Pickup)?),
+        AnchorContentKind::Conn => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Anchor)?),
+    };
+    Ok(content)
+}
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum RefillKind {
+    Full,
+    Checkpoint,
+    Health,
+    Energy,
+}
+fn parse_anchor_refill<'a>(parser: &mut Parser<'a>) -> Result<Refill<'a>, ParseError> {
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::AnchorContent)?;
+    let kind = parse_ident!(parser, Suggestion::Refill)?;
+    let value = match kind {
+        RefillKind::Full => RefillValue::Full,
+        RefillKind::Checkpoint => RefillValue::Checkpoint,
+        RefillKind::Health => RefillValue::Health(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?),
+        RefillKind::Energy => RefillValue::Energy(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?),
+    };
+
+    let requirements = if parser.current_token().kind == TokenKind::Colon {
+        Some(parse_group(parser)?)
+    } else {
+        parser.skip(TokenKind::Whitespace);
+        parser.eat_or_suggest(TokenKind::Newline, Suggestion::Refill)?;
+        None
+    };
+
+    Ok(Refill { value, requirements })
+}
+fn parse_anchor_connection<'a>(parser: &mut Parser<'a>, kind: NodeKind) -> Result<Connection<'a>, ParseError> {
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::AnchorContent)?;
+    let identifier = read_ident!(parser, Suggestion::Identifier)?;
+    let requirements = parse_group(parser)?;
+    Ok(Connection { kind, identifier, requirements })
 }
 
-fn parse_group<'a>(tokens: &[Token<'a>], position: &mut usize, metadata: &Metadata) -> Result<Group<'a>, ParseError> {
-    let mut lines = Vec::new();
+fn parse_group<'a>(parser: &mut Parser<'a>) -> Result<Group<'a>, ParseError> {
+    parser.eat(TokenKind::Colon)?;
+    parser.skip(TokenKind::Whitespace);
 
-    let token = next_token!(tokens, *position, TokenType::Free, TokenType::Indent);
-    match token.name {
-        TokenType::Free => {
-            eat(tokens, position, TokenType::Newline)?;
-            lines.push(Line {
-                ands: vec![Requirement::Free],
-                ..Line::default()
-            });
-        },
-        TokenType::Indent => {
-            loop {
-                lines.push(parse_line(tokens, position, metadata)?);
-                if tokens.get(*position).map_or(true, |token| token.name == TokenType::Dedent) {
-                    *position += 1;
-                    break;
+    let mut lines = Vec::new();
+    if parser.current_token().kind == TokenKind::Indent {
+        parser.next_token();
+
+        loop {
+            match parse_line(parser) {
+                Ok(line) => {
+                    lines.push(line);
+                    if check_dedent(parser)? { break }
+                },
+                Err(err) => {
+                    recover(parser, |kind| matches!(kind, TokenKind::Dedent { .. }));
+                    check_dedent(parser)?;
+                    return Err(err);
                 }
             }
         }
-        _ => wrong_token!(token, TokenType::Free, TokenType::Indent),
+    } else {
+        let line = parse_line(parser)?;
+        lines.push(line);
     }
 
     Ok(Group { lines })
 }
 
-fn parse_refill<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &str, metadata: &Metadata) -> Result<Refill<'a>, ParseError> {
-    let mut requirements = None;
+fn parse_line<'a>(parser: &mut Parser<'a>) -> Result<Line<'a>, ParseError> {
+    let mut ands = Vec::new();
+    let mut ors = Vec::with_capacity(1);
+    let mut has_seen_or = false;
 
-    let token = next_token!(tokens, *position, TokenType::Group, TokenType::Newline);
-    match token.name {
-        TokenType::Group => requirements = Some(parse_group(tokens, position, metadata)?),
-        TokenType::Newline => {},
-        _ => wrong_token!(token, TokenType::Group, TokenType::Newline),
-    }
+    let group = loop {
+        let requirement = parse_requirement(parser)?;
+        parser.skip(TokenKind::Whitespace);
 
-    let name = if identifier == "Checkpoint" {
-        RefillType::Checkpoint
-    } else if identifier == "Full" {
-        RefillType::Full
-    } else if let Some(amount) = identifier.strip_prefix("Health=") {
-        let amount: u16 = match amount.parse() {
-            Ok(result) => result,
-            Err(_) => return Err(not_int(&tokens[*position - 2])),
-        };
-        RefillType::Health(f32::from(amount))
-    } else if identifier == "Health" {
-        RefillType::Health(1.0)
-    } else if let Some(amount) = identifier.strip_prefix("Energy=") {
-        let amount: u16 = match amount.parse() {
-            Ok(result) => result,
-            Err(_) => return Err(not_int(&tokens[*position - 2])),
-        };
-        RefillType::Energy(f32::from(amount))
-    } else {
-        wrong_token!(tokens[*position - 2], "Checkpoint", "Full", "Health", "Energy");
+        let token = parser.current_token();
+        match parser.current_token().kind {
+            TokenKind::Comma => match has_seen_or {
+                true => return Err(parser.error("Comma after OR", token.range.clone())),
+                false => ands.push(requirement),
+            },
+            TokenKind::Identifier if parser.read_token(token) == "OR" => {
+                ors.push(requirement);
+                has_seen_or = true;
+            },
+            TokenKind::Newline => {
+                ors.push(requirement);
+                parser.next_token();
+                break None;
+            },
+            TokenKind::Colon => {
+                let group = parse_group(parser)?;
+                ors.push(requirement);
+                break Some(group)
+            },
+            TokenKind::Indent => return Err(parser.error("unexpected Indent", token.range.clone())),
+            _ => return Err(parser.error("expected separator or Newline", token.range.clone())),
+        }
+        parser.next_token();
+        parser.skip(TokenKind::Whitespace);
     };
 
-    Ok(Refill {
-        name,
-        requirements,
-    })
-}
-#[inline]
-fn parse_connection<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata, name: NodeType) -> Result<Connection<'a>, ParseError> {
-    eat(tokens, position, TokenType::Group)?;
-    let requirements = parse_group(tokens, position, metadata)?;
-
-    Ok(Connection { name, identifier, requirements })
-}
-fn parse_state<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, position, identifier, metadata, NodeType::State)
-}
-fn parse_quest<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, position, identifier, metadata, NodeType::Quest)
-}
-fn parse_pickup<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, position, identifier, metadata, NodeType::Pickup)
-}
-fn parse_anchor_connection<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Connection<'a>, ParseError> {
-    parse_connection(tokens, position, identifier, metadata, NodeType::Anchor)
+    Ok(Line { ands, ors, group })
 }
 
-fn parse_anchor<'a>(tokens: &[Token<'a>], position: &mut usize, identifier: &'a str, metadata: &Metadata) -> Result<Anchor<'a>, ParseError> {
-    let mut token = next_token!(tokens, *position, TokenType::Position, TokenType::Group);
-
-    let mut anchor_position = None;
-    if token.name == TokenType::Position {
-        let mut coords = token.value.split(',');
-        let x = coords.next().unwrap().trim().parse::<R32>().map_err(|_| not_int(token))?;
-        let y = if let Some(y) = coords.next() {
-            y.trim().parse::<R32>().map_err(|_| not_int(token))?
-        } else {
-            return Err(not_int(token));
-        };
-        anchor_position = Some(Position { x, y });
-
-        if let Some(next) = tokens.get(*position) {
-            *position += 1;
-            token = next;
-        } else {
-            missing_token!(TokenType::Group)
+#[derive(Display, FromStr)]
+#[ParseFromIdentifier]
+pub enum RequirementKind {
+    Free,
+    Impossible,
+    SpiritLight,
+    Water,
+    Damage,
+    Danger,
+    Combat,
+    Boss,
+    BreakWall,
+    BreakCrystal,
+    ShurikenBreak,
+    SentryBreak,
+    HammerBreak,
+    SpearBreak,
+    SentryJump,
+    SwordSJump,
+    HammerSJump,
+    SentryBurn,
+    LaunchSwap,
+    SentrySwap,
+    FlashSwap,
+    BlazeSwap,
+    WaveDash,
+    GrenadeJump,
+    GrenadeCancel,
+    HammerJump,
+    SwordJump,
+    GrenadeRedirect,
+    SentryRedirect,
+    GlideJump,
+    GlideHammerJump,
+    SpearJump,
+}
+#[derive(Debug, Clone, Copy, FromStr)]
+#[ParseFromIdentifier]
+pub enum Resource {
+    Health = 0,
+    Energy = 1,
+    Ore = 2,
+    Keystone = 3,
+    ShardSlot = 4,
+}
+impl From<Resource> for item::Resource {
+    fn from(resource: Resource) -> item::Resource {
+        item::Resource::try_from(resource as u8).unwrap()
+    }
+}
+#[derive(Debug, Clone, Copy, FromStr)]
+#[ParseFromIdentifier]
+pub enum Skill {
+    Bash = 0,
+    WallJump = 3,
+    DoubleJump = 5,
+    Launch = 8,
+    Glide = 14,
+    WaterBreath = 23,
+    Grenade = 51,
+    Grapple = 57,
+    Flash = 62,
+    Spear = 74,
+    Regenerate = 77,
+    Bow = 97,
+    Hammer = 98,
+    Sword = 100,
+    Burrow = 101,
+    Dash = 102,
+    WaterDash = 104,
+    Shuriken = 106,
+    Seir = 108,
+    Blaze = 115,
+    Sentry = 116,
+    Flap = 118,
+}
+impl From<Skill> for item::Skill {
+    fn from(skill: Skill) -> item::Skill {
+        item::Skill::try_from(skill as u8).unwrap()
+    }
+}
+#[derive(Debug, Clone, Copy, FromStr)]
+#[ParseFromIdentifier]
+pub enum Shard {
+    TripleJump = 2,
+    Bounty = 4,
+    Magnet = 8,
+    Quickshot = 14,
+    LifeHarvest = 23,
+    EnergyHarvest = 25,
+    Sense = 30,
+    UltraBash = 32,
+    UltraGrapple = 33,
+    Thorn = 35,
+    Catalyst = 36,
+    Turmoil = 38,
+    Sticky = 39,
+    Deflector = 44,
+    Fracture = 46,
+    Arcing = 47,
+}
+impl From<Shard> for item::Shard {
+    fn from(shard: Shard) -> item::Shard {
+        item::Shard::try_from(shard as u8).unwrap()
+    }
+}
+#[derive(Debug, Clone, Copy, FromStr)]
+#[ParseFromIdentifier]
+pub enum Teleporter {
+    MarshTP = 16,
+    DenTP = 1,
+    HollowTP = 5,
+    GladesTP = 17,
+    WellspringTP = 3,
+    BurrowsTP = 0,
+    WestWoodsTP = 7,
+    EastWoodsTP = 8,
+    ReachTP = 4,
+    DepthsTP = 6,
+    EastPoolsTP = 2,
+    WestPoolsTP = 13,
+    WestWastesTP = 9,
+    EastWastesTP = 10,
+    OuterRuinsTP = 11,
+    InnerRuinsTP = 14,
+    WillowTP = 12,
+    ShriekTP = 15,
+}
+impl From<Teleporter> for item::Teleporter {
+    fn from(shard: Teleporter) -> item::Teleporter {
+        item::Teleporter::try_from(shard as u8).unwrap()
+    }
+}
+fn parse_requirement<'a>(parser: &mut Parser<'a>) -> Result<Requirement<'a>, ParseError> {
+    let start = parser.current_token().range.start;
+    let identifier = read_ident!(parser, Suggestion::Requirement)?;
+    let value = match RequirementKind::from_str(identifier) {
+        Ok(kind) => parse_special_requirement(parser, kind)?,
+        Err(_) => match Difficulty::from_str(identifier) {
+            Ok(difficulty) => RequirementValue::Difficulty(difficulty),
+            Err(_) => match Trick::from_str(identifier) {
+                Ok(trick) => RequirementValue::Trick(trick),
+                Err(_) => match Skill::from_str(identifier) {
+                    Ok(skill) => match parser.current_token().kind == TokenKind::Eq {
+                        true => RequirementValue::UseSkill(skill, parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?),
+                        false => RequirementValue::Skill(skill),
+                    },
+                    Err(_) => match Resource::from_str(identifier) {
+                        Ok(resource) => RequirementValue::Resource(resource, parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?),
+                        Err(_) => match Shard::from_str(identifier) {
+                            Ok(shard) => RequirementValue::Shard(shard),
+                            Err(_) => match Teleporter::from_str(identifier) {
+                                Ok(teleporter) => RequirementValue::Teleporter(teleporter),
+                                Err(_) => RequirementValue::State(identifier),  // This will get checked against the available states later
+                            }
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    if token.name != TokenType::Group {
-        wrong_token!(token, TokenType::Group);
-    }
-    eat(tokens, position, TokenType::Indent)?;
-
-    token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::NoSpawn, TokenType::Dedent);
-    let can_spawn = if token.name == TokenType::NoSpawn {
-        eat(tokens, position, TokenType::Newline)?;
-        token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
-        false
-    } else { true };
-
-    let mut refills = Vec::new();
-    let mut connections = Vec::new();
-
+    };
+    let range = start..parser.current_token().range.start;
+    Ok(Requirement { range, value })
+}
+fn parse_special_requirement<'a>(parser: &mut Parser<'a>, kind: RequirementKind) -> Result<RequirementValue<'a>, ParseError> {
+    let requirement = match kind {
+        RequirementKind::Free => RequirementValue::Free,
+        RequirementKind::Impossible => RequirementValue::Impossible,
+        RequirementKind::Water => RequirementValue::Water,
+        RequirementKind::BreakCrystal => RequirementValue::BreakCrystal,
+        RequirementKind::HammerBreak => RequirementValue::HammerBreak,
+        RequirementKind::SpearBreak => RequirementValue::SpearBreak,
+        RequirementKind::LaunchSwap => RequirementValue::LaunchSwap,
+        RequirementKind::FlashSwap => RequirementValue::FlashSwap,
+        RequirementKind::WaveDash => RequirementValue::WaveDash,
+        RequirementKind::GrenadeJump => RequirementValue::GrenadeJump,
+        RequirementKind::GrenadeCancel => RequirementValue::GrenadeCancel,
+        RequirementKind::HammerJump => RequirementValue::HammerJump,
+        RequirementKind::SwordJump => RequirementValue::SwordJump,
+        RequirementKind::GlideJump => RequirementValue::GlideJump,
+        RequirementKind::GlideHammerJump => RequirementValue::GlideHammerJump,
+        RequirementKind::Combat => parse_combat_requirement(parser)?,
+        _ => {
+            let amount = parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?;
+            match kind {
+                RequirementKind::SpiritLight => RequirementValue::SpiritLight(amount),
+                RequirementKind::Damage => RequirementValue::Damage(amount),
+                RequirementKind::Danger => RequirementValue::Danger(amount),
+                RequirementKind::Boss => RequirementValue::Boss(amount),
+                RequirementKind::BreakWall => RequirementValue::BreakWall(amount),
+                RequirementKind::ShurikenBreak => RequirementValue::ShurikenBreak(amount),
+                RequirementKind::SentryBreak => RequirementValue::SentryBreak(amount),
+                RequirementKind::SentryJump => RequirementValue::SentryJump(amount),
+                RequirementKind::SwordSJump => RequirementValue::SwordSentryJump(amount),
+                RequirementKind::HammerSJump => RequirementValue::HammerSentryJump(amount),
+                RequirementKind::SentryBurn => RequirementValue::SentryBurn(amount),
+                RequirementKind::SentrySwap => RequirementValue::SentrySwap(amount),
+                RequirementKind::BlazeSwap => RequirementValue::BlazeSwap(amount),
+                RequirementKind::GrenadeRedirect => RequirementValue::GrenadeRedirect(amount),
+                RequirementKind::SentryRedirect => RequirementValue::SentryRedirect(amount),
+                RequirementKind::SpearJump => RequirementValue::SpearJump(amount),
+                _ => panic!("Missing implementation for requirement {}", kind),
+            }
+        }
+    };
+    Ok(requirement)
+}
+fn parse_combat_requirement<'a>(parser: &mut Parser<'a>) -> Result<RequirementValue<'a>, ParseError> {
+    parser.eat_or_suggest(TokenKind::Eq, Suggestion::Requirement)?;
+    let mut enemies = SmallVec::new();
     loop {
-        match token.name {
-            TokenType::Refill => refills.push(parse_refill(tokens, position, token.value, metadata)?),
-            TokenType::State => connections.push(parse_state(tokens, position, token.value, metadata)?),
-            TokenType::Quest => connections.push(parse_quest(tokens, position, token.value, metadata)?),
-            TokenType::Pickup => connections.push(parse_pickup(tokens, position, token.value, metadata)?),
-            TokenType::Connection => connections.push(parse_anchor_connection(tokens, position, token.value, metadata)?),
-            TokenType::Dedent => return Ok(Anchor { identifier, position: anchor_position, can_spawn, refills, connections }),
-            _ => wrong_token!(token, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent),
+        let amount = if parser.current_token().kind == TokenKind::Number {
+            let amount = parse_number!(parser, Suggestion::Integer)?;
+            parser.eat_or_suggest(TokenKind::X, Suggestion::Integer)?;
+            amount
+        } else { 1 };
+        let enemy = parse_ident!(parser, Suggestion::Enemy)?;
+        enemies.push((enemy, amount));
+        if parser.current_token().kind == TokenKind::Plus {
+            parser.next_token();
+            continue;
         }
-        token = next_token!(tokens, *position, TokenType::Refill, TokenType::State, TokenType::Quest, TokenType::Pickup, TokenType::Connection, TokenType::Dedent);
+        break;
     }
+    Ok(RequirementValue::Combat(enemies))
 }
 
-pub fn parse_areas<'a>(tokens: Vec<Token<'a>>, metadata: &Metadata) -> Result<AreaTree<'a>, ParseError> {
-    let end = tokens.len();
-    let mut definitions = FxHashMap::default();
-    let mut regions = FxHashMap::default();
-    regions.reserve(20);
-    let mut anchors = Vec::with_capacity(end / 200);
-
-    let mut position = 0;
-
-    while let Some(token) = tokens.get(position) {
-        position += 1;
-        match token.name {
-            TokenType::Definition => {
-                eat(&tokens, &mut position, TokenType::Group)?;
-                let requirements = parse_group(&tokens, &mut position, metadata)?;
-                if definitions.insert(token.value, requirements).is_some() {
-                    return Err(ParseError::new(token.position, format!("Requirement name {} already in use at line {}", token.value, token.line)));
+fn fill_macros_and_states(contents: &mut Vec<AreaContent>, parser: &Parser) -> Result<(), ParseError> {
+    let mut macros = Vec::new();
+    let mut states = Vec::new();
+    for content in contents.iter_mut() {
+        match content {
+            AreaContent::Requirement(named_group) => macros.push(named_group.name),
+            AreaContent::Anchor(anchor) => for connection in &anchor.connections {
+                if connection.kind == NodeKind::State || connection.kind == NodeKind::Quest {
+                    states.push(connection.identifier);
                 }
             },
-            TokenType::Region => {
-                eat(&tokens, &mut position, TokenType::Group)?;
-                let requirements = parse_group(&tokens, &mut position, metadata)?;
-                if regions.insert(token.value, requirements).is_some() {
-                    return Err(ParseError::new(token.position, format!("Region name {} already in use at line {}", token.value, token.line)));
-                }
-            },
-            TokenType::Anchor => anchors.push(parse_anchor(&tokens, &mut position, token.value, metadata)?),
-            TokenType::Newline => {},
-            _ => wrong_token!(token, TokenType::Definition, TokenType::Anchor),
+            _ => {},
         }
     }
 
-    Ok(AreaTree {
-        definitions,
-        regions,
-        anchors,
-    })
+    for content in contents {
+        if let AreaContent::Anchor(anchor) = content {
+            for refill in &mut anchor.refills {
+                for requirement in &mut refill.requirements {
+                    fill_group(requirement, &macros, &states, parser)?;
+                }
+            }
+            for connection in &mut anchor.connections {
+                fill_group(&mut connection.requirements, &macros, &states, parser)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+fn fill_group(group: &mut Group, macros: &[&str], states: &[&str], parser: &Parser) -> Result<(), ParseError> {
+    for line in &mut group.lines {
+        for and in &mut line.ands {
+            fill_requirement(and, macros, states, parser)?;
+        }
+        for or in &mut line.ors {
+            fill_requirement(or, macros, states, parser)?;
+        }
+        for group in &mut line.group {
+            fill_group(group, macros, states, parser)?;
+        }
+    }
+    Ok(())
+}
+fn fill_requirement(requirement: &mut Requirement, macros: &[&str], states: &[&str], parser: &Parser) -> Result<(), ParseError> {
+    if let RequirementValue::State(identifier) = requirement.value {
+        requirement.value = if macros.contains(&identifier) {
+            RequirementValue::Macro(identifier)
+        } else if states.contains(&identifier) {
+            RequirementValue::State(identifier)
+        } else {
+            return Err(parser.error("unknown requirement", requirement.range.clone()));
+        };
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn logic_parse() {
+        let input = std::fs::read_to_string("areas.wotw").unwrap();
+        if let Err(err) = Areas::parse(&input) {
+            panic!("{}", err.verbose_display());
+        }
+    }
 }

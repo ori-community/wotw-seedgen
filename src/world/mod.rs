@@ -167,8 +167,11 @@ mod tests {
         let mut settings = Settings::default();
         settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
-        let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        let mut world = World::new(graph, settings.world_settings[0].clone());
+        let areas = util::read_file("areas.wotw", "logic").unwrap();
+        let locations = util::read_file("loc_data.csv", "logic").unwrap();
+        let states = util::read_file("state_data.csv", "logic").unwrap();
+        let graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
+        let mut world = World::new(&graph, settings.world_settings[0].clone());
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
 
@@ -176,27 +179,27 @@ mod tests {
         let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
         let reached: FxHashSet<_> = reached.iter()
             .filter_map(|node| {
-                if node.node_type() == NodeType::State { None }
+                if node.node_kind() == NodeKind::State { None }
                 else { node.uber_state() }
             })
             .cloned().collect();
 
         let input = util::read_file("loc_data.csv", "logic").unwrap();
-        let locations = logic::parse_locations(&input).unwrap();
-        let locations: FxHashSet<_> = locations.iter().map(|location| &location.uber_state).cloned().collect();
+        let all_locations = logic::parse_locations(&input).unwrap();
+        let all_locations: FxHashSet<_> = all_locations.iter().map(|location| &location.uber_state).cloned().collect();
 
-        if !(reached == locations) {
-            let diff: Vec<_> = locations.difference(&reached).collect();
-            eprintln!("difference ({} / {} items): {:?}", reached.len(), locations.len(), diff);
+        if !(reached == all_locations) {
+            let diff: Vec<_> = all_locations.difference(&reached).collect();
+            eprintln!("difference ({} / {} items): {:?}", reached.len(), all_locations.len(), diff);
         }
 
-        assert_eq!(reached, locations);
+        assert_eq!(reached, all_locations);
 
         let mut settings = Settings::default();
         settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
-        let graph = &languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        let mut world = World::new(graph, settings.world_settings[0].clone());
+        let graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
+        let mut world = World::new(&graph, settings.world_settings[0].clone());
 
         world.player.settings.difficulty = Difficulty::Unsafe;
         world.player.inventory.grant(Item::Resource(Resource::Health), 7);
@@ -206,7 +209,7 @@ mod tests {
 
         let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
         let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
-        let reached: Vec<_> = reached.iter().filter_map(|node| node.uber_state()).cloned().collect();
-        assert_eq!(reached, vec![UberState::from_parts("42178", "63404").unwrap(), UberState::from_parts("42178", "42762").unwrap(), UberState::from_parts("23987", "14014").unwrap(), UberState::from_parts("42178", "6117").unwrap()]);
+        let reached: Vec<_> = reached.iter().map(|node| node.identifier()).collect();
+        assert_eq!(reached, vec!["GladesTown.UpdraftCeilingEX", "GladesTown.AboveTpEX", "GladesTown.BountyShard", "GladesTown.BelowHoleHutEX"]);
     }
 }

@@ -5,7 +5,8 @@ use rustc_hash::FxHashMap;
 use seedgen_derive::VVariant;
 
 use crate::VItem;
-use crate::header::{VResolve, VString, parser::Parser, tokenizer::TokenKind};
+use crate::header::{VResolve, VString, parser};
+use crate::languages::TokenKind;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
 pub struct Message {
@@ -76,7 +77,7 @@ impl fmt::Display for VMessage {
 }
 
 fn replace_item_syntax(message: &mut String) {
-    let mut parser = Parser::new(message);
+    let mut parser = parser::new(message);
     let mut replacements = vec![];
     loop {
         parser.skip_while(|kind| kind != TokenKind::Dollar);

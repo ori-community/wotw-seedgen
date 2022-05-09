@@ -385,12 +385,15 @@ mod tests {
     #[test]
     fn some_seeds() {
         let mut settings = Settings::default();
-        let mut graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        let areas = util::read_file("areas.wotw", "logic").unwrap();
+        let locations = util::read_file("loc_data.csv", "logic").unwrap();
+        let states = util::read_file("state_data.csv", "logic").unwrap();
+        let mut graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
 
         generate_seed(&graph, settings.clone()).unwrap();
 
         settings.world_settings[0].difficulty = Difficulty::Unsafe;
-        graph = languages::parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
+        graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
         generate_seed(&graph, settings.clone()).unwrap();
 
         settings.world_settings[0].headers = vec![

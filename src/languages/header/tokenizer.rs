@@ -1,78 +1,8 @@
-use std::{ops::Range, iter::FusedIterator};
+use std::iter::FusedIterator;
 
-use crate::languages::cursor::Cursor;
+use crate::languages::{Cursor, Token, TokenKind, CommentKind};
 
-#[derive(Debug, Clone, Copy, PartialEq, seedgen_derive::Display)]
-pub(crate) enum TokenKind {
-    /// `\n`
-    Newline,
-    /// General whitespace characters, not including newlines
-    Whitespace,
-    /// `// Helpful explanation`, `/// My Header`
-    Comment { kind: CommentKind },
-    /// `1`, `-999`, `345.67`
-    Number,
-    /// `header_core`, `opher`, `int`
-    Identifier,
-    /// `"Greetings Hello"`
-    String { terminated: bool },
-    /// `|`
-    Separator,
-    /// `=`
-    Eq,
-    /// `,`
-    Comma,
-    /// `.`
-    Dot,
-    /// `:`
-    Colon,
-    /// `!`
-    Bang,
-    /// `$`
-    Dollar,
-    /// `(`
-    OpenParen,
-    /// `)`
-    CloseParen,
-    /// `[`
-    OpenBracket,
-    /// `]`
-    CloseBracket,
-    /// `{`
-    OpenBrace,
-    /// `}`
-    CloseBrace,
-    /// `+`
-    Plus,
-    /// `-`
-    Minus,
-    /// `#`
-    Pound,
-    /// End of File
-    /// 
-    /// This is never directly returned by the tokenizer, but can be useful in later processing
-    Eof,
-    /// Tokens not used in the language, e.g. `@`
-    Unknown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) enum CommentKind {
-    /// `// Common Comment`
-    Note,
-    /// `/// My Header`
-    HeaderDoc,
-    /// `//// Amount to add to the pool`
-    ConfigDoc,
-}
-
-#[derive(Clone)]
-pub(crate) struct Token {
-    pub kind: TokenKind,
-    pub range: Range<usize>,
-}
-
-pub(super) struct TokenStream<'a> {
+pub(crate) struct TokenStream<'a> {
     cursor: Cursor<'a>,
 }
 impl Iterator for TokenStream<'_> {
@@ -117,7 +47,7 @@ impl Cursor<'_> {
             '#' => TokenKind::Pound,
             _ => TokenKind::Unknown,
         };
-        let range = self.consumed_range();
+        let range = self.reset_consumed_range();
 
         Some(Token { kind, range })
     }

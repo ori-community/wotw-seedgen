@@ -1,5 +1,6 @@
 pub mod tokenizer;
-pub mod parser;
+use tokenizer::TokenStream;
+pub(crate) mod parser;
 mod emitter;
 mod v;
 mod tools;
@@ -17,7 +18,8 @@ use crate::{util::{Icon, UberState, VUberState, UberIdentifier}, VItem, Item};
 use rustc_hash::FxHashMap;
 use rand::Rng;
 
-use parser::{Parser, ParseError, parse_header_contents};
+use parser::{parse_header_contents};
+use super::{ParseError, parser::ParseErrorCollection};
 
 #[derive(Debug, Clone)]
 pub struct TimerDefinition {
@@ -61,10 +63,10 @@ impl Header {
     /// Parse complete header syntax
     /// 
     /// All `!!pool`, `!!flush` and `!!take` syntax will be evaluated at this time, using the provided rng
-    pub fn parse<R: Rng>(mut input: String, rng: &mut R) -> Result<Header, Vec<ParseError>> {
+    pub fn parse<R: Rng>(mut input: String, rng: &mut R) -> Result<Header, ParseErrorCollection> {
         // TODO not actually parsing pool means anything using pool gets wrong errors
         parser::preprocess(&mut input, rng).map_err(|err| vec![ParseError::new(format!("Error preprocessing: {err}"), "", 0..0)])?;
-        let mut parser = Parser::new(&input);
+        let mut parser = parser::new(&input);
         let contents = parse_header_contents(&mut parser)?;
         Ok(Header { contents })
     }

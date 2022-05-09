@@ -5,7 +5,7 @@ use seedgen_derive::FromStr;
 use crate::VItem;
 
 use crate::header::{HeaderCommand, ParameterDefault, V, VString, ParameterType};
-use crate::header::tokenizer::TokenKind;
+use crate::languages::TokenKind;
 
 use super::{Parser, ParseError, parse_ident, parse_number, parse_v_number, parse_string, parse_icon, Suggestion};
 
@@ -28,8 +28,8 @@ enum HeaderCommandKind {
 }
 
 impl HeaderCommand {
-    pub fn parse(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
-        let kind = parse_ident!(parser, Suggestion::HeaderCommand);
+    pub(crate) fn parse(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+        let kind = parse_ident!(parser, Suggestion::HeaderCommand)?;
         match kind {
             HeaderCommandKind::Include => parse_include(parser),
             HeaderCommandKind::Exclude => parse_exclude(parser),
@@ -50,7 +50,7 @@ impl HeaderCommand {
 impl FromStr for HeaderCommand {
     type Err = String;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let mut parser = Parser::new(input);
+        let mut parser = super::new(input);
         let command = HeaderCommand::parse(&mut parser).map_err(|err| err.verbose_display())?;
         let remaining = parser.remaining();
         if remaining.is_empty() {
@@ -83,12 +83,12 @@ fn parse_item_amount(parser: &mut Parser) -> Result<V<i32>, ParseError> {
 
 fn parse_include(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
-    let name = parse_ident!(parser, Suggestion::Identifier);
+    let name = parse_ident!(parser, Suggestion::Identifier)?;
     Ok(HeaderCommand::Include { name })
 }
 fn parse_exclude(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
-    let name = parse_ident!(parser, Suggestion::Identifier);
+    let name = parse_ident!(parser, Suggestion::Identifier)?;
     Ok(HeaderCommand::Exclude { name })
 }
 fn parse_add(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
@@ -140,14 +140,14 @@ fn parse_icon_command(parser: &mut Parser) -> Result<HeaderCommand, ParseError> 
 }
 fn parse_parameter(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
-    let identifier = parse_ident!(parser, Suggestion::Identifier);
+    let identifier = parse_ident!(parser, Suggestion::Identifier)?;
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::Identifier)?;
-    let parameter_type = parse_ident!(parser, Suggestion::ParameterType);
+    let parameter_type = parse_ident!(parser, Suggestion::ParameterType)?;
     parser.eat_or_suggest(TokenKind::Colon, Suggestion::ParameterType)?;
     let default = match parameter_type {
-        ParameterType::Bool => ParameterDefault::Bool(parse_ident!(parser, Suggestion::Boolean)),
-        ParameterType::Int => ParameterDefault::Int(parse_number!(parser, Suggestion::Integer)),
-        ParameterType::Float => ParameterDefault::Float(parse_number!(parser, Suggestion::Float)),
+        ParameterType::Bool => ParameterDefault::Bool(parse_ident!(parser, Suggestion::Boolean)?),
+        ParameterType::Int => ParameterDefault::Int(parse_number!(parser, Suggestion::Integer)?),
+        ParameterType::Float => ParameterDefault::Float(parse_number!(parser, Suggestion::Float)?),
         ParameterType::String => ParameterDefault::String(parse_string(parser)?.to_owned()),
     };
     Ok(HeaderCommand::Parameter { identifier, default })
@@ -169,7 +169,7 @@ fn parse_set(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
 }
 fn parse_if(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
-    let parameter = parse_ident!(parser, Suggestion::Identifier);
+    let parameter = parse_ident!(parser, Suggestion::Identifier)?;
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::Identifier)?;
     let token = parser.next_token();
     let value = parser.read_token(&token).to_owned();

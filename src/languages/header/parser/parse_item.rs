@@ -5,10 +5,12 @@ use crate::{
     VItem,
     item::{VCommand, SysMessage, VWheelCommand, VShopCommand, VUberStateItem, VUberStateOperator, VUberStateRange, VUberStateRangeBoundary, VMessage, WheelItemPosition},
     util::{VUberState, UberType, UberIdentifier, VPosition},
-    header::{V, VString, tokenizer::TokenKind},
+    header::{V, VString},
+    languages::TokenKind,
+    languages::parser::{parse_number, parse_value, parse_ident},
 };
 
-use super::{Parser, ParseError, parse_string, parse_number, parse_removable_number, parse_value, parse_ident, parse_v_ident, parse_v_number, parse_v_removable_number, parse_uber_identifier, parse_icon, Suggestion};
+use super::{Parser, ParseError, parse_string, parse_removable_number, parse_v_ident, parse_v_number, parse_v_removable_number, parse_uber_identifier, parse_icon, Suggestion};
 
 impl VItem {
     /// Parse item syntax
@@ -122,7 +124,7 @@ fn parse_v_position(parser: &mut Parser) -> Result<VPosition, ParseError> {
 }
 
 fn parse_item(parser: &mut Parser) -> Result<VItem, ParseError> {
-    let kind = parse_number!(parser, Suggestion::ItemKind);
+    let kind = parse_number!(parser, Suggestion::ItemKind)?;
     match kind {
         ItemKind::SpiritLight => parse_spirit_light(parser),
         ItemKind::Resource => parse_resource(parser),
@@ -154,7 +156,7 @@ fn parse_spirit_light(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_resource(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let resource = parse_number!(parser, Suggestion::Resource);
+    let resource = parse_number!(parser, Suggestion::Resource)?;
     Ok(VItem::Resource(resource))
 }
 fn parse_skill(parser: &mut Parser) -> Result<VItem, ParseError> {
@@ -179,7 +181,7 @@ fn parse_shard(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let kind = parse_number!(parser, Suggestion::CommandKind);
+    let kind = parse_number!(parser, Suggestion::CommandKind)?;
     let command = match kind {
         CommandKind::Autosave => Ok(VCommand::Autosave),
         CommandKind::Resource => parse_set_resource(parser),
@@ -217,7 +219,7 @@ fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_set_resource(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let resource = parse_number!(parser, Suggestion::Resource);
+    let resource = parse_number!(parser, Suggestion::Resource)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Resource)?;
     let amount = parse_v_number!(parser, Suggestion::Integer);
     Ok(VCommand::Resource { resource, amount })
@@ -239,7 +241,7 @@ fn parse_stop_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_toggle(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let target = parse_number!(parser, Suggestion::ToggleCommandKind);
+    let target = parse_number!(parser, Suggestion::ToggleCommandKind)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ToggleCommandKind)?;
     let on = parse_v_number!(parser, Suggestion::NumericBoolean);
     Ok(VCommand::Toggle { target, on })
@@ -261,9 +263,9 @@ fn parse_stop_timer(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_intercept(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let intercept = parse_number!(parser, Suggestion::Integer);
+    let intercept = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
-    let set = parse_number!(parser, Suggestion::Integer);
+    let set = parse_number!(parser, Suggestion::Integer)?;
     Ok(VCommand::StateRedirect { intercept, set })
 }
 fn parse_set_health(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -285,7 +287,7 @@ fn parse_equip(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
     let slot = parse_v_number!(parser, Suggestion::EquipSlot);
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::EquipSlot)?;
-    let ability = parse_number!(parser, Suggestion::Spell);
+    let ability = parse_number!(parser, Suggestion::Spell)?;
     Ok(VCommand::Equip { slot, ability })
 }
 fn parse_ahk_signal(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -327,7 +329,7 @@ fn parse_enable_sync(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let id = parse_number!(parser, Suggestion::Integer);
+    let id = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
     let position = parse_v_position(parser)?;
     let label = if parser.current_token().kind == TokenKind::Separator {
@@ -342,7 +344,7 @@ fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_destroy_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let id = parse_number!(parser, Suggestion::Integer);
+    let id = parse_number!(parser, Suggestion::Integer)?;
     Ok(VCommand::DestroyWarp { id })
 }
 fn parse_if_box(parser: &mut Parser) -> Result<VCommand, ParseError> {
@@ -377,19 +379,19 @@ fn parse_if_self_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_unequip(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let ability = parse_number!(parser, Suggestion::Spell);
+    let ability = parse_number!(parser, Suggestion::Spell)?;
     Ok(VCommand::UnEquip { ability })
 }
 fn parse_save_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let id = parse_number!(parser, Suggestion::Integer);
+    let id = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
     let string = VString(parse_string(parser)?.to_owned());
     Ok(VCommand::SaveString { id, string })
 }
 fn parse_append_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let id = parse_number!(parser, Suggestion::Integer);
+    let id = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
     let string = VString(parse_string(parser)?.to_owned());
     Ok(VCommand::AppendString { id, string })
@@ -427,10 +429,10 @@ fn parse_message(parser: &mut Parser) -> Result<VItem, ParseError> {
                 parser.next_token();
                 match flag {
                     MessageFlag::Mute => message.mute = true,
-                    MessageFlag::F => message.frames = Some(parse_value!(parser, Suggestion::Integer, Suggestion::MessageFlag)),
+                    MessageFlag::F => message.frames = Some(parse_value!(parser, Suggestion::Integer, Suggestion::MessageFlag)?),
                     MessageFlag::Instant => message.instant = true,
                     MessageFlag::Quiet => message.quiet = true,
-                    MessageFlag::P => message.pos = Some(parse_value!(parser, Suggestion::Float, Suggestion::MessageFlag)),
+                    MessageFlag::P => message.pos = Some(parse_value!(parser, Suggestion::Float, Suggestion::MessageFlag)?),
                     MessageFlag::NoClear => message.noclear = true,
                 }
             } else { break }
@@ -442,7 +444,7 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
     let uber_identifier = parse_uber_identifier(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberId)?;
-    let uber_type = parse_ident!(parser, Suggestion::UberType);
+    let uber_type = parse_ident!(parser, Suggestion::UberType)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberType)?;
 
     let (signed, sign) = match parser.current_token().kind {
@@ -537,27 +539,27 @@ fn parse_water(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_bonus_item(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let bonus_item = parse_number!(parser, Suggestion::BonusItem);
+    let bonus_item = parse_number!(parser, Suggestion::BonusItem)?;
     Ok(VItem::BonusItem(bonus_item))
 }
 fn parse_bonus_upgrade(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let bonus_upgrade = parse_number!(parser, Suggestion::BonusUpgrade);
+    let bonus_upgrade = parse_number!(parser, Suggestion::BonusUpgrade)?;
     Ok(VItem::BonusUpgrade(bonus_upgrade))
 }
 fn parse_relic(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let zone = parse_number!(parser, Suggestion::Zone);
+    let zone = parse_number!(parser, Suggestion::Zone)?;
     Ok(VItem::Relic(zone))
 }
 fn parse_sys_message(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let kind = parse_number!(parser, Suggestion::SysMessageKind);
+    let kind = parse_number!(parser, Suggestion::SysMessageKind)?;
     let sys_message = match kind {
         SysMessageKind::RelicList => SysMessage::RelicList,
         SysMessageKind::MapRelicList => {
             parser.eat_or_suggest(TokenKind::Separator, Suggestion::SysMessageKind)?;
-            let zone = parse_number!(parser, Suggestion::Zone);
+            let zone = parse_number!(parser, Suggestion::Zone)?;
             SysMessage::MapRelicList(zone)
         },
         SysMessageKind::PickupCount => SysMessage::PickupCount,
@@ -567,7 +569,7 @@ fn parse_sys_message(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_wheel_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let kind = parse_number!(parser, Suggestion::WheelCommandKind);
+    let kind = parse_number!(parser, Suggestion::WheelCommandKind)?;
     let command = match kind {
         WheelCommandKind::SetName => parse_wheel_set_name(parser),
         WheelCommandKind::SetDescription => parse_wheel_set_description(parser),
@@ -583,9 +585,9 @@ fn parse_wheel_command(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_wheel_item_position(parser: &mut Parser) -> Result<(u32, WheelItemPosition), ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelCommandKind)?;
-    let wheel = parse_number!(parser, Suggestion::Integer);
+    let wheel = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
-    let position = parse_number!(parser, Suggestion::WheelItemPosition);
+    let position = parse_number!(parser, Suggestion::WheelItemPosition)?;
     Ok((wheel, position))
 }
 fn parse_wheel_set_name(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
@@ -621,21 +623,21 @@ fn parse_wheel_set_color(parser: &mut Parser) -> Result<VWheelCommand, ParseErro
 fn parse_wheel_set_item(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     let (wheel, position) = parse_wheel_item_position(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelItemPosition)?;
-    let bind = parse_number!(parser, Suggestion::WheelBind);
+    let bind = parse_number!(parser, Suggestion::WheelBind)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelBind)?;
     let item = Box::new(parse_item(parser)?);
     Ok(VWheelCommand::SetItem { wheel, position, bind, item })
 }
 fn parse_wheel_set_sticky(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelCommandKind)?;
-    let wheel = parse_number!(parser, Suggestion::Integer);
+    let wheel = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
     let sticky = parse_v_ident!(parser, Suggestion::Boolean);
     Ok(VWheelCommand::SetSticky { wheel, sticky })
 }
 fn parse_wheel_switch_wheel(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelCommandKind)?;
-    let wheel = parse_number!(parser, Suggestion::Integer);
+    let wheel = parse_number!(parser, Suggestion::Integer)?;
     Ok(VWheelCommand::SwitchWheel { wheel })
 }
 fn parse_wheel_remove_item(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
@@ -644,7 +646,7 @@ fn parse_wheel_remove_item(parser: &mut Parser) -> Result<VWheelCommand, ParseEr
 }
 fn parse_shop_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let kind = parse_number!(parser, Suggestion::ShopCommandKind);
+    let kind = parse_number!(parser, Suggestion::ShopCommandKind)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ShopCommandKind)?;
     let uber_identifier = parse_uber_identifier(parser)?;
     let command = match kind {

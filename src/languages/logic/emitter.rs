@@ -1,19 +1,17 @@
 use rustc_hash::{FxHashSet, FxHashMap};
 
-use super::{parser::{self, AreaTree}, tokenizer::Metadata, Location, NamedState};
+use super::{parser::{self, Areas, AreaContent}, locations::Location, states::NamedState};
+
 use crate::{world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
-}, settings::{Difficulty, Trick}, Settings};
+}, settings::{Difficulty, Trick}, Settings, util::NodeKind};
 use crate::item::Skill;
-use crate::util::Zone;
 
 struct EmitterContext<'a> {
-    definitions: &'a FxHashMap<&'a str, parser::Group<'a>>,
+    macros: &'a FxHashMap<&'a str, parser::Group<'a>>,
     settings: &'a Settings,
-    validate: bool,
-    node_map: FxHashMap<&'a str, usize>,
-    used_states: FxHashSet<&'a str>,
+    node_map: FxHashMap<String, usize>,
 }
 
 fn build_trick_requirement(trick: &Trick, out: Requirement, context: &mut EmitterContext) -> Requirement {
@@ -61,48 +59,45 @@ fn build_difficulty_requirement(difficulty: Difficulty, out: Requirement, region
 
 const HARD_BOSS_HEALTH_MULTIPLIER: f32 = 1.8;
 
-fn build_boss_requirement(health: u16, context: &EmitterContext) -> Requirement {
+fn build_boss_requirement(health: f32, context: &EmitterContext) -> Requirement {
     if context.settings.any_play_hard() {
         if context.settings.all_play_hard() {
-            Requirement::Boss(f32::from(health) * HARD_BOSS_HEALTH_MULTIPLIER)
+            Requirement::Boss(health * HARD_BOSS_HEALTH_MULTIPLIER)
         } else {
             Requirement::Or(vec![
                 Requirement::And(vec![
                     Requirement::NormalGameDifficulty,
-                    Requirement::Boss(f32::from(health)),
+                    Requirement::Boss(health),
                 ]),
-                Requirement::Boss(f32::from(health) * HARD_BOSS_HEALTH_MULTIPLIER),
+                Requirement::Boss(health * HARD_BOSS_HEALTH_MULTIPLIER),
             ])
         }
     } else {
-        Requirement::Boss(f32::from(health))
+        Requirement::Boss(health)
     }
 }
 
 fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, context: &mut EmitterContext<'a>) -> Requirement {
-    match requirement {
-        parser::Requirement::Free => Requirement::Free,
-        parser::Requirement::Impossible => Requirement::Impossible,
-        parser::Requirement::Definition(identifier) => build_requirement_group(&context.definitions[identifier], region, context),
-        parser::Requirement::Difficulty(difficulty) => build_difficulty_requirement(*difficulty, Requirement::Free, region, context),
-        parser::Requirement::Trick(glitch) => build_trick_requirement(glitch, Requirement::Free, context),
-        parser::Requirement::Skill(skill) => Requirement::Skill(*skill),
-        parser::Requirement::EnergySkill(skill, amount) => Requirement::EnergySkill(*skill, (*amount).into()),
-        parser::Requirement::SpiritLight(amount) => Requirement::SpiritLight(*amount),
-        parser::Requirement::Resource(resource, amount) => Requirement::Resource(*resource, *amount),
-        parser::Requirement::Shard(shard) => Requirement::Shard(*shard),
-        parser::Requirement::Teleporter(teleporter) => Requirement::Teleporter(*teleporter),
-        parser::Requirement::Water => Requirement::Water,
-        parser::Requirement::State(state) => {
-            if context.validate { context.used_states.insert(state); }
-            Requirement::State(context.node_map[state])
-        },
-        parser::Requirement::Damage(amount) => Requirement::Damage(f32::from(*amount)),
-        parser::Requirement::Danger(amount) => Requirement::Danger(f32::from(*amount)),
-        parser::Requirement::Combat(enemies) => Requirement::Combat(enemies.clone()),
-        parser::Requirement::Boss(health) => build_boss_requirement(*health, context),
-        parser::Requirement::BreakWall(health) => Requirement::BreakWall(f32::from(*health)),
-        parser::Requirement::BreakCrystal =>
+    match &requirement.value {
+        parser::RequirementValue::Free => Requirement::Free,
+        parser::RequirementValue::Impossible => Requirement::Impossible,
+        parser::RequirementValue::Macro(identifier) => build_requirement_group(&context.macros[identifier], region, context),
+        parser::RequirementValue::Difficulty(difficulty) => build_difficulty_requirement(*difficulty, Requirement::Free, region, context),
+        parser::RequirementValue::Trick(glitch) => build_trick_requirement(glitch, Requirement::Free, context),
+        parser::RequirementValue::Skill(skill) => Requirement::Skill((*skill).into()),
+        parser::RequirementValue::UseSkill(skill, amount) => Requirement::EnergySkill((*skill).into(), *amount as f32),
+        parser::RequirementValue::SpiritLight(amount) => Requirement::SpiritLight(*amount),
+        parser::RequirementValue::Resource(resource, amount) => Requirement::Resource((*resource).into(), *amount),
+        parser::RequirementValue::Shard(shard) => Requirement::Shard((*shard).into()),
+        parser::RequirementValue::Teleporter(teleporter) => Requirement::Teleporter((*teleporter).into()),
+        parser::RequirementValue::Water => Requirement::Water,
+        parser::RequirementValue::State(state) => Requirement::State(context.node_map[*state]),
+        parser::RequirementValue::Damage(amount) => Requirement::Damage(*amount as f32),
+        parser::RequirementValue::Danger(amount) => Requirement::Danger(*amount as f32),
+        parser::RequirementValue::Combat(enemies) => Requirement::Combat(enemies.clone()),
+        parser::RequirementValue::Boss(health) => build_boss_requirement(*health as f32, context),
+        parser::RequirementValue::BreakWall(health) => Requirement::BreakWall(*health as f32),
+        parser::RequirementValue::BreakCrystal =>
             build_or(vec![
                 Requirement::Skill(Skill::Sword),
                 Requirement::Skill(Skill::Hammer),
@@ -111,43 +106,43 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
                 build_difficulty_requirement(Difficulty::Gorlek, Requirement::EnergySkill(Skill::Grenade, 1.0), false, context),
                 build_difficulty_requirement(Difficulty::Unsafe, Requirement::EnergySkill(Skill::Spear, 1.0), false, context),
             ]),
-        parser::Requirement::ShurikenBreak(health) => build_trick_requirement(&Trick::ShurikenBreak, Requirement::ShurikenBreak(f32::from(*health)), context),
-        parser::Requirement::SentryBreak(health) => build_trick_requirement(&Trick::SentryBreak, Requirement::SentryBreak(f32::from(*health)), context),
-        parser::Requirement::HammerBreak => build_trick_requirement(&Trick::HammerBreak, Requirement::Skill(Skill::Hammer), context),
-        parser::Requirement::SpearBreak => build_trick_requirement(&Trick::SpearBreak, Requirement::EnergySkill(Skill::Spear, 1.0), context),
-        parser::Requirement::SentryJump(amount) => 
+        parser::RequirementValue::ShurikenBreak(health) => build_trick_requirement(&Trick::ShurikenBreak, Requirement::ShurikenBreak(*health as f32), context),
+        parser::RequirementValue::SentryBreak(health) => build_trick_requirement(&Trick::SentryBreak, Requirement::SentryBreak(*health as f32), context),
+        parser::RequirementValue::HammerBreak => build_trick_requirement(&Trick::HammerBreak, Requirement::Skill(Skill::Hammer), context),
+        parser::RequirementValue::SpearBreak => build_trick_requirement(&Trick::SpearBreak, Requirement::EnergySkill(Skill::Spear, 1.0), context),
+        parser::RequirementValue::SentryJump(amount) => 
             build_and(vec![
-                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::EnergySkill(Skill::Sentry, *amount as f32),
                 build_or(vec![
                     build_trick_requirement(&Trick::SwordSentryJump, Requirement::Skill(Skill::Sword), context),
                     build_trick_requirement(&Trick::HammerSentryJump, Requirement::Skill(Skill::Hammer), context),
                 ]),
             ]),
-        parser::Requirement::SwordSentryJump(amount) => build_trick_requirement(&Trick::SwordSentryJump,
+        parser::RequirementValue::SwordSentryJump(amount) => build_trick_requirement(&Trick::SwordSentryJump,
             Requirement::And(vec![
-                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::EnergySkill(Skill::Sentry, *amount as f32),
                 Requirement::Skill(Skill::Sword),
             ]), context),
-        parser::Requirement::HammerSentryJump(amount) => build_trick_requirement(&Trick::HammerSentryJump,
+        parser::RequirementValue::HammerSentryJump(amount) => build_trick_requirement(&Trick::HammerSentryJump,
             Requirement::And(vec![
-                Requirement::EnergySkill(Skill::Sentry, (*amount).into()),
+                Requirement::EnergySkill(Skill::Sentry, *amount as f32),
                 Requirement::Skill(Skill::Hammer),
             ]), context),
-        parser::Requirement::SentryBurn(amount) => build_trick_requirement(&Trick::SentryBurn, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
-        parser::Requirement::LaunchSwap => build_trick_requirement(&Trick::LaunchSwap, Requirement::Skill(Skill::Launch), context),
-        parser::Requirement::SentrySwap(amount) => build_trick_requirement(&Trick::SentrySwap, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
-        parser::Requirement::FlashSwap => build_trick_requirement(&Trick::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
-        parser::Requirement::BlazeSwap(amount) => build_trick_requirement(&Trick::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, (*amount).into()), context),
-        parser::Requirement::WaveDash => build_trick_requirement(&Trick::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
-        parser::Requirement::GrenadeJump => build_trick_requirement(&Trick::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
-        parser::Requirement::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
-        parser::Requirement::HammerJump => build_trick_requirement(&Trick::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
-        parser::Requirement::SwordJump => build_trick_requirement(&Trick::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
-        parser::Requirement::GrenadeRedirect(amount) => build_trick_requirement(&Trick::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),
-        parser::Requirement::SentryRedirect(amount) => build_trick_requirement(&Trick::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, (*amount).into()), context),
-        parser::Requirement::GlideJump => build_trick_requirement(&Trick::GlideJump, Requirement::Skill(Skill::Glide), context),
-        parser::Requirement::GlideHammerJump => build_trick_requirement(&Trick::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
-        parser::Requirement::SpearJump(amount) => build_trick_requirement(&Trick::SpearJump, Requirement::EnergySkill(Skill::Spear, (*amount).into()), context),
+        parser::RequirementValue::SentryBurn(amount) => build_trick_requirement(&Trick::SentryBurn, Requirement::EnergySkill(Skill::Sentry, *amount as f32), context),
+        parser::RequirementValue::LaunchSwap => build_trick_requirement(&Trick::LaunchSwap, Requirement::Skill(Skill::Launch), context),
+        parser::RequirementValue::SentrySwap(amount) => build_trick_requirement(&Trick::SentrySwap, Requirement::EnergySkill(Skill::Sentry, *amount as f32), context),
+        parser::RequirementValue::FlashSwap => build_trick_requirement(&Trick::FlashSwap, Requirement::NonConsumingEnergySkill(Skill::Flash), context),
+        parser::RequirementValue::BlazeSwap(amount) => build_trick_requirement(&Trick::BlazeSwap, Requirement::EnergySkill(Skill::Blaze, *amount as f32), context),
+        parser::RequirementValue::WaveDash => build_trick_requirement(&Trick::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
+        parser::RequirementValue::GrenadeJump => build_trick_requirement(&Trick::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
+        parser::RequirementValue::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
+        parser::RequirementValue::HammerJump => build_trick_requirement(&Trick::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::RequirementValue::SwordJump => build_trick_requirement(&Trick::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
+        parser::RequirementValue::GrenadeRedirect(amount) => build_trick_requirement(&Trick::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, *amount as f32), context),
+        parser::RequirementValue::SentryRedirect(amount) => build_trick_requirement(&Trick::SentryRedirect, Requirement::EnergySkill(Skill::Sentry, *amount as f32), context),
+        parser::RequirementValue::GlideJump => build_trick_requirement(&Trick::GlideJump, Requirement::Skill(Skill::Glide), context),
+        parser::RequirementValue::GlideHammerJump => build_trick_requirement(&Trick::GlideHammerJump, Requirement::And(vec![Requirement::Skill(Skill::Glide), Requirement::Skill(Skill::Hammer)]), context),
+        parser::RequirementValue::SpearJump(amount) => build_trick_requirement(&Trick::SpearJump, Requirement::EnergySkill(Skill::Spear, *amount as f32), context),
     }
 }
 
@@ -197,162 +192,147 @@ fn build_requirement_group<'a>(group: &parser::Group<'a>, region: bool, context:
     build_or(lines)
 }
 
-fn add_entry<'a>(graph: &mut FxHashMap<&'a str, usize>, key: &'a str, index: usize) -> Result<(), String> {
-    if graph.insert(key, index).is_some() {
-        return Err(format!("Name {} was used multiple times ambiguously", key));
+fn add_entry(node_map: &mut FxHashMap<String, usize>, key: &str, index: usize) -> Result<(), String> {
+    match node_map.insert(key.to_string(), index) {
+        Some(_) => Err(format!("Name \"{key}\" was used multiple times ambiguously")),
+        None => Ok(()),
     }
-    Ok(())
 }
 
-pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state_map: &[NamedState], settings: &Settings, validate: bool) -> Result<Graph, String> {
-    let node_count = areas.anchors.len() + locations.len() + metadata.states.len();
-    let mut graph = Vec::with_capacity(node_count);
-    let mut used_states = FxHashSet::default();
-    used_states.reserve(metadata.states.len());
+/// Builds the [`Graph`] from parsed data
+/// 
+/// The given [`Settings`] will be used to optimize the [`Graph`], changing them afterwards may invalidate the result
+pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedState>, settings: &Settings, validate: bool) -> Result<Graph, String> {
+    let mut macros = FxHashMap::default();
+    let mut regions = FxHashMap::default();
+    regions.reserve(20);
+    let mut states = FxHashSet::default();
+    states.reserve(named_states.len());
+    let mut quests = FxHashSet::default();
+    quests.reserve(named_states.len() / 5);
+    let mut anchors = Vec::with_capacity(250);
+    let node_count = areas.contents.len();
+    for content in areas.contents {
+        match content {
+            AreaContent::Requirement(named_group) => { macros.insert(named_group.name, named_group.group); },
+            AreaContent::Region(named_group) => { regions.insert(named_group.name, named_group.group); },
+            AreaContent::Anchor(anchor) => {
+                for connection in &anchor.connections {
+                    match connection.kind {
+                        NodeKind::State => { states.insert(connection.identifier); },
+                        NodeKind::Quest => { quests.insert(connection.identifier); },
+                        _ => {},
+                    }
+                }
+                anchors.push(anchor)
+            },
+        }
+    }
+
+    if validate {
+        for &region in regions.keys() {
+            if !anchors.iter().any(|anchor| anchor.region() == region) {
+                log::warn!("Region {} has no anchors with a matching name.", region);
+            }
+        }
+    }
+
+    let mut index = 0;
+    let mut nodes = Vec::with_capacity(node_count);
     let mut node_map = FxHashMap::default();
     node_map.reserve(node_count);
 
     for location in locations {
-        let name = &location.name[..];
-        let zone = match &location.zone[..] {
-            "Inkwater Marsh" => Zone::Marsh,
-            "Midnight Burrows" => Zone::Burrows,
-            "Kwoloks Hollow" => Zone::Hollow,
-            "Wellspring Glades" => Zone::Glades,
-            "The Wellspring" => Zone::Wellspring,
-            "Luma Pools" => Zone::Pools,
-            "Silent Woods" => Zone::Woods,
-            "Baurs Reach" => Zone::Reach,
-            "Mouldwood Depths" => Zone::Depths,
-            "Windswept Wastes" => Zone::Wastes,
-            "Windtorn Ruins" => Zone::Ruins,
-            "Willows End" => Zone::Willow,
-            "Shop" => Zone::Shop,
-            "Void" => Zone::Void,
-            _ => return Err(format!("invalid zone {} in loc_data", location.zone)),
+        let Location { name, zone, uber_state, position } = location;
+        let identifier = name;
+        add_entry(&mut node_map, &identifier, index)?;
+        let node = match quests.contains(&identifier[..]) {
+            true => Node::Quest(graph::Quest { identifier, zone, index, uber_state, position }),
+            false => Node::Pickup(graph::Pickup { identifier, zone, index, uber_state, position }),
         };
-
-        let index = graph.len();
-        add_entry(&mut node_map, &location.name, index)?;
-
-        if metadata.quests.contains(name) {
-            graph.push(Node::Quest(graph::Quest {
-                identifier: location.name.clone(),
-                zone,
-                index,
-                uber_state: location.uber_state.clone(),
-                position: location.position.clone(),
-            }));
-        } else {
-            graph.push(Node::Pickup(graph::Pickup {
-                identifier: location.name.clone(),
-                zone,
-                index,
-                uber_state: location.uber_state.clone(),
-                position: location.position.clone(),
-            }));
-        }
+        nodes.push(node);
+        index += 1;
     }
-    for &state in &metadata.states {
-        let index = graph.len();
-        add_entry(&mut node_map, state, index)?;
-
-        let mut uber_state = None;
-        if let Some(named_state) = state_map.iter().find(|&named_state| named_state.name == state) {
-            uber_state = Some(named_state.uber_state.clone());
-        } else if validate {
+    for state in &states {
+        let identifier = state.to_string();
+        let uber_state = named_states.iter()
+            .find(|named_state| named_state.name == identifier)
+            .map(|named_state| &named_state.uber_state)
+            .cloned();
+        if uber_state.is_none() {
             log::trace!("Couldn't find an entry for {} in the state table", state);
         }
-
-        graph.push(Node::State(graph::State {
-            identifier: state.to_owned(),
-            index,
-            uber_state,
-        }));
+        add_entry(&mut node_map, &identifier, index)?;
+        let node = Node::State(graph::State { identifier, index, uber_state });
+        nodes.push(node);
+        index += 1;
     }
 
-    let length = graph.len();
-    for (index, anchor) in areas.anchors.iter().enumerate() {
-        add_entry(&mut node_map, anchor.identifier, length + index)?;
+    for (anchor_index, anchor) in anchors.iter().enumerate() {
+        add_entry(&mut node_map, &anchor.identifier, index + anchor_index)?;
     }
 
     let mut context = EmitterContext {
-        definitions: &areas.definitions,
+        macros: &macros,
         settings,
-        validate,
         node_map,
-        used_states,
     };
+    for anchor in anchors {
+        let region = regions.get(anchor.region());
+        let region_requirement = region.map(|group| build_requirement_group(group, true, &mut context));
 
-    for anchor in &areas.anchors {
-        let region = anchor.region();
-        let region = areas.regions.get(region);
-        let mut region_requirement = None;
-        if let Some(group) = region {
-            region_requirement = Some(build_requirement_group(group, true, &mut context));
-        }
+        let parser::Anchor { identifier, position, can_spawn, refills, connections } = anchor;
+        let identifier = identifier.to_owned();
 
-        let refills = anchor.refills.iter().map(|refill| {
-            let mut requirement = Requirement::Free;
-            if let Some(group) = &refill.requirements {
-                requirement = build_requirement_group(group, false, &mut context);
-            }
-            graph::Refill {
-                name: refill.name,
-                requirement,
-            }
-        }).collect::<Vec<_>>();
+        let refills = refills.into_iter().map(|refill| {
+            let value = refill.value;
+            let requirement = refill.requirements.map_or(Requirement::Free, |group| build_requirement_group(&group, false, &mut context));
+            graph::Refill { value, requirement }
+        }).collect();
 
-        let mut connections = Vec::with_capacity(anchor.connections.len());
-        for connection in &anchor.connections {
+        let connections = connections.into_iter().map(|connection| {
             let mut requirement = build_requirement_group(&connection.requirements, false, &mut context);
             if let Some(region_requirement) = &region_requirement {
                 requirement = build_and(vec![region_requirement.clone(), requirement]);
             }
+            let to = *context.node_map.get(connection.identifier).ok_or_else(|| format!("Anchor {} connects to {} {} which doesn't actually exist", identifier, connection.kind, connection.identifier))?;
 
-            let to = *context.node_map.get(connection.identifier).ok_or_else(|| format!("Anchor {} connects to {:?} {} which doesn't actually exist", anchor.identifier, connection.name, connection.identifier))?;
-
-            connections.push(graph::Connection {
-                to,
-                requirement,
-            });
-        }
-
-        graph.push(Node::Anchor(graph::Anchor {
-            identifier: anchor.identifier.to_owned(),
-            position: anchor.position.clone(),
-            can_spawn: anchor.can_spawn,
-            index: graph.len(),
-            refills,
-            connections,
-        }));
-    }
-
-    if validate {
-        for anchor in &areas.anchors {
-            for connection in &anchor.connections {
-                let expected_type = graph[context.node_map[connection.identifier]].node_type();
-                if connection.name != expected_type {
-                    return Err(format!("Anchor {} connects to {:?} {} which is actually a {:?}", anchor.identifier, connection.name, connection.identifier, expected_type));
+            if validate {
+                let expected_kind = nodes.get(to).map_or(NodeKind::Anchor, |node| node.node_kind());
+                if connection.kind != expected_kind {
+                    return Err(format!("Anchor {} connects to {} {} which is actually a {}", identifier, connection.kind, connection.identifier, expected_kind));
                 }
             }
-        }
 
-        for &region in areas.regions.keys() {
-            if !areas.anchors.iter().any(|anchor| anchor.region() == region) {
-                log::warn!("Region {} has no anchors with a matching name.", region);
-            }
-        }
-        for state in &metadata.states {
-            if !context.used_states.contains(state) {
-                log::trace!("State {} was never used as a requirement.", state);
-            }
-        }
+            Ok(graph::Connection { to, requirement })
+        }).collect::<Result<Vec<_>, String>>()?;
+
+        let node = Node::Anchor(graph::Anchor { identifier, position, can_spawn, index, refills, connections });
+        index += 1;
+        nodes.push(node);
+    };
+
+    if validate {
+        check_unused_states(&nodes, &states);
     }
 
-    Ok(Graph {
-        nodes: graph,
-    })
+    Ok(Graph { nodes })
+}
+
+fn check_unused_states(nodes: &[Node], states: &FxHashSet<&str>) {
+    let mut used_states = FxHashSet::default();
+    used_states.reserve(states.len());
+    nodes.iter()
+        .filter_map(|node| if let Node::Anchor(anchor) = node { Some(anchor) } else { None })
+        .flat_map(|anchor| &anchor.connections)
+        .map(|connection| &nodes[connection.to])
+        .filter(|node| node.node_kind() == NodeKind::State)
+        .for_each(|node| { used_states.insert(node.identifier()); });
+
+    let unused_states = states.iter().filter(|state| !used_states.contains(*state));
+    for state in unused_states {
+        log::trace!("State {} was never used as a requirement", state);
+    }
 }
 
 #[cfg(test)]
@@ -362,14 +342,12 @@ mod tests {
     #[test]
     fn boss_scaling() {
         let context = EmitterContext {
-            definitions: &FxHashMap::default(),
+            macros: &FxHashMap::default(),
             settings: &Settings::default(),
-            validate: false,
             node_map: FxHashMap::default(),
-            used_states: FxHashSet::default(),
         };
 
-        let requirement = build_boss_requirement(100, &context);
+        let requirement = build_boss_requirement(100.0, &context);
         match requirement {
             Requirement::Boss(health) if health == 100.0 => {},
             _ => panic!(),
@@ -378,14 +356,12 @@ mod tests {
         let mut settings = Settings::default();
         settings.world_settings[0].hard = true;
         let context = EmitterContext {
-            definitions: &FxHashMap::default(),
+            macros: &FxHashMap::default(),
             settings: &settings,
-            validate: false,
             node_map: FxHashMap::default(),
-            used_states: FxHashSet::default(),
         };
 
-        let requirement = build_boss_requirement(100, &context);
+        let requirement = build_boss_requirement(100.0, &context);
         match requirement {
             Requirement::Boss(health) if health == 100.0 * 1.7999999523162841796875 => {},
             _ => panic!(),
