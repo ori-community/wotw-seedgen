@@ -637,7 +637,7 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
     kii:
       Bash, Glide OR Grenade=1 OR Sword OR Hammer OR Damage=10
       Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1  # use the abillity to get on the wall to the right and use shuriken to get onto the vine
-      Sword, Sentry=1 OR Hammer OR Flash=1, Spear=1  # pogo off the enemy
+      Sword, Sentry=1 OR Hammer OR Flash=1 OR Spear=1  # pogo off the enemy
     unsafe:
       Grenade=1, Damage=10            # Grenade jump to get to the vine, then jump right. Dboost the last gap.
       Grenade=2                       # Grenade jump to get to the vine, then jump right. Grenade jump the last gap.
