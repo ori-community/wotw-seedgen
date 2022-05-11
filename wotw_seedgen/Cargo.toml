@@ -5,7 +5,6 @@ version = "0.0.3"
 authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/ori-rando/wotw-seedgen"
-publish = ["crates-io"]
 license = "MIT"
 
 [dependencies]
