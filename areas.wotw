@@ -6454,6 +6454,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       DoubleJump, Bash, Grenade=1
       Glide, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
       Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
+      DoubleJump, GrenadeJump
   conn WoodsMain.AbovePit:
     moki:
       DoubleJump, Bash
