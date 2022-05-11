@@ -8,7 +8,7 @@ repository = "https://github.com/ori-rando/wotw-seedgen"
 license = "MIT"
 
 [dependencies]
-wotw_seedgen_derive = { path = "../wotw_seedgen_derive" }
+wotw_seedgen_derive = { path = "../wotw_seedgen_derive", version = "0.1" }
 serde = { version = "1.0.124", features = ["derive"] }
 serde_json = "1.0"
 csv = "1.1"
