@@ -224,7 +224,7 @@ impl<'b> ParseContext<'_, '_> {
 }
 pub(super) fn parse_header_contents(parser: &mut Parser) -> Result<Vec<HeaderContent>, ParseErrorCollection> {
     let mut context = ParseContext::new(parser);
-    let mut errors = ParseErrorCollection::new();
+    let mut errors = ParseErrorCollection::default();
 
     loop {
         parse_whitespace(&mut context);

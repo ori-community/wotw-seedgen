@@ -1,4 +1,4 @@
-mod languages;
+pub mod languages;
 pub mod world;
 pub mod inventory;
 pub mod item;

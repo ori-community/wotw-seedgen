@@ -119,7 +119,7 @@ impl<'a> Areas<'a> {
     /// Parses the input string into the [`Areas`] representation
     pub fn parse(input: &'a str) -> Result<Areas<'a>, ParseErrorCollection> {
         let mut contents = Vec::new();
-        let mut errors = ParseErrorCollection::new();
+        let mut errors = ParseErrorCollection::default();
         let mut parser = new(input);
         loop {
             parser.skip_while(|kind| kind == TokenKind::Newline || kind == TokenKind::Whitespace);

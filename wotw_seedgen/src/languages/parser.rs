@@ -152,7 +152,7 @@ impl Display for ParseError {
 }
 impl Error for ParseError {}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct ParseErrorCollection {
     errors: Vec<ParseError>,
 }
@@ -181,9 +181,6 @@ impl Display for ParseErrorCollection {
     }
 }
 impl ParseErrorCollection {
-    pub(super) fn new() -> ParseErrorCollection {
-        ParseErrorCollection { errors: Vec::new() }
-    }
     pub fn verbose_display(&self) -> String {
         self.errors.iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n")
     }
