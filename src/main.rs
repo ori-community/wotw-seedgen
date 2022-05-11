@@ -14,7 +14,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings, util, languages::{headers::{self, parser::HeaderContext}, self}};
+use wotw_seedgen::{self, item, world, settings, util, languages::{headers::{self, parser::HeaderContext}, self}};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::{
@@ -459,7 +459,7 @@ fn generate_seeds(mut args: SeedArgs) -> Result<(), String> {
     let worlds = settings.worlds;
     let race = settings.race;
     let players = settings.players.clone();
-    let (seeds, spoilers) = seedgen::generate_seed(&graph, settings, &args.inline_headers, seed).map_err(|err| format!("Error generating seed: {}", err))?;
+    let (seeds, spoilers) = wotw_seedgen::generate_seed(&graph, settings, &args.inline_headers, seed).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -606,7 +606,7 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
     let mut context = HeaderContext::default();
 
     let header_block = headers::parser::parse_header(&path, &header, &mut world, &mut context, &HashMap::default(), &mut rng)?;
-    let flag_line = seedgen::write_flags(&settings, context.flags);
+    let flag_line = wotw_seedgen::write_flags(&settings, context.flags);
 
     let compiled = format!("{}{}", flag_line, header_block);
 
@@ -628,7 +628,7 @@ fn main() {
     match args.command {
         SeedGenCommand::Seed { args } => {
             let use_file = if args.verbose { Some("generator.log") } else { None };
-            seedgen::initialize_log(use_file, LevelFilter::Info, args.json_stderr).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            wotw_seedgen::initialize_log(use_file, LevelFilter::Info, args.json_stderr).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             generate_seeds(args).unwrap_or_else(|err| {
               log::error!("{}", err);
@@ -636,17 +636,17 @@ fn main() {
             });
         },
         SeedGenCommand::Play => {
-            seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            wotw_seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             play_last_seed().unwrap_or_else(|err| log::error!("{}", err));
         },
         SeedGenCommand::Preset { args } => {
-            seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            wotw_seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             create_preset(args).unwrap_or_else(|err| log::error!("{}", err));
         },
         SeedGenCommand::Headers { headers, subcommand } => {
-            seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            wotw_seedgen::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             match subcommand {
                 Some(HeaderCommand::Validate { path }) => {
@@ -665,7 +665,7 @@ fn main() {
             }
         },
         SeedGenCommand::ReachCheck { args } => {
-            seedgen::initialize_log(Some("reach.log"), LevelFilter::Off, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+            wotw_seedgen::initialize_log(Some("reach.log"), LevelFilter::Off, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             match reach_check(args) {
                 Ok(reached) => println!("{}", reached),

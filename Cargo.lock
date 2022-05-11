@@ -539,6 +539,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "ori_rando_wotw_seedgen"
+version = "0.0.1"
+dependencies = [
+ "ansi_term 0.12.1",
+ "atty",
+ "bugsalot",
+ "criterion",
+ "csv",
+ "decorum",
+ "log",
+ "log4rs",
+ "num_enum",
+ "open",
+ "rand",
+ "rand_seeder",
+ "regex",
+ "rustc-hash",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "structopt",
+]
+
+[[package]]
 name = "parking_lot"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -805,30 +829,6 @@ name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
-
-[[package]]
-name = "seedgen"
-version = "1.0.10"
-dependencies = [
- "ansi_term 0.12.1",
- "atty",
- "bugsalot",
- "criterion",
- "csv",
- "decorum",
- "log",
- "log4rs",
- "num_enum",
- "open",
- "rand",
- "rand_seeder",
- "regex",
- "rustc-hash",
- "serde",
- "serde_json",
- "smallvec",
- "structopt",
-]
 
 [[package]]
 name = "semver"
