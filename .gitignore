@@ -3,3 +3,4 @@ rls/*
 *.wotwr
 *.log
 .currentseedpath
+Cargo.lock
