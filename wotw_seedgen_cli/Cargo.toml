@@ -1,0 +1,24 @@
+[package]
+name = "wotw_seedgen_cli"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+wotw_seedgen = { path = "../wotw_seedgen" }
+rustc-hash = "1.1"
+rand = "0.8"
+serde_json = "1.0"
+log = "0.4"
+log4rs = "1.1"
+ansi_term = "0.12"
+open = "2.1"
+atty = "0.2"
+bugsalot = "0.2"
+structopt = "0.3"
+
+[build-dependencies]
+syn = "1.0"
+
+[[bin]]
+name = "seedgen"
+path = "src/main.rs"

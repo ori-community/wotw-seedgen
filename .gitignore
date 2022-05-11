@@ -2,5 +2,5 @@ target/*
 rls/*
 *.wotwr
 *.log
-.currentseedpath
+*.currentseedpath
 Cargo.lock
