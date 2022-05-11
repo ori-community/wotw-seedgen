@@ -1,10 +1,10 @@
 [package]
 name = "wotw_seedgen"
-description = "Command line interface to generate seeds for the Ori and the Will of the Wisps Randomizer"
+description = "Seed Generator for the Ori and the Will of the Wisps Randomizer"
 version = "0.0.1"
 authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
-edition = "2018"
-repository = "https://github.com/sparkle-preference/OriWotwRandomizerClient/tree/master/projects/SeedGenCli"
+edition = "2022"
+repository = "https://github.com/ori-rando/wotw-seedgen"
 publish = ["crates-io"]
 license = "MIT"
 
