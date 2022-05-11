@@ -52,10 +52,10 @@ impl From<LocationZone> for Zone {
 /// # Examples
 /// 
 /// ```
-/// # use seedgen::logic::{parse_locations, Location};
-/// use seedgen::util::UberState;
-/// use seedgen::util::Position;
-/// use seedgen::util::Zone;
+/// # use wotw_seedgen::logic::{parse_locations, Location};
+/// use wotw_seedgen::util::UberState;
+/// use wotw_seedgen::util::Position;
+/// use wotw_seedgen::util::Zone;
 /// 
 /// let input = "MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, -958, -4313";
 /// let locations = parse_locations(input).unwrap();

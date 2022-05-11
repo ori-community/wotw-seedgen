@@ -21,8 +21,8 @@ use slugstrings::SLUGSTRINGS;
 /// # Examples
 /// 
 /// ```
-/// # use seedgen::Settings;
-/// use seedgen::settings::WorldSettings;
+/// # use wotw_seedgen::Settings;
+/// use wotw_seedgen::settings::WorldSettings;
 /// 
 /// let settings = Settings::default();
 /// 
@@ -36,7 +36,7 @@ use slugstrings::SLUGSTRINGS;
 /// Settings can be serialized and deserialized
 /// 
 /// ```
-/// # use seedgen::Settings;
+/// # use wotw_seedgen::Settings;
 /// #
 /// let settings = Settings::default();
 /// let json = settings.to_json();
@@ -45,7 +45,7 @@ use slugstrings::SLUGSTRINGS;
 /// Settings can be read from a generated seed
 /// 
 /// ```
-/// # use seedgen::Settings;
+/// # use wotw_seedgen::Settings;
 /// #
 /// let seed = "
 /// // [...pickup data and stuff...]

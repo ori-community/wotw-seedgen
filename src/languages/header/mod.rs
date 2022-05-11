@@ -110,8 +110,8 @@ impl Header {
     /// # Examples
     /// 
     /// ```
-    /// # use seedgen::Header;
-    /// use seedgen::header::Annotation;
+    /// # use wotw_seedgen::Header;
+    /// use wotw_seedgen::header::Annotation;
     /// 
     /// let input = "#hide\n9|0|8|9|0|int|0".to_string();
     /// 
@@ -133,9 +133,9 @@ impl Header {
     /// # Examples
     /// 
     /// ```
-    /// # use seedgen::Header;
-    /// use seedgen::header::ParameterDefault;
-    /// use seedgen::header::ParameterInfo;
+    /// # use wotw_seedgen::Header;
+    /// use wotw_seedgen::header::ParameterDefault;
+    /// use wotw_seedgen::header::ParameterInfo;
     /// 
     /// let input = "!!parameter fun int:69".to_string();
     /// let header = Header::parse(input, &mut rand::thread_rng()).unwrap();
@@ -169,8 +169,8 @@ impl Header {
     /// # Examples
     /// 
     /// ```
-    /// # use seedgen::Header;
-    /// use seedgen::header::Annotation;
+    /// # use wotw_seedgen::Header;
+    /// use wotw_seedgen::header::Annotation;
     /// 
     /// let input = "#hide\n/// My first header\n///\n/// Someday I'll have this header do something!".to_string();
     /// let header = Header::parse(input, &mut rand::thread_rng()).unwrap();
@@ -205,8 +205,8 @@ impl Header {
     /// # Examples
     /// 
     /// ```
-    /// # use seedgen::Header;
-    /// use seedgen::header::Annotation;
+    /// # use wotw_seedgen::Header;
+    /// use wotw_seedgen::header::Annotation;
     /// 
     /// let input = "#hide\n9|0|8|9|0|int|0";
     /// 
@@ -218,7 +218,7 @@ impl Header {
     /// This will only parse the minimum amount required to know the annotations
     /// 
     /// ```
-    /// # use seedgen::Header;
+    /// # use wotw_seedgen::Header;
     /// # 
     /// let input = "#hide\n3|6|\"This isn't even valid header syntax!\"";
     /// 
@@ -245,8 +245,8 @@ impl Header {
     /// # Examples
     /// 
     /// ```
-    /// # use seedgen::Header;
-    /// use seedgen::header::Annotation;
+    /// # use wotw_seedgen::Header;
+    /// use wotw_seedgen::header::Annotation;
     /// 
     /// let input = "#hide\n/// My first header\n///\n/// Someday I'll have this header do something!";
     /// 
@@ -259,7 +259,7 @@ impl Header {
     /// This will only parse the minimum amount required to know the documentation
     /// 
     /// ```
-    /// # use seedgen::Header;
+    /// # use wotw_seedgen::Header;
     /// # 
     /// let input = "/// A very bad header\n3|6|\"This isn't even valid header syntax!\"";
     /// 
@@ -299,9 +299,9 @@ impl Header {
     /// # Examples
     /// 
     /// ```
-    /// # use seedgen::Header;
-    /// use seedgen::header::ParameterDefault;
-    /// use seedgen::header::ParameterInfo;
+    /// # use wotw_seedgen::Header;
+    /// use wotw_seedgen::header::ParameterDefault;
+    /// use wotw_seedgen::header::ParameterInfo;
     /// 
     /// let input = "3|0|6|\"Good luck have fun!\"\n//// Some ad\n!!parameter extra_text string:\"Hier könnte ihre Werbung stehen!\"\n3|0|6|\"$PARAM(extra_text)\"";
     /// 

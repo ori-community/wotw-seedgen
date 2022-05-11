@@ -19,8 +19,8 @@ struct StateEntry<'a> {
 /// # Examples
 /// 
 /// ```
-/// # use seedgen::logic::{parse_states, NamedState};
-/// use seedgen::util::UberState;
+/// # use wotw_seedgen::logic::{parse_states, NamedState};
+/// use wotw_seedgen::util::UberState;
 /// 
 /// let input = "MarshSpawn.HowlBurnt, 21786, 25095";
 /// let states = parse_states(input).unwrap();

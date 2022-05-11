@@ -13,9 +13,9 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// [`Preset`]s can be serialized and deserialized
 /// 
 /// ```
-/// # use seedgen::Preset;
-/// use seedgen::preset::WorldPreset;
-/// use seedgen::settings::Difficulty;
+/// # use wotw_seedgen::Preset;
+/// use wotw_seedgen::preset::WorldPreset;
+/// use wotw_seedgen::settings::Difficulty;
 /// 
 /// let mut preset = Preset::default();
 /// let mut world_settings = WorldPreset::default();
@@ -31,9 +31,9 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// Use [`Settings::apply_preset`](crate::Settings::apply_preset) to merge a [`Preset`] into existing [`Settings`](crate::Settings)
 /// 
 /// ```
-/// # use seedgen::Preset;
-/// use seedgen::Settings;
-/// use seedgen::settings::Spawn;
+/// # use wotw_seedgen::Preset;
+/// use wotw_seedgen::Settings;
+/// use wotw_seedgen::settings::Spawn;
 /// 
 /// let mut settings = Settings::default();
 /// 
@@ -94,8 +94,8 @@ impl Preset {
 /// [`WorldPreset`]s can be serialized and deserialized
 /// 
 /// ```
-/// # use seedgen::preset::WorldPreset;
-/// use seedgen::settings::Difficulty;
+/// # use wotw_seedgen::preset::WorldPreset;
+/// use wotw_seedgen::settings::Difficulty;
 /// 
 /// let mut world_preset = WorldPreset::default();
 /// world_preset.difficulty = Some(Difficulty::Gorlek);
@@ -109,9 +109,9 @@ impl Preset {
 /// Use [`WorldSettings::apply_world_preset`](crate::settings::WorldSettings::apply_world_preset) to merge a [`WorldPreset`] into existing [`WorldSettings`](crate::settings::WorldSettings)
 /// 
 /// ```
-/// # use seedgen::preset::WorldPreset;
-/// use seedgen::settings::WorldSettings;
-/// use seedgen::settings::Spawn;
+/// # use wotw_seedgen::preset::WorldPreset;
+/// use wotw_seedgen::settings::WorldSettings;
+/// use wotw_seedgen::settings::Spawn;
 /// 
 /// let mut world_settings = WorldSettings::default();
 /// 

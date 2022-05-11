@@ -43,8 +43,8 @@ impl Orbs {
 /// # Examples
 /// 
 /// ```
-/// # use seedgen::util::Orbs;
-/// # use seedgen::util::orbs::either;
+/// # use wotw_seedgen::util::Orbs;
+/// # use wotw_seedgen::util::orbs::either;
 /// # use smallvec::{SmallVec, smallvec};
 /// #
 /// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
@@ -108,8 +108,8 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> SmallVec<[Orbs; 3]> {
 /// # Examples
 /// 
 /// ```
-/// # use seedgen::util::Orbs;
-/// # use seedgen::util::orbs::both;
+/// # use wotw_seedgen::util::Orbs;
+/// # use wotw_seedgen::util::orbs::both;
 /// # use smallvec::{SmallVec, smallvec};
 /// #
 /// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
