@@ -3,7 +3,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 
-use seedgen::*;
+use wotw_seedgen::*;
 use languages::*;
 use logic::*;
 use world::*;
@@ -108,14 +108,14 @@ fn generation(c: &mut Criterion) {
 
     c.bench_function("singleplayer", |b| b.iter(|| {
         let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
+        wotw_seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
     }));
 
     settings.worlds = 2;
 
     c.bench_function("two worlds", |b| b.iter(|| {
         let graph = parse_logic("areas.wotw", "loc_data.csv", "state_data.csv", &settings, false).unwrap();
-        seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
+        wotw_seedgen::generate_seed(&graph, settings.clone(), &vec![], None).unwrap();
     }));
 }
 

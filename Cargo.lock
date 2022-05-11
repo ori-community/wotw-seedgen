@@ -539,30 +539,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ori_rando_wotw_seedgen"
-version = "0.0.1"
-dependencies = [
- "ansi_term 0.12.1",
- "atty",
- "bugsalot",
- "criterion",
- "csv",
- "decorum",
- "log",
- "log4rs",
- "num_enum",
- "open",
- "rand",
- "rand_seeder",
- "regex",
- "rustc-hash",
- "serde",
- "serde_json",
- "smallvec",
- "structopt",
-]
-
-[[package]]
 name = "parking_lot"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1189,6 +1165,30 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
+[[package]]
+name = "wotw_seedgen"
+version = "0.0.2"
+dependencies = [
+ "ansi_term 0.12.1",
+ "atty",
+ "bugsalot",
+ "criterion",
+ "csv",
+ "decorum",
+ "log",
+ "log4rs",
+ "num_enum",
+ "open",
+ "rand",
+ "rand_seeder",
+ "regex",
+ "rustc-hash",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "structopt",
+]
 
 [[package]]
 name = "yaml-rust"
