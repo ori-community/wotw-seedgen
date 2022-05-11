@@ -542,26 +542,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
-name = "seedgen"
-version = "0.2.0"
-dependencies = [
- "ansi_term",
- "csv",
- "decorum",
- "log",
- "num_enum",
- "rand",
- "rand_seeder",
- "regex",
- "rustc-hash",
- "seedgen_derive",
- "serde",
- "serde_json",
- "smallvec",
- "syn",
-]
-
-[[package]]
 name = "seedgen_cli"
 version = "1.0.0"
 dependencies = [
@@ -573,10 +553,10 @@ dependencies = [
  "open",
  "rand",
  "rustc-hash",
- "seedgen",
  "serde_json",
  "structopt",
  "syn",
+ "wotw_seedgen",
 ]
 
 [[package]]
@@ -870,6 +850,26 @@ name = "windows_x86_64_msvc"
 version = "0.36.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c811ca4a8c853ef420abd8592ba53ddbbac90410fab6903b3e79972a631f7680"
+
+[[package]]
+name = "wotw_seedgen"
+version = "0.0.2"
+dependencies = [
+ "ansi_term",
+ "csv",
+ "decorum",
+ "log",
+ "num_enum",
+ "rand",
+ "rand_seeder",
+ "regex",
+ "rustc-hash",
+ "seedgen_derive",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "syn",
+]
 
 [[package]]
 name = "yaml-rust"

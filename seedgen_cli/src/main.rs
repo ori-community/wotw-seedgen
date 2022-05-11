@@ -17,7 +17,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::WorldPreset, Preset, Settings, logic, Header};
+use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::WorldPreset, Preset, Settings, logic, Header};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
@@ -701,7 +701,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
 
     let worlds = settings.world_count();
     let players = settings.world_settings.iter().map(|world_settings| world_settings.world_name.clone()).collect::<Vec<_>>();
-    let seeds = seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let seeds = wotw_seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -861,7 +861,7 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
     let mut rng = rand::thread_rng();
 
     let header = Header::parse(header, &mut rng)
-        .map_err(|errors| errors.into_iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?
+        .map_err(|errors| (**errors).into_iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?
         .build(FxHashMap::default())?;
 
     path.set_extension("wotwr");
