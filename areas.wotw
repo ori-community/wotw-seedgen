@@ -11240,8 +11240,9 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
       Bash, Grenade=1  # can either bash off the gorlek, then the grenade - or climb the wall to get additional height out of the bashgrenade
       Bash, DoubleJump  # Bash the gorlek's projectile
     unsafe:
-      SentryJump=1, DoubleJump OR Dash
+      SentryJump=1  # sentry jumps are OP
       Bash  # bash the gorlek then its projectile
+      GrenadeJump, DoubleJump
 
 anchor LowerWastes.Shovel at 1634, -3981:  # On the ground to the left of the Sand Bridge
   refill Energy=3:
