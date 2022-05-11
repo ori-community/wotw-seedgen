@@ -1,1 +1,1 @@
-{"includes":["qol"],"difficulty":"Moki","headers":["vanilla_opher_upgrades","black_market","teleporters","key_hints","zone_hints","no_trials","no_rain","fragment_overflow","spawn_with_sword"],"headerArgs":["zone_hints.tp_hints=true"]}
+{"includes":["qol"],"difficulty":"Moki","headers":["vanilla_opher_upgrades","black_market","teleporters","key_hints","zone_hints","no_trials","no_rain","fragment_overflow","spawn_with_sword"],"headerConfig":[{"header_name":"zone_hints","config_name":"tp_hints","config_value":"true"}]}
