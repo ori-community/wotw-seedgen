@@ -4035,6 +4035,8 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Grapple, Dash OR Sword
       Bash, Glide  # bash the mantis upwards and buffer glide (over and over and over)
       Bash, DoubleJump  # bash the mantis upwards and djump immediately after (over and over and over)
+      SentryJump=2
+      GrenadeJump, DoubleJump, TripleJump OR Dash OR PauseHover  # Use the wheel on the left.
   pickup OuterWellspring.WheelEX:
     moki: OuterWellspring.EntranceDoorOpen
   pickup OuterWellspring.BasementEC:
@@ -4132,6 +4134,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       OuterWellspring.FallingWheel, Glide, Damage=10  # Glide jump
       OuterWellspring.FallingWheel, Damage=15, Shuriken=5 OR Sentry=5
       OuterWellspring.FallingWheel, Dash, Sword
+      GrenadeJump, DoubleJump, TripleJump
   conn OuterWellspring.WestDoor:  # going directly up the left wall
     gorlek:
       Bash, Grenade=2, DoubleJump, Dash OR Glide
