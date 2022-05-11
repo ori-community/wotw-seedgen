@@ -4551,6 +4551,8 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
     unsafe:
       Grapple, DoubleJump, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Not kii because it's hard to exit the spikes
       Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
+      SentryJump=1  # use the weapon for movement
+      GrenadeJump, DoubleJump OR Dash OR PauseHover
   conn InnerWellspring.Teleporter:
     moki: InnerWellspring.TopDoorOpen
   conn OuterWellspring.EastDoor: free
