@@ -7152,8 +7152,11 @@ anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind
     unsafe:
       Launch  # TP out
       DoubleJump, TripleJump, Damage=20, Sword OR Hammer OR Bash  # tjump + upslash/bash the gorlek to climb the right wall, tjump to the left spiky wall, iframe to wjump and tjump again to wjump from the wall just above and tjump again to the ice wall<
-      SentryJump=2, Damage=20, DoubleJump OR Dash  # sjump, damage boost (the spikes wond t hit Ori after landing on them), sjump again then upsalsh to reach the right wall then sword combo to reach the pickup and tp out
-      DoubleJump, TripleJump, SentryJump=1, Damage=20  # same as above, triple jump + up slash to get to the right wall then jump into the spikes to avoid the first sjump
+      SentryJump=1, Damage=20, DoubleJump OR Dash OR PauseHover  # sjump onto the spikes under the safe wall, sword combo + ability to reach the pickup, tp out
+      SentryJump=1, Damage=20, Damage=20  # None of the spikes deal damage after you've already landed in them, so they are all valid points for Regenerate.
+      HammerJump  # Smooth right wall -> microwall under left ledge 2 -> side of left ledge 2 -> smooth left wall -> xp -> TP out
+      GrenadeJump, DoubleJump
+      GrenadeJump, Damage=20, Damage=20  # Damage boost on left ledge 1, wall jump on left ledge 2, damage boost on right ledge 3. Be careful not to get yeeted on that last one. None of the spikes deal damage after you've already landed in them, so they are all valid points for Regenerate.
 
   conn LowerReach.CentralFurnacePedestal:
     moki: Combat=ShieldMiner OR Bash OR Launch
@@ -7165,7 +7168,10 @@ anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind
     unsafe:
       Launch
       DoubleJump, TripleJump, Damage=40, Sword OR Hammer OR Bash
-      DoubleJump, Grenade=1, Damage=40  # Grenade jumps
+      SentryJump=2, Damage=20
+      HammerJump  # Take the path used for the xp, and end with a really tight extended hammer jump around the spikes onto the ledge where the moki is.
+      GrenadeJump, DoubleJump  # Like the HammerJump path, but harder. Go right at the top.
+      GrenadeJump, Damage=20, Damage=20, Damage=20  # Smooth right wall -> left ledge 1 -> side of left ledge 2 -> right ledge 2 -> left ledge 3. None of the spikes deal damage after you've already landed in them, so they are all valid points for Regenerate.
 
 anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where you hand delicious marshclam soup to a moki (or alternatively extuingish his fireplace...)
   refill Energy=4:
