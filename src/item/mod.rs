@@ -20,7 +20,7 @@ use seedgen_derive::VVariant;
 use crate::header::parser;
 use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
-use crate::util::{Zone, Icon};
+use crate::util::{Zone, Icon, UberState, UberIdentifier};
 
 pub use self::{
     resource::Resource,
@@ -238,6 +238,24 @@ impl Item {
     #[inline]
     pub fn random_shop_price(&self) -> bool {
         !matches!(self, Item::Skill(Skill::Blaze))
+    }
+
+    /// Returns the UberState that gets set when collecting this item, if applicable
+    pub fn triggered_state(&self) -> Option<UberState> {
+        match self {
+            Item::Skill(skill) => Some(1000 + *skill as u16),
+            Item::Water => Some(2000),
+            Item::Teleporter(teleporter) => return Some(teleporter.triggered_state()),
+            _ => None,
+        }.map(|uber_id|
+            UberState {
+                identifier: UberIdentifier {
+                    uber_group: 6,
+                    uber_id,
+                },
+                value: String::new(),
+            }
+        )
     }
 
     pub fn code(&self) -> String {
