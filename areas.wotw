@@ -212,7 +212,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
 
-anchor MarshSpawn.BrokenBridge at -643, -4352:  # after dropping down the breaking bridge
+anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaking bridge
   refill Checkpoint
 
   pickup MarshSpawn.ResilienceShard:
