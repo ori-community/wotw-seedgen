@@ -229,7 +229,9 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
   pickup MarshSpawn.BashEC:
     moki: Bash OR Launch
     gorlek: SentryJump=1
-    unsafe: MarshSpawn.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
+    unsafe:
+      MarshSpawn.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
+      GrenadeJump  # precise grenade wall jump off of a microwall on the left
   pickup MarshSpawn.PreLupoEX: free
   pickup MarshSpawn.LupoMap:
     moki: SpiritLight=200
