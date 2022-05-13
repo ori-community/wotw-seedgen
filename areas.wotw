@@ -460,6 +460,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Sword
       Bash, Hammer, Damage=10  # dboost under the first lantern, too precise for gorlek
       Launch  # Enough ledges to regain launch
+      DoubleJump, TripleJump  # more hardcore parkour
 
   conn MarshSpawn.BeforeBurrows:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -475,6 +476,14 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Damage=10, Sword OR Hammer
       Bash, Damage=10, Sentry=3 OR Shuriken=3
       Bash, Damage=30
+    unsafe:
+      GrenadeJump, DoubleJump, Bash OR Glide OR Damage=10 OR PauseHover  # Triple Grenade Jump is possible but redundant
+      GrenadeJump, Damage=30  # damage under the first lantern, damage on the spikes at the top, damage after the second lantern
+      SwordSJump=1, Damage=20  # air sjump from below the first lantern, weapon stall to minimize damage
+      Bash, Sentry=1 OR Damage=10 OR PauseHover  # use a projectile to reach the first lantern
+      HammerJump, Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
+      DoubleJump, TripleJump  # hardcore parkour
+      Launch
   conn MarshSpawn.Cave: free
   conn MarshSpawn.BurrowFightArena:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -501,6 +510,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Bash, Sword OR DoubleJump OR Hammer OR Dash OR Glide  # tentacle needs to shoot up along the left wall
     unsafe:
       SentryJump=1, Damage=10, DoubleJump  # Land in the spikes under the pickup and doublejump + upslash to reach the right platform. Hammer upslash is enough to reach the platform, sword upslash the ennemy to refresh your double jump
+      GrenadeJump, DoubleJump
 
   conn MarshSpawn.BurrowsEntry:
     moki:
@@ -535,6 +545,8 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
     unsafe:
       Launch, Dash
       Launch, Glide  # Reset your launch by touching the wallunder the spikes
+      Launch, PauseHover  # use pause floats for horizontal movement and Launch for vertical movement
+      GrenadeJump, DoubleJump, TripleJump OR Bash
 
 anchor MarshSpawn.BurrowsEntry at -931, -4494:  # At the bells puzzle
   refill Checkpoint
