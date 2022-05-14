@@ -7716,7 +7716,7 @@ anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
       Launch, DoubleJump, Dash OR TripleJump
       Launch, Damage=20  # Launch on the wall at the start of the wind cave
 
-anchor LowerReach.TrialStart at 64, -4046:  # At trial start
+anchor LowerReach.TrialStart at 64, -4045:  # At trial start
   refill Checkpoint
 
   state LowerReach.KeystoneDoor:
