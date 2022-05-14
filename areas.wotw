@@ -7766,6 +7766,10 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
       Launch, Damage=40  # Pass under the two falling slimes
       Launch, Damage=20, DoubleJump OR Dash
       Launch, DoubleJump, TripleJump
+    unsafe:
+      GrenadeJump, DoubleJump, TripleJump, Damage=20
+      HammerJump, DoubleJump, TripleJump, Damage=20
+      FlashSwap  # TODO: calculate blaze swaps
 
   conn LowerReach.TownEntry:
     moki: Glide
