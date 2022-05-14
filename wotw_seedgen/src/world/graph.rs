@@ -111,6 +111,14 @@ impl Node {
             Node::Quest(quest) => Some(&quest.position),
         }
     }
+    pub fn map_position(&self) -> Option<&Position> {
+        match self {
+            Node::Anchor(anchor) => anchor.position.as_ref(),
+            Node::Pickup(pickup) => Some(&pickup.map_position),
+            Node::State(_) => None,
+            Node::Quest(quest) => Some(&quest.map_position),
+        }
+    }
     pub fn can_place(&self) -> bool {
         matches!(self, Node::Pickup(_) | Node::Quest(_))
     }
