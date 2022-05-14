@@ -10950,7 +10950,7 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
         Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.DrainRoomPurpleWall, Damage=60, Damage=20, Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
-anchor UpperPools.RightBubbleSpamRoom at -1586, -4053:  # To the right of where all the bubbles rise
+anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where all the bubbles rise
   refill Checkpoint
 
   state UpperPools.BubbleSpamLever:
