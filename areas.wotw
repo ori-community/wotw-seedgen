@@ -10610,6 +10610,11 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
       DoubleJump, TripleJump OR Dash  # From the trial's activation
     unsafe:
       Bash, Grenade=1  # Bash grenade to reach the slime, bash glide from it
+      HammerSJump=1
+      Grapple, UltraGrapple, Sword OR Hammer OR BlazeSwap=1 OR Sentry=1 OR SpearJump=1 OR Shuriken=1 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR PauseHover  # Use the slime.
+      GrenadeJump, Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Shuriken=1 OR DoubleJump OR Dash OR FlashSwap OR Damage=20  # Grenade Wall Jump from under the spikes. Might be possible with very precise pause floats.
+      HammerJump
+      DoubleJump, TripleJump OR Glide  # hardcore parkour
 
 anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of Waterdash tree
   refill Checkpoint
@@ -10964,8 +10969,8 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
     kii:
       Combat=Bee+Skeeto, DoubleJump OR Dash
     unsafe:
-      Sword OR Hammer OR DoubleJump
-      Combat=Bee+Skeeto, Shuriken=1 OR Sentry=2
+      Sword OR Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR Shuriken=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR FlashSwap OR PauseHover
+      Grapple, UltraGrapple  # wait for the bee to go up and then grapple to it
 
   pickup UpperPools.FishPoolEX:
     moki: Water, Bash OR WaterDash OR Damage=10  # just in case someone's troubled by the fish
@@ -10986,7 +10991,13 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
       DoubleJump, Bash, TripleJump OR Sword
     kii:
       Bash  # Juggle the exploding enemy
-    unsafe: Dash  # walljump on the bubbles by dashing into them
+    unsafe:
+      DoubleJump, TripleJump, GlideJump OR PauseHover  # you can glide jump after bouncing on a bubble
+      DoubleJump, GlideJump, PauseHover
+      SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
+      GrenadeJump
+      HammerJump  # extended hammer jump
+      Dash  # walljump on the bubbles by dashing into them
   pickup UpperPools.RightBubblesEX:  # paths using the torpedo originate from LeftBubbleSpamRoom 
     moki: Water, WaterDash
     kii: WaterDash, Damage=100
