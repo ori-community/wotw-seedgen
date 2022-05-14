@@ -339,6 +339,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Vec<String>, S
         index: usize::MAX,
         uber_state: UberState::spawn(),
         position: Position::default(),
+        map_position: Position::default(),
     });
 
     let (placements, spawn_locs) = generate_placements(graph, &worlds, &spawn_pickup_node, &mut rng)?;

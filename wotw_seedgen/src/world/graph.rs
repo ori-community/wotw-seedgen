@@ -35,6 +35,7 @@ pub struct Anchor {
 pub struct Pickup {
     pub identifier: String,
     pub position: Position,
+    pub map_position: Position,
     pub zone: Zone,
     pub index: usize,
     pub uber_state: UberState,
@@ -49,6 +50,7 @@ pub struct State {
 pub struct Quest {
     pub identifier: String,
     pub position: Position,
+    pub map_position: Position,
     pub zone: Zone,
     pub index: usize,
     pub uber_state: UberState,

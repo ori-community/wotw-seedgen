@@ -243,12 +243,12 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedStat
     node_map.reserve(node_count);
 
     for location in locations {
-        let Location { name, zone, uber_state, position } = location;
+        let Location { name, zone, uber_state, position, map_position } = location;
         let identifier = name;
         add_entry(&mut node_map, &identifier, index)?;
         let node = match quests.contains(&identifier[..]) {
-            true => Node::Quest(graph::Quest { identifier, zone, index, uber_state, position }),
-            false => Node::Pickup(graph::Pickup { identifier, zone, index, uber_state, position }),
+            true => Node::Quest(graph::Quest { identifier, zone, index, uber_state, position, map_position }),
+            false => Node::Pickup(graph::Pickup { identifier, zone, index, uber_state, position, map_position }),
         };
         nodes.push(node);
         index += 1;

@@ -8,6 +8,7 @@ pub struct Location {
     pub zone: Zone,
     pub uber_state: UberState,
     pub position: Position,
+    pub map_position: Position,
 }
 
 #[derive(Deserialize)]
@@ -22,6 +23,8 @@ struct LocationEntry<'a> {
     uber_id: &'a str,
     x: f32,
     y: f32,
+    map_x: f32,
+    map_y: f32,
 }
 
 #[derive(Deserialize)]
@@ -57,7 +60,10 @@ impl From<LocationZone> for Zone {
 /// use wotw_seedgen::util::Position;
 /// use wotw_seedgen::util::Zone;
 /// 
-/// let input = "MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, -958, -4313";
+/// let input = "
+/// PickupIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberIdCondition, X, Y, MapX, MapY
+/// MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, -958, -4313, -958, -4313
+/// GladesTown.MotayHutEX, Wellspring Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, -172, -4584, -394, -4136";
 /// let locations = parse_locations(input).unwrap();
 /// 
 /// assert_eq!(locations, vec![
@@ -66,12 +72,19 @@ impl From<LocationZone> for Zone {
 ///         zone: Zone::Marsh,
 ///         uber_state: UberState::from_parts("21786", "60210").unwrap(),
 ///         position: Position::new(-958., -4313.),
+///         map_position: Position::new(-958., -4313.),
+///     },
+///     Location {
+///         name: "GladesTown.MotayHutEX".to_string(),
+///         zone: Zone::Glades,
+///         uber_state: UberState::from_parts("42178", "57455").unwrap(),
+///         position: Position::new(-172., -4584.),
+///         map_position: Position::new(-394., -4136.),
 ///     }
 /// ]);
 /// ```
 pub fn parse_locations(input: &str) -> Result<Vec<Location>, String> {
     let mut reader = csv::ReaderBuilder::new()
-        .has_headers(false)
         .trim(csv::Trim::All)
         .from_reader(input.as_bytes());
 
@@ -87,6 +100,8 @@ pub fn parse_locations(input: &str) -> Result<Vec<Location>, String> {
             uber_id,
             x,
             y,
+            map_x,
+            map_y,
             ..
         } = record;
 
@@ -95,7 +110,10 @@ pub fn parse_locations(input: &str) -> Result<Vec<Location>, String> {
         let x = util::float_to_real(x)?;
         let y = util::float_to_real(y)?;
         let position = Position { x, y };
-        let location = Location { name, zone, uber_state, position };
+        let x = util::float_to_real(map_x)?;
+        let y = util::float_to_real(map_y)?;
+        let map_position = Position { x, y };
+        let location = Location { name, zone, uber_state, position, map_position };
 
         locations.push(location);
     }
