@@ -26,6 +26,7 @@
 # WaveDash: Extends to Dash, Regenerate and having energy to use it
 # GrenadeJump: Extends to Grenade and having energy to use it
 # GrenadeCancel: Extends to Grenade and having energy to use it
+# BowCancel: Extends to Bow and having energy to use it
 # HammerJump: Extends to Hammer, DoubleJump
 # SwordJump: Extends to Sword, DoubleJump
 # GrenadeRedirect=x: Extends to Grenade=x
@@ -40,6 +41,7 @@
 requirement DepthsLight:
   moki: UpperDepths.ForestsEyes OR Flash=1
   gorlek: Bow=3  # should be good, right?
+  kii: BowCancel  # is this reasonable?
   # unsafe: Grenade=3  # probably enough
 
 anchor HeaderStates:  # States you need to resolve by using the !!set command in headers and that you can't resolve through playing

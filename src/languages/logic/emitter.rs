@@ -117,6 +117,7 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::Requirement::WaveDash => build_glitch_requirement(&Glitch::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
         parser::Requirement::GrenadeJump => build_glitch_requirement(&Glitch::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
         parser::Requirement::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
+        parser::Requirement::BowCancel => Requirement::NonConsumingEnergySkill(Skill::Bow),
         parser::Requirement::HammerJump => build_glitch_requirement(&Glitch::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::Requirement::SwordJump => build_glitch_requirement(&Glitch::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::Requirement::GrenadeRedirect(amount) => build_glitch_requirement(&Glitch::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, (*amount).into()), context),

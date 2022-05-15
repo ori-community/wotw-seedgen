@@ -56,6 +56,7 @@ pub enum Requirement<'a> {
     WaveDash,
     GrenadeJump,
     GrenadeCancel,
+    BowCancel
     HammerJump,
     SwordJump,
     GrenadeRedirect(u16),
@@ -284,6 +285,7 @@ fn parse_requirement<'a>(token: &Token<'a>, metadata: &Metadata) -> Result<Requi
             "Grapple" => Ok(Requirement::Skill(Skill::Grapple)),
             "Grenade" => Ok(Requirement::Skill(Skill::Grenade)),
             "GrenadeCancel" => Ok(Requirement::GrenadeCancel),
+            "BowCancel" => Ok(Requirement::BowCancel),
             "GrenadeJump" => Ok(Requirement::GrenadeJump),
             "Hammer" => Ok(Requirement::Skill(Skill::Hammer)),
             "HammerBreak" => Ok(Requirement::HammerBreak),
