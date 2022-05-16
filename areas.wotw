@@ -591,7 +591,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
     kii:
       Bash, Dash OR Sword OR Hammer OR DoubleJump OR Damage=10
     unsafe:
-      DoubleJump, Deflector
+      Sword OR Hammer OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR Damage=10 OR PauseHover  # Sneaky micro ledges. Shuriken path requires you to angle the shuriken forwards for quicker catching.
 
   conn PoolsApproach.OnTopOfWheel:
     moki, Water:
