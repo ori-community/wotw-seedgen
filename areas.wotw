@@ -3895,8 +3895,12 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Grapple, Hammer OR Shuriken=1 OR Sentry=2
       Bash, Grenade=1  # Bash the mortar so you can reach your grenade from higher
     unsafe:
+      Grapple, BlazeSwap=1 OR SentrySwap=1
       Bash
       DoubleJump, TripleJump, Sword OR Hammer
+      SentryJump=1
+      GrenadeJump, DoubleJump
+      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
   conn WestGlades.Upper:
     moki:  # realizing the semisolid not considered for moki
       Bash, DoubleJump OR Dash OR Glide OR Grenade=1
