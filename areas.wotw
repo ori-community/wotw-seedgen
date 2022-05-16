@@ -212,7 +212,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
 
-anchor MarshSpawn.BrokenBridge at -643, -4352:  # after dropping down the breaking bridge
+anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaking bridge
   refill Checkpoint
 
   pickup MarshSpawn.ResilienceShard:
@@ -229,7 +229,9 @@ anchor MarshSpawn.BrokenBridge at -643, -4352:  # after dropping down the breaki
   pickup MarshSpawn.BashEC:
     moki: Bash OR Launch
     gorlek: SentryJump=1
-    unsafe: MarshSpawn.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
+    unsafe:
+      MarshSpawn.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
+      GrenadeJump  # precise grenade wall jump off of a microwall on the left
   pickup MarshSpawn.PreLupoEX: free
   pickup MarshSpawn.LupoMap:
     moki: SpiritLight=200
@@ -458,6 +460,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Sword
       Bash, Hammer, Damage=10  # dboost under the first lantern, too precise for gorlek
       Launch  # Enough ledges to regain launch
+      DoubleJump, TripleJump  # more hardcore parkour
 
   conn MarshSpawn.BeforeBurrows:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -473,6 +476,14 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Damage=10, Sword OR Hammer
       Bash, Damage=10, Sentry=3 OR Shuriken=3
       Bash, Damage=30
+    unsafe:
+      GrenadeJump, DoubleJump, Bash OR Glide OR Damage=10 OR PauseHover  # Triple Grenade Jump is possible but redundant
+      GrenadeJump, Damage=30  # damage under the first lantern, damage on the spikes at the top, damage after the second lantern
+      SwordSJump=1, Damage=20  # air sjump from below the first lantern, weapon stall to minimize damage
+      Bash, Sentry=1 OR Damage=10 OR PauseHover  # use a projectile to reach the first lantern
+      HammerJump, Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
+      DoubleJump, TripleJump  # hardcore parkour
+      Launch
   conn MarshSpawn.Cave: free
   conn MarshSpawn.BurrowFightArena:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -499,6 +510,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Bash, Sword OR DoubleJump OR Hammer OR Dash OR Glide  # tentacle needs to shoot up along the left wall
     unsafe:
       SentryJump=1, Damage=10, DoubleJump  # Land in the spikes under the pickup and doublejump + upslash to reach the right platform. Hammer upslash is enough to reach the platform, sword upslash the ennemy to refresh your double jump
+      GrenadeJump, DoubleJump
 
   conn MarshSpawn.BurrowsEntry:
     moki:
@@ -533,6 +545,8 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
     unsafe:
       Launch, Dash
       Launch, Glide  # Reset your launch by touching the wallunder the spikes
+      Launch, PauseHover  # use pause floats for horizontal movement and Launch for vertical movement
+      GrenadeJump, DoubleJump, TripleJump OR Bash
 
 anchor MarshSpawn.BurrowsEntry at -931, -4494:  # At the bells puzzle
   refill Checkpoint
@@ -4036,6 +4050,8 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Grapple, Dash OR Sword
       Bash, Glide  # bash the mantis upwards and buffer glide (over and over and over)
       Bash, DoubleJump  # bash the mantis upwards and djump immediately after (over and over and over)
+      SentryJump=2
+      GrenadeJump, DoubleJump, TripleJump OR Dash OR PauseHover  # Use the wheel on the left.
   pickup OuterWellspring.WheelEX:
     moki: OuterWellspring.EntranceDoorOpen
   pickup OuterWellspring.BasementEC:
@@ -4133,6 +4149,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       OuterWellspring.FallingWheel, Glide, Damage=10  # Glide jump
       OuterWellspring.FallingWheel, Damage=15, Shuriken=5 OR Sentry=5
       OuterWellspring.FallingWheel, Dash, Sword
+      GrenadeJump, DoubleJump, TripleJump
   conn OuterWellspring.WestDoor:  # going directly up the left wall
     gorlek:
       Bash, Grenade=2, DoubleJump, Dash OR Glide
@@ -4549,6 +4566,8 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
     unsafe:
       Grapple, DoubleJump, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Not kii because it's hard to exit the spikes
       Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
+      SentryJump=1  # use the weapon for movement
+      GrenadeJump, DoubleJump OR Dash OR PauseHover
   conn InnerWellspring.Teleporter:
     moki: InnerWellspring.TopDoorOpen
   conn OuterWellspring.EastDoor: free
@@ -6064,8 +6083,18 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
       DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
       Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
     unsafe:
-      SentryJump=1, DoubleJump, TripleJump, Damage=15  # sjump from a micro ledge at very edge of the fire pit
-      Sword, DoubleJump, TripleJump, Damage=15  # double jump onto the wall, then double sword jump into the spikes.
+      SwordSJump=1  # Sjump onto the wall, use the sword for movement. It looks possible with Hammer, but I can't get it to work.
+      HammerSJump=2  # Sword sjump paths are redundant with the above
+      HammerSJump=1, Shuriken=1 OR BlazeSwap=1 OR DoubleJump OR Dash OR Glide OR Damage=15 OR PauseHover  # Sjump from a micro ledge at very edge of the fire pit. The damage path requires jumping onto the left wall and climbing up. This is doable with sjump+sentry, but why would you do that when you could just sjump twice?
+      Sword, DoubleJump, TripleJump, Damage=15  # Double jump onto the wall, then double sword jump into the spikes.
+      DoubleJump, GrenadeJump  # Micro ledge at the right edge of the fire pit, micro ledge at the right edge of the spikes. Use both.
+      Bash  # The skeeto is uncooperative, but it's doable.
+      BlazeSwap=6 OR FlashSwap  # Probably room for improvement, I'm not good at swaps
+      HammerJump  # This can be done without Triple Jump, but it's really difficult: 
+        # 1. Jump to the right from the micro ledge on the fire pit, and do an extended hammer jump. You need to reach the small climable wall on the ceiling, next to the spikes above the corruption.
+        # 2. Wall jump to the left, and do an extended hammer jump onto the micro ledge next to the spikes in the hidden area. Do the hammer jump late so that you don't hit the ceiling.
+        # 3. Hammer jump onto the wall, and hammer jump again to reach the ore. Teleport out.
+        # 4. Take a vacation in Luma Pools. You deserve it.
   pickup WoodsMain.YellowWallEX:
     moki: WoodsMain.BalloonLureYellowBarrierBroken
 
@@ -6440,6 +6469,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       DoubleJump, Bash, Grenade=1
       Glide, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
       Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
+      DoubleJump, GrenadeJump
   conn WoodsMain.AbovePit:
     moki:
       DoubleJump, Bash
@@ -7143,8 +7173,11 @@ anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind
     unsafe:
       Launch  # TP out
       DoubleJump, TripleJump, Damage=20, Sword OR Hammer OR Bash  # tjump + upslash/bash the gorlek to climb the right wall, tjump to the left spiky wall, iframe to wjump and tjump again to wjump from the wall just above and tjump again to the ice wall<
-      SentryJump=2, Damage=20, DoubleJump OR Dash  # sjump, damage boost (the spikes wond t hit Ori after landing on them), sjump again then upsalsh to reach the right wall then sword combo to reach the pickup and tp out
-      DoubleJump, TripleJump, SentryJump=1, Damage=20  # same as above, triple jump + up slash to get to the right wall then jump into the spikes to avoid the first sjump
+      SentryJump=1, Damage=20, DoubleJump OR Dash OR PauseHover  # sjump onto the spikes under the safe wall, sword combo + ability to reach the pickup, tp out
+      SentryJump=1, Damage=20, Damage=20  # None of the spikes deal damage after you've already landed in them, so they are all valid points for Regenerate.
+      HammerJump  # Smooth right wall -> microwall under left ledge 2 -> side of left ledge 2 -> smooth left wall -> xp -> TP out
+      GrenadeJump, DoubleJump
+      GrenadeJump, Damage=20, Damage=20  # Damage boost on left ledge 1, wall jump on left ledge 2, damage boost on right ledge 3. Be careful not to get yeeted on that last one. None of the spikes deal damage after you've already landed in them, so they are all valid points for Regenerate.
 
   conn LowerReach.CentralFurnacePedestal:
     moki: Combat=ShieldMiner OR Bash OR Launch
@@ -7156,7 +7189,10 @@ anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind
     unsafe:
       Launch
       DoubleJump, TripleJump, Damage=40, Sword OR Hammer OR Bash
-      DoubleJump, Grenade=1, Damage=40  # Grenade jumps
+      SentryJump=2, Damage=20
+      HammerJump  # Take the path used for the xp, and end with a really tight extended hammer jump around the spikes onto the ledge where the moki is.
+      GrenadeJump, DoubleJump  # Like the HammerJump path, but harder. Go right at the top.
+      GrenadeJump, Damage=20, Damage=20, Damage=20  # Smooth right wall -> left ledge 1 -> side of left ledge 2 -> right ledge 2 -> left ledge 3. None of the spikes deal damage after you've already landed in them, so they are all valid points for Regenerate.
 
 anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where you hand delicious marshclam soup to a moki (or alternatively extuingish his fireplace...)
   refill Energy=4:
@@ -7681,7 +7717,7 @@ anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
       Launch, DoubleJump, Dash OR TripleJump
       Launch, Damage=20  # Launch on the wall at the start of the wind cave
 
-anchor LowerReach.TrialStart at 64, -4046:  # At trial start
+anchor LowerReach.TrialStart at 64, -4045:  # At trial start
   refill Checkpoint
 
   state LowerReach.KeystoneDoor:
@@ -7731,6 +7767,10 @@ anchor LowerReach.TrialStart at 64, -4046:  # At trial start
       Launch, Damage=40  # Pass under the two falling slimes
       Launch, Damage=20, DoubleJump OR Dash
       Launch, DoubleJump, TripleJump
+    unsafe:
+      GrenadeJump, DoubleJump, TripleJump, Damage=20
+      HammerJump, DoubleJump, TripleJump, Damage=20
+      FlashSwap  # TODO: calculate blaze swaps
 
   conn LowerReach.TownEntry:
     moki: Glide
@@ -10575,6 +10615,11 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
       DoubleJump, TripleJump OR Dash  # From the trial's activation
     unsafe:
       Bash, Grenade=1  # Bash grenade to reach the slime, bash glide from it
+      HammerSJump=1
+      Grapple, UltraGrapple, Sword OR Hammer OR BlazeSwap=1 OR Sentry=1 OR SpearJump=1 OR Shuriken=1 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR PauseHover  # Use the slime.
+      GrenadeJump, Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Shuriken=1 OR DoubleJump OR Dash OR FlashSwap OR Damage=20  # Grenade Wall Jump from under the spikes. Might be possible with very precise pause floats.
+      HammerJump
+      DoubleJump, TripleJump OR Glide  # hardcore parkour
 
 anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of Waterdash tree
   refill Checkpoint
@@ -10915,7 +10960,7 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
         Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.DrainRoomPurpleWall, Damage=60, Damage=20, Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
-anchor UpperPools.RightBubbleSpamRoom at -1586, -4053:  # To the right of where all the bubbles rise
+anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where all the bubbles rise
   refill Checkpoint
 
   state UpperPools.BubbleSpamLever:
@@ -10929,8 +10974,8 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4053:  # To the right of where 
     kii:
       Combat=Bee+Skeeto, DoubleJump OR Dash
     unsafe:
-      Sword OR Hammer OR DoubleJump
-      Combat=Bee+Skeeto, Shuriken=1 OR Sentry=2
+      Sword OR Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR Shuriken=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR FlashSwap OR PauseHover
+      Grapple, UltraGrapple  # wait for the bee to go up and then grapple to it
 
   pickup UpperPools.FishPoolEX:
     moki: Water, Bash OR WaterDash OR Damage=10  # just in case someone's troubled by the fish
@@ -10951,7 +10996,13 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4053:  # To the right of where 
       DoubleJump, Bash, TripleJump OR Sword
     kii:
       Bash  # Juggle the exploding enemy
-    unsafe: Dash  # walljump on the bubbles by dashing into them
+    unsafe:
+      DoubleJump, TripleJump, GlideJump OR PauseHover  # you can glide jump after bouncing on a bubble
+      DoubleJump, GlideJump, PauseHover
+      SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
+      GrenadeJump
+      HammerJump  # extended hammer jump
+      Dash  # walljump on the bubbles by dashing into them
   pickup UpperPools.RightBubblesEX:  # paths using the torpedo originate from LeftBubbleSpamRoom 
     moki: Water, WaterDash
     kii: WaterDash, Damage=100
@@ -11220,8 +11271,9 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
       Bash, Grenade=1  # can either bash off the gorlek, then the grenade - or climb the wall to get additional height out of the bashgrenade
       Bash, DoubleJump  # Bash the gorlek's projectile
     unsafe:
-      SentryJump=1, DoubleJump OR Dash
+      SentryJump=1  # sentry jumps are OP
       Bash  # bash the gorlek then its projectile
+      GrenadeJump, DoubleJump
 
 anchor LowerWastes.Shovel at 1634, -3981:  # On the ground to the left of the Sand Bridge
   refill Energy=3:
@@ -11679,6 +11731,8 @@ anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the wa
       DoubleJump, TripleJump, Spear=2
     unsafe, SpiritLight=150:
       DoubleJump, TripleJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1  # land on the wood structure on the left of the sand bag. Make the sand bag swing to reach the wood structure with just tjump.
+      SentryJump=1
+      GrenadeJump
 
   conn LowerWastes.SkeetoHive:
     moki: Burrow
