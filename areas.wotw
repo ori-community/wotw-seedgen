@@ -3985,7 +3985,16 @@ anchor WestGlades.ShrineArea at -664, -4026:
       Grapple, DoubleJump, Hammer OR Sword OR Sentry=2
     unsafe:
       Grapple, DoubleJump, Shuriken=2
-      Grapple, Hammer, Dash                         # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
+      Grapple, Hammer, Dash  # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
+      Grapple, Glide, PauseHover
+      GlideJump, PauseHover  # Climb the right wall and then glide across.
+      GrenadeJump, DoubleJump
+      GrenadeJump, PauseHover, Dash OR Glide  # Grenade Jump from the shrine to maximize height, float left.
+      HammerJump  # Upswing then Hammer Jump.
+      DoubleJump, GlideJump  # Climb the right wall and then glide across.
+      SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
+      Hammer, DoubleJump, SentrySwap=1 OR BlazeSwap=1
+      Hammer, DoubleJump, Glide  # Climb the right wall and then glide across.
 
   conn GladesShrine: free
   conn WestGlades.MillApproach: free
