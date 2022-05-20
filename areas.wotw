@@ -1877,9 +1877,9 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
     kii, WestHollow.UpperDrainLeverPulled: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       WestHollow.UpperDrainLeverPulled, BlazeSwap=1 OR GrenadeJump OR PauseHover
-      Damage=60
+      Damage=60, Sword OR Hammer OR BlazeSwap=1 OR Shuriken=1 OR Blaze=2 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR Flash=1 OR Launch OR PauseHover  # extra abilities for softlock prevention
       Damage=40, DoubleJump OR Dash OR Sword
-      WaterDash
+      WaterDash, Sword OR Hammer OR BlazeSwap=1 OR Shuriken=1 OR Blaze=2 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR Flash=1 OR Launch OR PauseHover  # extra abilities for softlock prevention
 
 anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below HollowDrainMiddle, submerged until WestHollow.FullyDrained
   nospawn  # underwater
