@@ -1877,8 +1877,8 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
     kii, WestHollow.UpperDrainLeverPulled: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       WestHollow.UpperDrainLeverPulled, BlazeSwap=1 OR GrenadeJump OR PauseHover
-      Damage=60, Sword OR Hammer OR BlazeSwap=1 OR Shuriken=1 OR Blaze=2 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR Flash=1 OR Launch OR PauseHover  # extra abilities for softlock prevention
-      Damage=40, DoubleJump OR Dash OR Sword
+      # Damage=60, Sword OR Hammer OR BlazeSwap=1 OR Shuriken=1 OR Blaze=2 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR Flash=1 OR Launch OR PauseHover  # not valid because you can't use Regenerate here
+      # Damage=40, DoubleJump OR Dash OR Sword  # not valid because you can't use Regenerate here
       WaterDash, Sword OR Hammer OR BlazeSwap=1 OR Shuriken=1 OR Blaze=2 OR Sentry=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR Flash=1 OR Launch OR PauseHover  # extra abilities for softlock prevention
 
 anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below HollowDrainMiddle, submerged until WestHollow.FullyDrained
@@ -1982,8 +1982,8 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
     moki: WestHollow.FullyDrained
   conn WestHollow.HollowDrainLower:
     unsafe:
-      Damage=80
-      WaterDash, Damage=40  # Possible with only 30 damage without draining the water at all but that would softlock if you drain the upper part
+      WestHollow.UpperDrainLeverPulled, Damage=80  # You can't use Regenerate in the initial water state, so that path can't be used.
+      WestHollow.UpperDrainLeverPulled, WaterDash, Damage=40  # Possible with only 30 damage without draining the water at all but that would softlock if you drain the upper part.
   conn WestHollow.Entrance:
     unsafe:
       WestHollow.FullyDrained, Bash  # Place an enemy on HollowDrainMiddle and Bash off of it. There are multiple ways to do this, and none of them are fun. The Skeeto on the left is probably the most cooperative. This kinda looks possible from HollowDrainLower as well, but the Skeetos don't seem to have enough of an attention span to make it work.
@@ -2106,7 +2106,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       WestHollow.FullyDrained, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
       WestHollow.FullyDrained, BlazeSwap=4 OR FlashSwap  # I'm not good at swaps, there's probably room for improvement.
       WestHollow.FullyDrained, DoubleJump, Bash, TripleJump OR Glide  # juggle the slime
-      # Dirty Swims. All of the following contain duplicates of other paths for the purposes of softlock prevention.
+      # Dirty Swims. All of the following contain duplicates of other paths for the purposes of softlock prevention. Initial state swims don't work here because the anchor is underwater.
       WestHollow.UpperDrainLeverPulled, Damage=90, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # Use the spikes to gain IFrames.
       WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Bash, Grenade=1  # The tongue saves its state incorrectly if you die while it is extending, so shoot it, die, swim back up, and then climb on it.
       WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Dash OR GrenadeJump OR PauseHover
