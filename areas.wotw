@@ -2103,7 +2103,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     unsafe:  # TODO: other difficulties
       WestHollow.FullyDrained, Bow=1, Bash, Grenade=1
       WestHollow.FullyDrained, Bow=1, Dash OR GrenadeJump OR PauseHover  # If you've already destroyed the rock wall and you need to use the Bow shot for the upper tongue, you can do a ridiculously precise wall jump onto the lower one after it's extended.
-      WestHollow.FullyDrained, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
+      WestHollow.FullyDrained, Bow=1, Shuriken=1, Blaze=1 OR Sentry=1 OR Spear=1 OR Glide OR Flash=1
       WestHollow.FullyDrained, BlazeSwap=4 OR FlashSwap  # I'm not good at swaps, there's probably room for improvement.
       WestHollow.FullyDrained, DoubleJump, Bash, TripleJump OR Glide  # juggle the slime
       # Dirty Swims. All of the following contain duplicates of other paths for the purposes of softlock prevention. Initial state swims don't work here because the anchor is underwater.
