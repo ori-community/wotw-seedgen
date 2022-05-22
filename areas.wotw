@@ -1983,7 +1983,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
   conn WestHollow.HollowDrainLower:
     unsafe:
       WestHollow.UpperDrainLeverPulled, Damage=80  # You can't use Regenerate in the initial water state, so that path can't be used.
-      WestHollow.UpperDrainLeverPulled, WaterDash, Damage=40  # Possible with only 30 damage without draining the water at all but that would softlock if you drain the upper part.
+      WestHollow.UpperDrainLeverPulled, WaterDash, Damage=40  # Just barely possible with the tongue out.
   conn WestHollow.Entrance:
     unsafe:
       WestHollow.FullyDrained, Bash  # Place an enemy on HollowDrainMiddle and Bash off of it. There are multiple ways to do this, and none of them are fun. The Skeeto on the left is probably the most cooperative. This kinda looks possible from HollowDrainLower as well, but the Skeetos don't seem to have enough of an attention span to make it work.
