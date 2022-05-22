@@ -2110,15 +2110,30 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       WestHollow.UpperDrainLeverPulled, Damage=90, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # Use the spikes to gain IFrames.
       WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Bash, Grenade=1  # The tongue saves its state incorrectly if you die while it is extending, so shoot it, die, swim back up, and then climb on it.
       WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Dash OR GrenadeJump OR PauseHover
-      WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
+      WestHollow.UpperDrainLeverPulled, Damage=90, Bow=1, Shuriken=1, Blaze=1 OR Sentry=1 OR Spear=1 OR Glide OR Flash=1
       WestHollow.UpperDrainLeverPulled, Damage=90, BlazeSwap=4 OR FlashSwap
       WestHollow.UpperDrainLeverPulled, Damage=90, DoubleJump, Bash, TripleJump OR Glide
       WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # This is doable with just Water Dash, but that could cause softlocks.
       WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Bash, Grenade=1
       WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Dash OR GrenadeJump OR PauseHover
-      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
+      WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, Bow=1, Shuriken=1, Blaze=1 OR Sentry=1 OR Spear=1 OR Glide OR Flash=1
       WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, BlazeSwap=4 OR FlashSwap
       WestHollow.UpperDrainLeverPulled, Damage=40, WaterDash, DoubleJump, Bash, TripleJump OR Glide
+  conn WestHollow.Entrance:  # Initial state swims. Water Dash paths abuse respawn mechanics to get to the top without taking any more damage.
+    unsafe:
+      Damage=120, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch
+      Damage=120, Bow=1, Bash, Grenade=1
+      Damage=120, Bow=1, Dash OR GrenadeJump OR PauseHover
+      Damage=120, Bow=1, Shuriken=1, Blaze=1 OR Sentry=1 OR Glide OR Flash=1
+      Damage=120, BlazeSwap=4 OR FlashSwap
+      Damage=120, DoubleJump, Bash, TripleJump OR Glide
+      Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch
+      Damage=40, WaterDash, Bow=1, Bash, Grenade=1
+      Damage=40, WaterDash, Bow=1, Dash OR GrenadeJump OR PauseHover
+      Damage=40, WaterDash, Bow=1, Shuriken=1, Blaze=1 OR Sentry=1 OR Glide OR Flash=1
+      Damage=40, WaterDash, BlazeSwap=4 OR FlashSwap
+      Damage=40, WaterDash, DoubleJump, Bash, TripleJump OR Glide
+
   conn WestHollow.RockPuzzle:  # Dirty Swim paths, since they can't use SubmergedPlatform. All of these paths assume that both tongues are out, just in case; there may be room for improvement.
     unsafe:
       Damage=90, Launch  # Use the spikes to gain IFrames.
