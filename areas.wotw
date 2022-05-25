@@ -7347,6 +7347,10 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       Bash, Grenade=2, DoubleJump, TripleJump OR Dash OR Glide
       SentryJump=1, DoubleJump, Dash
       DoubleJump, Grenade=1  # from the checkpoint, grenade jumps to the small wall under the spikes and grenade jumps again from there
+      SentryJump=2
+      GrenadeJump, DoubleJump  # grenade wall jump off of the microwall under the spikes
+      HammerJump
+      BlazeSwap=6 OR FlashSwap  # might be doable with less somehow, blaze swaps are hard
   pickup LowerReach.RoofRightEX:
     moki: Launch  # intended path omitted in moki
     gorlek:
@@ -7357,6 +7361,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       Bash, Grenade=1, DoubleJump, Dash OR TripleJump  # Climb on the right wall above the 2nd plant
     unsafe:
       SentryJump=1, DoubleJump  # Climb on the wall above the 2nd plant
+      HammerJump
 
   conn LowerReach.HalfwayIceCavern:
     moki:
