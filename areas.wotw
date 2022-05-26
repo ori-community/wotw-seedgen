@@ -7461,6 +7461,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
     unsafe, LowerReach.EastDoorLantern:
       SwordSJump=1, DoubleJump, TripleJump OR Dash OR Glide  # double jump from the platform, refill dash/jumps by slashing the energy cristal then sjump on the plant
       SwordSJump=2, DoubleJump OR Glide OR Dash
+      HammerJump
   conn LowerReach.EastFurnace:
     moki:
       Bash, Grenade=1
