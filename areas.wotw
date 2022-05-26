@@ -8880,18 +8880,26 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
       Dash, Glide OR Sword
       Bash OR Launch
       Water, WaterDash
-    unsafe:
+    kii:
       Hammer, DoubleJump OR Dash
       Glide, Sword OR Hammer
+    unsafe:
+      Glide OR PauseHover
+      Shuriken=2, DoubleJump OR Dash  # catch the shuriken
+      HammerJump
   refill Energy=3:  # to the left
     gorlek, BreakCrystal:
       DoubleJump, TripleJump OR Dash OR Glide OR Sword
       Dash, Glide OR Sword
       Bash OR Launch
       Water, WaterDash
-    unsafe:
+    kii:
       Hammer, DoubleJump OR Dash
       Glide, Sword OR Hammer
+    unsafe:
+      Glide OR PauseHover
+      Shuriken=2, DoubleJump OR Dash  # catch the shuriken
+      HammerJump
   # energy crystal on the way not considered
 
   quest LowerDepths.HandToHandSilk:
