@@ -8920,6 +8920,10 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
   pickup LowerDepths.SwimEC:
     moki: Water, Bash, UpperDepths.ForestsEyes OR Flash
     gorlek: Water, Damage=10, UpperDepths.ForestsEyes OR Flash
+    kii:
+      Water, UpperDepths.ForestsEyes OR Flash
+      WaterDash, UpperDepths.ForestsEyes, Damage=150  # Adding some damage for lenience. No Flash because you can't really see where you're going while water dashing.
+    unsafe: WaterDash, Water OR Damage=120  # probably involves too much blind water dashing to be kii
   pickup LowerDepths.LeftEX:
     moki:
       DepthsLight, DoubleJump OR Dash OR Glide
@@ -8927,7 +8931,8 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
     gorlek:
       DepthsLight, Sword OR Hammer
       BreakWall=1, Sword OR Hammer
-    unsafe: DepthsLight OR BreakWall=1
+    kii: DepthsLight OR BreakWall=1  # A little tricky, but you can see where you're jumping pretty well thanks to the pickup light.
+    unsafe: Dash OR Launch
 
   conn DepthsShrine:
     moki:
