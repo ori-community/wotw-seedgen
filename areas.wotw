@@ -7446,7 +7446,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       SwordSJump=1, Water
       SwordSJump=2, DoubleJump, Glide
       LowerReach.ThawEastFurnace, WaterDash, Water, DoubleJump  # Wall jump from the right wall
-    kii:
+    kii, LowerReach.EastDoorLantern:
       Bash, Grenade=1, Damage=40  # bash the fish and worm to go faster and avoid taking one more dboost
       Bash, Grenade=1, Damage=20, WaterDash OR DoubleJump OR Dash OR Sword
       Bash, Grenade=1, Sword, DoubleJump OR Dash  # pogo the worm
@@ -7458,7 +7458,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       LowerReach.ThawEastFurnace, WaterDash, Damage=20, Damage=20, Hammer OR Spear=1
       LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Hammer, Water OR Dash OR Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # tjump+ hammer upslash from the closed snaptrap to walljump on the left wall
       LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Spear=1, Water OR Dash OR Glide OR Sword OR Sentry=3 OR Damage=20  # tjump+spear from the closed snaptrap to walljump on the left wall
-    unsafe:
+    unsafe, LowerReach.EastDoorLantern:
       SwordSJump=1, DoubleJump, TripleJump OR Dash OR Glide  # double jump from the platform, refill dash/jumps by slashing the energy cristal then sjump on the plant
       SwordSJump=2, DoubleJump OR Glide OR Dash
   conn LowerReach.EastFurnace:
