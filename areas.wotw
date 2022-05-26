@@ -8951,12 +8951,26 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
         SentryJump=2
         Bash, Dash
         Bash, Grenade=1, DoubleJump OR Glide OR Sword OR Hammer
+    kii:
+      ShurikenBreak=20:
+        Hammer, DoubleJump OR Dash
+        Glide, Sword OR Hammer
+        DoubleJump, Water
+        DoubleJump, Damage=20  # Either you swim decently fast or you remember that you can double jump to delay entering the water.
+        WaterDash, Damage=20
     unsafe:
+      ShurikenBreak=20:
+        Glide OR PauseHover
+        Shuriken=2, DoubleJump OR Dash  # catch the shuriken
+        HammerJump
+        Sword, Water  # lure a fish to pogo
+        Sword, Damage=140
+        SentrySwap=1 OR BlazeSwap=1 OR FlashSwap
       Water, UpperDepths.ForestsEyes OR Flash:
         Bash  # the bash off the lantern is a bit precise
         DoubleJump, Dash, Sword OR Hammer  # djump + upslash + dash to the reach the wall before the shrine
-      ShurikenBreak=20, Hammer, DoubleJump OR Dash
-      ShurikenBreak=20, Glide, Sword OR Hammer
+        GlideJump, DoubleJump OR Dash OR PauseHover
+        FlashSwap  # TODO: calculate blaze swaps
   conn UpperDepths.LowerConnection:
     moki: DepthsLight, Launch
     gorlek:  # Can make it easier by adding BreakWall=1 and using the firefly
