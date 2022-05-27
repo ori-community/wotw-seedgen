@@ -8999,11 +8999,21 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
       DepthsLight, SentryJump=1, Damage=10, Bash, Dash OR Glide
       DepthsLight, Bash, Grenade=1, Damage=10, Glide OR Dash OR Sword OR Hammer
       DepthsLight, DoubleJump, TripleJump, Dash OR Sword OR Hammer  # 4 arrows with sword, 5 arrows with hammer
-    unsafe, BreakWall=1 OR DepthsLight:
-      Bash, Grenade=1, Damage=10
-      Bash, Grenade=1, Dash, Sword OR Hammer
-      Dash, SentryJump=1
-      DoubleJump, Sword
+    kii:
+      BreakWall=1 OR DepthsLight:  # The bat is kinda scary, but fighting it while also tracking a firefly and planning the jump over the spikes is equally scary.
+        Sword, DoubleJump, Damage=10
+        Hammer, DoubleJump, Damage=30
+        Bash, Grenade=1
+        SentryJump=1, Bash, DoubleJump OR Dash OR Glide
+        Launch
+    unsafe:
+      BreakWall=1 OR DepthsLight:
+        Dash, SentryJump=1
+        DoubleJump, Sword
+        SentryJump=1, Damage=10, PauseHover OR Glide
+        SentryJump=1, GlideJump
+        HammerJump
+      Launch  # Extremely Precise. Use the spider and the crystal for light.
 
 anchor DepthsShrine at 213, -4515:
   nospawn
