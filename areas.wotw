@@ -9013,7 +9013,7 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
         SentryJump=1, Damage=10, PauseHover OR Glide
         SentryJump=1, GlideJump
         HammerJump
-      Launch  # Extremely Precise. Use the spider and the crystal for light.
+      Launch  # Extremely Precise. Use the bat and the crystal for light.
 
 anchor DepthsShrine at 213, -4515:
   nospawn
