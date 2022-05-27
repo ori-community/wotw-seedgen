@@ -9046,6 +9046,12 @@ anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
       DepthsLight, Grapple, Sword OR Hammer OR Dash OR Glide  # grapple the light after using the jumpad to reach the platform above
   pickup LowerDepths.SpiritTrial:
     moki: LowerDepths.TrialActivation, DoubleJump, Dash, Bash, Grapple
+    kii, LowerDepths.TrialActivation:
+      Dash, Bash, Grapple, Glide
+      DoubleJump, Bash, Grapple  # Tight on timing, but it's mostly just holding forward + decent grapple skills. Might be too hard for kii, possibly could use Glide as a failsafe.
+    unsafe, LowerDepths.TrialActivation:
+      Dash, Bash, Grapple  # Swing the first firefly. It could be kii if you damage boost instead, but that damage boost looks like it qualifies as friendly spikes.
+      DoubleJump, Dash, Bash, Glide  # Swing the last firefly.
 
   conn LowerDepths.East:
     moki:
