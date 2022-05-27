@@ -8958,8 +8958,7 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
         DoubleJump, Water
         DoubleJump, Damage=20  # Either you swim decently fast or you remember that you can double jump to delay entering the water.
         WaterDash, Damage=20
-      Water, UpperDepths.ForestsEyes OR Flash:
-        Bash  # the bash off the lantern is a bit precise
+      Bash, Water, UpperDepths.ForestsEyes  # Using Flash makes it too easy to accidentally kill the slime you need to bash off of; the jump can be done without the slime, but it's probably too precise.
     unsafe:
       ShurikenBreak=20:
         Glide OR PauseHover
@@ -8972,7 +8971,9 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
         DoubleJump, Dash, Sword OR Hammer  # djump + upslash + dash to the reach the wall before the shrine
         GlideJump, DoubleJump OR Dash OR PauseHover
         HammerJump
+        SentryJump=1
         FlashSwap  # TODO: calculate blaze / sentry swaps
+      Bash, Water, Flash
   conn UpperDepths.LowerConnection:
     moki: DepthsLight, Launch
     gorlek:  # Can make it easier by adding BreakWall=1 and using the firefly
