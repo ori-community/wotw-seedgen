@@ -8985,6 +8985,7 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
       DepthsLight, Damage=20, Dash
       DepthsLight, Damage=10, DoubleJump
       BreakWall=1, Launch  # use the slime for light
+      LaunchSwap  # squishy platform before the drop -> platform under the slime -> straight up past the slime
   conn LowerDepths.Central:
     moki, BreakWall=1 OR DepthsLight:
       DoubleJump, Bash, Dash  # combatting the bat would need bash anyway in moki
