@@ -8979,8 +8979,11 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
     gorlek:  # Can make it easier by adding BreakWall=1 and using the firefly
       DepthsLight, DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword OR Hammer
       DepthsLight, DoubleJump, TripleJump, Dash OR Glide OR Sword
+    kii:
+      DepthsLight, Damage=30, DoubleJump, Dash OR Glide OR Sword  # You can't really see where you're going for the first part, so I'll make it generous.
     unsafe:
-      DepthsLight, Damage=30, DoubleJump OR Dash  # Dash needs 4 arrows, djump needs 5
+      DepthsLight, Damage=20, Dash
+      DepthsLight, Damage=10, DoubleJump
   conn LowerDepths.Central:
     moki, BreakWall=1 OR DepthsLight:
       DoubleJump, Bash, Dash  # combatting the bat would need bash anyway in moki
