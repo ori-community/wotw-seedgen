@@ -9040,10 +9040,26 @@ anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
     gorlek:
       DepthsLight, Bash, Grenade=1, DoubleJump OR Dash  # easiest from the platform right of the jump pad
       DepthsLight, SentryJump=1, DoubleJump OR Dash
-      DepthsLight, DoubleJump, TripleJump  # climb the right wall. djump might be easy enough for gorlek.
+      DepthsLight, DoubleJump, TripleJump  # Climb the right wall.
+    kii:
+      DepthsLight, DoubleJump  # Might be easy enough for gorlek.
+      DepthsLight, Bash, Grenade=1, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Blaze=1
+      DepthsLight, Grapple, Dash OR Glide  # so...
+      # - The first jump is extremely weird, it's just barely free but super awkward.
+      # - Failing the jump doesn't really cause any problems for the player at all, you just drop back to where you started and try again.
+      # - Any vertical movement boost at all makes it very easy.
+      # - Grappling the light provides the necessary vertical height, but kii might not know that.
+      # Going with the assumption that the player either knows the Grapple strat or notices that the free path is possible, but not both.
+      Flash OR UpperDepths.ForestsEyes, Grapple, Sword OR Hammer OR Shuriken=2 OR Sentry=2  # Not enough time for bow light.
+      DoubleJump, TripleJump, Dash  # Use the grapple plant for light.
     unsafe:
-      DepthsLight, DoubleJump
-      DepthsLight, Grapple, Sword OR Hammer OR Dash OR Glide  # grapple the light after using the jumpad to reach the platform above
+      DepthsLight, Grapple, Shuriken=2 OR Sentry=2 OR PauseHover
+      DepthsLight, GrenadeJump  # Grenade Jump from the platform right of the jump pad, Grenade Wall Jump for extra distance.
+      SentryJump=1  # Sentry Jump from the platform right of the jump pad.
+      Grapple, DoubleJump OR Bow=1 OR Dash  # Use the ledge above the grapple plant. The Bow shot provides both light and movement.
+      HammerJump  # Hammer Jump to the wall above the grapple plant, Hammer Jump around the ledge.
+      DoubleJump, TripleJump, GlideJump  # Reach the grapple plant to refresh light, glide across.
+      
   pickup LowerDepths.SpiritTrial:
     moki: LowerDepths.TrialActivation, DoubleJump, Dash, Bash, Grapple
     kii, LowerDepths.TrialActivation:
