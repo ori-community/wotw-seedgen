@@ -9079,10 +9079,19 @@ anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
       Launch, Damage=30
       DepthsLight, DoubleJump, Dash, Glide OR Sword
       DepthsLight, DoubleJump, TripleJump, Dash OR Sword OR Glide
-    unsafe:
-      DepthsLight, DoubleJump, TripleJump, Hammer
-      Bash, DoubleJump OR Dash OR Glide OR Sword
-      Launch
+    kii:
+      Flash=1 OR UpperDepths.ForestsEyes:  # Midair bow shot if bow is the light source.
+        DoubleJump, TripleJump, Hammer
+      Bash, DoubleJump, Shuriken=1 OR Sentry=1 OR Spear=1 OR Flash=1  # Flash Boost.
+      Bash, Glide
+      Launch  # You need to reset Launch on the wall left of the last two fireflies. Going with kii because the reset is easy (some of the wall is safe for wall jumping) and there's plenty of light to use.
+    unsafe:  # There's a safe platform in the spikes below the lanterns.
+      DepthsLight, DoubleJump, TripleJump OR Sword OR Hammer
+      Flash=1, DoubleJump  # Activate Flash late for a boost.
+      Bash, DoubleJump, Blaze=1
+      Bash, Sword OR Hammer OR Shuriken=2 OR Sentry=3 OR DoubleJump OR Dash OR Damage=30 OR PauseHover
+      Bash, Spear=1 OR GrenadeCancel  # Grenade/Spear Zoom off of the first firefly to reach the second.
+      HammerJump  # Extended Hammer Jump from the first firefly to the second, land on the platform in the spikes.
   conn UpperDepths.LowerConnection:
     moki:
       DepthsLight, Launch, Bash
