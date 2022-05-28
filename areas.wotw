@@ -9098,13 +9098,20 @@ anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
       DepthsLight, Bash, DoubleJump
     gorlek:
       DepthsLight, Launch
-      DepthsLight, Bash, Grenade=1, DoubleJump
       DepthsLight, Combat=WeakSlug, DoubleJump, TripleJump, Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30  # need 6 arrows
+    kii:
+      DepthsLight, DoubleJump, TripleJump OR Dash OR Glide OR Damage=30
+      Sword OR Hammer OR DoubleJump OR Grapple OR Grenade=1:  # These are to get to the trial platform, see RaceStartHC for more info.
+        DepthsLight, Bash, Dash OR Glide
+      Flash=1 OR UpperDepths.ForestsEyes:  # Bow path requires a midair bow shot.
+        Bash, Hammer OR Sword
     unsafe:
-      DepthsLight, Bash, Grenade=1, Dash OR Glide
       DepthsLight, Bash, Hammer OR Sword
-      DepthsLight, Bash, Dash, Grapple OR Damage=30  # Dash in the spikes, you can reach the lantern from here or grapple the grappable light to reach the trial platform
-      DepthsLight, Bash, Glide, Grapple OR Damage=30
+      DepthsLight, Bash, Dash OR Glide
+      DepthsLight, PauseHover
+      DepthsLight, GlideJump  # Glide Jump to reach the wall next to the firefly.
+      DepthsLight, HammerJump
+      LaunchSwap  # wall left of firefly -> wall under BelowDoorOre -> wall next to slime
 
 # checkpoint at 478, -4517
 
