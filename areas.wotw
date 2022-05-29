@@ -9152,9 +9152,22 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, DoubleJump, TripleJump, Dash, Glide OR Damage=30
       DepthsLight, Bash, Grenade=1, DoubleJump, TripleJump, Dash OR Glide OR Damage=30
       DepthsLight, Bash, Grenade=1, DoubleJump, Dash, Damage=30
-    unsafe:
-      DoubleJump, TripleJump, Dash
+    kii:
+      DepthsLight, DoubleJump, TripleJump, Damage=30
+      DoubleJump, TripleJump, Dash OR Glide  # The Glide path might be too hard due to time.
+      Grapple, Sword OR Dash OR Glide  # The Glide path might be too hard due to grapple plant physics.
       Launch
+    unsafe:  # There's a safe spot in the middle of the spikes.
+      DepthsLight, DoubleJump, GlideJump
+      DepthsLight, HammerJump
+      DepthsLight, GrenadeJump, Glide
+      DoubleJump, TripleJump
+      Grapple, Damage=30, Damage=30  # Jump to the safe spot, grapple the plant for light, use Regenerate, grapple the plant again, jump to the bottom left platform, grapple the other plant and jump to it. Very hard.
+      PauseHover, DoubleJump OR Grapple OR GlideJump
+      FlashSwap
+      Grapple, Hammer OR Sentry=2  # Probably too precise for kii, especially given that the grapple plants have physics.
+      Shuriken=4, DoubleJump, Flash=1  # Flash Boost, catch the shuriken twice. Last shuriken is to reach the wall next to the grapple plant.
+      Bash, Grapple, GrenadeCancel, GrenadeJump  # Grenade Zoom off of a skeeto, Grenade Jump onto the grapple plant.
   pickup LowerDepths.LupoMap:
     moki, SpiritLight=150:
       Grapple, DoubleJump OR Dash OR Glide
