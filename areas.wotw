@@ -9181,9 +9181,26 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, DoubleJump, TripleJump, Dash OR Sword OR Hammer
       DepthsLight, DoubleJump, Dash, Sword OR Hammer
       DepthsLight, Damage=30, DoubleJump OR Dash OR Grapple OR Sword OR Hammer
-    unsafe, SpiritLight=150:
-      DoubleJump, TripleJump  # wjump on the left wall near the 1st grappable light above the spikes
-      DoubleJump, Hammer, Dash  # djump+upslash+dash to reach the left wall near the 1st grappable light above the spikes
+    kii, SpiritLight=150:
+      DepthsLight, Damage=60
+      DepthsLight, Damage=30, Shuriken=1 OR Sentry=2  # Might need an extra shuriken for the second jump, depending on how good kii is at iframe abuse.
+      DepthsLight, DoubleJump, Dash, Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1  # Possible with just Double Jump + Dash, but that looks a little bit too hard.
+      DepthsLight, DoubleJump, Sword OR Hammer
+      DoubleJump, TripleJump OR Glide  # Triple Jump path uses the wall left of the first grapple plant.
+      Grapple
+    unsafe, SpiritLight=150:  # There's two safe spots in the spikes. The first one's kinda useless.
+      DoubleJump, Dash  # Reset Dash on the ceiling a couple times.
+      Flash=1, Damage=30  # Flash Boost for distance and light.
+      PauseHover, DepthsLight OR DoubleJump
+      Bash, GrenadeCancel  # Grenade Zoom.
+      DoubleJump, GrenadeJump
+      GlideJump
+      WaveDash  # The slope on the platform is Wave-Dash-safe for some reason.
+      DepthsLight, Shuriken=3  # Double shuriken catch.
+      DepthsLight, Damage=30, Damage=30
+      DepthsLight, Damage=30, Blaze=1 OR Sentry=1
+      DepthsLight, DoubleJump OR Dash
+      Flash=1, Damage=30  # Flash Boost.
 
   conn UpperDepths.SecondKSRoom:
     moki, BreakWall=20:
