@@ -9127,10 +9127,14 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Bash OR SentryJump=1
       DoubleJump, TripleJump OR Dash OR Glide OR Sword
     kii, BreakCrystal:
+      Sword, DoubleJump OR Dash
+      Hammer, DoubleJump OR Dash
       Glide
     unsafe, BreakCrystal:
       DoubleJump, Hammer
       GrenadeJump OR PauseHover
+      Grapple, UltraGrapple
+      Sword  # Pogo a skeeto.
 
   state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: DoubleJump, Bash, Grapple
