@@ -9217,10 +9217,18 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, Bash, DoubleJump, TripleJump
       DepthsLight, DoubleJump, TripleJump, SwordSJump=1  # sjump before the lanterns, tjump+weapon stall to reach the breakable wall. Climb the right wall with tjump to reach the jumpad
       DepthsLight, DoubleJump, TripleJump, HammerSJump=1, Dash OR Glide  # sjump before the lanterns, tjump+weapon stall to reach the breakable wall. Climb the right wall with tjump to reach the jumpad
-    unsafe, BreakWall=20:
-      DepthsLight, Bash, Grapple, Hammer
+    kii, BreakWall=20:
+      DepthsLight, Bash, Grapple, Hammer OR Shuriken=1 OR Sentry=2 OR Glide
+      DepthsLight, Bash, Grenade=1  # Wall Jump to catch up to the grenade.
+      Flash=1 OR UpperDepths.ForestsEyes:
+        DoubleJump, TripleJump  # The climb up to the breakable wall is kinda weird, and Bow for light would make it a lot scarier.
+    unsafe, BreakWall=20:  # Dark runs can't work because there's no way to know how quickly you can break the wall.
       DepthsLight, DoubleJump, TripleJump
-      DepthsLight, Bash, SentryJump=1 OR Grenade=1
+      DepthsLight, Bash, SentryJump=1
+      DepthsLight, Bash, DoubleJump OR Glide OR PauseHover  # Use the spiderling.
+      DepthsLight, Bash, Grapple  # Use Grapple for a boost at the top of the shaft.
+      DepthsLight, Bash, HammerSJump=1
+      DepthsLight, HammerJump
   conn LowerDepths.TreeArea:
     moki:
       BreakWall=1, DoubleJump, Bash, Grapple, Dash OR Glide
