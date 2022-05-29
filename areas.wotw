@@ -9126,10 +9126,16 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
     gorlek, BreakCrystal:
       Bash OR SentryJump=1
       DoubleJump, TripleJump OR Dash OR Glide OR Sword
-    unsafe: DoubleJump, Hammer
+    kii, BreakCrystal:
+      Glide
+    unsafe, BreakCrystal:
+      DoubleJump, Hammer
+      GrenadeJump OR PauseHover
 
   state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: DoubleJump, Bash, Grapple
+    kii: Dash, Bash, Grapple
+    unsafe: DoubleJump, Dash, Bash, Glide
 
   pickup LowerDepths.SpiritSurgeShard:
     moki:
