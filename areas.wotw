@@ -9254,11 +9254,15 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
         Bash, Grapple, Sword
         Bash, DoubleJump, TripleJump, Dash OR Glide OR Sword
         Launch, Bash
+    kii:
+      BreakWall=1, Sword, Bash, Grapple, Damage=30  # There's a lot of places to mess up here, going with the assumption that the player fails exactly one of them.
+      BreakWall=1, Launch, Damage=30
+      DepthsLight, Launch
+      DepthsLight, DoubleJump, TripleJump, Hammer OR Grapple OR Damage=20  # Hammer: upswing to reach the ceiling wall after the last grapple plant. Might be too precise?
     unsafe:
       BreakWall=1, Bash, Grapple, Sword OR Hammer
-      Launch, DepthsLight OR BreakWall=1
-      DepthsLight, DoubleJump, TripleJump, Grapple, Sword
-
+      Launch, BreakWall=1
+      LaunchSwap  # From the checkpoint: aim for the ceiling over the vertical segment, fall straight down, Launch again from the ground.
   conn LowerDepths.Central:
     moki:
       Bash, DoubleJump OR Launch
