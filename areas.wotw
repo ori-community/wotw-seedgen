@@ -9237,13 +9237,16 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Bash, Grapple, Sword
       Bash, DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer
     kii:
-      BreakWall=1, Launch, Damage=30
-      Bash, Grapple, Hammer  # Either tight on movement or tight on light, depending on how you use the hammer. There's enough options that I think it's fine.
+      Launch, Damage=30  # Top path
+      Bash, DoubleJump, TripleJump, Shuriken=1 OR Sentry=1 OR Blaze=1 OR Spear=1
       UpperDepths.ForestsEyes, Launch  # Using extra light to make sure that the player can see the path.
       Flash=1 OR UpperDepths.ForestsEyes:
         DoubleJump, TripleJump, Grapple OR Damage=50
     unsafe:
       Launch
+      Bash, Grapple, Hammer
+      Bash, DoubleJump OR Dash OR Glide OR PauseHover  # Swing the second firefly a lot.
+      DepthsLight, DoubleJump, TripleJump, Grapple OR Damage=20
   conn LowerDepths.TreeArea:  # Paths that go up to the firefly egg and then across with it.
     gorlek:
       BreakWall=1 OR DepthsLight:
