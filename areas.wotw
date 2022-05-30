@@ -9136,11 +9136,6 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Grapple, UltraGrapple
       Sword  # Pogo a skeeto.
 
-  state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
-    moki: DoubleJump, Bash, Grapple
-    kii: Dash, Bash, Grapple
-    unsafe: DoubleJump, Dash, Bash, Glide
-
   pickup LowerDepths.SpiritSurgeShard:
     moki:
       DoubleJump, Grapple, Dash OR Glide
@@ -9229,40 +9224,35 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, Bash, Grapple  # Use Grapple for a boost at the top of the shaft.
       DepthsLight, Bash, HammerSJump=1
       DepthsLight, HammerJump
-  conn LowerDepths.TreeArea:
+  conn LowerDepths.BeforeTree:  # @validator new anchor, the lower difficulties probably need validation as well.
     moki:
-      BreakWall=1, DoubleJump, Bash, Grapple, Dash OR Glide
-      BreakWall=1, Launch, Bash, DoubleJump, Dash
-      BreakWall=1, Launch, Bash, Glide
-      BreakWall=1, Launch, Grapple, DoubleJump OR Dash OR Bash OR Glide
-      DepthsLight, Bash, Grapple, DoubleJump OR Dash OR Glide
-      DepthsLight, Launch, Bash OR Grapple
+      Bash, Grapple, DoubleJump OR Dash OR Glide
+      Launch, Bash OR Grapple
     gorlek:
-      BreakWall=1 OR DepthsLight:  # These paths go the top route, so they can use the firefly egg
-        Bash, DoubleJump, TripleJump, Damage=30, Hammer
-        Launch, Grapple
+      BreakWall=1 OR DepthsLight:
         Launch, DoubleJump, TripleJump OR Dash OR Glide OR Bash OR Sword OR Hammer OR Damage=30
         Launch, Dash, Glide OR Bash OR Sword OR Hammer OR Damage=30
         Launch, Glide, Bash OR Damage=30
         Launch, Damage=30, Bash OR Sword
-      BreakWall=1:  # These paths also go the top route, but would be redundant with other depthslight paths
-        Bash, Grapple, DoubleJump
-        Bash, Grapple, Dash, Glide OR Sword
-        Bash, DoubleJump, TripleJump, Dash, Glide OR Sword
-        Bash, DoubleJump, TripleJump, Damage=30, Dash OR Glide OR Sword
-      DepthsLight:  # These paths only work on the bottom route, so they can't use the firefly
-        Bash, Grapple, Sword
-        Bash, DoubleJump, TripleJump, Dash OR Glide OR Sword
-        Launch, Bash
+      Bash, Grapple, Sword
+      Bash, DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer
     kii:
-      BreakWall=1, Sword, Bash, Grapple, Damage=30  # There's a lot of places to mess up here, going with the assumption that the player fails exactly one of them.
       BreakWall=1, Launch, Damage=30
-      DepthsLight, Launch
-      DepthsLight, DoubleJump, TripleJump, Hammer OR Grapple OR Damage=20  # Hammer: upswing to reach the ceiling wall after the last grapple plant. Might be too precise?
+      Bash, Grapple, Hammer  # Either tight on movement or tight on light, depending on how you use the hammer. There's enough options that I think it's fine.
+      UpperDepths.ForestsEyes, Launch  # Using extra light to make sure that the player can see the path.
+      Flash=1 OR UpperDepths.ForestsEyes:
+        DoubleJump, TripleJump, Grapple OR Damage=50
     unsafe:
-      BreakWall=1, Bash, Grapple, Sword OR Hammer
-      Launch, BreakWall=1
-      LaunchSwap  # From the checkpoint: aim for the ceiling over the vertical segment, fall straight down, Launch again from the ground.
+      Launch
+  conn LowerDepths.TreeArea:  # Paths that go up to the firefly egg and then across with it.
+    gorlek:
+      BreakWall=1 OR DepthsLight:
+        Launch, DoubleJump, TripleJump OR Dash OR Glide OR Bash OR Sword OR Hammer OR Damage=30
+        Launch, Dash, Glide OR Bash OR Sword OR Hammer OR Damage=30
+        Launch, Glide, Bash OR Damage=30
+        Launch, Damage=30, Bash OR Sword
+    kii:
+      BreakWall=1, Launch, Damage=30
   conn LowerDepths.Central:
     moki:
       Bash, DoubleJump OR Launch
@@ -9275,34 +9265,65 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, DoubleJump, TripleJump
       Bash  # make the last lantern swing to the left
 
+# @validator new anchor, the lower difficulties probably need validation as well.
+anchor LowerDepths.BeforeTree at 693, -4515:  # The last glowshroom patch before the flash tree
+  refill Checkpoint
+
+  state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: DoubleJump, Bash, Grapple
+    kii: Dash, Bash, Grapple
+    unsafe: DoubleJump, Dash, Bash, Glide
+
+  conn LowerDepths.East:
+    moki:
+      Glide
+      DoubleJump, Bash OR Grapple
+      Dash, Bash OR Grapple
+      Launch  # This seems a little tight, but it was here before so...?
+    gorlek:
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=30
+      DoubleJump, Dash, Sword OR Hammer OR Damage=30
+      DoubleJump, Damage=30, Sword OR Hammer
+    unsafe:
+      Sword, Bash OR Grapple
+      Hammer, Bash OR Grapple
+  conn LowerDepths.TreeArea:
+    moki:
+      DepthsLight
+      BreakWall=1:
+        DoubleJump, Bash, Grapple, Dash OR Glide
+        Launch, Bash, DoubleJump, Dash
+        Launch, Bash, Glide
+        Launch, Grapple, DoubleJump OR Dash OR Bash OR Glide
+    gorlek, BreakWall=1:
+      Bash, Grapple, DoubleJump
+      Bash, Grapple, Dash, Glide OR Sword
+      Bash, DoubleJump, TripleJump, Dash, Glide OR Sword
+      Bash, DoubleJump, TripleJump, Damage=30, Dash OR Glide OR Sword OR Hammer
+    kii, BreakWall=1:
+      Sword, Bash, Grapple, Danger=30  # Not sure how much lenience should be provided, might be Damage instead.
+    unsafe:
+      LaunchSwap
+      BreakWall=1:
+        Launch
+        Bash, Grapple, Sword OR Hammer
+
 # checkpoint at 621, -4579
-# checkpoint at 693, -4515
 
 anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
   refill Checkpoint
   refill Energy=4:
     moki: BreakCrystal
 
-  # there could be a path to activate the trial here, but these aren't used currently...
-
   pickup LowerDepths.FlashTree: free
   pickup LowerDepths.RightEX:
     moki: DepthsLight OR Launch
     gorlek: Bash, Grenade=1
     unsafe: SentryJump=1
-
-  conn LowerDepths.East:
-    moki:
-      DepthsLight, Glide OR Launch
-      DepthsLight, DoubleJump, Bash OR Grapple
-      DepthsLight, Dash, Bash OR Grapple
-    gorlek:
-      DepthsLight, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=30
-      DepthsLight, DoubleJump, Dash, Sword OR Hammer OR Damage=30
-      DepthsLight, DoubleJump, Damage=30, Sword OR Hammer
-    unsafe:
-      DepthsLight, Sword, Bash OR Grapple
-      DepthsLight, Hammer, Bash OR Grapple
+  
+  conn LowerDepths.BeforeTree:  # @validator new anchor, the lower difficulties probably need validation as well.
+    moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # Gorlek doesn't add paths here because the weapons tend to knock away the platforms.
+    unsafe: DepthsLight
 
 region PoolsApproach:
   moki: Danger=25
