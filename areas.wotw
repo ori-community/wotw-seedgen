@@ -9275,8 +9275,25 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, DoubleJump, TripleJump
       Bash  # make the last lantern swing to the left
 
+# @validator this anchor is new, so the lower difficulty paths probably need re-validation.
+anchor LowerDepths.BeforeTree at 693, -4515:  # The last glowshroom patch before the flash tree
+  refill Checkpoint
+
+  conn LowerDepths.East:
+    moki:
+      Glide
+      DoubleJump, Bash OR Grapple
+      Dash, Bash OR Grapple
+      Launch  # This seems a little tight, but it was here before so...?
+    gorlek:
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=30
+      DoubleJump, Dash, Sword OR Hammer OR Damage=30
+      DoubleJump, Damage=30, Sword OR Hammer
+    unsafe:
+      Sword, Bash OR Grapple
+      Hammer, Bash OR Grapple
+
 # checkpoint at 621, -4579
-# checkpoint at 693, -4515
 
 anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
   refill Checkpoint
@@ -9290,19 +9307,10 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
     moki: DepthsLight OR Launch
     gorlek: Bash, Grenade=1
     unsafe: SentryJump=1
-
-  conn LowerDepths.East:
-    moki:
-      DepthsLight, Glide OR Launch
-      DepthsLight, DoubleJump, Bash OR Grapple
-      DepthsLight, Dash, Bash OR Grapple
-    gorlek:
-      DepthsLight, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=30
-      DepthsLight, DoubleJump, Dash, Sword OR Hammer OR Damage=30
-      DepthsLight, DoubleJump, Damage=30, Sword OR Hammer
-    unsafe:
-      DepthsLight, Sword, Bash OR Grapple
-      DepthsLight, Hammer, Bash OR Grapple
+  
+  conn LowerDepths.BeforeTree:
+    moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # Gorlek doesn't add paths here because the weapons tend to knock away the platforms.
+    kii: DepthsLight
 
 region PoolsApproach:
   moki: Danger=25
