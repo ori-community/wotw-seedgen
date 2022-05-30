@@ -9136,11 +9136,6 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Grapple, UltraGrapple
       Sword  # Pogo a skeeto.
 
-  state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
-    moki: DoubleJump, Bash, Grapple
-    kii: Dash, Bash, Grapple
-    unsafe: DoubleJump, Dash, Bash, Glide
-
   pickup LowerDepths.SpiritSurgeShard:
     moki:
       DoubleJump, Grapple, Dash OR Glide
@@ -9274,6 +9269,11 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
 anchor LowerDepths.BeforeTree at 693, -4515:  # The last glowshroom patch before the flash tree
   refill Checkpoint
 
+  state LowerDepths.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
+    moki: DoubleJump, Bash, Grapple
+    kii: Dash, Bash, Grapple
+    unsafe: DoubleJump, Dash, Bash, Glide
+
   conn LowerDepths.East:
     moki:
       Glide
@@ -9314,8 +9314,6 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
   refill Checkpoint
   refill Energy=4:
     moki: BreakCrystal
-
-  # there could be a path to activate the trial here, but these aren't used currently...
 
   pickup LowerDepths.FlashTree: free
   pickup LowerDepths.RightEX:
