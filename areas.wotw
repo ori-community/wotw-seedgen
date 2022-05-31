@@ -9248,14 +9248,14 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Bash, DoubleJump OR Dash OR Glide OR PauseHover  # Swing the second firefly a lot.
       DepthsLight, DoubleJump, TripleJump, Grapple OR Damage=20
   conn LowerDepths.TreeArea:  # Paths that go up to the firefly egg and then across with it.
-    gorlek:
-      BreakWall=1 OR DepthsLight:
-        Launch, DoubleJump, TripleJump OR Dash OR Glide OR Bash OR Sword OR Hammer OR Damage=30
-        Launch, Dash, Glide OR Bash OR Sword OR Hammer OR Damage=30
-        Launch, Glide, Bash OR Damage=30
-        Launch, Damage=30, Bash OR Sword
-    kii:
-      BreakWall=1, Launch, Damage=30
+    gorlek, BreakWall=1 OR DepthsLight:
+      Launch, DoubleJump, TripleJump OR Dash OR Glide OR Bash OR Sword OR Hammer OR Damage=30
+      Launch, Dash, Glide OR Bash OR Sword OR Hammer OR Damage=30
+      Launch, Glide, Bash OR Damage=30
+      Launch, Damage=30, Bash OR Sword
+    kii, BreakWall=1:
+      Launch, Damage=30
+      Launch, Bash, Shuriken=1 OR Sentry=2
   conn LowerDepths.Central:
     moki:
       Bash, DoubleJump OR Launch
@@ -9319,12 +9319,23 @@ anchor LowerDepths.BeforeTree at 693, -4515:  # The last glowshroom patch before
       Bash, DoubleJump, TripleJump, Dash, Glide OR Sword
       Bash, DoubleJump, TripleJump, Damage=30, Dash OR Glide OR Sword OR Hammer
     kii, BreakWall=1:
-      Sword, Bash, Grapple, Danger=30  # Not sure how much lenience should be provided, might be Damage instead.
+      Launch, Sword OR DoubleJump OR Grapple OR Glide
+      Launch, Bash, Shuriken=2 OR Sentry=4 OR Dash
+      Launch, Damage=30, Shuriken=1 OR Sentry=2 OR Damage=30
+      Bash, Grapple, Sword OR Sentry=7 OR Dash OR Glide
+      Bash, Grapple, Damage=30, Shuriken=4 OR Sentry=5  # Also possible with 4 Flash Boosts. Currently, that's redundant with the DepthsLight path, but it might not be in the future.
+      Bash, DoubleJump, TripleJump, Damage=30, Shuriken=2 OR Sentry=3 OR Blaze=5
+      Bash, DoubleJump, TripleJump, Sword OR Glide
+      Bash, DoubleJump, TripleJump, Dash, Hammer OR Shuriken=1 OR Sentry=1  # Also possible with a Flash Boost.
     unsafe:
-      LaunchSwap
+      LaunchSwap  # Launch Swap to the ceiling over the drop, fall straight down, Launch Swap after hitting the floor.
       BreakWall=1:
         Launch
-        Bash, Grapple, Sword OR Hammer
+        Bash, Grapple, Hammer OR Sentry=5
+        Bash, DoubleJump, TripleJump, Shuriken=3 OR Dash  # Reset Dash on the ceiling a few times.
+        Bash, DoubleJump, Glide, Damage=30
+        Bash, PauseHover, DoubleJump OR Dash OR Grapple OR Glide
+        Bash, Damage=30, Damage=30
 
 # checkpoint at 621, -4579
 
