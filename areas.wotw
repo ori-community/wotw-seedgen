@@ -9264,9 +9264,14 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Bash, Dash
       Launch
       DepthsLight, DoubleJump, TripleJump, Dash, Glide, Damage=30
+    kii:
+      UpperDepths.ForestsEyes, DoubleJump, TripleJump  # Obscure path needs lots of light. If this is too hard, there's a lot of skills that would make it easier.
+      Bash, Sword OR Shuriken=1 OR Sentry=1
+      DepthsLight, Bash, Hammer
     unsafe:
-      DepthsLight, DoubleJump, TripleJump
+      DoubleJump, TripleJump
       Bash  # make the last lantern swing to the left
+      DepthsLight, DoubleJump, Damage=60
 
 # @validator new anchor, the lower difficulties probably need validation as well.
 anchor LowerDepths.BeforeTree at 693, -4515:  # The last glowshroom patch before the flash tree
