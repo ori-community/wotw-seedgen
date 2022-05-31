@@ -9292,9 +9292,19 @@ anchor LowerDepths.BeforeTree at 693, -4515:  # The last glowshroom patch before
       DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=30
       DoubleJump, Dash, Sword OR Hammer OR Damage=30
       DoubleJump, Damage=30, Sword OR Hammer
+    kii:
+      Sword, Dash OR Bash OR Grapple OR Damage=30  # A little fast.
+      DepthsLight, Hammer, Bash OR Grapple
+      Bash, Grapple
+      Dash, Sentry=3 OR Damage=30
+      DoubleJump, Sentry=3 OR TripleJump OR Dash OR Flash=2 OR Damage=30  # If you don't know the path, you'll see it on your way down. Is that too much trial and error?
     unsafe:
-      Sword, Bash OR Grapple
+      Damage=10, Sword OR DoubleJump  # Some spikes deal a lot less damage than others.
+      Dash  # Funky dash reset on the tip of the bottleneck.
       Hammer, Bash OR Grapple
+      DepthsLight, Hammer, Damage=10
+      DoubleJump, Shuriken=2
+      PauseHover
   conn LowerDepths.TreeArea:
     moki:
       DepthsLight
