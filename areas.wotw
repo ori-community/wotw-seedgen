@@ -9352,6 +9352,7 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
   
   conn LowerDepths.BeforeTree:  # @validator new anchor, the lower difficulties probably need validation as well.
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # Gorlek doesn't add paths here because the weapons tend to knock away the platforms.
+    kii: DepthsLight, Sentry=1
     unsafe: DepthsLight
 
 region PoolsApproach:
