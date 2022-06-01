@@ -605,7 +605,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
     kii:
       Bash, Dash OR Sword OR Hammer OR DoubleJump OR Damage=10
     unsafe:
-      DoubleJump, Deflector
+      Sword OR Hammer OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR Damage=10 OR PauseHover  # Sneaky micro ledges. Shuriken path requires you to angle the shuriken forwards for quicker catching.
 
   conn PoolsApproach.OnTopOfWheel:
     moki, Water:
@@ -3909,8 +3909,12 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Grapple, Hammer OR Shuriken=1 OR Sentry=2
       Bash, Grenade=1  # Bash the mortar so you can reach your grenade from higher
     unsafe:
+      Grapple, BlazeSwap=1 OR SentrySwap=1
       Bash
       DoubleJump, TripleJump, Sword OR Hammer
+      SentryJump=1
+      GrenadeJump, DoubleJump
+      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
   conn WestGlades.Upper:
     moki:  # realizing the semisolid not considered for moki
       Bash, DoubleJump OR Dash OR Glide OR Grenade=1
@@ -3995,7 +3999,16 @@ anchor WestGlades.ShrineArea at -664, -4026:
       Grapple, DoubleJump, Hammer OR Sword OR Sentry=2
     unsafe:
       Grapple, DoubleJump, Shuriken=2
-      Grapple, Hammer, Dash                         # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
+      Grapple, Hammer, Dash  # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
+      Grapple, Glide, PauseHover
+      GlideJump, PauseHover  # Climb the right wall and then glide across.
+      GrenadeJump, DoubleJump
+      GrenadeJump, PauseHover, Dash OR Glide  # Grenade Jump from the shrine to maximize height, float left.
+      HammerJump  # Upswing then Hammer Jump.
+      DoubleJump, GlideJump  # Climb the right wall and then glide across.
+      SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
+      Hammer, DoubleJump, SentrySwap=1 OR BlazeSwap=1
+      Hammer, DoubleJump, Glide  # Climb the right wall and then glide across.
 
   conn GladesShrine: free
   conn WestGlades.MillApproach: free
@@ -7370,6 +7383,10 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       Bash, Grenade=2, DoubleJump, TripleJump OR Dash OR Glide
       SentryJump=1, DoubleJump, Dash
       DoubleJump, Grenade=1  # from the checkpoint, grenade jumps to the small wall under the spikes and grenade jumps again from there
+      SentryJump=2
+      GrenadeJump, DoubleJump  # grenade wall jump off of the microwall under the spikes
+      HammerJump
+      BlazeSwap=6 OR FlashSwap  # might be doable with less somehow, blaze swaps are hard
   pickup LowerReach.RoofRightEX:
     moki: Launch  # intended path omitted in moki
     gorlek:
@@ -7380,6 +7397,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       Bash, Grenade=1, DoubleJump, Dash OR TripleJump  # Climb on the right wall above the 2nd plant
     unsafe:
       SentryJump=1, DoubleJump  # Climb on the wall above the 2nd plant
+      HammerJump
 
   conn LowerReach.HalfwayIceCavern:
     moki:
@@ -7421,6 +7439,8 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
 anchor LowerReach.HalfwayIceCavern at -43, -3955:  # On the snaptrap halfway through the spiky ice cavern
 # Going through that ice cavern in order to activate LowerReach.EastDoorLantern or going to LowerReach.SwimmingPool is horrible to find paths for, especially when using sjumps/bashnades
 # That anchor is just so pathfinder have an easier time patfinding the horrible paths through that icy cavern.
+  nospawn  # It's on a live snaptrap, might be scary for lower difficulties.
+
   state LowerReach.EastDoorLantern:
     moki:
       Grenade=1, DoubleJump, Dash, Glide
@@ -7462,7 +7482,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       SwordSJump=1, Water
       SwordSJump=2, DoubleJump, Glide
       LowerReach.ThawEastFurnace, WaterDash, Water, DoubleJump  # Wall jump from the right wall
-    kii:
+    kii, LowerReach.EastDoorLantern:
       Bash, Grenade=1, Damage=40  # bash the fish and worm to go faster and avoid taking one more dboost
       Bash, Grenade=1, Damage=20, WaterDash OR DoubleJump OR Dash OR Sword
       Bash, Grenade=1, Sword, DoubleJump OR Dash  # pogo the worm
@@ -7474,9 +7494,10 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       LowerReach.ThawEastFurnace, WaterDash, Damage=20, Damage=20, Hammer OR Spear=1
       LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Hammer, Water OR Dash OR Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # tjump+ hammer upslash from the closed snaptrap to walljump on the left wall
       LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Spear=1, Water OR Dash OR Glide OR Sword OR Sentry=3 OR Damage=20  # tjump+spear from the closed snaptrap to walljump on the left wall
-    unsafe:
+    unsafe, LowerReach.EastDoorLantern:
       SwordSJump=1, DoubleJump, TripleJump OR Dash OR Glide  # double jump from the platform, refill dash/jumps by slashing the energy cristal then sjump on the plant
       SwordSJump=2, DoubleJump OR Glide OR Dash
+      HammerJump
   conn LowerReach.EastFurnace:
     moki:
       Bash, Grenade=1
