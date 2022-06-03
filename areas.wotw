@@ -9071,7 +9071,8 @@ anchor LowerDepths.Central at 482, -4536:  # Below where the trial starts
       # - Any vertical movement boost at all makes it very easy.
       # - Grappling the light provides the necessary vertical height, but kii might not know that.
       # Going with the assumption that the player either knows the Grapple strat or notices that the free path is possible, but not both.
-      Flash OR UpperDepths.ForestsEyes, Grapple, Sword OR Hammer OR Shuriken=2 OR Sentry=2  # Not enough time for bow light.
+      Flash OR UpperDepths.ForestsEyes:  # Not enough time for bow light.
+         Grapple, Sword OR Hammer OR Shuriken=2 OR Sentry=2
       DoubleJump, TripleJump, Dash  # Use the grapple plant for light.
     unsafe:
       DepthsLight, Grapple, Shuriken=2 OR Sentry=2 OR PauseHover
