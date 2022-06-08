@@ -5414,7 +5414,25 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     unsafe:  # You can bait the Miner to make them fall into spikes
       DoubleJump OR Hammer OR Sentry=2
       Sword, Sentry=1
-  # backwards connections is not relevant here because you need to solve InnerWellspring.SpinArena, which is impossible without already having a way to reach InnerWellspring.EastDoor
+  conn InnerWellspring.EastDoor:
+    moki, InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved:  # Need to solve the spin puzzle otherwise it would softlock after pulling the first lever because of lasers blocking you
+      Launch
+      Grapple, DoubleJump OR Dash OR Glide
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide
+    gorlek, InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved:
+      Grapple, Sword OR Hammer OR Damage=15
+      Bash, Grenade=1, Sword OR Hammer OR Damage=15
+      DoubleJump, TripleJump OR Dash  # wall jump on the arena wall in order to reach the pole
+      SentryJump=1  # take the lower path, use weapon to avoid the spikes then sjumps when exiting the spiinning room
+    kii, InnerWellspring.SpinningRoomOpen:
+      Water:  # water deactivates some lasers (not considered before kii) which lets you traverse the spinning room for free, reguarless of the state it's in
+        Launch OR Grapple OR DoubleJump
+        Bash, Grenade=1
+      InnerWellspring.SpinPuzzleSolved, DoubleJump
+      InnerWellspring.SpinPuzzleSolved, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Hammer, Water OR InnerWellspring.SpinPuzzleSolved # wall jump on the arena wall in order to reach the pole
+    unsafe, InnerWellspring.SpinningRoomOpen:
+      Water OR InnerWellspring.SpinPuzzleSolved  # precise wall jum pto get on the pole
 
 anchor InnerWellspring.AboveSpinPuzzle at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
   refill Checkpoint
