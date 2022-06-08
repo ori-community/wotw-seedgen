@@ -7457,7 +7457,6 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
 anchor LowerReach.HalfwayIceCavern at -43, -3955:  # On the snaptrap halfway through the spiky ice cavern
 # Going through that ice cavern in order to activate LowerReach.EastDoorLantern or going to LowerReach.SwimmingPool is horrible to find paths for, especially when using sjumps/bashnades
 # That anchor is just so pathfinder have an easier time patfinding the horrible paths through that icy cavern.
-  nospawn  # It's on a live snaptrap, might be scary for lower difficulties.
 
   state LowerReach.EastDoorLantern:
     moki:
@@ -7476,12 +7475,33 @@ anchor LowerReach.HalfwayIceCavern at -43, -3955:  # On the snaptrap halfway thr
       SentryJump=2, Grenade=1, Dash  # Need to use up slashes
       SentryBurn=1, SwordSJump=2
 
+  #pickup LowerReach.RoofRightEX:  # Be careful it's not redundant with going to PastSnowball first
+
   conn LowerReach.SwimmingPool:
     moki:
       Glide, DoubleJump OR Dash
       Launch
     gorlek: Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Damage=20
     kii: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+  conn LowerReach.PastSnowball:
+    moki:
+      Launch
+      DoubleJump, Dash OR Glide
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump OR Dash OR Glide
+    gorlek:
+      DoubleJump, TripleJump
+      Glide, Dash OR Damage=20
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, Sword OR Hammer
+      LowerReach.FreezeEastFurnace, SentryJump=1  # use weapon to hover as well
+    kii:
+      DoubleJump OR Hammer OR Damage=40
+      Bash, Grenade=1
+      Glide, Sword
+      LowerReach.ThawEastFurnace, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
+      LowerReach.ThawEastFurnace, Damage=20, Spear=1 OR Flash=1 OR Blaze=1 OR Sentry=1
+    unsafe:
+      Sword OR GlideJump OR Damage=20
+      Dash  # if frozen, dash ramp from the left of the snaptrap
 
 anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezable water
   refill Energy=4:
