@@ -7409,7 +7409,8 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
     moki: Launch  # intended path omitted in moki
     gorlek:
       LowerReach.FreezeEastFurnace, Bash, Grenade=2
-      SwordSJump=2
+      SwordSJump=2, Dash OR DoubleJump
+      LowerReach.FreezeEastFurnace, HammerSJump=2, Dash OR DoubleJump
     kii:
       Bash, Grenade=2  # You have to time the second grenade throw just before the snaptrap open again
       Bash, Grenade=1, DoubleJump, Dash OR TripleJump  # Climb on the right wall above the 2nd plant
@@ -7475,8 +7476,27 @@ anchor LowerReach.HalfwayIceCavern at -43, -3955:  # On the snaptrap halfway thr
       SentryJump=2, Grenade=1, Dash  # Need to use up slashes
       SentryBurn=1, SwordSJump=2
 
-  #pickup LowerReach.RoofRightEX:  # Be careful it's not redundant with going to PastSnowball first
-
+  pickup LowerReach.RoofRightEX:  # Be careful it's not redundant with going to PastSnowball first
+    gorlek:
+      DoubleJump, TripleJump, Dash
+      SwordSJump=1, DoubleJump
+      SwordSJump=2, Dash
+      LowerReach.FreezeEastFurnace, HammerSJump=1, DoubleJump
+      LowerReach.FreezeEastFurnace, HammerSJump=2, Dash
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, Glide, Dash OR Damage=20
+      LowerReach.FreezeEastFurnace, Bash, Grenade=2, Dash OR Glide OR Sword OR Hammer OR Damage=20
+    kii:
+      DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Glide, Blaze=1
+      Bash, Grenade=2
+      Bash, Grenade=1, DoubleJump OR Hammer OR LowerReach.FreezeEastFurnace OR Damage=20
+      Bash, Grenade=1, Glide, Sword
+      LowerReach.ThawEastFurnace, Bash, Grenade=1, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
+    unsafe:
+      DoubleJump, TripleJump OR Dash
+      Bash, Grenade=1      
+      
   conn LowerReach.SwimmingPool:
     moki:
       Glide, DoubleJump OR Dash
@@ -7489,18 +7509,17 @@ anchor LowerReach.HalfwayIceCavern at -43, -3955:  # On the snaptrap halfway thr
       DoubleJump, Dash OR Glide
       LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump OR Dash OR Glide
     gorlek:
-      DoubleJump, TripleJump
+      DoubleJump
       Glide, Dash OR Damage=20
-      LowerReach.FreezeEastFurnace, Bash, Grenade=1, Sword OR Hammer
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, Sword OR Hammer OR Damage=20
       LowerReach.FreezeEastFurnace, SentryJump=1  # use weapon to hover as well
     kii:
-      DoubleJump OR Hammer OR Damage=40
+      Hammer OR Damage=20
       Bash, Grenade=1
       Glide, Sword
       LowerReach.ThawEastFurnace, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
-      LowerReach.ThawEastFurnace, Damage=20, Spear=1 OR Flash=1 OR Blaze=1 OR Sentry=1
     unsafe:
-      Sword OR GlideJump OR Damage=20
+      Sword OR GlideJump
       Dash  # if frozen, dash ramp from the left of the snaptrap
 
 anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezable water
@@ -7550,6 +7569,10 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       DoubleJump  # Precise wall jump on the right wall then wjump on the left wall
       LowerReach.ThawEastFurnace, Bash, Water OR Damage=100  # Bash the fish
       LowerReach.ThawEastFurnace, Bash, WaterDash, Water OR Damage=40
+  conn LowerReach.HalfwayIceCavern:
+    unsafe:
+      Launch
+      DoubleJump, TripleJump  # climb the left wall in order to reach the wall above the anchor point. Then tjump to the crystal wall
 
 anchor LowerReach.EastFurnace at -61, -3987:  # At the furnace above the swimming pool
   refill Checkpoint
