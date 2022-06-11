@@ -8,7 +8,7 @@ use std::{
     convert::TryFrom,
     io::{self, Read},
     time::Instant,
-    process, env, error::Error,
+    env, error::Error, process::ExitCode,
 };
 
 use rustc_hash::FxHashMap;
@@ -784,7 +784,7 @@ fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> 
 }
 
 // TODO some of this logic probably belongs in the library
-fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
+fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     let command = env::args().collect::<Vec<_>>().join(" ");
     log::trace!("{command}");
 
@@ -875,7 +875,8 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
         .collect::<Vec<_>>()
         .join(", ");
 
-    Ok(reached)
+    println!("{reached}");
+    Ok(())
 }
 
 fn compile_seed(mut path: PathBuf) -> Result<(), String> {
@@ -898,7 +899,7 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
     Ok(())
 }
 
-fn main() {
+fn main() -> ExitCode {
     let args = SeedGen::from_args();
 
     if args.wait_on_debugger {
@@ -906,46 +907,43 @@ fn main() {
         debugger::wait_until_attached(None).expect("state() not implemented on this platform");
     }
 
-    match args.command {
+    match match args.command {
         SeedGenCommand::Seed { args } => {
             let use_file = if args.verbose { Some("generator.log") } else { None };
             initialize_log(use_file, LevelFilter::Info, args.json_stderr).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            generate_seeds(args).unwrap_or_else(|err| {
-              log::error!("{}", err);
-              process::exit(2);
-            });
+            generate_seeds(args).map_err(|err| err.to_string())
         },
         SeedGenCommand::Play => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            play_last_seed().unwrap_or_else(|err| log::error!("{}", err));
+            play_last_seed()
         },
         SeedGenCommand::Preset { args } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            create_preset(args).unwrap_or_else(|err| log::error!("{}", err));
+            create_preset(args).map_err(|err| err.to_string())
         },
         SeedGenCommand::WorldPreset { args } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            create_world_preset(args).unwrap_or_else(|err| log::error!("{}", err));
+            create_world_preset(args).map_err(|err| err.to_string())
         },
         SeedGenCommand::Headers { headers, subcommand } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
             match subcommand {
                 Some(HeaderCommand::Validate { path }) => {
-                    if let Err(err) = header::validate(path) { log::error!("{}", err) }
+                   header::validate(path).map(|_| ())
                 },
                 Some(HeaderCommand::Parse { path }) => {
-                    compile_seed(path).unwrap_or_else(|err| log::error!("{}", err));
+                    compile_seed(path)
                 },
                 None => {
                     if headers.is_empty() {
-                        header::list().unwrap_or_else(|err| log::error!("{}", err));
+                        header::list()
                     } else {
-                        header::inspect(headers).unwrap_or_else(|err| log::error!("{}", err));
+                        header::inspect(headers)
                     }
                 },
             }
@@ -953,10 +951,13 @@ fn main() {
         SeedGenCommand::ReachCheck { args } => {
             initialize_log(Some("reach.log"), LevelFilter::Off, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            match reach_check(args) {
-                Ok(reached) => println!("{}", reached),
-                Err(err) => log::error!("{}", err),
-            }
+            reach_check(args)
+        },
+    } {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(err) => {
+            log::error!("{err}");
+            ExitCode::FAILURE
         },
     }
 }
