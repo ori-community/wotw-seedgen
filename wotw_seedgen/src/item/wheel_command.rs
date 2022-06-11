@@ -7,7 +7,7 @@ use super::{Item, VItem};
 use crate::util::Icon;
 use crate::header::{VString, vdisplay};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum WheelCommand {
     SetName { wheel: u32, position: WheelItemPosition, #[VType] name: String },
     SetDescription { wheel: u32, position: WheelItemPosition, #[VType] description: String },
@@ -26,7 +26,7 @@ impl WheelCommand {
             WheelCommand::SetDescription { wheel, position, description } => format!("1|{}|{}|{}", wheel, *position as u8, description),
             WheelCommand::SetIcon { wheel, position, icon } => format!("2|{}|{}|{}", wheel, *position as u8, icon.code()),
             WheelCommand::SetColor { wheel, position, r, g, b, a } => format!("3|{}|{}|{}|{}|{}|{}", wheel, *position as u8, r, g, b, a),
-            WheelCommand::SetItem { wheel, position, bind, item } => format!("4|{}|{}|{}|{}", wheel, *position as u8, *bind as u8, item),
+            WheelCommand::SetItem { wheel, position, bind, item } => format!("4|{}|{}|{}|{}", wheel, *position as u8, *bind as u8, item.code()),
             WheelCommand::SetSticky { wheel, sticky } => format!("5|{}|{}", wheel, sticky),
             WheelCommand::SwitchWheel { wheel } => format!("6|{}", wheel),
             WheelCommand::RemoveItem { wheel, position } => format!("7|{}|{}", wheel, *position as u8),
@@ -53,7 +53,7 @@ vdisplay! {
     }
 }
 
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum WheelItemPosition {
     Top = 0,
@@ -69,7 +69,7 @@ pub enum WheelItemPosition {
     LeftTop = 10,
     TopLeft = 11,
 }
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum WheelBind {
     AllBinds = 0,

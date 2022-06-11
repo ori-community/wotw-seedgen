@@ -4,7 +4,7 @@ use wotw_seedgen_derive::VVariant;
 
 use crate::{util::{UberIdentifier, UberType}, header::vdisplay};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct UberStateItem {
     pub uber_identifier: UberIdentifier,
     pub uber_type: UberType,
@@ -46,7 +46,7 @@ vdisplay! {
         }
     }
 }
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum UberStateOperator {
     Value(#[VWrap] String),
     Pointer(UberIdentifier),
@@ -73,7 +73,7 @@ vdisplay! {
         }
     }
 }
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct UberStateRange {
     #[VType]
     pub start: UberStateRangeBoundary,
@@ -93,7 +93,7 @@ vdisplay! {
         }
     }
 }
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum UberStateRangeBoundary {
     Value(#[VWrap] String),
     Pointer(UberIdentifier),

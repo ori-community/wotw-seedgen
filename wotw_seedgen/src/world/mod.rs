@@ -16,17 +16,17 @@ use crate::settings::WorldSettings;
 use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
-pub struct World<'a> {
+pub struct World<'a, 'b> {
     pub graph: &'a Graph,
-    pub player: Player,
+    pub player: Player<'b>,
     pub pool: Pool,
     pub preplacements: FxHashMap<UberState, Vec<Item>>,
     pub uber_states: FxHashMap<UberIdentifier, String>,
     pub sets: Vec<usize>,
     pub custom_items: FxHashMap<Item, ItemDetails>,
 }
-impl<'a> World<'a> {
-    pub fn new(graph: &Graph, settings: WorldSettings) -> World {
+impl World<'_, '_> {
+    pub fn new<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
         World {
             graph,
             player: Player::spawn(settings),
@@ -159,6 +159,7 @@ impl<'a> World<'a> {
 #[cfg(test)]
 mod tests {
     use crate::languages::logic;
+    use crate::settings::Difficulty;
 
     use super::*;
     use super::super::*;
@@ -176,7 +177,7 @@ mod tests {
         let locations = util::read_file("loc_data.csv", "logic").unwrap();
         let states = util::read_file("state_data.csv", "logic").unwrap();
         let graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
-        let mut world = World::new(&graph, settings.world_settings[0].clone());
+        let mut world = World::new(&graph, &settings.world_settings[0]);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
 
@@ -204,9 +205,8 @@ mod tests {
         settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
         let graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
-        let mut world = World::new(&graph, settings.world_settings[0].clone());
+        let mut world = World::new(&graph, &settings.world_settings[0]);
 
-        world.player.settings.difficulty = Difficulty::Unsafe;
         world.player.inventory.grant(Item::Resource(Resource::Health), 7);
         world.player.inventory.grant(Item::Resource(Resource::Energy), 6);
         world.player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);

@@ -5,7 +5,9 @@ pub mod icon;
 pub(crate) mod extensions;
 
 pub use orbs::Orbs;
-pub use icon::Icon;
+pub use icon::{Icon, MapIcon};
+use serde::{Serialize, Serializer};
+use serde::ser::SerializeStruct;
 pub use uber_state::{UberState, VUberState, UberIdentifier, UberType};
 
 use decorum::R32;
@@ -21,14 +23,14 @@ use std::{
 
 use crate::header::vdisplay;
 
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum NumericBool {
     False = 0,
     True = 1,
 }
 
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u16)]
 pub enum Spell {
     Hammer = 1000,
@@ -75,7 +77,7 @@ pub enum Spell {
     WaterBreath = 4009,
 }
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, FromPrimitive, FromStr)]
+#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, FromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Zone {
     Marsh = 0,
@@ -179,12 +181,23 @@ pub enum NodeKind {
     Quest,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct Position {
     #[VWrap]
     pub x: R32,
     #[VWrap]
     pub y: R32,
+}
+impl Serialize for Position {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut position = serializer.serialize_struct("Position", 2)?;
+        position.serialize_field("x", &self.x.into_inner())?;
+        position.serialize_field("y", &self.y.into_inner())?;
+        position.end()
+    }
 }
 impl Position {
     /// Returns a new [`Position`] with the given coordinates

@@ -7,22 +7,22 @@ use crate::util::{self, Orbs};
 
 /// A logical representation of the in-game player
 #[derive(Debug, Clone)]
-pub struct Player {
+pub struct Player<'a> {
     pub inventory: Inventory,
-    pub settings: WorldSettings,
+    pub settings: &'a WorldSettings,
 }
-impl Player {
+impl Player<'_> {
     /// Returns an instance of [`Player`] with the given [`WorldSettings`]
     /// 
     /// The [`Player`] will have an empty Inventory. Use [`Player::spawn`] to create a player with starting health and energy like in-game
-    pub fn new(settings: WorldSettings) -> Player {
+    pub fn new(settings: &WorldSettings) -> Player {
         let inventory = Inventory::default();
         Player { inventory, settings }
     }
     /// Returns an instance of [`Player`] with the given [`WorldSettings`]
     /// 
     /// The [`Player`] will have six Health and Energy fragments - these are the resources a player spawns with in-game
-    pub fn spawn(settings: WorldSettings) -> Player {
+    pub fn spawn(settings: &WorldSettings) -> Player {
         let mut inventory = Inventory::default();
         inventory.grant(Item::Resource(Resource::Health), 6);
         inventory.grant(Item::Resource(Resource::Energy), 6);
@@ -39,7 +39,8 @@ impl Player {
     /// # use wotw_seedgen::world::Player;
     /// use wotw_seedgen::settings::WorldSettings;
     /// 
-    /// let player = Player::spawn(WorldSettings::default());
+    /// let world_settings = WorldSettings::default();
+    /// let mut player = Player::spawn(&world_settings);
     /// assert_eq!(player.max_health(), 30.0);
     /// ```
     pub fn max_health(&self) -> f32 {
@@ -57,7 +58,8 @@ impl Player {
     /// # use wotw_seedgen::world::Player;
     /// use wotw_seedgen::settings::WorldSettings;
     /// 
-    /// let player = Player::spawn(WorldSettings::default());
+    /// let world_settings = WorldSettings::default();
+    /// let mut player = Player::spawn(&world_settings);
     /// assert_eq!(player.max_energy(), 3.0);
     /// ```
     pub fn max_energy(&self) -> f32 {
@@ -83,7 +85,8 @@ impl Player {
     /// use wotw_seedgen::settings::WorldSettings;
     /// use wotw_seedgen::util::Orbs;
     /// 
-    /// let player = Player::spawn(WorldSettings::default());
+    /// let world_settings = WorldSettings::default();
+    /// let player = Player::spawn(&world_settings);
     /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
     /// 
     /// player.cap_orbs(&mut orbs, false);
@@ -101,9 +104,10 @@ impl Player {
     /// use wotw_seedgen::item::Shard;
     /// use wotw_seedgen::settings::Difficulty;
     /// 
-    /// let mut player = Player::spawn(WorldSettings::default());
+    /// let mut world_settings = WorldSettings::default();
+    /// world_settings.difficulty = Difficulty::Gorlek;
+    /// let mut player = Player::spawn(&world_settings);
     /// player.inventory.grant(Item::Shard(Shard::Vitality), 1);
-    /// player.settings.difficulty = Difficulty::Gorlek;
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
     /// 
     /// player.cap_orbs(&mut orbs, false);
@@ -147,7 +151,8 @@ impl Player {
     /// use wotw_seedgen::Item;
     /// use wotw_seedgen::item::Resource;
     /// 
-    /// let mut player = Player::spawn(WorldSettings::default());
+    /// let world_settings = WorldSettings::default();
+    /// let mut player = Player::spawn(&world_settings);
     /// assert_eq!(player.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     /// 
@@ -181,7 +186,8 @@ impl Player {
     /// use wotw_seedgen::Item;
     /// use wotw_seedgen::item::Resource;
     /// 
-    /// let mut player = Player::spawn(WorldSettings::default());
+    /// let world_settings = WorldSettings::default();
+    /// let mut player = Player::spawn(&world_settings);
     /// assert_eq!(player.health_plant_drops(), 1.0);
     /// 
     /// player.inventory.grant(Item::Resource(Resource::Health), 8);
@@ -414,7 +420,8 @@ mod tests {
 
     #[test]
     fn inventory() {
-        let mut player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
         player.inventory.grant(Item::BonusItem(BonusItem::Relic), 2);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         assert!(player.inventory.has(&Item::BonusItem(BonusItem::Relic), 1));
@@ -425,13 +432,15 @@ mod tests {
 
     #[test]
     fn weapon_preference() {
-        let mut player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
         assert_eq!(player.preferred_weapon(true), None);
         assert_eq!(player.preferred_ranged_weapon(), None);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         assert_eq!(player.preferred_weapon(true), Some(Skill::Shuriken));
         assert_eq!(player.preferred_ranged_weapon(), None);
-        player.settings.difficulty = Difficulty::Gorlek;
+        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(player.preferred_ranged_weapon(), Some(Skill::Shuriken));
         player.inventory.grant(Item::Skill(Skill::Spear), 1);
         assert_eq!(player.preferred_weapon(true), Some(Skill::Shuriken));
@@ -439,7 +448,7 @@ mod tests {
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
         assert_eq!(player.preferred_weapon(true), Some(Skill::Sword));
 
-        player = Player::new(WorldSettings::default());
+        player = Player::new(&world_settings);
         let weapons: SmallVec<[_; 8]> = smallvec![
             Skill::Sword,
             Skill::Hammer,
@@ -460,7 +469,8 @@ mod tests {
             Skill::Shuriken,
         ];
         assert_eq!(player.progression_weapons(false), weapons);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         let weapons: SmallVec<[_; 5]> = smallvec![
             Skill::Sword,
             Skill::Hammer,
@@ -473,24 +483,28 @@ mod tests {
 
     #[test]
     fn max_energy() {
-        let mut player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
         assert_eq!(player.max_energy(), 0.0);
         for _ in 0..10 { player.inventory.grant(Item::Resource(Resource::Energy), 1); }
         player.inventory.grant(Item::Shard(Shard::Energy), 1);
         assert_eq!(player.max_energy(), 5.0);
-        player.settings.difficulty = Difficulty::Gorlek;
+        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(player.max_energy(), 6.0);
     }
 
     #[test]
     fn destroy_cost() {
-        let mut player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
         assert_eq!(player.destroy_cost(10.0, Skill::Bow, false), 1.5);
         assert_eq!(player.destroy_cost(10.0, Skill::Spear, true), 4.0);
         assert_eq!(player.destroy_cost(0.0, Skill::Spear, false), 0.0);
         player.inventory.grant(Item::Skill(Skill::AncestralLight1), 1);
         player.inventory.grant(Item::Skill(Skill::AncestralLight2), 1);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         player.inventory.grant(Item::Shard(Shard::Wingclip), 1);
         player.inventory.grant(Item::Resource(Resource::ShardSlot), 1);
         assert_eq!(player.destroy_cost(10.0, Skill::Bow, true), 0.25);
@@ -499,7 +513,8 @@ mod tests {
 
     #[test]
     fn refill_orbs() {
-        let mut player = Player::spawn(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::spawn(&world_settings);
 
         let expected = [30.,35.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,41.,42.,44.,45.,47.,48.,50.,52.,53.,55.,56.,58.,59.,61.,62.,64.,65.,66.,68.,69.];
         for health in expected {
@@ -507,7 +522,7 @@ mod tests {
             player.inventory.grant(Item::Resource(Resource::Health), 1);
         }
 
-        player = Player::new(WorldSettings::default());
+        player = Player::new(&world_settings);
 
         let expected = [0.,0.,0.,0.,1.,1.,1.,1.,1.,2.,2.,2.,2.,2.,2.,2.,3.,3.,3.,3.,3.,4.,4.,4.,4.,4.,4.,4.,5.,5.,5.,5.,5.,6.,6.,6.,6.,6.,6.,6.,7.,7.,7.,7.,7.,8.,8.];
         for drops in expected {
@@ -515,8 +530,8 @@ mod tests {
             player.inventory.grant(Item::Resource(Resource::Health), 1);
         }
 
-        player = Player::new(WorldSettings::default());
-        player.settings.difficulty = Difficulty::Gorlek;
+        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
+        player = Player::new(&world_settings);
 
         player.inventory.grant(Item::Shard(Shard::Energy), 1);
         player.inventory.grant(Item::Shard(Shard::Vitality), 1);

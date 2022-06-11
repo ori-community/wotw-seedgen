@@ -7,7 +7,7 @@ use crate::item::Shard;
 
 use super::Spell;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum Icon {
     Shard(Shard),
     Spell(Spell),
@@ -44,7 +44,7 @@ impl fmt::Display for Icon {
     }
 }
 
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum OpherIcon {
     Sentry = 0,
@@ -60,14 +60,14 @@ pub enum OpherIcon {
     WaterBreath = 10,
     FastTravel = 11,
 }
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum LupoIcon {
     EnergyFragmentsMap = 0,
     HealthFragmentsMap = 1,
     ShardsMap = 2,
 }
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum GromIcon {
     RepairTheSpiritWell = 0,
@@ -78,7 +78,7 @@ pub enum GromIcon {
     ThornySituation = 5,
     TheGorlekTouch = 6,
 }
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum TuleyIcon {
     SelaFlowers = 0,
@@ -87,4 +87,18 @@ pub enum TuleyIcon {
     BlueMoon = 3,
     SpringPlants = 4,
     TheLastSeed = 5,
+}
+
+pub enum MapIcon {
+    Keystone,
+    Health,
+    Energy,
+    Ore,
+    ShardSlot,
+    SpiritLight,
+    Skill,
+    Shard,
+    Teleporter,
+    QuestItem,
+    Other,
 }

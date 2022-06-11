@@ -522,8 +522,8 @@ mod tests {
 
     #[test]
     fn is_met() {
-        let mut player = Player::new(WorldSettings::default());
-        let empty_player = player.clone();
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
 
         player.inventory.grant(Item::Resource(Resource::Health), 1);
         let mut states = FxHashSet::default();
@@ -543,9 +543,11 @@ mod tests {
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
 
@@ -573,60 +575,68 @@ mod tests {
         let req = Requirement::Danger(60.0);
         assert_eq!(req.is_met(&player, &states, Orbs { health: 30.0, energy: player.max_energy() }), Some(smallvec![Orbs { health: 30.0, energy: -1.0 }]));
 
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let req = Requirement::BreakWall(12.0);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { ..orbs }]));
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         player.inventory.grant(Item::Skill(Skill::Grenade), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 3);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let req = Requirement::BreakWall(16.0);
         player.inventory.grant(Item::Skill(Skill::Grenade), 1);
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -1.0, ..orbs }]));
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
 
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let req = Requirement::ShurikenBreak(12.0);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 4);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
         player.inventory.grant(Item::Resource(Resource::Energy), 6);
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -6.0, ..orbs }]));
 
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let req = Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]);
         player.inventory.grant(Item::Skill(Skill::Bow), 1);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 7);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -3.25, ..orbs }]));
         player.inventory.grant(Item::Resource(Resource::Energy), 6);
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -6.5, ..orbs }]));
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let req = Requirement::Combat(smallvec![(Enemy::Sandworm, 1), (Enemy::Bat, 1), (Enemy::EnergyRefill, 99), (Enemy::ShieldMiner, 2), (Enemy::EnergyRefill, 1), (Enemy::Balloon, 4)]);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         player.inventory.grant(Item::Skill(Skill::Spear), 1);
         player.inventory.grant(Item::Resource(Resource::Energy), 27);
-        player.settings.difficulty = Difficulty::Gorlek;
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
+        player.settings = &world_settings;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -14.0, ..orbs }]));
@@ -634,26 +644,30 @@ mod tests {
         player.inventory.grant(Item::Skill(Skill::Bash), 1);
         player.inventory.grant(Item::Skill(Skill::Launch), 1);
         player.inventory.grant(Item::Skill(Skill::Burrow), 1);
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -33.0, ..orbs }]));
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let req = Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]);
         player.inventory.grant(Item::Skill(Skill::Spear), 1);
         player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         player.inventory.grant(Item::Resource(Resource::Energy), 4);
-        player.settings.difficulty = Difficulty::Gorlek;
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
+        player.settings = &world_settings;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }]));
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 11);
         assert!(req.is_met(&player, &states, player.max_orbs()).is_none());
         player.inventory.grant(Item::Resource(Resource::Energy), 1);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -8.0, ..orbs }]));
 
-        player = empty_player.clone();
+        player = Player::new(&world_settings);
         let a = Requirement::EnergySkill(Skill::Blaze, 2.0);
         let b = Requirement::Damage(20.0);
         let c = Requirement::EnergySkill(Skill::Blaze, 1.0);
@@ -662,7 +676,8 @@ mod tests {
         player.inventory.grant(Item::Resource(Resource::Energy), 4);
         player.inventory.grant(Item::Resource(Resource::Health), 5);
         let req = Requirement::And(vec![c.clone(), d.clone()]);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { health: -10.0, energy: -1.0 }]));
         let req = Requirement::Or(vec![a.clone(), b.clone()]);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs { energy: -2.0, ..orbs }, Orbs { health: -20.0, ..orbs }]));
@@ -679,8 +694,9 @@ mod tests {
         let req = Requirement::Or(vec![b.clone(), Requirement::Free]);
         assert_eq!(req.is_met(&player, &states, player.max_orbs()), Some(smallvec![Orbs::default()]));
 
-        player = empty_player.clone();
-        player.settings.difficulty = Difficulty::Unsafe;
+        player = Player::new(&world_settings);
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         player.inventory.grant(Item::Resource(Resource::Health), 7);
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         let req = Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]);
@@ -697,7 +713,8 @@ mod tests {
 
     #[test]
     fn items_needed() {
-        let mut player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
         let states = Vec::default();
         let orbs = Orbs::default();
 
@@ -719,12 +736,14 @@ mod tests {
 
         let req = Requirement::EnergySkill(Skill::Grenade, 2.0);
         assert_eq!(req.items_needed(&player, &states), vec![(Inventory::from(Item::Skill(Skill::Grenade)), Orbs { energy: -4.0, ..orbs })]);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::from(Item::Skill(Skill::Grenade)), Orbs { energy: -2.0, ..orbs }),
             (Inventory::from(vec![Item::Skill(Skill::Grenade), Item::Shard(Shard::Overcharge)]), Orbs { energy: -1.0, ..orbs }),
         ]);
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
 
         let req = Requirement::Resource(Resource::ShardSlot, 3);
         assert_eq!(req.items_needed(&player, &states), vec![(Inventory::from((Item::Resource(Resource::ShardSlot), 3)), orbs)]);
@@ -737,12 +756,14 @@ mod tests {
 
         let req = Requirement::Damage(36.0);
         assert_eq!(req.items_needed(&player, &states), vec![(Inventory::default(), Orbs { health: -36.0, ..orbs })]);
-        player.settings.difficulty = Difficulty::Gorlek;
+        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::default(), Orbs { health: -36.0, ..orbs }),
             (Inventory::from(Item::Shard(Shard::Resilience)), Orbs { health: -36.0 * 0.9, ..orbs }),
         ]);
-        player.settings.difficulty = Difficulty::Moki;
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
+        player.settings = &world_settings;
 
         let req = Requirement::BreakWall(12.0);
         assert_eq!(req.items_needed(&player, &states), vec![
@@ -754,7 +775,8 @@ mod tests {
             (Inventory::from(Item::Skill(Skill::Blaze)), Orbs { energy: -2.0, ..orbs }),
             (Inventory::from(Item::Skill(Skill::Spear)), Orbs { energy: -4.0, ..orbs }),
         ]);
-        player.settings.difficulty = Difficulty::Unsafe;
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::from(Item::Skill(Skill::Sword)), orbs),
             (Inventory::from(Item::Skill(Skill::Hammer)), orbs),
@@ -780,7 +802,8 @@ mod tests {
         ]);
 
         let req = Requirement::Combat(smallvec![(Enemy::Slug, 1)]);
-        player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let player = Player::new(&world_settings);
 
         assert_eq!(req.items_needed(&player, &states), vec![
             (Inventory::from(Item::Skill(Skill::Sword)), orbs),

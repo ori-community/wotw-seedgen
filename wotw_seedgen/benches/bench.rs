@@ -31,8 +31,8 @@ fn parsing(c: &mut Criterion) {
 }
 
 fn requirements(c: &mut Criterion) {
-    let mut player = Player::new(WorldSettings::default());
-    player.settings.difficulty = Difficulty::Unsafe;
+    let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+    let mut player = Player::new(&world_settings);
     let states = FxHashSet::default();
 
     let req_a = Requirement::EnergySkill(Skill::Blaze, 2.0);
@@ -45,7 +45,8 @@ fn requirements(c: &mut Criterion) {
     let req = Requirement::And(vec![Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()]), Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()])]);
     c.bench_function("nested ands and ors", |b| b.iter(|| req.is_met(&player, &states, player.max_orbs())));
 
-    player = Player::new(WorldSettings::default());
+    let world_settings = WorldSettings::default();
+    player = Player::new(&world_settings);
     player.inventory.grant(Item::Skill(Skill::Bow), 1);
     player.inventory.grant(Item::Resource(Resource::Energy), 40);
     let req = Requirement::Combat(smallvec![
@@ -77,7 +78,8 @@ fn reach_checking(c: &mut Criterion) {
     let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
 
     c.bench_function("short reach check", |b| b.iter(|| {
-        let mut player = Player::new(WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut player = Player::new(&world_settings);
         player.inventory.grant(Item::Resource(Resource::Health), 40);
         player.inventory.grant(Item::Resource(Resource::Energy), 40);
         player.inventory.grant(Item::Resource(Resource::Keystone), 34);
@@ -87,12 +89,13 @@ fn reach_checking(c: &mut Criterion) {
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
         player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         player.inventory.grant(Item::Skill(Skill::Dash), 1);
-        let world = World::new(&graph, WorldSettings::default());
+        let world = World::new(&graph, &world_settings);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
         world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
     }));
     c.bench_function("long reach check", |b| b.iter(|| {
-        let mut world = World::new(&graph, WorldSettings::default());
+        let world_settings = WorldSettings::default();
+        let mut world = World::new(&graph, &world_settings);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
@@ -125,4 +128,4 @@ criterion_group!(only_parsing, parsing);
 criterion_group!(only_requirements, requirements);
 criterion_group!(only_reach_checking, reach_checking);
 criterion_group!(only_generation, generation);
-criterion_main!(only_parsing);  // put any of the group names in here
+criterion_main!(only_generation);  // put any of the group names in here

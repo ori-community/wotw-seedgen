@@ -7,7 +7,7 @@ use wotw_seedgen_derive::VVariant;
 
 use crate::{item::{Item, UberStateItem, UberStateOperator}, header::V};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum UberType {
     Bool,
     Teleporter,

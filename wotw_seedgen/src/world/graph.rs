@@ -34,8 +34,8 @@ pub struct Anchor {
 #[derive(Debug)]
 pub struct Pickup {
     pub identifier: String,
-    pub position: Position,
-    pub map_position: Position,
+    pub position: Option<Position>,
+    pub map_position: Option<Position>,
     pub zone: Zone,
     pub index: usize,
     pub uber_state: UberState,
@@ -49,8 +49,8 @@ pub struct State {
 #[derive(Debug)]
 pub struct Quest {
     pub identifier: String,
-    pub position: Position,
-    pub map_position: Position,
+    pub position: Option<Position>,
+    pub map_position: Option<Position>,
     pub zone: Zone,
     pub index: usize,
     pub uber_state: UberState,
@@ -106,17 +106,17 @@ impl Node {
     pub fn position(&self) -> Option<&Position> {
         match self {
             Node::Anchor(anchor) => anchor.position.as_ref(),
-            Node::Pickup(pickup) => Some(&pickup.position),
+            Node::Pickup(pickup) => pickup.position.as_ref(),
             Node::State(_) => None,
-            Node::Quest(quest) => Some(&quest.position),
+            Node::Quest(quest) => quest.position.as_ref(),
         }
     }
     pub fn map_position(&self) -> Option<&Position> {
         match self {
             Node::Anchor(anchor) => anchor.position.as_ref(),
-            Node::Pickup(pickup) => Some(&pickup.map_position),
+            Node::Pickup(pickup) => pickup.map_position.as_ref(),
             Node::State(_) => None,
-            Node::Quest(quest) => Some(&quest.map_position),
+            Node::Quest(quest) => quest.map_position.as_ref(),
         }
     }
     pub fn can_place(&self) -> bool {
@@ -138,8 +138,8 @@ pub type Reached<'a> = Vec<&'a Node>;
 pub type Progressions<'a> = Vec<(&'a Requirement, SmallVec<[Orbs; 3]>)>;
 
 #[derive(Debug)]
-struct ReachContext<'a, 'b> {
-    player: &'b Player,
+struct ReachContext<'a, 'b, 'c> {
+    player: &'b Player<'c>,
     progression_check: bool,
     states: FxHashSet<usize>,
     state_progressions: FxHashMap<usize, Vec<(usize, &'a Connection)>>,
@@ -149,9 +149,22 @@ struct ReachContext<'a, 'b> {
 #[derive(Debug)]
 pub struct Graph {
     pub nodes: Vec<Node>,
+    pub spawn_pickup_node: Node,
 }
 impl Graph {
-    fn follow_state_progressions<'a>(&'a self, index: usize, context: &mut ReachContext<'a, '_>) -> (Reached<'a>, Progressions<'a>) {
+    pub fn new(nodes: Vec<Node>) -> Graph {
+        let spawn_pickup_node = Node::Pickup(Pickup {
+            identifier: String::from("Spawn"),
+            zone: Zone::Spawn,
+            index: usize::MAX,
+            uber_state: UberState::spawn(),
+            position: None,
+            map_position: None,
+        });
+        Graph { nodes, spawn_pickup_node }
+    }
+
+    fn follow_state_progressions<'a>(&'a self, index: usize, context: &mut ReachContext<'a, '_, '_>) -> (Reached<'a>, Progressions<'a>) {
         let mut reached = Vec::new();
         let mut progressions = Vec::new();
         if let Some(connections) = context.state_progressions.get(&index) {
@@ -180,7 +193,7 @@ impl Graph {
         target_orbs
     }
 
-    fn reach_recursion<'a>(&'a self, entry: &'a Node, is_spawn: bool, mut best_orbs: SmallVec<[Orbs; 3]>, context: &mut ReachContext<'a, '_>) -> (Reached<'a>, Progressions<'a>) {
+    fn reach_recursion<'a>(&'a self, entry: &'a Node, is_spawn: bool, mut best_orbs: SmallVec<[Orbs; 3]>, context: &mut ReachContext<'a, '_, '_>) -> (Reached<'a>, Progressions<'a>) {
         context.world_state.insert(entry.index(), best_orbs.clone());
         match entry {
             Node::Anchor(anchor) => {

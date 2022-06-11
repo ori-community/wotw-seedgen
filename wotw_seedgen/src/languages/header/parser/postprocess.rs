@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 
 use regex::Regex;
 
-use crate::{world::Graph, settings::WorldSettings, util::{UberState, Zone}};
+use crate::{world::Graph, util::{UberState, Zone}, Settings};
 
 fn read_args(seed: &str, start_index: usize) -> Option<usize> {
     let mut depth: u8 = 1;
@@ -17,7 +17,7 @@ fn read_args(seed: &str, start_index: usize) -> Option<usize> {
     None
 }
 
-fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, settings: &[&WorldSettings]) -> Result<String, String> {
+fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, settings: &Settings) -> Result<String, String> {
     let re = Regex::new(&format!(r"^({})$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))?;
 
     for mut line in seeds[world_index].lines() {
@@ -45,7 +45,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
                 for other_world_index in other_worlds {
                     let actual_zone = where_is(&actual_item, other_world_index, seeds, graph, settings)?;
                     if &actual_zone != "Unknown" {
-                        let player_name = &settings[other_world_index].world_name;
+                        let player_name = &settings.world_settings[other_world_index].world_name;
 
                         return Ok(format!("{}'s {}", player_name, actual_zone));
                     }
@@ -123,7 +123,7 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
     Ok(locations)
 }
 
-pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &[&WorldSettings]) -> Result<(), String> {
+pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &Settings) -> Result<(), String> {
     let clone = seeds.clone();
 
     for (world_index, seed) in seeds.iter_mut().enumerate() {

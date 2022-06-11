@@ -18,7 +18,7 @@ fn new(input: &str) -> Parser { crate::languages::Parser::new(input, tokenize(in
 
 /// Syntax Tree representing an areas file
 /// 
-/// This is one needed component that has to be passed to [`logic::build`]
+/// This is one needed component that has to be passed to [`logic::build`](crate::logic::build)
 /// 
 /// Use [`Areas::parse`] to parse a string into this format
 #[derive(Debug, Clone)]

@@ -3,7 +3,7 @@ use wotw_seedgen_derive::FromStr;
 
 use crate::util::{Icon, icon::OpherIcon};
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum BonusUpgrade {
     RapidHammer = 0,

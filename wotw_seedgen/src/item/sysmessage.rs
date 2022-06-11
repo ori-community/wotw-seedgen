@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::util::Zone;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
 pub enum SysMessage {
     RelicList,
     MapRelicList(Zone),

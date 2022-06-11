@@ -5,7 +5,7 @@ use wotw_seedgen_derive::VVariant;
 use crate::util::{UberIdentifier, Icon};
 use crate::header::{VString, vdisplay};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum ShopCommand {
     SetIcon { uber_identifier: UberIdentifier, icon: Icon },
     SetTitle { uber_identifier: UberIdentifier, #[VType] title: Option<String> },

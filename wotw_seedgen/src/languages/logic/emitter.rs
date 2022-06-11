@@ -245,6 +245,9 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedStat
     for location in locations {
         let Location { name, zone, uber_state, position, map_position } = location;
         let identifier = name;
+        let position = if position.x == 0. && position.y == 0. { None } else { Some(position) };
+        let map_position = if map_position.x == 0. && map_position.y == 0. { None } else { Some(map_position) };
+
         add_entry(&mut node_map, &identifier, index)?;
         let node = match quests.contains(&identifier[..]) {
             true => Node::Quest(graph::Quest { identifier, zone, index, uber_state, position, map_position }),
@@ -316,7 +319,7 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedStat
         check_unused_states(&nodes, &states);
     }
 
-    Ok(Graph { nodes })
+    Ok(Graph::new(nodes))
 }
 
 fn check_unused_states(nodes: &[Node], states: &FxHashSet<&str>) {

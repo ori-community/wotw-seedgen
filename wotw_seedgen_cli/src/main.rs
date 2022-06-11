@@ -17,7 +17,7 @@ use bugsalot::debugger;
 
 use log::LevelFilter;
 
-use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::WorldPreset, Preset, Settings, logic, Header};
+use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::WorldPreset, Preset, Settings, logic, Header, generator::Seed};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
@@ -303,6 +303,9 @@ struct SeedArgs {
     /// write stderr logs in json format
     #[structopt(long)]
     json_stderr: bool,
+    /// write spoiler in json format
+    #[structopt(long)]
+    json_spoiler: bool,
     /// launch the seed after generating
     #[structopt(short, long)]
     launch: bool,
@@ -639,9 +642,9 @@ fn read_stdin() -> Result<String, String> {
     Ok(output)
 }
 
-fn write_seeds_to_files(seeds: &[String], mut filename: String, mut folder: PathBuf, players: &[String]) -> Result<(), String> {
-    let seed_count = seeds.len();
-    let multiworld = seed_count > 1;
+fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, players: &[String], json_spoiler: bool) -> Result<(), String> {
+    let seeds = seed.seed_files()?;
+    let multiworld = seeds.len() > 1;
 
     if multiworld {
         let mut multi_folder = folder.clone();
@@ -653,11 +656,12 @@ fn write_seeds_to_files(seeds: &[String], mut filename: String, mut folder: Path
     for (index, seed) in seeds.iter().enumerate() {
         let player = players.get(index).cloned().unwrap_or_else(|| format!("Player {}", index + 1));
 
-        if multiworld {
-            filename = player.clone();
-        }
         let mut path = folder.clone();
-        path.push(filename.clone());
+        if multiworld {
+            path.push(&player);
+        } else {
+            path.push(filename);
+        }
         path.set_extension("wotwr");
 
         let file = util::create_file(&path, seed, "", true)?;
@@ -673,11 +677,34 @@ fn write_seeds_to_files(seeds: &[String], mut filename: String, mut folder: Path
         }
     }
 
+    let mut path = folder;
+    path.push(format!("{filename}_spoiler"));
+
+    let contents = match json_spoiler {
+        true => {
+            path.set_extension("json");
+            seed.spoiler.to_json()
+        },
+        false => {
+            path.set_extension("txt");
+            seed.spoiler.to_string()
+        },
+    };
+
+    let file = util::create_file(path, &contents, "", true).map_err(|err| format!("Error writing spoiler: {err}"))?;
+    log::info!("Wrote spoiler to {}", file.display());
+
     Ok(())
 }
 
-fn write_seeds_to_stdout(seeds: Vec<String>) {
-    println!("{}", seeds.join("\n======= END SEED =======\n"));
+fn write_seeds_to_stdout(seed: &Seed, json_spoiler: bool) -> Result<(), String> {
+    let seeds =  seed.seed_files()?.join("\n======= END SEED =======\n");
+    let spoiler =  match json_spoiler {
+        true => seed.spoiler.to_json(),
+        false => seed.spoiler.to_string(),
+    };
+    println!("{seeds}\n======= SPOILER =======\n{spoiler}");
+    Ok(())
 }
 
 fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
@@ -701,7 +728,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
 
     let worlds = settings.world_count();
     let players = settings.world_settings.iter().map(|world_settings| world_settings.world_name.clone()).collect::<Vec<_>>();
-    let seeds = wotw_seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let seed = wotw_seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -709,11 +736,11 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     }
 
     if args.tostdout {
-        write_seeds_to_stdout(seeds);
+        write_seeds_to_stdout(&seed, args.json_spoiler)?;
     } else {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
-        write_seeds_to_files(&seeds, filename, args.seed_folder, &players).unwrap_or_else(|err| log::error!("{}", err));
+        write_seeds_to_files(&seed, &filename, args.seed_folder, &players, args.json_spoiler)?;
     }
 
     if args.launch {
@@ -779,7 +806,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<String, String> {
     let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
     let graph = logic::parse_logic(&areas, &locations, &states, &settings, false)?;
     let world_settings = settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
-    let mut world = World::new(&graph, world_settings);
+    let mut world = World::new(&graph, &world_settings);
 
     world.player.inventory.grant(Item::Resource(Resource::Health), args.health / 5);
     #[allow(clippy::cast_possible_truncation)]

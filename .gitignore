@@ -4,3 +4,5 @@ rls/*
 *.log
 *.currentseedpath
 Cargo.lock
+*spoiler*.txt
+*spoiler*.json

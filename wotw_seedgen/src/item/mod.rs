@@ -15,12 +15,13 @@ use std::fmt;
 use std::str::FromStr;
 
 use rustc_hash::FxHashMap;
+use serde::{Serialize, Serializer};
 use wotw_seedgen_derive::VVariant;
 
 use crate::header::parser;
 use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
-use crate::util::{Zone, Icon, UberState, UberIdentifier};
+use crate::util::{Zone, Icon, MapIcon, UberState, UberIdentifier};
 
 pub use self::{
     resource::Resource,
@@ -37,28 +38,28 @@ pub use self::{
     shop_command::{ShopCommand, VShopCommand},
 };
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum Item {
-    SpiritLight(#[VWrap] u32),
-    RemoveSpiritLight(#[VWrap] u32),
-    Resource(Resource),
-    Skill(Skill),
-    RemoveSkill(Skill),
-    Shard(Shard),
-    RemoveShard(Shard),
-    Command(#[VType] Command),
-    Teleporter(Teleporter),
-    RemoveTeleporter(Teleporter),
-    Message(#[VType] Message),
-    UberState(#[VType] UberStateItem),
+    Relic(Zone),
     Water,
     RemoveWater,
+    Skill(Skill),
+    RemoveSkill(Skill),
+    Teleporter(Teleporter),
+    RemoveTeleporter(Teleporter),
+    Resource(Resource),
+    Shard(Shard),
+    RemoveShard(Shard),
     BonusItem(BonusItem),
     BonusUpgrade(BonusUpgrade),
-    Relic(Zone),
-    SysMessage(SysMessage),
+    SpiritLight(#[VWrap] u32),
+    RemoveSpiritLight(#[VWrap] u32),
+    Message(#[VType] Message),
+    UberState(#[VType] UberStateItem),
+    Command(#[VType] Command),
     WheelCommand(#[VType] WheelCommand),
     ShopCommand(#[VType] ShopCommand),
+    SysMessage(SysMessage),
 }
 vdisplay! {
     VItem,
@@ -308,6 +309,26 @@ impl Item {
             Item::Relic(_) => Some(Icon::File(String::from("assets/icons/game/relic.png"))),
             _ => None,
         }
+    }
+    pub fn map_icon(&self) -> MapIcon {
+        match self {
+            Item::SpiritLight(_) => MapIcon::SpiritLight,
+            Item::Resource(resource) => resource.map_icon(),
+            Item::Skill(_) => MapIcon::Skill,
+            Item::Shard(_) => MapIcon::Shard,
+            Item::Teleporter(_) => MapIcon::Teleporter,
+            Item::Water | Item::Relic(_) => MapIcon::QuestItem,
+            _ => MapIcon::Other,
+        }
+    }
+}
+
+impl Serialize for Item {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&self.code())
     }
 }
 

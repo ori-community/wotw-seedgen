@@ -3,9 +3,9 @@ use std::fmt;
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::FromStr;
 
-use crate::util::Icon;
+use crate::util::{Icon, MapIcon};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Resource {
     Health = 0,
@@ -34,5 +34,14 @@ impl Resource {
             Resource::Keystone => Icon::File(String::from("assets/icons/game/keystone.png")),
             Resource::ShardSlot => Icon::File(String::from("assets/icons/game/shardslot.png")),
         })
+    }
+    pub fn map_icon(&self) -> MapIcon {
+        match self {
+            Resource::Health => MapIcon::Health,
+            Resource::Energy => MapIcon::Energy,
+            Resource::Ore => MapIcon::Ore,
+            Resource::Keystone => MapIcon::Keystone,
+            Resource::ShardSlot => MapIcon::ShardSlot,
+        }
     }
 }

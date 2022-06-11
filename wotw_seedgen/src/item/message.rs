@@ -8,7 +8,7 @@ use crate::VItem;
 use crate::header::{VResolve, VString, parser};
 use crate::languages::TokenKind;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct Message {
     #[VType] pub message: String,
     pub frames: Option<u32>,
@@ -35,10 +35,10 @@ impl Message {
     pub fn code(&self) -> String {
         let mut code = self.message.clone();
         if let Some(frames) = self.frames {
-            code.push_str(&format!("f={frames}"));
+            code.push_str(&format!("|f={frames}"));
         }
         if let Some(pos) = self.pos {
-            code.push_str(&format!("p={pos}"));
+            code.push_str(&format!("|p={pos}"));
         }
         if self.mute { code.push_str("|mute") }
         if self.instant { code.push_str("|instant") }

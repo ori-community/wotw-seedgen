@@ -5,7 +5,7 @@ use crate::util::icon::OpherIcon;
 use crate::util::{Icon, Spell};
 use crate::settings::Difficulty;
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Skill {
     Bash = 0,

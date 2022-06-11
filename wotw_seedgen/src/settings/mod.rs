@@ -10,7 +10,7 @@ use rand::distributions::{Distribution, Uniform};
 use wotw_seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize};
 
-use crate::{Preset, preset::WorldPreset};
+use crate::{Preset, preset::WorldPreset, util::constants::DEFAULT_SPAWN};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -399,8 +399,6 @@ impl WorldSettings {
         self.apply_world_preset_guarded(preset, already_applied)
     }
 }
-
-pub const DEFAULT_SPAWN: &str = "MarshSpawn.Main";
 
 /// The Spawn destination, determining the starting location of the seed
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]

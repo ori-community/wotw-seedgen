@@ -7,7 +7,7 @@ use super::{Item, VItem, Resource};
 use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool, Spell};
 use crate::header::{VString, vdisplay};
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum Command {
     Autosave,
     Resource { resource: Resource, #[VWrap] amount: i16 },
@@ -119,7 +119,7 @@ vdisplay! {
     }
 }
 
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum ToggleCommand {
     KwolokDoor = 0,
@@ -127,7 +127,7 @@ pub enum ToggleCommand {
     Howl = 2,
 }
 
-#[derive(Debug, Display, PartialEq, Eq, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum EquipSlot {
     Ability1,
