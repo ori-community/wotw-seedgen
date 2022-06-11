@@ -9758,6 +9758,8 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
     unsafe:
       Damage=180, Bash
       Damage=160, Spear=1
+      Flap, Water OR Damage=220
+      Flap, WaterDash, Damage=100
       Grenade=1, Water OR Damage=180  # grenade redirect
   
   pickup PoolsApproach.AboveWheelEX:
