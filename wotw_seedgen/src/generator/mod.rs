@@ -51,9 +51,7 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Seed, String> 
     Ok(Seed { worlds, settings, graph, spoiler })
 }
 
-fn parse_headers<R>(world: &mut World, rng: &mut R) -> Result<(Vec<String>, String), String>
-where R: Rng
-{
+fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, String), String> {
     validate_header_names(&world.player.settings.headers, &world.player.settings.inline_headers)?;
 
     let mut config_map = build_config_map(&world.player.settings.header_config)?;

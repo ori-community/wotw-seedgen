@@ -63,7 +63,7 @@ impl Header {
     /// Parse complete header syntax
     /// 
     /// All `!!pool`, `!!flush` and `!!take` syntax will be evaluated at this time, using the provided rng
-    pub fn parse<R: Rng>(mut input: String, rng: &mut R) -> Result<Header, ParseErrorCollection> {
+    pub fn parse(mut input: String, rng: &mut impl Rng) -> Result<Header, ParseErrorCollection> {
         // TODO not actually parsing pool means anything using pool gets wrong errors
         parser::preprocess(&mut input, rng).map_err(|err| vec![ParseError::new(format!("Error preprocessing: {err}"), "", 0..0)])?;
         let mut parser = parser::new(&input);

@@ -7,7 +7,7 @@ use crate::util::extensions::StrExtension;
 use super::trim_comment;
 
 type Replacements = Vec<(Range<usize>, String)>;
-fn determine_replacements<R: Rng>(input: &str, rng: &mut R) -> Result<Replacements, String> {
+fn determine_replacements(input: &str, rng: &mut impl Rng) -> Result<Replacements, String> {
     let mut pool = vec![];
     let mut replacements = vec![];
 
@@ -54,7 +54,7 @@ fn apply_replacements(input: &mut String, replacements: Replacements) {
 /// Process all `!!pool`, `!!flush` and `!!take` statements before evaluation of the syntax
 /// 
 /// `!!pool` and `!!flush` will only be accepted at the start of lines, `!!take` can be in any location
-pub(crate) fn preprocess<R: Rng>(input: &mut String, rng: &mut R) -> Result<(), String> {
+pub(crate) fn preprocess(input: &mut String, rng: &mut impl Rng) -> Result<(), String> {
     let replacements = determine_replacements(input, rng)?;
     apply_replacements(input, replacements);
     Ok(())

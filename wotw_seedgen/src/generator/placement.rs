@@ -803,10 +803,7 @@ impl SpiritLightAmounts {
             index: 0,
         }
     }
-    fn sample<R>(&mut self, rng: &mut R) -> u32
-    where
-        R: Rng + ?Sized
-    {
+    fn sample(&mut self, rng: &mut impl Rng) -> u32 {
         #[allow(clippy::cast_precision_loss)]
         let amount = (self.factor * self.index.pow(2) as f32 + 50.0 * self.noise.sample(rng)).round();
         self.index += 1;
@@ -1286,10 +1283,7 @@ fn generate_placements_from_spawn<'a, 'b>(
     }
 }
 
-fn pick_spawn<'a, R>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut R) -> Result<&'a Node, String>
-where
-    R: Rng
-{
+fn pick_spawn<'a>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut impl Rng) -> Result<&'a Node, String> {
     let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
     let spawn = match &world_settings.spawn {
         Spawn::Random => valid
@@ -1313,13 +1307,11 @@ where
     Ok(spawn)
 }
 
-pub(super) fn generate_placements<'a, 'b, R>(
+pub(super) fn generate_placements<'a, 'b>(
     graph: &'a Graph,
     worlds: Vec<World<'a, 'b>>,
-    rng: &mut R
-) -> Result<(Vec<SeedWorld<'a>>, SeedSpoiler), String>
-where R: Rng
-{
+    rng: &mut impl Rng
+) -> Result<(Vec<SeedWorld<'a>>, SeedSpoiler), String> {
     let mut index = 0;
     loop {
         let spawn_locs = worlds.iter()

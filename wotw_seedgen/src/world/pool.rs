@@ -115,10 +115,7 @@ impl Pool {
         true
     }
 
-    pub fn choose_random<R>(&self, multiworld_spread: bool, rng: &mut R) -> Option<&Item>
-    where
-        R: Rng
-    {
+    pub fn choose_random(&self, multiworld_spread: bool, rng: &mut impl Rng) -> Option<&Item> {
         let mut items = self.inventory.items.iter().collect::<Vec<_>>();
         if multiworld_spread {
             items.retain(|&(item, _)| item.is_multiworld_spread());
