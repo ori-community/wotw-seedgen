@@ -6,7 +6,7 @@ pub(crate) mod extensions;
 
 pub use orbs::Orbs;
 pub use icon::{Icon, MapIcon};
-use serde::{Serialize, Serializer};
+use serde::{Serialize, Serializer, Deserialize};
 use serde::ser::SerializeStruct;
 pub use uber_state::{UberState, VUberState, UberIdentifier, UberType};
 
@@ -181,22 +181,33 @@ pub enum NodeKind {
     Quest,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant, Serialize, Deserialize)]
+#[serde(into = "SerdePosition", from = "SerdePosition")]
 pub struct Position {
     #[VWrap]
     pub x: R32,
     #[VWrap]
     pub y: R32,
 }
-impl Serialize for Position {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut position = serializer.serialize_struct("Position", 2)?;
-        position.serialize_field("x", &self.x.into_inner())?;
-        position.serialize_field("y", &self.y.into_inner())?;
-        position.end()
+#[derive(Serialize, Deserialize)]
+struct SerdePosition {
+    x: f32,
+    y: f32,
+}
+impl From<Position> for SerdePosition {
+    fn from(position: Position) -> SerdePosition {
+        SerdePosition {
+            x: position.x.into(),
+            y: position.y.into(),
+        }
+    }
+}
+impl From<SerdePosition> for Position {
+    fn from(position: SerdePosition) -> Position {
+        Position {
+            x: position.x.into(),
+            y: position.y.into(),
+        }
     }
 }
 impl Position {

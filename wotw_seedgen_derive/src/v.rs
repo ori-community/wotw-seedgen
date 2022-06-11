@@ -114,6 +114,7 @@ pub fn v_impl(mut input: syn::DeriveInput) -> TokenStream {
 
     let v_ident = format_ident!("V{ident}");
     input.ident = v_ident.clone();
+    input.attrs.clear();
 
     let implementation = match &mut input.data {
         syn::Data::Struct(data_struct) => {

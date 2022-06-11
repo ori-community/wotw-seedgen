@@ -11,11 +11,12 @@ mod sysmessage;
 mod wheel_command;
 mod shop_command;
 
+use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
 
 use rustc_hash::FxHashMap;
-use serde::{Serialize, Serializer};
+use serde::{Serialize, Deserialize};
 use wotw_seedgen_derive::VVariant;
 
 use crate::header::parser;
@@ -38,7 +39,8 @@ pub use self::{
     shop_command::{ShopCommand, VShopCommand},
 };
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant, Serialize, Deserialize)]
+#[serde(into = "String", try_from = "&str")]
 pub enum Item {
     Relic(Zone),
     Water,
@@ -323,12 +325,15 @@ impl Item {
     }
 }
 
-impl Serialize for Item {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&self.code())
+impl Into<String> for Item {
+    fn into(self) -> String {
+        self.code()
+    }
+}
+impl TryFrom<&str> for Item {
+    type Error = String;
+    fn try_from<'a>(code: &str) -> Result<Self, Self::Error> {
+        Item::from_str(code)
     }
 }
 

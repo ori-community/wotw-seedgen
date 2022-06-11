@@ -9,7 +9,7 @@ license = "MIT"
 
 [dependencies]
 wotw_seedgen_derive = { path = "../wotw_seedgen_derive", version = "0.1" }
-serde = { version = "1.0.124", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 csv = "1.1"
 rustc-hash = "1.1.0"
