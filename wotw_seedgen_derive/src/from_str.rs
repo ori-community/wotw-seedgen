@@ -1,6 +1,5 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn;
 
 pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
     let name = &input.ident;
@@ -17,9 +16,7 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
                 },
                 syn::Meta::List(list) => {
                     if list.path.get_ident().map_or(false, |ident| ident == "repr") {
-                        if list.nested.len() != 1 || repr_ident.is_some() {
-                            panic!("Expected exactly one repr argument");
-                        }
+                        assert!(list.nested.len() == 1 && repr_ident.is_none(), "Expected exactly one repr argument");
                         let repr = list.nested.into_iter().next().unwrap();
                         if let syn::NestedMeta::Meta(syn::Meta::Path(repr)) = repr {
                             repr_ident = Some(repr.get_ident().expect("repr identifier").clone());
@@ -28,7 +25,7 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
                         }
                     }
                 },
-                _ => {},
+                syn::Meta::NameValue(_) => {},
             }
         }
     }
@@ -37,22 +34,19 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
         let variants = match input.data {
             syn::Data::Enum(data_enum) => {
                 data_enum.variants.into_iter().map(|variant| {
-                    if !matches!(variant.fields, syn::Fields::Unit) {
-                        panic!("Expected unit variant");
-                    }
+
+                    assert!(matches!(variant.fields, syn::Fields::Unit), "Expected unit variant");
 
                     let mut custom_ident = None;
                     for attribute in variant.attrs {
-                        if let Ok(meta) = attribute.parse_meta() {
-                            if let syn::Meta::NameValue(name_value) = meta {
-                                if name_value.path.is_ident("Ident") {
-                                    if let syn::Lit::Str(str) = name_value.lit {
-                                        custom_ident = Some(str.value());
-                                    } else {
-                                        panic!("Expected string literal in Ident attribute")
-                                    }
-                                    
+                        if let Ok(syn::Meta::NameValue(name_value)) = attribute.parse_meta() {
+                            if name_value.path.is_ident("Ident") {
+                                if let syn::Lit::Str(str) = name_value.lit {
+                                    custom_ident = Some(str.value());
+                                } else {
+                                    panic!("Expected string literal in Ident attribute")
                                 }
+                                
                             }
                         }
                     }

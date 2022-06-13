@@ -25,19 +25,19 @@ fn determine_replacements(input: &str, rng: &mut impl Rng) -> Result<Replacement
             last_take_index = after_match;
 
             let random_item = pool.remove(rng.gen_range(0..pool.len()));
-            replacements.push((range.start + take_index..range.start + after_match, random_item))
+            replacements.push((range.start + take_index..range.start + after_match, random_item));
         }
 
         if let Some(pool_item) = line.strip_prefix("!!pool ") {
             let pool_item = trim_comment(pool_item).trim_start().to_string();
             pool.push(pool_item);
-            replacements.push((range, String::new()))
+            replacements.push((range, String::new()));
         } else if let Some(should_be_empty) = line.strip_prefix("!!flush") {
             if !trim_comment(should_be_empty).is_empty() {
                 continue;
             }
             pool.clear();
-            replacements.push((range, String::new()))
+            replacements.push((range, String::new()));
         }
     }
 

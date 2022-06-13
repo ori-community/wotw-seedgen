@@ -55,9 +55,9 @@ pub enum UberStateOperator {
 impl UberStateOperator {
     pub fn code(&self) -> String {
         match self {
-            Self::Value(value) => format!("{value}"),
+            Self::Value(value) => value.clone(),
             Self::Pointer(uber_identifier) => format!("$({uber_identifier})"),
-            Self::Range(range) => format!("{}", range.code()),
+            Self::Range(range) => range.code(),
         }
     }
 }
@@ -101,7 +101,7 @@ pub enum UberStateRangeBoundary {
 impl UberStateRangeBoundary {
     pub fn code(&self) -> String {
         match self {
-            Self::Value(value) => format!("{value}"),
+            Self::Value(value) => value.clone(),
             Self::Pointer(identifier) => format!("$({})", identifier.code()),
         }
     }

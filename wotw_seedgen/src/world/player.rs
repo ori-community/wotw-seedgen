@@ -199,6 +199,7 @@ impl Player<'_> {
     pub fn health_plant_drops(&self) -> f32 {
         let value = self.max_health() / 30.0;
         // the game rounds to even
+        #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation, clippy::float_cmp)]
         if value % 1. == 0.5 && value as u8 % 2 == 0 {
             value.floor()
         } else {
@@ -355,7 +356,6 @@ impl Player<'_> {
         let mut inventories = Vec::new();
 
         if orbs.health <= 0.0 {
-            #[allow(clippy::cast_possible_truncation)]
             let health_fragments = util::float_to_int(((-orbs.health + 0.1) / 5.0).ceil()).unwrap();
             inventories.push(Inventory::from((Item::Resource(Resource::Health), health_fragments)));
 
@@ -374,12 +374,10 @@ impl Player<'_> {
                     let regen_orbs = orbs + Orbs { health: (30.0 * regens), energy: -1.0 * regens };
 
                     if regen_orbs.health <= 0.0 {
-                        #[allow(clippy::cast_possible_truncation)]
                         let health_fragments = util::float_to_int(((-regen_orbs.health + 0.1) / 5.0).ceil()).unwrap();
                         regen_inventory.grant(Item::Resource(Resource::Health), health_fragments);
                     }
                     if regen_orbs.energy < 0.0 {
-                        #[allow(clippy::cast_possible_truncation)]
                         let energy_fragments = util::float_to_int((-regen_orbs.energy * 2.0).ceil()).unwrap();
                         regen_inventory.grant(Item::Resource(Resource::Energy), energy_fragments);
                     }
@@ -394,7 +392,6 @@ impl Player<'_> {
         }
 
         if orbs.energy < 0.0 {
-            #[allow(clippy::cast_possible_truncation)]
             let energy_fragments = util::float_to_int((-orbs.energy * 2.0).ceil()).unwrap();
 
             for inventory in &mut inventories {

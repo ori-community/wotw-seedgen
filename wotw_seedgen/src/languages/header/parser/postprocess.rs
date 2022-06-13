@@ -123,8 +123,8 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
     Ok(locations)
 }
 
-pub fn postprocess(seeds: &mut Vec<String>, graph: &Graph, settings: &Settings) -> Result<(), String> {
-    let clone = seeds.clone();
+pub fn postprocess(seeds: &mut [String], graph: &Graph, settings: &Settings) -> Result<(), String> {
+    let clone = seeds.to_vec();
 
     for (world_index, seed) in seeds.iter_mut().enumerate() {
         let mut last_index = 0;

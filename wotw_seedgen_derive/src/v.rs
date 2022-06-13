@@ -2,7 +2,6 @@ use std::iter::Map;
 
 use proc_macro::TokenStream;
 use quote::{quote, format_ident};
-use syn;
 
 #[derive(Default)]
 struct VBehaviour {
@@ -37,19 +36,20 @@ fn v_target(ty: &mut syn::Type) -> &mut syn::Type {
     }
 }
 
-fn v_fields<'a, I: Iterator<Item = &'a mut syn::Field>>(fields: I) -> Map<I, fn(&mut syn::Field) -> (&syn::Field, Option<(VBehaviour, syn::Type)>)> {
+type VBehaviourMap<I> = Map<I, fn(&mut syn::Field) -> (&syn::Field, Option<(VBehaviour, syn::Type)>)>;
+fn v_fields<'a, I>(fields: I) -> VBehaviourMap<I>
+where I: Iterator<Item = &'a mut syn::Field>
+{
     fields.map(|field| {
         let mut behaviour = VBehaviour::default();
         for index in field.attrs.iter().enumerate().filter_map(|(index, attribute)| {
-            if let Ok(meta) = attribute.parse_meta() {
-                if let syn::Meta::Path(path) = meta {
-                    if path.is_ident("VWrap") {
-                        behaviour.wrap = true;
-                        return Some(index);
-                    } else if path.is_ident("VType") {
-                        behaviour.auto_type = true;
-                        return Some(index);
-                    }
+            if let Ok(syn::Meta::Path(path)) = attribute.parse_meta() {
+                if path.is_ident("VWrap") {
+                    behaviour.wrap = true;
+                    return Some(index);
+                } else if path.is_ident("VType") {
+                    behaviour.auto_type = true;
+                    return Some(index);
                 }
             }
             None
@@ -73,7 +73,7 @@ fn v_fields<'a, I: Iterator<Item = &'a mut syn::Field>>(fields: I) -> Map<I, fn(
                     let inner_path = path.clone();
                     *path = syn::Path {
                         leading_colon: None,
-                        segments: syn::punctuated::Punctuated::from_iter([
+                        segments: [
                             syn::PathSegment {
                                 ident: syn::Ident::new("crate", span),
                                 arguments: syn::PathArguments::None,
@@ -87,14 +87,14 @@ fn v_fields<'a, I: Iterator<Item = &'a mut syn::Field>>(fields: I) -> Map<I, fn(
                                 arguments: syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
                                     colon2_token: None,
                                     lt_token: syn::Token![<](span),
-                                    args: syn::punctuated::Punctuated::from_iter([syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
+                                    args: [syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
                                         qself: None,
                                         path: inner_path,
-                                    }))].into_iter()),
+                                    }))].into_iter().collect(),
                                     gt_token: syn::Token![>](span),
                                 })
                             }
-                        ].into_iter()),
+                        ].into_iter().collect(),
                     }
                 }
             } else {
@@ -205,7 +205,7 @@ pub fn v_impl(mut input: syn::DeriveInput) -> TokenStream {
                 }
             }
         },
-        _ => panic!("Expected Struct or Enum"),
+        syn::Data::Union(_) => panic!("Expected Struct or Enum"),
     };
 
     quote! {

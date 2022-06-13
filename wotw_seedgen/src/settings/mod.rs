@@ -140,7 +140,7 @@ impl Settings {
                     world_settings.apply_world_preset(preset_world_settings)?;
                 }
             } else if preset_worlds == 1 {
-                for world_settings in self.world_settings.iter_mut() {
+                for world_settings in &mut self.world_settings {
                     world_settings.apply_world_preset(preset_world_settings[0].clone())?;
                 }
             } else if setting_worlds == 1 {
@@ -185,8 +185,7 @@ impl Settings {
 
     /// Returns a slug unique to these settings
     pub fn slugify(&self) -> String {
-        // this is safe because the Settings struct is known to serialize successfully
-        let serialized = serde_json::to_string(&self).unwrap();
+        let serialized = self.to_json();
 
         let mut hasher = DefaultHasher::new();
         hasher.write(serialized.as_bytes());
@@ -204,8 +203,9 @@ impl Settings {
                 shift += 1;
             };
 
-            let word_index = (hash >> (index as u32 * shift)) & (2_u32.pow(shift) - 1) as u64;
-            slug_strings[word_index as usize]
+            #[allow(clippy::cast_possible_truncation)]
+            let word_index = (hash >> (index as u32 * shift)) as usize & (2_usize.pow(shift) - 1);
+            slug_strings[word_index]
         }).collect()
     }
 
@@ -240,12 +240,12 @@ impl Settings {
     }
 
     /// Checks if any of the [`WorldSettings`]s contain the [`Trick`]
-    pub fn any_contain_trick(&self, trick: &Trick) -> bool {
-        self.world_settings.iter().any(|world| world.tricks.contains(trick))
+    pub fn any_contain_trick(&self, trick: Trick) -> bool {
+        self.world_settings.iter().any(|world| world.tricks.contains(&trick))
     }
     /// Checks if all of the [`WorldSettings`]s contain the [`Trick`]
-    pub fn all_contain_trick(&self, trick: &Trick) -> bool {
-        self.world_settings.iter().all(|world| world.tricks.contains(trick))
+    pub fn all_contain_trick(&self, trick: Trick) -> bool {
+        self.world_settings.iter().all(|world| world.tricks.contains(&trick))
     }
 
     /// Checks if any of the [`WorldSettings`]s play on hard in-game difficulty

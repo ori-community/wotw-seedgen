@@ -64,13 +64,13 @@ impl fmt::Display for UberIdentifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         rando_data::NAMED_UBER_STATES.iter()
             .find(|(_, identifier)| self == identifier)
-            .map(|(name, _)| name.to_string())
-            .unwrap_or_else(||
+            .map_or_else(
+                ||
                 game_data::UBER_STATES.iter()
                     .find(|(_, identifier)| self == identifier)
-                    .map(|(name, _)| name.to_string())
-                    .unwrap_or_else(|| self.code())
-            ).fmt(f)
+                    .map_or_else(|| self.code(), |(name, _)| (*name).to_string()),
+                |(name, _)| (*name).to_string())
+            .fmt(f)
     }
 }
 
@@ -148,7 +148,7 @@ impl UberState {
 impl UberState {
     pub fn code(&self) -> String {
         if self.value.is_empty() {
-            format!("{}", self.identifier.code())
+            self.identifier.code()
         } else {
             format!("{}={}", self.identifier.code(), self.value)
         }

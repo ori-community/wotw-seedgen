@@ -102,11 +102,11 @@ enum WheelCommandKind {
 #[derive(TryFromPrimitive, FromStr)]
 #[repr(u8)]
 enum ShopCommandKind {
-    SetIcon = 0,
-    SetTitle = 1,
-    SetDescription = 2,
-    SetLocked = 3,
-    SetVisible = 4,
+    Icon = 0,
+    Title = 1,
+    Description = 2,
+    Locked = 3,
+    Visible = 4,
 }
 
 fn parse_v_uber_state_condition(parser: &mut Parser) -> Result<VUberState, ParseError> {
@@ -493,7 +493,7 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
             if parser.read(range) == "skip" {
                 parser.next_token();
                 parser.next_token();
-                skip = true
+                skip = true;
             }
         }
     }
@@ -650,11 +650,11 @@ fn parse_shop_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ShopCommandKind)?;
     let uber_identifier = parse_uber_identifier(parser)?;
     let command = match kind {
-        ShopCommandKind::SetIcon => parse_shop_set_icon(parser, uber_identifier),
-        ShopCommandKind::SetTitle => parse_shop_set_title(parser, uber_identifier),
-        ShopCommandKind::SetDescription => parse_shop_set_description(parser, uber_identifier),
-        ShopCommandKind::SetLocked => parse_shop_set_locked(parser, uber_identifier),
-        ShopCommandKind::SetVisible => parse_shop_set_visible(parser, uber_identifier),
+        ShopCommandKind::Icon => parse_shop_set_icon(parser, uber_identifier),
+        ShopCommandKind::Title => parse_shop_set_title(parser, uber_identifier),
+        ShopCommandKind::Description => parse_shop_set_description(parser, uber_identifier),
+        ShopCommandKind::Locked => parse_shop_set_locked(parser, uber_identifier),
+        ShopCommandKind::Visible => parse_shop_set_visible(parser, uber_identifier),
     }?;
     Ok(VItem::ShopCommand(command))
 }

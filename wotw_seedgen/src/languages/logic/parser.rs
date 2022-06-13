@@ -527,7 +527,7 @@ fn parse_requirement<'a>(parser: &mut Parser<'a>) -> Result<Requirement<'a>, Par
     let start = parser.current_token().range.start;
     let identifier = read_ident!(parser, Suggestion::Requirement)?;
     let value = match RequirementKind::from_str(identifier) {
-        Ok(kind) => parse_special_requirement(parser, kind)?,
+        Ok(kind) => parse_special_requirement(parser, &kind)?,
         Err(_) => match Difficulty::from_str(identifier) {
             Ok(difficulty) => RequirementValue::Difficulty(difficulty),
             Err(_) => match Trick::from_str(identifier) {
@@ -552,9 +552,9 @@ fn parse_requirement<'a>(parser: &mut Parser<'a>) -> Result<Requirement<'a>, Par
         }
     };
     let range = start..parser.current_token().range.start;
-    Ok(Requirement { range, value })
+    Ok(Requirement { value, range })
 }
-fn parse_special_requirement<'a>(parser: &mut Parser<'a>, kind: RequirementKind) -> Result<RequirementValue<'a>, ParseError> {
+fn parse_special_requirement<'a>(parser: &mut Parser<'a>, kind: &RequirementKind) -> Result<RequirementValue<'a>, ParseError> {
     let requirement = match kind {
         RequirementKind::Free => RequirementValue::Free,
         RequirementKind::Impossible => RequirementValue::Impossible,
@@ -628,7 +628,7 @@ fn fill_macros_and_states(contents: &mut Vec<AreaContent>, parser: &Parser) -> R
                     states.push(connection.identifier);
                 }
             },
-            _ => {},
+            AreaContent::Region(_) => {},
         }
     }
 

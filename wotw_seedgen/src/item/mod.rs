@@ -243,7 +243,7 @@ impl Item {
         !matches!(self, Item::Skill(Skill::Blaze))
     }
 
-    /// Returns the UberState that gets set when collecting this item, if applicable
+    /// Returns the [`UberState`] that gets set when collecting this [`Item`], if applicable
     pub fn triggered_state(&self) -> Option<UberState> {
         match self {
             Item::Skill(skill) => Some(1000 + *skill as u16),
@@ -280,9 +280,11 @@ impl Item {
             Item::BonusItem(bonus) => format!("10|{}", *bonus as u8),
             Item::BonusUpgrade(bonus) => format!("11|{}", *bonus as u8),
             Item::Relic(zone) => format!("14|{}", *zone as u8),
-            Item::SysMessage(message) => match message {
-                    SysMessage::MapRelicList(zone) => format!("15|{}|{}", *zone as u8, message.to_id()),
-                    _ => format!("15|{}", message.to_id()),
+            Item::SysMessage(message) =>
+                if let SysMessage::MapRelicList(zone) = message {
+                    format!("15|{}|{}", *zone as u8, message.to_id())
+                } else {
+                    format!("15|{}", message.to_id())
                 },
             Item::WheelCommand(command) => format!("16|{}", command.code()),
             Item::ShopCommand(command) => format!("17|{}", command.code()),
@@ -325,9 +327,9 @@ impl Item {
     }
 }
 
-impl Into<String> for Item {
-    fn into(self) -> String {
-        self.code()
+impl From<Item> for String {
+    fn from(item: Item) -> String {
+        item.code()
     }
 }
 impl TryFrom<&str> for Item {

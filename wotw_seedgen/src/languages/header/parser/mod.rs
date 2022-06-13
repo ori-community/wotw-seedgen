@@ -24,7 +24,7 @@ pub(crate) fn new(input: &str) -> Parser { crate::languages::Parser::new(input, 
 #[derive(FromStr)]
 #[ParseFromIdentifier]
 enum InterpolationCommand {
-    PARAM,
+    Param,
 }
 
 macro_rules! parse_removable_number {
@@ -67,7 +67,7 @@ macro_rules! parse_v {
             $crate::languages::TokenKind::Dollar => {
                 let command = $crate::languages::parser::parse_ident!($parser, $crate::header::parser::Suggestion::InterpolationCommand)?;
                 match command {
-                    $crate::header::parser::InterpolationCommand::PARAM => $crate::header::parser::parse_v_param($parser)?,
+                    $crate::header::parser::InterpolationCommand::Param => $crate::header::parser::parse_v_param($parser)?,
                 }
             },
             _ => return Err($parser.error(format!("Expected {}", $expected), $token.range).with_suggestion($expected)),
@@ -230,15 +230,15 @@ pub(super) fn parse_header_contents(parser: &mut Parser) -> Result<Vec<HeaderCon
         parse_whitespace(&mut context);
         if context.parser.current_token().kind == TokenKind::Eof { break }
         match parse_expression(&mut context) {
-            Ok(content) => {
-                context.contents.push(content);
+            Ok(header_content) => {
+                context.contents.push(header_content);
                 context.parser.skip_while(|kind| matches!(kind, TokenKind::Whitespace | TokenKind::Comment { .. }));
                 if context.parser.current_token().kind == TokenKind::Eof { break }
                 if let Err(err) = context.parser.eat(TokenKind::Newline) {
-                    recover(err, &mut errors, &mut context.parser);
+                    recover(err, &mut errors, context.parser);
                 }
             },
-            Err(err) => recover(err, &mut errors, &mut context.parser),
+            Err(err) => recover(err, &mut errors, context.parser),
         }
         context.skip_validation = false;
     }
@@ -281,7 +281,7 @@ enum ExpressionIdentKind {
     Timer,
 }
 fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseError> {
-    let parser = &mut context.parser;
+    let parser = &mut (*context.parser);
     let current_token = parser.current_token();
     match current_token.kind {
         TokenKind::Identifier => {
@@ -337,7 +337,7 @@ fn parse_command(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     HeaderCommand::parse(parser).map(HeaderContent::Command)
 }
 fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderContent, ParseError> {
-    let parser = &mut context.parser;
+    let parser = &mut (*context.parser);
 
     let identifier = parse_uber_identifier(parser)?;
     let (value, suggestion) = if parser.current_token().kind == TokenKind::Eq {

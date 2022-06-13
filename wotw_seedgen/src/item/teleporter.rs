@@ -26,7 +26,7 @@ pub enum Teleporter {
     Shriek = 15,
 }
 impl Teleporter {
-    pub(crate) fn triggered_state(&self) -> UberState {
+    pub(crate) fn triggered_state(self) -> UberState {
         let identifier = match self {
             Teleporter::Marsh => UberIdentifier { uber_group: 21786, uber_id: 10185 },
             Teleporter::Den => UberIdentifier { uber_group: 11666, uber_id: 61594 },

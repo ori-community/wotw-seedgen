@@ -182,7 +182,7 @@ impl Display for ParseErrorCollection {
 }
 impl ParseErrorCollection {
     pub fn verbose_display(&self) -> String {
-        self.errors.iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n")
+        self.errors.iter().map(ParseError::verbose_display).collect::<Vec<_>>().join("\n")
     }
 }
 

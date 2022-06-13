@@ -154,11 +154,11 @@ impl Header {
             let documentation = last_documentation.take();
             match content {
                 HeaderContent::InnerDocumentation(documentation) => {
-                    last_documentation = Some(documentation.to_owned());
+                    last_documentation = Some(documentation.clone());
                     None
                 },
                 HeaderContent::Command(HeaderCommand::Parameter { identifier, default }) =>
-                    Some(ParameterInfo { identifier: identifier.to_owned(), default: default.to_owned(), documentation }),
+                    Some(ParameterInfo { identifier: identifier.clone(), default: default.clone(), documentation }),
                 _ => None,
             }
         }).collect()
@@ -187,12 +187,12 @@ impl Header {
             if let HeaderContent::OuterDocumentation(documentation) = content {
                 if documentation.is_empty() { continue }
                 if name.is_none() {
-                    name = Some(documentation.to_owned());
+                    name = Some(documentation.clone());
                 } else if let Some(prior) = &mut description {
                     prior.push('\n');
                     prior.push_str(documentation);
                 } else {
-                    description = Some(documentation.to_owned());
+                    description = Some(documentation.clone());
                 }
             }
         }
@@ -229,7 +229,7 @@ impl Header {
 
         for line in input.lines() {
             if let Some(annotation) = line.strip_prefix('#') {
-                let end = annotation.find(|c: char| c == '/' || c.is_whitespace()).unwrap_or_else(|| annotation.len());
+                let end = annotation.find(|c: char| c == '/' || c.is_whitespace()).unwrap_or(annotation.len());
                 let annotation = annotation[..end].parse()?;
                 annotations.push(annotation);
             } else if !line.is_empty() {
@@ -317,7 +317,7 @@ impl Header {
         let mut last_documentation = None;
         input.lines().filter_map(|line| {
             let documentation = if let Some(documentation) = line.strip_prefix("////") {
-                if !documentation.starts_with("/") {
+                if !documentation.starts_with('/') {
                     last_documentation = Some(documentation.trim().to_owned());
                 }
                 return None;

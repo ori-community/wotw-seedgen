@@ -89,6 +89,7 @@ impl Inventory {
         true
     }
 
+    #[must_use]
     pub fn merge(&self, other: &Inventory) -> Inventory {
         let mut merged = self.clone();
         for (item, amount) in other.items.clone() {

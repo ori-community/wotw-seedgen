@@ -30,11 +30,11 @@ impl AddAssign for Orbs {
 impl Orbs {
     /// Replenish health, but don't exceed the player's maximum health
     pub fn heal(&mut self, amount: f32, player: &Player) {
-        self.health = (self.health + amount).min(player.max_health())
+        self.health = (self.health + amount).min(player.max_health());
     }
     /// Replenish energy, but don't exceed the player's maximum energy
     pub fn recharge(&mut self, amount: f32, player: &Player) {
-        self.energy = (self.energy + amount).min(player.max_energy())
+        self.energy = (self.energy + amount).min(player.max_energy());
     }
 }
 
@@ -154,7 +154,7 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> SmallVec<[Orbs; 3]> {
         }
         product.iter().filter(|orbs| {
             !product.iter().any(|other| other.energy > orbs.energy && other.health >= orbs.health || other.energy >= orbs.energy && other.health > orbs.health)
-        }).cloned().collect()
+        }).copied().collect()
     }
 }
 /// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns all possible sums, filtered for any redundancies
@@ -173,6 +173,6 @@ pub fn both_single(a: &[Orbs], b: Orbs) -> SmallVec<[Orbs; 3]> {
         }
         product.iter().filter(|orbs| {
             !product.iter().any(|other| other.energy > orbs.energy && other.health >= orbs.health || other.energy >= orbs.energy && other.health > orbs.health)
-        }).cloned().collect()
+        }).copied().collect()
     }
 }

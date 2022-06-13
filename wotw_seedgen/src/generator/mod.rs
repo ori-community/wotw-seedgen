@@ -6,7 +6,7 @@ pub use seed::{Seed, SeedWorld};
 pub use spoiler::{SeedSpoiler, SpoilerWorld, SpoilerGroup, SpoilerWorldReachable, SpoilerPlacement};
 pub use placement::Placement;
 
-use std::fmt::Write;
+use std::{fmt::Write, cmp::Ordering};
 
 use rand::{
     Rng, prelude::StdRng,
@@ -41,14 +41,14 @@ pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Seed, String> 
         Ok((world, (flags, headers)))
     }).collect::<Result<Vec<_>, String>>()?.into_iter().unzip();
 
-    let (mut worlds, spoiler) = generate_placements(graph, worlds, &mut rng)?;
+    let (mut worlds, spoiler) = generate_placements(graph, &worlds, &mut rng)?;
 
     for ((world, flags), headers) in worlds.iter_mut().zip(flags).zip(headers) {
         world.flags = flags;
         world.headers = headers;
     }
 
-    Ok(Seed { worlds, settings, graph, spoiler })
+    Ok(Seed { worlds, graph, settings, spoiler })
 }
 
 fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, String), String> {
@@ -95,10 +95,11 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
         }
 
         for (item, amount) in header.item_pool_changes {
-            if amount > 0 {
-                world.pool.grant(item, amount as u32);
-            } else if amount < 0 {
-                world.pool.remove(&item, (-amount) as u32);
+            #[allow(clippy::cast_sign_loss)]
+            match amount.cmp(&0) {
+                Ordering::Less => world.pool.remove(&item, (-amount) as u32),
+                Ordering::Equal => {},
+                Ordering::Greater => world.pool.grant(item, amount as u32),
             }
         }
 
@@ -132,7 +133,7 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
 
     let mut header_block = String::new();
     write!(header_block, "{seed_contents}").unwrap();
-    if !state_sets.is_empty() { write!(header_block, "// Sets: {}\n", state_sets.join(", ")).unwrap(); }
+    if !state_sets.is_empty() { writeln!(header_block, "// Sets: {}", state_sets.join(", ")).unwrap(); }
 
     Ok((flags, header_block))
 }

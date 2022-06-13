@@ -209,10 +209,10 @@ impl Requirement {
                     let cost = player.destroy_cost(*health, Skill::Sentry, false) * clip_mod;
                     return Requirement::cost_is_met(cost, player, orbs);
                 },
-            Requirement::And(ands) => {
+            Requirement::And(requirements) => {
                 let mut best_orbs = smallvec![orbs];
 
-                for and in ands {
+                for and in requirements {
                     let mut orbcosts = SmallVec::<[Orbs; 3]>::new();
                     let mut met = false;
 
@@ -231,10 +231,10 @@ impl Requirement {
                 let cost = orbs::both_single(&best_orbs, Orbs { health: -orbs.health, energy: -orbs.energy });
                 return Some(cost);
             },
-            Requirement::Or(ors) => {
+            Requirement::Or(requirements) => {
                 let mut cheapest = SmallVec::<[Orbs; 3]>::new();
 
-                for or in ors {
+                for or in requirements {
                     if let Some(orbcost) = or.is_met(player, states, orbs) {
                         if cheapest.is_empty() {
                             cheapest = orbcost;
@@ -269,7 +269,7 @@ impl Requirement {
         let mut itemsets = Requirement::needed_for_cost(cost, player);
 
         for (inventory, _) in &mut itemsets {
-            inventory.grant(Item::Skill(weapon), 1)
+            inventory.grant(Item::Skill(weapon), 1);
         }
 
         itemsets

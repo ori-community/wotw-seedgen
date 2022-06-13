@@ -19,5 +19,5 @@ pub fn parse_logic(areas: &str, locations: &str, states: &str, settings: &Settin
     let areas = Areas::parse(areas).map_err(|err| err.verbose_display())?;
     let locations = parse_locations(locations)?;
     let named_states = parse_states(states)?;
-    build(areas, locations, named_states, settings, validate)
+    build(areas, locations, &named_states, settings, validate)
 }

@@ -58,13 +58,11 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
                 HeaderContent::Timer(timer) => lines.push(format!("timer: {}", timer.code())),
                 HeaderContent::Pickup(pickup) => build_pickup(pickup, &mut lines, &mut header_build.preplacements, parameters)?,
             }
-        } else {
-            if let HeaderContent::Command(command) = content {
-                match command {
-                    HeaderCommand::If { .. } => if_stack.push(false),
-                    HeaderCommand::EndIf => build_endif(&mut if_stack)?,
-                    _ => { /* Continue skipping */ }
-                }
+        } else if let HeaderContent::Command(command) = content {
+            match command {
+                HeaderCommand::If { .. } => if_stack.push(false),
+                HeaderCommand::EndIf => build_endif(&mut if_stack)?,
+                _ => { /* Continue skipping */ }
             }
         }
     }
@@ -107,15 +105,15 @@ fn build_command(command: HeaderCommand, header_build: &mut HeaderBuild, if_stac
         HeaderCommand::Icon { item, icon } => build_icon(item, icon, &mut header_build.item_details, parameters)?,
         HeaderCommand::Parameter { .. } => { /* Skip, parameters have been processed earlier */ },
         HeaderCommand::Set { state } => header_build.state_sets.push(state),
-        HeaderCommand::If { parameter, value } => build_if(parameter, value, if_stack, parameters)?,
+        HeaderCommand::If { parameter, value } => build_if(&parameter, &value, if_stack, parameters)?,
         HeaderCommand::EndIf => build_endif(if_stack)?,
     }
 
     Ok(())
 }
 
-fn build_if(parameter: String, value: String, if_stack: &mut Vec<bool>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
-    let met = parameters.get(&parameter).ok_or_else(|| format!("Unknown parameter {parameter} in if"))? == &value;
+fn build_if(parameter: &str, value: &str, if_stack: &mut Vec<bool>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+    let met = parameters.get(parameter).ok_or_else(|| format!("Unknown parameter {parameter} in if"))? == value;
     if_stack.push(met);
     Ok(())
 }

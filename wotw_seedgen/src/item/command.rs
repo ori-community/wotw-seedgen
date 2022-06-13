@@ -44,10 +44,10 @@ pub enum Command {
 impl Command {
     pub fn code(&self) -> String {
         match self {
-            Command::Autosave => format!("0"),
+            Command::Autosave => "0".to_string(),
             Command::Resource { resource, amount } => format!("1|{}|{}", *resource as u8, amount),
-            Command::Checkpoint => format!("2"),
-            Command::Magic => format!("3"),
+            Command::Checkpoint => "2".to_string(),
+            Command::Magic => "3".to_string(),
             Command::StopEqual { uber_state } => format!("4|{}|{}", uber_state.identifier.code(), uber_state.value),
             Command::StopGreater { uber_state } => format!("5|{}|{}", uber_state.identifier.code(), uber_state.value),
             Command::StopLess { uber_state } => format!("6|{}|{}", uber_state.identifier.code(), uber_state.value),

@@ -237,7 +237,7 @@ impl Graph {
 
                         if states.is_empty() {
                             if context.progression_check {
-                                progressions.push((&connection.requirement, best_orbs.clone()))
+                                progressions.push((&connection.requirement, best_orbs.clone()));
                             }
                         } else {
                             for state in states {
@@ -339,7 +339,7 @@ impl Graph {
         for (_, state_progressions) in context.state_progressions {
             for (from, connection) in state_progressions {
                 if !context.world_state.contains_key(&connection.to) {
-                    progressions.push((&connection.requirement, context.world_state[&from].clone()))
+                    progressions.push((&connection.requirement, context.world_state[&from].clone()));
                 }
             }
         }

@@ -2,7 +2,6 @@ use std::iter;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn;
 
 pub fn display_impl(input: syn::DeriveInput) -> TokenStream {
     let name = input.ident;

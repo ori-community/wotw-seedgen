@@ -1,3 +1,13 @@
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::match_bool)]
+#![allow(clippy::must_use_candidate)]
+#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::struct_excessive_bools)]
+
 pub mod languages;
 pub mod world;
 pub mod inventory;
@@ -14,26 +24,6 @@ pub use item::{Item, VItem};
 pub use preset::Preset;
 pub use settings::Settings;
 pub use generator::generate_seed;
-
-use settings::{Goal, WorldSettings};
-
-pub fn write_flags(world_settings: &WorldSettings, mut flags: Vec<String>) -> String {
-    let mut settings_flags = Vec::new();
-
-    for flag in world_settings.goals.iter().map(Goal::flag_name) {
-        settings_flags.push(flag.to_string());
-    }
-
-    if world_settings.is_random_spawn() { settings_flags.push("RandomSpawn".to_string()); }
-
-    settings_flags.append(&mut flags);
-
-    if settings_flags.is_empty() {
-        String::default()
-    } else {
-        format!("Flags: {}\n", settings_flags.join(", "))
-    }
-}
 
 #[cfg(test)]
 mod tests {

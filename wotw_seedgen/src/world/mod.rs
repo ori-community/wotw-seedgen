@@ -50,9 +50,9 @@ impl World<'_, '_> {
                             UberStateRangeBoundary::Value(value) => value,
                             UberStateRangeBoundary::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
                         },
-                    }.to_owned();
+                    }.clone();
 
-                    let entry = self.uber_states.entry(command.uber_identifier.to_owned()).or_insert_with(|| String::from("0"));
+                    let entry = self.uber_states.entry(command.uber_identifier.clone()).or_insert_with(|| String::from("0"));
                     let uber_value = match command.uber_type {
                         UberType::Bool | UberType::Teleporter => uber_value.to_string(),
                         UberType::Byte | UberType::Int => {
@@ -91,7 +91,7 @@ impl World<'_, '_> {
                     *entry = uber_value;
 
                     let uber_state = UberState {
-                        identifier: command.uber_identifier.to_owned(),
+                        identifier: command.uber_identifier.clone(),
                         value: entry.clone(),
                     };
 
@@ -135,6 +135,11 @@ impl World<'_, '_> {
         self.preplacements.entry(uber_state).or_default().push(item);
     }
     pub fn collect_preplacements(&mut self, reached: &UberState) -> bool {
+        if WISP_STATES.contains(&reached.identifier) {
+            log::trace!("Granting player Wisp");
+            self.player.inventory.grant(Item::Resource(Resource::Health), 2);
+            self.player.inventory.grant(Item::Resource(Resource::Energy), 2);
+        }
         if let Some(items) = self.preplacements.get(reached) {
             log::trace!("Collecting preplacements on {}", reached);
             let items = items.clone();
@@ -144,12 +149,6 @@ impl World<'_, '_> {
             }
 
             true
-        } else if WISP_STATES.contains(&reached.identifier) {
-            log::trace!("Granting player Wisp");
-            self.player.inventory.grant(Item::Resource(Resource::Health), 2);
-            self.player.inventory.grant(Item::Resource(Resource::Energy), 2);
-
-            false
         } else {
             false
         }

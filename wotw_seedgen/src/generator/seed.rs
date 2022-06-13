@@ -43,7 +43,7 @@ impl Seed<'_> {
                 // Generator Version: {version}\n\
                 // Slug: {slug}\n\
                 // Config: {config}\n")
-        }).collect();
+        }).collect::<Vec<_>>();
 
         header::parser::postprocess(&mut seeds, self.graph, &self.settings)?;
 
@@ -54,26 +54,26 @@ impl Seed<'_> {
 impl Display for SeedWorld<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if !self.flags.is_empty() {
-            write!(f, "Flags: {}\n", self.flags.join(", "))?;
+            writeln!(f, "Flags: {}", self.flags.join(", "))?;
         }
 
         let spawn_identifier = self.spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
             let position = self.spawn.position().expect("Seed Spawn had no coordinates");
-            write!(f, "Spawn: {position}  // {spawn_identifier}\n")?;
+            writeln!(f, "Spawn: {position}  // {spawn_identifier}")?;
 
             if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == spawn_identifier { Some(item) } else { None }) {
-                write!(f, "{}|{}|mute\n", UberState::spawn().code(), spawn_item.code())?;
+                writeln!(f, "{}|{}|mute", UberState::spawn().code(), spawn_item.code())?;
             }
         }
 
         for placement in &self.placements {
-            write!(f, "{}\n", placement.code())?;
+            writeln!(f, "{}", placement.code())?;
         }
 
         write!(f, "{}", self.headers)?;
 
-        if !self.headers.ends_with('\n') { write!(f, "\n")?; }
+        if !self.headers.ends_with('\n') { writeln!(f,)?; }
 
         Ok(())
     }

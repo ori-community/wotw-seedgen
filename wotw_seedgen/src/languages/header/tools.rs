@@ -181,7 +181,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
             },
             Err(err) => {
                 util::add_trailing_spaces(&mut name, HEADER_INDENT);
-                failed.push(format!("{}  {}\n", NAME_COLOUR.paint(name), err))
+                failed.push(format!("{}  {}\n", NAME_COLOUR.paint(name), err));
             },
         }
     }
@@ -209,9 +209,9 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
                     uber_state == other || (generic && uber_state.identifier == other.identifier)
                 }) {
                     collision_message = format!("Collision between used state {} and {} using {}",
-                        UBERSTATE_COLOUR.paint(format!("{}", uber_state.code())),
+                        UBERSTATE_COLOUR.paint(uber_state.code()),
                         NAME_COLOUR.paint(other_header),
-                        UBERSTATE_COLOUR.paint(format!("{}", collision.code()))
+                        UBERSTATE_COLOUR.paint(collision.code())
                     );
                     break 'outer;
                 }
@@ -242,7 +242,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
                     range = false;
                 }
 
-                occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(format!("{}", uber_state.code())));
+                occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(uber_state.code()));
             }
 
             for _ in 0..2 { occupied_summary.pop(); }
@@ -311,15 +311,15 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
     );
     check_free("integer", 1..100, |state: &UberState, index: i32|
         state.identifier.uber_group == 9
-        && state.identifier.uber_id as i32 == index
+        && i32::from(state.identifier.uber_id) == index
     );
     check_free("boolean", 100..150, |state: &UberState, index: i32|
         state.identifier.uber_group == 9
-        && state.identifier.uber_id as i32 == index
+        && i32::from(state.identifier.uber_id) == index
     );
     check_free("float", 150..175, |state: &UberState, index: i32|
         state.identifier.uber_group == 9
-        && state.identifier.uber_id as i32 == index
+        && i32::from(state.identifier.uber_id) == index
     );
 
     println!("{}", output);
@@ -364,9 +364,9 @@ pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), 
                             });
                         }
                     },
-                    Item::Command(Command::StopEqual { uber_state }) |
-                    Item::Command(Command::StopGreater { uber_state }) |
-                    Item::Command(Command::StopLess { uber_state }) => {
+                    Item::Command(Command::StopEqual { uber_state } |
+                    Command::StopGreater { uber_state } |
+                    Command::StopLess { uber_state }) => {
                         if pickup.trigger.identifier.uber_group == 9 {
                             if uber_state.identifier.uber_group == 9 {
                                 occupied_states.push(uber_state);

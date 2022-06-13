@@ -31,7 +31,7 @@ impl<'a> Iterator for LineRanges<'a> {
     type Item = Range<usize>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(next_index) = self.next_index {
+        self.next_index.map(|next_index| {
             let start_index = next_index;
 
             self.next_index = self.source
@@ -39,11 +39,9 @@ impl<'a> Iterator for LineRanges<'a> {
                 .and_then(|remaining| remaining.find('\n'))
                 .map(|index| next_index + index + 1);
 
-            let end_index = self.next_index.unwrap_or_else(|| self.source.len());
-            Some(start_index..end_index)
-        } else {
-            None
-        }
+            let end_index = self.next_index.unwrap_or(self.source.len());
+            start_index..end_index
+        })
     }
 }
 impl<'a> FusedIterator for LineRanges<'a> {}

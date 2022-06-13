@@ -119,12 +119,10 @@ impl TokenStream<'_> {
     }
     fn ident(&mut self) -> TokenKind {
         self.cursor.eat_while(is_ident_char);
-        if self.cursor.first() == '.' {
-            if is_ident_char(self.cursor.second()) {
-                self.cursor.bump();
-                self.cursor.bump();
-                self.cursor.eat_while(is_ident_char);
-            }
+        if self.cursor.first() == '.' && is_ident_char(self.cursor.second()) {
+            self.cursor.bump();
+            self.cursor.bump();
+            self.cursor.eat_while(is_ident_char);
         }
         TokenKind::Identifier
     }

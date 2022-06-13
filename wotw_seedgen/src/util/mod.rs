@@ -142,7 +142,7 @@ impl Enemy {
             Enemy::ShieldCrystalMiner => 50.0,
             Enemy::MaceMiner | Enemy::ShieldMiner => 60.0,
             Enemy::CrystalMiner => 80.0,
-            _ => 0.0,
+            Enemy::EnergyRefill => 0.0,
         }
     }
     pub fn shielded(self) -> bool {
@@ -312,29 +312,23 @@ pub fn create_folder<P: AsRef<Path>>(file: P) -> Result<PathBuf, io::Error> {
     }
 }
 
-pub fn add_trailing_spaces(string: &mut String, target_length: usize) {
+pub(crate) fn add_trailing_spaces(string: &mut String, target_length: usize) {
     let mut length = string.len();
     while target_length > length {
         string.push(' ');
         length += 1;
     }
 }
-pub fn with_leading_spaces(string: &str, target_length: usize) -> String {
-    let mut length = string.len();
-    let mut out = String::with_capacity(length);
-    while target_length > length {
-        out.push(' ');
-        length += 1;
-    }
-    out += string;
-    out
-}
 
-pub fn float_to_int(float: f32) -> Result<u32, String> {
-    if float < u32::MIN as f32  || float > u32::MAX as f32 {
-        return Err(format!("Failed to convert float to int: {float}"));
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+pub(crate) fn float_to_int(float: f32) -> Result<u32, String> {
+    const MIN: f32 = u32::MIN as f32;
+    const MAX: f32 = u32::MAX as f32;
+
+    if (MIN..=MAX).contains(&float) {
+        return Ok(float as u32);
     }
-    Ok(float as u32)
+    Err(format!("Failed to convert float to int: {float}"))
 }
 
 pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
@@ -348,6 +342,7 @@ pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
 /// 
 /// This reads the final spawn location, e.g. if the settings declared a random spawn, this will read the spawn that was chosen
 /// Returns [`None`] if the seed contains no information about the spawn location
+#[must_use]
 pub fn spawn_from_seed(input: &str) -> Option<String> {
     input.lines()
         .find_map(|line| line.strip_prefix("Spawn: ")

@@ -26,8 +26,8 @@ fn parsing(c: &mut Criterion) {
     let mut settings = Settings::default();
     settings.world_settings[0].difficulty = Difficulty::Unsafe;
 
-    logic::build(areas.clone(), locations.clone(), states.clone(), &settings, false).unwrap();
-    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), states.clone(), &settings, false)));
+    logic::build(areas.clone(), locations.clone(), &states, &settings, false).unwrap();
+    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), &states, &settings, false)));
 }
 
 fn requirements(c: &mut Criterion) {

@@ -68,20 +68,20 @@ impl Display for SeedSpoiler {
 
         if multiworld {
             for SpoilerWorld { name, spawn } in &self.worlds {
-                write!(f, "{name}'s Spawn: {spawn}\n")?;
+                writeln!(f, "{name}'s Spawn: {spawn}")?;
             }
         } else {
             let spawn = &self.worlds[0].spawn;
-            write!(f, "Spawn: {spawn}\n")?;
+            writeln!(f, "Spawn: {spawn}")?;
         }
 
         for (index, spoiler_group) in self.groups.iter().enumerate() {
             write!(f, "Step {index}")?;
 
             if spoiler_group.reachable.is_empty() {
-                write!(f, " - Priority placements\n")?;
+                writeln!(f, " - Priority placements")?;
             } else {
-                if multiworld { write!(f, "\n")?; }
+                if multiworld { writeln!(f)?; }
                 else { write!(f, " - ")?; }
                 for (world_index, world_reachable) in spoiler_group.reachable.iter().enumerate() {
                     if multiworld {
@@ -89,13 +89,13 @@ impl Display for SeedSpoiler {
                         write!(f, "{world_name}: ")?;
                     }
                     if world_reachable.locations.is_empty() {
-                        write!(f, "No new locations reachable\n")?;
+                        writeln!(f, "No new locations reachable")?;
                     } else {
                         let locations = world_reachable.locations.join(", ");
                         let count = world_reachable.locations.len();
                         write!(f, "{count} new location")?;
                         if count > 1 { write!(f, "s")?; }
-                        write!(f, " reachable: {locations}\n")?;
+                        writeln!(f, " reachable: {locations}")?;
                     }
                 }
             }
@@ -104,7 +104,7 @@ impl Display for SeedSpoiler {
             if placement_count > 0 {
                 write!(f, "{placement_count} item")?;
                 if placement_count > 1 { write!(f, "s")?; }
-                write!(f, " placed:\n")?;
+                writeln!(f, " placed:")?;
 
                 for placement in &spoiler_group.placements {
                     if placement.forced { write!(f, "(forced) ")?; }
@@ -127,11 +127,11 @@ impl Display for SeedSpoiler {
                     if let Some(node_position) = &placement.node_position {
                         write!(f, " at {node_position}")?;
                     }
-                    write!(f, "\n")?;
+                    writeln!(f)?;
                 }
             }
 
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
 
         Ok(())
