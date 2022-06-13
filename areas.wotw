@@ -12416,12 +12416,15 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
     moki: Burrow OR Launch OR Bash
     gorlek:
       Glide
+      DoubleJump, Dash OR Sword OR Hammer
+      Dash, Sword OR Hammer
       Combat=Mantis+MaceMiner, SentryJump=1
       Combat=Mantis+MaceMiner, DoubleJump, TripleJump
     kii:
       Sword OR Hammer OR Blaze=4 OR Sentry=2
-      Combat=Mantis, DoubleJump
-    unsafe: free
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Combat=Mantis
+      Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Just dash might be fit for kii tbh
+    unsafe: free  #Precise wall jumping required. Lure the mantis onto the platform to get it out of the way.
   #No connection to RuinsApproach in order to make the TP refill logically relevant
 
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
