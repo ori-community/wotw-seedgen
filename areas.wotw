@@ -12412,10 +12412,17 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
 
   conn WindtornRuins.UpperRuinsDoor:
     moki: EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
-  conn UpperWastes.RuinsApproach:
-    moki: Burrow
-  conn UpperWastes.NorthTP:  # Not logic relevant outside of unsafe, only needed for the NonGladesTeleporter state. If there's ever another reason to get this teleporter, this will need to be checked for difficulty.
-    unsafe: free  # Precise wall jumping required. Lure the mantis onto the platform to get it out of the way.
+  conn UpperWastes.NorthTP:
+    moki: Burrow OR Launch OR Bash
+    gorlek:
+      Glide
+      Combat=Mantis+MaceMiner, SentryJump=1
+      Combat=Mantis+MaceMiner, DoubleJump, TripleJump
+    kii:
+      Sword OR Hammer OR Blaze=4 OR Sentry=2
+      Combat=Mantis, DoubleJump
+    unsafe: free
+  #No connection to RuinsApproach in order to make the TP refill logically relevant
 
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
   refill Checkpoint
