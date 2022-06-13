@@ -1,11 +1,11 @@
-use std::fmt;
+use std::fmt::{self, Display};
 
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::{VVariant, FromStr, Display};
 
 use super::{Item, VItem};
 use crate::util::Icon;
-use crate::header::{VString, vdisplay};
+use crate::header::{VString, vdisplay, CodeDisplay};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum WheelCommand {
@@ -20,23 +20,25 @@ pub enum WheelCommand {
     ClearAll,
 }
 impl WheelCommand {
-    pub fn code(&self) -> String {
-        match self {
-            WheelCommand::SetName { wheel, position, name } => format!("0|{}|{}|{}", wheel, *position as u8, name),
-            WheelCommand::SetDescription { wheel, position, description } => format!("1|{}|{}|{}", wheel, *position as u8, description),
-            WheelCommand::SetIcon { wheel, position, icon } => format!("2|{}|{}|{}", wheel, *position as u8, icon.code()),
-            WheelCommand::SetColor { wheel, position, r, g, b, a } => format!("3|{}|{}|{}|{}|{}|{}", wheel, *position as u8, r, g, b, a),
-            WheelCommand::SetItem { wheel, position, bind, item } => format!("4|{}|{}|{}|{}", wheel, *position as u8, *bind as u8, item.code()),
-            WheelCommand::SetSticky { wheel, sticky } => format!("5|{}|{}", wheel, sticky),
-            WheelCommand::SwitchWheel { wheel } => format!("6|{}", wheel),
-            WheelCommand::RemoveItem { wheel, position } => format!("7|{}|{}", wheel, *position as u8),
-            WheelCommand::ClearAll => "8".to_string(),
-        }
+    pub fn code(&self) -> CodeDisplay<WheelCommand> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                WheelCommand::SetName { wheel, position, name } => write!(f, "0|{}|{}|{}", wheel, *position as u8, name),
+                WheelCommand::SetDescription { wheel, position, description } => write!(f, "1|{}|{}|{}", wheel, *position as u8, description),
+                WheelCommand::SetIcon { wheel, position, icon } => write!(f, "2|{}|{}|{}", wheel, *position as u8, icon.code()),
+                WheelCommand::SetColor { wheel, position, r, g, b, a } => write!(f, "3|{}|{}|{}|{}|{}|{}", wheel, *position as u8, r, g, b, a),
+                WheelCommand::SetItem { wheel, position, bind, item } => write!(f, "4|{}|{}|{}|{}", wheel, *position as u8, *bind as u8, item.code()),
+                WheelCommand::SetSticky { wheel, sticky } => write!(f, "5|{}|{}", wheel, sticky),
+                WheelCommand::SwitchWheel { wheel } => write!(f, "6|{}", wheel),
+                WheelCommand::RemoveItem { wheel, position } => write!(f, "7|{}|{}", wheel, *position as u8),
+                WheelCommand::ClearAll => "8".fmt(f),
+            }
+        })
     }
 }
 vdisplay! {
     VWheelCommand,
-    impl fmt::Display for WheelCommand {
+    impl Display for WheelCommand {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
                 Self::SetName { wheel, position, name } => write!(f, "Set the name of the {position} item in wheel {wheel} to \"{name}\""),

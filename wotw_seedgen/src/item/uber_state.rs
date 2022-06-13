@@ -1,8 +1,8 @@
-use std::fmt;
+use std::fmt::{self, Display};
 
 use wotw_seedgen_derive::VVariant;
 
-use crate::{util::{UberIdentifier, UberType}, header::vdisplay};
+use crate::{util::{UberIdentifier, UberType}, header::{vdisplay, CodeDisplay}};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct UberStateItem {
@@ -15,18 +15,17 @@ pub struct UberStateItem {
     pub skip: bool,
 }
 impl UberStateItem {
-    pub fn code(&self) -> String {
-        format!("{}|{}|{}{}",
-            self.uber_identifier.code(),
-            self.uber_type.code(),
-            if self.signed { if self.sign { "+" } else { "-" } } else { "" },
-            self.operator.code()
-        )
+    pub fn code(&self) -> CodeDisplay<UberStateItem> {
+        CodeDisplay::new(self, |s, f| write!(f, "{}|{}|{}{}",
+            s.uber_identifier.code(),
+            s.uber_type.code(),
+            if s.signed { if s.sign { "+" } else { "-" } } else { "" },
+            s.operator.code()))
     }
 }
 vdisplay! {
     VUberStateItem,
-    impl fmt::Display for UberStateItem {
+    impl Display for UberStateItem {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             let identifier = &self.uber_identifier;
             let value = self.operator.to_string();
@@ -53,17 +52,19 @@ pub enum UberStateOperator {
     Range(#[VType] UberStateRange)
 }
 impl UberStateOperator {
-    pub fn code(&self) -> String {
-        match self {
-            Self::Value(value) => value.clone(),
-            Self::Pointer(uber_identifier) => format!("$({uber_identifier})"),
-            Self::Range(range) => range.code(),
-        }
+    pub fn code(&self) -> CodeDisplay<UberStateOperator> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                Self::Value(value) => value.fmt(f),
+                Self::Pointer(uber_identifier) => write!(f, "$({})", uber_identifier),
+                Self::Range(range) => range.code().fmt(f),
+            }
+        })
     }
 }
 vdisplay! {
     VUberStateOperator,
-    impl fmt::Display for UberStateOperator {
+    impl Display for UberStateOperator {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
                 Self::Value(value) => value.fmt(f),
@@ -81,13 +82,13 @@ pub struct UberStateRange {
     pub end: UberStateRangeBoundary,
 }
 impl UberStateRange {
-    pub fn code(&self) -> String {
-        format!("[{},{}]", self.start.code(), self.end.code())
+    pub fn code(&self) -> CodeDisplay<UberStateRange> {
+        CodeDisplay::new(self, |s, f| write!(f, "[{},{}]", s.start.code(), s.end.code()))
     }
 }
 vdisplay! {
     VUberStateRange,
-    impl fmt::Display for UberStateRange {
+    impl Display for UberStateRange {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             write!(f, "a random value between {} and {}", self.start, self.end)
         }
@@ -99,16 +100,18 @@ pub enum UberStateRangeBoundary {
     Pointer(UberIdentifier),
 }
 impl UberStateRangeBoundary {
-    pub fn code(&self) -> String {
-        match self {
-            Self::Value(value) => value.clone(),
-            Self::Pointer(identifier) => format!("$({})", identifier.code()),
-        }
+    pub fn code(&self) -> CodeDisplay<UberStateRangeBoundary> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                Self::Value(value) => value.fmt(f),
+                Self::Pointer(identifier) => write!(f, "$({})", identifier.code()),
+            }
+        })
     }
 }
 vdisplay! {
     VUberStateRangeBoundary,
-    impl fmt::Display for UberStateRangeBoundary {
+    impl Display for UberStateRangeBoundary {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
                 Self::Value(value) => write!(f, "{value}"),

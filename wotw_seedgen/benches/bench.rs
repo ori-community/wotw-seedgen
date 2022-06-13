@@ -109,17 +109,22 @@ fn generation(c: &mut Criterion) {
     let areas = fs::read_to_string("areas.wotw").unwrap();
     let locations = fs::read_to_string("loc_data.csv").unwrap();
     let states = fs::read_to_string("state_data.csv").unwrap();
+    let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
 
     c.bench_function("singleplayer", |b| b.iter(|| {
-        let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
         wotw_seedgen::generate_seed(&graph, settings.clone()).unwrap();
     }));
 
     settings.world_settings.extend_from_within(..);
 
     c.bench_function("two worlds", |b| b.iter(|| {
-        let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
         wotw_seedgen::generate_seed(&graph, settings.clone()).unwrap();
+    }));
+
+    let seed = wotw_seedgen::generate_seed(&graph, settings.clone()).unwrap();
+
+    c.bench_function("convert seed to text", |b| b.iter(|| {
+        seed.seed_files()
     }));
 }
 

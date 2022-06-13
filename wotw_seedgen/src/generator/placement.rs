@@ -17,7 +17,7 @@ use crate::{
         World,
         graph::{self, Node, Graph},
         player::Player,
-    }
+    }, header::CodeDisplay
 };
 
 use super::seed::SeedWorld;
@@ -33,9 +33,10 @@ pub struct Placement<'a> {
     /// The [`Item`] to be granted when collecting this placement
     pub item: Item,
 }
+
 impl Placement<'_> {
-    pub fn code(&self) -> String {
-        format!("{}|{}", self.uber_state.code(), self.item.code())
+    pub fn code(&self) -> CodeDisplay<Placement> {
+        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.uber_state.code(), s.item.code()) })
     }
 }
 

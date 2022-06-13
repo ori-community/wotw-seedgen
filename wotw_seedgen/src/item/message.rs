@@ -5,7 +5,7 @@ use rustc_hash::FxHashMap;
 use wotw_seedgen_derive::VVariant;
 
 use crate::VItem;
-use crate::header::{VResolve, VString, parser};
+use crate::header::{VResolve, VString, parser, CodeDisplay};
 use crate::languages::TokenKind;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
@@ -32,19 +32,21 @@ impl Message {
         }
     }
 
-    pub fn code(&self) -> String {
-        let mut code = self.message.clone();
-        if let Some(frames) = self.frames {
-            code.push_str(&format!("|f={frames}"));
-        }
-        if let Some(pos) = self.pos {
-            code.push_str(&format!("|p={pos}"));
-        }
-        if self.mute { code.push_str("|mute") }
-        if self.instant { code.push_str("|instant") }
-        if self.quiet { code.push_str("|quiet") }
-        if self.noclear { code.push_str("|noclear") }
-        code
+    pub fn code(&self) -> CodeDisplay<Message> {
+        CodeDisplay::new(self, |s, f| {
+            write!(f, "{}", s.message)?;
+            if let Some(frames) = s.frames {
+                write!(f, "|f={frames}")?;
+            }
+            if let Some(pos) = s.pos {
+                write!(f, "|p={pos}")?;
+            }
+            if s.mute { write!(f, "|mute")?; }
+            if s.instant { write!(f, "|instant")?; }
+            if s.quiet { write!(f, "|quiet")?; }
+            if s.noclear { write!(f, "|noclear")?; }
+            Ok(())
+        })
     }
 }
 impl VMessage {

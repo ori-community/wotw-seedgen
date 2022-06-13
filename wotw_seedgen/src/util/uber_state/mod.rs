@@ -1,11 +1,11 @@
 mod game_data;
 mod rando_data;
 
-use std::fmt;
+use std::fmt::{self, Display};
 
 use wotw_seedgen_derive::VVariant;
 
-use crate::{item::{Item, UberStateItem, UberStateOperator}, header::V};
+use crate::{item::{Item, UberStateItem, UberStateOperator}, header::{V, CodeDisplay}};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum UberType {
@@ -16,14 +16,14 @@ pub enum UberType {
     Float,
 }
 impl UberType {
-    pub fn code(&self) -> String {
-        match self {
+    pub fn code(&self) -> CodeDisplay<UberType> {
+        CodeDisplay::new(self, |s, f| write!(f, "{}", match s {
             UberType::Bool => "bool",
             UberType::Teleporter => "teleporter",
             UberType::Byte => "byte",
             UberType::Int => "int",
             UberType::Float => "float",
-        }.to_string()
+        }))
     }
 }
 impl std::str::FromStr for UberType {
@@ -56,11 +56,11 @@ impl UberIdentifier {
     }
 }
 impl UberIdentifier {
-    pub fn code(&self) -> String {
-        format!("{}|{}", self.uber_group, self.uber_id)
+    pub fn code(&self) -> CodeDisplay<UberIdentifier> {
+        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.uber_group, s.uber_id)})
     }
 }
-impl fmt::Display for UberIdentifier {
+impl Display for UberIdentifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         rando_data::NAMED_UBER_STATES.iter()
             .find(|(_, identifier)| self == identifier)
@@ -68,7 +68,7 @@ impl fmt::Display for UberIdentifier {
                 ||
                 game_data::UBER_STATES.iter()
                     .find(|(_, identifier)| self == identifier)
-                    .map_or_else(|| self.code(), |(name, _)| (*name).to_string()),
+                    .map_or_else(|| self.code().to_string(), |(name, _)| (*name).to_string()),
                 |(name, _)| (*name).to_string())
             .fmt(f)
     }
@@ -146,15 +146,17 @@ impl UberState {
     }
 }
 impl UberState {
-    pub fn code(&self) -> String {
-        if self.value.is_empty() {
-            self.identifier.code()
-        } else {
-            format!("{}={}", self.identifier.code(), self.value)
-        }
+    pub fn code(&self) -> CodeDisplay<UberState> {
+        CodeDisplay::new(self, |s, f| {
+            s.identifier.code().fmt(f)?;
+            if s.value.is_empty() { Ok(()) }
+            else {
+                write!(f, "={}", s.value)
+            }
+        })
     }
 }
-impl fmt::Display for UberState {
+impl Display for UberState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.value.is_empty() {
             write!(f, "{}", self.identifier)
@@ -163,7 +165,7 @@ impl fmt::Display for UberState {
         }
     }
 }
-impl fmt::Display for VUberState {
+impl Display for VUberState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let bare = if let V::Literal(value) = &self.value {
             value.is_empty()

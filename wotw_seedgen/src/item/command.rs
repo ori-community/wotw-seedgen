@@ -5,7 +5,7 @@ use wotw_seedgen_derive::{VVariant, FromStr, Display};
 
 use super::{Item, VItem, Resource};
 use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool, Spell};
-use crate::header::{VString, vdisplay};
+use crate::header::{VString, vdisplay, CodeDisplay};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum Command {
@@ -42,40 +42,48 @@ pub enum Command {
     AppendString { id: i32, #[VType] string: String },
 }
 impl Command {
-    pub fn code(&self) -> String {
-        match self {
-            Command::Autosave => "0".to_string(),
-            Command::Resource { resource, amount } => format!("1|{}|{}", *resource as u8, amount),
-            Command::Checkpoint => "2".to_string(),
-            Command::Magic => "3".to_string(),
-            Command::StopEqual { uber_state } => format!("4|{}|{}", uber_state.identifier.code(), uber_state.value),
-            Command::StopGreater { uber_state } => format!("5|{}|{}", uber_state.identifier.code(), uber_state.value),
-            Command::StopLess { uber_state } => format!("6|{}|{}", uber_state.identifier.code(), uber_state.value),
-            Command::Toggle { target, on } => format!("7|{}|{}", *target as u8, *on as u8),
-            Command::Warp { position } => format!("8|{}", position.code()),
-            Command::StartTimer { identifier } => format!("9|{}", identifier.code()),
-            Command::StopTimer { identifier } => format!("10|{}", identifier.code()),
-            Command::StateRedirect { intercept, set } => format!("11|{}|{}", intercept, set),
-            Command::SetHealth { amount } => format!("12|{}", amount),
-            Command::SetEnergy { amount } => format!("13|{}", amount),
-            Command::SetSpiritLight { amount } => format!("14|{}", amount),
-            Command::Equip { slot, ability } => format!("15|{}|{}", *slot as u8, ability),
-            Command::AhkSignal { signal } => format!("16|{}", signal),
-            Command::IfEqual { uber_state, item } => format!("17|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
-            Command::IfGreater { uber_state, item } => format!("18|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
-            Command::IfLess { uber_state, item } => format!("19|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
-            Command::DisableSync { uber_identifier } => format!("20|{}", uber_identifier.code()),
-            Command::EnableSync { uber_identifier } => format!("21|{}", uber_identifier.code()),
-            Command::CreateWarp { id, position, label } => format!("22|{}|{}{}", id, position.code(), label.iter().map(|label| format!("|{label}")).collect::<String>()),
-            Command::DestroyWarp { id } => format!("23|{}", id),
-            Command::IfBox { position1, position2, item } => format!("24|{}|{}|{}", position1.code(), position2.code(), item.code()),
-            Command::IfSelfEqual { value, item } => format!("25|{}|{}", value, item.code()),
-            Command::IfSelfGreater { value, item } => format!("26|{}|{}", value, item.code()),
-            Command::IfSelfLess { value, item } => format!("27|{}|{}", value, item.code()),
-            Command::UnEquip { ability } => format!("28|{}", ability),
-            Command::SaveString { id, string } => format!("29|{}|{}", id, string),
-            Command::AppendString { id, string } => format!("30|{}|{}", id, string),
-        }
+    pub fn code(&self) -> CodeDisplay<Command> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                Command::Autosave => write!(f, "0"),
+                Command::Resource { resource, amount } => write!(f, "1|{}|{}", *resource as u8, amount),
+                Command::Checkpoint => write!(f, "2"),
+                Command::Magic => write!(f, "3"),
+                Command::StopEqual { uber_state } => write!(f, "4|{}|{}", uber_state.identifier.code(), uber_state.value),
+                Command::StopGreater { uber_state } => write!(f, "5|{}|{}", uber_state.identifier.code(), uber_state.value),
+                Command::StopLess { uber_state } => write!(f, "6|{}|{}", uber_state.identifier.code(), uber_state.value),
+                Command::Toggle { target, on } => write!(f, "7|{}|{}", *target as u8, *on as u8),
+                Command::Warp { position } => write!(f, "8|{}", position.code()),
+                Command::StartTimer { identifier } => write!(f, "9|{}", identifier.code()),
+                Command::StopTimer { identifier } => write!(f, "10|{}", identifier.code()),
+                Command::StateRedirect { intercept, set } => write!(f, "11|{}|{}", intercept, set),
+                Command::SetHealth { amount } => write!(f, "12|{}", amount),
+                Command::SetEnergy { amount } => write!(f, "13|{}", amount),
+                Command::SetSpiritLight { amount } => write!(f, "14|{}", amount),
+                Command::Equip { slot, ability } => write!(f, "15|{}|{}", *slot as u8, ability),
+                Command::AhkSignal { signal } => write!(f, "16|{}", signal),
+                Command::IfEqual { uber_state, item } => write!(f, "17|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
+                Command::IfGreater { uber_state, item } => write!(f, "18|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
+                Command::IfLess { uber_state, item } => write!(f, "19|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
+                Command::DisableSync { uber_identifier } => write!(f, "20|{}", uber_identifier.code()),
+                Command::EnableSync { uber_identifier } => write!(f, "21|{}", uber_identifier.code()),
+                Command::CreateWarp { id, position, label } => {
+                    write!(f, "22|{}|{}", id, position.code())?;
+                    match label {
+                        Some(label) => write!(f, "|{label}"),
+                        None => Ok(()),
+                    }
+                },
+                Command::DestroyWarp { id } => write!(f, "23|{}", id),
+                Command::IfBox { position1, position2, item } => write!(f, "24|{}|{}|{}", position1.code(), position2.code(), item.code()),
+                Command::IfSelfEqual { value, item } => write!(f, "25|{}|{}", value, item.code()),
+                Command::IfSelfGreater { value, item } => write!(f, "26|{}|{}", value, item.code()),
+                Command::IfSelfLess { value, item } => write!(f, "27|{}|{}", value, item.code()),
+                Command::UnEquip { ability } => write!(f, "28|{}", ability),
+                Command::SaveString { id, string } => write!(f, "29|{}|{}", id, string),
+                Command::AppendString { id, string } => write!(f, "30|{}|{}", id, string),
+            }
+        })
     }
 }
 vdisplay! {
@@ -105,7 +113,13 @@ vdisplay! {
                 Self::IfLess { uber_state, item } => write!(f, "Grant this item if {} is less than {}: {}", uber_state.identifier, uber_state.value, item),
                 Self::DisableSync { uber_identifier } => write!(f, "Disable multiplayer sync for {uber_identifier}"),
                 Self::EnableSync { uber_identifier } => write!(f, "Enable multiplayer sync for {uber_identifier}"),
-                Self::CreateWarp { id, position, label } => write!(f, "Create a warp icon with identifier {id} at {position}{}", label.iter().map(|label| format!(" labelled \"{label}\"")).collect::<String>()),
+                Self::CreateWarp { id, position, label } => {
+                    write!(f, "Create a warp icon with identifier {id} at {position}")?;
+                    match label {
+                        Some(label) => write!(f, " labelled \"{label}\""),
+                        None => Ok(()),
+                    }
+                },
                 Self::DestroyWarp { id } => write!(f, "Destroy the warp icon with identifier {id}"),
                 Self::IfBox { position1, position2, item } => write!(f, "Grant this item if Ori is within the rectangle defined by {position1}/{position2}: {item}"),
                 Self::IfSelfEqual { value, item } => write!(f, "Grant this item if the trigger state's value is {value}: {item}"),

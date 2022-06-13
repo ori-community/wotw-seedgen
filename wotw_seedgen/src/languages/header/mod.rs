@@ -4,12 +4,13 @@ pub(crate) mod parser;
 mod emitter;
 mod v;
 mod tools;
+mod code;
 
 pub use emitter::{HeaderBuild, ItemDetails};
-use wotw_seedgen_derive::{FromStr, VVariant};
 pub use v::{VResolve, V, VString};
 pub(crate) use v::vdisplay;
 pub use tools::{list, inspect, validate};
+pub use code::CodeDisplay;
 
 use std::{fmt, str::FromStr};
 
@@ -21,14 +22,16 @@ use rand::Rng;
 use parser::{parse_header_contents};
 use super::{ParseError, parser::ParseErrorCollection};
 
+use wotw_seedgen_derive::{FromStr, VVariant};
+
 #[derive(Debug, Clone)]
 pub struct TimerDefinition {
     pub toggle: UberIdentifier,
     pub timer: UberIdentifier,
 }
 impl TimerDefinition {
-    pub fn code(&self) -> String {
-        format!("{}|{}", self.toggle.code(), self.timer.code())
+    pub fn code(&self) -> CodeDisplay<TimerDefinition> {
+        CodeDisplay::new(self, |s, f| write!(f, "{}|{}", s.toggle.code(), s.timer.code()))
     }
 }
 
@@ -47,8 +50,8 @@ pub struct Pickup {
     pub skip_validation: bool,
 }
 impl Pickup {
-    pub fn code(&self) -> String {
-        format!("{}|{}", self.trigger.code(), self.item.code())
+    pub fn code(&self) -> CodeDisplay<Pickup> {
+        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.trigger.code(), s.item.code())})
     }
 }
 

@@ -20,7 +20,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::header::vdisplay;
+use crate::header::{vdisplay, CodeDisplay};
 
 #[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
@@ -218,8 +218,8 @@ impl Position {
     pub fn new(x: f32, y: f32) -> Position {
         Position { x: x.into(), y: y.into() }
     }
-    pub fn code(&self) -> String {
-        format!("{}|{}", self.x, self.y)
+    pub fn code(&self) -> CodeDisplay<Position> {
+        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.x, s.y)})
     }
 }
 vdisplay! {

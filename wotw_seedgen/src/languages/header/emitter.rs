@@ -74,7 +74,7 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
 
 fn build_pickup(pickup: VPickup, lines: &mut Vec<String>, preplacements: &mut Vec<Pickup>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
     let pickup = pickup.resolve(parameters)?;
-    lines.push(pickup.code());
+    lines.push(pickup.code().to_string());
 
     if !pickup.ignore {
         preplacements.push(pickup);

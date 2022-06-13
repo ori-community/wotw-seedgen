@@ -19,7 +19,7 @@ use rustc_hash::FxHashMap;
 use serde::{Serialize, Deserialize};
 use wotw_seedgen_derive::VVariant;
 
-use crate::header::parser;
+use crate::header::{parser, CodeDisplay};
 use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
 use crate::util::{Zone, Icon, MapIcon, UberState, UberIdentifier};
@@ -261,34 +261,36 @@ impl Item {
         )
     }
 
-    pub fn code(&self) -> String {
-        match self {
-            Item::SpiritLight(amount) => format!("0|{}", amount),
-            Item::RemoveSpiritLight(amount) => format!("0|-{}", amount),
-            Item::Resource(resource) => format!("1|{}", *resource as u8),
-            Item::Skill(skill) => format!("2|{}", *skill as u8),
-            Item::RemoveSkill(skill) => format!("2|-{}", *skill as u8),
-            Item::Shard(shard) => format!("3|{}", *shard as u8),
-            Item::RemoveShard(shard) => format!("3|-{}", *shard as u8),
-            Item::Command(command) => format!("4|{}", command.code()),
-            Item::Teleporter(teleporter) => format!("5|{}", *teleporter as u8),
-            Item::RemoveTeleporter(teleporter) => format!("5|-{}", *teleporter as u8),
-            Item::Message(message) => format!("6|{}", message.code()),
-            Item::UberState(command) => format!("8|{}", command.code()),
-            Item::Water => String::from("9|0"),
-            Item::RemoveWater => String::from("9|-0"),
-            Item::BonusItem(bonus) => format!("10|{}", *bonus as u8),
-            Item::BonusUpgrade(bonus) => format!("11|{}", *bonus as u8),
-            Item::Relic(zone) => format!("14|{}", *zone as u8),
-            Item::SysMessage(message) =>
-                if let SysMessage::MapRelicList(zone) = message {
-                    format!("15|{}|{}", *zone as u8, message.to_id())
-                } else {
-                    format!("15|{}", message.to_id())
-                },
-            Item::WheelCommand(command) => format!("16|{}", command.code()),
-            Item::ShopCommand(command) => format!("17|{}", command.code()),
-        }
+    pub fn code(&self) -> CodeDisplay<Item> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                Item::SpiritLight(amount) => write!(f, "0|{}", amount),
+                Item::RemoveSpiritLight(amount) => write!(f, "0|-{}", amount),
+                Item::Resource(resource) => write!(f, "1|{}", *resource as u8),
+                Item::Skill(skill) => write!(f, "2|{}", *skill as u8),
+                Item::RemoveSkill(skill) => write!(f, "2|-{}", *skill as u8),
+                Item::Shard(shard) => write!(f, "3|{}", *shard as u8),
+                Item::RemoveShard(shard) => write!(f, "3|-{}", *shard as u8),
+                Item::Command(command) => write!(f, "4|{}", command.code()),
+                Item::Teleporter(teleporter) => write!(f, "5|{}", *teleporter as u8),
+                Item::RemoveTeleporter(teleporter) => write!(f, "5|-{}", *teleporter as u8),
+                Item::Message(message) => write!(f, "6|{}", message.code()),
+                Item::UberState(command) => write!(f, "8|{}", command.code()),
+                Item::Water => write!(f, "9|0"),
+                Item::RemoveWater => write!(f, "9|-0"),
+                Item::BonusItem(bonus) => write!(f, "10|{}", *bonus as u8),
+                Item::BonusUpgrade(bonus) => write!(f, "11|{}", *bonus as u8),
+                Item::Relic(zone) => write!(f, "14|{}", *zone as u8),
+                Item::SysMessage(message) =>
+                    if let SysMessage::MapRelicList(zone) = message {
+                        write!(f, "15|{}|{}", *zone as u8, message.to_id())
+                    } else {
+                        write!(f, "15|{}", message.to_id())
+                    },
+                Item::WheelCommand(command) => write!(f, "16|{}", command.code()),
+                Item::ShopCommand(command) => write!(f, "17|{}", command.code()),
+            }
+        })
     }
 
     pub fn description(&self) -> Option<String> {
@@ -329,7 +331,7 @@ impl Item {
 
 impl From<Item> for String {
     fn from(item: Item) -> String {
-        item.code()
+        item.code().to_string()
     }
 }
 impl TryFrom<&str> for Item {
@@ -345,15 +347,15 @@ mod tests {
 
     #[test]
     fn item_display() {
-        assert_eq!(Item::SpiritLight(45).code(), "0|45");
-        assert_eq!(Item::Resource(Resource::Keystone).code(), "1|3");
-        assert_eq!(Item::Skill(Skill::Launch).code(), "2|8");
-        assert_eq!(Item::Skill(Skill::AncestralLight1).code(), "2|120");
-        assert_eq!(Item::Shard(Shard::Magnet).code(), "3|8");
-        assert_eq!(Item::Teleporter(Teleporter::Marsh).code(), "5|16");
-        assert_eq!(Item::Water.code(), "9|0");
-        assert_eq!(Item::BonusItem(BonusItem::Relic).code(), "10|20");
-        assert_eq!(Item::BonusUpgrade(BonusUpgrade::ShurikenEfficiency).code(), "11|4");
-        assert_eq!(Item::Message(Message::new(String::from("8|0|9|7"))).code(), "6|8|0|9|7");
+        assert_eq!(Item::SpiritLight(45).code().to_string(), "0|45");
+        assert_eq!(Item::Resource(Resource::Keystone).code().to_string(), "1|3");
+        assert_eq!(Item::Skill(Skill::Launch).code().to_string(), "2|8");
+        assert_eq!(Item::Skill(Skill::AncestralLight1).code().to_string(), "2|120");
+        assert_eq!(Item::Shard(Shard::Magnet).code().to_string(), "3|8");
+        assert_eq!(Item::Teleporter(Teleporter::Marsh).code().to_string(), "5|16");
+        assert_eq!(Item::Water.code().to_string(), "9|0");
+        assert_eq!(Item::BonusItem(BonusItem::Relic).code().to_string(), "10|20");
+        assert_eq!(Item::BonusUpgrade(BonusUpgrade::ShurikenEfficiency).code().to_string(), "11|4");
+        assert_eq!(Item::Message(Message::new(String::from("8|0|9|7"))).code().to_string(), "6|8|0|9|7");
     }
 }

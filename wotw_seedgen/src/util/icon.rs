@@ -3,7 +3,7 @@ use std::fmt;
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::{FromStr, Display};
 
-use crate::item::Shard;
+use crate::{item::Shard, header::CodeDisplay};
 
 use super::Spell;
 
@@ -18,16 +18,18 @@ pub enum Icon {
     File(String),
 }
 impl Icon {
-    pub fn code(&self) -> String {
-        match self {
-            Icon::Shard(shard) => format!("shard:{}", *shard as u8),
-            Icon::Spell(spell) => format!("spell:{}", *spell as u16),
-            Icon::Opher(opher) => format!("opher:{}", *opher as u8),
-            Icon::Lupo(lupo) => format!("lupo:{}", *lupo as u8),
-            Icon::Grom(grom) => format!("grom:{}", *grom as u8),
-            Icon::Tuley(tuley) => format!("tuley:{}", *tuley as u8),
-            Icon::File(file) => format!("file:{file}"),
-        }
+    pub fn code(&self) -> CodeDisplay<Icon> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                Icon::Shard(shard) => write!(f, "shard:{}", *shard as u8),
+                Icon::Spell(spell) => write!(f, "spell:{}", *spell as u16),
+                Icon::Opher(opher) => write!(f, "opher:{}", *opher as u8),
+                Icon::Lupo(lupo) => write!(f, "lupo:{}", *lupo as u8),
+                Icon::Grom(grom) => write!(f, "grom:{}", *grom as u8),
+                Icon::Tuley(tuley) => write!(f, "tuley:{}", *tuley as u8),
+                Icon::File(file) => write!(f, "file:{file}"),
+            }
+        })
     }
 }
 impl fmt::Display for Icon {
