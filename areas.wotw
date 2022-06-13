@@ -85,9 +85,11 @@ anchor Teleporters:  # teleporter access
   conn UpperWastes.NorthTP:
     moki: OuterRuinsTP, Burrow
   conn WindtornRuins.RuinsTP:
-    moki: InnerRuinsTP, Burrow
+    moki: InnerRuinsTP, Burrow, EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
   conn WillowsEnd.InnerTP:
     moki: WillowTP, Burrow
+  conn WillowsEnd.Upper:
+    moki: ShriekTP, Burrow
 
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   refill Full
