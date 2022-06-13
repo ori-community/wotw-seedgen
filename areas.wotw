@@ -7570,9 +7570,15 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       LowerReach.ThawEastFurnace, Bash, Water OR Damage=100  # Bash the fish
       LowerReach.ThawEastFurnace, Bash, WaterDash, Water OR Damage=40
   conn LowerReach.HalfwayIceCavern:
+    kii:
+      Bash, Grenade=1, DoubleJump, TripleJump
+      LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Sword  # Pogo the worm to reach the right wall
+      LowerReach.ThawEastFurnace, DoubleJump, TripleJump, WaterDash, Water OR Damage=20
     unsafe:
       Launch
-      DoubleJump, TripleJump  # climb the left wall in order to reach the wall above the anchor point. Then tjump to the crystal wall
+      DoubleJump, TripleJump OR Dash  # https://youtu.be/V_Gzv4W34nU
+      LowerReach.ThawEastFurnace, DoubleJump, Sword  # pogo the worm then slash the crystal to climb the wall
+      SwordJump  # https://cdn.discordapp.com/attachments/845415952790454272/985979202341863445/2022-06-13_20-47-59.mp4
 
 anchor LowerReach.EastFurnace at -61, -3987:  # At the furnace above the swimming pool
   refill Checkpoint
