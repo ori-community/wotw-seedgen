@@ -11,7 +11,7 @@ FROM alpine
 
 WORKDIR /app
 
-COPY --from=build-seedgen /app/build/target/release/seedgen /app/seedgen
+COPY --from=build-seedgen /app/target/release/seedgen /app/seedgen
 COPY --from=build-seedgen /app/wotw_seedgen/headers /app/headers
 COPY --from=build-seedgen /app/wotw_seedgen/presets /app/presets
 COPY --from=build-seedgen /app/wotw_seedgen/areas.wotw /app/areas.wotw
