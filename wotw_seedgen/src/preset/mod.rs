@@ -59,6 +59,9 @@ pub struct Preset {
     /// Require an online connection to play the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub online: Option<bool>,
+    /// The seed's seed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seed: Option<String>,
     /// Automatically create an online game when generating the seed
     /// 
     /// This exists for future compability, but does not have any effect currently

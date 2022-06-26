@@ -314,11 +314,7 @@ struct SeedArgs {
     /// launch the seed after generating
     #[structopt(short, long)]
     launch: bool,
-    /// Seed the random number generator
-    /// 
-    /// Without this flag, the rng seed will be randomly generated
-    #[structopt(long)]
-    seed: Option<String>,
+
     #[structopt(flatten)]
     settings: SeedSettings,
 }
@@ -386,6 +382,11 @@ struct SeedSettings {
     /// This is needed for Co-op, Multiworld and Bingo
     #[structopt(short, long)]
     online: bool,
+    /// Seed the random number generator
+    ///
+    /// Without this flag, the rng seed will be randomly generated
+    #[structopt(long)]
+    seed: Option<String>,
 }
 
 fn vec_in_option<T>(vector: Vec<T>) -> Option<Vec<T>> {
@@ -408,6 +409,7 @@ impl SeedSettings {
             inline_headers,
             disable_logic_filter,
             online,
+            seed,
         } = self;
 
         let has_world_names = world_names.is_some();
@@ -457,6 +459,7 @@ impl SeedSettings {
             includes: presets,
             world_settings: Some(yes_fun),
             disable_logic_filter,
+            seed,
             online,
             create_game: None,
         })
@@ -609,15 +612,12 @@ enum HeaderCommand {
     }
 }
 
-fn parse_settings(seed: Option<String>, args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
+fn parse_settings(args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
     let has_world_names = args.world_names.is_some();
     let preset = args.into_preset()?;
 
     settings.apply_preset(preset)?;
 
-    if let Some(seed) = seed {
-        settings.seed = seed;
-    }
     if !has_world_names {
         settings.world_settings[0].world_name = "World".to_string();
     }
@@ -743,7 +743,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
         settings.apply_preset(preset)?;
     }
 
-    parse_settings(args.seed, args.settings, &mut settings)?;
+    parse_settings(args.settings, &mut settings)?;
 
     let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
     let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;

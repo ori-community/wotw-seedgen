@@ -119,6 +119,7 @@ impl Settings {
             world_settings,
             disable_logic_filter,
             online,
+            seed,
             create_game,
         } = preset;
 
@@ -159,6 +160,9 @@ impl Settings {
         }
         if let Some(online) = online {
             self.online = online;
+        }
+        if let Some(seed) = seed {
+            self.seed = seed;
         }
         if let Some(create_game) = create_game {
             self.create_game = create_game;
