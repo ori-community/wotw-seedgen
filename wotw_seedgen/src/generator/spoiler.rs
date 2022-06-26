@@ -8,7 +8,7 @@ use crate::{util::Position, Item};
 use super::placement::Placement;
 
 /// Complete data to create a logic spoiler for the seed
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SeedSpoiler {
     /// Metadata about the number of worlds and basic details about them
     pub worlds: Vec<SpoilerWorld>,
@@ -16,7 +16,7 @@ pub struct SeedSpoiler {
     pub groups: Vec<SpoilerGroup>,
 }
 /// Basic details about a world
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SpoilerWorld {
     /// User-given name for this world, or "World" as a default on single-world seeds
     pub name: String,
@@ -24,7 +24,7 @@ pub struct SpoilerWorld {
     pub spawn: String,
 }
 /// One "step" of placements in a [`SeedSpoiler`]
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct SpoilerGroup {
     /// Either contains the reachables for each world, or empty for placement groups before reachables are considered
     pub reachable: Vec<SpoilerWorldReachable>,
@@ -32,12 +32,12 @@ pub struct SpoilerGroup {
     pub placements: Vec<SpoilerPlacement>,
 }
 /// Newly reachable locations
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SpoilerWorldReachable {
     pub locations: Vec<String>,
 }
 /// One item placed on one location
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SpoilerPlacement {
     /// Whether this placement happened as a part of forced progression (as opposed to random placement)
     pub forced: bool,

@@ -14,6 +14,7 @@ use std::{
 use rustc_hash::FxHashMap;
 use structopt::StructOpt;
 use bugsalot::debugger;
+use serde::{Serialize, Deserialize};
 
 use log::LevelFilter;
 
@@ -22,6 +23,7 @@ use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal,
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
 use util::UberState;
+use wotw_seedgen::generator::SeedSpoiler;
 
 /// For CLI flags that contain a mixture of world specifiers and flag values
 struct WorldOpt<T> {
@@ -303,9 +305,12 @@ struct SeedArgs {
     /// write stderr logs in json format
     #[structopt(long)]
     json_stderr: bool,
-    /// write spoiler in json format
+    /// use json output where possible
+    ///
+    /// If --tostdout is enabled, a json object with all output data is written to stdout.
+    /// If --tostdout is disabled, only spoilers will be written as json files.
     #[structopt(long)]
-    json_spoiler: bool,
+    json: bool,
     /// launch the seed after generating
     #[structopt(short, long)]
     launch: bool,
@@ -697,13 +702,33 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, player
     Ok(())
 }
 
-fn write_seeds_to_stdout(seed: &Seed, json_spoiler: bool) -> Result<(), String> {
-    let seeds =  seed.seed_files()?.join("\n======= END SEED =======\n");
-    let spoiler =  match json_spoiler {
-        true => seed.spoiler.to_json(),
-        false => seed.spoiler.to_string(),
-    };
-    println!("{seeds}\n======= SPOILER =======\n{spoiler}");
+fn write_seeds_to_stdout(seed: &Seed, json: bool) -> Result<(), String> {
+    let files = seed.seed_files()?;
+
+    if json {
+        let output = SeedgenCliJsonOutput {
+            seed_files: files,
+            spoiler: seed.spoiler.clone(),
+            spoiler_text: seed.spoiler.to_string(),
+        };
+
+        println!("{}", output.to_json())
+
+    } else {
+        if files.len() > 1 {
+            for (index, file) in files.iter().enumerate() {
+                println!("======= World {index} =======");
+                println!("{file}");
+            }
+        } else {
+            println!("{}", files[0]);
+        }
+
+        println!();
+        println!("======= Spoiler =======");
+        println!("{}", seed.spoiler.to_string());
+    }
+
     Ok(())
 }
 
@@ -736,11 +761,11 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     }
 
     if args.tostdout {
-        write_seeds_to_stdout(&seed, args.json_spoiler)?;
+        write_seeds_to_stdout(&seed, args.json)?;
     } else {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
-        write_seeds_to_files(&seed, &filename, args.seed_folder, &players, args.json_spoiler)?;
+        write_seeds_to_files(&seed, &filename, args.seed_folder, &players, args.json)?;
     }
 
     if args.launch {
@@ -959,5 +984,23 @@ fn main() -> ExitCode {
             log::error!("{err}");
             ExitCode::FAILURE
         },
+    }
+}
+
+/// Struct that is used for JSON output to stdout
+#[derive(Serialize, Deserialize)]
+struct SeedgenCliJsonOutput {
+    /// The seed file contents (i.e. text that goes into .wotwr files)
+    pub seed_files: Vec<String>,
+    /// Spoiler for this seed
+    pub spoiler: SeedSpoiler,
+    /// Text representation of the spoiler
+    pub spoiler_text: String,
+}
+
+impl SeedgenCliJsonOutput {
+    /// Serialize into json format
+    pub fn to_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
     }
 }

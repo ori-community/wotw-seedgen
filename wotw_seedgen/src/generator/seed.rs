@@ -38,11 +38,11 @@ impl Seed<'_> {
             let config = &self.settings.to_json();
 
             format!("{world}\
-                // This World: {index}\n\
-                // Target: ^2.0\n\
-                // Generator Version: {version}\n\
-                // Slug: {slug}\n\
-                // Config: {config}\n")
+                %world-index: {index}\n\
+                %target: ^2.0\n\
+                %generator-version: {version}\n\
+                %slug: {slug}\n\
+                %config: {config}\n")
         }).collect::<Vec<_>>();
 
         header::parser::postprocess(&mut seeds, self.graph, &self.settings)?;
