@@ -332,7 +332,7 @@ struct SeedSettings {
     #[structopt(short = "p", long)]
     world_presets: Vec<WorldOpt<String>>,
     /// World names in multiworld
-    /// 
+    ///
     /// Usually the names of the players or teams playing in a world
     /// This also determines how many worlds to generate the seed with
     /// Without this flag, one world with a default name will be generated
@@ -412,7 +412,6 @@ impl SeedSettings {
             seed,
         } = self;
 
-        let has_world_names = world_names.is_some();
         let internal_world_names = world_names.unwrap_or_else(|| vec!["World".to_string()]);
 
         let world_presets = resolve_world_opts(world_presets, &internal_world_names)?;
@@ -438,12 +437,9 @@ impl SeedSettings {
             .zip(world_headers)
             .zip(world_header_configs)
             .zip(world_inline_headers)
-            .map(|(((((((((world_name, world_presets), spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
-                let world_name = if has_world_names { Some(world_name) } else { None };
-
+            .map(|(((((((((_world_name, world_presets), spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
                 WorldPreset {
                     includes: vec_in_option(world_presets),
-                    world_name,
                     spawn: spawn.map(SpawnOpt::into_inner),
                     difficulty,
                     tricks: vec_in_option(tricks),
@@ -542,7 +538,7 @@ impl WorldPresetSettings {
     fn into_world_preset(self) -> WorldPreset {
         let Self {
             includes,
-            world_name,
+            world_name: _world_name,
             spawn,
             difficulty,
             tricks,
@@ -555,7 +551,6 @@ impl WorldPresetSettings {
 
         WorldPreset {
             includes,
-            world_name,
             spawn: spawn.map(SpawnOpt::into_inner),
             difficulty,
             tricks,
@@ -613,14 +608,9 @@ enum HeaderCommand {
 }
 
 fn parse_settings(args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
-    let has_world_names = args.world_names.is_some();
     let preset = args.into_preset()?;
 
     settings.apply_preset(preset)?;
-
-    if !has_world_names {
-        settings.world_settings[0].world_name = "World".to_string();
-    }
 
     Ok(())
 }
@@ -752,7 +742,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
-    let players = settings.world_settings.iter().map(|world_settings| world_settings.world_name.clone()).collect::<Vec<_>>();
+    let players = settings.world_settings.iter().enumerate().map(|(world_index, _)| format!("World {}", world_index)).collect::<Vec<_>>();
     let seed = wotw_seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
