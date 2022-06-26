@@ -76,6 +76,9 @@ impl Display for SeedSpoiler {
             writeln!(f, "Spawn: {spawn}")?;
         }
 
+        writeln!(f)?;
+        writeln!(f)?;
+
         let items_table_format = format::FormatBuilder::new()
             .column_separator(' ')
             .separators(&[], format::LineSeparator::default())
