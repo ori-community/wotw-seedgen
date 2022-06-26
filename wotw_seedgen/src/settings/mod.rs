@@ -50,7 +50,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// %config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
+/// #config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
@@ -94,7 +94,7 @@ impl Settings {
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
     pub fn from_seed(input: &str) -> Option<Result<Settings, serde_json::Error>> {
-        input.lines().find_map(|line| line.strip_prefix("%config: ").map(serde_json::from_str))
+        input.lines().find_map(|line| line.strip_prefix("#config: ").map(serde_json::from_str))
     }
 
     /// Apply the settings from a preset

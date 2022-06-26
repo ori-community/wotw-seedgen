@@ -38,11 +38,11 @@ impl Seed<'_> {
             let config = &self.settings.to_json();
 
             format!("{world}\
-                %world-index: {index}\n\
-                %target: ^2.0\n\
-                %generator-version: {version}\n\
-                %slug: {slug}\n\
-                %config: {config}\n")
+                #world-index: {index}\n\
+                #target: ^2.0\n\
+                #generator-version: {version}\n\
+                #slug: {slug}\n\
+                #config: {config}\n")
         }).collect::<Vec<_>>();
 
         header::parser::postprocess(&mut seeds, self.graph, &self.settings)?;
@@ -54,13 +54,13 @@ impl Seed<'_> {
 impl Display for SeedWorld<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if !self.flags.is_empty() {
-            writeln!(f, "Flags: {}", self.flags.join(", "))?;
+            writeln!(f, "#flags: {}", self.flags.join(", "))?;
         }
 
         let spawn_identifier = self.spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
             let position = self.spawn.position().expect("Seed Spawn had no coordinates");
-            writeln!(f, "Spawn: {position}  // {spawn_identifier}")?;
+            writeln!(f, "setup 1|{}|{}  // Spawn at {spawn_identifier}", position.x, position.y)?;
 
             if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == spawn_identifier { Some(item) } else { None }) {
                 writeln!(f, "{}|{}|mute", UberState::spawn().code(), spawn_item.code())?;
