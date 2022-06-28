@@ -624,7 +624,7 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
 
     if multiworld {
         let mut multi_folder = folder.clone();
-        multi_folder.push(filename.clone());
+        multi_folder.push(filename);
         folder = util::create_folder(&multi_folder).map_err(|err| format!("Error creating seed folder: {}", err))?;
     }
 
@@ -632,7 +632,7 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
     for (index, seed) in seeds.iter().enumerate() {
         let mut path = folder.clone();
         if multiworld {
-            path.push(format!("world_{}", index.to_string()));
+            path.push(format!("world_{}", index));
         } else {
             path.push(filename);
         }
@@ -644,7 +644,7 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
         if first {
             first = false;
             if let Some(path) = file.to_str() {
-                fs::write(".currentseedpath", path.to_string()).unwrap_or_else(|err| log::warn!("Unable to write .currentseedpath: {}", err));
+                fs::write(".currentseedpath", path).unwrap_or_else(|err| log::warn!("Unable to write .currentseedpath: {}", err));
             } else {
                 log::warn!("Unable to write .currentseedpath: path is not valid unicode");
             }
@@ -695,7 +695,7 @@ fn write_seeds_to_stdout(seed: Seed, json: bool) -> Result<(), String> {
 
         println!();
         println!("======= Spoiler =======");
-        println!("{}", seed.spoiler.to_string());
+        println!("{}", seed.spoiler);
     }
 
     Ok(())
@@ -882,7 +882,7 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
     let mut rng = rand::thread_rng();
 
     let header = Header::parse(header, &mut rng)
-        .map_err(|errors| (**errors).into_iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?
+        .map_err(|errors| (*errors).iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?
         .build(FxHashMap::default())?;
 
     path.set_extension("wotwr");
