@@ -26,7 +26,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
         }
         line = line.trim();
 
-        if line.is_empty() || line.starts_with("Flags:") || line.starts_with("Spawn:") || line.starts_with("timer:") {
+        if line.is_empty() || line.starts_with('#') || line.starts_with("setup") {
             continue;
         }
 
@@ -74,7 +74,7 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
         }
         line = line.trim();
 
-        if line.is_empty() || line.starts_with("Flags:") || line.starts_with("Spawn:") || line.starts_with("timer:") {
+        if line.is_empty() || line.starts_with('#') || line.starts_with("setup") {
             continue;
         }
 

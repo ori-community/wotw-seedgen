@@ -60,7 +60,7 @@ impl Display for SeedWorld<'_> {
         let spawn_identifier = self.spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
             let position = self.spawn.position().expect("Seed Spawn had no coordinates");
-            writeln!(f, "setup 1|{}|{}  // Spawn at {spawn_identifier}", position.x, position.y)?;
+            writeln!(f, "setup 1|{}|{}  // {spawn_identifier}", position.x, position.y)?;
 
             if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == spawn_identifier { Some(item) } else { None }) {
                 writeln!(f, "{}|{}|mute", UberState::spawn().code(), spawn_item.code())?;
