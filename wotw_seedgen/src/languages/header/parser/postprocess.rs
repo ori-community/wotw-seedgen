@@ -45,9 +45,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
                 for other_world_index in other_worlds {
                     let actual_zone = where_is(&actual_item, other_world_index, seeds, graph, settings)?;
                     if &actual_zone != "Unknown" {
-                        let player_name = &settings.world_settings[other_world_index].world_name;
-
-                        return Ok(format!("{}'s {}", player_name, actual_zone));
+                        return Ok(format!("$[15|5|{}]'s {}", other_world_index, actual_zone));
                     }
                 }
             } else if uber_group == "3" && (uber_id == "0" || uber_id == "1") {

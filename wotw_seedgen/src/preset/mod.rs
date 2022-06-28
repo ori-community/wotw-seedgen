@@ -128,9 +128,6 @@ pub struct WorldPreset {
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<Vec<String>>,
-    /// The name of this world (usually the name of the player or co-op team)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub world_name: Option<String>,
     /// Spawn destination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spawn: Option<Spawn>,

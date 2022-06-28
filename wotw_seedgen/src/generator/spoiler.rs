@@ -10,18 +10,10 @@ use super::placement::Placement;
 /// Complete data to create a logic spoiler for the seed
 #[derive(Serialize, Deserialize)]
 pub struct SeedSpoiler {
-    /// Metadata about the number of worlds and basic details about them
-    pub worlds: Vec<SpoilerWorld>,
+    /// Anchor identifier of all the spawn locations
+    pub spawns: Vec<String>,
     /// Each [`SpoilerGroup`] represents one "step" of placements
     pub groups: Vec<SpoilerGroup>,
-}
-/// Basic details about a world
-#[derive(Serialize, Deserialize)]
-pub struct SpoilerWorld {
-    /// User-given name for this world, or "World" as a default on single-world seeds
-    pub name: String,
-    /// Anchor identifier of the spawn location
-    pub spawn: String,
 }
 /// One "step" of placements in a [`SeedSpoiler`]
 #[derive(Default, Serialize, Deserialize)]
@@ -63,16 +55,16 @@ impl SeedSpoiler {
 
 impl Display for SeedSpoiler {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let world_count = self.worlds.len();
+        let world_count = self.spawns.len();
         let multiworld = world_count > 1;
 
         if multiworld {
-            for SpoilerWorld { name, spawn } in &self.worlds {
-                writeln!(f, "{name}'s Spawn: {spawn}")?;
+            for (index, spawn) in self.spawns.iter().enumerate() {
+                write!(f, "World {index}'s Spawn: {spawn}\n")?;
             }
         } else {
-            let spawn = &self.worlds[0].spawn;
-            writeln!(f, "Spawn: {spawn}")?;
+            let spawn = &self.spawns[0];
+            write!(f, "Spawn: {spawn}\n")?;
         }
 
         for (index, spoiler_group) in self.groups.iter().enumerate() {
@@ -85,8 +77,7 @@ impl Display for SeedSpoiler {
                 else { write!(f, " - ")?; }
                 for (world_index, world_reachable) in spoiler_group.reachable.iter().enumerate() {
                     if multiworld {
-                        let world_name = &self.worlds[world_index].name;
-                        write!(f, "{world_name}: ")?;
+                        write!(f, "World {world_index}: ")?;
                     }
                     if world_reachable.locations.is_empty() {
                         writeln!(f, "No new locations reachable")?;
@@ -110,16 +101,16 @@ impl Display for SeedSpoiler {
                     if placement.forced { write!(f, "(forced) ")?; }
 
                     if multiworld {
-                        let target_world = &self.worlds[placement.target_world_index].name;
-                        write!(f, "{target_world}'s ")?;
+                        let target_world_index = &placement.target_world_index;
+                        write!(f, "World {target_world_index}'s ")?;
                     }
 
                     let item = &placement.item;
                     write!(f, "{item} from ")?;
 
                     if multiworld {
-                        let origin_world = &self.worlds[placement.origin_world_index].name;
-                        write!(f, "{origin_world}'s ")?;
+                        let origin_world_index = &placement.origin_world_index;
+                        write!(f, "World {origin_world_index}'s ")?;
                     }
 
                     let node_identifier = &placement.node_identifier;

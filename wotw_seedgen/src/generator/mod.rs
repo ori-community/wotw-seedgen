@@ -3,7 +3,7 @@ mod spoiler;
 mod placement;
 
 pub use seed::{Seed, SeedWorld};
-pub use spoiler::{SeedSpoiler, SpoilerWorld, SpoilerGroup, SpoilerWorldReachable, SpoilerPlacement};
+pub use spoiler::{SeedSpoiler, SpoilerGroup, SpoilerWorldReachable, SpoilerPlacement};
 pub use placement::Placement;
 
 use std::{fmt::Write, cmp::Ordering};

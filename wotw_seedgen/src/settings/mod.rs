@@ -50,7 +50,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"worldName\":\"\",\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
+/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
@@ -295,8 +295,6 @@ impl Error for ApplyPresetError {}
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct WorldSettings {
-    /// The name of this world (usually the name of the player or co-op team)
-    pub world_name: String,
     /// Spawn destination
     pub spawn: Spawn,
     /// Logically expected difficulty
@@ -340,7 +338,6 @@ impl WorldSettings {
     fn apply_world_preset_guarded(&mut self, preset: WorldPreset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
         let WorldPreset {
             includes,
-            world_name,
             difficulty,
             tricks,
             goals,
@@ -357,9 +354,6 @@ impl WorldSettings {
             }
         }
 
-        if let Some(world_name) = world_name {
-            self.world_name = world_name;
-        }
         if let Some(difficulty) = difficulty {
             self.difficulty = difficulty;
         }

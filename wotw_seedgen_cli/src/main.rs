@@ -9,6 +9,7 @@ use std::{
     io::{self, Read},
     time::Instant,
     env, error::Error, process::ExitCode,
+    fmt::{self, Display, Debug},
 };
 
 use rustc_hash::FxHashMap;
@@ -29,54 +30,46 @@ struct WorldOpt<T> {
     inner: WorldOptInner<T>,
 }
 impl<T: FromStr> FromStr for WorldOpt<T> {
-    type Err = T::Err;
+    type Err = WorldOptError<T::Err>;
 
-    fn from_str(s: &str) -> Result<Self, T::Err> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let inner = if let Some(world) = s.strip_prefix(':') {
-            WorldOptInner::World(WorldIdentifier::from(world))
+            let index = world.parse().map_err(|_| WorldOptError::IndexError(world.to_string()))?;
+            WorldOptInner::World(index)
         } else {
-            WorldOptInner::Opt(T::from_str(s)?)
+            WorldOptInner::Opt(T::from_str(s).map_err( WorldOptError::ValueError)?)
         };
         let source = s.to_string();
         Ok(WorldOpt { source, inner })
     }
 }
+#[derive(Debug)]
+enum WorldOptError<Err> {
+    IndexError(String),
+    ValueError(Err),
+}
+impl<Err: Display> Display for WorldOptError<Err> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            WorldOptError::IndexError(index) => write!(f, "Invalid world index :{index}"),
+            WorldOptError::ValueError(err) => write!(f, "{err}"),
+        }
+    }
+}
+impl<Err: Display + Debug> Error for WorldOptError<Err> {}
 
 enum WorldOptInner<T> {
-    World(WorldIdentifier),
+    World(usize),
     Opt(T),
 }
 
-enum WorldIdentifier {
-    Index(usize),
-    Name(String),
-}
-impl From<&str> for WorldIdentifier {
-    fn from(s: &str) -> Self {
-        s.parse::<usize>().map_or_else(
-            |_| WorldIdentifier::Name(s.to_string()),
-            WorldIdentifier::Index
-        )
-    }
-}
-
-fn resolve_world_identifier(identifier: WorldIdentifier, world_names: &[String]) -> Result<usize, String> {
-    match identifier {
-        WorldIdentifier::Index(index) => Ok(index),
-        WorldIdentifier::Name(name) => world_names.iter().enumerate()
-            .find(|(_, world_name)| &&name == world_name)
-            .map(|t| t.0)
-            .ok_or(format!("Unknown world name {name}")),
-    }
-}
-
-fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_names: &[String]) -> Result<Vec<Vec<T>>, String> {
-    let mut world_values: Vec<Vec<T>> = world_names.iter().map(|_| vec![]).collect();
+fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_count: usize) -> Result<Vec<Vec<T>>, String> {
+    let mut world_values: Vec<Vec<T>> = vec![vec![]; world_count];
     let mut current_world = None;
 
     for world_opt in world_opts {
         match world_opt.inner {
-            WorldOptInner::World(identifier) => current_world = Some(resolve_world_identifier(identifier, world_names)?),
+            WorldOptInner::World(index) => current_world = Some(index),
             WorldOptInner::Opt(value) => {
                 if let Some(index) = current_world {
                     world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?.push(value);
@@ -101,13 +94,13 @@ fn assign_nonduplicate<T>(assign: T, current_world_entry: &mut Option<(T, String
         },
     }
 }
-fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_names: &[String]) -> Result<Vec<Option<T>>, String> {
-    let mut world_values: Vec<Option<(T, String)>> = world_names.iter().map(|_| None).collect();
+fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_count: usize) -> Result<Vec<Option<T>>, String> {
+    let mut world_values: Vec<Option<(T, String)>> = vec![None; world_count];
     let mut current_world = None;
 
     for world_opt in world_opts {
         match world_opt.inner {
-            WorldOptInner::World(identifier) => current_world = Some(resolve_world_identifier(identifier, world_names)?),
+            WorldOptInner::World(index) => current_world = Some(index),
             WorldOptInner::Opt(value) => {
                 if let Some(index) = current_world {
                     let current_world_entry = world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?;
@@ -330,13 +323,11 @@ struct SeedSettings {
     /// Presets later in the list override earlier ones, and flags from the command override any preset
     #[structopt(short = "p", long)]
     world_presets: Vec<WorldOpt<String>>,
-    /// World names in multiworld
+    /// How many worlds to generate
     /// 
-    /// Usually the names of the players or teams playing in a world
-    /// This also determines how many worlds to generate the seed with
-    /// Without this flag, one world with a default name will be generated
-    #[structopt(short, long)]
-    world_names: Option<Vec<String>>,
+    /// Seeds with more than one world are called multiworld seeds
+    #[structopt(short, long, default_value = "1")]
+    world_count: usize,
     /// Spawn destination
     ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
@@ -392,7 +383,7 @@ impl SeedSettings {
         let Self {
             presets,
             world_presets,
-            world_names,
+            world_count,
             spawn,
             difficulty,
             tricks,
@@ -405,24 +396,20 @@ impl SeedSettings {
             online,
         } = self;
 
-        let has_world_names = world_names.is_some();
-        let internal_world_names = world_names.unwrap_or_else(|| vec!["World".to_string()]);
-
-        let world_presets = resolve_world_opts(world_presets, &internal_world_names)?;
-        let world_spawns = resolve_nonduplicate_world_opts(spawn, &internal_world_names)?;
-        let world_difficulties = resolve_nonduplicate_world_opts(difficulty, &internal_world_names)?;
-        let world_tricks = resolve_world_opts(tricks, &internal_world_names)?;
-        let world_hard_flags = resolve_nonduplicate_world_opts(hard, &internal_world_names)?;
-        let world_goals = resolve_world_opts(goals, &internal_world_names)?;
-        let world_headers = resolve_world_opts(headers, &internal_world_names)?;
-        let world_header_configs = resolve_world_opts(header_config, &internal_world_names)?;
-        let world_inline_headers = resolve_world_opts(inline_headers, &internal_world_names)?;
+        let world_presets = resolve_world_opts(world_presets, world_count)?;
+        let world_spawns = resolve_nonduplicate_world_opts(spawn, world_count)?;
+        let world_difficulties = resolve_nonduplicate_world_opts(difficulty, world_count)?;
+        let world_tricks = resolve_world_opts(tricks, world_count)?;
+        let world_hard_flags = resolve_nonduplicate_world_opts(hard, world_count)?;
+        let world_goals = resolve_world_opts(goals, world_count)?;
+        let world_headers = resolve_world_opts(headers, world_count)?;
+        let world_header_configs = resolve_world_opts(header_config, world_count)?;
+        let world_inline_headers = resolve_world_opts(inline_headers, world_count)?;
 
         let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
         let online = if online { Some(true) } else { None };
 
-        let yes_fun = internal_world_names.into_iter()
-            .zip(world_presets)
+        let yes_fun = world_presets.into_iter()
             .zip(world_spawns)
             .zip(world_difficulties)
             .zip(world_tricks)
@@ -431,12 +418,9 @@ impl SeedSettings {
             .zip(world_headers)
             .zip(world_header_configs)
             .zip(world_inline_headers)
-            .map(|(((((((((world_name, world_presets), spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
-                let world_name = if has_world_names { Some(world_name) } else { None };
-
+            .map(|((((((((world_presets, spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
                 WorldPreset {
                     includes: vec_in_option(world_presets),
-                    world_name,
                     spawn: spawn.map(SpawnOpt::into_inner),
                     difficulty,
                     tricks: vec_in_option(tricks),
@@ -487,11 +471,6 @@ struct WorldPresetSettings {
     /// Presets later in the list override earlier ones, and flags from the command override any preset
     #[structopt(short = "p", long)]
     includes: Option<Vec<String>>,
-    /// World name in multiworld
-    /// 
-    /// Usually the name of the player or team playing in the world
-    #[structopt(short, long)]
-    world_name: Option<String>,
     /// Spawn destination
     ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
@@ -534,7 +513,6 @@ impl WorldPresetSettings {
     fn into_world_preset(self) -> WorldPreset {
         let Self {
             includes,
-            world_name,
             spawn,
             difficulty,
             tricks,
@@ -547,7 +525,6 @@ impl WorldPresetSettings {
 
         WorldPreset {
             includes,
-            world_name,
             spawn: spawn.map(SpawnOpt::into_inner),
             difficulty,
             tricks,
@@ -605,16 +582,11 @@ enum HeaderCommand {
 }
 
 fn parse_settings(seed: Option<String>, args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
-    let has_world_names = args.world_names.is_some();
     let preset = args.into_preset()?;
-
     settings.apply_preset(preset)?;
 
     if let Some(seed) = seed {
         settings.seed = seed;
-    }
-    if !has_world_names {
-        settings.world_settings[0].world_name = "World".to_string();
     }
 
     Ok(())
@@ -642,7 +614,7 @@ fn read_stdin() -> Result<String, String> {
     Ok(output)
 }
 
-fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, players: &[String], json_spoiler: bool) -> Result<(), String> {
+fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_spoiler: bool) -> Result<(), String> {
     let seeds = seed.seed_files()?;
     let multiworld = seeds.len() > 1;
 
@@ -654,18 +626,16 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, player
 
     let mut first = true;
     for (index, seed) in seeds.iter().enumerate() {
-        let player = players.get(index).cloned().unwrap_or_else(|| format!("Player {}", index + 1));
-
         let mut path = folder.clone();
         if multiworld {
-            path.push(&player);
+            path.push(format!("world_{}", index.to_string()));
         } else {
             path.push(filename);
         }
         path.set_extension("wotwr");
 
         let file = util::create_file(&path, seed, "", true)?;
-        log::info!("Wrote seed for {} to {}", player, file.display());
+        log::info!("Wrote seed for World {} to {}", index, file.display());
 
         if first {
             first = false;
@@ -727,7 +697,6 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
-    let players = settings.world_settings.iter().map(|world_settings| world_settings.world_name.clone()).collect::<Vec<_>>();
     let seed = wotw_seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
@@ -740,7 +709,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     } else {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
-        write_seeds_to_files(&seed, &filename, args.seed_folder, &players, args.json_spoiler)?;
+        write_seeds_to_files(&seed, &filename, args.seed_folder, args.json_spoiler)?;
     }
 
     if args.launch {
