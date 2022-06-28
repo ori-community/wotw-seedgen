@@ -61,7 +61,7 @@ impl Display for SeedSpoiler {
 
         if multiworld {
             for (index, spawn) in self.spawns.iter().enumerate() {
-                writeln!(f, "World {index}'s Spawn: {spawn}")?;
+                writeln!(f, "Spawn for World [{index}]: {spawn}")?;
             }
         } else {
             let spawn = &self.spawns[0];
@@ -88,7 +88,7 @@ impl Display for SeedSpoiler {
 
                 for (world_index, world_reachable) in spoiler_group.reachable.iter().enumerate() {
                     if multiworld {
-                        write!(f, "  World {world_index}: ")?;
+                        write!(f, "  [{world_index}]: ")?;
                     } else {
                         write!(f, "  ")?;
                     }
@@ -115,33 +115,22 @@ impl Display for SeedSpoiler {
                 writeln!(f)?;
 
                 for placement in &spoiler_group.placements {
-                    let mut pickup = "".to_owned();
-                    let mut location = "".to_owned();
-                    let mut position = "".to_owned();
-
-                    if multiworld {
+                    let mut pickup = if multiworld {
                         let target_world_index = &placement.target_world_index;
-                        write!(f, "World {target_world_index}'s ")?;
-                    }
-
-                    let item = &placement.item;
-                    pickup.push_str(&item.to_string());
-
+                        format!("[{target_world_index}] ")
+                    } else { String::new() };
+                    pickup.push_str(&placement.item.to_string());
                     if placement.forced {
                         pickup.push_str(" [forced]")
                     }
 
-                    if multiworld {
+                    let mut location = if multiworld {
                         let origin_world_index = &placement.origin_world_index;
-                        write!(f, "World {origin_world_index}'s ")?;
-                    }
+                        format!("[{origin_world_index}] ")
+                    } else { String::new() };
+                    location.push_str(&placement.node_identifier);
 
-                    let node_identifier = &placement.node_identifier;
-                    location.push_str(node_identifier);
-
-                    if let Some(node_position) = &placement.node_position {
-                        position.push_str(&node_position.to_string());
-                    }
+                    let position = placement.node_position.as_ref().map_or(String::new(), |position| position.to_string());
 
                     items_table.add_row(row![
                         pickup,
