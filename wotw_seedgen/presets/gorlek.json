@@ -1,23 +1,23 @@
 {
-    "includes": [
-        "qol"
-    ],
-    "difficulty": "Gorlek",
-    "headers": [
-        "vanilla_opher_upgrades",
-        "black_market",
-        "teleporters",
-        "key_hints",
-        "zone_hints",
-        "trial_hints",
-        "no_rain",
-        "fragment_overflow"
-    ],
-    "headerConfig": [
-        {
-            "header_name": "zone_hints",
-            "config_name": "tp_hints",
-            "config_value": "true"
-        }
-    ]
+  "includes": [
+    "qol"
+  ],
+  "difficulty": "Gorlek",
+  "headers": [
+    "vanilla_opher_upgrades",
+    "black_market",
+    "teleporters",
+    "key_hints",
+    "zone_hints",
+    "trial_hints",
+    "no_rain",
+    "fragment_overflow"
+  ],
+  "headerConfig": [
+    {
+      "header_name": "zone_hints",
+      "config_name": "tp_hints",
+      "config_value": "true"
+    }
+  ]
 }
