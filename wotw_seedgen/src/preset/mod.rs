@@ -76,8 +76,13 @@ impl Preset {
     }
     /// Serialize the [`Preset`] into json format
     pub fn to_json(&self) -> String {
-        // This is safe because the preset struct is known to serialize successfully
+        // This is safe because the Preset struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
+    }
+    /// Serialize the [`Preset`] into pretty-printed json format
+    pub fn to_json_pretty(&self) -> String {
+        // This is safe because the Preset struct is known to serialize successfully
+        serde_json::to_string_pretty(&self).unwrap()
     }
 
     /// Find and read a [`Preset`] with the given name
@@ -160,19 +165,24 @@ pub struct WorldPreset {
 }
 
 impl WorldPreset {
-    /// Parse a preset from json
+    /// Parse a [`WorldPreset`] from json
     pub fn parse(input: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(input)
     }
-    /// Serialize the preset into json format
+    /// Serialize the [`WorldPreset`] into json format
     pub fn to_json(&self) -> String {
-        // This is safe because the preset struct is known to serialize successfully
+        // This is safe because the WorldPreset struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
     }
+    /// Serialize the [`WorldPreset`] into json format
+    pub fn to_json_pretty(&self) -> String {
+        // This is safe because the WorldPreset struct is known to serialize successfully
+        serde_json::to_string_pretty(&self).unwrap()
+    }
 
-    /// Find and read a preset with the given name
+    /// Find and read a [`WorldPreset`] with the given name
     /// 
-    /// The preset will be searched as .json file in the current and /presets child directory
+    /// The [`WorldPreset`] will be searched as .json file in the current and /presets child directory
     pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
         name.push_str(".json");
         let input = util::read_file(name, "presets")?;

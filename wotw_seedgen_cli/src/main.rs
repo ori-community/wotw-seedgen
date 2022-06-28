@@ -756,7 +756,7 @@ fn play_last_seed() -> Result<(), String> {
 
 fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
     let preset = args.settings.into_preset()?;
-    let preset = preset.to_json();
+    let preset = preset.to_json_pretty();
     args.name.set_extension("json");
 
     let path = util::create_file(&args.name, &preset, "presets", false)?;
@@ -767,7 +767,7 @@ fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
 
 fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> {
     let preset = args.settings.into_world_preset();
-    let preset = preset.to_json();
+    let preset = preset.to_json_pretty();
     args.name.set_extension("json");
 
     let path = util::create_file(&args.name, &preset, "presets", false)?;
