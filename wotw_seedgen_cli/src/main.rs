@@ -671,18 +671,18 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
     Ok(())
 }
 
-fn write_seeds_to_stdout(seed: &Seed, json: bool) -> Result<(), String> {
+fn write_seeds_to_stdout(seed: Seed, json: bool) -> Result<(), String> {
     let files = seed.seed_files()?;
 
     if json {
+        let spoiler_text = seed.spoiler.to_string();
         let output = SeedgenCliJsonOutput {
             seed_files: files,
-            spoiler: seed.spoiler.clone(),
-            spoiler_text: seed.spoiler.to_string(),
+            spoiler: seed.spoiler,
+            spoiler_text,
         };
 
         println!("{}", output.to_json())
-
     } else {
         if files.len() > 1 {
             for (index, file) in files.iter().enumerate() {
@@ -729,7 +729,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     }
 
     if args.tostdout {
-        write_seeds_to_stdout(&seed, args.json)?;
+        write_seeds_to_stdout(seed, args.json)?;
     } else {
         let filename = args.filename.unwrap_or_else(|| String::from("seed"));
 
