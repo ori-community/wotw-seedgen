@@ -218,7 +218,10 @@ where
 
     let node_identifier = node.identifier().to_string();
     let node_position = node.position().cloned();
-    context.current_spoiler_group.placements.push(SpoilerPlacement { forced, origin_world_index, target_world_index, node_identifier, node_position, item });
+    if forced {
+        context.current_spoiler_group.forced_items.grant(item.clone(), 1);
+    }
+    context.current_spoiler_group.placements.push(SpoilerPlacement { origin_world_index, target_world_index, node_identifier, node_position, item });
 
     Ok(())
 }
@@ -596,7 +599,6 @@ where
                     let node = world_context.spawn_slots.pop();
 
                     context.current_spoiler_group.placements.push(SpoilerPlacement {
-                        forced: true,
                         origin_world_index: world_index,
                         target_world_index: world_index,
                         node_identifier: "Spawn".to_string(),

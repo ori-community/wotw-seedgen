@@ -1,9 +1,8 @@
-use std::fmt::{self, Display};
-use prettytable::{format, row, cell, Table};
+use std::fmt::{self, Display, Write};
 
 use serde::{Serialize, Deserialize};
 
-use crate::{util::Position, Item};
+use crate::{util::Position, Item, Inventory};
 
 #[cfg(doc)]
 use super::placement::Placement;
@@ -21,6 +20,8 @@ pub struct SeedSpoiler {
 pub struct SpoilerGroup {
     /// Either contains the reachables for each world, or empty for placement groups before reachables are considered
     pub reachable: Vec<SpoilerWorldReachable>,
+    /// The set of items that were placed as forced progression, if any
+    pub forced_items: Inventory,
     /// An ordered list detailing the [`Placement`]s
     pub placements: Vec<SpoilerPlacement>,
 }
@@ -32,8 +33,6 @@ pub struct SpoilerWorldReachable {
 /// One item placed on one location
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SpoilerPlacement {
-    /// Whether this placement happened as a part of forced progression (as opposed to random placement)
-    pub forced: bool,
     /// The "sending" world
     pub origin_world_index: usize,
     /// The "receiving" world
@@ -71,22 +70,39 @@ impl Display for SeedSpoiler {
         writeln!(f)?;
         writeln!(f)?;
 
-        let items_table_format = format::FormatBuilder::new()
-            .column_separator(' ')
-            .separators(&[], format::LineSeparator::default())
-            .padding(2, 1)
-            .indent(2)
-            .build();
+        let mut longest_pickup = 0;
+        let mut longest_location = 0;
 
-        for (index, spoiler_group) in self.groups.iter().enumerate() {
+        let spoiler_groups = self.groups.iter().map(|spoiler_group| {
+            let placements = spoiler_group.placements.iter().map(|placement| {
+                let mut pickup = String::new();
+                if multiworld {
+                    write!(pickup, "[{}] ", placement.target_world_index)?;
+                }
+                write!(pickup, "{}", placement.item)?;
+                if pickup.len() > longest_pickup { longest_pickup = pickup.len(); }
+
+                let mut location  = String::new();
+                if multiworld {
+                    write!(location , "[{}] ", placement.origin_world_index)?;
+                }
+                write!(location, "{}", placement.node_identifier)?;
+                if location.len() > longest_location { longest_location = location.len(); }
+
+                Ok((pickup, location, &placement.node_position))
+            }).collect::<Result<Vec<_>, _>>()?;
+            Ok((&spoiler_group.reachable, &spoiler_group.forced_items, placements))
+        }).collect::<Result<Vec<_>, _>>()?;
+
+        for (index, (reachable, forced_items, placements)) in spoiler_groups.into_iter().enumerate() {
             write!(f, "Step {index}")?;
 
-            if spoiler_group.reachable.is_empty() {
+            if reachable.is_empty() {
                 writeln!(f, " (priority placements)")?;
             } else {
                 writeln!(f)?;
 
-                for (world_index, world_reachable) in spoiler_group.reachable.iter().enumerate() {
+                for (world_index, world_reachable) in reachable.iter().enumerate() {
                     if multiworld {
                         write!(f, "  [{world_index}]: ")?;
                     } else {
@@ -94,52 +110,31 @@ impl Display for SeedSpoiler {
                     }
 
                     if world_reachable.locations.is_empty() {
-                        writeln!(f, "No new locations reachable")?;
+                        writeln!(f, "No new reachables")?;
                     } else {
+                        let locations = world_reachable.locations.join(", ");
                         let count = world_reachable.locations.len();
-                        write!(f, "{count} new location")?;
+                        write!(f, "{count} new reachable")?;
                         if count > 1 { write!(f, "s")?; }
-                        writeln!(f, " reachable")?;
+                        writeln!(f, ": {locations}")?;
                     }
                 }
             }
 
-            let mut items_table = Table::new();
-            items_table.set_format(items_table_format);
+            if !forced_items.items.is_empty() {
+                writeln!(f, "  Force placed: {forced_items}")?;
+            }
+            writeln!(f)?;
 
-            let placement_count = spoiler_group.placements.len();
+            let placement_count = placements.len();
             if placement_count > 0 {
-                write!(f, "  {placement_count} item")?;
-                if placement_count > 1 { write!(f, "s")?; }
-                writeln!(f, " placed")?;
-                writeln!(f)?;
-
-                for placement in &spoiler_group.placements {
-                    let mut pickup = if multiworld {
-                        let target_world_index = &placement.target_world_index;
-                        format!("[{target_world_index}] ")
-                    } else { String::new() };
-                    pickup.push_str(&placement.item.to_string());
-                    if placement.forced {
-                        pickup.push_str(" [forced]")
-                    }
-
-                    let mut location = if multiworld {
-                        let origin_world_index = &placement.origin_world_index;
-                        format!("[{origin_world_index}] ")
-                    } else { String::new() };
-                    location.push_str(&placement.node_identifier);
-
-                    let position = placement.node_position.as_ref().map_or(String::new(), |position| position.to_string());
-
-                    items_table.add_row(row![
-                        pickup,
-                        location,
-                        position,
-                    ]);
+                for (pickup, location, position) in placements {
+                    write!(f, "    {pickup:<longest_pickup$}  ")?;
+                    match position {
+                        Some(position) => writeln!(f, "{location:<longest_location$}  {position}"),
+                        None => writeln!(f, "{location}"),
+                    }?;
                 }
-
-                writeln!(f, "{items_table}")?;
             }
 
             writeln!(f)?;

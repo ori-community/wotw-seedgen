@@ -1,10 +1,12 @@
 use std::fmt;
 
+use serde::{Serialize, Deserialize};
+
 use rustc_hash::FxHashMap;
 
 use crate::item::Item;
 
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Inventory {
     pub items: FxHashMap<Item, u32>,
 }
