@@ -1,4 +1,5 @@
 use std::fmt::{self, Display};
+use prettytable::{format, row, cell, Table};
 
 use serde::{Serialize, Deserialize};
 
@@ -8,7 +9,7 @@ use crate::{util::Position, Item};
 use super::placement::Placement;
 
 /// Complete data to create a logic spoiler for the seed
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SeedSpoiler {
     /// Anchor identifier of all the spawn locations
     pub spawns: Vec<String>,
@@ -16,7 +17,7 @@ pub struct SeedSpoiler {
     pub groups: Vec<SpoilerGroup>,
 }
 /// One "step" of placements in a [`SeedSpoiler`]
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct SpoilerGroup {
     /// Either contains the reachables for each world, or empty for placement groups before reachables are considered
     pub reachable: Vec<SpoilerWorldReachable>,
@@ -24,12 +25,12 @@ pub struct SpoilerGroup {
     pub placements: Vec<SpoilerPlacement>,
 }
 /// Newly reachable locations
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SpoilerWorldReachable {
     pub locations: Vec<String>,
 }
 /// One item placed on one location
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SpoilerPlacement {
     /// Whether this placement happened as a part of forced progression (as opposed to random placement)
     pub forced: bool,
@@ -67,38 +68,56 @@ impl Display for SeedSpoiler {
             write!(f, "Spawn: {spawn}\n")?;
         }
 
+        writeln!(f)?;
+        writeln!(f)?;
+
+        let items_table_format = format::FormatBuilder::new()
+            .column_separator(' ')
+            .separators(&[], format::LineSeparator::default())
+            .padding(2, 1)
+            .indent(2)
+            .build();
+
         for (index, spoiler_group) in self.groups.iter().enumerate() {
             write!(f, "Step {index}")?;
 
             if spoiler_group.reachable.is_empty() {
-                writeln!(f, " - Priority placements")?;
+                writeln!(f, " (priority placements)")?;
             } else {
-                if multiworld { writeln!(f)?; }
-                else { write!(f, " - ")?; }
+                writeln!(f)?;
+
                 for (world_index, world_reachable) in spoiler_group.reachable.iter().enumerate() {
                     if multiworld {
-                        write!(f, "World {world_index}: ")?;
+                        write!(f, "  World {world_index}: ")?;
+                    } else {
+                        write!(f, "  ")?;
                     }
+
                     if world_reachable.locations.is_empty() {
                         writeln!(f, "No new locations reachable")?;
                     } else {
-                        let locations = world_reachable.locations.join(", ");
                         let count = world_reachable.locations.len();
                         write!(f, "{count} new location")?;
                         if count > 1 { write!(f, "s")?; }
-                        writeln!(f, " reachable: {locations}")?;
+                        writeln!(f, " reachable")?;
                     }
                 }
             }
 
+            let mut items_table = Table::new();
+            items_table.set_format(items_table_format);
+
             let placement_count = spoiler_group.placements.len();
             if placement_count > 0 {
-                write!(f, "{placement_count} item")?;
+                write!(f, "  {placement_count} item")?;
                 if placement_count > 1 { write!(f, "s")?; }
-                writeln!(f, " placed:")?;
+                writeln!(f, " placed")?;
+                writeln!(f)?;
 
                 for placement in &spoiler_group.placements {
-                    if placement.forced { write!(f, "(forced) ")?; }
+                    let mut pickup = "".to_owned();
+                    let mut location = "".to_owned();
+                    let mut position = "".to_owned();
 
                     if multiworld {
                         let target_world_index = &placement.target_world_index;
@@ -106,7 +125,11 @@ impl Display for SeedSpoiler {
                     }
 
                     let item = &placement.item;
-                    write!(f, "{item} from ")?;
+                    pickup.push_str(format!("{item}").as_str());
+
+                    if placement.forced {
+                        pickup.push_str(" [forced]")
+                    }
 
                     if multiworld {
                         let origin_world_index = &placement.origin_world_index;
@@ -114,12 +137,20 @@ impl Display for SeedSpoiler {
                     }
 
                     let node_identifier = &placement.node_identifier;
-                    write!(f, "{node_identifier}")?;
+                    location.push_str(format!("{node_identifier}").as_str());
+
                     if let Some(node_position) = &placement.node_position {
-                        write!(f, " at {node_position}")?;
+                        position.push_str(format!("{node_position}").as_str());
                     }
-                    writeln!(f)?;
+
+                    items_table.add_row(row![
+                        pickup,
+                        location,
+                        position,
+                    ]);
                 }
+
+                writeln!(f, "{}", items_table.to_string())?;
             }
 
             writeln!(f)?;

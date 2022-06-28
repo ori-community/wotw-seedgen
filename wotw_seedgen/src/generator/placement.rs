@@ -751,7 +751,7 @@ where
     }
 
     let origin_world_context = &mut world_contexts[origin_world_index];
-    log::trace!("(World {}): Reserving {} as {}placeholder",origin_world_index, node, if force { "forced " } else { "" });
+    log::trace!("(World {}): Reserving {} as {}placeholder", origin_world_index, node, if force { "forced " } else { "" });
 
     origin_world_context.placeholders.push(node);
     if !allow_placeholder {
