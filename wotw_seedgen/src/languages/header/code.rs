@@ -8,6 +8,6 @@ impl<'a, T> CodeDisplay<'a, T> {
 }
 impl<T> Display for CodeDisplay<'_, T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       self.1(&self.0, f)
+       self.1(self.0, f)
     }
 }

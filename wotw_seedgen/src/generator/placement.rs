@@ -878,9 +878,7 @@ where
         }
     }
 
-    for world_index in 0..context.world_count {
-        let world_shop_placeholders = &shop_placeholders[world_index];
-
+    for (world_index, world_shop_placeholders) in shop_placeholders.iter().enumerate() {
         if !world_shop_placeholders.is_empty() {
             log::warn!("(World {}): Not enough items in the pool to fill all shops! Filling with extra Gorlek Ore", world_index);
 

@@ -61,11 +61,11 @@ impl Display for SeedSpoiler {
 
         if multiworld {
             for (index, spawn) in self.spawns.iter().enumerate() {
-                write!(f, "World {index}'s Spawn: {spawn}\n")?;
+                writeln!(f, "World {index}'s Spawn: {spawn}")?;
             }
         } else {
             let spawn = &self.spawns[0];
-            write!(f, "Spawn: {spawn}\n")?;
+            writeln!(f, "Spawn: {spawn}")?;
         }
 
         writeln!(f)?;
@@ -125,7 +125,7 @@ impl Display for SeedSpoiler {
                     }
 
                     let item = &placement.item;
-                    pickup.push_str(format!("{item}").as_str());
+                    pickup.push_str(&item.to_string());
 
                     if placement.forced {
                         pickup.push_str(" [forced]")
@@ -137,10 +137,10 @@ impl Display for SeedSpoiler {
                     }
 
                     let node_identifier = &placement.node_identifier;
-                    location.push_str(format!("{node_identifier}").as_str());
+                    location.push_str(node_identifier);
 
                     if let Some(node_position) = &placement.node_position {
-                        position.push_str(format!("{node_position}").as_str());
+                        position.push_str(&node_position.to_string());
                     }
 
                     items_table.add_row(row![
@@ -150,7 +150,7 @@ impl Display for SeedSpoiler {
                     ]);
                 }
 
-                writeln!(f, "{}", items_table.to_string())?;
+                writeln!(f, "{items_table}")?;
             }
 
             writeln!(f)?;
