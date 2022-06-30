@@ -365,9 +365,9 @@ struct SeedSettings {
     /// Inline header syntax
     #[structopt(short, long = "inline")]
     inline_headers: Vec<WorldOpt<InlineHeaderOpt>>,
-    /// Whether the in-logic map filter should be offered
+    /// Disallow the use of the In-Logic filter while playing the seed
     #[structopt(short = "L", long)]
-    logic_map: bool,
+    disable_logic_filter: bool,
     /// Require an online connection to play the seed
     /// 
     /// This is needed for Co-op, Multiworld and Bingo
@@ -398,7 +398,7 @@ impl SeedSettings {
             headers,
             header_config,
             inline_headers,
-            logic_map,
+            disable_logic_filter,
             online,
             seed,
         } = self;
@@ -413,7 +413,7 @@ impl SeedSettings {
         let world_header_configs = resolve_world_opts(header_config, world_count)?;
         let world_inline_headers = resolve_world_opts(inline_headers, world_count)?;
 
-        let logic_map = if logic_map { Some(true) } else { None };
+        let logic_map = if disable_logic_filter { Some(false) } else { None };
         let online = if online { Some(true) } else { None };
 
         let yes_fun = world_presets.into_iter()
