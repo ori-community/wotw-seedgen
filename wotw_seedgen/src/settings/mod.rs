@@ -10,7 +10,7 @@ use rand::distributions::{Distribution, Uniform};
 use wotw_seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize};
 
-use crate::{Preset, preset::WorldPreset, util::constants::DEFAULT_SPAWN};
+use crate::{Preset, preset::WorldPreset, util::constants::DEFAULT_SPAWN, header::CodeDisplay};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -50,7 +50,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// #config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
+/// #config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"logicMap\":true,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
@@ -66,8 +66,8 @@ pub struct Settings {
     /// 
     /// This is assumed never to be empty
     pub world_settings: Vec<WorldSettings>,
-    /// Disallow the use of the In-Logic filter while playing the seed
-    pub disable_logic_filter: bool,
+    /// Whether the in-logic map filter should be offered
+    pub logic_map: bool,
     /// Require an online connection to play the seed
     /// 
     /// This is needed for Co-op, Multiworld and Bingo
@@ -117,7 +117,7 @@ impl Settings {
         let Preset {
             includes,
             world_settings,
-            disable_logic_filter,
+            logic_map,
             online,
             seed,
             create_game,
@@ -155,8 +155,9 @@ impl Settings {
                 return Err(Box::new(ApplyPresetError { message }));
             }
         }
-        if let Some(disable_logic_filter) = disable_logic_filter {
-            self.disable_logic_filter = disable_logic_filter;
+
+        if let Some(logic_map) = logic_map {
+            self.logic_map = logic_map;
         }
         if let Some(online) = online {
             self.online = online;
@@ -267,7 +268,7 @@ impl Default for Settings {
         Settings {
             seed: Self::random_seed(),
             world_settings: vec![WorldSettings::default()],
-            disable_logic_filter: false,
+            logic_map: true,
             online: false,
             create_game: CreateGame::default(),
         }
@@ -516,11 +517,21 @@ impl Goal {
     /// The flag name communicates to the randomizer client which restrictions to apply before allowing to finish the game
     pub fn flag_name(&self) -> &'static str {
         match self {
-            Goal::Wisps => "ForceWisps",
-            Goal::Trees => "ForceTrees",
-            Goal::Quests => "ForceQuests",
-            Goal::Relics(_) | Goal::RelicChance(_) => "WorldTour",
+            Goal::Wisps => "Force Wisps",
+            Goal::Trees => "Force Trees",
+            Goal::Quests => "Force Quests",
+            Goal::Relics(_) | Goal::RelicChance(_) => "World Tour",
         }
+    }
+    pub fn code(&self) -> CodeDisplay<Goal> {
+        CodeDisplay::new(self, |s, f| {
+            match s {
+                Goal::Wisps => write!(f, "wisps"),
+                Goal::Trees => write!(f, "trees"),
+                Goal::Quests => write!(f, "quests"),
+                Goal::Relics(_) | Goal::RelicChance(_) => write!(f, "relics"),
+            }
+        })
     }
 }
 

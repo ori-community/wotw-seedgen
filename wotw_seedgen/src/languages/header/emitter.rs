@@ -52,10 +52,9 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
     for content in contents {
         if if_stack.last().copied().unwrap_or(true) {
             match content {
-                HeaderContent::OuterDocumentation(_) | HeaderContent::InnerDocumentation(_) | HeaderContent::Annotation(_) => {},
-                HeaderContent::Flags(flag_string) => header_build.flags = build_flags(flag_string, &header_build.flags, parameters)?,
+                HeaderContent::OuterDocumentation(_) | HeaderContent::InnerDocumentation(_) |  HeaderContent::Annotation(_) => {},
                 HeaderContent::Command(command) => build_command(command, &mut header_build, &mut if_stack, parameters)?,
-                HeaderContent::Timer(timer) => lines.push(format!("// TODO timer: {}", timer.code())),
+                HeaderContent::Setup(setup) => lines.push(setup.code().to_string()),
                 HeaderContent::Pickup(pickup) => build_pickup(pickup, &mut lines, &mut header_build.preplacements, parameters)?,
             }
         } else if let HeaderContent::Command(command) = content {
@@ -83,15 +82,6 @@ fn build_pickup(pickup: VPickup, lines: &mut Vec<String>, preplacements: &mut Ve
     Ok(())
 }
 
-fn build_flags(flag_string: Vec<VString>, flags: &[String], parameters: &FxHashMap<String, String>) -> Result<Vec<String>, String> {
-    if !flags.is_empty() {
-        return Err("Duplicate flagline".to_string());
-    }
-    flag_string.into_iter()
-        .map(|flag| flag.resolve(parameters))
-        .collect::<Result<Vec<_>, _>>()
-}
-
 fn build_command(command: HeaderCommand, header_build: &mut HeaderBuild, if_stack: &mut Vec<bool>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
     match command {
         HeaderCommand::Include { name } => header_build.includes.push(name),
@@ -107,6 +97,7 @@ fn build_command(command: HeaderCommand, header_build: &mut HeaderBuild, if_stac
         HeaderCommand::Set { state } => header_build.state_sets.push(state),
         HeaderCommand::If { parameter, value } => build_if(&parameter, &value, if_stack, parameters)?,
         HeaderCommand::EndIf => build_endif(if_stack)?,
+        HeaderCommand::Flags { flags } => header_build.flags = build_flags(flags, &header_build.flags)?,
     }
 
     Ok(())
@@ -176,5 +167,13 @@ fn change_item_details<T: Display>(value: T, detail: &mut Option<T>, field_name:
     } else {
         *detail = Some(value);
         Ok(())
+    }
+}
+
+fn build_flags(flags: Vec<String>, prior_flags: &[String]) -> Result<Vec<String>, String> {
+    if prior_flags.is_empty() {
+        Ok(flags)
+    } else {
+        Err("Duplicate flagline".to_string())
     }
 }

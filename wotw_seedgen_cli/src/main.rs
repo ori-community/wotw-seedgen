@@ -365,9 +365,9 @@ struct SeedSettings {
     /// Inline header syntax
     #[structopt(short, long = "inline")]
     inline_headers: Vec<WorldOpt<InlineHeaderOpt>>,
-    /// Disallow the use of the In-Logic filter while playing the seed
+    /// Whether the in-logic map filter should be offered
     #[structopt(short = "L", long)]
-    disable_logic_filter: bool,
+    logic_map: bool,
     /// Require an online connection to play the seed
     /// 
     /// This is needed for Co-op, Multiworld and Bingo
@@ -398,7 +398,7 @@ impl SeedSettings {
             headers,
             header_config,
             inline_headers,
-            disable_logic_filter,
+            logic_map,
             online,
             seed,
         } = self;
@@ -413,7 +413,7 @@ impl SeedSettings {
         let world_header_configs = resolve_world_opts(header_config, world_count)?;
         let world_inline_headers = resolve_world_opts(inline_headers, world_count)?;
 
-        let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
+        let logic_map = if logic_map { Some(true) } else { None };
         let online = if online { Some(true) } else { None };
 
         let yes_fun = world_presets.into_iter()
@@ -442,7 +442,7 @@ impl SeedSettings {
         Ok(Preset {
             includes: presets,
             world_settings: Some(yes_fun),
-            disable_logic_filter,
+            logic_map,
             seed,
             online,
             create_game: None,
@@ -721,7 +721,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
-    let seed = wotw_seedgen::generate_seed(&graph, settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let seed = wotw_seedgen::generate_seed(&graph, &settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -837,7 +837,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     }
 
     for line in contents.lines() {
-        if let Some(sets) = line.strip_prefix("// Sets: ") {
+        if let Some(sets) = line.strip_prefix("#sets: ") {
             if !sets.is_empty() {
                 for identifier in sets.split(',').map(str::trim) {
                     let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;

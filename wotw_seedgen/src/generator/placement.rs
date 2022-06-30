@@ -994,11 +994,11 @@ where
     Ok(())
 }
 
-fn generate_placements_from_spawn<'a, 'b>(
-    worlds: Vec<World<'a, 'b>>,
-    spawns: Vec<&'a Node>,
+fn generate_placements_from_spawn<'graph, 'settings>(
+    worlds: Vec<World<'graph, 'settings>>,
+    spawns: Vec<&'graph Node>,
     rng: &mut impl Rng
-) -> Result<(Vec<SeedWorld<'a>>, SeedSpoiler), String> {
+) -> Result<(Vec<SeedWorld<'graph, 'settings>>, SeedSpoiler), String> {
     // TODO enforce a max total price for shops
     let price_range = Uniform::new_inclusive(0.75, 1.25);
 
@@ -1098,6 +1098,7 @@ fn generate_placements_from_spawn<'a, 'b>(
                         spawn,
                         placements: world_context.placements,
                         headers: String::new(),  // Filled later
+                        world_settings: world_context.world.player.settings,
                     },
                     world_context.spawn.identifier().to_string()))
                 .unzip();
@@ -1315,11 +1316,11 @@ fn pick_spawn<'a>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut im
     Ok(spawn)
 }
 
-pub(super) fn generate_placements<'a, 'b>(
-    graph: &'a Graph,
-    worlds: &[World<'a, 'b>],
+pub(super) fn generate_placements<'graph, 'settings>(
+    graph: &'graph Graph,
+    worlds: &[World<'graph, 'settings>],
     rng: &mut impl Rng
-) -> Result<(Vec<SeedWorld<'a>>, SeedSpoiler), String> {
+) -> Result<(Vec<SeedWorld<'graph, 'settings>>, SeedSpoiler), String> {
     let mut index = 0;
     loop {
         let spawn_locs = worlds.iter()

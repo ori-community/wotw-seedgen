@@ -1,6 +1,6 @@
 /// No Launch
 ///
 /// There is no Launch
-Flags: "No Launch"
+!!flags "No Launch"
 
 !!remove 2|8

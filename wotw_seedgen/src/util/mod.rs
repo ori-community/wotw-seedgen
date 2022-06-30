@@ -345,7 +345,6 @@ pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
 #[must_use]
 pub fn spawn_from_seed(input: &str) -> Option<String> {
     input.lines()
-        .find_map(|line| line.strip_prefix("setup 1|")
-        .and_then(|spawn| spawn.split_once("//")
-        .map(|(_, identifier)| identifier.trim().to_string())))
+        .find_map(|line| line.strip_prefix("#spawn-anchor:")
+        .map(|spawn| spawn.trim().to_string()))
 }

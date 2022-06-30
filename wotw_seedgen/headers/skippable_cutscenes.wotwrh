@@ -4,8 +4,8 @@
 /// if a "Game Saved" message appears as a text box, you can reload from the menu to have the current cutscene skipped
 !!include header_core
 
-timer: 9|102|9|151
-timer: 9|103|9|152
+setup timer|9|102|9|151
+setup timer|9|103|9|152
 
 9|0=1|6|""|f=0  // manual wisp
 !9|0=1|1|0

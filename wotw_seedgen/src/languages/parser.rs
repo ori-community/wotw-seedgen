@@ -86,6 +86,16 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
         &self.input[start..]
     }
 
+    /// Checks that the remaining portion of the input string is empty and returns a [`ParseError`] otherwise
+    pub(crate) fn expect_end(&self) -> Result<(), ParseError> {
+        let remaining = self.remaining();
+        if remaining.is_empty() {
+            Ok(())
+        } else {
+            Err(self.error(format!("Input left after parsing: \"{remaining}\""), self.current_token.range.clone()))
+        }
+    }
+
     /// Returns a [`ParseError`] with the given message and error range
     pub(crate) fn error(&self, message: impl AsRef<str>, range: Range<usize>) -> ParseError {
         ParseError::new(message, self.input, range)

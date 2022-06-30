@@ -96,15 +96,10 @@ impl FromStr for Item {
     type Err = String;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let mut parser = parser::new(input);
-        let item = VItem::parse(&mut parser)
-            .map_err(|err| err.verbose_display())?
+        let item = VItem::parse(&mut parser).map_err(|err| err.verbose_display())?
             .resolve(&FxHashMap::default())?;
-        let remaining = parser.remaining();
-        if remaining.is_empty() {
-            Ok(item)
-        } else {
-            Err(format!("Input left after parsing item: \"{remaining}\""))
-        }
+        parser.expect_end().map_err(|err| err.verbose_display())?;
+        Ok(item)
     }
 }
 impl Item {

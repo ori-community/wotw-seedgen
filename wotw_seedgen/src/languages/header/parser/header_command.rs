@@ -25,6 +25,7 @@ enum HeaderCommandKind {
     Set,
     #[Ident = "if"] StartIf,
     EndIf,
+    Flags,
 }
 
 impl HeaderCommand {
@@ -44,20 +45,17 @@ impl HeaderCommand {
             HeaderCommandKind::Set => parse_set(parser),
             HeaderCommandKind::StartIf => parse_if(parser),
             HeaderCommandKind::EndIf => Ok(HeaderCommand::EndIf),
+            HeaderCommandKind::Flags => parse_flags(parser),
         }
     }
 }
 impl FromStr for HeaderCommand {
-    type Err = String;
+    type Err = ParseError;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let mut parser = super::new(input);
-        let command = HeaderCommand::parse(&mut parser).map_err(|err| err.verbose_display())?;
-        let remaining = parser.remaining();
-        if remaining.is_empty() {
-            Ok(command)
-        } else {
-            Err(format!("Input left after parsing command: \"{remaining}\""))
-        }
+        let command = HeaderCommand::parse(&mut parser)?;
+        parser.expect_end()?;
+        Ok(command)
     }
 }
 
@@ -174,4 +172,20 @@ fn parse_if(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     let token = parser.next_token();
     let value = parser.read_token(&token).to_owned();
     Ok(HeaderCommand::If { parameter, value })
+}
+fn parse_flags(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
+
+    let mut flags = vec![];
+
+    loop {
+        let flag = parse_string(parser)?.to_owned();
+        flags.push(flag);
+
+        if parser.current_token().kind == TokenKind::Whitespace && matches!(parser.peek_token().kind, TokenKind::String { .. }) {
+            parser.next_token();
+        } else { break }
+    }
+
+    Ok(HeaderCommand::Flags { flags })
 }

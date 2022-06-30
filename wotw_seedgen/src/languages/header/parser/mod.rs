@@ -14,7 +14,7 @@ use crate::{
     util::{VUberState, UberIdentifier, Icon}, languages::parser::ParseErrorCollection,
 };
 
-use super::{HeaderCommand, HeaderContent, TimerDefinition, VPickup, V, VString, tokenizer::tokenize};
+use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, Setup, SetupTimer};
 
 use crate::languages::{TokenKind, CommentKind, ParseError};
 use crate::languages::parser::{parse_number, parse_ident};
@@ -148,6 +148,7 @@ pub(crate) enum Suggestion {
     LupoIcon,
     GromIcon,
     TuleyIcon,
+    SetupKind,
     Annotation,
     Expression,
     InterpolationCommand,
@@ -277,8 +278,7 @@ fn parse_whitespace(context: &mut ParseContext) {
 #[derive(FromStr)]
 #[ParseFromIdentifier]
 enum ExpressionIdentKind {
-    Flags,
-    Timer,
+    Setup,
 }
 fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseError> {
     let parser = &mut (*context.parser);
@@ -286,11 +286,9 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
     match current_token.kind {
         TokenKind::Identifier => {
             let kind = parse_ident!(parser, Suggestion::Expression)?;
-            parser.eat_or_suggest(TokenKind::Colon, Suggestion::Expression)?;
             parser.skip(TokenKind::Whitespace);
             match kind {
-                ExpressionIdentKind::Flags => parse_flags(parser),
-                ExpressionIdentKind::Timer => parse_timer(parser),
+                ExpressionIdentKind::Setup => parse_setup(parser),
             }
         },
         TokenKind::Bang => {
@@ -310,28 +308,25 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
         _ => Err(parser.error("expected expression", current_token.range.clone())),
     }
 }
-fn parse_flags(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
-    let mut flags = vec![];
-
-    loop {
-        let flag = VString(parse_string(parser)?.to_owned());
-        flags.push(flag);
-
-        if parser.current_token().kind == TokenKind::Comma {
-            parser.next_token();
-            parser.skip(TokenKind::Whitespace);
-        } else { break }
-    }
-
-    Ok(HeaderContent::Flags(flags))
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum SetupKind {
+    Timer,
 }
-fn parse_timer(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
-    let toggle = parse_uber_identifier(parser)?;
+fn parse_setup(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
+    let kind = parse_ident!(parser, Suggestion::SetupKind)?;
+    parser.eat_or_suggest(TokenKind::Separator, Suggestion::SetupKind)?;
+    match kind {
+        SetupKind::Timer => parse_timer(parser),
+    }.map(HeaderContent::Setup)
+}
+fn parse_timer(parser: &mut Parser) -> Result<Setup, ParseError> {
+    let switch = parse_uber_identifier(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberId)?;
-    let timer = parse_uber_identifier(parser)?;
+    let counter = parse_uber_identifier(parser)?;
 
-    let timer_definition = TimerDefinition { toggle, timer };
-    Ok(HeaderContent::Timer(timer_definition))
+    let timer = SetupTimer { switch, counter };
+    Ok(Setup::Timer(timer))
 }
 fn parse_command(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     HeaderCommand::parse(parser).map(HeaderContent::Command)
@@ -355,6 +350,7 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
     let pickup = VPickup { trigger, item, ignore, skip_validation };
     Ok(HeaderContent::Pickup(pickup))
 }
+
 fn parse_annotation(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     let annotation = parse_ident!(parser, Suggestion::Annotation)?;
     Ok(HeaderContent::Annotation(annotation))

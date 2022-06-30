@@ -5,16 +5,17 @@ mod emitter;
 mod v;
 mod tools;
 mod code;
+mod setup;
 
 pub use emitter::{HeaderBuild, ItemDetails};
 pub use v::{VResolve, V, VString};
 pub(crate) use v::vdisplay;
 pub use tools::{list, inspect, validate};
 pub use code::CodeDisplay;
-
+pub use setup::{Setup, SetupTimer};
 use std::{fmt, str::FromStr};
 
-use crate::{util::{Icon, UberState, VUberState, UberIdentifier}, VItem, Item};
+use crate::{util::{Icon, UberState, VUberState}, VItem, Item};
 
 use rustc_hash::FxHashMap;
 use rand::Rng;
@@ -23,17 +24,6 @@ use parser::{parse_header_contents};
 use super::{ParseError, parser::ParseErrorCollection};
 
 use wotw_seedgen_derive::{FromStr, VVariant};
-
-#[derive(Debug, Clone)]
-pub struct TimerDefinition {
-    pub toggle: UberIdentifier,
-    pub timer: UberIdentifier,
-}
-impl TimerDefinition {
-    pub fn code(&self) -> CodeDisplay<TimerDefinition> {
-        CodeDisplay::new(self, |s, f| write!(f, "{}|{}", s.toggle.code(), s.timer.code()))
-    }
-}
 
 /// An item placed at a location trigger
 #[derive(Debug, Clone, VVariant)]
@@ -233,7 +223,7 @@ impl Header {
         for line in input.lines() {
             if let Some(annotation) = line.strip_prefix('#') {
                 let end = annotation.find(|c: char| c == '/' || c.is_whitespace()).unwrap_or(annotation.len());
-                let annotation = annotation[..end].parse()?;
+                let annotation = Annotation::from_str(&annotation[..end])?;
                 annotations.push(annotation);
             } else if !line.is_empty() {
                 break;
@@ -374,12 +364,10 @@ pub enum HeaderContent {
     InnerDocumentation(String),
     /// Meta annotations
     Annotation(Annotation),
-    /// A List of Flags to add to the resulting seed
-    Flags(Vec<VString>),
     /// A header command to be applied at generation time
     Command(HeaderCommand),
-    /// A timer definition to add to the resulting seed
-    Timer(TimerDefinition),
+    /// A setup command to add to the seed
+    Setup(Setup),
     /// A pickup to add to the resulting seed
     Pickup(VPickup),
 }
@@ -400,6 +388,7 @@ pub enum HeaderCommand {
     Set { state: String },
     If { parameter: String, value: String },
     EndIf,
+    Flags { flags: Vec<String> },
 }
 
 /// Type and value of a parameter's default

@@ -16,7 +16,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::{
     item::{Item, Message, UberStateOperator},
-    settings::{Goal, InlineHeader, HeaderConfig}, util::{
+    settings::{InlineHeader, HeaderConfig}, util::{
         self,
         UberState,
     }, world::{
@@ -28,7 +28,7 @@ use crate::{
 
 use placement::generate_placements;
 
-pub fn generate_seed(graph: &Graph, settings: Settings) -> Result<Seed, String> {
+pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, settings: &'settings Settings) -> Result<Seed<'graph, 'settings>, String> {
     let mut rng: StdRng = Seeder::from(&settings.seed).make_rng();
     log::trace!("Seeded RNG with {}", settings.seed);
 
@@ -126,14 +126,22 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
         }
     }
 
-    for flag in world.player.settings.goals.iter().map(Goal::flag_name) {
-        flags.push(flag.to_string());
-    }
-    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
+    if world.player.settings.is_random_spawn() { flags.push("Random Spawn".to_string()); }
 
     let mut header_block = String::new();
+    if !world.player.settings.goals.is_empty() {
+        header_block.push_str("setup goals");
+        for flag in &world.player.settings.goals {
+            write!(header_block, "|{}", flag.code()).unwrap();
+            flags.push(flag.flag_name().to_string());
+        }
+        header_block.push('\n');
+    }
+    if world.player.settings.hard {
+        header_block.push_str("setup difficulty|hard");
+    }
     write!(header_block, "{seed_contents}").unwrap();
-    if !state_sets.is_empty() { writeln!(header_block, "// Sets: {}", state_sets.join(", ")).unwrap(); }
+    if !state_sets.is_empty() { writeln!(header_block, "#sets: {}", state_sets.join(", ")).unwrap(); }
 
     Ok((flags, header_block))
 }
@@ -151,7 +159,7 @@ fn parse_header(
     let header_config = config_map.remove(&header_name).unwrap_or_default();
 
     let header = Header::parse(header, rng)
-        .map_err(|err| format!("{} in header {}", err[0], header_name))?
+        .map_err(|err| format!("Error in header {}:\n{}", header_name, err.verbose_display()))?
         .build(header_config)?;
 
     for include in &header.includes {

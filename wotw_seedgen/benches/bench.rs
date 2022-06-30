@@ -112,16 +112,16 @@ fn generation(c: &mut Criterion) {
     let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
 
     c.bench_function("singleplayer", |b| b.iter(|| {
-        wotw_seedgen::generate_seed(&graph, settings.clone()).unwrap();
+        wotw_seedgen::generate_seed(&graph, &settings).unwrap();
     }));
 
     settings.world_settings.extend_from_within(..);
 
     c.bench_function("two worlds", |b| b.iter(|| {
-        wotw_seedgen::generate_seed(&graph, settings.clone()).unwrap();
+        wotw_seedgen::generate_seed(&graph, &settings).unwrap();
     }));
 
-    let seed = wotw_seedgen::generate_seed(&graph, settings.clone()).unwrap();
+    let seed = wotw_seedgen::generate_seed(&graph, &settings).unwrap();
 
     c.bench_function("convert seed to text", |b| b.iter(|| {
         seed.seed_files()

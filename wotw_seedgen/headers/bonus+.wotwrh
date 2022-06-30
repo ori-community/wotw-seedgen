@@ -1,7 +1,7 @@
 /// Bonus+
 ///
 /// Break the game with overpowered Bonus Upgrades
-Flags: "Bonus+"
+!!flags "Bonus+"
 !!exclude bonus_items
 !!include skill_velocity
 !!include jumpgrades

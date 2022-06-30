@@ -53,9 +53,9 @@ pub struct Preset {
     /// The individual settings for each world of the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub world_settings: Option<Vec<WorldPreset>>,
-    /// Disallow the use of the In-Logic filter while playing the seed
+    /// Whether the in-logic map filter should be offered
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub disable_logic_filter: Option<bool>,
+    pub logic_map: Option<bool>,
     /// Require an online connection to play the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub online: Option<bool>,

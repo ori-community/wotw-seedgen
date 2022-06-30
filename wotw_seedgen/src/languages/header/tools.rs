@@ -12,7 +12,7 @@ use crate::{util::{
     constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR}, UberState,
 }, Header, Item, item::{UberStateOperator, Command}};
 
-use super::{HeaderContent, VResolve};
+use super::{HeaderContent, VResolve, Setup};
 
 fn is_hidden(header: &Path) -> Result<bool, String> {
     let file = fs::File::open(header).map_err(|err| format!("Failed to open header from {:?}: {}", header, err))?;
@@ -338,9 +338,9 @@ pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), 
 
     for content in header.contents {
         match content {
-            HeaderContent::Timer(timer) => {
+            HeaderContent::Setup(Setup::Timer(timer)) => {
                 occupied_states.push(UberState {
-                    identifier: timer.timer,
+                    identifier: timer.counter,
                     value: "++".to_string(),  // represent a timer so that the sort will put it alongside + and - commands
                 });
             },

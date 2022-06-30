@@ -39,11 +39,11 @@ mod tests {
         let states = util::read_file("state_data.csv", "logic").unwrap();
         let mut graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
 
-        generate_seed(&graph, settings.clone()).unwrap();
+        generate_seed(&graph, &settings).unwrap();
 
         settings.world_settings[0].difficulty = Difficulty::Unsafe;
         graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
-        generate_seed(&graph, settings.clone()).unwrap();
+        generate_seed(&graph, &settings).unwrap();
 
         settings.world_settings[0].headers = vec![
             "bingo".to_string(),
@@ -73,6 +73,6 @@ mod tests {
         };
         settings.apply_preset(preset).unwrap();
 
-        generate_seed(&graph, settings.clone()).unwrap();
+        generate_seed(&graph, &settings).unwrap();
     }
 }

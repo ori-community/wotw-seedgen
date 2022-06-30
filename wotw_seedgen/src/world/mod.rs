@@ -16,9 +16,9 @@ use crate::settings::WorldSettings;
 use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
-pub struct World<'a, 'b> {
-    pub graph: &'a Graph,
-    pub player: Player<'b>,
+pub struct World<'graph, 'settings> {
+    pub graph: &'graph Graph,
+    pub player: Player<'settings>,
     pub pool: Pool,
     pub preplacements: FxHashMap<UberState, Vec<Item>>,
     pub uber_states: FxHashMap<UberIdentifier, String>,
