@@ -1,47 +1,14 @@
 /// Skippable Cutscenes
 ///
-/// skips several cutscenes
-/// if a "Game Saved" message appears as a text box, you can reload from the menu to have the current cutscene skipped
+/// skips several short cutscenes
 !!include header_core
 
-setup timer|9|102|9|151
-setup timer|9|103|9|152
-
-9|0=1|6|""|f=0  // manual wisp
-!9|0=1|1|0
-!9|0=1|1|0
-!9|0=1|1|1
-!9|0=1|1|1
-// timed autosaves
-9|151|8|9|102|bool|true
-9|151|4|26|10|4|27|11|8|9|102|bool|false
-9|151|4|26|10|4|27|11|6|"Game Saved!"
-9|151|4|26|10|4|27|11|4|0
-// timed checkpoints
-9|151|4|26|20|4|27|21|8|9|102|bool|false
-9|151|4|26|20|4|27|21|4|2
-// skips
 !46462|59806|8|937|6778|bool|true   // voice door
 42178|18751=3|8|42178|16586|byte|1  // cave project
 42178|18751=3|8|14019|33776|int|1
 6|1014|8|18793|25789|bool|true      // depths gate
-18793|26713=1|6|""|f=0                 // mora start
-18793|26713=1|8|18793|26713|int|2
-18793|26713=1|4|8|693|-4458
-18793|26713=1|4|12|999
-18793|26713=1|4|13|999
-18793|26713=1|8|9|151|float|19.97
 937|10071|8|9|0|int|2               // ruins gate
 !18793|63291|8|9|0|int|2
 !28895|25522|8|9|0|int|2
 !945|49747|8|9|0|int|2
 9|0=2|4|17|937|10071|1|4|17|28895|25522|1|4|17|18793|63291|1|4|17|945|49747|1|8|10289|3804|bool|true
-10289|19890=1|6|""|f=0                 // ruins start
-10289|19890=1|8|10289|19890|int|2
-10289|19890=1|2|108
-10289|19890=3|8|9|106|bool|true     // ruins end
-9|106|8|9|151|float|9.2
-9|106|8|14019|35399|int|3
-9|106|8|14019|54675|int|6
-9|106|8|10289|22102|bool|true
-9|106|8|9|0|int|1
