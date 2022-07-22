@@ -1224,7 +1224,7 @@ fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node],
             }
         }
 
-        let world_tour = world.player.settings.goals.iter().find_map(|goal|
+        let world_tour = world.goals.iter().find_map(|goal|
             match *goal {
                 Goal::Relics(amount) => Some(amount),
                 Goal::RelicChance(chance) => {

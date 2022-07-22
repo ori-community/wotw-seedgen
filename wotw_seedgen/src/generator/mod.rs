@@ -16,7 +16,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::{
     item::{Item, Message, UberStateOperator},
-    settings::{InlineHeader, HeaderConfig}, util::{
+    settings::{InlineHeader, HeaderConfig, Goal}, util::{
         self,
         UberState,
     }, world::{
@@ -36,7 +36,8 @@ pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, settings: &'settin
         let mut world = World::new(graph, world_settings);
         world.pool = Pool::preset();
 
-        let (flags, headers) = parse_headers(&mut world, &mut rng)?;
+        let (goals, flags, headers) = parse_headers(&mut world, &mut rng)?;
+        world.goals = goals;
 
         Ok((world, (flags, headers)))
     }).collect::<Result<Vec<_>, String>>()?.into_iter().unzip();
@@ -51,7 +52,7 @@ pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, settings: &'settin
     Ok(Seed { worlds, graph, settings, spoiler })
 }
 
-fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, String), String> {
+fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<Goal>, Vec<String>, String), String> {
     validate_header_names(&world.player.settings.headers, &world.player.settings.inline_headers)?;
 
     let mut config_map = build_config_map(&world.player.settings.header_config)?;
@@ -74,6 +75,7 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
     let mut excludes = FxHashMap::default();
     let mut seed_contents = String::new();
     let mut flags = vec![];
+    let mut goals = vec![];
     let mut state_sets = vec![];
 
     let header_names = headers.into_iter().map(|(header_name, mut header)| {
@@ -87,6 +89,7 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
         }
 
         flags.append(&mut header.flags);
+        goals.append(&mut header.goals);
 
         for preplacement in header.preplacements {
             block_spawn_sets(&preplacement, world);
@@ -129,9 +132,12 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
     if world.player.settings.is_random_spawn() { flags.push("Random Spawn".to_string()); }
 
     let mut header_block = String::new();
-    if !world.player.settings.goals.is_empty() {
+
+    goals.extend(world.player.settings.goals.iter().cloned());
+
+    if !goals.is_empty() {
         header_block.push_str("setup goals");
-        for flag in &world.player.settings.goals {
+        for flag in &goals {
             write!(header_block, "|{}", flag.code()).unwrap();
             flags.push(flag.flag_name().to_string());
         }
@@ -143,7 +149,7 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<String>, 
     write!(header_block, "{seed_contents}").unwrap();
     if !state_sets.is_empty() { writeln!(header_block, "#sets: {}", state_sets.join(", ")).unwrap(); }
 
-    Ok((flags, header_block))
+    Ok((goals, flags, header_block))
 }
 
 fn parse_header(

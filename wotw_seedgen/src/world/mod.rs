@@ -12,7 +12,7 @@ use rustc_hash::FxHashMap;
 
 use crate::header::ItemDetails;
 use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
-use crate::settings::WorldSettings;
+use crate::settings::{WorldSettings, Goal};
 use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
@@ -24,6 +24,7 @@ pub struct World<'graph, 'settings> {
     pub uber_states: FxHashMap<UberIdentifier, String>,
     pub sets: Vec<usize>,
     pub custom_items: FxHashMap<Item, ItemDetails>,
+    pub goals: Vec<Goal>,
 }
 impl World<'_, '_> {
     pub fn new<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
@@ -35,6 +36,7 @@ impl World<'_, '_> {
             uber_states: FxHashMap::default(),
             sets: Vec::default(),
             custom_items: FxHashMap::default(),
+            goals: Vec::default(),
         }
     }
 

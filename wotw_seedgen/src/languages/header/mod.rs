@@ -389,6 +389,15 @@ pub enum HeaderCommand {
     If { parameter: String, value: String },
     EndIf,
     Flags { flags: Vec<String> },
+    GoalmodeHack(GoalmodeHack),
+}
+
+#[derive(Debug, Clone)]
+pub enum GoalmodeHack {
+    Trees,
+    Wisps,
+    Quests,
+    Relics { chance: V<f64>, amount: V<usize> },
 }
 
 /// Type and value of a parameter's default

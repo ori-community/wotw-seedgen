@@ -4,7 +4,7 @@ use wotw_seedgen_derive::FromStr;
 
 use crate::VItem;
 
-use crate::header::{HeaderCommand, ParameterDefault, V, VString, ParameterType};
+use crate::header::{HeaderCommand, ParameterDefault, V, VString, ParameterType, GoalmodeHack};
 use crate::languages::TokenKind;
 
 use super::{Parser, ParseError, parse_ident, parse_number, parse_v_number, parse_string, parse_icon, Suggestion};
@@ -26,6 +26,7 @@ enum HeaderCommandKind {
     #[Ident = "if"] StartIf,
     EndIf,
     Flags,
+    #[Ident = "__goalmode_hack"] GoalmodeHack,
 }
 
 impl HeaderCommand {
@@ -46,6 +47,7 @@ impl HeaderCommand {
             HeaderCommandKind::StartIf => parse_if(parser),
             HeaderCommandKind::EndIf => Ok(HeaderCommand::EndIf),
             HeaderCommandKind::Flags => parse_flags(parser),
+            HeaderCommandKind::GoalmodeHack => parse_goalmode(parser),
         }
     }
 }
@@ -188,4 +190,30 @@ fn parse_flags(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     }
 
     Ok(HeaderCommand::Flags { flags })
+}
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum Goalmode {
+    Trees,
+    Wisps,
+    Quests,
+    Relics,
+}
+fn parse_goalmode(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
+
+    let goal = match parse_ident!(parser, Suggestion::Integer)? {
+        Goalmode::Trees => GoalmodeHack::Trees,
+        Goalmode::Wisps => GoalmodeHack::Wisps,
+        Goalmode::Quests => GoalmodeHack::Quests,
+        Goalmode::Relics => {
+            parser.eat(TokenKind::Whitespace)?;
+            let chance = parse_v_number!(parser, Suggestion::Float);
+            parser.eat(TokenKind::Whitespace)?;
+            let amount = parse_v_number!(parser, Suggestion::Integer);
+            GoalmodeHack::Relics { chance, amount }
+        },
+    };
+
+    Ok(HeaderCommand::GoalmodeHack(goal))
 }

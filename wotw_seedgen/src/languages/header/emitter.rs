@@ -2,9 +2,9 @@ use std::fmt::Display;
 
 use rustc_hash::FxHashMap;
 
-use crate::{Item, VItem, util::Icon};
+use crate::{Item, VItem, util::Icon, settings::Goal};
 
-use super::{HeaderContent, V, VResolve, VString, HeaderCommand, Pickup, VPickup};
+use super::{HeaderContent, V, VResolve, VString, HeaderCommand, Pickup, VPickup, GoalmodeHack};
 
 /// Configurable details for how to treat an [`Item`] during seed generation
 #[derive(Debug, Clone, Default)]
@@ -40,6 +40,7 @@ pub struct HeaderBuild {
     pub item_details: FxHashMap<Item, ItemDetails>,
     /// Logical states to be set at the start of seed generation
     pub state_sets: Vec<String>,
+    pub goals: Vec<Goal>,
 }
 
 pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String, String>) -> Result<HeaderBuild, String> {
@@ -98,6 +99,7 @@ fn build_command(command: HeaderCommand, header_build: &mut HeaderBuild, if_stac
         HeaderCommand::If { parameter, value } => build_if(&parameter, &value, if_stack, parameters)?,
         HeaderCommand::EndIf => build_endif(if_stack)?,
         HeaderCommand::Flags { flags } => header_build.flags = build_flags(flags, &header_build.flags)?,
+        HeaderCommand::GoalmodeHack(goalmode) => build_goalmode(goalmode, &mut header_build.goals, parameters)?,
     }
 
     Ok(())
@@ -176,4 +178,26 @@ fn build_flags(flags: Vec<String>, prior_flags: &[String]) -> Result<Vec<String>
     } else {
         Err("Duplicate flagline".to_string())
     }
+}
+
+fn build_goalmode(goalmode: GoalmodeHack, goals: &mut Vec<Goal>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+    let goal = match goalmode {
+        GoalmodeHack::Trees => Goal::Trees,
+        GoalmodeHack::Wisps => Goal::Wisps,
+        GoalmodeHack::Quests => Goal::Quests,
+        GoalmodeHack::Relics { chance, amount } => {
+            let chance = chance.resolve(parameters)?;
+            let amount = amount.resolve(parameters)?;
+
+            if amount == 0 {
+                Goal::RelicChance(chance)
+            } else {
+                Goal::Relics(amount)
+            }
+        },
+    };
+
+    goals.push(goal);
+
+    Ok(())
 }
