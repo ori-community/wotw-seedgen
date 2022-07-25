@@ -789,7 +789,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
         Ok(Settings::default())
     }).map_err(|err| format!("Error reading settings: {err}"))?;
 
-    let world_index = contents.lines().find_map(|line| line.strip_prefix("#world-index: ").map(str::parse)).unwrap_or_else(|| {
+    let world_index = contents.lines().find_map(|line| line.strip_prefix("// This World: ").map(str::parse)).unwrap_or_else(|| {
         log::trace!("No current world information found in seed, using first world");
         Ok(0)
     }).map_err(|err| format!("Error reading current world: {err}"))?;
