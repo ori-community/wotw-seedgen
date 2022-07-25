@@ -21,14 +21,14 @@ impl ShopCommand {
                 ShopCommand::SetTitle { uber_identifier, title } => {
                     write!(f, "1|{}", uber_identifier.code())?;
                     match title {
-                        Some(title) => write!(f, "{}", title),
+                        Some(title) => write!(f, "|{}", title),
                         None => Ok(()),
                     }
                 },
                 ShopCommand::SetDescription { uber_identifier, description } => {
                     write!(f, "2|{}", uber_identifier.code())?;
                     match description {
-                        Some(description) => write!(f, "{}", description),
+                        Some(description) => write!(f, "|{}", description),
                         None => Ok(()),
                     }
                 },

@@ -1,7 +1,7 @@
 /// No Rain
 ///
 /// Marsh starts sunny as it usually is after getting the sword tree. Also Howl is dead
-!!flags "No Rain"
+Flags: No Rain
 
 3|0|8|7|2|bool|true
 !!set MarshSpawn.RainLifted

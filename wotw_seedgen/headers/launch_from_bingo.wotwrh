@@ -1,7 +1,7 @@
 /// Launch from Bingo
 ///
 /// grants launch on completing bingo lines
-!!flags "Launch from Bingo"
+Flags: Launch from Bingo
 !!include header_core
 //// How many lines you need for Launch
 !!parameter line int:2

@@ -10,7 +10,7 @@ use rand::distributions::{Distribution, Uniform};
 use wotw_seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize};
 
-use crate::{Preset, preset::WorldPreset, util::constants::DEFAULT_SPAWN, header::CodeDisplay};
+use crate::{Preset, preset::WorldPreset, util::constants::DEFAULT_SPAWN};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -50,7 +50,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// #config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"logicMap\":true,\"online\":false,\"createGame\":\"None\"}
+/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"logicMap\":true,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
@@ -94,7 +94,7 @@ impl Settings {
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
     pub fn from_seed(input: &str) -> Option<Result<Settings, serde_json::Error>> {
-        input.lines().find_map(|line| line.strip_prefix("#config: ").map(serde_json::from_str))
+        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
     }
 
     /// Apply the settings from a preset
@@ -517,21 +517,11 @@ impl Goal {
     /// The flag name communicates to the randomizer client which restrictions to apply before allowing to finish the game
     pub fn flag_name(&self) -> &'static str {
         match self {
-            Goal::Wisps => "Force Wisps",
-            Goal::Trees => "Force Trees",
-            Goal::Quests => "Force Quests",
-            Goal::Relics(_) | Goal::RelicChance(_) => "World Tour",
+            Goal::Wisps => "ForceWisps",
+            Goal::Trees => "ForceTrees",
+            Goal::Quests => "ForceQuests",
+            Goal::Relics(_) | Goal::RelicChance(_) => "WorldTour",
         }
-    }
-    pub fn code(&self) -> CodeDisplay<Goal> {
-        CodeDisplay::new(self, |s, f| {
-            match s {
-                Goal::Wisps => write!(f, "wisps"),
-                Goal::Trees => write!(f, "trees"),
-                Goal::Quests => write!(f, "quests"),
-                Goal::Relics(_) | Goal::RelicChance(_) => write!(f, "relics"),
-            }
-        })
     }
 }
 

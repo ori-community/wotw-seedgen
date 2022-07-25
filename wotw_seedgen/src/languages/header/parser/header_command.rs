@@ -25,7 +25,6 @@ enum HeaderCommandKind {
     Set,
     #[Ident = "if"] StartIf,
     EndIf,
-    Flags,
     #[Ident = "__goalmode_hack"] GoalmodeHack,
 }
 
@@ -46,7 +45,6 @@ impl HeaderCommand {
             HeaderCommandKind::Set => parse_set(parser),
             HeaderCommandKind::StartIf => parse_if(parser),
             HeaderCommandKind::EndIf => Ok(HeaderCommand::EndIf),
-            HeaderCommandKind::Flags => parse_flags(parser),
             HeaderCommandKind::GoalmodeHack => parse_goalmode(parser),
         }
     }
@@ -107,21 +105,21 @@ fn parse_name(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
     let item = VItem::parse(parser)?;
     parser.eat(TokenKind::Whitespace)?;
-    let name = VString(parse_string(parser)?.to_owned());
+    let name = VString(parse_string(parser).to_owned());
     Ok(HeaderCommand::Name { item, name })
 }
 fn parse_display(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
     let item = VItem::parse(parser)?;
     parser.eat(TokenKind::Whitespace)?;
-    let name = VString(parse_string(parser)?.to_owned());
+    let name = VString(parse_string(parser).to_owned());
     Ok(HeaderCommand::Display { item, name })
 }
 fn parse_description(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
     let item = VItem::parse(parser)?;
     parser.eat(TokenKind::Whitespace)?;
-    let description = VString(parse_string(parser)?.to_owned());
+    let description = VString(parse_string(parser).to_owned());
     Ok(HeaderCommand::Description { item, description })
 }
 fn parse_price(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
@@ -148,7 +146,7 @@ fn parse_parameter(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
         ParameterType::Bool => ParameterDefault::Bool(parse_ident!(parser, Suggestion::Boolean)?),
         ParameterType::Int => ParameterDefault::Int(parse_number!(parser, Suggestion::Integer)?),
         ParameterType::Float => ParameterDefault::Float(parse_number!(parser, Suggestion::Float)?),
-        ParameterType::String => ParameterDefault::String(parse_string(parser)?.to_owned()),
+        ParameterType::String => ParameterDefault::String(parse_string(parser).to_owned()),
     };
     Ok(HeaderCommand::Parameter { identifier, default })
 }
@@ -174,22 +172,6 @@ fn parse_if(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     let token = parser.next_token();
     let value = parser.read_token(&token).to_owned();
     Ok(HeaderCommand::If { parameter, value })
-}
-fn parse_flags(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
-    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
-
-    let mut flags = vec![];
-
-    loop {
-        let flag = parse_string(parser)?.to_owned();
-        flags.push(flag);
-
-        if parser.current_token().kind == TokenKind::Whitespace && matches!(parser.peek_token().kind, TokenKind::String { .. }) {
-            parser.next_token();
-        } else { break }
-    }
-
-    Ok(HeaderCommand::Flags { flags })
 }
 #[derive(FromStr)]
 #[ParseFromIdentifier]

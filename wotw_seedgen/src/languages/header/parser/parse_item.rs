@@ -336,7 +336,7 @@ fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
         let peeked = parser.peek_token();
         if matches!(peeked.kind, TokenKind::String { .. }) {
             parser.next_token();
-            let label = parse_string(parser)?.to_owned();
+            let label = parse_string(parser).to_owned();
             Some(label)
         } else { None }
     } else { None };
@@ -386,14 +386,14 @@ fn parse_save_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
     let id = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
-    let string = VString(parse_string(parser)?.to_owned());
+    let string = VString(parse_string(parser).to_owned());
     Ok(VCommand::SaveString { id, string })
 }
 fn parse_append_string(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
     let id = parse_number!(parser, Suggestion::Integer)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::Integer)?;
-    let string = VString(parse_string(parser)?.to_owned());
+    let string = VString(parse_string(parser).to_owned());
     Ok(VCommand::AppendString { id, string })
 }
 fn parse_teleporter(parser: &mut Parser) -> Result<VItem, ParseError> {
@@ -417,15 +417,15 @@ enum MessageFlag {
     NoClear,
 }
 fn parse_message(parser: &mut Parser) -> Result<VItem, ParseError> {
-    parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let message = VString(parse_string(parser)?.to_owned());
-    let mut message = VMessage::new(message);
+    // Pain
+    let mut message = VMessage::new(VString(String::new()));
+    let mut message_content = String::new();
+
     while parser.current_token().kind == TokenKind::Separator {
-        let peeked = parser.peek_token();
-        if peeked.kind == TokenKind::Identifier {
-            let range = peeked.range.clone();
-            if let Ok(flag) = parser.read(range).parse() {
-                parser.next_token();
+        parser.next_token();
+        let token = parser.current_token();
+        if token.kind == TokenKind::Identifier {
+            if let Ok(flag) = parser.read_token(token).parse() {
                 parser.next_token();
                 match flag {
                     MessageFlag::Mute => message.mute = true,
@@ -435,9 +435,23 @@ fn parse_message(parser: &mut Parser) -> Result<VItem, ParseError> {
                     MessageFlag::P => message.pos = Some(parse_value!(parser, Suggestion::Float, Suggestion::MessageFlag)?),
                     MessageFlag::NoClear => message.noclear = true,
                 }
-            } else { break }
-        } else { break }
+                continue;
+            }
+        }
+
+        // Not a message flag, parse as message content
+        let start = token.range.start;
+        parser.skip_while(|kind| !matches!(kind, TokenKind::Separator | TokenKind::Newline | TokenKind::Comment { .. }));
+        let end = parser.current_token().range.start;
+
+        // We may have encountered a separator that is part of an interpolation
+        if !message_content.is_empty() {
+            message_content.push('|');
+        }
+        message_content.push_str(parser.read(start..end).trim_end());
     }
+
+    message.message = VString(message_content);
     Ok(VItem::Message(message))
 }
 fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
@@ -493,12 +507,18 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
             if parser.read(range) == "skip" {
                 parser.next_token();
                 parser.next_token();
+                let _: JustOne = parse_value!(parser, Suggestion::Integer, Suggestion::Identifier)?;
                 skip = true;
             }
         }
     }
 
     Ok(VItem::UberState(VUberStateItem { uber_identifier, uber_type, signed, sign, operator, skip }))
+}
+#[derive(TryFromPrimitive, FromStr)]
+#[repr(u8)]
+enum JustOne {
+    One = 1,
 }
 fn parse_boundary(parser: &mut Parser, uber_type: &UberType) -> Result<VUberStateRangeBoundary, ParseError> {
     let token = parser.current_token().clone();
@@ -593,13 +613,13 @@ fn parse_wheel_item_position(parser: &mut Parser) -> Result<(u32, WheelItemPosit
 fn parse_wheel_set_name(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     let (wheel, position) = parse_wheel_item_position(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelItemPosition)?;
-    let name = VString(parse_string(parser)?.to_owned());
+    let name = VString(parse_string(parser).to_owned());
     Ok(VWheelCommand::SetName { wheel, position, name })
 }
 fn parse_wheel_set_description(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
     let (wheel, position) = parse_wheel_item_position(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::WheelItemPosition)?;
-    let description = VString(parse_string(parser)?.to_owned());
+    let description = VString(parse_string(parser).to_owned());
     Ok(VWheelCommand::SetDescription { wheel, position, description })
 }
 fn parse_wheel_set_icon(parser: &mut Parser) -> Result<VWheelCommand, ParseError> {
@@ -658,15 +678,11 @@ fn parse_shop_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     }?;
     Ok(VItem::ShopCommand(command))
 }
-fn parse_optional_string(parser: &mut Parser) -> Result<Option<VString>, ParseError> {
-    let string = if parser.current_token().kind == TokenKind::Separator {
-        if matches!(parser.peek_token().kind, TokenKind::String { .. }) {
-            parser.next_token();
-            let string = VString(parse_string(parser)?.to_owned());
-            Some(string)
-        } else { None }
-    } else { None };
-    Ok(string)
+fn parse_optional_string(parser: &mut Parser) -> Option<VString> {
+    if parser.current_token().kind == TokenKind::Separator {
+        parser.next_token();
+        Some(VString(parse_string(parser).to_owned()))
+    } else { None }
 }
 fn parse_shop_set_icon(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ShopCommandKind)?;
@@ -674,11 +690,11 @@ fn parse_shop_set_icon(parser: &mut Parser, uber_identifier: UberIdentifier) -> 
     Ok(VShopCommand::SetIcon { uber_identifier, icon })
 }
 fn parse_shop_set_title(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
-    let title = parse_optional_string(parser)?;
+    let title = parse_optional_string(parser);
     Ok(VShopCommand::SetTitle { uber_identifier, title })
 }
 fn parse_shop_set_description(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {
-    let description = parse_optional_string(parser)?;
+    let description = parse_optional_string(parser);
     Ok(VShopCommand::SetDescription { uber_identifier, description })
 }
 fn parse_shop_set_locked(parser: &mut Parser, uber_identifier: UberIdentifier) -> Result<VShopCommand, ParseError> {

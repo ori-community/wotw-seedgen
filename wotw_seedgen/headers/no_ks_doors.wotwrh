@@ -1,7 +1,7 @@
 /// No KS Doors
 ///
 /// All keystone doors start open
-!!flags "No Keystone Doors"
+Flags: No Keystone Doors
 
 3|0|8|20120|28786|bool|true
 3|0|8|21786|42309|bool|true

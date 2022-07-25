@@ -129,25 +129,17 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<Goal>, Ve
         }
     }
 
-    if world.player.settings.is_random_spawn() { flags.push("Random Spawn".to_string()); }
+    goals.extend(world.player.settings.goals.iter().cloned());
+    
+    for flag in goals.iter().map(Goal::flag_name) {
+        flags.push(flag.to_string());
+    }
+    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
 
     let mut header_block = String::new();
 
-    goals.extend(world.player.settings.goals.iter().cloned());
-
-    if !goals.is_empty() {
-        header_block.push_str("setup goals");
-        for flag in &goals {
-            write!(header_block, "|{}", flag.code()).unwrap();
-            flags.push(flag.flag_name().to_string());
-        }
-        header_block.push('\n');
-    }
-    if world.player.settings.hard {
-        header_block.push_str("setup difficulty|hard");
-    }
     write!(header_block, "{seed_contents}").unwrap();
-    if !state_sets.is_empty() { writeln!(header_block, "#sets: {}", state_sets.join(", ")).unwrap(); }
+    if !state_sets.is_empty() { writeln!(header_block, "// Sets: {}", state_sets.join(", ")).unwrap(); }
 
     Ok((goals, flags, header_block))
 }

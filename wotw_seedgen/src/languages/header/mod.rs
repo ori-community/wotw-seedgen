@@ -5,17 +5,15 @@ mod emitter;
 mod v;
 mod tools;
 mod code;
-mod setup;
 
 pub use emitter::{HeaderBuild, ItemDetails};
 pub use v::{VResolve, V, VString};
 pub(crate) use v::vdisplay;
 pub use tools::{list, inspect, validate};
 pub use code::CodeDisplay;
-pub use setup::{Setup, SetupTimer};
 use std::{fmt, str::FromStr};
 
-use crate::{util::{Icon, UberState, VUberState}, VItem, Item};
+use crate::{util::{Icon, UberState, VUberState, UberIdentifier}, VItem, Item};
 
 use rustc_hash::FxHashMap;
 use rand::Rng;
@@ -213,7 +211,7 @@ impl Header {
     /// ```
     /// # use wotw_seedgen::Header;
     /// # 
-    /// let input = "#hide\n3|6|\"This isn't even valid header syntax!\"";
+    /// let input = "#hide\n3|6|This isn't even valid header syntax!";
     /// 
     /// assert!(Header::parse_annotations(input).is_ok());
     /// ```
@@ -254,7 +252,7 @@ impl Header {
     /// ```
     /// # use wotw_seedgen::Header;
     /// # 
-    /// let input = "/// A very bad header\n3|6|\"This isn't even valid header syntax!\"";
+    /// let input = "/// A very bad header\n3|6|This isn't even valid header syntax!";
     /// 
     /// let documentation = Header::parse_documentation(input);
     /// 
@@ -296,7 +294,7 @@ impl Header {
     /// use wotw_seedgen::header::ParameterDefault;
     /// use wotw_seedgen::header::ParameterInfo;
     /// 
-    /// let input = "3|0|6|\"Good luck have fun!\"\n//// Some ad\n!!parameter extra_text string:\"Hier könnte ihre Werbung stehen!\"\n3|0|6|\"$PARAM(extra_text)\"";
+    /// let input = "3|0|6|Good luck have fun!\n//// Some ad\n!!parameter extra_text string:Hier könnte ihre Werbung stehen!\n3|0|6|$PARAM(extra_text)";
     /// 
     /// let parameters = Header::parse_parameters(input);
     /// 
@@ -364,12 +362,25 @@ pub enum HeaderContent {
     InnerDocumentation(String),
     /// Meta annotations
     Annotation(Annotation),
+    /// A List of Flags to add to the resulting seed
+    Flags(Vec<String>),
+    /// A timer definition to add to the resulting seed
+    Timer(TimerDefinition),
     /// A header command to be applied at generation time
     Command(HeaderCommand),
-    /// A setup command to add to the seed
-    Setup(Setup),
     /// A pickup to add to the resulting seed
     Pickup(VPickup),
+}
+
+#[derive(Debug, Clone)]
+pub struct TimerDefinition {
+    pub switch: UberIdentifier,
+    pub counter: UberIdentifier,
+}
+impl TimerDefinition {
+    pub fn code(&self) -> CodeDisplay<TimerDefinition> {
+        CodeDisplay::new(self, |s, f| write!(f, "{}|{}", s.switch.code(), s.counter.code()))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -388,7 +399,6 @@ pub enum HeaderCommand {
     Set { state: String },
     If { parameter: String, value: String },
     EndIf,
-    Flags { flags: Vec<String> },
     GoalmodeHack(GoalmodeHack),
 }
 

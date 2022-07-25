@@ -50,7 +50,7 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
         }
     }
     /// Skips [`Token`]s as long as they fulfill a condition
-    pub(crate) fn skip_while(&mut self, condition: fn(TokenKind) -> bool) {
+    pub(crate) fn skip_while(&mut self, mut condition: impl FnMut(TokenKind) -> bool) {
         while condition(self.current_token.kind) {
             let token = self.next_token();
             if token.kind == TokenKind::Eof { break }

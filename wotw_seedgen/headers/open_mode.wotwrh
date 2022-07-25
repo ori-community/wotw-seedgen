@@ -1,7 +1,7 @@
 /// Open Mode
 ///
 /// opens many doors so random spawn works better, especially with no teleporters
-!!flags "Open Mode"
+Flags: Open Mode
 
 !!include no_rain
 3|0|8|21786|53932|bool|true     // Barrier Above Den TP         HowlsDen.BoneBarrier, 21786, 53932

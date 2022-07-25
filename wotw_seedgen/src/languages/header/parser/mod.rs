@@ -14,7 +14,7 @@ use crate::{
     util::{VUberState, UberIdentifier, Icon}, languages::parser::ParseErrorCollection,
 };
 
-use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, Setup, SetupTimer};
+use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, TimerDefinition};
 
 use crate::languages::{TokenKind, CommentKind, ParseError};
 use crate::languages::parser::{parse_number, parse_ident};
@@ -42,17 +42,12 @@ macro_rules! parse_removable_number {
     };
 }
 use parse_removable_number;
-fn parse_string<'a>(parser: &'a mut Parser) -> Result<&'a str, ParseError> {
-    let token = parser.next_token();
-    if let TokenKind::String { terminated } = token.kind {
-        if !terminated {
-            return Err(parser.error("Unterminated string", token.range));
-        }
-    } else {
-        return Err(parser.error("Expected string", token.range));
-    }
-    let content_range = token.range.start + 1..token.range.end - 1;
-    Ok(parser.read(content_range))
+fn parse_string<'a>(parser: &'a mut Parser) -> &'a str {
+    let start = parser.current_token().range.start;
+    parser.skip_while(|kind| !matches!(kind, TokenKind::Newline | TokenKind::Comment { .. }));
+    let end = parser.current_token().range.start;
+
+    parser.read(start..end).trim_end()
 }
 fn parse_v_param<T: FromStr>(parser: &mut Parser) -> Result<V<T>, ParseError> {
     parser.eat_or_suggest(TokenKind::OpenParen, Suggestion::InterpolationCommand)?;
@@ -148,7 +143,6 @@ pub(crate) enum Suggestion {
     LupoIcon,
     GromIcon,
     TuleyIcon,
-    SetupKind,
     Annotation,
     Expression,
     InterpolationCommand,
@@ -204,7 +198,7 @@ fn parse_icon(parser: &mut Parser) -> Result<Icon, ParseError> {
         IconKind::Lupo => Icon::Lupo(parse_number!(parser, Suggestion::LupoIcon)?),
         IconKind::Grom => Icon::Grom(parse_number!(parser, Suggestion::GromIcon)?),
         IconKind::Tuley => Icon::Tuley(parse_number!(parser, Suggestion::TuleyIcon)?),
-        IconKind::File => Icon::File(parse_string(parser)?.to_owned()),
+        IconKind::File => Icon::File(parse_string(parser).to_owned()),
     };
     Ok(icon)
 }
@@ -278,7 +272,8 @@ fn parse_whitespace(context: &mut ParseContext) {
 #[derive(FromStr)]
 #[ParseFromIdentifier]
 enum ExpressionIdentKind {
-    Setup,
+    Flags,
+    Timer,
 }
 fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseError> {
     let parser = &mut (*context.parser);
@@ -286,9 +281,11 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
     match current_token.kind {
         TokenKind::Identifier => {
             let kind = parse_ident!(parser, Suggestion::Expression)?;
+            parser.eat_or_suggest(TokenKind::Colon, Suggestion::Expression)?;
             parser.skip(TokenKind::Whitespace);
             match kind {
-                ExpressionIdentKind::Setup => parse_setup(parser),
+                ExpressionIdentKind::Flags => parse_flags(parser),
+                ExpressionIdentKind::Timer => parse_timer(parser),
             }
         },
         TokenKind::Bang => {
@@ -308,25 +305,32 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
         _ => Err(parser.error("expected expression", current_token.range.clone())),
     }
 }
-#[derive(FromStr)]
-#[ParseFromIdentifier]
-enum SetupKind {
-    Timer,
+fn parse_flags(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
+    let mut flags = vec![];
+
+    loop {
+        let start = parser.current_token().range.start;
+        parser.skip_while(|kind| !matches!(kind, TokenKind::Newline | TokenKind::Comment { .. } | TokenKind::Comma));
+        let end = parser.current_token().range.start;
+
+        let flag = parser.read(start..end).trim_end().to_owned();
+        flags.push(flag);
+
+        if parser.current_token().kind == TokenKind::Comma {
+            parser.next_token();
+            parser.skip(TokenKind::Whitespace);
+        } else { break }
+    }
+
+    Ok(HeaderContent::Flags(flags))
 }
-fn parse_setup(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
-    let kind = parse_ident!(parser, Suggestion::SetupKind)?;
-    parser.eat_or_suggest(TokenKind::Separator, Suggestion::SetupKind)?;
-    match kind {
-        SetupKind::Timer => parse_timer(parser),
-    }.map(HeaderContent::Setup)
-}
-fn parse_timer(parser: &mut Parser) -> Result<Setup, ParseError> {
+fn parse_timer(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     let switch = parse_uber_identifier(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberId)?;
     let counter = parse_uber_identifier(parser)?;
 
-    let timer = SetupTimer { switch, counter };
-    Ok(Setup::Timer(timer))
+    let timer_definition = TimerDefinition { switch, counter };
+    Ok(HeaderContent::Timer(timer_definition))
 }
 fn parse_command(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     HeaderCommand::parse(parser).map(HeaderContent::Command)
@@ -334,6 +338,17 @@ fn parse_command(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
 fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderContent, ParseError> {
     let parser = &mut (*context.parser);
 
+    let (trigger, suggestion) = parse_trigger(parser)?;
+    parser.eat_or_suggest(TokenKind::Separator, suggestion)?;
+
+    let item = VItem::parse(parser)?;
+    let skip_validation = context.skip_validation;
+
+    let pickup = VPickup { trigger, item, ignore, skip_validation };
+    Ok(HeaderContent::Pickup(pickup))
+}
+
+fn parse_trigger(parser: &mut Parser) -> Result<(VUberState, Suggestion), ParseError> {
     let identifier = parse_uber_identifier(parser)?;
     let (value, suggestion) = if parser.current_token().kind == TokenKind::Eq {
         parser.next_token();
@@ -342,13 +357,7 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
     } else { (V::Literal(String::new()), Suggestion::UberId) };
     let trigger = VUberState { identifier, value };
 
-    parser.eat_or_suggest(TokenKind::Separator, suggestion)?;
-
-    let item = VItem::parse(parser)?;
-    let skip_validation = context.skip_validation;
-
-    let pickup = VPickup { trigger, item, ignore, skip_validation };
-    Ok(HeaderContent::Pickup(pickup))
+    Ok((trigger, suggestion))
 }
 
 fn parse_annotation(parser: &mut Parser) -> Result<HeaderContent, ParseError> {

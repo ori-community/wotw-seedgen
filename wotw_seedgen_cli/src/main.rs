@@ -837,7 +837,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     }
 
     for line in contents.lines() {
-        if let Some(sets) = line.strip_prefix("#sets: ") {
+        if let Some(sets) = line.strip_prefix("// Sets: ") {
             if !sets.is_empty() {
                 for identifier in sets.split(',').map(str::trim) {
                     let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;

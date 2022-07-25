@@ -35,19 +35,17 @@ impl Seed<'_, '_> {
     /// May error if postprocessing commands (such as `$WHEREIS`) contain invalid regexes
     pub fn seed_files(&self) -> Result<Vec<String>, String> {
         let mut seeds = self.worlds.iter().enumerate().map(|(index, world)| {
-            let logic_map = if self.settings.logic_map { "" } else { "setup logic_map|false\n" };
             let version = env!("CARGO_PKG_VERSION");
             let slug = &self.settings.slugify();
             let config = &self.settings.to_json();
 
             format!("\
-                {logic_map}\
                 {world}\
-                #world-index: {index}\n\
-                #target: ^2.0\n\
-                #generator-version: {version}\n\
-                #slug: {slug}\n\
-                #config: {config}\n\
+                // This World: {index}\n\
+                // Target: ^2.0\n\
+                // Generator Version: {version}\n\
+                // Slug: {slug}\n\
+                // Config: {config}\n\
             ")
         }).collect::<Vec<_>>();
 
@@ -60,19 +58,18 @@ impl Seed<'_, '_> {
 impl Display for SeedWorld<'_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if !self.flags.is_empty() {
-            writeln!(f, "#flags: {}", self.flags.join(", "))?;
+            writeln!(f, "Flags: {}", self.flags.join(", "))?;
         }
 
         let spawn_identifier = self.spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
             let position = self.spawn.position().expect("Seed Spawn had no coordinates");
-            writeln!(f, "setup spawn|{}", position.code())?;
+            writeln!(f, "Spawn: {}, {}  // {}", position.x, position.y, spawn_identifier)?;
 
             if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == spawn_identifier { Some(item) } else { None }) {
                 writeln!(f, "{}|{}|mute", UberState::spawn().code(), spawn_item.code())?;
             }
         }
-        writeln!(f, "#spawn-anchor: {spawn_identifier}")?;
 
         for placement in &self.placements {
             writeln!(f, "{}", placement.code())?;

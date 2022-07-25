@@ -19,6 +19,20 @@ pub struct Message {
     pub noclear: bool,
 }
 
+macro_rules! write_part {
+    ($first:ident, $dst:expr, $($arg:tt)*) => {
+        {
+            #[allow(unused_assignments)]
+            if $first {
+                $first = false;
+            } else {
+                write!($dst, "|")?;
+            }
+            write!($dst, $($arg)*)
+        }
+    };
+}
+
 impl Message {
     pub(crate) fn new(message: String) -> Message {
         Message {
@@ -34,17 +48,21 @@ impl Message {
 
     pub fn code(&self) -> CodeDisplay<Message> {
         CodeDisplay::new(self, |s, f| {
-            write!(f, "{}", s.message)?;
+            let mut first = true;
+
+            if !s.message.is_empty() {
+                write_part!(first, f, "{}", s.message)?;
+            }
             if let Some(frames) = s.frames {
-                write!(f, "|f={frames}")?;
+                write_part!(first, f, "f={frames}")?;
             }
             if let Some(pos) = s.pos {
-                write!(f, "|p={pos}")?;
+                write_part!(first, f, "p={pos}")?;
             }
-            if s.mute { write!(f, "|mute")?; }
-            if s.instant { write!(f, "|instant")?; }
-            if s.quiet { write!(f, "|quiet")?; }
-            if s.noclear { write!(f, "|noclear")?; }
+            if s.mute { write_part!(first, f, "mute")?; }
+            if s.instant { write_part!(first, f, "instant")?; }
+            if s.quiet { write_part!(first, f, "quiet")?; }
+            if s.noclear { write_part!(first, f, "noclear")?; }
             Ok(())
         })
     }
