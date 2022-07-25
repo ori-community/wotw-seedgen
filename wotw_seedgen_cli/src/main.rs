@@ -65,8 +65,8 @@ enum WorldOptInner<T> {
     Opt(T),
 }
 
-fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_count: usize) -> Result<Vec<Vec<T>>, String> {
-    let mut world_values: Vec<Vec<T>> = vec![vec![]; world_count];
+fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> Result<Vec<Vec<T>>, String> {
+    let mut world_values: Vec<Vec<T>> = vec![vec![]; worlds];
     let mut current_world = None;
 
     for world_opt in world_opts {
@@ -96,8 +96,8 @@ fn assign_nonduplicate<T>(assign: T, current_world_entry: &mut Option<(T, String
         },
     }
 }
-fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world_count: usize) -> Result<Vec<Option<T>>, String> {
-    let mut world_values: Vec<Option<(T, String)>> = vec![None; world_count];
+fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> Result<Vec<Option<T>>, String> {
+    let mut world_values: Vec<Option<(T, String)>> = vec![None; worlds];
     let mut current_world = None;
 
     for world_opt in world_opts {
@@ -328,7 +328,7 @@ struct SeedSettings {
     /// 
     /// Seeds with more than one world are called multiworld seeds
     #[structopt(short, long, default_value = "1")]
-    world_count: usize,
+    worlds: usize,
     /// Spawn destination
     ///
     /// Use an anchor name from the areas file, "r" / "random" for a random teleporter or "f" / "fullyrandom" for any location
@@ -389,7 +389,7 @@ impl SeedSettings {
         let Self {
             presets,
             world_presets,
-            world_count,
+            worlds,
             spawn,
             difficulty,
             tricks,
@@ -403,15 +403,15 @@ impl SeedSettings {
             seed,
         } = self;
 
-        let world_presets = resolve_world_opts(world_presets, world_count)?;
-        let world_spawns = resolve_nonduplicate_world_opts(spawn, world_count)?;
-        let world_difficulties = resolve_nonduplicate_world_opts(difficulty, world_count)?;
-        let world_tricks = resolve_world_opts(tricks, world_count)?;
-        let world_hard_flags = resolve_nonduplicate_world_opts(hard, world_count)?;
-        let world_goals = resolve_world_opts(goals, world_count)?;
-        let world_headers = resolve_world_opts(headers, world_count)?;
-        let world_header_configs = resolve_world_opts(header_config, world_count)?;
-        let world_inline_headers = resolve_world_opts(inline_headers, world_count)?;
+        let world_presets = resolve_world_opts(world_presets, worlds)?;
+        let world_spawns = resolve_nonduplicate_world_opts(spawn, worlds)?;
+        let world_difficulties = resolve_nonduplicate_world_opts(difficulty, worlds)?;
+        let world_tricks = resolve_world_opts(tricks, worlds)?;
+        let world_hard_flags = resolve_nonduplicate_world_opts(hard, worlds)?;
+        let world_goals = resolve_world_opts(goals, worlds)?;
+        let world_headers = resolve_world_opts(headers, worlds)?;
+        let world_header_configs = resolve_world_opts(header_config, worlds)?;
+        let world_inline_headers = resolve_world_opts(inline_headers, worlds)?;
 
         let logic_map = if disable_logic_filter { Some(false) } else { None };
         let online = if online { Some(true) } else { None };
