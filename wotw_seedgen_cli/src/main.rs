@@ -413,7 +413,7 @@ impl SeedSettings {
         let world_header_configs = resolve_world_opts(header_config, worlds)?;
         let world_inline_headers = resolve_world_opts(inline_headers, worlds)?;
 
-        let logic_map = if disable_logic_filter { Some(false) } else { None };
+        let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
         let online = if online { Some(true) } else { None };
 
         let yes_fun = world_presets.into_iter()
@@ -442,7 +442,7 @@ impl SeedSettings {
         Ok(Preset {
             includes: presets,
             world_settings: Some(yes_fun),
-            logic_map,
+            disable_logic_filter,
             seed,
             online,
             create_game: None,

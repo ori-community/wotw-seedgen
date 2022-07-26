@@ -67,7 +67,7 @@ pub struct Settings {
     /// This is assumed never to be empty
     pub world_settings: Vec<WorldSettings>,
     /// Whether the in-logic map filter should be offered
-    pub logic_map: bool,
+    pub disable_logic_filter: bool,
     /// Require an online connection to play the seed
     /// 
     /// This is needed for Co-op, Multiworld and Bingo
@@ -117,7 +117,7 @@ impl Settings {
         let Preset {
             includes,
             world_settings,
-            logic_map,
+            disable_logic_filter,
             online,
             seed,
             create_game,
@@ -156,8 +156,8 @@ impl Settings {
             }
         }
 
-        if let Some(logic_map) = logic_map {
-            self.logic_map = logic_map;
+        if let Some(disable_logic_filter) = disable_logic_filter {
+            self.disable_logic_filter = disable_logic_filter;
         }
         if let Some(online) = online {
             self.online = online;
@@ -268,7 +268,7 @@ impl Default for Settings {
         Settings {
             seed: Self::random_seed(),
             world_settings: vec![WorldSettings::default()],
-            logic_map: true,
+            disable_logic_filter: false,
             online: false,
             create_game: CreateGame::default(),
         }
