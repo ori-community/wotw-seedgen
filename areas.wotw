@@ -1090,6 +1090,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   pickup MarshPastOpher.SpiritTrial:
     moki: MarshPastOpher.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: MarshPastOpher.TrialActivation, Dash, Grapple
+    unsafe: MarshPastOpher.TrialActivation, Grapple  # https://youtu.be/sFNJzOvtOwM
   pickup MarshSpawn.BridgeEX:  # paths that can't get to Main
     moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
     gorlek, MarshSpawn.ToOpherBarrier:
