@@ -1514,14 +1514,14 @@ anchor MidnightBurrows.BelowLupo at -850, -4579:  # Past the enemies near the te
   conn MidnightBurrows.Teleporter:
     moki: Combat=SneezeSlug+Bat OR Bash OR Launch
     gorlek: free
-  conn MidnightBurrows.Central:
+  conn MidnightBurrows.Central:  # The slug can be really annoying if it's on the left of the platform
     moki:
-      DoubleJump, Combat=SneezeSlug OR Bash
+      DoubleJump, Bash
       Launch
     gorlek:
-      DoubleJump OR Dash OR Sword OR Hammer
-      Combat=SneezeSlug, Glide
-    kii: Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2 OR Damage=15  # Land on spikes to go into the lower left portal
+      DoubleJump, Dash OR TripleJump  # if the slug is on the left, jump above it
+      Bash, Dash OR Sword OR Hammer OR Glide OR Damage=15
+    kii: DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2 OR Damage=15  # walljump on the wall left to the slug's platform and jump back in the portal to go near Lupo. From there you have enough momentum to avoid the slug if it's on the left of the platform
     unsafe: free  # jump into the portal and wait until you get enough height. That's it.
       # Blaze=1
       # Grenade=1  # Grenade while in right Teleporter to get to the left ceiling
