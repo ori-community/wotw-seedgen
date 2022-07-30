@@ -25,6 +25,7 @@ use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
 use util::UberState;
 use wotw_seedgen::generator::SeedSpoiler;
+use wotw_seedgen::util::constants::DEFAULT_SPAWN;
 
 /// For CLI flags that contain a mixture of world specifiers and flag values
 struct WorldOpt<T> {
@@ -850,8 +851,8 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
         }
     }
 
-    let spawn = util::spawn_from_seed(&contents).ok_or_else(|| "Failed to read spawn location from seed".to_string())?;
-    let spawn = world.graph.find_spawn(&spawn)?;
+    let spawn_name = util::spawn_from_seed(&contents).unwrap_or(DEFAULT_SPAWN.to_string());
+    let spawn = world.graph.find_spawn(&spawn_name)?;
 
     let mut reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).expect("Invalid Reach Check");
     reached.retain(|&node| node.can_place());
@@ -864,7 +865,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
 
     let reached = reached.into_iter()
         .filter_map(|node| node.uber_state())
-        .map(|uber_state| uber_state.to_string())
+        .map(|uber_state| uber_state.identifier.code().to_string())
         .collect::<Vec<_>>()
         .join(", ");
 
