@@ -22,6 +22,8 @@ use std::{
 
 use crate::header::{vdisplay, CodeDisplay};
 
+use self::constants::DEFAULT_SPAWN;
+
 #[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum NumericBool {
@@ -341,11 +343,13 @@ pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
 /// Read the spawn location from a generated seed
 /// 
 /// This reads the final spawn location, e.g. if the settings declared a random spawn, this will read the spawn that was chosen
-/// Returns [`None`] if the seed contains no information about the spawn location
+/// Returns an error if the seed contains a Spawn but doesn't annotate its identifier
 #[must_use]
-pub fn spawn_from_seed(input: &str) -> Option<String> {
+pub fn spawn_from_seed(input: &str) -> Result<String, String> {
     input.lines()
-    .find_map(|line| line.strip_prefix("Spawn: ")
-    .and_then(|spawn| spawn.split_once("//")
-    .map(|(_, identifier)| identifier.trim().to_string())))
+        .find_map(|line| line.strip_prefix("Spawn: ")
+        .map(|spawn| spawn.split_once("//")
+        .ok_or_else(|| "Failed to read spawn location from seed".to_string())
+        .map(|(_, identifier)| identifier.trim().to_string())))
+        .unwrap_or_else(|| Ok(DEFAULT_SPAWN.to_string()))
 }
