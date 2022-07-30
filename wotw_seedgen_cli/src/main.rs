@@ -865,7 +865,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
 
     let reached = reached.into_iter()
         .filter_map(|node| node.uber_state())
-        .map(|uber_state| uber_state.to_string())
+        .map(|uber_state| uber_state.identifier.code().to_string())
         .collect::<Vec<_>>()
         .join(", ");
 

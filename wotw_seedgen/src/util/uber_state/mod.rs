@@ -54,8 +54,7 @@ impl UberIdentifier {
             uber_id,
         })
     }
-}
-impl UberIdentifier {
+
     pub fn code(&self) -> CodeDisplay<UberIdentifier> {
         CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.uber_group, s.uber_id)})
     }
