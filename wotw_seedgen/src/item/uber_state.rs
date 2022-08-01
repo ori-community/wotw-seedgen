@@ -56,7 +56,7 @@ impl UberStateOperator {
         CodeDisplay::new(self, |s, f| {
             match s {
                 Self::Value(value) => value.fmt(f),
-                Self::Pointer(uber_identifier) => write!(f, "$({})", uber_identifier),
+                Self::Pointer(uber_identifier) => write!(f, "$({})", uber_identifier.code()),
                 Self::Range(range) => range.code().fmt(f),
             }
         })
