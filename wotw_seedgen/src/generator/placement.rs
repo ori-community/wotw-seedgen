@@ -152,10 +152,10 @@ where
     let origin_details = origin_world_context.world.custom_items.get(&item);
     let custom_name =  origin_details.and_then(|details| details.name.clone());
     let display =  origin_details.and_then(|details| details.display.clone());
-    let generic_name = custom_name.clone().unwrap_or_else(|| item.to_string());
+    let item_name = custom_name.clone().unwrap_or_else(|| item.to_string());
 
     if origin_world_index == target_world_index {
-        log::trace!("(World {}): Placed {} at {}", origin_world_index, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!("(World {}): Placed {} at {}", origin_world_index, item_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         origin_world_context.placements.push(Placement {
             node: Some(node),
@@ -179,7 +179,7 @@ where
             });
         }
     } else {
-        log::trace!("(World {}): Placed World {}'s {} at {}", origin_world_index, target_world_index, generic_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!("(World {}): Placed World {}'s {} at {}", origin_world_index, target_world_index, item_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         let target_world_context = &mut world_contexts[target_world_index];
         let target_details = target_world_context.world.custom_items.get(&item);
@@ -221,7 +221,7 @@ where
     if forced {
         context.current_spoiler_group.forced_items.grant(item.clone(), 1);
     }
-    context.current_spoiler_group.placements.push(SpoilerPlacement { origin_world_index, target_world_index, node_identifier, node_position, item });
+    context.current_spoiler_group.placements.push(SpoilerPlacement { origin_world_index, target_world_index, node_identifier, node_position, item, item_name });
 
     Ok(())
 }
@@ -589,7 +589,12 @@ where
                     world_context.world.pool.remove(&item, 1);
                     world_context.world.grant_player(item.clone(), 1).unwrap_or_else(|err| log::error!("(World {}): {}", world_index, err));
 
-                    log::trace!("(World {}): Placed {} as spawn progression", world_index, item);
+                    let origin_details = world_context.world.custom_items.get(&item);
+                    let custom_name =  origin_details.and_then(|details| details.name.clone());
+                    let display =  origin_details.and_then(|details| details.display.clone());
+                    let item_name = custom_name.clone().unwrap_or_else(|| item.to_string());
+
+                    log::trace!("(World {}): Placed {} as spawn progression", world_index, item_name);
 
                     if matches!(item, Item::Skill(Skill::Regenerate)) {
                         random_slots -= 1;
@@ -604,7 +609,15 @@ where
                         node_identifier: "Spawn".to_string(),
                         node_position: None,
                         item: item.clone(),
+                        item_name,
                     });
+                    if let Some(display) = display.or(custom_name) {
+                        world_context.placements.push(Placement {
+                            node,
+                            uber_state: UberState::spawn(),
+                            item: Item::Message(Message::new(display)),
+                        });
+                    }
                     world_context.placements.push(Placement {
                         node,
                         uber_state: UberState::spawn(),

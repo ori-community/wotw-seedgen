@@ -43,6 +43,8 @@ pub struct SpoilerPlacement {
     pub node_position: Option<Position>,
     /// The placed [`Item`]
     pub item: Item,
+    /// The name of the [`Item`], which may vary from the [`Item`]s [`Display`] implementation if a custom name for item was provided by headers
+    pub item_name: String,
 }
 
 impl SeedSpoiler {
@@ -79,7 +81,7 @@ impl Display for SeedSpoiler {
                 if multiworld {
                     write!(pickup, "[{}] ", placement.target_world_index)?;
                 }
-                write!(pickup, "{}", placement.item)?;
+                write!(pickup, "{}", placement.item_name)?;
                 if pickup.len() > longest_pickup { longest_pickup = pickup.len(); }
 
                 let mut location  = String::new();
