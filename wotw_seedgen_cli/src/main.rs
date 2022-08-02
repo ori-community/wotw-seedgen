@@ -805,7 +805,7 @@ fn create_game_preset(mut args: GamePresetArgs) -> Result<(), Box<dyn Error>> {
     let preset = preset.to_json_pretty();
     args.filename.set_extension("json");
 
-    let path = util::create_file(&args.filename, &preset, "presets", false)?;
+    let path = util::create_file(&args.filename, &preset, "game_presets", false)?;
     log::info!("Created preset {}", path.display());
 
     Ok(())
@@ -816,7 +816,7 @@ fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> 
     let preset = preset.to_json_pretty();
     args.filename.set_extension("json");
 
-    let path = util::create_file(&args.filename, &preset, "presets", false)?;
+    let path = util::create_file(&args.filename, &preset, "world_presets", false)?;
     log::info!("Created preset {}", path.display());
 
     Ok(())

@@ -93,7 +93,7 @@ impl GamePreset {
     /// The [`GamePreset`] will be searched as .json file in the current and /presets child directory
     pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
         name.push_str(".json");
-        let input = util::read_file(name, "presets")?;
+        let input = util::read_file(name, "game_presets")?;
         Ok(Self::parse(&input)?)
     }
 }
@@ -191,7 +191,7 @@ impl WorldPreset {
     /// The [`WorldPreset`] will be searched as .json file in the current and /presets child directory
     pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
         name.push_str(".json");
-        let input = util::read_file(name, "presets")?;
+        let input = util::read_file(name, "world_presets")?;
         Ok(Self::parse(&input)?)
     }
 }

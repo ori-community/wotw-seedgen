@@ -26,7 +26,7 @@ fn main() {
         ),
         trick_list.join(",\n    ")
     );
-    fs::write("presets/glitches.json", preset).expect("failed to write glitches preset");
+    fs::write("world_presets/glitches.json", preset).expect("failed to write glitches preset");
 }
 
 fn find_enum<'a>(syntax: &'a syn::File, ident: &str) -> Option<&'a syn::ItemEnum> {
