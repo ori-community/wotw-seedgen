@@ -19,7 +19,7 @@ use serde::{Serialize, Deserialize};
 
 use log::LevelFilter;
 
-use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::WorldPreset, Preset, Settings, logic, Header, generator::Seed};
+use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::{WorldPreset, PresetGroup, PresetInfo}, Preset, Settings, logic, Header, generator::Seed};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
@@ -427,6 +427,7 @@ impl SeedSettings {
             .zip(world_inline_headers)
             .map(|((((((((world_presets, spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
                 WorldPreset {
+                    info: None,
                     includes: vec_in_option(world_presets),
                     spawn: spawn.map(SpawnOpt::into_inner),
                     difficulty,
@@ -440,6 +441,7 @@ impl SeedSettings {
             }).collect::<Vec<_>>();
 
         Ok(Preset {
+            info: None,
             includes: presets,
             world_settings: Some(yes_fun),
             disable_logic_filter,
@@ -456,7 +458,9 @@ struct PresetArgs {
     ///
     /// later you can run seed -p <preset-name> to use this preset
     #[structopt(parse(from_os_str))]
-    name: PathBuf,
+    filename: PathBuf,
+    #[structopt(flatten)]
+    info: PresetInfoArgs,
     #[structopt(flatten)]
     settings: SeedSettings,
 }
@@ -467,13 +471,15 @@ struct WorldPresetArgs {
     ///
     /// Later you can run seed -p <preset-name> to use this preset
     #[structopt(parse(from_os_str))]
-    name: PathBuf,
+    filename: PathBuf,
     #[structopt(flatten)]
     settings: WorldPresetSettings,
 }
 
 #[derive(StructOpt)]
 struct WorldPresetSettings {
+    #[structopt(flatten)]
+    info: PresetInfoArgs,
     /// Include further world presets
     ///
     /// Presets later in the list override earlier ones, and flags from the command override any preset
@@ -520,6 +526,7 @@ struct WorldPresetSettings {
 impl WorldPresetSettings {
     fn into_world_preset(self) -> WorldPreset {
         let Self {
+            info,
             includes,
             spawn,
             difficulty,
@@ -532,6 +539,7 @@ impl WorldPresetSettings {
         } = self;
 
         WorldPreset {
+            info: info.into_preset_info(),
             includes,
             spawn: spawn.map(SpawnOpt::into_inner),
             difficulty,
@@ -542,6 +550,39 @@ impl WorldPresetSettings {
             header_config: header_config.map(|header_config| header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
             inline_headers: inline_headers.map(|inline_headers| inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
         }
+    }
+}
+
+#[derive(StructOpt)]
+struct PresetInfoArgs {
+    /// Display name
+    #[structopt(long)]
+    name: Option<String>,
+    /// Extended description
+    #[structopt(long)]
+    description: Option<String>,
+    /// Mark this as a base preset
+    /// 
+    /// Base presets are displayed more prominently
+    #[structopt(long)]
+    base_preset: bool,
+}
+
+impl PresetInfoArgs {
+    fn into_preset_info(self) -> Option<PresetInfo> {
+        let Self {
+            name,
+            description,
+            base_preset,
+        } = self;
+
+        let preset_info = PresetInfo {
+            name,
+            description,
+            group: if base_preset { Some(PresetGroup::Base) } else { None },
+        };
+
+        if preset_info == PresetInfo::default() { None } else { Some(preset_info) }
     }
 }
 
@@ -755,11 +796,12 @@ fn play_last_seed() -> Result<(), String> {
 }
 
 fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
-    let preset = args.settings.into_preset()?;
+    let mut preset = args.settings.into_preset()?;
+    preset.info = args.info.into_preset_info();
     let preset = preset.to_json_pretty();
-    args.name.set_extension("json");
+    args.filename.set_extension("json");
 
-    let path = util::create_file(&args.name, &preset, "presets", false)?;
+    let path = util::create_file(&args.filename, &preset, "presets", false)?;
     log::info!("Created preset {}", path.display());
 
     Ok(())
@@ -768,9 +810,9 @@ fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
 fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> {
     let preset = args.settings.into_world_preset();
     let preset = preset.to_json_pretty();
-    args.name.set_extension("json");
+    args.filename.set_extension("json");
 
-    let path = util::create_file(&args.name, &preset, "presets", false)?;
+    let path = util::create_file(&args.filename, &preset, "presets", false)?;
     log::info!("Created preset {}", path.display());
 
     Ok(())

@@ -1,4 +1,8 @@
 {
+  "info": {
+    "name": "Quality of Life",
+    "description": "Enables some quality of life settings (e.g. autoplant, cutscene skips etc.)"
+  },
   "headers": [
     "progress_helper",
     "skippable_cutscenes",

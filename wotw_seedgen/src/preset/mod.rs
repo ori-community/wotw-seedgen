@@ -45,6 +45,9 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Preset {
+    /// User-targetted information about the preset
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info: Option<PresetInfo>,
     /// Names of further [`Preset`]s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
@@ -131,6 +134,9 @@ impl Preset {
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct WorldPreset {
+    /// User-targetted information about the preset
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info: Option<PresetInfo>,
     /// Names of further [`WorldPreset`]s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
@@ -188,4 +194,27 @@ impl WorldPreset {
         let input = util::read_file(name, "presets")?;
         Ok(Self::parse(&input)?)
     }
+}
+
+/// Information for the user about a [`Preset`] or [`WorldPreset`]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+pub struct PresetInfo {
+    /// Display name
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Extended description
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    /// Where to present the preset
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group: Option<PresetGroup>,
+}
+
+/// Special groups to display a preset in
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum PresetGroup {
+    /// Generally, only one base preset will be used at a time.
+    /// 
+    /// The most common form of base presets are the difficulty presets, such as "Moki" and "Gorlek"
+    Base,
 }

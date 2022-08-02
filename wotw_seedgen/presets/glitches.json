@@ -1,4 +1,8 @@
 {
+  "info": {
+    "name": "Glitches",
+    "description": "Requires glitches"
+  },
   "tricks": [
     "SwordSentryJump",
     "HammerSentryJump",

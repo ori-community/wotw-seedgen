@@ -1,4 +1,9 @@
 {
+  "info": {
+    "name": "Gorlek",
+    "description": "For advanced players, requires some hard paths and doesn't spawn with sword",
+    "group": "Base"
+  },
   "includes": [
     "qol"
   ],

@@ -12,7 +12,20 @@ fn main() {
     let trick_enum = find_enum(&syntax, "Trick").expect("failed to locate Trick enum in settings source");
     let trick_list = list_variants(trick_enum);
 
-    let preset = format!("{{\n  \"tricks\": [\n    {}\n  ]\n}}", trick_list.join(",\n    "));
+    let preset = format!(
+        concat!(
+            "{{\n",
+            "  \"info\": {{\n",
+            "    \"name\": \"Glitches\",\n",
+            "    \"description\": \"Requires glitches\"\n",
+            "  }},\n",
+            "  \"tricks\": [\n",
+            "    {}\n",
+            "  ]\n",
+            "}}",
+        ),
+        trick_list.join(",\n    ")
+    );
     fs::write("presets/glitches.json", preset).expect("failed to write glitches preset");
 }
 

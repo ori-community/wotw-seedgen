@@ -1,4 +1,8 @@
 {
+  "info": {
+    "name": "Random Spawn",
+    "description": "Set the initial spawn to a random teleporter"
+  },
   "spawn": "Random",
   "headers": [
     "better_random_spawn"

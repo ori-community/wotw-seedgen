@@ -115,6 +115,7 @@ impl Settings {
     /// Inner method to memorize nested presets to prevent cyclic patterns
     fn apply_preset_guarded(&mut self, preset: Preset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
         let Preset {
+            info: _,
             includes,
             world_settings,
             disable_logic_filter,
@@ -342,6 +343,7 @@ impl WorldSettings {
     /// Inner method to memorize nested presets to prevent cyclic patterns
     fn apply_world_preset_guarded(&mut self, preset: WorldPreset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
         let WorldPreset {
+            info: _,
             includes,
             difficulty,
             tricks,
