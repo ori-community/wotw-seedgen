@@ -10,14 +10,14 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// 
 /// # Examples
 /// 
-/// [`Preset`]s can be serialized and deserialized
+/// [`GamePreset`]s can be serialized and deserialized
 /// 
 /// ```
-/// # use wotw_seedgen::Preset;
+/// # use wotw_seedgen::preset::GamePreset;
 /// use wotw_seedgen::preset::WorldPreset;
 /// use wotw_seedgen::settings::Difficulty;
 /// 
-/// let mut preset = Preset::default();
+/// let mut preset = GamePreset::default();
 /// let mut world_settings = WorldPreset::default();
 /// world_settings.difficulty = Some(Difficulty::Gorlek);
 /// preset.world_settings = Some(vec![world_settings]);
@@ -25,30 +25,30 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// let json = "{\"worldSettings\":[{\"difficulty\":\"Gorlek\"}]}".to_string();
 /// 
 /// assert_eq!(preset.to_json(), json);
-/// assert_eq!(preset, Preset::parse(&json).unwrap());
+/// assert_eq!(preset, GamePreset::parse(&json).unwrap());
 /// ```
 /// 
-/// Use [`Settings::apply_preset`](crate::Settings::apply_preset) to merge a [`Preset`] into existing [`Settings`](crate::Settings)
+/// Use [`Settings::apply_preset`](crate::Settings::apply_preset) to merge a [`GamePreset`] into existing [`Settings`](crate::Settings)
 /// 
 /// ```
-/// # use wotw_seedgen::Preset;
+/// # use wotw_seedgen::preset::GamePreset;
 /// use wotw_seedgen::Settings;
 /// use wotw_seedgen::settings::Spawn;
 /// 
 /// let mut settings = Settings::default();
 /// 
-/// let preset = Preset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
+/// let preset = GamePreset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
 /// 
 /// settings.apply_preset(preset);
 /// assert_eq!(settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct Preset {
+pub struct GamePreset {
     /// User-targetted information about the preset
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
-    /// Names of further [`Preset`]s to use
+    /// Names of further [`GamePreset`]s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,25 +72,25 @@ pub struct Preset {
     pub create_game: Option<CreateGame>,
 }
 
-impl Preset {
-    /// Parse a [`Preset`] from json
+impl GamePreset {
+    /// Parse a [`GamePreset`] from json
     pub fn parse(input: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(input)
     }
-    /// Serialize the [`Preset`] into json format
+    /// Serialize the [`GamePreset`] into json format
     pub fn to_json(&self) -> String {
-        // This is safe because the Preset struct is known to serialize successfully
+        // This is safe because the GamePreset struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
     }
-    /// Serialize the [`Preset`] into pretty-printed json format
+    /// Serialize the [`GamePreset`] into pretty-printed json format
     pub fn to_json_pretty(&self) -> String {
-        // This is safe because the Preset struct is known to serialize successfully
+        // This is safe because the GamePreset struct is known to serialize successfully
         serde_json::to_string_pretty(&self).unwrap()
     }
 
-    /// Find and read a [`Preset`] with the given name
+    /// Find and read a [`GamePreset`] with the given name
     /// 
-    /// The [`Preset`] will be searched as .json file in the current and /presets child directory
+    /// The [`GamePreset`] will be searched as .json file in the current and /presets child directory
     pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
         name.push_str(".json");
         let input = util::read_file(name, "presets")?;
@@ -196,7 +196,7 @@ impl WorldPreset {
     }
 }
 
-/// Information for the user about a [`Preset`] or [`WorldPreset`]
+/// Information for the user about a [`GamePreset`] or [`WorldPreset`]
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PresetInfo {
     /// Display name

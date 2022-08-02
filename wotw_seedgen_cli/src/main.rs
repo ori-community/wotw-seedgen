@@ -19,7 +19,7 @@ use serde::{Serialize, Deserialize};
 
 use log::LevelFilter;
 
-use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::{WorldPreset, PresetGroup, PresetInfo}, Preset, Settings, logic, Header, generator::Seed};
+use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::{GamePreset, WorldPreset, PresetGroup, PresetInfo}, Settings, logic, Header, generator::Seed};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
@@ -244,12 +244,16 @@ enum SeedGenCommand {
     },
     /// Play the most recent generated seed
     Play,
-    /// Create a preset of the given settings
-    Preset {
+    /// Create a game preset of the given settings
+    /// 
+    /// A game preset defines the settings for the entire game and can contain different settings on a per world basis
+    GamePreset {
         #[structopt(flatten)]
-        args: PresetArgs,
+        args: GamePresetArgs,
     },
     /// Create a world preset of the given settings
+    /// 
+    /// A world preset defines the settings for one world and will be applied to all worlds the same way when generating a multiworld seed
     WorldPreset {
         #[structopt(flatten)]
         args: WorldPresetArgs,
@@ -318,7 +322,7 @@ struct SeedSettings {
     ///
     /// Presets later in the list override earlier ones, and flags from the command override any preset
     #[structopt(short = "P", long)]
-    presets: Option<Vec<String>>,
+    game_presets: Option<Vec<String>>,
     /// Derive the settings for individual worlds from one or more presets
     ///
     /// Presets later in the list override earlier ones, and flags from the command override any preset
@@ -385,9 +389,9 @@ fn vec_in_option<T>(vector: Vec<T>) -> Option<Vec<T>> {
 }
 
 impl SeedSettings {
-    fn into_preset(self) -> Result<Preset, String> {
+    fn into_game_preset(self) -> Result<GamePreset, String> {
         let Self {
-            presets,
+            game_presets,
             world_presets,
             worlds,
             spawn,
@@ -440,9 +444,9 @@ impl SeedSettings {
                 }
             }).collect::<Vec<_>>();
 
-        Ok(Preset {
+        Ok(GamePreset {
             info: None,
-            includes: presets,
+            includes: game_presets,
             world_settings: Some(yes_fun),
             disable_logic_filter,
             seed,
@@ -453,10 +457,10 @@ impl SeedSettings {
 }
 
 #[derive(StructOpt)]
-struct PresetArgs {
+struct GamePresetArgs {
     /// name of the preset
     ///
-    /// later you can run seed -p <preset-name> to use this preset
+    /// later you can run seed -P <preset-name> to use this preset
     #[structopt(parse(from_os_str))]
     filename: PathBuf,
     #[structopt(flatten)]
@@ -631,7 +635,7 @@ enum HeaderCommand {
 }
 
 fn parse_settings(args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
-    let preset = args.into_preset()?;
+    let preset = args.into_game_preset()?;
     settings.apply_preset(preset)?;
 
     Ok(())
@@ -795,8 +799,8 @@ fn play_last_seed() -> Result<(), String> {
     Ok(())
 }
 
-fn create_preset(mut args: PresetArgs) -> Result<(), Box<dyn Error>> {
-    let mut preset = args.settings.into_preset()?;
+fn create_game_preset(mut args: GamePresetArgs) -> Result<(), Box<dyn Error>> {
+    let mut preset = args.settings.into_game_preset()?;
     preset.info = args.info.into_preset_info();
     let preset = preset.to_json_pretty();
     args.filename.set_extension("json");
@@ -954,10 +958,10 @@ fn main() -> ExitCode {
 
             play_last_seed()
         },
-        SeedGenCommand::Preset { args } => {
+        SeedGenCommand::GamePreset { args } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            create_preset(args).map_err(|err| err.to_string())
+            create_game_preset(args).map_err(|err| err.to_string())
         },
         SeedGenCommand::WorldPreset { args } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));

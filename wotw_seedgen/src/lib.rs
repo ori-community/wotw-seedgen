@@ -21,13 +21,12 @@ pub use languages::{logic, header::{self, Header}};
 pub use world::World;
 pub use inventory::Inventory;
 pub use item::{Item, VItem};
-pub use preset::Preset;
 pub use settings::Settings;
 pub use generator::generate_seed;
 
 #[cfg(test)]
 mod tests {
-    use crate::{preset::WorldPreset, settings::Difficulty};
+    use crate::{preset::{WorldPreset, GamePreset}, settings::Difficulty};
 
     use super::*;
 
@@ -67,9 +66,9 @@ mod tests {
             settings.world_settings[0].apply_world_preset(preset).unwrap();
         }
 
-        let preset = Preset {
+        let preset = GamePreset {
             world_settings: Some(vec![WorldPreset::default(); 2]),
-            ..Preset::default()
+            ..GamePreset::default()
         };
         settings.apply_preset(preset).unwrap();
 

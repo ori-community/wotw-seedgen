@@ -10,7 +10,7 @@ use rand::distributions::{Distribution, Uniform};
 use wotw_seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize};
 
-use crate::{Preset, preset::WorldPreset, util::constants::DEFAULT_SPAWN};
+use crate::{preset::{GamePreset, WorldPreset}, util::constants::DEFAULT_SPAWN};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -50,7 +50,7 @@ use slugstrings::SLUGSTRINGS;
 /// let seed = "
 /// // [...pickup data and stuff...]
 /// 
-/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"logicMap\":true,\"online\":false,\"createGame\":\"None\"}
+/// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
 /// let settings = Settings::from_seed(seed);
@@ -97,7 +97,7 @@ impl Settings {
         input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
     }
 
-    /// Apply the settings from a preset
+    /// Apply the settings from a [`GamePreset`]
     /// 
     /// This follows various rules to retain all unrelated parts of the existing Settings:
     /// - Any [`None`] values of the preset will be ignored
@@ -108,13 +108,13 @@ impl Settings {
     /// - If multiple worlds are in the preset, but only one in the existing settings, the existing settings will be copied for all worlds, then the preset will be applied per index
     /// - If multiple worlds are in both and their number does not match, returns an [`Error`]
     /// - Nested presets will be applied before the parent preset
-    pub fn apply_preset(&mut self, preset: Preset) -> Result<(), Box<dyn Error>> {
+    pub fn apply_preset(&mut self, preset: GamePreset) -> Result<(), Box<dyn Error>> {
         self.apply_preset_guarded(preset, &mut vec![])
     }
 
     /// Inner method to memorize nested presets to prevent cyclic patterns
-    fn apply_preset_guarded(&mut self, preset: Preset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
-        let Preset {
+    fn apply_preset_guarded(&mut self, preset: GamePreset, already_applied: &mut Vec<String>) -> Result<(), Box<dyn Error>> {
+        let GamePreset {
             info: _,
             includes,
             world_settings,
@@ -180,7 +180,7 @@ impl Settings {
             return Ok(());
         }
         already_applied.push(preset.clone());
-        let preset = Preset::read_file(preset)?;
+        let preset = GamePreset::read_file(preset)?;
         self.apply_preset_guarded(preset, already_applied)
     }
 
@@ -276,8 +276,8 @@ impl Default for Settings {
     }
 }
 
-impl From<Preset> for Settings {
-    fn from(preset: Preset) -> Settings {
+impl From<GamePreset> for Settings {
+    fn from(preset: GamePreset) -> Settings {
         let mut settings = Settings::default();
         // This is safe because the default settings will contain one world
         settings.apply_preset(preset).unwrap();
@@ -329,7 +329,7 @@ impl WorldSettings {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
     }
 
-    /// Apply the settings from a world preset
+    /// Apply the settings from a [`WorldPreset`]
     /// 
     /// This follows various rules to retain all unrelated parts of the existing Settings:
     /// - Any [`None`] values of the preset will be ignored

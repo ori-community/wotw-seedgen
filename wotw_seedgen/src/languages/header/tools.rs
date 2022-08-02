@@ -117,14 +117,14 @@ pub fn inspect(headers: Vec<PathBuf>) -> Result<(), String> {
 
     let hint = if headers.len() == 1 {
         let name = headers[0].file_stem().unwrap().to_string_lossy();
-        format!("Use 'preset <name> -h {} ...' to add this and other headers to a preset", NAME_COLOUR.paint(name))
+        format!("Use 'world-preset <name> -h {} ...' to add this and other headers to a preset", NAME_COLOUR.paint(name))
     } else {
         let mut arguments = headers.iter().fold(String::new(), |acc, header|
             format!("{}{} ", acc, header.file_stem().unwrap().to_string_lossy())
         );
         arguments.pop();
 
-        format!("Use 'preset <name> -h {} ...' to add these headers to a preset", NAME_COLOUR.paint(arguments))
+        format!("Use 'world-preset <name> -h {} ...' to add these headers to a preset", NAME_COLOUR.paint(arguments))
     };
 
     for mut header in headers {
