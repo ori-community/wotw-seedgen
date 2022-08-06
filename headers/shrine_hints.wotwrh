@@ -3,20 +3,20 @@
 /// Displays hints for the item contained within while standing in front of a combat shrine
 
 //!!include update_loop
-timer: 9|101|9|150
+timer: 9|101|9|155
 3|1|8|9|101|bool|true
 
-9|150|4|24|-333|-4571|-323|-4562|4|17|24922|13993|0|8|9|145|bool|true // Howl's Den
+9|155|4|24|-333|-4571|-323|-4562|4|17|24922|13993|0|8|9|145|bool|true // Howl's Den
 9|145|6|instant|noclear|p=-2|f=300|Complete the Howl's Den Combat Shrine to gain\n$[(24922|13993)]
 
-9|150|4|24|-388|-4343|-378|-4333|4|17|21786|18109|0|8|9|146|bool|true // Marsh
+9|155|4|24|-388|-4343|-378|-4333|4|17|21786|18109|0|8|9|146|bool|true // Marsh
 9|146|6|instant|noclear|p=-2|f=300|Complete the Marsh Combat Shrine to gain\n$[(21786|18109)]
 
-9|150|4|24|-640|-4021|-630|-4011|4|17|44310|9902|0|8|9|147|bool|true // Glades
+9|155|4|24|-640|-4021|-630|-4011|4|17|44310|9902|0|8|9|147|bool|true // Glades
 9|147|6|instant|noclear|p=-2|f=300|Complete the Glades Combat Shrine to gain\n$[(44310|9902)]
 
-9|150|4|24|1356|-4069|1366|-4059|4|17|58674|29265|0|8|9|148|bool|true // Woods
+9|155|4|24|1356|-4069|1366|-4059|4|17|58674|29265|0|8|9|148|bool|true // Woods
 9|148|6|instant|noclear|p=-2|f=300|Complete the Woods Combat Shrine to gain\n$[(58674|29265)]
 
-9|150|4|24|208|-4516|219|-4506|4|17|18793|31937|0|8|9|149|bool|true // Depths
+9|155|4|24|208|-4516|219|-4506|4|17|18793|31937|0|8|9|149|bool|true // Depths
 9|149|6|instant|noclear|p=-2|f=300|Complete the Depths Combat Shrine to gain\n$[(18793|31937)]
