@@ -18,6 +18,12 @@ Flags: Bonus Items
 !!parameter shurikenEfficiency int:1
 //// How many Sentry Efficiency to shuffle in
 !!parameter sentryEfficiency int:1
+//// How many Bow Efficiency to shuffle in
+!!parameter bowEfficiency int:0
+//// How many Regenerate Efficiency to shuffle in
+!!parameter regenEfficiency int:0
+//// How many Flash Efficiency to shuffle in
+!!parameter flashEfficiency int:0
 //// How many Grenade Efficiency to shuffle in
 !!parameter grenadeEfficiency int:1
 
@@ -30,4 +36,7 @@ Flags: Bonus Items
 !!add $PARAM(spikeEfficiency)x 11|3         // Spike Efficiency
 !!add $PARAM(shurikenEfficiency)x 11|4      // Shuriken Efficiency
 !!add $PARAM(sentryEfficiency)x 11|5        // Sentry Efficiency
+!!add $PARAM(bowEfficiency)x 11|6           // Bow Efficiency
+!!add $PARAM(regenEfficiency)x 11|7         // Regeneration Efficiency
+!!add $PARAM(flashEfficiency)x 11|8         // Flash Efficiency
 !!add $PARAM(grenadeEfficiency)x 11|9       // Grenade Efficiency
