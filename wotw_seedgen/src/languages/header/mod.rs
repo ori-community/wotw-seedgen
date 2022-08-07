@@ -221,8 +221,9 @@ impl Header {
         for line in input.lines() {
             if let Some(annotation) = line.strip_prefix('#') {
                 let end = annotation.find(|c: char| c == '/' || c.is_whitespace()).unwrap_or(annotation.len());
-                let annotation = Annotation::from_str(&annotation[..end])?;
-                annotations.push(annotation);
+                if let Ok(annotation) = Annotation::from_str(&annotation[..end]) {
+                    annotations.push(annotation);
+                }
             } else if !line.is_empty() {
                 break;
             }
@@ -334,11 +335,12 @@ pub struct ParameterInfo {
 }
 
 /// Annotations providing meta information about how to treat the header
-#[derive(Debug, Clone, Copy, PartialEq, FromStr)]
-#[ParseFromIdentifier]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Annotation {
     /// Hide this header from the user, it is only to be used internally through includes
     Hide,
+    /// Put this header into a category with other, similar headers
+    Category(String),
 }
 
 #[derive(Debug, Clone)]

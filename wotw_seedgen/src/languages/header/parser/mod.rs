@@ -14,7 +14,7 @@ use crate::{
     util::{VUberState, UberIdentifier, Icon}, languages::parser::ParseErrorCollection,
 };
 
-use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, TimerDefinition};
+use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, TimerDefinition, Annotation};
 
 use crate::languages::{TokenKind, CommentKind, ParseError};
 use crate::languages::parser::{parse_number, parse_ident};
@@ -360,9 +360,37 @@ fn parse_trigger(parser: &mut Parser) -> Result<(VUberState, Suggestion), ParseE
     Ok((trigger, suggestion))
 }
 
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum AnnotationKind {
+    Hide,
+    Category,
+}
+impl Annotation {
+    pub(crate) fn parse(parser: &mut Parser) -> Result<Annotation, ParseError> {
+        let kind = parse_ident!(parser, Suggestion::Annotation)?;
+        match kind {
+            AnnotationKind::Hide => Ok(Annotation::Hide),
+            AnnotationKind::Category => parse_category(parser),
+        }
+    }
+}
+impl FromStr for Annotation {
+    type Err = ParseError;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let mut parser = new(input);
+        let annotation = Annotation::parse(&mut parser)?;
+        parser.expect_end()?;
+        Ok(annotation)
+    }
+}
+fn parse_category(parser: &mut Parser) -> Result<Annotation, ParseError> {
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::Annotation)?;
+    let category = parse_string(parser).to_owned();
+    Ok(Annotation::Category(category))
+}
 fn parse_annotation(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
-    let annotation = parse_ident!(parser, Suggestion::Annotation)?;
-    Ok(HeaderContent::Annotation(annotation))
+    Annotation::parse(parser).map(HeaderContent::Annotation)
 }
 
 #[cfg(test)]
