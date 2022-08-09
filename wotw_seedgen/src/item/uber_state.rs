@@ -16,11 +16,12 @@ pub struct UberStateItem {
 }
 impl UberStateItem {
     pub fn code(&self) -> CodeDisplay<UberStateItem> {
-        CodeDisplay::new(self, |s, f| write!(f, "{}|{}|{}{}",
-            s.uber_identifier.code(),
-            s.uber_type.code(),
-            if s.signed { if s.sign { "+" } else { "-" } } else { "" },
-            s.operator.code()))
+        CodeDisplay::new(self, |s, f| {
+            write!(f, "{}|{}|", s.uber_identifier.code(), s.uber_type.code())?;
+            if s.signed { if s.sign { write!(f, "+")? } else { write!(f, "-")? } }
+            write!(f, "{}", s.operator.code())?;
+            if s.skip { write!(f, "|skip=1") } else { Ok(()) }
+        })
     }
 }
 vdisplay! {
