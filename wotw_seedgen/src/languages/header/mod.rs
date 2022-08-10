@@ -219,9 +219,11 @@ impl Header {
         let mut annotations = vec![];
 
         for line in input.lines() {
-            if let Some(annotation) = line.strip_prefix('#') {
-                let end = annotation.find(|c: char| c == '/' || c.is_whitespace()).unwrap_or(annotation.len());
-                if let Ok(annotation) = Annotation::from_str(&annotation[..end]) {
+            if let Some(mut annotation) = line.strip_prefix('#') {
+                let end = annotation.find('\n').unwrap_or(annotation.len());
+                annotation = &annotation[..end];
+                if let Some(end) = annotation.find("//") { annotation = &annotation[..end] }
+                if let Ok(annotation) = Annotation::from_str(annotation) {
                     annotations.push(annotation);
                 }
             } else if !line.is_empty() {
@@ -266,7 +268,7 @@ impl Header {
 
         for line in input.lines() {
             if line.is_empty() || line.starts_with('#') { continue }
-            if let Some(documentation) = line.strip_prefix("///") {
+            if let Some(documentation) = line.trim_start().strip_prefix("///") {
                 if documentation.starts_with('/') { break }
                 let documentation = documentation.trim();
                 if documentation.is_empty() { continue }
