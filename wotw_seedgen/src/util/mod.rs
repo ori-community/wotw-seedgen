@@ -344,7 +344,6 @@ pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
 /// 
 /// This reads the final spawn location, e.g. if the settings declared a random spawn, this will read the spawn that was chosen
 /// Returns an error if the seed contains a Spawn but doesn't annotate its identifier
-#[must_use]
 pub fn spawn_from_seed(input: &str) -> Result<String, String> {
     input.lines()
         .find_map(|line| line.strip_prefix("Spawn: ")

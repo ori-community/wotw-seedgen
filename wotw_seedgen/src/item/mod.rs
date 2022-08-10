@@ -11,7 +11,6 @@ mod sysmessage;
 mod wheel_command;
 mod shop_command;
 
-use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
 

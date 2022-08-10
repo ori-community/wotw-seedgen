@@ -147,9 +147,7 @@ impl ParseError {
                 ")
             }).collect::<String>();
 
-        if source_view.is_empty() {
-            panic!("Error range out of bounds");
-        }
+        assert!(!source_view.is_empty(), "Error range out of bounds");
 
         let message = &self.message;
         format!("{message}{source_view}")

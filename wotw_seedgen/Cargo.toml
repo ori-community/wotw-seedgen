@@ -3,7 +3,7 @@ name = "wotw_seedgen"
 description = "Seed Generator for the Ori and the Will of the Wisps Randomizer"
 version = "0.0.7"
 authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/ori-rando/wotw-seedgen"
 license = "MIT"
 
