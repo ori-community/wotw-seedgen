@@ -11,16 +11,25 @@ use world::*;
 use item::*;
 use util::*;
 use settings::*;
+use files::*;
+
+struct NoFileAccess;
+impl FileAccess for NoFileAccess {
+    fn read_game_preset(&self, _: &str) -> Result<String, String> { panic!("no file access") }
+    fn read_world_preset(&self, _: &str) -> Result<String, String> { panic!("no file access") }
+    fn read_header(&self, _: &str) -> Result<String, String> { panic!("no file access") }
+}
+const NO_FILE_ACCESS: NoFileAccess = NoFileAccess;
 
 fn parsing(c: &mut Criterion) {
-    let input = read_file("areas.wotw", "logic").unwrap();
+    let input = read_file("areas", "wotw", "logic").unwrap();
     let areas = logic::Areas::parse(&input).unwrap();
     c.bench_function("parse areas", |b| b.iter(|| logic::Areas::parse(&input)));
 
-    let input = read_file("loc_data.csv", "logic").unwrap();
+    let input = read_file("loc_data", "csv", "logic").unwrap();
     let locations = logic::parse_locations(&input).unwrap();
     c.bench_function("parse locations", |b| b.iter(|| logic::parse_locations(&input)));
-    let input = read_file("state_data.csv", "logic").unwrap();
+    let input = read_file("state_data", "csv", "logic").unwrap();
     let states = logic::parse_states(&input).unwrap();
 
     let mut settings = Settings::default();
@@ -112,16 +121,16 @@ fn generation(c: &mut Criterion) {
     let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
 
     c.bench_function("singleplayer", |b| b.iter(|| {
-        wotw_seedgen::generate_seed(&graph, &settings).unwrap();
+        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &settings).unwrap();
     }));
 
     settings.world_settings.extend_from_within(..);
 
     c.bench_function("two worlds", |b| b.iter(|| {
-        wotw_seedgen::generate_seed(&graph, &settings).unwrap();
+        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &settings).unwrap();
     }));
 
-    let seed = wotw_seedgen::generate_seed(&graph, &settings).unwrap();
+    let seed = wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &settings).unwrap();
 
     c.bench_function("convert seed to text", |b| b.iter(|| {
         seed.seed_files()

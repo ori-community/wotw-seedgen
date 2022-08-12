@@ -1,11 +1,14 @@
 [package]
 name = "wotw_seedgen"
 description = "Seed Generator for the Ori and the Will of the Wisps Randomizer"
-version = "0.0.7"
+version = "0.0.8"
 authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
 edition = "2021"
 repository = "https://github.com/ori-rando/wotw-seedgen"
 license = "MIT"
+
+[features]
+fs = []
 
 [dependencies]
 wotw_seedgen_derive = { path = "../wotw_seedgen_derive", version = "0.1" }

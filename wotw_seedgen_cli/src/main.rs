@@ -1,12 +1,13 @@
 mod log_init;
 use log_init::initialize_log;
+mod tools;
 
 use std::{
     fs,
     str::FromStr,
     path::PathBuf,
     convert::TryFrom,
-    io::{self, Read},
+    io::{self, Read, Write},
     time::Instant,
     env, error::Error, process::ExitCode,
     fmt::{self, Display, Debug},
@@ -19,7 +20,11 @@ use serde::{Serialize, Deserialize};
 
 use log::LevelFilter;
 
-use wotw_seedgen::{self, item, world, settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader}, util, header, preset::{GamePreset, WorldPreset, PresetGroup, PresetInfo}, Settings, logic, Header, generator::Seed};
+use wotw_seedgen::{item, world, util, logic, Header};
+use wotw_seedgen::settings::{Settings, Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
+use wotw_seedgen::preset::{GamePreset, WorldPreset, PresetGroup, PresetInfo};
+use wotw_seedgen::generator::Seed;
+use wotw_seedgen::files::{self, FILE_SYSTEM_ACCESS};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
@@ -266,8 +271,7 @@ enum SeedGenCommand {
     /// Inspect the available headers
     Headers {
         /// headers to look at in detail
-        #[structopt(parse(from_os_str))]
-        headers: Vec<PathBuf>,
+        headers: Vec<String>,
         #[structopt(subcommand)]
         subcommand: Option<HeaderCommand>,
     },
@@ -461,8 +465,7 @@ struct GamePresetArgs {
     /// name of the preset
     ///
     /// later you can run seed -P <preset-name> to use this preset
-    #[structopt(parse(from_os_str))]
-    filename: PathBuf,
+    filename: String,
     #[structopt(flatten)]
     info: PresetInfoArgs,
     #[structopt(flatten)]
@@ -474,8 +477,7 @@ struct WorldPresetArgs {
     /// Name of the preset
     ///
     /// Later you can run seed -p <preset-name> to use this preset
-    #[structopt(parse(from_os_str))]
-    filename: PathBuf,
+    filename: String,
     #[structopt(flatten)]
     settings: WorldPresetSettings,
 }
@@ -636,7 +638,7 @@ enum HeaderCommand {
 
 fn parse_settings(args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
     let preset = args.into_game_preset()?;
-    settings.apply_preset(preset)?;
+    settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
 
     Ok(())
 }
@@ -670,7 +672,7 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
     if multiworld {
         let mut multi_folder = folder.clone();
         multi_folder.push(filename);
-        folder = util::create_folder(&multi_folder).map_err(|err| format!("Error creating seed folder: {}", err))?;
+        folder = create_multiworld_folder(multi_folder).map_err(|err| format!("Error creating seed folder: {err}"))?;
     }
 
     let mut first = true;
@@ -683,7 +685,7 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
         }
         path.set_extension("wotwr");
 
-        let file = util::create_file(&path, seed, "", true)?;
+        let file = create_seedfile(path, seed).map_err(|err| format!("Error writing seed file: {err}"))?;
         log::info!("Wrote seed for World {} to {}", index, file.display());
 
         if first {
@@ -710,10 +712,53 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
         },
     };
 
-    let file = util::create_file(path, &contents, "", true).map_err(|err| format!("Error writing spoiler: {err}"))?;
+    let file = create_seedfile(path, &contents).map_err(|err| format!("Error writing spoiler: {err}"))?;
     log::info!("Wrote spoiler to {}", file.display());
 
     Ok(())
+}
+
+fn create_seedfile(mut path: PathBuf, contents: &str) -> Result<PathBuf, io::Error> {
+    let mut index = 0;
+    loop {
+        let mut filename = path.file_stem().unwrap().to_os_string();
+        if index > 0 {
+            filename.push(format!("_{}", index));
+        }
+        let extension = path.extension().unwrap_or_default().to_owned();
+        path.set_file_name(filename);
+        path.set_extension(extension);
+
+        match fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path) {
+                Ok(mut file) => {
+                    file.write_all(contents.as_bytes())?;
+                    return Ok(path);
+                },
+                Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
+                Err(err) if err.kind() == io::ErrorKind::NotFound => fs::create_dir_all(path.parent().unwrap())?,
+                Err(err) => return Err(err),
+            }
+    }
+}
+fn create_multiworld_folder(mut path: PathBuf) -> Result<PathBuf, io::Error> {
+    let mut index = 0;
+    loop {
+        let mut filename = path.file_stem().unwrap().to_os_string();
+        if index > 0 {
+            filename.push(format!("_{}", index));
+        }
+        path.set_file_name(filename);
+
+        match fs::create_dir(&path) {
+            Ok(_) => return Ok(path),
+            Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
+            Err(err) if err.kind() == io::ErrorKind::NotFound => fs::create_dir_all(path.parent().unwrap())?,
+            Err(err) => return Err(err),
+        }
+    }
 }
 
 fn write_seeds_to_stdout(seed: Seed, json: bool) -> Result<(), String> {
@@ -754,7 +799,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     let stdin = read_stdin()?;
     if !stdin.is_empty() {
         let preset = serde_json::from_str(&stdin)?;
-        settings.apply_preset(preset)?;
+        settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
     }
 
     parse_settings(args.settings, &mut settings)?;
@@ -766,7 +811,7 @@ fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = settings.world_count();
-    let seed = wotw_seedgen::generate_seed(&graph, &settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -799,25 +844,23 @@ fn play_last_seed() -> Result<(), String> {
     Ok(())
 }
 
-fn create_game_preset(mut args: GamePresetArgs) -> Result<(), Box<dyn Error>> {
+fn create_game_preset(args: GamePresetArgs) -> Result<(), Box<dyn Error>> {
     let mut preset = args.settings.into_game_preset()?;
     preset.info = args.info.into_preset_info();
     let preset = preset.to_json_pretty();
-    args.filename.set_extension("json");
 
-    let path = util::create_file(&args.filename, &preset, "game_presets", false)?;
-    log::info!("Created preset {}", path.display());
+    FILE_SYSTEM_ACCESS.write_game_preset(&args.filename, &preset)?;
+    log::info!("Created game preset {}", args.filename);
 
     Ok(())
 }
 
-fn create_world_preset(mut args: WorldPresetArgs) -> Result<(), Box<dyn Error>> {
+fn create_world_preset(args: WorldPresetArgs) -> Result<(), Box<dyn Error>> {
     let preset = args.settings.into_world_preset();
     let preset = preset.to_json_pretty();
-    args.filename.set_extension("json");
 
-    let path = util::create_file(&args.filename, &preset, "world_presets", false)?;
-    log::info!("Created preset {}", path.display());
+    FILE_SYSTEM_ACCESS.write_world_preset(&args.filename, &preset)?;
+    log::info!("Created world preset {}", args.filename);
 
     Ok(())
 }
@@ -828,7 +871,7 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     log::trace!("{command}");
 
     args.seed_file.set_extension("wotwr");
-    let contents = util::read_file(&args.seed_file, "seeds")?;
+    let contents = fs::read_to_string(&args.seed_file).map_err(|err| format!("Error reading seed: {err}"))?;
 
     let settings = Settings::from_seed(&contents).unwrap_or_else(|| {
         log::trace!("No settings found in seed, using default settings");
@@ -923,6 +966,7 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
         path.set_extension("wotwrh");
     }
 
+    let identifier = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
     let header = fs::read_to_string(path.clone()).map_err(|err| format!("Failed to read {}: {}", path.display(), err))?;
 
     let mut rng = rand::thread_rng();
@@ -932,8 +976,8 @@ fn compile_seed(mut path: PathBuf) -> Result<(), String> {
         .build(FxHashMap::default())?;
 
     path.set_extension("wotwr");
-    let path = util::create_file(path.file_name().unwrap(), &header.seed_content, "target", false)?;
-    log::info!("Compiled to {}", path.display());
+    files::write_file(&identifier, "wotwr", &header.seed_content, "target")?;
+    log::info!("Compiled {}", identifier);
 
     Ok(())
 }
@@ -973,16 +1017,16 @@ fn main() -> ExitCode {
 
             match subcommand {
                 Some(HeaderCommand::Validate { path }) => {
-                   header::validate(path).map(|_| ())
+                    tools::validate(path).map(|_| ())
                 },
                 Some(HeaderCommand::Parse { path }) => {
                     compile_seed(path)
                 },
                 None => {
                     if headers.is_empty() {
-                        header::list()
+                        tools::list()
                     } else {
-                        header::inspect(headers)
+                        tools::inspect(headers)
                     }
                 },
             }

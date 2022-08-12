@@ -16,19 +16,17 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::{
     item::{Item, Message, UberStateOperator},
-    settings::{InlineHeader, HeaderConfig, Goal}, util::{
-        self,
-        UberState,
-    }, world::{
+    settings::{InlineHeader, HeaderConfig, Goal}, util::UberState,
+    world::{
         World,
         graph::Graph,
         Pool,
-    }, Settings, header::{self, HeaderBuild}, Header
+    }, Settings, header::{self, HeaderBuild}, Header, files::FileAccess
 };
 
 use placement::generate_placements;
 
-pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, settings: &'settings Settings) -> Result<Seed<'graph, 'settings>, String> {
+pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, file_access: &impl FileAccess, settings: &'settings Settings) -> Result<Seed<'graph, 'settings>, String> {
     let mut rng: StdRng = Seeder::from(&settings.seed).make_rng();
     log::trace!("Seeded RNG with {}", settings.seed);
 
@@ -36,7 +34,7 @@ pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, settings: &'settin
         let mut world = World::new(graph, world_settings);
         world.pool = Pool::preset();
 
-        let (goals, flags, headers) = parse_headers(&mut world, &mut rng)?;
+        let (goals, flags, headers) = parse_headers(&mut world, file_access, &mut rng)?;
         world.goals = goals;
 
         Ok((world, (flags, headers)))
@@ -52,7 +50,7 @@ pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, settings: &'settin
     Ok(Seed { worlds, graph, settings, spoiler })
 }
 
-fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<Goal>, Vec<String>, String), String> {
+fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut impl Rng) -> Result<(Vec<Goal>, Vec<String>, String), String> {
     validate_header_names(&world.player.settings.headers, &world.player.settings.inline_headers)?;
 
     let mut config_map = build_config_map(&world.player.settings.header_config)?;
@@ -62,14 +60,14 @@ fn parse_headers(world: &mut World, rng: &mut impl Rng) -> Result<(Vec<Goal>, Ve
     includes.extend(world.player.settings.headers.iter().cloned());
 
     for header_name in &world.player.settings.headers {
-        let header = util::read_file(format!("{header_name}.wotwrh"), "headers")?;
-        parse_header(header_name.clone(), header, &mut headers, &mut includes, &mut config_map, rng)?;
+        let header = file_access.read_header(header_name)?;
+        parse_header(header_name.clone(), header, &mut headers, &mut includes, &mut config_map, file_access, rng)?;
     }
 
     for inline_header in &world.player.settings.inline_headers {
         let header_name = inline_header.name.as_ref().cloned().unwrap_or_else(|| "Anonymous Header".to_string());
         let header = inline_header.content.clone();
-        parse_header(header_name, header, &mut headers, &mut includes, &mut config_map, rng)?;
+        parse_header(header_name, header, &mut headers, &mut includes, &mut config_map, file_access, rng)?;
     }
 
     let mut excludes = FxHashMap::default();
@@ -150,6 +148,7 @@ fn parse_header(
     headers: &mut Vec<(String, HeaderBuild)>,
     includes: &mut FxHashSet<String>,
     config_map: &mut FxHashMap::<String, FxHashMap<String, String>>,
+    file_access: &impl FileAccess,
     rng: &mut impl Rng
 ) -> Result<(), String> {
     log::trace!("Parsing header {header_name}");
@@ -162,8 +161,8 @@ fn parse_header(
 
     for include in &header.includes {
         if includes.insert(include.clone()) {
-            let header = util::read_file(format!("{include}.wotwrh"), "headers")?;
-            parse_header(include.clone(), header, headers, includes, config_map, rng)?;
+            let header = file_access.read_header(include)?;
+            parse_header(include.clone(), header, headers, includes, config_map, file_access, rng)?;
         }
     }
 

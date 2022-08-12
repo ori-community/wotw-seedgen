@@ -9,7 +9,7 @@ mod code;
 pub use emitter::{HeaderBuild, ItemDetails};
 pub use v::{VResolve, V, VString};
 pub(crate) use v::vdisplay;
-pub use tools::{list, inspect, validate};
+pub use tools::validate_headers;
 pub use code::CodeDisplay;
 use std::{fmt, str::FromStr};
 

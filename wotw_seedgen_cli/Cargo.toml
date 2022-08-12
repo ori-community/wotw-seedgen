@@ -4,7 +4,7 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-wotw_seedgen = { path = "../wotw_seedgen" }
+wotw_seedgen = { path = "../wotw_seedgen", features = ["fs"] }
 rustc-hash = "1.1"
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }

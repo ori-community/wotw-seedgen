@@ -1,9 +1,3 @@
-use std::{
-    fs,
-    io::{BufRead, BufReader},
-    path::{Path, PathBuf},
-};
-
 use ansi_term::{Style, Colour};
 use rustc_hash::FxHashMap;
 
@@ -14,154 +8,14 @@ use crate::{util::{
 
 use super::{HeaderContent, VResolve};
 
-fn is_hidden(header: &Path) -> Result<bool, String> {
-    let file = fs::File::open(header).map_err(|err| format!("Failed to open header from {:?}: {}", header, err))?;
-    let mut file = BufReader::new(file);
-
-    let mut line = String::new();
-    file.read_line(&mut line).map_err(|err| format!("Failed to read header from {:?}: {}", header, err))?;
-
-    Ok(line.trim() == "#hide")
-}
-
-fn headers_in_directory(directory: &Path) -> Result<Vec<PathBuf>, String> {
-    Ok(fs::read_dir(directory).map_err(|err| format!("Failed to read directory {:?}: {}", directory, err))?
-        .filter_map(|entry| {
-            if let Ok(entry) = entry {
-                let path = entry.path();
-                if let Some(extension) = path.extension() {
-                    if let Some("wotwrh") = extension.to_str() {
-                        return Some(path);
-                    }
-                }
-            }
-            None
-        })
-        .collect())
-}
-
-fn find_headers(show_hidden: bool) -> Result<Vec<PathBuf>, String> {
-    let mut headers = headers_in_directory(Path::new("."))?;
-    if let Ok(mut more) = headers_in_directory(Path::new("./headers")) {
-        headers.append(&mut more);
-    }
-
-    if !show_hidden {
-        headers = headers.iter()
-            .map(|header| is_hidden(header).map(|hidden| if hidden { None } else { Some(header) }))
-            .collect::<Result<Vec<_>, _>>()?
-            .iter()
-            .filter_map(|&header| header)
-            .cloned()
-            .collect::<Vec<_>>();
-    }
-
-    Ok(headers)
-}
-
-fn summarize_headers(headers: &[PathBuf]) -> Result<String, String> {
+pub type Identifier = String;
+/// Perform a set of checks on the given [`Header`]s, including parsing them and checking for collisions in the used uberStates.
+/// 
+/// Will also print information about what uberStates are still free to use
+/// 
+/// Returns `true` if all checks passed
+pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
     let mut output = String::new();
-
-    for header in headers {
-        let mut name = header.file_stem().unwrap().to_string_lossy().into_owned();
-        let header = fs::read_to_string(header).map_err(|err| format!("Error reading header from {:?}: {}", header, err))?;
-
-        let mut description = None;
-
-        for line in header.lines() {
-            if let Some(desc) = line.trim_start().strip_prefix("///") {
-                let desc = desc.trim();
-                if desc.is_empty() {
-                    continue;
-                }
-                let first = description.is_none();
-                description = Some(desc);
-                if !first {
-                    break;
-                }
-            }
-        }
-
-        util::add_trailing_spaces(&mut name, HEADER_INDENT);
-
-        output += &format!("{}  {}\n", NAME_COLOUR.paint(name), description.unwrap_or("no description"));
-    }
-
-    Ok(output)
-}
-
-pub fn list() -> Result<(), String> {
-    let mut output = String::new();
-
-    let headers = find_headers(false)?;
-
-    if headers.is_empty() {
-        println!("No headers found");
-        return Ok(());
-    }
-
-    let headers_length = headers.len();
-    output += &format!("{}", Style::new().fg(Colour::Green).bold().paint(format!("{} header{} found\n\n", headers_length, if headers_length == 1 { "" } else { "s" })));
-
-    output += &summarize_headers(&headers)?;
-    output.push('\n');
-
-    output += "Use 'headers <name>...' for details about one or more headers";
-
-    println!("{}", output);
-    Ok(())
-}
-
-pub fn inspect(headers: Vec<PathBuf>) -> Result<(), String> {
-    let mut output = String::new();
-
-    let hint = if headers.len() == 1 {
-        let name = headers[0].file_stem().unwrap().to_string_lossy();
-        format!("Use 'world-preset <name> -h {} ...' to add this and other headers to a preset", NAME_COLOUR.paint(name))
-    } else {
-        let mut arguments = headers.iter().fold(String::new(), |acc, header|
-            format!("{}{} ", acc, header.file_stem().unwrap().to_string_lossy())
-        );
-        arguments.pop();
-
-        format!("Use 'world-preset <name> -h {} ...' to add these headers to a preset", NAME_COLOUR.paint(arguments))
-    };
-
-    for mut header in headers {
-        header.set_extension("wotwrh");
-        let name = header.file_stem().unwrap().to_string_lossy();
-
-        let contents = util::read_file(&header, "headers")?;
-
-        let mut description = NAME_COLOUR.paint(format!("{} header:\n", name)).to_string();
-
-        for line in contents.lines() {
-            if let Some(desc) = line.trim_start().strip_prefix("///") {
-                description.push_str(desc.trim());
-                description.push('\n');
-            }
-        }
-
-        if description.is_empty() {
-            output += &Style::new().italic().paint("No description provided\n");
-        } else {
-            output += &description;
-            output.push('\n');
-        }
-    }
-
-    output += &hint;
-    println!("{}", output);
-    Ok(())
-}
-
-pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
-    let mut output = String::new();
-
-    let headers = match path {
-        Some(path) => vec![path],
-        None => find_headers(true)?,
-    };
 
     let mut occupation_map = Vec::new();
 
@@ -171,17 +25,15 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
     let mut passed = Vec::new();
     let mut failed = Vec::new();
 
-    for header in headers {
-        let contents = util::read_file(&header, "headers")?;
-        let mut name = header.file_stem().unwrap().to_string_lossy().into_owned();
-
-        match validate_header(&contents) {
+    for (identifier, header) in headers {
+        let mut identifier = identifier.to_string();
+        match validate_header(header) {
             Ok((occupied, excludes)) => {
-                occupation_map.push((name, occupied, excludes));
+                occupation_map.push((identifier, occupied, excludes));
             },
             Err(err) => {
-                util::add_trailing_spaces(&mut name, HEADER_INDENT);
-                failed.push(format!("{}  {}\n", NAME_COLOUR.paint(name), err));
+                util::add_trailing_spaces(&mut identifier, HEADER_INDENT);
+                failed.push(format!("{}  {}\n", NAME_COLOUR.paint(identifier), err));
             },
         }
     }
@@ -323,13 +175,13 @@ pub fn validate(path: Option<PathBuf>) -> Result<bool, String> {
     );
 
     println!("{}", output);
-    Ok(valid)
+    valid
 }
 
-pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), String> {
+pub fn validate_header(contents: String) -> Result<(Vec<UberState>, Vec<String>), String> {
     let mut default_parameters = FxHashMap::default();
 
-    let header = Header::parse(contents.to_string(), &mut rand::thread_rng())
+    let header = Header::parse(contents, &mut rand::thread_rng())
         .map_err(|errors| errors.verbose_display())?;
     header.fill_parameters(&mut default_parameters)?;
     let build = header.clone().build(default_parameters.clone())?;
@@ -404,8 +256,18 @@ pub fn validate_header(contents: &str) -> Result<(Vec<UberState>, Vec<String>), 
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
+    use crate::files;
+
     #[test]
     fn validate() {
-        assert!(super::validate(None).unwrap());
+        let headers = files::find_headers().unwrap().into_iter()
+            .map(|path| {
+                let content = fs::read_to_string(&path).unwrap();
+                let identifier = path.file_stem().unwrap().to_string_lossy().to_string();
+                (identifier, content)
+            }).collect();
+        assert!(super::validate_headers(headers), "validation failed");
     }
 }

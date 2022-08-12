@@ -13,12 +13,7 @@ use decorum::R32;
 use num_enum::{FromPrimitive, TryFromPrimitive};
 use wotw_seedgen_derive::{VVariant, FromStr, Display};
 
-use std::{
-    fmt,
-    fs,
-    io::{self, Write},
-    path::{Path, PathBuf},
-};
+use std::fmt;
 
 use crate::header::{vdisplay, CodeDisplay};
 
@@ -229,87 +224,6 @@ vdisplay! {
     impl fmt::Display for Position {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "{}, {}", self.x, self.y)
-        }
-    }
-}
-
-fn in_folder<P1: AsRef<Path>, P2: AsRef<Path>>(file: P1, folder: P2) -> Result<Option<PathBuf>, String> {
-    let file = file.as_ref();
-    let file_name = file.file_name().ok_or_else(|| format!("Invalid file path {}", file.display()))?;
-    let file_location = file.parent().ok_or_else(|| format!("Invalid file path {}", file.display()))?;
-
-    if let Some(file_folder) = file_location.file_name() {
-        if folder.as_ref() == file_folder {
-            return Ok(None);
-        }
-    }
-
-    let mut in_folder = PathBuf::from(file_location);
-    in_folder.push(folder);
-    in_folder.push(file_name);
-
-    Ok(Some(in_folder))
-}
-
-pub fn read_file<P1: AsRef<Path>, P2: AsRef<Path>>(file: P1, default_folder: P2) -> Result<String, String> {
-    in_folder(&file, default_folder)?.map_or_else(
-        || fs::read_to_string(&file).map_err(|err| format!("Failed to read file {}: {}", file.as_ref().display(), err)),
-        |in_folder| fs::read_to_string(in_folder).or_else(|_| {
-            fs::read_to_string(&file).map_err(|err| format!("Failed to read file {}: {}", file.as_ref().display(), err))
-        })
-    )
-}
-
-fn create_in_folder<P: AsRef<Path>>(file: P, contents: &str, create_new: bool) -> Result<PathBuf, io::Error> {
-    let file = file.as_ref();
-    let mut index = 0;
-    loop {
-        let mut filename = file.file_stem().unwrap().to_os_string();
-        if index > 0 {
-            filename.push(format!("_{}", index));
-        }
-        filename.push(format!(".{}", file.extension().unwrap().to_string_lossy()));
-        let path = file.with_file_name(filename);
-
-        match fs::OpenOptions::new()
-            .write(true)
-            .truncate(true)
-            .create(true)
-            .create_new(create_new)
-            .open(&path) {
-                Ok(mut file) => {
-                    file.write_all(contents.as_bytes())?;
-                    return Ok(path);
-                },
-                Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
-                Err(err) if err.kind() == io::ErrorKind::NotFound => fs::create_dir_all(path.parent().unwrap())?,
-                Err(err) => return Err(err),
-            }
-    }
-}
-pub fn create_file<P1: AsRef<Path>, P2: AsRef<Path>>(file: P1, contents: &str, default_folder: P2, create_new: bool) -> Result<PathBuf, String> {
-    in_folder(&file, default_folder)?.map_or_else(
-        || create_in_folder(&file, contents, create_new).map_err(|err| format!("Failed to create {}: {}", file.as_ref().display(), err)),
-        |in_folder| create_in_folder(&in_folder, contents, create_new).or_else(|_| {
-            create_in_folder(&file, contents, create_new).map_err(|err| format!("Failed to create {}: {}", file.as_ref().display(), err))
-        })
-    )
-}
-pub fn create_folder<P: AsRef<Path>>(file: P) -> Result<PathBuf, io::Error> {
-    let file = file.as_ref();
-    let mut index = 0;
-    loop {
-        let mut filename = file.file_stem().unwrap().to_os_string();
-        if index > 0 {
-            filename.push(format!("_{}", index));
-        }
-        let path = file.with_file_name(filename);
-
-        match fs::create_dir(&path) {
-            Ok(_) => return Ok(path),
-            Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
-            Err(err) if err.kind() == io::ErrorKind::NotFound => fs::create_dir_all(path.parent().unwrap())?,
-            Err(err) => return Err(err),
         }
     }
 }

@@ -174,9 +174,9 @@ mod tests {
         let mut settings = Settings::default();
         settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
-        let areas = util::read_file("areas.wotw", "logic").unwrap();
-        let locations = util::read_file("loc_data.csv", "logic").unwrap();
-        let states = util::read_file("state_data.csv", "logic").unwrap();
+        let areas = files::read_file("areas", "wotw", "logic").unwrap();
+        let locations = files::read_file("loc_data", "csv", "logic").unwrap();
+        let states = files::read_file("state_data", "csv", "logic").unwrap();
         let graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
         let mut world = World::new(&graph, &settings.world_settings[0]);
         world.player.inventory = Pool::preset().inventory;
@@ -191,7 +191,7 @@ mod tests {
             })
             .cloned().collect();
 
-        let input = util::read_file("loc_data.csv", "logic").unwrap();
+        let input = files::read_file("loc_data", "csv", "logic").unwrap();
         let all_locations = logic::parse_locations(&input).unwrap();
         let all_locations: FxHashSet<_> = all_locations.iter().map(|location| &location.uber_state).cloned().collect();
 

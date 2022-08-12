@@ -4,7 +4,7 @@ use std::error::Error;
 
 use serde::{Serialize, Deserialize};
 
-use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig, InlineHeader}, util};
+use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig, InlineHeader}, files::FileAccess};
 
 /// A collection of settings that can be applied to existing settings
 /// 
@@ -34,12 +34,13 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// # use wotw_seedgen::preset::GamePreset;
 /// use wotw_seedgen::Settings;
 /// use wotw_seedgen::settings::Spawn;
+/// use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 /// 
 /// let mut settings = Settings::default();
 /// 
 /// let preset = GamePreset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
 /// 
-/// settings.apply_preset(preset);
+/// settings.apply_preset(preset, &FILE_SYSTEM_ACCESS);
 /// assert_eq!(settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
@@ -91,9 +92,8 @@ impl GamePreset {
     /// Find and read a [`GamePreset`] with the given name
     /// 
     /// The [`GamePreset`] will be searched as .json file in the current and /presets child directory
-    pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
-        name.push_str(".json");
-        let input = util::read_file(name, "game_presets")?;
+    pub fn read_file(identifier: &str, file_access: &impl FileAccess) -> Result<Self, Box<dyn Error>> {
+        let input = file_access.read_game_preset(identifier)?;
         Ok(Self::parse(&input)?)
     }
 }
@@ -123,12 +123,13 @@ impl GamePreset {
 /// # use wotw_seedgen::preset::WorldPreset;
 /// use wotw_seedgen::settings::WorldSettings;
 /// use wotw_seedgen::settings::Spawn;
+/// use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 /// 
 /// let mut world_settings = WorldSettings::default();
 /// 
 /// let world_preset = WorldPreset::parse("{\"spawn\":\"Random\"}").unwrap();
 /// 
-/// world_settings.apply_world_preset(world_preset);
+/// world_settings.apply_world_preset(world_preset, &FILE_SYSTEM_ACCESS);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
@@ -189,9 +190,8 @@ impl WorldPreset {
     /// Find and read a [`WorldPreset`] with the given name
     /// 
     /// The [`WorldPreset`] will be searched as .json file in the current and /presets child directory
-    pub fn read_file(mut name: String) -> Result<Self, Box<dyn Error>> {
-        name.push_str(".json");
-        let input = util::read_file(name, "world_presets")?;
+    pub fn read_file(identifier: &str, file_access: &impl FileAccess) -> Result<Self, Box<dyn Error>> {
+        let input = file_access.read_world_preset(identifier)?;
         Ok(Self::parse(&input)?)
     }
 }
