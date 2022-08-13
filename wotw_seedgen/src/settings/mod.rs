@@ -315,6 +315,16 @@ pub struct WorldSettings {
 }
 
 impl WorldSettings {
+    /// Parse [`WorldSettings`] from json
+    pub fn parse(input: &str) -> Result<WorldSettings, serde_json::Error> {
+        serde_json::from_str(input)
+    }
+    /// Serialize the [`WorldSettings`] into json format
+    pub fn to_json(&self) -> String {
+        // This is safe because the settings struct is known to serialize successfully
+        serde_json::to_string(&self).unwrap()
+    }
+
     /// Checks whether these settings feature a random spawn location
     pub fn is_random_spawn(&self) -> bool {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
