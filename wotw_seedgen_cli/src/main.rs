@@ -718,15 +718,15 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
     Ok(())
 }
 
-fn create_seedfile(mut path: PathBuf, contents: &str) -> Result<PathBuf, io::Error> {
+fn create_seedfile(path: PathBuf, contents: &str) -> Result<PathBuf, io::Error> {
     let mut index = 0;
     loop {
         let mut filename = path.file_stem().unwrap().to_os_string();
         if index > 0 {
             filename.push(format!("_{}", index));
         }
-        let extension = path.extension().unwrap_or_default().to_owned();
-        path.set_file_name(filename);
+        let extension = path.extension().unwrap_or_default();
+        let mut path = path.with_file_name(filename);
         path.set_extension(extension);
 
         match fs::OpenOptions::new()
