@@ -1,7 +1,7 @@
 #category Hints
 /// Shrine Hints
 ///
-/// Reveal the reward a Combat Shrine gives when standing in front of it
+/// Reveal the reward a Combat Shrine gives when starting it
 
 19|1=1|6|instant|noclear|p=-2|Complete the Marsh Combat Shrine to gain\n$[(21786|18109)]
 19|2=1|6|instant|noclear|p=-2|Complete the Howl's Den Combat Shrine to gain\n$[(24922|13993)]
