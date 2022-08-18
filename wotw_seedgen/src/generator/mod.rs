@@ -192,7 +192,9 @@ fn build_config_map(header_config: &[HeaderConfig]) -> Result<FxHashMap::<String
             .or_default()
             .insert(config.config_name.clone(), config.config_value.clone())
         {
-            return Err(format!("provided multiple values for configuration parameter {} for header {} ({} and {})", config.config_name, config.header_name, prior, config.config_value));
+            if prior != config.config_value {
+                return Err(format!("provided multiple values for configuration parameter {} for header {} ({} and {})", config.config_name, config.header_name, prior, config.config_value));
+            }
         }
     }
 
