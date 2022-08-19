@@ -1047,6 +1047,7 @@ fn main() -> ExitCode {
 
 /// Struct that is used for JSON output to stdout
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct SeedgenCliJsonOutput {
     /// The seed file contents (i.e. text that goes into .wotwr files)
     pub seed_files: Vec<String>,

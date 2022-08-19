@@ -17,6 +17,7 @@ pub struct SeedSpoiler {
 }
 /// One "step" of placements in a [`SeedSpoiler`]
 #[derive(Default, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SpoilerGroup {
     /// Either contains the reachables for each world, or empty for placement groups before reachables are considered
     pub reachable: Vec<SpoilerWorldReachable>,
@@ -32,6 +33,7 @@ pub struct SpoilerWorldReachable {
 }
 /// One item placed on one location
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SpoilerPlacement {
     /// The "sending" world
     pub origin_world_index: usize,

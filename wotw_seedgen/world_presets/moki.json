@@ -21,9 +21,9 @@
   ],
   "headerConfig": [
     {
-      "header_name": "zone_hints",
-      "config_name": "tp_hints",
-      "config_value": "true"
+      "headerName": "zone_hints",
+      "configName": "tp_hints",
+      "configValue": "true"
     }
   ]
 }

@@ -552,6 +552,7 @@ impl Default for CreateGame {
 
 /// Configuration parameter for a header
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct HeaderConfig {
     /// The name of the header
     pub header_name: String,

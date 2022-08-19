@@ -11,54 +11,54 @@
   ],
   "headerConfig": [
     {
-      "header_name": "bonus_items",
-      "config_name": "extraJumps",
-      "config_value": "4"
+      "headerName": "bonus_items",
+      "configName": "extraJumps",
+      "configValue": "4"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "extraDashes",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "extraDashes",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "blazeEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "blazeEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "spikeEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "spikeEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "shurikenEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "shurikenEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "sentryEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "sentryEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "bowEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "bowEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "regenEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "regenEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "flashEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "flashEfficiency",
+      "configValue": "2"
     },
     {
-      "header_name": "bonus_items",
-      "config_name": "grenadeEfficiency",
-      "config_value": "2"
+      "headerName": "bonus_items",
+      "configName": "grenadeEfficiency",
+      "configValue": "2"
     }
   ]
 }
