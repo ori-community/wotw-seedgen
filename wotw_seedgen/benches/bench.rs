@@ -32,11 +32,11 @@ fn parsing(c: &mut Criterion) {
     let input = read_file("state_data", "csv", "logic").unwrap();
     let states = logic::parse_states(&input).unwrap();
 
-    let mut settings = Settings::default();
-    settings.world_settings[0].difficulty = Difficulty::Unsafe;
+    let mut game_settings = GameSettings::default();
+    game_settings.world_settings[0].difficulty = Difficulty::Unsafe;
 
-    logic::build(areas.clone(), locations.clone(), &states, &settings, false).unwrap();
-    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), &states, &settings, false)));
+    logic::build(areas.clone(), locations.clone(), &states, &game_settings, false).unwrap();
+    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), &states, &game_settings, false)));
 }
 
 fn requirements(c: &mut Criterion) {
@@ -84,7 +84,7 @@ fn reach_checking(c: &mut Criterion) {
     let areas = fs::read_to_string("areas.wotw").unwrap();
     let locations = fs::read_to_string("loc_data.csv").unwrap();
     let states = fs::read_to_string("state_data.csv").unwrap();
-    let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
+    let graph = parse_logic(&areas, &locations, &states, &GameSettings::default(), false).unwrap();
 
     c.bench_function("short reach check", |b| b.iter(|| {
         let world_settings = WorldSettings::default();
@@ -113,24 +113,24 @@ fn reach_checking(c: &mut Criterion) {
 }
 
 fn generation(c: &mut Criterion) {
-    let mut settings = Settings::default();
+    let mut game_settings = GameSettings::default();
 
     let areas = fs::read_to_string("areas.wotw").unwrap();
     let locations = fs::read_to_string("loc_data.csv").unwrap();
     let states = fs::read_to_string("state_data.csv").unwrap();
-    let graph = parse_logic(&areas, &locations, &states, &Settings::default(), false).unwrap();
+    let graph = parse_logic(&areas, &locations, &states, &game_settings, false).unwrap();
 
     c.bench_function("singleplayer", |b| b.iter(|| {
-        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &settings).unwrap();
+        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &game_settings).unwrap();
     }));
 
-    settings.world_settings.extend_from_within(..);
+    game_settings.world_settings.extend_from_within(..);
 
     c.bench_function("two worlds", |b| b.iter(|| {
-        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &settings).unwrap();
+        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &game_settings).unwrap();
     }));
 
-    let seed = wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &settings).unwrap();
+    let seed = wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &game_settings).unwrap();
 
     c.bench_function("convert seed to text", |b| b.iter(|| {
         seed.seed_files()

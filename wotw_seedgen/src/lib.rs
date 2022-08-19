@@ -22,30 +22,29 @@ pub use languages::{logic, header::{self, Header}};
 pub use world::World;
 pub use inventory::Inventory;
 pub use item::{Item, VItem};
-pub use settings::Settings;
 pub use generator::generate_seed;
 
 #[cfg(test)]
 mod tests {
-    use crate::{preset::{WorldPreset, GamePreset}, settings::Difficulty, files::FILE_SYSTEM_ACCESS};
+    use crate::{preset::{WorldPreset, GamePreset}, settings::{Difficulty, GameSettings}, files::FILE_SYSTEM_ACCESS};
 
     use super::*;
 
     #[test]
     fn some_seeds() {
-        let mut settings = Settings::default();
+        let mut game_settings = GameSettings::default();
         let areas = files::read_file("areas", "wotw", "logic").unwrap();
         let locations = files::read_file("loc_data", "csv", "logic").unwrap();
         let states = files::read_file("state_data", "csv", "logic").unwrap();
-        let mut graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
+        let mut graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false).unwrap();
 
-        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &settings).unwrap();
+        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &game_settings).unwrap();
 
-        settings.world_settings[0].difficulty = Difficulty::Unsafe;
-        graph = logic::parse_logic(&areas, &locations, &states, &settings, false).unwrap();
-        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &settings).unwrap();
+        game_settings.world_settings[0].difficulty = Difficulty::Unsafe;
+        graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false).unwrap();
+        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &game_settings).unwrap();
 
-        settings.world_settings[0].headers = vec![
+        game_settings.world_settings[0].headers = vec![
             "bingo".to_string(),
             "bonus+".to_string(),
             "glades_done".to_string(),
@@ -64,15 +63,15 @@ mod tests {
 
         for preset in ["gorlek", "rspawn"] {
             let preset = WorldPreset::read_file(preset, &FILE_SYSTEM_ACCESS).unwrap();
-            settings.world_settings[0].apply_world_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
+            game_settings.world_settings[0].apply_world_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
         }
 
         let preset = GamePreset {
             world_settings: Some(vec![WorldPreset::default(); 2]),
             ..GamePreset::default()
         };
-        settings.apply_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
+        game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
 
-        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &settings).unwrap();
+        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &game_settings).unwrap();
     }
 }

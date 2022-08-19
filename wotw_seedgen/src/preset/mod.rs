@@ -28,20 +28,20 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// assert_eq!(preset, GamePreset::parse(&json).unwrap());
 /// ```
 /// 
-/// Use [`Settings::apply_preset`](crate::Settings::apply_preset) to merge a [`GamePreset`] into existing [`Settings`](crate::Settings)
+/// Use [`GameSettings::apply_preset`](crate::settings::GameSettings::apply_preset) to merge a [`GamePreset`] into existing [`GameSettings`](crate::settings::GameSettings)
 /// 
 /// ```
 /// # use wotw_seedgen::preset::GamePreset;
-/// use wotw_seedgen::Settings;
+/// use wotw_seedgen::settings::GameSettings;
 /// use wotw_seedgen::settings::Spawn;
 /// use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 /// 
-/// let mut settings = Settings::default();
+/// let mut game_settings = GameSettings::default();
 /// 
 /// let preset = GamePreset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
 /// 
-/// settings.apply_preset(preset, &FILE_SYSTEM_ACCESS);
-/// assert_eq!(settings.world_settings[0].spawn, Spawn::Random);
+/// game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS);
+/// assert_eq!(game_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]

@@ -5,18 +5,18 @@ use super::{parser::{self, Areas, AreaContent}, locations::Location, states::Nam
 use crate::{world::{
     graph::{self, Graph, Node},
     requirements::Requirement,
-}, settings::{Difficulty, Trick}, Settings, util::NodeKind};
+}, settings::{GameSettings, Difficulty, Trick}, util::NodeKind};
 use crate::item::Skill;
 
 struct EmitterContext<'a> {
     macros: &'a FxHashMap<&'a str, parser::Group<'a>>,
-    settings: &'a Settings,
+    game_settings: &'a GameSettings,
     node_map: FxHashMap<String, usize>,
 }
 
 fn build_trick_requirement(trick: Trick, out: Requirement, context: &mut EmitterContext) -> Requirement {
-    if context.settings.any_contain_trick(trick) {
-        if context.settings.all_contain_trick(trick) {
+    if context.game_settings.any_contain_trick(trick) {
+        if context.game_settings.all_contain_trick(trick) {
             out
         } else {
             build_and(vec![
@@ -31,8 +31,8 @@ fn build_trick_requirement(trick: Trick, out: Requirement, context: &mut Emitter
 
 fn build_difficulty_requirement(difficulty: Difficulty, out: Requirement, region: bool, context: &mut EmitterContext) -> Requirement {
     if region {
-        if context.settings.any_have_difficulty(difficulty) {
-            if context.settings.lowest_difficulty() >= difficulty {
+        if context.game_settings.any_have_difficulty(difficulty) {
+            if context.game_settings.lowest_difficulty() >= difficulty {
                 out
             } else {
                 build_and(vec![
@@ -43,8 +43,8 @@ fn build_difficulty_requirement(difficulty: Difficulty, out: Requirement, region
         } else {
             Requirement::Impossible
         }
-    } else if context.settings.highest_difficulty() >= difficulty {
-        if context.settings.lowest_difficulty() >= difficulty {
+    } else if context.game_settings.highest_difficulty() >= difficulty {
+        if context.game_settings.lowest_difficulty() >= difficulty {
             out
         } else {
             build_and(vec![
@@ -60,8 +60,8 @@ fn build_difficulty_requirement(difficulty: Difficulty, out: Requirement, region
 const HARD_BOSS_HEALTH_MULTIPLIER: f32 = 1.8;
 
 fn build_boss_requirement(health: f32, context: &EmitterContext) -> Requirement {
-    if context.settings.any_play_hard() {
-        if context.settings.all_play_hard() {
+    if context.game_settings.any_play_hard() {
+        if context.game_settings.all_play_hard() {
             Requirement::Boss(health * HARD_BOSS_HEALTH_MULTIPLIER)
         } else {
             Requirement::Or(vec![
@@ -201,8 +201,8 @@ fn add_entry(node_map: &mut FxHashMap<String, usize>, key: &str, index: usize) -
 
 /// Builds the [`Graph`] from parsed data
 /// 
-/// The given [`Settings`] will be used to optimize the [`Graph`], changing them afterwards may invalidate the result
-pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState], settings: &Settings, validate: bool) -> Result<Graph, String> {
+/// The given [`GameSettings`] will be used to optimize the [`Graph`], changing them afterwards may invalidate the result
+pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState], game_settings: &GameSettings, validate: bool) -> Result<Graph, String> {
     let mut macros = FxHashMap::default();
     let mut regions = FxHashMap::default();
     regions.reserve(20);
@@ -277,7 +277,7 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState]
 
     let mut context = EmitterContext {
         macros: &macros,
-        settings,
+        game_settings,
         node_map,
     };
     for anchor in anchors {
@@ -346,7 +346,7 @@ mod tests {
     fn boss_scaling() {
         let context = EmitterContext {
             macros: &FxHashMap::default(),
-            settings: &Settings::default(),
+            game_settings: &GameSettings::default(),
             node_map: FxHashMap::default(),
         };
 
@@ -356,11 +356,11 @@ mod tests {
             _ => panic!(),
         }
 
-        let mut settings = Settings::default();
-        settings.world_settings[0].hard = true;
+        let mut game_settings = GameSettings::default();
+        game_settings.world_settings[0].hard = true;
         let context = EmitterContext {
             macros: &FxHashMap::default(),
-            settings: &settings,
+            game_settings: &game_settings,
             node_map: FxHashMap::default(),
         };
 

@@ -1,6 +1,6 @@
 //! Data structures to represent the settings when generating a seed
 //! 
-//! See the [`Settings`] struct for more information
+//! See the [`GameSettings`] struct for more information
 
 mod slugstrings;
 
@@ -21,31 +21,31 @@ use slugstrings::SLUGSTRINGS;
 /// # Examples
 /// 
 /// ```
-/// # use wotw_seedgen::Settings;
+/// # use wotw_seedgen::settings::GameSettings;
 /// use wotw_seedgen::settings::WorldSettings;
 /// 
-/// let settings = Settings::default();
+/// let game_settings = GameSettings::default();
 /// 
-/// assert_eq!(settings.world_count(), 1);
-/// assert_eq!(settings.world_settings[0], WorldSettings::default());
-/// assert!(!settings.seed.is_empty());
+/// assert_eq!(game_settings.world_count(), 1);
+/// assert_eq!(game_settings.world_settings[0], WorldSettings::default());
+/// assert!(!game_settings.seed.is_empty());
 /// ```
 /// 
 /// The seed on default settings will be randomly generated
 /// 
-/// Settings can be serialized and deserialized
+/// GameSettings can be serialized and deserialized
 /// 
 /// ```
-/// # use wotw_seedgen::Settings;
+/// # use wotw_seedgen::settings::GameSettings;
 /// #
-/// let settings = Settings::default();
-/// let json = settings.to_json();
+/// let game_settings = GameSettings::default();
+/// let json = game_settings.to_json();
 /// ```
 /// 
 /// Settings can be read from a generated seed
 /// 
 /// ```
-/// # use wotw_seedgen::Settings;
+/// # use wotw_seedgen::settings::GameSettings;
 /// #
 /// let seed = "
 /// // [...pickup data and stuff...]
@@ -53,13 +53,13 @@ use slugstrings::SLUGSTRINGS;
 /// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":{\"Set\":\"MarshSpawn.Main\"},\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
-/// let settings = Settings::from_seed(seed);
-/// assert!(settings.is_some());
-/// assert!(settings.unwrap().is_ok());
+/// let game_settings = GameSettings::from_seed(seed);
+/// assert!(game_settings.is_some());
+/// assert!(game_settings.unwrap().is_ok());
 /// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct Settings {
+pub struct GameSettings {
     /// The seed that determines all randomness
     pub seed: String,
     /// The individual settings for each world of the seed
@@ -78,9 +78,9 @@ pub struct Settings {
     pub create_game: CreateGame,
 }
 
-impl Settings {
+impl GameSettings {
     /// Parse settings from json
-    pub fn parse(input: &str) -> Result<Settings, serde_json::Error> {
+    pub fn parse(input: &str) -> Result<GameSettings, serde_json::Error> {
         serde_json::from_str(input)
     }
     /// Serialize the settings into json format
@@ -93,7 +93,7 @@ impl Settings {
     /// 
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
-    pub fn from_seed(input: &str) -> Option<Result<Settings, serde_json::Error>> {
+    pub fn from_seed(input: &str) -> Option<Result<GameSettings, serde_json::Error>> {
         input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
     }
 
@@ -226,7 +226,7 @@ impl Settings {
     /// 
     /// # Panics
     /// 
-    /// Panics if the [`Settings`] contain no worlds
+    /// Panics if the [`GameSettings`] contain no worlds
     pub fn highest_difficulty(&self) -> Difficulty {
         // world_settings is assumed not to be empty
         self.world_settings.iter().map(|world| world.difficulty).max().unwrap()
@@ -235,7 +235,7 @@ impl Settings {
     /// 
     /// # Panics
     /// 
-    /// Panics if the [`Settings`] contain no worlds
+    /// Panics if the [`GameSettings`] contain no worlds
     pub fn lowest_difficulty(&self) -> Difficulty {
         // world_settings is assumed not to be empty
         self.world_settings.iter().map(|world| world.difficulty).min().unwrap()
@@ -264,9 +264,9 @@ impl Settings {
     }
 }
 
-impl Default for Settings {
-    fn default() -> Settings {
-        Settings {
+impl Default for GameSettings {
+    fn default() -> GameSettings {
+        GameSettings {
             seed: Self::random_seed(),
             world_settings: vec![WorldSettings::default()],
             disable_logic_filter: false,
@@ -584,16 +584,16 @@ mod tests {
         let mut slugs = FxHashSet::default();
 
         for _ in 0..1000 {
-            let mut settings = Settings::default();
+            let mut game_settings = GameSettings::default();
 
             let goals = vec![Goal::Wisps, Goal::Trees, Goal::Quests, Goal::RelicChance(0.8)];
             for goal in goals {
                 if rng.gen_bool(0.25) {
-                    settings.world_settings[0].goals.push(goal);
+                    game_settings.world_settings[0].goals.push(goal);
                 }
             }
 
-            let slug = settings.slugify();
+            let slug = game_settings.slugify();
 
             if slugs.contains(&slug) {
                 panic!("After {} settings, two had the same slug: {}", slugs.len(), slug);

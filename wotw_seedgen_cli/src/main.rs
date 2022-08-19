@@ -21,7 +21,7 @@ use serde::{Serialize, Deserialize};
 use log::LevelFilter;
 
 use wotw_seedgen::{item, world, util, logic, Header};
-use wotw_seedgen::settings::{Settings, Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
+use wotw_seedgen::settings::{GameSettings, Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
 use wotw_seedgen::preset::{GamePreset, WorldPreset, PresetGroup, PresetInfo};
 use wotw_seedgen::generator::Seed;
 use wotw_seedgen::files::{self, FILE_SYSTEM_ACCESS};
@@ -636,9 +636,9 @@ enum HeaderCommand {
     }
 }
 
-fn parse_settings(args: SeedSettings, settings: &mut Settings) -> Result<(), Box<dyn Error>> {
+fn parse_settings(args: SeedSettings, game_settings: &mut GameSettings) -> Result<(), Box<dyn Error>> {
     let preset = args.into_game_preset()?;
-    settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
+    game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
 
     Ok(())
 }
@@ -794,24 +794,24 @@ fn write_seeds_to_stdout(seed: Seed, json: bool) -> Result<(), String> {
 fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     let now = Instant::now();
 
-    let mut settings = Settings::default();
+    let mut game_settings = GameSettings::default();
 
     let stdin = read_stdin()?;
     if !stdin.is_empty() {
         let preset = serde_json::from_str(&stdin)?;
-        settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
+        game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
     }
 
-    parse_settings(args.settings, &mut settings)?;
+    parse_settings(args.settings, &mut game_settings)?;
 
     let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
     let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
     let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
-    let graph = logic::parse_logic(&areas, &locations, &states, &settings, !args.trust)?;
+    let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
-    let worlds = settings.world_count();
-    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let worlds = game_settings.world_count();
+    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &game_settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -873,9 +873,9 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     args.seed_file.set_extension("wotwr");
     let contents = fs::read_to_string(&args.seed_file).map_err(|err| format!("Error reading seed: {err}"))?;
 
-    let settings = Settings::from_seed(&contents).unwrap_or_else(|| {
+    let game_settings = GameSettings::from_seed(&contents).unwrap_or_else(|| {
         log::trace!("No settings found in seed, using default settings");
-        Ok(Settings::default())
+        Ok(GameSettings::default())
     }).map_err(|err| format!("Error reading settings: {err}"))?;
 
     let world_index = contents.lines().find_map(|line| line.strip_prefix("// This World: ").map(str::parse)).unwrap_or_else(|| {
@@ -886,8 +886,8 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
     let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
     let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
-    let graph = logic::parse_logic(&areas, &locations, &states, &settings, false)?;
-    let world_settings = settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
+    let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false)?;
+    let world_settings = game_settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
     let mut world = World::new(&graph, &world_settings);
 
     world.player.inventory.grant(Item::Resource(Resource::Health), args.health / 5);
