@@ -1099,6 +1099,9 @@ fn generate_placements_from_spawn<'graph, 'settings>(
             for (world_index, reserved) in reserved_slots {
                 world_contexts[world_index].placeholders.push(reserved);
             }
+            for (world_context, mut world_needs_placement) in world_contexts.iter_mut().zip(needs_placement) {
+                world_context.placeholders.append(&mut world_needs_placement);
+            }
 
             place_remaining(&mut world_contexts, &mut context)?;
 
