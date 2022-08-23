@@ -5,10 +5,12 @@
 mod slugstrings;
 
 use std::{error::Error, fmt, iter, collections::hash_map::DefaultHasher, hash::Hasher};
+use std::fmt::Formatter;
 
 use rand::distributions::{Distribution, Uniform};
 use wotw_seedgen_derive::FromStr;
-use serde::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize, Serializer, Deserializer};
+use serde::de::Visitor;
 
 use crate::{preset::{GamePreset, WorldPreset}, util::constants::DEFAULT_SPAWN, files::FileAccess};
 
@@ -403,7 +405,7 @@ impl WorldSettings {
 }
 
 /// The Spawn destination, determining the starting location of the seed
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Spawn {
     /// Spawn in a specific location, described by the anchor name from the logic file
     Set(String),
@@ -416,6 +418,40 @@ pub enum Spawn {
 impl Default for Spawn {
     fn default() -> Spawn {
         Spawn::Set(DEFAULT_SPAWN.to_string())
+    }
+}
+
+impl Serialize for Spawn {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        match &self {
+            Spawn::Random => serializer.serialize_str("Random"),
+            Spawn::FullyRandom => serializer.serialize_str("FullyRandom"),
+            Spawn::Set(spawn_loc) => serializer.serialize_str(spawn_loc),
+        }
+    }
+}
+
+struct SpawnStringVisitor;
+
+impl<'de> Visitor<'de> for SpawnStringVisitor {
+    type Value = Spawn;
+
+    fn expecting(&self, formatter: &mut Formatter) -> fmt::Result {
+        formatter.write_str("a string representing an anchor, 'Random' or 'FullyRandom'")
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E> where E: serde::de::Error {
+        match v {
+            "Random" => Ok(Spawn::Random),
+            "FullyRandom" => Ok(Spawn::FullyRandom),
+            set => Ok(Spawn::Set(set.to_string()))
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for Spawn {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        deserializer.deserialize_str(SpawnStringVisitor)
     }
 }
 
