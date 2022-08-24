@@ -2233,7 +2233,7 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floot after th
       DoubleJump, TripleJump
     kii: DoubleJump
 
-anchor EastHollow.BashTreeCheckpoint at -7,-327:  # Checkpoint at Bash tree
+anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
   refill Checkpoint
 
   pickup EastHollow.BashTree: free
