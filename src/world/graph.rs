@@ -174,17 +174,25 @@ impl Graph {
         context.world_state.insert(entry.index(), best_orbs.clone());
         match entry {
             Node::Anchor(anchor) => {
-                for refill in &anchor.refills {
-                    for orbs in &best_orbs {
-                        if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
-                            best_orbs = orbs::both(&best_orbs, &orbcost);
-                            match refill.name {
-                                RefillType::Full => best_orbs = smallvec![context.player.max_orbs()],
-                                RefillType::Checkpoint => best_orbs = context.player.checkpoint_orbs(&best_orbs),
-                                RefillType::Health(amount) => best_orbs = context.player.health_orbs(&best_orbs, amount),
-                                RefillType::Energy(amount) => best_orbs = context.player.energy_orbs(&best_orbs, amount),
+                let max_orbs = context.player.max_orbs();
+                if best_orbs.get(0).map_or(true, |first_orbs| first_orbs != &max_orbs) {
+                    for refill in &anchor.refills {
+                        for orbs in &best_orbs {
+                            if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
+                                if matches!(refill.name, RefillType::Full) {
+                                    best_orbs = smallvec![max_orbs];
+                                    break;
+                                }
+                                let mut refill_orbs = orbs::both(&best_orbs, &orbcost);
+                                match refill.name {
+                                    RefillType::Checkpoint => refill_orbs = context.player.checkpoint_orbs(&refill_orbs),
+                                    RefillType::Health(amount) => refill_orbs = context.player.health_orbs(&refill_orbs, amount),
+                                    RefillType::Energy(amount) => refill_orbs = context.player.energy_orbs(&refill_orbs, amount),
+                                    RefillType::Full => unreachable!(),
+                                }
+                                best_orbs = orbs::either(&best_orbs, &refill_orbs);
+                                break;
                             }
-                            break;
                         }
                     }
                 }

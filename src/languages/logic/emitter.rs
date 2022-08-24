@@ -261,7 +261,7 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
     };
 
     for anchor in &areas.anchors {
-        let region = anchor.identifier.splitn(2, '.').next().unwrap();
+        let region = anchor.region();
         let region = areas.regions.get(region);
         let mut region_requirement = None;
         if let Some(group) = region {
@@ -314,8 +314,8 @@ pub fn emit(areas: &AreaTree, metadata: &Metadata, locations: &[Location], state
             }
         }
 
-        for region in areas.regions.keys() {
-            if !areas.anchors.iter().any(|anchor| anchor.identifier.splitn(2, '.').next().unwrap() == *region) {
+        for &region in areas.regions.keys() {
+            if !areas.anchors.iter().any(|anchor| anchor.region() == region) {
                 log::warn!("Region {} has no anchors with a matching name.", region);
             }
         }
