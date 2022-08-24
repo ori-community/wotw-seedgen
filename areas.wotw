@@ -675,7 +675,7 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
     kii:
       Bash, Glide OR Grenade=1 OR Sword OR Hammer OR Damage=10
       Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1  # use the abillity to get on the wall to the right and use shuriken to get onto the vine
-      Sword, Sentry=1 OR Hammer OR Flash=1, Spear=1  # pogo off the enemy
+      Sword, Sentry=1 OR Hammer OR Flash=1 OR Spear=1  # pogo off the enemy
     unsafe:
       GrenadeJump OR GlideJump
       Sword                           # With upslash on the right wall, jump off it close to the ceiling and slash sword
@@ -2221,36 +2221,27 @@ region EastHollow:
   unsafe: free
 
 anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
+  # before writing any paths that use the (left) mantis or the skeeto, please remember they only spawn when the player has bash
   refill Full
 
-  state EastHollow.VoiceDoor:
+  state EastHollow.VoiceDoorOpen:
     moki: EastHollow.ForestsVoice
   state NonGladesTeleporter: free
 
   pickup EastHollow.HornBeetleFightEX:
-    moki, EastHollow.BeetleDefeated:
-      DoubleJump, Dash, Bash
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide  # the nearby skeeto loses interest in you if you go to the ledge below this pickup
-      Launch
-    gorlek:
-      DoubleJump, Bash, TripleJump OR Dash
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide  # the nearby skeeto loses interest in you if you go to the ledge below this pickup
-      Launch
-      SentryJump=1, DoubleJump, TripleJump
-      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer  # Dont make the third jump too quick if you have just Hammer
     kii:
-      DoubleJump, TripleJump, Sword  # Pogo
       Bash  # baiting the skeeto can be annoying
-      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      DoubleJump, Sword  # Pogo + upslash
-      Hammer, DoubleJump                 # HammerJump
-      DoubleJump, Sentry=3 OR Grenade=2  # Use Sentry hops to boost the height or GrenadeJumps
+      HammerJump
+      DoubleJump, Sentry=3  # Use Sentry hops to boost the height
+      GrenadeJump
       EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear
       EastHollow.BeetleDefeated, DoubleJump, Sentry=4  # Djump+3 sentries from the vine, ceiling jump + sentry to access to the pickup
 
   conn Teleporters: free
-  conn BeetleFight: free
+  conn BeetleFight:
+    moki: Combat=Skeeto+Mantis
+    gorlek: free
   conn EastHollow.AfterBeetleFight:  # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
     moki: EastHollow.BeetleDefeated, DoubleJump OR Bash OR Launch
     gorlek:
@@ -2260,21 +2251,20 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
     kii:
       Bash  # need to bait the skeeto all the way on the right which can be annoying
     unsafe:
-      Hammer, DoubleJump                         # HammerJump
-      # WaveDash, DoubleJump                     # wavedash off the teleporter
-  conn EastHollow.MapMoki:
-    moki, EastHollow.BeetleDefeated, EastHollow.VoiceDoor:
-      Bash, DoubleJump OR Dash OR Glide
-      Launch
-    gorlek, EastHollow.VoiceDoor:
+      HammerJump
+      WaveDash, DoubleJump                     # wavedash off the teleporter
+      Dash, SwordJump, TripleJump
+  conn EastHollow.VoiceDoorPlatform:  # make sure it's not redundant with ->afterbeetlefight->voicedoorplatform
+    gorlek:
       Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-      Launch
-    kii, EastHollow.VoiceDoor:
+      SentryJump=1, DoubleJump, TripleJump
+    kii:
       Bash
-      DoubleJump, TripleJump, Sword  # Pogo
-    unsafe, EastHollow.VoiceDoor:
-      DoubleJump, Sword  # Pogo
-      Hammer, DoubleJump  # HammerJump
+    unsafe:
+      SwordJump, TripleJump
+      HammerJump
+      EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear
+      EastHollow.BeetleDefeated, DoubleJump, Sentry=3  # Djump+3 sentries from the vine
   conn WestHollow.InFrontPurpleDoor:
     moki: WestHollow.PurpleDoorOpen
 
@@ -2282,10 +2272,38 @@ anchor BeetleFight at -81, -4243:
   nospawn
   refill Full
 
-  state EastHollow.BeetleDefeated:
-    moki: Boss=250, Regenerate, Damage=35, Dash OR Launch  # Kinda tight on assumed damage, but that's literally what the base game throws you at. It isn't too difficult to avoid the beetle's attacks without Dash, but this is what the base game taught.
-    gorlek: Boss=250, Regenerate, Damage=35, DoubleJump
+  state EastHollow.BeetleDefeated:  # Mantis and skeeto don't respawn when dying in the fight
+    moki: Boss=250, Regenerate, Damage=45, Dash  # It isn't too difficult to avoid the beetle's attacks without Dash, but this is what the base game taught.
+    gorlek: Boss=250, Regenerate, Damage=35, DoubleJump OR Launch
     unsafe: Boss=250
+
+# please split the VoiceDoorPlatform and MapMoki paths like this: everything to the right of the VoiceDoor is for VoiceDoorPlatform. everything to the left of it belongs to MapMoki
+anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
+  # paths need to be completable with both door states if the state is not a requirement
+  pickup EastHollow.HornBeetleFightEX:
+    moki:
+      DoubleJump, Dash, Bash
+      Bash, Grenade=1
+      Launch
+    gorlek:
+      SentryJump=1, DoubleJump
+      DoubleJump, TripleJump
+    kii:
+      DoubleJump, Hammer  # not too precise
+    unsafe:
+      SwordJump OR GrenadeJump
+      DoubleJump, Sentry=2  # Use Sentry hops to boost the height
+      EastHollow.BeetleDefeated, DoubleJump, Spear=1
+      EastHollow.BeetleDefeated, DoubleJump, Sentry=1  # ceiling jump + sentry to access to the pickup  
+
+  conn EastHollow.MapMoki:
+    moki: EastHollow.VoiceDoorOpen
+  conn EastHollow.Teleporter:
+    moki: DoubleJump OR Dash OR Glide OR Bash OR Launch
+    gorlek: free
+  conn EastHollow.AfterBeetleFight:  # make sure it's not redundant with ->teleporter->afterbeetlefight
+    moki, EastHollow.BeetleDefeated: Glide
+    kii: Dash, DoubleJump
 
 anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door above beetle fight
   refill Checkpoint
@@ -2297,10 +2315,12 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
     gorlek: Bash
     kii:
       Deflector, Sword, Launch
-      Deflector, Sword, DoubleJump, TripleJump OR Hammer OR Spear=1 OR Damage=10  # from the right wall or take a dboost in the left spieks
+      Deflector, Sword, DoubleJump, TripleJump OR Hammer OR Spear=1 OR Damage=10  # from the right wall or take a dboost in the left spikes
     unsafe:
       Deflector, Hammer, Launch OR DoubleJump
 
+  conn EastHollow.VoiceDoorPlatform:
+    moki: EastHollow.VoiceDoorOpen
   conn EastHollow.OutsideGlades:
     moki:
       DoubleJump, Bash
@@ -2319,47 +2339,46 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
       DoubleJump, Hammer, Deflector  # break the wall to GladesApproachOre so you can refresh your upslash without taking a dboost
       DoubleJump, Damage=10, Sentry=1
       DoubleJump, Sword, Damage=10  # climb the left wall, pogo the mortar
-  conn EastHollow.Teleporter:
-    moki: EastHollow.VoiceDoor, DoubleJump OR Dash OR Glide OR Bash OR Launch
-    gorlek: EastHollow.VoiceDoor
+      Damage=20, Hammer  # reset hammer upswings in the spikes
+      DoubleJump, Dash  # right wall and some clean movement
+      Hammer, Dash, Damage=10  # the 2 above together
 
 anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
   state GladesTown.GromsWall:
     moki: Bash
     unsafe:
-      Deflector, Sword OR Hammer  # Probably too precise for kii
-      Grenade=1 OR Sentry=1
+      Deflector, Sword OR Hammer  # too precise for kii
+      GrenadeRedirect=1 OR SentryRedirect=1
 
   conn GladesTown.Teleporter:
     moki: GladesTown.GromsWall
   conn EastHollow.MapMoki: free
 
-anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to Bash tree
+anchor EastHollow.AfterBeetleFight at -28, -4232:  # At the breakable floor to Bash tree
+  # before writing any paths that use the (right) mantis, please remember it only spawns when the player has grapple
+  # before writing any paths that use the (left) mantis or the skeeto, please remember they only spawn when the player has bash
   refill Checkpoint
 
-  state EastHollow.DepthsLever:
-    moki: Bash, DoubleJump OR Dash OR Glide OR Launch  # just Bash is treacherous
-    gorlek: Bash
-    kii: Deflector, Sword OR Hammer
-    unsafe:
-      Combat=SneezeSlug, Sentry=1 OR Grenade=1  # grenade/sentry redirect
-      Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
-      Hammer, DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
-  state EastHollow.VoiceDoor:
+  state EastHollow.VoiceDoorOpen:
     moki: EastHollow.ForestsVoice
 
   pickup EastHollow.SpikeLanternEX:
     moki: Bash, DoubleJump OR Launch  # there's a couple small awkward things adding up if you do this without Double Jump
     gorlek:
+      DoubleJump, Launch
       Bash, Grenade=1 OR SentryJump=1
       EastHollow.BeetleDefeated, Bash, Dash OR Glide OR Sword
       SentryJump=1, DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword
     kii:
-      Launch  # @validator not sure why it's not in gorlek
+      Launch  # not in gorlek due to visibility problems of the walls you need to launch to
       DoubleJump, TripleJump, Dash
-      Bash  # Go to the right to make the mantis spawn if it's not here
+      Grapple, DoubleJump, Sword, Dash  # pogo the mantis
+      Grapple, Bash  # Go to the right to make the mantis spawn if it's not here
+      Bash, Dash  # use the mortar projectile
     unsafe:
+      Grapple, DoubleJump, Sword  # pogo the mantis; too precise for kii without Dash
       DoubleJump, SentryJump=1 OR Dash
+      Bash  # use the mortar projectile
   pickup EastHollow.SecretRoofEX:
     moki:
       Bash OR Launch
@@ -2374,11 +2393,12 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
       Grapple, DoubleJump
       Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       Grapple, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump, Dash
     unsafe:
       Grapple, Shuriken=2
-      Hammer, DoubleJump  # HammerJump
+      HammerJump
       DoubleJump, SentryJump=1
+      DoubleJump, TripleJump
   pickup EastHollow.MortarEX:
     moki:
       Bash, DoubleJump OR Dash OR Glide
@@ -2399,30 +2419,44 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
 
   conn BeetleFight: free
   conn EastHollow.AboveBash: free
-  conn EastHollow.Teleporter:  # so far this seemed to cover all paths going towards glades
+  conn EastHollow.Teleporter:  # make sure it's not redundant with ->voicedoorplatform->teleporter
     moki, EastHollow.BeetleDefeated:
       DoubleJump, Dash
-      Bash, DoubleJump OR Dash OR Grenade=1
-      Glide OR Launch
+      Bash, Grenade=1
+      Glide
     gorlek:
-      Bash, DoubleJump, TripleJump OR Dash OR Glide
       DoubleJump, TripleJump, Glide
       SentryJump=1, Glide, DoubleJump OR Dash
-      Launch
       EastHollow.BeetleDefeated:
         DoubleJump, Sword OR Hammer
         Dash, Sword OR Hammer
-        Bash OR SentryJump=1
+        SentryJump=1
     kii:
-      Bash
-      DoubleJump, Sword, Glide  # Pogo the mantis
+      Grapple, Bash  # grapple not for use, but to spawn enemy
+      Grapple, DoubleJump, Sword, Glide
       DoubleJump, Sword, Spear=1  # djump+spear to reach the tp from the beetle arena
       DoubleJump, Hammer, Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, TripleJump
-      DoubleJump, Sword  # sword jumps
+      SwordJump
       # DoubleJump, Sword, Shuriken=1
+  conn EastHollow.VoiceDoorPlatform:
+    moki, EastHollow.BeetleDefeated:
+      Bash, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek:
+      Bash, DoubleJump, TripleJump OR Dash OR Glide
+      Launch
+      EastHollow.BeetleDefeated:
+        DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer  # Dont make the third jump too quick if you have just Hammer
+        DoubleJump, Dash
+        Bash
+    kii:
+      Grapple, DoubleJump, Sword, Dash  # Pogo the mantis
+      Grapple, Bash, Glide  # Bashglide; grapple not for use, but to spawn enemy
+      DoubleJump, Bash  # Bashglide
+      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn EastHollow.Kwolok:
     moki:
       Bash, DoubleJump OR Dash OR Glide OR Launch
@@ -2434,6 +2468,9 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
     kii:
       DoubleJump, TripleJump, Dash
       DoubleJump, Grapple, Dash OR Glide OR Sword OR Hammer OR Sentry=3
+      DoubleJump, Grapple, Sentry=2, Damage=10
+      Grapple, Glide, Dash
+      Grapple, Glide, Sentry=3, Damage=10
     unsafe:
       Grapple, Dash, Damage=10
       DoubleJump, Grapple, Shuriken=3
@@ -2443,7 +2480,15 @@ anchor EastHollow.AfterBeetleFight at -28, -4233:  # At the breakable floor to B
 
 # checkpoint at 21, -4220
 
-anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floot after the beetle arena
+anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after the beetle arena
+  state EastHollow.DepthsLever:
+    moki: Bash, DoubleJump OR Dash OR Glide OR Launch  # just Bash is treacherous
+    gorlek: Bash
+    kii: Deflector, Sword OR Hammer
+    unsafe:
+      Combat=SneezeSlug, Sentry=1 OR Grenade=1  # grenade/sentry redirect
+      Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
+      Hammer, DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
   pickup EastHollow.BashEC:
     moki:
       Bash, DoubleJump, Dash
@@ -2479,14 +2524,16 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floot after th
     gorlek: EastHollow.DepthsLever, DoubleJump OR Dash OR Bash OR Sword OR Hammer OR Damage=10
     kii: EastHollow.DepthsLever
   conn EastHollow.AfterBeetleFight:  # Mortar break the ceiling for you
-  # If you don't collect bash's tree, the camera is stuck. These paths ignore this issue.
+    # If you don't collect bash's tree, the camera is stuck. These paths ignore this issue.
     moki: Launch OR Bash
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump
     kii: DoubleJump
+    unsafe:
+      Sword, Shuriken=1  # shuriken pogo from the right wall (that you reach with sword upslash)
 
-anchor EastHollow.BashTreeCheckpoint at -7,-327:  # Checkpoint at Bash tree
+anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
   refill Checkpoint
 
   pickup EastHollow.BashTree: free
@@ -2495,13 +2542,12 @@ anchor EastHollow.BashTreeCheckpoint at -7,-327:  # Checkpoint at Bash tree
       DoubleJump, Bash
       Launch
     gorlek:
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
       SentryJump=1, DoubleJump, TripleJump
     kii:
-      Bash, Grenade=1 OR Sword OR Hammer OR Flash=2 OR Sentry=2
-      Bash, Glide, Flash=1 OR Sentry=1
-      Bash, Dash, Flash=1 OR Sentry=1
+      Bash, Grenade=1 OR Sword OR Hammer OR Glide OR Dash OR Flash=1 OR Sentry=1  # you can bash to the wall without any extra abilities
       DoubleJump, TripleJump
+      DoubleJump, Dash, Hammer OR Sentry=2 OR Spear=2
     unsafe:
       SentryJump=1, DoubleJump OR Dash
       DoubleJump, Dash OR Hammer
@@ -2519,6 +2565,8 @@ anchor EastHollow.BashTreeCheckpoint at -7,-327:  # Checkpoint at Bash tree
       Bash, Grenade=1  # Make the slug near the door shoot at you. Bash the projectile to reach your grenade
     unsafe:
       Bash  # Bash the lantern next to the door and bait the slug to shoot at you so you can bash its projectile
+      DoubleJump, TripleJump, Sword, Deflector  # sick moves
+      DoubleJump, TripleJump, Dash, Sword, Spear=1  # even sicker moves
 
 anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
@@ -2533,16 +2581,24 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   pickup EastHollow.RightKwolokEX:
     moki: Bash OR Launch
     gorlek: SentryJump=1
-    kii: DoubleJump, Sword, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mortar
-    unsafe: DoubleJump, Sword  # Pogo the mortar
+    kii: 
+      DoubleJump, Sword, TripleJump OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # pogo the mortar
+      Dash, DoubleJump, TripleJump, Hammer, Sentry=1 OR Flash=1  # Coyote Dash from high point left; Dash, Dash, DoubleJump, TripleJump, HammerUpswing, Sentry/Flash  (you end up on the left wall)
+    unsafe: 
+      DoubleJump, Sword  # Pogo the mortar
+      DoubleJump, Sword, Shuriken=1  # too precise for kii
   pickup EastHollow.SilentSwimEC:
     moki: Combat=Balloon, Water, WaterDash OR Launch
     gorlek:
       Water, WaterDash OR Launch
       Combat=Balloon, Water, DoubleJump, TripleJump, Damage=10
       Water, DoubleJump, TripleJump, Damage=20
-    kii: Water, DoubleJump, TripleJump, Damage=10  # Balloon will go for a swim on its own as long as you aggro it
-    unsafe: Water, Damage=10, DoubleJump OR SentryJump=1
+    kii:  # Balloon will go for a swim on its own as long as you aggro it
+      Water, DoubleJump, TripleJump, Damage=10
+      Water, DoubleJump, Hammer, Damage=20
+    unsafe: 
+      Water, Damage=10, DoubleJump OR SentryJump=1
+      Water, DoubleJump, Hammer, Damage=10  # one extra dboost for kii
   pickup EastHollow.KwolokSwimOre:
     moki: Water, Bash OR Damage=10  # enemy in the way
     gorlek: Water
@@ -2551,15 +2607,16 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
     gorlek: Water, DoubleJump, TripleJump  # Do a wrap around from the right wall
     kii:
       Water, Bash  # Bash the fish
-      Water, DoubleJump, Sword, Hammer OR Spear=1  # bait the fish and pogo it
+      Water, DoubleJump, Hammer OR Spear=1  # Djump from the right wall, upswing for extra height. Use left ledge to regain upswing
     unsafe:
       Water, DoubleJump                           # At left wall, with quick jumps sliding up the wall you can keepp the dj
-      # Water, DoubleJump, Hammer OR Flash=1 OR Sentry=1                 # upswing to gain a bit more hight. Standig on the left ledge to regain upswing after fail.
+      Water, DoubleJump, Sword  # bait the fish and pogo it
+      # Water, DoubleJump, Flash=1 OR Sentry=1  # Ability to gain a bit more height. Standig on the left ledge to regain upswing after fail.
   pickup EastHollow.KwolokSwimRightEX:
     moki: Water
   pickup EastHollow.SecretRoofEX:  # this path can't get over the big spike wall from the left anchor
     gorlek: DoubleJump, TripleJump, Dash
-    kii: DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+    kii: DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Shuriken=1 OR Sentry=1
     unsafe: Dash
 
   conn EastHollow.AfterBeetleFight:
@@ -2612,6 +2669,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, Grapple, DoubleJump  # Cancel grapple with djump
       Water, DoubleJump, TripleJump
       Water, WaterDash, Dash, Damage=10  # coyote jump from the ledge under the grappable plant
+      Water, WaterDash, Sword  # Pogo the projectile
       # Water, Grapple, SwordSJump=1                       # standing on the ledge below grapple plant. Holding right during SJump. Swordcombo to go right. Lure balloon into water first
       # Water, Grapple, SwordSJump=1, DoubleJump OR Glide  # standing on the ledge below grapple plant. Holding right during SJump
 # checkpoint at -8, -4327
