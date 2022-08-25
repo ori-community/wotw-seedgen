@@ -743,14 +743,14 @@ fn create_seedfile(path: PathBuf, contents: &str) -> Result<PathBuf, io::Error> 
             }
     }
 }
-fn create_multiworld_folder(mut path: PathBuf) -> Result<PathBuf, io::Error> {
+fn create_multiworld_folder(path: PathBuf) -> Result<PathBuf, io::Error> {
     let mut index = 0;
     loop {
         let mut filename = path.file_stem().unwrap().to_os_string();
         if index > 0 {
             filename.push(format!("_{}", index));
         }
-        path.set_file_name(filename);
+        let path = path.with_file_name(filename);
 
         match fs::create_dir(&path) {
             Ok(_) => return Ok(path),
