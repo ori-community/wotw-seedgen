@@ -222,12 +222,10 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
     kii: MarshSpawn.RainLifted  # Lure mantis
   pickup MarshSpawn.ResilienceOre:
     moki: BreakWall=16, Water
-    # @validator BreakWall + Damage is missing (kii)
-    kii: MarshSpawn.RainLifted, Water OR Damage=60  # Lure mantis | u can see all the spikes underwater
+    kii: MarshSpawn.RainLifted, Water # Lure mantis
     unsafe:
-      MarshSpawn.RainLifted OR BreakWall=16:
-        Damage=50
-        Damage=20, WaterDash
+      Damage=50, MarshSpawn.RainLifted OR BreakWall=16
+      Damage=20, WaterDash, MarshSpawn.RainLifted OR BreakWall=16
   pickup MarshSpawn.BashEC:
     moki: Bash OR Launch
     gorlek: SentryJump=1
