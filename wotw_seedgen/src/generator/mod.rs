@@ -31,7 +31,7 @@ pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, file_access: &impl
     log::trace!("Seeded RNG with {}", settings.seed);
 
     let (worlds, (flags, headers)): (Vec<_>, (Vec<_>, Vec<_>)) = settings.world_settings.iter().map(|world_settings| {
-        let mut world = World::new(graph, world_settings);
+        let mut world = World::new_spawn(graph, world_settings);
         world.pool = Pool::preset();
 
         let (goals, flags, headers) = parse_headers(&mut world, file_access, &mut rng)?;

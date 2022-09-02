@@ -27,16 +27,28 @@ pub struct World<'graph, 'settings> {
     pub goals: Vec<Goal>,
 }
 impl World<'_, '_> {
+    /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
+    /// 
+    /// Note that the player will start with an empty inventory, use [`new_spawn`] if you want the player to start with the vanilla inventory of 3 energy and 30 health.
     pub fn new<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
         World {
             graph,
-            player: Player::spawn(settings),
+            player: Player::new(settings),
             pool: Pool::default(),
             preplacements: FxHashMap::default(),
             uber_states: FxHashMap::default(),
             sets: Vec::default(),
             custom_items: FxHashMap::default(),
             goals: Vec::default(),
+        }
+    }
+    /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
+    /// 
+    /// Note that the player will start with the vanilla inventory of 3 energy and 30 health, use [`new`] if you want the player to start with an empty inventory.
+    pub fn new_spawn<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
+        World {
+            player: Player::spawn(settings),
+            ..World::new(graph, settings)
         }
     }
 
@@ -206,7 +218,7 @@ mod tests {
         game_settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
         let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false).unwrap();
-        let mut world = World::new(&graph, &game_settings.world_settings[0]);
+        let mut world = World::new_spawn(&graph, &game_settings.world_settings[0]);
 
         world.player.inventory.grant(Item::Resource(Resource::Health), 7);
         world.player.inventory.grant(Item::Resource(Resource::Energy), 6);

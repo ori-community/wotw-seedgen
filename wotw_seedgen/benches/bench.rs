@@ -98,13 +98,13 @@ fn reach_checking(c: &mut Criterion) {
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
         player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         player.inventory.grant(Item::Skill(Skill::Dash), 1);
-        let world = World::new(&graph, &world_settings);
+        let world = World::new_spawn(&graph, &world_settings);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
         world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
     }));
     c.bench_function("long reach check", |b| b.iter(|| {
         let world_settings = WorldSettings::default();
-        let mut world = World::new(&graph, &world_settings);
+        let mut world = World::new_spawn(&graph, &world_settings);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
