@@ -209,7 +209,11 @@ fn parse_region<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
     Ok(AreaContent::Region(NamedGroup { name, group }))
 }
 fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseError> {
+    let token_range = parser.current_token().range.clone();
     let identifier = read_ident!(parser, Suggestion::Identifier)?;
+    if identifier == "Random" || identifier == "FullyRandom" {
+        return Err(parser.error("Invalid anchor identifier", token_range));
+    }
     parser.skip(TokenKind::Whitespace);
     let position = parse_anchor_position(parser)?;
     parser.skip(TokenKind::Whitespace);
