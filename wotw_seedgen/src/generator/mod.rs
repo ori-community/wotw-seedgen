@@ -16,7 +16,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::{
     item::{Item, Message, UberStateOperator},
-    settings::{GameSettings, InlineHeader, HeaderConfig, Goal}, util::UberState,
+    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, util::UberState,
     world::{
         World,
         graph::Graph,
@@ -26,7 +26,7 @@ use crate::{
 
 use placement::generate_placements;
 
-pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, file_access: &impl FileAccess, settings: &'settings GameSettings) -> Result<Seed<'graph, 'settings>, String> {
+pub fn generate_seed<'graph, 'settings>(graph: &'graph Graph, file_access: &impl FileAccess, settings: &'settings UniverseSettings) -> Result<Seed<'graph, 'settings>, String> {
     let mut rng: StdRng = Seeder::from(&settings.seed).make_rng();
     log::trace!("Seeded RNG with {}", settings.seed);
 

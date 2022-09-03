@@ -21,8 +21,8 @@ use serde::{Serialize, Deserialize};
 use log::LevelFilter;
 
 use wotw_seedgen::{item, world, util, logic, Header};
-use wotw_seedgen::settings::{GameSettings, Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
-use wotw_seedgen::preset::{GamePreset, WorldPreset, PresetGroup, PresetInfo};
+use wotw_seedgen::settings::{UniverseSettings, Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
+use wotw_seedgen::preset::{UniversePreset, WorldPreset, PresetGroup, PresetInfo};
 use wotw_seedgen::generator::Seed;
 use wotw_seedgen::files::{self, FILE_SYSTEM_ACCESS};
 
@@ -249,12 +249,12 @@ enum SeedGenCommand {
     },
     /// Play the most recent generated seed
     Play,
-    /// Create a game preset of the given settings
+    /// Create a universe preset of the given settings
     /// 
-    /// A game preset defines the settings for the entire game and can contain different settings on a per world basis
-    GamePreset {
+    /// A universe preset defines the settings for the entire game and can contain different settings on a per world basis
+    UniversePreset {
         #[structopt(flatten)]
-        args: GamePresetArgs,
+        args: UniversePresetArgs,
     },
     /// Create a world preset of the given settings
     /// 
@@ -326,7 +326,7 @@ struct SeedSettings {
     ///
     /// Presets later in the list override earlier ones, and flags from the command override any preset
     #[structopt(short = "P", long)]
-    game_presets: Option<Vec<String>>,
+    universe_presets: Option<Vec<String>>,
     /// Derive the settings for individual worlds from one or more presets
     ///
     /// Presets later in the list override earlier ones, and flags from the command override any preset
@@ -393,9 +393,9 @@ fn vec_in_option<T>(vector: Vec<T>) -> Option<Vec<T>> {
 }
 
 impl SeedSettings {
-    fn into_game_preset(self) -> Result<GamePreset, String> {
+    fn into_universe_preset(self) -> Result<UniversePreset, String> {
         let Self {
-            game_presets,
+            universe_presets,
             world_presets,
             worlds,
             spawn,
@@ -448,9 +448,9 @@ impl SeedSettings {
                 }
             }).collect::<Vec<_>>();
 
-        Ok(GamePreset {
+        Ok(UniversePreset {
             info: None,
-            includes: game_presets,
+            includes: universe_presets,
             world_settings: Some(yes_fun),
             disable_logic_filter,
             seed,
@@ -461,7 +461,7 @@ impl SeedSettings {
 }
 
 #[derive(StructOpt)]
-struct GamePresetArgs {
+struct UniversePresetArgs {
     /// name of the preset
     ///
     /// later you can run seed -P <preset-name> to use this preset
@@ -636,9 +636,9 @@ enum HeaderCommand {
     }
 }
 
-fn parse_settings(args: SeedSettings, game_settings: &mut GameSettings) -> Result<(), Box<dyn Error>> {
-    let preset = args.into_game_preset()?;
-    game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
+fn parse_settings(args: SeedSettings, universe_settings: &mut UniverseSettings) -> Result<(), Box<dyn Error>> {
+    let preset = args.into_universe_preset()?;
+    universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
 
     Ok(())
 }
@@ -794,24 +794,24 @@ fn write_seeds_to_stdout(seed: Seed, json: bool) -> Result<(), String> {
 fn generate_seeds(args: SeedArgs) -> Result<(), Box<dyn Error>> {
     let now = Instant::now();
 
-    let mut game_settings = GameSettings::default();
+    let mut universe_settings = UniverseSettings::default();
 
     let stdin = read_stdin()?;
     if !stdin.is_empty() {
         let preset = serde_json::from_str(&stdin)?;
-        game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
+        universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS)?;
     }
 
-    parse_settings(args.settings, &mut game_settings)?;
+    parse_settings(args.settings, &mut universe_settings)?;
 
     let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
     let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
     let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
-    let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, !args.trust)?;
+    let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
-    let worlds = game_settings.world_count();
-    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &game_settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let worlds = universe_settings.world_count();
+    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -844,13 +844,13 @@ fn play_last_seed() -> Result<(), String> {
     Ok(())
 }
 
-fn create_game_preset(args: GamePresetArgs) -> Result<(), Box<dyn Error>> {
-    let mut preset = args.settings.into_game_preset()?;
+fn create_universe_preset(args: UniversePresetArgs) -> Result<(), Box<dyn Error>> {
+    let mut preset = args.settings.into_universe_preset()?;
     preset.info = args.info.into_preset_info();
     let preset = preset.to_json_pretty();
 
-    FILE_SYSTEM_ACCESS.write_game_preset(&args.filename, &preset)?;
-    log::info!("Created game preset {}", args.filename);
+    FILE_SYSTEM_ACCESS.write_universe_preset(&args.filename, &preset)?;
+    log::info!("Created universe preset {}", args.filename);
 
     Ok(())
 }
@@ -873,9 +873,9 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     args.seed_file.set_extension("wotwr");
     let contents = fs::read_to_string(&args.seed_file).map_err(|err| format!("Error reading seed: {err}"))?;
 
-    let game_settings = GameSettings::from_seed(&contents).unwrap_or_else(|| {
+    let universe_settings = UniverseSettings::from_seed(&contents).unwrap_or_else(|| {
         log::trace!("No settings found in seed, using default settings");
-        Ok(GameSettings::default())
+        Ok(UniverseSettings::default())
     }).map_err(|err| format!("Error reading settings: {err}"))?;
 
     let world_index = contents.lines().find_map(|line| line.strip_prefix("// This World: ").map(str::parse)).unwrap_or_else(|| {
@@ -886,8 +886,8 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
     let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
     let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
-    let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false)?;
-    let world_settings = game_settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
+    let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false)?;
+    let world_settings = universe_settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string())?;
     let mut world = World::new(&graph, &world_settings);
 
     world.player.inventory.grant(Item::Resource(Resource::Health), args.health / 5);
@@ -1002,10 +1002,10 @@ fn main() -> ExitCode {
 
             play_last_seed()
         },
-        SeedGenCommand::GamePreset { args } => {
+        SeedGenCommand::UniversePreset { args } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
-            create_game_preset(args).map_err(|err| err.to_string())
+            create_universe_preset(args).map_err(|err| err.to_string())
         },
         SeedGenCommand::WorldPreset { args } => {
             initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));

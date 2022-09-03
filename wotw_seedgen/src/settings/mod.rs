@@ -1,6 +1,6 @@
 //! Data structures to represent the settings when generating a seed
 //! 
-//! See the [`GameSettings`] struct for more information
+//! See the [`UniverseSettings`] struct for more information
 
 mod slugstrings;
 
@@ -12,7 +12,7 @@ use wotw_seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use serde::de::Visitor;
 
-use crate::{preset::{GamePreset, WorldPreset}, util::constants::DEFAULT_SPAWN, files::FileAccess};
+use crate::{preset::{UniversePreset, WorldPreset}, util::constants::DEFAULT_SPAWN, files::FileAccess};
 
 use slugstrings::SLUGSTRINGS;
 
@@ -23,31 +23,31 @@ use slugstrings::SLUGSTRINGS;
 /// # Examples
 /// 
 /// ```
-/// # use wotw_seedgen::settings::GameSettings;
+/// # use wotw_seedgen::settings::UniverseSettings;
 /// use wotw_seedgen::settings::WorldSettings;
 /// 
-/// let game_settings = GameSettings::default();
+/// let universe_settings = UniverseSettings::default();
 /// 
-/// assert_eq!(game_settings.world_count(), 1);
-/// assert_eq!(game_settings.world_settings[0], WorldSettings::default());
-/// assert!(!game_settings.seed.is_empty());
+/// assert_eq!(universe_settings.world_count(), 1);
+/// assert_eq!(universe_settings.world_settings[0], WorldSettings::default());
+/// assert!(!universe_settings.seed.is_empty());
 /// ```
 /// 
 /// The seed on default settings will be randomly generated
 /// 
-/// GameSettings can be serialized and deserialized
+/// UniverseSettings can be serialized and deserialized
 /// 
 /// ```
-/// # use wotw_seedgen::settings::GameSettings;
+/// # use wotw_seedgen::settings::UniverseSettings;
 /// #
-/// let game_settings = GameSettings::default();
-/// let json = game_settings.to_json();
+/// let universe_settings = UniverseSettings::default();
+/// let json = universe_settings.to_json();
 /// ```
 /// 
 /// Settings can be read from a generated seed
 /// 
 /// ```
-/// # use wotw_seedgen::settings::GameSettings;
+/// # use wotw_seedgen::settings::UniverseSettings;
 /// #
 /// let seed = "
 /// // [...pickup data and stuff...]
@@ -55,13 +55,13 @@ use slugstrings::SLUGSTRINGS;
 /// // Config: {\"seed\":\"3027801186584776\",\"worldSettings\":[{\"spawn\":\"MarshSpawn.Main\",\"difficulty\":\"Moki\",\"tricks\":[],\"hard\":false,\"goals\":[],\"headers\":[],\"headerConfig\":[],\"inlineHeaders\":[]}],\"disableLogicFilter\":false,\"online\":false,\"createGame\":\"None\"}
 /// ";
 /// 
-/// let game_settings = GameSettings::from_seed(seed);
-/// assert!(game_settings.is_some());
-/// assert!(game_settings.unwrap().is_ok());
+/// let universe_settings = UniverseSettings::from_seed(seed);
+/// assert!(universe_settings.is_some());
+/// assert!(universe_settings.unwrap().is_ok());
 /// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct GameSettings {
+pub struct UniverseSettings {
     /// The seed that determines all randomness
     pub seed: String,
     /// The individual settings for each world of the seed
@@ -80,9 +80,9 @@ pub struct GameSettings {
     pub create_game: CreateGame,
 }
 
-impl GameSettings {
+impl UniverseSettings {
     /// Parse settings from json
-    pub fn parse(input: &str) -> Result<GameSettings, serde_json::Error> {
+    pub fn parse(input: &str) -> Result<UniverseSettings, serde_json::Error> {
         serde_json::from_str(input)
     }
     /// Serialize the settings into json format
@@ -95,11 +95,11 @@ impl GameSettings {
     /// 
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
-    pub fn from_seed(input: &str) -> Option<Result<GameSettings, serde_json::Error>> {
+    pub fn from_seed(input: &str) -> Option<Result<UniverseSettings, serde_json::Error>> {
         input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
     }
 
-    /// Apply the settings from a [`GamePreset`]
+    /// Apply the settings from a [`UniversePreset`]
     /// 
     /// This follows various rules to retain all unrelated parts of the existing Settings:
     /// - Any [`None`] values of the preset will be ignored
@@ -110,13 +110,13 @@ impl GameSettings {
     /// - If multiple worlds are in the preset, but only one in the existing settings, the existing settings will be copied for all worlds, then the preset will be applied per index
     /// - If multiple worlds are in both and their number does not match, returns an [`Error`]
     /// - Nested presets will be applied before the parent preset
-    pub fn apply_preset(&mut self, preset: GamePreset, file_access: &impl FileAccess) -> Result<(), Box<dyn Error>> {
+    pub fn apply_preset(&mut self, preset: UniversePreset, file_access: &impl FileAccess) -> Result<(), Box<dyn Error>> {
         self.apply_preset_guarded(preset, &mut vec![], file_access)
     }
 
     /// Inner method to memorize nested presets to prevent cyclic patterns
-    fn apply_preset_guarded(&mut self, preset: GamePreset, already_applied: &mut Vec<String>, file_access: &impl FileAccess) -> Result<(), Box<dyn Error>> {
-        let GamePreset {
+    fn apply_preset_guarded(&mut self, preset: UniversePreset, already_applied: &mut Vec<String>, file_access: &impl FileAccess) -> Result<(), Box<dyn Error>> {
+        let UniversePreset {
             info: _,
             includes,
             world_settings,
@@ -182,7 +182,7 @@ impl GameSettings {
             return Ok(());
         }
         already_applied.push(preset.clone());
-        let preset = GamePreset::read_file(&preset, file_access)?;
+        let preset = UniversePreset::read_file(&preset, file_access)?;
         self.apply_preset_guarded(preset, already_applied, file_access)
     }
 
@@ -228,7 +228,7 @@ impl GameSettings {
     /// 
     /// # Panics
     /// 
-    /// Panics if the [`GameSettings`] contain no worlds
+    /// Panics if the [`UniverseSettings`] contain no worlds
     pub fn highest_difficulty(&self) -> Difficulty {
         // world_settings is assumed not to be empty
         self.world_settings.iter().map(|world| world.difficulty).max().unwrap()
@@ -237,7 +237,7 @@ impl GameSettings {
     /// 
     /// # Panics
     /// 
-    /// Panics if the [`GameSettings`] contain no worlds
+    /// Panics if the [`UniverseSettings`] contain no worlds
     pub fn lowest_difficulty(&self) -> Difficulty {
         // world_settings is assumed not to be empty
         self.world_settings.iter().map(|world| world.difficulty).min().unwrap()
@@ -266,9 +266,9 @@ impl GameSettings {
     }
 }
 
-impl Default for GameSettings {
-    fn default() -> GameSettings {
-        GameSettings {
+impl Default for UniverseSettings {
+    fn default() -> UniverseSettings {
+        UniverseSettings {
             seed: Self::random_seed(),
             world_settings: vec![WorldSettings::default()],
             disable_logic_filter: false,
@@ -620,16 +620,16 @@ mod tests {
         let mut slugs = FxHashSet::default();
 
         for _ in 0..1000 {
-            let mut game_settings = GameSettings::default();
+            let mut universe_settings = UniverseSettings::default();
 
             let goals = vec![Goal::Wisps, Goal::Trees, Goal::Quests, Goal::RelicChance(0.8)];
             for goal in goals {
                 if rng.gen_bool(0.25) {
-                    game_settings.world_settings[0].goals.push(goal);
+                    universe_settings.world_settings[0].goals.push(goal);
                 }
             }
 
-            let slug = game_settings.slugify();
+            let slug = universe_settings.slugify();
 
             if slugs.contains(&slug) {
                 panic!("After {} settings, two had the same slug: {}", slugs.len(), slug);

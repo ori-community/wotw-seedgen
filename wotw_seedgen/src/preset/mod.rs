@@ -10,46 +10,46 @@ use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig,
 /// 
 /// # Examples
 /// 
-/// [`GamePreset`]s can be serialized and deserialized
+/// [`UniversePreset`]s can be serialized and deserialized
 /// 
 /// ```
-/// # use wotw_seedgen::preset::GamePreset;
+/// # use wotw_seedgen::preset::UniversePreset;
 /// use wotw_seedgen::preset::WorldPreset;
 /// use wotw_seedgen::settings::Difficulty;
-/// 
-/// let mut preset = GamePreset::default();
+///
+/// let mut preset = UniversePreset::default();
 /// let mut world_settings = WorldPreset::default();
 /// world_settings.difficulty = Some(Difficulty::Gorlek);
 /// preset.world_settings = Some(vec![world_settings]);
-/// 
+///
 /// let json = "{\"worldSettings\":[{\"difficulty\":\"Gorlek\"}]}".to_string();
-/// 
+///
 /// assert_eq!(preset.to_json(), json);
-/// assert_eq!(preset, GamePreset::parse(&json).unwrap());
+/// assert_eq!(preset, UniversePreset::parse(&json).unwrap());
 /// ```
 /// 
-/// Use [`GameSettings::apply_preset`](crate::settings::GameSettings::apply_preset) to merge a [`GamePreset`] into existing [`GameSettings`](crate::settings::GameSettings)
+/// Use [`UniverseSettings::apply_preset`](crate::settings::UniverseSettings::apply_preset) to merge a [`UniversePreset`] into existing [`UniverseSettings`](crate::settings::UniverseSettings)
 /// 
 /// ```
-/// # use wotw_seedgen::preset::GamePreset;
-/// use wotw_seedgen::settings::GameSettings;
+/// # use wotw_seedgen::preset::UniversePreset;
+/// use wotw_seedgen::settings::UniverseSettings;
 /// use wotw_seedgen::settings::Spawn;
 /// use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
-/// 
-/// let mut game_settings = GameSettings::default();
-/// 
-/// let preset = GamePreset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
-/// 
-/// game_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS);
-/// assert_eq!(game_settings.world_settings[0].spawn, Spawn::Random);
+///
+/// let mut universe_settings = UniverseSettings::default();
+///
+/// let preset = UniversePreset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
+///
+/// universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS);
+/// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct GamePreset {
+pub struct UniversePreset {
     /// User-targetted information about the preset
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
-    /// Names of further [`GamePreset`]s to use
+    /// Names of further [`UniversePreset`]s to use
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,27 +73,27 @@ pub struct GamePreset {
     pub create_game: Option<CreateGame>,
 }
 
-impl GamePreset {
-    /// Parse a [`GamePreset`] from json
+impl UniversePreset {
+    /// Parse a [`UniversePreset`] from json
     pub fn parse(input: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(input)
     }
-    /// Serialize the [`GamePreset`] into json format
+    /// Serialize the [`UniversePreset`] into json format
     pub fn to_json(&self) -> String {
-        // This is safe because the GamePreset struct is known to serialize successfully
+        // This is safe because the UniversePreset struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
     }
-    /// Serialize the [`GamePreset`] into pretty-printed json format
+    /// Serialize the [`UniversePreset`] into pretty-printed json format
     pub fn to_json_pretty(&self) -> String {
-        // This is safe because the GamePreset struct is known to serialize successfully
+        // This is safe because the UniversePreset struct is known to serialize successfully
         serde_json::to_string_pretty(&self).unwrap()
     }
 
-    /// Find and read a [`GamePreset`] with the given name
+    /// Find and read a [`UniversePreset`] with the given name
     /// 
-    /// The [`GamePreset`] will be searched as .json file in the current and /presets child directory
+    /// The [`UniversePreset`] will be searched as .json file in the current and /presets child directory
     pub fn read_file(identifier: &str, file_access: &impl FileAccess) -> Result<Self, Box<dyn Error>> {
-        let input = file_access.read_game_preset(identifier)?;
+        let input = file_access.read_universe_preset(identifier)?;
         Ok(Self::parse(&input)?)
     }
 }
@@ -196,7 +196,7 @@ impl WorldPreset {
     }
 }
 
-/// Information for the user about a [`GamePreset`] or [`WorldPreset`]
+/// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PresetInfo {
     /// Display name

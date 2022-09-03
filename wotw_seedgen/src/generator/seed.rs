@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}, UberState}, header, settings::{GameSettings, WorldSettings}};
+use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}, UberState}, header, settings::{UniverseSettings, WorldSettings}};
 
 use super::{spoiler::SeedSpoiler, Placement};
 
@@ -10,8 +10,8 @@ pub struct Seed<'graph, 'settings> {
     pub worlds: Vec<SeedWorld<'graph, 'settings>>,
     /// The logic [`Graph`] used to generate the seed
     pub graph: &'graph Graph,
-    /// The [`GameSettings`] used to generate the seed
-    pub settings: &'settings GameSettings,
+    /// The [`UniverseSettings`] used to generate the seed
+    pub settings: &'settings UniverseSettings,
     /// Spoiler data for the generation process
     pub spoiler: SeedSpoiler,
 }

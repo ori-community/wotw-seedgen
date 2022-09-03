@@ -183,14 +183,14 @@ mod tests {
 
     #[test]
     fn reach_check() {
-        let mut game_settings = GameSettings::default();
-        game_settings.world_settings[0].difficulty = Difficulty::Gorlek;
+        let mut universe_settings = UniverseSettings::default();
+        universe_settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
         let areas = files::read_file("areas", "wotw", "logic").unwrap();
         let locations = files::read_file("loc_data", "csv", "logic").unwrap();
         let states = files::read_file("state_data", "csv", "logic").unwrap();
-        let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false).unwrap();
-        let mut world = World::new(&graph, &game_settings.world_settings[0]);
+        let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+        let mut world = World::new(&graph, &universe_settings.world_settings[0]);
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
 
@@ -214,11 +214,11 @@ mod tests {
 
         assert_eq!(reached, all_locations);
 
-        let mut game_settings = GameSettings::default();
-        game_settings.world_settings[0].difficulty = Difficulty::Gorlek;
+        let mut universe_settings = UniverseSettings::default();
+        universe_settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
-        let graph = logic::parse_logic(&areas, &locations, &states, &game_settings, false).unwrap();
-        let mut world = World::new_spawn(&graph, &game_settings.world_settings[0]);
+        let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+        let mut world = World::new_spawn(&graph, &universe_settings.world_settings[0]);
 
         world.player.inventory.grant(Item::Resource(Resource::Health), 7);
         world.player.inventory.grant(Item::Resource(Resource::Energy), 6);

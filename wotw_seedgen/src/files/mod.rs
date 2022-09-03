@@ -4,8 +4,8 @@
 /// 
 /// The [`files`](crate::files) module contains an implementations of the `FileAccess` trait based on the local file system if you have the "fs" feature flag enabled
 pub trait FileAccess {
-    /// Read a [`GamePreset`](crate::preset::GamePreset) with the given identifier, returning its contents
-    fn read_game_preset(&self, identifier: &str) -> Result<String, String>;
+    /// Read a [`UniversePreset`](crate::preset::UniversePreset) with the given identifier, returning its contents
+    fn read_universe_preset(&self, identifier: &str) -> Result<String, String>;
     /// Read a [`WorldPreset`](crate::preset::WorldPreset) with the given identifier, returning its contents
     fn read_world_preset(&self, identifier: &str) -> Result<String, String>;
     /// Read a [`Header`](crate::header::Header) with the given identifier, returning its contents
@@ -23,7 +23,7 @@ mod fs_access {
     use std::io::{self, Write};
     use std::path::{Path, PathBuf};
 
-    const GAME_PRESET_FOLDER: &str = "game_presets";
+    const UNIVERSE_PRESET_FOLDER: &str = "universe_presets";
     const WORLD_PRESET_FOLDER: &str = "world_presets";
     const HEADER_FOLDER: &str = "headers";
 
@@ -32,15 +32,15 @@ mod fs_access {
     /// It will append the appropriate file extensions, e.g. requesting "black_market" will search for "black_market.wotwrh"
     /// 
     /// All reads will first be attempted in defined subfolders:
-    /// - "game_presets" for [`GamePreset`](crate::preset::GamePreset)s
+    /// - "universe_presets" for [`UniversePreset`](crate::preset::UniversePreset)s
     /// - "world_presets" for [`WorldPreset`](crate::preset::WorldPreset)s
     /// - "headers" for [`Header`](crate::header::Header)s
     /// 
     /// If unable to perform the operation in the subfolder, it will be attempted in the current directory instead
     pub struct FileSystemAccess;
     impl FileAccess for FileSystemAccess {
-        fn read_game_preset(&self, identifier: &str) -> Result<String, String> {
-            read_file(identifier, "json", GAME_PRESET_FOLDER)
+        fn read_universe_preset(&self, identifier: &str) -> Result<String, String> {
+            read_file(identifier, "json", UNIVERSE_PRESET_FOLDER)
         }
         fn read_world_preset(&self, identifier: &str) -> Result<String, String> {
             read_file(identifier, "json", WORLD_PRESET_FOLDER)
@@ -50,8 +50,8 @@ mod fs_access {
         }
     }
     impl FileSystemAccess {
-        pub fn write_game_preset(&self, identifier: &str, contents: &str) -> Result<(), String> {
-            write_file(identifier, "json", contents, GAME_PRESET_FOLDER)
+        pub fn write_universe_preset(&self, identifier: &str, contents: &str) -> Result<(), String> {
+            write_file(identifier, "json", contents, UNIVERSE_PRESET_FOLDER)
         }
         pub fn write_world_preset(&self, identifier: &str, contents: &str) -> Result<(), String> {
             write_file(identifier, "json", contents, WORLD_PRESET_FOLDER)
