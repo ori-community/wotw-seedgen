@@ -7705,6 +7705,8 @@ anchor LowerReach.ArenaArea at 44, -3992:  # To the left of the combat arena
     kii, LowerReach.ArenaBeaten:
       Launch
       DoubleJump, TripleJump
+    unsafe, LowerReach.ArenaBeaten:
+      FlashSwap
   conn LowerReach.SwimmingPool:
     moki, LowerReach.EastDoorLantern:
       LowerReach.FreezeEastFurnace OR Water
@@ -7742,6 +7744,8 @@ anchor LowerReach.WindSpinners at 73,-3929:  # midway through the wind column ab
       Launch, Spear=1 OR Shuriken=1 OR Sentry=1 OR Spear=1 OR Flash=1  # Pass under the first spinner and launch to the wall above it
       DoubleJump, TripleJump, Damage=20
       Bash, Grenade=1, DoubleJump, TripleJump  # Precise grenade throw above the first spinner, pass under the spinner to catch the grenade and bash glide to the right wall
+      FlashSwap
+      Launch  # There are multiple ways to do this, and all of them look awesome.
   conn LowerReach.ArenaArea:
     moki: Glide, LowerReach.ArenaBeaten
     gorlek: LowerReach.ArenaBeaten
@@ -7792,6 +7796,8 @@ anchor LowerReach.LowerWispPath at 83, -3874:  # At the checkpoint just after th
       Bash, DoubleJump, TripleJump, Damage=20
       Bash, SwordSJump=1
       Bash, HammerSJump=1, Glide OR DoubleJump OR Dash
+      FlashSwap
+      LaunchSwap
   conn LowerReach.WindSpinners:
     moki: Glide
     gorlek: Launch, Damage=20
@@ -7821,6 +7827,8 @@ anchor LowerReach.BridgeWispPath at 67, -3808:  # At the bridge checkpoint, next
     unsafe:
       Bash, DoubleJump OR Dash OR Grapple OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Shuriken=2
+      FlashSwap
+      Launch
   conn LowerReach.LowerWispPath:
     moki:
       Bash
@@ -7877,6 +7885,7 @@ anchor LowerReach.SnowEscape at 79, -3733:
       SentryJump=2, DoubleJump, Dash  # 1st sjump on a friendly spike and 2nd one on the branch to pass the 1st wind column
       SentryJump=3, Dash, Grapple OR Damage=20
       Dash, SentryJump=4
+      FlashSwap  # Dodging the water is scary but totally doable.
 
   pickup LowerReach.EscapeRevisitEX:
     moki: LowerReach.ForestsMemory
@@ -7975,7 +7984,9 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
       Bash, Grenade=1, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=10
   conn LowerReach.ArenaArea:
     moki: LowerReach.ArenaBeaten, Glide
-    unsafe: LowerReach.ArenaBeaten, Launch  # Launch Swap
+    unsafe, LowerReach.ArenaBeaten:
+      Launch  # Launch Swap
+      FlashSwap
 
 region UpperReach:
   moki: Danger=40, Regenerate
