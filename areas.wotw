@@ -12668,6 +12668,7 @@ anchor WindtornRuins.Escape at 2021, -4026:
       Burrow, Grapple, Damage=10  # You are allowed to hate me if this is forced progression https://youtu.be/H3UIH4FyU4Q
       Burrow, Grapple, Blaze=5 OR Flash=5
       Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
+      Burrow, FlashSwap
 
 anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
   # requires escape to be done
