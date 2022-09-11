@@ -7853,6 +7853,7 @@ anchor LowerReach.SnowEscape at 79, -3733:
       SentryJump=2, DoubleJump, Dash  # 1st sjump on a friendly spike and 2nd one on the branch to pass the 1st wind column
       SentryJump=3, Dash, Grapple OR Damage=20
       Dash, SentryJump=4
+      FlashSwap  # Dodging the water is scary but totally doable.
 
   state LowerReach.BearSneezed:  # Same paths as LowerReach.ForestsMemory (when finishing the escape, Baur isn't blocking the Reach entrance anymore)
     moki:
