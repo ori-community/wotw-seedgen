@@ -8955,6 +8955,7 @@ anchor MoraEscape at 712, -4482:
     unsafe:
       Bash, Grapple
       Launch
+      FlashSwap # Yes, it works on hard mode.
   
 anchor MoraSecondPhase at 690, -4386:
   nospawn
