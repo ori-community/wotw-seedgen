@@ -5645,6 +5645,10 @@ anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
       Dash, Hammer, Grapple
     unsafe:
       Dash OR DoubleJump OR SentryJump=1
+      FlashSwap OR BlazeSwap=2 OR SentrySwap=2 # Jump from the top of the stairs and climb the left wall.
+      BlazeSwap=1 OR SentrySwap=1:
+        Sword OR Hammer OR Shuriken=1 OR Spear=1 OR Glide OR Flash=1 OR PauseHover # Yep, difficult Blaze/Sentry swap and then Flash hop. Why not.
+      GrenadeJump
 
 # checkpoint at -1249, -3641
 
