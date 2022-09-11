@@ -5683,6 +5683,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Grapple, Bash, WaterDash, Damage=80
       Grapple, Bash, Hammer
       Grapple, DoubleJump
+      FlashSwap
 
   pickup InnerWellspring.EscapeRevisitEX:
     moki: InnerWellspring.WaterEscape
