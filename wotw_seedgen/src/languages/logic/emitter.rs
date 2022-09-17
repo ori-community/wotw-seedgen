@@ -243,30 +243,30 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState]
     node_map.reserve(node_count);
 
     for location in locations {
-        let Location { name, zone, uber_state, position, map_position } = location;
+        let Location { name, zone, trigger, position, map_position } = location;
         let identifier = name;
         let position = if position.x == 0. && position.y == 0. { None } else { Some(position) };
         let map_position = if map_position.x == 0. && map_position.y == 0. { None } else { Some(map_position) };
 
         add_entry(&mut node_map, &identifier, index)?;
         let node = match quests.contains(&identifier[..]) {
-            true => Node::Quest(graph::Quest { identifier, position, map_position, zone, index, uber_state }),
-            false => Node::Pickup(graph::Pickup { identifier, position, map_position, zone, index, uber_state }),
+            true => Node::Quest(graph::Quest { identifier, position, map_position, zone, index, trigger }),
+            false => Node::Pickup(graph::Pickup { identifier, position, map_position, zone, index, trigger }),
         };
         nodes.push(node);
         index += 1;
     }
     for &state in &states {
         let identifier = state.to_string();
-        let uber_state = named_states.iter()
+        let trigger = named_states.iter()
             .find(|named_state| named_state.name == identifier)
-            .map(|named_state| &named_state.uber_state)
+            .map(|named_state| &named_state.trigger)
             .cloned();
-        if uber_state.is_none() {
+        if trigger.is_none() {
             log::trace!("Couldn't find an entry for {} in the state table", state);
         }
         add_entry(&mut node_map, &identifier, index)?;
-        let node = Node::State(graph::State { identifier, index, uber_state });
+        let node = Node::State(graph::State { identifier, index, trigger });
         nodes.push(node);
         index += 1;
     }

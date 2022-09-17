@@ -11,17 +11,17 @@ pub use requirements::Requirement;
 use rustc_hash::FxHashMap;
 
 use crate::header::ItemDetails;
-use crate::item::{Item, Resource, UberStateOperator, UberStateRangeBoundary};
+use crate::item::{Item, Resource};
 use crate::settings::{WorldSettings, Goal};
-use crate::util::{UberState, UberIdentifier, UberType, constants::WISP_STATES};
+use crate::util::{UberStateTrigger, UberIdentifier, constants::WISP_STATES};
 
 #[derive(Debug, Clone)]
 pub struct World<'graph, 'settings> {
     pub graph: &'graph Graph,
     pub player: Player<'settings>,
     pub pool: Pool,
-    pub preplacements: FxHashMap<UberState, Vec<Item>>,
-    pub uber_states: FxHashMap<UberIdentifier, String>,
+    pub preplacements: FxHashMap<UberStateTrigger, Vec<Item>>,
+    uber_states: FxHashMap<UberIdentifier, f32>,
     pub sets: Vec<usize>,
     pub custom_items: FxHashMap<Item, ItemDetails>,
     pub goals: Vec<Goal>,
@@ -56,71 +56,11 @@ impl World<'_, '_> {
         match item {
             Item::UberState(command) => {
                 for _ in 0..amount {
-                    let default = String::from("0");
-                    let uber_value = match &command.operator {
-                        UberStateOperator::Value(value) => value,
-                        UberStateOperator::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
-                        UberStateOperator::Range(range) => match &range.start {
-                            UberStateRangeBoundary::Value(value) => value,
-                            UberStateRangeBoundary::Pointer(uber_identifier) => self.uber_states.get(uber_identifier).unwrap_or(&default),
-                        },
-                    }.clone();
-
-                    let entry = self.uber_states.entry(command.uber_identifier.clone()).or_insert_with(|| String::from("0"));
-                    let uber_value = match command.uber_type {
-                        UberType::Bool | UberType::Teleporter => uber_value.to_string(),
-                        UberType::Byte | UberType::Int => {
-                            if command.signed {
-                                let uber_value = uber_value.parse::<i32>().unwrap();
-                                let mut prior = entry.parse::<i32>().map_err(|_| format!("Failed to apply uberState command {} because the current state ({}) doesn't match the specified type", command.code(), entry))?;
-
-                                if command.sign {
-                                    prior += uber_value;
-                                } else {
-                                    prior -= uber_value;
-                                }
-                                prior.to_string()
-                            } else {
-                                uber_value.to_string()
-                            }
-                        },
-                        UberType::Float => {
-                            if command.signed {
-                                let uber_value = uber_value.parse::<f32>().unwrap();
-                                let mut prior = entry.parse::<f32>().map_err(|_| format!("Failed to apply uberState command {} because the current state ({}) doesn't match the specified type", command.code(), entry))?;
-
-                                if command.sign {
-                                    prior += uber_value;
-                                } else {
-                                    prior -= uber_value;
-                                }
-                                prior.to_string()
-                            } else {
-                                uber_value.to_string()
-                            }
-                        },
-                    };
-                    if uber_value == "false" || uber_value == "0" || uber_value == *entry { return Ok(()); }
-
-                    *entry = uber_value;
-
-                    let uber_state = UberState {
-                        identifier: command.uber_identifier.clone(),
-                        value: entry.clone(),
-                    };
-
-                    if command.skip {
-                        log::trace!("Skipped granting UberState {}", uber_state);
-                        return Ok(());
+                    let new = command.do_the_math(&self.uber_states);
+                    let old = self.uber_states.insert(command.identifier, new);
+                    if !command.skip {
+                        self.collect_preplacements(command.identifier, old.unwrap_or_default());
                     }
-
-                    log::trace!("Granting player UberState {}", uber_state);
-                    self.collect_preplacements(&uber_state);
-                    let without_value = UberState {
-                        value: String::new(),
-                        ..uber_state
-                    };
-                    self.collect_preplacements(&without_value);
                 }
             },
             Item::SpiritLight(stacked_amount) => {
@@ -129,15 +69,14 @@ impl World<'_, '_> {
                 self.player.inventory.grant(Item::SpiritLight(1), amount * stacked_amount);
             }
             item => {
-                let triggered_state = item.triggered_state();
+                let triggered_state = item.attached_state();
                 if item.is_progression(self.player.settings.difficulty) {
                     log::trace!("Granting player {}{}", if amount == 1 { String::new() } else { format!("{} ", amount) }, item);
 
                     self.player.inventory.grant(item, amount);
                 }
-                if let Some(uber_state) = triggered_state {
-                    self.uber_states.insert(uber_state.identifier.clone(), "true".to_string());
-                    self.collect_preplacements(&uber_state);
+                if let Some(identifier) = triggered_state {
+                    self.set_uber_state(identifier, 1.);
                 }
             },
         }
@@ -145,28 +84,45 @@ impl World<'_, '_> {
         Ok(())
     }
 
-    pub fn preplace(&mut self, uber_state: UberState, item: Item) {
+    pub(crate) fn preplace(&mut self, uber_state: UberStateTrigger, item: Item) {
         self.preplacements.entry(uber_state).or_default().push(item);
     }
-    pub fn collect_preplacements(&mut self, reached: &UberState) -> bool {
-        if WISP_STATES.contains(&reached.identifier) {
+    fn collect_preplacements(&mut self, identifier: UberIdentifier, old: f32) -> bool {
+        let new = self.uber_states.get(&identifier).copied().unwrap_or_default();
+        if new == old { return false }
+        if WISP_STATES.contains(&identifier) {
             log::trace!("Granting player Wisp");
             self.player.inventory.grant(Item::Resource(Resource::Health), 2);
             self.player.inventory.grant(Item::Resource(Resource::Energy), 2);
         }
-        if let Some(items) = self.preplacements.get(reached) {
-            log::trace!("Collecting preplacements on {}", reached);
-            let items = items.clone();
 
-            for item in items {
-                self.grant_player(item, 1).unwrap_or_else(|err| log::error!("{}", err));
-            }
-
-            true
-        } else {
-            false
+        let mut preplaced = false;
+        let collected = self.preplacements.iter().filter_map(|(trigger, items)|
+            if trigger.check(identifier, new) && (trigger.condition.is_none() || !trigger.check_value(old)) {
+                preplaced = true;
+                Some(items)
+            } else { None }
+        ).flatten().cloned().collect::<Vec<_>>();
+        for item in collected {
+            self.grant_player(item, 1).unwrap_or_else(|err| log::error!("{}", err));
         }
+
+        preplaced
     }
+
+    /// Sets the value at an [`UberIdentifier`] and collects any items preplaced on it
+    /// 
+    /// Returns `true` if any preplaced items were collected
+    pub fn set_uber_state(&mut self, identifier: UberIdentifier, value: f32) -> bool {
+        let old = self.uber_states.insert(identifier, value).unwrap_or_default();
+        self.collect_preplacements(identifier, old)
+    }
+    /// Returns the value at an [`UberIdentifier`]
+    pub fn get_uber_state(&self, identifier: UberIdentifier) -> f32 {
+        self.uber_states.get(&identifier).copied().unwrap_or_default()
+    }
+    /// Returns the entire uber state map of this world
+    pub fn uber_states(&self) -> &FxHashMap<UberIdentifier, f32> { &self.uber_states }
 }
 
 #[cfg(test)]
@@ -199,13 +155,13 @@ mod tests {
         let reached: FxHashSet<_> = reached.iter()
             .filter_map(|node| {
                 if node.node_kind() == NodeKind::State { None }
-                else { node.uber_state() }
+                else { node.trigger() }
             })
             .cloned().collect();
 
         let input = files::read_file("loc_data", "csv", "logic").unwrap();
         let all_locations = logic::parse_locations(&input).unwrap();
-        let all_locations: FxHashSet<_> = all_locations.iter().map(|location| &location.uber_state).cloned().collect();
+        let all_locations: FxHashSet<_> = all_locations.iter().map(|location| &location.trigger).cloned().collect();
 
         if !(reached == all_locations) {
             let diff: Vec<_> = all_locations.difference(&reached).collect();

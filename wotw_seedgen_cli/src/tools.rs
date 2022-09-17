@@ -29,7 +29,7 @@ pub fn list() -> Result<(), String> {
 
         add_trailing_spaces(&mut identifier, HEADER_INDENT);
 
-        output += &format!("{}  {}\n", NAME_COLOUR.paint(identifier), description.unwrap_or("no description".to_string()));
+        output += &format!("{}  {}\n", NAME_COLOUR.paint(identifier), description.unwrap_or_else(|| "no description".to_string()));
     }
 
     output.push('\n');
@@ -59,7 +59,7 @@ pub fn inspect(headers: Vec<String>) -> Result<(), String> {
         let contents = FILE_SYSTEM_ACCESS.read_header(&header)?;
         let documentation = Header::parse_documentation(&contents);
 
-        write!(output, "{} header:\n", NAME_COLOUR.paint(header)).unwrap();
+        writeln!(output, "{} header:", NAME_COLOUR.paint(header)).unwrap();
 
         if let Some(name) = documentation.name { write!(output, "{name}\n\n").unwrap() }
         match documentation.description {

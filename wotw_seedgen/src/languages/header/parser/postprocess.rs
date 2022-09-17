@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::{world::Graph, util::{UberState, Zone}, settings::UniverseSettings};
+use crate::{world::Graph, util::{Zone, UberStateTrigger}, settings::UniverseSettings};
 
 fn read_args(seed: &str, start_index: usize) -> Option<usize> {
     let mut depth: u8 = 1;
@@ -48,12 +48,11 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
                 }
             } else if uber_group == "3" && (uber_id == "0" || uber_id == "1") {
                 return Ok(String::from("Spawn"));
-            } else {
-                let uber_state = UberState::from_parts(uber_group, uber_id)?;
-                if let Some(node) = graph.nodes.iter().find(|&node| node.uber_state() == Some(&uber_state)) {
-                    if let Some(zone) = node.zone() {
-                        return Ok(zone.to_string());
-                    }
+            } else if let Some(node) = graph.nodes.iter().find(|&node|
+                node.trigger().map_or(false, |trigger| trigger.code().to_string() == format!("{uber_group}|{uber_id}"))
+            ) {
+                if let Some(zone) = node.zone() {
+                    return Ok(zone.to_string());
                 }
             }
         }
@@ -62,7 +61,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
     Ok(String::from("Unknown"))
 }
 
-fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], graph: &Graph) -> Result<Vec<UberState>, String> {
+fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], graph: &Graph) -> Result<Vec<UberStateTrigger>, String> {
     let mut locations = Vec::new();
     let re = Regex::new(&format!(r"^({})$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))?;
 
@@ -81,10 +80,17 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
         let uber_id = parts.next().ok_or_else(|| format!("failed to read line {} in seed", line))?;
         let item = parts.next().ok_or_else(|| format!("failed to read line {} in seed", line))?;
 
-        let uber_state = UberState::from_parts(uber_group, uber_id)?;
-        if graph.nodes.iter().any(|node| node.zone() == Some(zone) && node.uber_state() == Some(&uber_state)) {
+        if let Some(trigger) = graph.nodes.iter().find_map(|node| {
+            if node.zone() == Some(zone) {
+                let trigger = node.trigger();
+                if trigger.map_or(false, |trigger| trigger.code().to_string() == format!("{uber_group}|{uber_id}")) {
+                    return trigger;
+                }
+            }
+            None
+        }) {
             if re.is_match(item) {
-                locations.push(uber_state);
+                locations.push(trigger.clone());
             } else {  // if multiworld shared
                 let mut item_parts = item.split('|');
                 if item_parts.next() != Some("8") { continue; }
@@ -106,7 +112,7 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
                             actual_item = actual_item.trim();
 
                             if re.is_match(actual_item) {
-                                locations.push(uber_state);
+                                locations.push(trigger.clone());
                                 break 'outer;
                             }
                         }

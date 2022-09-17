@@ -6,7 +6,6 @@ use std::{
     fs,
     str::FromStr,
     path::PathBuf,
-    convert::TryFrom,
     io::{self, Read, Write},
     time::Instant,
     env, error::Error, process::ExitCode,
@@ -20,7 +19,7 @@ use serde::{Serialize, Deserialize};
 
 use log::LevelFilter;
 
-use wotw_seedgen::{item, world, util, logic, Header};
+use wotw_seedgen::{item, world::{self, graph::Node}, util, logic, Header};
 use wotw_seedgen::settings::{UniverseSettings, Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
 use wotw_seedgen::preset::{UniversePreset, WorldPreset, PresetGroup, PresetInfo};
 use wotw_seedgen::generator::Seed;
@@ -28,7 +27,6 @@ use wotw_seedgen::files::{self, FILE_SYSTEM_ACCESS};
 
 use item::{Item, Resource, Skill, Shard, Teleporter};
 use world::World;
-use util::UberState;
 use wotw_seedgen::generator::SeedSpoiler;
 
 /// For CLI flags that contain a mixture of world specifiers and flag values
@@ -616,8 +614,30 @@ struct ReachCheckArgs {
     ore: u32,
     /// player spirit light
     spirit_light: u32,
-    /// any additional player items in the format s:<skill id>, t:<teleporter id>, sh:<shard id>, w:<world event id> or u:<ubergroup>,<uberid>
-    items: Vec<String>,
+    /// any additional player items in the format s:<skill id>, t:<teleporter id>, sh:<shard id>, w:<world event id> or n:<node identifier>
+    items: Vec<ReachData>,
+}
+
+enum ReachData {
+    Skill(Skill),
+    Teleporter(Teleporter),
+    Shard(Shard),
+    Water,
+    Node(String),
+}
+impl FromStr for ReachData {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (kind, data) = s.split_once(':').ok_or_else(|| "Expected <kind>:<data>".to_string())?;
+        match kind {
+            "s" => data.parse().map(Self::Skill).map_err(|err| err.to_string()),
+            "t" => data.parse().map(Self::Teleporter).map_err(|err| err.to_string()),
+            "sh" => data.parse().map(Self::Shard).map_err(|err| err.to_string()),
+            "w" => if data == "0" { Ok(Self::Water) } else { Err(format!("Unknown world event \"{data}\"")) },
+            "n" => Ok(Self::Node(data.to_string())),
+            _ => Err("Innvalid arg \"{s}\", args have to start with s:, t:, sh:, w: or n:".to_string()),
+        }
+    }
 }
 
 #[derive(StructOpt)]
@@ -897,42 +917,27 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     world.player.inventory.grant(Item::Resource(Resource::Ore), args.ore);
     world.player.inventory.grant(Item::SpiritLight(1), args.spirit_light);
 
-    for item in args.items {
-        if let Some(skill) = item.strip_prefix("s:") {
-            let id: u8 = skill.parse().map_err(|_| format!("expected numeric skill id in {}", item))?;
-            world.player.inventory.grant(Item::Skill(Skill::try_from(id).map_err(|_| format!("{} is not a valid skill id", id))?), 1);
-        }
-        else if let Some(teleporter) = item.strip_prefix("t:") {
-            let id: u8 = teleporter.parse().map_err(|_| format!("expected numeric teleporter id in {}", item))?;
-            world.player.inventory.grant(Item::Teleporter(Teleporter::try_from(id).map_err(|_| format!("{} is not a valid teleporter id", id))?), 1);
-        }
-        else if let Some(shard) = item.strip_prefix("sh:") {
-            let id: u8 = shard.parse().map_err(|_| format!("expected numeric shard id in {}", item))?;
-            world.player.inventory.grant(Item::Shard(Shard::try_from(id).map_err(|_| format!("{} is not a valid shard id", id))?), 1);
-        }
-        else if let Some(world_event) = item.strip_prefix("w:") {
-            let id: u8 = world_event.parse().map_err(|_| format!("expected numeric world event id in {}", item))?;
-            if id != 0 { return Err(format!("{} is not a valid world event id (only 0 is)", id)); } 
-            world.player.inventory.grant(Item::Water, 1);
-        }
-        else if let Some(uber_state) = item.strip_prefix("u:") {
-            let uber_state = UberState::from_str(uber_state).map_err(|err| format!("failed to parse uber state in {}: {}", item, err))?;
+    let mut set_node = |identifier: &str| -> Result<(), String> {
+        let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
+        log::trace!("Setting state {}", identifier);
+        world.sets.push(node.index());
+        Ok(())
+    };
 
-            world.uber_states.insert(uber_state.identifier, uber_state.value);
-        }
-        else {
-            return Err(format!("items have to start with s:, t:, sh:, w: or u: (for skill, teleporter, shard, world event or uber state), except found {}", item));
+    for item in args.items {
+        match item {
+            ReachData::Skill(skill) => world.player.inventory.grant(Item::Skill(skill), 1),
+            ReachData::Teleporter(teleporter) => world.player.inventory.grant(Item::Teleporter(teleporter), 1),
+            ReachData::Shard(shard) => world.player.inventory.grant(Item::Shard(shard), 1),
+            ReachData::Water => world.player.inventory.grant(Item::Water, 1),
+            ReachData::Node(identifier) => set_node(&identifier)?,
         }
     }
 
     for line in contents.lines() {
         if let Some(sets) = line.strip_prefix("// Sets: ") {
             if !sets.is_empty() {
-                for identifier in sets.split(',').map(str::trim) {
-                    let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
-                    log::trace!("Setting state {}", identifier);
-                    world.sets.push(node.index());
-                }
+                sets.split(',').map(str::trim).try_for_each(set_node)?;
             }
 
             break;
@@ -942,22 +947,16 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     let spawn_name = util::spawn_from_seed(&contents)?;
     let spawn = world.graph.find_spawn(&spawn_name)?;
 
-    let mut reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).expect("Invalid Reach Check");
+    let mut reached = world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets).expect("Invalid Reach Check");
     reached.retain(|&node| node.can_place());
 
-    let identifiers = reached.iter()
-        .map(|&node| node.identifier())
+    let identifiers = reached.into_iter()
+        .map(Node::identifier)
         .collect::<Vec<_>>()
         .join(", ");
     log::info!("reachable locations: {}", identifiers);
 
-    let reached = reached.into_iter()
-        .filter_map(|node| node.uber_state())
-        .map(|uber_state| uber_state.code().to_string())
-        .collect::<Vec<_>>()
-        .join(", ");
-
-    println!("{reached}");
+    println!("{identifiers}");
     Ok(())
 }
 

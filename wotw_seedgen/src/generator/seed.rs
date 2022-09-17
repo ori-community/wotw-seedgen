@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}, UberState}, header, settings::{UniverseSettings, WorldSettings}};
+use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}, UberStateTrigger}, header, settings::{UniverseSettings, WorldSettings}};
 
 use super::{spoiler::SeedSpoiler, Placement};
 
@@ -67,7 +67,7 @@ impl Display for SeedWorld<'_, '_> {
             writeln!(f, "Spawn: {}, {}  // {}", position.x, position.y, spawn_identifier)?;
 
             if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == spawn_identifier { Some(item) } else { None }) {
-                writeln!(f, "{}|{}|mute", UberState::spawn().code(), spawn_item.code())?;
+                writeln!(f, "{}|{}|mute", UberStateTrigger::spawn().code(), spawn_item.code())?;
             }
         }
 

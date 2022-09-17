@@ -3,1946 +3,1946 @@ use super::UberIdentifier;
 pub(super) const NAMED_UBER_STATES: &[(&str, UberIdentifier)] = &[
     (
         "MarshSpawn.RockHC",
-        UberIdentifier { uber_group: 21786, uber_id: 60210 },
+        UberIdentifier::new(21786, 60210),
     ),
     (
         "MarshSpawn.FirstPickupEX",
-        UberIdentifier { uber_group: 21786, uber_id: 49485 },
+        UberIdentifier::new(21786, 49485),
     ),
     (
         "MarshSpawn.GrappleHC",
-        UberIdentifier { uber_group: 21786, uber_id: 25761 },
+        UberIdentifier::new(21786, 25761),
     ),
     (
         "MarshSpawn.BridgeEX",
-        UberIdentifier { uber_group: 21786, uber_id: 6987 },
+        UberIdentifier::new(21786, 6987),
     ),
     (
         "MarshSpawn.ResilienceShard",
-        UberIdentifier { uber_group: 23987, uber_id: 59173 },
+        UberIdentifier::new(23987, 59173),
     ),
     (
         "MarshSpawn.ResilienceOre",
-        UberIdentifier { uber_group: 21786, uber_id: 29892 },
+        UberIdentifier::new(21786, 29892),
     ),
     (
         "MarshSpawn.BashEC",
-        UberIdentifier { uber_group: 21786, uber_id: 7152 },
+        UberIdentifier::new(21786, 7152),
     ),
     (
         "MarshSpawn.PreLupoEX",
-        UberIdentifier { uber_group: 9593, uber_id: 5929 },
+        UberIdentifier::new(9593, 5929),
     ),
     (
         "MarshSpawn.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 18767 },
+        UberIdentifier::new(48248, 18767),
     ),
     (
         "MarshSpawn.RegenTree",
-        UberIdentifier { uber_group: 0, uber_id: 77 },
+        UberIdentifier::new(0, 77),
     ),
     (
         "MarshSpawn.LeverEC",
-        UberIdentifier { uber_group: 21786, uber_id: 17920 },
+        UberIdentifier::new(21786, 17920),
     ),
     (
         "MarshSpawn.LeftTokkEX",
-        UberIdentifier { uber_group: 21786, uber_id: 59513 },
+        UberIdentifier::new(21786, 59513),
     ),
     (
         "MarshSpawn.FightRoomEX",
-        UberIdentifier { uber_group: 9593, uber_id: 42047 },
+        UberIdentifier::new(9593, 42047),
     ),
     (
         "MarshSpawn.CaveKS",
-        UberIdentifier { uber_group: 21786, uber_id: 64677 },
+        UberIdentifier::new(21786, 64677),
     ),
     (
         "MarshSpawn.TokkKeystoneQuest",
-        UberIdentifier { uber_group: 48248, uber_id: 51645 },
+        UberIdentifier::new(48248, 51645),
     ),
     (
         "MarshSpawn.CaveOre",
-        UberIdentifier { uber_group: 9593, uber_id: 23858 },
+        UberIdentifier::new(9593, 23858),
     ),
     (
         "MarshSpawn.LongSwimEX",
-        UberIdentifier { uber_group: 21786, uber_id: 23154 },
+        UberIdentifier::new(21786, 23154),
     ),
     (
         "MarshSpawn.BurrowOre",
-        UberIdentifier { uber_group: 9593, uber_id: 20382 },
+        UberIdentifier::new(9593, 20382),
     ),
     (
         "MarshSpawn.LifepactShard",
-        UberIdentifier { uber_group: 23987, uber_id: 50415 },
+        UberIdentifier::new(23987, 50415),
     ),
     (
         "MarshSpawn.BurrowsApproachLedgeEX",
-        UberIdentifier { uber_group: 24922, uber_id: 32076 },
+        UberIdentifier::new(24922, 32076),
     ),
     (
         "MarshSpawn.CrusherSwimEX",
-        UberIdentifier { uber_group: 24922, uber_id: 62138 },
+        UberIdentifier::new(24922, 62138),
     ),
     (
         "MarshSpawn.TokkTabletQuest",
-        UberIdentifier { uber_group: 48248, uber_id: 18458 },
+        UberIdentifier::new(48248, 18458),
     ),
     (
         "MarshSpawn.RecklessShard",
-        UberIdentifier { uber_group: 23987, uber_id: 9864 },
+        UberIdentifier::new(23987, 9864),
     ),
     (
         "MarshSpawn.FangEC",
-        UberIdentifier { uber_group: 21786, uber_id: 61706 },
+        UberIdentifier::new(21786, 61706),
     ),
     (
         "MarshSpawn.FangQI",
-        UberIdentifier { uber_group: 14019, uber_id: 27539 },
+        UberIdentifier::new(14019, 27539),
     ),
     (
         "MarshSpawn.MokkFangQuest",
-        UberIdentifier { uber_group: 14019, uber_id: 15983 },
+        UberIdentifier::new(14019, 15983),
     ),
     (
         "MarshSpawn.DamageTree",
-        UberIdentifier { uber_group: 0, uber_id: 121 },
+        UberIdentifier::new(0, 121),
     ),
     (
         "MarshSpawn.PoolsPathEX",
-        UberIdentifier { uber_group: 21786, uber_id: 21727 },
+        UberIdentifier::new(21786, 21727),
     ),
     (
         "MidnightBurrows.LeftKS",
-        UberIdentifier { uber_group: 24922, uber_id: 60358 },
+        UberIdentifier::new(24922, 60358),
     ),
     (
         "MidnightBurrows.RightKS",
-        UberIdentifier { uber_group: 24922, uber_id: 47244 },
+        UberIdentifier::new(24922, 47244),
     ),
     (
         "MidnightBurrows.UpperKS",
-        UberIdentifier { uber_group: 24922, uber_id: 34250 },
+        UberIdentifier::new(24922, 34250),
     ),
     (
         "MidnightBurrows.LowerKS",
-        UberIdentifier { uber_group: 24922, uber_id: 33535 },
+        UberIdentifier::new(24922, 33535),
     ),
     (
         "MidnightBurrows.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 45538 },
+        UberIdentifier::new(48248, 45538),
     ),
     (
         "MidnightBurrows.DeflectorShard",
-        UberIdentifier { uber_group: 24922, uber_id: 46311 },
+        UberIdentifier::new(24922, 46311),
     ),
     (
         "MidnightBurrows.TabletQI",
-        UberIdentifier { uber_group: 14019, uber_id: 52747 },
+        UberIdentifier::new(14019, 52747),
     ),
     (
         "HowlsDen.UpperEX",
-        UberIdentifier { uber_group: 21786, uber_id: 43668 },
+        UberIdentifier::new(21786, 43668),
     ),
     (
         "HowlsDen.RightHC",
-        UberIdentifier { uber_group: 21786, uber_id: 28908 },
+        UberIdentifier::new(21786, 28908),
     ),
     (
         "HowlsDen.LeftHC",
-        UberIdentifier { uber_group: 9593, uber_id: 61304 },
+        UberIdentifier::new(9593, 61304),
     ),
     (
         "HowlsDen.AboveDoorKS",
-        UberIdentifier { uber_group: 21786, uber_id: 22068 },
+        UberIdentifier::new(21786, 22068),
     ),
     (
         "HowlsDen.MagnetShard",
-        UberIdentifier { uber_group: 21786, uber_id: 63545 },
+        UberIdentifier::new(21786, 63545),
     ),
     (
         "HowlsDen.SwordTree",
-        UberIdentifier { uber_group: 0, uber_id: 100 },
+        UberIdentifier::new(0, 100),
     ),
     (
         "HowlsDen.BoneOre",
-        UberIdentifier { uber_group: 21786, uber_id: 2046 },
+        UberIdentifier::new(21786, 2046),
     ),
     (
         "HowlsDen.AboveTPEX",
-        UberIdentifier { uber_group: 21786, uber_id: 16206 },
+        UberIdentifier::new(21786, 16206),
     ),
     (
         "HowlsDen.LaserKS",
-        UberIdentifier { uber_group: 21786, uber_id: 2852 },
+        UberIdentifier::new(21786, 2852),
     ),
     (
         "HowlsDen.CombatShrine",
-        UberIdentifier { uber_group: 24922, uber_id: 13993 },
+        UberIdentifier::new(24922, 13993),
     ),
     (
         "HowlsDen.DoubleJumpEX",
-        UberIdentifier { uber_group: 9593, uber_id: 17818 },
+        UberIdentifier::new(9593, 17818),
     ),
     (
         "HowlsDen.StickyShard",
-        UberIdentifier { uber_group: 23987, uber_id: 27134 },
+        UberIdentifier::new(23987, 27134),
     ),
     (
         "HowlsDen.DoubleJumpTree",
-        UberIdentifier { uber_group: 0, uber_id: 5 },
+        UberIdentifier::new(0, 5),
     ),
     (
         "MarshPastOpher.TrialLeftEX",
-        UberIdentifier { uber_group: 9593, uber_id: 5253 },
+        UberIdentifier::new(9593, 5253),
     ),
     (
         "MarshPastOpher.TrialOre",
-        UberIdentifier { uber_group: 9593, uber_id: 25989 },
+        UberIdentifier::new(9593, 25989),
     ),
     (
         "MarshPastOpher.TrialEC",
-        UberIdentifier { uber_group: 9593, uber_id: 27562 },
+        UberIdentifier::new(9593, 27562),
     ),
     (
         "MarshPastOpher.TrialHC",
-        UberIdentifier { uber_group: 21786, uber_id: 20194 },
+        UberIdentifier::new(21786, 20194),
     ),
     (
         "MarshPastOpher.TrialRightEX",
-        UberIdentifier { uber_group: 21786, uber_id: 10413 },
+        UberIdentifier::new(21786, 10413),
     ),
     (
         "MarshPastOpher.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 45951 },
+        UberIdentifier::new(44964, 45951),
     ),
     (
         "MarshPastOpher.CombatShrine",
-        UberIdentifier { uber_group: 21786, uber_id: 18109 },
+        UberIdentifier::new(21786, 18109),
     ),
     (
         "MarshPastOpher.SwingPoleEX",
-        UberIdentifier { uber_group: 9593, uber_id: 59344 },
+        UberIdentifier::new(9593, 59344),
     ),
     (
         "MarshPastOpher.LeftEyestone",
-        UberIdentifier { uber_group: 21786, uber_id: 27433 },
+        UberIdentifier::new(21786, 27433),
     ),
     (
         "MarshPastOpher.RightEyestone",
-        UberIdentifier { uber_group: 21786, uber_id: 37225 },
+        UberIdentifier::new(21786, 37225),
     ),
     (
         "MarshPastOpher.BowEC",
-        UberIdentifier { uber_group: 21786, uber_id: 10295 },
+        UberIdentifier::new(21786, 10295),
     ),
     (
         "MarshPastOpher.BowTree",
-        UberIdentifier { uber_group: 0, uber_id: 97 },
+        UberIdentifier::new(0, 97),
     ),
     (
         "MarshPastOpher.CeilingEX",
-        UberIdentifier { uber_group: 21786, uber_id: 50255 },
+        UberIdentifier::new(21786, 50255),
     ),
     (
         "MarshPastOpher.PoolsPathEC",
-        UberIdentifier { uber_group: 9593, uber_id: 26457 },
+        UberIdentifier::new(9593, 26457),
     ),
     (
         "MarshPastOpher.PoolsPathEX",
-        UberIdentifier { uber_group: 945, uber_id: 10833 },
+        UberIdentifier::new(945, 10833),
     ),
     (
         "WestHollow.CrusherHC",
-        UberIdentifier { uber_group: 937, uber_id: 61897 },
+        UberIdentifier::new(937, 61897),
     ),
     (
         "WestHollow.FarLeftEX",
-        UberIdentifier { uber_group: 937, uber_id: 16163 },
+        UberIdentifier::new(937, 16163),
     ),
     (
         "WestHollow.RockPuzzleEX",
-        UberIdentifier { uber_group: 937, uber_id: 2538 },
+        UberIdentifier::new(937, 2538),
     ),
     (
         "WestHollow.HiddenEC",
-        UberIdentifier { uber_group: 937, uber_id: 8518 },
+        UberIdentifier::new(937, 8518),
     ),
     (
         "WestHollow.QuickshotShard",
-        UberIdentifier { uber_group: 23987, uber_id: 61017 },
+        UberIdentifier::new(23987, 61017),
     ),
     (
         "WestHollow.SwimEC",
-        UberIdentifier { uber_group: 937, uber_id: 24175 },
+        UberIdentifier::new(937, 24175),
     ),
     (
         "WestHollow.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 3638 },
+        UberIdentifier::new(48248, 3638),
     ),
     (
         "WestHollow.TrialHC",
-        UberIdentifier { uber_group: 937, uber_id: 2463 },
+        UberIdentifier::new(937, 2463),
     ),
     (
         "WestHollow.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 25545 },
+        UberIdentifier::new(44964, 25545),
     ),
     (
         "WestHollow.BelowLupoEX",
-        UberIdentifier { uber_group: 937, uber_id: 48192 },
+        UberIdentifier::new(937, 48192),
     ),
     (
         "WestHollow.AboveDashEX",
-        UberIdentifier { uber_group: 937, uber_id: 61744 },
+        UberIdentifier::new(937, 61744),
     ),
     (
         "WestHollow.DashRightEX",
-        UberIdentifier { uber_group: 937, uber_id: 37926 },
+        UberIdentifier::new(937, 37926),
     ),
     (
         "WestHollow.CrusherEX",
-        UberIdentifier { uber_group: 937, uber_id: 50176 },
+        UberIdentifier::new(937, 50176),
     ),
     (
         "WestHollow.DashTree",
-        UberIdentifier { uber_group: 0, uber_id: 102 },
+        UberIdentifier::new(0, 102),
     ),
     (
         "EastHollow.HandToHandMap",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "EastHollow.GladesApproachOre",
-        UberIdentifier { uber_group: 937, uber_id: 10729 },
+        UberIdentifier::new(937, 10729),
     ),
     (
         "EastHollow.HornBeetleFightEX",
-        UberIdentifier { uber_group: 937, uber_id: 13413 },
+        UberIdentifier::new(937, 13413),
     ),
     (
         "EastHollow.SpikeLanternEX",
-        UberIdentifier { uber_group: 937, uber_id: 5568 },
+        UberIdentifier::new(937, 5568),
     ),
     (
         "EastHollow.SecretRoofEX",
-        UberIdentifier { uber_group: 937, uber_id: 45987 },
+        UberIdentifier::new(937, 45987),
     ),
     (
         "EastHollow.MortarEX",
-        UberIdentifier { uber_group: 937, uber_id: 19529 },
+        UberIdentifier::new(937, 19529),
     ),
     (
         "EastHollow.BashEC",
-        UberIdentifier { uber_group: 937, uber_id: 23772 },
+        UberIdentifier::new(937, 23772),
     ),
     (
         "EastHollow.BashHC",
-        UberIdentifier { uber_group: 13428, uber_id: 59730 },
+        UberIdentifier::new(13428, 59730),
     ),
     (
         "EastHollow.BashEX",
-        UberIdentifier { uber_group: 937, uber_id: 30182 },
+        UberIdentifier::new(937, 30182),
     ),
     (
         "EastHollow.BashTree",
-        UberIdentifier { uber_group: 0, uber_id: 0 },
+        UberIdentifier::new(0, 0),
     ),
     (
         "EastHollow.KwolokAmuletQuest",
-        UberIdentifier { uber_group: 14019, uber_id: 50597 },
+        UberIdentifier::new(14019, 50597),
     ),
     (
         "EastHollow.RightKwolokEX",
-        UberIdentifier { uber_group: 58674, uber_id: 20983 },
+        UberIdentifier::new(58674, 20983),
     ),
     (
         "EastHollow.SilentSwimEC",
-        UberIdentifier { uber_group: 58674, uber_id: 9583 },
+        UberIdentifier::new(58674, 9583),
     ),
     (
         "EastHollow.SplinterShard",
-        UberIdentifier { uber_group: 23987, uber_id: 62973 },
+        UberIdentifier::new(23987, 62973),
     ),
     (
         "EastHollow.ForestsVoice",
-        UberIdentifier { uber_group: 46462, uber_id: 59806 },
+        UberIdentifier::new(46462, 59806),
     ),
     (
         "EastHollow.KwolokSwimOre",
-        UberIdentifier { uber_group: 46462, uber_id: 37897 },
+        UberIdentifier::new(46462, 37897),
     ),
     (
         "EastHollow.KwolokSwimLeftEX",
-        UberIdentifier { uber_group: 46462, uber_id: 29054 },
+        UberIdentifier::new(46462, 29054),
     ),
     (
         "EastHollow.KwolokSwimRightEX",
-        UberIdentifier { uber_group: 46462, uber_id: 20780 },
+        UberIdentifier::new(46462, 20780),
     ),
     (
         "EastHollow.DepthsExteriorEX",
-        UberIdentifier { uber_group: 18793, uber_id: 42980 },
+        UberIdentifier::new(18793, 42980),
     ),
     (
         "GladesTown.HandToHandPouch",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "GladesTown.HandToHandLantern",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "GladesTown.HandToHandCanteen",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "GladesTown.HandToHandSoup",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "GladesTown.FamilyReunionKey",
-        UberIdentifier { uber_group: 14019, uber_id: 27804 },
+        UberIdentifier::new(14019, 27804),
     ),
     (
         "GladesTown.AcornQI",
-        UberIdentifier { uber_group: 14019, uber_id: 2782 },
+        UberIdentifier::new(14019, 2782),
     ),
     (
         "GladesTown.MokiAcornQuest",
-        UberIdentifier { uber_group: 14019, uber_id: 33776 },
+        UberIdentifier::new(14019, 33776),
     ),
     (
         "GladesTown.HoleHutEC",
-        UberIdentifier { uber_group: 42178, uber_id: 52786 },
+        UberIdentifier::new(42178, 52786),
     ),
     (
         "GladesTown.AboveGromHC",
-        UberIdentifier { uber_group: 44310, uber_id: 29043 },
+        UberIdentifier::new(44310, 29043),
     ),
     (
         "GladesTown.LupoSwimHC",
-        UberIdentifier { uber_group: 44310, uber_id: 17523 },
+        UberIdentifier::new(44310, 17523),
     ),
     (
         "GladesTown.UpperOre",
-        UberIdentifier { uber_group: 42178, uber_id: 27110 },
+        UberIdentifier::new(42178, 27110),
     ),
     (
         "GladesTown.LowerOre",
-        UberIdentifier { uber_group: 42178, uber_id: 23125 },
+        UberIdentifier::new(42178, 23125),
     ),
     (
         "GladesTown.ArcingShard",
-        UberIdentifier { uber_group: 23987, uber_id: 23015 },
+        UberIdentifier::new(23987, 23015),
     ),
     (
         "GladesTown.BountyShard",
-        UberIdentifier { uber_group: 23987, uber_id: 14014 },
+        UberIdentifier::new(23987, 14014),
     ),
     (
         "GladesTown.LupoSoupEX",
-        UberIdentifier { uber_group: 42178, uber_id: 51468 },
+        UberIdentifier::new(42178, 51468),
     ),
     (
         "GladesTown.BraveMokiHutEX",
-        UberIdentifier { uber_group: 42178, uber_id: 13327 },
+        UberIdentifier::new(42178, 13327),
     ),
     (
         "GladesTown.MotayHutEX",
-        UberIdentifier { uber_group: 42178, uber_id: 57455 },
+        UberIdentifier::new(42178, 57455),
     ),
     (
         "GladesTown.HoleHutEX",
-        UberIdentifier { uber_group: 42178, uber_id: 30520 },
+        UberIdentifier::new(42178, 30520),
     ),
     (
         "GladesTown.UpperLeftEX",
-        UberIdentifier { uber_group: 42178, uber_id: 59623 },
+        UberIdentifier::new(42178, 59623),
     ),
     (
         "GladesTown.LupoSwimMiddleEX",
-        UberIdentifier { uber_group: 42178, uber_id: 9780 },
+        UberIdentifier::new(42178, 9780),
     ),
     (
         "GladesTown.CaveBurrowEX",
-        UberIdentifier { uber_group: 42178, uber_id: 18448 },
+        UberIdentifier::new(42178, 18448),
     ),
     (
         "GladesTown.BelowHoleHutEX",
-        UberIdentifier { uber_group: 42178, uber_id: 6117 },
+        UberIdentifier::new(42178, 6117),
     ),
     (
         "GladesTown.KeyMokiHutEX",
-        UberIdentifier { uber_group: 42178, uber_id: 51934 },
+        UberIdentifier::new(42178, 51934),
     ),
     (
         "GladesTown.AboveTpEX",
-        UberIdentifier { uber_group: 42178, uber_id: 42762 },
+        UberIdentifier::new(42178, 42762),
     ),
     (
         "GladesTown.AboveCaveEX",
-        UberIdentifier { uber_group: 42178, uber_id: 30206 },
+        UberIdentifier::new(42178, 30206),
     ),
     (
         "GladesTown.LupoSwimLeftEX",
-        UberIdentifier { uber_group: 42178, uber_id: 37028 },
+        UberIdentifier::new(42178, 37028),
     ),
     (
         "GladesTown.UpdraftCeilingEX",
-        UberIdentifier { uber_group: 42178, uber_id: 63404 },
+        UberIdentifier::new(42178, 63404),
     ),
     (
         "GladesTown.LeafPileEX",
-        UberIdentifier { uber_group: 42178, uber_id: 44748 },
+        UberIdentifier::new(42178, 44748),
     ),
     (
         "GladesTown.DamageTree",
-        UberIdentifier { uber_group: 0, uber_id: 120 },
+        UberIdentifier::new(0, 120),
     ),
     (
         "GladesTown.RebuildTheGlades",
-        UberIdentifier { uber_group: 14019, uber_id: 44578 },
+        UberIdentifier::new(14019, 44578),
     ),
     (
         "GladesTown.TwillenGemQuest",
-        UberIdentifier { uber_group: 23987, uber_id: 14832 },
+        UberIdentifier::new(23987, 14832),
     ),
     (
         "GladesTown.RegrowTheGlades",
-        UberIdentifier { uber_group: 14019, uber_id: 26394 },
+        UberIdentifier::new(14019, 26394),
     ),
     (
         "WestGlades.GrappleEX",
-        UberIdentifier { uber_group: 53632, uber_id: 12019 },
+        UberIdentifier::new(53632, 12019),
     ),
     (
         "WestGlades.AbovePlantEX",
-        UberIdentifier { uber_group: 937, uber_id: 31036 },
+        UberIdentifier::new(937, 31036),
     ),
     (
         "WestGlades.LowerPoolEX",
-        UberIdentifier { uber_group: 937, uber_id: 40657 },
+        UberIdentifier::new(937, 40657),
     ),
     (
         "WestGlades.UpperPoolEX",
-        UberIdentifier { uber_group: 937, uber_id: 45744 },
+        UberIdentifier::new(937, 45744),
     ),
     (
         "WestGlades.SwimEC",
-        UberIdentifier { uber_group: 937, uber_id: 17761 },
+        UberIdentifier::new(937, 17761),
     ),
     (
         "WestGlades.LeftOre",
-        UberIdentifier { uber_group: 937, uber_id: 6703 },
+        UberIdentifier::new(937, 6703),
     ),
     (
         "WestGlades.RightOre",
-        UberIdentifier { uber_group: 937, uber_id: 11846 },
+        UberIdentifier::new(937, 11846),
     ),
     (
         "WestGlades.ShrineHC",
-        UberIdentifier { uber_group: 44310, uber_id: 36911 },
+        UberIdentifier::new(44310, 36911),
     ),
     (
         "WestGlades.CombatShrine",
-        UberIdentifier { uber_group: 44310, uber_id: 9902 },
+        UberIdentifier::new(44310, 9902),
     ),
     (
         "OuterWellspring.RightWallOre",
-        UberIdentifier { uber_group: 53632, uber_id: 25556 },
+        UberIdentifier::new(53632, 25556),
     ),
     (
         "OuterWellspring.RightWallEC",
-        UberIdentifier { uber_group: 53632, uber_id: 1911 },
+        UberIdentifier::new(53632, 1911),
     ),
     (
         "OuterWellspring.RightWallEX",
-        UberIdentifier { uber_group: 53632, uber_id: 51706 },
+        UberIdentifier::new(53632, 51706),
     ),
     (
         "OuterWellspring.TrialOre",
-        UberIdentifier { uber_group: 37858, uber_id: 58286 },
+        UberIdentifier::new(37858, 58286),
     ),
     (
         "OuterWellspring.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 11512 },
+        UberIdentifier::new(44964, 11512),
     ),
     (
         "OuterWellspring.UltraGrappleShard",
-        UberIdentifier { uber_group: 23987, uber_id: 12104 },
+        UberIdentifier::new(23987, 12104),
     ),
     (
         "OuterWellspring.HiddenHC",
-        UberIdentifier { uber_group: 53632, uber_id: 17403 },
+        UberIdentifier::new(53632, 17403),
     ),
     (
         "OuterWellspring.EntranceRoofEX",
-        UberIdentifier { uber_group: 53632, uber_id: 42264 },
+        UberIdentifier::new(53632, 42264),
     ),
     (
         "OuterWellspring.WheelEX",
-        UberIdentifier { uber_group: 53632, uber_id: 6500 },
+        UberIdentifier::new(53632, 6500),
     ),
     (
         "OuterWellspring.BasementEC",
-        UberIdentifier { uber_group: 53632, uber_id: 6869 },
+        UberIdentifier::new(53632, 6869),
     ),
     (
         "OuterWellspring.LifeHarvestShard",
-        UberIdentifier { uber_group: 23987, uber_id: 53934 },
+        UberIdentifier::new(23987, 53934),
     ),
     (
         "OuterWellspring.SwimEX",
-        UberIdentifier { uber_group: 53632, uber_id: 62356 },
+        UberIdentifier::new(53632, 62356),
     ),
     (
         "OuterWellspring.SwimOre",
-        UberIdentifier { uber_group: 53632, uber_id: 21124 },
+        UberIdentifier::new(53632, 21124),
     ),
     (
         "OuterWellspring.TheLostCompass",
-        UberIdentifier { uber_group: 14019, uber_id: 20667 },
+        UberIdentifier::new(14019, 20667),
     ),
     (
         "InnerWellspring.ThornShard",
-        UberIdentifier { uber_group: 23987, uber_id: 31426 },
+        UberIdentifier::new(23987, 31426),
     ),
     (
         "InnerWellspring.ThornEX",
-        UberIdentifier { uber_group: 37858, uber_id: 22107 },
+        UberIdentifier::new(37858, 22107),
     ),
     (
         "InnerWellspring.ThreeWheelsEX",
-        UberIdentifier { uber_group: 37858, uber_id: 45906 },
+        UberIdentifier::new(37858, 45906),
     ),
     (
         "InnerWellspring.WaterSwitchEX",
-        UberIdentifier { uber_group: 37858, uber_id: 45656 },
+        UberIdentifier::new(37858, 45656),
     ),
     (
         "InnerWellspring.DrainHC",
-        UberIdentifier { uber_group: 37858, uber_id: 25833 },
+        UberIdentifier::new(37858, 25833),
     ),
     (
         "InnerWellspring.DrainEX",
-        UberIdentifier { uber_group: 37858, uber_id: 41380 },
+        UberIdentifier::new(37858, 41380),
     ),
     (
         "InnerWellspring.LaserOre",
-        UberIdentifier { uber_group: 37858, uber_id: 58846 },
+        UberIdentifier::new(37858, 58846),
     ),
     (
         "InnerWellspring.LeverEC",
-        UberIdentifier { uber_group: 37858, uber_id: 57552 },
+        UberIdentifier::new(37858, 57552),
     ),
     (
         "InnerWellspring.LupoEX",
-        UberIdentifier { uber_group: 37858, uber_id: 41911 },
+        UberIdentifier::new(37858, 41911),
     ),
     (
         "InnerWellspring.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 1590 },
+        UberIdentifier::new(48248, 1590),
     ),
     (
         "InnerWellspring.ShortcutWheelEX",
-        UberIdentifier { uber_group: 37858, uber_id: 33063 },
+        UberIdentifier::new(37858, 33063),
     ),
     (
         "InnerWellspring.GrappleTreeEX",
-        UberIdentifier { uber_group: 37858, uber_id: 31136 },
+        UberIdentifier::new(37858, 31136),
     ),
     (
         "InnerWellspring.GrappleTree",
-        UberIdentifier { uber_group: 0, uber_id: 57 },
+        UberIdentifier::new(0, 57),
     ),
     (
         "InnerWellspring.AboveSpinArenaEX",
-        UberIdentifier { uber_group: 37858, uber_id: 64086 },
+        UberIdentifier::new(37858, 64086),
     ),
     (
         "InnerWellspring.HandToHandHerbs",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "InnerWellspring.RotateRoomEX",
-        UberIdentifier { uber_group: 37858, uber_id: 52110 },
+        UberIdentifier::new(37858, 52110),
     ),
     (
         "InnerWellspring.RotateRoomOre",
-        UberIdentifier { uber_group: 37858, uber_id: 47533 },
+        UberIdentifier::new(37858, 47533),
     ),
     (
         "InnerWellspring.NeedleQI",
-        UberIdentifier { uber_group: 53632, uber_id: 41227 },
+        UberIdentifier::new(53632, 41227),
     ),
     (
         "InnerWellspring.LibraryEX",
-        UberIdentifier { uber_group: 37858, uber_id: 59022 },
+        UberIdentifier::new(37858, 59022),
     ),
     (
         "InnerWellspring.AboveTpEX",
-        UberIdentifier { uber_group: 37858, uber_id: 2797 },
+        UberIdentifier::new(37858, 2797),
     ),
     (
         "InnerWellspring.BlueMoonSeed",
-        UberIdentifier { uber_group: 14019, uber_id: 24142 },
+        UberIdentifier::new(14019, 24142),
     ),
     (
         "InnerWellspring.SwimOre",
-        UberIdentifier { uber_group: 37858, uber_id: 32932 },
+        UberIdentifier::new(37858, 32932),
     ),
     (
         "InnerWellspring.EscapeRevisitEX",
-        UberIdentifier { uber_group: 37858, uber_id: 56444 },
+        UberIdentifier::new(37858, 56444),
     ),
     (
         "InnerWellspring.WaterEscape",
-        UberIdentifier { uber_group: 37858, uber_id: 12379 },
+        UberIdentifier::new(37858, 12379),
     ),
     (
         "PoolsApproach.CurrentEX",
-        UberIdentifier { uber_group: 945, uber_id: 10682 },
+        UberIdentifier::new(945, 10682),
     ),
     (
         "PoolsApproach.AboveWheelEX",
-        UberIdentifier { uber_group: 945, uber_id: 14530 },
+        UberIdentifier::new(945, 14530),
     ),
     (
         "PoolsApproach.MillPathHC",
-        UberIdentifier { uber_group: 945, uber_id: 37243 },
+        UberIdentifier::new(945, 37243),
     ),
     (
         "PoolsApproach.MillPathEC",
-        UberIdentifier { uber_group: 945, uber_id: 21334 },
+        UberIdentifier::new(945, 21334),
     ),
     (
         "PoolsApproach.MillPathEX",
-        UberIdentifier { uber_group: 945, uber_id: 58723 },
+        UberIdentifier::new(945, 58723),
     ),
     (
         "EastPools.RightOre",
-        UberIdentifier { uber_group: 5377, uber_id: 34852 },
+        UberIdentifier::new(5377, 34852),
     ),
     (
         "EastPools.KwolokAmuletQI",
-        UberIdentifier { uber_group: 14019, uber_id: 53103 },
+        UberIdentifier::new(14019, 53103),
     ),
     (
         "EastPools.TwoCrushersEX",
-        UberIdentifier { uber_group: 5377, uber_id: 13832 },
+        UberIdentifier::new(5377, 13832),
     ),
     (
         "EastPools.CurrentEX",
-        UberIdentifier { uber_group: 5377, uber_id: 17396 },
+        UberIdentifier::new(5377, 17396),
     ),
     (
         "EastPools.BelowLeverEX",
-        UberIdentifier { uber_group: 5377, uber_id: 27204 },
+        UberIdentifier::new(5377, 27204),
     ),
     (
         "EastPools.AboveDoorOre",
-        UberIdentifier { uber_group: 5377, uber_id: 19694 },
+        UberIdentifier::new(5377, 19694),
     ),
     (
         "EastPools.PurpleWallHC",
-        UberIdentifier { uber_group: 5377, uber_id: 63201 },
+        UberIdentifier::new(5377, 63201),
     ),
     (
         "EastPools.HandToHandSpyglass",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "EastPools.AboveTpEX",
-        UberIdentifier { uber_group: 5377, uber_id: 7540 },
+        UberIdentifier::new(5377, 7540),
     ),
     (
         "EastPools.LupoOre",
-        UberIdentifier { uber_group: 5377, uber_id: 12235 },
+        UberIdentifier::new(5377, 12235),
     ),
     (
         "EastPools.UltraBashShard",
-        UberIdentifier { uber_group: 23987, uber_id: 25996 },
+        UberIdentifier::new(23987, 25996),
     ),
     (
         "EastPools.FightRoomHC",
-        UberIdentifier { uber_group: 5377, uber_id: 45774 },
+        UberIdentifier::new(5377, 45774),
     ),
     (
         "EastPools.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 54686 },
+        UberIdentifier::new(44964, 54686),
     ),
     (
         "EastPools.EnergyHarvestShard",
-        UberIdentifier { uber_group: 5377, uber_id: 40328 },
+        UberIdentifier::new(5377, 40328),
     ),
     (
         "EastPools.LupoEX",
-        UberIdentifier { uber_group: 5377, uber_id: 35440 },
+        UberIdentifier::new(5377, 35440),
     ),
     (
         "EastPools.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 1557 },
+        UberIdentifier::new(48248, 1557),
     ),
     (
         "EastPools.BehindCrusherEX",
-        UberIdentifier { uber_group: 5377, uber_id: 18345 },
+        UberIdentifier::new(5377, 18345),
     ),
     (
         "EastPools.GrassSeed",
-        UberIdentifier { uber_group: 14019, uber_id: 28662 },
+        UberIdentifier::new(14019, 28662),
     ),
     (
         "UpperPools.LowerKS",
-        UberIdentifier { uber_group: 5377, uber_id: 46926 },
+        UberIdentifier::new(5377, 46926),
     ),
     (
         "UpperPools.UpperLeftKS",
-        UberIdentifier { uber_group: 5377, uber_id: 35091 },
+        UberIdentifier::new(5377, 35091),
     ),
     (
         "UpperPools.UpperMidKS",
-        UberIdentifier { uber_group: 5377, uber_id: 16426 },
+        UberIdentifier::new(5377, 16426),
     ),
     (
         "UpperPools.UpperRightKS",
-        UberIdentifier { uber_group: 5377, uber_id: 41881 },
+        UberIdentifier::new(5377, 41881),
     ),
     (
         "UpperPools.FishPoolEX",
-        UberIdentifier { uber_group: 5377, uber_id: 33110 },
+        UberIdentifier::new(5377, 33110),
     ),
     (
         "UpperPools.FishPoolOre",
-        UberIdentifier { uber_group: 5377, uber_id: 31434 },
+        UberIdentifier::new(5377, 31434),
     ),
     (
         "UpperPools.BubblesEC",
-        UberIdentifier { uber_group: 5377, uber_id: 1600 },
+        UberIdentifier::new(5377, 1600),
     ),
     (
         "UpperPools.LeftBubblesEX",
-        UberIdentifier { uber_group: 5377, uber_id: 628 },
+        UberIdentifier::new(5377, 628),
     ),
     (
         "UpperPools.RightBubblesEX",
-        UberIdentifier { uber_group: 5377, uber_id: 21860 },
+        UberIdentifier::new(5377, 21860),
     ),
     (
         "UpperPools.SwimDashTree",
-        UberIdentifier { uber_group: 0, uber_id: 104 },
+        UberIdentifier::new(0, 104),
     ),
     (
         "UpperPools.CurrentEX",
-        UberIdentifier { uber_group: 5377, uber_id: 52791 },
+        UberIdentifier::new(5377, 52791),
     ),
     (
         "UpperPools.RoofEX",
-        UberIdentifier { uber_group: 5377, uber_id: 33180 },
+        UberIdentifier::new(5377, 33180),
     ),
     (
         "UpperPools.WaterfallEC",
-        UberIdentifier { uber_group: 5377, uber_id: 32750 },
+        UberIdentifier::new(5377, 32750),
     ),
     (
         "WestPools.BurrowEX",
-        UberIdentifier { uber_group: 5377, uber_id: 62180 },
+        UberIdentifier::new(5377, 62180),
     ),
     (
         "WestPools.BurrowOre",
-        UberIdentifier { uber_group: 5377, uber_id: 65019 },
+        UberIdentifier::new(5377, 65019),
     ),
     (
         "WestPools.TpEX",
-        UberIdentifier { uber_group: 5377, uber_id: 25391 },
+        UberIdentifier::new(5377, 25391),
     ),
     (
         "WestPools.EscapeRevisitEX",
-        UberIdentifier { uber_group: 5377, uber_id: 44122 },
+        UberIdentifier::new(5377, 44122),
     ),
     (
         "WestPools.ForestsStrength",
-        UberIdentifier { uber_group: 945, uber_id: 49747 },
+        UberIdentifier::new(945, 49747),
     ),
     (
         "WoodsEntry.LastTreeBranch",
-        UberIdentifier { uber_group: 14019, uber_id: 59708 },
+        UberIdentifier::new(14019, 59708),
     ),
     (
         "WoodsEntry.DollQI",
-        UberIdentifier { uber_group: 14019, uber_id: 57399 },
+        UberIdentifier::new(14019, 57399),
     ),
     (
         "WoodsEntry.TreeSeed",
-        UberIdentifier { uber_group: 14019, uber_id: 7470 },
+        UberIdentifier::new(14019, 7470),
     ),
     (
         "WoodsEntry.MudPitEX",
-        UberIdentifier { uber_group: 58674, uber_id: 8487 },
+        UberIdentifier::new(58674, 8487),
     ),
     (
         "WoodsEntry.LedgeOre",
-        UberIdentifier { uber_group: 58674, uber_id: 28710 },
+        UberIdentifier::new(58674, 28710),
     ),
     (
         "WoodsEntry.LeafPileEX",
-        UberIdentifier { uber_group: 58674, uber_id: 22472 },
+        UberIdentifier::new(58674, 22472),
     ),
     (
         "WoodsEntry.TpEX",
-        UberIdentifier { uber_group: 58674, uber_id: 59691 },
+        UberIdentifier::new(58674, 59691),
     ),
     (
         "WoodsEntry.LowerKS",
-        UberIdentifier { uber_group: 58674, uber_id: 40073 },
+        UberIdentifier::new(58674, 40073),
     ),
     (
         "WoodsEntry.UpperKS",
-        UberIdentifier { uber_group: 58674, uber_id: 11736 },
+        UberIdentifier::new(58674, 11736),
     ),
     (
         "WoodsMain.RightKS",
-        UberIdentifier { uber_group: 58674, uber_id: 43033 },
+        UberIdentifier::new(58674, 43033),
     ),
     (
         "WoodsMain.UpperKS",
-        UberIdentifier { uber_group: 58674, uber_id: 19769 },
+        UberIdentifier::new(58674, 19769),
     ),
     (
         "WoodsMain.LeftKS",
-        UberIdentifier { uber_group: 58674, uber_id: 42531 },
+        UberIdentifier::new(58674, 42531),
     ),
     (
         "WoodsMain.LowerKS",
-        UberIdentifier { uber_group: 58674, uber_id: 780 },
+        UberIdentifier::new(58674, 780),
     ),
     (
         "WoodsMain.BehindWallOre",
-        UberIdentifier { uber_group: 58674, uber_id: 26274 },
+        UberIdentifier::new(58674, 26274),
     ),
     (
         "WoodsMain.LowerLeafPileEX",
-        UberIdentifier { uber_group: 58674, uber_id: 42158 },
+        UberIdentifier::new(58674, 42158),
     ),
     (
         "WoodsMain.MiddleLeafPileEX",
-        UberIdentifier { uber_group: 58674, uber_id: 33893 },
+        UberIdentifier::new(58674, 33893),
     ),
     (
         "WoodsMain.UpperLeafPileEX",
-        UberIdentifier { uber_group: 58674, uber_id: 30908 },
+        UberIdentifier::new(58674, 30908),
     ),
     (
         "WoodsMain.YellowWallEX",
-        UberIdentifier { uber_group: 58674, uber_id: 59714 },
+        UberIdentifier::new(58674, 59714),
     ),
     (
         "WoodsMain.HiddenOre",
-        UberIdentifier { uber_group: 58674, uber_id: 20713 },
+        UberIdentifier::new(58674, 20713),
     ),
     (
         "WoodsMain.HiddenEX",
-        UberIdentifier { uber_group: 58674, uber_id: 54516 },
+        UberIdentifier::new(58674, 54516),
     ),
     (
         "WoodsMain.BelowKeystonesEX",
-        UberIdentifier { uber_group: 58674, uber_id: 23186 },
+        UberIdentifier::new(58674, 23186),
     ),
     (
         "WoodsMain.BehindDoorRoofEX",
-        UberIdentifier { uber_group: 58674, uber_id: 64057 },
+        UberIdentifier::new(58674, 64057),
     ),
     (
         "WoodsMain.PetrifiedHowlEX",
-        UberIdentifier { uber_group: 58674, uber_id: 17974 },
+        UberIdentifier::new(58674, 17974),
     ),
     (
         "WoodsMain.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 22703 },
+        UberIdentifier::new(44964, 22703),
     ),
     (
         "WoodsMain.OverflowShard",
-        UberIdentifier { uber_group: 23987, uber_id: 25183 },
+        UberIdentifier::new(23987, 25183),
     ),
     (
         "WoodsMain.CombatShrine",
-        UberIdentifier { uber_group: 58674, uber_id: 29265 },
+        UberIdentifier::new(58674, 29265),
     ),
     (
         "WoodsMain.ShrineEX",
-        UberIdentifier { uber_group: 58674, uber_id: 32647 },
+        UberIdentifier::new(58674, 32647),
     ),
     (
         "WoodsMain.FeedingGroundsEX",
-        UberIdentifier { uber_group: 58674, uber_id: 64484 },
+        UberIdentifier::new(58674, 64484),
     ),
     (
         "LowerReach.BelowBaurEX",
-        UberIdentifier { uber_group: 28895, uber_id: 55384 },
+        UberIdentifier::new(28895, 55384),
     ),
     (
         "LowerReach.AboveBaurLowerEX",
-        UberIdentifier { uber_group: 28895, uber_id: 24533 },
+        UberIdentifier::new(28895, 24533),
     ),
     (
         "LowerReach.AboveBaurUpperEX",
-        UberIdentifier { uber_group: 28895, uber_id: 3777 },
+        UberIdentifier::new(28895, 3777),
     ),
     (
         "LowerReach.IcefallOre",
-        UberIdentifier { uber_group: 28895, uber_id: 58675 },
+        UberIdentifier::new(28895, 58675),
     ),
     (
         "LowerReach.IcefallEX",
-        UberIdentifier { uber_group: 28895, uber_id: 45337 },
+        UberIdentifier::new(28895, 45337),
     ),
     (
         "LowerReach.AboveDoorEX",
-        UberIdentifier { uber_group: 28895, uber_id: 38143 },
+        UberIdentifier::new(28895, 38143),
     ),
     (
         "LowerReach.HiddenOre",
-        UberIdentifier { uber_group: 28895, uber_id: 47529 },
+        UberIdentifier::new(28895, 47529),
     ),
     (
         "LowerReach.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 29604 },
+        UberIdentifier::new(48248, 29604),
     ),
     (
         "LowerReach.MeltIceEX",
-        UberIdentifier { uber_group: 28895, uber_id: 4301 },
+        UberIdentifier::new(28895, 4301),
     ),
     (
         "LowerReach.BurrowEX",
-        UberIdentifier { uber_group: 28895, uber_id: 45066 },
+        UberIdentifier::new(28895, 45066),
     ),
     (
         "LowerReach.TPLeftEX",
-        UberIdentifier { uber_group: 28895, uber_id: 36231 },
+        UberIdentifier::new(28895, 36231),
     ),
     (
         "LowerReach.BelowLupoEX",
-        UberIdentifier { uber_group: 28895, uber_id: 38049 },
+        UberIdentifier::new(28895, 38049),
     ),
     (
         "LowerReach.BreakWallEX",
-        UberIdentifier { uber_group: 42178, uber_id: 40609 },
+        UberIdentifier::new(42178, 40609),
     ),
     (
         "LowerReach.WindBottomEX",
-        UberIdentifier { uber_group: 28895, uber_id: 35045 },
+        UberIdentifier::new(28895, 35045),
     ),
     (
         "LowerReach.WindHiddenEX",
-        UberIdentifier { uber_group: 28895, uber_id: 54373 },
+        UberIdentifier::new(28895, 54373),
     ),
     (
         "LowerReach.HandToHandHat",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "LowerReach.SnowballHC",
-        UberIdentifier { uber_group: 28895, uber_id: 40744 },
+        UberIdentifier::new(28895, 40744),
     ),
     (
         "LowerReach.RoofLeftEX",
-        UberIdentifier { uber_group: 28895, uber_id: 53283 },
+        UberIdentifier::new(28895, 53283),
     ),
     (
         "LowerReach.RoofRightEX",
-        UberIdentifier { uber_group: 28895, uber_id: 46711 },
+        UberIdentifier::new(28895, 46711),
     ),
     (
         "LowerReach.FractureShard",
-        UberIdentifier { uber_group: 23987, uber_id: 36359 },
+        UberIdentifier::new(23987, 36359),
     ),
     (
         "LowerReach.EscapeRevisitEX",
-        UberIdentifier { uber_group: 28895, uber_id: 46404 },
+        UberIdentifier::new(28895, 46404),
     ),
     (
         "LowerReach.ForestsMemory",
-        UberIdentifier { uber_group: 28895, uber_id: 25522 },
+        UberIdentifier::new(28895, 25522),
     ),
     (
         "LowerReach.RightKS",
-        UberIdentifier { uber_group: 28895, uber_id: 29898 },
+        UberIdentifier::new(28895, 29898),
     ),
     (
         "LowerReach.UpperLeftKS",
-        UberIdentifier { uber_group: 28895, uber_id: 10823 },
+        UberIdentifier::new(28895, 10823),
     ),
     (
         "LowerReach.MiddleLeftKS",
-        UberIdentifier { uber_group: 28895, uber_id: 37444 },
+        UberIdentifier::new(28895, 37444),
     ),
     (
         "LowerReach.BottomLeftKS",
-        UberIdentifier { uber_group: 28895, uber_id: 18358 },
+        UberIdentifier::new(28895, 18358),
     ),
     (
         "LowerReach.TrialEX",
-        UberIdentifier { uber_group: 28895, uber_id: 22761 },
+        UberIdentifier::new(28895, 22761),
     ),
     (
         "LowerReach.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 23661 },
+        UberIdentifier::new(44964, 23661),
     ),
     (
         "LowerReach.CatalystShard",
-        UberIdentifier { uber_group: 23987, uber_id: 897 },
+        UberIdentifier::new(23987, 897),
     ),
     (
         "UpperReach.LifeForceShard",
-        UberIdentifier { uber_group: 23987, uber_id: 19630 },
+        UberIdentifier::new(23987, 19630),
     ),
     (
         "UpperReach.LifeForceEX",
-        UberIdentifier { uber_group: 28287, uber_id: 32414 },
+        UberIdentifier::new(28287, 32414),
     ),
     (
         "UpperReach.LowerKS",
-        UberIdentifier { uber_group: 28895, uber_id: 1053 },
+        UberIdentifier::new(28895, 1053),
     ),
     (
         "UpperReach.UpperKS",
-        UberIdentifier { uber_group: 28895, uber_id: 50368 },
+        UberIdentifier::new(28895, 50368),
     ),
     (
         "UpperReach.MiddleLeftKS",
-        UberIdentifier { uber_group: 28895, uber_id: 22382 },
+        UberIdentifier::new(28895, 22382),
     ),
     (
         "UpperReach.MiddleRightKS",
-        UberIdentifier { uber_group: 28895, uber_id: 9949 },
+        UberIdentifier::new(28895, 9949),
     ),
     (
         "UpperReach.SoupOre",
-        UberIdentifier { uber_group: 28895, uber_id: 23795 },
+        UberIdentifier::new(28895, 23795),
     ),
     (
         "UpperReach.SwingPoleEX",
-        UberIdentifier { uber_group: 28895, uber_id: 40089 },
+        UberIdentifier::new(28895, 40089),
     ),
     (
         "UpperReach.SwimEX",
-        UberIdentifier { uber_group: 28895, uber_id: 40242 },
+        UberIdentifier::new(28895, 40242),
     ),
     (
         "UpperReach.LightBurstTree",
-        UberIdentifier { uber_group: 0, uber_id: 51 },
+        UberIdentifier::new(0, 51),
     ),
     (
         "UpperReach.TreeOre",
-        UberIdentifier { uber_group: 28895, uber_id: 39291 },
+        UberIdentifier::new(28895, 39291),
     ),
     (
         "UpperReach.WellEX",
-        UberIdentifier { uber_group: 28895, uber_id: 7597 },
+        UberIdentifier::new(28895, 7597),
     ),
     (
         "UpperReach.SpringSeed",
-        UberIdentifier { uber_group: 14019, uber_id: 32376 },
+        UberIdentifier::new(14019, 32376),
     ),
     (
         "UpperReach.HiddenEX",
-        UberIdentifier { uber_group: 28895, uber_id: 2129 },
+        UberIdentifier::new(28895, 2129),
     ),
     (
         "UpperDepths.EntrySpikesEX",
-        UberIdentifier { uber_group: 18793, uber_id: 19004 },
+        UberIdentifier::new(18793, 19004),
     ),
     (
         "UpperDepths.EntryRoofEX",
-        UberIdentifier { uber_group: 18793, uber_id: 15396 },
+        UberIdentifier::new(18793, 15396),
     ),
     (
         "UpperDepths.EntryOre",
-        UberIdentifier { uber_group: 18793, uber_id: 35351 },
+        UberIdentifier::new(18793, 35351),
     ),
     (
         "UpperDepths.RightEntryKS",
-        UberIdentifier { uber_group: 18793, uber_id: 1914 },
+        UberIdentifier::new(18793, 1914),
     ),
     (
         "UpperDepths.LeftEntryKS",
-        UberIdentifier { uber_group: 18793, uber_id: 58148 },
+        UberIdentifier::new(18793, 58148),
     ),
     (
         "UpperDepths.SwimEC",
-        UberIdentifier { uber_group: 18793, uber_id: 26618 },
+        UberIdentifier::new(18793, 26618),
     ),
     (
         "UpperDepths.TeleporterEX",
-        UberIdentifier { uber_group: 18793, uber_id: 29979 },
+        UberIdentifier::new(18793, 29979),
     ),
     (
         "UpperDepths.LeftHealthKS",
-        UberIdentifier { uber_group: 18793, uber_id: 53953 },
+        UberIdentifier::new(18793, 53953),
     ),
     (
         "UpperDepths.RightHealthKS",
-        UberIdentifier { uber_group: 18793, uber_id: 23986 },
+        UberIdentifier::new(18793, 23986),
     ),
     (
         "UpperDepths.LightcatcherSeed",
-        UberIdentifier { uber_group: 14019, uber_id: 8192 },
+        UberIdentifier::new(14019, 8192),
     ),
     (
         "UpperDepths.BossPathEX",
-        UberIdentifier { uber_group: 18793, uber_id: 18395 },
+        UberIdentifier::new(18793, 18395),
     ),
     (
         "UpperDepths.KeystoneHC",
-        UberIdentifier { uber_group: 18793, uber_id: 42235 },
+        UberIdentifier::new(18793, 42235),
     ),
     (
         "UpperDepths.HiveEX",
-        UberIdentifier { uber_group: 18793, uber_id: 6573 },
+        UberIdentifier::new(18793, 6573),
     ),
     (
         "UpperDepths.ForestsEyes",
-        UberIdentifier { uber_group: 18793, uber_id: 63291 },
+        UberIdentifier::new(18793, 63291),
     ),
     (
         "LowerDepths.RaceStartHC",
-        UberIdentifier { uber_group: 18793, uber_id: 62694 },
+        UberIdentifier::new(18793, 62694),
     ),
     (
         "LowerDepths.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 28552 },
+        UberIdentifier::new(44964, 28552),
     ),
     (
         "LowerDepths.BelowDoorOre",
-        UberIdentifier { uber_group: 18793, uber_id: 836 },
+        UberIdentifier::new(18793, 836),
     ),
     (
         "LowerDepths.SpiritSurgeShard",
-        UberIdentifier { uber_group: 23987, uber_id: 986 },
+        UberIdentifier::new(23987, 986),
     ),
     (
         "LowerDepths.HandToHandSilk",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "LowerDepths.CombatShrine",
-        UberIdentifier { uber_group: 18793, uber_id: 31937 },
+        UberIdentifier::new(18793, 31937),
     ),
     (
         "LowerDepths.SwimEC",
-        UberIdentifier { uber_group: 18793, uber_id: 28175 },
+        UberIdentifier::new(18793, 28175),
     ),
     (
         "LowerDepths.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 48423 },
+        UberIdentifier::new(48248, 48423),
     ),
     (
         "LowerDepths.LeftEX",
-        UberIdentifier { uber_group: 18793, uber_id: 2881 },
+        UberIdentifier::new(18793, 2881),
     ),
     (
         "LowerDepths.RightEX",
-        UberIdentifier { uber_group: 18793, uber_id: 23799 },
+        UberIdentifier::new(18793, 23799),
     ),
     (
         "LowerDepths.FlashTree",
-        UberIdentifier { uber_group: 0, uber_id: 62 },
+        UberIdentifier::new(0, 62),
     ),
     (
         "LowerWastes.WestTPOre",
-        UberIdentifier { uber_group: 7228, uber_id: 54494 },
+        UberIdentifier::new(7228, 54494),
     ),
     (
         "LowerWastes.PurpleWallEX",
-        UberIdentifier { uber_group: 7228, uber_id: 56821 },
+        UberIdentifier::new(7228, 56821),
     ),
     (
         "LowerWastes.SunsetViewEX",
-        UberIdentifier { uber_group: 7228, uber_id: 52086 },
+        UberIdentifier::new(7228, 52086),
     ),
     (
         "LowerWastes.SpiritTrial",
-        UberIdentifier { uber_group: 44964, uber_id: 30767 },
+        UberIdentifier::new(44964, 30767),
     ),
     (
         "LowerWastes.SandBridgeOre",
-        UberIdentifier { uber_group: 20120, uber_id: 46919 },
+        UberIdentifier::new(20120, 46919),
     ),
     (
         "LowerWastes.EerieGemQI",
-        UberIdentifier { uber_group: 14019, uber_id: 58342 },
+        UberIdentifier::new(14019, 58342),
     ),
     (
         "LowerWastes.MuncherTunnelEC",
-        UberIdentifier { uber_group: 20120, uber_id: 11785 },
+        UberIdentifier::new(20120, 11785),
     ),
     (
         "LowerWastes.SandPotHC",
-        UberIdentifier { uber_group: 20120, uber_id: 62264 },
+        UberIdentifier::new(20120, 62264),
     ),
     (
         "LowerWastes.SandPotEX",
-        UberIdentifier { uber_group: 20120, uber_id: 57781 },
+        UberIdentifier::new(20120, 57781),
     ),
     (
         "LowerWastes.MuncherPitEX",
-        UberIdentifier { uber_group: 20120, uber_id: 10397 },
+        UberIdentifier::new(20120, 10397),
     ),
     (
         "LowerWastes.BottomRightEX",
-        UberIdentifier { uber_group: 20120, uber_id: 224 },
+        UberIdentifier::new(20120, 224),
     ),
     (
         "LowerWastes.BottomRightHC",
-        UberIdentifier { uber_group: 20120, uber_id: 12941 },
+        UberIdentifier::new(20120, 12941),
     ),
     (
         "LowerWastes.LastStandShard",
-        UberIdentifier { uber_group: 23987, uber_id: 50364 },
+        UberIdentifier::new(23987, 50364),
     ),
     (
         "LowerWastes.LastStandEX",
-        UberIdentifier { uber_group: 20120, uber_id: 33275 },
+        UberIdentifier::new(20120, 33275),
     ),
     (
         "LowerWastes.MuncherClimbEX",
-        UberIdentifier { uber_group: 20120, uber_id: 57133 },
+        UberIdentifier::new(20120, 57133),
     ),
     (
         "LowerWastes.SkeetoHiveEX",
-        UberIdentifier { uber_group: 20120, uber_id: 8910 },
+        UberIdentifier::new(20120, 8910),
     ),
     (
         "LowerWastes.HandToHandMapstone",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "LowerWastes.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 61146 },
+        UberIdentifier::new(48248, 61146),
     ),
     (
         "LowerWastes.BurrowTree",
-        UberIdentifier { uber_group: 0, uber_id: 101 },
+        UberIdentifier::new(0, 101),
     ),
     (
         "LowerWastes.BurrowTreeEX",
-        UberIdentifier { uber_group: 20120, uber_id: 19113 },
+        UberIdentifier::new(20120, 19113),
     ),
     (
         "LowerWastes.UpperPathEC",
-        UberIdentifier { uber_group: 20120, uber_id: 50026 },
+        UberIdentifier::new(20120, 50026),
     ),
     (
         "LowerWastes.UpperPathEX",
-        UberIdentifier { uber_group: 20120, uber_id: 48829 },
+        UberIdentifier::new(20120, 48829),
     ),
     (
         "LowerWastes.UpperPathHiddenEX",
-        UberIdentifier { uber_group: 20120, uber_id: 17798 },
+        UberIdentifier::new(20120, 17798),
     ),
     (
         "LowerWastes.UpperPathHC",
-        UberIdentifier { uber_group: 20120, uber_id: 59046 },
+        UberIdentifier::new(20120, 59046),
     ),
     (
         "LowerWastes.EastTPOre",
-        UberIdentifier { uber_group: 20120, uber_id: 40245 },
+        UberIdentifier::new(20120, 40245),
     ),
     (
         "UpperWastes.LowerKS",
-        UberIdentifier { uber_group: 7228, uber_id: 20282 },
+        UberIdentifier::new(7228, 20282),
     ),
     (
         "UpperWastes.UpperKS",
-        UberIdentifier { uber_group: 7228, uber_id: 62117 },
+        UberIdentifier::new(7228, 62117),
     ),
     (
         "UpperWastes.TurmoilShard",
-        UberIdentifier { uber_group: 23987, uber_id: 48605 },
+        UberIdentifier::new(23987, 48605),
     ),
     (
         "UpperWastes.KSDoorEX",
-        UberIdentifier { uber_group: 7228, uber_id: 35329 },
+        UberIdentifier::new(7228, 35329),
     ),
     (
         "UpperWastes.LedgeEC",
-        UberIdentifier { uber_group: 20120, uber_id: 22354 },
+        UberIdentifier::new(20120, 22354),
     ),
     (
         "UpperWastes.MissileSpawnEX",
-        UberIdentifier { uber_group: 20120, uber_id: 30740 },
+        UberIdentifier::new(20120, 30740),
     ),
     (
         "UpperWastes.PurpleWallEX",
-        UberIdentifier { uber_group: 20120, uber_id: 52812 },
+        UberIdentifier::new(20120, 52812),
     ),
     (
         "UpperWastes.PurpleWallHC",
-        UberIdentifier { uber_group: 20120, uber_id: 18965 },
+        UberIdentifier::new(20120, 18965),
     ),
     (
         "UpperWastes.RoofEX",
-        UberIdentifier { uber_group: 20120, uber_id: 2013 },
+        UberIdentifier::new(20120, 2013),
     ),
     (
         "UpperWastes.SpinLasersRightEX",
-        UberIdentifier { uber_group: 7228, uber_id: 54275 },
+        UberIdentifier::new(7228, 54275),
     ),
     (
         "UpperWastes.SpinLasersMiddleEX",
-        UberIdentifier { uber_group: 7228, uber_id: 48993 },
+        UberIdentifier::new(7228, 48993),
     ),
     (
         "UpperWastes.SpinLasersLowerEX",
-        UberIdentifier { uber_group: 7228, uber_id: 61548 },
+        UberIdentifier::new(7228, 61548),
     ),
     (
         "UpperWastes.FlowersSeed",
-        UberIdentifier { uber_group: 14019, uber_id: 20601 },
+        UberIdentifier::new(14019, 20601),
     ),
     (
         "UpperWastes.WallOre",
-        UberIdentifier { uber_group: 7228, uber_id: 8370 },
+        UberIdentifier::new(7228, 8370),
     ),
     (
         "WindtornRuins.EscapeRevisitEC",
-        UberIdentifier { uber_group: 10289, uber_id: 44555 },
+        UberIdentifier::new(10289, 44555),
     ),
     (
         "WindtornRuins.Seir",
-        UberIdentifier { uber_group: 10289, uber_id: 22102 },
+        UberIdentifier::new(10289, 22102),
     ),
     (
         "WindtornRuins.HandToHandComplete",
-        UberIdentifier { uber_group: 14019, uber_id: 26318 },
+        UberIdentifier::new(14019, 26318),
     ),
     (
         "WeepingRidge.Ore",
-        UberIdentifier { uber_group: 36153, uber_id: 3013 },
+        UberIdentifier::new(36153, 3013),
     ),
     (
         "WeepingRidge.LaunchTree",
-        UberIdentifier { uber_group: 0, uber_id: 8 },
+        UberIdentifier::new(0, 8),
     ),
     (
         "WeepingRidge.SpikeClimbEX",
-        UberIdentifier { uber_group: 36153, uber_id: 36521 },
+        UberIdentifier::new(36153, 36521),
     ),
     (
         "WeepingRidge.PortalEX",
-        UberIdentifier { uber_group: 36153, uber_id: 12077 },
+        UberIdentifier::new(36153, 12077),
     ),
     (
         "WillowsEnd.SpikesOre",
-        UberIdentifier { uber_group: 16155, uber_id: 38979 },
+        UberIdentifier::new(16155, 38979),
     ),
     (
         "WillowsEnd.EntryEX",
-        UberIdentifier { uber_group: 16155, uber_id: 49381 },
+        UberIdentifier::new(16155, 49381),
     ),
     (
         "WillowsEnd.PoisonfallHC",
-        UberIdentifier { uber_group: 16155, uber_id: 46270 },
+        UberIdentifier::new(16155, 46270),
     ),
     (
         "WillowsEnd.LupoMap",
-        UberIdentifier { uber_group: 48248, uber_id: 4045 },
+        UberIdentifier::new(48248, 4045),
     ),
     (
         "WillowsEnd.WindSpinOre",
-        UberIdentifier { uber_group: 16155, uber_id: 9230 },
+        UberIdentifier::new(16155, 9230),
     ),
     (
         "WillowsEnd.RedirectEX",
-        UberIdentifier { uber_group: 16155, uber_id: 55446 },
+        UberIdentifier::new(16155, 55446),
     ),
     (
         "WillowsEnd.UpperLeftEX",
-        UberIdentifier { uber_group: 36153, uber_id: 23902 },
+        UberIdentifier::new(36153, 23902),
     ),
     (
         "WillowsEnd.UpperRightEX",
-        UberIdentifier { uber_group: 36153, uber_id: 3662 },
+        UberIdentifier::new(36153, 3662),
     ),
     (
         "TwillenShop.Overcharge",
-        UberIdentifier { uber_group: 2, uber_id: 1 },
+        UberIdentifier::new(2, 1),
     ),
     (
         "TwillenShop.TripleJump",
-        UberIdentifier { uber_group: 2, uber_id: 2 },
+        UberIdentifier::new(2, 2),
     ),
     (
         "TwillenShop.Wingclip",
-        UberIdentifier { uber_group: 2, uber_id: 3 },
+        UberIdentifier::new(2, 3),
     ),
     (
         "TwillenShop.Swap",
-        UberIdentifier { uber_group: 2, uber_id: 5 },
+        UberIdentifier::new(2, 5),
     ),
     (
         "TwillenShop.LightHarvest",
-        UberIdentifier { uber_group: 2, uber_id: 19 },
+        UberIdentifier::new(2, 19),
     ),
     (
         "TwillenShop.Vitality",
-        UberIdentifier { uber_group: 2, uber_id: 22 },
+        UberIdentifier::new(2, 22),
     ),
     (
         "TwillenShop.Energy",
-        UberIdentifier { uber_group: 2, uber_id: 26 },
+        UberIdentifier::new(2, 26),
     ),
     (
         "TwillenShop.Finesse",
-        UberIdentifier { uber_group: 2, uber_id: 40 },
+        UberIdentifier::new(2, 40),
     ),
     (
         "OpherShop.WaterBreath",
-        UberIdentifier { uber_group: 1, uber_id: 23 },
+        UberIdentifier::new(1, 23),
     ),
     (
         "OpherShop.Spike",
-        UberIdentifier { uber_group: 1, uber_id: 74 },
+        UberIdentifier::new(1, 74),
     ),
     (
         "OpherShop.SpiritSmash",
-        UberIdentifier { uber_group: 1, uber_id: 98 },
+        UberIdentifier::new(1, 98),
     ),
     (
         "OpherShop.Teleport",
-        UberIdentifier { uber_group: 1, uber_id: 105 },
+        UberIdentifier::new(1, 105),
     ),
     (
         "OpherShop.SpiritStar",
-        UberIdentifier { uber_group: 1, uber_id: 106 },
+        UberIdentifier::new(1, 106),
     ),
     (
         "OpherShop.Blaze",
-        UberIdentifier { uber_group: 1, uber_id: 115 },
+        UberIdentifier::new(1, 115),
     ),
     (
         "OpherShop.Sentry",
-        UberIdentifier { uber_group: 1, uber_id: 116 },
+        UberIdentifier::new(1, 116),
     ),
     (
         "OpherShop.ExplodingSpike",
-        UberIdentifier { uber_group: 1, uber_id: 1074 },
+        UberIdentifier::new(1, 1074),
     ),
     (
         "OpherShop.ShockSmash",
-        UberIdentifier { uber_group: 1, uber_id: 1098 },
+        UberIdentifier::new(1, 1098),
     ),
     (
         "OpherShop.StaticStar",
-        UberIdentifier { uber_group: 1, uber_id: 1106 },
+        UberIdentifier::new(1, 1106),
     ),
     (
         "OpherShop.ChargeBlaze",
-        UberIdentifier { uber_group: 1, uber_id: 1115 },
+        UberIdentifier::new(1, 1115),
     ),
     (
         "OpherShop.RapidSentry",
-        UberIdentifier { uber_group: 1, uber_id: 1116 },
+        UberIdentifier::new(1, 1116),
     ),
     (
         "LupoShop.HCMapIcon",
-        UberIdentifier { uber_group: 48248, uber_id: 19396 },
+        UberIdentifier::new(48248, 19396),
     ),
     (
         "LupoShop.ECMapIcon",
-        UberIdentifier { uber_group: 48248, uber_id: 57987 },
+        UberIdentifier::new(48248, 57987),
     ),
     (
         "LupoShop.ShardMapIcon",
-        UberIdentifier { uber_group: 48248, uber_id: 41666 },
+        UberIdentifier::new(48248, 41666),
     ),
     (
         "MarshSpawn.HowlBurnt",
-        UberIdentifier { uber_group: 21786, uber_id: 25095 },
+        UberIdentifier::new(21786, 25095),
     ),
     (
         "MarshSpawn.KeystoneDoor",
-        UberIdentifier { uber_group: 21786, uber_id: 42309 },
+        UberIdentifier::new(21786, 42309),
     ),
     (
         "MarshSpawn.RainLifted",
-        UberIdentifier { uber_group: 0, uber_id: 100 },
+        UberIdentifier::new(0, 100),
     ),
     (
         "MarshSpawn.LogBroken",
-        UberIdentifier { uber_group: 21786, uber_id: 59922 },
+        UberIdentifier::new(21786, 59922),
     ),
     (
         "MarshSpawn.BurrowsOpen",
-        UberIdentifier { uber_group: 24922, uber_id: 13349 },
+        UberIdentifier::new(24922, 13349),
     ),
     (
         "MarshSpawn.ToOpherBarrier",
-        UberIdentifier { uber_group: 21786, uber_id: 23177 },
+        UberIdentifier::new(21786, 23177),
     ),
     (
         "MarshSpawn.TokkBarrier",
-        UberIdentifier { uber_group: 21786, uber_id: 35166 },
+        UberIdentifier::new(21786, 35166),
     ),
     (
         "HowlsDen.BoneBarrier",
-        UberIdentifier { uber_group: 21786, uber_id: 53932 },
+        UberIdentifier::new(21786, 53932),
     ),
     (
         "HowlsDen.KeystoneDoor",
-        UberIdentifier { uber_group: 21786, uber_id: 47445 },
+        UberIdentifier::new(21786, 47445),
     ),
     (
         "MarshPastOpher.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 45951 },
+        UberIdentifier::new(44964, 45951),
     ),
     (
         "MarshPastOpher.EyestoneDoor",
-        UberIdentifier { uber_group: 937, uber_id: 64003 },
+        UberIdentifier::new(937, 64003),
     ),
     (
         "EastHollow.BeetleDefeated",
-        UberIdentifier { uber_group: 937, uber_id: 53122 },
+        UberIdentifier::new(937, 53122),
     ),
     (
         "EastHollow.VoiceDoor",
-        UberIdentifier { uber_group: 937, uber_id: 6778 },
+        UberIdentifier::new(937, 6778),
     ),
     (
         "EastHollow.DepthsLever",
-        UberIdentifier { uber_group: 937, uber_id: 22419 },
+        UberIdentifier::new(937, 22419),
     ),
     (
         "EastHollow.DepthsOpen",
-        UberIdentifier { uber_group: 18793, uber_id: 25789 },
+        UberIdentifier::new(18793, 25789),
     ),
     (
         "WestHollow.PurpleDoorOpen",
-        UberIdentifier { uber_group: 937, uber_id: 59850 },
+        UberIdentifier::new(937, 59850),
     ),
     (
         "WestHollow.UpperDrainLeverPulled",
-        UberIdentifier { uber_group: 937, uber_id: 42245 },
+        UberIdentifier::new(937, 42245),
     ),
     (
         "WestHollow.RockPuzzleSolved",
-        UberIdentifier { uber_group: 937, uber_id: 22716 },
+        UberIdentifier::new(937, 22716),
     ),
     (
         "WestHollow.FullyDrained",
-        UberIdentifier { uber_group: 937, uber_id: 42245 },
+        UberIdentifier::new(937, 42245),
     ),
     (
         "WestHollow.DoorLever",
-        UberIdentifier { uber_group: 937, uber_id: 59920 },
+        UberIdentifier::new(937, 59920),
     ),
     (
         "WestHollow.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 25545 },
+        UberIdentifier::new(44964, 25545),
     ),
     (
         "GladesTown.GromsWall",
-        UberIdentifier { uber_group: 42178, uber_id: 5815 },
+        UberIdentifier::new(42178, 5815),
     ),
     (
         "GladesTown.BuildHuts",
-        UberIdentifier { uber_group: 42178, uber_id: 51230 },
+        UberIdentifier::new(42178, 51230),
     ),
     (
         "GladesTown.CaveEntrance",
-        UberIdentifier { uber_group: 42178, uber_id: 16586 },
+        UberIdentifier::new(42178, 16586),
     ),
     (
         "GladesTown.ClearThorns",
-        UberIdentifier { uber_group: 42178, uber_id: 18751 },
+        UberIdentifier::new(42178, 18751),
     ),
     (
         "GladesTown.OnwardsAndUpwards",
-        UberIdentifier { uber_group: 42178, uber_id: 40448 },
+        UberIdentifier::new(42178, 40448),
     ),
     (
         "GladesTown.RoofsOverHeads",
-        UberIdentifier { uber_group: 42178, uber_id: 23607 },
+        UberIdentifier::new(42178, 23607),
     ),
     (
         "GladesTown.TuleySpawned",
-        UberIdentifier { uber_group: 6, uber_id: 300 },
+        UberIdentifier::new(6, 300),
     ),
     (
         "TuleyShop.BlueMoon",
-        UberIdentifier { uber_group: 42178, uber_id: 33011 },
+        UberIdentifier::new(42178, 33011),
     ),
     (
         "TuleyShop.LastTree",
-        UberIdentifier { uber_group: 42178, uber_id: 40006 },
+        UberIdentifier::new(42178, 40006),
     ),
     (
         "TuleyShop.LastTreeBranchRejected",
-        UberIdentifier { uber_group: 14019, uber_id: 59708 },
+        UberIdentifier::new(14019, 59708),
     ),
     (
         "TuleyShop.Lightcatchers",
-        UberIdentifier { uber_group: 42178, uber_id: 47651 },
+        UberIdentifier::new(42178, 47651),
     ),
     (
         "TuleyShop.SelaFlowers",
-        UberIdentifier { uber_group: 42178, uber_id: 16254 },
+        UberIdentifier::new(42178, 16254),
     ),
     (
         "TuleyShop.SpringPlants",
-        UberIdentifier { uber_group: 42178, uber_id: 38393 },
+        UberIdentifier::new(42178, 38393),
     ),
     (
         "TuleyShop.StickyGrass",
-        UberIdentifier { uber_group: 42178, uber_id: 64583 },
+        UberIdentifier::new(42178, 64583),
     ),
     (
         "MidnightBurrows.KeystoneDoor",
-        UberIdentifier { uber_group: 18793, uber_id: 3171 },
+        UberIdentifier::new(18793, 3171),
     ),
     (
         "MidnightBurrows.Lever",
-        UberIdentifier { uber_group: 24922, uber_id: 16603 },
+        UberIdentifier::new(24922, 16603),
     ),
     (
         "MidnightBurrows.HowlsDenShortcut",
-        UberIdentifier { uber_group: 24922, uber_id: 2524 },
+        UberIdentifier::new(24922, 2524),
     ),
     (
         "InnerWellspring.DrainLever",
-        UberIdentifier { uber_group: 37858, uber_id: 31187 },
+        UberIdentifier::new(37858, 31187),
     ),
     (
         "InnerWellspring.DrainRoomBottomWheel",
-        UberIdentifier { uber_group: 37858, uber_id: 50902 },
+        UberIdentifier::new(37858, 50902),
     ),
     (
         "InnerWellspring.DrainRoomTopWheel",
-        UberIdentifier { uber_group: 37858, uber_id: 60716 },
+        UberIdentifier::new(37858, 60716),
     ),
     (
         "InnerWellspring.MiddleDoorsOpen",
-        UberIdentifier { uber_group: 37858, uber_id: 9487 },
+        UberIdentifier::new(37858, 9487),
     ),
     (
         "InnerWellspring.ShortCutWheel",
-        UberIdentifier { uber_group: 37858, uber_id: 34433 },
+        UberIdentifier::new(37858, 34433),
     ),
     (
         "InnerWellspring.SpinArena",
-        UberIdentifier { uber_group: 37858, uber_id: 8487 },
+        UberIdentifier::new(37858, 8487),
     ),
     (
         "InnerWellspring.SpinPuzzleSolved",
-        UberIdentifier { uber_group: 37858, uber_id: 36070 },
+        UberIdentifier::new(37858, 36070),
     ),
     (
         "InnerWellspring.ThreeWheels",
-        UberIdentifier { uber_group: 37858, uber_id: 64055 },
+        UberIdentifier::new(37858, 64055),
     ),
     (
         "InnerWellspring.TopDoorOpen",
-        UberIdentifier { uber_group: 37858, uber_id: 31962 },
+        UberIdentifier::new(37858, 31962),
     ),
     (
         "InnerWellspring.UpperCorruption",
-        UberIdentifier { uber_group: 37858, uber_id: 31584 },
+        UberIdentifier::new(37858, 31584),
     ),
     (
         "OuterWellspring.EntranceDoorOpen",
-        UberIdentifier { uber_group: 37858, uber_id: 23644 },
+        UberIdentifier::new(37858, 23644),
     ),
     (
         "OuterWellspring.WestDoorBlueMoonFree",
-        UberIdentifier { uber_group: 53632, uber_id: 2522 },
+        UberIdentifier::new(53632, 2522),
     ),
     (
         "OuterWellspring.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 11512 },
+        UberIdentifier::new(44964, 11512),
     ),
     (
         "WoodsEntry.KeystoneDoor",
-        UberIdentifier { uber_group: 58674, uber_id: 21500 },
+        UberIdentifier::new(58674, 21500),
     ),
     (
         "WoodsMain.KeystoneDoor",
-        UberIdentifier { uber_group: 18793, uber_id: 41544 },
+        UberIdentifier::new(18793, 41544),
     ),
     (
         "WoodsMain.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 22703 },
+        UberIdentifier::new(44964, 22703),
     ),
     (
         "LowerReach.ArenaBeaten",
-        UberIdentifier { uber_group: 28895, uber_id: 42209 },
+        UberIdentifier::new(28895, 42209),
     ),
     (
         "LowerReach.BearBridgeBroken",
-        UberIdentifier { uber_group: 28895, uber_id: 49329 },
+        UberIdentifier::new(28895, 49329),
     ),
     (
         "LowerReach.BearSneezed",
-        UberIdentifier { uber_group: 28895, uber_id: 29098 },
+        UberIdentifier::new(28895, 29098),
     ),
     (
         "LowerReach.Lever",
-        UberIdentifier { uber_group: 28895, uber_id: 62198 },
+        UberIdentifier::new(28895, 62198),
     ),
     (
         "LowerReach.WindLantern",
-        UberIdentifier { uber_group: 28895, uber_id: 59394 },
+        UberIdentifier::new(28895, 59394),
     ),
     (
         "LowerReach.TPLantern",
-        UberIdentifier { uber_group: 28895, uber_id: 48757 },
+        UberIdentifier::new(28895, 48757),
     ),
     (
         "LowerReach.RolledSnowball",
-        UberIdentifier { uber_group: 28895, uber_id: 20731 },
+        UberIdentifier::new(28895, 20731),
     ),
     (
         "LowerReach.EastDoorLantern",
-        UberIdentifier { uber_group: 28895, uber_id: 37287 },
+        UberIdentifier::new(28895, 37287),
     ),
     (
         "LowerReach.KeystoneDoor",
-        UberIdentifier { uber_group: 28895, uber_id: 4290 },
+        UberIdentifier::new(28895, 4290),
     ),
     (
         "LowerReach.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 23661 },
+        UberIdentifier::new(44964, 23661),
     ),
     (
         "UpperReach.KeystoneDoor",
-        UberIdentifier { uber_group: 28895, uber_id: 49900 },
+        UberIdentifier::new(28895, 49900),
     ),
     (
         "UpperDepths.CentralKeystoneDoor",
-        UberIdentifier { uber_group: 18793, uber_id: 10758 },
+        UberIdentifier::new(18793, 10758),
     ),
     (
         "UpperDepths.EntryKeystoneDoor",
-        UberIdentifier { uber_group: 21786, uber_id: 59990 },
+        UberIdentifier::new(21786, 59990),
     ),
     (
         "UpperDepths.LightPuzzle",
-        UberIdentifier { uber_group: 18793, uber_id: 21994 },
+        UberIdentifier::new(18793, 21994),
     ),
     (
         "LowerDepths.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 28552 },
+        UberIdentifier::new(44964, 28552),
     ),
     (
         "PoolsApproach.WheelFreed",
-        UberIdentifier { uber_group: 945, uber_id: 12852 },
+        UberIdentifier::new(945, 12852),
     ),
     (
         "EastPools.BelowTokkBubbleFree",
-        UberIdentifier { uber_group: 5377, uber_id: 35751 },
+        UberIdentifier::new(5377, 35751),
     ),
     (
         "EastPools.EntryLever",
-        UberIdentifier { uber_group: 5377, uber_id: 14488 },
+        UberIdentifier::new(5377, 14488),
     ),
     (
         "EastPools.FightArenas",
-        UberIdentifier { uber_group: 5377, uber_id: 53480 },
+        UberIdentifier::new(5377, 53480),
     ),
     (
         "EastPools.LowerWaterDrained",
-        UberIdentifier { uber_group: 5377, uber_id: 63173 },
+        UberIdentifier::new(5377, 63173),
     ),
     (
         "EastPools.LupoPurpleFloor",
-        UberIdentifier { uber_group: 5377, uber_id: 8451 },
+        UberIdentifier::new(5377, 8451),
     ),
     (
         "EastPools.CentralRoomPurpleWall",
-        UberIdentifier { uber_group: 5377, uber_id: 10782 },
+        UberIdentifier::new(5377, 10782),
     ),
     (
         "UpperPools.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 54686 },
+        UberIdentifier::new(44964, 54686),
     ),
     (
         "UpperPools.KeystoneDoor",
-        UberIdentifier { uber_group: 5377, uber_id: 47621 },
+        UberIdentifier::new(5377, 47621),
     ),
     (
         "UpperPools.KeystoneRoomBubbleFree",
-        UberIdentifier { uber_group: 5377, uber_id: 15754 },
+        UberIdentifier::new(5377, 15754),
     ),
     (
         "UpperPools.TreeRoomLeftBubbleFree",
-        UberIdentifier { uber_group: 5377, uber_id: 24765 },
+        UberIdentifier::new(5377, 24765),
     ),
     (
         "UpperPools.UpperWaterDrained",
-        UberIdentifier { uber_group: 5377, uber_id: 29911 },
+        UberIdentifier::new(5377, 29911),
     ),
     (
         "UpperPools.ButtonDoorAboveTree",
-        UberIdentifier { uber_group: 5377, uber_id: 15402 },
+        UberIdentifier::new(5377, 15402),
     ),
     (
         "LowerWastes.SandPlatformLever",
-        UberIdentifier { uber_group: 20120, uber_id: 48009 },
+        UberIdentifier::new(20120, 48009),
     ),
     (
         "LowerWastes.TrialActivation",
-        UberIdentifier { uber_group: 44964, uber_id: 30767 },
+        UberIdentifier::new(44964, 30767),
     ),
     (
         "UpperWastes.KeystoneDoor",
-        UberIdentifier { uber_group: 20120, uber_id: 28786 },
+        UberIdentifier::new(20120, 28786),
     ),
     (
         "UpperWastes.LeverDoor",
-        UberIdentifier { uber_group: 20120, uber_id: 12902 },
+        UberIdentifier::new(20120, 12902),
     ),
     (
         "WindtornRuins.HeartBarrier",
-        UberIdentifier { uber_group: 10289, uber_id: 43103 },
+        UberIdentifier::new(10289, 43103),
     ),
     (
         "WindtornRuins.RuinsLever",
-        UberIdentifier { uber_group: 10289, uber_id: 41277 },
+        UberIdentifier::new(10289, 41277),
     ),
     (
         "WeepingRidge.ElevatorFightCompleted",
-        UberIdentifier { uber_group: 36153, uber_id: 23584 },
+        UberIdentifier::new(36153, 23584),
     ),
     (
         "WillowsEnd.GrappleWheelsHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 60752 },
+        UberIdentifier::new(16155, 60752),
     ),
     (
         "WillowsEnd.BoulderHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 41488 },
+        UberIdentifier::new(16155, 41488),
     ),
     (
         "WillowsEnd.RedirectHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 65277 },
+        UberIdentifier::new(16155, 65277),
     ),
     (
         "WillowsEnd.BurrowHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 3588 },
+        UberIdentifier::new(16155, 3588),
     ),
     (
         "WillowsEnd.MinibossHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 28478 },
+        UberIdentifier::new(16155, 28478),
     ),
     (
         "WillowsEnd.SpinLasersHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 54940 },
+        UberIdentifier::new(16155, 54940),
     ),
     (
         "WillowsEnd.GlideHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 42976 },
+        UberIdentifier::new(16155, 42976),
     ),
     (
         "WillowsEnd.SpinPortalsHeart",
-        UberIdentifier { uber_group: 16155, uber_id: 24290 },
+        UberIdentifier::new(16155, 24290),
     ),
 ];

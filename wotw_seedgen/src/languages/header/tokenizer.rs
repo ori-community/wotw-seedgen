@@ -32,6 +32,8 @@ impl Cursor<'_> {
             '"' => self.string(),
             '|' => TokenKind::Separator,
             '=' => TokenKind::Eq,
+            '>' => TokenKind::Greater,
+            '<' => TokenKind::Less,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
             ':' => TokenKind::Colon,

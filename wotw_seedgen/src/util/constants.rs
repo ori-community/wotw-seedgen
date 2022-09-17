@@ -59,26 +59,11 @@ pub const KEYSTONE_DOORS: &[(&str, u32)] = &[
 ];
 
 pub const WISP_STATES: &[UberIdentifier] = &[
-    UberIdentifier {
-        uber_group: 46462,
-        uber_id: 59806,
-    },
-    UberIdentifier {
-        uber_group: 945,
-        uber_id: 49747,
-    },
-    UberIdentifier {
-        uber_group: 28895,
-        uber_id: 25522,
-    },
-    UberIdentifier {
-        uber_group: 18793,
-        uber_id: 63291,
-    },
-    UberIdentifier {
-        uber_group: 10289,
-        uber_id: 22102,
-    },
+    UberIdentifier::new(46462, 59806),
+    UberIdentifier::new(945, 49747),
+    UberIdentifier::new(28895, 25522),
+    UberIdentifier::new(18793, 63291),
+    UberIdentifier::new(10289, 22102),
 ];
 
 pub const RESERVE_SLOTS: usize = 1;  // how many slots to reserve after random placements for the next iteration
@@ -93,256 +78,118 @@ pub const UBERSTATE_COLOUR: Colour = Colour::Cyan;
 pub const SHOP_PRICES: &[(&str, UberIdentifier, UberIdentifier)] = &[
     (
         "TwillenShop.Overcharge",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 1,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 101,
-        }
+        UberIdentifier::new(2, 1),
+        UberIdentifier::new(2, 101)
     ),
     (
         "TwillenShop.TripleJump",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 2,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 102,
-        }
+        UberIdentifier::new(2, 2),
+        UberIdentifier::new(2, 102)
     ),
     (
         "TwillenShop.Wingclip",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 3,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 103,
-        }
+        UberIdentifier::new(2, 3),
+        UberIdentifier::new(2, 103)
     ),
     (
         "TwillenShop.Swap",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 5,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 105,
-        }
+        UberIdentifier::new(2, 5),
+        UberIdentifier::new(2, 105)
     ),
     (
         "TwillenShop.LightHarvest",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 19,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 119,
-        }
+        UberIdentifier::new(2, 19),
+        UberIdentifier::new(2, 119)
     ),
     (
         "TwillenShop.Vitality",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 22,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 122,
-        }
+        UberIdentifier::new(2, 22),
+        UberIdentifier::new(2, 122)
     ),
     (
         "TwillenShop.Energy",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 26,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 126,
-        }
+        UberIdentifier::new(2, 26),
+        UberIdentifier::new(2, 126)
     ),
     (
         "TwillenShop.Finesse",
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 40,
-        },
-        UberIdentifier {
-            uber_group: 2,
-            uber_id: 140,
-        }
+        UberIdentifier::new(2, 40),
+        UberIdentifier::new(2, 140)
     ),
     (
         "OpherShop.WaterBreath",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 23,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10023,
-        }
+        UberIdentifier::new(1, 23),
+        UberIdentifier::new(1, 10023)
     ),
     (
         "OpherShop.Spike",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 74,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10074,
-        }
+        UberIdentifier::new(1, 74),
+        UberIdentifier::new(1, 10074)
     ),
     (
         "OpherShop.ExplodingSpike",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 1074,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 11074,
-        }
+        UberIdentifier::new(1, 1074),
+        UberIdentifier::new(1, 11074)
     ),
     (
         "OpherShop.SpiritSmash",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 98,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10098,
-        }
+        UberIdentifier::new(1, 98),
+        UberIdentifier::new(1, 10098)
     ),
     (
         "OpherShop.ShockSmash",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 1098,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 11098,
-        }
+        UberIdentifier::new(1, 1098),
+        UberIdentifier::new(1, 11098)
     ),
     (
         "OpherShop.Teleport",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 105,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10105,
-        }
+        UberIdentifier::new(1, 105),
+        UberIdentifier::new(1, 10105)
     ),
     (
         "OpherShop.SpiritStar",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 106,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10106,
-        }
+        UberIdentifier::new(1, 106),
+        UberIdentifier::new(1, 10106)
     ),
     (
         "OpherShop.StaticStar",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 1106,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 11106,
-        }
+        UberIdentifier::new(1, 1106),
+        UberIdentifier::new(1, 11106)
     ),
     (
         "OpherShop.Blaze",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 115,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10115,
-        }
+        UberIdentifier::new(1, 115),
+        UberIdentifier::new(1, 10115)
     ),
     (
         "OpherShop.ChargeBlaze",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 1115,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 11115,
-        }
+        UberIdentifier::new(1, 1115),
+        UberIdentifier::new(1, 11115)
     ),
     (
         "OpherShop.Sentry",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 116,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 10116,
-        }
+        UberIdentifier::new(1, 116),
+        UberIdentifier::new(1, 10116)
     ),
     (
         "OpherShop.RapidSentry",
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 1116,
-        },
-        UberIdentifier {
-            uber_group: 1,
-            uber_id: 11116,
-        }
+        UberIdentifier::new(1, 1116),
+        UberIdentifier::new(1, 11116)
     ),
     (
         "LupoShop.HCMapIcon",
-        UberIdentifier {
-            uber_group: 48248,
-            uber_id: 19396,
-        },
-        UberIdentifier {
-            uber_group: 48248,
-            uber_id: 19397,
-        }
+        UberIdentifier::new(48248, 19396),
+        UberIdentifier::new(48248, 19397)
     ),
     (
         "LupoShop.ECMapIcon",
-        UberIdentifier {
-            uber_group: 48248,
-            uber_id: 57987,
-        },
-        UberIdentifier {
-            uber_group: 48248,
-            uber_id: 57988,
-        }
+        UberIdentifier::new(48248, 57987),
+        UberIdentifier::new(48248, 57988)
     ),
     (
         "LupoShop.ShardMapIcon",
-        UberIdentifier {
-            uber_group: 48248,
-            uber_id: 41666,
-        },
-        UberIdentifier {
-            uber_group: 48248,
-            uber_id: 41667,
-        }
+        UberIdentifier::new(48248, 41666),
+        UberIdentifier::new(48248, 41667)
     ),
 ];
 

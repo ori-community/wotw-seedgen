@@ -1,11 +1,12 @@
 mod game_data;
 mod rando_data;
 
-use std::fmt::{self, Display};
+use std::{fmt::{self, Display}, str::FromStr};
 
+use rustc_hash::FxHashMap;
 use wotw_seedgen_derive::VVariant;
 
-use crate::{item::{Item, UberStateItem, UberStateOperator}, header::{V, CodeDisplay}};
+use crate::{header::{CodeDisplay, parser, VResolve}};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum UberType {
@@ -40,23 +41,36 @@ impl std::str::FromStr for UberType {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub struct UberIdentifier {
     pub uber_group: u16,
     pub uber_id: u16,
 }
 impl UberIdentifier {
-    pub fn from_parts(group: &str, id: &str) -> Result<UberIdentifier, String> {
-        let uber_group: u16 = group.parse().map_err(|_| format!("invalid uber group {}", group))?;
-        let uber_id: u16 = id.parse().map_err(|_| format!("invalid uber id {}", id))?;
-        Ok(UberIdentifier {
-            uber_group,
-            uber_id,
-        })
+    pub const fn new(uber_group: u16, uber_id: u16) -> Self {
+        Self { uber_group, uber_id }
     }
 
     pub fn code(&self) -> CodeDisplay<UberIdentifier> {
         CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.uber_group, s.uber_id)})
+    }
+
+    pub fn is_shop(&self) -> bool {
+        matches!(self.uber_group, 1 | 2) ||
+        self.uber_group == 48248 && matches!(self.uber_id, 19396 | 57987 | 41666)
+    }
+    pub fn is_purchasable(&self) -> bool {
+        matches!(self.uber_group, 1 | 2) ||
+        self.uber_group == 48248 && matches!(self.uber_id, 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045 | 19396 | 57987 | 41666)
+    }
+
+    #[inline]
+    pub fn spawn() -> UberIdentifier {
+        UberIdentifier::new(3, 0)
+    }
+    #[inline]
+    pub fn load() -> UberIdentifier {
+        UberIdentifier::new(3, 1)
     }
 }
 impl Display for UberIdentifier {
@@ -73,119 +87,117 @@ impl Display for UberIdentifier {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord, VVariant)]
-pub struct UberState {
+#[derive(Debug, Clone, PartialEq, Eq, Hash, VVariant)]
+pub struct UberStateTrigger {
     pub identifier: UberIdentifier,
-    #[VWrap]
-    pub value: String,
+    #[VType] pub condition: Option<UberStateCondition>,
 }
-impl UberState {
-    pub fn from_parts(group: &str, id: &str) -> Result<UberState, String> {
-        let uber_group = group.parse().map_err(|_| format!("invalid uber group {group}"))?;
-        let mut id_parts = id.splitn(2, '=');
-        let uber_id = id_parts.next().unwrap().parse().map_err(|_| format!("invalid uber id {id}"))?;
-        let value = id_parts.next().unwrap_or("");
-        if !value.is_empty() {
-            value.parse::<f32>().map_err(|_| format!("invalid uber value {value}"))?;
+#[derive(Debug, Clone, PartialEq, Eq, Hash, VVariant)]
+pub struct UberStateCondition {
+    pub comparator: UberStateComparator,
+    #[VWrap] pub value: u32,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UberStateComparator {
+    Equals,
+    Greater,
+    GreaterOrEquals,
+    Less,
+    LessOrEquals,
+}
+
+impl UberStateCondition {
+    // consider <3 and <=2 to be equal
+    pub fn functionally_eq(&self, other: &Self) -> bool {
+        match (&self.comparator, &other.comparator) {
+            (UberStateComparator::Greater, UberStateComparator::GreaterOrEquals) | (UberStateComparator::LessOrEquals, UberStateComparator::Less)
+            => other.value.saturating_sub(self.value) == 1,
+            (UberStateComparator::GreaterOrEquals, UberStateComparator::Greater) | (UberStateComparator::Less, UberStateComparator::LessOrEquals)
+            => self.value.saturating_sub(other.value) == 1,
+            _ => self.comparator == other.comparator && self.value == other.value,
         }
-        Ok(UberState {
-            identifier: UberIdentifier {
-                uber_group,
-                uber_id,
-            },
-            value: value.to_string(),
-        })
-    }
-
-    pub fn to_item(self, uber_type: UberType) -> Item {
-        let value = if matches!(uber_type, UberType::Bool | UberType::Teleporter) {
-            String::from("true")
-        } else { self.value };
-
-        Item::UberState(UberStateItem {
-            uber_identifier: self.identifier,
-            uber_type,
-            signed: false,
-            sign: false,
-            operator: UberStateOperator::Value(value),
-            skip: false,
-        })
-    }
-
-    #[inline]
-    pub fn spawn() -> UberState {
-        UberState {
-            identifier: UberIdentifier {
-                uber_group: 3,
-                uber_id: 0,
-            },
-            value: String::new(),
-        }
-    }
-    #[inline]
-    pub fn load() -> UberState {
-        UberState {
-            identifier: UberIdentifier {
-                uber_group: 3,
-                uber_id: 1,
-            },
-            value: String::new(),
-        }
-    }
-
-    pub fn is_shop(&self) -> bool {
-        self.identifier.uber_group == 1 ||
-        self.identifier.uber_group == 2 ||
-        self.identifier.uber_group == 48248 && matches!(self.identifier.uber_id, 19396 | 57987 | 41666)
-    }
-    pub fn is_purchasable(&self) -> bool {
-        self.identifier.uber_group == 1 ||
-        self.identifier.uber_group == 2 ||
-        self.identifier.uber_group == 48248 && matches!(self.identifier.uber_id, 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045 | 19396 | 57987 | 41666)
     }
 }
-impl UberState {
-    pub fn code(&self) -> CodeDisplay<UberState> {
+impl FromStr for UberStateTrigger {
+    type Err = String;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let mut parser = parser::new(input);
+        let item = VUberStateTrigger::parse(&mut parser).map_err(|err| err.verbose_display())?
+            .resolve(&FxHashMap::default())?;
+        parser.expect_end().map_err(|err| err.verbose_display())?;
+        Ok(item)
+    }
+}
+impl UberStateTrigger {
+    pub fn code(&self) -> CodeDisplay<UberStateTrigger> {
         CodeDisplay::new(self, |s, f| {
             s.identifier.code().fmt(f)?;
-            if s.value.is_empty() { Ok(()) }
-            else {
-                write!(f, "={}", s.value)
+            if let Some(condition) = &s.condition {
+                condition.fmt(f)?;
             }
+
+            Ok(())
         })
     }
-}
-impl Display for UberState {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.value.is_empty() {
-            write!(f, "{}", self.identifier)
-        } else {
-            write!(f, "{}={}", self.identifier, self.value)
+
+    pub(crate) fn check(&self, identifier: UberIdentifier, value: f32) -> bool {
+        self.identifier == identifier && self.check_value(value)
+    }
+    pub(crate) fn check_value(&self, value: f32) -> bool {
+        self.condition.as_ref().map_or(true, |condition| condition.met_by(value))
+    }
+
+    // consider <3 and <=2 to be equal
+    pub fn functionally_eq(&self, other: &Self) -> bool {
+        self.identifier == other.identifier && match &self.condition {
+            Some(condition) => other.condition.as_ref().map_or(false, |other| condition.functionally_eq(other)),
+            None => other.condition.is_none(),
+        }
+    }
+
+    #[inline]
+    pub fn spawn() -> UberStateTrigger {
+        UberStateTrigger {
+            identifier: UberIdentifier::spawn(),
+            condition: None,
+        }
+    }
+    #[inline]
+    pub fn load() -> UberStateTrigger {
+        UberStateTrigger {
+            identifier: UberIdentifier::load(),
+            condition: None,
         }
     }
 }
-impl Display for VUberState {
+
+impl Display for UberStateCondition {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let bare = if let V::Literal(value) = &self.value {
-            value.is_empty()
-        } else { false };
-        if bare {
-            write!(f, "{}", self.identifier)
-        } else {
-            write!(f, "{}={}", self.identifier, self.value)
+        write!(f, "{}{}", self.comparator, self.value)
+    }
+}
+
+impl UberStateCondition {
+    pub fn met_by<I: Into<f32>>(&self, value: I) -> bool {
+        match self.comparator {
+            UberStateComparator::Equals => self.value as f32 == value.into(),
+            UberStateComparator::Greater => self.value as f32 > value.into(),
+            UberStateComparator::GreaterOrEquals => self.value as f32 >= value.into(),
+            UberStateComparator::Less => (self.value as f32) < value.into(),
+            UberStateComparator::LessOrEquals => self.value as f32 <= value.into(),
         }
     }
 }
-impl std::str::FromStr for UberState {
-    type Err = String;
 
-    fn from_str(uber_state: &str) -> Result<UberState, String> {
-        let mut parts = uber_state.split(&['|', ','][..]);
-        let uber_group = parts.next().ok_or_else(|| String::from("expected uber group"))?;
-        let uber_id = parts.next().ok_or_else(|| String::from("expected uber id"))?;
-        if parts.next().is_some() { return Err(String::from("expected only two parts")); }
-
-        UberState::from_parts(uber_group, uber_id)
+impl Display for UberStateComparator {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Equals => "=",
+            Self::Greater => ">",
+            Self::GreaterOrEquals => ">=",
+            Self::Less => "<",
+            Self::LessOrEquals => "<=",
+        }.fmt(f)
     }
 }
 
@@ -194,12 +206,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn uber_states() {
-        let uber_state = UberState::from_parts("25432", "7854").unwrap();
-        assert_eq!(format!("{}", uber_state.code()), "25432|7854");
-        let uber_state = UberState::from_parts("25432", "65195=11").unwrap();
-        assert_eq!(format!("{}", uber_state.code()), "25432|65195=11");
-        assert!(UberState::from_parts("", "3").is_err());
-        assert!(UberState::from_parts("a", "3").is_err());
+    fn trigger_eq() {
+        let trigger = |s| UberStateTrigger::from_str(s).unwrap();
+
+        assert!(trigger("9|0>1").functionally_eq(&trigger("9|0>=2")));
+        assert!(trigger("9|0>=2").functionally_eq(&trigger("9|0>1")));
+        assert!(!trigger("9|0=2").functionally_eq(&trigger("9|0>=2")));
+        assert!(!trigger("9|0=2").functionally_eq(&trigger("9|0")));
+        assert!(trigger("9|0<2").functionally_eq(&trigger("9|0<=1")));
+        assert!(trigger("9|0<=1").functionally_eq(&trigger("9|0<2")));
     }
 }

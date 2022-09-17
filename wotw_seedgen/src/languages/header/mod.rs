@@ -13,7 +13,7 @@ pub use tools::validate_headers;
 pub use code::CodeDisplay;
 use std::{fmt, str::FromStr};
 
-use crate::{util::{Icon, UberState, VUberState, UberIdentifier}, VItem, Item};
+use crate::{util::{Icon, UberStateTrigger, VUberStateTrigger, UberIdentifier}, VItem, Item};
 
 use rustc_hash::FxHashMap;
 use rand::Rng;
@@ -26,9 +26,9 @@ use wotw_seedgen_derive::{FromStr, VVariant};
 /// An item placed at a location trigger
 #[derive(Debug, Clone, VVariant)]
 pub struct Pickup {
-    /// UberState trigger that should grant the [`Item`]
+    /// [`UberStateTrigger`] that should grant the [`Item`]
     #[VType]
-    pub trigger: UberState,
+    pub trigger: UberStateTrigger,
     /// [`Item`] to be granted
     #[VType]
     pub item: Item,

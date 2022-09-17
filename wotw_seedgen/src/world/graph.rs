@@ -4,11 +4,11 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
 
 use super::{player::Player, requirements::Requirement};
-use crate::util::{
-    RefillValue, NodeKind, Position, Zone, UberState, UberIdentifier,
+use crate::{util::{
+    RefillValue, NodeKind, Position, Zone, UberIdentifier, UberStateTrigger,
     orbs::{self, Orbs},
     constants::TP_ANCHOR,
-};
+}};
 
 #[derive(Debug)]
 pub struct Refill {
@@ -38,13 +38,13 @@ pub struct Pickup {
     pub map_position: Option<Position>,
     pub zone: Zone,
     pub index: usize,
-    pub uber_state: UberState,
+    pub trigger: UberStateTrigger,
 }
 #[derive(Debug)]
 pub struct State {
     pub identifier: String,
     pub index: usize,
-    pub uber_state: Option<UberState>,
+    pub trigger: Option<UberStateTrigger>,
 }
 #[derive(Debug)]
 pub struct Quest {
@@ -53,7 +53,7 @@ pub struct Quest {
     pub map_position: Option<Position>,
     pub zone: Zone,
     pub index: usize,
-    pub uber_state: UberState,
+    pub trigger: UberStateTrigger,
 }
 
 #[derive(Debug)]
@@ -95,12 +95,12 @@ impl Node {
             Node::Quest(quest) => quest.index,
         }
     }
-    pub fn uber_state(&self) -> Option<&UberState> {
+    pub fn trigger(&self) -> Option<&UberStateTrigger> {
         match self {
             Node::Anchor(_) => None,
-            Node::Pickup(pickup) => Some(&pickup.uber_state),
-            Node::State(state) => state.uber_state.as_ref(),
-            Node::Quest(quest) => Some(&quest.uber_state),
+            Node::Pickup(pickup) => Some(&pickup.trigger),
+            Node::State(state) => state.trigger.as_ref(),
+            Node::Quest(quest) => Some(&quest.trigger),
         }
     }
     pub fn position(&self) -> Option<&Position> {
@@ -157,7 +157,10 @@ impl Graph {
             identifier: String::from("Spawn"),
             zone: Zone::Spawn,
             index: usize::MAX,
-            uber_state: UberState::spawn(),
+            trigger: UberStateTrigger {
+                identifier: UberIdentifier::spawn(),
+                condition: None,
+            },
             position: None,
             map_position: None,
         });
@@ -277,21 +280,16 @@ impl Graph {
         }
     }
 
-    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> FxHashSet<usize> {
+    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> FxHashSet<usize> {
         let mut states = FxHashSet::default();
 
-        for node in &self.nodes {
-            let (uber_state, index) = match node {
-                Node::State(state) =>
-                    if let Some(uber_state) = &state.uber_state {
-                        (uber_state, &state.index)
-                    } else { continue; },
-                Node::Quest(quest) => (&quest.uber_state, &quest.index),
-                _ => continue,
-            };
-            if let Some(value) = extra_states.get(&uber_state.identifier) {
-                if value == &uber_state.value || value == "true" {
-                    states.insert(*index);
+        for (trigger, index) in self.nodes.iter()
+            .filter(|node| matches!(node, Node::State(_) | Node::Quest(_)))
+            .filter_map(|node| node.trigger().map(|trigger| (trigger, node.index())))
+        {
+            if let Some(value) = extra_states.get(&trigger.identifier) {
+                if trigger.check_value(*value) {
+                    states.insert(index);
                 }
             }
         }
@@ -311,7 +309,7 @@ impl Graph {
         Ok(entry)
     }
 
-    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> Result<Reached<'a>, String> {
+    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> Result<Reached<'a>, String> {
         let mut context = ReachContext {
             player,
             progression_check: false,
@@ -324,7 +322,7 @@ impl Graph {
 
         Ok(reached)
     }
-    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, String>, sets: &[usize]) -> Result<(Reached<'a>, Progressions<'a>), String> {
+    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> Result<(Reached<'a>, Progressions<'a>), String> {
         let mut context = ReachContext {
             player,
             progression_check: true,

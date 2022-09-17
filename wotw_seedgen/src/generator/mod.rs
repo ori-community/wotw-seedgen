@@ -16,7 +16,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::{
     item::{Item, Message, UberStateOperator},
-    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, util::UberState,
+    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, util::UberStateTrigger,
     world::{
         World,
         graph::Graph,
@@ -203,22 +203,20 @@ fn build_config_map(header_config: &[HeaderConfig]) -> Result<FxHashMap::<String
 
 fn block_spawn_sets(preplacement: &header::Pickup, world: &mut World) {
     if let Item::UberState(uber_state_item) = &preplacement.item {
-        if preplacement.trigger.identifier == UberState::spawn().identifier {
-            if let UberStateOperator::Value(value) = &uber_state_item.operator {
-                let target = UberState {
-                    identifier: uber_state_item.uber_identifier.clone(),
-                    value: if value == "true" { String::new() } else { value.clone() },
-                };
-
-                if world.graph.nodes.iter().any(|node| node.can_place() && node.uber_state().map_or(false, |uber_state| uber_state == &target)) {
-                    log::trace!("adding an empty pickup at {target} to prevent placements");
-                    let mut message = Message::new(String::new());
-                    message.frames = Some(0);
-                    message.quiet = true;
-                    message.noclear = true;
-                    let null_item = Item::Message(message);
-                    world.preplace(target, null_item);
-                }
+        if preplacement.trigger != UberStateTrigger::spawn() { return }
+        if let UberStateOperator::Value(value) = &uber_state_item.operator {
+            for trigger in world.graph.nodes.iter()
+                .filter(|node| node.can_place())
+                .filter_map(|node| node.trigger())
+                .filter(|trigger| trigger.check(uber_state_item.identifier, (**value).into()))
+            {
+                log::trace!("adding an empty pickup at {} to prevent placements", trigger.code());
+                let mut message = Message::new(String::new());
+                message.frames = Some(0);
+                message.quiet = true;
+                message.noclear = true;
+                let null_item = Item::Message(message);
+                world.preplace(trigger.clone(), null_item);
             }
         }
     }
