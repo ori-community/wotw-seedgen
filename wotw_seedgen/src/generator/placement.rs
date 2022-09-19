@@ -11,14 +11,14 @@ use crate::{
     item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message, UberStateItem},
     settings::{Difficulty, Goal, WorldSettings, Spawn}, util::{
         self,
-        UberType,
-        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES, GORLEK_SPAWNS, MOKI_SPAWNS}, uber_state::UberStateTrigger, UberIdentifier,
+        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES, GORLEK_SPAWNS, MOKI_SPAWNS},
     }, world::{
         World,
         graph::{self, Node, Graph},
         player::Player,
     }, header::CodeDisplay
 };
+use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
 
 use super::seed::SeedWorld;
 use super::spoiler::{SeedSpoiler, SpoilerGroup, SpoilerWorldReachable, SpoilerPlacement};

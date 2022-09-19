@@ -11,7 +11,8 @@ use std::str::FromStr;
 
 use crate::{
     VItem,
-    util::{UberIdentifier, VUberStateTrigger, Icon, uber_state::{VUberStateCondition, UberStateComparator}}, languages::parser::ParseErrorCollection,
+    util::Icon, languages::parser::ParseErrorCollection,
+    uber_state::{VUberStateCondition, UberStateComparator, UberIdentifier, VUberStateTrigger},
 };
 
 use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, TimerDefinition, Annotation};
@@ -432,7 +433,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::item::*;
-    use crate::util::*;
+    use crate::uber_state::*;
 
     #[test]
     fn item_parsing() {

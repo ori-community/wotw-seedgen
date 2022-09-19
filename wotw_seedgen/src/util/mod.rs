@@ -1,5 +1,4 @@
 pub mod orbs;
-pub mod uber_state;
 pub mod constants;
 pub mod icon;
 pub(crate) mod extensions;
@@ -7,7 +6,6 @@ pub(crate) mod extensions;
 pub use orbs::Orbs;
 pub use icon::{Icon, MapIcon};
 use serde::{Serialize, Deserialize};
-pub use uber_state::{UberIdentifier, VUberStateTrigger, UberStateTrigger, UberType};
 
 use decorum::R32;
 use num_enum::{FromPrimitive, TryFromPrimitive};

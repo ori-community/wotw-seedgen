@@ -4,11 +4,12 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
 
 use super::{player::Player, requirements::Requirement};
-use crate::{util::{
-    RefillValue, NodeKind, Position, Zone, UberIdentifier, UberStateTrigger,
+use crate::util::{
+    RefillValue, NodeKind, Position, Zone,
     orbs::{self, Orbs},
     constants::TP_ANCHOR,
-}};
+};
+use crate::uber_state::{UberIdentifier, UberStateTrigger};
 
 #[derive(Debug)]
 pub struct Refill {

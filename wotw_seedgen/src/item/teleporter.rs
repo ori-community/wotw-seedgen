@@ -1,7 +1,7 @@
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::FromStr;
 
-use crate::util::UberIdentifier;
+use crate::uber_state::UberIdentifier;
 
 #[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
 #[repr(u8)]

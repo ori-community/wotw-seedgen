@@ -13,7 +13,8 @@ use rustc_hash::FxHashMap;
 use crate::header::ItemDetails;
 use crate::item::{Item, Resource};
 use crate::settings::{WorldSettings, Goal};
-use crate::util::{UberStateTrigger, UberIdentifier, constants::WISP_STATES};
+use crate::util::constants::WISP_STATES;
+use crate::uber_state::{UberStateTrigger, UberIdentifier};
 
 #[derive(Debug, Clone)]
 pub struct World<'graph, 'settings> {

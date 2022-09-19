@@ -5,7 +5,8 @@ use wotw_seedgen_derive::FromStr;
 use crate::{
     VItem,
     item::{VCommand, SysMessage, VWheelCommand, VShopCommand, VUberStateItem, VUberStateOperator, VUberStateRange, VUberStateRangeBoundary, VMessage, WheelItemPosition},
-    util::{UberType, UberIdentifier, VPosition},
+    util::VPosition,
+    uber_state::{UberType, UberIdentifier},
     header::{V, VString},
     languages::TokenKind,
     languages::parser::{parse_number, parse_value, parse_ident},

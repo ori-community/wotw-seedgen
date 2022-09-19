@@ -5,7 +5,8 @@ use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::{VVariant, FromStr, Display};
 
 use super::{Item, VItem, Resource};
-use crate::util::{UberIdentifier, Position, VPosition, NumericBool, Spell};
+use crate::util::{Position, VPosition, NumericBool, Spell};
+use crate::uber_state::UberIdentifier;
 use crate::header::{VString, vdisplay, CodeDisplay};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]

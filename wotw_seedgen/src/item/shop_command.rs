@@ -2,7 +2,8 @@ use std::fmt;
 
 use wotw_seedgen_derive::VVariant;
 
-use crate::util::{UberIdentifier, Icon};
+use crate::util::Icon;
+use crate::uber_state::UberIdentifier;
 use crate::header::{VString, vdisplay, CodeDisplay};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]

@@ -1,6 +1,7 @@
 use regex::Regex;
 
-use crate::{world::Graph, util::{Zone, UberStateTrigger}, settings::UniverseSettings};
+use crate::{world::Graph, util::Zone, settings::UniverseSettings};
+use crate::uber_state::UberStateTrigger;
 
 fn read_args(seed: &str, start_index: usize) -> Option<usize> {
     let mut depth: u8 = 1;

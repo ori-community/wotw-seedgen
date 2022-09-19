@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::util::{UberIdentifier, UberStateTrigger, uber_state::{UberStateCondition, UberStateComparator}};
+use crate::uber_state::{UberIdentifier, UberStateTrigger, UberStateCondition, UberStateComparator};
 
 /// Information about an obtainable world state
 #[derive(Debug, Clone, PartialEq)]
@@ -23,7 +23,7 @@ struct StateEntry {
 /// 
 /// ```
 /// # use wotw_seedgen::logic::{parse_states, NamedState};
-/// use wotw_seedgen::util::UberStateTrigger;
+/// use wotw_seedgen::uber_state::UberStateTrigger;
 /// 
 /// let input = "
 /// NodeIdentifier, UberGroup, UberId, UberStateValue

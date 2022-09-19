@@ -5,8 +5,9 @@ use rustc_hash::FxHashMap;
 
 use crate::{util::{
     self,
-    constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR}, UberStateTrigger, uber_state::UberStateComparator, UberIdentifier,
+    constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR},
 }, Header, Item, item::{UberStateOperator, Command}};
+use crate::uber_state::{UberStateComparator, UberStateTrigger, UberIdentifier};
 
 use super::{HeaderContent, VResolve, CodeDisplay};
 

@@ -1,5 +1,6 @@
 use serde::Deserialize;
-use crate::{util::{self, Position, Zone, UberIdentifier, UberStateTrigger, uber_state::{UberStateCondition, UberStateComparator}}};
+use crate::{util::{self, Position, Zone}};
+use crate::uber_state::{UberStateCondition, UberStateComparator, UberIdentifier, UberStateTrigger};
 
 /// Information about a pickup location
 #[derive(Debug, Clone, PartialEq)]
@@ -57,7 +58,7 @@ impl From<LocationZone> for Zone {
 /// 
 /// ```
 /// # use wotw_seedgen::logic::{parse_locations, Location};
-/// use wotw_seedgen::util::UberStateTrigger;
+/// use wotw_seedgen::uber_state::UberStateTrigger;
 /// use wotw_seedgen::util::Position;
 /// use wotw_seedgen::util::Zone;
 /// 

@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 
-use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}, UberStateTrigger}, header, settings::{UniverseSettings, WorldSettings}};
+use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}}, header, settings::{UniverseSettings, WorldSettings}};
+use crate::uber_state::UberStateTrigger;
 
 use super::{spoiler::SeedSpoiler, Placement};
 

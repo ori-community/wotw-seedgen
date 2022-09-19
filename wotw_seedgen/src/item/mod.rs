@@ -21,7 +21,8 @@ use wotw_seedgen_derive::VVariant;
 use crate::header::{parser, CodeDisplay};
 use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
-use crate::util::{Zone, Icon, MapIcon, UberIdentifier};
+use crate::util::{Zone, Icon, MapIcon};
+use crate::uber_state::UberIdentifier;
 
 pub use self::{
     resource::Resource,

@@ -1,5 +1,6 @@
-use super::{Zone, UberIdentifier};
+use super::Zone;
 use crate::item::{Item, Teleporter};
+use crate::uber_state::UberIdentifier;
 
 use ansi_term::Colour;
 

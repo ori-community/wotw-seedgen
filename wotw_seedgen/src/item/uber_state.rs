@@ -4,7 +4,8 @@ use decorum::R32;
 use rustc_hash::FxHashMap;
 use wotw_seedgen_derive::VVariant;
 
-use crate::{util::{UberIdentifier, UberType}, header::{vdisplay, CodeDisplay}, Item};
+use crate::{header::{vdisplay, CodeDisplay}, Item};
+use crate::uber_state::{UberIdentifier, UberType};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct UberStateItem {

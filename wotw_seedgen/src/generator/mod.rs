@@ -16,7 +16,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::{
     item::{Item, Message, UberStateOperator},
-    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, util::UberStateTrigger,
+    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, uber_state::UberStateTrigger,
     world::{
         World,
         graph::Graph,
