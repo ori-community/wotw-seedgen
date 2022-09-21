@@ -31,7 +31,7 @@ pub use self::{
     command::{Command, VCommand, ToggleCommand, EquipSlot},
     teleporter::Teleporter,
     message::{Message, VMessage},
-    uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary},
+    uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary, UberStateValue},
     bonus_item::BonusItem,
     bonus_upgrade::BonusUpgrade,
     sysmessage::SysMessage,

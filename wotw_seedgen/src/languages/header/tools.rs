@@ -239,7 +239,7 @@ pub fn validate_header(contents: String) -> Result<(Vec<UsedUberState>, Vec<Stri
                         if let UberStateOperator::Value(value) = uber_state_item.operator {
                             occupied_states.push(UsedUberState {
                                 identifier: uber_state_item.identifier,
-                                used_value: Some((*value).into_inner() as u32),
+                                used_value: Some(value.to_f32() as u32),
                             });
                         }
                     },

@@ -208,7 +208,7 @@ fn block_spawn_sets(preplacement: &header::Pickup, world: &mut World) {
             for trigger in world.graph.nodes.iter()
                 .filter(|node| node.can_place())
                 .filter_map(|node| node.trigger())
-                .filter(|trigger| trigger.check(uber_state_item.identifier, (**value).into()))
+                .filter(|trigger| trigger.check(uber_state_item.identifier, value.to_f32()))
             {
                 log::trace!("adding an empty pickup at {} to prevent placements", trigger.code());
                 let mut message = Message::new(String::new());

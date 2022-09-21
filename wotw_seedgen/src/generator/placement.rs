@@ -8,7 +8,7 @@ use rand::{
 
 use crate::{
     inventory::Inventory,
-    item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message, UberStateItem},
+    item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message, UberStateItem, UberStateValue},
     settings::{Difficulty, Goal, WorldSettings, Spawn}, util::{
         self,
         constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES, GORLEK_SPAWNS, MOKI_SPAWNS},
@@ -190,7 +190,7 @@ where
         let custom_name = custom_name.unwrap_or_else(|| format!("$[{}]", item.code()));
         let origin_message = Item::Message(Message::new(format!("$[15|5|{}]'s {}", target_world_index, custom_name)));
         let send_identifier = UberIdentifier::new(12, state_index);
-        let send_item = UberStateItem::simple_setter(send_identifier, UberType::Bool, 1.);
+        let send_item = UberStateItem::simple_setter(send_identifier, UberType::Bool, UberStateValue::Bool(true));
         let target_message = Item::Message(Message::new(format!("{} from $[15|5|{}]|mute", target_display.unwrap_or(custom_name), origin_world_index)));
         let target_trigger = UberStateTrigger {
             identifier: UberIdentifier::new(12, state_index),
@@ -249,7 +249,7 @@ where
         price = util::float_to_int(modified_price).map_err(|_| format!("(World {}): Overflowed shop price for {} after adding a random amount to it", world_index, item))?;
     }
 
-    let price_setter = UberStateItem::simple_setter(*price_uber_identifier, UberType::Int, price as f32);
+    let price_setter = UberStateItem::simple_setter(*price_uber_identifier, UberType::Int, UberStateValue::Number((price as f32).into()));
 
     log::trace!("(World {}): Placing {} at Spawn as price for the item below", world_index, price_setter);
 

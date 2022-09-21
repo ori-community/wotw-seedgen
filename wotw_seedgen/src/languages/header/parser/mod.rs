@@ -458,7 +458,7 @@ mod tests {
         assert!(Item::from_str("8|5|3|in|3").is_err());
         assert!(Item::from_str("8|5|3|bool|3").is_err());
         assert!(Item::from_str("8|5|3|float|hm").is_err());
-        assert_eq!(Item::from_str("8|5|3|int|6"), Ok(UberStateItem::simple_setter(UberIdentifier::new(5, 3), UberType::Int, 6.)));
+        assert_eq!(Item::from_str("8|5|3|int|6"), Ok(UberStateItem::simple_setter(UberIdentifier::new(5, 3), UberType::Int, UberStateValue::Number((6.).into()))));
         assert_eq!(Item::from_str("4|0"), Ok(Item::Command(Command::Autosave)));
         assert!(Item::from_str("12").is_err());
         assert!(Item::from_str("").is_err());

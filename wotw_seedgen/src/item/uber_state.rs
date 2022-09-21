@@ -1,4 +1,4 @@
-use std::{fmt::{self, Display}, str::FromStr, ops::Deref};
+use std::{fmt::{self, Display}, str::FromStr};
 
 use decorum::R32;
 use rustc_hash::FxHashMap;
@@ -30,10 +30,10 @@ impl UberStateItem {
     /// Returns the result of this [`UberStateItem`]'s operation when applied to the given uber_states
     pub(crate) fn do_the_math(&self, uber_states: &FxHashMap<UberIdentifier, f32>) -> f32 {
         let mut new = match &self.operator {
-            UberStateOperator::Value(value) => value.into_inner(),
+            UberStateOperator::Value(value) => value.to_f32(),
             UberStateOperator::Pointer(uber_identifier) => uber_states.get(uber_identifier).copied().unwrap_or_default(),
             UberStateOperator::Range(range) => match &range.start {  // Use the lower boundary for consistent results
-                UberStateRangeBoundary::Value(value) => value.into_inner(),
+                UberStateRangeBoundary::Value(value) => value.to_f32(),
                 UberStateRangeBoundary::Pointer(uber_identifier) => uber_states.get(uber_identifier).copied().unwrap_or_default(),
             },
         };
@@ -44,13 +44,13 @@ impl UberStateItem {
     }
 
     /// Helper to construct a simple [`UberStateItem`]
-    pub(crate) fn simple_setter<I: Into<R32>>(uber_identifier: UberIdentifier, uber_type: UberType, value: I) -> Item {
+    pub(crate) fn simple_setter(uber_identifier: UberIdentifier, uber_type: UberType, value: UberStateValue) -> Item {
         Item::UberState(UberStateItem {
             identifier: uber_identifier,
             uber_type,
             signed: false,
             sign: false,
-            operator: UberStateOperator::Value(value.into().into()),
+            operator: UberStateOperator::Value(value),
             skip: false,
         })
     }
@@ -154,10 +154,17 @@ vdisplay! {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
-pub struct UberStateValue(R32);
-impl From<R32> for UberStateValue {
-    fn from(value: R32) -> Self {
-        Self(value)
+pub enum UberStateValue {
+    Bool(bool),
+    Number(R32),
+}
+
+impl UberStateValue {
+    pub fn to_f32(&self) -> f32 {
+        match self {
+            UberStateValue::Bool(bool) => *bool as u8 as f32,
+            UberStateValue::Number(number) => number.into_inner(),
+        }
     }
 }
 impl FromStr for UberStateValue {
@@ -165,20 +172,17 @@ impl FromStr for UberStateValue {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "false" => Ok(Self(0_f32.into())),
-            "true" => Ok(Self(1_f32.into())),
-            _ => s.parse().map(Self),
+            "false" => Ok(Self::Bool(false)),
+            "true" => Ok(Self::Bool(true)),
+            _ => s.parse().map(Self::Number),
         }
-    }
-}
-impl Deref for UberStateValue {
-    type Target = R32;
-    fn deref(&self) -> &R32 {
-        &self.0
     }
 }
 impl Display for UberStateValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
+        match self {
+            Self::Bool(bool) => bool.fmt(f),
+            Self::Number(number) => number.fmt(f),
+        }
     }
 }
