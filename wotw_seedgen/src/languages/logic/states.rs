@@ -14,7 +14,7 @@ struct StateEntry {
     node_identifier: String,
     uber_group: u16,
     uber_id: u16,
-    uber_state_value: u32,
+    uber_state_value: Option<u32>,
 }
 
 /// Parses state data from a csv format
@@ -47,7 +47,7 @@ pub fn parse_states(input: &str) -> Result<Vec<NamedState>, String> {
         let StateEntry { node_identifier, uber_group, uber_id, uber_state_value } = record.map_err(|err| err.to_string())?;
 
         let identifier = UberIdentifier::new(uber_group, uber_id);
-        let condition = Some(UberStateCondition { comparator: UberStateComparator::GreaterOrEquals, value: uber_state_value });
+        let condition = uber_state_value.map(|value| UberStateCondition { comparator: UberStateComparator::GreaterOrEquals, value });
         let trigger = UberStateTrigger { identifier, condition };
         Ok(NamedState { name: node_identifier, trigger })
     }).collect::<Result<_, String>>()?;
