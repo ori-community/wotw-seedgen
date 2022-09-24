@@ -178,13 +178,13 @@ impl Display for UberStateCondition {
 }
 
 impl UberStateCondition {
-    pub fn met_by<I: Into<f32>>(&self, value: I) -> bool {
+    pub fn met_by(&self, value: f32) -> bool {
         match self.comparator {
-            UberStateComparator::Equals => self.value as f32 == value.into(),
-            UberStateComparator::Greater => self.value as f32 > value.into(),
-            UberStateComparator::GreaterOrEquals => self.value as f32 >= value.into(),
-            UberStateComparator::Less => (self.value as f32) < value.into(),
-            UberStateComparator::LessOrEquals => self.value as f32 <= value.into(),
+            UberStateComparator::Equals => value == self.value as f32,
+            UberStateComparator::Greater => value > self.value as f32,
+            UberStateComparator::GreaterOrEquals => value >= self.value as f32,
+            UberStateComparator::Less => value < self.value as f32,
+            UberStateComparator::LessOrEquals => value <= self.value as f32,
         }
     }
 }
