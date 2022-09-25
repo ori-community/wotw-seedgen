@@ -35,8 +35,8 @@ fn parsing(c: &mut Criterion) {
     let mut universe_settings = UniverseSettings::default();
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
 
-    logic::build(areas.clone(), locations.clone(), &states, &universe_settings, false).unwrap();
-    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), &states, &universe_settings, false)));
+    logic::build(areas.clone(), locations.clone(), states.clone(), &universe_settings, false).unwrap();
+    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), states.clone(), &universe_settings, false)));
 }
 
 fn requirements(c: &mut Criterion) {
@@ -142,4 +142,4 @@ criterion_group!(only_parsing, parsing);
 criterion_group!(only_requirements, requirements);
 criterion_group!(only_reach_checking, reach_checking);
 criterion_group!(only_generation, generation);
-criterion_main!(only_generation);  // put any of the group names in here
+criterion_main!(only_parsing);  // put any of the group names in here

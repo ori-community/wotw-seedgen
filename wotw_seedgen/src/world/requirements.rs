@@ -508,8 +508,8 @@ impl Requirement {
     pub fn contained_states(&self) -> Vec<usize> {
         match self {
             Requirement::State(state) => vec![*state],
-            Requirement::And(ands) => ands.iter().flat_map(Requirement::contained_states).collect(),
-            Requirement::Or(ors) => ors.iter().flat_map(Requirement::contained_states).collect(),
+            Requirement::And(nested) |
+            Requirement::Or(nested) => nested.iter().flat_map(Requirement::contained_states).collect(),
             _ => vec![],
         }
     }
