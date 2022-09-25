@@ -967,7 +967,7 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
 
         for node in reachable_locations {
             let trigger = node.trigger().unwrap();
-            let value = trigger.condition.as_ref().map_or(1, |condition| condition.value) as f32;
+            let value = trigger.set_value() as f32;
             let preplaced = finished_world.set_uber_state(trigger.identifier, value);
             if preplaced {
                 collected_preplacements.push(node.index());
@@ -1079,7 +1079,7 @@ fn generate_placements_from_spawn<'graph, 'settings>(
 
             for node in world_reachable {
                 let trigger = node.trigger().unwrap();
-                let value = trigger.condition.as_ref().map_or(1, |condition| condition.value) as f32;
+                let value = trigger.set_value() as f32;
                 let preplaced = world_context.world.set_uber_state(trigger.identifier, value);
                 if preplaced {
                     world_context.collected_preplacements.push(node.index());

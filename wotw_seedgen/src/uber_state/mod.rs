@@ -169,6 +169,18 @@ impl UberStateTrigger {
             condition: None,
         }
     }
+
+    /// For convenience, [`UberStateTrigger`]s are used to represent what UberStates [`Node`]s correspond to.
+    /// 
+    /// These have additional guarantees since they always use the `>=` [`UberStateOperator`].
+    /// 
+    /// I am lazy and don't want to express those additional guarantees through the type system so this is a private helper function to get the associated value when working with those nodes.
+    /// 
+    /// [`Node`]: crate::world::graph::Node
+    /// [`UberStateOperator`]: crate::item::UberStateOperator
+    pub(crate) fn set_value(&self) -> u32 {
+        self.condition.as_ref().map_or(1, |condition| condition.value)
+    }
 }
 
 impl Display for UberStateCondition {
