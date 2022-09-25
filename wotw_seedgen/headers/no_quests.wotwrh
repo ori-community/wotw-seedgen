@@ -11,7 +11,7 @@ Flags: No Quests
 3|0|8|48248|18458|int|4                 // MarshSpawn.TokkTabletQuest
 3|0|8|14019|50597|int|4                 // EastHollow.KwolokAmuletQuest
 3|0|8|14019|20667|int|3                 // OuterWellspring.TheLostCompass
-3|0|8|14019|59708|int|1                 // WoodsEntry.LastTreeBranch
+3|0|8|14019|59708|int|3                 // Tree Keeper (WoodsEntry.LastTreeBranch)
 3|0|8|14019|7470|bool|true              // WoodsEntry.TreeSeed
 3|0|8|14019|53103|bool|true             // EastPools.KwolokAmuletQI
 3|0|8|14019|58342|bool|true             // LowerWastes.EerieGemQI
@@ -20,17 +20,7 @@ Flags: No Quests
 3|0|8|14019|33776|int|3                 // GladesTown.MokiAcornQuest
 3|0|8|14019|44578|int|2                 // GladesTown.RebuildTheGlades
 3|0|8|14019|26394|int|2                 // GladesTown.RegrowTheGlades
-3|0|8|14019|26318|int|1                 // EastHollow.HandToHandMap
-3|0|8|14019|26318|int|2                 // GladesTown.HandToHandPouch
-3|0|8|14019|26318|int|3                 // InnerWellspring.HandToHandHerbs
-3|0|8|14019|26318|int|4                 // LowerReach.HandToHandSoup
-3|0|8|14019|26318|int|5                 // LowerReach.HandToHandHat
-3|0|8|14019|26318|int|6                 // GladesTown.HandToHandLantern
-3|0|8|14019|26318|int|7                 // LowerDepths.HandToHandSilk
-3|0|8|14019|26318|int|8                 // EastPools.HandToHandSpyglass
-3|0|8|14019|26318|int|9                 // GladesTown.HandToHandCanteen
-3|0|8|14019|26318|int|10                // LowerWastes.HandToHandMapstone
-3|0|8|14019|26318|int|11                // WindtornRuins.HandToHandComplete
+3|0|8|14019|26318|int|11                // Hand to Hand (EastHollow.HandToHandMap, GladesTown.HandToHandPouch, InnerWellspring.HandToHandHerbs, LowerReach.HandToHandSoup, LowerReach.HandToHandHat, GladesTown.HandToHandLantern, LowerDepths.HandToHandSilk, EastPools.HandToHandSpyglass, GladesTown.HandToHandCanteen, LowerWastes.HandToHandMapstone, WindtornRuins.HandToHandComplete)
 // Reveal items behind quests
 3|0|8|937|34641|int|4                   // Silent Teeth -> Tuley
 3|0|8|42178|40006|byte|3                // Planting the Last Tree
@@ -38,6 +28,5 @@ Flags: No Quests
 3|0|8|58674|14313|bool|true             // Family Murder -> Doll
 42178|51230=3|8|42178|36609|bool|true   // Family Murder -> SL inside father hut
 // Quests that just kind of exist
-3|0|8|14019|59708|int|3                 // Tree Keeper
 3|0|8|14019|61011|int|5                 // A Diamond in the Rough
 42178|51230=3|8|14019|27804|int|4       // Family Murder
