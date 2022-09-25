@@ -918,9 +918,15 @@ fn reach_check(mut args: ReachCheckArgs) -> Result<(), String> {
     world.player.inventory.grant(Item::SpiritLight(1), args.spirit_light);
 
     let mut set_node = |identifier: &str| -> Result<(), String> {
-        let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier).ok_or_else(|| format!("target {} not found", identifier))?;
-        log::trace!("Setting state {}", identifier);
-        world.sets.push(node.index());
+        let node = world.graph.nodes.iter().find(|&node| node.identifier() == identifier);
+
+        if let Some(found_node) = node {
+            log::trace!("Setting state {}", identifier);
+            world.sets.push(found_node.index());
+        } else {
+            log::warn!("State {} not found", identifier);
+        }
+
         Ok(())
     };
 
