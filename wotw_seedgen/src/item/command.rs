@@ -1,10 +1,12 @@
 use std::fmt;
 
+use decorum::R32;
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::{VVariant, FromStr, Display};
 
 use super::{Item, VItem, Resource};
-use crate::util::{UberIdentifier, UberState, VUberState, Position, VPosition, NumericBool, Spell};
+use crate::util::{Position, VPosition, NumericBool, Spell};
+use crate::uber_state::UberIdentifier;
 use crate::header::{VString, vdisplay, CodeDisplay};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
@@ -13,9 +15,9 @@ pub enum Command {
     Resource { resource: Resource, #[VWrap] amount: i16 },
     Checkpoint,
     Magic,
-    StopEqual { #[VType] uber_state: UberState },
-    StopGreater { #[VType] uber_state: UberState },
-    StopLess { #[VType] uber_state: UberState },
+    StopEqual { uber_identifier: UberIdentifier, #[VWrap] value: R32 },
+    StopGreater { uber_identifier: UberIdentifier, #[VWrap] value: R32 },
+    StopLess { uber_identifier: UberIdentifier, #[VWrap] value: R32 },
     Toggle { target: ToggleCommand, #[VWrap] on: NumericBool },
     Warp { #[VType] position: Position },
     StartTimer { identifier: UberIdentifier },
@@ -26,9 +28,9 @@ pub enum Command {
     SetSpiritLight { #[VWrap] amount: i16 },
     Equip { #[VWrap] slot: EquipSlot, ability: Spell },
     AhkSignal { signal: String },
-    IfEqual { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
-    IfGreater { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
-    IfLess { #[VType] uber_state: UberState, #[VType] item: Box<Item> },
+    IfEqual { uber_identifier: UberIdentifier, #[VWrap] value: R32, #[VType] item: Box<Item> },
+    IfGreater { uber_identifier: UberIdentifier, #[VWrap] value: R32, #[VType] item: Box<Item> },
+    IfLess { uber_identifier: UberIdentifier, #[VWrap] value: R32, #[VType] item: Box<Item> },
     DisableSync { uber_identifier: UberIdentifier },
     EnableSync { uber_identifier: UberIdentifier },
     CreateWarp { id: u8, #[VType] position: Position, label: Option<String> },
@@ -49,9 +51,9 @@ impl Command {
                 Command::Resource { resource, amount } => write!(f, "1|{}|{}", *resource as u8, amount),
                 Command::Checkpoint => write!(f, "2"),
                 Command::Magic => write!(f, "3"),
-                Command::StopEqual { uber_state } => write!(f, "4|{}|{}", uber_state.identifier.code(), uber_state.value),
-                Command::StopGreater { uber_state } => write!(f, "5|{}|{}", uber_state.identifier.code(), uber_state.value),
-                Command::StopLess { uber_state } => write!(f, "6|{}|{}", uber_state.identifier.code(), uber_state.value),
+                Command::StopEqual { uber_identifier, value } => write!(f, "4|{}|{}", uber_identifier.code(), value),
+                Command::StopGreater { uber_identifier, value } => write!(f, "5|{}|{}", uber_identifier.code(), value),
+                Command::StopLess { uber_identifier, value } => write!(f, "6|{}|{}", uber_identifier.code(), value),
                 Command::Toggle { target, on } => write!(f, "7|{}|{}", *target as u8, *on as u8),
                 Command::Warp { position } => write!(f, "8|{}", position.code()),
                 Command::StartTimer { identifier } => write!(f, "9|{}", identifier.code()),
@@ -62,9 +64,9 @@ impl Command {
                 Command::SetSpiritLight { amount } => write!(f, "14|{}", amount),
                 Command::Equip { slot, ability } => write!(f, "15|{}|{}", *slot as u8, ability),
                 Command::AhkSignal { signal } => write!(f, "16|{}", signal),
-                Command::IfEqual { uber_state, item } => write!(f, "17|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
-                Command::IfGreater { uber_state, item } => write!(f, "18|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
-                Command::IfLess { uber_state, item } => write!(f, "19|{}|{}|{}", uber_state.identifier.code(), uber_state.value, item.code()),
+                Command::IfEqual { uber_identifier, value, item } => write!(f, "17|{}|{}|{}", uber_identifier.code(), value, item.code()),
+                Command::IfGreater { uber_identifier, value, item } => write!(f, "18|{}|{}|{}", uber_identifier.code(), value, item.code()),
+                Command::IfLess { uber_identifier, value, item } => write!(f, "19|{}|{}|{}", uber_identifier.code(), value, item.code()),
                 Command::DisableSync { uber_identifier } => write!(f, "20|{}", uber_identifier.code()),
                 Command::EnableSync { uber_identifier } => write!(f, "21|{}", uber_identifier.code()),
                 Command::CreateWarp { id, position, label } => {
@@ -95,9 +97,9 @@ vdisplay! {
                 Self::Resource { resource, amount } => write!(f, "Set {resource} to {amount}"),
                 Self::Checkpoint => write!(f, "Checkpoint"),
                 Self::Magic => write!(f, "✨Magic✨"),
-                Self::StopEqual { uber_state } => write!(f, "Stop the multipickup if {} is {}", uber_state.identifier, uber_state.value),
-                Self::StopGreater { uber_state } => write!(f, "Stop the multipickup if {} is greater than {}", uber_state.identifier, uber_state.value),
-                Self::StopLess { uber_state } => write!(f, "Stop the multipickup if {} is less than {}", uber_state.identifier, uber_state.value),
+                Self::StopEqual { uber_identifier, value } => write!(f, "Stop the multipickup if {} is {}", uber_identifier, value),
+                Self::StopGreater { uber_identifier, value } => write!(f, "Stop the multipickup if {} is greater than {}", uber_identifier, value),
+                Self::StopLess { uber_identifier, value } => write!(f, "Stop the multipickup if {} is less than {}", uber_identifier, value),
                 Self::Toggle { target, on } => write!(f, "Sets the {target} to {on}"),
                 Self::Warp { position } => write!(f, "Warp to {position}"),
                 Self::StartTimer { identifier } => write!(f, "Start a timer on {identifier}"),
@@ -108,9 +110,9 @@ vdisplay! {
                 Self::SetSpiritLight { amount } => write!(f, "Set current spirit light to {amount}"),
                 Self::Equip { slot, ability } => write!(f, "Equip {ability} to slot {slot}"),
                 Self::AhkSignal { signal } => write!(f, "Trigger the \"{signal}\" keybind"),
-                Self::IfEqual { uber_state, item } => write!(f, "Grant this item if {} is {}: {}", uber_state.identifier, uber_state.value, item),
-                Self::IfGreater { uber_state, item } => write!(f, "Grant this item if {} is greater than {}: {}", uber_state.identifier, uber_state.value, item),
-                Self::IfLess { uber_state, item } => write!(f, "Grant this item if {} is less than {}: {}", uber_state.identifier, uber_state.value, item),
+                Self::IfEqual { uber_identifier, value, item } => write!(f, "Grant this item if {} is {}: {}", uber_identifier, value, item),
+                Self::IfGreater { uber_identifier, value, item } => write!(f, "Grant this item if {} is greater than {}: {}", uber_identifier, value, item),
+                Self::IfLess { uber_identifier, value, item } => write!(f, "Grant this item if {} is less than {}: {}", uber_identifier, value, item),
                 Self::DisableSync { uber_identifier } => write!(f, "Disable multiplayer sync for {uber_identifier}"),
                 Self::EnableSync { uber_identifier } => write!(f, "Enable multiplayer sync for {uber_identifier}"),
                 Self::CreateWarp { id, position, label } => {

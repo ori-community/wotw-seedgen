@@ -11,7 +11,8 @@ use std::str::FromStr;
 
 use crate::{
     VItem,
-    util::{VUberState, UberIdentifier, Icon}, languages::parser::ParseErrorCollection,
+    util::Icon, languages::parser::ParseErrorCollection,
+    uber_state::{VUberStateCondition, UberStateComparator, UberIdentifier, VUberStateTrigger},
 };
 
 use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, TimerDefinition, Annotation};
@@ -348,16 +349,50 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
     Ok(HeaderContent::Pickup(pickup))
 }
 
-fn parse_trigger(parser: &mut Parser) -> Result<(VUberState, Suggestion), ParseError> {
+fn parse_trigger(parser: &mut Parser) -> Result<(VUberStateTrigger, Suggestion), ParseError> {
     let identifier = parse_uber_identifier(parser)?;
-    let (value, suggestion) = if parser.current_token().kind == TokenKind::Eq {
-        parser.next_token();
-        let value = parse_v_number!(parser, Suggestion::UberTriggerValue);
-        (value, Suggestion::UberTriggerValue)
-    } else { (V::Literal(String::new()), Suggestion::UberId) };
-    let trigger = VUberState { identifier, value };
+    let (condition, suggestion) = parse_uber_state_condition(parser)?;
+    let trigger = VUberStateTrigger { identifier, condition };
 
     Ok((trigger, suggestion))
+}
+fn parse_uber_state_condition(parser: &mut Parser) -> Result<(Option<VUberStateCondition>, Suggestion), ParseError> {
+    match parse_comparator(parser) {
+        Some(comparator) => {
+            let value = parse_v_number!(parser, Suggestion::UberTriggerValue);
+            Ok((Some(VUberStateCondition { comparator, value }), Suggestion::UberTriggerValue))
+        },
+        None => Ok((None, Suggestion::UberId)),
+    }
+}
+fn parse_comparator(parser: &mut Parser) -> Option<UberStateComparator> {
+    match parser.current_token().kind {
+        TokenKind::Eq => {
+            parser.next_token();
+            Some(UberStateComparator::Equals)
+        },
+        TokenKind::Greater => {
+            parser.next_token();
+            if parser.current_token().kind == TokenKind::Eq {
+                parser.next_token();
+                Some(UberStateComparator::GreaterOrEquals)
+            } else { Some(UberStateComparator::Greater) }
+        },
+        TokenKind::Less => {
+            parser.next_token();
+            if parser.current_token().kind == TokenKind::Eq {
+                parser.next_token();
+                Some(UberStateComparator::LessOrEquals)
+            } else { Some(UberStateComparator::Less) }
+        },
+        _ => None,
+    }
+}
+
+impl VUberStateTrigger {
+    pub(crate) fn parse(parser: &mut Parser) -> Result<VUberStateTrigger, ParseError> {
+        parse_trigger(parser).map(|(trigger, _)| trigger)
+    }
 }
 
 #[derive(FromStr)]
@@ -398,7 +433,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::item::*;
-    use crate::util::*;
+    use crate::uber_state::*;
 
     #[test]
     fn item_parsing() {
@@ -423,7 +458,7 @@ mod tests {
         assert!(Item::from_str("8|5|3|in|3").is_err());
         assert!(Item::from_str("8|5|3|bool|3").is_err());
         assert!(Item::from_str("8|5|3|float|hm").is_err());
-        assert_eq!(Item::from_str("8|5|3|int|6"), Ok(UberState::from_parts("5", "3=6").unwrap().to_item(UberType::Int)));
+        assert_eq!(Item::from_str("8|5|3|int|6"), Ok(UberStateItem::simple_setter(UberIdentifier::new(5, 3), UberType::Int, UberStateValue::Number((6.).into()))));
         assert_eq!(Item::from_str("4|0"), Ok(Item::Command(Command::Autosave)));
         assert!(Item::from_str("12").is_err());
         assert!(Item::from_str("").is_err());

@@ -35,8 +35,8 @@ fn parsing(c: &mut Criterion) {
     let mut universe_settings = UniverseSettings::default();
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
 
-    logic::build(areas.clone(), locations.clone(), &states, &universe_settings, false).unwrap();
-    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), &states, &universe_settings, false)));
+    logic::build(areas.clone(), locations.clone(), states.clone(), &universe_settings, false).unwrap();
+    c.bench_function("build", |b| b.iter(|| logic::build(areas.clone(), locations.clone(), states.clone(), &universe_settings, false)));
 }
 
 fn requirements(c: &mut Criterion) {
@@ -100,7 +100,7 @@ fn reach_checking(c: &mut Criterion) {
         player.inventory.grant(Item::Skill(Skill::Dash), 1);
         let world = World::new_spawn(&graph, &world_settings);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
+        world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets).unwrap();
     }));
     c.bench_function("long reach check", |b| b.iter(|| {
         let world_settings = WorldSettings::default();
@@ -108,7 +108,7 @@ fn reach_checking(c: &mut Criterion) {
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
+        world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets).unwrap();
     }));
 }
 
@@ -142,4 +142,4 @@ criterion_group!(only_parsing, parsing);
 criterion_group!(only_requirements, requirements);
 criterion_group!(only_reach_checking, reach_checking);
 criterion_group!(only_generation, generation);
-criterion_main!(only_generation);  // put any of the group names in here
+criterion_main!(only_parsing);  // put any of the group names in here

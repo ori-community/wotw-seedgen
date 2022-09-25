@@ -21,7 +21,8 @@ use wotw_seedgen_derive::VVariant;
 use crate::header::{parser, CodeDisplay};
 use crate::header::{VResolve, vdisplay};
 use crate::settings::Difficulty;
-use crate::util::{Zone, Icon, MapIcon, UberState, UberIdentifier};
+use crate::util::{Zone, Icon, MapIcon};
+use crate::uber_state::UberIdentifier;
 
 pub use self::{
     resource::Resource,
@@ -30,7 +31,7 @@ pub use self::{
     command::{Command, VCommand, ToggleCommand, EquipSlot},
     teleporter::Teleporter,
     message::{Message, VMessage},
-    uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary},
+    uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary, UberStateValue},
     bonus_item::BonusItem,
     bonus_upgrade::BonusUpgrade,
     sysmessage::SysMessage,
@@ -237,22 +238,14 @@ impl Item {
         !matches!(self, Item::Skill(Skill::Blaze))
     }
 
-    /// Returns the [`UberState`] that gets set when collecting this [`Item`], if applicable
-    pub fn triggered_state(&self) -> Option<UberState> {
+    /// Returns the [`UberIdentifier`] that gets set to true as a side effect when collecting this [`Item`], if applicable
+    pub fn attached_state(&self) -> Option<UberIdentifier> {
         match self {
             Item::Skill(skill) => Some(1000 + *skill as u16),
             Item::Water => Some(2000),
-            Item::Teleporter(teleporter) => return Some(teleporter.triggered_state()),
+            Item::Teleporter(teleporter) => return Some(teleporter.attached_state()),
             _ => None,
-        }.map(|uber_id|
-            UberState {
-                identifier: UberIdentifier {
-                    uber_group: 6,
-                    uber_id,
-                },
-                value: String::new(),
-            }
-        )
+        }.map(|uber_id| UberIdentifier::new(6, uber_id))
     }
 
     pub fn code(&self) -> CodeDisplay<Item> {

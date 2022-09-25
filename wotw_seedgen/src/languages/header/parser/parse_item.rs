@@ -1,10 +1,12 @@
+use decorum::R32;
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::FromStr;
 
 use crate::{
     VItem,
     item::{VCommand, SysMessage, VWheelCommand, VShopCommand, VUberStateItem, VUberStateOperator, VUberStateRange, VUberStateRangeBoundary, VMessage, WheelItemPosition},
-    util::{VUberState, UberType, UberIdentifier, VPosition},
+    util::VPosition,
+    uber_state::{UberType, UberIdentifier},
     header::{V, VString},
     languages::TokenKind,
     languages::parser::{parse_number, parse_value, parse_ident},
@@ -109,11 +111,11 @@ enum ShopCommandKind {
     Visible = 4,
 }
 
-fn parse_v_uber_state_condition(parser: &mut Parser) -> Result<VUberState, ParseError> {
+fn parse_v_uber_state_condition(parser: &mut Parser) -> Result<(UberIdentifier, V<R32>), ParseError> {
     let identifier = parse_uber_identifier(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberId)?;
     let value = parse_v_number!(parser, Suggestion::UberConditionValue);
-    Ok(VUberState { identifier, value })
+    Ok((identifier, value))
 }
 
 fn parse_v_position(parser: &mut Parser) -> Result<VPosition, ParseError> {
@@ -226,18 +228,18 @@ fn parse_set_resource(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_stop_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let uber_state = parse_v_uber_state_condition(parser)?;
-    Ok(VCommand::StopEqual { uber_state })
+    let (uber_identifier, value) = parse_v_uber_state_condition(parser)?;
+    Ok(VCommand::StopEqual { uber_identifier, value })
 }
 fn parse_stop_greater(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let uber_state = parse_v_uber_state_condition(parser)?;
-    Ok(VCommand::StopGreater { uber_state })
+    let (uber_identifier, value) = parse_v_uber_state_condition(parser)?;
+    Ok(VCommand::StopGreater { uber_identifier, value })
 }
 fn parse_stop_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let uber_state = parse_v_uber_state_condition(parser)?;
-    Ok(VCommand::StopLess { uber_state })
+    let (uber_identifier, value) = parse_v_uber_state_condition(parser)?;
+    Ok(VCommand::StopLess { uber_identifier, value })
 }
 fn parse_toggle(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
@@ -298,24 +300,24 @@ fn parse_ahk_signal(parser: &mut Parser) -> Result<VCommand, ParseError> {
 }
 fn parse_if_equal(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let uber_state = parse_v_uber_state_condition(parser)?;
+    let (uber_identifier, value) = parse_v_uber_state_condition(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberConditionValue)?;
     let item = Box::new(parse_item(parser)?);
-    Ok(VCommand::IfEqual { uber_state, item })
+    Ok(VCommand::IfEqual { uber_identifier, value, item })
 }
 fn parse_if_greater(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let uber_state = parse_v_uber_state_condition(parser)?;
+    let (uber_identifier, value) = parse_v_uber_state_condition(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberConditionValue)?;
     let item = Box::new(parse_item(parser)?);
-    Ok(VCommand::IfGreater { uber_state, item })
+    Ok(VCommand::IfGreater { uber_identifier, value, item })
 }
 fn parse_if_less(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
-    let uber_state = parse_v_uber_state_condition(parser)?;
+    let (uber_identifier, value) = parse_v_uber_state_condition(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberConditionValue)?;
     let item = Box::new(parse_item(parser)?);
-    Ok(VCommand::IfLess { uber_state, item })
+    Ok(VCommand::IfLess { uber_identifier, value, item })
 }
 fn parse_disable_sync(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;
@@ -456,7 +458,7 @@ fn parse_message(parser: &mut Parser) -> Result<VItem, ParseError> {
 }
 fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
-    let uber_identifier = parse_uber_identifier(parser)?;
+    let identifier = parse_uber_identifier(parser)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberId)?;
     let uber_type = parse_ident!(parser, Suggestion::UberType)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberType)?;
@@ -513,7 +515,7 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
         }
     }
 
-    Ok(VItem::UberState(VUberStateItem { uber_identifier, uber_type, signed, sign, operator, skip }))
+    Ok(VItem::UberState(VUberStateItem { identifier, uber_type, signed, sign, operator, skip }))
 }
 #[derive(TryFromPrimitive, FromStr)]
 #[repr(u8)]

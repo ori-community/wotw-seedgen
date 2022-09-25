@@ -24,6 +24,10 @@ pub(crate) enum TokenKind {
     Separator,
     /// `=`
     Eq,
+    /// `>`
+    Greater,
+    /// `<`
+    Less,
     /// `,`
     Comma,
     /// `.`

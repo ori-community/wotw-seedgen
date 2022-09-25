@@ -1,17 +1,20 @@
 use serde::Deserialize;
-use crate::util::UberState;
+
+use crate::uber_state::{UberIdentifier, UberStateTrigger, UberStateCondition, UberStateComparator};
 
 /// Information about an obtainable world state
 #[derive(Debug, Clone, PartialEq)]
 pub struct NamedState {
     pub name: String,
-    pub uber_state: UberState,
+    pub trigger: UberStateTrigger,
 }
 #[derive(Deserialize)]
-struct StateEntry<'a> {
-    name: String,
-    uber_group: &'a str,
-    uber_id: &'a str,
+#[serde(rename_all = "PascalCase")]
+struct StateEntry {
+    node_identifier: String,
+    uber_group: u16,
+    uber_id: u16,
+    uber_state_value: Option<u32>,
 }
 
 /// Parses state data from a csv format
@@ -20,36 +23,34 @@ struct StateEntry<'a> {
 /// 
 /// ```
 /// # use wotw_seedgen::logic::{parse_states, NamedState};
-/// use wotw_seedgen::util::UberState;
+/// use wotw_seedgen::uber_state::UberStateTrigger;
 /// 
-/// let input = "MarshSpawn.HowlBurnt, 21786, 25095";
+/// let input = "
+/// NodeIdentifier, UberGroup, UberId, UberStateValue
+/// MarshSpawn.HowlBurnt, 21786, 25095, 1
+/// ";
 /// let states = parse_states(input).unwrap();
 /// 
 /// assert_eq!(states, vec![
 ///     NamedState {
 ///         name: "MarshSpawn.HowlBurnt".to_string(),
-///         uber_state: UberState::from_parts("21786", "25095").unwrap(),
+///         trigger: "21786|25095>=1".parse().unwrap(),
 ///     }
 /// ]);
 /// ```
 pub fn parse_states(input: &str) -> Result<Vec<NamedState>, String> {
     let mut reader = csv::ReaderBuilder::new()
-        .has_headers(false)
         .trim(csv::Trim::All)
         .from_reader(input.as_bytes());
 
-    let mut states = Vec::with_capacity(97);
+    let states = reader.deserialize().map(|record| {
+        let StateEntry { node_identifier, uber_group, uber_id, uber_state_value } = record.map_err(|err| err.to_string())?;
 
-    let mut record = csv::StringRecord::new();
-    while reader.read_record(&mut record).map_err(|err| err.to_string())? {
-        let record = record.deserialize(None).map_err(|err| err.to_string())?;
-        let StateEntry { name, uber_group, uber_id } = record;
-
-        let uber_state = UberState::from_parts(uber_group, uber_id)?;
-        let state = NamedState { name, uber_state };
-
-        states.push(state);
-    }
+        let identifier = UberIdentifier::new(uber_group, uber_id);
+        let condition = uber_state_value.map(|value| UberStateCondition { comparator: UberStateComparator::GreaterOrEquals, value });
+        let trigger = UberStateTrigger { identifier, condition };
+        Ok(NamedState { name: node_identifier, trigger })
+    }).collect::<Result<_, String>>()?;
 
     Ok(states)
 }

@@ -1,12 +1,13 @@
 use serde::Deserialize;
-use crate::util::{self, UberState, Position, Zone};
+use crate::{util::{self, Position, Zone}};
+use crate::uber_state::{UberStateCondition, UberStateComparator, UberIdentifier, UberStateTrigger};
 
 /// Information about a pickup location
 #[derive(Debug, Clone, PartialEq)]
 pub struct Location {
     pub name: String,
     pub zone: Zone,
-    pub uber_state: UberState,
+    pub trigger: UberStateTrigger,
     pub position: Position,
     pub map_position: Position,
 }
@@ -18,9 +19,10 @@ struct LocationEntry<'a> {
     _kind: &'a str,
     _variant: &'a str,
     _uber_group_name: &'a str,
-    uber_group: &'a str,
+    uber_group: u16,
     _uber_id_name: &'a str,
-    uber_id: &'a str,
+    uber_id: u16,
+    uber_state_value: Option<u32>,
     x: f32,
     y: f32,
     map_x: f32,
@@ -56,28 +58,28 @@ impl From<LocationZone> for Zone {
 /// 
 /// ```
 /// # use wotw_seedgen::logic::{parse_locations, Location};
-/// use wotw_seedgen::util::UberState;
+/// use wotw_seedgen::uber_state::UberStateTrigger;
 /// use wotw_seedgen::util::Position;
 /// use wotw_seedgen::util::Zone;
 /// 
 /// let input = "
-/// PickupIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberIdCondition, X, Y, MapX, MapY
-/// MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, -958, -4313, -958, -4313
-/// GladesTown.MotayHutEX, Wellspring Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, -172, -4584, -394, -4136";
+/// PickupIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberId, UberStateValue, X, Y, MapX, MapY
+/// MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, 1, -958, -4313, -958, -4313
+/// GladesTown.MotayHutEX, Wellspring Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, 1, -172, -4584, -394, -4136";
 /// let locations = parse_locations(input).unwrap();
 /// 
 /// assert_eq!(locations, vec![
 ///     Location {
 ///         name: "MarshSpawn.RockHC".to_string(),
 ///         zone: Zone::Marsh,
-///         uber_state: UberState::from_parts("21786", "60210").unwrap(),
+///         trigger: "21786|60210>=1".parse().unwrap(),
 ///         position: Position::new(-958., -4313.),
 ///         map_position: Position::new(-958., -4313.),
 ///     },
 ///     Location {
 ///         name: "GladesTown.MotayHutEX".to_string(),
 ///         zone: Zone::Glades,
-///         uber_state: UberState::from_parts("42178", "57455").unwrap(),
+///         trigger: "42178|57455>=1".parse().unwrap(),
 ///         position: Position::new(-172., -4584.),
 ///         map_position: Position::new(-394., -4136.),
 ///     }
@@ -98,6 +100,7 @@ pub fn parse_locations(input: &str) -> Result<Vec<Location>, String> {
             zone,
             uber_group,
             uber_id,
+            uber_state_value,
             x,
             y,
             map_x,
@@ -106,14 +109,16 @@ pub fn parse_locations(input: &str) -> Result<Vec<Location>, String> {
         } = record;
 
         let zone = zone.into();
-        let uber_state = UberState::from_parts(uber_group, uber_id)?;
+        let identifier = UberIdentifier::new(uber_group, uber_id);
+        let condition = uber_state_value.map(|value| UberStateCondition { comparator: UberStateComparator::GreaterOrEquals, value });
+        let trigger = UberStateTrigger { identifier, condition };
         let x = util::float_to_real(x)?;
         let y = util::float_to_real(y)?;
         let position = Position { x, y };
         let x = util::float_to_real(map_x)?;
         let y = util::float_to_real(map_y)?;
         let map_position = Position { x, y };
-        let location = Location { name, zone, uber_state, position, map_position };
+        let location = Location { name, zone, trigger, position, map_position };
 
         locations.push(location);
     }

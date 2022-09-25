@@ -12,6 +12,7 @@ struct EmitterContext<'a> {
     macros: &'a FxHashMap<&'a str, parser::Group<'a>>,
     universe_settings: &'a UniverseSettings,
     node_map: FxHashMap<String, usize>,
+    used_states: FxHashSet<&'a str>,
 }
 
 fn build_trick_requirement(trick: Trick, out: Requirement, context: &mut EmitterContext) -> Requirement {
@@ -91,7 +92,10 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::RequirementValue::Shard(shard) => Requirement::Shard((*shard).into()),
         parser::RequirementValue::Teleporter(teleporter) => Requirement::Teleporter((*teleporter).into()),
         parser::RequirementValue::Water => Requirement::Water,
-        parser::RequirementValue::State(state) => Requirement::State(context.node_map[*state]),
+        parser::RequirementValue::State(state) => {
+            context.used_states.insert(state);
+            Requirement::State(context.node_map[*state])
+        },
         parser::RequirementValue::Damage(amount) => Requirement::Damage(*amount as f32),
         parser::RequirementValue::Danger(amount) => Requirement::Danger(*amount as f32),
         parser::RequirementValue::Combat(enemies) => Requirement::Combat(enemies.clone()),
@@ -202,7 +206,7 @@ fn add_entry(node_map: &mut FxHashMap<String, usize>, key: &str, index: usize) -
 /// Builds the [`Graph`] from parsed data
 /// 
 /// The given [`UniverseSettings`] will be used to optimize the [`Graph`], changing them afterwards may invalidate the result
-pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState], universe_settings: &UniverseSettings, validate: bool) -> Result<Graph, String> {
+pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedState>, universe_settings: &UniverseSettings, validate: bool) -> Result<Graph, String> {
     let mut macros = FxHashMap::default();
     let mut regions = FxHashMap::default();
     regions.reserve(20);
@@ -243,33 +247,45 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState]
     node_map.reserve(node_count);
 
     for location in locations {
-        let Location { name, zone, uber_state, position, map_position } = location;
+        let Location { name, zone, trigger, position, map_position } = location;
         let identifier = name;
         let position = if position.x == 0. && position.y == 0. { None } else { Some(position) };
         let map_position = if map_position.x == 0. && map_position.y == 0. { None } else { Some(map_position) };
 
         add_entry(&mut node_map, &identifier, index)?;
         let node = match quests.contains(&identifier[..]) {
-            true => Node::Quest(graph::Quest { identifier, position, map_position, zone, index, uber_state }),
-            false => Node::Pickup(graph::Pickup { identifier, position, map_position, zone, index, uber_state }),
+            true => Node::Quest(graph::Quest { identifier, position, map_position, zone, index, trigger }),
+            false => Node::Pickup(graph::Pickup { identifier, position, map_position, zone, index, trigger }),
         };
         nodes.push(node);
         index += 1;
     }
-    for &state in &states {
-        let identifier = state.to_string();
-        let uber_state = named_states.iter()
-            .find(|named_state| named_state.name == identifier)
-            .map(|named_state| &named_state.uber_state)
-            .cloned();
-        if uber_state.is_none() {
-            log::trace!("Couldn't find an entry for {} in the state table", state);
-        }
-        add_entry(&mut node_map, &identifier, index)?;
-        let node = Node::State(graph::State { identifier, index, uber_state });
+    let state_start_index = index;
+    for state in named_states {
+        states.remove(&state.name[..]);
+        add_entry(&mut node_map, &state.name, index)?;
+        let node = Node::State(graph::State {
+            identifier: state.name,
+            index,
+            trigger: Some(state.trigger)
+        });
         nodes.push(node);
         index += 1;
     }
+    for identifier in states {
+        log::trace!("Couldn't find an entry for {} in the state table", identifier);
+        add_entry(&mut node_map, &identifier, index)?;
+        let node = Node::State(graph::State {
+            identifier: identifier.to_string(),
+            index,
+            trigger: None
+        });
+        nodes.push(node);
+        index += 1;
+    }
+    let state_end_index = index;
+    let mut used_states = FxHashSet::default();
+    used_states.reserve(state_end_index - state_start_index);
 
     for (anchor_index, anchor) in anchors.iter().enumerate() {
         add_entry(&mut node_map, anchor.identifier, index + anchor_index)?;
@@ -279,6 +295,7 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState]
         macros: &macros,
         universe_settings,
         node_map,
+        used_states,
     };
     for anchor in anchors {
         let region = regions.get(anchor.region());
@@ -316,26 +333,14 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: &[NamedState]
     };
 
     if validate {
-        check_unused_states(&nodes, &states);
+        let states = nodes[state_start_index..state_end_index].iter().map(|node| node.identifier()).collect::<FxHashSet<_>>();
+        let unused_states = states.difference(&context.used_states);
+        for state in unused_states {
+            log::trace!("State {} was never used as a requirement", state);
+        }
     }
 
     Ok(Graph::new(nodes))
-}
-
-fn check_unused_states(nodes: &[Node], states: &FxHashSet<&str>) {
-    let mut used_states = FxHashSet::default();
-    used_states.reserve(states.len());
-    nodes.iter()
-        .filter_map(|node| if let Node::Anchor(anchor) = node { Some(anchor) } else { None })
-        .flat_map(|anchor| &anchor.connections)
-        .map(|connection| &nodes[connection.to])
-        .filter(|node| node.node_kind() == NodeKind::State)
-        .for_each(|node| { used_states.insert(node.identifier()); });
-
-    let unused_states = states.iter().filter(|state| !used_states.contains(*state));
-    for state in unused_states {
-        log::trace!("State {} was never used as a requirement", state);
-    }
 }
 
 #[cfg(test)]
@@ -348,6 +353,7 @@ mod tests {
             macros: &FxHashMap::default(),
             universe_settings: &UniverseSettings::default(),
             node_map: FxHashMap::default(),
+            used_states: FxHashSet::default(),
         };
 
         let requirement = build_boss_requirement(100.0, &context);
@@ -359,9 +365,8 @@ mod tests {
         let mut universe_settings = UniverseSettings::default();
         universe_settings.world_settings[0].hard = true;
         let context = EmitterContext {
-            macros: &FxHashMap::default(),
             universe_settings: &universe_settings,
-            node_map: FxHashMap::default(),
+            ..context
         };
 
         let requirement = build_boss_requirement(100.0, &context);
