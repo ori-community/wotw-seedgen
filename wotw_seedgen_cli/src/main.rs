@@ -635,7 +635,7 @@ impl FromStr for ReachData {
             "sh" => data.parse().map(Self::Shard).map_err(|err| err.to_string()),
             "w" => if data == "0" { Ok(Self::Water) } else { Err(format!("Unknown world event \"{data}\"")) },
             "n" => Ok(Self::Node(data.to_string())),
-            _ => Err("Innvalid arg \"{s}\", args have to start with s:, t:, sh:, w: or n:".to_string()),
+            _ => Err(format!("Invalid arg \"{s}\", args have to start with s:, t:, sh:, w: or n:")),
         }
     }
 }
