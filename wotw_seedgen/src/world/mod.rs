@@ -85,11 +85,11 @@ impl World<'_, '_> {
         Ok(())
     }
 
-    pub(crate) fn preplace(&mut self, uber_state: UberStateTrigger, item: Item) {
-        self.preplacements.entry(uber_state).or_default().push(item);
+    pub(crate) fn preplace(&mut self, trigger: UberStateTrigger, item: Item) {
+        self.preplacements.entry(trigger).or_default().push(item);
     }
     fn collect_preplacements(&mut self, identifier: UberIdentifier, old: f32) -> bool {
-        let new = self.uber_states.get(&identifier).copied().unwrap_or_default();
+        let new = self.get_uber_state(identifier);
         if new == old { return false }
         if WISP_STATES.contains(&identifier) {
             log::trace!("Granting player Wisp");
@@ -117,6 +117,16 @@ impl World<'_, '_> {
     pub fn set_uber_state(&mut self, identifier: UberIdentifier, value: f32) -> bool {
         let old = self.uber_states.insert(identifier, value).unwrap_or_default();
         self.collect_preplacements(identifier, old)
+    }
+    /// Sets the value at an [`UberIdentifier`] and collects any items preplaced on it, but only if the current value is lower than the target value
+    /// 
+    /// This is used to set vanilla quest and world state UberStates, since they need to behave strictly incrementally
+    /// 
+    /// Returns `true` if any preplaced items were collected or the current value was already equal or higher than the target value
+    pub(crate) fn set_incremental_uber_state(&mut self, identifier: UberIdentifier, value: f32) -> bool {
+        if self.get_uber_state(identifier) < value {
+            self.set_uber_state(identifier, value)
+        } else { true }  // If a quest uberState was already manually set to a higher value, it should block placements on all the skipped quest steps
     }
     /// Returns the value at an [`UberIdentifier`]
     pub fn get_uber_state(&self, identifier: UberIdentifier) -> f32 {

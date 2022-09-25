@@ -964,11 +964,14 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
             node.trigger().is_some() &&
             !collected_preplacements.iter().any(|&index| index == node.index())
         });
+        // We need to ensure that if multiple quest steps are unlocked at the same time, their uberState values are set in order.
+        // Otherwise we would block placements on the skipped steps
+        reachable_locations.sort_unstable_by_key(|node| node.trigger().map_or(0, UberStateTrigger::set_value));
 
         for node in reachable_locations {
             let trigger = node.trigger().unwrap();
             let value = trigger.set_value() as f32;
-            let preplaced = finished_world.set_uber_state(trigger.identifier, value);
+            let preplaced = finished_world.set_incremental_uber_state(trigger.identifier, value);
             if preplaced {
                 collected_preplacements.push(node.index());
             }
@@ -1065,6 +1068,9 @@ fn generate_placements_from_spawn<'graph, 'settings>(
                     !reserved_slots.iter().any(|&(reserved_world, node)| reserved_world == world_index && node.index() == node_index)
                 )
             });
+            // We need to ensure that if multiple quest steps are unlocked at the same time, their uberState values are set in order.
+            // Otherwise we would block placements on the skipped steps
+            world_reachable.sort_unstable_by_key(|node| node.trigger().map_or(0, UberStateTrigger::set_value));
 
             let identifiers: Vec<_> = world_reachable.iter()
                 .filter_map(|&node| 
@@ -1080,7 +1086,7 @@ fn generate_placements_from_spawn<'graph, 'settings>(
             for node in world_reachable {
                 let trigger = node.trigger().unwrap();
                 let value = trigger.set_value() as f32;
-                let preplaced = world_context.world.set_uber_state(trigger.identifier, value);
+                let preplaced = world_context.world.set_incremental_uber_state(trigger.identifier, value);
                 if preplaced {
                     world_context.collected_preplacements.push(node.index());
                 } else if node.can_place() {
