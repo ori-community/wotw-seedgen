@@ -4,10 +4,12 @@
 
 mod slugstrings;
 
+use std::ops::{Deref, DerefMut};
 use std::{error::Error, fmt, iter, collections::hash_map::DefaultHasher, hash::Hasher};
-use std::fmt::Formatter;
+use std::fmt::{Formatter, Display};
 
 use rand::distributions::{Distribution, Uniform};
+use rustc_hash::FxHashSet;
 use wotw_seedgen_derive::FromStr;
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use serde::de::Visitor;
@@ -299,15 +301,15 @@ pub struct WorldSettings {
     /// Logically expected difficulty
     pub difficulty: Difficulty,
     /// Logically expected tricks
-    pub tricks: Vec<Trick>,
+    pub tricks: FxHashSet<Trick>,
     /// Logically assume hard in-game difficulty
     pub hard: bool,
     /// Goal Requirements before finishing the game
-    pub goals: Vec<Goal>,
+    pub goals: GoalModes,
     /// Names of headers to use
     /// 
     /// When generating a seed with these settings, the headers will be searched as .wotwrh files in the current and /headers child directory
-    pub headers: Vec<String>,
+    pub headers: FxHashSet<String>,
     /// Configuration parameters to pass to headers
     /// 
     /// Format for one parameter: <headername>.<parametername>=<value>
@@ -367,11 +369,13 @@ impl WorldSettings {
         if let Some(difficulty) = difficulty {
             self.difficulty = difficulty;
         }
-        if let Some(mut tricks) = tricks {
-            self.tricks.append(&mut tricks);
+        if let Some(tricks) = tricks {
+            self.tricks.extend(tricks);
         }
-        if let Some(mut goals) = goals {
-            self.goals.append(&mut goals);
+        if let Some(goals) = goals {
+            for goal in goals {
+                self.goals.add(goal)?;
+            }
         }
         if let Some(spawn) = spawn {
             self.spawn = spawn;
@@ -379,8 +383,8 @@ impl WorldSettings {
         if let Some(hard) = hard {
             self.hard = hard;
         }
-        if let Some(mut headers) = headers {
-            self.headers.append(&mut headers);
+        if let Some(headers) = headers {
+            self.headers.extend(headers);
         }
         if let Some(mut header_config) = header_config {
             self.header_config.append(&mut header_config);
@@ -478,7 +482,7 @@ impl Default for Difficulty {
 /// This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, FromStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, FromStr)]
 #[ParseFromIdentifier]
 pub enum Trick {
     /// Grounded Sentry Jumps with Sword
@@ -549,7 +553,17 @@ pub enum Goal {
     /// There are 11 zones that allow Relics, the specified chance represents how likely each single zone will have a relic
     RelicChance(f64),
 }
-
+impl Display for Goal {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Goal::Wisps => "Wisps".fmt(f),
+            Goal::Trees => "Trees".fmt(f),
+            Goal::Quests => "Quests".fmt(f),
+            Goal::Relics(count) => write!(f, "{} Relics", count),
+            Goal::RelicChance(chance) => write!(f, "{}% Relic chance", chance * 100.),
+        }
+    }
+}
 impl Goal {
     /// Returns the flag name representing this goal
     /// 
@@ -561,6 +575,55 @@ impl Goal {
             Goal::Quests => "ForceQuests",
             Goal::Relics(_) | Goal::RelicChance(_) => "WorldTour",
         }
+    }
+
+    fn is_relic_goal(&self) -> bool {
+        matches!(self, Goal::Relics(_) | Goal::RelicChance(_))
+    }
+}
+
+/// A collection of non-redundant [`Goal`]s
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct GoalModes {
+    goals: Vec<Goal>,
+}
+impl GoalModes {
+    /// Adds a [`Goal`], ensuring that it isn't redundant with existing [`Goal`]s
+    pub fn add(&mut self, goal: Goal) -> Result<(), String> {
+        if self.goals.contains(&goal) { return Ok(()) }
+
+        if goal.is_relic_goal() {
+            if let Some(other) = self.goals.iter().find(|goal| goal.is_relic_goal()) {
+                return Err(format!("Contradicting goal modes {} and {}", other, goal));
+            }
+        }
+
+        self.goals.push(goal);
+        Ok(())
+    }
+}
+impl FromIterator<Goal> for GoalModes {
+    fn from_iter<T: IntoIterator<Item = Goal>>(iter: T) -> Self {
+        Self { goals: Vec::<Goal>::from_iter(iter) }
+    }
+}
+impl IntoIterator for GoalModes {
+    type Item = Goal;
+    type IntoIter = <Vec<Goal> as IntoIterator>::IntoIter;
+    fn into_iter(self) -> Self::IntoIter {
+        self.goals.into_iter()
+    }
+}
+impl Deref for GoalModes {
+    type Target = [Goal];
+    fn deref(&self) -> &[Goal] {
+        self.goals.deref()
+    }
+}
+impl DerefMut for GoalModes {
+    fn deref_mut(&mut self) -> &mut [Goal] {
+        self.goals.deref_mut()
     }
 }
 
@@ -625,7 +688,7 @@ mod tests {
             let goals = vec![Goal::Wisps, Goal::Trees, Goal::Quests, Goal::RelicChance(0.8)];
             for goal in goals {
                 if rng.gen_bool(0.25) {
-                    universe_settings.world_settings[0].goals.push(goal);
+                    universe_settings.world_settings[0].goals.add(goal).unwrap();
                 }
             }
 

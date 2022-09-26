@@ -2,9 +2,10 @@
 
 use std::error::Error;
 
+use rustc_hash::FxHashSet;
 use serde::{Serialize, Deserialize};
 
-use crate::{settings::{Trick, Difficulty, Goal, Spawn, CreateGame, HeaderConfig, InlineHeader}, files::FileAccess};
+use crate::{settings::{Trick, Difficulty, Spawn, CreateGame, HeaderConfig, InlineHeader, GoalModes}, files::FileAccess};
 
 /// A collection of settings that can be applied to existing settings
 /// 
@@ -53,7 +54,7 @@ pub struct UniversePreset {
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub includes: Option<Vec<String>>,
+    pub includes: Option<FxHashSet<String>>,
     /// The individual settings for each world of the seed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub world_settings: Option<Vec<WorldPreset>>,
@@ -142,7 +143,7 @@ pub struct WorldPreset {
     /// 
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub includes: Option<Vec<String>>,
+    pub includes: Option<FxHashSet<String>>,
     /// Spawn destination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spawn: Option<Spawn>,
@@ -151,18 +152,18 @@ pub struct WorldPreset {
     pub difficulty: Option<Difficulty>,
     /// Logically expected tricks
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub tricks: Option<Vec<Trick>>,
+    pub tricks: Option<FxHashSet<Trick>>,
     /// Logically assume hard in-game difficulty
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hard: Option<bool>,
     /// Goal Requirements before finishing the game
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub goals: Option<Vec<Goal>>,
+    pub goals: Option<GoalModes>,
     /// Names of headers to use
     /// 
     /// When generating a seed with these settings, the headers will be searched as .wotwrh files in the current and /headers child directory
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub headers: Option<Vec<String>>,
+    pub headers: Option<FxHashSet<String>>,
     /// Configuration parameters to pass to headers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub header_config: Option<Vec<HeaderConfig>>,

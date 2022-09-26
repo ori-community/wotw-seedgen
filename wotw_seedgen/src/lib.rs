@@ -45,7 +45,7 @@ mod tests {
         graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
         generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
 
-        universe_settings.world_settings[0].headers = vec![
+        universe_settings.world_settings[0].headers = [
             "bingo".to_string(),
             "bonus+".to_string(),
             "glades_done".to_string(),
@@ -60,7 +60,7 @@ mod tests {
             "util_twillen".to_string(),
             "vanilla_opher_upgrades".to_string(),
             "bonus_opher_upgrades".to_string(),
-        ];
+        ].into_iter().collect();
 
         for preset in ["gorlek", "rspawn"] {
             let preset = WorldPreset::read_file(preset, &FILE_SYSTEM_ACCESS).unwrap();

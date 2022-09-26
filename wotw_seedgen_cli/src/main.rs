@@ -9,10 +9,10 @@ use std::{
     io::{self, Read, Write},
     time::Instant,
     env, error::Error, process::ExitCode,
-    fmt::{self, Display, Debug},
+    fmt::{self, Display, Debug}, ops::Deref,
 };
 
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 use structopt::StructOpt;
 use bugsalot::debugger;
 use serde::{Serialize, Deserialize};
@@ -386,8 +386,8 @@ struct SeedSettings {
     seed: Option<String>,
 }
 
-fn vec_in_option<T>(vector: Vec<T>) -> Option<Vec<T>> {
-    if vector.is_empty() { None } else { Some(vector) }
+fn slice_in_option<T, S: Deref<Target = [T]>>(slice: S) -> Option<S> {
+    if slice.is_empty() { None } else { Some(slice) }
 }
 
 impl SeedSettings {
@@ -434,21 +434,21 @@ impl SeedSettings {
             .map(|((((((((world_presets, spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
                 WorldPreset {
                     info: None,
-                    includes: vec_in_option(world_presets),
+                    includes: slice_in_option(world_presets).map(FxHashSet::from_iter),
                     spawn: spawn.map(SpawnOpt::into_inner),
                     difficulty,
-                    tricks: vec_in_option(tricks),
-                    goals: vec_in_option(goals.into_iter().map(GoalsOpt::into_inner).collect()),
+                    tricks: slice_in_option(tricks).map(FxHashSet::from_iter),
+                    goals: slice_in_option(goals.into_iter().map(GoalsOpt::into_inner).collect()),
                     hard,
-                    headers: vec_in_option(headers),
-                    header_config: vec_in_option(header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
-                    inline_headers: vec_in_option(inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
+                    headers: slice_in_option(headers).map(FxHashSet::from_iter),
+                    header_config: slice_in_option(header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
+                    inline_headers: slice_in_option(inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
                 }
             }).collect::<Vec<_>>();
 
         Ok(UniversePreset {
             info: None,
-            includes: universe_presets,
+            includes: universe_presets.map(FxHashSet::from_iter),
             world_settings: Some(yes_fun),
             disable_logic_filter,
             seed,
@@ -544,13 +544,13 @@ impl WorldPresetSettings {
 
         WorldPreset {
             info: info.into_preset_info(),
-            includes,
+            includes: includes.map(FxHashSet::from_iter),
             spawn: spawn.map(SpawnOpt::into_inner),
             difficulty,
-            tricks,
+            tricks: tricks.map(FxHashSet::from_iter),
             hard: if hard { Some(true) } else { None },
             goals: goals.map(|goals| goals.into_iter().map(GoalsOpt::into_inner).collect()),
-            headers,
+            headers: headers.map(FxHashSet::from_iter),
             header_config: header_config.map(|header_config| header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
             inline_headers: inline_headers.map(|inline_headers| inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
         }

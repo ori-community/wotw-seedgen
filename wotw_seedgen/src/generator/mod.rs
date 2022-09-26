@@ -172,7 +172,7 @@ fn parse_header(
 }
 
 /// verifies that inline headers don't claim names already in use
-fn validate_header_names(headers: &[String], inline_headers: &[InlineHeader]) -> Result<(), String> {
+fn validate_header_names(headers: &FxHashSet<String>, inline_headers: &[InlineHeader]) -> Result<(), String> {
     for inline_header in inline_headers {
         if let Some(name) = &inline_header.name {
             if headers.contains(name) {
