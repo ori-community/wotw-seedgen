@@ -1,0 +1,5 @@
+#category Goals
+/// Force Wisps
+///
+/// Require collecting all Wisps before fighting Shriek
+!!__GOALMODE_HACK wisps

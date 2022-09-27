@@ -1,0 +1,36 @@
+[package]
+name = "wotw_seedgen"
+description = "Seed Generator for the Ori and the Will of the Wisps Randomizer"
+version = "0.1.1"
+authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
+edition = "2021"
+repository = "https://github.com/ori-rando/wotw-seedgen"
+license = "MIT"
+
+[features]
+fs = []
+
+[dependencies]
+wotw_seedgen_derive = { path = "../wotw_seedgen_derive", version = "0.1" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+csv = "1.1"
+rustc-hash = "1.1.0"
+rand = { version = "0.8.3", features = ["std_rng", "alloc"] }
+rand_seeder = "0.2.2"
+log = "0.4"
+ansi_term = "0.12.1"
+smallvec = "1.6.1"
+regex = "1"
+num_enum = "0.5"
+decorum = "0.3"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[build-dependencies]
+syn = { version = "1.0", features = ["full"] }
+
+[[bench]]
+name = "bench"
+harness = false

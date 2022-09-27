@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Moki",
+    "description": "Default game paths and always spawn with sword, best choice for beginners",
+    "group": "Base"
+  },
+  "includes": [
+    "qol"
+  ],
+  "difficulty": "Moki",
+  "headers": [
+    "vanilla_opher_upgrades",
+    "black_market",
+    "teleporters",
+    "key_hints",
+    "zone_hints",
+    "no_trials",
+    "no_rain",
+    "fragment_overflow",
+    "spawn_with_sword"
+  ],
+  "headerConfig": [
+    {
+      "headerName": "zone_hints",
+      "configName": "tp_hints",
+      "configValue": "true"
+    }
+  ]
+}

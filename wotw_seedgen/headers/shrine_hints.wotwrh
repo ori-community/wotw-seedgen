@@ -1,0 +1,22 @@
+#category Hints
+/// Shrine Hints
+///
+/// Reveal the reward a Combat Shrine gives when starting it
+
+// Sync
+3|1|4|21|9|14
+3|1|4|21|9|15
+3|1|4|21|9|16
+3|1|4|21|9|17
+3|1|4|21|9|18
+
+19|1=1|8|9|14|int|+1
+9|14|6|instant|noclear|p=-2|Complete the Marsh Combat Shrine to gain\n$[(21786|18109)]
+19|2=1|8|9|15|int|+1
+9|15|6|instant|noclear|p=-2|Complete the Howl's Den Combat Shrine to gain\n$[(24922|13993)]
+19|0=1|8|9|16|int|+1
+9|16|6|instant|noclear|p=-2|Complete the Glades Combat Shrine to gain\n$[(44310|9902)]
+19|4=1|8|9|17|int|+1
+9|17|6|instant|noclear|p=-2|Complete the Woods Combat Shrine to gain\n$[(58674|29265)]
+19|3=1|8|9|18|int|+1
+9|18|6|instant|noclear|p=-2|Complete the Mouldwood Combat Shrine to gain\n$[(18793|31937)]

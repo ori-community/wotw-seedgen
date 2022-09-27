@@ -1,0 +1,10 @@
+#category World Changes
+/// No Rain
+///
+/// Marsh starts sunny as it usually is after getting the sword tree. Also Howl is dead
+Flags: No Rain
+
+3|0|8|6|401|bool|true
+3|0|8|21786|30656|bool|true
+3|0|8|21786|40322|bool|true
+3|0|8|21786|25095|bool|true

@@ -1,0 +1,10 @@
+#category Goals
+/// World Tour
+///
+/// Require finding randomly placed Relics before fighting Shriek
+//// Specify the chance for each individual area of the game to have a relic
+!!parameter relic_chance float:0.6
+//// Specify how many relics should be placed (max 11). Overrides relic chance
+!!parameter relic_count int:0
+
+!!__GOALMODE_HACK relics $PARAM(relic_chance) $PARAM(relic_count)
