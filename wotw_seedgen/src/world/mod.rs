@@ -88,6 +88,32 @@ impl World<'_, '_> {
     pub(crate) fn preplace(&mut self, trigger: UberStateTrigger, item: Item) {
         self.preplacements.entry(trigger).or_default().push(item);
     }
+    /// Some UberStates are chained to other UberStates that should get set as consequence
+    /// 
+    /// This should mirror the SpecialHandlers in [https://github.com/ori-rando/wotw-client/blob/dev/projects/RandoMainDLL/UberStateController.cs]
+    // With the official logic file and headers, these are all redundant, but they may be relevant for custom logic or header files
+    fn set_chained_states(&mut self, identifier: UberIdentifier, value: f32) {
+        match identifier {
+            UberIdentifier { uber_group: 5377, uber_id: 53480 } if value as u8 == 4 => {  // Water Dash Fight Arena
+                self.set_uber_state(UberIdentifier::new(5377, 1373), 4.); },  // Waterdashless Arena
+            UberIdentifier { uber_group: 42178, uber_id: 2654 } if value > 0.5 && value < 2.5 => {  // Diamond in the Rough
+                self.set_uber_state(identifier, 3.);
+                self.set_uber_state(UberIdentifier::new(23987, 14832), 1.); },  // Waterdashless Arena
+            UberIdentifier { uber_group: 37858, uber_id: 12379 } if value > 0.5 => {  // Mill complete
+                self.set_uber_state(UberIdentifier::new(937, 34641), 3.); },  // Mill Quest
+            // Voice Hackfix has no meaning to seedgen
+            UberIdentifier { uber_group: 937, uber_id: 34641 } if value > 2.5 => {  // Mill Quest
+                self.set_uber_state(UberIdentifier::new(6, 300), 1.); },  // Tuley
+            UberIdentifier { uber_group: 58674, uber_id: 32810 } if value as u8 == 7 => {  // Cat and Mouse
+                self.set_uber_state(identifier, 8.); },  // Cat and Mouse complete
+            UberIdentifier { uber_group: 16155, uber_id: 28478 } if value > 0.5 => {  // Willow Stone Vine
+                self.set_uber_state(UberIdentifier::new(16155, 12971), 4.); },  // Willow Stone Boss
+            // 5377, 63173 Any sane kind of logic file should already account for this
+            UberIdentifier { uber_group: 0, uber_id: 100 } if value > 0.5 => {  // Sword Tree
+                self.set_uber_state(UberIdentifier::new(6, 401), 1.); },  // Rain Lifted
+            _ => {},
+        };
+    }
     fn collect_preplacements(&mut self, identifier: UberIdentifier, old: f32) -> bool {
         let new = self.get_uber_state(identifier);
         if new == old { return false }
@@ -116,6 +142,7 @@ impl World<'_, '_> {
     /// Returns `true` if any preplaced items were collected
     pub fn set_uber_state(&mut self, identifier: UberIdentifier, value: f32) -> bool {
         let old = self.uber_states.insert(identifier, value).unwrap_or_default();
+        self.set_chained_states(identifier, value);
         self.collect_preplacements(identifier, old)
     }
     /// Sets the value at an [`UberIdentifier`] and collects any items preplaced on it, but only if the current value is lower than the target value
