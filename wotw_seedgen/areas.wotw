@@ -2081,7 +2081,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     gorlek, WestHollow.FullyDrained: Bow=1, Combat=Slug OR Bash OR Damage=10
     
   pickup WestHollow.HiddenEC:
-    moki: WestHollow.FullyDrained, Combat=Slug OR Bash, BreakWall=10  # probably fine
+    moki: WestHollow.FullyDrained, BreakWall=10, Combat=Slug OR Bash  # probably fine
     unsafe:
       WestHollow.FullyDrained, BreakWall=10  # you can jump around the slug, but it's kinda annoying.
       WaterDash, BreakWall=10, Damage=20  # break the wall with Water Dash
