@@ -221,7 +221,7 @@ mod tests {
 
         let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
         let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
-        let reached: Vec<_> = reached.iter().map(|node| node.identifier()).collect();
-        assert_eq!(reached, vec!["GladesTown.UpdraftCeilingEX", "GladesTown.AboveTpEX", "GladesTown.BountyShard", "GladesTown.BelowHoleHutEX"]);
+        let reached: FxHashSet<_> = reached.iter().map(|node| node.identifier()).collect();
+        assert_eq!(reached, ["GladesTown.UpdraftCeilingEX", "GladesTown.AboveTpEX", "GladesTown.BountyShard", "GladesTown.BelowHoleHutEX"].into_iter().collect());
     }
 }
