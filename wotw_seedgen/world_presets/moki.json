@@ -9,15 +9,16 @@
   ],
   "difficulty": "Moki",
   "headers": [
-    "vanilla_opher_upgrades",
-    "black_market",
-    "teleporters",
-    "key_hints",
-    "zone_hints",
+    "shrine_hints",
     "no_trials",
-    "no_rain",
+    "teleporters",
     "fragment_overflow",
-    "spawn_with_sword"
+    "key_hints",
+    "black_market",
+    "zone_hints",
+    "spawn_with_sword",
+    "vanilla_opher_upgrades",
+    "no_rain"
   ],
   "headerConfig": [
     {
