@@ -89,16 +89,6 @@ fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> 
 
     Ok(world_values)
 }
-
-fn assign_nonduplicate<T>(assign: T, current_world_entry: &mut Option<(T, String)>, source: String) -> Result<(), String> {
-    match current_world_entry {
-        Some((_, prior_source)) => Err(format!("Provided multiple values for the same world: {source} and {prior_source}")),
-        None => {
-            *current_world_entry = Some((assign, source));
-            Ok(())
-        },
-    }
-}
 fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> Result<Vec<Option<T>>, String> {
     let mut world_values: Vec<Option<(T, String)>> = vec![None; worlds];
     let mut current_world = None;
@@ -109,10 +99,10 @@ fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world
             WorldOptInner::Opt(value) => {
                 if let Some(index) = current_world {
                     let current_world_entry = world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?;
-                    assign_nonduplicate(value, current_world_entry, world_opt.source)?;
+                    *current_world_entry = Some((value, world_opt.source));
                 } else {
                     for current_world_entry in &mut world_values {
-                        assign_nonduplicate(value.clone(), current_world_entry, world_opt.source.clone())?;
+                        *current_world_entry = Some((value.clone(), world_opt.source.clone()));
                     }
                 }
             },
@@ -121,6 +111,16 @@ fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world
 
     let world_values = world_values.into_iter().map(|current_world_value| current_world_value.map(|t| t.0)).collect();
     Ok(world_values)
+}
+fn resolve_flag_world_opts(world_opts: Option<Vec<WorldOpt<bool>>>, worlds: usize) -> Result<Vec<Option<bool>>, String> {
+    match world_opts {
+        Some(opts) => if opts.is_empty() {
+                Ok(vec![Some(true); worlds])
+            } else {
+                resolve_nonduplicate_world_opts(opts, worlds)
+            },
+        None => Ok(vec![None; worlds])
+    }
 }
 
 type CannotError = String;
@@ -352,7 +352,7 @@ struct SeedSettings {
     tricks: Vec<WorldOpt<Trick>>,
     /// Logically assume hard in-game difficulty
     #[structopt(long)]
-    hard: Vec<WorldOpt<bool>>,
+    hard: Option<Vec<WorldOpt<bool>>>,
     /// Goal Requirements before finishing the game
     ///
     /// Available goals are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
@@ -413,7 +413,7 @@ impl SeedSettings {
         let world_spawns = resolve_nonduplicate_world_opts(spawn, worlds)?;
         let world_difficulties = resolve_nonduplicate_world_opts(difficulty, worlds)?;
         let world_tricks = resolve_world_opts(tricks, worlds)?;
-        let world_hard_flags = resolve_nonduplicate_world_opts(hard, worlds)?;
+        let world_hard_flags = resolve_flag_world_opts(hard, worlds)?;
         let world_goals = resolve_world_opts(goals, worlds)?;
         let world_headers = resolve_world_opts(headers, worlds)?;
         let world_header_configs = resolve_world_opts(header_config, worlds)?;
