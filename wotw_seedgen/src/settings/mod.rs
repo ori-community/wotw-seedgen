@@ -570,10 +570,10 @@ impl Goal {
     /// The flag name communicates to the randomizer client which restrictions to apply before allowing to finish the game
     pub fn flag_name(&self) -> &'static str {
         match self {
-            Goal::Wisps => "ForceWisps",
-            Goal::Trees => "ForceTrees",
-            Goal::Quests => "ForceQuests",
-            Goal::Relics(_) | Goal::RelicChance(_) => "WorldTour",
+            Goal::Wisps => "All Wisps",
+            Goal::Trees => "All Trees",
+            Goal::Quests => "All Quests",
+            Goal::Relics(_) | Goal::RelicChance(_) => "Relics",
         }
     }
 
