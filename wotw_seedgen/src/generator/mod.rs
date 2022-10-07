@@ -76,6 +76,11 @@ fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut imp
     let mut goals = vec![];
     let mut state_sets = vec![];
 
+    flags.push(world.player.settings.difficulty.to_string());
+    if !world.player.settings.tricks.is_empty() { flags.push("Glitches".to_string()); }
+    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
+    if world.player.settings.hard { flags.push("Hard".to_string()); }
+
     let header_names = headers.into_iter().map(|(header_name, mut header)| {
         for exclude in header.excludes {
             excludes.insert(exclude, header_name.clone());
@@ -132,7 +137,6 @@ fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut imp
     for flag in goals.iter().map(Goal::flag_name) {
         flags.push(flag.to_string());
     }
-    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
 
     let mut header_block = String::new();
 

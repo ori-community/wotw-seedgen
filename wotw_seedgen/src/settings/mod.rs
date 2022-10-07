@@ -10,7 +10,7 @@ use std::fmt::{Formatter, Display};
 
 use rand::distributions::{Distribution, Uniform};
 use rustc_hash::FxHashSet;
-use wotw_seedgen_derive::FromStr;
+use wotw_seedgen_derive::{FromStr, Display};
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use serde::de::Visitor;
 
@@ -465,7 +465,7 @@ impl<'de> Deserialize<'de> for Spawn {
 /// Difficulties don't include glitches by default, these can be toggled through the Trick settings
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, FromStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, FromStr, Display)]
 #[ParseFromIdentifier]
 pub enum Difficulty {
     Moki,
