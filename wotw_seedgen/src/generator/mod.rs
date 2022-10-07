@@ -78,7 +78,7 @@ fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut imp
 
     flags.push(world.player.settings.difficulty.to_string());
     if !world.player.settings.tricks.is_empty() { flags.push("Glitches".to_string()); }
-    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
+    if world.player.settings.is_random_spawn() { flags.push("Random Spawn".to_string()); }
     if world.player.settings.hard { flags.push("Hard".to_string()); }
 
     let header_names = headers.into_iter().map(|(header_name, mut header)| {
