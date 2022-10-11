@@ -1,10 +1,12 @@
+use std::slice;
+
 use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use super::player::Player;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard, Teleporter};
-use crate::settings::{Difficulty, Trick};
+use crate::settings::{Difficulty, Trick, WorldSettings};
 use crate::util::{Enemy, orbs::{self, Orbs}};
 
 type Itemset = Vec<(Inventory, Orbs)>;
@@ -505,12 +507,59 @@ impl Requirement {
         }
     }
 
-    pub fn contained_states(&self) -> Vec<usize> {
+    /// Checks whether this [`Requirement`] is possible to meet with the given settings
+    pub(crate) fn is_possible_for(&self, settings: &WorldSettings) -> bool {
         match self {
-            Requirement::State(state) => vec![*state],
-            Requirement::And(nested) |
-            Requirement::Or(nested) => nested.iter().flat_map(Requirement::contained_states).collect(),
-            _ => vec![],
+            Requirement::Impossible => false,
+            Requirement::Difficulty(difficulty) => settings.difficulty >= *difficulty,
+            Requirement::NormalGameDifficulty => !settings.hard,
+            Requirement::Trick(trick) => settings.tricks.contains(trick),
+            Requirement::And(nested) => nested.iter().all(|requirement| requirement.is_possible_for(settings)),
+            Requirement::Or(nested) => nested.iter().any(|requirement| requirement.is_possible_for(settings)),
+            _ => true,
+        }
+    }
+
+    pub(crate) fn contained_requirements<'a, 'b>(&'a self, settings: &'b WorldSettings) -> ContainedRequirements<'a, 'b> {
+        ContainedRequirements::new(self, settings)
+    }
+}
+
+pub(crate) struct ContainedRequirements<'a, 'b> {
+    nested: Vec<slice::Iter<'a, Requirement>>,
+    settings: &'b WorldSettings,
+}
+impl<'a, 'b> ContainedRequirements<'a, 'b> {
+    pub(crate) fn new(requirement: &'a Requirement, settings: &'b WorldSettings) -> ContainedRequirements<'a, 'b> {
+        ContainedRequirements {
+            nested: vec![slice::from_ref(requirement).iter()],
+            settings,
+        }
+    }
+}
+impl<'a> Iterator for ContainedRequirements<'a, '_> {
+    type Item = &'a Requirement;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        'outer: loop {
+            let current = self.nested.last_mut()?;
+            loop {
+                match current.next() {
+                    Some(requirement) => {
+                        if requirement.is_possible_for(&self.settings) {
+                            match requirement {
+                                Requirement::And(nested) | Requirement::Or(nested) => self.nested.push(nested.iter()),
+                                req @ _ => return Some(req)
+                            }
+                            continue 'outer;
+                        }
+                    },
+                    None => {
+                        self.nested.pop();
+                        continue 'outer;
+                    },
+                }
+            }
         }
     }
 }

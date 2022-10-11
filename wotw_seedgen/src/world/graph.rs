@@ -236,8 +236,12 @@ impl Graph {
                     }
                     let target_orbs = Graph::try_connection(context.player, connection, &best_orbs, &context.states);
                     if target_orbs.is_empty() {
-                        let mut states = connection.requirement.contained_states();
-                        states.retain(|state| !context.states.contains(state));
+                        let states = connection.requirement.contained_requirements(&context.player.settings)
+                            .filter_map(|requirement| match requirement {
+                                Requirement::State(state) if !context.states.contains(state) => Some(*state),
+                                _ => None,
+                            })
+                            .collect::<Vec<_>>();
 
                         if states.is_empty() {
                             if context.progression_check {

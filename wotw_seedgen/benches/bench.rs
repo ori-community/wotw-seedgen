@@ -113,7 +113,10 @@ fn reach_checking(c: &mut Criterion) {
 }
 
 fn generation(c: &mut Criterion) {
-    let mut universe_settings = UniverseSettings::default();
+    let mut universe_settings = UniverseSettings {
+        seed: String::new(),
+        ..UniverseSettings::default()
+    };
 
     let areas = fs::read_to_string("areas.wotw").unwrap();
     let locations = fs::read_to_string("loc_data.csv").unwrap();
@@ -142,4 +145,4 @@ criterion_group!(only_parsing, parsing);
 criterion_group!(only_requirements, requirements);
 criterion_group!(only_reach_checking, reach_checking);
 criterion_group!(only_generation, generation);
-criterion_main!(only_parsing);  // put any of the group names in here
+criterion_main!(only_generation);  // put any of the group names in here
