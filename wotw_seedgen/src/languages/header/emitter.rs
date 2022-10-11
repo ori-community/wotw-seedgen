@@ -178,7 +178,7 @@ fn build_goalmode(goalmode: GoalmodeHack, goals: &mut Vec<Goal>, parameters: &Fx
         GoalmodeHack::Wisps => Goal::Wisps,
         GoalmodeHack::Quests => Goal::Quests,
         GoalmodeHack::Relics { chance, amount } => {
-            let chance = chance.resolve(parameters)?;
+            let chance = chance.resolve(parameters)?.min(1.0);
             let amount = amount.resolve(parameters)?;
 
             if amount == 0 {
