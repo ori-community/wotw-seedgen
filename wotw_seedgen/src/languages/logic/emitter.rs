@@ -188,8 +188,10 @@ fn build_requirement_group<'a>(group: &parser::Group<'a>, region: bool, context:
             let ors = line.ors.iter().map(|or| build_requirement(or, region, context)).collect::<Vec<_>>();
             parts.push(build_or(ors));
         }
-        if let Some(subgroup) = &line.group {
-            parts.push(build_requirement_group(subgroup, region, context));
+        if !parts.iter().any(|requirement| matches!(requirement, Requirement::Impossible)) {
+            if let Some(subgroup) = &line.group {
+                parts.push(build_requirement_group(subgroup, region, context));
+            }
         }
         build_and(parts)
     }).collect::<Vec<_>>();
