@@ -25,7 +25,7 @@ jobs:
           override: true
       
       - name: Publish to crates.io
-        run: cargo publish --token ${CRATES_TOKEN}
+        run: cargo publish --token ${CRATES_TOKEN} -p wotw_seedgen
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
       

@@ -2,4 +2,7 @@ target/*
 rls/*
 *.wotwr
 *.log
-.currentseedpath
+*.currentseedpath
+Cargo.lock
+*spoiler*.txt
+*spoiler*.json

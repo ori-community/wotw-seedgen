@@ -1,0 +1,64 @@
+{
+  "info": {
+    "name": "Full Bonus",
+    "description": "All of the Bonus, None of the Balance"
+  },
+  "headers": [
+    "bonus_items",
+    "jumpgrades",
+    "skill_velocity",
+    "bonus+"
+  ],
+  "headerConfig": [
+    {
+      "headerName": "bonus_items",
+      "configName": "extraJumps",
+      "configValue": "4"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "extraDashes",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "blazeEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "spikeEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "shurikenEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "sentryEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "bowEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "regenEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "flashEfficiency",
+      "configValue": "2"
+    },
+    {
+      "headerName": "bonus_items",
+      "configName": "grenadeEfficiency",
+      "configValue": "2"
+    }
+  ]
+}

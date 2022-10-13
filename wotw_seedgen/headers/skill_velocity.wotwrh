@@ -1,0 +1,49 @@
+#category Item Pool
+/// Skill Velocity
+///
+/// Adds Skill Velocity pickups into the item pool that make you more speedy
+/// Toggle this on or off in the Randomizer Wheel
+!!include bonus_core
+//// How many Skill Velocities to shuffle in
+!!parameter count int:5
+!!name 8|9|5|int|+1 #Skill Velocity#
+!!display 8|9|5|int|+1 $[(9|999=400)]
+!!description 8|9|5|int|+1 Move faster when using abilities such as Dash and Bash
+!!icon 8|9|5|int|+1 file:assets/icons/bonus/skillvelocity.png
+!!add $PARAM(count)x 8|9|5|int|+1
+
+// skip-validate
+9|0=199|4|17|9|109|1|8|9|0|int|200      // Add wheel toggle
+9|0=200|16|0|1|0|Toggle Skill Velocity
+9|0=200|4|17|9|110|1|16|1|1|0|[Ability1]Toggle off
+9|0=200|4|17|9|110|0|16|1|1|0|[Ability1]Toggle on
+9|0=200|16|2|1|0|file:assets/icons/bonus/skillvelocity.png
+9|0=200|4|17|9|110|1|16|3|1|0|255|255|255|255
+9|0=200|4|17|9|110|0|16|3|1|0|128|128|128|196
+9|0=200|16|4|1|0|0|8|9|0|int|51
+
+9|999=400|6|#Skill Velocity x$(9|5)#    // display name
+
+9|5|4|25|1|8|9|110|bool|true            // set to default enabled
+9|5|4|26|100|8|9|5|int|100|skip=1       // cap at 100
+9|5|4|17|9|110|1|8|9|6|int|1            // grant on pickup if enabled
+9|5=1|8|9|109|bool|true                 // subscribe to bonus core
+
+9|0=100|8|9|6|int|$(9|5)                // enable callback
+9|0=101|8|9|6|int|101|skip=1            // disable callback
+9|0=101|8|9|6|int|+$(9|5)
+// Apply speed factors in a loop
+9|6|4|27|101|8|4|80|float|+0.16
+9|6|4|27|101|8|4|81|float|+0.16
+9|6|4|27|101|8|4|82|float|+0.16
+9|6|4|27|101|8|4|84|float|+0.16
+9|6|4|27|101|8|4|86|float|+0.16
+9|6|4|27|101|8|4|90|float|+0.16
+9|6|4|26|101|8|4|80|float|-0.16
+9|6|4|26|101|8|4|81|float|-0.16
+9|6|4|26|101|8|4|82|float|-0.16
+9|6|4|26|101|8|4|84|float|-0.16
+9|6|4|26|101|8|4|86|float|-0.16
+9|6|4|26|101|8|4|90|float|-0.16
+9|6|4|25|101|8|9|6|int|0
+9|6|8|9|6|int|-1

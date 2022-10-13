@@ -1,0 +1,14 @@
+{
+  "info": {
+    "name": "Quality of Life",
+    "description": "Enables some quality of life settings (e.g. autoplant, cutscene skips etc.)"
+  },
+  "headers": [
+    "progress_helper",
+    "spawn_tuley",
+    "autoplants",
+    "no_branch",
+    "no_cutscenes",
+    "tp_refill"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Gorlek",
+    "description": "For advanced players, requires some hard paths and doesn't spawn with sword",
+    "group": "Base"
+  },
+  "includes": [
+    "qol"
+  ],
+  "difficulty": "Gorlek",
+  "headers": [
+    "shrine_hints",
+    "trial_hints",
+    "teleporters",
+    "fragment_overflow",
+    "key_hints",
+    "black_market",
+    "zone_hints",
+    "vanilla_opher_upgrades",
+    "no_rain"
+  ],
+  "headerConfig": [
+    {
+      "headerName": "zone_hints",
+      "configName": "tp_hints",
+      "configValue": "true"
+    }
+  ]
+}
