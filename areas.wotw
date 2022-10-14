@@ -7391,7 +7391,7 @@ anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the en
       DepthsLight, SentryJump=1
     kii:
       Bash
-      DepthsLight, Hammer, OR Shuriken=2 OR Sentry=2 OR Sword
+      DepthsLight, Hammer OR Shuriken=2 OR Sentry=2 OR Sword
 
   conn UpperDepths.FirstKSRoom:
     moki:
