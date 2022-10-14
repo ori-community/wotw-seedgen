@@ -7194,7 +7194,7 @@ anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the
       Glide, Combat=Bat OR Bash
       Combat=2xBombSlug, Damage=30, Bash, DoubleJump OR Dash  # Lots of possibilities here but Bash is the most reliable way to avoid too much damage
     kii:
-      Dash, Damage=40 
+      Dash, Damage=40
       Glide
       Shuriken=4 OR Blaze=2, Damage=40
       Sentry=4 OR Sword OR Flash=4, Damage=70
@@ -7229,7 +7229,6 @@ anchor UpperDepths.FirstFirefly at 211, -4391:  # Where the Voice dialogue plays
       Bash, Sword OR Hammer OR Shuriken=1
       Bash, Damage=30, Sentry=1 OR Flash=1
       DoubleJump, TripleJump
-      
     unsafe:
       Bash
       SentryJump=1, Combat=Bat, Glide, Damage=30
@@ -7293,6 +7292,7 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
     gorlek:
       Water, UpperDepths.ForestsEyes OR Flash=1
       DepthsLight, ShurikenBreak=20, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30
+
   conn UpperDepths.FirstFirefly:
     moki:
       Grapple, DoubleJump, Combat=Spiderling+WeakSlug OR Bash
@@ -7319,7 +7319,7 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
       DoubleJump, TripleJump OR Dash
   conn UpperDepths.RightKeystonePath:
     gorlek:
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide # It looks like you need a bash glide, so it should probably kii
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide  # @Validator It looks like you need a bash glide, so it should probably kii
       Glide, DoubleJump OR Dash
 
 # checkpoint at 136, -4425
@@ -7341,7 +7341,6 @@ anchor UpperDepths.KeydoorLedge at 285, -4407:  # In front of the entry keystone
       Launch, DoubleJump OR Dash OR Glide OR Sword
     kii, UpperDepths.EntryKeystoneDoor, BreakWall=16, BreakWall=16:
       Launch, Damage=30
-
   state UpperDepths.EntryKeystoneDoor:
     moki: Keystone=2
 
@@ -7357,11 +7356,10 @@ anchor UpperDepths.KeydoorLedge at 285, -4407:  # In front of the entry keystone
     gorlek:
       DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # With Hammer first do howering, then press DoubleJump
       Grapple, Sword
-    kii: 
+    kii:
       Dash OR Sword
       Grapple, Hammer OR Sentry=2
       DoubleJump, Sentry=2 OR Shuriken
-  
   conn UpperDepths.BelowHive:
     moki, UpperDepths.EntryKeystoneDoor, UpperDepths.LightPuzzle OR DepthsLight:
       Bash, DoubleJump, Grapple
@@ -7376,6 +7374,7 @@ anchor UpperDepths.KeydoorLedge at 285, -4407:  # In front of the entry keystone
       UpperDepths.LightPuzzle OR DepthsLight:
         Sentry=1 OR Shuriken=1 OR Sword OR Hammer OR Glide OR DoubleJump OR Damage=30
       Flash=1 # if flash is your lightsource as well you need to turn it off and then turn it on again during your jump
+
 anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the entry keydoor, going towards the keystone
   refill Checkpoint
 
@@ -7402,7 +7401,7 @@ anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the en
       Grapple, SentryJump=1
       Launch
     kii:
-      Dash, Damage=30, DoubleJump OR Shuriken=1 OR Flash=1 OR Sword OR Hammer    
+      Dash, Damage=30, DoubleJump OR Shuriken=1 OR Flash=1 OR Sword OR Hammer
 
 anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tunnel leading downwards
   refill Checkpoint
@@ -7435,6 +7434,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
   quest UpperDepths.LightcatcherSeed:
     gorlek: ShurikenBreak=20, DepthsLight, DoubleJump OR Dash OR Glide OR Sword
     kii: ShurikenBreak=20, DepthsLight, Sword OR Sentry=2
+
   pickup UpperDepths.HiveEX:
     moki: Bash OR Launch  # bash makes paths destroying the hive redundant in moki
     gorlek:
@@ -7448,7 +7448,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
     gorlek, UpperDepths.EntryKeystoneDoor:
       DepthsLight, Sword OR Hammer OR Damage=30
       Dash, Launch
-    kii, UpperDepths.EntryKeystoneDoor: 
+    kii, UpperDepths.EntryKeystoneDoor:
       DepthsLight:
         Sentry=1 OR Shuriken=1 OR Sword OR Hammer OR Glide OR DoubleJump OR Damage=30
       Flash=1 # if flash is your lightsource as well you need to turn it off and then turn it on again during your jump
@@ -7460,7 +7460,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
       DoubleJump, TripleJump
       DepthsLight, Damage=30, DoubleJump OR Dash
       DepthsLight, SentryJump=1
-    kii: 
+    kii:
       DoubleJump
   conn UpperDepths.Central:  # paths using the firefly have to go from the teleporter
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
@@ -7473,7 +7473,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
 
 anchor UpperDepths.Teleporter at 513, -4361:  # The spirit well
   refill Full
-  
+
   state NonGladesTeleporter: free
 
   pickup UpperDepths.TeleporterEX: free  # just a few steps away in the darkness
@@ -7488,9 +7488,8 @@ anchor UpperDepths.Teleporter at 513, -4361:  # The spirit well
       BreakWall=1, Shuriken OR Grenade
       SentryJump=1  # use the weapon to break the firefly egg
       Dash, Damage=30 OR Launch  # spam and land in the spikes or catch with launch
-    kii: 
-      Dash OR Launch 
-      
+    kii:
+      Dash OR Launch
   conn UpperDepths.Central:  # paths using depthslight already solve connection through the midway anchor
     moki:
       BreakWall=1, Bow, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
@@ -7524,7 +7523,7 @@ anchor UpperDepths.Central at 464, -4484:  # The firefly egg to the right of the
     gorlek:
       DepthsLight, Bash, Grenade=1, DoubleJump, TripleJump OR Damage=10
       DepthsLight, SentryJump=1, DoubleJump, TripleJump, Damage=10
-    kii: 
+    kii:
       DepthsLight, DoubleJump, TripleJump
 
 anchor UpperDepths.SecondKSRoom at 542, -4467:  # The egg of the firefly circling through the keystone room
@@ -7562,7 +7561,7 @@ anchor UpperDepths.SecondKSRoom at 542, -4467:  # The egg of the firefly circlin
       BreakWall=1, DoubleJump, TripleJump OR Dash OR Glide
       DepthsLight, DoubleJump, TripleJump
       Dash, Launch
-    kii: 
+    kii:
       DepthsLight, DoubleJump, Sword OR Hammer OR Flash=1 OR Blaze=1 OR Shuriken=1
   pickup UpperDepths.BossPathEX:  # saved for later to know redundancies with the new anchor
     moki:
@@ -7592,7 +7591,7 @@ anchor UpperDepths.SecondKSRoom at 542, -4467:  # The egg of the firefly circlin
       DepthsLight, Dash, Damage=30
       DepthsLight, Bash, Grenade=1, Damage=30, Glide OR Sword
       DepthsLight, Bash, Grenade=2
-    kii: 
+    kii:
       DepthsLight, Damage=60, Sentry=4 OR Sword OR Shuriken=4 OR Hammer
 
 anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark path towards Mora
@@ -7615,6 +7614,7 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
     kii:
       DepthsLight, Grapple, Damage=30 OR Dash OR Glide OR Sword OR Sentry=2 OR Shuriken=1
       DepthsLight, DoubleJump
+
   conn UpperDepths.OutsideMoraFight:
     moki:
       DepthsLight, Grapple, DoubleJump, Dash OR Glide
@@ -7632,7 +7632,7 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
       DepthsLight, HammerSJump=2, DoubleJump OR Dash OR Glide
       DepthsLight, SentryJump=3
       Launch, DoubleJump OR Dash OR Glide
-    kii: 
+    kii:
       DepthsLight, Grapple, Damage=30, Dash OR Sword OR DoubleJump OR Glide
       DepthsLight, Bash, Damage=30, Sword OR DoubleJump OR Dash OR Glide
   conn UpperDepths.SecondKSRoom:
@@ -7715,7 +7715,7 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
       BreakWall=1, DoubleJump, TripleJump
       BreakWall=1, SentryJump=4
       SentryJump=1, DoubleJump, DepthsLight OR BreakWall=1
-    kii: 
+    kii:
       DepthsLight, Grapple, Sentry=3 OR Shuriken=3 OR Sword OR Hammer
       DepthsLight, DoubleJump, TripleJump
   conn UpperDepths.Central:
@@ -7753,7 +7753,7 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
       DepthsLight, DoubleJump, Dash, Hammer
       DepthsLight, Dash, Sword
       DepthsLight, Launch, Sword OR Hammer OR Damage=30
-    kii: 
+    kii:
       DepthsLight, Bash, Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
       DepthsLight, Sword, Sentry=2
       DepthsLight, Damage=30, Shuriken=2 OR Sentry=3
