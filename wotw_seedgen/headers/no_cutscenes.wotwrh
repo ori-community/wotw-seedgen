@@ -1,0 +1,36 @@
+#category Quality of Life
+/// No Cutscenes
+///
+/// skips several short cutscenes
+!!include header_core
+
+3|0|8|4220|11666|bool|true     // hasOriUsedSavePedestal
+3|0|8|41644|58674|bool|true    // mokiFoulWaterVignetteTriggered
+3|0|8|37811|58674|bool|true    // mokiCleanWaterVignetteTriggered
+3|0|8|35023|5377|bool|true     // playedMokiVignette
+3|0|8|3846|48248|bool|true     // stenchTease
+3|0|8|9367|945|bool|true       // wispSequencePlayedOut
+3|0|8|40451|48248|bool|true    // baurReachWispIntro
+3|0|8|37364|48248|bool|true    // mouldwoodDepthsWisptIntro
+3|0|8|55196|20120|bool|true    // wispSequencePlayedOut
+3|0|8|45740|24922|bool|true    // interactedWithTokk
+3|0|8|25031|37858|bool|true    // rescuedOpher
+3|0|8|21700|5377|bool|true     // talkedToKwolok
+3|0|8|48794|14019|int|1        // findToadQuestUberState
+3|0|8|34641|937|int|2          // cleanseWellspringQuestUberState
+3|0|8|3621|10289|bool|true     // ruinsVisited
+
+3|0|8|51018|21786|bool|true    // powlTeaseTriggered
+3|0|8|2108|28895|bool|true     // powlTeaseTriggered
+3|0|8|23225|37858|bool|true    // playedNaruGumoCutaway
+3|0|8|32922|16155|bool|true    // introPlayed
+
+!46462|59806|8|937|6778|bool|true   // voice door
+42178|18751=3|8|42178|16586|byte|1  // cave project
+42178|18751=3|8|14019|33776|int|1
+6|1014|8|18793|25789|bool|true      // depths gate
+937|10071|8|9|0|int|2               // ruins gate
+!18793|63291|8|9|0|int|2
+!28895|25522|8|9|0|int|2
+!945|49747|8|9|0|int|2
+9|0=2|4|17|937|10071|1|4|17|28895|25522|1|4|17|18793|63291|1|4|17|945|49747|1|8|10289|3804|bool|true

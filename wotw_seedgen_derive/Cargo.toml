@@ -1,0 +1,14 @@
+[package]
+name = "wotw_seedgen_derive"
+description = "Derive macro utilities used for wotw_seedgen"
+version = "0.1.1"
+edition = "2021"
+repository = "https://github.com/ori-rando/wotw-seedgen"
+license = "MIT"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0"
+quote = "1.0"

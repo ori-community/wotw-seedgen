@@ -1,0 +1,33 @@
+name: publish-crate
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish-crate:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+      
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      
+      - name: Publish to crates.io
+        run: cargo publish --token ${CRATES_TOKEN} -p wotw_seedgen
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+      
+
+
