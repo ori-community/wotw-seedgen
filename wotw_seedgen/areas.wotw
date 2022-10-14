@@ -8546,8 +8546,8 @@ anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the
     kii:
       Dash, Damage=40
       Glide
-      Shuriken=4 OR Blaze=2, Damage=40
-      Sentry=4 OR Sword OR Flash=4, Damage=70
+      Damage=40, Shuriken=4 OR Blaze=2
+      Damage=70, Sentry=4 OR Sword OR Flash=4
   conn EastHollow.AboveDepths:
     moki: EastHollow.DepthsOpen, Glide
     gorlek, EastHollow.DepthsOpen:
