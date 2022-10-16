@@ -133,7 +133,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=1  # Grenade bash straight up from below
     gorlek:
-      MarshSpawn.RainLifted, Bash  # bash the mantis
+      MarshSpawn.RainLifted, Bash  # jump the jumper
       Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
     kii:
       Sentry=1 OR Flash=1
