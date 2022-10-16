@@ -602,7 +602,9 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
   refill Checkpoint
 
   state PoolsApproach.WheelFreed:  # Make sure it's not redundant with going to PoolsApproach.OnTopOfWheel first
-    moki: Water, Bash
+    moki: Water, WaterBreath, Bash
+    gorlek: Water, Bash
+    # something something waterdash?
 
   pickup MarshSpawn.PoolsPathEX:
     moki:
@@ -619,10 +621,13 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       Sword OR Hammer OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR Damage=10 OR PauseHover  # Sneaky micro ledges. Shuriken path requires you to angle the shuriken forwards for quicker catching.
 
   conn PoolsApproach.OnTopOfWheel:
-    moki, Water:
+    moki, Water, WaterBreath OR WaterDash:  # since WheelFreed solves this on its own, the other paths don't have to work with a spinning wheel
       PoolsApproach.WheelFreed OR DoubleJump OR Launch
       Bash, Grenade=1
-    gorlek, Water: Hammer OR SentryJump=1
+    gorlek, Water:
+      PoolsApproach.WheelFreed OR DoubleJump OR Launch
+      Bash, Grenade=1
+      Hammer OR SentryJump=1
     unsafe: Water  # Precise wall jump where the tentacle is grabbing the wheel
   conn MarshSpawn.Main:
     moki:
