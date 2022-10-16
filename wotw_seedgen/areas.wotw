@@ -1109,7 +1109,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
     moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
     gorlek, MarshSpawn.ToOpherBarrier:
       MarshSpawn.RainLifted, Bash  # jump the jumper
-      Sword OR Hammer # Long jump, upslash and neutral slashes are enough with both weapons
+      Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
     kii, MarshSpawn.ToOpherBarrier:
       Sentry=2 OR Shuriken=1 OR Blaze=3
 
