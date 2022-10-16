@@ -416,12 +416,19 @@ anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the 
     moki: MarshSpawn.BurrowArena
 
   conn MarshSpawn.BurrowFightArena:
-    moki: DoubleJump OR Dash OR Launch
-    gorlek: Sword OR Damage=10
-    kii: Glide OR Hammer
+    moki:
+      DoubleJump, Dash OR Glide
+      Dash, Glide
+      Launch
+    gorlek:
+      DoubleJump OR Dash OR Damage=10
+      SentryJump=1
+    kii: Glide OR Sword OR Hammer
   conn MarshSpawn.PoolsBurrowsSignpost:  # check for redundancies with BurrowFightArena
-    moki: Bash, Glide
-    gorlek: Bash
+    moki: Bash, DoubleJump OR Dash OR Glide OR Launch
+    gorlek:
+      Bash
+      Damage=10, Glide OR Sword OR Hammer
     kii: free
 
 anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between pools, burrows and marsh
