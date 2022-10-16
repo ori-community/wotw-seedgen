@@ -492,14 +492,18 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       DoubleJump, TripleJump  # hardcore parkour
       Launch
   conn MarshSpawn.Cave: free
-  conn MarshSpawn.BurrowFightArena:
+  conn MarshSpawn.LifepactLedge:
     moki: Bash, DoubleJump OR Dash OR Launch
+    gorlek:
+      Bash, Damage=10, Glide OR Sword
+      Launch, Damage=10
     kii:
       Bash, Glide
       Damage=10, DoubleJump OR Dash
-      Sword OR Hammer OR DoubleJump OR Dash
-  conn MarshSpawn.LifepactLedge:  # check for redundancies with BurrowFightArena
-    gorlek: Bash, Damage=10, Glide OR Sword
+      Sword OR Hammer OR DoubleJump OR Dash OR Launch
+
+  conn MarshSpawn.BurrowFightArena:  # check for redundancies with LifepactLedge
+    gorlek: Bash, SentryJump=1
 
 # checkpoint at -954, -4355
 # checkpoint at -1004, -4497
