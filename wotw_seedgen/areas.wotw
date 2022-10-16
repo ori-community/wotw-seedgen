@@ -1917,62 +1917,6 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       Damage=40, DoubleJump OR Dash OR Sword
       WaterDash
 
-anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below HollowDrainMiddle, submerged until WestHollow.FullyDrained
-  nospawn  # underwater
-  refill Energy=1:
-    moki: WestHollow.FullyDrained, BreakCrystal
-    
-  state WestHollow.UpperTongueExtended:
-    moki, WestHollow.FullyDrained: Combat=BombSlug, Bow=1  # camera won't show the frog statue unless you kill the slug
-    unsafe: Bow=1  #Snipe
-  state WestHollow.UpperTongueRetracted:  # This tongue can be a negative for the HollowDrainMiddle connection so we need a state for retracting it to prevent softlocks. Unlike when coming from above, you can screw yourself here without any stupid headers by extending the tongue and blocking your line of sight to retract it again, so we choose to write paths for this scenario
-    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended, Combat=BombSlug, Bow=1
-    gorlek, WestHollow.FullyDrained: WestHollow.LowerTongueExtended, Bow=1
-  state WestHollow.LowerTongueExtended:
-    moki, WestHollow.FullyDrained: Combat=BombSlug, Bow=1  # need to kill the slug in order to aim the frog statue
-    unsafe, WestHollow.FullyDrained: Bow=1  # waiting long enough on the left of the energy crystal will zoom out the camera and allow to autoaim the statue
-      
-  pickup WestHollow.HiddenEC:
-    moki, WestHollow.FullyDrained: BreakWall=10, DoubleJump OR Glide OR Launch OR WestHollow.LowerTongueExtended
-    gorlek, WestHollow.FullyDrained: BreakWall=10
-    
-  conn WestHollow.HollowDrainMiddle:
-    moki, WestHollow.FullyDrained:
-      Launch  # Works regardless of the tongue states
-      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, DoubleJump, Dash
-      WestHollow.UpperTongueRetracted, Bash, Grenade=1, DoubleJump OR Dash OR Glide
-    gorlek, WestHollow.FullyDrained:
-      DoubleJump, TripleJump  # if the the tongue is retracted, wjump on the frog statue. else, jump on the tongue directly
-      WestHollow.UpperTongueRetracted, Bash, Grenade=1
-      WestHollow.UpperTongueRetracted, SentryJump=1
-      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, DoubleJump
-    kii, WestHollow.FullyDrained:
-      DoubleJump, Sword OR Hammer OR Spear=2 OR WestHollow.UpperTongueExtended  # Grab the pole and jump on the frog statue or extend the tongue and jump on it
-      DoubleJump, Spear=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # More energy efficient than 2 spears
-      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Dash OR Hammer
-      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Glide, Shuriken=2 OR Flash=2 OR Sentry=2
-      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Glide, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, WestHollow.FullyDrained:
-      DoubleJump, Spear=1
-      HammerJump OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 # land on the narrow ledge next to the spikes
-      GlideJump, DoubleJump  # the platform is a bit higher near the crystal 'even if it's broken)
-      Bash, Grenade=1  # the placement of the grenade is different depending on how the tongues are oriented, but it's always doable.
-      WestHollow.UpperTongueExtended, Dash OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR GlideJump
-      Bow=1, Shuriken=1, Blaze=1 OR Glide  # Not sure which tongue this path is using?
-  conn WestHollow.RockPuzzle:
-    moki, WestHollow.FullyDrained: DoubleJump OR Dash  # Launch redundant with going to HollowDrainMiddle first
-    gorlek, WestHollow.FullyDrained:
-      SwordSJump=1  # sword sjump works fine with the upper tongue extended
-      WestHollow.UpperTongueRetracted, HammerSJump=1
-      Damage=10
-    kii, WestHollow.FullyDrained:
-      Hammer OR Shuriken=1
-      Glide, Sword OR Flash=1 OR Sentry=1
-    unsafe: Sword OR Flash=1 OR Sentry=1 OR FlashSwap OR BlazeSwap=1 OR GlideJump OR GrenadeJump OR PauseHover
-  conn WestHollow.HollowDrainLower:
-    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended OR Launch OR Glide OR DoubleJump
-    gorlek: WestHollow.FullyDrained
-
 anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock puzzle room
   refill Checkpoint
   refill Health=1
@@ -2025,7 +1969,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
     unsafe, WestHollow.UpperDrainLeverPulled, WestHollow.RockPuzzleSolved:
       Hammer  # Upslash and swing left
   conn WestHollow.HollowDrainMiddle:
-  # If FullyDrained, this connection originate from SubmergedPlatform instead
+  # If FullyDrained, this connection originates from SubmergedPlatform instead
   # WestHollow.UpperTongueExtended is a HUGE negative for this connection and you can't retract it unless you have access to SubmergedPlatform
     gorlek, WestHollow.UpperDrainLeverPulled:
       Damage=20, Launch  # dboost in dirty water to pass under the upper tongue. If fully drained, solve by going to SubmergedPlatform
@@ -2097,6 +2041,62 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
   # backwards connection blocked by the door
 
 # checkpoint at -356, -4306
+
+anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below HollowDrainMiddle, submerged until WestHollow.FullyDrained
+  nospawn  # underwater
+  refill Energy=1:
+    moki: WestHollow.FullyDrained, BreakCrystal
+    
+  state WestHollow.UpperTongueExtended:
+    moki, WestHollow.FullyDrained: Combat=BombSlug, Bow=1  # camera won't show the frog statue unless you kill the slug
+    unsafe: Bow=1  #Snipe
+  state WestHollow.UpperTongueRetracted:  # This tongue can be a negative for the HollowDrainMiddle connection so we need a state for retracting it to prevent softlocks. Unlike when coming from above, you can screw yourself here without any stupid headers by extending the tongue and blocking your line of sight to retract it again, so we choose to write paths for this scenario
+    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended, Combat=BombSlug, Bow=1
+    gorlek, WestHollow.FullyDrained: WestHollow.LowerTongueExtended, Bow=1
+  state WestHollow.LowerTongueExtended:
+    moki, WestHollow.FullyDrained: Combat=BombSlug, Bow=1  # need to kill the slug in order to aim the frog statue
+    unsafe, WestHollow.FullyDrained: Bow=1  # waiting long enough on the left of the energy crystal will zoom out the camera and allow to autoaim the statue
+      
+  pickup WestHollow.HiddenEC:
+    moki, WestHollow.FullyDrained: BreakWall=10, DoubleJump OR Glide OR Launch OR WestHollow.LowerTongueExtended
+    gorlek, WestHollow.FullyDrained: BreakWall=10
+    
+  conn WestHollow.HollowDrainMiddle:
+    moki, WestHollow.FullyDrained:
+      Launch  # Works regardless of the tongue states
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, DoubleJump, Dash
+      WestHollow.UpperTongueRetracted, Bash, Grenade=1, DoubleJump OR Dash OR Glide
+    gorlek, WestHollow.FullyDrained:
+      DoubleJump, TripleJump  # if the the tongue is retracted, wjump on the frog statue. else, jump on the tongue directly
+      WestHollow.UpperTongueRetracted, Bash, Grenade=1
+      WestHollow.UpperTongueRetracted, SentryJump=1
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, DoubleJump
+    kii, WestHollow.FullyDrained:
+      DoubleJump, Sword OR Hammer OR Spear=2 OR WestHollow.UpperTongueExtended  # Grab the pole and jump on the frog statue or extend the tongue and jump on it
+      DoubleJump, Spear=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # More energy efficient than 2 spears
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Dash OR Hammer
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Glide, Shuriken=2 OR Flash=2 OR Sentry=2
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Glide, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, WestHollow.FullyDrained:
+      DoubleJump, Spear=1
+      HammerJump OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 # land on the narrow ledge next to the spikes
+      GlideJump, DoubleJump  # the platform is a bit higher near the crystal 'even if it's broken)
+      Bash, Grenade=1  # the placement of the grenade is different depending on how the tongues are oriented, but it's always doable.
+      WestHollow.UpperTongueExtended, Dash OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR GlideJump
+      Bow=1, Shuriken=1, Blaze=1 OR Glide  # Not sure which tongue this path is using?
+  conn WestHollow.RockPuzzle:
+    moki, WestHollow.FullyDrained: DoubleJump OR Dash  # Launch redundant with going to HollowDrainMiddle first
+    gorlek, WestHollow.FullyDrained:
+      SwordSJump=1  # sword sjump works fine with the upper tongue extended
+      WestHollow.UpperTongueRetracted, HammerSJump=1
+      Damage=10
+    kii, WestHollow.FullyDrained:
+      Hammer OR Shuriken=1
+      Glide, Sword OR Flash=1 OR Sentry=1
+    unsafe: Sword OR Flash=1 OR Sentry=1 OR FlashSwap OR BlazeSwap=1 OR GlideJump OR GrenadeJump OR PauseHover
+  conn WestHollow.HollowDrainLower:
+    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended OR Launch OR Glide OR DoubleJump
+    gorlek: WestHollow.FullyDrained
 
 anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left of Lupo
   refill Checkpoint
