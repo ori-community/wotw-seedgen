@@ -2332,7 +2332,10 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
     # No moki path because the need for dash/burrow/waterdash in order to drop through the log is too obscure
     gorlek: Dash
     unsafe: Burrow OR WaterDash  # hmmmmm
-  
+  pickup WestHollow.DashTree:
+    moki: Dash OR Launch
+    unsafe: free
+
   conn WestHollow.DashArea:  # Make sure it's not redundant with AboveDashTree->DashArea
     moki: Dash, Bash, Grenade=1
     gorlek: Dash, SentryJump=1
@@ -2344,11 +2347,20 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
       DoubleJump, Dash
       Launch
     gorlek:
-      DoubleJump, TripleJump OR Glide OR Sword
-      Dash, Bash, Grenade=1, Glide OR Sword OR Hammer OR Damage=10  # around the right
+      DoubleJump, TripleJump OR Sword
+      Bash, Grenade=1, Dash, Glide OR Sword OR Hammer  # around the right
+      Bash:  # to reach the right ledge
+        SentryJump=1, Dash
+        SwordSJump=1, Damage=10
+        HammerSJump=1, DoubleJump
+      Combat=Mantis+Lizard, SentryJump=1:  # to reach the right ledge
+        SentryJump=1, Dash
+        SwordSJump=1, Damage=10
+        HammerSJump=1, DoubleJump
     kii:
       Bash, Grenade=2  # Bash the mantis in order to reach your grenade from higher. Bash grenade from the hanging log.
-      DoubleJump, Hammer
+      Bash, Grenade=1, Dash, Damage=10
+      DoubleJump, Glide OR Hammer
       DoubleJump, Damage=10, Bash OR Shuriken=2 OR Flash=2 OR Sentry=2
       DoubleJump, Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Dash, Sword OR Hammer
@@ -2383,9 +2395,9 @@ anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
       DoubleJump, Dash OR Glide
       Launch
     gorlek:
-      DoubleJump OR Dash OR Hammer
+      DoubleJump OR Dash
       Bash, Sword OR Damage=10
-      Combat=Hornbug, Sword OR Damage=10
+      Combat=Hornbug, Glide OR Sword OR Damage=10
     kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
     unsafe: Bash OR Shuriken=2
       
