@@ -2308,12 +2308,6 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
   refill Checkpoint
 
   pickup WestHollow.DashTree: free
-  pickup WestHollow.AboveDashEX:  # Paths going above the tree. Path passing through the crushers originate from DashCrushers. Make sure they aren't redundant.
-    gorlek: SentryJump=1  # Launch would be redundant with going the long way around
-    kii:
-      Bash  # Bash the slug twice
-      DoubleJump, TripleJump  # Jump from where the door was. Can wall jump from it if it's still closed
-      WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis
 
   conn WestHollow.DashApproach:
     moki: WestHollow.DoorLever
@@ -2321,9 +2315,12 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
     moki: Dash OR Launch
     kii: Bash, Grenade=1
     unsafe: free
-  conn WestHollow.DashRoomTopRight:  # Paths going above the tree. Path passing through the crushers originate from DashCrushers. Make sure they aren't redundant.
-    kii: DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from the ledge right next to the spikes
-    unsafe: WestHollow.DoorLever, Bash  # Bash the slime on the log above, use the mantis to go there too. Precise bash angle to send the slime in the spikes and bash it again after it dies. Also, the skeeto can come in the spikes area, making that path waaaaay easier
+  conn WestHollow.AboveDashSemisolid:  # Paths going above the tree. Path passing through the crushers originate from DashCrushers. Make sure they aren't redundant.
+    gorlek: SentryJump=1  # Launch would be redundant with going the long way around
+    kii:
+      Bash  # Bash the slug twice
+      DoubleJump, TripleJump  # Jump from where the door was. Can wall jump from it if it's still closed
+      WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis
 
 anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at dash tree
   refill Checkpoint
@@ -2389,7 +2386,13 @@ anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
     unsafe:
       DoubleJump, Combat=WeakSlug
       Glide, Combat=WeakSlug, Sentry=2
-  pickup WestHollow.AboveDashEX:
+
+  conn WestHollow.DashCrushers:
+    moki: Bash OR Glide OR Launch OR DoubleJump OR Dash
+    gorlek: Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    unsafe: free
+  conn WestHollow.AboveDashSemisolid:
     moki:
       Glide, Combat=Hornbug+Skeeto OR Bash
       DoubleJump, Dash OR Glide
@@ -2400,24 +2403,15 @@ anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
       Combat=Hornbug, Glide OR Sword OR Damage=10
     kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
     unsafe: Bash OR Shuriken=2
-      
-  conn WestHollow.DashCrushers:
-    moki: Bash OR Glide OR Launch OR DoubleJump OR Dash
-    gorlek: Sword OR Hammer
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
-    unsafe: free
-  conn WestHollow.DashArea:  # same paths as WestHollow.AboveDashEX
-    moki:
-      Glide, Combat=Hornbug+Skeeto OR Bash
-      DoubleJump, Dash OR Glide
-      Launch
-    gorlek:
-      DoubleJump OR Dash OR Hammer
-      Bash, Sword OR Damage=10
-      Combat=Hornbug, Sword OR Damage=10
-    kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
-    unsafe: Bash OR Shuriken=2
-  
+
+anchor WestHollow.AboveDashSemisolid at -81, -4411:  # the semisolid near WestHollow.AboveDashEX
+  pickup WestHollow.AboveDashEX: free
+
+  conn WestHollow.DashArea: free
+  conn WestHollow.DashRoomTopRight:  # check for redundancies with DashArea
+    kii: DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from the ledge right next to the spikes
+    unsafe: WestHollow.DoorLever, Bash  # Bash the slime on the log above, use the mantis to go there too. Precise bash angle to send the slime in the spikes and bash it again after it dies. Also, the skeeto can come in the spikes area, making that path waaaaay easier
+
 region EastHollow:
   moki: Danger=20
   gorlek: free
