@@ -627,7 +627,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
     gorlek, Water:
       PoolsApproach.WheelFreed OR DoubleJump OR Launch
       Bash, Grenade=1
-      Hammer OR SentryJump=1
+      Hammer OR SwordSJump=1
     unsafe: Water  # Precise wall jump where the tentacle is grabbing the wheel
   conn MarshSpawn.Main:
     moki:
