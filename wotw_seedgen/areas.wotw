@@ -1737,19 +1737,6 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
   refill Energy=3:
     moki: BreakCrystal
 
-  state WestHollow.UpperDrainLeverPulled:  # Lever that drains the first section of the hollow. Paths who cross the first bridge originate from InFrontPurpleDoor. Make sure it's not redundant with Entrance->InFrontPurpleDoor->UpperDrainLeverPulled
-    moki:
-      Bash, Combat=BombSlug, Bow=1  # bashing up with the slug
-      Bash, Combat=BombSlug, DoubleJump, Dash OR Glide  # bashing up with the slug
-    gorlek:
-      Bash, Bow=1 OR DoubleJump OR Dash OR Glide OR Sword  # bait the bombslug
-      SwordSJump=1
-      HammerSJump=1, Bow=1 OR DoubleJump OR Dash OR Glide
-    kii:
-      Bash, Hammer OR Sentry=2
-    unsafe:
-      HammerSJump=1
-      Bash, Shuriken=2
   state WestHollow.PurpleDoorOpen:  # Path who drop from the frog statue originate from InFrontPurpleDoor
     moki, WestHollow.UpperDrainLeverPulled, Bow=1:
       DoubleJump, Dash
@@ -1778,17 +1765,19 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Dash OR Glide OR Sword OR Hammer OR Damage=10  # Go through the lower part
     kii, MarshPastOpher.EyestoneDoor: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: MarshPastOpher.EyestoneDoor  # (free with tight platforming)
-  conn WestHollow.InFrontPurpleDoor:  # do not relly on the dirty water. If you need the water, it would be a softlockable path once you drained the water
+  conn WestHollow.MokiByTwillen:
+    moki: Launch OR Bash  # the slug
+    gorlek:
+      DoubleJump, TripleJump
+      SentryJump=1
+  conn WestHollow.InFrontPurpleDoor:  # check for redundancies with MokiByTwillen
+    # using the dirty water may be softlockable if you drain the water. Currently draining the water provides no advantage for this connection, so no paths using the water can exist
     moki:
       Combat=2xSlug, Bow=1, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
       DoubleJump, Dash OR Glide
-      Bash, Combat=BombSlug OR DoubleJump OR Dash OR Glide  # bashing up with the slug
-      Launch
     gorlek:
       Bow=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=10  # deal with the camera
-      DoubleJump, TripleJump OR Sword OR Hammer
-      SentryJump=1  # Go up to the moki, then poles and then jump down
-      Bash  # bash the slime to get up
+      DoubleJump, Sword OR Hammer
     kii:
       Bow=1, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -1804,30 +1793,30 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Damage=60
       WaterDash, Damage=20
 
-anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple door, before the TP
-  state WestHollow.UpperDrainLeverPulled:  # Lever that drains the first section of the hollow. Make sure it's not redundant with paths from Entrance
+anchor WestHollow.MokiByTwillen at -230, -4229:  # The moki to the upper left of Twillen, standing on a bridge
+  # this anchor was newly added while validating the moki and gorlek paths for this area
+  # As such, connections to and from this anchor may be lacking kii paths, I leave it to the kii validator to look at those
+  refill Health=1
+
+  state WestHollow.UpperDrainLeverPulled:
     moki:
-      Combat=Slug, Bow=3, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
-      Combat=BombSlug, DoubleJump, Dash, Glide
+      Combat=BombSlug, Bow=1
+      Combat=BombSlug, DoubleJump, Dash OR Glide
       Launch
-    gorlek:
-      Bow=2
-      Bow=1, DoubleJump OR Dash OR Glide OR Sword
-      DoubleJump, TripleJump OR Dash
-      SentryJump=1, DoubleJump
-      Bash, Grenade=1, DoubleJump
-    kii:
-      Bow=1, Hammer OR Sentry=2
-      Dash, Sword OR Hammer
-      DoubleJump, Hammer OR Shuriken=1
-      DoubleJump, Glide, Sword OR Flash=1 OR Sentry=1
-      DoubleJump, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # djump->upslash->energy weapon
-      DoubleJump, Damage=10, Sword OR Glide OR Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Damage is easy to avoid (beside with blaze) but you'll land in friendly spikes
-      Bash, Grenade=1  # Bash the slime to the platform, throw Grenade, bash from slime then Grenade
-    unsafe:
-      SentryJump=1
-      DoubleJump, Sword OR Glide OR Spear=1 OR Flash=1 OR Sentry=1 # Could be kii but you will touch friendly spikes 
-      DoubleJump, Damage=10
+    gorlek: Bow=1 OR DoubleJump OR Dash OR Glide OR Sword  # bait the bombslug
+    kii: Hammer OR Sentry=2
+    unsafe: Shuriken=2
+
+  conn WestHollow.Entrance: free
+  conn WestHollow.InFrontPurpleDoor:
+    moki: Combat=BombSlug OR DoubleJump OR Dash OR Glide OR Launch
+    gorlek: free  # bait the bombslug
+
+anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple door, before the TP
+  # Add the below state when kii gets glitches, not sure if there are any non-redundant paths without glitches
+  # state WestHollow.UpperDrainLeverPulled:  # check for redundancies with MokiByTwillen
+    # since the only non-redundant paths here have to go up directly, which is offscreen, paths start at kii
+    # kii: SentryJump=1
   state WestHollow.PurpleDoorOpen:  # Be carefull it's not redundant with paths from Entrance
     kii, WestHollow.UpperDrainLeverPulled, Bow=1: 
       Dash, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -1836,13 +1825,32 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
     unsafe: Bow=1  # Drop shot
       # Bow=1, DoubleJump, Shuriken=1
       # Bow=1, Sword, Hammer
-  
-  conn WestHollow.Entrance:
+
+  conn WestHollow.MokiByTwillen:
     moki:
-      Combat=2xSlug, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide OR Bow=1
-      Bash, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide OR Bow=1 OR Grenade=1
+      Bow=1, Combat=Slug OR Bash
+      Bash, Grenade=1
       Launch
-    gorlek: WestHollow.UpperDrainLeverPulled OR Bow=1 OR DoubleJump OR Dash OR Glide OR Sword OR Damage=20
+    gorlek:
+      Bow=1
+      DoubleJump, Dash  # TripleJump would be redundant with Entrance
+      SentryJump=1
+    kii: Bow=1  # below are paths that lead directly to the lever before I added this anchor, but I didn't want to look at the kii+ paths since the area isn't validated yet anyway. Feel free to take the paths below as inspiration, but keep in mind they were not intended to lead to this anchor
+    #   Dash, Sword OR Hammer
+    #   DoubleJump, Hammer OR Shuriken=1
+    #   DoubleJump, Glide, Sword OR Flash=1 OR Sentry=1
+    #   DoubleJump, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # djump->upslash->energy weapon
+    #   DoubleJump, Damage=10, Sword OR Glide OR Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Damage is easy to avoid (beside with blaze) but you'll land in friendly spikes
+    #   Bash, Grenade=1  # Bash the slime to the platform, throw Grenade, bash from slime then Grenade
+    # unsafe:
+    #   SentryJump=1
+    #   DoubleJump, Sword OR Glide OR Spear=1 OR Flash=1 OR Sentry=1 # Could be kii but you will touch friendly spikes 
+    #   DoubleJump, Damage=10
+  conn WestHollow.Entrance:  # check for redundancies with MokiByTwillen
+    moki:
+      Combat=2xSlug, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide
+      Bash, WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide
+    gorlek: WestHollow.UpperDrainLeverPulled OR DoubleJump OR Dash OR Glide OR Sword OR Damage=20  # since UpperDrainLeverPulled solves this path on its own, using the dirty water is sound here
     kii: Bash OR Hammer OR Sentry=2
     unsafe: Shuriken=1
   conn WestHollow.HollowDrainMiddle:
