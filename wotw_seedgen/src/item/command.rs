@@ -62,7 +62,7 @@ impl Command {
                 Command::SetHealth { amount } => write!(f, "12|{}", amount),
                 Command::SetEnergy { amount } => write!(f, "13|{}", amount),
                 Command::SetSpiritLight { amount } => write!(f, "14|{}", amount),
-                Command::Equip { slot, ability } => write!(f, "15|{}|{}", *slot as u8, ability),
+                Command::Equip { slot, ability } => write!(f, "15|{}|{}", *slot as u8, *ability as u16),
                 Command::AhkSignal { signal } => write!(f, "16|{}", signal),
                 Command::IfEqual { uber_identifier, value, item } => write!(f, "17|{}|{}|{}", uber_identifier.code(), value, item.code()),
                 Command::IfGreater { uber_identifier, value, item } => write!(f, "18|{}|{}|{}", uber_identifier.code(), value, item.code()),
@@ -81,7 +81,7 @@ impl Command {
                 Command::IfSelfEqual { value, item } => write!(f, "25|{}|{}", value, item.code()),
                 Command::IfSelfGreater { value, item } => write!(f, "26|{}|{}", value, item.code()),
                 Command::IfSelfLess { value, item } => write!(f, "27|{}|{}", value, item.code()),
-                Command::UnEquip { ability } => write!(f, "28|{}", ability),
+                Command::UnEquip { ability } => write!(f, "28|{}", *ability as u16),
                 Command::SaveString { id, string } => write!(f, "29|{}|{}", id, string),
                 Command::AppendString { id, string } => write!(f, "30|{}|{}", id, string),
             }
