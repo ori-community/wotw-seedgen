@@ -2136,7 +2136,6 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     gorlek, WestHollow.FullyDrained:  
       Bow=1, Dash OR Launch
     kii, WestHollow.FullyDrained: Bow=1  # bait the first crusher, us it as an elevator to the eye then bait it again and jump from it to the left
-    unsafe: WestHollow.FullyDrained, Bow=1, WaterDash, Water OR Damage=20
   pickup WestHollow.SwimEC:
     moki: Water
     unsafe:
