@@ -2477,6 +2477,9 @@ anchor BeetleFight at -81, -4243:
 
 # please split the VoiceDoorPlatform and MapMoki paths like this: everything to the right of the VoiceDoor is for VoiceDoorPlatform. everything to the left of it belongs to MapMoki
 anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
+  state EastHollow.VoiceDoorOpen:
+    moki: EastHollow.ForestsVoice
+
   # paths need to be completable with both door states if the state is not a requirement
   pickup EastHollow.HornBeetleFightEX:
     moki:
@@ -2506,6 +2509,7 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
 anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door above beetle fight
   refill Checkpoint
 
+  # the VoiceDoorOpen state cannot be gained from this side, the cutscene that opens the door if you have the Voice doesn't trigger here
   quest EastHollow.HandToHandMap: free
 
   pickup EastHollow.GladesApproachOre:
