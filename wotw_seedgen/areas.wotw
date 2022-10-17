@@ -2962,7 +2962,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   #       TuleyShop.SpringPlants, Bash, Grenade=1
 
   quest GladesTown.RebuildTheGlades:
-    moki: Ore=40
+    moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
 
   pickup GladesTown.ArcingShard:
     moki, GladesTown.ClearThorns:
