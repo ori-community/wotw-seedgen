@@ -2426,7 +2426,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
     moki: EastHollow.ForestsVoice
   state NonGladesTeleporter: free
 
-  pickup EastHollow.HornBeetleFightEX:
+  pickup EastHollow.HornBeetleFightEX:  # for future pathfinders: these paths should probably lead through VoiceDoorPlatform?
     kii:
       Bash  # baiting the skeeto can be annoying
     unsafe:
@@ -2439,7 +2439,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
   conn Teleporters: free
   conn BeetleFight:
     moki: Combat=Skeeto+Mantis
-    gorlek: free
+    gorlek: free  # the enemies only spawn if you have Bash, which allows to handle them
   conn EastHollow.AfterBeetleFight:  # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
     moki: EastHollow.BeetleDefeated, DoubleJump OR Bash OR Launch
     gorlek:
@@ -2487,7 +2487,6 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
       Bash, Grenade=1
       Launch
     gorlek:
-      SentryJump=1, DoubleJump
       DoubleJump, TripleJump
     kii:
       DoubleJump, Hammer  # not too precise
@@ -2504,6 +2503,10 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
     gorlek: free
   conn EastHollow.AfterBeetleFight:  # make sure it's not redundant with ->teleporter->afterbeetlefight
     moki, EastHollow.BeetleDefeated: Glide
+    gorlek:
+      Bash, Sword
+      DoubleJump, TripleJump
+      DoubleJump, Dash, Glide OR Sword OR Hammer
     kii: Dash, DoubleJump
 
 anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door above beetle fight
