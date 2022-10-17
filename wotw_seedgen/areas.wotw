@@ -2440,19 +2440,16 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
   conn BeetleFight:
     moki: Combat=Skeeto+Mantis
     gorlek: free  # the enemies only spawn if you have Bash, which allows to handle them
-  conn EastHollow.AfterBeetleFight:  # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
+  conn EastHollow.AfterBeetleFight:  # check for redundancies with VoiceDoorPlatform when not using the BeetleDefeated state
+    # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
     moki: EastHollow.BeetleDefeated, DoubleJump OR Bash OR Launch
     gorlek:
       EastHollow.BeetleDefeated OR Launch
-      Bash, DoubleJump OR Dash OR Glide
       SentryJump=1, DoubleJump OR Dash OR Glide  # Go down to the pit, do SentryJump and the use Sword or Hammer to get to the rope
-    kii:
-      Bash  # need to bait the skeeto all the way on the right which can be annoying
-    unsafe:
-      HammerJump
-      WaveDash, DoubleJump                     # wavedash off the teleporter
-      Dash, SwordJump, TripleJump
-  conn EastHollow.VoiceDoorPlatform:  # make sure it's not redundant with ->afterbeetlefight->voicedoorplatform
+    unsafe: WaveDash, DoubleJump  # wavedash off the teleporter
+  conn EastHollow.VoiceDoorPlatform:
+    # for paths where the beetle is still alive, going from here is more advantageous than going from the right side
+    # so paths not using EastHollow.BeetleDefeated originate primarily from here, other paths preferrably use the connection to EastHollow.AfterBeetleFight
     gorlek:
       Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       SentryJump=1, DoubleJump, TripleJump
@@ -2504,10 +2501,14 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
   conn EastHollow.AfterBeetleFight:  # make sure it's not redundant with ->teleporter->afterbeetlefight
     moki, EastHollow.BeetleDefeated: Glide
     gorlek:
-      Bash, Sword
+      Bash, DoubleJump OR Dash OR Glide OR Sword
       DoubleJump, TripleJump
       DoubleJump, Dash, Glide OR Sword OR Hammer
-    kii: Dash, DoubleJump
+    kii:
+      Bash  # need to bait the skeeto all the way on the right which can be annoying
+      Dash, DoubleJump
+    unsafe:
+      HammerJump
 
 anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door above beetle fight
   refill Checkpoint
@@ -2570,10 +2571,10 @@ anchor EastHollow.AfterBeetleFight at -28, -4232:  # At the breakable floor to B
   pickup EastHollow.SpikeLanternEX:
     moki: Bash, DoubleJump OR Launch  # there's a couple small awkward things adding up if you do this without Double Jump
     gorlek:
-      DoubleJump, Launch
       Bash, Grenade=1 OR SentryJump=1
       EastHollow.BeetleDefeated, Bash, Dash OR Glide OR Sword
       SentryJump=1, DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword
+      Launch, DoubleJump OR Dash OR Damage=10
     kii:
       Launch  # not in gorlek due to visibility problems of the walls you need to launch to
       DoubleJump, TripleJump, Dash
@@ -2625,20 +2626,24 @@ anchor EastHollow.AfterBeetleFight at -28, -4232:  # At the breakable floor to B
 
   conn BeetleFight: free
   conn EastHollow.AboveBash: free
-  conn EastHollow.Teleporter:  # make sure it's not redundant with ->voicedoorplatform->teleporter
+  conn EastHollow.Teleporter:  # check for redundancies with VoiceDoorPlatform when using the BeetleDefeated state
     moki, EastHollow.BeetleDefeated:
       DoubleJump, Dash
       Bash, Grenade=1
       Glide
     gorlek:
+      Bash, Glide
       DoubleJump, TripleJump, Glide
+      DoubleJump, TripleJump, Dash, Bash OR Sword
       SentryJump=1, Glide, DoubleJump OR Dash
+      Launch
       EastHollow.BeetleDefeated:
-        DoubleJump, Sword OR Hammer
+        DoubleJump, TripleJump OR Sword OR Hammer
         Dash, Sword OR Hammer
-        SentryJump=1
+        Bash OR SentryJump=1
     kii:
       Grapple, Bash  # grapple not for use, but to spawn enemy
+      DoubleJump, Bash  # Bashglide
       Grapple, DoubleJump, Sword, Glide
       DoubleJump, Sword, Spear=1  # djump+spear to reach the tp from the beetle arena
       DoubleJump, Hammer, Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
@@ -2648,21 +2653,15 @@ anchor EastHollow.AfterBeetleFight at -28, -4232:  # At the breakable floor to B
       SwordJump
       # DoubleJump, Sword, Shuriken=1
   conn EastHollow.VoiceDoorPlatform:
+    # for paths where the beetle has to be defeated, going from here is more advantageous than going from the teleporter
+    # so paths using EastHollow.BeetleDefeated originate primarily from here, other paths preferrably use the connection to EastHollow.Teleporter
     moki, EastHollow.BeetleDefeated:
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek:
-      Bash, DoubleJump, TripleJump OR Dash OR Glide
-      Launch
-      EastHollow.BeetleDefeated:
-        DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer  # Dont make the third jump too quick if you have just Hammer
-        DoubleJump, Dash
-        Bash
+    gorlek: EastHollow.BeetleDefeated, DoubleJump, TripleJump, Dash OR Glide OR Sword
     kii:
       Grapple, DoubleJump, Sword, Dash  # Pogo the mantis
-      Grapple, Bash, Glide  # Bashglide; grapple not for use, but to spawn enemy
-      DoubleJump, Bash  # Bashglide
-      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn EastHollow.Kwolok:
     moki:
       Bash, DoubleJump OR Dash OR Glide OR Launch
