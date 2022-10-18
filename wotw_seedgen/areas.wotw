@@ -3473,10 +3473,11 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
     moki:
       Launch
       Bash, Grenade=1 OR TuleyShop.Lightcatchers
-      TuleyShop.StickyGrass, Grapple
+      TuleyShop.StickyGrass, Grapple, DoubleJump OR Dash OR Glide
     gorlek:
-      DoubleJump, TripleJump OR TuleyShop.StickyGrass
+      DoubleJump, TripleJump
       SentryJump=1
+      TuleyShop.StickyGrass, DoubleJump OR Grapple
     kii:
       DoubleJump, Hammer OR Spear=1
     unsafe:
