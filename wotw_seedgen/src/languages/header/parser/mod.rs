@@ -170,6 +170,7 @@ pub(crate) enum Suggestion {
     ShopCommandKind,
     HeaderCommand,
     ParameterType,
+    PickupFlag
 }
 
 fn parse_uber_identifier(parser: &mut Parser) -> Result<UberIdentifier, ParseError> {
@@ -336,6 +337,11 @@ fn parse_timer(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
 fn parse_command(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     HeaderCommand::parse(parser).map(HeaderContent::Command)
 }
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum PickupFlag {
+    Mute,
+}
 fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderContent, ParseError> {
     let parser = &mut (*context.parser);
 
@@ -345,7 +351,13 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
     let item = VItem::parse(parser)?;
     let skip_validation = context.skip_validation;
 
-    let pickup = VPickup { trigger, item, ignore, skip_validation };
+    let hide_others = if parser.current_token().kind == TokenKind::Separator {
+        parser.next_token();
+        let _: PickupFlag = parse_ident!(parser, Suggestion::PickupFlag)?;
+        true
+    } else { false };
+
+    let pickup = VPickup { trigger, item, ignore, hide_others, skip_validation };
     Ok(HeaderContent::Pickup(pickup))
 }
 
