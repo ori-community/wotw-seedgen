@@ -3022,7 +3022,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
       DoubleJump, TripleJump  # hardcore parkour
       GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
-  conn GladesTown.BellowBountyShard:
+  conn GladesTown.BelowBountyShard:
     moki:
       Launch
       TuleyShop.Lightcatchers, Bash:
@@ -3470,7 +3470,7 @@ anchor GladesTown.MokiAcorn at -347, -4182:  # At the moki near the cave
     kii, GladesTown.ClearThorns: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.ClearThorns: Dash
 
-anchor GladesTown.BellowBountyShard at -247, -4121:  # Bridge bellow the bounty shard 
+anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty shard 
   pickup GladesTown.AboveTpEX: free
   pickup GladesTown.BountyShard:
     moki:
@@ -3570,7 +3570,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       Flap, Glide, Sword OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
       TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounces
       TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
-  conn GladesTown.BellowBountyShard:
+  conn GladesTown.BelowBountyShard:
     moki: TuleyShop.Lightcatchers, Bash, DoubleJump
     gorlek: TuleyShop.Lightcatchers, Bash, Glide OR Dash  # @validator the Dash path got validated before but I don't think it should be gorlek
     kii: TuleyShop.Lightcatchers, Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
