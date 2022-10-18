@@ -3576,7 +3576,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     kii: TuleyShop.Lightcatchers, Bash, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       TuleyShop.Lightcatchers, Bash
-      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E
+      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E  haha nice path
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
   pickup GladesTown.LupoSoupEX: free
