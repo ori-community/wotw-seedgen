@@ -3020,14 +3020,11 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
       DoubleJump, TripleJump  # hardcore parkour
       GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
-  conn GladesTown.BelowBountyShard:
+  conn GladesTown.BelowBountyShard:  # paths using the right platforms may want to go through AboveOpher first
     moki:
       Launch
-      TuleyShop.Lightcatchers, Bash:
-        Grenade=1
-        TuleyShop.StickyGrass, Grapple
-        TuleyShop.BlueMoon, DoubleJump, Grapple
-        TuleyShop.SpringPlants, DoubleJump
+      TuleyShop.Lightcatchers, Bash, Grenade=1
+      TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple
     gorlek:
       DoubleJump, TripleJump
       TuleyShop.Lightcatchers, Bash, SentryJump=1
@@ -3570,7 +3567,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       Flap, Glide, Sword OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
       TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounces
       TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
-  conn GladesTown.BelowBountyShard:
+  conn GladesTown.BelowBountyShard:  # check for redundancies with Teleporter
     moki: TuleyShop.Lightcatchers, Bash, DoubleJump
     gorlek: TuleyShop.Lightcatchers, Bash, Glide OR Dash  # @validator the Dash path got validated before but I don't think it should be gorlek
     kii: TuleyShop.Lightcatchers, Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
