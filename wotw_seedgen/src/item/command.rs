@@ -12,7 +12,7 @@ use crate::header::{VString, vdisplay, CodeDisplay};
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum Command {
     Autosave,
-    Resource { resource: Resource, #[VWrap] amount: i16 },
+    Resource { resource: Resource, #[VWrap] amount: i32 },
     Checkpoint,
     Magic,
     StopEqual { uber_identifier: UberIdentifier, #[VWrap] value: R32 },
@@ -23,9 +23,9 @@ pub enum Command {
     StartTimer { identifier: UberIdentifier },
     StopTimer { identifier: UberIdentifier },
     StateRedirect { intercept: i32, set: i32 },
-    SetHealth { #[VWrap] amount: i16 },
-    SetEnergy { #[VWrap] amount: i16 },
-    SetSpiritLight { #[VWrap] amount: i16 },
+    SetHealth { #[VWrap] amount: i32 },
+    SetEnergy { #[VWrap] amount: i32 },
+    SetSpiritLight { #[VWrap] amount: i32 },
     Equip { #[VWrap] slot: EquipSlot, ability: Spell },
     AhkSignal { signal: String },
     IfEqual { uber_identifier: UberIdentifier, #[VWrap] value: R32, #[VType] item: Box<Item> },
