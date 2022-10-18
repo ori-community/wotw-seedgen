@@ -3590,7 +3590,7 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
     moki: Water, Burrow
   pickup GladesTown.LupoSwimMiddleEX:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
     unsafe:
-      Damage=1000 # just wall jump between both walls
+      Damage=100 # just wall jump between both walls
       WaterDash, Damage=40
   
   conn GladesTown.Teleporter:
