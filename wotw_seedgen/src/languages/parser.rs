@@ -104,8 +104,8 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
 
 #[derive(Debug, Clone)]
 pub struct ParseError {
-    message: String,
-    source: String,
+    pub message: String,
+    pub source: String,
     pub range: Range<usize>,
     pub suggestion: Option<String>,
 }
