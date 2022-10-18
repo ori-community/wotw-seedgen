@@ -2995,9 +2995,6 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       WaterDash, Damage=40
   pickup GladesTown.CaveBurrowEX:
     unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
-  pickup GladesTown.UpdraftCeilingEX:  # paths that can't get to AboveOpher but can get the pickup
-    moki: TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple  # @validator I don't think getting that pickup with just bash should be in moki?
-    gorlek: TuleyShop.BlueMoon, Grapple, Hammer
   
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
@@ -3040,19 +3037,15 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
       SwordSJump=1  # high sjump to reach the wall on the lef t of the bridge then wall jump and upslash+downslash
       TuleyShop.StickyGrass, Grapple, DoubleJump  # ceiling jump
-  conn GladesTown.AboveOpher:
+  conn GladesTown.AboveOpher:  # paths using the platform left above the coals may want to go to GladesTown.LeftAboveCoals first
     moki:
       Launch OR TuleyShop.SpringPlants
       Flap, Glide
       Bash, Grenade=1
-      TuleyShop.BlueMoon, DoubleJump, Grapple
-      TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple, Dash
     gorlek:
       SentryJump=1
-      DoubleJump, TripleJump
-      TuleyShop.BlueMoon, Grapple, Dash OR Glide OR Sword
+      DoubleJump, TripleJump  # still works with the second huts there
     kii:
-      TuleyShop.BlueMoon, Grapple, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Glide OR Dash OR Sword OR Hammer OR Sentry=2  # from where Tuley is. Building the second house makes it harder but still possible
     unsafe:
       Grenade=1, Sword  # Grenade Pogos. I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
@@ -3060,6 +3053,11 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
       Dash, GlideJump OR Hammer  # coyote dash form where Tuley. Could be kii but building the second house makes it way harder
       Dash, Burrow  # I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
+  conn GladesTown.LeftAboveCoals:  # check for redundancies with AboveOpher
+    moki:
+      TuleyShop.BlueMoon, Grapple, DoubleJump
+      TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Grapple, Bash
+    gorlek: TuleyShop.BlueMoon, Grapple
   conn GladesTown.LupoHouse:
     moki: Burrow OR Water
     unsafe:
@@ -3483,35 +3481,28 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
     unsafe:
       DoubleJump
       GrenadeJump
-  pickup GladesTown.UpdraftCeilingEX:
-    moki: TuleyShop.Lightcatchers, Bash, Glide OR Dash
-    gorlek: TuleyShop.Lightcatchers, Bash
-    kii: Sentry=2, Spear=1  # More energy efficient than going to GladesTown.AboveOpher first
   
   conn GladesTown.Teleporter: free
-  conn GladesTown.AboveOpher:
+  conn GladesTown.LeftAboveCoals:
     moki:
-      DoubleJump, Glide OR Dash
-      TuleyShop.Lightcatchers, Bash, DoubleJump
+      Glide
+      DoubleJump, Dash
+      TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
     gorlek:
       DoubleJump OR Dash OR Glide  # Sword is possible but TuleyShop.Lightcatchers makes is awkward
-      TuleyShop.Lightcatchers, Bash, Sword
-    kii:
-      Sword OR Hammer OR Sentry=3
-      Sentry=2, Shuriken=1 OR Flash=1  # More energy efficient than 3 sentries
+      TuleyShop.Lightcatchers, Bash
+    kii: Sword OR Hammer OR Sentry=2
 
-anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
-  refill Checkpoint:
-    moki: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
-
+anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to the left above the coals near Opher
   pickup GladesTown.UpdraftCeilingEX:
     moki:
       DoubleJump OR Launch
       Flap, Glide  # activate the updraft below
-      TuleyShop.Lightcatchers, Bash  # @validator this was there before I create this anchor and I don't think this should?
+      TuleyShop.Lightcatchers, Bash, Glide OR Dash
       TuleyShop.SpringPlants, Dash OR Glide
     gorlek:
       Hammer OR SentryJump=1
+      TuleyShop.Lightcatchers, Bash
       TuleyShop.SpringPlants, Sword
     kii:
       Dash OR Spear=1  # coyote dash or spear under the pickup
@@ -3522,6 +3513,25 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       TuleyShop.SpringPlants, PauseHover
   
   conn GladesTown.Teleporter: free
+  conn GladesTown.BelowBountyShard:  # check for redundancies with Teleporter
+    moki: TuleyShop.Lightcatchers, Bash, DoubleJump
+    gorlek:
+      TuleyShop.Lightcatchers, Bash, Glide
+      TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
+    kii: TuleyShop.Lightcatchers, Bash, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      TuleyShop.Lightcatchers, Bash
+      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E  haha nice path
+  conn GladesTown.AboveOpher:
+    moki: DoubleJump
+    gorlek: Dash OR Glide
+    kii: Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
+
+anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
+  refill Checkpoint:
+    moki: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
+
+  conn GladesTown.LeftAboveCoals: free
   conn LowerReach.VeralHome:
     moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
   conn GladesTown.HoleHut:
@@ -3568,15 +3578,6 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       Flap, Glide, Sword OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
       TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounces
       TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
-  conn GladesTown.BelowBountyShard:  # check for redundancies with Teleporter
-    moki: TuleyShop.Lightcatchers, Bash, DoubleJump
-    gorlek:
-      TuleyShop.Lightcatchers, Bash, Glide
-      TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
-    kii: TuleyShop.Lightcatchers, Bash, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      TuleyShop.Lightcatchers, Bash
-      TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E  haha nice path
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
   pickup GladesTown.LupoSoupEX: free
