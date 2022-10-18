@@ -3306,7 +3306,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   refill Checkpoint:
-    moki: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
+    unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
 
   pickup GladesTown.ArcingShard:
     moki, GladesTown.ClearThorns:
@@ -3394,7 +3394,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     
 anchor GladesTown.MokiAcorn at -347, -4182:  # At the moki near the cave
   refill Checkpoint:
-    moki: GladesTown.CaveEntrance  # Enter the cave for a refill
+    unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
   refill Energy=4:
     moki: GladesTown.CaveEntrance, BreakCrystal
 
@@ -3529,7 +3529,7 @@ anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to 
 
 anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
   refill Checkpoint:
-    moki: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
+    unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
   conn GladesTown.LeftAboveCoals: free
   conn LowerReach.VeralHome:
@@ -3647,7 +3647,7 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
   
 anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup house
   refill Checkpoint:
-    moki: GladesTown.RoofsOverHeads
+    unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
   
   pickup GladesTown.HoleHutEX:
     moki: GladesTown.RoofsOverHeads
