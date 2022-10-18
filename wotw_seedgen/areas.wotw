@@ -3570,8 +3570,10 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
   conn GladesTown.BelowBountyShard:  # check for redundancies with Teleporter
     moki: TuleyShop.Lightcatchers, Bash, DoubleJump
-    gorlek: TuleyShop.Lightcatchers, Bash, Glide OR Dash  # @validator the Dash path got validated before but I don't think it should be gorlek
-    kii: TuleyShop.Lightcatchers, Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    gorlek:
+      TuleyShop.Lightcatchers, Bash, Glide
+      TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
+    kii: TuleyShop.Lightcatchers, Bash, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       TuleyShop.Lightcatchers, Bash
       TuleyShop.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E
