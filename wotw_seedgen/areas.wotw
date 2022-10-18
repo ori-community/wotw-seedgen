@@ -2995,8 +2995,6 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       WaterDash, Damage=40
   pickup GladesTown.CaveBurrowEX:
     unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
-  pickup GladesTown.AboveCaveEX:
-    moki: GladesTown.ClearThorns
   pickup GladesTown.UpdraftCeilingEX:  # paths that can't get to AboveOpher but can get the pickup
     moki: TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Bash, Grapple  # @validator I don't think getting that pickup with just bash should be in moki?
     gorlek: TuleyShop.BlueMoon, Grapple, Hammer
@@ -3103,6 +3101,8 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
       Spear=1, Sword OR Damage=10  # sword float
     kii: Spear=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Spear=1  # tricky jump over the coals damageless
+  pickup GladesTown.AboveCaveEX:
+    moki: GladesTown.ClearThorns
   pickup GladesTown.KeyMokiHutEX:
     moki: GladesTown.BuildHuts, WoodsEntry.DollQI
   pickup GladesTown.DamageTree:
