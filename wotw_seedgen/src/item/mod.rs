@@ -156,15 +156,7 @@ impl Item {
                 Shard::Resilience |
                 Shard::Vitality |
                 Shard::Energy => difficulty >= Difficulty::Gorlek,
-                Shard::Bounty |
-                Shard::Swap |
-                Shard::Quickshot |
-                Shard::SpiritLightHarvest |
-                Shard::LifeHarvest |
-                Shard::EnergyHarvest |
-                Shard::Sense |
-                Shard::Turmoil |
-                Shard::Arcing => false,
+                _ => false,
             },
             Item::SpiritLight(_) | Item::Teleporter(_) | Item::Water | Item::UberState(_) => true,
             _ => false,
