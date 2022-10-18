@@ -479,6 +479,7 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
     let token = parser.current_token().clone();
     let operator = match token.kind {
         TokenKind::OpenBracket => {
+            parser.next_token();
             let start = parse_boundary(parser, &uber_type)?;
             parser.eat(TokenKind::Comma)?;
             let end = parse_boundary(parser, &uber_type)?;
