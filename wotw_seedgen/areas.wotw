@@ -3534,50 +3534,39 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
   conn GladesTown.LeftAboveCoals: free
   conn LowerReach.VeralHome:
     moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
-  conn GladesTown.HoleHut:
+  conn GladesTown.PlayfulMoki:
     moki:
       Launch
-      Flap, Glide:  # Activate the updraft below
-        DoubleJump
-        Bash, Grenade=1
-        Grapple, TuleyShop.BlueMoon OR TuleyShop.StickyGrass  # @validator I don't think stickygrass is a good fit for moki
-        TuleyShop.SpringPlants
-      TuleyShop.Lightcatchers, Bash:
-        Grenade=1 OR DoubleJump
-        TuleyShop.BlueMoon, Grapple, Dash OR Glide
-        TuleyShop.SpringPlants
+      Flap, Glide  # Activate the updraft below
+      TuleyShop.Lightcatchers, Bash
       TuleyShop.SpringPlants, DoubleJump
-      GladesTown.RoofsOverHeads:
-        Bash, Grenade=2
-        DoubleJump, Bash, Grenade=1
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash OR Glide
-        TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Dash OR Glide  # @validator I don't think stickygrass is a good fit for moki
-        TuleyShop.SpringPlants, Bash, Grenade=1
+      GladesTown.RoofsOverHeads, Bash, Grenade=1
     gorlek:
-      Flap, Glide, Hammer OR SwordSJump=1
       DoubleJump, TripleJump
-      SentryJump=1:
-        DoubleJump OR Hammer OR SwordSJump=1
-        TuleyShop.BlueMoon, Grapple
-        TuleyShop.StickyGrass, Grapple, Dash OR Glide
-      TuleyShop.Lightcatchers, Bash:
-        Hammer OR SentryJump=1
-        TuleyShop.BlueMoon, Grapple
       TuleyShop.SpringPlants, Hammer OR Sword
-      GladesTown.RoofsOverHeads:
-        Bash, Grenade=1, Hammer
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
-        TuleyShop.StickyGrass, Grapple, DoubleJump, Dash OR Glide OR Sword OR Hammer
-        TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Sword
+      SentryJump=1
     kii:
-      Bash, Grenade=2
-      Bash, Grenade=1, DoubleJump OR Hammer
+      Bash, Grenade=1
       TuleyShop.SpringPlants, Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       SwordJump OR GrenadeJump
-      Flap, Glide, Sword OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
-      TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounces
-      TuleyShop.Lightcatchers, Bash, Sword OR Dash  # with Dash, dash ramp from the very edge of the platform
+      TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounce
+
+anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather play
+  conn GladesTown.HoleHut:
+    moki:
+      TuleyShop.SpringPlants OR DoubleJump OR Launch
+      Bash, Grenade=1
+      TuleyShop.BlueMoon, Grapple, Dash OR Glide
+    gorlek:
+      Hammer OR SwordSJump=1
+      TuleyShop.BlueMoon, Grapple
+    unsafe: Sword OR Dash OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
+  conn GladesTown.AboveOpher: free
+  conn TuleyShop:  # check for redundancies with AboveOpher and Teleporter
+    moki: GladesTown.TuleySpawned, Dash
+    gorlek: GladesTown.TuleySpawned, Sword OR Hammer
+    # seed paths tbd if ever necessary
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
   pickup GladesTown.LupoSoupEX: free
@@ -3639,11 +3628,7 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
       TuleyShop.SpringPlants, Hammer  # Uphammer Bounce
       TuleyShop.StickyGrass, Grapple, Sword OR Hammer OR Blaze=1 OR Shuriken=1 OR Sentry=1 OR Flash
       DoubleJump, Glide
-  conn TuleyShop:
-    moki: GladesTown.TuleySpawned, Dash OR Glide  # seed paths tbd if ever necessary
-    gorlek: GladesTown.TuleySpawned, Sword OR Hammer  # getting up there with just a weapon from below is not written in gorlek. The weapon floats from hole hut, however, are probably gorlek difficulty.
-    # everything else is redundant
-  conn GladesTown.Teleporter: free
+  conn GladesTown.PlayfulMoki: free
   
 anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup house
   refill Checkpoint:
@@ -3684,12 +3669,9 @@ anchor LowerReach.VeralHome at -140, -4096:  # At the soup
       #Water, Flap, Sentry=2  # theoretical double redirect, still in testing
   
   conn GladesTown.HoleHut:
-    moki:
-      DoubleJump OR Dash OR Glide OR Launch
-      TuleyShop.BlueMoon, TuleyShop.SpringPlants, Grapple
-      TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
+    moki: Dash OR Glide  # check for redundancies with PlayfulMoki
     gorlek: free  # free if you know the whole branch is semisolid, but you probably don't as a moki player
-  conn GladesTown.AboveOpher: free
+  conn GladesTown.PlayfulMoki: free
   conn TuleyShop:
     moki: GladesTown.TuleySpawned
   conn LowerReach.TownEntry:
