@@ -3422,7 +3422,7 @@ anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
       # Grenade=4  # grenade jumps and light refills, very nasty strat
       DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
       DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
-  quest GladesTown.AcornMokiQuest:
+  quest GladesTown.MokiAcornQuest:
     moki: GladesTown.AcornQI
   
   pickup GladesTown.AboveCaveEX:
