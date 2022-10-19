@@ -3551,6 +3551,12 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     unsafe:
       SwordJump OR GrenadeJump
       TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounce
+  conn TuleyShop:  # check for redundancies with Teleporter
+    moki:
+      Glide
+      GladesTown.RoofsOverHeads, Dash
+    gorlek: Dash, Sword OR Hammer
+    # seed paths tbd if ever necessary
 
 anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather play
   conn GladesTown.HoleHut:
