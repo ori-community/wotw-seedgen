@@ -3332,8 +3332,8 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump
-      TuleyShop.StickyGrass, Grapple, Dash
-    kii: TuleyShop.StickyGrass, Grapple, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      TuleyShop.StickyGrass, Grapple, Dash OR Sword OR Hammer
+    kii: TuleyShop.StickyGrass, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: free  # https://youtu.be/3rxIf0qIUNc
       #DoubleJump
       #Sword, Grenade=1 OR Shuriken=2  # pogo
