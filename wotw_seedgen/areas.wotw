@@ -3532,8 +3532,6 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
   conn GladesTown.LeftAboveCoals: free
-  conn LowerReach.VeralHome:
-    moki: TuleyShop.Lightcatchers, TuleyShop.StickyGrass, Bash, Grapple, DoubleJump OR Dash  # other paths should be redundant with HoleHut
   conn GladesTown.PlayfulMoki:
     moki:
       Launch
