@@ -3313,10 +3313,12 @@ anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Mo
     kii, GladesTown.BuildHuts, TuleyShop.BlueMoon, Grapple, Bash, Grenade=1:  # grapple the right plant to reach the house above
       DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
       Dash, Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
-    unsafe, GladesTown.BuildHuts:
-      GrenadeJump
-      TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
-      TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover # grapple the right plant to reach the house above
+    unsafe:
+      TuleyShop.StickyGrass, GrenadeJump  # you can Grenadejump as you exit the unbuilt house and grab the moss
+      GladesTown.BuildHuts:
+        GrenadeJump
+        TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
+        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover # grapple the right plant to reach the house above
 
   conn GladesTown.West: free
 
