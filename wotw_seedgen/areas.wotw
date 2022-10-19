@@ -3361,15 +3361,13 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       Sword OR Hammer  # Weapon Float
       TuleyShop.StickyGrass, Grapple
     kii, GladesTown.BuildHuts: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-  pickup GladesTown.UpperOre:
+  pickup GladesTown.UpperOre:  # check for redundancies with GladesTown.West
     moki: GladesTown.BuildHuts, Bash, Grenade=2, Dash OR Glide
-    gorlek:
-      TuleyShop.StickyGrass, Grapple
-      GladesTown.BuildHuts:
-        TuleyShop.StickyGrass, SentryJump=1
-        TuleyShop.StickyGrass, Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
-        SentryJump=2
-        SwordSJump=1, DoubleJump, TripleJump OR Dash
+    gorlek, GladesTown.BuildHuts:
+      TuleyShop.StickyGrass, SentryJump=1
+      TuleyShop.StickyGrass, Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
+      SentryJump=2
+      SwordSJump=1, DoubleJump, TripleJump OR Dash
     kii:
       GladesTown.BuildHuts, TuleyShop.StickyGrass, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       GladesTown.BuildHuts, Bash, Grenade=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -3378,9 +3376,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     moki:
       Dash OR Glide
       TuleyShop.BlueMoon, Grapple
-    gorlek:
-      Sword OR Hammer
-      TuleyShop.StickyGrass, Grapple
+    gorlek: Sword OR Hammer
     kii: GladesTown.BuildHuts, Blaze=1
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
