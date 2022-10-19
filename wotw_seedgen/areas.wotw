@@ -6572,9 +6572,9 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
       Glide OR Launch
       Bash, Grenade=1
     gorlek:
-      DoubleJump, Hammer OR TripleJump
-      Bash, Dash OR Hammer
-      Sword
+      DoubleJump, TripleJump OR Sword OR Hammer
+      Dash, Bash OR Sword OR Hammer
+      Bash, Sword OR Hammer
     kii:
       Dash OR DoubleJump OR Hammer OR Blaze=4 OR Sentry=2
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
