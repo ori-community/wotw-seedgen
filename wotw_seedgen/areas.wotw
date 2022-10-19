@@ -3102,7 +3102,7 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     moki: TuleyShop.LastTree
 
   conn TwillenShop: free
-  conn GladesTown.MokiAcorn:
+  conn GladesTown.AcornMoki:
     moki: GladesTown.ClearThorns
   conn GladesTown.West:
     moki:
@@ -3392,7 +3392,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 
     unsafe: free
     
-anchor GladesTown.MokiAcorn at -347, -4182:  # At the moki near the cave
+anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
   refill Checkpoint:
     unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
   refill Energy=4:
@@ -3435,7 +3435,7 @@ anchor GladesTown.MokiAcorn at -347, -4182:  # At the moki near the cave
       # Grenade=4  # grenade jumps and light refills, very nasty strat
       DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
       DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
-  quest GladesTown.MokiAcornQuest:
+  quest GladesTown.AcornMokiQuest:
     moki: GladesTown.AcornQI
   
   pickup GladesTown.AboveCaveEX:
