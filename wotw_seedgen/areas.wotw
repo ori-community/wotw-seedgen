@@ -3139,13 +3139,11 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, Dash, Glide
         TuleyShop.Lightcatchers, Bash, DoubleJump, Dash
         TuleyShop.Lightcatchers, Bash, Glide
-      GladesTown.BuildHuts:
+      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
         DoubleJump, Bash, Grenade=2
-        Bash, Grenade=3
-        Launch
         TuleyShop.StickyGrass:
           DoubleJump, Bash, Grenade=1
-          TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
+          TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash
         TuleyShop.Lightcatchers, Bash, Grenade=1
     gorlek:
       Launch
@@ -3157,14 +3155,12 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         DoubleJump, TripleJump, Sword OR Hammer  # upswing to the moss
         TuleyShop.Lightcatchers, Bash, Grenade=1 OR SentryJump=1  # can still do this with the huts up
         TuleyShop.Lightcatchers, Bash, DoubleJump  # wrap around
-      GladesTown.BuildHuts:
+      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
         Bash, Grenade=2
-        SentryJump=3  # just two seems a bit precise in gorlek, even though gorlek height is technically barely enough
         SentryJump=2, DoubleJump
         TuleyShop.Lightcatchers, Bash, SentryJump=1
         TuleyShop.StickyGrass:
           Bash, Grenade=1, Dash OR Glide OR Sword  # hammer mildly inconsistent
-          SentryJump=2
           SwordSJump=1  # hammer mildly inconsistent
           TuleyShop.Lightcatchers, Bash
     kii:
@@ -3175,21 +3171,16 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, Sword, Spear=1 OR Shuriken=1
         TuleyShop.Lightcatchers, Bash, Sword
         TuleyShop.Lightcatchers, Bash, Hammer, Flash  # Possible with other energy weapons but you need to be careful about not damaging the plant
-      GladesTown.BuildHuts, TuleyShop.BlueMoon, Grapple, Bash, Grenade=1:  # go to Motay's house and grapple the right plant to reach the house above
-        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
-        Dash, Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       SentryJump=2  # Midairs
-      GladesTown.BuildHuts:
-        GrenadeJump
+      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
         Bash  # use both slimes
-        TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
         DoubleJump, TripleJump, GlideJump
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover # go to Motay's house and grapple the right plant to reach the house above
       TuleyShop.Lightcatchers, Bash, Grenade=1
       DoubleJump, TripleJump, Dash OR Glide     # using the ceiling from the left
       TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Hammer
-  pickup GladesTown.MotayHutEX:
+
+  conn GladesTown.MotayHut:
     moki, GladesTown.BuildHuts:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
@@ -3211,7 +3202,6 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Dash                                  # late coyote
       Sword                                 # high jump, full combo, upslash and then downslash (all while holding right)
       # Dash, Glide OR Sword OR Hammer
-
   conn WestGlades.PastTown:
     moki:
       Bash, DoubleJump OR Dash
@@ -3304,6 +3294,32 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         TuleyShop.Lightcatchers, Bash, Sword OR Hammer
   # all other paths should be redundant with the connection to tp
 
+anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Motay
+  # IMPORTANT this anchor is INSIDE the hut. It may only be accessed if the player has the BuildHuts state
+  # however we still allow the player to spawn inside the unbuilt hut because that's fun
+  # if you want to use the platform outside, use the BuildHuts state. Paths without it have to assume there is no platform
+  refill Checkpoint:
+    unsafe: GladesTown.BuildHuts  # Exit the house for a checkpoint
+
+  pickup GladesTown.MotayHutEX: free
+  pickup GladesTown.UpperOre:
+    moki, GladesTown.BuildHuts:
+      Bash, Grenade=2
+      Launch
+    gorlek, GladesTown.BuildHuts:
+      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Glide  # holding right works
+      SentryJump=2
+      TuleyShop.StickyGrass, SentryJump=1
+    kii, GladesTown.BuildHuts, TuleyShop.BlueMoon, Grapple, Bash, Grenade=1:  # grapple the right plant to reach the house above
+      DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
+      Dash, Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+    unsafe, GladesTown.BuildHuts:
+      GrenadeJump
+      TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
+      TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover # grapple the right plant to reach the house above
+
+  conn GladesTown.West: free
+
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   refill Checkpoint:
     unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
@@ -3353,31 +3369,18 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
       TuleyShop.BlueMoon, Grapple
-  pickup GladesTown.MotayHutEX:
+
+  conn GladesTown.MotayHut:  # check for redundancies with GladesTown.West
     moki, GladesTown.BuildHuts:
       DoubleJump OR Dash OR Glide
       TuleyShop.BlueMoon, Grapple
-    gorlek, GladesTown.BuildHuts:
-      Sword OR Hammer  # Weapon Float
-      TuleyShop.StickyGrass, Grapple
+    gorlek, GladesTown.BuildHuts: Sword OR Hammer  # Weapon Float
     kii, GladesTown.BuildHuts: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-  pickup GladesTown.UpperOre:  # check for redundancies with GladesTown.West
-    moki: GladesTown.BuildHuts, Bash, Grenade=2, Dash OR Glide
-    gorlek, GladesTown.BuildHuts:
-      TuleyShop.StickyGrass, SentryJump=1
-      TuleyShop.StickyGrass, Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
-      SentryJump=2
-      SwordSJump=1, DoubleJump, TripleJump OR Dash
-    kii:
-      GladesTown.BuildHuts, TuleyShop.StickyGrass, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      GladesTown.BuildHuts, Bash, Grenade=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-
   conn GladesTown.West:  # Make sure it's not redundant with going to GladesTown.TwillenHome first
     moki:
       Dash OR Glide
       TuleyShop.BlueMoon, Grapple
     gorlek: Sword OR Hammer
-    kii: GladesTown.BuildHuts, Blaze=1
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
     moki:
