@@ -2998,8 +2998,6 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
-  conn GladesTown.MokiAcorn:
-    moki: GladesTown.ClearThorns
   conn GladesTown.UpperWest:
     moki:
       Launch, DoubleJump OR Dash OR Glide
@@ -3104,6 +3102,8 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     moki: TuleyShop.LastTree
 
   conn TwillenShop: free
+  conn GladesTown.MokiAcorn:
+    moki: GladesTown.ClearThorns
   conn GladesTown.West:
     moki:
       DoubleJump OR Launch
