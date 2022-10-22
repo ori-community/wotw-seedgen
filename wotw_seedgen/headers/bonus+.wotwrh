@@ -99,7 +99,7 @@ Flags: Bonus+
 !!description 8|4|46|byte|10 Sentry fires more shots per burst
 
 // Sentry Fire Rate Upgrade
-!!add $PARAM(sentryFireRateUpgrades)x 8|4|46|float|2.5
+!!add $PARAM(sentryFireRateUpgrades)x 8|4|47|float|2.5
 !!name 8|4|47|float|2.5 #Sentry Fire Rate Upgrade#
 !!display 8|4|47|float|2.5 #Sentry Fire Rate Upgrade#
 !!description 8|4|47|float|2.5 Sentry fires shots even faster
