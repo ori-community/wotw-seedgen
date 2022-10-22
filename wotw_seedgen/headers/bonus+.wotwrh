@@ -102,7 +102,7 @@ Flags: Bonus+
 !!add $PARAM(sentryFireRateUpgrades)x 8|4|46|float|2.5
 !!name 8|4|47|float|2.5 #Sentry Fire Rate Upgrade#
 !!display 8|4|47|float|2.5 #Sentry Fire Rate Upgrade#
-!!description 8|4|47|float|2.5 Sentry sires shots even faster
+!!description 8|4|47|float|2.5 Sentry fires shots even faster
 
 // Extra Shurikens
 !!add $PARAM(extraShurikens)x 8|4|38|byte|+1
