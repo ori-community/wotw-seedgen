@@ -32,6 +32,10 @@ Flags: Bonus+
 !!parameter splinterGrenade int:1
 //// How many Unlimited Sentries to shuffle in
 !!parameter unlimitedSentries int:1
+//// How many Sentry Burst Upgrades to shuffle in
+!!parameter sentryBurstUpgrades int:1
+//// How many Sentry Fire Rate Upgrades to shuffle in
+!!parameter sentryFireRateUpgrades int:1
 //// How many Extra Shurikens to shuffle in
 !!parameter extraShurikens int:1
 
@@ -87,6 +91,18 @@ Flags: Bonus+
 !!name 8|4|37|byte|100 #Unlimited Sentries#
 !!display 8|4|37|byte|100 #Unlimited Sentries#
 !!description 8|4|37|byte|100 Spawn unlimited Sentries
+
+// Sentry Burst Upgrade
+!!add $PARAM(sentryBurstUpgrades)x 8|4|46|byte|10
+!!name 8|4|46|byte|10 #Sentry Burst Upgrade#
+!!display 8|4|46|byte|10 #Sentry Burst Upgrade#
+!!description 8|4|46|byte|10 Sentry fires more shots per burst
+
+// Sentry Fire Rate Upgrade
+!!add $PARAM(sentryFireRateUpgrades)x 8|4|46|float|2.5
+!!name 8|4|47|float|2.5 #Sentry Fire Rate Upgrade#
+!!display 8|4|47|float|2.5 #Sentry Fire Rate Upgrade#
+!!description 8|4|47|float|2.5 Sentry sires shots even faster
 
 // Extra Shurikens
 !!add $PARAM(extraShurikens)x 8|4|38|byte|+1
