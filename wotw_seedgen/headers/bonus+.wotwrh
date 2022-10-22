@@ -30,8 +30,8 @@ Flags: Bonus+
 !!parameter extraGrenade int:1
 //// How many Splinter Grenade to shuffle in
 !!parameter splinterGrenade int:1
-//// How many Extra Sentries to shuffle in
-!!parameter extraSentries int:2
+//// How many Unlimited Sentries to shuffle in
+!!parameter unlimitedSentries int:1
 //// How many Extra Shurikens to shuffle in
 !!parameter extraShurikens int:1
 
@@ -83,10 +83,10 @@ Flags: Bonus+
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
 
 // Extra Sentries
-!!add $PARAM(extraSentries)x 8|4|37|byte|+1
-!!name 8|4|37|byte|+1 #Extra Sentry#
-!!display 8|4|37|byte|+1 #Extra Sentry x$(4|40)#
-!!description 8|4|37|byte|+1 Spawn more Sentries at once
+!!add $PARAM(unlimitedSentries)x 8|4|37|byte|100
+!!name 8|4|37|byte|100 #Unlimited Sentries#
+!!display 8|4|37|byte|100 #Unlimited Sentries#
+!!description 8|4|37|byte|100 Spawn unlimited Sentries
 
 // Extra Shurikens
 !!add $PARAM(extraShurikens)x 8|4|38|byte|+1
