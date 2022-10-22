@@ -13446,7 +13446,7 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
         Combat=MaceMiner, DoubleJump, TripleJump OR Damage=40  # get a wjump on the energy crystal
       SentryJump=2
       Launch
-  conn WillowsEnd.GlideRooms:
+  conn WillowsEnd.GlideHeartPath:
     moki: Launch
     gorlek:
       DoubleJump, Dash, Glide
