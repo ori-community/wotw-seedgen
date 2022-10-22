@@ -32,6 +32,8 @@ Flags: Bonus+
 !!parameter splinterGrenade int:1
 //// How many Extra Sentries to shuffle in
 !!parameter extraSentries int:2
+//// How many Extra Shurikens to shuffle in
+!!parameter extraShurikens int:1
 
 !!add $PARAM(rapidSmashes)x 8|4|50|byte|+1       // Rapid Smashes
 !!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
@@ -85,3 +87,9 @@ Flags: Bonus+
 !!name 8|4|37|byte|+1 #Extra Sentry#
 !!display 8|4|37|byte|+1 #Extra Sentry x$(4|40)#
 !!description 8|4|37|byte|+1 Spawn more Sentries at once
+
+// Extra Shurikens
+!!add $PARAM(extraShurikens)x 8|4|38|byte|+1
+!!name 8|4|38|byte|+1 #Extra Shuriken#
+!!display 8|4|38|byte|+1 #Extra Shuriken x$(4|38)#
+!!description 8|4|38|byte|+1 Throw multiple Shurikens
