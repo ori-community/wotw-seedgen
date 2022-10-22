@@ -6,3 +6,4 @@ rls/*
 Cargo.lock
 *spoiler*.txt
 *spoiler*.json
+.idea
