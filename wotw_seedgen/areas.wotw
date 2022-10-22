@@ -8343,6 +8343,7 @@ anchor UpperReach.UpperSoupThawed at -215, -3877:
 anchor UpperReach.UpperSoupPaths at -215, -3877:
   nospawn
   refill Checkpoint
+  refill Health=1
 
   pickup UpperReach.SoupOre: free
   pickup UpperReach.LowerKS:  # check for redundancies with KeystoneSnapPlant
