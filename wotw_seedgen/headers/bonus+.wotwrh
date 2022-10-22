@@ -16,6 +16,8 @@ Flags: Bonus+
 !!parameter rapidGrenade int:2
 //// How many Quickshot upgrade to shuffle in
 !!parameter quickshotUpgrade int:2
+//// How many Rapid Regenerate to shuffle in
+!!parameter rapidRegenerate int:1
 //// How many Melting Blaze to shuffle in
 !!parameter meltingBlaze int:1
 //// How many Melting Sword to shuffle in
@@ -29,9 +31,10 @@ Flags: Bonus+
 //// How many Splinter Grenade to shuffle in
 !!parameter splinterGrenade int:1
 
-!!add $PARAM(rapidSmashes)x 8|4|50|byte|+1  // Rapid Smashes
-!!add $PARAM(rapidSwords)x 8|4|51|byte|+1   // Rapid Swords
-!!add $PARAM(rapidSpears)x 8|9|12|byte|+1   // Rapid Spears
+!!add $PARAM(rapidSmashes)x 8|4|50|byte|+1       // Rapid Smashes
+!!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
+!!add $PARAM(rapidSpears)x 8|9|12|byte|+1        // Rapid Spears
+!!add $PARAM(rapidRegenerate)x 8|9|12|float|+2   // Rapid Regenerates
 
 // Melting Upgrades
 !!add $PARAM(meltingBlaze)x 8|4|71|bool|true
