@@ -30,11 +30,17 @@ Flags: Bonus+
 !!parameter extraGrenade int:1
 //// How many Splinter Grenade to shuffle in
 !!parameter splinterGrenade int:1
+//// How many Extra Sentries to shuffle in
+!!parameter extraSentries int:2
 
 !!add $PARAM(rapidSmashes)x 8|4|50|byte|+1       // Rapid Smashes
 !!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
 !!add $PARAM(rapidSpears)x 8|9|12|byte|+1        // Rapid Spears
-!!add $PARAM(rapidRegenerate)x 8|9|12|float|+2   // Rapid Regenerates
+
+!!add $PARAM(rapidRegenerate)x 8|4|91|float|+1   // Rapid Regenerates
+!!name 8|4|91|float|+1 #Rapid Regenerate#
+!!display 8|4|91|float|+1 #Rapid Regenerate x$(4|91)#
+!!description 8|4|91|float|+1 Heal faster with Regenerate
 
 // Melting Upgrades
 !!add $PARAM(meltingBlaze)x 8|4|71|bool|true
@@ -73,3 +79,8 @@ Flags: Bonus+
 !!name 8|4|10|float|-0.4 #Quickshot Upgrade#
 !!description 8|4|10|float|-0.4 Bow attacks with Quickshot are faster
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
+
+// Extra Sentries
+!!name 8|4|37|byte|+1 #Extra Sentry#
+!!display 8|4|37|byte|+1 #Extra Sentry x$(4|40)#
+!!description 8|4|37|byte|+1 Spawn more Sentries at once
