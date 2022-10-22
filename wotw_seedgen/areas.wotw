@@ -1865,7 +1865,6 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
   # this anchor doesn't assume drained water because that should make it usable for weird dirty water swim paths
   nospawn  # underwater
-
   refill Checkpoint
   refill Energy=3:
     moki: WestHollow.UpperDrainLeverPulled, BreakCrystal
@@ -1918,6 +1917,7 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       WaterDash
 
 anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock puzzle room
+  nospawn  # underwater
   refill Checkpoint
   refill Health=1
   refill Energy=3:
@@ -1992,6 +1992,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.FullyDrained, Bash  # Place an enemy on HollowDrainMiddle and Bash off of it. There are multiple ways to do this, and none of them are fun. The Skeeto on the left is probably the most cooperative. This kinda looks possible from HollowDrainLower as well, but the Skeetos don't seem to have enough of an attention span to make it work.
       
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
+  nospawn  # underwater
   refill Energy=3:  # fast respawning crystal
     moki: BreakCrystal
   # energy crystal below not considered because it doesn't seem relevant for anything
@@ -8278,6 +8279,7 @@ anchor UpperReach.KeystoneSnapPlant at -231, -3865:  # At the snap plant with Mi
 
 anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
   nospawn
+  
   conn UpperReach.KeystoneSnapPlantPaths: free
   conn UpperReach.KeystoneSnapPlantThawedPaths: free
   conn UpperReach.UpperSoupThawed:  # mirrored in main variant
@@ -8299,6 +8301,7 @@ anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
 
 anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
   nospawn
+  
   pickup UpperReach.MiddleLeftKS: free
   pickup UpperReach.LowerKS:
     gorlek: DoubleJump, TripleJump
@@ -8312,6 +8315,7 @@ anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
 
 anchor UpperReach.KeystoneSnapPlantThawedPaths at -231, -3865:
   nospawn
+  
   pickup UpperReach.LowerKS:
     moki: Glide
     gorlek:
@@ -8332,11 +8336,13 @@ anchor UpperReach.UpperSoup at -215, -3877:  # At the soup
 
 anchor UpperReach.UpperSoupFrozen at -215, -3877:
   nospawn
+  
   conn UpperReach.UpperSoupPaths: free
   conn UpperReach.UpperSoupFrozenPaths: free
 
 anchor UpperReach.UpperSoupThawed at -215, -3877:
   nospawn
+  
   conn UpperReach.UpperSoupPaths: free
   conn UpperReach.UpperSoupThawedPaths: free
 
