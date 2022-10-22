@@ -1,0 +1,18 @@
+#category Quality of Life
+/// Better Stomp
+///
+/// Various QoL improvements to hammer stomps
+
+//// Preserve velocity when stomping through portals
+!!parameter stomp_through_portals bool:true
+
+//// Preserve velocity when stomping into water
+!!parameter stomp_into_water bool:true
+
+!!if stomp_through_portals true
+3|0|8|7|9|bool|true
+!!endif
+
+!!if stomp_into_water true
+3|0|8|7|10|bool|true
+!!endif
