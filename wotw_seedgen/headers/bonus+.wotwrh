@@ -81,6 +81,7 @@ Flags: Bonus+
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
 
 // Extra Sentries
+!!add $PARAM(extraSentries)x 8|4|37|byte|+1
 !!name 8|4|37|byte|+1 #Extra Sentry#
 !!display 8|4|37|byte|+1 #Extra Sentry x$(4|40)#
 !!description 8|4|37|byte|+1 Spawn more Sentries at once
