@@ -82,7 +82,7 @@ Flags: Bonus+
 !!description 8|4|10|float|-0.4 Bow attacks with Quickshot are faster
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
 
-// Extra Sentries
+// Unlimited Sentries
 !!add $PARAM(unlimitedSentries)x 8|4|37|byte|100
 !!name 8|4|37|byte|100 #Unlimited Sentries#
 !!display 8|4|37|byte|100 #Unlimited Sentries#
