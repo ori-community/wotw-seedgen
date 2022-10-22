@@ -203,8 +203,8 @@ UpperPools.UpperRightKS, Luma Pools, Resource, Keystone, lumaPoolsStateGroup, 53
 UpperPools.FishPoolEX, Luma Pools, SpiritLight, 50, lumaPoolsStateGroup, 5377, mediumExpOrbPlaceholderC, 33110, , -1568, -4063, -1568, -4063
 UpperPools.FishPoolOre, Luma Pools, Resource, Ore, lumaPoolsStateGroup, 5377, gorlekOreA, 31434, , -1535, -4034, -1535, -4034
 UpperPools.BubblesEC, Luma Pools, Resource, Energy, lumaPoolsStateGroup, 5377, energyCellFragmentA, 1600, , -1623, -4000, -1623, -4000
-UpperPools.LeftBubblesEX, Luma Pools, SpiritLight, 200, lumaPoolsStateGroup, 5377, largeExpOrbPlaceholderA, 628, , -1572, -4077, -1572, -4077
-UpperPools.RightBubblesEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 21860, , -1645, -4085, -1645, -4085
+UpperPools.LeftBubblesEX, Luma Pools, SpiritLight, 200, lumaPoolsStateGroup, 5377, largeExpOrbPlaceholderA, 628, , -1645, -4085, -1645, -4085
+UpperPools.RightBubblesEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 21860, , -1572, -4077, -1572, -4077
 UpperPools.SwimDashTree, Luma Pools, Ability, SwimDash, treesDontWorry, 0, SwimDash, 104, , -1430, -4082, -1430, -4082
 UpperPools.CurrentEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbB, 52791, , -1468, -4098, -1468, -4098
 UpperPools.RoofEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 33180, , -1449, -4037, -1449, -4037
