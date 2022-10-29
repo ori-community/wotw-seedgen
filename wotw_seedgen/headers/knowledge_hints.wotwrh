@@ -7,9 +7,7 @@
 9|129|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe moki will only open the entrance once you find $[2|14].
 9|150|4|24|-527|-4015|-459|-3977|4|17|28895|29098|0|8|9|130|bool|true  // Baur the Bear
 9|130|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe bear will only wake if you use $[2|118].
-9|150|4|24|-44|-4444|-32|-4431|4|17|6|1102|0|8|9|131|bool|true  // Dash Tree Platform
-9|150|4|24|-44|-4444|-32|-4431|4|17|6|1101|0|8|9|131|bool|true
-9|150|4|24|-44|-4444|-32|-4431|4|17|6|1104|0|8|9|131|bool|true
+9|150|4|24|-44|-4444|-32|-4431|4|17|6|1102|0|4|17|6|1101|0|4|17|6|1104|0|8|9|131|bool|true  // Dash Tree Platform
 9|131|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe semisolid platform will remain solid until you find $[2|102], $[2|101] or $[2|104].
 15|200|4|26|5|4|17|6|1077|0|8|9|132|bool|true  // Regenerate in late areas
 9|132|6|instant|noclear|p=-2|f=300|#Motay's Note#\nEntering zones after #The Wellspring# won't be logically required until you find $[2|77].
