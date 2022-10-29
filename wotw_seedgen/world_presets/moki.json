@@ -9,6 +9,7 @@
   ],
   "difficulty": "Moki",
   "headers": [
+    "knowledge_hints",
     "shrine_hints",
     "no_trials",
     "teleporters",
