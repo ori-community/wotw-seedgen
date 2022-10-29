@@ -38,7 +38,7 @@
 10289|4928|4|17|6|1101|0|8|9|100|bool|false
 10289|4928|4|17|6|1101|0|4|24|2106|-4001|2142|-3972|8|9|100|bool|false
 10289|4928|4|17|6|1101|0|4|17|9|100|0|8|9|139|bool|true  // Burrow for Inner Ruins TP
-9|139|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|14] won't be required until you find $[2|101].
+9|139|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|14] won't be required until you find $[2|101] and the four Wisps.
 16155|41465|4|17|6|1101|0|8|9|100|bool|false
 16155|41465|4|17|6|1101|0|4|24|400|3870|447|-3847|8|9|100|bool|false
 16155|41465|4|17|6|1101|0|4|17|9|100|0|8|9|140|bool|true  // Burrow for Willow's End TP
