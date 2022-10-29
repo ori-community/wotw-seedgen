@@ -9,6 +9,7 @@
   ],
   "difficulty": "Gorlek",
   "headers": [
+    "knowledge_hints",
     "shrine_hints",
     "trial_hints",
     "teleporters",
