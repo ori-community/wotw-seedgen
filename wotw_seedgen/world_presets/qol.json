@@ -4,6 +4,7 @@
     "description": "Enables some quality of life settings (e.g. autoplant, cutscene skips etc.)"
   },
   "headers": [
+    "better_stomp",
     "progress_helper",
     "spawn_tuley",
     "autoplants",
