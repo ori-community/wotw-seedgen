@@ -11526,9 +11526,7 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
       Damage=140
       WaterDash, Damage=60
   pickup UpperPools.RightBubblesEX:  # These paths use the torpedo to break the wall. Paths using another solution for the wall originate from UpperPools.RightBubbleSpamRoom
-    moki:
-      Water, Bash, WaterBreath, DoubleJump OR Launch
-      Water, Bash, WaterDash
+    moki: Water, Bash, WaterBreath, DoubleJump OR Launch
     gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
     kii:  # bait the torpedo into the wall. No dirty swim path because you can't afford to stay in the water
       Water, Launch
