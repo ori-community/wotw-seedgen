@@ -3074,10 +3074,9 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     moki: GladesTown.BuildHuts
 
   pickup GladesTown.LowerOre:
-    moki:
-      Hammer, DoubleJump OR Dash OR Glide OR Launch
-      Spear=1, DoubleJump OR Dash OR Glide OR Launch
-      Bash, Grenade=1, Hammer OR Spear=1
+    moki, Hammer OR Spear=1:
+      DoubleJump OR Dash OR Glide OR Launch
+      Bash, Grenade=1
     gorlek:
       Hammer  # hammer float
       Spear=1, Sword OR Damage=10  # sword float
