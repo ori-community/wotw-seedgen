@@ -3785,12 +3785,11 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
   conn GladesTown.West:
     moki:
       Bash, DoubleJump OR Dash OR Glide
-      DoubleJump, Dash, Glide
       Launch
     gorlek:
       Bash
       DoubleJump, TripleJump OR Dash
-      DoubleJump, Damage=10, Glide OR Sword
+      DoubleJump, Glide, Damage=10
       SwordSJump=1
       HammerSJump=1, DoubleJump OR Dash OR Glide OR Damage=10
     kii:  # dboosts because of friendly spikes
