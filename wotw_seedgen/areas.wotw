@@ -3140,7 +3140,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, DoubleJump OR Glide  # glide somehow still a bit precise even though you just hold right
         SentryJump=1, DoubleJump OR Glide  # glide somehow still a bit precise even though you just hold right
         SentryJump=1, Dash
-        DoubleJump, TripleJump, Sword OR Hammer  # upswing to the moss
+        DoubleJump, TripleJump, Hammer  # upswing to the moss
         TuleyShop.Lightcatchers, Bash, Grenade=1 OR SentryJump=1  # can still do this with the huts up
         TuleyShop.Lightcatchers, Bash, DoubleJump  # wrap around
       GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
@@ -3229,59 +3229,40 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       GladesTown.BuildHuts, Dash, Sword
       GladesTown.BuildHuts, Dash, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       GladesTown.BuildHuts, Sword, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-  conn GladesTown.UpperWest:
+  conn GladesTown.UpperWest:  # paths that use the huts may want to go to MotayHut first; check for redundancies with Teleporter
     moki:
       TuleyShop.StickyGrass, Launch
       TuleyShop.Lightcatchers, Bash:
         DoubleJump, Dash OR Glide
-        Dash, Glide
         Launch
-        TuleyShop.StickyGrass, Grapple, DoubleJump OR Dash OR Glide
-      TuleyShop.BlueMoon, Grapple, DoubleJump OR Dash OR Glide OR Launch  # extra abilities because it's harder if the huts are there
-      GladesTown.BuildHuts:
-        Bash, Grenade=2  # has an alternate solution if the lightcatcher is there
-        Bash, Grenade=1, DoubleJump, Dash OR Glide
-        Launch
-        TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
+        TuleyShop.StickyGrass, Grapple, DoubleJump
+      TuleyShop.BlueMoon, Grapple, DoubleJump OR Dash OR Glide  # extra abilities because it's harder if the huts are there
     gorlek:
       # Launch already connects over the teleporter
       TuleyShop.Lightcatchers, Bash:
-        Glide
-        DoubleJump, TripleJump OR Dash OR Sword OR Hammer
-        Dash, Sword OR Hammer
-        SentryJump=1
-        TuleyShop.StickyGrass, Grapple
+        DoubleJump, TripleJump OR Sword OR Hammer
+        Dash, Glide OR Sword OR Hammer
+        SentryJump=1, DoubleJump OR Dash
+        TuleyShop.StickyGrass, Grapple, Dash
       TuleyShop.BlueMoon, Grapple, Sword OR Hammer
       TuleyShop.StickyGrass:
-        DoubleJump, TripleJump, Sword  # upslash to the moss
         DoubleJump, TripleJump, Hammer, Dash OR Glide  # upswing to the moss
-        Grapple, DoubleJump, Dash, Glide OR TripleJump OR Sword
-        Grapple, DoubleJump, TripleJump, Glide
-      GladesTown.BuildHuts:
-        Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
-        Bash, Grenade=1, Dash, Glide OR Sword
-        SentryJump=1, DoubleJump, TripleJump OR Dash
+        Grapple, DoubleJump, TripleJump, Dash OR Glide
     kii:
-      TuleyShop.Lightcatchers, Bash, Flash=1, DoubleJump OR Dash  # Would be possible with other weapons but the second plant can be destroyed
+      TuleyShop.Lightcatchers, Bash:
+        Glide
+        Flash=1, DoubleJump OR Dash  # Would be possible with other weapons but the second plant can be destroyed
+        TuleyShop.StickyGrass, Grapple
       TuleyShop.BlueMoon, Grapple
       TuleyShop.StickyGrass:
         DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # condition for reaching the bridge
         Grapple, DoubleJump, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      GladesTown.BuildHuts:
-        Bash, Grenade=1, DoubleJump, Shuriken=1  # more energy efficient the grenade=2
-        Bash, Grenade=1, Dash, Hammer OR Shuriken=1 OR Flash=1
-        Bash, Grenade=1, Sword, Hammer OR Shuriken=1 OR Flash=1
-        Bash, Grenade=1, Hammer, Glide, Shuriken=1 OR Flash=1
     unsafe:
       Grenade=2, DoubleJump, Sword  # Midair Grenade Pogo
       TuleyShop.Lightcatchers, Bash  # Use the slimes to reach the plant above Motay then bash glide to the bridge
-      TuleyShop.StickyGrass, DoubleJump, TripleJump
-      GladesTown.BuildHuts:
-        Bash, Grenade=1, GrenadeJump
-        GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
-        SwordSJump=1, Dash  # Dash + Sword to land at the hut then sjump and dash.
-        TuleyShop.Lightcatchers, Bash, Sword OR Hammer
-  # all other paths should be redundant with the connection to tp
+      TuleyShop.StickyGrass:
+        DoubleJump, TripleJump
+        Grapple, DoubleJump, Dash, Glide OR Sword
 
 anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Motay
   # IMPORTANT this anchor is INSIDE the hut. It may only be accessed if the player has the BuildHuts state
@@ -3310,6 +3291,20 @@ anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Mo
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover # grapple the right plant to reach the house above
 
   conn GladesTown.West: free
+  conn GladesTown.UpperWest:
+    moki, GladesTown.BuildHuts:
+      Bash, Grenade=2, Dash  # 1 extra grenade if you hit the Lightcatcher
+      Launch
+      TuleyShop.Lightcatchers, Bash, DoubleJump
+    gorlek, GladesTown.BuildHuts:
+      Bash, Grenade=1
+      SentryJump=1, DoubleJump, TripleJump OR Dash
+      TuleyShop.Lightcatchers, Bash, Dash
+    kii: GladesTown.BuildHuts, TuleyShop.Lightcatchers, Bash, Glide
+    unsafe, GladesTown.BuildHuts:
+      GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
+      SwordSJump=1, Dash
+      TuleyShop.Lightcatchers, Bash, Sword OR Hammer
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   refill Checkpoint:
