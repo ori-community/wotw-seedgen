@@ -3438,7 +3438,7 @@ anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
     moki: Burrow, DoubleJump OR Launch
     gorlek: Burrow  # Burrow Dash out of the sand
 
-  conn GladesTown.Teleporter:  # only usefull for GladesDone
+  conn GladesTown.Teleporter:  # only useful for GladesDone
     moki, GladesTown.ClearThorns:
       Launch OR DoubleJump
       Bash, Grenade=1, Dash  # can't see the exit from the ground so accounting for landing near GladesTown.AboveCaveEX
@@ -4297,7 +4297,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
 
 # checkpoint at -978, -4042
 
-anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openning the entrance
+anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption opening the entrance
   state OuterWellspring.EntranceDoorOpen:
     moki: BreakWall=16
     
@@ -13061,7 +13061,7 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
 
 anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
-# Not a really usefull anchor but will make pathfinding less of a pain
+# Not a really useful anchor but will make pathfinding less of a pain
  refill Checkpoint
  refill Health=1
  
