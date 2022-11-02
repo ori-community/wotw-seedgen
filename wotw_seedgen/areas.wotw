@@ -3915,7 +3915,8 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
       Damage=30, Dash, Sword
   conn WestGlades.LowerPool:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide OR Bash
-    gorlek: free
+    gorlek: Sword OR Hammer
+    kii: free
   conn WestGlades.PastTown:  # This connection is strictly because of energy/health management
     kii:
       Damage=10 OR Combat=Tentacle:
