@@ -3193,18 +3193,19 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
   conn WestGlades.PastTown:
     moki:
       Bash, DoubleJump OR Dash
-      Combat=2xWeakSlug, DoubleJump, Dash, Glide  # this path is too nice to not be moki... right?
       Launch
     gorlek:
       Bash, Glide
       Bash, Damage=10, Sword
-      Combat=2xWeakSlug, DoubleJump, Dash
-      Combat=2xWeakSlug, DoubleJump, TripleJump  # can either wrap around or grab the bottom of the last wall
-      DoubleJump, Sword, Damage=10
+      Combat=2xWeakSlug, DoubleJump, TripleJump, Dash OR Glide  # the spikes here are awkward to escape from
+      Combat=2xWeakSlug, DoubleJump, Dash, Glide
+      Sword, DoubleJump, TripleJump OR Dash
     kii:
       Bash, Sword OR Hammer
       Bash, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
       Dash, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Combat=2xWeakSlug, DoubleJump, TripleJump OR Dash
+      Sword, DoubleJump, Damage=10
       Combat=2xWeakSlug, DoubleJump, Damage=20, Blaze=1 OR Damage=10
       Combat=2xWeakSlug, DoubleJump, Damage=10, Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
