@@ -4323,21 +4323,30 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openin
   
   conn OuterWellspring.EntranceDoor:
     moki:
-      Launch, DoubleJump OR Dash OR Glide OR Bash OR Grapple
-      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, Grapple OR Dash OR Glide
+      Launch, OuterWellspring.EntranceDoorOpen OR DoubleJump OR Dash OR Glide OR Bash OR Grapple
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, Grapple OR Glide
       # Use the wheel above BasementEC
-      OuterWellspring.EntranceDoorOpen, Launch, Water
       OuterWellspring.EntranceDoorOpen, Water, Grapple, Combat=WeakSlug OR Bash
       OuterWellspring.EntranceDoorOpen, Water, WaterDash, Combat=WeakSlug OR Bash
     gorlek:
-      Launch
-      OuterWellspring.EntranceDoorOpen, Grapple, DoubleJump OR Dash OR Sword  # Pass inside the wheel with the SL container
-      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, TripleJump OR Sword
-      OuterWellspring.EntranceDoorOpen, Bash, Damage=15, DoubleJump OR Dash # Can be done without damage by bashing the bee but it can just decide to hit spikes
+      Launch, Sword OR Hammer OR Damage=15
+      OuterWellspring.EntranceDoorOpen, Grapple, DoubleJump, TripleJump OR Dash  # Pass inside the wheel with the SL container
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, TripleJump, Dash OR Sword OR Hammer  # if the bee is near using hammer might get you hit, but then you can also use Bash on the bee
+      OuterWellspring.EntranceDoorOpen, Bash, DoubleJump, Dash, Sword OR Hammer
+      OuterWellspring.EntranceDoorOpen, Bash, Damage=15, DoubleJump # Can be done without damage by bashing the bee but it can just decide to hit spikes
+      OuterWellspring.EntranceDoorOpen, Bash, Damage=15, Dash, Glide
+      SwordSJump=1, DoubleJump, TripleJump, Grapple OR Bash  # redundant with simpler hammer paths
+      HammerSJump=1, DoubleJump, Grapple OR Bash
+      HammerSJump=1, DoubleJump, Damage=15, Dash
+      HammerSJump=1, DoubleJump, Damage=15, Glide, Sword
+      SentryJump=1, DoubleJump, TripleJump, Dash, Glide
+      SentryJump=1, DoubleJump, TripleJump, Damage=15
+      # technically there might be bashgrenade paths here because currently logically one grenade does not break the corruption but I'd rather make one grenade break the corruption logically than write bashgrenade paths here
     kii:
+      Launch
       DoubleJump, TripleJump, Grapple, Combat=2xWeakSlug
       DoubleJump, TripleJump, Bash, Grenade=1
-      OuterWellspring.EntranceDoorOpen, Grapple, Combat=WeakSlug
+      OuterWellspring.EntranceDoorOpen, Grapple, Combat=WeakSlug OR DoubleJump OR Dash
       OuterWellspring.EntranceDoorOpen, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       OuterWellspring.EntranceDoorOpen, Water, Bash  # Bash the fish to grab the wheel above Basement EC
       OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Water OR Damage=20:
@@ -4348,6 +4357,7 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openin
     unsafe:
       Grapple, DoubleJump, Combat=WeakSlug OR Bash
       Damage=15, Water, WaterDash OR Bash OR SwordSJump=1  # Use the wheel above BasementEC. walljump after the damage to regrab the wheel and use the iframes to pass the spikes.
+      OuterWellspring.EntranceDoorOpen, Bash OR Grapple
       OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
       
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
