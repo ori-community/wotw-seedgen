@@ -5507,7 +5507,7 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     kii, InnerWellspring.SpinPuzzleSolved: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: InnerWellspring.SpinPuzzleSolved
 
-  conn InnerWellspring.AboveSpinPuzzle:
+  conn InnerWellspring.GrappleThroughZigZagSpikes:
     moki:
       Launch
       Grapple, Combat=Miner, DoubleJump OR Dash OR Glide
@@ -5541,7 +5541,7 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     unsafe, InnerWellspring.SpinningRoomOpen:
       Water OR InnerWellspring.SpinPuzzleSolved  # precise wall jum pto get on the pole
 
-anchor InnerWellspring.AboveSpinPuzzle at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
+anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
   refill Checkpoint
   
   conn InnerWellspring.TopSecondRoom:  
@@ -5582,7 +5582,7 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
 
   conn InnerWellspring.EastDoor:
     moki: InnerWellspring.TopDoorOpen
-  conn InnerWellspring.AboveSpinPuzzle:
+  conn InnerWellspring.GrappleThroughZigZagSpikes:
     moki: 
       Glide, Combat=Miner, Grapple OR Launch OR DoubleJump OR Dash OR Water
       Glide, Bash, Grapple OR Launch OR DoubleJump OR Dash OR Water
