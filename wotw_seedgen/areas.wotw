@@ -4423,7 +4423,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
     unsafe:
       Glide
       Sword, Shuriken=1  # Pogo the energy cristal to grab the wheel
-  conn WestGlades.MillApproach:
+  conn WestGlades.MillApproach:  # check for redundancies with EntranceDoor and RightWallMidpoint
     gorlek: Glide
   conn OuterWellspring.EntranceDoor: free
 
@@ -4566,11 +4566,11 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
   conn OuterWellspring.TrialApproach:
     moki: Grapple OR Launch
     gorlek:
-      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=15  # Dmage depends on where you land in the spikes
+      DoubleJump, Glide
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Damage=15  # Damage depends on where you land in the spikes, some deal only 10
       DoubleJump, TripleJump, Bash, Grenade=1
       DoubleJump, Dash, Sword OR Hammer OR Damage=15  # Damage depends on where you land in the spikes
       DoubleJump, Dash, Bash, Grenade=1
-      DoubleJump, Glide
       SentryJump=2  # follow up the second sentryjump with a weapon hover
       Bash, Grenade=2, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
