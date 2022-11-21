@@ -5415,7 +5415,6 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
   conn InnerWellspring.BelowDrainLever: free
 
 anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to the spin puzzle
-  # Having water changes the lasers in the spin puzzle room to the right. Using this is only logically expected in kii and above
   refill Checkpoint
   refill Health=1
   refill Energy=4:
@@ -5424,24 +5423,10 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
   state InnerWellspring.SpinArena:  # finishing the arena
     moki: Combat=2xLizard+3xMantis+Miner, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Combat=2xLizard+3xMantis+Miner  # different ways to solve
+    # technically opening the spinning room clears this fight automatically as well, but that doesn't lead to anything logically
   state InnerWellspring.SpinningRoomOpen:  # Breaking the corruption which opens the spinning room
     moki: InnerWellspring.SpinArena, BreakWall=16, DoubleJump OR Dash OR Glide OR Launch
     gorlek: InnerWellspring.SpinArena, BreakWall=16
-  state InnerWellspring.SpinPuzzleSolved:
-    moki, InnerWellspring.SpinningRoomOpen:
-      Grapple, DoubleJump OR Dash
-      Grapple, Bash, Grenade=1
-      Launch
-    gorlek, InnerWellspring.SpinningRoomOpen: Grapple, Glide OR Sword OR Hammer
-    kii, InnerWellspring.SpinningRoomOpen:
-      Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Water, DoubleJump OR Grapple OR Dash OR Hammer OR Damage=30
-      Water, Bash, Grenade=1
-      Water, Damage=15, Sword
-      DoubleJump, TripleJump
-    unsafe, InnerWellspring.SpinningRoomOpen:
-      Grapple
-      Water, Spear=1 OR SentryJump=1 OR Damage=15
 
   quest InnerWellspring.HandToHandHerbs:
     moki: GladesTown.HandToHandPouch
@@ -5469,17 +5454,52 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
       Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump
     unsafe: DoubleJump
-  pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
-    moki: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved
-  pickup InnerWellspring.RotateRoomOre:  # blocked off until you fully solve the puzzle
-    moki: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved
 
   conn OuterWellspring.EastDoor: free
+  conn InnerWellspring.SpinPuzzle:
+    moki: InnerWellspring.SpinningRoomOpen
+
+anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking the spin puzzle
+  # Having water changes the lasers in the spin puzzle room to the right. Using this is only logically expected in kii and above
+  refill Checkpoint
+
+  state InnerWellspring.SpinPuzzleSolved:
+    moki:
+      Grapple, DoubleJump OR Dash
+      Grapple, Bash, Grenade=1
+      Launch
+    gorlek: Grapple, Glide OR Sword OR Hammer
+    kii:
+      Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Water, DoubleJump OR Grapple OR Dash OR Hammer OR Damage=30
+      Water, Bash, Grenade=1
+      Water, Damage=15, Sword
+      DoubleJump, TripleJump
+    unsafe:
+      Grapple
+      Water, Spear=1 OR SentryJump=1 OR Damage=15
+
+  pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
+    moki: InnerWellspring.SpinPuzzleSolved
+  pickup InnerWellspring.RotateRoomOre:  # blocked off until you fully solve the puzzle
+    moki: InnerWellspring.SpinPuzzleSolved
+
   conn InnerWellspring.PastSpinPuzzle:  # while there are abilitysets to get through the spinning room regardless of state, they are more expensive than just solving the puzzle
-    moki: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
-    gorlek: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
-    kii: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
-    unsafe: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
+    moki: InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
+    gorlek: InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
+    kii: InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
+    unsafe: InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
+  conn InnerWellspring.EastDoor:
+    moki, InnerWellspring.SpinningRoomOpen:
+      Grapple OR Launch
+      Bash, Grenade=1
+    gorlek, InnerWellspring.SpinningRoomOpen:
+      DoubleJump, TripleJump OR Dash  # wall jump on the arena wall in order to reach the pole
+      SentryJump=1
+    kii, InnerWellspring.SpinningRoomOpen:
+      DoubleJump
+      Dash, Hammer  # wall jump on the arena wall in order to reach the pole
+    unsafe: InnerWellspring.SpinningRoomOpen  # precise wall jump to get on the pole
 
 anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting the spin puzzle room
   # Having water changes the lasers in the spin puzzle room to the left. Using this is only logically expected in kii and above
@@ -5494,22 +5514,6 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     unsafe:
       Water, Spear=1 OR SentryJump=1 OR Damage=15
       
-  # the below pickups can't have any redundant paths with EastDoor because the SpinningRoomOpen door might be closed
-  pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
-    moki, InnerWellspring.SpinPuzzleSolved:
-      Launch OR DoubleJump OR Glide
-      Grapple, Dash
-    gorlek, InnerWellspring.SpinPuzzleSolved: Dash OR Damage=15
-    kii, InnerWellspring.SpinPuzzleSolved: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: InnerWellspring.SpinPuzzleSolved
-  pickup InnerWellspring.RotateRoomOre:  # blocked off until you fully solve the puzzle
-    moki, InnerWellspring.SpinPuzzleSolved:
-      Launch OR DoubleJump OR Glide
-      Grapple, Dash
-    gorlek, InnerWellspring.SpinPuzzleSolved: Dash OR Damage=15
-    kii, InnerWellspring.SpinPuzzleSolved: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: InnerWellspring.SpinPuzzleSolved
-
   conn InnerWellspring.GrappleThroughZigZagSpikes:
     moki:
       Launch
@@ -5524,25 +5528,16 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     unsafe:  # You can bait the Miner to make them fall into spikes
       DoubleJump OR Hammer OR Sentry=2
       Sword, Sentry=1
-  conn InnerWellspring.EastDoor:
-    moki, InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved:  # Need to solve the spin puzzle otherwise it would softlock after pulling the first lever because of lasers blocking you
-      Launch
-      Grapple, DoubleJump OR Dash OR Glide
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide
-    gorlek, InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved:
-      Grapple, Sword OR Hammer OR Damage=15
-      Bash, Grenade=1, Sword OR Hammer OR Damage=15
-      DoubleJump, TripleJump OR Dash  # wall jump on the arena wall in order to reach the pole
-      SentryJump=1  # take the lower path, use weapon to avoid the spikes then sjumps when exiting the spiinning room
-    kii, InnerWellspring.SpinningRoomOpen:
-      Water:  # water deactivates some lasers (not considered before kii) which lets you traverse the spinning room for free, reguarless of the state it's in
-        Launch OR Grapple OR DoubleJump
-        Bash, Grenade=1
-      InnerWellspring.SpinPuzzleSolved, DoubleJump
-      InnerWellspring.SpinPuzzleSolved, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Hammer, Water OR InnerWellspring.SpinPuzzleSolved # wall jump on the arena wall in order to reach the pole
-    unsafe, InnerWellspring.SpinningRoomOpen:
-      Water OR InnerWellspring.SpinPuzzleSolved  # precise wall jum pto get on the pole
+  conn InnerWellspring.SpinPuzzle:
+    moki, InnerWellspring.SpinPuzzleSolved:
+      DoubleJump OR Glide OR Launch
+      Grapple, Dash
+    gorlek, InnerWellspring.SpinPuzzleSolved: Dash OR Sword OR Hammer OR Damage=15
+    kii:
+      # Water  # This was in kii which doesn't seem right to me but rn I'm just validating moki and gorlek so I'll leave it to someone else to figure out what should be here
+      InnerWellspring.SpinPuzzleSolved, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      InnerWellspring.SpinPuzzleSolved OR Water  # yep, water works for all four states of the room. Cool, huh?
 
 anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
   refill Checkpoint
