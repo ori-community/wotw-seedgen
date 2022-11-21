@@ -11934,43 +11934,50 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitEX
       Bash, Grenade=1  # either find a place where you can throw a grenade or do the bash-only path
     kii:
       Sword OR Hammer  # With sword, pogo the gorlek
-      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # Possible with only one of each but the last jump into the bridge feels really weird
-      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Glide  # Glide jump
-      Bash  # Sorta janky but seems to work most of the time. Doesn't _look_ like it should work though
-      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Can add another use of energy weapons if the jump into the bridge feels too awkward
+    unsafe: GlideJump
   conn LowerWastes.BeforeMinesEntrance:
     gorlek: ShurikenBreak=20, Combat=MaceMiner OR DoubleJump OR Bash OR Launch
-    kii: ShurikenBreak=20
 
 anchor LowerWastes.BeforeMinesEntrance at 1846, -3986:  # To the right of the breakable wall leading to the Wooden Bridge
   pickup LowerWastes.BottomRightHC: free
 
-  conn LowerWastes.MinesEntrance:
+  conn LowerWastes.MinesEntranceEnemyPaths:
     moki:
       Combat=MaceMiner+Mantis, DoubleJump OR Dash OR Glide OR Grapple
       Bash, DoubleJump OR Dash OR Glide OR Grapple
       Launch
     gorlek:
-      Damage=30, Combat=MaceMiner+Mantis OR Bash
-      DoubleJump
-    kii: Bash, Grenade=1
+      Combat=MaceMiner+Mantis, Sword OR Hammer OR Damage=30
+      Bash, Sword OR Hammer OR Damage=30
+    kii:
+      Combat=MaceMiner+Mantis, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      Combat=MaceMiner+Mantis, Spear=1 OR Blaze=1
+      Bash, Spear=1 OR Blaze=1
   conn LowerWastes.WoodenBridge:
     moki, BreakWall=20: Combat=MaceMiner OR Bash OR Launch
     gorlek, BreakWall=20: DoubleJump
     kii: BreakWall=20
-  conn LowerWastes.LeverArea:  # make sure it's not redundant with BeforeMinesEntrance->WoodenBridge->LeverArea
+  conn LowerWastes.LeverArea:  # make sure it's not redundant with BeforeMinesEntrance->WoodenBridge->LeverArea and that it still solves if the wall is broken
     gorlek:
-      DoubleJump, TripleJump
+      DoubleJump  # if the wall is broken, go through WoodenBridge
       Launch
-    kii:
-      DoubleJump
-      Bash, Grenade=1
-    unsafe: free
+    kii: Bash, Grenade=1  # if the wall is broken, go through WoodenBridge
+    
+anchor LowerWastes.MinesEntranceEnemyPaths at 1921, -4001:  # Enemy path counterpart for LowerWastes.MinesEntrance
+  nospawn
+  # these are exclusively non-redundant paths relying on the mantis enemy that despawns if you spawn on this anchor
+  # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
+
+  pickup LowerWastes.BottomRightEX:  # Make sure it solves even after destroying the breakable wall
+    kii: Bash  # Bash the gorlek to reach the mantis when it jumps
+    
+  conn LowerWastes.MinesEntrance: free  # connection to non-enemy reliant paths
 
 anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins breakable wall
-  pickup LowerWastes.BottomRightEX:
+  pickup LowerWastes.BottomRightEX:  # Make sure it solves even after destroying the breakable wall
     moki:
       Combat=MaceMiner+Mantis, Grapple
       Bash, Grenade=1, DoubleJump OR Dash  # Very much not a mandatory grenade... This is only important if the Ruins Wall is broken, and then only if you don't use the enemies
@@ -11979,17 +11986,16 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       DoubleJump, TripleJump, Hammer
       SentryJump=1  # can either jump good or use the right wall and weapon float
       Bash, Grenade=1 OR DoubleJump OR Glide
-      Bash, Dash OR Sword OR Hammer  # @Validator seems like thay are missing. Climb the right wall above the breakable wall
+      Bash, Dash OR Sword OR Hammer  # @Validator seems like they are missing. Climb the right wall above the breakable wall
     kii:
       Grapple  # @validator Can probably be gorlek
-      Bash  # Bash the gorlek to reach the mntis when it jumps
       Sword, DoubleJump  # pogo
       Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
-      DoubleJump, TripleJump, Sentry=1 OR Flash=1
+      DoubleJump, TripleJump  # https://cdn.discordapp.com/attachments/942484861569105990/1044369238040793138/Untitled.mp4
   pickup LowerWastes.BottomRightHC:  # Make sure it's not redundant with conn LowerWastes.BeforeMinesEntrance
     moki:
-      Combat=MaceMiner+Mantis, Grapple  # Use both Grapple points
+      Grapple, Combat=MaceMiner+Mantis OR Bash  # Use both Grapple points
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
       Launch
     gorlek:
@@ -11997,7 +12003,7 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       DoubleJump, TripleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
     kii:
-      Grapple  # @validator could be gorlek
+      Grapple  # Grapple the wheel to avoid combat requirement. @validator Could be gorlek
       Damage=40  # dboost in the spikes and the gorlek
       DoubleJump, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2
       Bash, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2
@@ -12021,7 +12027,7 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Grapple, Glide, Spear=1
   conn WindtornRuins.LowerRuins:
     gorlek: ShurikenBreak=20, Burrow
-
+    
 anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the lever
   refill Checkpoint
   refill Energy=3:
