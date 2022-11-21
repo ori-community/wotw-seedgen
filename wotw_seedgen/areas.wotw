@@ -5415,6 +5415,7 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
   conn InnerWellspring.BelowDrainLever: free
 
 anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to the spin puzzle
+  # Having water changes the lasers in the spin puzzle room to the right. Using this is only logically expected in kii and above
   refill Checkpoint
   refill Health=1
   refill Energy=4:
@@ -5426,7 +5427,7 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
   state InnerWellspring.SpinningRoomOpen:  # Breaking the corruption which opens the spinning room
     moki: InnerWellspring.SpinArena, BreakWall=16, DoubleJump OR Dash OR Glide OR Launch
     gorlek: InnerWellspring.SpinArena, BreakWall=16
-  state InnerWellspring.SpinPuzzleSolved:  # Having Water changes this room (not considered in moki)
+  state InnerWellspring.SpinPuzzleSolved:
     moki, InnerWellspring.SpinningRoomOpen:
       Grapple, DoubleJump OR Dash
       Grapple, Bash, Grenade=1
@@ -5481,9 +5482,10 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
     unsafe: InnerWellspring.SpinningRoomOpen, InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
 
 anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting the spin puzzle room
+  # Having water changes the lasers in the spin puzzle room to the left. Using this is only logically expected in kii and above
   refill Checkpoint
   
-  state InnerWellspring.SpinPuzzleSolved:  # Having Water changes this room (not considered in moki)
+  state InnerWellspring.SpinPuzzleSolved:
     kii, Water:  # Water is required because lasers are blocking your way if you pulled at least one lever and return to the anchor before solving the puzzle
       Grapple OR Launch
       DoubleJump OR Dash OR Hammer OR Damage=30
@@ -5492,6 +5494,7 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     unsafe:
       Water, Spear=1 OR SentryJump=1 OR Damage=15
       
+  # the below pickups can't have any redundant paths with EastDoor because the SpinningRoomOpen door might be closed
   pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
     moki, InnerWellspring.SpinPuzzleSolved:
       Launch OR DoubleJump OR Glide
