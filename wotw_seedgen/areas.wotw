@@ -4596,6 +4596,8 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Damage=15
   conn OuterWellspring.AboveEntranceDoor: free
+  conn WestGlades.MillApproach:  # check for redundancies with RightWallMidpoint and AboveEntranceDoor
+    gorlek: Damage=20
 
 anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing over west door
   refill Energy=3:
