@@ -5514,17 +5514,19 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     unsafe:
       Water, Spear=1 OR SentryJump=1 OR Damage=15
       
-  conn InnerWellspring.GrappleThroughZigZagSpikes:
+  conn InnerWellspring.GrappleThroughZigZagSpikes:  # the miner on the way is in an unusually rude position, so just using Combat=Miner might not always represent the difficulty of killing him
     moki:
       Launch
       Grapple, Combat=Miner, DoubleJump OR Dash OR Glide
       Grapple, Bash, DoubleJump OR Dash OR Glide
     gorlek:
-      Grapple, Combat=Miner OR Bash OR Damage=10
-      DoubleJump, TripleJump, Damage=15, Combat=Miner OR Bash  # dboost in the spikes at the first laser
-      DoubleJump, SentryJump=2  # use weapon to kill the Miner
-      SentryJump=3  # Use weapon to kill the Miner
-    kii: DoubleJump, Damage=15, Combat=Miner OR Bash OR Damage=10  # wjump of the right wall to grab the first wheel then dboost at the first laser
+      Grapple, Combat=Miner OR Bash
+      DoubleJump, TripleJump, SentryJump=1, Bash
+      DoubleJump, SentryJump=2, Bash
+      SentryJump=3, Bash
+    kii:
+      Grapple, Damage=10
+      DoubleJump, Damage=15, Combat=Miner OR Bash OR Damage=10  # wjump of the right wall to grab the first wheel then dboost at the first laser
     unsafe:  # You can bait the Miner to make them fall into spikes
       DoubleJump OR Hammer OR Sentry=2
       Sword, Sentry=1
@@ -5536,10 +5538,10 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
     kii:
       # Water  # This was in kii which doesn't seem right to me but rn I'm just validating moki and gorlek so I'll leave it to someone else to figure out what should be here
       InnerWellspring.SpinPuzzleSolved, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      InnerWellspring.SpinPuzzleSolved OR Water  # yep, water works for all four states of the room. Cool, huh?
+    unsafe: InnerWellspring.SpinPuzzleSolved OR Water  # yep, water works for all four states of the room. Cool, huh?
 
 anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
+  # dealing with the miner is represented in the connections from both directions to this anchor. When spawning on this anchor, the miner is not an issue
   refill Checkpoint
   
   conn InnerWellspring.TopSecondRoom:  
@@ -5561,12 +5563,9 @@ anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the 
       Launch  # https://youtu.be/wbz2cLfuFOk
   conn InnerWellspring.PastSpinPuzzle:  # Camera doesn't show the lower wheel when you are on the top one, making it difficult to rely on them in lower difficulties 
     moki:
-      Glide, Combat=Miner, Grapple OR DoubleJump OR Dash OR Water
-      Glide, Bash, Grapple OR DoubleJump OR Dash
-      Glide, Launch
-    gorlek:
-      Glide OR Launch 
-      Grapple, DoubleJump OR Dash OR Sword OR Damage=20
+      Glide, Combat=2xSlug, DoubleJump OR Launch
+      Glide, Bash, DoubleJump OR Launch
+    gorlek: Glide, DoubleJump OR Launch
     kii:
       Grapple OR Damage=35  # Possible without any damage but this account for the worst case scenario of dbosting on both the laser and the spikes
     unsafe: free
@@ -5581,17 +5580,25 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
   conn InnerWellspring.EastDoor:
     moki: InnerWellspring.TopDoorOpen
   conn InnerWellspring.GrappleThroughZigZagSpikes:
-    moki: 
-      Glide, Combat=Miner, Grapple OR Launch OR DoubleJump OR Dash OR Water
-      Glide, Bash, Grapple OR Launch OR DoubleJump OR Dash OR Water
+    moki:
+      Combat=Miner OR Bash:
+        Glide, Water OR DoubleJump OR Dash OR Grapple OR Launch
+        Grapple, DoubleJump, Dash
       Launch, Water
     gorlek:
-      Glide, Combat=Miner OR Bash OR Damage=10
-      Water, Combat=Miner, DoubleJump OR Dash OR Sword OR Hammer OR Damage=15
-      Water, Bash, DoubleJump OR Dash OR Sword OR Hammer OR Damage=15
-      Water, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
-      Grapple, Launch
+      Combat=Miner OR Bash:
+        Glide
+        Grapple, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+        Grapple, Dash, Sword OR Damage=20
+        Water, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+        Water, Dash, Sword OR Hammer
+        Damage=20, DoubleJump, TripleJump, Dash OR Sword
+      Launch, Grapple OR Damage=20
+      Launch, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+      Launch, Dash, Sword OR Hammer
     kii:
+      Glide, Damage=10
+      Water, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
       Damage=75, Combat=Miner OR Bash
       Damage=85
       Water, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
