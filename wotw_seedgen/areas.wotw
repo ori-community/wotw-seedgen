@@ -6027,13 +6027,13 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
 
   state WoodsMain.KeystoneDoor:
     moki: Keystone=4
-
   state WoodsMain.KSRoomYellowBarrierBroken:  # Flap being the casual way of breaking the yellow barrier
     moki:  # getting assisting abilities to deal with Skeetos and positioning of Balloon
       Combat=3xSkeeto, Flap, DoubleJump OR Glide
       Bash, Flap, DoubleJump OR Glide
-    gorlek: Flap  # casual way without assist
-    kii: Combat=Balloon OR Damage=20  # killing balloon at the right time or letting it explode inside of you
+    gorlek: Flap, Combat=3xSkeeto OR Bash
+    kii: Flap OR Combat=Balloon OR Damage=20  # killing balloon at the right time or letting it explode inside of you
+    unsafe: free  # master balloon baiter
 
   pickup WoodsMain.MiddleLeafPileEX:
     moki: Flap
