@@ -7598,20 +7598,18 @@ anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway thr
 
   pickup LowerReach.RoofRightEX:  # Be careful it's not redundant with going to PastSnowball first
     gorlek:
-      DoubleJump, TripleJump, Dash
       SwordSJump=1, DoubleJump
       SwordSJump=2, Dash
       LowerReach.FreezeEastFurnace, HammerSJump=1, DoubleJump
       LowerReach.FreezeEastFurnace, HammerSJump=2, Dash
       LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump
-      LowerReach.FreezeEastFurnace, Bash, Grenade=1, Glide, Dash OR Damage=20
       LowerReach.FreezeEastFurnace, Bash, Grenade=2, Dash OR Glide OR Sword OR Hammer OR Damage=20
     kii:
-      DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Glide, Blaze=1
       Bash, Grenade=2
       Bash, Grenade=1, DoubleJump OR Hammer OR LowerReach.FreezeEastFurnace OR Damage=20
-      Bash, Grenade=1, Glide, Sword
+      Bash, Grenade=1, Glide, Dash OR Sword
       LowerReach.ThawEastFurnace, Bash, Grenade=1, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
     unsafe:
       DoubleJump, TripleJump OR Dash
@@ -7627,16 +7625,15 @@ anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway thr
     moki:
       Launch
       DoubleJump, Dash OR Glide
-      LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump OR Dash OR Glide
     gorlek:
       DoubleJump
-      Glide, Dash OR Damage=20
-      LowerReach.FreezeEastFurnace, Bash, Grenade=1, Sword OR Hammer OR Damage=20
-      LowerReach.FreezeEastFurnace, SentryJump=1  # use weapon to hover as well
+      SwordSJump=1
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
+      LowerReach.FreezeEastFurnace, HammerSJump=1  # use weapon to hover as well
     kii:
       Hammer OR Damage=20
       Bash, Grenade=1
-      Glide, Sword
+      Glide, Dash OR Sword
       LowerReach.ThawEastFurnace, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
     unsafe:
       Sword OR GlideJump
