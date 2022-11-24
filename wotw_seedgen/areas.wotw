@@ -7525,40 +7525,12 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       GrenadeJump, DoubleJump  # grenade wall jump off of the microwall under the spikes
       HammerJump
       BlazeSwap=6 OR FlashSwap  # might be doable with less somehow, blaze swaps are hard
-  pickup LowerReach.RoofRightEX:
-    moki: Launch  # intended path omitted in moki
-    gorlek:
-      LowerReach.FreezeEastFurnace, Bash, Grenade=2
-      SwordSJump=2, Dash OR DoubleJump
-      LowerReach.FreezeEastFurnace, HammerSJump=2, Dash OR DoubleJump
-    kii:
-      Bash, Grenade=2  # You have to time the second grenade throw just before the snaptrap open again
-      Bash, Grenade=1, DoubleJump, Dash OR TripleJump  # Climb on the right wall above the 2nd plant
-    unsafe:
-      SentryJump=1, DoubleJump  # Climb on the wall above the 2nd plant
-      HammerJump
 
-  conn LowerReach.HalfwayIceCavern:
+  conn LowerReach.IceCavern:
     moki:
-      Bash, Grenade=1, DoubleJump, Dash, Glide
+      Bash, Grenade=1
       Launch
-    gorlek:
-      SwordSJump=1, DoubleJump
-      SwordSJump=3
-      Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Glide
-    kii:
-      Bash, Grenade=3
-      Bash, Grenade=2, DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1, DoubleJump, Sword OR Hammer OR Sentry=2
-      Bash, Grenade=1, DoubleJump, Damage=20, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1, Dash, Sword OR Hammer OR Sentry=2
-      LowerReach.ThawEastFurnace, Bash, Grenade=1, DoubleJump, Shuriken=1
-      LowerReach.ThawEastFurnace, Bash, Grenade=1, DoubleJump, Blaze=1, Damage=20
-      LowerReach.ThawEastFurnace, Bash, Grenade=1, Dash, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-    unsafe:
-      Bash, Grenade=1, DoubleJump, Damage=20
-      SwordSJump=1, DoubleJump, Dash OR Glide
-      Bash, Grenade=1, Dash, Sentry=1 OR Flash=1 OR LowerReach.ThawEastFurnace  # Need to walljump on the wall above the 2nd plant then dash, get a reset by touching the ceilin and dash a second time
+    gorlek: SentryJump=1
   conn LowerReach.EastFurnace:
     gorlek: ShurikenBreak=20
   conn LowerReach.SnowballEnemyPaths:
@@ -7573,7 +7545,40 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       Hammer
       Bash  # use the lizard
 
-# checkpoint at -60, -3987
+anchor LowerReach.IceCavern at -85, -3966:  # On the snaptrap facing upwards at the entrance to the spiky ice cavern after the snowball
+  pickup LowerReach.RoofRightEX:
+    moki: Launch
+    gorlek:
+      SwordSJump=1, DoubleJump OR Dash
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1
+      LowerReach.FreezeEastFurnace, HammerSJump=1, DoubleJump OR Dash
+    unsafe: HammerJump
+
+  conn LowerReach.PastSnowball: free
+  conn LowerReach.HalfwayIceCavern:
+    moki:
+      DoubleJump, Dash, Glide
+      Launch
+    gorlek:
+      DoubleJump, TripleJump OR Dash OR Glide OR Sword
+      DoubleJump, Hammer, Damage=20
+      SwordSJump=1, DoubleJump OR Dash
+      SwordSJump=2
+      LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump OR Dash
+      LowerReach.FreezeEastFurnace, Bash, Grenade=2
+      LowerReach.FreezeEastFurnace, HammerSJump=1, DoubleJump OR Dash
+      LowerReach.FreezeEastFurnace, HammerSJump=2
+    kii:
+      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Hammer OR Sentry=2
+      DoubleJump, Damage=20, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Dash, Sword OR Hammer OR Sentry=2
+      LowerReach.ThawEastFurnace, DoubleJump, Shuriken=1
+      LowerReach.ThawEastFurnace, DoubleJump, Blaze=1, Damage=20
+      LowerReach.ThawEastFurnace, Dash, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+    unsafe:
+      DoubleJump, Damage=20
+      Dash, Sentry=1 OR Flash=1 OR LowerReach.ThawEastFurnace  # Need to walljump on the wall above the 2nd plant then dash, get a reset by touching the ceilin and dash a second time
 
 anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway through the spiky ice cavern
 # Going through that ice cavern in order to activate LowerReach.EastDoorLantern or going to LowerReach.SwimmingPool is horrible to find paths for, especially when using sjumps/bashnades
@@ -7596,32 +7601,13 @@ anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway thr
       SentryJump=2, Grenade=1, Dash  # Need to use up slashes
       SentryBurn=1, SwordSJump=2
 
-  pickup LowerReach.RoofRightEX:  # Be careful it's not redundant with going to PastSnowball first
-    gorlek:
-      SwordSJump=1, DoubleJump
-      SwordSJump=2, Dash
-      LowerReach.FreezeEastFurnace, HammerSJump=1, DoubleJump
-      LowerReach.FreezeEastFurnace, HammerSJump=2, Dash
-      LowerReach.FreezeEastFurnace, Bash, Grenade=1, DoubleJump
-      LowerReach.FreezeEastFurnace, Bash, Grenade=2, Dash OR Glide OR Sword OR Hammer OR Damage=20
-    kii:
-      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Glide, Blaze=1
-      Bash, Grenade=2
-      Bash, Grenade=1, DoubleJump OR Hammer OR LowerReach.FreezeEastFurnace OR Damage=20
-      Bash, Grenade=1, Glide, Dash OR Sword
-      LowerReach.ThawEastFurnace, Bash, Grenade=1, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
-    unsafe:
-      DoubleJump, TripleJump OR Dash
-      Bash, Grenade=1      
-      
   conn LowerReach.SwimmingPool:
     moki:
       Glide, DoubleJump OR Dash
       Launch
     gorlek: Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Damage=20
     kii: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-  conn LowerReach.PastSnowball:
+  conn LowerReach.IceCavern:
     moki:
       Launch
       DoubleJump, Dash OR Glide
