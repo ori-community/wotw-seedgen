@@ -636,15 +636,19 @@ fn fill_macros_and_states(contents: &mut Vec<AreaContent>, parser: &Parser) -> R
     }
 
     for content in contents {
-        if let AreaContent::Anchor(anchor) = content {
-            for refill in &mut anchor.refills {
-                for requirement in &mut refill.requirements {
-                    fill_group(requirement, &macros, &states, parser)?;
+        match content {
+            AreaContent::Requirement(named_group) | AreaContent::Region(named_group) =>
+                fill_group(&mut named_group.group, &macros, &states, parser)?,
+            AreaContent::Anchor(anchor) => {
+                for refill in &mut anchor.refills {
+                    for requirement in &mut refill.requirements {
+                        fill_group(requirement, &macros, &states, parser)?;
+                    }
                 }
-            }
-            for connection in &mut anchor.connections {
-                fill_group(&mut connection.requirements, &macros, &states, parser)?;
-            }
+                for connection in &mut anchor.connections {
+                    fill_group(&mut connection.requirements, &macros, &states, parser)?;
+                }
+            },
         }
     }
 
@@ -666,11 +670,9 @@ fn fill_group(group: &mut Group, macros: &[&str], states: &[&str], parser: &Pars
 }
 fn fill_requirement(requirement: &mut Requirement, macros: &[&str], states: &[&str], parser: &Parser) -> Result<(), ParseError> {
     if let RequirementValue::State(identifier) = requirement.value {
-        requirement.value = if macros.contains(&identifier) {
-            RequirementValue::Macro(identifier)
-        } else if states.contains(&identifier) {
-            RequirementValue::State(identifier)
-        } else {
+        if macros.contains(&identifier) {
+            requirement.value = RequirementValue::Macro(identifier);
+        } else if !states.contains(&identifier) {
             return Err(parser.error("unknown requirement", requirement.range.clone()));
         };
     }
