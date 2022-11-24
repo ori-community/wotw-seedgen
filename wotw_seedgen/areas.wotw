@@ -7575,7 +7575,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
 
 # checkpoint at -60, -3987
 
-anchor LowerReach.HalfwayIceCavern at -43, -3955:  # On the snaptrap halfway through the spiky ice cavern
+anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway through the spiky ice cavern
 # Going through that ice cavern in order to activate LowerReach.EastDoorLantern or going to LowerReach.SwimmingPool is horrible to find paths for, especially when using sjumps/bashnades
 # That anchor is just so pathfinder have an easier time patfinding the horrible paths through that icy cavern.
 
