@@ -6318,8 +6318,11 @@ anchor WoodsMain.BrokenOwl at 848, -4058:  # At the collapsing petrified Owl
       Dash OR Sword OR Damage=15  # With sword, pogo the skeeto
 
   conn WoodsMain.TrialStart:
-    moki: DoubleJump OR Launch
-    gorlek: Hammer OR SwordSJump=1
+    moki:
+      DoubleJump OR Launch
+      Bash, Grenade=1
+    gorlek: Bash OR Hammer OR SwordSJump=1
+    kii: Sword  # Pogo a skeeto
     unsafe: free  # just die/reload
 
 anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
@@ -6368,7 +6371,7 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
       DoubleJump, Burrow, Damage=45
     unsafe:
       DoubleJump, TripleJump, Damage=30
-  conn WoodsMain.BeforeLog:
+  conn WoodsMain.BeforeLog:  # check for redundancies with AboveHowl
     gorlek: Glide  # Jump and hold right while gliding
     kii: Dash  # coyote + normal dash
     unsafe: Burrow, Damage=15
@@ -6380,13 +6383,16 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
       Burrow, DoubleJump OR Dash  # get to the most right sandball, burrow through it and go right
   conn WoodsMain.AboveHowl:
     gorlek: free  # Jump and hold right
+  conn WoodsMain.TrialStart:  # check for redundancies with AboveHowl -> BrokenOwl
+    gorlek: Dash OR Glide
+    kii: free
 
 anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
   refill Checkpoint
 
   state WoodsMain.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: DoubleJump, Dash
-    gorlek: DoubleJump, TripleJump OR Glide
+    kii: DoubleJump, Glide
 
   pickup WoodsMain.OverflowShard:
     moki:
@@ -6398,20 +6404,18 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
       Sword, Sentry=1 OR Shuriken=1 OR Flash=1
       Hammer, Sentry=1 OR Shuriken=1 OR Flash=1
 
-  conn WoodsMain.AboveHowl:  # make sure it's not redundant with ->BeforeLog->AboveHowl
-    moki:
-      Launch
-      DoubleJump, Dash OR Bash OR Glide
-  conn WoodsMain.BeforeLog:
-    moki:
-      DoubleJump, Dash OR Bash OR Glide
-      Launch, Combat=Balloon OR Dash OR DoubleJump
-    gorlek: DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Launch
+  conn WoodsMain.MidwayTrial:
+    gorlek: Glide
+  conn WoodsMain.AboveHowl:
+    gorlek: DoubleJump OR Bash OR Sword OR Hammer
+  conn WoodsMain.BeforeLog:  # check for redundancies with AboveHowl and MidwayTrial
+    moki: DoubleJump, Dash OR Bash OR Glide
+    gorlek: Dash
     kii: Sentry=2 OR Shuriken=1
   conn WoodsMain.OrangeTree:  # make sure it's not redundant with ->BeforeLog->OrangeTree
     gorlek: 
       Glide
-      DoubleJump, Dash, Burrow
+      Burrow, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
     kii:
       Burrow, DoubleJump OR Dash OR Sentry=5
     unsafe:
@@ -6425,9 +6429,13 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
   conn WoodsMain.BrokenOwl: free
   conn WoodsMain.BeforeLog:
     moki:
-      Combat=Balloon, DoubleJump OR Launch
+      Combat=Balloon, DoubleJump
       Combat=Balloon, Bash, Grenade=1
-    gorlek: SentryJump=1, Combat=Balloon OR Dash OR Damage=20
+      Launch
+    gorlek:
+      DoubleJump, Dash OR Damage=20
+      Bash, Grenade=1, Dash OR Damage=20
+      SentryJump=1, Combat=Balloon OR Dash OR Damage=20
     kii:
       DoubleJump OR Launch
       Bash
@@ -6436,8 +6444,6 @@ anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced How
       SentryJump=1
       Sword  # pogo the skeeto twice (enemy behaviour not easily readable, therefore not kii)
       Hammer, Spear=1 OR Blaze=1
-  conn WoodsMain.TrialStart:  # make sure its not redundant with BrokenOwl -> TrialStart
-    kii: Sword  # Pogo a skeeto
 
 anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (where shriek chases you and ku)
   refill Checkpoint:  # at 980, -4015
@@ -6453,20 +6459,17 @@ anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (whe
 
   conn WoodsMain.Teleporter:
     moki: WoodsMain.LogBlobDestroyed, Combat=3xBalloon
-    gorlek: WoodsMain.LogBlobDestroyed, Combat=Balloon OR Dash OR Damage=20
+    gorlek: WoodsMain.LogBlobDestroyed, Combat=Balloon OR Damage=20
     kii: WoodsMain.LogBlobDestroyed
-  conn WoodsMain.AboveHowl:
-    moki: 
-      Combat=2xBalloon
-      Combat=Balloon, Dash OR Launch
-    gorlek: free
+  conn WoodsMain.AboveHowl: free
   conn WoodsMain.OrangeTree:
     gorlek:
       Launch
       DoubleJump, Bash, Grenade=1
-      DoubleJump, SentryJump=1
+      DoubleJump, SentryJump=2  # one extra to let the player figure out where to sjump
     unsafe:
       Bash, Grenade=1  # too precise
+      SentryJump=1
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
