@@ -8683,10 +8683,9 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
     kii:
       Grapple, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1 OR Hammer
       DoubleJump, TripleJump OR Dash
-  conn UpperDepths.RightKeystonePath:
-    gorlek:
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide  # @Validator It looks like you need a bash glide, so it should probably kii
-      Glide, DoubleJump OR Dash
+  conn UpperDepths.RightKeystonePath:  # check for redundancies with KeydoorLedge
+    gorlek: Glide, DoubleJump OR Dash
+    kii: Bash, Grenade=1, DoubleJump OR Dash
 
 # checkpoint at 136, -4425
 # checkpoint at 297, -4376
