@@ -7735,7 +7735,7 @@ anchor LowerReach.ArenaArea at 44, -3992:  # To the left of the combat arena
 
 anchor LowerReach.WindSpinners at 73,-3929:  # midway through the wind column above the combat arena
 # This anchor is just so ArenaArea->WispsPath is easier to pathfind for
-  conn LowerReach.LowerWispPath:
+  conn LowerReach.WispPathCheckpoint:
     moki:
       Glide, Grapple OR Launch
       Glide, DoubleJump, Bash, Grenade=1
@@ -7760,7 +7760,7 @@ anchor LowerReach.WindSpinners at 73,-3929:  # midway through the wind column ab
     moki: Glide, LowerReach.ArenaBeaten
     gorlek: LowerReach.ArenaBeaten
 
-anchor LowerReach.LowerWispPath at 83, -3874:  # At the checkpoint just after the grappable plant
+anchor LowerReach.WispPathCheckpoint at 83, -3874:  # At the checkpoint just after the grappable plant
   refill Checkpoint
   refill Health=1:  # Requirements are here so you can return to the checkpoint afterwards
     moki:
@@ -7839,7 +7839,7 @@ anchor LowerReach.BridgeWispPath at 67, -3808:  # At the bridge checkpoint, next
       DoubleJump, TripleJump, Shuriken=2
       FlashSwap
       Launch
-  conn LowerReach.LowerWispPath:
+  conn LowerReach.WispPathCheckpoint:
     moki:
       Bash
       Combat=WeakSlug, Combat=Miner
