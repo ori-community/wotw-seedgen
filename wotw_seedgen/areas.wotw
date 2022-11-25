@@ -10693,6 +10693,17 @@ anchor EastPools.NextToLupoOre at -1373, -4166:  # Checkpoint between Lupo and t
       Damage=160
       WaterDash, Damage=60
     unsafe: Damage=120, Launch OR Grapple OR Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+  conn EastPools.WaterdashArena:
+    kii, EastPools.ArenaWall:
+      Damage=120
+      WaterDash, Damage=60
+      EastPools.LowerWaterDrained:
+        Damage=100
+        WaterDash, Damage=40
+    unsafe, EastPools.ArenaWall:
+      Damage=100
+      WaterDash, damage=40
+      EastPools.LowerWaterDrained, Damage=80
 
 anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
   refill Checkpoint
@@ -10761,6 +10772,17 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
     kii, EastPools.ArenaWall, EastPools.LowerWaterDrained:
       Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1
+  conn EastPools.NextToLupoOre:
+    kii, EastPools.ArenaWall:
+      Damage=120
+      WaterDash, Damage=60
+      EastPools.LowerWaterDrained:
+        Damage=100
+        WaterDash, Damage=40
+    unsafe, EastPools.ArenaWall:
+      Damage=100
+      WaterDash, damage=40
+      EastPools.LowerWaterDrained, Damage=100
   conn EastPools.MissilePuzzle:
     moki, EastPools.FightArenas: Water OR DoubleJump OR Dash OR Glide OR Launch 
     gorlek, EastPools.FightArenas: Sword OR Hammer OR Damage=20
