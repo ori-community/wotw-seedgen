@@ -6327,7 +6327,7 @@ anchor WoodsMain.BrokenOwl at 848, -4058:  # At the collapsing petrified Owl
 
 anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
   refill Checkpoint:  # refill by starting the trial
-    unsafe: free
+    unsafe: WoodsMain.TrialActivation
 
   pickup WoodsMain.SpiritTrial:
     moki: WoodsMain.TrialActivation, DoubleJump, Dash, Bash, Grapple, Burrow
