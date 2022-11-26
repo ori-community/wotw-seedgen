@@ -12762,10 +12762,8 @@ anchor WindtornRuins.BrokenMural at 2108, -3959:  # At the broken mural above th
     moki, BreakWall=16:
       Burrow, DoubleJump OR Dash OR Glide OR Launch
       Burrow, Bash, Grenade=1
-    gorlek:
-      Burrow, BreakWall=16
-      SentryBreak=16
-    unsafe: ShurikenBreak=16
+    gorlek: Burrow, BreakWall=16
+    unsafe: ShurikenBreak=16 OR SentryBreak=16
   
   conn WindtornRuins.UpperRuinsDoor:
     moki, WindtornRuins.RuinsLever: Burrow
