@@ -12904,7 +12904,7 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
     kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
       Burrow, Dash OR DoubleJump
       DoubleJump, TripleJump
-  conn LowerWastes.MinesEntrance:
+  conn LowerWastes.MinesEntranceEnemyPaths:
     moki: Burrow, BreakWall=20
 
 region WeepingRidge:
