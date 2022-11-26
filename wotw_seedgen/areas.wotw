@@ -12756,32 +12756,40 @@ anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
 anchor WindtornRuins.BrokenMural at 2108, -3959:  # At the broken mural above the teleporter
   refill Checkpoint
   
-  state WindtornRuins.HeartBarrier:
-  # Most of these paths go to the teleporter and break the corruption heart. But they can't be used as connection to the teleporter anchor because after you broke the heart, you can't go to the teleporter again by using those paths.
-  # While breaking the heart always teleport you near the teleporter afterwards (even when using Shuriken/Sentry breaks, which means you'll be able to teleport there whenever you want), the edgecase of using an header to break this corruption from the start makes those paths not viable as connections to the teleporter.
-    moki, BreakWall=16:
-      Burrow, DoubleJump OR Dash OR Glide OR Launch
-      Burrow, Bash, Grenade=1
-    gorlek: Burrow, BreakWall=16
-    unsafe: ShurikenBreak=16 OR SentryBreak=16
-  
   conn WindtornRuins.UpperRuinsDoor:
     moki, WindtornRuins.RuinsLever: Burrow
-  conn WindtornRuins.RuinsTP:  # this accounts for both situations of having broken the heart or not
-    moki:
-      Burrow, DoubleJump, Dash OR Glide
-      Burrow, Bash, Grenade=1, Glide
-      Launch, Burrow OR WindtornRuins.HeartBarrier
+  conn WindtornRuins.FallenPillar: free
+  conn WindtornRuins.RuinsTP:  # check for redundancies with FallenPillar
     gorlek:
       Burrow, DoubleJump OR Dash OR Glide OR Sword  # Just hold right. Or if you drop down, some can recover jumping from the right wall and burrowing through the sand platform
-      Burrow, Bash, Grenade=1  # Burrow through the sand platform to get up
-      Burrow, SentryJump=1
       WindtornRuins.HeartBarrier, Glide OR Dash
       WindtornRuins.HeartBarrier, DoubleJump, TripleJump OR Sword OR Hammer
     kii:
       WindtornRuins.HeartBarrier, Hammer OR Sword OR Sentry=2
       Burrow, Hammer OR Sword
       Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbing platform
+    unsafe: Burrow  # at the pilar, hold up+right and burrow through the crumbing platform
+
+anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from the Broken Mural
+  state WindtornRuins.HeartBarrier:
+    # Most of these paths go to the teleporter and break the corruption heart. But they can't be used as connection to the teleporter anchor because after you broke the heart, you can't go to the teleporter again by using those paths.
+    # While breaking the heart always teleport you near the teleporter afterwards (even when using Shuriken/Sentry breaks, which means you'll be able to teleport there whenever you want), the edgecase of using an header to break this corruption from the start makes those paths not viable as connections to the teleporter.
+    moki, BreakWall=16:
+      Burrow, DoubleJump OR Dash OR Glide OR Launch
+      Burrow, Bash, Grenade=1
+    gorlek: Burrow, BreakWall=16
+    unsafe: ShurikenBreak=16 OR SentryBreak=16
+  
+  conn WindtornRuins.RuinsTP:  # this accounts for both situations of having broken the heart or not
+    moki:
+      Burrow, DoubleJump, Dash OR Glide
+      Burrow, Bash, Grenade=1, Glide
+      Launch, Burrow OR WindtornRuins.HeartBarrier
+    gorlek:
+      Burrow, Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Damage=40
+      Burrow, SentryJump=1
+    kii:
+      Burrow, Bash, Grenade=1
     unsafe: Burrow  # at the pilar, hold up+right and burrow through the crumbing platform
   conn WindtornRuins.Escape:  # this connection doesn't have to account for the gap in the floor because it only exists after you finished the escape
     moki: WindtornRuins.HeartBarrier
@@ -12794,6 +12802,15 @@ anchor WindtornRuins.BrokenMural at 2108, -3959:  # At the broken mural above th
     gorlek, WindtornRuins.HeartBarrier, WindtornRuins.Seir: Sword OR Hammer
     kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: WindtornRuins.HeartBarrier, WindtornRuins.Seir
+  conn WindtornRuins.BrokenMural:
+    # If the HeartBarrier is not broken, this connection is free, so it is sufficient to test these paths with the HeartBarrier broken
+    moki, Burrow OR WindtornRuins.HeartBarrier:  # these account for both situations of having broken the heart or not
+      Bash, Grenade=1, DoubleJump OR Dash
+      Glide, DoubleJump OR Dash
+      Launch
+    gorlek, Burrow OR WindtornRuins.HeartBarrier:
+      SentryJump=1
+      Bash, Grenade=1
 
 anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
   refill Full
@@ -12803,29 +12820,16 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
   state NonGladesTeleporter: free
 
   conn Teleporters: free
-  conn WindtornRuins.Escape:  # this connection doesn't have to account for the gap in the floor because it only exists after you finished the escape
-    moki: WindtornRuins.HeartBarrier
-  conn WindtornRuins.LowerRuins:  # connection after the escape is finished
-    # if you completed the escape, there's a gap in the floor that you have to cross, but Burrow alone is enough to do so
-    # Since Burrow solves this connection, it accounts for all paths to the escape revisit pickup
-    moki, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      DoubleJump OR Dash OR Glide OR Burrow OR Launch
-      Bash, Grenade=1  # yes, this needs a bashgrenade path
-    gorlek, WindtornRuins.HeartBarrier, WindtornRuins.Seir: Sword OR Hammer
-    kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: WindtornRuins.HeartBarrier, WindtornRuins.Seir
-  conn WindtornRuins.BrokenMural:
+  conn WindtornRuins.FallenPillar:
+    moki: WindtornRuins.HeartBarrier OR Burrow
+  conn WindtornRuins.BrokenMural:  # check for redundancies with FallenPillar
     # Each path which isn't including WindtornRuins.HeartBarrier is done with this state resolved and is burrowing through the crumbling platform. But since these are also possible with only Burrow before breaking the heart, you don't actually need WindtornRuins.HeartBarrier at all.
     moki, Burrow OR WindtornRuins.HeartBarrier:  # these account for both situations of having broken the heart or not
-      Bash, Grenade=1, DoubleJump OR Dash
       Glide, DoubleJump OR Dash
-      Launch
     gorlek, Burrow OR WindtornRuins.HeartBarrier:
       Glide
       Sword, DoubleJump OR Dash
       DoubleJump, Dash, Hammer
-      SentryJump=1
-      Bash, Grenade=1
     kii:
       WindtornRuins.HeartBarrier, DoubleJump, TripleJump OR Dash OR Hammer OR Blaze=4 OR Sentry=2
       WindtornRuins.HeartBarrier, Dash, Hammer OR Sentry=2
@@ -12880,31 +12884,17 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
     moki: WindtornRuins.Seir, Burrow
 
   conn WindtornRuins.Escape: free  # walk over the invisible sandworm
-  conn WindtornRuins.BrokenMural:
+  conn WindtornRuins.FallenPillar:
     moki, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      Bash, Grenade=2, DoubleJump OR Dash OR Glide
-      Bash, Grenade=1, DoubleJump, Dash OR Glide
+      DoubleJump, Dash OR Glide
+      Bash, Grenade=1
       Launch
     gorlek, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      Bash, Grenade=2
-      Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Glide OR Sword
-      SentryJump=2
-      SentryJump=1, DoubleJump, TripleJump OR Dash OR Glide
-      SwordSJump=1, DoubleJump
-  conn WindtornRuins.RuinsTP:  # Make sure it's not redundant with LowerRuins->BrokenMural->RuinsTP
-    moki, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      Burrow, DoubleJump, Dash OR Glide
-      Burrow, Bash, Grenade=2, DoubleJump OR Dash OR Glide
-    gorlek, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      Burrow, DoubleJump, TripleJump
-      Burrow, Bash, Grenade=1, DoubleJump, Sword
-      Burrow, Bash, Grenade=2, Dash OR Glide OR Sword OR Hammer OR Damage=40
-      Burrow, SwordSJump=1, DoubleJump
-      Burrow, SentryJump=2
-      Bash, Grenade=2, DoubleJump
+      DoubleJump, TripleJump OR Sword
+      SentryJump=1
     kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      Burrow, Dash OR DoubleJump
-      DoubleJump, TripleJump
+      Burrow, DoubleJump, Dash
+      Dash, Glide
   conn LowerWastes.MinesEntranceEnemyPaths:
     moki: Burrow, BreakWall=20
 
