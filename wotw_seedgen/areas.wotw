@@ -12039,7 +12039,7 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitEX
   conn LowerWastes.BeforeMinesEntrance:
     gorlek: ShurikenBreak=20, Combat=MaceMiner OR DoubleJump OR Bash OR Launch
 
-anchor LowerWastes.BeforeMinesEntrance at 1846, -3986:  # To the right of the breakable wall leading to the Wooden Bridge
+anchor LowerWastes.BeforeMinesEntrance at 1849, -3986:  # To the right of the breakable wall leading to the Wooden Bridge
   pickup LowerWastes.BottomRightHC: free
 
   conn LowerWastes.MinesEntranceEnemyPaths:
