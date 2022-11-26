@@ -12079,16 +12079,16 @@ anchor LowerWastes.MinesEntranceEnemyPaths at 1921, -4001:  # Enemy path counter
 anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins breakable wall
   pickup LowerWastes.BottomRightEX:  # Make sure it solves even after destroying the breakable wall
     moki:
-      Combat=MaceMiner+Mantis, Grapple
+      Grapple, Combat=MaceMiner+Mantis OR Bash
       Bash, Grenade=1, DoubleJump OR Dash  # Very much not a mandatory grenade... This is only important if the Ruins Wall is broken, and then only if you don't use the enemies
       Launch
     gorlek:
       DoubleJump, TripleJump, Hammer
       SentryJump=1  # can either jump good or use the right wall and weapon float
       Bash, Grenade=1 OR DoubleJump OR Glide
-      Bash, Dash OR Sword OR Hammer  # @Validator seems like they are missing. Climb the right wall above the breakable wall
+      Bash, Dash OR Sword OR Hammer  # the Miner enemy here doesn't despawn, even if this is your spawn anchor
     kii:
-      Grapple  # @validator Can probably be gorlek
+      Grapple
       Sword, DoubleJump  # pogo
       Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
