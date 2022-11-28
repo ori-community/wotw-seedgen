@@ -13129,10 +13129,8 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Bash, Grenade=1
       DoubleJump, TripleJump, Dash OR Sword OR Hammer
   conn WillowsEnd.GrappleHeartMidPoint:
-    moki:
-      Grapple, Launch, DoubleJump, Dash
-      Grapple, Launch, Glide
-    gorlek: Launch, Dash OR Glide OR DoubleJump OR Sword OR Hammer
+    moki: Grapple, Launch, DoubleJump OR Dash OR Glide
+    gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
       Launch, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # use energy weapon before to touch the wall before the first portal
       Launch, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # same as above but one more energy weapon in order to touch the wall before the last wheel
@@ -13445,7 +13443,7 @@ anchor WillowsEnd.RedirectHeart at 614, -3836:  # standing in front of the first
       Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       Glide, DoubleJump, TripleJump, Bash, Damage=20, Sword OR Hammer  # redirect the projectile so it pass under the pickup, dboost in the double lasser at the left so you can re-entre the top portal. Glide under the pickup then bash. Upslash can help if needed
     kii:
-      Bash, Grenade=1, DoubleJump  # @validator tjump variant should probably be gorlek
+      Bash, Grenade=1, DoubleJump
       # redirect the projectile so it pass under the pickup
       Bash, DoubleJump, TripleJump, BreakWall=10, Glide OR Sword OR Damage=40
       Bash, DoubleJump, TripleJump, BreakWall=10, Dash, Hammer OR Sentry=2 OR Blaze=4
@@ -13625,7 +13623,8 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
     gorlek:
       Launch, Grapple, Bash
       Launch, DoubleJump, TripleJump, Damage=40, Grapple OR Bash OR Glide
-      WillowsEnd.SpinPortalsHeart, Launch, Bash
+      WillowsEnd.SpinPortalsHeart, Launch, Bash, DoubleJump
+      WillowsEnd.SpinPortalsHeart, Launch, Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
       WillowsEnd.SpinPortalsHeart, Launch, DoubleJump, TripleJump
     kii:
       Launch, Damage=160  # one dboost at the first elemental, a second one under UpperLeftEX then two dboost on the way to the last portal
