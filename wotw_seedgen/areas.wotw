@@ -13427,9 +13427,10 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
     gorlek: Bash OR Sword OR Hammer
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself don before entering the portal
     unsafe: PauseHover
+  conn WillowsEnd.RedirectHeartPuzzle: free
   # most likely there will be non-redundant paths to WillowsEnd.AboveInnerTP here in the future, just right now there aren't any
 
-anchor WillowsEnd.RedirectHeart at 614, -3836:  # standing in front of the first portal used for the puzzle
+anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the first portal used for the puzzle
   refill Checkpoint
 
   # state WillowsEnd.RedirectHeart:
