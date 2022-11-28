@@ -3680,13 +3680,14 @@ region WestGlades:
 anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool in WestGlades
   refill Checkpoint
   refill Energy=3:
+    # paths using energy or health AFTER grabbing the refill would be invalid here because they would misrepresent the resulting health or energy
     moki, BreakCrystal:
       DoubleJump, Dash OR Glide
       Launch
     gorlek, Bow=1 OR Grenade=1:
-        Water  # break the crystal from afar and jump into the water to get the energy
-        Glide  # break the crystal from afar and use glide to collect the energy midair
-        DoubleJump, TripleJump  # break the crystal from afar and use triple jump to collect the energy midair
+      Water  # break the crystal from afar and jump into the water to get the energy
+      Glide  # break the crystal from afar and use glide to collect the energy midair
+      DoubleJump, TripleJump  # break the crystal from afar and use triple jump to collect the energy midair
     kii:
       Bow=1 OR Shuriken=1 OR Grenade=1:
         Water OR DoubleJump OR Dash OR Glide OR Hammer OR Sword
@@ -7763,32 +7764,36 @@ anchor LowerReach.WindSpinners at 73,-3929:  # midway through the wind column ab
 anchor LowerReach.WispPathCheckpoint at 83, -3874:  # At the checkpoint just after the grappable plant
   refill Checkpoint
   refill Health=1:  # Requirements are here so you can return to the checkpoint afterwards
+    # paths using energy or health AFTER grabbing the refill would be invalid here because they would misrepresent the resulting health or energy
     moki:
       Grapple OR Launch
-      Bash, Grenade=1  # wasted energy...
+      # Bash, Grenade=1  # wasted energy...
     gorlek:
       DoubleJump, TripleJump OR Dash
-      SentryJump=1
+      # SentryJump=1
     kii:
-      DoubleJump, Hammer OR Damage=20
+      DoubleJump, Hammer
+      # DoubleJump, Damage=20
     unsafe:
       DoubleJump, Sword OR Hammer
       Dash, Hammer
   refill Energy=4:  # Requirements are here so you can return to the checkpoint afterwards
+    # paths using energy or health AFTER grabbing the refill would be invalid here because they would misrepresent the resulting health or energy
     moki:
       DoubleJump, Grapple
-      DoubleJump, Bash, Grenade=1  # wasted energy...
-      Dash, Damage=20, Grapple
-      Dash, Damage=20, Bash, Grenade=1  # wasted energy...
+      # DoubleJump, Bash, Grenade=1  # wasted energy...
+      # Dash, Damage=20, Grapple
+      # Dash, Damage=20, Bash, Grenade=1  # wasted energy...
       Launch
     gorlek:
       Grapple, Dash OR Glide OR Sword
-      SentryJump=1
-      Bash, Grenade=1, Dash OR Glide OR Sword
+      # SentryJump=1
+      # Bash, Grenade=1, Dash OR Glide OR Sword
       DoubleJump, TripleJump OR Dash
     kii:
-      Grapple, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Hammer OR Damage=20
+      Hammer, DoubleJump OR Grapple
+      # Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # DoubleJump, Damage=20
     unsafe:
       DoubleJump, Sword
       Dash, Hammer
@@ -13410,30 +13415,25 @@ anchor WillowsEnd.East at 547, -3805:  # To the left of the redirect puzzle
       Bash
       SwordSJump=1, DoubleJump, TripleJump, Damage=20  # sjump+ tjump to rech the right wall. dboost in the laser. tjump+ sword combo to reach the right wall. Pogo the elemental+tjump
 
-# checkpoint at 614, -3836
-
 anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energy refill on the way to the redirect heart
   refill Health=1
   refill Energy=4:  # these paths need to be able to return to the starting point
+    # paths using energy or health AFTER grabbing the refill would be invalid here because they would misrepresent the resulting health or energy
     moki:
       BreakCrystal, Launch OR DoubleJump OR Glide
       Bow=1, Dash
-    gorlek, BreakCrystal:  # break the crystal, collect the energy on the ground then bash grenade to get back up
-      Bash, Grenade=1
-      SentryJump=1  # same as above
-      DoubleJump, TripleJump, Damage=40
-    kii, BreakCrystal: DoubleJump, Damage=40
-    unsafe, BreakCrystal: DoubleJump, Sword  # Pogo the mine
-  refill Checkpoint:  # these paths need to be able to return to the starting point
-    moki:
-      Bash, Grenade=1
-      Launch
-    gorlek:
-      SentryJump=1
-      DoubleJump, TripleJump, Damage=40
-    kii: DoubleJump, Damage=40
-    unsafe: DoubleJump, Sword  # pogo the mine
+    unsafe: BreakCrystal
       
+  conn WillowsEnd.East:
+    moki: Launch OR DoubleJump OR Dash OR Glide
+    gorlek: Bash OR Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself don before entering the portal
+    unsafe: PauseHover
+  # most likely there will be non-redundant paths to WillowsEnd.AboveInnerTP here in the future, just right now there aren't any
+
+anchor WillowsEnd.RedirectHeart at 614, -3836:  # standing in front of the first portal used for the puzzle
+  refill Checkpoint
+
   # state WillowsEnd.RedirectHeart:
   #   moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
 
@@ -13454,12 +13454,15 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
       Launch
       Bash, Grenade=1, BreakWall=10, Damage=160
   
-  conn WillowsEnd.East:
-    moki: Launch OR DoubleJump OR Dash OR Glide
-    gorlek: Bash OR Sword OR Hammer
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself don before entering the portal
-    unsafe: PauseHover
-  # connection towards AboveInnerTP are handled by going to East first
+  conn WillowsEnd.RedirectHeartPath:
+    moki:
+      Bash, Grenade=1
+      Launch
+    gorlek:
+      SentryJump=1
+      DoubleJump, TripleJump, Damage=40
+    kii: DoubleJump, Damage=40
+    unsafe: DoubleJump, Sword  # pogo the mine
 
 anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
   refill Checkpoint
