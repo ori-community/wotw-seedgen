@@ -10445,6 +10445,64 @@ anchor EastPools.BehindEntryDoor at -1239, -4162:  # behind the door opened by E
     gorlek, EastPools.EntryLever: Water, Damage=10  # dboost on the crab then wait for the bubble in the water
     unsafe: EastPools.EntryLever
   
+#anchor EastPools.BelowTokk at -1278, -4158:  # at the checkpoint where you do puzzle skip, between Tokk and the slime
+#
+#  Anchor is now obsolete because of EastPools.TokkBubble. Keeping it commentated in case we want to add it back one day
+#
+#  refill Checkpoint
+#
+#  state EastPools.BelowTokkBubbleFree:  # Be sure it's not redundant with going to EastPools.BehindEntryDoor first 
+#    moki: Water, Bash OR WaterDash
+#    unsafe: EastPools.BelowTokkPurpleWall, Bow=1 OR Grenade=1
+#  state EastPools.BelowTokkPurpleWall:  # Be sure it's not redundant with going to EastPools.BehindEntryDoor first
+#    moki: Water, Bash
+#    kii:
+#      Water OR Damage=160
+#      WaterDash, Damage=120
+#    unsafe:
+#      Combat=Crab, Damage=125  # dboost on the slug's projectile before dropping into the water
+#      Damage=130  # dboost on the crab before dropping in the water
+#  state EastPools.LowerWaterDrained:  # Puzzle skip
+#    unsafe: free  # Take the checkpoint bellow and die in the right water pound. If you have clean water, you can bait a torpedo instead https://cdn.discordapp.com/attachments/942484861569105990/1045401688229560381/2022-11-24_19-10-22.mp4
+#
+#  pickup EastPools.AboveDoorOre:  # Make sure it's not redundant with paths comming from EastPools.BehindEntryDoor
+#    gorlek:
+#      Bash, Grenade=1, Damage=20
+#      SentryJump=1, Damage=20
+#
+#  conn EastPools.BehindEntryDoor:
+#    moki:
+#      Launch OR Grapple  # with grapple, go below
+#      Bash, Grenade=1  # either go below or bash the slime after bashing your grenade if going above
+#      DoubleJump, Dash OR Glide
+#    gorlek: DoubleJump OR SentryJump=1 OR Damage=20  # sjump from below. Use your weapon to kill the crab
+#    kii:
+#      Bash  # Go below
+#      Combat=CorruptSlug, Hammer  # if you hit the slug it gets weird because you can hit it again which makes it explodes so it's better to kill it before going over the spikes
+#  conn EastPools.TPArea:
+#    moki:
+#      Launch
+#      Bash, Grenade=1
+#      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Combat=Crab, Grapple, Flap, DoubleJump OR Dash OR Glide
+#      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Bash, Grapple, Flap, DoubleJump OR Dash OR Glide      
+#    gorlek:
+#      SentryJump=1
+#      Bash, DoubleJump, TripleJump, Dash OR Sword OR Glide  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
+#      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Sword OR Hammer OR Damage=20
+#      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Sword OR Hammer OR Damage=20
+#    kii:
+#      Bash, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with just bash/tjump but there is a small colider at the left that make it hard when the slug is right next to it
+#      DoubleJump, TripleJump, Sword  # tjump, hit the slime then tjump+upslash
+#      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Combat=Crab, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+#      EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Flap, Bash, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+#    #unsafe:  # Unsafe can just do puzzle skip in order to reach that anchor from the TP
+#    #  EastPools.BelowTokkBubbleFree, EastPools.BelowTokkPurpleWall, Grapple, Bash OR Combat=Crab:  # Push the bubble by jumping on it rather than using flap
+#    #    DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+#    #  Bash, DoubleJump  # Bash the slug to the left of the spike, bash it again to reach tokk
+#    #  DoubleJump, TripleJump, Damage=20  # tjump in the spikes under Tokk to reset your tjump. Make sure to use your tjump before eating the spikes
+#  conn EastPools.Teleporter:
+#    unsafe: EastPools.LowerWaterDrained  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can die redo the same manipulation to activate the checkpoint (you won't have the cutscene) then QTM/die to respawn on the teleporter
+  
 anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used to reach Tokk in a casual playthrough
   refill Checkpoint
 
