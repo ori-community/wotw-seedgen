@@ -9776,15 +9776,16 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
   
   conn PoolsApproach.MillPathCheckpoint:
     moki, Damage=20:  # severe enemy spam
-      Bash, DoubleJump  # bash errything
-      Combat=Crab+2xSmallSkeeto, Bash, Grenade=3, Dash OR Glide  # clear the space to bashnade
-      Combat=Crab+2xSmallSkeeto, Bash, Grenade=2, Grapple, Dash OR Glide  # clear the space to bashnade
+      Bash, DoubleJump, Dash OR Glide  # bash errything
+      Combat=Crab+2xSmallSkeeto, Bash, Grenade=3, DoubleJump OR Dash OR Glide  # clear the space to bashnade
+      Combat=Crab+2xSmallSkeeto, Bash, Grenade=2, Grapple, DoubleJump OR Dash OR Glide  # clear the space to bashnade
       Combat=Crab+2xSmallSkeeto, DoubleJump, Grapple, Dash OR Glide
       Launch, DoubleJump OR Dash OR Bash OR Glide
-    gorlek:  # @validator this should probably have more combat requirement
-      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-      Grapple, DoubleJump OR SentryJump=1
-      DoubleJump, TripleJump, Combat=CorruptSlug OR SentryJump=1  # climb the wall bellow the checkpoint
+    gorlek:
+      Bash, DoubleJump OR Dash OR Glide
+      Bash, Grenade=2, Sword OR Hammer OR Damage=20  # Using Sword or Hammer it's hard to work with the bomb slugs without them doing the kaboom thing
+      Combat=Crab+SmallSkeeto, Grapple, DoubleJump OR SentryJump=1
+      Combat=2xSmallSkeeto, DoubleJump, TripleJump, Combat=CorruptSlug OR SentryJump=1  # climb the wall bellow the checkpoint
       Launch
     kii:
       Grapple, Sword OR Hammer
@@ -9794,7 +9795,7 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Combat=Crab+SmallSkeeto+CorruptSlug, Grapple, Damage=20, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # kill the first corrupted slime so you can climb the wall in order to have th grappable plant in range
       Combat=Crab+SmallSkeeto, Grapple, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Sword  # Use Sword to kill everything. Pogo on the last corrupted slime.
-      Bash, Grenade=1 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # bash glide a grenade where the crab is or dboost in the spikes or use energy weapon to avoid the dboost (possible with just Bash but require some specific enemies positions)
+      Bash, Grenade=1 OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # bash glide a grenade where the crab is or dboost in the spikes or use energy weapon to avoid the dboost (possible with just Bash but require some specific enemies positions)
     unsafe:
       Bash
       DoubleJump, Hammer
