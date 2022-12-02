@@ -7409,7 +7409,7 @@ anchor LowerReach.EastEnemyPaths at -223, -3967:  # Enemy path counterpart for L
   conn LowerReach.SnowballEnemyPaths:
     kii: DoubleJump, TripleJump, Bash
 
-anchor LowerReach.East at -223, -3967:  # To the right side outside the teleporter
+anchor LowerReach.East at -223, -3966:  # To the right side outside the teleporter
   # the slug despawns if you spawn on this anchor, paths using it have to be in the LowerReach.EastEnemyPaths counterpart
 
   state LowerReach.TPLantern:  # Most paths redundant with Snowball
