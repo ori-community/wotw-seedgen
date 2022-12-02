@@ -9673,9 +9673,9 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
     unsafe: DepthsLight OR LaunchSwap  # Launch Swap: right side of first cocoon -> left side of second cocoon -> all the way across.
 
 region PoolsApproach:
-  moki: Danger=25
-  gorlek: free
-  kii: free
+  moki: Danger=25, Regenerate
+  gorlek: Regenerate
+  kii: Regenerate
   unsafe: free
 
 anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfway between Mill Approach and Mill Path (added mostly because the paths through here reached ridiculous complexity otherwise)
