@@ -8408,8 +8408,7 @@ anchor UpperReach.UpperSoupFrozenPaths at -215, -3877:
   pickup UpperReach.UpperKS:
     unsafe: SwordSJump=1, Damage=20  # dboost in the spike at the right of the enemy and sjump from here
   pickup UpperReach.SwingPoleEX:
-    gorlek: Dash OR Sword
-    kii: Glide OR Sentry=1 OR Flash=1 OR Shuriken=1
+    kii: Dash OR Glide OR Sword OR Sentry=1 OR Flash=1 OR Shuriken=1
     unsafe: free
 
   conn UpperReach.UpperSoupThawedPaths:  # light the furnace without dropping down
