@@ -9803,10 +9803,9 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
   conn PoolsApproach.OnTopOfWheel:
     moki, PoolsApproach.UnderwaterWallBroken, Water:
       Launch
-      DoubleJump, Dash
       Grapple, Combat=SpinCrab OR DoubleJump OR Bash
       PoolsApproach.WheelFreed, Combat=SpinCrab OR DoubleJump OR Bash
-    gorlek, PoolsApproach.UnderwaterWallBroken, Water: DoubleJump OR SentryJump=1
+    gorlek, PoolsApproach.UnderwaterWallBroken, Water: PoolsApproach.WheelFreed OR DoubleJump OR Grapple OR SentryJump=1
     kii, PoolsApproach.UnderwaterWallBroken:
       Water, Hammer
       WaterDash, Damage=100, Launch OR Grapple OR DoubleJump OR Hammer OR SentryJump=1 OR PoolsApproach.WheelFreed
@@ -9896,7 +9895,7 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
   
   pickup PoolsApproach.MillPathHC:
     moki, Water:
-      DoubleJump, Dash, WaterDash
+      DoubleJump, Dash, WaterDash, Damage=20
       DoubleJump, Launch
     gorlek, Water:
       Bash, DoubleJump, TripleJump
