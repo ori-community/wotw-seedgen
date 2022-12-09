@@ -12452,7 +12452,7 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
     moki: Burrow
   conn LowerWastes.UpperPath:
     moki: Burrow, DoubleJump OR Dash OR Launch
-    gorlek: Burrow, Glide OR Sword OR Hammer
+    gorlek: Burrow, Glide OR Sword OR Hammer OR Damage=30
     kii: Burrow
   conn UpperWastes.KeystoneRoom:
     moki: Burrow, DoubleJump OR Dash OR Launch
