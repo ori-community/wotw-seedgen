@@ -575,13 +575,15 @@ anchor MarshSpawn.BurrowsEntry at -931, -4494:  # At the bells puzzle
       Bash, SwordSJump=1
     kii: Bash, DoubleJump  # bashgliding
     unsafe: Bash  # fun
+  state MarshSpawn.DamageTreeOpen:
+    moki: Bash, DoubleJump OR Dash OR Glide OR Launch
+    gorlek: Bash
 
   quest MarshSpawn.TokkTabletQuest:
     moki: MidnightBurrows.TabletQI
 
   pickup MarshSpawn.DamageTree:
-    moki: Bash, DoubleJump OR Dash OR Glide OR Launch
-    gorlek: Bash
+    moki: MarshSpawn.DamageTreeOpen
 
   conn Tokk: free
   conn MidnightBurrows.Teleporter:
