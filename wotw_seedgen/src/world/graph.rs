@@ -177,7 +177,7 @@ impl Graph {
                     // TODO loop with improved orbs?
                     continue;
                 }
-                let target_orbs = Graph::try_connection(context.player, connection, &context.world_state[&from], &context.states);
+                let target_orbs = connection.requirement.is_met(context.player, &context.states, context.world_state[&from].clone());
                 if !target_orbs.is_empty() {
                     let (mut child_reached, mut child_progressions) = self.reach_recursion(&self.nodes[connection.to], false, target_orbs, context);
                     reached.append(&mut child_reached);
@@ -187,15 +187,6 @@ impl Graph {
         }
         (reached, progressions)
     }
-    fn try_connection(player: &Player, connection: &Connection, best_orbs: &[Orbs], states: &FxHashSet<usize>) -> SmallVec<[Orbs; 3]> {
-        let mut target_orbs = SmallVec::<[Orbs; 3]>::default();
-        for orbs in best_orbs {
-            if let Some(orbcost) = connection.requirement.is_met(player, states, *orbs) {
-                target_orbs.append(&mut orbs::both_single(&orbcost, *orbs));
-            }
-        }
-        target_orbs
-    }
 
     fn reach_recursion<'a>(&'a self, entry: &'a Node, is_spawn: bool, mut best_orbs: SmallVec<[Orbs; 3]>, context: &mut ReachContext<'a, '_, '_>) -> (Reached<'a>, Progressions<'a>) {
         context.world_state.insert(entry.index(), best_orbs.clone());
@@ -204,25 +195,21 @@ impl Graph {
                 let max_orbs = context.player.max_orbs();
                 if best_orbs.get(0).map_or(true, |first_orbs| first_orbs != &max_orbs) {
                     for refill in &anchor.refills {
-                        for orbs in &best_orbs {
-                            if let Some(orbcost) = refill.requirement.is_met(context.player, &context.states, *orbs) {
-                                if matches!(refill.value, RefillValue::Full) {
-                                    best_orbs = smallvec![max_orbs];
+                        let mut refill_orbs = refill.requirement.is_met(context.player, &context.states, best_orbs.clone());
+                        if !refill_orbs.is_empty() {
+                            match refill.value {
+                                RefillValue::Full => {
+                                    best_orbs = smallvec![context.player.max_orbs()];
                                     break;
-                                }
-                                let mut refill_orbs = orbs::both(&best_orbs, &orbcost);
-                                match refill.value {
-                                    RefillValue::Checkpoint => refill_orbs = orbs::either_single(&refill_orbs, context.player.checkpoint_orbs()),
-                                    RefillValue::Health(amount) => {
-                                        let amount = amount * context.player.health_plant_drops();
-                                        refill_orbs.iter_mut().for_each(|orbs| orbs.heal(amount, context.player));
-                                    },
-                                    RefillValue::Energy(amount) => refill_orbs.iter_mut().for_each(|orbs| orbs.recharge(amount, context.player)),
-                                    RefillValue::Full => unreachable!(),
-                                }
-                                best_orbs = orbs::either(&best_orbs, &refill_orbs);
-                                break;
+                                },
+                                RefillValue::Checkpoint => refill_orbs = orbs::either_single(&refill_orbs, context.player.checkpoint_orbs()),
+                                RefillValue::Health(amount) => {
+                                    let amount = amount * context.player.health_plant_drops();
+                                    refill_orbs.iter_mut().for_each(|orbs| orbs.heal(amount, context.player));
+                                },
+                                RefillValue::Energy(amount) => refill_orbs.iter_mut().for_each(|orbs| orbs.recharge(amount, context.player)),
                             }
+                            best_orbs = orbs::either(&best_orbs, &refill_orbs);
                         }
                     }
                 }
@@ -234,7 +221,7 @@ impl Graph {
                         // TODO loop with improved orbs?
                         continue;
                     }
-                    let target_orbs = Graph::try_connection(context.player, connection, &best_orbs, &context.states);
+                    let target_orbs = connection.requirement.is_met(context.player, &context.states, best_orbs.clone());
                     if target_orbs.is_empty() {
                         let states = connection.requirement.contained_requirements(&context.player.settings)
                             .filter_map(|requirement| match requirement {

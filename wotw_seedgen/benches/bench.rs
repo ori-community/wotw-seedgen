@@ -52,7 +52,7 @@ fn requirements(c: &mut Criterion) {
     player.inventory.grant(Item::Resource(Resource::Energy), 4);
     player.inventory.grant(Item::Resource(Resource::Health), 4);
     let req = Requirement::And(vec![Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()]), Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()])]);
-    c.bench_function("nested ands and ors", |b| b.iter(|| req.is_met(&player, &states, player.max_orbs())));
+    c.bench_function("nested ands and ors", |b| b.iter(|| req.is_met(&player, &states, smallvec![player.max_orbs()])));
 
     let world_settings = WorldSettings::default();
     player = Player::new(&world_settings);
@@ -61,7 +61,7 @@ fn requirements(c: &mut Criterion) {
     let req = Requirement::Combat(smallvec![
         (Enemy::Lizard, 3),
     ]);
-    c.bench_function("short combat", |b| b.iter(|| req.is_met(&player, &states, player.max_orbs())));
+    c.bench_function("short combat", |b| b.iter(|| req.is_met(&player, &states, smallvec![player.max_orbs()])));
     let req = Requirement::Combat(smallvec![
         (Enemy::Mantis, 2),
         (Enemy::Lizard, 2),
