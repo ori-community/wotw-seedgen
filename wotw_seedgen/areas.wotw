@@ -4047,7 +4047,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
     unsafe:
       Water, DoubleJump  # or just be a madman
       Water, GlideJump
-      Water, Bash  # https://discord.com/channels/116250700685508615/845415952790454272/919589633543766037
+      Water, Bash  # https://youtu.be/nk874rtFxUo
 
   conn WestGlades.ShrineArea:
     moki:
@@ -4241,7 +4241,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Bash, Glide OR Sword OR Hammer
       Bash, Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
     unsafe, BreakWall=20:
-      Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918247805364088832
+      Bash  # https://youtu.be/Lnv5ggGH69s
       DoubleJump, TripleJump
       FlashSwap
   pickup OuterWellspring.SwimEX:
@@ -4353,7 +4353,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Bash, Glide  # Bash glide from the slime on the wooden platform
     unsafe:
       Dash, Glide
-      Bash  # https://discord.com/channels/116250700685508615/845415952790454272/918944477215866900
+      Bash  # https://youtu.be/oKrKsmUBt54
 
 # checkpoint at -978, -4042
 
@@ -7741,7 +7741,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       Launch
       DoubleJump, TripleJump OR Dash  # https://youtu.be/V_Gzv4W34nU
       LowerReach.ThawEastFurnace, DoubleJump, Sword  # pogo the worm then slash the crystal to climb the wall
-      SwordJump  # https://cdn.discordapp.com/attachments/845415952790454272/985979202341863445/2022-06-13_20-47-59.mp4
+      SwordJump  # https://youtu.be/v-ICBnUhDuQ
 
 anchor LowerReach.EastFurnace at -61, -3987:  # At the furnace above the swimming pool
   refill Checkpoint
@@ -10588,7 +10588,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
       Combat=Crab, Damage=125  # dboost on the slug's projectile before dropping into the water
       Damage=130  # dboost on the crab before dropping in the water
   state EastPools.LowerWaterDrained:  # Puzzle skip
-    unsafe: free  # Take the checkpoint bellow and die in the right water pound. If you have clean water, you can bait a torpedo instead https://cdn.discordapp.com/attachments/942484861569105990/1045401688229560381/2022-11-24_19-10-22.mp4
+    unsafe: free  # Die in the right water pound. If you have clean water, you can bait a torpedo instead https://youtu.be/rnRBUmY2NN4
   
   pickup EastPools.AboveDoorOre:  # Paths using the bubble spawner or that aren't redundant with going to either BehindEntryDoor or TPArea first
     moki: EastPools.TokkBubbleFree, EastPools.TokkBubblePurpleWall, Grapple, Flap, DoubleJump OR Dash
@@ -12212,7 +12212,7 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Sword, DoubleJump  # pogo
       Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
-      DoubleJump, TripleJump  # https://cdn.discordapp.com/attachments/942484861569105990/1044369238040793138/Untitled.mp4
+      DoubleJump, TripleJump  # https://youtu.be/tuMG8O-Mifc
   pickup LowerWastes.BottomRightHC:  # Make sure it's not redundant with conn LowerWastes.BeforeMinesEntrance
     moki:
       Grapple, Combat=MaceMiner+Mantis OR Bash  # Use both Grapple points
