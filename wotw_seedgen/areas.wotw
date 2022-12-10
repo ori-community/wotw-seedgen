@@ -824,11 +824,9 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
       Bash, DoubleJump OR Dash OR Glide OR Sword  # use the slime
       Bash  # use the slime, tight coyote jump
       SentryJump=1
-  conn HowlsDen.SecretRoom:
-    gorlek: ShurikenBreak=16, BreakWall=20
-    unsafe:
-      HammerBreak
-      SpearBreak, BreakWall=20
+  conn HowlsDen.OutsideSecretRoom:
+    gorlek: ShurikenBreak=16
+    unsafe: HammerBreak OR SpearBreak OR SentryBreak=16
 
 anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door blocking the loop with the right hc
   refill Checkpoint:
@@ -845,8 +843,8 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
     gorlek:
       Launch
       DoubleJump, TripleJump
-    kii:
-      DoubleJump, Hammer  # kinda pointless with hammer but a path is a path
+    unsafe:
+      DoubleJump  # wall jump on the small wall between the breakable wall and the spikes
     # If you can sentry jump, you can take the normal path
   conn HowlsDen.UpperLoopExit:
     moki:
@@ -916,19 +914,40 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       DoubleJump, TripleJump
       Bash, Grenade=1, Grapple  # Zoomie off the mantis
       GrenadeJump, DoubleJump
-  conn HowlsDen.SecretRoom:
-    moki: HowlsDen.KeystoneDoor, BreakWall=20, Water OR DoubleJump OR Dash OR Glide OR Launch
-    gorlek, HowlsDen.KeystoneDoor:
-      Sword OR Hammer  # weapon breaks the wall
-      BreakWall=20, Damage=10  # @Validator added this path
-    kii: HowlsDen.KeystoneDoor, BreakWall=20, Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Spear=1
+  conn HowlsDen.OutsideSecretRoom:
+    moki, HowlsDen.KeystoneDoor: Water OR DoubleJump OR Dash OR Glide OR Launch
+    gorlek, HowlsDen.KeystoneDoor: Sword OR Hammer OR Damage=10
+    kii, HowlsDen.KeystoneDoor: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn HowlsDen.AboveBoneBridge:
-    moki, HowlsDen.KeystoneDoor:
+    unsafe:
+      Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
+      SwordSJump=2
+  conn HowlsDen.Teleporter:
+    moki: HowlsDen.BoneBarrier
+
+anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable wall behind the keystone door
+  refill Checkpoint:  # You need to return the anchor coordinates after getting the checkpoint
+    moki: Water OR Launch OR DoubleJump OR Dash OR Glide
+    gorlek: Sword OR Hammer
+    
+  state HowlsDen.SecretRoomWall:
+    moki: BreakWall=20
+    
+  conn HowlsDen.SecretRoom:
+    moki: HowlsDen.SecretRoomWall
+  conn HowlsDen.BoneBridge:
+    moki, HowlsDen.KeystoneDoor: Water OR Launch OR DoubleJump OR Dash OR Glide
+    gorlek, HowlsDen.KeystoneDoor:
+      Sword OR Hammer OR Damage=10
+      Bash, Grenade=1
+    kii, HowlsDen.KeystoneDoor: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+  conn HowlsDen.AboveBoneBridge:
+    moki:
       BreakWall=16, DoubleJump, Combat=2xSlug OR Bash
       BreakWall=16, Dash, Bash, Grenade=1
       BreakWall=16, Glide, Bash, Grenade=2
       BreakWall=16, Launch
-    gorlek, HowlsDen.KeystoneDoor:
+    gorlek:
       BreakWall=16, Dash, Combat=2xSlug OR Bash
       BreakWall=16, Glide, Bash, Grenade=1
       BreakWall=16, Water, Bash, Grenade=3, Damage=10
@@ -939,18 +958,16 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       HammerSJump=1, Glide  # weapon breaks the wall
       SentryJump=3, Hammer, Damage=10  # hammer breaks the wall
       Water, WaterDash, HammerSJump=2, Damage=10  # hammer breaks the wall
-    kii, HowlsDen.KeystoneDoor:
+    kii:
       Sword OR Hammer
-      BreakWall=16, Damage=10, Shuriken=5 OR Sentry=5 OR Flash=5  # one jump is kinda hard
-      BreakWall=16, Sentry=6  # two sentries in the air to avoid the spikes
-    unsafe:
-      Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
-      SentryJump=2
-  conn HowlsDen.Teleporter:
-    moki: HowlsDen.BoneBarrier
+      BreakWall=16, Damage=10, Shuriken=4 OR Sentry=4 OR Flash=4  # one jump is kinda hard
+      BreakWall=16, Sentry=5  # two sentries in the air to avoid the spikes
 
 anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   refill Checkpoint
+  
+  state HowlsDen.SecretRoomWall:  # No paths outside of unsafe because of how weird breaking that wall is
+    unsafe: BreakWall=20, Sword OR Hammer OR Bow OR Spear OR Shuriken OR Sentry  # also works with fractured grenade, but not regular grenade
 
   pickup HowlsDen.LeftHC:
     moki:
@@ -966,7 +983,9 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
       Spear=4, Damage=10
     unsafe:
       GrenadeJump, Damage=50  # 30dmg get to slime, 10dmg set-up grenade jump, 10mg close gap to HC
-  # could add backwards connections someday
+  
+  conn HowlsDen.OutsideSecretRoom:
+    moki: HowlsDen.SecretRoomWall
 
 # checkpoint at -511, -4479
 # checkpoint at -476, -4441
