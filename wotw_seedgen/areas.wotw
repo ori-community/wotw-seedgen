@@ -411,7 +411,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, Water, Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1
     unsafe:
       Burrow, Damage=30, DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1  # kii path but with 10 less damage
-      Burrow, SwordSJump=1, Damage=20, Blaze  # https://lowkey.gg/v/259b4cf4-af46-4225-b647-91adf4a02d34
+      Burrow, SwordSJump=1, Damage=20, Blaze
 
 anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the door blocking Life Pact
   pickup MarshSpawn.LifepactShard:
