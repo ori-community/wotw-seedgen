@@ -1584,7 +1584,29 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
     unsafe:
       DoubleJump, Damage=15, TripleJump OR Sword
       Grenade=1
-  conn MidnightBurrows.LeverRoom:  # keep in mind that these paths have to work after the lever has been pulled
+  conn MidnightBurrows.PortalRoom:  # keep in mind that these paths have to work after the lever has been pulled
+    moki: Launch OR Glide OR DoubleJump OR Dash
+    gorlek: Sword OR Hammer OR Damage=15
+    kii: free
+
+anchor MidnightBurrows.TabletRoom at -824, -4531:  # Before the four keystone door
+  refill Checkpoint
+  refill Health=1
+
+  state MidnightBurrows.KeystoneDoor:
+    moki: Keystone=4
+
+  quest MidnightBurrows.TabletQI:
+    moki: MidnightBurrows.KeystoneDoor
+
+  conn MidnightBurrows.Central: free
+
+# checkpoint at -698, -4566
+
+anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big room full of portals
+  refill Checkpoint
+
+  conn MidnightBurrows.LeverRoom:
     moki:
       Glide
       DoubleJump, Dash
@@ -1604,7 +1626,7 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
       Damage=15, Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
     unsafe: Bash  # Bash the lantern once to the right then bash it again
   conn MidnightBurrows.BelowUpperKS:  # so far all paths not using MidnightBurrows.Lever would be redundant
-    moki: MidnightBurrows.Lever, Launch  # paths coming from the right side are on that anchor
+    moki: MidnightBurrows.Lever, Launch
     gorlek: MidnightBurrows.Lever, SentryJump=2, DoubleJump OR Dash OR Glide
     kii, MidnightBurrows.Lever:
       DoubleJump, TripleJump, Damage=15
@@ -1626,21 +1648,10 @@ anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big port
       Hammer OR Shuriken=2 OR Sentry=3
       Bash, Shuriken=1 OR Sentry=2
     unsafe: MidnightBurrows.Lever, Bash OR Sentry=1 OR Blaze=1 OR Flash=1 OR Shuriken=1 OR Spear=1
-
-anchor MidnightBurrows.TabletRoom at -824, -4531:  # Before the four keystone door
-  refill Checkpoint
-  refill Health=1
-
-  state MidnightBurrows.KeystoneDoor:
-    moki: Keystone=4
-
-  quest MidnightBurrows.TabletQI:
-    moki: MidnightBurrows.KeystoneDoor
-
-  conn MidnightBurrows.Central: free
-
-# checkpoint at -707, -4588
-# checkpoint at -698, -4566
+  conn MidnightBurrows.Central:
+    moki: MidnightBurrows.Lever
+    gorlek: Damage=15
+    kii: free
 
 anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the portals
   refill Checkpoint
@@ -1662,6 +1673,36 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe: Sword
+
+  conn MidnightBurrows.PortalRoom:
+    moki:
+      Bash, Launch
+      Bash, DoubleJump, Dash OR Glide
+      Bash, Dash, Glide 
+    gorlek:
+      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=15
+      Bash, DoubleJump, TripleJump
+      Bash, Dash, Glide OR Sword 
+    kii:
+      Launch
+      Bash, Damage=15
+      Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      Bash, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=60  # dboost then wall jump on wall above the bashable plant
+      DoubleJump, Damage=45, Dash OR Glide OR Shuriken=1 OR Sentry=2  # avoid the dboost on the right of the bashable plant
+      DoubleJump, Damage=30, TripleJump OR Sword OR Hammer  # less damage because you can jump on the wall above the bashable plant from lower
+      Damage=105  # dboost while going to the left portal
+      Damage=75, Dash OR Sword
+      Damage=90, Hammer
+    unsafe:
+      Bash, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      Bash, Dash OR Grenade=1
+      Bash, Sword, Shuriken=1  # pogo the shuriken 
+      DoubleJump, TripleJump  # https://youtu.be/OMjOhM767ac
+      DoubleJump, Damage=30
+      Hammer, Damage=60
+      Damage=75
 
 anchor MidnightBurrows.East at -687, -4553:  # Behind the timed-puzzle door
   refill Checkpoint
@@ -1718,11 +1759,9 @@ anchor MidnightBurrows.BelowUpperKS at -724, -4524:  # Just below the upper keys
     gorlek: Dash OR Launch
     kii: free
 
-  conn MidnightBurrows.Central:
-    moki: Combat=Bat OR Bash
-    gorlek: Dash OR Launch
-    kii: free
-  conn MidnightBurrows.PortalCorridor:  # check for redundancies with Central -> Lever
+  conn MidnightBurrows.PortalRoom:
+    moki: free
+  conn MidnightBurrows.PortalCorridor:  # check for redundancies with PortalRoom -> Lever
     kii:
       Damage=15, Blaze=6
       Damage=45, Spear=4
