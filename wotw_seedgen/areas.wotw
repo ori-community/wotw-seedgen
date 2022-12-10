@@ -793,9 +793,9 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
       Bash, Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1  # hop to the first ledge and then bash the mantis
     unsafe, MarshSpawn.HowlBurnt:
       Sword, Shuriken=1  # downslash on a shuriken
-      Bash                            # Long distance lure for the first jump, simple lure for second
-      Dash, Sentry=1                  # As above but uses sentry
-      Grenade=2                       # Grenade jump to get over both gaps
+      Bash  # Long distance lure for the first jump, simple lure for second
+      Dash, Sentry=1  # As above but uses sentry
+      GrenadeJump
 
 # checkpoint at -298, -4388
 
@@ -899,7 +899,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     kii:
       Sword OR Hammer OR Bash OR Sentry=3 OR Shuriken=3
     unsafe:
-      Grenade=2  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
+      GrenadeJump  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
   pickup HowlsDen.SwordTree: free
   pickup HowlsDen.MagnetShard:
     moki: BreakWall=10, BreakWall=16 OR Launch
@@ -965,7 +965,7 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
       Sword OR Hammer OR Sentry=4 OR Flash=4 OR Shuriken=4
       Spear=4, Damage=10
     unsafe:
-      Grenade=1, Damage=50  # 30dmg get to slime, 10dmg set-up grenade jump, 10mg close gap to HC
+      GrenadeJump, Damage=50  # 30dmg get to slime, 10dmg set-up grenade jump, 10mg close gap to HC
   # could add backwards connections someday
 
 # checkpoint at -511, -4479
@@ -995,7 +995,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       Sword OR Dash OR Hammer  # pogo on the slime for sword, upslash for hammer
       Spear=1, Glide
     unsafe, BreakWall=10:
-      Grenade=1              # Grenade jump to platform
+      GrenadeJump
   pickup HowlsDen.LaserKS:
     moki:
       DoubleJump OR Dash OR Launch
@@ -1006,7 +1006,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       Sword OR Hammer OR Bash OR Shuriken=1
       Glide, Sentry=1 OR Flash=1 OR Spear=1
     unsafe:
-      Grenade=1               # Grenade jump to platform
+      GrenadeJump
   pickup HowlsDen.DoubleJumpEX:  # paths going through the fight arena; other paths go through DoubleJumpTreeLedge
     moki: HowlsDen.DoubleJumpTreeCombat
     kii: Combat=Mantis+2xLizard  # The arena state requires fighting an additional skeeto in case the player has Bash. In kii Bash solves by going around though, so kii can omit the added enemy for this pickup
@@ -2545,7 +2545,7 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
       Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Grenade=1  # land near the second pole, throw a grenade, jump on the pole and immediatly jump to the grenade. Avoiding spikes damage is a bit hard.
-      Grenade=5, Damage=10, EastHollow.BeetleDefeated  # Grenade Redirect and Grenade Jumps
+      GrenadeJump  # gjump to grab the pole then extend pole momentum to reach the ledge above the mortar and do the same from the second pole
       DoubleJump, Hammer, Deflector  # break the wall to GladesApproachOre so you can refresh your upslash without taking a dboost
       DoubleJump, Damage=10, Sentry=1
       DoubleJump, Sword, Damage=10  # climb the left wall, pogo the mortar
@@ -3327,7 +3327,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       Hammer
     unsafe, GladesTown.OnwardsAndUpwards:
       Sword OR Spear=1 # upslash+downslash
-      GrenadeJump  # grenade jump
+      GrenadeJump
   pickup GladesTown.UpperLeftEX:
     moki:
       Bash, Grenade=1
@@ -3717,7 +3717,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
     unsafe:
       Dash, Sword  # pogo the projectile
       DoubleJump, Spear=1
-      Grenade=1  # grenade jump
+      GrenadeJump
       Glide, DoubleJump  # GlideJump
       Bash:
         Glide OR Bow=1                   # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
@@ -3972,7 +3972,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       Dash, DoubleJump, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       Dash, Hammer, Shuriken=1
     unsafe:
-      Grenade=1  # grenade jump
+      GrenadeJump
       Dash, DoubleJump
 
 anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room opening up to Wellspring
@@ -4051,7 +4051,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Bash, Grenade=1, Grapple  # requires holding up
       Sentry=5  # may be kii
       Glide
-      Grenade=2, Hammer  # grenade jumps and hammer floats
+      GrenadeJump, Hammer
   conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
     kii:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -7523,7 +7523,6 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       SwordSJump=1, DoubleJump, TripleJump
       Bash, Grenade=2, DoubleJump, TripleJump OR Dash OR Glide
       SentryJump=1, DoubleJump, Dash
-      DoubleJump, Grenade=1  # from the checkpoint, grenade jumps to the small wall under the spikes and grenade jumps again from there
       SentryJump=2
       GrenadeJump, DoubleJump  # grenade wall jump off of the microwall under the spikes
       HammerJump
@@ -9801,7 +9800,7 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Bash
       DoubleJump, Hammer
       DoubleJump, Glide, Combat=CorruptSlug  # kill the first CorruptSlug then wall jump to the left wall. Climbing that wall is a bit precise. Can make it easier with a glide jump, which means killing the second CorruptSlug
-      Grenade=1, Grapple, Combat=Crab, Sword OR Hammer OR Glide OR Damage=20  # Grenade jump from
+      GrenadeJump, Grapple, Combat=Crab, Sword OR Hammer OR Glide OR Damage=20  # Grenade jump from
   conn PoolsApproach.OnTopOfWheel:
     moki, PoolsApproach.UnderwaterWallBroken, Water:
       Launch
@@ -11001,7 +11000,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       WaterDash, Damage=180
     unsafe:
       Water, WaterBreath, Launch
-      Water, WaterBreath, DoubleJump, Grenade OR Hammer  # greande/hammer jumps. With grenade jumps, start a grenade jump while in the water then use your doublejump
+      Water, WaterBreath, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
       Water, WaterBreath, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
   conn EastPools.MissilePuzzle:
@@ -11084,7 +11083,7 @@ anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entranc
   conn WestPools: 
     unsafe:  # Glitch the crushers so you don't need Water Breath
       Water, Launch
-      Water, DoubleJump, Grenade OR Hammer  # greande/hammer jumps. With grenade jumps, start a grenade jump while in the water then use your doublejump
+      Water, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, DoubleJump, TripleJump, Damage=20
       Water, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
   
