@@ -88,7 +88,8 @@ impl Requirement {
         orb_variants
     }
     fn regenerate_as_needed(cost: f32, player: &Player, orbs: &mut Orbs) -> bool {
-        let regens = ((cost - orbs.health) / 30.0).ceil();
+        let mut regens = ((cost - orbs.health) / 30.0).ceil();
+        if orbs.health + 30.0 * regens <= cost { regens += 1.0 }
         orbs.heal(30.0 * regens, player);
         orbs.energy -= regens;
         return orbs.energy >= 0.0;
@@ -615,9 +616,9 @@ mod tests {
         player.inventory.grant(Item::Skill(Skill::Regenerate), 1);
         test!(&player, &states, Requirement::Damage(60.0), []);
         player.inventory.grant(Item::Resource(Resource::Health), 6);
-        test!(&player, &states, Requirement::Damage(60.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: -30.0, energy: -1.0 }]);
-        test!(&player, &states, Requirement::Danger(30.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs::default()]);
-        test!(&player, &states, Requirement::Danger(60.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: 30.0, energy: -1.0 }]);
+        test!(&player, &states, Requirement::Damage(60.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: -25.0, energy: -2.0 }]);
+        test!(&player, &states, Requirement::Danger(30.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: 30.0, energy: -1.0 }]);
+        test!(&player, &states, Requirement::Danger(60.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: 35.0, energy: -2.0 }]);
 
         player = Player::new(&world_settings);
         test!(&player, &states, Requirement::BreakWall(12.0), []);
