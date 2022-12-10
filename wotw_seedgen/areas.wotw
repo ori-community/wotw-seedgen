@@ -9730,7 +9730,7 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
     unsafe:
       Launch OR Bash  # Bash the ennemies but they don't really like being on the right position for you to bash them
       Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=20
-      DoubleJump, Hammer, Dash OR TripleJump  # Hammer jumps
+      DoubleJump, HammerJump, Dash OR TripleJump
       DoubleJump, TripleJump, Sword  # Reset your jumps by hitting/pogoing the ennemies
 
 anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three paths merge
@@ -10083,8 +10083,8 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       Water, DoubleJump, Bash, Grapple, Sword OR Hammer  # the air stalling to skip grapple is quite hard + need an upslash and a precise shot to get to the HC but you can't refill your upsash anywhere
       Water, DoubleJump, Bash, Damage=20, Sword OR Hammer  # the air stalling to skip grapple is quite hard + need an upslash and a precise shot to get to the HC but you can't refill your upsash anywhere
       Water, WaterDash, DoubleJump, Grapple  # the waterdash to get to the hc is really hard with keyboard swimming
-      Water, DoubleJump, Hammer, Damage=20, Dash OR TripleJump  # Hammer jumps
-      Water, DoubleJump, Hammer, Grapple OR Glide  # Hammer jumps
+      Water, DoubleJump, HammerJump, Damage=20, Dash OR TripleJump
+      Water, DoubleJump, HammerJump, Grapple OR Glide
       Water, Bash, Damage=20, Hammer, Sword
       
   conn PoolsApproach.MarshBreakableWall:
@@ -10189,8 +10189,8 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       Water, DoubleJump, Damage=20, WaterDash OR Bash
       Water, Grapple, WaterDash, Sword OR Hammer  # Need an upslash but you can't refill it anywhere near
       Water, Grapple, Bash, Sword OR Hammer  # Need an upslash but you can't refill it anywhere near
-      Water, DoubleJump, Hammer, Damage=20, Dash OR TripleJump  # Hammer jumps
-      Water, DoubleJump, Hammer, Grapple OR Glide  # Hammer jumps
+      Water, DoubleJump, HammerJump, Damage=20, Dash OR TripleJump
+      Water, DoubleJump, HammerJump, Grapple OR Glide
       Damage=60, WaterDash, Launch
       Damage=80, WaterDash, DoubleJump, Glide OR Sword OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # walljump of the wall bellow the spikes at the end
       Damage=100, WaterDash, Dash, Spear=1 OR Blaze=1
@@ -10243,7 +10243,7 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       DoubleJump, Sword  # please don't put this in a supported difficulty thank you
       Water, WaterDash, DoubleJump, Dash, Hammer  # water dash straight up, double jump, upslash, dash
       WaterDash, Water OR Damage=20  # :3
-      Water, DoubleJump, TripleJump, Hammer  # Hammer jumps
+      Water, DoubleJump, TripleJump, HammerJump
   conn PoolsApproach.MillPath:
     moki, PoolsApproach.UnderwaterWallBroken:
       Water, Bash, Damage=10, Grapple, DoubleJump, Dash OR Glide
