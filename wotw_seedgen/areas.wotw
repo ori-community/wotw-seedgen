@@ -2619,7 +2619,8 @@ anchor EastHollow.AfterBeetleFight at -28, -4232:  # At the breakable floor to B
       Grapple, DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # Grapple, tjump, upslash, one horizontal attack, energy weapon
     unsafe:
       DoubleJump, TripleJump, Dash  # using the walls and ceilings
-      DoubleJump, TripleJump, Sword OR Hammer  # friendly spikes after the grappl section. Sword jumps from there or tjump+hammer upslash
+      DoubleJump, TripleJump, Hammer  # friendly spikes after the grappl section. Tjump+hammer upslash from there
+      SwordJump, TripleJump  # same as above
       # DoubleJump, TripleJump, Dash, Flash=1 OR Sentry=1  # Go just under the pickup, tjump from here+sentry/flash to reach the wall above the spikes
       SentryJump=2, Grapple
       SentryJump=3                                  # pogo on the last mortar
@@ -6235,7 +6236,7 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
       SwordSJump=1  # Sjump onto the wall, use the sword for movement. It looks possible with Hammer, but I can't get it to work.
       HammerSJump=2  # Sword sjump paths are redundant with the above
       HammerSJump=1, Shuriken=1 OR BlazeSwap=1 OR DoubleJump OR Dash OR Glide OR Damage=15 OR PauseHover  # Sjump from a micro ledge at very edge of the fire pit. The damage path requires jumping onto the left wall and climbing up. This is doable with sjump+sentry, but why would you do that when you could just sjump twice?
-      Sword, DoubleJump, TripleJump, Damage=15  # Double jump onto the wall, then double sword jump into the spikes.
+      SwordJump, TripleJump, Damage=15  # Double jump onto the wall, then double sword jump into the spikes.
       DoubleJump, GrenadeJump  # Micro ledge at the right edge of the fire pit, micro ledge at the right edge of the spikes. Use both.
       Bash  # The skeeto is uncooperative, but it's doable.
       BlazeSwap=6 OR FlashSwap  # Probably room for improvement, I'm not good at swaps
@@ -7394,7 +7395,8 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
       SentryJump=1
       Bash, Hammer, Spear=1
       Bash, Glide, Spear=1 OR Shuriken=1 OR Sentry=1
-      DoubleJump, TripleJump, Dash OR Sword  # climb the wall near the moki, dash then triple jump to the wall to reset your jumps and dash + triple jump to reach the plant. With sword, pogo the fire, triple jump + upslash to reach the wall to reset your jumps then sword jump to the plant
+      DoubleJump, TripleJump, Dash  # climb the wall near the moki, dash then triple jump to the wall to reset your jumps and dash + triple jump to reach the plant.
+      SwordJump, TripleJump  # pogo the fire, triple jump + upslash to reach the wall to reset your jumps then sword jump to the plant
   conn LowerReach.SnowballEnemyPaths:  # check for redundancies with LowerReach.East
     kii: LowerReach.FreezeCentralFurnace, Bash, Grenade=1
 
@@ -9706,7 +9708,7 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
     unsafe:
       Water, Grapple, Glide OR Damage=45  # grapple the plant then let you fall under it and regrapple it from bellow to have more height
       Water, DoubleJump, TripleJump  # walljumps on the wall in the ceiling
-      Water, DoubleJump, Sword, Damage=15  # Sword jumps
+      Water, SwordJump, Damage=15
       Water, DoubleJump, Hammer, Damage=15
       Water, HammerJump
   conn PoolsApproach.MillPath:
@@ -11000,7 +11002,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Water, WaterBreath, Launch
       Water, WaterBreath, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
-      Water, WaterBreath, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+      Water, WaterBreath, SwordJump, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
   conn EastPools.MissilePuzzle:
     moki, EastPools.CentralRoomPurpleWall: Water
     kii, EastPools.CentralRoomPurpleWall:
@@ -11083,8 +11085,7 @@ anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entranc
       Water, Launch
       Water, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, DoubleJump, TripleJump, Damage=20
-      Water, DoubleJump, Sword, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
-  
+      Water, SwordJump, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
 
 anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubble spawner and the bounce pad
   refill Checkpoint
@@ -12532,7 +12533,8 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     unsafe:
       Bash  # Break slug's shell with a gorlek's projectile
       Burrow
-      DoubleJump, TripleJump, Dash, Sword  # tjump+upslash+dash to climb the right wall (can also just sword jump + upslash to remove the requirement of dash)
+      DoubleJump, TripleJump, Dash, Sword  # tjump+upslash+dash to climb the right wall
+      SwordJump, TripleJump
 
   conn LowerWastes.EastTP:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
@@ -13151,7 +13153,7 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
     unsafe:
       Bash, Grenade=2
       DoubleJump, TripleJump, Damage=20  # dboost an the mine so you can stand on the lava thingy and jump from it to the floating platform
-      DoubleJump, TripleJump, Sword, Dash  # land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
+      SwordJump, TripleJump, Dash  # land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
   
   conn WillowsEnd.InnerTP:
     moki:
@@ -13556,7 +13558,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Damage=90, Combat=CrystalMiner
       Bash, Grenade=1
     unsafe:
-      DoubleJump, TripleJump, Sword  # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
+      SwordJump, TripleJump  # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
       DoubleJump, TripleJump, Dash  # Dash ramp from the left side + tjump in order to touch a small wall in the ceilling. Then tjump+dash toward the portal
       Damage=90  # That checkpoint box is really big so you don't have to bother with the CrystalMiner
   conn WillowsEnd.UpperHeartPath:
