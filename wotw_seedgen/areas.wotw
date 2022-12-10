@@ -1788,8 +1788,7 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Dash
       Glide, Sword OR Hammer  # with sword, pogo the slime
     unsafe:
-      Glide  # glide jump
-      DoubleJump  # this one is really precise
+      DoubleJump OR GlideJump
   conn WestHollow.HollowDrainMiddle:
     moki: WestHollow.UpperDrainLeverPulled
     unsafe:
@@ -3720,7 +3719,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       GrenadeJump
       Glide, DoubleJump  # GlideJump
       Bash:
-        Glide OR Bow=1                   # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
+        GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
         WaterDash, Water OR Damage=20
         Glide, Water OR Damage=20
   pickup WestGlades.AbovePlantEX:
@@ -3742,10 +3741,10 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       DoubleJump, TripleJump, Sword  # reset jumps with sword
       Combat=Tentacle, DoubleJump, TripleJump, Hammer OR Spear=1
     unsafe:
-      Bash, Glide OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
+      Bash, GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
       DoubleJump, Sword  # Pogo the projectile to pass above the tentacle
       Combat=Tentacle, SwordSJump=1
-      Combat=Tentacle, Glide, DoubleJump  # Glide jump
+      Combat=Tentacle, GlideJump, DoubleJump
       Combat=Tentacle, DoubleJump, Spear=2  # extend jumps momentum with spears
       # DiveLaunch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Flap OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup WestGlades.LowerPoolEX:
@@ -3950,8 +3949,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Hammer, Combat=Tentacle, Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
-      Bash
-      Glide  # Glide jump
+      Bash OR GlideJump
       Glide, Spear=1 OR Blaze=1  # too difficult for kii
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
@@ -3989,7 +3987,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
     kii, Water: DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       Water, DoubleJump               # or just be a madman
-      Water, Glide  # Glide jump
+      Water, GlideJump
       Water, Bash  # https://discord.com/channels/116250700685508615/845415952790454272/919589633543766037
 
   conn WestGlades.ShrineArea:
@@ -4257,7 +4255,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       SentryJump=1, Damage=15, Dash OR Glide          # Slightly different methods needed for hammer vs sentry, hammer is similar to above, sword goes left side
       SwordSJump=2
       HammerSJump=2, Dash OR Glide OR Damage=15
-      OuterWellspring.FallingWheel, Glide, Damage=10  # Glide jump
+      OuterWellspring.FallingWheel, GlideJump, Damage=10
       OuterWellspring.FallingWheel, Damage=15, Shuriken=5 OR Sentry=5
       OuterWellspring.FallingWheel, Dash, Sword
       GrenadeJump, DoubleJump, TripleJump
@@ -4588,7 +4586,7 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
       Bash, Grenade=2
     unsafe:
       Dash  # There's a little friendly spike area on the very edge of the platform
-      Glide  # Glide jumps
+      GlideJump
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # There's a little friendly spike area on the very edge of the platform
       Bash, Grenade=1, Sentry=2, Damage=10
   conn OuterWellspring.RightWallMidpoint:
@@ -5130,7 +5128,7 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Bash, Grenade=1, Sword
     unsafe:
       Dash, Combat=2xWeakSlug
-      Water, WaterDash, Glide  # glide jump from the wheel to the sl container
+      Water, WaterDash, GlideJump  # glide jump from the wheel to the sl container
       Bash, Grenade=1, Shuriken=1
 
 anchor InnerWellspring.DrainAreaEX at -1064, -3961:  # At DrainEX
@@ -6861,7 +6859,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
       # DoubleJump, Glide, Sword  # pogo the fish, land on the snaptrap. from the second snaptrap, glide+djump+upslash
       DoubleJump, Sword  # reset your djump by hitting the nest with sword
       DoubleJump, Dash, Combat=Nest, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=40  # bait the second snaptrap, dash ramp on the snaptrap then dash+djump.
-      DoubleJump, TripleJump, Combat=Nest, Glide OR Water OR Damage=20  # with glide, glide jump
+      DoubleJump, TripleJump, Combat=Nest, GlideJump OR Water OR Damage=20
       Combat=Nest, SwordSJump=1, DoubleJump, TripleJump  # running sjump +tjump+upslash
       Combat=Nest, HammerSJump=1, DoubleJump, TripleJump, Dash
   pickup LowerReach.IcefallEX:
@@ -12366,7 +12364,7 @@ anchor LowerWastes.SkeetoHive at 1715, -3936:  # The ledge right of SkeetoHive o
       Grapple, Sword OR Hammer  # Land on the friendly spikes between the 1st and 2nd muncher. Upslash + grapple from there
       Grapple, Damage=30, Shuriken=2 OR Sentry=3
       Grapple, Damage=60, Shuriken=1 OR Sentry=2
-      DoubleJump, Glide, Damage=30  # glide jump
+      DoubleJump, GlideJump, Damage=30
 
 anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the way to the tree
   refill Checkpoint
