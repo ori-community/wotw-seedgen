@@ -40,59 +40,66 @@ pub enum Requirement {
 impl Requirement {
     fn cost_is_met(cost: f32, player: &Player, mut orb_variants: SmallVec<[Orbs; 3]>) -> SmallVec<[Orbs; 3]> {
         orb_variants.retain(|orbs| {
+            if !Requirement::nonconsuming_cost_is_met_single(cost, player, orbs) { return false }
             if orbs.energy >= cost {
                 orbs.energy -= cost;
-                true
-            } else if player.settings.difficulty >= Difficulty::Unsafe
-            && player.inventory.has(&Item::Shard(Shard::LifePact), 1)
-            && orbs.energy + orbs.health > cost {
+            } else {
+                orbs.energy = 0.0;
                 orbs.health -= (cost - orbs.energy) * player.defense_mod();
-                orbs.energy = 0.;
-                true
-            } else { false }
+            }
+            true
         });
         orb_variants
     }
     fn nonconsuming_cost_is_met(cost: f32, player: &Player, mut orb_variants: SmallVec<[Orbs; 3]>) -> SmallVec<[Orbs; 3]> {
-        orb_variants.retain(|orbs|
-            orbs.energy >= cost || (
-                player.settings.difficulty >= Difficulty::Unsafe
-                && player.inventory.has(&Item::Shard(Shard::LifePact), 1)
-                && orbs.energy + orbs.health > cost
-            )
-        );
+        orb_variants.retain(|orbs| Requirement::nonconsuming_cost_is_met_single(cost, player, orbs));
         orb_variants
+    }
+    fn nonconsuming_cost_is_met_single(cost: f32, player: &Player, orbs: &mut Orbs) -> bool {
+        if orbs.energy >= cost {
+            true
+        } else if player.settings.difficulty >= Difficulty::Unsafe
+        && player.inventory.has(&Item::Shard(Shard::LifePact), 1) {
+            loop {
+                let game_thinks_health_cost = cost - orbs.energy;
+                let health_cost = game_thinks_health_cost * player.defense_mod();
+
+                let unmet_cost = if orbs.health > game_thinks_health_cost {
+                    if orbs.health > health_cost {
+                        break true;
+                    } else { health_cost }
+                } else { game_thinks_health_cost };
+                if !Requirement::regenerate_as_needed(unmet_cost, player, orbs) { return false }
+            }
+        } else { false }
     }
     fn health_is_met(cost: f32, player: &Player, mut orb_variants: SmallVec<[Orbs; 3]>) -> SmallVec<[Orbs; 3]> {
         orb_variants.retain(|orbs| {
-            if orbs.health > cost {
-                orbs.health -= cost;
-                true
-            } else if player.inventory.has(&Item::Skill(Skill::Regenerate), 1) && player.max_health() > cost {
-                let met = Requirement::regenerate_as_needed(cost, player, orbs);
-                orbs.health -= cost;
-                met
-            } else {
-                false
-            }
+            if !Requirement::nonconsuming_health_is_met_single(cost, player, orbs) { return false }
+            orbs.health -= cost;
+            true
         });
         orb_variants
     }
     fn nonconsuming_health_is_met(cost: f32, player: &Player, mut orb_variants: SmallVec<[Orbs; 3]>) -> SmallVec<[Orbs; 3]> {
-        orb_variants.retain(|orbs|
-            orbs.health > cost || (
-                player.inventory.has(&Item::Skill(Skill::Regenerate), 1) && player.max_health() > cost
-                && Requirement::regenerate_as_needed(cost, player, orbs)
-            )
-        );
+        orb_variants.retain(|orbs| Requirement::nonconsuming_health_is_met_single(cost, player, orbs));
         orb_variants
+    }
+    fn nonconsuming_health_is_met_single(cost: f32, player: &Player, orbs: &mut Orbs) -> bool {
+        orbs.health > cost || (
+            player.inventory.has(&Item::Skill(Skill::Regenerate), 1) && player.max_health() > cost
+            && Requirement::regenerate_as_needed(cost, player, orbs)
+        )
     }
     fn regenerate_as_needed(cost: f32, player: &Player, orbs: &mut Orbs) -> bool {
         let mut regens = ((cost - orbs.health) / 30.0).ceil();
         if orbs.health + 30.0 * regens <= cost { regens += 1.0 }
         orbs.heal(30.0 * regens, player);
-        orbs.energy -= regens;
-        return orbs.energy >= 0.0;
+        let game_thinks_regen_cost = Skill::Regenerate.energy_cost();
+        let regen_cost = player.use_cost(Skill::Regenerate);
+        // Regenerate is special cased to not allow Life Pact, so we don't go through cost_is_met
+        orbs.energy -= regen_cost * regens;
+        orbs.energy >= 0.0 && orbs.energy + regen_cost - game_thinks_regen_cost >= 0.0
     }
 
     pub fn is_met(&self, player: &Player, states: &FxHashSet<usize>, mut orb_variants: SmallVec<[Orbs; 3]>) -> SmallVec<[Orbs; 3]> {
@@ -607,6 +614,8 @@ mod tests {
         test!(&player, &states, Requirement::State(34), [...]);
         test!(&player, &states, Requirement::State(33), []);
 
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player.settings = &world_settings;
         test!(&player, &states, Requirement::Damage(30.0), []);
         player.inventory.grant(Item::Resource(Resource::Health), 5);
         test!(&player, &states, Requirement::Damage(30.0), []);
@@ -620,6 +629,7 @@ mod tests {
         test!(&player, &states, Requirement::Danger(30.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: 30.0, energy: -1.0 }]);
         test!(&player, &states, Requirement::Danger(60.0), [Orbs { health: 30.0, energy: player.max_energy() }], [Orbs { health: 35.0, energy: -2.0 }]);
 
+        let world_settings = WorldSettings { difficulty: Difficulty::Moki, ..WorldSettings::default() };
         player = Player::new(&world_settings);
         test!(&player, &states, Requirement::BreakWall(12.0), []);
         player.inventory.grant(Item::Skill(Skill::Sword), 1);
