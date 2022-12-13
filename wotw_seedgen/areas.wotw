@@ -8954,7 +8954,7 @@ anchor UpperDepths.Central at 464, -4484:  # The firefly egg to the right of the
     kii:
       DepthsLight, DoubleJump, TripleJump
 
-anchor UpperDepths.SecondKSRoom at 542, -4467:  # The egg of the firefly circling through the keystone room
+anchor UpperDepths.SecondKSRoom at 542, -4466:  # The egg of the firefly circling through the keystone room
   refill Checkpoint
   refill Energy=4:
     moki: BreakCrystal
@@ -9021,6 +9021,10 @@ anchor UpperDepths.SecondKSRoom at 542, -4467:  # The egg of the firefly circlin
       DepthsLight, Bash, Grenade=2
     kii:
       DepthsLight, Damage=60, Sentry=4 OR Sword OR Shuriken=4 OR Hammer
+  conn LowerDepths.East:
+    gorlek, ShurikenBreak=20: DepthsLight, Combat=Spiderling, Launch OR DoubleJump OR Dash OR Glide OR Bash OR Sword OR Hammer
+    kii, ShurikenBreak=20: DepthsLight, Combat=Spiderling  # jump from the very edge of the platform above the spikes
+    unsafe: ShurikenBreak=20  # Avoid the spiderling and use it as a lightsource 
 
 anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark path towards Mora
   refill Checkpoint
