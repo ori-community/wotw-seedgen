@@ -140,6 +140,7 @@ fn build_requirement<'a>(requirement: &parser::Requirement<'a>, region: bool, co
         parser::RequirementValue::WaveDash => build_trick_requirement(Trick::WaveDash, Requirement::And(vec![Requirement::Skill(Skill::Dash), Requirement::NonConsumingEnergySkill(Skill::Regenerate)]), context),
         parser::RequirementValue::GrenadeJump => build_trick_requirement(Trick::GrenadeJump, Requirement::NonConsumingEnergySkill(Skill::Grenade), context),
         parser::RequirementValue::GrenadeCancel => Requirement::NonConsumingEnergySkill(Skill::Grenade),
+        parser::RequirementValue::BowCancel => Requirement::NonConsumingEnergySkill(Skill::Bow),
         parser::RequirementValue::HammerJump => build_trick_requirement(Trick::HammerJump, Requirement::And(vec![Requirement::Skill(Skill::Hammer), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::RequirementValue::SwordJump => build_trick_requirement(Trick::SwordJump, Requirement::And(vec![Requirement::Skill(Skill::Sword), Requirement::Skill(Skill::DoubleJump)]), context),
         parser::RequirementValue::GrenadeRedirect(amount) => build_trick_requirement(Trick::GrenadeRedirect, Requirement::EnergySkill(Skill::Grenade, *amount as f32), context),

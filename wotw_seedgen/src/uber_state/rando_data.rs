@@ -398,7 +398,7 @@ pub(super) const NAMED_UBER_STATES: &[(&str, UberIdentifier)] = &[
         UberIdentifier::new(14019, 26318),
     ),
     (
-        "GladesTown.HandToHandSoup",
+        "LowerReach.HandToHandSoup",
         UberIdentifier::new(14019, 26318),
     ),
     (
@@ -1606,7 +1606,7 @@ pub(super) const NAMED_UBER_STATES: &[(&str, UberIdentifier)] = &[
         UberIdentifier::new(937, 53122),
     ),
     (
-        "EastHollow.VoiceDoor",
+        "EastHollow.VoiceDoorOpen",
         UberIdentifier::new(937, 6778),
     ),
     (

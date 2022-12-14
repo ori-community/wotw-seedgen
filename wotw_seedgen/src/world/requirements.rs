@@ -146,7 +146,7 @@ impl Requirement {
                     let cost = player.destroy_cost(*health, weapon, false);
                     return Requirement::cost_is_met(cost, player, orbs);
                 }
-            Requirement::Combat(enemies) => {
+            Requirement::Combat(enemies) => {  // TODO handle nests better
                 if let Some(weapon) = player.preferred_weapon(false) {
                     let (mut aerial, mut dangerous) = (false, false);
                     let mut energy = orbs.energy;
