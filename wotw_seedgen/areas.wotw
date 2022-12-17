@@ -13286,6 +13286,13 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Sword, DoubleJump, Bash, Grenade=1  # djump, pogo the mine, djump+upslash to reach the floating platform
       SentryJump=1, DoubleJump, Damage=20  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
       Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
+  conn WeepingRidge.LaunchArea:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
+    gorlek, WeepingRidge.ElevatorFightCompleted:
+      Glide OR Damage=20
+    kii, WeepingRidge.ElevatorFightCompleted:  # land on top of the second laser 
+      Launch OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
+      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: WeepingRidge.ElevatorFightCompleted
 
 anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
   refill Checkpoint
