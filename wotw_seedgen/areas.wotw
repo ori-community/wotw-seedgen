@@ -4959,7 +4959,9 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       SentryJump=1  # sentry jump on right side, then use sword/hammer to reach platform
       DoubleJump, TripleJump
     kii:
-      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer  # Bash grenade up right side, climb on the first wheel to reach yourgrenade (whih isn't gorlek), jump to left side vines, use abilities to reach platform
+      Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Bash grenade up right side, climb on the first wheel to reach yourgrenade (whih isn't gorlek), jump to left side vines, use abilities to reach platform
+    unsafe: Bash, Grenade=1  # On the left, bash grenade on the first rotating wheel, jump on the second one and reach your grenade from there
   conn InnerWellspring.DrainRoom:
     moki:
       DoubleJump OR Dash OR Glide OR Launch
@@ -5053,6 +5055,10 @@ anchor InnerWellspring.ShortcutLever at -1264, -3907:  # At the lever on top of 
     unsafe, InnerWellspring.ShortCutWheel:
       Hammer OR Sentry=2  # friendly spikes when you slide off the wheel
       Shuriken=2
+  conn InnerWellspring.ThornShardArea:  # Make sure it's not redundant with going to InnerWellspring.EntranceDoor first
+    gorlek: DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    kii: Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+    unsafe: free  # grab the right moss for an easier jump onto the left one the
 
 anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can drain
   refill Checkpoint
@@ -5487,21 +5493,11 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
   state InnerWellspring.SpinningRoomOpen:  # Breaking the corruption which opens the spinning room
     moki: InnerWellspring.SpinArena, BreakWall=16, DoubleJump OR Dash OR Glide OR Launch
     gorlek: InnerWellspring.SpinArena, BreakWall=16
+  # It's possible to solve InnerWellspring.TopDoorOpen from there with ChargedBlaze but logic doesn't have any keyword for it
 
   quest InnerWellspring.HandToHandHerbs:
     moki: GladesTown.HandToHandPouch
-  quest InnerWellspring.NeedleQI:
-    moki, InnerWellspring.TopDoorOpen:
-      Grapple, DoubleJump OR Launch
-      Bash, Grenade=1, DoubleJump OR Launch
-      Launch, DoubleJump
-    gorlek, InnerWellspring.TopDoorOpen:
-      Bash, Grenade=1
-      Grapple OR Launch
-    kii, InnerWellspring.TopDoorOpen:
-      DoubleJump, TripleJump, Hammer OR Spear=1
-    unsafe, InnerWellspring.TopDoorOpen: DoubleJump, TripleJump, Flash=1 OR Sentry=1
-
+  
   pickup InnerWellspring.AboveSpinArenaEX:
     moki:
       Grapple, DoubleJump OR Dash
@@ -5514,10 +5510,21 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
       Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump
     unsafe: DoubleJump
-
+  
   conn OuterWellspring.EastDoor: free
   conn InnerWellspring.SpinPuzzle:
     moki: InnerWellspring.SpinningRoomOpen
+  conn InnerWellspring.TopSecondRoom:
+    moki, InnerWellspring.TopDoorOpen:
+      Grapple, DoubleJump OR Launch
+      Bash, Grenade=1, DoubleJump OR Launch
+      Launch, DoubleJump
+    gorlek, InnerWellspring.TopDoorOpen:
+      Bash, Grenade=1
+      Grapple OR Launch
+    kii, InnerWellspring.TopDoorOpen:
+      DoubleJump, TripleJump, Hammer OR Spear=1
+    unsafe, InnerWellspring.TopDoorOpen: DoubleJump, TripleJump, Flash=1 OR Sentry=1
 
 anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking the spin puzzle
   # Having water changes the lasers in the spin puzzle room to the right. Using this is only logically expected in kii and above
