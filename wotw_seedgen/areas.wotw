@@ -13281,11 +13281,10 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
 
 anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
-# Not a really useful anchor but will make pathfinding less of a pain
- refill Checkpoint
- refill Health=1
+  refill Checkpoint
+  refill Health=1
  
- conn WillowsEnd.GrappleHeart:
+  conn WillowsEnd.GrappleHeart:
     moki:
       Grapple, Launch, DoubleJump, Dash
       Grapple, Launch, Glide
@@ -13300,8 +13299,16 @@ anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way t
       DoubleJump, TripleJump, Damage=100  # dboost in the spikes next to the double laser (40) + dboost in the spikes in between the double laser (40) + dboost in the last laser (20)
     unsafe:
       Launch
-      DoubleJump, TripleJump, Damage=20 # Reset you tjump with the walls before the second laser than tjump in the portal. Land on the left edge then tboost to reach the last laser and dboost on it
-  # connection toward the entrance is harder than going toward the heart and would only matter in high difficulty with fully random spawn if you don't have any weapon
+      DoubleJump, HammerJump  # https://youtu.be/nWob6QqkKpM
+      DoubleJump, TripleJump OR Dash OR GrenadeJump  # https://youtu.be/DRJrr9v-6xg
+  conn WillowsEnd.Entry:  # Be sure it's not redundant with going to WillowsEnd.GrappleHeart first 
+    kii:
+      Launch, Glide
+      Launch, DoubleJump, TripleJump  # tjump in more for stalling than for movement itself. Use it in order to await the end of lasers and slow yourself down
+    unsafe:
+      Launch
+      DoubleJump, GrenadeJump
+      DoubleJump, TripleJump, Dash  #https://youtu.be/kEzMDyc-G1k
 
 anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheels heart
   refill Checkpoint
