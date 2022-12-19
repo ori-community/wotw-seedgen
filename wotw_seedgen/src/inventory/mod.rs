@@ -129,8 +129,8 @@ impl From<(Item, u32)> for Inventory {
         inventory
     }
 }
-impl From<Vec<Item>> for Inventory {
-    fn from(items: Vec<Item>) -> Inventory {
+impl FromIterator<Item> for Inventory {
+    fn from_iter<T: IntoIterator<Item = Item>>(items: T) -> Inventory {
         let mut inventory = Inventory::default();
         for item in items {
             inventory.grant(item, 1);
@@ -138,8 +138,8 @@ impl From<Vec<Item>> for Inventory {
         inventory
     }
 }
-impl From<Vec<(Item, u32)>> for Inventory {
-    fn from(items: Vec<(Item, u32)>) -> Inventory {
+impl FromIterator<(Item, u32)> for Inventory {
+    fn from_iter<T: IntoIterator<Item = (Item, u32)>>(items: T) -> Inventory {
         let mut inventory = Inventory::default();
         for (item, amount) in items {
             inventory.grant(item, amount);
