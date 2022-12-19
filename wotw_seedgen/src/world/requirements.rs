@@ -44,8 +44,7 @@ impl Requirement {
             if orbs.energy >= cost {
                 orbs.energy -= cost;
             } else {
-                orbs.energy = 0.0;
-                orbs.health -= (cost - orbs.energy) * player.defense_mod();
+                orbs.energy = 0.0;  // The health has already been drained at this point
             }
             true
         });
@@ -61,11 +60,14 @@ impl Requirement {
         } else if player.settings.difficulty >= Difficulty::Unsafe
         && player.inventory.has(&Item::Shard(Shard::LifePact), 1) {
             loop {
-                let game_thinks_health_cost = cost - orbs.energy;
+                let missing_energy = cost - orbs.energy;
+                let game_thinks_health_cost = missing_energy * 10.0;  // A health orb is ten times as much as an energy orb, but the game considers orbs equal for Life Pact
                 let health_cost = game_thinks_health_cost * player.defense_mod();
 
                 let unmet_cost = if orbs.health > game_thinks_health_cost {
                     if orbs.health > health_cost {
+                        orbs.health -= health_cost;
+                        orbs.recharge(missing_energy, player);  // The game doesn't refund the health, it refunds it as energy
                         break true;
                     } else { health_cost }
                 } else { game_thinks_health_cost };
@@ -586,7 +588,6 @@ mod tests {
         let world_settings = WorldSettings::default();
         let mut player = Player::new(&world_settings);
 
-        player.inventory.grant(Item::Resource(Resource::Health), 1);
         let mut states = FxHashSet::default();
         let orbs = Orbs::default();
 
@@ -609,15 +610,24 @@ mod tests {
         player.inventory.grant(Item::Resource(Resource::Energy), 2);
         test!(&player, &states, Requirement::EnergySkill(Skill::Blaze, 1.0), [Orbs { energy: -2.0, ..orbs }]);
 
+        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
+        player = Player::new(&world_settings);
+        player.inventory.grant(Item::Skill(Skill::Blaze), 1);
+        player.inventory.grant(Item::Resource(Resource::Energy), 1);
+        player.inventory.grant(Item::Resource(Resource::Health), 3);
+        player.inventory.grant(Item::Shard(Shard::LifePact), 1);
+        test!(&player, &states, Requirement::EnergySkill(Skill::Blaze, 1.0), [Orbs { energy: -0.5, health: -5.0 }]);
+        test!(&player, &states, Requirement::NonConsumingEnergySkill(Skill::Blaze), [Orbs { health: -5.0, ..orbs }]);
+        test!(&player, &states, Requirement::NonConsumingEnergySkill(Skill::Blaze), [Orbs { energy: 0.0, health: player.max_health() }], [Orbs { energy: 0.5, health: -10.0 }]);
+
         test!(&player, &states, Requirement::State(34), []);
         states.insert(34);
         test!(&player, &states, Requirement::State(34), [...]);
         test!(&player, &states, Requirement::State(33), []);
 
-        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
-        player.settings = &world_settings;
-        test!(&player, &states, Requirement::Damage(30.0), []);
-        player.inventory.grant(Item::Resource(Resource::Health), 5);
+        player = Player::new(&world_settings);
+        player.inventory.grant(Item::Resource(Resource::Energy), 4);
+        player.inventory.grant(Item::Resource(Resource::Health), 6);
         test!(&player, &states, Requirement::Damage(30.0), []);
         player.inventory.grant(Item::Resource(Resource::Health), 1);
         test!(&player, &states, Requirement::Damage(30.0), [Orbs { health: -30.0, ..orbs }]);
