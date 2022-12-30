@@ -127,7 +127,15 @@ fn generation(c: &mut Criterion) {
         wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &universe_settings).unwrap();
     }));
 
+    universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
+    let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+    c.bench_function("unsafe", |b| b.iter(|| {
+        wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &universe_settings).unwrap();
+    }));
+
+    universe_settings.world_settings[0].difficulty = Difficulty::Moki;
     universe_settings.world_settings.extend_from_within(..);
+    let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
 
     c.bench_function("two worlds", |b| b.iter(|| {
         wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &universe_settings).unwrap();
