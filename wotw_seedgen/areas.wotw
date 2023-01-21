@@ -2753,7 +2753,7 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
     gorlek: Bash
     kii: Deflector, Sword OR Hammer
     unsafe:
-      Combat=SneezeSlug, Sentry=1 OR Grenade=1  # grenade/sentry redirect
+      Combat=SneezeSlug, SentryRedirect=1 OR GrenadeRedirect=1
       Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
       Hammer, DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
 
@@ -4084,7 +4084,7 @@ anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room openi
       Bash OR Hammer OR Sentry=2
       Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Spear=2
     unsafe:
-      Grenade=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1  # GrenadeJump
+      GrenadeJump, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1  # GrenadeJump
   conn OuterWellspring.EntranceDoor:
     moki:
       Launch OR Water
@@ -5798,7 +5798,11 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
   conn EastHollow.Kwolok:
     gorlek: Water, Bash, Damage=10  # bit hard but important for random spawn
     kii: Water, Spear=1
-    unsafe: Water, Bash OR Grenade=1 OR Sentry=1  # redirect the projectile (sentry is way harder than the others). Also works with sword+deflector
+    unsafe:
+      Water, Bash # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc
+      Water, Sword, Deflector
+      Water, GrenadeRedirect=1 OR SentryRedirect=1  # https://youtu.be/AIHaUnHRTF0
+      
 
 anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death mud
   refill Checkpoint
@@ -10086,7 +10090,7 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       Damage=160, Spear=1
       Flap, Water OR Damage=220
       Flap, WaterDash, Damage=100
-      Grenade=1, Water OR Damage=180  # grenade redirect
+      GrenadeRedirect=1, Water OR Damage=180  # grenade redirect
   
   pickup PoolsApproach.AboveWheelEX:
     moki:
