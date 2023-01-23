@@ -11159,6 +11159,8 @@ anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entranc
       Water, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, DoubleJump, TripleJump, Damage=20
       Water, SwordJump, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+  conn WestPools.RightKwolokPlatform:
+    unsafe: Water, ShurikenBreak=20, Damage=20, Damage=20, Damage=20  # https://youtu.be/MVD8IxJuysQ
 
 anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubble spawner and the bounce pad
   refill Checkpoint
