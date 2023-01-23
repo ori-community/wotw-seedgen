@@ -11841,7 +11841,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
     kii: Damage=160, WaterDash
     unsafe: Water, WaterBreath
 
-anchor WestPools.LeftKwolokPlatform at -1168, -4127:  # Left side of the platform where the Kwolok's escape starts
+anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platform where the Kwolok's escape starts
   refill Checkpoint:  # Checkpoint only appears after you defeated Kwolok
     moki: WestPools.ForestsStrength
 
@@ -11863,7 +11863,7 @@ anchor WestPools.LeftKwolokPlatform at -1168, -4127:  # Left side of the platfor
       DoubleJump, HammerJump
       DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
     
-anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Left side of the platform where the Kwolok's escape starts
+anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platform where the Kwolok's escape starts
   refill Checkpoint:
     moki: WestPools.ForestsStrength  # Checkpoint only appears after you defeated Kwolok
 
