@@ -78,7 +78,7 @@ anchor Teleporters:  # teleporter access
     moki: DepthsTP, Glide
   conn EastPools.Teleporter:
     moki: EastPoolsTP, Water
-  conn WestPools:
+  conn WestPools.Teleporter:
     moki: WestPoolsTP, Water
   conn LowerWastes.WestTP:
     moki: WestWastesTP
@@ -11064,7 +11064,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       EastPools.CentralRoomBubbleFree, GrenadeJump, DoubleJump OR Glide  # grenade jump on the bubble, use the other ability to stall, repeat until at the top
       EastPools.CentralRoomBubbleFree, PauseHover  # Pause float spam is just barely enough stall to gain height. This is just as much fun as it sounds.
       SentryJump=2  # sjump to GrassSeed, sjump from GrassSeed
-  conn WestPools:
+  conn WestPools.Teleporter:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Water, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=20
     kii:
@@ -11153,12 +11153,14 @@ anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entranc
       DoubleJump, Flash=1 OR Sentry=1
   conn UpperPools.KeystoneRoom:
     kii: Bash  # bash the crab
-  conn WestPools: 
+  conn WestPools.Teleporter: 
     unsafe:  # Glitch the crushers so you don't need Water Breath
       Water, Launch
       Water, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, DoubleJump, TripleJump, Damage=20
       Water, SwordJump, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+  conn WestPools.RightKwolokPlatform:
+    unsafe: Water, ShurikenBreak=20, Damage=20, Damage=20, Damage=20  # https://youtu.be/MVD8IxJuysQ
 
 anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubble spawner and the bounce pad
   refill Checkpoint
@@ -11789,7 +11791,7 @@ region WestPools:
   kii: Regenerate
   unsafe: free
 
-anchor WestPools at -1656, -4171:  # the west Pools TP
+anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
   refill Full
   
   state NonGladesTeleporter: free
@@ -11816,34 +11818,80 @@ anchor WestPools at -1656, -4171:  # the west Pools TP
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
     kii: WestPools.ForestsStrength, Damage=100, Damage=60, Damage=80, WaterDash, Burrow
     unsafe: WestPools.ForestsStrength, Water, Burrow
-  pickup WestPools.EscapeRevisitEX:
-    moki, WestPools.ForestsStrength:
-      Water, WaterBreath, DoubleJump, Bash
-      Water, WaterBreath, WaterDash, Combat=Crab+SpinCrab OR Bash
-      Water, WaterBreath, Launch, Bash OR WaterDash
-    gorlek, WestPools.ForestsStrength:
-      Water, WaterDash, Combat=Crab+SpinCrab OR DoubleJump OR Damage=10
-      Water, Bash OR Launch
-    kii, WestPools.ForestsStrength:
-      Damage=100, WaterDash, Damage=80, Combat=Crab+SpinCrab OR DoubleJump OR Damage=10 OR Bash OR Launch
-
+  
   conn Teleporters: free
-  conn KwolokEscape:
-    moki: Water, WaterBreath, DoubleJump OR Dash OR Launch
-    gorlek: Water
-    kii: 
+  conn WestPools.LeftKwolokPlatform:  # WaterDash/Bash to deal with the fishes and crabs which spawns after you defeated Kwolok
+    moki:
+      Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Launch
+      Water, WaterBreath, Bash, DoubleJump OR Dash OR Launch
+    gorlek:
+      Water, WaterDash
+      Water, Combat=SpinCrab, Bash OR Damage=3
+    kii:
+      Water, Bash 
       Damage=100, WaterDash
-      Damage=220
+      Damage=220, Bash  # 220 health if the mobs haven't spawned yet. Bashing them on your way will result in less damage
     unsafe:
+      Water
+      WestPools.ForestsStrength, Bash, Damage=160
       Damage=200, Burrow, Blaze=1, DoubleJump OR Launch
   conn EastPools.CentralRoom:
     moki: Water, WaterBreath, WaterDash
     gorlek: Water, WaterDash
     kii: Damage=160, WaterDash
     unsafe: Water, WaterBreath
+
+anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platform where the Kwolok's escape starts
+  refill Checkpoint:  # Checkpoint only appears after you defeated Kwolok
+    moki: WestPools.ForestsStrength
+
+  conn KwolokEscape: free  # Doesn't need any requirement since the enemies will only spawn after Kwolok is defeated
+  conn WestPools.Teleporter:  # WaterDash/Bash to deal with the fishes and crabs which spawns after you defeated Kwolok
+    moki: Water, WaterBreath, Bash OR WaterDash 
+    gorlek: Water, Bash OR WaterDash OR Damage=3
+    kii:
+      Damage=100, WaterDash
+      Damage=220, Bash  # 220 health if the mobs haven't spawned yet. Bashing them on your way will result in less damage
+    unsafe: Water
+  conn WestPools.RightKwolokPlatform:
+    moki: WestPools.ForestsStrength, Bash OR Launch OR Combat=Crab+SpinCrab
+    gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
+    unsafe:
+      WestPools.ForestsStrength
+      #pass over the Kwolok's escape trigger
+      Launch
+      DoubleJump, HammerJump
+      DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
+    
+anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platform where the Kwolok's escape starts
+  refill Checkpoint:
+    moki: WestPools.ForestsStrength  # Checkpoint only appears after you defeated Kwolok
+
+  pickup WestPools.EscapeRevisitEX:
+    moki: Water
+    kii:
+      Damage=140
+      WaterDash, Damage=80
+    unsafe:
+      Damage=80
+      WaterDash, Damage=40
+  pickup UpperPools.LowerKS:  # Only dirty water paths. Solves through the UpperPools.KeystoneRoomEntrance connection with clean water
+    kii: WaterDash, Damage=80
+      
+  conn KwolokEscape: free  # Doesn't need any requirement since the enemies will only spawn after Kwolok is defeated
+  conn WestPools.LeftKwolokPlatform:
+    moki: WestPools.ForestsStrength, Bash OR Launch OR Combat=Crab+SpinCrab
+    gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
+    unsafe:
+      WestPools.ForestsStrength
+      #pass over the Kwolok's escape trigger
+      Launch, Water OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # Additional skill because the slow zone prevents you from jumping https://youtu.be/GxZYdw0JC7s
+      DoubleJump, TripleJump, Dash, HammerJump
   conn UpperPools.KeystoneRoomEntrance:
-    moki: WestPools.ForestsStrength, Water, WaterBreath, WaterDash
-    gorlek: WestPools.ForestsStrength, Water, WaterDash
+    moki: Water, WaterBreath, WaterDash
+    gorlek: Water, WaterDash
+    kii: Damage=120, WaterDash
+    unsafe: Water, BreakWall=20, Shuriken OR Grenade OR Bow  # Also possible with Spear and Sentry but it will targets the ennemies which spawn after you defeated Kwolok first
 
 anchor KwolokEscape at -1650, -4125:
   nospawn
