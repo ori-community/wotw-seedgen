@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ori-rando/wotw-seedgen
+  IMAGE_NAME: ori-community/wotw-seedgen
 
 jobs:
   ci:
