@@ -57,6 +57,8 @@ InnerWellspring.ThreeWheels, 37858, 64055,
 InnerWellspring.TopDoorOpen, 37858, 31962,
 InnerWellspring.UpperCorruption, 37858, 31584,
 OuterWellspring.EntranceDoorOpen, 37858, 23644,
+OuterWellspring.LifeHarvestLeverPulled, 26019, 23382
+OuterWellspring.LifeHarvestWallBroken, 53632, 62781
 OuterWellspring.WestDoorBlueMoonFree, 53632, 2522,
 OuterWellspring.FallingWheel, 37858, 16604,
 OuterWellspring.TrialActivation, 44964, 11512, 1

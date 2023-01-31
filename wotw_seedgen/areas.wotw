@@ -4202,6 +4202,13 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
     kii: BreakWall=16, Water, Damage=15, Bow OR Spear OR Shuriken OR Grenade OR Blaze  # dboost on the wheel above OuterWellspring.BasementEC and use a ranged weapon to break the corruption
   state OuterWellspring.FallingWheel:
     unsafe: BreakWall=16, Bow  # Master Sniper
+  state OuterWellspring.LifeHarvestWallBroken:
+    moki, BreakWall=20:
+      DoubleJump, Bash OR Combat=Slug+Mantis
+      Launch
+    gorlek, BreakWall=20:
+      DoubleJump OR Bash OR Dash OR Combat=Slug+Mantis
+    kii: BreakWall=20
     
   pickup OuterWellspring.EntranceRoofEX:
     moki:
@@ -4228,29 +4235,23 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
     kii:
       Damage=35
       Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Damage=10  # let the bee hit you and use the iframes to pass through the spikes
-  pickup OuterWellspring.LifeHarvestShard:
-    moki, BreakWall=20:
-      DoubleJump, Bash
-      Launch
-    gorlek, BreakWall=20:
-      SentryJump=1, DoubleJump OR Dash OR Glide OR Damage=15
-      Bash, Dash  # other options are somewhere on the border between difficulties
-      Bash, Grenade=1  # this would be in moki if the camera didn’t put ori right at the top of the screen, making it hard to aim/catch the grenade
-    kii, BreakWall=20:
-      Bash, Glide OR Sword OR Hammer
-      Bash, Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
-    unsafe, BreakWall=20:
-      Bash  # https://youtu.be/Lnv5ggGH69s
-      DoubleJump, TripleJump
-      FlashSwap
+    unsafe:
+      #Damage=15  # either jump into the spikes a bit to the left and hold left+dwon to get back on the moss wheel or walljump off spiked wheel
+      Damage=10  # let the bee hit you and use the iframes to pass through the spikes
   pickup OuterWellspring.SwimEX:
     moki: Water
     unsafe:
       Damage=180
       WaterDash, Damage=80
       Bash, Damage=120
-      
+
+  conn OuterWellspring.LifeHarvestEntry:
+    moki, OuterWellspring.LifeHarvestWallBroken:
+      DoubleJump, Bash OR Combat=Slug+Mantis
+      Launch
+    gorlek, OuterWellspring.LifeHarvestWallBroken:
+      DoubleJump OR Bash OR Dash OR Combat=Slug+Mantis
+    kii: OuterWellspring.LifeHarvestWallBroken
   conn InnerWellspring.EntranceDoor:
     moki: OuterWellspring.EntranceDoorOpen
   conn OuterWellspring.Basement:
@@ -4355,7 +4356,45 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Dash, Glide
       Bash  # https://youtu.be/oKrKsmUBt54
 
-# checkpoint at -978, -4042
+anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the LifeHarvest Shard
+  state OuterWellspring.LifeHarvestLeverPulled:
+    moki:
+      DoubleJump, Bash
+      Launch
+    gorlek:
+      Bash, Dash
+      DoubleJump
+    kii:
+      Glide OR Sword OR Hammer
+      Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
+  state OuterWellspring.LifeHarvestWallBroken:
+    gorlek: ShurikenBreak=20
+    unsafe: SentryBreak=20
+
+  pickup OuterWellspring.LifeHarvestShard:
+    moki:
+      OuterWellspring.LifeHarvestLeverPulled, DoubleJump, Bash
+      Launch
+    gorlek:
+      Bash, Grenade=1  # this would be in moki if the camera didn’t put ori right at the top of the screen, making it hard to aim/catch the grenade
+      OuterWellspring.LifeHarvestLeverPulled, SentryJump=1, DoubleJump OR Dash OR Glide OR Damage=15
+      OuterWellspring.LifeHarvestLeverPulled, Bash, Dash  # other options are somewhere on the border between difficulties
+    kii:
+      OuterWellspring.LifeHarvestLeverPulled, Bash, Glide OR Sword OR Hammer
+      OuterWellspring.LifeHarvestLeverPulled, Bash, Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
+    unsafe:
+      OuterWellspring.LifeHarvestWallBroken, Bash  # https://youtu.be/Lnv5ggGH69s
+      DoubleJump, TripleJump OR GlideJump
+      SwordJump OR HammerJump OR GlideHammerJump OR FlashSwap OR GrenadeJump  # HammerJump w/o DoubleJump possible
+      Sword, Shuriken=2  # Double Shuriken pogo
+      #Sentry=1, Regenerate, Dash  # RegenSentryDash
+
+  conn OuterWellspring.EntranceDoor:
+    moki, OuterWellspring.LifeHarvestWallBroken:
+      Launch OR Bash OR Combat=Mantis+Slug
+    gorlek, OuterWellspring.LifeHarvestWallBroken:
+      DoubleJump OR Dash
+    kii: OuterWellspring.LifeHarvestWallBroken
 
 anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption opening the entrance
   state OuterWellspring.EntranceDoorOpen:
