@@ -54,15 +54,13 @@ fn requirements(c: &mut Criterion) {
     let req = Requirement::And(vec![Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()]), Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()])]);
     c.bench_function("nested ands and ors", |b| b.iter(|| req.is_met(&player, &states, smallvec![player.max_orbs()])));
 
-    let world_settings = WorldSettings::default();
-    player = Player::new(&world_settings);
     player.inventory.grant(Item::Skill(Skill::Bow), 1);
-    player.inventory.grant(Item::Resource(Resource::Energy), 40);
+    player.inventory.grant(Item::Resource(Resource::Energy), 20);
     let req = Requirement::Combat(smallvec![
         (Enemy::Lizard, 3),
     ]);
     c.bench_function("short combat", |b| b.iter(|| req.is_met(&player, &states, smallvec![player.max_orbs()])));
-    let req = Requirement::Combat(smallvec![
+    let req = Requirement::And(vec![Requirement::Combat(smallvec![
         (Enemy::Mantis, 2),
         (Enemy::Lizard, 2),
         (Enemy::EnergyRefill, 4),
@@ -75,9 +73,9 @@ fn requirements(c: &mut Criterion) {
         (Enemy::EnergyRefill, 4),
         (Enemy::Lizard, 2),
         (Enemy::Mantis, 2),
-    ]);
-    let states = Vec::default();
-    c.bench_function("long combat progression", |b| b.iter(|| req.items_needed(&player, &states)));
+    ]), Requirement::Damage(50.0)]);
+    player.inventory.items.clear();
+    c.bench_function("long combat progression", |b| b.iter(|| req.solutions(&player, &states, smallvec![player.max_orbs()], 1000, 1000)));
 }
 
 fn reach_checking(c: &mut Criterion) {
@@ -113,10 +111,8 @@ fn reach_checking(c: &mut Criterion) {
 }
 
 fn generation(c: &mut Criterion) {
-    let mut universe_settings = UniverseSettings {
-        seed: String::new(),
-        ..UniverseSettings::default()
-    };
+    let mut universe_settings = UniverseSettings::default();
+    let mut seed = 0;
 
     let areas = fs::read_to_string("areas.wotw").unwrap();
     let locations = fs::read_to_string("loc_data.csv").unwrap();
@@ -124,20 +120,28 @@ fn generation(c: &mut Criterion) {
     let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
 
     c.bench_function("singleplayer", |b| b.iter(|| {
+        universe_settings.seed = seed.to_string();
+        seed += 1;
         wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &universe_settings).unwrap();
     }));
 
+    seed = 0;
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
     let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
-    c.bench_function("unsafe", |b| b.iter(|| {
+    Criterion::default().sample_size(10).bench_function("unsafe", |b| b.iter(|| {
+        universe_settings.seed = seed.to_string();
+        seed += 1;
         wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &universe_settings).unwrap();
     }));
 
+    seed = 0;
     universe_settings.world_settings[0].difficulty = Difficulty::Moki;
     universe_settings.world_settings.extend_from_within(..);
     let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
 
     c.bench_function("two worlds", |b| b.iter(|| {
+        universe_settings.seed = seed.to_string();
+        seed += 1;
         wotw_seedgen::generate_seed(&graph, &NO_FILE_ACCESS, &universe_settings).unwrap();
     }));
 

@@ -164,6 +164,7 @@ impl Item {
     }
     #[inline]
     pub fn is_multiworld_spread(&self) -> bool {
+        // Note that requirement::solutions has logic based on spirit light not being multiworld spread (check_slot_limits)
         !matches!(self, Item::SpiritLight(_))
     }
 

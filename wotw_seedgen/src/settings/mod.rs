@@ -10,10 +10,12 @@ use std::fmt::{Formatter, Display};
 
 use rand::distributions::{Distribution, Uniform};
 use rustc_hash::FxHashSet;
+use smallvec::{smallvec, SmallVec};
 use wotw_seedgen_derive::{FromStr, Display};
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use serde::de::Visitor;
 
+use crate::item::Skill;
 use crate::{preset::{UniversePreset, WorldPreset}, util::constants::DEFAULT_SPAWN, files::FileAccess};
 
 use slugstrings::SLUGSTRINGS;
@@ -475,6 +477,49 @@ pub enum Difficulty {
 }
 impl Default for Difficulty {
     fn default() -> Difficulty { Difficulty::Moki }
+}
+impl Difficulty {
+    // TODO would it be worth to precompile the resulting slices for all variants?
+    /// Allowed weapons on this difficulty
+    pub fn weapons<const TARGET_IS_WALL: bool>(self) -> SmallVec<[Skill; 9]> {
+        let mut weapons = smallvec![
+            Skill::Sword,
+            Skill::Hammer,
+            Skill::Bow,
+            Skill::Grenade,
+            Skill::Shuriken,
+            Skill::Blaze,
+            Skill::Spear,
+        ];
+        if !TARGET_IS_WALL { weapons.push(Skill::Flash); }
+        if self >= Difficulty::Unsafe { weapons.push(Skill::Sentry); }
+        weapons
+    }
+    /// Allowed ranged weapons on this difficulty
+    pub fn ranged_weapons(self) -> SmallVec<[Skill; 6]> {
+        let mut weapons = smallvec![
+            Skill::Bow,
+            Skill::Spear,
+        ];
+        if self >= Difficulty::Gorlek {
+            weapons.push(Skill::Grenade);
+            weapons.push(Skill::Shuriken);
+            if self >= Difficulty::Unsafe {
+                weapons.push(Skill::Flash);
+                weapons.push(Skill::Blaze);
+            }
+        }
+        weapons
+    }
+    /// Allowed shield weapons on this difficulty
+    pub fn shield_weapons(self) -> SmallVec<[Skill; 4]> {
+        smallvec![
+            Skill::Hammer,
+            Skill::Launch,
+            Skill::Grenade,
+            Skill::Spear,
+        ]
+    }
 }
 
 /// A Trick that can be logically required

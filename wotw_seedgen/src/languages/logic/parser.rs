@@ -536,9 +536,14 @@ fn parse_requirement<'a>(parser: &mut Parser<'a>) -> Result<Requirement<'a>, Par
             Err(_) => match Trick::from_str(identifier) {
                 Ok(trick) => RequirementValue::Trick(trick),
                 Err(_) => match Skill::from_str(identifier) {
-                    Ok(skill) => match parser.current_token().kind == TokenKind::Eq {
-                        true => RequirementValue::UseSkill(skill, parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?),
-                        false => RequirementValue::Skill(skill),
+                    Ok(skill) => match parser.current_token().kind {
+                        TokenKind::Eq => {
+                            let value = parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?;
+                            match skill {
+                                Skill::Regenerate => return Err(parser.error("Explicit Regenerate amounts are forbidden, try removing the value", start..parser.current_token().range.start)),  // The game has buggy logic for when you're allowed to regenerate and there should never be a reason to explicitely force an amount of Regenerates
+                                _ => RequirementValue::UseSkill(skill, value),
+                            }},
+                        _ => RequirementValue::Skill(skill),
                     },
                     Err(_) => match Resource::from_str(identifier) {
                         Ok(resource) => RequirementValue::Resource(resource, parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?),

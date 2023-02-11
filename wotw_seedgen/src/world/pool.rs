@@ -4,6 +4,7 @@ use rustc_hash::FxHashMap;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard, BonusUpgrade};
 
+// TODO the pool could be an inventory probably
 #[derive(Default, Debug, Clone)]
 pub struct Pool {
     pub inventory: Inventory,

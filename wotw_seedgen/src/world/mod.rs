@@ -1,12 +1,12 @@
 pub mod graph;
 pub mod pool;
 pub mod player;
-pub mod requirements;
+pub mod requirement;
 
 pub use graph::Graph;
 pub use pool::Pool;
 pub use player::Player;
-pub use requirements::Requirement;
+pub use requirement::Requirement;
 
 use rustc_hash::FxHashMap;
 

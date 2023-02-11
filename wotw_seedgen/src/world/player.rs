@@ -1,9 +1,9 @@
-use smallvec::{SmallVec, smallvec};
+use smallvec::SmallVec;
 
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard};
 use crate::settings::{Difficulty, WorldSettings};
-use crate::util::{self, Orbs};
+use crate::util::Orbs;
 
 /// A logical representation of the in-game player
 #[derive(Debug, Clone)]
@@ -44,9 +44,7 @@ impl Player<'_> {
     /// assert_eq!(player.max_health(), 30.0);
     /// ```
     pub fn max_health(&self) -> f32 {
-        let mut health = (self.inventory.get(&Item::Resource(Resource::Health)) * 5) as f32;
-        if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
-        health
+        self.inventory.max_health(self.settings.difficulty)
     }
     /// Returns the maximum energy
     /// 
@@ -63,16 +61,11 @@ impl Player<'_> {
     /// assert_eq!(player.max_energy(), 3.0);
     /// ```
     pub fn max_energy(&self) -> f32 {
-        let mut energy = self.inventory.get(&Item::Resource(Resource::Energy)) as f32 * 0.5;
-        if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
-        energy
+        self.inventory.max_energy(self.settings.difficulty)
     }
     /// Returns the maximum health and energy
     pub fn max_orbs(&self) -> Orbs {
-        Orbs {
-            energy: self.max_energy(),
-            health: self.max_health(),
-        }
+        self.inventory.max_orbs(self.settings.difficulty)
     }
     /// Reduces the [`Orbs`] to the maximum health and energy of this [`Player`] if they exceed it
     /// 
@@ -207,205 +200,56 @@ impl Player<'_> {
         }
     }
 
+    /// Replenish health, but don't exceed the player's maximum health
+    pub fn heal(&self, orbs: &mut Orbs, amount: f32) {
+        self.inventory.heal(orbs, amount, self.settings.difficulty);
+    }
+    /// Replenish energy, but don't exceed the player's maximum energy
+    pub fn recharge(&self, orbs: &mut Orbs, amount: f32) {
+        self.inventory.recharge(orbs, amount, self.settings.difficulty);
+    }
+
     pub fn damage_mod(&self, flying_target: bool, bow: bool) -> f32 {
-        let mut damage_mod = 1.0;
-
-        if self.settings.difficulty >= Difficulty::Gorlek {
-            if self.inventory.has(&Item::Skill(Skill::AncestralLight1), 1) { damage_mod += 0.25; }
-            if self.inventory.has(&Item::Skill(Skill::AncestralLight2), 1) { damage_mod += 0.25; }
-        }
-
-        if self.settings.difficulty >= Difficulty::Unsafe {
-            let mut slots = self.inventory.get(&Item::Resource(Resource::ShardSlot));
-            let mut splinter = false;
-
-            if flying_target && slots > 0 && self.inventory.has(&Item::Shard(Shard::Wingclip), 1) { damage_mod += 1.0; slots -= 1; }
-            if slots > 0 && bow && self.inventory.has(&Item::Shard(Shard::Splinter), 1) { splinter = true; slots -= 1; }
-            if slots > 0 && self.inventory.has(&Item::Shard(Shard::SpiritSurge), 1) { damage_mod += (self.inventory.get(&Item::SpiritLight(1)) / 10000) as f32; slots -= 1; }
-            if slots > 0 && self.inventory.has(&Item::Shard(Shard::LastStand), 1) { damage_mod += 0.2; slots -= 1; }
-            if slots > 0 && self.inventory.has(&Item::Shard(Shard::Reckless), 1) { damage_mod += 0.15; slots -= 1; }
-            if slots > 0 && self.inventory.has(&Item::Shard(Shard::Lifeforce), 1) { damage_mod += 0.1; slots -= 1; }
-            if slots > 0 && self.inventory.has(&Item::Shard(Shard::Finesse), 1) { damage_mod += 0.05; }
-            if splinter { damage_mod *= 1.5; }  // Splinter stacks multiplicatively where other buffs stack additively
-        }
-
-        damage_mod
+        self.inventory.damage_mod(flying_target, bow, self.settings)
     }
     pub fn defense_mod(&self) -> f32 {
-        let mut defense_mod = if self.settings.difficulty >= Difficulty::Gorlek && self.inventory.has(&Item::Shard(Shard::Resilience), 1) { 0.9 } else { 1.0 };
-        if self.settings.hard { defense_mod *= 2.0; }
-        defense_mod
+        self.inventory.defense_mod(self.settings)
     }
     pub fn energy_mod(&self) -> f32 {
-        let mut energy_mod = 1.0;
-        if self.settings.difficulty < Difficulty::Unsafe { energy_mod *= 2.0; }
-        else if self.inventory.has(&Item::Shard(Shard::Overcharge), 1) { energy_mod *= 0.5; }
-        energy_mod
+        self.inventory.energy_mod(self.settings)
     }
 
     pub fn use_cost(&self, skill: Skill) -> f32 {
-        skill.energy_cost() * self.energy_mod()
+        self.inventory.use_cost(skill, self.settings)
     }
-    pub fn destroy_cost(&self, health: f32, skill: Skill, flying_target: bool) -> f32 {
-        let damage = skill.damage(Difficulty::Unsafe) * self.damage_mod(flying_target, matches!(skill, Skill::Bow)) + skill.burn_damage();  // Burn damage is unaffected by damage buffs
-        (health / damage).ceil() * self.use_cost(skill)
+    pub fn destroy_cost<const TARGET_IS_WALL: bool>(&self, target_health: f32, flying_target: bool) -> Option<f32> {
+        self.inventory.destroy_cost::<TARGET_IS_WALL>(target_health, flying_target, self.settings)
     }
-
-    fn weapons_by_dpe(&self, wall: bool) -> SmallVec<[Skill; 8]> {
-        let mut weapons: SmallVec<[_; 8]> = smallvec![
-            Skill::Sword,
-            Skill::Hammer,
-            Skill::Bow,
-            Skill::Grenade,
-            Skill::Shuriken,
-            Skill::Blaze,
-            Skill::Spear,
-        ];
-        if !wall { weapons.push(Skill::Flash); }
-        if self.settings.difficulty >= Difficulty::Unsafe { weapons.push(Skill::Sentry); }
-
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.settings.difficulty) * 10.0) as u16);
-        weapons
+    pub fn destroy_cost_ranged(&self, target_health: f32, flying_target: bool) -> Option<f32> {
+        self.inventory.destroy_cost_ranged(target_health, flying_target, self.settings)
     }
-    fn ranged_weapons_by_dpe(&self) -> SmallVec<[Skill; 2]> {
-        let mut weapons: SmallVec<[_; 2]> = smallvec![
-            Skill::Bow,
-            Skill::Spear,
-        ];
-        if self.settings.difficulty >= Difficulty::Gorlek {
-            weapons.push(Skill::Grenade);
-            weapons.push(Skill::Shuriken);
-        }
-        if self.settings.difficulty >= Difficulty::Unsafe {
-            weapons.push(Skill::Flash);
-            weapons.push(Skill::Blaze);
-        }
-
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.settings.difficulty) * 10.0) as u16);
-        weapons
-    }
-    fn shield_weapons_by_dpe(&self) -> SmallVec<[Skill; 4]> {
-        let mut weapons: SmallVec<[_; 4]> = smallvec![
-            Skill::Hammer,
-            Skill::Launch,
-            Skill::Grenade,
-            Skill::Spear,
-        ];
-
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        weapons.sort_unstable_by_key(|&weapon| (weapon.damage_per_energy(self.settings.difficulty) * 10.0) as u16);
-        weapons
+    pub fn destroy_cost_with(&self, target_health: f32, weapon: Skill, flying_target: bool) -> f32 {
+        self.inventory.destroy_cost_with(target_health, weapon, flying_target, self.settings)
     }
 
-    fn preferred_among_weapons<W>(&self, weapons: W) -> Option<Skill>
-    where W: IntoIterator<Item=Skill>,
-    {
-        for weapon in weapons {
-            if self.inventory.has(&Item::Skill(weapon), 1) {
-                return Some(weapon);
-            }
-        }
-        None
+    pub fn owned_weapons<const TARGET_IS_WALL: bool>(&self) -> SmallVec<[Skill; 9]> {
+        self.inventory.owned_weapons::<TARGET_IS_WALL>(self.settings)
     }
-    pub fn preferred_weapon(&self, wall: bool) -> Option<Skill> {
-        self.preferred_among_weapons(self.weapons_by_dpe(wall))
+    pub fn owned_ranged_weapons(&self) -> SmallVec<[Skill; 6]> {
+        self.inventory.owned_ranged_weapons(self.settings)
     }
-    pub fn preferred_ranged_weapon(&self) -> Option<Skill> {
-        self.preferred_among_weapons(self.ranged_weapons_by_dpe())
-    }
-    pub fn preferred_shield_weapon(&self) -> Option<Skill> {
-        self.preferred_among_weapons(self.shield_weapons_by_dpe())
+    pub fn owned_shield_weapons(&self) -> SmallVec<[Skill; 4]> {
+        self.inventory.owned_shield_weapons(self.settings)
     }
 
-    fn progression_among_weapons<W>(&self, weapons: W) -> SmallVec<[Skill; 8]>
-    where W: IntoIterator<Item=Skill>,
-    {
-        let mut progression_weapons = SmallVec::new();
-
-        for weapon in weapons {
-            progression_weapons.push(weapon);
-            if self.inventory.has(&Item::Skill(weapon), 1) {
-                break;
-            }
-        }
-
-        progression_weapons
+    pub fn progression_weapons<const TARGET_IS_WALL: bool>(&self) -> SmallVec<[Skill; 9]> {
+        self.inventory.progression_weapons::<TARGET_IS_WALL>(self.settings)
     }
-    pub fn progression_weapons(&self, wall: bool) -> SmallVec<[Skill; 8]> {
-        self.progression_among_weapons(self.weapons_by_dpe(wall))
+    pub fn ranged_progression_weapons(&self) -> SmallVec<[Skill; 6]> {
+        self.inventory.ranged_progression_weapons(self.settings)
     }
-    pub fn ranged_progression_weapons(&self) -> SmallVec<[Skill; 8]> {
-        self.progression_among_weapons(self.ranged_weapons_by_dpe())
-    }
-    pub fn shield_progression_weapons(&self) -> SmallVec<[Skill; 8]> {
-        self.progression_among_weapons(self.shield_weapons_by_dpe())
-    }
-
-    pub fn missing_items(&self, needed: &mut Inventory) {
-        for (item, amount) in &mut needed.items {
-            let owned = self.inventory.get(item);
-            *amount -= owned.min(*amount);
-        }
-
-        needed.items.retain(|_, amount| *amount > 0);
-    }
-    pub fn missing_for_orbs(&self, needed: &Inventory, orb_cost: Orbs, current_orbs: Orbs) -> Vec<Inventory> {
-        let orbs = current_orbs + orb_cost;
-        let mut inventories = Vec::new();
-
-        if orbs.health <= 0.0 {
-            let health_fragments = util::float_to_int(((-orbs.health + 0.1) / 5.0).ceil()).unwrap();
-            inventories.push(Inventory::from((Item::Resource(Resource::Health), health_fragments)));
-
-            let max_heal = self.max_health() - current_orbs.health;
-            if max_heal > -orbs.health {
-                let has_regen = self.inventory.has(&Item::Skill(Skill::Regenerate), 1);
-                let max_regens = (-orbs.health / 30.0).ceil();
-
-                let mut regens = 1.0;
-                while regens <= max_regens {
-                    let mut regen_inventory = Inventory::default();
-                    if !has_regen {
-                        regen_inventory.grant(Item::Skill(Skill::Regenerate), 1);
-                    }
-
-                    let regen_orbs = orbs + Orbs { health: (30.0 * regens), energy: -1.0 * regens };
-
-                    if regen_orbs.health <= 0.0 {
-                        let health_fragments = util::float_to_int(((-regen_orbs.health + 0.1) / 5.0).ceil()).unwrap();
-                        regen_inventory.grant(Item::Resource(Resource::Health), health_fragments);
-                    }
-                    if regen_orbs.energy < 0.0 {
-                        let energy_fragments = util::float_to_int((-regen_orbs.energy * 2.0).ceil()).unwrap();
-                        regen_inventory.grant(Item::Resource(Resource::Energy), energy_fragments);
-                    }
-
-                    inventories.push(regen_inventory);
-
-                    regens += 1.0;
-                }
-            }
-        } else {
-            inventories.push(Inventory::default());
-        }
-
-        if orbs.energy < 0.0 {
-            let energy_fragments = util::float_to_int((-orbs.energy * 2.0).ceil()).unwrap();
-
-            for inventory in &mut inventories {
-                inventory.grant(Item::Resource(Resource::Energy), energy_fragments);
-            }
-        }
-
-        for inventory in &mut inventories {
-            for (item, amount) in needed.items.clone() {
-                inventory.grant(item, amount);
-            }
-        }
-
-        inventories
+    pub fn shield_progression_weapons(&self) -> SmallVec<[Skill; 4]> {
+        self.inventory.shield_progression_weapons(self.settings)
     }
 }
 
@@ -413,6 +257,7 @@ impl Player<'_> {
 mod tests {
     use super::*;
 
+    use smallvec::smallvec;
     use crate::item::BonusItem;
 
     #[test]
@@ -431,21 +276,6 @@ mod tests {
     fn weapon_preference() {
         let world_settings = WorldSettings::default();
         let mut player = Player::new(&world_settings);
-        assert_eq!(player.preferred_weapon(true), None);
-        assert_eq!(player.preferred_ranged_weapon(), None);
-        player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
-        assert_eq!(player.preferred_weapon(true), Some(Skill::Shuriken));
-        assert_eq!(player.preferred_ranged_weapon(), None);
-        let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
-        player.settings = &world_settings;
-        assert_eq!(player.preferred_ranged_weapon(), Some(Skill::Shuriken));
-        player.inventory.grant(Item::Skill(Skill::Spear), 1);
-        assert_eq!(player.preferred_weapon(true), Some(Skill::Shuriken));
-        assert_eq!(player.preferred_ranged_weapon(), Some(Skill::Shuriken));
-        player.inventory.grant(Item::Skill(Skill::Sword), 1);
-        assert_eq!(player.preferred_weapon(true), Some(Skill::Sword));
-
-        player = Player::new(&world_settings);
         let weapons: SmallVec<[_; 8]> = smallvec![
             Skill::Sword,
             Skill::Hammer,
@@ -456,7 +286,7 @@ mod tests {
             Skill::Flash,
             Skill::Spear,
         ];
-        assert_eq!(player.progression_weapons(false), weapons);
+        assert_eq!(player.progression_weapons::<false>(), weapons);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
         let weapons: SmallVec<[_; 5]> = smallvec![
             Skill::Sword,
@@ -465,7 +295,7 @@ mod tests {
             Skill::Grenade,
             Skill::Shuriken,
         ];
-        assert_eq!(player.progression_weapons(false), weapons);
+        assert_eq!(player.progression_weapons::<false>(), weapons);
         let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
         player.settings = &world_settings;
         let weapons: SmallVec<[_; 5]> = smallvec![
@@ -475,7 +305,7 @@ mod tests {
             Skill::Grenade,
             Skill::Shuriken,
         ];
-        assert_eq!(player.progression_weapons(false), weapons);
+        assert_eq!(player.progression_weapons::<false>(), weapons);
     }
 
     #[test]
@@ -489,23 +319,6 @@ mod tests {
         let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
         player.settings = &world_settings;
         assert_eq!(player.max_energy(), 6.0);
-    }
-
-    #[test]
-    fn destroy_cost() {
-        let world_settings = WorldSettings::default();
-        let mut player = Player::new(&world_settings);
-        assert_eq!(player.destroy_cost(10.0, Skill::Bow, false), 1.5);
-        assert_eq!(player.destroy_cost(10.0, Skill::Spear, true), 4.0);
-        assert_eq!(player.destroy_cost(0.0, Skill::Spear, false), 0.0);
-        player.inventory.grant(Item::Skill(Skill::AncestralLight1), 1);
-        player.inventory.grant(Item::Skill(Skill::AncestralLight2), 1);
-        let world_settings = WorldSettings { difficulty: Difficulty::Unsafe, ..WorldSettings::default() };
-        player.settings = &world_settings;
-        player.inventory.grant(Item::Shard(Shard::Wingclip), 1);
-        player.inventory.grant(Item::Resource(Resource::ShardSlot), 1);
-        assert_eq!(player.destroy_cost(10.0, Skill::Bow, true), 0.25);
-        assert_eq!(player.destroy_cost(1.0, Skill::Spear, false), 2.0);
     }
 
     #[test]

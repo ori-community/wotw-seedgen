@@ -39,10 +39,12 @@ mod tests {
         let states = files::read_file("state_data", "csv", "logic").unwrap();
         let mut graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
 
+        eprintln!("Default settings ({})", universe_settings.seed);
         generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
 
         universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
         graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+        eprintln!("Unsafe ({})", universe_settings.seed);
         generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
 
         universe_settings.world_settings[0].headers = [
@@ -73,6 +75,7 @@ mod tests {
         };
         universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
 
+        eprintln!("Gorlek with headers ({})", universe_settings.seed);
         generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
     }
 }
