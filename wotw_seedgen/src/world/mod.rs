@@ -189,7 +189,7 @@ mod tests {
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
 
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets);
         let reached: FxHashSet<_> = reached.iter()
             .filter_map(|node| {
                 if node.node_kind() == NodeKind::State { None }
@@ -220,7 +220,7 @@ mod tests {
         world.player.inventory.grant(Item::Shard(Shard::TripleJump), 1);
 
         let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets);
         let reached: Vec<_> = reached.iter().map(|node| node.identifier()).collect();
         assert_eq!(reached, vec!["GladesTown.UpdraftCeilingEX", "GladesTown.AboveTpEX", "GladesTown.BountyShard", "GladesTown.BelowHoleHutEX"]);
     }

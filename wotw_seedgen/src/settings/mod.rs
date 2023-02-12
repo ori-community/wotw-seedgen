@@ -99,8 +99,8 @@ impl UniverseSettings {
     /// 
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
-    pub fn from_seed(input: &str) -> Option<Result<UniverseSettings, serde_json::Error>> {
-        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
+    pub fn from_seed(input: &str) -> Option<Result<UniverseSettings, String>> {
+        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(|config| serde_json::from_str(config).map_err(|err| err.to_string())))
     }
 
     /// Apply the settings from a [`UniversePreset`]
@@ -329,6 +329,25 @@ impl WorldSettings {
     pub fn to_json(&self) -> String {
         // This is safe because the settings struct is known to serialize successfully
         serde_json::to_string(&self).unwrap()
+    }
+
+    /// Read the settings from a generated seed
+    /// 
+    /// You can obtain the [`UniverseSettings`] using [`UniverseSettings::from_seed`]
+    /// 
+    /// Returns [`None`] if the seed is multiworld and contains no information about which world it belongs to
+    /// Returns an [`Error`] if the world index format could not be read
+    pub fn from_seed(input: &str, universe_settings: UniverseSettings) -> Option<Result<WorldSettings, String>> {
+        if universe_settings.world_settings.len() == 1 {
+            return Some(Ok(universe_settings.world_settings.into_iter().next().unwrap()));
+        }
+
+        let world_settings = match input.lines().find_map(|line| line.strip_prefix("// This World: "))?.parse() {
+            Ok(world_index) => universe_settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string()),
+            Err(err) => Err(format!("Error reading current world: {err}")),
+        };
+
+        Some(world_settings)
     }
 
     /// Checks whether these settings feature a random spawn location

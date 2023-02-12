@@ -301,7 +301,7 @@ impl Graph {
         Ok(entry)
     }
 
-    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> Result<Reached<'a>, String> {
+    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> Reached<'a> {
         let mut context = ReachContext {
             player,
             progression_check: false,
@@ -312,9 +312,9 @@ impl Graph {
 
         let (reached, _) = self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
 
-        Ok(reached)
+        reached
     }
-    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> Result<(Reached<'a>, Progressions<'a>), String> {
+    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> (Reached<'a>, Progressions<'a>) {
         let mut context = ReachContext {
             player,
             progression_check: true,
@@ -334,6 +334,6 @@ impl Graph {
             }
         }
 
-        Ok((reached, progressions))
+        (reached, progressions)
     }
 }

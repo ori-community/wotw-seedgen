@@ -109,7 +109,7 @@ where
     let mut unmet = Vec::with_capacity(context.world_count);
 
     for world_context in world_contexts {
-        let (world_reachable, world_unmet) = world_context.world.graph.reached_and_progressions(&world_context.world.player, world_context.spawn, world_context.world.uber_states(), &world_context.world.sets)?;
+        let (world_reachable, world_unmet) = world_context.world.graph.reached_and_progressions(&world_context.world.player, world_context.spawn, world_context.world.uber_states(), &world_context.world.sets);
         let world_reachable_states = world_reachable.iter().filter(|node| !node.can_place()).copied().collect::<Vec<_>>();
         reachable.push(world_reachable);
         reachable_states.push(world_reachable_states);
@@ -450,7 +450,7 @@ I: Iterator<Item=u16>,
 
         let mut lookahead_player = target_world_context.world.player.clone();
         lookahead_player.inventory.merge(inventory.clone());
-        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(&lookahead_player, target_world_context.spawn, target_world_context.world.uber_states(), &target_world_context.world.sets)?;
+        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(&lookahead_player, target_world_context.spawn, target_world_context.world.uber_states(), &target_world_context.world.sets);
         lookahead_reachable.retain(|&node| node.can_place());
 
         // Resource tracking can result in reaching less locations with an added teleporter, so prevent any overflows.
@@ -911,7 +911,7 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
     let spawn = finished_world.graph.find_spawn(DEFAULT_SPAWN)?;
 
     loop {
-        let mut reachable_locations = finished_world.graph.reached_locations(&finished_world.player, spawn, finished_world.uber_states(), &finished_world.sets)?;
+        let mut reachable_locations = finished_world.graph.reached_locations(&finished_world.player, spawn, finished_world.uber_states(), &finished_world.sets);
         let new_reachable_count = reachable_locations.len();
 
         if new_reachable_count > total_reachable_count {

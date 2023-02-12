@@ -18,12 +18,14 @@ pub mod generator;
 pub mod files;
 pub mod uber_state;
 pub mod util;
+mod reach_check;
 
 pub use languages::{logic, header::{self, Header}};
 pub use world::World;
 pub use inventory::Inventory;
 pub use item::{Item, VItem};
 pub use generator::generate_seed;
+pub use reach_check::reach_check;
 
 #[cfg(test)]
 mod tests {
