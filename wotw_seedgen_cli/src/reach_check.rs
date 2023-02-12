@@ -7,11 +7,10 @@ use std::env;
 use log::LevelFilter;
 
 use wotw_seedgen::Inventory;
-use wotw_seedgen::{item, world::{self, graph::Node}, util, logic};
+use wotw_seedgen::item::{Item, Resource};
+use wotw_seedgen::world::graph::Node;
+use wotw_seedgen::logic;
 use wotw_seedgen::settings::UniverseSettings;
-
-use item::{Item, Resource};
-use world::World;
 
 pub fn reach_check(mut args: cli::ReachCheckArgs) -> Result<(), String> {
     log_init::initialize_log(Some("reach.log"), LevelFilter::Off, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
