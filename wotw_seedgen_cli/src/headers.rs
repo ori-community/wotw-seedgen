@@ -1,13 +1,58 @@
+use super::cli;
+use super::log_init;
+
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::fmt::Write;
 
+use log::LevelFilter;
+use rustc_hash::FxHashMap;
 use ansi_term::{Style, Colour};
 
-use wotw_seedgen::Header;
-use wotw_seedgen::files::{find_headers, FILE_SYSTEM_ACCESS, FileAccess};
-use wotw_seedgen::header::validate_headers;
+use wotw_seedgen::files::{self, FILE_SYSTEM_ACCESS, FileAccess};
+use wotw_seedgen::header::{self, Header};
 use wotw_seedgen::util::constants::NAME_COLOUR;
+
+pub fn headers(headers: Vec<String>, subcommand: Option<cli::HeaderCommand>) -> Result<(), String> {
+    log_init::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+
+    match subcommand {
+        Some(cli::HeaderCommand::Validate { path }) => {
+            validate(path).map(|_| ())
+        },
+        Some(cli::HeaderCommand::Parse { path }) => {
+            compile_seed(path)
+        },
+        None => {
+            if headers.is_empty() {
+                list()
+            } else {
+                inspect(headers)
+            }
+        },
+    }
+}
+
+fn compile_seed(mut path: PathBuf) -> Result<(), String> {
+    if path.extension().is_none() {
+        path.set_extension("wotwrh");
+    }
+
+    let identifier = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
+    let header = fs::read_to_string(path.clone()).map_err(|err| format!("Failed to read {}: {}", path.display(), err))?;
+
+    let mut rng = rand::thread_rng();
+
+    let header = Header::parse(header, &mut rng)
+        .map_err(|errors| (*errors).iter().map(|err| err.verbose_display()).collect::<Vec<_>>().join("\n"))?
+        .build(FxHashMap::default())?;
+
+    path.set_extension("wotwr");
+    files::write_file(&identifier, "wotwr", &header.seed_content, "target")?;
+    log::info!("Compiled {}", identifier);
+
+    Ok(())
+}
 
 const HEADER_INDENT: usize = 24;  // Which column to align header descriptions on
 
@@ -79,7 +124,7 @@ pub fn validate(path: Option<PathBuf>) -> Result<(), String> {
         None => read_all()?,
     };
 
-    validate_headers(headers);
+    header::validate_headers(headers);
     Ok(())
 }
 
@@ -90,7 +135,7 @@ fn identifier(path: impl AsRef<Path>) -> String {
     path.as_ref().file_stem().unwrap().to_string_lossy().to_string()
 }
 fn read_all() -> Result<Vec<(String, String)>, String> {
-    find_headers().map(|headers| headers.into_iter()
+    files::find_headers().map(|headers| headers.into_iter()
         .map(|header| read(&header).map(|content| (identifier(&header), content)))
         .filter_map(|header| header.ok())
         .collect())
