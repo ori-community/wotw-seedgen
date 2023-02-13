@@ -98,7 +98,7 @@ fn reach_checking(c: &mut Criterion) {
         player.inventory.grant(Item::Skill(Skill::Dash), 1);
         let world = World::new_spawn(&graph, &world_settings);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets).unwrap();
+        world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets);
     }));
     c.bench_function("long reach check", |b| b.iter(|| {
         let world_settings = WorldSettings::default();
@@ -106,7 +106,7 @@ fn reach_checking(c: &mut Criterion) {
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets).unwrap();
+        world.graph.reached_locations(&world.player, spawn, world.uber_states(), &world.sets);
     }));
 }
 
