@@ -135,25 +135,26 @@ where
     R: Rng,
     I: Iterator<Item=u16>,
 {
-    let origin_world_context = &mut world_contexts[origin_world_index];
-
     let trigger = node.trigger().unwrap();
     let is_shop = trigger.identifier.is_shop();
 
     if trigger.identifier.is_purchasable() {
-        origin_world_context.shop_slots -= 1;
+        world_contexts[origin_world_index].shop_slots -= 1;
 
         if is_shop {
-            shop_placement(node, &item, origin_world_index, origin_world_context, context)?;
+            shop_placement(node, &item, origin_world_index, target_world_index, world_contexts, context)?;
         }
     }
 
+    let origin_world_context = &world_contexts[origin_world_index];
     let origin_details = origin_world_context.world.custom_items.get(&item);
     let custom_name =  origin_details.and_then(|details| details.name.clone());
-    let display =  origin_details.and_then(|details| details.display.clone());
+    let display =  origin_details.and_then(|details| details.display.clone());  // Using the display of other worlds is dangerous because it often relies on further information from the other world's headers
     let item_name = custom_name.clone().unwrap_or_else(|| item.to_string());
 
     if origin_world_index == target_world_index {
+        let origin_world_context = &mut world_contexts[origin_world_index];
+
         log::trace!("(World {}): Placed {} at {}", origin_world_index, item_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
 
         origin_world_context.placements.push(Placement {
@@ -186,7 +187,8 @@ where
 
         let state_index = context.multiworld_state_index.next().unwrap();
 
-        let custom_name = custom_name.unwrap_or_else(|| format!("$[{}]", item.code()));
+        // We check for a custom name in the target world in case this world doesn't have the relevant header, but we ignore the target world's display code because that usually references other part in the header we might be missing
+        let custom_name = custom_name.or_else(|| target_details.and_then(|details| details.name.clone())).unwrap_or_else(|| format!("$[{}]", item.code()));
         let origin_message = Item::Message(Message::new(format!("$[15|5|{}]'s {}", target_world_index, custom_name)));
         let send_identifier = UberIdentifier::new(12, state_index);
         let send_item = UberStateItem::simple_setter(send_identifier, UberType::Bool, UberStateValue::Bool(true));
@@ -229,56 +231,67 @@ where
     Ok(())
 }
 
-fn shop_placement<R, I>(node: &Node, item: &Item, world_index: usize, world_context: &mut WorldContext, context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn shop_placement<'a, R, I>(node: &Node, item: &Item, origin_world_index: usize, target_world_index: usize, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
 where
     R: Rng,
     I: Iterator<Item=u16>,
 {
-    let details = world_context.world.custom_items.get(item);
+    let origin_details = world_contexts[origin_world_index].world.custom_items.get(item);
+    let target_details = world_contexts[target_world_index].world.custom_items.get(item);
     let trigger = node.trigger().unwrap();
 
     let (_, _, price_uber_identifier) = SHOP_PRICES.iter()
         .find(|(_, location, _)| &trigger.identifier == location)
-        .ok_or_else(|| format!("(World {}): {} claims to be a shop location, but doesn't have an entry in the shop prices table!", world_index, node))?;
+        .ok_or_else(|| format!("(World {}): {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_world_index, node))?;
 
-    let mut price = details.and_then(|details| details.price).unwrap_or_else(|| item.shop_price());
+    let mut price = origin_details.and_then(|details| details.price)
+        .or_else(|| target_details.and_then(|details| details.price))
+        .unwrap_or_else(|| item.shop_price());
 
     if item.random_shop_price() {
         let modified_price = price as f32 * context.price_range.sample(context.rng);
-        price = util::float_to_int(modified_price).map_err(|_| format!("(World {}): Overflowed shop price for {} after adding a random amount to it", world_index, item))?;
+        price = util::float_to_int(modified_price).map_err(|_| format!("(World {}): Overflowed shop price for {} after adding a random amount to it", origin_world_index, item))?;
     }
 
     let price_setter = UberStateItem::simple_setter(*price_uber_identifier, UberType::Int, UberStateValue::Number((price as f32).into()));
 
-    log::trace!("(World {}): Placing {} at Spawn as price for the item below", world_index, price_setter);
+    let description = origin_details.and_then(|details| details.description.clone())
+        .or_else(|| target_details.and_then(|details| details.description.clone()))
+        .or_else(|| item.description());
+    let icon = origin_details.and_then(|details| details.icon.clone())
+        .or_else(|| target_details.and_then(|details| details.icon.clone()))
+        .or_else(|| item.icon());
 
-    world_context.placements.push(Placement {
+    log::trace!("(World {}): Placing {} at Spawn as price for the item below", origin_world_index, price_setter);
+
+    let origin_world_context = &mut world_contexts[origin_world_index];
+
+    origin_world_context.placements.push(Placement {
         node: None,
         trigger: UberStateTrigger::load(),
         item: price_setter,
     });
 
-    let description = details.and_then(|details| details.description.clone()).or_else(|| item.description());
     if description.is_some() {
         let description_setter = Item::ShopCommand(ShopCommand::SetDescription {
             uber_identifier: trigger.identifier,
             description,
         });
 
-        world_context.placements.push(Placement {
+        origin_world_context.placements.push(Placement {
             node: None,
             trigger: UberStateTrigger::load(),
             item: description_setter,
         });
     }
 
-    if let Some(icon) = details.and_then(|details| details.icon.clone()).or_else(|| item.icon()) {
+    if let Some(icon) = icon {
         let icon_setter = Item::ShopCommand(ShopCommand::SetIcon {
             uber_identifier: trigger.identifier,
             icon,
         });
 
-        world_context.placements.push(Placement {
+        origin_world_context.placements.push(Placement {
             node: None,
             trigger: UberStateTrigger::load(),
             item: icon_setter,

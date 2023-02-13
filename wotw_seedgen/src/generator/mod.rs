@@ -8,21 +8,16 @@ pub use placement::Placement;
 
 use std::{fmt::Write, cmp::Ordering};
 
-use rand::{
-    Rng, prelude::StdRng,
-};
+use rand::{Rng, prelude::StdRng};
 use rand_seeder::Seeder;
 use rustc_hash::{FxHashMap, FxHashSet};
 
-use crate::{
-    item::{Item, Message, UberStateOperator},
-    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, uber_state::UberStateTrigger,
-    world::{
-        World,
-        graph::Graph,
-        Pool,
-    }, header::{self, HeaderBuild}, Header, files::FileAccess
-};
+use crate::item::{Item, Message, UberStateOperator};
+use crate::settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal};
+use crate::uber_state::UberStateTrigger;
+use crate::world::{World, Graph, Pool};
+use crate::header::{self, Header, HeaderBuild};
+use crate::files::FileAccess;
 
 use placement::generate_placements;
 
