@@ -20,7 +20,7 @@ use wotw_seedgen_derive::VVariant;
 
 use crate::header::{parser, CodeDisplay};
 use crate::header::{VResolve, vdisplay};
-use crate::settings::Difficulty;
+use crate::settings::{Difficulty, logical_difficulty};
 use crate::util::{Zone, Icon, MapIcon};
 use crate::uber_state::UberIdentifier;
 
@@ -104,16 +104,16 @@ impl FromStr for Item {
 }
 impl Item {
     // TODO read from logic file instead
+    // TODO is this worth it?
     #[inline]
     pub fn is_progression(&self, difficulty: Difficulty) -> bool {
         match self {
             Item::Resource(resource) => match resource {
-                Resource::ShardSlot => difficulty >= Difficulty::Unsafe,
+                Resource::ShardSlot => difficulty >= Difficulty::Unsafe,  // lower difficulties have no issue with the default shards
                 Resource::HealthFragment | Resource::EnergyFragment | Resource::GorlekOre | Resource::Keystone => true,
             },
             Item::Skill(skill) => match skill {
-                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => difficulty >= Difficulty::Unsafe,
-                Skill::Shuriken | Skill::Blaze | Skill::Sentry => difficulty >= Difficulty::Gorlek,
+                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => difficulty >= logical_difficulty::DAMAGE_BUFFS,
                 Skill::Seir | Skill::WallJump => false,
                 Skill::Bash |
                 Skill::DoubleJump |
@@ -131,31 +131,24 @@ impl Item {
                 Skill::Burrow |
                 Skill::Dash |
                 Skill::WaterDash |
+                Skill::Shuriken |
+                Skill::Blaze |
+                Skill::Sentry |
                 Skill::Flap => true,
             },
             Item::Shard(shard) => match shard {
-                Shard::Overcharge |
-                Shard::Wingclip |
-                Shard::Magnet |
-                Shard::Splinter |
-                Shard::Reckless |
-                Shard::LifePact |
-                Shard::LastStand |
-                Shard::UltraBash |
-                Shard::UltraGrapple |
-                Shard::Overflow |
-                Shard::Thorn |
-                Shard::Catalyst |
-                Shard::Sticky |
-                Shard::Finesse |
-                Shard::SpiritSurge |
-                Shard::Lifeforce |
-                Shard::Deflector |
-                Shard::Fracture => difficulty >= Difficulty::Unsafe,
-                Shard::TripleJump |
-                Shard::Resilience |
-                Shard::Vitality |
-                Shard::Energy => difficulty >= Difficulty::Gorlek,
+                Shard::UltraGrapple | Shard::Deflector | Shard::Magnet | Shard::Splinter | Shard::Sticky | Shard::Fracture => true,  // Here logic has to decide the difficulties
+                Shard::TripleJump => difficulty >= logical_difficulty::TRIPLE_JUMP,
+                Shard::Resilience => difficulty >= logical_difficulty::RESILIENCE,
+                Shard::Vitality => difficulty >= logical_difficulty::VITALITY,
+                Shard::Energy => difficulty >= logical_difficulty::ENERGY_SHARD,
+                Shard::Lifeforce | Shard::Finesse | Shard::LastStand | Shard::Reckless | Shard::Wingclip | Shard::SpiritSurge => difficulty >= logical_difficulty::DAMAGE_BUFFS,
+                Shard::LifePact => difficulty >= logical_difficulty::LIFE_PACT,
+                Shard::Overcharge => difficulty >= logical_difficulty::OVERCHARGE,
+                Shard::UltraBash => difficulty >= logical_difficulty::ULTRA_BASH,
+                Shard::Overflow => difficulty >= logical_difficulty::OVERFLOW,
+                Shard::Thorn => difficulty >= logical_difficulty::THORN,
+                Shard::Catalyst => difficulty >= logical_difficulty::CATALYST,
                 _ => false,
             },
             Item::SpiritLight(_) | Item::Teleporter(_) | Item::Water | Item::UberState(_) => true,

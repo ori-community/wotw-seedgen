@@ -6,28 +6,6 @@ use ansi_term::Colour;
 
 pub const DEFAULT_SPAWN: &str = "MarshSpawn.Main";
 pub const TP_ANCHOR: &str = "Teleporters";
-pub const MOKI_SPAWNS: &[&str] = &[
-    "MarshSpawn.Main",
-    "HowlsDen.Teleporter",
-    "GladesTown.Teleporter",
-    "InnerWellspring.Teleporter",
-    "MidnightBurrows.Teleporter",
-];
-pub const GORLEK_SPAWNS: &[&str] = &[
-    "MarshSpawn.Main",
-    "HowlsDen.Teleporter",
-    "EastHollow.Teleporter",
-    "GladesTown.Teleporter",
-    "InnerWellspring.Teleporter",
-    "MidnightBurrows.Teleporter",
-    "WoodsEntry.Teleporter",
-    "WoodsMain.Teleporter",
-    "LowerReach.Teleporter",
-    "UpperDepths.Teleporter",
-    "EastPools.Teleporter",
-    "LowerWastes.WestTP",
-    "LowerWastes.EastTP",
-];
 pub const SPAWN_GRANTS: &[(&str, Item)] = &[
     ("EastPools.Teleporter", Item::Teleporter(Teleporter::EastLuma)),
 ];

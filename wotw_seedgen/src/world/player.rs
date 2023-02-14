@@ -2,7 +2,7 @@ use smallvec::SmallVec;
 
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard};
-use crate::settings::{Difficulty, WorldSettings};
+use crate::settings::{WorldSettings, logical_difficulty};
 use crate::util::Orbs;
 
 /// A logical representation of the in-game player
@@ -109,6 +109,7 @@ impl Player<'_> {
     /// player.cap_orbs(&mut orbs, true);
     /// assert_eq!(orbs, Orbs { health: 30.0, energy: 1.0 });
     /// ```
+    // TODO this didn't end up being used much, maybe it should be used more to have the overflow check?
     pub fn cap_orbs(&self, orbs: &mut Orbs, checkpoint: bool) {
         // checkpoints don't refill health given by the Vitality shard
         let max_health = if checkpoint {
@@ -119,7 +120,7 @@ impl Player<'_> {
         // (but they do refill energy from the Energy shard...)
         let max_energy = self.max_energy();
 
-        if self.settings.difficulty >= Difficulty::Unsafe && self.inventory.has(&Item::Shard(Shard::Overflow), 1) {
+        if self.settings.difficulty >= logical_difficulty::OVERFLOW && self.inventory.has(&Item::Shard(Shard::Overflow), 1) {
             if orbs.health > max_health {
                 orbs.energy += orbs.health - max_health;
             } else if orbs.energy > max_energy {
@@ -259,6 +260,7 @@ mod tests {
 
     use smallvec::smallvec;
     use crate::item::BonusItem;
+    use crate::settings::Difficulty;
 
     #[test]
     fn inventory() {

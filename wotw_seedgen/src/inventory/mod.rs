@@ -5,7 +5,7 @@ use serde::{Serialize, Deserialize};
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 
-use crate::{item::{Item, Resource, Shard, Skill}, settings::{Difficulty, WorldSettings}, util::Orbs};
+use crate::{item::{Item, Resource, Shard, Skill}, settings::{Difficulty, WorldSettings, logical_difficulty}, util::Orbs};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Inventory {
@@ -81,12 +81,12 @@ impl Inventory {
 
     pub fn max_health(&self, difficulty: Difficulty) -> f32 {
         let mut health = (self.get(&Item::Resource(Resource::HealthFragment)) * 5) as f32;
-        if difficulty >= Difficulty::Gorlek && self.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
+        if difficulty >= logical_difficulty::VITALITY && self.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
         health
     }
     pub fn max_energy(&self, difficulty: Difficulty) -> f32 {
         let mut energy = self.get(&Item::Resource(Resource::EnergyFragment)) as f32 * 0.5;
-        if difficulty >= Difficulty::Gorlek && self.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
+        if difficulty >= logical_difficulty::ENERGY_SHARD && self.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
         energy
     }
     pub fn max_orbs(&self, difficulty: Difficulty) -> Orbs {
@@ -108,12 +108,10 @@ impl Inventory {
     pub fn damage_mod(&self, flying_target: bool, bow: bool, settings: &WorldSettings) -> f32 {
         let mut damage_mod = 1.0;
 
-        if settings.difficulty >= Difficulty::Gorlek {
+        if settings.difficulty >= logical_difficulty::DAMAGE_BUFFS {
             if self.has(&Item::Skill(Skill::GladesAncestralLight), 1) { damage_mod += 0.25; }
             if self.has(&Item::Skill(Skill::InkwaterAncestralLight), 1) { damage_mod += 0.25; }
-        }
 
-        if settings.difficulty >= Difficulty::Unsafe {
             let mut slots = self.get(&Item::Resource(Resource::ShardSlot));
             let mut splinter = false;
 
@@ -136,7 +134,7 @@ impl Inventory {
         energy_mod
     }
     pub fn defense_mod(&self, settings: &WorldSettings) -> f32 {
-        let mut defense_mod = if settings.difficulty >= Difficulty::Gorlek && self.has(&Item::Shard(Shard::Resilience), 1) { 0.9 } else { 1.0 };
+        let mut defense_mod = if settings.difficulty >= logical_difficulty::RESILIENCE && self.has(&Item::Shard(Shard::Resilience), 1) { 0.9 } else { 1.0 };
         if settings.hard { defense_mod *= 2.0; }
         defense_mod
     }

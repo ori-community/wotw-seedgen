@@ -11,7 +11,7 @@ use crate::{
     item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message, UberStateItem, UberStateValue},
     settings::{Difficulty, Goal, WorldSettings, Spawn}, util::{
         self,
-        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES, GORLEK_SPAWNS, MOKI_SPAWNS},
+        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES},
     }, world::{
         World,
         graph::{self, Node, Graph}, requirement,
@@ -1296,17 +1296,13 @@ fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node],
 fn pick_spawn<'a>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut impl Rng) -> Result<&'a Node, String> {
     let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
     let spawn = match &world_settings.spawn {
-        Spawn::Random => valid
-            .filter(|&node| {
-                let identifier = node.identifier();
-                if world_settings.difficulty >= Difficulty::Gorlek {
-                    GORLEK_SPAWNS.contains(&identifier)
-                } else {
-                    MOKI_SPAWNS.contains(&identifier)
-                }
-            })
-            .choose(rng)
-            .ok_or_else(|| String::from("No valid spawn locations available"))?,
+        Spawn::Random => {
+            let spawns = world_settings.difficulty.spawn_locations();
+            valid
+                .filter(|&node| spawns.contains(&node.identifier()))
+                .choose(rng)
+                .ok_or_else(|| String::from("No valid spawn locations available"))?
+        },
         Spawn::FullyRandom => valid
             .choose(rng)
             .ok_or_else(|| String::from("No valid spawn locations available"))?,

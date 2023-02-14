@@ -4,6 +4,7 @@ use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 
 use crate::item::Item;
+use crate::settings::logical_difficulty;
 use crate::world::player::Player;
 use crate::util::orbs::{self, Orbs, OrbVariants};
 
@@ -163,7 +164,7 @@ fn cost_is_met(cost: f32, player: &Player, mut orb_variants: OrbVariants, consum
     let mut added_orb_variants = vec![];
 
     fn orbs_meet_cost(orbs: &mut Orbs, added_orb_variants: &mut Vec<Orbs>, cost: f32, player: &Player, consuming: bool) -> bool {
-        let has_life_pact = player.settings.difficulty >= Difficulty::Unsafe && player.inventory.has(&Item::Shard(Shard::LifePact), 1);
+        let has_life_pact = player.settings.difficulty >= logical_difficulty::LIFE_PACT && player.inventory.has(&Item::Shard(Shard::LifePact), 1);
         if has_life_pact && consuming && player.inventory.has(&Item::Skill(Skill::Regenerate), 1) {
             // Health is worth more than Energy with Life Pact and if we wait too long we might be unable to Regenerate later
             let game_thinks_regen_cost = Skill::Regenerate.energy_cost();

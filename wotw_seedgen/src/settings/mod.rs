@@ -498,6 +498,36 @@ impl Default for Difficulty {
     fn default() -> Difficulty { Difficulty::Moki }
 }
 impl Difficulty {
+    /// Allowed spawns on this difficulty when using the random spawn setting
+    pub fn spawn_locations(self) -> &'static [&'static str] {
+        pub const MOKI_SPAWNS: &[&str] = &[
+            "MarshSpawn.Main",
+            "HowlsDen.Teleporter",
+            "GladesTown.Teleporter",
+            "InnerWellspring.Teleporter",
+            "MidnightBurrows.Teleporter",
+        ];
+        pub const GORLEK_SPAWNS: &[&str] = &[
+            "MarshSpawn.Main",
+            "HowlsDen.Teleporter",
+            "EastHollow.Teleporter",
+            "GladesTown.Teleporter",
+            "InnerWellspring.Teleporter",
+            "MidnightBurrows.Teleporter",
+            "WoodsEntry.Teleporter",
+            "WoodsMain.Teleporter",
+            "LowerReach.Teleporter",
+            "UpperDepths.Teleporter",
+            "EastPools.Teleporter",
+            "LowerWastes.WestTP",
+            "LowerWastes.EastTP",
+        ];
+        match self {
+            Difficulty::Moki => MOKI_SPAWNS,
+            _ => GORLEK_SPAWNS,
+        }
+    }
+
     // TODO would it be worth to precompile the resulting slices for all variants?
     /// Allowed weapons on this difficulty
     pub fn weapons<const TARGET_IS_WALL: bool>(self) -> SmallVec<[Skill; 9]> {
@@ -539,6 +569,23 @@ impl Difficulty {
             Skill::Spear,
         ]
     }
+}
+
+/// [`Difficulty`] requirements to use certain items that the seed generator may require as part of energy, damage etc. requirements
+pub mod logical_difficulty {
+    use super::Difficulty;
+
+    pub const TRIPLE_JUMP: Difficulty = Difficulty::Gorlek;
+    pub const RESILIENCE: Difficulty = Difficulty::Gorlek;
+    pub const VITALITY: Difficulty = Difficulty::Gorlek;
+    pub const ENERGY_SHARD: Difficulty = Difficulty::Gorlek;
+    pub const DAMAGE_BUFFS: Difficulty = Difficulty::Unsafe;
+    pub const OVERCHARGE: Difficulty = Difficulty::Unsafe;
+    pub const LIFE_PACT: Difficulty = Difficulty::Unsafe;
+    pub const ULTRA_BASH: Difficulty = Difficulty::Unsafe;
+    pub const OVERFLOW: Difficulty = Difficulty::Unsafe;
+    pub const THORN: Difficulty = Difficulty::Unsafe;
+    pub const CATALYST: Difficulty = Difficulty::Unsafe;
 }
 
 /// A Trick that can be logically required
