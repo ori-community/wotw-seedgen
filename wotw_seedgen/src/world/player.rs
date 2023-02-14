@@ -150,8 +150,8 @@ impl Player<'_> {
     /// assert_eq!(player.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     /// 
-    /// player.inventory.grant(Item::Resource(Resource::Health), 22);
-    /// player.inventory.grant(Item::Resource(Resource::Energy), 24);
+    /// player.inventory.grant(Item::Resource(Resource::HealthFragment), 22);
+    /// player.inventory.grant(Item::Resource(Resource::EnergyFragment), 24);
     /// assert_eq!(player.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
     /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
     /// ```
@@ -184,10 +184,10 @@ impl Player<'_> {
     /// let mut player = Player::spawn(&world_settings);
     /// assert_eq!(player.health_plant_drops(), 1.0);
     /// 
-    /// player.inventory.grant(Item::Resource(Resource::Health), 8);
+    /// player.inventory.grant(Item::Resource(Resource::HealthFragment), 8);
     /// assert_eq!(player.health_plant_drops(), 2.0);
     /// 
-    /// player.inventory.grant(Item::Resource(Resource::Health), 18);
+    /// player.inventory.grant(Item::Resource(Resource::HealthFragment), 18);
     /// assert_eq!(player.health_plant_drops(), 5.0);
     /// ```
     pub fn health_plant_drops(&self) -> f32 {
