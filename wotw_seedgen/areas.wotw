@@ -3690,47 +3690,6 @@ anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup
   
   conn GladesTown.HoleHut: free
 
-anchor LowerReach.VeralHome at -140, -4096:  # At the soup
-  refill Checkpoint
-
-  quest LowerReach.HandToHandSoup:
-    moki: InnerWellspring.HandToHandHerbs
-
-  pickup GladesTown.LeafPileEX:
-    moki: Flap
-  pickup LowerReach.CatalystShard:
-    moki:
-      Water, Bash, Flap  # seems to be a casual strat the game suggests you to do
-      Water, Grenade=1
-    kii:
-      Damage=80, Grenade=1
-      Damage=80, Bash, Flap
-      WaterDash, Damage=60, Grenade=1
-      WaterDash, Damage=60, Bash, Flap
-    unsafe:
-      WaterDash, Damage=40, Grenade=1
-      WaterDash, Damage=40, Bash, Flap
-      #Water, Flap, Sentry=2  # theoretical double redirect, still in testing
-  
-  conn GladesTown.HoleHut:
-    moki: Dash OR Glide  # check for redundancies with PlayfulMoki
-    gorlek: free  # free if you know the whole branch is semisolid, but you probably don't as a moki player
-  conn GladesTown.PlayfulMoki: free
-  conn TuleyShop:
-    moki: GladesTown.TuleySpawned
-  conn LowerReach.TownEntry:
-    moki:
-      Bash, Flap OR Grenade=1  # may need to juggle the soupgrenade once
-      Launch
-    gorlek:
-      DoubleJump, TripleJump, Glide OR Dash OR Sword
-      SentryJump=1
-    kii: DoubleJump, TripleJump  # climb the wall above the gorlek 
-    unsafe:
-      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
-      Dash, Glide, Sword  # Needs a ramp on the left side corner of the platform near the cauldron
-      DoubleJump, Glide OR Sword OR Hammer # Jump on the floating platform next to the soup then wall jump from the wall above it
-
 region WestGlades:
   moki: Danger=20
   gorlek: free
@@ -8013,6 +7972,47 @@ anchor LowerReach.SnowEscape at 79, -3733:
 
   pickup LowerReach.EscapeRevisitEX:
     moki: LowerReach.ForestsMemory
+
+anchor LowerReach.VeralHome at -140, -4096:  # At the soup
+  refill Checkpoint
+
+  quest LowerReach.HandToHandSoup:
+    moki: InnerWellspring.HandToHandHerbs
+
+  pickup GladesTown.LeafPileEX:
+    moki: Flap
+  pickup LowerReach.CatalystShard:
+    moki:
+      Water, Bash, Flap  # seems to be a casual strat the game suggests you to do
+      Water, Grenade=1
+    kii:
+      Damage=80, Grenade=1
+      Damage=80, Bash, Flap
+      WaterDash, Damage=60, Grenade=1
+      WaterDash, Damage=60, Bash, Flap
+    unsafe:
+      WaterDash, Damage=40, Grenade=1
+      WaterDash, Damage=40, Bash, Flap
+      #Water, Flap, Sentry=2  # theoretical double redirect, still in testing
+  
+  conn GladesTown.HoleHut:
+    moki: Dash OR Glide  # check for redundancies with PlayfulMoki
+    gorlek: free  # free if you know the whole branch is semisolid, but you probably don't as a moki player
+  conn GladesTown.PlayfulMoki: free
+  conn TuleyShop:
+    moki: GladesTown.TuleySpawned
+  conn LowerReach.TownEntry:
+    moki:
+      Bash, Flap OR Grenade=1  # may need to juggle the soupgrenade once
+      Launch
+    gorlek:
+      DoubleJump, TripleJump, Glide OR Dash OR Sword
+      SentryJump=1
+    kii: DoubleJump, TripleJump  # climb the wall above the gorlek 
+    unsafe:
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
+      Dash, Glide, Sword  # Needs a ramp on the left side corner of the platform near the cauldron
+      DoubleJump, Glide OR Sword OR Hammer # Jump on the floating platform next to the soup then wall jump from the wall above it
 
 anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
   conn LowerReach.VeralHome: free
