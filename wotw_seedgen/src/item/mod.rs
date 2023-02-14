@@ -112,7 +112,7 @@ impl Item {
                 Resource::HealthFragment | Resource::EnergyFragment | Resource::GorlekOre | Resource::Keystone => true,
             },
             Item::Skill(skill) => match skill {
-                Skill::AncestralLight1 | Skill::AncestralLight2 => difficulty >= Difficulty::Unsafe,
+                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => difficulty >= Difficulty::Unsafe,
                 Skill::Shuriken | Skill::Blaze | Skill::Sentry => difficulty >= Difficulty::Gorlek,
                 Skill::Seir | Skill::WallJump => false,
                 Skill::Bash |
@@ -193,7 +193,7 @@ impl Item {
             Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600,  // Basic Weapons
             Item::Skill(Skill::Burrow | Skill::Bash | Skill::Flap | Skill::WaterDash | Skill::Grenade | Skill::Flash | Skill::Seir) | Item::Water => 1800,  // Key Skills
             Item::Skill(Skill::Blaze | Skill::Sentry) => 2800,  // Tedious Weapons
-            Item::Skill(Skill::AncestralLight1 | Skill::AncestralLight2) => 3000,  // Unhinted Skill
+            Item::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight) => 3000,  // Unhinted Skill
             Item::Skill(Skill::Spear) => 4000,  // No
             Item::Skill(Skill::Launch) => 40000,  // Absolutely Broken
             Item::Shard(_) => 1000,
@@ -213,7 +213,7 @@ impl Item {
             Item::Resource(Resource::ShardSlot) => 250,
             Item::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
-                Skill::AncestralLight1 | Skill::AncestralLight2 => 300,
+                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => 300,
                 Skill::Blaze => 420,
                 Skill::Launch => 800,
                 _ => 500,
@@ -330,7 +330,7 @@ mod tests {
         assert_eq!(Item::SpiritLight(45).code().to_string(), "0|45");
         assert_eq!(Item::Resource(Resource::Keystone).code().to_string(), "1|3");
         assert_eq!(Item::Skill(Skill::Launch).code().to_string(), "2|8");
-        assert_eq!(Item::Skill(Skill::AncestralLight1).code().to_string(), "2|120");
+        assert_eq!(Item::Skill(Skill::GladesAncestralLight).code().to_string(), "2|120");
         assert_eq!(Item::Shard(Shard::Magnet).code().to_string(), "3|8");
         assert_eq!(Item::Teleporter(Teleporter::Marsh).code().to_string(), "5|16");
         assert_eq!(Item::Water.code().to_string(), "9|0");

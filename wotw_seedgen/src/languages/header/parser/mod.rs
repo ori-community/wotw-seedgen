@@ -455,8 +455,8 @@ mod tests {
         assert!(Item::from_str("1|-2").is_err());
         assert!(Item::from_str("1|5").is_err());
         assert_eq!(Item::from_str("2|8"), Ok(Item::Skill(Skill::Launch)));
-        assert_eq!(Item::from_str("2|120"), Ok(Item::Skill(Skill::AncestralLight1)));
-        assert_eq!(Item::from_str("2|121"), Ok(Item::Skill(Skill::AncestralLight2)));
+        assert_eq!(Item::from_str("2|120"), Ok(Item::Skill(Skill::GladesAncestralLight)));
+        assert_eq!(Item::from_str("2|121"), Ok(Item::Skill(Skill::InkwaterAncestralLight)));
         assert!(Item::from_str("2|25").is_err());
         assert!(Item::from_str("2|-9").is_err());
         assert_eq!(Item::from_str("3|28"), Ok(Item::Shard(Shard::LastStand)));

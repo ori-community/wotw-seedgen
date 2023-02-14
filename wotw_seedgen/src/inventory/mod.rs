@@ -109,8 +109,8 @@ impl Inventory {
         let mut damage_mod = 1.0;
 
         if settings.difficulty >= Difficulty::Gorlek {
-            if self.has(&Item::Skill(Skill::AncestralLight1), 1) { damage_mod += 0.25; }
-            if self.has(&Item::Skill(Skill::AncestralLight2), 1) { damage_mod += 0.25; }
+            if self.has(&Item::Skill(Skill::GladesAncestralLight), 1) { damage_mod += 0.25; }
+            if self.has(&Item::Skill(Skill::InkwaterAncestralLight), 1) { damage_mod += 0.25; }
         }
 
         if settings.difficulty >= Difficulty::Unsafe {
@@ -299,8 +299,8 @@ mod tests {
         inventory.grant(Item::Skill(Skill::Bow), 1);
         assert_eq!(inventory.destroy_cost::<false>(10.0, false, &world_settings), Some(1.5));
         world_settings.difficulty = Difficulty::Unsafe;
-        inventory.grant(Item::Skill(Skill::AncestralLight1), 1);
-        inventory.grant(Item::Skill(Skill::AncestralLight2), 1);
+        inventory.grant(Item::Skill(Skill::GladesAncestralLight), 1);
+        inventory.grant(Item::Skill(Skill::InkwaterAncestralLight), 1);
         inventory.grant(Item::Shard(Shard::Wingclip), 1);
         inventory.grant(Item::Resource(Resource::ShardSlot), 1);
         inventory.remove(&Item::Skill(Skill::Bow), 1);

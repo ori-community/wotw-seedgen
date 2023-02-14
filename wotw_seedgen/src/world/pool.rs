@@ -39,8 +39,8 @@ impl Pool {
         items.insert(Item::Skill(Skill::Blaze), 1);
         items.insert(Item::Skill(Skill::Sentry), 1);
         items.insert(Item::Skill(Skill::Flap), 1);
-        items.insert(Item::Skill(Skill::AncestralLight1), 1);
-        items.insert(Item::Skill(Skill::AncestralLight2), 1);
+        items.insert(Item::Skill(Skill::GladesAncestralLight), 1);
+        items.insert(Item::Skill(Skill::InkwaterAncestralLight), 1);
         items.insert(Item::Water, 1);
         items.insert(Item::Shard(Shard::Overcharge), 1);
         items.insert(Item::Shard(Shard::TripleJump), 1);

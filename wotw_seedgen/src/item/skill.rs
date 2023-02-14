@@ -30,8 +30,8 @@ pub enum Skill {
     Blaze = 115,
     Sentry = 116,
     Flap = 118,
-    AncestralLight1 = 120,
-    AncestralLight2 = 121,
+    GladesAncestralLight = 120,
+    InkwaterAncestralLight = 121,
 }
 impl Skill {
     pub fn icon(self) -> Option<Icon> {
@@ -58,8 +58,8 @@ impl Skill {
             Skill::Blaze => Icon::Opher(OpherIcon::Blaze),
             Skill::Sentry => Icon::Opher(OpherIcon::Sentry),
             Skill::Flap => Icon::Spell(Spell::Flap),
-            Skill::AncestralLight1 => Icon::File(String::from("assets/icons/game/ancestrallight1.png")),
-            Skill::AncestralLight2 => Icon::File(String::from("assets/icons/game/ancestrallight2.png")),
+            Skill::GladesAncestralLight => Icon::File(String::from("assets/icons/game/ancestrallight1.png")),
+            Skill::InkwaterAncestralLight => Icon::File(String::from("assets/icons/game/ancestrallight2.png")),
         };
         Some(icon)
     }
