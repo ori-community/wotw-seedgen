@@ -26,6 +26,7 @@ impl Player<'_> {
         let mut inventory = Inventory::default();
         inventory.grant(Item::Resource(Resource::HealthFragment), 6);
         inventory.grant(Item::Resource(Resource::EnergyFragment), 6);
+        inventory.grant(Item::Resource(Resource::ShardSlot), 3);
         Player { inventory, settings }
     }
 
