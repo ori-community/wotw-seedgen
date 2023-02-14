@@ -3991,7 +3991,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       GrenadeJump
       Dash, DoubleJump
 
-anchor WestGlades.MillApproach at -703, -4064:  # At the ledge of the room opening up to Wellspring
+anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room opening up to Wellspring. The loading here is not very smart so we place the coordinates a bit left of the autosave
   refill Checkpoint
   refill Health=1
 
