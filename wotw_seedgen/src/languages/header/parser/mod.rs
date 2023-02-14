@@ -451,7 +451,7 @@ mod tests {
     fn item_parsing() {
         assert_eq!(Item::from_str("0|5000"), Ok(Item::SpiritLight(5000)));
         assert_eq!(Item::from_str("0|-5000"), Ok(Item::RemoveSpiritLight(5000)));
-        assert_eq!(Item::from_str("1|2"), Ok(Item::Resource(Resource::Ore)));
+        assert_eq!(Item::from_str("1|2"), Ok(Item::Resource(Resource::GorlekOre)));
         assert!(Item::from_str("1|-2").is_err());
         assert!(Item::from_str("1|5").is_err());
         assert_eq!(Item::from_str("2|8"), Ok(Item::Skill(Skill::Launch)));

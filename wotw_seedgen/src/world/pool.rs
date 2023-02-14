@@ -14,9 +14,9 @@ impl Pool {
     pub fn preset() -> Pool {
         let mut items = FxHashMap::default();
 
-        items.insert(Item::Resource(Resource::Health), 24);
-        items.insert(Item::Resource(Resource::Energy), 24);
-        items.insert(Item::Resource(Resource::Ore), 40);
+        items.insert(Item::Resource(Resource::HealthFragment), 24);
+        items.insert(Item::Resource(Resource::EnergyFragment), 24);
+        items.insert(Item::Resource(Resource::GorlekOre), 40);
         items.insert(Item::Resource(Resource::Keystone), 34);
         items.insert(Item::Resource(Resource::ShardSlot), 5);
         items.insert(Item::Skill(Skill::Bash), 1);

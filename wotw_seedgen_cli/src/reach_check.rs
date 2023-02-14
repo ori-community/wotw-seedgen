@@ -30,11 +30,11 @@ pub fn reach_check(mut args: cli::ReachCheckArgs) -> Result<(), String> {
     let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false)?;
 
     let mut inventory = Inventory::default();
-    inventory.grant(Item::Resource(Resource::Health), args.health / 5);
+    inventory.grant(Item::Resource(Resource::HealthFragment), args.health / 5);
     #[allow(clippy::cast_possible_truncation)]
-    inventory.grant(Item::Resource(Resource::Energy), (args.energy * 2.0) as u32);
+    inventory.grant(Item::Resource(Resource::EnergyFragment), (args.energy * 2.0) as u32);
     inventory.grant(Item::Resource(Resource::Keystone), args.keystones);
-    inventory.grant(Item::Resource(Resource::Ore), args.ore);
+    inventory.grant(Item::Resource(Resource::GorlekOre), args.ore);
     inventory.grant(Item::SpiritLight(1), args.spirit_light);
 
     let mut nodes = vec![];

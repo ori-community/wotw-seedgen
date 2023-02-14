@@ -24,8 +24,8 @@ impl Player<'_> {
     /// The [`Player`] will have six Health and Energy fragments - these are the resources a player spawns with in-game
     pub fn spawn(settings: &WorldSettings) -> Player {
         let mut inventory = Inventory::default();
-        inventory.grant(Item::Resource(Resource::Health), 6);
-        inventory.grant(Item::Resource(Resource::Energy), 6);
+        inventory.grant(Item::Resource(Resource::HealthFragment), 6);
+        inventory.grant(Item::Resource(Resource::EnergyFragment), 6);
         Player { inventory, settings }
     }
 
@@ -112,7 +112,7 @@ impl Player<'_> {
     pub fn cap_orbs(&self, orbs: &mut Orbs, checkpoint: bool) {
         // checkpoints don't refill health given by the Vitality shard
         let max_health = if checkpoint {
-            (self.inventory.get(&Item::Resource(Resource::Health)) * 5) as f32
+            (self.inventory.get(&Item::Resource(Resource::HealthFragment)) * 5) as f32
         } else {
             self.max_health()
         };
@@ -313,7 +313,7 @@ mod tests {
         let world_settings = WorldSettings::default();
         let mut player = Player::new(&world_settings);
         assert_eq!(player.max_energy(), 0.0);
-        for _ in 0..10 { player.inventory.grant(Item::Resource(Resource::Energy), 1); }
+        for _ in 0..10 { player.inventory.grant(Item::Resource(Resource::EnergyFragment), 1); }
         player.inventory.grant(Item::Shard(Shard::Energy), 1);
         assert_eq!(player.max_energy(), 5.0);
         let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
@@ -329,7 +329,7 @@ mod tests {
         let expected = [30.,35.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,40.,41.,42.,44.,45.,47.,48.,50.,52.,53.,55.,56.,58.,59.,61.,62.,64.,65.,66.,68.,69.];
         for health in expected {
             assert_eq!(player.checkpoint_orbs().health, health);
-            player.inventory.grant(Item::Resource(Resource::Health), 1);
+            player.inventory.grant(Item::Resource(Resource::HealthFragment), 1);
         }
 
         player = Player::new(&world_settings);
@@ -337,7 +337,7 @@ mod tests {
         let expected = [0.,0.,0.,0.,1.,1.,1.,1.,1.,2.,2.,2.,2.,2.,2.,2.,3.,3.,3.,3.,3.,4.,4.,4.,4.,4.,4.,4.,5.,5.,5.,5.,5.,6.,6.,6.,6.,6.,6.,6.,7.,7.,7.,7.,7.,8.,8.];
         for drops in expected {
             assert_eq!(player.health_plant_drops(), drops);
-            player.inventory.grant(Item::Resource(Resource::Health), 1);
+            player.inventory.grant(Item::Resource(Resource::HealthFragment), 1);
         }
 
         let world_settings = WorldSettings { difficulty: Difficulty::Gorlek, ..WorldSettings::default() };
@@ -348,11 +348,11 @@ mod tests {
 
         assert_eq!(player.checkpoint_orbs(), Orbs { energy: 1.0, health: 0.0 });
 
-        player.inventory.grant(Item::Resource(Resource::Health), 7);
+        player.inventory.grant(Item::Resource(Resource::HealthFragment), 7);
 
         assert_eq!(player.checkpoint_orbs(), Orbs { health: 35.0, energy: 1.0 });
 
-        player.inventory.grant(Item::Resource(Resource::Health), 21);
+        player.inventory.grant(Item::Resource(Resource::HealthFragment), 21);
 
         assert_eq!(player.checkpoint_orbs(), Orbs { health: 45.0, energy: 1.0 });
     }

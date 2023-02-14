@@ -119,8 +119,8 @@ impl World<'_, '_> {
         if new == old { return false }
         if WISP_STATES.contains(&identifier) {
             log::trace!("Granting player Wisp");
-            self.player.inventory.grant(Item::Resource(Resource::Health), 2);
-            self.player.inventory.grant(Item::Resource(Resource::Energy), 2);
+            self.player.inventory.grant(Item::Resource(Resource::HealthFragment), 2);
+            self.player.inventory.grant(Item::Resource(Resource::EnergyFragment), 2);
         }
 
         let mut preplaced = false;
@@ -214,8 +214,8 @@ mod tests {
         let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
         let mut world = World::new_spawn(&graph, &universe_settings.world_settings[0]);
 
-        world.player.inventory.grant(Item::Resource(Resource::Health), 7);
-        world.player.inventory.grant(Item::Resource(Resource::Energy), 6);
+        world.player.inventory.grant(Item::Resource(Resource::HealthFragment), 7);
+        world.player.inventory.grant(Item::Resource(Resource::EnergyFragment), 6);
         world.player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         world.player.inventory.grant(Item::Shard(Shard::TripleJump), 1);
 

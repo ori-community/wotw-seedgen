@@ -873,7 +873,7 @@ where
             log::warn!("(World {}): Not enough items in the pool to fill all shops! Filling with extra Gorlek Ore", world_index);
 
             for &world_shop_placeholder in world_shop_placeholders {
-                place_item(world_index, world_index, world_shop_placeholder, true, false, Item::Resource(Resource::Ore), world_contexts, context)?;
+                place_item(world_index, world_index, world_shop_placeholder, true, false, Item::Resource(Resource::GorlekOre), world_contexts, context)?;
             }
         }
     }
@@ -893,7 +893,7 @@ where
         }
         while let Some(unreachable) = world_contexts[world_index].unreachable_locations.pop() {
             let item = if unreachable.trigger().map_or(false, |trigger| trigger.identifier.is_purchasable()) {
-                Item::Resource(Resource::Ore)
+                Item::Resource(Resource::GorlekOre)
             } else {
                 let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
                 Item::SpiritLight(amount)

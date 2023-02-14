@@ -109,7 +109,7 @@ impl Item {
         match self {
             Item::Resource(resource) => match resource {
                 Resource::ShardSlot => difficulty >= Difficulty::Unsafe,
-                Resource::Health | Resource::Energy | Resource::Ore | Resource::Keystone => true,
+                Resource::HealthFragment | Resource::EnergyFragment | Resource::GorlekOre | Resource::Keystone => true,
             },
             Item::Skill(skill) => match skill {
                 Skill::AncestralLight1 | Skill::AncestralLight2 => difficulty >= Difficulty::Unsafe,
@@ -183,8 +183,8 @@ impl Item {
         #[allow(clippy::match_same_arms)]
         match self {
             Item::SpiritLight(amount) => *amount,
-            Item::Resource(Resource::Ore) => 20,
-            Item::Resource(Resource::Energy | Resource::Health) => 120,
+            Item::Resource(Resource::GorlekOre) => 20,
+            Item::Resource(Resource::EnergyFragment | Resource::HealthFragment) => 120,
             Item::Resource(Resource::Keystone) => 320,
             Item::Resource(Resource::ShardSlot) => 480,
             Item::Skill(Skill::Regenerate | Skill::WaterBreath) => 200,  // Quality-of-Life Skills
@@ -207,9 +207,9 @@ impl Item {
     pub fn shop_price(&self) -> u32 {
         #[allow(clippy::match_same_arms)]
         match self {
-            Item::Resource(Resource::Health) => 200,
-            Item::Resource(Resource::Energy) => 150,
-            Item::Resource(Resource::Ore | Resource::Keystone) => 100,
+            Item::Resource(Resource::HealthFragment) => 200,
+            Item::Resource(Resource::EnergyFragment) => 150,
+            Item::Resource(Resource::GorlekOre | Resource::Keystone) => 100,
             Item::Resource(Resource::ShardSlot) => 250,
             Item::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,

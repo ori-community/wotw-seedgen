@@ -259,8 +259,8 @@ fn needed_for_health(total_solutions: &mut Vec<TaggedSolution>, solutions: Vec<u
                             let mut solution = TaggedSolution { orbs, ..solution.clone() };
                             solution.inventory.grant(Item::Skill(Skill::Regenerate), 1);
                             solution.tags[Tag::UseRegenerate as usize] = Some(true);
-                            solution.inventory.grant(Item::Resource(Resource::Health), missing_health_fragments);
-                            solution.inventory.grant(Item::Resource(Resource::Energy), total_missing_energy_fragments);  // the regen branch cannot be entered if we previously used Life Pact (this would not make sense), so we don't need to check health_payed_for_life_pact, it will be zero
+                            solution.inventory.grant(Item::Resource(Resource::HealthFragment), missing_health_fragments);
+                            solution.inventory.grant(Item::Resource(Resource::EnergyFragment), total_missing_energy_fragments);  // the regen branch cannot be entered if we previously used Life Pact (this would not make sense), so we don't need to check health_payed_for_life_pact, it will be zero
                             debug_assert_eq!(solution.health_payed_for_life_pact, 0.0);
                             total_solutions.push(solution);
                         }
@@ -269,7 +269,7 @@ fn needed_for_health(total_solutions: &mut Vec<TaggedSolution>, solutions: Vec<u
 
                 // Reuse the current slot for the solution without Regenerate
                 let solution = &mut total_solutions[index];
-                solution.inventory.grant(Item::Resource(Resource::Health), missing_health_fragments);
+                solution.inventory.grant(Item::Resource(Resource::HealthFragment), missing_health_fragments);
                 solution.orbs = orbs;
             }
         });
@@ -312,7 +312,7 @@ fn needed_for_energy(total_solutions: &mut Vec<TaggedSolution>, solutions: Vec<u
                                     let missing_energy = higher_cost - solution.orbs.energy;
                                     let missing_energy_fragments = (missing_energy * 2.0).ceil().max(0.0);
                                     solution.orbs.energy += missing_energy_fragments * 0.5 - total_cost;  // granting fragments increases max energy as well
-                                    solution.inventory.grant(Item::Resource(Resource::Energy), missing_energy_fragments as u32);
+                                    solution.inventory.grant(Item::Resource(Resource::EnergyFragment), missing_energy_fragments as u32);
                                 };
 
                                 let regens = max_heal / 30.0;
@@ -355,7 +355,7 @@ fn needed_for_energy(total_solutions: &mut Vec<TaggedSolution>, solutions: Vec<u
                                     if consuming { solution.orbs.energy = 0.0; }
                                     else { solution.orbs.energy = (solution.orbs.energy + true_health_cost).min(max_energy) }
 
-                                    solution.inventory.grant(Item::Resource(Resource::Health), missing_health_fragments as u32);
+                                    solution.inventory.grant(Item::Resource(Resource::HealthFragment), missing_health_fragments as u32);
                                 };
 
                                 if solution.do_not_generate_all_life_pact_variants {
@@ -387,7 +387,7 @@ fn needed_for_energy(total_solutions: &mut Vec<TaggedSolution>, solutions: Vec<u
                                     }
 
                                     solution = &mut total_solutions[index];
-                                    solution.inventory.grant(Item::Resource(Resource::Energy), 1);
+                                    solution.inventory.grant(Item::Resource(Resource::EnergyFragment), 1);
                                     solution.orbs.energy += 0.5;  // As asserted above, this solution has never used life pact. Otherwise, we would have to perform additional calculations to determine how much we would increase the health instead of the energy
                                     missing_energy -= 0.5;
                                     health_cost -= 5.0;
@@ -455,7 +455,7 @@ fn needed_for_energy(total_solutions: &mut Vec<TaggedSolution>, solutions: Vec<u
                     let missing_energy_fragments = (missing_energy * 2.0).ceil().max(0.0);
                     solution.orbs.energy += missing_energy_fragments * 0.5;  // granting fragments increases max energy as well
                     if consuming { solution.orbs.energy -= cost; }
-                    solution.inventory.grant(Item::Resource(Resource::Energy), missing_energy_fragments as u32);  // this branch cannot be entered if we previously used Life Pact, so we don't need to check health_payed_for_life_pact, it will be zero
+                    solution.inventory.grant(Item::Resource(Resource::EnergyFragment), missing_energy_fragments as u32);  // this branch cannot be entered if we previously used Life Pact, so we don't need to check health_payed_for_life_pact, it will be zero
                     debug_assert_eq!(solution.health_payed_for_life_pact, 0.0);
                 }
             }

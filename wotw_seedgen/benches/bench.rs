@@ -41,13 +41,13 @@ fn requirements(c: &mut Criterion) {
     let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let req_d = Requirement::Damage(10.0);
     player.inventory.grant(Item::Skill(Skill::Blaze), 1);
-    player.inventory.grant(Item::Resource(Resource::Energy), 4);
-    player.inventory.grant(Item::Resource(Resource::Health), 4);
+    player.inventory.grant(Item::Resource(Resource::EnergyFragment), 4);
+    player.inventory.grant(Item::Resource(Resource::HealthFragment), 4);
     let req = Requirement::And(vec![Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()]), Requirement::Or(vec![req_a.clone(), req_d.clone()]), Requirement::Or(vec![req_b.clone(), req_c.clone()])]);
     c.bench_function("nested ands and ors", |b| b.iter(|| req.is_met(&player, &states, smallvec![player.max_orbs()])));
 
     player.inventory.grant(Item::Skill(Skill::Bow), 1);
-    player.inventory.grant(Item::Resource(Resource::Energy), 20);
+    player.inventory.grant(Item::Resource(Resource::EnergyFragment), 20);
     let req = Requirement::Combat(smallvec![
         (Enemy::Lizard, 3),
     ]);
@@ -79,10 +79,10 @@ fn reach_checking(c: &mut Criterion) {
     c.bench_function("short reach check", |b| b.iter(|| {
         let world_settings = WorldSettings::default();
         let mut player = Player::new(&world_settings);
-        player.inventory.grant(Item::Resource(Resource::Health), 40);
-        player.inventory.grant(Item::Resource(Resource::Energy), 40);
+        player.inventory.grant(Item::Resource(Resource::HealthFragment), 40);
+        player.inventory.grant(Item::Resource(Resource::EnergyFragment), 40);
         player.inventory.grant(Item::Resource(Resource::Keystone), 34);
-        player.inventory.grant(Item::Resource(Resource::Ore), 40);
+        player.inventory.grant(Item::Resource(Resource::GorlekOre), 40);
         player.inventory.grant(Item::SpiritLight(1), 10000);
         player.inventory.grant(Item::Resource(Resource::ShardSlot), 8);
         player.inventory.grant(Item::Skill(Skill::Sword), 1);

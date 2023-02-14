@@ -80,12 +80,12 @@ impl Inventory {
     }
 
     pub fn max_health(&self, difficulty: Difficulty) -> f32 {
-        let mut health = (self.get(&Item::Resource(Resource::Health)) * 5) as f32;
+        let mut health = (self.get(&Item::Resource(Resource::HealthFragment)) * 5) as f32;
         if difficulty >= Difficulty::Gorlek && self.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
         health
     }
     pub fn max_energy(&self, difficulty: Difficulty) -> f32 {
-        let mut energy = self.get(&Item::Resource(Resource::Energy)) as f32 * 0.5;
+        let mut energy = self.get(&Item::Resource(Resource::EnergyFragment)) as f32 * 0.5;
         if difficulty >= Difficulty::Gorlek && self.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
         energy
     }
