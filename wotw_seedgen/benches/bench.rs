@@ -14,14 +14,14 @@ use settings::*;
 use files::*;
 
 fn parsing(c: &mut Criterion) {
-    let input = read_file("areas", "wotw", "logic").unwrap();
+    let input = fs::read_to_string("areas.wotw").unwrap();
     let areas = logic::Areas::parse(&input).unwrap();
     c.bench_function("parse areas", |b| b.iter(|| logic::Areas::parse(&input)));
 
-    let input = read_file("loc_data", "csv", "logic").unwrap();
+    let input = fs::read_to_string("loc_data.csv").unwrap();
     let locations = logic::parse_locations(&input).unwrap();
     c.bench_function("parse locations", |b| b.iter(|| logic::parse_locations(&input)));
-    let input = read_file("state_data", "csv", "logic").unwrap();
+    let input = fs::read_to_string("state_data.csv").unwrap();
     let states = logic::parse_states(&input).unwrap();
 
     let mut universe_settings = UniverseSettings::default();
