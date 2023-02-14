@@ -491,14 +491,14 @@ fn needed_for_combat(solutions: &mut Vec<TaggedSolution>, player: &Player, enemi
     let mut burrow = false;
 
     for (enemy, _) in enemies {
-        if enemy.shielded() { shielded = true; }
-        if enemy == &Enemy::Sandworm { burrow = true; }
+        shielded |= enemy.shielded();
+        burrow |= matches!(enemy, Enemy::Sandworm);
         if player.settings.difficulty < Difficulty::Unsafe {
-            if enemy == &Enemy::Bat { bash = true; }
-            if enemy.aerial() { aerial = true; }
-            if enemy.dangerous() { dangerous = true; }
-            if enemy.ranged() { ranged = true; }
-            else { melee = true; }
+            bash |= matches!(enemy, Enemy::Bat);
+            aerial |= enemy.aerial();
+            dangerous |= enemy.dangerous();
+            if enemy.ranged() { ranged = true }
+            else { melee = true }
         }
     }
 

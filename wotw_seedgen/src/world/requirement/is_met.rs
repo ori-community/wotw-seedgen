@@ -61,24 +61,22 @@ impl Requirement {
                 }
             Requirement::Combat(enemies) => {
                 // Check for movement skills
-                for (enemy, _) in enemies {
-                    if player.settings.difficulty < Difficulty::Unsafe && (
-                        (enemy.aerial() && !(
-                            player.inventory.has(&Item::Skill(Skill::DoubleJump), 1)
-                            || player.inventory.has(&Item::Skill(Skill::Launch), 1)
-                            || player.settings.difficulty >= Difficulty::Gorlek && player.inventory.has(&Item::Skill(Skill::Bash), 1)
-                        ))
-                        || (enemy.dangerous() && !(
-                            player.inventory.has(&Item::Skill(Skill::DoubleJump), 1)
-                            || player.inventory.has(&Item::Skill(Skill::Dash), 1)
-                            || player.inventory.has(&Item::Skill(Skill::Bash), 1)
-                            || player.inventory.has(&Item::Skill(Skill::Launch), 1)
-                        ))
-                        || (*enemy == Enemy::Bat && !player.inventory.has(&Item::Skill(Skill::Bash), 1))
-                    )
-                    { return smallvec![] }
-                }
+                if player.settings.difficulty < Difficulty::Unsafe && enemies.iter().any(|(enemy, _)| {
+                    (enemy.aerial() && !(
+                        player.inventory.has(&Item::Skill(Skill::DoubleJump), 1)
+                        || player.inventory.has(&Item::Skill(Skill::Launch), 1)
+                        || player.settings.difficulty >= Difficulty::Gorlek && player.inventory.has(&Item::Skill(Skill::Bash), 1)
+                    ))
+                    || (enemy.dangerous() && !(
+                        player.inventory.has(&Item::Skill(Skill::DoubleJump), 1)
+                        || player.inventory.has(&Item::Skill(Skill::Dash), 1)
+                        || player.inventory.has(&Item::Skill(Skill::Bash), 1)
+                        || player.inventory.has(&Item::Skill(Skill::Launch), 1)
+                    ))
+                    || (matches!(enemy, Enemy::Bat) && !player.inventory.has(&Item::Skill(Skill::Bash), 1))
+                }) { return smallvec![] }
 
+                // TODO this might be a try block once that's stable
                 let combat_is_met = || {
                     let shield_weapon = player.owned_shield_weapons().first().copied();
                     let mut cost = 0.0;
