@@ -12,6 +12,18 @@ pub trait FileAccess {
     fn read_header(&self, identifier: &str) -> Result<String, String>;
 }
 
+/// A [`FileAccess`] implementation prohibiting access to any files
+/// 
+/// Attempting to use presets that depend on other presets or headers that depend on other headers will error
+pub struct NoFileAccess;
+impl FileAccess for NoFileAccess {
+    fn read_universe_preset(&self, _: &str) -> Result<String, String> { Err("no file access".into()) }
+    fn read_world_preset(&self, _: &str) -> Result<String, String> { Err("no file access".into()) }
+    fn read_header(&self, _: &str) -> Result<String, String> { Err("no file access".into()) }
+}
+/// Instance of [`NoFileAccess`]
+pub const NO_FILE_ACCESS: NoFileAccess = NoFileAccess;
+
 #[cfg(any(feature = "fs", test))]
 pub use fs_access::*;
 #[cfg(any(feature = "fs", test))]

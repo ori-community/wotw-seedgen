@@ -13,14 +13,6 @@ use util::*;
 use settings::*;
 use files::*;
 
-struct NoFileAccess;
-impl FileAccess for NoFileAccess {
-    fn read_universe_preset(&self, _: &str) -> Result<String, String> { panic!("no file access") }
-    fn read_world_preset(&self, _: &str) -> Result<String, String> { panic!("no file access") }
-    fn read_header(&self, _: &str) -> Result<String, String> { panic!("no file access") }
-}
-const NO_FILE_ACCESS: NoFileAccess = NoFileAccess;
-
 fn parsing(c: &mut Criterion) {
     let input = read_file("areas", "wotw", "logic").unwrap();
     let areas = logic::Areas::parse(&input).unwrap();
