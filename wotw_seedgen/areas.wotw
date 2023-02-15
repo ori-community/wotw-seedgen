@@ -922,7 +922,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     unsafe:
       Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
       SwordSJump=2
-  conn HowlsDen.Teleporter:
+  conn HowlsDen.AboveTeleporter:
     moki: HowlsDen.BoneBarrier
 
 anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable wall behind the keystone door
@@ -990,31 +990,28 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
 # checkpoint at -511, -4479
 # checkpoint at -476, -4441
 
+anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the Sword Tree area and destroying the bone barrier
+  state HowlsDen.BoneBarrier:
+    gorlek: ShurikenBreak=16
+    unsafe: SentryBreak=16 OR HammerBreak OR SpearBreak
+
+  pickup HowlsDen.AboveTPEX:
+    moki: BreakWall=10
+    unsafe: HowlsDen.SwordTree  # Seems to be the trigger for spawning the Lizard? Not entirely sure
+
+  conn HowlsDen.Teleporter: free
+  conn HowlsDen.BoneBridge:
+    moki: HowlsDen.BoneBarrier, Combat=Slug OR DoubleJump OR Bash OR Launch
+    gorlek: HowlsDen.BoneBarrier
+
 anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
   # if someone manages to lower the elevator platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
   refill Full
 
-  state HowlsDen.BoneBarrier:
-    gorlek: ShurikenBreak=16, DoubleJump OR Launch OR Bash OR SentryJump=1
-    unsafe:
-      ShurikenBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
-      SentryBreak=16, DoubleJump OR Launch OR Bash OR Sword OR Hammer
-      HammerBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
-      SpearBreak, DoubleJump OR Launch OR Bash OR Sword OR Hammer
   state HowlsDen.DoubleJumpTreeCombat:  # the game puts this before regen. It's why all the enemies drop tons of health
     moki: Combat=Mantis+2xLizard+SmallSkeeto  # The SmallSkeeto spawns in this arena if the player has Bash.
   state NonGladesTeleporter: free
 
-  pickup HowlsDen.AboveTPEX:
-    moki, BreakWall=10:
-      DoubleJump OR Launch
-      Bash  # bash the slime
-    gorlek: BreakWall=10, SentryJump=1
-    kii, BreakWall=10:
-      Sword OR Dash OR Hammer  # pogo on the slime for sword, upslash for hammer
-      Spear=1, Glide
-    unsafe, BreakWall=10:
-      GrenadeJump
   pickup HowlsDen.LaserKS:
     moki:
       DoubleJump OR Dash OR Launch
@@ -1039,12 +1036,15 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     kii:
       Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
       Bash, Grenade=1
-  conn HowlsDen.BoneBridge:
-    moki, HowlsDen.BoneBarrier:
+  conn HowlsDen.AboveTeleporter:
+    moki:
       DoubleJump OR Launch
       Bash, Grenade=1
-    gorlek: HowlsDen.BoneBarrier, Bash OR SentryJump=1
-    kii: HowlsDen.BoneBarrier, Sword OR Hammer
+    gorlek: Bash OR SentryJump=1
+    kii:
+      Sword OR Dash OR Hammer  # pogo on the slime for sword, upslash for hammer
+      Spear=1, Glide
+    unsafe: GrenadeJump
 
 anchor DenShrine at -328, -4569:
   nospawn
