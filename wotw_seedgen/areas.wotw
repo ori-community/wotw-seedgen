@@ -884,6 +884,8 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
   state HowlsDen.BoneBarrier:  # the barrier blocking the lowest part of Howl's Den
     moki: BreakWall=16
 
+  quest HowlsDen.SwordTree: free
+
   pickup HowlsDen.BoneOre:
     moki:
       Hammer
@@ -898,7 +900,6 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Sword OR Hammer OR Bash OR Sentry=3 OR Shuriken=3
     unsafe:
       GrenadeJump  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
-  pickup HowlsDen.SwordTree: free
   pickup HowlsDen.MagnetShard:
     moki: BreakWall=10, BreakWall=16 OR Launch
     kii: BreakWall=10, DoubleJump, TripleJump
