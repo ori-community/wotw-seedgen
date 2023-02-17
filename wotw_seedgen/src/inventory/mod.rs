@@ -42,6 +42,9 @@ impl Inventory {
     pub fn has(&self, item: &Item, amount: u32) -> bool {
         self.items.get(item).map_or(false, |owned| *owned >= amount)
     }
+    pub fn has_any(&self, item: &Item) -> bool {
+        self.items.contains_key(item)
+    }
     pub fn get(&self, item: &Item) -> u32 {
         self.items.get(item).copied().unwrap_or_default()
     }
@@ -81,12 +84,12 @@ impl Inventory {
 
     pub fn max_health(&self, difficulty: Difficulty) -> f32 {
         let mut health = (self.get(&Item::Resource(Resource::HealthFragment)) * 5) as f32;
-        if difficulty >= logical_difficulty::VITALITY && self.has(&Item::Shard(Shard::Vitality), 1) { health += 10.0; }
+        if difficulty >= logical_difficulty::VITALITY && self.has_any(&Item::Shard(Shard::Vitality)) { health += 10.0; }
         health
     }
     pub fn max_energy(&self, difficulty: Difficulty) -> f32 {
         let mut energy = self.get(&Item::Resource(Resource::EnergyFragment)) as f32 * 0.5;
-        if difficulty >= logical_difficulty::ENERGY_SHARD && self.has(&Item::Shard(Shard::Energy), 1) { energy += 1.0; }
+        if difficulty >= logical_difficulty::ENERGY_SHARD && self.has_any(&Item::Shard(Shard::Energy)) { energy += 1.0; }
         energy
     }
     pub fn max_orbs(&self, difficulty: Difficulty) -> Orbs {
@@ -109,19 +112,19 @@ impl Inventory {
         let mut damage_mod = 1.0;
 
         if settings.difficulty >= logical_difficulty::DAMAGE_BUFFS {
-            if self.has(&Item::Skill(Skill::GladesAncestralLight), 1) { damage_mod += 0.25; }
-            if self.has(&Item::Skill(Skill::InkwaterAncestralLight), 1) { damage_mod += 0.25; }
+            if self.has_any(&Item::Skill(Skill::GladesAncestralLight)) { damage_mod += 0.25; }
+            if self.has_any(&Item::Skill(Skill::InkwaterAncestralLight)) { damage_mod += 0.25; }
 
             let mut slots = self.get(&Item::Resource(Resource::ShardSlot));
             let mut splinter = false;
 
-            if flying_target && slots > 0 && self.has(&Item::Shard(Shard::Wingclip), 1) { damage_mod += 1.0; slots -= 1; }
-            if slots > 0 && bow && self.has(&Item::Shard(Shard::Splinter), 1) { splinter = true; slots -= 1; }
-            if slots > 0 && self.has(&Item::Shard(Shard::SpiritSurge), 1) { damage_mod += (self.get(&Item::SpiritLight(1)) / 10000) as f32; slots -= 1; }
-            if slots > 0 && self.has(&Item::Shard(Shard::LastStand), 1) { damage_mod += 0.2; slots -= 1; }
-            if slots > 0 && self.has(&Item::Shard(Shard::Reckless), 1) { damage_mod += 0.15; slots -= 1; }
-            if slots > 0 && self.has(&Item::Shard(Shard::Lifeforce), 1) { damage_mod += 0.1; slots -= 1; }
-            if slots > 0 && self.has(&Item::Shard(Shard::Finesse), 1) { damage_mod += 0.05; }
+            if flying_target && slots > 0 && self.has_any(&Item::Shard(Shard::Wingclip)) { damage_mod += 1.0; slots -= 1; }
+            if slots > 0 && bow && self.has_any(&Item::Shard(Shard::Splinter)) { splinter = true; slots -= 1; }
+            if slots > 0 && self.has_any(&Item::Shard(Shard::SpiritSurge)) { damage_mod += (self.get(&Item::SpiritLight(1)) / 10000) as f32; slots -= 1; }
+            if slots > 0 && self.has_any(&Item::Shard(Shard::LastStand)) { damage_mod += 0.2; slots -= 1; }
+            if slots > 0 && self.has_any(&Item::Shard(Shard::Reckless)) { damage_mod += 0.15; slots -= 1; }
+            if slots > 0 && self.has_any(&Item::Shard(Shard::Lifeforce)) { damage_mod += 0.1; slots -= 1; }
+            if slots > 0 && self.has_any(&Item::Shard(Shard::Finesse)) { damage_mod += 0.05; }
             if splinter { damage_mod *= 1.5; }  // Splinter stacks multiplicatively where other buffs stack additively
         }
 
@@ -130,11 +133,11 @@ impl Inventory {
     pub fn energy_mod(&self, settings: &WorldSettings) -> f32 {
         let mut energy_mod = 1.0;
         if settings.difficulty < Difficulty::Unsafe { energy_mod *= 2.0; }
-        else if self.has(&Item::Shard(Shard::Overcharge), 1) { energy_mod *= 0.5; }
+        else if self.has_any(&Item::Shard(Shard::Overcharge)) { energy_mod *= 0.5; }
         energy_mod
     }
     pub fn defense_mod(&self, settings: &WorldSettings) -> f32 {
-        let mut defense_mod = if settings.difficulty >= logical_difficulty::RESILIENCE && self.has(&Item::Shard(Shard::Resilience), 1) { 0.9 } else { 1.0 };
+        let mut defense_mod = if settings.difficulty >= logical_difficulty::RESILIENCE && self.has_any(&Item::Shard(Shard::Resilience)) { 0.9 } else { 1.0 };
         if settings.hard { defense_mod *= 2.0; }
         defense_mod
     }
@@ -191,7 +194,7 @@ impl Inventory {
     where F: FnOnce(Difficulty) -> SmallVec<[Skill; N]>
     {
         let mut weapons = weapons_fn(settings.difficulty);
-        weapons.retain(|weapon| self.has(&Item::Skill(*weapon), 1));
+        weapons.retain(|weapon| self.has_any(&Item::Skill(*weapon)));
         weapons
     }
     // TODO would it be worth to precompile the resulting slices for all variants?
@@ -212,7 +215,7 @@ impl Inventory {
         // TODO check whether creating this map is even worth it
         let dpe_map = weapons.iter().map(|weapon| (*weapon, (weapon.damage_per_energy(settings) * 10.0) as u16)).collect::<FxHashMap<Skill, u16>>();
         weapons.sort_unstable_by_key(|weapon| dpe_map[weapon]);
-        if let Some((index, weapon)) = weapons.iter().enumerate().find(|(_, weapon)| self.has(&Item::Skill(**weapon), 1)) {
+        if let Some((index, weapon)) = weapons.iter().enumerate().find(|(_, weapon)| self.has_any(&Item::Skill(**weapon))) {
             let dpe = dpe_map[weapon];
             weapons.truncate(index + 1);
             // maybe there are multiple weapons costing the same and we already skipped over a redundant one

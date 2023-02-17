@@ -20,14 +20,14 @@ impl Requirement {
             Requirement::Trick(trick) =>
                 if player.settings.tricks.contains(trick) { return orb_variants }
             Requirement::Skill(skill) =>
-                if player.inventory.has(&Item::Skill(*skill), 1) { return orb_variants },
+                if player.inventory.has_any(&Item::Skill(*skill)) { return orb_variants },
             Requirement::EnergySkill(skill, amount) =>
-                if player.inventory.has(&Item::Skill(*skill), 1) {
+                if player.inventory.has_any(&Item::Skill(*skill)) {
                     let cost = player.use_cost(*skill) * *amount;
                     return cost_is_met(cost, player, orb_variants, true);
                 }
             Requirement::NonConsumingEnergySkill(skill) =>
-                if player.inventory.has(&Item::Skill(*skill), 1) {
+                if player.inventory.has_any(&Item::Skill(*skill)) {
                     let cost = player.use_cost(*skill);
                     return cost_is_met(cost, player, orb_variants, false);
                 }
@@ -36,11 +36,11 @@ impl Requirement {
             Requirement::Resource(resource, amount) =>
                 if player.inventory.has(&Item::Resource(*resource), *amount) { return orb_variants },
             Requirement::Shard(shard) =>
-                if player.inventory.has(&Item::Shard(*shard), 1) { return orb_variants },
+                if player.inventory.has_any(&Item::Shard(*shard)) { return orb_variants },
             Requirement::Teleporter(teleporter) =>
-                if player.inventory.has(&Item::Teleporter(*teleporter), 1) { return orb_variants },
+                if player.inventory.has_any(&Item::Teleporter(*teleporter)) { return orb_variants },
             Requirement::Water =>
-                if player.inventory.has(&Item::Water, 1) { return orb_variants },
+                if player.inventory.has_any(&Item::Water) { return orb_variants },
             Requirement::State(state) =>
                 if states.contains(state) { return orb_variants },
             Requirement::Damage(amount) => {
@@ -64,17 +64,17 @@ impl Requirement {
                 // Check for movement skills
                 if player.settings.difficulty < Difficulty::Unsafe && enemies.iter().any(|(enemy, _)| {
                     (enemy.aerial() && !(
-                        player.inventory.has(&Item::Skill(Skill::DoubleJump), 1)
-                        || player.inventory.has(&Item::Skill(Skill::Launch), 1)
-                        || player.settings.difficulty >= Difficulty::Gorlek && player.inventory.has(&Item::Skill(Skill::Bash), 1)
+                        player.inventory.has_any(&Item::Skill(Skill::DoubleJump))
+                        || player.inventory.has_any(&Item::Skill(Skill::Launch))
+                        || player.settings.difficulty >= Difficulty::Gorlek && player.inventory.has_any(&Item::Skill(Skill::Bash))
                     ))
                     || (enemy.dangerous() && !(
-                        player.inventory.has(&Item::Skill(Skill::DoubleJump), 1)
-                        || player.inventory.has(&Item::Skill(Skill::Dash), 1)
-                        || player.inventory.has(&Item::Skill(Skill::Bash), 1)
-                        || player.inventory.has(&Item::Skill(Skill::Launch), 1)
+                        player.inventory.has_any(&Item::Skill(Skill::DoubleJump))
+                        || player.inventory.has_any(&Item::Skill(Skill::Dash))
+                        || player.inventory.has_any(&Item::Skill(Skill::Bash))
+                        || player.inventory.has_any(&Item::Skill(Skill::Launch))
                     ))
-                    || (matches!(enemy, Enemy::Bat) && !player.inventory.has(&Item::Skill(Skill::Bash), 1))
+                    || (matches!(enemy, Enemy::Bat) && !player.inventory.has_any(&Item::Skill(Skill::Bash)))
                 }) { return smallvec![] }
 
                 // TODO this might be a try block once that's stable
@@ -98,7 +98,7 @@ impl Requirement {
                                 continue;
                             },
                             Enemy::Sandworm => {
-                                if player.inventory.has(&Item::Skill(Skill::Burrow), 1) { continue }
+                                if player.inventory.has_any(&Item::Skill(Skill::Burrow)) { continue }
                                 else if player.settings.difficulty < Difficulty::Unsafe { return None }
                             },
                             _ => {},
@@ -119,13 +119,13 @@ impl Requirement {
                 return combat_is_met().unwrap_or_else(|| smallvec![]);
             },
             Requirement::ShurikenBreak(health) =>
-                if player.inventory.has(&Item::Skill(Skill::Shuriken), 1) {
+                if player.inventory.has_any(&Item::Skill(Skill::Shuriken)) {
                     let clip_mod = if player.settings.difficulty >= Difficulty::Unsafe { 2.0 } else { 3.0 };
                     let cost = player.destroy_cost_with(*health, Skill::Shuriken, false) * clip_mod;
                     return cost_is_met(cost, player, orb_variants, true);
                 },
             Requirement::SentryBreak(health) =>
-                if player.inventory.has(&Item::Skill(Skill::Sentry), 1) {
+                if player.inventory.has_any(&Item::Skill(Skill::Sentry)) {
                     let clip_mod = 6.25;
                     let cost = player.destroy_cost_with(*health, Skill::Sentry, false) * clip_mod;
                     return cost_is_met(cost, player, orb_variants, true);
@@ -164,8 +164,8 @@ fn cost_is_met(cost: f32, player: &Player, mut orb_variants: OrbVariants, consum
     let mut added_orb_variants = vec![];
 
     fn orbs_meet_cost(orbs: &mut Orbs, added_orb_variants: &mut Vec<Orbs>, cost: f32, player: &Player, consuming: bool) -> bool {
-        let has_life_pact = player.settings.difficulty >= logical_difficulty::LIFE_PACT && player.inventory.has(&Item::Shard(Shard::LifePact), 1);
-        if has_life_pact && consuming && player.inventory.has(&Item::Skill(Skill::Regenerate), 1) {
+        let has_life_pact = player.settings.difficulty >= logical_difficulty::LIFE_PACT && player.inventory.has_any(&Item::Shard(Shard::LifePact));
+        if has_life_pact && consuming && player.inventory.has_any(&Item::Skill(Skill::Regenerate)) {
             // Health is worth more than Energy with Life Pact and if we wait too long we might be unable to Regenerate later
             let game_thinks_regen_cost = Skill::Regenerate.energy_cost();
             let regen_cost = player.use_cost(Skill::Regenerate);
@@ -211,7 +211,7 @@ fn cost_is_met(cost: f32, player: &Player, mut orb_variants: OrbVariants, consum
 fn health_is_met(cost: f32, player: &Player, mut orb_variants: OrbVariants, consuming: bool) -> OrbVariants {
     orb_variants.retain(|orbs| {
         let met = orbs.health > cost
-        || (player.inventory.has(&Item::Skill(Skill::Regenerate), 1) && player.max_health() > cost && regenerate_as_needed(cost, player, orbs));
+        || (player.inventory.has_any(&Item::Skill(Skill::Regenerate)) && player.max_health() > cost && regenerate_as_needed(cost, player, orbs));
         if consuming { orbs.health -= cost }
         met
     });

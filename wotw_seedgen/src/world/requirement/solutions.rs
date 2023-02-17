@@ -167,7 +167,7 @@ fn call_for_alternatives<T, F>(total_solutions: &mut Vec<TaggedSolution>, soluti
 where F: Fn(&mut Vec<TaggedSolution>, Vec<usize>, T)
 {
     if player.settings.difficulty >= tag.difficulty() {
-        if player.inventory.has(&tag.item(), 1) {
+        if player.inventory.has_any(&tag.item()) {
             f(total_solutions, solutions, value_when_using);
         } else {
             let (using, not_using) = duplicate_solutions(total_solutions, solutions, tag);
@@ -204,7 +204,7 @@ fn require_missing(solutions: &mut [TaggedSolution], item: Item, amount: u32) {
     });
 }
 fn require_any_of<I: IntoIterator<Item = Item> + AsRef<[Item]>>(solutions: &mut Vec<TaggedSolution>, items: I, player: &Player) {
-    if !items.as_ref().iter().any(|item| player.inventory.has(item, 1)) {
+    if !items.as_ref().iter().any(|item| player.inventory.has_any(item)) {
         alternate_solutions(solutions, items, |solutions, item| require(solutions, item));
     }
 }
@@ -513,7 +513,7 @@ fn needed_for_combat(solutions: &mut Vec<TaggedSolution>, player: &Player, enemi
         player.shield_progression_weapons()
     } else { smallvec![Skill::Spear] };
     let use_burrow: SmallVec<[_; 2]> = if burrow {
-        if player.settings.difficulty < Difficulty::Unsafe || player.inventory.has(&Item::Skill(Skill::Burrow), 1) {
+        if player.settings.difficulty < Difficulty::Unsafe || player.inventory.has_any(&Item::Skill(Skill::Burrow)) {
             smallvec![true]
         } else {
             smallvec![true, false]

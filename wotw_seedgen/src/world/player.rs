@@ -121,7 +121,7 @@ impl Player<'_> {
         // (but they do refill energy from the Energy shard...)
         let max_energy = self.max_energy();
 
-        if self.settings.difficulty >= logical_difficulty::OVERFLOW && self.inventory.has(&Item::Shard(Shard::Overflow), 1) {
+        if self.settings.difficulty >= logical_difficulty::OVERFLOW && self.inventory.has_any(&Item::Shard(Shard::Overflow)) {
             if orbs.health > max_health {
                 orbs.energy += orbs.health - max_health;
             } else if orbs.energy > max_energy {
@@ -269,9 +269,9 @@ mod tests {
         let mut player = Player::new(&world_settings);
         player.inventory.grant(Item::BonusItem(BonusItem::Relic), 2);
         player.inventory.grant(Item::Skill(Skill::Shuriken), 1);
-        assert!(player.inventory.has(&Item::BonusItem(BonusItem::Relic), 1));
+        assert!(player.inventory.has_any(&Item::BonusItem(BonusItem::Relic)));
         assert!(player.inventory.has(&Item::BonusItem(BonusItem::Relic), 2));
-        assert!(player.inventory.has(&Item::Skill(Skill::Shuriken), 1));
+        assert!(player.inventory.has_any(&Item::Skill(Skill::Shuriken)));
         assert!(!player.inventory.has(&Item::Skill(Skill::Bash), 0));
     }
 
