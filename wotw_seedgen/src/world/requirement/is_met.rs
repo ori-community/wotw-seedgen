@@ -104,11 +104,14 @@ impl Requirement {
                             _ => {},
                         }
 
-                        if enemy.shielded() {
-                            cost += player.use_cost(shield_weapon?) * amount;  // TODO grenade also burns
-                        }
                         let mut health = enemy.health();
-                        if enemy.armored() && player.settings.difficulty < Difficulty::Unsafe { health *= 2.0 };
+
+                        if enemy.shielded() {
+                            let shield_weapon = shield_weapon?;
+                            cost += player.use_cost(shield_weapon) * amount;
+                            health = (health - shield_weapon.burn_damage()).max(0.0);
+                        } else if enemy.armored() && player.settings.difficulty < Difficulty::Unsafe { health *= 2.0 };  // No enemy is shielded and armored
+
                         let cost_function = if enemy.ranged() && player.settings.difficulty < Difficulty::Unsafe { Player::destroy_cost_ranged } else { Player::destroy_cost::<false> };
                         cost += cost_function(player, health, enemy.flying())? * amount;
                     }

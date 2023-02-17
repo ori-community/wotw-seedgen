@@ -552,11 +552,12 @@ fn needed_for_combat(solutions: &mut Vec<TaggedSolution>, player: &Player, enemi
                 _ => {},
             }
 
+            let mut health = enemy.health();
+
             if enemy.shielded() {
                 cost += shield_weapon.energy_cost() * amount;
-            }
-            let mut health = enemy.health();
-            if enemy.armored() && player.settings.difficulty < Difficulty::Unsafe { health *= 2.0 };
+                health = (health - shield_weapon.burn_damage()).max(0.0);
+            } else if enemy.armored() && player.settings.difficulty < Difficulty::Unsafe { health *= 2.0 };  // No enemy is shielded and armored
 
             let used_weapon = if enemy.ranged() && player.settings.difficulty < Difficulty::Unsafe { ranged_weapon } else { weapon };
 
