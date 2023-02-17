@@ -4,12 +4,29 @@
 /// Interactively displays useful hints on niche randomizer knowledge while playing the seed
 !!include update_loop
 
-9|150|4|24|127|-4306|183|-4268|4|17|18793|25789|0|4|17|6|1014|0|8|9|129|bool|true  // Mouldwood Entrance
-9|129|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe moki will only open the entrance once you find $[2|14].
-9|150|4|24|-527|-4033|-461|-4018|4|17|28895|29098|0|4|17|6|1118|0|8|9|130|bool|true  // Baur the Bear
-9|130|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe bear will only wake if you use $[2|118].
-9|150|4|24|-44|-4449|-32|-4439|4|17|6|1102|0|4|17|6|1101|0|4|17|6|1104|0|8|9|131|bool|true  // Dash Tree Platform
-9|131|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe semisolid platform will remain solid until you find $[2|102], $[2|101] or $[2|104].
+// This is our repetition breaker; we want to display some messages every time the player enters a hitbox, but of course not every frame while they are inside it
+9|150|8|9|100|bool|false
+
+// Mouldwood Entrance
+9|150|4|24|127|-4306|183|-4268|8|9|0|int|1|skip=1
+9|150|4|24|127|-4306|183|-4268|4|17|18793|25789|0|4|17|6|1014|0|8|9|129|bool|true
+9|150|4|24|127|-4306|183|-4268|8|9|100|bool|true
+9|129|4|17|9|0|1|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe moki will only open the entrance once you find $[2|14].
+// Baur the Bear
+9|150|4|24|-527|-4033|-461|-4018|8|9|0|int|2|skip=1
+9|150|4|24|-527|-4033|-461|-4018|4|17|28895|29098|0|4|17|6|1118|0|8|9|129|bool|true
+9|150|4|24|-527|-4033|-461|-4018|8|9|100|bool|true
+9|129|4|17|9|0|2|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe bear will only wake if you use $[2|118].
+// Dash Tree Platform
+9|150|4|24|-44|-4449|-32|-4439|8|9|0|int|3|skip=1
+9|150|4|24|-44|-4449|-32|-4439|4|17|6|1102|0|4|17|6|1101|0|4|17|6|1104|0|8|9|129|bool|true
+9|150|4|24|-44|-4449|-32|-4439|8|9|100|bool|true
+9|129|4|17|9|0|3|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe semisolid platform will remain solid until you find $[2|102], $[2|101] or $[2|104].
+
+// Reset if the player exited the hitbox
+9|150|4|17|9|100|0|8|9|129|bool|false
+9|150|8|9|0|int|0
+
 15|200|4|26|5|8|9|20|int|1  // Regenerate in late areas
 9|150|4|17|9|20|1|8|9|20|int|2  // One frame delay to wait for spawn items
 9|20=2|4|17|6|1077|0|8|9|132|bool|true
