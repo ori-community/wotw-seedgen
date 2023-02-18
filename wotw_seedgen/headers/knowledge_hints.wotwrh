@@ -27,51 +27,63 @@
 9|150|4|17|9|100|0|8|9|129|bool|false
 9|150|8|9|0|int|0
 
-15|200|4|26|5|8|9|20|int|1  // Regenerate in late areas
+// Regenerate in late areas
+9|150|8|9|100|bool|false
+9|150|4|24|-486|-3773|-476|-3763|8|9|100|bool|true  // Ori touches Reach briefly after falling from the Wellspring escape
+15|200|4|26|5|4|27|13|4|17|9|100|0|8|9|20|int|1
 9|150|4|17|9|20|1|8|9|20|int|2  // One frame delay to wait for spawn items
 9|20=2|4|17|6|1077|0|8|9|132|bool|true
 9|132|6|instant|noclear|p=-2|f=300|#Motay's Note#\nIn Moki and Gorlek, entering zones after #The Wellspring# won't be required until you find $[2|77].
-28895|54235|8|9|21|int|1  // Flap for Reach TP
+// Flap for Reach TP
+28895|54235|8|9|21|int|1
 9|150|4|17|9|21|1|8|9|21|int|2
 9|21=2|4|17|6|1118|0|8|9|100|bool|false
 9|21=2|4|17|6|1118|0|4|24|-284|-3971|-223|-3945|8|9|100|bool|true  // Ignore on map activations
 9|21=2|4|17|6|1118|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|4] won't be required until you find $[2|118].
-18793|38871|8|9|22|int|1  // Glide for Mouldwood TP
+// Glide for Mouldwood TP
+18793|38871|8|9|22|int|1
 9|150|4|17|9|22|1|8|9|22|int|2
 9|22=2|4|17|6|1014|0|8|9|100|bool|false
 9|22=2|4|17|6|1014|0|4|24|499|-4381|561|-4335|8|9|100|bool|true
 9|22=2|4|17|6|1014|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|6] won't be required until you find $[2|14].
-945|58183|8|9|23|int|1  // Water for East Luma TP
+// Water for East Luma TP
+945|58183|8|9|23|int|1
 9|150|4|17|9|23|1|8|9|23|int|2
 9|23=2|4|17|6|2000|0|8|9|100|bool|false
 9|23=2|4|17|6|2000|0|4|24|-1334|-4160|-1280|-4121|8|9|100|bool|true
 9|23=2|4|17|6|2000|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|2] won't be required until you find $[9|0].
-945|1370|8|9|24|int|1  // Water for West Luma TP
+// Water for West Luma TP
+945|1370|8|9|24|int|1
 9|150|4|17|9|24|1|8|9|24|int|2
 9|24=2|4|17|6|2000|0|8|9|100|bool|false
 9|24=2|4|17|6|2000|0|4|24|-1677|-4175|-1625|-4156|8|9|100|bool|true
 9|24=2|4|17|6|2000|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|13] won't be required until you find $[9|0].
-20120|49994|8|9|25|int|1  // Burrow for East Wastes TP
+// Burrow for East Wastes TP
+20120|49994|8|9|25|int|1
 9|150|4|17|9|25|1|8|9|25|int|2
 9|25=2|4|17|6|1101|0|8|9|100|bool|false
 9|25=2|4|17|6|1101|0|4|24|1946|-3910|2018|-3857|8|9|100|bool|true
 9|25=2|4|17|6|1101|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|10] won't be required until you find $[2|101].
-20120|41398|8|9|26|int|1  // Burrow for Outer Ruins TP
+// Burrow for Outer Ruins TP
+20120|41398|8|9|26|int|1
 9|150|4|17|9|26|1|8|9|26|int|2
 9|26=2|4|17|6|1101|0|8|9|100|bool|false
 9|26=2|4|17|6|1101|0|4|24|2013|-3690|2067|-3658|8|9|100|bool|true
 9|26=2|4|17|6|1101|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|11] won't be required until you find $[2|101].
-10289|4928|8|9|27|int|1  // Burrow for Inner Ruins TP
+// Burrow for Inner Ruins TP
+10289|4928|8|9|27|int|1
 9|150|4|17|9|27|1|8|9|27|int|2
 9|27=2|4|17|6|1101|0|8|9|100|bool|false
 9|27=2|4|17|6|1101|0|4|24|2106|-4001|2142|-3972|8|9|100|bool|true
 9|27=2|4|17|6|1101|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|14] won't be required until you find $[2|101] and the four Wisps.
-16155|41465|8|9|28|int|1  // Burrow for Willow's End TP
+// Burrow for Willow's End TP
+16155|41465|8|9|28|int|1
 9|150|4|17|9|28|1|8|9|28|int|2
 9|28=2|4|17|6|1101|0|8|9|100|bool|false
 9|28=2|4|17|6|1101|0|4|24|400|3870|447|-3847|8|9|100|bool|true
 9|28=2|4|17|6|1101|0|4|17|9|100|0|6|instant|noclear|p=-2|f=300|#Motay's Note#\nUsing the $[5|12] won't be required until you find $[2|101].
-24922|42531|8|9|29|int|1  // Bash for Midnight Burrows TP
+// Bash for Midnight Burrows TP
+24922|42531|8|9|29|int|1
 9|150|4|17|9|29|1|8|9|29|int|2
 9|29=2|4|17|6|1000|0|8|9|100|bool|false
 9|29=2|4|17|6|1000|0|4|24|-960|-4586|-931|-4564|8|9|100|bool|true
