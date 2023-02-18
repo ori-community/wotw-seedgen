@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Moki",
-    "description": "Default game paths and always spawn with sword, best choice for beginners",
+    "description": "Default game paths and always spawn with sword, best choice for beginners. Quests are disabled",
     "group": "Base"
   },
   "includes": [
@@ -11,6 +11,7 @@
   "headers": [
     "knowledge_hints",
     "shrine_hints",
+    "no_quests",
     "no_trials",
     "teleporters",
     "fragment_overflow",
@@ -20,12 +21,5 @@
     "spawn_with_sword",
     "vanilla_opher_upgrades",
     "no_rain"
-  ],
-  "headerConfig": [
-    {
-      "headerName": "zone_hints",
-      "configName": "tp_hints",
-      "configValue": "true"
-    }
   ]
 }

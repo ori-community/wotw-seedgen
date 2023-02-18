@@ -19,12 +19,5 @@
     "zone_hints",
     "vanilla_opher_upgrades",
     "no_rain"
-  ],
-  "headerConfig": [
-    {
-      "headerName": "zone_hints",
-      "configName": "tp_hints",
-      "configValue": "true"
-    }
   ]
 }
