@@ -22,6 +22,11 @@
 9|150|4|24|-44|-4449|-32|-4439|4|17|6|1102|0|4|17|6|1101|0|4|17|6|1104|0|8|9|129|bool|true
 9|150|4|24|-44|-4449|-32|-4439|8|9|100|bool|true
 9|129|4|17|9|0|3|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe semisolid platform will remain solid until you find $[2|102], $[2|101] or $[2|104].
+// Voice Door
+9|150|4|24|-98|-4245|-60|-4205|8|9|0|int|4|skip=1
+9|150|4|24|-98|-4245|-60|-4205|4|17|6|1102|0|4|17|6|1101|0|4|17|6|1104|0|8|9|129|bool|true
+9|150|4|24|-98|-4245|-60|-4205|8|9|100|bool|true
+9|129|4|17|9|0|4|6|instant|noclear|p=-2|f=300|#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok.
 
 // Reset if the player exited the hitbox
 9|150|4|17|9|100|0|8|9|129|bool|false
