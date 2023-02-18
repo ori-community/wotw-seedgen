@@ -8191,7 +8191,7 @@ anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four key
   #     Outgoing anchor connections may only connect to frozen variants, unless they light the furnace, in which case they may connect to thawed variants.
   # - Thawed Variant ("UpperReach.[name]Thawed):
   #     Paths to this anchor have to use the thawed furnace state! Outgoing connections cannot use the frozen furnace state.
-  #     Outgoing anchor connections may only connect to frozen variants
+  #     Outgoing anchor connections may only connect to thawed variants
   # This would however create countless redundancies, which is why additionally there's a counterpart for each variant:
   # These counterparts may not connect to any other anchors that have variants dependant on the same furnace, unless explicitely to connect into another furnace state.
   # - Main Paths ("UpperReach.[name]Paths"):
