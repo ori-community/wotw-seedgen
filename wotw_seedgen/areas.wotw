@@ -8840,10 +8840,12 @@ anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone
       Grapple, Hammer OR Sentry=2
       DoubleJump, Sentry=2 OR Shuriken
   conn UpperDepths.BelowHive:  # LightPuzzle spawns another bat above the spikes
-    moki, UpperDepths.EntryKeystoneDoor, UpperDepths.LightPuzzle OR DepthsLight:
-      Launch
-      Bash, DoubleJump OR Dash OR Glide
-      Combat=2xBat, DoubleJump OR Dash  # Combat=Bat expects a ranged weapon
+    moki, UpperDepths.EntryKeystoneDoor:
+      UpperDepths.LightPuzzle, Bash, Glide
+      UpperDepths.LightPuzzle OR DepthsLight:
+        Launch
+        Bash, DoubleJump OR Dash
+        Combat=2xBat, DoubleJump OR Dash  # Combat=Bat expects a ranged weapon
     gorlek, UpperDepths.EntryKeystoneDoor:
       UpperDepths.LightPuzzle, Bash
       UpperDepths.LightPuzzle OR DepthsLight:
