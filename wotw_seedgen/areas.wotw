@@ -8804,7 +8804,7 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
 # checkpoint at 136, -4425
 # checkpoint at 297, -4376
 
-anchor UpperDepths.KeydoorLedge at 285, -4407:  # In front of the entry keystone door
+anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone door
   refill Checkpoint:
     moki: UpperDepths.EntryKeystoneDoor
 
@@ -8839,21 +8839,22 @@ anchor UpperDepths.KeydoorLedge at 285, -4407:  # In front of the entry keystone
       Dash OR Sword
       Grapple, Hammer OR Sentry=2
       DoubleJump, Sentry=2 OR Shuriken
-  conn UpperDepths.BelowHive:
+  conn UpperDepths.BelowHive:  # LightPuzzle spawns another bat above the spikes
     moki, UpperDepths.EntryKeystoneDoor, UpperDepths.LightPuzzle OR DepthsLight:
-      Bash, DoubleJump, Grapple
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
       Launch
+      Bash, DoubleJump OR Dash OR Glide
+      Combat=2xBat, DoubleJump OR Dash  # Combat=Bat expects a ranged weapon
     gorlek, UpperDepths.EntryKeystoneDoor:
+      UpperDepths.LightPuzzle, Bash
       UpperDepths.LightPuzzle OR DepthsLight:
-        DoubleJump, Grapple
-        Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grapple
-        Launch
-    kii, UpperDepths.EntryKeystoneDoor:
-      UpperDepths.LightPuzzle OR DepthsLight:
-        Sentry=1 OR Shuriken=1 OR Sword OR Hammer OR Glide OR DoubleJump OR Damage=30
-      Flash=1 # if flash is your lightsource as well you need to turn it off and then turn it on again during your jump
-
+        Damage=30
+        Combat=Bat, DoubleJump OR Dash OR Glide OR Sword  # Combat=Bat expects a ranged weapon
+    kii, UpperDepths.EntryKeystoneDoor, UpperDepths.LightPuzzle OR DepthsLight:
+      Combat=Bat, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, UpperDepths.EntryKeystoneDoor:
+      Bash  # https://youtu.be/6lg7Yl-ehX8
+      Damage=10, UpperDepths.LightPuzzle OR DepthsLight  # dboost on a bat's projectile 
+      
 anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the entry keydoor, going towards the keystone
   refill Checkpoint
 
