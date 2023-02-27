@@ -561,7 +561,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Launch, PauseHover  # use pause floats for horizontal movement and Launch for vertical movement
       GrenadeJump, DoubleJump, TripleJump OR Bash
 
-anchor MarshSpawn.BurrowsEntry at -931, -4494:  # At the bells puzzle
+anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
   refill Checkpoint
 
   state MarshSpawn.BurrowsOpen:
