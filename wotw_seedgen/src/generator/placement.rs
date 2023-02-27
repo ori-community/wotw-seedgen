@@ -1251,7 +1251,7 @@ fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node],
             ).collect::<Vec<_>>();
         if !unreachable_locations.is_empty() {
             let identifiers = unreachable_locations.iter().map(|&node| node.identifier()).collect::<Vec<_>>();
-            if !(unreachable_locations.len() == 1 && world.player.settings.difficulty == Difficulty::Moki) {  // moki always has one unreachable pickup
+            if !(unreachable_locations.len() == 2 && world.player.settings.difficulty == Difficulty::Moki) {  // moki always has two unreachable pickups
                 log::warn!("(World {}): {} locations are unreachable on these settings! These will only hold Spirit Light.", world_index, identifiers.len());
             }
             log::trace!("(World {}): Unreachable locations on these settings: {}", world_index, format_identifiers(identifiers));

@@ -60,7 +60,7 @@ impl Requirement {
                 if let Some(cost) = player.destroy_cost::<false>(*health, false) {
                     return cost_is_met(cost, player, orb_variants, true);
                 }
-            Requirement::Combat(enemies) => {
+            Requirement::Combat(enemies) => {  // TODO handle nests better
                 // Check for movement skills
                 if player.settings.difficulty < Difficulty::Unsafe && enemies.iter().any(|(enemy, _)| {
                     (enemy.aerial() && !(
