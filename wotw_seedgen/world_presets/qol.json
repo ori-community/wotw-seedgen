@@ -5,10 +5,11 @@
   },
   "headers": [
     "progress_helper",
-    "no_cutscenes",
+    "spawn_tuley",
+    "better_stomp",
     "autoplants",
     "no_branch",
-    "tp_refill",
-    "spawn_tuley"
+    "no_cutscenes",
+    "tp_refill"
   ]
 }

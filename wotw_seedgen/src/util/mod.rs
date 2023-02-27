@@ -3,7 +3,7 @@ pub mod constants;
 pub mod icon;
 pub(crate) mod extensions;
 
-pub use orbs::Orbs;
+pub use orbs::{Orbs, OrbVariants};
 pub use icon::{Icon, MapIcon};
 use serde::{Serialize, Deserialize};
 

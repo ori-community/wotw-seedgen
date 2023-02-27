@@ -3,7 +3,7 @@
 ///
 /// Lupo's maps give information about the number of skills in the current zone. Lupo in Glades sells the hints for Woods and Glades.
 //// Show teleporter amounts in addition to skill amounts
-!!parameter tp_hints bool:false
+!!parameter tp_hints bool:true
 !!include progress_helper
 
 9|999=0|4|17|48248|18767|1|6|Marsh Skills - $HOWMANY(0, 2\|(\d{1,2}|1[0-1]\d)|9\|0)

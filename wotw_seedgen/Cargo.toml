@@ -1,10 +1,10 @@
 [package]
 name = "wotw_seedgen"
 description = "Seed Generator for the Ori and the Will of the Wisps Randomizer"
-version = "0.1.1"
+version = "0.3.0"
 authors = ["Sirius Ashling <siriusashling@gmail.com>", "Rikhardur Bjarni Einarsson <badulf96@gmail.com>"]
 edition = "2021"
-repository = "https://github.com/ori-rando/wotw-seedgen"
+repository = "https://github.com/ori-community/wotw-seedgen"
 license = "MIT"
 
 [features]
@@ -20,10 +20,11 @@ rand = { version = "0.8.3", features = ["std_rng", "alloc"] }
 rand_seeder = "0.2.2"
 log = "0.4"
 ansi_term = "0.12.1"
-smallvec = "1.6.1"
+smallvec = { version = "1.6.1", features = ["const_generics"] }
 regex = "1"
 num_enum = "0.5"
 decorum = "0.3"
+partition = "0.1"
 
 [dev-dependencies]
 criterion = "0.3"

@@ -4,7 +4,7 @@ use super::{parser::{self, Areas, AreaContent}, locations::Location, states::Nam
 
 use crate::{world::{
     graph::{self, Graph, Node},
-    requirements::Requirement,
+    requirement::Requirement,
 }, settings::{UniverseSettings, Difficulty, Trick}, util::NodeKind};
 use crate::item::Skill;
 
@@ -189,8 +189,10 @@ fn build_requirement_group<'a>(group: &parser::Group<'a>, region: bool, context:
             let ors = line.ors.iter().map(|or| build_requirement(or, region, context)).collect::<Vec<_>>();
             parts.push(build_or(ors));
         }
-        if let Some(subgroup) = &line.group {
-            parts.push(build_requirement_group(subgroup, region, context));
+        if !parts.iter().any(|requirement| matches!(requirement, Requirement::Impossible)) {
+            if let Some(subgroup) = &line.group {
+                parts.push(build_requirement_group(subgroup, region, context));
+            }
         }
         build_and(parts)
     }).collect::<Vec<_>>();
@@ -275,7 +277,7 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedStat
     }
     for identifier in states {
         log::trace!("Couldn't find an entry for {} in the state table", identifier);
-        add_entry(&mut node_map, &identifier, index)?;
+        add_entry(&mut node_map, identifier, index)?;
         let node = Node::State(graph::State {
             identifier: identifier.to_string(),
             index,

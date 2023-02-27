@@ -35,13 +35,13 @@ use crate::{settings::{Trick, Difficulty, Spawn, CreateGame, HeaderConfig, Inlin
 /// # use wotw_seedgen::preset::UniversePreset;
 /// use wotw_seedgen::settings::UniverseSettings;
 /// use wotw_seedgen::settings::Spawn;
-/// use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
+/// use wotw_seedgen::files::NO_FILE_ACCESS;
 ///
 /// let mut universe_settings = UniverseSettings::default();
 ///
 /// let preset = UniversePreset::parse("{\"worldSettings\":[{\"spawn\":\"Random\"}]}").unwrap();
 ///
-/// universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS);
+/// universe_settings.apply_preset(preset, &NO_FILE_ACCESS);
 /// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
@@ -124,13 +124,13 @@ impl UniversePreset {
 /// # use wotw_seedgen::preset::WorldPreset;
 /// use wotw_seedgen::settings::WorldSettings;
 /// use wotw_seedgen::settings::Spawn;
-/// use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
+/// use wotw_seedgen::files::NO_FILE_ACCESS;
 /// 
 /// let mut world_settings = WorldSettings::default();
 /// 
 /// let world_preset = WorldPreset::parse("{\"spawn\":\"Random\"}").unwrap();
 /// 
-/// world_settings.apply_world_preset(world_preset, &FILE_SYSTEM_ACCESS);
+/// world_settings.apply_world_preset(world_preset, &NO_FILE_ACCESS);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]

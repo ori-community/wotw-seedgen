@@ -170,6 +170,7 @@ pub(crate) enum Suggestion {
     ShopCommandKind,
     HeaderCommand,
     ParameterType,
+    PickupFlag
 }
 
 fn parse_uber_identifier(parser: &mut Parser) -> Result<UberIdentifier, ParseError> {
@@ -336,6 +337,11 @@ fn parse_timer(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
 fn parse_command(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
     HeaderCommand::parse(parser).map(HeaderContent::Command)
 }
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum PickupFlag {
+    Mute,
+}
 fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderContent, ParseError> {
     let parser = &mut (*context.parser);
 
@@ -345,7 +351,13 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
     let item = VItem::parse(parser)?;
     let skip_validation = context.skip_validation;
 
-    let pickup = VPickup { trigger, item, ignore, skip_validation };
+    let hide_others = if parser.current_token().kind == TokenKind::Separator {
+        parser.next_token();
+        let _: PickupFlag = parse_ident!(parser, Suggestion::PickupFlag)?;
+        true
+    } else { false };
+
+    let pickup = VPickup { trigger, item, ignore, hide_others, skip_validation };
     Ok(HeaderContent::Pickup(pickup))
 }
 
@@ -439,12 +451,12 @@ mod tests {
     fn item_parsing() {
         assert_eq!(Item::from_str("0|5000"), Ok(Item::SpiritLight(5000)));
         assert_eq!(Item::from_str("0|-5000"), Ok(Item::RemoveSpiritLight(5000)));
-        assert_eq!(Item::from_str("1|2"), Ok(Item::Resource(Resource::Ore)));
+        assert_eq!(Item::from_str("1|2"), Ok(Item::Resource(Resource::GorlekOre)));
         assert!(Item::from_str("1|-2").is_err());
         assert!(Item::from_str("1|5").is_err());
         assert_eq!(Item::from_str("2|8"), Ok(Item::Skill(Skill::Launch)));
-        assert_eq!(Item::from_str("2|120"), Ok(Item::Skill(Skill::AncestralLight1)));
-        assert_eq!(Item::from_str("2|121"), Ok(Item::Skill(Skill::AncestralLight2)));
+        assert_eq!(Item::from_str("2|120"), Ok(Item::Skill(Skill::GladesAncestralLight)));
+        assert_eq!(Item::from_str("2|121"), Ok(Item::Skill(Skill::InkwaterAncestralLight)));
         assert!(Item::from_str("2|25").is_err());
         assert!(Item::from_str("2|-9").is_err());
         assert_eq!(Item::from_str("3|28"), Ok(Item::Shard(Shard::LastStand)));

@@ -3,7 +3,7 @@ name = "wotw_seedgen_derive"
 description = "Derive macro utilities used for wotw_seedgen"
 version = "0.1.1"
 edition = "2021"
-repository = "https://github.com/ori-rando/wotw-seedgen"
+repository = "https://github.com/ori-community/wotw-seedgen"
 license = "MIT"
 
 [lib]

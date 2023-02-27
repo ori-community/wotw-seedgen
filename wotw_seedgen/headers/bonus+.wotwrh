@@ -16,6 +16,8 @@ Flags: Bonus+
 !!parameter rapidGrenade int:2
 //// How many Quickshot upgrade to shuffle in
 !!parameter quickshotUpgrade int:2
+//// How many Rapid Regenerate to shuffle in
+!!parameter rapidRegenerate int:1
 //// How many Melting Blaze to shuffle in
 !!parameter meltingBlaze int:1
 //// How many Melting Sword to shuffle in
@@ -28,10 +30,23 @@ Flags: Bonus+
 !!parameter extraGrenade int:1
 //// How many Splinter Grenade to shuffle in
 !!parameter splinterGrenade int:1
+//// How many Unlimited Sentries to shuffle in
+!!parameter unlimitedSentries int:1
+//// How many Sentry Burst Upgrades to shuffle in
+!!parameter sentryBurstUpgrades int:1
+//// How many Sentry Fire Rate Upgrades to shuffle in
+!!parameter sentryFireRateUpgrades int:1
+//// How many Extra Shurikens to shuffle in
+!!parameter extraShurikens int:1
 
-!!add $PARAM(rapidSmashes)x 8|4|50|byte|+1  // Rapid Smashes
-!!add $PARAM(rapidSwords)x 8|4|51|byte|+1   // Rapid Swords
-!!add $PARAM(rapidSpears)x 8|9|12|byte|+1   // Rapid Spears
+!!add $PARAM(rapidSmashes)x 8|4|50|byte|+1       // Rapid Smashes
+!!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
+!!add $PARAM(rapidSpears)x 8|9|12|byte|+1        // Rapid Spears
+
+!!add $PARAM(rapidRegenerate)x 8|4|91|float|+1   // Rapid Regenerates
+!!name 8|4|91|float|+1 #Rapid Regenerate#
+!!display 8|4|91|float|+1 #Rapid Regenerate x$(4|91)#
+!!description 8|4|91|float|+1 Heal faster with Regenerate
 
 // Melting Upgrades
 !!add $PARAM(meltingBlaze)x 8|4|71|bool|true
@@ -70,3 +85,27 @@ Flags: Bonus+
 !!name 8|4|10|float|-0.4 #Quickshot Upgrade#
 !!description 8|4|10|float|-0.4 Bow attacks with Quickshot are faster
 !!icon 8|4|10|float|-0.4 file:assets/icons/bonus/rapidquickshot.png
+
+// Unlimited Sentries
+!!add $PARAM(unlimitedSentries)x 8|4|37|byte|100
+!!name 8|4|37|byte|100 #Unlimited Sentries#
+!!display 8|4|37|byte|100 #Unlimited Sentries#
+!!description 8|4|37|byte|100 Spawn unlimited Sentries
+
+// Sentry Burst Upgrade
+!!add $PARAM(sentryBurstUpgrades)x 8|4|46|byte|+10
+!!name 8|4|46|byte|+10 #Sentry Burst Upgrade#
+!!display 8|4|46|byte|+10 #Sentry Burst Upgrade#
+!!description 8|4|46|byte|+10 Sentry fires more shots per burst
+
+// Sentry Fire Rate Upgrade
+!!add $PARAM(sentryFireRateUpgrades)x 8|4|47|float|+2.5
+!!name 8|4|47|float|+2.5 #Sentry Fire Rate Upgrade#
+!!display 8|4|47|float|+2.5 #Sentry Fire Rate Upgrade#
+!!description 8|4|47|float|+2.5 Sentry fires shots even faster
+
+// Extra Shurikens
+!!add $PARAM(extraShurikens)x 8|4|38|byte|+1
+!!name 8|4|38|byte|+1 #Extra Shuriken#
+!!display 8|4|38|byte|+1 #Extra Shuriken x$(4|38)#
+!!description 8|4|38|byte|+1 Throw multiple Shurikens

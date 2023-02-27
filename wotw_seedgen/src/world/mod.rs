@@ -1,12 +1,12 @@
 pub mod graph;
 pub mod pool;
 pub mod player;
-pub mod requirements;
+pub mod requirement;
 
 pub use graph::Graph;
 pub use pool::Pool;
 pub use player::Player;
-pub use requirements::Requirement;
+pub use requirement::Requirement;
 
 use rustc_hash::FxHashMap;
 
@@ -119,8 +119,8 @@ impl World<'_, '_> {
         if new == old { return false }
         if WISP_STATES.contains(&identifier) {
             log::trace!("Granting player Wisp");
-            self.player.inventory.grant(Item::Resource(Resource::Health), 2);
-            self.player.inventory.grant(Item::Resource(Resource::Energy), 2);
+            self.player.inventory.grant(Item::Resource(Resource::HealthFragment), 2);
+            self.player.inventory.grant(Item::Resource(Resource::EnergyFragment), 2);
         }
 
         let mut preplaced = false;
@@ -189,7 +189,7 @@ mod tests {
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
 
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets);
         let reached: FxHashSet<_> = reached.iter()
             .filter_map(|node| {
                 if node.node_kind() == NodeKind::State { None }
@@ -214,13 +214,13 @@ mod tests {
         let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
         let mut world = World::new_spawn(&graph, &universe_settings.world_settings[0]);
 
-        world.player.inventory.grant(Item::Resource(Resource::Health), 7);
-        world.player.inventory.grant(Item::Resource(Resource::Energy), 6);
+        world.player.inventory.grant(Item::Resource(Resource::HealthFragment), 7);
+        world.player.inventory.grant(Item::Resource(Resource::EnergyFragment), 6);
         world.player.inventory.grant(Item::Skill(Skill::DoubleJump), 1);
         world.player.inventory.grant(Item::Shard(Shard::TripleJump), 1);
 
         let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
-        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets).unwrap();
+        let reached = world.graph.reached_locations(&world.player, spawn, &world.uber_states, &world.sets);
         let reached: FxHashSet<_> = reached.iter().map(|node| node.identifier()).collect();
         assert_eq!(reached, ["GladesTown.UpdraftCeilingEX", "GladesTown.AboveTpEX", "GladesTown.BountyShard", "GladesTown.BelowHoleHutEX"].into_iter().collect());
     }

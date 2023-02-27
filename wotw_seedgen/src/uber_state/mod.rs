@@ -6,7 +6,7 @@ use std::{fmt::{self, Display}, str::FromStr};
 use rustc_hash::FxHashMap;
 use wotw_seedgen_derive::VVariant;
 
-use crate::{header::{CodeDisplay, parser, VResolve}};
+use crate::{header::{CodeDisplay, parser, VResolve, vdisplay}};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum UberType {
@@ -118,6 +118,16 @@ impl UberStateCondition {
         }
     }
 }
+vdisplay! {
+    VUberStateTrigger,
+    impl Display for UberStateTrigger {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            self.identifier.fmt(f)?;
+            if let Some(condition) = &self.condition { condition.fmt(f) }
+            else { Ok(()) }
+        }
+    }
+}
 impl FromStr for UberStateTrigger {
     type Err = String;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
@@ -183,9 +193,12 @@ impl UberStateTrigger {
     }
 }
 
-impl Display for UberStateCondition {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}{}", self.comparator, self.value)
+vdisplay! {
+    VUberStateCondition,
+    impl Display for UberStateCondition {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}{}", self.comparator, self.value)
+        }
     }
 }
 

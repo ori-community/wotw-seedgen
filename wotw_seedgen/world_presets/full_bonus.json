@@ -5,9 +5,9 @@
   },
   "headers": [
     "bonus_items",
-    "bonus+",
+    "jumpgrades",
     "skill_velocity",
-    "jumpgrades"
+    "bonus+"
   ],
   "headerConfig": [
     {

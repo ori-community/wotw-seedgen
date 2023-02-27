@@ -4,6 +4,7 @@ use rustc_hash::FxHashMap;
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard, BonusUpgrade};
 
+// TODO the pool could be an inventory probably
 #[derive(Default, Debug, Clone)]
 pub struct Pool {
     pub inventory: Inventory,
@@ -13,9 +14,9 @@ impl Pool {
     pub fn preset() -> Pool {
         let mut items = FxHashMap::default();
 
-        items.insert(Item::Resource(Resource::Health), 24);
-        items.insert(Item::Resource(Resource::Energy), 24);
-        items.insert(Item::Resource(Resource::Ore), 40);
+        items.insert(Item::Resource(Resource::HealthFragment), 24);
+        items.insert(Item::Resource(Resource::EnergyFragment), 24);
+        items.insert(Item::Resource(Resource::GorlekOre), 40);
         items.insert(Item::Resource(Resource::Keystone), 34);
         items.insert(Item::Resource(Resource::ShardSlot), 5);
         items.insert(Item::Skill(Skill::Bash), 1);
@@ -38,8 +39,8 @@ impl Pool {
         items.insert(Item::Skill(Skill::Blaze), 1);
         items.insert(Item::Skill(Skill::Sentry), 1);
         items.insert(Item::Skill(Skill::Flap), 1);
-        items.insert(Item::Skill(Skill::AncestralLight1), 1);
-        items.insert(Item::Skill(Skill::AncestralLight2), 1);
+        items.insert(Item::Skill(Skill::GladesAncestralLight), 1);
+        items.insert(Item::Skill(Skill::InkwaterAncestralLight), 1);
         items.insert(Item::Water, 1);
         items.insert(Item::Shard(Shard::Overcharge), 1);
         items.insert(Item::Shard(Shard::TripleJump), 1);

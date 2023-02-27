@@ -20,7 +20,7 @@ use wotw_seedgen_derive::VVariant;
 
 use crate::header::{parser, CodeDisplay};
 use crate::header::{VResolve, vdisplay};
-use crate::settings::Difficulty;
+use crate::settings::{Difficulty, logical_difficulty};
 use crate::util::{Zone, Icon, MapIcon};
 use crate::uber_state::UberIdentifier;
 
@@ -104,16 +104,16 @@ impl FromStr for Item {
 }
 impl Item {
     // TODO read from logic file instead
+    // TODO is this worth it?
     #[inline]
     pub fn is_progression(&self, difficulty: Difficulty) -> bool {
         match self {
             Item::Resource(resource) => match resource {
-                Resource::ShardSlot => difficulty >= Difficulty::Unsafe,
-                Resource::Health | Resource::Energy | Resource::Ore | Resource::Keystone => true,
+                Resource::ShardSlot => difficulty >= Difficulty::Unsafe,  // lower difficulties have no issue with the default shards
+                Resource::HealthFragment | Resource::EnergyFragment | Resource::GorlekOre | Resource::Keystone => true,
             },
             Item::Skill(skill) => match skill {
-                Skill::AncestralLight1 | Skill::AncestralLight2 => difficulty >= Difficulty::Unsafe,
-                Skill::Shuriken | Skill::Blaze | Skill::Sentry => difficulty >= Difficulty::Gorlek,
+                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => difficulty >= logical_difficulty::DAMAGE_BUFFS,
                 Skill::Seir | Skill::WallJump => false,
                 Skill::Bash |
                 Skill::DoubleJump |
@@ -131,40 +131,25 @@ impl Item {
                 Skill::Burrow |
                 Skill::Dash |
                 Skill::WaterDash |
+                Skill::Shuriken |
+                Skill::Blaze |
+                Skill::Sentry |
                 Skill::Flap => true,
             },
             Item::Shard(shard) => match shard {
-                Shard::Overcharge |
-                Shard::Wingclip |
-                Shard::Magnet |
-                Shard::Splinter |
-                Shard::Reckless |
-                Shard::LifePact |
-                Shard::LastStand |
-                Shard::UltraBash |
-                Shard::UltraGrapple |
-                Shard::Overflow |
-                Shard::Thorn |
-                Shard::Catalyst |
-                Shard::Sticky |
-                Shard::Finesse |
-                Shard::SpiritSurge |
-                Shard::Lifeforce |
-                Shard::Deflector |
-                Shard::Fracture => difficulty >= Difficulty::Unsafe,
-                Shard::TripleJump |
-                Shard::Resilience |
-                Shard::Vitality |
-                Shard::Energy => difficulty >= Difficulty::Gorlek,
-                Shard::Bounty |
-                Shard::Swap |
-                Shard::Quickshot |
-                Shard::SpiritLightHarvest |
-                Shard::LifeHarvest |
-                Shard::EnergyHarvest |
-                Shard::Sense |
-                Shard::Turmoil |
-                Shard::Arcing => false,
+                Shard::UltraGrapple | Shard::Deflector | Shard::Magnet | Shard::Splinter | Shard::Sticky | Shard::Fracture => true,  // Here logic has to decide the difficulties
+                Shard::TripleJump => difficulty >= logical_difficulty::TRIPLE_JUMP,
+                Shard::Resilience => difficulty >= logical_difficulty::RESILIENCE,
+                Shard::Vitality => difficulty >= logical_difficulty::VITALITY,
+                Shard::Energy => difficulty >= logical_difficulty::ENERGY_SHARD,
+                Shard::Lifeforce | Shard::Finesse | Shard::LastStand | Shard::Reckless | Shard::Wingclip | Shard::SpiritSurge => difficulty >= logical_difficulty::DAMAGE_BUFFS,
+                Shard::LifePact => difficulty >= logical_difficulty::LIFE_PACT,
+                Shard::Overcharge => difficulty >= logical_difficulty::OVERCHARGE,
+                Shard::UltraBash => difficulty >= logical_difficulty::ULTRA_BASH,
+                Shard::Overflow => difficulty >= logical_difficulty::OVERFLOW,
+                Shard::Thorn => difficulty >= logical_difficulty::THORN,
+                Shard::Catalyst => difficulty >= logical_difficulty::CATALYST,
+                _ => false,
             },
             Item::SpiritLight(_) | Item::Teleporter(_) | Item::Water | Item::UberState(_) => true,
             _ => false,
@@ -172,6 +157,7 @@ impl Item {
     }
     #[inline]
     pub fn is_multiworld_spread(&self) -> bool {
+        // Note that requirement::solutions has logic based on spirit light not being multiworld spread (check_slot_limits)
         !matches!(self, Item::SpiritLight(_))
     }
 
@@ -190,8 +176,8 @@ impl Item {
         #[allow(clippy::match_same_arms)]
         match self {
             Item::SpiritLight(amount) => *amount,
-            Item::Resource(Resource::Ore) => 20,
-            Item::Resource(Resource::Energy | Resource::Health) => 120,
+            Item::Resource(Resource::GorlekOre) => 20,
+            Item::Resource(Resource::EnergyFragment | Resource::HealthFragment) => 120,
             Item::Resource(Resource::Keystone) => 320,
             Item::Resource(Resource::ShardSlot) => 480,
             Item::Skill(Skill::Regenerate | Skill::WaterBreath) => 200,  // Quality-of-Life Skills
@@ -200,7 +186,7 @@ impl Item {
             Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600,  // Basic Weapons
             Item::Skill(Skill::Burrow | Skill::Bash | Skill::Flap | Skill::WaterDash | Skill::Grenade | Skill::Flash | Skill::Seir) | Item::Water => 1800,  // Key Skills
             Item::Skill(Skill::Blaze | Skill::Sentry) => 2800,  // Tedious Weapons
-            Item::Skill(Skill::AncestralLight1 | Skill::AncestralLight2) => 3000,  // Unhinted Skill
+            Item::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight) => 3000,  // Unhinted Skill
             Item::Skill(Skill::Spear) => 4000,  // No
             Item::Skill(Skill::Launch) => 40000,  // Absolutely Broken
             Item::Shard(_) => 1000,
@@ -214,13 +200,13 @@ impl Item {
     pub fn shop_price(&self) -> u32 {
         #[allow(clippy::match_same_arms)]
         match self {
-            Item::Resource(Resource::Health) => 200,
-            Item::Resource(Resource::Energy) => 150,
-            Item::Resource(Resource::Ore | Resource::Keystone) => 100,
+            Item::Resource(Resource::HealthFragment) => 200,
+            Item::Resource(Resource::EnergyFragment) => 150,
+            Item::Resource(Resource::GorlekOre | Resource::Keystone) => 100,
             Item::Resource(Resource::ShardSlot) => 250,
             Item::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
-                Skill::AncestralLight1 | Skill::AncestralLight2 => 300,
+                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => 300,
                 Skill::Blaze => 420,
                 Skill::Launch => 800,
                 _ => 500,
@@ -337,7 +323,7 @@ mod tests {
         assert_eq!(Item::SpiritLight(45).code().to_string(), "0|45");
         assert_eq!(Item::Resource(Resource::Keystone).code().to_string(), "1|3");
         assert_eq!(Item::Skill(Skill::Launch).code().to_string(), "2|8");
-        assert_eq!(Item::Skill(Skill::AncestralLight1).code().to_string(), "2|120");
+        assert_eq!(Item::Skill(Skill::GladesAncestralLight).code().to_string(), "2|120");
         assert_eq!(Item::Shard(Shard::Magnet).code().to_string(), "3|8");
         assert_eq!(Item::Teleporter(Teleporter::Marsh).code().to_string(), "5|16");
         assert_eq!(Item::Water.code().to_string(), "9|0");

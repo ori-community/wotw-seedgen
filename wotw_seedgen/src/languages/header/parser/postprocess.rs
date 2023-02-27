@@ -16,8 +16,15 @@ fn read_args(seed: &str, start_index: usize) -> Option<usize> {
     None
 }
 
+/// Create a new item matcher regex from the given pattern
+/// 
+/// This will require the pattern to match the entire item, excluding the optional pickup flag `|mute` at the end which will always be accepted
+fn create_regex(pattern: &str) -> Result<Regex, String> {
+    Regex::new(&format!(r"^({}(?:\|mute)?)$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))
+}
+
 fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, universe_settings: &UniverseSettings) -> Result<String, String> {
-    let re = Regex::new(&format!(r"^({})$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))?;
+    let re = create_regex(pattern)?;
 
     for mut line in seeds[world_index].lines() {
         if let Some(index) = line.find("//") {
@@ -64,7 +71,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
 
 fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], graph: &Graph) -> Result<Vec<UberStateTrigger>, String> {
     let mut locations = Vec::new();
-    let re = Regex::new(&format!(r"^({})$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))?;
+    let re = create_regex(pattern)?;
 
     for mut line in seeds[world_index].lines() {
         if let Some(index) = line.find("//") {

@@ -336,7 +336,8 @@ fn parse_create_warp(parser: &mut Parser) -> Result<VCommand, ParseError> {
     let position = parse_v_position(parser)?;
     let label = if parser.current_token().kind == TokenKind::Separator {
         let peeked = parser.peek_token();
-        if matches!(peeked.kind, TokenKind::String { .. }) {
+        let range = peeked.range.clone();
+        if matches!(peeked.kind, TokenKind::Identifier) && parser.read(range) != "mute" {  // <.< string literals when
             parser.next_token();
             let label = parse_string(parser).to_owned();
             Some(label)
@@ -478,6 +479,7 @@ fn parse_set_uber_state(parser: &mut Parser) -> Result<VItem, ParseError> {
     let token = parser.current_token().clone();
     let operator = match token.kind {
         TokenKind::OpenBracket => {
+            parser.next_token();
             let start = parse_boundary(parser, &uber_type)?;
             parser.eat(TokenKind::Comma)?;
             let end = parse_boundary(parser, &uber_type)?;

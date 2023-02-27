@@ -9,20 +9,15 @@
   ],
   "difficulty": "Gorlek",
   "headers": [
-    "vanilla_opher_upgrades",
-    "black_market",
-    "teleporters",
-    "key_hints",
-    "zone_hints",
+    "knowledge_hints",
+    "shrine_hints",
     "trial_hints",
-    "no_rain",
-    "fragment_overflow"
-  ],
-  "headerConfig": [
-    {
-      "headerName": "zone_hints",
-      "configName": "tp_hints",
-      "configValue": "true"
-    }
+    "teleporters",
+    "fragment_overflow",
+    "key_hints",
+    "black_market",
+    "zone_hints",
+    "vanilla_opher_upgrades",
+    "no_rain"
   ]
 }

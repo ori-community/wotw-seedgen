@@ -35,12 +35,19 @@ pub struct Pickup {
     pub item: Item,
     /// Whether this pickup should be ignored for any logic the seed generator applies based on header
     pub ignore: bool,
+    /// Whether this pickup should hide the messages of all other pickups on the same trigger
+    pub hide_others: bool,
     /// Whether this pickup should be ignored during header validation
     pub skip_validation: bool,
 }
 impl Pickup {
     pub fn code(&self) -> CodeDisplay<Pickup> {
-        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.trigger.code(), s.item.code())})
+        CodeDisplay::new(self, |s, f| {
+            write!(f, "{}|{}", s.trigger.code(), s.item.code())?;
+            if s.hide_others {
+                write!(f, "|mute")
+            } else { Ok(()) }
+        })
     }
 }
 

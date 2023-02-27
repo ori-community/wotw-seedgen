@@ -10,10 +10,12 @@ use std::fmt::{Formatter, Display};
 
 use rand::distributions::{Distribution, Uniform};
 use rustc_hash::FxHashSet;
-use wotw_seedgen_derive::FromStr;
+use smallvec::{smallvec, SmallVec};
+use wotw_seedgen_derive::{FromStr, Display};
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use serde::de::Visitor;
 
+use crate::item::Skill;
 use crate::{preset::{UniversePreset, WorldPreset}, util::constants::DEFAULT_SPAWN, files::FileAccess};
 
 use slugstrings::SLUGSTRINGS;
@@ -97,8 +99,8 @@ impl UniverseSettings {
     /// 
     /// Returns [`None`] if the seed contains no information about the settings used to generate it
     /// Returns an [`Error`] if the settings format could not be read
-    pub fn from_seed(input: &str) -> Option<Result<UniverseSettings, serde_json::Error>> {
-        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(serde_json::from_str))
+    pub fn from_seed(input: &str) -> Option<Result<UniverseSettings, String>> {
+        input.lines().find_map(|line| line.strip_prefix("// Config: ").map(|config| serde_json::from_str(config).map_err(|err| err.to_string())))
     }
 
     /// Apply the settings from a [`UniversePreset`]
@@ -329,6 +331,25 @@ impl WorldSettings {
         serde_json::to_string(&self).unwrap()
     }
 
+    /// Read the settings from a generated seed
+    /// 
+    /// You can obtain the [`UniverseSettings`] using [`UniverseSettings::from_seed`]
+    /// 
+    /// Returns [`None`] if the seed is multiworld and contains no information about which world it belongs to
+    /// Returns an [`Error`] if the world index format could not be read
+    pub fn from_seed(input: &str, universe_settings: UniverseSettings) -> Option<Result<WorldSettings, String>> {
+        if universe_settings.world_settings.len() == 1 {
+            return Some(Ok(universe_settings.world_settings.into_iter().next().unwrap()));
+        }
+
+        let world_settings = match input.lines().find_map(|line| line.strip_prefix("// This World: "))?.parse() {
+            Ok(world_index) => universe_settings.world_settings.into_iter().nth(world_index).ok_or_else(|| "Current world index out of bounds".to_string()),
+            Err(err) => Err(format!("Error reading current world: {err}")),
+        };
+
+        Some(world_settings)
+    }
+
     /// Checks whether these settings feature a random spawn location
     pub fn is_random_spawn(&self) -> bool {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
@@ -465,7 +486,7 @@ impl<'de> Deserialize<'de> for Spawn {
 /// Difficulties don't include glitches by default, these can be toggled through the Trick settings
 /// 
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, FromStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, FromStr, Display)]
 #[ParseFromIdentifier]
 pub enum Difficulty {
     Moki,
@@ -475,6 +496,96 @@ pub enum Difficulty {
 }
 impl Default for Difficulty {
     fn default() -> Difficulty { Difficulty::Moki }
+}
+impl Difficulty {
+    /// Allowed spawns on this difficulty when using the random spawn setting
+    pub fn spawn_locations(self) -> &'static [&'static str] {
+        pub const MOKI_SPAWNS: &[&str] = &[
+            "MarshSpawn.Main",
+            "HowlsDen.Teleporter",
+            "GladesTown.Teleporter",
+            "InnerWellspring.Teleporter",
+            "MidnightBurrows.Teleporter",
+        ];
+        pub const GORLEK_SPAWNS: &[&str] = &[
+            "MarshSpawn.Main",
+            "HowlsDen.Teleporter",
+            "EastHollow.Teleporter",
+            "GladesTown.Teleporter",
+            "InnerWellspring.Teleporter",
+            "MidnightBurrows.Teleporter",
+            "WoodsEntry.Teleporter",
+            "WoodsMain.Teleporter",
+            "LowerReach.Teleporter",
+            "UpperDepths.Teleporter",
+            "EastPools.Teleporter",
+            "LowerWastes.WestTP",
+            "LowerWastes.EastTP",
+        ];
+        match self {
+            Difficulty::Moki => MOKI_SPAWNS,
+            _ => GORLEK_SPAWNS,
+        }
+    }
+
+    // TODO would it be worth to precompile the resulting slices for all variants?
+    /// Allowed weapons on this difficulty
+    pub fn weapons<const TARGET_IS_WALL: bool>(self) -> SmallVec<[Skill; 9]> {
+        let mut weapons = smallvec![
+            Skill::Sword,
+            Skill::Hammer,
+            Skill::Bow,
+            Skill::Grenade,
+            Skill::Shuriken,
+            Skill::Blaze,
+            Skill::Spear,
+        ];
+        if !TARGET_IS_WALL { weapons.push(Skill::Flash); }
+        if self >= Difficulty::Unsafe { weapons.push(Skill::Sentry); }
+        weapons
+    }
+    /// Allowed ranged weapons on this difficulty
+    pub fn ranged_weapons(self) -> SmallVec<[Skill; 6]> {
+        let mut weapons = smallvec![
+            Skill::Bow,
+            Skill::Spear,
+        ];
+        if self >= Difficulty::Gorlek {
+            weapons.push(Skill::Grenade);
+            weapons.push(Skill::Shuriken);
+            if self >= Difficulty::Unsafe {
+                weapons.push(Skill::Flash);
+                weapons.push(Skill::Blaze);
+            }
+        }
+        weapons
+    }
+    /// Allowed shield weapons on this difficulty
+    pub fn shield_weapons(self) -> SmallVec<[Skill; 4]> {
+        smallvec![
+            Skill::Hammer,
+            Skill::Launch,
+            Skill::Grenade,
+            Skill::Spear,
+        ]
+    }
+}
+
+/// [`Difficulty`] requirements to use certain items that the seed generator may require as part of energy, damage etc. requirements
+pub mod logical_difficulty {
+    use super::Difficulty;
+
+    pub const TRIPLE_JUMP: Difficulty = Difficulty::Gorlek;
+    pub const RESILIENCE: Difficulty = Difficulty::Gorlek;
+    pub const VITALITY: Difficulty = Difficulty::Gorlek;
+    pub const ENERGY_SHARD: Difficulty = Difficulty::Gorlek;
+    pub const DAMAGE_BUFFS: Difficulty = Difficulty::Unsafe;
+    pub const OVERCHARGE: Difficulty = Difficulty::Unsafe;
+    pub const LIFE_PACT: Difficulty = Difficulty::Unsafe;
+    pub const ULTRA_BASH: Difficulty = Difficulty::Unsafe;
+    pub const OVERFLOW: Difficulty = Difficulty::Unsafe;
+    pub const THORN: Difficulty = Difficulty::Unsafe;
+    pub const CATALYST: Difficulty = Difficulty::Unsafe;
 }
 
 /// A Trick that can be logically required
@@ -570,10 +681,10 @@ impl Goal {
     /// The flag name communicates to the randomizer client which restrictions to apply before allowing to finish the game
     pub fn flag_name(&self) -> &'static str {
         match self {
-            Goal::Wisps => "ForceWisps",
-            Goal::Trees => "ForceTrees",
-            Goal::Quests => "ForceQuests",
-            Goal::Relics(_) | Goal::RelicChance(_) => "WorldTour",
+            Goal::Wisps => "All Wisps",
+            Goal::Trees => "All Trees",
+            Goal::Quests => "All Quests",
+            Goal::Relics(_) | Goal::RelicChance(_) => "Relics",
         }
     }
 

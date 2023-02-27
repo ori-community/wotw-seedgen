@@ -4,3 +4,10 @@ members = [
     "wotw_seedgen_cli",
     "wotw_seedgen_derive",
 ]
+
+# TODO remove this after a while if there are no issues
+[profile.release]
+debug-assertions = true
+
+[profile.bench]
+debug-assertions = false

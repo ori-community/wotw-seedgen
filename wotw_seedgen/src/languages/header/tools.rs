@@ -48,7 +48,7 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
         'outer: for uber_state in occupied {
             // special cases because this system is not holding up to modern header logic
             if uber_state.identifier.uber_group == 9 && (
-                uber_state.identifier.uber_id == 0 && [250, 251, 999].contains(&uber_state.used_value.unwrap_or_default())
+                uber_state.identifier.uber_id == 0 && uber_state.used_value.map_or(false, |value| matches!(value, 0 | 250 | 251 | 999))
                 || uber_state.identifier.uber_id == 999 && uber_state.used_value == Some(200)
                 || uber_state.identifier.uber_id == 100
                 || uber_state.identifier.uber_id == 150

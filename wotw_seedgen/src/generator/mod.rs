@@ -8,21 +8,16 @@ pub use placement::Placement;
 
 use std::{fmt::Write, cmp::Ordering};
 
-use rand::{
-    Rng, prelude::StdRng,
-};
+use rand::{Rng, prelude::StdRng};
 use rand_seeder::Seeder;
 use rustc_hash::{FxHashMap, FxHashSet};
 
-use crate::{
-    item::{Item, Message, UberStateOperator},
-    settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal}, uber_state::UberStateTrigger,
-    world::{
-        World,
-        graph::Graph,
-        Pool,
-    }, header::{self, HeaderBuild}, Header, files::FileAccess
-};
+use crate::item::{Item, Message, UberStateOperator};
+use crate::settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal};
+use crate::uber_state::UberStateTrigger;
+use crate::world::{World, Graph, Pool};
+use crate::header::{self, Header, HeaderBuild};
+use crate::files::FileAccess;
 
 use placement::generate_placements;
 
@@ -75,6 +70,11 @@ fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut imp
     let mut flags = vec![];
     let mut goals = vec![];
     let mut state_sets = vec![];
+
+    flags.push(world.player.settings.difficulty.to_string());
+    if !world.player.settings.tricks.is_empty() { flags.push("Glitches".to_string()); }
+    if world.player.settings.is_random_spawn() { flags.push("Random Spawn".to_string()); }
+    if world.player.settings.hard { flags.push("Hard".to_string()); }
 
     let header_names = headers.into_iter().map(|(header_name, mut header)| {
         for exclude in header.excludes {
@@ -132,7 +132,6 @@ fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut imp
     for flag in goals.iter().map(Goal::flag_name) {
         flags.push(flag.to_string());
     }
-    if world.player.settings.is_random_spawn() { flags.push("RandomSpawn".to_string()); }
 
     let mut header_block = String::new();
 
