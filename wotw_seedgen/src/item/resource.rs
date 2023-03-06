@@ -14,7 +14,13 @@ pub enum Resource {
 }
 impl Resource {
     pub fn icon(self) -> Option<Icon> {
-        Some(Icon::File(format!("assets/icons/game/{}.png", self.to_string().to_lowercase())))
+        Some(match self {
+            Resource::HealthFragment => Icon::File(String::from("assets/icons/game/healthfragment.png")),
+            Resource::EnergyFragment => Icon::File(String::from("assets/icons/game/energyfragment.png")),
+            Resource::GorlekOre => Icon::File(String::from("assets/icons/game/gorlekore.png")),
+            Resource::Keystone => Icon::File(String::from("assets/icons/game/keystone.png")),
+            Resource::ShardSlot => Icon::File(String::from("assets/icons/game/shardslot.png")),
+        })
     }
     pub fn map_icon(&self) -> MapIcon {
         match self {
