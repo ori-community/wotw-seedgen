@@ -35,6 +35,7 @@ impl<'graph, F: FileAccess> Seeds<'graph, F> {
         let seed_factory = SeedFactory::<F>::new(
             0, // Initialized after exhausting existing
             0, // Initialized after exhausting existing
+            0, // Initialized after exhausting existing
             error_message_limit,
             settings,
             graph,
@@ -70,6 +71,7 @@ impl<F: FileAccess> Iterator for Seeds<'_, F> {
                     print_feedback_for_unusable_seeds(self.existing.errors);
                     self.missing = self.sample_size.saturating_sub(self.existing_amount);
                     self.seed_factory.amount = self.missing;
+                    self.seed_factory.existing_amount = self.existing_amount;
                     self.seed_factory.tolerated_errors = self
                         .tolerated_errors
                         .unwrap_or_else(|| usize::max(self.missing.saturating_mul(4), 100));
@@ -99,6 +101,7 @@ fn print_feedback_for_unusable_seeds(unusable_amount: usize) {
 }
 struct SeedFactory<'graph, F: FileAccess> {
     amount: usize,
+    existing_amount: usize,
     successes: usize,
     errors: usize,
     error_messages: Vec<String>,
@@ -114,6 +117,7 @@ struct SeedFactory<'graph, F: FileAccess> {
 impl<'graph, F: FileAccess> SeedFactory<'graph, F> {
     fn new(
         amount: usize,
+        existing_amount: usize,
         tolerated_errors: usize,
         error_message_limit: usize,
         settings: UniverseSettings,
@@ -121,6 +125,7 @@ impl<'graph, F: FileAccess> SeedFactory<'graph, F> {
     ) -> SeedFactory<'graph, F> {
         SeedFactory {
             amount,
+            existing_amount,
             successes: 0,
             errors: 0,
             error_messages: vec![],
@@ -157,9 +162,9 @@ impl<F: FileAccess> Iterator for SeedFactory<'_, F> {
                         if self.errors >= self.tolerated_errors {
                             let more = self.errors - self.error_messages.len();
                             eprint!(
-                            "Too many errors while generating seeds\nSample of some errors:\n{}",
-                            self.error_messages.join("\n")
-                        );
+                                "Too many errors while generating seeds\nSample of some errors:\n{}",
+                                self.error_messages.join("\n")
+                            );
                             if more > 0 {
                                 eprint!("\n...{more} more");
                             }
@@ -170,7 +175,9 @@ impl<F: FileAccess> Iterator for SeedFactory<'_, F> {
                         continue;
                     }
                 };
-                if let Err(err) = F::write_seed(&seed, &self.settings) {
+                if let Err(err) =
+                    F::write_seed(&seed, &self.settings, self.existing_amount + self.successes)
+                {
                     if self.write_errors < 10 {
                         eprintln!("{err}");
                     }

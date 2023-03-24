@@ -18,7 +18,9 @@ pub trait FileAccess {
     /// fetch seeds that have been previously generated with these settings
     fn read_seeds(settings: &UniverseSettings, limit: usize) -> Result<Self::Iter>;
     /// write a seed generated from these settings for later use
-    fn write_seed(seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()>;
+    ///
+    /// `key` should be unique, although it is recommended you don't rely on this being true and take it as a hint for what key you could use
+    fn write_seed(seed: &SeedSpoiler, settings: &UniverseSettings, key: usize) -> Result<()>;
     /// clean all seeds that have previously been generated with these settings
     fn clean_seeds(settings: &UniverseSettings) -> Result<()>;
     /// clean all seeds that have previously been generated
@@ -35,7 +37,7 @@ impl FileAccess for NoFileAccess {
     fn read_seeds(_: &UniverseSettings, _: usize) -> Result<Self::Iter> {
         Ok(iter::empty())
     }
-    fn write_seed(_: &SeedSpoiler, _: &UniverseSettings) -> Result<()> {
+    fn write_seed(_: &SeedSpoiler, _: &UniverseSettings, _: usize) -> Result<()> {
         Ok(())
     }
     fn clean_seeds(_: &UniverseSettings) -> Result<()> {
@@ -76,15 +78,18 @@ mod fs_access {
             ReadSeeds::new(path, limit)
         }
 
-        fn write_seed(seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()> {
+        fn write_seed(
+            seed: &SeedSpoiler,
+            settings: &UniverseSettings,
+            mut key: usize,
+        ) -> Result<()> {
             let bytes = bincode::serialize(seed).expect("Failed to serialize spoiler");
             let base_path = path_from_settings(settings);
             fs::create_dir_all(&base_path)
                 .map_err(|err| format!("Failed to create folder for seed storage: {err}"))?;
-            let mut index = 0;
             loop {
                 let mut path = base_path.to_path_buf();
-                path.push(index.to_string());
+                path.push(key.to_string());
 
                 match fs::OpenOptions::new()
                     .write(true)
@@ -98,7 +103,7 @@ mod fs_access {
                     }
                     Err(err) => {
                         if err.kind() == io::ErrorKind::AlreadyExists {
-                            index += 1
+                            key += 1
                         } else {
                             return Err(format!("Failed to write seed to storage: {err}"));
                         }
