@@ -95,7 +95,7 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                 .0
                 .into_iter()
                 .map(|analyzer| match analyzer {
-                    cli::Analyzer::SpawnLocations => box_analyzer(analyzers::SpawnLocationStats),
+                    cli::Analyzer::SpawnLocation => box_analyzer(analyzers::SpawnLocationStats),
                     cli::Analyzer::SpawnRegion => box_analyzer(analyzers::SpawnRegionStats),
                     cli::Analyzer::ZoneUnlock { zone } => {
                         box_analyzer(analyzers::ZoneUnlockStats { zone })

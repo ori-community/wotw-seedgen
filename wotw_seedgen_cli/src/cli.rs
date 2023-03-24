@@ -667,7 +667,7 @@ pub struct StatsArgs {
 pub struct ChainedAnalyzers(pub Vec<Analyzer>);
 #[derive(StructOpt)]
 pub enum Analyzer {
-    SpawnLocations,
+    SpawnLocation,
     SpawnRegion,
     ZoneUnlock { zone: Zone },
 }

@@ -363,8 +363,6 @@ pub struct WorldSettings {
     /// When generating a seed with these settings, the headers will be searched as .wotwrh files in the current and /headers child directory
     pub headers: FxHashSet<String>,
     /// Configuration parameters to pass to headers
-    ///
-    /// Format for one parameter: <headername>.<parametername>=<value>
     pub header_config: Vec<HeaderConfig>,
     /// Fully qualified header syntax
     pub inline_headers: Vec<InlineHeader>,

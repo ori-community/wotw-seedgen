@@ -32,6 +32,8 @@ impl World<'_, '_> {
     /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
     ///
     /// Note that the player will start with an empty inventory, use [`new_spawn`] if you want the player to start with the vanilla inventory of 3 energy and 30 health.
+    ///
+    /// [`new_spawn`]: World::new_spawn
     pub fn new<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
         World {
             graph,
@@ -47,6 +49,8 @@ impl World<'_, '_> {
     /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
     ///
     /// Note that the player will start with the vanilla inventory of 3 energy and 30 health, use [`new`] if you want the player to start with an empty inventory.
+    ///
+    /// [`new`]: World::new
     pub fn new_spawn<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
         World {
             player: Player::spawn(settings),

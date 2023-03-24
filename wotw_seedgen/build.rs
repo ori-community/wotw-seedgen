@@ -1,10 +1,14 @@
-use std::fs;
+use std::{env, fs};
 
 const SETTINGS_PATH: &str = "src/settings/mod.rs";
 
 // very hacky yes
 fn main() {
     println!("cargo:rerun-if-changed={SETTINGS_PATH}");
+
+    if env::var("DOCS_RS").is_ok() {
+        return;
+    }
 
     let source = fs::read_to_string(SETTINGS_PATH)
         .unwrap_or_else(|_| panic!("failed to read {}", SETTINGS_PATH));

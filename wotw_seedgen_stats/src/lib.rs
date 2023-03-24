@@ -15,7 +15,7 @@ use crate::seed_storage::Seeds;
 
 type Result<T> = std::result::Result<T, String>;
 
-/// Arguments passed to [stats]
+/// Arguments passed to [`stats`]
 pub struct StatsArgs<'graph> {
     /// The [`UniverseSettings`] to generate seeds with
     pub settings: UniverseSettings,
@@ -23,13 +23,16 @@ pub struct StatsArgs<'graph> {
     pub sample_size: usize,
     /// Any number of [`Analyzer`]s that will analyze the seeds
     ///
-    /// Each instance of [`ChainedAnalyzers`] will be treated separately (as though you would call [stats] multiple times with each of them),
+    /// Each instance of [`ChainedAnalyzers`] will be treated separately (as though you would call [`stats`] multiple times with each of them),
     /// but the [`Analyzer`]s within one [`ChainedAnalyzers`] will be chained together, e.g. chaining [`SpawnLocationStats`] with [`ZoneUnlockStats`]
     /// would analyze the zone unlocks for each spawn
+    ///
+    /// [`SpawnLocationStats`]: (analyzers::SpawnLocationStats)
+    /// [`ZoneUnlockStats`]: (analyzers::ZoneUnlockStats)
     pub analyzers: Vec<ChainedAnalyzers>,
     /// The logical [`Graph`]
     ///
-    /// You can obtain this from the seedgen library using [wotw_seedgen::logic::parse_logic]
+    /// You can obtain this from the seedgen library using [`wotw_seedgen::logic::parse_logic`]
     pub graph: &'graph Graph,
     /// How many errors during seed generation should be tolerated before aborting
     ///
