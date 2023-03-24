@@ -10,6 +10,7 @@ use crate::util::{
     constants::TP_ANCHOR,
 };
 use crate::uber_state::{UberIdentifier, UberStateTrigger};
+use crate::generator::NodeSummary;
 
 #[derive(Debug)]
 pub struct Refill {
@@ -127,6 +128,13 @@ impl Node {
         if let Node::Anchor(anchor) = self {
             anchor.position.is_some() && anchor.can_spawn
         } else { false }
+    }
+    pub(crate) fn summary(&self) -> NodeSummary {
+        NodeSummary {
+            identifier: self.identifier().to_string(),
+            position: self.position().cloned(),
+            zone: self.zone(),
+        }
     }
 }
 impl fmt::Display for Node {

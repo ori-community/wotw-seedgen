@@ -50,7 +50,7 @@ impl Seed<'_, '_> {
             ")
         }).collect::<Vec<_>>();
 
-        header::parser::postprocess(&mut seeds, self.graph, self.settings)?;
+        header::parser::postprocess(&mut seeds, self.graph)?;
 
         Ok(seeds)
     }

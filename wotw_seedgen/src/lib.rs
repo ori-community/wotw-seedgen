@@ -27,6 +27,37 @@ pub use item::{Item, VItem};
 pub use generator::generate_seed;
 pub use reach_check::reach_check;
 
+mod log {
+    macro_rules! trace {
+        ($($arg:tt)+) => {{
+            #[cfg(feature = "log")]
+            ::log::trace!($($arg)+)
+        }}
+    }
+    pub(crate) use trace;
+    macro_rules! info {
+        ($($arg:tt)+) => {{
+            #[cfg(feature = "log")]
+            ::log::info!($($arg)+)
+        }}
+    }
+    pub(crate) use info;
+    macro_rules! warning {
+        ($($arg:tt)+) => {{
+            #[cfg(feature = "log")]
+            ::log::warn!($($arg)+)
+        }}
+    }
+    pub(crate) use warning;  // warn is a built in attribute
+    macro_rules! error {
+        ($($arg:tt)+) => {{
+            #[cfg(feature = "log")]
+            ::log::error!($($arg)+)
+        }}
+    }
+    pub(crate) use error;
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{preset::{WorldPreset, UniversePreset}, settings::{Difficulty, UniverseSettings}, files::FILE_SYSTEM_ACCESS};

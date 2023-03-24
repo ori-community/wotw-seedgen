@@ -5,7 +5,7 @@ use super::{parser::{self, Areas, AreaContent}, locations::Location, states::Nam
 use crate::{world::{
     graph::{self, Graph, Node},
     requirement::Requirement,
-}, settings::{UniverseSettings, Difficulty, Trick}, util::NodeKind};
+}, settings::{UniverseSettings, Difficulty, Trick}, util::NodeKind, log};
 use crate::item::Skill;
 
 struct EmitterContext<'a> {
@@ -239,7 +239,7 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedStat
     if validate {
         for &region in regions.keys() {
             if !anchors.iter().any(|anchor| anchor.region() == region) {
-                log::warn!("Region {} has no anchors with a matching name.", region);
+                log::warning!("Region {} has no anchors with a matching name.", region);
             }
         }
     }
@@ -335,6 +335,7 @@ pub fn build(areas: Areas, locations: Vec<Location>, named_states: Vec<NamedStat
         nodes.push(node);
     };
 
+    #[cfg(feature = "log")]
     if validate {
         let states = nodes[state_start_index..state_end_index].iter().map(|node| node.identifier()).collect::<FxHashSet<_>>();
         let unused_states = states.difference(&context.used_states);

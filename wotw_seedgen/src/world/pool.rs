@@ -3,6 +3,7 @@ use rustc_hash::FxHashMap;
 
 use crate::inventory::Inventory;
 use crate::item::{Item, Resource, Skill, Shard, BonusUpgrade};
+use crate::log;
 
 // TODO the pool could be an inventory probably
 #[derive(Default, Debug, Clone)]

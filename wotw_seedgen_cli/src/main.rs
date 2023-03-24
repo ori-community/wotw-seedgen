@@ -3,6 +3,7 @@ mod seed;
 mod play;
 mod universe_preset;
 mod world_preset;
+mod stats;
 mod headers;
 mod reach_check;
 mod log_init;
@@ -25,6 +26,8 @@ fn main() -> ExitCode {
         cli::SeedGenCommand::Play => play::play(),
         cli::SeedGenCommand::UniversePreset { args } => universe_preset::create_universe_preset(args),
         cli::SeedGenCommand::WorldPreset { args } => world_preset::create_world_preset(args),
+        cli::SeedGenCommand::Stats { args } => stats::generate_stats(args),
+        cli::SeedGenCommand::CleanStatsCache => stats::clean_stats_cache(),
         cli::SeedGenCommand::Headers { headers, subcommand } => headers::headers(headers, subcommand),
         cli::SeedGenCommand::ReachCheck { args } => reach_check::reach_check(args),
     }.map_or_else(|err| {

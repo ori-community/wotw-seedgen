@@ -98,7 +98,7 @@ mod fs_access {
     pub fn find_headers() -> Result<Vec<PathBuf>, String> {
         let mut current_directory = PathBuf::from(".");
         let mut headers = files_in_directory(&current_directory, "wotwrh")?;
-        current_directory.push(&HEADER_FOLDER);
+        current_directory.push(HEADER_FOLDER);
         if let Ok(mut more) = files_in_directory(&current_directory, "wotwrh") {
             headers.append(&mut more);
         }

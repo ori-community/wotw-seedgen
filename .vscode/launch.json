@@ -7,8 +7,8 @@
         {
             "type": "lldb",
             "request": "attach",
-            "name": "Attach executable 'wotw_seedgen_cli'",
-            "pid": "${command:pickMyProcess}"
+            "name": "Attach to CLI",
+            "program": "${workspaceFolder}/seedgen.exe"
         },
         {
             "type": "lldb",

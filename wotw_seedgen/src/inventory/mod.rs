@@ -5,7 +5,7 @@ use serde::{Serialize, Deserialize};
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 
-use crate::{item::{Item, Resource, Shard, Skill}, settings::{Difficulty, WorldSettings, logical_difficulty}, util::Orbs};
+use crate::{item::{Item, Resource, Shard, Skill}, settings::{Difficulty, WorldSettings, logical_difficulty}, util::Orbs, log};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Inventory {
@@ -16,7 +16,7 @@ impl Inventory {
         if amount == 0 { return }
         let single_instance = item.is_single_instance();  // A `Sword AND Sword` requirement should still just require one Sword
         if single_instance && amount > 1 {
-            log::warn!("Granted {} more than once, but that item can only be aquired once...", item);
+            log::warning!("Granted {} more than once, but that item can only be aquired once...", item);
         }
         if let Item::SpiritLight(stacked_amount) = item {
             amount *= stacked_amount;

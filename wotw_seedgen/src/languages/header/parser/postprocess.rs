@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::{world::Graph, util::Zone, settings::UniverseSettings};
+use crate::{world::Graph, util::Zone};
 use crate::uber_state::UberStateTrigger;
 
 fn read_args(seed: &str, start_index: usize) -> Option<usize> {
@@ -23,7 +23,7 @@ fn create_regex(pattern: &str) -> Result<Regex, String> {
     Regex::new(&format!(r"^({}(?:\|mute)?)$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))
 }
 
-fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, universe_settings: &UniverseSettings) -> Result<String, String> {
+fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph) -> Result<String, String> {
     let re = create_regex(pattern)?;
 
     for mut line in seeds[world_index].lines() {
@@ -49,7 +49,7 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph, 
                 other_worlds.remove(world_index);
 
                 for other_world_index in other_worlds {
-                    let actual_zone = where_is(&actual_item, other_world_index, seeds, graph, universe_settings)?;
+                    let actual_zone = where_is(&actual_item, other_world_index, seeds, graph)?;
                     if &actual_zone != "Unknown" {
                         return Ok(format!("$[15|5|{}]'s {}", other_world_index, actual_zone));
                     }
@@ -133,7 +133,7 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
     Ok(locations)
 }
 
-pub fn postprocess(seeds: &mut [String], graph: &Graph, universe_settings: &UniverseSettings) -> Result<(), String> {
+pub fn postprocess(seeds: &mut [String], graph: &Graph) -> Result<(), String> {
     let clone = seeds.to_vec();
 
     for (world_index, seed) in seeds.iter_mut().enumerate() {
@@ -148,7 +148,7 @@ pub fn postprocess(seeds: &mut [String], graph: &Graph, universe_settings: &Univ
                 if let Some(end_index) = read_args(seed, after_bracket) {
                     let pattern = seed[after_bracket..end_index].trim();
 
-                    let zone = where_is(pattern, world_index, &clone, graph, universe_settings)?;
+                    let zone = where_is(pattern, world_index, &clone, graph)?;
                     seed.replace_range(start_index..=end_index, &zone);
 
                     continue;

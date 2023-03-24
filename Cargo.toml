@@ -3,6 +3,7 @@ members = [
     "wotw_seedgen",
     "wotw_seedgen_cli",
     "wotw_seedgen_derive",
+    "wotw_seedgen_stats",
 ]
 
 # TODO remove this after a while if there are no issues

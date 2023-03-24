@@ -12,6 +12,7 @@ use rustc_hash::FxHashMap;
 
 use crate::header::ItemDetails;
 use crate::item::{Item, Resource};
+use crate::log;
 use crate::settings::{WorldSettings, Goal};
 use crate::util::constants::WISP_STATES;
 use crate::uber_state::{UberStateTrigger, UberIdentifier};
@@ -53,7 +54,7 @@ impl World<'_, '_> {
         }
     }
 
-    pub fn grant_player(&mut self, item: Item, amount: u32) -> Result<(), String> {
+    pub fn grant_player(&mut self, item: Item, amount: u32) {
         match item {
             Item::UberState(command) => {
                 for _ in 0..amount {
@@ -81,8 +82,6 @@ impl World<'_, '_> {
                 }
             },
         }
-
-        Ok(())
     }
 
     pub(crate) fn preplace(&mut self, trigger: UberStateTrigger, item: Item) {
@@ -131,7 +130,7 @@ impl World<'_, '_> {
             } else { None }
         ).flatten().cloned().collect::<Vec<_>>();
         for item in collected {
-            self.grant_player(item, 1).unwrap_or_else(|err| log::error!("{}", err));
+            self.grant_player(item, 1);
         }
 
         preplaced

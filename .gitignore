@@ -1,9 +1,6 @@
 target/*
 rls/*
-*.wotwr
 *.log
 *.currentseedpath
 Cargo.lock
-*spoiler*.txt
-*spoiler*.json
 .idea

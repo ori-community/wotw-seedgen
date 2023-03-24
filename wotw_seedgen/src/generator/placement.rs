@@ -9,18 +9,19 @@ use rand::{
 use crate::{
     inventory::Inventory,
     item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message, UberStateItem, UberStateValue},
-    settings::{Difficulty, Goal, WorldSettings, Spawn}, util::{
+    settings::{Goal, WorldSettings, Spawn}, util::{
         self,
-        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES},
+        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES}, Zone,
     }, world::{
         World,
         graph::{self, Node, Graph}, requirement,
-    }, header::CodeDisplay
+    }, header::CodeDisplay, log, generator::spoiler::NodeSummary
 };
+#[cfg(feature = "log")] use crate::settings::Difficulty;
 use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
 
 use super::seed::SeedWorld;
-use super::spoiler::{SeedSpoiler, SpoilerGroup, SpoilerWorldReachable, SpoilerPlacement};
+use super::spoiler::{SeedSpoiler, SpoilerGroup, SpoilerPlacement};
 
 #[derive(Debug, Clone)]
 /// One [`Item`] tied to an [`UberStateTrigger`]
@@ -84,6 +85,7 @@ struct ReachContext<'a> {
     unreached_count: usize,
 }
 
+#[cfg(feature = "log")]
 fn format_identifiers(mut identifiers: Vec<&str>) -> String {
     let length = identifiers.len();
     if length > 20 {
@@ -130,7 +132,7 @@ where
     })
 }
 
-fn place_item<'a, R, I>(origin_world_index: usize, target_world_index: usize, node: &'a Node, was_placeholder: bool, forced: bool, item: Item, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn place_item<'a, R, I>(origin_world_index: usize, target_world_index: usize, node: &'a Node, #[cfg_attr(not(feature = "log"), allow(unused_variables))] was_placeholder: bool, forced: bool, item: Item, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
 where
     R: Rng,
     I: Iterator<Item=u16>,
@@ -221,12 +223,16 @@ where
         });
     }
 
-    let node_identifier = node.identifier().to_string();
-    let node_position = node.position().cloned();
+    let location = NodeSummary {
+        identifier: node.identifier().to_string(),
+        position: node.position().cloned(),
+        zone: node.zone(),
+    };
+
     if forced {
         context.current_spoiler_group.forced_items.grant(item.clone(), 1);
     }
-    context.current_spoiler_group.placements.push(SpoilerPlacement { origin_world_index, target_world_index, node_identifier, node_position, item, item_name });
+    context.current_spoiler_group.placements.push(SpoilerPlacement { origin_world_index, target_world_index, location, item, item_name });
 
     Ok(())
 }
@@ -432,7 +438,7 @@ where
 
     let world_context = &mut world_contexts[target_world_index];
     world_context.world.pool.remove(&item, 1);
-    world_context.world.grant_player(item.clone(), 1).unwrap_or_else(|err| log::error!("(World {}): {}", target_world_index, err));
+    world_context.world.grant_player(item.clone(), 1);
     place_item(node.0, target_world_index, node.1, node.2, true, item, world_contexts, context)?;
 
     Ok(())
@@ -485,6 +491,7 @@ I: Iterator<Item=u16>,
     let with_weights = itemsets.iter()
         .map::<Result<(&Inventory, f32), String>, _>(|inventory| Ok((inventory, weight(inventory)?)))
         .collect::<Result<Vec<_>, _>>()?;
+    #[cfg(feature = "log")]
     let weight_sum: f32 = with_weights.iter().map(|(_, weight)| weight).sum();
 
     let (progression, _) = with_weights
@@ -561,7 +568,7 @@ where
                 for item in items {
                     let world_context = &mut world_contexts[world_index];
                     world_context.world.pool.remove(&item, 1);
-                    world_context.world.grant_player(item.clone(), 1).unwrap_or_else(|err| log::error!("(World {}): {}", world_index, err));
+                    world_context.world.grant_player(item.clone(), 1);
 
                     let origin_details = world_context.world.custom_items.get(&item);
                     let custom_name =  origin_details.and_then(|details| details.name.clone());
@@ -580,8 +587,11 @@ where
                     context.current_spoiler_group.placements.push(SpoilerPlacement {
                         origin_world_index: world_index,
                         target_world_index: world_index,
-                        node_identifier: "Spawn".to_string(),
-                        node_position: None,
+                        location: NodeSummary {
+                            identifier: "Spawn".to_string(),
+                            position: None,
+                            zone: Some(Zone::Spawn),
+                        },
                         item: item.clone(),
                         item_name,
                     });
@@ -635,12 +645,14 @@ where
             }
 
             if world_contexts.iter().all(|world_context| world_context.placements.is_empty()) {
+                #[cfg(feature = "log")]
                 for (world_index, world_context) in world_contexts.iter().enumerate() {
                     log::trace!("(World {}): Failed to reach anything from spawn location {}", world_index, world_context.spawn);
                 }
                 return Err(String::from("Failed to reach anything from spawn location"));
             }
 
+            #[cfg(feature = "log")]
             for (world_index, world_context) in world_contexts.iter().enumerate() {
                 let identifiers: Vec<_> = world_context.reachable_locations.iter()
                     .filter_map(|&node| {
@@ -700,7 +712,7 @@ where
                 let item = item.clone();
                 let is_progression = item.is_progression(target_world_context.world.player.settings.difficulty);
                 target_world_context.world.pool.remove(&item, 1);
-                target_world_context.world.grant_player(item.clone(), 1).unwrap_or_else(|err| log::error!("(World {}): {}", target_world_index, err));
+                target_world_context.world.grant_player(item.clone(), 1);
                 place_item(origin_world_index, target_world_index, node, false, false, item, world_contexts, context)?;
 
                 return Ok(is_progression);
@@ -716,7 +728,7 @@ where
     let item = Item::SpiritLight(amount);
 
     origin_world_context.world.pool.remove(&item, 1);
-    origin_world_context.world.grant_player(item.clone(), 1).unwrap_or_else(|err| log::error!("(World {}): {}", origin_world_index, err));
+    origin_world_context.world.grant_player(item.clone(), 1);
     place_item(origin_world_index, origin_world_index, node, false, false, item, world_contexts, context)?;
 
     Ok(true)
@@ -733,9 +745,13 @@ where
     let origin_world_context = &mut world_contexts[origin_world_index];
 
     // force a couple placeholders at the start
+    #[cfg(feature = "log")]
     let mut force = false;
     if origin_world_context.placeholders.len() < 4 {
-        force = true;
+        #[cfg(feature = "log")]
+        {
+            force = true
+        };
     } else if context.random_progression.sample(context.rng) {
         return random_item_placement(origin_world_index, node, world_contexts, context);
     }
@@ -860,7 +876,7 @@ where
 
                 space_remaining = false;
 
-                log::warn!("(World {}): Not enough space to place all items from the item pool!", target_world_index);
+                log::warning!("(World {}): Not enough space to place all items from the item pool!", target_world_index);
                 log::trace!("Unable to place {}", item);
             } else {
                 log::trace!("Unable to place {}", item);
@@ -870,7 +886,7 @@ where
 
     for (world_index, world_shop_placeholders) in shop_placeholders.iter().enumerate() {
         if !world_shop_placeholders.is_empty() {
-            log::warn!("(World {}): Not enough items in the pool to fill all shops! Filling with extra Gorlek Ore", world_index);
+            log::warning!("(World {}): Not enough items in the pool to fill all shops! Filling with extra Gorlek Ore", world_index);
 
             for &world_shop_placeholder in world_shop_placeholders {
                 place_item(world_index, world_index, world_shop_placeholder, true, false, Item::Resource(Resource::GorlekOre), world_contexts, context)?;
@@ -913,10 +929,10 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
     let mut finished_world = world.clone();
     for (item, amount) in &world.pool.inventory.items {
         if item.is_progression(world.player.settings.difficulty) {
-            finished_world.grant_player(item.clone(), *amount)?;
+            finished_world.grant_player(item.clone(), *amount);
         }
     }
-    finished_world.grant_player(Item::SpiritLight(1), world.pool.spirit_light)?;
+    finished_world.grant_player(Item::SpiritLight(1), world.pool.spirit_light);
 
     let mut collected_preplacements = Vec::new();
     let mut total_reachable_count = 0;
@@ -975,7 +991,7 @@ where
                     let target_world_context = &mut world_contexts[target_world_index];
 
                     target_world_context.world.pool.remove(&item, 1);
-                    target_world_context.world.grant_player(item.clone(), 1).unwrap_or_else(|err| log::error!("(World {}): {}", target_world_index, err));
+                    target_world_context.world.grant_player(item.clone(), 1);
                     place_item(origin_world_index, target_world_index, node, true, false, item, world_contexts, context)?;
 
                     continue 'outer;
@@ -1046,14 +1062,17 @@ fn generate_placements_from_spawn<'graph, 'settings>(
             // Otherwise we would block placements on the skipped steps
             world_reachable.sort_unstable_by_key(|node| node.trigger().map_or(0, UberStateTrigger::set_value));
 
-            let identifiers: Vec<_> = world_reachable.iter()
-                .filter_map(|&node| 
-                    if node.can_place() {
-                        Some(node.identifier())
-                    } else { None })
-                .collect();
+            #[cfg(feature = "log")]
+            {
+                let identifiers: Vec<_> = world_reachable.iter()
+                    .filter_map(|&node| 
+                        if node.can_place() {
+                            Some(node.identifier())
+                        } else { None })
+                    .collect();
 
-            log::trace!("(World {}): {} Reachable free locations: {}", world_index, identifiers.len(), format_identifiers(identifiers));
+                log::trace!("(World {}): {} Reachable free locations: {}", world_index, identifiers.len(), format_identifiers(identifiers));
+            }
 
             let mut world_needs_placement = Vec::with_capacity(world_reachable.len());
 
@@ -1068,8 +1087,10 @@ fn generate_placements_from_spawn<'graph, 'settings>(
                 }
             }
 
-            let locations = world_needs_placement.iter().map(|node| node.identifier().to_owned()).collect::<Vec<_>>();
-            context.current_spoiler_group.reachable.push(SpoilerWorldReachable { locations });
+            let locations = world_needs_placement.iter()
+                .map(|node| node.summary())
+                .collect::<Vec<_>>();
+            context.current_spoiler_group.reachable.push(locations);
 
             world_needs_placement.append(&mut world_context.spawn_slots);
             world_needs_placement.shrink_to_fit();
@@ -1208,7 +1229,7 @@ fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node],
         if !spawn_is_tp {
             if let Some(position) = spawn.position().cloned() {
                 if !has_warned_about_tp_refill && !world.player.settings.headers.iter().any(|header| header == "tp_refill") {
-                    log::warn!("Spawning on non-teleporter locations without the tp_refill header is not recommended!");
+                    log::warning!("Spawning on non-teleporter locations without the tp_refill header is not recommended!");
                     has_warned_about_tp_refill = true;
                 }
 
@@ -1249,10 +1270,11 @@ fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node],
                 !reachable_locations.iter().any(|&reachable| reachable.index() == node.index()) &&
                 !world.preplacements.iter().any(|(trigger, _)| trigger == node.trigger().unwrap())
             ).collect::<Vec<_>>();
+        #[cfg(feature = "log")]
         if !unreachable_locations.is_empty() {
             let identifiers = unreachable_locations.iter().map(|&node| node.identifier()).collect::<Vec<_>>();
             if !(unreachable_locations.len() == 2 && world.player.settings.difficulty == Difficulty::Moki) {  // moki always has two unreachable pickups
-                log::warn!("(World {}): {} locations are unreachable on these settings! These will only hold Spirit Light.", world_index, identifiers.len());
+                log::warning!("(World {}): {} locations are unreachable on these settings! These will only hold Spirit Light.", world_index, identifiers.len());
             }
             log::trace!("(World {}): Unreachable locations on these settings: {}", world_index, format_identifiers(identifiers));
         }
@@ -1323,6 +1345,7 @@ pub(super) fn generate_placements<'graph, 'settings>(
         let spawn_locs = worlds.iter()
             .map(|world| pick_spawn(graph, world.player.settings, rng))
             .collect::<Result<Vec<_>, String>>()?;
+        #[cfg(feature = "log")]
         let identifiers = spawn_locs.iter().map(|spawn_loc| spawn_loc.identifier()).collect::<Vec<_>>();
         log::trace!("Spawning on {}", identifiers.join(", "));
 
@@ -1334,6 +1357,7 @@ pub(super) fn generate_placements<'graph, 'settings>(
 
                 return Ok(seed);
             },
+            #[cfg_attr(not(feature = "log"), allow(unused_variables))]
             Err(err) => log::error!("{}\nRetrying...", err),
         }
 

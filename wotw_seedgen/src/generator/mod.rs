@@ -2,9 +2,9 @@ mod seed;
 mod spoiler;
 mod placement;
 
-pub use seed::{Seed, SeedWorld};
-pub use spoiler::{SeedSpoiler, SpoilerGroup, SpoilerWorldReachable, SpoilerPlacement};
-pub use placement::Placement;
+pub use seed::*;
+pub use spoiler::*;
+pub use placement::*;
 
 use std::{fmt::Write, cmp::Ordering};
 
@@ -13,6 +13,7 @@ use rand_seeder::Seeder;
 use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::item::{Item, Message, UberStateOperator};
+use crate::log;
 use crate::settings::{UniverseSettings, InlineHeader, HeaderConfig, Goal};
 use crate::uber_state::UberStateTrigger;
 use crate::world::{World, Graph, Pool};
@@ -123,7 +124,7 @@ fn parse_headers(world: &mut World, file_access: &impl FileAccess, rng: &mut imp
     }
     for header_with_parameters in config_map.keys() {
         if !header_names.iter().any(|header| header == header_with_parameters) {
-            log::warn!("The header {header_with_parameters} referenced in a header argument isn't active");
+            log::warning!("The header {header_with_parameters} referenced in a header argument isn't active");
         }
     }
 

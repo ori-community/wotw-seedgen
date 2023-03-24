@@ -71,7 +71,7 @@ pub enum Spell {
     WaterBreath = 4009,
 }
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, FromPrimitive, FromStr)]
+#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Serialize, Deserialize, FromPrimitive, FromStr)]
 #[repr(u8)]
 pub enum Zone {
     Marsh = 0,

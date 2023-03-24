@@ -10,6 +10,7 @@ use rustc_hash::FxHashSet;
 use wotw_seedgen::item::{Skill, Shard, Teleporter};
 use wotw_seedgen::settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
 use wotw_seedgen::preset::{UniversePreset, WorldPreset, PresetGroup, PresetInfo};
+use wotw_seedgen::util::Zone;
 
 #[derive(StructOpt)]
 /// Generate seeds for the Ori 2 randomizer.
@@ -46,6 +47,13 @@ pub enum SeedGenCommand {
         #[structopt(flatten)]
         args: WorldPresetArgs,
     },
+    /// Generate seed statistics
+    Stats {
+        #[structopt(flatten)]
+        args: StatsArgs,
+    },
+    /// Deletes all cached seeds used to generate statistics
+    CleanStatsCache,
     /// Check which locations are in logic
     ReachCheck {
         #[structopt(flatten)]
@@ -536,6 +544,68 @@ impl WorldPresetSettings {
             header_config: header_config.map(|header_config| header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
             inline_headers: inline_headers.map(|inline_headers| inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
         }
+    }
+}
+
+#[derive(StructOpt)]
+pub struct StatsArgs {
+    /// the input file representing the logic
+    #[structopt(parse(from_os_str), default_value = "areas.wotw", long)]
+    pub areas: PathBuf,
+    /// the input file representing pickup locations
+    #[structopt(parse(from_os_str), default_value = "loc_data.csv", long)]
+    pub locations: PathBuf,
+    /// the input file representing state namings
+    #[structopt(parse(from_os_str), default_value = "state_data.csv", long)]
+    pub uber_states: PathBuf,
+    /// How many samples (seeds) to use
+    #[structopt(short = "z", long, default_value = "10000")]
+    pub sample_size: usize,
+    /// Any amount of analyzers that will provide statistics
+    /// 
+    /// Multiple analyzers separated with spaces will create separate stats files analyzing their individual criteria
+    /// 
+    /// However, you can also chain analyzers together by separating them with plus (no spaces).
+    /// E.g. --analyzers spawn-locations+zone-unlocks will generate stats that analyze the zone unlocks for each individual spawn location
+    #[structopt(short, long, required = true)]
+    pub analyzers: Vec<ChainedAnalyzers>,
+    /// The generated stats will be written to "stats/<folder_name>/<stats go here>"
+    ///
+    /// This will default to a summary of the provided settings
+    #[structopt(short, long)]
+    pub folder_name: Option<String>,
+    /// How many errors during seed generation should be tolerated before aborting
+    ///
+    /// If not provided, this will default to a value based on `sample_size`
+    #[structopt(long)]
+    pub tolerated_errors: Option<usize>,
+    /// How many error messages should be displayed after aborting due to `tolerated_errors` being exceeded
+    #[structopt(long, default_value = "10")]
+    pub error_message_limit: usize,
+    /// cleans the cache for the provided settings and generates new seeds from scratch
+    #[structopt(long)]
+    pub overwrite_cache: bool,
+    #[structopt(flatten)]
+    pub settings: SeedSettings,
+}
+
+pub struct ChainedAnalyzers(pub Vec<Analyzer>);
+#[derive(StructOpt)]
+pub enum Analyzer {
+    SpawnLocations,
+    SpawnRegion,
+    ZoneUnlock { zone: Zone },
+}
+impl FromStr for ChainedAnalyzers {
+    type Err = structopt::clap::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.split('+').map(|s| {
+            match s.split_once(':') {
+                None => Analyzer::from_iter_safe(["", s]),  // The first arg is the "executable name", I think clap would have a more elegant solution here
+                Some((identifier, args)) => Analyzer::from_iter_safe(["", identifier].into_iter().chain(args.split(',')))
+            }
+        }).collect::<Result<Vec<_>, _>>().map(Self)
     }
 }
 

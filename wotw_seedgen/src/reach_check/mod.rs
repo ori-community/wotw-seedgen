@@ -1,4 +1,4 @@
-use crate::Inventory;
+use crate::{Inventory, log};
 use crate::settings::{UniverseSettings, WorldSettings};
 use crate::util;
 use crate::world::World;
@@ -35,7 +35,7 @@ fn set_node(world: &mut World, identifier: &str) {
         log::trace!("Setting state {}", identifier);
         world.sets.push(found_node.index());
     } else {
-        log::warn!("State {} not found", identifier);
+        log::warning!("State {} not found", identifier);
     }
 }
 

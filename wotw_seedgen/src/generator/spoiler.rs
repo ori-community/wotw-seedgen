@@ -1,14 +1,15 @@
 use std::fmt::{self, Display, Write};
 
-use serde::{Serialize, Deserialize};
+use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
-use crate::{util::Position, Item, Inventory};
-
-#[cfg(doc)]
-use super::placement::Placement;
+use crate::{
+    util::{Position, Zone},
+    Inventory, Item,
+};
 
 /// Complete data to create a logic spoiler for the seed
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SeedSpoiler {
     /// Anchor identifier of all the spawn locations
     pub spawns: Vec<String>,
@@ -16,37 +17,42 @@ pub struct SeedSpoiler {
     pub groups: Vec<SpoilerGroup>,
 }
 /// One "step" of placements in a [`SeedSpoiler`]
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerGroup {
-    /// Either contains the reachables for each world, or empty for placement groups before reachables are considered
-    pub reachable: Vec<SpoilerWorldReachable>,
+    /// Either contains the new reachables for each world, or empty for placement groups before reachables are considered
+    pub reachable: Vec<Vec<NodeSummary>>,
     /// The set of items that were placed as forced progression, if any
     pub forced_items: Inventory,
     /// An ordered list detailing the [`Placement`]s
+    /// 
+    /// [`Placement`]: super::Placement
     pub placements: Vec<SpoilerPlacement>,
 }
-/// Newly reachable locations
-#[derive(Serialize, Deserialize, Clone)]
-pub struct SpoilerWorldReachable {
-    pub locations: Vec<String>,
-}
 /// One item placed on one location
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerPlacement {
     /// The "sending" world
     pub origin_world_index: usize,
     /// The "receiving" world
     pub target_world_index: usize,
-    /// The identifier of the placement location
-    pub node_identifier: String,
-    /// The [`Position`] of the location, if applicable
-    pub node_position: Option<Position>,
+    /// The placement location
+    pub location: NodeSummary,
     /// The placed [`Item`]
     pub item: Item,
     /// The name of the [`Item`], which may vary from the [`Item`]s [`Display`] implementation if a custom name for item was provided by headers
     pub item_name: String,
+}
+/// Select data from a [`Node`](crate::world::graph::Node)
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct NodeSummary {
+    /// The identifier
+    pub identifier: String,
+    /// The [`Position`], if applicable
+    pub position: Option<Position>,
+    /// The [`Zone`], if applicable
+    pub zone: Option<Zone>,
 }
 
 impl SeedSpoiler {
@@ -90,10 +96,10 @@ impl Display for SeedSpoiler {
                 if multiworld {
                     write!(location , "[{}] ", placement.origin_world_index)?;
                 }
-                write!(location, "{}", placement.node_identifier)?;
+                write!(location, "{}", placement.location.identifier)?;
                 if location.len() > longest_location { longest_location = location.len(); }
 
-                Ok((pickup, location, &placement.node_position))
+                Ok((pickup, location, &placement.location.position))
             }).collect::<Result<Vec<_>, _>>()?;
             Ok((&spoiler_group.reachable, &spoiler_group.forced_items, placements))
         }).collect::<Result<Vec<_>, _>>()?;
@@ -113,11 +119,11 @@ impl Display for SeedSpoiler {
                         write!(f, "  ")?;
                     }
 
-                    if world_reachable.locations.is_empty() {
+                    if world_reachable.is_empty() {
                         writeln!(f, "No new reachables")?;
                     } else {
-                        let locations = world_reachable.locations.join(", ");
-                        let count = world_reachable.locations.len();
+                        let locations = world_reachable.iter().map(|node| &node.identifier).join(", ");
+                        let count = world_reachable.len();
                         write!(f, "{count} new reachable")?;
                         if count > 1 { write!(f, "s")?; }
                         writeln!(f, ": {locations}")?;
