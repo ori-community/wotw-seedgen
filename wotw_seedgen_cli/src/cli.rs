@@ -667,8 +667,10 @@ pub struct StatsArgs {
 pub struct ChainedAnalyzers(pub Vec<Analyzer>);
 #[derive(StructOpt)]
 pub enum Analyzer {
+    SpawnItems,
     SpawnLocation,
     SpawnRegion,
+    ItemUnlock { item: String },
     ZoneUnlock { zone: Zone },
 }
 impl FromStr for ChainedAnalyzers {

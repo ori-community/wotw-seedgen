@@ -112,6 +112,10 @@ pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
         eprintln!("Cleaned seed storage for these settings");
     }
 
+    if settings.world_count() > 1 {
+        return Err("Multiworld seeds aren't well supported yet".to_string());
+    }
+
     let seeds = Seeds::<F>::new(
         settings,
         sample_size,

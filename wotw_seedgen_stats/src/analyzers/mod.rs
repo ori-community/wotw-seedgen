@@ -1,7 +1,11 @@
+mod item_unlock;
+mod spawn_items;
 mod spawn_location;
 mod spawn_region;
 mod zone_unlock;
 
+pub use item_unlock::ItemUnlockStats;
+pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;
 pub use spawn_region::SpawnRegionStats;
 pub use zone_unlock::ZoneUnlockStats;
