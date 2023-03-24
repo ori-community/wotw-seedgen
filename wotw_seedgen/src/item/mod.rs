@@ -1,42 +1,45 @@
-mod resource;
-mod skill;
-mod shard;
-mod command;
-mod teleporter;
-mod message;
-mod uber_state;
 mod bonus_item;
 mod bonus_upgrade;
-mod sysmessage;
-mod wheel_command;
+mod command;
+mod message;
+mod resource;
+mod shard;
 mod shop_command;
+mod skill;
+mod sysmessage;
+mod teleporter;
+mod uber_state;
+mod wheel_command;
 
 use std::fmt;
 use std::str::FromStr;
 
 use rustc_hash::FxHashMap;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use wotw_seedgen_derive::VVariant;
 
 use crate::header::{parser, CodeDisplay};
-use crate::header::{VResolve, vdisplay};
-use crate::settings::{Difficulty, logical_difficulty};
-use crate::util::{Zone, Icon, MapIcon};
+use crate::header::{vdisplay, VResolve};
+use crate::settings::{logical_difficulty, Difficulty};
 use crate::uber_state::UberIdentifier;
+use crate::util::{Icon, MapIcon, Zone};
 
 pub use self::{
-    resource::Resource,
-    skill::Skill,
-    shard::Shard,
-    command::{Command, VCommand, ToggleCommand, EquipSlot},
-    teleporter::Teleporter,
-    message::{Message, VMessage},
-    uber_state::{UberStateItem, VUberStateItem, UberStateOperator, VUberStateOperator, UberStateRange, VUberStateRange, UberStateRangeBoundary, VUberStateRangeBoundary, UberStateValue},
     bonus_item::BonusItem,
     bonus_upgrade::BonusUpgrade,
-    sysmessage::SysMessage,
-    wheel_command::{WheelCommand, VWheelCommand, WheelItemPosition, WheelBind},
+    command::{Command, EquipSlot, ToggleCommand, VCommand},
+    message::{Message, VMessage},
+    resource::Resource,
+    shard::Shard,
     shop_command::{ShopCommand, VShopCommand},
+    skill::Skill,
+    sysmessage::SysMessage,
+    teleporter::Teleporter,
+    uber_state::{
+        UberStateItem, UberStateOperator, UberStateRange, UberStateRangeBoundary, UberStateValue,
+        VUberStateItem, VUberStateOperator, VUberStateRange, VUberStateRangeBoundary,
+    },
+    wheel_command::{VWheelCommand, WheelBind, WheelCommand, WheelItemPosition},
 };
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant, Serialize, Deserialize)]
@@ -96,7 +99,8 @@ impl FromStr for Item {
     type Err = String;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let mut parser = parser::new(input);
-        let item = VItem::parse(&mut parser).map_err(|err| err.verbose_display())?
+        let item = VItem::parse(&mut parser)
+            .map_err(|err| err.verbose_display())?
             .resolve(&FxHashMap::default())?;
         parser.expect_end().map_err(|err| err.verbose_display())?;
         Ok(item)
@@ -109,40 +113,55 @@ impl Item {
     pub fn is_progression(&self, difficulty: Difficulty) -> bool {
         match self {
             Item::Resource(resource) => match resource {
-                Resource::ShardSlot => difficulty >= Difficulty::Unsafe,  // lower difficulties have no issue with the default shards
-                Resource::HealthFragment | Resource::EnergyFragment | Resource::GorlekOre | Resource::Keystone => true,
+                Resource::ShardSlot => difficulty >= Difficulty::Unsafe, // lower difficulties have no issue with the default shards
+                Resource::HealthFragment
+                | Resource::EnergyFragment
+                | Resource::GorlekOre
+                | Resource::Keystone => true,
             },
             Item::Skill(skill) => match skill {
-                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => difficulty >= logical_difficulty::DAMAGE_BUFFS,
+                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => {
+                    difficulty >= logical_difficulty::DAMAGE_BUFFS
+                }
                 Skill::Seir | Skill::WallJump => false,
-                Skill::Bash |
-                Skill::DoubleJump |
-                Skill::Launch |
-                Skill::Glide |
-                Skill::WaterBreath |
-                Skill::Grenade |
-                Skill::Grapple |
-                Skill::Flash |
-                Skill::Spear |
-                Skill::Regenerate |
-                Skill::Bow |
-                Skill::Hammer |
-                Skill::Sword |
-                Skill::Burrow |
-                Skill::Dash |
-                Skill::WaterDash |
-                Skill::Shuriken |
-                Skill::Blaze |
-                Skill::Sentry |
-                Skill::Flap => true,
+                Skill::Bash
+                | Skill::DoubleJump
+                | Skill::Launch
+                | Skill::Glide
+                | Skill::WaterBreath
+                | Skill::Grenade
+                | Skill::Grapple
+                | Skill::Flash
+                | Skill::Spear
+                | Skill::Regenerate
+                | Skill::Bow
+                | Skill::Hammer
+                | Skill::Sword
+                | Skill::Burrow
+                | Skill::Dash
+                | Skill::WaterDash
+                | Skill::Shuriken
+                | Skill::Blaze
+                | Skill::Sentry
+                | Skill::Flap => true,
             },
             Item::Shard(shard) => match shard {
-                Shard::UltraGrapple | Shard::Deflector | Shard::Magnet | Shard::Splinter | Shard::Sticky | Shard::Fracture => true,  // Here logic has to decide the difficulties
+                Shard::UltraGrapple
+                | Shard::Deflector
+                | Shard::Magnet
+                | Shard::Splinter
+                | Shard::Sticky
+                | Shard::Fracture => true, // Here logic has to decide the difficulties
                 Shard::TripleJump => difficulty >= logical_difficulty::TRIPLE_JUMP,
                 Shard::Resilience => difficulty >= logical_difficulty::RESILIENCE,
                 Shard::Vitality => difficulty >= logical_difficulty::VITALITY,
                 Shard::Energy => difficulty >= logical_difficulty::ENERGY_SHARD,
-                Shard::Lifeforce | Shard::Finesse | Shard::LastStand | Shard::Reckless | Shard::Wingclip | Shard::SpiritSurge => difficulty >= logical_difficulty::DAMAGE_BUFFS,
+                Shard::Lifeforce
+                | Shard::Finesse
+                | Shard::LastStand
+                | Shard::Reckless
+                | Shard::Wingclip
+                | Shard::SpiritSurge => difficulty >= logical_difficulty::DAMAGE_BUFFS,
                 Shard::LifePact => difficulty >= logical_difficulty::LIFE_PACT,
                 Shard::Overcharge => difficulty >= logical_difficulty::OVERCHARGE,
                 Shard::UltraBash => difficulty >= logical_difficulty::ULTRA_BASH,
@@ -163,11 +182,16 @@ impl Item {
 
     #[inline]
     pub fn is_single_instance(&self) -> bool {
-        !matches!(self,
-            Item::SpiritLight(_) | Item::RemoveSpiritLight(_) |
-            Item::Resource(_) |
-            Item::BonusItem(_) | Item::BonusUpgrade(_) |
-            Item::UberState(_) | Item::Command(_) | Item::Message(_)
+        !matches!(
+            self,
+            Item::SpiritLight(_)
+                | Item::RemoveSpiritLight(_)
+                | Item::Resource(_)
+                | Item::BonusItem(_)
+                | Item::BonusUpgrade(_)
+                | Item::UberState(_)
+                | Item::Command(_)
+                | Item::Message(_)
         )
     }
 
@@ -180,15 +204,24 @@ impl Item {
             Item::Resource(Resource::EnergyFragment | Resource::HealthFragment) => 120,
             Item::Resource(Resource::Keystone) => 320,
             Item::Resource(Resource::ShardSlot) => 480,
-            Item::Skill(Skill::Regenerate | Skill::WaterBreath) => 200,  // Quality-of-Life Skills
-            Item::Skill(Skill::WallJump | Skill::DoubleJump | Skill::Dash) => 1200,  // Essential Movement
-            Item::Skill(Skill::Glide | Skill::Grapple) => 1400,  // Feel-Good Finds
-            Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600,  // Basic Weapons
-            Item::Skill(Skill::Burrow | Skill::Bash | Skill::Flap | Skill::WaterDash | Skill::Grenade | Skill::Flash | Skill::Seir) | Item::Water => 1800,  // Key Skills
-            Item::Skill(Skill::Blaze | Skill::Sentry) => 2800,  // Tedious Weapons
-            Item::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight) => 3000,  // Unhinted Skill
-            Item::Skill(Skill::Spear) => 4000,  // No
-            Item::Skill(Skill::Launch) => 40000,  // Absolutely Broken
+            Item::Skill(Skill::Regenerate | Skill::WaterBreath) => 200, // Quality-of-Life Skills
+            Item::Skill(Skill::WallJump | Skill::DoubleJump | Skill::Dash) => 1200, // Essential Movement
+            Item::Skill(Skill::Glide | Skill::Grapple) => 1400, // Feel-Good Finds
+            Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600, // Basic Weapons
+            Item::Skill(
+                Skill::Burrow
+                | Skill::Bash
+                | Skill::Flap
+                | Skill::WaterDash
+                | Skill::Grenade
+                | Skill::Flash
+                | Skill::Seir,
+            )
+            | Item::Water => 1800, // Key Skills
+            Item::Skill(Skill::Blaze | Skill::Sentry) => 2800, // Tedious Weapons
+            Item::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight) => 3000, // Unhinted Skill
+            Item::Skill(Skill::Spear) => 4000,                                                // No
+            Item::Skill(Skill::Launch) => 40000, // Absolutely Broken
             Item::Shard(_) => 1000,
             Item::Teleporter(Teleporter::Marsh) => 30000,
             Item::Teleporter(_) => 25000,
@@ -231,38 +264,38 @@ impl Item {
             Item::Water => Some(2000),
             Item::Teleporter(teleporter) => return Some(teleporter.attached_state()),
             _ => None,
-        }.map(|uber_id| UberIdentifier::new(6, uber_id))
+        }
+        .map(|uber_id| UberIdentifier::new(6, uber_id))
     }
 
     pub fn code(&self) -> CodeDisplay<Item> {
-        CodeDisplay::new(self, |s, f| {
-            match s {
-                Item::SpiritLight(amount) => write!(f, "0|{}", amount),
-                Item::RemoveSpiritLight(amount) => write!(f, "0|-{}", amount),
-                Item::Resource(resource) => write!(f, "1|{}", *resource as u8),
-                Item::Skill(skill) => write!(f, "2|{}", *skill as u8),
-                Item::RemoveSkill(skill) => write!(f, "2|-{}", *skill as u8),
-                Item::Shard(shard) => write!(f, "3|{}", *shard as u8),
-                Item::RemoveShard(shard) => write!(f, "3|-{}", *shard as u8),
-                Item::Command(command) => write!(f, "4|{}", command.code()),
-                Item::Teleporter(teleporter) => write!(f, "5|{}", *teleporter as u8),
-                Item::RemoveTeleporter(teleporter) => write!(f, "5|-{}", *teleporter as u8),
-                Item::Message(message) => write!(f, "6|{}", message.code()),
-                Item::UberState(command) => write!(f, "8|{}", command.code()),
-                Item::Water => write!(f, "9|0"),
-                Item::RemoveWater => write!(f, "9|-0"),
-                Item::BonusItem(bonus) => write!(f, "10|{}", *bonus as u8),
-                Item::BonusUpgrade(bonus) => write!(f, "11|{}", *bonus as u8),
-                Item::Relic(zone) => write!(f, "14|{}", *zone as u8),
-                Item::SysMessage(message) =>
-                    if let SysMessage::MapRelicList(zone) = message {
-                        write!(f, "15|{}|{}", *zone as u8, message.to_id())
-                    } else {
-                        write!(f, "15|{}", message.to_id())
-                    },
-                Item::WheelCommand(command) => write!(f, "16|{}", command.code()),
-                Item::ShopCommand(command) => write!(f, "17|{}", command.code()),
+        CodeDisplay::new(self, |s, f| match s {
+            Item::SpiritLight(amount) => write!(f, "0|{}", amount),
+            Item::RemoveSpiritLight(amount) => write!(f, "0|-{}", amount),
+            Item::Resource(resource) => write!(f, "1|{}", *resource as u8),
+            Item::Skill(skill) => write!(f, "2|{}", *skill as u8),
+            Item::RemoveSkill(skill) => write!(f, "2|-{}", *skill as u8),
+            Item::Shard(shard) => write!(f, "3|{}", *shard as u8),
+            Item::RemoveShard(shard) => write!(f, "3|-{}", *shard as u8),
+            Item::Command(command) => write!(f, "4|{}", command.code()),
+            Item::Teleporter(teleporter) => write!(f, "5|{}", *teleporter as u8),
+            Item::RemoveTeleporter(teleporter) => write!(f, "5|-{}", *teleporter as u8),
+            Item::Message(message) => write!(f, "6|{}", message.code()),
+            Item::UberState(command) => write!(f, "8|{}", command.code()),
+            Item::Water => write!(f, "9|0"),
+            Item::RemoveWater => write!(f, "9|-0"),
+            Item::BonusItem(bonus) => write!(f, "10|{}", *bonus as u8),
+            Item::BonusUpgrade(bonus) => write!(f, "11|{}", *bonus as u8),
+            Item::Relic(zone) => write!(f, "14|{}", *zone as u8),
+            Item::SysMessage(message) => {
+                if let SysMessage::MapRelicList(zone) = message {
+                    write!(f, "15|{}|{}", *zone as u8, message.to_id())
+                } else {
+                    write!(f, "15|{}", message.to_id())
+                }
             }
+            Item::WheelCommand(command) => write!(f, "16|{}", command.code()),
+            Item::ShopCommand(command) => write!(f, "17|{}", command.code()),
         })
     }
 
@@ -276,11 +309,15 @@ impl Item {
 
     pub fn icon(&self) -> Option<Icon> {
         match self {
-            Item::SpiritLight(_) => Some(Icon::File(String::from("assets/icons/game/experience.png"))),
+            Item::SpiritLight(_) => {
+                Some(Icon::File(String::from("assets/icons/game/experience.png")))
+            }
             Item::Resource(resource) => resource.icon(),
             Item::Skill(skill) => skill.icon(),
             Item::Shard(shard) => shard.icon(),
-            Item::Teleporter(_) => Some(Icon::File(String::from("assets/icons/game/teleporter.png"))),
+            Item::Teleporter(_) => {
+                Some(Icon::File(String::from("assets/icons/game/teleporter.png")))
+            }
             Item::Message(_) => Some(Icon::File(String::from("assets/icons/game/message.png"))),
             Item::Water => Some(Icon::File(String::from("assets/icons/game/water.png"))),
             Item::BonusItem(bonus_item) => bonus_item.icon(),
@@ -323,12 +360,31 @@ mod tests {
         assert_eq!(Item::SpiritLight(45).code().to_string(), "0|45");
         assert_eq!(Item::Resource(Resource::Keystone).code().to_string(), "1|3");
         assert_eq!(Item::Skill(Skill::Launch).code().to_string(), "2|8");
-        assert_eq!(Item::Skill(Skill::GladesAncestralLight).code().to_string(), "2|120");
+        assert_eq!(
+            Item::Skill(Skill::GladesAncestralLight).code().to_string(),
+            "2|120"
+        );
         assert_eq!(Item::Shard(Shard::Magnet).code().to_string(), "3|8");
-        assert_eq!(Item::Teleporter(Teleporter::Marsh).code().to_string(), "5|16");
+        assert_eq!(
+            Item::Teleporter(Teleporter::Marsh).code().to_string(),
+            "5|16"
+        );
         assert_eq!(Item::Water.code().to_string(), "9|0");
-        assert_eq!(Item::BonusItem(BonusItem::Relic).code().to_string(), "10|20");
-        assert_eq!(Item::BonusUpgrade(BonusUpgrade::ShurikenEfficiency).code().to_string(), "11|4");
-        assert_eq!(Item::Message(Message::new(String::from("8|0|9|7"))).code().to_string(), "6|8|0|9|7");
+        assert_eq!(
+            Item::BonusItem(BonusItem::Relic).code().to_string(),
+            "10|20"
+        );
+        assert_eq!(
+            Item::BonusUpgrade(BonusUpgrade::ShurikenEfficiency)
+                .code()
+                .to_string(),
+            "11|4"
+        );
+        assert_eq!(
+            Item::Message(Message::new(String::from("8|0|9|7")))
+                .code()
+                .to_string(),
+            "6|8|0|9|7"
+        );
     }
 }

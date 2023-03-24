@@ -6,7 +6,8 @@ use log::LevelFilter;
 use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 
 pub fn create_world_preset(args: cli::WorldPresetArgs) -> Result<(), String> {
-    log_init::initialize_log(None, LevelFilter::Info, false).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+    log_init::initialize_log(None, LevelFilter::Info, false)
+        .unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
     let preset = args.settings.into_world_preset();
     let preset = preset.to_json_pretty();

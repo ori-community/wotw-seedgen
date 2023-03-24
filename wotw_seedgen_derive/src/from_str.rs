@@ -13,10 +13,13 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
                     if path.is_ident("ParseFromIdentifier") {
                         parse_from_ident = true;
                     }
-                },
+                }
                 syn::Meta::List(list) => {
                     if list.path.get_ident().map_or(false, |ident| ident == "repr") {
-                        assert!(list.nested.len() == 1 && repr_ident.is_none(), "Expected exactly one repr argument");
+                        assert!(
+                            list.nested.len() == 1 && repr_ident.is_none(),
+                            "Expected exactly one repr argument"
+                        );
                         let repr = list.nested.into_iter().next().unwrap();
                         if let syn::NestedMeta::Meta(syn::Meta::Path(repr)) = repr {
                             repr_ident = Some(repr.get_ident().expect("repr identifier").clone());
@@ -24,18 +27,22 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
                             panic!("Invalid repr attribute")
                         }
                     }
-                },
-                syn::Meta::NameValue(_) => {},
+                }
+                syn::Meta::NameValue(_) => {}
             }
         }
     }
 
     let implementation = if parse_from_ident {
         let variants = match input.data {
-            syn::Data::Enum(data_enum) => {
-                data_enum.variants.into_iter().map(|variant| {
-
-                    assert!(matches!(variant.fields, syn::Fields::Unit), "Expected unit variant");
+            syn::Data::Enum(data_enum) => data_enum
+                .variants
+                .into_iter()
+                .map(|variant| {
+                    assert!(
+                        matches!(variant.fields, syn::Fields::Unit),
+                        "Expected unit variant"
+                    );
 
                     let mut custom_ident = None;
                     for attribute in variant.attrs {
@@ -46,19 +53,19 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
                                 } else {
                                     panic!("Expected string literal in Ident attribute")
                                 }
-                                
                             }
                         }
                     }
 
                     let variant = variant.ident;
-                    let variant_string = custom_ident.unwrap_or_else(|| variant.to_string().to_lowercase());
+                    let variant_string =
+                        custom_ident.unwrap_or_else(|| variant.to_string().to_lowercase());
 
                     quote! {
                         #variant_string => #name::#variant
                     }
-                }).collect::<Vec<_>>()
-            },
+                })
+                .collect::<Vec<_>>(),
             _ => panic!("Expected enum"),
         };
 
@@ -91,5 +98,6 @@ pub fn from_str_impl(input: syn::DeriveInput) -> TokenStream {
         impl std::str::FromStr for #name {
             #implementation
         }
-    }.into()
+    }
+    .into()
 }

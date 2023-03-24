@@ -4,10 +4,13 @@ use wotw_seedgen_derive::FromStr;
 
 use crate::VItem;
 
-use crate::header::{HeaderCommand, ParameterDefault, V, VString, ParameterType, GoalmodeHack};
+use crate::header::{GoalmodeHack, HeaderCommand, ParameterDefault, ParameterType, VString, V};
 use crate::languages::TokenKind;
 
-use super::{Parser, ParseError, parse_ident, parse_number, parse_v_number, parse_string, parse_icon, Suggestion};
+use super::{
+    parse_icon, parse_ident, parse_number, parse_string, parse_v_number, ParseError, Parser,
+    Suggestion,
+};
 
 #[derive(FromStr)]
 #[ParseFromIdentifier]
@@ -23,9 +26,11 @@ enum HeaderCommandKind {
     Icon,
     Parameter,
     Set,
-    #[Ident = "if"] StartIf,
+    #[Ident = "if"]
+    StartIf,
     EndIf,
-    #[Ident = "__goalmode_hack"] GoalmodeHack,
+    #[Ident = "__goalmode_hack"]
+    GoalmodeHack,
 }
 
 impl HeaderCommand {
@@ -66,8 +71,10 @@ fn parse_item_amount(parser: &mut Parser) -> Result<V<i32>, ParseError> {
             if peeked.kind == TokenKind::Identifier {
                 let range = peeked.range.clone();
                 parser.read(range) == "x"
-            } else { false }
-        },
+            } else {
+                false
+            }
+        }
         TokenKind::Dollar => true,
         _ => false,
     } {
@@ -148,7 +155,10 @@ fn parse_parameter(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
         ParameterType::Float => ParameterDefault::Float(parse_number!(parser, Suggestion::Float)?),
         ParameterType::String => ParameterDefault::String(parse_string(parser).to_owned()),
     };
-    Ok(HeaderCommand::Parameter { identifier, default })
+    Ok(HeaderCommand::Parameter {
+        identifier,
+        default,
+    })
 }
 fn parse_set(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
@@ -194,7 +204,7 @@ fn parse_goalmode(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
             parser.eat(TokenKind::Whitespace)?;
             let amount = parse_v_number!(parser, Suggestion::Integer);
             GoalmodeHack::Relics { chance, amount }
-        },
+        }
     };
 
     Ok(HeaderCommand::GoalmodeHack(goal))

@@ -1,9 +1,9 @@
 use std::fmt;
 
 use num_enum::TryFromPrimitive;
-use wotw_seedgen_derive::{FromStr, Display};
+use wotw_seedgen_derive::{Display, FromStr};
 
-use crate::{item::Shard, header::CodeDisplay};
+use crate::{header::CodeDisplay, item::Shard};
 
 use super::Spell;
 
@@ -19,16 +19,14 @@ pub enum Icon {
 }
 impl Icon {
     pub fn code(&self) -> CodeDisplay<Icon> {
-        CodeDisplay::new(self, |s, f| {
-            match s {
-                Icon::Shard(shard) => write!(f, "shard:{}", *shard as u8),
-                Icon::Spell(spell) => write!(f, "spell:{}", *spell as u16),
-                Icon::Opher(opher) => write!(f, "opher:{}", *opher as u8),
-                Icon::Lupo(lupo) => write!(f, "lupo:{}", *lupo as u8),
-                Icon::Grom(grom) => write!(f, "grom:{}", *grom as u8),
-                Icon::Tuley(tuley) => write!(f, "tuley:{}", *tuley as u8),
-                Icon::File(file) => write!(f, "file:{file}"),
-            }
+        CodeDisplay::new(self, |s, f| match s {
+            Icon::Shard(shard) => write!(f, "shard:{}", *shard as u8),
+            Icon::Spell(spell) => write!(f, "spell:{}", *spell as u16),
+            Icon::Opher(opher) => write!(f, "opher:{}", *opher as u8),
+            Icon::Lupo(lupo) => write!(f, "lupo:{}", *lupo as u8),
+            Icon::Grom(grom) => write!(f, "grom:{}", *grom as u8),
+            Icon::Tuley(tuley) => write!(f, "tuley:{}", *tuley as u8),
+            Icon::File(file) => write!(f, "file:{file}"),
         })
     }
 }
@@ -46,7 +44,9 @@ impl fmt::Display for Icon {
     }
 }
 
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr,
+)]
 #[repr(u8)]
 pub enum OpherIcon {
     Sentry = 0,
@@ -62,14 +62,18 @@ pub enum OpherIcon {
     WaterBreath = 10,
     FastTravel = 11,
 }
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr,
+)]
 #[repr(u8)]
 pub enum LupoIcon {
     EnergyFragmentsMap = 0,
     HealthFragmentsMap = 1,
     ShardsMap = 2,
 }
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr,
+)]
 #[repr(u8)]
 pub enum GromIcon {
     RepairTheSpiritWell = 0,
@@ -80,7 +84,9 @@ pub enum GromIcon {
     ThornySituation = 5,
     TheGorlekTouch = 6,
 }
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr,
+)]
 #[repr(u8)]
 pub enum TuleyIcon {
     SelaFlowers = 0,

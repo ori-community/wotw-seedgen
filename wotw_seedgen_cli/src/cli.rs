@@ -1,15 +1,15 @@
-use std::str::FromStr;
-use std::path::PathBuf;
 use std::error::Error;
 use std::fmt;
 use std::ops::Deref;
+use std::path::PathBuf;
+use std::str::FromStr;
 
-use structopt::StructOpt;
 use rustc_hash::FxHashSet;
+use structopt::StructOpt;
 
-use wotw_seedgen::item::{Skill, Shard, Teleporter};
-use wotw_seedgen::settings::{Spawn, Difficulty, Trick, Goal, HeaderConfig, InlineHeader};
-use wotw_seedgen::preset::{UniversePreset, WorldPreset, PresetGroup, PresetInfo};
+use wotw_seedgen::item::{Shard, Skill, Teleporter};
+use wotw_seedgen::preset::{PresetGroup, PresetInfo, UniversePreset, WorldPreset};
+use wotw_seedgen::settings::{Difficulty, Goal, HeaderConfig, InlineHeader, Spawn, Trick};
 use wotw_seedgen::util::Zone;
 
 #[derive(StructOpt)]
@@ -34,14 +34,14 @@ pub enum SeedGenCommand {
     /// Play the most recent generated seed
     Play,
     /// Create a universe preset of the given settings
-    /// 
+    ///
     /// A universe preset defines the settings for the entire game and can contain different settings on a per world basis
     UniversePreset {
         #[structopt(flatten)]
         args: UniversePresetArgs,
     },
     /// Create a world preset of the given settings
-    /// 
+    ///
     /// A world preset defines the settings for one world and will be applied to all worlds the same way when generating a multiworld seed
     WorldPreset {
         #[structopt(flatten)]
@@ -133,10 +133,12 @@ impl<T: FromStr> FromStr for WorldOpt<T> {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let inner = if let Some(world) = s.strip_prefix(':') {
-            let index = world.parse().map_err(|_| WorldOptError::IndexError(world.to_string()))?;
+            let index = world
+                .parse()
+                .map_err(|_| WorldOptError::IndexError(world.to_string()))?;
             WorldOptInner::World(index)
         } else {
-            WorldOptInner::Opt(T::from_str(s).map_err( WorldOptError::ValueError)?)
+            WorldOptInner::Opt(T::from_str(s).map_err(WorldOptError::ValueError)?)
         };
         let source = s.to_string();
         Ok(WorldOpt { source, inner })
@@ -162,7 +164,10 @@ pub enum WorldOptInner<T> {
     Opt(T),
 }
 
-fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> Result<Vec<Vec<T>>, String> {
+fn resolve_world_opts<T: Clone>(
+    world_opts: Vec<WorldOpt<T>>,
+    worlds: usize,
+) -> Result<Vec<Vec<T>>, String> {
     let mut world_values: Vec<Vec<T>> = vec![vec![]; worlds];
     let mut current_world = None;
 
@@ -171,19 +176,25 @@ fn resolve_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> 
             WorldOptInner::World(index) => current_world = Some(index),
             WorldOptInner::Opt(value) => {
                 if let Some(index) = current_world {
-                    world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?.push(value);
+                    world_values
+                        .get_mut(index)
+                        .ok_or(format!("World index {index} greater than number of worlds"))?
+                        .push(value);
                 } else {
                     for world in &mut world_values {
                         world.push(value.clone());
                     }
                 }
-            },
+            }
         }
     }
 
     Ok(world_values)
 }
-fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, worlds: usize) -> Result<Vec<Option<T>>, String> {
+fn resolve_nonduplicate_world_opts<T: Clone>(
+    world_opts: Vec<WorldOpt<T>>,
+    worlds: usize,
+) -> Result<Vec<Option<T>>, String> {
     let mut world_values: Vec<Option<(T, String)>> = vec![None; worlds];
     let mut current_world = None;
 
@@ -192,28 +203,38 @@ fn resolve_nonduplicate_world_opts<T: Clone>(world_opts: Vec<WorldOpt<T>>, world
             WorldOptInner::World(index) => current_world = Some(index),
             WorldOptInner::Opt(value) => {
                 if let Some(index) = current_world {
-                    let current_world_entry = world_values.get_mut(index).ok_or(format!("World index {index} greater than number of worlds"))?;
+                    let current_world_entry = world_values
+                        .get_mut(index)
+                        .ok_or(format!("World index {index} greater than number of worlds"))?;
                     *current_world_entry = Some((value, world_opt.source));
                 } else {
                     for current_world_entry in &mut world_values {
                         *current_world_entry = Some((value.clone(), world_opt.source.clone()));
                     }
                 }
-            },
+            }
         }
     }
 
-    let world_values = world_values.into_iter().map(|current_world_value| current_world_value.map(|t| t.0)).collect();
+    let world_values = world_values
+        .into_iter()
+        .map(|current_world_value| current_world_value.map(|t| t.0))
+        .collect();
     Ok(world_values)
 }
-fn resolve_flag_world_opts(world_opts: Option<Vec<WorldOpt<bool>>>, worlds: usize) -> Result<Vec<Option<bool>>, String> {
+fn resolve_flag_world_opts(
+    world_opts: Option<Vec<WorldOpt<bool>>>,
+    worlds: usize,
+) -> Result<Vec<Option<bool>>, String> {
     match world_opts {
-        Some(opts) => if opts.is_empty() {
+        Some(opts) => {
+            if opts.is_empty() {
                 Ok(vec![Some(true); worlds])
             } else {
                 resolve_nonduplicate_world_opts(opts, worlds)
-            },
-        None => Ok(vec![None; worlds])
+            }
+        }
+        None => Ok(vec![None; worlds]),
     }
 }
 
@@ -260,16 +281,28 @@ impl FromStr for GoalsOpt {
             "r" | "relics" => {
                 if !details.is_empty() {
                     if let Some(chance) = details.strip_suffix('%') {
-                        let chance = chance.parse::<f64>().map_err(|_| format!("Invalid chance in details string for goal {s}"))?;
-                        if !(0.0..=100.0).contains(&chance) { return Err(format!("Invalid chance in details string for goal {s}")); }
+                        let chance = chance.parse::<f64>().map_err(|_| {
+                            format!("Invalid chance in details string for goal {s}")
+                        })?;
+                        if !(0.0..=100.0).contains(&chance) {
+                            return Err(format!("Invalid chance in details string for goal {s}"));
+                        }
                         Goal::RelicChance(chance / 100.0)
                     } else {
-                        let amount = details.parse().map_err(|_| format!("expected amount or % expression in details string for goal {s}"))?;
-                        if !(0..=11).contains(&amount) { return Err(format!("Invalid amount in details string for goal {s}")); }
+                        let amount = details.parse().map_err(|_| {
+                            format!(
+                                "expected amount or % expression in details string for goal {s}"
+                            )
+                        })?;
+                        if !(0..=11).contains(&amount) {
+                            return Err(format!("Invalid amount in details string for goal {s}"));
+                        }
                         Goal::Relics(amount)
                     }
-                } else { Goal::RelicChance(0.6) }
-            },
+                } else {
+                    Goal::RelicChance(0.6)
+                }
+            }
             other => return Err(format!("Unknown goal {other}")),
         };
 
@@ -289,7 +322,9 @@ impl FromStr for HeaderConfigOpt {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (identifier, config_value) = s.split_once('=').unwrap_or((s, "true"));
-        let (header_name, config_name) = identifier.split_once('.').ok_or_else(|| format!("Expected <header>.<parameter> in header configuration parameter {s}"))?;
+        let (header_name, config_name) = identifier.split_once('.').ok_or_else(|| {
+            format!("Expected <header>.<parameter> in header configuration parameter {s}")
+        })?;
 
         let header_config = HeaderConfig {
             header_name: header_name.to_string(),
@@ -333,7 +368,7 @@ pub struct SeedSettings {
     #[structopt(short = "p", long)]
     pub world_presets: Vec<WorldOpt<String>>,
     /// How many worlds to generate
-    /// 
+    ///
     /// Seeds with more than one world are called multiworld seeds
     #[structopt(short, long, default_value = "1")]
     pub worlds: usize,
@@ -361,7 +396,7 @@ pub struct SeedSettings {
     #[structopt(short, long)]
     pub goals: Vec<WorldOpt<GoalsOpt>>,
     /// Names of headers that will be used when generating the seed
-    /// 
+    ///
     /// The headers will be searched as .wotwrh files in the current and /headers child directory
     #[structopt(short, long)]
     pub headers: Vec<WorldOpt<String>>,
@@ -377,7 +412,7 @@ pub struct SeedSettings {
     #[structopt(short = "L", long)]
     pub disable_logic_filter: bool,
     /// Require an online connection to play the seed
-    /// 
+    ///
     /// This is needed for Co-op, Multiworld and Bingo
     #[structopt(short, long)]
     pub online: bool,
@@ -389,7 +424,11 @@ pub struct SeedSettings {
 }
 
 fn slice_in_option<T, S: Deref<Target = [T]>>(slice: S) -> Option<S> {
-    if slice.is_empty() { None } else { Some(slice) }
+    if slice.is_empty() {
+        None
+    } else {
+        Some(slice)
+    }
 }
 
 impl SeedSettings {
@@ -421,10 +460,15 @@ impl SeedSettings {
         let world_header_configs = resolve_world_opts(header_config, worlds)?;
         let world_inline_headers = resolve_world_opts(inline_headers, worlds)?;
 
-        let disable_logic_filter = if disable_logic_filter { Some(true) } else { None };
+        let disable_logic_filter = if disable_logic_filter {
+            Some(true)
+        } else {
+            None
+        };
         let online = if online { Some(true) } else { None };
 
-        let yes_fun = world_presets.into_iter()
+        let yes_fun = world_presets
+            .into_iter()
             .zip(world_spawns)
             .zip(world_difficulties)
             .zip(world_tricks)
@@ -433,20 +477,41 @@ impl SeedSettings {
             .zip(world_headers)
             .zip(world_header_configs)
             .zip(world_inline_headers)
-            .map(|((((((((world_presets, spawn), difficulty), tricks), hard), goals), headers), header_config), inline_headers)| {
-                WorldPreset {
-                    info: None,
-                    includes: slice_in_option(world_presets).map(FxHashSet::from_iter),
-                    spawn: spawn.map(SpawnOpt::into_inner),
-                    difficulty,
-                    tricks: slice_in_option(tricks).map(FxHashSet::from_iter),
-                    goals: slice_in_option(goals.into_iter().map(GoalsOpt::into_inner).collect()),
-                    hard,
-                    headers: slice_in_option(headers).map(FxHashSet::from_iter),
-                    header_config: slice_in_option(header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
-                    inline_headers: slice_in_option(inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
-                }
-            }).collect::<Vec<_>>();
+            .map(
+                |(
+                    (
+                        ((((((world_presets, spawn), difficulty), tricks), hard), goals), headers),
+                        header_config,
+                    ),
+                    inline_headers,
+                )| {
+                    WorldPreset {
+                        info: None,
+                        includes: slice_in_option(world_presets).map(FxHashSet::from_iter),
+                        spawn: spawn.map(SpawnOpt::into_inner),
+                        difficulty,
+                        tricks: slice_in_option(tricks).map(FxHashSet::from_iter),
+                        goals: slice_in_option(
+                            goals.into_iter().map(GoalsOpt::into_inner).collect(),
+                        ),
+                        hard,
+                        headers: slice_in_option(headers).map(FxHashSet::from_iter),
+                        header_config: slice_in_option(
+                            header_config
+                                .into_iter()
+                                .map(HeaderConfigOpt::into_inner)
+                                .collect(),
+                        ),
+                        inline_headers: slice_in_option(
+                            inline_headers
+                                .into_iter()
+                                .map(InlineHeaderOpt::into_inner)
+                                .collect(),
+                        ),
+                    }
+                },
+            )
+            .collect::<Vec<_>>();
 
         Ok(UniversePreset {
             info: None,
@@ -503,7 +568,7 @@ pub struct WorldPresetSettings {
     #[structopt(short, long)]
     pub goals: Option<Vec<GoalsOpt>>,
     /// Names of headers that will be used when generating the seed
-    /// 
+    ///
     /// The headers will be searched as .wotwrh files in the current and /headers child directory
     #[structopt(short, long)]
     pub headers: Option<Vec<String>>,
@@ -541,8 +606,18 @@ impl WorldPresetSettings {
             hard: if hard { Some(true) } else { None },
             goals: goals.map(|goals| goals.into_iter().map(GoalsOpt::into_inner).collect()),
             headers: headers.map(FxHashSet::from_iter),
-            header_config: header_config.map(|header_config| header_config.into_iter().map(HeaderConfigOpt::into_inner).collect()),
-            inline_headers: inline_headers.map(|inline_headers| inline_headers.into_iter().map(InlineHeaderOpt::into_inner).collect()),
+            header_config: header_config.map(|header_config| {
+                header_config
+                    .into_iter()
+                    .map(HeaderConfigOpt::into_inner)
+                    .collect()
+            }),
+            inline_headers: inline_headers.map(|inline_headers| {
+                inline_headers
+                    .into_iter()
+                    .map(InlineHeaderOpt::into_inner)
+                    .collect()
+            }),
         }
     }
 }
@@ -562,9 +637,9 @@ pub struct StatsArgs {
     #[structopt(short = "z", long, default_value = "10000")]
     pub sample_size: usize,
     /// Any amount of analyzers that will provide statistics
-    /// 
+    ///
     /// Multiple analyzers separated with spaces will create separate stats files analyzing their individual criteria
-    /// 
+    ///
     /// However, you can also chain analyzers together by separating them with plus (no spaces).
     /// E.g. --analyzers spawn-locations+zone-unlocks will generate stats that analyze the zone unlocks for each individual spawn location
     #[structopt(short, long, required = true)]
@@ -600,12 +675,17 @@ impl FromStr for ChainedAnalyzers {
     type Err = structopt::clap::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.split('+').map(|s| {
-            match s.split_once(':') {
-                None => Analyzer::from_iter_safe(["", s]),  // The first arg is the "executable name", I think clap would have a more elegant solution here
-                Some((identifier, args)) => Analyzer::from_iter_safe(["", identifier].into_iter().chain(args.split(',')))
-            }
-        }).collect::<Result<Vec<_>, _>>().map(Self)
+        s.split('+')
+            .map(|s| {
+                match s.split_once(':') {
+                    None => Analyzer::from_iter_safe(["", s]), // The first arg is the "executable name", I think clap would have a more elegant solution here
+                    Some((identifier, args)) => Analyzer::from_iter_safe(
+                        ["", identifier].into_iter().chain(args.split(',')),
+                    ),
+                }
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map(Self)
     }
 }
 
@@ -647,14 +727,27 @@ pub enum ReachData {
 impl FromStr for ReachData {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (kind, data) = s.split_once(':').ok_or_else(|| "Expected <kind>:<data>".to_string())?;
+        let (kind, data) = s
+            .split_once(':')
+            .ok_or_else(|| "Expected <kind>:<data>".to_string())?;
         match kind {
             "s" => data.parse().map(Self::Skill).map_err(|err| err.to_string()),
-            "t" => data.parse().map(Self::Teleporter).map_err(|err| err.to_string()),
+            "t" => data
+                .parse()
+                .map(Self::Teleporter)
+                .map_err(|err| err.to_string()),
             "sh" => data.parse().map(Self::Shard).map_err(|err| err.to_string()),
-            "w" => if data == "0" { Ok(Self::Water) } else { Err(format!("Unknown world event \"{data}\"")) },
+            "w" => {
+                if data == "0" {
+                    Ok(Self::Water)
+                } else {
+                    Err(format!("Unknown world event \"{data}\""))
+                }
+            }
             "n" => Ok(Self::Node(data.to_string())),
-            _ => Err(format!("Invalid arg \"{s}\", args have to start with s:, t:, sh:, w: or n:")),
+            _ => Err(format!(
+                "Invalid arg \"{s}\", args have to start with s:, t:, sh:, w: or n:"
+            )),
         }
     }
 }
@@ -672,7 +765,7 @@ pub enum HeaderCommand {
         /// The file to parse
         #[structopt(parse(from_os_str))]
         path: PathBuf,
-    }
+    },
 }
 
 #[derive(StructOpt)]
@@ -684,7 +777,7 @@ pub struct PresetInfoArgs {
     #[structopt(long)]
     pub description: Option<String>,
     /// Mark this as a base preset
-    /// 
+    ///
     /// Base presets are displayed more prominently
     #[structopt(long)]
     pub base_preset: bool,
@@ -701,9 +794,17 @@ impl PresetInfoArgs {
         let preset_info = PresetInfo {
             name,
             description,
-            group: if base_preset { Some(PresetGroup::Base) } else { None },
+            group: if base_preset {
+                Some(PresetGroup::Base)
+            } else {
+                None
+            },
         };
 
-        if preset_info == PresetInfo::default() { None } else { Some(preset_info) }
+        if preset_info == PresetInfo::default() {
+            None
+        } else {
+            Some(preset_info)
+        }
     }
 }

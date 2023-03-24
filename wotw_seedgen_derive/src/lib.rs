@@ -3,8 +3,8 @@
 
 extern crate proc_macro;
 
-mod from_str;
 mod display;
+mod from_str;
 mod v;
 
 use proc_macro::TokenStream;

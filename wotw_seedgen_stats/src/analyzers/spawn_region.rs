@@ -10,6 +10,9 @@ impl Analyzer for SpawnRegionStats {
     }
 
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.spawns.iter().map(|spawn| spawn.split('.').next().unwrap().to_string()).collect()
+        seed.spawns
+            .iter()
+            .map(|spawn| spawn.split('.').next().unwrap().to_string())
+            .collect()
     }
 }

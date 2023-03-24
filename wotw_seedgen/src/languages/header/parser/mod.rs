@@ -1,26 +1,31 @@
-mod preprocess;
-mod postprocess;
-mod parse_item;
 mod header_command;
+mod parse_item;
+mod postprocess;
+mod preprocess;
 
-pub(super) use preprocess::preprocess;
 pub use postprocess::postprocess;
-use wotw_seedgen_derive::{FromStr, Display};
+pub(super) use preprocess::preprocess;
+use wotw_seedgen_derive::{Display, FromStr};
 
 use std::str::FromStr;
 
 use crate::{
+    languages::parser::ParseErrorCollection,
+    uber_state::{UberIdentifier, UberStateComparator, VUberStateCondition, VUberStateTrigger},
+    util::Icon,
     VItem,
-    util::Icon, languages::parser::ParseErrorCollection,
-    uber_state::{VUberStateCondition, UberStateComparator, UberIdentifier, VUberStateTrigger},
 };
 
-use super::{HeaderCommand, HeaderContent, VPickup, V, tokenizer::tokenize, TimerDefinition, Annotation};
+use super::{
+    tokenizer::tokenize, Annotation, HeaderCommand, HeaderContent, TimerDefinition, VPickup, V,
+};
 
-use crate::languages::{TokenKind, CommentKind, ParseError};
-use crate::languages::parser::{parse_number, parse_ident};
+use crate::languages::parser::{parse_ident, parse_number};
+use crate::languages::{CommentKind, ParseError, TokenKind};
 pub(crate) type Parser<'a> = crate::languages::Parser<'a, super::TokenStream<'a>>;
-pub(crate) fn new(input: &str) -> Parser { crate::languages::Parser::new(input, tokenize(input) ) }
+pub(crate) fn new(input: &str) -> Parser {
+    crate::languages::Parser::new(input, tokenize(input))
+}
 
 #[derive(FromStr)]
 #[ParseFromIdentifier]
@@ -29,18 +34,20 @@ enum InterpolationCommand {
 }
 
 macro_rules! parse_removable_number {
-    ($parser:expr, $expected:path) => {
-        {
-            let token = $parser.eat_or_suggest($crate::languages::TokenKind::Number, $expected)?;
-            let mut string = $parser.read_token(&token);
-            let remove = if let Some(remove) = string.strip_prefix('-') {
-                string = remove;
-                true
-            } else { false };
-            let parsed = string.parse().map_err($crate::languages::parser::invalid!(token, $parser, $expected))?;
-            (parsed, remove)
-        }
-    };
+    ($parser:expr, $expected:path) => {{
+        let token = $parser.eat_or_suggest($crate::languages::TokenKind::Number, $expected)?;
+        let mut string = $parser.read_token(&token);
+        let remove = if let Some(remove) = string.strip_prefix('-') {
+            string = remove;
+            true
+        } else {
+            false
+        };
+        let parsed = string.parse().map_err($crate::languages::parser::invalid!(
+            token, $parser, $expected
+        ))?;
+        (parsed, remove)
+    }};
 }
 use parse_removable_number;
 fn parse_string<'a>(parser: &'a mut Parser) -> &'a str {
@@ -61,70 +68,96 @@ macro_rules! parse_v {
     ($parser:expr, $token:ident, $expected:path) => {
         match $token.kind {
             $crate::languages::TokenKind::Dollar => {
-                let command = $crate::languages::parser::parse_ident!($parser, $crate::header::parser::Suggestion::InterpolationCommand)?;
+                let command = $crate::languages::parser::parse_ident!(
+                    $parser,
+                    $crate::header::parser::Suggestion::InterpolationCommand
+                )?;
                 match command {
-                    $crate::header::parser::InterpolationCommand::Param => $crate::header::parser::parse_v_param($parser)?,
+                    $crate::header::parser::InterpolationCommand::Param => {
+                        $crate::header::parser::parse_v_param($parser)?
+                    }
                 }
-            },
-            _ => return Err($parser.error(format!("Expected {}", $expected), $token.range).with_suggestion($expected)),
+            }
+            _ => {
+                return Err($parser
+                    .error(format!("Expected {}", $expected), $token.range)
+                    .with_suggestion($expected))
+            }
         }
     };
 }
 use parse_v;
 macro_rules! parse_v_or_kind {
-    ($parser:expr, $expected:path, $kind:pat) => {
-        {
-            let token = $parser.next_token();
-            match token.kind {
-                $kind => {
-                    let string = $parser.read_token(&token);
-                    let literal = string.parse().map_err($crate::languages::parser::invalid!(token, $parser, $expected))?;
-                    $crate::header::V::Literal(literal)
-                },
-                _ => $crate::header::parser::parse_v!($parser, token, $expected)
+    ($parser:expr, $expected:path, $kind:pat) => {{
+        let token = $parser.next_token();
+        match token.kind {
+            $kind => {
+                let string = $parser.read_token(&token);
+                let literal = string.parse().map_err($crate::languages::parser::invalid!(
+                    token, $parser, $expected
+                ))?;
+                $crate::header::V::Literal(literal)
             }
+            _ => $crate::header::parser::parse_v!($parser, token, $expected),
         }
-    };
+    }};
 }
 use parse_v_or_kind;
 macro_rules! parse_v_ident {
     ($parser:expr, $expected:path) => {
-        $crate::header::parser::parse_v_or_kind!($parser, $expected, $crate::languages::TokenKind::Identifier)
+        $crate::header::parser::parse_v_or_kind!(
+            $parser,
+            $expected,
+            $crate::languages::TokenKind::Identifier
+        )
     };
 }
 use parse_v_ident;
 macro_rules! parse_v_number {
     ($parser:expr, $expected:path) => {
-        $crate::header::parser::parse_v_or_kind!($parser, $expected, $crate::languages::TokenKind::Number)
+        $crate::header::parser::parse_v_or_kind!(
+            $parser,
+            $expected,
+            $crate::languages::TokenKind::Number
+        )
     };
 }
 use parse_v_number;
 macro_rules! parse_v_removable_number {
-    ($parser:expr, $expected:path) => {
-        {
-            let token = $parser.next_token();
-            match token.kind {
-                $crate::languages::TokenKind::Number => {
-                    let mut string = $parser.read_token(&token);
-                    let remove = if let Some(remove) = string.strip_prefix('-') {
-                        string = remove;
-                        true
-                    } else { false };
-                    let parsed = string.parse().map_err($crate::languages::parser::invalid!(token, $parser, $expected))?;
-                    (V::Literal(parsed), remove)
-                },
-                $crate::languages::TokenKind::Minus => {
-                    ($crate::header::parser::parse_v_number!($parser, $expected), true)
-                },
-                _ => ($crate::header::parser::parse_v!($parser, token, $expected), false)
+    ($parser:expr, $expected:path) => {{
+        let token = $parser.next_token();
+        match token.kind {
+            $crate::languages::TokenKind::Number => {
+                let mut string = $parser.read_token(&token);
+                let remove = if let Some(remove) = string.strip_prefix('-') {
+                    string = remove;
+                    true
+                } else {
+                    false
+                };
+                let parsed = string.parse().map_err($crate::languages::parser::invalid!(
+                    token, $parser, $expected
+                ))?;
+                (V::Literal(parsed), remove)
             }
+            $crate::languages::TokenKind::Minus => (
+                $crate::header::parser::parse_v_number!($parser, $expected),
+                true,
+            ),
+            _ => (
+                $crate::header::parser::parse_v!($parser, token, $expected),
+                false,
+            ),
         }
-    };
+    }};
 }
 use parse_v_removable_number;
 
 fn trim_comment(input: &str) -> &str {
-    input.find("//").map_or(input, |index| &input[..index]).trim_end()
+    input
+        .find("//")
+        .map_or(input, |index| &input[..index])
+        .trim_end()
 }
 
 #[derive(Display)]
@@ -170,14 +203,17 @@ pub(crate) enum Suggestion {
     ShopCommandKind,
     HeaderCommand,
     ParameterType,
-    PickupFlag
+    PickupFlag,
 }
 
 fn parse_uber_identifier(parser: &mut Parser) -> Result<UberIdentifier, ParseError> {
     let uber_group = parse_number!(parser, Suggestion::UberGroup)?;
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::UberGroup)?;
     let uber_id = parse_number!(parser, Suggestion::UberId)?;
-    Ok(UberIdentifier { uber_group, uber_id })
+    Ok(UberIdentifier {
+        uber_group,
+        uber_id,
+    })
 }
 #[derive(PartialEq, FromStr)]
 #[ParseFromIdentifier]
@@ -219,22 +255,30 @@ impl<'b> ParseContext<'_, '_> {
         }
     }
 }
-pub(super) fn parse_header_contents(parser: &mut Parser) -> Result<Vec<HeaderContent>, ParseErrorCollection> {
+pub(super) fn parse_header_contents(
+    parser: &mut Parser,
+) -> Result<Vec<HeaderContent>, ParseErrorCollection> {
     let mut context = ParseContext::new(parser);
     let mut errors = ParseErrorCollection::default();
 
     loop {
         parse_whitespace(&mut context);
-        if context.parser.current_token().kind == TokenKind::Eof { break }
+        if context.parser.current_token().kind == TokenKind::Eof {
+            break;
+        }
         match parse_expression(&mut context) {
             Ok(header_content) => {
                 context.contents.push(header_content);
-                context.parser.skip_while(|kind| matches!(kind, TokenKind::Whitespace | TokenKind::Comment { .. }));
-                if context.parser.current_token().kind == TokenKind::Eof { break }
+                context.parser.skip_while(|kind| {
+                    matches!(kind, TokenKind::Whitespace | TokenKind::Comment { .. })
+                });
+                if context.parser.current_token().kind == TokenKind::Eof {
+                    break;
+                }
                 if let Err(err) = context.parser.eat(TokenKind::Newline) {
                     recover(err, &mut errors, context.parser);
                 }
-            },
+            }
             Err(err) => recover(err, &mut errors, context.parser),
         }
         context.skip_validation = false;
@@ -257,15 +301,23 @@ fn parse_whitespace(context: &mut ParseContext) {
     loop {
         let current_token = context.parser.current_token();
         match current_token.kind {
-            TokenKind::Newline | TokenKind::Whitespace => {},
+            TokenKind::Newline | TokenKind::Whitespace => {}
             TokenKind::Comment { kind } => {
                 let comment = context.parser.read_token(current_token);
                 match kind {
-                    CommentKind::Note => if comment[2..].trim() == "skip-validate" { context.skip_validation = true },
-                    CommentKind::HeaderDoc => context.contents.push(HeaderContent::OuterDocumentation(comment[3..].trim().to_owned())),
-                    CommentKind::ConfigDoc => context.contents.push(HeaderContent::InnerDocumentation(comment[4..].trim().to_owned()))
+                    CommentKind::Note => {
+                        if comment[2..].trim() == "skip-validate" {
+                            context.skip_validation = true
+                        }
+                    }
+                    CommentKind::HeaderDoc => context.contents.push(
+                        HeaderContent::OuterDocumentation(comment[3..].trim().to_owned()),
+                    ),
+                    CommentKind::ConfigDoc => context.contents.push(
+                        HeaderContent::InnerDocumentation(comment[4..].trim().to_owned()),
+                    ),
                 }
-            },
+            }
             _ => return,
         }
         context.parser.next_token();
@@ -289,7 +341,7 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
                 ExpressionIdentKind::Flags => parse_flags(parser),
                 ExpressionIdentKind::Timer => parse_timer(parser),
             }
-        },
+        }
         TokenKind::Bang => {
             parser.next_token();
             if parser.current_token().kind == TokenKind::Bang {
@@ -298,12 +350,12 @@ fn parse_expression(context: &mut ParseContext) -> Result<HeaderContent, ParseEr
             } else {
                 parse_pickup(context, true)
             }
-        },
+        }
         TokenKind::Number | TokenKind::Dollar => parse_pickup(context, false),
         TokenKind::Pound => {
             parser.next_token();
             parse_annotation(parser)
-        },
+        }
         _ => Err(parser.error("expected expression", current_token.range.clone())),
     }
 }
@@ -312,7 +364,12 @@ fn parse_flags(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
 
     loop {
         let start = parser.current_token().range.start;
-        parser.skip_while(|kind| !matches!(kind, TokenKind::Newline | TokenKind::Comment { .. } | TokenKind::Comma));
+        parser.skip_while(|kind| {
+            !matches!(
+                kind,
+                TokenKind::Newline | TokenKind::Comment { .. } | TokenKind::Comma
+            )
+        });
         let end = parser.current_token().range.start;
 
         let flag = parser.read(start..end).trim_end().to_owned();
@@ -321,7 +378,9 @@ fn parse_flags(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
         if parser.current_token().kind == TokenKind::Comma {
             parser.next_token();
             parser.skip(TokenKind::Whitespace);
-        } else { break }
+        } else {
+            break;
+        }
     }
 
     Ok(HeaderContent::Flags(flags))
@@ -355,25 +414,41 @@ fn parse_pickup(context: &mut ParseContext, ignore: bool) -> Result<HeaderConten
         parser.next_token();
         let _: PickupFlag = parse_ident!(parser, Suggestion::PickupFlag)?;
         true
-    } else { false };
+    } else {
+        false
+    };
 
-    let pickup = VPickup { trigger, item, ignore, hide_others, skip_validation };
+    let pickup = VPickup {
+        trigger,
+        item,
+        ignore,
+        hide_others,
+        skip_validation,
+    };
     Ok(HeaderContent::Pickup(pickup))
 }
 
 fn parse_trigger(parser: &mut Parser) -> Result<(VUberStateTrigger, Suggestion), ParseError> {
     let identifier = parse_uber_identifier(parser)?;
     let (condition, suggestion) = parse_uber_state_condition(parser)?;
-    let trigger = VUberStateTrigger { identifier, condition };
+    let trigger = VUberStateTrigger {
+        identifier,
+        condition,
+    };
 
     Ok((trigger, suggestion))
 }
-fn parse_uber_state_condition(parser: &mut Parser) -> Result<(Option<VUberStateCondition>, Suggestion), ParseError> {
+fn parse_uber_state_condition(
+    parser: &mut Parser,
+) -> Result<(Option<VUberStateCondition>, Suggestion), ParseError> {
     match parse_comparator(parser) {
         Some(comparator) => {
             let value = parse_v_number!(parser, Suggestion::UberTriggerValue);
-            Ok((Some(VUberStateCondition { comparator, value }), Suggestion::UberTriggerValue))
-        },
+            Ok((
+                Some(VUberStateCondition { comparator, value }),
+                Suggestion::UberTriggerValue,
+            ))
+        }
         None => Ok((None, Suggestion::UberId)),
     }
 }
@@ -382,21 +457,25 @@ fn parse_comparator(parser: &mut Parser) -> Option<UberStateComparator> {
         TokenKind::Eq => {
             parser.next_token();
             Some(UberStateComparator::Equals)
-        },
+        }
         TokenKind::Greater => {
             parser.next_token();
             if parser.current_token().kind == TokenKind::Eq {
                 parser.next_token();
                 Some(UberStateComparator::GreaterOrEquals)
-            } else { Some(UberStateComparator::Greater) }
-        },
+            } else {
+                Some(UberStateComparator::Greater)
+            }
+        }
         TokenKind::Less => {
             parser.next_token();
             if parser.current_token().kind == TokenKind::Eq {
                 parser.next_token();
                 Some(UberStateComparator::LessOrEquals)
-            } else { Some(UberStateComparator::Less) }
-        },
+            } else {
+                Some(UberStateComparator::Less)
+            }
+        }
         _ => None,
     }
 }
@@ -451,26 +530,51 @@ mod tests {
     fn item_parsing() {
         assert_eq!(Item::from_str("0|5000"), Ok(Item::SpiritLight(5000)));
         assert_eq!(Item::from_str("0|-5000"), Ok(Item::RemoveSpiritLight(5000)));
-        assert_eq!(Item::from_str("1|2"), Ok(Item::Resource(Resource::GorlekOre)));
+        assert_eq!(
+            Item::from_str("1|2"),
+            Ok(Item::Resource(Resource::GorlekOre))
+        );
         assert!(Item::from_str("1|-2").is_err());
         assert!(Item::from_str("1|5").is_err());
         assert_eq!(Item::from_str("2|8"), Ok(Item::Skill(Skill::Launch)));
-        assert_eq!(Item::from_str("2|120"), Ok(Item::Skill(Skill::GladesAncestralLight)));
-        assert_eq!(Item::from_str("2|121"), Ok(Item::Skill(Skill::InkwaterAncestralLight)));
+        assert_eq!(
+            Item::from_str("2|120"),
+            Ok(Item::Skill(Skill::GladesAncestralLight))
+        );
+        assert_eq!(
+            Item::from_str("2|121"),
+            Ok(Item::Skill(Skill::InkwaterAncestralLight))
+        );
         assert!(Item::from_str("2|25").is_err());
         assert!(Item::from_str("2|-9").is_err());
         assert_eq!(Item::from_str("3|28"), Ok(Item::Shard(Shard::LastStand)));
-        assert_eq!(Item::from_str("5|16"), Ok(Item::Teleporter(Teleporter::Marsh)));
+        assert_eq!(
+            Item::from_str("5|16"),
+            Ok(Item::Teleporter(Teleporter::Marsh))
+        );
         assert_eq!(Item::from_str("9|0"), Ok(Item::Water));
         assert_eq!(Item::from_str("9|-0"), Ok(Item::RemoveWater));
-        assert_eq!(Item::from_str("11|0"), Ok(Item::BonusUpgrade(BonusUpgrade::RapidHammer)));
-        assert_eq!(Item::from_str("10|31"), Ok(Item::BonusItem(BonusItem::EnergyRegeneration)));
+        assert_eq!(
+            Item::from_str("11|0"),
+            Ok(Item::BonusUpgrade(BonusUpgrade::RapidHammer))
+        );
+        assert_eq!(
+            Item::from_str("10|31"),
+            Ok(Item::BonusItem(BonusItem::EnergyRegeneration))
+        );
         assert!(Item::from_str("8|5|3|6").is_err());
         assert!(Item::from_str("8||||").is_err());
         assert!(Item::from_str("8|5|3|in|3").is_err());
         assert!(Item::from_str("8|5|3|bool|3").is_err());
         assert!(Item::from_str("8|5|3|float|hm").is_err());
-        assert_eq!(Item::from_str("8|5|3|int|6"), Ok(UberStateItem::simple_setter(UberIdentifier::new(5, 3), UberType::Int, UberStateValue::Number((6.).into()))));
+        assert_eq!(
+            Item::from_str("8|5|3|int|6"),
+            Ok(UberStateItem::simple_setter(
+                UberIdentifier::new(5, 3),
+                UberType::Int,
+                UberStateValue::Number((6.).into())
+            ))
+        );
         assert_eq!(Item::from_str("4|0"), Ok(Item::Command(Command::Autosave)));
         assert!(Item::from_str("12").is_err());
         assert!(Item::from_str("").is_err());

@@ -9,7 +9,7 @@ pub(crate) enum TokenKind {
     /// Additional whitespace at the start of a line
     Indent,
     /// Reduced whitespace at the start of a line
-    /// 
+    ///
     /// `matching` is false if the new amount of spaces doesn't line up with any prior indent
     Dedent { matching: bool },
     /// `// Helpful explanation`, `/// My Header`
@@ -59,7 +59,7 @@ pub(crate) enum TokenKind {
     /// `x` after a number, for instance in `2x`
     X,
     /// End of File
-    /// 
+    ///
     /// This is never directly returned by the tokenizer, but can be useful in later processing
     Eof,
     /// Tokens not used in the language, e.g. `@`

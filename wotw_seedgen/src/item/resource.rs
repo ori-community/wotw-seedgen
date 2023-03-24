@@ -1,9 +1,11 @@
 use num_enum::TryFromPrimitive;
-use wotw_seedgen_derive::{FromStr, Display};
+use wotw_seedgen_derive::{Display, FromStr};
 
 use crate::util::{Icon, MapIcon};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr, Display)]
+#[derive(
+    Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr, Display,
+)]
 #[repr(u8)]
 pub enum Resource {
     HealthFragment = 0,
@@ -15,8 +17,12 @@ pub enum Resource {
 impl Resource {
     pub fn icon(self) -> Option<Icon> {
         Some(match self {
-            Resource::HealthFragment => Icon::File(String::from("assets/icons/game/healthfragment.png")),
-            Resource::EnergyFragment => Icon::File(String::from("assets/icons/game/energyfragment.png")),
+            Resource::HealthFragment => {
+                Icon::File(String::from("assets/icons/game/healthfragment.png"))
+            }
+            Resource::EnergyFragment => {
+                Icon::File(String::from("assets/icons/game/energyfragment.png"))
+            }
             Resource::GorlekOre => Icon::File(String::from("assets/icons/game/gorlekore.png")),
             Resource::Keystone => Icon::File(String::from("assets/icons/game/keystone.png")),
             Resource::ShardSlot => Icon::File(String::from("assets/icons/game/shardslot.png")),

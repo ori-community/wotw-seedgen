@@ -1,6 +1,6 @@
 use std::iter::FusedIterator;
 
-use crate::languages::{Cursor, Token, TokenKind, CommentKind};
+use crate::languages::{CommentKind, Cursor, Token, TokenKind};
 
 pub(crate) struct TokenStream<'a> {
     cursor: Cursor<'a>,

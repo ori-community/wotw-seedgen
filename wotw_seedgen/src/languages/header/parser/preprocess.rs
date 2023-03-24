@@ -25,7 +25,10 @@ fn determine_replacements(input: &str, rng: &mut impl Rng) -> Result<Replacement
             last_take_index = after_match;
 
             let random_item = pool.remove(rng.gen_range(0..pool.len()));
-            replacements.push((range.start + take_index..range.start + after_match, random_item));
+            replacements.push((
+                range.start + take_index..range.start + after_match,
+                random_item,
+            ));
         }
 
         if let Some(pool_item) = line.strip_prefix("!!pool ") {
@@ -52,7 +55,7 @@ fn apply_replacements(input: &mut String, replacements: Replacements) {
 }
 
 /// Process all `!!pool`, `!!flush` and `!!take` statements before evaluation of the syntax
-/// 
+///
 /// `!!pool` and `!!flush` will only be accepted at the start of lines, `!!take` can be in any location
 pub(crate) fn preprocess(input: &mut String, rng: &mut impl Rng) -> Result<(), String> {
     let replacements = determine_replacements(input, rng)?;
@@ -66,10 +69,9 @@ mod tests {
 
     #[test]
     fn pool_take() {
-        let mut input = format!("{}\n{}\n{}",
-            "!!pool happy",
-            "!!pool sad",
-            "3|0|6|Today's mood: !!take",
+        let mut input = format!(
+            "{}\n{}\n{}",
+            "!!pool happy", "!!pool sad", "3|0|6|Today's mood: !!take",
         );
         let mut rng = rand::thread_rng();
 

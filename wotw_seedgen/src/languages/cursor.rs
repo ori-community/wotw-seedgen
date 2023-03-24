@@ -1,4 +1,4 @@
-use std::{str::Chars, ops::Range};
+use std::{ops::Range, str::Chars};
 
 /// Peekable iterator over a char sequence.
 ///

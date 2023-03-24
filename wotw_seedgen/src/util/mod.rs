@@ -1,15 +1,15 @@
-pub mod orbs;
 pub mod constants;
-pub mod icon;
 pub(crate) mod extensions;
+pub mod icon;
+pub mod orbs;
 
-pub use orbs::{Orbs, OrbVariants};
 pub use icon::{Icon, MapIcon};
-use serde::{Serialize, Deserialize};
+pub use orbs::{OrbVariants, Orbs};
+use serde::{Deserialize, Serialize};
 
 use decorum::R32;
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use wotw_seedgen_derive::{VVariant, FromStr, Display};
+use wotw_seedgen_derive::{Display, FromStr, VVariant};
 
 use std::fmt;
 
@@ -17,14 +17,18 @@ use crate::header::{vdisplay, CodeDisplay};
 
 use self::constants::DEFAULT_SPAWN;
 
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr,
+)]
 #[repr(u8)]
 pub enum NumericBool {
     False = 0,
     True = 1,
 }
 
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr,
+)]
 #[repr(u16)]
 pub enum Spell {
     Hammer = 1000,
@@ -71,7 +75,21 @@ pub enum Spell {
     WaterBreath = 4009,
 }
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Serialize, Deserialize, FromPrimitive, FromStr)]
+#[derive(
+    Debug,
+    wotw_seedgen_derive::Display,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    Copy,
+    Serialize,
+    Deserialize,
+    FromPrimitive,
+    FromStr,
+)]
 #[repr(u8)]
 pub enum Zone {
     Marsh = 0,
@@ -141,22 +159,50 @@ impl Enemy {
         }
     }
     pub fn shielded(self) -> bool {
-        matches!(self, Enemy::Hornbug | Enemy::ShieldSlug | Enemy::ShieldMiner | Enemy::ShieldCrystalMiner)
+        matches!(
+            self,
+            Enemy::Hornbug | Enemy::ShieldSlug | Enemy::ShieldMiner | Enemy::ShieldCrystalMiner
+        )
     }
     pub fn armored(self) -> bool {
         matches!(self, Enemy::Tentacle)
     }
-    pub fn aerial(self) -> bool {  // whether we consider the enemy flying for movement restriction purposes
-        matches!(self, Enemy::Bat | Enemy::Skeeto | Enemy::SmallSkeeto | Enemy::Bee | Enemy::Nest | Enemy::Tentacle)
+    pub fn aerial(self) -> bool {
+        // whether we consider the enemy flying for movement restriction purposes
+        matches!(
+            self,
+            Enemy::Bat
+                | Enemy::Skeeto
+                | Enemy::SmallSkeeto
+                | Enemy::Bee
+                | Enemy::Nest
+                | Enemy::Tentacle
+        )
     }
-    pub fn flying(self) -> bool {  // whether the game considers the enemy flying for wingclip
+    pub fn flying(self) -> bool {
+        // whether the game considers the enemy flying for wingclip
         matches!(self, Enemy::Skeeto | Enemy::SmallSkeeto | Enemy::Bee)
     }
-    pub fn ranged(self) -> bool {  // whether you need a ranged weapon
-        matches!(self, Enemy::BombSlug | Enemy::CorruptSlug | Enemy::Balloon | Enemy::Bat)
+    pub fn ranged(self) -> bool {
+        // whether you need a ranged weapon
+        matches!(
+            self,
+            Enemy::BombSlug | Enemy::CorruptSlug | Enemy::Balloon | Enemy::Bat
+        )
     }
     pub fn dangerous(self) -> bool {
-        matches!(self, Enemy::SneezeSlug | Enemy::Hornbug | Enemy::Crab | Enemy::SpinCrab | Enemy::Miner | Enemy::MaceMiner | Enemy::ShieldMiner | Enemy::CrystalMiner | Enemy::ShieldCrystalMiner)
+        matches!(
+            self,
+            Enemy::SneezeSlug
+                | Enemy::Hornbug
+                | Enemy::Crab
+                | Enemy::SpinCrab
+                | Enemy::Miner
+                | Enemy::MaceMiner
+                | Enemy::ShieldMiner
+                | Enemy::CrystalMiner
+                | Enemy::ShieldCrystalMiner
+        )
     }
 }
 
@@ -206,15 +252,18 @@ impl From<SerdePosition> for Position {
 }
 impl Position {
     /// Returns a new [`Position`] with the given coordinates
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// Panics if either coordinate is not a real number
     pub fn new(x: f32, y: f32) -> Position {
-        Position { x: x.into(), y: y.into() }
+        Position {
+            x: x.into(),
+            y: y.into(),
+        }
     }
     pub fn code(&self) -> CodeDisplay<Position> {
-        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.x, s.y)})
+        CodeDisplay::new(self, |s, f| write!(f, "{}|{}", s.x, s.y))
     }
 }
 vdisplay! {
@@ -253,14 +302,19 @@ pub(crate) fn float_to_real(float: f32) -> Result<R32, String> {
 }
 
 /// Read the spawn location from a generated seed
-/// 
+///
 /// This reads the final spawn location, e.g. if the settings declared a random spawn, this will read the spawn that was chosen
 /// Returns an error if the seed contains a Spawn but doesn't annotate its identifier
 pub fn spawn_from_seed(input: &str) -> Result<String, String> {
-    input.lines()
-        .find_map(|line| line.strip_prefix("Spawn: ")
-        .map(|spawn| spawn.split_once("//")
-        .ok_or_else(|| "Failed to read spawn location from seed".to_string())
-        .map(|(_, identifier)| identifier.trim().to_string())))
+    input
+        .lines()
+        .find_map(|line| {
+            line.strip_prefix("Spawn: ").map(|spawn| {
+                spawn
+                    .split_once("//")
+                    .ok_or_else(|| "Failed to read spawn location from seed".to_string())
+                    .map(|(_, identifier)| identifier.trim().to_string())
+            })
+        })
         .unwrap_or_else(|| Ok(DEFAULT_SPAWN.to_string()))
 }

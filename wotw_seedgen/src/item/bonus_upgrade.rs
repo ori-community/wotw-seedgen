@@ -1,9 +1,21 @@
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::FromStr;
 
-use crate::util::{Icon, icon::OpherIcon};
+use crate::util::{icon::OpherIcon, Icon};
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug,
+    wotw_seedgen_derive::Display,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    Copy,
+    TryFromPrimitive,
+    FromStr,
+)]
 #[repr(u8)]
 pub enum BonusUpgrade {
     RapidHammer = 0,
@@ -36,21 +48,45 @@ impl BonusUpgrade {
             BonusUpgrade::RegenerateEfficiency => Some("Reduce Regenerate Cost by 50%".to_string()),
             BonusUpgrade::FlashEfficiency => Some("Reduce Flash Cost by 50%".to_string()),
             BonusUpgrade::GrenadeEfficiency => Some("Reduce Grenade Cost by 50%".to_string()),
-            BonusUpgrade::ExplodingSpike | BonusUpgrade::ShockSmash | BonusUpgrade::StaticStar | BonusUpgrade::ChargeBlaze | BonusUpgrade::RapidSentry => None,
+            BonusUpgrade::ExplodingSpike
+            | BonusUpgrade::ShockSmash
+            | BonusUpgrade::StaticStar
+            | BonusUpgrade::ChargeBlaze
+            | BonusUpgrade::RapidSentry => None,
         }
     }
     pub fn icon(self) -> Option<Icon> {
         let icon = match self {
-            BonusUpgrade::RapidHammer => Icon::File(String::from("assets/icons/bonus/rapidsmash.png")),
-            BonusUpgrade::RapidSword => Icon::File(String::from("assets/icons/bonus/rapidsword.png")),
-            BonusUpgrade::BlazeEfficiency => Icon::File(String::from("assets/icons/bonus/blazeefficiency.png")),
-            BonusUpgrade::SpearEfficiency => Icon::File(String::from("assets/icons/bonus/spearefficiency.png")),
-            BonusUpgrade::ShurikenEfficiency => Icon::File(String::from("assets/icons/bonus/shurikenefficiency.png")),
-            BonusUpgrade::SentryEfficiency => Icon::File(String::from("assets/icons/bonus/sentryefficiency.png")),
-            BonusUpgrade::BowEfficiency => Icon::File(String::from("assets/icons/bonus/bowefficiency.png")),
-            BonusUpgrade::RegenerateEfficiency => Icon::File(String::from("assets/icons/bonus/regenerateefficiency.png")),
-            BonusUpgrade::FlashEfficiency => Icon::File(String::from("assets/icons/bonus/flashefficiency.png")),
-            BonusUpgrade::GrenadeEfficiency => Icon::File(String::from("assets/icons/bonus/grenadeefficiency.png")),
+            BonusUpgrade::RapidHammer => {
+                Icon::File(String::from("assets/icons/bonus/rapidsmash.png"))
+            }
+            BonusUpgrade::RapidSword => {
+                Icon::File(String::from("assets/icons/bonus/rapidsword.png"))
+            }
+            BonusUpgrade::BlazeEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/blazeefficiency.png"))
+            }
+            BonusUpgrade::SpearEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/spearefficiency.png"))
+            }
+            BonusUpgrade::ShurikenEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/shurikenefficiency.png"))
+            }
+            BonusUpgrade::SentryEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/sentryefficiency.png"))
+            }
+            BonusUpgrade::BowEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/bowefficiency.png"))
+            }
+            BonusUpgrade::RegenerateEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/regenerateefficiency.png"))
+            }
+            BonusUpgrade::FlashEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/flashefficiency.png"))
+            }
+            BonusUpgrade::GrenadeEfficiency => {
+                Icon::File(String::from("assets/icons/bonus/grenadeefficiency.png"))
+            }
             BonusUpgrade::ExplodingSpike => Icon::Opher(OpherIcon::SpearUpgrade),
             BonusUpgrade::ShockSmash => Icon::Opher(OpherIcon::HammerUpgrade),
             BonusUpgrade::StaticStar => Icon::Opher(OpherIcon::ShurikenUpgrade),

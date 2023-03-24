@@ -1,7 +1,12 @@
 use std::fmt::{self, Display};
 
-use crate::{world::{graph::Node, Graph}, util::{constants::{DEFAULT_SPAWN, SPAWN_GRANTS}}, header, settings::{UniverseSettings, WorldSettings}};
 use crate::uber_state::UberStateTrigger;
+use crate::{
+    header,
+    settings::{UniverseSettings, WorldSettings},
+    util::constants::{DEFAULT_SPAWN, SPAWN_GRANTS},
+    world::{graph::Node, Graph},
+};
 
 use super::{spoiler::SeedSpoiler, Placement};
 
@@ -32,23 +37,30 @@ pub struct SeedWorld<'graph, 'settings> {
 
 impl Seed<'_, '_> {
     /// Returns the seed files for each world to be used by the randomizer client
-    /// 
+    ///
     /// May error if postprocessing commands (such as `$WHEREIS`) contain invalid regexes
     pub fn seed_files(&self) -> Result<Vec<String>, String> {
-        let mut seeds = self.worlds.iter().enumerate().map(|(index, world)| {
-            let version = env!("CARGO_PKG_VERSION");
-            let slug = &self.settings.slugify();
-            let config = &self.settings.to_json();
+        let mut seeds = self
+            .worlds
+            .iter()
+            .enumerate()
+            .map(|(index, world)| {
+                let version = env!("CARGO_PKG_VERSION");
+                let slug = &self.settings.slugify();
+                let config = &self.settings.to_json();
 
-            format!("\
+                format!(
+                    "\
                 {world}\
                 // This World: {index}\n\
                 // Target: ^2.0\n\
                 // Generator Version: {version}\n\
                 // Slug: {slug}\n\
                 // Config: {config}\n\
-            ")
-        }).collect::<Vec<_>>();
+            "
+                )
+            })
+            .collect::<Vec<_>>();
 
         header::parser::postprocess(&mut seeds, self.graph)?;
 
@@ -64,11 +76,29 @@ impl Display for SeedWorld<'_, '_> {
 
         let spawn_identifier = self.spawn.identifier();
         if spawn_identifier != DEFAULT_SPAWN {
-            let position = self.spawn.position().expect("Seed Spawn had no coordinates");
-            writeln!(f, "Spawn: {}, {}  // {}", position.x, position.y, spawn_identifier)?;
+            let position = self
+                .spawn
+                .position()
+                .expect("Seed Spawn had no coordinates");
+            writeln!(
+                f,
+                "Spawn: {}, {}  // {}",
+                position.x, position.y, spawn_identifier
+            )?;
 
-            if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| if *spawn == spawn_identifier { Some(item) } else { None }) {
-                writeln!(f, "{}|{}|mute", UberStateTrigger::spawn().code(), spawn_item.code())?;
+            if let Some(spawn_item) = SPAWN_GRANTS.iter().find_map(|(spawn, item)| {
+                if *spawn == spawn_identifier {
+                    Some(item)
+                } else {
+                    None
+                }
+            }) {
+                writeln!(
+                    f,
+                    "{}|{}|mute",
+                    UberStateTrigger::spawn().code(),
+                    spawn_item.code()
+                )?;
             }
         }
 
@@ -78,7 +108,9 @@ impl Display for SeedWorld<'_, '_> {
 
         write!(f, "{}", self.headers)?;
 
-        if !self.headers.ends_with('\n') { writeln!(f,)?; }
+        if !self.headers.ends_with('\n') {
+            writeln!(f,)?;
+        }
 
         Ok(())
     }

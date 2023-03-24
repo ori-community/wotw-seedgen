@@ -1,9 +1,9 @@
-pub mod logic;
-pub mod header;
 mod cursor;
+pub mod header;
+pub mod logic;
 use cursor::Cursor;
 mod token;
-pub(crate) use token::{Token, TokenKind, CommentKind};
+pub(crate) use token::{CommentKind, Token, TokenKind};
 mod parser;
-pub(crate) use parser::Parser;
 pub use parser::ParseError;
+pub(crate) use parser::Parser;

@@ -1,11 +1,23 @@
 use num_enum::TryFromPrimitive;
 use wotw_seedgen_derive::FromStr;
 
+use crate::settings::{Difficulty, WorldSettings};
 use crate::util::icon::OpherIcon;
 use crate::util::{Icon, Spell};
-use crate::settings::{Difficulty, WorldSettings};
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug,
+    wotw_seedgen_derive::Display,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    Copy,
+    TryFromPrimitive,
+    FromStr,
+)]
 #[repr(u8)]
 pub enum Skill {
     Bash = 0,
@@ -58,8 +70,12 @@ impl Skill {
             Skill::Blaze => Icon::Opher(OpherIcon::Blaze),
             Skill::Sentry => Icon::Opher(OpherIcon::Sentry),
             Skill::Flap => Icon::Spell(Spell::Flap),
-            Skill::GladesAncestralLight => Icon::File(String::from("assets/icons/game/ancestrallight1.png")),
-            Skill::InkwaterAncestralLight => Icon::File(String::from("assets/icons/game/ancestrallight2.png")),
+            Skill::GladesAncestralLight => {
+                Icon::File(String::from("assets/icons/game/ancestrallight1.png"))
+            }
+            Skill::InkwaterAncestralLight => {
+                Icon::File(String::from("assets/icons/game/ancestrallight2.png"))
+            }
         };
         Some(icon)
     }
@@ -80,7 +96,13 @@ impl Skill {
             Skill::Launch => 5.0,
             Skill::Hammer | Skill::Flash => 12.0,
             Skill::Shuriken => 7.0,
-            Skill::Grenade => if settings.difficulty >= Difficulty::Unsafe { 8.0 } else { 4.0 },
+            Skill::Grenade => {
+                if settings.difficulty >= Difficulty::Unsafe {
+                    8.0
+                } else {
+                    4.0
+                }
+            }
             Skill::Spear => 20.0,
             Skill::Blaze => 3.0,
             Skill::Sentry => 8.8,
@@ -97,6 +119,7 @@ impl Skill {
 
     pub fn damage_per_energy(self, settings: &WorldSettings) -> f32 {
         // (self.damage(unsafe_paths) + self.burn_damage()) / self.energy_cost()
-        (10.0 / (self.damage(settings) + self.burn_damage())).ceil() * self.energy_cost()  // "how much energy do you need to deal 10 damage" leads to a more realistic ordering than pure damage per energy
+        (10.0 / (self.damage(settings) + self.burn_damage())).ceil() * self.energy_cost()
+        // "how much energy do you need to deal 10 damage" leads to a more realistic ordering than pure damage per energy
     }
 }

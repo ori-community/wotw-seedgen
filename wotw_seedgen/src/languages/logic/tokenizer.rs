@@ -1,4 +1,4 @@
-use std::{ops::Range, iter::FusedIterator, cmp::Ordering};
+use std::{cmp::Ordering, iter::FusedIterator, ops::Range};
 
 use crate::languages::{Cursor, Token, TokenKind};
 
@@ -22,7 +22,12 @@ pub(super) fn tokenize(input: &str) -> TokenStream {
     let indent_stack = Vec::new();
     let ongoing_dedent = None;
     let last_was_number = false;
-    TokenStream { cursor, indent_stack, ongoing_dedent, last_was_number }
+    TokenStream {
+        cursor,
+        indent_stack,
+        ongoing_dedent,
+        last_was_number,
+    }
 }
 
 impl TokenStream<'_> {
@@ -38,7 +43,9 @@ impl TokenStream<'_> {
                 '#' => self.comment(),
                 '-' => self.minus(),
                 '0'..='9' => self.number(),
-                'x' if self.last_was_number && !self.cursor.first().is_ascii_lowercase() => TokenKind::X,
+                'x' if self.last_was_number && !self.cursor.first().is_ascii_lowercase() => {
+                    TokenKind::X
+                }
                 c if is_ident_char(c) => self.ident(),
                 '=' => TokenKind::Eq,
                 ',' => TokenKind::Comma,
@@ -60,19 +67,21 @@ impl TokenStream<'_> {
             self.cursor.eat_while(|c| c == ' ');
             let spaces = self.cursor.consumed_count() - newlines;
             self.whitespace();
-            if self.cursor.first() != '\n' { break spaces }
+            if self.cursor.first() != '\n' {
+                break spaces;
+            }
         };
 
         match spaces.cmp(self.indent_stack.last().unwrap_or(&0)) {
             Ordering::Greater => {
                 self.indent_stack.push(spaces);
                 TokenKind::Indent
-            },
+            }
             Ordering::Equal => TokenKind::Newline,
             Ordering::Less => {
                 self.ongoing_dedent = Some((spaces, self.cursor.consumed_range()));
                 TokenKind::Newline
-            },
+            }
         }
     }
     fn dedent(&mut self, spaces: usize) -> TokenKind {
@@ -83,7 +92,7 @@ impl TokenStream<'_> {
             Ordering::Less => {
                 self.ongoing_dedent = Some((spaces, self.cursor.consumed_range()));
                 true
-            },
+            }
         };
         TokenKind::Dedent { matching }
     }
@@ -151,29 +160,33 @@ mod tests {
  ,
 ,
 ";
-        let tokens = tokenize(source).into_iter().map(|token| token.kind).collect::<Vec<_>>();
-        assert_eq!(tokens,
-        vec![
-            TokenKind::Newline,
-            TokenKind::Comma,
-            TokenKind::Indent,
-            TokenKind::Comma,
-            TokenKind::Indent,
-            TokenKind::Comma,
-            TokenKind::Newline,
-            TokenKind::Comma,
-            TokenKind::Newline,
-            TokenKind::Dedent { matching: true },
-            TokenKind::Comma,
-            TokenKind::Newline,
-            TokenKind::Comma,
-            TokenKind::Newline,
-            TokenKind::Dedent { matching: false },
-            TokenKind::Comma,
-            TokenKind::Newline,
-            TokenKind::Comma,
-            TokenKind::Newline,
-        ]
+        let tokens = tokenize(source)
+            .into_iter()
+            .map(|token| token.kind)
+            .collect::<Vec<_>>();
+        assert_eq!(
+            tokens,
+            vec![
+                TokenKind::Newline,
+                TokenKind::Comma,
+                TokenKind::Indent,
+                TokenKind::Comma,
+                TokenKind::Indent,
+                TokenKind::Comma,
+                TokenKind::Newline,
+                TokenKind::Comma,
+                TokenKind::Newline,
+                TokenKind::Dedent { matching: true },
+                TokenKind::Comma,
+                TokenKind::Newline,
+                TokenKind::Comma,
+                TokenKind::Newline,
+                TokenKind::Dedent { matching: false },
+                TokenKind::Comma,
+                TokenKind::Newline,
+                TokenKind::Comma,
+                TokenKind::Newline,
+            ]
         )
     }
 }

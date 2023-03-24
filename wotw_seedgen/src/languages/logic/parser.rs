@@ -1,24 +1,28 @@
 use std::ops::Range;
 use std::str::FromStr;
 
-use wotw_seedgen_derive::{FromStr, Display};
 use smallvec::SmallVec;
+use wotw_seedgen_derive::{Display, FromStr};
 
 use crate::item;
-use crate::languages::parser::{parse_ident, read_ident, parse_value, parse_number, ParseErrorCollection};
+use crate::languages::parser::{
+    parse_ident, parse_number, parse_value, read_ident, ParseErrorCollection,
+};
 use crate::languages::{ParseError, TokenKind};
 use crate::settings::{Difficulty, Trick};
-use crate::util::{RefillValue, NodeKind, Enemy, Position};
+use crate::util::{Enemy, NodeKind, Position, RefillValue};
 
 use super::tokenizer::{tokenize, TokenStream};
 
 type Parser<'a> = crate::languages::Parser<'a, TokenStream<'a>>;
-fn new(input: &str) -> Parser { crate::languages::Parser::new(input, tokenize(input)) }
+fn new(input: &str) -> Parser {
+    crate::languages::Parser::new(input, tokenize(input))
+}
 
 /// Syntax Tree representing an areas file
-/// 
+///
 /// This is one needed component that has to be passed to [`logic::build`](crate::logic::build)
-/// 
+///
 /// Use [`Areas::parse`] to parse a string into this format
 #[derive(Debug, Clone)]
 pub struct Areas<'a> {
@@ -56,7 +60,7 @@ pub struct Connection<'a> {
 }
 #[derive(Debug, Clone)]
 pub struct Group<'a> {
-    pub lines: Vec<Line<'a>>
+    pub lines: Vec<Line<'a>>,
 }
 #[derive(Debug, Clone)]
 pub struct Line<'a> {
@@ -123,7 +127,9 @@ impl<'a> Areas<'a> {
         let mut parser = new(input);
         loop {
             parser.skip_while(|kind| kind == TokenKind::Newline || kind == TokenKind::Whitespace);
-            if parser.current_token().kind == TokenKind::Eof { break }
+            if parser.current_token().kind == TokenKind::Eof {
+                break;
+            }
             match parse_content(&mut parser) {
                 Ok(content) => contents.push(content),
                 Err(err) => errors.push(err),
@@ -141,7 +147,9 @@ impl<'a> Areas<'a> {
 
 impl<'a> Anchor<'a> {
     pub fn region(&self) -> &'a str {
-        self.identifier.split_once('.').map_or(self.identifier, |parts| parts.0)
+        self.identifier
+            .split_once('.')
+            .map_or(self.identifier, |parts| parts.0)
     }
 }
 
@@ -161,11 +169,19 @@ fn recover(parser: &mut Parser, recover_if: fn(TokenKind) -> bool) {
     let mut depth = 0;
     loop {
         let token = parser.current_token();
-        if token.kind == TokenKind::Eof { break }
-        if token.kind == TokenKind::Indent { depth += 1 }
+        if token.kind == TokenKind::Eof {
+            break;
+        }
+        if token.kind == TokenKind::Indent {
+            depth += 1
+        }
         if depth > 0 {
-            if matches!(token.kind, TokenKind::Dedent { .. }) { depth -= 1 }
-        } else if recover_if(token.kind) { break }
+            if matches!(token.kind, TokenKind::Dedent { .. }) {
+                depth -= 1
+            }
+        } else if recover_if(token.kind) {
+            break;
+        }
         parser.next_token();
     }
 }
@@ -176,9 +192,9 @@ fn check_dedent(parser: &mut Parser) -> Result<bool, ParseError> {
             let token = parser.next_token();
             match matching {
                 true => Ok(true),
-                false => Err(parser.error("malformed Indent", token.range))
+                false => Err(parser.error("malformed Indent", token.range)),
             }
-        },
+        }
         _ => Ok(false),
     }
 }
@@ -225,7 +241,9 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
     let mut connections = Vec::new();
 
     loop {
-        if check_dedent(parser)? { break }
+        if check_dedent(parser)? {
+            break;
+        }
 
         match parse_anchor_content(parser) {
             Ok(content) => match content {
@@ -241,7 +259,13 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
         }
     }
 
-    Ok(AreaContent::Anchor(Anchor { identifier, position, can_spawn, refills, connections }))
+    Ok(AreaContent::Anchor(Anchor {
+        identifier,
+        position,
+        can_spawn,
+        refills,
+        connections,
+    }))
 }
 fn parse_anchor_position(parser: &mut Parser) -> Result<Option<Position>, ParseError> {
     let token = parser.next_token();
@@ -254,7 +278,7 @@ fn parse_anchor_position(parser: &mut Parser) -> Result<Option<Position>, ParseE
             let y = parse_number!(parser, Suggestion::Float)?;
             parser.eat_or_suggest(TokenKind::Colon, Suggestion::Float)?;
             Some(Position { x, y })
-        },
+        }
         TokenKind::Colon => None,
         _ => return Err(parser.error("Expected Colon or at", token.range)),
     };
@@ -282,12 +306,20 @@ fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>
             parser.skip(TokenKind::Whitespace);
             parser.eat_or_suggest(TokenKind::Newline, Suggestion::AnchorContent)?;
             AnchorContent::NoSpawn
-        },
+        }
         AnchorContentKind::Refill => AnchorContent::Refill(parse_anchor_refill(parser)?),
-        AnchorContentKind::State => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::State)?),
-        AnchorContentKind::Quest => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Quest)?),
-        AnchorContentKind::Pickup => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Pickup)?),
-        AnchorContentKind::Conn => AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Anchor)?),
+        AnchorContentKind::State => {
+            AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::State)?)
+        }
+        AnchorContentKind::Quest => {
+            AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Quest)?)
+        }
+        AnchorContentKind::Pickup => {
+            AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Pickup)?)
+        }
+        AnchorContentKind::Conn => {
+            AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Anchor)?)
+        }
     };
     Ok(content)
 }
@@ -305,8 +337,12 @@ fn parse_anchor_refill<'a>(parser: &mut Parser<'a>) -> Result<Refill<'a>, ParseE
     let value = match kind {
         RefillKind::Full => RefillValue::Full,
         RefillKind::Checkpoint => RefillValue::Checkpoint,
-        RefillKind::Health => RefillValue::Health(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?),
-        RefillKind::Energy => RefillValue::Energy(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?),
+        RefillKind::Health => {
+            RefillValue::Health(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?)
+        }
+        RefillKind::Energy => {
+            RefillValue::Energy(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?)
+        }
     };
 
     let requirements = if parser.current_token().kind == TokenKind::Colon {
@@ -317,13 +353,23 @@ fn parse_anchor_refill<'a>(parser: &mut Parser<'a>) -> Result<Refill<'a>, ParseE
         None
     };
 
-    Ok(Refill { value, requirements })
+    Ok(Refill {
+        value,
+        requirements,
+    })
 }
-fn parse_anchor_connection<'a>(parser: &mut Parser<'a>, kind: NodeKind) -> Result<Connection<'a>, ParseError> {
+fn parse_anchor_connection<'a>(
+    parser: &mut Parser<'a>,
+    kind: NodeKind,
+) -> Result<Connection<'a>, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::AnchorContent)?;
     let identifier = read_ident!(parser, Suggestion::Identifier)?;
     let requirements = parse_group(parser)?;
-    Ok(Connection { kind, identifier, requirements })
+    Ok(Connection {
+        kind,
+        identifier,
+        requirements,
+    })
 }
 
 fn parse_group<'a>(parser: &mut Parser<'a>) -> Result<Group<'a>, ParseError> {
@@ -338,8 +384,10 @@ fn parse_group<'a>(parser: &mut Parser<'a>) -> Result<Group<'a>, ParseError> {
             match parse_line(parser) {
                 Ok(line) => {
                     lines.push(line);
-                    if check_dedent(parser)? { break }
-                },
+                    if check_dedent(parser)? {
+                        break;
+                    }
+                }
                 Err(err) => {
                     recover(parser, |kind| matches!(kind, TokenKind::Dedent { .. }));
                     check_dedent(parser)?;
@@ -373,17 +421,17 @@ fn parse_line<'a>(parser: &mut Parser<'a>) -> Result<Line<'a>, ParseError> {
             TokenKind::Identifier if parser.read_token(token) == "OR" => {
                 ors.push(requirement);
                 has_seen_or = true;
-            },
+            }
             TokenKind::Newline => {
                 ors.push(requirement);
                 parser.next_token();
                 break None;
-            },
+            }
             TokenKind::Colon => {
                 let group = parse_group(parser)?;
                 ors.push(requirement);
-                break Some(group)
-            },
+                break Some(group);
+            }
             TokenKind::Indent => return Err(parser.error("unexpected Indent", token.range.clone())),
             _ => return Err(parser.error("expected separator or Newline", token.range.clone())),
         }
@@ -540,31 +588,39 @@ fn parse_requirement<'a>(parser: &mut Parser<'a>) -> Result<Requirement<'a>, Par
                 Err(_) => match Skill::from_str(identifier) {
                     Ok(skill) => match parser.current_token().kind {
                         TokenKind::Eq => {
-                            let value = parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?;
+                            let value =
+                                parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?;
                             match skill {
                                 Skill::Regenerate => return Err(parser.error("Explicit Regenerate amounts are forbidden, try removing the value", start..parser.current_token().range.start)),  // The game has buggy logic for when you're allowed to regenerate and there should never be a reason to explicitely force an amount of Regenerates
                                 _ => RequirementValue::UseSkill(skill, value),
-                            }},
+                            }
+                        }
                         _ => RequirementValue::Skill(skill),
                     },
                     Err(_) => match Resource::from_str(identifier) {
-                        Ok(resource) => RequirementValue::Resource(resource, parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?),
+                        Ok(resource) => RequirementValue::Resource(
+                            resource,
+                            parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?,
+                        ),
                         Err(_) => match Shard::from_str(identifier) {
                             Ok(shard) => RequirementValue::Shard(shard),
                             Err(_) => match Teleporter::from_str(identifier) {
                                 Ok(teleporter) => RequirementValue::Teleporter(teleporter),
-                                Err(_) => RequirementValue::State(identifier),  // This will get checked against the available states later
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                                Err(_) => RequirementValue::State(identifier), // This will get checked against the available states later
+                            },
+                        },
+                    },
+                },
+            },
+        },
     };
     let range = start..parser.current_token().range.start;
     Ok(Requirement { value, range })
 }
-fn parse_special_requirement<'a>(parser: &mut Parser<'a>, kind: &RequirementKind) -> Result<RequirementValue<'a>, ParseError> {
+fn parse_special_requirement<'a>(
+    parser: &mut Parser<'a>,
+    kind: &RequirementKind,
+) -> Result<RequirementValue<'a>, ParseError> {
     let requirement = match kind {
         RequirementKind::Free => RequirementValue::Free,
         RequirementKind::Impossible => RequirementValue::Impossible,
@@ -608,7 +664,9 @@ fn parse_special_requirement<'a>(parser: &mut Parser<'a>, kind: &RequirementKind
     };
     Ok(requirement)
 }
-fn parse_combat_requirement<'a>(parser: &mut Parser<'a>) -> Result<RequirementValue<'a>, ParseError> {
+fn parse_combat_requirement<'a>(
+    parser: &mut Parser<'a>,
+) -> Result<RequirementValue<'a>, ParseError> {
     parser.eat_or_suggest(TokenKind::Eq, Suggestion::Requirement)?;
     let mut enemies = SmallVec::new();
     loop {
@@ -616,7 +674,9 @@ fn parse_combat_requirement<'a>(parser: &mut Parser<'a>) -> Result<RequirementVa
             let amount = parse_number!(parser, Suggestion::Integer)?;
             parser.eat_or_suggest(TokenKind::X, Suggestion::Integer)?;
             amount
-        } else { 1 };
+        } else {
+            1
+        };
         let enemy = parse_ident!(parser, Suggestion::Enemy)?;
         enemies.push((enemy, amount));
         if parser.current_token().kind == TokenKind::Plus {
@@ -628,25 +688,31 @@ fn parse_combat_requirement<'a>(parser: &mut Parser<'a>) -> Result<RequirementVa
     Ok(RequirementValue::Combat(enemies))
 }
 
-fn fill_macros_and_states(contents: &mut Vec<AreaContent>, parser: &Parser) -> Result<(), ParseError> {
+fn fill_macros_and_states(
+    contents: &mut Vec<AreaContent>,
+    parser: &Parser,
+) -> Result<(), ParseError> {
     let mut macros = Vec::new();
     let mut states = Vec::new();
     for content in contents.iter_mut() {
         match content {
             AreaContent::Requirement(named_group) => macros.push(named_group.name),
-            AreaContent::Anchor(anchor) => for connection in &anchor.connections {
-                if connection.kind == NodeKind::State || connection.kind == NodeKind::Quest {
-                    states.push(connection.identifier);
+            AreaContent::Anchor(anchor) => {
+                for connection in &anchor.connections {
+                    if connection.kind == NodeKind::State || connection.kind == NodeKind::Quest {
+                        states.push(connection.identifier);
+                    }
                 }
-            },
-            AreaContent::Region(_) => {},
+            }
+            AreaContent::Region(_) => {}
         }
     }
 
     for content in contents {
         match content {
-            AreaContent::Requirement(named_group) | AreaContent::Region(named_group) =>
-                fill_group(&mut named_group.group, &macros, &states, parser)?,
+            AreaContent::Requirement(named_group) | AreaContent::Region(named_group) => {
+                fill_group(&mut named_group.group, &macros, &states, parser)?
+            }
             AreaContent::Anchor(anchor) => {
                 for refill in &mut anchor.refills {
                     for requirement in &mut refill.requirements {
@@ -656,13 +722,18 @@ fn fill_macros_and_states(contents: &mut Vec<AreaContent>, parser: &Parser) -> R
                 for connection in &mut anchor.connections {
                     fill_group(&mut connection.requirements, &macros, &states, parser)?;
                 }
-            },
+            }
         }
     }
 
     Ok(())
 }
-fn fill_group(group: &mut Group, macros: &[&str], states: &[&str], parser: &Parser) -> Result<(), ParseError> {
+fn fill_group(
+    group: &mut Group,
+    macros: &[&str],
+    states: &[&str],
+    parser: &Parser,
+) -> Result<(), ParseError> {
     for line in &mut group.lines {
         for and in &mut line.ands {
             fill_requirement(and, macros, states, parser)?;
@@ -676,7 +747,12 @@ fn fill_group(group: &mut Group, macros: &[&str], states: &[&str], parser: &Pars
     }
     Ok(())
 }
-fn fill_requirement(requirement: &mut Requirement, macros: &[&str], states: &[&str], parser: &Parser) -> Result<(), ParseError> {
+fn fill_requirement(
+    requirement: &mut Requirement,
+    macros: &[&str],
+    states: &[&str],
+    parser: &Parser,
+) -> Result<(), ParseError> {
     if let RequirementValue::State(identifier) = requirement.value {
         if macros.contains(&identifier) {
             requirement.value = RequirementValue::Macro(identifier);

@@ -1,26 +1,26 @@
 pub mod tokenizer;
 use tokenizer::TokenStream;
-pub(crate) mod parser;
-mod emitter;
-mod v;
-mod tools;
 mod code;
+mod emitter;
+pub(crate) mod parser;
+mod tools;
+mod v;
 
-pub use emitter::{HeaderBuild, ItemDetails};
-pub use v::{VResolve, V, VString};
-pub(crate) use v::vdisplay;
-pub use tools::validate_headers;
 pub use code::CodeDisplay;
+pub use emitter::{HeaderBuild, ItemDetails};
 use std::{fmt, str::FromStr};
+pub use tools::validate_headers;
+pub(crate) use v::vdisplay;
+pub use v::{VResolve, VString, V};
 
-use crate::{util::Icon, VItem, Item};
-use crate::uber_state::{UberStateTrigger, VUberStateTrigger, UberIdentifier};
+use crate::uber_state::{UberIdentifier, UberStateTrigger, VUberStateTrigger};
+use crate::{util::Icon, Item, VItem};
 
-use rustc_hash::FxHashMap;
 use rand::Rng;
+use rustc_hash::FxHashMap;
 
-use parser::{parse_header_contents};
-use super::{ParseError, parser::ParseErrorCollection};
+use super::{parser::ParseErrorCollection, ParseError};
+use parser::parse_header_contents;
 
 use wotw_seedgen_derive::{FromStr, VVariant};
 
@@ -46,7 +46,9 @@ impl Pickup {
             write!(f, "{}|{}", s.trigger.code(), s.item.code())?;
             if s.hide_others {
                 write!(f, "|mute")
-            } else { Ok(()) }
+            } else {
+                Ok(())
+            }
         })
     }
 }
@@ -60,18 +62,24 @@ pub struct Header {
 
 impl Header {
     /// Parse complete header syntax
-    /// 
+    ///
     /// All `!!pool`, `!!flush` and `!!take` syntax will be evaluated at this time, using the provided rng
     pub fn parse(mut input: String, rng: &mut impl Rng) -> Result<Header, ParseErrorCollection> {
         // TODO not actually parsing pool means anything using pool gets wrong errors
-        parser::preprocess(&mut input, rng).map_err(|err| vec![ParseError::new(format!("Error preprocessing: {err}"), "", 0..0)])?;
+        parser::preprocess(&mut input, rng).map_err(|err| {
+            vec![ParseError::new(
+                format!("Error preprocessing: {err}"),
+                "",
+                0..0,
+            )]
+        })?;
         let mut parser = parser::new(&input);
         let contents = parse_header_contents(&mut parser)?;
         Ok(Header { contents })
     }
 
     /// Evaluates the header based on the provided parameters and returns the desired changes to seed generation
-    /// 
+    ///
     /// Returns an error if the parameters lead to invalid syntax
     /// See [`HeaderBuild`] for more information
     pub fn build(self, mut parameters: FxHashMap<String, String>) -> Result<HeaderBuild, String> {
@@ -83,18 +91,39 @@ impl Header {
         let own_parameters = self.parameters();
 
         // Reject any unknown parameters
-        if let Some(unknown) = parameters.keys().find(|&identifier| !own_parameters.iter().any(|own| &own.identifier == identifier)) {
+        if let Some(unknown) = parameters.keys().find(|&identifier| {
+            !own_parameters
+                .iter()
+                .any(|own| &own.identifier == identifier)
+        }) {
             return Err(format!("Unknown parameter {unknown}"));
         }
 
         // Validate custom parameters
-        for ParameterInfo { identifier, default, .. } in own_parameters {
+        for ParameterInfo {
+            identifier,
+            default,
+            ..
+        } in own_parameters
+        {
             if let Some(custom) = parameters.get(&identifier) {
                 match default.kind() {
-                    ParameterType::Bool => { custom.parse::<bool>().map_err(|_| format!("invalid value for parameter {identifier}"))?; },
-                    ParameterType::Int => { custom.parse::<i32>().map_err(|_| format!("invalid value for parameter {identifier}"))?; },
-                    ParameterType::Float => { custom.parse::<f32>().map_err(|_| format!("invalid value for parameter {identifier}"))?; },
-                    ParameterType::String => {},
+                    ParameterType::Bool => {
+                        custom
+                            .parse::<bool>()
+                            .map_err(|_| format!("invalid value for parameter {identifier}"))?;
+                    }
+                    ParameterType::Int => {
+                        custom
+                            .parse::<i32>()
+                            .map_err(|_| format!("invalid value for parameter {identifier}"))?;
+                    }
+                    ParameterType::Float => {
+                        custom
+                            .parse::<f32>()
+                            .map_err(|_| format!("invalid value for parameter {identifier}"))?;
+                    }
+                    ParameterType::String => {}
                 }
             } else {
                 parameters.insert(identifier, default.to_string());
@@ -105,42 +134,47 @@ impl Header {
     }
 
     /// Returns the annotations of this header
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
     /// use wotw_seedgen::header::Annotation;
-    /// 
+    ///
     /// let input = "#hide\n9|0|8|9|0|int|0".to_string();
-    /// 
+    ///
     /// let header = Header::parse(input, &mut rand::thread_rng()).unwrap();
     /// let annotations = header.annotations();
-    /// 
+    ///
     /// assert_eq!(annotations, vec![&Annotation::Hide]);
     /// ```
     pub fn annotations(&self) -> Vec<&Annotation> {
-        self.contents.iter().filter_map(|content|
-            if let HeaderContent::Annotation(annotation) = content {
-                Some(annotation)
-            } else { None }
-        ).collect()
+        self.contents
+            .iter()
+            .filter_map(|content| {
+                if let HeaderContent::Annotation(annotation) = content {
+                    Some(annotation)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     /// Returns the configuration parameters for this header
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
     /// use wotw_seedgen::header::ParameterDefault;
     /// use wotw_seedgen::header::ParameterInfo;
-    /// 
+    ///
     /// let input = "!!parameter fun int:69".to_string();
     /// let header = Header::parse(input, &mut rand::thread_rng()).unwrap();
-    /// 
+    ///
     /// let parameters = header.parameters();
-    /// 
+    ///
     /// assert_eq!(parameters, vec![ParameterInfo {
     ///     identifier: "fun".to_string(),
     ///     default: ParameterDefault::Int(69),
@@ -149,33 +183,42 @@ impl Header {
     /// ```
     pub fn parameters(&self) -> Vec<ParameterInfo> {
         let mut last_documentation = None;
-        self.contents.iter().filter_map(|content| {
-            let documentation = last_documentation.take();
-            match content {
-                HeaderContent::InnerDocumentation(documentation) => {
-                    last_documentation = Some(documentation.clone());
-                    None
-                },
-                HeaderContent::Command(HeaderCommand::Parameter { identifier, default }) =>
-                    Some(ParameterInfo { identifier: identifier.clone(), default: default.clone(), documentation }),
-                _ => None,
-            }
-        }).collect()
+        self.contents
+            .iter()
+            .filter_map(|content| {
+                let documentation = last_documentation.take();
+                match content {
+                    HeaderContent::InnerDocumentation(documentation) => {
+                        last_documentation = Some(documentation.clone());
+                        None
+                    }
+                    HeaderContent::Command(HeaderCommand::Parameter {
+                        identifier,
+                        default,
+                    }) => Some(ParameterInfo {
+                        identifier: identifier.clone(),
+                        default: default.clone(),
+                        documentation,
+                    }),
+                    _ => None,
+                }
+            })
+            .collect()
     }
 
     /// Returns the documentation for this header
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
     /// use wotw_seedgen::header::Annotation;
-    /// 
+    ///
     /// let input = "#hide\n/// My first header\n///\n/// Someday I'll have this header do something!".to_string();
     /// let header = Header::parse(input, &mut rand::thread_rng()).unwrap();
-    /// 
+    ///
     /// let documentation = header.documentation();
-    /// 
+    ///
     /// assert_eq!(documentation.name, Some("My first header".to_string()));
     /// assert_eq!(documentation.description, Some("Someday I'll have this header do something!".to_string()));
     /// ```
@@ -184,7 +227,9 @@ impl Header {
         let mut description: Option<String> = None;
         for content in &self.contents {
             if let HeaderContent::OuterDocumentation(documentation) = content {
-                if documentation.is_empty() { continue }
+                if documentation.is_empty() {
+                    continue;
+                }
                 if name.is_none() {
                     name = Some(documentation.clone());
                 } else if let Some(prior) = &mut description {
@@ -200,27 +245,27 @@ impl Header {
     }
 
     /// Returns the annotations of a given header syntax
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
     /// use wotw_seedgen::header::Annotation;
-    /// 
+    ///
     /// let input = "#hide\n9|0|8|9|0|int|0";
-    /// 
+    ///
     /// let annotations = Header::parse_annotations(input).unwrap();
-    /// 
+    ///
     /// assert_eq!(annotations, vec![Annotation::Hide]);
     /// ```
-    /// 
+    ///
     /// This will only parse the minimum amount required to know the annotations
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
-    /// # 
+    /// #
     /// let input = "#hide\n3|6|This isn't even valid header syntax!";
-    /// 
+    ///
     /// assert!(Header::parse_annotations(input).is_ok());
     /// ```
     pub fn parse_annotations(input: &str) -> Result<Vec<Annotation>, String> {
@@ -230,7 +275,9 @@ impl Header {
             if let Some(mut annotation) = line.strip_prefix('#') {
                 let end = annotation.find('\n').unwrap_or(annotation.len());
                 annotation = &annotation[..end];
-                if let Some(end) = annotation.find("//") { annotation = &annotation[..end] }
+                if let Some(end) = annotation.find("//") {
+                    annotation = &annotation[..end]
+                }
                 if let Ok(annotation) = Annotation::from_str(annotation) {
                     annotations.push(annotation);
                 }
@@ -243,30 +290,30 @@ impl Header {
     }
 
     /// Returns the name and description of a given header syntax
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
     /// use wotw_seedgen::header::Annotation;
-    /// 
+    ///
     /// let input = "#hide\n/// My first header\n///\n/// Someday I'll have this header do something!";
-    /// 
+    ///
     /// let documentation = Header::parse_documentation(input);
-    /// 
+    ///
     /// assert_eq!(documentation.name, Some("My first header".to_string()));
     /// assert_eq!(documentation.description, Some("Someday I'll have this header do something!".to_string()));
     /// ```
-    /// 
+    ///
     /// This will only parse the minimum amount required to know the documentation
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
-    /// # 
+    /// #
     /// let input = "/// A very bad header\n3|6|This isn't even valid header syntax!";
-    /// 
+    ///
     /// let documentation = Header::parse_documentation(input);
-    /// 
+    ///
     /// assert_eq!(documentation.name, Some("A very bad header".to_string()));
     /// assert_eq!(documentation.description, None);
     /// ```
@@ -275,11 +322,17 @@ impl Header {
         let mut description: Option<String> = None;
 
         for line in input.lines() {
-            if line.is_empty() || line.starts_with('#') { continue }
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
             if let Some(documentation) = line.trim_start().strip_prefix("///") {
-                if documentation.starts_with('/') { break }
+                if documentation.starts_with('/') {
+                    break;
+                }
                 let documentation = documentation.trim();
-                if documentation.is_empty() { continue }
+                if documentation.is_empty() {
+                    continue;
+                }
                 if name.is_none() {
                     name = Some(documentation.to_string());
                 } else if let Some(prior) = &mut description {
@@ -288,27 +341,29 @@ impl Header {
                 } else {
                     description = Some(documentation.to_string());
                 }
-            } else { break }
+            } else {
+                break;
+            }
         }
 
         HeaderDocumentation { name, description }
     }
 
     /// Returns the parameters present in the header, including their names and default values
-    /// 
+    ///
     /// This will parse any parameter lines to read their relevant values, but skip parsing anything else
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use wotw_seedgen::Header;
     /// use wotw_seedgen::header::ParameterDefault;
     /// use wotw_seedgen::header::ParameterInfo;
-    /// 
+    ///
     /// let input = "3|0|6|Good luck have fun!\n//// Some ad\n!!parameter extra_text string:Hier könnte ihre Werbung stehen!\n3|0|6|$PARAM(extra_text)";
-    /// 
+    ///
     /// let parameters = Header::parse_parameters(input);
-    /// 
+    ///
     /// assert_eq!(parameters, vec![ParameterInfo {
     ///     identifier: "extra_text".to_string(),
     ///     default: ParameterDefault::String("Hier könnte ihre Werbung stehen!".to_string()),
@@ -317,23 +372,40 @@ impl Header {
     /// ```
     pub fn parse_parameters(input: &str) -> Vec<ParameterInfo> {
         let mut last_documentation = None;
-        input.lines().filter_map(|line| {
-            let documentation = if let Some(documentation) = line.strip_prefix("////") {
-                if !documentation.starts_with('/') {
-                    last_documentation = Some(documentation.trim().to_owned());
-                }
-                return None;
-            } else { last_documentation.take() };
-            line.strip_prefix("!!").and_then(|command|
-                if command.starts_with("parameter ") {
-                    HeaderCommand::from_str(command).ok().map(|command|
-                        if let HeaderCommand::Parameter { identifier, default } = command {
-                            ParameterInfo { identifier, default, documentation }
-                        } else { unreachable!() }
-                    )
-                } else { None }
-            )
-        }).collect()
+        input
+            .lines()
+            .filter_map(|line| {
+                let documentation = if let Some(documentation) = line.strip_prefix("////") {
+                    if !documentation.starts_with('/') {
+                        last_documentation = Some(documentation.trim().to_owned());
+                    }
+                    return None;
+                } else {
+                    last_documentation.take()
+                };
+                line.strip_prefix("!!").and_then(|command| {
+                    if command.starts_with("parameter ") {
+                        HeaderCommand::from_str(command).ok().map(|command| {
+                            if let HeaderCommand::Parameter {
+                                identifier,
+                                default,
+                            } = command
+                            {
+                                ParameterInfo {
+                                    identifier,
+                                    default,
+                                    documentation,
+                                }
+                            } else {
+                                unreachable!()
+                            }
+                        })
+                    } else {
+                        None
+                    }
+                })
+            })
+            .collect()
     }
 }
 
@@ -356,11 +428,11 @@ pub enum Annotation {
 #[derive(Debug, Clone)]
 pub struct HeaderDocumentation {
     /// Brief name, this may never exceed one line
-    /// 
+    ///
     /// [`None`] if not provided by the header
     pub name: Option<String>,
     /// Extended description
-    /// 
+    ///
     /// [`None`] if not provided by the header
     pub description: Option<String>,
 }
@@ -391,25 +463,60 @@ pub struct TimerDefinition {
 }
 impl TimerDefinition {
     pub fn code(&self) -> CodeDisplay<TimerDefinition> {
-        CodeDisplay::new(self, |s, f| write!(f, "{}|{}", s.switch.code(), s.counter.code()))
+        CodeDisplay::new(self, |s, f| {
+            write!(f, "{}|{}", s.switch.code(), s.counter.code())
+        })
     }
 }
 
 #[derive(Debug, Clone)]
 /// Header-specific commands that influence seed generation, but won't be added to the resulting seed
 pub enum HeaderCommand {
-    Include { name: String },
-    Exclude { name: String },
-    Add { item: VItem, amount: V<i32> },
-    Remove { item: VItem, amount: V<i32> },
-    Name { item: VItem, name: VString },
-    Display { item: VItem, name: VString },
-    Description { item: VItem, description: VString },
-    Price { item: VItem, price: V<u32> },
-    Icon { item: VItem, icon: Icon },
-    Parameter { identifier: String, default: ParameterDefault },
-    Set { state: String },
-    If { parameter: String, value: String },
+    Include {
+        name: String,
+    },
+    Exclude {
+        name: String,
+    },
+    Add {
+        item: VItem,
+        amount: V<i32>,
+    },
+    Remove {
+        item: VItem,
+        amount: V<i32>,
+    },
+    Name {
+        item: VItem,
+        name: VString,
+    },
+    Display {
+        item: VItem,
+        name: VString,
+    },
+    Description {
+        item: VItem,
+        description: VString,
+    },
+    Price {
+        item: VItem,
+        price: V<u32>,
+    },
+    Icon {
+        item: VItem,
+        icon: Icon,
+    },
+    Parameter {
+        identifier: String,
+        default: ParameterDefault,
+    },
+    Set {
+        state: String,
+    },
+    If {
+        parameter: String,
+        value: String,
+    },
     EndIf,
     GoalmodeHack(GoalmodeHack),
 }
@@ -465,9 +572,21 @@ impl FromStr for ParameterDefault {
         };
 
         let default = match parameter_type {
-            "bool" => ParameterDefault::Bool(default.parse().map_err(|_| format!("invalid value boolean {default}"))?),
-            "int" => ParameterDefault::Int(default.parse().map_err(|_| format!("invalid value integer {default}"))?),
-            "float" => ParameterDefault::Float(default.parse().map_err(|_| format!("invalid value float {default}"))?),
+            "bool" => ParameterDefault::Bool(
+                default
+                    .parse()
+                    .map_err(|_| format!("invalid value boolean {default}"))?,
+            ),
+            "int" => ParameterDefault::Int(
+                default
+                    .parse()
+                    .map_err(|_| format!("invalid value integer {default}"))?,
+            ),
+            "float" => ParameterDefault::Float(
+                default
+                    .parse()
+                    .map_err(|_| format!("invalid value float {default}"))?,
+            ),
             "string" => ParameterDefault::String(default.to_string()),
             _ => return Err(format!("invalid parameter type {parameter_type}")),
         };

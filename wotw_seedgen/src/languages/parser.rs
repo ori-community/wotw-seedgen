@@ -1,8 +1,8 @@
-use std::fmt::{self, Display};
-use std::slice::SliceIndex;
-use std::iter::Peekable;
 use std::error::Error;
-use std::ops::{Range, Deref, DerefMut};
+use std::fmt::{self, Display};
+use std::iter::Peekable;
+use std::ops::{Deref, DerefMut, Range};
+use std::slice::SliceIndex;
 
 use super::{Token, TokenKind};
 
@@ -20,9 +20,17 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
     pub(crate) fn new(input: &'a str, tokens: TokenStream) -> Self {
         let mut tokens = tokens.peekable();
         let len = input.len();
-        let eof_token = Token { kind: TokenKind::Eof, range: len..len };
+        let eof_token = Token {
+            kind: TokenKind::Eof,
+            range: len..len,
+        };
         let current_token = tokens.next().unwrap_or_else(|| eof_token.clone());
-        Self { input, tokens, current_token, eof_token }
+        Self {
+            input,
+            tokens,
+            current_token,
+            eof_token,
+        }
     }
 
     /// Expects the current [`Token`] to match the [`TokenKind`], returns it and steps to the next [`Token`]
@@ -35,12 +43,18 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
         }
     }
     /// Convenience function to call [`Parser::eat`] and add a [`Suggestion`] to the potential [`ParseError`]
-    pub(crate) fn eat_or_suggest(&mut self, kind: TokenKind, suggestion: impl Display) -> Result<Token, ParseError> {
+    pub(crate) fn eat_or_suggest(
+        &mut self,
+        kind: TokenKind,
+        suggestion: impl Display,
+    ) -> Result<Token, ParseError> {
         let token = self.next_token();
         if token.kind == kind {
             Ok(token)
         } else {
-            Err(self.error(format!("Expected {kind}"), token.range).with_suggestion(suggestion))
+            Err(self
+                .error(format!("Expected {kind}"), token.range)
+                .with_suggestion(suggestion))
         }
     }
     /// If the current [`Token`] matches the [`TokenKind`], steps to the next [`Token`]
@@ -53,7 +67,9 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
     pub(crate) fn skip_while(&mut self, mut condition: impl FnMut(TokenKind) -> bool) {
         while condition(self.current_token.kind) {
             let token = self.next_token();
-            if token.kind == TokenKind::Eof { break }
+            if token.kind == TokenKind::Eof {
+                break;
+            }
         }
     }
 
@@ -92,7 +108,10 @@ impl<'a, TokenStream: Iterator<Item = Token>> Parser<'a, TokenStream> {
         if remaining.is_empty() {
             Ok(())
         } else {
-            Err(self.error(format!("Input left after parsing: \"{remaining}\""), self.current_token.range.clone()))
+            Err(self.error(
+                format!("Input left after parsing: \"{remaining}\""),
+                self.current_token.range.clone(),
+            ))
         }
     }
 
@@ -110,10 +129,19 @@ pub struct ParseError {
     pub suggestion: Option<String>,
 }
 impl ParseError {
-    pub(crate) fn new(message: impl AsRef<str>, source: impl AsRef<str>, range: Range<usize>) -> Self {
+    pub(crate) fn new(
+        message: impl AsRef<str>,
+        source: impl AsRef<str>,
+        range: Range<usize>,
+    ) -> Self {
         let message = message.as_ref().to_string();
         let source = source.as_ref().to_string();
-        Self { message, source, range, suggestion: None }
+        Self {
+            message,
+            source,
+            range,
+            suggestion: None,
+        }
     }
 
     /// Adds the completion to this [`ParseError`]
@@ -123,29 +151,39 @@ impl ParseError {
     }
 
     /// Returns a multiline visual representation of this [`ParseError`]
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// May panic if the [`ParseError`] is out of bounds of its source string
     pub fn verbose_display(&self) -> String {
-        if self.source.is_empty() { return format!("{}\n(input was empty)", self.message) }
+        if self.source.is_empty() {
+            return format!("{}\n(input was empty)", self.message);
+        }
 
-        let source_view = self.source.line_ranges()
+        let source_view = self
+            .source
+            .line_ranges()
             .enumerate()
-            .filter(|(_, line_range)| line_range.end >= self.range.start && line_range.start < self.range.end)
+            .filter(|(_, line_range)| {
+                line_range.end >= self.range.start && line_range.start < self.range.end
+            })
             .map(|(line_number, line_range)| {
                 let line_number = format!("line {}", line_number + 1);
                 let indent = " ".repeat(line_number.len());
-                let err_range = line_range.start.max(self.range.start)..line_range.end.min(self.range.end);
+                let err_range =
+                    line_range.start.max(self.range.start)..line_range.end.min(self.range.end);
                 let err_offset = " ".repeat(err_range.start - line_range.start);
                 let err_underline = "^".repeat(err_range.len());
                 let line = &self.source[line_range];
                 let newline = if line.ends_with('\n') { "" } else { "\n" };
-                format!("\n\
+                format!(
+                    "\n\
                     {line_number}: {line}{newline}\
                     {indent}  {err_offset}{err_underline}\
-                ")
-            }).collect::<String>();
+                "
+                )
+            })
+            .collect::<String>();
 
         assert!(!source_view.is_empty(), "Error range out of bounds");
 
@@ -190,63 +228,82 @@ impl Display for ParseErrorCollection {
 }
 impl ParseErrorCollection {
     pub fn verbose_display(&self) -> String {
-        self.errors.iter().map(ParseError::verbose_display).collect::<Vec<_>>().join("\n")
+        self.errors
+            .iter()
+            .map(ParseError::verbose_display)
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 }
 
 macro_rules! invalid {
     ($token:ident, $parser:expr, $expected:path) => {
-        |err| $parser.error(format!("Invalid {}: {}", $expected, err), $token.range).with_suggestion($expected)
+        |err| {
+            $parser
+                .error(format!("Invalid {}: {}", $expected, err), $token.range)
+                .with_suggestion($expected)
+        }
     };
 }
 pub(super) use invalid;
 
 macro_rules! parse_token {
-    ($token_kind:path, $parser:expr, $expected:path) => {
-        {
-            $parser.eat_or_suggest($token_kind, $expected)
+    ($token_kind:path, $parser:expr, $expected:path) => {{
+        $parser
+            .eat_or_suggest($token_kind, $expected)
             .and_then(|token| {
                 let string = $parser.read_token(&token);
-                string.parse().map_err($crate::languages::parser::invalid!(token, $parser, $expected))
+                string.parse().map_err($crate::languages::parser::invalid!(
+                    token, $parser, $expected
+                ))
             })
-        }
-    };
+    }};
 }
 pub(super) use parse_token;
 macro_rules! parse_number {
     ($parser:expr, $expected:path) => {
-        $crate::languages::parser::parse_token!($crate::languages::TokenKind::Number, $parser, $expected)
+        $crate::languages::parser::parse_token!(
+            $crate::languages::TokenKind::Number,
+            $parser,
+            $expected
+        )
     };
 }
 pub(super) use parse_number;
 macro_rules! parse_value {
-    ($parser:expr, $expected:path, $prior_expected:path) => {
-        {
-            $parser.eat_or_suggest($crate::languages::TokenKind::Eq, $prior_expected)
+    ($parser:expr, $expected:path, $prior_expected:path) => {{
+        $parser
+            .eat_or_suggest($crate::languages::TokenKind::Eq, $prior_expected)
             .and_then(|_| $crate::languages::parser::parse_number!($parser, $expected))
-        }
-    };
+    }};
 }
 pub(super) use parse_value;
 macro_rules! parse_ident {
     ($parser:expr, $expected:path) => {
-        $crate::languages::parser::parse_token!($crate::languages::TokenKind::Identifier, $parser, $expected)
+        $crate::languages::parser::parse_token!(
+            $crate::languages::TokenKind::Identifier,
+            $parser,
+            $expected
+        )
     };
 }
 pub(super) use parse_ident;
 
 macro_rules! read_token {
-    ($token_kind:path, $parser:expr, $expected:path) => {
-        {
-            $parser.eat_or_suggest($token_kind, $expected)
+    ($token_kind:path, $parser:expr, $expected:path) => {{
+        $parser
+            .eat_or_suggest($token_kind, $expected)
             .map(|token| $parser.read_token(&token))
-        }
-    };
+    }};
 }
 pub(super) use read_token;
 macro_rules! read_ident {
     ($parser:expr, $expected:path) => {
-        $crate::languages::parser::read_token!($crate::languages::TokenKind::Identifier, $parser, $expected)
+        $crate::languages::parser::read_token!(
+            $crate::languages::TokenKind::Identifier,
+            $parser,
+            $expected
+        )
     };
 }
 pub(super) use read_ident;

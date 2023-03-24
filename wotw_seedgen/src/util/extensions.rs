@@ -2,7 +2,7 @@ use std::{iter::FusedIterator, ops::Range};
 
 pub(crate) trait StrExtension {
     /// Returns an iterator over the lines of a string, as [`Range`]s to index into the string
-    /// 
+    ///
     /// Unlike the `lines` method on [`str`], this will include trailing newlines
     fn line_ranges(&self) -> LineRanges;
 }
@@ -34,7 +34,8 @@ impl<'a> Iterator for LineRanges<'a> {
         self.next_index.map(|next_index| {
             let start_index = next_index;
 
-            self.next_index = self.source
+            self.next_index = self
+                .source
                 .get(next_index..)
                 .and_then(|remaining| remaining.find('\n'))
                 .map(|index| next_index + index + 1);

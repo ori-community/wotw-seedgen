@@ -4,13 +4,13 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::smallvec;
 
 use super::{player::Player, requirement::Requirement};
-use crate::util::{
-    RefillValue, NodeKind, Position, Zone,
-    orbs::{self, OrbVariants},
-    constants::TP_ANCHOR,
-};
-use crate::uber_state::{UberIdentifier, UberStateTrigger};
 use crate::generator::NodeSummary;
+use crate::uber_state::{UberIdentifier, UberStateTrigger};
+use crate::util::{
+    constants::TP_ANCHOR,
+    orbs::{self, OrbVariants},
+    NodeKind, Position, RefillValue, Zone,
+};
 
 #[derive(Debug)]
 pub struct Refill {
@@ -127,7 +127,9 @@ impl Node {
     pub fn can_spawn(&self) -> bool {
         if let Node::Anchor(anchor) = self {
             anchor.position.is_some() && anchor.can_spawn
-        } else { false }
+        } else {
+            false
+        }
     }
     pub(crate) fn summary(&self) -> NodeSummary {
         NodeSummary {
@@ -152,7 +154,7 @@ struct ReachContext<'a, 'b, 'c> {
     progression_check: bool,
     states: FxHashSet<usize>,
     state_progressions: FxHashMap<usize, Vec<(usize, &'a Connection)>>,
-    world_state: FxHashMap<usize, OrbVariants>
+    world_state: FxHashMap<usize, OrbVariants>,
 }
 
 #[derive(Debug)]
@@ -173,10 +175,17 @@ impl Graph {
             position: None,
             map_position: None,
         });
-        Graph { nodes, spawn_pickup_node }
+        Graph {
+            nodes,
+            spawn_pickup_node,
+        }
     }
 
-    fn follow_state_progressions<'a>(&'a self, index: usize, context: &mut ReachContext<'a, '_, '_>) -> (Reached<'a>, Progressions<'a>) {
+    fn follow_state_progressions<'a>(
+        &'a self,
+        index: usize,
+        context: &mut ReachContext<'a, '_, '_>,
+    ) -> (Reached<'a>, Progressions<'a>) {
         let mut reached = Vec::new();
         let mut progressions = Vec::new();
         if let Some(connections) = context.state_progressions.get(&index) {
@@ -185,9 +194,18 @@ impl Graph {
                     // TODO loop with improved orbs?
                     continue;
                 }
-                let target_orbs = connection.requirement.is_met(context.player, &context.states, context.world_state[&from].clone());
+                let target_orbs = connection.requirement.is_met(
+                    context.player,
+                    &context.states,
+                    context.world_state[&from].clone(),
+                );
                 if !target_orbs.is_empty() {
-                    let (mut child_reached, mut child_progressions) = self.reach_recursion(&self.nodes[connection.to], false, target_orbs, context);
+                    let (mut child_reached, mut child_progressions) = self.reach_recursion(
+                        &self.nodes[connection.to],
+                        false,
+                        target_orbs,
+                        context,
+                    );
                     reached.append(&mut child_reached);
                     progressions.append(&mut child_progressions);
                 }
@@ -196,26 +214,48 @@ impl Graph {
         (reached, progressions)
     }
 
-    fn reach_recursion<'a>(&'a self, entry: &'a Node, is_spawn: bool, mut best_orbs: OrbVariants, context: &mut ReachContext<'a, '_, '_>) -> (Reached<'a>, Progressions<'a>) {
+    fn reach_recursion<'a>(
+        &'a self,
+        entry: &'a Node,
+        is_spawn: bool,
+        mut best_orbs: OrbVariants,
+        context: &mut ReachContext<'a, '_, '_>,
+    ) -> (Reached<'a>, Progressions<'a>) {
         context.world_state.insert(entry.index(), best_orbs.clone());
         match entry {
             Node::Anchor(anchor) => {
                 let max_orbs = context.player.max_orbs();
-                if best_orbs.get(0).map_or(true, |first_orbs| first_orbs != &max_orbs) {
+                if best_orbs
+                    .get(0)
+                    .map_or(true, |first_orbs| first_orbs != &max_orbs)
+                {
                     for refill in &anchor.refills {
-                        let mut refill_orbs = refill.requirement.is_met(context.player, &context.states, best_orbs.clone());
+                        let mut refill_orbs = refill.requirement.is_met(
+                            context.player,
+                            &context.states,
+                            best_orbs.clone(),
+                        );
                         if !refill_orbs.is_empty() {
                             match refill.value {
                                 RefillValue::Full => {
                                     best_orbs = smallvec![context.player.max_orbs()];
                                     break;
-                                },
-                                RefillValue::Checkpoint => refill_orbs = orbs::either_single(&refill_orbs, context.player.checkpoint_orbs()),
+                                }
+                                RefillValue::Checkpoint => {
+                                    refill_orbs = orbs::either_single(
+                                        &refill_orbs,
+                                        context.player.checkpoint_orbs(),
+                                    )
+                                }
                                 RefillValue::Health(amount) => {
                                     let amount = amount * context.player.health_plant_drops();
-                                    refill_orbs.iter_mut().for_each(|orbs| context.player.heal(orbs, amount));
-                                },
-                                RefillValue::Energy(amount) => refill_orbs.iter_mut().for_each(|orbs| context.player.recharge(orbs, amount)),
+                                    refill_orbs
+                                        .iter_mut()
+                                        .for_each(|orbs| context.player.heal(orbs, amount));
+                                }
+                                RefillValue::Energy(amount) => refill_orbs
+                                    .iter_mut()
+                                    .for_each(|orbs| context.player.recharge(orbs, amount)),
                             }
                             best_orbs = orbs::either(&best_orbs, &refill_orbs);
                         }
@@ -229,11 +269,19 @@ impl Graph {
                         // TODO loop with improved orbs?
                         continue;
                     }
-                    let target_orbs = connection.requirement.is_met(context.player, &context.states, best_orbs.clone());
+                    let target_orbs = connection.requirement.is_met(
+                        context.player,
+                        &context.states,
+                        best_orbs.clone(),
+                    );
                     if target_orbs.is_empty() {
-                        let states = connection.requirement.contained_requirements(context.player.settings)
+                        let states = connection
+                            .requirement
+                            .contained_requirements(context.player.settings)
                             .filter_map(|requirement| match requirement {
-                                Requirement::State(state) if !context.states.contains(state) => Some(*state),
+                                Requirement::State(state) if !context.states.contains(state) => {
+                                    Some(*state)
+                                }
                                 _ => None,
                             })
                             .collect::<Vec<_>>();
@@ -244,46 +292,72 @@ impl Graph {
                             }
                         } else {
                             for state in states {
-                                context.state_progressions.entry(state).or_default().push((anchor.index, connection));
+                                context
+                                    .state_progressions
+                                    .entry(state)
+                                    .or_default()
+                                    .push((anchor.index, connection));
                             }
                         }
                     } else {
-                        let (mut child_reached, mut child_progressions) = self.reach_recursion(&self.nodes[connection.to], false, target_orbs, context);
+                        let (mut child_reached, mut child_progressions) = self.reach_recursion(
+                            &self.nodes[connection.to],
+                            false,
+                            target_orbs,
+                            context,
+                        );
                         reached.append(&mut child_reached);
                         progressions.append(&mut child_progressions);
                     }
                 }
                 if is_spawn {
-                    if let Some(tp_anchor) = self.nodes.iter().find(|&node| node.identifier() == TP_ANCHOR) {
-                        if !anchor.connections.iter().any(|connection| connection.to == tp_anchor.index()) {
-                            let (mut tp_reached, mut tp_progressions) = self.reach_recursion(tp_anchor, false, best_orbs, context);
+                    if let Some(tp_anchor) = self
+                        .nodes
+                        .iter()
+                        .find(|&node| node.identifier() == TP_ANCHOR)
+                    {
+                        if !anchor
+                            .connections
+                            .iter()
+                            .any(|connection| connection.to == tp_anchor.index())
+                        {
+                            let (mut tp_reached, mut tp_progressions) =
+                                self.reach_recursion(tp_anchor, false, best_orbs, context);
                             reached.append(&mut tp_reached);
                             progressions.append(&mut tp_progressions);
                         }
                     }
                 }
                 (reached, progressions)
-            },
+            }
             Node::Pickup(_) => (vec![entry], vec![]),
             Node::State(state) => {
                 context.states.insert(state.index);
-                let (mut reached, progressions) = self.follow_state_progressions(state.index, context);
+                let (mut reached, progressions) =
+                    self.follow_state_progressions(state.index, context);
                 reached.push(entry);
                 (reached, progressions)
-            },
+            }
             Node::Quest(quest) => {
                 context.states.insert(quest.index);
-                let (mut reached, progressions) = self.follow_state_progressions(quest.index, context);
+                let (mut reached, progressions) =
+                    self.follow_state_progressions(quest.index, context);
                 reached.push(entry);
                 (reached, progressions)
-            },
+            }
         }
     }
 
-    fn collect_extra_states(&self, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> FxHashSet<usize> {
+    fn collect_extra_states(
+        &self,
+        extra_states: &FxHashMap<UberIdentifier, f32>,
+        sets: &[usize],
+    ) -> FxHashSet<usize> {
         let mut states = FxHashSet::default();
 
-        for (trigger, index) in self.nodes.iter()
+        for (trigger, index) in self
+            .nodes
+            .iter()
             .filter(|node| matches!(node, Node::State(_) | Node::Quest(_)))
             .filter_map(|node| node.trigger().map(|trigger| (trigger, node.index())))
         {
@@ -304,12 +378,28 @@ impl Graph {
 
     #[inline]
     pub fn find_spawn(&self, spawn: &str) -> Result<&Node, String> {
-        let entry = self.nodes.iter().find(|&node| node.identifier() == spawn).ok_or_else(|| format!("Spawn {} not found", spawn))?;
-        if !matches!(entry, Node::Anchor(_)) { return Err(format!("Spawn has to be an anchor, {} is a {:?}", spawn, entry.node_kind())); }
+        let entry = self
+            .nodes
+            .iter()
+            .find(|&node| node.identifier() == spawn)
+            .ok_or_else(|| format!("Spawn {} not found", spawn))?;
+        if !matches!(entry, Node::Anchor(_)) {
+            return Err(format!(
+                "Spawn has to be an anchor, {} is a {:?}",
+                spawn,
+                entry.node_kind()
+            ));
+        }
         Ok(entry)
     }
 
-    pub fn reached_locations<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> Reached<'a> {
+    pub fn reached_locations<'a>(
+        &'a self,
+        player: &Player,
+        spawn: &'a Node,
+        extra_states: &FxHashMap<UberIdentifier, f32>,
+        sets: &[usize],
+    ) -> Reached<'a> {
         let mut context = ReachContext {
             player,
             progression_check: false,
@@ -318,11 +408,18 @@ impl Graph {
             world_state: FxHashMap::default(),
         };
 
-        let (reached, _) = self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
+        let (reached, _) =
+            self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
 
         reached
     }
-    pub fn reached_and_progressions<'a>(&'a self, player: &Player, spawn: &'a Node, extra_states: &FxHashMap<UberIdentifier, f32>, sets: &[usize]) -> (Reached<'a>, Progressions<'a>) {
+    pub fn reached_and_progressions<'a>(
+        &'a self,
+        player: &Player,
+        spawn: &'a Node,
+        extra_states: &FxHashMap<UberIdentifier, f32>,
+        sets: &[usize],
+    ) -> (Reached<'a>, Progressions<'a>) {
         let mut context = ReachContext {
             player,
             progression_check: true,
@@ -331,13 +428,15 @@ impl Graph {
             world_state: FxHashMap::default(),
         };
 
-        let (reached, mut progressions) = self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
+        let (reached, mut progressions) =
+            self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
 
         // add progressions containing states that were never met
         for (_, state_progressions) in context.state_progressions {
             for (from, connection) in state_progressions {
                 if !context.world_state.contains_key(&connection.to) {
-                    progressions.push((&connection.requirement, context.world_state[&from].clone()));
+                    progressions
+                        .push((&connection.requirement, context.world_state[&from].clone()));
                 }
             }
         }

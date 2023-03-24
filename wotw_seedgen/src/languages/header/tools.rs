@@ -1,21 +1,25 @@
 use std::fmt::Display;
 
-use ansi_term::{Style, Colour};
+use ansi_term::{Colour, Style};
 use rustc_hash::FxHashMap;
 
-use crate::{util::{
-    self,
-    constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR},
-}, Header, Item, item::{UberStateOperator, Command}};
-use crate::uber_state::{UberStateComparator, UberStateTrigger, UberIdentifier};
+use crate::uber_state::{UberIdentifier, UberStateComparator, UberStateTrigger};
+use crate::{
+    item::{Command, UberStateOperator},
+    util::{
+        self,
+        constants::{HEADER_INDENT, NAME_COLOUR, UBERSTATE_COLOUR},
+    },
+    Header, Item,
+};
 
-use super::{HeaderContent, VResolve, CodeDisplay};
+use super::{CodeDisplay, HeaderContent, VResolve};
 
 pub type Identifier = String;
 /// Perform a set of checks on the given [`Header`]s, including parsing them and checking for collisions in the used uberStates.
-/// 
+///
 /// Will also print information about what uberStates are still free to use
-/// 
+///
 /// Returns `true` if all checks passed
 pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
     let mut output = String::new();
@@ -23,7 +27,14 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
     let mut occupation_map = Vec::new();
 
     let length = headers.len();
-    output += &format!("{}", Style::new().italic().paint(format!("validating {} header{}\n", length, if length == 1 { "" } else { "s" })));
+    output += &format!(
+        "{}",
+        Style::new().italic().paint(format!(
+            "validating {} header{}\n",
+            length,
+            if length == 1 { "" } else { "s" }
+        ))
+    );
 
     let mut passed = Vec::new();
     let mut failed = Vec::new();
@@ -33,11 +44,11 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
         match validate_header(header) {
             Ok((occupied, excludes)) => {
                 occupation_map.push((identifier, occupied, excludes));
-            },
+            }
             Err(err) => {
                 util::add_trailing_spaces(&mut identifier, HEADER_INDENT);
                 failed.push(format!("{}  {}\n", NAME_COLOUR.paint(identifier), err));
-            },
+            }
         }
     }
 
@@ -47,12 +58,15 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
 
         'outer: for uber_state in occupied {
             // special cases because this system is not holding up to modern header logic
-            if uber_state.identifier.uber_group == 9 && (
-                uber_state.identifier.uber_id == 0 && uber_state.used_value.map_or(false, |value| matches!(value, 0 | 250 | 251 | 999))
-                || uber_state.identifier.uber_id == 999 && uber_state.used_value == Some(200)
-                || uber_state.identifier.uber_id == 100
-                || uber_state.identifier.uber_id == 150
-            ) {
+            if uber_state.identifier.uber_group == 9
+                && (uber_state.identifier.uber_id == 0
+                    && uber_state
+                        .used_value
+                        .map_or(false, |value| matches!(value, 0 | 250 | 251 | 999))
+                    || uber_state.identifier.uber_id == 999 && uber_state.used_value == Some(200)
+                    || uber_state.identifier.uber_id == 100
+                    || uber_state.identifier.uber_id == 150)
+            {
                 continue;
             }
 
@@ -64,7 +78,8 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
                     let generic = uber_state.used_value.is_none() || other.used_value.is_none();
                     uber_state == other || (generic && uber_state.identifier == other.identifier)
                 }) {
-                    collision_message = format!("Collision between used state {} and {} using {}",
+                    collision_message = format!(
+                        "Collision between used state {} and {} using {}",
                         UBERSTATE_COLOUR.paint(uber_state.code().to_string()),
                         NAME_COLOUR.paint(other_header),
                         UBERSTATE_COLOUR.paint(collision.code().to_string())
@@ -84,8 +99,11 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
                     if last_value != u32::MAX && value == last_value + 1 {
                         range = true;
                     } else if range {
-                        for _ in 0..2 { occupied_summary.pop(); }
-                        occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(format!("..{}", last_value)));
+                        for _ in 0..2 {
+                            occupied_summary.pop();
+                        }
+                        occupied_summary +=
+                            &format!("{}, ", UBERSTATE_COLOUR.paint(format!("..{}", last_value)));
                         range = false;
                     }
                     last_value = value;
@@ -93,18 +111,27 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
                         continue;
                     }
                 } else if range {
-                    for _ in 0..2 { occupied_summary.pop(); }
-                    occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(format!("..{}", last_value)));
+                    for _ in 0..2 {
+                        occupied_summary.pop();
+                    }
+                    occupied_summary +=
+                        &format!("{}, ", UBERSTATE_COLOUR.paint(format!("..{}", last_value)));
                     range = false;
                 }
 
-                occupied_summary += &format!("{}, ", UBERSTATE_COLOUR.paint(uber_state.code().to_string()));
+                occupied_summary += &format!(
+                    "{}, ",
+                    UBERSTATE_COLOUR.paint(uber_state.code().to_string())
+                );
             }
 
-            for _ in 0..2 { occupied_summary.pop(); }
+            for _ in 0..2 {
+                occupied_summary.pop();
+            }
 
             if range {
-                occupied_summary += &format!("{}", UBERSTATE_COLOUR.paint(format!("..{}", last_value)));
+                occupied_summary +=
+                    &format!("{}", UBERSTATE_COLOUR.paint(format!("..{}", last_value)));
             }
 
             let mut name = header.clone();
@@ -113,19 +140,30 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
             if occupied_summary.is_empty() {
                 passed.push(format!("{}  --\n", NAME_COLOUR.paint(name)));
             } else {
-                passed.push(format!("{}  uses {}\n", NAME_COLOUR.paint(name), occupied_summary));
+                passed.push(format!(
+                    "{}  uses {}\n",
+                    NAME_COLOUR.paint(name),
+                    occupied_summary
+                ));
             }
         } else {
             let mut name = header.clone();
             util::add_trailing_spaces(&mut name, HEADER_INDENT);
-            failed.push(format!("{}  {}\n", NAME_COLOUR.paint(name), collision_message));
+            failed.push(format!(
+                "{}  {}\n",
+                NAME_COLOUR.paint(name),
+                collision_message
+            ));
         }
     }
 
     let failed_length = failed.len();
     let valid = failed_length == 0;
     if !valid {
-        output += &format!("{}", Colour::Red.paint(format!("\n{}/{} failed\n", failed_length, length)));
+        output += &format!(
+            "{}",
+            Colour::Red.paint(format!("\n{}/{} failed\n", failed_length, length))
+        );
 
         for failed in failed {
             output += &failed;
@@ -133,18 +171,22 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
     }
     let passed_length = passed.len();
     if passed_length > 0 {
-        output += &format!("{}", Colour::Green.paint(format!("\n{}/{} passed\n", passed_length, length)));
+        output += &format!(
+            "{}",
+            Colour::Green.paint(format!("\n{}/{} passed\n", passed_length, length))
+        );
 
         for passed in passed {
             output += &passed;
         }
     }
 
-    let mut check_free = |description, range, condition: fn(&UsedUberState, u32) -> bool |
-    {
+    let mut check_free = |description, range, condition: fn(&UsedUberState, u32) -> bool| {
         let mut first = None;
         for index in range {
-            let occupied = occupation_map.iter().any(|(_, states, _)| states.iter().any(|state| condition(state, index)));
+            let occupied = occupation_map
+                .iter()
+                .any(|(_, states, _)| states.iter().any(|state| condition(state, index)));
             if occupied {
                 if let Some(first_value) = first {
                     let last = index - 1;
@@ -160,23 +202,24 @@ pub fn validate_headers(headers: Vec<(Identifier, String)>) -> bool {
         }
     };
 
-    check_free("9|0", 1..1000, |trigger: &UsedUberState, index: u32|
+    check_free("9|0", 1..1000, |trigger: &UsedUberState, index: u32| {
         trigger.identifier.uber_group == 9
-        && trigger.identifier.uber_id == 0
-        && trigger.used_value == Some(index)
+            && trigger.identifier.uber_id == 0
+            && trigger.used_value == Some(index)
+    });
+    check_free("integer", 1..100, |trigger: &UsedUberState, index: u32| {
+        trigger.identifier.uber_group == 9 && u32::from(trigger.identifier.uber_id) == index
+    });
+    check_free(
+        "boolean",
+        100..150,
+        |trigger: &UsedUberState, index: u32| {
+            trigger.identifier.uber_group == 9 && u32::from(trigger.identifier.uber_id) == index
+        },
     );
-    check_free("integer", 1..100, |trigger: &UsedUberState, index: u32|
-        trigger.identifier.uber_group == 9
-        && u32::from(trigger.identifier.uber_id) == index
-    );
-    check_free("boolean", 100..150, |trigger: &UsedUberState, index: u32|
-        trigger.identifier.uber_group == 9
-        && u32::from(trigger.identifier.uber_id) == index
-    );
-    check_free("float", 150..175, |trigger: &UsedUberState, index: u32|
-        trigger.identifier.uber_group == 9
-        && u32::from(trigger.identifier.uber_id) == index
-    );
+    check_free("float", 150..175, |trigger: &UsedUberState, index: u32| {
+        trigger.identifier.uber_group == 9 && u32::from(trigger.identifier.uber_id) == index
+    });
 
     println!("{}", output);
     valid
@@ -189,12 +232,18 @@ pub struct UsedUberState {
 }
 impl From<UberStateTrigger> for UsedUberState {
     fn from(trigger: UberStateTrigger) -> Self {
-        let UberStateTrigger { identifier, condition } = trigger;
+        let UberStateTrigger {
+            identifier,
+            condition,
+        } = trigger;
         let used_value = condition.and_then(|condition| match condition.comparator {
             UberStateComparator::Equals => Some(condition.value),
             _ => None,
         });
-        Self { identifier, used_value }
+        Self {
+            identifier,
+            used_value,
+        }
     }
 }
 impl UsedUberState {
@@ -203,7 +252,9 @@ impl UsedUberState {
             s.identifier.code().fmt(f)?;
             if let Some(value) = s.used_value {
                 write!(f, "={}", value)
-            } else { Ok(()) }
+            } else {
+                Ok(())
+            }
         })
     }
 }
@@ -225,9 +276,11 @@ pub fn validate_header(contents: String) -> Result<(Vec<UsedUberState>, Vec<Stri
                     identifier: timer.counter,
                     used_value: None,
                 });
-            },
+            }
             HeaderContent::Pickup(pickup) => {
-                if pickup.skip_validation { continue }
+                if pickup.skip_validation {
+                    continue;
+                }
 
                 let pickup = pickup.resolve(&default_parameters)?;
                 if pickup.trigger.identifier.uber_group == 9 {
@@ -235,17 +288,30 @@ pub fn validate_header(contents: String) -> Result<(Vec<UsedUberState>, Vec<Stri
                 }
 
                 match pickup.item {
-                    Item::UberState(uber_state_item) if uber_state_item.identifier.uber_group == 9 => {
+                    Item::UberState(uber_state_item)
+                        if uber_state_item.identifier.uber_group == 9 =>
+                    {
                         if let UberStateOperator::Value(value) = uber_state_item.operator {
                             occupied_states.push(UsedUberState {
                                 identifier: uber_state_item.identifier,
                                 used_value: Some(value.to_f32() as u32),
                             });
                         }
-                    },
-                    Item::Command(Command::StopEqual { uber_identifier, value } |
-                    Command::StopGreater { uber_identifier, value } |
-                    Command::StopLess { uber_identifier, value }) => {
+                    }
+                    Item::Command(
+                        Command::StopEqual {
+                            uber_identifier,
+                            value,
+                        }
+                        | Command::StopGreater {
+                            uber_identifier,
+                            value,
+                        }
+                        | Command::StopLess {
+                            uber_identifier,
+                            value,
+                        },
+                    ) => {
                         if pickup.trigger.identifier.uber_group == 9 {
                             if uber_identifier.uber_group == 9 {
                                 occupied_states.push(UsedUberState {
@@ -257,10 +323,10 @@ pub fn validate_header(contents: String) -> Result<(Vec<UsedUberState>, Vec<Stri
                             return Err(format!("stop command on {} stops a multipickup outside of uber group 9. This may interact unpredictably with other headers.", pickup.trigger.code()));
                         }
                     }
-                    _ => {},
+                    _ => {}
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
@@ -290,12 +356,15 @@ mod tests {
 
     #[test]
     fn validate() {
-        let headers = files::find_headers().unwrap().into_iter()
+        let headers = files::find_headers()
+            .unwrap()
+            .into_iter()
             .map(|path| {
                 let content = fs::read_to_string(&path).unwrap();
                 let identifier = path.file_stem().unwrap().to_string_lossy().to_string();
                 (identifier, content)
-            }).collect();
+            })
+            .collect();
         assert!(super::validate_headers(headers), "validation failed");
     }
 }

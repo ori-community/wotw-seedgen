@@ -27,9 +27,13 @@ impl<T: FromStr> VResolve<T> for V<T> {
     fn resolve(self, parameters: &FxHashMap<String, String>) -> Result<T, String> {
         match self {
             V::Literal(t) => Ok(t),
-            V::Parameter(identifier) => parameters.get(&identifier)
+            V::Parameter(identifier) => parameters
+                .get(&identifier)
                 .ok_or_else(|| format!("Unknown parameter {identifier}"))
-                .and_then(|value| T::from_str(value).map_err(|_| format!("Invalid value {value} for parameter {identifier}")))
+                .and_then(|value| {
+                    T::from_str(value)
+                        .map_err(|_| format!("Invalid value {value} for parameter {identifier}"))
+                }),
         }
     }
 }
@@ -50,12 +54,16 @@ pub(crate) use vdisplay;
 pub struct VString(pub String);
 impl VResolve<String> for VString {
     fn resolve(mut self, parameters: &FxHashMap<String, String>) -> Result<String, String> {
-        while let Some(range) = self.0.find("$PARAM(")
-            .and_then(|start| self.0[start + 7..].find(')').map(|end| start..start + end + 8))
-        {
+        while let Some(range) = self.0.find("$PARAM(").and_then(|start| {
+            self.0[start + 7..]
+                .find(')')
+                .map(|end| start..start + end + 8)
+        }) {
             let inner_range = range.start + 7..range.end - 1;
             let identifier = &self.0[inner_range.clone()];
-            let value = parameters.get(identifier).ok_or_else(|| format!("Unknown parameter {identifier}"))?;
+            let value = parameters
+                .get(identifier)
+                .ok_or_else(|| format!("Unknown parameter {identifier}"))?;
             self.0.replace_range(range, value);
         }
 

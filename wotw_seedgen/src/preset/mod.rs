@@ -3,16 +3,19 @@
 use std::error::Error;
 
 use rustc_hash::FxHashSet;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::{settings::{Trick, Difficulty, Spawn, CreateGame, HeaderConfig, InlineHeader, GoalModes}, files::FileAccess};
+use crate::{
+    files::FileAccess,
+    settings::{CreateGame, Difficulty, GoalModes, HeaderConfig, InlineHeader, Spawn, Trick},
+};
 
 /// A collection of settings that can be applied to existing settings
-/// 
+///
 /// # Examples
-/// 
+///
 /// [`UniversePreset`]s can be serialized and deserialized
-/// 
+///
 /// ```
 /// # use wotw_seedgen::preset::UniversePreset;
 /// use wotw_seedgen::preset::WorldPreset;
@@ -28,9 +31,9 @@ use crate::{settings::{Trick, Difficulty, Spawn, CreateGame, HeaderConfig, Inlin
 /// assert_eq!(preset.to_json(), json);
 /// assert_eq!(preset, UniversePreset::parse(&json).unwrap());
 /// ```
-/// 
+///
 /// Use [`UniverseSettings::apply_preset`](crate::settings::UniverseSettings::apply_preset) to merge a [`UniversePreset`] into existing [`UniverseSettings`](crate::settings::UniverseSettings)
-/// 
+///
 /// ```
 /// # use wotw_seedgen::preset::UniversePreset;
 /// use wotw_seedgen::settings::UniverseSettings;
@@ -51,7 +54,7 @@ pub struct UniversePreset {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
     /// Names of further [`UniversePreset`]s to use
-    /// 
+    ///
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<FxHashSet<String>>,
@@ -68,7 +71,7 @@ pub struct UniversePreset {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub seed: Option<String>,
     /// Automatically create an online game when generating the seed
-    /// 
+    ///
     /// This exists for future compability, but does not have any effect currently
     #[serde(skip_serializing_if = "Option::is_none")]
     pub create_game: Option<CreateGame>,
@@ -91,45 +94,48 @@ impl UniversePreset {
     }
 
     /// Find and read a [`UniversePreset`] with the given name
-    /// 
+    ///
     /// The [`UniversePreset`] will be searched as .json file in the current and /presets child directory
-    pub fn read_file(identifier: &str, file_access: &impl FileAccess) -> Result<Self, Box<dyn Error>> {
+    pub fn read_file(
+        identifier: &str,
+        file_access: &impl FileAccess,
+    ) -> Result<Self, Box<dyn Error>> {
         let input = file_access.read_universe_preset(identifier)?;
         Ok(Self::parse(&input)?)
     }
 }
 
 /// A collection of settings that can be applied to one world of the existing settings
-/// 
+///
 /// # Examples
-/// 
+///
 /// [`WorldPreset`]s can be serialized and deserialized
-/// 
+///
 /// ```
 /// # use wotw_seedgen::preset::WorldPreset;
 /// use wotw_seedgen::settings::Difficulty;
-/// 
+///
 /// let mut world_preset = WorldPreset::default();
 /// world_preset.difficulty = Some(Difficulty::Gorlek);
-/// 
+///
 /// let json = "{\"difficulty\":\"Gorlek\"}".to_string();
-/// 
+///
 /// assert_eq!(world_preset.to_json(), json);
 /// assert_eq!(world_preset, WorldPreset::parse(&json).unwrap());
 /// ```
-/// 
+///
 /// Use [`WorldSettings::apply_world_preset`](crate::settings::WorldSettings::apply_world_preset) to merge a [`WorldPreset`] into existing [`WorldSettings`](crate::settings::WorldSettings)
-/// 
+///
 /// ```
 /// # use wotw_seedgen::preset::WorldPreset;
 /// use wotw_seedgen::settings::WorldSettings;
 /// use wotw_seedgen::settings::Spawn;
 /// use wotw_seedgen::files::NO_FILE_ACCESS;
-/// 
+///
 /// let mut world_settings = WorldSettings::default();
-/// 
+///
 /// let world_preset = WorldPreset::parse("{\"spawn\":\"Random\"}").unwrap();
-/// 
+///
 /// world_settings.apply_world_preset(world_preset, &NO_FILE_ACCESS);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
@@ -140,7 +146,7 @@ pub struct WorldPreset {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
     /// Names of further [`WorldPreset`]s to use
-    /// 
+    ///
     /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
     #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<FxHashSet<String>>,
@@ -160,7 +166,7 @@ pub struct WorldPreset {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goals: Option<GoalModes>,
     /// Names of headers to use
-    /// 
+    ///
     /// When generating a seed with these settings, the headers will be searched as .wotwrh files in the current and /headers child directory
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<FxHashSet<String>>,
@@ -189,9 +195,12 @@ impl WorldPreset {
     }
 
     /// Find and read a [`WorldPreset`] with the given name
-    /// 
+    ///
     /// The [`WorldPreset`] will be searched as .json file in the current and /presets child directory
-    pub fn read_file(identifier: &str, file_access: &impl FileAccess) -> Result<Self, Box<dyn Error>> {
+    pub fn read_file(
+        identifier: &str,
+        file_access: &impl FileAccess,
+    ) -> Result<Self, Box<dyn Error>> {
         let input = file_access.read_world_preset(identifier)?;
         Ok(Self::parse(&input)?)
     }
@@ -215,7 +224,7 @@ pub struct PresetInfo {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PresetGroup {
     /// Generally, only one base preset will be used at a time.
-    /// 
+    ///
     /// The most common form of base presets are the difficulty presets, such as "Moki" and "Gorlek"
     Base,
 }

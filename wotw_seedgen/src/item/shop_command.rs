@@ -2,40 +2,72 @@ use std::fmt;
 
 use wotw_seedgen_derive::VVariant;
 
-use crate::util::Icon;
+use crate::header::{vdisplay, CodeDisplay, VString};
 use crate::uber_state::UberIdentifier;
-use crate::header::{VString, vdisplay, CodeDisplay};
+use crate::util::Icon;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum ShopCommand {
-    SetIcon { uber_identifier: UberIdentifier, icon: Icon },
-    SetTitle { uber_identifier: UberIdentifier, #[VType] title: Option<String> },
-    SetDescription { uber_identifier: UberIdentifier, #[VType] description: Option<String> },
-    SetLocked { uber_identifier: UberIdentifier, #[VWrap] locked: bool },
-    SetVisible { uber_identifier: UberIdentifier, #[VWrap] visible: bool },
+    SetIcon {
+        uber_identifier: UberIdentifier,
+        icon: Icon,
+    },
+    SetTitle {
+        uber_identifier: UberIdentifier,
+        #[VType]
+        title: Option<String>,
+    },
+    SetDescription {
+        uber_identifier: UberIdentifier,
+        #[VType]
+        description: Option<String>,
+    },
+    SetLocked {
+        uber_identifier: UberIdentifier,
+        #[VWrap]
+        locked: bool,
+    },
+    SetVisible {
+        uber_identifier: UberIdentifier,
+        #[VWrap]
+        visible: bool,
+    },
 }
 impl ShopCommand {
     pub fn code(&self) -> CodeDisplay<ShopCommand> {
-        CodeDisplay::new(self, |s, f| {
-            match s {
-                ShopCommand::SetIcon { uber_identifier, icon } => write!(f, "0|{}|{}", uber_identifier.code(), icon.code()),
-                ShopCommand::SetTitle { uber_identifier, title } => {
-                    write!(f, "1|{}", uber_identifier.code())?;
-                    match title {
-                        Some(title) => write!(f, "|{}", title),
-                        None => Ok(()),
-                    }
-                },
-                ShopCommand::SetDescription { uber_identifier, description } => {
-                    write!(f, "2|{}", uber_identifier.code())?;
-                    match description {
-                        Some(description) => write!(f, "|{}", description),
-                        None => Ok(()),
-                    }
-                },
-                ShopCommand::SetLocked { uber_identifier, locked } => write!(f, "3|{}|{}", uber_identifier.code(), locked),
-                ShopCommand::SetVisible { uber_identifier, visible } => write!(f, "4|{}|{}", uber_identifier.code(), visible),
+        CodeDisplay::new(self, |s, f| match s {
+            ShopCommand::SetIcon {
+                uber_identifier,
+                icon,
+            } => write!(f, "0|{}|{}", uber_identifier.code(), icon.code()),
+            ShopCommand::SetTitle {
+                uber_identifier,
+                title,
+            } => {
+                write!(f, "1|{}", uber_identifier.code())?;
+                match title {
+                    Some(title) => write!(f, "|{}", title),
+                    None => Ok(()),
+                }
             }
+            ShopCommand::SetDescription {
+                uber_identifier,
+                description,
+            } => {
+                write!(f, "2|{}", uber_identifier.code())?;
+                match description {
+                    Some(description) => write!(f, "|{}", description),
+                    None => Ok(()),
+                }
+            }
+            ShopCommand::SetLocked {
+                uber_identifier,
+                locked,
+            } => write!(f, "3|{}|{}", uber_identifier.code(), locked),
+            ShopCommand::SetVisible {
+                uber_identifier,
+                visible,
+            } => write!(f, "4|{}|{}", uber_identifier.code(), visible),
         })
     }
 }

@@ -2,9 +2,9 @@ use std::fmt::Display;
 
 use rustc_hash::FxHashMap;
 
-use crate::{Item, VItem, util::Icon, settings::Goal};
+use crate::{settings::Goal, util::Icon, Item, VItem};
 
-use super::{HeaderContent, V, VResolve, VString, HeaderCommand, Pickup, VPickup, GoalmodeHack};
+use super::{GoalmodeHack, HeaderCommand, HeaderContent, Pickup, VPickup, VResolve, VString, V};
 
 /// Configurable details for how to treat an [`Item`] during seed generation
 #[derive(Debug, Clone, Default)]
@@ -43,7 +43,10 @@ pub struct HeaderBuild {
     pub goals: Vec<Goal>,
 }
 
-pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String, String>) -> Result<HeaderBuild, String> {
+pub(super) fn build(
+    contents: Vec<HeaderContent>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<HeaderBuild, String> {
     let mut header_build = HeaderBuild::default();
 
     // A `true` in the if stack represents "met, don't skip", `false` represents "unmet, skip"
@@ -53,11 +56,22 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
     for content in contents {
         if if_stack.last().copied().unwrap_or(true) {
             match content {
-                HeaderContent::OuterDocumentation(_) | HeaderContent::InnerDocumentation(_) |  HeaderContent::Annotation(_) => {},
-                HeaderContent::Flags(mut flag_string) => header_build.flags.append(&mut flag_string),
+                HeaderContent::OuterDocumentation(_)
+                | HeaderContent::InnerDocumentation(_)
+                | HeaderContent::Annotation(_) => {}
+                HeaderContent::Flags(mut flag_string) => {
+                    header_build.flags.append(&mut flag_string)
+                }
                 HeaderContent::Timer(timer) => lines.push(format!("timer: {}", timer.code())),
-                HeaderContent::Command(command) => build_command(command, &mut header_build, &mut if_stack, parameters)?,
-                HeaderContent::Pickup(pickup) => build_pickup(pickup, &mut lines, &mut header_build.preplacements, parameters)?,
+                HeaderContent::Command(command) => {
+                    build_command(command, &mut header_build, &mut if_stack, parameters)?
+                }
+                HeaderContent::Pickup(pickup) => build_pickup(
+                    pickup,
+                    &mut lines,
+                    &mut header_build.preplacements,
+                    parameters,
+                )?,
             }
         } else if let HeaderContent::Command(command) = content {
             match command {
@@ -73,7 +87,12 @@ pub(super) fn build(contents: Vec<HeaderContent>, parameters: &FxHashMap<String,
     Ok(header_build)
 }
 
-fn build_pickup(pickup: VPickup, lines: &mut Vec<String>, preplacements: &mut Vec<Pickup>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+fn build_pickup(
+    pickup: VPickup,
+    lines: &mut Vec<String>,
+    preplacements: &mut Vec<Pickup>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
     let pickup = pickup.resolve(parameters)?;
     lines.push(pickup.code().to_string());
 
@@ -84,48 +103,107 @@ fn build_pickup(pickup: VPickup, lines: &mut Vec<String>, preplacements: &mut Ve
     Ok(())
 }
 
-fn build_command(command: HeaderCommand, header_build: &mut HeaderBuild, if_stack: &mut Vec<bool>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+fn build_command(
+    command: HeaderCommand,
+    header_build: &mut HeaderBuild,
+    if_stack: &mut Vec<bool>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
     match command {
         HeaderCommand::Include { name } => header_build.includes.push(name),
         HeaderCommand::Exclude { name } => header_build.excludes.push(name),
-        HeaderCommand::Add { item, amount } => build_add(item, amount, &mut header_build.item_pool_changes, parameters)?,
-        HeaderCommand::Remove { item, amount } => build_remove(item, amount, &mut header_build.item_pool_changes, parameters)?,
-        HeaderCommand::Name { item, name } => build_name(item, name, &mut header_build.item_details, parameters)?,
-        HeaderCommand::Display { item, name } => build_display(item, name, &mut header_build.item_details, parameters)?,
-        HeaderCommand::Description { item, description } => build_description(item, description, &mut header_build.item_details, parameters)?,
-        HeaderCommand::Price { item, price } => build_price(item, price, &mut header_build.item_details, parameters)?,
-        HeaderCommand::Icon { item, icon } => build_icon(item, icon, &mut header_build.item_details, parameters)?,
-        HeaderCommand::Parameter { .. } => { /* Skip, parameters have been processed earlier */ },
+        HeaderCommand::Add { item, amount } => build_add(
+            item,
+            amount,
+            &mut header_build.item_pool_changes,
+            parameters,
+        )?,
+        HeaderCommand::Remove { item, amount } => build_remove(
+            item,
+            amount,
+            &mut header_build.item_pool_changes,
+            parameters,
+        )?,
+        HeaderCommand::Name { item, name } => {
+            build_name(item, name, &mut header_build.item_details, parameters)?
+        }
+        HeaderCommand::Display { item, name } => {
+            build_display(item, name, &mut header_build.item_details, parameters)?
+        }
+        HeaderCommand::Description { item, description } => build_description(
+            item,
+            description,
+            &mut header_build.item_details,
+            parameters,
+        )?,
+        HeaderCommand::Price { item, price } => {
+            build_price(item, price, &mut header_build.item_details, parameters)?
+        }
+        HeaderCommand::Icon { item, icon } => {
+            build_icon(item, icon, &mut header_build.item_details, parameters)?
+        }
+        HeaderCommand::Parameter { .. } => { /* Skip, parameters have been processed earlier */ }
         HeaderCommand::Set { state } => header_build.state_sets.push(state),
-        HeaderCommand::If { parameter, value } => build_if(&parameter, &value, if_stack, parameters)?,
+        HeaderCommand::If { parameter, value } => {
+            build_if(&parameter, &value, if_stack, parameters)?
+        }
         HeaderCommand::EndIf => build_endif(if_stack)?,
-        HeaderCommand::GoalmodeHack(goalmode) => build_goalmode(goalmode, &mut header_build.goals, parameters)?,
+        HeaderCommand::GoalmodeHack(goalmode) => {
+            build_goalmode(goalmode, &mut header_build.goals, parameters)?
+        }
     }
 
     Ok(())
 }
 
-fn build_if(parameter: &str, value: &str, if_stack: &mut Vec<bool>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
-    let met = parameters.get(parameter).ok_or_else(|| format!("Unknown parameter {parameter} in if"))? == value;
+fn build_if(
+    parameter: &str,
+    value: &str,
+    if_stack: &mut Vec<bool>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
+    let met = parameters
+        .get(parameter)
+        .ok_or_else(|| format!("Unknown parameter {parameter} in if"))?
+        == value;
     if_stack.push(met);
     Ok(())
 }
 fn build_endif(if_stack: &mut Vec<bool>) -> Result<(), String> {
-    if_stack.pop().ok_or_else(|| "Unexpected !!endif without an open !!if block".to_string()).map(|_| ())
+    if_stack
+        .pop()
+        .ok_or_else(|| "Unexpected !!endif without an open !!if block".to_string())
+        .map(|_| ())
 }
 
-fn build_add(item: VItem, amount: V<i32>, item_pool_changes: &mut FxHashMap<Item, i32>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+fn build_add(
+    item: VItem,
+    amount: V<i32>,
+    item_pool_changes: &mut FxHashMap<Item, i32>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
     let amount = amount.resolve(parameters)?;
     change_item_pool(item, amount, item_pool_changes, parameters)
 }
-fn build_remove(item: VItem, amount: V<i32>, item_pool_changes: &mut FxHashMap<Item, i32>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+fn build_remove(
+    item: VItem,
+    amount: V<i32>,
+    item_pool_changes: &mut FxHashMap<Item, i32>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
     let amount = -amount.resolve(parameters)?;
     change_item_pool(item, amount, item_pool_changes, parameters)
 }
 
-fn change_item_pool(item: VItem, amount: i32, item_pool_changes: &mut FxHashMap<Item, i32>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+fn change_item_pool(
+    item: VItem,
+    amount: i32,
+    item_pool_changes: &mut FxHashMap<Item, i32>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
     let item = item.resolve(parameters)?;
-    item_pool_changes.entry(item)
+    item_pool_changes
+        .entry(item)
         .and_modify(|prior| *prior += amount)
         .or_insert(amount);
 
@@ -134,7 +212,12 @@ fn change_item_pool(item: VItem, amount: i32, item_pool_changes: &mut FxHashMap<
 
 macro_rules! __vdetails {
     ($fn_ident:ident $field_ident:ident $field_name:literal $ty:ty) => {
-        fn $fn_ident(item: VItem, $field_ident: $ty, item_details: &mut FxHashMap<Item, ItemDetails>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+        fn $fn_ident(
+            item: VItem,
+            $field_ident: $ty,
+            item_details: &mut FxHashMap<Item, ItemDetails>,
+            parameters: &FxHashMap<String, String>,
+        ) -> Result<(), String> {
             let $field_ident = $field_ident.resolve(parameters)?;
             let item = item.resolve(parameters)?;
             let detail = &mut item_details.entry(item).or_default().$field_ident;
@@ -163,16 +246,26 @@ details!(build_description description "description" VString);
 details!(build_price price "price" V<u32>);
 details!(build_icon icon "icon" Icon);
 
-fn change_item_details<T: Display>(value: T, detail: &mut Option<T>, field_name: impl Display) -> Result<(), String> {
+fn change_item_details<T: Display>(
+    value: T,
+    detail: &mut Option<T>,
+    field_name: impl Display,
+) -> Result<(), String> {
     if let Some(prior) = detail {
-        Err(format!("Tried to assign {field_name} {value}, but already assigned {prior} earlier"))
+        Err(format!(
+            "Tried to assign {field_name} {value}, but already assigned {prior} earlier"
+        ))
     } else {
         *detail = Some(value);
         Ok(())
     }
 }
 
-fn build_goalmode(goalmode: GoalmodeHack, goals: &mut Vec<Goal>, parameters: &FxHashMap<String, String>) -> Result<(), String> {
+fn build_goalmode(
+    goalmode: GoalmodeHack,
+    goals: &mut Vec<Goal>,
+    parameters: &FxHashMap<String, String>,
+) -> Result<(), String> {
     let goal = match goalmode {
         GoalmodeHack::Trees => Goal::Trees,
         GoalmodeHack::Wisps => Goal::Wisps,
@@ -186,7 +279,7 @@ fn build_goalmode(goalmode: GoalmodeHack, goals: &mut Vec<Goal>, parameters: &Fx
             } else {
                 Goal::Relics(amount)
             }
-        },
+        }
     };
 
     goals.push(goal);

@@ -3,7 +3,19 @@ use wotw_seedgen_derive::FromStr;
 
 use crate::util::Icon;
 
-#[derive(Debug, wotw_seedgen_derive::Display, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, TryFromPrimitive, FromStr)]
+#[derive(
+    Debug,
+    wotw_seedgen_derive::Display,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    Copy,
+    TryFromPrimitive,
+    FromStr,
+)]
 #[repr(u8)]
 pub enum Shard {
     Overcharge = 1,

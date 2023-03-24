@@ -1,7 +1,7 @@
 use std::iter::Map;
 
 use proc_macro::TokenStream;
-use quote::{quote, format_ident};
+use quote::{format_ident, quote};
 
 #[derive(Default)]
 struct VBehaviour {
@@ -11,7 +11,11 @@ struct VBehaviour {
 
 fn v_target(ty: &mut syn::Type) -> &mut syn::Type {
     if let syn::Type::Path(path) = ty {
-        let last = path.path.segments.last_mut().expect("Cannot use VType on empty Path");
+        let last = path
+            .path
+            .segments
+            .last_mut()
+            .expect("Cannot use VType on empty Path");
         if last.ident != "Box" && last.ident != "Option" {
             return ty;
         }
@@ -20,7 +24,11 @@ fn v_target(ty: &mut syn::Type) -> &mut syn::Type {
     };
 
     if let syn::Type::Path(path) = ty {
-        let last = path.path.segments.last_mut().expect("Cannot use VType on empty Path");
+        let last = path
+            .path
+            .segments
+            .last_mut()
+            .expect("Cannot use VType on empty Path");
         if let syn::PathArguments::AngleBracketed(args) = &mut last.arguments {
             for arg in &mut args.args {
                 if let syn::GenericArgument::Type(ty) = arg {
@@ -36,24 +44,33 @@ fn v_target(ty: &mut syn::Type) -> &mut syn::Type {
     }
 }
 
-type VBehaviourMap<I> = Map<I, fn(&mut syn::Field) -> (&syn::Field, Option<(VBehaviour, syn::Type)>)>;
+type VBehaviourMap<I> =
+    Map<I, fn(&mut syn::Field) -> (&syn::Field, Option<(VBehaviour, syn::Type)>)>;
 fn v_fields<'a, I>(fields: I) -> VBehaviourMap<I>
-where I: Iterator<Item = &'a mut syn::Field>
+where
+    I: Iterator<Item = &'a mut syn::Field>,
 {
     fields.map(|field| {
         let mut behaviour = VBehaviour::default();
-        for index in field.attrs.iter().enumerate().filter_map(|(index, attribute)| {
-            if let Ok(syn::Meta::Path(path)) = attribute.parse_meta() {
-                if path.is_ident("VWrap") {
-                    behaviour.wrap = true;
-                    return Some(index);
-                } else if path.is_ident("VType") {
-                    behaviour.auto_type = true;
-                    return Some(index);
+        for index in field
+            .attrs
+            .iter()
+            .enumerate()
+            .filter_map(|(index, attribute)| {
+                if let Ok(syn::Meta::Path(path)) = attribute.parse_meta() {
+                    if path.is_ident("VWrap") {
+                        behaviour.wrap = true;
+                        return Some(index);
+                    } else if path.is_ident("VType") {
+                        behaviour.auto_type = true;
+                        return Some(index);
+                    }
                 }
-            }
-            None
-        }).rev().collect::<Vec<_>>() {
+                None
+            })
+            .rev()
+            .collect::<Vec<_>>()
+        {
             field.attrs.remove(index);
         }
 
@@ -64,7 +81,11 @@ where I: Iterator<Item = &'a mut syn::Field>
             let target_type = v_target(ty);
             if let syn::Type::Path(path) = target_type {
                 let path = &mut path.path;
-                let last_ident = &mut path.segments.last_mut().expect("Cannot use VType on empty Path").ident;
+                let last_ident = &mut path
+                    .segments
+                    .last_mut()
+                    .expect("Cannot use VType on empty Path")
+                    .ident;
                 let span = last_ident.span();
                 if behaviour.auto_type {
                     *last_ident = format_ident!("V{last_ident}");
@@ -84,17 +105,25 @@ where I: Iterator<Item = &'a mut syn::Field>
                             },
                             syn::PathSegment {
                                 ident: syn::Ident::new("V", span),
-                                arguments: syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-                                    colon2_token: None,
-                                    lt_token: syn::Token![<](span),
-                                    args: [syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
-                                        qself: None,
-                                        path: inner_path,
-                                    }))].into_iter().collect(),
-                                    gt_token: syn::Token![>](span),
-                                })
-                            }
-                        ].into_iter().collect(),
+                                arguments: syn::PathArguments::AngleBracketed(
+                                    syn::AngleBracketedGenericArguments {
+                                        colon2_token: None,
+                                        lt_token: syn::Token![<](span),
+                                        args: [syn::GenericArgument::Type(syn::Type::Path(
+                                            syn::TypePath {
+                                                qself: None,
+                                                path: inner_path,
+                                            },
+                                        ))]
+                                        .into_iter()
+                                        .collect(),
+                                        gt_token: syn::Token![>](span),
+                                    },
+                                ),
+                            },
+                        ]
+                        .into_iter()
+                        .collect(),
                     }
                 }
             } else {
@@ -135,7 +164,7 @@ pub fn v_impl(mut input: syn::DeriveInput) -> TokenStream {
                     });
 
                     quote! { #ident { #(#fields),* } }
-                },
+                }
                 syn::Fields::Unnamed(fields) => {
                     let fields = v_fields(fields.unnamed.iter_mut()).enumerate().map(|(index, (_, behaviour))| {
                         let index = syn::Index::from(index);
@@ -150,10 +179,10 @@ pub fn v_impl(mut input: syn::DeriveInput) -> TokenStream {
                     });
 
                     quote! { #ident(#(#fields),*) }
-                },
+                }
                 syn::Fields::Unit => panic!("Unit structs can't have meaningful VVariants"),
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             let branches = data_enum.variants.iter_mut().map(|variant| {
                 let variant_ident = &variant.ident;
@@ -204,7 +233,7 @@ pub fn v_impl(mut input: syn::DeriveInput) -> TokenStream {
                     #(#branches),*
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Expected Struct or Enum"),
     };
 

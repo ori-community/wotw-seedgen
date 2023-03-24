@@ -1,6 +1,8 @@
 use serde::Deserialize;
 
-use crate::uber_state::{UberIdentifier, UberStateTrigger, UberStateCondition, UberStateComparator};
+use crate::uber_state::{
+    UberIdentifier, UberStateComparator, UberStateCondition, UberStateTrigger,
+};
 
 /// Information about an obtainable world state
 #[derive(Debug, Clone, PartialEq)]
@@ -18,19 +20,19 @@ struct StateEntry {
 }
 
 /// Parses state data from a csv format
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// # use wotw_seedgen::logic::{parse_states, NamedState};
 /// use wotw_seedgen::uber_state::UberStateTrigger;
-/// 
+///
 /// let input = "
 /// NodeIdentifier, UberGroup, UberId, UberStateValue
 /// MarshSpawn.HowlBurnt, 21786, 25095, 1
 /// ";
 /// let states = parse_states(input).unwrap();
-/// 
+///
 /// assert_eq!(states, vec![
 ///     NamedState {
 ///         name: "MarshSpawn.HowlBurnt".to_string(),
@@ -43,14 +45,31 @@ pub fn parse_states(input: &str) -> Result<Vec<NamedState>, String> {
         .trim(csv::Trim::All)
         .from_reader(input.as_bytes());
 
-    let states = reader.deserialize().map(|record| {
-        let StateEntry { node_identifier, uber_group, uber_id, uber_state_value } = record.map_err(|err| err.to_string())?;
+    let states = reader
+        .deserialize()
+        .map(|record| {
+            let StateEntry {
+                node_identifier,
+                uber_group,
+                uber_id,
+                uber_state_value,
+            } = record.map_err(|err| err.to_string())?;
 
-        let identifier = UberIdentifier::new(uber_group, uber_id);
-        let condition = uber_state_value.map(|value| UberStateCondition { comparator: UberStateComparator::GreaterOrEquals, value });
-        let trigger = UberStateTrigger { identifier, condition };
-        Ok(NamedState { name: node_identifier, trigger })
-    }).collect::<Result<_, String>>()?;
+            let identifier = UberIdentifier::new(uber_group, uber_id);
+            let condition = uber_state_value.map(|value| UberStateCondition {
+                comparator: UberStateComparator::GreaterOrEquals,
+                value,
+            });
+            let trigger = UberStateTrigger {
+                identifier,
+                condition,
+            };
+            Ok(NamedState {
+                name: node_identifier,
+                trigger,
+            })
+        })
+        .collect::<Result<_, String>>()?;
 
     Ok(states)
 }

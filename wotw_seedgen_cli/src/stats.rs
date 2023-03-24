@@ -91,7 +91,8 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
     let analyzers = analyzers
         .into_iter()
         .map(|chained_analyzers| {
-            chained_analyzers.0
+            chained_analyzers
+                .0
                 .into_iter()
                 .map(|analyzer| match analyzer {
                     cli::Analyzer::SpawnLocations => box_analyzer(analyzers::SpawnLocationStats),

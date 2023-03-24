@@ -1,110 +1,35 @@
 use super::UberIdentifier;
 
 pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
-    (
-        "trees.bash",
-        UberIdentifier::new(0, 0),
-    ),
-    (
-        "trees.double_jump",
-        UberIdentifier::new(0, 5),
-    ),
-    (
-        "trees.launch",
-        UberIdentifier::new(0, 8),
-    ),
-    (
-        "trees.grenade",
-        UberIdentifier::new(0, 51),
-    ),
-    (
-        "trees.grapple",
-        UberIdentifier::new(0, 57),
-    ),
-    (
-        "trees.flash",
-        UberIdentifier::new(0, 62),
-    ),
-    (
-        "trees.regenerate",
-        UberIdentifier::new(0, 77),
-    ),
-    (
-        "trees.bow",
-        UberIdentifier::new(0, 97),
-    ),
-    (
-        "trees.sword",
-        UberIdentifier::new(0, 100),
-    ),
-    (
-        "trees.burrow",
-        UberIdentifier::new(0, 101),
-    ),
-    (
-        "trees.dash",
-        UberIdentifier::new(0, 102),
-    ),
-    (
-        "trees.water_dash",
-        UberIdentifier::new(0, 104),
-    ),
-    (
-        "trees.ancestral_light",
-        UberIdentifier::new(0, 120),
-    ),
-    (
-        "trees.ancestral_light_2",
-        UberIdentifier::new(0, 121),
-    ),
-    (
-        "opher_weapons.Water Breath",
-        UberIdentifier::new(1, 23),
-    ),
-    (
-        "opher_weapons.Spike",
-        UberIdentifier::new(1, 74),
-    ),
-    (
-        "opher_weapons.Spirit Smash",
-        UberIdentifier::new(1, 98),
-    ),
-    (
-        "opher_weapons.Fast Travel",
-        UberIdentifier::new(1, 105),
-    ),
-    (
-        "opher_weapons.Spirit Star",
-        UberIdentifier::new(1, 106),
-    ),
-    (
-        "opher_weapons.Blaze",
-        UberIdentifier::new(1, 115),
-    ),
-    (
-        "opher_weapons.Sentry",
-        UberIdentifier::new(1, 116),
-    ),
+    ("trees.bash", UberIdentifier::new(0, 0)),
+    ("trees.double_jump", UberIdentifier::new(0, 5)),
+    ("trees.launch", UberIdentifier::new(0, 8)),
+    ("trees.grenade", UberIdentifier::new(0, 51)),
+    ("trees.grapple", UberIdentifier::new(0, 57)),
+    ("trees.flash", UberIdentifier::new(0, 62)),
+    ("trees.regenerate", UberIdentifier::new(0, 77)),
+    ("trees.bow", UberIdentifier::new(0, 97)),
+    ("trees.sword", UberIdentifier::new(0, 100)),
+    ("trees.burrow", UberIdentifier::new(0, 101)),
+    ("trees.dash", UberIdentifier::new(0, 102)),
+    ("trees.water_dash", UberIdentifier::new(0, 104)),
+    ("trees.ancestral_light", UberIdentifier::new(0, 120)),
+    ("trees.ancestral_light_2", UberIdentifier::new(0, 121)),
+    ("opher_weapons.Water Breath", UberIdentifier::new(1, 23)),
+    ("opher_weapons.Spike", UberIdentifier::new(1, 74)),
+    ("opher_weapons.Spirit Smash", UberIdentifier::new(1, 98)),
+    ("opher_weapons.Fast Travel", UberIdentifier::new(1, 105)),
+    ("opher_weapons.Spirit Star", UberIdentifier::new(1, 106)),
+    ("opher_weapons.Blaze", UberIdentifier::new(1, 115)),
+    ("opher_weapons.Sentry", UberIdentifier::new(1, 116)),
     (
         "opher_weapons.Exploding Spike",
         UberIdentifier::new(1, 1074),
     ),
-    (
-        "opher_weapons.Shock Smash",
-        UberIdentifier::new(1, 1098),
-    ),
-    (
-        "opher_weapons.Static Star",
-        UberIdentifier::new(1, 1106),
-    ),
-    (
-        "opher_weapons.Charge Blaze",
-        UberIdentifier::new(1, 1115),
-    ),
-    (
-        "opher_weapons.Rapid Sentry",
-        UberIdentifier::new(1, 1116),
-    ),
+    ("opher_weapons.Shock Smash", UberIdentifier::new(1, 1098)),
+    ("opher_weapons.Static Star", UberIdentifier::new(1, 1106)),
+    ("opher_weapons.Charge Blaze", UberIdentifier::new(1, 1115)),
+    ("opher_weapons.Rapid Sentry", UberIdentifier::new(1, 1116)),
     (
         "opher_weapons.Has bought everything",
         UberIdentifier::new(1, 20000),
@@ -113,10 +38,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "opher_weapons.Water Breath cost",
         UberIdentifier::new(1, 10023),
     ),
-    (
-        "opher_weapons.Spike cost",
-        UberIdentifier::new(1, 10074),
-    ),
+    ("opher_weapons.Spike cost", UberIdentifier::new(1, 10074)),
     (
         "opher_weapons.Spirit Smash cost",
         UberIdentifier::new(1, 10098),
@@ -129,14 +51,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "opher_weapons.Spirit Star cost",
         UberIdentifier::new(1, 10106),
     ),
-    (
-        "opher_weapons.Blaze cost",
-        UberIdentifier::new(1, 10115),
-    ),
-    (
-        "opher_weapons.Sentry cost",
-        UberIdentifier::new(1, 10116),
-    ),
+    ("opher_weapons.Blaze cost", UberIdentifier::new(1, 10115)),
+    ("opher_weapons.Sentry cost", UberIdentifier::new(1, 10116)),
     (
         "opher_weapons.Exploding Spike cost",
         UberIdentifier::new(1, 11074),
@@ -157,38 +73,14 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "opher_weapons.Rapid Sentry cost",
         UberIdentifier::new(1, 11116),
     ),
-    (
-        "twillen_shards.Overcharge",
-        UberIdentifier::new(2, 1),
-    ),
-    (
-        "twillen_shards.TripleJump",
-        UberIdentifier::new(2, 2),
-    ),
-    (
-        "twillen_shards.Wingclip",
-        UberIdentifier::new(2, 3),
-    ),
-    (
-        "twillen_shards.Swap",
-        UberIdentifier::new(2, 5),
-    ),
-    (
-        "twillen_shards.LightHarvest",
-        UberIdentifier::new(2, 19),
-    ),
-    (
-        "twillen_shards.Vitality",
-        UberIdentifier::new(2, 22),
-    ),
-    (
-        "twillen_shards.Energy",
-        UberIdentifier::new(2, 26),
-    ),
-    (
-        "twillen_shards.Finesse",
-        UberIdentifier::new(2, 40),
-    ),
+    ("twillen_shards.Overcharge", UberIdentifier::new(2, 1)),
+    ("twillen_shards.TripleJump", UberIdentifier::new(2, 2)),
+    ("twillen_shards.Wingclip", UberIdentifier::new(2, 3)),
+    ("twillen_shards.Swap", UberIdentifier::new(2, 5)),
+    ("twillen_shards.LightHarvest", UberIdentifier::new(2, 19)),
+    ("twillen_shards.Vitality", UberIdentifier::new(2, 22)),
+    ("twillen_shards.Energy", UberIdentifier::new(2, 26)),
+    ("twillen_shards.Finesse", UberIdentifier::new(2, 40)),
     (
         "twillen_shards.Has bought everything",
         UberIdentifier::new(2, 20000),
@@ -201,74 +93,26 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "twillen_shards.TripleJump cost",
         UberIdentifier::new(2, 102),
     ),
-    (
-        "twillen_shards.Wingclip cost",
-        UberIdentifier::new(2, 103),
-    ),
-    (
-        "twillen_shards.Swap cost",
-        UberIdentifier::new(2, 105),
-    ),
+    ("twillen_shards.Wingclip cost", UberIdentifier::new(2, 103)),
+    ("twillen_shards.Swap cost", UberIdentifier::new(2, 105)),
     (
         "twillen_shards.LightHarvest cost",
         UberIdentifier::new(2, 119),
     ),
-    (
-        "twillen_shards.Vitality cost",
-        UberIdentifier::new(2, 122),
-    ),
-    (
-        "twillen_shards.Energy cost",
-        UberIdentifier::new(2, 126),
-    ),
-    (
-        "twillen_shards.Finesse cost",
-        UberIdentifier::new(2, 140),
-    ),
-    (
-        "game_state.Spawn",
-        UberIdentifier::new(3, 0),
-    ),
-    (
-        "game_state.Goal Modes Complete",
-        UberIdentifier::new(3, 11),
-    ),
-    (
-        "game_state.On Teleport",
-        UberIdentifier::new(3, 20),
-    ),
-    (
-        "game_state.Reload",
-        UberIdentifier::new(3, 1),
-    ),
-    (
-        "game_state.Binding One",
-        UberIdentifier::new(3, 2),
-    ),
-    (
-        "game_state.Binding Two",
-        UberIdentifier::new(3, 3),
-    ),
-    (
-        "game_state.Binding Three",
-        UberIdentifier::new(3, 4),
-    ),
-    (
-        "game_state.Binding Four",
-        UberIdentifier::new(3, 5),
-    ),
-    (
-        "game_state.Binding Five",
-        UberIdentifier::new(3, 6),
-    ),
-    (
-        "game_state.Load",
-        UberIdentifier::new(3, 7),
-    ),
-    (
-        "rando_upgrades.Autoaim",
-        UberIdentifier::new(4, 37),
-    ),
+    ("twillen_shards.Vitality cost", UberIdentifier::new(2, 122)),
+    ("twillen_shards.Energy cost", UberIdentifier::new(2, 126)),
+    ("twillen_shards.Finesse cost", UberIdentifier::new(2, 140)),
+    ("game_state.Spawn", UberIdentifier::new(3, 0)),
+    ("game_state.Goal Modes Complete", UberIdentifier::new(3, 11)),
+    ("game_state.On Teleport", UberIdentifier::new(3, 20)),
+    ("game_state.Reload", UberIdentifier::new(3, 1)),
+    ("game_state.Binding One", UberIdentifier::new(3, 2)),
+    ("game_state.Binding Two", UberIdentifier::new(3, 3)),
+    ("game_state.Binding Three", UberIdentifier::new(3, 4)),
+    ("game_state.Binding Four", UberIdentifier::new(3, 5)),
+    ("game_state.Binding Five", UberIdentifier::new(3, 6)),
+    ("game_state.Load", UberIdentifier::new(3, 7)),
+    ("rando_upgrades.Autoaim", UberIdentifier::new(4, 37)),
     (
         "rando_upgrades.Grenades explode on collision",
         UberIdentifier::new(4, 41),
@@ -357,42 +201,18 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_upgrades.Grenade charge time modifier",
         UberIdentifier::new(4, 44),
     ),
-    (
-        "rando_upgrades.Launch Speed",
-        UberIdentifier::new(4, 80),
-    ),
-    (
-        "rando_upgrades.Dash Distance",
-        UberIdentifier::new(4, 81),
-    ),
-    (
-        "rando_upgrades.Bash Speed",
-        UberIdentifier::new(4, 82),
-    ),
-    (
-        "rando_upgrades.Burrow Speed",
-        UberIdentifier::new(4, 83),
-    ),
+    ("rando_upgrades.Launch Speed", UberIdentifier::new(4, 80)),
+    ("rando_upgrades.Dash Distance", UberIdentifier::new(4, 81)),
+    ("rando_upgrades.Bash Speed", UberIdentifier::new(4, 82)),
+    ("rando_upgrades.Burrow Speed", UberIdentifier::new(4, 83)),
     (
         "rando_upgrades.Burrow Dash Speed",
         UberIdentifier::new(4, 84),
     ),
-    (
-        "rando_upgrades.Swim Speed",
-        UberIdentifier::new(4, 85),
-    ),
-    (
-        "rando_upgrades.Swim Dash Speed",
-        UberIdentifier::new(4, 86),
-    ),
-    (
-        "rando_upgrades.Jump Height",
-        UberIdentifier::new(4, 87),
-    ),
-    (
-        "rando_upgrades.Relic",
-        UberIdentifier::new(4, 20),
-    ),
+    ("rando_upgrades.Swim Speed", UberIdentifier::new(4, 85)),
+    ("rando_upgrades.Swim Dash Speed", UberIdentifier::new(4, 86)),
+    ("rando_upgrades.Jump Height", UberIdentifier::new(4, 87)),
+    ("rando_upgrades.Relic", UberIdentifier::new(4, 20)),
     (
         "rando_upgrades.Health Regeneration",
         UberIdentifier::new(4, 30),
@@ -405,26 +225,14 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_upgrades.Extra Double Jumps",
         UberIdentifier::new(4, 35),
     ),
-    (
-        "rando_upgrades.Extra Dashes",
-        UberIdentifier::new(4, 36),
-    ),
-    (
-        "rando_upgrades.Extra Grenades",
-        UberIdentifier::new(4, 40),
-    ),
+    ("rando_upgrades.Extra Dashes", UberIdentifier::new(4, 36)),
+    ("rando_upgrades.Extra Grenades", UberIdentifier::new(4, 40)),
     (
         "rando_upgrades.Grenade multishot",
         UberIdentifier::new(4, 45),
     ),
-    (
-        "rando_upgrades.Hammer Speed",
-        UberIdentifier::new(4, 50),
-    ),
-    (
-        "rando_upgrades.Sword Speed",
-        UberIdentifier::new(4, 51),
-    ),
+    ("rando_upgrades.Hammer Speed", UberIdentifier::new(4, 50)),
+    ("rando_upgrades.Sword Speed", UberIdentifier::new(4, 51)),
     (
         "rando_upgrades.Blaze Efficiency",
         UberIdentifier::new(4, 52),
@@ -441,10 +249,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_upgrades.Sentry Efficiency",
         UberIdentifier::new(4, 55),
     ),
-    (
-        "rando_upgrades.Bow Efficiency",
-        UberIdentifier::new(4, 56),
-    ),
+    ("rando_upgrades.Bow Efficiency", UberIdentifier::new(4, 56)),
     (
         "rando_upgrades.Regenerate Efficiency",
         UberIdentifier::new(4, 57),
@@ -457,70 +262,25 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_upgrades.Light Burst Efficiency",
         UberIdentifier::new(4, 59),
     ),
-    (
-        "rando_upgrades.Exploding Spike",
-        UberIdentifier::new(4, 95),
-    ),
-    (
-        "rando_upgrades.Shock Smash",
-        UberIdentifier::new(4, 96),
-    ),
-    (
-        "rando_upgrades.Static Star",
-        UberIdentifier::new(4, 97),
-    ),
-    (
-        "rando_upgrades.Charge Blaze",
-        UberIdentifier::new(4, 98),
-    ),
-    (
-        "rando_upgrades.Rapid Sentry",
-        UberIdentifier::new(4, 99),
-    ),
-    (
-        "rando_upgrades.Marsh Relic",
-        UberIdentifier::new(4, 100),
-    ),
-    (
-        "rando_upgrades.Hollow Relic",
-        UberIdentifier::new(4, 101),
-    ),
-    (
-        "rando_upgrades.Glades Relic",
-        UberIdentifier::new(4, 102),
-    ),
+    ("rando_upgrades.Exploding Spike", UberIdentifier::new(4, 95)),
+    ("rando_upgrades.Shock Smash", UberIdentifier::new(4, 96)),
+    ("rando_upgrades.Static Star", UberIdentifier::new(4, 97)),
+    ("rando_upgrades.Charge Blaze", UberIdentifier::new(4, 98)),
+    ("rando_upgrades.Rapid Sentry", UberIdentifier::new(4, 99)),
+    ("rando_upgrades.Marsh Relic", UberIdentifier::new(4, 100)),
+    ("rando_upgrades.Hollow Relic", UberIdentifier::new(4, 101)),
+    ("rando_upgrades.Glades Relic", UberIdentifier::new(4, 102)),
     (
         "rando_upgrades.Wellspring Relic",
         UberIdentifier::new(4, 103),
     ),
-    (
-        "rando_upgrades.Burrows Relic",
-        UberIdentifier::new(4, 104),
-    ),
-    (
-        "rando_upgrades.Woods Relic",
-        UberIdentifier::new(4, 105),
-    ),
-    (
-        "rando_upgrades.Reach Relic",
-        UberIdentifier::new(4, 106),
-    ),
-    (
-        "rando_upgrades.Pools Relic",
-        UberIdentifier::new(4, 107),
-    ),
-    (
-        "rando_upgrades.Depths Relic",
-        UberIdentifier::new(4, 108),
-    ),
-    (
-        "rando_upgrades.Wastes Relic",
-        UberIdentifier::new(4, 109),
-    ),
-    (
-        "rando_upgrades.Willow Relic",
-        UberIdentifier::new(4, 111),
-    ),
+    ("rando_upgrades.Burrows Relic", UberIdentifier::new(4, 104)),
+    ("rando_upgrades.Woods Relic", UberIdentifier::new(4, 105)),
+    ("rando_upgrades.Reach Relic", UberIdentifier::new(4, 106)),
+    ("rando_upgrades.Pools Relic", UberIdentifier::new(4, 107)),
+    ("rando_upgrades.Depths Relic", UberIdentifier::new(4, 108)),
+    ("rando_upgrades.Wastes Relic", UberIdentifier::new(4, 109)),
+    ("rando_upgrades.Willow Relic", UberIdentifier::new(4, 111)),
     (
         "rando_state.Checkable Item Hint 1",
         UberIdentifier::new(6, 10),
@@ -561,42 +321,15 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_state.Checkable Item Hint 10",
         UberIdentifier::new(6, 19),
     ),
-    (
-        "rando_state.HollowTP",
-        UberIdentifier::new(6, 106),
-    ),
-    (
-        "rando_state.Bash",
-        UberIdentifier::new(6, 1000),
-    ),
-    (
-        "rando_state.WallJump",
-        UberIdentifier::new(6, 1003),
-    ),
-    (
-        "rando_state.DoubleJump",
-        UberIdentifier::new(6, 1005),
-    ),
-    (
-        "rando_state.Launch",
-        UberIdentifier::new(6, 1008),
-    ),
-    (
-        "rando_state.Feather",
-        UberIdentifier::new(6, 1014),
-    ),
-    (
-        "rando_state.Spirit Flame",
-        UberIdentifier::new(6, 1015),
-    ),
-    (
-        "rando_state.WaterBreath",
-        UberIdentifier::new(6, 1023),
-    ),
-    (
-        "rando_state.Resilience",
-        UberIdentifier::new(6, 1031),
-    ),
+    ("rando_state.HollowTP", UberIdentifier::new(6, 106)),
+    ("rando_state.Bash", UberIdentifier::new(6, 1000)),
+    ("rando_state.WallJump", UberIdentifier::new(6, 1003)),
+    ("rando_state.DoubleJump", UberIdentifier::new(6, 1005)),
+    ("rando_state.Launch", UberIdentifier::new(6, 1008)),
+    ("rando_state.Feather", UberIdentifier::new(6, 1014)),
+    ("rando_state.Spirit Flame", UberIdentifier::new(6, 1015)),
+    ("rando_state.WaterBreath", UberIdentifier::new(6, 1023)),
+    ("rando_state.Resilience", UberIdentifier::new(6, 1031)),
     (
         "rando_state.Health Efficiency",
         UberIdentifier::new(6, 1032),
@@ -605,126 +338,39 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_state.Energy Efficiency",
         UberIdentifier::new(6, 1039),
     ),
-    (
-        "rando_state.LightBurst",
-        UberIdentifier::new(6, 1051),
-    ),
-    (
-        "rando_state.Grapple",
-        UberIdentifier::new(6, 1057),
-    ),
-    (
-        "rando_state.Flash",
-        UberIdentifier::new(6, 1062),
-    ),
-    (
-        "rando_state.Spike",
-        UberIdentifier::new(6, 1074),
-    ),
-    (
-        "rando_state.Regenerate",
-        UberIdentifier::new(6, 1077),
-    ),
-    (
-        "rando_state.SpiritArc",
-        UberIdentifier::new(6, 1097),
-    ),
-    (
-        "rando_state.SpiritSmash",
-        UberIdentifier::new(6, 1098),
-    ),
-    (
-        "rando_state.Torch",
-        UberIdentifier::new(6, 1099),
-    ),
-    (
-        "rando_state.SpiritEdge",
-        UberIdentifier::new(6, 1100),
-    ),
-    (
-        "rando_state.Burrow",
-        UberIdentifier::new(6, 1101),
-    ),
-    (
-        "rando_state.Dash",
-        UberIdentifier::new(6, 1102),
-    ),
-    (
-        "rando_state.WaterDash",
-        UberIdentifier::new(6, 1104),
-    ),
-    (
-        "rando_state.SpiritStar",
-        UberIdentifier::new(6, 1106),
-    ),
-    (
-        "rando_state.Seir",
-        UberIdentifier::new(6, 1108),
-    ),
-    (
-        "rando_state.Bow Charge",
-        UberIdentifier::new(6, 1109),
-    ),
-    (
-        "rando_state.Spirit Magnet",
-        UberIdentifier::new(6, 1112),
-    ),
-    (
-        "rando_state.Blaze",
-        UberIdentifier::new(6, 1115),
-    ),
-    (
-        "rando_state.Sentry",
-        UberIdentifier::new(6, 1116),
-    ),
-    (
-        "rando_state.Flap",
-        UberIdentifier::new(6, 1118),
-    ),
-    (
-        "rando_state.Weapon Charge",
-        UberIdentifier::new(6, 1119),
-    ),
-    (
-        "rando_state.DamageUpgrade1",
-        UberIdentifier::new(6, 1120),
-    ),
-    (
-        "rando_state.DamageUpgrade2",
-        UberIdentifier::new(6, 1121),
-    ),
-    (
-        "rando_state.Clean Water",
-        UberIdentifier::new(6, 2000),
-    ),
-    (
-        "rando_state.Collected Keystones",
-        UberIdentifier::new(6, 0),
-    ),
-    (
-        "rando_state.Purchased Keystones",
-        UberIdentifier::new(6, 1),
-    ),
-    (
-        "rando_state.Pickups Collected",
-        UberIdentifier::new(6, 2),
-    ),
+    ("rando_state.LightBurst", UberIdentifier::new(6, 1051)),
+    ("rando_state.Grapple", UberIdentifier::new(6, 1057)),
+    ("rando_state.Flash", UberIdentifier::new(6, 1062)),
+    ("rando_state.Spike", UberIdentifier::new(6, 1074)),
+    ("rando_state.Regenerate", UberIdentifier::new(6, 1077)),
+    ("rando_state.SpiritArc", UberIdentifier::new(6, 1097)),
+    ("rando_state.SpiritSmash", UberIdentifier::new(6, 1098)),
+    ("rando_state.Torch", UberIdentifier::new(6, 1099)),
+    ("rando_state.SpiritEdge", UberIdentifier::new(6, 1100)),
+    ("rando_state.Burrow", UberIdentifier::new(6, 1101)),
+    ("rando_state.Dash", UberIdentifier::new(6, 1102)),
+    ("rando_state.WaterDash", UberIdentifier::new(6, 1104)),
+    ("rando_state.SpiritStar", UberIdentifier::new(6, 1106)),
+    ("rando_state.Seir", UberIdentifier::new(6, 1108)),
+    ("rando_state.Bow Charge", UberIdentifier::new(6, 1109)),
+    ("rando_state.Spirit Magnet", UberIdentifier::new(6, 1112)),
+    ("rando_state.Blaze", UberIdentifier::new(6, 1115)),
+    ("rando_state.Sentry", UberIdentifier::new(6, 1116)),
+    ("rando_state.Flap", UberIdentifier::new(6, 1118)),
+    ("rando_state.Weapon Charge", UberIdentifier::new(6, 1119)),
+    ("rando_state.DamageUpgrade1", UberIdentifier::new(6, 1120)),
+    ("rando_state.DamageUpgrade2", UberIdentifier::new(6, 1121)),
+    ("rando_state.Clean Water", UberIdentifier::new(6, 2000)),
+    ("rando_state.Collected Keystones", UberIdentifier::new(6, 0)),
+    ("rando_state.Purchased Keystones", UberIdentifier::new(6, 1)),
+    ("rando_state.Pickups Collected", UberIdentifier::new(6, 2)),
     (
         "rando_state.Spirit Light Collected",
         UberIdentifier::new(6, 3),
     ),
-    (
-        "rando_state.Spirit Light Spent",
-        UberIdentifier::new(6, 4),
-    ),
-    (
-        "rando_state.Ore Collected",
-        UberIdentifier::new(6, 5),
-    ),
-    (
-        "rando_state.Ore Spent",
-        UberIdentifier::new(6, 6),
-    ),
+    ("rando_state.Spirit Light Spent", UberIdentifier::new(6, 4)),
+    ("rando_state.Ore Collected", UberIdentifier::new(6, 5)),
+    ("rando_state.Ore Spent", UberIdentifier::new(6, 6)),
     (
         "rando_state.Marsh Key Item Hint",
         UberIdentifier::new(6, 10000),
@@ -769,22 +415,13 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_state.Willow Key Item Hint",
         UberIdentifier::new(6, 10011),
     ),
-    (
-        "rando_config.glades_tp_fix",
-        UberIdentifier::new(7, 0),
-    ),
+    ("rando_config.glades_tp_fix", UberIdentifier::new(7, 0)),
     (
         "rando_config.prevent_map_reactivate_tps",
         UberIdentifier::new(7, 1),
     ),
-    (
-        "rando_config.marsh_starts_sunny",
-        UberIdentifier::new(7, 2),
-    ),
-    (
-        "rando_config.howl_starts_dead",
-        UberIdentifier::new(7, 3),
-    ),
+    ("rando_config.marsh_starts_sunny", UberIdentifier::new(7, 2)),
+    ("rando_config.howl_starts_dead", UberIdentifier::new(7, 3)),
     (
         "rando_config.enable_vanilla_regen_tree",
         UberIdentifier::new(7, 4),
@@ -793,1678 +430,559 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_config.disable_tree_check_for_rain",
         UberIdentifier::new(7, 5),
     ),
-    (
-        "map_filter.show_spoiler",
-        UberIdentifier::new(8, 70),
-    ),
-    (
-        "plando_vars.100_bool",
-        UberIdentifier::new(9, 100),
-    ),
-    (
-        "plando_vars.101_bool",
-        UberIdentifier::new(9, 101),
-    ),
-    (
-        "plando_vars.102_bool",
-        UberIdentifier::new(9, 102),
-    ),
-    (
-        "plando_vars.103_bool",
-        UberIdentifier::new(9, 103),
-    ),
-    (
-        "plando_vars.104_bool",
-        UberIdentifier::new(9, 104),
-    ),
-    (
-        "plando_vars.105_bool",
-        UberIdentifier::new(9, 105),
-    ),
-    (
-        "plando_vars.106_bool",
-        UberIdentifier::new(9, 106),
-    ),
-    (
-        "plando_vars.107_bool",
-        UberIdentifier::new(9, 107),
-    ),
-    (
-        "plando_vars.108_bool",
-        UberIdentifier::new(9, 108),
-    ),
-    (
-        "plando_vars.109_bool",
-        UberIdentifier::new(9, 109),
-    ),
-    (
-        "plando_vars.110_bool",
-        UberIdentifier::new(9, 110),
-    ),
-    (
-        "plando_vars.111_bool",
-        UberIdentifier::new(9, 111),
-    ),
-    (
-        "plando_vars.112_bool",
-        UberIdentifier::new(9, 112),
-    ),
-    (
-        "plando_vars.113_bool",
-        UberIdentifier::new(9, 113),
-    ),
-    (
-        "plando_vars.114_bool",
-        UberIdentifier::new(9, 114),
-    ),
-    (
-        "plando_vars.115_bool",
-        UberIdentifier::new(9, 115),
-    ),
-    (
-        "plando_vars.116_bool",
-        UberIdentifier::new(9, 116),
-    ),
-    (
-        "plando_vars.117_bool",
-        UberIdentifier::new(9, 117),
-    ),
-    (
-        "plando_vars.118_bool",
-        UberIdentifier::new(9, 118),
-    ),
-    (
-        "plando_vars.119_bool",
-        UberIdentifier::new(9, 119),
-    ),
-    (
-        "plando_vars.120_bool",
-        UberIdentifier::new(9, 120),
-    ),
-    (
-        "plando_vars.121_bool",
-        UberIdentifier::new(9, 121),
-    ),
-    (
-        "plando_vars.122_bool",
-        UberIdentifier::new(9, 122),
-    ),
-    (
-        "plando_vars.123_bool",
-        UberIdentifier::new(9, 123),
-    ),
-    (
-        "plando_vars.124_bool",
-        UberIdentifier::new(9, 124),
-    ),
-    (
-        "plando_vars.125_bool",
-        UberIdentifier::new(9, 125),
-    ),
-    (
-        "plando_vars.126_bool",
-        UberIdentifier::new(9, 126),
-    ),
-    (
-        "plando_vars.127_bool",
-        UberIdentifier::new(9, 127),
-    ),
-    (
-        "plando_vars.128_bool",
-        UberIdentifier::new(9, 128),
-    ),
-    (
-        "plando_vars.129_bool",
-        UberIdentifier::new(9, 129),
-    ),
-    (
-        "plando_vars.130_bool",
-        UberIdentifier::new(9, 130),
-    ),
-    (
-        "plando_vars.131_bool",
-        UberIdentifier::new(9, 131),
-    ),
-    (
-        "plando_vars.132_bool",
-        UberIdentifier::new(9, 132),
-    ),
-    (
-        "plando_vars.133_bool",
-        UberIdentifier::new(9, 133),
-    ),
-    (
-        "plando_vars.134_bool",
-        UberIdentifier::new(9, 134),
-    ),
-    (
-        "plando_vars.135_bool",
-        UberIdentifier::new(9, 135),
-    ),
-    (
-        "plando_vars.136_bool",
-        UberIdentifier::new(9, 136),
-    ),
-    (
-        "plando_vars.137_bool",
-        UberIdentifier::new(9, 137),
-    ),
-    (
-        "plando_vars.138_bool",
-        UberIdentifier::new(9, 138),
-    ),
-    (
-        "plando_vars.139_bool",
-        UberIdentifier::new(9, 139),
-    ),
-    (
-        "plando_vars.140_bool",
-        UberIdentifier::new(9, 140),
-    ),
-    (
-        "plando_vars.141_bool",
-        UberIdentifier::new(9, 141),
-    ),
-    (
-        "plando_vars.142_bool",
-        UberIdentifier::new(9, 142),
-    ),
-    (
-        "plando_vars.143_bool",
-        UberIdentifier::new(9, 143),
-    ),
-    (
-        "plando_vars.144_bool",
-        UberIdentifier::new(9, 144),
-    ),
-    (
-        "plando_vars.145_bool",
-        UberIdentifier::new(9, 145),
-    ),
-    (
-        "plando_vars.146_bool",
-        UberIdentifier::new(9, 146),
-    ),
-    (
-        "plando_vars.147_bool",
-        UberIdentifier::new(9, 147),
-    ),
-    (
-        "plando_vars.148_bool",
-        UberIdentifier::new(9, 148),
-    ),
-    (
-        "plando_vars.149_bool",
-        UberIdentifier::new(9, 149),
-    ),
-    (
-        "plando_vars.0_int",
-        UberIdentifier::new(9, 0),
-    ),
-    (
-        "plando_vars.1_int",
-        UberIdentifier::new(9, 1),
-    ),
-    (
-        "plando_vars.2_int",
-        UberIdentifier::new(9, 2),
-    ),
-    (
-        "plando_vars.3_int",
-        UberIdentifier::new(9, 3),
-    ),
-    (
-        "plando_vars.4_int",
-        UberIdentifier::new(9, 4),
-    ),
-    (
-        "plando_vars.5_int",
-        UberIdentifier::new(9, 5),
-    ),
-    (
-        "plando_vars.6_int",
-        UberIdentifier::new(9, 6),
-    ),
-    (
-        "plando_vars.7_int",
-        UberIdentifier::new(9, 7),
-    ),
-    (
-        "plando_vars.8_int",
-        UberIdentifier::new(9, 8),
-    ),
-    (
-        "plando_vars.9_int",
-        UberIdentifier::new(9, 9),
-    ),
-    (
-        "plando_vars.10_int",
-        UberIdentifier::new(9, 10),
-    ),
-    (
-        "plando_vars.11_int",
-        UberIdentifier::new(9, 11),
-    ),
-    (
-        "plando_vars.12_int",
-        UberIdentifier::new(9, 12),
-    ),
-    (
-        "plando_vars.13_int",
-        UberIdentifier::new(9, 13),
-    ),
-    (
-        "plando_vars.14_int",
-        UberIdentifier::new(9, 14),
-    ),
-    (
-        "plando_vars.15_int",
-        UberIdentifier::new(9, 15),
-    ),
-    (
-        "plando_vars.16_int",
-        UberIdentifier::new(9, 16),
-    ),
-    (
-        "plando_vars.17_int",
-        UberIdentifier::new(9, 17),
-    ),
-    (
-        "plando_vars.18_int",
-        UberIdentifier::new(9, 18),
-    ),
-    (
-        "plando_vars.19_int",
-        UberIdentifier::new(9, 19),
-    ),
-    (
-        "plando_vars.20_int",
-        UberIdentifier::new(9, 20),
-    ),
-    (
-        "plando_vars.21_int",
-        UberIdentifier::new(9, 21),
-    ),
-    (
-        "plando_vars.22_int",
-        UberIdentifier::new(9, 22),
-    ),
-    (
-        "plando_vars.23_int",
-        UberIdentifier::new(9, 23),
-    ),
-    (
-        "plando_vars.24_int",
-        UberIdentifier::new(9, 24),
-    ),
-    (
-        "plando_vars.25_int",
-        UberIdentifier::new(9, 25),
-    ),
-    (
-        "plando_vars.26_int",
-        UberIdentifier::new(9, 26),
-    ),
-    (
-        "plando_vars.27_int",
-        UberIdentifier::new(9, 27),
-    ),
-    (
-        "plando_vars.28_int",
-        UberIdentifier::new(9, 28),
-    ),
-    (
-        "plando_vars.29_int",
-        UberIdentifier::new(9, 29),
-    ),
-    (
-        "plando_vars.30_int",
-        UberIdentifier::new(9, 30),
-    ),
-    (
-        "plando_vars.31_int",
-        UberIdentifier::new(9, 31),
-    ),
-    (
-        "plando_vars.32_int",
-        UberIdentifier::new(9, 32),
-    ),
-    (
-        "plando_vars.33_int",
-        UberIdentifier::new(9, 33),
-    ),
-    (
-        "plando_vars.34_int",
-        UberIdentifier::new(9, 34),
-    ),
-    (
-        "plando_vars.35_int",
-        UberIdentifier::new(9, 35),
-    ),
-    (
-        "plando_vars.36_int",
-        UberIdentifier::new(9, 36),
-    ),
-    (
-        "plando_vars.37_int",
-        UberIdentifier::new(9, 37),
-    ),
-    (
-        "plando_vars.38_int",
-        UberIdentifier::new(9, 38),
-    ),
-    (
-        "plando_vars.39_int",
-        UberIdentifier::new(9, 39),
-    ),
-    (
-        "plando_vars.40_int",
-        UberIdentifier::new(9, 40),
-    ),
-    (
-        "plando_vars.41_int",
-        UberIdentifier::new(9, 41),
-    ),
-    (
-        "plando_vars.42_int",
-        UberIdentifier::new(9, 42),
-    ),
-    (
-        "plando_vars.43_int",
-        UberIdentifier::new(9, 43),
-    ),
-    (
-        "plando_vars.44_int",
-        UberIdentifier::new(9, 44),
-    ),
-    (
-        "plando_vars.45_int",
-        UberIdentifier::new(9, 45),
-    ),
-    (
-        "plando_vars.46_int",
-        UberIdentifier::new(9, 46),
-    ),
-    (
-        "plando_vars.47_int",
-        UberIdentifier::new(9, 47),
-    ),
-    (
-        "plando_vars.48_int",
-        UberIdentifier::new(9, 48),
-    ),
-    (
-        "plando_vars.49_int",
-        UberIdentifier::new(9, 49),
-    ),
-    (
-        "plando_vars.50_int",
-        UberIdentifier::new(9, 50),
-    ),
-    (
-        "plando_vars.51_int",
-        UberIdentifier::new(9, 51),
-    ),
-    (
-        "plando_vars.52_int",
-        UberIdentifier::new(9, 52),
-    ),
-    (
-        "plando_vars.53_int",
-        UberIdentifier::new(9, 53),
-    ),
-    (
-        "plando_vars.54_int",
-        UberIdentifier::new(9, 54),
-    ),
-    (
-        "plando_vars.55_int",
-        UberIdentifier::new(9, 55),
-    ),
-    (
-        "plando_vars.56_int",
-        UberIdentifier::new(9, 56),
-    ),
-    (
-        "plando_vars.57_int",
-        UberIdentifier::new(9, 57),
-    ),
-    (
-        "plando_vars.58_int",
-        UberIdentifier::new(9, 58),
-    ),
-    (
-        "plando_vars.59_int",
-        UberIdentifier::new(9, 59),
-    ),
-    (
-        "plando_vars.60_int",
-        UberIdentifier::new(9, 60),
-    ),
-    (
-        "plando_vars.61_int",
-        UberIdentifier::new(9, 61),
-    ),
-    (
-        "plando_vars.62_int",
-        UberIdentifier::new(9, 62),
-    ),
-    (
-        "plando_vars.63_int",
-        UberIdentifier::new(9, 63),
-    ),
-    (
-        "plando_vars.64_int",
-        UberIdentifier::new(9, 64),
-    ),
-    (
-        "plando_vars.65_int",
-        UberIdentifier::new(9, 65),
-    ),
-    (
-        "plando_vars.66_int",
-        UberIdentifier::new(9, 66),
-    ),
-    (
-        "plando_vars.67_int",
-        UberIdentifier::new(9, 67),
-    ),
-    (
-        "plando_vars.68_int",
-        UberIdentifier::new(9, 68),
-    ),
-    (
-        "plando_vars.69_int",
-        UberIdentifier::new(9, 69),
-    ),
-    (
-        "plando_vars.70_int",
-        UberIdentifier::new(9, 70),
-    ),
-    (
-        "plando_vars.71_int",
-        UberIdentifier::new(9, 71),
-    ),
-    (
-        "plando_vars.72_int",
-        UberIdentifier::new(9, 72),
-    ),
-    (
-        "plando_vars.73_int",
-        UberIdentifier::new(9, 73),
-    ),
-    (
-        "plando_vars.74_int",
-        UberIdentifier::new(9, 74),
-    ),
-    (
-        "plando_vars.75_int",
-        UberIdentifier::new(9, 75),
-    ),
-    (
-        "plando_vars.76_int",
-        UberIdentifier::new(9, 76),
-    ),
-    (
-        "plando_vars.77_int",
-        UberIdentifier::new(9, 77),
-    ),
-    (
-        "plando_vars.78_int",
-        UberIdentifier::new(9, 78),
-    ),
-    (
-        "plando_vars.79_int",
-        UberIdentifier::new(9, 79),
-    ),
-    (
-        "plando_vars.80_int",
-        UberIdentifier::new(9, 80),
-    ),
-    (
-        "plando_vars.81_int",
-        UberIdentifier::new(9, 81),
-    ),
-    (
-        "plando_vars.82_int",
-        UberIdentifier::new(9, 82),
-    ),
-    (
-        "plando_vars.83_int",
-        UberIdentifier::new(9, 83),
-    ),
-    (
-        "plando_vars.84_int",
-        UberIdentifier::new(9, 84),
-    ),
-    (
-        "plando_vars.85_int",
-        UberIdentifier::new(9, 85),
-    ),
-    (
-        "plando_vars.86_int",
-        UberIdentifier::new(9, 86),
-    ),
-    (
-        "plando_vars.87_int",
-        UberIdentifier::new(9, 87),
-    ),
-    (
-        "plando_vars.88_int",
-        UberIdentifier::new(9, 88),
-    ),
-    (
-        "plando_vars.89_int",
-        UberIdentifier::new(9, 89),
-    ),
-    (
-        "plando_vars.90_int",
-        UberIdentifier::new(9, 90),
-    ),
-    (
-        "plando_vars.91_int",
-        UberIdentifier::new(9, 91),
-    ),
-    (
-        "plando_vars.92_int",
-        UberIdentifier::new(9, 92),
-    ),
-    (
-        "plando_vars.93_int",
-        UberIdentifier::new(9, 93),
-    ),
-    (
-        "plando_vars.94_int",
-        UberIdentifier::new(9, 94),
-    ),
-    (
-        "plando_vars.95_int",
-        UberIdentifier::new(9, 95),
-    ),
-    (
-        "plando_vars.96_int",
-        UberIdentifier::new(9, 96),
-    ),
-    (
-        "plando_vars.97_int",
-        UberIdentifier::new(9, 97),
-    ),
-    (
-        "plando_vars.98_int",
-        UberIdentifier::new(9, 98),
-    ),
-    (
-        "plando_vars.99_int",
-        UberIdentifier::new(9, 99),
-    ),
-    (
-        "plando_vars.150_float",
-        UberIdentifier::new(9, 150),
-    ),
-    (
-        "plando_vars.151_float",
-        UberIdentifier::new(9, 151),
-    ),
-    (
-        "plando_vars.152_float",
-        UberIdentifier::new(9, 152),
-    ),
-    (
-        "plando_vars.153_float",
-        UberIdentifier::new(9, 153),
-    ),
-    (
-        "plando_vars.154_float",
-        UberIdentifier::new(9, 154),
-    ),
-    (
-        "plando_vars.155_float",
-        UberIdentifier::new(9, 155),
-    ),
-    (
-        "plando_vars.156_float",
-        UberIdentifier::new(9, 156),
-    ),
-    (
-        "plando_vars.157_float",
-        UberIdentifier::new(9, 157),
-    ),
-    (
-        "plando_vars.158_float",
-        UberIdentifier::new(9, 158),
-    ),
-    (
-        "plando_vars.159_float",
-        UberIdentifier::new(9, 159),
-    ),
-    (
-        "plando_vars.160_float",
-        UberIdentifier::new(9, 160),
-    ),
-    (
-        "plando_vars.161_float",
-        UberIdentifier::new(9, 161),
-    ),
-    (
-        "plando_vars.162_float",
-        UberIdentifier::new(9, 162),
-    ),
-    (
-        "plando_vars.163_float",
-        UberIdentifier::new(9, 163),
-    ),
-    (
-        "plando_vars.164_float",
-        UberIdentifier::new(9, 164),
-    ),
-    (
-        "plando_vars.165_float",
-        UberIdentifier::new(9, 165),
-    ),
-    (
-        "plando_vars.166_float",
-        UberIdentifier::new(9, 166),
-    ),
-    (
-        "plando_vars.167_float",
-        UberIdentifier::new(9, 167),
-    ),
-    (
-        "plando_vars.168_float",
-        UberIdentifier::new(9, 168),
-    ),
-    (
-        "plando_vars.169_float",
-        UberIdentifier::new(9, 169),
-    ),
-    (
-        "plando_vars.170_float",
-        UberIdentifier::new(9, 170),
-    ),
-    (
-        "plando_vars.171_float",
-        UberIdentifier::new(9, 171),
-    ),
-    (
-        "plando_vars.172_float",
-        UberIdentifier::new(9, 172),
-    ),
-    (
-        "plando_vars.173_float",
-        UberIdentifier::new(9, 173),
-    ),
-    (
-        "plando_vars.174_float",
-        UberIdentifier::new(9, 174),
-    ),
-    (
-        "bingo_state.Squares",
-        UberIdentifier::new(10, 0),
-    ),
-    (
-        "bingo_state.Lines",
-        UberIdentifier::new(10, 1),
-    ),
-    (
-        "bingo_state.Rank",
-        UberIdentifier::new(10, 2),
-    ),
-    (
-        "bingo_state.Kills",
-        UberIdentifier::new(10, 10),
-    ),
-    (
-        "bingo_state.SwordKills",
-        UberIdentifier::new(10, 11),
-    ),
-    (
-        "bingo_state.HammerKills",
-        UberIdentifier::new(10, 12),
-    ),
-    (
-        "bingo_state.BowKills",
-        UberIdentifier::new(10, 13),
-    ),
-    (
-        "bingo_state.SpearKills",
-        UberIdentifier::new(10, 14),
-    ),
-    (
-        "bingo_state.SentryKills",
-        UberIdentifier::new(10, 15),
-    ),
-    (
-        "bingo_state.BlazeKills",
-        UberIdentifier::new(10, 16),
-    ),
-    (
-        "bingo_state.GrenadeKills",
-        UberIdentifier::new(10, 17),
-    ),
-    (
-        "bingo_state.BurnDoTKills",
-        UberIdentifier::new(10, 18),
-    ),
-    (
-        "bingo_state.ShurikenKills",
-        UberIdentifier::new(10, 19),
-    ),
-    (
-        "bingo_state.LaunchKills",
-        UberIdentifier::new(10, 20),
-    ),
-    (
-        "bingo_state.FlashKills",
-        UberIdentifier::new(10, 21),
-    ),
-    (
-        "bingo_state.BashKills",
-        UberIdentifier::new(10, 22),
-    ),
-    (
-        "bingo_state.DrownedEnemies",
-        UberIdentifier::new(10, 23),
-    ),
-    (
-        "bingo_state.MinerKills",
-        UberIdentifier::new(10, 40),
-    ),
-    (
-        "bingo_state.FlierKills",
-        UberIdentifier::new(10, 41),
-    ),
-    (
-        "bingo_state.TentaKills",
-        UberIdentifier::new(10, 42),
-    ),
-    (
-        "bingo_state.SlimeKills",
-        UberIdentifier::new(10, 43),
-    ),
-    (
-        "bingo_state.FishKills",
-        UberIdentifier::new(10, 44),
-    ),
-    (
-        "bingo_state.ExploderKills",
-        UberIdentifier::new(10, 45),
-    ),
-    (
-        "appliers_serialization.0_id",
-        UberIdentifier::new(11, 0),
-    ),
-    (
-        "appliers_serialization.1_value",
-        UberIdentifier::new(11, 1),
-    ),
-    (
-        "appliers_serialization.2_id",
-        UberIdentifier::new(11, 2),
-    ),
-    (
-        "appliers_serialization.3_value",
-        UberIdentifier::new(11, 3),
-    ),
-    (
-        "appliers_serialization.4_id",
-        UberIdentifier::new(11, 4),
-    ),
-    (
-        "appliers_serialization.5_value",
-        UberIdentifier::new(11, 5),
-    ),
-    (
-        "appliers_serialization.6_id",
-        UberIdentifier::new(11, 6),
-    ),
-    (
-        "appliers_serialization.7_value",
-        UberIdentifier::new(11, 7),
-    ),
-    (
-        "appliers_serialization.8_id",
-        UberIdentifier::new(11, 8),
-    ),
-    (
-        "appliers_serialization.9_value",
-        UberIdentifier::new(11, 9),
-    ),
-    (
-        "appliers_serialization.10_id",
-        UberIdentifier::new(11, 10),
-    ),
+    ("map_filter.show_spoiler", UberIdentifier::new(8, 70)),
+    ("plando_vars.100_bool", UberIdentifier::new(9, 100)),
+    ("plando_vars.101_bool", UberIdentifier::new(9, 101)),
+    ("plando_vars.102_bool", UberIdentifier::new(9, 102)),
+    ("plando_vars.103_bool", UberIdentifier::new(9, 103)),
+    ("plando_vars.104_bool", UberIdentifier::new(9, 104)),
+    ("plando_vars.105_bool", UberIdentifier::new(9, 105)),
+    ("plando_vars.106_bool", UberIdentifier::new(9, 106)),
+    ("plando_vars.107_bool", UberIdentifier::new(9, 107)),
+    ("plando_vars.108_bool", UberIdentifier::new(9, 108)),
+    ("plando_vars.109_bool", UberIdentifier::new(9, 109)),
+    ("plando_vars.110_bool", UberIdentifier::new(9, 110)),
+    ("plando_vars.111_bool", UberIdentifier::new(9, 111)),
+    ("plando_vars.112_bool", UberIdentifier::new(9, 112)),
+    ("plando_vars.113_bool", UberIdentifier::new(9, 113)),
+    ("plando_vars.114_bool", UberIdentifier::new(9, 114)),
+    ("plando_vars.115_bool", UberIdentifier::new(9, 115)),
+    ("plando_vars.116_bool", UberIdentifier::new(9, 116)),
+    ("plando_vars.117_bool", UberIdentifier::new(9, 117)),
+    ("plando_vars.118_bool", UberIdentifier::new(9, 118)),
+    ("plando_vars.119_bool", UberIdentifier::new(9, 119)),
+    ("plando_vars.120_bool", UberIdentifier::new(9, 120)),
+    ("plando_vars.121_bool", UberIdentifier::new(9, 121)),
+    ("plando_vars.122_bool", UberIdentifier::new(9, 122)),
+    ("plando_vars.123_bool", UberIdentifier::new(9, 123)),
+    ("plando_vars.124_bool", UberIdentifier::new(9, 124)),
+    ("plando_vars.125_bool", UberIdentifier::new(9, 125)),
+    ("plando_vars.126_bool", UberIdentifier::new(9, 126)),
+    ("plando_vars.127_bool", UberIdentifier::new(9, 127)),
+    ("plando_vars.128_bool", UberIdentifier::new(9, 128)),
+    ("plando_vars.129_bool", UberIdentifier::new(9, 129)),
+    ("plando_vars.130_bool", UberIdentifier::new(9, 130)),
+    ("plando_vars.131_bool", UberIdentifier::new(9, 131)),
+    ("plando_vars.132_bool", UberIdentifier::new(9, 132)),
+    ("plando_vars.133_bool", UberIdentifier::new(9, 133)),
+    ("plando_vars.134_bool", UberIdentifier::new(9, 134)),
+    ("plando_vars.135_bool", UberIdentifier::new(9, 135)),
+    ("plando_vars.136_bool", UberIdentifier::new(9, 136)),
+    ("plando_vars.137_bool", UberIdentifier::new(9, 137)),
+    ("plando_vars.138_bool", UberIdentifier::new(9, 138)),
+    ("plando_vars.139_bool", UberIdentifier::new(9, 139)),
+    ("plando_vars.140_bool", UberIdentifier::new(9, 140)),
+    ("plando_vars.141_bool", UberIdentifier::new(9, 141)),
+    ("plando_vars.142_bool", UberIdentifier::new(9, 142)),
+    ("plando_vars.143_bool", UberIdentifier::new(9, 143)),
+    ("plando_vars.144_bool", UberIdentifier::new(9, 144)),
+    ("plando_vars.145_bool", UberIdentifier::new(9, 145)),
+    ("plando_vars.146_bool", UberIdentifier::new(9, 146)),
+    ("plando_vars.147_bool", UberIdentifier::new(9, 147)),
+    ("plando_vars.148_bool", UberIdentifier::new(9, 148)),
+    ("plando_vars.149_bool", UberIdentifier::new(9, 149)),
+    ("plando_vars.0_int", UberIdentifier::new(9, 0)),
+    ("plando_vars.1_int", UberIdentifier::new(9, 1)),
+    ("plando_vars.2_int", UberIdentifier::new(9, 2)),
+    ("plando_vars.3_int", UberIdentifier::new(9, 3)),
+    ("plando_vars.4_int", UberIdentifier::new(9, 4)),
+    ("plando_vars.5_int", UberIdentifier::new(9, 5)),
+    ("plando_vars.6_int", UberIdentifier::new(9, 6)),
+    ("plando_vars.7_int", UberIdentifier::new(9, 7)),
+    ("plando_vars.8_int", UberIdentifier::new(9, 8)),
+    ("plando_vars.9_int", UberIdentifier::new(9, 9)),
+    ("plando_vars.10_int", UberIdentifier::new(9, 10)),
+    ("plando_vars.11_int", UberIdentifier::new(9, 11)),
+    ("plando_vars.12_int", UberIdentifier::new(9, 12)),
+    ("plando_vars.13_int", UberIdentifier::new(9, 13)),
+    ("plando_vars.14_int", UberIdentifier::new(9, 14)),
+    ("plando_vars.15_int", UberIdentifier::new(9, 15)),
+    ("plando_vars.16_int", UberIdentifier::new(9, 16)),
+    ("plando_vars.17_int", UberIdentifier::new(9, 17)),
+    ("plando_vars.18_int", UberIdentifier::new(9, 18)),
+    ("plando_vars.19_int", UberIdentifier::new(9, 19)),
+    ("plando_vars.20_int", UberIdentifier::new(9, 20)),
+    ("plando_vars.21_int", UberIdentifier::new(9, 21)),
+    ("plando_vars.22_int", UberIdentifier::new(9, 22)),
+    ("plando_vars.23_int", UberIdentifier::new(9, 23)),
+    ("plando_vars.24_int", UberIdentifier::new(9, 24)),
+    ("plando_vars.25_int", UberIdentifier::new(9, 25)),
+    ("plando_vars.26_int", UberIdentifier::new(9, 26)),
+    ("plando_vars.27_int", UberIdentifier::new(9, 27)),
+    ("plando_vars.28_int", UberIdentifier::new(9, 28)),
+    ("plando_vars.29_int", UberIdentifier::new(9, 29)),
+    ("plando_vars.30_int", UberIdentifier::new(9, 30)),
+    ("plando_vars.31_int", UberIdentifier::new(9, 31)),
+    ("plando_vars.32_int", UberIdentifier::new(9, 32)),
+    ("plando_vars.33_int", UberIdentifier::new(9, 33)),
+    ("plando_vars.34_int", UberIdentifier::new(9, 34)),
+    ("plando_vars.35_int", UberIdentifier::new(9, 35)),
+    ("plando_vars.36_int", UberIdentifier::new(9, 36)),
+    ("plando_vars.37_int", UberIdentifier::new(9, 37)),
+    ("plando_vars.38_int", UberIdentifier::new(9, 38)),
+    ("plando_vars.39_int", UberIdentifier::new(9, 39)),
+    ("plando_vars.40_int", UberIdentifier::new(9, 40)),
+    ("plando_vars.41_int", UberIdentifier::new(9, 41)),
+    ("plando_vars.42_int", UberIdentifier::new(9, 42)),
+    ("plando_vars.43_int", UberIdentifier::new(9, 43)),
+    ("plando_vars.44_int", UberIdentifier::new(9, 44)),
+    ("plando_vars.45_int", UberIdentifier::new(9, 45)),
+    ("plando_vars.46_int", UberIdentifier::new(9, 46)),
+    ("plando_vars.47_int", UberIdentifier::new(9, 47)),
+    ("plando_vars.48_int", UberIdentifier::new(9, 48)),
+    ("plando_vars.49_int", UberIdentifier::new(9, 49)),
+    ("plando_vars.50_int", UberIdentifier::new(9, 50)),
+    ("plando_vars.51_int", UberIdentifier::new(9, 51)),
+    ("plando_vars.52_int", UberIdentifier::new(9, 52)),
+    ("plando_vars.53_int", UberIdentifier::new(9, 53)),
+    ("plando_vars.54_int", UberIdentifier::new(9, 54)),
+    ("plando_vars.55_int", UberIdentifier::new(9, 55)),
+    ("plando_vars.56_int", UberIdentifier::new(9, 56)),
+    ("plando_vars.57_int", UberIdentifier::new(9, 57)),
+    ("plando_vars.58_int", UberIdentifier::new(9, 58)),
+    ("plando_vars.59_int", UberIdentifier::new(9, 59)),
+    ("plando_vars.60_int", UberIdentifier::new(9, 60)),
+    ("plando_vars.61_int", UberIdentifier::new(9, 61)),
+    ("plando_vars.62_int", UberIdentifier::new(9, 62)),
+    ("plando_vars.63_int", UberIdentifier::new(9, 63)),
+    ("plando_vars.64_int", UberIdentifier::new(9, 64)),
+    ("plando_vars.65_int", UberIdentifier::new(9, 65)),
+    ("plando_vars.66_int", UberIdentifier::new(9, 66)),
+    ("plando_vars.67_int", UberIdentifier::new(9, 67)),
+    ("plando_vars.68_int", UberIdentifier::new(9, 68)),
+    ("plando_vars.69_int", UberIdentifier::new(9, 69)),
+    ("plando_vars.70_int", UberIdentifier::new(9, 70)),
+    ("plando_vars.71_int", UberIdentifier::new(9, 71)),
+    ("plando_vars.72_int", UberIdentifier::new(9, 72)),
+    ("plando_vars.73_int", UberIdentifier::new(9, 73)),
+    ("plando_vars.74_int", UberIdentifier::new(9, 74)),
+    ("plando_vars.75_int", UberIdentifier::new(9, 75)),
+    ("plando_vars.76_int", UberIdentifier::new(9, 76)),
+    ("plando_vars.77_int", UberIdentifier::new(9, 77)),
+    ("plando_vars.78_int", UberIdentifier::new(9, 78)),
+    ("plando_vars.79_int", UberIdentifier::new(9, 79)),
+    ("plando_vars.80_int", UberIdentifier::new(9, 80)),
+    ("plando_vars.81_int", UberIdentifier::new(9, 81)),
+    ("plando_vars.82_int", UberIdentifier::new(9, 82)),
+    ("plando_vars.83_int", UberIdentifier::new(9, 83)),
+    ("plando_vars.84_int", UberIdentifier::new(9, 84)),
+    ("plando_vars.85_int", UberIdentifier::new(9, 85)),
+    ("plando_vars.86_int", UberIdentifier::new(9, 86)),
+    ("plando_vars.87_int", UberIdentifier::new(9, 87)),
+    ("plando_vars.88_int", UberIdentifier::new(9, 88)),
+    ("plando_vars.89_int", UberIdentifier::new(9, 89)),
+    ("plando_vars.90_int", UberIdentifier::new(9, 90)),
+    ("plando_vars.91_int", UberIdentifier::new(9, 91)),
+    ("plando_vars.92_int", UberIdentifier::new(9, 92)),
+    ("plando_vars.93_int", UberIdentifier::new(9, 93)),
+    ("plando_vars.94_int", UberIdentifier::new(9, 94)),
+    ("plando_vars.95_int", UberIdentifier::new(9, 95)),
+    ("plando_vars.96_int", UberIdentifier::new(9, 96)),
+    ("plando_vars.97_int", UberIdentifier::new(9, 97)),
+    ("plando_vars.98_int", UberIdentifier::new(9, 98)),
+    ("plando_vars.99_int", UberIdentifier::new(9, 99)),
+    ("plando_vars.150_float", UberIdentifier::new(9, 150)),
+    ("plando_vars.151_float", UberIdentifier::new(9, 151)),
+    ("plando_vars.152_float", UberIdentifier::new(9, 152)),
+    ("plando_vars.153_float", UberIdentifier::new(9, 153)),
+    ("plando_vars.154_float", UberIdentifier::new(9, 154)),
+    ("plando_vars.155_float", UberIdentifier::new(9, 155)),
+    ("plando_vars.156_float", UberIdentifier::new(9, 156)),
+    ("plando_vars.157_float", UberIdentifier::new(9, 157)),
+    ("plando_vars.158_float", UberIdentifier::new(9, 158)),
+    ("plando_vars.159_float", UberIdentifier::new(9, 159)),
+    ("plando_vars.160_float", UberIdentifier::new(9, 160)),
+    ("plando_vars.161_float", UberIdentifier::new(9, 161)),
+    ("plando_vars.162_float", UberIdentifier::new(9, 162)),
+    ("plando_vars.163_float", UberIdentifier::new(9, 163)),
+    ("plando_vars.164_float", UberIdentifier::new(9, 164)),
+    ("plando_vars.165_float", UberIdentifier::new(9, 165)),
+    ("plando_vars.166_float", UberIdentifier::new(9, 166)),
+    ("plando_vars.167_float", UberIdentifier::new(9, 167)),
+    ("plando_vars.168_float", UberIdentifier::new(9, 168)),
+    ("plando_vars.169_float", UberIdentifier::new(9, 169)),
+    ("plando_vars.170_float", UberIdentifier::new(9, 170)),
+    ("plando_vars.171_float", UberIdentifier::new(9, 171)),
+    ("plando_vars.172_float", UberIdentifier::new(9, 172)),
+    ("plando_vars.173_float", UberIdentifier::new(9, 173)),
+    ("plando_vars.174_float", UberIdentifier::new(9, 174)),
+    ("bingo_state.Squares", UberIdentifier::new(10, 0)),
+    ("bingo_state.Lines", UberIdentifier::new(10, 1)),
+    ("bingo_state.Rank", UberIdentifier::new(10, 2)),
+    ("bingo_state.Kills", UberIdentifier::new(10, 10)),
+    ("bingo_state.SwordKills", UberIdentifier::new(10, 11)),
+    ("bingo_state.HammerKills", UberIdentifier::new(10, 12)),
+    ("bingo_state.BowKills", UberIdentifier::new(10, 13)),
+    ("bingo_state.SpearKills", UberIdentifier::new(10, 14)),
+    ("bingo_state.SentryKills", UberIdentifier::new(10, 15)),
+    ("bingo_state.BlazeKills", UberIdentifier::new(10, 16)),
+    ("bingo_state.GrenadeKills", UberIdentifier::new(10, 17)),
+    ("bingo_state.BurnDoTKills", UberIdentifier::new(10, 18)),
+    ("bingo_state.ShurikenKills", UberIdentifier::new(10, 19)),
+    ("bingo_state.LaunchKills", UberIdentifier::new(10, 20)),
+    ("bingo_state.FlashKills", UberIdentifier::new(10, 21)),
+    ("bingo_state.BashKills", UberIdentifier::new(10, 22)),
+    ("bingo_state.DrownedEnemies", UberIdentifier::new(10, 23)),
+    ("bingo_state.MinerKills", UberIdentifier::new(10, 40)),
+    ("bingo_state.FlierKills", UberIdentifier::new(10, 41)),
+    ("bingo_state.TentaKills", UberIdentifier::new(10, 42)),
+    ("bingo_state.SlimeKills", UberIdentifier::new(10, 43)),
+    ("bingo_state.FishKills", UberIdentifier::new(10, 44)),
+    ("bingo_state.ExploderKills", UberIdentifier::new(10, 45)),
+    ("appliers_serialization.0_id", UberIdentifier::new(11, 0)),
+    ("appliers_serialization.1_value", UberIdentifier::new(11, 1)),
+    ("appliers_serialization.2_id", UberIdentifier::new(11, 2)),
+    ("appliers_serialization.3_value", UberIdentifier::new(11, 3)),
+    ("appliers_serialization.4_id", UberIdentifier::new(11, 4)),
+    ("appliers_serialization.5_value", UberIdentifier::new(11, 5)),
+    ("appliers_serialization.6_id", UberIdentifier::new(11, 6)),
+    ("appliers_serialization.7_value", UberIdentifier::new(11, 7)),
+    ("appliers_serialization.8_id", UberIdentifier::new(11, 8)),
+    ("appliers_serialization.9_value", UberIdentifier::new(11, 9)),
+    ("appliers_serialization.10_id", UberIdentifier::new(11, 10)),
     (
         "appliers_serialization.11_value",
         UberIdentifier::new(11, 11),
     ),
-    (
-        "appliers_serialization.12_id",
-        UberIdentifier::new(11, 12),
-    ),
+    ("appliers_serialization.12_id", UberIdentifier::new(11, 12)),
     (
         "appliers_serialization.13_value",
         UberIdentifier::new(11, 13),
     ),
-    (
-        "appliers_serialization.14_id",
-        UberIdentifier::new(11, 14),
-    ),
+    ("appliers_serialization.14_id", UberIdentifier::new(11, 14)),
     (
         "appliers_serialization.15_value",
         UberIdentifier::new(11, 15),
     ),
-    (
-        "appliers_serialization.16_id",
-        UberIdentifier::new(11, 16),
-    ),
+    ("appliers_serialization.16_id", UberIdentifier::new(11, 16)),
     (
         "appliers_serialization.17_value",
         UberIdentifier::new(11, 17),
     ),
-    (
-        "appliers_serialization.18_id",
-        UberIdentifier::new(11, 18),
-    ),
+    ("appliers_serialization.18_id", UberIdentifier::new(11, 18)),
     (
         "appliers_serialization.19_value",
         UberIdentifier::new(11, 19),
     ),
-    (
-        "appliers_serialization.20_id",
-        UberIdentifier::new(11, 20),
-    ),
+    ("appliers_serialization.20_id", UberIdentifier::new(11, 20)),
     (
         "appliers_serialization.21_value",
         UberIdentifier::new(11, 21),
     ),
-    (
-        "appliers_serialization.22_id",
-        UberIdentifier::new(11, 22),
-    ),
+    ("appliers_serialization.22_id", UberIdentifier::new(11, 22)),
     (
         "appliers_serialization.23_value",
         UberIdentifier::new(11, 23),
     ),
-    (
-        "appliers_serialization.24_id",
-        UberIdentifier::new(11, 24),
-    ),
+    ("appliers_serialization.24_id", UberIdentifier::new(11, 24)),
     (
         "appliers_serialization.25_value",
         UberIdentifier::new(11, 25),
     ),
-    (
-        "appliers_serialization.26_id",
-        UberIdentifier::new(11, 26),
-    ),
+    ("appliers_serialization.26_id", UberIdentifier::new(11, 26)),
     (
         "appliers_serialization.27_value",
         UberIdentifier::new(11, 27),
     ),
-    (
-        "appliers_serialization.28_id",
-        UberIdentifier::new(11, 28),
-    ),
+    ("appliers_serialization.28_id", UberIdentifier::new(11, 28)),
     (
         "appliers_serialization.29_value",
         UberIdentifier::new(11, 29),
     ),
-    (
-        "appliers_serialization.30_id",
-        UberIdentifier::new(11, 30),
-    ),
+    ("appliers_serialization.30_id", UberIdentifier::new(11, 30)),
     (
         "appliers_serialization.31_value",
         UberIdentifier::new(11, 31),
     ),
-    (
-        "appliers_serialization.32_id",
-        UberIdentifier::new(11, 32),
-    ),
+    ("appliers_serialization.32_id", UberIdentifier::new(11, 32)),
     (
         "appliers_serialization.33_value",
         UberIdentifier::new(11, 33),
     ),
-    (
-        "appliers_serialization.34_id",
-        UberIdentifier::new(11, 34),
-    ),
+    ("appliers_serialization.34_id", UberIdentifier::new(11, 34)),
     (
         "appliers_serialization.35_value",
         UberIdentifier::new(11, 35),
     ),
-    (
-        "appliers_serialization.36_id",
-        UberIdentifier::new(11, 36),
-    ),
+    ("appliers_serialization.36_id", UberIdentifier::new(11, 36)),
     (
         "appliers_serialization.37_value",
         UberIdentifier::new(11, 37),
     ),
-    (
-        "appliers_serialization.38_id",
-        UberIdentifier::new(11, 38),
-    ),
+    ("appliers_serialization.38_id", UberIdentifier::new(11, 38)),
     (
         "appliers_serialization.39_value",
         UberIdentifier::new(11, 39),
     ),
-    (
-        "appliers_serialization.40_id",
-        UberIdentifier::new(11, 40),
-    ),
+    ("appliers_serialization.40_id", UberIdentifier::new(11, 40)),
     (
         "appliers_serialization.41_value",
         UberIdentifier::new(11, 41),
     ),
-    (
-        "appliers_serialization.42_id",
-        UberIdentifier::new(11, 42),
-    ),
+    ("appliers_serialization.42_id", UberIdentifier::new(11, 42)),
     (
         "appliers_serialization.43_value",
         UberIdentifier::new(11, 43),
     ),
-    (
-        "appliers_serialization.44_id",
-        UberIdentifier::new(11, 44),
-    ),
+    ("appliers_serialization.44_id", UberIdentifier::new(11, 44)),
     (
         "appliers_serialization.45_value",
         UberIdentifier::new(11, 45),
     ),
-    (
-        "appliers_serialization.46_id",
-        UberIdentifier::new(11, 46),
-    ),
+    ("appliers_serialization.46_id", UberIdentifier::new(11, 46)),
     (
         "appliers_serialization.47_value",
         UberIdentifier::new(11, 47),
     ),
-    (
-        "appliers_serialization.48_id",
-        UberIdentifier::new(11, 48),
-    ),
+    ("appliers_serialization.48_id", UberIdentifier::new(11, 48)),
     (
         "appliers_serialization.49_value",
         UberIdentifier::new(11, 49),
     ),
-    (
-        "appliers_serialization.50_id",
-        UberIdentifier::new(11, 50),
-    ),
+    ("appliers_serialization.50_id", UberIdentifier::new(11, 50)),
     (
         "appliers_serialization.51_value",
         UberIdentifier::new(11, 51),
     ),
-    (
-        "appliers_serialization.52_id",
-        UberIdentifier::new(11, 52),
-    ),
+    ("appliers_serialization.52_id", UberIdentifier::new(11, 52)),
     (
         "appliers_serialization.53_value",
         UberIdentifier::new(11, 53),
     ),
-    (
-        "appliers_serialization.54_id",
-        UberIdentifier::new(11, 54),
-    ),
+    ("appliers_serialization.54_id", UberIdentifier::new(11, 54)),
     (
         "appliers_serialization.55_value",
         UberIdentifier::new(11, 55),
     ),
-    (
-        "appliers_serialization.56_id",
-        UberIdentifier::new(11, 56),
-    ),
+    ("appliers_serialization.56_id", UberIdentifier::new(11, 56)),
     (
         "appliers_serialization.57_value",
         UberIdentifier::new(11, 57),
     ),
-    (
-        "appliers_serialization.58_id",
-        UberIdentifier::new(11, 58),
-    ),
+    ("appliers_serialization.58_id", UberIdentifier::new(11, 58)),
     (
         "appliers_serialization.59_value",
         UberIdentifier::new(11, 59),
     ),
-    (
-        "appliers_serialization.60_id",
-        UberIdentifier::new(11, 60),
-    ),
+    ("appliers_serialization.60_id", UberIdentifier::new(11, 60)),
     (
         "appliers_serialization.61_value",
         UberIdentifier::new(11, 61),
     ),
-    (
-        "appliers_serialization.62_id",
-        UberIdentifier::new(11, 62),
-    ),
+    ("appliers_serialization.62_id", UberIdentifier::new(11, 62)),
     (
         "appliers_serialization.63_value",
         UberIdentifier::new(11, 63),
     ),
-    (
-        "appliers_serialization.64_id",
-        UberIdentifier::new(11, 64),
-    ),
+    ("appliers_serialization.64_id", UberIdentifier::new(11, 64)),
     (
         "appliers_serialization.65_value",
         UberIdentifier::new(11, 65),
     ),
-    (
-        "appliers_serialization.66_id",
-        UberIdentifier::new(11, 66),
-    ),
+    ("appliers_serialization.66_id", UberIdentifier::new(11, 66)),
     (
         "appliers_serialization.67_value",
         UberIdentifier::new(11, 67),
     ),
-    (
-        "appliers_serialization.68_id",
-        UberIdentifier::new(11, 68),
-    ),
+    ("appliers_serialization.68_id", UberIdentifier::new(11, 68)),
     (
         "appliers_serialization.69_value",
         UberIdentifier::new(11, 69),
     ),
-    (
-        "appliers_serialization.70_id",
-        UberIdentifier::new(11, 70),
-    ),
+    ("appliers_serialization.70_id", UberIdentifier::new(11, 70)),
     (
         "appliers_serialization.71_value",
         UberIdentifier::new(11, 71),
     ),
-    (
-        "appliers_serialization.72_id",
-        UberIdentifier::new(11, 72),
-    ),
+    ("appliers_serialization.72_id", UberIdentifier::new(11, 72)),
     (
         "appliers_serialization.73_value",
         UberIdentifier::new(11, 73),
     ),
-    (
-        "appliers_serialization.74_id",
-        UberIdentifier::new(11, 74),
-    ),
+    ("appliers_serialization.74_id", UberIdentifier::new(11, 74)),
     (
         "appliers_serialization.75_value",
         UberIdentifier::new(11, 75),
     ),
-    (
-        "appliers_serialization.76_id",
-        UberIdentifier::new(11, 76),
-    ),
+    ("appliers_serialization.76_id", UberIdentifier::new(11, 76)),
     (
         "appliers_serialization.77_value",
         UberIdentifier::new(11, 77),
     ),
-    (
-        "appliers_serialization.78_id",
-        UberIdentifier::new(11, 78),
-    ),
+    ("appliers_serialization.78_id", UberIdentifier::new(11, 78)),
     (
         "appliers_serialization.79_value",
         UberIdentifier::new(11, 79),
     ),
-    (
-        "appliers_serialization.80_id",
-        UberIdentifier::new(11, 80),
-    ),
+    ("appliers_serialization.80_id", UberIdentifier::new(11, 80)),
     (
         "appliers_serialization.81_value",
         UberIdentifier::new(11, 81),
     ),
-    (
-        "appliers_serialization.82_id",
-        UberIdentifier::new(11, 82),
-    ),
+    ("appliers_serialization.82_id", UberIdentifier::new(11, 82)),
     (
         "appliers_serialization.83_value",
         UberIdentifier::new(11, 83),
     ),
-    (
-        "appliers_serialization.84_id",
-        UberIdentifier::new(11, 84),
-    ),
+    ("appliers_serialization.84_id", UberIdentifier::new(11, 84)),
     (
         "appliers_serialization.85_value",
         UberIdentifier::new(11, 85),
     ),
-    (
-        "appliers_serialization.86_id",
-        UberIdentifier::new(11, 86),
-    ),
+    ("appliers_serialization.86_id", UberIdentifier::new(11, 86)),
     (
         "appliers_serialization.87_value",
         UberIdentifier::new(11, 87),
     ),
-    (
-        "appliers_serialization.88_id",
-        UberIdentifier::new(11, 88),
-    ),
+    ("appliers_serialization.88_id", UberIdentifier::new(11, 88)),
     (
         "appliers_serialization.89_value",
         UberIdentifier::new(11, 89),
     ),
-    (
-        "appliers_serialization.90_id",
-        UberIdentifier::new(11, 90),
-    ),
+    ("appliers_serialization.90_id", UberIdentifier::new(11, 90)),
     (
         "appliers_serialization.91_value",
         UberIdentifier::new(11, 91),
     ),
-    (
-        "appliers_serialization.92_id",
-        UberIdentifier::new(11, 92),
-    ),
+    ("appliers_serialization.92_id", UberIdentifier::new(11, 92)),
     (
         "appliers_serialization.93_value",
         UberIdentifier::new(11, 93),
     ),
-    (
-        "appliers_serialization.94_id",
-        UberIdentifier::new(11, 94),
-    ),
+    ("appliers_serialization.94_id", UberIdentifier::new(11, 94)),
     (
         "appliers_serialization.95_value",
         UberIdentifier::new(11, 95),
     ),
-    (
-        "appliers_serialization.96_id",
-        UberIdentifier::new(11, 96),
-    ),
+    ("appliers_serialization.96_id", UberIdentifier::new(11, 96)),
     (
         "appliers_serialization.97_value",
         UberIdentifier::new(11, 97),
     ),
-    (
-        "appliers_serialization.98_id",
-        UberIdentifier::new(11, 98),
-    ),
+    ("appliers_serialization.98_id", UberIdentifier::new(11, 98)),
     (
         "appliers_serialization.99_value",
         UberIdentifier::new(11, 99),
     ),
-    (
-        "multi_vars.0_multi",
-        UberIdentifier::new(12, 0),
-    ),
-    (
-        "multi_vars.1_multi",
-        UberIdentifier::new(12, 1),
-    ),
-    (
-        "multi_vars.2_multi",
-        UberIdentifier::new(12, 2),
-    ),
-    (
-        "multi_vars.3_multi",
-        UberIdentifier::new(12, 3),
-    ),
-    (
-        "multi_vars.4_multi",
-        UberIdentifier::new(12, 4),
-    ),
-    (
-        "multi_vars.5_multi",
-        UberIdentifier::new(12, 5),
-    ),
-    (
-        "multi_vars.6_multi",
-        UberIdentifier::new(12, 6),
-    ),
-    (
-        "multi_vars.7_multi",
-        UberIdentifier::new(12, 7),
-    ),
-    (
-        "multi_vars.8_multi",
-        UberIdentifier::new(12, 8),
-    ),
-    (
-        "multi_vars.9_multi",
-        UberIdentifier::new(12, 9),
-    ),
-    (
-        "multi_vars.10_multi",
-        UberIdentifier::new(12, 10),
-    ),
-    (
-        "multi_vars.11_multi",
-        UberIdentifier::new(12, 11),
-    ),
-    (
-        "multi_vars.12_multi",
-        UberIdentifier::new(12, 12),
-    ),
-    (
-        "multi_vars.13_multi",
-        UberIdentifier::new(12, 13),
-    ),
-    (
-        "multi_vars.14_multi",
-        UberIdentifier::new(12, 14),
-    ),
-    (
-        "multi_vars.15_multi",
-        UberIdentifier::new(12, 15),
-    ),
-    (
-        "multi_vars.16_multi",
-        UberIdentifier::new(12, 16),
-    ),
-    (
-        "multi_vars.17_multi",
-        UberIdentifier::new(12, 17),
-    ),
-    (
-        "multi_vars.18_multi",
-        UberIdentifier::new(12, 18),
-    ),
-    (
-        "multi_vars.19_multi",
-        UberIdentifier::new(12, 19),
-    ),
-    (
-        "multi_vars.20_multi",
-        UberIdentifier::new(12, 20),
-    ),
-    (
-        "multi_vars.21_multi",
-        UberIdentifier::new(12, 21),
-    ),
-    (
-        "multi_vars.22_multi",
-        UberIdentifier::new(12, 22),
-    ),
-    (
-        "multi_vars.23_multi",
-        UberIdentifier::new(12, 23),
-    ),
-    (
-        "multi_vars.24_multi",
-        UberIdentifier::new(12, 24),
-    ),
-    (
-        "multi_vars.25_multi",
-        UberIdentifier::new(12, 25),
-    ),
-    (
-        "multi_vars.26_multi",
-        UberIdentifier::new(12, 26),
-    ),
-    (
-        "multi_vars.27_multi",
-        UberIdentifier::new(12, 27),
-    ),
-    (
-        "multi_vars.28_multi",
-        UberIdentifier::new(12, 28),
-    ),
-    (
-        "multi_vars.29_multi",
-        UberIdentifier::new(12, 29),
-    ),
-    (
-        "multi_vars.30_multi",
-        UberIdentifier::new(12, 30),
-    ),
-    (
-        "multi_vars.31_multi",
-        UberIdentifier::new(12, 31),
-    ),
-    (
-        "multi_vars.32_multi",
-        UberIdentifier::new(12, 32),
-    ),
-    (
-        "multi_vars.33_multi",
-        UberIdentifier::new(12, 33),
-    ),
-    (
-        "multi_vars.34_multi",
-        UberIdentifier::new(12, 34),
-    ),
-    (
-        "multi_vars.35_multi",
-        UberIdentifier::new(12, 35),
-    ),
-    (
-        "multi_vars.36_multi",
-        UberIdentifier::new(12, 36),
-    ),
-    (
-        "multi_vars.37_multi",
-        UberIdentifier::new(12, 37),
-    ),
-    (
-        "multi_vars.38_multi",
-        UberIdentifier::new(12, 38),
-    ),
-    (
-        "multi_vars.39_multi",
-        UberIdentifier::new(12, 39),
-    ),
-    (
-        "multi_vars.40_multi",
-        UberIdentifier::new(12, 40),
-    ),
-    (
-        "multi_vars.41_multi",
-        UberIdentifier::new(12, 41),
-    ),
-    (
-        "multi_vars.42_multi",
-        UberIdentifier::new(12, 42),
-    ),
-    (
-        "multi_vars.43_multi",
-        UberIdentifier::new(12, 43),
-    ),
-    (
-        "multi_vars.44_multi",
-        UberIdentifier::new(12, 44),
-    ),
-    (
-        "multi_vars.45_multi",
-        UberIdentifier::new(12, 45),
-    ),
-    (
-        "multi_vars.46_multi",
-        UberIdentifier::new(12, 46),
-    ),
-    (
-        "multi_vars.47_multi",
-        UberIdentifier::new(12, 47),
-    ),
-    (
-        "multi_vars.48_multi",
-        UberIdentifier::new(12, 48),
-    ),
-    (
-        "multi_vars.49_multi",
-        UberIdentifier::new(12, 49),
-    ),
-    (
-        "multi_vars.50_multi",
-        UberIdentifier::new(12, 50),
-    ),
-    (
-        "multi_vars.51_multi",
-        UberIdentifier::new(12, 51),
-    ),
-    (
-        "multi_vars.52_multi",
-        UberIdentifier::new(12, 52),
-    ),
-    (
-        "multi_vars.53_multi",
-        UberIdentifier::new(12, 53),
-    ),
-    (
-        "multi_vars.54_multi",
-        UberIdentifier::new(12, 54),
-    ),
-    (
-        "multi_vars.55_multi",
-        UberIdentifier::new(12, 55),
-    ),
-    (
-        "multi_vars.56_multi",
-        UberIdentifier::new(12, 56),
-    ),
-    (
-        "multi_vars.57_multi",
-        UberIdentifier::new(12, 57),
-    ),
-    (
-        "multi_vars.58_multi",
-        UberIdentifier::new(12, 58),
-    ),
-    (
-        "multi_vars.59_multi",
-        UberIdentifier::new(12, 59),
-    ),
-    (
-        "multi_vars.60_multi",
-        UberIdentifier::new(12, 60),
-    ),
-    (
-        "multi_vars.61_multi",
-        UberIdentifier::new(12, 61),
-    ),
-    (
-        "multi_vars.62_multi",
-        UberIdentifier::new(12, 62),
-    ),
-    (
-        "multi_vars.63_multi",
-        UberIdentifier::new(12, 63),
-    ),
-    (
-        "multi_vars.64_multi",
-        UberIdentifier::new(12, 64),
-    ),
-    (
-        "multi_vars.65_multi",
-        UberIdentifier::new(12, 65),
-    ),
-    (
-        "multi_vars.66_multi",
-        UberIdentifier::new(12, 66),
-    ),
-    (
-        "multi_vars.67_multi",
-        UberIdentifier::new(12, 67),
-    ),
-    (
-        "multi_vars.68_multi",
-        UberIdentifier::new(12, 68),
-    ),
-    (
-        "multi_vars.69_multi",
-        UberIdentifier::new(12, 69),
-    ),
-    (
-        "multi_vars.70_multi",
-        UberIdentifier::new(12, 70),
-    ),
-    (
-        "multi_vars.71_multi",
-        UberIdentifier::new(12, 71),
-    ),
-    (
-        "multi_vars.72_multi",
-        UberIdentifier::new(12, 72),
-    ),
-    (
-        "multi_vars.73_multi",
-        UberIdentifier::new(12, 73),
-    ),
-    (
-        "multi_vars.74_multi",
-        UberIdentifier::new(12, 74),
-    ),
-    (
-        "multi_vars.75_multi",
-        UberIdentifier::new(12, 75),
-    ),
-    (
-        "multi_vars.76_multi",
-        UberIdentifier::new(12, 76),
-    ),
-    (
-        "multi_vars.77_multi",
-        UberIdentifier::new(12, 77),
-    ),
-    (
-        "multi_vars.78_multi",
-        UberIdentifier::new(12, 78),
-    ),
-    (
-        "multi_vars.79_multi",
-        UberIdentifier::new(12, 79),
-    ),
-    (
-        "multi_vars.80_multi",
-        UberIdentifier::new(12, 80),
-    ),
-    (
-        "multi_vars.81_multi",
-        UberIdentifier::new(12, 81),
-    ),
-    (
-        "multi_vars.82_multi",
-        UberIdentifier::new(12, 82),
-    ),
-    (
-        "multi_vars.83_multi",
-        UberIdentifier::new(12, 83),
-    ),
-    (
-        "multi_vars.84_multi",
-        UberIdentifier::new(12, 84),
-    ),
-    (
-        "multi_vars.85_multi",
-        UberIdentifier::new(12, 85),
-    ),
-    (
-        "multi_vars.86_multi",
-        UberIdentifier::new(12, 86),
-    ),
-    (
-        "multi_vars.87_multi",
-        UberIdentifier::new(12, 87),
-    ),
-    (
-        "multi_vars.88_multi",
-        UberIdentifier::new(12, 88),
-    ),
-    (
-        "multi_vars.89_multi",
-        UberIdentifier::new(12, 89),
-    ),
-    (
-        "multi_vars.90_multi",
-        UberIdentifier::new(12, 90),
-    ),
-    (
-        "multi_vars.91_multi",
-        UberIdentifier::new(12, 91),
-    ),
-    (
-        "multi_vars.92_multi",
-        UberIdentifier::new(12, 92),
-    ),
-    (
-        "multi_vars.93_multi",
-        UberIdentifier::new(12, 93),
-    ),
-    (
-        "multi_vars.94_multi",
-        UberIdentifier::new(12, 94),
-    ),
-    (
-        "multi_vars.95_multi",
-        UberIdentifier::new(12, 95),
-    ),
-    (
-        "multi_vars.96_multi",
-        UberIdentifier::new(12, 96),
-    ),
-    (
-        "multi_vars.97_multi",
-        UberIdentifier::new(12, 97),
-    ),
-    (
-        "multi_vars.98_multi",
-        UberIdentifier::new(12, 98),
-    ),
-    (
-        "multi_vars.99_multi",
-        UberIdentifier::new(12, 99),
-    ),
-    (
-        "rando_stats.Deaths",
-        UberIdentifier::new(14, 101),
-    ),
-    (
-        "rando_stats.warps used",
-        UberIdentifier::new(14, 106),
-    ),
-    (
-        "rando_stats.Peak PPM count",
-        UberIdentifier::new(14, 108),
-    ),
-    (
-        "rando_stats.Marsh Time",
-        UberIdentifier::new(14, 0),
-    ),
-    (
-        "rando_stats.Hollow Time",
-        UberIdentifier::new(14, 1),
-    ),
-    (
-        "rando_stats.Glades Time",
-        UberIdentifier::new(14, 2),
-    ),
-    (
-        "rando_stats.Wellspring Time",
-        UberIdentifier::new(14, 3),
-    ),
-    (
-        "rando_stats.Burrows Time",
-        UberIdentifier::new(14, 4),
-    ),
-    (
-        "rando_stats.Woods Time",
-        UberIdentifier::new(14, 5),
-    ),
-    (
-        "rando_stats.Reach Time",
-        UberIdentifier::new(14, 6),
-    ),
-    (
-        "rando_stats.Pools Time",
-        UberIdentifier::new(14, 7),
-    ),
-    (
-        "rando_stats.Depths Time",
-        UberIdentifier::new(14, 8),
-    ),
-    (
-        "rando_stats.Wastes Time",
-        UberIdentifier::new(14, 9),
-    ),
-    (
-        "rando_stats.Ruins Time",
-        UberIdentifier::new(14, 10),
-    ),
-    (
-        "rando_stats.Willow Time",
-        UberIdentifier::new(14, 11),
-    ),
-    (
-        "rando_stats.Void Time",
-        UberIdentifier::new(14, 12),
-    ),
-    (
-        "rando_stats.Time",
-        UberIdentifier::new(14, 100),
-    ),
-    (
-        "rando_stats.Current Drought",
-        UberIdentifier::new(14, 102),
-    ),
-    (
-        "rando_stats.Longest Drought",
-        UberIdentifier::new(14, 103),
-    ),
+    ("multi_vars.0_multi", UberIdentifier::new(12, 0)),
+    ("multi_vars.1_multi", UberIdentifier::new(12, 1)),
+    ("multi_vars.2_multi", UberIdentifier::new(12, 2)),
+    ("multi_vars.3_multi", UberIdentifier::new(12, 3)),
+    ("multi_vars.4_multi", UberIdentifier::new(12, 4)),
+    ("multi_vars.5_multi", UberIdentifier::new(12, 5)),
+    ("multi_vars.6_multi", UberIdentifier::new(12, 6)),
+    ("multi_vars.7_multi", UberIdentifier::new(12, 7)),
+    ("multi_vars.8_multi", UberIdentifier::new(12, 8)),
+    ("multi_vars.9_multi", UberIdentifier::new(12, 9)),
+    ("multi_vars.10_multi", UberIdentifier::new(12, 10)),
+    ("multi_vars.11_multi", UberIdentifier::new(12, 11)),
+    ("multi_vars.12_multi", UberIdentifier::new(12, 12)),
+    ("multi_vars.13_multi", UberIdentifier::new(12, 13)),
+    ("multi_vars.14_multi", UberIdentifier::new(12, 14)),
+    ("multi_vars.15_multi", UberIdentifier::new(12, 15)),
+    ("multi_vars.16_multi", UberIdentifier::new(12, 16)),
+    ("multi_vars.17_multi", UberIdentifier::new(12, 17)),
+    ("multi_vars.18_multi", UberIdentifier::new(12, 18)),
+    ("multi_vars.19_multi", UberIdentifier::new(12, 19)),
+    ("multi_vars.20_multi", UberIdentifier::new(12, 20)),
+    ("multi_vars.21_multi", UberIdentifier::new(12, 21)),
+    ("multi_vars.22_multi", UberIdentifier::new(12, 22)),
+    ("multi_vars.23_multi", UberIdentifier::new(12, 23)),
+    ("multi_vars.24_multi", UberIdentifier::new(12, 24)),
+    ("multi_vars.25_multi", UberIdentifier::new(12, 25)),
+    ("multi_vars.26_multi", UberIdentifier::new(12, 26)),
+    ("multi_vars.27_multi", UberIdentifier::new(12, 27)),
+    ("multi_vars.28_multi", UberIdentifier::new(12, 28)),
+    ("multi_vars.29_multi", UberIdentifier::new(12, 29)),
+    ("multi_vars.30_multi", UberIdentifier::new(12, 30)),
+    ("multi_vars.31_multi", UberIdentifier::new(12, 31)),
+    ("multi_vars.32_multi", UberIdentifier::new(12, 32)),
+    ("multi_vars.33_multi", UberIdentifier::new(12, 33)),
+    ("multi_vars.34_multi", UberIdentifier::new(12, 34)),
+    ("multi_vars.35_multi", UberIdentifier::new(12, 35)),
+    ("multi_vars.36_multi", UberIdentifier::new(12, 36)),
+    ("multi_vars.37_multi", UberIdentifier::new(12, 37)),
+    ("multi_vars.38_multi", UberIdentifier::new(12, 38)),
+    ("multi_vars.39_multi", UberIdentifier::new(12, 39)),
+    ("multi_vars.40_multi", UberIdentifier::new(12, 40)),
+    ("multi_vars.41_multi", UberIdentifier::new(12, 41)),
+    ("multi_vars.42_multi", UberIdentifier::new(12, 42)),
+    ("multi_vars.43_multi", UberIdentifier::new(12, 43)),
+    ("multi_vars.44_multi", UberIdentifier::new(12, 44)),
+    ("multi_vars.45_multi", UberIdentifier::new(12, 45)),
+    ("multi_vars.46_multi", UberIdentifier::new(12, 46)),
+    ("multi_vars.47_multi", UberIdentifier::new(12, 47)),
+    ("multi_vars.48_multi", UberIdentifier::new(12, 48)),
+    ("multi_vars.49_multi", UberIdentifier::new(12, 49)),
+    ("multi_vars.50_multi", UberIdentifier::new(12, 50)),
+    ("multi_vars.51_multi", UberIdentifier::new(12, 51)),
+    ("multi_vars.52_multi", UberIdentifier::new(12, 52)),
+    ("multi_vars.53_multi", UberIdentifier::new(12, 53)),
+    ("multi_vars.54_multi", UberIdentifier::new(12, 54)),
+    ("multi_vars.55_multi", UberIdentifier::new(12, 55)),
+    ("multi_vars.56_multi", UberIdentifier::new(12, 56)),
+    ("multi_vars.57_multi", UberIdentifier::new(12, 57)),
+    ("multi_vars.58_multi", UberIdentifier::new(12, 58)),
+    ("multi_vars.59_multi", UberIdentifier::new(12, 59)),
+    ("multi_vars.60_multi", UberIdentifier::new(12, 60)),
+    ("multi_vars.61_multi", UberIdentifier::new(12, 61)),
+    ("multi_vars.62_multi", UberIdentifier::new(12, 62)),
+    ("multi_vars.63_multi", UberIdentifier::new(12, 63)),
+    ("multi_vars.64_multi", UberIdentifier::new(12, 64)),
+    ("multi_vars.65_multi", UberIdentifier::new(12, 65)),
+    ("multi_vars.66_multi", UberIdentifier::new(12, 66)),
+    ("multi_vars.67_multi", UberIdentifier::new(12, 67)),
+    ("multi_vars.68_multi", UberIdentifier::new(12, 68)),
+    ("multi_vars.69_multi", UberIdentifier::new(12, 69)),
+    ("multi_vars.70_multi", UberIdentifier::new(12, 70)),
+    ("multi_vars.71_multi", UberIdentifier::new(12, 71)),
+    ("multi_vars.72_multi", UberIdentifier::new(12, 72)),
+    ("multi_vars.73_multi", UberIdentifier::new(12, 73)),
+    ("multi_vars.74_multi", UberIdentifier::new(12, 74)),
+    ("multi_vars.75_multi", UberIdentifier::new(12, 75)),
+    ("multi_vars.76_multi", UberIdentifier::new(12, 76)),
+    ("multi_vars.77_multi", UberIdentifier::new(12, 77)),
+    ("multi_vars.78_multi", UberIdentifier::new(12, 78)),
+    ("multi_vars.79_multi", UberIdentifier::new(12, 79)),
+    ("multi_vars.80_multi", UberIdentifier::new(12, 80)),
+    ("multi_vars.81_multi", UberIdentifier::new(12, 81)),
+    ("multi_vars.82_multi", UberIdentifier::new(12, 82)),
+    ("multi_vars.83_multi", UberIdentifier::new(12, 83)),
+    ("multi_vars.84_multi", UberIdentifier::new(12, 84)),
+    ("multi_vars.85_multi", UberIdentifier::new(12, 85)),
+    ("multi_vars.86_multi", UberIdentifier::new(12, 86)),
+    ("multi_vars.87_multi", UberIdentifier::new(12, 87)),
+    ("multi_vars.88_multi", UberIdentifier::new(12, 88)),
+    ("multi_vars.89_multi", UberIdentifier::new(12, 89)),
+    ("multi_vars.90_multi", UberIdentifier::new(12, 90)),
+    ("multi_vars.91_multi", UberIdentifier::new(12, 91)),
+    ("multi_vars.92_multi", UberIdentifier::new(12, 92)),
+    ("multi_vars.93_multi", UberIdentifier::new(12, 93)),
+    ("multi_vars.94_multi", UberIdentifier::new(12, 94)),
+    ("multi_vars.95_multi", UberIdentifier::new(12, 95)),
+    ("multi_vars.96_multi", UberIdentifier::new(12, 96)),
+    ("multi_vars.97_multi", UberIdentifier::new(12, 97)),
+    ("multi_vars.98_multi", UberIdentifier::new(12, 98)),
+    ("multi_vars.99_multi", UberIdentifier::new(12, 99)),
+    ("rando_stats.Deaths", UberIdentifier::new(14, 101)),
+    ("rando_stats.warps used", UberIdentifier::new(14, 106)),
+    ("rando_stats.Peak PPM count", UberIdentifier::new(14, 108)),
+    ("rando_stats.Marsh Time", UberIdentifier::new(14, 0)),
+    ("rando_stats.Hollow Time", UberIdentifier::new(14, 1)),
+    ("rando_stats.Glades Time", UberIdentifier::new(14, 2)),
+    ("rando_stats.Wellspring Time", UberIdentifier::new(14, 3)),
+    ("rando_stats.Burrows Time", UberIdentifier::new(14, 4)),
+    ("rando_stats.Woods Time", UberIdentifier::new(14, 5)),
+    ("rando_stats.Reach Time", UberIdentifier::new(14, 6)),
+    ("rando_stats.Pools Time", UberIdentifier::new(14, 7)),
+    ("rando_stats.Depths Time", UberIdentifier::new(14, 8)),
+    ("rando_stats.Wastes Time", UberIdentifier::new(14, 9)),
+    ("rando_stats.Ruins Time", UberIdentifier::new(14, 10)),
+    ("rando_stats.Willow Time", UberIdentifier::new(14, 11)),
+    ("rando_stats.Void Time", UberIdentifier::new(14, 12)),
+    ("rando_stats.Time", UberIdentifier::new(14, 100)),
+    ("rando_stats.Current Drought", UberIdentifier::new(14, 102)),
+    ("rando_stats.Longest Drought", UberIdentifier::new(14, 103)),
     (
         "rando_stats.Time since last checkpoint",
         UberIdentifier::new(14, 104),
@@ -2473,114 +991,36 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "rando_stats.Time lost to deaths",
         UberIdentifier::new(14, 105),
     ),
-    (
-        "rando_stats.Peak PPM time",
-        UberIdentifier::new(14, 107),
-    ),
-    (
-        "rando_stats.Marsh Deaths",
-        UberIdentifier::new(14, 20),
-    ),
-    (
-        "rando_stats.Hollow Deaths",
-        UberIdentifier::new(14, 21),
-    ),
-    (
-        "rando_stats.Glades Deaths",
-        UberIdentifier::new(14, 22),
-    ),
-    (
-        "rando_stats.Wellspring Deaths",
-        UberIdentifier::new(14, 23),
-    ),
-    (
-        "rando_stats.Burrows Deaths",
-        UberIdentifier::new(14, 24),
-    ),
-    (
-        "rando_stats.Woods Deaths",
-        UberIdentifier::new(14, 25),
-    ),
-    (
-        "rando_stats.Reach Deaths",
-        UberIdentifier::new(14, 26),
-    ),
-    (
-        "rando_stats.Pools Deaths",
-        UberIdentifier::new(14, 27),
-    ),
-    (
-        "rando_stats.Depths Deaths",
-        UberIdentifier::new(14, 28),
-    ),
-    (
-        "rando_stats.Wastes Deaths",
-        UberIdentifier::new(14, 29),
-    ),
-    (
-        "rando_stats.Ruins Deaths",
-        UberIdentifier::new(14, 30),
-    ),
-    (
-        "rando_stats.Willow Deaths",
-        UberIdentifier::new(14, 31),
-    ),
-    (
-        "rando_stats.Void Deaths",
-        UberIdentifier::new(14, 32),
-    ),
-    (
-        "rando_stats.Marsh Pickups",
-        UberIdentifier::new(14, 40),
-    ),
-    (
-        "rando_stats.Hollow Pickups",
-        UberIdentifier::new(14, 41),
-    ),
-    (
-        "rando_stats.Glades Pickups",
-        UberIdentifier::new(14, 42),
-    ),
+    ("rando_stats.Peak PPM time", UberIdentifier::new(14, 107)),
+    ("rando_stats.Marsh Deaths", UberIdentifier::new(14, 20)),
+    ("rando_stats.Hollow Deaths", UberIdentifier::new(14, 21)),
+    ("rando_stats.Glades Deaths", UberIdentifier::new(14, 22)),
+    ("rando_stats.Wellspring Deaths", UberIdentifier::new(14, 23)),
+    ("rando_stats.Burrows Deaths", UberIdentifier::new(14, 24)),
+    ("rando_stats.Woods Deaths", UberIdentifier::new(14, 25)),
+    ("rando_stats.Reach Deaths", UberIdentifier::new(14, 26)),
+    ("rando_stats.Pools Deaths", UberIdentifier::new(14, 27)),
+    ("rando_stats.Depths Deaths", UberIdentifier::new(14, 28)),
+    ("rando_stats.Wastes Deaths", UberIdentifier::new(14, 29)),
+    ("rando_stats.Ruins Deaths", UberIdentifier::new(14, 30)),
+    ("rando_stats.Willow Deaths", UberIdentifier::new(14, 31)),
+    ("rando_stats.Void Deaths", UberIdentifier::new(14, 32)),
+    ("rando_stats.Marsh Pickups", UberIdentifier::new(14, 40)),
+    ("rando_stats.Hollow Pickups", UberIdentifier::new(14, 41)),
+    ("rando_stats.Glades Pickups", UberIdentifier::new(14, 42)),
     (
         "rando_stats.Wellspring Pickups",
         UberIdentifier::new(14, 43),
     ),
-    (
-        "rando_stats.Burrows Pickups",
-        UberIdentifier::new(14, 44),
-    ),
-    (
-        "rando_stats.Woods Pickups",
-        UberIdentifier::new(14, 45),
-    ),
-    (
-        "rando_stats.Reach Pickups",
-        UberIdentifier::new(14, 46),
-    ),
-    (
-        "rando_stats.Pools Pickups",
-        UberIdentifier::new(14, 47),
-    ),
-    (
-        "rando_stats.Depths Pickups",
-        UberIdentifier::new(14, 48),
-    ),
-    (
-        "rando_stats.Wastes Pickups",
-        UberIdentifier::new(14, 49),
-    ),
-    (
-        "rando_stats.Ruins Pickups",
-        UberIdentifier::new(14, 50),
-    ),
-    (
-        "rando_stats.Willow Pickups",
-        UberIdentifier::new(14, 51),
-    ),
-    (
-        "rando_stats.Void Pickups",
-        UberIdentifier::new(14, 52),
-    ),
+    ("rando_stats.Burrows Pickups", UberIdentifier::new(14, 44)),
+    ("rando_stats.Woods Pickups", UberIdentifier::new(14, 45)),
+    ("rando_stats.Reach Pickups", UberIdentifier::new(14, 46)),
+    ("rando_stats.Pools Pickups", UberIdentifier::new(14, 47)),
+    ("rando_stats.Depths Pickups", UberIdentifier::new(14, 48)),
+    ("rando_stats.Wastes Pickups", UberIdentifier::new(14, 49)),
+    ("rando_stats.Ruins Pickups", UberIdentifier::new(14, 50)),
+    ("rando_stats.Willow Pickups", UberIdentifier::new(14, 51)),
+    ("rando_stats.Void Pickups", UberIdentifier::new(14, 52)),
     (
         "animalCutsceneGroupDescriptor.animalCutsceneDoneUberState",
         UberIdentifier::new(192, 80),
@@ -3369,10 +1809,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "lagoonStateGroup.breakableWallA",
         UberIdentifier::new(945, 55795),
     ),
-    (
-        "lagoonStateGroup.medExpA",
-        UberIdentifier::new(945, 58723),
-    ),
+    ("lagoonStateGroup.medExpA", UberIdentifier::new(945, 58723)),
     (
         "lagoonStateGroup.savePedestalUberState",
         UberIdentifier::new(945, 1370),
@@ -4057,14 +2494,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "desertAGroup.collectableEDesertA",
         UberIdentifier::new(7228, 2996),
     ),
-    (
-        "desertAGroup.secretWall",
-        UberIdentifier::new(7228, 4034),
-    ),
-    (
-        "desertAGroup.gorlekOre",
-        UberIdentifier::new(7228, 8370),
-    ),
+    ("desertAGroup.secretWall", UberIdentifier::new(7228, 4034)),
+    ("desertAGroup.gorlekOre", UberIdentifier::new(7228, 8370)),
     (
         "desertAGroup.keystoneAUberState",
         UberIdentifier::new(7228, 20282),
@@ -4073,10 +2504,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "desertAGroup.collectableFDesertA",
         UberIdentifier::new(7228, 32434),
     ),
-    (
-        "desertAGroup.expOrb",
-        UberIdentifier::new(7228, 35329),
-    ),
+    ("desertAGroup.expOrb", UberIdentifier::new(7228, 35329)),
     (
         "desertAGroup.collectableDesertA",
         UberIdentifier::new(7228, 36579),
@@ -4097,14 +2525,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "desertAGroup.collectableCDesertA",
         UberIdentifier::new(7228, 52086),
     ),
-    (
-        "desertAGroup.xpOrbB",
-        UberIdentifier::new(7228, 54275),
-    ),
-    (
-        "desertAGroup.gorlekOre",
-        UberIdentifier::new(7228, 54494),
-    ),
+    ("desertAGroup.xpOrbB", UberIdentifier::new(7228, 54275)),
+    ("desertAGroup.gorlekOre", UberIdentifier::new(7228, 54494)),
     (
         "desertAGroup.collectableADesertA",
         UberIdentifier::new(7228, 56821),
@@ -4769,10 +3191,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "howlsDenGRoup.howlsDenLargeXPOrbA",
         UberIdentifier::new(11666, 24943),
     ),
-    (
-        "howlsDenGRoup.areaText",
-        UberIdentifier::new(11666, 42038),
-    ),
+    ("howlsDenGRoup.areaText", UberIdentifier::new(11666, 42038)),
     (
         "howlsDenGRoup.savePedestalUberState",
         UberIdentifier::new(11666, 16542),
@@ -5201,10 +3620,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "questUberStateGroup.firstRaceRumorMokiState",
         UberIdentifier::new(14019, 62288),
     ),
-    (
-        "willowsEndGroup.expOrb",
-        UberIdentifier::new(16155, 2065),
-    ),
+    ("willowsEndGroup.expOrb", UberIdentifier::new(16155, 2065)),
     (
         "willowsEndGroup.fallingPortalB",
         UberIdentifier::new(16155, 2235),
@@ -5233,10 +3649,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "willowsEndGroup.fallingPortal",
         UberIdentifier::new(16155, 18906),
     ),
-    (
-        "willowsEndGroup.creepA",
-        UberIdentifier::new(16155, 20672),
-    ),
+    ("willowsEndGroup.creepA", UberIdentifier::new(16155, 20672)),
     (
         "willowsEndGroup.chaseSequenceG",
         UberIdentifier::new(16155, 21083),
@@ -5249,10 +3662,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "willowsEndGroup.vineCClear",
         UberIdentifier::new(16155, 24290),
     ),
-    (
-        "willowsEndGroup.xpOrbA",
-        UberIdentifier::new(16155, 25259),
-    ),
+    ("willowsEndGroup.xpOrbA", UberIdentifier::new(16155, 25259)),
     (
         "willowsEndGroup.chaseSequenceA",
         UberIdentifier::new(16155, 27024),
@@ -5317,22 +3727,13 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "willowsEndGroup.healthCellA",
         UberIdentifier::new(16155, 46270),
     ),
-    (
-        "willowsEndGroup.expOrbB",
-        UberIdentifier::new(16155, 47690),
-    ),
-    (
-        "willowsEndGroup.expOrbA",
-        UberIdentifier::new(16155, 49381),
-    ),
+    ("willowsEndGroup.expOrbB", UberIdentifier::new(16155, 47690)),
+    ("willowsEndGroup.expOrbA", UberIdentifier::new(16155, 49381)),
     (
         "willowsEndGroup.chaseSequenceE",
         UberIdentifier::new(16155, 49408),
     ),
-    (
-        "willowsEndGroup.expOrb",
-        UberIdentifier::new(16155, 49457),
-    ),
+    ("willowsEndGroup.expOrb", UberIdentifier::new(16155, 49457)),
     (
         "willowsEndGroup.chaseSequenceF",
         UberIdentifier::new(16155, 49744),
@@ -5349,10 +3750,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "willowsEndGroup.vineBClear",
         UberIdentifier::new(16155, 54940),
     ),
-    (
-        "willowsEndGroup.xpOrbA",
-        UberIdentifier::new(16155, 55446),
-    ),
+    ("willowsEndGroup.xpOrbA", UberIdentifier::new(16155, 55446)),
     (
         "willowsEndGroup.fallingPortalA",
         UberIdentifier::new(16155, 55721),
@@ -6093,10 +4491,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.enemyRoom",
         UberIdentifier::new(21786, 2869),
     ),
-    (
-        "swampStateGroup.xpOrbA",
-        UberIdentifier::new(21786, 6987),
-    ),
+    ("swampStateGroup.xpOrbA", UberIdentifier::new(21786, 6987)),
     (
         "swampStateGroup.stompableFloor",
         UberIdentifier::new(21786, 6994),
@@ -6141,10 +4536,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.spiritShardPickupA",
         UberIdentifier::new(21786, 12077),
     ),
-    (
-        "swampStateGroup.xpOrbC",
-        UberIdentifier::new(21786, 16206),
-    ),
+    ("swampStateGroup.xpOrbC", UberIdentifier::new(21786, 16206)),
     (
         "swampStateGroup.energyHalfCell",
         UberIdentifier::new(21786, 17920),
@@ -6165,10 +4557,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.creepTreeC",
         UberIdentifier::new(21786, 20144),
     ),
-    (
-        "swampStateGroup.xpOrbB",
-        UberIdentifier::new(21786, 20160),
-    ),
+    ("swampStateGroup.xpOrbB", UberIdentifier::new(21786, 20160)),
     (
         "swampStateGroup.lifeCellA",
         UberIdentifier::new(21786, 20194),
@@ -6329,10 +4718,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.watermillDiscovered",
         UberIdentifier::new(21786, 43216),
     ),
-    (
-        "swampStateGroup.xpOrbB",
-        UberIdentifier::new(21786, 43668),
-    ),
+    ("swampStateGroup.xpOrbB", UberIdentifier::new(21786, 43668)),
     (
         "swampStateGroup.energyContainerA",
         UberIdentifier::new(21786, 44157),
@@ -6381,10 +4767,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.swampWalljumpChallengeBKeystoneACollected",
         UberIdentifier::new(21786, 50281),
     ),
-    (
-        "swampStateGroup.leverA",
-        UberIdentifier::new(21786, 50432),
-    ),
+    ("swampStateGroup.leverA", UberIdentifier::new(21786, 50432)),
     (
         "swampStateGroup.leverAndDoor",
         UberIdentifier::new(21786, 50453),
@@ -6421,10 +4804,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.gateUberState",
         UberIdentifier::new(21786, 58612),
     ),
-    (
-        "swampStateGroup.expOrb",
-        UberIdentifier::new(21786, 59513),
-    ),
+    ("swampStateGroup.expOrb", UberIdentifier::new(21786, 59513)),
     (
         "swampStateGroup.breakableBridgeBroken",
         UberIdentifier::new(21786, 59922),
@@ -6453,10 +4833,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "swampStateGroup.stompableFloor",
         UberIdentifier::new(21786, 61900),
     ),
-    (
-        "swampStateGroup.xpOrbA",
-        UberIdentifier::new(21786, 63072),
-    ),
+    ("swampStateGroup.xpOrbA", UberIdentifier::new(21786, 63072)),
     (
         "swampStateGroup.spiritShardA",
         UberIdentifier::new(21786, 63545),
@@ -6517,10 +4894,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "pickupsGroup.ultraLeashShardPickup",
         UberIdentifier::new(23987, 12104),
     ),
-    (
-        "pickupsGroup.energyCell",
-        UberIdentifier::new(23987, 12746),
-    ),
+    ("pickupsGroup.energyCell", UberIdentifier::new(23987, 12746)),
     (
         "pickupsGroup.focusShardPickup",
         UberIdentifier::new(23987, 14014),
@@ -6597,18 +4971,12 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "howlsOriginGroup.secretWallA",
         UberIdentifier::new(24922, 2524),
     ),
-    (
-        "howlsOriginGroup.expOrbA",
-        UberIdentifier::new(24922, 8568),
-    ),
+    ("howlsOriginGroup.expOrbA", UberIdentifier::new(24922, 8568)),
     (
         "howlsOriginGroup.bellPuzzleSolved",
         UberIdentifier::new(24922, 13349),
     ),
-    (
-        "howlsOriginGroup.xpOrbA",
-        UberIdentifier::new(24922, 13921),
-    ),
+    ("howlsOriginGroup.xpOrbA", UberIdentifier::new(24922, 13921)),
     (
         "howlsOriginGroup.shardSlotUpgradePlaceholder",
         UberIdentifier::new(24922, 13993),
@@ -7013,10 +5381,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.largeExpOrb",
         UberIdentifier::new(28895, 2129),
     ),
-    (
-        "baursReachGroup.xpOrbA",
-        UberIdentifier::new(28895, 2462),
-    ),
+    ("baursReachGroup.xpOrbA", UberIdentifier::new(28895, 2462)),
     (
         "baursReachGroup.stompableFloorA",
         UberIdentifier::new(28895, 2896),
@@ -7033,10 +5398,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.doorWithFourSlots",
         UberIdentifier::new(28895, 4290),
     ),
-    (
-        "baursReachGroup.xpOrbF",
-        UberIdentifier::new(28895, 4301),
-    ),
+    ("baursReachGroup.xpOrbF", UberIdentifier::new(28895, 4301)),
     (
         "baursReachGroup.frozenMokiInteracted",
         UberIdentifier::new(28895, 7152),
@@ -7057,18 +5419,12 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.stompableFloorA",
         UberIdentifier::new(28895, 8664),
     ),
-    (
-        "baursReachGroup.xpOrbA",
-        UberIdentifier::new(28895, 8834),
-    ),
+    ("baursReachGroup.xpOrbA", UberIdentifier::new(28895, 8834)),
     (
         "baursReachGroup.breakableWallB",
         UberIdentifier::new(28895, 8934),
     ),
-    (
-        "baursReachGroup.expOrbD",
-        UberIdentifier::new(28895, 9321),
-    ),
+    ("baursReachGroup.expOrbD", UberIdentifier::new(28895, 9321)),
     (
         "baursReachGroup.keystoneC",
         UberIdentifier::new(28895, 9949),
@@ -7085,10 +5441,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.breakableRocksG",
         UberIdentifier::new(28895, 11936),
     ),
-    (
-        "baursReachGroup.xpOrbA",
-        UberIdentifier::new(28895, 12140),
-    ),
+    ("baursReachGroup.xpOrbA", UberIdentifier::new(28895, 12140)),
     (
         "baursReachGroup.breakableWallA",
         UberIdentifier::new(28895, 14264),
@@ -7109,10 +5462,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.breakableWallA",
         UberIdentifier::new(28895, 19041),
     ),
-    (
-        "baursReachGroup.expOrbE",
-        UberIdentifier::new(28895, 19077),
-    ),
+    ("baursReachGroup.expOrbE", UberIdentifier::new(28895, 19077)),
     (
         "baursReachGroup.breakableRockWall",
         UberIdentifier::new(28895, 20731),
@@ -7137,14 +5487,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.mediumExpOrb",
         UberIdentifier::new(28895, 22761),
     ),
-    (
-        "baursReachGroup.expOrbC",
-        UberIdentifier::new(28895, 22959),
-    ),
-    (
-        "baursReachGroup.xpOrbA",
-        UberIdentifier::new(28895, 23605),
-    ),
+    ("baursReachGroup.expOrbC", UberIdentifier::new(28895, 22959)),
+    ("baursReachGroup.xpOrbA", UberIdentifier::new(28895, 23605)),
     (
         "baursReachGroup.breakableRocksH",
         UberIdentifier::new(28895, 23678),
@@ -7209,14 +5553,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.closingGate",
         UberIdentifier::new(28895, 32443),
     ),
-    (
-        "baursReachGroup.xpOrbB",
-        UberIdentifier::new(28895, 33337),
-    ),
-    (
-        "baursReachGroup.xpOrbE",
-        UberIdentifier::new(28895, 33846),
-    ),
+    ("baursReachGroup.xpOrbB", UberIdentifier::new(28895, 33337)),
+    ("baursReachGroup.xpOrbE", UberIdentifier::new(28895, 33846)),
     (
         "baursReachGroup.breakableWall",
         UberIdentifier::new(28895, 34098),
@@ -7241,10 +5579,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.hintZoneA",
         UberIdentifier::new(28895, 35874),
     ),
-    (
-        "baursReachGroup.xpOrbC",
-        UberIdentifier::new(28895, 36231),
-    ),
+    ("baursReachGroup.xpOrbC", UberIdentifier::new(28895, 36231)),
     (
         "baursReachGroup.smallExpA",
         UberIdentifier::new(28895, 36378),
@@ -7261,18 +5596,12 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.keystoneB",
         UberIdentifier::new(28895, 37444),
     ),
-    (
-        "baursReachGroup.xpOrbB",
-        UberIdentifier::new(28895, 38049),
-    ),
+    ("baursReachGroup.xpOrbB", UberIdentifier::new(28895, 38049)),
     (
         "baursReachGroup.breakableRocksE",
         UberIdentifier::new(28895, 38120),
     ),
-    (
-        "baursReachGroup.xpOrbA",
-        UberIdentifier::new(28895, 38143),
-    ),
+    ("baursReachGroup.xpOrbA", UberIdentifier::new(28895, 38143)),
     (
         "baursReachGroup.breakableRocksF",
         UberIdentifier::new(28895, 38525),
@@ -7281,14 +5610,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.gorlekOreA",
         UberIdentifier::new(28895, 39291),
     ),
-    (
-        "baursReachGroup.xpOrbB",
-        UberIdentifier::new(28895, 40089),
-    ),
-    (
-        "baursReachGroup.xpOrbC",
-        UberIdentifier::new(28895, 40242),
-    ),
+    ("baursReachGroup.xpOrbB", UberIdentifier::new(28895, 40089)),
+    ("baursReachGroup.xpOrbC", UberIdentifier::new(28895, 40242)),
     (
         "baursReachGroup.healthCellA",
         UberIdentifier::new(28895, 40744),
@@ -7309,10 +5632,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.firePedestal",
         UberIdentifier::new(28895, 43977),
     ),
-    (
-        "baursReachGroup.xpOrbE",
-        UberIdentifier::new(28895, 45066),
-    ),
+    ("baursReachGroup.xpOrbE", UberIdentifier::new(28895, 45066)),
     (
         "baursReachGroup.largeXPOrbA",
         UberIdentifier::new(28895, 45337),
@@ -7321,14 +5641,8 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.firePedestalBooleanUberState",
         UberIdentifier::new(28895, 46293),
     ),
-    (
-        "baursReachGroup.xpOrbB",
-        UberIdentifier::new(28895, 46404),
-    ),
-    (
-        "baursReachGroup.xpOrbB",
-        UberIdentifier::new(28895, 46711),
-    ),
+    ("baursReachGroup.xpOrbB", UberIdentifier::new(28895, 46404)),
+    ("baursReachGroup.xpOrbB", UberIdentifier::new(28895, 46711)),
     (
         "baursReachGroup.breakableRocksI",
         UberIdentifier::new(28895, 46875),
@@ -7337,10 +5651,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.orePlaceholder",
         UberIdentifier::new(28895, 47529),
     ),
-    (
-        "baursReachGroup.creepA",
-        UberIdentifier::new(28895, 48186),
-    ),
+    ("baursReachGroup.creepA", UberIdentifier::new(28895, 48186)),
     (
         "baursReachGroup.grenadeSwitchA",
         UberIdentifier::new(28895, 48757),
@@ -7377,10 +5688,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.seenLoremasterMenu",
         UberIdentifier::new(28895, 53166),
     ),
-    (
-        "baursReachGroup.xpOrbC",
-        UberIdentifier::new(28895, 53283),
-    ),
+    ("baursReachGroup.xpOrbC", UberIdentifier::new(28895, 53283)),
     (
         "baursReachGroup.smallXPOrbA",
         UberIdentifier::new(28895, 54373),
@@ -7405,10 +5713,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.gorlekOreA",
         UberIdentifier::new(28895, 58675),
     ),
-    (
-        "baursReachGroup.expOrbA",
-        UberIdentifier::new(28895, 58848),
-    ),
+    ("baursReachGroup.expOrbA", UberIdentifier::new(28895, 58848)),
     (
         "baursReachGroup.talkedToSleepingBaur",
         UberIdentifier::new(28895, 59287),
@@ -7421,10 +5726,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "baursReachGroup.interactedWithCampfire",
         UberIdentifier::new(28895, 59955),
     ),
-    (
-        "baursReachGroup.xpOrbA",
-        UberIdentifier::new(28895, 61536),
-    ),
+    ("baursReachGroup.xpOrbA", UberIdentifier::new(28895, 61536)),
     (
         "baursReachGroup.firePedestalBooleanUberState",
         UberIdentifier::new(28895, 61789),
@@ -8157,10 +6459,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "hubUberStateGroup.mediumExpC",
         UberIdentifier::new(42178, 38743),
     ),
-    (
-        "hubUberStateGroup.pyreA",
-        UberIdentifier::new(42178, 38905),
-    ),
+    ("hubUberStateGroup.pyreA", UberIdentifier::new(42178, 38905)),
     (
         "hubUberStateGroup.mediumExpB",
         UberIdentifier::new(42178, 40609),
@@ -8417,22 +6716,13 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "raceGroup.mouldwoodDepthsRace",
         UberIdentifier::new(44964, 28552),
     ),
-    (
-        "raceGroup.desertRace",
-        UberIdentifier::new(44964, 30767),
-    ),
+    ("raceGroup.desertRace", UberIdentifier::new(44964, 30767)),
     (
         "raceGroup.inkwaterMarshRace",
         UberIdentifier::new(44964, 45951),
     ),
-    (
-        "raceGroup.testRace",
-        UberIdentifier::new(44964, 50634),
-    ),
-    (
-        "raceGroup.lumaPoolsRace",
-        UberIdentifier::new(44964, 54686),
-    ),
+    ("raceGroup.testRace", UberIdentifier::new(44964, 50634)),
+    ("raceGroup.lumaPoolsRace", UberIdentifier::new(44964, 54686)),
     (
         "kwoloksCavernThroneRoomGroup.mediumExpA",
         UberIdentifier::new(46462, 3872),
@@ -8573,10 +6863,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "npcsStateGroup.willowsEndSeirExitCutscene",
         UberIdentifier::new(48248, 8985),
     ),
-    (
-        "npcsStateGroup.metGrom",
-        UberIdentifier::new(48248, 9394),
-    ),
+    ("npcsStateGroup.metGrom", UberIdentifier::new(48248, 9394)),
     (
         "npcsStateGroup.hasMapGorlekMines",
         UberIdentifier::new(48248, 9750),
@@ -8781,10 +7068,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "npcsStateGroup.desertRuinsLoreWispC",
         UberIdentifier::new(48248, 52065),
     ),
-    (
-        "npcsStateGroup.metMotay",
-        UberIdentifier::new(48248, 53028),
-    ),
+    ("npcsStateGroup.metMotay", UberIdentifier::new(48248, 53028)),
     (
         "npcsStateGroup.hasMapWellspringGlades",
         UberIdentifier::new(48248, 54647),
@@ -9057,10 +7341,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "wellspringGroupDescriptor.showDoorCutsceneState",
         UberIdentifier::new(53632, 26178),
     ),
-    (
-        "prologueGroup.areaText",
-        UberIdentifier::new(54846, 27125),
-    ),
+    ("prologueGroup.areaText", UberIdentifier::new(54846, 27125)),
     (
         "_petrifiedForestGroup.xpOrbA",
         UberIdentifier::new(58674, 193),
@@ -9561,10 +7842,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         "_petrifiedForestGroup.petrifiedOwlState",
         UberIdentifier::new(58674, 61616),
     ),
-    (
-        "shrineGroup.shrineLaser",
-        UberIdentifier::new(61306, 2129),
-    ),
+    ("shrineGroup.shrineLaser", UberIdentifier::new(61306, 2129)),
     (
         "shrineGroup.shrineProjectile",
         UberIdentifier::new(61306, 2239),

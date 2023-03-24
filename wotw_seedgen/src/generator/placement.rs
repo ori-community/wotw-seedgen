@@ -1,24 +1,37 @@
 use std::mem;
 
 use rand::{
+    distributions::{Bernoulli, Distribution, Uniform},
+    seq::{IteratorRandom, SliceRandom},
     Rng,
-    seq::{SliceRandom, IteratorRandom},
-    distributions::{Distribution, Uniform, Bernoulli},
 };
 
-use crate::{
-    inventory::Inventory,
-    item::{Item, Resource, Skill, Teleporter, Command, ShopCommand, Message, UberStateItem, UberStateValue},
-    settings::{Goal, WorldSettings, Spawn}, util::{
-        self,
-        constants::{RELIC_ZONES, KEYSTONE_DOORS, RESERVE_SLOTS, PLACEHOLDER_SLOTS, SHOP_PRICES, DEFAULT_SPAWN, RANDOM_PROGRESSION, RETRIES}, Zone,
-    }, world::{
-        World,
-        graph::{self, Node, Graph}, requirement,
-    }, header::CodeDisplay, log, generator::spoiler::NodeSummary
-};
-#[cfg(feature = "log")] use crate::settings::Difficulty;
+#[cfg(feature = "log")]
+use crate::settings::Difficulty;
 use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
+use crate::{
+    generator::spoiler::NodeSummary,
+    header::CodeDisplay,
+    inventory::Inventory,
+    item::{
+        Command, Item, Message, Resource, ShopCommand, Skill, Teleporter, UberStateItem,
+        UberStateValue,
+    },
+    log,
+    settings::{Goal, Spawn, WorldSettings},
+    util::{
+        self,
+        constants::{
+            DEFAULT_SPAWN, KEYSTONE_DOORS, PLACEHOLDER_SLOTS, RANDOM_PROGRESSION, RELIC_ZONES,
+            RESERVE_SLOTS, RETRIES, SHOP_PRICES,
+        },
+        Zone,
+    },
+    world::{
+        graph::{self, Graph, Node},
+        requirement, World,
+    },
+};
 
 use super::seed::SeedWorld;
 use super::spoiler::{SeedSpoiler, SpoilerGroup, SpoilerPlacement};
@@ -36,7 +49,9 @@ pub struct Placement<'a> {
 
 impl Placement<'_> {
     pub fn code(&self) -> CodeDisplay<Placement> {
-        CodeDisplay::new(self, |s, f| { write!(f, "{}|{}", s.trigger.code(), s.item.code()) })
+        CodeDisplay::new(self, |s, f| {
+            write!(f, "{}|{}", s.trigger.code(), s.item.code())
+        })
     }
 }
 
@@ -49,7 +64,7 @@ struct WorldContext<'a, 'b> {
     spawn_slots: Vec<&'a Node>,
     reachable_locations: Vec<&'a Node>,
     unreachable_locations: Vec<&'a Node>,
-    spirit_light_rng: SpiritLightAmounts,  // TODO this can get kinda weird maybe have a shared spirit light rng instead
+    spirit_light_rng: SpiritLightAmounts, // TODO this can get kinda weird maybe have a shared spirit light rng instead
     random_spirit_light: Bernoulli,
     shop_slots: usize,
     world_tour: Option<usize>,
@@ -58,7 +73,7 @@ struct WorldContext<'a, 'b> {
 struct GeneratorContext<'a, R, I>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     world_count: usize,
     total_reachable_count: usize,
@@ -70,10 +85,13 @@ where
     rng: &'a mut R,
 }
 
-impl<R: Rng, I: Iterator<Item=u16>> GeneratorContext<'_, R, I> {
+impl<R: Rng, I: Iterator<Item = u16>> GeneratorContext<'_, R, I> {
     fn finalize_spoiler_group(&mut self) {
-        self.current_spoiler_group.placements.sort_unstable_by(|a, b| a.item.cmp(&b.item));
-        self.spoiler_groups.push(mem::take(&mut self.current_spoiler_group));
+        self.current_spoiler_group
+            .placements
+            .sort_unstable_by(|a, b| a.item.cmp(&b.item));
+        self.spoiler_groups
+            .push(mem::take(&mut self.current_spoiler_group));
     }
 }
 
@@ -101,25 +119,43 @@ fn format_identifiers(mut identifiers: Vec<&str>) -> String {
     identifiers
 }
 
-fn progression_check<'a, R, I>(world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<ReachContext<'a>, String>
+fn progression_check<'a, R, I>(
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<ReachContext<'a>, String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let mut reachable = Vec::with_capacity(context.world_count);
     let mut reachable_states = Vec::with_capacity(context.world_count);
     let mut unmet = Vec::with_capacity(context.world_count);
 
     for world_context in world_contexts {
-        let (world_reachable, world_unmet) = world_context.world.graph.reached_and_progressions(&world_context.world.player, world_context.spawn, world_context.world.uber_states(), &world_context.world.sets);
-        let world_reachable_states = world_reachable.iter().filter(|node| !node.can_place()).copied().collect::<Vec<_>>();
+        let (world_reachable, world_unmet) = world_context.world.graph.reached_and_progressions(
+            &world_context.world.player,
+            world_context.spawn,
+            world_context.world.uber_states(),
+            &world_context.world.sets,
+        );
+        let world_reachable_states = world_reachable
+            .iter()
+            .filter(|node| !node.can_place())
+            .copied()
+            .collect::<Vec<_>>();
         reachable.push(world_reachable);
         reachable_states.push(world_reachable_states);
         unmet.push(world_unmet);
     }
 
-    let reachable_counts = reachable.iter()
-        .map(|world_reachable| world_reachable.iter().filter(|node| node.can_place()).count())
+    let reachable_counts = reachable
+        .iter()
+        .map(|world_reachable| {
+            world_reachable
+                .iter()
+                .filter(|node| node.can_place())
+                .count()
+        })
         .collect::<Vec<_>>();
     let unreached_count = context.total_reachable_count - reachable_counts.iter().sum::<usize>();
 
@@ -132,10 +168,19 @@ where
     })
 }
 
-fn place_item<'a, R, I>(origin_world_index: usize, target_world_index: usize, node: &'a Node, #[cfg_attr(not(feature = "log"), allow(unused_variables))] was_placeholder: bool, forced: bool, item: Item, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn place_item<'a, R, I>(
+    origin_world_index: usize,
+    target_world_index: usize,
+    node: &'a Node,
+    #[cfg_attr(not(feature = "log"), allow(unused_variables))] was_placeholder: bool,
+    forced: bool,
+    item: Item,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let trigger = node.trigger().unwrap();
     let is_shop = trigger.identifier.is_shop();
@@ -144,20 +189,40 @@ where
         world_contexts[origin_world_index].shop_slots -= 1;
 
         if is_shop {
-            shop_placement(node, &item, origin_world_index, target_world_index, world_contexts, context)?;
+            shop_placement(
+                node,
+                &item,
+                origin_world_index,
+                target_world_index,
+                world_contexts,
+                context,
+            )?;
         }
     }
 
     let origin_world_context = &world_contexts[origin_world_index];
     let origin_details = origin_world_context.world.custom_items.get(&item);
-    let custom_name =  origin_details.and_then(|details| details.name.clone());
-    let display =  origin_details.and_then(|details| details.display.clone());  // Using the display of other worlds is dangerous because it often relies on further information from the other world's headers
+    let custom_name = origin_details.and_then(|details| details.name.clone());
+    let display = origin_details.and_then(|details| details.display.clone()); // Using the display of other worlds is dangerous because it often relies on further information from the other world's headers
     let item_name = custom_name.clone().unwrap_or_else(|| item.to_string());
 
     if origin_world_index == target_world_index {
         let origin_world_context = &mut world_contexts[origin_world_index];
 
-        log::trace!("(World {}): Placed {} at {}", origin_world_index, item_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!(
+            "(World {}): Placed {} at {}",
+            origin_world_index,
+            item_name,
+            if was_placeholder {
+                format!(
+                    "placeholder {} ({} left)",
+                    node,
+                    origin_world_context.placeholders.len()
+                )
+            } else {
+                format!("{}", node)
+            }
+        );
 
         origin_world_context.placements.push(Placement {
             node: Some(node),
@@ -181,7 +246,21 @@ where
             });
         }
     } else {
-        log::trace!("(World {}): Placed World {}'s {} at {}", origin_world_index, target_world_index, item_name, if was_placeholder { format!("placeholder {} ({} left)", node, origin_world_context.placeholders.len()) } else { format!("{}", node) });
+        log::trace!(
+            "(World {}): Placed World {}'s {} at {}",
+            origin_world_index,
+            target_world_index,
+            item_name,
+            if was_placeholder {
+                format!(
+                    "placeholder {} ({} left)",
+                    node,
+                    origin_world_context.placeholders.len()
+                )
+            } else {
+                format!("{}", node)
+            }
+        );
 
         let target_world_context = &mut world_contexts[target_world_index];
         let target_details = target_world_context.world.custom_items.get(&item);
@@ -190,11 +269,24 @@ where
         let state_index = context.multiworld_state_index.next().unwrap();
 
         // We check for a custom name in the target world in case this world doesn't have the relevant header, but we ignore the target world's display code because that usually references other part in the header we might be missing
-        let custom_name = custom_name.or_else(|| target_details.and_then(|details| details.name.clone())).unwrap_or_else(|| format!("$[{}]", item.code()));
-        let origin_message = Item::Message(Message::new(format!("$[15|5|{}]'s {}", target_world_index, custom_name)));
+        let custom_name = custom_name
+            .or_else(|| target_details.and_then(|details| details.name.clone()))
+            .unwrap_or_else(|| format!("$[{}]", item.code()));
+        let origin_message = Item::Message(Message::new(format!(
+            "$[15|5|{}]'s {}",
+            target_world_index, custom_name
+        )));
         let send_identifier = UberIdentifier::new(12, state_index);
-        let send_item = UberStateItem::simple_setter(send_identifier, UberType::Bool, UberStateValue::Bool(true));
-        let target_message = Item::Message(Message::new(format!("{} from $[15|5|{}]|mute", target_display.unwrap_or(custom_name), origin_world_index)));
+        let send_item = UberStateItem::simple_setter(
+            send_identifier,
+            UberType::Bool,
+            UberStateValue::Bool(true),
+        );
+        let target_message = Item::Message(Message::new(format!(
+            "{} from $[15|5|{}]|mute",
+            target_display.unwrap_or(custom_name),
+            origin_world_index
+        )));
         let target_trigger = UberStateTrigger {
             identifier: UberIdentifier::new(12, state_index),
             condition: None,
@@ -230,45 +322,86 @@ where
     };
 
     if forced {
-        context.current_spoiler_group.forced_items.grant(item.clone(), 1);
+        context
+            .current_spoiler_group
+            .forced_items
+            .grant(item.clone(), 1);
     }
-    context.current_spoiler_group.placements.push(SpoilerPlacement { origin_world_index, target_world_index, location, item, item_name });
+    context
+        .current_spoiler_group
+        .placements
+        .push(SpoilerPlacement {
+            origin_world_index,
+            target_world_index,
+            location,
+            item,
+            item_name,
+        });
 
     Ok(())
 }
 
-fn shop_placement<'a, R, I>(node: &Node, item: &Item, origin_world_index: usize, target_world_index: usize, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn shop_placement<'a, R, I>(
+    node: &Node,
+    item: &Item,
+    origin_world_index: usize,
+    target_world_index: usize,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
-    let origin_details = world_contexts[origin_world_index].world.custom_items.get(item);
-    let target_details = world_contexts[target_world_index].world.custom_items.get(item);
+    let origin_details = world_contexts[origin_world_index]
+        .world
+        .custom_items
+        .get(item);
+    let target_details = world_contexts[target_world_index]
+        .world
+        .custom_items
+        .get(item);
     let trigger = node.trigger().unwrap();
 
     let (_, _, price_uber_identifier) = SHOP_PRICES.iter()
         .find(|(_, location, _)| &trigger.identifier == location)
         .ok_or_else(|| format!("(World {}): {} claims to be a shop location, but doesn't have an entry in the shop prices table!", origin_world_index, node))?;
 
-    let mut price = origin_details.and_then(|details| details.price)
+    let mut price = origin_details
+        .and_then(|details| details.price)
         .or_else(|| target_details.and_then(|details| details.price))
         .unwrap_or_else(|| item.shop_price());
 
     if item.random_shop_price() {
         let modified_price = price as f32 * context.price_range.sample(context.rng);
-        price = util::float_to_int(modified_price).map_err(|_| format!("(World {}): Overflowed shop price for {} after adding a random amount to it", origin_world_index, item))?;
+        price = util::float_to_int(modified_price).map_err(|_| {
+            format!(
+                "(World {}): Overflowed shop price for {} after adding a random amount to it",
+                origin_world_index, item
+            )
+        })?;
     }
 
-    let price_setter = UberStateItem::simple_setter(*price_uber_identifier, UberType::Int, UberStateValue::Number((price as f32).into()));
+    let price_setter = UberStateItem::simple_setter(
+        *price_uber_identifier,
+        UberType::Int,
+        UberStateValue::Number((price as f32).into()),
+    );
 
-    let description = origin_details.and_then(|details| details.description.clone())
+    let description = origin_details
+        .and_then(|details| details.description.clone())
         .or_else(|| target_details.and_then(|details| details.description.clone()))
         .or_else(|| item.description());
-    let icon = origin_details.and_then(|details| details.icon.clone())
+    let icon = origin_details
+        .and_then(|details| details.icon.clone())
         .or_else(|| target_details.and_then(|details| details.icon.clone()))
         .or_else(|| item.icon());
 
-    log::trace!("(World {}): Placing {} at Spawn as price for the item below", origin_world_index, price_setter);
+    log::trace!(
+        "(World {}): Placing {} at Spawn as price for the item below",
+        origin_world_index,
+        price_setter
+    );
 
     let origin_world_context = &mut world_contexts[origin_world_index];
 
@@ -307,10 +440,15 @@ where
     Ok(())
 }
 
-fn place_relics<'a, R, I>(amount: usize, world_index: usize, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn place_relics<'a, R, I>(
+    amount: usize,
+    world_index: usize,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let world_context = &mut world_contexts[world_index];
 
@@ -318,15 +456,25 @@ where
     relic_zones.shuffle(context.rng);
     relic_zones.truncate(amount);
 
-    let mut relic_locations = relic_zones.into_iter().map(|zone| (zone, Vec::with_capacity(60))).collect::<Vec<_>>();
+    let mut relic_locations = relic_zones
+        .into_iter()
+        .map(|zone| (zone, Vec::with_capacity(60)))
+        .collect::<Vec<_>>();
 
     for &node in &world_context.reachable_locations {
         if let Some(zone) = node.zone() {
-            if let Some((_, zone_relic_locations)) = relic_locations.iter_mut().find(|(relic_zone, _)| zone == *relic_zone) {
+            if let Some((_, zone_relic_locations)) = relic_locations
+                .iter_mut()
+                .find(|(relic_zone, _)| zone == *relic_zone)
+            {
                 let trigger = node.trigger().unwrap();
 
                 if !world_context.world.preplacements.contains_key(trigger)
-                && !world_context.placements.iter().any(|placement| &placement.trigger == trigger) {
+                    && !world_context
+                        .placements
+                        .iter()
+                        .any(|placement| &placement.trigger == trigger)
+                {
                     zone_relic_locations.push(node);
                 }
             }
@@ -337,7 +485,16 @@ where
         log::trace!("(World {}): Placing Relic in {}", world_index, zone);
 
         if let Some(&location) = relic_locations.choose(context.rng) {
-            place_item(world_index, world_index, location, false, false, Item::Relic(*zone), world_contexts, context)?;
+            place_item(
+                world_index,
+                world_index,
+                location,
+                false,
+                false,
+                Item::Relic(*zone),
+                world_contexts,
+                context,
+            )?;
         }
     }
 
@@ -345,45 +502,78 @@ where
 }
 
 #[inline]
-fn force_keystones<'a, R, I>(reachable_states: &[Vec<&Node>], reserved_slots: &mut Vec<(usize, &'a Node)>, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn force_keystones<'a, R, I>(
+    reachable_states: &[Vec<&Node>],
+    reserved_slots: &mut Vec<(usize, &'a Node)>,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     for target_world_index in 0..context.world_count {
         let mut missing_keystones = 0;
 
         let world_context = &mut world_contexts[target_world_index];
 
-        let placed_keystones = world_context.world.player.inventory.get(&Item::Resource(Resource::Keystone));
-        if placed_keystones < 2 { return Ok(()); }
+        let placed_keystones = world_context
+            .world
+            .player
+            .inventory
+            .get(&Item::Resource(Resource::Keystone));
+        if placed_keystones < 2 {
+            return Ok(());
+        }
 
-        let required_keystones: u32 = reachable_states[target_world_index].iter()
+        let required_keystones: u32 = reachable_states[target_world_index]
+            .iter()
             .filter_map(|&node| {
-                if let Some((_, keystones)) = KEYSTONE_DOORS.iter().find(|&&(identifier, _)| identifier == node.identifier()) {
+                if let Some((_, keystones)) = KEYSTONE_DOORS
+                    .iter()
+                    .find(|&&(identifier, _)| identifier == node.identifier())
+                {
                     return Some(*keystones);
                 }
                 None
             })
             .sum();
-        if required_keystones <= placed_keystones { return Ok(()); }
+        if required_keystones <= placed_keystones {
+            return Ok(());
+        }
 
         missing_keystones += required_keystones - placed_keystones;
 
-        log::trace!("(World {}): Force placing {} keystones to avoid keylocks", target_world_index, missing_keystones);
+        log::trace!(
+            "(World {}): Force placing {} keystones to avoid keylocks",
+            target_world_index,
+            missing_keystones
+        );
 
         for _ in 0..missing_keystones {
-            forced_placement(target_world_index, Item::Resource(Resource::Keystone), reserved_slots, world_contexts, context)?;
+            forced_placement(
+                target_world_index,
+                Item::Resource(Resource::Keystone),
+                reserved_slots,
+                world_contexts,
+                context,
+            )?;
         }
     }
 
     Ok(())
 }
 
-fn forced_placement<'a, R, I>(target_world_index: usize, item: Item, reserved_slots: &mut Vec<(usize, &'a Node)>, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn forced_placement<'a, R, I>(
+    target_world_index: usize,
+    item: Item,
+    reserved_slots: &mut Vec<(usize, &'a Node)>,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let is_multiworld_spread = item.is_multiworld_spread();
 
@@ -404,7 +594,11 @@ where
                 }
             }
         } else {
-            if let Some((index, _)) = reserved_slots.iter().enumerate().find(|(_, (world_index, _))| world_index == &target_world_index) {
+            if let Some((index, _)) = reserved_slots
+                .iter()
+                .enumerate()
+                .find(|(_, (world_index, _))| world_index == &target_world_index)
+            {
                 let (_, node) = reserved_slots.remove(index);
                 return Ok((target_world_index, node, false));
             }
@@ -416,7 +610,10 @@ where
                 return Ok((target_world_index, node, true));
             }
         }
-        return Err(format!("(World {}): Not enough slots to place forced progression {}", target_world_index, item))  // due to the slot checks in missing_items this should only ever happen for forced keystone placements
+        return Err(format!(
+            "(World {}): Not enough slots to place forced progression {}",
+            target_world_index, item
+        )); // due to the slot checks in missing_items this should only ever happen for forced keystone placements
     };
 
     let mut node = choose_node()?;
@@ -432,35 +629,85 @@ where
         }
 
         for skipped_slot in skipped_slots {
-            world_contexts[skipped_slot.0].placeholders.push(skipped_slot.1);
+            world_contexts[skipped_slot.0]
+                .placeholders
+                .push(skipped_slot.1);
         }
     }
 
     let world_context = &mut world_contexts[target_world_index];
     world_context.world.pool.remove(&item, 1);
     world_context.world.grant_player(item.clone(), 1);
-    place_item(node.0, target_world_index, node.1, node.2, true, item, world_contexts, context)?;
+    place_item(
+        node.0,
+        target_world_index,
+        node.1,
+        node.2,
+        true,
+        item,
+        world_contexts,
+        context,
+    )?;
 
     Ok(())
 }
 
-fn determine_progressions<'a>(world_index: usize, slots: usize, world_slots: usize, reach_context: &ReachContext, world_context: &WorldContext<'a, '_>) -> Vec<Inventory> {
-    let owned_states = reach_context.reachable_states[world_index].iter().map(|&node| node.index()).collect();
+fn determine_progressions<'a>(
+    world_index: usize,
+    slots: usize,
+    world_slots: usize,
+    reach_context: &ReachContext,
+    world_context: &WorldContext<'a, '_>,
+) -> Vec<Inventory> {
+    let owned_states = reach_context.reachable_states[world_index]
+        .iter()
+        .map(|&node| node.index())
+        .collect();
 
-    reach_context.unmet[world_index].iter().flat_map(|(requirement, best_orbs)| {
-        requirement.solutions(&world_context.world.player, &owned_states, best_orbs.clone(), slots, world_slots).into_iter().filter_map(|solution| {
-            debug_assert!(solution.item_count() as usize <= slots && solution.world_item_count() as usize <= world_slots);
-            if solution.items.is_empty() || !world_context.world.pool.contains(&solution) { None }
-            else { Some(solution) }
+    reach_context.unmet[world_index]
+        .iter()
+        .flat_map(|(requirement, best_orbs)| {
+            requirement
+                .solutions(
+                    &world_context.world.player,
+                    &owned_states,
+                    best_orbs.clone(),
+                    slots,
+                    world_slots,
+                )
+                .into_iter()
+                .filter_map(|solution| {
+                    debug_assert!(
+                        solution.item_count() as usize <= slots
+                            && solution.world_item_count() as usize <= world_slots
+                    );
+                    if solution.items.is_empty() || !world_context.world.pool.contains(&solution) {
+                        None
+                    } else {
+                        Some(solution)
+                    }
+                })
         })
-    }).collect()
+        .collect()
 }
 
-fn pick_progression<'a, 'b, R, I>(target_world_index: usize, itemsets: &'b [Inventory], slots: usize, reach_context: &ReachContext, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<&'b Inventory, String>where
-R: Rng,
-I: Iterator<Item=u16>,
+fn pick_progression<'a, 'b, R, I>(
+    target_world_index: usize,
+    itemsets: &'b [Inventory],
+    slots: usize,
+    reach_context: &ReachContext,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<&'b Inventory, String>
+where
+    R: Rng,
+    I: Iterator<Item = u16>,
 {
-    log::trace!("(World {}): {} options for forced progression:", target_world_index, itemsets.len());
+    log::trace!(
+        "(World {}): {} options for forced progression:",
+        target_world_index,
+        itemsets.len()
+    );
 
     let weight = |inventory: &Inventory| -> Result<f32, String> {
         let mut newly_reached = 0;
@@ -469,14 +716,29 @@ I: Iterator<Item=u16>,
 
         let mut lookahead_player = target_world_context.world.player.clone();
         lookahead_player.inventory.merge(inventory.clone());
-        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(&lookahead_player, target_world_context.spawn, target_world_context.world.uber_states(), &target_world_context.world.sets);
+        let mut lookahead_reachable = target_world_context.world.graph.reached_locations(
+            &lookahead_player,
+            target_world_context.spawn,
+            target_world_context.world.uber_states(),
+            &target_world_context.world.sets,
+        );
         lookahead_reachable.retain(|&node| node.can_place());
 
         // Resource tracking can result in reaching less locations with an added teleporter, so prevent any overflows.
         // This is very rare and usually means the granted teleporter doesn't actually lead anywhere new, so 0 newly reached is accurate enough.
-        newly_reached += lookahead_reachable.len().saturating_sub(reach_context.reachable_counts[target_world_index]);
+        newly_reached += lookahead_reachable
+            .len()
+            .saturating_sub(reach_context.reachable_counts[target_world_index]);
 
-        lookahead_reachable.retain(|&node| node.trigger().map_or(false, |reached| target_world_context.world.preplacements.keys().any(|preplaced| reached == preplaced)));
+        lookahead_reachable.retain(|&node| {
+            node.trigger().map_or(false, |reached| {
+                target_world_context
+                    .world
+                    .preplacements
+                    .keys()
+                    .any(|preplaced| reached == preplaced)
+            })
+        });
         let preplaced_reached = lookahead_reachable.len();
 
         if slots - (inventory.item_count() as usize) < 3 && newly_reached <= preplaced_reached {
@@ -488,8 +750,11 @@ I: Iterator<Item=u16>,
         // TODO I think newly_reached shouldn't be considered linearly, for an optimal pace you don't want too few, but also not too many or the bias gets really strong
         Ok(base_weight * (newly_reached + 1) as f32)
     };
-    let with_weights = itemsets.iter()
-        .map::<Result<(&Inventory, f32), String>, _>(|inventory| Ok((inventory, weight(inventory)?)))
+    let with_weights = itemsets
+        .iter()
+        .map::<Result<(&Inventory, f32), String>, _>(|inventory| {
+            Ok((inventory, weight(inventory)?))
+        })
         .collect::<Result<Vec<_>, _>>()?;
     #[cfg(feature = "log")]
     let weight_sum: f32 = with_weights.iter().map(|(_, weight)| weight).sum();
@@ -498,28 +763,49 @@ I: Iterator<Item=u16>,
         .choose_weighted(context.rng, |&(inventory, weight)| {
             let mut inventory = format!("{}", inventory);
             util::add_trailing_spaces(&mut inventory, 20);
-            log::trace!("-> {}  ({}%)", inventory, (weight / weight_sum * 1000.0).round() / 10.0);
+            log::trace!(
+                "-> {}  ({}%)",
+                inventory,
+                (weight / weight_sum * 1000.0).round() / 10.0
+            );
 
             weight
         })
-        .map_err(|err| format!("(World {}): Error choosing progression: {}", target_world_index, err))?;
+        .map_err(|err| {
+            format!(
+                "(World {}): Error choosing progression: {}",
+                target_world_index, err
+            )
+        })?;
 
-    log::trace!("(World {}): Chosen progression: {}", target_world_index, progression);
+    log::trace!(
+        "(World {}): Chosen progression: {}",
+        target_world_index,
+        progression
+    );
 
     Ok(progression)
 }
 
-fn split_progression_item<'a, R, I>(world_index: usize, item: &Item, amount: u32, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Vec<Item>
+fn split_progression_item<'a, R, I>(
+    world_index: usize,
+    item: &Item,
+    amount: u32,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Vec<Item>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     if let Item::SpiritLight(1) = item {
         let mut spirit_light_items = Vec::with_capacity(1);
         let mut amount_placed = 0;
 
         while amount_placed < amount {
-            let stacked_amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
+            let stacked_amount = world_contexts[world_index]
+                .spirit_light_rng
+                .sample(context.rng);
             amount_placed += stacked_amount;
             spirit_light_items.push(Item::SpiritLight(stacked_amount));
         }
@@ -531,10 +817,13 @@ where
 }
 
 #[inline]
-fn spawn_progressions<'a, R, I>(world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn spawn_progressions<'a, R, I>(
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     'outer: for world_index in 0..context.world_count {
         let mut random_slots = 2;
@@ -549,10 +838,16 @@ where
 
             log::trace!("(World {}): Placing spawn progression", world_index);
 
-            let reach_context = progression_check(world_contexts, context)?;  // TODO This is inefficient! The problem here is that the ReachContext always holds all worlds at once. Maybe it should be a Vec of per-world Reach contexts?
+            let reach_context = progression_check(world_contexts, context)?; // TODO This is inefficient! The problem here is that the ReachContext always holds all worlds at once. Maybe it should be a Vec of per-world Reach contexts?
             let world_context = &world_contexts[world_index];
 
-            let mut itemsets = determine_progressions(world_index, available_spawn_slots, available_spawn_slots, &reach_context, world_context);
+            let mut itemsets = determine_progressions(
+                world_index,
+                available_spawn_slots,
+                available_spawn_slots,
+                &reach_context,
+                world_context,
+            );
 
             if itemsets.is_empty() {
                 log::trace!("(World {}): No progressions found", world_index);
@@ -560,10 +855,18 @@ where
             }
 
             requirement::filter_redundancies(&mut itemsets);
-            let progression = pick_progression(world_index, &itemsets, available_spawn_slots, &reach_context, world_contexts, context)?;
+            let progression = pick_progression(
+                world_index,
+                &itemsets,
+                available_spawn_slots,
+                &reach_context,
+                world_contexts,
+                context,
+            )?;
 
             for (item, amount) in &progression.items {
-                let items = split_progression_item(world_index, item, *amount, world_contexts, context);
+                let items =
+                    split_progression_item(world_index, item, *amount, world_contexts, context);
 
                 for item in items {
                     let world_context = &mut world_contexts[world_index];
@@ -571,11 +874,15 @@ where
                     world_context.world.grant_player(item.clone(), 1);
 
                     let origin_details = world_context.world.custom_items.get(&item);
-                    let custom_name =  origin_details.and_then(|details| details.name.clone());
-                    let display =  origin_details.and_then(|details| details.display.clone());
+                    let custom_name = origin_details.and_then(|details| details.name.clone());
+                    let display = origin_details.and_then(|details| details.display.clone());
                     let item_name = custom_name.clone().unwrap_or_else(|| item.to_string());
 
-                    log::trace!("(World {}): Placed {} as spawn progression", world_index, item_name);
+                    log::trace!(
+                        "(World {}): Placed {} as spawn progression",
+                        world_index,
+                        item_name
+                    );
 
                     if matches!(item, Item::Skill(Skill::Regenerate)) {
                         random_slots -= 1;
@@ -584,17 +891,20 @@ where
                     let world_context = &mut world_contexts[world_index];
                     let node = world_context.spawn_slots.pop();
 
-                    context.current_spoiler_group.placements.push(SpoilerPlacement {
-                        origin_world_index: world_index,
-                        target_world_index: world_index,
-                        location: NodeSummary {
-                            identifier: "Spawn".to_string(),
-                            position: None,
-                            zone: Some(Zone::Spawn),
-                        },
-                        item: item.clone(),
-                        item_name,
-                    });
+                    context
+                        .current_spoiler_group
+                        .placements
+                        .push(SpoilerPlacement {
+                            origin_world_index: world_index,
+                            target_world_index: world_index,
+                            location: NodeSummary {
+                                identifier: "Spawn".to_string(),
+                                position: None,
+                                zone: Some(Zone::Spawn),
+                            },
+                            item: item.clone(),
+                            item_name,
+                        });
                     if let Some(display) = display.or(custom_name) {
                         world_context.placements.push(Placement {
                             node,
@@ -615,12 +925,21 @@ where
     Ok(())
 }
 
-fn force_progression<'a, R, I>(reserved_slots: &mut Vec<(usize, &'a Node)>, reach_context: &mut ReachContext,world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn force_progression<'a, R, I>(
+    reserved_slots: &mut Vec<(usize, &'a Node)>,
+    reach_context: &mut ReachContext,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
-    let slots = reserved_slots.len() + world_contexts.iter().map(|world_context| world_context.placeholders.len()).sum::<usize>();
+    let slots = reserved_slots.len()
+        + world_contexts
+            .iter()
+            .map(|world_context| world_context.placeholders.len())
+            .sum::<usize>();
 
     let mut world_indices = (0..context.world_count).collect::<Vec<_>>();
     world_indices.shuffle(context.rng);
@@ -628,9 +947,19 @@ where
     let (target_world_index, mut itemsets) = loop {
         if let Some(chosen_world_index) = world_indices.pop() {
             let world_context = &mut world_contexts[chosen_world_index];
-            let world_slots = reserved_slots.iter().filter(|(world_index, _)| *world_index == chosen_world_index).count() + world_context.placeholders.len();
+            let world_slots = reserved_slots
+                .iter()
+                .filter(|(world_index, _)| *world_index == chosen_world_index)
+                .count()
+                + world_context.placeholders.len();
 
-            let itemsets = determine_progressions(chosen_world_index, slots, world_slots, reach_context, world_context);
+            let itemsets = determine_progressions(
+                chosen_world_index,
+                slots,
+                world_slots,
+                reach_context,
+                world_context,
+            );
 
             if itemsets.is_empty() {
                 log::trace!("(World {}): No progressions found", chosen_world_index);
@@ -638,39 +967,78 @@ where
                 break (chosen_world_index, itemsets);
             }
         } else {
-            if world_contexts.iter().any(|world_context| !world_context.placeholders.is_empty()) &&
-            world_contexts.iter().any(|world_context| world_context.world.pool.inventory.items.iter().any(|(item, _)| matches!(item, Item::UberState(_)))) {
+            if world_contexts
+                .iter()
+                .any(|world_context| !world_context.placeholders.is_empty())
+                && world_contexts.iter().any(|world_context| {
+                    world_context
+                        .world
+                        .pool
+                        .inventory
+                        .items
+                        .iter()
+                        .any(|(item, _)| matches!(item, Item::UberState(_)))
+                })
+            {
                 flush_item_pool(world_contexts, context)?;
                 return Ok(());
             }
 
-            if world_contexts.iter().all(|world_context| world_context.placements.is_empty()) {
+            if world_contexts
+                .iter()
+                .all(|world_context| world_context.placements.is_empty())
+            {
                 #[cfg(feature = "log")]
                 for (world_index, world_context) in world_contexts.iter().enumerate() {
-                    log::trace!("(World {}): Failed to reach anything from spawn location {}", world_index, world_context.spawn);
+                    log::trace!(
+                        "(World {}): Failed to reach anything from spawn location {}",
+                        world_index,
+                        world_context.spawn
+                    );
                 }
                 return Err(String::from("Failed to reach anything from spawn location"));
             }
 
             #[cfg(feature = "log")]
             for (world_index, world_context) in world_contexts.iter().enumerate() {
-                let identifiers: Vec<_> = world_context.reachable_locations.iter()
+                let identifiers: Vec<_> = world_context
+                    .reachable_locations
+                    .iter()
                     .filter_map(|&node| {
                         let node_index = node.index();
 
-                        node.trigger().and_then(|uber_state|
-                            if !world_context.placements.iter().any(|placement| &placement.trigger == uber_state) &&
-                            !world_context.placeholders.iter().any(|&placeholder| placeholder.index() == node_index) &&
-                            !world_context.collected_preplacements.iter().any(|&collected| collected == node_index)
+                        node.trigger().and_then(|uber_state| {
+                            if !world_context
+                                .placements
+                                .iter()
+                                .any(|placement| &placement.trigger == uber_state)
+                                && !world_context
+                                    .placeholders
+                                    .iter()
+                                    .any(|&placeholder| placeholder.index() == node_index)
+                                && !world_context
+                                    .collected_preplacements
+                                    .iter()
+                                    .any(|&collected| collected == node_index)
                             {
                                 Some(node.identifier())
-                            } else { None }
-                        )
+                            } else {
+                                None
+                            }
+                        })
                     })
                     .collect();
 
-                log::trace!("(World {}): Failed to reach all locations with inventory: {}", world_index, world_context.world.player.inventory);
-                log::error!("(World {}): Couldn't reach locations {}", world_index, format_identifiers(identifiers));
+                log::trace!(
+                    "(World {}): Failed to reach all locations with inventory: {}",
+                    world_index,
+                    world_context.world.player.inventory
+                );
+                log::error!(
+                    "(World {}): Couldn't reach locations {}",
+                    world_index,
+                    format_identifiers(identifiers)
+                );
             }
 
             return Err(String::from("Failed to reach all locations"));
@@ -679,13 +1047,27 @@ where
 
     // TODO would it help variety if we didn't filter here? (Applies to spawn_progression as well)
     requirement::filter_redundancies(&mut itemsets);
-    let progression = pick_progression(target_world_index, &itemsets, slots, reach_context, world_contexts, context)?;
+    let progression = pick_progression(
+        target_world_index,
+        &itemsets,
+        slots,
+        reach_context,
+        world_contexts,
+        context,
+    )?;
 
     for (item, amount) in &progression.items {
-        let items = split_progression_item(target_world_index, item, *amount, world_contexts, context);
+        let items =
+            split_progression_item(target_world_index, item, *amount, world_contexts, context);
 
         for item in items {
-            forced_placement(target_world_index, item, reserved_slots, world_contexts, context)?;
+            forced_placement(
+                target_world_index,
+                item,
+                reserved_slots,
+                world_contexts,
+                context,
+            )?;
         }
     }
 
@@ -693,32 +1075,63 @@ where
 }
 
 #[inline]
-fn random_item_placement<'a, R, I>(origin_world_index: usize, node: &'a Node, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<bool, String>
+fn random_item_placement<'a, R, I>(
+    origin_world_index: usize,
+    node: &'a Node,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<bool, String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let origin_world_context = &mut world_contexts[origin_world_index];
 
-    let is_purchasable = node.trigger().map_or(false, |trigger| trigger.identifier.is_purchasable());
+    let is_purchasable = node
+        .trigger()
+        .map_or(false, |trigger| trigger.identifier.is_purchasable());
 
     if is_purchasable || !origin_world_context.random_spirit_light.sample(context.rng) {
         let target_world_index = context.rng.gen_range(0..context.world_count);
 
-        if is_purchasable || origin_world_context.shop_slots < world_contexts[target_world_index].world.pool.inventory.item_count() as usize {
+        if is_purchasable
+            || origin_world_context.shop_slots
+                < world_contexts[target_world_index]
+                    .world
+                    .pool
+                    .inventory
+                    .item_count() as usize
+        {
             let target_world_context = &mut world_contexts[target_world_index];
 
-            if let Some(item) = target_world_context.world.pool.choose_random(origin_world_index != target_world_index, context.rng) {
+            if let Some(item) = target_world_context
+                .world
+                .pool
+                .choose_random(origin_world_index != target_world_index, context.rng)
+            {
                 let item = item.clone();
-                let is_progression = item.is_progression(target_world_context.world.player.settings.difficulty);
+                let is_progression =
+                    item.is_progression(target_world_context.world.player.settings.difficulty);
                 target_world_context.world.pool.remove(&item, 1);
                 target_world_context.world.grant_player(item.clone(), 1);
-                place_item(origin_world_index, target_world_index, node, false, false, item, world_contexts, context)?;
+                place_item(
+                    origin_world_index,
+                    target_world_index,
+                    node,
+                    false,
+                    false,
+                    item,
+                    world_contexts,
+                    context,
+                )?;
 
                 return Ok(is_progression);
             }
         } else {
-            log::trace!("(World {}) Forcing spirit light placement to preserve items for shop slots", origin_world_index);
+            log::trace!(
+                "(World {}) Forcing spirit light placement to preserve items for shop slots",
+                origin_world_index
+            );
         }
     }
 
@@ -729,7 +1142,16 @@ where
 
     origin_world_context.world.pool.remove(&item, 1);
     origin_world_context.world.grant_player(item.clone(), 1);
-    place_item(origin_world_index, origin_world_index, node, false, false, item, world_contexts, context)?;
+    place_item(
+        origin_world_index,
+        origin_world_index,
+        node,
+        false,
+        false,
+        item,
+        world_contexts,
+        context,
+    )?;
 
     Ok(true)
 }
@@ -737,10 +1159,16 @@ where
 #[inline]
 /// May randomly place an item, or add a placeholder
 /// Returns `true` if a progression item was placed, `false` if a placeholder was added or the placed item cannot be progression
-fn random_placement<'a, R, I>(origin_world_index: usize, node: &'a Node, allow_placeholder: bool, world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<bool, String>
+fn random_placement<'a, R, I>(
+    origin_world_index: usize,
+    node: &'a Node,
+    allow_placeholder: bool,
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<bool, String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let origin_world_context = &mut world_contexts[origin_world_index];
 
@@ -757,11 +1185,18 @@ where
     }
 
     let origin_world_context = &mut world_contexts[origin_world_index];
-    log::trace!("(World {}): Reserving {} as {}placeholder", origin_world_index, node, if force { "forced " } else { "" });
+    log::trace!(
+        "(World {}): Reserving {} as {}placeholder",
+        origin_world_index,
+        node,
+        if force { "forced " } else { "" }
+    );
 
     origin_world_context.placeholders.push(node);
     if !allow_placeholder {
-        let placeholder_index = context.rng.gen_range(0..origin_world_context.placeholders.len());
+        let placeholder_index = context
+            .rng
+            .gen_range(0..origin_world_context.placeholders.len());
         let placeholder = origin_world_context.placeholders.remove(placeholder_index);
         return random_item_placement(origin_world_index, placeholder, world_contexts, context);
     }
@@ -770,21 +1205,40 @@ where
 }
 
 #[inline]
-fn one_xp<'a, R, I>(world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn one_xp<'a, R, I>(
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     for world_index in 0..context.world_count {
         let world_context = &world_contexts[world_index];
 
-        if let Some(node) = world_context.world.graph.nodes.iter()
-            .filter(|&node|
-                node.can_place() &&
-                node.trigger().map_or(true, |trigger| !world_context.world.preplacements.contains_key(trigger)))
+        if let Some(node) = world_context
+            .world
+            .graph
+            .nodes
+            .iter()
+            .filter(|&node| {
+                node.can_place()
+                    && node.trigger().map_or(true, |trigger| {
+                        !world_context.world.preplacements.contains_key(trigger)
+                    })
+            })
             .choose(context.rng)
         {
-            place_item(world_index, world_index, node, false, false, Item::SpiritLight(1), world_contexts, context)?;
+            place_item(
+                world_index,
+                world_index,
+                node,
+                false,
+                false,
+                Item::SpiritLight(1),
+                world_contexts,
+                context,
+            )?;
         }
     }
 
@@ -806,8 +1260,16 @@ struct SpiritLightAmounts {
     index: usize,
 }
 impl SpiritLightAmounts {
-    fn new(spirit_light_pool: f32, spirit_light_slots: f32, random_low: f32, random_high: f32) -> SpiritLightAmounts {
-        let factor = (spirit_light_pool - spirit_light_slots * 50.0) / (spirit_light_slots.powi(3) / 3.0 + spirit_light_slots.powi(2) / 2.0 + spirit_light_slots / 6.0);
+    fn new(
+        spirit_light_pool: f32,
+        spirit_light_slots: f32,
+        random_low: f32,
+        random_high: f32,
+    ) -> SpiritLightAmounts {
+        let factor = (spirit_light_pool - spirit_light_slots * 50.0)
+            / (spirit_light_slots.powi(3) / 3.0
+                + spirit_light_slots.powi(2) / 2.0
+                + spirit_light_slots / 6.0);
         let noise = Uniform::new_inclusive(random_low, random_high);
 
         SpiritLightAmounts {
@@ -818,7 +1280,8 @@ impl SpiritLightAmounts {
     }
     fn sample(&mut self, rng: &mut impl Rng) -> u32 {
         #[allow(clippy::cast_precision_loss)]
-        let amount = (self.factor * self.index.pow(2) as f32 + 50.0 * self.noise.sample(rng)).round();
+        let amount =
+            (self.factor * self.index.pow(2) as f32 + 50.0 * self.noise.sample(rng)).round();
         self.index += 1;
 
         #[allow(clippy::cast_possible_truncation)]
@@ -826,10 +1289,13 @@ impl SpiritLightAmounts {
     }
 }
 
-fn place_remaining<'a, R, I>(world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn place_remaining<'a, R, I>(
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     let mut shop_placeholders = vec![Vec::new(); context.world_count];
 
@@ -840,7 +1306,9 @@ where
             if node.trigger().unwrap().identifier.is_purchasable() {
                 shop_placeholders[world_index].push(node);
                 false
-            } else { true }
+            } else {
+                true
+            }
         });
 
         shop_placeholders[world_index].shuffle(context.rng);
@@ -849,10 +1317,19 @@ where
     }
 
     for target_world_index in 0..context.world_count {
-        let mut remaining = world_contexts[target_world_index].world.pool.inventory.items.drain()
+        let mut remaining = world_contexts[target_world_index]
+            .world
+            .pool
+            .inventory
+            .items
+            .drain()
             .flat_map(|(item, amount)| vec![item; amount as usize])
             .collect::<Vec<_>>();
-        log::trace!("(World {}): Placing the remaining {} items randomly", target_world_index, remaining.len());
+        log::trace!(
+            "(World {}): Placing the remaining {} items randomly",
+            target_world_index,
+            remaining.len()
+        );
 
         remaining.shuffle(context.rng);
 
@@ -868,15 +1345,30 @@ where
                 };
 
                 for origin_world_index in origin_world_indices {
-                    if let Some(node) = shop_placeholders[origin_world_index].pop().or_else(|| world_contexts[origin_world_index].placeholders.pop()) {
-                        place_item(origin_world_index, target_world_index, node, true, false, item, world_contexts, context)?;
+                    if let Some(node) = shop_placeholders[origin_world_index]
+                        .pop()
+                        .or_else(|| world_contexts[origin_world_index].placeholders.pop())
+                    {
+                        place_item(
+                            origin_world_index,
+                            target_world_index,
+                            node,
+                            true,
+                            false,
+                            item,
+                            world_contexts,
+                            context,
+                        )?;
                         continue 'outer;
                     }
                 }
 
                 space_remaining = false;
 
-                log::warning!("(World {}): Not enough space to place all items from the item pool!", target_world_index);
+                log::warning!(
+                    "(World {}): Not enough space to place all items from the item pool!",
+                    target_world_index
+                );
                 log::trace!("Unable to place {}", item);
             } else {
                 log::trace!("Unable to place {}", item);
@@ -889,33 +1381,70 @@ where
             log::warning!("(World {}): Not enough items in the pool to fill all shops! Filling with extra Gorlek Ore", world_index);
 
             for &world_shop_placeholder in world_shop_placeholders {
-                place_item(world_index, world_index, world_shop_placeholder, true, false, Item::Resource(Resource::GorlekOre), world_contexts, context)?;
+                place_item(
+                    world_index,
+                    world_index,
+                    world_shop_placeholder,
+                    true,
+                    false,
+                    Item::Resource(Resource::GorlekOre),
+                    world_contexts,
+                    context,
+                )?;
             }
         }
     }
 
     for world_index in 0..context.world_count {
-        log::trace!("(World {}): Placed all items from the pool, placing Spirit Light", world_index);
+        log::trace!(
+            "(World {}): Placed all items from the pool, placing Spirit Light",
+            world_index
+        );
 
         while let Some(placeholder) = world_contexts[world_index].placeholders.pop() {
-            let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
+            let amount = world_contexts[world_index]
+                .spirit_light_rng
+                .sample(context.rng);
             let item = Item::SpiritLight(amount);
 
-            place_item(world_index, world_index, placeholder, true, false, item, world_contexts, context)?;
+            place_item(
+                world_index,
+                world_index,
+                placeholder,
+                true,
+                false,
+                item,
+                world_contexts,
+                context,
+            )?;
         }
 
         if !world_contexts[world_index].unreachable_locations.is_empty() {
             log::trace!("(World {}): Filling unreachable locations", world_index);
         }
         while let Some(unreachable) = world_contexts[world_index].unreachable_locations.pop() {
-            let item = if unreachable.trigger().map_or(false, |trigger| trigger.identifier.is_purchasable()) {
+            let item = if unreachable
+                .trigger()
+                .map_or(false, |trigger| trigger.identifier.is_purchasable())
+            {
                 Item::Resource(Resource::GorlekOre)
             } else {
-                let amount = world_contexts[world_index].spirit_light_rng.sample(context.rng);
+                let amount = world_contexts[world_index]
+                    .spirit_light_rng
+                    .sample(context.rng);
                 Item::SpiritLight(amount)
             };
 
-            place_item(world_index, world_index, unreachable, false, false, item, world_contexts, context)?;
+            place_item(
+                world_index,
+                world_index,
+                unreachable,
+                false,
+                false,
+                item,
+                world_contexts,
+                context,
+            )?;
         }
 
         world_contexts[world_index].placements.shrink_to_fit();
@@ -940,7 +1469,12 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
     let spawn = finished_world.graph.find_spawn(DEFAULT_SPAWN)?;
 
     loop {
-        let mut reachable_locations = finished_world.graph.reached_locations(&finished_world.player, spawn, finished_world.uber_states(), &finished_world.sets);
+        let mut reachable_locations = finished_world.graph.reached_locations(
+            &finished_world.player,
+            spawn,
+            finished_world.uber_states(),
+            &finished_world.sets,
+        );
         let new_reachable_count = reachable_locations.len();
 
         if new_reachable_count > total_reachable_count {
@@ -951,12 +1485,15 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
         }
 
         reachable_locations.retain(|&node| {
-            node.trigger().is_some() &&
-            !collected_preplacements.iter().any(|&index| index == node.index())
+            node.trigger().is_some()
+                && !collected_preplacements
+                    .iter()
+                    .any(|&index| index == node.index())
         });
         // We need to ensure that if multiple quest steps are unlocked at the same time, their uberState values are set in order.
         // Otherwise we would block placements on the skipped steps
-        reachable_locations.sort_unstable_by_key(|node| node.trigger().map_or(0, UberStateTrigger::set_value));
+        reachable_locations
+            .sort_unstable_by_key(|node| node.trigger().map_or(0, UberStateTrigger::set_value));
 
         for node in reachable_locations {
             let trigger = node.trigger().unwrap();
@@ -966,18 +1503,26 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
                 collected_preplacements.push(node.index());
             }
         }
-    };
+    }
 }
 
-fn flush_item_pool<'a, R, I>(world_contexts: &mut [WorldContext<'a, '_>], context: &mut GeneratorContext<'_, R, I>) -> Result<(), String>
+fn flush_item_pool<'a, R, I>(
+    world_contexts: &mut [WorldContext<'a, '_>],
+    context: &mut GeneratorContext<'_, R, I>,
+) -> Result<(), String>
 where
     R: Rng,
-    I: Iterator<Item=u16>,
+    I: Iterator<Item = u16>,
 {
     log::trace!("Got stuck. Trying to flush uberState items from the item pool to recover...");
 
     for target_world_index in 0..context.world_count {
-        let uber_state_items = world_contexts[target_world_index].world.pool.inventory.items.iter()
+        let uber_state_items = world_contexts[target_world_index]
+            .world
+            .pool
+            .inventory
+            .items
+            .iter()
             .filter(|(item, _)| matches!(item, Item::UberState(_)))
             .flat_map(|(item, amount)| vec![item.clone(); *amount as usize])
             .collect::<Vec<_>>();
@@ -992,7 +1537,16 @@ where
 
                     target_world_context.world.pool.remove(&item, 1);
                     target_world_context.world.grant_player(item.clone(), 1);
-                    place_item(origin_world_index, target_world_index, node, true, false, item, world_contexts, context)?;
+                    place_item(
+                        origin_world_index,
+                        target_world_index,
+                        node,
+                        true,
+                        false,
+                        item,
+                        world_contexts,
+                        context,
+                    )?;
 
                     continue 'outer;
                 }
@@ -1006,14 +1560,17 @@ where
 fn generate_placements_from_spawn<'graph, 'settings>(
     worlds: Vec<World<'graph, 'settings>>,
     spawns: Vec<&'graph Node>,
-    rng: &mut impl Rng
+    rng: &mut impl Rng,
 ) -> Result<(Vec<SeedWorld<'graph, 'settings>>, SeedSpoiler), String> {
     // TODO enforce a max total price for shops
     let price_range = Uniform::new_inclusive(0.75, 1.25);
 
     let mut world_contexts = build_world_contexts(worlds, &spawns, rng)?;
 
-    let total_reachable_count: usize = world_contexts.iter().map(|world_context| world_context.reachable_locations.len()).sum();
+    let total_reachable_count: usize = world_contexts
+        .iter()
+        .map(|world_context| world_context.reachable_locations.len())
+        .sum();
 
     let mut context = GeneratorContext {
         world_count: world_contexts.len(),
@@ -1042,62 +1599,94 @@ fn generate_placements_from_spawn<'graph, 'settings>(
 
         let mut reach_context = progression_check(&mut world_contexts, &mut context)?;
 
-        force_keystones(&reach_context.reachable_states, &mut reserved_slots, &mut world_contexts, &mut context)?;
+        force_keystones(
+            &reach_context.reachable_states,
+            &mut reserved_slots,
+            &mut world_contexts,
+            &mut context,
+        )?;
 
-        let mut needs_placement = (0..context.world_count).map(|world_index| {
-            let world_reachable = &mut reach_context.reachable[world_index];
-            let world_context = &mut world_contexts[world_index];
+        let mut needs_placement = (0..context.world_count)
+            .map(|world_index| {
+                let world_reachable = &mut reach_context.reachable[world_index];
+                let world_context = &mut world_contexts[world_index];
 
-            world_reachable.retain(|&node| {
-                let node_index = node.index();
+                world_reachable.retain(|&node| {
+                    let node_index = node.index();
 
-                node.trigger().map_or(false, |trigger|
-                    !world_context.placements.iter().any(|placement| &placement.trigger == trigger) &&
-                    !world_context.placeholders.iter().any(|&placeholder| placeholder.index() == node_index) &&
-                    !world_context.collected_preplacements.iter().any(|&collected| collected == node_index) &&
-                    !reserved_slots.iter().any(|&(reserved_world, node)| reserved_world == world_index && node.index() == node_index)
-                )
-            });
-            // We need to ensure that if multiple quest steps are unlocked at the same time, their uberState values are set in order.
-            // Otherwise we would block placements on the skipped steps
-            world_reachable.sort_unstable_by_key(|node| node.trigger().map_or(0, UberStateTrigger::set_value));
+                    node.trigger().map_or(false, |trigger| {
+                        !world_context
+                            .placements
+                            .iter()
+                            .any(|placement| &placement.trigger == trigger)
+                            && !world_context
+                                .placeholders
+                                .iter()
+                                .any(|&placeholder| placeholder.index() == node_index)
+                            && !world_context
+                                .collected_preplacements
+                                .iter()
+                                .any(|&collected| collected == node_index)
+                            && !reserved_slots.iter().any(|&(reserved_world, node)| {
+                                reserved_world == world_index && node.index() == node_index
+                            })
+                    })
+                });
+                // We need to ensure that if multiple quest steps are unlocked at the same time, their uberState values are set in order.
+                // Otherwise we would block placements on the skipped steps
+                world_reachable.sort_unstable_by_key(|node| {
+                    node.trigger().map_or(0, UberStateTrigger::set_value)
+                });
 
-            #[cfg(feature = "log")]
-            {
-                let identifiers: Vec<_> = world_reachable.iter()
-                    .filter_map(|&node| 
-                        if node.can_place() {
-                            Some(node.identifier())
-                        } else { None })
-                    .collect();
+                #[cfg(feature = "log")]
+                {
+                    let identifiers: Vec<_> = world_reachable
+                        .iter()
+                        .filter_map(|&node| {
+                            if node.can_place() {
+                                Some(node.identifier())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
 
-                log::trace!("(World {}): {} Reachable free locations: {}", world_index, identifiers.len(), format_identifiers(identifiers));
-            }
-
-            let mut world_needs_placement = Vec::with_capacity(world_reachable.len());
-
-            for node in world_reachable {
-                let trigger = node.trigger().unwrap();
-                let value = trigger.set_value() as f32;
-                let preplaced = world_context.world.set_incremental_uber_state(trigger.identifier, value);
-                if preplaced {
-                    world_context.collected_preplacements.push(node.index());
-                } else if node.can_place() {
-                    world_needs_placement.push(*node);
+                    log::trace!(
+                        "(World {}): {} Reachable free locations: {}",
+                        world_index,
+                        identifiers.len(),
+                        format_identifiers(identifiers)
+                    );
                 }
-            }
 
-            let locations = world_needs_placement.iter()
-                .map(|node| node.summary())
-                .collect::<Vec<_>>();
-            context.current_spoiler_group.reachable.push(locations);
+                let mut world_needs_placement = Vec::with_capacity(world_reachable.len());
 
-            world_needs_placement.append(&mut world_context.spawn_slots);
-            world_needs_placement.shrink_to_fit();
-            world_needs_placement.shuffle(context.rng);
+                for node in world_reachable {
+                    let trigger = node.trigger().unwrap();
+                    let value = trigger.set_value() as f32;
+                    let preplaced = world_context
+                        .world
+                        .set_incremental_uber_state(trigger.identifier, value);
+                    if preplaced {
+                        world_context.collected_preplacements.push(node.index());
+                    } else if node.can_place() {
+                        world_needs_placement.push(*node);
+                    }
+                }
 
-            world_needs_placement
-        }).collect::<Vec<_>>();
+                let locations = world_needs_placement
+                    .iter()
+                    .map(|node| node.summary())
+                    .collect::<Vec<_>>();
+                context.current_spoiler_group.reachable.push(locations);
+
+                world_needs_placement.append(&mut world_context.spawn_slots);
+                world_needs_placement.shrink_to_fit();
+                world_needs_placement.shuffle(context.rng);
+
+                world_needs_placement
+            })
+            .collect::<Vec<_>>();
 
         if reach_context.unreached_count == 0 {
             log::trace!("All locations reached");
@@ -1105,24 +1694,33 @@ fn generate_placements_from_spawn<'graph, 'settings>(
             for (world_index, reserved) in reserved_slots {
                 world_contexts[world_index].placeholders.push(reserved);
             }
-            for (world_context, mut world_needs_placement) in world_contexts.iter_mut().zip(needs_placement) {
-                world_context.placeholders.append(&mut world_needs_placement);
+            for (world_context, mut world_needs_placement) in
+                world_contexts.iter_mut().zip(needs_placement)
+            {
+                world_context
+                    .placeholders
+                    .append(&mut world_needs_placement);
             }
 
             place_remaining(&mut world_contexts, &mut context)?;
 
             context.finalize_spoiler_group();
 
-            let (seed_worlds, spawns) = world_contexts.into_iter().zip(spawns)
-                .map(|(world_context, spawn)| (
-                    SeedWorld {
-                        flags: Vec::new(),  // filled later
-                        spawn,
-                        placements: world_context.placements,
-                        headers: String::new(),  // Filled later
-                        world_settings: world_context.world.player.settings,
-                    },
-                    world_context.spawn.identifier().to_string()))
+            let (seed_worlds, spawns) = world_contexts
+                .into_iter()
+                .zip(spawns)
+                .map(|(world_context, spawn)| {
+                    (
+                        SeedWorld {
+                            flags: Vec::new(), // filled later
+                            spawn,
+                            placements: world_context.placements,
+                            headers: String::new(), // Filled later
+                            world_settings: world_context.world.player.settings,
+                        },
+                        world_context.spawn.identifier().to_string(),
+                    )
+                })
                 .unzip();
             let groups = context.spoiler_groups;
 
@@ -1150,15 +1748,28 @@ fn generate_placements_from_spawn<'graph, 'settings>(
 
         let placement_count: usize = needs_placement.iter().map(Vec::len).sum();
         if placement_count > 0 {
-            log::trace!("Placing {} items randomly, reserved {} for the next placement group", placement_count, reserved_slots.len());
+            log::trace!(
+                "Placing {} items randomly, reserved {} for the next placement group",
+                placement_count,
+                reserved_slots.len()
+            );
 
-            let mut total_placeholders = world_contexts.iter().map(|world_context| world_context.placeholders.len()).sum::<usize>();
+            let mut total_placeholders = world_contexts
+                .iter()
+                .map(|world_context| world_context.placeholders.len())
+                .sum::<usize>();
             let mut any_random_placements = false;
 
             for (origin_world_index, world_needs_placement) in needs_placement.iter().enumerate() {
                 for &node in world_needs_placement {
                     let allow_placeholder = total_placeholders < PLACEHOLDER_SLOTS;
-                    if random_placement(origin_world_index, node, allow_placeholder, &mut world_contexts, &mut context)? {
+                    if random_placement(
+                        origin_world_index,
+                        node,
+                        allow_placeholder,
+                        &mut world_contexts,
+                        &mut context,
+                    )? {
                         any_random_placements |= true;
                     } else {
                         total_placeholders += 1;
@@ -1166,14 +1777,25 @@ fn generate_placements_from_spawn<'graph, 'settings>(
                 }
             }
 
-            if any_random_placements { continue }
+            if any_random_placements {
+                continue;
+            }
         }
 
-        force_progression(&mut reserved_slots, &mut reach_context, &mut world_contexts, &mut context)?;
+        force_progression(
+            &mut reserved_slots,
+            &mut reach_context,
+            &mut world_contexts,
+            &mut context,
+        )?;
     }
 }
 
-fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node], rng: &mut impl Rng) -> Result<Vec<WorldContext<'a, 'b>>, String> {
+fn build_world_contexts<'a, 'b>(
+    worlds: Vec<World<'a, 'b>>,
+    spawns: &[&'a Node],
+    rng: &mut impl Rng,
+) -> Result<Vec<WorldContext<'a, 'b>>, String> {
     let mut has_warned_about_tp_refill = false;
 
     worlds.into_iter().enumerate().map(|(world_index, mut world)| {
@@ -1315,7 +1937,11 @@ fn build_world_contexts<'a, 'b>(worlds: Vec<World<'a, 'b>>, spawns: &[&'a Node],
     }).collect::<Result<Vec<_>, String>>()
 }
 
-fn pick_spawn<'a>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut impl Rng) -> Result<&'a Node, String> {
+fn pick_spawn<'a>(
+    graph: &'a Graph,
+    world_settings: &WorldSettings,
+    rng: &mut impl Rng,
+) -> Result<&'a Node, String> {
     let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
     let spawn = match &world_settings.spawn {
         Spawn::Random => {
@@ -1324,13 +1950,13 @@ fn pick_spawn<'a>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut im
                 .filter(|&node| spawns.contains(&node.identifier()))
                 .choose(rng)
                 .ok_or_else(|| String::from("No valid spawn locations available"))?
-        },
+        }
         Spawn::FullyRandom => valid
             .choose(rng)
             .ok_or_else(|| String::from("No valid spawn locations available"))?,
         Spawn::Set(spawn_loc) => valid
             .find(|&node| node.identifier() == spawn_loc)
-            .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?
+            .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?,
     };
     Ok(spawn)
 }
@@ -1338,32 +1964,43 @@ fn pick_spawn<'a>(graph: &'a Graph, world_settings: &WorldSettings, rng: &mut im
 pub(super) fn generate_placements<'graph, 'settings>(
     graph: &'graph Graph,
     worlds: &[World<'graph, 'settings>],
-    rng: &mut impl Rng
+    rng: &mut impl Rng,
 ) -> Result<(Vec<SeedWorld<'graph, 'settings>>, SeedSpoiler), String> {
     let mut index = 0;
     loop {
-        let spawn_locs = worlds.iter()
+        let spawn_locs = worlds
+            .iter()
             .map(|world| pick_spawn(graph, world.player.settings, rng))
             .collect::<Result<Vec<_>, String>>()?;
         #[cfg(feature = "log")]
-        let identifiers = spawn_locs.iter().map(|spawn_loc| spawn_loc.identifier()).collect::<Vec<_>>();
+        let identifiers = spawn_locs
+            .iter()
+            .map(|spawn_loc| spawn_loc.identifier())
+            .collect::<Vec<_>>();
         log::trace!("Spawning on {}", identifiers.join(", "));
 
         match generate_placements_from_spawn(worlds.to_owned(), spawn_locs, rng) {
             Ok(seed) => {
                 if index > 0 {
-                    log::info!("Generated seed after {} tries{}", index + 1, if index < RETRIES / 2 { "" } else { " (phew)" });
+                    log::info!(
+                        "Generated seed after {} tries{}",
+                        index + 1,
+                        if index < RETRIES / 2 { "" } else { " (phew)" }
+                    );
                 }
 
                 return Ok(seed);
-            },
+            }
             #[cfg_attr(not(feature = "log"), allow(unused_variables))]
             Err(err) => log::error!("{}\nRetrying...", err),
         }
 
         index += 1;
         if index == RETRIES {
-            return Err(format!("All {} attempts to generate a seed failed :(", RETRIES));
+            return Err(format!(
+                "All {} attempts to generate a seed failed :(",
+                RETRIES
+            ));
         }
-    };
+    }
 }

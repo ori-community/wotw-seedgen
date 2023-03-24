@@ -4,13 +4,14 @@ use decorum::R32;
 use rustc_hash::FxHashMap;
 use wotw_seedgen_derive::VVariant;
 
-use crate::VItem;
-use crate::header::{VResolve, VString, parser, CodeDisplay};
+use crate::header::{parser, CodeDisplay, VResolve, VString};
 use crate::languages::TokenKind;
+use crate::VItem;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub struct Message {
-    #[VType] pub message: String,
+    #[VType]
+    pub message: String,
     pub frames: Option<u32>,
     pub pos: Option<R32>,
     pub mute: bool,
@@ -59,10 +60,18 @@ impl Message {
             if let Some(pos) = s.pos {
                 write_part!(first, f, "p={pos}")?;
             }
-            if s.mute { write_part!(first, f, "mute")?; }
-            if s.instant { write_part!(first, f, "instant")?; }
-            if s.quiet { write_part!(first, f, "quiet")?; }
-            if s.noclear { write_part!(first, f, "noclear")?; }
+            if s.mute {
+                write_part!(first, f, "mute")?;
+            }
+            if s.instant {
+                write_part!(first, f, "instant")?;
+            }
+            if s.quiet {
+                write_part!(first, f, "quiet")?;
+            }
+            if s.noclear {
+                write_part!(first, f, "noclear")?;
+            }
             Ok(())
         })
     }
@@ -102,10 +111,14 @@ fn replace_item_syntax(message: &mut String) {
     loop {
         parser.skip_while(|kind| kind != TokenKind::Dollar);
         let token = parser.next_token();
-        if token.kind == TokenKind::Eof { break }
+        if token.kind == TokenKind::Eof {
+            break;
+        }
         let start = token.range.start;
         let token = parser.next_token();
-        if token.kind != TokenKind::OpenBracket { continue }
+        if token.kind != TokenKind::OpenBracket {
+            continue;
+        }
         if let Ok(item) = VItem::parse(&mut parser) {
             if let Ok(item) = item.resolve(&FxHashMap::default()) {
                 let token = parser.next_token();

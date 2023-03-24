@@ -1,13 +1,16 @@
 use regex::Regex;
 
-use crate::{world::Graph, util::Zone};
 use crate::uber_state::UberStateTrigger;
+use crate::{util::Zone, world::Graph};
 
 fn read_args(seed: &str, start_index: usize) -> Option<usize> {
     let mut depth: u8 = 1;
     for (index, byte) in seed[start_index..].bytes().enumerate() {
-        if byte == b'(' { depth += 1; }
-        else if byte == b')' { depth -= 1; }
+        if byte == b'(' {
+            depth += 1;
+        } else if byte == b')' {
+            depth -= 1;
+        }
         if depth == 0 {
             return Some(start_index + index);
         }
@@ -17,13 +20,19 @@ fn read_args(seed: &str, start_index: usize) -> Option<usize> {
 }
 
 /// Create a new item matcher regex from the given pattern
-/// 
+///
 /// This will require the pattern to match the entire item, excluding the optional pickup flag `|mute` at the end which will always be accepted
 fn create_regex(pattern: &str) -> Result<Regex, String> {
-    Regex::new(&format!(r"^({}(?:\|mute)?)$", pattern)).map_err(|err| format!("Invalid regex {}: {}", pattern, err))
+    Regex::new(&format!(r"^({}(?:\|mute)?)$", pattern))
+        .map_err(|err| format!("Invalid regex {}: {}", pattern, err))
 }
 
-fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph) -> Result<String, String> {
+fn where_is(
+    pattern: &str,
+    world_index: usize,
+    seeds: &[String],
+    graph: &Graph,
+) -> Result<String, String> {
     let re = create_regex(pattern)?;
 
     for mut line in seeds[world_index].lines() {
@@ -32,17 +41,26 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph) 
         }
         line = line.trim();
 
-        if line.is_empty() || line.starts_with("Spawn:") || line.starts_with("Flags:") || line.starts_with("timer:") {
+        if line.is_empty()
+            || line.starts_with("Spawn:")
+            || line.starts_with("Flags:")
+            || line.starts_with("timer:")
+        {
             continue;
         }
 
         let mut parts = line.splitn(3, '|');
         let uber_group = parts.next().unwrap();
-        let uber_id = parts.next().ok_or_else(|| format!("failed to read line {} in seed", line))?;
-        let item = parts.next().ok_or_else(|| format!("failed to read line {} in seed", line))?;
+        let uber_id = parts
+            .next()
+            .ok_or_else(|| format!("failed to read line {} in seed", line))?;
+        let item = parts
+            .next()
+            .ok_or_else(|| format!("failed to read line {} in seed", line))?;
 
         if re.is_match(item) {
-            if uber_group == "12" {  // if multiworld shared
+            if uber_group == "12" {
+                // if multiworld shared
                 let actual_item = format!(r"8\|12\|{}\|bool\|true", uber_id);
 
                 let mut other_worlds = (0..seeds.len()).collect::<Vec<_>>();
@@ -56,9 +74,11 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph) 
                 }
             } else if uber_group == "3" && (uber_id == "0" || uber_id == "1") {
                 return Ok(String::from("Spawn"));
-            } else if let Some(node) = graph.nodes.iter().find(|&node|
-                node.trigger().map_or(false, |trigger| trigger.code().to_string() == format!("{uber_group}|{uber_id}"))
-            ) {
+            } else if let Some(node) = graph.nodes.iter().find(|&node| {
+                node.trigger().map_or(false, |trigger| {
+                    trigger.code().to_string() == format!("{uber_group}|{uber_id}")
+                })
+            }) {
                 if let Some(zone) = node.zone() {
                     return Ok(zone.to_string());
                 }
@@ -69,7 +89,13 @@ fn where_is(pattern: &str, world_index: usize, seeds: &[String], graph: &Graph) 
     Ok(String::from("Unknown"))
 }
 
-fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], graph: &Graph) -> Result<Vec<UberStateTrigger>, String> {
+fn how_many(
+    pattern: &str,
+    zone: Zone,
+    world_index: usize,
+    seeds: &[String],
+    graph: &Graph,
+) -> Result<Vec<UberStateTrigger>, String> {
     let mut locations = Vec::new();
     let re = create_regex(pattern)?;
 
@@ -79,19 +105,29 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
         }
         line = line.trim();
 
-        if line.is_empty() || line.starts_with("Spawn:") || line.starts_with("Flags:") || line.starts_with("timer:") {
+        if line.is_empty()
+            || line.starts_with("Spawn:")
+            || line.starts_with("Flags:")
+            || line.starts_with("timer:")
+        {
             continue;
         }
 
         let mut parts = line.splitn(3, '|');
         let uber_group = parts.next().unwrap();
-        let uber_id = parts.next().ok_or_else(|| format!("failed to read line {} in seed", line))?;
-        let item = parts.next().ok_or_else(|| format!("failed to read line {} in seed", line))?;
+        let uber_id = parts
+            .next()
+            .ok_or_else(|| format!("failed to read line {} in seed", line))?;
+        let item = parts
+            .next()
+            .ok_or_else(|| format!("failed to read line {} in seed", line))?;
 
         if let Some(trigger) = graph.nodes.iter().find_map(|node| {
             if node.zone() == Some(zone) {
                 let trigger = node.trigger();
-                if trigger.map_or(false, |trigger| trigger.code().to_string() == format!("{uber_group}|{uber_id}")) {
+                if trigger.map_or(false, |trigger| {
+                    trigger.code().to_string() == format!("{uber_group}|{uber_id}")
+                }) {
                     return trigger;
                 }
             }
@@ -99,10 +135,15 @@ fn how_many(pattern: &str, zone: Zone, world_index: usize, seeds: &[String], gra
         }) {
             if re.is_match(item) {
                 locations.push(trigger.clone());
-            } else {  // if multiworld shared
+            } else {
+                // if multiworld shared
                 let mut item_parts = item.split('|');
-                if item_parts.next() != Some("8") { continue; }
-                if item_parts.next() != Some("12") { continue; }
+                if item_parts.next() != Some("8") {
+                    continue;
+                }
+                if item_parts.next() != Some("12") {
+                    continue;
+                }
                 let share_id = item_parts.next().unwrap();
                 let share_state = format!("12|{}|", share_id);
 
@@ -168,12 +209,18 @@ pub fn postprocess(seeds: &mut [String], graph: &Graph) -> Result<(), String> {
                 if let Some(end_index) = read_args(seed, after_bracket) {
                     let mut args = seed[after_bracket..end_index].splitn(2, ',');
                     let zone = args.next().unwrap().trim();
-                    let zone: u8 = zone.parse().map_err(|_| format!("expected numeric zone, got {}", zone))?;
-                    let zone = Zone::try_from(zone).map_err(|_| format!("invalid zone {}", zone))?;
+                    let zone: u8 = zone
+                        .parse()
+                        .map_err(|_| format!("expected numeric zone, got {}", zone))?;
+                    let zone =
+                        Zone::try_from(zone).map_err(|_| format!("invalid zone {}", zone))?;
                     let pattern = args.next().unwrap_or("").trim();
 
                     let locations = how_many(pattern, zone, world_index, &clone, graph)?;
-                    let locations = locations.into_iter().map(|uber_state| uber_state.code().to_string()).collect::<Vec<_>>();
+                    let locations = locations
+                        .into_iter()
+                        .map(|uber_state| uber_state.code().to_string())
+                        .collect::<Vec<_>>();
                     let locations = locations.join(",").replace('|', ",");
 
                     let sysmessage = format!("$[15|4|{}]", locations);

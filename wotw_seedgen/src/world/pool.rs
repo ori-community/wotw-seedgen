@@ -1,8 +1,8 @@
-use rand::{Rng, seq::SliceRandom};
+use rand::{seq::SliceRandom, Rng};
 use rustc_hash::FxHashMap;
 
 use crate::inventory::Inventory;
-use crate::item::{Item, Resource, Skill, Shard, BonusUpgrade};
+use crate::item::{BonusUpgrade, Item, Resource, Shard, Skill};
 use crate::log;
 
 // TODO the pool could be an inventory probably
@@ -81,9 +81,7 @@ impl Pool {
         items.insert(Item::BonusUpgrade(BonusUpgrade::RapidSentry), 1);
 
         Pool {
-            inventory: Inventory {
-                items,
-            },
+            inventory: Inventory { items },
             spirit_light: 20000,
         }
     }
@@ -136,7 +134,7 @@ impl Pool {
                 }
             }
 
-            return Some(item)
+            return Some(item);
         }
     }
 }

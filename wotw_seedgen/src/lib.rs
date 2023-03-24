@@ -8,24 +8,27 @@
 #![allow(clippy::too_many_lines)]
 #![allow(clippy::struct_excessive_bools)]
 
-pub mod languages;
-pub mod world;
+pub mod files;
+pub mod generator;
 pub mod inventory;
 pub mod item;
+pub mod languages;
 pub mod preset;
+mod reach_check;
 pub mod settings;
-pub mod generator;
-pub mod files;
 pub mod uber_state;
 pub mod util;
-mod reach_check;
+pub mod world;
 
-pub use languages::{logic, header::{self, Header}};
-pub use world::World;
+pub use generator::generate_seed;
 pub use inventory::Inventory;
 pub use item::{Item, VItem};
-pub use generator::generate_seed;
+pub use languages::{
+    header::{self, Header},
+    logic,
+};
 pub use reach_check::reach_check;
+pub use world::World;
 
 mod log {
     macro_rules! trace {
@@ -48,7 +51,7 @@ mod log {
             ::log::warn!($($arg)+)
         }}
     }
-    pub(crate) use warning;  // warn is a built in attribute
+    pub(crate) use warning; // warn is a built in attribute
     macro_rules! error {
         ($($arg:tt)+) => {{
             #[cfg(feature = "log")]
@@ -60,7 +63,11 @@ mod log {
 
 #[cfg(test)]
 mod tests {
-    use crate::{preset::{WorldPreset, UniversePreset}, settings::{Difficulty, UniverseSettings}, files::FILE_SYSTEM_ACCESS};
+    use crate::{
+        files::FILE_SYSTEM_ACCESS,
+        preset::{UniversePreset, WorldPreset},
+        settings::{Difficulty, UniverseSettings},
+    };
 
     use super::*;
 
@@ -70,7 +77,8 @@ mod tests {
         let areas = files::read_file("areas", "wotw", "logic").unwrap();
         let locations = files::read_file("loc_data", "csv", "logic").unwrap();
         let states = files::read_file("state_data", "csv", "logic").unwrap();
-        let mut graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+        let mut graph =
+            logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
 
         eprintln!("Default settings ({})", universe_settings.seed);
         generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
@@ -95,18 +103,24 @@ mod tests {
             "util_twillen".to_string(),
             "vanilla_opher_upgrades".to_string(),
             "bonus_opher_upgrades".to_string(),
-        ].into_iter().collect();
+        ]
+        .into_iter()
+        .collect();
 
         for preset in ["gorlek", "rspawn"] {
             let preset = WorldPreset::read_file(preset, &FILE_SYSTEM_ACCESS).unwrap();
-            universe_settings.world_settings[0].apply_world_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
+            universe_settings.world_settings[0]
+                .apply_world_preset(preset, &FILE_SYSTEM_ACCESS)
+                .unwrap();
         }
 
         let preset = UniversePreset {
             world_settings: Some(vec![WorldPreset::default(); 2]),
             ..UniversePreset::default()
         };
-        universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS).unwrap();
+        universe_settings
+            .apply_preset(preset, &FILE_SYSTEM_ACCESS)
+            .unwrap();
 
         eprintln!("Gorlek with headers ({})", universe_settings.seed);
         generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();

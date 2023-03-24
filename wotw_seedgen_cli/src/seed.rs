@@ -1,23 +1,28 @@
 use super::cli;
-use super::play;
 use super::log_init;
+use super::play;
 
 use std::fs;
-use std::path::PathBuf;
 use std::io::{self, Read, Write};
+use std::path::PathBuf;
 use std::time::Instant;
 
 use log::LevelFilter;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
+use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
+use wotw_seedgen::generator::{Seed, SeedSpoiler};
 use wotw_seedgen::logic;
 use wotw_seedgen::settings::UniverseSettings;
-use wotw_seedgen::generator::{Seed, SeedSpoiler};
-use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 
 pub fn generate_seeds(args: cli::SeedArgs) -> Result<(), String> {
-    let use_file = if args.verbose { Some("generator.log") } else { None };
-    log_init::initialize_log(use_file, LevelFilter::Info, args.json_stderr).unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
+    let use_file = if args.verbose {
+        Some("generator.log")
+    } else {
+        None
+    };
+    log_init::initialize_log(use_file, LevelFilter::Info, args.json_stderr)
+        .unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 
     let now = Instant::now();
 
@@ -25,20 +30,27 @@ pub fn generate_seeds(args: cli::SeedArgs) -> Result<(), String> {
 
     let stdin = read_stdin()?;
     if !stdin.is_empty() {
-        let preset = serde_json::from_str(&stdin).map_err(|err| format!("Error parsing stdin as preset: {err}"))?;
-        universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS).map_err(|err| format!("Error applying the stdin preset: {err}"))?;
+        let preset = serde_json::from_str(&stdin)
+            .map_err(|err| format!("Error parsing stdin as preset: {err}"))?;
+        universe_settings
+            .apply_preset(preset, &FILE_SYSTEM_ACCESS)
+            .map_err(|err| format!("Error applying the stdin preset: {err}"))?;
     }
 
     parse_settings(args.settings, &mut universe_settings)?;
 
-    let areas = fs::read_to_string(&args.areas).map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
-    let locations = fs::read_to_string(&args.locations).map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
-    let states = fs::read_to_string(&args.uber_states).map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
+    let areas = fs::read_to_string(&args.areas)
+        .map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
+    let locations = fs::read_to_string(&args.locations)
+        .map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
+    let states = fs::read_to_string(&args.uber_states)
+        .map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
     let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, !args.trust)?;
     log::info!("Parsed logic in {:?}", now.elapsed());
 
     let worlds = universe_settings.world_count();
-    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).map_err(|err| format!("Error generating seed: {}", err))?;
+    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings)
+        .map_err(|err| format!("Error generating seed: {}", err))?;
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
@@ -75,7 +87,9 @@ fn read_stdin() -> Result<String, String> {
     let mut output = String::new();
 
     loop {
-        let result = stdin.read_to_string(&mut output).map_err(|err| format!("failed to read standard input: {err}"))?;
+        let result = stdin
+            .read_to_string(&mut output)
+            .map_err(|err| format!("failed to read standard input: {err}"))?;
         if result == 0 {
             break;
         }
@@ -86,21 +100,32 @@ fn read_stdin() -> Result<String, String> {
     Ok(output)
 }
 
-fn parse_settings(args: cli::SeedSettings, universe_settings: &mut UniverseSettings) -> Result<(), String> {
+fn parse_settings(
+    args: cli::SeedSettings,
+    universe_settings: &mut UniverseSettings,
+) -> Result<(), String> {
     let preset = args.into_universe_preset()?;
-    universe_settings.apply_preset(preset, &FILE_SYSTEM_ACCESS).map_err(|err| format!("Error applying settings: {err}"))?;
+    universe_settings
+        .apply_preset(preset, &FILE_SYSTEM_ACCESS)
+        .map_err(|err| format!("Error applying settings: {err}"))?;
 
     Ok(())
 }
 
-fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_spoiler: bool) -> Result<(), String> {
+fn write_seeds_to_files(
+    seed: &Seed,
+    filename: &str,
+    mut folder: PathBuf,
+    json_spoiler: bool,
+) -> Result<(), String> {
     let seeds = seed.seed_files()?;
     let multiworld = seeds.len() > 1;
 
     if multiworld {
         let mut multi_folder = folder.clone();
         multi_folder.push(filename);
-        folder = create_multiworld_folder(multi_folder).map_err(|err| format!("Error creating seed folder: {err}"))?;
+        folder = create_multiworld_folder(multi_folder)
+            .map_err(|err| format!("Error creating seed folder: {err}"))?;
     }
 
     let mut first = true;
@@ -113,13 +138,15 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
         }
         path.set_extension("wotwr");
 
-        let file = create_seedfile(path, seed).map_err(|err| format!("Error writing seed file: {err}"))?;
+        let file =
+            create_seedfile(path, seed).map_err(|err| format!("Error writing seed file: {err}"))?;
         log::info!("Wrote seed for World {} to {}", index, file.display());
 
         if first {
             first = false;
             if let Some(path) = file.to_str() {
-                fs::write(".currentseedpath", path).unwrap_or_else(|err| log::warn!("Unable to write .currentseedpath: {}", err));
+                fs::write(".currentseedpath", path)
+                    .unwrap_or_else(|err| log::warn!("Unable to write .currentseedpath: {}", err));
             } else {
                 log::warn!("Unable to write .currentseedpath: path is not valid unicode");
             }
@@ -133,14 +160,15 @@ fn write_seeds_to_files(seed: &Seed, filename: &str, mut folder: PathBuf, json_s
         true => {
             path.set_extension("json");
             seed.spoiler.to_json()
-        },
+        }
         false => {
             path.set_extension("txt");
             seed.spoiler.to_string()
-        },
+        }
     };
 
-    let file = create_seedfile(path, &contents).map_err(|err| format!("Error writing spoiler: {err}"))?;
+    let file =
+        create_seedfile(path, &contents).map_err(|err| format!("Error writing spoiler: {err}"))?;
     log::info!("Wrote spoiler to {}", file.display());
 
     Ok(())
@@ -160,15 +188,18 @@ fn create_seedfile(path: PathBuf, contents: &str) -> Result<PathBuf, io::Error> 
         match fs::OpenOptions::new()
             .write(true)
             .create_new(true)
-            .open(&path) {
-                Ok(mut file) => {
-                    file.write_all(contents.as_bytes())?;
-                    return Ok(path);
-                },
-                Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
-                Err(err) if err.kind() == io::ErrorKind::NotFound => fs::create_dir_all(path.parent().unwrap())?,
-                Err(err) => return Err(err),
+            .open(&path)
+        {
+            Ok(mut file) => {
+                file.write_all(contents.as_bytes())?;
+                return Ok(path);
             }
+            Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
+            Err(err) if err.kind() == io::ErrorKind::NotFound => {
+                fs::create_dir_all(path.parent().unwrap())?
+            }
+            Err(err) => return Err(err),
+        }
     }
 }
 fn create_multiworld_folder(path: PathBuf) -> Result<PathBuf, io::Error> {
@@ -183,7 +214,9 @@ fn create_multiworld_folder(path: PathBuf) -> Result<PathBuf, io::Error> {
         match fs::create_dir(&path) {
             Ok(_) => return Ok(path),
             Err(err) if err.kind() == io::ErrorKind::AlreadyExists => index += 1,
-            Err(err) if err.kind() == io::ErrorKind::NotFound => fs::create_dir_all(path.parent().unwrap())?,
+            Err(err) if err.kind() == io::ErrorKind::NotFound => {
+                fs::create_dir_all(path.parent().unwrap())?
+            }
             Err(err) => return Err(err),
         }
     }
