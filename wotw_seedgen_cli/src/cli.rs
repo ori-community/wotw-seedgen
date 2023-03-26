@@ -48,6 +48,10 @@ pub enum SeedGenCommand {
         args: WorldPresetArgs,
     },
     /// Generate seed statistics
+    ///
+    /// The resulting statistics will be written into a "stats" folder, you can read them out there
+    ///
+    /// This command also maintains a cache of seeds in a "seed_storage" folder, you do not need to interact with this folder (although you won't break anything either if you delete it or such)
     Stats {
         #[structopt(flatten)]
         args: StatsArgs,
@@ -638,10 +642,19 @@ pub struct StatsArgs {
     pub sample_size: usize,
     /// Any amount of analyzers that will provide statistics
     ///
+    /// Some analyzers take additional arguments. You can provide those like <analyzer>:<arg>[, <arg...>]
+    ///
+    /// For instance, "--analyzers item-unlock:Launch" will create a "Reachables on launch unlock.csv"
+    ///
     /// Multiple analyzers separated with spaces will create separate stats files analyzing their individual criteria
     ///
-    /// However, you can also chain analyzers together by separating them with plus (no spaces).
-    /// E.g. --analyzers spawn-locations+zone-unlocks will generate stats that analyze the zone unlocks for each individual spawn location
+    /// For instance, "--spawn random --analyzers spawn-location spawn-items" will create one set of stats "Spawn Location.csv" and another "Spawn Items.csv"
+    ///
+    /// However, you can also chain analyzers together by separating them with plus signs (no spaces).
+    ///
+    /// For instance, "--spawn random --analyzers spawn-location+spawn-items" will create a "Spawn Location and Spawn Items.csv" that contains stats on spawn items for each individual spawn location
+    ///
+    /// The available analyzers are: spawn-items, spawn-location, spawn-region, item-unlock:<item-name>, zone-unlock:<zone id>,
     #[structopt(short, long, required = true)]
     pub analyzers: Vec<ChainedAnalyzers>,
     /// The generated stats will be written to "stats/<folder_name>/<stats go here>"
