@@ -15,7 +15,7 @@ use wotw_seedgen::generator::SeedSpoiler;
 /// Trait for types that may analyze seeds and generate statistics
 ///
 /// Check the types in this module for some provided implementations
-pub trait Analyzer {
+pub trait Analyzer: Sync {
     /// A brief title describing what kind of statistic is analyzed
     fn title(&self) -> String;
 

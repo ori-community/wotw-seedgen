@@ -113,11 +113,16 @@ mod fs_access {
         }
         fn clean_seeds(settings: &UniverseSettings) -> Result<()> {
             let path = path_from_settings(settings);
-            fs::remove_dir_all(path).map_err(|err| format!("Failed to clean seed storage: {err}"))
+            fs::remove_dir_all(path).or_else(|err| match err.kind() {
+                io::ErrorKind::NotFound => Ok(()),
+                _ => Err(format!("Failed to clean seed storage: {err}")),
+            })
         }
         fn clean_all_seeds() -> Result<()> {
-            fs::remove_dir_all(SEED_STORAGE_FOLDER)
-                .map_err(|err| format!("Failed to clean seed storage: {err}"))
+            fs::remove_dir_all(SEED_STORAGE_FOLDER).or_else(|err| match err.kind() {
+                io::ErrorKind::NotFound => Ok(()),
+                _ => Err(format!("Failed to clean seed storage: {err}")),
+            })
         }
     }
 

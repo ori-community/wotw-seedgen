@@ -3,15 +3,13 @@ pub mod files;
 mod handle_errors;
 mod seed_storage;
 
-use std::{fmt::Write, iter, rc::Rc, time::Instant};
+use std::{fmt::Write, sync::Arc, time::Instant};
 
 use analyzers::Analyzer;
 use files::FileAccess;
 use itertools::Itertools;
 use rustc_hash::FxHashMap;
 use wotw_seedgen::{settings::UniverseSettings, world::Graph};
-
-use crate::seed_storage::Seeds;
 
 type Result<T> = std::result::Result<T, String>;
 
@@ -50,7 +48,7 @@ pub type ChainedAnalyzers = Vec<Box<dyn Analyzer>>;
 
 pub struct Stats {
     analyzer_titles: Vec<String>,
-    pub data: FxHashMap<Vec<Rc<String>>, u32>,
+    pub data: FxHashMap<Vec<Arc<String>>, u32>,
 }
 impl Stats {
     pub fn title(&self) -> String {
@@ -64,7 +62,7 @@ impl Stats {
         #[derive(PartialEq, Eq, PartialOrd, Ord)]
         enum StringOrNumber {
             // For smarter sorting
-            String(Rc<String>),
+            String(Arc<String>),
             Number(u32),
         }
         data.sort_by_key(|(keys, _)| {
@@ -116,27 +114,14 @@ pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
         return Err("Multiworld seeds aren't well supported yet".to_string());
     }
 
-    let seeds = Seeds::<F>::new(
-        settings,
+    let data = seed_storage::analyze::<F>(
+        &analyzers,
+        &settings,
         sample_size,
         tolerated_errors,
         error_message_limit,
         graph,
     )?;
-
-    let mut data = iter::repeat(FxHashMap::default())
-        .take(analyzers.len())
-        .collect::<Vec<_>>();
-
-    for seed in seeds {
-        for (data, chained_analyzers) in data.iter_mut().zip(analyzers.iter()) {
-            chained_analyzers
-                .iter()
-                .map(|analyzer| analyzer.analyze(&seed).into_iter().map(Rc::new))
-                .multi_cartesian_product()
-                .for_each(|key| *data.entry(key).or_default() += 1);
-        }
-    }
 
     let stats = data
         .into_iter()

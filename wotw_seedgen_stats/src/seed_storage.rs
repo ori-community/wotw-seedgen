@@ -1,88 +1,161 @@
-use std::{fmt::Write as _, marker::PhantomData};
+use std::{
+    fmt::Write,
+    iter,
+    num::NonZeroUsize,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc, Mutex,
+    },
+    thread,
+};
+
 use wotw_seedgen::{
     files::FILE_SYSTEM_ACCESS, generator::SeedSpoiler, settings::UniverseSettings, world::Graph,
 };
 
-use crate::{files::FileAccess, handle_errors::HandleErrors, Result};
+use itertools::Itertools;
+use rustc_hash::FxHashMap;
+
+use crate::{files::FileAccess, handle_errors::HandleErrors, ChainedAnalyzers, Result};
 
 const DEFAULT_ERROR_MESSAGE_LIMIT: usize = 10;
+const ANOTHER_THREAD_PANICKED: &str = "Another thread panicked";
 
-pub(crate) struct Seeds<'graph, F: FileAccess> {
+pub(crate) type SeedData = FxHashMap<Vec<Arc<String>>, u32>;
+pub(crate) fn analyze<F: FileAccess>(
+    analyzers: &[ChainedAnalyzers],
+    settings: &UniverseSettings,
     sample_size: usize,
-    existing: HandleErrors<SeedSpoiler, String, F::Iter, fn(String)>,
-    existing_amount: usize,
-    exhausted_existing: bool,
     tolerated_errors: Option<usize>,
-    seed_factory: SeedFactory<'graph, F>,
-    missing: usize,
-    finished: bool,
-}
-impl<'graph, F: FileAccess> Seeds<'graph, F> {
-    pub(crate) fn new(
-        settings: UniverseSettings,
-        sample_size: usize,
-        tolerated_errors: Option<usize>,
-        error_message_limit: Option<usize>,
-        graph: &'graph Graph,
-    ) -> Result<Seeds<'graph, F>> {
-        let existing = HandleErrors::new(
-            F::read_seeds(&settings, sample_size)?,
-            (|err| {
-                eprintln!("{err}");
-            }) as fn(String),
-        );
+    error_message_limit: Option<usize>,
+    graph: &Graph,
+) -> Result<Vec<SeedData>> {
+    let mut data = iter::repeat(FxHashMap::<_, u32>::default())
+        .take(analyzers.len())
+        .collect::<Vec<_>>();
+
+    let existing_amount = analyze_existing_seeds::<F>(analyzers, settings, sample_size, &mut data)?;
+
+    let missing = sample_size.saturating_sub(existing_amount);
+    if missing > 0 {
+        let available = thread::available_parallelism().map_or(4, NonZeroUsize::get);
+        let mut remainder = iter::repeat(1).take(missing % available);
+        let sample_size_per_thread = iter::repeat(missing / available)
+            .map(|sample_size| sample_size + remainder.next().unwrap_or(0))
+            .take(available);
+
+        let data = Mutex::new(data);
+        let count = AtomicUsize::new(0);
+        let tolerated_errors =
+            tolerated_errors.unwrap_or_else(|| usize::max(missing.saturating_mul(4), 100));
+        let errors = AtomicUsize::new(0);
         let error_message_limit = error_message_limit.unwrap_or(DEFAULT_ERROR_MESSAGE_LIMIT);
-        let seed_factory = SeedFactory::<F>::new(
-            0, // Initialized after exhausting existing
-            0, // Initialized after exhausting existing
-            0, // Initialized after exhausting existing
-            error_message_limit,
-            settings,
-            graph,
-        );
-        Ok(Self {
-            sample_size,
-            existing,
-            existing_amount: 0,
-            exhausted_existing: false,
-            tolerated_errors,
-            seed_factory,
-            missing: 0, // Initialized after exhausting existing
-            finished: false,
-        })
+        let error_messages = Mutex::new(vec![]);
+        let write_errors = AtomicUsize::new(0);
+
+        std::thread::scope(|scope| {
+            let data = &data;
+            let count = &count;
+            let errors = &errors;
+            let error_messages = &error_messages;
+            let write_errors = &write_errors;
+
+            // we collect to spawn all the threads
+            #[allow(clippy::needless_collect)]
+            let handles = sample_size_per_thread.map(|thread_sample_size| {
+                thread::Builder::new().name("seedgen".to_string()).spawn_scoped(scope, move || {
+                    let mut settings = settings.clone();
+
+                    for _ in 0..thread_sample_size {
+                        let count = count.fetch_add(1, Ordering::Relaxed) + 1;
+                        eprint!("Generating seed {}/{}\r", count, missing);
+
+                        settings.seed = rand::random::<u64>().to_string();
+
+                        let seed = loop {
+                            match wotw_seedgen::generate_seed(
+                                graph,
+                                &FILE_SYSTEM_ACCESS,
+                                &settings,
+                            ) {
+                                Ok(seed) => break seed.spoiler,
+                                Err(err) => {
+                                    let mut error_messages_lock = error_messages.lock().expect(ANOTHER_THREAD_PANICKED);
+
+                                    if error_messages_lock.len() < error_message_limit {
+                                        error_messages_lock.push(err);
+                                    }
+                                    let errors = errors.fetch_add(1, Ordering::Relaxed) + 1;
+                                    if errors > tolerated_errors {
+                                        let more = errors - error_messages_lock.len();
+                                        let mut error_message = format!(
+                                            "Too many errors while generating seeds\nSample of some errors:\n{}",
+                                            error_messages_lock.join("\n")
+                                        );
+                                        if more > 0 {
+                                            write!(error_message, "\n...{more} more").unwrap();
+                                        }
+                                        return Err(error_message);
+                                    }
+                                }
+                            }
+                        };
+
+                        if let Err(err) =
+                            F::write_seed(&seed, &settings, existing_amount + count)
+                        {
+                            let write_errors = write_errors.fetch_add(1, Ordering::Relaxed);
+                            if write_errors < 10 {
+                                eprintln!("{err}");
+                            }
+                        };
+
+                        analyze_seed(&seed, analyzers, &mut data.lock().expect(ANOTHER_THREAD_PANICKED));
+                    }
+
+                    Ok(())
+                }).expect("failed to create thread")
+            }).collect::<Vec<_>>();
+
+            handles
+                .into_iter()
+                .try_for_each(|handle| handle.join().expect("A seedgen thread panicked"))
+        })?;
+
+        print_feedback_for_generated_seeds(missing, sample_size);
+
+        Ok(data.into_inner().expect("data was poisoned"))
+    } else {
+        Ok(data)
     }
 }
-impl<F: FileAccess> Iterator for Seeds<'_, F> {
-    type Item = SeedSpoiler;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.finished {
-            return None;
-        }
-        if !self.exhausted_existing {
-            let next = self.existing.next();
-            match next {
-                Some(seed) => {
-                    self.existing_amount += 1;
-                    return Some(seed);
-                }
-                None => {
-                    self.exhausted_existing = true;
-                    print_feedback_for_unusable_seeds(self.existing.errors);
-                    self.missing = self.sample_size.saturating_sub(self.existing_amount);
-                    self.seed_factory.amount = self.missing;
-                    self.seed_factory.existing_amount = self.existing_amount;
-                    self.seed_factory.tolerated_errors = self
-                        .tolerated_errors
-                        .unwrap_or_else(|| usize::max(self.missing.saturating_mul(4), 100));
-                }
-            }
-        }
-        let next = self.seed_factory.next();
-        if next.is_none() && self.missing > 0 {
-            print_feedback_for_generated_seeds(self.missing, self.sample_size);
-        }
-        next
+fn analyze_existing_seeds<F: FileAccess>(
+    analyzers: &[ChainedAnalyzers],
+    settings: &UniverseSettings,
+    sample_size: usize,
+    data: &mut [SeedData],
+) -> Result<usize> {
+    let mut existing = HandleErrors::new(F::read_seeds(settings, sample_size)?, |err| {
+        eprintln!("{err}");
+    });
+    let mut existing_amount = 0;
+
+    for seed in existing.by_ref() {
+        existing_amount += 1;
+        analyze_seed(&seed, analyzers, data);
+    }
+    print_feedback_for_unusable_seeds(existing.errors);
+
+    Ok(existing_amount)
+}
+fn analyze_seed(seed: &SeedSpoiler, analyzers: &[ChainedAnalyzers], data: &mut [SeedData]) {
+    for (data, chained_analyzers) in data.iter_mut().zip(analyzers.iter()) {
+        chained_analyzers
+            .iter()
+            .map(|analyzer| analyzer.analyze(seed).into_iter().map(Arc::new))
+            .multi_cartesian_product()
+            .for_each(|key| *data.entry(key).or_default() += 1);
     }
 }
 
@@ -97,106 +170,6 @@ fn print_feedback_for_unusable_seeds(unusable_amount: usize) {
             if singular { "a " } else { "" },
             plural_s,
         );
-    }
-}
-struct SeedFactory<'graph, F: FileAccess> {
-    amount: usize,
-    existing_amount: usize,
-    successes: usize,
-    errors: usize,
-    error_messages: Vec<String>,
-    error_message_limit: usize,
-    tolerated_errors: usize,
-    failed: bool,
-    write_errors: usize,
-    printed_write_error_count: bool,
-    settings: UniverseSettings,
-    graph: &'graph Graph,
-    file_access: PhantomData<F>,
-}
-impl<'graph, F: FileAccess> SeedFactory<'graph, F> {
-    fn new(
-        amount: usize,
-        existing_amount: usize,
-        tolerated_errors: usize,
-        error_message_limit: usize,
-        settings: UniverseSettings,
-        graph: &'graph Graph,
-    ) -> SeedFactory<'graph, F> {
-        SeedFactory {
-            amount,
-            existing_amount,
-            successes: 0,
-            errors: 0,
-            error_messages: vec![],
-            error_message_limit,
-            tolerated_errors,
-            failed: false,
-            write_errors: 0,
-            printed_write_error_count: false,
-            settings,
-            graph,
-            file_access: PhantomData::default(),
-        }
-    }
-}
-impl<F: FileAccess> Iterator for SeedFactory<'_, F> {
-    type Item = SeedSpoiler;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if !self.failed {
-            while self.successes < self.amount {
-                eprint!("Generating seed {}/{}\r", self.successes + 1, self.amount);
-                self.settings.seed = rand::random::<u64>().to_string();
-                let seed = match wotw_seedgen::generate_seed(
-                    self.graph,
-                    &FILE_SYSTEM_ACCESS,
-                    &self.settings,
-                ) {
-                    Ok(seed) => seed.spoiler,
-                    Err(err) => {
-                        if self.error_messages.len() < self.error_message_limit {
-                            self.error_messages.push(err);
-                        }
-                        self.errors += 1;
-                        if self.errors >= self.tolerated_errors {
-                            let more = self.errors - self.error_messages.len();
-                            eprint!(
-                                "Too many errors while generating seeds\nSample of some errors:\n{}",
-                                self.error_messages.join("\n")
-                            );
-                            if more > 0 {
-                                eprint!("\n...{more} more");
-                            }
-                            eprintln!();
-                            self.failed = true;
-                            return None;
-                        }
-                        continue;
-                    }
-                };
-                if let Err(err) =
-                    F::write_seed(&seed, &self.settings, self.existing_amount + self.successes)
-                {
-                    if self.write_errors < 10 {
-                        eprintln!("{err}");
-                    }
-                    self.write_errors += 1;
-                };
-                self.successes += 1;
-                return Some(seed);
-            }
-        }
-        if !self.printed_write_error_count && self.write_errors > 10 {
-            let more = self.write_errors - 10;
-            eprintln!(
-                "...{} more error{} omitted",
-                more,
-                if more == 1 { "" } else { "s" }
-            );
-            self.printed_write_error_count = true;
-        }
-        None
     }
 }
 fn print_feedback_for_generated_seeds(generated: usize, total: usize) {
