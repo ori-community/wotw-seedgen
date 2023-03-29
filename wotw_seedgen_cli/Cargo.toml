@@ -17,6 +17,7 @@ open = "3"
 atty = "0.2"
 bugsalot = "0.2"
 structopt = "0.3"
+sanitize-filename = "0.4"
 
 [build-dependencies]
 syn = "1.0"

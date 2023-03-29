@@ -2,6 +2,7 @@ use std::fmt::Write;
 use std::{fs, path::PathBuf};
 
 use log::LevelFilter;
+use sanitize_filename::sanitize;
 use wotw_seedgen::settings::Spawn;
 use wotw_seedgen::util::constants::DEFAULT_SPAWN;
 use wotw_seedgen::world::Graph;
@@ -95,12 +96,20 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                 .0
                 .into_iter()
                 .map(|analyzer| match analyzer {
-                    cli::Analyzer::SpawnItems => box_analyzer(analyzers::SpawnItemStats),
-                    cli::Analyzer::SpawnLocation => box_analyzer(analyzers::SpawnLocationStats),
-                    cli::Analyzer::SpawnRegion => box_analyzer(analyzers::SpawnRegionStats),
+                    cli::Analyzer::EarlySkills { reachable_limit } => {
+                        box_analyzer(analyzers::EarlySkillsStats {
+                            reachable_limit: reachable_limit.unwrap_or(50),
+                        })
+                    }
                     cli::Analyzer::ItemUnlock { item } => {
                         box_analyzer(analyzers::ItemUnlockStats { item })
                     }
+                    cli::Analyzer::ItemZone { item } => {
+                        box_analyzer(analyzers::ItemZoneStats { item })
+                    }
+                    cli::Analyzer::SpawnItems => box_analyzer(analyzers::SpawnItemStats),
+                    cli::Analyzer::SpawnLocation => box_analyzer(analyzers::SpawnLocationStats),
+                    cli::Analyzer::SpawnRegion => box_analyzer(analyzers::SpawnRegionStats),
                     cli::Analyzer::ZoneUnlock { zone } => {
                         box_analyzer(analyzers::ZoneUnlockStats { zone })
                     }
@@ -120,10 +129,17 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
     };
     let stats = wotw_seedgen_stats::stats::<FileSystemAccess>(args)?;
 
+    fs::create_dir_all(&path).map_err(|err| {
+        format!(
+            "failed to create folder for statistics at \"{}\": {}",
+            path.display(),
+            err
+        )
+    })?; // It might've been a while ago that we created this folder, lets check if we need to recreate it in case the user deleted it in the meantime
     for stats in stats {
         let csv = stats.csv();
         let mut path = path.clone();
-        path.push(stats.title());
+        path.push(sanitize(stats.title()));
         path.set_extension("csv");
         fs::write(&path, csv).map_err(|err| {
             format!(

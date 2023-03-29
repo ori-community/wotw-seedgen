@@ -654,7 +654,7 @@ pub struct StatsArgs {
     ///
     /// For instance, "--spawn random --analyzers spawn-location+spawn-items" will create a "Spawn Location and Spawn Items.csv" that contains stats on spawn items for each individual spawn location
     ///
-    /// The available analyzers are: spawn-items, spawn-location, spawn-region, item-unlock:<item-name>, zone-unlock:<zone id>,
+    /// To learn more about the available analyzers, try "--analyzers help"
     #[structopt(short, long, required = true)]
     pub analyzers: Vec<ChainedAnalyzers>,
     /// The generated stats will be written to "stats/<folder_name>/<stats go here>"
@@ -680,10 +680,24 @@ pub struct StatsArgs {
 pub struct ChainedAnalyzers(pub Vec<Analyzer>);
 #[derive(StructOpt)]
 pub enum Analyzer {
-    SpawnItems,
-    SpawnLocation,
-    SpawnRegion,
+    /// Analyzes the skills placed early on. By default this means placed in the first 50 reachable locations.
+    /// You can optionally pass early-skills:<reachable-limit> to override the default value
+    EarlySkills { reachable_limit: Option<usize> },
+    /// Analyzes how many locations are reachable when an item unlocks.
+    /// Pass item-unlock:<item-name> to specify which item to analyze (Example: item-unlock:Launch)
     ItemUnlock { item: String },
+    /// Analyzes what zone an item is placed in.
+    /// Pass item-zone:<item-name> to specify which item to analyze (Example: "item-zone:Launch Fragment")
+    ItemZone { item: String },
+    /// Analyzes the spawn items. Only makes sense with random spawn, since with the default spawn no spawn items are given
+    SpawnItems,
+    /// Analyzes the spawn locations. Only makes sense with random spawn, otherwise this will always be the same
+    SpawnLocation,
+    /// Analyzes the spawn region. Useful for fully random spawn where there are a lot of spawn locations
+    SpawnRegion,
+    /// Analyzes how many locations are reachable when a zone unlocks.
+    /// Pass zone-unlock:<zone> to specify which zone to analyze (Example: zone-unlock:3).
+    /// Currently only numeric zone identifiers are supported
     ZoneUnlock { zone: Zone },
 }
 impl FromStr for ChainedAnalyzers {
@@ -693,13 +707,15 @@ impl FromStr for ChainedAnalyzers {
         s.split('+')
             .map(|s| {
                 match s.split_once(':') {
-                    None => Analyzer::from_iter_safe(["", s]), // The first arg is the "executable name", I think clap would have a more elegant solution here
+                    None => Analyzer::from_iter_safe(["--analyzer", s]), // The first arg is the "executable name"
                     Some((identifier, args)) => Analyzer::from_iter_safe(
-                        ["", identifier].into_iter().chain(args.split(',')),
+                        ["--analyzer", identifier]
+                            .into_iter()
+                            .chain(args.split(',')),
                     ),
                 }
             })
-            .collect::<Result<Vec<_>, _>>()
+            .collect::<Result<_, _>>()
             .map(Self)
     }
 }
