@@ -107,6 +107,7 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                     cli::Analyzer::ItemZone { item } => {
                         box_analyzer(analyzers::ItemZoneStats { item })
                     }
+                    cli::Analyzer::Progression => box_analyzer(analyzers::ProgressionStats),
                     cli::Analyzer::SpawnItems => box_analyzer(analyzers::SpawnItemStats),
                     cli::Analyzer::SpawnLocation => box_analyzer(analyzers::SpawnLocationStats),
                     cli::Analyzer::SpawnRegion => box_analyzer(analyzers::SpawnRegionStats),
@@ -148,9 +149,9 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                 err
             )
         })?;
+        eprintln!("Wrote statistics to \"{}\"", path.display());
     }
 
-    eprintln!("Wrote stats to \"{}\"", path.display());
     path.push("settings.json");
     fs::write(&path, settings_json).map_err(|err| {
         format!(

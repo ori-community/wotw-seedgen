@@ -689,6 +689,8 @@ pub enum Analyzer {
     /// Analyzes what zone an item is placed in.
     /// Pass item-zone:<item-name> to specify which item to analyze (Example: "item-zone:Launch Fragment")
     ItemZone { item: String },
+    /// Analyzes which items get placed as forced progression
+    Progression,
     /// Analyzes the spawn items. Only makes sense with random spawn, since with the default spawn no spawn items are given
     SpawnItems,
     /// Analyzes the spawn locations. Only makes sense with random spawn, otherwise this will always be the same
@@ -707,9 +709,9 @@ impl FromStr for ChainedAnalyzers {
         s.split('+')
             .map(|s| {
                 match s.split_once(':') {
-                    None => Analyzer::from_iter_safe(["--analyzer", s]), // The first arg is the "executable name"
+                    None => Analyzer::from_iter_safe(["--analyzers", s]), // The first arg is the "executable name"
                     Some((identifier, args)) => Analyzer::from_iter_safe(
-                        ["--analyzer", identifier]
+                        ["--analyzers", identifier]
                             .into_iter()
                             .chain(args.split(',')),
                     ),

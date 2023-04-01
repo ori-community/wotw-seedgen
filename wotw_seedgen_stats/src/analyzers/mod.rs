@@ -1,6 +1,7 @@
 mod early_skills;
 mod item_unlock;
 mod item_zone;
+mod progression;
 mod spawn_items;
 mod spawn_location;
 mod spawn_region;
@@ -9,6 +10,7 @@ mod zone_unlock;
 pub use early_skills::EarlySkillsStats;
 pub use item_unlock::ItemUnlockStats;
 pub use item_zone::ItemZoneStats;
+pub use progression::ProgressionStats;
 pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;
 pub use spawn_region::SpawnRegionStats;
