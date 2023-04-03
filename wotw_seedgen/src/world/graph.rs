@@ -155,6 +155,21 @@ struct ReachContext<'a, 'b, 'c> {
     states: FxHashSet<usize>,
     state_progressions: FxHashMap<usize, Vec<(usize, &'a Connection)>>,
     world_state: FxHashMap<usize, OrbVariants>,
+    reached: Vec<&'a Node>,
+    progressions: Vec<(&'a Requirement, OrbVariants)>,
+}
+impl<'b, 'c> ReachContext<'_, 'b, 'c> {
+    fn new(player: &'b Player<'c>, progression_check: bool, states: FxHashSet<usize>) -> Self {
+        ReachContext {
+            player,
+            progression_check,
+            states,
+            state_progressions: Default::default(),
+            world_state: Default::default(),
+            reached: Default::default(),
+            progressions: Default::default(),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -185,9 +200,7 @@ impl Graph {
         &'a self,
         index: usize,
         context: &mut ReachContext<'a, '_, '_>,
-    ) -> (Reached<'a>, Progressions<'a>) {
-        let mut reached = Vec::new();
-        let mut progressions = Vec::new();
+    ) {
         if let Some(connections) = context.state_progressions.get(&index) {
             for (from, connection) in connections.clone() {
                 if context.world_state.contains_key(&connection.to) {
@@ -200,18 +213,10 @@ impl Graph {
                     context.world_state[&from].clone(),
                 );
                 if !target_orbs.is_empty() {
-                    let (mut child_reached, mut child_progressions) = self.reach_recursion(
-                        &self.nodes[connection.to],
-                        false,
-                        target_orbs,
-                        context,
-                    );
-                    reached.append(&mut child_reached);
-                    progressions.append(&mut child_progressions);
+                    self.reach_recursion(&self.nodes[connection.to], false, target_orbs, context);
                 }
             }
         }
-        (reached, progressions)
     }
 
     fn reach_recursion<'a>(
@@ -220,7 +225,7 @@ impl Graph {
         is_spawn: bool,
         mut best_orbs: OrbVariants,
         context: &mut ReachContext<'a, '_, '_>,
-    ) -> (Reached<'a>, Progressions<'a>) {
+    ) {
         context.world_state.insert(entry.index(), best_orbs.clone());
         match entry {
             Node::Anchor(anchor) => {
@@ -262,8 +267,6 @@ impl Graph {
                     }
                 }
 
-                let mut reached = Vec::new();
-                let mut progressions = Vec::new();
                 for connection in &anchor.connections {
                     if context.world_state.contains_key(&connection.to) {
                         // TODO loop with improved orbs?
@@ -288,7 +291,9 @@ impl Graph {
 
                         if states.is_empty() {
                             if context.progression_check {
-                                progressions.push((&connection.requirement, best_orbs.clone()));
+                                context
+                                    .progressions
+                                    .push((&connection.requirement, best_orbs.clone()));
                             }
                         } else {
                             for state in states {
@@ -300,14 +305,12 @@ impl Graph {
                             }
                         }
                     } else {
-                        let (mut child_reached, mut child_progressions) = self.reach_recursion(
+                        self.reach_recursion(
                             &self.nodes[connection.to],
                             false,
                             target_orbs,
                             context,
                         );
-                        reached.append(&mut child_reached);
-                        progressions.append(&mut child_progressions);
                     }
                 }
                 if is_spawn {
@@ -321,29 +324,21 @@ impl Graph {
                             .iter()
                             .any(|connection| connection.to == tp_anchor.index())
                         {
-                            let (mut tp_reached, mut tp_progressions) =
-                                self.reach_recursion(tp_anchor, false, best_orbs, context);
-                            reached.append(&mut tp_reached);
-                            progressions.append(&mut tp_progressions);
+                            self.reach_recursion(tp_anchor, false, best_orbs, context);
                         }
                     }
                 }
-                (reached, progressions)
             }
-            Node::Pickup(_) => (vec![entry], vec![]),
+            Node::Pickup(_) => context.reached.push(entry),
             Node::State(state) => {
                 context.states.insert(state.index);
-                let (mut reached, progressions) =
-                    self.follow_state_progressions(state.index, context);
-                reached.push(entry);
-                (reached, progressions)
+                context.reached.push(entry);
+                self.follow_state_progressions(state.index, context);
             }
             Node::Quest(quest) => {
                 context.states.insert(quest.index);
-                let (mut reached, progressions) =
-                    self.follow_state_progressions(quest.index, context);
-                reached.push(entry);
-                (reached, progressions)
+                context.reached.push(entry);
+                self.follow_state_progressions(quest.index, context);
             }
         }
     }
@@ -400,18 +395,12 @@ impl Graph {
         extra_states: &FxHashMap<UberIdentifier, f32>,
         sets: &[usize],
     ) -> Reached<'a> {
-        let mut context = ReachContext {
-            player,
-            progression_check: false,
-            states: self.collect_extra_states(extra_states, sets),
-            state_progressions: FxHashMap::default(),
-            world_state: FxHashMap::default(),
-        };
+        let mut context =
+            ReachContext::new(player, false, self.collect_extra_states(extra_states, sets));
 
-        let (reached, _) =
-            self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
+        self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
 
-        reached
+        context.reached
     }
     pub fn reached_and_progressions<'a>(
         &'a self,
@@ -420,27 +409,22 @@ impl Graph {
         extra_states: &FxHashMap<UberIdentifier, f32>,
         sets: &[usize],
     ) -> (Reached<'a>, Progressions<'a>) {
-        let mut context = ReachContext {
-            player,
-            progression_check: true,
-            states: self.collect_extra_states(extra_states, sets),
-            state_progressions: FxHashMap::default(),
-            world_state: FxHashMap::default(),
-        };
+        let mut context =
+            ReachContext::new(player, true, self.collect_extra_states(extra_states, sets));
 
-        let (reached, mut progressions) =
-            self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
+        self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
 
         // add progressions containing states that were never met
         for (_, state_progressions) in context.state_progressions {
             for (from, connection) in state_progressions {
                 if !context.world_state.contains_key(&connection.to) {
-                    progressions
+                    context
+                        .progressions
                         .push((&connection.requirement, context.world_state[&from].clone()));
                 }
             }
         }
 
-        (reached, progressions)
+        (context.reached, context.progressions)
     }
 }
