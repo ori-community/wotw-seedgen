@@ -29,6 +29,7 @@ pub struct Anchor {
     pub identifier: String,
     pub position: Option<Position>,
     pub can_spawn: bool,
+    pub teleport_restriction: Requirement,
     pub index: usize,
     pub refills: Vec<Refill>,
     pub connections: Vec<Connection>,
@@ -213,7 +214,7 @@ impl Graph {
                     context.world_state[&from].clone(),
                 );
                 if !target_orbs.is_empty() {
-                    self.reach_recursion(&self.nodes[connection.to], false, target_orbs, context);
+                    self.reach_recursion(&self.nodes[connection.to], target_orbs, context);
                 }
             }
         }
@@ -222,7 +223,6 @@ impl Graph {
     fn reach_recursion<'a>(
         &'a self,
         entry: &'a Node,
-        is_spawn: bool,
         mut best_orbs: OrbVariants,
         context: &mut ReachContext<'a, '_, '_>,
     ) {
@@ -305,27 +305,7 @@ impl Graph {
                             }
                         }
                     } else {
-                        self.reach_recursion(
-                            &self.nodes[connection.to],
-                            false,
-                            target_orbs,
-                            context,
-                        );
-                    }
-                }
-                if is_spawn {
-                    if let Some(tp_anchor) = self
-                        .nodes
-                        .iter()
-                        .find(|&node| node.identifier() == TP_ANCHOR)
-                    {
-                        if !anchor
-                            .connections
-                            .iter()
-                            .any(|connection| connection.to == tp_anchor.index())
-                        {
-                            self.reach_recursion(tp_anchor, false, best_orbs, context);
-                        }
+                        self.reach_recursion(&self.nodes[connection.to], target_orbs, context);
                     }
                 }
             }
@@ -339,6 +319,29 @@ impl Graph {
                 context.states.insert(quest.index);
                 context.reached.push(entry);
                 self.follow_state_progressions(quest.index, context);
+            }
+        }
+    }
+    fn reached_by_teleporter<'a>(&'a self, context: &mut ReachContext<'a, '_, '_>) {
+        if context
+            .world_state
+            .iter()
+            .any(|(index, orb_variants)| match &self.nodes[*index] {
+                Node::Anchor(anchor) => !anchor
+                    .teleport_restriction
+                    .is_met(context.player, &context.states, orb_variants.clone())
+                    .is_empty(),
+                _ => false,
+            })
+        {
+            if let Some(tp_anchor) = self
+                .nodes
+                .iter()
+                .find(|&node| node.identifier() == TP_ANCHOR)
+            {
+                if !context.world_state.contains_key(&tp_anchor.index()) {
+                    self.reach_recursion(tp_anchor, smallvec![context.player.max_orbs()], context);
+                }
             }
         }
     }
@@ -398,7 +401,8 @@ impl Graph {
         let mut context =
             ReachContext::new(player, false, self.collect_extra_states(extra_states, sets));
 
-        self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
+        self.reach_recursion(spawn, smallvec![player.max_orbs()], &mut context);
+        self.reached_by_teleporter(&mut context);
 
         context.reached
     }
@@ -412,7 +416,8 @@ impl Graph {
         let mut context =
             ReachContext::new(player, true, self.collect_extra_states(extra_states, sets));
 
-        self.reach_recursion(spawn, true, smallvec![player.max_orbs()], &mut context);
+        self.reach_recursion(spawn, smallvec![player.max_orbs()], &mut context);
+        self.reached_by_teleporter(&mut context);
 
         // add progressions containing states that were never met
         for (_, state_progressions) in context.state_progressions {

@@ -44,6 +44,7 @@ pub struct Anchor<'a> {
     pub identifier: &'a str,
     pub position: Option<Position>,
     pub can_spawn: bool,
+    pub teleport_restriction: Option<Group<'a>>,
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
 }
@@ -229,7 +230,10 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
     let token_range = parser.current_token().range.clone();
     let identifier = read_ident!(parser, Suggestion::Identifier)?;
     if identifier == "Random" || identifier == "FullyRandom" {
-        return Err(parser.error("Invalid anchor identifier", token_range));
+        return Err(parser.error(
+            "An anchor cannot be named \"Random\" or \"FullyRandom\"",
+            token_range,
+        ));
     }
     parser.skip(TokenKind::Whitespace);
     let position = parse_anchor_position(parser)?;
@@ -237,6 +241,7 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
     parser.eat(TokenKind::Indent)?;
 
     let mut can_spawn = true;
+    let mut teleport_restriction = None;
     let mut refills = Vec::new();
     let mut connections = Vec::new();
 
@@ -245,9 +250,21 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
             break;
         }
 
+        let start = parser.current_token().range.start;
+
         match parse_anchor_content(parser) {
             Ok(content) => match content {
                 AnchorContent::NoSpawn => can_spawn = false,
+                AnchorContent::TpRestriction(requirement) => {
+                    if teleport_restriction.replace(requirement).is_some() {
+                        let range = start..parser.current_token().range.start;
+                        recover(parser, |kind| matches!(kind, TokenKind::Dedent { .. }));
+                        check_dedent(parser)?;
+                        return Err(
+                            parser.error("An anchor may only have one teleport restriction", range)
+                        );
+                    }
+                }
                 AnchorContent::Refill(refill) => refills.push(refill),
                 AnchorContent::Connection(connection) => connections.push(connection),
             },
@@ -263,6 +280,7 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
         identifier,
         position,
         can_spawn,
+        teleport_restriction,
         refills,
         connections,
     }))
@@ -288,6 +306,7 @@ fn parse_anchor_position(parser: &mut Parser) -> Result<Option<Position>, ParseE
 #[ParseFromIdentifier]
 enum AnchorContentKind {
     NoSpawn,
+    TpRestriction,
     Refill,
     State,
     Quest,
@@ -296,6 +315,7 @@ enum AnchorContentKind {
 }
 enum AnchorContent<'a> {
     NoSpawn,
+    TpRestriction(Group<'a>),
     Refill(Refill<'a>),
     Connection(Connection<'a>),
 }
@@ -307,6 +327,7 @@ fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>
             parser.eat_or_suggest(TokenKind::Newline, Suggestion::AnchorContent)?;
             AnchorContent::NoSpawn
         }
+        AnchorContentKind::TpRestriction => AnchorContent::TpRestriction(parse_group(parser)?),
         AnchorContentKind::Refill => AnchorContent::Refill(parse_anchor_refill(parser)?),
         AnchorContentKind::State => {
             AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::State)?)
@@ -322,6 +343,18 @@ fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>
         }
     };
     Ok(content)
+}
+fn parse_optional_group<'a>(parser: &mut Parser<'a>) -> Result<Option<Group<'a>>, ParseError> {
+    let group = match parser.current_token().kind {
+        TokenKind::Colon => Some(parse_group(parser)?),
+        _ => {
+            parser.skip(TokenKind::Whitespace);
+            parser.eat_or_suggest(TokenKind::Newline, Suggestion::Refill)?;
+            None
+        }
+    };
+
+    Ok(group)
 }
 #[derive(FromStr)]
 #[ParseFromIdentifier]
@@ -345,13 +378,7 @@ fn parse_anchor_refill<'a>(parser: &mut Parser<'a>) -> Result<Refill<'a>, ParseE
         }
     };
 
-    let requirements = if parser.current_token().kind == TokenKind::Colon {
-        Some(parse_group(parser)?)
-    } else {
-        parser.skip(TokenKind::Whitespace);
-        parser.eat_or_suggest(TokenKind::Newline, Suggestion::Refill)?;
-        None
-    };
+    let requirements = parse_optional_group(parser)?;
 
     Ok(Refill {
         value,

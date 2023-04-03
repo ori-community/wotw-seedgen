@@ -1926,13 +1926,13 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
 
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
   # this anchor doesn't assume drained water because that should make it usable for weird dirty water swim paths
-  nospawn  # underwater
+  tprestriction: WestHollow.UpperDrainLeverPulled
   refill Checkpoint
   refill Energy=3:
     moki: WestHollow.UpperDrainLeverPulled, BreakCrystal
   
   state WestHollow.UpperTongueExtended:  # this tongue stays extended permanently, so it can be a state. If you're able to retract it, you are also able to extend it again
-    moki: Bow=1
+    moki: WestHollow.UpperDrainLeverPulled, Bow=1
 
   pickup WestHollow.HiddenEC:
     moki: WestHollow.FullyDrained, BreakWall=10

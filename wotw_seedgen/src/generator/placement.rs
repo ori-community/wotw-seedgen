@@ -1934,21 +1934,33 @@ fn pick_spawn<'a>(
     world_settings: &WorldSettings,
     rng: &mut impl Rng,
 ) -> Result<&'a Node, String> {
-    let mut valid = graph.nodes.iter().filter(|node| node.can_spawn());
     let spawn = match &world_settings.spawn {
         Spawn::Random => {
             let spawns = world_settings.difficulty.spawn_locations();
-            valid
+            graph
+                .nodes
+                .iter()
                 .filter(|&node| spawns.contains(&node.identifier()))
                 .choose(rng)
                 .ok_or_else(|| String::from("No valid spawn locations available"))?
         }
-        Spawn::FullyRandom => valid
+        Spawn::FullyRandom => graph
+            .nodes
+            .iter()
+            .filter(|node| node.can_spawn())
             .choose(rng)
             .ok_or_else(|| String::from("No valid spawn locations available"))?,
-        Spawn::Set(spawn_loc) => valid
-            .find(|&node| node.identifier() == spawn_loc)
-            .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?,
+        Spawn::Set(spawn_loc) => {
+            let node = graph
+                .nodes
+                .iter()
+                .find(|&node| node.identifier() == spawn_loc)
+                .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?;
+            if !node.can_spawn() {
+                return Err(format!("{} is not a valid spawn", spawn_loc));
+            }
+            node
+        }
     };
     Ok(spawn)
 }

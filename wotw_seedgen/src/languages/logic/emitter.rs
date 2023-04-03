@@ -518,10 +518,15 @@ pub fn build(
             identifier,
             position,
             can_spawn,
+            teleport_restriction,
             refills,
             connections,
         } = anchor;
         let identifier = identifier.to_owned();
+
+        let teleport_restriction = teleport_restriction.map_or(Requirement::Free, |group| {
+            build_requirement_group(&group, false, &mut context)
+        });
 
         let refills = refills
             .into_iter()
@@ -567,6 +572,7 @@ pub fn build(
             identifier,
             position,
             can_spawn,
+            teleport_restriction,
             index,
             refills,
             connections,
