@@ -694,7 +694,6 @@ fn determine_progressions<'a>(
 fn pick_progression<'a, 'b, R, I>(
     target_world_index: usize,
     itemsets: &'b [Inventory],
-    slots: usize,
     reach_context: &ReachContext,
     world_contexts: &mut [WorldContext<'a, '_>],
     context: &mut GeneratorContext<'_, R, I>,
@@ -739,11 +738,6 @@ where
                     .any(|preplaced| reached == preplaced)
             })
         });
-        let preplaced_reached = lookahead_reachable.len();
-
-        if slots - (inventory.item_count() as usize) < 3 && newly_reached <= preplaced_reached {
-            return Ok(0.000_001);
-        }
 
         let base_weight = 1.0 / inventory.cost() as f32;
 
@@ -858,7 +852,6 @@ where
             let progression = pick_progression(
                 world_index,
                 &itemsets,
-                available_spawn_slots,
                 &reach_context,
                 world_contexts,
                 context,
@@ -1050,7 +1043,6 @@ where
     let progression = pick_progression(
         target_world_index,
         &itemsets,
-        slots,
         reach_context,
         world_contexts,
         context,

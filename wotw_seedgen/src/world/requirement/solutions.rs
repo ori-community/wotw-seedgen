@@ -159,6 +159,7 @@ impl Requirement {
         );
     }
 
+    #[cfg(debug_assertions)]
     fn check_solutions(
         &self,
         solutions: &[Inventory],

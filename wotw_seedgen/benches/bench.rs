@@ -186,6 +186,7 @@ fn generation(c: &mut Criterion) {
 
     seed = 0;
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
+    universe_settings.world_settings[0].spawn = Spawn::FullyRandom;
     let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
     Criterion::default()
         .sample_size(10)
@@ -198,7 +199,7 @@ fn generation(c: &mut Criterion) {
         });
 
     seed = 0;
-    universe_settings.world_settings[0].difficulty = Difficulty::Moki;
+    universe_settings = UniverseSettings::default();
     universe_settings.world_settings.extend_from_within(..);
     let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
 
