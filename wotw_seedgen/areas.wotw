@@ -1926,7 +1926,8 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
 
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
   # this anchor doesn't assume drained water because that should make it usable for weird dirty water swim paths
-  tprestriction: WestHollow.UpperDrainLeverPulled
+  tprestriction:
+    moki: WestHollow.UpperDrainLeverPulled
   refill Checkpoint
   refill Energy=3:
     moki: WestHollow.UpperDrainLeverPulled, BreakCrystal
