@@ -52,13 +52,6 @@ mod log {
         }}
     }
     pub(crate) use warning; // warn is a built in attribute
-    macro_rules! error {
-        ($($arg:tt)+) => {{
-            #[cfg(feature = "log")]
-            ::log::error!($($arg)+)
-        }}
-    }
-    pub(crate) use error;
 }
 
 #[cfg(test)]

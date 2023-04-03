@@ -1027,7 +1027,7 @@ where
                     world_index,
                     world_context.world.player.inventory
                 );
-                log::error!(
+                log::warning!(
                     "(World {}): Couldn't reach locations {}",
                     world_index,
                     format_identifiers(identifiers)
@@ -1984,7 +1984,7 @@ pub(super) fn generate_placements<'graph, 'settings>(
                 return Ok(seed);
             }
             #[cfg_attr(not(feature = "log"), allow(unused_variables))]
-            Err(err) => log::error!("{}\nRetrying...", err),
+            Err(err) => log::warning!("{}\nRetrying...", err),
         }
 
         index += 1;
