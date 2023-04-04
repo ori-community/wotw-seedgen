@@ -68,7 +68,10 @@ impl Stats {
         data.sort_by_key(|(keys, _)| {
             keys.iter()
                 .map(|key| {
-                    key.parse::<u32>()
+                    key.split('-')
+                        .next()
+                        .unwrap()
+                        .parse::<u32>()
                         .map_or(StringOrNumber::String(key.clone()), |number| {
                             StringOrNumber::Number(number)
                         })

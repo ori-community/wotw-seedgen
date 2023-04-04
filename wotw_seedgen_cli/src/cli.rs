@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt;
+use std::num::NonZeroUsize;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -671,7 +672,7 @@ pub struct StatsArgs {
     #[structopt(long, default_value = "10")]
     pub error_message_limit: usize,
     /// cleans the cache for the provided settings and generates new seeds from scratch
-    #[structopt(long)]
+    #[structopt(short = "O", long)]
     pub overwrite_cache: bool,
     #[structopt(flatten)]
     pub settings: SeedSettings,
@@ -682,10 +683,18 @@ pub struct ChainedAnalyzers(pub Vec<Analyzer>);
 pub enum Analyzer {
     /// Analyzes the skills placed early on. By default this means placed in the first 50 reachable locations.
     /// You can optionally pass early-skills:<reachable-limit> to override the default value
-    EarlySkills { reachable_limit: Option<usize> },
+    EarlySkills {
+        #[structopt(default_value = "50")]
+        reachable_limit: usize,
+    },
     /// Analyzes how many locations are reachable when an item unlocks.
     /// Pass item-unlock:<item-name> to specify which item to analyze (Example: item-unlock:Launch)
-    ItemUnlock { item: String },
+    /// You can optionally pass item-unlock:<item-name>,<result-bucket-size> to group results together in buckets
+    ItemUnlock {
+        item: String,
+        #[structopt(default_value = "1")]
+        result_bucket_size: NonZeroUsize,
+    },
     /// Analyzes what zone an item is placed in.
     /// Pass item-zone:<item-name> to specify which item to analyze (Example: "item-zone:Launch Fragment")
     ItemZone { item: String },
@@ -697,10 +706,21 @@ pub enum Analyzer {
     SpawnLocation,
     /// Analyzes the spawn region. Useful for fully random spawn where there are a lot of spawn locations
     SpawnRegion,
+    /// Analyzes how big the steps of progression are
+    /// You can optionally pass step-size:<result-bucket-size> to group results together in buckets
+    StepSize {
+        #[structopt(default_value = "1")]
+        result_bucket_size: NonZeroUsize,
+    },
     /// Analyzes how many locations are reachable when a zone unlocks.
     /// Pass zone-unlock:<zone> to specify which zone to analyze (Example: zone-unlock:3).
     /// Currently only numeric zone identifiers are supported
-    ZoneUnlock { zone: Zone },
+    /// You can optionally pass zone-unlock:<zone>,<result-bucket-size> to group results together in buckets
+    ZoneUnlock {
+        zone: Zone,
+        #[structopt(default_value = "1")]
+        result_bucket_size: NonZeroUsize,
+    },
 }
 impl FromStr for ChainedAnalyzers {
     type Err = structopt::clap::Error;

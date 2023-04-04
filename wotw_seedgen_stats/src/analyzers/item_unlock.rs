@@ -1,3 +1,5 @@
+use std::num::NonZeroUsize;
+
 use wotw_seedgen::generator::SeedSpoiler;
 
 use super::Analyzer;
@@ -5,6 +7,8 @@ use super::Analyzer;
 /// Analyzes how late an item is placed
 pub struct ItemUnlockStats {
     pub item: String,
+    /// How many adjacent result to group together
+    pub result_bucket_size: NonZeroUsize,
 }
 impl Analyzer for ItemUnlockStats {
     fn title(&self) -> String {
@@ -24,6 +28,9 @@ impl Analyzer for ItemUnlockStats {
             .flat_map(|group| group.reachable.iter().map(|reachable| reachable.len()))
             .sum::<usize>();
 
-        vec![reachable_until_unlocked.to_string()]
+        vec![super::group_result(
+            reachable_until_unlocked,
+            self.result_bucket_size,
+        )]
     }
 }

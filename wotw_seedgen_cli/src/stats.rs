@@ -97,13 +97,15 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                 .into_iter()
                 .map(|analyzer| match analyzer {
                     cli::Analyzer::EarlySkills { reachable_limit } => {
-                        box_analyzer(analyzers::EarlySkillsStats {
-                            reachable_limit: reachable_limit.unwrap_or(50),
-                        })
+                        box_analyzer(analyzers::EarlySkillsStats { reachable_limit })
                     }
-                    cli::Analyzer::ItemUnlock { item } => {
-                        box_analyzer(analyzers::ItemUnlockStats { item })
-                    }
+                    cli::Analyzer::ItemUnlock {
+                        item,
+                        result_bucket_size,
+                    } => box_analyzer(analyzers::ItemUnlockStats {
+                        item,
+                        result_bucket_size,
+                    }),
                     cli::Analyzer::ItemZone { item } => {
                         box_analyzer(analyzers::ItemZoneStats { item })
                     }
@@ -111,9 +113,16 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                     cli::Analyzer::SpawnItems => box_analyzer(analyzers::SpawnItemStats),
                     cli::Analyzer::SpawnLocation => box_analyzer(analyzers::SpawnLocationStats),
                     cli::Analyzer::SpawnRegion => box_analyzer(analyzers::SpawnRegionStats),
-                    cli::Analyzer::ZoneUnlock { zone } => {
-                        box_analyzer(analyzers::ZoneUnlockStats { zone })
+                    cli::Analyzer::StepSize { result_bucket_size } => {
+                        box_analyzer(analyzers::StepSizeStats { result_bucket_size })
                     }
+                    cli::Analyzer::ZoneUnlock {
+                        zone,
+                        result_bucket_size,
+                    } => box_analyzer(analyzers::ZoneUnlockStats {
+                        zone,
+                        result_bucket_size,
+                    }),
                 })
                 .collect()
         })

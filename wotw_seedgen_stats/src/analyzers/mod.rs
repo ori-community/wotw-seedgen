@@ -5,6 +5,7 @@ mod progression;
 mod spawn_items;
 mod spawn_location;
 mod spawn_region;
+mod step_size;
 mod zone_unlock;
 
 pub use early_skills::EarlySkillsStats;
@@ -14,7 +15,10 @@ pub use progression::ProgressionStats;
 pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;
 pub use spawn_region::SpawnRegionStats;
+pub use step_size::StepSizeStats;
 pub use zone_unlock::ZoneUnlockStats;
+
+use std::num::NonZeroUsize;
 
 use wotw_seedgen::generator::SeedSpoiler;
 
@@ -29,4 +33,15 @@ pub trait Analyzer: Sync {
     ///
     /// For instance, [`SpawnLocationStats`] will return the name of the spawn locations here
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String>;
+}
+
+fn group_result(result: usize, bucket_size: NonZeroUsize) -> String {
+    let bucket_size = bucket_size.get();
+    if bucket_size == 1 {
+        return result.to_string();
+    }
+
+    let floor = result - result % bucket_size;
+    let ceiling = floor + bucket_size - 1;
+    format!("{floor}-{ceiling}")
 }

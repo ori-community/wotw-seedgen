@@ -1,3 +1,5 @@
+use std::num::NonZeroUsize;
+
 use wotw_seedgen::{generator::SeedSpoiler, util::Zone};
 
 use super::Analyzer;
@@ -7,6 +9,8 @@ use super::Analyzer;
 /// A zone is considered unlocked once the first item within that zone is unlocked
 pub struct ZoneUnlockStats {
     pub zone: Zone,
+    /// How many adjacent result to group together
+    pub result_bucket_size: NonZeroUsize,
 }
 impl Analyzer for ZoneUnlockStats {
     fn title(&self) -> String {
@@ -25,6 +29,9 @@ impl Analyzer for ZoneUnlockStats {
             .flat_map(|group| group.reachable.iter().map(|reachable| reachable.len()))
             .sum::<usize>();
 
-        vec![reachable_count.to_string()]
+        vec![super::group_result(
+            reachable_count,
+            self.result_bucket_size,
+        )]
     }
 }

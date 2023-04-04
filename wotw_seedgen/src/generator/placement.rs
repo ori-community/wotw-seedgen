@@ -709,8 +709,6 @@ where
     );
 
     let weight = |inventory: &Inventory| -> Result<f32, String> {
-        let mut newly_reached = 0;
-
         let target_world_context = &world_contexts[target_world_index];
 
         let mut lookahead_player = target_world_context.world.player.clone();
@@ -725,23 +723,12 @@ where
 
         // Resource tracking can result in reaching less locations with an added teleporter, so prevent any overflows.
         // This is very rare and usually means the granted teleporter doesn't actually lead anywhere new, so 0 newly reached is accurate enough.
-        newly_reached += lookahead_reachable
+        let newly_reached = lookahead_reachable
             .len()
             .saturating_sub(reach_context.reachable_counts[target_world_index]);
 
-        lookahead_reachable.retain(|&node| {
-            node.trigger().map_or(false, |reached| {
-                target_world_context
-                    .world
-                    .preplacements
-                    .keys()
-                    .any(|preplaced| reached == preplaced)
-            })
-        });
-
         let base_weight = 1.0 / inventory.cost() as f32;
 
-        // TODO I think newly_reached shouldn't be considered linearly, for an optimal pace you don't want too few, but also not too many or the bias gets really strong
         Ok(base_weight * (newly_reached + 1) as f32)
     };
     let with_weights = itemsets
@@ -1023,13 +1010,9 @@ where
                     .collect();
 
                 log::trace!(
-                    "(World {}): Failed to reach all locations with inventory: {}",
+                    "(World {}): Failed to reach all locations with inventory: {}\nUnreached locations: {}",
                     world_index,
-                    world_context.world.player.inventory
-                );
-                log::warning!(
-                    "(World {}): Couldn't reach locations {}",
-                    world_index,
+                    world_context.world.player.inventory,
                     format_identifiers(identifiers)
                 );
             }

@@ -126,7 +126,7 @@ impl Pool {
             let cost = item.cost();
 
             if cost > 10000 {
-                let reroll_chance = -10000.0 / f64::from(item.cost()) + 1.0;
+                let reroll_chance = -10000.0 / f64::from(cost) + 1.0;
 
                 if rng.gen_bool(reroll_chance) {
                     log::trace!("Rerolling random placement {}", item);
