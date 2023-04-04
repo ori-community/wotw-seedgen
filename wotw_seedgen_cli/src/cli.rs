@@ -687,6 +687,8 @@ pub enum Analyzer {
         #[structopt(default_value = "50")]
         reachable_limit: usize,
     },
+    /// Analyzes which weapon gets placed first
+    FirstWeapon,
     /// Analyzes how many locations are reachable when an item unlocks.
     /// Pass item-unlock:<item-name> to specify which item to analyze (Example: item-unlock:Launch)
     /// You can optionally pass item-unlock:<item-name>,<result-bucket-size> to group results together in buckets

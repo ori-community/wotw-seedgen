@@ -99,6 +99,7 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                     cli::Analyzer::EarlySkills { reachable_limit } => {
                         box_analyzer(analyzers::EarlySkillsStats { reachable_limit })
                     }
+                    cli::Analyzer::FirstWeapon => box_analyzer(analyzers::FirstWeaponStats),
                     cli::Analyzer::ItemUnlock {
                         item,
                         result_bucket_size,

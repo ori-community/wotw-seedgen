@@ -1,4 +1,5 @@
 mod early_skills;
+mod first_weapon;
 mod item_unlock;
 mod item_zone;
 mod progression;
@@ -9,6 +10,7 @@ mod step_size;
 mod zone_unlock;
 
 pub use early_skills::EarlySkillsStats;
+pub use first_weapon::FirstWeaponStats;
 pub use item_unlock::ItemUnlockStats;
 pub use item_zone::ItemZoneStats;
 pub use progression::ProgressionStats;
