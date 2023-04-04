@@ -1,7 +1,9 @@
 mod early_skills;
 mod first_weapon;
+mod item_location;
 mod item_unlock;
 mod item_zone;
+mod location_item;
 mod progression;
 mod spawn_items;
 mod spawn_location;
@@ -11,8 +13,10 @@ mod zone_unlock;
 
 pub use early_skills::EarlySkillsStats;
 pub use first_weapon::FirstWeaponStats;
+pub use item_location::ItemLocationStats;
 pub use item_unlock::ItemUnlockStats;
 pub use item_zone::ItemZoneStats;
+pub use location_item::LocationItemStats;
 pub use progression::ProgressionStats;
 pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;

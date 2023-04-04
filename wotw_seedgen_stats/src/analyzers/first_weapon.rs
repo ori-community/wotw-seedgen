@@ -10,32 +10,30 @@ impl Analyzer for FirstWeaponStats {
     }
 
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        let mut keys = vec![];
-
-        if let Some(first_weapon) = seed.groups.iter().find_map(|group| {
-            group
-                .placements
-                .iter()
-                .find(|placement| {
-                    matches!(
-                        placement.item,
-                        Item::Skill(
-                            Skill::Grenade
-                                | Skill::Spear
-                                | Skill::Bow
-                                | Skill::Hammer
-                                | Skill::Sword
-                                | Skill::Shuriken
-                                | Skill::Blaze
-                                | Skill::Sentry
+        seed.groups
+            .iter()
+            .find_map(|group| {
+                group
+                    .placements
+                    .iter()
+                    .find(|placement| {
+                        matches!(
+                            placement.item,
+                            Item::Skill(
+                                Skill::Grenade
+                                    | Skill::Spear
+                                    | Skill::Bow
+                                    | Skill::Hammer
+                                    | Skill::Sword
+                                    | Skill::Shuriken
+                                    | Skill::Blaze
+                                    | Skill::Sentry
+                            )
                         )
-                    )
-                })
-                .map(|placement| placement.item_name.clone())
-        }) {
-            keys.push(first_weapon);
-        }
-
-        keys
+                    })
+                    .map(|placement| placement.item_name.clone())
+            })
+            .into_iter()
+            .collect()
     }
 }

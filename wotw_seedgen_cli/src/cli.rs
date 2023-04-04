@@ -689,8 +689,11 @@ pub enum Analyzer {
     },
     /// Analyzes which weapon gets placed first
     FirstWeapon,
+    /// Analyzes what location an item get placed on
+    /// Pass item-location:<item-name> to specify which item to analyze (Example: "item-location:Launch")
+    ItemLocation { item: String },
     /// Analyzes how many locations are reachable when an item unlocks.
-    /// Pass item-unlock:<item-name> to specify which item to analyze (Example: item-unlock:Launch)
+    /// Pass item-unlock:<item-name> to specify which item to analyze (Example: "item-unlock:Launch")
     /// You can optionally pass item-unlock:<item-name>,<result-bucket-size> to group results together in buckets
     ItemUnlock {
         item: String,
@@ -698,8 +701,11 @@ pub enum Analyzer {
         result_bucket_size: NonZeroUsize,
     },
     /// Analyzes what zone an item is placed in.
-    /// Pass item-zone:<item-name> to specify which item to analyze (Example: "item-zone:Launch Fragment")
+    /// Pass item-zone:<item-name> to specify which item to analyze (Example: "item-zone:Launch")
     ItemZone { item: String },
+    /// Analyzes what item gets placed on a location
+    /// Pass location-item:<pickup-name> to specify which location to analyze (Example: "location-item:GladesTown.RebuildTheGlades")
+    LocationItem { location: String },
     /// Analyzes which items get placed as forced progression
     Progression,
     /// Analyzes the spawn items. Only makes sense with random spawn, since with the default spawn no spawn items are given
@@ -715,7 +721,7 @@ pub enum Analyzer {
         result_bucket_size: NonZeroUsize,
     },
     /// Analyzes how many locations are reachable when a zone unlocks.
-    /// Pass zone-unlock:<zone> to specify which zone to analyze (Example: zone-unlock:3).
+    /// Pass zone-unlock:<zone> to specify which zone to analyze (Example: "zone-unlock:3").
     /// Currently only numeric zone identifiers are supported
     /// You can optionally pass zone-unlock:<zone>,<result-bucket-size> to group results together in buckets
     ZoneUnlock {

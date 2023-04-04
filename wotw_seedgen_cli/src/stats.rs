@@ -100,6 +100,9 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                         box_analyzer(analyzers::EarlySkillsStats { reachable_limit })
                     }
                     cli::Analyzer::FirstWeapon => box_analyzer(analyzers::FirstWeaponStats),
+                    cli::Analyzer::ItemLocation { item } => {
+                        box_analyzer(analyzers::ItemLocationStats { item })
+                    }
                     cli::Analyzer::ItemUnlock {
                         item,
                         result_bucket_size,
@@ -109,6 +112,9 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                     }),
                     cli::Analyzer::ItemZone { item } => {
                         box_analyzer(analyzers::ItemZoneStats { item })
+                    }
+                    cli::Analyzer::LocationItem { location } => {
+                        box_analyzer(analyzers::LocationItemStats { location })
                     }
                     cli::Analyzer::Progression => box_analyzer(analyzers::ProgressionStats),
                     cli::Analyzer::SpawnItems => box_analyzer(analyzers::SpawnItemStats),
@@ -150,8 +156,7 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
     for stats in stats {
         let csv = stats.csv();
         let mut path = path.clone();
-        path.push(sanitize(stats.title()));
-        path.set_extension("csv");
+        path.push(format!("{}.csv", sanitize(stats.title())));
         fs::write(&path, csv).map_err(|err| {
             format!(
                 "failed to write statistics to \"{}\": {}",
