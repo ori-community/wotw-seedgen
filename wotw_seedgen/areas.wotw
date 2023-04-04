@@ -1926,7 +1926,6 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
 
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
   # this anchor doesn't assume drained water because that should make it usable for weird dirty water swim paths
-  nospawn  # underwater
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
   refill Checkpoint
@@ -1984,7 +1983,8 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       WaterDash
 
 anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock puzzle room
-  nospawn  # underwater
+  tprestriction:
+    moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
   refill Checkpoint
   refill Health=1
   refill Energy=3:
@@ -2059,7 +2059,8 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.FullyDrained, Bash  # Place an enemy on HollowDrainMiddle and Bash off of it. There are multiple ways to do this, and none of them are fun. The Skeeto on the left is probably the most cooperative. This kinda looks possible from HollowDrainLower as well, but the Skeetos don't seem to have enough of an attention span to make it work.
       
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
-  nospawn  # underwater
+  tprestriction:
+    moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
   refill Energy=3:  # fast respawning crystal
     moki: BreakCrystal
   # energy crystal below not considered because it doesn't seem relevant for anything
@@ -2111,7 +2112,8 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
 # checkpoint at -356, -4306
 
 anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below HollowDrainMiddle, submerged until WestHollow.FullyDrained
-  nospawn  # underwater
+  tprestriction:
+    moki: WestHollow.FullyDrained
   refill Energy=1:
     moki: WestHollow.FullyDrained, BreakCrystal
     
@@ -2163,7 +2165,8 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
     gorlek: WestHollow.FullyDrained
 
 anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad at the bottom of the drain sequence
-  nospawn  # underwater
+  tprestriction:
+    moki: WestHollow.FullyDrained  # It's possible to tp from there before pulling the first lever, but that would make that spawn softlockable
 
   state WestHollow.LowerTongueExtended:
     moki: WestHollow.FullyDrained, Bow=1
