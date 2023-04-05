@@ -9,6 +9,7 @@ mod spawn_items;
 mod spawn_location;
 mod spawn_region;
 mod step_size;
+mod zone_spirit_light;
 mod zone_unlock;
 
 pub use early_skills::EarlySkillsStats;
@@ -22,6 +23,7 @@ pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;
 pub use spawn_region::SpawnRegionStats;
 pub use step_size::StepSizeStats;
+pub use zone_spirit_light::ZoneSpiritLightStats;
 pub use zone_unlock::ZoneUnlockStats;
 
 use std::num::NonZeroUsize;

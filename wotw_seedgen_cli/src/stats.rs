@@ -123,6 +123,13 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                     cli::Analyzer::StepSize { result_bucket_size } => {
                         box_analyzer(analyzers::StepSizeStats { result_bucket_size })
                     }
+                    cli::Analyzer::ZoneSpiritLight {
+                        zone,
+                        result_bucket_size,
+                    } => box_analyzer(analyzers::ZoneSpiritLightStats {
+                        zone,
+                        result_bucket_size,
+                    }),
                     cli::Analyzer::ZoneUnlock {
                         zone,
                         result_bucket_size,

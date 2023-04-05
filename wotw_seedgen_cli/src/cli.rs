@@ -720,6 +720,15 @@ pub enum Analyzer {
         #[structopt(default_value = "1")]
         result_bucket_size: NonZeroUsize,
     },
+    /// Analyzes how much Spirit Light is in a zone
+    /// Pass zone-spirit-light:<zone> to specify which zone to analyze (Example: "zone-spirit-light:3").
+    /// Currently only numeric zone identifiers are supported
+    /// You can optionally pass zone-spirit-light:<zone>,<result-bucket-size> to group results together in buckets
+    ZoneSpiritLight {
+        zone: Zone,
+        #[structopt(default_value = "1")]
+        result_bucket_size: NonZeroUsize,
+    },
     /// Analyzes how many locations are reachable when a zone unlocks.
     /// Pass zone-unlock:<zone> to specify which zone to analyze (Example: "zone-unlock:3").
     /// Currently only numeric zone identifiers are supported
