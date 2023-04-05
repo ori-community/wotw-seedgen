@@ -3,18 +3,20 @@ use wotw_seedgen::generator::SeedSpoiler;
 use super::Analyzer;
 
 /// Analyzes the spawn items
-pub struct SpawnItemStats;
-impl Analyzer for SpawnItemStats {
+pub struct SpawnItemCountStats;
+impl Analyzer for SpawnItemCountStats {
     fn title(&self) -> String {
-        "Spawn Items".to_string()
+        "Spawn Item Count".to_string()
     }
 
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.groups
+        let count = seed
+            .groups
             .iter()
             .flat_map(|group| group.placements.iter())
             .filter(|placement| placement.location.identifier == "Spawn")
-            .map(|placement| placement.item_name.clone())
-            .collect()
+            .count();
+
+        vec![count.to_string()]
     }
 }

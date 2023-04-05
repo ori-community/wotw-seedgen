@@ -708,7 +708,9 @@ pub enum Analyzer {
     LocationItem { location: String },
     /// Analyzes which items get placed as forced progression
     Progression,
-    /// Analyzes the spawn items. Only makes sense with random spawn, since with the default spawn no spawn items are given
+    /// Analyzes the amount of spawn items. Mostly makes sense with random spawn, since with the default spawn usually no spawn items are given
+    SpawnItemCount,
+    /// Analyzes the spawn items. Mostly makes sense with random spawn, since with the default spawn usually no spawn items are given
     SpawnItems,
     /// Analyzes the spawn locations. Only makes sense with random spawn, otherwise this will always be the same
     SpawnLocation,

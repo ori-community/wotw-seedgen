@@ -8,14 +8,12 @@ use rand::{
 
 #[cfg(feature = "log")]
 use crate::settings::Difficulty;
-use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
 use crate::{
     generator::spoiler::NodeSummary,
     header::CodeDisplay,
     inventory::Inventory,
     item::{
-        Command, Item, Message, Resource, ShopCommand, Skill, Teleporter, UberStateItem,
-        UberStateValue,
+        Command, Item, Message, Resource, ShopCommand, Teleporter, UberStateItem, UberStateValue,
     },
     log,
     settings::{Goal, Spawn, WorldSettings},
@@ -25,12 +23,15 @@ use crate::{
             DEFAULT_SPAWN, KEYSTONE_DOORS, PLACEHOLDER_SLOTS, RANDOM_PROGRESSION, RELIC_ZONES,
             RESERVE_SLOTS, RETRIES, SHOP_PRICES,
         },
-        Zone,
     },
     world::{
         graph::{self, Graph, Node},
         requirement, World,
     },
+};
+use crate::{
+    uber_state::{UberIdentifier, UberStateTrigger, UberType},
+    util::constants::{PREFERRED_SPAWN_SLOTS, SPAWN_SLOTS},
 };
 
 use super::seed::SeedWorld;
@@ -61,7 +62,8 @@ struct WorldContext<'a, 'b> {
     placements: Vec<Placement<'a>>,
     placeholders: Vec<&'a Node>,
     collected_preplacements: Vec<usize>,
-    spawn_slots: Vec<&'a Node>,
+    spawn_slots: usize,
+    prevent_sharing: usize,
     reachable_locations: Vec<&'a Node>,
     unreachable_locations: Vec<&'a Node>,
     spirit_light_rng: SpiritLightAmounts, // TODO this can get kinda weird maybe have a shared spirit light rng instead
@@ -575,7 +577,13 @@ where
     R: Rng,
     I: Iterator<Item = u16>,
 {
-    let is_multiworld_spread = item.is_multiworld_spread();
+    let prevent_sharing = &mut world_contexts[target_world_index].prevent_sharing;
+    let is_multiworld_spread = if *prevent_sharing > 0 {
+        *prevent_sharing -= 1;
+        false
+    } else {
+        item.is_multiworld_spread()
+    };
 
     let mut choose_node = || {
         if is_multiworld_spread {
@@ -609,6 +617,15 @@ where
                 let node = placeholders.remove(index);
                 return Ok((target_world_index, node, true));
             }
+        }
+        let target_world_context = &mut world_contexts[target_world_index];
+        if target_world_context.spawn_slots > 0 {
+            target_world_context.spawn_slots -= 1;
+            return Ok((
+                target_world_index,
+                &target_world_context.world.graph.spawn_pickup_node,
+                false,
+            ));
         }
         return Err(format!(
             "(World {}): Not enough slots to place forced progression {}",
@@ -694,6 +711,7 @@ fn determine_progressions<'a>(
 fn pick_progression<'a, 'b, R, I>(
     target_world_index: usize,
     itemsets: &'b [Inventory],
+    slots: usize,
     reach_context: &ReachContext,
     world_contexts: &mut [WorldContext<'a, '_>],
     context: &mut GeneratorContext<'_, R, I>,
@@ -727,9 +745,16 @@ where
             .len()
             .saturating_sub(reach_context.reachable_counts[target_world_index]);
 
-        let base_weight = 1.0 / inventory.cost() as f32;
+        let mut weight = 1.0 / inventory.cost() as f32 * (newly_reached + 1) as f32;
 
-        Ok(base_weight * (newly_reached + 1) as f32)
+        let begrudgingly_used_slots = (inventory.item_count() as usize
+            + (SPAWN_SLOTS - PREFERRED_SPAWN_SLOTS))
+            .saturating_sub(slots);
+        if begrudgingly_used_slots > 0 {
+            weight *= (0.3_f32).powf(begrudgingly_used_slots as f32);
+        }
+
+        Ok(weight)
     };
     let with_weights = itemsets
         .iter()
@@ -797,114 +822,6 @@ where
     }
 }
 
-#[inline]
-fn spawn_progressions<'a, R, I>(
-    world_contexts: &mut [WorldContext<'a, '_>],
-    context: &mut GeneratorContext<'_, R, I>,
-) -> Result<(), String>
-where
-    R: Rng,
-    I: Iterator<Item = u16>,
-{
-    'outer: for world_index in 0..context.world_count {
-        let mut random_slots = 2;
-
-        loop {
-            let available_spawn_slots = world_contexts[world_index].spawn_slots.len();
-            if available_spawn_slots <= random_slots {
-                continue 'outer;
-            }
-
-            context.finalize_spoiler_group();
-
-            log::trace!("(World {}): Placing spawn progression", world_index);
-
-            let reach_context = progression_check(world_contexts, context)?; // TODO This is inefficient! The problem here is that the ReachContext always holds all worlds at once. Maybe it should be a Vec of per-world Reach contexts?
-            let world_context = &world_contexts[world_index];
-
-            let mut itemsets = determine_progressions(
-                world_index,
-                available_spawn_slots,
-                available_spawn_slots,
-                &reach_context,
-                world_context,
-            );
-
-            if itemsets.is_empty() {
-                log::trace!("(World {}): No progressions found", world_index);
-                continue 'outer;
-            }
-
-            requirement::filter_redundancies(&mut itemsets);
-            let progression = pick_progression(
-                world_index,
-                &itemsets,
-                &reach_context,
-                world_contexts,
-                context,
-            )?;
-
-            for (item, amount) in &progression.items {
-                let items =
-                    split_progression_item(world_index, item, *amount, world_contexts, context);
-
-                for item in items {
-                    let world_context = &mut world_contexts[world_index];
-                    world_context.world.pool.remove(&item, 1);
-                    world_context.world.grant_player(item.clone(), 1);
-
-                    let origin_details = world_context.world.custom_items.get(&item);
-                    let custom_name = origin_details.and_then(|details| details.name.clone());
-                    let display = origin_details.and_then(|details| details.display.clone());
-                    let item_name = custom_name.clone().unwrap_or_else(|| item.to_string());
-
-                    log::trace!(
-                        "(World {}): Placed {} as spawn progression",
-                        world_index,
-                        item_name
-                    );
-
-                    if matches!(item, Item::Skill(Skill::Regenerate)) {
-                        random_slots -= 1;
-                    }
-
-                    let world_context = &mut world_contexts[world_index];
-                    let node = world_context.spawn_slots.pop();
-
-                    context
-                        .current_spoiler_group
-                        .placements
-                        .push(SpoilerPlacement {
-                            origin_world_index: world_index,
-                            target_world_index: world_index,
-                            location: NodeSummary {
-                                identifier: "Spawn".to_string(),
-                                position: None,
-                                zone: Some(Zone::Spawn),
-                            },
-                            item: item.clone(),
-                            item_name,
-                        });
-                    if let Some(display) = display.or(custom_name) {
-                        world_context.placements.push(Placement {
-                            node,
-                            trigger: UberStateTrigger::spawn(),
-                            item: Item::Message(Message::new(display)),
-                        });
-                    }
-                    world_context.placements.push(Placement {
-                        node,
-                        trigger: UberStateTrigger::spawn(),
-                        item,
-                    });
-                }
-            }
-        }
-    }
-
-    Ok(())
-}
-
 fn force_progression<'a, R, I>(
     reserved_slots: &mut Vec<(usize, &'a Node)>,
     reach_context: &mut ReachContext,
@@ -918,7 +835,7 @@ where
     let slots = reserved_slots.len()
         + world_contexts
             .iter()
-            .map(|world_context| world_context.placeholders.len())
+            .map(|world_context| world_context.placeholders.len() + world_context.spawn_slots)
             .sum::<usize>();
 
     let mut world_indices = (0..context.world_count).collect::<Vec<_>>();
@@ -931,7 +848,8 @@ where
                 .iter()
                 .filter(|(world_index, _)| *world_index == chosen_world_index)
                 .count()
-                + world_context.placeholders.len();
+                + world_context.placeholders.len()
+                + world_context.spawn_slots;
 
             let itemsets = determine_progressions(
                 chosen_world_index,
@@ -1026,6 +944,7 @@ where
     let progression = pick_progression(
         target_world_index,
         &itemsets,
+        slots,
         reach_context,
         world_contexts,
         context,
@@ -1067,7 +986,12 @@ where
         .map_or(false, |trigger| trigger.identifier.is_purchasable());
 
     if is_purchasable || !origin_world_context.random_spirit_light.sample(context.rng) {
-        let target_world_index = context.rng.gen_range(0..context.world_count);
+        let target_world_index = if origin_world_context.prevent_sharing > 0 {
+            origin_world_context.prevent_sharing -= 1;
+            origin_world_index
+        } else {
+            context.rng.gen_range(0..context.world_count)
+        };
 
         if is_purchasable
             || origin_world_context.shop_slots
@@ -1565,8 +1489,6 @@ fn generate_placements_from_spawn<'graph, 'settings>(
         }
     }
 
-    spawn_progressions(&mut world_contexts, &mut context)?;
-
     let mut reserved_slots = Vec::<(usize, &Node)>::with_capacity(RESERVE_SLOTS);
 
     loop {
@@ -1655,7 +1577,6 @@ fn generate_placements_from_spawn<'graph, 'settings>(
                     .collect::<Vec<_>>();
                 context.current_spoiler_group.reachable.push(locations);
 
-                world_needs_placement.append(&mut world_context.spawn_slots);
                 world_needs_placement.shrink_to_fit();
                 world_needs_placement.shuffle(context.rng);
 
@@ -1745,7 +1666,7 @@ fn generate_placements_from_spawn<'graph, 'settings>(
                         &mut world_contexts,
                         &mut context,
                     )? {
-                        any_random_placements |= true;
+                        any_random_placements = true;
                     } else {
                         total_placeholders += 1;
                     }
@@ -1777,14 +1698,10 @@ fn build_world_contexts<'a, 'b>(
         world.set_uber_state(UberIdentifier::spawn(), 1.);
 
         let mut placements = Vec::with_capacity(450);
-        let mut spawn_slots = Vec::new();
 
         let spawn = spawns[world_index];
         let spawn_identifier = spawn.identifier();
-        if spawn_identifier != DEFAULT_SPAWN {
-            for _ in 0..3 {
-                spawn_slots.push(&world.graph.spawn_pickup_node);
-            }
+        let spawn_slots = if spawn_identifier == DEFAULT_SPAWN { 0 } else {
             let mut message = Message::new(String::new());
             message.frames = Some(420);
             message.instant = true;
@@ -1793,7 +1710,8 @@ fn build_world_contexts<'a, 'b>(
                 trigger: UberStateTrigger::spawn(),
                 item: Item::Message(message),
             });
-        }
+            SPAWN_SLOTS
+        };
 
         let mut spawn_is_tp = false;
         // Remove spawn tp from the pool
@@ -1902,6 +1820,7 @@ fn build_world_contexts<'a, 'b>(
             placeholders: Vec::with_capacity(300),
             collected_preplacements: Vec::new(),
             spawn_slots,
+            prevent_sharing: 5,
             reachable_locations,
             unreachable_locations,
             spirit_light_rng,

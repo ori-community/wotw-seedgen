@@ -117,6 +117,7 @@ pub fn generate_stats(args: cli::StatsArgs) -> Result<(), String> {
                         box_analyzer(analyzers::LocationItemStats { location })
                     }
                     cli::Analyzer::Progression => box_analyzer(analyzers::ProgressionStats),
+                    cli::Analyzer::SpawnItemCount => box_analyzer(analyzers::SpawnItemCountStats),
                     cli::Analyzer::SpawnItems => box_analyzer(analyzers::SpawnItemStats),
                     cli::Analyzer::SpawnLocation => box_analyzer(analyzers::SpawnLocationStats),
                     cli::Analyzer::SpawnRegion => box_analyzer(analyzers::SpawnRegionStats),
