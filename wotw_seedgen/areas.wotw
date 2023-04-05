@@ -9621,7 +9621,6 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       DepthsLight, Damage=30, Damage=30
       DepthsLight, Damage=30, Blaze=1 OR Sentry=1
       DepthsLight, DoubleJump OR Dash
-      Flash=1, Damage=30  # Flash Boost.
 
   conn UpperDepths.SecondKSRoom:
     moki, BreakWall=20:
