@@ -9140,7 +9140,7 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
       DepthsLight, Combat=3xSpiderling, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Damage=30
       DepthsLight, SentryJump=1, Grapple, Glide OR Damage=30  # kill the spiderlings with the weapon
       DepthsLight, SentryJump=2, Glide OR Damage=30  # kill the spiderlings with the weapon
-    kii:
+    kii, BreakWall=20:
       DepthsLight, DoubleJump
       DepthsLight, Grapple, Damage=40 OR Dash OR Glide OR Sword OR Sentry=3 OR Shuriken=2
   # going to the keydoor should always be easier through the bottom path (keystone room) than going past the seed
