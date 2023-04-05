@@ -60,9 +60,19 @@ impl SubAssign for Orbs {
 /// let either_orbs: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 30.0, energy: 0.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 ///
+/// let a = vec![Orbs { health: 30.0, energy: 1.0 }, Orbs { health: 10.0, energy: 3.0 }];
+/// let b = vec![Orbs { health: 30.0, energy: 3.0 }];
+/// let either_orbs: OrbVariants = smallvec![Orbs { health: 30.0, energy: 3.0 }];
+/// assert_eq!(either(&a, &b), either_orbs);
+///
 /// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
 /// let b = vec![];
 /// let either_orbs: OrbVariants = smallvec![Orbs::default()];
+/// assert_eq!(either(&a, &b), either_orbs);
+///
+/// let a = vec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }];
+/// let b = vec![Orbs { health: 15.0, energy: 1.0 }];
+/// let either_orbs: OrbVariants = smallvec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }, Orbs { health: 15.0, energy: 1.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 /// ```
 pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
@@ -70,18 +80,13 @@ pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
         smallvec![Orbs::default()]
     } else {
         let mut sum: OrbVariants = a.to_smallvec();
-        for b_ in b {
-            let mut used = false;
-            for a_ in &mut sum {
-                if b_.energy >= a_.energy && b_.health >= a_.health {
-                    *a_ = *b_;
-                    used = true;
-                }
-            }
-            if !used && sum.iter().all(|a_| a_.energy < b_.energy)
-                || sum.iter().all(|a_| a_.health < b_.health)
+        for b in b {
+            if sum
+                .iter()
+                .any(|a| a.energy < b.energy || a.health < b.health)
             {
-                sum.push(*b_);
+                sum.retain(|a| a.energy > b.energy || a.health > b.health);
+                sum.push(*b);
             }
         }
         sum
@@ -95,16 +100,11 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
         smallvec![Orbs::default()]
     } else {
         let mut sum: OrbVariants = a.to_smallvec();
-        let mut used = false;
-        for a_ in &mut sum {
-            if b.energy >= a_.energy && b.health >= a_.health {
-                *a_ = b;
-                used = true;
-            }
-        }
-        if !used && sum.iter().all(|a_| a_.energy < b.energy)
-            || sum.iter().all(|a_| a_.health < b.health)
+        if sum
+            .iter()
+            .any(|a| a.energy < b.energy || a.health < b.health)
         {
+            sum.retain(|a| a.energy > b.energy || a.health > b.health);
             sum.push(b);
         }
         sum

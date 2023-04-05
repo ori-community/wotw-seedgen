@@ -661,9 +661,9 @@ fn is_met() {
 }
 
 #[test]
-fn items_needed() {
+fn solutions() {
     macro_rules! test {
-        ($player:expr, $states:expr, $req:expr, [$player_orbs:expr], [$($solutions:expr),* $(,)?]) => {
+        ($player:expr, $states:expr, $req:expr, [$($player_orbs:expr),* $(,)?], [$($solutions:expr),* $(,)?]) => {
             {
                 fn sort(mut solutions: Vec<Inventory>) -> Vec<Inventory> {
                     solutions.sort_unstable_by_key(|inventory| {
@@ -673,7 +673,7 @@ fn items_needed() {
                     });  // dumb string based sort
                     solutions
                 }
-                assert_eq!(sort($req.solutions($player, $states, smallvec![$player_orbs], 1000, 1000)), sort(vec![$($solutions),*]));
+                assert_eq!(sort($req.solutions($player, $states, smallvec![$($player_orbs),*], 1000, 1000)), sort(vec![$($solutions),*]));
             }
         };
         ($player:expr, $states:expr, $req:expr, [$($solutions:tt)*]) => {

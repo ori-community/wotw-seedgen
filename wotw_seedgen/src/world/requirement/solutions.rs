@@ -391,9 +391,8 @@ fn needed_for_health(
                         // If this solution used Life Pact before, that implies it used up all of its energy and Regenerate prohibits using health to pay for it
                         // If we tried to grant extra energy fragments to pay for the Regenerate, that extra energy would just get eaten up by the earlier cost that Life Pact payed for
                         // We can assume that some other solution contains a variant where enough energy was granted not to need Life Pact, we'll just put the Regenerate solutions into that other solution
-                        let can_regen = solution.orbs.energy >= higher_cost
-                            || solution.health_payed_for_life_pact == 0.0;
-                        if can_regen {
+                        // Technically there are still ways to Regenerate using nonconsuming energy weapons that refund the payed health as energy, but we don't consider this for logic because it is softlockable with efficiency upgrades
+                        if solution.health_payed_for_life_pact == 0.0 {
                             // We don't use the tag here because in this context Regenerate never has a strict advantage, we'd never to cover all cases anyway
                             let max_regens =
                                 ((max_health - solution.orbs.health) * (1.0 / 30.0)).ceil() as u32;
@@ -522,12 +521,12 @@ fn needed_for_energy(
                                             // just to be able to regenerate at all because we used life pact so much
                                             // But right now I can't think of a proof that regenerates are guaranteed to be redundant in any case here, so...
                                             let grant_energy = |solution: &mut TaggedSolution, total_cost: f32, game_thinks_total_cost: f32| {
-                                    let higher_cost = total_cost.max(game_thinks_total_cost);
-                                    let missing_energy = higher_cost - solution.orbs.energy;
-                                    let missing_energy_fragments = (missing_energy * 2.0).ceil().max(0.0);
-                                    solution.orbs.energy += missing_energy_fragments * 0.5 - total_cost;  // granting fragments increases max energy as well
-                                    solution.inventory.grant(Item::Resource(Resource::EnergyFragment), missing_energy_fragments as u32);
-                                };
+                                                let higher_cost = total_cost.max(game_thinks_total_cost);
+                                                let missing_energy = higher_cost - solution.orbs.energy;
+                                                let missing_energy_fragments = (missing_energy * 2.0).ceil().max(0.0);
+                                                solution.orbs.energy += missing_energy_fragments * 0.5 - total_cost;  // granting fragments increases max energy as well
+                                                solution.inventory.grant(Item::Resource(Resource::EnergyFragment), missing_energy_fragments as u32);
+                                            };
 
                                             let regens = max_heal / 30.0;
                                             let max_optimal_regens = regens.floor();
@@ -568,23 +567,24 @@ fn needed_for_energy(
                                             let max_energy = solution
                                                 .inventory
                                                 .max_energy(player.settings.difficulty);
-                                            let mut missing_energy = cost - solution.orbs.energy;
+                                            let mut missing_energy =
+                                                (cost - solution.orbs.energy).max(0.0);
                                             let mut health_cost = missing_energy * 10.0;
 
                                             let health_fragment_solution = |solution: &mut TaggedSolution, health_cost: f32| {
-                                    let true_health_cost = health_cost * defense_mod;
-                                    let higher_amount = health_cost.max(true_health_cost);
-                                    let missing_health = higher_amount - solution.orbs.health;
-                                    let mut missing_health_fragments = (missing_health * 0.2).ceil().max(0.0);
-                                    if missing_health - missing_health_fragments * 5.0 >= 0.0 { missing_health_fragments += 1.0 }
-                                    solution.orbs.health += missing_health_fragments * 5.0;  // granting fragments increases max health as well
-                                    solution.orbs.health -= true_health_cost;
-                                    solution.health_payed_for_life_pact += true_health_cost;
-                                    if consuming { solution.orbs.energy = 0.0; }
-                                    else { solution.orbs.energy = (solution.orbs.energy + true_health_cost).min(max_energy) }
+                                                let true_health_cost = health_cost * defense_mod;
+                                                let higher_amount = health_cost.max(true_health_cost);
+                                                let missing_health = higher_amount - solution.orbs.health;
+                                                let mut missing_health_fragments = (missing_health * 0.2).ceil().max(0.0);
+                                                if missing_health - missing_health_fragments * 5.0 >= 0.0 { missing_health_fragments += 1.0 }
+                                                solution.orbs.health += missing_health_fragments * 5.0;  // granting fragments increases max health as well
+                                                solution.orbs.health -= true_health_cost;
+                                                solution.health_payed_for_life_pact += true_health_cost;
+                                                if consuming { solution.orbs.energy = 0.0; }
+                                                else { solution.orbs.energy = (solution.orbs.energy + true_health_cost * 0.1).min(max_energy) }
 
-                                    solution.inventory.grant(Item::Resource(Resource::HealthFragment), missing_health_fragments as u32);
-                                };
+                                                solution.inventory.grant(Item::Resource(Resource::HealthFragment), missing_health_fragments as u32);
+                                            };
 
                                             if solution.do_not_generate_all_life_pact_variants {
                                                 // This flag indicates we only need to generate the health fragment solution
@@ -683,9 +683,8 @@ fn needed_for_energy(
                                             let max_health = solution
                                                 .inventory
                                                 .max_health(player.settings.difficulty);
-                                            let max_heal = max_health
-                                                - solution.orbs.health
-                                                - solution.health_payed_for_life_pact; // In order to regenerate, we will have to grant energy fragments until we undid all the health payed for life pact
+                                            // We don't have to subtract health_payed_for_life_pact because we already checked whether it's > 0 above
+                                            let max_heal = max_health - solution.orbs.health;
 
                                             let mut regenerate_cost =
                                                 Skill::Regenerate.energy_cost() * cost_mod;

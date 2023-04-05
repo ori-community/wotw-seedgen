@@ -24,7 +24,7 @@ impl Player<'_> {
     }
     /// Returns an instance of [`Player`] with the given [`WorldSettings`]
     ///
-    /// The [`Player`] will have six Health and Energy fragments - these are the resources a player spawns with in-game
+    /// The [`Player`] will have six Health and Energy fragments as well as three Shard Slots - these are the resources a player spawns with in-game
     pub fn spawn(settings: &WorldSettings) -> Player {
         let mut inventory = Inventory::default();
         inventory.grant(Item::Resource(Resource::HealthFragment), 6);
