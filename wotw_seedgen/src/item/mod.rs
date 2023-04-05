@@ -205,24 +205,21 @@ impl Item {
             Item::Resource(Resource::Keystone) => 320,
             Item::Resource(Resource::ShardSlot) => 480,
             Item::Skill(Skill::Regenerate | Skill::WaterBreath) => 200, // Quality-of-Life Skills
-            Item::Skill(Skill::WallJump | Skill::DoubleJump | Skill::Dash) => 1200, // Essential Movement
-            Item::Skill(Skill::Glide | Skill::Grapple) => 1400, // Feel-Good Finds
-            Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600, // Basic Weapons
             Item::Skill(
-                Skill::Burrow
-                | Skill::Bash
-                | Skill::Flap
-                | Skill::WaterDash
-                | Skill::Grenade
-                | Skill::Flash
-                | Skill::Seir,
-            )
+                Skill::WallJump | Skill::Dash // Essential Movement
+                | Skill::Flap // Counteracting a bias because Flap unlocks rather little
+            ) => 1200,
+            Item::Skill(Skill::Glide | Skill::Grapple) => 1400,         // Feel-Good Finds
+            Item::Skill(Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken) => 1600, // Basic Weapons
+            Item::Skill(Skill::Burrow | Skill::WaterDash | Skill::Grenade | Skill::Flash)
             | Item::Water => 1800, // Key Skills
+            Item::Skill(Skill::DoubleJump) => 2000, // Good to find, but this is already biased for by being powerful
             Item::Skill(Skill::Blaze | Skill::Sentry) => 2800, // Tedious Weapons
-            Item::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight) => 3000, // Unhinted Skill
-            Item::Skill(Skill::Spear) => 4000,                                                // No
+            Item::Skill(Skill::Bash) => 3000, // Counteracting a bias because Bash unlocks a lot
+            Item::Skill(Skill::Spear) => 4000, // No
             Item::Skill(Skill::Launch) => 40000, // Absolutely Broken
-            Item::Shard(_) => 1000,
+            Item::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight)
+            | Item::Shard(_) => 1000,
             Item::Teleporter(Teleporter::Marsh) => 30000,
             Item::Teleporter(_) => 25000,
             _ => 400,
