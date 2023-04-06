@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use wotw_seedgen::generator::SeedSpoiler;
 
 use super::Analyzer;
@@ -14,5 +16,9 @@ impl Analyzer for SpawnRegionStats {
             .iter()
             .map(|spawn| spawn.split('.').next().unwrap().to_string())
             .collect()
+    }
+
+    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+        super::compare_fixed_order::<super::RegionFixedOrder>
     }
 }

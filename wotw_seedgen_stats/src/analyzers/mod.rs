@@ -1,3 +1,4 @@
+mod compare;
 mod early_skills;
 mod first_weapon;
 mod item_location;
@@ -13,6 +14,7 @@ mod step_size;
 mod zone_spirit_light;
 mod zone_unlock;
 
+use compare::*;
 pub use early_skills::EarlySkillsStats;
 pub use first_weapon::FirstWeaponStats;
 pub use item_location::ItemLocationStats;
@@ -28,7 +30,7 @@ pub use step_size::StepSizeStats;
 pub use zone_spirit_light::ZoneSpiritLightStats;
 pub use zone_unlock::ZoneUnlockStats;
 
-use std::num::NonZeroUsize;
+use std::{cmp::Ordering, num::NonZeroUsize};
 
 use wotw_seedgen::generator::SeedSpoiler;
 
@@ -43,6 +45,27 @@ pub trait Analyzer: Sync {
     ///
     /// For instance, [`SpawnLocationStats`] will return the name of the spawn locations here
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String>;
+
+    /// Compare two keys created by this analyzer
+    ///
+    /// You can manually implement this to customize how your keys will be ordered in the resulting csv
+    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+        // We need the indirection of returning a function pointer so the trait can still be made into a trait object
+        fn compare(a: &String, b: &String) -> Ordering {
+            for (a, b) in a
+                .split('-')
+                .next()
+                .unwrap()
+                .parse::<u32>()
+                .into_iter()
+                .zip(b.split('-').next().unwrap().parse::<u32>())
+            {
+                return a.cmp(&b);
+            }
+            a.cmp(b)
+        }
+        compare
+    }
 }
 
 fn group_result(result: usize, bucket_size: NonZeroUsize) -> String {

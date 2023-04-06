@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use wotw_seedgen::generator::SeedSpoiler;
 
 use super::Analyzer;
@@ -23,5 +25,9 @@ impl Analyzer for ItemZoneStats {
                     .map_or("Unknown".to_string(), |zone| zone.to_string())
             })
             .collect()
+    }
+
+    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+        super::compare_fixed_order::<super::ZoneFixedOrder>
     }
 }

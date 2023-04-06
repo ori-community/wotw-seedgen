@@ -3,7 +3,7 @@ pub mod files;
 mod handle_errors;
 mod seed_storage;
 
-use std::{fmt::Write, sync::Arc, time::Instant};
+use std::{cmp::Ordering, fmt::Write, sync::Arc, time::Instant};
 
 use analyzers::Analyzer;
 use files::FileAccess;
@@ -47,36 +47,30 @@ pub struct StatsArgs<'graph> {
 pub type ChainedAnalyzers = Vec<Box<dyn Analyzer>>;
 
 pub struct Stats {
-    analyzer_titles: Vec<String>,
+    analyzers: ChainedAnalyzers,
     pub data: FxHashMap<Vec<Arc<String>>, u32>,
 }
 impl Stats {
     pub fn title(&self) -> String {
-        self.analyzer_titles.join(" and ")
+        self.analyzers
+            .iter()
+            .map(|analyzer| analyzer.title())
+            .join(" and ")
     }
     pub fn csv(&self) -> String {
-        let mut csv = self.analyzer_titles.join(", ");
+        let mut csv = self.title();
         csv.push_str(", Count\n");
 
         let mut data = self.data.iter().collect::<Vec<_>>();
-        #[derive(PartialEq, Eq, PartialOrd, Ord)]
-        enum StringOrNumber {
-            // For smarter sorting
-            String(Arc<String>),
-            Number(u32),
-        }
-        data.sort_by_key(|(keys, _)| {
-            keys.iter()
-                .map(|key| {
-                    key.split('-')
-                        .next()
-                        .unwrap()
-                        .parse::<u32>()
-                        .map_or(StringOrNumber::String(key.clone()), |number| {
-                            StringOrNumber::Number(number)
-                        })
-                })
-                .collect::<Vec<_>>()
+        data.sort_unstable_by(|(a, _), (b, _)| {
+            for ((x, y), analyzer) in a.iter().zip(b.iter()).zip(self.analyzers.iter()) {
+                match analyzer.compare_keys()(x, y) {
+                    Ordering::Equal => (),
+                    non_eq => return non_eq,
+                }
+            }
+
+            Ordering::Equal
         });
 
         csv.extend(Itertools::intersperse_with(
@@ -129,16 +123,7 @@ pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
     let stats = data
         .into_iter()
         .zip(analyzers)
-        .map(|(data, chained_analyzers)| {
-            let analyzer_titles = chained_analyzers
-                .iter()
-                .map(|analyzer| analyzer.title())
-                .collect();
-            Stats {
-                analyzer_titles,
-                data,
-            }
-        })
+        .map(|(data, analyzers)| Stats { analyzers, data })
         .collect();
 
     let elapsed = now.elapsed();

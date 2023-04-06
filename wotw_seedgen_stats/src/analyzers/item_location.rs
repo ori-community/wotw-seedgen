@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use wotw_seedgen::generator::SeedSpoiler;
 
 use super::Analyzer;
@@ -18,5 +20,9 @@ impl Analyzer for ItemLocationStats {
             .filter(|placement| &placement.item_name == &self.item)
             .map(|placement| placement.location.identifier.clone())
             .collect()
+    }
+
+    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+        super::compare_location
     }
 }
