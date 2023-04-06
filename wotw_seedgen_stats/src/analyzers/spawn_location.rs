@@ -15,7 +15,7 @@ impl Analyzer for SpawnLocationStats {
         seed.spawns.clone()
     }
 
-    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+    fn compare_keys(&self) -> fn(&str, &str) -> Ordering {
         super::compare_location
     }
 }

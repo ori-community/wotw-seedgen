@@ -8,10 +8,10 @@ pub(super) fn order_index(s: &str, order: &[&str]) -> usize {
         .find(|(_, zone)| s == **zone)
         .map_or(usize::MAX, |(index, _)| index)
 }
-pub(super) fn compare_fixed_order<T: FixedOrder>(a: &String, b: &String) -> Ordering {
+pub(super) fn compare_fixed_order<T: FixedOrder>(a: &str, b: &str) -> Ordering {
     order_index(a, T::ORDER).cmp(&order_index(b, T::ORDER))
 }
-pub(super) fn compare_location(a: &String, b: &String) -> Ordering {
+pub(super) fn compare_location(a: &str, b: &str) -> Ordering {
     let (a_region, a_identifier) = a.split_once('.').unwrap_or((a, ""));
     let (b_region, b_identifier) = b.split_once('.').unwrap_or((b, ""));
 

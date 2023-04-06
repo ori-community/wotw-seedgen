@@ -18,7 +18,7 @@ impl Analyzer for SpawnRegionStats {
             .collect()
     }
 
-    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+    fn compare_keys(&self) -> fn(&str, &str) -> Ordering {
         super::compare_fixed_order::<super::RegionFixedOrder>
     }
 }

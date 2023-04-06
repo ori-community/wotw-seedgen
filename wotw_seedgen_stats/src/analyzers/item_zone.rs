@@ -17,7 +17,7 @@ impl Analyzer for ItemZoneStats {
         seed.groups
             .iter()
             .flat_map(|group| group.placements.iter())
-            .filter(|placement| &placement.item_name == &self.item)
+            .filter(|placement| placement.item_name == self.item)
             .map(|placement| {
                 placement
                     .location
@@ -27,7 +27,7 @@ impl Analyzer for ItemZoneStats {
             .collect()
     }
 
-    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+    fn compare_keys(&self) -> fn(&str, &str) -> Ordering {
         super::compare_fixed_order::<super::ZoneFixedOrder>
     }
 }

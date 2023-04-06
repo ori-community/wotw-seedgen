@@ -49,20 +49,21 @@ pub trait Analyzer: Sync {
     /// Compare two keys created by this analyzer
     ///
     /// You can manually implement this to customize how your keys will be ordered in the resulting csv
-    fn compare_keys(&self) -> fn(&String, &String) -> Ordering {
+    fn compare_keys(&self) -> fn(&str, &str) -> Ordering {
         // We need the indirection of returning a function pointer so the trait can still be made into a trait object
-        fn compare(a: &String, b: &String) -> Ordering {
-            for (a, b) in a
+        fn compare(a: &str, b: &str) -> Ordering {
+            match a
                 .split('-')
                 .next()
                 .unwrap()
                 .parse::<u32>()
                 .into_iter()
                 .zip(b.split('-').next().unwrap().parse::<u32>())
+                .next()
             {
-                return a.cmp(&b);
+                None => a.cmp(b),
+                Some((a, b)) => a.cmp(&b),
             }
-            a.cmp(b)
         }
         compare
     }
