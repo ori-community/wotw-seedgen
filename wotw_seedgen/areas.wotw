@@ -9836,10 +9836,9 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
       Water, HammerJump
   conn PoolsApproach.MillPath:
     moki, Damage=20:  # severe enemy spam
-      Bash, Grapple OR Launch  # this is probably actually closest to how you'd traverse this naturally
       Combat=Crab+2xSmallSkeeto, Grapple, DoubleJump OR Dash  # go through the gap from above, you can use Grapple to reset if you fall
       Bash, Grapple, DoubleJump OR Dash  # go through the gap from above, you can use Grapple to reset if you fall
-      Launch, DoubleJump OR Grapple
+      Launch, DoubleJump OR Grapple OR Bash
     gorlek:
       Combat=2xSmallSkeeto, Grapple, Glide OR Sword OR Hammer
       Bash, Grapple, Glide OR Sword OR Hammer OR Grenade=1
@@ -9848,7 +9847,6 @@ anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfwa
     kii:
       Combat=2xSmallSkeeto, Grapple, Shuriken=1
       Bash, Grapple OR Grenade=1
-      Launch, Bash OR DoubleJump OR Grapple # @validator should probably be in gorlek (not redundant with moki since moki has extra damage)
       Launch, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Launch OR Bash  # Bash the ennemies but they don't really like being on the right position for you to bash them
