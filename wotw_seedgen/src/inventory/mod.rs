@@ -12,6 +12,7 @@ use crate::{
     util::Orbs,
 };
 
+// TODO optimization idea inline max_health etc.
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Inventory {
     pub items: FxHashMap<Item, u32>, // TODO what would a switch to usize do here? Often we need a usize and end up casting this
@@ -125,6 +126,54 @@ impl Inventory {
         Orbs {
             energy: self.max_energy(difficulty),
             health: self.max_health(difficulty),
+        }
+    }
+    pub fn cap_orbs(&self, orbs: &mut Orbs, checkpoint: bool, difficulty: Difficulty) {
+        // checkpoints don't refill health given by the Vitality shard
+        let max_health = if checkpoint {
+            (self.get(&Item::Resource(Resource::HealthFragment)) * 5) as f32
+        } else {
+            self.max_health(difficulty)
+        };
+        // (but they do refill energy from the Energy shard...)
+        let max_energy = self.max_energy(difficulty);
+
+        if difficulty >= logical_difficulty::OVERFLOW && self.has_any(&Item::Shard(Shard::Overflow))
+        {
+            if orbs.health > max_health {
+                orbs.energy += orbs.health - max_health;
+            } else if orbs.energy > max_energy {
+                orbs.health += orbs.energy - max_energy;
+            }
+        }
+
+        orbs.health = orbs.health.min(max_health);
+        orbs.energy = orbs.energy.min(max_energy);
+    }
+    pub fn checkpoint_orbs(&self, difficulty: Difficulty) -> Orbs {
+        let health_refill = (self.max_health(difficulty) * 0.3).ceil().max(40.0);
+        let energy_refill = (self.max_energy(difficulty) * 0.2).ceil().max(1.0);
+
+        let mut orbs = Orbs {
+            health: health_refill,
+            energy: energy_refill,
+        };
+
+        self.cap_orbs(&mut orbs, true, difficulty);
+        orbs
+    }
+    pub fn health_plant_drops(&self, difficulty: Difficulty) -> f32 {
+        let value = self.max_health(difficulty) / 30.0;
+        // the game rounds to even
+        #[allow(
+            clippy::cast_sign_loss,
+            clippy::cast_possible_truncation,
+            clippy::float_cmp
+        )]
+        if value % 1. == 0.5 && value as u8 % 2 == 0 {
+            value.floor()
+        } else {
+            value.round()
         }
     }
 

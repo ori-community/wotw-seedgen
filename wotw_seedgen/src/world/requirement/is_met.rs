@@ -200,11 +200,14 @@ impl Requirement {
             Requirement::And(requirements) => {
                 for and in requirements {
                     orb_variants = and.is_met(player, states, orb_variants);
+                    if orb_variants.is_empty() {
+                        break;
+                    }
                 }
                 return orb_variants;
             }
             Requirement::Or(requirements) => {
-                let mut cheapest = SmallVec::<[Orbs; 3]>::new();
+                let mut cheapest = OrbVariants::new();
 
                 for or in requirements {
                     let orbcost = or.is_met(player, states, orb_variants.clone());
@@ -227,6 +230,7 @@ impl Requirement {
     }
 }
 
+#[must_use]
 fn cost_is_met(
     cost: f32,
     player: &Player,

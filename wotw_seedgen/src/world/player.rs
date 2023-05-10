@@ -1,9 +1,9 @@
-use smallvec::SmallVec;
+use smallvec::{smallvec, SmallVec};
 
 use crate::inventory::Inventory;
-use crate::item::{Item, Resource, Shard, Skill};
-use crate::settings::{logical_difficulty, WorldSettings};
-use crate::util::Orbs;
+use crate::item::{Item, Resource, Skill};
+use crate::settings::WorldSettings;
+use crate::util::{orbs, OrbVariants, Orbs, RefillValue};
 
 /// A logical representation of the in-game player
 #[derive(Debug, Clone)]
@@ -118,30 +118,8 @@ impl Player<'_> {
     /// ```
     // TODO this didn't end up being used much, maybe it should be used more to have the overflow check?
     pub fn cap_orbs(&self, orbs: &mut Orbs, checkpoint: bool) {
-        // checkpoints don't refill health given by the Vitality shard
-        let max_health = if checkpoint {
-            (self
-                .inventory
-                .get(&Item::Resource(Resource::HealthFragment))
-                * 5) as f32
-        } else {
-            self.max_health()
-        };
-        // (but they do refill energy from the Energy shard...)
-        let max_energy = self.max_energy();
-
-        if self.settings.difficulty >= logical_difficulty::OVERFLOW
-            && self.inventory.has_any(&Item::Shard(Shard::Overflow))
-        {
-            if orbs.health > max_health {
-                orbs.energy += orbs.health - max_health;
-            } else if orbs.energy > max_energy {
-                orbs.health += orbs.energy - max_energy;
-            }
-        }
-
-        orbs.health = orbs.health.min(max_health);
-        orbs.energy = orbs.energy.min(max_energy);
+        self.inventory
+            .cap_orbs(orbs, checkpoint, self.settings.difficulty)
     }
 
     /// Returns the [`Orbs`] after respawning on a checkpoint
@@ -168,16 +146,7 @@ impl Player<'_> {
     /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
     /// ```
     pub fn checkpoint_orbs(&self) -> Orbs {
-        let health_refill = (self.max_health() * 0.3).ceil().max(40.0);
-        let energy_refill = (self.max_energy() * 0.2).ceil().max(1.0);
-
-        let mut orbs = Orbs {
-            health: health_refill,
-            energy: energy_refill,
-        };
-
-        self.cap_orbs(&mut orbs, true);
-        orbs
+        self.inventory.checkpoint_orbs(self.settings.difficulty)
     }
     /// Returns how many health orbs plants will drop
     ///
@@ -203,18 +172,7 @@ impl Player<'_> {
     /// assert_eq!(player.health_plant_drops(), 5.0);
     /// ```
     pub fn health_plant_drops(&self) -> f32 {
-        let value = self.max_health() / 30.0;
-        // the game rounds to even
-        #[allow(
-            clippy::cast_sign_loss,
-            clippy::cast_possible_truncation,
-            clippy::float_cmp
-        )]
-        if value % 1. == 0.5 && value as u8 % 2 == 0 {
-            value.floor()
-        } else {
-            value.round()
-        }
+        self.inventory.health_plant_drops(self.settings.difficulty)
     }
 
     /// Replenish health, but don't exceed the player's maximum health
@@ -225,6 +183,27 @@ impl Player<'_> {
     pub fn recharge(&self, orbs: &mut Orbs, amount: f32) {
         self.inventory
             .recharge(orbs, amount, self.settings.difficulty);
+    }
+    /// Apply the refill from a [`RefillValue`] to a set of [`OrbVariants`]
+    pub(crate) fn refill(&self, refill: RefillValue, orb_variants: &mut OrbVariants) {
+        debug_assert!(!orb_variants.is_empty());
+        match refill {
+            RefillValue::Full => *orb_variants = smallvec![self.max_orbs()],
+            RefillValue::Checkpoint => {
+                *orb_variants = orbs::either_single(orb_variants, self.checkpoint_orbs())
+            }
+            RefillValue::Health(amount) => {
+                let amount = amount * self.health_plant_drops();
+                orb_variants
+                    .iter_mut()
+                    .for_each(|orbs| self.heal(orbs, amount));
+            }
+            RefillValue::Energy(amount) => {
+                orb_variants
+                    .iter_mut()
+                    .for_each(|orbs| self.recharge(orbs, amount));
+            }
+        }
     }
 
     pub fn damage_mod(&self, flying_target: bool, bow: bool) -> f32 {
@@ -284,7 +263,7 @@ impl Player<'_> {
 mod tests {
     use super::*;
 
-    use crate::item::BonusItem;
+    use crate::item::{BonusItem, Shard};
     use crate::settings::Difficulty;
     use smallvec::smallvec;
 
@@ -430,5 +409,11 @@ mod tests {
                 energy: 1.0
             }
         );
+
+        player = Player::spawn(&world_settings);
+
+        let mut orb_variants = smallvec![Orbs::default()];
+        player.refill(RefillValue::Full, &mut orb_variants);
+        assert_eq!(&orb_variants[..], &[player.max_orbs()]);
     }
 }

@@ -241,27 +241,12 @@ impl Graph {
                             best_orbs.clone(),
                         );
                         if !refill_orbs.is_empty() {
-                            match refill.value {
-                                RefillValue::Full => {
-                                    best_orbs = smallvec![context.player.max_orbs()];
-                                    break;
-                                }
-                                RefillValue::Checkpoint => {
-                                    refill_orbs = orbs::either_single(
-                                        &refill_orbs,
-                                        context.player.checkpoint_orbs(),
-                                    )
-                                }
-                                RefillValue::Health(amount) => {
-                                    let amount = amount * context.player.health_plant_drops();
-                                    refill_orbs
-                                        .iter_mut()
-                                        .for_each(|orbs| context.player.heal(orbs, amount));
-                                }
-                                RefillValue::Energy(amount) => refill_orbs
-                                    .iter_mut()
-                                    .for_each(|orbs| context.player.recharge(orbs, amount)),
+                            if matches!(refill.value, RefillValue::Full) {
+                                // shortcut
+                                best_orbs = smallvec![max_orbs];
+                                break;
                             }
+                            context.player.refill(refill.value, &mut refill_orbs);
                             best_orbs = orbs::either(&best_orbs, &refill_orbs);
                         }
                     }

@@ -366,24 +366,26 @@ enum RefillKind {
 }
 fn parse_anchor_refill<'a>(parser: &mut Parser<'a>) -> Result<Refill<'a>, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::AnchorContent)?;
-    let kind = parse_ident!(parser, Suggestion::Refill)?;
-    let value = match kind {
-        RefillKind::Full => RefillValue::Full,
-        RefillKind::Checkpoint => RefillValue::Checkpoint,
-        RefillKind::Health => {
-            RefillValue::Health(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?)
-        }
-        RefillKind::Energy => {
-            RefillValue::Energy(parse_value!(parser, Suggestion::Float, Suggestion::Refill)?)
-        }
-    };
-
+    let value = parse_refill_value(parser)?;
     let requirements = parse_optional_group(parser)?;
 
     Ok(Refill {
         value,
         requirements,
     })
+}
+fn parse_refill_value(parser: &mut Parser) -> Result<RefillValue, ParseError> {
+    let kind = parse_ident!(parser, Suggestion::Refill)?;
+    match kind {
+        RefillKind::Full => Ok(RefillValue::Full),
+        RefillKind::Checkpoint => Ok(RefillValue::Checkpoint),
+        RefillKind::Health => {
+            parse_value!(parser, Suggestion::Float, Suggestion::Refill).map(RefillValue::Health)
+        }
+        RefillKind::Energy => {
+            parse_value!(parser, Suggestion::Float, Suggestion::Refill).map(RefillValue::Energy)
+        }
+    }
 }
 fn parse_anchor_connection<'a>(
     parser: &mut Parser<'a>,

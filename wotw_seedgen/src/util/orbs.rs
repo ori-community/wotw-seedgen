@@ -75,15 +75,18 @@ impl SubAssign for Orbs {
 /// let either_orbs: OrbVariants = smallvec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }, Orbs { health: 15.0, energy: 1.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 /// ```
+// TODO optimization idea take ownership
+#[must_use]
 pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
     if b.is_empty() || a.is_empty() {
+        // TODO whyever are there these is_empty checks?
         smallvec![Orbs::default()]
     } else {
         let mut sum: OrbVariants = a.to_smallvec();
         for b in b {
-            if sum
+            if !sum
                 .iter()
-                .any(|a| a.energy < b.energy || a.health < b.health)
+                .any(|a| a.energy >= b.energy && a.health >= b.health)
             {
                 sum.retain(|a| a.energy > b.energy || a.health > b.health);
                 sum.push(*b);
@@ -95,14 +98,15 @@ pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
 /// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns a list of [`Orbs`] that contains the options of both, filtered for any redundancies
 ///
 /// This is an optimization over [`orbs::either`](either) for only one additional option, see [`orbs::either`](either) for further documentation
+#[must_use]
 pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
     if a.is_empty() {
         smallvec![Orbs::default()]
     } else {
         let mut sum: OrbVariants = a.to_smallvec();
-        if sum
+        if !sum
             .iter()
-            .any(|a| a.energy < b.energy || a.health < b.health)
+            .any(|a| a.energy >= b.energy && a.health >= b.health)
         {
             sum.retain(|a| a.energy > b.energy || a.health > b.health);
             sum.push(b);
@@ -144,6 +148,7 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
 /// let both_orbs: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
 /// assert_eq!(both(&a, &b), both_orbs);
 /// ```
+#[must_use]
 pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
     if b.is_empty() {
         a.to_smallvec()
@@ -174,6 +179,7 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
 /// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns all possible sums, filtered for any redundancies
 ///
 /// This is an optimization over [`orbs::both`](both) with only one additional option, see [`orbs::both`](both) for further documentation
+#[must_use]
 pub fn both_single(a: &[Orbs], b: Orbs) -> OrbVariants {
     if a.is_empty() {
         smallvec![b]
