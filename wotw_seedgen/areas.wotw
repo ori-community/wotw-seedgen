@@ -6500,7 +6500,7 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
       Burrow, Shuriken=4  # not in kii cause you use 2 shurikens in a row
       Burrow, Sword
 
-anchor WoodsMain.AboveHowl at 916, -4047:  # At the semisolid above silenced Howl
+anchor WoodsMain.AboveHowl at 916, -4046:  # At the semisolid above silenced Howl
   pickup WoodsMain.HiddenEX: free
 
   conn WoodsMain.PetrifiedHowl: free
