@@ -4945,10 +4945,12 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       Launch
       InnerWellspring.ThreeWheels
     gorlek:
-      DoubleJump, TripleJump
       SentryJump=1
+    kii:
+      DoubleJump, TripleJump, Hammer
     unsafe:
-      Grenade=1
+      DoubleJump, TripleJump
+      GrenadeJump
   pickup InnerWellspring.WaterSwitchEX:
     moki: Water, WaterDash
     unsafe: WaterDash, Damage=40, Damage=60
@@ -5358,9 +5360,10 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
       InnerWellspring.UpperCorruption, DoubleJump
       Launch
     gorlek:
-      DoubleJump, TripleJump, Damage=15
       InnerWellspring.UpperCorruption OR SentryJump=1
-    unsafe: Grenade=1
+    kii:
+      DoubleJump, TripleJump, Damage=15
+    unsafe: GrenadeJump
 
   pickup InnerWellspring.LeverEC:
     moki:
@@ -5370,19 +5373,17 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
       InnerWellspring.UpperCorruption, DoubleJump, Grapple
       Launch
     gorlek:
-      DoubleJump, TripleJump, Damage=15, Bash, Grenade=1
-      DoubleJump, TripleJump, Damage=15, Grapple OR SentryJump=1
+      DoubleJump, TripleJump, Bash, Grenade=1
+      DoubleJump, TripleJump, InnerWellspring.UpperCorruption OR SentryJump=1
       Bash, Grenade=1, Grapple
       SentryJump=2
       SentryJump=1, Grapple
       InnerWellspring.UpperCorruption, Bash, Grenade=1
       InnerWellspring.UpperCorruption, Grapple OR SentryJump=1
-      InnerWellspring.UpperCorruption, DoubleJump, TripleJump, Damage=15
     kii:
-      DoubleJump, TripleJump, InnerWellspring.UpperCorruption OR Damage=15
-      Bash, Grenade=1, DoubleJump, TripleJump
+      DoubleJump, TripleJump, Damage=15
     unsafe:
-      Grenade=2
+      GrenadeJump
 
   conn InnerWellspring.AbovePole:
     moki:
