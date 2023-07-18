@@ -71,10 +71,23 @@ pub enum SeedGenCommand {
         #[structopt(subcommand)]
         subcommand: Option<HeaderCommand>,
     },
+    /// Attempts to regenerate a previously generated seed (for debugging)
+    Regenerate {
+        #[structopt(flatten)]
+        args: RegenerateArgs,
+    },
 }
 
 #[derive(StructOpt)]
 pub struct SeedArgs {
+    #[structopt(flatten)]
+    pub meta: SeedMetaArgs,
+    #[structopt(flatten)]
+    pub settings: SeedSettings,
+}
+
+#[derive(StructOpt)]
+pub struct SeedMetaArgs {
     /// the seed's name and name of the file it will be written to. The name also seeds the rng if no seed is given.
     #[structopt()]
     pub filename: Option<String>,
@@ -111,9 +124,6 @@ pub struct SeedArgs {
     /// launch the seed after generating
     #[structopt(short, long)]
     pub launch: bool,
-
-    #[structopt(flatten)]
-    pub settings: SeedSettings,
 }
 
 #[derive(StructOpt)]
@@ -126,6 +136,14 @@ pub struct UniversePresetArgs {
     pub info: PresetInfoArgs,
     #[structopt(flatten)]
     pub settings: SeedSettings,
+}
+
+#[derive(StructOpt)]
+pub struct RegenerateArgs {
+    #[structopt(parse(from_os_str))]
+    pub path: PathBuf,
+    #[structopt(flatten)]
+    pub meta: SeedMetaArgs,
 }
 
 /// For CLI flags that contain a mixture of world specifiers and flag values
@@ -384,7 +402,7 @@ pub struct SeedSettings {
     pub spawn: Vec<WorldOpt<SpawnOpt>>,
     /// Logically expected difficulty of execution you may be required to perform
     ///
-    /// Available difficulties are "moki", "gorlek", "unsafe"
+    /// Available difficulties are "moki", "gorlek", "kii", "unsafe"
     #[structopt(short, long)]
     pub difficulty: Vec<WorldOpt<Difficulty>>,
     /// Logically expected tricks you may have to use

@@ -35,6 +35,7 @@ fn main() -> ExitCode {
             subcommand,
         } => headers::headers(headers, subcommand),
         cli::SeedGenCommand::ReachCheck { args } => reach_check::reach_check(args),
+        cli::SeedGenCommand::Regenerate { args } => seed::regenerate_seed(args),
     }
     .map_or_else(
         |err| {

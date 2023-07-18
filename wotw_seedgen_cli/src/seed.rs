@@ -1,3 +1,6 @@
+use crate::cli::RegenerateArgs;
+use crate::cli::SeedMetaArgs;
+
 use super::cli;
 use super::log_init;
 use super::play;
@@ -14,17 +17,12 @@ use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 use wotw_seedgen::generator::{Seed, SeedSpoiler};
 use wotw_seedgen::logic;
 use wotw_seedgen::settings::UniverseSettings;
+use wotw_seedgen::world::Graph;
 
 pub fn generate_seeds(args: cli::SeedArgs) -> Result<(), String> {
-    let use_file = if args.verbose {
-        Some("generator.log")
-    } else {
-        None
-    };
-    log_init::initialize_log(use_file, LevelFilter::Info, args.json_stderr)
-        .unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
-
     let now = Instant::now();
+
+    initialize_log(&args.meta);
 
     let mut universe_settings = UniverseSettings::default();
 
@@ -39,41 +37,29 @@ pub fn generate_seeds(args: cli::SeedArgs) -> Result<(), String> {
 
     parse_settings(args.settings, &mut universe_settings)?;
 
-    let areas = fs::read_to_string(&args.areas)
-        .map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
-    let locations = fs::read_to_string(&args.locations)
-        .map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
-    let states = fs::read_to_string(&args.uber_states)
-        .map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
-    let graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, !args.trust)?;
-    log::info!("Parsed logic in {:?}", now.elapsed());
+    let graph = read_input_files(&args.meta, &universe_settings)?;
 
-    let worlds = universe_settings.world_count();
     let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings)
         .map_err(|err| format!("Error generating seed: {}", err))?;
+
+    let worlds = universe_settings.world_count();
     if worlds == 1 {
         log::info!("Generated seed in {:?}", now.elapsed());
     } else {
         log::info!("Generated {} worlds in {:?}", worlds, now.elapsed());
     }
 
-    if args.tostdout {
-        write_seeds_to_stdout(seed, args.json)?;
+    write_seeds(args.meta, seed)
+}
+
+fn initialize_log(args: &SeedMetaArgs) {
+    let use_file = if args.verbose {
+        Some("generator.log")
     } else {
-        let filename = args.filename.unwrap_or_else(|| String::from("seed"));
-
-        write_seeds_to_files(&seed, &filename, args.seed_folder, args.json)?;
-    }
-
-    if args.launch {
-        if args.tostdout {
-            log::warn!("Can't launch a seed that has been written to stdout");
-        } else {
-            play::play_last_seed()?;
-        }
-    }
-
-    Ok(())
+        None
+    };
+    log_init::initialize_log(use_file, LevelFilter::Info, args.json_stderr)
+        .unwrap_or_else(|err| eprintln!("Failed to initialize log: {}", err));
 }
 
 fn read_stdin() -> Result<String, String> {
@@ -108,6 +94,45 @@ fn parse_settings(
     universe_settings
         .apply_preset(preset, &FILE_SYSTEM_ACCESS)
         .map_err(|err| format!("Error applying settings: {err}"))?;
+
+    Ok(())
+}
+
+fn read_input_files(
+    args: &SeedMetaArgs,
+    universe_settings: &UniverseSettings,
+) -> Result<Graph, String> {
+    let now = Instant::now();
+
+    let areas = fs::read_to_string(&args.areas)
+        .map_err(|err| format!("Failed to read {}: {}", args.areas.display(), err))?;
+    let locations = fs::read_to_string(&args.locations)
+        .map_err(|err| format!("Failed to read {}: {}", args.locations.display(), err))?;
+    let states = fs::read_to_string(&args.uber_states)
+        .map_err(|err| format!("Failed to read {}: {}", args.uber_states.display(), err))?;
+    let graph = logic::parse_logic(&areas, &locations, &states, universe_settings, !args.trust)?;
+
+    log::info!("Parsed logic in {:?}", now.elapsed());
+
+    Ok(graph)
+}
+
+fn write_seeds(args: SeedMetaArgs, seed: Seed<'_, '_>) -> Result<(), String> {
+    if args.tostdout {
+        write_seeds_to_stdout(seed, args.json)?;
+    } else {
+        let filename = args.filename.unwrap_or_else(|| String::from("seed"));
+
+        write_seeds_to_files(&seed, &filename, args.seed_folder, args.json)?;
+    }
+
+    if args.launch {
+        if args.tostdout {
+            log::warn!("Can't launch a seed that has been written to stdout");
+        } else {
+            play::play_last_seed()?;
+        }
+    }
 
     Ok(())
 }
@@ -269,4 +294,24 @@ impl SeedgenCliJsonOutput {
     pub fn to_json(&self) -> String {
         serde_json::to_string(&self).unwrap()
     }
+}
+
+pub fn regenerate_seed(args: RegenerateArgs) -> Result<(), String> {
+    let now = Instant::now();
+
+    initialize_log(&args.meta);
+
+    let seed =
+        fs::read_to_string(args.path).map_err(|err| format!("failed to read seed: {err}"))?;
+    let universe_settings =
+        UniverseSettings::from_seed(&seed).ok_or("no settings found in seed")??;
+
+    let graph = read_input_files(&args.meta, &universe_settings)?;
+
+    let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings)
+        .map_err(|err| format!("Error generating seed: {}", err))?;
+
+    log::info!("Regenerated in {:?}", now.elapsed());
+
+    write_seeds(args.meta, seed)
 }
