@@ -45,19 +45,19 @@ impl Seed<'_, '_> {
             .iter()
             .enumerate()
             .map(|(index, world)| {
-                let version = env!("CARGO_PKG_VERSION");
+                let version = concat!(env!("CARGO_PKG_VERSION"), "-", env!("GIT_HASH"));
                 let slug = &self.settings.slugify();
                 let config = &self.settings.to_json();
 
                 format!(
                     "\
-                {world}\
-                // This World: {index}\n\
-                // Target: ^2.0\n\
-                // Generator Version: {version}\n\
-                // Slug: {slug}\n\
-                // Config: {config}\n\
-            "
+                        {world}\
+                        // This World: {index}\n\
+                        // Target: ^2.0\n\
+                        // Generator Version: {version}\n\
+                        // Slug: {slug}\n\
+                        // Config: {config}\n\
+                    "
                 )
             })
             .collect::<Vec<_>>();
