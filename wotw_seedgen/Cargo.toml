@@ -32,7 +32,7 @@ criterion = "0.3"
 
 [build-dependencies]
 syn = { version = "1.0", features = ["full"] }
-vergen = { version = "8", features = [ "git", "gitcl" ] }
+vergen = { version = "8", features = [ "git", "gitoxide" ] }
 
 [[bench]]
 name = "bench"
