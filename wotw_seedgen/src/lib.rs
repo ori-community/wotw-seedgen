@@ -30,6 +30,8 @@ pub use languages::{
 pub use reach_check::reach_check;
 pub use world::World;
 
+pub const VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-", env!("VERGEN_GIT_SHA"));
+
 mod log {
     macro_rules! trace {
         ($($arg:tt)+) => {{

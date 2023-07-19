@@ -45,7 +45,7 @@ impl Seed<'_, '_> {
             .iter()
             .enumerate()
             .map(|(index, world)| {
-                let version = concat!(env!("CARGO_PKG_VERSION"), "-", env!("VERGEN_GIT_SHA"));
+                let version = crate::VERSION;
                 let slug = &self.settings.slugify();
                 let config = &self.settings.to_json();
 

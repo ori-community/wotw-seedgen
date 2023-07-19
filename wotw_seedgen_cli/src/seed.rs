@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
 use wotw_seedgen::files::FILE_SYSTEM_ACCESS;
 use wotw_seedgen::generator::{Seed, SeedSpoiler};
 use wotw_seedgen::logic;
+use wotw_seedgen::settings;
 use wotw_seedgen::settings::UniverseSettings;
 use wotw_seedgen::world::Graph;
 
@@ -301,17 +302,54 @@ pub fn regenerate_seed(args: RegenerateArgs) -> Result<(), String> {
 
     initialize_log(&args.meta);
 
-    let seed =
+    let model =
         fs::read_to_string(args.path).map_err(|err| format!("failed to read seed: {err}"))?;
+
+    verify_generator_version(&model).unwrap_or_else(|err| log::warn!("{err}"));
+
     let universe_settings =
-        UniverseSettings::from_seed(&seed).ok_or("no settings found in seed")??;
+        UniverseSettings::from_seed(&model).ok_or("no settings found in seed")??;
 
     let graph = read_input_files(&args.meta, &universe_settings)?;
 
     let seed = wotw_seedgen::generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings)
         .map_err(|err| format!("Error generating seed: {}", err))?;
 
+    match verify_seed(&model, &seed) {
+        Ok(()) => log::info!("Seed passed verification. Yay!"),
+        Err(err) => log::error!("Seed failed verification: {err}"),
+    }
+
     log::info!("Regenerated in {:?}", now.elapsed());
 
     write_seeds(args.meta, seed)
+}
+
+fn verify_generator_version(model: &str) -> Result<(), String> {
+    let model_version = model
+        .lines()
+        .find_map(|line| line.strip_prefix("// Generator Version: "))
+        .ok_or("No generator version found in seed")?;
+
+    if model_version == wotw_seedgen::VERSION {
+        Ok(())
+    } else {
+        Err(format!(
+            "Attempting to regenerate on version {}. but the seed was generated on {}",
+            wotw_seedgen::VERSION,
+            model_version,
+        ))
+    }
+}
+
+fn verify_seed(model: &str, seed: &Seed) -> Result<(), String> {
+    let seeds = seed.seed_files()?;
+    let world = settings::world_index_from_seed(&model).ok_or("no world index found in seed")??;
+    let world_seed = seeds.get(world).ok_or("world index out of bounds")?;
+
+    if model == world_seed {
+        Ok(())
+    } else {
+        Err("Regenerated seed does not match".to_string())
+    }
 }

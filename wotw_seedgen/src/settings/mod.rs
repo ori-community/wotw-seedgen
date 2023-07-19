@@ -397,20 +397,15 @@ impl WorldSettings {
                 .unwrap()));
         }
 
-        let world_settings = match input
-            .lines()
-            .find_map(|line| line.strip_prefix("// This World: "))?
-            .parse()
-        {
-            Ok(world_index) => universe_settings
-                .world_settings
-                .into_iter()
-                .nth(world_index)
-                .ok_or_else(|| "Current world index out of bounds".to_string()),
-            Err(err) => Err(format!("Error reading current world: {err}")),
-        };
-
-        Some(world_settings)
+        world_index_from_seed(input).map(|parse_result| {
+            parse_result.and_then(|world_index| {
+                universe_settings
+                    .world_settings
+                    .into_iter()
+                    .nth(world_index)
+                    .ok_or_else(|| "Current world index out of bounds".to_string())
+            })
+        })
     }
 
     /// Checks whether these settings feature a random spawn location
@@ -869,6 +864,15 @@ pub struct InlineHeader {
     pub name: Option<String>,
     /// Contained header syntax
     pub content: String,
+}
+
+pub fn world_index_from_seed(seed: &str) -> Option<Result<usize, String>> {
+    seed.lines()
+        .find_map(|line| line.strip_prefix("// This World: "))
+        .map(|line| {
+            line.parse()
+                .map_err(|err| format!("Error reading current world: {err}"))
+        })
 }
 
 #[cfg(test)]
