@@ -1,15 +1,16 @@
-use std::{env, fs, process::Command};
+use std::{env, fs};
+
+use vergen::EmitBuilder;
 
 const SETTINGS_PATH: &str = "src/settings/mod.rs";
 
 // very hacky yes
 fn main() {
-    let output = Command::new("git")
-        .args(&["rev-parse", "HEAD"])
-        .output()
+    EmitBuilder::builder()
+        .git_sha(false)
+        .fail_on_error()
+        .emit_and_set()
         .unwrap();
-    let git_hash = String::from_utf8(output.stdout).unwrap();
-    println!("cargo:rustc-env=GIT_HASH={}", git_hash);
 
     if env::var("DOCS_RS").is_ok() {
         return;
