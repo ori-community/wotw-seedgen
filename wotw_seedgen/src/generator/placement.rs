@@ -515,8 +515,6 @@ where
     I: Iterator<Item = u16>,
 {
     for target_world_index in 0..context.world_count {
-        let mut missing_keystones = 0;
-
         let world_context = &mut world_contexts[target_world_index];
 
         let placed_keystones = world_context
@@ -525,26 +523,23 @@ where
             .inventory
             .get(&Item::Resource(Resource::Keystone));
         if placed_keystones < 2 {
-            return Ok(());
+            continue;
         }
 
         let required_keystones: u32 = reachable_states[target_world_index]
             .iter()
-            .filter_map(|&node| {
-                if let Some((_, keystones)) = KEYSTONE_DOORS
+            .map(|&node| {
+                KEYSTONE_DOORS
                     .iter()
                     .find(|&&(identifier, _)| identifier == node.identifier())
-                {
-                    return Some(*keystones);
-                }
-                None
+                    .map_or(0, |(_, keystones)| *keystones)
             })
             .sum();
         if required_keystones <= placed_keystones {
-            return Ok(());
+            continue;
         }
 
-        missing_keystones += required_keystones - placed_keystones;
+        let missing_keystones = required_keystones - placed_keystones;
 
         log::trace!(
             "(World {}): Force placing {} keystones to avoid keylocks",
