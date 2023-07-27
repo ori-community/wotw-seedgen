@@ -5233,6 +5233,7 @@ anchor InnerWellspring.DrainAreaEX at -1064, -3961:  # At DrainEX
 
 anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in the breakable wall.
 # This anchor assumes that the wall is already broken.
+  nospawn
   refill Checkpoint
 
   conn InnerWellspring.DrainAreaEX: free
