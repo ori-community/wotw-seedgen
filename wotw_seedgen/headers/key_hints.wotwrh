@@ -5,6 +5,7 @@
 /// Opher after the Water escape tells the zones holding Water, Glide, Flap
 /// Lupo in Glades tells the zones holding Burrow, Water Dash, Grenade and Flash
 /// Twillen tells the zones holding Bow and Bash
+Flags: Key Hints
 !!include header_core
 !!include progress_helper
 

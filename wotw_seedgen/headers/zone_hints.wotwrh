@@ -3,6 +3,7 @@
 ///
 /// Lupo's maps give information about the number of skills in the current zone. Lupo in Glades sells the hints for Woods and Glades.
 //// Show teleporter amounts in addition to skill amounts
+Flags: Zone Hints
 !!parameter tp_hints bool:true
 !!include progress_helper
 

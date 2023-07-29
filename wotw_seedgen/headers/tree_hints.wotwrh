@@ -6,6 +6,7 @@
 /// Marsh Ancestral Light Tree has the Glide hint
 /// Clean Water Hint is on Wellspring Escape
 /// Works best without Vanilla Opher Upgrades, Bonus Opher Upgrades and Key Hints
+Flags: Tree Hints
 !!include header_core
 !!include progress_helper
 
