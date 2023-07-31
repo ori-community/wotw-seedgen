@@ -4890,12 +4890,8 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
     moki:
       Grapple, DoubleJump
       Launch
-    gorlek:
-      Dash OR Glide
-      DoubleJump, Sword OR Hammer
-    kii:
-      DoubleJump, TripleJump  # @validator Probably should be gorlek
-      Sword OR Sentry=3
+    gorlek: DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
+    kii: Dash OR Glide OR Sword OR Sentry=3
     unsafe: DoubleJump OR Shuriken=2 OR Sentry=2
   conn OuterWellspring.TrialApproach: free
 
@@ -5512,11 +5508,11 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
       Grapple, DoubleJump OR Dash
       Launch
     gorlek:
-      Grapple, Sword OR HammerSJump=1 OR Damage=15
+      Grapple, Sword OR HammerSJump=1
       DoubleJump, TripleJump, SentryJump=1 OR Damage=15
       ShurikenBreak=10, Combat=Tentacle OR Bash
     kii:
-      Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
       DoubleJump, TripleJump
     unsafe: DoubleJump
   
