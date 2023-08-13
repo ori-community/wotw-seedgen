@@ -5612,7 +5612,7 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
       InnerWellspring.SpinPuzzleSolved, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: InnerWellspring.SpinPuzzleSolved OR Water  # yep, water works for all four states of the room. Cool, huh?
 
-anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
+anchor InnerWellspring.GrappleThroughZigZagSpikes at -1088, -3725:  # after the two rotating wheel on the way to the top of the room. Not at the respawning point itself because it has load issues
   # dealing with the miner is represented in the connections from both directions to this anchor. When spawning on this anchor, the miner is not an issue
   refill Checkpoint
   
