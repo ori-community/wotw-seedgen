@@ -5,7 +5,7 @@
 /// Toggle this on or off in the Randomizer Wheel
 !!include bonus_core
 //// How many Skill Velocities to shuffle in
-!!parameter count int:5
+!!parameter count int:3
 !!name 8|9|5|int|+1 #Skill Velocity#
 !!display 8|9|5|int|+1 $[(9|999=400)]
 !!description 8|9|5|int|+1 Move faster when using abilities such as Dash and Bash
