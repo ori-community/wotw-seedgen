@@ -19,7 +19,7 @@ fn main() {
     match fs::read_to_string(".cargo_vcs_info.json") {
         Ok(package_meta) => {
             let package_meta: PackageMeta = serde_json::from_str(&package_meta).unwrap();
-            eprintln!("cargo:rustc-env=VERGEN_GIT_SHA={}", package_meta.git.sha1);
+            println!("cargo:rustc-env=VERGEN_GIT_SHA={}", package_meta.git.sha1);
         }
         Err(err) if matches!(err.kind(), ErrorKind::NotFound) => {
             EmitBuilder::builder()
