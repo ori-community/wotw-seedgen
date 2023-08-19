@@ -1,17 +1,37 @@
-use std::{env, fs};
+use std::{env, fs, io::ErrorKind};
 
+use serde::Deserialize;
 use vergen::EmitBuilder;
 
 const SETTINGS_PATH: &str = "src/settings/mod.rs";
 
+#[derive(Deserialize)]
+struct PackageMeta {
+    git: PackageMetaGit,
+}
+#[derive(Deserialize)]
+struct PackageMetaGit {
+    sha1: String,
+}
+
 // very hacky yes
 fn main() {
-    EmitBuilder::builder()
-        .git_sha(false)
-        .fail_on_error()
-        .emit_and_set()
-        .unwrap();
+    match fs::read_to_string(".cargo_vcs_info.json") {
+        Ok(package_meta) => {
+            let package_meta: PackageMeta = serde_json::from_str(&package_meta).unwrap();
+            eprintln!("cargo:rustc-env=VERGEN_GIT_SHA={}", package_meta.git.sha1);
+        }
+        Err(err) if matches!(err.kind(), ErrorKind::NotFound) => {
+            EmitBuilder::builder()
+                .git_sha(false)
+                .fail_on_error()
+                .emit_and_set()
+                .unwrap();
+        }
+        Err(err) => panic!("{err:?}"),
+    }
 
+    // TODO I think the issue here was writing arbitrary files, this might be solvable by properly structuring the build output
     if env::var("DOCS_RS").is_ok() {
         return;
     }
