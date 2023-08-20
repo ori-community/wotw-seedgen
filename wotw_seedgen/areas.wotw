@@ -6010,7 +6010,7 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
   pickup WoodsMain.LowerLeafPileEX:
     moki: Flap
   pickup WoodsMain.BehindWallOre:
-    gorlek: Flap, Glide  # Lure the balloon
+    kii: Flap, Glide  # Lure the balloon
 
   conn WoodsMain.FourKeystoneRoom:
     moki: Combat=2xBalloon, Flap, Glide
