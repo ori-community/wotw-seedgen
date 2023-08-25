@@ -3399,12 +3399,14 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     moki:
       Bash, Grenade=1
       Launch
-      TuleyShop.StickyGrass, DoubleJump, Grapple
+      DoubleJump, Grapple, TuleyShop.StickyGrass OR TuleyShop.BlueMoon
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump
-      TuleyShop.StickyGrass, Grapple, Dash OR Sword OR Hammer
-    kii: TuleyShop.StickyGrass, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      TuleyShop.StickyGrass, Grapple, Dash, Sword OR Hammer
+    kii:
+      TuleyShop.StickyGrass, Grapple, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # Jump from the branch on the right of the grass
+      TuleyShop.BlueMoon, Grapple, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: free  # https://youtu.be/3rxIf0qIUNc
       #DoubleJump
       #Sword, Grenade=1 OR Shuriken=2  # pogo
@@ -3414,16 +3416,17 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       DoubleJump, Bash, Grenade=1
       Launch
       TuleyShop.StickyGrass, Grapple
+      TuleyShop.BlueMoon, Grapple, Dash OR DoubleJump OR Glide
     gorlek:
       DoubleJump, SentryJump=1
       DoubleJump, TripleJump
+      TuleyShop.BlueMoon, Grapple
     kii: Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # grenade bash under GladesTown.UpperLeftEX
     unsafe:
       DoubleJump
       Bash, Grenade=1
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
-      TuleyShop.BlueMoon, Grapple
 
   conn GladesTown.MotayHut:  # check for redundancies with GladesTown.West
     moki, GladesTown.BuildHuts:
