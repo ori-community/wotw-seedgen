@@ -8389,10 +8389,11 @@ anchor UpperReach.KeystoneSnapPlant at -231, -3865:  # At the snap plant with Mi
       Glide OR Launch
       DoubleJump, Dash
     gorlek:
-      Sword
-      DoubleJump, TripleJump OR Hammer OR Damage=20
-      Dash, Hammer OR Damage=20
+      DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+      Dash, Sword OR Hammer OR Damage=20
+      Sword, Damage=20
     kii:
+      Sword
       DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
       Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
@@ -8400,6 +8401,8 @@ anchor UpperReach.KeystoneSnapPlant at -231, -3865:  # At the snap plant with Mi
       Damage=20, Shuriken=1 OR Sentry=2
     unsafe:
       Damage=40
+      Hammer # https://youtu.be/upeQp93EZIo
+      Dash # Reset your dash into the ceiling
 
 anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
   nospawn
