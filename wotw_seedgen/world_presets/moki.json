@@ -9,9 +9,8 @@
   ],
   "difficulty": "Moki",
   "headers": [
-    "knowledge_hints",
-    "shrine_hints",
     "no_quests",
+    "shrine_hints",
     "no_trials",
     "teleporters",
     "fragment_overflow",
@@ -19,7 +18,7 @@
     "black_market",
     "zone_hints",
     "spawn_with_sword",
-    "vanilla_opher_upgrades",
-    "no_rain"
+    "no_rain",
+    "knowledge_hints"
   ]
 }

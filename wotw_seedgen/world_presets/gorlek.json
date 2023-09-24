@@ -9,7 +9,6 @@
   ],
   "difficulty": "Gorlek",
   "headers": [
-    "knowledge_hints",
     "shrine_hints",
     "trial_hints",
     "teleporters",
@@ -17,7 +16,7 @@
     "key_hints",
     "black_market",
     "zone_hints",
-    "vanilla_opher_upgrades",
-    "no_rain"
+    "no_rain",
+    "knowledge_hints"
   ]
 }
