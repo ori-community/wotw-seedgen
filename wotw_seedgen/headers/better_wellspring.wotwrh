@@ -1,0 +1,6 @@
+#category World Changes
+/// Better Wellspring
+///
+/// Opens the top door of Wellspring
+
+3|0|8|37858|31962|bool|true 
