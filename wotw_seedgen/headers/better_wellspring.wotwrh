@@ -1,0 +1,6 @@
+#category World Changes
+///Better Wellspring
+///
+///Opens specifically the top door of wellspring giving an access to the TP without tivializing the whole area
+
+3|0|8|37858|31962|bool|true 
