@@ -9,7 +9,7 @@ Flags: Bonus+
 //// How many Rapid Smashes to shuffle in
 !!parameter rapidSmashes int:3
 //// How many Rapid Swords to shuffle in
-!!parameter rapidSwords int:3
+!!parameter rapidSwords int:0
 //// How many Rapid Spears to shuffle in
 !!parameter rapidSpears int:2
 //// How many Rapid Grenade to shuffle in
