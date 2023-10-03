@@ -5,11 +5,10 @@
   },
   "headers": [
     "progress_helper",
-    "spawn_tuley",
     "better_stomp",
     "autoplants",
-    "no_branch",
     "no_cutscenes",
-    "tp_refill"
+    "tp_refill",
+    "quest_autoadvance"
   ]
 }
