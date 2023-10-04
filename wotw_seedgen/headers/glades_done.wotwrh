@@ -3,7 +3,6 @@
 ///
 /// start with glades rebuilt and regrown
 Flags: Glades Done
-!!include spawn_tuley
 
 // Block placements
 3|0|8|14019|44578|int|2     // GladesTown.RebuildTheGlades
@@ -23,3 +22,5 @@ Flags: Glades Done
 3|0|8|42178|16586|byte|3    // Clear the Cave Entrance
 3|0|8|14019|33776|int|1     // Cave Entrance Quest
 !!remove 40x 1|2
+// Spawn Tuley
+3|0|8|6|300|bool|true
