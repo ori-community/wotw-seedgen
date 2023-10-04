@@ -3,13 +3,13 @@
 ///
 /// Advance/skip certain steps of quests
 
-/// Skip the first half of the Tree Keeper quest and get the seed directly
+//// Skip the first half of the Tree Keeper quest and get the seed directly
 !!parameter noBranch bool:true
 
-/// Tuley is always there in Glades
+//// Tuley is always there in Glades
 !!parameter spawnTuley bool:true
 
-/// Skips needing to talk to the moki again after defeating kwolok
+//// Skips needing to talk to the moki again after defeating kwolok
 !!parameter instantPayRespect bool:true
 
 !!if noBranch true
