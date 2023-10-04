@@ -9,7 +9,7 @@
 //// Tuley is always there in Glades
 !!parameter spawnTuley bool:true
 
-//// Skips needing to talk to the moki again after defeating kwolok
+//// Skips needing to talk to the Moki again after defeating Kwolok
 !!parameter instantPayRespect bool:true
 
 !!if noBranch true
