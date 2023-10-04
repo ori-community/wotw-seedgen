@@ -4,9 +4,11 @@
 /// Lupo's maps give information about the number of skills in the current zone. Lupo in Glades sells the hints for Woods and Glades.
 //// Show teleporter amounts in addition to skill amounts
 Flags: Zone Hints
-!!parameter tp_hints bool:true
+!!parameter skill_hints bool:true
+!!parameter teleporter_hints bool:true
 !!include progress_helper
 
+!!if skill_hints true
 9|999=0|4|17|48248|18767|1|6|Marsh Skills - $HOWMANY(0, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=3|4|17|48248|3638|1|6|Hollow Skills - $HOWMANY(1, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=6|4|17|48248|19396|1|6|Glades Skills - $HOWMANY(2, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
@@ -18,7 +20,8 @@ Flags: Zone Hints
 9|999=24|4|17|48248|48423|1|6|Mouldwood Skills - $HOWMANY(8, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=27|4|17|48248|61146|1|6|Wastes Skills - $HOWMANY(9, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
 9|999=33|4|17|48248|4045|1|6|Willow Skills - $HOWMANY(11, 2\|(\d{1,2}|1[0-1]\d)|9\|0)
-!!if tp_hints true
+!!endif
+!!if teleporter_hints true
 9|999=1|4|17|48248|18767|1|6|Marsh TPs - $HOWMANY(0, 5\|.*)
 9|999=4|4|17|48248|3638|1|6|Hollow TPs - $HOWMANY(1, 5\|.*)
 9|999=7|4|17|48248|19396|1|6|Glades TPs - $HOWMANY(2, 5\|.*)
@@ -32,6 +35,7 @@ Flags: Zone Hints
 9|999=34|4|17|48248|4045|1|6|Willow TPs - $HOWMANY(11, 5\|.*)
 !!endif
 
+!!if skill_hints true
 48248|18767|6|$[(9|999=0)]              // Marsh Zone Hint from LupoMap.Marsh
 48248|3638|6|$[(9|999=3)]               // Hollow Zone Hint from LupoMap.Hollow
 48248|19396|6|f=0|Glades Skills Hint    // Glades Zone Hint from LupoMap.HCMapIcons
@@ -51,7 +55,8 @@ Flags: Zone Hints
 48248|48423|6|$[(9|999=24)]             // Depths Zone Hint from LupoMap.Depths
 48248|61146|6|$[(9|999=27)]             // Wastes Zone Hint from LupoMap.Wastes
 48248|4045|6|$[(9|999=33)]              // Willow Zone Hint from LupoMap.Willow
-!!if tp_hints true
+!!endif
+!!if teleporter_hints true
 48248|18767|6|$[(9|999=1)]                  // Marsh Zone Hint from LupoMap.Marsh
 48248|3638|6|$[(9|999=4)]                   // Hollow Zone Hint from LupoMap.Hollow
 48248|19396|6|f=0|Glades Teleporters Hint   // Glades Zone Hint from LupoMap.HCMapIcons
