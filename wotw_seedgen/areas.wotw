@@ -10456,9 +10456,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   pickup EastPools.CurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=80
-    unsafe:
-      Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
-      WaterDash, Damage=60
+    unsafe: WaterDash, Damage=60
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
