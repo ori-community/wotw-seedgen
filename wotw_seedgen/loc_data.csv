@@ -173,7 +173,7 @@ InnerWellspring.BlueMoonSeed, The Wellspring, Quest, Seed, questUberStateGroup, 
 InnerWellspring.SwimOre, The Wellspring, Resource, Ore, waterMillStateGroupDescriptor, 37858, gorlekOreA, 32932, , -1203.9, -3715.7, -1203.9, -3715.7
 InnerWellspring.EscapeRevisitEX, The Wellspring, SpiritLight, 100, waterMillStateGroupDescriptor, 37858, xpOrb, 56444, , -1313.1, -3640.1, -1313.1, -3640.1
 InnerWellspring.WaterEscape, The Wellspring, Quest, Water, waterMillStateGroupDescriptor, 37858, finishedWatermillEscape, 12379, , -481, -3763, -1159, -3635
-PoolsApproach.CurrentEX, Luma Pools, SpiritLight, 100, lagoonStateGroup, 945, mediumExpB, 10682, , -1047.3, -4216.8, -1047.3, -4216.8
+PoolsApproach.MarshPathCurrentEX, Luma Pools, SpiritLight, 100, lagoonStateGroup, 945, mediumExpB, 10682, , -1047.3, -4216.8, -1047.3, -4216.8
 PoolsApproach.AboveWheelEX, Luma Pools, SpiritLight, 100, lagoonStateGroup, 945, mediumExpA, 14530, , -940.7, -4144.7, -940.7, -4144.7
 PoolsApproach.MillPathHC, Luma Pools, Resource, Life, lagoonStateGroup, 945, lagoonMillTransitionHealthCell, 37243, , -850.6, -4195.6, -850.6, -4195.6
 PoolsApproach.MillPathEC, Luma Pools, Resource, Energy, lagoonStateGroup, 945, energyCellA, 21334, , -924.3, -4169.5, -924.3, -4169.5
@@ -181,7 +181,7 @@ PoolsApproach.MillPathEX, Luma Pools, SpiritLight, 100, lagoonStateGroup, 945, m
 EastPools.RightOre, Luma Pools, Resource, Ore, lumaPoolsStateGroup, 5377, orePickupA, 34852, , -1134.6, -4115.9, -1134.6, -4115.9
 EastPools.KwolokAmuletQI, Luma Pools, Quest, Amulet, questUberStateGroup, 14019, kwoloksWisdomItemCollected, 53103, , -1173, -4154, -1173, -4154
 EastPools.TwoCrushersEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbD, 13832, , -1176.4, -4177.9, -1176.4, -4177.9
-EastPools.CurrentEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbC, 17396, , -1214.3, -4182.0, -1214.3, -4182.0
+EastPools.BubbleCurrentEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbC, 17396, , -1214.3, -4182.0, -1214.3, -4182.0
 EastPools.BelowLeverEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 27204, , -1230.6, -4125.7, -1230.6, -4125.7
 EastPools.AboveDoorOre, Luma Pools, Resource, Ore, lumaPoolsStateGroup, 5377, pickupA, 19694, , -1248.7, -4139.0, -1248.7, -4139.0
 EastPools.PurpleWallHC, Luma Pools, Resource, Life, lumaPoolsStateGroup, 5377, healthContainerA, 63201, , -1277.9, -4086.0, -1277.9, -4086.0
@@ -206,7 +206,7 @@ UpperPools.BubblesEC, Luma Pools, Resource, Energy, lumaPoolsStateGroup, 5377, e
 UpperPools.RightBubblesEX, Luma Pools, SpiritLight, 200, lumaPoolsStateGroup, 5377, largeExpOrbPlaceholderA, 628, , -1572.3, -4076.9, -1572.3, -4076.9
 UpperPools.LeftBubblesEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 21860, , -1645.0, -4083.8, -1645.0, -4083.8
 UpperPools.SwimDashTree, Luma Pools, Ability, SwimDash, treesDontWorry, 0, SwimDash, 104, , -1430, -4082, -1430, -4082
-UpperPools.CurrentEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbB, 52791, , -1468.1, -4098.2, -1468.1, -4098.2
+UpperPools.SwimDashCurrentEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbB, 52791, , -1468.1, -4098.2, -1468.1, -4098.2
 UpperPools.RoofEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 33180, , -1449.0, -4036.8, -1449.0, -4036.8
 UpperPools.WaterfallEC, Luma Pools, Resource, Energy, lumaPoolsStateGroup, 5377, energyContainerA, 32750, , -1389.0, -4039.5, -1389.0, -4039.5
 WestPools.BurrowEX, Luma Pools, SpiritLight, 200, lumaPoolsStateGroup, 5377, xpOrbB, 62180, , -1654.9, -4188.9, -1654.9, -4188.9
