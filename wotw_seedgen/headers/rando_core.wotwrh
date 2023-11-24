@@ -1,0 +1,12 @@
+#hide
+/// Rando Core
+///
+/// Sets up uberstates to set the seed up for the randomizer
+
+3|0|8|48248|16489|int|1		// npcsStateGroup.fastTravelEnabledUberState
+3|0|8|17|16825|bool|true	// gromShop.spiritWellBuilt
+3|0|8|17|15068|bool|true	// gromShop.beautifyBuilt
+3|0|8|21786|47458|bool|true	// swampStateGroup.torchHolded
+3|0|8|937|54318|bool|true	// kwolokGroupDescriptor.risingPedestals
+3|0|8|9593|3621|bool|true	// inkwaterMarshStateGroup.mokiTorchPlayed
+3|0|8|21786|50432|bool|true	// swampStateGroup.leverA
