@@ -491,7 +491,7 @@ fn needed_for_energy(
                                          solutions: Vec<usize>,
                                          use_regenerate| {
                                     for index in solutions {
-                                        let mut solution = &mut total_solutions[index];
+                                        let solution = &mut total_solutions[index];
                                         let mut new_index = None; // If we need to duplicate the solution, we will store the index here
                                                                   // This flag includes the information that we are allowed and may want to heal
                                         if use_regenerate {

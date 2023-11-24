@@ -45,6 +45,7 @@ enum ItemKind {
     SysMessage = 15,
     WheelCommand = 16,
     ShopCommand = 17,
+    SetMapMessage = 18,
 }
 #[derive(TryFromPrimitive, FromStr)]
 #[repr(u8)]
@@ -151,6 +152,7 @@ fn parse_item(parser: &mut Parser) -> Result<VItem, ParseError> {
         ItemKind::SysMessage => parse_sys_message(parser),
         ItemKind::WheelCommand => parse_wheel_command(parser),
         ItemKind::ShopCommand => parse_shop_command(parser),
+        ItemKind::SetMapMessage => parse_set_map_message(parser),
     }
 }
 
@@ -791,6 +793,12 @@ fn parse_shop_command(parser: &mut Parser) -> Result<VItem, ParseError> {
         ShopCommandKind::Visible => parse_shop_set_visible(parser, uber_identifier),
     }?;
     Ok(VItem::ShopCommand(command))
+}
+fn parse_set_map_message(parser: &mut Parser) -> Result<VItem, ParseError> {
+    parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
+    Ok(VItem::SetMapMessage(VString(
+        parse_string(parser).to_owned(),
+    )))
 }
 fn parse_optional_string(parser: &mut Parser) -> Option<VString> {
     if parser.current_token().kind == TokenKind::Separator {

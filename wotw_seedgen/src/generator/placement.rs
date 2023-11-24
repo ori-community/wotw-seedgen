@@ -46,12 +46,17 @@ pub struct Placement<'a> {
     pub trigger: UberStateTrigger,
     /// The [`Item`] to be granted when collecting this placement
     pub item: Item,
+    pub hide_message: bool,
 }
 
 impl Placement<'_> {
     pub fn code(&self) -> CodeDisplay<Placement> {
         CodeDisplay::new(self, |s, f| {
-            write!(f, "{}|{}", s.trigger.code(), s.item.code())
+            write!(f, "{}|{}", s.trigger.code(), s.item.code())?;
+            if s.hide_message {
+                write!(f, "|mute")?;
+            }
+            Ok(())
         })
     }
 }
@@ -230,6 +235,7 @@ where
             node: Some(node),
             trigger: trigger.clone(),
             item: item.clone(),
+            hide_message: false,
         });
 
         if is_shop {
@@ -238,6 +244,7 @@ where
                     node: Some(node),
                     trigger: trigger.clone(),
                     item: Item::Message(Message::new(name)),
+                    hide_message: false,
                 });
             }
         } else if let Some(display) = display.or(custom_name) {
@@ -245,6 +252,7 @@ where
                 node: Some(node),
                 trigger: trigger.clone(),
                 item: Item::Message(Message::new(display)),
+                hide_message: false,
             });
         }
     } else {
@@ -285,7 +293,7 @@ where
             UberStateValue::Bool(true),
         );
         let target_message = Item::Message(Message::new(format!(
-            "{} from $[15|5|{}]|mute",
+            "{} from $[15|5|{}]",
             target_display.unwrap_or(custom_name),
             origin_world_index
         )));
@@ -298,22 +306,26 @@ where
             node: None,
             trigger: target_trigger.clone(),
             item: item.clone(),
+            hide_message: true,
         });
         target_world_context.placements.push(Placement {
             node: None,
             trigger: target_trigger,
             item: target_message,
+            hide_message: false,
         });
         let origin_world_context = &mut world_contexts[origin_world_index];
         origin_world_context.placements.push(Placement {
             node: Some(node),
             trigger: trigger.clone(),
             item: send_item,
+            hide_message: false,
         });
         origin_world_context.placements.push(Placement {
             node: Some(node),
             trigger: trigger.clone(),
             item: origin_message,
+            hide_message: false,
         });
     }
 
@@ -411,6 +423,7 @@ where
         node: None,
         trigger: UberStateTrigger::load(),
         item: price_setter,
+        hide_message: false,
     });
 
     if description.is_some() {
@@ -423,6 +436,7 @@ where
             node: None,
             trigger: UberStateTrigger::load(),
             item: description_setter,
+            hide_message: false,
         });
     }
 
@@ -436,6 +450,7 @@ where
             node: None,
             trigger: UberStateTrigger::load(),
             item: icon_setter,
+            hide_message: false,
         });
     }
 
@@ -1697,14 +1712,6 @@ fn build_world_contexts<'a, 'b>(
         let spawn = spawns[world_index];
         let spawn_identifier = spawn.identifier();
         let spawn_slots = if spawn_identifier == DEFAULT_SPAWN { 0 } else {
-            let mut message = Message::new(String::new());
-            message.frames = Some(420);
-            message.instant = true;
-            placements.push(Placement {
-                node: Some(&world.graph.spawn_pickup_node),
-                trigger: UberStateTrigger::spawn(),
-                item: Item::Message(message),
-            });
             SPAWN_SLOTS
         };
 
@@ -1750,6 +1757,7 @@ fn build_world_contexts<'a, 'b>(
                     node: None,
                     trigger: UberStateTrigger::load(),
                     item,
+                    hide_message: false,
                 });
             } else {
                 return Err(format!("Cannot spawn on {} which has no specified coordinates", spawn.identifier()));

@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use wotw_seedgen_derive::VVariant;
 
 use crate::header::{parser, CodeDisplay};
-use crate::header::{vdisplay, VResolve};
+use crate::header::{vdisplay, VResolve, VString};
 use crate::settings::{logical_difficulty, Difficulty};
 use crate::uber_state::UberIdentifier;
 use crate::util::{Icon, MapIcon, Zone};
@@ -65,6 +65,7 @@ pub enum Item {
     WheelCommand(#[VType] WheelCommand),
     ShopCommand(#[VType] ShopCommand),
     SysMessage(SysMessage),
+    SetMapMessage(#[VType] String),
 }
 vdisplay! {
     VItem,
@@ -91,6 +92,7 @@ vdisplay! {
                 Self::SysMessage(message) => write!(f, "{message}"),
                 Self::WheelCommand(command) => write!(f, "{command}"),
                 Self::ShopCommand(command) => write!(f, "{command}"),
+                Self::SetMapMessage(message) => write!(f, "Set Map Message to \"{message}\""),
             }
         }
     }
@@ -293,6 +295,7 @@ impl Item {
             }
             Item::WheelCommand(command) => write!(f, "16|{}", command.code()),
             Item::ShopCommand(command) => write!(f, "17|{}", command.code()),
+            Item::SetMapMessage(message) => write!(f, "18|{}", message),
         })
     }
 

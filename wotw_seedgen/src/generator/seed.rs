@@ -106,6 +106,8 @@ impl Display for SeedWorld<'_, '_> {
             writeln!(f, "{}", placement.code())?;
         }
 
+        write!(f, include_str!("seed_core.wotwr"))?;
+
         write!(f, "{}", self.headers)?;
 
         if !self.headers.ends_with('\n') {
