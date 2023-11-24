@@ -91,21 +91,25 @@ Flags: Bonus+
 !!name 8|4|37|byte|100 #Unlimited Sentries#
 !!display 8|4|37|byte|100 #Unlimited Sentries#
 !!description 8|4|37|byte|100 Spawn unlimited Sentries
+!!icon 8|4|37|byte|100 file:assets/icons/bonus/unlimitedsentries.png
 
 // Sentry Burst Upgrade
 !!add $PARAM(sentryBurstUpgrades)x 8|4|46|byte|+10
 !!name 8|4|46|byte|+10 #Sentry Burst Upgrade#
 !!display 8|4|46|byte|+10 #Sentry Burst Upgrade#
 !!description 8|4|46|byte|+10 Sentry fires more shots per burst
+!!icon 8|4|46|byte|+10 file:assets/icons/bonus/sentryburstupgrade.png
 
 // Sentry Fire Rate Upgrade
 !!add $PARAM(sentryFireRateUpgrades)x 8|4|47|float|+2.5
 !!name 8|4|47|float|+2.5 #Sentry Fire Rate Upgrade#
 !!display 8|4|47|float|+2.5 #Sentry Fire Rate Upgrade#
 !!description 8|4|47|float|+2.5 Sentry fires shots even faster
+!!icon 8|4|47|float|+2.5 file:assets/icons/bonus/sentryattackspeed.png
 
 // Extra Shurikens
 !!add $PARAM(extraShurikens)x 8|4|38|byte|+1
 !!name 8|4|38|byte|+1 #Extra Shuriken#
 !!display 8|4|38|byte|+1 #Extra Shuriken x$(4|38)#
 !!description 8|4|38|byte|+1 Throw multiple Shurikens
+!!icon 8|4|38|byte|+1 file:assets/icons/bonus/extrashuriken.png
