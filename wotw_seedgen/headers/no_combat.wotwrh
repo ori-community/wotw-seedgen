@@ -42,8 +42,7 @@ Flags: No Combat
 
 !!if skipBosses true
 945|58403=3|8|945|58403|int|6          // Skip Kwolok's fight
-945|58403=3|6|f=0                      // -
-945|58403=3|4|8|-1958|-4067            // -
+945|58403=3|4|8|-1958|-4067|mute       // -
 !!set SkipKwolok
 18793|26713=2|8|18793|26713|int|4      // Skip Mora's fight
 18793|26713=5|8|18793|26713|int|7      // -
