@@ -137,8 +137,8 @@
 9|7|4|25|10|4|17|9|128|0|4|30|0|$[(9|999=409)] Disabled
 9|7|4|27|11|4|17|9|0|1|4|30|0|\n<icon>DA5</> Toggle\n<icon>DA4</> Cycle (1 page)  // tooltip
 9|7|4|27|11|4|18|9|0|1|4|30|0|\n<icon>DA5</> Toggle\n<icon>DA4</> Cycle ($(9|0) pages)
+9|7|4|27|11|6|${0}
 9|7|4|25|11|8|9|7|int|1                                 // cycle back to start
-9|7|6|${0}
 
 // Autoselect the first item
 // skip-validate
