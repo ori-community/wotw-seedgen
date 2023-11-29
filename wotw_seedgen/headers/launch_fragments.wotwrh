@@ -16,6 +16,6 @@ Flags: Launch Fragments
 3|0|8|9|4|int|$PARAM(required)
 !9|2|4|17|9|2|$PARAM(required)|2|8                                                      // Give Launch (out of logic)
 9|2=$PARAM(count)|2|8|mute                                                              // Give logical Launch
-9|999=200|6|[if([state_int(9|2)] < $PARAM(required), *Launch Fragments* ($(9|2)/$PARAM(required)), $($(9|2)/$PARAM(required))$)]
+9|999=200|6|*Launch Fragments* [if([state_int(9|2)] < $PARAM(required), ($(9|2)/$PARAM(required)), $($(9|2)/$PARAM(required))$)]
 // skip-validate
 9|0=10|4|30|0|$[(9|999=200)]\n
