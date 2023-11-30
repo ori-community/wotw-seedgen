@@ -37,15 +37,15 @@
 3|1|17|0|17|23607|grom:2
 3|1|17|1|17|23607|Roofs Over Heads
 3|1|17|2|17|23607|Time to #build some more housing#! Now on the big tree, by the fire.
-3|1|4|17|17|51230|0|17|4|17|23607|true
-17|51230|17|4|17|23607|false
+3|1|4|17|17|51230|0|17|4|17|23607|false
+17|51230|17|4|17|23607|true
 3|1|8|17|23608|int|6
 17|23607|8|21|23607|bool|true
 3|1|17|0|17|40448|grom:3
 3|1|17|1|17|40448|Onwards and Upwards
 3|1|17|2|17|40448|Treehouses seem to be popular with the Moki. How about we add a couple more?
-3|1|4|17|17|23607|0|17|4|17|40448|true
-17|23607|17|4|17|40448|false
+3|1|4|17|17|23607|0|17|4|17|40448|false
+17|23607|17|4|17|40448|true
 3|1|8|17|40449|int|8
 17|40448|8|21|40448|bool|true
 3|1|17|0|17|18751|grom:5
@@ -56,8 +56,8 @@
 3|1|17|0|17|16586|grom:4
 3|1|17|1|17|16586|Clear the Cave Entrance
 3|1|17|2|17|16586|That old cave entrance looks like it's #about to collapse#...but we Gorlek learned a thing or two about tunnelling after fleeing to the mines. With some Ore, I can #repair# it.
-3|1|4|17|17|18751|0|17|4|17|16586|true
-17|18751|17|4|17|16586|false
+3|1|4|17|17|18751|0|17|4|17|16586|false
+17|18751|17|4|17|16586|true
 3|1|8|17|16587|int|6
 17|16586|8|21|16586|bool|true
 3|1|17|0|17|15068|grom:6
@@ -68,36 +68,36 @@
 3|1|17|0|20|16254|tuley:0
 3|1|17|1|20|16254|Wellspring Wildflowers
 3|1|17|2|20|16254|I could never quite get #Sela flowers# to prosper in my old garden. Perhaps they'll do better here?
-3|1|4|17|14019|20601|0|17|4|20|16254|true
-14019|20601|17|4|20|16254|false
-20|16254|8|21|16254|bool|true
+3|1|4|17|14019|20601|0|17|4|20|16254|false
+14019|20601|17|4|20|16254|true
+20|16254|8|21|16254|bool|false
 3|1|17|0|20|64583|tuley:1
 3|1|17|1|20|64583|Sticky Situation
 3|1|17|2|20|64583|I'm not surprised you found this seed so far away. Feel how sticky it is? Grass seeds hitch rides on passers-by to find fresh soil.
-3|1|4|17|14019|28662|0|17|4|20|64583|true
-14019|28662|17|4|20|64583|false
-20|64583|8|21|64583|bool|true
+3|1|4|17|14019|28662|0|17|4|20|64583|false
+14019|28662|17|4|20|64583|true
+20|64583|8|21|64583|bool|false
 3|1|17|0|20|47651|tuley:2
 3|1|17|1|20|47651|Firemoth's Delight
 3|1|17|2|20|47651|With the days growing darker since the #Decay#, Lightcatchers are finding it harder to collect the light they need for their hanging bulbs.
-3|1|4|17|14019|8192|0|17|4|20|47651|true
-14019|8192|17|4|20|47651|false
-20|47651|8|21|47651|bool|true
+3|1|4|17|14019|8192|0|17|4|20|47651|false
+14019|8192|17|4|20|47651|true
+20|47651|8|21|47651|bool|false
 3|1|17|0|20|33011|tuley:3
 3|1|17|1|20|33011|Blue Moon
 3|1|17|2|20|33011|Unlike their cousins, the #Lightcatchers#, these hanging flowers draw energy from the light of the #moon#, not the sun.
-3|1|4|17|14019|24142|0|17|4|20|33011|true
-14019|24142|17|4|20|33011|false
-20|33011|8|21|33011|bool|true
+3|1|4|17|14019|24142|0|17|4|20|33011|false
+14019|24142|17|4|20|33011|true
+20|33011|8|21|33011|bool|false
 3|1|17|0|20|38393|tuley:4
 3|1|17|1|20|38393|Left Behind
 3|1|17|2|20|38393|I thought I saved every seed, but it seems on was left behind in the cold, and survived against all odds.
-3|1|4|17|14019|32376|0|17|4|20|38393|true
-14019|32376|17|4|20|38393|false
-20|38393|8|21|38393|bool|true
+3|1|4|17|14019|32376|0|17|4|20|38393|false
+14019|32376|17|4|20|38393|true
+20|38393|8|21|38393|bool|false
 3|1|17|0|20|40006|tuley:5
 3|1|17|1|20|40006|The Last Seed
 3|1|17|2|20|40006|I recognize this seed. It seems the tree I couldn't save is not completely gone.
-3|1|4|17|14019|7470|0|17|4|20|40006|true
-14019|7470|17|4|20|40006|false
-20|40006|8|21|40006|bool|true
+3|1|4|17|14019|7470|0|17|4|20|40006|false
+14019|7470|17|4|20|40006|true
+20|40006|8|21|40006|bool|false
