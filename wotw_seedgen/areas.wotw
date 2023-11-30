@@ -1800,6 +1800,9 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
   refill Energy=3:
     moki: BreakCrystal
 
+  state MarshPastOpher.EyestoneDoor:
+    moki: Keystone=2  # we can now open it from Twillen's side
+
   state WestHollow.PurpleDoorOpen:  # Path who drop from the frog statue originate from InFrontPurpleDoor
     moki, Bow=1, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       DoubleJump, Dash
