@@ -2080,7 +2080,7 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       DoubleJump, TripleJump  # Jump off the eye to the left
       DoubleJump, Damage=10, Dash
       Damage=20, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # these paths aren't meaningful anymore if the water is gone, so this does not softlock
-    kii:
+    kii, WestHollow.UpperDrainLeverPulled:
       Bow=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bow=1, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
       WaterDash, Damage=20, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
