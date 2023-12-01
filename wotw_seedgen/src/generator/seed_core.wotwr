@@ -34,21 +34,21 @@
 3|1|17|2|17|51230|It's a shame how those old Moki dwellings are in shambles. Maybe if we #fixed them up# the Moki could #move back to the Glades#?
 3|1|8|17|51231|int|4
 17|51230|8|21|51230|bool|true
-3|1|17|0|17|23607|grom:2
+3|1|17|0|17|23607|grom:3
 3|1|17|1|17|23607|Roofs Over Heads
 3|1|17|2|17|23607|Time to #build some more housing#! Now on the big tree, by the fire.
 3|1|4|17|17|51230|0|17|4|17|23607|false
 17|51230|17|4|17|23607|true
 3|1|8|17|23608|int|6
 17|23607|8|21|23607|bool|true
-3|1|17|0|17|40448|grom:3
+3|1|17|0|17|40448|grom:5
 3|1|17|1|17|40448|Onwards and Upwards
 3|1|17|2|17|40448|Treehouses seem to be popular with the Moki. How about we add a couple more?
 3|1|4|17|17|23607|0|17|4|17|40448|false
 17|23607|17|4|17|40448|true
 3|1|8|17|40449|int|8
 17|40448|8|21|40448|bool|true
-3|1|17|0|17|18751|grom:5
+3|1|17|0|17|18751|grom:2
 3|1|17|1|17|18751|Thorny Situation
 3|1|17|2|17|18751|Those spikey vines all over the place are quite the nuisance, let me tell you. With some help, I could #clear them out# and #make the Glades safer# for everyone!
 3|1|8|17|18752|int|5
