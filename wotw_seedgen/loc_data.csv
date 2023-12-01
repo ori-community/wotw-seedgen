@@ -52,7 +52,7 @@ MarshPastOpher.TrialOre, Inkwater Marsh, Resource, Ore, inkwaterMarshStateGroup,
 MarshPastOpher.TrialEC, Inkwater Marsh, Resource, Energy, inkwaterMarshStateGroup, 9593, halfEnergyCellA, 27562, , -473.8, -4339.6, -473.83002, -4338.5796
 MarshPastOpher.TrialHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, lifeCellA, 20194, , -437.7, -4380.8, -437.67, -4379.8403
 MarshPastOpher.TrialRightEX, Inkwater Marsh, SpiritLight, 100, swampStateGroup, 21786, largeExpA, 10413, , -344.1, -4356.9, -344.07, -4356.92
-MarshPastOpher.SpiritTrial, Inkwater Marsh, SpiritLight, 1000, raceGroup, 44964, inkwaterMarshRace, 45951, 2, -614, -4319, -614, -4319
+MarshPastOpher.SpiritTrial, Inkwater Marsh, SpiritLight, 1000, raceGroup, 44964, inkwaterMarshRace, 45951, 2, -614, -4319, -423.68, -4306.3604
 MarshPastOpher.CombatShrine, Inkwater Marsh, Resource, ShardSlot, swampStateGroup, 21786, enemyRoom, 18109, , -382.6, -4338.3, -382.63397, -4337.3223
 MarshPastOpher.SwingPoleEX, Inkwater Marsh, SpiritLight, 50, inkwaterMarshStateGroup, 9593, expOrb, 59344, , -492.7, -4261.3, -492.66, -4261.27
 MarshPastOpher.LeftEyestone, Inkwater Marsh, Resource, Eyestone, swampStateGroup, 21786, keyStoneA, 27433, , -461.3, -4195.3, -461.27002, -4195.29
@@ -70,7 +70,7 @@ WestHollow.QuickshotShard, Kwoloks Hollow, Shard, Quickshot, pickupsGroup, 23987
 WestHollow.SwimEC, Kwoloks Hollow, Resource, Energy, kwolokGroupDescriptor, 937, energyHalfContainer, 24175, , -177.8, -4354.2, -177.8136, -4353.2246
 WestHollow.LupoMap, Kwoloks Hollow, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapKwoloksHollow, 3638, , -146, -4321, -146, -4321
 WestHollow.TrialHC, Kwoloks Hollow, Resource, Life, kwolokGroupDescriptor, 937, halfHealthCell, 2463, , -122.0, -4268.2, -121.979996, -4267.23
-WestHollow.SpiritTrial, Kwoloks Hollow, SpiritLight, 1000, raceGroup, 44964, kwolokDropRace, 25545, 2, -115, -4259, -115, -4259
+WestHollow.SpiritTrial, Kwoloks Hollow, SpiritLight, 1000, raceGroup, 44964, kwolokDropRace, 25545, 2, -115, -4259, -175.43, -4440.89
 WestHollow.BelowLupoEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholderA, 48192, , -82.3, -4369.6, -82.32001, -4369.565
 WestHollow.AboveDashEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholderC, 61744, , -100.0, -4407.2, -99.98999, -4407.225
 WestHollow.DashRightEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholder, 37926, , 11.6, -4401.1, 11.600098, -4401.12
@@ -139,7 +139,7 @@ OuterWellspring.RightWallOre, The Wellspring, Resource, Ore, wellspringGroupDesc
 OuterWellspring.RightWallEC, The Wellspring, Resource, Energy, wellspringGroupDescriptor, 53632, energyVesselA, 1911, , -735.3, -3988.3, -735.25366, -3987.25
 OuterWellspring.RightWallEX, The Wellspring, SpiritLight, 100, wellspringGroupDescriptor, 53632, mediumExpOrbPlaceholderE, 51706, , -745.1, -3942.0, -745.0513, -3941.9956
 OuterWellspring.TrialOre, The Wellspring, Resource, Ore, waterMillStateGroupDescriptor, 37858, gorlekOreA, 58286, , -677.7, -3933.2, -677.7317, -3933.1733
-OuterWellspring.SpiritTrial, The Wellspring, SpiritLight, 1000, raceGroup, 44964, wellspringRace, 11512, 2, -668, -3937, -668, -3937
+OuterWellspring.SpiritTrial, The Wellspring, SpiritLight, 1000, raceGroup, 44964, wellspringRace, 11512, 2, -668, -3937, -834.55005, -3893.5503
 OuterWellspring.UltraGrappleShard, The Wellspring, Shard, UltraGrapple, pickupsGroup, 23987, ultraLeashShardPickup, 12104, , -798.7, -3912.2, -798.66003, -3911.1501
 OuterWellspring.HiddenHC, The Wellspring, Resource, Life, wellspringGroupDescriptor, 53632, lifeVesselA, 17403, , -877.8, -3961.0, -877.8399, -3959.99
 OuterWellspring.EntranceRoofEX, The Wellspring, SpiritLight, 100, wellspringGroupDescriptor, 53632, mediumExpOrbPlaceholderF, 42264, , -848.9, -4023.5, -848.91876, -4023.5227
@@ -190,7 +190,7 @@ EastPools.AboveTpEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xp
 EastPools.LupoOre, Luma Pools, Resource, Ore, lumaPoolsStateGroup, 5377, gorlekOreA, 12235, , -1370.0, -4166.2, -1369.9664, -4166.21
 EastPools.UltraBashShard, Luma Pools, Shard, UltraBash, pickupsGroup, 23987, ultraBashShardPickup, 25996, , -1284.6, -4196.2, -1284.62, -4195.23
 EastPools.FightRoomHC, Luma Pools, Resource, Life, lumaPoolsStateGroup, 5377, healthContainerA, 45774, , -1365.2, -4109.5, -1365.1549, -4108.4673
-EastPools.SpiritTrial, Luma Pools, SpiritLight, 1000, raceGroup, 44964, lumaPoolsRace, 54686, 2, -1417, -4126, -1417, -4126
+EastPools.SpiritTrial, Luma Pools, SpiritLight, 1000, raceGroup, 44964, lumaPoolsRace, 54686, 2, -1417, -4126, -1485.9731, -4059.728
 EastPools.EnergyHarvestShard, Luma Pools, Shard, EnergyHarvest, lumaPoolsStateGroup, 5377, spiritShard, 40328, , -1441.4, -4129.7, -1441.3499, -4128.7153
 EastPools.LupoEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbB, 35440, , -1414.3, -4154.6, -1414.3197, -4154.631
 EastPools.LupoMap, Luma Pools, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapLumaPools, 1557, , -1391, -4167, -1391, -4167
@@ -237,7 +237,7 @@ WoodsMain.HiddenEX, Silent Woods, SpiritLight, 100, _petrifiedForestGroup, 58674
 WoodsMain.BelowKeystonesEX, Silent Woods, SpiritLight, 50, _petrifiedForestGroup, 58674, expOrbA, 23186, , 941.8, -4185.9, 941.81433, -4185.8574
 WoodsMain.BehindDoorRoofEX, Silent Woods, SpiritLight, 100, _petrifiedForestGroup, 58674, expOrbA, 64057, , 968.6, -4123.3, 968.604, -4123.2627
 WoodsMain.PetrifiedHowlEX, Silent Woods, SpiritLight, 50, _petrifiedForestGroup, 58674, smallPickupA, 17974, , 904.7, -4076.7, 904.6666, -4076.6702
-WoodsMain.SpiritTrial, Silent Woods, SpiritLight, 1000, raceGroup, 44964, silentWoodlandRace, 22703, 2, 820, -4047, 820, -4047
+WoodsMain.SpiritTrial, Silent Woods, SpiritLight, 1000, raceGroup, 44964, silentWoodlandRace, 22703, 2, 820, -4047, 859.62, -3938.6702
 WoodsMain.OverflowShard, Silent Woods, Shard, Overflow, pickupsGroup, 23987, recycleShardPickup, 25183, , 826.6, -3940.1, 826.62494, -3939.051
 WoodsMain.CombatShrine, Silent Woods, Resource, ShardSlot, _petrifiedForestGroup, 58674, enemyRoom, 29265, , 1361.1, -4064.0, 1361.1, -4063.04
 WoodsMain.ShrineEX, Silent Woods, SpiritLight, 100, _petrifiedForestGroup, 58674, expOrbA, 32647, , 1406.0, -4064.4, 1405.9546, -4064.3982
@@ -269,7 +269,7 @@ LowerReach.UpperLeftKS, Baurs Reach, Resource, Keystone, baursReachGroup, 28895,
 LowerReach.MiddleLeftKS, Baurs Reach, Resource, Keystone, baursReachGroup, 28895, keystoneB, 37444, , -80.6, -4040.1, -80.55005, -4040.1401
 LowerReach.BottomLeftKS, Baurs Reach, Resource, Keystone, baursReachGroup, 28895, keystoneD, 18358, , -58.0, -4054.9, -58.03015, -4054.9102
 LowerReach.TrialEX, Baurs Reach, SpiritLight, 100, baursReachGroup, 28895, mediumExpOrb, 22761, , -38.7, -4017.7, -38.670044, -4017.73
-LowerReach.SpiritTrial, Baurs Reach, SpiritLight, 1000, raceGroup, 44964, baursReachWindTunnelRace, 23661, 2, 75, -4046, 75, -4046
+LowerReach.SpiritTrial, Baurs Reach, SpiritLight, 1000, raceGroup, 44964, baursReachWindTunnelRace, 23661, 2, 75, -4046, 101.933716, -4046.7227
 LowerReach.CatalystShard, Baurs Reach, Shard, Catalyst, pickupsGroup, 23987, hollowEnergyShardPickup, 897, , -90.2, -4096.5, -90.165726, -4095.3179
 LowerReach.HandToHandSoup, Baurs Reach, Quest, Soup, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 4, -110, -4090, -110, -4090
 UpperReach.LifeForceShard, Baurs Reach, Shard, Lifeforce, pickupsGroup, 23987, untouchableShardPickup, 19630, , -400.8, -3860.5, -400.7699, -3859.5312
@@ -301,7 +301,7 @@ UpperDepths.KeystoneHC, Mouldwood Depths, Resource, Life, mouldwoodDepthsGroup, 
 UpperDepths.HiveEX, Mouldwood Depths, SpiritLight, 100, mouldwoodDepthsGroup, 18793, expOrbB, 6573, , 425.4, -4384.8, 425.41998, -4384.77
 UpperDepths.ForestsEyes, Mouldwood Depths, Wisp, Eyes, mouldwoodDepthsGroup, 18793, bossReward, 63291, , 687, -4386, 687, -4386
 LowerDepths.RaceStartHC, Mouldwood Depths, Resource, Life, mouldwoodDepthsGroup, 18793, healthCellA, 62694, , 496.4, -4498.2, 496.37314, -4497.1514
-LowerDepths.SpiritTrial, Mouldwood Depths, SpiritLight, 1000, raceGroup, 44964, mouldwoodDepthsRace, 28552, 2, 478, -4517, 478, -4517
+LowerDepths.SpiritTrial, Mouldwood Depths, SpiritLight, 1000, raceGroup, 44964, mouldwoodDepthsRace, 28552, 2, 478, -4517, 573.47345, -4510.134
 LowerDepths.BelowDoorOre, Mouldwood Depths, Resource, Ore, mouldwoodDepthsGroup, 18793, orePickupA, 836, , 437.0, -4507.1, 436.98193, -4507.07
 LowerDepths.SpiritSurgeShard, Mouldwood Depths, Shard, SpiritSurge, pickupsGroup, 23987, spiritPowerShardPickup, 986, , 564.2, -4570.2, 564.18604, -4569.2515
 LowerDepths.HandToHandSilk, Mouldwood Depths, Quest, Silk, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 7, 317, -4508, 317, -4508
@@ -314,7 +314,7 @@ LowerDepths.FlashTree, Mouldwood Depths, Ability, Flash, treesDontWorry, 0, Flas
 LowerWastes.WestTPOre, Windswept Wastes, Resource, Ore, desertAGroup, 7228, gorlekOre, 54494, , 1504.3, -4007.0, 1504.34, -4006.9902
 LowerWastes.PurpleWallEX, Windswept Wastes, SpiritLight, 100, desertAGroup, 7228, collectableADesertA, 56821, , 1534.1, -3996.6, 1534.09, -3996.6396
 LowerWastes.SunsetViewEX, Windswept Wastes, SpiritLight, 100, desertAGroup, 7228, collectableCDesertA, 52086, , 1607.3, -3974.5, 1607.25, -3974.4702
-LowerWastes.SpiritTrial, Windswept Wastes, SpiritLight, 1000, raceGroup, 44964, desertRace, 30767, 2, 1527, -4009, 1527, -4009
+LowerWastes.SpiritTrial, Windswept Wastes, SpiritLight, 1000, raceGroup, 44964, desertRace, 30767, 2, 1527, -4009, 1580.71, -3898.5503
 LowerWastes.SandBridgeOre, Windswept Wastes, Resource, Ore, windsweptWastesGroupDescriptor, 20120, gorlekOre, 46919, , 1657.9, -3972.7, 1657.88, -3972.6895
 LowerWastes.EerieGemQI, Windswept Wastes, Quest, Gem, questUberStateGroup, 14019, mineGemItemCollected, 58342, , 1640.4, -4004.1, 1640.4, -4004.1
 LowerWastes.MuncherTunnelEC, Windswept Wastes, Resource, Energy, windsweptWastesGroupDescriptor, 20120, energyHalfCell, 11785, , 1652.9, -4014.4, 1652.92, -4013.37
