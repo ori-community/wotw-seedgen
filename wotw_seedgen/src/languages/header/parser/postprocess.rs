@@ -158,6 +158,9 @@ fn how_many(
                             if let Some(index) = actual_item.find("//") {
                                 actual_item = &actual_item[..index];
                             }
+                            if let Some(index) = actual_item.find("|mute") {
+                                actual_item = &actual_item[..index];
+                            }
                             actual_item = actual_item.trim();
 
                             if re.is_match(actual_item) {
