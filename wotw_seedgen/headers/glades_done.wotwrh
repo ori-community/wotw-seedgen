@@ -14,12 +14,18 @@ Flags: Glades Done
 3|0|8|42178|47651|byte|3    // Lightcatcher
 3|0|8|42178|16254|byte|3    // Sela Flowers
 3|0|8|42178|40006|byte|3    // Last Seed
+// Shop from Grom (should eventually become conditional if we have random items in Groms shop)
+3|0|8|17|51230|bool|true    // Dwelling Repairs
+3|0|8|17|23607|bool|true    // Roofs Over Heads
+3|0|8|17|40448|bool|true    // Onwards and Upwards
+3|0|8|17|18751|bool|true    // Thorny Situation
+3|0|8|17|16586|bool|true    // Clear the Cave Entrance
 // Build Stuff
-3|0|8|42178|51230|byte|3    // Dwelling Repairs
-3|0|8|42178|23607|byte|3    // Roofs Over Heads
-3|0|8|42178|40448|byte|3    // Onwards and Upwards
-3|0|8|42178|18751|byte|3    // Thorny Situation
-3|0|8|42178|16586|byte|3    // Clear the Cave Entrance
+3|0|8|21|51230|bool|true    // Dwelling Repairs
+3|0|8|21|23607|bool|true    // Roofs Over Heads
+3|0|8|21|40448|bool|true    // Onwards and Upwards
+3|0|8|21|18751|bool|true    // Thorny Situation
+3|0|8|21|16586|bool|true    // Clear the Cave Entrance
 3|0|8|14019|33776|int|1     // Cave Entrance Quest
 !!remove 40x 1|2
 // Spawn Tuley
