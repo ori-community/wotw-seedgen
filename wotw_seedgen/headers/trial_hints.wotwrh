@@ -4,10 +4,18 @@
 /// Reveal the reward a Spirit Trial gives when activating it
 
 44964|45951=1|6|Complete the Marsh Spirit Trial to gain\n$[(44964|45951>=2)]         // Inkwater Marsh
+3|100|4|29|100|Reward: $[(44964|45951>=2)]
 44964|25545=1|6|Complete the Hollow Spirit Trial to gain\n$[(44964|25545>=2)]        // Kwolok's Hollow
+3|101|4|29|101|Reward: $[(44964|25545>=2)]
 44964|11512=1|6|Complete the Wellspring Spirit Trial to gain\n$[(44964|11512>=2)]    // The Wellspring
-44964|54686=1|6|Complete the Luma Spirit Trial to gain\n$[(44964|54686>=2)]          // Luma Pools
+3|102|4|29|102|Reward: $[(44964|11512>=2)]
 44964|22703=1|6|Complete the Woods Spirit Trial to gain\n$[(44964|22703>=2)]         // Silent Woods
+3|103|4|29|103|Reward: $[(44964|22703>=2)]
 44964|23661=1|6|Complete the Reach Spirit Trial to gain\n$[(44964|23661>=2)]         // Baur's Reach
+3|104|4|29|104|Reward: $[(44964|23661>=2)]
 44964|28552=1|6|Complete the Mouldwood Spirit Trial to gain\n$[(44964|28552>=2)]     // Mouldwood Depths
+3|105|4|29|105|Reward: $[(44964|28552>=2)]
+44964|54686=1|6|Complete the Luma Spirit Trial to gain\n$[(44964|54686>=2)]          // Luma Pools
+3|106|4|29|106|Reward: $[(44964|54686>=2)]
 44964|30767=1|6|Complete the Wastes Spirit Trial to gain\n$[(44964|30767>=2)]        // Windswept Wastes
+3|107|4|29|107|Reward: $[(44964|30767>=2)]
