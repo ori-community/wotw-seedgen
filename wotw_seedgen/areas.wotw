@@ -2399,9 +2399,8 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
   refill Checkpoint
   
   pickup WestHollow.CrusherEX:
-    # No moki path because the need for dash/burrow/waterdash in order to drop through the log is too obscure
-    gorlek: Dash
-    unsafe: Burrow OR WaterDash  # hmmmmm
+    moki: Dash
+    unsafe: free
   pickup WestHollow.DashTree:
     moki: Dash OR Launch
     unsafe: free
