@@ -53,7 +53,7 @@ impl Seed<'_, '_> {
                     "\
                         {world}\
                         // This World: {index}\n\
-                        // Target: ^2.0\n\
+                        // Format Version: 1.0.0\n\
                         // Generator Version: {version}\n\
                         // Slug: {slug}\n\
                         // Config: {config}\n\
