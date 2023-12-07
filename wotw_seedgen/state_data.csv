@@ -28,11 +28,11 @@ WestHollow.FullyDrained, 937, 42245, 2
 WestHollow.DoorLever, 937, 59920,
 WestHollow.TrialActivation, 44964, 25545, 1
 GladesTown.GromsWall, 42178, 5815,
-GladesTown.BuildHuts, 42178, 51230, 3
-GladesTown.CaveEntrance, 42178, 16586, 3
-GladesTown.ClearThorns, 42178, 18751, 3
-GladesTown.OnwardsAndUpwards, 42178, 40448, 3
-GladesTown.RoofsOverHeads, 42178, 23607, 3
+GladesTown.BuildHuts, 17, 51230,
+GladesTown.CaveEntrance, 17, 16586,
+GladesTown.ClearThorns, 17, 18751,
+GladesTown.OnwardsAndUpwards, 17, 40448,
+GladesTown.RoofsOverHeads, 17, 23607,
 GladesTown.TuleySpawned, 6, 300,
 WestGlades.CombatShrineCompleted, 44310, 58796,
 TuleyShop.BlueMoon, 42178, 33011, 3
