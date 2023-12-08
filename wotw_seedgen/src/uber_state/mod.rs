@@ -68,11 +68,10 @@ impl UberIdentifier {
     }
 
     pub fn is_shop(&self) -> bool {
-        matches!(self.uber_group, 1 | 2)
-            || self.uber_group == 48248 && matches!(self.uber_id, 19396 | 57987 | 41666)
+        matches!(self.uber_group, 1 | 2 | 15)
     }
     pub fn is_purchasable(&self) -> bool {
-        matches!(self.uber_group, 1 | 2)
+        matches!(self.uber_group, 1 | 2 | 15)
             || self.uber_group == 48248
                 && matches!(
                     self.uber_id,
@@ -85,9 +84,6 @@ impl UberIdentifier {
                         | 48423
                         | 61146
                         | 4045
-                        | 19396
-                        | 57987
-                        | 41666
                 )
     }
 

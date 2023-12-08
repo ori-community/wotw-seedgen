@@ -31,10 +31,6 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ("opher_weapons.Charge Blaze", UberIdentifier::new(1, 1115)),
     ("opher_weapons.Rapid Sentry", UberIdentifier::new(1, 1116)),
     (
-        "opher_weapons.Has bought everything",
-        UberIdentifier::new(1, 20000),
-    ),
-    (
         "opher_weapons.Water Breath cost",
         UberIdentifier::new(1, 10023),
     ),
@@ -81,10 +77,6 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ("twillen_shards.Vitality", UberIdentifier::new(2, 22)),
     ("twillen_shards.Energy", UberIdentifier::new(2, 26)),
     ("twillen_shards.Finesse", UberIdentifier::new(2, 40)),
-    (
-        "twillen_shards.Has bought everything",
-        UberIdentifier::new(2, 20000),
-    ),
     (
         "twillen_shards.Overcharge cost",
         UberIdentifier::new(2, 101),
@@ -6909,10 +6901,6 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         UberIdentifier::new(48248, 19551),
     ),
     (
-        "npcsStateGroup.Has bought everything",
-        UberIdentifier::new(48248, 20000),
-    ),
-    (
         "npcsStateGroup.lupoEncounteredWellspringValley",
         UberIdentifier::new(48248, 21009),
     ),
@@ -7123,7 +7111,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ),
     (
         "npcsStateGroup.HCMapIconCost",
-        UberIdentifier::new(48248, 19397),
+        UberIdentifier::new(15, 19397),
     ),
     (
         "npcsStateGroup.twillenKwolokDialogState",
@@ -7147,7 +7135,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ),
     (
         "npcsStateGroup.ShardMapIconCost",
-        UberIdentifier::new(48248, 41667),
+        UberIdentifier::new(15, 41667),
     ),
     (
         "npcsStateGroup.frozenMokiDialogState",
@@ -7167,7 +7155,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ),
     (
         "npcsStateGroup.ECMapIconCost",
-        UberIdentifier::new(48248, 57988),
+        UberIdentifier::new(15, 57988),
     ),
     (
         "npcsStateGroup.lupoIntroState",
@@ -7183,7 +7171,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ),
     (
         "npcsStateGroup.mapmakerShowMapIconEnergyUberState",
-        UberIdentifier::new(48248, 19396),
+        UberIdentifier::new(15, 19396),
     ),
     (
         "npcsStateGroup.ShowMapIconCreepheartUberState",
@@ -7191,11 +7179,11 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
     ),
     (
         "npcsStateGroup.mapmakerShowMapIconShardUberState",
-        UberIdentifier::new(48248, 41666),
+        UberIdentifier::new(15, 41666),
     ),
     (
         "npcsStateGroup.mapmakerShowMapIconHealthUberState",
-        UberIdentifier::new(48248, 57987),
+        UberIdentifier::new(15, 57987),
     ),
     (
         "wellspringGroupDescriptor.energyVesselA",

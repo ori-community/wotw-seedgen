@@ -161,18 +161,18 @@ pub const SHOP_PRICES: &[(&str, UberIdentifier, UberIdentifier)] = &[
     ),
     (
         "LupoShop.HCMapIcon",
-        UberIdentifier::new(48248, 19396),
-        UberIdentifier::new(48248, 19397),
+        UberIdentifier::new(15, 19396),
+        UberIdentifier::new(15, 19397),
     ),
     (
         "LupoShop.ECMapIcon",
-        UberIdentifier::new(48248, 57987),
-        UberIdentifier::new(48248, 57988),
+        UberIdentifier::new(15, 57987),
+        UberIdentifier::new(15, 57988),
     ),
     (
         "LupoShop.ShardMapIcon",
-        UberIdentifier::new(48248, 41666),
-        UberIdentifier::new(48248, 41667),
+        UberIdentifier::new(15, 41666),
+        UberIdentifier::new(15, 41667),
     ),
 ];
 

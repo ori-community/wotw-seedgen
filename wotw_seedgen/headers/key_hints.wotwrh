@@ -9,35 +9,35 @@ Flags: Key Hints
 !!include header_core
 !!include progress_helper
 
-48248|41666|6|f=0|Burrow, Water Dash, Grenade, Flash hint   // key skill hint from LupoHint.Shards
-48248|41666|8|9|0|int|33
+15|41666|6|f=0|Burrow, Water Dash, Grenade, Flash hint   // key skill hint from LupoHint.Shards
+15|41666|8|9|0|int|33
 9|0=33|8|9|0|int|41
 9|0=33|6|${1}
 9|0=41|4|29|1|
-9|0=41|4|17|48248|41666|1|4|17|6|1101|0|4|30|1|Burrow: $WHEREIS(2\|101), <>
-9|0=41|4|17|48248|41666|1|4|17|6|1101|1|4|30|1|$Burrow: $WHEREIS(2\|101)$, <>
-9|0=41|4|17|48248|41666|1|4|17|6|1104|0|4|30|1|Water Dash: $WHEREIS(2\|104), <>
-9|0=41|4|17|48248|41666|1|4|17|6|1104|1|4|30|1|$Water Dash: $WHEREIS(2\|104)$, <>
-9|0=41|4|17|48248|41666|1|4|17|6|1051|0|4|30|1|Grenade: $WHEREIS(2\|51), <>
-9|0=41|4|17|48248|41666|1|4|17|6|1051|1|4|30|1|$Grenade: $WHEREIS(2\|51)$, <>
-9|0=41|4|17|48248|41666|1|4|17|6|1062|0|4|30|1|Flash: $WHEREIS(2\|62)
-9|0=41|4|17|48248|41666|1|4|17|6|1062|1|4|30|1|$Flash: $WHEREIS(2\|62)$
+9|0=41|4|17|15|41666|1|4|17|6|1101|0|4|30|1|Burrow: $WHEREIS(2\|101), <>
+9|0=41|4|17|15|41666|1|4|17|6|1101|1|4|30|1|$Burrow: $WHEREIS(2\|101)$, <>
+9|0=41|4|17|15|41666|1|4|17|6|1104|0|4|30|1|Water Dash: $WHEREIS(2\|104), <>
+9|0=41|4|17|15|41666|1|4|17|6|1104|1|4|30|1|$Water Dash: $WHEREIS(2\|104)$, <>
+9|0=41|4|17|15|41666|1|4|17|6|1051|0|4|30|1|Grenade: $WHEREIS(2\|51), <>
+9|0=41|4|17|15|41666|1|4|17|6|1051|1|4|30|1|$Grenade: $WHEREIS(2\|51)$, <>
+9|0=41|4|17|15|41666|1|4|17|6|1062|0|4|30|1|Flash: $WHEREIS(2\|62)
+9|0=41|4|17|15|41666|1|4|17|6|1062|1|4|30|1|$Flash: $WHEREIS(2\|62)$
 // skip-validate
 9|0=10|8|9|0|int|41
 // skip-validate
-9|0=10|4|17|48248|41666|1|4|30|0|${1}\n
+9|0=10|4|17|15|41666|1|4|30|0|${1}\n
 3|1|8|9|0|int|30                                                // set price on load
 6|1101|8|9|0|int|30                                             // set price on Burrow find
 6|1104|8|9|0|int|30                                             // set price on Water Dash find
 6|1051|8|9|0|int|30                                             // set price on Grenade find
 6|1062|8|9|0|int|30                                             // set price on Flash find
-9|0=30|8|48248|41667|int|4000                                   // base price
-9|0=30|4|17|6|1101|1|8|48248|41667|int|-500                     // reduce for Burrow
-9|0=30|4|17|6|1104|1|8|48248|41667|int|-500                     // reduce for Water Dash
-9|0=30|4|17|6|1051|1|8|48248|41667|int|-500                     // reduce for Grenade
-9|0=30|4|17|6|1062|1|8|48248|41667|int|-500                     // reduce for Flash
-9|0=30|4|17|48248|41667|2000|8|48248|41667|int|0                // set price to zero with nothing left to hint
-3|1|17|0|48248|41666|lupo:2                                     // set icon
+9|0=30|8|15|41667|int|4000                                   // base price
+9|0=30|4|17|6|1101|1|8|15|41667|int|-500                     // reduce for Burrow
+9|0=30|4|17|6|1104|1|8|15|41667|int|-500                     // reduce for Water Dash
+9|0=30|4|17|6|1051|1|8|15|41667|int|-500                     // reduce for Grenade
+9|0=30|4|17|6|1062|1|8|15|41667|int|-500                     // reduce for Flash
+9|0=30|4|17|15|41667|2000|8|15|41667|int|0                // set price to zero with nothing left to hint
+3|1|17|0|15|41666|lupo:2                                     // set icon
 
 1|23|6|f=0|Clean Water, Flap, Glide hint                        // key skill hint from OpherShop.WaterBreath
 1|23|8|9|0|int|34
