@@ -8,7 +8,7 @@ MarshSpawn.ResilienceOre, Inkwater Marsh, Resource, Ore, swampStateGroup, 21786,
 MarshSpawn.BashEC, Inkwater Marsh, Resource, Energy, swampStateGroup, 21786, halfEnergyCellA, 7152, , -667.8, -4329.7, -667.8059, -4328.67
 MarshSpawn.PreLupoEX, Inkwater Marsh, SpiritLight, 50, inkwaterMarshStateGroup, 9593, xpOrbA, 5929, , -656.8, -4342.1, -656.7713, -4342.064
 MarshSpawn.LupoMap, Inkwater Marsh, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapInkwaterMarsh, 18767, , -589, -4348, -589, -4348
-MarshSpawn.RegenTree, Inkwater Marsh, Ability, Regenerate, treesDontWorry, 0, Regenerate, 77, , -539, -4406, -540.16003, -4400.4663
+MarshSpawn.RegenTree, Inkwater Marsh, Ability, Regenerate, trees, 0, Regenerate, 77, , -539, -4406, -540.16003, -4400.4663
 MarshSpawn.LeverEC, Inkwater Marsh, Resource, Energy, swampStateGroup, 21786, energyHalfCell, 17920, , -625.9, -4418.0, -625.87, -4417.03
 MarshSpawn.LeftTokkEX, Inkwater Marsh, SpiritLight, 50, swampStateGroup, 21786, expOrb, 59513, , -755.8, -4422.9, -755.80414, -4422.9463
 MarshSpawn.FightRoomEX, Inkwater Marsh, SpiritLight, 50, inkwaterMarshStateGroup, 9593, xpOrb, 42047, , -783.3, -4452.0, -783.30786, -4451.996
@@ -25,7 +25,7 @@ MarshSpawn.RecklessShard, Inkwater Marsh, Shard, Reckless, pickupsGroup, 23987, 
 MarshSpawn.FangEC, Inkwater Marsh, Resource, Energy, swampStateGroup, 21786, halfEnergyCellA, 61706, , -233.4, -4384.4, -233.37244, -4383.35
 MarshSpawn.FangQI, Inkwater Marsh, Quest, Fang, questUberStateGroup, 14019, braveMokiItemCollected, 27539, , -221.9, -4406.5, -221.93663, -4406.473
 MarshSpawn.MokkFangQuest, Inkwater Marsh, Quest, Ore, questUberStateGroup, 14019, braveMokiQuest, 15983, 3, -391, -4414, -388.5, -4412.6
-MarshSpawn.DamageTree, Inkwater Marsh, Ability, AncestralLight, treesDontWorry, 0, AncestralLight, 121, , -840, -4488, -840.43994, -4484.155
+MarshSpawn.DamageTree, Inkwater Marsh, Ability, AncestralLight, trees, 0, AncestralLight, 121, , -840, -4488, -840.43994, -4484.155
 MarshSpawn.PoolsPathEX, Inkwater Marsh, SpiritLight, 200, swampStateGroup, 21786, largeExpA, 21727, , -1014.5, -4268.0, -1014.5, -4268
 MidnightBurrows.LeftKS, Midnight Burrows, Resource, Keystone, howlsOriginGroup, 24922, keystoneA, 60358, , -799.5, -4579.5, -799.54, -4579.5
 MidnightBurrows.RightKS, Midnight Burrows, Resource, Keystone, howlsOriginGroup, 24922, keystoneA, 47244, , -597.4, -4548.3, -597.37006, -4548.3047
@@ -39,14 +39,14 @@ HowlsDen.RightHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, halfHe
 HowlsDen.LeftHC, Inkwater Marsh, Resource, Life, inkwaterMarshStateGroup, 9593, healthContainer, 61304, , -569.7, -4454.1, -569.7299, -4453.08
 HowlsDen.AboveDoorKS, Inkwater Marsh, Resource, Keystone, swampStateGroup, 21786, keyStone, 22068, , -439.5, -4461.4, -439.52002, -4461.38
 HowlsDen.MagnetShard, Inkwater Marsh, Shard, Magnet, swampStateGroup, 21786, spiritShardA, 63545, , -239.2, -4440.4, -239.20001, -4439.38
-HowlsDen.SwordTree, Inkwater Marsh, Ability, SpiritEdge, treesDontWorry, 0, SpiritEdge, 100, , -296, -4483, -296, -4478
+HowlsDen.SwordTree, Inkwater Marsh, Ability, SpiritEdge, trees, 0, SpiritEdge, 100, , -296, -4483, -296, -4478
 HowlsDen.BoneOre, Inkwater Marsh, Resource, Ore, swampStateGroup, 21786, gorlekOreA, 2046, , -432.6, -4503.3, -432.58002, -4503.26
 HowlsDen.AboveTPEX, Inkwater Marsh, SpiritLight, 50, swampStateGroup, 21786, xpOrbC, 16206, , -388.6, -4502.7, -388.58002, -4502.74
 HowlsDen.LaserKS, Inkwater Marsh, Resource, Keystone, swampStateGroup, 21786, laserPuzzleSolved, 2852, , -399.9, -4567.2, -399.94, -4567.21
 HowlsDen.CombatShrine, Inkwater Marsh, Resource, ShardSlot, howlsOriginGroup, 24922, shrineArena, 13993, , -328.1, -4565.5, -328.07, -4564.52
 HowlsDen.DoubleJumpEX, Inkwater Marsh, SpiritLight, 50, inkwaterMarshStateGroup, 9593, expOrb, 17818, , -507.9, -4536.6, -507.89798, -4536.5684
 HowlsDen.StickyShard, Inkwater Marsh, Shard, Sticky, pickupsGroup, 23987, glueShardPickup, 27134, , -547.8, -4529.3, -547.82, -4528.2896
-HowlsDen.DoubleJumpTree, Inkwater Marsh, Ability, DoubleJump, treesDontWorry, 0, DoubleJump, 5, , -555, -4551, -555.25, -4546.7656
+HowlsDen.DoubleJumpTree, Inkwater Marsh, Ability, DoubleJump, trees, 0, DoubleJump, 5, , -555, -4551, -555.25, -4546.7656
 MarshPastOpher.TrialLeftEX, Inkwater Marsh, SpiritLight, 100, inkwaterMarshStateGroup, 9593, expOrbA, 5253, , -527.9, -4354.1, -527.93005, -4354.1196
 MarshPastOpher.TrialOre, Inkwater Marsh, Resource, Ore, inkwaterMarshStateGroup, 9593, gorlekOreA, 25989, , -501.5, -4340.0, -501.49002, -4340.0293
 MarshPastOpher.TrialEC, Inkwater Marsh, Resource, Energy, inkwaterMarshStateGroup, 9593, halfEnergyCellA, 27562, , -473.8, -4339.6, -473.83002, -4338.5796
@@ -58,7 +58,7 @@ MarshPastOpher.SwingPoleEX, Inkwater Marsh, SpiritLight, 50, inkwaterMarshStateG
 MarshPastOpher.LeftEyestone, Inkwater Marsh, Resource, Eyestone, swampStateGroup, 21786, keyStoneA, 27433, , -461.3, -4195.3, -461.27002, -4195.29
 MarshPastOpher.RightEyestone, Inkwater Marsh, Resource, Eyestone, swampStateGroup, 21786, keyStoneB, 37225, , -394.0, -4188.3, -393.96918, -4188.325
 MarshPastOpher.BowEC, Inkwater Marsh, Resource, Energy, swampStateGroup, 21786, energyHalfCellA, 10295, , -421.5, -4272.4, -421.49, -4271.3896
-MarshPastOpher.BowTree, Inkwater Marsh, Ability, SpiritArc, treesDontWorry, 0, SpiritArc, 97, , -457, -4267, -457.04626, -4261.291
+MarshPastOpher.BowTree, Inkwater Marsh, Ability, SpiritArc, trees, 0, SpiritArc, 97, , -457, -4267, -457.04626, -4261.291
 MarshPastOpher.CeilingEX, Inkwater Marsh, SpiritLight, 100, swampStateGroup, 21786, mediumExpA, 50255, , -641.3, -4223.0, -641.2577, -4223.0117
 MarshPastOpher.PoolsPathEC, Inkwater Marsh, Resource, Energy, inkwaterMarshStateGroup, 9593, energyContainer, 26457, , -662.8, -4186.5, -662.76996, -4185.5103
 MarshPastOpher.PoolsPathEX, Inkwater Marsh, SpiritLight, 200, lagoonStateGroup, 945, largeExpC, 10833, , -802.3, -4186.1, -802.3163, -4186.148
@@ -75,7 +75,7 @@ WestHollow.BelowLupoEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 
 WestHollow.AboveDashEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholderC, 61744, , -100.0, -4407.2, -99.98999, -4407.225
 WestHollow.DashRightEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholder, 37926, , 11.6, -4401.1, 11.600098, -4401.12
 WestHollow.CrusherEX, Kwoloks Hollow, SpiritLight, 200, kwolokGroupDescriptor, 937, xpOrbA, 50176, , -37.5, -4452.6, -37.47986, -4452.6426
-WestHollow.DashTree, Kwoloks Hollow, Ability, Dash, treesDontWorry, 0, Dash, 102, , -69, -4453, -69.149994, -4448.132
+WestHollow.DashTree, Kwoloks Hollow, Ability, Dash, trees, 0, Dash, 102, , -69, -4453, -69.149994, -4448.132
 EastHollow.HandToHandMap, Kwoloks Hollow, Quest, Map, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 1, -110, -4220, -112.2, -4218.3
 EastHollow.GladesApproachOre, Kwoloks Hollow, Resource, Ore, kwolokGroupDescriptor, 937, gromOreA, 10729, , -97.6, -4190.1, -97.55, -4190.1
 EastHollow.HornBeetleFightEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, xpOrbA, 13413, , -86.0, -4210.3, -86.03, -4210.3
@@ -85,7 +85,7 @@ EastHollow.MortarEX, Kwoloks Hollow, SpiritLight, 100, kwolokGroupDescriptor, 93
 EastHollow.BashEC, Kwoloks Hollow, Resource, Energy, kwolokGroupDescriptor, 937, energyHalfCell, 23772, , 46.8, -4236.6, 46.772675, -4235.625
 EastHollow.BashHC, Kwoloks Hollow, Resource, Life, bashIntroductionA__clone1Group, 13428, healthContainerA, 59730, , 84.0, -4263.0, 84.0289, -4262.0195
 EastHollow.BashEX, Kwoloks Hollow, SpiritLight, 100, kwolokGroupDescriptor, 937, mediumExpB, 30182, , -31.4, -4302.3, -31.656738, -4301.913
-EastHollow.BashTree, Kwoloks Hollow, Ability, Bash, treesDontWorry, 0, Bash, 0, , -20, -4326, -20.328445, -4319.618
+EastHollow.BashTree, Kwoloks Hollow, Ability, Bash, trees, 0, Bash, 0, , -20, -4326, -20.328445, -4319.618
 EastHollow.KwolokAmuletQuest, Kwoloks Hollow, Quest, SL500, questUberStateGroup, 14019, kwoloksWisdomQuest, 50597, 4, 240, -4207, 240.1, -4207.5
 EastHollow.RightKwolokEX, Kwoloks Hollow, SpiritLight, 100, _petrifiedForestGroup, 58674, expOrbA, 20983, , 289.0, -4195.7, 289.0374, -4195.708
 EastHollow.SilentSwimEC, Kwoloks Hollow, Resource, Energy, _petrifiedForestGroup, 58674, energyContainerA, 9583, , 331.9, -4191.3, 331.87, -4190.344
@@ -122,7 +122,7 @@ GladesTown.AboveCaveEX, Wellspring Glades, SpiritLight, 50, hubUberStateGroup, 4
 GladesTown.LupoSwimLeftEX, Wellspring Glades, SpiritLight, 50, hubUberStateGroup, 42178, smallExpB, 37028, , -277.1, -4171.8, -277.13055, -4171.818
 GladesTown.UpdraftCeilingEX, Wellspring Glades, SpiritLight, 50, hubUberStateGroup, 42178, smallExpC, 63404, , -239.6, -4129.9, -239.55182, -4129.9424
 GladesTown.LeafPileEX, Wellspring Glades, SpiritLight, 50, hubUberStateGroup, 42178, smallExpG, 44748, , -160.6, -4098.2, -160.66998, -4096.58
-GladesTown.DamageTree, Wellspring Glades, Ability, AncestralLight, treesDontWorry, 0, AncestralLight, 120, , -368, -4158, -368.17413, -4153.7295
+GladesTown.DamageTree, Wellspring Glades, Ability, AncestralLight, trees, 0, AncestralLight, 120, , -368, -4158, -368.17413, -4153.7295
 GladesTown.RebuildTheGlades, Wellspring Glades, Quest, SL1000, questUberStateGroup, 14019, rebuildGladesQuest, 44578, 2, -322, -4153, -328.5, -4150.1
 GladesTown.TwillenGemQuest, Wellspring Glades, Quest, Shard, pickupsGroup, 23987, secretShardPickup, 14832, , -408, -4162, -406, -4158.9
 GladesTown.RegrowTheGlades, Wellspring Glades, Quest, SL1000, questUberStateGroup, 14019, regrowGladesQuest, 26394, 2, -173, -4139, -176, -4134.7
@@ -161,7 +161,7 @@ InnerWellspring.LupoEX, The Wellspring, SpiritLight, 100, waterMillStateGroupDes
 InnerWellspring.LupoMap, The Wellspring, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapWellspring, 1590, , -1190, -3861, -1190, -3861
 InnerWellspring.ShortcutWheelEX, The Wellspring, SpiritLight, 200, waterMillStateGroupDescriptor, 37858, xpOrbA, 33063, , -1227.6, -3910.5, -1227.6171, -3910.532
 InnerWellspring.GrappleTreeEX, The Wellspring, SpiritLight, 100, waterMillStateGroupDescriptor, 37858, mediumExpA, 31136, , -1307.6, -3884.3, -1307.8835, -3883.543
-InnerWellspring.GrappleTree, The Wellspring, Ability, Grapple, treesDontWorry, 0, Grapple, 57, , -1309, -3905, -1309.2, -3899.3662
+InnerWellspring.GrappleTree, The Wellspring, Ability, Grapple, trees, 0, Grapple, 57, , -1309, -3905, -1309.2, -3899.3662
 InnerWellspring.AboveSpinArenaEX, The Wellspring, SpiritLight, 200, waterMillStateGroupDescriptor, 37858, expOrb, 64086, , -1236.5, -3739.3, -1236.5, -3739.34
 InnerWellspring.HandToHandHerbs, The Wellspring, Quest, Herbs, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 3, -1168, -3733, -1165.6, -3730.9
 InnerWellspring.RotateRoomEX, The Wellspring, SpiritLight, 100, waterMillStateGroupDescriptor, 37858, mediumExpB, 52110, , -1151.4, -3840.1, -1151.4448, -3840.1448
@@ -205,7 +205,7 @@ UpperPools.FishPoolOre, Luma Pools, Resource, Ore, lumaPoolsStateGroup, 5377, go
 UpperPools.BubblesEC, Luma Pools, Resource, Energy, lumaPoolsStateGroup, 5377, energyCellFragmentA, 1600, , -1643.0, -4002.7, -1643.001, -4001.6646
 UpperPools.RightBubblesEX, Luma Pools, SpiritLight, 200, lumaPoolsStateGroup, 5377, largeExpOrbPlaceholderA, 628, , -1572.3, -4076.9, -1572.3201, -4076.915
 UpperPools.LeftBubblesEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 21860, , -1645.0, -4083.8, -1645.0286, -4083.81
-UpperPools.SwimDashTree, Luma Pools, Ability, SwimDash, treesDontWorry, 0, SwimDash, 104, , -1430, -4082, -1429.8096, -4077.332
+UpperPools.SwimDashTree, Luma Pools, Ability, SwimDash, trees, 0, SwimDash, 104, , -1430, -4082, -1429.8096, -4077.332
 UpperPools.SwimDashCurrentEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbB, 52791, , -1468.1, -4098.2, -1468.1074, -4098.208
 UpperPools.RoofEX, Luma Pools, SpiritLight, 100, lumaPoolsStateGroup, 5377, xpOrbA, 33180, , -1449.0, -4036.8, -1449.0184, -4036.8418
 UpperPools.WaterfallEC, Luma Pools, Resource, Energy, lumaPoolsStateGroup, 5377, energyContainerA, 32750, , -1389.0, -4039.5, -1388.9896, -4038.5205
@@ -281,7 +281,7 @@ UpperReach.MiddleRightKS, Baurs Reach, Resource, Keystone, baursReachGroup, 2889
 UpperReach.SoupOre, Baurs Reach, Resource, Ore, baursReachGroup, 28895, gorlekOreA, 23795, , -202.6, -3885.4, -202.60999, -3885.4302
 UpperReach.SwingPoleEX, Baurs Reach, SpiritLight, 100, baursReachGroup, 28895, xpOrbB, 40089, , -193.7, -3854.4, -193.71997, -3854.3901
 UpperReach.SwimEX, Baurs Reach, SpiritLight, 100, baursReachGroup, 28895, xpOrbC, 40242, , -239.4, -3920.6, -239.36255, -3920.6006
-UpperReach.LightBurstTree, Baurs Reach, Ability, LightBurst, treesDontWorry, 0, LightBurst, 51, , -106, -3934, -106.45276, -3928.5732
+UpperReach.LightBurstTree, Baurs Reach, Ability, LightBurst, trees, 0, LightBurst, 51, , -106, -3934, -106.45276, -3928.5732
 UpperReach.TreeOre, Baurs Reach, Resource, Ore, baursReachGroup, 28895, gorlekOreA, 39291, , -86.5, -3903.3, -86.392334, -3902.9707
 UpperReach.WellEX, Baurs Reach, SpiritLight, 50, baursReachGroup, 28895, smallExpB, 7597, , -71.2, -3926.7, -71.150024, -3926.6802
 UpperReach.SpringSeed, Baurs Reach, Quest, Seed, questUberStateGroup, 14019, gardenerSeedSpringCollected, 32376, , -103.4, -3857.3, -34, -3924
@@ -310,7 +310,7 @@ LowerDepths.SwimEC, Mouldwood Depths, Resource, Energy, mouldwoodDepthsGroup, 18
 LowerDepths.LupoMap, Mouldwood Depths, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapMouldwoodDepths, 48423, , 682, -4576, 682, -4576
 LowerDepths.LeftEX, Mouldwood Depths, SpiritLight, 100, mouldwoodDepthsGroup, 18793, expOrbB, 2881, , 385.8, -4523.5, 385.8384, -4523.4575
 LowerDepths.RightEX, Mouldwood Depths, SpiritLight, 200, mouldwoodDepthsGroup, 18793, expOrbC, 23799, , 798.7, -4513.1, 798.72, -4513.07
-LowerDepths.FlashTree, Mouldwood Depths, Ability, Flash, treesDontWorry, 0, Flash, 62, , 776, -4541, 776.4115, -4536.4595
+LowerDepths.FlashTree, Mouldwood Depths, Ability, Flash, trees, 0, Flash, 62, , 776, -4541, 776.4115, -4536.4595
 LowerWastes.WestTPOre, Windswept Wastes, Resource, Ore, desertAGroup, 7228, gorlekOre, 54494, , 1504.3, -4007.0, 1504.34, -4006.9902
 LowerWastes.PurpleWallEX, Windswept Wastes, SpiritLight, 100, desertAGroup, 7228, collectableADesertA, 56821, , 1534.1, -3996.6, 1534.09, -3996.6396
 LowerWastes.SunsetViewEX, Windswept Wastes, SpiritLight, 100, desertAGroup, 7228, collectableCDesertA, 52086, , 1607.3, -3974.5, 1607.25, -3974.4702
@@ -329,7 +329,7 @@ LowerWastes.MuncherClimbEX, Windswept Wastes, SpiritLight, 50, windsweptWastesGr
 LowerWastes.SkeetoHiveEX, Windswept Wastes, SpiritLight, 100, windsweptWastesGroupDescriptor, 20120, xpOrbA, 8910, , 1642.1, -3944.1, 1642.1178, -3944.0781
 LowerWastes.HandToHandMapstone, Windswept Wastes, Quest, Mapstone, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 10, 1685, -3923, 1685, -3923
 LowerWastes.LupoMap, Windswept Wastes, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapWindsweptWastes, 61146, , 1647, -3899, 1647, -3899
-LowerWastes.BurrowTree, Windswept Wastes, Ability, Burrow, treesDontWorry, 0, Grapple, 101, , 1583, -3930, 1582.2701, -3924.0415
+LowerWastes.BurrowTree, Windswept Wastes, Ability, Burrow, trees, 0, Grapple, 101, , 1583, -3930, 1582.2701, -3924.0415
 LowerWastes.BurrowTreeEX, Windswept Wastes, SpiritLight, 100, windsweptWastesGroupDescriptor, 20120, xpOrbB, 19113, , 1600.9, -3953.7, 1600.9083, -3953.6802
 LowerWastes.UpperPathEC, Windswept Wastes, Resource, Energy, windsweptWastesGroupDescriptor, 20120, energyContainer, 50026, , 1778.3, -3873.8, 1778.3434, -3872.7769
 LowerWastes.UpperPathEX, Windswept Wastes, SpiritLight, 100, windsweptWastesGroupDescriptor, 20120, expOrbD, 48829, , 1810.3, -3883.9, 1810.3274, -3883.9126
@@ -354,7 +354,7 @@ WindtornRuins.EscapeRevisitEC, Windtorn Ruins, Resource, Energy, windtornRuinsGr
 WindtornRuins.Seir, Windtorn Ruins, Wisp, Seir, windtornRuinsGroup, 10289, wispRewardPickup, 22102, , 2056, -3568, 2056, -3568
 WindtornRuins.HandToHandComplete, Windtorn Ruins, Quest, Secrets, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 11, 1969, -4024, 1969, -4024
 WeepingRidge.Ore, Silent Woods, Resource, Ore, corruptedPeakGroup, 36153, gorlekOreA, 3013, , 1305.5, -3732.6, 1305.48, -3732.58
-WeepingRidge.LaunchTree, Silent Woods, Ability, Launch, treesDontWorry, 0, Launch, 8, , 1363, -3815, 1362.97, -3809.77
+WeepingRidge.LaunchTree, Silent Woods, Ability, Launch, trees, 0, Launch, 8, , 1363, -3815, 1362.97, -3809.77
 WeepingRidge.SpikeClimbEX, Silent Woods, SpiritLight, 200, corruptedPeakGroup, 36153, expOrb, 36521, , 1381.9, -3767.2, 1381.8734, -3767.157
 WeepingRidge.PortalEX, Silent Woods, SpiritLight, 200, corruptedPeakGroup, 36153, xpOrbB, 12077, , 1331.1, -3797.6, 1331.0848, -3797.5515
 WillowsEnd.SpikesOre, Willows End, Resource, Ore, willowsEndGroup, 16155, gorlekOreA, 38979, , 557.0, -3876.3, 556.97656, -3876.315
@@ -365,26 +365,26 @@ WillowsEnd.WindSpinOre, Willows End, Resource, Ore, willowsEndGroup, 16155, gorl
 WillowsEnd.RedirectEX, Willows End, SpiritLight, 200, willowsEndGroup, 16155, xpOrbA, 55446, , 653.6, -3780.1, 653.57104, -3780.0996
 WillowsEnd.UpperLeftEX, Willows End, SpiritLight, 200, corruptedPeakGroup, 36153, expOrbA, 23902, , 433.5, -3639.7, 433.44998, -3639.69
 WillowsEnd.UpperRightEX, Willows End, SpiritLight, 200, corruptedPeakGroup, 36153, expOrbB, 3662, , 540.3, -3655.0, 540.25415, -3654.963
-TwillenShop.Overcharge, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Overcharge, 1, , 0, 0, 0, 0
-TwillenShop.TripleJump, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, TripleJump, 2, , 0, 0, 0, 0
-TwillenShop.Wingclip, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Wingclip, 3, , 0, 0, 0, 0
-TwillenShop.Swap, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Swap, 5, , 0, 0, 0, 0
-TwillenShop.LightHarvest, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, LightHarvest, 19, , 0, 0, 0, 0
-TwillenShop.Vitality, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Vitality, 22, , 0, 0, 0, 0
-TwillenShop.Energy, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Energy, 26, , 0, 0, 0, 0
-TwillenShop.Finesse, Shop, Shop, TwillenShard, twillenShopDontWorry, 2, Finesse, 40, , 0, 0, 0, 0
-OpherShop.WaterBreath, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, WaterBreath, 23, , 0, 0, 0, 0
-OpherShop.Spike, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Spike, 74, , 0, 0, 0, 0
-OpherShop.SpiritSmash, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, SpiritSmash, 98, , 0, 0, 0, 0
-OpherShop.Teleport, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Teleport, 105, , 0, 0, 0, 0
-OpherShop.SpiritStar, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, SpiritStar, 106, , 0, 0, 0, 0
-OpherShop.Blaze, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Blaze, 115, , 0, 0, 0, 0
-OpherShop.Sentry, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, Sentry, 116, , 0, 0, 0, 0
-OpherShop.ExplodingSpike, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, ExplodingSpike, 1074, , 0, 0, 0, 0
-OpherShop.ShockSmash, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, ShockSmash, 1098, , 0, 0, 0, 0
-OpherShop.StaticStar, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, StaticStar, 1106, , 0, 0, 0, 0
-OpherShop.ChargeBlaze, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, ChargeBlaze, 1115, , 0, 0, 0, 0
-OpherShop.RapidSentry, Shop, Shop, OpherWeapon, opherShopDontWorry, 1, RapidSentry, 1116, , 0, 0, 0, 0
-LupoShop.HCMapIcon, Shop, Shop, LupoMap, npcsStateGroup, 48248, HCMapIcon, 19396, , 0, 0, -209, -4162
-LupoShop.ECMapIcon, Shop, Shop, LupoMap, npcsStateGroup, 48248, ECMapIcon, 57987, , 0, 0, -209, -4162
-LupoShop.ShardMapIcon, Shop, Shop, LupoMap, npcsStateGroup, 48248, ShardMapIcon, 41666, , 0, 0, -209, -4162
+TwillenShop.Overcharge, Shop, Shop, TwillenShard, twillenShop, 2, Overcharge, 1, , 0, 0, 0, 0
+TwillenShop.TripleJump, Shop, Shop, TwillenShard, twillenShop, 2, TripleJump, 2, , 0, 0, 0, 0
+TwillenShop.Wingclip, Shop, Shop, TwillenShard, twillenShop, 2, Wingclip, 3, , 0, 0, 0, 0
+TwillenShop.Swap, Shop, Shop, TwillenShard, twillenShop, 2, Swap, 5, , 0, 0, 0, 0
+TwillenShop.LightHarvest, Shop, Shop, TwillenShard, twillenShop, 2, LightHarvest, 19, , 0, 0, 0, 0
+TwillenShop.Vitality, Shop, Shop, TwillenShard, twillenShop, 2, Vitality, 22, , 0, 0, 0, 0
+TwillenShop.Energy, Shop, Shop, TwillenShard, twillenShop, 2, Energy, 26, , 0, 0, 0, 0
+TwillenShop.Finesse, Shop, Shop, TwillenShard, twillenShop, 2, Finesse, 40, , 0, 0, 0, 0
+OpherShop.WaterBreath, Shop, Shop, OpherWeapon, opherShop, 1, WaterBreath, 23, , 0, 0, 0, 0
+OpherShop.Spike, Shop, Shop, OpherWeapon, opherShop, 1, Spike, 74, , 0, 0, 0, 0
+OpherShop.SpiritSmash, Shop, Shop, OpherWeapon, opherShop, 1, SpiritSmash, 98, , 0, 0, 0, 0
+OpherShop.Teleport, Shop, Shop, OpherWeapon, opherShop, 1, Teleport, 105, , 0, 0, 0, 0
+OpherShop.SpiritStar, Shop, Shop, OpherWeapon, opherShop, 1, SpiritStar, 106, , 0, 0, 0, 0
+OpherShop.Blaze, Shop, Shop, OpherWeapon, opherShop, 1, Blaze, 115, , 0, 0, 0, 0
+OpherShop.Sentry, Shop, Shop, OpherWeapon, opherShop, 1, Sentry, 116, , 0, 0, 0, 0
+OpherShop.ExplodingSpike, Shop, Shop, OpherWeapon, opherShop, 1, ExplodingSpike, 1074, , 0, 0, 0, 0
+OpherShop.ShockSmash, Shop, Shop, OpherWeapon, opherShop, 1, ShockSmash, 1098, , 0, 0, 0, 0
+OpherShop.StaticStar, Shop, Shop, OpherWeapon, opherShop, 1, StaticStar, 1106, , 0, 0, 0, 0
+OpherShop.ChargeBlaze, Shop, Shop, OpherWeapon, opherShop, 1, ChargeBlaze, 1115, , 0, 0, 0, 0
+OpherShop.RapidSentry, Shop, Shop, OpherWeapon, opherShop, 1, RapidSentry, 1116, , 0, 0, 0, 0
+LupoShop.HCMapIcon, Shop, Shop, LupoMap, lupoShop, 15, HCMapIcon, 19396, , 0, 0, -209, -4162
+LupoShop.ECMapIcon, Shop, Shop, LupoMap, lupoShop, 15, ECMapIcon, 57987, , 0, 0, -209, -4162
+LupoShop.ShardMapIcon, Shop, Shop, LupoMap, lupoShop, 15, ShardMapIcon, 41666, , 0, 0, -209, -4162
