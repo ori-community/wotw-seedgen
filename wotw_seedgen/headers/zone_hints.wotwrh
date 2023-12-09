@@ -60,20 +60,20 @@ Flags: Zone Hints
 !!if skill_hints true
 48248|18767|6|Inkwater Skills - $HOWMANY(0, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n           // Inkwater Zone Hint from LupoMap.Marsh
 48248|3638|6|Hollow Skills - $HOWMANY(1, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n              // Hollow Zone Hint from LupoMap.Hollow
-15|19396|6|f=0|Glades Skills Hint                                                // Glades Zone Hint from LupoMap.HCMapIcons
+15|19396|6|f=0|Glades Skills Hint                                                   // Glades Zone Hint from LupoMap.HCMapIcons
 15|19396|8|9|0|int|36
 9|0=36|6|Glades Skills - $HOWMANY(2, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n
-3|1|8|15|19397|int|200                                                           // Price for Glades Zone Hint
-3|1|17|0|15|19396|lupo:1                                                         // Icon for Glades Zone Hint
+3|1|8|15|19397|int|200                                                              // Price for Glades Zone Hint
+3|1|17|0|15|19396|lupo:1                                                            // Icon for Glades Zone Hint
 48248|1590|6|Wellspring Skills - $HOWMANY(3, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n          // Wellspring Zone Hint from LupoMap.Wellspring
 48248|1557|6|Luma Skills - $HOWMANY(4, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n                // Pools Zone Hint from LupoMap.Pools
 48248|45538|6|Midnight Burrows Skills - $HOWMANY(5, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n   // Midnight Burrows Zone Hint from LupoMap.Burrows
 48248|29604|6|Reach Skills - $HOWMANY(6, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n              // Reach Zone Hint from LupoMap.Reach
-15|57987|6|f=0|Woods Skills Hint                                                 // Woods Zone Hint from LupoMap.HCMapIcons
+15|57987|6|f=0|Woods Skills Hint                                                    // Woods Zone Hint from LupoMap.HCMapIcons
 15|57987|8|9|0|int|37
 9|0=37|6|Woods Skills - $HOWMANY(7, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n
-3|1|8|15|57988|int|200                                                           // Price for Woods Zone Hint
-3|1|17|0|15|57987|lupo:0                                                         // Icon for Woods Zone Hint
+3|1|8|15|57988|int|200                                                              // Price for Woods Zone Hint
+3|1|17|0|15|57987|lupo:0                                                            // Icon for Woods Zone Hint
 48248|48423|6|Mouldwood Skills - $HOWMANY(8, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n          // Depths Zone Hint from LupoMap.Depths
 48248|61146|6|Wastes Skills - $HOWMANY(9, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n             // Wastes Zone Hint from LupoMap.Wastes
 48248|4045|6|Willow Skills - $HOWMANY(11, 2\|(\d{1,2}|1[0-1]\d)|9\|0)\n             // Willow Zone Hint from LupoMap.Willow
@@ -81,13 +81,13 @@ Flags: Zone Hints
 !!if teleporter_hints true
 48248|18767|6|Inkwater TPs - $HOWMANY(0, 5\|.*)\n           // Inkwater Zone Hint from LupoMap.Marsh
 48248|3638|6|Hollow TPs - $HOWMANY(1, 5\|.*)\n              // Hollow Zone Hint from LupoMap.Hollow
-15|19396|6|f=0|Glades Teleporters Hint                   // Glades Zone Hint from LupoMap.HCMapIcons
+15|19396|6|f=0|Glades Teleporters Hint                      // Glades Zone Hint from LupoMap.HCMapIcons
 9|0=36|6|Glades TPs - $HOWMANY(2, 5\|.*)\n
 48248|1590|6|Wellspring TPs - $HOWMANY(3, 5\|.*)\n          // Wellspring Zone Hint from LupoMap.Wellspring
 48248|1557|6|Luma TPs - $HOWMANY(4, 5\|.*)\n                // Pools Zone Hint from LupoMap.Pools
 48248|45538|6|Midnight Burrows TPs - $HOWMANY(5, 5\|.*)\n   // Midnight Burrows Zone Hint from LupoMap.Burrows
 48248|29604|6|Reach TPs - $HOWMANY(6, 5\|.*)\n              // Reach Zone Hint from LupoMap.Reach
-15|57987|6|f=0|Woods Teleporters Hint                    // Woods Zone Hint from LupoMap.HCMapIcons
+15|57987|6|f=0|Woods Teleporters Hint                       // Woods Zone Hint from LupoMap.HCMapIcons
 9|0=37|6|Woods TPs - $HOWMANY(7, 5\|.*)\n
 48248|48423|6|Mouldwood TPs - $HOWMANY(8, 5\|.*)\n          // Depths Zone Hint from LupoMap.Depths
 48248|61146|6|Wastes TPs - $HOWMANY(9, 5\|.*)\n             // Wastes Zone Hint from LupoMap.Wastes
