@@ -25,7 +25,7 @@
 3|0|8|16155|32922|bool|true         // willowsEndGroup.introPlayed
 3|0|8|48248|5982|bool|true          // npcsStateGroup.metOpherHubAfterWatermill
 3|0|8|48248|55122|bool|true         // npcsStateGroup.metOpherHubBeforeWatermill
-3|0|8|48248|46745|bool|true         // npcsStateGroup.opherMentionedWatermill
+3|0|8|48248|46745|bool|true         // npcsStateGroup.opherMentiodedWatermill
 3|0|8|48248|25267|int|2             // npcsStateGroup.twillenKwolokDialogState
 3|0|8|48248|12799|int|3             // npcsStateGroup.twillenHubDialogState
 3|0|8|48248|34756|bool|true         // npcsStateGroup.twillenMournedKu
