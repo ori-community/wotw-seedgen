@@ -21,7 +21,7 @@
 
 // Progress Message
 3|8|4|29|0|Pickups: $(6|2)/[total_pickup_count()]\n[goal_mode_progress()][relic_progress()]
-3|8|8|9|19|int|$(15|200)
+3|8|8|9|19|int|$(6|200)
 3|8|8|9|0|int|10
 3|8|6|${0}|instant
 
