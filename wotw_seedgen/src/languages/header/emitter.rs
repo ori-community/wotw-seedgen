@@ -19,6 +19,8 @@ pub struct ItemDetails {
     pub price: Option<u32>,
     /// The icon to use when placing this item in a shop
     pub icon: Option<Icon>,
+    /// The icon displayed in the spoiler map
+    pub map_icon: Option<String>,
 }
 
 /// Compilation of all the manipulations a [`Header`](super::Header) wishes to do
@@ -142,6 +144,9 @@ fn build_command(
         HeaderCommand::Icon { item, icon } => {
             build_icon(item, icon, &mut header_build.item_details, parameters)?
         }
+        HeaderCommand::MapIcon { item, icon } => {
+            build_map_icon(item, icon, &mut header_build.item_details, parameters)?
+        }
         HeaderCommand::Parameter { .. } => { /* Skip, parameters have been processed earlier */ }
         HeaderCommand::Set { state } => header_build.state_sets.push(state),
         HeaderCommand::If { parameter, value } => {
@@ -245,6 +250,7 @@ details!(build_display display "display" VString);
 details!(build_description description "description" VString);
 details!(build_price price "price" V<u32>);
 details!(build_icon icon "icon" Icon);
+details!(build_map_icon map_icon "icon" String);
 
 fn change_item_details<T: Display>(
     value: T,

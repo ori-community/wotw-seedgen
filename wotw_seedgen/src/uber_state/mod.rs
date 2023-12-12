@@ -75,15 +75,7 @@ impl UberIdentifier {
             || self.uber_group == 48248
                 && matches!(
                     self.uber_id,
-                    18767
-                        | 45538
-                        | 3638
-                        | 1590
-                        | 1557
-                        | 29604
-                        | 48423
-                        | 61146
-                        | 4045
+                    18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045
                 )
     }
 
@@ -114,19 +106,19 @@ impl Display for UberIdentifier {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, VVariant)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, VVariant)]
 pub struct UberStateTrigger {
     pub identifier: UberIdentifier,
     #[VType]
     pub condition: Option<UberStateCondition>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash, VVariant)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, VVariant)]
 pub struct UberStateCondition {
     pub comparator: UberStateComparator,
     #[VWrap]
     pub value: u32,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum UberStateComparator {
     Equals,
     Greater,

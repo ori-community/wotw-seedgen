@@ -10,6 +10,7 @@
 !!display 8|9|8|int|+1 $[(9|999=401)]
 !!description 8|9|8|int|+1 Jump higher
 !!icon 8|9|8|int|+1 file:assets/icons/bonus/jumpgrade.png
+!!mapicon 8|9|8|int|+1 BonusItem
 !!add $PARAM(count)x 8|9|8|int|+1
 
 // skip-validate

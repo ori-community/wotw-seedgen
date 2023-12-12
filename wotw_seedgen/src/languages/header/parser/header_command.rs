@@ -24,6 +24,7 @@ enum HeaderCommandKind {
     Description,
     Price,
     Icon,
+    MapIcon,
     Parameter,
     Set,
     #[Ident = "if"]
@@ -46,6 +47,7 @@ impl HeaderCommand {
             HeaderCommandKind::Description => parse_description(parser),
             HeaderCommandKind::Price => parse_price(parser),
             HeaderCommandKind::Icon => parse_icon_command(parser),
+            HeaderCommandKind::MapIcon => parse_map_icon_command(parser),
             HeaderCommandKind::Parameter => parse_parameter(parser),
             HeaderCommandKind::Set => parse_set(parser),
             HeaderCommandKind::StartIf => parse_if(parser),
@@ -142,6 +144,13 @@ fn parse_icon_command(parser: &mut Parser) -> Result<HeaderCommand, ParseError> 
     parser.eat(TokenKind::Whitespace)?;
     let icon = parse_icon(parser)?;
     Ok(HeaderCommand::Icon { item, icon })
+}
+fn parse_map_icon_command(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
+    parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;
+    let item = VItem::parse(parser)?;
+    parser.eat(TokenKind::Whitespace)?;
+    let icon = parse_string(parser).to_string();
+    Ok(HeaderCommand::MapIcon { item, icon })
 }
 fn parse_parameter(parser: &mut Parser) -> Result<HeaderCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Whitespace, Suggestion::HeaderCommand)?;

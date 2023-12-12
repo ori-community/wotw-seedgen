@@ -12,6 +12,7 @@ Flags: Launch Fragments
 !!name 8|9|2|int|+1 *Launch Fragment*
 !!display 8|9|2|int|+1 $[(9|999=200)]
 !!icon 8|9|2|int|+1 file:assets/icons/bonus/launchfragment.png
+!!mapicon 8|9|2|int|+1 LaunchFragment
 !!add $PARAM(count)x 8|9|2|int|+1                                                       // Scatter fragments
 3|0|8|9|4|int|$PARAM(required)
 !9|2|4|17|9|2|$PARAM(required)|2|8                                                      // Give Launch (out of logic)

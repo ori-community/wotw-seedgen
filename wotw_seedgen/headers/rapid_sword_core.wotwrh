@@ -8,6 +8,7 @@
 !!display 8|4|51|byte|+1 $[(9|999=403)]
 !!description 8|4|51|byte|+1 Sword attacks are faster
 !!icon 8|4|51|byte|+1 file:assets/icons/bonus/rapidsword.png
+!!mapicon 8|4|51|byte|+1 BonusItem
 
 // skip-validate
 9|0=199|4|17|9|115|1|8|9|0|int|203      // Add wheel toggle

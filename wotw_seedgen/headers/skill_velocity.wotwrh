@@ -10,6 +10,7 @@
 !!display 8|9|5|int|+1 $[(9|999=400)]
 !!description 8|9|5|int|+1 Move faster when using abilities such as Dash and Bash
 !!icon 8|9|5|int|+1 file:assets/icons/bonus/skillvelocity.png
+!!mapicon 8|9|5|int|+1 BonusItem
 !!add $PARAM(count)x 8|9|5|int|+1
 
 // skip-validate

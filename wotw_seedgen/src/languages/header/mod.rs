@@ -506,6 +506,10 @@ pub enum HeaderCommand {
         item: VItem,
         icon: Icon,
     },
+    MapIcon {
+        item: VItem,
+        icon: String,
+    },
     Parameter {
         identifier: String,
         default: ParameterDefault,

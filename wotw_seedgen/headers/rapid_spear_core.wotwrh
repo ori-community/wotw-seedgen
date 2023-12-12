@@ -8,6 +8,7 @@
 !!display 8|9|12|byte|+1 $[(9|999=404)]
 !!description 8|9|12|byte|+1 Spear attacks are faster
 !!icon 8|9|12|byte|+1 file:assets/icons/bonus/rapidspear.png
+!!mapicon 8|9|12|byte|+1 BonusItem
 
 // skip-validate
 9|0=199|4|17|9|117|1|8|9|0|int|204      // Add wheel toggle

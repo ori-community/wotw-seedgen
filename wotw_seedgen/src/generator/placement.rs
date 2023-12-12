@@ -329,6 +329,25 @@ where
         });
     }
 
+    if let Some(icon) = world_contexts[target_world_index]
+        .world
+        .custom_items
+        .get(&item)
+        .and_then(|details| details.map_icon.clone())
+    {
+        world_contexts[origin_world_index]
+            .placements
+            .push(Placement {
+                node: Some(node),
+                trigger: UberStateTrigger::load(),
+                item: Item::Command(Command::SetMapIcon {
+                    trigger: trigger.clone(),
+                    icon,
+                }),
+                hide_message: false,
+            });
+    }
+
     let location = NodeSummary {
         identifier: node.identifier().to_string(),
         position: node.position().cloned(),

@@ -6,7 +6,7 @@ use wotw_seedgen_derive::{Display, FromStr, VVariant};
 
 use super::{Item, Resource, VItem};
 use crate::header::{vdisplay, CodeDisplay, VString};
-use crate::uber_state::UberIdentifier;
+use crate::uber_state::{UberIdentifier, UberStateTrigger, VUberStateTrigger};
 use crate::util::{NumericBool, Position, Spell, VPosition};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
@@ -148,6 +148,12 @@ pub enum Command {
         #[VType]
         string: String,
     },
+    SetMapIcon {
+        #[VType]
+        trigger: UberStateTrigger,
+        #[VType]
+        icon: String,
+    },
 }
 impl Command {
     pub fn code(&self) -> CodeDisplay<Command> {
@@ -224,6 +230,7 @@ impl Command {
             Command::UnEquip { ability } => write!(f, "28|{}", *ability as u16),
             Command::SaveString { id, string } => write!(f, "29|{}|{}", id, string),
             Command::AppendString { id, string } => write!(f, "30|{}|{}", id, string),
+            Command::SetMapIcon { trigger, icon } => write!(f, "31|{}|{}", trigger.code(), icon),
         })
     }
 }
@@ -269,6 +276,7 @@ vdisplay! {
                 Self::UnEquip { ability } => write!(f, "Unequip {ability}"),
                 Self::SaveString { id, string } => write!(f, "Stores the string \"{string}\" under the identifier {id}"),
                 Self::AppendString { id, string } => write!(f, "Appends the string \"{string}\" to the current value stored under the identifier {id}"),
+                Self::SetMapIcon { trigger, icon } => write!(f, "Sets the icon on the spoiler map for the pickup location {trigger} to {icon}"),
             }
         }
     }
