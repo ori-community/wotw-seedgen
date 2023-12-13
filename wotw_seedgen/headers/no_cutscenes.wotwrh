@@ -60,7 +60,7 @@
 3|0|4|17|14019|44578|0|8|14019|44578|int|1  // questUberStateGroup.rebuildGladesQuest
 // Dynamic cutscene skips
 !46462|59806|8|937|6778|bool|true   // voice door
-6|1014|8|18793|25789|bool|true      // depths gate
+24|14|8|18793|25789|bool|true      // depths gate
 937|10071|8|9|0|int|2               // ruins gate
 !18793|63291|8|9|0|int|2
 !28895|25522|8|9|0|int|2

@@ -27,10 +27,10 @@ Flags: Key Hints
 // skip-validate
 9|0=10|4|17|15|41666|1|4|30|0|${1}\n
 3|1|8|9|0|int|30                                                // set price on load
-6|1101|8|9|0|int|30                                             // set price on Burrow find
-6|1104|8|9|0|int|30                                             // set price on Water Dash find
-6|1051|8|9|0|int|30                                             // set price on Grenade find
-6|1062|8|9|0|int|30                                             // set price on Flash find
+24|101|8|9|0|int|30                                             // set price on Burrow find
+24|104|8|9|0|int|30                                             // set price on Water Dash find
+24|51|8|9|0|int|30                                              // set price on Grenade find
+24|62|8|9|0|int|30                                              // set price on Flash find
 9|0=30|8|15|41667|int|4000                                      // base price
 9|0=30|4|17|24|101|1|8|15|41667|int|-500                        // reduce for Burrow
 9|0=30|4|17|24|104|1|8|15|41667|int|-500                        // reduce for Water Dash
@@ -56,8 +56,8 @@ Flags: Key Hints
 9|0=10|4|17|1|23|1|4|30|0|${1}\n
 3|1|8|9|0|int|31                                                // set price on load
 6|2000|8|9|0|int|31                                             // set price on Clean Water find
-6|1118|8|9|0|int|31                                             // set price on Flap find
-6|1014|8|9|0|int|31                                             // set price on Glide find
+24|118|8|9|0|int|31                                             // set price on Flap find
+24|14|8|9|0|int|31                                             // set price on Glide find
 9|0=31|8|1|10023|int|2500                                       // base price
 9|0=31|4|17|6|2000|1|8|1|10023|int|-500                         // reduce for Clean Water
 9|0=31|4|17|24|118|1|8|1|10023|int|-500                         // reduce for Flap
@@ -83,10 +83,10 @@ Flags: Key Hints
 // skip-validate
 9|0=10|4|17|2|2|1|4|30|0|${1}\n
 3|1|8|9|0|int|32                                                // set price on load
-6|1000|8|9|0|int|32                                             // set price on Bash find
-6|1097|8|9|0|int|32                                             // set price on Bow find
+24|0|8|9|0|int|32                                               // set price on Bash find
+24|97|8|9|0|int|32                                              // set price on Bow find
 9|0=32|8|2|102|int|1500                                         // base price
-9|0=32|4|17|24|0|1|8|2|102|int|-500                             // reduce for Clean Water
-9|0=32|4|17|24|97|1|8|2|102|int|-500                            // reduce for Flap
+9|0=32|4|17|24|0|1|8|2|102|int|-500                             // reduce for Bash
+9|0=32|4|17|24|97|1|8|2|102|int|-500                            // reduce for Bow
 9|0=32|4|17|2|102|500|8|2|102|int|0                             // set price to zero with nothing left to hint
 3|1|17|0|2|2|lupo:2                                             // set icon
