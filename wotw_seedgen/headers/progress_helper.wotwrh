@@ -21,13 +21,13 @@
 
 // Progress Message
 3|8|4|29|0|Pickups: $(6|2)/[total_pickup_count()]\n[goal_mode_progress()][relic_progress()]
-3|8|8|9|19|int|$(23|50)
+3|8|8|9|19|int|$(5|50)
 3|8|8|9|0|int|10
 3|8|6|${0}|instant
 
 // Map Progress
-23|51=0|8|9|0|int|11
-23|51|4|27|14|8|9|0|int|11
+5|51=0|8|9|0|int|11
+5|51|4|27|14|8|9|0|int|11
 9|0=11|8|9|19|int|$(23|51)
 9|0=11|4|29|0|[map_relic_progress()]
 9|0=11|8|9|0|int|10
