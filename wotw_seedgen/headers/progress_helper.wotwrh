@@ -21,18 +21,18 @@
 
 // Progress Message
 3|8|4|29|0|Pickups: $(6|2)/[total_pickup_count()]\n[goal_mode_progress()][relic_progress()]
-3|8|8|9|19|int|$(6|200)
+3|8|8|9|19|int|$(23|50)
 3|8|8|9|0|int|10
 3|8|6|${0}|instant
 
 // Map Progress
-6|15=0|8|9|0|int|11
-6|15|4|27|14|8|9|0|int|11
-9|0=11|8|9|19|int|$(6|15)
+23|51=0|8|9|0|int|11
+23|51|4|27|14|8|9|0|int|11
+9|0=11|8|9|19|int|$(23|51)
 9|0=11|4|29|0|[map_relic_progress()]
 9|0=11|8|9|0|int|10
 9|0=11|18|${0}
-6|15=14|18|
+23|51=14|18|
 
 // Trees Helper
 3|1|16|0|0|1|Tree Progress
