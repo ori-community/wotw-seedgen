@@ -75,8 +75,8 @@ impl Pool {
         items.insert(Item::Shard(Shard::Fracture), 1);
         items.insert(Item::Shard(Shard::Arcing), 1);
         items.insert(Item::BonusUpgrade(BonusUpgrade::ExplodingSpike), 1);
-        items.insert(Item::BonusUpgrade(BonusUpgrade::ShockSmash), 1);
-        items.insert(Item::BonusUpgrade(BonusUpgrade::StaticStar), 1);
+        items.insert(Item::BonusUpgrade(BonusUpgrade::HammerShockwave), 1);
+        items.insert(Item::BonusUpgrade(BonusUpgrade::StaticShuriken), 1);
         items.insert(Item::BonusUpgrade(BonusUpgrade::ChargeBlaze), 1);
         items.insert(Item::BonusUpgrade(BonusUpgrade::RapidSentry), 1);
 

@@ -29,8 +29,8 @@ pub enum BonusUpgrade {
     FlashEfficiency = 8,
     GrenadeEfficiency = 9,
     ExplodingSpike = 45,
-    ShockSmash = 46,
-    StaticStar = 47,
+    HammerShockwave = 46,
+    StaticShuriken = 47,
     ChargeBlaze = 48,
     RapidSentry = 49,
 }
@@ -38,7 +38,7 @@ pub enum BonusUpgrade {
 impl BonusUpgrade {
     pub fn description(self) -> Option<String> {
         match self {
-            BonusUpgrade::RapidHammer => Some("Spirit Smash attacks are faster".to_string()),
+            BonusUpgrade::RapidHammer => Some("Hammer attacks are faster".to_string()),
             BonusUpgrade::RapidSword => Some("Sword attacks are faster".to_string()),
             BonusUpgrade::BlazeEfficiency => Some("Reduce Blaze Cost by 50%".to_string()),
             BonusUpgrade::SpearEfficiency => Some("Reduce Spear Cost by 50%".to_string()),
@@ -49,8 +49,8 @@ impl BonusUpgrade {
             BonusUpgrade::FlashEfficiency => Some("Reduce Flash Cost by 50%".to_string()),
             BonusUpgrade::GrenadeEfficiency => Some("Reduce Grenade Cost by 50%".to_string()),
             BonusUpgrade::ExplodingSpike
-            | BonusUpgrade::ShockSmash
-            | BonusUpgrade::StaticStar
+            | BonusUpgrade::HammerShockwave
+            | BonusUpgrade::StaticShuriken
             | BonusUpgrade::ChargeBlaze
             | BonusUpgrade::RapidSentry => None,
         }
@@ -88,8 +88,8 @@ impl BonusUpgrade {
                 Icon::File(String::from("assets/icons/bonus/grenadeefficiency.png"))
             }
             BonusUpgrade::ExplodingSpike => Icon::Opher(OpherIcon::SpearUpgrade),
-            BonusUpgrade::ShockSmash => Icon::Opher(OpherIcon::HammerUpgrade),
-            BonusUpgrade::StaticStar => Icon::Opher(OpherIcon::ShurikenUpgrade),
+            BonusUpgrade::HammerShockwave => Icon::Opher(OpherIcon::HammerUpgrade),
+            BonusUpgrade::StaticShuriken => Icon::Opher(OpherIcon::ShurikenUpgrade),
             BonusUpgrade::ChargeBlaze => Icon::Opher(OpherIcon::BlazeUpgrade),
             BonusUpgrade::RapidSentry => Icon::Opher(OpherIcon::SentryUpgrade),
         };

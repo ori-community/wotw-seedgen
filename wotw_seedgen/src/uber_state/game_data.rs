@@ -255,7 +255,7 @@ pub(super) const UBER_STATES: &[(&str, UberIdentifier)] = &[
         UberIdentifier::new(4, 59),
     ),
     ("rando_upgrades.Exploding Spike", UberIdentifier::new(4, 95)),
-    ("rando_upgrades.Shock Smash", UberIdentifier::new(4, 96)),
+    ("rando_upgrades.Hammer Shockwave", UberIdentifier::new(4, 96)),
     ("rando_upgrades.Static Star", UberIdentifier::new(4, 97)),
     ("rando_upgrades.Charge Blaze", UberIdentifier::new(4, 98)),
     ("rando_upgrades.Rapid Sentry", UberIdentifier::new(4, 99)),

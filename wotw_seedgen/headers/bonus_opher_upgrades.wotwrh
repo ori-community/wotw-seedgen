@@ -3,12 +3,12 @@
 ///
 /// Opher sells five weapon upgrades unique to the randomizer
 Flags: Bonus Opher Upgrades
-!!include rapid_smash_core
+!!include rapid_hammer_core
 
 1|74|11|3               // Spike Efficiency from OpherShop.Spike
-1|98|6|f=0|#Rapid Smash#
-1|98|8|4|50|byte|+1     // Rapid Smash from OpherShop.SpiritSmash
-1|106|11|4              // Star Efficiency from OpherShop.SpiritStar
+1|98|6|f=0|#Rapid Hammer#
+1|98|8|4|50|byte|+1     // Rapid Hammer from OpherShop.SpiritSmash
+1|106|11|4              // Shuriken Efficiency from OpherShop.SpiritStar
 1|115|11|2              // Blaze Efficiency from OpherShop.Blaze
 1|116|11|5              // Sentry Efficiency from OpherShop.Sentry
 
@@ -20,7 +20,7 @@ Flags: Bonus Opher Upgrades
 3|1|8|1|10116|int|600
 // Set descriptions
 3|1|17|2|1|74|Reduce Spear Cost by 50%
-3|1|17|2|1|98|Spirit Smash attacks are faster
+3|1|17|2|1|98|Hammer attacks are faster
 3|1|17|2|1|106|Reduce Shuriken Cost by 50%
 3|1|17|2|1|115|Reduce Blaze Cost by 50%
 3|1|17|2|1|116|Reduce Sentry Cost by 50%
