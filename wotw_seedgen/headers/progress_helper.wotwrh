@@ -20,7 +20,7 @@
 3|1|16|4|0|0|0|4|16|ShowProgressWithHints
 
 // Progress Message
-3|8|4|29|0|Pickups: $(6|2)/[total_pickup_count()]\n[goal_mode_progress()][relic_progress()]
+3|8|4|29|0|Pickups: $(14|2)/[total_pickup_count()]\n[goal_mode_progress()][relic_progress()]
 3|8|8|9|19|int|$(5|50)
 3|8|8|9|0|int|10
 3|8|6|${0}|instant
