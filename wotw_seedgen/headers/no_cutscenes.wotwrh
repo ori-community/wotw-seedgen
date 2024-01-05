@@ -5,66 +5,65 @@
 !!include header_core
 
 // Static cutscene skips
-3|0|8|11666|4220|bool|true          // howlsDenGRoup.hasOriUsedSavePedestal
-3|0|8|58674|41644|bool|true         // _petrifiedForestGroup.mokiFoulWaterVignetteTriggered
-3|0|8|58674|37811|bool|true         // _petrifiedForestGroup.mokiCleanWaterVignetteTriggered
-3|0|8|5377|35023|bool|true          // lumaPoolsStateGroup.playedMokiVignette
-3|0|8|48248|3846|bool|true          // npcsStateGroup.stenchTease
-3|0|8|945|9367|bool|true            // lagoonStateGroup.wispSequencePlayedOut
-3|0|8|48248|40451|bool|true         // npcsStateGroup.baurReachWispIntro
-3|0|8|48248|37364|bool|true         // npcsStateGroup.mouldwoodDepthsWisptIntro
-3|0|8|20120|55196|bool|true         // windsweptWastesGroupDescriptor.wispSequencePlayedOut
-3|0|8|24922|45740|bool|true         // howlsOriginGroup.interactedWithTokk
-3|0|8|37858|25031|bool|true         // waterMillStateGroupDescriptor.rescuedOpher
-3|0|8|5377|21700|bool|true          // lumaPoolsStateGroup.talkedToKwolok
-3|0|8|14019|48794|int|1             // questUberStateGroup.findToadQuestUberState
-3|0|8|937|34641|int|2               // kwolokGroupDescriptor.cleanseWellspringQuestUberState
-3|0|8|10289|3621|bool|true          // windtornRuinsGroup.ruinsVisited
-3|0|8|21786|51018|bool|true         // swampStateGroup.powlTeaseTriggered
-3|0|8|28895|2108|bool|true          // baursReachGroup.powlTeaseTriggered
-3|0|8|37858|23225|bool|true         // waterMillStateGroupDescriptor.playedNaruGumoCutaway
-3|0|8|16155|32922|bool|true         // willowsEndGroup.introPlayed
+3|0|8|11666|4220|bool|true                  // howlsDenGRoup.hasOriUsedSavePedestal
+3|0|8|58674|41644|bool|true                 // _petrifiedForestGroup.mokiFoulWaterVignetteTriggered
+3|0|8|58674|37811|bool|true                 // _petrifiedForestGroup.mokiCleanWaterVignetteTriggered
+3|0|8|5377|35023|bool|true                  // lumaPoolsStateGroup.playedMokiVignette
+3|0|8|48248|3846|bool|true                  // npcsStateGroup.stenchTease
+3|0|8|945|9367|bool|true                    // lagoonStateGroup.wispSequencePlayedOut
+3|0|8|48248|40451|bool|true                 // npcsStateGroup.baurReachWispIntro
+3|0|8|48248|37364|bool|true                 // npcsStateGroup.mouldwoodDepthsWisptIntro
+3|0|8|20120|55196|bool|true                 // windsweptWastesGroupDescriptor.wispSequencePlayedOut
+3|0|8|24922|45740|bool|true                 // howlsOriginGroup.interactedWithTokk
+3|0|8|37858|25031|bool|true                 // waterMillStateGroupDescriptor.rescuedOpher
+3|0|8|5377|21700|bool|true                  // lumaPoolsStateGroup.talkedToKwolok
+3|0|4|19|14019|48794|1|8|14019|48794|int|1  // questUberStateGroup.findToadQuestUberState
+3|0|4|19|937|34641|2|8|937|34641|int|2      // kwolokGroupDescriptor.cleanseWellspringQuestUberState
+3|0|8|10289|3621|bool|true                  // windtornRuinsGroup.ruinsVisited
+3|0|8|21786|51018|bool|true                 // swampStateGroup.powlTeaseTriggered
+3|0|8|28895|2108|bool|true                  // baursReachGroup.powlTeaseTriggered
+3|0|8|37858|23225|bool|true                 // waterMillStateGroupDescriptor.playedNaruGumoCutaway
+3|0|8|16155|32922|bool|true                 // willowsEndGroup.introPlayed
 // Dialogue skips
-3|0|8|48248|5982|bool|true          // npcsStateGroup.metOpherHubAfterWatermill
-3|0|8|48248|55122|bool|true         // npcsStateGroup.metOpherHubBeforeWatermill
-3|0|8|48248|46745|bool|true         // npcsStateGroup.opherMentiodedWatermill
-3|0|8|48248|25267|int|2             // npcsStateGroup.twillenKwolokDialogState
-3|0|8|48248|12799|int|3             // npcsStateGroup.twillenHubDialogState
-3|0|8|48248|34756|bool|true         // npcsStateGroup.twillenMournedKu
-3|0|8|48248|6194|bool|true          // npcsStateGroup.twillenGaveRumor
-3|0|8|48248|9394|bool|true          // npcsStateGroup.metGrom
-3|0|8|14019|57552|int|2             // questUberStateGroup.desertRumorState
-3|0|8|42178|50418|bool|true         // hubUberStateGroup.gromIntroSequencePlayed
-3|0|8|48248|7646|bool|true          // npcsStateGroup.gromGaveWarning
-3|0|8|48248|45751|bool|true         // npcsStateGroup.gromTalkedAboutDesert
-3|0|8|48248|54806|bool|true         // npcsStateGroup.gromTalkedAboutWatermill
-3|0|8|48248|46471|bool|true         // npcsStateGroup.gromTalkedAboutMouldwoodGate
-3|0|8|48248|7321|bool|true          // npcsStateGroup.gromTalkedAboutBaur
-3|0|8|48248|30073|bool|true         // npcsStateGroup.gromTalkedAboutLagoon
-3|0|8|14019|24683|int|4             // questUberStateGroup.luposMapQuest
-3|0|8|48248|10337|int|2             // npcsStateGroup.talkedInHub
-3|0|8|48248|8985|bool|true          // npcsStateGroup.willowsEndSeirExitCutscene
-3|0|8|48248|56448|bool|true         // npcsStateGroup.metOpherHub
-3|0|8|48248|5186|bool|true          // npcsStateGroup.gromMentionedOre
-3|0|8|58674|58268|bool|true         // _petrifiedForestGroup.wispCutscenePlayed
-3|0|8|3440|20131|bool|true          // playerUberStateGroupDescriptor.playerPurchasedWeaponMasterUpgrade
-3|0|8|14019|16509|int|2             // questUberStateGroup.wellspringShrineRumorState
-3|0|8|14019|30596|int|2             // questUberStateGroup.gardenerHutRumorState
-3|0|8|48248|7160|bool|true          // npcsStateGroup.desertRuinsLoreWispA
-3|0|8|48248|15833|bool|true         // npcsStateGroup.desertRuinsLoreWispB
-3|0|8|48248|52065|bool|true         // npcsStateGroup.desertRuinsLoreWispC
-3|0|8|48248|13320|bool|true         // npcsStateGroup.desertRuinsLoreWispD
-3|0|8|48248|5269|bool|true          // npcsStateGroup.desertRuinsLoreWispE
-3|0|8|14019|24683|int|5             // questUberStateGroup.luposMapQuest
-// This only partially completes a quest so we check the current value to avoid setting it back
+3|0|8|48248|5982|bool|true                  // npcsStateGroup.metOpherHubAfterWatermill
+3|0|8|48248|55122|bool|true                 // npcsStateGroup.metOpherHubBeforeWatermill
+3|0|8|48248|46745|bool|true                 // npcsStateGroup.opherMentiodedWatermill
+3|0|8|48248|25267|int|2                     // npcsStateGroup.twillenKwolokDialogState
+3|0|8|48248|12799|int|3                     // npcsStateGroup.twillenHubDialogState
+3|0|8|48248|34756|bool|true                 // npcsStateGroup.twillenMournedKu
+3|0|8|48248|6194|bool|true                  // npcsStateGroup.twillenGaveRumor
+3|0|8|48248|9394|bool|true                  // npcsStateGroup.metGrom
+3|0|8|14019|57552|int|2                     // questUberStateGroup.desertRumorState
+3|0|8|42178|50418|bool|true                 // hubUberStateGroup.gromIntroSequencePlayed
+3|0|8|48248|7646|bool|true                  // npcsStateGroup.gromGaveWarning
+3|0|8|48248|45751|bool|true                 // npcsStateGroup.gromTalkedAboutDesert
+3|0|8|48248|54806|bool|true                 // npcsStateGroup.gromTalkedAboutWatermill
+3|0|8|48248|46471|bool|true                 // npcsStateGroup.gromTalkedAboutMouldwoodGate
+3|0|8|48248|7321|bool|true                  // npcsStateGroup.gromTalkedAboutBaur
+3|0|8|48248|30073|bool|true                 // npcsStateGroup.gromTalkedAboutLagoon
+3|0|8|14019|24683|int|4                     // questUberStateGroup.luposMapQuest
+3|0|8|48248|10337|int|2                     // npcsStateGroup.talkedInHub
+3|0|8|48248|8985|bool|true                  // npcsStateGroup.willowsEndSeirExitCutscene
+3|0|8|48248|56448|bool|true                 // npcsStateGroup.metOpherHub
+3|0|8|48248|5186|bool|true                  // npcsStateGroup.gromMentionedOre
+3|0|8|58674|58268|bool|true                 // _petrifiedForestGroup.wispCutscenePlayed
+3|0|8|3440|20131|bool|true                  // playerUberStateGroupDescriptor.playerPurchasedWeaponMasterUpgrade
+3|0|8|14019|16509|int|2                     // questUberStateGroup.wellspringShrineRumorState
+3|0|8|14019|30596|int|2                     // questUberStateGroup.gardenerHutRumorState
+3|0|8|48248|7160|bool|true                  // npcsStateGroup.desertRuinsLoreWispA
+3|0|8|48248|15833|bool|true                 // npcsStateGroup.desertRuinsLoreWispB
+3|0|8|48248|52065|bool|true                 // npcsStateGroup.desertRuinsLoreWispC
+3|0|8|48248|13320|bool|true                 // npcsStateGroup.desertRuinsLoreWispD
+3|0|8|48248|5269|bool|true                  // npcsStateGroup.desertRuinsLoreWispE
+3|0|8|14019|24683|int|5                     // questUberStateGroup.luposMapQuest
 3|0|4|17|14019|44578|0|8|14019|44578|int|1  // questUberStateGroup.rebuildGladesQuest
 // Dynamic cutscene skips
-!46462|59806|8|937|6778|bool|true   // voice door
-24|14|8|18793|25789|bool|true      // depths gate
-937|10071|8|9|0|int|2               // ruins gate
+!46462|59806|8|937|6778|bool|true           // voice door
+24|14|8|18793|25789|bool|true               // depths gate
+937|10071|8|9|0|int|2                       // ruins gate
 !18793|63291|8|9|0|int|2
 !28895|25522|8|9|0|int|2
 !945|49747|8|9|0|int|2
 9|0=2|4|17|937|10071|1|4|17|28895|25522|1|4|17|18793|63291|1|4|17|945|49747|1|8|10289|3804|bool|true
-!10289|22102|8|58674|36832|bool|true // Seir Shriek cutscene in Feeding Grounds
+!10289|22102|8|58674|36832|bool|true        // Seir Shriek cutscene in Feeding Grounds
 !10289|22102|8|58674|61616|int|6

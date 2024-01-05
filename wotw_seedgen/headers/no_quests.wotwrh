@@ -6,26 +6,26 @@
 Flags: No Quests
 
 // Block quest item placements
-3|0|8|48248|51645|int|3                 // MarshSpawn.TokkKeystoneQuest
-3|0|8|14019|15983|int|3                 // MarshSpawn.MokkFangQuest
-3|0|8|48248|18458|int|4                 // MarshSpawn.TokkTabletQuest
-3|0|8|14019|50597|int|4                 // EastHollow.KwolokAmuletQuest
-3|0|8|14019|20667|int|3                 // OuterWellspring.TheLostCompass
-3|0|8|14019|59708|int|3                 // Tree Keeper (WoodsEntry.LastTreeBranch)
-3|0|8|14019|7470|bool|true              // WoodsEntry.TreeSeed
-3|0|8|14019|53103|bool|true             // EastPools.KwolokAmuletQI
-3|0|8|14019|58342|bool|true             // LowerWastes.EerieGemQI
-3|0|8|23987|14832|bool|true             // GladesTown.TwillenGemQuest
-3|0|8|14019|27804|int|2                 // GladesTown.FamilyReunionKey
-3|0|8|14019|33776|int|3                 // GladesTown.MokiAcornQuest
-3|0|8|14019|44578|int|2                 // GladesTown.RebuildTheGlades
-3|0|8|14019|26394|int|2                 // GladesTown.RegrowTheGlades
-3|0|8|14019|26318|int|11                // Hand to Hand (EastHollow.HandToHandMap, GladesTown.HandToHandPouch, InnerWellspring.HandToHandHerbs, LowerReach.HandToHandSoup, LowerReach.HandToHandHat, GladesTown.HandToHandLantern, LowerDepths.HandToHandSilk, EastPools.HandToHandSpyglass, GladesTown.HandToHandCanteen, LowerWastes.HandToHandMapstone, WindtornRuins.HandToHandComplete)
+3|0|8|48248|51645|int|3                     // MarshSpawn.TokkKeystoneQuest
+3|0|8|14019|15983|int|3                     // MarshSpawn.MokkFangQuest
+3|0|8|48248|18458|int|4                     // MarshSpawn.TokkTabletQuest
+3|0|8|14019|50597|int|4                     // EastHollow.KwolokAmuletQuest
+3|0|8|14019|20667|int|3                     // OuterWellspring.TheLostCompass
+3|0|8|14019|59708|int|3                     // Tree Keeper (WoodsEntry.LastTreeBranch)
+3|0|8|14019|7470|bool|true                  // WoodsEntry.TreeSeed
+3|0|8|14019|53103|bool|true                 // EastPools.KwolokAmuletQI
+3|0|8|14019|58342|bool|true                 // LowerWastes.EerieGemQI
+3|0|8|23987|14832|bool|true                 // GladesTown.TwillenGemQuest
+3|0|4|19|14019|27804|2|8|14019|27804|int|2  // GladesTown.FamilyReunionKey
+3|0|8|14019|33776|int|3                     // GladesTown.MokiAcornQuest
+3|0|8|14019|44578|int|2                     // GladesTown.RebuildTheGlades
+3|0|8|14019|26394|int|2                     // GladesTown.RegrowTheGlades
+3|0|8|14019|26318|int|11                    // Hand to Hand (EastHollow.HandToHandMap, GladesTown.HandToHandPouch, InnerWellspring.HandToHandHerbs, LowerReach.HandToHandSoup, LowerReach.HandToHandHat, GladesTown.HandToHandLantern, LowerDepths.HandToHandSilk, EastPools.HandToHandSpyglass, GladesTown.HandToHandCanteen, LowerWastes.HandToHandMapstone, WindtornRuins.HandToHandComplete)
 // Reveal items behind quests
-3|0|8|937|34641|int|4                   // Silent Teeth -> Tuley
-3|0|8|42178|40006|byte|3                // Planting the Last Tree
-3|0|8|58674|14313|bool|true             // Family Murder -> Doll
-21|51230|8|42178|36609|bool|true        // Family Murder -> SL inside father hut
+3|0|8|937|34641|int|4                       // Silent Teeth -> Tuley
+3|0|8|42178|40006|byte|3                    // Planting the Last Tree
+3|0|8|58674|14313|bool|true                 // Family Murder -> Doll
+21|51230|8|42178|36609|bool|true            // Family Murder -> SL inside father hut
 // Quests that just kind of exist
-3|0|8|14019|61011|int|5                 // A Diamond in the Rough
-21|51230|8|14019|27804|int|4            // Family Murder
+3|0|8|14019|61011|int|5                     // A Diamond in the Rough
+21|51230|8|14019|27804|int|4                // Family Murder

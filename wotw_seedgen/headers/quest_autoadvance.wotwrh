@@ -13,8 +13,8 @@
 !!parameter instantPayRespect bool:true
 
 !!if noBranch true
-3|0|8|14019|59708|int|1     // Collecting the Branch
-3|0|8|14019|59708|int|2     // Showing the Branch to Tuley
+3|0|4|19|14019|59708|1|8|14019|59708|int|1  // Collecting the Branch
+3|0|4|19|14019|59708|2|8|14019|59708|int|2  // Showing the Branch to Tuley
 !!endif
 
 !!if spawnTuley true

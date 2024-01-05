@@ -26,7 +26,7 @@ Flags: Glades Done
 3|0|8|21|40448|bool|true    // Onwards and Upwards
 3|0|8|21|18751|bool|true    // Thorny Situation
 3|0|8|21|16586|bool|true    // Clear the Cave Entrance
-3|0|8|14019|33776|int|1     // Cave Entrance Quest
+3|0|4|19|14019|33776|1|8|14019|33776|int|1  // Cave Entrance Quest
 !!remove 40x 1|2
 // Spawn Tuley
 3|0|8|6|300|bool|true
