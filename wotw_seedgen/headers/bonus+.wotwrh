@@ -7,7 +7,7 @@ Flags: Bonus+
 !!include rapid_sword_core
 !!include rapid_spear_core
 //// How many Rapid Hammers to shuffle in
-!!parameter rapidHammera int:3
+!!parameter rapidHammers int:3
 //// How many Rapid Swords to shuffle in
 !!parameter rapidSwords int:0
 //// How many Rapid Spears to shuffle in
@@ -38,8 +38,10 @@ Flags: Bonus+
 !!parameter sentryFireRateUpgrades int:1
 //// How many Extra Shurikens to shuffle in
 !!parameter extraShurikens int:1
+//// How many Splinter Shurikens to shuffle in
+!!parameter splinterShurikens int:2
 
-!!add $PARAM(rapidHammera)x 8|4|50|byte|+1       // Rapid Hammers
+!!add $PARAM(rapidHammers)x 8|4|50|byte|+1       // Rapid Hammers
 !!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
 !!add $PARAM(rapidSpears)x 8|9|12|byte|+1        // Rapid Spears
 
@@ -127,3 +129,11 @@ Flags: Bonus+
 !!description 8|4|38|byte|+1 Throw multiple Shurikens
 !!icon 8|4|38|byte|+1 file:assets/icons/bonus/extrashuriken.png
 !!mapicon 8|4|38|byte|+1 BonusItem
+
+// Splinter Shurikens
+!!add $PARAM(splinterShurikens)x 8|4|48|byte|+2
+!!name 8|4|48|byte|+2 #Splinter Shuriken#
+!!display 8|4|48|byte|+2 #Splinter Shuriken#
+!!description 8|4|48|byte|+2 Throw multiple Shurikens at once
+!!icon 8|4|48|byte|+2 file:assets/icons/bonus/extrashuriken.png
+!!mapicon 8|4|48|byte|+2 BonusItem
