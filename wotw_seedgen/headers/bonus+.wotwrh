@@ -40,6 +40,8 @@ Flags: Bonus+
 !!parameter extraShurikens int:1
 //// How many Splinter Shurikens to shuffle in
 !!parameter splinterShurikens int:2
+//// How many Bashable Shurikens to shuffle in
+!!parameter bashableShurikens int:1
 
 !!add $PARAM(rapidHammers)x 8|4|50|byte|+1       // Rapid Hammers
 !!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
@@ -137,3 +139,10 @@ Flags: Bonus+
 !!description 8|4|48|byte|+2 Throw multiple Shurikens at once
 !!icon 8|4|48|byte|+2 file:assets/icons/bonus/extrashuriken.png
 !!mapicon 8|4|48|byte|+2 BonusItem
+
+// Bashable Shurikens
+!!add $PARAM(bashableShurikens)x 8|4|95|bool|true
+!!name 8|4|95|bool|true #Bashable Shurikens#
+!!display 8|4|95|bool|true #Bashable Shuriken#
+!!description 8|4|95|bool|true Lets you bash your shurikens
+!!mapicon 8|4|95|bool|true BonusItem
