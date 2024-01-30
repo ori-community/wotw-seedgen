@@ -143,6 +143,6 @@ Flags: Bonus+
 // Bashable Shurikens
 !!add $PARAM(bashableShurikens)x 8|4|95|bool|true
 !!name 8|4|95|bool|true #Bashable Shurikens#
-!!display 8|4|95|bool|true #Bashable Shuriken#
+!!display 8|4|95|bool|true #Bashable Shurikens#
 !!description 8|4|95|bool|true Lets you bash your shurikens
 !!mapicon 8|4|95|bool|true BonusItem
