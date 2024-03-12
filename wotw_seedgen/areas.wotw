@@ -5617,7 +5617,7 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
       InnerWellspring.SpinPuzzleSolved, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: InnerWellspring.SpinPuzzleSolved OR Water  # yep, water works for all four states of the room. Cool, huh?
 
-anchor InnerWellspring.GrappleThroughZigZagSpikes at -1088, -3725:  # after the two rotating wheel on the way to the top of the room. Not at the respawning point itself because it has load issues
+anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
   # dealing with the miner is represented in the connections from both directions to this anchor. When spawning on this anchor, the miner is not an issue
   refill Checkpoint
   
@@ -7515,7 +7515,7 @@ anchor LowerReach.East at -223, -3966:  # To the right side outside the teleport
       DoubleJump, TripleJump
   conn LowerReach.SoupMoki: free
 
-anchor LowerReach.SnowballEnemyPaths at -188, -3955:  # Enemy path counterpart for LowerReach.Snowball
+anchor LowerReach.SnowballEnemyPaths at -182, -3968:  # Enemy path counterpart for LowerReach.Snowball
   nospawn
   # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
   # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
@@ -7528,7 +7528,7 @@ anchor LowerReach.SnowballEnemyPaths at -188, -3955:  # Enemy path counterpart f
   conn LowerReach.EastEnemyPaths:
     kii: Bash
 
-anchor LowerReach.Snowball at -188, -3955:  # At the ledge above the snowball ice wall
+anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ice wall
   # the slug despawns if you spawn on this anchor, paths using it have to be in the LowerReach.SnowballEnemyPaths counterpart
   state LowerReach.TPLantern:
     moki: Grenade=1, Combat=WeakSlug OR Bash
