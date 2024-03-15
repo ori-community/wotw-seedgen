@@ -145,5 +145,5 @@ Flags: Bonus+
 !!name 8|4|95|bool|true #Bashable Shurikens#
 !!display 8|4|95|bool|true #Bashable Shurikens#
 !!description 8|4|95|bool|true Lets you bash your shurikens
-!!icon 8|4|48|byte|+2 file:assets/icons/bonus/bashableshuriken.png
+!!icon 8|4|95|bool|true file:assets/icons/bonus/bashableshuriken.png
 !!mapicon 8|4|95|bool|true BonusItem
