@@ -137,7 +137,7 @@ Flags: Bonus+
 !!name 8|4|48|byte|+2 #Splinter Shuriken#
 !!display 8|4|48|byte|+2 #Splinter Shuriken#
 !!description 8|4|48|byte|+2 Throw multiple Shurikens at once
-!!icon 8|4|48|byte|+2 file:assets/icons/bonus/extrashuriken.png
+!!icon 8|4|48|byte|+2 file:assets/icons/bonus/splintershuriken.png
 !!mapicon 8|4|48|byte|+2 BonusItem
 
 // Bashable Shurikens
@@ -145,4 +145,5 @@ Flags: Bonus+
 !!name 8|4|95|bool|true #Bashable Shurikens#
 !!display 8|4|95|bool|true #Bashable Shurikens#
 !!description 8|4|95|bool|true Lets you bash your shurikens
+!!icon 8|4|48|byte|+2 file:assets/icons/bonus/bashableshuriken.png
 !!mapicon 8|4|95|bool|true BonusItem
