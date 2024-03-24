@@ -11,13 +11,19 @@ use crate::util::{NumericBool, Position, Spell, VPosition};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, VVariant)]
 pub enum Command {
-    Autosave,
+    Autosave {
+        #[VType]
+        position: Option<Position>,
+    },
     Resource {
         resource: Resource,
         #[VWrap]
         amount: i32,
     },
-    Checkpoint,
+    Checkpoint {
+        #[VType]
+        position: Option<Position>,
+    },
     Magic,
     StopEqual {
         uber_identifier: UberIdentifier,
@@ -158,9 +164,21 @@ pub enum Command {
 impl Command {
     pub fn code(&self) -> CodeDisplay<Command> {
         CodeDisplay::new(self, |s, f| match s {
-            Command::Autosave => write!(f, "0"),
+            Command::Autosave { position } => {
+                write!(f, "0")?;
+                match position {
+                    None => Ok(()),
+                    Some(position) => write!(f, "|{}", position.code()),
+                }
+            }
             Command::Resource { resource, amount } => write!(f, "1|{}|{}", *resource as u8, amount),
-            Command::Checkpoint => write!(f, "2"),
+            Command::Checkpoint { position } => {
+                write!(f, "2")?;
+                match position {
+                    None => Ok(()),
+                    Some(position) => write!(f, "|{}", position.code()),
+                }
+            }
             Command::Magic => write!(f, "3"),
             Command::StopEqual {
                 uber_identifier,
@@ -239,9 +257,21 @@ vdisplay! {
     impl fmt::Display for Command {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
-                Self::Autosave => write!(f, "Autosave"),
+                Self::Autosave { position } => {
+                    write!(f, "Autosave")?;
+                    match position {
+                        None => Ok(()),
+                        Some(position) => write!(f, " at {position}")
+                    }
+                },
                 Self::Resource { resource, amount } => write!(f, "Set {resource} to {amount}"),
-                Self::Checkpoint => write!(f, "Checkpoint"),
+                Self::Checkpoint { position } => {
+                    write!(f, "Checkpoint")?;
+                    match position {
+                        None => Ok(()),
+                        Some(position) => write!(f, " at {position}")
+                    }
+                },
                 Self::Magic => write!(f, "✨Magic✨"),
                 Self::StopEqual { uber_identifier, value } => write!(f, "Stop the multipickup if {} is {}", uber_identifier, value),
                 Self::StopGreater { uber_identifier, value } => write!(f, "Stop the multipickup if {} is greater than {}", uber_identifier, value),

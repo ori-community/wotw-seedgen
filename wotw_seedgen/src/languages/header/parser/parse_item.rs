@@ -8,8 +8,10 @@ use crate::{
         SysMessage, VCommand, VMessage, VShopCommand, VUberStateItem, VUberStateOperator,
         VUberStateRange, VUberStateRangeBoundary, VWheelCommand, WheelItemPosition,
     },
-    languages::parser::{parse_ident, parse_number, parse_value},
-    languages::TokenKind,
+    languages::{
+        parser::{parse_ident, parse_number, parse_value},
+        TokenKind,
+    },
     uber_state::{UberIdentifier, UberType},
     util::VPosition,
     VItem,
@@ -195,9 +197,9 @@ fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::ItemKind)?;
     let kind = parse_number!(parser, Suggestion::CommandKind)?;
     let command = match kind {
-        CommandKind::Autosave => Ok(VCommand::Autosave),
+        CommandKind::Autosave => parse_save(parser, |position| VCommand::Autosave { position }),
         CommandKind::Resource => parse_set_resource(parser),
-        CommandKind::Checkpoint => Ok(VCommand::Checkpoint),
+        CommandKind::Checkpoint => parse_save(parser, |position| VCommand::Checkpoint { position }),
         CommandKind::Magic => Ok(VCommand::Magic),
         CommandKind::StopEqual => parse_stop_equal(parser),
         CommandKind::StopGreater => parse_stop_greater(parser),
@@ -228,6 +230,20 @@ fn parse_command(parser: &mut Parser) -> Result<VItem, ParseError> {
         CommandKind::AppendString => parse_append_string(parser),
     }?;
     Ok(VItem::Command(command))
+}
+fn parse_save<F>(parser: &mut Parser, f: F) -> Result<VCommand, ParseError>
+where
+    F: FnOnce(Option<VPosition>) -> VCommand,
+{
+    let mut position = None;
+    if parser.current_token().kind == TokenKind::Separator
+        && parser.peek_token().kind == TokenKind::Number
+    {
+        parser.next_token();
+        position = Some(parse_v_position(parser)?)
+    };
+
+    Ok(f(position))
 }
 fn parse_set_resource(parser: &mut Parser) -> Result<VCommand, ParseError> {
     parser.eat_or_suggest(TokenKind::Separator, Suggestion::CommandKind)?;

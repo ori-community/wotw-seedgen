@@ -523,8 +523,11 @@ fn parse_annotation(parser: &mut Parser) -> Result<HeaderContent, ParseError> {
 mod tests {
     use std::str::FromStr;
 
+    use crate::header::parser;
+    use crate::header::VResolve;
     use crate::item::*;
     use crate::uber_state::*;
+    use crate::util::Position;
 
     #[test]
     fn item_parsing() {
@@ -575,7 +578,25 @@ mod tests {
                 UberStateValue::Number((6.).into())
             ))
         );
-        assert_eq!(Item::from_str("4|0"), Ok(Item::Command(Command::Autosave)));
+        assert_eq!(
+            Item::from_str("4|0"),
+            Ok(Item::Command(Command::Autosave { position: None }))
+        );
+        assert_eq!(
+            VItem::parse(&mut parser::new("4|0|mute"))
+                .map_err(|err| err.verbose_display())
+                .and_then(|v_item| v_item.resolve(&Default::default())),
+            Ok(Item::Command(Command::Autosave { position: None }))
+        );
+        assert_eq!(
+            Item::from_str("4|0|1|2"),
+            Ok(Item::Command(Command::Autosave {
+                position: Some(Position {
+                    x: (1.).into(),
+                    y: (2.).into()
+                })
+            }))
+        );
         assert!(Item::from_str("12").is_err());
         assert!(Item::from_str("").is_err());
         assert!(Item::from_str("0|").is_err());
