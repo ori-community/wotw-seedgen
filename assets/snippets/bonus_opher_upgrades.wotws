@@ -1,0 +1,33 @@
+#category("Placements")
+#name("Bonus Opher Upgrades")
+#description("Opher sells five weapon upgrades unique to the randomizer")
+
+!flag("Bonus Opher Upgrades")
+
+!use_icon(blaze_efficiency_icon, "assets/icons/bonus/blazeefficiency.png")
+!use_icon(spear_efficiency_icon, "assets/icons/bonus/spearefficiency.png")
+!use_icon(shuriken_efficiency_icon, "assets/icons/bonus/shurikenefficiency.png")
+!use_icon(sentry_efficiency_icon, "assets/icons/bonus/sentryefficiency.png")
+!use_icon(rapid_hammer_icon, "assets/icons/bonus/rapidsmash.png") // TODO rename file
+
+!include("bonus_item_core")
+!use("bonus_item_core", spear_efficiency)
+!use("bonus_item_core", shuriken_efficiency)
+!use("bonus_item_core", blaze_efficiency)
+!use("bonus_item_core", sentry_efficiency)
+!include("rapid_hammer_core")
+!use("rapid_hammer_core", rapid_hammer)
+
+on OpherShop.Spike spear_efficiency()
+on OpherShop.SpiritSmash rapid_hammer()
+on OpherShop.SpiritStar shuriken_efficiency()
+on OpherShop.Blaze blaze_efficiency()
+on OpherShop.Sentry sentry_efficiency()
+
+on reload {
+    set_shop_item_data(OpherShop.Spike, 300, "#Spear Efficiency#", "Reduce Spear Cost by 50%", spear_efficiency_icon)
+    set_shop_item_data(OpherShop.SpiritSmash, 600, "#Rapid Hammer#", "Hammer attacks are faster", rapid_hammer_icon)
+    set_shop_item_data(OpherShop.SpiritStar, 300, "#Shuriken Efficiency#", "Reduce Shuriken Cost by 50%", shuriken_efficiency_icon)
+    set_shop_item_data(OpherShop.Blaze, 300, "#Blaze Efficiency#", "Reduce Blaze Cost by 50%", blaze_efficiency_icon)
+    set_shop_item_data(OpherShop.Sentry, 600, "#Sentry Efficiency#", "Reduce Sentry Cost by 50%", sentry_efficiency_icon)
+}

@@ -3,15 +3,11 @@ name = "wotw_seedgen_stats"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-default = ["fs"]
-fs = []
-
 [dependencies]
-wotw_seedgen = { path = "../wotw_seedgen", features = ["fs"] }
+wotw_seedgen = { path = "../wotw_seedgen" }
 bincode = "1"
 rustc-hash = "1"
 chrono = "0.4"
 rand = "0.8"
 serde_json = "1.0"
-itertools = "0.10"
+itertools = "0.12"

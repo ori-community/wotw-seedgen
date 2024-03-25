@@ -1,0 +1,16 @@
+#category("World Changes")
+#name("No Trials")
+#description("Trials will give no rewards")
+
+!flag("No Trials")
+
+on spawn {
+    store(raceGroup.inkwaterMarshRace, 2)
+    store(raceGroup.kwolokDropRace, 2)
+    store(raceGroup.wellspringRace, 2)
+    store(raceGroup.lumaPoolsRace, 2)
+    store(raceGroup.silentWoodlandRace, 2)
+    store(raceGroup.baursReachWindTunnelRace, 2)
+    store(raceGroup.mouldwoodDepthsRace, 2)
+    store(raceGroup.desertRace, 2)
+}

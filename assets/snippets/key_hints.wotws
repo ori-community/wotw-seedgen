@@ -1,0 +1,163 @@
+#category("Hints")
+#name("Key Hints")
+#description("
+Npcs sell hints:
+Opher after the Water escape tells the zones holding Water, Glide, Flap
+Lupo in Glades tells the zones holding Burrow, Water Dash, Grenade and Flash
+Twillen tells the zones holding Bow and Bash")
+
+!flag("Key Hints")
+
+// TODO have to stringify constant before compilation because they will be turned into numbers otherwise
+!zone_of(burrow_zone, skill(Skill::Burrow))
+!zone_of(water_dash_zone, skill(Skill::WaterDash))
+!zone_of(grenade_zone, skill(Skill::Grenade))
+!zone_of(flash_zone, skill(Skill::Flash))
+!zone_of(clean_water_zone, clean_water())
+!zone_of(flap_zone, skill(Skill::Flap))
+!zone_of(glide_zone, skill(Skill::Glide))
+!zone_of(bash_zone, skill(Skill::Bash))
+!zone_of(bow_zone, skill(Skill::Bow))
+
+!include("progress_helper")
+
+!on_callback("progress_helper", write_progress_message, {
+    if LupoShop.ShardMapIcon > 0 {
+        write_lupo_hint()
+        set_string("progress_message", get_string("progress_message") + "\n" + get_string("lupo_hint"))
+    }
+    if OpherShop.WaterBreath {
+        write_opher_hint()
+        set_string("progress_message", get_string("progress_message") + "\n" + get_string("opher_hint"))
+    }
+    if TwillenShop.TripleJump {
+        write_twillen_hint()
+        set_string("progress_message", get_string("progress_message") + "\n" + get_string("twillen_hint"))
+    }
+})
+
+fun write_lupo_hint() {
+    set_string("burrow_color", "")
+    if skills.burrow set_string("burrow_color", "$")
+    set_string("water_dash_color", "")
+    if skills.waterDash set_string("water_dash_color", "$")
+    set_string("grenade_color", "")
+    if skills.grenade set_string("grenade_color", "$")
+    set_string("flash_color", "")
+    if skills.flash set_string("flash_color", "$")
+
+    set_string("lupo_hint",
+        get_string("burrow_color") + "Burrow: " + burrow_zone + get_string("burrow_color") + ", " +
+        get_string("water_dash_color") + "Water Dash: " + water_dash_zone + get_string("water_dash_color") + ", " +
+        get_string("grenade_color") + "Grenade: " + grenade_zone + get_string("grenade_color") + ", " +
+        get_string("flash_color") + "Flash: " + flash_zone + get_string("flash_color")
+    )
+}
+fun write_opher_hint() {
+    set_string("clean_water_color", "")
+    if randoState.cleanWater set_string("clean_water_color", "$")
+    set_string("flap_color", "")
+    if skills.flap set_string("flap_color", "$")
+    set_string("glide_color", "")
+    if skills.glide set_string("glide_color", "$")
+
+    set_string("opher_hint",
+        get_string("clean_water_color") + "Clean Water: " + clean_water_zone + get_string("clean_water_color") + ", " +
+        get_string("flap_color") + "Flap: " + flap_zone + get_string("flap_color") + ", " +
+        get_string("glide_color") + "Glide: " + glide_zone + get_string("glide_color")
+    )
+}
+fun write_twillen_hint() {
+    set_string("bash_color", "")
+    if skills.bash set_string("bash_color", "$")
+    set_string("bow_color", "")
+    if skills.bow set_string("bow_color", "$")
+
+    set_string("lupo_hint",
+        get_string("bash_color") + "Bash: " + bash_zone + get_string("bash_color") + ", " +
+        get_string("bow_color") + "Bow: " + bow_zone + get_string("bow_color")
+    )
+}
+
+on reload {
+    set_shop_item_data(
+        LupoShop.ShardMapIcon,
+        4000,
+        "Burrow, Water Dash, Grenade, Flash hint",
+        "Costs 500 less for every item you found already",
+        LupoIcon::ShardsMap,
+    )
+    set_shop_item_data(
+        OpherShop.WaterBreath,
+        2500,
+        "Clean Water, Flap, Glide hint",
+        "Costs 500 less for every item you found already",
+        LupoIcon::ShardsMap,
+    )
+    if InnerWellspring.WaterEscape == false {
+        set_shop_item_description(OpherShop.WaterBreath, "Complete the Wellspring escape to unlock")
+        set_shop_item_hidden(OpherShop.WaterBreath, true)
+    }
+    set_shop_item_data(
+        TwillenShop.TripleJump,
+        1500,
+        "Bash, Bow hint",
+        "Costs 500 less for every item you found already",
+        LupoIcon::ShardsMap,
+    )
+    updateLupoHintPrice()
+    updateOpherHintPrice()
+    updateTwillenHintPrice()
+}
+on InnerWellspring.WaterEscape {
+    set_shop_item_description(OpherShop.WaterBreath, "Costs 500 less for every item you found already")
+    set_shop_item_hidden(OpherShop.WaterBreath, false)
+}
+
+fun updateLupoHintPrice() {
+    set_integer("lupo_hint_price", 4000)
+    if skills.burrow set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
+    if skills.waterDash set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
+    if skills.grenade set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
+    if skills.flash set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
+    if get_integer("lupo_hint_price") == 2000 set_integer("lupo_hint_price", 0)
+    set_shop_item_price(LupoShop.ShardMapIcon, get_integer("lupo_hint_price"))
+}
+fun updateOpherHintPrice() {
+    set_integer("opher_hint_price", 2500)
+    if randoState.cleanWater set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
+    if skills.flap set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
+    if skills.glide set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
+    if get_integer("opher_hint_price") == 1000 set_integer("opher_hint_price", 0)
+    set_shop_item_price(OpherShop.WaterBreath, get_integer("opher_hint_price"))
+}
+fun updateTwillenHintPrice() {
+    set_integer("twillen_hint_price", 1500)
+    if skills.bash set_integer("twillen_hint_price", get_integer("twillen_hint_price") - 500)
+    if skills.bow set_integer("twillen_hint_price", get_integer("twillen_hint_price") - 500)
+    if get_integer("twillen_hint_price") == 500 set_integer("twillen_hint_price", 0)
+    set_shop_item_price(TwillenShop.TripleJump, get_integer("twillen_hint_price"))
+}
+
+on skills.burrow updateLupoHintPrice()
+on skills.waterDash updateLupoHintPrice()
+on skills.grenade updateLupoHintPrice()
+on skills.flash updateLupoHintPrice()
+on randoState.cleanWater updateOpherHintPrice()
+on skills.flap updateOpherHintPrice()
+on skills.glide updateOpherHintPrice()
+on skills.bash updateTwillenHintPrice()
+on skills.bow updateTwillenHintPrice()
+
+on LupoShop.ShardMapIcon > 0 {
+    write_lupo_hint()
+    item_message(get_string("lupo_hint"))
+}
+on OpherShop.WaterBreath {
+    write_opher_hint()
+    item_message(get_string("opher_hint"))
+}
+on TwillenShop.TripleJump {
+    write_twillen_hint()
+    item_message(get_string("twillen_hint"))
+}

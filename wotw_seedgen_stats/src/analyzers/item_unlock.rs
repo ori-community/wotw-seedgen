@@ -1,8 +1,6 @@
-use std::num::NonZeroUsize;
-
-use wotw_seedgen::generator::SeedSpoiler;
-
 use super::Analyzer;
+use std::num::NonZeroUsize;
+use wotw_seedgen::spoiler::SeedSpoiler;
 
 /// Analyzes how late an item is placed
 pub struct ItemUnlockStats {

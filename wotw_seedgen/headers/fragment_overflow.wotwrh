@@ -1,5 +1,0 @@
-#category Quality of Life
-/// Fragment Overflow
-///
-/// When collecting a Health or Energy fragment with the Overflow shard equipped, refill both resources instead of just the matching one
-3|0|8|4|150|bool|true

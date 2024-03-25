@@ -1,0 +1,21 @@
+#category("World Changes")
+#name("No KS Doors")
+#description("All keystone doors start open")
+
+on spawn {
+    store(UpperWastes.KeystoneDoor, true)
+    store(MarshSpawn.KeystoneDoor, true)
+    store(HowlsDen.KeystoneDoor, true)
+    store(UpperDepths.EntryKeystoneDoor, true)
+    store(UpperDepths.CentralKeystoneDoor, true)
+    store(UpperPools.KeystoneDoor, true)
+    store(LowerReach.KeystoneDoor, true)
+    store(UpperReach.KeystoneDoor, true)
+    store(MidnightBurrows.KeystoneDoor, true)
+    store(WoodsEntry.KeystoneDoor, true)
+    store(WoodsMain.KeystoneDoor, true)
+    store(kwolokGroupDescriptor.eyesPlacedIntoStatue, 3)
+    store(MarshPastOpher.EyestoneDoor, true)
+}
+
+!remove(keystone(), 34)

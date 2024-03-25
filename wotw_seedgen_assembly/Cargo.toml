@@ -1,0 +1,14 @@
+[package]
+name = "wotw_seedgen_assembly"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wotw_seedgen_data = { path = "../wotw_seedgen_data", features = ["serde", "strum"] }
+wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language" }
+wotw_seedgen_settings = { path = "../wotw_seedgen_settings" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rustc-hash = "1.1"
+tar = "0.4"
+xz2 = "0.1"

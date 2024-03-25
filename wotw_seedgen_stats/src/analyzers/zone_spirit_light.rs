@@ -1,8 +1,6 @@
-use std::num::NonZeroUsize;
-
-use wotw_seedgen::{generator::SeedSpoiler, util::Zone, Item};
-
 use super::Analyzer;
+use std::num::NonZeroUsize;
+use wotw_seedgen::{data::Zone, spoiler::SeedSpoiler, CommonItem};
 
 /// Analyzes how much Spirit Light is in a zone
 pub struct ZoneSpiritLightStats {
@@ -26,11 +24,12 @@ impl Analyzer for ZoneSpiritLightStats {
                     .zone
                     .map_or(false, |zone| zone == self.zone)
             })
-            .filter_map(|placement| match &placement.item {
-                Item::SpiritLight(amount) => Some(amount),
+            .flat_map(|placement| CommonItem::from_command(&placement.command))
+            .filter_map(|item| match item {
+                CommonItem::SpiritLight(amount) => Some(amount),
                 _ => None,
             })
-            .sum::<u32>() as usize;
+            .sum();
 
         vec![super::group_result(spirit_light, self.result_bucket_size)]
     }

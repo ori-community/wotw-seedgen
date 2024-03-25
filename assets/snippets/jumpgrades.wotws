@@ -1,0 +1,78 @@
+#category("Item Pool")
+#name("Jumpgrades")
+#description("Adds Jumpgrades into the item pool that make you jump higher")
+
+!config(count, "How many Jumpgrades to shuffle in", Integer, 3)
+
+!state(enabled, Boolean)
+!state(collected, Integer)
+
+!include("bonus_core")
+!use("bonus_core", update_bonus_wheel)
+
+!use_icon(jumpgrade_icon, "assets/icons/bonus/jumpgrade.png")
+
+!on_callback("bonus_core", any_collected, if collected > 0 set_boolean("any_collected", true))
+!on_callback("bonus_core", any_enabled, if enabled set_boolean("any_enabled", true))
+!on_callback("bonus_core", enable_all, if enabled == false enable())
+!on_callback("bonus_core", disable_all, if enabled disable())
+
+fun jumpgrade() {
+    item_message("#Jumpgrade x" + (collected + 1) + "#")
+    store(collected, collected + 1)
+}
+
+!add(jumpgrade(), count)
+!item_data(jumpgrade(),
+    "#Jumpgrade#",
+    200,
+    "Jump higher",
+    jumpgrade_icon,
+    MapIcon::BonusItem
+)
+
+fun enable() {
+    store(enabled, true)
+    set_wheel_item_disable()
+    update_bonus_wheel()
+    // TODO rando_upgrades.Jump Height and no clue what the others are
+    store(randoUpgrades.jumpHeight, collected * 0.33)
+    store(randoUpgrades.wallJumpStrength, collected * 0.15)
+    store(randoUpgrades.doubleJumpStrength, collected * 0.15)
+}
+fun disable() {
+    store(enabled, false)
+    set_wheel_item_enable()
+    update_bonus_wheel()
+    store(randoUpgrades.jumpHeight, 0)
+    store(randoUpgrades.wallJumpStrength, 0)
+    store(randoUpgrades.doubleJumpStrength, 0)
+}
+
+on reload {
+    if collected > 0 {
+        create_wheel_item()
+    }
+}
+on collected == 1 create_wheel_item()
+
+fun create_wheel_item() {
+    set_wheel_item_name("bonus_upgrade", WheelItemPosition::TopRight, "Toggle Jumpgrades")
+    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::TopRight, jumpgrade_icon)
+    if enabled {
+        set_wheel_item_disable()
+    }
+    if enabled == false {
+        set_wheel_item_enable()
+    }
+}
+fun set_wheel_item_disable() {
+    set_wheel_item_description("bonus_upgrade", WheelItemPosition::TopRight, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", WheelItemPosition::TopRight, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", WheelItemPosition::TopRight, WheelBind::All, disable())
+}
+fun set_wheel_item_enable() {
+    set_wheel_item_description("bonus_upgrade", WheelItemPosition::TopRight, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", WheelItemPosition::TopRight, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", WheelItemPosition::TopRight, WheelBind::All, enable())
+}

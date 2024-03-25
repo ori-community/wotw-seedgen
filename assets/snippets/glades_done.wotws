@@ -1,0 +1,35 @@
+#category("World Changes")
+#name("Glades Done")
+#description("Start with glades rebuilt and regrown")
+
+!flag("Glades Done")
+!include("spawn_tuley")
+
+on spawn {
+    // Block placements
+    store(questUberStateGroup.rebuildGladesQuest, 2)
+    store(questUberStateGroup.regrowGladesQuest, 2)
+    // TODO moved to new states
+    // TODO block tuley shop
+    // Plant Seeds
+    // store(TuleyShop.BlueMoon, true)
+    // store(TuleyShop.StickyGrass, true)
+    // store(TuleyShop.SpringPlants, true)
+    // store(TuleyShop.Lightcatchers, true)
+    // store(TuleyShop.SelaFlowers, true)
+    // store(TuleyShop.LastTree, true)
+    // Shop from Grom (should eventually become conditional if we have random items in Groms shop)
+    store(gromShop.housesABought, true)
+    store(gromShop.housesBBought, true)
+    store(gromShop.housesCBought, true)
+    store(gromShop.removeThornsBought, true)
+    store(gromShop.openCaveBought, true)
+    // Build Stuff
+    store(GladesTown.BuildHuts, true)
+    store(GladesTown.RoofsOverHeads, true)
+    store(GladesTown.OnwardsAndUpwards, true)
+    store(GladesTown.ClearThorns, true)
+    store(GladesTown.CaveEntrance, true)
+    if questUberStateGroup.darkCaveQuest < 1 store(questUberStateGroup.darkCaveQuest, 1)
+}
+!remove(gorlek_ore(), 40)

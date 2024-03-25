@@ -1,0 +1,21 @@
+{
+  "info": {
+    "name": "Full Bonus",
+    "description": "All of the Bonus, None of the Balance"
+  },
+  "snippets": ["bonus_items", "jumpgrades", "skill_velocity", "bonus+"],
+  "snippetConfig": {
+    "bonus_items": {
+      "extraJumps": "4",
+      "extraDashes": "2",
+      "blazeEfficiency": "2",
+      "spikeEfficiency": "2",
+      "shurikenEfficiency": "2",
+      "sentryEfficiency": "2",
+      "bowEfficiency": "2",
+      "regenEfficiency": "2",
+      "flashEfficiency": "2",
+      "grenadeEfficiency": "2"
+    }
+  }
+}

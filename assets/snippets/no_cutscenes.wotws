@@ -1,0 +1,77 @@
+#category("Quality of Life")
+#name("No Cutscenes")
+#description("Skips several short cutscenes")
+
+// TODO it seems like the migrated client doesn't set kuberstates? what's that about? didn't add them here for now
+
+on spawn {
+    // Static cutscene skips
+    store(howlsDenGRoup.hasOriUsedSavePedestal, true)
+    store(_petrifiedForestGroup.mokiFoulWaterVignetteTriggered, true)
+    store(_petrifiedForestGroup.mokiCleanWaterVignetteTriggered, true)
+    store(lumaPoolsStateGroup.playedMokiVignette, true)
+    store(npcsStateGroup.stenchTease, true)
+    store(lagoonStateGroup.wispSequencePlayedOut, true)
+    store(npcsStateGroup.baurReachWispIntro, true)
+    store(npcsStateGroup.mouldwoodDepthsWisptIntro, true)
+    store(windsweptWastesGroupDescriptor.wispSequencePlayedOut, true)
+    store(howlsOriginGroup.interactedWithTokk, true)
+    store(waterMillStateGroupDescriptor.rescuedOpher, true)
+    store(lumaPoolsStateGroup.talkedToKwolok, true)
+    if questUberStateGroup.findToadQuestUberState < 1 store(questUberStateGroup.findToadQuestUberState, 1)
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
+    store(windtornRuinsGroup.ruinsVisited, true)
+    store(swampStateGroup.powlTeaseTriggered, true)
+    store(baursReachGroup.powlTeaseTriggered, true)
+    store(waterMillStateGroupDescriptor.playedNaruGumoCutaway, true)
+    store(willowsEndGroup.introPlayed, true)
+    // Dialogue skips
+    store(npcsStateGroup.metOpherHubAfterWatermill, true)
+    store(npcsStateGroup.metOpherHubBeforeWatermill, true)
+    store(npcsStateGroup.opherMentiodedWatermill, true)
+    store(npcsStateGroup.twillenKwolokDialogState, 2)
+    store(npcsStateGroup.twillenHubDialogState, 3)
+    store(npcsStateGroup.twillenMournedKu, true)
+    store(npcsStateGroup.twillenGaveRumor, true)
+    store(npcsStateGroup.metGrom, true)
+    store(questUberStateGroup.desertRumorState, 2)
+    store(hubUberStateGroup.gromIntroSequencePlayed, true)
+    store(npcsStateGroup.gromGaveWarning, true)
+    store(npcsStateGroup.gromTalkedAboutDesert, true)
+    store(npcsStateGroup.gromTalkedAboutWatermill, true)
+    store(npcsStateGroup.gromTalkedAboutMouldwoodGate, true)
+    store(npcsStateGroup.gromTalkedAboutBaur, true)
+    store(npcsStateGroup.gromTalkedAboutLagoon, true)
+    store(hubUberStateGroup.builderProjectHouses, 1) // TODO check if this is fixed on the dev branch
+    store(questUberStateGroup.luposMapQuest, 4)
+    store(npcsStateGroup.talkedInHub, 2)
+    store(npcsStateGroup.willowsEndSeirExitCutscene, true)
+    store(npcsStateGroup.metOpherHub, true)
+    store(npcsStateGroup.gromMentionedOre, true)
+    store(_petrifiedForestGroup.wispCutscenePlayed, true)
+    store(playerUberStateGroupDescriptor.playerPurchasedWeaponMasterUpgrade, true)
+    store(questUberStateGroup.wellspringShrineRumorState, 2)
+    store(questUberStateGroup.gardenerHutRumorState, 2)
+    store(npcsStateGroup.desertRuinsLoreWispA, true)
+    store(npcsStateGroup.desertRuinsLoreWispB, true)
+    store(npcsStateGroup.desertRuinsLoreWispC, true)
+    store(npcsStateGroup.desertRuinsLoreWispD, true)
+    store(npcsStateGroup.desertRuinsLoreWispE, true)
+    store(questUberStateGroup.luposMapQuest, 5)
+    if questUberStateGroup.rebuildGladesQuest < 1 store(questUberStateGroup.rebuildGladesQuest, 1)
+    if questUberStateGroup.treeKeeperQuest < 2 {
+        // TODO can we set to 2 directly?
+        store(questUberStateGroup.treeKeeperQuest, 1)
+        store(questUberStateGroup.treeKeeperQuest, 2)
+    }
+}
+
+on EastHollow.ForestsVoice store(EastHollow.VoiceDoorOpen, true)
+on skills.glide store(EastHollow.DepthsOpen, true)
+on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3)
+// TODO why is this not the wisp pickup?
+on kwolokGroupDescriptor.kwolokNpcState > 0 && UpperDepths.ForestsEyes && LowerReach.ForestsMemory && WestPools.ForestsStrength store(windtornRuinsGroup.openedDesertRuins, true)
+on WindtornRuins.Seir {
+    store(_petrifiedForestGroup.floatZoneState, true)
+    store(_petrifiedForestGroup.petrifiedOwlState, 6)
+}

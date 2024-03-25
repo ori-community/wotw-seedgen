@@ -1,0 +1,8 @@
+{
+  "info": {
+    "name": "Random Spawn",
+    "description": "Randomize the initial spawn"
+  },
+  "spawn": "Random",
+  "snippets": ["better_random_spawn"]
+}

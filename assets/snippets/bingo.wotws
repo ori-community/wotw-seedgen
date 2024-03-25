@@ -1,0 +1,20 @@
+#hide
+#name("Bingo")
+#description(
+"prints updates on line completion; sets the 'game_complete' state once you have enough lines (3 by default)
+(remember to enable netcode in options when rolling the seed)")
+
+!flag("Bingo")
+!config(lines, "How many lines you need to complete the game", Integer, 3)
+!state(bingo_complete, Boolean)
+
+on change bingoState.lines {
+    item_message(bingoState.lines + " line(s) completed!")
+    if bingoState.lines >= lines {
+        store(bingo_complete, true)
+    }
+}
+on bingo_complete {
+    item_message("Bingo complete! Press Alt+C to warp to credits")
+    store(gameStateGroup.gameFinished, true)
+}

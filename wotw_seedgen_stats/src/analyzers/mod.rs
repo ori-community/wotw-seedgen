@@ -13,6 +13,7 @@ mod spawn_region;
 mod step_size;
 mod zone_spirit_light;
 mod zone_unlock;
+// TODO idea: progression_location analyzer for which locations get chosen for progression
 
 use compare::*;
 pub use early_skills::EarlySkillsStats;
@@ -32,7 +33,7 @@ pub use zone_unlock::ZoneUnlockStats;
 
 use std::{cmp::Ordering, num::NonZeroUsize};
 
-use wotw_seedgen::generator::SeedSpoiler;
+use wotw_seedgen::spoiler::SeedSpoiler;
 
 /// Trait for types that may analyze seeds and generate statistics
 ///

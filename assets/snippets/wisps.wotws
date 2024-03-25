@@ -1,0 +1,46 @@
+#category("Goals")
+#name("All Wisps")
+#description("Require visiting all Wisps before fighting Shriek")
+
+!flag("All Wisps")
+!include("goal_mode_core")
+
+!on_callback("goal_mode_core", write_goal_progress_message, {
+    if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
+    set_boolean("comma", true)
+    count_wisps()
+    set_string("color", "")
+    if get_integer("wisp_count") == 5 set_string("color", "$")
+    write_wisps_message()
+    set_string("goal_progress_message", get_string("goal_progress_message") + get_string("wisps_message"))
+})
+
+!on_callback("goal_mode_core", check_goals_completed, {
+    count_wisps()
+    if get_integer("wisp_count") < 5 set_boolean("goals_completed", false)
+})
+
+!on_callback("goal_mode_core", write_goals_incomplete_message, {
+    count_wisps()
+    if get_integer("wisp_count") < 5 {
+        set_string("color", "@")
+        write_wisps_message()
+        set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("wisps_message"))
+    }
+})
+
+fun count_wisps() {
+    set_integer("wisp_count", 0)
+    if EastHollow.ForestsVoice increment_wisp_count()
+    if WestPools.ForestsStrength increment_wisp_count()
+    if LowerReach.ForestsMemory increment_wisp_count()
+    if UpperDepths.ForestsEyes increment_wisp_count()
+    if WindtornRuins.Seir increment_wisp_count()
+}
+fun increment_wisp_count() {
+    set_integer("wisp_count", get_integer("wisp_count") + 1)
+}
+
+fun write_wisps_message() {
+    set_string("wisps_message", get_string("color") + "Wisps: " + get_integer("wisp_count") + "/17" + get_string("color"))
+}

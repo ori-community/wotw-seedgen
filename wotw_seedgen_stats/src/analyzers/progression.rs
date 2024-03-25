@@ -1,11 +1,8 @@
-use std::iter;
-
-use wotw_seedgen::generator::SeedSpoiler;
-
 use super::Analyzer;
+use wotw_seedgen::spoiler::SeedSpoiler;
 
 pub struct ProgressionStats;
-/// Analyzes which items get placed as forced progression
+/// Analyzes which progressions get placed
 impl Analyzer for ProgressionStats {
     fn title(&self) -> String {
         "Progression items".to_string()
@@ -14,8 +11,7 @@ impl Analyzer for ProgressionStats {
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
         seed.groups
             .iter()
-            .flat_map(|group| group.forced_items.items.iter())
-            .flat_map(|(item, amount)| iter::repeat(item.to_string()).take(*amount as usize))
+            .map(|group| group.forced_items.to_string())
             .collect()
     }
 }

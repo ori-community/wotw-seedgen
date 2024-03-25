@@ -1,0 +1,8 @@
+#category("Quality of Life")
+#name("Teleport Refills")
+#description("Heals you to full when warping to a spirit well")
+
+on teleport {
+    store(player.health, 999)
+    store(player.energy, 999)
+}

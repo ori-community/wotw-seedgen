@@ -1,7 +1,0 @@
-#hide
-/// Update Loop
-///
-/// Triggers 9|150 every frame
-
-timer: 9|101|9|150
-3|1|8|9|101|bool|true

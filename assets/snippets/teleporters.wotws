@@ -1,0 +1,43 @@
+#category("Item Pool")
+#name("Teleporters")
+#description("Find teleporter activations as pickups")
+
+!flag("Teleporters")
+
+!config(inkwater, "Inkwater Marsh TP", Boolean, true)
+!config(howls_den, "Howl's Den TP", Boolean, true)
+!config(hollow, "Kwolok's Hollow TP", Boolean, true)
+!config(glades, "Glades TP", Boolean, true)
+!config(wellspring, "Wellspring TP", Boolean, true)
+!config(burrows, "Midnight Burrows TP", Boolean, true)
+!config(woods_entrance, "Woods Entrance TP", Boolean, true)
+!config(woods_exit, "Woods Exit TP", Boolean, true)
+!config(reach, "Baur's Reach TP", Boolean, true)
+!config(depths, "Mouldwood Depths TP", Boolean, true)
+!config(central_luma, "Central Luma TP", Boolean, true)
+!config(luma_boss, "Luma Boss TP", Boolean, false)
+!config(feeding_grounds, "Feeding Grounds TP", Boolean, true)
+!config(central_wastes, "Central Wastes TP", Boolean, true)
+!config(outer_ruins, "Outer Ruins TP", Boolean, true)
+!config(inner_ruins, "Inner Ruins TP", Boolean, false)
+!config(willow, "Willow's End TP", Boolean, true)
+!config(shriek, "Shriek TP", Boolean, false)
+
+!if inkwater { !add(teleporter(Teleporter::Inkwater), 1) }
+!if howls_den { !add(teleporter(Teleporter::Den), 1) }
+!if hollow { !add(teleporter(Teleporter::Hollow), 1) }
+!if glades { !add(teleporter(Teleporter::Glades), 1) }
+!if wellspring { !add(teleporter(Teleporter::Wellspring), 1) }
+!if burrows { !add(teleporter(Teleporter::Burrows), 1) }
+!if woods_entrance { !add(teleporter(Teleporter::WoodsEntrance), 1) }
+!if woods_exit { !add(teleporter(Teleporter::WoodsExit), 1) }
+!if reach { !add(teleporter(Teleporter::Reach), 1) }
+!if depths { !add(teleporter(Teleporter::Depths), 1) }
+!if central_luma { !add(teleporter(Teleporter::CentralLuma), 1) }
+!if luma_boss { !add(teleporter(Teleporter::LumaBoss), 1) }
+!if feeding_grounds { !add(teleporter(Teleporter::FeedingGrounds), 1) }
+!if central_wastes { !add(teleporter(Teleporter::CentralWastes), 1) }
+!if outer_ruins { !add(teleporter(Teleporter::OuterRuins), 1) }
+!if inner_ruins { !add(teleporter(Teleporter::InnerRuins), 1) }
+!if willow { !add(teleporter(Teleporter::Willow), 1) }
+!if shriek { !add(teleporter(Teleporter::Shriek), 1) }

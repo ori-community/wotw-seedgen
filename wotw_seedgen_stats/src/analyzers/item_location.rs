@@ -1,8 +1,6 @@
-use std::cmp::Ordering;
-
-use wotw_seedgen::generator::SeedSpoiler;
-
 use super::Analyzer;
+use std::cmp::Ordering;
+use wotw_seedgen::spoiler::SeedSpoiler;
 
 /// Analyzes what location an item get placed on
 pub struct ItemLocationStats {

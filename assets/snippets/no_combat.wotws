@@ -1,0 +1,59 @@
+#category("World Changes")
+#name("No Combat")
+#description("
+Skip all combat heavy parts. Shrine have their pickup floating above them before the fight
+all the arenas start as completed and all boss' combat phases are skipped")
+
+// TODO port https://github.com/SiriusAshling/wotw-seedgen/commit/ce324788abdd79ba7be5b9aa5fedc48ac2ad7dee
+
+!flag("No Combat")
+!config(skipArenas, "Skip Combat Shrines and Fight Rooms", Boolean, true)
+!config(skipBosses, "Skip Bosses (Howl, Hornbug, Mora, Kwolok, Flying Rock, Shriek)", Boolean, true)
+
+!if skipArenas {
+    on spawn {
+        store(MarshPastOpher.CombatShrineCompleted, true)
+        store(HowlsDen.CombatShrineCompleted, true)
+        store(LowerDepths.CombatShrineCompleted, true)
+        store(WoodsMain.CombatShrineCompleted, true)
+        store(WestGlades.CombatShrineCompleted, true)
+        store(MarshSpawn.CaveFight, true)
+        store(LowerReach.ArenaBeaten, true)
+        store(MarshSpawn.BurrowArena, true)
+        store(inkwaterMarshStateGroup.lizardMultiWaveArenaInt, 3)
+        store(WeepingRidge.ElevatorFightCompleted, true)
+        store(waterMillStateGroupDescriptor.rotatingEnemyArenaStates, 5)
+        store(lumaPoolsStateGroup.arenaBByteStateSerialized, 4)
+    }
+}
+
+!if skipBosses {
+    on spawn {
+        store(swampStateGroup.nightCrawlerChaseStarted, true)
+        store(MarshSpawn.HowlBurnt, true)
+        store(swampStateGroup.nightCrawlerEscaped, true)
+        store(EastHollow.BeetleDefeated, true)
+        store(kwolokGroupDescriptor.hornBugBossState, 4)
+        store(WillowsEnd.MinibossHeart, true)
+        store(willowsEndGroup.laserShooterBossState, 4)
+    }
+    on lagoonStateGroup.kwolokBossState == 3 {
+        store(lagoonStateGroup.kwolokBossState, 6)
+        warp(-1958, -4067)
+    }
+    !set_logic_state("SkipKwolok")
+    on mouldwoodDepthsGroup.spiderBossState == 2 store(mouldwoodDepthsGroup.spiderBossState, 4)
+    !set_logic_state("SkipMora1")
+    on mouldwoodDepthsGroup.spiderBossState == 5 store(mouldwoodDepthsGroup.spiderBossState, 7)
+    !set_logic_state("SkipMora2")
+    on willowsEndGroup.petrifiedOwlBossState == 1 {
+        store(willowsEndGroup.petrifiedOwlBossState, 2)
+        store(player.health, 999)
+        store(player.energy, 999)
+    }
+    on willowsEndGroup.petrifiedOwlBossState == 3 {
+        store(willowsEndGroup.petrifiedOwlBossState, 5)
+        store(gameStateGroup.gameFinished, true)
+        trigger_keybind("WarpCredits")
+    }
+}

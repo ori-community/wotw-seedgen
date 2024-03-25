@@ -1,0 +1,33 @@
+#category("World Changes")
+#name("No Quests")
+#description("
+Don't get any items for talking to npcs
+Locations behind quests, such as the Last Tree in Glades, will be available from the start")
+
+!flag("No Quests")
+
+on spawn {
+    store(npcsStateGroup.marshKeystoneQuest, 3)
+    store(questUberStateGroup.braveMokiQuest, 3)
+    store(npcsStateGroup.inkwaterWellQuest, 4)
+    store(questUberStateGroup.kwoloksWisdomQuest, 4)
+    store(questUberStateGroup.lostCompassQuest, 3)
+    store(questUberStateGroup.treeKeeperQuest, 3)
+    store(WoodsEntry.TreeSeed, true)
+    store(EastPools.KwolokAmuletQI, true)
+    store(LowerWastes.EerieGemQI, true)
+    store(GladesTown.TwillenGemQuest, true)
+    if questUberStateGroup.familyReunionQuest < 2 store(questUberStateGroup.familyReunionQuest, 2)
+    store(questUberStateGroup.darkCaveQuest, 3)
+    store(questUberStateGroup.rebuildGladesQuest, 2)
+    store(questUberStateGroup.regrowGladesQuest, 2)
+    store(questUberStateGroup.tradeSequenceQuest, 11)
+    store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 4)
+    store(hubUberStateGroup.gardenerProjectTree, 3)
+    store(_petrifiedForestGroup.hutDoorUnlocked, true)
+    store(questUberStateGroup.desertCogQuest, 5)
+}
+on GladesTown.BuildHuts {
+    store(hubUberStateGroup.fatherMokiGone, true)
+    store(questUberStateGroup.familyReunionQuest, 4)
+}

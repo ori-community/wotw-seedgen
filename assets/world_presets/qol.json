@@ -1,0 +1,12 @@
+{
+  "info": {
+    "name": "Quality of Life",
+    "description": "Enables some quality of life settings (e.g. autoplant, cutscene skips etc.)"
+  },
+  "snippets": [
+    "progress_helper",
+    "better_stomp",
+    "no_cutscenes",
+    "tp_refill"
+  ]
+}

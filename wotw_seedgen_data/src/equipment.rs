@@ -1,0 +1,64 @@
+#[cfg(feature = "serde")]
+use serde_repr::{Deserialize_repr, Serialize_repr};
+#[cfg(feature = "strum")]
+use strum::{Display, EnumString};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
+#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[repr(u8)]
+pub enum EquipSlot {
+    Ability1 = 0,
+    Ability2 = 1,
+    Ability3 = 2,
+}
+
+// TODO try for better error messages than the strum default
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
+#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[repr(u16)]
+pub enum Equipment {
+    Hammer = 1000,
+    Bow = 1001,
+    Sword = 1002,
+    Torch = 1003,
+    Swordstaff = 1004,
+    Chainsword = 1005,
+    Shot = 2000,
+    HomingMissiles = 2001,
+    Wave = 2002,
+    Whirl = 2003,
+    Glow = 2004,
+    LockOn = 2005,
+    Shield = 2006,
+    Invisibility = 2007,
+    LifeAbsorb = 2008,
+    Shards = 2009,
+    Grenade = 2010,
+    Sentry = 2011,
+    Spear = 2012,
+    Regenerate = 2013,
+    Teleport = 2014,
+    Shuriken = 2015,
+    Blaze = 2016,
+    Turret = 2017,
+    Sein = 2018,
+    Launch = 2019,
+    Bash = 3000,
+    Grapple = 3001,
+    Burrow = 3002,
+    Drill = 3003,
+    DoubleJump = 3004,
+    Flap = 3005,
+    Dash = 4000,
+    Bounce = 4001,
+    Glide = 4002,
+    ChargeJump = 4003,
+    WaterDash = 4004,
+    Climb = 4005,
+    WeaponCharge = 4006,
+    DamageUpgradeA = 4007,
+    DamageUpgradeB = 4008,
+    WaterBreath = 4009,
+}

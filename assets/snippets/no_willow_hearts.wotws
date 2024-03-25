@@ -1,0 +1,18 @@
+// TODO add some_willow_hearts functionality
+
+#category("World Changes")
+#name("No Willow Hearts")
+#description("Start with the final door in Willow's End open")
+
+!flag("No Willow Hearts")
+
+on spawn {
+    store(WillowsEnd.GlideHeart, true)
+    store(WillowsEnd.SpinLasersHeart, true)
+    store(WillowsEnd.SpinPortalsHeart, true)
+    store(WillowsEnd.MinibossHeart, true)
+    store(WillowsEnd.BurrowHeart, true)
+    store(WillowsEnd.RedirectHeart, true)
+    store(WillowsEnd.BoulderHeart, true)
+    store(WillowsEnd.GrappleWheelsHeart, true)
+}

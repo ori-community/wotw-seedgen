@@ -1,47 +1,33 @@
 mod cli;
-mod headers;
-mod log_init;
-mod play;
-mod reach_check;
+mod files;
+mod plando;
 mod seed;
 mod stats;
-mod universe_preset;
-mod world_preset;
 
-use std::process::ExitCode;
+use clap::Parser;
+use cli::Cli;
+use plando::plando;
+use seed::seed;
+use stats::stats;
+use std::fmt::{self, Debug};
 
-use bugsalot::debugger;
-use structopt::StructOpt;
-
-fn main() -> ExitCode {
-    let args = cli::SeedGen::from_args();
-
-    if args.wait_on_debugger {
-        eprintln!("waiting for debugger...");
-        debugger::wait_until_attached(None).expect("state() not implemented on this platform");
+fn main() -> Result<(), Error> {
+    let cli = Cli::parse();
+    match cli {
+        Cli::Seed { settings } => seed(settings.0),
+        Cli::Plando { args } => plando(args),
+        Cli::Stats { args } => stats(args),
     }
+}
 
-    match args.command {
-        cli::SeedGenCommand::Seed { args } => seed::generate_seeds(args),
-        cli::SeedGenCommand::Play => play::play(),
-        cli::SeedGenCommand::UniversePreset { args } => {
-            universe_preset::create_universe_preset(args)
-        }
-        cli::SeedGenCommand::WorldPreset { args } => world_preset::create_world_preset(args),
-        cli::SeedGenCommand::Stats { args } => stats::generate_stats(args),
-        cli::SeedGenCommand::CleanStatsCache => stats::clean_stats_cache(),
-        cli::SeedGenCommand::Headers {
-            headers,
-            subcommand,
-        } => headers::headers(headers, subcommand),
-        cli::SeedGenCommand::ReachCheck { args } => reach_check::reach_check(args),
-        cli::SeedGenCommand::Regenerate { args } => seed::regenerate_seed(args),
+pub struct Error(String);
+impl Debug for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
     }
-    .map_or_else(
-        |err| {
-            log::error!("{err}");
-            ExitCode::FAILURE
-        },
-        |()| ExitCode::SUCCESS,
-    )
+}
+impl<T: ToString> From<T> for Error {
+    fn from(value: T) -> Self {
+        Self(value.to_string())
+    }
 }

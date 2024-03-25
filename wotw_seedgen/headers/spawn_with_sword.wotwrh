@@ -1,8 +1,0 @@
-#category Placements
-/// Spawn with Sword
-///
-/// Start the seed with Sword as a weapon
-Flags: Spawn with Sword
-
-3|0|2|100|mute
-3|0|4|15|0|1002|mute

@@ -1,0 +1,6 @@
+#category("Quality of Life")
+#name("Fragment Overflow")
+#description("When collecting a Health or Energy fragment with the Overflow shard equipped, refill both resources instead of just the matching one")
+
+// TODO this probably doesn't do anything anymore?
+on spawn store(randoUpgrades.overflowPickupUpgrade, true)

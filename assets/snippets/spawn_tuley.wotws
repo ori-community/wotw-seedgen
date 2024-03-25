@@ -1,0 +1,5 @@
+#category("World Changes")
+#name("Spawn Tuley")
+#description("Tuley is always there in Glades")
+
+on spawn store(GladesTown.TuleySpawned, true)

@@ -1,0 +1,491 @@
+#category("Goals")
+#name("Relics")
+#description("You have to find Relics randomly scattered throughout Niwen before fighting Shriek")
+
+// TODO manage the states for the tracker: "goals.totalRelicCount", "goals.currentRelicCount", "goals.currentAreaHasUncollectedRelic"
+
+// TODO how define the constraints? Some kind of range type?
+!config(relic_chance, "Chance for each individual area of the game to have a relic", Float, 0.6)
+!config(relic_count, "If not zero, overrides relic chance. How many relics to place", Integer, 0)
+
+!if relic_count == 0 {
+    !flag("Relics (" + to_integer(relic_chance * 100) + "%)")
+}
+!if relic_count != 0 {
+    !flag("Relics (" + relic_count + ")")
+}
+
+!include("progress_helper")
+!include("goal_mode_core")
+
+!state(inkwater_relic_collected, Boolean)
+!state(hollow_relic_collected, Boolean)
+!state(glades_relic_collected, Boolean)
+!state(wellspring_relic_collected, Boolean)
+!state(woods_relic_collected, Boolean)
+!state(reach_relic_collected, Boolean)
+!state(depths_relic_collected, Boolean)
+!state(luma_relic_collected, Boolean)
+!state(wastes_relic_collected, Boolean)
+!state(willow_relic_collected, Boolean)
+!state(burrows_relic_collected, Boolean)
+
+// TODO flavour messages
+!if relic_count == 0 {
+    !random_float(inkwater_relic, 0, 1)
+    !if inkwater_relic <= relic_chance {
+        !preplace({
+            item_message("@Inkwater Relic@")
+            store(inkwater_relic_collected, true)
+        }, Zone::Inkwater)
+        !let(inkwater_relic_exists, true)
+    }
+    !if inkwater_relic > relic_chance {
+        !let(inkwater_relic_exists, false)
+    }
+    !random_float(hollow_relic, 0, 1)
+    !if hollow_relic <= relic_chance {
+        !preplace({
+            item_message("@Hollow Relic@")
+            store(hollow_relic_collected, true)
+        }, Zone::Hollow)
+        !let(hollow_relic_exists, true)
+    }
+    !if hollow_relic > relic_chance {
+        !let(hollow_relic_exists, false)
+    }
+    !random_float(glades_relic, 0, 1)
+    !if glades_relic <= relic_chance {
+        !preplace({
+            item_message("@Glades Relic@")
+            store(glades_relic_collected, true)
+        }, Zone::Glades)
+        !let(glades_relic_exists, true)
+    }
+    !if glades_relic > relic_chance {
+        !let(glades_relic_exists, false)
+    }
+    !random_float(wellspring_relic, 0, 1)
+    !if wellspring_relic <= relic_chance {
+        !preplace({
+            item_message("@Wellspring Relic@")
+            store(wellspring_relic_collected, true)
+        }, Zone::Wellspring)
+        !let(wellspring_relic_exists, true)
+    }
+    !if wellspring_relic > relic_chance {
+        !let(wellspring_relic_exists, false)
+    }
+    !random_float(woods_relic, 0, 1)
+    !if woods_relic <= relic_chance {
+        !preplace({
+            item_message("@Woods Relic@")
+            store(woods_relic_collected, true)
+        }, Zone::Woods)
+        !let(woods_relic_exists, true)
+    }
+    !if woods_relic > relic_chance {
+        !let(woods_relic_exists, false)
+    }
+    !random_float(reach_relic, 0, 1)
+    !if reach_relic <= relic_chance {
+        !preplace({
+            item_message("@Reach Relic@")
+            store(reach_relic_collected, true)
+        }, Zone::Reach)
+        !let(reach_relic_exists, true)
+    }
+    !if reach_relic > relic_chance {
+        !let(reach_relic_exists, false)
+    }
+    !random_float(depths_relic, 0, 1)
+    !if depths_relic <= relic_chance {
+        !preplace({
+            item_message("@Depths Relic@")
+            store(depths_relic_collected, true)
+        }, Zone::Depths)
+        !let(depths_relic_exists, true)
+    }
+    !if depths_relic > relic_chance {
+        !let(depths_relic_exists, false)
+    }
+    !random_float(luma_relic, 0, 1)
+    !if luma_relic <= relic_chance {
+        !preplace({
+            item_message("@Luma Relic@")
+            store(luma_relic_collected, true)
+        }, Zone::Luma)
+        !let(luma_relic_exists, true)
+    }
+    !if luma_relic > relic_chance {
+        !let(luma_relic_exists, false)
+    }
+    !random_float(wastes_relic, 0, 1)
+    !if wastes_relic <= relic_chance {
+        !preplace({
+            item_message("@Wastes Relic@")
+            store(wastes_relic_collected, true)
+        }, Zone::Wastes)
+        !let(wastes_relic_exists, true)
+    }
+    !if wastes_relic > relic_chance {
+        !let(wastes_relic_exists, false)
+    }
+    !random_float(willow_relic, 0, 1)
+    !if willow_relic <= relic_chance {
+        !preplace({
+            item_message("@Willow Relic@")
+            store(willow_relic_collected, true)
+        }, Zone::Willow)
+        !let(willow_relic_exists, true)
+    }
+    !if willow_relic > relic_chance {
+        !let(willow_relic_exists, false)
+    }
+    !random_float(burrows_relic, 0, 1)
+    !if burrows_relic <= relic_chance {
+        !preplace({
+            item_message("@Burrows Relic@")
+            store(burrows_relic_collected, true)
+        }, Zone::Burrows)
+        !let(burrows_relic_exists, true)
+    }
+    !if burrows_relic > relic_chance {
+        !let(burrows_relic_exists, false)
+    }
+}
+!if relic_count > 0 {
+    !random_pool(relics, String, ["inkwater", "hollow", "glades", "wellspring", "woods", "reach", "depths", "luma", "wastes", "willow", "burrows"])
+    !repeat relic_count {
+        !random_from_pool(relic, relics)
+        !if relic == "inkwater" {
+            !preplace({
+                item_message("@Inkwater Relic@")
+                store(inkwater_relic_collected, true)
+            }, Zone::Inkwater)
+            !let(inkwater_relic_exists, true)
+        }
+        !if relic == "hollow" {
+            !preplace({
+                item_message("@Hollow Relic@")
+                store(hollow_relic_collected, true)
+            }, Zone::Hollow)
+            !let(hollow_relic_exists, true)
+        }
+        !if relic == "glades" {
+            !preplace({
+                item_message("@Glades Relic@")
+                store(glades_relic_collected, true)
+            }, Zone::Glades)
+            !let(glades_relic_exists, true)
+        }
+        !if relic == "wellspring" {
+            !preplace({
+                item_message("@Wellspring Relic@")
+                store(wellspring_relic_collected, true)
+            }, Zone::Wellspring)
+            !let(wellspring_relic_exists, true)
+        }
+        !if relic == "woods" {
+            !preplace({
+                item_message("@Woods Relic@")
+                store(woods_relic_collected, true)
+            }, Zone::Woods)
+            !let(woods_relic_exists, true)
+        }
+        !if relic == "reach" {
+            !preplace({
+                item_message("@Reach Relic@")
+                store(reach_relic_collected, true)
+            }, Zone::Reach)
+            !let(reach_relic_exists, true)
+        }
+        !if relic == "depths" {
+            !preplace({
+                item_message("@Depths Relic@")
+                store(depths_relic_collected, true)
+            }, Zone::Depths)
+            !let(depths_relic_exists, true)
+        }
+        !if relic == "luma" {
+            !preplace({
+                item_message("@Luma Relic@")
+                store(luma_relic_collected, true)
+            }, Zone::Luma)
+            !let(luma_relic_exists, true)
+        }
+        !if relic == "wastes" {
+            !preplace({
+                item_message("@Wastes Relic@")
+                store(wastes_relic_collected, true)
+            }, Zone::Wastes)
+            !let(wastes_relic_exists, true)
+        }
+        !if relic == "willow" {
+            !preplace({
+                item_message("@Willow Relic@")
+                store(willow_relic_collected, true)
+            }, Zone::Willow)
+            !let(willow_relic_exists, true)
+        }
+        !if relic == "burrows" {
+            !preplace({
+                item_message("@Burrows Relic@")
+                store(burrows_relic_collected, true)
+            }, Zone::Burrows)
+            !let(burrows_relic_exists, true)
+        }
+    }
+    !repeat 11 - relic_count {
+        !random_from_pool(relic, relics)
+        !if relic == "inkwater" { !let(inkwater_relic_exists, false) }
+        !if relic == "hollow" { !let(hollow_relic_exists, false) }
+        !if relic == "glades" { !let(glades_relic_exists, false) }
+        !if relic == "wellspring" { !let(wellspring_relic_exists, false) }
+        !if relic == "woods" { !let(woods_relic_exists, false) }
+        !if relic == "reach" { !let(reach_relic_exists, false) }
+        !if relic == "depths" { !let(depths_relic_exists, false) }
+        !if relic == "luma" { !let(luma_relic_exists, false) }
+        !if relic == "wastes" { !let(wastes_relic_exists, false) }
+        !if relic == "willow" { !let(willow_relic_exists, false) }
+        !if relic == "burrows" { !let(burrows_relic_exists, false) }
+    }
+}
+
+!let(total_relic_count, 0)
+!if inkwater_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if hollow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if glades_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if wellspring_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if woods_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if reach_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if depths_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if luma_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if wastes_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+
+!on_callback("progress_helper", write_progress_message, {
+    count_relics()
+    set_string("outer_color", "")
+    if get_integer("relic_count") == total_relic_count set_string("outer_color", "$")
+    write_relics_message()
+    set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
+})
+
+!on_callback("goal_mode_core", check_goals_completed, {
+    count_relics()
+    if get_integer("relic_count") < total_relic_count set_boolean("goals_completed", false)
+})
+
+!on_callback("goal_mode_core", write_goals_incomplete_message, {
+    count_relics()
+    if get_integer("relic_count") < total_relic_count {
+        set_string("outer_color", "@")
+        write_relics_message()
+        set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("relics_message"))
+    }
+})
+
+!if inkwater_relic_exists {
+    fun write_inkwater_relic() {
+        set_string("color", "")
+        if current_zone() == Zone::Inkwater {
+            set_string("color", "#")
+        }
+        if inkwater_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Inkwater" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if inkwater_relic_exists == false { fun write_inkwater_relic() {} }
+!if hollow_relic_exists {
+    fun write_hollow_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Hollow {
+            set_string("color", "#")
+        }
+        if hollow_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Hollow" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if hollow_relic_exists == false { fun write_hollow_relic() {} }
+!if glades_relic_exists {
+    fun write_glades_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Glades {
+            set_string("color", "#")
+        }
+        if glades_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Glades" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if glades_relic_exists == false { fun write_glades_relic() {} }
+!if wellspring_relic_exists {
+    fun write_wellspring_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Wellspring {
+            set_string("color", "#")
+        }
+        if wellspring_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Wellspring" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if wellspring_relic_exists == false { fun write_wellspring_relic() {} }
+!if woods_relic_exists {
+    fun write_woods_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Woods {
+            set_string("color", "#")
+        }
+        if woods_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Woods" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if woods_relic_exists == false { fun write_woods_relic() {} }
+!if reach_relic_exists {
+    fun write_reach_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Reach {
+            set_string("color", "#")
+        }
+        if reach_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Reach" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if reach_relic_exists == false { fun write_reach_relic() {} }
+!if depths_relic_exists {
+    fun write_depths_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Depths {
+            set_string("color", "#")
+        }
+        if depths_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Depths" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if depths_relic_exists == false { fun write_depths_relic() {} }
+!if luma_relic_exists {
+    fun write_luma_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Luma {
+            set_string("color", "#")
+        }
+        if luma_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Luma" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if luma_relic_exists == false { fun write_luma_relic() {} }
+!if wastes_relic_exists {
+    fun write_wastes_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Wastes {
+            set_string("color", "#")
+        }
+        if wastes_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Wastes" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if wastes_relic_exists == false { fun write_wastes_relic() {} }
+!if willow_relic_exists {
+    fun write_willow_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Willow {
+            set_string("color", "#")
+        }
+        if willow_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Willow" + get_string("color"))
+        set_boolean("comma", true)
+    }
+}
+!if willow_relic_exists == false { fun write_willow_relic() {} }
+!if burrows_relic_exists {
+    fun write_burrows_relic() {
+        relics_add_comma()
+        set_string("color", "")
+        if current_zone() == Zone::Burrows {
+            set_string("color", "#")
+        }
+        if burrows_relic_collected {
+            set_string("color", "$")
+        }
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Burrows" + get_string("color"))
+    }
+}
+!if burrows_relic_exists == false { fun write_burrows_relic() {} }
+
+fun count_relics() {
+    set_integer("relic_count", 0)
+    if inkwater_relic_collected increment_relic_count()
+    if hollow_relic_collected increment_relic_count()
+    if glades_relic_collected increment_relic_count()
+    if wellspring_relic_collected increment_relic_count()
+    if woods_relic_collected increment_relic_count()
+    if reach_relic_collected increment_relic_count()
+    if depths_relic_collected increment_relic_count()
+    if luma_relic_collected increment_relic_count()
+    if wastes_relic_collected increment_relic_count()
+    if willow_relic_collected increment_relic_count()
+    if burrows_relic_collected increment_relic_count()
+}
+fun increment_relic_count() {
+    set_integer("relic_count", get_integer("relic_count") + 1)
+}
+
+// TODO some primary area names have changed
+fun write_relics_message() {
+    set_string("relics_message", get_string("outer_color") + "Relics (" + get_integer("relic_count") + "/" + total_relic_count + "): ")
+    set_boolean("comma", false)
+    write_inkwater_relic()
+    write_hollow_relic()
+    write_glades_relic()
+    write_wellspring_relic()
+    write_woods_relic()
+    write_reach_relic()
+    write_depths_relic()
+    write_luma_relic()
+    write_wastes_relic()
+    write_willow_relic()
+    write_burrows_relic()
+    set_string("relics_message", get_string("relics_message") + get_string("outer_color"))
+}
+fun relics_add_comma() {
+    if get_boolean("comma") set_string("progress_message", get_string("progress_message") + ", ")
+}

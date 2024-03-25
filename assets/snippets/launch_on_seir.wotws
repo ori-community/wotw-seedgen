@@ -1,0 +1,7 @@
+#category("Placements")
+#name("Launch on Seir")
+#description("Launch will always be on Seir")
+
+!flag("Launch on Seir")
+
+on WindtornRuins.Seir skill(Skill::Launch)

@@ -1,0 +1,9 @@
+#category("Placements")
+#name("Spawn with Sword")
+#description("Start the seed with Sword as a weapon")
+
+// TODO do it without showing messages?
+on spawn {
+    skill(Skill::Sword)
+    equip(EquipSlot::Ability1, Equipment::Sword)
+}

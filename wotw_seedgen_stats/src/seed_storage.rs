@@ -1,6 +1,6 @@
 use std::{
     fmt::Write,
-    iter,
+    io, iter,
     num::NonZeroUsize,
     sync::{
         atomic::{AtomicUsize, Ordering},
@@ -9,26 +9,31 @@ use std::{
     thread,
 };
 
+use itertools::Itertools;
 use wotw_seedgen::{
-    files::FILE_SYSTEM_ACCESS, generator::SeedSpoiler, settings::UniverseSettings, world::Graph,
+    assets::{SnippetAccess, UberStateData},
+    logic_language::output::Graph,
+    settings::UniverseSettings,
+    spoiler::SeedSpoiler,
 };
 
-use itertools::Itertools;
 use rustc_hash::FxHashMap;
 
-use crate::{files::FileAccess, handle_errors::HandleErrors, ChainedAnalyzers, Result};
+use crate::{files::SeedStorageAccess, handle_errors::HandleErrors, ChainedAnalyzers, Result};
 
 const DEFAULT_ERROR_MESSAGE_LIMIT: usize = 10;
 const ANOTHER_THREAD_PANICKED: &str = "Another thread panicked";
 
 pub(crate) type SeedData = FxHashMap<Vec<Arc<String>>, u32>;
-pub(crate) fn analyze<F: FileAccess>(
+pub(crate) fn analyze<F: SeedStorageAccess, SA: SnippetAccess + Sync>(
     analyzers: &[ChainedAnalyzers],
     settings: &UniverseSettings,
     sample_size: usize,
     tolerated_errors: Option<usize>,
     error_message_limit: Option<usize>,
     graph: &Graph,
+    snippet_access: &SA,
+    uber_state_data: &UberStateData,
 ) -> Result<Vec<SeedData>> {
     let mut data = iter::repeat(FxHashMap::<_, u32>::default())
         .take(analyzers.len())
@@ -39,6 +44,7 @@ pub(crate) fn analyze<F: FileAccess>(
     let missing = sample_size.saturating_sub(existing_amount);
     if missing > 0 {
         let available = thread::available_parallelism().map_or(4, NonZeroUsize::get);
+        // TODO simplify this to a shared usize that all threads take from
         let mut remainder = iter::repeat(1).take(missing % available);
         let sample_size_per_thread = iter::repeat(missing / available)
             .map(|sample_size| sample_size + remainder.next().unwrap_or(0))
@@ -75,7 +81,9 @@ pub(crate) fn analyze<F: FileAccess>(
                         let seed = loop {
                             match wotw_seedgen::generate_seed(
                                 graph,
-                                &FILE_SYSTEM_ACCESS,
+                                snippet_access,
+                                uber_state_data,
+                                &mut io::stderr(),
                                 &settings,
                             ) {
                                 Ok(seed) => break seed.spoiler,
@@ -130,7 +138,7 @@ pub(crate) fn analyze<F: FileAccess>(
     }
 }
 
-fn analyze_existing_seeds<F: FileAccess>(
+fn analyze_existing_seeds<F: SeedStorageAccess>(
     analyzers: &[ChainedAnalyzers],
     settings: &UniverseSettings,
     sample_size: usize,

@@ -6,15 +6,19 @@ mod seed_storage;
 use std::{cmp::Ordering, fmt::Write, sync::Arc, time::Instant};
 
 use analyzers::Analyzer;
-use files::FileAccess;
+use files::SeedStorageAccess;
 use itertools::Itertools;
 use rustc_hash::FxHashMap;
-use wotw_seedgen::{settings::UniverseSettings, world::Graph};
+use wotw_seedgen::{
+    assets::{SnippetAccess, UberStateData},
+    logic_language::output::Graph,
+    settings::UniverseSettings,
+};
 
 type Result<T> = std::result::Result<T, String>;
 
 /// Arguments passed to [`stats`]
-pub struct StatsArgs<'graph> {
+pub struct StatsArgs<'graph, 'access, 'uberstates, A: SnippetAccess + Sync> {
     /// The [`UniverseSettings`] to generate seeds with
     pub settings: UniverseSettings,
     /// How many seeds to analyze
@@ -28,10 +32,18 @@ pub struct StatsArgs<'graph> {
     /// [`SpawnLocationStats`]: (analyzers::SpawnLocationStats)
     /// [`ZoneUnlockStats`]: (analyzers::ZoneUnlockStats)
     pub analyzers: Vec<ChainedAnalyzers>,
-    /// The logical [`Graph`]
+    /// The logical [`Graph`] passed to seedgen
     ///
     /// You can obtain this from the seedgen library using [`wotw_seedgen::logic::parse_logic`]
     pub graph: &'graph Graph,
+    /// The [`SnippetAccess`] passed to seedgen
+    ///
+    /// TODO how can you obtain this
+    pub snippet_access: &'access A,
+    /// The [`UberStateData`] passed to seedgen
+    ///
+    /// TODO how can you obtain this
+    pub uber_state_data: &'uberstates UberStateData,
     /// How many errors during seed generation should be tolerated before aborting
     ///
     /// If `None`, this will default to a value based on `sample_size`
@@ -89,7 +101,9 @@ impl Stats {
 /// Generates a set of stats
 ///
 /// See [`StatsArgs`] for more details on the passed arguments
-pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
+pub fn stats<A: SeedStorageAccess, A2: SnippetAccess + Sync>(
+    args: StatsArgs<A2>,
+) -> Result<Vec<Stats>> {
     let now = Instant::now();
 
     let StatsArgs {
@@ -97,13 +111,15 @@ pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
         sample_size,
         analyzers,
         graph,
+        snippet_access,
+        uber_state_data,
         tolerated_errors,
         error_message_limit,
         overwrite_seed_storage,
     } = args;
 
     if overwrite_seed_storage {
-        F::clean_seeds(&settings)?;
+        A::clean_seeds(&settings)?;
         eprintln!("Cleaned seed storage for these settings");
     }
 
@@ -111,13 +127,15 @@ pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
         return Err("Multiworld seeds aren't well supported yet".to_string());
     }
 
-    let data = seed_storage::analyze::<F>(
+    let data = seed_storage::analyze::<A, A2>(
         &analyzers,
         &settings,
         sample_size,
         tolerated_errors,
         error_message_limit,
         graph,
+        snippet_access,
+        uber_state_data,
     )?;
 
     let stats = data
@@ -126,8 +144,7 @@ pub fn stats<F: FileAccess>(args: StatsArgs) -> Result<Vec<Stats>> {
         .map(|(data, analyzers)| Stats { analyzers, data })
         .collect();
 
-    let elapsed = now.elapsed();
-    eprintln!("Generated stats in {:.1}s", elapsed.as_secs_f32());
+    eprintln!("Generated stats in {:.1}s", now.elapsed().as_secs_f32());
 
     Ok(stats)
 }

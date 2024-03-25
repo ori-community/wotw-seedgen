@@ -1,6 +1,5 @@
-use wotw_seedgen::generator::SeedSpoiler;
-
 use super::Analyzer;
+use wotw_seedgen::spoiler::SeedSpoiler;
 
 /// Analyzes the spawn items
 pub struct SpawnItemCountStats;

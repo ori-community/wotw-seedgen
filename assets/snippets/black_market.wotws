@@ -1,0 +1,75 @@
+#category("Placements")
+#name("Black Market")
+#description(
+"Opher sells Keystones from the Black Market. These Keystones are never required to beat the seed.
+Supply lasts indefinitely, but the price grows with the demand.")
+
+!config(keystones, "Let Opher sell Keystones", Boolean, true)
+!config(ores, "Let Twillen sell Gorlek Ore", Boolean, true)
+
+!use_icon(keystone_icon, "assets/icons/game/keystone.png")
+!use_icon(ore_icon, "assets/icons/game/gorlekore.png")
+
+!if keystones {
+    !state(keystones_purchased, Integer)
+
+    on reload {
+        disable_server_sync(OpherShop.Teleport)
+        keystone_price()
+        set_shop_item_data(
+            OpherShop.Teleport,
+            get_integer("keystone_price"),
+            "Black Market Keystone",
+            "If anyone asks, you found it in a cave!",
+            keystone_icon,
+        )
+    }
+    on OpherShop.Teleport {
+        store(OpherShop.Teleport, false)
+        keystone()
+        store(keystones_purchased, keystones_purchased + 1)
+        keystone_price()
+        set_shop_item_price(OpherShop.Teleport, get_integer("keystone_price"))
+    }
+
+    fun keystone_price() {
+        if keystones_purchased <= 3 {
+            set_integer("keystone_price", (keystones_purchased + 1) * 200)
+        }
+        if keystones_purchased > 3 {
+            set_integer("keystone_price", 1000)
+        }
+    }
+}
+
+!if ores {
+    !state(ores_purchased, Integer)
+
+    on reload {
+        disable_server_sync(TwillenShop.LightHarvest)
+        ore_price()
+        set_shop_item_data(
+            TwillenShop.LightHarvest,
+            get_integer("ore_price"),
+            "Black Market Ore",
+            "If anyone asks, you found it in the Gorlek Mines!",
+            ore_icon,
+        )
+    }
+    on TwillenShop.LightHarvest {
+        store(TwillenShop.LightHarvest, false)
+        gorlek_ore()
+        store(ores_purchased, ores_purchased + 1)
+        ore_price()
+        set_shop_item_price(TwillenShop.LightHarvest, get_integer("ore_price"))
+    }
+
+    fun ore_price() {
+        if ores_purchased <= 3 {
+            set_integer("ore_price", (ores_purchased + 1) * 200)
+        }
+        if ores_purchased > 3 {
+            set_integer("ore_price", 1000)
+        }
+    }
+}

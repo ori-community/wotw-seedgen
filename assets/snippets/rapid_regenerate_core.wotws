@@ -1,0 +1,72 @@
+#hide
+#name("Rapid Regenerate Core")
+#description("Adds support for toggleable Rapid Regenerate")
+
+!state(enabled, Boolean)
+!state(collected, Integer)
+
+!include("bonus_core")
+!use("bonus_core", update_bonus_wheel)
+
+!use_icon(rapid_regenerate_icon, "assets/icons/bonus/rapidregenerate.png")
+
+!on_callback("bonus_core", any_collected, if collected > 0 set_boolean("any_collected", true))
+!on_callback("bonus_core", any_enabled, if enabled set_boolean("any_enabled", true))
+!on_callback("bonus_core", enable_all, if enabled == false enable())
+!on_callback("bonus_core", disable_all, if enabled disable())
+
+fun rapid_regenerate() {
+    item_message("#Rapid Regenerate x" + (collected + 1) + "#") // TODO I don't think this item message is used in the display
+    store(collected, collected + 1)
+}
+!share(rapid_regenerate)
+
+!item_data(
+    rapid_regenerate(),
+    "#Rapid Regenerate#",
+    200,
+    "Heal faster with Regenerate",
+    rapid_regenerate_icon,
+    MapIcon::BonusItem
+)
+
+fun enable() {
+    store(enabled, true)
+    set_wheel_item_disable()
+    update_bonus_wheel()
+    store(randoUpgrades.regenerateSpeed, collected * 0.25)
+}
+fun disable() {
+    store(enabled, false)
+    set_wheel_item_enable()
+    update_bonus_wheel()
+    store(randoUpgrades.regenerateSpeed, 0)
+}
+
+on reload {
+    if collected > 0 {
+        create_wheel_item()
+    }
+}
+on collected == 1 create_wheel_item()
+
+fun create_wheel_item() {
+    set_wheel_item_name("bonus_upgrade", WheelItemPosition::BottomRight, "Toggle Rapid Regenerate")
+    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::BottomRight, rapid_regenerate_icon)
+    if enabled {
+        set_wheel_item_disable()
+    }
+    if enabled == false {
+        set_wheel_item_enable()
+    }
+}
+fun set_wheel_item_disable() {
+    set_wheel_item_description("bonus_upgrade", WheelItemPosition::BottomRight, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", WheelItemPosition::BottomRight, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", WheelItemPosition::BottomRight, WheelBind::All, disable())
+}
+fun set_wheel_item_enable() {
+    set_wheel_item_description("bonus_upgrade", WheelItemPosition::BottomRight, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", WheelItemPosition::BottomRight, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", WheelItemPosition::BottomRight, WheelBind::All, enable())
+}

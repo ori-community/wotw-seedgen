@@ -1,8 +1,6 @@
-use std::num::NonZeroUsize;
-
-use wotw_seedgen::{generator::SeedSpoiler, util::Zone};
-
 use super::Analyzer;
+use std::num::NonZeroUsize;
+use wotw_seedgen::{data::Zone, spoiler::SeedSpoiler};
 
 /// Analyzes when zones unlock
 ///

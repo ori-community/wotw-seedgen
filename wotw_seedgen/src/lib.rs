@@ -8,116 +8,52 @@
 #![allow(clippy::too_many_lines)]
 #![allow(clippy::struct_excessive_bools)]
 
-pub mod files;
-pub mod generator;
-pub mod inventory;
-pub mod item;
-pub mod languages;
-pub mod preset;
-mod reach_check;
-pub mod settings;
-pub mod uber_state;
-pub mod util;
-pub mod world;
+pub use wotw_seedgen_assembly as assembly;
+pub use wotw_seedgen_assets as assets;
+pub use wotw_seedgen_data as data;
+pub use wotw_seedgen_logic_language as logic_language;
+pub use wotw_seedgen_seed_language as seed_language;
+pub use wotw_seedgen_settings as settings;
 
-pub use generator::generate_seed;
-pub use inventory::Inventory;
-pub use item::{Item, VItem};
-pub use languages::{
-    header::{self, Header},
-    logic,
-};
-pub use reach_check::reach_check;
-pub use world::World;
+mod common_item;
+mod generator;
+mod inventory;
+mod logical_difficulty;
+mod orbs;
+#[cfg(test)]
+mod tests;
+mod world;
 
-pub const VERSION: &str = concat!(env!("CARGO_PKG_VERSION"), "-", env!("VERGEN_GIT_SHA"));
+pub use common_item::CommonItem;
+pub use generator::{generate_seed, item_pool, spoiler, Seed};
+pub use world::{Player, Simulate, UberStates, World};
+
+pub(crate) use world::{filter_redundancies, node_condition, node_trigger};
+
+// TODO use this and also set the other metadata: current world, format version, settings
+// TODO look into having the commit hash again
+pub const VERSION: &str = concat!(env!("CARGO_PKG_VERSION"));
 
 mod log {
     macro_rules! trace {
         ($($arg:tt)+) => {{
-            #[cfg(feature = "log")]
+            #[cfg(any(feature = "log", test))]
             ::log::trace!($($arg)+)
         }}
     }
     pub(crate) use trace;
     macro_rules! info {
         ($($arg:tt)+) => {{
-            #[cfg(feature = "log")]
+            #[cfg(any(feature = "log", test))]
             ::log::info!($($arg)+)
         }}
     }
     pub(crate) use info;
     macro_rules! warning {
         ($($arg:tt)+) => {{
-            #[cfg(feature = "log")]
+            #[cfg(any(feature = "log", test))]
             ::log::warn!($($arg)+)
         }}
     }
     pub(crate) use warning; // warn is a built in attribute
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        files::FILE_SYSTEM_ACCESS,
-        preset::{UniversePreset, WorldPreset},
-        settings::{Difficulty, UniverseSettings},
-    };
-
-    use super::*;
-
-    #[test]
-    fn some_seeds() {
-        let mut universe_settings = UniverseSettings::default();
-        let areas = files::read_file("areas", "wotw", "logic").unwrap();
-        let locations = files::read_file("loc_data", "csv", "logic").unwrap();
-        let states = files::read_file("state_data", "csv", "logic").unwrap();
-        let mut graph =
-            logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
-
-        eprintln!("Default settings ({})", universe_settings.seed);
-        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
-
-        universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
-        graph = logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
-        eprintln!("Unsafe ({})", universe_settings.seed);
-        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
-
-        universe_settings.world_settings[0].headers = [
-            "bingo".to_string(),
-            "bonus+".to_string(),
-            "glades_done".to_string(),
-            "launch_fragments".to_string(),
-            "launch_from_bingo".to_string(),
-            "no_combat".to_string(),
-            "no_ks_doors".to_string(),
-            "no_quests".to_string(),
-            "no_willow_hearts".to_string(),
-            "open_mode".to_string(),
-            "spawn_with_sword".to_string(),
-            "util_twillen".to_string(),
-            "vanilla_opher_upgrades".to_string(),
-            "bonus_opher_upgrades".to_string(),
-        ]
-        .into_iter()
-        .collect();
-
-        for preset in ["gorlek", "rspawn"] {
-            let preset = WorldPreset::read_file(preset, &FILE_SYSTEM_ACCESS).unwrap();
-            universe_settings.world_settings[0]
-                .apply_world_preset(preset, &FILE_SYSTEM_ACCESS)
-                .unwrap();
-        }
-
-        let preset = UniversePreset {
-            world_settings: Some(vec![WorldPreset::default(); 2]),
-            ..UniversePreset::default()
-        };
-        universe_settings
-            .apply_preset(preset, &FILE_SYSTEM_ACCESS)
-            .unwrap();
-
-        eprintln!("Gorlek with headers ({})", universe_settings.seed);
-        generate_seed(&graph, &FILE_SYSTEM_ACCESS, &universe_settings).unwrap();
-    }
 }

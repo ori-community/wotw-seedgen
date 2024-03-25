@@ -1,0 +1,56 @@
+#category("Goals")
+#name("All Trees")
+#description("Require visiting all Trees before fighting Shriek")
+
+!flag("All Trees")
+!include("goal_mode_core")
+
+!on_callback("goal_mode_core", write_goal_progress_message, {
+    if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
+    set_boolean("comma", true)
+    count_trees()
+    set_string("color", "")
+    if get_integer("tree_count") == 14 set_string("color", "$")
+    write_trees_message()
+    set_string("goal_progress_message", get_string("goal_progress_message") + get_string("trees_message"))
+})
+
+!on_callback("goal_mode_core", check_goals_completed, {
+    count_trees()
+    if get_integer("tree_count") < 14 set_boolean("goals_completed", false)
+})
+
+// TODO maybe do a fancier feedback message pointing out what exactly you are missing?
+!on_callback("goal_mode_core", write_goals_incomplete_message, {
+    count_trees()
+    if get_integer("tree_count") < 14 {
+        set_string("color", "@")
+        write_trees_message()
+        set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("trees_message"))
+    }
+})
+
+fun count_trees() {
+    set_integer("tree_count", 0)
+    if MarshSpawn.RegenTree increment_tree_count()
+    if MarshSpawn.DamageTree increment_tree_count()
+    if HowlsDen.SwordTree increment_tree_count()
+    if HowlsDen.DoubleJumpTree increment_tree_count()
+    if MarshPastOpher.BowTree increment_tree_count()
+    if WestHollow.DashTree increment_tree_count()
+    if EastHollow.BashTree increment_tree_count()
+    if GladesTown.DamageTree increment_tree_count()
+    if InnerWellspring.GrappleTree increment_tree_count()
+    if UpperReach.LightBurstTree increment_tree_count()
+    if UpperPools.SwimDashTree increment_tree_count()
+    if LowerDepths.FlashTree increment_tree_count()
+    if LowerWastes.BurrowTree increment_tree_count()
+    if WeepingRidge.LaunchTree increment_tree_count()
+}
+fun increment_tree_count() {
+    set_integer("tree_count", get_integer("tree_count") + 1)
+}
+
+fun write_trees_message() {
+    set_string("trees_message", get_string("color") + "Trees: " + get_integer("tree_count") + "/17" + get_string("color"))
+}

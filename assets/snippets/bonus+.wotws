@@ -1,0 +1,217 @@
+#category("Item Pool")
+#name("Bonus+")
+#description("Game balance is now optional")
+
+!flag("Bonus+")
+
+!include("rapid_hammer_core")
+!use("rapid_hammer_core", rapid_hammer)
+!include("rapid_sword_core")
+!use("rapid_sword_core", rapid_sword)
+!include("rapid_spear_core")
+!use("rapid_spear_core", rapid_spear)
+!include("rapid_regenerate_core")
+!use("rapid_regenerate_core", rapid_regenerate)
+
+!config(rapid_hammers, "How many Rapid Hammers to shuffle in", Integer, 3)
+!config(rapid_swords, "How many Rapid Swords to shuffle in", Integer, 3)
+!config(rapid_spears, "How many Rapid Spears to shuffle in", Integer, 2)
+!config(rapid_regenerates, "How many Rapid Regenerate to shuffle in", Integer, 1)
+!config(rapid_grenades, "How many Rapid Grenade to shuffle in", Integer, 2)
+!config(quickshot_upgrades, "How many Quickshot upgrade to shuffle in", Integer, 2)
+!config(melting_blazes, "How many Melting Blaze to shuffle in", Integer, 1)
+!config(melting_swords, "How many Melting Sword to shuffle in", Integer, 1)
+!config(melting_shurikens, "How many Melting Shuriken to shuffle in", Integer, 1)
+!config(uncharged_bashnades, "How many Uncharged Bashgrenades to shuffle in", Integer, 1)
+!config(extra_grenades, "How many Extra Grenade to shuffle in", Integer, 1)
+!config(splinter_grenades, "How many Splinter Grenade to shuffle in", Integer, 2)
+!config(unlimited_sentries, "How many Unlimited Sentries to shuffle in", Integer, 1)
+!config(sentry_burst_upgrades, "How many Sentry Burst Upgrades to shuffle in", Integer, 1)
+!config(sentry_fire_rate_upgrades, "How many Sentry Fire Rate Upgrades to shuffle in", Integer, 1)
+!config(extra_shurikens, "How many Extra Shurikens to shuffle in", Integer, 1)
+!config(splinter_shurikens, "How many Splinter Shurikens to shuffle in", Integer, 2)
+!config(bashable_shurikens, "How many Bashable Shurikens to shuffle in", Integer, 1)
+
+!use_icon(rapid_regenerate_icon, "assets/icons/bonus/rapidregen.png")
+!use_icon(rapid_grenade_icon, "assets/icons/bonus/rapidgrenade.png")
+!use_icon(quickshot_upgrade_icon, "assets/icons/bonus/rapidquickshot.png")
+!use_icon(melting_blaze_icon, "assets/icons/bonus/meltingblaze.png")
+!use_icon(melting_sword_icon, "assets/icons/bonus/meltingsword.png")
+!use_icon(melting_shuriken_icon, "assets/icons/bonus/meltingshuriken.png")
+!use_icon(uncharged_bashnade_icon, "assets/icons/bonus/unchargedbashgrenade.png")
+!use_icon(extra_grenade_icon, "assets/icons/bonus/extragrenade.png")
+!use_icon(splinter_grenade_icon, "assets/icons/bonus/splintergrenade.png")
+!use_icon(unlimited_sentries_icon, "assets/icons/bonus/unlimitedsentries.png")
+!use_icon(sentry_burst_upgrade_icon, "assets/icons/bonus/sentryburstupgrade.png")
+!use_icon(sentry_fire_rate_upgrade_icon, "assets/icons/bonus/sentryattackspeed.png")
+!use_icon(extra_shuriken_icon, "assets/icons/bonus/extrashuriken.png")
+!use_icon(splinter_shuriken_icon, "assets/icons/bonus/splintershuriken.png")
+!use_icon(bashable_shuriken_icon, "assets/icons/bonus/bashableshuriken.png")
+
+!add(rapid_hammer(), rapid_hammers)
+!add(rapid_sword(), rapid_swords)
+!add(rapid_spear(), rapid_spears)
+!add(rapid_regenerate(), rapid_regenerates)
+
+// TODO take a look at bonus uberState names
+
+fun rapid_grenade() { store(randoUpgrades.grenadeChargeTimeModifier, randoUpgrades.grenadeChargeTimeModifier - 0.5) }
+!add(rapid_grenade(), rapid_grenades)
+!item_data(
+    rapid_grenade(),
+    "#Rapid Grenade#",
+    200,
+    "Grenade attacks are faster",
+    rapid_grenade_icon,
+    MapIcon::BonusItem
+)
+
+fun quickshot_upgrade() { store(randoUpgrades.bowRapidFireMultiplier, randoUpgrades.bowRapidFireMultiplier - 0.4) }
+!add(quickshot_upgrade(), quickshot_upgrades)
+!item_data(
+    quickshot_upgrade(),
+    "#Quickshot Upgrade#",
+    200,
+    "Bow attacks with Quickshot are faster",
+    quickshot_upgrade_icon,
+    MapIcon::BonusItem
+)
+
+fun melting_blaze() { store(randoUpgrades.blazeAsFireSource, true) }
+!add(melting_blaze(), melting_blazes)
+!item_data(
+    melting_blaze(),
+    "#Melting Blaze#",
+    200,
+    "Blaze melts ice and ignites lanterns",
+    melting_blaze_icon,
+    MapIcon::BonusItem
+)
+
+fun melting_sword() { store(randoUpgrades.swordAsFireSource, true) }
+!add(melting_sword(), melting_swords)
+!item_data(
+    melting_sword(),
+    "#Melting Sword#",
+    200,
+    "Sword melts ice and ignites lanterns",
+    melting_sword_icon,
+    MapIcon::BonusItem
+)
+
+fun melting_shuriken() { store(randoUpgrades.shurikenAsFireSource, true) }
+!add(melting_shuriken(), melting_shurikens)
+!item_data(
+    melting_shuriken(),
+    "#Melting Shuriken#",
+    200,
+    "Shuriken melts ice and ignites lanterns",
+    melting_shuriken_icon,
+    MapIcon::BonusItem
+)
+
+fun uncharged_bashnade() { store(randoUpgrades.bashableUnchargedGrenades, true) }
+!add(uncharged_bashnade(), uncharged_bashnades)
+!item_data(
+    uncharged_bashnade(),
+    "#Uncharged Bashgrenades#",
+    200,
+    "Bash your Grenades without charging them first on the ground",
+    uncharged_bashnade_icon,
+    MapIcon::BonusItem
+)
+
+fun extra_grenade() { store(randoUpgrades.extraGrenades, randoUpgrades.extraGrenades + 1) }
+!add(extra_grenade(), extra_grenades)
+!item_data(
+    extra_grenade(),
+    "#Extra Grenade#",
+    200,
+    "Throw multiple Grenades without exploding the prior one",
+    extra_grenade_icon,
+    MapIcon::BonusItem
+)
+
+fun splinter_grenade() { store(randoUpgrades.grenadeMultishot, randoUpgrades.grenadeMultishot + 1) }
+!add(splinter_grenade(), splinter_grenades)
+!item_data(
+    splinter_grenade(),
+    "#Splinter Grenade#",
+    200,
+    "Throw an additional Grenade",
+    splinter_grenade_icon,
+    MapIcon::BonusItem
+)
+
+fun unlimited_sentries() { store(randoUpgrades.extraSentries, 100) }
+!add(unlimited_sentries(), unlimited_sentries)
+!item_data(
+    unlimited_sentries(),
+    "#Unlimited Sentries#",
+    200,
+    "Spawn unlimited Sentries",
+    unlimited_sentries_icon,
+    MapIcon::BonusItem
+)
+
+// TODO merge burst and fire rate upgrade to make the names less confusing?
+fun sentry_burst_upgrade() { store(randoUpgrades.extraSentries, randoUpgrades.extraSentries + 10) }
+!add(sentry_burst_upgrade(), sentry_burst_upgrades)
+!item_data(
+    sentry_burst_upgrade(),
+    "#Sentry Burst Upgrade#",
+    200,
+    "Sentry fires more shots per burst",
+    sentry_burst_upgrade_icon,
+    MapIcon::BonusItem
+)
+
+fun sentry_fire_rate_upgrade() { store(randoUpgrades.sentryFireRateSpeed, randoUpgrades.sentryFireRateSpeed + 2.5) }
+!add(sentry_fire_rate_upgrade(), sentry_fire_rate_upgrades)
+!item_data(
+    sentry_fire_rate_upgrade(),
+    "#Sentry Fire Rate Upgrade#",
+    200,
+    "Sentry fires shots even faster",
+    sentry_fire_rate_upgrade_icon,
+    MapIcon::BonusItem
+)
+
+fun extra_shuriken() { store(randoUpgrades.extraShurikens, randoUpgrades.extraShurikens + 1) }
+!add(extra_shuriken(), extra_shurikens)
+!item_data(
+    extra_shuriken(),
+    "#Extra Shuriken#",
+    200,
+    "Throw multiple Shurikens",
+    extra_shuriken_icon,
+    MapIcon::BonusItem
+)
+
+fun splinter_shuriken() {
+    // TODO implement once the client branch is updated to include the new uberState
+    // store(randoUpgrades.splinterShurikens, randoUpgrades.splinterShurikens + 2)
+}
+!add(splinter_shuriken(), splinter_shurikens)
+!item_data(
+    splinter_shuriken(),
+    "#Splinter Shuriken#",
+    200,
+    "Throw multiple Shurikens at once",
+    splinter_shuriken_icon,
+    MapIcon::BonusItem
+)
+
+fun bashable_shuriken() {
+    // TODO implement once the client branch is updated to include the new uberState
+    // store(randoUpgrades.bashableShurikens, true)
+}
+!add(bashable_shuriken(), bashable_shurikens)
+!item_data(
+    bashable_shuriken(),
+    "#Bashable Shuriken#",
+    200,
+    "Bash off your Shuriken",
+    bashable_shuriken_icon,
+    MapIcon::BonusItem
+)

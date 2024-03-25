@@ -1,0 +1,34 @@
+#hide
+#name("Goal Mode Core")
+#description("Manages access to Shriek")
+
+// TODO manage randoState.shriekBarrier state
+
+!include("progress_helper")
+
+!callback(write_goal_progress_message)
+!callback(check_goals_completed)
+!callback(write_goals_incomplete_message)
+
+!on_callback("progress_helper", write_progress_message, {
+    set_string("goal_progress_message", "")
+    set_boolean("comma", false)
+    write_goal_progress_message()
+    if get_boolean("comma") {
+        set_string("progress_message", get_string("progress_message") + "\n" + get_string("goal_progress_message"))
+    }
+})
+
+on is_in_hitbox(520, -3617, 744, -3503) {
+    set_boolean("goals_completed", true)
+    check_goals_completed()
+    if get_boolean("goals_completed") == false {
+        warp(-3540, -407) // TODO get exact location
+        set_string("goals_incomplete_message", "")
+        write_goals_incomplete_message()
+        priority_message(
+            get_string("goals_incomplete_message"),
+            4,
+        )
+    }
+}

@@ -1,8 +1,6 @@
-use std::num::NonZeroUsize;
-
-use wotw_seedgen::generator::SeedSpoiler;
-
 use super::Analyzer;
+use std::num::NonZeroUsize;
+use wotw_seedgen::spoiler::SeedSpoiler;
 
 /// Analyzes how big the steps of progression are
 pub struct StepSizeStats {

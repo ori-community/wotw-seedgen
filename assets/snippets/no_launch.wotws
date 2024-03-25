@@ -1,0 +1,5 @@
+#category("Item Pool")
+#name("No Launch")
+#description("There is no Launch")
+
+!remove(skill(Skill::Launch), 1)

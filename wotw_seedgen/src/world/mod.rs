@@ -1,349 +1,349 @@
-pub mod graph;
-pub mod player;
-pub mod pool;
-pub mod requirement;
+mod graph;
+mod player;
+mod reached;
+mod simulate;
+mod uber_states;
 
-pub use graph::Graph;
+use ordered_float::OrderedFloat;
 pub use player::Player;
-pub use pool::Pool;
-pub use requirement::Requirement;
+pub use simulate::Simulate;
+pub use uber_states::UberStates;
 
-use rustc_hash::FxHashMap;
-
-use crate::header::ItemDetails;
-use crate::item::{Item, Resource};
-use crate::log;
-use crate::settings::{Goal, WorldSettings};
-use crate::uber_state::{UberIdentifier, UberStateTrigger};
-use crate::util::constants::WISP_STATES;
-
-#[derive(Debug, Clone)]
-pub struct World<'graph, 'settings> {
-    pub graph: &'graph Graph,
-    pub player: Player<'settings>,
-    pub pool: Pool,
-    pub preplacements: FxHashMap<UberStateTrigger, Vec<Item>>,
-    uber_states: FxHashMap<UberIdentifier, f32>,
-    pub sets: Vec<usize>,
-    pub custom_items: FxHashMap<Item, ItemDetails>,
-    pub goals: Vec<Goal>,
-}
-impl World<'_, '_> {
-    /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
-    ///
-    /// Note that the player will start with an empty inventory, use [`new_spawn`] if you want the player to start with the vanilla inventory of 3 energy and 30 health.
-    ///
-    /// [`new_spawn`]: World::new_spawn
-    pub fn new<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
-        World {
-            graph,
-            player: Player::new(settings),
-            pool: Pool::default(),
-            preplacements: FxHashMap::default(),
-            uber_states: FxHashMap::default(),
-            sets: Vec::default(),
-            custom_items: FxHashMap::default(),
-            goals: Vec::default(),
-        }
-    }
-    /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
-    ///
-    /// Note that the player will start with the vanilla inventory of 3 energy and 30 health, use [`new`] if you want the player to start with an empty inventory.
-    ///
-    /// [`new`]: World::new
-    pub fn new_spawn<'a, 'b>(graph: &'a Graph, settings: &'b WorldSettings) -> World<'a, 'b> {
-        World {
-            player: Player::spawn(settings),
-            ..World::new(graph, settings)
-        }
-    }
-
-    pub fn grant_player(&mut self, item: Item, amount: u32) {
-        match item {
-            Item::UberState(command) => {
-                for _ in 0..amount {
-                    let new = command.do_the_math(&self.uber_states);
-                    let old = self.uber_states.insert(command.identifier, new);
-                    if !command.skip {
-                        self.collect_preplacements(command.identifier, old.unwrap_or_default());
-                    }
-                }
-            }
-            Item::SpiritLight(stacked_amount) => {
-                log::trace!("Granting player {} Spirit Light", amount * stacked_amount);
-
-                self.player
-                    .inventory
-                    .grant(Item::SpiritLight(1), amount * stacked_amount);
-            }
-            item => {
-                let triggered_state = item.attached_state();
-                if item.is_progression(self.player.settings.difficulty) {
-                    log::trace!(
-                        "Granting player {}{}",
-                        if amount == 1 {
-                            String::new()
-                        } else {
-                            format!("{} ", amount)
-                        },
-                        item
-                    );
-
-                    self.player.inventory.grant(item, amount);
-                }
-                if let Some(identifier) = triggered_state {
-                    self.set_uber_state(identifier, 1.);
-                }
-            }
-        }
-    }
-
-    pub(crate) fn preplace(&mut self, trigger: UberStateTrigger, item: Item) {
-        self.preplacements.entry(trigger).or_default().push(item);
-    }
-    /// Some UberStates are chained to other UberStates that should get set as consequence
-    ///
-    /// This should mirror the SpecialHandlers in [https://github.com/ori-rando/wotw-client/blob/dev/projects/RandoMainDLL/UberStateController.cs]
-    // With the official logic file and headers, these are all redundant, but they may be relevant for custom logic or header files
-    fn set_chained_states(&mut self, identifier: UberIdentifier, value: f32) {
-        match identifier {
-            UberIdentifier {
-                uber_group: 5377,
-                uber_id: 53480,
-            } if value as u8 == 4 => {
-                // Water Dash Fight Arena
-                self.set_uber_state(UberIdentifier::new(5377, 1373), 4.);
-            } // Waterdashless Arena
-            UberIdentifier {
-                uber_group: 42178,
-                uber_id: 2654,
-            } if value > 0.5 && value < 2.5 => {
-                // Diamond in the Rough
-                self.set_uber_state(identifier, 3.);
-                self.set_uber_state(UberIdentifier::new(23987, 14832), 1.);
-            } // Waterdashless Arena
-            UberIdentifier {
-                uber_group: 37858,
-                uber_id: 12379,
-            } if value > 0.5 => {
-                // Mill complete
-                self.set_uber_state(UberIdentifier::new(937, 34641), 3.);
-            } // Mill Quest
-            // Voice Hackfix has no meaning to seedgen
-            UberIdentifier {
-                uber_group: 937,
-                uber_id: 34641,
-            } if value > 2.5 => {
-                // Mill Quest
-                self.set_uber_state(UberIdentifier::new(6, 300), 1.);
-            } // Tuley
-            UberIdentifier {
-                uber_group: 58674,
-                uber_id: 32810,
-            } if value as u8 == 7 => {
-                // Cat and Mouse
-                self.set_uber_state(identifier, 8.);
-            } // Cat and Mouse complete
-            UberIdentifier {
-                uber_group: 16155,
-                uber_id: 28478,
-            } if value > 0.5 => {
-                // Willow Stone Vine
-                self.set_uber_state(UberIdentifier::new(16155, 12971), 4.);
-            } // Willow Stone Boss
-            // 5377, 63173 Any sane kind of logic file should already account for this
-            UberIdentifier {
-                uber_group: 0,
-                uber_id: 100,
-            } if value > 0.5 => {
-                // Sword Tree
-                self.set_uber_state(UberIdentifier::new(6, 401), 1.);
-            } // Rain Lifted
-            _ => {}
-        };
-    }
-    fn collect_preplacements(&mut self, identifier: UberIdentifier, old: f32) -> bool {
-        let new = self.get_uber_state(identifier);
-        if new == old {
-            return false;
-        }
-        if WISP_STATES.contains(&identifier) {
-            log::trace!("Granting player Wisp");
-            self.player
-                .inventory
-                .grant(Item::Resource(Resource::HealthFragment), 2);
-            self.player
-                .inventory
-                .grant(Item::Resource(Resource::EnergyFragment), 2);
-        }
-
-        let mut preplaced = false;
-        let collected = self
-            .preplacements
-            .iter()
-            .filter_map(|(trigger, items)| {
-                if trigger.check(identifier, new)
-                    && (trigger.condition.is_none() || !trigger.check_value(old))
-                {
-                    preplaced = true;
-                    Some(items)
-                } else {
-                    None
-                }
-            })
-            .flatten()
-            .cloned()
-            .collect::<Vec<_>>();
-        for item in collected {
-            self.grant_player(item, 1);
-        }
-
-        preplaced
-    }
-
-    /// Sets the value at an [`UberIdentifier`] and collects any items preplaced on it
-    ///
-    /// Returns `true` if any preplaced items were collected
-    pub fn set_uber_state(&mut self, identifier: UberIdentifier, value: f32) -> bool {
-        let old = self
-            .uber_states
-            .insert(identifier, value)
-            .unwrap_or_default();
-        self.set_chained_states(identifier, value);
-        self.collect_preplacements(identifier, old)
-    }
-    /// Sets the value at an [`UberIdentifier`] and collects any items preplaced on it, but only if the current value is lower than the target value
-    ///
-    /// This is used to set vanilla quest and world state UberStates, since they need to behave strictly incrementally
-    ///
-    /// Returns `true` if any preplaced items were collected or the current value was already equal or higher than the target value
-    pub(crate) fn set_incremental_uber_state(
-        &mut self,
-        identifier: UberIdentifier,
-        value: f32,
-    ) -> bool {
-        if self.get_uber_state(identifier) < value {
-            self.set_uber_state(identifier, value)
-        } else {
-            true
-        } // If a quest uberState was already manually set to a higher value, it should block placements on all the skipped quest steps
-    }
-    /// Returns the value at an [`UberIdentifier`]
-    pub fn get_uber_state(&self, identifier: UberIdentifier) -> f32 {
-        self.uber_states
-            .get(&identifier)
-            .copied()
-            .unwrap_or_default()
-    }
-    /// Returns the entire uber state map of this world
-    pub fn uber_states(&self) -> &FxHashMap<UberIdentifier, f32> {
-        &self.uber_states
-    }
-}
+pub(crate) use graph::{node_condition, node_trigger};
+pub(crate) use reached::ReachedLocations;
+// TODO remove maybe
+pub(crate) use player::filter_redundancies;
 
 #[cfg(test)]
-mod tests {
+mod tests;
 
-    use super::super::*;
-    use super::*;
-    use item::*;
-    use languages::logic;
-    use rustc_hash::FxHashSet;
-    use settings::*;
-    use util::*;
-    use world::pool::Pool;
+use crate::inventory::Inventory;
 
-    #[test]
-    fn reach_check() {
-        let mut universe_settings = UniverseSettings::default();
-        universe_settings.world_settings[0].difficulty = Difficulty::Gorlek;
+use self::reached::ReachContext;
+use rustc_hash::{FxHashMap, FxHashSet};
+use smallvec::smallvec;
+use wotw_seedgen_data::{uber_identifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade};
+use wotw_seedgen_logic_language::output::{Graph, Node};
+use wotw_seedgen_seed_language::output::{
+    ArithmeticOperator, ClientEvent, CommandBoolean, CommandFloat, CommandInteger, CommandVoid,
+    CompilerOutput, Operation, Trigger,
+};
+use wotw_seedgen_settings::WorldSettings;
 
-        let areas = files::read_file("areas", "wotw", "logic").unwrap();
-        let locations = files::read_file("loc_data", "csv", "logic").unwrap();
-        let states = files::read_file("state_data", "csv", "logic").unwrap();
-        let graph =
-            logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
-        let mut world = World::new(&graph, &universe_settings.world_settings[0]);
-        world.player.inventory = Pool::preset().inventory;
-        world.player.inventory.grant(Item::SpiritLight(1), 10000);
+// TODO A stateful reach check would have some advantages, for instance currently seedgen would not correctly account for "Grant Launch on breaking this Wall"
 
-        let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
-        let reached =
-            world
-                .graph
-                .reached_locations(&world.player, spawn, &world.uber_states, &world.sets);
-        let reached: FxHashSet<_> = reached
-            .iter()
-            .filter_map(|node| {
-                if node.node_kind() == NodeKind::State {
-                    None
-                } else {
-                    node.trigger()
-                }
-            })
-            .cloned()
-            .collect();
-
-        let input = files::read_file("loc_data", "csv", "logic").unwrap();
-        let all_locations = logic::parse_locations(&input).unwrap();
-        let all_locations: FxHashSet<_> = all_locations
-            .iter()
-            .map(|location| &location.trigger)
-            .cloned()
-            .collect();
-
-        if !(reached == all_locations) {
-            let diff: Vec<_> = all_locations.difference(&reached).collect();
-            eprintln!(
-                "difference ({} / {} items): {:?}",
-                reached.len(),
-                all_locations.len(),
-                diff
-            );
+// TODO design interfaces instead of spamming pub(crate)?
+#[derive(Debug, Clone)]
+pub struct World<'graph, 'settings> {
+    pub(crate) graph: &'graph Graph,
+    pub(crate) spawn: usize,
+    // TODO technically the entire inventory is already contained in the uber_states?
+    pub(crate) player: Player<'settings>,
+    pub(crate) uber_states: UberStates,
+    pub(crate) logic_states: FxHashSet<usize>, // TODO implement
+    logic_state_map: FxHashMap<UberIdentifier, Vec<usize>>,
+    variables: Variables,
+}
+impl<'graph, 'settings> World<'graph, 'settings> {
+    /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
+    ///
+    /// Note that the player will start with an empty inventory, use [`new_spawn`] if you want the player to start with the vanilla inventory.
+    ///
+    /// [`new_spawn`]: World::new_spawn
+    pub fn new(
+        graph: &'graph Graph,
+        spawn: usize,
+        settings: &'settings WorldSettings,
+        uber_states: UberStates,
+    ) -> Self {
+        World {
+            graph,
+            spawn,
+            player: Player::new(settings),
+            uber_states,
+            logic_states: Default::default(),
+            logic_state_map: Default::default(),
+            variables: Default::default(),
         }
+    }
+    /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
+    ///
+    /// Note that the player will start with the vanilla inventory of 3 energy, 30 health and 3 shard slots, use [`new`] if you want the player to start with an empty inventory.
+    ///
+    /// [`new`]: World::new
+    pub fn new_spawn(
+        graph: &'graph Graph,
+        spawn: usize,
+        settings: &'settings WorldSettings,
+        uber_states: UberStates,
+    ) -> Self {
+        World {
+            player: Player::new_spawn(settings),
+            ..World::new(graph, spawn, settings, uber_states)
+        }
+    }
 
-        assert_eq!(reached, all_locations);
+    pub fn reached(&mut self) -> Vec<&'graph Node> {
+        let mut context = ReachContext::default();
 
-        let mut universe_settings = UniverseSettings::default();
-        universe_settings.world_settings[0].difficulty = Difficulty::Gorlek;
+        self.reach_recursion(self.spawn, smallvec![self.player.max_orbs()], &mut context);
+        self.reached_by_teleporter(&mut context);
 
-        let graph =
-            logic::parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
-        let mut world = World::new_spawn(&graph, &universe_settings.world_settings[0]);
+        context.reached_locations.reached
+    }
+    // TODO there are progressions where the requirements is a pure "Impossible". Are we not optimizing those away?
+    // TODO it seems like we are returning progressions to nodes that are already reached. Maybe we have to filter that in post since they
+    // may have been reached after initially encountering the unmet requirement? This is common for teleporters
+    pub(crate) fn reached_and_progressions(&mut self) -> ReachedLocations<'graph> {
+        let mut context = ReachContext::default();
+        context.progression_check = true;
 
-        world
-            .player
-            .inventory
-            .grant(Item::Resource(Resource::HealthFragment), 7);
-        world
-            .player
-            .inventory
-            .grant(Item::Resource(Resource::EnergyFragment), 6);
-        world
-            .player
-            .inventory
-            .grant(Item::Skill(Skill::DoubleJump), 1);
-        world
-            .player
-            .inventory
-            .grant(Item::Shard(Shard::TripleJump), 1);
+        self.reach_recursion(self.spawn, smallvec![self.player.max_orbs()], &mut context);
+        self.reached_by_teleporter(&mut context);
 
-        let spawn = world.graph.find_spawn("GladesTown.Teleporter").unwrap();
-        let reached =
-            world
-                .graph
-                .reached_locations(&world.player, spawn, &world.uber_states, &world.sets);
-        let reached: FxHashSet<_> = reached.iter().map(|node| node.identifier()).collect();
-        assert_eq!(
-            reached,
-            [
-                "GladesTown.UpdraftCeilingEX",
-                "GladesTown.AboveTpEX",
-                "GladesTown.BountyShard",
-                "GladesTown.BelowHoleHutEX"
-            ]
-            .into_iter()
-            .collect()
+        context.reached_locations
+    }
+
+    #[inline]
+    pub fn simulate<T: Simulate>(&mut self, t: &T, output: &CompilerOutput) -> T::Return {
+        t.simulate(self, output)
+    }
+    pub fn simulate_client_event(&mut self, client_event: ClientEvent, output: &CompilerOutput) {
+        output
+            .events
+            .iter()
+            .filter(|event| event.trigger == Trigger::ClientEvent(client_event))
+            .for_each(|event| {
+                event.command.simulate(self, output);
+            })
+    }
+    pub fn set_boolean(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: bool,
+        output: &CompilerOutput,
+    ) {
+        self.simulate(
+            &CommandVoid::StoreBoolean {
+                uber_identifier,
+                value: CommandBoolean::Constant { value },
+                trigger_events: true,
+            },
+            output,
         );
+    }
+    pub fn set_integer(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: i32,
+        output: &CompilerOutput,
+    ) {
+        self.simulate(
+            &CommandVoid::StoreInteger {
+                uber_identifier,
+                value: CommandInteger::Constant { value },
+                trigger_events: true,
+            },
+            output,
+        );
+    }
+    pub fn set_float(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: OrderedFloat<f32>,
+        output: &CompilerOutput,
+    ) {
+        self.simulate(
+            &CommandVoid::StoreFloat {
+                uber_identifier,
+                value: CommandFloat::Constant { value },
+                trigger_events: true,
+            },
+            output,
+        );
+    }
+    pub fn modify_integer(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        add: i32,
+        output: &CompilerOutput,
+    ) {
+        self.simulate(
+            &CommandVoid::StoreInteger {
+                uber_identifier,
+                value: CommandInteger::Arithmetic {
+                    operation: Box::new(Operation {
+                        left: CommandInteger::FetchInteger { uber_identifier },
+                        operator: ArithmeticOperator::Add,
+                        right: CommandInteger::Constant { value: add },
+                    }),
+                },
+                trigger_events: true,
+            },
+            output,
+        );
+    }
+    pub fn modify_float(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        add: OrderedFloat<f32>,
+        output: &CompilerOutput,
+    ) {
+        self.simulate(
+            &CommandVoid::StoreFloat {
+                uber_identifier,
+                value: CommandFloat::Arithmetic {
+                    operation: Box::new(Operation {
+                        left: CommandFloat::FetchFloat { uber_identifier },
+                        operator: ArithmeticOperator::Add,
+                        right: CommandFloat::Constant { value: add },
+                    }),
+                },
+                trigger_events: true,
+            },
+            output,
+        );
+    }
+
+    #[inline]
+    pub fn set_spirit_light(&mut self, value: i32, output: &CompilerOutput) {
+        self.set_integer(uber_identifier::SPIRIT_LIGHT, value, output);
+    }
+    #[inline]
+    pub fn modify_spirit_light(&mut self, add: i32, output: &CompilerOutput) {
+        self.modify_integer(uber_identifier::SPIRIT_LIGHT, add, output);
+    }
+    #[inline]
+    pub fn set_gorlek_ore(&mut self, value: i32, output: &CompilerOutput) {
+        self.set_integer(uber_identifier::GORLEK_ORE, value, output);
+    }
+    #[inline]
+    pub fn modify_gorlek_ore(&mut self, add: i32, output: &CompilerOutput) {
+        self.modify_integer(uber_identifier::GORLEK_ORE, add, output);
+    }
+    #[inline]
+    pub fn set_keystones(&mut self, value: i32, output: &CompilerOutput) {
+        self.set_integer(uber_identifier::KEYSTONES, value, output);
+    }
+    #[inline]
+    pub fn modify_keystones(&mut self, add: i32, output: &CompilerOutput) {
+        self.modify_integer(uber_identifier::KEYSTONES, add, output);
+    }
+    #[inline]
+    pub fn set_shard_slots(&mut self, value: i32, output: &CompilerOutput) {
+        self.set_integer(uber_identifier::SHARD_SLOTS, value, output);
+    }
+    #[inline]
+    pub fn modify_shard_slots(&mut self, add: i32, output: &CompilerOutput) {
+        self.modify_integer(uber_identifier::SHARD_SLOTS, add, output);
+    }
+    #[inline]
+    pub fn set_max_health(&mut self, value: i32, output: &CompilerOutput) {
+        self.set_integer(uber_identifier::MAX_HEALTH, value, output);
+    }
+    // TODO check that uses scaled correctly since they might have used the number of fragments before
+    #[inline]
+    pub fn modify_max_health(&mut self, add: i32, output: &CompilerOutput) {
+        self.modify_integer(uber_identifier::MAX_HEALTH, add, output);
+    }
+    // TODO but where do I *really* want OrderedFloat
+    #[inline]
+    pub fn set_max_energy(&mut self, value: OrderedFloat<f32>, output: &CompilerOutput) {
+        self.set_float(uber_identifier::MAX_ENERGY, value, output);
+    }
+    // TODO check that uses scaled correctly since they might have used the number of fragments before
+    #[inline]
+    pub fn modify_max_energy(&mut self, add: OrderedFloat<f32>, output: &CompilerOutput) {
+        self.modify_float(uber_identifier::MAX_ENERGY, add, output);
+    }
+    #[inline]
+    pub fn set_skill(&mut self, skill: Skill, value: bool, output: &CompilerOutput) {
+        self.set_boolean(skill.uber_identifier(), value, output);
+    }
+    #[inline]
+    pub fn set_shard(&mut self, shard: Shard, value: bool, output: &CompilerOutput) {
+        self.set_boolean(shard.uber_identifier(), value, output);
+    }
+    #[inline]
+    pub fn set_teleporter(&mut self, teleporter: Teleporter, value: bool, output: &CompilerOutput) {
+        self.set_boolean(teleporter.uber_identifier(), value, output);
+    }
+    #[inline]
+    pub fn set_clean_water(&mut self, value: bool, output: &CompilerOutput) {
+        self.set_boolean(uber_identifier::CLEAN_WATER, value, output);
+    }
+    #[inline]
+    pub fn set_weapon_upgrade(
+        &mut self,
+        weapon_upgrade: WeaponUpgrade,
+        value: bool,
+        output: &CompilerOutput,
+    ) {
+        self.set_boolean(weapon_upgrade.uber_identifier(), value, output);
+    }
+
+    #[inline]
+    pub fn inventory(&self) -> &Inventory {
+        &self.player.inventory
+    }
+
+    // TODO should be possible to use an immutable reference
+    // TODO inefficient to do this every time
+    // pub(crate) fn collect_states(&mut self, output: &CompilerOutput) -> FxHashSet<usize> {
+    //     let mut states = FxHashSet::default();
+
+    //     for (condition, index) in self
+    //         .graph
+    //         .nodes
+    //         .iter()
+    //         .filter(|node| matches!(node, Node::State(_) | Node::LogicalState(_)))
+    //         .filter_map(|node| node.condition().map(|condition| (condition, node.index())))
+    //     {
+    //         // TODO conceptually I'd expect any condition contained in loc or state data to never mutate the world,
+    //         // or maybe more generally for commands returning values if that's reasonable
+    //         if condition.simulate(self, output) {
+    //             states.insert(index);
+    //         }
+    //     }
+
+    //     // TODO !set commands
+
+    //     states
+    // }
+
+    // TODO reminder that quest and similar uberStates have to behave strictly incrementally
+}
+
+#[derive(Debug, Default, Clone)]
+struct Variables {
+    booleans: FxHashMap<usize, bool>,
+    integers: FxHashMap<usize, i32>,
+    floats: FxHashMap<usize, OrderedFloat<f32>>,
+    strings: FxHashMap<usize, String>,
+}
+impl Variables {
+    fn set_boolean(&mut self, id: usize, value: bool) {
+        self.booleans.insert(id, value);
+    }
+    fn set_integer(&mut self, id: usize, value: i32) {
+        self.integers.insert(id, value);
+    }
+    fn set_float(&mut self, id: usize, value: OrderedFloat<f32>) {
+        self.floats.insert(id, value);
+    }
+    fn set_string(&mut self, id: usize, value: String) {
+        self.strings.insert(id, value);
+    }
+    fn get_boolean(&self, id: &usize) -> bool {
+        self.booleans.get(id).copied().unwrap_or_default()
+    }
+    fn get_integer(&self, id: &usize) -> i32 {
+        self.integers.get(id).copied().unwrap_or_default()
+    }
+    fn get_float(&self, id: &usize) -> OrderedFloat<f32> {
+        self.floats.get(id).copied().unwrap_or_default()
+    }
+    fn get_string(&self, id: &usize) -> String {
+        self.strings.get(id).cloned().unwrap_or_default()
     }
 }

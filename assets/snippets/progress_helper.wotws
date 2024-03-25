@@ -1,0 +1,524 @@
+#category("Quality of Life")
+#name("Progress Helper")
+#description("
+Tracks your progress as you play
+By default those are bound to
+- Alt+P (general progress)
+- Ctrl+Alt+1 (trees)
+- Ctrl+Alt+2 (wisps)
+- Ctrl+Alt+3 (quests)
+")
+
+// TODO there's a regression here because previously progress messages were in a consistent order
+// To add a progress message from your header, use the write_progress_message callback
+// On callback, append your progress message to the string with id progress_message
+// Usually, you'll want to start with a newline so you have your own line
+// This example shows how to add a line "Fun: 10/10" into the progress message:
+// !include("progress_helper")
+// !on_callback("progress_helper", write_progress_message, set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
+
+!use_icon(progress_summary_icon, "assets/icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
+!use_icon(tree_progress_icon, "assets/icons/wheel/tree_progress.blue.png")
+!use_icon(wisp_progress_icon, "assets/icons/wheel/wisps_progress.png") // TODO why do others have blue and this one not
+!use_icon(quest_progress_icon, "assets/icons/wheel/quests_progress.blue.png") // TODO some filenames are singular, some plural...
+!use_icon(teleporter_icon, "assets/icons/game/teleporter.png")
+
+!callback(write_progress_message)
+
+!state(disable_keybinds, Boolean)
+!share(disable_keybinds)
+
+on reload {
+    set_wheel_item_data(
+        "root",
+        WheelItemPosition::Top,
+        "Progress Summary",
+        "[Ability1]View Progress",
+        progress_summary_icon,
+        trigger_keybind("ShowProgressWithHints"),
+    )
+    set_wheel_item_data(
+        "root",
+        WheelItemPosition::TopRight,
+        "Tree Progress",
+        "[Ability1]View Progress",
+        tree_progress_icon,
+        {
+            write_tree_progress()
+            priority_message(
+                get_string("tree_progress"),
+                4.0
+            )
+        },
+    )
+    set_wheel_item_data(
+        "root",
+        WheelItemPosition::RightTop,
+        "Wisp Progress",
+        "[Ability1]View Progress",
+        wisp_progress_icon,
+        {
+            write_wisp_progress()
+            priority_message(
+                get_string("wisp_progress"),
+                4.0
+            )
+        },
+    )
+    set_wheel_item_data(
+        "root",
+        WheelItemPosition::Right,
+        "Quest Progress",
+        "[Ability1]View Progress",
+        quest_progress_icon,
+        show_quest_progress(),
+    )
+    set_wheel_item_data(
+        "root",
+        WheelItemPosition::RightBottom,
+        "Teleporter Progress",
+        "[Ability1]View Progress",
+        teleporter_icon,
+        show_teleporter_progress(),
+    )
+}
+
+on progress_message {
+    set_string("progress_message", "")
+    // TODO can't write randoState.Pickups collected
+    // TODO need state for total pickups
+    // set_string("progress_message", get_string("progress_message") + "Pickups: " + randoStats.pickupsCollected + "/" + "")
+    write_progress_message()
+    item_message(get_string("progress_message"))
+}
+// TODO map progress message
+
+on binding_1 if disable_keybinds == false {
+    write_tree_progress()
+    write_wisp_progress()
+    priority_message(
+        get_string("tree_progress") + "\n" + get_string("wisp_progress"),
+        4.0
+    )
+}
+on binding_2 if disable_keybinds == false show_quest_progress()
+on binding_3 if disable_keybinds == false show_teleporter_progress()
+
+fun write_tree_progress() {
+    set_string("tree_progress", "#Trees found#: ")
+    set_boolean("comma", false)
+    if MarshSpawn.RegenTree {
+        set_string("tree_progress", get_string("tree_progress") + "Regenerate")
+        set_boolean("comma", true)
+    }
+    if HowlsDen.SwordTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Sword")
+        set_boolean("comma", true)
+    }
+    if HowlsDen.DoubleJumpTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Double Jump")
+        set_boolean("comma", true)
+    }
+    if MarshPastOpher.BowTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Bow")
+        set_boolean("comma", true)
+    }
+    if WestHollow.DashTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Dash")
+        set_boolean("comma", true)
+    }
+    if EastHollow.BashTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Bash")
+        set_boolean("comma", true)
+    }
+    if InnerWellspring.GrappleTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Grapple")
+        set_boolean("comma", true)
+    }
+    if MarshSpawn.DamageTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Inkwater Ancestral Light")
+        set_boolean("comma", true)
+    }
+    if GladesTown.DamageTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Glades Ancestral Light")
+        set_boolean("comma", true)
+    }
+    if LowerWastes.BurrowTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Burrow")
+        set_boolean("comma", true)
+    }
+    if UpperReach.LightBurstTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Grenade")
+        set_boolean("comma", true)
+    }
+    if LowerDepths.FlashTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Flash")
+        set_boolean("comma", true)
+    }
+    if UpperPools.SwimDashTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Water Dash")
+        set_boolean("comma", true)
+    }
+    if WeepingRidge.LaunchTree {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Launch")
+        set_boolean("comma", true)
+    }
+    if get_boolean("comma") == false {
+        set_string("tree_progress", get_string("tree_progress") + "None")
+    }
+    set_string("tree_progress", get_string("tree_progress") + "\n#Trees remaining#: ")
+    set_boolean("comma", false)
+    if MarshSpawn.RegenTree == false {
+        set_string("tree_progress", get_string("tree_progress") + "Regenerate")
+        set_boolean("comma", true)
+    }
+    if HowlsDen.SwordTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Sword")
+        set_boolean("comma", true)
+    }
+    if HowlsDen.DoubleJumpTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Double Jump")
+        set_boolean("comma", true)
+    }
+    if MarshPastOpher.BowTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Bow")
+        set_boolean("comma", true)
+    }
+    if WestHollow.DashTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Dash")
+        set_boolean("comma", true)
+    }
+    if EastHollow.BashTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Bash")
+        set_boolean("comma", true)
+    }
+    if InnerWellspring.GrappleTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Grapple")
+        set_boolean("comma", true)
+    }
+    if MarshSpawn.DamageTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Inkwater Ancestral Light")
+        set_boolean("comma", true)
+    }
+    if GladesTown.DamageTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Glades Ancestral Light")
+        set_boolean("comma", true)
+    }
+    if LowerWastes.BurrowTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Burrow")
+        set_boolean("comma", true)
+    }
+    if UpperReach.LightBurstTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Grenade")
+        set_boolean("comma", true)
+    }
+    if LowerDepths.FlashTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Flash")
+        set_boolean("comma", true)
+    }
+    if UpperPools.SwimDashTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Water Dash")
+        set_boolean("comma", true)
+    }
+    if WeepingRidge.LaunchTree == false {
+        trees_add_comma()
+        set_string("tree_progress", get_string("tree_progress") + "Launch")
+        set_boolean("comma", true)
+    }
+    if get_boolean("comma") == false {
+        set_string("tree_progress", get_string("tree_progress") + "None")
+    }
+}
+fun trees_add_comma() {
+    if get_boolean("comma") set_string("tree_progress", get_string("tree_progress") + ", ")
+}
+fun write_wisp_progress() {
+    set_string("wisp_progress", "#Wisps found#: ")
+    set_boolean("comma", false)
+    if EastHollow.ForestsVoice {
+        set_string("wisp_progress", get_string("wisp_progress") + "Voice")
+        set_boolean("comma", true)
+    }
+    if LowerReach.ForestsMemory {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Memory")
+        set_boolean("comma", true)
+    }
+    if UpperDepths.ForestsEyes {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Eyes")
+        set_boolean("comma", true)
+    }
+    if WestPools.ForestsStrength {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Strength")
+        set_boolean("comma", true)
+    }
+    if WindtornRuins.Seir {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Heart")
+        set_boolean("comma", true)
+    }
+    if get_boolean("comma") == false {
+        set_string("wisp_progress", get_string("wisp_progress") + "None")
+    }
+    set_string("wisp_progress", get_string("wisp_progress") + "\n#Wisps remaining#: ")
+    set_boolean("comma", false)
+    if EastHollow.ForestsVoice == false {
+        set_string("wisp_progress", get_string("wisp_progress") + "Voice")
+        set_boolean("comma", true)
+    }
+    if LowerReach.ForestsMemory == false {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Memory")
+        set_boolean("comma", true)
+    }
+    if UpperDepths.ForestsEyes == false {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Eyes")
+        set_boolean("comma", true)
+    }
+    if WestPools.ForestsStrength == false {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Strength")
+        set_boolean("comma", true)
+    }
+    if WindtornRuins.Seir == false {
+        wisps_add_comma()
+        set_string("wisp_progress", get_string("wisp_progress") + "Heart")
+        set_boolean("comma", true)
+    }
+    if get_boolean("comma") == false {
+        set_string("wisp_progress", get_string("wisp_progress") + "None")
+    }
+}
+fun wisps_add_comma() {
+    if get_boolean("comma") set_string("wisp_progress", get_string("wisp_progress") + ", ")
+}
+
+fun show_quest_progress() {
+    // TODO add quest aliases?
+    set_string("quest_progress", "#Silent Teeth# - ")
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState == 0 set_string("quest_progress", get_string("quest_progress") + "Meet Kwolok")
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState == 1 set_string("quest_progress", get_string("quest_progress") + "Restart the Mill")
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState == 2 set_string("quest_progress", get_string("quest_progress") + "Search the Mill")
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 set_string("quest_progress", get_string("quest_progress") + "Return to Kwolok")
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState == 4 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", get_string("quest_progress") + "\n#Shifting Sands# - ")
+    if questUberStateGroup.desertWispQuestUberState <= 1 set_string("quest_progress", get_string("quest_progress") + "Find the Heart of the Forest")
+    if questUberStateGroup.desertWispQuestUberState == 2 set_string("quest_progress", get_string("quest_progress") + "Gather the Four Wisps")
+    if questUberStateGroup.desertWispQuestUberState == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", get_string("quest_progress") + "\n#Lost Paradise# - ")
+    if questUberStateGroup.lagoonWispQuestUberState <= 1 set_string("quest_progress", get_string("quest_progress") + "Find the Strength of the Forest")
+    if questUberStateGroup.lagoonWispQuestUberState == 2 set_string("quest_progress", get_string("quest_progress") + "Defeat Kwolok")
+    if questUberStateGroup.lagoonWispQuestUberState == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", get_string("quest_progress") + "\n#Breaking Mould# - ")
+    if questUberStateGroup.mouldwoodDepthsWispQuestUberState <= 1 set_string("quest_progress", get_string("quest_progress") + "Find the Eyes of the Forest")
+    if questUberStateGroup.mouldwoodDepthsWispQuestUberState == 2 set_string("quest_progress", get_string("quest_progress") + "Defeat Mora")
+    if questUberStateGroup.mouldwoodDepthsWispQuestUberState == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", get_string("quest_progress") + "\n#Highest Reach# - ")
+    if questUberStateGroup.winterForestWispQuestUberState <= 1 set_string("quest_progress", get_string("quest_progress") + "Find the Memory of the Forest")
+    if questUberStateGroup.winterForestWispQuestUberState == 2 set_string("quest_progress", get_string("quest_progress") + "Wake Baur")
+    if questUberStateGroup.winterForestWispQuestUberState == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", get_string("quest_progress") + "\n#Missing Key# - ")
+    if npcsStateGroup.marshKeystoneQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet Tokk in a Cave")
+    if npcsStateGroup.marshKeystoneQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find the Keystone")
+    if npcsStateGroup.marshKeystoneQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Show the Keystone to Tokk")
+    if npcsStateGroup.marshKeystoneQuest == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Into Burrows# - ")
+    if npcsStateGroup.inkwaterWellQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet Tokk above the Midnight Burrows")
+    if npcsStateGroup.inkwaterWellQuest == 1 || npcsStateGroup.inkwaterWellQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Find the artifact in the Midnight Burrows")
+    if npcsStateGroup.inkwaterWellQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Return to Tokk")
+    if npcsStateGroup.inkwaterWellQuest == 4 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Lost Compass# - ")
+    if questUberStateGroup.lostCompassQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet Tokk at the Wellspring")
+    if questUberStateGroup.lostCompassQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find Tokk's Compass")
+    if questUberStateGroup.lostCompassQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Return the iron needle to Tokk")
+    if questUberStateGroup.lostCompassQuest == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Little Braver# - ")
+    if questUberStateGroup.braveMokiQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet Mokk the Brave near where you fought Howl")
+    if questUberStateGroup.braveMokiQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find a Howl fang near where you fought Howl")
+    if questUberStateGroup.braveMokiQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Give the Howl fang to Mokk the Brave")
+    if questUberStateGroup.braveMokiQuest == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Family Reunion# - ")
+    if questUberStateGroup.familyReunionQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet a father Moki in the Wellspring Glades")
+    if questUberStateGroup.familyReunionQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Talk to Grom about building a home")
+    if questUberStateGroup.familyReunionQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Find the Moki family near the Silent Woods")
+    if questUberStateGroup.familyReunionQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Return to the Moki father with the bad news")
+    if questUberStateGroup.familyReunionQuest == 4 set_string("quest_progress", get_string("quest_progress") + "@Complete@")
+    set_string("quest_progress", "#Tree Keeper# - ")
+    if questUberStateGroup.braveMokiQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet the Tree Keeper in the Silent Woods")
+    if questUberStateGroup.braveMokiQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find someone who knows a lot about plants")
+    if questUberStateGroup.braveMokiQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Bring the Tree Keeper the bad news")
+    if questUberStateGroup.braveMokiQuest == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Rough Diamond# - ")
+    if questUberStateGroup.desertCogQuest <= 1 set_string("quest_progress", get_string("quest_progress") + "Explore the Windswept Wastes near the Shovel")
+    if questUberStateGroup.desertCogQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Find a use for the metal cog")
+    if questUberStateGroup.desertCogQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Go treasure hunting in the Gorlek Mines")
+    if questUberStateGroup.desertCogQuest == 4 set_string("quest_progress", get_string("quest_progress") + "Take the eerie gem to a specialist (Twillen)")
+    if questUberStateGroup.desertCogQuest == 5 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Hand to Hand# - ")
+    if questUberStateGroup.tradeSequenceQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet a Moki near where you fought Hornbeetle")
+    if questUberStateGroup.tradeSequenceQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find a wanderer with an interest in maps (Tokk)")
+    if questUberStateGroup.tradeSequenceQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Find an aspiring adventurer who might need a small bag (Moki in Wellspring)")
+    if questUberStateGroup.tradeSequenceQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Find someone who might have a use for herbs (Veral in Glades)")
+    if questUberStateGroup.tradeSequenceQuest == 4 set_string("quest_progress", get_string("quest_progress") + "Find someone in need of a warm meal (Moki in Reach)")
+    if questUberStateGroup.tradeSequenceQuest == 5 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs a hat (Moki in Glades)")
+    if questUberStateGroup.tradeSequenceQuest == 6 set_string("quest_progress", get_string("quest_progress") + "Find someone in need of light (Moki in Depths)")
+    if questUberStateGroup.tradeSequenceQuest == 7 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs string (Moki in Luma)")
+    if questUberStateGroup.tradeSequenceQuest == 8 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs a spyglass (Motay in Glades)")
+    if questUberStateGroup.tradeSequenceQuest == 9 set_string("quest_progress", get_string("quest_progress") + "Find someone in need of drinking water (Gorlek Miner in Wastes)")
+    if questUberStateGroup.tradeSequenceQuest == 10 set_string("quest_progress", get_string("quest_progress") + "Find the ancient Map Stone (Windtorn Ruins)")
+    if questUberStateGroup.tradeSequenceQuest == 11 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Into Darkness# - ")
+    if questUberStateGroup.darkCaveQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet the Moki in front of a cave in Glades")
+    if questUberStateGroup.darkCaveQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find a way into the Cave to retrieve the Moki's keepsake")
+    if questUberStateGroup.darkCaveQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Return the acorn to the Moki")
+    if questUberStateGroup.darkCaveQuest == 3 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Kwolok's Wisdom# - ")
+    if questUberStateGroup.kwoloksWisdomQuest == 0 set_string("quest_progress", get_string("quest_progress") + "Meet a Moki in Luma Pools")
+    if questUberStateGroup.kwoloksWisdomQuest == 1 set_string("quest_progress", get_string("quest_progress") + "Find Kwolok and report back")
+    if questUberStateGroup.kwoloksWisdomQuest == 2 set_string("quest_progress", get_string("quest_progress") + "Give the Amulet to Kwolok")
+    if questUberStateGroup.kwoloksWisdomQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Take the Amulet to Kwolok's Altar")
+    if questUberStateGroup.kwoloksWisdomQuest == 4 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Rebuilding the Glades# - ")
+    if GladesTown.RebuildTheGlades == false set_string("quest_progress", get_string("quest_progress") + "Help Grom rebuild the Wellspring Glades")
+    if GladesTown.RebuildTheGlades set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    set_string("quest_progress", "#Regrowing the Glades# - ")
+    if GladesTown.RegrowTheGlades == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
+    if GladesTown.RegrowTheGlades set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    priority_message(
+        get_string("quest_progress"),
+        6.0
+    )
+}
+
+fun show_teleporter_progress() {
+    set_string("teleporter_progress", "#Teleporters activated#: ")
+    set_boolean("comma", false)
+    if MarshSpawn.TeleporterActive {
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Inkwater Marsh")
+        set_boolean("comma", true)
+    }
+    if HowlsDen.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Howl's Den")
+        set_boolean("comma", true)
+    }
+    if EastHollow.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Kwolok's Hollow")
+        set_boolean("comma", true)
+    }
+    if GladesTown.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Glades")
+        set_boolean("comma", true)
+    }
+    if InnerWellspring.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Wellspring")
+        set_boolean("comma", true)
+    }
+    if MidnightBurrows.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Midnight Burrows")
+        set_boolean("comma", true)
+    }
+    // TODO some teleporters have been renamed
+    if WoodsEntry.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "West Woods")
+        set_boolean("comma", true)
+    }
+    if WoodsMain.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "East Woods")
+        set_boolean("comma", true)
+    }
+    if LowerReach.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Baur's Reach")
+        set_boolean("comma", true)
+    }
+    if UpperDepths.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Mouldwood Depths")
+        set_boolean("comma", true)
+    }
+    if EastPools.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "East Luma")
+        set_boolean("comma", true)
+    }
+    if WestPools.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "West Luma")
+        set_boolean("comma", true)
+    }
+    if LowerWastes.FeedingGroundsTeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Feeding Grounds")
+        set_boolean("comma", true)
+    }
+    if LowerWastes.CentralTeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "East Wastes")
+        set_boolean("comma", true)
+    }
+    if UpperWastes.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Outer Ruins")
+        set_boolean("comma", true)
+    }
+    if WindtornRuins.TeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Inner Ruins")
+        set_boolean("comma", true)
+    }
+    if WillowsEnd.InnerTeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Willow's End")
+        set_boolean("comma", true)
+    }
+    if WillowsEnd.ShriekTeleporterActive {
+        teleporters_add_comma()
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Shriek")
+        set_boolean("comma", true)
+    }
+    if get_boolean("comma") == false {
+        set_string("teleporter_progress", get_string("teleporter_progress") + "None")
+    }
+    priority_message(
+        get_string("quest_progress"),
+        4.0
+    )
+}
+fun teleporters_add_comma() {
+    if get_boolean("comma") set_string("teleporter_progress", get_string("teleporter_progress") + ", ")
+}

@@ -1,0 +1,51 @@
+#category("Placements")
+#name("Vanilla Opher Upgrades")
+#description("Places the five vanilla weapon upgrades on their vanilla locations in Opher's shop")
+
+!flag("Vanilla Opher Upgrades")
+
+// TODO rename the aliases to fit
+on OpherShop.ExplodingSpike weapon_upgrade(WeaponUpgrade::ExplodingSpear)
+on OpherShop.ShockSmash weapon_upgrade(WeaponUpgrade::HammerShockwave)
+on OpherShop.StaticStar weapon_upgrade(WeaponUpgrade::StaticShuriken)
+on OpherShop.ChargeBlaze weapon_upgrade(WeaponUpgrade::ChargeBlaze)
+on OpherShop.RapidSentry weapon_upgrade(WeaponUpgrade::RapidSentry)
+
+// TODO weapoon upgrade icons?
+on reload {
+    set_shop_item_data(
+        OpherShop.ExplodingSpike,
+        300,
+        weapon_upgrade_string(WeaponUpgrade::ExplodingSpear),
+        "", // TODO
+        OpherIcon::ExplodingSpear
+    )
+    set_shop_item_data(
+        OpherShop.ShockSmash,
+        300,
+        weapon_upgrade_string(WeaponUpgrade::HammerShockwave),
+        "", // TODO
+        OpherIcon::HammerShockwave
+    )
+    set_shop_item_data(
+        OpherShop.StaticStar,
+        300,
+        weapon_upgrade_string(WeaponUpgrade::StaticShuriken),
+        "", // TODO
+        OpherIcon::StaticShuriken
+    )
+    set_shop_item_data(
+        OpherShop.ChargeBlaze,
+        300,
+        weapon_upgrade_string(WeaponUpgrade::ChargeBlaze),
+        "", // TODO
+        OpherIcon::ChargeBlaze
+    )
+    set_shop_item_data(
+        OpherShop.RapidSentry,
+        300,
+        weapon_upgrade_string(WeaponUpgrade::RapidSentry),
+        "", // TODO
+        OpherIcon::RapidSentry
+    )
+}
