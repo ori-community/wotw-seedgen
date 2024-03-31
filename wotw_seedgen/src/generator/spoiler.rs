@@ -51,7 +51,7 @@ pub struct SpoilerPlacement {
     /// The readable name of the placed item, which usually varies from the `command`s [`Display`] implementation
     pub item_name: String,
 }
-/// Select data from a [`Node`](crate::world::graph::Node)
+/// Select data from a [`Node`](crate::logic_language::output::Node)
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NodeSummary {
     /// The identifier

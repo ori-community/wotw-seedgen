@@ -23,6 +23,9 @@
 //!
 //! - `ordered_float`: implements [`Ast`] for the ordered_float types [`OrderedFloat<f32>`] and [`OrderedFloat<f64>`]
 //! - `ariadne`: adds [`Error::write_pretty`] to write error messages with ariadne without further configuration
+//!
+//! [`OrderedFloat<f32>`]: ordered_float::OrderedFloat
+//! [`OrderedFloat<f64>`]: ordered_float::OrderedFloat
 
 #![warn(clippy::todo)]
 

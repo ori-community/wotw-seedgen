@@ -308,15 +308,14 @@ pub trait ParseIdentToken {
     }
 }
 
-/// The underlying parser you will have access to in [`Ast`] implementations
+/// The parser interface you will have access to in [`Ast`] implementations
 ///
-// TODO update documentation
-/// `Token` is a type you should provide. You can implement tokenization however you want by using [`Parser::with_tokens`], although there is a convenience function [`Parser::new`]
-/// if you decide to use the [`ParseToken`] trait.
+/// You may provide the underlying [`Tokenize`] implementation yourself, or use [`LogosTokenizer`] with the `logos` feature enabled
 ///
 /// Note that parsers cannot be cloned, you should use [`Parser::jump`] for any backtracking or lookahead needs
 ///
 /// [`Ast`]: crate::Ast
+/// [`LogosTokenizer`]: crate::LogosTokenizer
 pub struct Parser<'source, T: Tokenize> {
     source: &'source str,
     tokens: Vec<(T::Token, Range<usize>)>,
@@ -369,9 +368,6 @@ impl<'source, T: Tokenize> Parser<'source, T> {
         self.tokens.len()
     }
     /// Checks whether there are `Token`s left to parse
-    ///
-    // TODO update documentation
-    /// This may differ from `parser.current().is_err()` if the [`ParseToken`] implementation can return [`Error`]s at the tokenization stage.
     #[inline]
     pub fn is_finished(&self) -> bool {
         self.position >= self.tokens.len()
@@ -380,17 +376,14 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     // TODO check if this doc link behaves
     /// A reference to any token. You can obtain the `position` at any point by calling [`Parser::position`]
     ///
-    /// If `position` is beyond the last Token, the Tokenizer's [`EOF_TOKEN`](Tokenizer::EOF_TOKEN) will be returned
+    /// If `position` is beyond the last Token, the Tokenizer's [`eof_token`] will be returned
+    ///
+    /// [`eof_token`]: crate::TokenizeOutput
     #[inline]
     pub fn token_at(&self, position: usize) -> &(T::Token, Range<usize>) {
         self.tokens.get(position).unwrap_or(&self.eof)
     }
     /// A reference to the current `Token` that should be parsed
-    ///
-    /// The Token is [`Err`] if either:
-    /// - the parser is finished, then an [`Error`] with [`ErrorKind::UnexpectedEnd`] will be returned
-    // TODO update documentation
-    /// - the [`ParseToken`] implementation returned an [`Error`] at the tokenization stage
     #[inline]
     pub fn current(&self) -> &(T::Token, Range<usize>) {
         self.token_at(self.position)

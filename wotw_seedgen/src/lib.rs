@@ -6,7 +6,7 @@
 //!
 //! # Re-exports
 //!
-//! Relevant crates are re-exported here, e.g. you can access the [`wotw_seedgen_settings`] crate as [`wotw_seedgen::settings`]
+//! Relevant crates are re-exported here, e.g. you can access the [`wotw_seedgen_settings`] crate as `wotw_seedgen::settings`
 
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::cast_precision_loss)]

@@ -300,6 +300,8 @@ use crate::{
 /// [`Delimited`]: crate::Delimited
 /// [`ParseIdentToken::is_ident`]: crate::ParseIdentToken::is_ident
 /// [`Recoverable`]: crate::Recoverable
+/// [`OrderedFloat<f32>`]: ordered_float::OrderedFloat
+/// [`OrderedFloat<f64>`]: ordered_float::OrderedFloat
 pub trait Ast<'source, T: Tokenize>: Sized {
     /// Attempt to parse `Self`, only progressing `parser` if successful.
     fn ast(parser: &mut Parser<'source, T>) -> Result<Self>;

@@ -1,6 +1,6 @@
 use std::{
     fmt::Write,
-    io, iter,
+    iter,
     num::NonZeroUsize,
     sync::{
         atomic::{AtomicUsize, Ordering},
