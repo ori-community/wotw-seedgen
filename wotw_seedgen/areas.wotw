@@ -12490,7 +12490,7 @@ anchor LowerWastes.LastStandArea at 1794, -3938:  # next to the projectile spawn
     gorlek: Sword OR Hammer
     kii: free
 
-anchor LowerWastes.SkeetoHive at 1715, -3936:  # The ledge right of SkeetoHive on the way to the tree
+anchor LowerWastes.SkeetoHive at 1715, -3935:  # The ledge right of SkeetoHive on the way to the tree
   refill Checkpoint
 
   pickup LowerWastes.SkeetoHiveEX:
