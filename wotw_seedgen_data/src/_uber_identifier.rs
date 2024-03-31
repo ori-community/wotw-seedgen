@@ -2,7 +2,10 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
 
-/// Identifier for an UberState to store values in
+/// Identifier for an UberState
+///
+/// UberStates make up most of the save file format; every world state is associated with an UberState which may hold data, usually a single boolean or number.
+/// The `UberIdentifier` is the unique identifier for a given UberState
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct UberIdentifier {
@@ -10,10 +13,14 @@ pub struct UberIdentifier {
     pub member: i32,
 }
 impl UberIdentifier {
+    /// Creates a new `UberIdentifier` from its parts
+    ///
+    /// See the [`uber_identifier`] module for constants on major `UberIdentifier`s that might make your code more readable
     pub const fn new(group: i32, member: i32) -> Self {
         Self { group, member }
     }
 
+    /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
     pub const fn is_shop(self) -> bool {
         matches!(self.group, 1 | 2 | 15)
     }
@@ -24,6 +31,7 @@ impl Display for UberIdentifier {
     }
 }
 
+/// Constants for important [`UberIdentifier`]s
 pub mod uber_identifier {
     use crate::UberIdentifier;
 

@@ -4,6 +4,10 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString, FromRepr};
 
+/// Spirit Shards
+///
+/// Currently excludes unused shards
+// TODO ^ why?
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString, FromRepr))]
@@ -58,9 +62,11 @@ pub enum Shard {
     Arcing = 47,
 }
 impl Shard {
+    /// Returns the [`UberIdentifier`] tracking whether the player has this `Shard`
     pub const fn uber_identifier(self) -> UberIdentifier {
         UberIdentifier::new(25, self as i32)
     }
+    /// Returns the `Shard` corresponsing to the [`UberIdentifier`], if one exists
     #[cfg(feature = "strum")]
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         const MIN: i32 = u8::MIN as i32;

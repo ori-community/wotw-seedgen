@@ -4,6 +4,10 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString, FromRepr};
 
+/// Skills, sometimes also called Abilities
+///
+/// Currently excludes unused skills
+// TODO ^ why?
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString, FromRepr))]
@@ -120,9 +124,11 @@ pub enum Skill {
     InkwaterAncestralLight = 121,
 }
 impl Skill {
+    /// Returns the [`UberIdentifier`] tracking whether the player has this `Skill`
     pub const fn uber_identifier(self) -> UberIdentifier {
         UberIdentifier::new(24, self as i32)
     }
+    /// Returns the `Skill` corresponsing to the [`UberIdentifier`], if one exists
     #[cfg(feature = "strum")]
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         const MIN: i32 = u8::MIN as i32;
@@ -136,6 +142,7 @@ impl Skill {
         }
     }
 
+    /// Returns the energy cost of using this `Skill` once
     pub const fn energy_cost(self) -> f32 {
         match self {
             Skill::Bow => 0.25,
@@ -145,6 +152,11 @@ impl Skill {
             _ => 0.0,
         }
     }
+    /// Returns the immediate damage dealt when using this `Skill` once
+    ///
+    /// Does not include any inflicted burn damage, use [`Skill::burn_damage`] for that
+    ///
+    /// `charge_grenade` determines whether to use charged or uncharged grenade damage if this is `Skill::Grenade`
     pub const fn damage(self, charge_grenade: bool) -> f32 {
         match self {
             Skill::Bow | Skill::Sword => 4.0,
@@ -164,6 +176,7 @@ impl Skill {
             _ => 0.0,
         }
     }
+    /// Returns the total damage inflicted by burn when using this `Skill` once
     pub const fn burn_damage(self) -> f32 {
         match self {
             Skill::Grenade => 9.0,
@@ -171,6 +184,7 @@ impl Skill {
             _ => 0.0,
         }
     }
+    /// Returns the [`Equipment`] corresponding to this `Skill`
     pub const fn equipment(self) -> Equipment {
         match self {
             Skill::Bash => Equipment::Bash, // TODO huh? what happens if you "unequip" bash?

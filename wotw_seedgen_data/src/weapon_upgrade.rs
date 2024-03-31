@@ -4,6 +4,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString, FromRepr};
 
+/// Opher weapon upgrades
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString, FromRepr))]
@@ -16,6 +17,7 @@ pub enum WeaponUpgrade {
     RapidSentry = 4,
 }
 impl WeaponUpgrade {
+    /// Returns the [`UberIdentifier`] tracking whether the player has this `WeaponUpgrade`
     pub const fn uber_identifier(self) -> UberIdentifier {
         match self {
             WeaponUpgrade::ExplodingSpear => weapon_upgrade::EXPLODING_SPEAR,
@@ -25,6 +27,7 @@ impl WeaponUpgrade {
             WeaponUpgrade::RapidSentry => weapon_upgrade::RAPID_SENTRY,
         }
     }
+    /// Returns the `WeaponUpgrade` corresponsing to the [`UberIdentifier`], if one exists
     #[cfg(feature = "strum")]
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {

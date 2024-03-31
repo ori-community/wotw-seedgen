@@ -3,6 +3,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString};
 
+/// Icons used in the Opher shop
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString))]
@@ -21,6 +22,7 @@ pub enum OpherIcon {
     WaterBreath = 10,
     FastTravel = 11,
 }
+/// Icons used in the Lupo shop
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString))]
@@ -30,6 +32,7 @@ pub enum LupoIcon {
     HealthFragmentsMap = 1,
     ShardsMap = 2,
 }
+/// Icons used in the Grom shop
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString))]
@@ -43,6 +46,7 @@ pub enum GromIcon {
     ThornySituation = 5,
     TheGorlekTouch = 6,
 }
+/// Icons used in the Tuley shop
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString))]
@@ -56,6 +60,7 @@ pub enum TuleyIcon {
     TheLastSeed = 5,
 }
 // should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Core/enums/map_icon.h
+/// Icons used in the map
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(Display, EnumString))]

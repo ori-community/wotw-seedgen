@@ -6,6 +6,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg(feature = "strum")]
 use strum::EnumString;
 
+/// Spirit Wells which exist in the base game
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
 #[cfg_attr(feature = "strum", derive(EnumString))]
@@ -33,28 +34,30 @@ pub enum Teleporter {
 impl Display for Teleporter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Teleporter::Inkwater => write!(f, "Inkwater Marsh Teleporter"),
-            Teleporter::Den => write!(f, "Howl's Den Teleporter"),
-            Teleporter::Hollow => write!(f, "Kwolok's Hollow Teleporter"),
-            Teleporter::Glades => write!(f, "Glades Teleporter"),
-            Teleporter::Wellspring => write!(f, "Wellspring Teleporter"),
-            Teleporter::Burrows => write!(f, "Midnight Burrows Teleporter"),
-            Teleporter::WoodsEntrance => write!(f, "Woods Entrance Teleporter"),
-            Teleporter::WoodsExit => write!(f, "Woods Exit Teleporter"),
-            Teleporter::Reach => write!(f, "Baur's Reach Teleporter"),
-            Teleporter::Depths => write!(f, "Mouldwood Depths Teleporter"),
-            Teleporter::CentralLuma => write!(f, "Central Luma Teleporter"),
-            Teleporter::LumaBoss => write!(f, "Luma Boss Teleporter"),
-            Teleporter::FeedingGrounds => write!(f, "Feeding Grounds Teleporter"),
-            Teleporter::CentralWastes => write!(f, "Central Wastes Teleporter"),
-            Teleporter::OuterRuins => write!(f, "Outer Ruins Teleporter"),
-            Teleporter::InnerRuins => write!(f, "Inner Ruins Teleporter"),
-            Teleporter::Willow => write!(f, "Willow's End Teleporter"),
-            Teleporter::Shriek => write!(f, "Shriek Teleporter"),
+            Teleporter::Inkwater => write!(f, "Inkwater Marsh")?,
+            Teleporter::Den => write!(f, "Howl's Den")?,
+            Teleporter::Hollow => write!(f, "Kwolok's Hollow")?,
+            Teleporter::Glades => write!(f, "Glades")?,
+            Teleporter::Wellspring => write!(f, "Wellspring")?,
+            Teleporter::Burrows => write!(f, "Midnight Burrows")?,
+            Teleporter::WoodsEntrance => write!(f, "Woods Entrance")?,
+            Teleporter::WoodsExit => write!(f, "Woods Exit")?,
+            Teleporter::Reach => write!(f, "Baur's Reach")?,
+            Teleporter::Depths => write!(f, "Mouldwood Depths")?,
+            Teleporter::CentralLuma => write!(f, "Central Luma")?,
+            Teleporter::LumaBoss => write!(f, "Luma Boss")?,
+            Teleporter::FeedingGrounds => write!(f, "Feeding Grounds")?,
+            Teleporter::CentralWastes => write!(f, "Central Wastes")?,
+            Teleporter::OuterRuins => write!(f, "Outer Ruins")?,
+            Teleporter::InnerRuins => write!(f, "Inner Ruins")?,
+            Teleporter::Willow => write!(f, "Willow's End")?,
+            Teleporter::Shriek => write!(f, "Shriek")?,
         }
+        write!(f, " Teleporter")
     }
 }
 impl Teleporter {
+    /// Returns the [`UberIdentifier`] tracking whether the player has activated this `Teleporter`
     pub const fn uber_identifier(self) -> UberIdentifier {
         match self {
             Teleporter::Inkwater => teleporter::INKWATER,
@@ -77,6 +80,7 @@ impl Teleporter {
             Teleporter::Shriek => teleporter::SHRIEK,
         }
     }
+    /// Returns the `Teleporter` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {
             teleporter::INKWATER => Some(Teleporter::Inkwater),
