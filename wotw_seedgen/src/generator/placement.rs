@@ -29,7 +29,7 @@ use wotw_seedgen_logic_language::output::{Node, Requirement};
 use wotw_seedgen_seed_language::{
     compile,
     output::{
-        ClientEvent, CommandInteger, CommandString, CommandVoid, CompilerOutput, Event, Icon,
+        ClientEvent, CommandInteger, CommandString, CommandVoid, Event, Icon, IntermediateOutput,
         ItemMetadata, StringOrPlaceholder, Trigger,
     },
 };
@@ -55,7 +55,7 @@ const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are g
 
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
-    worlds: Vec<(World, CompilerOutput)>,
+    worlds: Vec<(World, IntermediateOutput)>,
 ) -> Result<Seed, String> {
     assert!(
         !worlds.is_empty(),
@@ -97,7 +97,7 @@ pub struct Context<'graph, 'settings> {
 pub struct WorldContext<'graph, 'settings> {
     rng: Pcg64Mcg,
     pub world: World<'graph, 'settings>,
-    pub output: CompilerOutput,
+    pub output: IntermediateOutput,
     /// world index of this world
     #[cfg_attr(not(any(feature = "log", test)), allow(unused))]
     index: usize,
@@ -129,7 +129,10 @@ pub struct WorldContext<'graph, 'settings> {
 }
 
 impl<'graph, 'settings> Context<'graph, 'settings> {
-    fn new(rng: &mut Pcg64Mcg, worlds: Vec<(World<'graph, 'settings>, CompilerOutput)>) -> Self {
+    fn new(
+        rng: &mut Pcg64Mcg,
+        worlds: Vec<(World<'graph, 'settings>, IntermediateOutput)>,
+    ) -> Self {
         let worlds = worlds
             .into_iter()
             .enumerate()
@@ -657,7 +660,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn new(
         rng: &mut Pcg64Mcg,
         mut world: World<'graph, 'settings>,
-        mut output: CompilerOutput,
+        mut output: IntermediateOutput,
         index: usize,
     ) -> Self {
         let mut item_pool = ItemPool::default();
@@ -1158,7 +1161,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
 fn total_reach_check<'graph>(
     world: &World<'graph, '_>,
-    output: &CompilerOutput,
+    output: &IntermediateOutput,
     item_pool: &ItemPool,
 ) -> Vec<&'graph Node> {
     let mut world = world.clone();
@@ -1268,7 +1271,7 @@ fn default_icon(command: &CommandVoid) -> Option<Icon> {
 
 // TODO make a generic contained_commands iterator?
 // This catches common cases but would fail to detect edge case commands
-fn modifies_uberstate(command: &CommandVoid, output: &CompilerOutput) -> bool {
+fn modifies_uberstate(command: &CommandVoid, output: &IntermediateOutput) -> bool {
     match command {
         CommandVoid::Multi { commands } => commands
             .iter()

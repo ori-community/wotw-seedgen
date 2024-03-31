@@ -81,9 +81,8 @@ pub(crate) fn analyze<F: SeedStorageAccess, SA: SnippetAccess + Sync>(
                         let seed = loop {
                             match wotw_seedgen::generate_seed(
                                 graph,
-                                snippet_access,
                                 uber_state_data,
-                                &mut io::stderr(),
+                                snippet_access,
                                 &settings,
                             ) {
                                 Ok(seed) => break seed.spoiler,
@@ -144,9 +143,7 @@ fn analyze_existing_seeds<F: SeedStorageAccess>(
     sample_size: usize,
     data: &mut [SeedData],
 ) -> Result<usize> {
-    let mut existing = HandleErrors::new(F::read_seeds(settings, sample_size)?, |err| {
-        eprintln!("{err}");
-    });
+    let mut existing = HandleErrors::new_print_errors(F::read_seeds(settings, sample_size)?);
     let mut existing_amount = 0;
 
     for seed in existing.by_ref() {

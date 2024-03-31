@@ -67,6 +67,7 @@ fn main() {
     }
     #[cfg(feature = "logic")]
     {
+        // TODO create logic folder
         println!("cargo:rerun-if-changed=../assets/logic");
 
         use itertools::Itertools;

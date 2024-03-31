@@ -6,19 +6,19 @@ use std::ops::{Add, Div, Mul, Sub};
 use wotw_seedgen_data::{UberIdentifier, Zone};
 use wotw_seedgen_seed_language::output::{
     ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Comparator, CompilerOutput, EqualityComparator, LogicOperator,
+    CommandVoid, CommandZone, Comparator, EqualityComparator, IntermediateOutput, LogicOperator,
     Operation, StringOrPlaceholder, Trigger,
 };
 
 pub trait Simulate {
     type Return;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return;
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return;
 }
 impl<T: Simulate> Simulate for Vec<T> {
     type Return = ();
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         for t in self {
             t.simulate(world, output);
         }
@@ -27,7 +27,7 @@ impl<T: Simulate> Simulate for Vec<T> {
 impl Simulate for Command {
     type Return = ();
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         match self {
             Command::Boolean(command) => {
                 command.simulate(world, output);
@@ -56,7 +56,7 @@ where
 {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         let left = self.left.simulate(world, output);
         let right = self.right.simulate(world, output);
         match self.operator {
@@ -71,7 +71,7 @@ where
 {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         let left = self.left.simulate(world, output);
         let right = self.right.simulate(world, output);
         match self.operator {
@@ -87,7 +87,7 @@ where
 impl<Item: Simulate<Return = bool>> Simulate for Operation<Item, LogicOperator> {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         let left = self.left.simulate(world, output);
         let right = self.right.simulate(world, output);
         match self.operator {
@@ -105,7 +105,7 @@ where
 {
     type Return = Item::Return;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         let left = self.left.simulate(world, output);
         let right = self.right.simulate(world, output);
         match self.operator {
@@ -119,7 +119,7 @@ where
 impl Simulate for CommandBoolean {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         match self {
             CommandBoolean::Constant { value } => *value,
             CommandBoolean::Multi { commands, last } => {
@@ -143,7 +143,7 @@ impl Simulate for CommandBoolean {
 impl Simulate for CommandInteger {
     type Return = i32;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         match self {
             CommandInteger::Constant { value } => *value,
             CommandInteger::Multi { commands, last } => {
@@ -164,7 +164,7 @@ impl Simulate for CommandInteger {
 impl Simulate for CommandFloat {
     type Return = OrderedFloat<f32>;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         match self {
             CommandFloat::Constant { value } => *value,
             CommandFloat::Multi { commands, last } => {
@@ -185,7 +185,7 @@ impl Simulate for CommandFloat {
 impl Simulate for CommandString {
     type Return = String;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         match self {
             CommandString::Constant { value } => match value {
                 StringOrPlaceholder::Value(value) => value.clone(),
@@ -209,7 +209,7 @@ impl Simulate for CommandString {
 impl Simulate for CommandZone {
     type Return = Zone;
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         match self {
             CommandZone::Constant { value } => *value,
             CommandZone::Multi { commands, last } => {
@@ -223,7 +223,7 @@ impl Simulate for CommandZone {
 impl Simulate for CommandVoid {
     type Return = ();
 
-    fn simulate(&self, world: &mut World, output: &CompilerOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
         if !matches!(self, CommandVoid::Multi { .. }) {
             for common_item in CommonItem::from_command(self) {
                 common_item.grant(&mut world.player.inventory);
@@ -321,7 +321,7 @@ impl Simulate for CommandVoid {
 
 fn set_uber_state(
     world: &mut World,
-    output: &CompilerOutput,
+    output: &IntermediateOutput,
     uber_identifier: UberIdentifier,
     value: UberStateValue,
     trigger_events: bool,
@@ -341,7 +341,7 @@ fn set_uber_state(
         world.uber_states.set(uber_identifier, value);
     }
 }
-fn process_triggers(world: &mut World, output: &CompilerOutput, events: Vec<usize>) {
+fn process_triggers(world: &mut World, output: &IntermediateOutput, events: Vec<usize>) {
     for index in events {
         let event = &output.events[index];
         if match &event.trigger {
@@ -388,7 +388,7 @@ fn prevent_uber_state_change(
 // This should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Randomizer/uber_states/misc_handlers.cpp
 fn uber_state_side_effects(
     world: &mut World,
-    output: &CompilerOutput,
+    output: &IntermediateOutput,
     uber_identifier: UberIdentifier,
     value: UberStateValue,
     trigger_events: bool,

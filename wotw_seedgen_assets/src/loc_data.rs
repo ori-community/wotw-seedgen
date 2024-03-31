@@ -3,40 +3,37 @@
 //! # Examples
 //!
 //! ```
-//! # use wotw_seedgen::logic::{parse_locations, Location};
-//! use wotw_seedgen::uber_state::UberStateTrigger;
-//! use wotw_seedgen::util::Position;
-//! use wotw_seedgen::util::Zone;
+//! use wotw_seedgen_assets::{LocData, LocDataEntry};
+//! use wotw_seedgen_assets::data::{UberIdentifier, Position, Zone};
 //!
-//! let input = "
-//! PickupIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberId, UberStateValue, X, Y, MapX, MapY
-//! MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, 1, -958, -4313, -958, -4313
-//! GladesTown.MotayHutEX, Wellspring Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, 1, -172, -4584, -394, -4136";
-//! let locations = parse_locations(input).unwrap();
+//! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberId, UberStateValue, X, Y, MapX, MapY
+//! MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, , -958.6, -4313.2, -958.6199, -4312.245
+//! GladesTown.MotayHutEX, Wellspring Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, , -172.7, -4583.2, -392.8, -4130.6";
+//! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
 //!
-//! assert_eq!(locations, vec![
-//!     Location {
-//!         name: "MarshSpawn.RockHC".to_string(),
-//!         zone: Zone::Marsh,
-//!         trigger: "21786|60210>=1".parse().unwrap(),
-//!         position: Position::new(-958., -4313.),
-//!         map_position: Position::new(-958., -4313.),
+//! assert_eq!(loc_data.entries, vec![
+//!     LocDataEntry {
+//!         identifier: "MarshSpawn.RockHC".to_string(),
+//!         zone: Zone::Inkwater,
+//!         uber_identifier: UberIdentifier::new(21786, 60210),
+//!         value: Some(1),
+//!         position: Some(Position::new(-958., -4313.)),
+//!         map_position: Some(Position::new(-958., -4313.)),
 //!     },
-//!     Location {
-//!         name: "GladesTown.MotayHutEX".to_string(),
+//!     LocDataEntry {
+//!         identifier: "GladesTown.MotayHutEX".to_string(),
 //!         zone: Zone::Glades,
-//!         trigger: "42178|57455>=1".parse().unwrap(),
-//!         position: Position::new(-172., -4584.),
-//!         map_position: Position::new(-394., -4136.),
+//!         uber_identifier: UberIdentifier::new(42178, 57455),
+//!         value: Some(1),
+//!         position: Some(Position::new(-172., -4584.)),
+//!         map_position: Some(Position::new(-394., -4136.)),
 //!     }
 //! ]);
 //! ```
 
 use serde::{Deserialize, Serialize};
 use std::io;
-use wotw_seedgen_data::Position;
-
-pub use wotw_seedgen_data::{UberIdentifier, Zone};
+use wotw_seedgen_data::{Position, UberIdentifier, Zone};
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct LocData {

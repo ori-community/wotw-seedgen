@@ -3,7 +3,6 @@ use crate::generate_seed;
 use env_logger::Env;
 use lazy_static::lazy_static;
 use log::info;
-use std::io;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::Graph,
@@ -39,9 +38,8 @@ fn some_seeds() {
     info!("Testing Default settings");
     generate_seed(
         &graph,
-        &*SNIPPET_ACCESS,
         &*UBER_STATE_DATA,
-        &mut io::stderr(),
+        &*SNIPPET_ACCESS,
         &universe_settings,
     )
     .unwrap();
@@ -58,9 +56,8 @@ fn some_seeds() {
     info!("Testing Unsafe");
     generate_seed(
         &graph,
-        &*SNIPPET_ACCESS,
         &*UBER_STATE_DATA,
-        &mut io::stderr(),
+        &*SNIPPET_ACCESS,
         &universe_settings,
     )
     .unwrap();
@@ -100,9 +97,8 @@ fn some_seeds() {
     info!("Testing multiworld Gorlek with headers");
     generate_seed(
         &graph,
-        &*SNIPPET_ACCESS,
         &*UBER_STATE_DATA,
-        &mut io::stderr(),
+        &*SNIPPET_ACCESS,
         &universe_settings,
     )
     .unwrap();

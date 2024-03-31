@@ -1,4 +1,5 @@
 # TODO rerun
+# TODO move some files out of assets so that the entire folder can be copied for the rando installation
 cargo run -p wotw_seedgen_cli -- world-preset moki --name Moki --description "Default game paths and always spawn with sword, best choice for beginners. Quests are disabled" --base-preset -p qol -d moki -h black_market teleporters spawn_tuley key_hints zone_hints shrine_hints no_trials no_rain fragment_overflow knowledge_hints spawn_with_sword no_quests
 cargo run -p wotw_seedgen_cli -- world-preset gorlek --name Gorlek --description "For advanced players, requires some hard paths and doesn't spawn with sword" --base-preset -p qol -d gorlek -h black_market teleporters spawn_tuley key_hints zone_hints shrine_hints trial_hints no_rain fragment_overflow knowledge_hints
 cargo run -p wotw_seedgen_cli -- world-preset qol --name "Quality of Life" --description "Enables some quality of life settings (e.g. autoplant, cutscene skips etc.)" -h progress_helper no_cutscenes autoplants tp_refill better_stomp

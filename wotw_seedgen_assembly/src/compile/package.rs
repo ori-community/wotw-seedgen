@@ -2,9 +2,11 @@ use super::{compile_into_lookup, Compile};
 use crate::{Event, SeedWorld, Spawn};
 use rustc_hash::FxHashMap;
 use std::collections::hash_map::Entry;
-use wotw_seedgen_seed_language::output::CompilerOutput;
+use wotw_seedgen_seed_language::output::IntermediateOutput;
 
-pub fn compile_intermediate_output(output: CompilerOutput) -> (SeedWorld, Vec<(String, Vec<u8>)>) {
+pub fn compile_intermediate_output(
+    output: IntermediateOutput,
+) -> (SeedWorld, Vec<(String, Vec<u8>)>) {
     let mut flags = output.flags;
     flags.sort();
     let spawn = output

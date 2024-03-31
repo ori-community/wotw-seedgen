@@ -18,12 +18,7 @@ impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> HandleErr
 }
 impl<T, E: Display, I: Iterator<Item = std::result::Result<T, E>>> HandleErrors<T, E, I, fn(E)> {
     pub(crate) fn new_print_errors(iter: I) -> Self {
-        Self {
-            iter,
-            handler: |err| eprintln!("{err}"),
-            errors: 0,
-            printed_error_count: false,
-        }
+        Self::new(iter, |err| eprintln!("{err}"))
     }
 }
 impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> Iterator

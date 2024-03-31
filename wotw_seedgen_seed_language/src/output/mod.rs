@@ -19,7 +19,7 @@ use wotw_seedgen_data::{
 
 // TODO check all the public derives
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct CompilerOutput {
+pub struct IntermediateOutput {
     pub spawn: Option<Position>,
     pub timers: Vec<Timer>,
     pub events: Vec<Event>,
@@ -30,7 +30,6 @@ pub struct CompilerOutput {
     pub item_metadata: ItemMetadata,
     pub logical_state_sets: FxHashSet<String>,
     pub preplacements: Vec<(CommandVoid, wotw_seedgen_data::Zone)>,
-    pub success: bool,
     pub debug: Option<DebugOutput>,
 }
 

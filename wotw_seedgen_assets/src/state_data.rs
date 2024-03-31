@@ -3,19 +3,20 @@
 //! # Examples
 //!
 //! ```
-//! # use wotw_seedgen::logic::{parse_states, NamedState};
-//! use wotw_seedgen::uber_state::UberStateTrigger;
+//! use wotw_seedgen_assets::{StateData, StateDataEntry};
+//! use wotw_seedgen_assets::data::UberIdentifier;
 //!
 //! let input = "
 //! NodeIdentifier, UberGroup, UberId, UberStateValue
 //! MarshSpawn.HowlBurnt, 21786, 25095, 1
 //! ";
-//! let states = parse_states(input).unwrap();
+//! let state_data = StateData::from_reader(input.as_bytes()).unwrap();
 //!
-//! assert_eq!(states, vec![
-//!     NamedState {
-//!         name: "MarshSpawn.HowlBurnt".to_string(),
-//!         trigger: "21786|25095>=1".parse().unwrap(),
+//! assert_eq!(state_data.entries, vec![
+//!     StateDataEntry {
+//!         identifier: "MarshSpawn.HowlBurnt".to_string(),
+//!         uber_identifier: UberIdentifier::new(21786, 25095),
+//!         value: Some(1),
 //!     }
 //! ]);
 //! ```

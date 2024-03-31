@@ -25,7 +25,7 @@ fn reach_check() {
         &universe_settings.world_settings[0],
         uber_states,
     );
-    let output = CompilerOutput::default();
+    let output = IntermediateOutput::default();
 
     let mut pool = ItemPool::default();
     for item in pool.drain() {

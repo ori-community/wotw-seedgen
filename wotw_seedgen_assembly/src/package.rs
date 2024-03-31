@@ -4,7 +4,7 @@ use std::{
     io::Write,
     path::{Path, PathBuf},
 };
-use wotw_seedgen_seed_language::output::CompilerOutput;
+use wotw_seedgen_seed_language::output::IntermediateOutput;
 
 pub struct Package {
     builder: tar::Builder<xz2::write::XzEncoder<File>>,
@@ -26,7 +26,7 @@ impl Package {
 
     pub fn add_from_intermediate_output(
         &mut self,
-        output: CompilerOutput,
+        output: IntermediateOutput,
         pretty: bool,
     ) -> Result<()> {
         let (seed_world, icons) = compile_intermediate_output(output);

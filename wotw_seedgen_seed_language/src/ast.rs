@@ -67,7 +67,6 @@ pub enum Trigger<'source> {
     Binding(Spanned<Change>, TriggerBinding<'source>),
     Condition(Expression<'source>),
 }
-// TODO remove ability triggers because the states are more flexible for those (remain true for the duration)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, Serialize, Deserialize)]
 #[ast(case = "snake")]
 #[strum(serialize_all = "snake_case")]

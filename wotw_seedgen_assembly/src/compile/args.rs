@@ -161,8 +161,7 @@ impl<'a> Args<'a> {
     }
 }
 
-// TODO remove debug
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum ArgType {
     Boolean,
     Integer,

@@ -25,7 +25,7 @@ pub struct Player<'settings> {
 impl Player<'_> {
     /// Returns an instance of [`Player`] with the given [`WorldSettings`]
     ///
-    /// The [`Player`] will have an empty Inventory. Use [`Player::spawn`] to create a player with starting health and energy like in-game
+    /// The [`Player`] will have an empty Inventory. Use [`Player::new_spawn`] to create a player with starting health and energy like in-game
     pub fn new(settings: &WorldSettings) -> Player {
         Player {
             inventory: Inventory::default(),
@@ -49,11 +49,11 @@ impl Player<'_> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::world::Player;
+    /// # use wotw_seedgen::Player;
     /// use wotw_seedgen::settings::WorldSettings;
     ///
     /// let world_settings = WorldSettings::default();
-    /// let mut player = Player::spawn(&world_settings);
+    /// let mut player = Player::new_spawn(&world_settings);
     /// assert_eq!(player.max_health(), 30.0);
     /// ```
     pub fn max_health(&self) -> f32 {
@@ -66,11 +66,11 @@ impl Player<'_> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::world::Player;
+    /// # use wotw_seedgen::Player;
     /// use wotw_seedgen::settings::WorldSettings;
     ///
     /// let world_settings = WorldSettings::default();
-    /// let mut player = Player::spawn(&world_settings);
+    /// let mut player = Player::new_spawn(&world_settings);
     /// assert_eq!(player.max_energy(), 3.0);
     /// ```
     pub fn max_energy(&self) -> f32 {
@@ -87,12 +87,12 @@ impl Player<'_> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::world::Player;
+    /// # use wotw_seedgen::Player;
     /// use wotw_seedgen::settings::WorldSettings;
-    /// use wotw_seedgen::util::Orbs;
+    /// use wotw_seedgen::orbs::Orbs;
     ///
     /// let world_settings = WorldSettings::default();
-    /// let player = Player::spawn(&world_settings);
+    /// let player = Player::new_spawn(&world_settings);
     /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
     ///
     /// player.cap_orbs(&mut orbs, false);
@@ -103,17 +103,15 @@ impl Player<'_> {
     /// `checkpoint` represents whether the Orbs are a result of the player respawning on a checkpoint, in which case special rules apply
     ///
     /// ```
-    /// # use wotw_seedgen::world::Player;
-    /// # use wotw_seedgen::settings::WorldSettings;
-    /// # use wotw_seedgen::util::Orbs;
-    /// use wotw_seedgen::Item;
-    /// use wotw_seedgen::item::Shard;
-    /// use wotw_seedgen::settings::Difficulty;
+    /// # use wotw_seedgen::Player;
+    /// use wotw_seedgen::data::Shard;
+    /// use wotw_seedgen::orbs::Orbs;
+    /// use wotw_seedgen::settings::{WorldSettings, Difficulty};
     ///
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
-    /// let mut player = Player::spawn(&world_settings);
-    /// player.inventory.grant(Item::Shard(Shard::Vitality), 1);
+    /// let mut player = Player::new_spawn(&world_settings);
+    /// player.inventory.shards.insert(Shard::Vitality);
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
     ///
     /// player.cap_orbs(&mut orbs, false);
@@ -135,19 +133,17 @@ impl Player<'_> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::world::Player;
+    /// # use wotw_seedgen::Player;
     /// use wotw_seedgen::settings::WorldSettings;
-    /// use wotw_seedgen::util::Orbs;
-    /// use wotw_seedgen::Item;
-    /// use wotw_seedgen::item::Resource;
+    /// use wotw_seedgen::orbs::Orbs;
     ///
     /// let world_settings = WorldSettings::default();
-    /// let mut player = Player::spawn(&world_settings);
+    /// let mut player = Player::new_spawn(&world_settings);
     /// assert_eq!(player.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
-    /// player.inventory.grant(Item::Resource(Resource::HealthFragment), 22);
-    /// player.inventory.grant(Item::Resource(Resource::EnergyFragment), 24);
+    /// player.inventory.health += 110;
+    /// player.inventory.energy += 12.;
     /// assert_eq!(player.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
     /// assert_eq!(player.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
     /// ```
@@ -161,20 +157,17 @@ impl Player<'_> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::world::Player;
+    /// # use wotw_seedgen::Player;
     /// use wotw_seedgen::settings::WorldSettings;
-    /// use wotw_seedgen::util::Orbs;
-    /// use wotw_seedgen::Item;
-    /// use wotw_seedgen::item::Resource;
     ///
     /// let world_settings = WorldSettings::default();
-    /// let mut player = Player::spawn(&world_settings);
+    /// let mut player = Player::new_spawn(&world_settings);
     /// assert_eq!(player.health_plant_drops(), 1.0);
     ///
-    /// player.inventory.grant(Item::Resource(Resource::HealthFragment), 8);
+    /// player.inventory.health += 40;
     /// assert_eq!(player.health_plant_drops(), 2.0);
     ///
-    /// player.inventory.grant(Item::Resource(Resource::HealthFragment), 18);
+    /// player.inventory.health += 90;
     /// assert_eq!(player.health_plant_drops(), 5.0);
     /// ```
     pub fn health_plant_drops(&self) -> f32 {

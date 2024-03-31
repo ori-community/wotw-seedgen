@@ -17,14 +17,14 @@ use crate::{
 use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
-use std::{io, iter};
+use std::iter;
 use wotw_seedgen_assembly::SeedWorld;
 use wotw_seedgen_assets::{SnippetAccess, UberStateData};
 use wotw_seedgen_data::uber_identifier;
 use wotw_seedgen_logic_language::output::Graph;
 use wotw_seedgen_seed_language::{
     compile::{self, Compiler},
-    output::{ClientEvent, CompilerOutput, Event, Trigger},
+    output::{ClientEvent, Event, IntermediateOutput, Trigger},
 };
 use wotw_seedgen_settings::{Spawn, UniverseSettings, WorldSettings};
 
@@ -38,13 +38,11 @@ pub struct Seed {
 
 const RETRIES: u16 = 10; // How many retries to allow when generating a seed
 
-pub fn generate_seed<F: SnippetAccess, W: io::Write>(
+/// Entry point for seed generation
+pub fn generate_seed<F: SnippetAccess>(
     graph: &Graph,
-    snippet_access: &F,
     uber_state_data: &UberStateData,
-    // TODO we don't fully support writing to an arbitrary output, so maybe this should be made consistent with that
-    // Maybe it could be put into the return type?
-    write_errors: &mut W,
+    snippet_access: &F,
     settings: &UniverseSettings,
 ) -> Result<Seed, String> {
     let mut rng: Pcg64Mcg = Seeder::from(&settings.seed).make_rng();
@@ -61,7 +59,7 @@ pub fn generate_seed<F: SnippetAccess, W: io::Write>(
                 world_settings.snippet_config.clone(),
             );
             // TODO this is inefficient because we probably do a lot of redundant work between the worlds
-            let output = parse_snippets(&world_settings.snippets, compiler, write_errors)?;
+            let output = parse_snippets(&world_settings.snippets, compiler)?;
             Ok((world_settings, output))
         })
         .collect::<Result<Vec<_>, String>>()?;
@@ -121,26 +119,17 @@ pub fn generate_seed<F: SnippetAccess, W: io::Write>(
 
 const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
 
-fn parse_snippets<W: io::Write>(
+fn parse_snippets(
     snippets: &[String],
     mut compiler: Compiler,
-    write_errors: &mut W,
-) -> Result<CompilerOutput, String> {
+) -> Result<IntermediateOutput, String> {
     for identifier in iter::once("seed_core").chain(snippets.iter().map(String::as_str)) {
         compiler
             .compile_snippet(identifier)
             .map_err(|err| format!("Failed to read snippet \"{identifier}\": {err}"))?;
     }
 
-    let output = compiler
-        .finish(write_errors)
-        .map_err(|err| format!("Failed to write errors: {err}"))?;
-
-    if output.success {
-        Ok(output)
-    } else {
-        Err("Snippet compilation failed, see errors for more details".to_string())
-    }
+    compiler.finish().into_result()
 }
 
 fn choose_spawn(

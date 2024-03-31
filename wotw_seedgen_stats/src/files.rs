@@ -6,8 +6,6 @@ use wotw_seedgen::{settings::UniverseSettings, spoiler::SeedSpoiler};
 ///
 /// When generating stats multiple times with the same settings, seeds generated for previous runs can be reused  
 /// These trait methods will be used to store and reuse seeds across stats runs
-///
-/// If the `fs` feature is enabled, you may use [`FileSystemAccess`] to store seeds in the local filesystem
 pub trait SeedStorageAccess {
     type Iter: Iterator<Item = Result<SeedSpoiler>>;
 

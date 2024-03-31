@@ -4,7 +4,7 @@ use crate::{
         UberIdentifierNumeric,
     },
     compile::Compiler,
-    output::CompilerOutput,
+    output::IntermediateOutput,
     token::TOKENIZER,
 };
 use lazy_static::lazy_static;
@@ -155,18 +155,8 @@ fn snippets() {
         }
     }
 
-    // TODO delete temporary test stuff
-    let mut compiler = Compiler::new(
-        &mut rand::thread_rng(),
-        &TestFileAccess,
-        &*UBER_STATE_DATA,
-        Default::default(),
-    );
-    compiler.compile_snippet("rapid_hammer_core").unwrap();
-    let output = compiler.finish(&mut &mut io::stderr()).unwrap();
-    assert!(output.success);
-
-    fn write_test_output(filename: impl Display, output: &CompilerOutput) {
+    // TODO remove test output
+    fn write_test_output(filename: impl Display, output: &IntermediateOutput) {
         fs::create_dir_all(format!("{}/target/snippet-test", *WORKDIR)).unwrap();
         fs::write(
             format!("{}/target/snippet-test/{}", *WORKDIR, filename),
@@ -201,81 +191,39 @@ fn snippets() {
     for identifier in &snippets {
         compiler.compile_snippet(identifier).unwrap();
     }
-    let output = compiler.finish(&mut io::stderr()).unwrap();
-    assert!(output.success);
+    let (output, success) = compiler.finish().eprint_errors();
+    assert!(success);
 
     write_test_output("_final", &output);
 
-    snippets
-        .iter()
-        .map(|identifier| {
-            let mut compiler = Compiler::new(
-                &mut rand::thread_rng(),
-                &TestFileAccess,
-                &*UBER_STATE_DATA,
-                Default::default(),
-            );
+    for identifier in &snippets {
+        let mut compiler = Compiler::new(
+            &mut rand::thread_rng(),
+            &TestFileAccess,
+            &*UBER_STATE_DATA,
+            Default::default(),
+        );
 
-            compiler.compile_snippet(identifier).unwrap();
+        compiler.compile_snippet(identifier).unwrap();
 
-            let output = compiler.finish(&mut io::stderr()).unwrap();
+        let (output, success) = compiler.finish().eprint_errors();
+        assert!(success);
 
-            write_test_output(identifier, &output);
-
-            output.success.then_some(())
-        })
-        .chain(test_with_config.keys().map(|identifier| {
-            let mut compiler = Compiler::new(
-                &mut rand::thread_rng(),
-                &TestFileAccess,
-                &*UBER_STATE_DATA,
-                test_with_config.clone(),
-            );
-
-            compiler.compile_snippet(identifier).unwrap();
-
-            let output = compiler.finish(&mut io::stderr()).unwrap();
-
-            write_test_output(format!("{identifier} (alternate config)"), &output);
-
-            output.success.then_some(())
-        }))
-        .collect::<Vec<_>>()
-        .into_iter()
-        .try_for_each(|t| t)
-        .unwrap();
-}
-
-// TODO delete
-#[test]
-fn dangerous() {
-    struct TestFileAccess;
-    impl SnippetAccess for TestFileAccess {
-        fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
-            let mut id = format!("{}/assets/dangerous/{}.wotws", *WORKDIR, identifier);
-            let content = fs::read_to_string(&id)
-                .or_else(|_| {
-                    id = format!("{}/assets/snippets/{}.wotws", *WORKDIR, identifier);
-                    fs::read_to_string(&id)
-                })
-                .map_err(|err| err.to_string())?;
-            Ok(Source { id, content })
-        }
-        fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-            let mut full_path = PathBuf::from(*WORKDIR);
-            full_path.push("assets/dangerous");
-            full_path.push(path);
-            fs::read(full_path).map_err(|err| err.to_string())
-        }
+        write_test_output(identifier, &output);
     }
+    for identifier in test_with_config.keys() {
+        let mut compiler = Compiler::new(
+            &mut rand::thread_rng(),
+            &TestFileAccess,
+            &*UBER_STATE_DATA,
+            test_with_config.clone(),
+        );
 
-    let mut compiler = Compiler::new(
-        &mut rand::thread_rng(),
-        &TestFileAccess,
-        &*UBER_STATE_DATA,
-        Default::default(),
-    );
-    compiler.compile_snippet("main").unwrap();
-    let output = compiler.finish(&mut io::stderr()).unwrap();
-    assert!(output.success);
+        compiler.compile_snippet(identifier).unwrap();
+
+        let (output, success) = compiler.finish().eprint_errors();
+        assert!(success);
+
+        write_test_output(format!("{identifier} (alternate config)"), &output);
+    }
 }

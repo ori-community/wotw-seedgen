@@ -4,7 +4,7 @@ use crate::{
 };
 use std::{
     fs::{self, File},
-    io::{self, Write},
+    io::Write,
 };
 use wotw_seedgen::{
     generate_seed,
@@ -24,13 +24,7 @@ pub(crate) fn seed(settings: UniversePreset) -> Result<(), Error> {
     let graph = compile_graph(assets.loc_data, assets.state_data, &settings.world_settings)?;
 
     let snippet_access = SnippetFileAccess;
-    let mut seed = generate_seed(
-        &graph,
-        &snippet_access,
-        &assets.uber_state_data,
-        &mut io::stderr(),
-        &settings,
-    )?;
+    let mut seed = generate_seed(&graph, &assets.uber_state_data, &snippet_access, &settings)?;
 
     fs::write("seeds/spoiler.txt", seed.spoiler.to_string())?;
 

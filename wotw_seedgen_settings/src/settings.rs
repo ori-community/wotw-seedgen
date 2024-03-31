@@ -2,7 +2,7 @@ use crate::{PresetAccess, UniversePreset, WorldPreset};
 use rustc_hash::{FxHashMap, FxHashSet};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{convert::Infallible, iter, str::FromStr};
+use std::iter;
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString, EnumVariantNames};
 
@@ -54,7 +54,7 @@ impl UniverseSettings {
     /// - If the number of worlds matches, the preset will be applied to each world per index
     /// - If only one world is in the preset, but multiple in the existing settings, the preset is applied to all worlds
     /// - If multiple worlds are in the preset, but only one in the existing settings, the existing settings will be copied for all worlds, then the preset will be applied per index
-    /// - If multiple worlds are in both and their number does not match, returns an [`Error`]
+    /// - If multiple worlds are in both and their number does not match, returns an error
     /// - Nested presets will be applied before the parent preset
     pub fn apply_preset<A: PresetAccess>(
         &mut self,

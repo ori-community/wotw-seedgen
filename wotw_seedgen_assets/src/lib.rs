@@ -1,3 +1,4 @@
+#[cfg(feature = "wotw_seedgen_data")]
 pub use wotw_seedgen_data as data;
 
 #[cfg(feature = "loc_data")]
@@ -5,7 +6,7 @@ mod loc_data;
 use std::path::Path;
 
 #[cfg(feature = "loc_data")]
-pub use loc_data::{LocData, LocDataEntry, UberIdentifier, Zone};
+pub use loc_data::{LocData, LocDataEntry};
 #[cfg(feature = "presets")]
 mod presets;
 #[cfg(feature = "state_data")]

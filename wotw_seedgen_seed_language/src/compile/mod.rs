@@ -17,8 +17,8 @@ use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
     ast::{self, UberStateType},
     output::{
-        self, intermediate::Literal, ArithmeticOperator, CommandBoolean, CommandFloat,
-        CommandInteger, CommandVoid, CompilerOutput, Operation, SnippetDebugOutput,
+        intermediate::Literal, ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger,
+        CommandVoid, IntermediateOutput, Operation, SnippetDebugOutput,
     },
     token::TOKENIZER,
     types::uber_state_type,
@@ -201,11 +201,10 @@ impl<'source> Compile<'source> for ast::Snippet<'source> {
     }
 }
 
-// referencing the necessary data instead of the whole Compiler avoids being generic over the Compiler's FileAccess
 #[derive(Derivative)]
 #[derivative(Debug)]
 pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
-    pub output: CompilerOutput,
+    pub output: IntermediateOutput,
     pub uber_state_data: &'uberstates UberStateData,
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
@@ -448,30 +447,60 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         Ok(())
     }
 
-    pub fn finish<W: Write>(self, write_errors: &mut W) -> io::Result<output::CompilerOutput> {
+    pub fn finish(self) -> CompileResult {
         let mut output = self.global.output;
         if let Some(debug) = &mut output.debug {
             debug.callbacks = self.global.callbacks;
         }
+
+        CompileResult {
+            output,
+            errors: self.errors,
+        }
+    }
+}
+
+pub struct CompileResult {
+    pub output: IntermediateOutput,
+    pub errors: Vec<(Source, Vec<Error>)>,
+}
+impl CompileResult {
+    pub fn into_result(self) -> std::result::Result<IntermediateOutput, String> {
+        for (source, errors) in self.errors {
+            if let Some(err) = errors.into_iter().next() {
+                return Err(error_to_string(&source, err));
+            }
+        }
+        Ok(self.output)
+    }
+
+    pub fn eprint_errors(self) -> (IntermediateOutput, bool) {
+        let mut stderr = io::stderr().lock();
 
         let mut error_count = 0;
 
         for (source, errors) in self.errors {
             for error in errors {
                 error_count += 1;
-                error.write_pretty(&source, &mut *write_errors)?;
+                error.write_pretty(&source, &mut stderr).unwrap();
             }
         }
 
-        if error_count == 0 {
-            output.success = true;
-        } else {
+        let success = error_count == 0;
+        if !success {
             writeln!(
-                write_errors,
+                &mut stderr,
                 "Failed to compile Snippets with {error_count} errors."
-            )?;
+            )
+            .unwrap();
         }
 
-        Ok(output)
+        (self.output, success)
     }
+}
+
+fn error_to_string(source: &Source, err: Error) -> String {
+    let mut bytes = Vec::with_capacity(0);
+    err.write_pretty(source, &mut bytes).unwrap();
+    String::from_utf8(bytes).expect("Invalid String returned from ariadne")
 }

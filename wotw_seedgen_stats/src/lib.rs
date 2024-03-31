@@ -1,5 +1,6 @@
 pub mod analyzers;
 pub mod files;
+
 mod handle_errors;
 mod seed_storage;
 
@@ -34,7 +35,7 @@ pub struct StatsArgs<'graph, 'access, 'uberstates, A: SnippetAccess + Sync> {
     pub analyzers: Vec<ChainedAnalyzers>,
     /// The logical [`Graph`] passed to seedgen
     ///
-    /// You can obtain this from the seedgen library using [`wotw_seedgen::logic::parse_logic`]
+    /// You can obtain this from the logic language crate using [`Graph::compile`]
     pub graph: &'graph Graph,
     /// The [`SnippetAccess`] passed to seedgen
     ///

@@ -3,7 +3,7 @@ use rustc_hash::FxHashMap;
 use serde::Serialize;
 use std::{
     fs,
-    io::{self, ErrorKind},
+    io::ErrorKind,
     mem,
     path::{Path, PathBuf},
 };
@@ -19,11 +19,6 @@ use wotw_seedgen::assembly::{
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs { path, debug } = args;
-
-    // TODO remove
-    // bugsalot::debugger::wait_until_attached(None)?;
-
-    TEMP()?;
 
     let uber_state_data = read_assets()?.uber_state_data;
 
@@ -63,10 +58,10 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         compiler.debug();
     }
     compiler.compile_snippet(entry)?;
-    let mut output = compiler.finish(&mut io::stderr())?;
-
-    // TODO remove
-    // fs::write("seeds/out/out.intermediate", format!("{output:#?}"))?;
+    let (mut output, success) = compiler.finish().eprint_errors();
+    if !success {
+        return Err("Compilation failed".into());
+    }
 
     let debug_output = mem::take(&mut output.debug);
 
@@ -93,25 +88,6 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     }
 
     package.finish()?;
-
-    Ok(())
-}
-
-fn TEMP() -> Result<(), Error> {
-    // let mut file = File::create("dangerous/reset.wotws")?;
-
-    // writeln!(file, "!callback(reset)")?;
-    // writeln!(file, "!on_callback(reset, world_reset())")?;
-    // writeln!(file, "")?;
-    // writeln!(file, "fun world_reset() {{")?;
-
-    // for (uber_identifier, data) in &UBER_STATE_DATA.id_lookup {
-    //     if !(uber_identifier.group == 9 || data.readonly) {
-    //         writeln!(file, "    store({uber_identifier}, {})", data.default_value)?;
-    //     }
-    // }
-
-    // writeln!(file, "}}")?;
 
     Ok(())
 }

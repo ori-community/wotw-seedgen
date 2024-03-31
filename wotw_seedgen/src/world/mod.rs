@@ -26,7 +26,7 @@ use wotw_seedgen_data::{uber_identifier, Shard, Skill, Teleporter, UberIdentifie
 use wotw_seedgen_logic_language::output::{Graph, Node};
 use wotw_seedgen_seed_language::output::{
     ArithmeticOperator, ClientEvent, CommandBoolean, CommandFloat, CommandInteger, CommandVoid,
-    CompilerOutput, Operation, Trigger,
+    IntermediateOutput, Operation, Trigger,
 };
 use wotw_seedgen_settings::WorldSettings;
 
@@ -105,10 +105,14 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     }
 
     #[inline]
-    pub fn simulate<T: Simulate>(&mut self, t: &T, output: &CompilerOutput) -> T::Return {
+    pub fn simulate<T: Simulate>(&mut self, t: &T, output: &IntermediateOutput) -> T::Return {
         t.simulate(self, output)
     }
-    pub fn simulate_client_event(&mut self, client_event: ClientEvent, output: &CompilerOutput) {
+    pub fn simulate_client_event(
+        &mut self,
+        client_event: ClientEvent,
+        output: &IntermediateOutput,
+    ) {
         output
             .events
             .iter()
@@ -121,7 +125,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         &mut self,
         uber_identifier: UberIdentifier,
         value: bool,
-        output: &CompilerOutput,
+        output: &IntermediateOutput,
     ) {
         self.simulate(
             &CommandVoid::StoreBoolean {
@@ -136,7 +140,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         &mut self,
         uber_identifier: UberIdentifier,
         value: i32,
-        output: &CompilerOutput,
+        output: &IntermediateOutput,
     ) {
         self.simulate(
             &CommandVoid::StoreInteger {
@@ -151,7 +155,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         &mut self,
         uber_identifier: UberIdentifier,
         value: OrderedFloat<f32>,
-        output: &CompilerOutput,
+        output: &IntermediateOutput,
     ) {
         self.simulate(
             &CommandVoid::StoreFloat {
@@ -166,7 +170,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         &mut self,
         uber_identifier: UberIdentifier,
         add: i32,
-        output: &CompilerOutput,
+        output: &IntermediateOutput,
     ) {
         self.simulate(
             &CommandVoid::StoreInteger {
@@ -187,7 +191,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         &mut self,
         uber_identifier: UberIdentifier,
         add: OrderedFloat<f32>,
-        output: &CompilerOutput,
+        output: &IntermediateOutput,
     ) {
         self.simulate(
             &CommandVoid::StoreFloat {
@@ -206,70 +210,75 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     }
 
     #[inline]
-    pub fn set_spirit_light(&mut self, value: i32, output: &CompilerOutput) {
+    pub fn set_spirit_light(&mut self, value: i32, output: &IntermediateOutput) {
         self.set_integer(uber_identifier::SPIRIT_LIGHT, value, output);
     }
     #[inline]
-    pub fn modify_spirit_light(&mut self, add: i32, output: &CompilerOutput) {
+    pub fn modify_spirit_light(&mut self, add: i32, output: &IntermediateOutput) {
         self.modify_integer(uber_identifier::SPIRIT_LIGHT, add, output);
     }
     #[inline]
-    pub fn set_gorlek_ore(&mut self, value: i32, output: &CompilerOutput) {
+    pub fn set_gorlek_ore(&mut self, value: i32, output: &IntermediateOutput) {
         self.set_integer(uber_identifier::GORLEK_ORE, value, output);
     }
     #[inline]
-    pub fn modify_gorlek_ore(&mut self, add: i32, output: &CompilerOutput) {
+    pub fn modify_gorlek_ore(&mut self, add: i32, output: &IntermediateOutput) {
         self.modify_integer(uber_identifier::GORLEK_ORE, add, output);
     }
     #[inline]
-    pub fn set_keystones(&mut self, value: i32, output: &CompilerOutput) {
+    pub fn set_keystones(&mut self, value: i32, output: &IntermediateOutput) {
         self.set_integer(uber_identifier::KEYSTONES, value, output);
     }
     #[inline]
-    pub fn modify_keystones(&mut self, add: i32, output: &CompilerOutput) {
+    pub fn modify_keystones(&mut self, add: i32, output: &IntermediateOutput) {
         self.modify_integer(uber_identifier::KEYSTONES, add, output);
     }
     #[inline]
-    pub fn set_shard_slots(&mut self, value: i32, output: &CompilerOutput) {
+    pub fn set_shard_slots(&mut self, value: i32, output: &IntermediateOutput) {
         self.set_integer(uber_identifier::SHARD_SLOTS, value, output);
     }
     #[inline]
-    pub fn modify_shard_slots(&mut self, add: i32, output: &CompilerOutput) {
+    pub fn modify_shard_slots(&mut self, add: i32, output: &IntermediateOutput) {
         self.modify_integer(uber_identifier::SHARD_SLOTS, add, output);
     }
     #[inline]
-    pub fn set_max_health(&mut self, value: i32, output: &CompilerOutput) {
+    pub fn set_max_health(&mut self, value: i32, output: &IntermediateOutput) {
         self.set_integer(uber_identifier::MAX_HEALTH, value, output);
     }
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
-    pub fn modify_max_health(&mut self, add: i32, output: &CompilerOutput) {
+    pub fn modify_max_health(&mut self, add: i32, output: &IntermediateOutput) {
         self.modify_integer(uber_identifier::MAX_HEALTH, add, output);
     }
     // TODO but where do I *really* want OrderedFloat
     #[inline]
-    pub fn set_max_energy(&mut self, value: OrderedFloat<f32>, output: &CompilerOutput) {
+    pub fn set_max_energy(&mut self, value: OrderedFloat<f32>, output: &IntermediateOutput) {
         self.set_float(uber_identifier::MAX_ENERGY, value, output);
     }
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
-    pub fn modify_max_energy(&mut self, add: OrderedFloat<f32>, output: &CompilerOutput) {
+    pub fn modify_max_energy(&mut self, add: OrderedFloat<f32>, output: &IntermediateOutput) {
         self.modify_float(uber_identifier::MAX_ENERGY, add, output);
     }
     #[inline]
-    pub fn set_skill(&mut self, skill: Skill, value: bool, output: &CompilerOutput) {
+    pub fn set_skill(&mut self, skill: Skill, value: bool, output: &IntermediateOutput) {
         self.set_boolean(skill.uber_identifier(), value, output);
     }
     #[inline]
-    pub fn set_shard(&mut self, shard: Shard, value: bool, output: &CompilerOutput) {
+    pub fn set_shard(&mut self, shard: Shard, value: bool, output: &IntermediateOutput) {
         self.set_boolean(shard.uber_identifier(), value, output);
     }
     #[inline]
-    pub fn set_teleporter(&mut self, teleporter: Teleporter, value: bool, output: &CompilerOutput) {
+    pub fn set_teleporter(
+        &mut self,
+        teleporter: Teleporter,
+        value: bool,
+        output: &IntermediateOutput,
+    ) {
         self.set_boolean(teleporter.uber_identifier(), value, output);
     }
     #[inline]
-    pub fn set_clean_water(&mut self, value: bool, output: &CompilerOutput) {
+    pub fn set_clean_water(&mut self, value: bool, output: &IntermediateOutput) {
         self.set_boolean(uber_identifier::CLEAN_WATER, value, output);
     }
     #[inline]
@@ -277,7 +286,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         &mut self,
         weapon_upgrade: WeaponUpgrade,
         value: bool,
-        output: &CompilerOutput,
+        output: &IntermediateOutput,
     ) {
         self.set_boolean(weapon_upgrade.uber_identifier(), value, output);
     }

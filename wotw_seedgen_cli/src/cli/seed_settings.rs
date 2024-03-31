@@ -221,7 +221,7 @@ where
     }
     help // TODO how create
 }
-#[derive(Debug, Clone)] // TODO remove debug derive
+#[derive(Clone)]
 enum WorldScopedArg<T> {
     WorldScope(usize),
     Arg(T),

@@ -46,8 +46,7 @@ impl SubAssign for Orbs {
 /// # Examples
 ///
 /// ```
-/// # use wotw_seedgen::util::{Orbs, OrbVariants};
-/// # use wotw_seedgen::util::orbs::either;
+/// # use wotw_seedgen::orbs::{either, Orbs, OrbVariants};
 /// # use smallvec::smallvec;
 /// #
 /// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
@@ -119,8 +118,7 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
 /// # Examples
 ///
 /// ```
-/// # use wotw_seedgen::util::{Orbs, OrbVariants};
-/// # use wotw_seedgen::util::orbs::both;
+/// # use wotw_seedgen::orbs::{both, Orbs, OrbVariants};
 /// # use smallvec::smallvec;
 /// #
 /// let a = vec![Orbs { health: 0.0, energy: 2.0 }];

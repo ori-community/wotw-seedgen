@@ -2,7 +2,6 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use lazy_static::lazy_static;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
-use std::io;
 use wotw_seedgen::{item_pool::ItemPool, Player, UberStates, World};
 use wotw_seedgen_assets::{LocData, StateData};
 use wotw_seedgen_data::Skill;
@@ -10,7 +9,7 @@ use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::{Enemy, Graph, Requirement},
 };
-use wotw_seedgen_seed_language::output::CompilerOutput;
+use wotw_seedgen_seed_language::output::IntermediateOutput;
 use wotw_seedgen_settings::{
     Difficulty, PresetAccess, Spawn, UniverseSettings, WorldPreset, WorldSettings, DEFAULT_SPAWN,
 };
@@ -113,7 +112,7 @@ fn reach_checking(c: &mut Criterion) {
 
     c.bench_function("short reach check", |b| {
         b.iter(|| {
-            let output = CompilerOutput::default();
+            let output = IntermediateOutput::default();
             let world_settings = WorldSettings::default();
             let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
             let mut world = World::new(&graph, spawn, &world_settings, uber_states.clone());
@@ -129,7 +128,7 @@ fn reach_checking(c: &mut Criterion) {
             world.reached()
         })
     });
-    let output = CompilerOutput::default();
+    let output = IntermediateOutput::default();
     let world_settings = WorldSettings::default();
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
     let uber_states = UberStates::new(&UBER_STATE_DATA);
@@ -162,14 +161,8 @@ fn generation(c: &mut Criterion) {
         b.iter(|| {
             universe_settings.seed = seed.to_string();
             seed += 1;
-            wotw_seedgen::generate_seed(
-                &graph,
-                snippet_access,
-                uber_state_data,
-                &mut io::stderr(),
-                &universe_settings,
-            )
-            .unwrap()
+            wotw_seedgen::generate_seed(&graph, uber_state_data, snippet_access, &universe_settings)
+                .unwrap()
         })
     });
 
@@ -206,9 +199,8 @@ fn generation(c: &mut Criterion) {
                 seed += 1;
                 wotw_seedgen::generate_seed(
                     &graph,
-                    snippet_access,
                     uber_state_data,
-                    &mut io::stderr(),
+                    snippet_access,
                     &universe_settings,
                 )
                 .unwrap()
@@ -231,14 +223,8 @@ fn generation(c: &mut Criterion) {
         b.iter(|| {
             universe_settings.seed = seed.to_string();
             seed += 1;
-            wotw_seedgen::generate_seed(
-                &graph,
-                snippet_access,
-                uber_state_data,
-                &mut io::stderr(),
-                &universe_settings,
-            )
-            .unwrap()
+            wotw_seedgen::generate_seed(&graph, uber_state_data, snippet_access, &universe_settings)
+                .unwrap()
         })
     });
 }

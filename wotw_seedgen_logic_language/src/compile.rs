@@ -26,7 +26,7 @@ impl Graph {
         loc_data: LocData,
         state_data: StateData,
         settings: &[WorldSettings],
-    ) -> Output {
+    ) -> CompileResult {
         let loc_data_nodes = loc_data
             .entries
             .into_iter()
@@ -51,7 +51,7 @@ impl Graph {
         nodes.extend(state_data_nodes);
         nodes.extend(compiled_nodes);
 
-        Output {
+        CompileResult {
             graph: Graph { nodes },
             errors,
         }
@@ -59,11 +59,11 @@ impl Graph {
 }
 
 #[derive(Debug, Clone)]
-pub struct Output {
+pub struct CompileResult {
     pub graph: Graph,
     pub errors: Vec<Error>,
 }
-impl Output {
+impl CompileResult {
     pub fn into_result(self) -> Result<Graph> {
         match self.errors.into_iter().next() {
             None => Ok(self.graph),
