@@ -1,23 +1,45 @@
 #[cfg(feature = "loc_data")]
-use crate::LocDataEntry;
+use crate::LocData;
 #[cfg(feature = "state_data")]
-use crate::StateDataEntry;
+use crate::StateData;
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{self, Display},
-    io,
+    io::Read,
 };
 use wotw_seedgen_data::UberIdentifier;
 
+/// Information about all UberStates used by the game
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct UberStateData {
+    /// Two-level map to resolve UberStates by their internal name.
+    /// Resolve by the group name first, then the member name.
+    /// UberState names are often written as `<group>.<member>`
+    ///
+    /// Every UberState does have a name, but multiple UberStates can have
+    /// the same name, which is why this resolves to [`Vec<UberStateAlias>`]
+    ///
+    /// With the `loc_data` and/or `state_data` features enabled, this may also include
+    /// the randomizer's custom identifiers, which are generally more intuitive
+    ///
+    /// If successful, this lookup will yield you the name's corresponding [`UberIdentifier`],
+    /// which you can use to query `id_lookup` for additional information
     pub name_lookup: FxHashMap<String, FxHashMap<String, Vec<UberStateAlias>>>,
+    /// Query a unique `UberIdentifier` for information about the UberState
     pub id_lookup: FxHashMap<UberIdentifier, UberStateDataEntry>,
 }
+/// Successful Resolution of an UberState name
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct UberStateAlias {
+    /// The unique `UberIdentifier` corresponding to this name
     pub uber_identifier: UberIdentifier,
+    /// `None` for all regular UberState names
+    ///
+    /// For custom identifiers from the randomizer, an additional value may be associated which
+    /// represents the minimum value inside the UberState. For instance, all Hand to Hand steps
+    /// have individual custom identifier, even though Hand to Hand progress is stored in a single
+    /// UberState. The value represents the current step of Hand to Hand.
     pub value: Option<u8>,
 }
 impl Display for UberStateAlias {
@@ -29,13 +51,23 @@ impl Display for UberStateAlias {
         Ok(())
     }
 }
+/// Information about an UberState
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UberStateDataEntry {
+    /// Regular name of this UberState as defined by the base game
+    ///
+    /// These names are not always unique to the UberState
     pub name: String,
+    /// If one exists, the randomizer's custom identifier for this UberState, which is often more intuitive than the regular name
     pub rando_name: Option<String>,
+    /// Default `UberStateValue` of this UberState after starting a new save
     pub default_value: UberStateValue,
+    /// If `true`, writing to this UberState manually will fail
     pub readonly: bool,
 }
+/// Typed value stored inside an UberState
+///
+/// The types are simplified since a lot of the used types are similar in nature
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum UberStateValue {
     Boolean(bool),
@@ -52,7 +84,11 @@ impl Display for UberStateValue {
     }
 }
 impl UberStateData {
-    pub fn from_reader<R: io::Read>(reader: R) -> serde_json::Result<Self> {
+    /// Parse from a [`Read`] implementation, such as a file or byte slice
+    ///
+    /// This is intended to be used on `uber_state_dump.json`, use [`UberStateData::add_loc_data`] and
+    /// [`UberStateData::add_state_data`] to add information from additional assets
+    pub fn from_reader<R: Read>(reader: R) -> serde_json::Result<Self> {
         let mut uber_state_data = Self::default();
         let dump: Dump = serde_json::from_reader(reader)?;
         for (group, dump_group) in dump.groups {
@@ -94,15 +130,21 @@ impl UberStateData {
         }
         Ok(uber_state_data)
     }
+    /// Add information from parsed [`LocData`]
+    ///
+    /// This will add the contained identifiers to `name_lookup` as well as insert `rando_name` values into `id_lookup`
     #[cfg(feature = "loc_data")]
-    pub fn add_loc_data(&mut self, loc_data: Vec<LocDataEntry>) {
-        for record in loc_data {
+    pub fn add_loc_data(&mut self, loc_data: LocData) {
+        for record in loc_data.entries {
             self.add_rando_name(record.identifier, record.uber_identifier, record.value);
         }
     }
+    /// Add information from parsed [`StateData`]
+    ///
+    /// This will add the contained identifiers to `name_lookup` as well as insert `rando_name` values into `id_lookup`
     #[cfg(feature = "state_data")]
-    pub fn add_state_data(&mut self, state_data: Vec<StateDataEntry>) {
-        for record in state_data {
+    pub fn add_state_data(&mut self, state_data: StateData) {
+        for record in state_data.entries {
             self.add_rando_name(record.identifier, record.uber_identifier, record.value);
         }
     }

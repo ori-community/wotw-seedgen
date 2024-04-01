@@ -21,22 +21,33 @@
 //! ]);
 //! ```
 
-use std::io;
+use std::io::Read;
 
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use wotw_seedgen_data::UberIdentifier;
 
+/// Information about all world states which are considered by the randomizer logic
+///
+/// Does not contain information about world states already present in [`LocData`]
+///
+/// [`Locdata`]: crate::LocData
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct StateData {
+    /// List of individual world states
     pub entries: Vec<StateDataEntry>,
 }
 // TODO maybe a custom deserialize could eliminate the need for separate input/output structs?
 /// Information about an obtainable world state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StateDataEntry {
+    /// Unique identifier for this world state which is used in `areas.wotw`
     pub identifier: String,
+    /// `UberIdentifier` where this world state is stored
+    ///
+    /// world states are either stored as booleans or as integers where being above a certain value means the world state is completed
     pub uber_identifier: UberIdentifier,
+    /// `None` if `uber_identifier` holds a boolean value. Otherwise, has the minimum integer value at which this world state is completed
     pub value: Option<u8>,
 }
 impl PartialEq for StateDataEntry {
@@ -45,7 +56,8 @@ impl PartialEq for StateDataEntry {
     }
 }
 impl StateData {
-    pub fn from_reader<R: io::Read>(reader: R) -> csv::Result<Self> {
+    /// Parse from a [`Read`] implementation, such as a file or byte slice
+    pub fn from_reader<R: Read>(reader: R) -> csv::Result<Self> {
         let entries = csv::ReaderBuilder::new()
             .trim(csv::Trim::All)
             .from_reader(reader)

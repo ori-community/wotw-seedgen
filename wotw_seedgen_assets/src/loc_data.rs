@@ -32,22 +32,32 @@
 //! ```
 
 use serde::{Deserialize, Serialize};
-use std::io;
+use std::io::Read;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
 
+/// Information about all pickup locations which should be filled by the randomizer
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct LocData {
+    /// List of individual pickup locations
     pub entries: Vec<LocDataEntry>,
 }
 // TODO while breaking everything could also just change the loc data format to save this transformation
 /// Information about a pickup location
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocDataEntry {
+    /// Unique identifier for this pickup location which is used in `areas.wotw`
     pub identifier: String,
+    /// Map zone containing this pickup location
     pub zone: Zone,
+    /// `UberIdentifier` where this pickup location's corresponding world state is stored
+    ///
+    /// pickup locations are either stored as booleans or as integers where being above a certain value means the pickup is collected
     pub uber_identifier: UberIdentifier,
+    /// `None` if `uber_identifier` holds a boolean value. Otherwise, has the minimum integer value at which this pickup is collected
     pub value: Option<u8>,
+    /// World coordinates of this pickup location, if applicable
     pub position: Option<Position>,
+    /// Map coordinates of this pickup location, if applicable
     pub map_position: Option<Position>,
 }
 impl PartialEq for LocDataEntry {
@@ -56,7 +66,8 @@ impl PartialEq for LocDataEntry {
     }
 }
 impl LocData {
-    pub fn from_reader<R: io::Read>(reader: R) -> csv::Result<Self> {
+    /// Parse from a [`Read`] implementation, such as a file or byte slice
+    pub fn from_reader<R: Read>(reader: R) -> csv::Result<Self> {
         let mut entries = vec![];
         let mut reader = csv::ReaderBuilder::new()
             .trim(csv::Trim::All)

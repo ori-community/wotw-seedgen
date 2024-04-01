@@ -30,8 +30,8 @@ pub fn read_assets() -> Result<Assets, Error> {
     let mut uber_state_data = UberStateData::from_reader(
         File::open("uber_state_dump.json").map_err(|err| format!("{err}: uber_state_dump.json"))?,
     )?;
-    uber_state_data.add_loc_data(loc_data.entries.clone());
-    uber_state_data.add_state_data(state_data.entries.clone());
+    uber_state_data.add_loc_data(loc_data.clone());
+    uber_state_data.add_state_data(state_data.clone());
     Ok(Assets {
         loc_data,
         state_data,

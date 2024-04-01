@@ -33,9 +33,9 @@ fn main() {
         )
         .unwrap();
         #[cfg(feature = "state_data")]
-        uber_state_data.add_state_data(state_data.entries);
+        uber_state_data.add_state_data(state_data);
         #[cfg(feature = "loc_data")]
-        uber_state_data.add_loc_data(loc_data.entries);
+        uber_state_data.add_loc_data(loc_data);
 
         write("uber_state_data", &uber_state_data);
     }
