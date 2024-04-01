@@ -5,16 +5,13 @@ use serde::{Deserialize, Serialize};
 
 /// A collection of settings that can be applied to existing settings
 ///
-/// Use [`UniverseSettings::apply_preset`](crate::settings::UniverseSettings::apply_preset) to merge a [`UniversePreset`] into existing [`UniverseSettings`](crate::settings::UniverseSettings)
+/// Use [`UniverseSettings::apply_preset`] to merge a [`UniversePreset`] into existing [`UniverseSettings`]
 ///
 /// # Examples
 ///
 /// ```
 /// # use wotw_seedgen_settings::UniversePreset;
-/// use wotw_seedgen_settings::WorldPreset;
-/// use wotw_seedgen_settings::UniverseSettings;
-/// use wotw_seedgen_settings::Spawn;
-/// use wotw_seedgen_settings::NoPresetAccess;
+/// use wotw_seedgen_settings::{NoPresetAccess, Spawn, UniverseSettings, WorldPreset};
 ///
 /// let mut universe_settings = UniverseSettings::new("seed".to_string());
 ///
@@ -31,6 +28,9 @@ use serde::{Deserialize, Serialize};
 /// universe_settings.apply_preset(preset, &NoPresetAccess);
 /// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
+///
+/// [`UniverseSettings`]: crate::settings::UniverseSettings
+/// [`UniverseSettings::apply_preset`]: crate::settings::UniverseSettings::apply_preset
 #[derive(Debug, Default, Clone, PartialEq)]
 #[cfg_attr(
     feature = "serde",
@@ -43,7 +43,9 @@ pub struct UniversePreset {
     pub info: Option<PresetInfo>,
     /// Names of further [`UniversePreset`]s to use
     ///
-    /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
+    /// A [`PresetAccess::universe_preset`] implementation may be used to resolve the identifiers
+    ///
+    /// [`PresetAccess::universe_preset`]: crate::PresetAccess::universe_preset
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub includes: Option<FxHashSet<String>>,
     /// The seed that determines all randomness
@@ -56,15 +58,13 @@ pub struct UniversePreset {
 
 /// A collection of settings that can be applied to one world of the existing settings
 ///
-/// Use [`WorldSettings::apply_world_preset`](crate::settings::WorldSettings::apply_world_preset) to merge a [`WorldPreset`] into existing [`WorldSettings`](crate::settings::WorldSettings)
+/// Use [`WorldSettings::apply_world_preset`] to merge a [`WorldPreset`] into existing [`WorldSettings`]
 ///
 /// # Examples
 ///
 /// ```
 /// # use wotw_seedgen_settings::WorldPreset;
-/// use wotw_seedgen_settings::WorldSettings;
-/// use wotw_seedgen_settings::Spawn;
-/// use wotw_seedgen_settings::NoPresetAccess;
+/// use wotw_seedgen_settings::{NoPresetAccess, Spawn, WorldSettings};
 ///
 /// let mut world_settings = WorldSettings::default();
 ///
@@ -76,6 +76,9 @@ pub struct UniversePreset {
 /// world_settings.apply_world_preset(world_preset, &NoPresetAccess);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
+///
+/// [`WorldSettings`]: crate::settings::WorldSettings
+/// [`WorldSettings::apply_world_preset`]: crate::settings::WorldSettings::apply_world_preset
 #[derive(Debug, Default, Clone, PartialEq)]
 #[cfg_attr(
     feature = "serde",
@@ -89,10 +92,12 @@ pub struct WorldPreset {
     pub info: Option<PresetInfo>,
     /// Names of further [`WorldPreset`]s to use
     ///
-    /// When applying the parent preset, these presets will be searched as .json files in the current and /presets child directory
+    /// A [`PresetAccess::world_preset`] implementation may be used to resolve the identifiers
+    ///
+    /// [`PresetAccess::world_preset`]: crate::PresetAccess::world_preset
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub includes: Option<FxHashSet<String>>,
-    /// Spawn destination
+    /// Spawn location
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub spawn: Option<Spawn>,
     /// Logically expected difficulty

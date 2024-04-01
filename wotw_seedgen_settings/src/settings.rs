@@ -259,7 +259,7 @@ impl WorldSettings {
     }
 }
 
-/// The Spawn destination, determining the starting location of the seed
+/// The Spawn location, which may either be fixed or randomly decided during seed generation
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Spawn {
