@@ -3053,8 +3053,9 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       GrenadeJump, Water OR Damage=100
       DoubleJump, Water OR Damage=100
       WaterDash, Damage=40
-  pickup GladesTown.CaveBurrowEX:
-    unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
+  # Disabled for now since seed_core applies a fix by default
+  # pickup GladesTown.CaveBurrowEX:
+  # unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
   
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
