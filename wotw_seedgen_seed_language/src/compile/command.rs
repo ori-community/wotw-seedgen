@@ -324,7 +324,7 @@ impl<'source> Compile<'source> for ast::FlagArg<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         if let Some(flag) = self.0.evaluate(compiler) {
-            compiler.global.output.flags.push(flag);
+            compiler.global.output.tags.push(flag);
         }
     }
 }

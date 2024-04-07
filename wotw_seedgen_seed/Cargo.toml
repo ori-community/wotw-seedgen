@@ -1,5 +1,5 @@
 [package]
-name = "wotw_seedgen_assembly"
+name = "wotw_seedgen_seed"
 version = "0.1.0"
 edition = "2021"
 

@@ -1,11 +1,9 @@
 mod args;
 mod command;
-mod package;
-
-pub use package::compile_intermediate_output;
+pub(crate) mod intermediate;
 
 use self::command::MemoryUsed;
-use crate::{Command, Event, Trigger};
+use crate::assembly::{Command, Event, Trigger};
 use wotw_seedgen_seed_language::output::{self as input, StringOrPlaceholder};
 
 // TODO dedup functions?

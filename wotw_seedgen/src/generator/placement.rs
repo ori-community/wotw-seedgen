@@ -1,5 +1,6 @@
 use super::{
-    cost::Cost, item_pool::ItemPool, spirit_light::SpiritLightProvider, Seed, SEED_FAILED_MESSAGE,
+    cost::Cost, item_pool::ItemPool, spirit_light::SpiritLightProvider, Seed, SeedUniverse,
+    SEED_FAILED_MESSAGE,
 };
 use crate::{
     common_item::CommonItem,
@@ -23,7 +24,6 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, iter, mem, ops::RangeFrom};
-use wotw_seedgen_assembly::{compile_intermediate_output, Spawn};
 use wotw_seedgen_data::{Equipment, MapIcon, OpherIcon, Skill, UberIdentifier, WeaponUpgrade};
 use wotw_seedgen_logic_language::output::{Node, Requirement};
 use wotw_seedgen_seed_language::{
@@ -56,7 +56,7 @@ const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are g
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
     worlds: Vec<(World, IntermediateOutput)>,
-) -> Result<Seed, String> {
+) -> Result<SeedUniverse, String> {
     assert!(
         !worlds.is_empty(),
         "Need at least one world to generate a seed"
@@ -633,22 +633,22 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             });
     }
 
-    fn finish(mut self) -> Seed {
+    fn finish(mut self) -> SeedUniverse {
         self.resolve_placeholders();
 
-        Seed {
+        SeedUniverse {
             worlds: self
                 .worlds
                 .into_iter()
-                .map(|world_context| {
-                    let (mut seed, icons) = compile_intermediate_output(world_context.output);
-                    assert!(icons.is_empty(), "custom icons in seedgen aren't supported"); // TODO custom icons in snippets
+                .map(|mut world_context| {
+                    assert!(
+                        world_context.output.icons.is_empty(),
+                        "custom icons in seedgen aren't supported"
+                    ); // TODO custom icons in snippets
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
-                    seed.spawn = Spawn {
-                        position: *spawn.position().unwrap(),
-                        identifier: spawn.identifier().to_string(),
-                    };
-                    seed
+                    world_context.output.spawn = Some(*spawn.position().unwrap());
+                    Seed::new(world_context.output)
+                    // TODO add seedgen info (spawn.identifier().to_string())
                 })
                 .collect(),
             spoiler: self.spoiler,

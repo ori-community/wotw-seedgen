@@ -12,7 +12,7 @@ use rustc_hash::FxHashMap;
 use std::{
     ffi::OsStr,
     fmt::Display,
-    fs, io,
+    fs,
     path::{Path, PathBuf},
 };
 use wotw_seedgen_assets::{SnippetAccess, Source};

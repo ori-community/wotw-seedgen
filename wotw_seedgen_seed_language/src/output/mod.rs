@@ -25,7 +25,7 @@ pub struct IntermediateOutput {
     pub events: Vec<Event>,
     pub command_lookup: Vec<CommandVoid>,
     pub icons: Vec<(String, Vec<u8>)>, // TODO poor memory
-    pub flags: Vec<String>,
+    pub tags: Vec<String>,
     pub item_pool_changes: FxHashMap<CommandVoid, i32>,
     pub item_metadata: ItemMetadata,
     pub logical_state_sets: FxHashSet<String>,

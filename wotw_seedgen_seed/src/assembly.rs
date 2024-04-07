@@ -1,35 +1,16 @@
-pub use wotw_seedgen_data as data;
-pub use wotw_seedgen_seed_language as seed_language;
-pub use wotw_seedgen_settings::UniverseSettings;
-
-mod compile;
-mod package;
-
-pub use compile::compile_intermediate_output;
-pub use package::Package;
-
 use serde::{Deserialize, Serialize};
-use std::error::Error;
-use wotw_seedgen_data::{Alignment, ScreenPosition};
 use wotw_seedgen_data::{
-    EquipSlot, Equipment, MapIcon, Position, UberIdentifier, WheelBind, WheelItemPosition,
+    Alignment, EquipSlot, Equipment, MapIcon, ScreenPosition, UberIdentifier, WheelBind,
+    WheelItemPosition,
 };
+use wotw_seedgen_seed_language::output::Timer;
 use wotw_seedgen_seed_language::output::{
-    ArithmeticOperator, ClientEvent, Comparator, EqualityComparator, Icon, LogicOperator, Timer,
+    ArithmeticOperator, ClientEvent, Comparator, EqualityComparator, Icon, LogicOperator,
 };
-use wotw_seedgen_settings::DEFAULT_SPAWN;
 
-pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
-
-pub const VERSION: &str = "0.0.0";
-
-/// Seed data for one World
+/// Contains the compiled seedgen output that makes up the seed.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SeedWorld {
-    /// String to display when loading the seed; usually a summary of the settings
-    pub flags: Vec<String>,
-    /// Starting location
-    pub spawn: Spawn,
+pub struct Assembly {
     /// List of timers
     pub timers: Vec<Timer>,
     /// Events from generation and snippets
@@ -39,34 +20,12 @@ pub struct SeedWorld {
     /// Each index may store multiple [`Command`]s to execute
     pub command_lookup: Vec<Vec<Command>>,
 }
-// TODO reminder for which metadata seedgen needs:
-// - universe settings
-// - world index
-// - logical state sets
-// - generator version
-
-/// Spawn location for a [`SeedWorld`]
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Spawn {
-    /// Where to spawn in world coordinates
-    pub position: Position,
-    /// Anchor Identifier from the logic source, needed for reach check
-    pub identifier: String,
-}
-impl Default for Spawn {
-    fn default() -> Self {
-        Self {
-            position: Position::new(-799., -4310.),
-            identifier: DEFAULT_SPAWN.to_string(),
-        }
-    }
-}
 
 /// The main event (:badumtsss:)
 ///
 /// The Trigger defines when to execute the command at the index
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Event(Trigger, usize);
+pub struct Event(pub Trigger, pub usize);
 
 /// Trigger for an [`Event`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

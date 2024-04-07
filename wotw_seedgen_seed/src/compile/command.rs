@@ -1,5 +1,5 @@
 use super::{args::Args, compile_into_lookup, unwrap_string_placeholder, Compile};
-use crate::Command;
+use crate::assembly::Command;
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_seed_language::output::{
     self as input, CommandFloat, CommandVoid, Comparator, EqualityComparator,

@@ -2,19 +2,18 @@ use crate::{cli::PlandoArgs, files::read_assets, Error};
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use std::{
-    fs,
+    fs::{self, File},
     io::ErrorKind,
     mem,
     path::{Path, PathBuf},
 };
-use wotw_seedgen::assembly::{
-    compile_intermediate_output,
+use wotw_seedgen::{
+    seed::{assembly::Command, Seed},
     seed_language::{
         assets::{SnippetAccess, Source},
         compile::Compiler,
         output::DebugOutput,
     },
-    Command, Package,
 };
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
@@ -65,29 +64,24 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let debug_output = mem::take(&mut output.debug);
 
-    let mut package = Package::new("seeds/out/out.wotwr")?;
-    let (seed_world, icons) = compile_intermediate_output(output);
-    package.add_seed(&seed_world, debug)?;
-    for (name, icon) in icons {
-        let mut path = PathBuf::from("assets");
-        path.push(name);
-        package.add_data(path, icon)?;
-    }
+    let mut seed = Seed::new(output);
 
     if debug {
         let metadata = Metadata {
             compiler_data: debug_output.unwrap(),
-            indexed_lookup: seed_world
+            indexed_lookup: seed
+                .assembly
                 .command_lookup
                 .iter()
                 .cloned()
                 .enumerate()
                 .collect(),
         };
-        package.add_data("debug", serde_json::to_vec_pretty(&metadata)?)?;
+        seed.assets
+            .insert("__debug".to_string(), serde_json::to_vec_pretty(&metadata)?);
     }
 
-    package.finish()?;
+    seed.package(&mut File::create("seeds/out/out.wotwr")?)?;
 
     Ok(())
 }
