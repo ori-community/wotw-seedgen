@@ -753,8 +753,8 @@ impl<'source> Compile<'source> for ast::RandomIntegerArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min = self.0.min.data.evaluate(compiler);
-        let max = self.0.max.data.evaluate(compiler);
+        let min = self.0.min.evaluate(compiler);
+        let max = self.0.max.evaluate(compiler);
         if let (Some(min), Some(max)) = (min, max) {
             let value = compiler.rng.gen_range(min..=max);
             compiler
@@ -767,8 +767,8 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min = self.0.min.data.evaluate::<OrderedFloat<f32>>(compiler);
-        let max = self.0.max.data.evaluate::<OrderedFloat<f32>>(compiler);
+        let min = self.0.min.evaluate::<OrderedFloat<f32>>(compiler);
+        let max = self.0.max.evaluate::<OrderedFloat<f32>>(compiler);
         if let (Some(min), Some(max)) = (min, max) {
             let value: f32 = compiler.rng.gen_range(min.into()..=max.into());
             compiler

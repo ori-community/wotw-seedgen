@@ -164,7 +164,7 @@ impl CompileInto for CommandBoolean {
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
-        match operation.operator {
+        match operation.operator.data {
             Operator::Logic(operator) => {
                 let left = operation.left.compile_into(compiler);
                 let operator = operator.compile(compiler);
@@ -438,7 +438,7 @@ impl CompileInto for CommandInteger {
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
-        match operation.operator {
+        match operation.operator.data {
             Operator::Arithmetic(operator) => {
                 let left = operation.left.compile_into(compiler);
                 let operator = operator.compile(compiler);
@@ -537,7 +537,7 @@ impl CompileInto for CommandFloat {
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
-        match operation.operator {
+        match operation.operator.data {
             Operator::Arithmetic(operator) => {
                 let left = operation.left.compile_into(compiler);
                 let operator = operator.compile(compiler);
@@ -664,7 +664,7 @@ impl CompileInto for CommandString {
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
-        match operation.operator {
+        match operation.operator.data {
             Operator::Arithmetic(ast::ArithmeticOperator::Add) => {
                 let left = operation.left.compile_into(compiler);
                 let right = operation.right.compile_into(compiler);
@@ -780,7 +780,7 @@ impl CompileInto for Command {
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
-        match operation.operator {
+        match operation.operator.data {
             Operator::Arithmetic(_) => {
                 let left = operation.left.infer_type(compiler)?;
                 let right = operation.right.infer_type(compiler)?;

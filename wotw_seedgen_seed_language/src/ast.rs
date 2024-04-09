@@ -5,8 +5,10 @@ use crate::{
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use strum::Display;
-use wotw_seedgen_parse::{
-    parse_ast, Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result,
+use wotw_seedgen_parse::parse_ast;
+
+pub use wotw_seedgen_parse::{
+    Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result,
     SeparatedNonEmpty, Span, Spanned, Symbol,
 };
 
@@ -158,7 +160,7 @@ pub enum Expression<'source> {
 #[derive(Debug, Clone, PartialEq, Eq, Span)]
 pub struct Operation<'source> {
     pub left: Expression<'source>,
-    pub operator: Operator,
+    pub operator: Spanned<Operator>,
     pub right: Expression<'source>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
@@ -182,13 +184,13 @@ impl<'source> Ast<'source, Tokenizer> for Expression<'source> {
             }
         }
         fn resolve_precedence(
-            mut sequence: SeparatedNonEmpty<ExpressionValue, Operator>,
+            mut sequence: SeparatedNonEmpty<ExpressionValue, Spanned<Operator>>,
         ) -> Expression {
             let current_operator_index = sequence
                 .more
                 .iter()
                 .enumerate()
-                .min_by_key(|(_, (operator, _))| precedence(*operator))
+                .min_by_key(|(_, (operator, _))| precedence(operator.data))
                 .map(|(index, _)| index);
 
             match current_operator_index {
@@ -472,14 +474,14 @@ pub struct CommandIf<'source> {
     pub condition: Expression<'source>,
     pub contents: Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>,
 }
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake")]
+pub struct Repeat;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CommandRepeat<'source> {
     pub amount: Expression<'source>,
     pub contents: Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>,
 }
-#[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
-pub struct Repeat;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
 pub struct Add;
@@ -614,9 +616,9 @@ pub struct RandomFloatArgs<'source>(pub RandomNumberArgs<'source>);
 pub struct RandomNumberArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub comma: Symbol<','>,
-    pub min: Spanned<Expression<'source>>,
+    pub min: Expression<'source>,
     pub comma_2: Symbol<','>,
-    pub max: Spanned<Expression<'source>>,
+    pub max: Expression<'source>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]

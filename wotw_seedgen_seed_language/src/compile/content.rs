@@ -19,7 +19,9 @@ impl<'source> Compile<'source> for ast::Content<'source> {
             ast::Content::Command(_, command) => {
                 command.compile(compiler);
             }
-            ast::Content::Annotation(..) => {}
+            ast::Content::Annotation(_, annotation) => {
+                annotation.compile(compiler);
+            }
         }
     }
 }
@@ -148,5 +150,24 @@ impl<'source> Compile<'source> for ast::ActionCondition<'source> {
             condition: condition?,
             command: Box::new(command??.expect_void(compiler, span)?),
         }))
+    }
+}
+
+impl<'source> Compile<'source> for ast::Annotation<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        match self {
+            ast::Annotation::Hide(_) => {}
+            ast::Annotation::Name(_, name) => {
+                compiler.consume_result(name.result);
+            }
+            ast::Annotation::Category(_, category) => {
+                compiler.consume_result(category.result);
+            }
+            ast::Annotation::Description(_, description) => {
+                compiler.consume_result(description.result);
+            }
+        }
     }
 }

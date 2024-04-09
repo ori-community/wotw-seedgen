@@ -358,7 +358,7 @@ impl intermediate::Constant {
 }
 impl InferType for Operation<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
-        match self.operator {
+        match self.operator.data {
             Operator::Arithmetic(_) => self.left.infer_type(compiler),
             Operator::Logic(_) | Operator::Comparator(_) => Some(Type::Boolean),
         }
