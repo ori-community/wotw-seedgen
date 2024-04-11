@@ -468,7 +468,7 @@ impl CompileResult {
     pub fn into_result(self) -> std::result::Result<IntermediateOutput, String> {
         for (source, errors) in self.errors {
             if let Some(err) = errors.into_iter().next() {
-                return Err(error_to_string(&source, err));
+                return Err(err.with_source(&source).to_string());
             }
         }
         Ok(self.output)
@@ -497,10 +497,4 @@ impl CompileResult {
 
         (self.output, success)
     }
-}
-
-fn error_to_string(source: &Source, err: Error) -> String {
-    let mut bytes = Vec::with_capacity(0);
-    err.write_pretty(source, &mut bytes).unwrap();
-    String::from_utf8(bytes).expect("Invalid String returned from ariadne")
 }
