@@ -3,8 +3,11 @@
 use super::{Compile, SharedValue, SnippetCompiler};
 use crate::{
     ast::{self, UberStateType},
-    output::{intermediate::Literal, CommandVoid, ItemMetadataEntry, StringOrPlaceholder, Timer},
+    output::{
+        intermediate::Literal, CommandVoid, Event, ItemMetadataEntry, StringOrPlaceholder, Trigger,
+    },
 };
+use ast::ClientEvent;
 use ordered_float::OrderedFloat;
 use rand::Rng;
 use std::{iter, mem, ops::Range, path::PathBuf};
@@ -391,7 +394,10 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
         let timer = compiler.consume_result(timer);
 
         if let (Some(toggle), Some(timer)) = (toggle, timer) {
-            compiler.global.output.timers.push(Timer { toggle, timer });
+            compiler.global.output.events.push(Event {
+                trigger: Trigger::ClientEvent(ClientEvent::Reload),
+                command: CommandVoid::DefineTimer { toggle, timer },
+            });
             compiler.variables.insert(
                 self.toggle_identifier.data,
                 Literal::UberIdentifier(UberStateAlias {

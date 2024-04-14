@@ -278,7 +278,8 @@ impl Simulate for CommandVoid {
                 world.variables.set_string(*id, value);
             }
             // TODO simulate more maybe?
-            CommandVoid::QueuedMessage { .. }
+            CommandVoid::DefineTimer { .. }
+            | CommandVoid::QueuedMessage { .. }
             | CommandVoid::FreeMessage { .. }
             | CommandVoid::MessageDestroy { .. }
             | CommandVoid::MessageText { .. }

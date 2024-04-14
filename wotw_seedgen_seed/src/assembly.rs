@@ -3,7 +3,6 @@ use wotw_seedgen_data::{
     Alignment, EquipSlot, Equipment, MapIcon, ScreenPosition, UberIdentifier, WheelBind,
     WheelItemPosition,
 };
-use wotw_seedgen_seed_language::output::Timer;
 use wotw_seedgen_seed_language::output::{
     ArithmeticOperator, ClientEvent, Comparator, EqualityComparator, Icon, LogicOperator,
 };
@@ -11,8 +10,6 @@ use wotw_seedgen_seed_language::output::{
 /// Contains the compiled seedgen output that makes up the seed.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Assembly {
-    /// List of timers
-    pub timers: Vec<Timer>,
     /// Events from generation and snippets
     pub events: Vec<Event>,
     /// [`Command`]s that may be referenced from elsewhere by index
@@ -114,6 +111,11 @@ pub enum Command {
     IntegerToString,
     /// Convert Float Memory 0 to a string and store it in String Memory 0
     FloatToString,
+    /// Until the next reload, on every tick where `toggle` is `true` increment `timer` by the delta time in seconds
+    DefineTimer(
+        /*toggle*/ UberIdentifier,
+        /*timer*/ UberIdentifier,
+    ),
     /// Check if Ori is in the hitbox defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3) and store the result in Boolean Memory 0
     IsInHitbox,
     /// Store the name of world number `index` in String Memory 0

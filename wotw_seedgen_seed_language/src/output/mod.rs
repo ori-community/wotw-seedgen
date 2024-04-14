@@ -14,14 +14,13 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::hash::Hash;
 use wotw_seedgen_data::{
-    Equipment, GromIcon, LupoIcon, MapIcon, OpherIcon, Position, Shard, TuleyIcon, UberIdentifier,
+    Equipment, GromIcon, LupoIcon, MapIcon, OpherIcon, Position, Shard, TuleyIcon,
 };
 
 // TODO check all the public derives
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct IntermediateOutput {
     pub spawn: Option<Position>,
-    pub timers: Vec<Timer>,
     pub events: Vec<Event>,
     pub command_lookup: Vec<CommandVoid>,
     pub icons: Vec<(String, Vec<u8>)>, // TODO poor memory
@@ -31,13 +30,6 @@ pub struct IntermediateOutput {
     pub logical_state_sets: FxHashSet<String>,
     pub preplacements: Vec<(CommandVoid, wotw_seedgen_data::Zone)>,
     pub debug: Option<DebugOutput>,
-}
-
-/// Timers should increment their `timer` uberState each frame by the deltaTime as long as their `toggle` is `true`
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Timer {
-    pub toggle: UberIdentifier,
-    pub timer: UberIdentifier,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]

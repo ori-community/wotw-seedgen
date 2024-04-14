@@ -177,6 +177,9 @@ impl Display for CommandVoid {
             CommandVoid::Multi { commands } => write!(f, "{{ {} }}", commands.iter().format(" ")),
             CommandVoid::Lookup { index } => write!(f, "lookup({index})"),
             CommandVoid::If { condition, command } => write!(f, "if ({condition}) {{ {command} }}"),
+            CommandVoid::DefineTimer { toggle, timer } => {
+                write!(f, "define_timer({toggle}, {timer})")
+            }
             // TODO this logic depends on implementation details of compilation
             CommandVoid::QueuedMessage {
                 id,

@@ -849,7 +849,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
             CommandVoid::If {
                 condition: CommandBoolean::FetchBoolean {
                     uber_identifier: UberIdentifier {
-                        group: 26,
+                        group: 27,
                         member: 0,
                     },
                 },
@@ -865,7 +865,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                     operation: Box::new(Operation {
                         left: CommandBoolean::FetchBoolean {
                             uber_identifier: UberIdentifier {
-                                group: 26,
+                                group: 27,
                                 member: 0,
                             },
                         },

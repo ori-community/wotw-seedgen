@@ -43,7 +43,6 @@ impl Seed {
                 slug: String::new(),
             },
             assembly: Assembly {
-                timers: output.timers,
                 events,
                 command_lookup,
             },

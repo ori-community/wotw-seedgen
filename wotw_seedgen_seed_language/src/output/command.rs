@@ -174,6 +174,11 @@ pub enum CommandVoid {
         condition: CommandBoolean,
         command: Box<CommandVoid>,
     },
+    /// Until the next reload, on every tick where `toggle` is `true` increment `timer` by the delta time in seconds
+    DefineTimer {
+        toggle: UberIdentifier,
+        timer: UberIdentifier,
+    },
     /// Add `message` to the queue with `timeout` or a default timeout.
     /// If `priority` is true, it should be a priority message.
     /// If `id` is specified, it can later be used to update the message

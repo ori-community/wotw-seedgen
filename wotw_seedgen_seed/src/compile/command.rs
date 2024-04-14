@@ -199,6 +199,9 @@ impl Compile for input::CommandVoid {
                     .boolean(condition)
                     .call(Command::ExecuteIf(index))
             }
+            Self::DefineTimer { toggle, timer } => {
+                (vec![Command::DefineTimer(toggle, timer)], MemoryUsed::ZERO)
+            }
             Self::QueuedMessage {
                 id,
                 priority,

@@ -405,6 +405,7 @@ impl ResolvePlaceholders for CommandVoid {
             }
             Self::SetWheelPinned { pinned, .. } => pinned.resolve(context),
             Self::Lookup { .. }
+            | Self::DefineTimer { .. }
             | Self::MessageDestroy { .. }
             | Self::FreeMessageAlignment { .. }
             | Self::FreeMessageScreenPosition { .. }
