@@ -3,13 +3,12 @@ use crate::generate_seed;
 use env_logger::Env;
 use lazy_static::lazy_static;
 use log::info;
+use wotw_seedgen_assets::{PresetAccess, UniversePreset, WorldPreset};
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::Graph,
 };
-use wotw_seedgen_settings::{
-    Difficulty, PresetAccess, UniversePreset, UniverseSettings, WorldPreset,
-};
+use wotw_seedgen_settings::{Difficulty, UniverseSettings};
 use wotw_seedgen_static_assets::{
     LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
 };
@@ -81,8 +80,8 @@ fn some_seeds() {
 
     for preset in ["gorlek", "rspawn"] {
         let preset = PRESET_ACCESS.world_preset(preset).unwrap();
-        universe_settings.world_settings[0]
-            .apply_world_preset(preset, &*PRESET_ACCESS)
+        preset
+            .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
             .unwrap();
     }
 
@@ -90,8 +89,8 @@ fn some_seeds() {
         world_settings: Some(vec![WorldPreset::default(); 2]),
         ..UniversePreset::default()
     };
-    universe_settings
-        .apply_preset(preset, &*PRESET_ACCESS)
+    preset
+        .apply(&mut universe_settings, &*PRESET_ACCESS)
         .unwrap();
 
     info!("Testing multiworld Gorlek with headers");

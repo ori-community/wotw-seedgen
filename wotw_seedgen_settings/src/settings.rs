@@ -1,8 +1,6 @@
-use crate::{PresetAccess, UniversePreset, WorldPreset};
 use rustc_hash::{FxHashMap, FxHashSet};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::iter;
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString, EnumVariantNames};
 
@@ -45,100 +43,6 @@ impl UniverseSettings {
         }
     }
 
-    /// Apply the settings from a [`UniversePreset`]
-    ///
-    /// This follows various rules to retain all unrelated parts of the existing Settings:
-    /// - Any [`None`] values of the preset will be ignored
-    /// - [`Vec`]s will be appended to the current contents
-    /// - Other values will be overwritten
-    /// - If the number of worlds matches, the preset will be applied to each world per index
-    /// - If only one world is in the preset, but multiple in the existing settings, the preset is applied to all worlds
-    /// - If multiple worlds are in the preset, but only one in the existing settings, the existing settings will be copied for all worlds, then the preset will be applied per index
-    /// - If multiple worlds are in both and their number does not match, returns an error
-    /// - Nested presets will be applied before the parent preset
-    pub fn apply_preset<A: PresetAccess>(
-        &mut self,
-        preset: UniversePreset,
-        preset_access: &A,
-    ) -> Result<(), String> {
-        self.apply_preset_guarded(preset, &mut vec![], preset_access)
-    }
-
-    /// Inner method to memorize nested presets to prevent cyclic patterns
-    fn apply_preset_guarded<A: PresetAccess>(
-        &mut self,
-        preset: UniversePreset,
-        already_applied: &mut Vec<String>,
-        preset_access: &A,
-    ) -> Result<(), String> {
-        let UniversePreset {
-            info: _,
-            includes,
-            world_settings,
-            seed,
-        } = preset;
-
-        if let Some(includes) = includes {
-            for nested_preset in includes {
-                self.apply_nested_preset(nested_preset, already_applied, preset_access)?;
-            }
-        }
-
-        if let Some(seed) = seed {
-            self.seed = seed;
-        }
-
-        let setting_worlds = self.world_count();
-
-        if let Some(preset_world_settings) = world_settings {
-            let preset_worlds = preset_world_settings.len();
-
-            if preset_worlds == 0 {
-                // do nothing
-            } else if setting_worlds == preset_worlds {
-                for (world_settings, preset_world_settings) in
-                    self.world_settings.iter_mut().zip(preset_world_settings)
-                {
-                    world_settings.apply_world_preset(preset_world_settings, preset_access)?;
-                }
-            } else if preset_worlds == 1 {
-                for world_settings in &mut self.world_settings {
-                    world_settings
-                        .apply_world_preset(preset_world_settings[0].clone(), preset_access)?;
-                }
-            } else if setting_worlds == 1 {
-                let diff = preset_worlds - setting_worlds;
-                self.world_settings
-                    .extend(iter::repeat(self.world_settings[0].clone()).take(diff));
-                for (world_settings, preset_world_settings) in
-                    self.world_settings.iter_mut().zip(preset_world_settings)
-                {
-                    world_settings.apply_world_preset(preset_world_settings, preset_access)?;
-                }
-            } else {
-                return Err(format!("Cannot apply preset with {preset_worlds} worlds to settings with {setting_worlds} worlds"));
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Find and apply nested presets
-    fn apply_nested_preset<A: PresetAccess>(
-        &mut self,
-        identifier: String,
-        already_applied: &mut Vec<String>,
-        preset_access: &A,
-    ) -> Result<(), String> {
-        // Prevent cyclic patterns
-        if already_applied.contains(&identifier) {
-            return Ok(());
-        }
-        let preset = preset_access.universe_preset(&identifier)?;
-        already_applied.push(identifier);
-        self.apply_preset_guarded(preset, already_applied, preset_access)
-    }
-
     /// Returns the number of worlds
     pub fn world_count(&self) -> usize {
         self.world_settings.len()
@@ -173,89 +77,6 @@ impl WorldSettings {
     /// Checks whether these settings feature a random spawn location
     pub fn is_random_spawn(&self) -> bool {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
-    }
-
-    /// Apply the settings from a [`WorldPreset`]
-    ///
-    /// This follows various rules to retain all unrelated parts of the existing Settings:
-    /// - Any [`None`] values of the preset will be ignored
-    /// - [`Vec`]s will be appended to the current contents
-    /// - Other values will be overwritten
-    /// - Nested presets will be applied before the parent preset
-    pub fn apply_world_preset<A: PresetAccess>(
-        &mut self,
-        preset: WorldPreset,
-        preset_access: &A,
-    ) -> Result<(), String> {
-        self.apply_world_preset_guarded(preset, &mut vec![], preset_access)
-    }
-
-    /// Inner method to memorize nested presets to prevent cyclic patterns
-    fn apply_world_preset_guarded<A: PresetAccess>(
-        &mut self,
-        preset: WorldPreset,
-        already_applied: &mut Vec<String>,
-        preset_access: &A,
-    ) -> Result<(), String> {
-        let WorldPreset {
-            info: _,
-            includes,
-            difficulty,
-            tricks,
-            spawn,
-            hard,
-            snippets,
-            snippet_config,
-        } = preset;
-
-        if let Some(includes) = includes {
-            for nested_preset in includes {
-                self.apply_nested_preset(nested_preset, already_applied, preset_access)?;
-            }
-        }
-
-        // TODO surely there's a handy command for this
-        if let Some(difficulty) = difficulty {
-            self.difficulty = difficulty;
-        }
-        if let Some(tricks) = tricks {
-            self.tricks.extend(tricks);
-        }
-        if let Some(spawn) = spawn {
-            self.spawn = spawn;
-        }
-        if let Some(hard) = hard {
-            self.hard = hard;
-        }
-        if let Some(snippets) = snippets {
-            self.snippets.extend(snippets);
-        }
-        if let Some(snippet_config) = snippet_config {
-            for (snippet_name, config) in snippet_config {
-                let entry = self.snippet_config.entry(snippet_name).or_default();
-                for (config_name, value) in config {
-                    entry.insert(config_name, value);
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Find and apply nested presets
-    fn apply_nested_preset<A: PresetAccess>(
-        &mut self,
-        identifier: String,
-        already_applied: &mut Vec<String>,
-        preset_access: &A,
-    ) -> Result<(), String> {
-        // Prevent cyclic patterns
-        if already_applied.contains(&identifier) {
-            return Ok(());
-        }
-        let preset = preset_access.world_preset(&identifier)?;
-        already_applied.push(identifier);
-        self.apply_world_preset_guarded(preset, already_applied, preset_access)
     }
 }
 

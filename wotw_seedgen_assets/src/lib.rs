@@ -8,19 +8,21 @@
 //!
 //! - `loc_data`: Parsing for `loc_data.csv`
 //! - `state_data`: Parsing for `state_data.csv`
-//! - `uber_sate_data`: Parsing for `uber_state_dump.json`
+//! - `uber_state_data`: Parsing for `uber_state_dump.json`
+//! - `snippet_access`: Trait and implementations to access snippets
+//! - `presets`: Parsing and access trait for preset files
+//! - `file_access`: Filesystem-based implementation to access asset files
 
 #[cfg(feature = "wotw_seedgen_data")]
 pub use wotw_seedgen_data as data;
+#[cfg(feature = "wotw_seedgen_settings")]
+pub use wotw_seedgen_settings as settings;
 
 #[cfg(feature = "loc_data")]
 mod loc_data;
-use std::path::Path;
 
 #[cfg(feature = "loc_data")]
 pub use loc_data::{LocData, LocDataEntry};
-#[cfg(feature = "presets")]
-mod presets;
 #[cfg(feature = "state_data")]
 mod state_data;
 #[cfg(feature = "state_data")]
@@ -29,6 +31,20 @@ pub use state_data::{StateData, StateDataEntry};
 mod uber_state_data;
 #[cfg(feature = "uber_state_data")]
 pub use uber_state_data::{UberStateAlias, UberStateData, UberStateDataEntry, UberStateValue};
+#[cfg(feature = "snippet_access")]
+mod snippet_access;
+#[cfg(feature = "snippet_access")]
+pub use snippet_access::{NoSnippetAccess, SnippetAccess};
+#[cfg(feature = "presets")]
+mod presets;
+#[cfg(feature = "presets")]
+pub use presets::{
+    NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, WorldPreset,
+};
+#[cfg(feature = "file_access")]
+mod file_access;
+#[cfg(feature = "file_access")]
+pub use file_access::FileAccess;
 
 /// Representation of a source file with the necessary information to display useful error messages.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -47,13 +63,4 @@ impl Source {
     pub fn new(id: String, content: String) -> Self {
         Self { id, content }
     }
-}
-
-// TODO maybe this should be in seed_language?
-/// Resolves include commands in the seed language
-pub trait SnippetAccess {
-    /// Resolve `!include(<identifier>)`
-    fn read_snippet(&self, identifier: &str) -> Result<Source, String>;
-    /// Resolve binary incldues such as `!include_icon(<path>)`
-    fn read_file(&self, path: &Path) -> Result<Vec<u8>, String>;
 }

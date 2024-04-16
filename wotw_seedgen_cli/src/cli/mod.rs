@@ -4,7 +4,7 @@ mod stats_args;
 
 pub use plando_args::PlandoArgs;
 pub use seed_settings::SeedSettings;
-pub use stats_args::{Analyzer, ChainedAnalyzers, StatsArgs};
+pub use stats_args::{ChainedAnalyzers, StatsArgs};
 
 use clap::{
     builder::{styling::Style, Styles},

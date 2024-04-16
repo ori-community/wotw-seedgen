@@ -3,16 +3,14 @@ use lazy_static::lazy_static;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPool, Player, UberStates, World};
-use wotw_seedgen_assets::{LocData, StateData};
+use wotw_seedgen_assets::{LocData, PresetAccess, StateData, WorldPreset};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::{Enemy, Graph, Requirement},
 };
 use wotw_seedgen_seed_language::output::IntermediateOutput;
-use wotw_seedgen_settings::{
-    Difficulty, PresetAccess, Spawn, UniverseSettings, WorldPreset, WorldSettings, DEFAULT_SPAWN,
-};
+use wotw_seedgen_settings::{Difficulty, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{
     LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
 };
@@ -142,8 +140,9 @@ fn reach_checking(c: &mut Criterion) {
 
 fn generation(c: &mut Criterion) {
     let mut universe_settings = UniverseSettings::new(String::default());
-    universe_settings.world_settings[0]
-        .apply_world_preset(PRESET_ACCESS.world_preset("moki").unwrap(), &*PRESET_ACCESS)
+    let preset = PRESET_ACCESS.world_preset("moki").unwrap();
+    preset
+        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
         .unwrap();
     let mut seed = 0;
     let graph = Graph::compile(
@@ -168,20 +167,18 @@ fn generation(c: &mut Criterion) {
 
     seed = 0;
     let mut universe_settings = UniverseSettings::new(String::default());
-    universe_settings.world_settings[0]
-        .apply_world_preset(
-            WorldPreset {
-                includes: Some(
-                    ["gorlek".to_string(), "rspawn".to_string()]
-                        .into_iter()
-                        .collect(),
-                ),
-                difficulty: Some(Difficulty::Unsafe),
-                spawn: Some(Spawn::FullyRandom),
-                ..Default::default()
-            },
-            &*PRESET_ACCESS,
-        )
+    let preset = WorldPreset {
+        includes: Some(
+            ["gorlek".to_string(), "rspawn".to_string()]
+                .into_iter()
+                .collect(),
+        ),
+        difficulty: Some(Difficulty::Unsafe),
+        spawn: Some(Spawn::FullyRandom),
+        ..Default::default()
+    };
+    preset
+        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
         .unwrap();
     let graph = Graph::compile(
         AREAS.clone(),

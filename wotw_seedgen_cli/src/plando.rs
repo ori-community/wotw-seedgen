@@ -1,34 +1,26 @@
-use crate::{cli::PlandoArgs, files::read_assets, Error};
+use crate::{cli::PlandoArgs, files, Error};
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use std::{
+    ffi::OsStr,
     fs::{self, File},
-    io::ErrorKind,
     mem,
-    path::{Path, PathBuf},
 };
 use wotw_seedgen::{
     seed::{assembly::Command, Seed},
-    seed_language::{
-        assets::{SnippetAccess, Source},
-        compile::Compiler,
-        output::DebugOutput,
-    },
+    seed_language::{compile::Compiler, output::DebugOutput},
 };
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs { path, debug } = args;
-
-    let uber_state_data = read_assets()?.uber_state_data;
-
-    fs::create_dir_all("seeds/out")?;
+    let name = path.file_stem().unwrap_or_else(|| OsStr::new("plando"));
 
     let (root, entry) = if path
         .metadata()
         .map_err(|err| format!("{err}: {}", path.display()))?
         .is_dir()
     {
-        (path, "main")
+        (path.as_path(), "main")
     } else {
         let mut file_name = path
             .file_name()
@@ -38,7 +30,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             .rsplit('.');
         match (file_name.next(), file_name.next()) {
             (Some("wotws"), Some(identifier)) => {
-                let root = path.parent().unwrap().to_path_buf();
+                let root = path.parent().unwrap();
                 (root, identifier)
             }
             _ => {
@@ -50,9 +42,18 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         }
     };
 
+    let logic_access = files::logic_access(root)?;
+    let uber_state_data =
+        logic_access.uber_state_data(logic_access.loc_data()?, logic_access.state_data()?)?;
+
     let mut rng = rand::thread_rng();
-    let files = Files { root };
-    let mut compiler = Compiler::new(&mut rng, &files, &uber_state_data, Default::default());
+    let snippet_access = files::snippet_access(root)?;
+    let mut compiler = Compiler::new(
+        &mut rng,
+        &snippet_access,
+        &uber_state_data,
+        Default::default(),
+    );
     if debug {
         compiler.debug();
     }
@@ -81,7 +82,15 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             .insert("__debug".to_string(), serde_json::to_vec_pretty(&metadata)?);
     }
 
-    seed.package(&mut File::create("seeds/out/out.wotwr")?)?;
+    let mut out = root.join("out");
+    fs::create_dir_all(&out)?;
+    out.push(name);
+    out.set_extension("wotwr");
+    let mut file = File::create(&out)
+        .map_err(|err| format!("failed to create \"{}\": {err}", out.display()))?;
+    seed.package(&mut file)?;
+
+    eprintln!("compiled successfully to \"{}\"", out.display());
 
     Ok(())
 }
@@ -90,52 +99,4 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 struct Metadata {
     compiler_data: DebugOutput,
     indexed_lookup: FxHashMap<usize, Vec<Command>>,
-}
-
-struct Files {
-    root: PathBuf,
-}
-impl SnippetAccess for Files {
-    fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
-        let mut filename = PathBuf::from(identifier);
-        filename.set_extension("wotws");
-
-        let mut path_plando = self.root.clone();
-        path_plando.push(&filename);
-        if let Some(result) = try_read(&path_plando) {
-            return result;
-        }
-
-        let mut path_snippet = PathBuf::from("snippets");
-        path_snippet.push(&filename);
-        if let Some(result) = try_read(&path_snippet) {
-            return result;
-        }
-
-        Err(format!(
-            "failed to find \"{}\" at \"{}\" or \"{}\"",
-            identifier,
-            path_plando.display(),
-            path_snippet.display(),
-        ))
-    }
-    fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-        let mut full_path = self.root.clone();
-        full_path.push(path);
-        fs::read(full_path).map_err(|err| err.to_string())
-    }
-}
-
-fn try_read(path: &Path) -> Option<Result<Source, String>> {
-    match fs::read_to_string(&path) {
-        Ok(content) => Some(Ok(Source::new(path.to_string_lossy().to_string(), content))),
-        Err(err) => match err.kind() {
-            ErrorKind::NotFound => None,
-            _ => Some(Err(format!(
-                "failed to read \"{}\": {}",
-                path.display(),
-                err
-            ))),
-        },
-    }
 }

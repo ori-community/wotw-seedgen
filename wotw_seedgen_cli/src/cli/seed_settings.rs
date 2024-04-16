@@ -1,5 +1,5 @@
 use super::{INVALID, LINK, LITERAL};
-use crate::files::PresetFileAccess;
+use crate::files;
 use clap::{
     builder::{styling::Reset, PossibleValue, StringValueParser, TypedValueParser},
     error::ErrorKind,
@@ -15,9 +15,9 @@ use std::{
     str::FromStr,
 };
 use strum::VariantNames;
-use wotw_seedgen::settings::{
-    Difficulty, PresetAccess, PresetInfo, Spawn, Trick, UniversePreset, WorldPreset,
-};
+use wotw_seedgen::assets::{PresetInfo, UniversePreset, WorldPreset};
+use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
+use wotw_seedgen_assets::{FileAccess, PresetAccess};
 
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePreset);
@@ -27,6 +27,8 @@ impl Args for SeedSettings {
         Some("seed_settings".into())
     }
     fn augment_args(cmd: clap::Command) -> clap::Command {
+        let preset_access = files::preset_access("").unwrap_or_else(|_| FileAccess::new([""]));
+
         cmd.group(ArgGroup::new("seed_settings").multiple(true))
             .arg(
                 Arg::new("seed")
@@ -45,9 +47,9 @@ impl Args for SeedSettings {
                     .num_args(1..)
                     .help("Universe presets to include")
                     .long_help(preset_help(
-                        &PresetFileAccess::available_universe_presets().unwrap_or_default(),
+                        &preset_access.available_universe_presets().unwrap_or_default(),
                         "Universe",
-                        |identifier| PresetFileAccess.universe_preset(identifier).map(|preset| preset.info)
+                        |identifier| preset_access.universe_preset(identifier).map(|preset| preset.info)
                     )),
             )
             .arg(
@@ -80,9 +82,9 @@ impl Args for SeedSettings {
                     .action(ArgAction::Append)
                     .help("World presets to include")
                     .long_help(preset_help(
-                        &PresetFileAccess::available_world_presets().unwrap_or_default(),
+                        &preset_access.available_world_presets().unwrap_or_default(),
                         "World",
-                        |identifier| PresetFileAccess.world_preset(identifier).map(|preset| preset.info)
+                        |identifier| preset_access.world_preset(identifier).map(|preset| preset.info)
                     )),
             )
             .arg(

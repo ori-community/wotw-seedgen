@@ -1,4 +1,10 @@
-use std::{borrow::Cow, iter, mem, ops::Range, str::FromStr};
+use std::{
+    borrow::Cow,
+    io::{self, Write},
+    iter, mem,
+    ops::Range,
+    str::FromStr,
+};
 
 use crate::{
     ast,
@@ -6,7 +12,7 @@ use crate::{
     token::Tokenizer,
 };
 use rustc_hash::FxHashMap;
-use wotw_seedgen_assets::{LocData, StateData};
+use wotw_seedgen_assets::{LocData, Source, StateData};
 use wotw_seedgen_data::{Position, Shard, Skill, Teleporter};
 use wotw_seedgen_parse::{
     Error, ErrorKind, Recover, Recoverable, Result, Separated, SeparatedNonEmpty, Span, Spanned,
@@ -69,6 +75,27 @@ impl CompileResult {
             None => Ok(self.graph),
             Some(err) => Err(err),
         }
+    }
+
+    pub fn eprint_errors(self, source: &Source) -> (Graph, bool) {
+        let mut stderr = io::stderr().lock();
+
+        let error_count = self.errors.len();
+
+        for error in self.errors {
+            error.write_pretty(source, &mut stderr).unwrap();
+        }
+
+        let success = error_count == 0;
+        if !success {
+            writeln!(
+                &mut stderr,
+                "Failed to compile Snippets with {error_count} errors."
+            )
+            .unwrap();
+        }
+
+        (self.graph, success)
     }
 }
 

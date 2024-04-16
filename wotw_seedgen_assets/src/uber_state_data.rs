@@ -1,7 +1,4 @@
-#[cfg(feature = "loc_data")]
-use crate::LocData;
-#[cfg(feature = "state_data")]
-use crate::StateData;
+use crate::{LocData, StateData};
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -86,9 +83,12 @@ impl Display for UberStateValue {
 impl UberStateData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
     ///
-    /// This is intended to be used on `uber_state_dump.json`, use [`UberStateData::add_loc_data`] and
-    /// [`UberStateData::add_state_data`] to add information from additional assets
-    pub fn from_reader<R: Read>(reader: R) -> serde_json::Result<Self> {
+    /// Information from `loc_data` and `state_data` will be included
+    pub fn from_reader<R: Read>(
+        reader: R,
+        loc_data: LocData,
+        state_data: StateData,
+    ) -> serde_json::Result<Self> {
         let mut uber_state_data = Self::default();
         let dump: Dump = serde_json::from_reader(reader)?;
         for (group, dump_group) in dump.groups {
@@ -128,27 +128,15 @@ impl UberStateData {
                 );
             }
         }
+        for record in loc_data.entries {
+            uber_state_data.add_rando_name(record.identifier, record.uber_identifier, record.value);
+        }
+        for record in state_data.entries {
+            uber_state_data.add_rando_name(record.identifier, record.uber_identifier, record.value);
+        }
         Ok(uber_state_data)
     }
-    /// Add information from parsed [`LocData`]
-    ///
-    /// This will add the contained identifiers to `name_lookup` as well as insert `rando_name` values into `id_lookup`
-    #[cfg(feature = "loc_data")]
-    pub fn add_loc_data(&mut self, loc_data: LocData) {
-        for record in loc_data.entries {
-            self.add_rando_name(record.identifier, record.uber_identifier, record.value);
-        }
-    }
-    /// Add information from parsed [`StateData`]
-    ///
-    /// This will add the contained identifiers to `name_lookup` as well as insert `rando_name` values into `id_lookup`
-    #[cfg(feature = "state_data")]
-    pub fn add_state_data(&mut self, state_data: StateData) {
-        for record in state_data.entries {
-            self.add_rando_name(record.identifier, record.uber_identifier, record.value);
-        }
-    }
-    #[cfg(any(feature = "loc_data", feature = "state_data"))]
+
     fn add_rando_name(&mut self, name: String, uber_identifier: UberIdentifier, value: Option<u8>) {
         let (group, member) = name.split_once('.').expect("Invalid UberState name");
         self.name_lookup

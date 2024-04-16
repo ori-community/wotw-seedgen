@@ -30,12 +30,10 @@ fn main() {
         #[allow(unused_mut)]
         let mut uber_state_data = wotw_seedgen_assets::UberStateData::from_reader(
             include_bytes!("../assets/uber_state_dump.json").as_slice(),
+            loc_data,
+            state_data,
         )
         .unwrap();
-        #[cfg(feature = "state_data")]
-        uber_state_data.add_state_data(state_data);
-        #[cfg(feature = "loc_data")]
-        uber_state_data.add_loc_data(loc_data);
 
         write("uber_state_data", &uber_state_data);
     }
@@ -99,7 +97,7 @@ fn main() {
         use rustc_hash::FxHashMap;
         use serde::{Deserialize, Serialize};
         use std::{fs::File, io::BufReader, path::PathBuf};
-        use wotw_seedgen_settings::{UniversePreset, WorldPreset};
+        use wotw_seedgen_assets::{UniversePreset, WorldPreset};
 
         fn process_presets<T: Serialize + for<'de> Deserialize<'de>>(folder: &str) {
             let presets = read_optional_dir(format!("../assets/{folder}"))

@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use rustc_hash::FxHashMap;
-use wotw_seedgen_settings::{PresetAccess, UniversePreset, WorldPreset};
+use wotw_seedgen_assets::{PresetAccess, UniversePreset, WorldPreset};
 
 pub struct StaticPresetAccess {
     universe_presets: FxHashMap<String, UniversePreset>,
