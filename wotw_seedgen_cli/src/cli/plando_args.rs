@@ -5,9 +5,14 @@ use std::path::PathBuf;
 pub struct PlandoArgs {
     /// Path to your plandomizer source
     ///
-    /// If the path points to a folder, "main.wotws" in that folder will be used as entry point.
-    /// Otherwise, the file at the path will be used as entry point directly.
+    /// If the path leads to a file, it will be used as entry point.
+    /// If it leads to a folder, "main.wotws" in that folder will be used as entry point.
     pub path: PathBuf,
+    /// Filename of the output file
+    ///
+    /// .wotwr will be appended as the file extension
+    #[arg(short = 'n', long)]
+    pub out_name: Option<String>,
     /// Write information useful for debugging into the seed
     #[arg(long)]
     pub debug: bool,

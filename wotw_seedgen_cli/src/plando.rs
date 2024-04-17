@@ -12,8 +12,11 @@ use wotw_seedgen::{
 };
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
-    let PlandoArgs { path, debug } = args;
-    let name = path.file_stem().unwrap_or_else(|| OsStr::new("plando"));
+    let PlandoArgs {
+        path,
+        out_name,
+        debug,
+    } = args;
 
     let (root, entry) = if path
         .metadata()
@@ -84,8 +87,13 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let mut out = root.join("out");
     fs::create_dir_all(&out)?;
-    out.push(name);
-    out.set_extension("wotwr");
+    match out_name {
+        None => {
+            out.push(path.file_stem().unwrap_or_else(|| OsStr::new("plando")));
+            out.set_extension("wotwr");
+        }
+        Some(name) => out.push(format!("{name}.wotwr")),
+    }
     let mut file = File::create(&out)
         .map_err(|err| format!("failed to create \"{}\": {err}", out.display()))?;
     seed.package(&mut file)?;
