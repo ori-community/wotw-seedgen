@@ -4,3 +4,6 @@ rls/*
 *.currentseedpath
 Cargo.lock
 .idea
+seeds/*
+seed_storage/*
+stats*/*

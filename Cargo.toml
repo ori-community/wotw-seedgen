@@ -14,4 +14,5 @@ members = [
     "wotw_seedgen_static_assets", # TODO move into a feature module of assets?
     "wotw_seedgen_stats",
 ]
+default-members = ["wotw_seedgen_cli"]
 resolver = "2"
