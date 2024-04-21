@@ -90,6 +90,7 @@ on reload {
     // TODO Tuley
 }
 
+on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true)
 on EastPools.FightArenas store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
 on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneState == 2 {
     store(hubUberStateGroup.craftCutsceneState, 3)
