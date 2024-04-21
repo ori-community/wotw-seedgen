@@ -10,7 +10,7 @@ use crate::{
 use ast::ClientEvent;
 use ordered_float::OrderedFloat;
 use rand::Rng;
-use std::{iter, mem, ops::Range, path::PathBuf};
+use std::{iter, mem, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
 use wotw_seedgen_parse::{Error, Identifier, Result, Span};
@@ -133,20 +133,15 @@ impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
             .read_file(self.path.data.as_ref())
             .map_err(|err| Error::custom(err, self.path.span()));
         if let Some(data) = compiler.consume_result(content) {
-            // TODO make sure nothing gets overwritten
-            match PathBuf::from(self.path.data).file_name() {
-                None => compiler
-                    .errors
-                    .push(Error::custom("invalid path".to_string(), self.path.span)),
-                Some(name) => {
-                    let name = name.to_string_lossy().to_string();
-                    compiler.global.output.icons.push((name, data));
-                    compiler.variables.insert(
-                        self.identifier.data,
-                        Literal::CustomIcon(self.path.data.to_string()),
-                    );
-                }
-            }
+            compiler
+                .global
+                .output
+                .icons
+                .push((self.path.data.to_string(), data));
+            compiler.variables.insert(
+                self.identifier.data,
+                Literal::CustomIcon(self.path.data.to_string()),
+            );
         }
     }
 }
