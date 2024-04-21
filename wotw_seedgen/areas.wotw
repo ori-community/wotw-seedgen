@@ -12109,7 +12109,7 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
       Bash  # bash the gorlek then its projectile
       GrenadeJump, DoubleJump
 
-anchor LowerWastes.Shovel at 1634, -3981:  # On the ground to the left of the Sand Bridge
+anchor LowerWastes.Shovel at 1635, -3981:  # On the ground to the left of the Sand Bridge
   refill Energy=3:
     moki, BreakCrystal:
       DoubleJump OR Launch
