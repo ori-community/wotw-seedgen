@@ -1110,7 +1110,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         for (placements_remaining, node) in needs_placement.into_iter().enumerate().rev() {
             let uber_identifier = node.uber_identifier().unwrap();
-            let command = if uber_identifier.is_shop() {
+            let is_shop = uber_identifier.is_shop();
+            let command = if is_shop {
                 // TODO try to avoid
                 let command = compile::gorlek_ore();
                 warning!("[World {}] Placing more {} than intended to avoid placing Spirit Light in a shop", self.index, self.log_name(&command));
@@ -1130,7 +1131,9 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 node.identifier()
             );
             let name = self.name(&command);
-            self.shop_item_data(&command, uber_identifier, name);
+            if is_shop {
+                self.shop_item_data(&command, uber_identifier, name)
+            }
             self.write_placement_spoiler(node, &command, placement_spoiler);
             self.push_command(node_trigger(node).unwrap(), command)
         }
