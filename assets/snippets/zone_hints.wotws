@@ -87,6 +87,7 @@
 )
 
 !on_callback("progress_helper", write_progress_message, {
+    set_string("zone_hint", "")
     if current_zone() == Zone::Inkwater {
         write_inkwater_hint()
     }
