@@ -81,8 +81,10 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
                 .enumerate()
                 .collect(),
         };
-        seed.assets
-            .insert("__debug".to_string(), serde_json::to_vec_pretty(&metadata)?);
+        seed.assets.insert(
+            "debug.json".to_string(),
+            serde_json::to_vec_pretty(&metadata)?,
+        );
     }
 
     let mut out = root.join("out");
@@ -96,7 +98,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     }
     let mut file = File::create(&out)
         .map_err(|err| format!("failed to create \"{}\": {err}", out.display()))?;
-    seed.package(&mut file)?;
+    seed.package(&mut file, !debug)?;
 
     eprintln!("compiled successfully to \"{}\"", out.display());
 

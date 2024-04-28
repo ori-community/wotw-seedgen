@@ -3,10 +3,20 @@ use std::io::{Seek, Write};
 use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
 impl Seed {
-    pub fn package<W: Write + Seek>(&self, obj: &mut W) -> Result<()> {
+    pub fn package<W: Write + Seek>(&self, obj: &mut W, compress: bool) -> Result<()> {
+        let f = if compress {
+            Package::append_compressed
+        } else {
+            Package::append
+        };
+
         let mut package = Package::new(obj)?;
         package.append("preload.json", serde_json::to_vec(&self.preload)?)?;
-        package.append_compressed("assembly.json", serde_json::to_vec(&self.assembly)?)?;
+        f(
+            &mut package,
+            "assembly.json",
+            serde_json::to_vec(&self.assembly)?,
+        )?;
         for (path, data) in &self.assets {
             package.append(format!("assets/{path}"), data)?;
         }

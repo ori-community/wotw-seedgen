@@ -36,7 +36,7 @@ pub(crate) fn seed(settings: UniversePreset) -> Result<(), Error> {
     fs::write("seeds/spoiler.txt", seed_universe.spoiler.to_string())?;
 
     let seed = seed_universe.worlds.pop().unwrap();
-    seed.package(&mut File::create("seeds/seed.wotwr")?)?;
+    seed.package(&mut File::create("seeds/seed.wotwr")?, true)?;
 
     eprintln!("Generated seed to \"seeds/seed.wotwr\"");
 
