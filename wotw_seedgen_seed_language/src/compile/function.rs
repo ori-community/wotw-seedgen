@@ -281,6 +281,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         if let Some(&index) = compiler.function_indices.get(self.identifier.data.0) {
+            // TODO are we dropping a result here?
             if let Ok(parameters) = &self.parameters.content {
                 if !parameters.is_empty() {
                     compiler.errors.push(Error::custom(

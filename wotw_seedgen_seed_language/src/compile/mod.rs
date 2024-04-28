@@ -408,6 +408,12 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         }
 
         let source = self.global.snippet_access.read_snippet(identifier)?;
+        self.global
+            .callbacks
+            .insert(identifier.to_string(), Default::default());
+        self.global
+            .shared_values
+            .insert(identifier.to_string(), Default::default());
         let mut errors = vec![];
 
         let ast = parse_ast(&source.content, TOKENIZER);

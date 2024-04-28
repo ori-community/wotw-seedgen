@@ -159,12 +159,7 @@ impl<'source> Compile<'source> for ast::CallbackArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let index = compiler.global.output.command_lookup.len();
-        compiler
-            .global
-            .output
-            .command_lookup
-            .push(CommandVoid::Multi { commands: vec![] });
+        let index = compiler.function_indices[self.0.data.0];
         compiler
             .global
             .callbacks
@@ -183,10 +178,10 @@ impl<'source> Compile<'source> for ast::OnCallbackArgs<'source> {
             .iter()
             .any(|include| include.data == self.snippet_name.data)
         {
-            compiler.errors.push(Error::custom(
-                "Unknown snippet. Maybe you should !include it first?".to_string(),
-                self.snippet_name.span,
-            ));
+            compiler.errors.push(
+                Error::custom("unknown snippet".to_string(), self.snippet_name.span)
+                    .with_help(format!("try !include(\"{}\")", self.snippet_name.data)),
+            );
             return;
         }
 
