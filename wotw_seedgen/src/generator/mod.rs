@@ -44,6 +44,7 @@ pub fn generate_seed<F: SnippetAccess>(
     uber_state_data: &UberStateData,
     snippet_access: &F,
     settings: &UniverseSettings,
+    debug: bool,
 ) -> Result<SeedUniverse, String> {
     let mut rng: Pcg64Mcg = Seeder::from(&settings.seed).make_rng();
     trace!("Seeded RNG with \"{}\"", settings.seed);
@@ -57,6 +58,7 @@ pub fn generate_seed<F: SnippetAccess>(
                 snippet_access,
                 uber_state_data,
                 world_settings.snippet_config.clone(),
+                debug,
             );
             // TODO this is inefficient because we probably do a lot of redundant work between the worlds
             let output = parse_snippets(&world_settings.snippets, compiler)?;
@@ -92,7 +94,7 @@ pub fn generate_seed<F: SnippetAccess>(
             })
             .collect::<Result<Vec<_>, String>>()?;
 
-        match generate_placements(&mut rng, worlds) {
+        match generate_placements(&mut rng, worlds, debug) {
             Ok(seed) => {
                 if attempt > 1 {
                     info!(

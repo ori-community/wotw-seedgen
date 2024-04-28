@@ -1,14 +1,20 @@
-use crate::{files, Error};
+use crate::{
+    cli::{SeedArgs, SeedSettings},
+    files, Error,
+};
 use std::fs::{self, File};
 use wotw_seedgen::{
-    assets::UniversePreset, generate_seed, logic_language::ast, logic_language::output::Graph,
-    settings::UniverseSettings,
+    generate_seed, logic_language::ast, logic_language::output::Graph, settings::UniverseSettings,
 };
 
 // TODO enable logging
 
-pub(crate) fn seed(settings: UniversePreset) -> Result<(), Error> {
-    let universe_preset = settings;
+pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
+    let SeedArgs {
+        settings: SeedSettings(universe_preset),
+        debug,
+    } = args;
+
     let mut settings = UniverseSettings::new("".to_string());
     universe_preset.apply(&mut settings, &files::preset_access("")?)?;
 
@@ -30,13 +36,14 @@ pub(crate) fn seed(settings: UniversePreset) -> Result<(), Error> {
 
     let uber_state_data = logic_access.uber_state_data(loc_data, state_data)?;
     let snippet_access = files::snippet_access("")?;
-    let mut seed_universe = generate_seed(&graph, &uber_state_data, &snippet_access, &settings)?;
+    let mut seed_universe =
+        generate_seed(&graph, &uber_state_data, &snippet_access, &settings, debug)?;
 
     fs::create_dir_all("seeds")?;
     fs::write("seeds/spoiler.txt", seed_universe.spoiler.to_string())?;
 
     let seed = seed_universe.worlds.pop().unwrap();
-    seed.package(&mut File::create("seeds/seed.wotwr")?, true)?;
+    seed.package(&mut File::create("seeds/seed.wotwr")?, !debug)?;
 
     eprintln!("Generated seed to \"seeds/seed.wotwr\"");
 

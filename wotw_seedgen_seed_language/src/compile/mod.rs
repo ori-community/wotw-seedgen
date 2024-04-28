@@ -233,9 +233,10 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
         uber_state_data: &'uberstates UberStateData,
         snippet_access: &'snippets dyn SnippetAccess,
         config: FxHashMap<String, FxHashMap<String, String>>,
+        debug: bool,
     ) -> Self {
         Self {
-            output: Default::default(),
+            output: IntermediateOutput::new(debug),
             uber_state_data,
             snippet_access,
             callbacks: Default::default(),
@@ -389,17 +390,14 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         snippet_access: &'snippets F,
         uber_state_data: &'uberstates UberStateData,
         config: FxHashMap<String, FxHashMap<String, String>>,
+        debug: bool,
     ) -> Self {
         Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
-            global: GlobalCompilerData::new(uber_state_data, snippet_access, config),
+            global: GlobalCompilerData::new(uber_state_data, snippet_access, config, debug),
             compiled_snippets: Default::default(),
             errors: Default::default(),
         }
-    }
-
-    pub fn debug(&mut self) {
-        self.global.output.debug = Some(Default::default());
     }
 
     pub fn compile_snippet(&mut self, identifier: &str) -> std::result::Result<(), String> {

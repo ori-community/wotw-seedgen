@@ -14,7 +14,7 @@ use std::fmt::{self, Debug};
 fn main() -> Result<(), Error> {
     let cli = Cli::parse();
     match cli {
-        Cli::Seed { settings } => seed(settings.0),
+        Cli::Seed { args } => seed(args),
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
     }

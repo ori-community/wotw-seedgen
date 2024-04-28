@@ -32,6 +32,16 @@ pub struct IntermediateOutput {
     pub debug: Option<DebugOutput>,
 }
 
+impl IntermediateOutput {
+    pub fn new(debug: bool) -> Self {
+        let mut s = Self::default();
+        if debug {
+            s.debug = Some(Default::default());
+        }
+        s
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct DebugOutput {
     pub snippets: FxHashMap<String, SnippetDebugOutput>,

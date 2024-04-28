@@ -19,6 +19,14 @@ use wotw_seedgen::assets::{PresetInfo, UniversePreset, WorldPreset};
 use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
 use wotw_seedgen_assets::{FileAccess, PresetAccess};
 
+#[derive(Args, Debug, Default)]
+pub struct SeedArgs {
+    #[command(flatten)]
+    pub settings: SeedSettings,
+    #[arg(long)]
+    pub debug: bool,
+}
+
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePreset);
 

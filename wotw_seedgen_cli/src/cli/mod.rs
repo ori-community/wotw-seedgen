@@ -1,9 +1,9 @@
 mod plando_args;
-mod seed_settings;
+mod seed_args;
 mod stats_args;
 
 pub use plando_args::PlandoArgs;
-pub use seed_settings::SeedSettings;
+pub use seed_args::{SeedArgs, SeedSettings};
 pub use stats_args::{ChainedAnalyzers, StatsArgs};
 
 use clap::{
@@ -24,7 +24,7 @@ pub enum Cli {
     /// Generate a seed
     Seed {
         #[command(flatten)]
-        settings: SeedSettings,
+        args: SeedArgs,
     },
     /// Compile a plandomizer
     Plando {

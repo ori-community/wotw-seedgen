@@ -1,4 +1,4 @@
-use super::{seed_settings::SeedSettings, LITERAL};
+use super::{seed_args::SeedSettings, LITERAL};
 use clap::{builder::styling::Reset, error::ErrorKind, Args, Parser};
 use std::{num::NonZeroUsize, str::FromStr};
 use wotw_seedgen::data::Zone;

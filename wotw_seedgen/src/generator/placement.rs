@@ -56,6 +56,7 @@ const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are g
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
     worlds: Vec<(World, IntermediateOutput)>,
+    debug: bool,
 ) -> Result<SeedUniverse, String> {
     assert!(
         !worlds.is_empty(),
@@ -81,7 +82,7 @@ pub fn generate_placements(
         }
     }
 
-    Ok(context.finish())
+    Ok(context.finish(debug))
 }
 
 pub struct Context<'graph, 'settings> {
@@ -633,7 +634,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             });
     }
 
-    fn finish(mut self) -> SeedUniverse {
+    fn finish(mut self, debug: bool) -> SeedUniverse {
         self.resolve_placeholders();
 
         SeedUniverse {
@@ -647,7 +648,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     ); // TODO custom icons in snippets
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
                     world_context.output.spawn = Some(*spawn.position().unwrap());
-                    Seed::new(world_context.output)
+                    Seed::new(world_context.output, debug)
                     // TODO add seedgen info (spawn.identifier().to_string())
                 })
                 .collect(),

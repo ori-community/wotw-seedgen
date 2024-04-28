@@ -165,6 +165,18 @@ fn snippets() {
         .unwrap();
     }
 
+    fn test_compiler(
+        config: FxHashMap<String, FxHashMap<String, String>>,
+    ) -> Compiler<'static, 'static> {
+        Compiler::new(
+            &mut rand::thread_rng(),
+            &TestFileAccess,
+            &*UBER_STATE_DATA,
+            config,
+            false,
+        )
+    }
+
     let test_with_config = [(
         "relics".to_string(),
         [("relic_count".to_string(), "5".to_string())]
@@ -181,12 +193,7 @@ fn snippets() {
         .map(|path| path.file_stem().unwrap().to_string_lossy().to_string())
         .collect::<Vec<_>>();
 
-    let mut compiler = Compiler::new(
-        &mut rand::thread_rng(),
-        &TestFileAccess,
-        &*UBER_STATE_DATA,
-        Default::default(),
-    );
+    let mut compiler = test_compiler(Default::default());
 
     for identifier in &snippets {
         compiler.compile_snippet(identifier).unwrap();
@@ -197,12 +204,7 @@ fn snippets() {
     write_test_output("_final", &output);
 
     for identifier in &snippets {
-        let mut compiler = Compiler::new(
-            &mut rand::thread_rng(),
-            &TestFileAccess,
-            &*UBER_STATE_DATA,
-            Default::default(),
-        );
+        let mut compiler = test_compiler(Default::default());
 
         compiler.compile_snippet(identifier).unwrap();
 
@@ -212,12 +214,7 @@ fn snippets() {
         write_test_output(identifier, &output);
     }
     for identifier in test_with_config.keys() {
-        let mut compiler = Compiler::new(
-            &mut rand::thread_rng(),
-            &TestFileAccess,
-            &*UBER_STATE_DATA,
-            test_with_config.clone(),
-        );
+        let mut compiler = test_compiler(test_with_config.clone());
 
         compiler.compile_snippet(identifier).unwrap();
 

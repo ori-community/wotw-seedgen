@@ -160,8 +160,14 @@ fn generation(c: &mut Criterion) {
         b.iter(|| {
             universe_settings.seed = seed.to_string();
             seed += 1;
-            wotw_seedgen::generate_seed(&graph, uber_state_data, snippet_access, &universe_settings)
-                .unwrap()
+            wotw_seedgen::generate_seed(
+                &graph,
+                uber_state_data,
+                snippet_access,
+                &universe_settings,
+                false,
+            )
+            .unwrap()
         })
     });
 
@@ -199,6 +205,7 @@ fn generation(c: &mut Criterion) {
                     uber_state_data,
                     snippet_access,
                     &universe_settings,
+                    false,
                 )
                 .unwrap()
             })
@@ -220,8 +227,14 @@ fn generation(c: &mut Criterion) {
         b.iter(|| {
             universe_settings.seed = seed.to_string();
             seed += 1;
-            wotw_seedgen::generate_seed(&graph, uber_state_data, snippet_access, &universe_settings)
-                .unwrap()
+            wotw_seedgen::generate_seed(
+                &graph,
+                uber_state_data,
+                snippet_access,
+                &universe_settings,
+                false,
+            )
+            .unwrap()
         })
     });
 }

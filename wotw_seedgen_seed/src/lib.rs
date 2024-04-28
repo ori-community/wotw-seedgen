@@ -7,9 +7,10 @@ pub mod assembly;
 mod compile;
 mod package;
 
-use assembly::Assembly;
+use assembly::{Assembly, Command};
 use compile::intermediate::{compile_command_lookup, compile_events};
 use rustc_hash::FxHashMap;
+use seed_language::output::DebugOutput;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use wotw_seedgen_data::Position;
@@ -30,12 +31,12 @@ pub struct Seed {
 }
 
 impl Seed {
-    pub fn new(mut output: IntermediateOutput) -> Self {
+    pub fn new(mut output: IntermediateOutput, debug: bool) -> Self {
         let mut command_lookup = compile_command_lookup(output.command_lookup);
         let events = compile_events(output.events, &mut command_lookup);
         output.tags.sort();
 
-        Self {
+        let mut seed = Self {
             format_version: FORMAT_VERSION,
             preload: Preload {
                 tags: output.tags,
@@ -47,7 +48,26 @@ impl Seed {
                 command_lookup,
             },
             assets: output.icons.into_iter().collect(), // TODO decide on a consistent data structure
+        };
+
+        if debug {
+            let debug_data = DebugData {
+                compiler_data: output.debug.unwrap_or_default(),
+                indexed_lookup: seed
+                    .assembly
+                    .command_lookup
+                    .iter()
+                    .cloned()
+                    .enumerate()
+                    .collect(),
+            };
+            seed.assets.insert(
+                "debug.json".to_string(),
+                serde_json::to_vec_pretty(&debug_data).unwrap(),
+            );
         }
+
+        seed
     }
 }
 
@@ -60,4 +80,10 @@ pub struct Preload {
     pub spawn: Position,
     /// Identical for seeds with the same universe settings (including the rng seed)
     pub slug: String,
+}
+
+#[derive(Serialize)]
+struct DebugData {
+    compiler_data: DebugOutput,
+    indexed_lookup: FxHashMap<usize, Vec<Command>>,
 }

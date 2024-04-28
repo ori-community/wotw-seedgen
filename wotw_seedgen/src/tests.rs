@@ -20,6 +20,17 @@ lazy_static! {
 
 #[test]
 fn some_seeds() {
+    fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
+        generate_seed(
+            &graph,
+            &*UBER_STATE_DATA,
+            &*SNIPPET_ACCESS,
+            universe_settings,
+            false,
+        )
+        .unwrap();
+    }
+
     env_logger::Builder::from_env(Env::default().default_filter_or("trace"))
         .format_timestamp(None)
         .is_test(true)
@@ -35,13 +46,7 @@ fn some_seeds() {
     .into_result()
     .unwrap();
     info!("Testing Default settings");
-    generate_seed(
-        &graph,
-        &*UBER_STATE_DATA,
-        &*SNIPPET_ACCESS,
-        &universe_settings,
-    )
-    .unwrap();
+    generate_test_seed(&graph, &universe_settings);
 
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
     graph = Graph::compile(
@@ -53,13 +58,7 @@ fn some_seeds() {
     .into_result()
     .unwrap();
     info!("Testing Unsafe");
-    generate_seed(
-        &graph,
-        &*UBER_STATE_DATA,
-        &*SNIPPET_ACCESS,
-        &universe_settings,
-    )
-    .unwrap();
+    generate_test_seed(&graph, &universe_settings);
 
     universe_settings.world_settings[0].snippets.extend([
         "bingo".to_string(),
@@ -94,11 +93,5 @@ fn some_seeds() {
         .unwrap();
 
     info!("Testing multiworld Gorlek with headers");
-    generate_seed(
-        &graph,
-        &*UBER_STATE_DATA,
-        &*SNIPPET_ACCESS,
-        &universe_settings,
-    )
-    .unwrap();
+    generate_test_seed(&graph, &universe_settings);
 }

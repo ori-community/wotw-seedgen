@@ -84,6 +84,7 @@ pub(crate) fn analyze<F: SeedStorageAccess, SA: SnippetAccess + Sync>(
                                 uber_state_data,
                                 snippet_access,
                                 &settings,
+                                false
                             ) {
                                 Ok(seed) => break seed.spoiler,
                                 Err(err) => {

@@ -1,15 +1,9 @@
 use crate::{cli::PlandoArgs, files, Error};
-use rustc_hash::FxHashMap;
-use serde::Serialize;
 use std::{
     ffi::OsStr,
     fs::{self, File},
-    mem,
 };
-use wotw_seedgen::{
-    seed::{assembly::Command, Seed},
-    seed_language::{compile::Compiler, output::DebugOutput},
-};
+use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
@@ -56,36 +50,15 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         &snippet_access,
         &uber_state_data,
         Default::default(),
+        debug,
     );
-    if debug {
-        compiler.debug();
-    }
     compiler.compile_snippet(entry)?;
-    let (mut output, success) = compiler.finish().eprint_errors();
+    let (output, success) = compiler.finish().eprint_errors();
     if !success {
         return Err("Compilation failed".into());
     }
 
-    let debug_output = mem::take(&mut output.debug);
-
-    let mut seed = Seed::new(output);
-
-    if debug {
-        let metadata = Metadata {
-            compiler_data: debug_output.unwrap(),
-            indexed_lookup: seed
-                .assembly
-                .command_lookup
-                .iter()
-                .cloned()
-                .enumerate()
-                .collect(),
-        };
-        seed.assets.insert(
-            "debug.json".to_string(),
-            serde_json::to_vec_pretty(&metadata)?,
-        );
-    }
+    let seed = Seed::new(output, debug);
 
     let mut out = root.join("out");
     fs::create_dir_all(&out)?;
@@ -103,10 +76,4 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     eprintln!("compiled successfully to \"{}\"", out.display());
 
     Ok(())
-}
-
-#[derive(Serialize)]
-struct Metadata {
-    compiler_data: DebugOutput,
-    indexed_lookup: FxHashMap<usize, Vec<Command>>,
 }
