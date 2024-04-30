@@ -99,7 +99,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   state MarshSpawn.LogBroken: free
   state MarshSpawn.ToOpherBarrier:
     moki: BreakWall=16
-    kii: MarshSpawn.RainLifted, Bash, Damage=10  # lure the mantis
+    unsafe: MarshSpawn.RainLifted  # https://youtu.be/2k1foADHu1E
   state NonGladesTeleporter: free
 
   pickup MarshSpawn.RockHC: free
