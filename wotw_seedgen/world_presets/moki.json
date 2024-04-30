@@ -19,6 +19,7 @@
     "zone_hints",
     "spawn_with_sword",
     "no_rain",
-    "knowledge_hints"
+    "knowledge_hints",
+    "spawn_tuley"
   ]
 }

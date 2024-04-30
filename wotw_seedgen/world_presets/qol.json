@@ -6,7 +6,6 @@
   "headers": [
     "progress_helper",
     "better_stomp",
-    "autoplants",
     "no_cutscenes",
     "tp_refill",
     "quest_autoadvance"
