@@ -21,6 +21,8 @@ fn main() -> Result<(), Error> {
         debugger::wait_until_attached(None).unwrap();
     }
 
+    env_logger::init();
+
     let cli = Cli::parse();
     match cli {
         Cli::Seed { args } => seed(args),
