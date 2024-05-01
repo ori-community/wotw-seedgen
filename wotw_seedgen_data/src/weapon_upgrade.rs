@@ -28,7 +28,6 @@ impl WeaponUpgrade {
         }
     }
     /// Returns the `WeaponUpgrade` corresponsing to the [`UberIdentifier`], if one exists
-    #[cfg(feature = "strum")]
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {
             weapon_upgrade::EXPLODING_SPEAR => Some(WeaponUpgrade::ExplodingSpear),
