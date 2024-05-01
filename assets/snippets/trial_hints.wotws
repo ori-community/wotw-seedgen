@@ -11,11 +11,11 @@
 !item_on(luma_trial_item, EastPools.SpiritTrial)
 !item_on(wastes_trial_item, LowerWastes.SpiritTrial)
 
-on MarshPastOpher.TrialActivation item_message("Complete the Marsh Spirit Trial to gain\n" + inkwater_trial_item)
+on MarshPastOpher.TrialActivation item_message("Complete the Inkwater Spirit Trial to gain\n" + inkwater_trial_item)
 on WestHollow.TrialActivation item_message("Complete the Hollow Spirit Trial to gain\n" + hollow_trial_item)
 on OuterWellspring.TrialActivation item_message("Complete the Wellspring Spirit Trial to gain\n" + wellspring_trial_item)
 on WoodsMain.TrialActivation item_message("Complete the Woods Spirit Trial to gain\n" + woods_trial_item)
 on LowerReach.TrialActivation item_message("Complete the Reach Spirit Trial to gain\n" + reach_trial_item)
-on LowerDepths.TrialActivation item_message("Complete the Mouldwood Spirit Trial to gain\n" + depths_trial_item) // TODO Mouldwood??
+on LowerDepths.TrialActivation item_message("Complete the Depths Spirit Trial to gain\n" + depths_trial_item)
 on UpperPools.TrialActivation item_message("Complete the Luma Spirit Trial to gain\n" + luma_trial_item)
 on LowerWastes.TrialActivation item_message("Complete the Wastes Spirit Trial to gain\n" + wastes_trial_item)
