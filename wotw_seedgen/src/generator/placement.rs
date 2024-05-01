@@ -52,6 +52,7 @@ const SPAWN_SLOTS: usize = 7;
 const PREFERRED_SPAWN_SLOTS: usize = 3;
 const _: usize = SPAWN_SLOTS - PREFERRED_SPAWN_SLOTS; // check that SPAWN_SLOTS >= PREFERRED_SPAWN_SLOTS
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
+const TOTAL_SPIRIT_LIGHT: i32 = 20000;
 
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
@@ -285,9 +286,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             for node in needs_random_placement {
                 any_placed = true; // TODO pull out of loop and skip some more calculations that way
                 let origin_world = &mut self.worlds[origin_world_index];
-                let should_place_spirit_light = self.rng.gen_bool(
-                    spirit_light_placements_remaining as f64 / placements_remaining as f64,
-                );
+                let should_place_spirit_light = !node.uber_identifier().unwrap().is_shop()
+                    && self.rng.gen_bool(
+                        spirit_light_placements_remaining as f64 / placements_remaining as f64,
+                    );
 
                 let (target_world_index, command) = if should_place_spirit_light {
                     let batch = origin_world
@@ -690,7 +692,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             output,
             index,
             item_pool,
-            spirit_light_provider: SpiritLightProvider::new(20000, rng), // TODO how should !add(spirit_light(100)) behave?
+            spirit_light_provider: SpiritLightProvider::new(TOTAL_SPIRIT_LIGHT, rng), // TODO how should !add(spirit_light(100)) behave?
             needs_placement,
             placeholders: Default::default(),
             reached: Default::default(),
@@ -729,14 +731,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             // We prefer generating indices over shuffling the nodes because usually there aren't many zone preplacements (relics)
             let node_index = nodes.swap_remove(self.rng.gen_range(0..nodes.len()));
             let node = self.needs_placement[node_index];
-            trace!(
-                "[World {}] Preplaced {} at {}",
-                self.index,
-                self.log_name(&command),
-                node.identifier()
-            );
-            self.write_placement_spoiler(node, &command, preplacement_spoiler);
-            self.push_command(node_trigger(node).unwrap(), command);
+            self.place(node, command, preplacement_spoiler);
             self.received_placement.push(node_index);
         }
     }
@@ -753,13 +748,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let node = self
                 .needs_placement
                 .swap_remove(self.rng.gen_range(0..self.needs_placement.len()));
-            trace!(
-                "[World {}] Placed something very important at {}",
-                self.index,
-                node.identifier()
-            );
-            self.write_placement_spoiler(node, &command, preplacement_spoiler);
-            self.push_command(node_trigger(node).unwrap(), command);
+            self.place(node, command, preplacement_spoiler);
         }
     }
 
@@ -938,14 +927,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 &mut self.rng,
             );
             let node = self.choose_placement_node(true).unwrap();
-            trace!(
-                "[World {}] Placing {} at {}",
-                self.index,
-                self.log_name(&command),
-                node.identifier()
-            );
-            self.write_placement_spoiler(node, &command, placement_spoiler);
-            self.push_command(node_trigger(node).unwrap(), command);
+            self.place(node, command, placement_spoiler);
         }
     }
 
@@ -1125,20 +1107,29 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     &mut self.rng,
                 )
             };
-            trace!(
-                "[World {}] Placing {} at {}",
-                self.index,
-                self.log_name(&command),
-                node.identifier()
-            );
-            let name = self.name(&command);
-            if is_shop {
-                self.shop_item_data(&command, uber_identifier, name)
-            }
-            self.write_placement_spoiler(node, &command, placement_spoiler);
-            self.push_command(node_trigger(node).unwrap(), command)
+            self.place(node, command, placement_spoiler);
         }
         // TODO unreachable items that should be filled
+    }
+
+    fn place(
+        &mut self,
+        node: &Node,
+        command: CommandVoid,
+        placement_spoiler: &mut Vec<SpoilerPlacement>,
+    ) {
+        trace!(
+            "[World {}] Placing {} at {}",
+            self.index,
+            self.log_name(&command),
+            node.identifier()
+        );
+        let uber_identifier = node.uber_identifier().unwrap();
+        if uber_identifier.is_shop() {
+            self.shop_item_data(&command, uber_identifier, self.name(&command))
+        }
+        self.write_placement_spoiler(node, &command, placement_spoiler);
+        self.push_command(node_trigger(node).unwrap(), command);
     }
 
     fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
@@ -1172,6 +1163,7 @@ fn total_reach_check<'graph>(
     for command in item_pool.clone().drain() {
         world.simulate(&command, output);
     }
+    world.modify_spirit_light(TOTAL_SPIRIT_LIGHT, output);
     world.reached()
 }
 

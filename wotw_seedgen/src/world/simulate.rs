@@ -387,6 +387,7 @@ fn prevent_uber_state_change(
 }
 
 // This should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Randomizer/uber_states/misc_handlers.cpp
+// TODO isn't most of this in seed core now?
 fn uber_state_side_effects(
     world: &mut World,
     output: &IntermediateOutput,
