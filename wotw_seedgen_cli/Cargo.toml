@@ -16,6 +16,7 @@ strum = "0.25"
 rustc-hash = "1.1"
 lazy_static = "1.4.0"
 open = "5.1.2"
+bugsalot = "0.2.2"
 
 [[bin]]
 name = "seedgen"

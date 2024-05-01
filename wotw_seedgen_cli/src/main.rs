@@ -4,14 +4,23 @@ mod plando;
 mod seed;
 mod stats;
 
+use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
 use plando::plando;
 use seed::seed;
 use stats::stats;
-use std::fmt::{self, Debug};
+use std::{
+    env,
+    fmt::{self, Debug},
+};
 
 fn main() -> Result<(), Error> {
+    if env::var_os("ATTACH").is_some() {
+        eprintln!("waiting for debugger...");
+        debugger::wait_until_attached(None).unwrap();
+    }
+
     let cli = Cli::parse();
     match cli {
         Cli::Seed { args } => seed(args),
