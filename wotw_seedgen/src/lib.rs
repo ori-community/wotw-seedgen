@@ -18,6 +18,7 @@
 #![allow(clippy::too_many_lines)]
 #![allow(clippy::struct_excessive_bools)]
 
+// TODO one argument against reexports would be that they propagate breaking changes
 pub use wotw_seedgen_assets as assets;
 pub use wotw_seedgen_data as data;
 pub use wotw_seedgen_logic_language as logic_language;

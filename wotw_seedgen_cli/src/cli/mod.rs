@@ -3,7 +3,7 @@ mod seed_args;
 mod stats_args;
 
 pub use plando_args::PlandoArgs;
-pub use seed_args::{SeedArgs, SeedSettings};
+pub use seed_args::{GenerationArgs, SeedArgs, SeedSettings};
 pub use stats_args::{ChainedAnalyzers, StatsArgs};
 
 use clap::{

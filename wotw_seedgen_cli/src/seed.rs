@@ -1,5 +1,5 @@
 use crate::{
-    cli::{SeedArgs, SeedSettings},
+    cli::{GenerationArgs, SeedArgs, SeedSettings},
     files, Error,
 };
 use std::fs::{self, File};
@@ -12,7 +12,7 @@ use wotw_seedgen::{
 pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
         settings: SeedSettings(universe_preset),
-        debug,
+        generation_args: GenerationArgs { debug, launch },
     } = args;
 
     let mut settings = UniverseSettings::new("".to_string());
@@ -42,10 +42,15 @@ pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
     fs::create_dir_all("seeds")?;
     fs::write("seeds/spoiler.txt", seed_universe.spoiler.to_string())?;
 
+    let path = "seeds/seed.wotwr";
     let seed = seed_universe.worlds.pop().unwrap();
-    seed.package(&mut File::create("seeds/seed.wotwr")?, !debug)?;
+    seed.package(&mut File::create(path)?, !debug)?;
 
     eprintln!("Generated seed to \"seeds/seed.wotwr\"");
+
+    if launch {
+        open::that_detached(path).map_err(|err| format!("failed to open \"{path}\": {err}"))?;
+    }
 
     Ok(())
 }

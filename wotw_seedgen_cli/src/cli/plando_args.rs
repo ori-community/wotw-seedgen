@@ -1,6 +1,8 @@
 use clap::Args;
 use std::path::PathBuf;
 
+use super::GenerationArgs;
+
 #[derive(Args)]
 pub struct PlandoArgs {
     /// Path to your plandomizer source
@@ -13,7 +15,6 @@ pub struct PlandoArgs {
     /// .wotwr will be appended as the file extension
     #[arg(short = 'n', long)]
     pub out_name: Option<String>,
-    /// Write information useful for debugging into the seed
-    #[arg(long)]
-    pub debug: bool,
+    #[command(flatten)]
+    pub generation_args: GenerationArgs,
 }

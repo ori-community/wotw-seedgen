@@ -1,4 +1,7 @@
-use crate::{cli::PlandoArgs, files, Error};
+use crate::{
+    cli::{GenerationArgs, PlandoArgs},
+    files, Error,
+};
 use std::{
     ffi::OsStr,
     fs::{self, File},
@@ -9,7 +12,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
         path,
         out_name,
-        debug,
+        generation_args: GenerationArgs { debug, launch },
     } = args;
 
     let (root, entry) = if path
@@ -74,6 +77,11 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     seed.package(&mut file, !debug)?;
 
     eprintln!("compiled successfully to \"{}\"", out.display());
+
+    if launch {
+        open::that_detached(&out)
+            .map_err(|err| format!("failed to open \"{}\": {err}", out.display()))?;
+    }
 
     Ok(())
 }

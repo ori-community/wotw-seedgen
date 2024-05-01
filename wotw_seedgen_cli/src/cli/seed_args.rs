@@ -23,8 +23,18 @@ use wotw_seedgen_assets::{FileAccess, PresetAccess};
 pub struct SeedArgs {
     #[command(flatten)]
     pub settings: SeedSettings,
+    #[command(flatten)]
+    pub generation_args: GenerationArgs,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct GenerationArgs {
+    /// Write information useful for debugging into the seed
     #[arg(long)]
     pub debug: bool,
+    /// Load the seed into the randomizer after finishing
+    #[arg(short, long)]
+    pub launch: bool,
 }
 
 #[derive(Debug, Default)]
