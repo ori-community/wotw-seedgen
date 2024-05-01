@@ -2,8 +2,7 @@
 #name("Spawn with Sword")
 #description("Start the seed with Sword as a weapon")
 
-// TODO do it without showing messages?
 on spawn {
-    skill(Skill::Sword)
+    store(skills.sword, true)
     equip(EquipSlot::Ability1, Equipment::Sword)
 }
