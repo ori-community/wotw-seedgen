@@ -450,15 +450,14 @@ fun show_teleporter_progress() {
         set_string("teleporter_progress", get_string("teleporter_progress") + "Midnight Burrows")
         set_boolean("comma", true)
     }
-    // TODO some teleporters have been renamed
     if WoodsEntry.TeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "West Woods")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Woods Entrance")
         set_boolean("comma", true)
     }
     if WoodsMain.TeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "East Woods")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Woods Exit")
         set_boolean("comma", true)
     }
     if LowerReach.TeleporterActive {
@@ -473,12 +472,12 @@ fun show_teleporter_progress() {
     }
     if EastPools.TeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "East Luma")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Central Luma")
         set_boolean("comma", true)
     }
     if WestPools.TeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "West Luma")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Luma Boss")
         set_boolean("comma", true)
     }
     if LowerWastes.FeedingGroundsTeleporterActive {
@@ -488,7 +487,7 @@ fun show_teleporter_progress() {
     }
     if LowerWastes.CentralTeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "East Wastes")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Central Wastes")
         set_boolean("comma", true)
     }
     if UpperWastes.TeleporterActive {
