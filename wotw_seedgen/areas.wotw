@@ -516,6 +516,9 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
   pickup MarshSpawn.CrusherSwimEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=20
+    unsafe:
+      Bash, Water OR Damage=10  # might be possible without damage if we catch the projectile right?
+      Hammer, Water OR Damage=20  # requires custom hammer physics
   pickup MarshSpawn.BurrowsApproachLedgeEX:
     moki: Launch  # Bash paths redundant with PoolsBurrowsSignpost
     gorlek: SentryJump=1, Damage=10, DoubleJump, TripleJump  # Land in the spikes under the pickup and triple jump to the left platform
