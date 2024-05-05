@@ -1,6 +1,0 @@
-#category Quality of Life
-/// Less Knockback
-///
-/// Adjusts the spike knockback to behave like in Patch 2
-
-3|0|8|7|17|bool|true
