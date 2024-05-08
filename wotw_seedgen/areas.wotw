@@ -12986,6 +12986,12 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
     unsafe: free  # Precise wall jumping required. Lure the mantis onto the platform to get it out of the way.
   # Connecting to RuinsApproach would be redundant because it needs Burrow
 
+region WindtornRuins:
+  moki: Danger=50, Regenerate
+  gorlek: Regenerate
+  kii: Regenerate
+  unsafe: free
+
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
   refill Checkpoint
   refill Energy=3:
