@@ -384,7 +384,7 @@ anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the 
 anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between pools, burrows and marsh
   refill Checkpoint
   refill Energy=1:
-    unsafe: BreakCrystal  # slightly out of sight
+    kii: BreakCrystal  # on the ground on the way to Burrows
 
   quest MarshSpawn.CaveKS: free
   
@@ -392,12 +392,13 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
     moki:
       DoubleJump OR Launch
       Bash, Grenade=1
-    gorlek:
-      SentryJump=1
-    kii:
-      Sentry=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer
+    gorlek: SentryJump=1
+    kii: Hammer OR Spear=1
     unsafe:
-      Dash OR Glide  # GlideJump
+      Bash  # https://youtu.be/1Qo0KvCotvM
+      Dash  # Dash ramp
+      Sword OR Shuriken=1 Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap
+      
   pickup MarshSpawn.BurrowsApproachLedgeEX:
     moki: Bash, DoubleJump OR Launch
     gorlek:
@@ -451,6 +452,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Glide
       Damage=10, DoubleJump OR Dash
       Sword OR Hammer OR DoubleJump OR Dash OR Launch
+    unsafe: free
 
   conn MarshSpawn.BurrowFightArena:  # check for redundancies with LifepactLedge
     gorlek: Bash, SentryJump=1
