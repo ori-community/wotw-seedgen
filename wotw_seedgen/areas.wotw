@@ -272,6 +272,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     kii:
       Sword  # Pogo on the slime and slash to the left
       Hammer  # upswing into leftswing
+    unsafe: GlideJump OR GrenadeJump
   quest MarshSpawn.TokkKeystoneQuest:
     moki: MarshSpawn.CaveKS
 
@@ -300,8 +301,13 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       Sword  # Pogo on the slime and slash to the left, Upslash to reach the branch
       Hammer  # weapon floats
       Bash  # use slimes
-      MarshSpawn.CaveFight, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-
+      MarshSpawn.CaveFight, Shuriken=1 OR Flash=1 OR Sentry=1
+      MarshSpawn.CaveFight, Glide, Spear=1
+    unsafe:
+      Dash  # dash ramp at the first slime to skip the arena
+      MarshSpawn.CaveFight, Spear=1  # not lenient enough for kii
+      GlideJump OR GrenadeJump
+    
 # checkpoint at -845, -4438
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
