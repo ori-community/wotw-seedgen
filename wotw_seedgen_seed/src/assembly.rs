@@ -18,6 +18,7 @@ pub struct Assembly {
     pub command_lookup: Vec<Vec<Command>>,
 }
 
+// TODO maybe events should have a Vec<Command> instead of usize?
 /// The main event (:badumtsss:)
 ///
 /// The Trigger defines when to execute the command at the index

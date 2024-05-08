@@ -18,6 +18,7 @@ pub trait Compile {
 impl Compile for input::Event {
     type Output = Event;
 
+    // TODO this is unused
     fn compile(self, command_lookup: &mut Vec<Vec<Command>>) -> Self::Output {
         Event(
             self.trigger.compile(command_lookup),
