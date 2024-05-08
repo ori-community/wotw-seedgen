@@ -210,7 +210,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
     moki: Keystone=2
   state MarshSpawn.TokkBarrier:
     moki: BreakWall=16
-    unsafe: MarshSpawn.RainLifted  # check this again. Lure the mantis
+    unsafe: MarshSpawn.RainLifted  # https://youtu.be/bYN3rhRJUAc
 
   pickup MarshSpawn.LeverEC:
     moki:
@@ -220,21 +220,21 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       Bash, Grenade=1, DoubleJump
     gorlek:
       Grapple, Bash, Dash OR Glide  # both weapon float variants are rather awkward
+      Bash, Grenade=1
       SentryJump=1, DoubleJump, TripleJump
       SentryJump=1, Bash
       Launch  # different ways to solve
     kii:
-      MarshSpawn.RainLifted, Bash  # Lure the Jumper, then bash off him
-      Grapple, Bash, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
-      DoubleJump, Hammer, Sentry=2  # Jump from the door frame
-      Bash, Grenade=1
-      MarshSpawn.RainLifted, DoubleJump, Sword  # Jump from the door frame and pogo on Jumper
+      Grapple, Bash, Hammer OR Shuriken=1 OR Sentry=2
+      DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from under the grappable plant
+      Bash, DoubleJump, Dash, Hammer OR Shuriken=1  # start jumping from under the grappable plant then djump to grab the bashable plant
+      MarshSpawn.RainLifted, Bash  # Lure the mantis, then bash off him
+      MarshSpawn.RainLifted, DoubleJump, Sword  # Lure the mantis near the door then pogo to reach the wall. Upslash to reach the lever
     unsafe:
       SentryJump=1  # max height
-      DoubleJump, TripleJump, Sword OR Hammer
-      Grapple, Dash  # Swing the plant with Grapple
-      DoubleJump, TripleJump  # Jump from the door frame
-      DoubleJump, Sword  # Jump from the door frame and pogo on Jumper
+      DoubleJump, TripleJump OR Hammer OR Spear=1
+      DoubleJump, Dash, Sword  # coyote dash from under the grappable plant
+      Grapple, Bash  # Swing the plant with Grapple
 
   conn MarshSpawn.DenApproach:
     moki: MarshSpawn.KeystoneDoor
@@ -245,11 +245,10 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
     gorlek:
       Dash OR SentryJump=1
       MarshSpawn.RainLifted, Bash  # enemy that only spawns at daytime
-    kii:
-      Sword OR Hammer
-      Sentry=1 OR Flash=1
+    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash  # at night there's a slime that works too
+      GlideJump OR GrenadeJump
   conn MarshSpawn.Cave:
     moki: MarshSpawn.TokkBarrier
 
