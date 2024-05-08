@@ -102,33 +102,29 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe: MarshSpawn.RainLifted  # https://youtu.be/2k1foADHu1E
   state NonGladesTeleporter: free
 
-  pickup MarshSpawn.RockHC: free
   pickup MarshSpawn.FirstPickupEX: free
   pickup MarshSpawn.GrappleHC:
     moki: Grapple, DoubleJump OR Launch
     gorlek:
       Grapple, Dash OR Glide OR Sword OR Hammer  # An air combo is enough to get you from the ceiling plant into range of the lower hanging plant
-      SentryJump=1, Launch, DoubleJump OR Dash  # just using the swordfloats was a bit precise
-      MarshSpawn.RainLifted:  # using the mantis
-        Grapple, Bash
-        Bash, Launch, Damage=10
-        Bash, Launch, DoubleJump, TripleJump OR Glide OR Sword OR Hammer
-        Bash, Launch, Dash
+      SentryJump=1, Launch, DoubleJump # sjump->launch up then either djump on the wall for a launch refresh or djump + weapon stall
+      Bash, Grapple, MarshSpawn.RainLifted OR Grenade=1
+      Bash, Launch, Damage=10, MarshSpawn.RainLifted OR Grenade=1
+      Bash, Grenade=1, Launch, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, MarshSpawn.RainLifted, Launch, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
-      Launch, Damage=10, DoubleJump OR Dash  # Jump off the wall next to the ceiling plant (possible w/o dmg by refreshing abilities on the left wall from the spikes)
-      Launch, DoubleJump, Dash  # Jump off the wall next to the ceiling plant and refresh abilities on the left wall from the spikes
       Grapple, Sentry=1 OR Shuriken=1 OR Flash=1
+      Bash, Launch, MarshSpawn.RainLifted OR Grenade=1
       MarshSpawn.RainLifted, Launch, Sword  # pogo the mantis between launches
     unsafe:
       Launch  # Launching along the ceiling, starting above the LongSwimEX
-      Grapple, Bash, Grenade=1
-      Grapple, Spear=1
-      MarshSpawn.RainLifted, Bash, DoubleJump, TripleJump  # Bash the slime from across the broken log to the mantis underneath the pickup and juggle him high, bash off both
+      Grapple, Spear=1 OR Blaze=2
+      MarshSpawn.RainLifted, Bash, DoubleJump OR Glide   # Chain bash the mantis
       # Glitched:
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
       HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseHover  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
       Grapple, PauseHover OR GrenadeJump OR BlazeSwap=1
-      HammerJump, TripleJump, Dash OR PauseHover  # Jumping along the ceiling, starting above the LongSwimEX
+      HammerJump, DoubleJump, TripleJump  # Start with either a wjump hjump of a coyote frame one
       FlashSwap  # hehe
   pickup MarshSpawn.BridgeEX: # not a free pickup because you could break the log and softlock yourself
     moki:
@@ -137,81 +133,15 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     gorlek:
       MarshSpawn.RainLifted, Bash  # jump the jumper
       Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
-    kii:
-      Sentry=1 OR Flash=1
-      Blaze=1 OR Shuriken=1  # Using drop-down
-    unsafe:
-      Spear=1  # Using drop-down
-      # Glitched:
-      PauseHover OR FlashSwap
-  pickup MarshSpawn.LongSwimEX:
-    moki: Water
-    unsafe:
-      Damage=90  # dropping down the right drop-down and holding directions for x dboosts: down-right=2, right=3, down-right=1, right=1, up-right=2 and u can see ori again
-      Damage=40, WaterDash # dropping down the right drop-down and waterdashing in direction x times: down-right=1, right=2, down-right=1, right=1, up-right=2 and u can see ori again
-  pickup MarshSpawn.BurrowOre:  # @validator make sure its not redundant with -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
-    moki:
-      Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
-      Water, Burrow, Bash, Grenade=1, Dash
-    gorlek: Water, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=10
-    kii:
-      Damage=20, Burrow, Hammer OR Sentry=2 OR Blaze=3 OR Shuriken=1
-      WaterDash, Damage=10, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
-      WaterDash, Damage=10, Burrow, Sentry=2 OR Blaze=3 OR Shuriken=1
-      Damage=30, Burrow
-      WaterDash, Damage=20, Burrow
-    unsafe, Burrow:
-      Bash:  # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
-        Water OR Damage=20
-        Damage=10, WaterDash
-      # Glitched:
-      PauseHover OR FlashSwap OR SentrySwap=1 OR BlazeSwap=2:
-        Water OR Damage=20
-        Damage=10, WaterDash
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Sentry=1 OR Flash=1
+    unsafe: PauseHover OR FlashSwap
+
   conn Teleporters: free
+  conn MarshSpawn.AboveRockHC: free
   conn MarshSpawn.BrokenBridge:  # although it is free, it doesn't make much sense to not use this state
     moki: MarshSpawn.LogBroken
-  conn MarshSpawn.BurrowFightArena:
-    moki:
-      Water, Burrow, DoubleJump OR Glide OR Launch
-      Water, Burrow, Dash, Bash, Grenade=1
-    gorlek: Water, Burrow, Dash OR Sword OR Hammer OR Damage=10
-    kii:
-      Damage=20, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
-      Damage=20, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
-      WaterDash, Damage=10, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer
-      WaterDash, Damage=10, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
-      Water, Burrow, Sentry=1 OR Blaze=2 OR Shuriken=1 OR Flash=1
-      Damage=30, Burrow
-      WaterDash, Damage=20, Burrow
-    unsafe:
-      # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
-      # cancel the vertical momentum out of the burrow with bow (or Grenade) [syntax needed]
-      Burrow, Water, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
-      Burrow, Damage=20, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
-      Burrow, Damage=10, WaterDash, Bash OR Bow=1 OR Grenade=1 OR Blaze=1 OR Spear=1 OR PauseHover OR FlashSwap
   conn MarshPastOpher.MillView:
     moki: MarshSpawn.ToOpherBarrier
-  conn MarshSpawn.PoolsPath:
-    moki:
-      DoubleJump, Bash, Glide
-      Bash, Launch
-    gorlek:
-      DoubleJump, Bash, TripleJump OR Dash OR Sword OR Hammer OR Damage=10
-      Bash, Glide, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer
-      Launch, Damage=10, DoubleJump OR Dash OR Glide OR Sword
-    kii:
-      Launch, DoubleJump OR Damage=10 OR Sword  # Land on the first turret
-      Bash, Damage=20
-    unsafe:
-      Bash, Dash, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer / Sometimes the cycle are off making it too hard for gorlek
-      Launch, Deflector, Sword OR Hammer
-      DoubleJump, TripleJump, Deflector, Sword OR Hammer  # Land on first turret
-      DoubleJump, TripleJump, Deflector, Damage=10, Sword OR Hammer  # Able to dmg boost on spikes
-      DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
-      # Glitched
-      LaunchSwap  # refresh launch on ceiling and then LaunchSwap through all of the spiked area or land on the turret and get a second LaunchSwap
-      FlashSwap, PauseHover  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseHover for "easier" execution
 
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
@@ -400,7 +330,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Bash OR Launch
       Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii: free
-  conn MarshSpawn.Main:
+  conn MarshSpawn.AboveRockHC:
     moki: 
       Water, Burrow, Bash, DoubleJump, Dash OR Glide
       Water, Burrow, Bash, Launch
@@ -605,6 +535,71 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
 
 # checkpoint at -1067, -4274
 
+anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
+  refill Full
+
+  pickup MarshSpawn.RockHC: free
+  pickup MarshSpawn.LongSwimEX:
+    moki: Water
+    unsafe:
+      Damage=90  # dropping down the right drop-down and holding directions for x dboosts: down-right=2, right=3, down-right=1, right=1, up-right=2 and u can see ori again
+      WaterDash, Damage=40  # dropping down the right drop-down and waterdashing in direction x times: down-right=1, right=2, down-right=1, right=1, up-right=2 and u can see ori again
+      MarshSpawn.RainLifted, WaterDash, Damage=35  # dboost on the Lizard before going into the water
+  pickup MarshSpawn.BurrowOre:  # @validator make sure its not redundant with -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
+    moki:
+      Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
+      Water, Burrow, Bash, Grenade=1, Dash
+    gorlek: Water, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=10
+    kii:
+      Water, Burrow, Shuriken=1  # No other energy weapons because they'll make the CorruptSlug explode and damage you
+      Burrow, Damage=20, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1 OR WaterDash  # 2 water dboost then avoid the spikes or 1 water dboost with wdash then land into the spikes
+      Burrow, Damage=30
+      Burrow, WaterDash, Damage=10, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1      
+    unsafe:
+      Burrow, Water, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap  # Precise burrow angle and then wjump off the platform with the CorruptSlug
+      Burrow, Damage=20, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
+      Burrow, WaterDash, Damage=10, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
+      Burrow, Bash, Water OR Damage=20  # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
+      Burrow, Bash, WaterDash, Damage=10
+  #pickup MarshSpawn.PoolsPathEX  # you have to patfind that
+  
+  conn MarshSpawn.Main: free
+  conn MarshSpawn.BurrowFightArena:
+    moki:
+      Water, Burrow, DoubleJump OR Glide OR Launch
+      Water, Burrow, Dash, Bash, Grenade=1
+    gorlek: Water, Burrow, Dash OR Sword OR Hammer OR Damage=10
+    kii:
+      Water, Burrow, Bash OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # With bash, bash the slime upwards then bash it again midair
+      Burrow, Damage=20, Bash OR DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR WaterDash  # 2 water dboost then avoid the spikes or 1 water dboost with wdash then land into the spikes
+      Burrow, Damage=30
+      Burrow, WaterDash, Damage=10, Bash OR DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR WaterDash
+    unsafe:
+      Burrow, Water, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=20, Bow=1 OR Grenade=1 Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=10, WaterDash, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
+  conn MarshSpawn.PoolsPath:
+    moki:
+      DoubleJump, Bash, Glide
+      Bash, Launch
+    gorlek:
+      DoubleJump, Bash, TripleJump OR Dash OR Sword OR Hammer OR Damage=10
+      Bash, Glide, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer
+      Launch, Damage=10, DoubleJump OR Dash OR Glide OR Sword
+    kii:
+      Launch, DoubleJump OR Damage=10 OR Sword  # Land on the first turret
+      Bash, Damage=20, DoubleJump OR Glide
+    unsafe:
+      Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
+      Launch  # https://youtu.be/ZHr718BCSaA
+      Bash, Dash, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer / Sometimes the cycle are off making it too hard for gorlek
+      DoubleJump, TripleJump, Deflector, Sword OR Hammer  # Land on first turret
+      DoubleJump, TripleJump, Deflector, Damage=10, Sword OR Hammer  # Able to dmg boost on spikes
+      DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
+      # Glitched
+      LaunchSwap  # refresh launch on ceiling and then LaunchSwap through all of the spiked area or land on the turret and get a second LaunchSwap
+      FlashSwap, PauseHover  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseHover for "easier" execution
+
 anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of spawn
   refill Checkpoint
 
@@ -636,7 +631,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       Bash, Grenade=1
       Hammer OR SwordSJump=1
     unsafe: Water  # Precise wall jump where the tentacle is grabbing the wheel
-  conn MarshSpawn.Main:
+  conn MarshSpawn.AboveRockHC:
     moki:
       Water, WaterDash OR Launch
       Glide, Bash OR Launch
