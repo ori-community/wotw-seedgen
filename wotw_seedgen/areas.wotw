@@ -96,11 +96,9 @@ anchor Teleporters:  # teleporter access
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   refill Full
 
-  state MarshSpawn.LogBroken: free
-  state MarshSpawn.ToOpherBarrier:
-    moki: BreakWall=16
-    unsafe: MarshSpawn.RainLifted  # https://youtu.be/2k1foADHu1E
   state NonGladesTeleporter: free
+  state MarshSpawn.ToOpherBarrier:
+    unsafe: MarshSpawn.RainLifted  # https://youtu.be/2k1foADHu1E
 
   pickup MarshSpawn.FirstPickupEX: free
   pickup MarshSpawn.GrappleHC:
@@ -138,30 +136,52 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
 
   conn Teleporters: free
   conn MarshSpawn.AboveRockHC: free
-  conn MarshSpawn.BrokenBridge:  # although it is free, it doesn't make much sense to not use this state
-    moki: MarshSpawn.LogBroken
-  conn MarshPastOpher.MillView:
-    moki: MarshSpawn.ToOpherBarrier
+  conn MarshPastOpher.OpherBarrier: free
 
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
+
+anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking access to MarshPastOpher
+  refill Checkpoint
+  
+  state MarshSpawn.ToOpherBarrier:
+    moki: BreakWall=16
+  state MarshSpawn.LogBroken: free
+    
+  conn MarshPastOpher.MillView:
+    moki: MarshSpawn.ToOpherBarrier
+  conn MarshSpawn.BrokenBridge:
+    moki: MarshSpawn.LogBroken
+  conn MarshSpawn.Main:
+    moki:
+      DoubleJump OR Launch
+      Bash, Grenade=1
+    gorlek: 
+      Hammer
+      Sword, Dash
+      SentryJump=1
+    kii:
+      MarshSpawn.RainLifted, Bash
+      Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
 anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaking bridge
   refill Checkpoint
 
   pickup MarshSpawn.ResilienceShard:
     moki: BreakWall=16
-    kii: MarshSpawn.RainLifted  # Lure mantis
+    unsafe: MarshSpawn.RainLifted  # Lure mantis
   pickup MarshSpawn.ResilienceOre:
     moki: BreakWall=16, Water
-    kii: MarshSpawn.RainLifted, Water # Lure mantis
     unsafe:
-      Damage=50, MarshSpawn.RainLifted OR BreakWall=16
+      MarshSpawn.RainLifted, Water # Lure mantis
+      Damage=40, MarshSpawn.RainLifted OR BreakWall=16
       Damage=20, WaterDash, MarshSpawn.RainLifted OR BreakWall=16
   pickup MarshSpawn.BashEC:
     moki: Bash OR Launch
     gorlek: SentryJump=1
+    kii: MarshSpawn.RainLifted, Sword, DoubleJump, TripleJump  # Pogo on the slime
     unsafe:
+      DoubleJump, TripleJump  # https://youtu.be/DIIHU4JiAj4
       MarshSpawn.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
       GrenadeJump  # precise grenade wall jump off of a microwall on the left
   pickup MarshSpawn.PreLupoEX: free
@@ -169,34 +189,19 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
     moki: SpiritLight=200
 
   conn MarshSpawn.CaveEntrance: free
-  conn MarshPastOpher.MillView:
-    moki, MarshSpawn.LogBroken, MarshSpawn.ToOpherBarrier:
-      Combat=Mantis, DoubleJump OR Bash OR Dash OR Launch
-    gorlek, MarshSpawn.LogBroken, MarshSpawn.ToOpherBarrier:
-      SentryJump=1
-      Hammer, Glide
-    kii, MarshSpawn.LogBroken, MarshSpawn.ToOpherBarrier:
-      MarshSpawn.RainLifted, Sword  # pogo
-      MarshSpawn.RainLifted, Bash
-      Sword, Sentry=1 OR Flash=1
-      Sentry=2
-      Hammer, Sword
-      Grenade=1, Bash
-    unsafe: MarshSpawn.LogBroken, Grenade  # GrenadeJump=1
-  conn MarshSpawn.Main:
+  conn MarshSpawn.OpherBarrier:
     moki, MarshSpawn.LogBroken:
-      Combat=Mantis, DoubleJump OR Bash OR Dash OR Launch
+      DoubleJump OR Dash OR Launch
+      Bash, MarshSpawn.RainLifted OR Grenade=1
     gorlek, MarshSpawn.LogBroken:
       SentryJump=1
       Hammer, Glide
     kii, MarshSpawn.LogBroken:
-      MarshSpawn.RainLifted, Sword  # pogo
-      MarshSpawn.RainLifted, Bash
-      Sword, Sentry=1 OR Flash=1
-      Sentry=3
-      Hammer, Sword
-      Grenade=2, Bash
-    unsafe: MarshSpawn.LogBroken, Grenade  # GrenadeJump=1
+      Hammer
+      Sword, Glide OR MarshSpawn.RainLifted OR Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1  # pogo / Upslash then use energy weapon
+    unsafe, MarshSpawn.LogBroken:
+      Sentry=2  # not lenient enough for kii
+      Grenade  # GrenadeJump=1
 
 anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen tree
   refill Checkpoint
@@ -1142,15 +1147,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   conn MarshPastOpher.BowPath:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: free
-  conn MarshSpawn.Main:
-    moki, MarshSpawn.ToOpherBarrier:
-      DoubleJump OR Launch
-      Bash, Grenade=1
-    gorlek: 
-      MarshSpawn.ToOpherBarrier, SentryJump=1
-    kii, MarshSpawn.ToOpherBarrier:
-      Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1 OR Spear=1 OR Sword OR Hammer
-  conn MarshSpawn.BrokenBridge:
+  conn MarshSpawn.OpherBarrier:
     moki: MarshSpawn.ToOpherBarrier
   conn MarshPastOpher.PoolsPathEast:
     gorlek:
