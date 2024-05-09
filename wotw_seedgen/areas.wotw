@@ -397,27 +397,17 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
     unsafe:
       Bash  # https://youtu.be/1Qo0KvCotvM
       Dash  # Dash ramp
-      Sword OR Shuriken=1 Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap
-      
-  pickup MarshSpawn.BurrowsApproachLedgeEX:
-    moki: Bash, DoubleJump OR Launch
-    gorlek:
-      Bash, Dash OR Glide
-      # weapon floats with bash moved out of gorlek
-      Launch, Glide
-      Launch, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
-      Launch, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+      Sword OR Shuriken=1 Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap OR GrenadeJump
+  pickup MarshSpawn.BurrowsApproachLedgeEX:  # Make sure it's not redundant with MarshSpawn.PoolsBurrowsSignpost->MarshSpawn.BeforeBurrows->MarshSpawn.BurrowsApproachLedgeEX
+    moki: Bash, DoubleJump
+    gorlek: Bash, Dash OR Glide
     kii:
-      Launch, Dash  # bonking your head on the cealing to reset launch and dash
-      Launch, Damage=10
-      Bash, Damage=10, Sword OR Hammer
-      Bash, Damage=10, Sentry=3 OR Shuriken=3
-      Bash, Damage=30
+      Bash, Damage=10, Sword OR Hammer  # use upsalsh inbetween the two lanterns. Not mandatory but players will probably use it there.
+      Bash, Damage=10, Shuriken=3 OR Sentry=3  # one before the first lantern, one inbetween the two lantern (not mandatory) and a final one with a bash glide
+      Bash, Damage=20, Blaze=3 OR Flash=2  # disable Flash inbetween the two lanterns
+      Bash, Spear=3, Damage=30  # two dboost before the first lantern (because spear momentum can screw you up) and one at the end with a bash glide
+      Bash, Damage=40
     unsafe:
-      Bash, Sentry=3  # Use Sentry instead of DoubleJump
-      Bash, Sword
-      Bash, Hammer, Damage=10  # dboost under the first lantern, too precise for gorlek
-      Launch  # Enough ledges to regain launch
       DoubleJump, TripleJump  # more hardcore parkour
 
   conn MarshSpawn.BeforeBurrows:
@@ -429,19 +419,24 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Launch, DoubleJump, TripleJump OR Dash OR Sword
       Launch, Dash, Sword
     kii:
-      Launch, Dash
-      Launch, Damage=10
-      Bash, Damage=10, Sword OR Hammer
-      Bash, Damage=10, Sentry=3 OR Shuriken=3
-      Bash, Damage=30
+      Launch, Damage=20
+      Launch, DoubleJump, Shuriken=1
+      Launch, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # energy stall harder if you bonk into the ceiling inbetween the bashable plant but that actually reset your launch
+      Launch, Sword, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, Damage=10, Sword OR Hammer  # use upsalsh inbetween the two lanterns. Not mandatory but players will probably use it there.
+      Bash, Damage=10, Shuriken=3 OR Sentry=3  # one before the first lantern, one inbetween the two lantern (not mandatory) and a final one with a bash glide
+      Bash, Damage=20, Blaze=3 OR Flash=2  # disable Flash inbetween the two lanterns
+      Bash, Spear=3, Damage=30  # two dboost before the first lantern (because spear momentum can screw you up) and one at the end with a bash glide
+      Bash, Damage=40
     unsafe:
+      Bash, Sword OR Hammer
+      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseHover  # use a projectile to reach the first lantern
+      Launch  # Enough ledges to regain launch
+      DoubleJump, TripleJump  # hardcore parkour
       GrenadeJump, DoubleJump, Bash OR Glide OR Damage=10 OR PauseHover  # Triple Grenade Jump is possible but redundant
       GrenadeJump, Damage=30  # damage under the first lantern, damage on the spikes at the top, damage after the second lantern
       SwordSJump=1, Damage=20  # air sjump from below the first lantern, weapon stall to minimize damage
-      Bash, Sentry=1 OR Damage=10 OR PauseHover  # use a projectile to reach the first lantern
       HammerJump, Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
-      DoubleJump, TripleJump  # hardcore parkour
-      Launch
   conn MarshSpawn.Cave: free
   conn MarshSpawn.LifepactLedge:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -449,11 +444,15 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Damage=10, Glide OR Sword
       Launch, Damage=10
     kii:
-      Bash, Glide
-      Damage=10, DoubleJump OR Dash
-      Sword OR Hammer OR DoubleJump OR Dash OR Launch
-    unsafe: free
-
+      Damage=10, Damage=10, Damage=10, Combat=Slug, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # dboost in spikes before the bat, on the bat projectile and in the spikes before the slime
+      Combat=Bat+Slug, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
+      Combat=Bat+Slug, Damage=10, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Damage=10, DoubleJump OR Sword OR Hammer  # dboost on the bat's projectile
+      Damage=10, Combat=Slug, Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3  # dboost on bat's projectile
+      Damage=10, Damage=10, Combat=Slug, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # dboost on bat's projectile then  in the spikes inbetween the slime and the bat
+      Bash, Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
+      Bash, Damage=10, Damage=10 OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+    unsafe: free  # microledge at the spikes above the slime
   conn MarshSpawn.BurrowFightArena:  # check for redundancies with LifepactLedge
     gorlek: Bash, SentryJump=1
 
