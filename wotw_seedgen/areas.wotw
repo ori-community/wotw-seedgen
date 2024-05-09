@@ -525,9 +525,11 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
     gorlek:
       Bash, DoubleJump, Dash
       Bash, Glide
-      Bash, Grenade=1
-      Bash, SwordSJump=1
-    kii: Bash, DoubleJump  # bashgliding
+      Bash, Grenade=1 OR SentryJump=1  # do the first 4 notes then land and bashnade from under the left lantern
+    kii:
+      Bash, DoubleJump  # bashgliding
+      Bash, Dash OR Sword  # bash upward on the right lantern to reach the left one
+      Bash, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1 # do the first 4 notes then use the jumpad + stall to reach the left lantern
     unsafe: Bash  # fun
   state MarshSpawn.DamageTreeOpen:
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch
@@ -538,7 +540,9 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
 
   pickup MarshSpawn.DamageTree:
     moki: MarshSpawn.DamageTreeOpen
-
+  pickup MarshSpawn.CrusherSwimEX:  # clean water paths with waterdash originate from MarshSpawn.BeforeBurrows
+    kii: WaterDash, Damage=20
+  
   conn Tokk: free
   conn MidnightBurrows.Teleporter:
     moki: MarshSpawn.BurrowsOpen
@@ -553,6 +557,10 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
       Hammer, DoubleJump OR Dash
       Damage=10, DoubleJump OR Dash OR Hammer  # splash the water if needed
       Water, DoubleJump OR Dash OR Hammer OR Damage=10
+    kii:
+      Hammer OR Blaze=5 OR Sentry=3 OR Water OR Damage=20  # Possible with only one dboost in the water but the wall is annoying to climb
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # friendly spikes where the tentacles spawn into precise wjump on the final platform to avoid a dboost
 
 # checkpoint at -1067, -4274
 
