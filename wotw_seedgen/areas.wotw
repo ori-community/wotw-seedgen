@@ -467,12 +467,14 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
     kii: WaterDash, Damage=20
     unsafe:
       Bash, Water OR Damage=10  # might be possible without damage if we catch the projectile right?
-  pickup MarshSpawn.BurrowsApproachLedgeEX:
-    moki: Launch  # Bash paths redundant with PoolsBurrowsSignpost
+  pickup MarshSpawn.BurrowsApproachLedgeEX:  # Most Bash paths redundant with BeforeBurrows->PoolsBurrowsSignpost->BurrowsApproachLedgeEX
+    moki: Launch
     gorlek: SentryJump=1, Damage=10, DoubleJump, TripleJump  # Land in the spikes under the pickup and triple jump to the left platform
     kii:
-      Bash, Sword OR DoubleJump OR Hammer OR Dash OR Glide  # tentacle needs to shoot up along the left wall
+      Bash, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # climb the left wall, cross to the right wall with either a tentacle shot of full combo + energy weapon
+      Bash, Glide, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # same as above but only upsmash and one horizontal attack
     unsafe:
+      Bash
       SentryJump=1, Damage=10, DoubleJump  # Land in the spikes under the pickup and doublejump + upslash to reach the right platform. Hammer upslash is enough to reach the platform, sword upslash the ennemy to refresh your double jump
       GrenadeJump, DoubleJump
 
@@ -488,13 +490,13 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Water, WaterDash, DoubleJump OR Dash OR SentryJump=1  # With sjump, weapon hover as well
       SentryJump=1, DoubleJump, TripleJump, Dash OR Glide
     kii:
-      Bash, Dash OR Glide
-      Bash, Damage=20, Sword OR Hammer
+      Bash, Dash OR Glide  # dash land on the right platform then wjump-*> dash in order to cross the final gap / glide bash the projectile then wait midair for the tenacle to appear again
+      Bash, Damage=10, Grenade=1, Sword OR Hammer  # dboost in the spikes where the tentacle is then bashnade from the platform on the right
       WaterDash, Damage=20, Dash OR DoubleJump
-      WaterDash, Damage=30, Sentry=2 OR Hammer OR Sword
+      WaterDash, Damage=20, Bash, Grenade=1
     unsafe:
       SentryJump=1, DoubleJump, Damage=10  # Weapon hover and damage boost in the first spikes
-      Bash, Dash OR Glide OR Hammer OR Sword  # Use the projectile from the ennemy at the left then bash the the tentacle and land directly on the last platform
+      Bash  # https://youtu.be/LurSDmDxrVM
   conn MarshSpawn.PoolsBurrowsSignpost:
     moki:
       Bash, DoubleJump, Dash
@@ -502,14 +504,15 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
     gorlek:
       Bash, DoubleJump, TripleJump OR Glide OR Sword OR Hammer
     kii:
-      Bash, DoubleJump
+      Bash, DoubleJump  # Not an easy path but there is 3 different solutions
       Bash, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
-      Launch, DoubleJump, TripleJump OR Dash OR Glide  # put this one here from gorlek because it waaaay to precise
-      Launch, Damage=10, DoubleJump OR Dash OR Glide OR Sword  # this one too
+      Launch, DoubleJump, TripleJump OR Dash OR Glide
+      Launch, Damage=10, DoubleJump OR Dash OR Glide
+      Launch, Damage=20
     unsafe:
-      Launch, Dash
-      Launch, Glide  # Reset your launch by touching the wallunder the spikes
-      Launch, PauseHover  # use pause floats for horizontal movement and Launch for vertical movement
+      Launch # https://youtu.be/0BoD2MlGWwU
+      Bash, Damage=20 OR Shuriken=2  # https://youtu.be/OgEGIH0fXCQ
+      Bash, Damage=10, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       GrenadeJump, DoubleJump, TripleJump OR Bash
 
 anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
