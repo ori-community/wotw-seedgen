@@ -11867,6 +11867,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Bash, Grenade=1  # Stand on the left of the TP, launch the grenade with a curve so it won't touch the ceiling and bash it when it falls down
       WaterDash, Dash, Hammer, Water OR Damage=20  # Already hard with analog swimming but it's a nightmare on keyboard
       DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # wall jump from the right wall. With weapons, climb the right wall then djump+ upslash.
+      Sentry=2 OR Blaze=2
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
     kii: Damage=40, Burrow
