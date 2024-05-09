@@ -136,7 +136,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
 
   conn Teleporters: free
   conn MarshSpawn.AboveRockHC: free
-  conn MarshPastOpher.OpherBarrier: free
+  conn MarshSpawn.OpherBarrier: free
 
 # checkpoint at -1021, -4305
 # checkpoint at -1068, -4274
@@ -353,9 +353,9 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, Damage=30, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Burrow, WaterDash, Damage=20, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Burrow, WaterDash, Damage=10, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap
-      Burrow, Damage=20, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap  # burrow as you exit the sand to exit the water before the 2nd water tick
-      Burrow, Water, PauseHover OR BlazeSwap
+      Burrow, WaterDash, Damage=10, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap=1
+      Burrow, Damage=20, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap=1  # burrow as you exit the sand to exit the water before the 2nd water tick
+      Burrow, Water, PauseHover OR BlazeSwap=1
 
 anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the door blocking Life Pact
   pickup MarshSpawn.LifepactShard:
@@ -397,7 +397,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
     unsafe:
       Bash  # https://youtu.be/1Qo0KvCotvM
       Dash  # Dash ramp
-      Sword OR Shuriken=1 Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap OR GrenadeJump
+      Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap=1 OR GrenadeJump
   pickup MarshSpawn.BurrowsApproachLedgeEX:  # Make sure it's not redundant with MarshSpawn.PoolsBurrowsSignpost->MarshSpawn.BeforeBurrows->MarshSpawn.BurrowsApproachLedgeEX
     moki: Bash, DoubleJump
     gorlek: Bash, Dash OR Glide
@@ -605,7 +605,7 @@ anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
       Burrow, WaterDash, Damage=10, Bash OR DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR WaterDash
     unsafe:
       Burrow, Water, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
-      Burrow, Damage=20, Bow=1 OR Grenade=1 Spear=1 OR PauseHover OR FlashSwap
+      Burrow, Damage=20, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
       Burrow, Damage=10, WaterDash, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
   conn MarshSpawn.PoolsPath:
     moki:
