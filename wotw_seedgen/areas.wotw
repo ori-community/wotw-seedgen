@@ -2165,7 +2165,7 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
     kii, WestHollow.FullyDrained:
       Hammer OR Shuriken=1
       Glide, Sword OR Flash=1 OR Sentry=1
-    unsafe: Sword OR Flash=1 OR Sentry=1 OR FlashSwap OR BlazeSwap=1 OR GlideJump OR GrenadeJump OR PauseHover
+    unsafe: WestHollow.FullyDrained, Sword OR Flash=1 OR Sentry=1 OR FlashSwap OR BlazeSwap=1 OR GlideJump OR GrenadeJump OR PauseHover
   conn WestHollow.AboveJumppad:
     moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended OR Launch OR Glide OR DoubleJump
     gorlek: WestHollow.FullyDrained
