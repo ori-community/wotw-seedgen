@@ -329,6 +329,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, Damage=10, Shuriken=1
       Burrow, Shuriken=2
       Burrow, Bash, Grenade=1  # bash the first slime past the arena to reach your grenade
+    unsafe: Burrow, Bash  # Bash the first slug up and quickly burrow down and up to catch it midair
 
   conn MarshSpawn.LifepactLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
@@ -565,7 +566,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
 # checkpoint at -1067, -4274
 
 anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
-  refill Full
+  refill Checkpoint
 
   pickup MarshSpawn.RockHC: free
   pickup MarshSpawn.LongSwimEX:
@@ -574,25 +575,48 @@ anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
       Damage=90  # dropping down the right drop-down and holding directions for x dboosts: down-right=2, right=3, down-right=1, right=1, up-right=2 and u can see ori again
       WaterDash, Damage=40  # dropping down the right drop-down and waterdashing in direction x times: down-right=1, right=2, down-right=1, right=1, up-right=2 and u can see ori again
       MarshSpawn.RainLifted, WaterDash, Damage=35  # dboost on the Lizard before going into the water
-  pickup MarshSpawn.BurrowOre:  # @validator make sure its not redundant with -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
+  pickup MarshSpawn.BurrowOre:  # make sure its not redundant with MarshSpawn.AboveRockHC -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
     moki:
       Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
       Water, Burrow, Bash, Grenade=1, Dash
     gorlek: Water, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=10
     kii:
       Water, Burrow, Shuriken=1  # No other energy weapons because they'll make the CorruptSlug explode and damage you
-      Burrow, Damage=20, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1 OR WaterDash  # 2 water dboost then avoid the spikes or 1 water dboost with wdash then land into the spikes
+      Burrow, WaterDash, Damage=10, Shuriken=1
+      Burrow, Damage=20, Shuriken=1 OR WaterDash  # 2 water dboost then avoid the spikes or 1 water dboost with wdash then land into the spikes
       Burrow, Damage=30
-      Burrow, WaterDash, Damage=10, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=1      
     unsafe:
       Burrow, Water, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap  # Precise burrow angle and then wjump off the platform with the CorruptSlug
       Burrow, Damage=20, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
       Burrow, WaterDash, Damage=10, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
-      Burrow, Bash, Water OR Damage=20  # Bash the slug 2 times up and quickly burrow down and up to catch it really high and bashglide to get the pickup
-      Burrow, Bash, WaterDash, Damage=10
-  #pickup MarshSpawn.PoolsPathEX  # you have to patfind that
+  #pickup MarshSpawn.PoolsPathEX  # All paths are redundant with MarshSpawn.AboveRockHC -> MarshSpawn.PoolsPath -> MarshSpawn.PoolsPathEX so far
   
   conn MarshSpawn.Main: free
+  conn MarshSpawn.PoolsPath:
+    moki:
+      DoubleJump, Bash, Glide
+      Bash, Launch
+    gorlek:
+      Bash, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Damage=10
+      Bash, Glide, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer
+      Launch, Damage=10, DoubleJump OR Dash  # dboost in the left spikes at the second turret then go under MarshSpawn.PoolsPathEX
+      Launch, Glide, Damage=10, Sword OR Hammer  # dboost in the left spikes at the second turret then go under MarshSpawn.PoolsPathEX with glide + upslash
+    kii:
+      Launch, Damage=6, Glide OR Damage=10  #  land on first turret then launch upward. taking a turret shot for leniency
+      Launch, DoubleJump OR Dash  # launch into the ceiling then djump/dash bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathEX
+      Launch, Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathEX
+      Bash, DoubleJump, Damage=10
+      Bash, Damage=20, DoubleJump OR Glide
+    unsafe:
+      Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
+      Launch  # https://youtu.be/ZHr718BCSaA
+      Bash, Dash, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer / Sometimes the cycle are off making it too hard for gorlek
+      DoubleJump, Deflector, Sword, Damage=10  # https://youtu.be/f-0Q8yuKV_g
+      DoubleJump, TripleJump, Deflector, Sword OR Hammer  # Land on first turret
+      DoubleJump, TripleJump, Deflector, Damage=10, Sword OR Hammer  # Able to dmg boost on spikes
+      DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
+      # Glitched
+      FlashSwap
   conn MarshSpawn.BurrowFightArena:
     moki:
       Water, Burrow, DoubleJump OR Glide OR Launch
@@ -607,27 +631,8 @@ anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
       Burrow, Water, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
       Burrow, Damage=20, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
       Burrow, Damage=10, WaterDash, Bow=1 OR Grenade=1 OR Spear=1 OR PauseHover OR FlashSwap
-  conn MarshSpawn.PoolsPath:
-    moki:
-      DoubleJump, Bash, Glide
-      Bash, Launch
-    gorlek:
-      DoubleJump, Bash, TripleJump OR Dash OR Sword OR Hammer OR Damage=10
-      Bash, Glide, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer
-      Launch, Damage=10, DoubleJump OR Dash OR Glide OR Sword
-    kii:
-      Launch, DoubleJump OR Damage=10 OR Sword  # Land on the first turret
-      Bash, Damage=20, DoubleJump OR Glide
-    unsafe:
-      Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
-      Launch  # https://youtu.be/ZHr718BCSaA
-      Bash, Dash, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer / Sometimes the cycle are off making it too hard for gorlek
-      DoubleJump, TripleJump, Deflector, Sword OR Hammer  # Land on first turret
-      DoubleJump, TripleJump, Deflector, Damage=10, Sword OR Hammer  # Able to dmg boost on spikes
-      DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
-      # Glitched
-      LaunchSwap  # refresh launch on ceiling and then LaunchSwap through all of the spiked area or land on the turret and get a second LaunchSwap
-      FlashSwap, PauseHover  # land on the first turret to get some pause and make it easier to make the correct cycle  # PauseHover for "easier" execution
+      Burrow, Bash, Water OR Damage=20  # Bash the slug up and quickly burrow down and up to catch it midair
+      Burrow, Bash, WaterDash, Damage=10  # Bash the slug up and quickly burrow down and up to catch it midair
 
 anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of spawn
   refill Checkpoint
@@ -645,11 +650,15 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       Launch
       Glide, Sword OR Hammer OR DoubleJump OR Dash OR Bash
       DoubleJump, TripleJump OR Dash
-      DoubleJump, Bash, Sword OR Hammer OR Damage=10
+      Bash, DoubleJump, Sword OR Hammer OR Damage=10
     kii:
-      Bash, Dash OR Sword OR Hammer OR DoubleJump OR Damage=10
+      DoubleJump, Sword
+      DoubleJump, Hammer, Shuriken=1
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Dash OR Sword OR Hammer OR DoubleJump OR Shuriken=1 OR Damage=20
     unsafe:
-      Sword OR Hammer OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR Damage=10 OR PauseHover  # Sneaky micro ledges. Shuriken path requires you to angle the shuriken forwards for quicker catching.
+      Bash OR Dash OR Sword OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 OR PauseHover  # Use firendly spikes in front of turret 
+      DoubleJump OR Glide OR Hammer OR Shuriken=2 OR Sentry=2 OR Damage=10 # Use firendly spikes in front of turret then wjump on friendly spikes bellow the pickup. Shuriken path requires you to angle the shuriken forwards for quicker catching.
 
   conn PoolsApproach.OnTopOfWheel:
     moki, Water, WaterBreath OR WaterDash:  # since WheelFreed solves this on its own, the other paths don't have to work with a spinning wheel
