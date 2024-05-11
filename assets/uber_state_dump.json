@@ -28133,7 +28133,7 @@
         "102": {
           "name": "dash",
           "readonly": false,
-          "type": "SerializedBooleanUberState",
+          "type": "VirtualUberState",
           "value": 0.0,
           "value_type": "Boolean"
         },
@@ -28239,7 +28239,7 @@
           "name": "wallJump",
           "readonly": false,
           "type": "VirtualUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "31": {
@@ -28836,14 +28836,21 @@
       }
     },
     "26": {
-      "name": "settings",
+      "name": "ui",
       "states": {
-        "0": {
-          "name": "randomSpiritLight",
-          "readonly": true,
-          "type": "VirtualUberState",
-          "value": 1.0,
-          "value_type": "Boolean"
+        "1": {
+          "name": "launchFragmentsCount",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "2": {
+          "name": "launchFragmentsRequired",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
         }
       }
     },
@@ -29269,6 +29276,37 @@
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
+        }
+      }
+    },
+    "27": {
+      "name": "settings",
+      "states": {
+        "0": {
+          "name": "randomSpiritLight",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 1.0,
+          "value_type": "Boolean"
+        }
+      }
+    },
+    "28": {
+      "name": "input",
+      "states": {
+        "1": {
+          "name": "mouseWorldPositionX",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": -799.037841796875,
+          "value_type": "Float"
+        },
+        "2": {
+          "name": "mouseWorldPositionY",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": -4306.54150390625,
+          "value_type": "Float"
         }
       }
     },
@@ -32134,6 +32172,20 @@
           "value": 1.0,
           "value_type": "Float"
         },
+        "48": {
+          "name": "shurikenMultishotCount",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 0.0,
+          "value_type": "Byte"
+        },
+        "49": {
+          "name": "shurikenMultishotSpread",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 35.0,
+          "value_type": "Float"
+        },
         "5": {
           "name": "sentryCostMultiplier",
           "readonly": false,
@@ -32364,6 +32416,34 @@
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
+        },
+        "92": {
+          "name": "shurikenDamageMultiplier",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 1.0,
+          "value_type": "Float"
+        },
+        "93": {
+          "name": "flashDamageMultiplier",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 1.0,
+          "value_type": "Float"
+        },
+        "94": {
+          "name": "flashTickInterval",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 1.0,
+          "value_type": "Float"
+        },
+        "95": {
+          "name": "shurikenBashable",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         }
       }
     },
@@ -34930,7 +35010,7 @@
         "1000": {
           "name": "inputLocked",
           "readonly": false,
-          "type": "BooleanUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
         },
@@ -34962,6 +35042,13 @@
           "value": 0.0,
           "value_type": "Integer"
         },
+        "3": {
+          "name": "shardSlots",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": 3.0,
+          "value_type": "Integer"
+        },
         "50": {
           "name": "currentArea",
           "readonly": true,
@@ -34974,13 +35061,6 @@
           "readonly": false,
           "type": "IntUberState",
           "value": 14.0,
-          "value_type": "Integer"
-        },
-        "3": {
-          "name": "shardSlots",
-          "readonly": false,
-          "type": "VirtualUberState",
-          "value": 0.0,
           "value_type": "Integer"
         }
       }
@@ -37308,6 +37388,20 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "100": {
+          "name": "removeShriekEscapeSand",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "101": {
+          "name": "removeFeedingGroundsToElevatorSand",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "11": {
           "name": "goodHollow",
           "readonly": false,
@@ -37322,12 +37416,61 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "13": {
+          "name": "fixMeetingKwolokUnderwaterTrigger",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "14": {
+          "name": "fixTeleporterChainOutOfBounds",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "15": {
+          "name": "fixKwolokBossEscapeUnderwaterSpiritLightSoftlock",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "16": {
+          "name": "fixShopAnywhere",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "17": {
+          "name": "usePatch2Kickback",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "301": {
           "name": "forceNoAirDecelerationFlag",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
+        },
+        "420": {
+          "name": "baurSneezeWithBlaze",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "421": {
+          "name": "baurSneezeWithFlash",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         },
         "500": {
           "name": "chaosTriggerMin",
@@ -37840,7 +37983,7 @@
           "name": "distanceTravelledStatSettingSerializedFloatUberState",
           "readonly": false,
           "type": "SerializedFloatUberState",
-          "value": 2.8326852321624756,
+          "value": 0.0,
           "value_type": "Float"
         },
         "63037": {
