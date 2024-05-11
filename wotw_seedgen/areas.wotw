@@ -590,7 +590,7 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
       Burrow, Damage=20, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
       Burrow, WaterDash, Damage=10, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
   #pickup MarshSpawn.PoolsPathEX  # All paths are redundant with MarshSpawn.LeftSpawnSignpost -> MarshSpawn.PoolsPath -> MarshSpawn.PoolsPathEX so far
-  s
+
   conn MarshSpawn.Main: free
   conn MarshSpawn.PoolsPath:
     moki:
@@ -610,12 +610,9 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
     unsafe:
       Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
       Launch  # https://youtu.be/ZHr718BCSaA
-      Bash, Dash, Damage=10, Sword OR Hammer  # While waiting for 3rd shot do two neutral slashes to stay in the air longer / Sometimes the cycle are off making it too hard for gorlek
-      DoubleJump, Deflector, Sword, Damage=10  # https://youtu.be/f-0Q8yuKV_g
-      DoubleJump, TripleJump, Deflector, Sword OR Hammer  # Land on first turret
-      DoubleJump, TripleJump, Deflector, Damage=10, Sword OR Hammer  # Able to dmg boost on spikes
-      DoubleJump, TripleJump, Deflector, Damage=10, Glide, Sword OR Hammer
-      # Glitched
+      DoubleJump, Deflector, Sword, Damage=10 OR TripleJump  # https://youtu.be/f-0Q8yuKV_g
+      DoubleJump, TripleJump, Deflector, Hammer, Damage=10  # https://youtu.be/_Fz20Cd4WBU
+      DoubleJump, HammerJump, Damage=6  # coyote hjump from the left, take a dboost on the 2nd turret projectile to avoid damage from spikes then coyote hjump from the turret
       FlashSwap
   conn MarshSpawn.BurrowFightArena:
     moki:
