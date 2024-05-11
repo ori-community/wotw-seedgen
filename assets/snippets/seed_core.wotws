@@ -7,6 +7,11 @@
 // TODO add comments
 on spawn {
     store(randoConfig.inLogicFilterEnabled, true)
+    store(randoConfig.fixMeetingKwolokUnderwaterTrigger, true)
+    store(randoConfig.fixTeleporterChainOutOfBounds, true)
+    store(randoConfig.fixKwolokBossEscapeUnderwaterSpiritLightSoftlock, true)
+    store(randoConfig.fixShopAnywhere, true)
+    store(randoConfig.usePatch2Kickback, true)
     store(randoState.regenTreeDrained, true)
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     store(gromShop.spiritWellBought, true)
