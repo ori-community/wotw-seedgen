@@ -15,9 +15,7 @@ on spawn {
     store(randoState.regenTreeDrained, true)
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     store(gromShop.spiritWellBought, true)
-    store(gladesProjects.spiritWellBuilt, true)
     store(gromShop.beautifyBought, true)
-    store(gladesProjects.beautifyBuilt, true)
     store(swampStateGroup.torchHolded, true)
     store(kwolokGroupDescriptor.risingPedestals, true)
     store(inkwaterMarshStateGroup.mokiTorchPlayed, true)
@@ -94,6 +92,32 @@ on reload {
     )
     // TODO Tuley
 }
+
+// TODO names are inconsistent with icon names
+// TODO try out storing the shop data in the save file
+on reload update_houses_b_unlocked()
+on change gromShop.housesABought update_houses_b_unlocked()
+fun update_houses_b_unlocked() {
+    set_shop_item_hidden(gromShop.housesBBought, gromShop.housesABought == false)
+}
+on reload update_houses_c_unlocked()
+on change gromShop.housesBBought update_houses_c_unlocked()
+fun update_houses_c_unlocked() {
+    set_shop_item_hidden(gromShop.housesCBought, gromShop.housesBBought == false)
+}
+on reload update_cave_unlocked()
+on change gromShop.removeThornsBought update_cave_unlocked()
+fun update_cave_unlocked() {
+    set_shop_item_hidden(gromShop.openCaveBought, gromShop.removeThornsBought == false)
+}
+
+on gromShop.spiritWellBought store(gladesProjects.spiritWellBuilt, true)
+on gromShop.housesABought store(gladesProjects.housesABuilt, true)
+on gromShop.housesBBought store(gladesProjects.housesBBuilt, true)
+on gromShop.housesCBought store(gladesProjects.housesCBuilt, true)
+on gromShop.removeThornsBought store(gladesProjects.removeThornsBuilt, true)
+on gromShop.openCaveBought store(gladesProjects.openCaveBuilt, true)
+on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
 
 on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true)
 on EastPools.FightArenas store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
