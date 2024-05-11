@@ -40,10 +40,10 @@ pub enum LupoIcon {
 pub enum GromIcon {
     RepairTheSpiritWell = 0,
     DwellingRepairs = 1, // TODO ensure consistent names
-    RoofsOverHeads = 2,
-    OnwardsAndUpwards = 3,
+    ThornySituation = 2,
+    RoofsOverHeads = 3,
     ClearTheCaveEntrance = 4,
-    ThornySituation = 5,
+    OnwardsAndUpwards = 5,
     TheGorlekTouch = 6,
 }
 /// Icons used in the Tuley shop
