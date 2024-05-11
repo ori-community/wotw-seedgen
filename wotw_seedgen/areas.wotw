@@ -637,7 +637,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
   state PoolsApproach.WheelFreed:  # Make sure it's not redundant with going to PoolsApproach.OnTopOfWheel first
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
-    # something something waterdash?
+    # something something waterdash? Unlikely, it looks like bash is hard required for the first wall and if you have bash then you don't need waterdash. 
 
   pickup MarshSpawn.PoolsPathEX:
     moki:
@@ -652,9 +652,9 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       DoubleJump, Sword
       DoubleJump, Hammer, Shuriken=1
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Dash OR Sword OR Hammer OR DoubleJump OR Shuriken=1 OR Damage=20
+      Bash, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=20
     unsafe:
-      Bash OR Dash OR Sword OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 OR PauseHover  # Use firendly spikes in front of turret 
+      Bash OR Dash OR Sword OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 OR PauseHover  # Use friendly spikes in front of turret 
       DoubleJump OR Glide OR Hammer OR Shuriken=2 OR Sentry=2 OR Damage=10 # Use firendly spikes in front of turret then wjump on friendly spikes bellow the pickup. Shuriken path requires you to angle the shuriken forwards for quicker catching.
 
   conn PoolsApproach.OnTopOfWheel:
@@ -665,20 +665,29 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       PoolsApproach.WheelFreed OR DoubleJump OR Launch
       Bash, Grenade=1
       Hammer OR SwordSJump=1
-    unsafe: Water  # Precise wall jump where the tentacle is grabbing the wheel
+    kii, Water: Spear=1
+    unsafe:
+      Water  # Precise wall jump where the tentacle is grabbing the wheel
+      WaterDash, Damage=160      
   conn MarshSpawn.LeftSpawnSignpost:
     moki:
       Water, WaterDash OR Launch
       Glide, Bash OR Launch
     gorlek:
-      Launch
+      Launch, Damage=10
       Water, DoubleJump OR Bash
       Glide, Dash OR DoubleJump
       DoubleJump, Sword OR Dash
     kii:
-      DoubleJump, Bash OR TripleJump
+      Launch
+      WaterDash, Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Bash OR TripleJump OR Hammer OR Sentry=2  # land on 2nd turret to make it easier
+      Bash, Dash  # land on 2nd turret to make it easier
     unsafe:
-      DoubleJump, Hammer
+      Bash
+      DoubleJump, Shuriken=1 OR Blaze=2 OR Sentry=1  # blaze/sentry wjump under the last turret
+      WaterDash, Damage=6  # dboost on a projectile of the 3rd turret while falling so you don't take damage from the water
       Dash  # Reset your dash on the ceiling
 
 anchor MarshSpawn.DenApproach at -540, -4406:  # at regen tree
@@ -10526,18 +10535,18 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       SentryJump=1, Damage=20, Dash, DoubleJump
       SentryJump=1, Launch  # Use weapon to stall before and after the launch
     kii:
-      Water, Sword, Dash
       Water, Spear=1
       WaterDash, Damage=100, PoolsApproach.WheelFreed OR DoubleJump OR Hammer
       DoubleJump, Damage=20, Sword OR Shuriken=2 OR Blaze=5 OR Sentry=3
       Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Damage=20, Dash, Hammer  # hammer for the static wheel, damage for the rotatin wheel
-      Glide, Dash, Sword OR Hammer OR Shuriken=1 OR Damage=20
+      Glide, Dash, Hammer
       Glide, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=3 OR Blaze=3 OR Sentry=3  # climb the left wall
     unsafe:
       Water  # Precise wall jump where the tentacle is grabbing the wheel
       Damage=240  # Only require 60 damage if the wheel isn't spinning but has to also work when the wheel is spinning
+      WaterDash, Damage=100  # Only requires 40 Damage if the wheel isn't spinning but has to also work when the wheel is spinning
       Launch  # climb the left wall then ceiling boost
   conn MarshSpawn.PoolsPath:
     moki: Water, WaterDash  # <3
