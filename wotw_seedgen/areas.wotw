@@ -236,7 +236,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       DoubleJump, Dash, Sword  # coyote dash from under the grappable plant
       Grapple, Bash  # Swing the plant with Grapple
 
-  conn MarshSpawn.DenApproach:
+  conn MarshSpawn.RegenDoor:
     moki: MarshSpawn.KeystoneDoor
   conn MarshSpawn.BrokenBridge:
     moki:
@@ -690,72 +690,47 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       WaterDash, Damage=6  # dboost on a projectile of the 3rd turret while falling so you don't take damage from the water
       Dash  # Reset your dash on the ceiling
 
-anchor MarshSpawn.DenApproach at -540, -4406:  # at regen tree
+anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
   state MarshSpawn.KeystoneDoor:
-    moki, Keystone=2:
-      DoubleJump, Dash, Bash, Glide  # not sorry
-      Bash, Grenade=1
-      Launch
-      MarshSpawn.RainLifted, DoubleJump  # the platform only spawns once you lift the rain
-    gorlek, Keystone=2:
-      DoubleJump, TripleJump  # wrap around
-      SentryJump=1  # weapon float after the sjump
-    kii, Keystone=2:
-      Hammer  # upslash to slash left to walljump up
-      DoubleJump
-      WaterDash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1
-      MarshSpawn.RainLifted, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1  # Use the platform appearing at day
-    unsafe, Keystone=2:
-      MarshSpawn.RainLifted, Dash  # Stand on the left of the platform to tilt it slightly, Dashcancel to the right with jump and Dash back left
-      WaterDash, DoubleJump
-      DoubleJump
-  state MarshSpawn.HowlBurnt:
-    moki:
-      DoubleJump OR Launch
-      Dash, Glide
-      Bash, Grenade=1
-      WaterDash  # water always clean
-    gorlek: SentryJump=1
-    kii: Dash OR Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1
+    moki: Keystone=2
 
   pickup MarshSpawn.RegenTree: free
-  pickup MarshSpawn.RecklessShard:
-    moki, BreakWall=10:
-      DoubleJump OR Launch
-      Dash, Glide
-      Bash, Grenade=1
-      WaterDash  # water always clean
-    gorlek: BreakWall=10, SentryJump=1
-    kii:
-      BreakWall=10, Dash OR Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1
-      MarshSpawn.RainLifted, Bash, Damage=10, Dash OR Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1  # Luring the Mantis without Bash is really hard (maybe impossible) | Damage because hitboxes
 
-  conn HowlsDen.Entrance:
-    moki, MarshSpawn.HowlBurnt:
-      DoubleJump OR Launch
-      Dash, Glide
-      Bash, Grenade=1
-      WaterDash  # water always clean
-    gorlek: MarshSpawn.HowlBurnt, SentryJump=1
-    kii: MarshSpawn.HowlBurnt, Dash OR Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1
   conn MarshSpawn.CaveEntrance:
-    moki, MarshSpawn.KeystoneDoor:
-      DoubleJump, Dash, Bash, Glide  # not sorry
+    moki: MarshSpawn.KeystoneDoor
+  conn MarshSpawn.DenApproach:
+    moki:
+      DoubleJump OR Launch
       Bash, Grenade=1
-      Launch
-      MarshSpawn.RainLifted, DoubleJump  # the platform only spawns once you lift the rain
-    gorlek, MarshSpawn.KeystoneDoor:
-      DoubleJump, TripleJump  # wrap around
-      SentryJump=1  # can do one of a good sjump, a good positioning, pressing left quickly after the sentryjump or spending an extra energy
-    kii, MarshSpawn.KeystoneDoor:
-      Hammer  # upslash to slash left to walljump up
-      DoubleJump
-      WaterDash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1
-      MarshSpawn.RainLifted, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1  # Use the platform appearing at day
-    unsafe, MarshSpawn.KeystoneDoor:
-      MarshSpawn.RainLifted, Dash  # Stand on the left of the platform to tilt it slightly, Dashcancel to the right with jump and Dash back left
+      WaterDash  # water always clean
+    gorlek:
+      Dash, Glide
+      SentryJump=1
+    kii: Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Spear=1  # Can take a damage so not in kii
+      PauseHover  # Pausefloat from the left platform 
+      GlideJump OR BlazeSwap=1
+  
+anchor MarshSpawn.DenApproach at -500, -4395:  # right of regen tree
+  refill Checkpoint
 
-# checkpoint at -500, -4395
+  state MarshSpawn.HowlBurnt: free
+  
+  pickup MarshSpawn.RegenTree: free
+  pickup MarshSpawn.RecklessShard:
+    moki: BreakWall=10
+    unsafe: MarshSpawn.RainLifted  # https://youtu.be/b31Zd5M4xDg
+    
+  conn MarshSpawn.RegenDoor:
+    moki:
+      DoubleJump OR Launch
+      Bash, Grenade=1
+    gorlek: SentryJump=1  # can do one of a good sjump, a good positioning, pressing left quickly after the sentryjump or spending an extra energy
+    kii: Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # upslash to slash left to walljump up
+    unsafe: Dash OR PauseHover OR BlazeSwap=1 OR GLideJump
+  conn HowlsDen.Entrance:
+    moki: MarshSpawn.HowlBurnt
 
 anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside the bridge if Howl is still lurking
   # Lifting the Rain is free from here in all scenarios, eliminating the need to note it as a requirement for the enemy or vine to the right
