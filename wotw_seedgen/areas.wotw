@@ -135,7 +135,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe: PauseHover OR FlashSwap
 
   conn Teleporters: free
-  conn MarshSpawn.AboveRockHC: free
+  conn MarshSpawn.LeftSpawnSignpost: free
   conn MarshSpawn.OpherBarrier: free
 
 # checkpoint at -1021, -4305
@@ -343,7 +343,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Bash OR Launch
       Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii: free
-  conn MarshSpawn.AboveRockHC:
+  conn MarshSpawn.LeftSpawnSignpost:
     moki: 
       Water, Burrow, Bash, DoubleJump, Dash OR Glide
       Water, Burrow, Bash, Launch
@@ -565,7 +565,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
 
 # checkpoint at -1067, -4274
 
-anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
+anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above RockHC
   refill Checkpoint
 
   pickup MarshSpawn.RockHC: free
@@ -575,7 +575,7 @@ anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
       Damage=90  # dropping down the right drop-down and holding directions for x dboosts: down-right=2, right=3, down-right=1, right=1, up-right=2 and u can see ori again
       WaterDash, Damage=40  # dropping down the right drop-down and waterdashing in direction x times: down-right=1, right=2, down-right=1, right=1, up-right=2 and u can see ori again
       MarshSpawn.RainLifted, WaterDash, Damage=35  # dboost on the Lizard before going into the water
-  pickup MarshSpawn.BurrowOre:  # make sure its not redundant with MarshSpawn.AboveRockHC -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
+  pickup MarshSpawn.BurrowOre:  # make sure its not redundant with MarshSpawn.LeftSpawnSignpost -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
     moki:
       Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
       Water, Burrow, Bash, Grenade=1, Dash
@@ -589,8 +589,8 @@ anchor MarshSpawn.AboveRockHC at -954, -4296:  # At the signpost above RockHC
       Burrow, Water, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap  # Precise burrow angle and then wjump off the platform with the CorruptSlug
       Burrow, Damage=20, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
       Burrow, WaterDash, Damage=10, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseHover OR FlashSwap
-  #pickup MarshSpawn.PoolsPathEX  # All paths are redundant with MarshSpawn.AboveRockHC -> MarshSpawn.PoolsPath -> MarshSpawn.PoolsPathEX so far
-  
+  #pickup MarshSpawn.PoolsPathEX  # All paths are redundant with MarshSpawn.LeftSpawnSignpost -> MarshSpawn.PoolsPath -> MarshSpawn.PoolsPathEX so far
+  s
   conn MarshSpawn.Main: free
   conn MarshSpawn.PoolsPath:
     moki:
@@ -669,7 +669,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       Bash, Grenade=1
       Hammer OR SwordSJump=1
     unsafe: Water  # Precise wall jump where the tentacle is grabbing the wheel
-  conn MarshSpawn.AboveRockHC:
+  conn MarshSpawn.LeftSpawnSignpost:
     moki:
       Water, WaterDash OR Launch
       Glide, Bash OR Launch
