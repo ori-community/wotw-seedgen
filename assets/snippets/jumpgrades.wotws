@@ -35,7 +35,6 @@ fun enable() {
     store(enabled, true)
     set_wheel_item_disable()
     update_bonus_wheel()
-    // TODO rando_upgrades.Jump Height and no clue what the others are
     store(randoUpgrades.jumpHeight, collected * 0.33)
     store(randoUpgrades.wallJumpStrength, collected * 0.15)
     store(randoUpgrades.doubleJumpStrength, collected * 0.15)

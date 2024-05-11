@@ -10,8 +10,6 @@
 
 !include("progress_helper")
 
-// TODO renames of zones
-
 !count_in_zone(
     [
         (skills_in_inkwater, Zone::Inkwater),

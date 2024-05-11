@@ -15,6 +15,7 @@
     !flag("Relics (" + relic_count + ")")
 }
 
+// TODO the other goal snippets don't include progress helper directly, why does this one?
 !include("progress_helper")
 !include("goal_mode_core")
 

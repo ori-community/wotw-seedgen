@@ -4,6 +4,8 @@
 "skip the seed planting animations
 seeds will be planted as soon as you collect them and as soon as Tuley is in the Glades")
 
+// TODO port quest autoadvance
+
 on hubUberStateGroup.gardenerProjectGrapplePlants > 0 update_tuley()
 on hubUberStateGroup.gardenerProjectGrass > 0 update_tuley()
 on hubUberStateGroup.gardenerProjectSpringPlants > 0 update_tuley()
