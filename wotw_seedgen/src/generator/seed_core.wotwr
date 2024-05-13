@@ -68,6 +68,7 @@
 3|1|17|2|17|16586|That old cave entrance looks like it's #about to collapse#...but we Gorlek learned a thing or two about tunnelling after fleeing to the mines. With some Ore, I can #repair# it.
 3|1|4|17|17|18751|0|17|4|17|16586|false
 17|18751|17|4|17|16586|true
+17|18751|4|17|14019|33776|0|8|14019|33776|byte|1
 3|1|8|17|16587|int|6
 17|16586|8|21|16586|bool|true
 3|1|17|0|17|15068|grom:6
