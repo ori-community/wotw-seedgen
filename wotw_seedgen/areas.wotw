@@ -698,7 +698,7 @@ anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
 
   conn MarshSpawn.CaveEntrance:
     moki: MarshSpawn.KeystoneDoor
-  conn MarshSpawn.DenApproach:
+  conn MarshSpawn.HowlApproach:
     moki:
       DoubleJump OR Launch
       Bash, Grenade=1
@@ -712,7 +712,7 @@ anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
       PauseHover  # Pausefloat from the left platform 
       GlideJump OR BlazeSwap=1
   
-anchor MarshSpawn.DenApproach at -500, -4395:  # right of regen tree
+anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
   refill Checkpoint
 
   state MarshSpawn.HowlBurnt: free
@@ -729,32 +729,71 @@ anchor MarshSpawn.DenApproach at -500, -4395:  # right of regen tree
     gorlek: SentryJump=1  # can do one of a good sjump, a good positioning, pressing left quickly after the sentryjump or spending an extra energy
     kii: Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # upslash to slash left to walljump up
     unsafe: Dash OR PauseHover OR BlazeSwap=1 OR GLideJump
-  conn HowlsDen.Entrance:
+  conn MarshSpawn.MokkTheBrave:
     moki: MarshSpawn.HowlBurnt
 
-anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside the bridge if Howl is still lurking
-  # Lifting the Rain is free from here in all scenarios, eliminating the need to note it as a requirement for the enemy or vine to the right
+anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but outside the bridge if Howl is still lurking
 
   state MarshSpawn.HowlBurnt: free
 
-  quest MarshSpawn.FangQI:
-    moki:
-      DoubleJump OR Launch
-      Bash, Dash  # Bash off the enemy to get to the vine, then jump&dash right
-    gorlek:
-      Bash, Grenade=1 OR Damage=10  # Bash off the enemy to get to the vine, then jump right. Dboost the last gap
-      SentryJump=1  # SentryJump to get over the initial jump, then jump right, use sword or hammer to get over last gap
-    kii:
-      Bash, Glide OR Grenade=1 OR Sword OR Hammer OR Damage=10
-      Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1  # use the abillity to get on the wall to the right and use shuriken to get onto the vine
-      Sword, Sentry=1 OR Hammer OR Flash=1 OR Spear=1  # pogo off the enemy
-    unsafe:
-      GrenadeJump OR GlideJump
-      Sword  # With upslash on the right wall, jump off it close to the ceiling and slash sword
-      Dash  # Dashramp
   quest MarshSpawn.MokkFangQuest:
     moki: MarshSpawn.HowlBurnt, MarshSpawn.FangQI
 
+  pickup MarshSpawn.RecklessShard:  #Make sure it's not redundant with MarshSpawn.MokkTheBrave->MarshSpawn.HowlApproach->MarshSpawn.RecklessShard
+    moki, MarshSpawn.HowlBurnt, BreakWall=10:
+      Bash, Grenade=1
+    gorlek, MarshSpawn.HowlBurnt, BreakWall=10:
+      Dash OR SentryJump=1
+      Glide, Sword OR Hammer
+    kii, MarshSpawn.HowlBurnt, BreakWall=10:
+      Sword
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, MarshSpawn.HowlBurnt:
+      BreakWall=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover
+      MarshSpawn.RainLifted, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover  # https://youtu.be/b31Zd5M4xDg
+  pickup MarshSpawn.MokkEX:
+    moki: MarshSpawn.HowlBurnt
+
+  conn HowlsDen.AboveBoneBridge:
+    moki: MarshSpawn.HowlBurnt
+  conn MarshSpawn.HowlApproach:
+    moki, MarshSpawn.HowlBurnt:
+      DoubleJump OR Launch
+      MarshSpawn.RainLifted, Bash, Grenade=1
+      Bash, Grenade=2
+    gorlek, MarshSpawn.HowlBurnt:
+      SentryJump=2
+      Dash, Bash, MarshSpawn.RainLifted OR Grenade=1  # Dash for first jump, bash off fronkey for second
+    kii:
+      Hammer  # upslash -> upslash
+      MarshSpawn.RainLifted, Sword  # upslash for the first gap, then pogo off the mantis for the second gap
+      MarshSpawn.RainLifted, Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # hop to the first ledge and then bash the mantis
+    unsafe, MarshSpawn.HowlBurnt:
+      Sword  # upslash then downslash to reach the last platform
+      MarshSpawn.RainLifted, Bash  # Long distance lure for the first jump, simple lure for second
+      Dash  # Dash ramp
+      Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/v_1aLNaPJeE
+      GrenadeJump
+  conn MarshSpawn.AboveHowlArena:  #Vine/enemy only spawn once the rain is lifted. Not many paths without RainLifted because it is free from here and adding paths without is only related to the logic filter (for when we add showing states in it)
+    moki:
+      Launch
+      MarshSpawn.RainLifted, DoubleJump OR Bash
+    gorlek:
+      MarshSpawn.RainLifted, Hammer, Dash
+      SentryJump=1
+      DoubleJump, TripleJump OR Dash
+    kii:
+      DoubleJump, Glide
+      MarshSpawn.RainLifted, Sword  # Pogo
+      MarshSpawn.RainLifted, Shuriken=1, Hammer OR Spear=1
+    unsafe: 
+      MarshSpawn.RainLifted, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/txogGlFUCwU
+      GrenadeJump
+
+anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the way to the fang
+  refill Checkpoint
+  refill Health=1
+  
   pickup MarshSpawn.FangEC:
     moki:
       DoubleJump, Dash  # Stick to the ceiling
@@ -778,48 +817,46 @@ anchor HowlsDen.Entrance at -376, -4413:  # Next to Mokk the Brave, but outside 
       SwordJump
       Dash, PauseHover
 
-  pickup MarshSpawn.RecklessShard:
-    moki, MarshSpawn.HowlBurnt, BreakWall=10:
+  conn MarshSpawn.MokkTheBrave: free
+  conn MarshSpawn.FangPlatform:
+    moki:
       DoubleJump OR Launch
-      Bash, Grenade=1
-    gorlek, MarshSpawn.HowlBurnt, BreakWall=10:
-      SentryJump=1
-      Dash
-    kii, MarshSpawn.HowlBurnt, BreakWall=10:
-      Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1
-    unsafe, MarshSpawn.HowlBurnt:
-      Bash, BreakWall=10  # long distance lure
-      Bash, MarshSpawn.RainLifted, Damage=20  # + using mantis as wall breakage
-      BreakWall=10, GrenadeJump  # Grenade jump to get over initial gap
-  pickup HowlsDen.UpperEX:
-    moki: MarshSpawn.HowlBurnt
-
-  conn HowlsDen.AboveBoneBridge:
-    moki: MarshSpawn.HowlBurnt
-  conn MarshSpawn.DenApproach:
-    moki, MarshSpawn.HowlBurnt:
-      DoubleJump OR Launch
-      Bash, Grenade=1
-    gorlek, MarshSpawn.HowlBurnt:
-      SentryJump=2
-      Dash, Bash  # Dash for first jump, bash off fronkey for second
+      Bash, Dash  # Bash off the enemy to get to the vine, then jump&dash right
+    gorlek:
+      Bash, Grenade=1 OR Damage=10  # Bash off the enemy to get to the vine, then jump right. Dboost the last gap
+      SentryJump=1  # SentryJump to get over the initial jump, then jump right, use sword or hammer to get over last gap
     kii:
-      Hammer  # upslash -> upslash
-      Sword  # upslash for the first gap, then pogo off the mantis for the second gap
-      Spear=1, Dash  # use spear to get close to the ledge and use little hop to dash on the platform
-      Bash, Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1  # hop to the first ledge and then bash the mantis
-    unsafe, MarshSpawn.HowlBurnt:
-      Sword, Shuriken=1  # downslash on a shuriken
-      Bash  # Long distance lure for the first jump, simple lure for second
-      Dash, Sentry=1  # As above but uses sentry
-      GrenadeJump
+      Bash, Glide OR Grenade=1 OR Sword OR Hammer OR Damage=10
+      Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1  # use the abillity to get on the wall to the right and use shuriken to get onto the vine
+      Sword, Sentry=1 OR Hammer OR Flash=1 OR Spear=1  # pogo off the enemy
+    unsafe:
+      GrenadeJump OR GlideJump
+      Sword  # With upslash on the right wall, jump off it close to the ceiling and slash sword
+      Dash  # Dashramp
+    
+anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
+  refill Health=1
 
-# checkpoint at -298, -4388
+  quest MarshSpawn.FangQI: free
+  
+  pickup MarshSpawn.FangEC:  #Make sure it's not redundant with MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena->MarshSpawn.FangEC
+    gorlek:
+      SentryJump=1
+      Bash, Grenade=1
+    unsafe:
+      HammerJump OR FlashSwap OR BlazeSwap=2
+  
+  conn MarshSpawn.AboveHowlArena:
+    moki:
+      DoubleJump OR Launch
+    gorlek:
+      Dash
+      Glide, Damage=10 OR Sword OR Hammer  # upslash to get on first suspended platform then dboost in the spikes before the checkpoint
 
 anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through the keydoor
   refill Checkpoint
 
-  pickup HowlsDen.UpperEX:
+  pickup MarshSpawn.MokkEX:
     moki: Launch
     gorlek:
       DoubleJump, TripleJump
@@ -830,7 +867,7 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
       SentryJump=1
 
   conn HowlsDen.UpperLoopEntrance: free
-  conn HowlsDen.Entrance:
+  conn MarshSpawn.MokkTheBrave:
     moki: MarshSpawn.HowlBurnt, Launch
     gorlek, MarshSpawn.HowlBurnt:
       DoubleJump, TripleJump
@@ -879,13 +916,13 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
 anchor HowlsDen.UpperLoopExit at -407, -4434:  # Checkpoint inside the bone door where you exit the loop with right hc (you can walk out)
   refill Checkpoint
 
-  pickup HowlsDen.UpperEX:
+  pickup MarshSpawn.MokkEX:
     moki: DoubleJump OR Dash
     gorlek: Glide OR Sword
     kii: Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1
     unsafe: free
 
-  conn HowlsDen.Entrance:
+  conn MarshSpawn.MokkTheBrave:
     moki: MarshSpawn.HowlBurnt, DoubleJump OR Dash
     gorlek: MarshSpawn.HowlBurnt, Glide OR Sword
     kii: MarshSpawn.HowlBurnt, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Hammer
