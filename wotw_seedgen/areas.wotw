@@ -798,41 +798,23 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
     moki:
       DoubleJump, Dash  # Stick to the ceiling
       Launch
-    gorlek:
-      Bash, Grenade=1, Damage=10  # Bash up off the enemy and take a dboost on the last gap
-      Bash, Grenade=2  # As above, but use bash grenade on the last gap
-      SentryJump=2, DoubleJump OR Dash OR Damage=10  # SentryJump to get over the initial jump, then jump right, use sword/hammer to get over last gap, SentryJump to EC
-      SentryJump=3  # SentryJump to get over the initial jump, then jump right, use sword/hammer to get over last gap, SentryJump to EC
-      DoubleJump, TripleJump  # Stick to the ceiling
+    gorlek: DoubleJump, TripleJump
     unsafe:
-      Bash, Grenade=1, DoubleJump OR Dash OR Glide  # Bash up off the enemy and Dash/Djump/Glide to the fang. Grenade+bash up from the fang
-      Bash, Grenade=1, Sword OR Hammer  # As above, but sword/hammer upslash to cross the last gap
-      WaveDash, Sword  # wavedash with regen
-      Dash, BlazeSwap=1 OR SentrySwap=1
-      DoubleJump, BlazeSwap=2 OR SentrySwap=2
-      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
-      Bash, Glide, Dash  # use the enemy for everything
-      HammerJump OR GlideHammerJump
-      GrenadeJump, DoubleJump OR Sentry=1 OR Spear=1 OR Flash=1
-      SwordJump
-      Dash, PauseHover
+      DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump  # djump then second movement option to reach the first wall in the ceiling. Then djump from one side of the wall to the other before going to the next wall with djump
+      WaveDash  # Wavedash on the health plant and regen jump
+      Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EC
+      BlazeSwap=2 OR SentrySwap=2
+      MarshSpawn.RainLifted, Bash, Glide, Dash  # use the enemy for everything
 
   conn MarshSpawn.MokkTheBrave: free
   conn MarshSpawn.FangPlatform:
     moki:
-      DoubleJump OR Launch
-      Bash, Dash  # Bash off the enemy to get to the vine, then jump&dash right
-    gorlek:
-      Bash, Grenade=1 OR Damage=10  # Bash off the enemy to get to the vine, then jump right. Dboost the last gap
-      SentryJump=1  # SentryJump to get over the initial jump, then jump right, use sword or hammer to get over last gap
-    kii:
-      Bash, Glide OR Grenade=1 OR Sword OR Hammer OR Damage=10
-      Shuriken=1, Sword OR Sentry=1 OR Flash=1 OR Spear=1  # use the abillity to get on the wall to the right and use shuriken to get onto the vine
-      Sword, Sentry=1 OR Hammer OR Flash=1 OR Spear=1  # pogo off the enemy
+      Launch OR DoubleJump OR Dash
+      Bash, Grenade=1
+    gorlek: Glide OR Sword OR Hammer OR Damage=10  # Dboost the last gap
+    kii: Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      GrenadeJump OR GlideJump
-      Sword  # With upslash on the right wall, jump off it close to the ceiling and slash sword
-      Dash  # Dashramp
+      Spear=1 OR BlazeSwap=1 OR GrenadeJump OR GlideJump OR PauseHover OR FlashSwap
     
 anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
   refill Health=1
@@ -845,6 +827,7 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
       Bash, Grenade=1
     unsafe:
       HammerJump OR FlashSwap OR BlazeSwap=2
+      GrenadeJump, DoubleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   
   conn MarshSpawn.AboveHowlArena:
     moki:
