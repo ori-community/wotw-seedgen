@@ -826,7 +826,7 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
       SentryJump=1
       Bash, Grenade=1
     unsafe:
-      HammerJump OR FlashSwap OR BlazeSwap=2
+      HammerJump OR FlashSwap OR BlazeSwap=2 OR SentrySwap=2
       GrenadeJump, DoubleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   
   conn MarshSpawn.AboveHowlArena:
@@ -835,6 +835,30 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
     gorlek:
       Dash
       Glide, Damage=10 OR Sword OR Hammer  # upslash to get on first suspended platform then dboost in the spikes before the checkpoint
+      SentryJump=1, Damage=10
+    kii:
+      Sword, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      Hammer, Spear=1 OR Flash=1 OR Sentry=1 OR Damage=10  # energy weapon to reach right suspended platform (no shuriken because it can push back the platform). Jump in the spikes to reach the left suspended platform without going on the right one
+      Damage=10, Damage=10, Damage=10, Damage=20
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:  # energy weapon to avoid 1st dboost
+        Damage=10, Damage=10, Damage=20
+      Damage=10, Shuriken=1, Damage=10, Shuriken=1, Damage=10  # avoid 2nd dboost and then takes only one tick of damage after the suspended platform
+      Damage=10, Flash=1, Damage=10, Flash=1, Damage=10  # same as above
+      Damage=10, Sentry=1, Damage=10, Sentry=1, Damage=10  # same as above
+      Shuriken=2, Damage=10, Shuriken=1, Damage=10  # avoid 1st and 2nd dboost then takes only one tick of damage after the suspended platform
+      Flash=2, Damage=10, Flash=1, Damage=10  # same as above
+      Sentry=2, Damage=10, Sentry=1, Damage=10  # same as above
+      Sentry=5, Damage=10  # avoid all dboost, energy weapon to get on the right suspended platform then another one to reach the left platform. Final energy usage to only take one tick of damages in spikes
+      Flash=5, Damage=10  # same as above
+      # No shuriken variant because if it hits a suspended patform, it get pushed back
+    unsafe:
+      Sword  # upslash then downslash for the last jump
+      Hammer
+      Shuriken=3 OR Flash=3 OR Sentry=3  #  https://youtu.be/U2khlKTXVzA  The shuriken variant might be a ceiling jump?
+      Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
+      Damage=10, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=10, Spear=1, Damage=10
+      Damage=10, Damage=10, Damage=10  # microledge under the left suspended platform to use regen before the 2nd dboost
 
 anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through the keydoor
   refill Checkpoint
