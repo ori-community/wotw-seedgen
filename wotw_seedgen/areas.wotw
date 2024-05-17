@@ -977,35 +977,44 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       DoubleJump, Sword OR TripleJump  # Door skip
       Bash, DoubleJump  # bash chain
       GrenadeJump, DoubleJump
-  conn HowlsDen.OutsideSecretRoom:
-    moki, HowlsDen.KeystoneDoor: Water OR DoubleJump OR Dash OR Glide OR Launch
-    gorlek, HowlsDen.KeystoneDoor: Sword OR Hammer OR Damage=10
-    kii, HowlsDen.KeystoneDoor: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe, HowlsDen.KeystoneDoor: PauseHover
+      SentryJump=2  # Sword sjump can go up to HowlsDen.AboveBoneBridge but landing here and doing the loop also solves the connection to AboveBoneBridge
+      HammerSJump=1, DoubleJump
   conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
       MarshSpawn.RainLifted, Bash, Glide  # Bash chain
       MarshSpawn.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
-      SwordSJump=2
+  conn HowlsDen.BoneBridgeDoor:
+    moki: HowlsDen.KeystoneDoor
   conn HowlsDen.AboveTeleporter:
     moki: HowlsDen.BoneBarrier
 
-anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable wall behind the keystone door
-  refill Checkpoint:  # You need to return the anchor coordinates after getting the checkpoint
+anchor HowlsDen.BoneBridgeDoor at -466, -4490:  # checkpoint once you opened the door skip door
+  refill Checkpoint
+  
+  state HowlsDen.KeystoneDoor:
+    moki: Keystone=2
+
+  conn HowlsDen.BoneBridge:
+    moki: HowlsDen.KeystoneDoor
+  conn HowlsDen.OutsideSecretRoom:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide
-    gorlek: Sword OR Hammer
-    
+    gorlek: Sword OR Hammer OR Damage=10
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # you don't take water damage if you land on the very left of the pound
+
+anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable wall behind the keystone door
   state HowlsDen.SecretRoomWall:
     moki: BreakWall=20
-    
+        
   conn HowlsDen.SecretRoom:
     moki: HowlsDen.SecretRoomWall
-  conn HowlsDen.BoneBridge:
-    moki, HowlsDen.KeystoneDoor: Water OR Launch OR DoubleJump OR Dash OR Glide
-    gorlek, HowlsDen.KeystoneDoor:
-      Sword OR Hammer OR Damage=10
+  conn HowlsDen.BoneBridgeDoor:
+    moki: Water OR Launch OR DoubleJump OR Dash OR Glide
+    gorlek: Sword OR Hammer OR Damage=10
+    kii:
       Bash, Grenade=1
-    kii, HowlsDen.KeystoneDoor: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Blaze=1 OR PauseHover OR OR Bow=1 OR Grenade=1 OR GrenadeCancel
   conn HowlsDen.AboveBoneBridge:
     moki:
       BreakWall=16, DoubleJump, Combat=2xSlug OR Bash
@@ -1024,9 +1033,31 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
       SentryJump=3, Hammer, Damage=10  # hammer breaks the wall
       Water, WaterDash, HammerSJump=2, Damage=10  # hammer breaks the wall
     kii:
-      Sword OR Hammer
-      BreakWall=16, Damage=10, Shuriken=4 OR Sentry=4 OR Flash=4  # one jump is kinda hard
-      BreakWall=16, Sentry=5  # two sentries in the air to avoid the spikes
+      Hammer
+      Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # The last chunck of spikes can repulse sword movement
+      # Base line energy paths (dboost in first spikes chunck)
+      Shuriken=1 OR Flash=1 OR Sentry=1:  # Reach the left platform
+        Damage=10, BreakWall=16, Shuriken=2 OR Flash=2 OR Sentry=2
+      Sentry=5, BreakWall=16  # two sentries in the air to avoid the first spikes
+      # Taking aditional dboost by not hovering above last spikes
+      Shuriken=1, Damage=10, Shuriken=1, Damage=10, BreakWall=16
+      Flash=1, Damage=10, Flash=1, Damage=10, BreakWall=16
+      Sentry=1, Damage=10, Sentry=1, Damage=10, BreakWall=16
+      # Avoiding first dboost by bashing the slime
+      Bash, BreakWall=16, Shuriken=3 OR Flash=3 OR Sentry=3
+      Bash, Shuriken=2 OR Flash=2 OR Sentry=2:
+        Damage=10, BreakWall=16
+      # Avoiding first energy weapon usage by using WaterDash
+      WaterDash, Water OR Damage=10:
+        Bash OR Damage=10:
+          BreakWall=16, Shuriken=2 OR Flash=2 OR Sentry=2
+          Damage=10, BreakWall=16, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Sword
+      BreakWall=16, Shuriken=4
+      BreakWall=16, Spear=1, Damage=10, Spear=1, Spear=1 OR Damage=10  # https://youtu.be/Y5nvYJbEtZg
+      Bash, Grenade=1, BreakWall=16, Grenade=1 OR Shuriken=1 OR Flash=1  # https://youtu.be/e9edNsLqE9Y
+      Bash, WaterDash, Grenade=1, BreakWall=16, Water OR Damage=10
 
 anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   refill Checkpoint
