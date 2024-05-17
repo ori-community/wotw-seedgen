@@ -1029,12 +1029,11 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
       Water, WaterDash, HammerSJump=1
     kii:
       Hammer
-      Bash, Grenade=1
       Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Shuriken=1 OR Flash=1 OR Sentry=1
-      WaterDash, Bash, Water OR Damage=10
+      Sentry=3  # two sentries in the air to avoid spikes
       WaterDash, Damage=10, Damage=10
-      Sentry=3  # two sentries in the air to avoid the first spikes
+      MarshSpawn.RainLifted, Bash, Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
+      MarshSpawn.RainLifted, WaterDash, Bash, Water OR Damage=10
     unsafe:
       Sentry=1, SentrySwap=1
       Damage=10, Spear=1 OR BlazeSwap=1  # https://youtu.be/Y5nvYJbEtZg
