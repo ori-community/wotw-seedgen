@@ -896,7 +896,7 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
     unsafe:  # anything using sword/hammer is redundant with going through the upperloop with just sword or hammer
       DoubleJump, Dash OR GlideJump
       SentrySwap=1 OR BlazeSwap=1 OR FlashSwap
-  conn HowlsDen.OutsideSecretRoom:
+  conn HowlsDen.MidwayBottomLoop:
     gorlek: ShurikenBreak=16
     unsafe: HammerBreak OR SpearBreak OR SentryBreak=16
 
@@ -1014,50 +1014,55 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
     kii:
       Bash, Grenade=1
       Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: Blaze=1 OR PauseHover OR OR Bow=1 OR Grenade=1 OR GrenadeCancel
+    unsafe: Blaze=1 OR PauseHover OR Bow=1 OR Grenade=1 OR GrenadeCancel
+  conn HowlsDen.MidwayBottomLoop:
+    moki:
+      Launch
+      Combat=Slug, DoubleJump
+      Bash, Grenade=1, Grenade=1 OR Dash OR Glide
+    gorlek:
+      Dash OR Glide OR Sword
+      Bash, Grenade=1, Damage=10
+      Water, WaterDash, Bash, Grenade=1
+      Water, WaterDash, Damage=10
+      HammerSJump=1, HammerSJump=1 OR Damage=10
+      Water, WaterDash, HammerSJump=1
+    kii:
+      Hammer
+      Bash, Grenade=1
+      Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Shuriken=1 OR Flash=1 OR Sentry=1
+      WaterDash, Bash, Water OR Damage=10
+      WaterDash, Damage=10, Damage=10
+      Sentry=3  # two sentries in the air to avoid the first spikes
+    unsafe:
+      Sentry=1, SentrySwap=1
+      Damage=10, Spear=1 OR BlazeSwap=1  # https://youtu.be/Y5nvYJbEtZg
+      BlazeSwap=2 OR PauseHover
+      
+anchor HowlsDen.MidwayBottomLoop at -492, -4459:  # At the Health refill behind the door
+  refill Health=1
+  
+  conn HowlsDen.OutsideSecretRoom: free
   conn HowlsDen.AboveBoneBridge:
     moki:
-      BreakWall=16, DoubleJump, Combat=2xSlug OR Bash
-      BreakWall=16, Dash, Bash, Grenade=1
-      BreakWall=16, Glide, Bash, Grenade=2
       BreakWall=16, Launch
+      BreakWall=16, DoubleJump, Combat=Slug OR Bash
+      BreakWall=16, Dash, Combat=Slug OR Bash
+      BreakWall=16, Bash, Grenade=1, Glide
     gorlek:
-      BreakWall=16, Dash, Combat=2xSlug OR Bash
-      BreakWall=16, Glide, Bash, Grenade=1
-      BreakWall=16, Water, Bash, Grenade=3, Damage=10
-      Hammer, Bash, Grenade=3, Damage=10  # hammer breaks the wall
-      BreakWall=16, Water, WaterDash, Bash, Grenade=2, Damage=10
-      Sword, Bash, Grenade=1  # sword breaks the wall
-      SwordSJump=1  # weapon breaks the wall
-      HammerSJump=1, Glide  # weapon breaks the wall
-      SentryJump=3, Hammer, Damage=10  # hammer breaks the wall
-      Water, WaterDash, HammerSJump=2, Damage=10  # hammer breaks the wall
+      BreakWall=16, DoubleJump OR Dash
+      BreakWall=16, Bash, Grenade=1, Sword OR Hammer OR Damage=10
+      SentryJump=1  # weapon breaks the wall
     kii:
       Hammer
       Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # The last chunck of spikes can repulse sword movement
-      # Base line energy paths (dboost in first spikes chunck)
-      Shuriken=1 OR Flash=1 OR Sentry=1:  # Reach the left platform
-        Damage=10, BreakWall=16, Shuriken=2 OR Flash=2 OR Sentry=2
-      Sentry=5, BreakWall=16  # two sentries in the air to avoid the first spikes
-      # Taking aditional dboost by not hovering above last spikes
-      Shuriken=1, Damage=10, Shuriken=1, Damage=10, BreakWall=16
-      Flash=1, Damage=10, Flash=1, Damage=10, BreakWall=16
-      Sentry=1, Damage=10, Sentry=1, Damage=10, BreakWall=16
-      # Avoiding first dboost by bashing the slime
-      Bash, BreakWall=16, Shuriken=3 OR Flash=3 OR Sentry=3
-      Bash, Shuriken=2 OR Flash=2 OR Sentry=2:
-        Damage=10, BreakWall=16
-      # Avoiding first energy weapon usage by using WaterDash
-      WaterDash, Water OR Damage=10:
-        Bash OR Damage=10:
-          BreakWall=16, Shuriken=2 OR Flash=2 OR Sentry=2
-          Damage=10, BreakWall=16, Shuriken=1 OR Flash=1 OR Sentry=1
+      BreakWall=16, Shuriken=2 OR Flash=2 OR Sentry=2  # bashnade paths are requires the same amount of energy as those
+      BreakWall=16, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Sword
-      BreakWall=16, Shuriken=4
-      BreakWall=16, Spear=1, Damage=10, Spear=1, Spear=1 OR Damage=10  # https://youtu.be/Y5nvYJbEtZg
-      Bash, Grenade=1, BreakWall=16, Grenade=1 OR Shuriken=1 OR Flash=1  # https://youtu.be/e9edNsLqE9Y
-      Bash, WaterDash, Grenade=1, BreakWall=16, Water OR Damage=10
+      BreakWall=16, Spear=1, Spear=1 OR Damage=10  # https://youtu.be/Y5nvYJbEtZg
+      Bash, Grenade=1, BreakWall=16  # https://youtu.be/e9edNsLqE9Y      
 
 anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   refill Checkpoint
