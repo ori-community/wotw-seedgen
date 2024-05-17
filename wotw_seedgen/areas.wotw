@@ -953,12 +953,19 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Bash, Damage=10  # Bash off the fronkey or slime to get to the unstable platform wall jump for the other two jumps
       SentryJump=1  # SentryJump onto the unstable platform, hammer/sword stall to left wall, wall jump to pickup
     kii:
-      Sword OR Hammer OR Bash OR Sentry=3 OR Shuriken=3
+      Sword OR Hammer OR Flash=3 OR Sentry=3  # Shuriken not in kii because throwing it into the platform can push it back
+      Flash=2 OR Sentry=2:
+        Damage=10
     unsafe:
+      Bash
+      Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/ESDKKCgALVc
+      Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10
       GrenadeJump  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
-  pickup HowlsDen.MagnetShard:
+  pickup HowlsDen.MagnetShard:  # Can use the barrier near Sword tree because if it got broken you can just go the long way around for free
     moki: BreakWall=10, BreakWall=16 OR Launch
-    kii: BreakWall=10, DoubleJump, TripleJump
+    kii: BreakWall=10, Bash, Grenade=1
+    unsafe: BreakWall=10, DoubleJump
   pickup HowlsDen.AboveTPEX:
     moki: HowlsDen.BoneBarrier, BreakWall=10
 
@@ -967,17 +974,18 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Launch
       Bash, Grenade=1, DoubleJump, TripleJump
     unsafe: 
-      DoubleJump, Sword  # Door skip
-      DoubleJump, TripleJump
-      Bash, Grenade=1, Grapple  # Zoomie off the mantis
+      DoubleJump, Sword OR TripleJump  # Door skip
+      Bash, DoubleJump  # bash chain
       GrenadeJump, DoubleJump
   conn HowlsDen.OutsideSecretRoom:
     moki, HowlsDen.KeystoneDoor: Water OR DoubleJump OR Dash OR Glide OR Launch
     gorlek, HowlsDen.KeystoneDoor: Sword OR Hammer OR Damage=10
     kii, HowlsDen.KeystoneDoor: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-  conn HowlsDen.AboveBoneBridge:
+    unsafe, HowlsDen.KeystoneDoor: PauseHover
+  conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
-      Bash, Glide OR DoubleJump  # Climbing with mantis (bashing enemy up and jump/glide directly afterwards) (glide can be buffered)
+      MarshSpawn.RainLifted, Bash, Glide  # Bash chain
+      MarshSpawn.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
       SwordSJump=2
   conn HowlsDen.AboveTeleporter:
     moki: HowlsDen.BoneBarrier
