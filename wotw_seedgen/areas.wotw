@@ -869,19 +869,24 @@ anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkEX
     kii, MarshSpawn.HowlBurnt: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # blaze start from the upper platform, the other one from the lower platform
     unsafe: MarshSpawn.HowlBurnt  # precise wjump above the spikes from the lower platform
 
-anchor HowlsDen.UpperLoopExit at -407, -4434:  # Checkpoint inside the bone door where you exit the loop with right hc (you can walk out)
-  refill Checkpoint
+anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where you exit the loop with right hc
+  refill Checkpoint:
+    moki: HowlsDen.UpperLoopExitBarrier
+  refill Health=1
+  
+  state HowlsDen.UpperLoopExitBarrier:
+    moki: BreakWall=16
 
   pickup HowlsDen.RightHC:
     moki: BreakWall=20, Combat=Slug OR Bash OR Launch
     gorlek: BreakWall=20
 
   conn MarshSpawn.HowlsDenEntrance:  # Make sure it's not redundant with paths doing HowlsDen.UpperLoopExit->HowlsDen.AboveBoneBridge->MarshSpawn.HowlsDenEntrance
-    moki: DoubleJump OR Dash
-    gorlek: Glide OR Sword
-    kii: Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: free  # tight jump
-  conn HowlsDen.AboveBoneBridge: free
+    moki: HowlsDen.UpperLoopExitBarrier, DoubleJump OR Dash
+    gorlek: HowlsDen.UpperLoopExitBarrier, Glide OR Sword
+    kii: HowlsDen.UpperLoopExitBarrier, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: HowlsDen.UpperLoopExitBarrier  # tight jump
+  conn HowlsDen.AboveBoneBridge: HowlsDen.UpperLoopExitBarrier
 
 anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through the keydoor
   refill Checkpoint
@@ -902,12 +907,15 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
 
 anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door blocking the loop with the right hc
   refill Checkpoint:
-    moki: BreakWall=16
+    moki: HowlsDen.UpperLoopEntranceBarrier
     unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it
 
+  state HowlsDen.UpperLoopEntranceBarrier:
+    moki: BreakWall=16
+
   pickup HowlsDen.RightHC:
-    moki: BreakWall=16, BreakWall=20, Combat=Slug OR Bash OR Launch
-    gorlek: BreakWall=16, BreakWall=20
+    moki: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20, Combat=Slug OR Bash OR Launch
+    gorlek: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20
 
   conn HowlsDen.BoneBridge: free
   conn HowlsDen.AboveBoneBridge:
@@ -920,16 +928,16 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
       DoubleJump  # wall jump on the small wall between the breakable wall and the spikes
   conn HowlsDen.UpperLoopExit:
     moki:
-      BreakWall=16, BreakWall=16, Combat=Slug, DoubleJump OR Dash
-      BreakWall=16, BreakWall=16, Bash, DoubleJump OR Dash
+      HowlsDen.UpperLoopEntranceBarrier, Combat=Slug, DoubleJump OR Dash
+      HowlsDen.UpperLoopEntranceBarrier, Bash, DoubleJump OR Dash
     gorlek:
-      BreakWall=16, BreakWall=16, DoubleJump OR Dash
-      BreakWall=16, BreakWall=16, Glide, Combat=Slug OR Bash
-      BreakWall=16, BreakWall=16, Sword OR HammerSJump=1
+      HowlsDen.UpperLoopEntranceBarrier, DoubleJump OR Dash
+      HowlsDen.UpperLoopEntranceBarrier, Glide, Combat=Slug OR Bash
+      HowlsDen.UpperLoopEntranceBarrier, Sword OR HammerSJump=1
     kii:
-      BreakWall=16, BreakWall=16, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
-      BreakWall=16, BreakWall=16, WaterDash, Water OR Damage=10
-    unsafe: BreakWall=16, BreakWall=16, Spear=1 OR BlazeSwap=1
+      HowlsDen.UpperLoopEntranceBarrier, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
+      HowlsDen.UpperLoopEntranceBarrier, WaterDash, Water OR Damage=10
+    unsafe: HowlsDen.UpperLoopEntranceBarrier, Spear=1 OR BlazeSwap=1
 
 anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's Den
   refill Checkpoint
