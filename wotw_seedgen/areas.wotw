@@ -1212,6 +1212,48 @@ anchor HowlsDen.DoubleJumpApproach at -436, -4528:  # Checkpoint inbetween the t
       Bash OR SpearJump=1 OR GrenadeJump OR BlazeSwap=1
   conn HowlsDen.Teleporter: free
 
+anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Double Jump Tree
+  refill Checkpoint
+
+  pickup HowlsDen.DoubleJumpEX:  # Exploding enemy only spawn once you have Bash
+    moki: Launch
+    gorlek: SentryJump=1
+    kii:
+      Bash  # The exploding enemy won't spawn if you respawned at the anchor, but then you can use the lizard instead
+    unsafe:
+      DoubleJump, TripleJump  # Triple jump from the right wall
+      SwordJump OR GrenadeJump OR HammerJump
+
+  conn HowlsDen.DoubleJumpTreeArea: free
+  conn HowlsDen.DoubleJumpApproach:
+    moki: DoubleJump OR Launch OR Dash OR Glide
+    gorlek: Sword OR Hammer
+    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+    unsafe: free
+
+anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
+  state HowlsDen.BoneBarrier:
+    unsafe: free  # Getting djump tree remove this barrier
+  state MidnightBurrows.HowlsDenShortcut:
+    unsafe: ShurikenBreak=10
+
+  pickup HowlsDen.DoubleJumpTree: free
+  pickup HowlsDen.StickyShard: free  # origlow
+  pickup HowlsDen.DoubleJumpEX:
+    kii: Dash, DoubleJump, TripleJump  # From Sticky shard. Reset your dash onto the ceiling
+
+  conn HowlsDen.DoubleJumpTreeLedge:
+    moki:
+      DoubleJump OR Glide OR Launch
+      Bash, Grenade=1
+    gorlek: SentryJump=1
+    kii:
+      Bash OR Sword OR Dash OR Sentry=3
+      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+    unsafe: Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2 OR SpearJump=1 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+  conn MidnightBurrows.DenConnection:
+    moki: MidnightBurrows.HowlsDenShortcut
+
 anchor DenShrine at -328, -4569:
   nospawn
   refill Full
@@ -1224,51 +1266,6 @@ anchor DenShrine at -328, -4569:
 
   pickup HowlsDen.CombatShrine:
     moki: HowlsDen.CombatShrineCompleted
-
-anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Double Jump Tree
-  refill Checkpoint
-
-  pickup HowlsDen.DoubleJumpEX:
-    moki: Launch
-    gorlek: SentryJump=1
-    kii:
-      Bash
-      Dash, DoubleJump, TripleJump  # hugging the ceiling from the sticky shard platform
-    unsafe:
-      DoubleJump, TripleJump  # Triple jump from the right wall
-      DoubleJump, Sword  # Jump/Sword combo or pogo on the enemy
-      GrenadeJump
-
-  conn HowlsDen.DoubleJumpTreeArea: free
-  conn HowlsDen.DoubleJumpApproach:
-    moki:
-      DoubleJump
-      Bash, Grenade=1, Dash OR Glide
-      Launch
-    gorlek: SentryJump=1  # Also use weapon stalls
-    kii: Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
-    unsafe: free
-
-anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
-  state HowlsDen.BoneBarrier:
-    unsafe: free  # good game yes
-  state MidnightBurrows.HowlsDenShortcut:
-    unsafe: ShurikenBreak=10
-
-  pickup HowlsDen.DoubleJumpTree: free
-  pickup HowlsDen.StickyShard: free  # origlow
-
-  conn HowlsDen.DoubleJumpTreeLedge:
-    moki:
-      DoubleJump OR Glide OR Launch
-      Bash, Grenade=1
-    gorlek: Sword OR HammerSJump=1
-    kii:
-      Dash OR Sentry=2
-      Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
-    unsafe: Hammer
-  conn MidnightBurrows.DenConnection:
-    moki: MidnightBurrows.HowlsDenShortcut
 
 # checkpoint at -682, -4309
 
