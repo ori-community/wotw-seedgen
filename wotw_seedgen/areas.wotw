@@ -98,7 +98,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
 
   state NonGladesTeleporter: free
   state MarshSpawn.ToOpherBarrier:
-    unsafe: MarshSpawn.RainLifted  # https://youtu.be/2k1foADHu1E
+    unsafe: HowlsDen.RainLifted  # https://youtu.be/2k1foADHu1E
 
   pickup MarshSpawn.FirstPickupEX: free
   pickup MarshSpawn.GrappleHC:
@@ -106,18 +106,18 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     gorlek:
       Grapple, Dash OR Glide OR Sword OR Hammer  # An air combo is enough to get you from the ceiling plant into range of the lower hanging plant
       SentryJump=1, Launch, DoubleJump # sjump->launch up then either djump on the wall for a launch refresh or djump + weapon stall
-      Bash, Grapple, MarshSpawn.RainLifted OR Grenade=1
-      Bash, Launch, Damage=10, MarshSpawn.RainLifted OR Grenade=1
+      Bash, Grapple, HowlsDen.RainLifted OR Grenade=1
+      Bash, Launch, Damage=10, HowlsDen.RainLifted OR Grenade=1
       Bash, Grenade=1, Launch, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
-      Bash, MarshSpawn.RainLifted, Launch, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, HowlsDen.RainLifted, Launch, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
       Grapple, Sentry=1 OR Shuriken=1 OR Flash=1
-      Bash, Launch, MarshSpawn.RainLifted OR Grenade=1
-      MarshSpawn.RainLifted, Launch, Sword  # pogo the mantis between launches
+      Bash, Launch, HowlsDen.RainLifted OR Grenade=1
+      HowlsDen.RainLifted, Launch, Sword  # pogo the mantis between launches
     unsafe:
       Launch  # Launching along the ceiling, starting above the LongSwimEX
       Grapple, Spear=1 OR Blaze=2
-      MarshSpawn.RainLifted, Bash, DoubleJump OR Glide   # Chain bash the mantis
+      HowlsDen.RainLifted, Bash, DoubleJump OR Glide   # Chain bash the mantis
       # Glitched:
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
       HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseHover  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
@@ -129,7 +129,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=1  # Grenade bash straight up from below
     gorlek:
-      MarshSpawn.RainLifted, Bash  # jump the jumper
+      HowlsDen.RainLifted, Bash  # jump the jumper
       Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Sentry=1 OR Flash=1
     unsafe: PauseHover OR FlashSwap
@@ -161,7 +161,7 @@ anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking 
       Sword, Dash
       SentryJump=1
     kii:
-      MarshSpawn.RainLifted, Bash
+      HowlsDen.RainLifted, Bash
       Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
 anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaking bridge
@@ -169,20 +169,20 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
 
   pickup MarshSpawn.ResilienceShard:
     moki: BreakWall=16
-    unsafe: MarshSpawn.RainLifted  # Lure mantis
+    unsafe: HowlsDen.RainLifted  # Lure mantis
   pickup MarshSpawn.ResilienceOre:
     moki: BreakWall=16, Water
     unsafe:
-      MarshSpawn.RainLifted, Water # Lure mantis
-      Damage=40, MarshSpawn.RainLifted OR BreakWall=16
-      Damage=20, WaterDash, MarshSpawn.RainLifted OR BreakWall=16
+      HowlsDen.RainLifted, Water # Lure mantis
+      Damage=40, HowlsDen.RainLifted OR BreakWall=16
+      Damage=20, WaterDash, HowlsDen.RainLifted OR BreakWall=16
   pickup MarshSpawn.BashEC:
     moki: Bash OR Launch
     gorlek: SentryJump=1
-    kii: MarshSpawn.RainLifted, Sword, DoubleJump, TripleJump  # Pogo on the slime
+    kii: HowlsDen.RainLifted, Sword, DoubleJump, TripleJump  # Pogo on the slime
     unsafe:
       DoubleJump, TripleJump  # https://youtu.be/DIIHU4JiAj4
-      MarshSpawn.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
+      HowlsDen.RainLifted, DoubleJump, Sword  # Use pogo of the slime to jump to the ledge
       GrenadeJump  # precise grenade wall jump off of a microwall on the left
   pickup MarshSpawn.PreLupoEX: free
   pickup MarshSpawn.LupoMap:
@@ -192,13 +192,13 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
   conn MarshSpawn.OpherBarrier:
     moki, MarshSpawn.LogBroken:
       DoubleJump OR Dash OR Launch
-      Bash, MarshSpawn.RainLifted OR Grenade=1
+      Bash, HowlsDen.RainLifted OR Grenade=1
     gorlek, MarshSpawn.LogBroken:
       SentryJump=1
       Hammer, Glide
     kii, MarshSpawn.LogBroken:
       Hammer
-      Sword, Glide OR MarshSpawn.RainLifted OR Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1  # pogo / Upslash then use energy weapon
+      Sword, Glide OR HowlsDen.RainLifted OR Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1  # pogo / Upslash then use energy weapon
     unsafe, MarshSpawn.LogBroken:
       Sentry=2  # not lenient enough for kii
       Grenade  # GrenadeJump=1
@@ -210,7 +210,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
     moki: Keystone=2
   state MarshSpawn.TokkBarrier:
     moki: BreakWall=16
-    unsafe: MarshSpawn.RainLifted  # https://youtu.be/bYN3rhRJUAc
+    unsafe: HowlsDen.RainLifted  # https://youtu.be/bYN3rhRJUAc
 
   pickup MarshSpawn.LeverEC:
     moki:
@@ -228,8 +228,8 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       Grapple, Bash, Hammer OR Shuriken=1 OR Sentry=2
       DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from under the grappable plant
       Bash, DoubleJump, Dash, Hammer OR Shuriken=1  # start jumping from under the grappable plant then djump to grab the bashable plant
-      MarshSpawn.RainLifted, Bash  # Lure the mantis, then bash off him
-      MarshSpawn.RainLifted, DoubleJump, Sword  # Lure the mantis near the door then pogo to reach the wall. Upslash to reach the lever
+      HowlsDen.RainLifted, Bash  # Lure the mantis, then bash off him
+      HowlsDen.RainLifted, DoubleJump, Sword  # Lure the mantis near the door then pogo to reach the wall. Upslash to reach the lever
     unsafe:
       SentryJump=1  # max height
       DoubleJump, TripleJump OR Hammer OR Spear=1
@@ -244,7 +244,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       Bash, Grenade=1
     gorlek:
       Dash OR SentryJump=1
-      MarshSpawn.RainLifted, Bash  # enemy that only spawns at daytime
+      HowlsDen.RainLifted, Bash  # enemy that only spawns at daytime
     kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash  # at night there's a slime that works too
@@ -574,7 +574,7 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
     unsafe:
       Damage=90  # dropping down the right drop-down and holding directions for x dboosts: down-right=2, right=3, down-right=1, right=1, up-right=2 and u can see ori again
       WaterDash, Damage=40  # dropping down the right drop-down and waterdashing in direction x times: down-right=1, right=2, down-right=1, right=1, up-right=2 and u can see ori again
-      MarshSpawn.RainLifted, WaterDash, Damage=35  # dboost on the Lizard before going into the water
+      HowlsDen.RainLifted, WaterDash, Damage=35  # dboost on the Lizard before going into the water
   pickup MarshSpawn.BurrowOre:  # make sure its not redundant with MarshSpawn.LeftSpawnSignpost -> MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowOre
     moki:
       Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
@@ -720,7 +720,7 @@ anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
   pickup MarshSpawn.RegenTree: free
   pickup MarshSpawn.RecklessShard:
     moki: BreakWall=10
-    unsafe: MarshSpawn.RainLifted  # https://youtu.be/b31Zd5M4xDg
+    unsafe: HowlsDen.RainLifted  # https://youtu.be/b31Zd5M4xDg
     
   conn MarshSpawn.RegenDoor:
     moki:
@@ -750,42 +750,42 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, MarshSpawn.HowlBurnt:
       BreakWall=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover
-      MarshSpawn.RainLifted, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover  # https://youtu.be/b31Zd5M4xDg
+      HowlsDen.RainLifted, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover  # https://youtu.be/b31Zd5M4xDg
 
   conn MarshSpawn.HowlsDenEntrance:
     moki: MarshSpawn.HowlBurnt
   conn MarshSpawn.HowlApproach:
     moki, MarshSpawn.HowlBurnt:
       DoubleJump OR Launch
-      MarshSpawn.RainLifted, Bash, Grenade=1
+      HowlsDen.RainLifted, Bash, Grenade=1
       Bash, Grenade=2
     gorlek, MarshSpawn.HowlBurnt:
       SentryJump=2
-      Dash, Bash, MarshSpawn.RainLifted OR Grenade=1  # Dash for first jump, bash off fronkey for second
+      Dash, Bash, HowlsDen.RainLifted OR Grenade=1  # Dash for first jump, bash off fronkey for second
     kii:
       Hammer  # upslash -> upslash
-      MarshSpawn.RainLifted, Sword  # upslash for the first gap, then pogo off the mantis for the second gap
-      MarshSpawn.RainLifted, Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # hop to the first ledge and then bash the mantis
+      HowlsDen.RainLifted, Sword  # upslash for the first gap, then pogo off the mantis for the second gap
+      HowlsDen.RainLifted, Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # hop to the first ledge and then bash the mantis
     unsafe, MarshSpawn.HowlBurnt:
       Sword  # upslash then downslash to reach the last platform
-      MarshSpawn.RainLifted, Bash  # Long distance lure for the first jump, simple lure for second
+      HowlsDen.RainLifted, Bash  # Long distance lure for the first jump, simple lure for second
       Dash  # Dash ramp
       Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/v_1aLNaPJeE
       GrenadeJump
   conn MarshSpawn.AboveHowlArena:  #Vine/enemy only spawn once the rain is lifted. Not many paths without RainLifted because it is free from here and adding paths without is only related to the logic filter (for when we add showing states in it)
     moki:
       Launch
-      MarshSpawn.RainLifted, DoubleJump OR Bash
+      HowlsDen.RainLifted, DoubleJump OR Bash
     gorlek:
-      MarshSpawn.RainLifted, Hammer, Dash
+      HowlsDen.RainLifted, Hammer, Dash
       SentryJump=1
       DoubleJump, TripleJump OR Dash
     kii:
       DoubleJump, Glide
-      MarshSpawn.RainLifted, Sword  # Pogo
-      MarshSpawn.RainLifted, Shuriken=1, Hammer OR Spear=1
+      HowlsDen.RainLifted, Sword  # Pogo
+      HowlsDen.RainLifted, Shuriken=1, Hammer OR Spear=1
     unsafe: 
-      MarshSpawn.RainLifted, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/txogGlFUCwU
+      HowlsDen.RainLifted, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/txogGlFUCwU
       GrenadeJump
 
 anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the way to the fang
@@ -802,7 +802,7 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       WaveDash  # Wavedash on the health plant and regen jump
       Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EC
       BlazeSwap=2 OR SentrySwap=2
-      MarshSpawn.RainLifted, Bash, Glide, Dash  # use the enemy for everything
+      HowlsDen.RainLifted, Bash, Glide, Dash  # use the enemy for everything
 
   conn MarshSpawn.MokkTheBrave: free
   conn MarshSpawn.FangPlatform:
@@ -936,7 +936,8 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
 
   state HowlsDen.KeystoneDoor:
     moki: Keystone=2
-  state MarshSpawn.RainLifted: free  # the sword tree
+  state HowlsDen.RainLifted:
+    moki: HowlsDen.SwordTree
   state HowlsDen.BoneBarrier:  # the barrier blocking the lowest part of Howl's Den
     moki: BreakWall=16
 
@@ -981,8 +982,8 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       HammerSJump=1, DoubleJump
   conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
-      MarshSpawn.RainLifted, Bash, Glide  # Bash chain
-      MarshSpawn.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
+      HowlsDen.RainLifted, Bash, Glide  # Bash chain
+      HowlsDen.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
   conn HowlsDen.BoneBridgeDoor:
     moki: HowlsDen.KeystoneDoor
   conn HowlsDen.AboveTeleporter:
@@ -1032,8 +1033,8 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
       Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
       Sentry=3  # two sentries in the air to avoid spikes
       WaterDash, Damage=10, Damage=10
-      MarshSpawn.RainLifted, Bash, Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
-      MarshSpawn.RainLifted, WaterDash, Bash, Water OR Damage=10
+      HowlsDen.RainLifted, Bash, Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
+      HowlsDen.RainLifted, WaterDash, Bash, Water OR Damage=10
     unsafe:
       Sentry=1, SentrySwap=1
       Damage=10, Spear=1 OR BlazeSwap=1  # https://youtu.be/Y5nvYJbEtZg
@@ -1097,7 +1098,7 @@ anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the 
 
   pickup HowlsDen.AboveTPEX:
     moki: BreakWall=10
-    unsafe: HowlsDen.SwordTree  # Seems to be the trigger for spawning the Lizard? Not entirely sure
+    unsafe: HowlsDen.RainLifted  # Seems to be the trigger for spawning the Lizard? Not entirely sure
 
   conn HowlsDen.Teleporter: free
   conn HowlsDen.BoneBridge:
@@ -1231,7 +1232,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   pickup MarshSpawn.BridgeEX:  # paths that can't get to Main
     moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
     gorlek, MarshSpawn.ToOpherBarrier:
-      MarshSpawn.RainLifted, Bash  # jump the jumper
+      HowlsDen.RainLifted, Bash  # jump the jumper
       Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
     kii, MarshSpawn.ToOpherBarrier:
       Sentry=2 OR Shuriken=1 OR Blaze=3
