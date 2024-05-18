@@ -1152,19 +1152,16 @@ anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the 
     kii: HowlsDen.BoneBarrier  # use the left wall, which you can't wjump sometimes
 
 anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
-  # if someone manages to lower the elevator platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
   refill Full
 
-  state HowlsDen.DoubleJumpTreeCombat:  # the game puts this before regen. It's why all the enemies drop tons of health
-    moki: Combat=Mantis+2xLizard+SmallSkeeto  # The SmallSkeeto spawns in this arena if the player has Bash.
   state NonGladesTeleporter: free
 
-  pickup HowlsDen.LaserKS:
+  pickup HowlsDen.LaserKS:  # The Lizard at the lever only spawns when you get DoubleJump
     moki:
-      DoubleJump OR Dash OR Launch
+      DoubleJump OR Launch
       Bash, Grenade=1
     gorlek:
-      SentryJump=1
+      Dash OR SentryJump=1
     kii:
       Hammer OR Bash OR Shuriken=1
       Glide, Flash=1 OR Sentry=1
@@ -1172,28 +1169,48 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     unsafe:
       Sword OR GrenadeJump OR GlideJump
       Glide, Spear=1
-  pickup HowlsDen.DoubleJumpEX:  # paths going through the fight arena; other paths go through DoubleJumpTreeLedge
-    moki: HowlsDen.DoubleJumpTreeCombat
-    kii: Combat=Mantis+2xLizard  # The arena state requires fighting an additional skeeto in case the player has Bash. In kii Bash solves by going around though, so kii can omit the added enemy for this pickup
 
   conn Teleporters: free
   conn DenShrine:
     moki: Hammer OR Spear=1
-  conn HowlsDen.DoubleJumpTreeLedge:
-    moki: HowlsDen.DoubleJumpTreeCombat OR DoubleJump OR Dash OR Glide OR Launch
-    gorlek: Sword OR Hammer
-    kii:
-      Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+  conn HowlsDen.DoubleJumpApproach:  # Don't use the rock, since it can fall in the pit towards the ks
+    moki:
+      DoubleJump OR Launch
+      Glide, Dash
       Bash, Grenade=1
+    gorlek: Hammer OR SwordSJump=1
+    kii:
+      Sword OR Dash OR Spear=1
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: free
   conn HowlsDen.AboveTeleporter:
     moki:
       DoubleJump OR Launch
       Bash, Grenade=1
     gorlek: Bash OR SentryJump=1
     kii:
-      Sword OR Dash OR Hammer  # pogo on the slime for sword, upslash for hammer
-      Spear=1, Glide
-    unsafe: GrenadeJump
+      Sword OR Hammer  # pogo on the slime for sword, upslash for hammer
+      Dash, Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Spear=1 OR Dash OR GrenadeJump OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR GlideJump
+
+anchor HowlsDen.DoubleJumpApproach at -436, -4528:  # Checkpoint inbetween the teleporter and the tree
+  refill Checkpoint
+  
+  state HowlsDen.DoubleJumpTreeCombat:  # the game puts this before regen. It's why all the enemies drop tons of health
+    moki: Combat=Mantis+2xLizard+SmallSkeeto  # The SmallSkeeto spawns in this arena if the player has Bash.
+  
+  pickup HowlsDen.DoubleJumpEX:  # paths going through the fight arena; other paths originate from DoubleJumpTreeLedge
+    moki: HowlsDen.DoubleJumpTreeCombat
+  
+  conn HowlsDen.DoubleJumpTreeLedge:
+    moki: HowlsDen.DoubleJumpTreeCombat OR DoubleJump OR Dash OR Glide OR Launch
+    gorlek: Sword OR Hammer
+    kii:
+      Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+      Bash, Grenade=1
+    unsafe:
+      Bash OR SpearJump=1 OR GrenadeJump OR BlazeSwap=1
+  conn HowlsDen.Teleporter: free
 
 anchor DenShrine at -328, -4569:
   nospawn
@@ -1223,7 +1240,7 @@ anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Doubl
       GrenadeJump
 
   conn HowlsDen.DoubleJumpTreeArea: free
-  conn HowlsDen.Teleporter:
+  conn HowlsDen.DoubleJumpApproach:
     moki:
       DoubleJump
       Bash, Grenade=1, Dash OR Glide
