@@ -1078,11 +1078,7 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   state HowlsDen.SecretRoomWall:  # No paths outside of unsafe because of how weird breaking that wall is
     unsafe: BreakWall=20, Sword OR Hammer OR Bow OR Spear OR Shuriken OR Sentry  # also works with fractured grenade, but not regular grenade
 
-  pickup HowlsDen.LeftHC:  # Paths not using the moss
-    unsafe:
-      GrenadeJump, Damage=10  # gjump into spikes to reach the slime
-
-  conn HowlsDen.SecretRoomAboveSlug:
+  conn HowlsDen.LeftSecretRoom:
     moki:
       DoubleJump OR Dash OR Launch
       Water, WaterDash
@@ -1094,7 +1090,7 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
       WaterDash, Damage=10
       Shuriken=1 OR Flash=1 OR Sentry=1:  # If you jump at the very edge of the blue moss, you'll hit the spikes
         Damage=10
-    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover
+    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseHover
   conn HowlsDen.OutsideSecretRoom:
     moki: HowlsDen.SecretRoomWall
 
@@ -1114,7 +1110,7 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
       Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
     unsafe:
       Bash  # https://youtu.be/EJ9tExwpRjA
-      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseHover OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseHover OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GrenadeJump
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       
   conn HowlsDen.SecretRoom:
