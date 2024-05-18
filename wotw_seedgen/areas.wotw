@@ -1144,12 +1144,12 @@ anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the 
 
   pickup HowlsDen.AboveTPEX:
     moki: BreakWall=10
-    unsafe: HowlsDen.RainLifted  # Seems to be the trigger for spawning the Lizard? Not entirely sure
+    unsafe: HowlsDen.RainLifted
 
   conn HowlsDen.Teleporter: free
   conn HowlsDen.BoneBridge:
     moki: HowlsDen.BoneBarrier, Combat=Slug OR DoubleJump OR Bash OR Launch
-    gorlek: HowlsDen.BoneBarrier
+    kii: HowlsDen.BoneBarrier  # use the left wall, which you can't wjump sometimes
 
 anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
   # if someone manages to lower the elevator platform, they'll manage to get over the gap as well. That's how it works in the base game, that's how it'll work here
@@ -1166,10 +1166,12 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     gorlek:
       SentryJump=1
     kii:
-      Sword OR Hammer OR Bash OR Shuriken=1
-      Glide, Sentry=1 OR Flash=1 OR Spear=1
+      Hammer OR Bash OR Shuriken=1
+      Glide, Flash=1 OR Sentry=1
+      Sword, Flash=1 OR Sentry=1
     unsafe:
-      GrenadeJump
+      Sword OR GrenadeJump OR GlideJump
+      Glide, Spear=1
   pickup HowlsDen.DoubleJumpEX:  # paths going through the fight arena; other paths go through DoubleJumpTreeLedge
     moki: HowlsDen.DoubleJumpTreeCombat
     kii: Combat=Mantis+2xLizard  # The arena state requires fighting an additional skeeto in case the player has Bash. In kii Bash solves by going around though, so kii can omit the added enemy for this pickup
