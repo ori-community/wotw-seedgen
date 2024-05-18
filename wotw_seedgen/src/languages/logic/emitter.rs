@@ -87,6 +87,34 @@ fn build_boss_requirement(health: f32, context: &EmitterContext) -> Requirement 
     }
 }
 
+fn build_swap_requirement(skill: Skill) -> Vec<Requirement> {
+    let mut swappable_skills = vec![
+        Requirement::Skill(Skill::Grenade),
+        Requirement::Skill(Skill::Spear),
+        Requirement::Skill(Skill::Regenerate),
+        Requirement::Skill(Skill::Bow),
+        Requirement::Skill(Skill::Hammer),
+        Requirement::Skill(Skill::Sword),
+        Requirement::Skill(Skill::Shuriken),
+        Requirement::Skill(Skill::Flap)
+    ];
+
+    if skill != Skill::Sentry{
+        swappable_skills.push(Requirement::Skill(Skill::Sentry));
+    }
+    if skill != Skill::Blaze{
+        swappable_skills.push(Requirement::Skill(Skill::Blaze));
+    }
+    if skill != Skill::Flash{
+        swappable_skills.push(Requirement::Skill(Skill::Flash));
+    }
+    if skill != Skill::Launch{
+        swappable_skills.push(Requirement::Skill(Skill::Launch));
+    }
+
+    return swappable_skills;
+}
+
 fn build_requirement<'a>(
     requirement: &parser::Requirement<'a>,
     region: bool,
@@ -207,22 +235,34 @@ fn build_requirement<'a>(
         ),
         parser::RequirementValue::LaunchSwap => build_trick_requirement(
             Trick::LaunchSwap,
-            Requirement::Skill(Skill::Launch),
+            Requirement::And(vec![
+                Requirement::Skill(Skill::Launch),
+                Requirement::Or(build_swap_requirement(Skill::Launch))
+            ]),
             context,
         ),
         parser::RequirementValue::SentrySwap(amount) => build_trick_requirement(
             Trick::SentrySwap,
-            Requirement::EnergySkill(Skill::Sentry, *amount as f32),
+            Requirement::And(vec![
+                Requirement::EnergySkill(Skill::Sentry, *amount as f32),
+                Requirement::Or(build_swap_requirement(Skill::Sentry))
+            ]),
             context,
         ),
         parser::RequirementValue::FlashSwap => build_trick_requirement(
             Trick::FlashSwap,
-            Requirement::NonConsumingEnergySkill(Skill::Flash),
+            Requirement::And(vec![
+                Requirement::NonConsumingEnergySkill(Skill::Flash),
+                Requirement::Or(build_swap_requirement(Skill::Flash))
+            ]),
             context,
         ),
         parser::RequirementValue::BlazeSwap(amount) => build_trick_requirement(
             Trick::BlazeSwap,
-            Requirement::EnergySkill(Skill::Blaze, *amount as f32),
+            Requirement::And(vec![
+                Requirement::EnergySkill(Skill::Blaze, *amount as f32),
+                Requirement::Or(build_swap_requirement(Skill::Blaze))
+            ]),
             context,
         ),
         parser::RequirementValue::WaveDash => build_trick_requirement(
