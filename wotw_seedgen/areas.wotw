@@ -1078,25 +1078,67 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   state HowlsDen.SecretRoomWall:  # No paths outside of unsafe because of how weird breaking that wall is
     unsafe: BreakWall=20, Sword OR Hammer OR Bow OR Spear OR Shuriken OR Sentry  # also works with fractured grenade, but not regular grenade
 
-  pickup HowlsDen.LeftHC:
-    moki:
-      Combat=SneezeSlug, DoubleJump OR Dash
-      Bash, DoubleJump OR Dash
-      Launch
-    gorlek:
-      DoubleJump OR Dash
-      Glide, Combat=SneezeSlug OR Bash  # hold glide before jumping from the moss
-      Sword, Damage=10  # just safety damage
-    kii:
-      Sword OR Hammer OR Sentry=4 OR Flash=4 OR Shuriken=4
-      Spear=4, Damage=10
+  pickup HowlsDen.LeftHC:  # Paths not using the moss
     unsafe:
-      GrenadeJump, Damage=50  # 30dmg get to slime, 10dmg set-up grenade jump, 10mg close gap to HC
-  
+      GrenadeJump, Damage=10  # gjump into spikes to reach the slime
+
+  conn HowlsDen.SecretRoomAboveSlug:
+    moki:
+      DoubleJump OR Dash OR Launch
+      Water, WaterDash
+    gorlek:
+      Glide  # hold glide before jumping from the moss
+      Damage=10, Sword OR Hammer
+    kii:
+      Sword OR Hammer
+      WaterDash, Damage=10
+      Shuriken=1 OR Flash=1 OR Sentry=1:  # If you jump at the very edge of the blue moss, you'll hit the spikes
+        Damage=10
+    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover
   conn HowlsDen.OutsideSecretRoom:
     moki: HowlsDen.SecretRoomWall
 
-# checkpoint at -511, -4479
+anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the moss in the hidden room holding HowlsDen.LeftHC
+  pickup HowlsDen.LeftHC:
+    moki:
+      Combat=SneezeSlug, DoubleJump OR Dash OR Glide
+      Bash, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek: DoubleJump OR Dash OR Sword OR Hammer
+    kii:
+      Glide OR Sword OR Hammer OR Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
+      Damage=10, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+          Damage=10
+      Bash, Shuriken=2 OR Flash=2 OR Sentry=2  # Bash the slug to reach the suspended platform. No Spear because it one shot the slug in easy
+      Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    unsafe:
+      Bash  # https://youtu.be/EJ9tExwpRjA
+      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseHover OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+      Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      
+  conn HowlsDen.SecretRoom:
+    moki:
+      Launch
+      DoubleJump, Bash OR Combat=SneezeSlug
+      Bash, Grenade=1, Dash OR Glide
+    gorlek:
+      DoubleJump OR SentryJump=1
+      Bash, Grenade=1, Sword OR Hammer OR Damage=10
+      Dash, Hammer  # upslash-> hammer to reach the slime's platform
+    kii:
+      Bash, Sword OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the slug to reach the suspended platform then bash a slug's projectile
+      # Paths going back to the moss
+      Dash OR Hammer
+      Sword, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Sword, Water, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Sword, Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # hover with sword to avoid the most water ticks possible
+    unsafe:
+      Bash OR Sword
+      Spear=1, Water OR Grapple OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # https://youtu.be/QYShpOZYmZQ
+      Damage=20, Spear=1
+      Damage=10, Spear=1, WaterDash OR Glide
+      
 # checkpoint at -476, -4441
 
 anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the Sword Tree area and destroying the bone barrier
