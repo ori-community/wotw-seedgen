@@ -147,7 +147,15 @@ anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking 
   state MarshSpawn.ToOpherBarrier:
     moki: BreakWall=16
   state MarshSpawn.LogBroken: free
-    
+  
+  pickup MarshSpawn.BridgeEX:  # paths that can't get to Main
+    moki: Dash OR Glide
+    gorlek:
+      HowlsDen.RainLifted, Bash  # jump the jumper
+      Sword # Long jump, upslash and neutral slashes are enough with both weapons
+    kii, MarshSpawn.ToOpherBarrier:
+      Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+  
   conn MarshPastOpher.MillView:
     moki: MarshSpawn.ToOpherBarrier
   conn MarshSpawn.BrokenBridge:
@@ -1277,46 +1285,49 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   state MarshSpawn.ToOpherBarrier:
     gorlek: ShurikenBreak=16
     unsafe: HammerBreak OR SpearBreak
-  state MarshSpawn.LogBroken:
-    moki: MarshSpawn.ToOpherBarrier
 
-  pickup MarshPastOpher.TrialLeftEX:
-    moki: BreakWall=20, DoubleJump OR Dash OR Glide OR Launch
+  conn OpherShop: free
+  conn MarshPastOpher.TrialStart: free
+  conn MarshSpawn.OpherBarrier:
+    moki: MarshSpawn.ToOpherBarrier
+  conn MarshPastOpher.PoolsPathEast:  # Make sure it's not redundant with paths from MarshPastOpher.BowApproach
+  # the enemies appear once you have water
     gorlek:
-      Sword OR Hammer  # Horizontal slash combo
-      BreakWall=20, Damage=10
-    kii, BreakWall=20:
-       Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
+      Water, Bash, Launch, DoubleJump OR Grenade=1 OR Damage=10
+      Bash, Grenade=1, Launch, DoubleJump OR Grenade=1 OR Damage=10
+    kii:
+      Bash, Launch, Water OR Grenade=1
+      DoubleJump, TripleJump, Bash, Grenade=1, Water OR Grenade=1
+    unsafe:
+      Water, Bash  # https://youtu.be/9LEokEz5GtA
+      DoubleJump, TripleJump, Damage=10
+      SwordJump, Damage=20
+      HammerJump, DoubleJump
+      SentryJump=2  # first one maxheight
+
+anchor MarshPastOpher.TrialStart at -602,-4316:  # Next to the start of the spirit trial
+  refill Checkpoint
+
+  state MarshPastOpher.TrunkWall:
+    moki: BreakWall=20
+    unsafe: free  # https://youtu.be/38jpoWj3Otk
+
   pickup MarshPastOpher.SpiritTrial:
     moki: MarshPastOpher.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: MarshPastOpher.TrialActivation, Dash, Grapple
     unsafe: MarshPastOpher.TrialActivation, Grapple  # https://youtu.be/sFNJzOvtOwM
-  pickup MarshSpawn.BridgeEX:  # paths that can't get to Main
-    moki: MarshSpawn.ToOpherBarrier, Dash OR Glide
-    gorlek, MarshSpawn.ToOpherBarrier:
-      HowlsDen.RainLifted, Bash  # jump the jumper
-      Sword OR Hammer  # Long jump, upslash and neutral slashes are enough with both weapons
-    kii, MarshSpawn.ToOpherBarrier:
-      Sentry=2 OR Shuriken=1 OR Blaze=3
+  pickup MarshPastOpher.TrialLeftEX:
+    moki: MarshPastOpher.TrunkWall, DoubleJump OR Dash OR Glide OR Launch
+    gorlek: MarshPastOpher.TrunkWall, Sword OR Hammer OR Damage=10  # Horizontal slash combo
+    kii: MarshPastOpher.TrunkWall, Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
+    unsafe: MarshPastOpher.TrunkWall  # https://youtu.be/F_4nWtGCcBM
 
-  conn OpherShop: free
-  conn MarshPastOpher.TrialArea:
-    moki: BreakWall=20
-    unsafe: free  # let the mantis jump on the left edge of the log multiple times
+  conn MarshPastOpher.TrialArea:  # Not using the ShurikenBreak path because both walls have the same amount of health and going to the shrine through the trunk is free, making the shuriken break more restrictive than MarshPastOpher.TrunkWall
+    moki: MarshPastOpher.TrunkWall
   conn MarshPastOpher.BowPath:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: free
-  conn MarshSpawn.OpherBarrier:
-    moki: MarshSpawn.ToOpherBarrier
-  conn MarshPastOpher.PoolsPathEast:
-    gorlek:
-      Water, Bash, Launch  # the enemies appear once you have water
-    kii:
-      Launch, DoubleJump 
-    unsafe:
-      Launch
-      SentryJump=2  # first one maxheight
-
+  
 # checkpoint at -603, -4316
 # checkpoint at -573, -4339
 
@@ -1442,11 +1453,9 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
       Bash #you can kite a mantis but it disappears when you die or just bash a slime
     unsafe:
       Grenade=1  # Running GrenadeJump
-  conn MarshPastOpher.TrialArea:
-    moki:
-      BreakWall=20, DoubleJump OR Dash OR Glide OR Launch
-      BreakWall=20, Bash, Grenade=1
-    gorlek: BreakWall=20  # the one-way has 20 health as well, so there are no relevant shurikenbreak paths here
+  conn MarshPastOpher.TrialStart:  # Make sure it's not redundant with MarshPastOpher.BowPath->MarshPastOpher.MillView->MarshPastOpher.TrialStart
+    moki: Bash, Grenade=1
+    gorlek: free
 
 anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above the scenic mill view
   refill Checkpoint
@@ -1482,7 +1491,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Launch, Sentry=2 OR Flash=2 OR Shuriken=2 # you can do it with one sentry but the second one is for leniency with the last jump from the platform to the anchor
       Glide, DoubleJump, Bash, BreakWall=12 
     unsafe:
-      Launch, Bash  # You can bash the lanterns without freeing them from the blob
+      Launch
       Dash, Regenerate, DoubleJump, TripleJump, SentryJump=1 OR Damage=20  # wavedash off health plant
       Dash, Regenerate, DoubleJump, Glide, SentryJump=1 OR Damage=40  # wavedash off health plant
 
