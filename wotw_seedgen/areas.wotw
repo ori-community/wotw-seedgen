@@ -1305,7 +1305,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
       HammerJump, DoubleJump
       SentryJump=2  # first one maxheight
 
-anchor MarshPastOpher.TrialStart at -602,-4316:  # Next to the start of the spirit trial
+anchor MarshPastOpher.TrialStart at -602, -4316:  # Next to the start of the spirit trial
   refill Checkpoint
 
   state MarshPastOpher.TrunkWall:
@@ -1316,22 +1316,36 @@ anchor MarshPastOpher.TrialStart at -602,-4316:  # Next to the start of the spir
     moki: MarshPastOpher.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: MarshPastOpher.TrialActivation, Dash, Grapple
     unsafe: MarshPastOpher.TrialActivation, Grapple  # https://youtu.be/sFNJzOvtOwM
-  pickup MarshPastOpher.TrialLeftEX:
-    moki: MarshPastOpher.TrunkWall, DoubleJump OR Dash OR Glide OR Launch
-    gorlek: MarshPastOpher.TrunkWall, Sword OR Hammer OR Damage=10  # Horizontal slash combo
-    kii: MarshPastOpher.TrunkWall, Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
-    unsafe: MarshPastOpher.TrunkWall  # https://youtu.be/F_4nWtGCcBM
 
-  conn MarshPastOpher.TrialArea:  # Not using the ShurikenBreak path because both walls have the same amount of health and going to the shrine through the trunk is free, making the shuriken break more restrictive than MarshPastOpher.TrunkWall
+  conn MarshPastOpher.UnderTrunk:
     moki: MarshPastOpher.TrunkWall
   conn MarshPastOpher.BowPath:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: free
-  
+  # Not using the ShurikenBreak path because both walls have the same amount of health and going to the shrine through the trunk is free, making the shuriken break more restrictive than MarshPastOpher.TrunkWall
+
 # checkpoint at -603, -4316
 # checkpoint at -573, -4339
 
-anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
+anchor MarshPastOpher.UnderTrunk at -573, -4339:  # After breaking the tree trunk next to MarshPastOpher.TrialStart
+  refill Checkpoint
+  
+  state MarshPastOpher.TrunkWall:
+    unsafe:
+      BreakWall=20, Sword OR Hammer OR Blaze OR Sentry OR Grenade  # Not hard to do but too obscure for others difficulties
+      ShurikenBreak=20
+  
+  pickup MarshPastOpher.TrialLeftEX:
+    moki: DoubleJump OR Dash OR Glide OR Launch
+    gorlek: Sword OR Hammer OR Damage=10  # Horizontal slash combo
+    kii: Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
+    unsafe: free  # https://youtu.be/F_4nWtGCcBM
+
+  conn MarshPastOpher.TrialArea: free
+  conn MarshPastOpher.TrialStart:
+    moki: MarshPastOpher.TrunkWall
+
+anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
   refill Checkpoint
   refill Health=1:  # right below
     moki: DoubleJump OR Dash OR Glide OR Launch
@@ -1344,23 +1358,6 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
     gorlek: Grapple, DoubleJump OR Dash OR Glide OR Damage=10
     unsafe: Grapple
 
-  pickup MarshPastOpher.TrialLeftEX:
-    moki:
-      DoubleJump, Dash OR Glide
-      Dash, Glide
-      Grapple OR Launch
-    gorlek:
-      DoubleJump
-      Damage=10, Dash OR Glide OR Sword OR Hammer
-    kii:
-      Damage=10, Sentry=1 OR Shuriken=1 OR Flash=1 OR Blaze=1 
-      Glide, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 # upslash to avoid the spikes
-      Dash # doubledash from the pole
-      Sword # may be a little bit too precise
-    unsafe:
-      Grenade=1, Bash # standing on a piece of wood on the edge of the spikes
-      Sentry=1, Damage=10
-      Damage=20
   pickup MarshPastOpher.TrialOre: free
   pickup MarshPastOpher.TrialEC:
     moki: DoubleJump OR Dash OR Glide OR Launch
@@ -1370,34 +1367,45 @@ anchor MarshPastOpher.TrialArea at -427, -4343:  # Next to the combat shrine
     kii:
       Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
       Damage=10, Spear=1 OR Blaze=1
-      Damage=20 #lenient option
     unsafe:
-      Grenade=1, Bash  # Throw Grenade up at the lower jumppad (right side and aim up ori facing right), use it and then bash
       Damage=10
+      Grenade=1 OR GrenadeCancel # Use grenade before landing on the left bouncepad
   pickup MarshPastOpher.TrialHC:
     moki: Hammer OR Spear=1
-    kii: free  # mantis lure
+    unsafe: free  # the mantis usually jump into spikes
   pickup MarshPastOpher.TrialRightEX:
-    moki: DoubleJump OR Bash OR Launch  # bash uses the enemy
+    moki: DoubleJump OR Launch
     gorlek: SentryJump=1
-    kii: 
-      Dash #normal coyote (may be too precise)
-      Sword #pogo on the enemy
-    unsafe: Dash OR Sword OR Hammer OR Grenade=1 OR Spear=1 # Sword: pogo on enemy, Hammer: upswing to reach ledge
+    kii:
+      Bash  # the mantis usually jump into spikes but you can use th slime instead
+      Dash, Sword OR Hammer
+    unsafe:
+      Dash OR Spear=1 OR GrenadeJump OR GlideJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
 
   conn MarshShrine: free
+  conn MarshPastOpher.UnderTrunk:  # Make sure it's not redundant with MarshPastOpher.TrialArea->MarshPastOpher.BowPath->MarshPastOpher.UnderTrunk
+    moki:
+      DoubleJump, Dash OR Glide
+      Dash, Glide
+      Grapple OR Launch
+    gorlek:
+      Damage=10, DoubleJump OR Dash OR Glide
+    kii: Damage=20  # If you jump at the wrong place, you'll take another dboost
+    unsafe:
+      Dash OR DoubleJump OR Damage=10 OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap
+      Spear=1  # https://youtu.be/EYPELh1H0UY
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Grenade=1, Bash # standing on a piece of wood on the edge of the spikes
   conn MarshPastOpher.BowPath:
     moki, BreakWall=20:
       Bash, DoubleJump OR Dash OR Glide OR Grapple OR Launch
       Combat=Mantis+SneezeSlug, DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek, BreakWall=20:
-      Bash, Sword OR Hammer
+      Sword OR Hammer OR Launch
       Bash, Grenade=1
-      Combat=Mantis+SneezeSlug, Sword OR Hammer
-      Launch
-    kii, BreakWall=20:
-      Shuriken=3 OR Sentry=4 OR Blaze=6 #OMEGALUL
-
+    kii, BreakWall=20: Bash OR Shuriken=3 OR Sentry=4 OR Blaze=6
+    unsafe: Bash OR DoubleJump OR Dash OR Glide OR Grapple OR Launch OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseHover #  https://youtu.be/4TnvbyW1BHE
+    
 anchor MarshShrine at -382, -4341:
   nospawn
   refill Full
