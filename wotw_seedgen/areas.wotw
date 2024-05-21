@@ -1423,32 +1423,33 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
   refill Energy=1:
     moki: BreakCrystal
 
-  pickup MarshPastOpher.SwingPoleEX:
+  pickup MarshPastOpher.SwingPoleEX:  # Make sure it's not redundant with MarshPastOpher.BowPath->MarshPastOpher.BowApproach->MarshPastOpher.SwingPoleEX
     moki:
-      Damage=10, DoubleJump OR Dash OR Glide OR Launch
+      Damage=10, Dash OR Glide
       Damage=10, Bash, Grenade=2
     gorlek:
-      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Launch  # it's notably harder to get without taking a hit. Up and/or Side combos with sword or hammer can make it to the horizontal branch from the launch pad.
-      Bash, Grenade=1
+      Damage=10, Sword OR Hammer
+      Damage=10, Bash, Grenade=1
     kii:
-      Sentry=2 OR Blaze=3
-    unsafe:
-      Bash  # the mantis disappears if you die
-      Damage=10, Grenade=1  # GrenadeJump onto the pole; may be possible without taking damage
+      Bash, Damage=10  # the mantis disappears when spawning at this anchor but you can use the slime instead
+      Damage=10, Blaze=3 OR Sentry=2
+    unsafe: Bash OR Shuriken=1 OR Blaze=2 OR Sentry=2
 
   conn MarshPastOpher.BowApproach:
     moki: DoubleJump OR Launch
     gorlek:
       Dash
       Bash, Grenade=2
+      Glide, Sword OR Hammer
     kii:
       Sword OR Hammer
       Sentry=3
       Sentry=2, Shuriken=1 OR Flash=1
-      Blaze=3, Shuriken=1 OR Sentry=1 OR Flash=1
+      Blaze=3, Spear=1 OR Shuriken=1 OR Flash=1
     unsafe:
-      Sword OR Hammer OR Sentry=1
-      Grenade=2, Damage=10
+      Glide  # make the suspended platform swing
+      Shuriken=2 OR GrenadeJump
+      Blaze=2, Spear=1 OR Flash=1  # using shuriken is more energy than Shuriken=2 / using sentry is the same energy requirement as Sentry=3
   conn MarshPastOpher.MillView:
     moki:
       DoubleJump OR Dash OR Glide OR Launch
@@ -1456,11 +1457,8 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
-    kii:
-      Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2 OR Spear=1
-      Bash #you can kite a mantis but it disappears when you die or just bash a slime
-    unsafe:
-      Grenade=1  # Running GrenadeJump
+    kii: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Bow=1 OR Grenade=1 OR GrenadeCancel OR PauseHover
   conn MarshPastOpher.TrialStart:  # Make sure it's not redundant with MarshPastOpher.BowPath->MarshPastOpher.MillView->MarshPastOpher.TrialStart
     moki: Bash, Grenade=1
     gorlek: free
@@ -1471,7 +1469,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
 
   pickup MarshPastOpher.SwingPoleEX:
     moki: Damage=10
-    gorlek: free
+    unsafe: free
 
   conn MarshPastOpher.BowPath: free
   conn MarshPastOpher.BowArea:
