@@ -1290,11 +1290,11 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   conn MarshPastOpher.TrialStart: free
   conn MarshSpawn.OpherBarrier:
     moki: MarshSpawn.ToOpherBarrier
-  conn MarshPastOpher.PoolsPathEast:  # Make sure it's not redundant with paths from MarshPastOpher.BowApproach
+  conn MarshPastOpher.OpherSkipBranch:  # Check for redundancy with 
   # the enemies appear once you have water
     gorlek:
-      Water, Bash, Launch, DoubleJump OR Grenade=1 OR Damage=10
-      Bash, Grenade=1, Launch, DoubleJump OR Grenade=1 OR Damage=10
+      Launch, Bash, Water OR Grenade=1
+      Launch, DoubleJump
     kii:
       Bash, Launch, Water OR Grenade=1
       DoubleJump, TripleJump, Bash, Grenade=1, Water OR Grenade=1
@@ -1304,6 +1304,25 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
       SwordJump, Damage=20
       HammerJump, DoubleJump
       SentryJump=2  # first one maxheight
+      
+anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
+# This anchor is a midway for going to MarshPastOpher.PoolsPathEast, since both paths from MarshPastOpher.MillView and MarshPastOpher.BowApproach want to reach that branch
+# So all connections towards MarshPastOpher.PoolsPathEast should check for redundancy with MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast since it's the "main" way to access PoolPathEast
+# Likewise, all paths connecting to that anchor should check for redundancy with MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
+  conn MarshPastOpher.MillView: free
+  conn MarshPastOpher.PoolsPathEast: 
+    gorlek:
+      Launch, DoubleJump OR Damage=10  # djump/damage/bashnade for leniency because the camera is weird here
+      Launch, Bash, Grenade=1
+    kii:
+      Launch
+      Bash, Grenade=1, DoubleJump, TripleJump
+    unsafe:
+      Water, Bash  # https://youtu.be/9LEokEz5GtA
+      DoubleJump, TripleJump, Damage=10
+      DoubleJump, Damage=20
+      HammerJump, DoubleJump OR Damage=10
+      SentryJump=1
 
 anchor MarshPastOpher.TrialStart at -602, -4316:  # Next to the start of the spirit trial
   refill Checkpoint
@@ -1498,8 +1517,11 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Glide, DoubleJump, Bash, BreakWall=12 
     unsafe:
       Launch
-      Dash, Regenerate, DoubleJump, TripleJump, SentryJump=1 OR Damage=20  # wavedash off health plant
-      Dash, Regenerate, DoubleJump, Glide, SentryJump=1 OR Damage=40  # wavedash off health plant
+  conn MarshPastOpher.OpherSkipBranch:  # Make sure it's not redundant with MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch nor MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
+    unsafe:
+      PauseHover  # I hope it'll make you regret playing with that trick in logic
+      WaveDash, Glide  # wavedash off health plant
+      WaveDash, DoubleJump, Sword OR Hammer
 
 anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit with bow tree.
   refill Energy=1:
@@ -1587,7 +1609,7 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       Bash
       Combat=Bat, Launch  # About a 45° angle from under the second bat to avoid a damage boost
       DoubleJump, TripleJump, Sword  # Use Sword on bats to regain TripleJump. Jump at the tiny ledges of the branches. Pogo on Crab
-  conn MarshPastOpher.MillView: free
+  conn MarshPastOpher.OpherSkipBranch: free
 
 anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable floor
   refill Checkpoint
