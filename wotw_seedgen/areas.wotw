@@ -1544,15 +1544,17 @@ anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit wi
       Combat=Skeeto, Bow=2, DoubleJump
       Launch
     gorlek:
-      SentryJump=2 OR DoubleJump  # can kill the skeeto with your weapon if desired on the sentryjump path
-      Combat=Skeeto, Bow=2, Dash OR Glide OR Sword OR Hammer
+      SentryJump=2  # can kill the skeeto with your weapon if desired on the sentryjump path
+      DoubleJump, TripleJump
+      Combat=Skeeto, Bow=2, Dash OR Sword OR Hammer
       Bash, Bow=2, Dash OR Glide OR Sword OR Hammer
       Bash, Grenade=2
     kii:
-      Bow=2, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Sword OR Hammer OR Dash OR Glide
+      Bow=2, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Dash
     unsafe:
-      Bash  # Repositioning the Skeeto
-      Bow=2, Sticky  # maybe possible without Sticky
+      Bash  # Repositioning the Skeeto. The skeeto doesn't spwn if you spawned at this anchor but you can go to the right and come back by bashing the lizard
+      Bow=2 OR DoubleJump OR Dash
   conn WestHollow.Entrance:
     moki: MarshPastOpher.EyestoneDoor  # crosses where the water would usually be
   conn MarshPastOpher.BowApproach:
@@ -1560,7 +1562,10 @@ anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit wi
       DoubleJump OR Dash OR Launch
       Combat=Skeeto, Bow=1
     gorlek: Bash OR Sword OR Damage=10
-    kii: Glide OR Hammer OR Sentry=2 OR Shuriken=1
+    kii:
+      Glide OR Hammer OR Sentry=2 OR Shuriken=1
+      Bow=1
+    unsafe: Flash=1 OR Sentry=1 OR GrenadeJump OR PauseHover
 
 anchor MarshPastOpher.UpperBowArea at -437, -4211:  # Between the eyestones
   refill Checkpoint
