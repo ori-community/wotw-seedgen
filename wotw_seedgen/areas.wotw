@@ -1318,7 +1318,7 @@ anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
       Launch
       Bash, Grenade=1, DoubleJump, TripleJump
     unsafe:
-      Water, Bash  # https://youtu.be/9LEokEz5GtA
+      Water, Bash  # Second part of this video https://youtu.be/9LEokEz5GtA (drop down to MillView to actually start the path)
       DoubleJump, TripleJump, Damage=10
       DoubleJump, Damage=20
       HammerJump, DoubleJump OR Damage=10
@@ -1496,7 +1496,8 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=1
     gorlek: Sword OR Hammer OR Damage=10
-    kii: Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2
+    kii: Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Spear=1 OR Blaze=2 OR GrenadeCancel OR PauseHover OR BlazeSwap=1
   conn MarshPastOpher.MillView:
     moki: Bash, Grenade=1  # this is the only non-redundant connection that will ever exist.
   conn MarshPastOpher.PoolsPathEast:
@@ -1505,17 +1506,22 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Bow=4, Bash, Launch  # autoaim doesn't catch the second target, 2 is needed minimum
     gorlek:
       Bow=2, Bash, Launch  # the moki path, but without safety energy
-      Bow=2, DoubleJump, Bash, TripleJump OR Dash OR Glide
-      Launch, DoubleJump OR Dash OR Glide  # For the last part reset your Launch on the wall above the lantern
+      Bow=2, DoubleJump, Bash, TripleJump OR Glide
+      Launch, Glide
     kii:
-      Spear=3, Bash, Launch # the gorlek path, but with a spear (3rd spear because the slime in the middle of the ceiling can steal the spear)
-      Spear=3, Bash, DoubleJump, TripleJump OR Dash OR Glide
-      Bow=2, Bash, DoubleJump, Hammer OR Sword #its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
-      Spear=3, Bash, DoubleJump, Hammer OR Sword
-      Launch, Sword OR Hammer
-      Launch, Sentry=2 OR Flash=2 OR Shuriken=2 # you can do it with one sentry but the second one is for leniency with the last jump from the platform to the anchor
-      Glide, DoubleJump, Bash, BreakWall=12 
+      Launch, Bow=2 OR Spear=3  # break corruption blobs and reset your launch everywhere
+      Launch, Spear=2, Grenade=1  # same as bove but more energy efficient
+      Launch, DoubleJump OR Dash OR Sword OR Hammer  # Sword/Hammer can break the 2nd corruption blob to reset launch. Pass underneath it and refresh launch on the next wall otherwise
+      Launch, Bow=1, Sentry=1 OR Flash=1 OR Shuriken=1  # 
+      Launch, Spear=1, Sentry=1 OR Flash=1 OR Shuriken=1
+      Bash, DoubleJump, TripleJump, Sword OR Hammer OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1 OR Blaze=1  # sentry doesn't target those blobs so can't use BreakWall
+      Spear=3, Bash, DoubleJump, Dash OR Glide OR Hammer OR Sword
+      Spear=2, Grenade=1, Bash, DoubleJump, Dash OR Glide OR Hammer OR Sword  # Same as above but more energy efficient
+      Bow=2, Bash, DoubleJump, Dash OR Hammer OR Sword  # its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
     unsafe:
+      Bow=2 OR Spear=2 OR Grenade=2:
+        Bash, DoubleJump OR Dash OR Sword OR Hammer  # https://youtu.be/LeoIWBsq-s0
+      Bash, Glide, Bow=1 OR Spear=1 OR Grenade=1 OR Shuriken=1  # https://youtu.be/LJmKEirEloM
       Launch
   conn MarshPastOpher.OpherSkipBranch:  # Make sure it's not redundant with MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch nor MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
     unsafe:
