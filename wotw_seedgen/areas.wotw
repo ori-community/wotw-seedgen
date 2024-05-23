@@ -1603,9 +1603,10 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       SwordSJump=1
       HammerSJump=1, DoubleJump OR Dash
     kii:
-      Bash, Grenade=1, Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
+      Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Dash #coyote, may be too precise 
     unsafe:
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash  # Repositioning the squonkey: squonkey respawns when u jump off to the east and back on the ledge
 
   conn MarshPastOpher.PoolsPathMiddle:  # the squonkey doesn't reappear if you respawn on this checkpoint
@@ -1614,12 +1615,12 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       Bash, Dash  # the bat is weird
       Combat=Bat, Launch, DoubleJump OR Dash
     kii:
-      Bash, Sword OR Hammer # the bat is very weird
-      Bash, Sentry=2 OR Shuriken=2 #very weird
+      Bash, Grenade=1, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # grenade to reach 2nd spider, rest for going above the 1st spikes
+      Bash, Damage=10, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # take a dboost in order to reach the 2nd spider
     unsafe:
-      Bash
-      Combat=Bat, Launch  # About a 45° angle from under the second bat to avoid a damage boost
-      DoubleJump, TripleJump, Sword  # Use Sword on bats to regain TripleJump. Jump at the tiny ledges of the branches. Pogo on Crab
+      Launch
+      Bash, Hammer OR Flash=1 OR Sentry=1 OR Damage=10  # Would be just bash if the second bat was dropping a bit from time to time 
+      DoubleJump, Sword  # https://youtu.be/5DXMPrR-RZo
   conn MarshPastOpher.OpherSkipBranch: free
 
 anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable floor
