@@ -1721,6 +1721,27 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
     unsafe:
       Damage=30  # dboost in the spikes, land on the friendly spike
       Damage=20, Sword  # pogo the mortar projectile as it touches the ground
+  conn MarshPastOpher.PoolsPathEast:  # Paths going backward to break the floor/ceiling
+  # No paths with Bash because then you can go to PoolsPathOneWayWall and destroy the wall with either hammer or a single spear
+    gorlek:
+      Glide, Hammer  # upslash while gliding to avoid the spikes
+      Glide, Spear=1, DoubleJump OR Dash
+      DoubleJump, Dash, Hammer OR Spear=1
+      DoubleJump, Sword, Hammer OR Spear=1
+      Water, WaterDash, Hammer OR Spear=1
+      Damage=10, WaterDash, Hammer
+    kii:
+      Hammer, Dash OR DoubleJump
+      Dash, Spear=1, Water OR Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # refresh dash into mushroom bellow the mortar
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Spear=1, Damage=10 OR Water
+      DoubleJump, TripleJump, Spear=1
+      Damage=20, WaterDash, Spear=1
+      Damage=10, WaterDash, Spear=1, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      DoubleJump, Spear=2
+      DoubleJump, Spear=1, Water OR Damage=10 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
+      Damage=10, WaterDash, Spear=1
       
 anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPastOpher.PoolsPathEX
   refill Checkpoint
