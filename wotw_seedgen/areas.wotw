@@ -1748,45 +1748,50 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
 
   pickup MarshPastOpher.PoolsPathEX: free
 
-  conn MarshPastOpher.PoolsPathOneWayWall:
+  conn MarshPastOpher.PoolsPathOneWayWall:  # Make sure it's not redundant with going to MarshPastOpher.PoolsPathBellowOneWayWall first
     moki:
-      DoubleJump, Bash, Dash OR Glide
+      Bash, DoubleJump, Dash OR Glide
       Bash, Grenade=1, Dash, Glide
       Launch, DoubleJump OR Dash OR Bash OR Glide
     gorlek:
-      DoubleJump, Bash, Sword OR Hammer OR TripleJump OR Damage=10
-      Dash, Bash, Glide OR Sword OR Hammer OR Damage=10
-      Sword, Bash, Damage=10
+      Bash, DoubleJump, Sword OR Hammer OR TripleJump
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, Dash, Glide OR Sword OR Hammer
       SentryJump=1, Bash, Damage=10  # land in the spikes, bash the lantern then air combo with sword or hammer to reach the patform
-      DoubleJump, TripleJump, Dash OR Glide OR Damage=10
-      DoubleJump, TripleJump, SentryJump=1  # triple jump from the left wall + air combo with sword or hammer. sjump to reach the platform
+      DoubleJump, TripleJump, Glide OR Damage=10
       DoubleJump, Damage=10, Dash OR Glide OR Sword OR Hammer
       Dash, Damage=10, Sword OR Hammer
       SwordSJump=1, Damage=10
-      Bash, Grenade=1, DoubleJump OR Dash OR Damage=10
       Launch  # Reset Launch by hitting the ceiling
     kii:
-      Damage=20, Sentry=3
-      DoubleJump, Shuriken=1, Damage=10
       Bash, Damage=20
-      Bash, Damage=10, Glide
+      Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Sword, Damage=10
+      Glide, Damage=10, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Hammer, Shuriken=1 OR Flash=1 OR Sentry=1:  # use the first energy weapon before hitting the spikes
+        Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=20, Sentry=3
+      DoubleJump, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Dash
       Damage=10, Dash OR Sword
     unsafe:
-      Damage=10, DoubleJump
-      Damage=10, Glide, Hammer
-      Damage=10, Bash
+      Damage=10, DoubleJump OR Hammer OR Bash
       Bash, Grenade=1  # bash grenade near the spikes, bash glide of the lantern
       SentryJump=1, Bash
   conn MarshPastOpher.PoolsPathBellowOneWayWall:
     gorlek:
-      Glide, DoubleJump, Hammer OR Spear=1  # go below and break the floor
-      Glide, Dash, Hammer OR Spear=1  # go below and break the floor
+      Bash, Grenade=1, Damage=10
+      Damage=10, DoubleJump OR Dash
+      DoubleJump, TripleJump, Sword OR Hammer
+      Glide, DoubleJump OR Dash
     kii:
       Dash, Damage=10, Hammer OR Spear=1 #from the below
       DoubleJump, TripleJump, Damage=10, Hammer OR Spear=1 #from the below
-      Glide, Damage=10, Hammer OR Spear=1 #from the below, hammer upslash to avoid the damage
-      Water, WaterDash, Damage=40, Hammer OR Spear=1
+      Damage=10, Glide OR Hammer
+      Damage=20, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=30
     unsafe:
+      GlideJump OR PauseHover
       HammerSJump=1, Damage=10 OR Water  # hammer breaks the wall, can avoid the damage boost but will land in water
   conn PoolsApproach.MarshBreakableWall:
     gorlek: ShurikenBreak=20
