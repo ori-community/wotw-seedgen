@@ -22,6 +22,7 @@ MarshSpawn.BurrowsApproachLedgeEX, Inkwater Marsh, SpiritLight, 50, howlsOriginG
 MarshSpawn.CrusherSwimEX, Inkwater Marsh, SpiritLight, 200, howlsOriginGroup, 24922, largeExpA, 62138, , -979.7, -4509.3, -979.67, -4509.34
 MarshSpawn.TokkTabletQuest, Inkwater Marsh, Quest, SL1000, npcsStateGroup, 48248, inkwaterWellQuest, 18458, 4, -932, -4494, -928.5, -4491.8
 MarshSpawn.RecklessShard, Inkwater Marsh, Shard, Reckless, pickupsGroup, 23987, recklessShardPickup, 9864, , -499.2, -4411.0, -499.24, -4409.98
+MarshSpawn.MokkEX, Inkwater Marsh, SpiritLight, 50, swampStateGroup, 21786, xpOrbB, 43668, , -434.3, -4419.8, -434.31998, -4419.7603
 MarshSpawn.FangEC, Inkwater Marsh, Resource, Energy, swampStateGroup, 21786, halfEnergyCellA, 61706, , -233.4, -4384.4, -233.37244, -4383.35
 MarshSpawn.FangQI, Inkwater Marsh, Quest, Fang, questUberStateGroup, 14019, braveMokiItemCollected, 27539, , -221.9, -4406.5, -221.93663, -4406.473
 MarshSpawn.MokkFangQuest, Inkwater Marsh, Quest, Ore, questUberStateGroup, 14019, braveMokiQuest, 15983, 3, -391, -4414, -388.5, -4412.6
@@ -34,7 +35,6 @@ MidnightBurrows.LowerKS, Midnight Burrows, Resource, Keystone, howlsOriginGroup,
 MidnightBurrows.LupoMap, Midnight Burrows, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapHowlsOrigin, 45538, , -870, -4555, -870, -4555
 MidnightBurrows.DeflectorShard, Midnight Burrows, Shard, Deflector, howlsOriginGroup, 24922, spiritShard, 46311, , -773.6, -4527.5, -773.63, -4526.525
 MidnightBurrows.TabletQI, Midnight Burrows, Quest, Tablet, questUberStateGroup, 14019, howlsOriginTreasureCollected, 52747, , -848.7, -4529.1, -848.74, -4529.09
-HowlsDen.UpperEX, Inkwater Marsh, SpiritLight, 50, swampStateGroup, 21786, xpOrbB, 43668, , -434.3, -4419.8, -434.31998, -4419.7603
 HowlsDen.RightHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, halfHealthCellA, 28908, , -332.3, -4438.6, -332.26, -4437.58
 HowlsDen.LeftHC, Inkwater Marsh, Resource, Life, inkwaterMarshStateGroup, 9593, healthContainer, 61304, , -569.7, -4454.1, -569.7299, -4453.08
 HowlsDen.AboveDoorKS, Inkwater Marsh, Resource, Keystone, swampStateGroup, 21786, keyStone, 22068, , -439.5, -4461.4, -439.52002, -4461.38
