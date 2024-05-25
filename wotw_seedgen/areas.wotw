@@ -1650,7 +1650,7 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       Bash OR Launch OR SentryJump=1
       DoubleJump, TripleJump
     unsafe, ShurikenBreak=20: DoubleJump OR GlideJump OR GrenadeJump
-  conn MarshPastOpher.PoolsPathBellowOneWayWall:  # the squonkey doesn't reappear if you respawn on this checkpoint
+  conn MarshPastOpher.PoolsPathBellowOneWayWall:
     moki:
       Bash, DoubleJump OR Launch
       Launch, Water, Hammer OR Spear=1
@@ -1668,14 +1668,18 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
     unsafe:
       DoubleJump, Spear=1, TripleJump OR Dash OR Water OR Sword OR Damage=10  # https://youtu.be/jbkDaPma9ZE
       Hammer, Bash OR DoubleJump
-      Hammer, Damage=70  # It's possible with 60dmg, but really precise
+      Hammer, Damage=10, Damage=20  # https://youtu.be/Qt6Jfi3675I
+      Hammer, Water, Damage=20
   conn MarshPastOpher.PoolsPathEast:
     moki: Bash
     gorlek:
       Glide, DoubleJump OR Dash OR Launch
       Damage=10  # more other paths would exist, but seem difficult to do damageless themselves
     kii:
-      Glide OR DoubleJump OR Dash OR Launch
+      Glide OR DoubleJump OR Dash OR Launch OR Sentry=2
+    unsafe:
+      Sword OR Shuriken=1
+      Damage=5, Hammer OR Blaze=2 # Take a dboost on the bat projectile instead of the spikes 
 
 anchor MarshPastOpher.PoolsPathOneWayWall at -744, -4173:  # Left of the one way wall next to the mortar
   refill Checkpoint:
