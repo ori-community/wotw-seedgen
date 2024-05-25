@@ -1698,14 +1698,12 @@ anchor MarshPastOpher.PoolsPathOneWayWall at -744, -4173:  # Left of the one way
       Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=10
     kii:
       Launch
-      Bash, Hammer OR Shuriken=2 OR Sentry=3
+      Bash, Hammer
       Damage=20, DoubleJump OR Dash OR Sentry=3
       DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
     unsafe:
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover  # https://youtu.be/z61PU_x49ko
-      Damage=40
-      Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=20, Hammer OR Sentry=2
       Damage=10, DoubleJump OR Dash OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump
       
@@ -1717,8 +1715,13 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
       DoubleJump, TripleJump OR Sword OR GlideJump 
       GrenadeJump OR HammerJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
   conn MarshPastOpher.PoolsPathWest:  # Paths that can't go to PoolsPathOneWayWall or are using the mortar
-    kii: Bash, Damage=10  # use the mortar projectile to reach the lantern directly
-
+    kii:
+      Bash, Shuriken=1 OR Blaze=3 OR Sentry=2 OR Damage=10  # use the mortar projectile to reach the lantern directly
+      DoubleJump, TripleJump, Damage=20 #dmg boosing through the last spikes
+    unsafe:
+      Damage=30  # dboost in the spikes, land on the friendly spike
+      Damage=20, Sword  # pogo the mortar projectile as it touches the ground
+      
 anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPastOpher.PoolsPathEX
   refill Checkpoint
 
