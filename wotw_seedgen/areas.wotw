@@ -1691,23 +1691,24 @@ anchor MarshPastOpher.PoolsPathOneWayWall at -744, -4173:  # Left of the one way
   conn MarshPastOpher.PoolsPathWest:
     moki: Bash, DoubleJump OR Launch
     gorlek:
-      Bash, Dash OR Glide
-      Bash, Sword
+      Bash, Dash OR Glide OR Sword
       Bash, Hammer, Damage=10
       DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword
       DoubleJump, TripleJump, Dash, Glide OR Sword  # enough tools to allow multiple approaches
       Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=10
     kii:
       Launch
+      Bash, Hammer OR Shuriken=2 OR Sentry=3
+      Damage=20, DoubleJump OR Dash OR Sentry=3
       DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
-      Damage=20, DoubleJump OR Dash
-      Bash, Hammer OR Shuriken=2 OR Sentry=3
     unsafe:
-      Damage=10, DoubleJump OR Dash
-      Hammer, Damage=20
-      Bash, PauseHover
-   
+      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover  # https://youtu.be/z61PU_x49ko
+      Damage=40
+      Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=20, Hammer OR Sentry=2
+      Damage=10, DoubleJump OR Dash OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump
+      
 anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bellow PoolsPathOneWayWall
   conn MarshPastOpher.PoolsPathOneWayWall:
     moki: Bash OR Launch
