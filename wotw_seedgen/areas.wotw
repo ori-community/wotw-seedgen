@@ -2127,7 +2127,7 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Sword  # pogo the slime
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap=1
       GrenadeJump
-  conn WestHollow.InFrontPurpleDoor:  # check for redundancies with MokiByTwillen
+  conn WestHollow.InFrontPurpleDoorEnemyPaths:  # check for redundancies with MokiByTwillen
     # using the dirty water may be softlockable if you drain the water. Currently draining the water provides no advantage for this connection, so no paths using the water can exist
     moki:
       Combat=2xSlug, Bow=1, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
@@ -2165,11 +2165,12 @@ anchor WestHollow.MokiByTwillen at -230, -4229:  # The moki to the upper left of
     unsafe: Shuriken=1 OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR PauseHover
 
   conn WestHollow.Entrance: free
-  conn WestHollow.InFrontPurpleDoor:
+  conn WestHollow.InFrontPurpleDoorEnemyPaths:
     moki: Combat=BombSlug OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: free  # bait the bombslug
 
 anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple door, before the TP
+# Paths using the slime originate from WestHollow.InFrontPurpleDoorEnemyPaths because it doesn't appear if you spawned at this anchor
   state WestHollow.PurpleDoorOpen:  # Be carefull it's not redundant with paths from Entrance
     kii, Bow=1, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained: 
       Dash, Sword OR Shuriken=1
@@ -2191,7 +2192,7 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       Sword  # pogo the slime
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap=1
       GrenadeJump
-  conn WestHollow.MokiByTwillen:  # Make sure it's not redundant with WestHollow.InFrontPurpleDoor->WestHollow.Entrance->WestHollow.MokiByTwillen
+  conn WestHollow.MokiByTwillen:  # Make sure it's not redundant with WestHollow.InFrontPurpleDoorEnemyPaths->WestHollow.Entrance->WestHollow.MokiByTwillen
     moki:
       Bow=1, Combat=Slug OR Bash
       Bash, Grenade=1
@@ -2222,6 +2223,15 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       WaterDash, Damage=20
   conn EastHollow.Teleporter:
     moki: WestHollow.PurpleDoorOpen
+
+anchor WestHollow.InFrontPurpleDoorEnemyPaths at -181, -4240:  # Variant of WestHollow.InFrontPurpleDoorEnemyPaths which are using the slime
+  conn WestHollow.InFrontPurpleDoor: free
+  conn WestHollow.MokiByTwillen:
+    kii: Bash
+  conn WestHollow.HollowDrainMiddle:
+    unsafe:  # Mid-air regen down swim. Use the slime because in hard you need to pre-damaged on its projectile instead of the spikes in order to fullfill the path
+      Regenerate, Damage=40
+      WaterDash, Regenerate, Damage=20
 
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
   # this anchor doesn't assume drained water because that should make it usable for weird dirty water swim paths
@@ -2828,7 +2838,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
       HammerJump
       EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear
       EastHollow.BeetleDefeated, DoubleJump, Sentry=3  # Djump+3 sentries from the vine
-  conn WestHollow.InFrontPurpleDoor:
+  conn WestHollow.InFrontPurpleDoorEnemyPaths:
     moki: WestHollow.PurpleDoorOpen
 
 anchor BeetleFight at -81, -4243:
