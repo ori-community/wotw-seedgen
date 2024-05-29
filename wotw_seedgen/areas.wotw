@@ -2225,6 +2225,8 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
     moki: WestHollow.PurpleDoorOpen
 
 anchor WestHollow.InFrontPurpleDoorEnemyPaths at -181, -4240:  # Variant of WestHollow.InFrontPurpleDoorEnemyPaths which are using the slime
+  nospawn
+
   conn WestHollow.InFrontPurpleDoor: free
   conn WestHollow.MokiByTwillen:
     kii: Bash
