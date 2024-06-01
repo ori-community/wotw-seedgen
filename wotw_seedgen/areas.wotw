@@ -2240,7 +2240,6 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained  # Protecting moki players from having to figure out that you can tp underwater the hard way
     gorlek: free
-
   refill Checkpoint
   refill Energy=3:
     moki: BreakCrystal, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
@@ -2297,6 +2296,7 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
 anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock puzzle room
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
+    gorlek: free
   refill Checkpoint
   refill Health=1
   refill Energy=3:
@@ -2314,12 +2314,16 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
     gorlek, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Bow=1, SentryJump=1 OR Launch  # Get up to the rock and push it to use only one Bow shot
       Bow=1, Bash, Grenade=1  # Get up to the rock and push it to use only one Bow shot
-      Combat=Skeeto, Bow=6  # Stand to the left of energy crystal, look up and aim for the target, minimum 4 shots needed
-    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Bow=4  # use the pole on the left in order to reach the floating platform
-      Bow=1, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 # climb the right wall
+    kii:
+      WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+        Bow=4  # use the pole on the left in order to reach the floating platform
+        Bow=1, DoubleJump, TripleJump, Hammer OR Spear=1 # start from the suspended platform then walljump on the ledge bellow the upper frog statue
+        Bow=1, DoubleJump, TripleJump, Dash  # From the ledge above the left frog statue. Either coyote dash (but you can get a down dash) or mid air dash then tjump (dash first to avoid bonking on the ceiling)
+      WestHollow.FullyDrained, Bow=1, Bash  # FullyDrained spawns slimes on the way to WestHollow.RockPuzzleEX. Bash one near the energy cristal and bash it twice to reach the rock
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Bow=2  # https://youtu.be/hZ4rYt_N-aU
       Bow=1, DoubleJump, Sword  # Pogo the skeeto. It's hard to bait it at the right position.
+      Bow=1, Bash  # bait the skeeto
       Bow=1, DoubleJump, TripleJump
   state WestHollow.UpperTongueExtended:
     unsafe: Bow=1  # TP to avoid touching the water
@@ -2327,11 +2331,8 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
   pickup WestHollow.RockPuzzleEX:
     moki: WestHollow.FullyDrained
     unsafe:
-      WestHollow.UpperDrainLeverPulled, Damage=80  # should probably be 40 damage considering the checkpoint?
-      WestHollow.UpperDrainLeverPulled, WaterDash, Damage=40
-  pickup WestHollow.HiddenEC:
-    moki: WestHollow.FullyDrained, BreakWall=10
-    unsafe: WestHollow.FullyDrained, WaterDash, Damage=120
+      WestHollow.UpperDrainLeverPulled, Damage=40
+      WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20
 
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
@@ -2342,11 +2343,13 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       SentryJump=1
       DoubleJump, Combat=Slug OR Damage=10  # Jump to the left wall and wrap around to the top
     kii, WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Bow=1, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bow=1, Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump
       Sword  # Pogo the skeeto
-    unsafe, WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Hammer  # Upslash and swing left
+    unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Launch  # https://youtu.be/guXiDCKM18I
+      WestHollow.RockPuzzleSolved, Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
+      WestHollow.RockPuzzleSolved, Bow=1, PauseHover
   conn WestHollow.HollowDrainMiddle:
   # If FullyDrained, this connection originates from SubmergedPlatform instead
   # WestHollow.UpperTongueExtended is a HUGE negative for this connection and you can't retract it unless you have access to SubmergedPlatform
@@ -2354,12 +2357,20 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       Damage=20, Launch  # dboost in dirty water to pass under the upper tongue. If fully drained, solve by going to SubmergedPlatform
       Damage=20, DoubleJump, TripleJump  # if tongue is extended, dboost in dirty water. Else, wjump on the frog statue
     kii, WestHollow.UpperDrainLeverPulled:
-      Damage=20, DoubleJump, Sword OR Hammer OR Spear=2 # wjump on the frog statue if the tongue is retracted, dboost in the water otherwise
+      Damage=20, DoubleJump, Hammer OR Spear=2 # wjump on the frog statue if the tongue is retracted, dboost in the water otherwise
       Damage=20, DoubleJump, Spear=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # More energy efficient than 2 spears
-    unsafe:
+    unsafe: 
+      WestHollow.UpperDrainLeverPulled, Damage=20, DoubleJump, Sword  # sword combo from the platform->djump->upslash to get a wjump from the frog statue. A bit too precise for kii.
       WestHollow.UpperDrainLeverPulled, Damage=20, DoubleJump, Spear=1  # precise djump from the ledge above the frog statue to avoid the dboost
       WestHollow.UpperDrainLeverPulled, DoubleJump, TripleJump OR Dash  # https://youtu.be/-Ww33y641DY
       WestHollow.FullyDrained, Bash  # Assuming this is bashing enemies from the rock puzzle room so it indeed need to originate from here despite using the fully drained state?
+      Damage=90:  # Dirty water paths need to also work without the water. dboost on the exploding slime to take a tiny bit less damage
+      #Removing dboosts from sub-paths because the damage from the water will cover for all possible dboosts when the water is gone
+        Launch
+        DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Spear=1
+      Damage=20, WaterDash: # If you die in the water just a bit after using wdash, you'll preserve a bit of its speed when respawning
+        Launch
+        DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Spear=1
   conn WestHollow.SubmergedPlatform:
     moki: WestHollow.FullyDrained
   conn WestHollow.HollowDrainLower:
@@ -2473,7 +2484,7 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
       Glide, Sword OR Flash=1 OR Sentry=1
     unsafe: WestHollow.FullyDrained, Sword OR Flash=1 OR Sentry=1 OR FlashSwap OR BlazeSwap=1 OR GlideJump OR GrenadeJump OR PauseHover
   conn WestHollow.AboveJumppad:
-    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended OR Launch OR Glide OR DoubleJump
+    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended OR Launch OR Glide OR DoubleJump OR Dash
     gorlek: WestHollow.FullyDrained
 
 anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad at the bottom of the drain sequence
