@@ -2236,20 +2236,17 @@ anchor WestHollow.InFrontPurpleDoorEnemyPaths at -181, -4240:  # Variant of West
       WaterDash, Regenerate, Damage=20
 
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
-  # this anchor doesn't assume drained water because that should make it usable for weird dirty water swim paths
+  # this anchor doesn't assume drained water because it's usable for weird dirty water swim paths
   tprestriction:
-    moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
+    moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained  # Protecting moki players from having to figure out that you can tp underwater the hard way
+    gorlek: free
+
   refill Checkpoint
   refill Energy=3:
     moki: BreakCrystal, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
   
   state WestHollow.UpperTongueExtended:  # this tongue stays extended permanently, so it can be a state. If you're able to retract it, you are also able to extend it again
     moki: Bow=1, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
-
-  pickup WestHollow.HiddenEC:
-    moki: WestHollow.FullyDrained, BreakWall=10
-    # the unsafe path bellow is softlockable because you can't use waterdash to break that wall once you fully drained the water
-    #unsafe: WestHollow.UpperDrainLeverPulled, WaterDash, Damage=80  # Break the wall with waterdash. Can't have a path without pulling the 1st lever because it would be a softlockable path as soon as you pull that lever.
 
   conn WestHollow.RockPuzzle:  # having the tongue extended can be a negative, so strictly speaking these paths would have to work with the tongue extended since a header could set the tongue. We choose to assume a header will never do this instead.
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
@@ -2262,18 +2259,20 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       Dash, Sword OR Hammer
       Damage=20  # dboost on the water if it's there and on the spikes if not
     kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Dash OR Sword OR Blaze=5 OR Sentry=3
+      Sword OR Blaze=6 OR Sentry=3
       WestHollow.UpperTongueExtended, Bow=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Retrat the tongue with bow
       Hammer, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      WestHollow.UpperDrainLeverPulled, DoubleJump OR Hammer OR Blaze=4 OR Sentry=2  # friendly spike on the very edge
-      WestHollow.FullyDrained, DoubleJump OR Hammer OR Blaze=4 OR Sentry=2  # friendly spike on the very edge
+    unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Dash  # Either coyote dash or a wall jump at the spikes. Not in kii because the spikes dissuade from doing the coyote dash 
+      DoubleJump OR Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2  # friendly spike on the very edge
+      Bash, Grenade=1  # https://youtu.be/JTR1UHwFPoM
+      PauseHover OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
       # Dirty water swim are irrelevant. You could solve the rock puzzle which let you get WestHollow.FarLeftEX but it have to be solvable without the water as well if you don't want the path to be softlockable.
       # You can't cross the bridge above WestHollow.RockPuzzleEX, making the pickup non-accesible without WestHollow.UpperDrainLeverPulled
       # You can't pull the WestHollow.FullyDrained lever when its underwater.
       # Damage=80
       # WaterDash, Damage=20
-  conn WestHollow.SubmergedPlatform:
+  conn WestHollow.SubmergedPlatform:  # Dirty water swim don't use that anchor for anything ; the only relevant one goes directly to WestHollow.HollowDrainLower
     moki: WestHollow.FullyDrained
   conn WestHollow.HollowDrainLower:
     unsafe:
@@ -2287,12 +2286,14 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       Sword OR Hammer  # Hammer is a bit particular; you can use upslash and horizontal slashes instead
     kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      WestHollow.UpperDrainLeverPulled, BlazeSwap=1 OR GrenadeJump OR PauseHover
-      WestHollow.FullyDrained, BlazeSwap=1 OR GrenadeJump OR PauseHover
-      Damage=60
-      Damage=40, DoubleJump OR Dash OR Sword
-      WaterDash
-
+      WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+        BlazeSwap=1 OR GrenadeJump OR PauseHover
+      # Dirty upswim can't be solved with just damage because draining the water would then lead to solftlockable paths
+      Damage=40, Launch OR DoubleJump OR Dash OR Sword OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+      Damage=60 OR WaterDash:
+        Glide OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR GrenadeJump OR PauseHover
+        Bash, Grenade=1
+      
 anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock puzzle room
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
@@ -7092,7 +7093,7 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
     unsafe:
       SentryJump=1
       Bash  # can be done damageless, but damage is likely. Keep jumping at the right wall until you go over it and bash the first latern at just the right angle to reach the second
-      DoubleJump, TripleJump, Sentry=3, Damage=20  # https://streamable.com/1rus0h except you can use some friendly spikes to avoid the first dboost
+      DoubleJump, TripleJump, Sentry=3, Damage=20  # https://youtu.be/EhC4SRe4UA0
       DoubleJump, TripleJump, Sword
       HammerJump, Damage=20
   conn LowerReach.Icefall:
