@@ -2363,7 +2363,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.UpperDrainLeverPulled, Damage=20, DoubleJump, Sword  # sword combo from the platform->djump->upslash to get a wjump from the frog statue. A bit too precise for kii.
       WestHollow.UpperDrainLeverPulled, Damage=20, DoubleJump, Spear=1  # precise djump from the ledge above the frog statue to avoid the dboost
       WestHollow.UpperDrainLeverPulled, DoubleJump, TripleJump OR Dash  # https://youtu.be/-Ww33y641DY
-      WestHollow.FullyDrained, Bash  # Assuming this is bashing enemies from the rock puzzle room so it indeed need to originate from here despite using the fully drained state?
+      WestHollow.FullyDrained, WestHollow.UpperTongueRetracted, Bash  # Assuming this is bashing enemies from the rock puzzle room so it indeed need to originate from here despite using the fully drained state?
       Damage=90:  # Dirty water paths need to also work without the water. dboost on the exploding slime to take a tiny bit less damage
       #Removing dboosts from sub-paths because the damage from the water will cover for all possible dboosts when the water is gone
         Launch
@@ -2384,8 +2384,9 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
+    gorlek: free
   refill Energy=3:  # fast respawning crystal
-    moki: BreakCrystal
+    moki: BreakCrystal, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
   # energy crystal below not considered because it doesn't seem relevant for anything
 
   state WestHollow.FullyDrained:
@@ -2397,21 +2398,20 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       Bow=1, DoubleJump, Sword OR Hammer  # DoubleJump and upslash to get on the wall to the right
       Bow=1, Bash, Grenade=1
       Bow=2, Sword OR Hammer
-      DoubleJump, TripleJump  # Jump off the eye to the left
+      DoubleJump, TripleJump, Damage=10  # Jump off the eye to the left
       DoubleJump, Damage=10, Dash
       Damage=20, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # these paths aren't meaningful anymore if the water is gone, so this does not softlock
     kii, WestHollow.UpperDrainLeverPulled:
       Bow=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bow=1, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
       WaterDash, Damage=20, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1, DoubleJump
-      Dash, Damage=10, Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Dash, Damage=20, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Damage=10, Hammer
+      DoubleJump, TripleJump
     unsafe, WestHollow.UpperDrainLeverPulled:
-      DoubleJump, Dash
-      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # precise bash grenade to wall jump on the right wall. Other option to jump to the lever
-      Dash, Damage=10, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      # DoubleJump, Dash, SentryJump=1  # SentryJump on the eye
+      Bow=2  # precise walljump to get a wjump of the 2nd frog statue (and not just its tongue)
+      Dash, DoubleJump OR Hammer OR Spear=1
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover  # precise bash grenade to wall jump on the right wall. Other option to jump to the lever
+      Dash, Damage=10, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
 
   pickup WestHollow.FarLeftEX:
     moki, WestHollow.FullyDrained:
@@ -2423,13 +2423,21 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       SentryJump=1
     kii, WestHollow.FullyDrained:
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Bow=1, Glide OR Hammer
-      Bow=1, Sentry=2, Shuriken=1 OR Flash=1 OR Sentry=1
-      Sword  # Pogo the slug. Baiting it under the pickup is pretty awful
+      Bow=1, Glide OR Sword OR Hammer
+      Bow=1, Sentry=2, Shuriken=1 OR Flash=1 OR Sentry=1  # Spear is less energy efficient than using a 3rd sentry
     unsafe:
-      WestHollow.FullyDrained:
-        Bow=1, Shuriken=3
+      # dirty water paths need to work both with and without water to avoid a softlock. Using WestHollow.UpperDrainLeverPulled for the water damage reference since it's the most restrictive of the 3 possible states
+      WestHollow.FullyDrained OR Damage=50:
+        Bash OR Launch OR DoubleJump
+        Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
         Sword  # Pogo the shot of the slug
+        HammerSJump=1 OR HammerJump OR GrenadeJump
+      WaterDash, Damage=30:
+        Bash OR Launch OR DoubleJump
+        Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
+        Sword  # Pogo the shot of the slug
+        HammerSJump=1 OR HammerJump OR GrenadeJump
+      
   # backwards connection blocked by the door
 
 # checkpoint at -356, -4306
