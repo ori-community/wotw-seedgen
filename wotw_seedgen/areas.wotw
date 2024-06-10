@@ -2445,6 +2445,7 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
 anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below HollowDrainMiddle, submerged until WestHollow.FullyDrained
   tprestriction:
     moki: WestHollow.FullyDrained
+    gorlek: free
   refill Energy=1:
     moki: WestHollow.FullyDrained, BreakCrystal
     
@@ -2469,18 +2470,18 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
       WestHollow.UpperTongueRetracted, SentryJump=1
       WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, DoubleJump
     kii, WestHollow.FullyDrained:
-      DoubleJump, Sword OR Hammer OR Spear=2 OR WestHollow.UpperTongueExtended  # Grab the pole and jump on the frog statue or extend the tongue and jump on it
-      DoubleJump, Spear=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # More energy efficient than 2 spears
-      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Dash OR Hammer
+      DoubleJump, Hammer OR WestHollow.UpperTongueExtended  # Grab the pole and jump on the frog statue or extend the tongue and jump on it
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Dash
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Hammer, Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Sword, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Glide, Shuriken=2 OR Flash=2 OR Sentry=2
       WestHollow.UpperTongueExtended, WestHollow.LowerTongueExtended, Glide, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, WestHollow.FullyDrained:
-      DoubleJump, Spear=1
-      HammerJump OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 # land on the narrow ledge next to the spikes
+      DoubleJump, Spear=1 OR Sword
       GlideJump, DoubleJump  # the platform is a bit higher near the crystal 'even if it's broken)
-      Bash, Grenade=1  # the placement of the grenade is different depending on how the tongues are oriented, but it's always doable.
-      WestHollow.UpperTongueExtended, Dash OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR GlideJump
-      Bow=1, Shuriken=1, Blaze=1 OR Glide  # Not sure which tongue this path is using?
+      HammerJump OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 # land on the narrow ledge next to the spikes
+      Bash, Grenade=2  # the placement of the grenade is different depending on how the tongues are oriented, but it's always doable.
+      WestHollow.UpperTongueExtended, Dash OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
   conn WestHollow.RockPuzzle:
     moki, WestHollow.FullyDrained: DoubleJump OR Dash  # Launch redundant with going to HollowDrainMiddle first
     gorlek, WestHollow.FullyDrained:
