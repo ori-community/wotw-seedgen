@@ -2499,18 +2499,21 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
 anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad at the bottom of the drain sequence
   tprestriction:
     moki: WestHollow.FullyDrained  # It's possible to tp from there before pulling the first lever, but that would make that spawn softlockable
+    gorlek: free
 
   state WestHollow.LowerTongueExtended:
     moki: WestHollow.FullyDrained, Bow=1
   state WestHollow.LowerTongueRetracted:  # fairly easy when doing a walljump from the right wall but it's pretty precise if aiming from the left platform hence why the state isn't in moki
     gorlek, WestHollow.FullyDrained: Bow=1, Combat=Slug OR Bash OR Damage=10
+    unsafe, WestHollow.FullyDrained: Bow=1
 
   pickup WestHollow.HiddenEC:
-    moki: WestHollow.FullyDrained, BreakWall=10  # probably fine
+    moki: WestHollow.FullyDrained, BreakWall=10
 
   conn WestHollow.HollowDrainLower:
     moki: WestHollow.FullyDrained
   conn WestHollow.SubmergedPlatform:  # Underwater in both water states. Opting to not use it for dirty swims, since it doesn't have a checkpoint.
+  # Slime doesn't spawn if you started at this anchor
     moki, WestHollow.FullyDrained:
       Launch
       WestHollow.LowerTongueExtended, DoubleJump, Dash
@@ -2518,13 +2521,11 @@ anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad
       WestHollow.LowerTongueExtended, DoubleJump
     kii, WestHollow.FullyDrained:
       Bash, Grenade=1, WestHollow.LowerTongueRetracted  # Precise grenade angle
-      Bash, WestHollow.LowerTongueExtended, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the slime to reach the tongue
-      WestHollow.LowerTongueExtended, Dash OR Hammer
-      WestHollow.LowerTongueExtended, Sword, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      WestHollow.LowerTongueExtended, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      WestHollow.LowerTongueExtended, Dash, Hammer OR Flash=1 OR Sentry=1
     unsafe, WestHollow.FullyDrained:
       DoubleJump, TripleJump  # https://youtu.be/6BwlBv2Y4yM
       WestHollow.LowerTongueExtended, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Dash OR Bash OR GlideJump OR Damage=10 OR PauseHover  # this is extremely difficult and not fun if you can't fight the enemies. There's a small safe spot on the left of the spikes under the tongue that is useful for a lot of these paths. If you've already destroyed the rock wall, you'll have to jump on the tongue as it's extending, or do an extremely precise wall jump from below it. The tongue saves its state, so you can shoot it once to close it and then leave to refill energy. The Bash path requires you to get a slime onto the tongue and then lure a Skeeto up to follow.
+      WestHollow.LowerTongueExtended, Glide, Flash=1 OR Sentry=1
       GrenadeJump, DoubleJump OR Dash OR PauseHover  # Grenade Jump from next to the spikes
       SentryJump=1 OR HammerJump
       DoubleJump, Damage=10, Hammer OR GlideJump  # climb onto the frog
@@ -2600,6 +2601,9 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
   conn WestHollow.AboveJumppad:
     moki: Combat=Slug OR Bash
     kii: Damage=10
+  conn WestHollow.SubmergedPlatform:  # paths using the slime which doesn't spawn if you saved at WestHollow.SubmergedPlatform
+    kii, WestHollow.FullyDrained:
+      Bash, WestHollow.LowerTongueExtended, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the slime to reach the tongue
   conn WestHollow.HollowDrainMiddle:  # paths which go directly because they need the checkpoint at HollowDrainMiddle for dirty swimming purposes
     unsafe:
       # Dirty Swims. All of the following contain duplicates of other paths for the purposes of softlock prevention. Middle state swim deals the most damage, so calculate damage according to that.
