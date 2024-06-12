@@ -2538,15 +2538,15 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     moki, WestHollow.FullyDrained:  # DoubleJump is for lenience on the bowshot
       DoubleJump, Bow=1, Dash, Combat=2xSkeeto OR Bash
       DoubleJump, Bow=1, Launch
-    gorlek, WestHollow.FullyDrained:  
-      Bow=1, Dash OR Launch
-    kii, WestHollow.FullyDrained: Bow=1  # bait the first crusher, us it as an elevator to the eye then bait it again and jump from it to the left
+    gorlek, WestHollow.FullyDrained: Bow=1, Dash OR Launch
+    kii, WestHollow.FullyDrained: Bow=1, WaterDash
+    unsafe, WestHollow.FullyDrained: Bow=1  # bait the first crusher, use it as an elevator to the eye then bait it again and jump from it to the left
   pickup WestHollow.SwimEC:
     moki: Water
     unsafe:
-      Damage=215  # 200 from water, 5 from fish, 10 from spikes
-      Bash, Damage=160
-      WaterDash, Damage=100
+      Damage=105  # 10 from slug's projectile, 80 from water, 5 from fish, 10 from spikes
+      Bash, Damage=70  # 10 from slug's projectile, 60 from water
+      WaterDash, Damage=50  # 10 from slug's projectile, 40 from water
   pickup WestHollow.LupoMap:
     moki, SpiritLight=150:  # All the path options here include a way to get past the enemy
       DoubleJump, Dash
@@ -2557,21 +2557,21 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       SentryJump=1
     kii, SpiritLight=150:
       Sword  # Pogo the slug
-      DoubleJump, Glide OR Shuriken=1 OR Sentry=2
-      Dash, Hammer OR Shuriken=1
+      DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1  # possible without glide but added it to the path in case you bonk on the ceiling after jumping from the pole
+      Dash, Hammer      
     unsafe, SpiritLight=150:
-      DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
-      Dash, Spear=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Spear=1 OR Flash=1 OR Sentry=1 OR PauseHover
+      Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover
+      BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump OR GrenadeJump OR HammerJump
   pickup WestHollow.BelowLupoEX:
     moki:  # All the path options here include a way to get past the enemies
       DoubleJump, Dash
       Launch
     gorlek:  # All the path options here include a way to get past the enemies
-      DoubleJump, TripleJump OR Sword OR Hammer OR Damage=10
+      DoubleJump, TripleJump OR Sword OR Hammer
     kii:
       DoubleJump, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump
       Damage=10, SwordSJump=1
@@ -2594,7 +2594,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       Hammer
       Combat=Slug+2xSkeeto, Sentry=2
     unsafe:
-      WestHollow.FullyDrained, Combat=Slug+2xSkeeto, Shuriken=2 OR Blaze=3
+      WestHollow.FullyDrained, Shuriken=2 OR Blaze=3 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
   conn WestHollow.DashApproach:
     moki: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
     gorlek: Dash
