@@ -2558,10 +2558,10 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     kii, SpiritLight=150:
       Sword  # Pogo the slug
       DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1  # possible without glide but added it to the path in case you bonk on the ceiling after jumping from the pole
-      Dash, Hammer      
+      Dash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, SpiritLight=150:
       DoubleJump, Spear=1 OR Flash=1 OR Sentry=1 OR PauseHover
-      Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover
+      Dash, Spear=1 OR PauseHover
       BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump OR GrenadeJump OR HammerJump
   pickup WestHollow.BelowLupoEX:
     moki:  # All the path options here include a way to get past the enemies
@@ -2640,14 +2640,15 @@ anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle
       Damage=10, Glide, Combat=Slug OR Bash
     kii:
       Sword
-      Hammer, Bash OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # kill the slime with your hammer, fall to the ground again then use your energy weapons to preserrve your upslash for the third jump
+      Hammer, Bash OR Shuriken=1
       Glide, Bash
-      Glide, Combat=Slug, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Damage=10, Combat=Slug, Spear=4 OR Shuriken=4 OR Blaze=4 OR Flash=4 OR Sentry=4
-      Damage=10, Damage=10, Combat=Slug, Spear=3 OR Shuriken=3 OR Blaze=3 OR Flash=3 OR Sentry=3
+      Glide, Combat=Slug, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10:  # To cross the spike pit
+        Combat=Slug, Damage=10, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+        Combat=Slug, Shuriken=4 OR Flash=4 OR Sentry=4
     unsafe:
-      Hammer OR Bash  # Sword or hammer movement to avoid damage; Bash using the slug
-      Damage=10, Combat=Slug
+      Bash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR BlazeSwap=1 OR PauseHover # https://youtu.be/HP9uSoPhWUo
+      Glide OR Spear=1  # https://youtu.be/g5qAXK3oz6k
   conn WestHollow.HollowDrainLower:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki: WestHollow.FullyDrained
 
