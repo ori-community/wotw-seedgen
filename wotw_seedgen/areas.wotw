@@ -2762,7 +2762,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
   
   pickup WestHollow.CrusherEX:
     moki: Dash
-    unsafe: free
+    gorlek: free
   pickup WestHollow.DashTree:
     moki: Dash OR Launch
     unsafe: free
@@ -2770,9 +2770,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
   conn WestHollow.DashArea:  # Make sure it's not redundant with AboveDashTree->DashArea
     moki: Dash, Bash, Grenade=1
     gorlek: Dash, SentryJump=1
-    unsafe:
-      SentryJump=1
-      Bash, Grenade=1
+    unsafe: HammerSJump=1
   conn WestHollow.DashRoomTopRight:
     moki:
       DoubleJump, Dash
@@ -2790,15 +2788,18 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
         HammerSJump=1, DoubleJump
     kii:
       Bash, Grenade=2  # Bash the mantis in order to reach your grenade from higher. Bash grenade from the hanging log.
-      Bash, Grenade=1, Dash, Damage=10
+      Bash, Grenade=1, Dash, Shuriken=1 OR Flash=1 OR Damage=10  # Bash grenade from the mantis spawn position. Other energy weapons cost the same amount of energy than 2 grenades
       DoubleJump, Glide OR Hammer
-      DoubleJump, Damage=10, Bash OR Shuriken=2 OR Flash=2 OR Sentry=2
-      DoubleJump, Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Sword OR Hammer
+      DoubleJump, Bash, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=10, Shuriken=3 OR Flash=3 OR Sentry=3
+      DoubleJump, Shuriken=4 OR Flash=4 OR Sentry=4
+      Dash, Sword OR Hammer OR Shuriken=4 OR Flash=4 OR Sentry=4
+      Dash, Damage=10, Shuriken=3 OR Flash=3 OR Sentry=3
     unsafe:
-      Sword 
-      Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 
+      Dash  # Coyote dash to the mantis spawwn position then coyote dash again from the frinedly spikes
+      DoubleJump  # Wjump on the wall on the physic object under the spikes. Might be a ceiling jump?
+      Sword  # https://youtu.be/FHBXBf1NP9A
       Bash, Grenade=1  # using the enemies to bash onto the hanging log
   
 anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
