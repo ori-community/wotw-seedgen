@@ -2770,7 +2770,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
   conn WestHollow.DashArea:  # Make sure it's not redundant with AboveDashTree->DashArea
     moki: Dash, Bash, Grenade=1
     gorlek: Dash, SentryJump=1
-    unsafe: HammerSJump=1
+    unsafe: HammerSJump=1 OR BlazeSwap=2 OR SentrySwap=2
   conn WestHollow.DashRoomTopRight:
     moki:
       DoubleJump, Dash
@@ -2801,6 +2801,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
       DoubleJump  # Wjump on the wall on the physic object under the spikes. Might be a ceiling jump?
       Sword  # https://youtu.be/FHBXBf1NP9A
       Bash, Grenade=1  # using the enemies to bash onto the hanging log
+      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
   
 anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
   refill Checkpoint
@@ -2814,12 +2815,12 @@ anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
       DoubleJump, Bash, TripleJump OR Glide
       DoubleJump, Combat=WeakSlug, TripleJump OR Glide
     kii:
-      Bash
       DoubleJump, Hammer
       DoubleJump, Combat=WeakSlug, Shuriken=1 OR Flash=1 OR Sentry=1
       Dash, Combat=WeakSlug, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, DoubleJump  # Bash glide of the slime. There are position where it's annoying to do but there is enough alternative to make that path work
     unsafe:
-      DoubleJump, Combat=WeakSlug
+      Bash OR DoubleJump OR Dash OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
       Glide, Combat=WeakSlug, Sentry=2
 
   conn WestHollow.DashCrushers:
@@ -2835,9 +2836,9 @@ anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
     gorlek:
       DoubleJump OR Dash
       Bash, Sword OR Damage=10
-      Combat=Hornbug, Glide OR Sword OR Damage=10
-    kii: Sword OR Blaze=3 OR Sentry=2 OR Damage=10
-    unsafe: Bash OR Shuriken=2
+      Combat=Hornbug, Glide OR Sword
+    kii: Glide OR Sword OR Blaze=3 OR Sentry=2 OR Damage=20  # you can get a bit stuck in the spikes depending on where you land in those
+    unsafe: Bash OR Hammer OR Shuriken=2 OR Damage=10 OR PauseHover OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
 
 anchor WestHollow.AboveDashSemisolid at -81, -4411:  # the semisolid near WestHollow.AboveDashEX
   pickup WestHollow.AboveDashEX: free
