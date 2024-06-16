@@ -2563,20 +2563,6 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       DoubleJump, Spear=1 OR Flash=1 OR Sentry=1 OR PauseHover
       Dash, Spear=1 OR PauseHover
       BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump OR GrenadeJump OR HammerJump
-  pickup WestHollow.BelowLupoEX:
-    moki:  # All the path options here include a way to get past the enemies
-      DoubleJump, Dash
-      Launch
-    gorlek:  # All the path options here include a way to get past the enemies
-      DoubleJump, TripleJump OR Sword OR Hammer
-    kii:
-      DoubleJump, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      DoubleJump
-      Damage=10, SwordSJump=1
-      Hammer  # upswing to get onto the right side of the spikes (you can touch them)
-      Dash  # max jump without hitting the spike hitbox, dash to the small ledge
 
   conn WestHollow.TrialApproach:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki, WestHollow.FullyDrained:
@@ -2595,7 +2581,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       Combat=Slug+2xSkeeto, Sentry=2
     unsafe:
       WestHollow.FullyDrained, Shuriken=2 OR Blaze=3 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
-  conn WestHollow.DashApproach:
+  conn WestHollow.PolesPound:
     moki: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
     gorlek: Dash
     kii: free
@@ -2665,6 +2651,53 @@ anchor WestHollow.TrialStart at -120, -4260:  # At the Spirit Trial start
 
 # checkpoint at -124, -4377
 
+anchor WestHollow.PolesPound at -123, -4377:  # Checkpoint at the right of the pound on the way to dash
+  refill Checkpoint
+  
+  pickup WestHollow.BelowLupoEX:
+    moki:  # All the path options here include a way to get past the enemies
+      DoubleJump, Dash
+      Launch
+    gorlek:  # All the path options here include a way to get past the enemies
+      DoubleJump, TripleJump OR Sword OR Hammer
+    kii:
+      DoubleJump, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      DoubleJump
+      Damage=10, SwordSJump=1
+      Hammer  # upswing to get onto the right side of the spikes (you can touch them)
+      Dash  # max jump without hitting the spike hitbox, dash to the small ledge
+
+  conn WestHollow.DashApproach:
+    moki: DoubleJump OR Bash OR Launch OR Glide OR Dash
+    gorlek: free
+  conn WestHollow.HollowDrainLower:
+    moki:
+      Combat=Slug, DoubleJump OR Dash
+      Bash, DoubleJump OR Dash
+      Launch
+    gorlek:
+      Sword
+      WaterDash, Damage=30, Combat=Slug, Hammer OR Glide  # Dboost in the water then waterdash
+      WaterDash, Water, Damage=10, Combat=Slug, Hammer OR Glide
+    kii:
+      Hammer
+      Combat=Slug, Shuriken=3 OR Sentry=4  # 2 sentries to reach the pole without a dboost
+      Bash, Shuriken=3 OR Sentry=4
+      Glide, Bash OR Combat=Slug:
+        Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Damage=10, Spear=1
+      WaterDash, Bash, Damage=30
+      WaterDash, Water, Bash, Damage=10
+      WaterDash, Combat=Slug, Damage=30, Shuriken=2 OR Flash=2 OR Sentry=2
+      WaterDash, Water, Combat=Slug, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
+    unsafe:
+      DoubleJump OR Dash OR PauseHover OR GlideJump OR BlazeSwap=2 OR SentrySwap=2 OR FlashSwap  # avoiding slugs is hard and might take patience
+      Damage=10, Glide OR Shuriken=2 OR Flash=2 OR Sentry=2      
+      Damage=20, Spear=2 OR Blaze=2
+      WaterDash, Damage=10, Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+
 anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
   refill Checkpoint
   refill Energy=3:
@@ -2673,39 +2706,37 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
   state WestHollow.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: DoubleJump OR Dash
     gorlek: Glide
+    kii: free
   state WestHollow.DoorLever:  # The door blocking Dash area
+  # Ennemies only spawn if you have Dash (except for the beetle which you can't use in a path because it never respawns)
     moki:
       Combat=Skeeto+Mantis+2xLizard+Hornbug, DoubleJump OR Dash
-      Combat=Skeeto+Mantis+2xLizard+Hornbug, Bash, Grenade=1
-      Bash, DoubleJump OR Dash
+      Bash, DoubleJump OR Dash OR Grenade=1
       Launch
-    gorlek:
-      DoubleJump OR Dash OR Bash
-      Combat=Skeeto+2xLizard+Hornbug, Glide OR Sword OR HammerSJump=1
-    kii:
-      Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Hammer
+    gorlek: DoubleJump OR Dash OR Glide OR Sword OR HammerSJump=1
+    kii: Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free
 
   conn WestHollow.HollowDrainLower:
+  # Skeeto only spawns if you have Dash. 
+  # Mantis doesn't spawn if you spawned at this anchor but the trial end point is far enough to make it spawns
     moki:
-      Combat=Slug, DoubleJump, Dash
-      Bash, Grenade=2, DoubleJump OR Dash
+      DoubleJump, Dash
+      Bash, Grenade=2, DoubleJump OR Dash OR Glide 
       Launch
     gorlek:
       SentryJump=3  # Possible with 2 SentryJumps
-      Combat=Slug, DoubleJump, TripleJump OR Glide OR Sword OR Hammer  # Take the vanilla path up, but use Sword or Hammer slashes as a substitute to Dash/DoubleJump
-      Bash, Grenade=2, Damage=10, Glide OR Sword
+      DoubleJump, TripleJump OR Sword
+      Bash, Grenade=2, Sword OR Hammer
     kii:
-      Combat=Slug, DoubleJump, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=3  # either bash the mantis or bait the skeeto
-      Bash, Grenade=1, Damage=10, Glide OR Flash=3 OR Sentry=3
-      Bash, Grenade=1, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Sword OR Hammer
+      DoubleJump, Glide OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR  Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # bash the mantis
+      Dash, Sword OR Hammer OR Shuriken=4 OR Flash=4 OR Sentry=4  # From the starting point, both coyote dash and jumping then dashing works.
     unsafe:
-      Bash  # Take your skeeto friend for a trip
       Dash  # avoiding slugs is hard and might take patience
       Sword
-      DoubleJump, Damage=10 OR Glide  # Jump into the first spike wall or glide over it and then avoid the slugs
+      Bash, PauseHover
+      DoubleJump, Damage=10 OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Jump into the first spike wall or glide over it and then avoid the slugs
   conn WestHollow.DashArea:
     moki: WestHollow.DoorLever
 
