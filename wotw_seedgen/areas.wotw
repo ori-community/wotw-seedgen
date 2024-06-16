@@ -2749,14 +2749,13 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
     moki: WestHollow.DoorLever
   conn WestHollow.DashCrushers:
     moki: Dash OR Launch
-    kii: Bash, Grenade=1
     unsafe: free
   conn WestHollow.AboveDashSemisolid:  # Paths going above the tree. Path passing through the crushers originate from DashCrushers. Make sure they aren't redundant.
     gorlek: SentryJump=1  # Launch would be redundant with going the long way around
     kii:
       Bash  # Bash the slug twice
       DoubleJump, TripleJump  # Jump from where the door was. Can wall jump from it if it's still closed
-      WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis
+      WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis. Doesn't spawn if you spawned here but going under the slime is far enough to make it spawns.
 
 anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at dash tree
   refill Checkpoint
