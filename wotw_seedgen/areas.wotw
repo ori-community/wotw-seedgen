@@ -13174,7 +13174,7 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
   pickup UpperWastes.PurpleWallHC:
     moki: Burrow
 
-  conn UpperWastes.RuinsApproach:  # this covers all connections to the pickups in the spinning lasers.
+  conn UpperWastes.SpinLasers:
     moki, Burrow:
       Bash, DoubleJump, Dash OR Glide  # dash or glide to make the lasers better
       DoubleJump, Dash  # you can retry the burrow with DoubleJump, so I think this is fine
@@ -13190,42 +13190,31 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
   conn UpperWastes.MissilePuzzleMiddle:  # for better random spawn
     moki: UpperWastes.LeverDoor, Burrow
 
-# checkpoint at 2037, -3751
-# Should there be an anchor here?
-
-anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser spinner
+anchor UpperWastes.SpinLasers at 2037, -3751:  # checkpoint before the laser spinner
   refill Checkpoint
 
-  pickup UpperWastes.SpinLasersRightEX:
-    moki: Burrow
-  pickup UpperWastes.SpinLasersMiddleEX:
-    moki: Burrow
-  pickup UpperWastes.SpinLasersLowerEX:
-    moki: Burrow
   pickup UpperWastes.RoofEX:
-    moki, Burrow:
+    moki:
       DoubleJump, Bash, Grenade=1
-      DoubleJump, Dash OR Glide
+      DoubleJump, Burrow, Dash OR Glide
       Launch
-    gorlek, Burrow:
-      DoubleJump, TripleJump OR Sword
+    gorlek:
+      DoubleJump, Burrow, TripleJump OR Sword
       Bash, DoubleJump OR Dash  # Bash the Mantis
       Bash, Damage=30, Glide OR Sword OR Hammer  # Bash the Mantis
       SentryJump=1, DoubleJump OR Dash OR Damage=30  # Kill the Mantis
-    kii, Burrow:
+    kii:
       Bash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Glide, Hammer OR Shuriken=1
-      Sword, Hammer  # Drop from the wall, upswing with hammer, then hover with sword
-    unsafe, Burrow:
-      Dash
+      DoubleJump, Burrow, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Burrow, Hammer OR Shuriken=1
+      Burrow, Sword, Hammer  # Drop from the wall, upswing with hammer, then hover with sword
+    unsafe:
+      Dash, Burrow
       Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after bashing the mantis a second time
-      Sword OR Shuriken=3
-      # Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 
+      Burrow, Sword OR Shuriken=3
+      # Burrow, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 
       SentryJump=1
 
-  conn UpperWastes.NorthTP:
-    moki: Burrow
   conn UpperWastes.MissilePuzzleRight:
     moki: Burrow, DoubleJump OR Launch
     gorlek, Burrow:
@@ -13240,6 +13229,24 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
     unsafe: Burrow  # friendly spikes between the lasers
       # Burrow, Sword  # pogo the mantis
       # Burrow, Damage=10  # Damage boost of the Mantis shockwave rather than the spikes
+  conn UpperWastes.RuinsApproach:  # this covers all connections to the pickups in the spinning lasers.
+    moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
+    gorlek: Burrow
+
+anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser spinner
+  refill Checkpoint
+
+  pickup UpperWastes.SpinLasersRightEX:
+    moki: Burrow
+  pickup UpperWastes.SpinLasersMiddleEX:
+    moki: Burrow
+  pickup UpperWastes.SpinLasersLowerEX:
+    moki: Burrow
+
+  conn UpperWastes.NorthTP:
+    moki: Burrow
+  conn UpperWastes.SpinLasers:
+    moki: Burrow
 
 anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
