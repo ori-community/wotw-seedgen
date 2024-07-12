@@ -13036,15 +13036,16 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     gorlek, Keystone=2:
       Burrow, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # can either avoid or deal with the shield slug
       SentryJump=2
+      Bash, Grenade=1, Burrow  # could be moki with some Combat requirement, the jump to the wooden platform might be hard for Moki
     kii, Keystone=2:
       Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1, Burrow  # @validator probably gorlek, could be moki with some Combat requirementz
-      Bash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1  # Bash the gorlek's projectile to reach the sand bag. tjump + upslash/spear from here
+      Bash, DoubleJump, TripleJump, Hammer OR Spear=1  # Bash the gorlek's projectile to reach the sand bag. tjump + upslash/spear from here
     unsafe, Keystone=2:
       Burrow
       # Burrow, Bash  # Break the slug shell with gorlek's projectile
       DoubleJump, TripleJump, Sword OR Hammer OR Damage=30  # tjump+upslash from right wall, tjump+dboost from left wall
       Bash, DoubleJump, TripleJump  # bash the gorlek projectile then stupid wall jump you won't see how to do without debug renderer
+      # Bash, DoubleJump, TripleJump, Sword  # tjump + upslash, too precise for Kii. Redundant
       Bash, SentryJump=1  # Remove the shell of the ShieldSlug and bash it twice to reach the pickup
       Bash, DoubleJump, SentryJump=1  # Bash the gorlek's projectile
       DoubleJump, TripleJump, Damage=30  # you can refresh your tjump on the ^ mark in the ceiling above the sandbag
@@ -13105,10 +13106,11 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
       Bash, DoubleJump OR Dash OR Glide
       Combat=ShieldSlug, DoubleJump OR Dash OR Glide
       Launch
-    gorlek, UpperWastes.KeystoneDoor, Burrow: DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    gorlek, UpperWastes.KeystoneDoor, Burrow:
+      DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Bash, Grenade=1  # could be moki with some Combat requirement, the jump to the wooden platform might be hard for Moki
     kii, UpperWastes.KeystoneDoor, Burrow:
-      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1  # @validator probably gorlek, could be moki with some Combat requirementz
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 
     unsafe, UpperWastes.KeystoneDoor: Burrow
 
 anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right of the sand after the keystone door
@@ -13155,7 +13157,9 @@ anchor UpperWastes.MissilePuzzleMiddle at 2005, -3802:  # On top of the sand ben
     unsafe: Burrow, Dash OR Launch  # Dash/Launch to avoid the explosion.
 
   pickup UpperWastes.PurpleWallEX:
-    moki: Combat=MaceMiner, Burrow
+    moki: Combat=MaceMiner, Burrow, Bash
+    gorlek: Combat=MaceMiner, Burrow, Dash OR Damage=14  # Dodge or tank the hit
+    kii: Combat=MaceMiner, Burrow  # Jump to avoid the explosion
     unsafe: Burrow  # hug the right wall before impact
 
   conn UpperWastes.MissilePuzzleLeft:  # for better random spawn
@@ -13179,7 +13183,7 @@ anchor UpperWastes.MissilePuzzleRight at 2058, -3813:  # On top of sand to the r
       DoubleJump, TripleJump OR Dash OR Glide
     kii, Burrow:
       Dash OR DoubleJump OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Damage=60
-      Damage=30, Bash OR Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Blaze=1
+      Damage=30, Bash OR Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: Burrow
   conn UpperWastes.MissilePuzzleMiddle:  # for better random spawn
     moki: UpperWastes.LeverDoor, Burrow
@@ -13197,37 +13201,40 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
   pickup UpperWastes.SpinLasersLowerEX:
     moki: Burrow
   pickup UpperWastes.RoofEX:
-    moki:
-      Burrow, DoubleJump, Bash, Grenade=1
-      Burrow, DoubleJump, Dash OR Glide
-      Burrow, Launch
-    gorlek:
-      Burrow, DoubleJump, TripleJump OR Sword
-      Burrow, Bash, DoubleJump OR Dash  # Bash the Mantis
-      Burrow, Bash, Damage=30, Glide OR Sword OR Hammer  # Bash the Mantis
-      Burrow, SentryJump=1, DoubleJump OR Dash OR Damage=30  # Kill the Mantis
-    kii:
-      Burrow, Dash
-      Burrow, Bash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Burrow, DoubleJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Burrow, Glide, Hammer OR Shuriken=1
-      Burrow, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Burrow, Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after abashing the mantis a second time
-      Burrow, Sword OR Shuriken=3
-      Burrow, SentryJump=1
+    moki, Burrow:
+      DoubleJump, Bash, Grenade=1
+      DoubleJump, Dash OR Glide
+      Launch
+    gorlek, Burrow:
+      DoubleJump, TripleJump OR Sword
+      Bash, DoubleJump OR Dash  # Bash the Mantis
+      Bash, Damage=30, Glide OR Sword OR Hammer  # Bash the Mantis
+      SentryJump=1, DoubleJump OR Dash OR Damage=30  # Kill the Mantis
+    kii, Burrow:
+      Bash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Hammer OR Shuriken=1
+      Sword, Hammer  # Drop from the wall, upswing with hammer, then hover with sword
+    unsafe, Burrow:
+      Dash
+      Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after bashing the mantis a second time
+      Sword OR Shuriken=3
+      # Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 
+      SentryJump=1
 
   conn UpperWastes.NorthTP:
     moki: Burrow
   conn UpperWastes.MissilePuzzleRight:
     moki: Burrow, DoubleJump OR Launch
-    gorlek:
-      Burrow, SwordSJump=1
-      Burrow, HammerSJump=1, Dash OR Glide
-      Burrow, Dash, Damage=30
-    kii:
-      Burrow, Bash OR Glide OR Dash OR Hammer
-      Burrow, Sword, Shuriken=1
+    gorlek, Burrow:
+      SwordSJump=1
+      HammerSJump=1, Dash OR Glide
+      Dash, Damage=30
+    kii, Burrow:
+      Bash OR Glide OR Dash OR Hammer
+      Sword, Shuriken=1
+      Damage=60
+      Damage=30, Sword OR Shuriken=1 OR Spear=1 OR Flash=1 OR Sentry=1 OR Blaze=1  # Extra skill for convenience
     unsafe: Burrow  # friendly spikes between the lasers
       # Burrow, Sword  # pogo the mantis
       # Burrow, Damage=10  # Damage boost of the Mantis shockwave rather than the spikes
@@ -13246,7 +13253,7 @@ anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of 
       Burrow, SentryJump=2, DoubleJump, TripleJump
       Launch, SentryJump=1  # weapon + launch allows you to kill the enemies
     kii:
-      Bash, Grenade=1, DoubleJump, Glide OR Sword OR Sentry=2 OR Damage=30
+      Bash, Grenade=1, DoubleJump, Glide OR Sword OR Sentry=2 OR Damage=30  # Use grenade on the left of the sandpot
       Bash, Grenade=2, DoubleJump
     unsafe:
       SentryJump=1, Damage=30, DoubleJump  # dboost in the spikes and sjump to the seed (use djump+upslash as well), sjump again to reach the lantern, djump on the sand ball, djump on the wall above and djump + use weapon to air stall to the pickup
@@ -13343,7 +13350,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       SentryJump=1, Glide
       Launch
     kii:
-      Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Burrow
+      Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Burrow  # Use energy to reach the sand bag, then bashnade
       Bash, Grenade=2
       Burrow, DoubleJump OR Sentry=3
       Damage=30, DoubleJump
@@ -13357,7 +13364,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       Combat=Mantis+MaceMiner, SentryJump=1
       Combat=Mantis+MaceMiner, DoubleJump, TripleJump
     kii:
-      Sword OR Hammer OR Blaze=4 OR Sentry=2
+      Sword OR Hammer OR Blaze=4 OR Sentry=2  # Drop from the seed platform
       DoubleJump, TripleJump OR Dash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Combat=Mantis
       Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Just dash might be fit for kii tbh
     unsafe: free  # Precise wall jumping required. Lure the mantis onto the platform to get it out of the way.
