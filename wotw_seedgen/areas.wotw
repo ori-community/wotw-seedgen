@@ -12614,10 +12614,10 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitEX
     kii:
       Spear=1
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # Could add Grapple so you can retry more easily or Damage=30 so the gliding section is less precise
-      Glide, Sword, Grapple OR Damage=30  # Grapple or damageto make it less precise
+      Glide, Sword, Grapple OR Damage=30  # Grapple or damage to make it less precise
     unsafe:
-      Glide, Sword  # Redundant
       Sword OR Flash=1 OR Sentry=1  # Make the sphere swing by wall jumping on it
+      # Glide, Sword
       Dash  # Dash when falling
 
   conn LowerWastes.SandPot:
@@ -12953,10 +12953,11 @@ anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the wa
     moki: Burrow
     kii: Launch, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: 
-      DoubleJump, TripleJump, Sword OR Hammer  # upslash from the ground
-      Launch, DoubleJump OR Spear=1  # Launch on the sand and reach the wall on the left with double jump to reset ; or spear jump from the ground
-      Launch, DoubleJump, Blaze=1
-      DoubleJump  # Use a ceilingjump (makes some other paths redundant)
+      Launch, Spear=1  # Launch on the sand and reach the wall on the left with double jump to reset ; or spear jump from the ground
+      DoubleJump  # Use a ceilingjump
+      # DoubleJump, TripleJump, Sword OR Hammer  # upslash from the ground
+      # Launch, DoubleJump, Blaze=1  # Not Kii because of the imputlock after blaze
+      # Launch, DoubleJump  # Launch on the sand and reach the wall on the left with double jump to reset
 
 anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path connecting tree and east teleporter
   refill Checkpoint
@@ -12996,8 +12997,9 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
       Bash, Grenade=1, Sword OR Hammer
     unsafe, BreakWall=20:
       Dash, Damage=60, Spear=1 OR Flash=1 OR Sentry=1
-      Dash, Damage=30, Sword OR Hammer OR Spear=2  # Redundant for Hammer and spear
+      Dash, Damage=30, Sword  # Damage boost on the left
       Dash, Hammer OR Spear=2  # Jump low from the wall on the right to avoid the ceiling, then upslash or spear
+      # Dash, Damage=30, Hammer OR Spear=2  # Damage boost on the left
   pickup LowerWastes.UpperPathHC:
     moki: Burrow
 
