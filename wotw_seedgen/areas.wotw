@@ -4899,6 +4899,7 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       OuterWellspring.WestDoorBlueMoonFree:
         Grapple, DoubleJump, TripleJump OR Damage=15
         Grapple, Damage=15, Dash OR Glide
+      Grapple, Launch
       Grapple, Bash, Grenade=1, DoubleJump, TripleJump OR Glide OR Damage=15
       Grapple, Bash, Grenade=1, Damage=15, Dash OR Glide
       Grapple, SentryJump=1, DoubleJump, TripleJump OR Glide OR Damage=15
@@ -4906,23 +4907,21 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       Bash, Grenade=1, Launch
       SentryJump=1, Launch
     kii:
-      Grapple, Launch  # @Validator should probably be moki/gorlek (path from moki require WestDoorBlueMoonFree as well)
       Grapple, DoubleJump, TripleJump
-      Grapple, Bash, Grenade=1, Sword
-      Grapple, Bash, Grenade=1, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Grapple, Bash, Grenade=1, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
-      Grapple, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Grapple, OuterWellspring.WestDoorBlueMoonFree, Sword
-      Grapple, OuterWellspring.WestDoorBlueMoonFree, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Grapple, OuterWellspring.WestDoorBlueMoonFree, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Grapple, OuterWellspring.WestDoorBlueMoonFree, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
-      Grapple, OuterWellspring.WestDoorBlueMoonFree, Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Grapple, Bash, Grenade=1:
+        DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      Grapple, OuterWellspring.WestDoorBlueMoonFree:
+        DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
     unsafe:
       Grapple, DoubleJump  # grapple the plant on the left, hold up to make it appear on screen
-      Grapple, Dash, OuterWellspring.WestDoorBlueMoonFree
-      Grapple, Bash, Grenade=1, Dash
-      Grapple, Bash, Grenade=1, Glide OR Sentry=2
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, Dash OR Sword
+      Grapple, OuterWellspring.WestDoorBlueMoonFree, Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Grapple, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Bash, Grenade=1, Dash OR Glide OR Sword OR Sentry=2
       Bash, Grenade=1, SentryJump=1, DoubleJump, TripleJump
 
   # this tokk disappears after the needle quest
@@ -4935,7 +4934,7 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       SentryJump=1, DoubleJump
     kii:
       Bash, Grenade=1, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1, Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Hammer, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1  # Damage boost to keep upslash for after the pole
       Bash, Grenade=1, Hammer, Shuriken=2
     unsafe: Bash, Grenade=1, Dash OR DoubleJump  # on the pole, stick to the wheel. You should get a nice curve when jumping, letting you reach the platform with your mobility option
   conn OuterWellspring.AboveEntranceDoor:
@@ -5025,12 +5024,11 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
       DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       Dash, Damage=15, Glide OR Sword OR Hammer OR Sentry=2 OR Damage=15  # Coyote dash then dash again to grab the whell on the right
       DoubleJump, Damage=15, Hammer OR Spear=2 OR Flash=2 OR Sentry=2  # Djump+your other movement option to grab the wheel. Using 2 energy weapons because dependaing on where you land in the spikes, the knockbak might make you fall
-      DoubleJump, Damage=15, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # Same as above but more energy efficient
-      Bash, Grenade=1, Damage=15, Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
-      Bash, Grenade=1, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
-      Bash, Grenade=1, Damage=30, Sentry=3  # Same as above but take the second dboost
+      Bash, Grenade=1, Damage=15, Dash OR Glide OR Sword
+      Bash, Grenade=1, Damage=30, Sentry=3
       Bash, Grenade=2
     unsafe:
+      DoubleJump, Damage=15, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # Same as the Kii path, but more energy efficient
       Dash  # There's a little friendly spike area on the very edge of the platform
       GlideJump
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # There's a little friendly spike area on the very edge of the platform
