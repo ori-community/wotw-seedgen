@@ -4708,8 +4708,9 @@ anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the
       Bash, Dash
       DoubleJump
     kii:
-      Glide OR Sword OR Hammer
-      Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
+      Glide OR Sword OR Hammer OR Dash OR Sentry=4 OR Shuriken=2
+      Water, Sentry=2 OR Shuriken=1
+      Damage=20, Sentry=2 OR Shuriken=1
   state OuterWellspring.LifeHarvestWallBroken:
     gorlek: ShurikenBreak=20
     unsafe: SentryBreak=20
@@ -4722,9 +4723,10 @@ anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the
       Bash, Grenade=1  # this would be in moki if the camera didn’t put ori right at the top of the screen, making it hard to aim/catch the grenade
       OuterWellspring.LifeHarvestLeverPulled, SentryJump=1, DoubleJump OR Dash OR Glide OR Damage=15
       OuterWellspring.LifeHarvestLeverPulled, Bash, Dash  # other options are somewhere on the border between difficulties
-    kii:
-      OuterWellspring.LifeHarvestLeverPulled, Bash, Glide OR Sword OR Hammer
-      OuterWellspring.LifeHarvestLeverPulled, Bash, Sentry=2, Shuriken=1 OR Sentry=2 OR Damage=20
+    kii, OuterWellspring.LifeHarvestLeverPulled, Bash:
+      Glide OR Sword OR Hammer OR Sentry=4 OR Shuriken=2
+      Water, Sentry=2 OR Shuriken=1
+      Damage=20, Sentry=2 OR Shuriken=1
     unsafe:
       OuterWellspring.LifeHarvestWallBroken, Bash  # https://youtu.be/Lnv5ggGH69s
       DoubleJump, TripleJump OR GlideJump
@@ -4749,13 +4751,13 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openin
     kii:
       Damage=80
       Damage=40, WaterDash OR DoubleJump OR Dash
-      Bash, Damage=20, DoubleJump OR Glide
+      Bash, Damage=20, DoubleJump OR Glide  # Bash glide
       Bash, Grapple, Damage=20, Dash OR Sword
       Dash, Grapple, Damage=20, DoubleJump OR Glide OR Sword OR Hammer
       Bash, Grapple, Glide
       Bash, DoubleJump, TripleJump, Grapple OR Glide OR Dash
       Bash, DoubleJump, TripleJump, Sword # Pogo the second fish
-      Bash, DoubleJump, TripleJump, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Damage=20
       Dash, Grapple, Damage=20
@@ -4794,14 +4796,16 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openin
       OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Water OR Damage=20:
         Damage=15, DoubleJump OR Dash OR Sword OR Hammer
         DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
-        Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+        Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
         Glide, Hammer
     unsafe:
       Grapple, DoubleJump, Combat=WeakSlug OR Bash
       Damage=15, Water, WaterDash OR Bash OR SwordSJump=1  # Use the wheel above BasementEC. walljump after the damage to regrab the wheel and use the iframes to pass the spikes.
       OuterWellspring.EntranceDoorOpen, Bash OR Grapple
       OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
-      
+      OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Damage=15, Water OR Damage=20  # Jump from the small ground on the wheels opening
+      OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Blaze=2, Water OR Damage=20
+
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
   refill Energy=3:
     moki: BreakCrystal
@@ -4821,8 +4825,8 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
     gorlek: Grapple, DoubleJump, TripleJump OR Sword OR Hammer
     kii:  # Grapple paths are covered by AboveEntranceDoor->RightWallMidpoint->TrialApproach->EastDoor
       DoubleJump, TripleJump, Bash
-      Bash, Grenade=2
     unsafe:
+      Bash, Grenade=2
       Bash, DoubleJump
       SentryJump=1, DoubleJump, Damage=15, Dash OR Glide
       SentryJump=1, Bash, Grenade=1, DoubleJump
@@ -4840,8 +4844,8 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       Bash, Grenade=3, DoubleJump
     kii:
       Grapple, Hammer OR Blaze=4 OR Sentry=2
-      Bash, Grenade=1, DoubleJump
     unsafe:
+      # Bash, Grenade=1, DoubleJump
       Grapple, Shuriken=2
       DoubleJump, Bash OR Dash
   conn OuterWellspring.RightWallMidpoint:
@@ -4857,13 +4861,14 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       SentryJump=1, Dash, Glide
     kii:
       Bash, Grenade=1
-      DoubleJump, Sword OR TripleJump
-      DoubleJump, Hammer, Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Bash OR Glide OR Sword OR Blaze=6 OR Sentry=4
-      Dash, Hammer, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump
+      DoubleJump, Sword, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Spear=1
+      DoubleJump, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Bash OR Glide OR Sword OR Blaze=6 OR Sentry=4  # Drop from the wheel above the wooden platform
     unsafe:
       Glide
+      DoubleJump, Hammer, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Dash, Hammer, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Drop from the wheel above the wooden platform
       Sword, Shuriken=1  # Pogo the energy cristal to grab the wheel
   conn WestGlades.MillApproach:  # check for redundancies with EntranceDoor and RightWallMidpoint
     gorlek: Glide
