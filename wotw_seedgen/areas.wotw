@@ -4580,9 +4580,9 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
   pickup OuterWellspring.SwimEX:
     moki: Water
     unsafe:
-      Damage=180
-      WaterDash, Damage=80
-      Bash, Damage=120
+      Damage=80
+      WaterDash, Damage=40
+      Bash, Damage=60
 
   conn OuterWellspring.LifeHarvestEntry:
     moki, OuterWellspring.LifeHarvestWallBroken:
@@ -5175,9 +5175,10 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
       SwordSJump=1, DoubleJump, TripleJump OR Dash  # Weapon hover
       HammerSJump=1, DoubleJump, TripleJump, Dash  # Weapon hover
     kii:
-      DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump, Dash OR Sword
       DoubleJump, TripleJump, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
+    unsafe: DoubleJump, TripleJump, Hammer
   conn OuterWellspring.EastDoor:  # Most paths from this anchor should be redundant with going to AboveEntranceDoor then EastDoor
     kii: Bash, Grenade=2  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
   conn OuterWellspring.TrialApproach:  # no moki path because the camera makes the connection hard to see
@@ -5185,10 +5186,11 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
     kii:
       Grapple
       Bash, Grenade=3  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
-      Bash, Grenade=2, Damage=15, DoubleJump OR Dash OR Glide OR Sword OR Sentry=3  # With sentry, 2 sentries to reach the spikes then 1 to exit the spikes without taking a second dboost
+      Bash, Grenade=2, Damage=15, DoubleJump OR Dash OR Glide OR Sword
+      Bash, Grenade=2, Damage=30, Sentry=3
+    unsafe:
       Bash, Grenade=2, Damage=15, Shuriken=1, Sentry=2  # Same as above but more energy efficient
-      Bash, Grenade=2, Damage=30, Sentry=3  # Same as above but take the second dboost
-    
+
 anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towards the trial room
   refill Checkpoint
 
@@ -5203,7 +5205,7 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Bash, Grenade=1, Dash OR Glide
     kii:
       Grapple, DoubleJump OR Dash OR Glide OR Sword
-      Bash, Grenade=1 OR DoubleJump OR Sword OR Hammer  # wall jump on the wall next to the SL container. Without grenade, use the 
+      Bash, Grenade=1 OR DoubleJump OR Sword OR Hammer  # wall jump on the wall next to the SL container. Without grenade, use the beetle
     unsafe:
       Grapple  # https://youtu.be/vI511KFMZWI
   pickup OuterWellspring.RightWallEC:
@@ -5244,7 +5246,7 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       DoubleJump, Hammer OR Sentry=2 OR Damage=15
       Dash, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15
       Damage=15, Sentry=2
-    unsafe: DoubleJump
+    unsafe: DoubleJump OR Dash
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
@@ -5288,14 +5290,13 @@ anchor OuterWellspring.TrialStart at -665, -3937:
       Grapple, Glide
       Launch
     gorlek:
-      DoubleJump, TripleJump OR Sword
+      DoubleJump, TripleJump OR Sword OR Hammer
       Dash, Sword OR Hammer
       Glide
       Grapple, DoubleJump OR Dash OR Sword OR Hammer
     kii:
       Dash OR Sword
       Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      DoubleJump, Hammer  # @validator probably should be gorlek
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Damage=30 OR DoubleJump
 
