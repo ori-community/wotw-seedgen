@@ -5396,21 +5396,22 @@ anchor InnerWellspring.ThornShardArea at -1317, -3933:  # on top of the wall at 
       Grapple, DoubleJump, TripleJump OR Sword OR Hammer
       Grapple, Dash, Glide OR Sword OR Hammer
     kii:
-      Bash, Grenade=1, Dash OR DoubleJump OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Dash OR DoubleJump OR Glide
       Grapple, Dash OR DoubleJump  # with djump, walljump on the wall above the grappable plant
       Grapple, Sword, Glide OR Hammer OR Spear=1 OR Shuriken=1
       Grapple, Hammer, Shuriken=1 OR Sentry=2 OR Damage=15
       Dash, DoubleJump, TripleJump OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=15
-      Dash, Damage=15, Sword OR Hammer
+      Dash, Damage=15, Sword OR Hammer  # With hammer, do only two slashes
       Dash, Glide, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
-      Dash, Sentry=2, Damage=15
     unsafe:
+      Bash, Grenade=1, Shuriken=1 OR Flash=1 OR Sentry=1  # Use energy to reach the grenade
+      Dash, DoubleJump, Sentry=1 OR Flash=1
       SwordSJump=1, Damage=15
       Grapple, Sword
-      Dash, Shuriken=2, Damage=15
+      Dash, Damage=15, Glide OR Shuriken=2 OR Sentry=2
 
   conn InnerWellspring.EntranceDoor: free
-  conn InnerWellspring.ShortcutLever:  # for fully rspawn. Make sure it's not redundant with paths from EntranceDoor
+  conn InnerWellspring.ShortcutLever:  # for fully respawn. Make sure it's not redundant with paths from EntranceDoor
     unsafe:
       Damage=30, DoubleJump
       Damage=45, Dash OR Sword OR Hammer OR Shuriken=3 OR Flash=3 OR Sentry=3
@@ -5434,11 +5435,10 @@ anchor InnerWellspring.ShortcutLever at -1264, -3907:  # At the lever on top of 
       Damage=15, Glide OR Sword OR Hammer
     kii, InnerWellspring.ShortCutWheel:
       Sword OR Damage=15
-      Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, InnerWellspring.ShortCutWheel:
-      Hammer OR Sentry=2  # friendly spikes when you slide off the wheel
-      Shuriken=2
+      Glide OR Hammer OR Sentry=2 OR Shuriken=2  # friendly spikes when you slide off the wheel
   conn InnerWellspring.ThornShardArea:  # Make sure it's not redundant with going to InnerWellspring.EntranceDoor first
     gorlek: DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii: Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
@@ -5449,7 +5449,7 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
   refill Energy=3:
     moki: BreakCrystal
 
-  state InnerWellspring.DrainRoomBottomWheel:  # @validator I added that state for DrainRoomExit->DrainRoom connection. Previous difficulty didn't deemed pathfinding that state was worth it so I'm not pathfinding it for kii either
+  state InnerWellspring.DrainRoomBottomWheel:  # @validator I added that state for DrainAreaExit->DrainRoom connection. Previous difficulty didn't deemed pathfinding that state was worth it so I'm not pathfinding it for kii either
     moki: InnerWellspring.ThreeWheels, BreakWall=16
 
   conn InnerWellspring.EntranceDoor:
@@ -5478,19 +5478,21 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
         Damage=15, Sword OR Hammer
         Bash, Grenade=1, Sword OR Hammer
         SentryJump=1
+      InnerWellspring.DrainLever:
+        DoubleJump
+        Dash, Sword OR Hammer
       Water, Dash  # if you drained the water, you can use the bottom of the wheel instead
       Water, Bash, Grenade=4  # if you drained the water, you can use the bottom of the wheel instead
     kii:
       DoubleJump, Blaze=5 OR Sentry=3
       Dash, Blaze=3 OR Sentry=2
       Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      InnerWellspring.DrainRoomBottomWheel, Sword OR Hammer OR Shuriken=4 OR Sentry=4
-      Damage=60, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
-      Damage=60, Bash, Grenade=3  # dboost in dirty water water. If you drained the water, you can go bellow the wheel instead
-      WaterDash, Damage=40, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
-      WaterDash, Damage=40, Bash, Grenade=4  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
-      InnerWellspring.DrainLever:  # @validator confused about why no paths are using this state in gorlek/moki
-        DoubleJump OR Dash
+      InnerWellspring.DrainRoomBottomWheel, Sword OR Hammer OR Shuriken=4
+      Damage=20, DoubleJump OR Dash  # dboost in dirty water after the wheel. If you drained the water, you can use the bottom of the wheel instead
+      Damage=60, Bash, Grenade=3  # dboost in dirty water. If you drained the water, you can go bellow the wheel instead
+      WaterDash, Damage=40, Bash, Grenade=3  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead (use an extra grenade on the small floor below the wheel)
+      InnerWellspring.DrainLever:
+        Dash
         Bash, Grenade=3
       # if you have a non-energy weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
       # Sword, InnerWellspring.DrainLever OR Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
@@ -5506,6 +5508,7 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
       WaterDash, Bash, Grenade=2, Damage=15, BreakWall=10, Water OR Damage=20  # if you drained the water, you can go through through the drained room instead
       InnerWellspring.DrainRoomBottomWheel, Shuriken=3 OR Blaze=5 OR Flash=3 OR Sentry=3
       InnerWellspring.DrainRoomBottomWheel, Bash, Grenade=2  # not hard, but grenades can vanish on rotating objects sometimes
+      InnerWellspring.DrainLever, Sword OR Shuriken=3
   conn InnerWellspring.DrainAreaEntrance:
     moki: InnerWellspring.DrainLever, DoubleJump OR Dash OR Grapple OR Glide OR Launch
     gorlek, InnerWellspring.DrainLever:
@@ -5530,12 +5533,12 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
       DoubleJump, Blaze=4 OR Sentry=3
       Dash, Blaze=3 OR Sentry=2
       InnerWellspring.DrainRoomBottomWheel, Shuriken=2 OR Flash=2 OR Sentry=2
-      Damage=60, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
-      Damage=60, Bash, Grenade=1  # dboost in dirty water water. If you drained the water, you can use the bellow the wheel instead
-      WaterDash, Damage=40, DoubleJump OR Dash  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
-      WaterDash, Damage=40, Bash, Grenade=4  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      Damage=20, DoubleJump OR Dash  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead
+      Damage=60, Bash, Grenade=1  # dboost in dirty water. If you drained the water, you can use the bellow the wheel instead
+      WaterDash, Damage=40, DoubleJump OR Dash  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead
+      WaterDash, Damage=40, Bash, Grenade=1  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead
       InnerWellspring.DrainLever:
-        DoubleJump OR Dash OR Damage=45
+        Damage=45
         Bash, Grenade=1
       # if you have a non-energy weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
       # Sword, InnerWellspring.DrainLever OR Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
@@ -5545,6 +5548,7 @@ anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can d
       DoubleJump
       Dash, Damage=15  # cross the gap going over
       InnerWellspring.DrainRoomBottomWheel, Bash, Grenade=2  # not hard, but grenades can vanish on rotating objects sometimes
+      InnerWellspring.DrainLever, Sword OR Shuriken=2
 
 anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after dropping through the gate draining the water
   pickup InnerWellspring.DrainHC:
@@ -5562,11 +5566,11 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Water, Bash, Grenade=1, Grapple OR Glide
       Launch
     gorlek:
-      DoubleJump, Water OR TripleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=20
+      DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
       Bash, Dash, Sword OR Hammer
-      Bash, Grenade=1, Water OR Dash OR Damage=20
+      Bash, Grenade=1, Water OR Damage=20
       Bash, SentryJump=1, Water OR Damage=20
-      Water, WaterDash, Dash, Sword OR Hammer  # @validator Added path. Gorlek might want some variation of this.
+      Water, WaterDash, Dash, Sword OR Hammer
     kii:
       Dash, Hammer OR Sword
       Dash, Bash, Spear=1 OR Flash=1 OR Sentry=1  # use energy weapon to reach the wall at the left of the lever
@@ -5575,6 +5579,8 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Dash, Damage=20, Damage=20, Combat=2xWeakSlug, WaterDash
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Sword
+      Water, WaterDash, Glide, Sword
+      Water, WaterDash, Hammer
     unsafe:
       Dash, Combat=2xWeakSlug
       Water, WaterDash, GlideJump  # glide jump from the wheel to the sl container
