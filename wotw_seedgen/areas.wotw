@@ -5938,9 +5938,10 @@ anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking th
       Water, DoubleJump OR Grapple OR Dash OR Hammer OR Damage=30
       Water, Bash, Grenade=1
       Water, Damage=15, Sword
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump, Damage=15  # Damage boost on the left in 2nd part
     unsafe:
       Grapple
+      DoubleJump, TripleJump
       Water, Spear=1 OR SentryJump=1 OR Damage=15
 
   pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
@@ -5951,8 +5952,10 @@ anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking th
   conn InnerWellspring.PastSpinPuzzle:  # while there are abilitysets to get through the spinning room regardless of state, they are more expensive than just solving the puzzle
     moki: InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
     gorlek: InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
-    kii: InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
-    unsafe: InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
+    kii: InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump, Damage=15
+    unsafe:
+      InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
+      InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
   conn InnerWellspring.EastDoor:
     moki, InnerWellspring.SpinningRoomOpen:
       Grapple OR Launch
@@ -5992,16 +5995,16 @@ anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting th
       Grapple, Damage=10
       DoubleJump, Damage=15, Combat=Miner OR Bash OR Damage=10  # wjump of the right wall to grab the first wheel then dboost at the first laser
     unsafe:  # You can bait the Miner to make them fall into spikes
-      DoubleJump OR Hammer OR Sentry=2
+      DoubleJump OR Grapple OR Hammer OR Sentry=2
       Sword, Sentry=1
   conn InnerWellspring.SpinPuzzle:
     moki, InnerWellspring.SpinPuzzleSolved:
       DoubleJump OR Glide OR Launch
       Grapple, Dash
     gorlek, InnerWellspring.SpinPuzzleSolved: Dash OR Sword OR Hammer OR Damage=15
-    kii:
-      # Water  # This was in kii which doesn't seem right to me but rn I'm just validating moki and gorlek so I'll leave it to someone else to figure out what should be here
-      InnerWellspring.SpinPuzzleSolved, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    kii, InnerWellspring.SpinPuzzleSolved:
+      Water, Damage=15
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: InnerWellspring.SpinPuzzleSolved OR Water  # yep, water works for all four states of the room. Cool, huh?
 
 anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the two rotating wheel on the way to the top of the room
@@ -6061,7 +6064,7 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
       Launch, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
       Launch, Dash, Sword OR Hammer
     kii:
-      Glide, Damage=10
+      Glide, Damage=10  # Damage boost the miner
       Water, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
       Damage=75, Combat=Miner OR Bash
       Damage=85
@@ -6071,6 +6074,8 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
       Damage=60, Bash, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=70, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      Launch  # There is a small ledge on the ceiling to reset launch
 
 anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
   refill Full
@@ -6110,8 +6115,8 @@ anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
   pickup InnerWellspring.SwimOre:
     moki: Water
     unsafe:  # Enemies aren't here if you don't have Clean Water
-      Damage=160
-      WaterDash, Damage=60
+      Damage=80
+      WaterDash, Damage=40
 
   conn Teleporters: free
   conn OuterWellspring.TopDoor: free
@@ -6162,16 +6167,19 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
         Water, Sentry=2 OR Damage=15  # two sentries to avoid the spikes before the falling wheel
         Damage=95
         Damage=60, Sentry=2  # two sentries before the falling wheel
-        # condition for energy management, since flash and shuriken cost less enegy than sentry
-        Damage=40, Sentry=2, Sentry=1 OR Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
-        Damage=20, Sentry=2, Sentry=2 OR Shuriken=2 OR Flash=2  # same as above but use both options
-        Sentry=4, Sentry=2 OR Shuriken=2 OR Flash=2  # same as above but use 2 sentries to make the first jump
+        Damage=40, Sentry=3  # same as above + either one at the 2nd jump or between the two rotating wheels
+        Damage=20, Sentry=4  # same as above but use both options
+      Grapple, Bash, Sentry=6  # same as above but use 2 sentries to make the first jump
     unsafe:
       Launch
       Grapple, Bash, WaterDash, Damage=80
       Grapple, Bash, Hammer
       Grapple, DoubleJump
       FlashSwap
+      # Same as Kii paths, but use two different energy weapons for energy management, since flash and shuriken cost less enegy than sentry
+      Grapple, Bash, WaterDash, Damage=40, Sentry=2, Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
+      Grapple, Bash, WaterDash, Damage=20, Sentry=2, Shuriken=2 OR Flash=2  # same as above but use both options
+      Grapple, Bash, Sentry=4, Shuriken=2 OR Flash=2  # same as above but use 2 sentries to make the first jump
 
   pickup InnerWellspring.EscapeRevisitEX:
     moki: InnerWellspring.WaterEscape
