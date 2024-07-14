@@ -5596,11 +5596,13 @@ anchor InnerWellspring.DrainAreaEX at -1064, -3961:  # At DrainEX
       Bash, DoubleJump OR Dash  # luring the skeetos with other abilities seems tricky
     kii:
       Damage=40, Bash OR Damage=20
-      Damage=20, Damage=20, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # use energy weapon the two floating logs
+      Damage=20, Damage=20, Shuriken=1 OR Flash=1 OR Sentry=1  # use energy weapon between the two floating logs
       Damage=20, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       WaterDash, Damage=20, Bash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      Dash, DoubleJump OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, DoubleJump OR Sword OR Hammer
     unsafe:
+      Dash, Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=20, Damage=20, Spear=1
       DoubleJump
       WaterDash, Damage=20
 
@@ -5638,23 +5640,27 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
       Spear=2 OR Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2
       Bash  # Bait the skeeto
   conn InnerWellspring.DrainRoom:  # Make sure it's not redundant with DrainAreaExit->DrainRoomCenter->DrainRoom
-    moki: Dash, Glide, Water  # @validator I removed most moki paths because they were redundant with DrainAreaExit->DrainRoomCenter->DrainRoom but there might have some paths using DrainRoomBottomWheel/DrainLever to find here...
+    moki:
+      Dash, Glide, Water OR InnerWellspring.DrainRoomBottomWheel
     gorlek:
+      InnerWellspring.DrainRoomBottomWheel, Glide, Sword OR Hammer
       Glide, Water OR Damage=20
       Water, Sword
       Water, Dash, Damage=15
       Water, Grapple, Damage=15, Hammer
     kii:
-      InnerWellspring.DrainRoomBottomWheel, Sentry=4
-      InnerWellspring.DrainRoomBottomWheel, Bash, Grenade=2
-      InnerWellspring.DrainRoomBottomWheel, Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, dboost in spikes instead.
+      InnerWellspring.DrainRoomBottomWheel:
+        Sentry=4
+        Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+        Bash, Grenade=2
+        Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, dboost in spikes instead.
       InnerWellspring.DrainLever:
         Damage=15, Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1 OR Damage=15
         Bash, Grenade=2
         Bash, Grenade=1, Damage=15
-      Bash, Grenade=1, Damage=80  # dboost in dirty water water. If you drained the water, you can dboost in the spikes instead
-      WaterDash, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1  # dboost in dirty water water. If you drained the water, dboost in spikes instead
-      WaterDash, Damage=40, Bash, Grenade=4  # dboost in dirty water water. If you drained the water, you can use the bottom of the wheel instead
+      Bash, Grenade=1, Damage=80  # dboost in dirty water. If you drained the water, you can dboost in the spikes instead
+      WaterDash, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1  # dboost in dirty water. If you drained the water, dboost in spikes instead
+      WaterDash, Damage=40, Bash, Grenade=1  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead
     unsafe:
       InnerWellspring.DrainLever, Damage=15, Grapple OR Blaze=2  # Grapple is awkward if the wheel is spinning snce you need to jump blindly and you might have jumped before the wheel can be grappled
 
@@ -5727,10 +5733,11 @@ anchor InnerWellspring.DrainRoomTop at -1086, -3908:  # At the right ledge on to
       InnerWellspring.DrainRoomTopWheel, SentryJump=1
     kii:
       DoubleJump OR Dash
-      Grapple, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Glide OR Sword OR Hammer OR Shuriken=1
       Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Grapple
+      # Grapple, Flash=1 OR Sentry=1
       Bash, Grenade=1
 
 anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room below the drain lever
@@ -5744,7 +5751,7 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
     gorlek:
       InnerWellspring.UpperCorruption OR SentryJump=1
     kii:
-      DoubleJump, TripleJump, Damage=15
+      DoubleJump, TripleJump, Damage=15  # Damage boost on the left
     unsafe: GrenadeJump
 
   pickup InnerWellspring.LeverEC:
@@ -5763,7 +5770,7 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
       InnerWellspring.UpperCorruption, Bash, Grenade=1
       InnerWellspring.UpperCorruption, Grapple OR SentryJump=1
     kii:
-      DoubleJump, TripleJump, Damage=15
+      DoubleJump, TripleJump, Damage=15  # Damage boost on the left
     unsafe:
       GrenadeJump
 
@@ -5776,7 +5783,7 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
       DoubleJump, TripleJump OR Sword OR Hammer
     kii:
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Sword OR Hammer
+      Dash, Sword OR Hammer OR Shuriken=1 OR Spear=1  # Weapon, then dash
     unsafe: free  # lovely friendly spikes
   conn InnerWellspring.WestDoor:
     moki:
@@ -5855,7 +5862,7 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
       Grapple, Dash
     kii:
       Grapple, Sword OR Hammer OR Shuriken=1
-      DoubleJump, Sword
+      DoubleJump, Sword OR Spear=1
     unsafe:
       Grapple, Sentry=2
       Grenade=1
