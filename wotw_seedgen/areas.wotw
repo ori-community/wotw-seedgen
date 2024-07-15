@@ -13750,8 +13750,9 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Bash, Grenade=1, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Glide OR Dash OR Sword OR Hammer
       Bash, Grenade=2, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer
       Launch, Sword OR Damage=40  # refresh your launch on the wall under Lupo. With sword, hit the elemental to refresh your launch. Dboost in the spikes otherwise
-      Launch, Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Launch, Bash, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Launch, Bash, Spear=1  # Too precise for Kii, and can kill the elemental
       Bash, Grenade=1, DoubleJump, TripleJump, Grenade=1 OR Dash OR WillowsEnd.PortalShortcut OR Damage=40
       DoubleJump, TripleJump, Damage=20, WillowsEnd.PortalShortcut  # dboost on the mine so you can stand on the lava thingy and jump from it to the floating platform
       DoubleJump, TripleJump, Bash, Damage=20, Dash OR Grenade=1 OR Damage=40
@@ -13767,12 +13768,13 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       SentryJump=1, Damage=40, Dash OR Glide  # float with the weapon if needed
     kii:
       Bash, Grenade=1
-      DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump, Dash  # Under the wheel
+    unsafe: DoubleJump, TripleJump, Sword OR Hammer  # Under the wheel
   conn WillowsEnd.GrappleHeartMidPoint:
     moki: Grapple, Launch, DoubleJump OR Dash OR Glide
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
-      Launch, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # use energy weapon before to touch the wall before the first portal
+      Launch, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # use energy weapon before touching the wall before the first portal
       Launch, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # same as above but one more energy weapon in order to touch the wall before the last wheel
       Bash, Grenade=2, DoubleJump, TripleJump, Grapple  # bashnade to reach the floating platform at the entrance, tjump to the second floating platform and bashnade towards the portals
       Bash, Grenade=1, DoubleJump, TripleJump, Grapple, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1  # same as above but condition instead of second bashnade. Possible with more energy weapons but these are the only which cost less energy than grenade
@@ -13820,12 +13822,13 @@ anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way t
       Launch, DoubleJump, Sword OR Damage=40
       Launch, Sword, Damage=40
     kii:
-      Launch, DoubleJump OR Sword OR Hammer OR Damage=40
+      Launch, DoubleJump OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=40
       DoubleJump, TripleJump, Glide, Damage=20  # wjump on the wall next to the laser. Take a damage boost in the double laser.
       DoubleJump, TripleJump, Damage=60, Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2  # dboost in the double laser (20) then in the spikes underneath (40)
       DoubleJump, TripleJump, Damage=100  # dboost in the spikes next to the double laser (40) + dboost in the spikes in between the double laser (40) + dboost in the last laser (20)
     unsafe:
       Launch
+      DoubleJump, TripleJump, Damage=20, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2 # Land after dboost in the dounle laser, tjump to the wall next to the last portal
       DoubleJump, HammerJump  # https://youtu.be/nWob6QqkKpM
       DoubleJump, TripleJump OR Dash OR GrenadeJump  # https://youtu.be/DRJrr9v-6xg
   conn WillowsEnd.Entry:  # Be sure it's not redundant with going to WillowsEnd.GrappleHeart first 
