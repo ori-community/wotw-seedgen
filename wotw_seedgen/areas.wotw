@@ -13828,7 +13828,7 @@ anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way t
       DoubleJump, TripleJump, Damage=100  # dboost in the spikes next to the double laser (40) + dboost in the spikes in between the double laser (40) + dboost in the last laser (20)
     unsafe:
       Launch
-      DoubleJump, TripleJump, Damage=20, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2 # Land after dboost in the dounle laser, tjump to the wall next to the last portal
+      DoubleJump, TripleJump, Damage=20, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2 # Land after dboost in the double laser, tjump to the wall next to the last portal
       DoubleJump, HammerJump  # https://youtu.be/nWob6QqkKpM
       DoubleJump, TripleJump OR Dash OR GrenadeJump  # https://youtu.be/DRJrr9v-6xg
   conn WillowsEnd.Entry:  # Be sure it's not redundant with going to WillowsEnd.GrappleHeart first 
@@ -13868,10 +13868,10 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=4
       Bash, Grenade=1, DoubleJump OR Dash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # bash grenade above the heart to avoid a dboost
       WillowsEnd.GrappleWheelsHeart, Sword OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      WillowsEnd.GrappleWheelsHeart, Blaze=1, Spear=1  # Blaze for the first jump, spear for the second. More energy efficient than 2 spears
       WillowsEnd.GrappleWheelsHeart, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump
+      WillowsEnd.GrappleWheelsHeart, Blaze=1, Spear=1  # Blaze for the first jump, spear for the second. More energy efficient than 2 spears
       WillowsEnd.GrappleWheelsHeart, Hammer
 
   conn WillowsEnd.Entry:  # going backwards without breaking the heart has many weird spots, saving it for later difficulties
@@ -13909,10 +13909,10 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Bash, Grenade=1, Damage=40, DoubleJump, TripleJump, Dash OR Glide  # damage because the maneuver is a bit tricky
     kii:
       Launch # launch on the wall bellow the spikes in order to reach the second wheel 
-      Grapple, DoubleJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40  #condition in order to reach the portal then land on the ledge when you exit the portal and coyote dash->dash->djump
+      Grapple, DoubleJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40  # condition in order to reach the portal then land on the ledge when you exit the portal and coyote dash->dash->djump
       Grapple, DoubleJump, TripleJump, Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # land on the ledge when exiting the portal
       Grapple, DoubleJump, TripleJump, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # same as above but land on the wheel to reach the portal
-      Bash, Grenade=1, DoubleJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40  #condition in order to reach the portal then land on the ledge when you exit the portal and coyote dash->dash->djump
+      Bash, Grenade=1, DoubleJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40  # condition in order to reach the portal then land on the ledge when you exit the portal and coyote dash->dash->djump
       Bash, Grenade=1, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # land on the ledge when exiting the portal
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # same as above but land on the wheel to reach the portal
     unsafe:  # paths may not make sense after moving them from entry
@@ -13942,6 +13942,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Bash, Grenade=2
     kii:
       Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR Damage=80
+      Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Damage=40
   conn WillowsEnd.InnerTP:
     kii:
@@ -14012,7 +14013,7 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
 
   conn WillowsEnd.InnerTP:
     moki: Combat=CrystalMiner OR Bash OR Launch
-    kii: Damage=10  # @validaotr should probably be gorlek. Dboost on the gorlek.
+    gorlek: Damage=10  # Dboost on the gorlek.
     unsafe: free  # reload to despawn the gorlek
   conn WillowsEnd.East:
     moki:
@@ -14032,7 +14033,7 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
       Bash, Grenade=1
       Bash, DoubleJump OR Glide OR Sword OR Hammer # Bash glide from the gorlek to the elemental 
       Bash, Dash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Sword, Dash  # slash the element to reset your jumps, pogo it then tjump+upslash to reach the wall above it
+      DoubleJump, TripleJump, Sword, Dash OR Glide  # slash the element to reset your jumps, pogo it then tjump+upslash to reach the wall above it
     unsafe:
       Bash, Dash  # Bash glide from the gorlek to the elemental 
       DoubleJump, TripleJump, Sword  # slash the element to reset your jumps, pogo it then tjump + up slash to reach the left wall
@@ -14078,11 +14079,11 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
       BreakCrystal, Launch OR DoubleJump OR Glide
       Bow=1, Dash
     unsafe: BreakCrystal
-      
+
   conn WillowsEnd.East:
     moki: Launch OR DoubleJump OR Dash OR Glide
     gorlek: Bash OR Sword OR Hammer
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself don before entering the portal
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself down before entering the portal
     unsafe: PauseHover
   conn WillowsEnd.RedirectHeartPuzzle: free
   # most likely there will be non-redundant paths to WillowsEnd.AboveInnerTP here in the future, just right now there aren't any
