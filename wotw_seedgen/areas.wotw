@@ -14156,7 +14156,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       SentryJump=1, DoubleJump, TripleJump, Damage=20
     kii:
       Damage=90, Combat=CrystalMiner
-      Bash, Grenade=1
+      Bash, Grenade=2
     unsafe:
       SwordJump, TripleJump  # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
       DoubleJump, TripleJump, Dash  # Dash ramp from the left side + tjump in order to touch a small wall in the ceilling. Then tjump+dash toward the portal
@@ -14196,7 +14196,7 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
       Bash, SentryJump=2
       SentryJump=1, DoubleJump, TripleJump
     kii, BreakWall=10:
-      Bash, Grenade=1 OR Damage=40  # bashnade to aovid dboost on the falling wheel
+      Bash, Grenade=1 OR Damage=40  # bashnade to avoid dboost on the falling wheel
       Bash, DoubleJump, Hammer  # djump+upslash to avoid dboost on the falling wheel
       DoubleJump, Sword  # Pogo the Crystal Miner then djump+upslash to avoid dboost on the falling wheel
     unsafe:
@@ -14240,7 +14240,8 @@ anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
   pickup WillowsEnd.WindSpinOre:
     moki: Glide
     kii: Launch, DoubleJump, Damage=40, Damage=80  # dboost on the first wheel, dboost twice on the second one
-    unsafe: Launch, DoubleJump, TripleJump
+    unsafe:
+      Launch, DoubleJump, TripleJump OR Damage=40  # dboost on the 2nd wheel (close to its center), there is a small ledge on the 1st wheel to wait
 
   conn WillowsEnd.GlideHeartPath: free  # :D
 
@@ -14302,6 +14303,7 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
     unsafe:
       Launch, DoubleJump OR Damage=40
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard
+      WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, Spear=1  # Grenade, then spear jump to bash it from higher
   
 anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the upper heart
   refill Checkpoint
