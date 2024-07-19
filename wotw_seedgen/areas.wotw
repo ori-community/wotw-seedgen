@@ -4899,7 +4899,6 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       OuterWellspring.WestDoorBlueMoonFree:
         Grapple, DoubleJump, TripleJump OR Damage=15
         Grapple, Damage=15, Dash OR Glide
-      Grapple, Launch
       Grapple, Bash, Grenade=1, DoubleJump, TripleJump OR Glide OR Damage=15
       Grapple, Bash, Grenade=1, Damage=15, Dash OR Glide
       Grapple, SentryJump=1, DoubleJump, TripleJump OR Glide OR Damage=15
@@ -4907,6 +4906,7 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       Bash, Grenade=1, Launch
       SentryJump=1, Launch
     kii:
+      Grapple, Launch
       Grapple, DoubleJump, TripleJump
       Grapple, Bash, Grenade=1:
         DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -5565,12 +5565,11 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Dash, Bash, Grenade=1
       Water, Bash, Grenade=1, Grapple OR Glide
       Launch
-    gorlek:
+    gorlek:  # Dealing with the enemies can be tricky, so the paths use bash or djump
       DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
       Bash, Dash, Sword OR Hammer
       Bash, Grenade=1, Water OR Damage=20
       Bash, SentryJump=1, Water OR Damage=20
-      Water, WaterDash, Dash, Sword OR Hammer
     kii:
       Dash, Hammer OR Sword
       Dash, Bash, Spear=1 OR Flash=1 OR Sentry=1  # use energy weapon to reach the wall at the left of the lever
@@ -5579,7 +5578,7 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Dash, Damage=20, Damage=20, Combat=2xWeakSlug, WaterDash
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Sword
-      Water, WaterDash, Glide, Sword
+      Water, WaterDash, Sword, Glide OR Dash
       Water, WaterDash, Hammer
     unsafe:
       Dash, Combat=2xWeakSlug
@@ -5643,7 +5642,7 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
     moki:
       Dash, Glide, Water OR InnerWellspring.DrainRoomBottomWheel
     gorlek:
-      InnerWellspring.DrainRoomBottomWheel, Glide, Sword OR Hammer
+      InnerWellspring.DrainRoomBottomWheel, Glide, Sword
       Glide, Water OR Damage=20
       Water, Sword
       Water, Dash, Damage=15
@@ -5651,7 +5650,7 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
     kii:
       InnerWellspring.DrainRoomBottomWheel:
         Sentry=4
-        Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+        Glide, Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
         Bash, Grenade=2
         Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, dboost in spikes instead.
       InnerWellspring.DrainLever:
@@ -5663,6 +5662,7 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
       WaterDash, Damage=40, Bash, Grenade=1  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead
     unsafe:
       InnerWellspring.DrainLever, Damage=15, Grapple OR Blaze=2  # Grapple is awkward if the wheel is spinning snce you need to jump blindly and you might have jumped before the wheel can be grappled
+      InnerWellspring.DrainRoomBottomWheel, Glide
 
 # checkpoint at the anchor below, just hard to reach
 
