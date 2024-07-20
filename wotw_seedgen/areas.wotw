@@ -11737,7 +11737,7 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
       Grenade=1 OR Spear=1 OR Bow=1 
       Shuriken=1, Water OR Damage=20
       Sentry=1, Water OR Damage=20
-    #unsafe: ChargeBlaze=1
+    # unsafe: ChargeBlaze=1
 
   pickup UpperPools.UpperLeftKS:  # connections using the bubble have to start from here, others use the higher anchor
     moki: UpperPools.KeystoneRoomBubbleFree, Flap, DoubleJump
@@ -11800,10 +11800,12 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       DoubleJump, TripleJump, Hammer  # Can either reach the left or right wall; for the right wall you can even do it starting from a grounded upswing
       WaterDash, DoubleJump, TripleJump, Water OR Damage=20
     kii:
-      DoubleJump, TripleJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Sword OR Spear=1
       WaterDash, DoubleJump, Water, Dash OR Glide OR Sword OR Hammer OR Flash=1 OR Sentry=1
       WaterDash, DoubleJump, Damage=20, Dash OR Glide OR Sword OR Hammer OR Flash=1 OR Sentry=1
     unsafe:
+      # DoubleJump, TripleJump, Flash=1 OR Sentry=1
+      DoubleJump, TripleJump  # Small ledge on the ceiling to the left
       WaterDash, DoubleJump, Water OR Damage=20
   pickup UpperPools.UpperMidKS:  # the majority of paths will go through connections around the top
     gorlek:
@@ -11812,8 +11814,11 @@ anchor UpperPools.KeystoneRoom at -1540, -4095:  # Autosave below the two upper 
       Bash, Grenade=1, Dash, Damage=20
     kii:
       Bash, Grenade=1, Damage=20
-      WaterDash, Water, Damage=20, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # wdash+upslash/energy weapon to reach the left wall, wjump in the spikes to get the key
-      WaterDash, Damage=40, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # wdash+upslash/energy weapon to reach the left wall, wjump in the spikes to get the key
+      WaterDash, Water, Damage=20, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # wdash+upslash/energy weapon to reach the right wall, wjump in the spikes to get the key
+      WaterDash, Damage=40, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # wdash+upslash/energy weapon to reach the right wall, wjump in the spikes to get the key
+    unsafe:
+      WaterDash, Damage=40  # wdash to the right wall
+      WaterDash, Water, Damage=20  # wdash to the right wall
   pickup UpperPools.UpperRightKS:
     moki:
       Bash, Grenade=1, Water OR DoubleJump OR Dash OR Glide
@@ -11916,7 +11921,7 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
       Grapple, UltraGrapple, Sword OR Hammer OR BlazeSwap=1 OR Sentry=1 OR SpearJump=1 OR Shuriken=1 OR DoubleJump OR Dash OR Bash OR Glide OR FlashSwap OR PauseHover  # Use the slime.
       GrenadeJump, Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Shuriken=1 OR DoubleJump OR Dash OR FlashSwap OR Damage=20  # Grenade Wall Jump from under the spikes. Might be possible with very precise pause floats.
       HammerJump
-      DoubleJump, TripleJump OR Glide  # hardcore parkour
+      DoubleJump, Glide  # hardcore parkour
 
 anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of Waterdash tree
   refill Checkpoint
