@@ -11857,12 +11857,13 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
   state UpperPools.ButtonDoorAboveTree:
     moki: Water, WaterDash
     kii: WaterDash, Damage=80
-    unsafe: WaterDash, Damage=60
+    unsafe: WaterDash, Damage=40  # tp after pushing it
 
   pickup UpperPools.SwimDashTree: free
   pickup UpperPools.SwimDashCurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=60
+    unsafe: WaterDash, Damage=40
 
   conn UpperPools.AboveTree:  # paths using the bubbles originate from UpperPools.TreeRoomEntrance
     gorlek:
@@ -11893,9 +11894,11 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
       UpperPools.TreeRoomRightBubbleFree, Damage=20, WaterDash, DoubleJump OR Sword OR Hammer
       UpperPools.TreeRoomRightBubbleFree, Bash, Grenade=1, DoubleJump OR Sword OR Hammer
     kii, UpperPools.ButtonDoorAboveTree:
-      Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1  # Sentry causes the enemy to explode
       UpperPools.TreeRoomRightBubbleFree  # let one bubble go out of the water, jump on the next one and use it to land on the first bubble
-    unsafe, UpperPools.ButtonDoorAboveTree: HammerSJump=1
+    unsafe, UpperPools.ButtonDoorAboveTree:
+      HammerSJump=1
+      Bash, Grenade=1, DoubleJump, Sentry=1
 
 anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup above swimdash tree
   pickup UpperPools.RoofEX:
@@ -11965,9 +11968,10 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
     kii:
       Grapple, DoubleJump
       Grapple, Dash, Sword OR Hammer
-      Grapple, Hammer, Sword OR Shuriken=1  # With sword, use both upslashes in order to reach the wall
+      Grapple, Hammer, Shuriken=1
       Bash, Grenade=1, Grapple  # Bash the slime after grappling the plant 
     unsafe:
+      # Grapple, Hammer, Sword  # use both upslashes in order to reach the wall
       Grapple, Hammer
       Grapple, Dash, Spear=1
       Bash, Grenade=2
@@ -11995,7 +11999,7 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
       UpperPools.DrainRoomPurpleWall, DoubleJump, TripleJump OR Sword OR Hammer
     kii:
       Grapple, DoubleJump
-      Grapple, Dash, Hammer
+      Grapple, Dash, Sword OR Hammer
       Grapple, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
       Bash, Grenade=1, Damage=120
       Bash, Grenade=1, Dash, Damage=60
@@ -12005,7 +12009,7 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
       UpperPools.DrainRoomPurpleWall, DoubleJump OR Dash
       UpperPools.DrainRoomPurpleWall, Sword, Hammer OR Spear=1 OR Shuriken=1
       UpperPools.DrainRoomPurpleWall, Hammer, Water OR UpperPools.UpperWaterDrained OR Damage=20:  # If the water is drained, you can walljump. Otherwise, you'll land in the water
-        Shuriken=1 OR Flash=1 OR Sentry=1
+        Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       UpperPools.DrainRoomPurpleWall, Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       Grapple, Hammer  # just need to upslash to be in range for grappling the plant
@@ -12014,7 +12018,7 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
       Bash, Grenade=1, Damage=80
       Bash, Grenade=2, Damage=20
       UpperPools.DrainRoomPurpleWall, Sword OR GlideJump
-      UpperPools.DrainRoomPurpleWall, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      UpperPools.DrainRoomPurpleWall, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       UpperPools.DrainRoomPurpleWall, UpperPools.UpperWaterDrained, Bash, Grenade=2  # micro ledge on the left of the muncher after the breakable wall
   conn UpperPools.DrainPuzzleExit:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
     moki, UpperPools.UpperWaterDrained:
@@ -12033,7 +12037,7 @@ anchor UpperPools.DrainPuzzleRight at -1324, -4060:  # On the ground next to the
   refill Energy=3:
      moki: BreakCrystal
   refill Health=1
-     
+
   state UpperPools.DrainRoomPurpleWall:
     moki: Bash, Water, WaterDash OR Launch
     gorlek:
@@ -12108,7 +12112,7 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
       Water, Bash, Dash OR Sword OR Grenade=1
       Water, Bash, DoubleJump, Hammer
     kii, UpperPools.UpperWaterDrained:
-      Damage=60, Bash, Launch OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Grenade=1 OR Sentry=2
+      Damage=60, Bash, Launch OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Grenade=1 OR Sentry=2  # Bash + damage to break the wall, the rest to reach the pickup
       Damage=60, Damage=60, Bash  # bash a torpedo to break the wall then bash glide another one to reach the pickup
       Water, Bash  # bash a torpedo to break the wall then bash glide another one to reach the pickup
     unsafe, UpperPools.UpperWaterDrained:  # You can manipulate the torpedo enemy in a way that it hits the purple wall without needing any skills
@@ -12127,9 +12131,9 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
         Bash, Grenade=1, DoubleJump
       Water, Bash, DoubleJump, WaterDash OR TripleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
-      Launch, Damage=60  # UpperPools.UpperWaterDrained OR Water OR Damage=60
-      Bash, Grenade=1, DoubleJump, Damage=60  # UpperPools.UpperWaterDrained OR Water OR Damage=60
-      Bash, DoubleJump, Water OR Damage=60  # Possible with only 40 damage but it also need to solve for before darining the water
+      Launch, UpperPools.UpperWaterDrained OR Water OR Damage=60
+      Bash, Grenade=1, DoubleJump, UpperPools.UpperWaterDrained OR Water OR Damage=60
+      Bash, DoubleJump, Water OR Damage=60  # Possible with only 40 damage but it also need to solve for before draining the water
       Bash, Grenade=1, Dash, UpperPools.UpperWaterDrained OR Water OR Damage=60
       Bash, WaterDash, Water OR Damage=60
   conn UpperPools.DrainPuzzleEntrance:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
@@ -12188,8 +12192,8 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
     moki: Water, WaterDash
     kii: WaterDash, Damage=100
     unsafe:
-      Grenade=1, Water OR Damage=140
-      WaterDash, Damage=80
+      Grenade=1, Water OR Damage=80
+      WaterDash, Damage=60
   pickup UpperPools.BubblesEC:
     moki: UpperPools.BubbleSpamLever, DoubleJump OR Dash OR Glide OR Launch
     gorlek: UpperPools.BubbleSpamLever
@@ -12207,6 +12211,9 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
     kii:
       Damage=140
       WaterDash, Damage=60
+    unsafe:
+      Damage=60
+      WaterDash, Damage=40
   pickup UpperPools.RightBubblesEX:  # These paths use the torpedo to break the wall. Paths using another solution for the wall originate from UpperPools.RightBubbleSpamRoom
     moki: Water, Bash, WaterBreath, DoubleJump OR Launch
     gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
@@ -12214,7 +12221,7 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
       Water, Launch
       Water, DoubleJump, TripleJump  # Climb the anemone wall once it's closed again
     unsafe:
-      Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the porpedo and activating the anemone
+      Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the torpedo and activating the anemone
       Bash, Damage=120, Damage=140, Launch OR SwordSJump=1  # bash the torpedo when it spawns then regen and use the bubbles to return safely to the other side
       Water, DoubleJump, Sword OR Hammer  # Climb the anemone wall once it's closed again
   
@@ -12232,7 +12239,7 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
       WaterDash, Sword, Water OR Damage=120  # Pogo the torpedo
       Water, Launch OR SwordSJump=1
       Damage=60, Launch OR SwordSJump=1
-      
+
 # checkpoint at -1386, -4062
 
 region WestPools:
