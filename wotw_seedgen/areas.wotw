@@ -11225,10 +11225,10 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
       Bash, Grenade=1, WaterDash, Water OR Damage=20
     unsafe, UpperPools.UpperWaterDrained:
       DoubleJump, TripleJump, Damage=20  # climb the left wall
-      
+
 anchor EastPools.NextToLupoOre at -1373, -4166:  # Checkpoint between Lupo and the ore
   refill Checkpoint
-  
+
   pickup EastPools.LupoOre: free
   pickup EastPools.UltraBashShard:
     moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
@@ -11240,7 +11240,7 @@ anchor EastPools.NextToLupoOre at -1373, -4166:  # Checkpoint between Lupo and t
       Damage=240
       WaterDash, Damage=180
       Bash, Damage=220
-  
+
   conn EastPools.LupoArea:
     gorlek: ShurikenBreak=20
   conn EastPools.Teleporter:
@@ -11271,10 +11271,10 @@ anchor EastPools.NextToLupoOre at -1373, -4166:  # Checkpoint between Lupo and t
 
 anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
   refill Checkpoint
-  
+
   state EastPools.LupoPurpleFloor:
     unsafe, EastPools.LowerWaterDrained: Water, Bash, Dash
-  
+
   pickup EastPools.LupoEX:
     moki: 
       Launch OR DoubleJump
@@ -11290,9 +11290,9 @@ anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
       Damage=160
       WaterDash, Damage=80
     unsafe, EastPools.LupoPurpleFloor:
-      Damage=140
-      WaterDash, Damage=60
-  
+      Damage=80
+      WaterDash, Damage=40
+
   conn EastPools.NextToLupoOre:
     moki: BreakWall=20
   conn EastPools.MissilePuzzle:
@@ -11301,11 +11301,13 @@ anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
     unsafe, EastPools.LupoPurpleFloor: Damage=180
   conn EastPools.CentralRoom:
     kii, EastPools.LupoPurpleFloor, EastPools.CentralRoomPurpleWall: WaterDash, Damage=100
-    unsafe, EastPools.LupoPurpleFloor, EastPools.CentralRoomPurpleWall: Damage=240
+    unsafe, EastPools.LupoPurpleFloor, EastPools.CentralRoomPurpleWall:
+      Damage=240
+      WaterDash, Damage=80
 
 anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of the pools arena
   refill Checkpoint
-  
+
   # There are two Arenas here: you get one if you enter without WaterDash and another if you enter with it.
   # This path is assuming the worse case of getting the strictly harder WaterDash arena, but doesn't list WaterDash explicitly because you don't need it unless you have it.
   # And any other way would lock basically all of Pools behind WaterDash. So it makes sense, right?
@@ -11313,14 +11315,15 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
     moki: Regenerate, Damage=20, Water, WaterBreath, Combat=4xCrab+Tentacle+2xSkeeto, Bash
     gorlek: Regenerate, Damage=20, Water, Combat=4xCrab+Tentacle+2xSkeeto, Bash
     unsafe: Water, Combat=4xCrab+Tentacle+2xSkeeto, Launch OR Dash OR Damage=20  # Land on the left then jump under the purple wall to correct the torpedo angle. launch in order to avoid the blast damage
-  
+
   pickup EastPools.FightRoomHC:  # The HC only gets unlocked if you finish the alternate WaterDash arena; FightArenas doesn't have WaterDash as requirement included for reasons explained above, so it's needed here
     moki, EastPools.FightArenas, WaterDash:
       DoubleJump, Dash OR Grapple
       Bash, Grenade=1
       Launch
-    gorlek, EastPools.FightArenas, WaterDash: Water OR Damage=20  # WaterDash on the bubble
-    kii, EastPools.FightArenas, WaterDash: DoubleJump  #@validator that might be gorlek? gorlek for sure with tjump
+    gorlek, EastPools.FightArenas, WaterDash:
+      Water OR Damage=20  # WaterDash on the bubble
+      DoubleJump
     unsafe, EastPools.FightArenas, WaterDash:
       Hammer  #Jump on the bubble then stall until a new one spawn
       Dash OR Glide OR Sword # jump on the bubble, wait on the left wall by wall jumping then go back to jump on a new bubble
@@ -11346,12 +11349,16 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
     unsafe, EastPools.ArenaWall:
       Damage=100
       WaterDash, Damage=40
-      EastPools.LowerWaterDrained, Damage=100
+      EastPools.LowerWaterDrained, Damage=80
   conn EastPools.MissilePuzzle:
     moki, EastPools.FightArenas: Water OR DoubleJump OR Dash OR Glide OR Launch 
     gorlek, EastPools.FightArenas: Sword OR Hammer OR Damage=20
     kii: EastPools.FightArenas
-    unsafe: Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
+    unsafe:
+      Water  # Water to avoid the fighting room altogether. Can QTM if the door is here.
+      Damage=40  # Drop in the water just before the arena trigger
+      WaterDash, Damage=20
+      Launch, DoubleJump OR Dash OR Glide  # Under the platform, and avoid touching the water
 
 anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
   refill Checkpoint
@@ -11370,7 +11377,7 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
     unsafe:
       Damage=300, Bash
       Damage=200, Bash, WaterDash
-  
+
   pickup EastPools.EnergyHarvestShard:
     moki:
       Water, WaterDash, DoubleJump
@@ -11382,6 +11389,7 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
       SentryJump=1
     kii:
       WaterDash, Hammer, Water OR Damage=20
+      WaterDash, Spear=1, Water OR Damage=20
       DoubleJump, TripleJump, Hammer  # tjump + upslash from the left wall
     unsafe:
       WaterDash, Sword, Water OR Damage=20
@@ -11399,16 +11407,21 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
       WaterDash, Damage=100
   pickup EastPools.SpiritTrial:
     moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
-    kii:
-      UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, DoubleJump
-      UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, Glide, Dash
-    unsafe: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, Grapple, WaterDash, Glide OR Dash
-    
+    kii, UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall:
+      Water, Grapple, WaterDash, DoubleJump
+      Water, Grapple, WaterDash, Glide, Dash, Bash OR Launch OR Hammer OR Spear=1  # The last condition is for reaching the start, the weapon/ability is not used during the trial
+    unsafe, UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall:
+      Water, Grapple, WaterDash, Glide, Bash OR Launch OR Sword OR Hammer OR Spear=1  # The last condition is for reaching the start, the weapon is not used during the trial
+      Water, Grapple, WaterDash, Dash, Bash OR Launch OR Sword OR Hammer OR Spear=1  # The last condition is for reaching the start, the weapon is not used during the trial
+
   conn EastPools.CentralRoom:
     moki, EastPools.CentralRoomPurpleWall: Water
     kii, EastPools.CentralRoomPurpleWall:
       Damage=180
       WaterDash, Damage=80
+    unsafe, EastPools.CentralRoomPurpleWall:
+      Damage=160
+      WaterDash, Damage=60
   conn EastPools.WaterdashArena:
     moki: EastPools.FightArenas, Water OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: EastPools.FightArenas
@@ -11426,13 +11439,16 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
   refill Checkpoint
 
   state EastPools.CentralRoomPurpleWall:  # @Validator Could had moki/gorlek paths if knowing that a tentacle projectile can break the wall isn't too heavy of the knowledge side
-    kii: Water OR Damage=180  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
+    kii: Water OR Damage=100  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
+    unsafe: WaterDash, Damage=60
   state EastPools.CentralRoomBubbleFree:
     moki: Water, Bash OR WaterDash
     kii:
-      Damage=160, Bash
+      Damage=120, Bash
       Damage=80, WaterDash
     unsafe:
+      Bash, Damage=100
+      WaterDash, Damage=60
       Water, Deflector, Sword
       Water, Bow=1
       Water, Grenade=1, Fracture
@@ -11458,7 +11474,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Bash, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       Bash, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Hammer, Sentry=3  # bashglide from the lantern then one hammer swing and 3 sentries
-      DoubleJump, Glide, Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Glide, Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Spear=1
     unsafe:
       EastPools.CentralRoomBubbleFree
       Bash, Grenade=1, Spear=1 OR Blaze=1
@@ -11480,7 +11496,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Launch
       EastPools.CentralRoomBubbleFree, DoubleJump, TripleJump  # from the seed, jump on a bubble to reach the wall near the lantern and wait for another bubble from there
       EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # with sword/hammer, hover before jumping to avoid touching the bubble
-      EastPools.CentralRoomBubbleFree, Bash, Grenade=1, Grenade=1 OR Water OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Damage=20  # bashnade from the seed to jump on the bubble then wait another bubble
+      EastPools.CentralRoomBubbleFree, Bash, Grenade=1, Grenade=1 OR Water OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # bashnade from the seed to jump on the bubble then wait another bubble
     unsafe:
       EastPools.CentralRoomBubbleFree, Bash, DoubleJump, Blaze=1
       EastPools.CentralRoomBubbleFree, Bash, Grenade=1  # bashnade from the seed to jump on the bubble then wait another bubble
@@ -11496,6 +11512,8 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       WaterDash, Damage=160, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       WaterDash, Damage=180
     unsafe:
+      WaterDash, Damage=120, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Damage=140
       Water, WaterBreath, Launch
       Water, WaterBreath, DoubleJump, GrenadeJump OR HammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
@@ -11505,9 +11523,12 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
     kii, EastPools.CentralRoomPurpleWall:
       Damage=180
       WaterDash, Damage=80
+    unsafe, EastPools.CentralRoomPurpleWall:
+      Damage=160
+      WaterDash, Damage=60
   conn EastPools.LupoArea:
     kii, EastPools.CentralRoomPurpleWall, EastPools.LupoPurpleFloor: WaterDash, Damage=80
-    unsafe, EastPools.CentralRoomPurpleWall, EastPools.LupoPurpleFloor: Damage=200
+    unsafe, EastPools.CentralRoomPurpleWall, EastPools.LupoPurpleFloor: Damage=180
 
 region UpperPools:
   moki: Danger=40, Regenerate
