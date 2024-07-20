@@ -12392,12 +12392,15 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Sentry=2 OR Blaze=2
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
-    kii: Damage=40, Burrow
-  pickup WestPools.BurrowOre:  # intended path omitted in moki
+    kii: Damage=60, Burrow
+  pickup WestPools.BurrowOre:
+    moki: WestPools.ForestsStrength, Water, WaterDash, Burrow, DoubleJump OR Launch
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
-    kii: WestPools.ForestsStrength, Damage=100, Damage=60, Damage=80, WaterDash, Burrow
-    unsafe: WestPools.ForestsStrength, Water, Burrow
-  
+    kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
+    unsafe: WestPools.ForestsStrength:
+      Water, Burrow
+      Damage=80, Damage=60, Damage=80, WaterDash, Burrow
+
   conn Teleporters: free
   conn WestPools.LeftKwolokPlatform:  # WaterDash/Bash to deal with the fishes and crabs which spawns after you defeated Kwolok
     moki:
@@ -12443,7 +12446,7 @@ anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platfor
       Launch
       DoubleJump, HammerJump
       DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
-    
+
 anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platform where the Kwolok's escape starts
   tprestriction:
     moki: WestPools.ForestsStrength
@@ -12456,8 +12459,8 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
       Damage=140
       WaterDash, Damage=80
     unsafe:
-      Damage=80
-      WaterDash, Damage=40
+      Damage=60
+      WaterDash, Damage=20
   pickup UpperPools.LowerKS:  # Only dirty water paths. Solves through the UpperPools.KeystoneRoomEntrance connection with clean water
     kii: WaterDash, Damage=80
       
@@ -12474,7 +12477,9 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
     moki: Water, WaterBreath, WaterDash
     gorlek: Water, WaterDash
     kii: Damage=120, WaterDash
-    unsafe: Water, BreakWall=20, Shuriken OR Grenade OR Bow  # Also possible with Spear and Sentry but it will targets the ennemies which spawn after you defeated Kwolok first
+    unsafe:
+      Damage=100, WaterDash
+      Water, BreakWall=20, Shuriken OR Grenade OR Bow  # Also possible with Spear and Sentry but it will targets the ennemies which spawn after you defeated Kwolok first
 
 anchor KwolokEscape at -1650, -4125:
   nospawn
