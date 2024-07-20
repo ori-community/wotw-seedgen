@@ -10925,7 +10925,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     kii, WaterDash, Damage=80
     unsafe:
       Water OR Damage=200
-      WaterDash, Damage=60
+      WaterDash, Damage=20
   pickup EastPools.RightOre:
     moki:
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, Dash OR Glide  # Need to flap from the green spot so the bubble don't go too far to the right
@@ -10933,9 +10933,9 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     gorlek:
       Launch  # Jump on the bubble before using launch
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, TripleJump OR Sword OR Hammer OR Damage=20  # Need to flap from the green spot so the bubble don't go too far to the right
+      DoubleJump, Grapple, Flap, Bash, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
     kii:
       DoubleJump, Grapple, Flap, TripleJump OR Damage=30  # avoid the slime or one dboost in the spikes + one the the slime
-      DoubleJump, Grapple, Flap, Bash, Dash OR Glide OR Sword OR Hammer OR Damage=20  # @validator not sure why those aren't in gorlek
       DoubleJump, Grapple, Flap, Damage=10, Dash OR Glide OR Sword OR Hammer
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Not adding the energy options to the bash/dboost variant because autoaim can screw you pretty hard because of the slime explosion
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=20  # can jump on the bubble but not mandatory
@@ -10945,7 +10945,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   pickup EastPools.BubbleCurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=80
-    unsafe: WaterDash, Damage=60
+    unsafe: WaterDash, Damage=40
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
@@ -10954,7 +10954,9 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     gorlek:
       EastPools.BelowEntryLeverBubble
       Bash, DoubleJump, TripleJump
-    kii: Bash  # Bait the skeeto, bash it when it's under the hole
+    kii:
+      Bash  # Bait the skeeto, bash it when it's under the hole
+      DoubleJump, TripleJump, Combat=CorruptSlug, Dash OR Glide
     unsafe:
       DoubleJump, TripleJump, Combat=CorruptSlug  # kill the slug on the left wall, tjump from this wall into the spikes under the pickup
       SentryJump=1, DoubleJump OR Damage=20  # The tree is swinging a bit. sjump from the left (Ori should almost fall) when the tree is swinging to the left
@@ -10962,6 +10964,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     moki: Water, WaterDash
     kii: WaterDash, Damage=80
     unsafe:
+      WaterDash, Damage=40
       Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
 
   conn EastPools.BehindEntryDoor:
@@ -10988,10 +10991,10 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       SentryJump=1, Launch  # Use weapon to stall before and after the launch
     kii:
       Water, Spear=1
-      WaterDash, Damage=100, PoolsApproach.WheelFreed OR DoubleJump OR Hammer
+      WaterDash, Damage=100, PoolsApproach.WheelFreed OR DoubleJump OR Hammer OR Spear=1
       DoubleJump, Damage=20, Sword OR Shuriken=2 OR Blaze=5 OR Sentry=3
-      Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
-      Bash, Grenade=1, Damage=20, Dash, Hammer  # hammer for the static wheel, damage for the rotatin wheel
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1 OR Spear=1
+      Bash, Grenade=1, Damage=20, Dash, Hammer  # hammer for the static wheel, damage for the rotating wheel
       Glide, Dash, Hammer
       Glide, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=3 OR Blaze=3 OR Sentry=3  # climb the left wall
@@ -11128,6 +11131,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
       EastPools.TokkBubblePurpleWall, WaterDash, Damage=60
     unsafe:
       Bash, Damage=65  # dboost on the slug's projectile
+      Combat=Crab, WaterDash, Damage=60
       EastPools.TokkBubblePurpleWall, WaterDash, Damage=40
       EastPools.TokkBubblePurpleWall, Bow=1 OR Grenade=1
   state EastPools.TokkBubblePurpleWall:
@@ -11135,7 +11139,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
     kii:
       Combat=Crab, Water OR Damage=160  # bait the torpedo into touching the wall
       Combat=Crab, WaterDash, Damage=120
-      Bash, Damage=140  # snipe the wall so you can waterdash earlier
+      Bash, Damage=140  # snipe the wall so you can leave earlier
       WaterDash, Bash, Damage=100  # snipe the wall so you can waterdash earlier
     unsafe:
       Bash  # bash the corrupted slime to blow the wall
@@ -11143,7 +11147,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
       Damage=130  # dboost on the crab before dropping in the water
   state EastPools.LowerWaterDrained:  # Puzzle skip
     unsafe: free  # Die in the right water pound. If you have clean water, you can bait a torpedo instead https://youtu.be/rnRBUmY2NN4
-  
+
   pickup EastPools.AboveDoorOre:  # Paths using the bubble spawner or that aren't redundant with going to either BehindEntryDoor or TPArea first
     moki: EastPools.TokkBubbleFree, EastPools.TokkBubblePurpleWall, Grapple, Flap, DoubleJump OR Dash
     gorlek:
@@ -11162,7 +11166,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
     kii:
       EastPools.TokkBubbleFree, EastPools.TokkBubblePurpleWall, Flap, Combat=Crab, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       EastPools.TokkBubbleFree, EastPools.TokkBubblePurpleWall, Flap, Bash, Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-    #unsafe can just do puzzle skip for free
+    # unsafe can just do puzzle skip for free
   conn EastPools.BehindEntryDoor:
     moki:
       Launch
@@ -11174,7 +11178,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
     kii:
       Bash
       DoubleJump, Sword OR TripleJump OR Combat=CorruptSlug+Crab  # Pogo the crab or tjump on the wall on the left of the grapple plant or just kill everything and climb the right wall
-    #unsafe paths can do puzzle skip and reach BehindEntryDoor from TpArea
+    # unsafe paths can do puzzle skip and reach BehindEntryDoor from TpArea
   conn EastPools.Teleporter:
     unsafe: EastPools.LowerWaterDrained  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can die redo the same manipulation to activate the checkpoint (you won't have the cutscene) then QTM/die to respawn on the teleporter
 
@@ -11271,7 +11275,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
     unsafe, EastPools.LowerWaterDrained:
       Damage=240
       Bash, Damage=220
-  
+
   conn Teleporters:
     moki: EastPools.LowerWaterDrained
   conn EastPools.TPArea:
@@ -11285,6 +11289,8 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
     kii, EastPools.LowerWaterDrained:
       Damage=100
       WaterDash, Damage=40
+    unsafe, EastPools.LowerWaterDrained:
+      Damage=80
 
 anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
   quest EastPools.HandToHandSpyglass:
