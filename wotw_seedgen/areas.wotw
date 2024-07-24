@@ -13553,7 +13553,9 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
       SentryJump=1
     kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
       DoubleJump, Burrow OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
-      Dash, Glide
+      Dash, Glide OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
+    unsafe, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
+      Dash OR DoubleJump
   conn LowerWastes.MinesEntranceEnemyPaths:
     moki: Burrow, BreakWall=20
 
