@@ -13516,7 +13516,7 @@ anchor WindtornRuins.BrokenMural at 2108, -3959:  # At the broken mural above th
       WindtornRuins.HeartBarrier, DoubleJump, TripleJump OR Sword OR Hammer
     kii:
       WindtornRuins.HeartBarrier, Hammer OR Sword OR Sentry=2
-      Burrow, Hammer OR Sword
+      Burrow, Hammer
       Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbing platform
     unsafe: Burrow  # at the pilar, hold up+right and burrow through the crumbing platform
 
@@ -13529,7 +13529,7 @@ anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from th
       Burrow, Bash, Grenade=1
     gorlek: Burrow, BreakWall=16
     unsafe: ShurikenBreak=16 OR SentryBreak=16
-  
+
   conn WindtornRuins.RuinsTP:  # this accounts for both situations of having broken the heart or not
     moki:
       Burrow, DoubleJump, Dash OR Glide
@@ -13585,7 +13585,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
       WindtornRuins.HeartBarrier, Dash, Hammer OR Sentry=2
       WindtornRuins.HeartBarrier, Sword, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Hammer
       WindtornRuins.HeartBarrier, Hammer, Sentry=2
-      Burrow, Sword OR Sentry=3  # jump on the left side of the crumbing platform and burrow it from underneath. You can slow yourself down with slashes
+      Burrow, Sword  # jump on the left side of the crumbing platform and burrow it from underneath. You can slow yourself down with slashes
       Burrow, DoubleJump, TripleJump OR Dash OR Hammer OR Blaze=3 OR Sentry=2
       Burrow, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbing platform from the left side
       Burrow, Hammer, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1    
@@ -13593,6 +13593,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
       Burrow OR WindtornRuins.HeartBarrier:
         Sword, Spear=1 OR Blaze=1
       Burrow, DoubleJump  # right side of the crumbing platform, touch it just before burrowing into it so you get a lot more speed
+      Burrow, Sentry=3
       Burrow, Hammer, Spear=1 OR Blaze=1
 
 anchor WindtornRuins.Escape at 2021, -4026:
@@ -13618,8 +13619,9 @@ anchor WindtornRuins.Escape at 2021, -4026:
       Burrow, Grapple, Sentry=5 OR Shuriken=5  # Same path, different energy weapon
       Burrow, Grapple, Damage=30, Sentry=3 OR Shuriken=3  # Sentry=5 / Shuriken=5 path but saving 2 uses by dboosting in the section where you fall down
       Burrow, Grapple, Damage=70, Sentry=2 OR Shuriken=2  # Sentry=5 / Shuriken=5 path but saving the first 3 uses by dboosting
-      Burrow, Dash, DoubleJump OR Hammer  # djump/upslash at the end of the second sandball+grapple section before dashing in order to avoid the spikes 
-    unsafe, WindtornRuins.HeartBarrier: 
+      Burrow, Dash, DoubleJump  # djump at the end of the second sandball+grapple section before dashing in order to avoid the spikes
+    unsafe, WindtornRuins.HeartBarrier:
+      Burrow, Dash, Hammer  # upslash at the end of the second sandball+grapple section before dashing in order to avoid the spikes
       Burrow, Grapple, Damage=10  # You are allowed to hate me if this is forced progression https://youtu.be/H3UIH4FyU4Q
       Burrow, Grapple, Blaze=5 OR Flash=5
       Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
@@ -13643,7 +13645,7 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
       DoubleJump, TripleJump OR Sword
       SentryJump=1
     kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
-      Burrow, DoubleJump, Dash
+      DoubleJump, Burrow OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
       Dash, Glide
   conn LowerWastes.MinesEntranceEnemyPaths:
     moki: Burrow, BreakWall=20
