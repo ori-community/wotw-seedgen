@@ -7659,7 +7659,7 @@ anchor LowerReach.BelowTokk at -296, -3944:
       Burrow, LowerReach.ThawCentralFurnace, DoubleJump, Dash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
       Burrow, LowerReach.ThawCentralFurnace, Dash, Hammer
     unsafe:
-      Burrow, DoubleJump, Hammer  # Hammer early to avoid the fake autotarget near the wall
+      Burrow, DoubleJump, Hammer OR Spear=1  # Hammer early to avoid the fake autotarget near the wall
       Burrow, DoubleJump, Damage=20
       Burrow, LowerReach.ThawCentralFurnace, Combat=Mantis, Dash, Spear=1
 
@@ -7722,9 +7722,9 @@ anchor LowerReach.SecondSoup at -316, -4037:  # Next to the soup below the telep
       DoubleJump, TripleJump
       SentryJump=1
     kii:
-      DoubleJump, Dash OR Glide OR Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=10
-      Dash, Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
-      Dash, Glide, Damage=10
+      Damage=10
+      DoubleJump, Dash OR Glide OR Sword OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Dash, Glide OR Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
     unsafe: free  # jump over the ShieldMiner from the soup
 
 anchor LowerReach.BelowLupo at -278, -4031:  # On the platform left of the central furnace
@@ -7743,7 +7743,7 @@ anchor LowerReach.BelowLupo at -278, -4031:  # On the platform left of the centr
       SentryJump=1, DoubleJump OR Dash OR Damage=20  # sjump from the frozen plant
       LowerReach.ThawCentralFurnace, Sword OR Damage=20
     kii:
-      Bash, Grenade=1, Sword OR Hammer
+      Bash, Grenade=1, Sword OR Hammer OR Shuriken=1
       LowerReach.ThawCentralFurnace, Glide OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
     unsafe:
       Bash, Grenade=1
@@ -7752,8 +7752,7 @@ anchor LowerReach.BelowLupo at -278, -4031:  # On the platform left of the centr
   conn LowerReach.SecondSoup:
     moki: Combat=ShieldMiner OR Bash OR Launch
     gorlek: DoubleJump OR SentryJump=1
-    kii: Dash
-    unsafe: Damage=10
+    kii: Dash OR Damage=10
   conn LowerReach.CentralFurnacePedestal:
     moki: LowerReach.ThawCentralFurnace OR DoubleJump OR Dash OR Glide
     gorlek: free
@@ -7784,7 +7783,7 @@ anchor LowerReach.CentralFurnacePedestal at -256, -4035:  # The furnace left of 
     gorlek:
       Glide OR SentryJump=1
       DoubleJump, TripleJump OR Dash
-    kii: DoubleJump OR Dash OR Damage=20
+    kii: DoubleJump OR Dash OR Damage=10
     unsafe: free
 
 anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind channel
@@ -7808,8 +7807,8 @@ anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind
       Launch, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
       Launch, Damage=20, Dash, Glide OR Sword OR Hammer
     kii:
-      DoubleJump, TripleJump, Damage=60, Hammer
-      DoubleJump, TripleJump, Damage=60, Bash, Grenade=1
+      DoubleJump, TripleJump, Damage=60, Hammer OR Spear=1  # Condition in case the wall is broken
+      DoubleJump, TripleJump, Damage=60, Bash, Grenade=1  # Condition in case the wall is broken
       Launch, Dash OR Damage=40
       Launch, DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
     unsafe:
@@ -7838,7 +7837,7 @@ anchor LowerReach.WindChannel at -223, -4043:  # At the lantern opening the wind
 
 anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where you hand delicious marshclam soup to a moki (or alternatively extuingish his fireplace...)
   refill Energy=4:
-    moki: BreakCrystal, DoubleJump OR Dash OR Glide
+    moki: BreakCrystal, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
@@ -7858,7 +7857,7 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
       DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
     unsafe:
-      Sword OR Flash=1 OR Sentry=1 OR Shuriken=1
+      DoubleJump OR Dash OR Sword OR Flash=1 OR Sentry=1 OR Shuriken=1
       Bash, Grenade=1
 
   conn LowerReach.WindChannel:
@@ -7959,7 +7958,6 @@ anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ic
     kii:
       SentryBurn=1, Bash, DoubleJump OR Glide OR Hammer
       SentryBurn=1, Bash, Dash, Damage=20
-    kii:
       SentryBurn=1, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Sentry=2 OR Damage=20  # Jump from the branch above the ice, triple jump to get close enough, sentry to melt the ice then return to safety
     unsafe:
       SentryBurn=1, Damage=20, SentryJump=1  # Jump in the spikes (won't damage Ori afterwards), sjump then sentry to melt the ice + sword combo to return to safety
