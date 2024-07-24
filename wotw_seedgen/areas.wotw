@@ -7186,9 +7186,10 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
       Bash, Glide, Damage=20
       SentryJump=1, DoubleJump OR Bash
     kii:
-      Bash, Damage=20, Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
+      Bash, Damage=20, Hammer OR Sentry=3
     unsafe:
       SentryJump=1
+      #Bash, Damage=20, Sword OR Shuriken=2 OR Sentry=2 OR Flash=2
       Bash  # can be done damageless, but damage is likely. Keep jumping at the right wall until you go over it and bash the first latern at just the right angle to reach the second
       DoubleJump, TripleJump, Sentry=3, Damage=20  # https://youtu.be/EhC4SRe4UA0
       DoubleJump, TripleJump, Sword
@@ -7284,14 +7285,15 @@ anchor LowerReach.AboveEntry at -401, -4000:  # On the platform above Baur insid
       DoubleJump, Sword OR Hammer OR Sentry=2 OR Damage=20
       Dash, Sword OR Hammer
       Dash, Damage=20, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
-      Glide, Hammer OR Damage=20
+      Glide, Hammer OR Spear=1 OR Damage=20
       Sword, Shuriken=1 OR Sentry=2 OR Damage=20
-      Hammer, Damage=20, Shuriken=1 OR Sentry=1
+      Hammer, Damage=20, Shuriken=1
     unsafe, LowerReach.Lever:
       Bash, Sentry=1 OR Flash=1
-      Hammer, Damage=20, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Glide, Spear=1 OR Sentry=1 OR Shuriken=1 OR Flash=1
-      Dash, Shuriken=1 OR Sentry=2  # Dash on the small wall from the branch where the lantern is attached, dash again then stall with sentry/shuriken
+      #Hammer, Damage=20, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Hammer, Damage=20
+      Glide, Sword OR Sentry=1 OR Shuriken=1 OR Flash=1
+      Dash, Shuriken=1 OR Sentry=2 OR Damage=20 # Dash on the small wall from the branch where the lantern is attached, dash again then stall with sentry/shuriken
   conn LowerReach.Entry: free
 
 anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's nose
@@ -7365,7 +7367,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
     kii, LowerReach.LeftFurnace:
       DoubleJump, Grapple
       DoubleJump, TripleJump, Dash OR Shuriken=1 OR Sentry=2
-      DoubleJump, TripleJump, Glide, Sentry=1 OR Flash=1 OR Spear=1
+      DoubleJump, TripleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
       DoubleJump, TripleJump, Combat=Nest, Hammer
       DoubleJump, Combat=Nest, Dash, Hammer
       DoubleJump, Sword, TripleJump OR Dash  # Pogo a fish or use the skeetos
@@ -7416,8 +7418,8 @@ anchor LowerReach.CentralEnemyPaths at -335, -4009:  # Enemy path counterpart fo
     kii:
       Bash, Hammer OR Spear=1
       Sword, DoubleJump, TripleJump, Spear=1
-      Sword, DoubleJump, Hammer
       LowerReach.ThawCentralFurnace, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+    unsafe: Sword, DoubleJump, Hammer
   conn LowerReach.Entry:
     unsafe: LowerReach.Lever, Bash  # bash the slime near the spikes then bash glide to the lantern
 
@@ -7435,7 +7437,7 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       LowerReach.Lever, DoubleJump, TripleJump
     kii:
       LowerReach.Lever, DoubleJump, Sword OR Hammer OR Spear=1
-      LowerReach.ThawCentralFurnace, DoubleJump, Glide, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      LowerReach.ThawCentralFurnace, DoubleJump, Glide, Hammer
       LowerReach.ThawCentralFurnace, DoubleJump, Glide, Spear=1, Shuriken=1 OR Sentry=1 OR Flash=1
       LowerReach.ThawCentralFurnace, DoubleJump, Glide, Spear=2
       LowerReach.ThawCentralFurnace, DoubleJump, Sentry=2, Hammer OR Spear=1
@@ -7474,11 +7476,12 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       SwordSJump=2, Spear=1
       HammerSJump=3
     kii:
-      LowerReach.Lever, Hammer, DoubleJump, Glide OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      LowerReach.Lever, Hammer, DoubleJump, Glide OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Damage=20
       LowerReach.Lever, Spear=1, DoubleJump, Dash
       LowerReach.ThawCentralFurnace, DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
       LowerReach.ThawCentralFurnace, DoubleJump, Sentry=5
-      LowerReach.ThawCentralFurnace, LowerReach.Lever, DoubleJump, Spear=2  # from LowerReach.AboveDoorEX
+      LowerReach.ThawCentralFurnace, DoubleJump, Sentry=2, Damage=20
+      LowerReach.ThawCentralFurnace, LowerReach.Lever, DoubleJump, Spear=2, Damage=20  # from LowerReach.AboveDoorEX
     unsafe:
       LowerReach.Lever, DoubleJump, Sword, Spear=1  # Pogo the mortar projectile once it hit the snaptrap
       Grenade=2, Hammer OR Spear=1  # GrenadeJump=2, Hammer OR Spear=1
@@ -7489,7 +7492,7 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
   conn LowerReach.SecondSoup: free
   conn LowerReach.BelowLupo:
     kii:
-      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2
+      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Blaze=3
       Damage=10, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
   conn LowerReach.OutsideTPRoom:
     moki:
