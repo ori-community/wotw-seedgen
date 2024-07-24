@@ -8030,9 +8030,9 @@ anchor LowerReach.IceCavern at -85, -3966:  # On the snaptrap facing upwards at 
       LowerReach.FreezeEastFurnace, HammerSJump=2
     kii:
       Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Hammer OR Sentry=2
-      DoubleJump, Damage=20, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Dash, Sword OR Hammer OR Sentry=2
+      DoubleJump, Sword OR Hammer OR Sentry=2
+      DoubleJump, Damage=20, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Spear=1
+      Dash, Sword OR Hammer OR Sentry=3
       LowerReach.ThawEastFurnace, DoubleJump, Shuriken=1
       LowerReach.ThawEastFurnace, DoubleJump, Blaze=1, Damage=20
       LowerReach.ThawEastFurnace, Dash, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
@@ -8042,7 +8042,7 @@ anchor LowerReach.IceCavern at -85, -3966:  # On the snaptrap facing upwards at 
 
 anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway through the spiky ice cavern
 # Going through that ice cavern in order to activate LowerReach.EastDoorLantern or going to LowerReach.SwimmingPool is horrible to find paths for, especially when using sjumps/bashnades
-# That anchor is just so pathfinder have an easier time patfinding the horrible paths through that icy cavern.
+# That anchor is just so pathfinder have an easier time pathfinding the horrible paths through that icy cavern.
 
   state LowerReach.EastDoorLantern:
     moki:
@@ -8066,7 +8066,9 @@ anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway thr
       Glide, DoubleJump OR Dash
       Launch
     gorlek: Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Damage=20
-    kii: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    kii:
+      Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1
   conn LowerReach.IceCavern:
     moki:
       Launch
@@ -8079,7 +8081,7 @@ anchor LowerReach.HalfwayIceCavern at -44, -3955:  # On the snaptrap halfway thr
     kii:
       Hammer OR Damage=20
       Bash, Grenade=1
-      Glide, Dash OR Sword
+      Glide, Dash OR Sword OR Shuriken=1 OR Spear=1 OR Flash=1 OR Sentry=1
       LowerReach.ThawEastFurnace, Glide OR Dash OR Sword OR Shuriken=1 OR Blaze=3 OR Sentry=2
     unsafe:
       Sword OR GlideJump
@@ -8107,7 +8109,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       Bash, Grenade=1, Damage=20, WaterDash OR DoubleJump OR Dash OR Sword
       Bash, Grenade=1, Sword, DoubleJump OR Dash  # pogo the worm
       Bash, Grenade=1, DoubleJump, Dash, TripleJump OR Glide OR Hammer OR Sentry=2
-      Bash, Grenade=2, Dash OR Glide OR DoubleJump OR Sword OR Shuriken=1 OR Sentry=2 OR Damage=20
+      Bash, Grenade=2, Dash OR Glide OR DoubleJump OR Sword OR Sentry=2 OR Damage=20
       LowerReach.ThawEastFurnace, Bash, Water  # bash the fish under the door
       LowerReach.ThawEastFurnace, Bash, WaterDash, Damage=20, Damage=40
       LowerReach.ThawEastFurnace, WaterDash, Water, Hammer OR Spear=1  # Wall jump from the right wall
@@ -8115,6 +8117,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Hammer, Water OR Dash OR Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20  # tjump+ hammer upslash from the closed snaptrap to walljump on the left wall
       LowerReach.ThawEastFurnace, DoubleJump, TripleJump, Spear=1, Water OR Dash OR Glide OR Sword OR Sentry=3 OR Damage=20  # tjump+spear from the closed snaptrap to walljump on the left wall
     unsafe, LowerReach.EastDoorLantern:
+      Bash, Grenade=2, Shuriken=1
       SwordSJump=1, DoubleJump, TripleJump OR Dash OR Glide  # double jump from the platform, refill dash/jumps by slashing the energy cristal then sjump on the plant
       SwordSJump=2, DoubleJump OR Glide OR Dash
       HammerJump
@@ -8123,15 +8126,16 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       Bash, Grenade=1
       Launch
     gorlek:
-      DoubleJump, TripleJump  # Climb the right wall then jump to the left wall before double jumping again to the platform
+      DoubleJump, TripleJump  # Climb the left wall then jump to the right wall before double jumping again to the platform
       SwordSJump=1
       HammerSJump=1, Dash OR DoubleJump OR LowerReach.FreezeEastFurnace
       LowerReach.ThawEastFurnace, WaterDash, DoubleJump, Water, Sword OR Hammer
       LowerReach.ThawEastFurnace, WaterDash, DoubleJump, Damage=20, Sword OR Hammer
     kii:
-      DoubleJump  # Precise wall jump on the right wall then wjump on the left wall
-      LowerReach.ThawEastFurnace, Bash, Water OR Damage=100  # Bash the fish
+      DoubleJump  # Precise wall jump on the left wall then wjump on the right wall
       LowerReach.ThawEastFurnace, Bash, WaterDash, Water OR Damage=40
+      LowerReach.ThawEastFurnace, Bash, Water  # Bash the fish
+    unsafe: LowerReach.ThawEastFurnace, Bash, Damage=100  # Bash the fish
   conn LowerReach.HalfwayIceCavern:
     kii:
       Bash, Grenade=1, DoubleJump, TripleJump
@@ -8205,12 +8209,12 @@ anchor LowerReach.WindSpinners at 73,-3929:  # midway through the wind column ab
       Glide, DoubleJump, TripleJump OR Dash
       Launch, DoubleJump, TripleJump OR Dash OR Damage=20  # Pass under the first spinner to reach the right wall, climb it and launch to the energy cristal
     kii:
-      Launch, Dash OR Sword OR Hammer OR Damage=20  # Pass under the first spinner and launch to the wall above it
-      Glide, DoubleJump, Hammer OR Damage=20
+      Launch, Dash OR Sword OR Hammer OR Shuriken=1 OR Damage=20  # Pass under the first spinner and launch to the wall above it
+      Glide, DoubleJump OR Hammer OR Damage=20
       DoubleJump, TripleJump, Damage=60  # 2 dboosts to reach the right wall, climb it, pass between the two spinners to reach the left wall, climb it and take a third dboost
-      DoubleJump, TripleJump, Damage=40, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pass under the 1st spinner by using tjump, dboost, tjump again and use your other mobility option to reach the right wall, climb it, pass between the two spinners to reach the left wall, climb it and take a third dboost
+      DoubleJump, TripleJump, Damage=40, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pass under the 1st spinner by using tjump, dboost, tjump again and use your other mobility option to reach the right wall, climb it, pass between the two spinners to reach the left wall, climb it and take a second dboost
     unsafe:
-      Glide, Dash, Hammer
+      Glide
       Launch, Spear=1 OR Shuriken=1 OR Sentry=1 OR Spear=1 OR Flash=1  # Pass under the first spinner and launch to the wall above it
       DoubleJump, TripleJump, Damage=20
       Bash, Grenade=1, DoubleJump, TripleJump  # Precise grenade throw above the first spinner, pass under the spinner to catch the grenade and bash glide to the right wall
