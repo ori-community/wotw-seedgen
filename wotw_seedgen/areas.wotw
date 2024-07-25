@@ -8239,11 +8239,11 @@ anchor LowerReach.WindSpinners at 73,-3929:  # midway through the wind column ab
       Launch, DoubleJump, TripleJump OR Dash OR Damage=20  # Pass under the first spinner to reach the right wall, climb it and launch to the energy cristal
     kii:
       Launch, Dash OR Sword OR Hammer OR Shuriken=1 OR Damage=20  # Pass under the first spinner and launch to the wall above it
-      Glide, DoubleJump OR Hammer OR Damage=20
+      Glide, DoubleJump, Hammer OR Damage=20
       DoubleJump, TripleJump, Damage=60  # 2 dboosts to reach the right wall, climb it, pass between the two spinners to reach the left wall, climb it and take a third dboost
       DoubleJump, TripleJump, Damage=40, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pass under the 1st spinner by using tjump, dboost, tjump again and use your other mobility option to reach the right wall, climb it, pass between the two spinners to reach the left wall, climb it and take a second dboost
     unsafe:
-      Glide
+      Glide, Dash, Hammer
       Launch, Spear=1 OR Shuriken=1 OR Sentry=1 OR Spear=1 OR Flash=1  # Pass under the first spinner and launch to the wall above it
       DoubleJump, TripleJump, Damage=20
       Bash, Grenade=1, DoubleJump, TripleJump  # Precise grenade throw above the first spinner, pass under the spinner to catch the grenade and bash glide to the right wall
@@ -8436,7 +8436,8 @@ anchor LowerReach.VeralHome at -140, -4096:  # At the soup
     unsafe:
       GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
       Dash, Glide, Sword  # Needs a ramp on the left side corner of the platform near the cauldron
-      DoubleJump, Glide OR Sword OR Hammer # Jump on the floating platform next to the soup then wall jump from the wall above it
+      #DoubleJump, Glide OR Sword OR Hammer # Jump on the floating platform next to the soup then wall jump from the wall above it
+      DoubleJump  # Go on the wall above the Gorlek
 
 anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
   conn LowerReach.VeralHome: free
@@ -8448,11 +8449,14 @@ anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
       Launch, Bash, Grenade=1
     kii:
       Launch, Damage=40
-      Launch, Damage=20, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Launch, Damage=20, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Avoid the second dboost
       Bash, Grenade=1, DoubleJump, TripleJump, Dash, Hammer, Damage=20
     unsafe:
       Bash, Grenade=1, DoubleJump, TripleJump, Dash, Hammer OR Damage=20
       Bash, Grenade=1, DoubleJump, TripleJump, Spear=1, Damage=20  # extend your bash with spear
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
+      DoubleJump, TripleJump, Damage=80, Hammer OR Spear=1  # tjump + hammer/spear to reach the wall
+      DoubleJump, TripleJump, Dash, Damage=60, Hammer OR Spear=1  # tjump + hammer/spear to reach the wall
       Launch, DoubleJump, Dash OR TripleJump
       Launch, Damage=20  # Launch on the wall at the start of the wind cave
 
@@ -8477,26 +8481,32 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
       SentryJump=1, DoubleJump
       Bash, Grenade=1, DoubleJump
     kii:
-      Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Start from the right
+      DoubleJump, TripleJump, Hammer, Spear=1  # Start from the left and reach the wall
+    unsafe:
+      Dash, DoubleJump, TripleJump  # Start from the right
+      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # Start from the left and reach the wall
   pickup LowerReach.UpperLeftKS:
     moki: Glide
     kii:  # TP out after taking the pickup
       Launch, DoubleJump, TripleJump, Damage=30  # dboost in the spikes+ dboost on the slime next to the keystone
       DoubleJump, TripleJump, Combat=BombSlug, Damage=80
-    unsafe: Launch, DoubleJump, TripleJump, Damage=20  # Launch against the walls. When on the wall above LowerReach.VeralHome, first use triple jump then lauch, triple jump again to take a damage boost to refresh launch then launch and triple jump again to take the pickup and tp out
+    unsafe:
+      Launch, DoubleJump, TripleJump, Damage=20  # Launch against the walls. When on the wall above LowerReach.VeralHome, first use triple jump then launch, triple jump again to take a damage boost to refresh launch then launch and triple jump again to take the pickup and tp out
+      DoubleJump, TripleJump, Combat=BombSlug, Damage=60
   pickup LowerReach.MiddleLeftKS:
     moki: Glide
     kii:  # TP out after taking the pickup
-      DoubleJump, TripleJump, Damage=60
       Launch, Damage=40
       Launch, DoubleJump, Damage=20, TripleJump OR Dash
-    unsafe: Launch, Damage=20, DoubleJump OR Dash  # Launch against the walls. When on the wall above LowerReach.VeralHome, first use djump/dash then lauch, reuse your mobility option, take a damage boost to refresh launch, take the pickup and TP out
+    unsafe:
+      Launch, Damage=20, DoubleJump OR Dash  # Launch against the walls. When on the wall above LowerReach.VeralHome, first use djump/dash then launch, reuse your mobility option, take a damage boost to refresh launch, take the pickup and TP out
+      DoubleJump, TripleJump, Damage=40
   pickup LowerReach.BottomLeftKS:
     moki: Glide
     kii:  # TP out after taking the pickup
-      Launch, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=3 OR Damage=20  # sentry where the two bomb slug are, walljump launch, 2 senties
-      DoubleJump, TripleJump, Combat=BombSlug, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Launch, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=3 OR Damage=20  # sentry where the two bomb slug are, walljump launch, 2 sentries
+      DoubleJump, TripleJump, Damage=20, Combat=BombSlug, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
     unsafe:
       Launch, Shuriken=1 OR Flash=1 OR Sentry=1  # shuriken/flash/sentry before using launch
       DoubleJump, TripleJump, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # dboost on the flying spikes, which only deal 10 damages
@@ -8505,8 +8515,9 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
     kii:
       Launch, Damage=40  # Pass under the two falling slimes
       Launch, Damage=20, DoubleJump OR Dash
-      Launch, DoubleJump, TripleJump
+      Launch, DoubleJump, TripleJump, Hammer OR Spear=1  # Extra ability to help reaching the pickup
     unsafe:
+      Launch, DoubleJump, TripleJump
       GrenadeJump, DoubleJump, TripleJump, Damage=20
       HammerJump, DoubleJump, TripleJump, Damage=20
       FlashSwap  # TODO: calculate blaze swaps
