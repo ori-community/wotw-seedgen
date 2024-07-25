@@ -4899,6 +4899,7 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       OuterWellspring.WestDoorBlueMoonFree:
         Grapple, DoubleJump, TripleJump OR Damage=15
         Grapple, Damage=15, Dash OR Glide
+      Grapple, Launch
       Grapple, Bash, Grenade=1, DoubleJump, TripleJump OR Glide OR Damage=15
       Grapple, Bash, Grenade=1, Damage=15, Dash OR Glide
       Grapple, SentryJump=1, DoubleJump, TripleJump OR Glide OR Damage=15
@@ -4906,7 +4907,6 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       Bash, Grenade=1, Launch
       SentryJump=1, Launch
     kii:
-      Grapple, Launch
       Grapple, DoubleJump, TripleJump
       Grapple, Bash, Grenade=1:
         DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
