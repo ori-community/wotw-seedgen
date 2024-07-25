@@ -3744,7 +3744,7 @@ anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Mo
     unsafe, GladesTown.BuildHuts:
       GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
       SwordSJump=1, Dash
-      TuleyShop.Lightcatchers, Bash, Sword OR Hammer
+      TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   refill Checkpoint:
