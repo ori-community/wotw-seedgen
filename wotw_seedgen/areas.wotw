@@ -13162,8 +13162,8 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
       DoubleJump, TripleJump, Sword  # tjump->pogo->tjump->upslash
       Burrow, Bash
       Burrow, DoubleJump, TripleJump, Hammer OR Spear=1
-      Burrow, DoubleJump, Sword  # pogo the torpedo
     unsafe:
+      Burrow, DoubleJump, Sword  # pogo the torpedo
       SentryJump=1
       Bash, DoubleJump, TripleJump  # Lure the miner on higher ground to the left
   pickup UpperWastes.MissileSpawnEX:
