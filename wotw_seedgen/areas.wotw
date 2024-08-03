@@ -2906,7 +2906,8 @@ anchor BeetleFight at -81, -4243:
 
   state EastHollow.BeetleDefeated:  # Mantis and skeeto don't respawn when dying in the fight
     moki: Boss=250, Regenerate, Damage=45, Dash  # It isn't too difficult to avoid the beetle's attacks without Dash, but this is what the base game taught.
-    gorlek: Boss=250, Regenerate, Damage=35, DoubleJump OR Launch
+    gorlek: Boss=250, Regenerate, Damage=35, DoubleJump OR Dash OR Launch
+    kii: Boss=250, Damage=35, DoubleJump OR Launch
     unsafe: Boss=250
 
 # please split the VoiceDoorPlatform and MapMoki paths like this: everything to the right of the VoiceDoor is for VoiceDoorPlatform. everything to the left of it belongs to MapMoki
@@ -6946,12 +6947,11 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   conn WoodsMain.BeforeLog:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->BeforeLog
     gorlek, WoodsMain.LogBlobDestroyed:
       DoubleJump, Combat=2xBalloon, Hammer OR Sword OR TripleJump
-      DoubleJump, Dash
       SentryJump=1, Combat=2xBalloon OR Dash
       Bash, Grenade=1, Combat=2xBalloon OR Dash
       Launch
     kii, WoodsMain.LogBlobDestroyed:
-      Combat=Balloon, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # only need to kill the first balloon
+      Combat=Balloon, DoubleJump, Dash OR Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # only need to kill the first balloon
       Damage=20, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost on the first balloon to kill it
     unsafe, WoodsMain.LogBlobDestroyed:
       DoubleJump
@@ -11323,7 +11323,8 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
       Launch
     gorlek, EastPools.FightArenas, WaterDash:
       Water OR Damage=20  # WaterDash on the bubble
-      DoubleJump
+      DoubleJump, TripleJump
+    kii, EastPools.FightArenas, WaterDash: DoubleJump
     unsafe, EastPools.FightArenas, WaterDash:
       Hammer  #Jump on the bubble then stall until a new one spawn
       Dash OR Glide OR Sword # jump on the bubble, wait on the left wall by wall jumping then go back to jump on a new bubble
@@ -12272,8 +12273,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
     kii: Damage=60, Burrow
-  pickup WestPools.BurrowOre:
-    moki: WestPools.ForestsStrength, Water, WaterDash, Burrow, DoubleJump OR Launch
+  pickup WestPools.BurrowOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
     kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
     unsafe: WestPools.ForestsStrength:
