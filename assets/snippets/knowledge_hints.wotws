@@ -13,7 +13,9 @@ on tick {
     if get_integer("show_message") > 0 && get_boolean("showing_message") == false {
         if get_integer("show_message") == 1 item_message("#Motay's Note#\nThe moki will only open the entrance once you find " + skill_string(Skill::Glide))
         if get_integer("show_message") == 2 item_message("#Motay's Note#\nThe bear will only wake if you use " + skill_string(Skill::Flap))
-        if get_integer("show_message") == 3 item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok")
+        if get_integer("show_message") == 3 && (kwolokGroupDescriptor.hornBugBossState < 1 || 3 < kwolokGroupDescriptor.hornBugBossState) {
+            item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok") // TODO placement is still pretty bad, don't have this too close to the vine
+        }
         set_boolean("showing_message", true)
     }
     if get_integer("show_message") == 0 && get_boolean("showing_message") == true {
