@@ -11444,7 +11444,8 @@ anchor EastPools.WaterdashArena at -1348, -4139:  # Checkpoint at the right of t
       Launch
     gorlek, EastPools.FightArenas, WaterDash:
       Water OR Damage=20  # WaterDash on the bubble
-      DoubleJump
+      DoubleJump, TripleJump
+    kii, EastPools.FightArenas, WaterDash: DoubleJump
     unsafe, EastPools.FightArenas, WaterDash:
       Hammer  #Jump on the bubble then stall until a new one spawn
       Dash OR Glide OR Sword # jump on the bubble, wait on the left wall by wall jumping then go back to jump on a new bubble
@@ -12393,8 +12394,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
     kii: Damage=60, Burrow
-  pickup WestPools.BurrowOre:
-    moki: WestPools.ForestsStrength, Water, WaterDash, Burrow, DoubleJump OR Launch
+  pickup WestPools.BurrowOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
     kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
     unsafe: WestPools.ForestsStrength:
