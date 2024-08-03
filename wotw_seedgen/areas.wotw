@@ -6987,13 +6987,13 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   conn WoodsMain.BeforeLog:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->BeforeLog
     gorlek, WoodsMain.LogBlobDestroyed:
       DoubleJump, Combat=2xBalloon, Hammer OR Sword OR TripleJump
-      DoubleJump, Dash
       SentryJump=1, Combat=2xBalloon OR Dash
       Bash, Grenade=1, Combat=2xBalloon OR Dash
       Launch
     kii, WoodsMain.LogBlobDestroyed:
       Combat=Balloon, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # only need to kill the first balloon
       Damage=20, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost on the first balloon to kill it
+      DoubleJump, Dash
     unsafe, WoodsMain.LogBlobDestroyed:
       DoubleJump
 
