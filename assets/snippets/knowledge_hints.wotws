@@ -8,14 +8,12 @@ on tick {
     set_integer("show_message", 0)
     if is_in_hitbox(127, -4306, 183, -4268) && EastHollow.DepthsOpen == false && skills.glide == false set_integer("show_message", 1)
     if is_in_hitbox(-527, -4033, -461, -4018) && LowerReach.BearSneezed == false && skills.flap == false set_integer("show_message", 2)
-    if is_in_hitbox(-44, -4449, -32, -4439) && skills.dash == false && skills.burrow == false && skills.waterDash == false set_integer("show_message", 3)
-    if is_in_hitbox(-98, -4245, -60, -4205) && EastHollow.ForestsVoice == false set_integer("show_message", 4) // TODO check hornbug fight state.
+    if is_in_hitbox(-98, -4245, -60, -4205) && EastHollow.ForestsVoice == false set_integer("show_message", 3)
 
     if get_integer("show_message") > 0 && get_boolean("showing_message") == false {
         if get_integer("show_message") == 1 item_message("#Motay's Note#\nThe moki will only open the entrance once you find " + skill_string(Skill::Glide))
         if get_integer("show_message") == 2 item_message("#Motay's Note#\nThe bear will only wake if you use " + skill_string(Skill::Flap))
-        if get_integer("show_message") == 3 item_message("#Motay's Note#\nThe semisolid platform will remain solid until you find " + skill_string(Skill::Dash) + ", " + skill_string(Skill::Burrow) + " or " + skill_string(Skill::WaterDash))
-        if get_integer("show_message") == 4 item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok")
+        if get_integer("show_message") == 3 item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok")
         set_boolean("showing_message", true)
     }
     if get_integer("show_message") == 0 && get_boolean("showing_message") == true {
