@@ -231,7 +231,7 @@ impl Graph {
             Node::Anchor(anchor) => {
                 let max_orbs = context.player.max_orbs();
                 if best_orbs
-                    .get(0)
+                    .first()
                     .map_or(true, |first_orbs| first_orbs != &max_orbs)
                 {
                     for refill in &anchor.refills {

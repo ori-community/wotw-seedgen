@@ -112,7 +112,7 @@ fn build_swap_requirement(skill: Skill) -> Vec<Requirement> {
         swappable_skills.push(Requirement::Skill(Skill::Launch));
     }
 
-    return swappable_skills;
+    swappable_skills
 }
 
 fn build_requirement<'a>(
@@ -664,7 +664,7 @@ mod tests {
 
         let requirement = build_boss_requirement(100.0, &context);
         match requirement {
-            Requirement::Boss(health) if health == 100.0 * 1.7999999523162841796875 => {}
+            Requirement::Boss(health) if health == 100.0 * 1.8 => {}
             _ => panic!(),
         }
     }

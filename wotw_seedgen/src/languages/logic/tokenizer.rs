@@ -108,7 +108,7 @@ impl TokenStream<'_> {
         TokenKind::Whitespace
     }
     fn minus(&mut self) -> TokenKind {
-        if matches!(self.cursor.first(), '0'..='9') {
+        if self.cursor.first().is_ascii_digit() {
             self.number()
         } else {
             TokenKind::Unknown
@@ -121,7 +121,7 @@ impl TokenStream<'_> {
                 decimals = true;
                 true
             } else {
-                matches!(c, '0'..='9')
+                c.is_ascii_digit()
             }
         });
         TokenKind::Number
@@ -161,7 +161,6 @@ mod tests {
 ,
 ";
         let tokens = tokenize(source)
-            .into_iter()
             .map(|token| token.kind)
             .collect::<Vec<_>>();
         assert_eq!(

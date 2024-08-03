@@ -23,7 +23,7 @@ impl Cursor<'_> {
     fn advance_token(&mut self) -> Option<Token> {
         let first_char = self.bump()?;
         let kind = match first_char {
-            c if c == '\n' => self.newline(),
+            '\n' => self.newline(),
             c if is_whitespace(c) => self.whitespace(),
             '/' => self.comment(),
             '-' => self.minus(),
@@ -88,7 +88,7 @@ impl Cursor<'_> {
         }
     }
     fn minus(&mut self) -> TokenKind {
-        if matches!(self.first(), '0'..='9') {
+        if self.first().is_ascii_digit() {
             self.number()
         } else {
             TokenKind::Minus
@@ -101,7 +101,7 @@ impl Cursor<'_> {
                 decimals = true;
                 true
             } else {
-                matches!(c, '0'..='9')
+                c.is_ascii_digit()
             }
         });
         TokenKind::Number

@@ -571,16 +571,13 @@ impl<'de> Deserialize<'de> for Spawn {
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, FromStr, Display,
 )]
 #[ParseFromIdentifier]
+#[derive(Default)]
 pub enum Difficulty {
+    #[default]
     Moki,
     Gorlek,
     Kii,
     Unsafe,
-}
-impl Default for Difficulty {
-    fn default() -> Difficulty {
-        Difficulty::Moki
-    }
 }
 impl Difficulty {
     /// Allowed spawns on this difficulty when using the random spawn setting
@@ -826,8 +823,10 @@ impl DerefMut for GoalModes {
 /// Different types of online games that can be automatically created when generating the seed
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromStr)]
 #[ParseFromIdentifier]
+#[derive(Default)]
 pub enum CreateGame {
     /// Don't create an online game
+    #[default]
     None,
     /// Create a normal online game suited for co-op and multiworld
     Normal,
@@ -839,11 +838,6 @@ pub enum CreateGame {
     LockoutBingo,
 }
 
-impl Default for CreateGame {
-    fn default() -> CreateGame {
-        CreateGame::None
-    }
-}
 
 /// Configuration parameter for a header
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]

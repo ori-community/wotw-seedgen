@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::fmt::{self, Display};
+use std::fmt::{self, Display, Write};
 use std::iter::Peekable;
 use std::ops::{Deref, DerefMut, Range};
 use std::slice::SliceIndex;
@@ -167,7 +167,7 @@ impl ParseError {
             .filter(|(_, line_range)| {
                 line_range.end >= self.range.start && line_range.start < self.range.end
             })
-            .map(|(line_number, line_range)| {
+            .fold(String::new(), |mut s, (line_number, line_range)| {
                 let line_number = format!("line {}", line_number + 1);
                 let indent = " ".repeat(line_number.len());
                 let err_range =
@@ -176,14 +176,15 @@ impl ParseError {
                 let err_underline = "^".repeat(err_range.len());
                 let line = &self.source[line_range];
                 let newline = if line.ends_with('\n') { "" } else { "\n" };
-                format!(
+                let _ = write!(
+                    s,
                     "\n\
                     {line_number}: {line}{newline}\
                     {indent}  {err_offset}{err_underline}\
-                "
-                )
-            })
-            .collect::<String>();
+                    "
+                );
+                s
+            });
 
         assert!(!source_view.is_empty(), "Error range out of bounds");
 

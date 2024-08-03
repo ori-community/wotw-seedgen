@@ -344,7 +344,7 @@ fn verify_generator_version(model: &str) -> Result<(), String> {
 
 fn verify_seed(model: &str, seed: &Seed) -> Result<(), String> {
     let seeds = seed.seed_files()?;
-    let world = settings::world_index_from_seed(&model).ok_or("no world index found in seed")??;
+    let world = settings::world_index_from_seed(model).ok_or("no world index found in seed")??;
     let world_seed = seeds.get(world).ok_or("world index out of bounds")?;
 
     if model == world_seed {

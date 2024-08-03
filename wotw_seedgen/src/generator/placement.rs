@@ -374,12 +374,12 @@ where
     Ok(())
 }
 
-fn shop_placement<'a, R, I>(
+fn shop_placement<R, I>(
     node: &Node,
     item: &Item,
     origin_world_index: usize,
     target_world_index: usize,
-    world_contexts: &mut [WorldContext<'a, '_>],
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
 ) -> Result<(), String>
 where
@@ -476,10 +476,10 @@ where
     Ok(())
 }
 
-fn place_relics<'a, R, I>(
+fn place_relics<R, I>(
     amount: usize,
     world_index: usize,
-    world_contexts: &mut [WorldContext<'a, '_>],
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
 ) -> Result<(), String>
 where
@@ -656,10 +656,10 @@ where
                 false,
             ));
         }
-        return Err(format!(
+        Err(format!(
             "(World {}): Not enough slots to place forced progression {}",
             target_world_index, item
-        )); // due to the slot checks in missing_items this should only ever happen for forced keystone placements
+        )) // due to the slot checks in missing_items this should only ever happen for forced keystone placements
     };
 
     let mut node = choose_node()?;
@@ -698,12 +698,12 @@ where
     Ok(())
 }
 
-fn determine_progressions<'a>(
+fn determine_progressions(
     world_index: usize,
     slots: usize,
     world_slots: usize,
     reach_context: &ReachContext,
-    world_context: &WorldContext<'a, '_>,
+    world_context: &WorldContext<'_, '_>,
 ) -> Vec<Inventory> {
     let owned_states = reach_context.reachable_states[world_index]
         .iter()
@@ -737,14 +737,14 @@ fn determine_progressions<'a>(
         .collect()
 }
 
-fn pick_progression<'a, 'b, R, I>(
+fn pick_progression<'a, R, I>(
     target_world_index: usize,
-    itemsets: &'b [Inventory],
+    itemsets: &'a [Inventory],
     slots: usize,
     reach_context: &ReachContext,
-    world_contexts: &mut [WorldContext<'a, '_>],
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
-) -> Result<&'b Inventory, String>
+) -> Result<&'a Inventory, String>
 where
     R: Rng,
     I: Iterator<Item = u16>,
@@ -822,11 +822,11 @@ where
     Ok(progression)
 }
 
-fn split_progression_item<'a, R, I>(
+fn split_progression_item<R, I>(
     world_index: usize,
     item: &Item,
     amount: u32,
-    world_contexts: &mut [WorldContext<'a, '_>],
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
 ) -> Vec<Item>
 where
@@ -1102,13 +1102,10 @@ where
 
     // force a couple placeholders at the start
     #[cfg(feature = "log")]
-    let mut force = false;
-    if origin_world_context.placeholders.len() < 4 {
-        #[cfg(feature = "log")]
-        {
-            force = true
-        };
-    } else if context.random_progression.sample(context.rng) {
+    let force = origin_world_context.placeholders.len() < 4;
+    if origin_world_context.placeholders.len() >= 4
+        && context.random_progression.sample(context.rng)
+    {
         return random_item_placement(origin_world_index, node, world_contexts, context);
     }
 
@@ -1133,8 +1130,8 @@ where
 }
 
 #[inline]
-fn one_xp<'a, R, I>(
-    world_contexts: &mut [WorldContext<'a, '_>],
+fn one_xp<R, I>(
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
 ) -> Result<(), String>
 where
@@ -1217,8 +1214,8 @@ impl SpiritLightAmounts {
     }
 }
 
-fn place_remaining<'a, R, I>(
-    world_contexts: &mut [WorldContext<'a, '_>],
+fn place_remaining<R, I>(
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
 ) -> Result<(), String>
 where
@@ -1434,8 +1431,8 @@ fn total_reach_check<'a>(world: &World<'a, '_>) -> Result<Vec<&'a Node>, String>
     }
 }
 
-fn flush_item_pool<'a, R, I>(
-    world_contexts: &mut [WorldContext<'a, '_>],
+fn flush_item_pool<R, I>(
+    world_contexts: &mut [WorldContext<'_, '_>],
     context: &mut GeneratorContext<'_, R, I>,
 ) -> Result<(), String>
 where

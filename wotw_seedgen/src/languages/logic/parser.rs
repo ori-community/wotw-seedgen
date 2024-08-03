@@ -744,7 +744,7 @@ fn fill_macros_and_states(
             }
             AreaContent::Anchor(anchor) => {
                 for refill in &mut anchor.refills {
-                    for requirement in &mut refill.requirements {
+                    if let Some(requirement) = &mut refill.requirements {
                         fill_group(requirement, &macros, &states, parser)?;
                     }
                 }
@@ -770,7 +770,7 @@ fn fill_group(
         for or in &mut line.ors {
             fill_requirement(or, macros, states, parser)?;
         }
-        for group in &mut line.group {
+        if let Some(group) = &mut line.group {
             fill_group(group, macros, states, parser)?;
         }
     }

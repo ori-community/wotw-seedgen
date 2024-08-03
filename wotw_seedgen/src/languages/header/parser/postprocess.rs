@@ -212,11 +212,10 @@ pub fn postprocess(seeds: &mut [String], graph: &Graph) -> Result<(), String> {
                 if let Some(end_index) = read_args(seed, after_bracket) {
                     let mut args = seed[after_bracket..end_index].splitn(2, ',');
                     let zone = args.next().unwrap().trim();
-                    let zone: u8 = zone
-                        .parse()
-                        .map_err(|_| format!("expected numeric zone, got {}", zone))?;
-                    let zone =
-                        Zone::try_from(zone).map_err(|_| format!("invalid zone {}", zone))?;
+                    let zone = zone
+                        .parse::<u8>()
+                        .map_err(|_| format!("expected numeric zone, got {}", zone))?
+                        .into();
                     let pattern = args.next().unwrap_or("").trim();
 
                     let locations = how_many(pattern, zone, world_index, &clone, graph)?;

@@ -209,6 +209,7 @@ impl TaggedSolution {
         }
     }
 }
+#[allow(clippy::enum_variant_names)]
 #[repr(usize)]
 #[derive(Clone, Copy)]
 enum Tag {
