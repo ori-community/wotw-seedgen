@@ -136,8 +136,8 @@
 9|7|4|25|10|4|17|9|127|0|8|9|7|int|+1|skip=1
 9|7|4|25|10|4|17|9|128|1|4|30|0|$[(9|999=409)] Enabled
 9|7|4|25|10|4|17|9|128|0|4|30|0|$[(9|999=409)] Disabled
-9|7|4|27|11|4|17|9|0|1|4|30|0|\n<icon>DA5</> Toggle\n<icon>DA4</> Cycle (1 page)  // tooltip
-9|7|4|27|11|4|18|9|0|1|4|30|0|\n<icon>DA5</> Toggle\n<icon>DA4</> Cycle ($(9|0) pages)
+9|7|4|27|11|4|17|9|0|1|4|30|0|\n<icon>A5</> Toggle\n<icon>A4</> Cycle (1 page)  // tooltip
+9|7|4|27|11|4|18|9|0|1|4|30|0|\n<icon>A5</> Toggle\n<icon>A4</> Cycle ($(9|0) pages)
 9|7|4|27|11|6|${0}|instant|f=180
 9|7|4|25|11|8|9|7|int|1                                 // cycle back to start
 
