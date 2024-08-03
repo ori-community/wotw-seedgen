@@ -306,6 +306,7 @@ pub enum Command<'source> {
     Use(Spanned<Use>, CommandArgs<UseArgs<'source>>),
     Spawn(Spanned<Spawn>, CommandArgs<SpawnArgs<'source>>),
     // TODO actually this might be plural since it takes multiple, should check if that works
+    // TODO I think these are called tags now
     Flag(
         Spanned<Flag>,
         CommandArgsCollection<SeparatedNonEmpty<FlagArg<'source>, Symbol<','>>>,
@@ -335,6 +336,7 @@ pub enum Command<'source> {
         Spanned<ItemDataIcon>,
         CommandArgs<ItemDataIconArgs<'source>>,
     ),
+    // TODO ItemDataMapIcon
     SetLogicState(
         Spanned<SetLogicState>,
         CommandArgs<SetLogicStateArgs<'source>>,
@@ -507,7 +509,7 @@ pub struct ItemDataArgs<'source> {
     pub comma: Symbol<','>,
     pub name: Expression<'source>,
     pub comma_2: Symbol<','>,
-    pub price: Expression<'source>,
+    pub price: Expression<'source>, // TODO why isn't the description after the name?
     pub comma_3: Symbol<','>,
     pub description: Expression<'source>,
     pub comma_4: Symbol<','>,

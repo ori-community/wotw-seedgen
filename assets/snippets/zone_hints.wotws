@@ -170,7 +170,7 @@ fun write_burrows_hint() {
 }
 
 fun write_inkwater_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Marsh Skills - " + skills_in_inkwater)
+    set_string("zone_hint", get_string("zone_hint") + "Marsh Skills - " + skills_in_inkwater) // TODO wrong zone name
 }
 fun write_hollow_skill_hint() {
     set_string("zone_hint", get_string("zone_hint") + "Hollow Skills - " + skills_in_hollow)
