@@ -305,9 +305,9 @@ pub enum Command<'source> {
     Spawn(Spanned<Spawn>, CommandArgs<SpawnArgs<'source>>),
     // TODO actually this might be plural since it takes multiple, should check if that works
     // TODO I think these are called tags now
-    Flag(
-        Spanned<Flag>,
-        CommandArgsCollection<SeparatedNonEmpty<FlagArg<'source>, Symbol<','>>>,
+    Tags(
+        Spanned<Tags>,
+        CommandArgsCollection<SeparatedNonEmpty<TagsArg<'source>, Symbol<','>>>,
     ),
     Config(Spanned<Config>, CommandArgs<ConfigArgs<'source>>),
     State(Spanned<State>, CommandArgs<StateArgs<'source>>),
@@ -420,9 +420,9 @@ pub struct SpawnArgs<'source> {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct Flag;
+pub struct Tags;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct FlagArg<'source>(pub Expression<'source>);
+pub struct TagsArg<'source>(pub Expression<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
 pub struct Config;

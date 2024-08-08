@@ -6,7 +6,7 @@ Opher after the Water escape tells the zones holding Water, Glide, Flap
 Lupo in Glades tells the zones holding Burrow, Water Dash, Grenade and Flash
 Twillen tells the zones holding Bow and Bash")
 
-!flag("Key Hints")
+!tags("Key Hints")
 
 // TODO have to stringify constant before compilation because they will be turned into numbers otherwise
 !zone_of(burrow_zone, skill(Skill::Burrow))

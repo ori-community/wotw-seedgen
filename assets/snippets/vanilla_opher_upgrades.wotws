@@ -2,7 +2,7 @@
 #name("Vanilla Opher Upgrades")
 #description("Places the five vanilla weapon upgrades on their vanilla locations in Opher's shop")
 
-!flag("Vanilla Opher Upgrades")
+!tags("Vanilla Opher Upgrades")
 
 // TODO rename and reorder the aliases to fit
 on OpherShop.RapidSentry weapon_upgrade(WeaponUpgrade::RapidSentry)

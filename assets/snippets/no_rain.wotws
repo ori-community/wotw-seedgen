@@ -2,7 +2,7 @@
 #name("No Rain")
 #description("Marsh starts sunny as it usually is after getting the sword tree. Also Howl is dead")
 
-!flag("No Rain")
+!tags("No Rain")
 
 on spawn {
     store(HowlsDen.RainLifted, true)

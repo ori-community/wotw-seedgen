@@ -2,7 +2,7 @@
 #name("Bonus+")
 #description("Game balance is now optional")
 
-!flag("Bonus+")
+!tags("Bonus+")
 
 !include("rapid_hammer_core")
 !use("rapid_hammer_core", rapid_hammer)

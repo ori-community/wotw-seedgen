@@ -6,7 +6,7 @@ The Flap hint is on the Glades Ancestral Light Tree
 The Glide hint is on the Inkwater Ancestral Light Tree
 The Clean Water Hint is on the Wellspring Escape")
 
-!flag("Tree Hints")
+!tags("Tree Hints")
 
 !zone_of(regenerate_zone, skill(Skill::Regenerate))
 !zone_of(sword_zone, skill(Skill::Sword))

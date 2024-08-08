@@ -4,7 +4,7 @@
 Places six guaranteed items at Twillen's shop:
 Sticky, Magnet, Water Breath, Catalyst, Overflow, Reckless")
 
-!flag("Utility Twillen")
+!tags("Utility Twillen")
 
 on TwillenShop.Vitality shard(Shard::Sticky)
 on TwillenShop.Finesse shard(Shard::Magnet)

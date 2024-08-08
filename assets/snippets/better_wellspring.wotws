@@ -2,6 +2,6 @@
 #category("World Changes")
 #description("Opens the top door of Wellspring")
 
-!flag("Better Wellspring")
+!tags("Better Wellspring")
 
 on spawn store(InnerWellspring.TopDoorOpen, true)

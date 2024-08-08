@@ -2,7 +2,7 @@
 #name("Teleporters")
 #description("Find teleporter activations as pickups")
 
-!flag("Teleporters")
+!tags("Teleporters")
 
 !config(inkwater, "Inkwater Marsh TP", Boolean, true)
 !config(howls_den, "Howl's Den TP", Boolean, true)

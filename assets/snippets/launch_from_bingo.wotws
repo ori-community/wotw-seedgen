@@ -4,6 +4,6 @@
 
 !config(lines, "How many lines you need for Launch", Integer, 2)
 
-!flag("Launch from Bingo")
+!tags("Launch from Bingo")
 
 on bingoState.lines >= lines if skills.launch == false skill(Skill::Launch)

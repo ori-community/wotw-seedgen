@@ -2,7 +2,7 @@
 #name("Zone Hints")
 #description("Lupo's maps give information about the number of important items in the current zone. Lupo in Glades sells the hints for Woods and Glades.")
 
-!flag("Zone Hints")
+!tags("Zone Hints")
 
 // TODO implement skill_hints toggle
 !config(skill_hints, "Lupo reveals the amount of skills in an area", Boolean, true)

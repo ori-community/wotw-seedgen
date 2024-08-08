@@ -4,7 +4,7 @@
 #name("No Willow Hearts")
 #description("Start with the final door in Willow's End open")
 
-!flag("No Willow Hearts")
+!tags("No Willow Hearts")
 
 on spawn {
     store(WillowsEnd.GlideHeart, true)

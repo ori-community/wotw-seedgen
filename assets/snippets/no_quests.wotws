@@ -4,7 +4,7 @@
 Don't get any items for talking to npcs
 Locations behind quests, such as the Last Tree in Glades, will be available from the start")
 
-!flag("No Quests")
+!tags("No Quests")
 
 on spawn {
     store(npcsStateGroup.marshKeystoneQuest, 3)

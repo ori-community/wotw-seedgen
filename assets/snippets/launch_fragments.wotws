@@ -4,7 +4,7 @@
 
 !config(total, "How many Launch Fragments to shuffle in", Integer, 5)
 !config(required, "How many Launch Fragments are required to get Launch", Integer, 3)
-!flag("Launch Fragments (" + required + "/" + total + ")")
+!tags("Launch Fragments (" + required + "/" + total + ")")
 
 !builtin_icon(launch_fragment_icon, "assets/icons/bonus/launchfragment.png")
 

@@ -2,7 +2,7 @@
 #name("Bonus Items")
 #description("Shuffles items unique to the randomizer into the world")
 
-!flag("Bonus Items")
+!tags("Bonus Items")
 !config(health_regenerations, "How many Health Regenerations to shuffle in", Integer, 3)
 !config(energy_regenerations, "How many Energy Regenerations to shuffle in", Integer, 3)
 !config(extra_double_jumps, "How many Extra Double Jumps to shuffle in", Integer, 1)

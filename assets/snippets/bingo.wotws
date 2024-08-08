@@ -4,7 +4,7 @@
 "prints updates on line completion; sets the 'game_complete' state once you have enough lines (3 by default)
 (remember to enable netcode in options when rolling the seed)")
 
-!flag("Bingo")
+!tags("Bingo")
 !config(lines, "How many lines you need to complete the game", Integer, 3)
 !state(bingo_complete, Boolean)
 

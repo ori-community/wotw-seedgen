@@ -2,7 +2,7 @@
 #name("Bonus Opher Upgrades")
 #description("Opher sells five weapon upgrades unique to the randomizer")
 
-!flag("Bonus Opher Upgrades")
+!tags("Bonus Opher Upgrades")
 
 !builtin_icon(blaze_efficiency_icon, "assets/icons/bonus/blazeefficiency.png")
 !builtin_icon(spear_efficiency_icon, "assets/icons/bonus/spearefficiency.png")

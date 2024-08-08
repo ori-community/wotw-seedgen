@@ -44,7 +44,7 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Spawn(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Flag(_, command) => {
+            ast::Command::Tags(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::Config(_, command) => {
@@ -321,12 +321,12 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
         }
     }
 }
-impl<'source> Compile<'source> for ast::FlagArg<'source> {
+impl<'source> Compile<'source> for ast::TagsArg<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let Some(flag) = self.0.evaluate(compiler) {
-            compiler.global.output.tags.push(flag);
+        if let Some(tag) = self.0.evaluate(compiler) {
+            compiler.global.output.tags.push(tag);
         }
     }
 }

@@ -9,10 +9,10 @@
 !config(relic_count, "If not zero, overrides relic chance. How many relics to place", Integer, 0)
 
 !if relic_count == 0 {
-    !flag("Relics (" + to_integer(relic_chance * 100) + "%)")
+    !tags("Relics (" + to_integer(relic_chance * 100) + "%)")
 }
 !if relic_count != 0 {
-    !flag("Relics (" + relic_count + ")")
+    !tags("Relics (" + relic_count + ")")
 }
 
 // TODO the other goal snippets don't include progress helper directly, why does this one?

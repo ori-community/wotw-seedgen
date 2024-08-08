@@ -6,7 +6,7 @@ all the arenas start as completed and all boss' combat phases are skipped")
 
 // TODO port https://github.com/SiriusAshling/wotw-seedgen/commit/ce324788abdd79ba7be5b9aa5fedc48ac2ad7dee
 
-!flag("No Combat")
+!tags("No Combat")
 !config(skipArenas, "Skip Combat Shrines and Fight Rooms", Boolean, true)
 !config(skipBosses, "Skip Bosses (Howl, Hornbug, Mora, Kwolok, Flying Rock, Shriek)", Boolean, true)
 

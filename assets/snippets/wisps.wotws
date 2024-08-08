@@ -2,7 +2,7 @@
 #name("All Wisps")
 #description("Require visiting all Wisps before fighting Shriek")
 
-!flag("All Wisps")
+!tags("All Wisps")
 !include("goal_mode_core")
 
 !on_event("goal_mode_core", write_goal_progress_message, {

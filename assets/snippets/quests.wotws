@@ -2,7 +2,7 @@
 #name("All Side Quests")
 #description("Require finishing all side quests before fighting Shriek (you poor soul...)")
 
-!flag("All Side Quests")
+!tags("All Side Quests")
 !include("goal_mode_core")
 
 !on_event("goal_mode_core", write_goal_progress_message, {
