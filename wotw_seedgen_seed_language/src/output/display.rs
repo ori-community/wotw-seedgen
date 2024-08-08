@@ -271,7 +271,7 @@ impl Display for CommandVoid {
             CommandVoid::SetFloat { id, value } => write!(f, "set_float({id}, {value})"),
             CommandVoid::SetString { id, value } => write!(f, "set_string({id}, {value})"),
             CommandVoid::Save {} => write!(f, "save()"),
-            CommandVoid::Checkpoint {} => write!(f, "checkpoint()"),
+            CommandVoid::SaveToMemory {} => write!(f, "save_to_memory()"),
             CommandVoid::Warp { x, y } => write!(f, "warp({x}, {y})"),
             CommandVoid::Equip { slot, equipment } => write!(f, "equip({slot}, {equipment})"),
             CommandVoid::Unequip { equipment } => write!(f, "unequip({equipment})"),

@@ -281,7 +281,7 @@ impl Compile for input::CommandVoid {
                 .string(0, value)
                 .call(Command::CopyString(0, id)),
             Self::Save {} => (vec![Command::Save], MemoryUsed::ZERO),
-            Self::Checkpoint {} => (vec![Command::Checkpoint], MemoryUsed::ZERO),
+            Self::SaveToMemory {} => (vec![Command::SaveToMemory], MemoryUsed::ZERO),
             Self::Warp { x, y } => Args::new(command_lookup)
                 .float(0, x)
                 .float(1, y)

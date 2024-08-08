@@ -209,7 +209,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetInteger
             | FunctionIdentifier::SetFloat
             | FunctionIdentifier::Save
-            | FunctionIdentifier::Checkpoint
+            | FunctionIdentifier::SaveToMemory
             | FunctionIdentifier::Warp
             | FunctionIdentifier::Equip
             | FunctionIdentifier::Unequip

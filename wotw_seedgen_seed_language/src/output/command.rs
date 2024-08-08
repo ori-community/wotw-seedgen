@@ -251,10 +251,10 @@ pub enum CommandVoid {
     SetFloat { id: usize, value: CommandFloat },
     /// Temporarily store `value` under `id`. The value should live at least until the next tick
     SetString { id: usize, value: CommandString },
-    /// Perform a "hard" save like an autosave
+    /// Save to disk, like an autosave
     Save {},
-    /// Perform a "soft" checkpoint like a boss fight checkpoint
-    Checkpoint {},
+    /// Save to memory, but not to disk, like a boss fight checkpoint
+    SaveToMemory {},
     /// Warp the player to (`x`, `y`)
     Warp { x: CommandFloat, y: CommandFloat },
     /// Equip `equipment` into `slot`

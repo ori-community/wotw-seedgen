@@ -410,7 +410,7 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::FreeMessageAlignment { .. }
             | Self::FreeMessageScreenPosition { .. }
             | Self::Save {}
-            | Self::Checkpoint {}
+            | Self::SaveToMemory {}
             | Self::Equip { .. }
             | Self::Unequip { .. }
             | Self::TriggerKeybind { .. }

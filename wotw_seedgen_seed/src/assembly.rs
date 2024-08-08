@@ -148,10 +148,10 @@ pub enum Command {
     FreeMessageAlignment(/*id*/ usize, /*alignment*/ Alignment),
     /// Set the `screen_position` of free message `id`
     FreeMessageScreenPosition(/*id*/ usize, /*screen_position*/ ScreenPosition),
-    /// Perform a "hard" save like an autosave
+    /// Save to disk, like an autosave
     Save,
-    /// Perform a "soft" checkpoint like a boss fight checkpoint
-    Checkpoint,
+    /// Save to memory, but not to disk, like a boss fight checkpoint
+    SaveToMemory,
     // TODO preload area command
     /// Warp the player to (Float Memory 0, Float Memory 1)
     Warp,

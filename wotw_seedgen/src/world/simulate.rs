@@ -292,7 +292,7 @@ impl Simulate for CommandVoid {
             | CommandVoid::DestroyWarpIcon { .. }
             | CommandVoid::Lookup { .. }
             | CommandVoid::Save { .. }
-            | CommandVoid::Checkpoint { .. }
+            | CommandVoid::SaveToMemory { .. }
             | CommandVoid::Warp { .. }
             | CommandVoid::Equip { .. }
             | CommandVoid::Unequip { .. }

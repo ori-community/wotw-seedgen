@@ -247,7 +247,7 @@ pub(crate) enum FunctionIdentifier {
     SetFloat,
     SetString,
     Save,
-    Checkpoint,
+    SaveToMemory,
     Warp,
     Equip,
     Unequip,
@@ -652,7 +652,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 value: arg(&mut context)?,
             }),
             FunctionIdentifier::Save => Command::Void(CommandVoid::Save {}),
-            FunctionIdentifier::Checkpoint => Command::Void(CommandVoid::Checkpoint {}),
+            FunctionIdentifier::SaveToMemory => Command::Void(CommandVoid::SaveToMemory {}),
             FunctionIdentifier::Warp => Command::Void(CommandVoid::Warp {
                 x: arg(&mut context)?,
                 y: arg(&mut context)?,
