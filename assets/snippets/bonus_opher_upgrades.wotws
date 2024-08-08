@@ -4,11 +4,11 @@
 
 !flag("Bonus Opher Upgrades")
 
-!use_icon(blaze_efficiency_icon, "assets/icons/bonus/blazeefficiency.png")
-!use_icon(spear_efficiency_icon, "assets/icons/bonus/spearefficiency.png")
-!use_icon(shuriken_efficiency_icon, "assets/icons/bonus/shurikenefficiency.png")
-!use_icon(sentry_efficiency_icon, "assets/icons/bonus/sentryefficiency.png")
-!use_icon(rapid_hammer_icon, "assets/icons/bonus/rapidsmash.png") // TODO rename file
+!builtin_icon(blaze_efficiency_icon, "assets/icons/bonus/blazeefficiency.png")
+!builtin_icon(spear_efficiency_icon, "assets/icons/bonus/spearefficiency.png")
+!builtin_icon(shuriken_efficiency_icon, "assets/icons/bonus/shurikenefficiency.png")
+!builtin_icon(sentry_efficiency_icon, "assets/icons/bonus/sentryefficiency.png")
+!builtin_icon(rapid_hammer_icon, "assets/icons/bonus/rapidsmash.png") // TODO rename file
 
 !include("bonus_item_core")
 !use("bonus_item_core", spear_efficiency)

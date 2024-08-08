@@ -8,7 +8,7 @@
 !include("bonus_core")
 !use("bonus_core", update_bonus_wheel)
 
-!use_icon(rapid_regenerate_icon, "assets/icons/bonus/rapidregenerate.png")
+!builtin_icon(rapid_regenerate_icon, "assets/icons/bonus/rapidregenerate.png")
 
 !on_event("bonus_core", any_collected, if collected > 0 set_boolean("any_collected", true))
 !on_event("bonus_core", any_enabled, if enabled set_boolean("any_enabled", true))

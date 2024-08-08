@@ -296,9 +296,8 @@ pub struct Variant;
 pub enum Command<'source> {
     // TODO have include be able to change the default config?
     Include(Spanned<Include>, CommandArgs<IncludeArgs<'source>>),
-    IncludeIcon(Spanned<IncludeIcon>, CommandArgs<IncludeIconArgs<'source>>),
-    // TODO rename useiconasset?
-    UseIcon(Spanned<UseIcon>, CommandArgs<UseIconArgs<'source>>),
+    BundleIcon(Spanned<BundleIcon>, CommandArgs<BundleIconArgs<'source>>),
+    BuiltinIcon(Spanned<BuiltinIcon>, CommandArgs<BuiltinIconArgs<'source>>),
     Event(Spanned<EventIdent>, CommandArgs<EventArgs<'source>>),
     OnEvent(Spanned<OnEvent>, CommandArgs<OnEventArgs<'source>>),
     Share(Spanned<Share>, CommandArgs<ShareArgs<'source>>),
@@ -364,18 +363,18 @@ pub struct Include;
 pub struct IncludeArgs<'source>(pub Spanned<&'source str>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct IncludeIcon;
+pub struct BundleIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct IncludeIconArgs<'source> {
+pub struct BundleIconArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub comma: Symbol<','>,
     pub path: Spanned<&'source str>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct UseIcon;
+pub struct BuiltinIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct UseIconArgs<'source> {
+pub struct BuiltinIconArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub comma: Symbol<','>,
     pub path: Spanned<&'source str>,

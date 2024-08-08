@@ -7,8 +7,8 @@ Supply lasts indefinitely, but the price grows with the demand.")
 !config(keystones, "Let Opher sell Keystones", Boolean, true)
 !config(ores, "Let Twillen sell Gorlek Ore", Boolean, true)
 
-!use_icon(keystone_icon, "assets/icons/game/keystone.png")
-!use_icon(ore_icon, "assets/icons/game/gorlekore.png")
+!builtin_icon(keystone_icon, "assets/icons/game/keystone.png")
+!builtin_icon(ore_icon, "assets/icons/game/gorlekore.png")
 
 !if keystones {
     !state(keystones_purchased, Integer)

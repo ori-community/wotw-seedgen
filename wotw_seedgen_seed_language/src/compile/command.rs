@@ -23,10 +23,10 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Include(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::IncludeIcon(_, command) => {
+            ast::Command::BundleIcon(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::UseIcon(_, command) => {
+            ast::Command::BuiltinIcon(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::Event(_, command) => {
@@ -123,7 +123,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
         /* all preprocessed ;) */
     }
 }
-impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
+impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
@@ -145,7 +145,7 @@ impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
         }
     }
 }
-impl<'source> Compile<'source> for ast::UseIconArgs<'source> {
+impl<'source> Compile<'source> for ast::BuiltinIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
