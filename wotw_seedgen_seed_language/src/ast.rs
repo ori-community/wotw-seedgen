@@ -407,7 +407,7 @@ pub struct Import;
 pub struct ImportArgs<'source> {
     pub snippet_name: Spanned<&'source str>,
     pub comma: Symbol<','>,
-    pub identifier: Spanned<Identifier<'source>>,
+    pub identifiers: SeparatedNonEmpty<Spanned<Identifier<'source>>, Symbol<','>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]

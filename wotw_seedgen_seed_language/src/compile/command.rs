@@ -256,50 +256,50 @@ impl<'source> Compile<'source> for ast::ImportArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let value = compiler
-            .global
-            .exported_values
-            .get(self.snippet_name.data)
-            .ok_or_else(|| {
+        let Some(snippet_exported_values) =
+            compiler.global.exported_values.get(self.snippet_name.data)
+        else {
+            compiler.errors.push(
                 Error::custom("unknown snippet".to_string(), self.snippet_name.span)
-                    .with_help(format!("try !include(\"{}\")", self.snippet_name.data))
-            })
-            .and_then(|snippet_exported_values| {
-                snippet_exported_values
-                    .get(self.identifier.data.0)
-                    .ok_or_else(|| {
-                        Error::custom(
-                            "identifier not found in snippet".to_string(),
-                            self.identifier.span,
-                        )
-                        .with_help(format!(
-                            "if it exists in {}, you have to export it there: !export({})",
-                            self.snippet_name.data, self.identifier.data
-                        ))
-                    })
-            });
+                    .with_help(format!("try !include(\"{}\")", self.snippet_name.data)),
+            );
+            return;
+        };
 
-        match value {
-            Ok(ExportedValue::Function(index)) => {
-                compiler
-                    .preprocessed
-                    .functions
-                    .insert(self.identifier.data.0.to_string());
-                compiler
-                    .function_indices
-                    .insert(self.identifier.data.0.to_string(), *index);
-                // TODO is this still used?
-                compiler.function_imports.insert(
-                    self.identifier.data.0.to_string(),
-                    self.snippet_name.data.to_string(),
+        for identifier in self.identifiers {
+            let Some(value) = snippet_exported_values.get(identifier.data.0) else {
+                compiler.errors.push(
+                    Error::custom(
+                        "identifier not found in snippet".to_string(),
+                        identifier.span,
+                    )
+                    .with_help(format!(
+                        "if it exists in {}, you have to export it there: !export({})",
+                        self.snippet_name.data, identifier.data
+                    )),
                 );
+                continue;
+            };
+
+            match value {
+                ExportedValue::Function(index) => {
+                    compiler
+                        .preprocessed
+                        .functions
+                        .insert(identifier.data.0.to_string());
+                    compiler
+                        .function_indices
+                        .insert(identifier.data.0.to_string(), *index);
+                    // TODO is this still used?
+                    compiler.function_imports.insert(
+                        identifier.data.0.to_string(),
+                        self.snippet_name.data.to_string(),
+                    );
+                }
+                ExportedValue::Literal(literal) => {
+                    compiler.variables.insert(identifier.data, literal.clone());
+                }
             }
-            Ok(ExportedValue::Literal(literal)) => {
-                compiler
-                    .variables
-                    .insert(self.identifier.data, literal.clone());
-            }
-            Err(err) => compiler.errors.push(err),
         }
     }
 }
