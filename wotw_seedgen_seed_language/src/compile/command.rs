@@ -29,10 +29,10 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::UseIcon(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Callback(_, command) => {
+            ast::Command::Event(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::OnCallback(_, command) => {
+            ast::Command::OnEvent(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::Share(_, command) => {
@@ -155,20 +155,20 @@ impl<'source> Compile<'source> for ast::UseIconArgs<'source> {
         );
     }
 }
-impl<'source> Compile<'source> for ast::CallbackArgs<'source> {
+impl<'source> Compile<'source> for ast::EventArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let index = compiler.function_indices[self.0.data.0];
         compiler
             .global
-            .callbacks
+            .events
             .entry(compiler.identifier.clone())
             .or_default()
             .insert(self.0.data.0.to_string(), index);
     }
 }
-impl<'source> Compile<'source> for ast::OnCallbackArgs<'source> {
+impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
@@ -185,15 +185,15 @@ impl<'source> Compile<'source> for ast::OnCallbackArgs<'source> {
             return;
         }
 
-        let callback = compiler
+        let event = compiler
             .global
-            .callbacks
+            .events
             .get(self.snippet_name.data)
-            .and_then(|callbacks| callbacks.get(self.identifier.data.0))
+            .and_then(|events| events.get(self.identifier.data.0))
             .copied();
-        if callback.is_none() {
+        if event.is_none() {
             compiler.errors.push(Error::custom(
-                "Could not find callback in snippet".to_string(),
+                "Could not find event in snippet".to_string(),
                 self.identifier.span,
             ));
         }
@@ -204,9 +204,9 @@ impl<'source> Compile<'source> for ast::OnCallbackArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
 
-        if let (Some(callback), Some(action)) = (callback, action) {
+        if let (Some(event), Some(action)) = (event, action) {
             if let CommandVoid::Multi { commands } =
-                &mut compiler.global.output.command_lookup[callback]
+                &mut compiler.global.output.command_lookup[event]
             {
                 match action {
                     CommandVoid::Multi { commands: extend } => commands.extend(extend),

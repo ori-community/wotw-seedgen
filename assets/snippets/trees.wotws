@@ -5,7 +5,7 @@
 !flag("All Trees")
 !include("goal_mode_core")
 
-!on_callback("goal_mode_core", write_goal_progress_message, {
+!on_event("goal_mode_core", write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
     set_boolean("comma", true)
     count_trees()
@@ -15,13 +15,13 @@
     set_string("goal_progress_message", get_string("goal_progress_message") + get_string("trees_message"))
 })
 
-!on_callback("goal_mode_core", check_goals_completed, {
+!on_event("goal_mode_core", check_goals_completed, {
     count_trees()
     if get_integer("tree_count") < 14 set_boolean("goals_completed", false)
 })
 
 // TODO maybe do a fancier feedback message pointing out what exactly you are missing?
-!on_callback("goal_mode_core", write_goals_incomplete_message, {
+!on_event("goal_mode_core", write_goals_incomplete_message, {
     count_trees()
     if get_integer("tree_count") < 14 {
         set_string("color", "@")

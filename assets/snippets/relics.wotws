@@ -266,7 +266,7 @@
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 
-!on_callback("progress_helper", write_progress_message, {
+!on_event("progress_helper", write_progress_message, {
     count_relics()
     set_string("outer_color", "")
     if get_integer("relic_count") == total_relic_count set_string("outer_color", "$")
@@ -274,12 +274,12 @@
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
 
-!on_callback("goal_mode_core", check_goals_completed, {
+!on_event("goal_mode_core", check_goals_completed, {
     count_relics()
     if get_integer("relic_count") < total_relic_count set_boolean("goals_completed", false)
 })
 
-!on_callback("goal_mode_core", write_goals_incomplete_message, {
+!on_event("goal_mode_core", write_goals_incomplete_message, {
     count_relics()
     if get_integer("relic_count") < total_relic_count {
         set_string("outer_color", "@")

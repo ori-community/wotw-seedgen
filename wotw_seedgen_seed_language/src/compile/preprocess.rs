@@ -2,7 +2,7 @@ use crate::ast::{self, RecoverContent};
 use rustc_hash::FxHashSet;
 use wotw_seedgen_parse::{Error, Recoverable, Span, Spanned};
 
-// TODO our preprocessing is a bit weird. For instance if you want to use a callback
+// TODO our preprocessing is a bit weird. For instance if you want to use an event
 // from a parent file, it fails to resolve with an odd error message
 
 #[derive(Default)]
@@ -53,7 +53,7 @@ impl Preprocessor {
                                     }
                                 }
                             }
-                            ast::Command::Callback(_, command) => {
+                            ast::Command::Event(_, command) => {
                                 if let Ok(command) = &command.result {
                                     if let Ok(args) = &command.content {
                                         self.output.functions.insert(args.0 .0.data.0.to_string());

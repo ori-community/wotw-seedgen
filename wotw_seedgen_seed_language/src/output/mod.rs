@@ -45,7 +45,7 @@ impl IntermediateOutput {
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct DebugOutput {
     pub snippets: FxHashMap<String, SnippetDebugOutput>,
-    pub callbacks: FxHashMap<String, FxHashMap<String, usize>>,
+    pub events: FxHashMap<String, FxHashMap<String, usize>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct SnippetDebugOutput {

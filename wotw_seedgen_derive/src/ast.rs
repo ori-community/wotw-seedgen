@@ -72,6 +72,7 @@ struct Attributes {
     debug: bool,
     token: Option<syn::Expr>,
     case: Option<Case>,
+    rename: Option<syn::LitStr>,
     with: Option<syn::LitStr>,
 }
 impl Attributes {
@@ -81,6 +82,9 @@ impl Attributes {
         for meta in find_attributes(attrs, "ast")? {
             match meta {
                 syn::Meta::Path(path) if path.is_ident("debug") => attributes.debug = true,
+                syn::Meta::NameValue(meta) if meta.path.is_ident("token") => {
+                    attributes.token = Some(meta.value);
+                }
                 syn::Meta::NameValue(meta) if meta.path.is_ident("case") => {
                     let case = match meta.value {
                         syn::Expr::Lit(syn::ExprLit {
@@ -103,8 +107,17 @@ impl Attributes {
                     };
                     attributes.case = Some(case);
                 }
-                syn::Meta::NameValue(meta) if meta.path.is_ident("token") => {
-                    attributes.token = Some(meta.value);
+                syn::Meta::NameValue(meta) if meta.path.is_ident("rename") => {
+                    let rename = match meta.value {
+                        syn::Expr::Lit(syn::ExprLit {
+                            lit: syn::Lit::Str(lit),
+                            ..
+                        }) => lit,
+                        other => {
+                            return Err(syn::Error::new_spanned(other, "Expected string literal"))
+                        }
+                    };
+                    attributes.rename = Some(rename);
                 }
                 syn::Meta::NameValue(meta) if meta.path.is_ident("with") => {
                     let with = match meta.value {
@@ -129,6 +142,7 @@ impl Attributes {
             debug: inner.debug || self.debug,
             token: inner.token.or(self.token),
             case: inner.case.or(self.case),
+            rename: inner.rename.or(self.rename),
             with: inner.with.or(self.with),
         }
     }
@@ -138,12 +152,14 @@ fn use_with_or_else<F: FnOnce() -> Result<TokenStream>>(
     default: F,
     with: Option<syn::LitStr>,
 ) -> Result<TokenStream> {
-    with.map_or_else(default, |with| {
-        let value = with.value();
-        let path = syn::parse_str::<syn::Path>(&value)?;
-        Ok(quote! {
-            #path
-        })
+    with.map_or_else(default, |with| parse_with(&with))
+}
+fn parse_with(with: &syn::LitStr) -> Result<TokenStream> {
+    let value = with.value();
+    let path =
+        syn::parse_str::<syn::Path>(&value).map_err(|err| syn::Error::new_spanned(with, err))?;
+    Ok(quote! {
+        #path
     })
 }
 
@@ -157,7 +173,7 @@ fn ast_fields<const IN_ENUM: bool>(
     let fields = match fields {
         syn::Fields::Named(fields) => ast_fields_named(ident, fields, attrs),
         syn::Fields::Unnamed(fields) => ast_fields_unnamed(ident, fields, attrs),
-        syn::Fields::Unit => return Ok(ast_fields_unit::<IN_ENUM>(ident, attrs)),
+        syn::Fields::Unit => return ast_fields_unit::<IN_ENUM>(ident, attrs),
     }?;
 
     let variant_construction = IN_ENUM.then(|| quote! { ::#ident });
@@ -272,11 +288,14 @@ fn ast_fields_unnamed(
         (#(#field_asts),*)
     })
 }
-fn ast_fields_unit<const IN_ENUM: bool>(ident: &syn::Ident, attrs: &Attributes) -> TokenStream {
+fn ast_fields_unit<const IN_ENUM: bool>(
+    ident: &syn::Ident,
+    attrs: &Attributes,
+) -> Result<TokenStream> {
     let variant_construction = IN_ENUM.then(|| quote! { ::#ident });
 
     if let Some(token) = &attrs.token {
-        return quote! {
+        return Ok(quote! {
             match parser.current().0 {
                 #token => {
                     parser.step();
@@ -286,23 +305,33 @@ fn ast_fields_unit<const IN_ENUM: bool>(ident: &syn::Ident, attrs: &Attributes) 
                     #token.to_string()
                 )))
             }
-        };
+        });
     }
 
-    let mut str = ident.to_string();
-    if let Some(case) = attrs.case {
-        // TODO should we make assumptions about the original case?
-        str = str.to_case(case);
+    if let Some(with) = &attrs.with {
+        return parse_with(with);
     }
 
-    quote! {
+    let str = match &attrs.rename {
+        None => {
+            let mut str = ident.to_string();
+            if let Some(case) = attrs.case {
+                // TODO should we make assumptions about the original case?
+                str = str.to_case(case);
+            }
+            str
+        }
+        Some(rename) => rename.value(),
+    };
+
+    Ok(quote! {
         if parser.current_slice() == #str {
             parser.step();
             Ok(Self #variant_construction)
         } else {
             Err(parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(format!(concat!('"', #str, '"')))))
         }
-    }
+    })
 }
 
 fn ast_enum(

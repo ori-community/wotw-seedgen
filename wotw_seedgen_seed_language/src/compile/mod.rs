@@ -208,7 +208,7 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     pub uber_state_data: &'uberstates UberStateData,
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
-    pub callbacks: FxHashMap<String, FxHashMap<String, usize>>,
+    pub events: FxHashMap<String, FxHashMap<String, usize>>,
     pub shared_values: FxHashMap<String, FxHashMap<String, SharedValue>>,
     pub boolean_ids: IdProvider,
     pub integer_ids: IdProvider,
@@ -239,7 +239,7 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             output: IntermediateOutput::new(debug),
             uber_state_data,
             snippet_access,
-            callbacks: Default::default(),
+            events: Default::default(),
             shared_values: Default::default(),
             boolean_ids: IdProvider::new(RESERVED_MEMORY),
             integer_ids: IdProvider::new(RESERVED_MEMORY),
@@ -407,7 +407,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
 
         let source = self.global.snippet_access.read_snippet(identifier)?;
         self.global
-            .callbacks
+            .events
             .insert(identifier.to_string(), Default::default());
         self.global
             .shared_values
@@ -454,7 +454,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
     pub fn finish(self) -> CompileResult {
         let mut output = self.global.output;
         if let Some(debug) = &mut output.debug {
-            debug.callbacks = self.global.callbacks;
+            debug.events = self.global.events;
         }
 
         CompileResult {

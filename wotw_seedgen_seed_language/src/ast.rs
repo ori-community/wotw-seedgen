@@ -79,7 +79,7 @@ pub enum ClientEvent {
     Reload,
     /// Trigger when respawning after death, void etc.
     Respawn,
-    // TODO on input <bind>?
+    // TODO on input <bind>? Or add all bindings to the `input` uberState group so you can trigger on press/release or check their current state?
     /// Trigger on keybind
     Binding1,
     /// Trigger on keybind
@@ -299,9 +299,8 @@ pub enum Command<'source> {
     IncludeIcon(Spanned<IncludeIcon>, CommandArgs<IncludeIconArgs<'source>>),
     // TODO rename useiconasset?
     UseIcon(Spanned<UseIcon>, CommandArgs<UseIconArgs<'source>>),
-    Callback(Spanned<Callback>, CommandArgs<CallbackArgs<'source>>),
-    // TODO rename use_callback?
-    OnCallback(Spanned<OnCallback>, CommandArgs<OnCallbackArgs<'source>>),
+    Event(Spanned<EventIdent>, CommandArgs<EventArgs<'source>>),
+    OnEvent(Spanned<OnEvent>, CommandArgs<OnEventArgs<'source>>),
     Share(Spanned<Share>, CommandArgs<ShareArgs<'source>>),
     Use(Spanned<Use>, CommandArgs<UseArgs<'source>>),
     Spawn(Spanned<Spawn>, CommandArgs<SpawnArgs<'source>>),
@@ -382,15 +381,15 @@ pub struct UseIconArgs<'source> {
     pub path: Spanned<&'source str>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
-pub struct Callback;
+#[ast(rename = "event")]
+pub struct EventIdent;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct CallbackArgs<'source>(pub Spanned<Identifier<'source>>);
+pub struct EventArgs<'source>(pub Spanned<Identifier<'source>>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct OnCallback;
+pub struct OnEvent;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct OnCallbackArgs<'source> {
+pub struct OnEventArgs<'source> {
     pub snippet_name: Spanned<&'source str>,
     pub comma: Symbol<','>,
     pub identifier: Spanned<Identifier<'source>>,

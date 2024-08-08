@@ -21,6 +21,7 @@ fn main() -> Result<(), Error> {
         debugger::wait_until_attached(None).unwrap();
     }
 
+    // TODO remove
     env_logger::init();
 
     let cli = Cli::parse();

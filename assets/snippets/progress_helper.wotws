@@ -10,12 +10,11 @@ By default those are bound to
 ")
 
 // TODO there's a regression here because previously progress messages were in a consistent order
-// To add a progress message from your header, use the write_progress_message callback
-// On callback, append your progress message to the string with id progress_message
+// To add a progress message from your header, use the write_progress_message event and append your progress message to the string with id progress_message
 // Usually, you'll want to start with a newline so you have your own line
 // This example shows how to add a line "Fun: 10/10" into the progress message:
 // !include("progress_helper")
-// !on_callback("progress_helper", write_progress_message, set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
+// !on_event("progress_helper", write_progress_message, set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
 
 !use_icon(progress_summary_icon, "assets/icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
 !use_icon(tree_progress_icon, "assets/icons/wheel/tree_progress.blue.png")
@@ -23,7 +22,7 @@ By default those are bound to
 !use_icon(quest_progress_icon, "assets/icons/wheel/quests_progress.blue.png") // TODO some filenames are singular, some plural...
 !use_icon(teleporter_icon, "assets/icons/game/teleporter.png")
 
-!callback(write_progress_message)
+!event(write_progress_message)
 
 !state(disable_keybinds, Boolean)
 !share(disable_keybinds)

@@ -5,7 +5,7 @@
 !flag("All Side Quests")
 !include("goal_mode_core")
 
-!on_callback("goal_mode_core", write_goal_progress_message, {
+!on_event("goal_mode_core", write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
     set_boolean("comma", true)
     count_quests()
@@ -15,12 +15,12 @@
     set_string("goal_progress_message", get_string("goal_progress_message") + get_string("quest_message"))
 })
 
-!on_callback("goal_mode_core", check_goals_completed, {
+!on_event("goal_mode_core", check_goals_completed, {
     count_quests()
     if get_integer("count_quests") < 12 set_boolean("goals_completed", false)
 })
 
-!on_callback("goal_mode_core", write_goals_incomplete_message, {
+!on_event("goal_mode_core", write_goals_incomplete_message, {
     count_quests()
     if get_integer("count_quests") < 12 {
         set_string("color", "@")

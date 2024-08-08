@@ -6,11 +6,11 @@
 
 !include("progress_helper")
 
-!callback(write_goal_progress_message)
-!callback(check_goals_completed)
-!callback(write_goals_incomplete_message)
+!event(write_goal_progress_message)
+!event(check_goals_completed)
+!event(write_goals_incomplete_message)
 
-!on_callback("progress_helper", write_progress_message, {
+!on_event("progress_helper", write_progress_message, {
     set_string("goal_progress_message", "")
     set_boolean("comma", false)
     write_goal_progress_message()
