@@ -155,8 +155,8 @@ fn compile() {
                 .iter()
                 .map(|connection| graph.nodes[connection.to].identifier())
                 .collect::<Vec<_>>();
-            assert!(adjacent.contains(&"MarshSpawn.LogBroken"));
-            assert!(adjacent.contains(&"MarshSpawn.RockHC"));
+            assert!(adjacent.contains(&"NonGladesTeleporter"));
+            assert!(adjacent.contains(&"MarshSpawn.GrappleHC"));
             assert!(adjacent.contains(&"Teleporters"));
         }
         _ => panic!(),

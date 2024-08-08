@@ -5,7 +5,7 @@
 !flag("No Rain")
 
 on spawn {
-    store(MarshSpawn.RainLifted, true)
+    store(HowlsDen.RainLifted, true)
     store(swampStateGroup.nightCrawlerChaseStarted, true)
     store(swampStateGroup.nightCrawlerDefeated, true)
     store(MarshSpawn.HowlBurnt, true)
