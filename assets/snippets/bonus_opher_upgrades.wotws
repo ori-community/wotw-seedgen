@@ -11,12 +11,12 @@
 !builtin_icon(rapid_hammer_icon, "assets/icons/bonus/rapidsmash.png") // TODO rename file
 
 !include("bonus_item_core")
-!use("bonus_item_core", spear_efficiency)
-!use("bonus_item_core", shuriken_efficiency)
-!use("bonus_item_core", blaze_efficiency)
-!use("bonus_item_core", sentry_efficiency)
+!import("bonus_item_core", spear_efficiency)
+!import("bonus_item_core", shuriken_efficiency)
+!import("bonus_item_core", blaze_efficiency)
+!import("bonus_item_core", sentry_efficiency)
 !include("rapid_hammer_core")
-!use("rapid_hammer_core", rapid_hammer)
+!import("rapid_hammer_core", rapid_hammer)
 
 on OpherShop.Spike spear_efficiency()
 on OpherShop.SpiritSmash rapid_hammer()

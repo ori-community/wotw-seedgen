@@ -209,7 +209,7 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
     pub events: FxHashMap<String, FxHashMap<String, usize>>,
-    pub shared_values: FxHashMap<String, FxHashMap<String, SharedValue>>,
+    pub exported_values: FxHashMap<String, FxHashMap<String, ExportedValue>>,
     pub boolean_ids: IdProvider,
     pub integer_ids: IdProvider,
     pub float_ids: IdProvider,
@@ -224,7 +224,7 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     pub config: FxHashMap<String, FxHashMap<String, String>>,
 }
 #[derive(Debug)]
-pub(crate) enum SharedValue {
+pub(crate) enum ExportedValue {
     Function(usize),
     Literal(Literal),
 }
@@ -240,7 +240,7 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             uber_state_data,
             snippet_access,
             events: Default::default(),
-            shared_values: Default::default(),
+            exported_values: Default::default(),
             boolean_ids: IdProvider::new(RESERVED_MEMORY),
             integer_ids: IdProvider::new(RESERVED_MEMORY),
             float_ids: IdProvider::new(RESERVED_MEMORY),
@@ -410,7 +410,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
             .events
             .insert(identifier.to_string(), Default::default());
         self.global
-            .shared_values
+            .exported_values
             .insert(identifier.to_string(), Default::default());
         let mut errors = vec![];
 

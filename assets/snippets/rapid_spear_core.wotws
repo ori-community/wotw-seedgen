@@ -6,7 +6,7 @@
 !state(collected, Integer)
 
 !include("bonus_core")
-!use("bonus_core", update_bonus_wheel)
+!import("bonus_core", update_bonus_wheel)
 
 !builtin_icon(rapid_spear_icon, "assets/icons/bonus/rapidspear.png")
 
@@ -19,7 +19,7 @@ fun rapid_spear() {
     item_message("#Rapid Spear x" + (collected + 1) + "#")
     store(collected, collected + 1)
 }
-!share(rapid_spear)
+!export(rapid_spear)
 
 !item_data(rapid_spear(),
     "#Rapid Spear#",

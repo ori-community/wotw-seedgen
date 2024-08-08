@@ -300,8 +300,8 @@ pub enum Command<'source> {
     BuiltinIcon(Spanned<BuiltinIcon>, CommandArgs<BuiltinIconArgs<'source>>),
     Event(Spanned<EventIdent>, CommandArgs<EventArgs<'source>>),
     OnEvent(Spanned<OnEvent>, CommandArgs<OnEventArgs<'source>>),
-    Share(Spanned<Share>, CommandArgs<ShareArgs<'source>>),
-    Use(Spanned<Use>, CommandArgs<UseArgs<'source>>),
+    Export(Spanned<Export>, CommandArgs<ExportArgs<'source>>),
+    Import(Spanned<Import>, CommandArgs<ImportArgs<'source>>),
     Spawn(Spanned<Spawn>, CommandArgs<SpawnArgs<'source>>),
     // TODO actually this might be plural since it takes multiple, should check if that works
     // TODO I think these are called tags now
@@ -397,14 +397,14 @@ pub struct OnEventArgs<'source> {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct Share;
+pub struct Export;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct ShareArgs<'source>(pub Spanned<Identifier<'source>>);
+pub struct ExportArgs<'source>(pub Spanned<Identifier<'source>>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct Use;
+pub struct Import;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct UseArgs<'source> {
+pub struct ImportArgs<'source> {
     pub snippet_name: Spanned<&'source str>,
     pub comma: Symbol<','>,
     pub identifier: Spanned<Identifier<'source>>,

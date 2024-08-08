@@ -5,13 +5,13 @@
 !tags("Bonus+")
 
 !include("rapid_hammer_core")
-!use("rapid_hammer_core", rapid_hammer)
+!import("rapid_hammer_core", rapid_hammer)
 !include("rapid_sword_core")
-!use("rapid_sword_core", rapid_sword)
+!import("rapid_sword_core", rapid_sword)
 !include("rapid_spear_core")
-!use("rapid_spear_core", rapid_spear)
+!import("rapid_spear_core", rapid_spear)
 !include("rapid_regenerate_core")
-!use("rapid_regenerate_core", rapid_regenerate)
+!import("rapid_regenerate_core", rapid_regenerate)
 
 !config(rapid_hammers, "How many Rapid Hammers to shuffle in", Integer, 3)
 !config(rapid_swords, "How many Rapid Swords to shuffle in", Integer, 3)

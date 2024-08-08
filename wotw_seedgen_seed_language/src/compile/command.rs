@@ -1,6 +1,6 @@
 // TODO this module name is confusing
 
-use super::{Compile, SharedValue, SnippetCompiler};
+use super::{Compile, ExportedValue, SnippetCompiler};
 use crate::{
     ast::{self, UberStateType},
     output::{
@@ -35,10 +35,10 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::OnEvent(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Share(_, command) => {
+            ast::Command::Export(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Use(_, command) => {
+            ast::Command::Import(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::Spawn(_, command) => {
@@ -216,7 +216,7 @@ impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
         }
     }
 }
-impl<'source> Compile<'source> for ast::ShareArgs<'source> {
+impl<'source> Compile<'source> for ast::ExportArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
@@ -226,8 +226,8 @@ impl<'source> Compile<'source> for ast::ShareArgs<'source> {
         let function = compiler.function_indices.get(self.0.data.0);
 
         let value = match (variable, function) {
-            (None, Some(index)) => SharedValue::Function(*index),
-            (Some(var), None) => SharedValue::Literal(var.clone()),
+            (None, Some(index)) => ExportedValue::Function(*index),
+            (Some(var), None) => ExportedValue::Literal(var.clone()),
             (Some(_), Some(_)) => {
                 compiler.errors.push(Error::custom(
                     "Could refer to either a function or a variable in the current scope. Consider renaming one of them to resolve the ambiguity".to_string(),
@@ -246,26 +246,26 @@ impl<'source> Compile<'source> for ast::ShareArgs<'source> {
 
         compiler
             .global
-            .shared_values
+            .exported_values
             .entry(compiler.identifier.clone())
             .or_default()
             .insert(identifier.0.to_string(), value);
     }
 }
-impl<'source> Compile<'source> for ast::UseArgs<'source> {
+impl<'source> Compile<'source> for ast::ImportArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let value = compiler
             .global
-            .shared_values
+            .exported_values
             .get(self.snippet_name.data)
             .ok_or_else(|| {
                 Error::custom("unknown snippet".to_string(), self.snippet_name.span)
                     .with_help(format!("try !include(\"{}\")", self.snippet_name.data))
             })
-            .and_then(|snippet_shared_values| {
-                snippet_shared_values
+            .and_then(|snippet_exported_values| {
+                snippet_exported_values
                     .get(self.identifier.data.0)
                     .ok_or_else(|| {
                         Error::custom(
@@ -273,14 +273,14 @@ impl<'source> Compile<'source> for ast::UseArgs<'source> {
                             self.identifier.span,
                         )
                         .with_help(format!(
-                            "if it exists in {}, you have to share it there: !share({})",
+                            "if it exists in {}, you have to export it there: !export({})",
                             self.snippet_name.data, self.identifier.data
                         ))
                     })
             });
 
         match value {
-            Ok(SharedValue::Function(index)) => {
+            Ok(ExportedValue::Function(index)) => {
                 compiler
                     .preprocessed
                     .functions
@@ -294,7 +294,7 @@ impl<'source> Compile<'source> for ast::UseArgs<'source> {
                     self.snippet_name.data.to_string(),
                 );
             }
-            Ok(SharedValue::Literal(literal)) => {
+            Ok(ExportedValue::Literal(literal)) => {
                 compiler
                     .variables
                     .insert(self.identifier.data, literal.clone());

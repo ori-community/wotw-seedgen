@@ -8,7 +8,7 @@
 !state(collected, Integer)
 
 !include("bonus_core")
-!use("bonus_core", update_bonus_wheel)
+!import("bonus_core", update_bonus_wheel)
 
 !builtin_icon(skill_velocity_icon, "assets/icons/bonus/skillvelocity.png")
 

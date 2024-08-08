@@ -25,7 +25,7 @@ By default those are bound to
 !event(write_progress_message)
 
 !state(disable_keybinds, Boolean)
-!share(disable_keybinds)
+!export(disable_keybinds)
 
 on reload {
     set_wheel_item_data(

@@ -6,7 +6,7 @@
 !state(collected, Integer)
 
 !include("bonus_core")
-!use("bonus_core", update_bonus_wheel)
+!import("bonus_core", update_bonus_wheel)
 
 !builtin_icon(rapid_sword_icon, "assets/icons/bonus/rapidsword.png")
 
@@ -19,7 +19,7 @@ fun rapid_sword() {
     item_message("#Rapid Sword x" + (collected + 1) + "#")
     store(collected, collected + 1)
 }
-!share(rapid_sword)
+!export(rapid_sword)
 
 !item_data(rapid_sword(),
     "#Rapid Sword#",

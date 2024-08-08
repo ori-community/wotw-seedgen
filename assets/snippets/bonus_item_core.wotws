@@ -26,7 +26,7 @@ fun health_regeneration() {
     health_regeneration_icon,
     MapIcon::BonusItem
 )
-!share(health_regeneration)
+!export(health_regeneration)
 
 fun energy_regeneration() {
     store(randoUpgrades.energyRegeneration, randoUpgrades.energyRegeneration + 1)
@@ -39,7 +39,7 @@ fun energy_regeneration() {
     energy_regeneration_icon,
     MapIcon::BonusItem
 )
-!share(energy_regeneration)
+!export(energy_regeneration)
 
 fun extra_double_jump() {
     store(randoUpgrades.extraDoubleJumps, randoUpgrades.extraDoubleJumps + 1)
@@ -52,7 +52,7 @@ fun extra_double_jump() {
     extra_double_jump_icon,
     MapIcon::BonusItem
 )
-!share(extra_double_jump)
+!export(extra_double_jump)
 
 fun extra_air_dash() {
     store(randoUpgrades.extraDashes, randoUpgrades.extraDashes + 1)
@@ -65,7 +65,7 @@ fun extra_air_dash() {
     extra_air_dash_icon,
     MapIcon::BonusItem
 )
-!share(extra_air_dash)
+!export(extra_air_dash)
 
 fun blaze_efficiency() {
     store(randoUpgrades.blazeEfficiency, randoUpgrades.blazeEfficiency + 1)
@@ -78,7 +78,7 @@ fun blaze_efficiency() {
     blaze_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(blaze_efficiency)
+!export(blaze_efficiency)
 
 fun spear_efficiency() {
     store(randoUpgrades.spearEfficiency, randoUpgrades.spearEfficiency + 1)
@@ -91,7 +91,7 @@ fun spear_efficiency() {
     spear_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(spear_efficiency)
+!export(spear_efficiency)
 
 fun shuriken_efficiency() {
     store(randoUpgrades.shurikenEfficiency, randoUpgrades.shurikenEfficiency + 1)
@@ -104,7 +104,7 @@ fun shuriken_efficiency() {
     shuriken_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(shuriken_efficiency)
+!export(shuriken_efficiency)
 
 fun sentry_efficiency() {
     store(randoUpgrades.sentryEfficiency, randoUpgrades.sentryEfficiency + 1)
@@ -117,7 +117,7 @@ fun sentry_efficiency() {
     sentry_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(sentry_efficiency)
+!export(sentry_efficiency)
 
 fun bow_efficiency() {
     store(randoUpgrades.bowEfficiency, randoUpgrades.bowEfficiency + 1)
@@ -130,7 +130,7 @@ fun bow_efficiency() {
     bow_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(bow_efficiency)
+!export(bow_efficiency)
 
 fun regenerate_efficiency() {
     store(randoUpgrades.regenerateEfficiency, randoUpgrades.regenerateEfficiency + 1)
@@ -143,7 +143,7 @@ fun regenerate_efficiency() {
     regenerate_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(regenerate_efficiency)
+!export(regenerate_efficiency)
 
 fun flash_efficiency() {
     store(randoUpgrades.flashEfficiency, randoUpgrades.flashEfficiency + 1)
@@ -156,7 +156,7 @@ fun flash_efficiency() {
     flash_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(flash_efficiency)
+!export(flash_efficiency)
 
 fun grenade_efficiency() {
     store(randoUpgrades.grenadeEfficiency, randoUpgrades.grenadeEfficiency + 1)
@@ -169,4 +169,4 @@ fun grenade_efficiency() {
     grenade_efficiency_icon,
     MapIcon::BonusItem
 )
-!share(grenade_efficiency)
+!export(grenade_efficiency)

@@ -41,7 +41,7 @@ fun update_bonus_wheel() {
     }
 }
 
-!share(update_bonus_wheel)
+!export(update_bonus_wheel)
 
 fun toggle_all() {
     set_boolean("any_enabled", false)
