@@ -4,6 +4,12 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg(feature = "strum")]
 use strum::{Display, EnumString, FromRepr};
 
+// TODO maybe descriptions should exist for random placements as well? Supposedly these are the weapon upgrade descriptions:
+// "Increases Sentry attack speed"
+// "Drop attacks with Hammer create a shockwave"
+// "Tap to pause the Shuriken's flight and spin it in place"
+// "Spike explodes on hit"
+// "Charge up a flame to damage and set all enemies on fire"
 /// Opher weapon upgrades
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
