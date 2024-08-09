@@ -1,6 +1,6 @@
 #category("Quality of Life")
 #name("No Cutscenes")
-#description("Skips several short cutscenes")
+#description("Skips several short cutscenes and dialogues")
 
 // TODO it seems like the migrated client doesn't set kuberstates? what's that about? didn't add them here for now
 
@@ -68,10 +68,49 @@ on spawn {
 
 on EastHollow.ForestsVoice store(EastHollow.VoiceDoorOpen, true)
 on skills.glide store(EastHollow.DepthsOpen, true)
+// TODO why is this not the wisp pickup?
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3)
 // TODO why is this not the wisp pickup?
 on kwolokGroupDescriptor.kwolokNpcState > 0 && UpperDepths.ForestsEyes && LowerReach.ForestsMemory && WestPools.ForestsStrength store(windtornRuinsGroup.openedDesertRuins, true)
 on WindtornRuins.Seir {
     store(_petrifiedForestGroup.floatZoneState, true)
     store(_petrifiedForestGroup.petrifiedOwlState, 6)
+}
+
+on hubUberStateGroup.gardenerProjectGrapplePlants > 0 update_tuley()
+on hubUberStateGroup.gardenerProjectGrass > 0 update_tuley()
+on hubUberStateGroup.gardenerProjectSpringPlants > 0 update_tuley()
+on hubUberStateGroup.gardenerProjectBashPlants > 0 update_tuley()
+on hubUberStateGroup.gardenerProjectFlowers > 0 update_tuley()
+on hubUberStateGroup.gardenerProjectTree > 0 update_tuley()
+on GladesTown.TuleySpawned update_tuley()
+
+fun update_tuley() {
+    if GladesTown.TuleySpawned {
+        if hubUberStateGroup.gardenerProjectGrapplePlants == 1 { store(hubUberStateGroup.gardenerProjectGrapplePlants, 3) }
+        if hubUberStateGroup.gardenerProjectGrass == 1 { store(hubUberStateGroup.gardenerProjectGrass, 3) }
+        if hubUberStateGroup.gardenerProjectSpringPlants == 1 { store(hubUberStateGroup.gardenerProjectSpringPlants, 3) }
+        if hubUberStateGroup.gardenerProjectBashPlants == 1 { store(hubUberStateGroup.gardenerProjectBashPlants, 3) }
+        if hubUberStateGroup.gardenerProjectFlowers == 1 { store(hubUberStateGroup.gardenerProjectFlowers, 3) }
+        if hubUberStateGroup.gardenerProjectTree == 1 { store(hubUberStateGroup.gardenerProjectTree, 3) }
+        // Fix Regrow Quest triggers
+        if questUberStateGroup.regrowGladesQuest == 0 {
+            if TuleyShop.BlueMoon
+            || TuleyShop.StickyGrass
+            || TuleyShop.SpringPlants
+            || TuleyShop.Lightcatchers
+            || TuleyShop.SelaFlowers
+            || TuleyShop.LastTree {
+                store(questUberStateGroup.regrowGladesQuest, 1)
+            }
+        }
+        if TuleyShop.BlueMoon
+        && TuleyShop.StickyGrass
+        && TuleyShop.SpringPlants
+        && TuleyShop.Lightcatchers
+        && TuleyShop.SelaFlowers 
+        && TuleyShop.LastTree {
+            store(questUberStateGroup.regrowGladesQuest, 2)
+        }
+    }
 }
