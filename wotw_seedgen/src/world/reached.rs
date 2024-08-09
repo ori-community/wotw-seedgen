@@ -84,7 +84,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                 }
             }
             Node::Pickup(_) | Node::State(_) | Node::LogicalState(_) => {
-                // TODO simulate uberState change?
+                // TODO simulate uberState change? If that is implemented, it might affect the lookahead logic when doing placements though
                 self.logic_states.insert(current_node_index);
                 context.reached_locations.reached.push(current_node);
                 self.follow_state_progressions(current_node_index, context);

@@ -891,8 +891,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .iter()
             .enumerate()
             .map(|(index, inventory)| {
+                let logic_states = self.world.logic_states.clone();
                 self.world.player.inventory += inventory.clone();
                 let mut lookahead_reachable = self.world.reached();
+                self.world.logic_states = logic_states;
                 self.world.player.inventory -= inventory;
                 lookahead_reachable.retain(|&node| node.can_place());
 
