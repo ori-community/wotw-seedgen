@@ -1196,7 +1196,30 @@ pub fn find_message(command: &CommandVoid) -> Option<&CommandString> {
     }
 }
 fn strip_control_characters(s: &str) -> String {
-    s.replace(['@', '#', '$', '*'], "") // TODO strip xml
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut in_tag = false;
+
+    for (index, byte) in s.as_bytes().iter().enumerate() {
+        match (in_tag, byte) {
+            (_, b'@' | b'#' | b'$' | b'*') => {
+                result.push_str(&s[last_end..index]);
+                last_end = index + 1;
+            }
+            (false, b'<') => {
+                result.push_str(&s[last_end..index]);
+                in_tag = true;
+            }
+            (true, b'>') => {
+                last_end = index + 1;
+                in_tag = false;
+            }
+            _ => {}
+        }
+    }
+    result.push_str(&s[last_end..]);
+
+    result
 }
 
 fn default_icon(command: &CommandVoid) -> Option<Icon> {
@@ -1277,5 +1300,19 @@ fn modifies_uberstate(command: &CommandVoid, output: &IntermediateOutput) -> boo
         | CommandVoid::StoreInteger { .. }
         | CommandVoid::StoreFloat { .. } => true,
         _ => false,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::strip_control_characters as strip;
+
+    #[test]
+    fn strip_control_characters() {
+        assert_eq!(strip(""), "");
+        assert_eq!(strip("aaa"), "aaa");
+        assert_eq!(strip("@#$"), "");
+        assert_eq!(strip("@@@a@a@@a@"), "aaa");
+        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
     }
 }
