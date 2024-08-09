@@ -261,9 +261,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             for _ in 0..missing_keystones {
                 self.force_place_command(keystone.clone(), world_index);
             }
-            self.worlds[world_index]
-                .item_pool
-                .change(keystone, -(missing_keystones as i32));
         }
     }
 
@@ -451,6 +448,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     }
 
     fn force_place_command(&mut self, command: CommandVoid, target_world_index: usize) {
+        self.worlds[target_world_index]
+            .item_pool
+            .change(command.clone(), -1); // TODO eliminate clone
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
         let name = self.name(&command, origin_world_index, target_world_index);
         let origin_world = &mut self.worlds[origin_world_index];
