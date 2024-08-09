@@ -1,19 +1,27 @@
 use crate::{
     cli::{GenerationArgs, SeedArgs, SeedSettings},
-    files, Error,
+    files,
+    log_init::initialize_log,
+    Error,
 };
+use log::LevelFilter;
 use std::fs::{self, File};
 use wotw_seedgen::{
     generate_seed, logic_language::ast, logic_language::output::Graph, settings::UniverseSettings,
 };
 
-// TODO enable logging
-
 pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
         settings: SeedSettings(universe_preset),
         generation_args: GenerationArgs { debug, launch },
+        verbose,
     } = args;
+
+    initialize_log(
+        verbose.then_some("seedgen_log.txt"),
+        LevelFilter::Info,
+        false,
+    )?;
 
     let mut settings = UniverseSettings::new("".to_string());
     universe_preset.apply(&mut settings, &files::preset_access("")?)?;

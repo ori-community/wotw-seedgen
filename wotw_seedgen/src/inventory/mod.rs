@@ -456,29 +456,41 @@ impl Display for Inventory {
 
         if self.spirit_light > 0 {
             first = false;
-            write!(f, "{} Spirit Light", self.spirit_light)?;
+            write!(f, "{} SpiritLight", self.spirit_light)?;
         }
         if self.gorlek_ore > 0 {
             comma(f, &mut first)?;
-            write!(f, "{} Gorlek Ore", self.gorlek_ore)?;
+            write!(f, "{} GorlekOre", self.gorlek_ore)?;
         }
         if self.keystones > 0 {
             comma(f, &mut first)?;
-            write!(f, "{} Keystones", self.keystones)?;
+            write!(f, "{} Keystone", self.keystones)?;
+            if self.keystones > 1 {
+                write!(f, "s")?;
+            }
         }
         if self.shard_slots > 0 {
             comma(f, &mut first)?;
-            write!(f, "{} Shard Slots", self.shard_slots)?;
+            write!(f, "{} ShardSlot", self.shard_slots)?;
+            if self.shard_slots > 1 {
+                write!(f, "s")?;
+            }
         }
         let health_fragments = self.health_fragments();
         if health_fragments > 0 {
             comma(f, &mut first)?;
-            write!(f, "{} Health Fragments", health_fragments)?;
+            write!(f, "{} HealthFragment", health_fragments)?;
+            if health_fragments > 1 {
+                write!(f, "s")?;
+            }
         }
         let energy_fragments = self.energy_fragments() as i32;
         if energy_fragments > 0 {
             comma(f, &mut first)?;
-            write!(f, "{} Energy Fragments", energy_fragments)?;
+            write!(f, "{} EnergyFragment", energy_fragments)?;
+            if energy_fragments > 1 {
+                write!(f, "s")?;
+            }
         }
         for skill in &self.skills {
             comma(f, &mut first)?;
@@ -494,7 +506,11 @@ impl Display for Inventory {
         }
         if self.clean_water {
             comma(f, &mut first)?;
-            write!(f, "Clean Water")?;
+            write!(f, "CleanWater")?;
+        }
+        for weapon_upgrade in &self.weapon_upgrades {
+            comma(f, &mut first)?;
+            weapon_upgrade.fmt(f)?;
         }
 
         Ok(())

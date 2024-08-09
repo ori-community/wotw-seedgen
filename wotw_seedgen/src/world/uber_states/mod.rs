@@ -4,7 +4,7 @@ use crate::log::warning;
 use ordered_float::OrderedFloat;
 use rustc_hash::{FxHashMap, FxHashSet};
 use std::cmp::Ordering;
-use strum::AsRefStr;
+use strum::Display;
 use wotw_seedgen_assets::UberStateData;
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_seed_language::output::{
@@ -60,7 +60,7 @@ pub struct UberStateEntry {
     value: UberStateValue,
     triggers: FxHashSet<usize>,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq, AsRefStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Display)]
 pub enum UberStateValue {
     Boolean(bool),
     Integer(i32),
@@ -71,7 +71,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Boolean(value) => value,
             _ => {
-                warning!("Attempted to access {} UberState as Boolean", self.as_ref());
+                warning!("Attempted to access {self} UberState as Boolean");
                 Default::default()
             }
         }
@@ -80,7 +80,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Integer(value) => value,
             _ => {
-                warning!("Attempted to access {} UberState as Integer", self.as_ref());
+                warning!("Attempted to access {self} UberState as Integer");
                 Default::default()
             }
         }
@@ -89,7 +89,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Float(value) => value,
             _ => {
-                warning!("Attempted to access {} UberState as Float", self.as_ref());
+                warning!("Attempted to access {self} UberState as Float");
                 Default::default()
             }
         }

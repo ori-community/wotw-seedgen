@@ -25,6 +25,8 @@ pub struct SeedArgs {
     pub settings: SeedSettings,
     #[command(flatten)]
     pub generation_args: GenerationArgs,
+    #[arg(short, long)]
+    pub verbose: bool,
 }
 
 #[derive(Args, Debug, Default)]

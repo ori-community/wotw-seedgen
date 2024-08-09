@@ -112,7 +112,7 @@ impl Display for SeedSpoiler {
                     .map(|placement| {
                         let mut pickup = String::new();
                         if multiworld {
-                            write!(pickup, "[World {}] ", placement.target_world_index)?;
+                            write!(pickup, "[{}] ", placement.target_world_index)?;
                         }
                         write!(pickup, "{}", placement.item_name)?;
                         if pickup.len() > longest_pickup {
@@ -121,7 +121,7 @@ impl Display for SeedSpoiler {
 
                         let mut location = String::new();
                         if multiworld {
-                            write!(location, "[World {}] ", placement.origin_world_index)?;
+                            write!(location, "[{}] ", placement.origin_world_index)?;
                         }
                         write!(location, "{}", placement.location.identifier)?;
                         if location.len() > longest_location {

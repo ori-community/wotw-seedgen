@@ -983,10 +983,31 @@ fn shard_string(shard: Shard, remove: bool) -> CommandString {
     CommandString::Constant { value }
 }
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
+    let name = match teleporter {
+        Teleporter::Inkwater => "Inkwater Marsh",
+        Teleporter::Den => "Howl's Den",
+        Teleporter::Hollow => "Kwolok's Hollow",
+        Teleporter::Glades => "Glades",
+        Teleporter::Wellspring => "Wellspring",
+        Teleporter::Burrows => "Midnight Burrows",
+        Teleporter::WoodsEntrance => "Woods Entrance",
+        Teleporter::WoodsExit => "Woods Exit",
+        Teleporter::Reach => "Baur's Reach",
+        Teleporter::Depths => "Mouldwood Depths",
+        Teleporter::CentralLuma => "Central Luma",
+        Teleporter::LumaBoss => "Luma Boss",
+        Teleporter::FeedingGrounds => "Feeding Grounds",
+        Teleporter::CentralWastes => "Central Wastes",
+        Teleporter::OuterRuins => "Outer Ruins",
+        Teleporter::InnerRuins => "Inner Ruins",
+        Teleporter::Willow => "Willow's End",
+        Teleporter::Shriek => "Shriek",
+    };
+
     let value = if remove {
-        format!("@Remove {teleporter}@")
+        format!("@Remove {name} Teleporter@")
     } else {
-        format!("#{teleporter}#")
+        format!("#{name} Teleporter#")
     }
     .into();
     CommandString::Constant { value }

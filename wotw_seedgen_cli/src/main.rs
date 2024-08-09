@@ -1,5 +1,6 @@
 mod cli;
 mod files;
+mod log_init;
 mod plando;
 mod seed;
 mod stats;
@@ -20,9 +21,6 @@ fn main() -> Result<(), Error> {
         eprintln!("waiting for debugger...");
         debugger::wait_until_attached(None).unwrap();
     }
-
-    // TODO remove
-    env_logger::init();
 
     let cli = Cli::parse();
     match cli {

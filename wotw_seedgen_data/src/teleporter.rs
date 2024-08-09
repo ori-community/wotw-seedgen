@@ -34,26 +34,26 @@ pub enum Teleporter {
 impl Display for Teleporter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Teleporter::Inkwater => write!(f, "Inkwater Marsh")?,
-            Teleporter::Den => write!(f, "Howl's Den")?,
-            Teleporter::Hollow => write!(f, "Kwolok's Hollow")?,
+            Teleporter::Inkwater => write!(f, "Inkwater")?,
+            Teleporter::Den => write!(f, "Den")?,
+            Teleporter::Hollow => write!(f, "Hollow")?,
             Teleporter::Glades => write!(f, "Glades")?,
             Teleporter::Wellspring => write!(f, "Wellspring")?,
-            Teleporter::Burrows => write!(f, "Midnight Burrows")?,
-            Teleporter::WoodsEntrance => write!(f, "Woods Entrance")?,
-            Teleporter::WoodsExit => write!(f, "Woods Exit")?,
-            Teleporter::Reach => write!(f, "Baur's Reach")?,
-            Teleporter::Depths => write!(f, "Mouldwood Depths")?,
-            Teleporter::CentralLuma => write!(f, "Central Luma")?,
-            Teleporter::LumaBoss => write!(f, "Luma Boss")?,
-            Teleporter::FeedingGrounds => write!(f, "Feeding Grounds")?,
-            Teleporter::CentralWastes => write!(f, "Central Wastes")?,
-            Teleporter::OuterRuins => write!(f, "Outer Ruins")?,
-            Teleporter::InnerRuins => write!(f, "Inner Ruins")?,
-            Teleporter::Willow => write!(f, "Willow's End")?,
+            Teleporter::Burrows => write!(f, "Burrows")?,
+            Teleporter::WoodsEntrance => write!(f, "WoodsEntrance")?,
+            Teleporter::WoodsExit => write!(f, "WoodsExit")?,
+            Teleporter::Reach => write!(f, "Reach")?,
+            Teleporter::Depths => write!(f, "Depths")?,
+            Teleporter::CentralLuma => write!(f, "CentralLuma")?,
+            Teleporter::LumaBoss => write!(f, "LumaBoss")?,
+            Teleporter::FeedingGrounds => write!(f, "FeedingGrounds")?,
+            Teleporter::CentralWastes => write!(f, "CentralWastes")?,
+            Teleporter::OuterRuins => write!(f, "OuterRuins")?,
+            Teleporter::InnerRuins => write!(f, "InnerRuins")?,
+            Teleporter::Willow => write!(f, "Willow")?,
             Teleporter::Shriek => write!(f, "Shriek")?,
         }
-        write!(f, " Teleporter")
+        write!(f, "TP")
     }
 }
 impl Teleporter {

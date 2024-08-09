@@ -103,6 +103,9 @@ pub struct WorldContext<'graph, 'settings> {
     /// world index of this world
     #[cfg_attr(not(any(feature = "log", test)), allow(unused))]
     index: usize,
+    /// ready-made string for referencing this world in the log
+    #[cfg_attr(not(any(feature = "log", test)), allow(unused))]
+    log_index: String,
     /// remaining items to place
     item_pool: ItemPool,
     /// generates appropriate spirit light amounts
@@ -135,10 +138,13 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         rng: &mut Pcg64Mcg,
         worlds: Vec<(World<'graph, 'settings>, IntermediateOutput)>,
     ) -> Self {
+        let multiworld = worlds.len() > 1;
         let worlds = worlds
             .into_iter()
             .enumerate()
-            .map(|(index, (world, output))| WorldContext::new(rng, world, output, index))
+            .map(|(index, (world, output))| {
+                WorldContext::new(rng, world, output, index, multiworld)
+            })
             .collect::<Vec<_>>();
         let spawns = worlds
             .iter()
@@ -167,7 +173,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn next_step(&mut self) {
         self.sort_spoiler_placements();
         self.step += 1;
-        trace!("Placement step #{}", self.step);
+        trace!("--- Placement step #{}", self.step);
         self.spoiler.groups.push(SpoilerGroup::default());
     }
 
@@ -243,7 +249,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             if item_pool_keystones < missing_keystones {
                 warning!("Need to place {missing_keystones} to avoid keylocks, but the item pool only has {item_pool_keystones} left. Placing regardless", );
             } else {
-                trace!("Placing {missing_keystones} keystones for World {world_index} to avoid keylocks");
+                trace!(
+                    "{}Placing {missing_keystones} keystones to avoid keylocks",
+                    world_context.log_index
+                );
             }
 
             self.spoiler.groups[self.step - 1].forced_items.keystones += missing_keystones;
@@ -343,8 +352,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 .iter()
                 .map(|world_context| {
                     format!(
-                        "[World {}]: {} unreached locations: {}\nwith these items: {}",
-                        world_context.index,
+                        "{}{} unreached locations: {}\nwith these items: {}",
+                        world_context.log_index,
                         world_context.needs_placement.len(),
                         world_context
                             .needs_placement
@@ -395,7 +404,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             let world_context = &mut self.worlds[target_world_index];
             world_context.item_pool.change(command, -1);
             if world_context.world.reached().len() > initial_reached[target_world_index] {
-                trace!("World {target_world_index} reached additional locations, resuming normal placement loop");
+                trace!(
+                    "{}reached additional locations, resuming normal placement loop",
+                    world_context.log_index
+                );
                 return Ok(());
             }
         }
@@ -446,14 +458,19 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             None => {
                 if origin_world.spawn_slots > 0 {
                     origin_world.spawn_slots -= 1;
+                    #[cfg(any(feature = "log", test))]
+                    let name = self.worlds[target_world_index].log_name(&command);
                     trace!(
-                        "Placing {} for World {target_world_index} at Spawn in World {origin_world_index}",
-                        self.worlds[target_world_index].log_name(&command)
+                        "Placing {}{name} at {}Spawn",
+                        self.worlds[target_world_index].log_index,
+                        self.worlds[origin_world_index].log_index
                     );
                 } else {
+                    #[cfg(any(feature = "log", test))]
+                    let name = self.worlds[target_world_index].log_name(&command);
                     warning!(
-                        "Not enough space to place {} for World {target_world_index}, placing at Spawn despite already having too many spawn items",
-                        self.worlds[target_world_index].log_name(&command)
+                        "Not enough space to place {}{name}, placing at Spawn despite already having too many spawn items",
+                        self.worlds[target_world_index].log_index,
                     );
                 }
                 self.write_placement_spoiler(
@@ -476,10 +493,13 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    // TODO might be worth to do some single-world happy paths?
+    // TODO might be worth to do some more single-world happy paths?
     fn choose_origin_world_for_forced_placement(&mut self, target_world_index: usize) -> usize {
+        if self.worlds.len() == 1 {
+            return target_world_index;
+        }
         if self.worlds[target_world_index].unshared_items > 0 {
-            trace!("World {target_world_index} is not allowed to share items yet, forcing item placement in own world");
+            trace!("[{target_world_index}] is not allowed to share items yet, forcing item placement in own world");
             self.worlds[target_world_index].unshared_items -= 1;
             target_world_index
         } else {
@@ -550,9 +570,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         origin_world_index: usize,
         target_world_index: usize,
     ) {
+        #[cfg(any(feature = "log", test))]
+        let log_name = self.worlds[target_world_index].log_name(&command);
         trace!(
-            "Placing {} for World {target_world_index} at {} in World {origin_world_index}",
-            self.worlds[target_world_index].log_name(&command),
+            "Placing {}{log_name} at {}{}",
+            self.worlds[target_world_index].log_index,
+            self.worlds[origin_world_index].log_index,
             node.identifier()
         );
 
@@ -667,7 +690,14 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         mut world: World<'graph, 'settings>,
         mut output: IntermediateOutput,
         index: usize,
+        multiworld: bool,
     ) -> Self {
+        let log_index = if multiworld {
+            format!("[{index}] ")
+        } else {
+            String::new()
+        };
+
         let mut item_pool = ItemPool::default();
 
         for (command, amount) in mem::take(&mut output.item_pool_changes) {
@@ -693,6 +723,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             world,
             output,
             index,
+            log_index,
             item_pool,
             spirit_light_provider: SpiritLightProvider::new(TOTAL_SPIRIT_LIGHT, rng), // TODO how should !add(spirit_light(100)) behave?
             needs_placement,
@@ -709,7 +740,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
-        trace!("[World {}] Generating preplacements", self.index);
+        trace!("{}Generating preplacements", self.log_index);
 
         self.hi_sigma(preplacement_spoiler);
 
@@ -726,10 +757,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             if nodes.is_empty() {
                 // TODO maybe remove the log feature gate
                 #[cfg(any(feature = "log", test))]
-                let index = self.index;
+                let name = self.log_name(&command);
                 warning!(
-                    "[World {index}] Failed to preplace {} in {zone} since no free placement location was available",
-                    self.log_name(&command)
+                    "{}Failed to preplace {name} in {zone} since no free placement location was available",
+                    self.log_index
                 );
             }
             // We prefer generating indices over shuffling the nodes because usually there aren't many zone preplacements (relics)
@@ -744,10 +775,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         let command = compile::spirit_light(CommandInteger::Constant { value: 1 }, &mut self.rng);
         if self.needs_placement.is_empty() {
             #[cfg(any(feature = "log", test))]
-            let index = self.index;
+            let name = self.log_name(&command);
             warning!(
-                "[World {index}] Failed to preplace {} since no free placement location was available",
-                self.log_name(&command)
+                "{}Failed to preplace {name} since no free placement location was available",
+                self.log_index
             );
         } else {
             let node = self
@@ -776,8 +807,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .collect();
         self.reached_item_locations = self.reached.iter().filter(|node| node.can_place()).count();
         trace!(
-            "[World {}] {} reached locations that need placements: {}",
-            self.index,
+            "{}{} reached locations that need placements: {}",
+            self.log_index,
             self.reached_needs_placement.len(),
             self.reached_needs_placement
                 .iter()
@@ -816,8 +847,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         self.placeholders.extend(placeholders);
         self.placeholders.shuffle(&mut self.rng);
         trace!(
-            "[World {}] Keeping {} placeholders: {}",
-            self.index,
+            "{}Keeping {} placeholders: {}",
+            self.log_index,
             self.placeholders.len(),
             self.placeholders
                 .iter()
@@ -836,7 +867,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn choose_progression(&mut self, slots: usize) -> Option<Inventory> {
-        trace!("[World {}] Attempting forced progression", self.index);
+        trace!("{}Attempting forced progression", self.log_index);
 
         let world_slots = self.progression_slots();
         let mut progressions = mem::take(&mut self.progressions)
@@ -892,11 +923,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let options = weights.iter().map(|(index, weight)| {
                 let inventory = &progressions[*index];
                 let chance = (*weight / weight_sum) * 100.;
-                format!("{chance:.1}%: {inventory}")
+                format!("- {chance:.1}%: {inventory}")
             });
             trace!(
-                "[World {}] {} options for forced progression:\n{}",
-                self.index,
+                "{}{} options for forced progression:\n{}",
+                self.log_index,
                 weights.len(),
                 options.format("\n")
             );
@@ -907,10 +938,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .ok()?
             .0;
         let progression = progressions.swap_remove(index);
-        trace!(
-            "[World {}] Chose forced progression: {progression}",
-            self.index
-        );
+        trace!("{}Chose forced progression: {progression}", self.log_index);
 
         Some(progression)
     }
@@ -1082,8 +1110,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
     fn fill_remaining(&mut self, placement_spoiler: &mut Vec<SpoilerPlacement>) {
         trace!(
-            "[World {}] Filling remaining locations with spirit light",
-            self.index
+            "{}Filling remaining locations with spirit light",
+            self.log_index
         );
 
         let mut needs_placement = mem::take(&mut self.needs_placement);
@@ -1097,8 +1125,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 // TODO try to avoid
                 let command = compile::gorlek_ore();
                 #[cfg(any(feature = "log", test))]
-                let index = self.index;
-                warning!("[World {index}] Placing more {} than intended to avoid placing Spirit Light in a shop", self.log_name(&command));
+                let name = self.log_name(&command);
+                warning!(
+                    "{}Placing more {name} than intended to avoid placing Spirit Light in a shop",
+                    self.log_index
+                );
                 command
             } else {
                 compile::spirit_light(
@@ -1120,12 +1151,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
         #[cfg(any(feature = "log", test))]
-        let index = self.index;
-        trace!(
-            "[World {index}] Placing {} at {}",
-            self.log_name(&command),
-            node.identifier()
-        );
+        let name = self.log_name(&command);
+        trace!("{}Placing {name} at {}", self.log_index, node.identifier());
         let uber_identifier = node.uber_identifier().unwrap();
         if uber_identifier.is_shop() {
             self.shop_item_data(&command, uber_identifier, self.name(&command))
@@ -1217,6 +1244,7 @@ fn strip_control_characters(s: &str) -> String {
     result
 }
 
+// TODO should this be in the common item impl?
 fn default_icon(command: &CommandVoid) -> Option<Icon> {
     CommonItem::from_command(command)
         .into_iter()

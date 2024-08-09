@@ -1,6 +1,5 @@
 target/*
 rls/*
-*.log
 *.currentseedpath
 Cargo.lock
 .idea
