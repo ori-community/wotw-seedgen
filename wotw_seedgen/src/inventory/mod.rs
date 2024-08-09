@@ -572,6 +572,9 @@ impl SubAssign<&Self> for Inventory {
         if rhs.clean_water {
             self.clean_water = false;
         }
+        for weapon_upgrade in &rhs.weapon_upgrades {
+            self.weapon_upgrades.remove(weapon_upgrade);
+        }
     }
 }
 
