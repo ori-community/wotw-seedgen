@@ -79,7 +79,7 @@ pub struct Preload {
     /// For preloading before starting the savefile
     pub spawn: Position,
     /// Identical for seeds with the same universe settings (including the rng seed)
-    pub slug: String,
+    pub slug: String, // TODO unused
 }
 
 #[derive(Serialize)]

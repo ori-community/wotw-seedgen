@@ -5,6 +5,7 @@ use crate::{
     Error,
 };
 use log::LevelFilter;
+use rand::{distributions::Uniform, prelude::Distribution};
 use std::fs::{self, File};
 use wotw_seedgen::{
     generate_seed, logic_language::ast, logic_language::output::Graph, settings::UniverseSettings,
@@ -25,6 +26,13 @@ pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
 
     let mut settings = UniverseSettings::new("".to_string());
     universe_preset.apply(&mut settings, &files::preset_access("")?)?;
+    if settings.seed.is_empty() {
+        let distribution = Uniform::from('0'..='9');
+        settings.seed = distribution
+            .sample_iter(rand::thread_rng())
+            .take(12)
+            .collect();
+    }
 
     let logic_access = files::logic_access("")?;
     let loc_data = logic_access.loc_data()?;
