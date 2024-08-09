@@ -129,7 +129,7 @@ impl Args for SeedSettings {
                     .short('d')
                     .value_name("DIFFICULTY")
                     .num_args(1..)
-                    .value_parser(StrumEnumValueParser::<Difficulty>::new())
+                    .value_parser(StrumEnumValueParser::<Difficulty>::new()) // TODO world scope?
                     .action(ArgAction::Append)
                     .help("Logically expected difficulty")
                     .long_help(format!(
@@ -149,7 +149,7 @@ impl Args for SeedSettings {
                     .short('t')
                     .value_name("TRICK")
                     .num_args(1..)
-                    .value_parser(StrumEnumValueParser::<Trick>::new())
+                    .value_parser(StrumEnumValueParser::<Trick>::new()) // TODO world scope?
                     .action(ArgAction::Append)
                     .help("Logically expected tricks")
                     .long_help(format!(

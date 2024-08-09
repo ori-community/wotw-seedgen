@@ -62,6 +62,9 @@ impl Preprocessor {
                             }
                             // TODO it seems difficult to evaluate ifs here but it's certainly odd to ignore the conditional compilation in this compiler.
                             // One side effect could be that a snippet successfully compiles which optionally declares a function behind an !if, but the client might error then
+                            // Idea: All commands are evaluated in preprocessing. This way ifs can be evaluated here as well.
+                            // Knowing the function structure isn't relevant in commands and includes can be handled immediately.
+                            // Reassigning identifiers in let commands should be disallowed to avoid confusion where a later let commands influences an earlier function call.
                             ast::Command::If(_, command) => {
                                 if let Ok(contents) = &command.contents.content {
                                     self.preprocess_contents(contents)

@@ -5,10 +5,10 @@ use crate::{
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use strum::Display;
-use wotw_seedgen_parse::{parse_ast, Separated};
+use wotw_seedgen_parse::parse_ast;
 
 pub use wotw_seedgen_parse::{
-    Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result,
+    Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
     SeparatedNonEmpty, Span, Spanned, Symbol,
 };
 
