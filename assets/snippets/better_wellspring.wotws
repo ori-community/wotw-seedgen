@@ -1,5 +1,5 @@
-#name("Better Wellspring")
 #category("World Changes")
+#name("Better Wellspring")
 #description("Opens the top door of Wellspring")
 
 !tags("Better Wellspring")

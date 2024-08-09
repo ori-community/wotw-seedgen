@@ -1,8 +1,8 @@
 #category("World Changes")
 #name("Better Random Spawn")
 #description(
-"opens some doors so random spawn works better, especially with no teleporters
-the lever door in upper wastes, the lever door at pools entry, the bone door above howl's den teleporter and the Howl fight.")
+"Opens some doors so random spawn works better, especially with no teleporters:
+The lever door in upper wastes, the lever door at pools entry, the bone door above howl's den teleporter and the Howl fight.")
 
 on spawn store(UpperWastes.LeverDoor, true)
 on spawn store(EastPools.EntryLever, true)
