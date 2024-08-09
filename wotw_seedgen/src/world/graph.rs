@@ -1,18 +1,12 @@
 use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed_language::output::{
-    CommandBoolean, CommandInteger, Comparator, EqualityComparator, Operation, Trigger,
+    CommandBoolean, CommandInteger, Comparator, Operation, Trigger,
 };
 
 pub fn node_condition(node: &Node) -> Option<CommandBoolean> {
     node.uber_identifier()
         .map(|uber_identifier| match node.value() {
-            None => CommandBoolean::CompareBoolean {
-                operation: Box::new(Operation {
-                    left: CommandBoolean::FetchBoolean { uber_identifier },
-                    operator: EqualityComparator::Equal,
-                    right: CommandBoolean::Constant { value: true },
-                }),
-            },
+            None => CommandBoolean::FetchBoolean { uber_identifier },
             Some(value) => CommandBoolean::CompareInteger {
                 operation: Box::new(Operation {
                     left: CommandInteger::FetchInteger { uber_identifier },
