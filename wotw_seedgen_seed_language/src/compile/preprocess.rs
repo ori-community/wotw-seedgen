@@ -38,16 +38,16 @@ impl Preprocessor {
                                             .output
                                             .includes
                                             .iter()
-                                            .any(|include| include.data == args.0 .0.data)
+                                            .any(|include| include.data == args.0.path.data)
                                         {
                                             self.errors.push(Error::custom(
                                                 "Snippet already included".to_string(),
-                                                args.0 .0.span(),
+                                                args.0.path.span(),
                                             ));
                                         } else {
                                             self.output.includes.push(Spanned::new(
-                                                args.0 .0.data.to_string(),
-                                                args.0 .0.span(),
+                                                args.0.path.data.to_string(),
+                                                args.0.path.span(),
                                             ));
                                         }
                                     }

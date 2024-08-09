@@ -5,7 +5,7 @@ use crate::{
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use strum::Display;
-use wotw_seedgen_parse::parse_ast;
+use wotw_seedgen_parse::{parse_ast, Separated};
 
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result,
@@ -301,10 +301,7 @@ pub enum Command<'source> {
     Event(Spanned<EventIdent>, CommandArgs<EventArgs<'source>>),
     OnEvent(Spanned<OnEvent>, CommandArgs<OnEventArgs<'source>>),
     Export(Spanned<Export>, CommandArgs<ExportArgs<'source>>),
-    Import(Spanned<Import>, CommandArgs<ImportArgs<'source>>),
     Spawn(Spanned<Spawn>, CommandArgs<SpawnArgs<'source>>),
-    // TODO actually this might be plural since it takes multiple, should check if that works
-    // TODO I think these are called tags now
     Tags(
         Spanned<Tags>,
         CommandArgsCollection<SeparatedNonEmpty<TagsArg<'source>, Symbol<','>>>,
@@ -360,7 +357,11 @@ pub type CommandArgs<Args> = CommandArgsCollection<Once<Args>>;
 #[ast(case = "snake")]
 pub struct Include;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct IncludeArgs<'source>(pub Spanned<&'source str>);
+pub struct IncludeArgs<'source> {
+    pub path: Spanned<&'source str>,
+    pub imports: Spanned<Option<(Symbol<','>, IncludeArgsImports<'source>)>>,
+}
+pub type IncludeArgsImports<'source> = Separated<Spanned<Identifier<'source>>, Symbol<','>>;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
 pub struct BundleIcon;
@@ -400,15 +401,6 @@ pub struct OnEventArgs<'source> {
 pub struct Export;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ExportArgs<'source>(pub Spanned<Identifier<'source>>);
-#[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
-pub struct Import;
-#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct ImportArgs<'source> {
-    pub snippet_name: Spanned<&'source str>,
-    pub comma: Symbol<','>,
-    pub identifiers: SeparatedNonEmpty<Spanned<Identifier<'source>>, Symbol<','>>,
-}
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
 pub struct Spawn;

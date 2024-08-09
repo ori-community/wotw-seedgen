@@ -38,9 +38,6 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Export(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Import(_, command) => {
-                command.compile(compiler);
-            }
             ast::Command::Spawn(_, command) => {
                 command.compile(compiler);
             }
@@ -119,8 +116,48 @@ impl<'source> Compile<'source> for ast::Command<'source> {
 impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
     type Output = ();
 
-    fn compile(self, _: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        /* all preprocessed ;) */
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        let Some(snippet_exported_values) = compiler.global.exported_values.get(self.path.data)
+        else {
+            compiler
+                .errors
+                .push(Error::custom("unknown snippet".to_string(), self.path.span));
+            return;
+        };
+
+        if let Some((_, imports)) = self.imports.data {
+            for import in imports {
+                let Some(value) = snippet_exported_values.get(import.data.0) else {
+                    compiler.errors.push(
+                        Error::custom("identifier not found in snippet".to_string(), import.span)
+                            .with_help(format!(
+                                "if it exists in {}, you have to export it there: !export({})",
+                                self.path.data, import.data
+                            )),
+                    );
+                    continue;
+                };
+
+                match value {
+                    ExportedValue::Function(index) => {
+                        compiler
+                            .preprocessed
+                            .functions
+                            .insert(import.data.0.to_string());
+                        compiler
+                            .function_indices
+                            .insert(import.data.0.to_string(), *index);
+                        // TODO is this still used?
+                        compiler
+                            .function_imports
+                            .insert(import.data.0.to_string(), self.path.data.to_string());
+                    }
+                    ExportedValue::Literal(literal) => {
+                        compiler.variables.insert(import.data, literal.clone());
+                    }
+                }
+            }
+        }
     }
 }
 impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
@@ -250,57 +287,6 @@ impl<'source> Compile<'source> for ast::ExportArgs<'source> {
             .entry(compiler.identifier.clone())
             .or_default()
             .insert(identifier.0.to_string(), value);
-    }
-}
-impl<'source> Compile<'source> for ast::ImportArgs<'source> {
-    type Output = ();
-
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let Some(snippet_exported_values) =
-            compiler.global.exported_values.get(self.snippet_name.data)
-        else {
-            compiler.errors.push(
-                Error::custom("unknown snippet".to_string(), self.snippet_name.span)
-                    .with_help(format!("try !include(\"{}\")", self.snippet_name.data)),
-            );
-            return;
-        };
-
-        for identifier in self.identifiers {
-            let Some(value) = snippet_exported_values.get(identifier.data.0) else {
-                compiler.errors.push(
-                    Error::custom(
-                        "identifier not found in snippet".to_string(),
-                        identifier.span,
-                    )
-                    .with_help(format!(
-                        "if it exists in {}, you have to export it there: !export({})",
-                        self.snippet_name.data, identifier.data
-                    )),
-                );
-                continue;
-            };
-
-            match value {
-                ExportedValue::Function(index) => {
-                    compiler
-                        .preprocessed
-                        .functions
-                        .insert(identifier.data.0.to_string());
-                    compiler
-                        .function_indices
-                        .insert(identifier.data.0.to_string(), *index);
-                    // TODO is this still used?
-                    compiler.function_imports.insert(
-                        identifier.data.0.to_string(),
-                        self.snippet_name.data.to_string(),
-                    );
-                }
-                ExportedValue::Literal(literal) => {
-                    compiler.variables.insert(identifier.data, literal.clone());
-                }
-            }
-        }
     }
 }
 impl<'source> Compile<'source> for ast::SpawnArgs<'source> {

@@ -16,9 +16,7 @@
 !config(flash_efficiencies, "How many Flash Efficiencies to shuffle in", Integer, 0)
 !config(grenade_efficiencies, "How many Grenade Efficiencies to shuffle in", Integer, 1)
 
-!include("bonus_item_core")
-!import(
-    "bonus_item_core",
+!include("bonus_item_core",
     health_regeneration,
     energy_regeneration,
     extra_double_jump,
