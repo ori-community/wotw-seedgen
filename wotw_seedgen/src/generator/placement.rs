@@ -556,6 +556,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             node.identifier()
         );
 
+        // TODO spoiler icons for snippet-placed items
+        // TODO spoiler icons for plandos?
         self.worlds[origin_world_index].map_icon(node, &command, name.clone());
 
         let uber_identifier = node.uber_identifier().unwrap();
@@ -722,9 +724,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     .collect::<Vec<_>>()
             });
             if nodes.is_empty() {
+                // TODO maybe remove the log feature gate
+                #[cfg(any(feature = "log", test))]
+                let index = self.index;
                 warning!(
-                    "[World {}] Failed to preplace {} in {zone} since no free placement location was available",
-                    self.index,
+                    "[World {index}] Failed to preplace {} in {zone} since no free placement location was available",
                     self.log_name(&command)
                 );
             }
@@ -739,9 +743,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         let command = compile::spirit_light(CommandInteger::Constant { value: 1 }, &mut self.rng);
         if self.needs_placement.is_empty() {
+            #[cfg(any(feature = "log", test))]
+            let index = self.index;
             warning!(
-                "[World {}] Failed to preplace {} since no free placement location was available",
-                self.index,
+                "[World {index}] Failed to preplace {} since no free placement location was available",
                 self.log_name(&command)
             );
         } else {
@@ -990,7 +995,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         command_name(command, &self.output.item_metadata)
     }
 
-    fn log_name(&self, command: &CommandVoid) -> String {
+    fn log_name(&mut self, command: &CommandVoid) -> String {
         self.output
             .item_metadata
             .name(command)
@@ -999,24 +1004,18 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 other => other.to_string(),
             })
             .or_else(|| {
-                CommonItem::from_command(command)
-                    .into_iter()
-                    .next()
-                    .map(|item| item.to_string())
-            })
-            .or_else(|| {
-                find_message(command).map(|command| match command {
-                    CommandString::Constant {
-                        value: StringOrPlaceholder::Value(value),
-                    } => strip_control_characters(value),
-                    other => other.to_string(),
-                })
+                self.simulate_message(command)
+                    .map(|message| strip_control_characters(&message))
             })
             .unwrap_or_else(|| {
                 let value = command.to_string();
                 warning!("No name specified for custom command: {value}");
                 value
             })
+    }
+
+    fn simulate_message(&mut self, command: &CommandVoid) -> Option<String> {
+        find_message(command).map(|message| self.world.simulate(message, &self.output))
     }
 
     fn on_load(&mut self, command: CommandVoid) {
@@ -1097,7 +1096,9 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let command = if is_shop {
                 // TODO try to avoid
                 let command = compile::gorlek_ore();
-                warning!("[World {}] Placing more {} than intended to avoid placing Spirit Light in a shop", self.index, self.log_name(&command));
+                #[cfg(any(feature = "log", test))]
+                let index = self.index;
+                warning!("[World {index}] Placing more {} than intended to avoid placing Spirit Light in a shop", self.log_name(&command));
                 command
             } else {
                 compile::spirit_light(
@@ -1118,9 +1119,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
+        #[cfg(any(feature = "log", test))]
+        let index = self.index;
         trace!(
-            "[World {}] Placing {} at {}",
-            self.index,
+            "[World {index}] Placing {} at {}",
             self.log_name(&command),
             node.identifier()
         );
@@ -1139,14 +1141,15 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn write_placement_spoiler(
-        &self,
+        &mut self,
         node: &Node,
         command: &CommandVoid,
         into: &mut Vec<SpoilerPlacement>,
     ) {
+        let origin_world_index = self.index;
         into.push(SpoilerPlacement {
-            origin_world_index: self.index,
-            target_world_index: self.index,
+            origin_world_index,
+            target_world_index: origin_world_index,
             location: NodeSummary::new(node),
             command: command.clone(),
             item_name: self.log_name(command),
@@ -1172,14 +1175,6 @@ pub fn command_name(command: &CommandVoid, item_metadata: &ItemMetadata) -> Comm
         .name(command)
         .map(|value| CommandString::Constant { value })
         .or_else(|| find_message(command).cloned())
-        .or_else(|| {
-            CommonItem::from_command(command)
-                .into_iter()
-                .next()
-                .map(|item| CommandString::Constant {
-                    value: item.to_string().into(),
-                })
-        })
         .unwrap_or_else(|| {
             let value = command.to_string();
             warning!("No name specified for custom command: {value}");
@@ -1188,7 +1183,7 @@ pub fn command_name(command: &CommandVoid, item_metadata: &ItemMetadata) -> Comm
             }
         })
 }
-pub fn find_message(command: &CommandVoid) -> Option<&CommandString> {
+fn find_message(command: &CommandVoid) -> Option<&CommandString> {
     match command {
         CommandVoid::Multi { commands } => commands.iter().find_map(find_message),
         CommandVoid::QueuedMessage { message, .. } => Some(message),

@@ -1,5 +1,4 @@
 use crate::inventory::Inventory;
-use std::fmt::{self, Display};
 use wotw_seedgen_data::{uber_identifier, MapIcon, Shard, Skill, Teleporter, WeaponUpgrade};
 use wotw_seedgen_seed_language::output::{
     ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid, Operation,
@@ -18,23 +17,6 @@ pub enum CommonItem {
     Teleporter(Teleporter),
     Skill(Skill),
     CleanWater,
-}
-impl Display for CommonItem {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            CommonItem::SpiritLight(amount) => write!(f, "{amount} SpiritLight"), // TODO casing
-            CommonItem::HealthFragment => write!(f, "HealthFragment"),
-            CommonItem::EnergyFragment => write!(f, "EnergyFragment"),
-            CommonItem::GorlekOre => write!(f, "GorlekOre"),
-            CommonItem::Keystone => write!(f, "Keystone"),
-            CommonItem::ShardSlot => write!(f, "ShardSlot"),
-            CommonItem::WeaponUpgrade(weapon_upgrade) => weapon_upgrade.fmt(f),
-            CommonItem::Shard(shard) => shard.fmt(f),
-            CommonItem::Teleporter(teleporter) => teleporter.fmt(f),
-            CommonItem::Skill(skill) => skill.fmt(f),
-            CommonItem::CleanWater => write!(f, "CleanWater"),
-        }
-    }
 }
 
 impl CommonItem {

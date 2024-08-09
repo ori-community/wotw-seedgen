@@ -29286,7 +29286,7 @@
           "name": "randomSpiritLight",
           "readonly": true,
           "type": "VirtualUberState",
-          "value": 1.0,
+          "value": 0.0,
           "value_type": "Boolean"
         }
       }

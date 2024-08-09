@@ -173,6 +173,7 @@ pub enum Command {
     SetWarpIconLabel(/*id*/ usize),
     /// If `id` refers to an existing spirit well icon, DESTROY, OBLITERATE and ANNIHILATE it
     DestroyWarpIcon(/*id*/ usize),
+    // TODO could instead do a SelectShopItem command and then omit the uber_identifier from all the other commands and similarly for other commands, might reduce seed size?
     /// Set the price of the shop item at `uber_identifier` to Integer Memory 0
     SetShopItemPrice(/*uber_identifier*/ UberIdentifier),
     /// Set the display name of the shop item at `uber_identifier` to String Memory 0

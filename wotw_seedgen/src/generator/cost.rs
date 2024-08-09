@@ -57,7 +57,7 @@ impl Cost for Inventory {
             + self.shards.cost()
             + self.teleporters.cost()
             + self.skills.cost()
-            + self.clean_water as usize * 1800
+            + self.clean_water as usize * CommonItem::CleanWater.cost()
     }
 }
 impl Cost for CommandVoid {
