@@ -157,7 +157,7 @@ impl<'source> Compile<'source> for ast::Annotation<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         match self {
-            ast::Annotation::Hide(_) => {}
+            ast::Annotation::Hidden(_) => {}
             ast::Annotation::Name(_, name) => {
                 compiler.consume_result(name.result);
             }

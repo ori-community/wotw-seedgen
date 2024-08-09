@@ -1,4 +1,4 @@
-#hide
+#hidden
 #name("Bingo")
 #description(
 "prints updates on line completion; sets the 'game_complete' state once you have enough lines (3 by default)

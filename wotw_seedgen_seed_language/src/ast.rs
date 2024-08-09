@@ -635,14 +635,14 @@ pub struct RandomFromPoolArgs<'source> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub enum Annotation<'source> {
-    Hide(Spanned<Hide>),
+    Hidden(Spanned<Hidden>),
     Name(Spanned<Name>, CommandArgs<Spanned<&'source str>>),
     Category(Spanned<Category>, CommandArgs<Spanned<&'source str>>),
     Description(Spanned<Description>, CommandArgs<Spanned<&'source str>>),
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
-pub struct Hide;
+pub struct Hidden;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
 pub struct Name;

@@ -1,4 +1,4 @@
-#hide
+#hidden
 #name("Bonus Item Core")
 #description("Convenience functions for simple bonus items")
 

@@ -1,4 +1,4 @@
-#hide
+#hidden
 #name("Rapid Regenerate Core")
 #description("Adds support for toggleable Rapid Regenerate")
 

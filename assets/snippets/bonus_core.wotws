@@ -1,4 +1,4 @@
-#hide
+#hidden
 #name("Bonus Core")
 #description("A menu bonus headers can subscribe to for an interface to toggle something on or off")
 

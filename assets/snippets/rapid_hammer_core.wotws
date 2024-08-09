@@ -1,4 +1,4 @@
-#hide
+#hidden
 #name("Rapid Hammer Core")
 #description("Adds support for toggleable Rapid Hammer")
 

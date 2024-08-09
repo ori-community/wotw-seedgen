@@ -1,4 +1,4 @@
-#hide
+#hidden
 #name("Goal Mode Core")
 #description("Manages access to Shriek")
 
