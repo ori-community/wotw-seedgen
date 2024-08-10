@@ -4,86 +4,10 @@
 
 !tags("Zone Hints")
 
-// TODO implement skill_hints toggle
 !config(skill_hints, "Lupo reveals the amount of skills in an area", Boolean, true)
 !config(teleporter_hints, "Lupo reveals the amount of teleporters in an area", Boolean, true)
 
 !include("progress_helper")
-
-!count_in_zone(
-    [
-        (skills_in_inkwater, Zone::Inkwater),
-        (skills_in_hollow, Zone::Hollow),
-        (skills_in_glades, Zone::Glades),
-        (skills_in_wellspring, Zone::Wellspring),
-        (skills_in_woods, Zone::Woods),
-        (skills_in_reach, Zone::Reach),
-        (skills_in_depths, Zone::Depths),
-        (skills_in_luma, Zone::Luma),
-        (skills_in_wastes, Zone::Wastes),
-        (skills_in_willow, Zone::Willow),
-        (skills_in_burrows, Zone::Burrows),
-    ],
-    [
-        skill(Skill::Bash),
-        skill(Skill::DoubleJump),
-        skill(Skill::Launch),
-        skill(Skill::Glide),
-        skill(Skill::WaterBreath),
-        skill(Skill::Grenade),
-        skill(Skill::Grapple),
-        skill(Skill::Flash),
-        skill(Skill::Spear),
-        skill(Skill::Regenerate),
-        skill(Skill::Bow),
-        skill(Skill::Hammer),
-        skill(Skill::Sword),
-        skill(Skill::Burrow),
-        skill(Skill::Dash),
-        skill(Skill::WaterDash),
-        skill(Skill::Shuriken),
-        skill(Skill::Blaze),
-        skill(Skill::Sentry),
-        skill(Skill::Flap),
-        clean_water(),
-    ]
-)
-!count_in_zone(
-    [
-        (teleporters_in_inkwater, Zone::Inkwater),
-        (teleporters_in_hollow, Zone::Hollow),
-        (teleporters_in_glades, Zone::Glades),
-        (teleporters_in_wellspring, Zone::Wellspring),
-        (teleporters_in_woods, Zone::Woods),
-        (teleporters_in_reach, Zone::Reach),
-        (teleporters_in_depths, Zone::Depths),
-        (teleporters_in_luma, Zone::Luma),
-        (teleporters_in_wastes, Zone::Wastes),
-        (teleporters_in_willow, Zone::Willow),
-        (teleporters_in_burrows, Zone::Burrows),
-    ],
-    [
-        teleporter(Teleporter::Inkwater),
-        teleporter(Teleporter::Den),
-        teleporter(Teleporter::Hollow),
-        teleporter(Teleporter::Glades),
-        teleporter(Teleporter::Wellspring),
-        teleporter(Teleporter::Burrows),
-        teleporter(Teleporter::WoodsEntrance),
-        teleporter(Teleporter::WoodsExit),
-        teleporter(Teleporter::Reach),
-        teleporter(Teleporter::Depths),
-        teleporter(Teleporter::CentralLuma),
-        teleporter(Teleporter::LumaBoss),
-        teleporter(Teleporter::FeedingGrounds),
-        teleporter(Teleporter::CentralWastes),
-        teleporter(Teleporter::OuterRuins),
-        teleporter(Teleporter::InnerRuins),
-        teleporter(Teleporter::Willow),
-        teleporter(Teleporter::Shriek),
-    ]
-)
-
 !on_event("progress_helper", write_progress_message, {
     set_string("zone_hint", "")
     if current_zone() == Zone::Inkwater {
@@ -119,91 +43,214 @@
     if current_zone() == Zone::Burrows {
         write_burrows_hint()
     }
-    set_string("progress_message", get_string("progress_message") + "\n" + get_string("zone_hint"))
+    if get_string("zone_hint") != "" {
+        set_string("progress_message", get_string("progress_message") + "\n" + get_string("zone_hint"))
+    }
 })
 
-
-
 fun write_inkwater_hint() {
-    write_inkwater_skill_hint()
-    write_inkwater_teleporter_hint()
+    if MarshSpawn.LupoMap {
+        write_inkwater_skill_hint()
+        write_inkwater_teleporter_hint()
+    }
 }
 fun write_hollow_hint() {
-    write_hollow_skill_hint()
-    write_hollow_teleporter_hint()
+    if WestHollow.LupoMap {
+        write_hollow_skill_hint()
+        write_hollow_teleporter_hint()
+    }
 }
 fun write_glades_hint() {
-    write_glades_skill_hint()
-    write_glades_teleporter_hint()
+    if LupoShop.HCMapIcon > 0 {
+        write_glades_skill_hint()
+        write_glades_teleporter_hint()
+    }
 }
 fun write_wellspring_hint() {
-    write_wellspring_skill_hint()
-    write_wellspring_teleporter_hint()
+    if InnerWellspring.LupoMap {
+        write_wellspring_skill_hint()
+        write_wellspring_teleporter_hint()
+    }
 }
 fun write_woods_hint() {
-    write_woods_skill_hint()
-    write_woods_teleporter_hint()
+    if LupoShop.ECMapIcon > 0 {
+        write_woods_skill_hint()
+        write_woods_teleporter_hint()
+    }
 }
 fun write_reach_hint() {
-    write_reach_skill_hint()
-    write_reach_teleporter_hint()
+    if LowerReach.LupoMap {
+        write_reach_skill_hint()
+        write_reach_teleporter_hint()
+    }
 }
 fun write_depths_hint() {
-    write_depths_skill_hint()
-    write_depths_teleporter_hint()
+    if LowerDepths.LupoMap {
+        write_depths_skill_hint()
+        write_depths_teleporter_hint()
+    }
 }
 fun write_luma_hint() {
-    write_luma_skill_hint()
-    write_luma_teleporter_hint()
+    if EastPools.LupoMap {
+        write_luma_skill_hint()
+        write_luma_teleporter_hint()
+    }
 }
 fun write_wastes_hint() {
-    write_wastes_skill_hint()
-    write_wastes_teleporter_hint()
+    if LowerWastes.LupoMap {
+        write_wastes_skill_hint()
+        write_wastes_teleporter_hint()
+    }
 }
 fun write_willow_hint() {
-    write_willow_skill_hint()
-    write_willow_teleporter_hint()
+    if WillowsEnd.LupoMap {
+        write_willow_skill_hint()
+        write_willow_teleporter_hint()
+    }
 }
 fun write_burrows_hint() {
-    write_burrows_skill_hint()
-    write_burrows_teleporter_hint()
+    if MidnightBurrows.LupoMap {
+        write_burrows_skill_hint()
+        write_burrows_teleporter_hint()
+    }
 }
 
-fun write_inkwater_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Marsh Skills - " + skills_in_inkwater) // TODO wrong zone name
+!let(description, "")
+
+!if skill_hints {
+    !let(description, "skills")
+
+    !count_in_zone(
+        [
+            (skills_in_inkwater, Zone::Inkwater),
+            (skills_in_hollow, Zone::Hollow),
+            (skills_in_glades, Zone::Glades),
+            (skills_in_wellspring, Zone::Wellspring),
+            (skills_in_woods, Zone::Woods),
+            (skills_in_reach, Zone::Reach),
+            (skills_in_depths, Zone::Depths),
+            (skills_in_luma, Zone::Luma),
+            (skills_in_wastes, Zone::Wastes),
+            (skills_in_willow, Zone::Willow),
+            (skills_in_burrows, Zone::Burrows),
+        ],
+        [
+            skill(Skill::Bash),
+            skill(Skill::DoubleJump),
+            skill(Skill::Launch),
+            skill(Skill::Glide),
+            skill(Skill::WaterBreath),
+            skill(Skill::Grenade),
+            skill(Skill::Grapple),
+            skill(Skill::Flash),
+            skill(Skill::Spear),
+            skill(Skill::Regenerate),
+            skill(Skill::Bow),
+            skill(Skill::Hammer),
+            skill(Skill::Sword),
+            skill(Skill::Burrow),
+            skill(Skill::Dash),
+            skill(Skill::WaterDash),
+            skill(Skill::Shuriken),
+            skill(Skill::Blaze),
+            skill(Skill::Sentry),
+            skill(Skill::Flap),
+            clean_water(),
+        ]
+    )
+
+    fun write_inkwater_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Marsh Skills - " + skills_in_inkwater) // TODO wrong zone name
+    }
+    fun write_hollow_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Hollow Skills - " + skills_in_hollow)
+    }
+    fun write_glades_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Glades Skills - " + skills_in_glades)
+    }
+    fun write_wellspring_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Wellspring Skills - " + skills_in_wellspring)
+    }
+    fun write_woods_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Woods Skills - " + skills_in_woods)
+    }
+    fun write_reach_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Reach Skills - " + skills_in_reach)
+    }
+    fun write_depths_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Mouldwood Skills - " + skills_in_depths)
+    }
+    fun write_luma_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Luma Skills - " + skills_in_luma)
+    }
+    fun write_wastes_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Wastes Skills - " + skills_in_wastes)
+    }
+    fun write_willow_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Willow Skills - " + skills_in_willow)
+    }
+    fun write_burrows_skill_hint() {
+        set_string("zone_hint", get_string("zone_hint") + "Burrows Skills - " + skills_in_burrows)
+    }
 }
-fun write_hollow_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Hollow Skills - " + skills_in_hollow)
-}
-fun write_glades_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Glades Skills - " + skills_in_glades)
-}
-fun write_wellspring_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Wellspring Skills - " + skills_in_wellspring)
-}
-fun write_woods_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Woods Skills - " + skills_in_woods)
-}
-fun write_reach_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Reach Skills - " + skills_in_reach)
-}
-fun write_depths_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Mouldwood Skills - " + skills_in_depths)
-}
-fun write_luma_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Luma Skills - " + skills_in_luma)
-}
-fun write_wastes_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Wastes Skills - " + skills_in_wastes)
-}
-fun write_willow_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Willow Skills - " + skills_in_willow)
-}
-fun write_burrows_skill_hint() {
-    set_string("zone_hint", get_string("zone_hint") + "Burrows Skills - " + skills_in_burrows)
+!if skill_hints == false {
+    fun write_inkwater_skill_hint() {}
+    fun write_hollow_skill_hint() {}
+    fun write_glades_skill_hint() {}
+    fun write_wellspring_skill_hint() {}
+    fun write_woods_skill_hint() {}
+    fun write_reach_skill_hint() {}
+    fun write_depths_skill_hint() {}
+    fun write_luma_skill_hint() {}
+    fun write_wastes_skill_hint() {}
+    fun write_willow_skill_hint() {}
+    fun write_burrows_skill_hint() {}
 }
 
 !if teleporter_hints {
+    !if skill_hints {
+        !let(description, "skills and teleporters")
+    }
+    !if skill_hints == false {
+        !let(description, "teleporters")
+    }
+
+    !count_in_zone(
+        [
+            (teleporters_in_inkwater, Zone::Inkwater),
+            (teleporters_in_hollow, Zone::Hollow),
+            (teleporters_in_glades, Zone::Glades),
+            (teleporters_in_wellspring, Zone::Wellspring),
+            (teleporters_in_woods, Zone::Woods),
+            (teleporters_in_reach, Zone::Reach),
+            (teleporters_in_depths, Zone::Depths),
+            (teleporters_in_luma, Zone::Luma),
+            (teleporters_in_wastes, Zone::Wastes),
+            (teleporters_in_willow, Zone::Willow),
+            (teleporters_in_burrows, Zone::Burrows),
+        ],
+        [
+            teleporter(Teleporter::Inkwater),
+            teleporter(Teleporter::Den),
+            teleporter(Teleporter::Hollow),
+            teleporter(Teleporter::Glades),
+            teleporter(Teleporter::Wellspring),
+            teleporter(Teleporter::Burrows),
+            teleporter(Teleporter::WoodsEntrance),
+            teleporter(Teleporter::WoodsExit),
+            teleporter(Teleporter::Reach),
+            teleporter(Teleporter::Depths),
+            teleporter(Teleporter::CentralLuma),
+            teleporter(Teleporter::LumaBoss),
+            teleporter(Teleporter::FeedingGrounds),
+            teleporter(Teleporter::CentralWastes),
+            teleporter(Teleporter::OuterRuins),
+            teleporter(Teleporter::InnerRuins),
+            teleporter(Teleporter::Willow),
+            teleporter(Teleporter::Shriek),
+        ]
+    )
+
     fun write_inkwater_teleporter_hint() {
         set_string("zone_hint", get_string("zone_hint") + "\nMarsh TPs - " + teleporters_in_inkwater)
     }
@@ -252,19 +299,26 @@ fun write_burrows_skill_hint() {
     fun write_burrows_teleporter_hint() {}
 }
 
+!if description != "" {
+    !let(description, "how many " + description + " there are")
+}
+!if description == "" {
+    !let(description, "nothing")
+}
+
 on reload {
     set_shop_item_data(
         LupoShop.HCMapIcon,
         200,
         "Glades Items Hint",
-        "Reveals how many important items there are in Glades",
+        "Reveals " + description + " in Glades",
         LupoIcon::HealthFragmentsMap,
     )
     set_shop_item_data(
         LupoShop.ECMapIcon,
         200,
         "Woods Items Hint",
-        "Reveals how many important items there are in Woods",
+        "Reveals " + description + " in Woods",
         LupoIcon::EnergyFragmentsMap,
     )
 }
