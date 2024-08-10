@@ -1,8 +1,10 @@
 target/*
-rls/*
-*.currentseedpath
 Cargo.lock
-.idea
 seeds/*
+seedgen_log.txt
 seed_storage/*
-stats*/*
+stats/*
+assets/seeds/*
+assets/seedgen_log.txt
+assets/seed_storage/*
+assets/stats/*

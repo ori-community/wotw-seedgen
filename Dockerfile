@@ -1,3 +1,5 @@
+# TODO update
+
 FROM rust:alpine as build-seedgen
 
 COPY . /app
