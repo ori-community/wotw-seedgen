@@ -2,6 +2,8 @@
 #name("Better Wellspring")
 #description("Opens the top door of Wellspring")
 
+// TODO add to difficulty presets
+
 !tags("Better Wellspring")
 
 on spawn store(InnerWellspring.TopDoorOpen, true)

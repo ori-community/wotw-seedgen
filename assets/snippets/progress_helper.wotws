@@ -104,6 +104,7 @@ on binding_2 if disable_keybinds == false show_quest_progress()
 on binding_3 if disable_keybinds == false show_teleporter_progress()
 
 fun write_tree_progress() {
+    // TODO could share the logic between found and remaining
     set_string("tree_progress", "#Trees found#: ")
     set_boolean("comma", false)
     if MarshSpawn.RegenTree {
@@ -142,7 +143,7 @@ fun write_tree_progress() {
     }
     if MarshSpawn.DamageTree {
         trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Inkwater Ancestral Light")
+        set_string("tree_progress", get_string("tree_progress") + "Marsh Ancestral Light")
         set_boolean("comma", true)
     }
     if GladesTown.DamageTree {
@@ -216,7 +217,7 @@ fun write_tree_progress() {
     }
     if MarshSpawn.DamageTree == false {
         trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Inkwater Ancestral Light")
+        set_string("tree_progress", get_string("tree_progress") + "Marsh Ancestral Light")
         set_boolean("comma", true)
     }
     if GladesTown.DamageTree == false {
@@ -389,7 +390,7 @@ fun show_quest_progress() {
     if questUberStateGroup.tradeSequenceQuest == 4 set_string("quest_progress", get_string("quest_progress") + "Find someone in need of a warm meal (Moki in Reach)")
     if questUberStateGroup.tradeSequenceQuest == 5 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs a hat (Moki in Glades)")
     if questUberStateGroup.tradeSequenceQuest == 6 set_string("quest_progress", get_string("quest_progress") + "Find someone in need of light (Moki in Depths)")
-    if questUberStateGroup.tradeSequenceQuest == 7 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs string (Moki in Luma)")
+    if questUberStateGroup.tradeSequenceQuest == 7 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs string (Moki in Pools)")
     if questUberStateGroup.tradeSequenceQuest == 8 set_string("quest_progress", get_string("quest_progress") + "Find someone who needs a spyglass (Motay in Glades)")
     if questUberStateGroup.tradeSequenceQuest == 9 set_string("quest_progress", get_string("quest_progress") + "Find someone in need of drinking water (Gorlek Miner in Wastes)")
     if questUberStateGroup.tradeSequenceQuest == 10 set_string("quest_progress", get_string("quest_progress") + "Find the ancient Map Stone (Windtorn Ruins)")
@@ -471,12 +472,12 @@ fun show_teleporter_progress() {
     }
     if EastPools.TeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "Central Luma")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Central Pools")
         set_boolean("comma", true)
     }
     if WestPools.TeleporterActive {
         teleporters_add_comma()
-        set_string("teleporter_progress", get_string("teleporter_progress") + "Luma Boss")
+        set_string("teleporter_progress", get_string("teleporter_progress") + "Pools Boss")
         set_boolean("comma", true)
     }
     if LowerWastes.FeedingGroundsTeleporterActive {

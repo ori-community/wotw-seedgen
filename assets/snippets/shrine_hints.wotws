@@ -2,14 +2,14 @@
 #name("Shrine Hints")
 #description("Reveal the reward a Combat Shrine gives when starting it")
 
-!item_on(inkwater_shrine_item, MarshPastOpher.CombatShrine)
+!item_on(marsh_shrine_item, MarshPastOpher.CombatShrine)
 !item_on(den_shrine_item, HowlsDen.CombatShrine)
 !item_on(glades_shrine_item, WestGlades.CombatShrine)
 !item_on(woods_shrine_item, WoodsMain.CombatShrine)
 !item_on(depths_shrine_item, LowerDepths.CombatShrine)
 
-on shrines.inkwaterWave == 1 item_message("Complete the Marsh Combat Shrine to gain\n" + inkwater_shrine_item)
+on shrines.inkwaterWave == 1 item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item) // TODO rename Inkwater -> Marsh
 on shrines.howlsDenWave == 1 item_message("Complete the Howl's Den Combat Shrine to gain\n" + den_shrine_item)
 on shrines.gladesWave == 1 item_message("Complete the Glades Combat Shrine to gain\n" + glades_shrine_item)
 on shrines.woodsWave == 1 item_message("Complete the Woods Combat Shrine to gain\n" + woods_shrine_item)
-on shrines.depthsWave == 1 item_message("Complete the Mouldwood Combat Shrine to gain\n" + depths_shrine_item)
+on shrines.depthsWave == 1 item_message("Complete the Depths Combat Shrine to gain\n" + depths_shrine_item)

@@ -194,7 +194,7 @@ impl CommonItem {
             CommonItem::EnergyFragment => 150.,
             CommonItem::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200.,
-                Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => 300.,
+                Skill::GladesAncestralLight | Skill::MarshAncestralLight => 300.,
                 Skill::Blaze => 420.,
                 Skill::Launch => 800.,
                 _ => 500.,

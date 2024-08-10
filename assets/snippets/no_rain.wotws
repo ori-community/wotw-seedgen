@@ -1,6 +1,7 @@
 #category("World Changes")
 #name("No Rain")
 #description("Marsh starts sunny as it usually is after getting the sword tree. Also Howl is dead")
+// TODO split Howl and rain logic?
 
 !tags("No Rain")
 

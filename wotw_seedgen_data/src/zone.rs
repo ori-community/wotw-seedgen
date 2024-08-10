@@ -10,14 +10,14 @@ use strum::{Display, EnumString};
 #[cfg_attr(feature = "strum", derive(Display, EnumString))]
 #[repr(u8)]
 pub enum Zone {
-    Inkwater = 0,
+    Marsh = 0,
     Hollow = 1,
     Glades = 2,
     Wellspring = 3,
     Woods = 7,
     Reach = 6,
     Depths = 8,
-    Luma = 4,
+    Pools = 4,
     Wastes = 9,
     Ruins = 10,
     Willow = 11,

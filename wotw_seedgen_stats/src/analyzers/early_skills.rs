@@ -37,7 +37,7 @@ impl Analyzer for EarlySkillsStats {
             .chain(last)
             .flat_map(|placement| CommonItem::from_command(&placement.command))
             .filter(|item| match item {
-                CommonItem::Skill(Skill::GladesAncestralLight | Skill::InkwaterAncestralLight) => {
+                CommonItem::Skill(Skill::GladesAncestralLight | Skill::MarshAncestralLight) => {
                     false
                 }
                 CommonItem::Skill(_) => true,

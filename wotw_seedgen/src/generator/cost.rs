@@ -22,7 +22,7 @@ impl Cost for Skill {
             Skill::Bash => 3000, // Counteracting a bias because Bash unlocks a lot
             Skill::Spear => 4000, // No
             Skill::Launch => 40000, // Absolutely Broken
-            Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => 1000,
+            Skill::GladesAncestralLight | Skill::MarshAncestralLight => 1000,
             Skill::SpiritFlame | Skill::Seir | Skill::BowCharge | Skill::Magnet | Skill::WeaponCharge => 0 // ?
         }
     }
@@ -35,7 +35,7 @@ impl Cost for Shard {
 impl Cost for Teleporter {
     fn cost(&self) -> usize {
         match self {
-            Teleporter::Inkwater => 30000,
+            Teleporter::Marsh => 30000,
             _ => 25000,
         }
     }

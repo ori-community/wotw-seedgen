@@ -19,30 +19,30 @@
 !include("progress_helper")
 !include("goal_mode_core")
 
-!state(inkwater_relic_collected, Boolean)
+!state(marsh_relic_collected, Boolean)
 !state(hollow_relic_collected, Boolean)
 !state(glades_relic_collected, Boolean)
 !state(wellspring_relic_collected, Boolean)
 !state(woods_relic_collected, Boolean)
 !state(reach_relic_collected, Boolean)
 !state(depths_relic_collected, Boolean)
-!state(luma_relic_collected, Boolean)
+!state(pools_relic_collected, Boolean)
 !state(wastes_relic_collected, Boolean)
 !state(willow_relic_collected, Boolean)
 !state(burrows_relic_collected, Boolean)
 
 // TODO flavour messages
 !if relic_count == 0 {
-    !random_float(inkwater_relic, 0, 1)
-    !if inkwater_relic <= relic_chance {
+    !random_float(marsh_relic, 0, 1)
+    !if marsh_relic <= relic_chance {
         !preplace({
-            item_message("@Inkwater Relic@")
-            store(inkwater_relic_collected, true)
-        }, Zone::Inkwater)
-        !let(inkwater_relic_exists, true)
+            item_message("@Marsh Relic@")
+            store(marsh_relic_collected, true)
+        }, Zone::Marsh)
+        !let(marsh_relic_exists, true)
     }
-    !if inkwater_relic > relic_chance {
-        !let(inkwater_relic_exists, false)
+    !if marsh_relic > relic_chance {
+        !let(marsh_relic_exists, false)
     }
     !random_float(hollow_relic, 0, 1)
     !if hollow_relic <= relic_chance {
@@ -110,16 +110,16 @@
     !if depths_relic > relic_chance {
         !let(depths_relic_exists, false)
     }
-    !random_float(luma_relic, 0, 1)
-    !if luma_relic <= relic_chance {
+    !random_float(pools_relic, 0, 1)
+    !if pools_relic <= relic_chance {
         !preplace({
-            item_message("@Luma Relic@")
-            store(luma_relic_collected, true)
-        }, Zone::Luma)
-        !let(luma_relic_exists, true)
+            item_message("@Pools Relic@")
+            store(pools_relic_collected, true)
+        }, Zone::Pools)
+        !let(pools_relic_exists, true)
     }
-    !if luma_relic > relic_chance {
-        !let(luma_relic_exists, false)
+    !if pools_relic > relic_chance {
+        !let(pools_relic_exists, false)
     }
     !random_float(wastes_relic, 0, 1)
     !if wastes_relic <= relic_chance {
@@ -156,15 +156,15 @@
     }
 }
 !if relic_count > 0 {
-    !random_pool(relics, String, ["inkwater", "hollow", "glades", "wellspring", "woods", "reach", "depths", "luma", "wastes", "willow", "burrows"])
+    !random_pool(relics, String, ["marsh", "hollow", "glades", "wellspring", "woods", "reach", "depths", "pools", "wastes", "willow", "burrows"])
     !repeat relic_count {
         !random_from_pool(relic, relics)
-        !if relic == "inkwater" {
+        !if relic == "marsh" {
             !preplace({
-                item_message("@Inkwater Relic@")
-                store(inkwater_relic_collected, true)
-            }, Zone::Inkwater)
-            !let(inkwater_relic_exists, true)
+                item_message("@Marsh Relic@")
+                store(marsh_relic_collected, true)
+            }, Zone::Marsh)
+            !let(marsh_relic_exists, true)
         }
         !if relic == "hollow" {
             !preplace({
@@ -208,12 +208,12 @@
             }, Zone::Depths)
             !let(depths_relic_exists, true)
         }
-        !if relic == "luma" {
+        !if relic == "pools" {
             !preplace({
-                item_message("@Luma Relic@")
-                store(luma_relic_collected, true)
-            }, Zone::Luma)
-            !let(luma_relic_exists, true)
+                item_message("@Pools Relic@")
+                store(pools_relic_collected, true)
+            }, Zone::Pools)
+            !let(pools_relic_exists, true)
         }
         !if relic == "wastes" {
             !preplace({
@@ -239,14 +239,14 @@
     }
     !repeat 11 - relic_count {
         !random_from_pool(relic, relics)
-        !if relic == "inkwater" { !let(inkwater_relic_exists, false) }
+        !if relic == "marsh" { !let(marsh_relic_exists, false) }
         !if relic == "hollow" { !let(hollow_relic_exists, false) }
         !if relic == "glades" { !let(glades_relic_exists, false) }
         !if relic == "wellspring" { !let(wellspring_relic_exists, false) }
         !if relic == "woods" { !let(woods_relic_exists, false) }
         !if relic == "reach" { !let(reach_relic_exists, false) }
         !if relic == "depths" { !let(depths_relic_exists, false) }
-        !if relic == "luma" { !let(luma_relic_exists, false) }
+        !if relic == "pools" { !let(pools_relic_exists, false) }
         !if relic == "wastes" { !let(wastes_relic_exists, false) }
         !if relic == "willow" { !let(willow_relic_exists, false) }
         !if relic == "burrows" { !let(burrows_relic_exists, false) }
@@ -254,14 +254,14 @@
 }
 
 !let(total_relic_count, 0)
-!if inkwater_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if marsh_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if hollow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if glades_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if wellspring_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if woods_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if reach_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if depths_relic_exists { !let(total_relic_count, total_relic_count + 1) }
-!if luma_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+!if pools_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if wastes_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
@@ -288,20 +288,20 @@
     }
 })
 
-!if inkwater_relic_exists {
-    fun write_inkwater_relic() {
+!if marsh_relic_exists {
+    fun write_marsh_relic() {
         set_string("color", "")
-        if current_zone() == Zone::Inkwater {
+        if current_zone() == Zone::Marsh {
             set_string("color", "#")
         }
-        if inkwater_relic_collected {
+        if marsh_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Inkwater" + get_string("color"))
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Marsh" + get_string("color"))
         set_boolean("comma", true)
     }
 }
-!if inkwater_relic_exists == false { fun write_inkwater_relic() {} }
+!if marsh_relic_exists == false { fun write_marsh_relic() {} }
 !if hollow_relic_exists {
     fun write_hollow_relic() {
         relics_add_comma()
@@ -392,21 +392,21 @@
     }
 }
 !if depths_relic_exists == false { fun write_depths_relic() {} }
-!if luma_relic_exists {
-    fun write_luma_relic() {
+!if pools_relic_exists {
+    fun write_pools_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Luma {
+        if current_zone() == Zone::Pools {
             set_string("color", "#")
         }
-        if luma_relic_collected {
+        if pools_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Luma" + get_string("color"))
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "pools" + get_string("color"))
         set_boolean("comma", true)
     }
 }
-!if luma_relic_exists == false { fun write_luma_relic() {} }
+!if pools_relic_exists == false { fun write_pools_relic() {} }
 !if wastes_relic_exists {
     fun write_wastes_relic() {
         relics_add_comma()
@@ -454,14 +454,14 @@
 
 fun count_relics() {
     set_integer("relic_count", 0)
-    if inkwater_relic_collected increment_relic_count()
+    if marsh_relic_collected increment_relic_count()
     if hollow_relic_collected increment_relic_count()
     if glades_relic_collected increment_relic_count()
     if wellspring_relic_collected increment_relic_count()
     if woods_relic_collected increment_relic_count()
     if reach_relic_collected increment_relic_count()
     if depths_relic_collected increment_relic_count()
-    if luma_relic_collected increment_relic_count()
+    if pools_relic_collected increment_relic_count()
     if wastes_relic_collected increment_relic_count()
     if willow_relic_collected increment_relic_count()
     if burrows_relic_collected increment_relic_count()
@@ -474,14 +474,14 @@ fun increment_relic_count() {
 fun write_relics_message() {
     set_string("relics_message", get_string("outer_color") + "Relics (" + get_integer("relic_count") + "/" + total_relic_count + "): ")
     set_boolean("comma", false)
-    write_inkwater_relic()
+    write_marsh_relic()
     write_hollow_relic()
     write_glades_relic()
     write_wellspring_relic()
     write_woods_relic()
     write_reach_relic()
     write_depths_relic()
-    write_luma_relic()
+    write_pools_relic()
     write_wastes_relic()
     write_willow_relic()
     write_burrows_relic()

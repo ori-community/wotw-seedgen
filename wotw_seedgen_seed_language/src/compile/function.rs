@@ -960,7 +960,7 @@ fn skill_string(skill: Skill, remove: bool) -> CommandString {
         format!("@Remove {skill_cased}@")
     } else {
         match skill {
-            Skill::GladesAncestralLight | Skill::InkwaterAncestralLight => {
+            Skill::GladesAncestralLight | Skill::MarshAncestralLight => {
                 format!("#{skill_cased}#")
             }
             _ => format!("*{skill_cased}*"),
@@ -983,31 +983,16 @@ fn shard_string(shard: Shard, remove: bool) -> CommandString {
     CommandString::Constant { value }
 }
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
-    let name = match teleporter {
-        Teleporter::Inkwater => "Inkwater Marsh",
-        Teleporter::Den => "Howl's Den",
-        Teleporter::Hollow => "Kwolok's Hollow",
-        Teleporter::Glades => "Glades",
-        Teleporter::Wellspring => "Wellspring",
-        Teleporter::Burrows => "Midnight Burrows",
-        Teleporter::WoodsEntrance => "Woods Entrance",
-        Teleporter::WoodsExit => "Woods Exit",
-        Teleporter::Reach => "Baur's Reach",
-        Teleporter::Depths => "Mouldwood Depths",
-        Teleporter::CentralLuma => "Central Luma",
-        Teleporter::LumaBoss => "Luma Boss",
-        Teleporter::FeedingGrounds => "Feeding Grounds",
-        Teleporter::CentralWastes => "Central Wastes",
-        Teleporter::OuterRuins => "Outer Ruins",
-        Teleporter::InnerRuins => "Inner Ruins",
-        Teleporter::Willow => "Willow's End",
-        Teleporter::Shriek => "Shriek",
-    };
-
+    let teleporter = teleporter.to_string();
+    let teleporter = &teleporter[..teleporter.len() - 2];
+    let teleporter_cased = teleporter
+        .to_string()
+        .from_case(Case::Pascal)
+        .to_case(Case::Title);
     let value = if remove {
-        format!("@Remove {name} Teleporter@")
+        format!("@Remove {teleporter_cased} Teleporter@")
     } else {
-        format!("#{name} Teleporter#")
+        format!("#{teleporter_cased} Teleporter#")
     }
     .into();
     CommandString::Constant { value }

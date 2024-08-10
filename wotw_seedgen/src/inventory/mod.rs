@@ -194,7 +194,7 @@ impl Inventory {
             if self.skills.contains(&Skill::GladesAncestralLight) {
                 damage_mod += 0.25;
             }
-            if self.skills.contains(&Skill::InkwaterAncestralLight) {
+            if self.skills.contains(&Skill::MarshAncestralLight) {
                 damage_mod += 0.25;
             }
 

@@ -157,8 +157,8 @@ pub mod uber_identifier {
         pub const WEAPON_CHARGE: UberIdentifier = Skill::WeaponCharge.uber_identifier();
         pub const GLADES_ANCESTRAL_LIGHT: UberIdentifier =
             Skill::GladesAncestralLight.uber_identifier();
-        pub const INKWATER_ANCESTRAL_LIGHT: UberIdentifier =
-            Skill::InkwaterAncestralLight.uber_identifier();
+        pub const MARSH_ANCESTRAL_LIGHT: UberIdentifier =
+            Skill::MarshAncestralLight.uber_identifier();
     }
 
     pub mod shard {
@@ -217,7 +217,7 @@ pub mod uber_identifier {
     pub mod teleporter {
         use crate::UberIdentifier;
 
-        pub const INKWATER: UberIdentifier = UberIdentifier::new(21786, 10185);
+        pub const MARSH: UberIdentifier = UberIdentifier::new(21786, 10185);
         pub const DEN: UberIdentifier = UberIdentifier::new(11666, 61594);
         pub const HOLLOW: UberIdentifier = UberIdentifier::new(937, 26601);
         pub const GLADES: UberIdentifier = UberIdentifier::new(42178, 42096);
@@ -227,8 +227,8 @@ pub mod uber_identifier {
         pub const WOODS_EXIT: UberIdentifier = UberIdentifier::new(58674, 1965);
         pub const REACH: UberIdentifier = UberIdentifier::new(28895, 54235);
         pub const DEPTHS: UberIdentifier = UberIdentifier::new(18793, 38871);
-        pub const CENTRAL_LUMA: UberIdentifier = UberIdentifier::new(945, 58183);
-        pub const LUMA_BOSS: UberIdentifier = UberIdentifier::new(945, 1370);
+        pub const CENTRAL_POOLS: UberIdentifier = UberIdentifier::new(945, 58183);
+        pub const POOLS_BOSS: UberIdentifier = UberIdentifier::new(945, 1370);
         pub const FEEDING_GROUNDS: UberIdentifier = UberIdentifier::new(58674, 10029);
         pub const CENTRAL_WASTES: UberIdentifier = UberIdentifier::new(20120, 49994);
         pub const OUTER_RUINS: UberIdentifier = UberIdentifier::new(20120, 41398);

@@ -97,7 +97,7 @@ pub enum ClientEvent {
     /// Trigger every frame
     Tick,
     /// Trigger when the Inkwater trial reward text should be updated
-    InkwaterTrialTextRequest,
+    InkwaterTrialTextRequest, // TODO rename Inkwater -> Marsh
     /// Trigger when the Hollow trial reward text should be updated
     HollowTrialTextRequest,
     /// Trigger when the Wellspring trial reward text should be updated
@@ -109,7 +109,7 @@ pub enum ClientEvent {
     /// Trigger when the Depths trial reward text should be updated
     DepthsTrialTextRequest,
     /// Trigger when the Luma trial reward text should be updated
-    LumaTrialTextRequest,
+    LumaTrialTextRequest, // TODO rename Luma -> Pools
     /// Trigger when the Wastes trial reward text should be updated
     WastesTrialTextRequest,
 }

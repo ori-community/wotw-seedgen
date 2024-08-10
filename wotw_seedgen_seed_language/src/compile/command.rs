@@ -320,6 +320,8 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        self.description.evaluate::<String>(compiler);
+
         let config = compiler
             .global
             .config

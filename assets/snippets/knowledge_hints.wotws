@@ -29,7 +29,7 @@ on tick if
         current_zone() == Zone::Woods
         || current_zone() == Zone::Reach
         || current_zone() == Zone::Depths
-        || current_zone() == Zone::Luma
+        || current_zone() == Zone::Pools
         || current_zone() == Zone::Wastes
         || current_zone() == Zone::Ruins
         || current_zone() == Zone::Willow
@@ -45,9 +45,9 @@ on LowerReach.TeleporterActive if skills.flap && is_in_hitbox(-284, -3971, -223,
 on UpperDepths.TeleporterActive if skills.glide && is_in_hitbox(499, -4381, 561, -4335) == false
     item_message("#Motay's Note#\nUsing the " + teleporter_string(Teleporter::Depths) + " won't be required until you find " + skill_string(Skill::Glide))
 on EastPools.TeleporterActive if randoState.cleanWater && is_in_hitbox(-1334, -4160, -1280, -4121) == false
-    item_message("#Motay's Note#\nUsing the " + teleporter_string(Teleporter::CentralLuma) + " won't be required until you find " + clean_water_string())
+    item_message("#Motay's Note#\nUsing the " + teleporter_string(Teleporter::CentralPools) + " won't be required until you find " + clean_water_string())
 on WestPools.TeleporterActive if randoState.cleanWater && is_in_hitbox(-1677, -4175, -1625, -4156) == false
-    item_message("#Motay's Note#\nUsing the " + teleporter_string(Teleporter::LumaBoss) + " won't be required until you find " + clean_water_string())
+    item_message("#Motay's Note#\nUsing the " + teleporter_string(Teleporter::PoolsBoss) + " won't be required until you find " + clean_water_string())
 on LowerWastes.CentralTeleporterActive if skills.burrow && is_in_hitbox(1946, -3910, 2018, -3857) == false
     item_message("#Motay's Note#\nUsing the " + teleporter_string(Teleporter::CentralWastes) + " won't be required until you find " + skill_string(Skill::Burrow))
 on UpperWastes.TeleporterActive if skills.burrow && is_in_hitbox(2013, -3690, 2067, -3658) == false

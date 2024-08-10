@@ -40,6 +40,8 @@ pub enum Trigger {
     Condition(usize),
 }
 
+// TODO breakpoint/debug logging toggle command?
+
 /// A Command, which may be used to affect the world, player or client state
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Command {

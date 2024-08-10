@@ -14,7 +14,7 @@
 //! assert_eq!(loc_data.entries, vec![
 //!     LocDataEntry {
 //!         identifier: "MarshSpawn.RockHC".to_string(),
-//!         zone: Zone::Inkwater,
+//!         zone: Zone::Marsh,
 //!         uber_identifier: UberIdentifier::new(21786, 60210),
 //!         value: Some(1),
 //!         position: Some(Position::new(-958., -4313.)),
@@ -119,7 +119,7 @@ struct LocDataInput<'a> {
 #[serde(remote = "Zone")]
 enum LocDataZone {
     #[serde(rename = "Inkwater Marsh")]
-    Inkwater,
+    Marsh,
     #[serde(rename = "Kwoloks Hollow")]
     Hollow,
     #[serde(rename = "Wellspring Glades")]
@@ -133,7 +133,7 @@ enum LocDataZone {
     #[serde(rename = "Mouldwood Depths")]
     Depths,
     #[serde(rename = "Luma Pools")]
-    Luma,
+    Pools,
     #[serde(rename = "Windswept Wastes")]
     Wastes,
     #[serde(rename = "Windtorn Ruins")]

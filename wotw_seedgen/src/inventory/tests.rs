@@ -146,7 +146,7 @@ fn destroy_cost() {
     );
     world_settings.difficulty = Difficulty::Unsafe;
     inventory.skills.insert(Skill::GladesAncestralLight);
-    inventory.skills.insert(Skill::InkwaterAncestralLight);
+    inventory.skills.insert(Skill::MarshAncestralLight);
     inventory.shards.insert(Shard::Wingclip);
     inventory.shard_slots += 1;
     inventory.skills.remove(&Skill::Bow);

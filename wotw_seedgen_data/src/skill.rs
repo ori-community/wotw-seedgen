@@ -121,7 +121,7 @@ pub enum Skill {
     Flap = 118,
     WeaponCharge = 119, // TODO what is this and why does it have an uberstate
     GladesAncestralLight = 120,
-    InkwaterAncestralLight = 121,
+    MarshAncestralLight = 121,
 }
 impl Skill {
     /// Returns the [`UberIdentifier`] tracking whether the player has this `Skill`
@@ -295,7 +295,7 @@ impl Skill {
             Skill::Flap => Equipment::Flap,
             Skill::WeaponCharge => Equipment::WeaponCharge,
             Skill::GladesAncestralLight => todo!(),
-            Skill::InkwaterAncestralLight => todo!(),
+            Skill::MarshAncestralLight => todo!(),
         }
     }
 }

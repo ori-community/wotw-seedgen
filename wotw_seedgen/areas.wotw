@@ -59,7 +59,7 @@ anchor Teleporters:  # teleporter access
     # It also makes a 4 keystone door available! Without the Keystone=2 line here, the seed generator
     # picks this path, unlocking 4 pickups, then immediately fills those with keystones and gets stuck
   conn MarshSpawn.Main:
-    moki: InkwaterTP
+    moki: MarshTP
   conn HowlsDen.Teleporter:
     moki: DenTP
   conn EastHollow.Teleporter:
@@ -77,9 +77,9 @@ anchor Teleporters:  # teleporter access
   conn UpperDepths.Teleporter:
     moki: DepthsTP, Glide
   conn EastPools.Teleporter:
-    moki: CentralLumaTP, Water
+    moki: CentralPoolsTP, Water
   conn WestPools.Teleporter:
-    moki: LumaBossTP, Water
+    moki: PoolsBossTP, Water
   conn LowerWastes.WestTP:
     moki: FeedingGroundsTP
   conn LowerWastes.EastTP:
@@ -93,7 +93,7 @@ anchor Teleporters:  # teleporter access
   conn WillowsEnd.Upper:
     moki: ShriekTP, Burrow
 
-anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
+anchor MarshSpawn.Main at -799, -4310:  # spawn location / marsh well
   refill Full
 
   state NonGladesTeleporter: free

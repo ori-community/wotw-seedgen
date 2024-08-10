@@ -357,8 +357,8 @@ fn process_triggers(world: &mut World, output: &IntermediateOutput, events: Vec<
 
 const WELLSPRING_QUEST: UberIdentifier = UberIdentifier::new(937, 34641);
 const KU_QUEST: UberIdentifier = UberIdentifier::new(14019, 34504);
-const LUMA_FIGHT_ARENA_2: UberIdentifier = UberIdentifier::new(5377, 53480);
-const LUMA_FIGHT_ARENA_1: UberIdentifier = UberIdentifier::new(5377, 1373);
+const POOLS_FIGHT_ARENA_2: UberIdentifier = UberIdentifier::new(5377, 53480);
+const POOLS_FIGHT_ARENA_1: UberIdentifier = UberIdentifier::new(5377, 1373);
 const DIAMOND_IN_THE_ROUGH_CUTSCENE: UberIdentifier = UberIdentifier::new(42178, 2654);
 const DIAMOND_IN_THE_ROUGH_PICKUP: UberIdentifier = UberIdentifier::new(23987, 14832);
 const WELLSPRING_ESCAPE_COMPLETE: UberIdentifier = UberIdentifier::new(37858, 12379);
@@ -396,11 +396,11 @@ fn uber_state_side_effects(
     trigger_events: bool,
 ) {
     match uber_identifier {
-        LUMA_FIGHT_ARENA_2 if value == 4 => {
+        POOLS_FIGHT_ARENA_2 if value == 4 => {
             set_uber_state(
                 world,
                 output,
-                LUMA_FIGHT_ARENA_1,
+                POOLS_FIGHT_ARENA_1,
                 UberStateValue::Integer(4),
                 trigger_events,
             );

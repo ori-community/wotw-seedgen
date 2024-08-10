@@ -4,26 +4,26 @@
 
 !tags("Teleporters")
 
-!config(inkwater, "Inkwater Marsh TP", Boolean, true)
-!config(howls_den, "Howl's Den TP", Boolean, true)
-!config(hollow, "Kwolok's Hollow TP", Boolean, true)
-!config(glades, "Glades TP", Boolean, true)
-!config(wellspring, "Wellspring TP", Boolean, true)
-!config(burrows, "Midnight Burrows TP", Boolean, true)
-!config(woods_entrance, "Woods Entrance TP", Boolean, true)
-!config(woods_exit, "Woods Exit TP", Boolean, true)
-!config(reach, "Baur's Reach TP", Boolean, true)
-!config(depths, "Mouldwood Depths TP", Boolean, true)
-!config(central_luma, "Central Luma TP", Boolean, true)
-!config(luma_boss, "Luma Boss TP", Boolean, false)
-!config(feeding_grounds, "Feeding Grounds TP", Boolean, true)
-!config(central_wastes, "Central Wastes TP", Boolean, true)
-!config(outer_ruins, "Outer Ruins TP", Boolean, true)
-!config(inner_ruins, "Inner Ruins TP", Boolean, false)
-!config(willow, "Willow's End TP", Boolean, true)
-!config(shriek, "Shriek TP", Boolean, false)
+!config(marsh, teleporter_string(Teleporter::Marsh), Boolean, true)
+!config(howls_den, teleporter_string(Teleporter::Den), Boolean, true)
+!config(hollow, teleporter_string(Teleporter::Hollow), Boolean, true)
+!config(glades, teleporter_string(Teleporter::Glades), Boolean, true)
+!config(wellspring, teleporter_string(Teleporter::Wellspring), Boolean, true)
+!config(burrows, teleporter_string(Teleporter::Burrows), Boolean, true)
+!config(woods_entrance, teleporter_string(Teleporter::WoodsEntrance), Boolean, true)
+!config(woods_exit, teleporter_string(Teleporter::WoodsExit), Boolean, true)
+!config(reach, teleporter_string(Teleporter::Reach), Boolean, true)
+!config(depths, teleporter_string(Teleporter::Depths), Boolean, true)
+!config(central_pools, teleporter_string(Teleporter::CentralPools), Boolean, true)
+!config(pools_boss, teleporter_string(Teleporter::PoolsBoss), Boolean, false)
+!config(feeding_grounds, teleporter_string(Teleporter::FeedingGrounds), Boolean, true)
+!config(central_wastes, teleporter_string(Teleporter::CentralWastes), Boolean, true)
+!config(outer_ruins, teleporter_string(Teleporter::OuterRuins), Boolean, true)
+!config(inner_ruins, teleporter_string(Teleporter::InnerRuins), Boolean, false)
+!config(willow, teleporter_string(Teleporter::Willow), Boolean, true)
+!config(shriek, teleporter_string(Teleporter::Shriek), Boolean, false)
 
-!if inkwater { !add(teleporter(Teleporter::Inkwater), 1) }
+!if marsh { !add(teleporter(Teleporter::Marsh), 1) }
 !if howls_den { !add(teleporter(Teleporter::Den), 1) }
 !if hollow { !add(teleporter(Teleporter::Hollow), 1) }
 !if glades { !add(teleporter(Teleporter::Glades), 1) }
@@ -33,8 +33,8 @@
 !if woods_exit { !add(teleporter(Teleporter::WoodsExit), 1) }
 !if reach { !add(teleporter(Teleporter::Reach), 1) }
 !if depths { !add(teleporter(Teleporter::Depths), 1) }
-!if central_luma { !add(teleporter(Teleporter::CentralLuma), 1) }
-!if luma_boss { !add(teleporter(Teleporter::LumaBoss), 1) }
+!if central_pools { !add(teleporter(Teleporter::CentralPools), 1) }
+!if pools_boss { !add(teleporter(Teleporter::PoolsBoss), 1) }
 !if feeding_grounds { !add(teleporter(Teleporter::FeedingGrounds), 1) }
 !if central_wastes { !add(teleporter(Teleporter::CentralWastes), 1) }
 !if outer_ruins { !add(teleporter(Teleporter::OuterRuins), 1) }

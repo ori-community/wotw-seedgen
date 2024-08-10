@@ -119,7 +119,7 @@ on gromShop.removeThornsBought store(gladesProjects.removeThornsBuilt, true)
 on gromShop.openCaveBought store(gladesProjects.openCaveBuilt, true)
 on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
 
-on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true)
+on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true) // TODO rename Inkwater -> Marsh
 on EastPools.FightArenas store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
 on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneState == 2 {
     store(hubUberStateGroup.craftCutsceneState, 3)

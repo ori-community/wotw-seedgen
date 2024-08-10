@@ -84,7 +84,7 @@ pub fn generate_seed<F: SnippetAccess>(
                     output.events.push(Event {
                         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                         command: compile::set_boolean_value(
-                            uber_identifier::teleporter::CENTRAL_LUMA,
+                            uber_identifier::teleporter::CENTRAL_POOLS,
                             true,
                         ),
                     })

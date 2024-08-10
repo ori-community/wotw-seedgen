@@ -1304,7 +1304,7 @@ fn default_icon(command: &CommandVoid) -> Option<Icon> {
                 Skill::GladesAncestralLight => Some(Icon::File(
                     "assets/icons/game/ancestrallight1.png".to_string(),
                 )),
-                Skill::InkwaterAncestralLight => Some(Icon::File(
+                Skill::MarshAncestralLight => Some(Icon::File(
                     "assets/icons/game/ancestrallight2.png".to_string(),
                 )),
                 _ => None,

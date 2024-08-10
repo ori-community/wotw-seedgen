@@ -12,7 +12,7 @@ use strum::EnumString;
 #[cfg_attr(feature = "strum", derive(EnumString))]
 #[repr(u8)]
 pub enum Teleporter {
-    Inkwater = 16,
+    Marsh = 16,
     Den = 1,
     Hollow = 5,
     Glades = 17,
@@ -22,8 +22,8 @@ pub enum Teleporter {
     WoodsExit = 8,
     Reach = 4,
     Depths = 6,
-    CentralLuma = 2,
-    LumaBoss = 13,
+    CentralPools = 2,
+    PoolsBoss = 13,
     FeedingGrounds = 9,
     CentralWastes = 10,
     OuterRuins = 11,
@@ -34,7 +34,7 @@ pub enum Teleporter {
 impl Display for Teleporter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Teleporter::Inkwater => write!(f, "Inkwater")?,
+            Teleporter::Marsh => write!(f, "Marsh")?,
             Teleporter::Den => write!(f, "Den")?,
             Teleporter::Hollow => write!(f, "Hollow")?,
             Teleporter::Glades => write!(f, "Glades")?,
@@ -44,8 +44,8 @@ impl Display for Teleporter {
             Teleporter::WoodsExit => write!(f, "WoodsExit")?,
             Teleporter::Reach => write!(f, "Reach")?,
             Teleporter::Depths => write!(f, "Depths")?,
-            Teleporter::CentralLuma => write!(f, "CentralLuma")?,
-            Teleporter::LumaBoss => write!(f, "LumaBoss")?,
+            Teleporter::CentralPools => write!(f, "CentralPools")?,
+            Teleporter::PoolsBoss => write!(f, "PoolsBoss")?,
             Teleporter::FeedingGrounds => write!(f, "FeedingGrounds")?,
             Teleporter::CentralWastes => write!(f, "CentralWastes")?,
             Teleporter::OuterRuins => write!(f, "OuterRuins")?,
@@ -60,7 +60,7 @@ impl Teleporter {
     /// Returns the [`UberIdentifier`] tracking whether the player has activated this `Teleporter`
     pub const fn uber_identifier(self) -> UberIdentifier {
         match self {
-            Teleporter::Inkwater => teleporter::INKWATER,
+            Teleporter::Marsh => teleporter::MARSH,
             Teleporter::Den => teleporter::DEN,
             Teleporter::Hollow => teleporter::HOLLOW,
             Teleporter::Glades => teleporter::GLADES,
@@ -70,8 +70,8 @@ impl Teleporter {
             Teleporter::WoodsExit => teleporter::WOODS_EXIT,
             Teleporter::Reach => teleporter::REACH,
             Teleporter::Depths => teleporter::DEPTHS,
-            Teleporter::CentralLuma => teleporter::CENTRAL_LUMA,
-            Teleporter::LumaBoss => teleporter::LUMA_BOSS,
+            Teleporter::CentralPools => teleporter::CENTRAL_POOLS,
+            Teleporter::PoolsBoss => teleporter::POOLS_BOSS,
             Teleporter::FeedingGrounds => teleporter::FEEDING_GROUNDS,
             Teleporter::CentralWastes => teleporter::CENTRAL_WASTES,
             Teleporter::OuterRuins => teleporter::OUTER_RUINS,
@@ -83,7 +83,7 @@ impl Teleporter {
     /// Returns the `Teleporter` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {
-            teleporter::INKWATER => Some(Teleporter::Inkwater),
+            teleporter::MARSH => Some(Teleporter::Marsh),
             teleporter::DEN => Some(Teleporter::Den),
             teleporter::HOLLOW => Some(Teleporter::Hollow),
             teleporter::GLADES => Some(Teleporter::Glades),
@@ -93,8 +93,8 @@ impl Teleporter {
             teleporter::WOODS_EXIT => Some(Teleporter::WoodsExit),
             teleporter::REACH => Some(Teleporter::Reach),
             teleporter::DEPTHS => Some(Teleporter::Depths),
-            teleporter::CENTRAL_LUMA => Some(Teleporter::CentralLuma),
-            teleporter::LUMA_BOSS => Some(Teleporter::LumaBoss),
+            teleporter::CENTRAL_POOLS => Some(Teleporter::CentralPools),
+            teleporter::POOLS_BOSS => Some(Teleporter::PoolsBoss),
             teleporter::FEEDING_GROUNDS => Some(Teleporter::FeedingGrounds),
             teleporter::CENTRAL_WASTES => Some(Teleporter::CentralWastes),
             teleporter::OUTER_RUINS => Some(Teleporter::OuterRuins),

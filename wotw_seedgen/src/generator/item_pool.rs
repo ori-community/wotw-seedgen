@@ -56,7 +56,7 @@ impl Default for ItemPool {
                 compile::skill(Skill::Sentry),
                 compile::skill(Skill::Flap),
                 compile::skill(Skill::GladesAncestralLight),
-                compile::skill(Skill::InkwaterAncestralLight),
+                compile::skill(Skill::MarshAncestralLight),
                 compile::clean_water(),
                 compile::shard(Shard::Overcharge),
                 compile::shard(Shard::TripleJump),
@@ -126,7 +126,7 @@ impl Default for ItemPool {
                     Skill::Sentry,
                     Skill::Flap,
                     Skill::GladesAncestralLight,
-                    Skill::InkwaterAncestralLight,
+                    Skill::MarshAncestralLight,
                 ]
                 .into_iter()
                 .collect(),
