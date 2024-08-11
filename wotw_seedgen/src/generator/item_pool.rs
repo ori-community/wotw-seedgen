@@ -266,7 +266,6 @@ impl ItemPool {
 
     #[inline]
     pub fn drain(&mut self) -> Drain<'_> {
-        self.inventory.clear();
         Drain::new(self)
     }
     #[inline]
