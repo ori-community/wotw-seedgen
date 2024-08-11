@@ -276,6 +276,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             }
         }
         for world_context in &mut self.worlds {
+            world_context.update_needs_placement();
             world_context.fill_remaining(&mut self.spoiler.groups[self.step - 1].placements);
         }
     }
@@ -789,11 +790,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn update_reached(&mut self) {
-        let mut received_placement = mem::take(&mut self.received_placement);
-        received_placement.sort();
-        for node_index in received_placement.into_iter().rev() {
-            self.needs_placement.swap_remove(node_index);
-        }
+        self.update_needs_placement();
 
         let reached_locations = self.world.reached_and_progressions();
         self.reached = reached_locations.reached;
@@ -815,6 +812,14 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 .map(|index| self.needs_placement[*index].identifier())
                 .format(", ")
         );
+    }
+
+    fn update_needs_placement(&mut self) {
+        let mut received_placement = mem::take(&mut self.received_placement);
+        received_placement.sort();
+        for node_index in received_placement.into_iter().rev() {
+            self.needs_placement.swap_remove(node_index);
+        }
     }
 
     fn placements_remaining(&self) -> usize {
