@@ -349,13 +349,6 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "18": {
-          "name": "burnDoTKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "19": {
           "name": "shurikenKills",
           "readonly": false,
@@ -37402,6 +37395,13 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "102": {
+          "name": "knockKnockWellspring",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "11": {
           "name": "goodHollow",
           "readonly": false,
@@ -37451,6 +37451,27 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "18": {
+          "name": "allowTeleportingUnderwater",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "19": {
+          "name": "allowTeleportingDuringCombatShrineFights",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "20": {
+          "name": "disableWillowHeartCutscenes",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "301": {
           "name": "forceNoAirDecelerationFlag",
           "readonly": false,
@@ -37472,32 +37493,11 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "500": {
-          "name": "chaosTriggerMin",
-          "readonly": false,
-          "type": "SerializedFloatUberState",
-          "value": 30.0,
-          "value_type": "Float"
-        },
-        "501": {
-          "name": "chaosTriggerMax",
-          "readonly": false,
-          "type": "SerializedFloatUberState",
-          "value": 60.0,
-          "value_type": "Float"
-        },
         "6": {
           "name": "allowOpeningEyestoneDoor",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 1.0,
-          "value_type": "Boolean"
-        },
-        "7": {
-          "name": "chaosMode",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
           "value_type": "Boolean"
         },
         "8": {
