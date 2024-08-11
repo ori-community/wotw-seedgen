@@ -62,7 +62,6 @@ fn some_seeds() {
 
     universe_settings.world_settings[0].snippets.extend([
         "bingo".to_string(),
-        "bonus+".to_string(),
         "glades_done".to_string(),
         "launch_fragments".to_string(),
         "launch_from_bingo".to_string(),
@@ -70,14 +69,11 @@ fn some_seeds() {
         "no_ks_doors".to_string(),
         "no_quests".to_string(),
         "no_willow_hearts".to_string(),
-        // "open_mode".to_string(), // TODO migrate?
-        "spawn_with_sword".to_string(),
-        "util_twillen".to_string(),
-        "vanilla_opher_upgrades".to_string(),
-        "bonus_opher_upgrades".to_string(),
+        "trees".to_string(),
+        "wisps".to_string(),
     ]);
 
-    for preset in ["gorlek", "rspawn"] {
+    for preset in ["gorlek", "rspawn", "full_bonus"] {
         let preset = PRESET_ACCESS.world_preset(preset).unwrap();
         preset
             .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
