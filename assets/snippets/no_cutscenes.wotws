@@ -6,6 +6,7 @@
 
 on spawn {
     // Static cutscene skips
+    // TODO add seir opening willow entrance
     store(howlsDenGRoup.hasOriUsedSavePedestal, true)
     store(_petrifiedForestGroup.mokiFoulWaterVignetteTriggered, true)
     store(_petrifiedForestGroup.mokiCleanWaterVignetteTriggered, true)
@@ -25,6 +26,7 @@ on spawn {
     store(baursReachGroup.powlTeaseTriggered, true)
     store(waterMillStateGroupDescriptor.playedNaruGumoCutaway, true)
     store(willowsEndGroup.introPlayed, true)
+    store(randoConfig.disableWillowHeartCutscenes, true)
     // Dialogue skips
     store(npcsStateGroup.metOpherHubAfterWatermill, true)
     store(npcsStateGroup.metOpherHubBeforeWatermill, true)

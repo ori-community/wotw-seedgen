@@ -12,6 +12,8 @@ on spawn {
     store(randoConfig.fixKwolokBossEscapeUnderwaterSpiritLightSoftlock, true)
     store(randoConfig.fixShopAnywhere, true)
     store(randoConfig.usePatch2Kickback, true)
+    store(randoConfig.allowTeleportingUnderwater, true)
+    store(randoConfig.allowTeleportingDuringCombatShrineFights, true)
     store(randoState.regenTreeDrained, true)
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     store(gromShop.spiritWellBought, true)
