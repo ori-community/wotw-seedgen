@@ -4124,14 +4124,13 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Bash, WaterDash, Damage=20, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, Hammer
     unsafe:
-      Dash, Sword  # pogo the projectile
-      DoubleJump, Spear=1
-      GrenadeJump
-      Glide, DoubleJump  # GlideJump
-      Bash:
-        GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
-        WaterDash, Water OR Damage=20
-        Glide, Water OR Damage=20
+      Sword  # https://youtu.be/S9-y-ZoP7sQ
+      DoubleJump  # https://youtu.be/Sh6buQ1hfCc
+      Bash, Bow=1  # Bow to aggro the tentacle (by hitting its mouth)
+      Bash, Water OR Hammer OR Damage=40 OR GlideJump OR PauseHover
+      Bash, Damage=20, WaterDash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      GlideJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
   pickup WestGlades.AbovePlantEX:
     moki:
       Bash, DoubleJump, Dash OR Glide
