@@ -4107,7 +4107,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
         Hammer, DoubleJump OR Dash
 
   state GladesTown.GromsWall:
-    unsafe: Bash, Launch
+    unsafe: Bash, Launch  # https://www.youtube.com/watch?v=edSpqN0b4UY
 
   pickup WestGlades.GrappleEX:
     moki:
