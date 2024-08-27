@@ -24,5 +24,5 @@ wotw_seedgen_settings = { path = "../wotw_seedgen_settings", version = "0.1", op
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", optional = true }
 rustc-hash = { version = "1.1", optional = true }
-itertools = { version = "0.12", optional = true }
+itertools = { version = "0.13", optional = true }
 ciborium = "0.2"

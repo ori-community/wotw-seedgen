@@ -328,7 +328,7 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
             .get(&compiler.identifier)
             .and_then(|config| config.get(self.identifier.data.0));
         let value = match config {
-            None => self.default.evaluate(compiler),
+            None => self.default.evaluate(compiler), // TODO typecheck?
             Some(value) => {
                 let parsed = match self.ty.data {
                     ast::UberStateType::Boolean => value.parse().ok().map(Literal::Boolean),

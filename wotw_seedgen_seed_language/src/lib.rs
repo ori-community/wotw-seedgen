@@ -3,6 +3,7 @@ pub use wotw_seedgen_data as data;
 
 pub mod ast;
 pub mod compile;
+pub mod metadata;
 pub mod output;
 
 mod token;

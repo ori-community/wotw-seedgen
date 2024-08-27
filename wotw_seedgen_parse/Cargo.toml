@@ -10,7 +10,7 @@ ordered_float = ["ordered-float"]
 wotw_seedgen_derive = { path = "../wotw_seedgen_derive" }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets" }
 logos = { version = "0.13", optional = true }
-itertools = "0.12"
+itertools = "0.13"
 ariadne = { version = "0.3", optional = true }
 derivative = "2.2"
 ordered-float = { version = "4.2", optional = true }

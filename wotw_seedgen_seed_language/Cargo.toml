@@ -8,7 +8,7 @@ wotw_seedgen_parse = { package = "wotw_seedgen_parse", path = "../wotw_seedgen_p
 wotw_seedgen_data = { path = "../wotw_seedgen_data", features = ["serde", "strum"] }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["uber_state_data", "snippet_access"] }
 logos = "0.13"
-itertools = "0.12"
+itertools = "0.13"
 rustc-hash = "1.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_repr = "0.1"

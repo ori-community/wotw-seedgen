@@ -123,9 +123,17 @@ impl FileAccess {
                     .flatten()
                     .map(|entry| entry.file_name())
                     .filter(|file_name| Path::new(file_name).extension() == Some(extension))
-                    .map(|file_name| file_name.to_string_lossy().to_string()),
+                    .map(|file_name| {
+                        Path::new(&file_name)
+                            .file_stem()
+                            .unwrap_or_default()
+                            .to_string_lossy()
+                            .to_string()
+                    }),
             );
         }
+
+        files.sort_unstable();
 
         Ok(files)
     }

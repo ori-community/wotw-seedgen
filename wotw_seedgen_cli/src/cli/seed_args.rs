@@ -17,7 +17,8 @@ use std::{
 use strum::VariantNames;
 use wotw_seedgen::assets::{PresetInfo, UniversePreset, WorldPreset};
 use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
-use wotw_seedgen_assets::{FileAccess, PresetAccess};
+use wotw_seedgen_assets::{FileAccess, PresetAccess, SnippetAccess};
+use wotw_seedgen_seed_language::metadata::Metadata;
 
 #[derive(Args, Debug, Default)]
 pub struct SeedArgs {
@@ -48,6 +49,7 @@ impl Args for SeedSettings {
     }
     fn augment_args(cmd: clap::Command) -> clap::Command {
         let preset_access = files::preset_access("").unwrap_or_else(|_| FileAccess::new([""]));
+        let available_snippets = available_snippets();
 
         cmd.group(ArgGroup::new("seed_settings").multiple(true))
             .arg(
@@ -63,7 +65,7 @@ impl Args for SeedSettings {
                     .group("seed_settings")
                     .long("universe-presets")
                     .short('P')
-                    .value_name("NAMES")
+                    .value_name("NAME")
                     .num_args(1..)
                     .help("Universe presets to include")
                     .long_help(preset_help(
@@ -96,7 +98,7 @@ impl Args for SeedSettings {
                     .group("seed_settings")
                     .long("world-presets")
                     .short('p')
-                    .value_name("NAMES")
+                    .value_name("NAME")
                     .num_args(1..)
                     .value_parser(value_parser!(WorldScopedArg<String>))
                     .action(ArgAction::Append)
@@ -180,12 +182,12 @@ impl Args for SeedSettings {
                     .group("seed_settings")
                     .long("snippets")
                     .short('s')
-                    .value_name("NAMES")
+                    .value_name("NAME")
                     .num_args(1..)
                     .value_parser(value_parser!(WorldScopedArg<String>))
                     .action(ArgAction::Append)
                     .help("Snippets to use")
-                    .long_help(""), // TODO
+                    .long_help(snippets_help(&available_snippets)),
             )
             .arg(
                 Arg::new("snippet_config")
@@ -204,7 +206,8 @@ impl Args for SeedSettings {
         Self::augment_args(cmd)
     }
 }
-fn preset_help<F>(available_presets: &[String], kind: &str, mut f: F) -> String
+
+fn preset_help<F>(available_presets: &[String], kind: &str, mut get_description: F) -> String
 where
     F: FnMut(&str) -> Result<Option<PresetInfo>, String>,
 {
@@ -219,30 +222,93 @@ where
         write!(
             help,
             ":\n{}",
-            available_presets
-                .iter()
-                .map(|identifier| {
-                    let description = match f(identifier) {
-                        Ok(info) => match info {
-                            None => "no details provided by preset".to_string(),
-                            Some(info) => info
-                                .description
-                                .unwrap_or_else(|| "no description provided by preset".to_string()),
-                        },
-                        Err(err) => format!("failed to read details: {err}"),
-                    };
-                    format!(
-                        "    {literal}{identifier}{reset}: {description}",
-                        literal = LITERAL.render(),
-                        reset = Reset.render(),
-                    )
-                })
-                .format("\n")
+            available_presets.iter().format_with("\n", |identifier, f| {
+                let description = match get_description(identifier) {
+                    Ok(info) => match info {
+                        None => "no details provided by preset".to_string(),
+                        Some(info) => info
+                            .description
+                            .map(|description| description.replace('\n', "\n        "))
+                            .unwrap_or_else(|| "no description provided by preset".to_string()),
+                    },
+                    Err(err) => format!("failed to read details: {err}"),
+                };
+                f(&format_args!(
+                    "    {literal}{identifier}{reset}: {description}",
+                    literal = LITERAL.render(),
+                    reset = Reset.render(),
+                ))
+            })
         )
         .unwrap();
     }
     help // TODO how create
 }
+fn available_snippets() -> Vec<(String, Metadata)> {
+    let snippet_access =
+        files::snippet_access("").unwrap_or_else(|_| FileAccess::new(["", "snippets"]));
+    let mut available_snippets = snippet_access
+        .available_snippets()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|identifier| {
+            let metadata = snippet_access
+                .read_snippet(&identifier)
+                .map(|source| Metadata::from_source(&source.content))
+                .unwrap_or_default();
+            (identifier, metadata)
+        })
+        .filter(|(_, metadata)| !metadata.hidden)
+        .collect::<Vec<_>>();
+    available_snippets
+        .sort_unstable_by(|a, b| a.1.category.cmp(&b.1.category).then_with(|| a.0.cmp(&b.0)));
+    available_snippets
+}
+fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
+    let mut help = format!(
+        "Snippets can modify seed generation in many ways.\n\
+        All wotws files in the 'snippets' folder inside the current directory or seedgen's directory are available\n\
+        See the official documentation for information on how to write your own snippets: https://docs.wotw.orirando.com/docs/seedlang\n\n\
+        Currently {} snippets are available",
+        available_snippets.len(),
+    );
+    if !available_snippets.is_empty() {
+        write!(
+            help,
+            ":\n{}",
+            available_snippets
+                .iter()
+                .chunk_by(|(_, metadata)| &metadata.category)
+                .into_iter()
+                .format_with("\n", |(category, snippets), f| {
+                    let category = category
+                        .as_ref()
+                        .map(String::as_str)
+                        .unwrap_or("No category");
+                    f(&format_args!(
+                        "    {category}:\n{}",
+                        snippets.format_with("\n", |(identifier, metadata), f| {
+                            let description = metadata
+                                .description
+                                .as_ref()
+                                .map(|description| description.replace('\n', "\n            "))
+                                .unwrap_or_else(|| {
+                                    "no description provided by snippet".to_string()
+                                });
+                            f(&format_args!(
+                                "        {literal}{identifier}{reset}: {description}",
+                                literal = LITERAL.render(),
+                                reset = Reset.render(),
+                            ))
+                        }),
+                    ))
+                })
+        )
+        .unwrap();
+    }
+    help
+}
+
 #[derive(Clone)]
 enum WorldScopedArg<T> {
     WorldScope(usize),

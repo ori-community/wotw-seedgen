@@ -147,7 +147,7 @@ fn analyze_existing_seeds<F: SeedStorageAccess>(
     let mut existing = HandleErrors::new_print_errors(F::read_seeds(settings, sample_size)?);
     let mut existing_amount = 0;
 
-    for seed in existing.by_ref() {
+    for seed in &mut existing {
         existing_amount += 1;
         analyze_seed(&seed, analyzers, data);
     }

@@ -23,7 +23,7 @@ log = { version = "0.4", optional = true }
 smallvec = { version = "1.6", features = ["const_generics"] }
 ordered-float = "4.2"
 partition = "0.1"
-itertools = "0.12"
+itertools = "0.13"
 strum = { version = "0.25", features = ["derive"] }
 
 [dev-dependencies]
