@@ -46,27 +46,3 @@ pub(crate) use world::{filter_redundancies, node_condition, node_trigger};
 // TODO use this and also set the other metadata: current world, format version, settings
 // TODO look into having the commit hash again
 pub const VERSION: &str = concat!(env!("CARGO_PKG_VERSION"));
-
-mod log {
-    macro_rules! trace {
-        ($($arg:tt)+) => {{
-            #[cfg(any(feature = "log", test))]
-            ::log::trace!($($arg)+)
-        }}
-    }
-    pub(crate) use trace;
-    macro_rules! info {
-        ($($arg:tt)+) => {{
-            #[cfg(any(feature = "log", test))]
-            ::log::info!($($arg)+)
-        }}
-    }
-    pub(crate) use info;
-    macro_rules! warning {
-        ($($arg:tt)+) => {{
-            #[cfg(any(feature = "log", test))]
-            ::log::warn!($($arg)+)
-        }}
-    }
-    pub(crate) use warning; // warn is a built in attribute
-}

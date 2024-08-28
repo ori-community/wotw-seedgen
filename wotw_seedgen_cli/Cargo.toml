@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-wotw_seedgen = { version = "0.4", path = "../wotw_seedgen", features = ["log"] }
+wotw_seedgen = { version = "0.4", path = "../wotw_seedgen" }
 wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language" }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["presets", "file_access"] }
 wotw_seedgen_stats = { version = "0.1", path = "../wotw_seedgen_stats" }

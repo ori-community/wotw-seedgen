@@ -8,12 +8,9 @@ mod string_placeholders;
 
 use self::spoiler::SeedSpoiler;
 use crate::{
-    generator::placement::generate_placements,
-    log::{info, trace, warning},
-    logical_difficulty,
-    world::World,
-    UberStates,
+    generator::placement::generate_placements, logical_difficulty, world::World, UberStates,
 };
+use log::{info, trace, warn};
 use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
@@ -76,7 +73,7 @@ pub fn generate_seed<F: SnippetAccess>(
             .map(|(world_settings, output)| {
                 let spawn = choose_spawn(graph, world_settings, &mut rng)?;
                 if output.spawn.is_some() {
-                    warning!("A Snippet attempted to set spawn");
+                    warn!("A Snippet attempted to set spawn");
                 }
                 let mut output = output.clone();
                 // TODO something less specialized?
@@ -109,8 +106,7 @@ pub fn generate_seed<F: SnippetAccess>(
 
                 return Ok(seed);
             }
-            #[cfg_attr(not(feature = "log"), allow(unused_variables))]
-            Err(err) => warning!("{err}"),
+            Err(err) => warn!("{err}"),
         }
     }
 

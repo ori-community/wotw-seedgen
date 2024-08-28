@@ -1,6 +1,6 @@
 // TODO why is this in a directory?
 
-use crate::log::warning;
+use log::warn;
 use ordered_float::OrderedFloat;
 use rustc_hash::{FxHashMap, FxHashSet};
 use std::cmp::Ordering;
@@ -71,7 +71,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Boolean(value) => value,
             _ => {
-                warning!("Attempted to access {self} UberState as Boolean");
+                warn!("Attempted to access {self} UberState as Boolean");
                 Default::default()
             }
         }
@@ -80,7 +80,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Integer(value) => value,
             _ => {
-                warning!("Attempted to access {self} UberState as Integer");
+                warn!("Attempted to access {self} UberState as Integer");
                 Default::default()
             }
         }
@@ -89,7 +89,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Float(value) => value,
             _ => {
-                warning!("Attempted to access {self} UberState as Float");
+                warn!("Attempted to access {self} UberState as Float");
                 Default::default()
             }
         }
@@ -131,7 +131,7 @@ impl UberStates {
     pub fn register_trigger(&mut self, trigger: &Trigger) {
         for uber_identifier in contained_uber_identifiers(trigger) {
             match self.states.get_mut(&uber_identifier) {
-                None => warning!("Trigger contained unknown UberState {uber_identifier}"),
+                None => warn!("Trigger contained unknown UberState {uber_identifier}"),
                 Some(entry) => {
                     entry.triggers.insert(self.registered_triggers);
                 }
@@ -150,7 +150,7 @@ impl UberStates {
     ) -> impl Iterator<Item = usize> + '_ {
         match self.states.get_mut(&uber_identifier) {
             None => {
-                warning!("Attempted to write to unknown UberState {uber_identifier}");
+                warn!("Attempted to write to unknown UberState {uber_identifier}");
                 self.fallback.triggers.iter().copied()
             }
             Some(entry) => {
@@ -167,7 +167,7 @@ impl UberStates {
     pub fn get(&self, uber_identifier: UberIdentifier) -> UberStateValue {
         match self.states.get(&uber_identifier) {
             None => {
-                warning!("Attempted to read from unknown UberState {uber_identifier}");
+                warn!("Attempted to read from unknown UberState {uber_identifier}");
                 self.fallback.value
             }
             Some(entry) => entry.value,

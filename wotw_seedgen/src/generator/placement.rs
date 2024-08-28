@@ -6,14 +6,13 @@ use crate::{
     common_item::CommonItem,
     filter_redundancies,
     inventory::Inventory,
-    log::{trace, warning},
     node_condition, node_trigger,
     orbs::OrbVariants,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerPlacement},
     World,
 };
 use itertools::Itertools;
-#[cfg(any(feature = "log", test))]
+use log::{trace, warn};
 use ordered_float::OrderedFloat;
 use rand::{
     distributions::Uniform,
@@ -101,10 +100,8 @@ pub struct WorldContext<'graph, 'settings> {
     pub world: World<'graph, 'settings>,
     pub output: IntermediateOutput,
     /// world index of this world
-    #[cfg_attr(not(any(feature = "log", test)), allow(unused))]
     index: usize,
     /// ready-made string for referencing this world in the log
-    #[cfg_attr(not(any(feature = "log", test)), allow(unused))]
     log_index: String,
     /// remaining items to place
     item_pool: ItemPool,
@@ -247,7 +244,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
             let item_pool_keystones = world_context.item_pool.inventory().keystones;
             if item_pool_keystones < missing_keystones {
-                warning!("Need to place {missing_keystones} to avoid keylocks, but the item pool only has {item_pool_keystones} left. Placing regardless", );
+                warn!("Need to place {missing_keystones} to avoid keylocks, but the item pool only has {item_pool_keystones} left. Placing regardless");
             } else {
                 trace!(
                     "{}Placing {missing_keystones} keystones to avoid keylocks",
@@ -346,22 +343,19 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
         trace!(
             "Unable to find any possible forced progression\n{}",
-            self.worlds
-                .iter()
-                .map(|world_context| {
-                    format!(
-                        "{}{} unreached locations: {}\nwith these items: {}",
-                        world_context.log_index,
-                        world_context.needs_placement.len(),
-                        world_context
-                            .needs_placement
-                            .iter()
-                            .map(|node| node.identifier())
-                            .format(", "),
-                        world_context.world.player.inventory,
-                    )
-                })
-                .format("\n")
+            self.worlds.iter().format_with("\n", |world_context, f| {
+                f(&format_args!(
+                    "{index}{len} unreached locations: {identifiers}\nwith these items: {inventory}",
+                    index = world_context.log_index,
+                    len = world_context.needs_placement.len(),
+                    identifiers = world_context
+                        .needs_placement
+                        .iter()
+                        .map(|node| node.identifier())
+                        .format(", "),
+                    inventory = world_context.world.player.inventory,
+                ))
+            })
         );
 
         self.flush_item_pool()?;
@@ -459,19 +453,17 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             None => {
                 if origin_world.spawn_slots > 0 {
                     origin_world.spawn_slots -= 1;
-                    #[cfg(any(feature = "log", test))]
-                    let name = self.worlds[target_world_index].log_name(&command);
                     trace!(
-                        "Placing {}{name} at {}Spawn",
-                        self.worlds[target_world_index].log_index,
-                        self.worlds[origin_world_index].log_index
+                        "Placing {target_index}{name} at {origin_index}Spawn",
+                        name = self.worlds[target_world_index].log_name(&command),
+                        target_index = self.worlds[target_world_index].log_index,
+                        origin_index = self.worlds[origin_world_index].log_index
                     );
                 } else {
-                    #[cfg(any(feature = "log", test))]
-                    let name = self.worlds[target_world_index].log_name(&command);
-                    warning!(
-                        "Not enough space to place {}{name}, placing at Spawn despite already having too many spawn items",
-                        self.worlds[target_world_index].log_index,
+                    warn!(
+                        "Not enough space to place {target_index}{name}, placing at Spawn despite already having too many spawn items",
+                        name = self.worlds[target_world_index].log_name(&command),
+                        target_index = self.worlds[target_world_index].log_index,
                     );
                 }
                 self.write_placement_spoiler(
@@ -571,13 +563,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         origin_world_index: usize,
         target_world_index: usize,
     ) {
-        #[cfg(any(feature = "log", test))]
         let log_name = self.worlds[target_world_index].log_name(&command);
         trace!(
-            "Placing {}{log_name} at {}{}",
-            self.worlds[target_world_index].log_index,
-            self.worlds[origin_world_index].log_index,
-            node.identifier()
+            "Placing {target_index}{log_name} at {origin_index}{node}",
+            target_index = self.worlds[target_world_index].log_index,
+            origin_index = self.worlds[origin_world_index].log_index,
+            node = node.identifier()
         );
 
         // TODO spoiler icons for snippet-placed items
@@ -756,10 +747,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     .collect::<Vec<_>>()
             });
             if nodes.is_empty() {
-                // TODO maybe remove the log feature gate
-                #[cfg(any(feature = "log", test))]
                 let name = self.log_name(&command);
-                warning!(
+                warn!(
                     "{}Failed to preplace {name} in {zone} since no free placement location was available",
                     self.log_index
                 );
@@ -775,9 +764,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         let command = compile::spirit_light(CommandInteger::Constant { value: 1 }, &mut self.rng);
         if self.needs_placement.is_empty() {
-            #[cfg(any(feature = "log", test))]
             let name = self.log_name(&command);
-            warning!(
+            warn!(
                 "{}Failed to preplace {name} since no free placement location was available",
                 self.log_index
             );
@@ -891,7 +879,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         // TODO is it desirable to filter here again? they have already been filterer per-solutions-call
         filter_redundancies(&mut progressions);
 
-        #[cfg_attr(not(any(feature = "log", test)), allow(unused_mut))]
         let mut weights = progressions
             .iter()
             .enumerate()
@@ -923,22 +910,23 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             })
             .collect::<Vec<_>>();
 
-        #[cfg(any(feature = "log", test))]
-        {
-            weights.sort_unstable_by(|(_, a), (_, b)| OrderedFloat(*b).cmp(&OrderedFloat(*a)));
-            let weight_sum = weights.iter().map(|(_, weight)| weight).sum::<f32>();
-            let options = weights.iter().map(|(index, weight)| {
-                let inventory = &progressions[*index];
-                let chance = (*weight / weight_sum) * 100.;
-                format!("- {chance:.1}%: {inventory}")
-            });
-            trace!(
-                "{}{} options for forced progression:\n{}",
-                self.log_index,
-                weights.len(),
-                options.format("\n")
-            );
-        }
+        // seedgen output should remain the same whether logging is enabled or not, so we sort even if logging is disabled
+        weights.sort_unstable_by(|(_, a), (_, b)| OrderedFloat(*b).cmp(&OrderedFloat(*a)));
+        trace!(
+            "{}{} options for forced progression:\n{}",
+            self.log_index,
+            weights.len(),
+            {
+                let weight_sum = weights.iter().map(|(_, weight)| weight).sum::<f32>();
+                progressions.iter().zip(&weights).format_with(
+                    "\n",
+                    move |(inventory, (_, weight)), f| {
+                        let chance = (*weight / weight_sum) * 100.;
+                        f(&format_args!("- {chance:.1}%: {inventory}"))
+                    },
+                )
+            }
+        );
 
         let index = weights
             .choose_weighted(&mut self.rng, |(_, weight)| *weight)
@@ -1044,7 +1032,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             })
             .unwrap_or_else(|| {
                 let value = command.to_string();
-                warning!("No name specified for custom command: {value}");
+                warn!("No name specified for custom command: {value}");
                 value
             })
     }
@@ -1131,11 +1119,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let command = if is_shop {
                 // TODO try to avoid
                 let command = compile::gorlek_ore();
-                #[cfg(any(feature = "log", test))]
-                let name = self.log_name(&command);
-                warning!(
-                    "{}Placing more {name} than intended to avoid placing Spirit Light in a shop",
-                    self.log_index
+                warn!(
+                    "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
+                    name = self.log_name(&command),
+                    index = self.log_index,
                 );
                 command
             } else {
@@ -1157,9 +1144,12 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
-        #[cfg(any(feature = "log", test))]
-        let name = self.log_name(&command);
-        trace!("{}Placing {name} at {}", self.log_index, node.identifier());
+        trace!(
+            "{index}Placing {name} at {node}",
+            name = self.log_name(&command),
+            index = self.log_index,
+            node = node.identifier()
+        );
         let uber_identifier = node.uber_identifier().unwrap();
         if uber_identifier.is_shop() {
             self.shop_item_data(&command, uber_identifier, self.name(&command))
@@ -1211,7 +1201,7 @@ pub fn command_name(command: &CommandVoid, item_metadata: &ItemMetadata) -> Comm
         .or_else(|| find_message(command).cloned())
         .unwrap_or_else(|| {
             let value = command.to_string();
-            warning!("No name specified for custom command: {value}");
+            warn!("No name specified for custom command: {value}");
             CommandString::Constant {
                 value: value.into(),
             }
