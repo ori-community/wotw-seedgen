@@ -6,6 +6,7 @@ use crate::{
     output::{
         intermediate::Literal, CommandVoid, Event, ItemMetadataEntry, StringOrPlaceholder, Trigger,
     },
+    types::InferType,
 };
 use ast::ClientEvent;
 use ordered_float::OrderedFloat;
@@ -320,7 +321,12 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        self.description.evaluate::<String>(compiler);
+        if self.default.data.infer_type(compiler) != Some(self.ty.data.into()) {
+            compiler.errors.push(Error::custom(
+                format!("expected {}", self.ty.data),
+                self.default.span,
+            ));
+        }
 
         let config = compiler
             .global
@@ -328,12 +334,12 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
             .get(&compiler.identifier)
             .and_then(|config| config.get(self.identifier.data.0));
         let value = match config {
-            None => self.default.evaluate(compiler), // TODO typecheck?
+            None => self.default.data.compile(compiler),
             Some(value) => {
                 let parsed = match self.ty.data {
-                    ast::UberStateType::Boolean => value.parse().ok().map(Literal::Boolean),
-                    ast::UberStateType::Integer => value.parse().ok().map(Literal::Integer),
-                    ast::UberStateType::Float => value.parse().ok().map(Literal::Float),
+                    ast::ConfigType::Boolean => value.parse().ok().map(Literal::Boolean),
+                    ast::ConfigType::Integer => value.parse().ok().map(Literal::Integer),
+                    ast::ConfigType::Float => value.parse().ok().map(Literal::Float),
                 };
                 if parsed.is_none() {
                     compiler.errors.push(Error::custom(

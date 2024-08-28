@@ -422,14 +422,14 @@ pub struct Config;
 pub struct ConfigArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub comma: Symbol<','>,
-    pub description: Expression<'source>,
+    pub description: Spanned<&'source str>,
     pub comma_2: Symbol<','>,
-    pub ty: Spanned<UberStateType>,
+    pub ty: Spanned<ConfigType>,
     pub comma_3: Symbol<','>,
-    pub default: Expression<'source>,
+    pub default: Spanned<Literal<'source>>,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display)]
-pub enum UberStateType {
+pub enum ConfigType {
     Boolean,
     Integer,
     Float,
@@ -442,6 +442,12 @@ pub struct StateArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub comma: Symbol<','>,
     pub ty: Spanned<UberStateType>,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display)]
+pub enum UberStateType {
+    Boolean,
+    Integer,
+    Float,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]

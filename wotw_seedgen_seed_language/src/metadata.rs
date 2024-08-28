@@ -1,6 +1,9 @@
+use crate::{
+    ast::{self, ConfigType},
+    output::intermediate::Literal,
+};
+use rustc_hash::FxHashMap;
 use wotw_seedgen_parse::Recoverable;
-
-use crate::ast;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Metadata {
@@ -8,6 +11,13 @@ pub struct Metadata {
     pub name: Option<String>,
     pub category: Option<String>,
     pub description: Option<String>,
+    pub config: FxHashMap<String, ConfigValue>,
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConfigValue {
+    pub description: String,
+    pub ty: ConfigType,
+    pub default: Literal,
 }
 
 impl Metadata {
@@ -54,6 +64,7 @@ impl ExtractMetadata for ast::Content<'_> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
         match self {
             ast::Content::Annotation(_, annotation) => annotation.extract_metadata(metadata),
+            ast::Content::Command(_, command) => command.extract_metadata(metadata),
             _ => {}
         }
     }
@@ -79,6 +90,32 @@ impl ExtractMetadata for ast::Annotation<'_> {
                     metadata.description = Some(description.data.to_string());
                 }
             }
+        }
+    }
+}
+impl ExtractMetadata for ast::Command<'_> {
+    fn extract_metadata(&self, metadata: &mut Metadata) {
+        match self {
+            ast::Command::Config(_, args) => {
+                if let Some(config) = extract_args(args) {
+                    let default = match config.default.data {
+                        ast::Literal::Boolean(value) => Literal::Boolean(value),
+                        ast::Literal::Integer(value) => Literal::Integer(value),
+                        ast::Literal::Float(value) => Literal::Float(value),
+                        _ => return,
+                    };
+
+                    let value = ConfigValue {
+                        description: config.description.data.to_string(),
+                        ty: config.ty.data,
+                        default,
+                    };
+                    metadata
+                        .config
+                        .insert(config.identifier.data.to_string(), value);
+                }
+            }
+            _ => {}
         }
     }
 }

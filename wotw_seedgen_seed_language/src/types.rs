@@ -1,7 +1,7 @@
 use crate::{
     ast::{
-        Action, Constant, Expression, ExpressionValue, FunctionCall, Literal, Operation, Operator,
-        UberStateType,
+        Action, ConfigType, Constant, Expression, ExpressionValue, FunctionCall, Literal,
+        Operation, Operator, UberStateType,
     },
     compile::{FunctionIdentifier, SnippetCompiler},
     output::intermediate::{self, ConstantDiscriminants},
@@ -43,6 +43,15 @@ pub enum Type {
     Trigger,
     Expression,
     Void,
+}
+impl From<ConfigType> for Type {
+    fn from(value: ConfigType) -> Self {
+        match value {
+            ConfigType::Boolean => Type::Boolean,
+            ConfigType::Integer => Type::Integer,
+            ConfigType::Float => Type::Float,
+        }
+    }
 }
 impl From<UberStateType> for Type {
     fn from(value: UberStateType) -> Self {

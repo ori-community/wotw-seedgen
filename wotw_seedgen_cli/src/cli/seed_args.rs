@@ -26,6 +26,7 @@ pub struct SeedArgs {
     pub settings: SeedSettings,
     #[command(flatten)]
     pub generation_args: GenerationArgs,
+    /// Write a detailed log into seedgen_log.txt
     #[arg(short, long)]
     pub verbose: bool,
 }
@@ -199,7 +200,7 @@ impl Args for SeedSettings {
                     .value_parser(value_parser!(WorldScopedArg<SnippetConfigArg>))
                     .action(ArgAction::Append)
                     .help("Configuration to pass to snippets")
-                    .long_help(""), // TODO
+                    .long_help(snippet_config_help(&available_snippets)),
             )
     }
     fn augment_args_for_update(cmd: clap::Command) -> clap::Command {
@@ -215,8 +216,9 @@ where
     let mut help = format!(
         "{kind} presets can define an entire multiworld setup, including worlds with different settings\n\
         All json files in the '{kind_lower}_presets' folder in the current working directory are available\n\n\
-        Currently {} {kind_lower} presets are available",
+        Currently {} {kind_lower} preset{} available",
         available_presets.len(),
+        if available_presets.len() == 1 { " is" } else { "s are" }
     );
     if !available_presets.is_empty() {
         write!(
@@ -269,8 +271,9 @@ fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
         "Snippets can modify seed generation in many ways.\n\
         All wotws files in the 'snippets' folder inside the current directory or seedgen's directory are available\n\
         See the official documentation for information on how to write your own snippets: https://docs.wotw.orirando.com/docs/seedlang\n\n\
-        Currently {} snippets are available",
+        Currently {} snippet{} available",
         available_snippets.len(),
+        if available_snippets.len() == 1 { " is" } else { "s are" }
     );
     if !available_snippets.is_empty() {
         write!(
@@ -305,6 +308,32 @@ fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
                 })
         )
         .unwrap();
+    }
+    help
+}
+fn snippet_config_help(available_snippets: &[(String, Metadata)]) -> String {
+    let mut help = format!(
+        "Many snippets offer additional settings to customize their behaviour.\n\
+        These will only have an effect if you use the respective snippet.\n\
+        For instance, you can remove black market keystones, but keep black market ore by setting {literal}black_market.keystones=false{reset}",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+    );
+    if !available_snippets.is_empty() {
+        let _ = write!(help, "\nCurrently these configurations are available:");
+
+        for (snippet_identifier, metadata) in available_snippets {
+            for (config_identifier, config_value) in &metadata.config {
+                let _ = write!(
+                    help,
+                    "\n    {literal}{snippet_identifier}.{config_identifier}{reset}: {description} [default: {default}]",
+                    literal = LITERAL.render(),
+                    reset = Reset.render(),
+                    description = config_value.description,
+                    default = config_value.default,
+                );
+            }
+        }
     }
     help
 }
