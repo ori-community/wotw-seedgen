@@ -1,4 +1,3 @@
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
 
@@ -6,8 +5,7 @@ use std::fmt::{self, Display};
 ///
 /// UberStates make up most of the save file format; every world state is associated with an UberState which may hold data, usually a single boolean or number.
 /// The `UberIdentifier` is the unique identifier for a given UberState
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub struct UberIdentifier {
     pub group: i32,
     pub member: i32,

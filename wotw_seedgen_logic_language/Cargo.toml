@@ -6,8 +6,8 @@ edition = "2021"
 [dependencies]
 wotw_seedgen_parse = { path = "../wotw_seedgen_parse", features = ["ordered_float"] }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["loc_data", "state_data"] }
-wotw_seedgen_data = { path = "../wotw_seedgen_data", features = ["strum"] }
-wotw_seedgen_settings = { path = "../wotw_seedgen_settings", features = ["strum"] }
+wotw_seedgen_data = { path = "../wotw_seedgen_data" }
+wotw_seedgen_settings = { path = "../wotw_seedgen_settings" }
 smallvec = "1.11"
 logos = "0.14"
 rustc-hash = "2.0"

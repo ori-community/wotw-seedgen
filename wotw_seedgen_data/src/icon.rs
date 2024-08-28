@@ -1,12 +1,21 @@
-#[cfg(feature = "serde")]
 use serde_repr::{Deserialize_repr, Serialize_repr};
-#[cfg(feature = "strum")]
 use strum::{Display, EnumString};
 
 /// Icons used in the Opher shop
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum OpherIcon {
     Sentry = 0,
@@ -23,9 +32,20 @@ pub enum OpherIcon {
     FastTravel = 11,
 }
 /// Icons used in the Lupo shop
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum LupoIcon {
     EnergyFragmentsMap = 0,
@@ -33,9 +53,20 @@ pub enum LupoIcon {
     ShardsMap = 2,
 }
 /// Icons used in the Grom shop
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum GromIcon {
     RepairTheSpiritWell = 0,
@@ -47,9 +78,20 @@ pub enum GromIcon {
     TheGorlekTouch = 6,
 }
 /// Icons used in the Tuley shop
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum TuleyIcon {
     SelaFlowers = 0,
@@ -61,9 +103,20 @@ pub enum TuleyIcon {
 }
 // should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Core/enums/map_icon.h
 /// Icons used in the map
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum MapIcon {
     Keystone = 0,

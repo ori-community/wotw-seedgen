@@ -1,6 +1,5 @@
 pub use wotw_seedgen_data as data;
 pub use wotw_seedgen_seed_language as seed_language;
-pub use wotw_seedgen_settings as settings;
 
 pub mod assembly;
 

@@ -1,16 +1,26 @@
 use crate::UberIdentifier;
-#[cfg(feature = "serde")]
 use serde_repr::{Deserialize_repr, Serialize_repr};
-#[cfg(feature = "strum")]
 use strum::{Display, EnumString, FromRepr};
 
 /// Spirit Shards
 ///
 /// Currently excludes unused shards
 // TODO ^ why?
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString, FromRepr))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+    FromRepr,
+)]
 #[repr(u8)]
 pub enum Shard {
     Overcharge = 1,
@@ -67,7 +77,6 @@ impl Shard {
         UberIdentifier::new(25, self as i32)
     }
     /// Returns the `Shard` corresponsing to the [`UberIdentifier`], if one exists
-    #[cfg(feature = "strum")]
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         const MIN: i32 = u8::MIN as i32;
         const MAX: i32 = u8::MAX as i32;

@@ -1,15 +1,23 @@
 use std::fmt::{self, Display};
 
 use crate::{uber_identifier::teleporter, UberIdentifier};
-#[cfg(feature = "serde")]
 use serde_repr::{Deserialize_repr, Serialize_repr};
-#[cfg(feature = "strum")]
 use strum::EnumString;
 
 /// Spirit Wells which exist in the base game
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum Teleporter {
     Marsh = 16,

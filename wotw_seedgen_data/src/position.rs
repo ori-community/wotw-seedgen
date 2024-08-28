@@ -1,11 +1,9 @@
 use ordered_float::OrderedFloat;
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
 
 /// `x`/`y` position
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Deserialize, Serialize)]
 pub struct Position {
     pub x: OrderedFloat<f32>,
     pub y: OrderedFloat<f32>,

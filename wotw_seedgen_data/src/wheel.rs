@@ -1,12 +1,21 @@
-#[cfg(feature = "serde")]
 use serde_repr::{Deserialize_repr, Serialize_repr};
-#[cfg(feature = "strum")]
 use strum::{Display, EnumString};
 
 /// Positioning in a weapon wheel like menu
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum WheelItemPosition {
     Top = 0,
@@ -23,9 +32,20 @@ pub enum WheelItemPosition {
     TopLeft = 11,
 }
 /// Possible input configurations for an item in a weapon wheel like menu
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum WheelBind {
     All = 0,

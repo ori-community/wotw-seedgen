@@ -1,5 +1,4 @@
 use rustc_hash::{FxHashMap, FxHashSet};
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::iter;
 use wotw_seedgen_settings::{Difficulty, Spawn, Trick, UniverseSettings, WorldSettings};
@@ -32,28 +31,24 @@ use wotw_seedgen_settings::{Difficulty, Spawn, Trick, UniverseSettings, WorldSet
 /// ```
 ///
 /// [`UniverseSettings`]: wotw_seedgen_settings::UniverseSettings
-#[derive(Debug, Default, Clone, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(Serialize, Deserialize),
-    serde(rename_all = "camelCase")
-)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UniversePreset {
     /// User-targetted information about the preset
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
     /// Names of further [`UniversePreset`]s to use
     ///
     /// A [`PresetAccess::universe_preset`] implementation may be used to resolve the identifiers
     ///
     /// [`PresetAccess::universe_preset`]: crate::PresetAccess::universe_preset
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<FxHashSet<String>>,
     /// The seed that determines all randomness
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub seed: Option<String>,
     /// The individual settings for each world of the seed
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub world_settings: Option<Vec<WorldPreset>>,
 }
 
@@ -192,64 +187,55 @@ fn include_world_preset<A: PresetAccess>(
 /// ```
 ///
 /// [`WorldSettings`]: wotw_seedgen_settings::WorldSettings
-#[derive(Debug, Default, Clone, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(Serialize, Deserialize),
-    serde(rename_all = "camelCase")
-)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 // TODO replace hashsets with vecs?
 pub struct WorldPreset {
     /// User-targetted information about the preset
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
     /// Names of further [`WorldPreset`]s to use
     ///
     /// A [`PresetAccess::world_preset`] implementation may be used to resolve the identifiers
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<FxHashSet<String>>,
     /// Spawn location
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spawn: Option<Spawn>,
     /// Logically expected difficulty
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub difficulty: Option<Difficulty>,
     /// Logically expected tricks
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tricks: Option<FxHashSet<Trick>>,
     /// Logically assume hard in-game difficulty
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hard: Option<bool>,
     /// Names of snippets to use
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub snippets: Option<Vec<String>>,
     /// Configuration to pass to snippets
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub snippet_config: Option<FxHashMap<String, FxHashMap<String, String>>>,
 }
 
 /// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
-#[derive(Debug, Default, Clone, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(Serialize, Deserialize),
-    serde(rename_all = "camelCase")
-)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PresetInfo {
     /// Display name
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// Extended description
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     /// Where to present the preset
-    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<PresetGroup>,
 }
 
 /// Special groups to display a preset in
-#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PresetGroup {
     /// Generally, only one base preset will be used at a time.
     ///

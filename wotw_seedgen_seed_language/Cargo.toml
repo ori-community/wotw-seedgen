@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 wotw_seedgen_parse = { package = "wotw_seedgen_parse", path = "../wotw_seedgen_parse", features = ["ordered_float", "logos", "ariadne"] }
-wotw_seedgen_data = { path = "../wotw_seedgen_data", features = ["serde", "strum"] }
+wotw_seedgen_data = { path = "../wotw_seedgen_data" }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["uber_state_data", "snippet_access"] }
 logos = "0.14"
 itertools = "0.13"

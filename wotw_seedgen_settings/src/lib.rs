@@ -14,9 +14,7 @@
 //! [`VariantNames`]: strum::VariantNames
 
 use rustc_hash::{FxHashMap, FxHashSet};
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "strum")]
 use strum::{Display, EnumString, VariantNames};
 
 /// A representation of all the relevant settings when generating a seed
@@ -35,12 +33,8 @@ use strum::{Display, EnumString, VariantNames};
 /// assert_eq!(universe_settings.world_settings[0], WorldSettings::default());
 /// assert_eq!(universe_settings.seed, "seed");
 /// ```
-#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(Serialize, Deserialize),
-    serde(rename_all = "camelCase")
-)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UniverseSettings {
     /// The seed that determines all randomness
     pub seed: String,
@@ -67,12 +61,8 @@ impl UniverseSettings {
 /// Seed settings bound to a specific world of a seed
 ///
 /// See the [Multiplayer wiki page](https://wiki.orirando.com/features/multiplayer) for an explanation of worlds
-#[derive(Debug, Default, Clone, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(Serialize, Deserialize),
-    serde(rename_all = "camelCase")
-)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WorldSettings {
     /// Spawn destination
     pub spawn: Spawn,
@@ -96,8 +86,7 @@ impl WorldSettings {
 }
 
 /// The Spawn location, which may either be fixed or randomly decided during seed generation
-#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Spawn {
     /// Spawn in a specific location, described by the anchor name from the logic file
     Set(String),
@@ -119,13 +108,22 @@ impl Default for Spawn {
 /// Difficulties don't include glitches by default, these are handled separately with [`Trick`]s
 ///
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(
-    feature = "strum",
-    derive(Display, EnumString, VariantNames),
-    strum(serialize_all = "lowercase")
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Default,
+    Serialize,
+    Deserialize,
+    Display,
+    EnumString,
+    VariantNames,
 )]
+#[strum(serialize_all = "lowercase")]
 pub enum Difficulty {
     #[default]
     Moki,
@@ -139,9 +137,19 @@ pub enum Difficulty {
 /// This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting
 ///
 /// See the [Paths wiki page](https://wiki.orirando.com/seedgen/paths) for more information
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString, VariantNames))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    Display,
+    EnumString,
+    VariantNames,
+)]
 pub enum Trick {
     /// Grounded Sentry Jumps with Sword
     SwordSentryJump,

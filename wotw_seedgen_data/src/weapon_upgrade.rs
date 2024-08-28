@@ -1,7 +1,5 @@
 use crate::{uber_identifier::weapon_upgrade, UberIdentifier};
-#[cfg(feature = "serde")]
 use serde_repr::{Deserialize_repr, Serialize_repr};
-#[cfg(feature = "strum")]
 use strum::{Display, EnumString, FromRepr};
 
 // TODO maybe descriptions should exist for random placements as well? Supposedly these are the weapon upgrade descriptions:
@@ -11,9 +9,21 @@ use strum::{Display, EnumString, FromRepr};
 // "Spike explodes on hit"
 // "Charge up a flame to damage and set all enemies on fire"
 /// Opher weapon upgrades
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString, FromRepr))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+    FromRepr,
+)]
 #[repr(u8)]
 pub enum WeaponUpgrade {
     ExplodingSpear = 0,

@@ -1,12 +1,21 @@
-#[cfg(feature = "serde")]
 use serde_repr::{Deserialize_repr, Serialize_repr};
-#[cfg(feature = "strum")]
 use strum::{Display, EnumString};
 
 /// Available slots for [`Equipment`] (the stuff displayed at the bottom between your energy and health)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u8)]
 pub enum EquipSlot {
     /// Bottom Left equipment slot
@@ -19,9 +28,20 @@ pub enum EquipSlot {
 // TODO try for better error messages than the strum default
 // TODO test equipments and document variants, some don't actually need to be equipped? how does that work
 /// Abilities which have to be equipped before use
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(Deserialize_repr, Serialize_repr))]
-#[cfg_attr(feature = "strum", derive(Display, EnumString))]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    EnumString,
+)]
 #[repr(u16)]
 pub enum Equipment {
     Hammer = 1000,

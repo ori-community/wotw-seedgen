@@ -4,17 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-loc_data = ["serde", "wotw_seedgen_data", "csv"]
-state_data = ["serde", "wotw_seedgen_data", "csv", "itertools"]
+loc_data = ["wotw_seedgen_data", "csv"]
+state_data = ["wotw_seedgen_data", "csv", "itertools"]
 uber_state_data = ["loc_data", "state_data", "serde_json", "rustc-hash"]
 snippet_access = []
 presets = ["wotw_seedgen_settings", "rustc-hash"]
-file_access = ["serde", "serde_json", "itertools"]
+file_access = ["serde_json", "itertools"]
 
 [dependencies]
-wotw_seedgen_data = { path = "../wotw_seedgen_data", version = "0.1", optional = true, features = ["serde"] } # TODO maybe remove serde features? Can't seem to control them properly anyway
-wotw_seedgen_settings = { path = "../wotw_seedgen_settings", version = "0.1", optional = true, features = ["serde"] }
-serde = { version = "1.0", optional = true, features = ["derive"] }
+wotw_seedgen_data = { path = "../wotw_seedgen_data", version = "0.1", optional = true }
+wotw_seedgen_settings = { path = "../wotw_seedgen_settings", version = "0.1", optional = true }
+serde = { version = "1.0", features = ["derive"] }
 csv = { version = "1.3", optional = true }
 serde_json = { version = "1.0", optional = true }
 rustc-hash = { version = "2.0", optional = true }
