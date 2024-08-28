@@ -25,12 +25,12 @@ impl Seed {
     }
 }
 
-struct Package<W: Write + Seek> {
+struct Package<'k, W: Write + Seek> {
     zip: ZipWriter<W>,
-    options: FileOptions,
+    options: FileOptions<'k, ()>,
 }
 
-impl<W: Write + Seek> Package<W> {
+impl<W: Write + Seek> Package<'_, W> {
     fn new(obj: W) -> Result<Self> {
         let zip = ZipWriter::new(obj);
         let options = FileOptions::default()
@@ -54,13 +54,13 @@ impl<W: Write + Seek> Package<W> {
         self.append_with(name.into(), data.as_ref(), self.options)
     }
 
-    fn append_with(&mut self, name: String, data: &[u8], options: FileOptions) -> Result<()> {
+    fn append_with(&mut self, name: String, data: &[u8], options: FileOptions<()>) -> Result<()> {
         self.zip.start_file(name, options)?;
         self.zip.write_all(data)?;
         Ok(())
     }
 
-    fn finish(mut self) -> Result<()> {
+    fn finish(self) -> Result<()> {
         self.zip.finish()?;
         Ok(())
     }

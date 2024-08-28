@@ -170,7 +170,7 @@ pub trait ParseIntToken {
 ///
 /// #[derive(Clone, Copy, Logos)]
 /// enum Token {
-///     #[regex(r"-?\d+", priority = 2)]
+///     #[regex(r"-?\d+", priority = 3)]
 ///     Integer,
 ///     #[regex(r"-?\d+(\.\d*)?(e\d+)?")]
 ///     Float,

@@ -92,7 +92,7 @@ impl Error {
     /// [`Write`]: io::Write
     #[cfg(feature = "ariadne")]
     pub fn write_pretty<W: io::Write>(&self, source: &Source, w: W) -> io::Result<()> {
-        use ariadne::{Color, Fmt, Label, Report, ReportKind, Source};
+        use ariadne::{Color, Config, Fmt, Label, Report, ReportKind, Source};
         let id = source.id.as_str();
         if source.content.is_empty() {
             // the error printing library (ariadne) seems to panic in this case
@@ -101,16 +101,13 @@ impl Error {
                 .finish()
                 .write((id, Source::from("")), w)
         } else {
-            // So... apparently ariadne makes the unconventional choice to interpret the span boundaries as character offsets, not byte offsets...
-            let start = source.content[..self.span.start].chars().count();
-            let end = start + source.content[self.span.clone()].chars().count();
-            let char_span = start..end;
-
-            let mut report = Report::build(ReportKind::Error, id, char_span.start).with_label(
-                Label::new((id, char_span))
-                    .with_message(self.kind.to_string().fg(Color::Red))
-                    .with_color(Color::Red),
-            );
+            let mut report = Report::build(ReportKind::Error, id, self.span.start)
+                .with_config(Config::default().with_index_type(ariadne::IndexType::Byte))
+                .with_label(
+                    Label::new((id, self.span.clone()))
+                        .with_message(self.kind.to_string().fg(Color::Red))
+                        .with_color(Color::Red),
+                );
             if let Some(help) = &self.help {
                 report.set_help(help);
             }

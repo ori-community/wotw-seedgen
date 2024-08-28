@@ -10,7 +10,7 @@ license = "MIT"
 proc-macro = true
 
 [dependencies]
-syn = { version = "2.0", features = ["extra-traits"] }
+syn = { version = "2.0", features = ["full"] }
 quote = "1.0"
 itertools = "0.13"
 proc-macro2 = "1.0"

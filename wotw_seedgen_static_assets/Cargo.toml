@@ -15,7 +15,7 @@ presets = ["wotw_seedgen_assets/presets", "serde_json", "rustc-hash", "itertools
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", version = "0.1", optional = true }
 wotw_seedgen_settings = { path = "../wotw_seedgen_settings", version = "0.1", optional = true, features = ["serde"] }
 lazy_static = "1.4"
-rustc-hash = { version = "1.1", optional = true }
+rustc-hash = { version = "2.0", optional = true }
 ciborium = "0.2"
 
 [build-dependencies]
@@ -23,6 +23,6 @@ wotw_seedgen_assets = { path = "../wotw_seedgen_assets", version = "0.1", option
 wotw_seedgen_settings = { path = "../wotw_seedgen_settings", version = "0.1", optional = true, features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", optional = true }
-rustc-hash = { version = "1.1", optional = true }
+rustc-hash = { version = "2.0", optional = true }
 itertools = { version = "0.13", optional = true }
 ciborium = "0.2"

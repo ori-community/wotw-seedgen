@@ -54,4 +54,6 @@ pub use parser::{
 };
 pub use recover::{Recover, Recoverable};
 pub use span::{Span, Spanned};
-pub use tokenizer::{LogosTokenizer, Tokenize, TokenizeOutput};
+#[cfg(feature = "logos")]
+pub use tokenizer::LogosTokenizer;
+pub use tokenizer::{Tokenize, TokenizeOutput};

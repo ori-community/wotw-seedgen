@@ -15,27 +15,24 @@ wotw_seedgen_seed = { path = "../wotw_seedgen_seed", version = "0.1" }
 wotw_seedgen_data = { path = "../wotw_seedgen_data", version = "0.1", features = ["serde", "strum"] }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", version = "0.1", features = ["loc_data", "state_data"]}
 serde = { version = "1.0", features = ["derive"] }
-rustc-hash = "1.1"
+rustc-hash = "2.0"
 rand = "0.8"
 rand_pcg = "0.3"
-rand_seeder = "0.2"
+rand_seeder = "0.3"
 log = "0.4"
 smallvec = { version = "1.6", features = ["const_generics"] }
 ordered-float = "4.2"
 partition = "0.1"
 itertools = "0.13"
-strum = { version = "0.25", features = ["derive"] }
+strum = { version = "0.26", features = ["derive"] }
 
 [dev-dependencies]
 criterion = "0.5"
 lazy_static = "1.4"
-log = "0.4"
-env_logger = "0.10" # TODO this has a bunch of default-on features
-# TODO is it needed?
+env_logger = { version = "0.11", default-features = false }
 wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets", version = "0.1", features = ["loc_data", "state_data", "uber_state_data", "snippets", "presets"] }
 
 [build-dependencies]
-syn = { version = "1.0", features = ["full"] } # TODO update all syn to version 2
 # vergen = { version = "8.2", features = [ "git", "gitoxide" ] } # TODO move into binary?
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
