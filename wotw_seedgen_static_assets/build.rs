@@ -90,7 +90,8 @@ fn main() {
     }
     #[cfg(feature = "presets")]
     {
-        println!("cargo::rerun-if-changed=../assets/universe_presets");
+        // cargo will always rerun this build script if told to scan a directory that doesn't exist, so this needs to be inactive as long as there are no universe presets in the assets
+        // println!("cargo::rerun-if-changed=../assets/universe_presets");
         println!("cargo::rerun-if-changed=../assets/world_presets");
 
         use itertools::Itertools;

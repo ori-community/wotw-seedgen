@@ -1,9 +1,11 @@
-use criterion::{criterion_group, criterion_main, Criterion};
+use std::time::Duration;
+
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use lazy_static::lazy_static;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPool, Player, UberStates, World};
-use wotw_seedgen_assets::{LocData, PresetAccess, StateData, WorldPreset, WorldPresetSettings};
+use wotw_seedgen_assets::{PresetAccess, WorldPreset, WorldPresetSettings};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
@@ -21,26 +23,25 @@ lazy_static! {
 }
 
 fn logic_parsing(c: &mut Criterion) {
-    c.bench_function("parse areas", |b| {
+    let mut group = c.benchmark_group("parse");
+
+    group.bench_function("areas", |b| {
         b.iter(|| parse::<Areas>(include_str!("../areas.wotw")))
     });
-    c.bench_function("parse locations and states", |b| {
-        b.iter(|| {
-            (
-                LocData::from_reader(include_bytes!("../../assets/loc_data.csv").as_slice()),
-                StateData::from_reader(include_bytes!("../../assets/state_data.csv").as_slice()),
-            )
-        })
-    });
+
     let areas = &*AREAS;
     let loc_data = &*LOC_DATA;
     let state_data = &*STATE_DATA;
-    c.bench_function("compile", |b| {
+    group.bench_function("compile", |b| {
         b.iter(|| Graph::compile(areas.clone(), loc_data.clone(), state_data.clone(), &[]))
     });
+
+    group.finish();
 }
 
 fn requirements(c: &mut Criterion) {
+    let mut group = c.benchmark_group("requirements");
+
     let world_settings = WorldSettings {
         difficulty: Difficulty::Unsafe,
         ..WorldSettings::default()
@@ -61,14 +62,14 @@ fn requirements(c: &mut Criterion) {
         Requirement::Or(vec![req_a.clone(), req_d.clone()]),
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
     ]);
-    c.bench_function("nested ands and ors", |b| {
+    group.bench_function("nesting", |b| {
         b.iter(|| player.is_met(&requirement, &states, smallvec![player.max_orbs()]))
     });
 
     player.inventory.skills.insert(Skill::Bow);
     player.inventory.energy += 10.;
     let requirement = Requirement::Combat(smallvec![(Enemy::Lizard, 3),]);
-    c.bench_function("short combat", |b| {
+    group.bench_function("short_combat", |b| {
         b.iter(|| player.is_met(&requirement, &states, smallvec![player.max_orbs()]))
     });
     let requirement = Requirement::And(vec![
@@ -89,7 +90,7 @@ fn requirements(c: &mut Criterion) {
         Requirement::Damage(50.0),
     ]);
     player.inventory.clear();
-    c.bench_function("long combat progression", |b| {
+    group.bench_function("long_combat_progression", |b| {
         b.iter(|| {
             player.solutions(
                 &requirement,
@@ -100,15 +101,19 @@ fn requirements(c: &mut Criterion) {
             )
         })
     });
+
+    group.finish();
 }
 
 fn reach_checking(c: &mut Criterion) {
+    let mut group = c.benchmark_group("reach_check");
+
     let graph = Graph::compile(AREAS.clone(), LOC_DATA.clone(), STATE_DATA.clone(), &[])
         .into_result()
         .unwrap();
     let uber_states = UberStates::new(&UBER_STATE_DATA);
 
-    c.bench_function("short reach check", |b| {
+    group.bench_function("short", |b| {
         b.iter(|| {
             let output = IntermediateOutput::default();
             let world_settings = WorldSettings::default();
@@ -135,16 +140,15 @@ fn reach_checking(c: &mut Criterion) {
     for item in pool.drain() {
         world.simulate(&item, &output);
     }
-    c.bench_function("long reach check", |b| b.iter(|| world.reached()));
+    group.bench_function("long", |b| b.iter(|| world.reached()));
 }
 
 fn generation(c: &mut Criterion) {
+    let mut group = c.benchmark_group("generation");
+    group.measurement_time(Duration::from_secs(10));
+
     let mut universe_settings = UniverseSettings::new(String::default());
-    let preset = PRESET_ACCESS.world_preset("moki").unwrap();
-    preset
-        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
-        .unwrap();
-    let mut seed = 0;
+    let mut seed = 0..;
     let graph = Graph::compile(
         AREAS.clone(),
         LOC_DATA.clone(),
@@ -153,13 +157,12 @@ fn generation(c: &mut Criterion) {
     )
     .into_result()
     .unwrap();
-
     let snippet_access = &*SNIPPET_ACCESS;
     let uber_state_data = &*UBER_STATE_DATA;
-    c.bench_function("moki", |b| {
+
+    group.bench_function("default", |b| {
         b.iter(|| {
-            universe_settings.seed = seed.to_string();
-            seed += 1;
+            universe_settings.seed = seed.next().unwrap().to_string();
             wotw_seedgen::generate_seed(
                 &graph,
                 uber_state_data,
@@ -171,7 +174,27 @@ fn generation(c: &mut Criterion) {
         })
     });
 
-    seed = 0;
+    seed = 0..;
+    let preset = PRESET_ACCESS.world_preset("moki").unwrap();
+    preset
+        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
+        .unwrap();
+
+    group.bench_function("moki", |b| {
+        b.iter(|| {
+            universe_settings.seed = seed.next().unwrap().to_string();
+            wotw_seedgen::generate_seed(
+                &graph,
+                uber_state_data,
+                snippet_access,
+                &universe_settings,
+                false,
+            )
+            .unwrap()
+        })
+    });
+
+    seed = 0..;
     let mut universe_settings = UniverseSettings::new(String::default());
     let preset = WorldPreset {
         assets_version: 1,
@@ -198,39 +221,9 @@ fn generation(c: &mut Criterion) {
     )
     .into_result()
     .unwrap();
-    Criterion::default()
-        .sample_size(10)
-        .bench_function("unsafe", |b| {
-            b.iter(|| {
-                universe_settings.seed = seed.to_string();
-                seed += 1;
-                wotw_seedgen::generate_seed(
-                    &graph,
-                    uber_state_data,
-                    snippet_access,
-                    &universe_settings,
-                    false,
-                )
-                .unwrap()
-            })
-        });
-
-    seed = 0;
-    universe_settings = UniverseSettings::new(String::default());
-    universe_settings.world_settings.extend_from_within(..);
-    let graph = Graph::compile(
-        AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
-        &universe_settings.world_settings,
-    )
-    .into_result()
-    .unwrap();
-
-    c.bench_function("two worlds", |b| {
+    group.bench_function("unsafe", |b| {
         b.iter(|| {
-            universe_settings.seed = seed.to_string();
-            seed += 1;
+            universe_settings.seed = seed.next().unwrap().to_string();
             wotw_seedgen::generate_seed(
                 &graph,
                 uber_state_data,
@@ -241,11 +234,60 @@ fn generation(c: &mut Criterion) {
             .unwrap()
         })
     });
+
+    group.finish();
 }
 
-criterion_group!(all, logic_parsing, requirements, reach_checking, generation);
-criterion_group!(only_parsing, logic_parsing);
-criterion_group!(only_requirements, requirements);
-criterion_group!(only_reach_checking, reach_checking);
-criterion_group!(only_generation, generation);
-criterion_main!(only_reach_checking); // put any of the group names in here
+fn multiworld(c: &mut Criterion) {
+    let mut group = c.benchmark_group("multiworld");
+
+    let mut universe_settings = UniverseSettings::new(String::default());
+    let preset = PRESET_ACCESS.world_preset("gorlek").unwrap();
+    preset
+        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
+        .unwrap();
+    let graph = Graph::compile(
+        AREAS.clone(),
+        LOC_DATA.clone(),
+        STATE_DATA.clone(),
+        &universe_settings.world_settings,
+    )
+    .into_result()
+    .unwrap();
+
+    let snippet_access = &*SNIPPET_ACCESS;
+    let uber_state_data = &*UBER_STATE_DATA;
+
+    let world_settings = universe_settings.world_settings.pop().unwrap();
+    let mut seed = 0..;
+
+    for worlds in (0..5).map(|x| 2_usize.pow(x)) {
+        group.throughput(Throughput::Elements(worlds as u64));
+        group.bench_with_input(BenchmarkId::from_parameter(worlds), &worlds, |b, worlds| {
+            universe_settings.world_settings = vec![world_settings.clone(); *worlds];
+            b.iter(|| {
+                universe_settings.seed = seed.next().unwrap().to_string();
+                wotw_seedgen::generate_seed(
+                    &graph,
+                    uber_state_data,
+                    snippet_access,
+                    &universe_settings,
+                    false,
+                )
+                .unwrap()
+            });
+        });
+    }
+
+    group.finish();
+}
+
+criterion_group!(
+    all,
+    logic_parsing,
+    requirements,
+    reach_checking,
+    generation,
+    multiworld
+);
+criterion_main!(all);
