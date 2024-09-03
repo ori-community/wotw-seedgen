@@ -13,7 +13,7 @@ use wotw_seedgen::{
 
 pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
-        settings: SeedSettings(universe_preset),
+        settings: SeedSettings(universe_preset_settings),
         generation_args: GenerationArgs { debug, launch },
         verbose,
     } = args;
@@ -25,7 +25,7 @@ pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
     )?;
 
     let mut settings = UniverseSettings::new("".to_string());
-    universe_preset.apply(&mut settings, &files::preset_access("")?)?;
+    universe_preset_settings.apply(&mut settings, &files::preset_access("")?)?;
     if settings.seed.is_empty() {
         let distribution = Uniform::from('0'..='9');
         settings.seed = distribution

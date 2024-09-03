@@ -1,7 +1,8 @@
 {
+  "assetsVersion": 1,
   "info": {
     "name": "Quality of Life",
-    "description": "Enables some quality of life settings (e.g. autoplant, cutscene skips etc.)"
+    "description": "Enables some tracking features and cutscene skips"
   },
   "snippets": ["progress_helper", "no_cutscenes"]
 }

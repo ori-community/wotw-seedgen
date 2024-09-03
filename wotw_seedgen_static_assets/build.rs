@@ -2,7 +2,7 @@ fn main() {
     #[cfg(feature = "loc_data")]
     #[allow(unused)]
     let loc_data = {
-        println!("cargo:rerun-if-changed=../assets/loc_data.csv");
+        println!("cargo::rerun-if-changed=../assets/loc_data.csv");
 
         let loc_data = wotw_seedgen_assets::LocData::from_reader(
             include_bytes!("../assets/loc_data.csv").as_slice(),
@@ -14,7 +14,7 @@ fn main() {
     #[cfg(feature = "state_data")]
     #[allow(unused)]
     let state_data = {
-        println!("cargo:rerun-if-changed=../assets/state_data.csv");
+        println!("cargo::rerun-if-changed=../assets/state_data.csv");
 
         let state_data = wotw_seedgen_assets::StateData::from_reader(
             include_bytes!("../assets/state_data.csv").as_slice(),
@@ -25,7 +25,7 @@ fn main() {
     };
     #[cfg(feature = "uber_state_data")]
     {
-        println!("cargo:rerun-if-changed=../assets/uber_state_dump.json");
+        println!("cargo::rerun-if-changed=../assets/uber_state_dump.json");
 
         #[allow(unused_mut)]
         let mut uber_state_data = wotw_seedgen_assets::UberStateData::from_reader(
@@ -39,7 +39,7 @@ fn main() {
     }
     #[cfg(feature = "snippets")]
     {
-        println!("cargo:rerun-if-changed=../assets/snippets");
+        println!("cargo::rerun-if-changed=../assets/snippets");
 
         use itertools::Itertools;
         use rustc_hash::FxHashMap;
@@ -66,7 +66,7 @@ fn main() {
     #[cfg(feature = "logic")]
     {
         // TODO create logic folder
-        println!("cargo:rerun-if-changed=../assets/logic");
+        println!("cargo::rerun-if-changed=../assets/logic");
 
         use itertools::Itertools;
         use std::path::PathBuf;
@@ -90,8 +90,8 @@ fn main() {
     }
     #[cfg(feature = "presets")]
     {
-        println!("cargo:rerun-if-changed=../assets/universe_presets");
-        println!("cargo:rerun-if-changed=../assets/world_presets");
+        println!("cargo::rerun-if-changed=../assets/universe_presets");
+        println!("cargo::rerun-if-changed=../assets/world_presets");
 
         use itertools::Itertools;
         use rustc_hash::FxHashMap;

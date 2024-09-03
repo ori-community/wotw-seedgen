@@ -61,19 +61,19 @@ impl FileAccess {
     }
 
     #[cfg(feature = "snippet_access")]
-    pub fn available_snippets(&self) -> Result<Vec<String>, String> {
+    pub fn available_snippets(&self) -> Vec<String> {
         self.files_in_folder("wotws")
     }
     #[cfg(feature = "presets")]
-    pub fn available_universe_presets(&self) -> Result<Vec<String>, String> {
+    pub fn available_universe_presets(&self) -> Vec<String> {
         self.available_presets("universe_presets")
     }
     #[cfg(feature = "presets")]
-    pub fn available_world_presets(&self) -> Result<Vec<String>, String> {
+    pub fn available_world_presets(&self) -> Vec<String> {
         self.available_presets("world_presets")
     }
     #[cfg(feature = "presets")]
-    fn available_presets(&self, folder: &str) -> Result<Vec<String>, String> {
+    fn available_presets(&self, folder: &str) -> Vec<String> {
         FileAccess::new(self.folders.iter().map(|path| path.join(folder))).files_in_folder("json")
     }
 
@@ -111,7 +111,7 @@ impl FileAccess {
         Ok((path, buf))
     }
 
-    fn files_in_folder(&self, extension: &str) -> Result<Vec<String>, String> {
+    fn files_in_folder(&self, extension: &str) -> Vec<String> {
         let extension = OsStr::new(extension);
         let mut files = vec![];
 
@@ -135,7 +135,7 @@ impl FileAccess {
 
         files.sort_unstable();
 
-        Ok(files)
+        files
     }
 }
 

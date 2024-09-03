@@ -3,6 +3,30 @@ use serde::{Deserialize, Serialize};
 use std::iter;
 use wotw_seedgen_settings::{Difficulty, Spawn, Trick, UniverseSettings, WorldSettings};
 
+/// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PresetInfo {
+    /// Display name
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Extended description
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    /// Where to present the preset
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group: Option<PresetGroup>,
+}
+
+/// Special groups to display a preset in
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum PresetGroup {
+    /// Generally, only one base preset will be used at a time.
+    ///
+    /// The most common form of base presets are the difficulty presets, such as "Moki" and "Gorlek"
+    Base,
+}
+
 /// A collection of settings that can be applied to existing settings
 ///
 /// Use [`UniversePreset::apply`] to merge a `UniversePreset` into existing [`UniverseSettings`]
@@ -11,45 +35,38 @@ use wotw_seedgen_settings::{Difficulty, Spawn, Trick, UniverseSettings, WorldSet
 ///
 /// ```
 /// # use wotw_seedgen_assets::UniversePreset;
-/// use wotw_seedgen_assets::{NoPresetAccess, WorldPreset};
+/// use wotw_seedgen_assets::{NoPresetAccess, UniversePresetSettings, WorldPresetSettings};
 /// use wotw_seedgen_assets::settings::{Spawn, UniverseSettings};
 ///
 /// let mut universe_settings = UniverseSettings::new("seed".to_string());
 ///
-/// let preset = UniversePreset {
+/// let preset = UniversePreset::new(None, UniversePresetSettings {
 ///     world_settings: Some(vec![
-///         WorldPreset {
+///         WorldPresetSettings {
 ///             spawn: Some(Spawn::Random),
 ///             ..Default::default()
 ///         }
 ///     ]),
 ///     ..Default::default()
-/// };
+/// });
 ///
 /// preset.apply(&mut universe_settings, &NoPresetAccess);
 /// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 ///
 /// [`UniverseSettings`]: wotw_seedgen_settings::UniverseSettings
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UniversePreset {
+    /// Assets version this preset is compatible with
+    #[serde(default)]
+    pub assets_version: u8,
     /// User-targetted information about the preset
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
-    /// Names of further [`UniversePreset`]s to use
-    ///
-    /// A [`PresetAccess::universe_preset`] implementation may be used to resolve the identifiers
-    ///
-    /// [`PresetAccess::universe_preset`]: crate::PresetAccess::universe_preset
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub includes: Option<FxHashSet<String>>,
-    /// The seed that determines all randomness
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub seed: Option<String>,
-    /// The individual settings for each world of the seed
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub world_settings: Option<Vec<WorldPreset>>,
+    /// Settings to apply
+    #[serde(flatten)]
+    pub settings: UniversePresetSettings,
 }
 
 impl UniversePreset {
@@ -78,8 +95,64 @@ impl UniversePreset {
         already_applied: &mut Vec<String>,
         preset_access: &A,
     ) -> Result<(), String> {
+        self.check_compability()?
+            ._apply(settings, already_applied, preset_access)
+    }
+
+    fn check_compability(mut self) -> Result<UniversePresetSettings, String> {
+        const CONVERSIONS: [fn(&mut UniversePresetSettings) -> Result<(), String>; 1] =
+            [UniversePresetSettings::check_compability_0_to_1];
+
+        for conversion in CONVERSIONS
+            .get(self.assets_version as usize..)
+            .into_iter()
+            .flatten()
+        {
+            conversion(&mut self.settings)?;
+        }
+
+        Ok(self.settings)
+    }
+}
+
+/// Settings to apply to [`UniverseSettings`]
+///
+/// Mostly used inside a [`UniversePreset`] which offers compability features
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct UniversePresetSettings {
+    /// Names of further [`UniversePreset`]s to use
+    ///
+    /// A [`PresetAccess::universe_preset`] implementation may be used to resolve the identifiers
+    ///
+    /// [`PresetAccess::universe_preset`]: crate::PresetAccess::universe_preset
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub includes: Option<FxHashSet<String>>,
+    /// The seed that determines all randomness
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seed: Option<String>,
+    /// The individual settings for each world of the seed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub world_settings: Option<Vec<WorldPresetSettings>>,
+}
+
+impl UniversePresetSettings {
+    /// Apply these `UniversePresetSettings` to some [`UniverseSettings`]
+    pub fn apply<A: PresetAccess>(
+        self,
+        settings: &mut UniverseSettings,
+        preset_access: &A,
+    ) -> Result<(), String> {
+        self._apply(settings, &mut vec![], preset_access)
+    }
+
+    fn _apply<A: PresetAccess>(
+        self,
+        settings: &mut UniverseSettings,
+        already_applied: &mut Vec<String>,
+        preset_access: &A,
+    ) -> Result<(), String> {
         let Self {
-            info: _,
             includes,
             world_settings,
             seed,
@@ -132,6 +205,14 @@ impl UniversePreset {
 
         Ok(())
     }
+
+    fn check_compability_0_to_1(&mut self) -> Result<(), String> {
+        for world_settings in self.world_settings.iter_mut().flatten() {
+            world_settings.check_compability_0_to_1()?;
+        }
+
+        Ok(())
+    }
 }
 
 fn include_universe_preset<A: PresetAccess>(
@@ -149,22 +230,7 @@ fn include_universe_preset<A: PresetAccess>(
     preset._apply(settings, already_applied, preset_access)
 }
 
-fn include_world_preset<A: PresetAccess>(
-    settings: &mut WorldSettings,
-    identifier: String,
-    already_applied: &mut Vec<String>,
-    preset_access: &A,
-) -> Result<(), String> {
-    // Prevent cyclic patterns
-    if already_applied.contains(&identifier) {
-        return Ok(());
-    }
-    let preset = preset_access.world_preset(&identifier)?;
-    already_applied.push(identifier);
-    preset._apply(settings, already_applied, preset_access)
-}
-
-/// A collection of settings that can be applied to one world of the existing settings
+/// A collection of settings that can be applied to one world of existing settings
 ///
 /// Use [`WorldPreset::apply`] to merge a `WorldPreset` into existing [`WorldSettings`]
 ///
@@ -172,28 +238,78 @@ fn include_world_preset<A: PresetAccess>(
 ///
 /// ```
 /// # use wotw_seedgen_assets::WorldPreset;
-/// use wotw_seedgen_assets::NoPresetAccess;
+/// use wotw_seedgen_assets::{NoPresetAccess, WorldPresetSettings};
 /// use wotw_seedgen_assets::settings::{Spawn, WorldSettings};
 ///
 /// let mut world_settings = WorldSettings::default();
 ///
-/// let world_preset = WorldPreset {
+/// let world_preset = WorldPreset::new(None, WorldPresetSettings {
 ///     spawn: Some(Spawn::Random),
 ///     ..Default::default()
-/// };
+/// });
 ///
 /// world_preset.apply(&mut world_settings, &NoPresetAccess);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
 ///
 /// [`WorldSettings`]: wotw_seedgen_settings::WorldSettings
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-// TODO replace hashsets with vecs?
 pub struct WorldPreset {
+    /// Assets version this preset is compatible with
+    #[serde(default)]
+    pub assets_version: u8,
     /// User-targetted information about the preset
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
+    /// Settings to apply
+    #[serde(flatten)]
+    pub settings: WorldPresetSettings,
+}
+
+impl WorldPreset {
+    /// Apply this `WorldPreset` to some [`WorldSettings`]
+    pub fn apply<A: PresetAccess>(
+        self,
+        settings: &mut WorldSettings,
+        preset_access: &A,
+    ) -> Result<(), String> {
+        self._apply(settings, &mut vec![], preset_access)
+    }
+
+    fn _apply<A: PresetAccess>(
+        self,
+        settings: &mut WorldSettings,
+        already_applied: &mut Vec<String>,
+        preset_access: &A,
+    ) -> Result<(), String> {
+        self.check_compability()?
+            ._apply(settings, already_applied, preset_access)
+    }
+
+    fn check_compability(mut self) -> Result<WorldPresetSettings, String> {
+        const CONVERSIONS: [fn(&mut WorldPresetSettings) -> Result<(), String>; 1] =
+            [WorldPresetSettings::check_compability_0_to_1];
+
+        for conversion in CONVERSIONS
+            .get(self.assets_version as usize..)
+            .into_iter()
+            .flatten()
+        {
+            conversion(&mut self.settings)?;
+        }
+
+        Ok(self.settings)
+    }
+}
+
+/// Settings to apply to [`WorldSettings`]
+///
+/// Mostly used inside a [`WorldPreset`] which offers compability features
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+// TODO replace hashsets with vecs?
+pub struct WorldPresetSettings {
     /// Names of further [`WorldPreset`]s to use
     ///
     /// A [`PresetAccess::world_preset`] implementation may be used to resolve the identifiers
@@ -219,31 +335,8 @@ pub struct WorldPreset {
     pub snippet_config: Option<FxHashMap<String, FxHashMap<String, String>>>,
 }
 
-/// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PresetInfo {
-    /// Display name
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    /// Extended description
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-    /// Where to present the preset
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub group: Option<PresetGroup>,
-}
-
-/// Special groups to display a preset in
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum PresetGroup {
-    /// Generally, only one base preset will be used at a time.
-    ///
-    /// The most common form of base presets are the difficulty presets, such as "Moki" and "Gorlek"
-    Base,
-}
-
-impl WorldPreset {
+impl WorldPresetSettings {
+    /// Apply these `WorldPresetSettings` to some [`WorldSettings`]
     pub fn apply<A: PresetAccess>(
         self,
         settings: &mut WorldSettings,
@@ -259,7 +352,6 @@ impl WorldPreset {
         preset_access: &A,
     ) -> Result<(), String> {
         let Self {
-            info: _,
             includes,
             difficulty,
             tricks,
@@ -300,6 +392,44 @@ impl WorldPreset {
 
         Ok(())
     }
+
+    fn check_compability_0_to_1(&mut self) -> Result<(), String> {
+        for snippet in self.snippets.iter_mut().flatten() {
+            match &snippet[..] {
+                "util_twillen" => return err_removed("util_twillen"),
+                "vanilla_opher_upgrades" => return err_removed("vanilla_opher_upgrades"),
+                "bonus_opher_upgrades" => return err_removed("bonus_opher_upgrades"),
+                "autoplants" => *snippet = "no_cutscenes".to_string(),
+                "better_stomp" | "fragment_overflow" | "tp_refill" => {
+                    *snippet = "better_mechanics".to_string()
+                }
+                _ => {}
+            }
+        }
+
+        Ok(())
+    }
+}
+
+fn include_world_preset<A: PresetAccess>(
+    settings: &mut WorldSettings,
+    identifier: String,
+    already_applied: &mut Vec<String>,
+    preset_access: &A,
+) -> Result<(), String> {
+    // Prevent cyclic patterns
+    if already_applied.contains(&identifier) {
+        return Ok(());
+    }
+    let preset = preset_access.world_preset(&identifier)?;
+    already_applied.push(identifier);
+    preset._apply(settings, already_applied, preset_access)
+}
+
+fn err_removed(identifier: &str) -> Result<(), String> {
+    Err(format!(
+        "{identifier} was removed from the settings available by default"
+    ))
 }
 
 /// Access to presets by identifier
@@ -319,6 +449,54 @@ impl PresetAccess for NoPresetAccess {
         panic!("Attempted to read universe preset \"{identifier}\" while explicitely using NoPresetAccess");
     }
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
-        panic!("Attempted to read universe preset \"{identifier}\" while explicitely using NoPresetAccess");
+        panic!("Attempted to read world preset \"{identifier}\" while explicitely using NoPresetAccess");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reject_incompatible() {
+        let preset = WorldPreset {
+            assets_version: 0,
+            info: None,
+            settings: WorldPresetSettings {
+                snippets: Some(vec!["util_twillen".to_string()]),
+                ..Default::default()
+            },
+        };
+        assert_eq!(
+            preset.check_compability().map(|_| ()),
+            err_removed("util_twillen")
+        );
+    }
+
+    #[test]
+    fn upgrade() {
+        let preset = WorldPreset {
+            assets_version: 0,
+            info: None,
+            settings: WorldPresetSettings {
+                snippets: Some(vec![
+                    "bonus_items".to_string(),
+                    "autoplants".to_string(),
+                    "better_stomp".to_string(),
+                ]),
+                ..Default::default()
+            },
+        };
+        assert_eq!(
+            preset.check_compability(),
+            Ok(WorldPresetSettings {
+                snippets: Some(vec![
+                    "bonus_items".to_string(),
+                    "no_cutscenes".to_string(),
+                    "better_mechanics".to_string()
+                ]),
+                ..Default::default()
+            })
+        );
     }
 }

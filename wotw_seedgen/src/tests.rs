@@ -3,7 +3,9 @@ use crate::generate_seed;
 use env_logger::Env;
 use lazy_static::lazy_static;
 use log::info;
-use wotw_seedgen_assets::{PresetAccess, UniversePreset, WorldPreset};
+use wotw_seedgen_assets::{
+    PresetAccess, UniversePreset, UniversePresetSettings, WorldPresetSettings,
+};
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::Graph,
@@ -81,8 +83,12 @@ fn some_seeds() {
     }
 
     let preset = UniversePreset {
-        world_settings: Some(vec![WorldPreset::default(); 2]),
-        ..UniversePreset::default()
+        assets_version: 1,
+        info: None,
+        settings: UniversePresetSettings {
+            world_settings: Some(vec![WorldPresetSettings::default(); 2]),
+            ..UniversePresetSettings::default()
+        },
     };
     preset
         .apply(&mut universe_settings, &*PRESET_ACCESS)

@@ -3,7 +3,7 @@ use lazy_static::lazy_static;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPool, Player, UberStates, World};
-use wotw_seedgen_assets::{LocData, PresetAccess, StateData, WorldPreset};
+use wotw_seedgen_assets::{LocData, PresetAccess, StateData, WorldPreset, WorldPresetSettings};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
@@ -174,14 +174,18 @@ fn generation(c: &mut Criterion) {
     seed = 0;
     let mut universe_settings = UniverseSettings::new(String::default());
     let preset = WorldPreset {
-        includes: Some(
-            ["gorlek".to_string(), "rspawn".to_string()]
-                .into_iter()
-                .collect(),
-        ),
-        difficulty: Some(Difficulty::Unsafe),
-        spawn: Some(Spawn::FullyRandom),
-        ..Default::default()
+        assets_version: 1,
+        info: None,
+        settings: WorldPresetSettings {
+            includes: Some(
+                ["gorlek".to_string(), "rspawn".to_string()]
+                    .into_iter()
+                    .collect(),
+            ),
+            difficulty: Some(Difficulty::Unsafe),
+            spawn: Some(Spawn::FullyRandom),
+            ..Default::default()
+        },
     };
     preset
         .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)

@@ -39,7 +39,8 @@ pub use snippet_access::{NoSnippetAccess, SnippetAccess};
 mod presets;
 #[cfg(feature = "presets")]
 pub use presets::{
-    NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, WorldPreset,
+    NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, UniversePresetSettings,
+    WorldPreset, WorldPresetSettings,
 };
 #[cfg(feature = "file_access")]
 mod file_access;

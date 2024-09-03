@@ -15,7 +15,7 @@ use std::{
     str::FromStr,
 };
 use strum::VariantNames;
-use wotw_seedgen::assets::{PresetInfo, UniversePreset, WorldPreset};
+use wotw_seedgen::assets::{PresetInfo, UniversePresetSettings, WorldPresetSettings};
 use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
 use wotw_seedgen_assets::{FileAccess, PresetAccess, SnippetAccess};
 use wotw_seedgen_seed_language::metadata::Metadata;
@@ -42,7 +42,7 @@ pub struct GenerationArgs {
 }
 
 #[derive(Debug, Default)]
-pub struct SeedSettings(pub UniversePreset);
+pub struct SeedSettings(pub UniversePresetSettings);
 
 impl Args for SeedSettings {
     fn group_id() -> Option<clap::Id> {
@@ -70,7 +70,7 @@ impl Args for SeedSettings {
                     .num_args(1..)
                     .help("Universe presets to include")
                     .long_help(preset_help(
-                        &preset_access.available_universe_presets().unwrap_or_default(),
+                        &preset_access.available_universe_presets(),
                         "Universe",
                         |identifier| preset_access.universe_preset(identifier).map(|preset| preset.info)
                     )),
@@ -105,7 +105,7 @@ impl Args for SeedSettings {
                     .action(ArgAction::Append)
                     .help("World presets to include")
                     .long_help(preset_help(
-                        &preset_access.available_world_presets().unwrap_or_default(),
+                        &preset_access.available_world_presets(),
                         "World",
                         |identifier| preset_access.world_preset(identifier).map(|preset| preset.info)
                     )),
@@ -251,7 +251,6 @@ fn available_snippets() -> Vec<(String, Metadata)> {
         files::snippet_access("").unwrap_or_else(|_| FileAccess::new(["", "snippets"]));
     let mut available_snippets = snippet_access
         .available_snippets()
-        .unwrap_or_default()
         .into_iter()
         .map(|identifier| {
             let metadata = snippet_access
@@ -438,18 +437,20 @@ impl FromArgMatches for SeedSettings {
             .get_many("universe_presets")
             .map(|values| values.cloned().collect());
 
-        let mut world_settings =
-            vec![WorldPreset::default(); matches.get_one::<NonZeroUsize>("worlds").unwrap().get()];
+        let mut world_settings = vec![
+            WorldPresetSettings::default();
+            matches.get_one::<NonZeroUsize>("worlds").unwrap().get()
+        ];
 
         fn update_from_world_scoped_args<T, F>(
             matches: &ArgMatches,
-            world_settings: &mut [WorldPreset],
+            world_settings: &mut [WorldPresetSettings],
             id: &str,
             mut f: F,
         ) -> Result<(), clap::Error>
         where
             T: Clone + Send + Sync + 'static,
-            F: FnMut(&mut WorldPreset, &T),
+            F: FnMut(&mut WorldPresetSettings, &T),
         {
             if let Some(occurences) = matches.get_occurrences::<WorldScopedArg<T>>(id) {
                 for occurence in occurences {
@@ -469,12 +470,12 @@ impl FromArgMatches for SeedSettings {
         }
         fn update_from_world_scoped_flag<F>(
             matches: &ArgMatches,
-            world_settings: &mut [WorldPreset],
+            world_settings: &mut [WorldPresetSettings],
             id: &str,
             mut f: F,
         ) -> Result<(), clap::Error>
         where
-            F: FnMut(&mut WorldPreset, &bool),
+            F: FnMut(&mut WorldPresetSettings, &bool),
         {
             if let Some(occurences) = matches.get_occurrences::<WorldScopedArg<bool>>(id) {
                 for occurence in occurences {
@@ -500,14 +501,14 @@ impl FromArgMatches for SeedSettings {
             Ok(())
         }
         fn update_from_world_scoped_occurence<T, F>(
-            world_settings: &mut [WorldPreset],
+            world_settings: &mut [WorldPresetSettings],
             world_scope: &mut Option<usize>,
             value: &WorldScopedArg<T>,
             mut f: F,
         ) -> Result<(), clap::Error>
         where
             T: Clone + Send + Sync + 'static,
-            F: FnMut(&mut WorldPreset, &T),
+            F: FnMut(&mut WorldPresetSettings, &T),
         {
             match value {
                 WorldScopedArg::WorldScope(index) => *world_scope = Some(*index),
