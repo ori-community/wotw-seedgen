@@ -6,97 +6,83 @@ use std::iter;
 use wotw_seedgen_data::{Shard, Skill, WeaponUpgrade};
 use wotw_seedgen_seed_language::{compile, output::CommandVoid};
 
-// TODO not so sure this is an efficient item pool, maybe try something else once it's possible to benchmark seedgen again
-// in particular, I think maybe simply cloning the items would be more efficient than the item_lookup
 // TODO don't really think this should be public
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemPool {
-    items: Vec<usize>,
-    item_lookup: Vec<CommandVoid>,
+    items: Vec<CommandVoid>,
     inventory: Inventory,
 }
 impl Default for ItemPool {
     fn default() -> Self {
         Self {
-            items: [
-                iter::repeat(0).take(40),
-                iter::repeat(1).take(34),
-                iter::repeat(2).take(5),
-                iter::repeat(3).take(24),
-                iter::repeat(4).take(24),
-            ]
-            .into_iter()
-            .flatten()
-            .chain(5..=63)
-            .collect(),
-            item_lookup: [
-                compile::gorlek_ore(),
-                compile::keystone(),
-                compile::shard_slot(),
-                compile::health_fragment(),
-                compile::energy_fragment(),
-                compile::skill(Skill::Bash),
-                compile::skill(Skill::DoubleJump),
-                compile::skill(Skill::Launch),
-                compile::skill(Skill::Glide),
-                compile::skill(Skill::WaterBreath),
-                compile::skill(Skill::Grenade),
-                compile::skill(Skill::Grapple),
-                compile::skill(Skill::Flash),
-                compile::skill(Skill::Spear),
-                compile::skill(Skill::Regenerate),
-                compile::skill(Skill::Bow),
-                compile::skill(Skill::Hammer),
-                compile::skill(Skill::Sword),
-                compile::skill(Skill::Burrow),
-                compile::skill(Skill::Dash),
-                compile::skill(Skill::WaterDash),
-                compile::skill(Skill::Shuriken),
-                compile::skill(Skill::Blaze),
-                compile::skill(Skill::Sentry),
-                compile::skill(Skill::Flap),
-                compile::skill(Skill::GladesAncestralLight),
-                compile::skill(Skill::MarshAncestralLight),
-                compile::clean_water(),
-                compile::shard(Shard::Overcharge),
-                compile::shard(Shard::TripleJump),
-                compile::shard(Shard::Wingclip),
-                compile::shard(Shard::Bounty),
-                compile::shard(Shard::Swap),
-                compile::shard(Shard::Magnet),
-                compile::shard(Shard::Splinter),
-                compile::shard(Shard::Reckless),
-                compile::shard(Shard::Quickshot),
-                compile::shard(Shard::Resilience),
-                compile::shard(Shard::SpiritLightHarvest),
-                compile::shard(Shard::Vitality),
-                compile::shard(Shard::LifeHarvest),
-                compile::shard(Shard::EnergyHarvest),
-                compile::shard(Shard::Energy),
-                compile::shard(Shard::LifePact),
-                compile::shard(Shard::LastStand),
-                compile::shard(Shard::Sense),
-                compile::shard(Shard::UltraBash),
-                compile::shard(Shard::UltraGrapple),
-                compile::shard(Shard::Overflow),
-                compile::shard(Shard::Thorn),
-                compile::shard(Shard::Catalyst),
-                compile::shard(Shard::Turmoil),
-                compile::shard(Shard::Sticky),
-                compile::shard(Shard::Finesse),
-                compile::shard(Shard::SpiritSurge),
-                compile::shard(Shard::Lifeforce),
-                compile::shard(Shard::Deflector),
-                compile::shard(Shard::Fracture),
-                compile::shard(Shard::Arcing),
-                compile::weapon_upgrade(WeaponUpgrade::ExplodingSpear),
-                compile::weapon_upgrade(WeaponUpgrade::HammerShockwave),
-                compile::weapon_upgrade(WeaponUpgrade::StaticShuriken),
-                compile::weapon_upgrade(WeaponUpgrade::ChargeBlaze),
-                compile::weapon_upgrade(WeaponUpgrade::RapidSentry),
-            ]
-            .into_iter()
-            .collect(),
+            items: iter::repeat(compile::gorlek_ore())
+                .take(40)
+                .chain(iter::repeat(compile::keystone()).take(34))
+                .chain(iter::repeat(compile::shard_slot()).take(5))
+                .chain(iter::repeat(compile::health_fragment()).take(24))
+                .chain(iter::repeat(compile::energy_fragment()).take(24))
+                .chain([
+                    compile::skill(Skill::Bash),
+                    compile::skill(Skill::DoubleJump),
+                    compile::skill(Skill::Launch),
+                    compile::skill(Skill::Glide),
+                    compile::skill(Skill::WaterBreath),
+                    compile::skill(Skill::Grenade),
+                    compile::skill(Skill::Grapple),
+                    compile::skill(Skill::Flash),
+                    compile::skill(Skill::Spear),
+                    compile::skill(Skill::Regenerate),
+                    compile::skill(Skill::Bow),
+                    compile::skill(Skill::Hammer),
+                    compile::skill(Skill::Sword),
+                    compile::skill(Skill::Burrow),
+                    compile::skill(Skill::Dash),
+                    compile::skill(Skill::WaterDash),
+                    compile::skill(Skill::Shuriken),
+                    compile::skill(Skill::Blaze),
+                    compile::skill(Skill::Sentry),
+                    compile::skill(Skill::Flap),
+                    compile::skill(Skill::GladesAncestralLight),
+                    compile::skill(Skill::MarshAncestralLight),
+                    compile::clean_water(),
+                    compile::shard(Shard::Overcharge),
+                    compile::shard(Shard::TripleJump),
+                    compile::shard(Shard::Wingclip),
+                    compile::shard(Shard::Bounty),
+                    compile::shard(Shard::Swap),
+                    compile::shard(Shard::Magnet),
+                    compile::shard(Shard::Splinter),
+                    compile::shard(Shard::Reckless),
+                    compile::shard(Shard::Quickshot),
+                    compile::shard(Shard::Resilience),
+                    compile::shard(Shard::SpiritLightHarvest),
+                    compile::shard(Shard::Vitality),
+                    compile::shard(Shard::LifeHarvest),
+                    compile::shard(Shard::EnergyHarvest),
+                    compile::shard(Shard::Energy),
+                    compile::shard(Shard::LifePact),
+                    compile::shard(Shard::LastStand),
+                    compile::shard(Shard::Sense),
+                    compile::shard(Shard::UltraBash),
+                    compile::shard(Shard::UltraGrapple),
+                    compile::shard(Shard::Overflow),
+                    compile::shard(Shard::Thorn),
+                    compile::shard(Shard::Catalyst),
+                    compile::shard(Shard::Turmoil),
+                    compile::shard(Shard::Sticky),
+                    compile::shard(Shard::Finesse),
+                    compile::shard(Shard::SpiritSurge),
+                    compile::shard(Shard::Lifeforce),
+                    compile::shard(Shard::Deflector),
+                    compile::shard(Shard::Fracture),
+                    compile::shard(Shard::Arcing),
+                    compile::weapon_upgrade(WeaponUpgrade::ExplodingSpear),
+                    compile::weapon_upgrade(WeaponUpgrade::HammerShockwave),
+                    compile::weapon_upgrade(WeaponUpgrade::StaticShuriken),
+                    compile::weapon_upgrade(WeaponUpgrade::ChargeBlaze),
+                    compile::weapon_upgrade(WeaponUpgrade::RapidSentry),
+                ])
+                .collect(),
             inventory: Inventory {
                 spirit_light: 0,
                 gorlek_ore: 40,
@@ -185,35 +171,21 @@ impl ItemPool {
     pub fn change(&mut self, command: CommandVoid, mut amount: i32) {
         let common_items = CommonItem::from_command(&command);
 
-        let index = self
-            .item_lookup
-            .iter()
-            .enumerate()
-            .find(|(_, a)| *a == &command)
-            .map(|(index, _)| index);
-
         if amount > 0 {
             for common_item in iter::repeat(common_items).take(amount as usize).flatten() {
                 common_item.grant(&mut self.inventory);
             }
 
-            let index = match index {
-                None => {
-                    let index = self.item_lookup.len();
-                    self.item_lookup.push(command);
-                    index
-                }
-                Some(index) => index,
-            };
-            self.items.extend(iter::repeat(index).take(amount as usize));
-        } else if let Some(index) = index {
+            self.items
+                .extend(iter::repeat(command).take(amount as usize));
+        } else {
             for common_item in iter::repeat(common_items).take(-amount as usize).flatten() {
                 common_item.remove(&mut self.inventory);
             }
 
             self.items.retain(|i| {
                 amount == 0
-                    || if *i == index {
+                    || if i == &command {
                         amount += 1;
                         false
                     } else {
@@ -227,15 +199,14 @@ impl ItemPool {
         if self.items.is_empty() {
             return None;
         }
-        let index = self.items.swap_remove(rng.gen_range(0..self.items.len()));
-        let command = self.item_lookup[index].clone();
+        let command = self.items.swap_remove(rng.gen_range(0..self.items.len()));
 
         let cost = command.cost();
         if cost > 10000 {
             let reroll_chance = -10000.0 / cost as f64 + 1.0;
 
             if rng.gen_bool(reroll_chance) {
-                self.items.push(index);
+                self.items.push(command);
                 return self.choose_random(rng);
             }
         }
@@ -257,7 +228,7 @@ impl ItemPool {
     }
     #[inline]
     pub fn items(&self) -> impl Iterator<Item = &CommandVoid> {
-        self.items.iter().map(|index| &self.item_lookup[*index])
+        self.items.iter()
     }
     #[inline]
     pub fn inventory(&self) -> &Inventory {
@@ -265,31 +236,15 @@ impl ItemPool {
     }
 
     #[inline]
-    pub fn drain(&mut self) -> Drain<'_> {
-        Drain::new(self)
+    pub fn drain<'pool>(&'pool mut self) -> impl Iterator<Item = CommandVoid> + 'pool {
+        self.items.drain(..)
     }
     #[inline]
-    pub fn drain_random<'pool>(&'pool mut self, rng: &mut Pcg64Mcg) -> Drain<'pool> {
+    pub fn drain_random<'pool>(
+        &'pool mut self,
+        rng: &mut Pcg64Mcg,
+    ) -> impl Iterator<Item = CommandVoid> + 'pool {
         self.items.shuffle(rng);
         self.drain()
-    }
-}
-
-pub struct Drain<'pool> {
-    item_pool: &'pool mut ItemPool,
-}
-impl<'pool> Drain<'pool> {
-    fn new(item_pool: &'pool mut ItemPool) -> Self {
-        Self { item_pool }
-    }
-}
-impl Iterator for Drain<'_> {
-    type Item = CommandVoid;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.item_pool
-            .items
-            .pop()
-            .map(|index| self.item_pool.item_lookup[index].clone())
     }
 }

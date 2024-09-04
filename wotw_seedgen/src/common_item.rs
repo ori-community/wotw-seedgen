@@ -165,7 +165,7 @@ impl CommonItem {
                 inventory.skills.remove(&skill);
             }
             CommonItem::CleanWater => {
-                inventory.clean_water = true;
+                inventory.clean_water = false;
             }
         }
     }
