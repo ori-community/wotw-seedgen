@@ -41,6 +41,7 @@ mod recover;
 mod span;
 mod tokenizer;
 
+pub use wotw_seedgen_assets::Source;
 pub use wotw_seedgen_derive::{Ast, Span, TokenDisplay};
 
 pub use ast::{parse_ast, Ast};

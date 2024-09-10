@@ -67,14 +67,19 @@ impl PartialEq for LocDataEntry {
 }
 impl LocData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
-    pub fn from_reader<R: Read>(reader: R) -> csv::Result<Self> {
+    pub fn from_reader<R: Read>(reader: R) -> Result<Self, String> {
         let mut entries = vec![];
         let mut reader = csv::ReaderBuilder::new()
             .trim(csv::Trim::All)
             .from_reader(reader);
         let mut record = csv::StringRecord::new();
-        while reader.read_record(&mut record)? {
-            let record = record.deserialize::<LocDataInput>(None)?;
+        while reader
+            .read_record(&mut record)
+            .map_err(|err| err.to_string())?
+        {
+            let record = record
+                .deserialize::<LocDataInput>(None)
+                .map_err(|err| err.to_string())?;
             let position = match (record.x, record.y) {
                 (Some(x), Some(y)) => Some(Position::new(x, y)),
                 _ => None,

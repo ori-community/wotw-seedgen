@@ -57,7 +57,7 @@ impl PartialEq for StateDataEntry {
 }
 impl StateData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
-    pub fn from_reader<R: Read>(reader: R) -> csv::Result<Self> {
+    pub fn from_reader<R: Read>(reader: R) -> Result<Self, String> {
         let entries = csv::ReaderBuilder::new()
             .trim(csv::Trim::All)
             .from_reader(reader)
@@ -67,7 +67,8 @@ impl StateData {
                 uber_identifier: UberIdentifier::new(input.uber_group, input.uber_id),
                 value: input.uber_state_value,
             })
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|err| err.to_string())?;
 
         Ok(Self { entries })
     }
