@@ -1,0 +1,6 @@
+#category Quality of Life
+/// Shriek Escape Healthbar
+///
+/// Keeps the health bar visible during Shriek Escape
+
+3|0|8|7|22|bool|true
