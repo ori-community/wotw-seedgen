@@ -3,6 +3,11 @@ use serde::{Deserialize, Serialize};
 use std::iter;
 use wotw_seedgen_settings::{Difficulty, Spawn, Trick, UniverseSettings, WorldSettings};
 
+/// The current version number for the assets directory.
+/// Presets targetting older versions may throw an error if they're affected by breaking changes.
+/// Check `assets/preset compability.md` for details
+pub const CURRENT_ASSETS_VERSION: u8 = 1;
+
 /// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -399,6 +404,7 @@ impl WorldPresetSettings {
                 "util_twillen" => return err_removed("util_twillen"),
                 "vanilla_opher_upgrades" => return err_removed("vanilla_opher_upgrades"),
                 "bonus_opher_upgrades" => return err_removed("bonus_opher_upgrades"),
+                "open_mode" => return err_removed("open_mode"),
                 "autoplants" => *snippet = "no_cutscenes".to_string(),
                 "better_stomp" | "fragment_overflow" | "tp_refill" => {
                     *snippet = "better_mechanics".to_string()

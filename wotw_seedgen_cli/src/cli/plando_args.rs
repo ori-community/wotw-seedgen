@@ -13,7 +13,7 @@ pub struct PlandoArgs {
     /// Filename of the output file
     ///
     /// .wotwr will be appended as the file extension
-    #[arg(short = 'n', long)]
+    #[arg(short = 'n', long, value_name = "STRING")]
     pub out_name: Option<String>,
     #[command(flatten)]
     pub generation_args: GenerationArgs,

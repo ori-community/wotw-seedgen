@@ -1,7 +1,6 @@
-use crate::{
-    ast::{self, ConfigType},
-    output::intermediate::Literal,
-};
+pub use crate::output::intermediate::Literal;
+
+use crate::ast;
 use rustc_hash::FxHashMap;
 use wotw_seedgen_parse::Recoverable;
 
@@ -16,7 +15,6 @@ pub struct Metadata {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfigValue {
     pub description: String,
-    pub ty: ConfigType,
     pub default: Literal,
 }
 
@@ -107,7 +105,6 @@ impl ExtractMetadata for ast::Command<'_> {
 
                     let value = ConfigValue {
                         description: config.description.data.to_string(),
-                        ty: config.ty.data,
                         default,
                     };
                     metadata

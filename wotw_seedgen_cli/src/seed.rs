@@ -11,7 +11,7 @@ use wotw_seedgen::{
     generate_seed, logic_language::ast, logic_language::output::Graph, settings::UniverseSettings,
 };
 
-pub(crate) fn seed(args: SeedArgs) -> Result<(), Error> {
+pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
         settings: SeedSettings(universe_preset_settings),
         generation_args: GenerationArgs { debug, launch },

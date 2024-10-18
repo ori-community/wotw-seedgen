@@ -40,7 +40,7 @@ mod presets;
 #[cfg(feature = "presets")]
 pub use presets::{
     NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, UniversePresetSettings,
-    WorldPreset, WorldPresetSettings,
+    WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
 };
 #[cfg(feature = "file_access")]
 mod file_access;

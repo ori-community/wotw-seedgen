@@ -131,6 +131,9 @@ impl FileAccess {
                             .to_string()
                     }),
             );
+            if !files.is_empty() {
+                break;
+            }
         }
 
         files.sort_unstable();

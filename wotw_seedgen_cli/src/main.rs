@@ -2,6 +2,7 @@ mod cli;
 mod files;
 mod log_init;
 mod plando;
+mod preset;
 mod seed;
 mod stats;
 
@@ -9,6 +10,7 @@ use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
 use plando::plando;
+use preset::{universe_preset, world_preset};
 use seed::seed;
 use stats::stats;
 use std::{
@@ -25,6 +27,8 @@ fn main() -> Result<(), Error> {
     let cli = Cli::parse();
     match cli {
         Cli::Seed { args } => seed(args),
+        Cli::UniversePreset { args } => universe_preset(args),
+        Cli::WorldPreset { args } => world_preset(args),
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
     }

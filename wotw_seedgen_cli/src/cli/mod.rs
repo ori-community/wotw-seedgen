@@ -1,9 +1,13 @@
 mod plando_args;
+mod preset_args;
 mod seed_args;
+mod seed_settings;
 mod stats_args;
 
 pub use plando_args::PlandoArgs;
-pub use seed_args::{GenerationArgs, SeedArgs, SeedSettings};
+pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
+pub use seed_args::{GenerationArgs, SeedArgs};
+pub use seed_settings::{SeedSettings, SeedWorldSettings};
 pub use stats_args::{ChainedAnalyzers, StatsArgs};
 
 use clap::{
@@ -25,6 +29,16 @@ pub enum Cli {
     Seed {
         #[command(flatten)]
         args: SeedArgs,
+    },
+    /// Create a world preset
+    UniversePreset {
+        #[command(flatten)]
+        args: UniversePresetArgs,
+    },
+    /// Create a world preset
+    WorldPreset {
+        #[command(flatten)]
+        args: WorldPresetArgs,
     },
     /// Compile a plandomizer
     Plando {
