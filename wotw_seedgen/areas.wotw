@@ -476,6 +476,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
     kii: WaterDash, Damage=20
     unsafe:
       Bash, Water OR Damage=10  # might be possible without damage if we catch the projectile right?
+      Launch, Water OR Damage=10
   pickup MarshSpawn.BurrowsApproachLedgeEX:  # Most Bash paths redundant with BeforeBurrows->PoolsBurrowsSignpost->BurrowsApproachLedgeEX
     moki: Launch
     gorlek: SentryJump=1, Damage=10, DoubleJump, TripleJump  # Land in the spikes under the pickup and triple jump to the left platform
