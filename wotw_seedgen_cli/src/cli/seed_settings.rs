@@ -1,15 +1,16 @@
 use super::{INVALID, LINK, LITERAL};
-use crate::files;
+use crate::{cli::interactive, files, Error};
 use clap::{
     builder::{styling::Reset, PossibleValue, StringValueParser, TypedValueParser},
     error::ErrorKind,
     value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches,
 };
 use itertools::Itertools;
+use lazy_static::lazy_static;
 use std::{
     convert::Infallible,
     ffi::OsStr,
-    fmt::{Debug, Display, Write},
+    fmt::{self, Debug, Display, Write},
     marker::PhantomData,
     num::NonZeroUsize,
     str::FromStr,
@@ -20,6 +21,107 @@ use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
 use wotw_seedgen_assets::{FileAccess, PresetAccess, SnippetAccess};
 use wotw_seedgen_seed_language::metadata::Metadata;
 
+lazy_static! {
+    pub static ref PRESET_ACCESS: FileAccess =
+        files::preset_access("").unwrap_or_else(|_| FileAccess::new([""]));
+    pub static ref AVAILABLE_UNIVERSE_PRESETS: Vec<AvailablePreset> = PRESET_ACCESS
+        .available_universe_presets()
+        .into_iter()
+        .map(|identifier| {
+            let info = PRESET_ACCESS
+                .universe_preset(&identifier)
+                .map(|preset| preset.info);
+            AvailablePreset { identifier, info }
+        })
+        .collect();
+    pub static ref AVAILABLE_WORLD_PRESETS: Vec<AvailablePreset> = PRESET_ACCESS
+        .available_world_presets()
+        .into_iter()
+        .map(|identifier| {
+            let info = PRESET_ACCESS
+                .world_preset(&identifier)
+                .map(|preset| preset.info);
+            AvailablePreset { identifier, info }
+        })
+        .collect();
+    pub static ref AVAILABLE_SNIPPETS: Vec<AvailableSnippet> = {
+        let snippet_access =
+            files::snippet_access("").unwrap_or_else(|_| FileAccess::new(["", "snippets"]));
+        let mut available_snippets = snippet_access
+            .available_snippets()
+            .into_iter()
+            .map(|identifier| {
+                let metadata = snippet_access
+                    .read_snippet(&identifier)
+                    .map(|source| Metadata::from_source(&source.content))
+                    .unwrap_or_default();
+                AvailableSnippet {
+                    identifier,
+                    metadata,
+                }
+            })
+            .filter(|available_snippet| !available_snippet.metadata.hidden)
+            .collect::<Vec<_>>();
+        available_snippets.sort_unstable_by(|a, b| {
+            a.metadata
+                .category
+                .cmp(&b.metadata.category)
+                .then_with(|| a.identifier.cmp(&b.identifier))
+        });
+        available_snippets
+    };
+}
+
+#[derive(Debug, Clone)]
+pub struct AvailablePreset {
+    pub identifier: String,
+    pub info: Result<Option<PresetInfo>, String>,
+}
+impl Display for AvailablePreset {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let description = match &self.info {
+            Ok(info) => match info {
+                None => "(no details provided by preset)".to_string(),
+                Some(info) => info
+                    .description
+                    .clone()
+                    .unwrap_or_else(|| "(no description provided by preset)".to_string()),
+            },
+            Err(err) => format!("failed to read details: {err}"),
+        };
+        write!(
+            f,
+            "{literal}{identifier}{reset}: {description}",
+            literal = LITERAL.render(),
+            identifier = self.identifier,
+            reset = Reset.render(),
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AvailableSnippet {
+    pub identifier: String,
+    pub metadata: Metadata,
+}
+impl Display for AvailableSnippet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let description = self
+            .metadata
+            .description
+            .as_ref()
+            .map(String::as_str)
+            .unwrap_or_else(|| "(no description provided by snippet)");
+        write!(
+            f,
+            "{literal}{identifier}{reset}: {description}",
+            literal = LITERAL.render(),
+            identifier = self.identifier,
+            reset = Reset.render(),
+        )
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePresetSettings);
 
@@ -29,20 +131,18 @@ impl Args for SeedSettings {
     }
 
     fn augment_args(cmd: clap::Command) -> clap::Command {
-        let preset_access = files::preset_access("").unwrap_or_else(|_| FileAccess::new([""]));
-        let available_snippets = available_snippets();
-
         cmd.group(ArgGroup::new("seed_settings").multiple(true))
+            .arg(interactive_arg())
             .arg(seed_arg())
-            .arg(universe_presets_arg(&preset_access))
+            .arg(universe_presets_arg())
             .arg(worlds_arg())
-            .arg(world_presets_arg(true, &preset_access))
+            .arg(world_presets_arg(true))
             .arg(spawn_arg(true))
             .arg(difficulty_arg(true))
             .arg(tricks_arg(true))
             .arg(hard_arg(true))
-            .arg(snippets_arg(true, &available_snippets))
-            .arg(snippet_config_arg(true, &available_snippets))
+            .arg(snippets_arg(true))
+            .arg(snippet_config_arg(true))
     }
 
     fn augment_args_for_update(cmd: clap::Command) -> clap::Command {
@@ -59,22 +159,30 @@ impl Args for SeedWorldSettings {
     }
 
     fn augment_args(cmd: clap::Command) -> clap::Command {
-        let preset_access = files::preset_access("").unwrap_or_else(|_| FileAccess::new([""]));
-        let available_snippets = available_snippets();
-
         cmd.group(ArgGroup::new("seed_settings").multiple(true))
-            .arg(world_presets_arg(false, &preset_access))
+            .arg(interactive_arg())
+            .arg(world_presets_arg(false))
             .arg(spawn_arg(false))
             .arg(difficulty_arg(false))
             .arg(tricks_arg(false))
             .arg(hard_arg(false))
-            .arg(snippets_arg(false, &available_snippets))
-            .arg(snippet_config_arg(false, &available_snippets))
+            .arg(snippets_arg(false))
+            .arg(snippet_config_arg(false))
     }
 
     fn augment_args_for_update(cmd: clap::Command) -> clap::Command {
         Self::augment_args(cmd)
     }
+}
+
+fn interactive_arg() -> Arg {
+    Arg::new("interactive")
+        .group("seed_settings")
+        .long("interactive")
+        .short('i')
+        .value_name("BOOLEAN")
+        .action(ArgAction::SetTrue)
+        .help("Interactively choose settings")
 }
 
 fn seed_arg() -> Arg {
@@ -86,7 +194,7 @@ fn seed_arg() -> Arg {
         .long_help("Generating with the same seed on the same seedgen version should always output the same result")
 }
 
-fn universe_presets_arg(preset_access: &FileAccess) -> Arg {
+fn universe_presets_arg() -> Arg {
     Arg::new("universe_presets")
         .group("seed_settings")
         .long("universe-presets")
@@ -94,15 +202,7 @@ fn universe_presets_arg(preset_access: &FileAccess) -> Arg {
         .value_name("NAME")
         .num_args(1..)
         .help("Universe presets to include")
-        .long_help(preset_help(
-            &preset_access.available_universe_presets(),
-            "Universe",
-            |identifier| {
-                preset_access
-                    .universe_preset(identifier)
-                    .map(|preset| preset.info)
-            },
-        ))
+        .long_help(preset_help(&*AVAILABLE_UNIVERSE_PRESETS, "Universe"))
 }
 
 fn worlds_arg() -> Arg {
@@ -157,7 +257,7 @@ macro_rules! choose_strum_enum_parser {
     };
 }
 
-fn world_presets_arg(world_scoped: bool, preset_access: &FileAccess) -> Arg {
+fn world_presets_arg(world_scoped: bool) -> Arg {
     let arg = Arg::new("world_presets")
         .group("seed_settings")
         .long("world-presets")
@@ -165,15 +265,7 @@ fn world_presets_arg(world_scoped: bool, preset_access: &FileAccess) -> Arg {
         .value_name("NAME")
         .num_args(1..)
         .help("World presets to include")
-        .long_help(preset_help(
-            &preset_access.available_world_presets(),
-            "World",
-            |identifier| {
-                preset_access
-                    .world_preset(identifier)
-                    .map(|preset| preset.info)
-            },
-        ));
+        .long_help(preset_help(&*AVAILABLE_WORLD_PRESETS, "World"));
     choose_parser!(arg, world_scoped, String)
 }
 
@@ -253,7 +345,7 @@ fn hard_arg(world_scoped: bool) -> Arg {
     choose_parser!(arg, world_scoped, bool)
 }
 
-fn snippets_arg(world_scoped: bool, available_snippets: &[(String, Metadata)]) -> Arg {
+fn snippets_arg(world_scoped: bool) -> Arg {
     let arg = Arg::new("snippets")
         .group("seed_settings")
         .long("snippets")
@@ -261,11 +353,11 @@ fn snippets_arg(world_scoped: bool, available_snippets: &[(String, Metadata)]) -
         .value_name("NAME")
         .num_args(1..)
         .help("Snippets to use")
-        .long_help(snippets_help(available_snippets));
+        .long_help(snippets_help(&*AVAILABLE_SNIPPETS));
     choose_parser!(arg, world_scoped, String)
 }
 
-fn snippet_config_arg(world_scoped: bool, available_snippets: &[(String, Metadata)]) -> Arg {
+fn snippet_config_arg(world_scoped: bool) -> Arg {
     let arg = Arg::new("snippet_config")
         .group("seed_settings")
         .long("snippet_config")
@@ -273,70 +365,41 @@ fn snippet_config_arg(world_scoped: bool, available_snippets: &[(String, Metadat
         .value_name("SNIPPET.CONFIG=VALUE")
         .num_args(1..)
         .help("Configuration to pass to snippets")
-        .long_help(snippet_config_help(available_snippets));
+        .long_help(snippet_config_help(&*AVAILABLE_SNIPPETS));
     choose_parser!(arg, world_scoped, SnippetConfigArg)
 }
 
-fn preset_help<F>(available_presets: &[String], kind: &str, mut get_description: F) -> String
-where
-    F: FnMut(&str) -> Result<Option<PresetInfo>, String>,
-{
+fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
     let kind_lower = kind.to_ascii_lowercase();
     let mut help = format!(
-        "{kind} presets can define an entire multiworld setup, including worlds with different settings\n\
+        "{kind} presets define reusable settings to be applied to a {kind_lower}.\n\
+        For details on how to create them, try '{literal}seedgen help {kind_lower}-preset{reset}'\n\
         All json files in the '{kind_lower}_presets' folder in the current working directory are available\n\n\
-        Currently {} {kind_lower} preset{} available",
-        available_presets.len(),
-        if available_presets.len() == 1 { " is" } else { "s are" }
+        Currently {count} {kind_lower} preset{plural} available",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+        count = available_presets.len(),
+        plural = if available_presets.len() == 1 { " is" } else { "s are" }
     );
     if !available_presets.is_empty() {
         write!(
             help,
             ":\n{}",
-            available_presets.iter().format_with("\n", |identifier, f| {
-                let description = match get_description(identifier) {
-                    Ok(info) => match info {
-                        None => "no details provided by preset".to_string(),
-                        Some(info) => info
-                            .description
-                            .map(|description| description.replace('\n', "\n        "))
-                            .unwrap_or_else(|| "no description provided by preset".to_string()),
-                    },
-                    Err(err) => format!("failed to read details: {err}"),
-                };
-                f(&format_args!(
-                    "    {literal}{identifier}{reset}: {description}",
-                    literal = LITERAL.render(),
-                    reset = Reset.render(),
-                ))
-            })
+            available_presets
+                .iter()
+                .format_with("\n", |available_preset, f| {
+                    f(&format_args!(
+                        "    {}",
+                        available_preset.to_string().replace('\n', "\n        ")
+                    ))
+                })
         )
         .unwrap();
     }
-    help // TODO how create
+    help
 }
 
-fn available_snippets() -> Vec<(String, Metadata)> {
-    let snippet_access =
-        files::snippet_access("").unwrap_or_else(|_| FileAccess::new(["", "snippets"]));
-    let mut available_snippets = snippet_access
-        .available_snippets()
-        .into_iter()
-        .map(|identifier| {
-            let metadata = snippet_access
-                .read_snippet(&identifier)
-                .map(|source| Metadata::from_source(&source.content))
-                .unwrap_or_default();
-            (identifier, metadata)
-        })
-        .filter(|(_, metadata)| !metadata.hidden)
-        .collect::<Vec<_>>();
-    available_snippets
-        .sort_unstable_by(|a, b| a.1.category.cmp(&b.1.category).then_with(|| a.0.cmp(&b.0)));
-    available_snippets
-}
-
-fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
+fn snippets_help(available_snippets: &[AvailableSnippet]) -> String {
     let mut help = format!(
         "Snippets can modify seed generation in many ways.\n\
         All wotws files in the 'snippets' folder inside the current directory or seedgen's directory are available\n\
@@ -351,7 +414,7 @@ fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
             ":\n{}",
             available_snippets
                 .iter()
-                .chunk_by(|(_, metadata)| &metadata.category)
+                .chunk_by(|available_snippet| &available_snippet.metadata.category)
                 .into_iter()
                 .format_with("\n", |(category, snippets), f| {
                     let category = category
@@ -360,18 +423,12 @@ fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
                         .unwrap_or("No category");
                     f(&format_args!(
                         "    {category}:\n{}",
-                        snippets.format_with("\n", |(identifier, metadata), f| {
-                            let description = metadata
-                                .description
-                                .as_ref()
-                                .map(|description| description.replace('\n', "\n            "))
-                                .unwrap_or_else(|| {
-                                    "no description provided by snippet".to_string()
-                                });
+                        snippets.format_with("\n", |available_snippet, f| {
                             f(&format_args!(
-                                "        {literal}{identifier}{reset}: {description}",
-                                literal = LITERAL.render(),
-                                reset = Reset.render(),
+                                "        {}",
+                                available_snippet
+                                    .to_string()
+                                    .replace('\n', "\n            ")
                             ))
                         }),
                     ))
@@ -382,7 +439,7 @@ fn snippets_help(available_snippets: &[(String, Metadata)]) -> String {
     help
 }
 
-fn snippet_config_help(available_snippets: &[(String, Metadata)]) -> String {
+fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
     let mut help = format!(
         "Many snippets offer additional settings to customize their behaviour.\n\
         These will only have an effect if you use the respective snippet.\n\
@@ -393,12 +450,13 @@ fn snippet_config_help(available_snippets: &[(String, Metadata)]) -> String {
     if !available_snippets.is_empty() {
         let _ = write!(help, "\nCurrently these configurations are available:");
 
-        for (snippet_identifier, metadata) in available_snippets {
-            for (config_identifier, config_value) in &metadata.config {
+        for available_snippet in available_snippets {
+            for (config_identifier, config_value) in &available_snippet.metadata.config {
                 let _ = write!(
                     help,
                     "\n    {literal}{snippet_identifier}.{config_identifier}{reset}: {description} [default: {default}]",
                     literal = LITERAL.render(),
+                    snippet_identifier = available_snippet.identifier,
                     reset = Reset.render(),
                     description = config_value.description,
                     default = config_value.default,
@@ -687,6 +745,10 @@ impl FromArgMatches for SeedSettings {
 
         self.0.world_settings = Some(world_settings);
 
+        if matches.get_flag("interactive") {
+            interactive::seed_settings(&mut self.0).map_err(interactive_error)?;
+        }
+
         Ok(())
     }
 }
@@ -717,6 +779,18 @@ impl FromArgMatches for SeedWorldSettings {
                 .map(|snippet_config| snippet_config.cloned().collect()),
         };
 
+        if matches.get_flag("interactive") {
+            interactive::seed_world_settings(String::new(), &mut self.0)
+                .map_err(interactive_error)?;
+        }
+
         Ok(())
     }
+}
+
+fn interactive_error(err: Error) -> clap::Error {
+    clap::Error::raw(
+        ErrorKind::ValueValidation,
+        format!("interactive session failed: {err:?}"),
+    )
 }

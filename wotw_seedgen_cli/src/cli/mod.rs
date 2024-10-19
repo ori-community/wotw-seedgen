@@ -1,3 +1,4 @@
+mod interactive;
 mod plando_args;
 mod preset_args;
 mod seed_args;
@@ -7,7 +8,10 @@ mod stats_args;
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
 pub use seed_args::{GenerationArgs, SeedArgs};
-pub use seed_settings::{SeedSettings, SeedWorldSettings};
+pub use seed_settings::{
+    SeedSettings, SeedWorldSettings, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
+    AVAILABLE_WORLD_PRESETS,
+};
 pub use stats_args::{ChainedAnalyzers, StatsArgs};
 
 use clap::{
@@ -22,7 +26,6 @@ const INVALID: Style = *STYLES.get_invalid();
 
 // TODO configure assets file paths
 
-// TODO documentation for the commands
 #[derive(Parser)]
 pub enum Cli {
     /// Generate a seed
@@ -30,7 +33,7 @@ pub enum Cli {
         #[command(flatten)]
         args: SeedArgs,
     },
-    /// Create a world preset
+    /// Create a universe preset
     UniversePreset {
         #[command(flatten)]
         args: UniversePresetArgs,

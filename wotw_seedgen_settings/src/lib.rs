@@ -15,7 +15,7 @@
 
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
-use strum::{Display, EnumString, VariantNames};
+use strum::{Display, EnumString, VariantArray, VariantNames};
 
 /// A representation of all the relevant settings when generating a seed
 ///
@@ -122,6 +122,7 @@ impl Default for Spawn {
     Display,
     EnumString,
     VariantNames,
+    VariantArray,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum Difficulty {
@@ -149,6 +150,7 @@ pub enum Difficulty {
     Display,
     EnumString,
     VariantNames,
+    VariantArray,
 )]
 pub enum Trick {
     /// Grounded Sentry Jumps with Sword

@@ -1,11 +1,14 @@
-use clap::Args;
+use clap::{builder::styling::Reset, Args};
 
-use super::{SeedSettings, SeedWorldSettings};
+use super::{SeedSettings, SeedWorldSettings, LITERAL};
 
 #[derive(Args, Debug, Default)]
 pub struct WorldPresetArgs {
-    /// The preset's identifier which you can later pass like `seedgen seed -p <identifier>`
-    #[arg(short, long, value_name = "STRING")]
+    #[arg(help = format!(
+        "The preset's identifier which you can later pass like '{literal}seedgen seed -p <identifier>{reset}'",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+    ))]
     pub identifier: String,
     #[command(flatten)]
     pub settings: SeedWorldSettings,
@@ -15,8 +18,11 @@ pub struct WorldPresetArgs {
 
 #[derive(Args, Debug, Default)]
 pub struct UniversePresetArgs {
-    /// The preset's identifier which you can later pass like `seedgen seed -P <identifier>`
-    #[arg(short, long, value_name = "STRING")]
+    #[arg(help = format!(
+        "The preset's identifier which you can later pass like '{literal}seedgen seed -P <identifier>{reset}'",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+    ))]
     pub identifier: String,
     #[command(flatten)]
     pub settings: SeedSettings,
