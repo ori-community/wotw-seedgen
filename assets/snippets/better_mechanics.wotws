@@ -4,19 +4,24 @@
 
 !config(better_stomp, "Preserve velocity when stomping through portals and into water", Boolean, true)
 !config(fragment_overflow, "When collecting a Health or Energy fragment with the Overflow shard equipped, refill both resources instead of just the matching one", Boolean, true)
+!config(shriek_escape_health_bar, "Keeps the health bar visible during Shriek Escape", Boolean, true)
 !config(teleport_refill, "Heals you to full when warping to a spirit well", Boolean, true)
 
-!if better_stomp == true {
+!if better_stomp {
     on spawn store(randoConfig.stompThroughPortals, true)
     on spawn store(randoConfig.stompIntoWater, true)
 }
 
-!if fragment_overflow == true {
+!if fragment_overflow {
     // TODO this probably doesn't do anything anymore?
     on spawn store(randoUpgrades.overflowPickupUpgrade, true)
 }
 
-!if teleport_refill == true {
+!if shriek_escape_health_bar {
+    // TODO enable on spawn store(randoConfig.keepShriekHealthBarDuringEscape, true)
+}
+
+!if teleport_refill {
     on teleport {
         store(player.health, 999)
         store(player.energy, 999)
