@@ -351,7 +351,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             "Unable to find any possible forced progression\n{}",
             self.worlds.iter().format_with("\n", |world_context, f| {
                 f(&format_args!(
-                    "{index}{len} unreached locations: {identifiers}\nwith these items: {inventory}",
+                    "{index}{len} unreached locations: {identifiers}\nwith these items: {inventory}\nand this item pool: {item_pool}",
                     index = world_context.log_index,
                     len = world_context.needs_placement.len(),
                     identifiers = world_context
@@ -360,6 +360,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .map(|node| node.identifier())
                         .format(", "),
                     inventory = world_context.world.player.inventory,
+                    item_pool = world_context.item_pool.inventory(),
                 ))
             })
         );
@@ -400,7 +401,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         for (target_world_index, command) in commands {
             self.force_place_command(command.clone(), target_world_index);
             let world_context = &mut self.worlds[target_world_index];
-            world_context.item_pool.change(command, -1);
             if world_context.world.reached().len() > initial_reached[target_world_index] {
                 trace!(
                     "{}reached additional locations, resuming normal placement loop",
@@ -1320,6 +1320,7 @@ fn default_icon(command: &CommandVoid) -> Option<Icon> {
 
 // TODO make a generic contained_commands iterator?
 // This catches common cases but would fail to detect edge case commands
+// TODO well, now everything modifies uberStates 😅
 fn modifies_uberstate(command: &CommandVoid, output: &IntermediateOutput) -> bool {
     match command {
         CommandVoid::Multi { commands } => commands
