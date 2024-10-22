@@ -1,6 +1,7 @@
 use crate::{
     cli::{GenerationArgs, PlandoArgs},
-    files, Error,
+    files::{self, launch_seed},
+    Error,
 };
 use std::{
     ffi::OsStr,
@@ -79,7 +80,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     eprintln!("compiled successfully to \"{}\"", out.display());
 
     if launch {
-        open::that_detached(&out).map_err(|err| file_err("launch", &out, err))?;
+        launch_seed(out)?;
     }
 
     Ok(())

@@ -19,6 +19,8 @@ pub struct GenerationArgs {
     #[arg(long)]
     pub debug: bool,
     /// Load the seed into the randomizer after finishing
+    ///
+    /// Ignored when generating multiworld seeds
     #[arg(short, long)]
     pub launch: bool,
 }
