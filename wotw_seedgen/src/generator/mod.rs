@@ -91,7 +91,7 @@ pub fn generate_seed<F: SnippetAccess>(
             })
             .collect::<Result<Vec<_>, String>>()?;
 
-        match generate_placements(&mut rng, worlds, debug) {
+        match generate_placements(&mut rng, worlds, settings, debug) {
             Ok(seed) => {
                 if attempt > 1 {
                     info!(

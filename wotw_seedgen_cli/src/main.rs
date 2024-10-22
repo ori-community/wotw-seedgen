@@ -3,6 +3,7 @@ mod files;
 mod log_init;
 mod plando;
 mod preset;
+mod regenerate;
 mod seed;
 mod stats;
 
@@ -11,6 +12,7 @@ use clap::Parser;
 use cli::Cli;
 use plando::plando;
 use preset::{universe_preset, world_preset};
+use regenerate::regenerate;
 use seed::seed;
 use stats::stats;
 use std::{
@@ -31,6 +33,7 @@ fn main() -> Result<(), Error> {
         Cli::WorldPreset { args } => world_preset(args),
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
+        Cli::Regenerate { args } => regenerate(args),
     }
 }
 

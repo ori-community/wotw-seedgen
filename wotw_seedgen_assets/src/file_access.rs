@@ -16,8 +16,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-fn read_err<E: Display>(action: &str, path: &Path, err: E) -> String {
-    format!("failed to {action} \"{}\": {err}", path.display())
+pub fn file_err<E: Display, P: AsRef<Path>>(action: &str, path: P, err: E) -> String {
+    format!("failed to {action} \"{}\": {err}", path.as_ref().display())
 }
 
 pub struct FileAccess {
@@ -36,12 +36,12 @@ impl FileAccess {
     #[cfg(feature = "loc_data")]
     pub fn loc_data(&self) -> Result<LocData, String> {
         let (path, file) = self.open(Path::new("loc_data.csv"))?;
-        LocData::from_reader(file).map_err(|err| read_err("parse", &path, err))
+        LocData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
     #[cfg(feature = "state_data")]
     pub fn state_data(&self) -> Result<StateData, String> {
         let (path, file) = self.open(Path::new("state_data.csv"))?;
-        StateData::from_reader(file).map_err(|err| read_err("parse", &path, err))
+        StateData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
     #[cfg(feature = "uber_state_data")]
     pub fn uber_state_data(
@@ -52,7 +52,7 @@ impl FileAccess {
         // TODO rename uber_state_dump -> uber_state_data
         let (path, file) = self.open(Path::new("uber_state_dump.json"))?;
         UberStateData::from_reader(file, loc_data, state_data)
-            .map_err(|err| read_err("parse", &path, err))
+            .map_err(|err| file_err("parse", &path, err))
     }
     pub fn areas(&self) -> Result<Source, String> {
         let (path, content) = self.read_to_string(Path::new("areas.wotw"))?;
@@ -84,7 +84,7 @@ impl FileAccess {
             match File::open(&full_path) {
                 Ok(file) => return Ok((full_path, file)),
                 Err(err) if err.kind() == ErrorKind::NotFound => attempts.push(full_path),
-                Err(err) => return Err(read_err("read", &full_path, err)),
+                Err(err) => return Err(file_err("read", &full_path, err)),
             }
         }
         return Err(format!(
@@ -100,14 +100,14 @@ impl FileAccess {
         let (path, mut file) = self.open(path)?;
         let mut buf = vec![];
         file.read_to_end(&mut buf)
-            .map_err(|err| read_err("read", &path, err))?;
+            .map_err(|err| file_err("read", &path, err))?;
         Ok((path, buf))
     }
     fn read_to_string(&self, path: &Path) -> Result<(PathBuf, String), String> {
         let (path, mut file) = self.open(path)?;
         let mut buf = String::new();
         file.read_to_string(&mut buf)
-            .map_err(|err| read_err("read", &path, err))?;
+            .map_err(|err| file_err("read", &path, err))?;
         Ok((path, buf))
     }
 
@@ -187,7 +187,7 @@ mod presets {
             path.set_extension("json");
             let (path, file) = self.open(&path)?;
             serde_json::from_reader(BufReader::new(file))
-                .map_err(|err| read_err("parse", &path, err))
+                .map_err(|err| file_err("parse", &path, err))
         }
     }
 }

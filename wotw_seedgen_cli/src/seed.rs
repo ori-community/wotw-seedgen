@@ -8,8 +8,12 @@ use log::LevelFilter;
 use rand::{distributions::Uniform, prelude::Distribution};
 use std::fs::{self, File};
 use wotw_seedgen::{
-    generate_seed, logic_language::ast, logic_language::output::Graph, settings::UniverseSettings,
+    generate_seed,
+    logic_language::{ast, output::Graph},
+    settings::UniverseSettings,
+    SeedUniverse,
 };
+use wotw_seedgen_assets::file_err;
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
@@ -34,6 +38,11 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
             .collect();
     }
 
+    let seed_universe = generate(&settings, debug)?;
+    write(seed_universe, debug, launch)
+}
+
+pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {
     let logic_access = files::logic_access("")?;
     let loc_data = logic_access.loc_data()?;
     let state_data = logic_access.state_data()?;
@@ -52,17 +61,21 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
 
     let uber_state_data = logic_access.uber_state_data(loc_data, state_data)?;
     let snippet_access = files::snippet_access("")?;
-    let mut seed_universe =
-        generate_seed(&graph, &uber_state_data, &snippet_access, &settings, debug)?;
+    let seed_universe = generate_seed(&graph, &uber_state_data, &snippet_access, &settings, debug)?;
 
+    Ok(seed_universe)
+}
+
+pub fn write(mut seed_universe: SeedUniverse, debug: bool, launch: bool) -> Result<(), Error> {
     fs::create_dir_all("seeds")?;
     fs::write("seeds/spoiler.txt", seed_universe.spoiler.to_string())?;
 
     let path = "seeds/seed.wotwr";
-    let seed = seed_universe.worlds.pop().unwrap();
-    seed.package(&mut File::create(path)?, !debug)?;
+    let seed = seed_universe.worlds.pop().unwrap(); // TODO multiworld output
+    let mut file = File::create(path).map_err(|err| file_err("create", path, err))?;
+    seed.package(&mut file, !debug)?;
 
-    eprintln!("Generated seed to \"seeds/seed.wotwr\"");
+    eprintln!("Generated seed to \"{path}\"");
 
     if launch {
         open::that_detached(path).map_err(|err| format!("failed to open \"{path}\": {err}"))?;

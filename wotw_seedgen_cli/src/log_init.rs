@@ -8,6 +8,7 @@ use log4rs::{
     encode::{json::JsonEncoder, pattern::PatternEncoder, Encode},
     filter::threshold::ThresholdFilter,
 };
+use wotw_seedgen_assets::file_err;
 
 pub fn initialize_log(
     use_file: Option<&str>,
@@ -30,7 +31,7 @@ pub fn initialize_log(
             .append(false)
             .encoder(Box::new(PatternEncoder::new("{l:5}  {m}{n}")))
             .build(path)
-            .map_err(|err| format!("Failed to create log file: {}", err))?;
+            .map_err(|err| file_err("create", path, err))?;
 
         Config::builder()
             .appender(Appender::builder().build("log_file", Box::new(log_file)))

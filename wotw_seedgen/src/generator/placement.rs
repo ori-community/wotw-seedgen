@@ -25,6 +25,7 @@ use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, iter, mem, ops::RangeFrom};
 use wotw_seedgen_data::{Equipment, MapIcon, OpherIcon, Skill, UberIdentifier, WeaponUpgrade};
 use wotw_seedgen_logic_language::output::{Node, Requirement};
+use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
     compile,
     output::{
@@ -32,6 +33,7 @@ use wotw_seedgen_seed_language::{
         ItemMetadata, StringOrPlaceholder, Trigger,
     },
 };
+use wotw_seedgen_settings::UniverseSettings;
 
 const KEYSTONE_DOORS: &[(&str, usize)] = &[
     ("MarshSpawn.KeystoneDoor", 2),
@@ -56,13 +58,14 @@ const TOTAL_SPIRIT_LIGHT: i32 = 20000;
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
     worlds: Vec<(World, IntermediateOutput)>,
+    settings: &UniverseSettings,
     debug: bool,
 ) -> Result<SeedUniverse, String> {
     assert!(
         !worlds.is_empty(),
         "Need at least one world to generate a seed"
     );
-    let mut context = Context::new(rng, worlds);
+    let mut context = Context::new(rng, worlds, settings);
 
     context.preplacements();
 
@@ -88,6 +91,7 @@ pub fn generate_placements(
 pub struct Context<'graph, 'settings> {
     rng: Pcg64Mcg,
     pub worlds: Vec<WorldContext<'graph, 'settings>>,
+    settings: &'settings UniverseSettings,
     /// next multiworld uberState id to use
     multiworld_state_index: RangeFrom<i32>,
     /// current placement step
@@ -134,6 +138,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn new(
         rng: &mut Pcg64Mcg,
         worlds: Vec<(World<'graph, 'settings>, IntermediateOutput)>,
+        settings: &'settings UniverseSettings,
     ) -> Self {
         let multiworld = worlds.len() > 1;
         let worlds = worlds
@@ -155,6 +160,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         Self {
             rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
             worlds,
+            settings,
             multiworld_state_index: 0..,
             step: 0,
             spoiler,
@@ -667,8 +673,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     ); // TODO custom icons in snippets
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
                     world_context.output.spawn = Some(*spawn.position().unwrap());
-                    Seed::new(world_context.output, debug)
-                    // TODO add seedgen info (spawn.identifier().to_string())
+                    let seedgen_info = SeedgenInfo {
+                        universe_settings: self.settings.clone(),
+                        world_index: world_context.index,
+                        spawn_identifier: spawn.identifier().to_string(),
+                    };
+                    Seed::new(world_context.output, debug).with_seedgen_info(seedgen_info)
                 })
                 .collect(),
             spoiler: self.spoiler,

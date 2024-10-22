@@ -7,6 +7,7 @@ use std::{
     fs::{self, File},
 };
 use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
+use wotw_seedgen_assets::file_err;
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
@@ -72,15 +73,13 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         }
         Some(name) => out.push(format!("{name}.wotwr")),
     }
-    let mut file = File::create(&out)
-        .map_err(|err| format!("failed to create \"{}\": {err}", out.display()))?;
+    let mut file = File::create(&out).map_err(|err| file_err("create", &out, err))?;
     seed.package(&mut file, !debug)?;
 
     eprintln!("compiled successfully to \"{}\"", out.display());
 
     if launch {
-        open::that_detached(&out)
-            .map_err(|err| format!("failed to open \"{}\": {err}", out.display()))?;
+        open::that_detached(&out).map_err(|err| file_err("launch", &out, err))?;
     }
 
     Ok(())

@@ -45,7 +45,7 @@ pub use presets::{
 #[cfg(feature = "file_access")]
 mod file_access;
 #[cfg(feature = "file_access")]
-pub use file_access::FileAccess;
+pub use file_access::{file_err, FileAccess};
 
 /// Representation of a source file with the necessary information to display useful error messages.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

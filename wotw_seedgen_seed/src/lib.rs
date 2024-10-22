@@ -5,6 +5,9 @@ pub mod assembly;
 
 mod compile;
 mod package;
+mod seedgen_info;
+
+pub use seedgen_info::SeedgenInfo;
 
 use assembly::{Assembly, Command};
 use compile::intermediate::{compile_command_lookup, compile_events};
@@ -26,6 +29,7 @@ pub struct Seed {
     pub format_version: &'static str,
     pub preload: Preload,
     pub assembly: Assembly,
+    pub seedgen_info: Option<SeedgenInfo>,
     pub assets: FxHashMap<String, Vec<u8>>,
 }
 
@@ -46,6 +50,7 @@ impl Seed {
                 events,
                 command_lookup,
             },
+            seedgen_info: None,
             assets: output.icons.into_iter().collect(), // TODO decide on a consistent data structure
         };
 
@@ -67,6 +72,11 @@ impl Seed {
         }
 
         seed
+    }
+
+    pub fn with_seedgen_info(mut self, seedgen_info: SeedgenInfo) -> Self {
+        self.seedgen_info = Some(seedgen_info);
+        self
     }
 }
 

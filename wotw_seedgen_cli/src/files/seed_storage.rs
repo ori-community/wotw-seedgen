@@ -1,4 +1,3 @@
-
 use crate::handle_errors::HandleErrors;
 
 use super::*;
@@ -28,8 +27,7 @@ impl FileAccess for FileSystemAccess {
     fn write_seed(seed: &SeedSpoiler, settings: &UniverseSettings, mut key: usize) -> Result<()> {
         let bytes = bincode::serialize(seed).expect("Failed to serialize spoiler");
         let base_path = path_from_settings(settings);
-        fs::create_dir_all(&base_path)
-            .map_err(|err| format!("Failed to create folder for seed storage: {err}"))?;
+        fs::create_dir_all(&base_path)?;
         loop {
             let mut path = base_path.to_path_buf();
             path.push(key.to_string());
