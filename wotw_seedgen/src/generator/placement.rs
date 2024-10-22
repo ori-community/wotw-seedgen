@@ -7,8 +7,8 @@ use crate::{
     filter_redundancies,
     inventory::Inventory,
     node_condition, node_trigger,
-    orbs::OrbVariants,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerPlacement},
+    world::Progression,
     World,
 };
 use itertools::Itertools;
@@ -24,7 +24,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, iter, mem, ops::RangeFrom};
 use wotw_seedgen_data::{Equipment, MapIcon, OpherIcon, Skill, UberIdentifier, WeaponUpgrade};
-use wotw_seedgen_logic_language::output::{Node, Requirement};
+use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
     compile,
@@ -118,7 +118,7 @@ pub struct WorldContext<'graph, 'settings> {
     /// reached nodes at the start of the current placement step
     reached: Vec<&'graph Node>,
     /// unmet requirements at the start of the current placement step
-    progressions: Vec<(&'graph Requirement, OrbVariants)>,
+    progressions: Vec<Progression<'graph>>,
     /// indices into `needs_placement` for nodes that are reachable and may be used for placements in this step
     reached_needs_placement: Vec<usize>,
     /// indices into `needs_placement` for nodes that have received a placement and should be removed before the next placement step
@@ -875,11 +875,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         let world_slots = self.progression_slots();
         let mut progressions = mem::take(&mut self.progressions)
             .into_iter()
-            .flat_map(|(requirement, best_orbs)| {
+            .flat_map(|progression| {
                 self.world.player.solutions(
-                    requirement,
+                    &progression.connection.requirement,
                     &self.world.logic_states,
-                    best_orbs,
+                    progression.orb_variants,
                     slots,
                     world_slots,
                 )

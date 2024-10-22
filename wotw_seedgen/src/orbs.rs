@@ -1,4 +1,7 @@
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::{
+    fmt::{self, Display},
+    ops::{Add, AddAssign, Sub, SubAssign},
+};
 
 use smallvec::{smallvec, SmallVec, ToSmallVec};
 
@@ -38,6 +41,12 @@ impl Sub for Orbs {
 impl SubAssign for Orbs {
     fn sub_assign(&mut self, other: Orbs) {
         *self = *self - other;
+    }
+}
+
+impl Display for Orbs {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}/{})", self.health, self.energy)
     }
 }
 

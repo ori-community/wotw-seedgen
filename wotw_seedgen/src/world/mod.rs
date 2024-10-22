@@ -10,7 +10,7 @@ pub use simulate::Simulate;
 pub use uber_states::UberStates;
 
 pub(crate) use graph::{node_condition, node_trigger};
-pub(crate) use reached::ReachedLocations;
+pub(crate) use reached::{Progression, ReachedLocations};
 // TODO remove maybe
 pub(crate) use player::filter_redundancies;
 
@@ -100,6 +100,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 
         self.reach_recursion(self.spawn, smallvec![self.player.max_orbs()], &mut context);
         self.reached_by_teleporter(&mut context);
+        context.finish_progressions();
 
         context.reached_locations
     }

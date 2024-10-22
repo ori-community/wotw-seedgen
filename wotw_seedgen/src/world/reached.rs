@@ -1,5 +1,7 @@
 use super::World;
 use crate::orbs::{self, OrbVariants};
+use itertools::Itertools;
+use log::trace;
 use rustc_hash::FxHashMap;
 use smallvec::smallvec;
 use wotw_seedgen_logic_language::output::{Connection, Node, RefillValue, Requirement};
@@ -9,7 +11,13 @@ pub const TP_ANCHOR: &str = "Teleporters";
 #[derive(Debug, Default)]
 pub struct ReachedLocations<'graph> {
     pub reached: Vec<&'graph Node>,
-    pub progressions: Vec<(&'graph Requirement, OrbVariants)>,
+    pub progressions: Vec<Progression<'graph>>,
+}
+
+#[derive(Debug)]
+pub struct Progression<'graph> {
+    pub connection: &'graph Connection,
+    pub orb_variants: OrbVariants,
 }
 
 impl<'graph, 'settings> World<'graph, 'settings> {
@@ -23,6 +31,13 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             .best_orbs
             .insert(current_node_index, best_orbs.clone());
         let current_node = &self.graph.nodes[current_node_index];
+        let identifier = current_node.identifier();
+
+        trace!(
+            "[{identifier}] reached with {}",
+            best_orbs.iter().format(" or ")
+        );
+
         match current_node {
             Node::Anchor(anchor) => {
                 let max_orbs = self.player.max_orbs();
@@ -53,23 +68,33 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                         // TODO loop with improved orbs?
                         continue;
                     }
+
+                    let to_identifier = self.graph.nodes[connection.to].identifier();
+                    trace!("[{identifier}] -> [{to_identifier}] attempting to connect");
+
                     let target_orbs = self.player.is_met(
                         &connection.requirement,
                         &self.logic_states,
                         best_orbs.clone(),
                     );
+
                     if target_orbs.is_empty() {
+                        trace!("[{identifier}] -> [{to_identifier}] cannot meet requirement");
+
                         let mut states = vec![];
                         contained_states(&connection.requirement, &mut states);
+                        states.retain(|index| !context.best_orbs.contains_key(index));
 
                         if states.is_empty() {
                             if context.progression_check {
-                                context
-                                    .reached_locations
-                                    .progressions
-                                    .push((&connection.requirement, best_orbs.clone()));
+                                context.reached_locations.progressions.push(Progression {
+                                    connection: &connection,
+                                    orb_variants: best_orbs.clone(),
+                                });
                             }
                         } else {
+                            trace!("[{identifier}] -> [{to_identifier}] adding state progressions for {}", states.iter().map(|index| self.graph.nodes[*index].identifier()).format(", "));
+
                             for state in states {
                                 context
                                     .state_progressions
@@ -120,8 +145,8 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         }
     }
     fn follow_state_progressions(&mut self, index: usize, context: &mut ReachContext<'graph>) {
-        if let Some(connections) = context.state_progressions.get(&index) {
-            for (from, connection) in connections.clone() {
+        if let Some(connections) = context.state_progressions.remove(&index) {
+            for (from, connection) in connections {
                 if context.best_orbs.contains_key(&connection.to) {
                     // TODO loop with improved orbs?
                     continue;
@@ -143,8 +168,27 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 pub struct ReachContext<'graph> {
     pub progression_check: bool,
     state_progressions: FxHashMap<usize, Vec<(usize, &'graph Connection)>>,
-    best_orbs: FxHashMap<usize, OrbVariants>,
+    pub best_orbs: FxHashMap<usize, OrbVariants>,
     pub reached_locations: ReachedLocations<'graph>,
+}
+
+impl ReachContext<'_> {
+    pub fn finish_progressions(&mut self) {
+        let unsolved_state_progressions =
+            self.state_progressions.values().flat_map(|connections| {
+                connections.iter().map(|(from, connection)| Progression {
+                    connection,
+                    orb_variants: self.best_orbs.get(&from).unwrap().clone(),
+                })
+            });
+        self.reached_locations
+            .progressions
+            .extend(unsolved_state_progressions);
+
+        self.reached_locations
+            .progressions
+            .retain(|progression| !self.best_orbs.contains_key(&progression.connection.to));
+    }
 }
 
 // TODO this optimization existed previously for contained_states, is it relevant?

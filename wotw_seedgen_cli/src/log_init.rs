@@ -4,7 +4,7 @@ use log4rs::{
         console::{ConsoleAppender, Target},
         file::FileAppender,
     },
-    config::{Appender, Config, Root},
+    config::{Appender, Config, Logger, Root},
     encode::{json::JsonEncoder, pattern::PatternEncoder, Encode},
     filter::threshold::ThresholdFilter,
 };
@@ -40,6 +40,7 @@ pub fn initialize_log(
                     .filter(Box::new(ThresholdFilter::new(stderr_log_level)))
                     .build("stderr", Box::new(stderr)),
             )
+            .logger(Logger::builder().build("wotw_seedgen::world::reached", LevelFilter::Off))
             .build(
                 Root::builder()
                     .appender("stderr")
