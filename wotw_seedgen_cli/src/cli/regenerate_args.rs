@@ -1,11 +1,12 @@
 use clap::Args;
 use std::path::PathBuf;
 
+use super::seed_args::VerboseArgs;
+
 #[derive(Args)]
 pub struct RegenerateArgs {
     /// Path to the existing seed
     pub path: PathBuf,
-    /// Write a detailed log into seedgen_log.txt
-    #[arg(short, long)]
-    pub verbose: bool,
+    #[command(flatten)]
+    pub verbose_args: VerboseArgs,
 }

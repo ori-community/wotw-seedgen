@@ -1,10 +1,9 @@
 use crate::{
     cli::{GenerationArgs, SeedArgs, SeedSettings},
     files::{self, write_seed},
-    log_init::initialize_log,
+    log_config::LogConfig,
     Error,
 };
-use log::LevelFilter;
 use rand::{distributions::Uniform, prelude::Distribution};
 use wotw_seedgen::{
     generate_seed,
@@ -17,14 +16,10 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
         settings: SeedSettings(universe_preset_settings),
         generation_args: GenerationArgs { debug, launch },
-        verbose,
+        verbose_args,
     } = args;
 
-    initialize_log(
-        verbose.then_some("seedgen_log.txt"),
-        LevelFilter::Info,
-        false,
-    )?;
+    LogConfig::from_args(verbose_args).apply()?;
 
     let mut settings = UniverseSettings::new("".to_string());
     universe_preset_settings.apply(&mut settings, &files::preset_access("")?)?;

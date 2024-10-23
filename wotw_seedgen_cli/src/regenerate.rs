@@ -1,21 +1,16 @@
 use std::fs::File;
 
-use log::LevelFilter;
 use serde::de::DeserializeOwned;
 use wotw_seedgen::seed::{assembly::Assembly, SeedgenInfo};
 use wotw_seedgen_assets::file_err;
 use zip::{read::ZipFile, ZipArchive};
 
-use crate::{cli::RegenerateArgs, log_init::initialize_log, seed::generate, Error};
+use crate::{cli::RegenerateArgs, log_config::LogConfig, seed::generate, Error};
 
 pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
-    let RegenerateArgs { path, verbose } = args;
+    let RegenerateArgs { path, verbose_args } = args;
 
-    initialize_log(
-        verbose.then_some("seedgen_log.txt"),
-        LevelFilter::Info,
-        false,
-    )?;
+    LogConfig::from_args(verbose_args).apply()?;
 
     let file = File::open(&path).map_err(|err| file_err("open", &path, err))?;
     let mut archive = ZipArchive::new(file).map_err(|err| file_err("read", &path, err))?;

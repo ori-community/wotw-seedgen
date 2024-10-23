@@ -1,6 +1,6 @@
 mod cli;
 mod files;
-mod log_init;
+mod log_config;
 mod plando;
 mod preset;
 mod regenerate;

@@ -9,7 +9,7 @@ mod stats_args;
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
 pub use regenerate_args::RegenerateArgs;
-pub use seed_args::{GenerationArgs, SeedArgs};
+pub use seed_args::{GenerationArgs, SeedArgs, VerboseArgs, VerboseTarget};
 pub use seed_settings::{
     SeedSettings, SeedWorldSettings, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
     AVAILABLE_WORLD_PRESETS,
