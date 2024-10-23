@@ -14,7 +14,7 @@ pub use seed_settings::{
     SeedSettings, SeedWorldSettings, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
     AVAILABLE_WORLD_PRESETS,
 };
-pub use stats_args::{ChainedAnalyzers, StatsArgs};
+pub use stats_args::{Analyzer, ChainedAnalyzers, StatsArgs};
 
 use clap::{
     builder::{styling::Style, Styles},

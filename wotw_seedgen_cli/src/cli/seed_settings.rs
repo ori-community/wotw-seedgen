@@ -16,8 +16,11 @@ use std::{
     str::FromStr,
 };
 use strum::VariantNames;
-use wotw_seedgen::assets::{PresetInfo, UniversePresetSettings, WorldPresetSettings};
 use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
+use wotw_seedgen::{
+    assets::{PresetInfo, UniversePresetSettings, WorldPresetSettings},
+    settings::UniverseSettings,
+};
 use wotw_seedgen_assets::{FileAccess, PresetAccess, SnippetAccess};
 use wotw_seedgen_seed_language::metadata::Metadata;
 
@@ -124,6 +127,14 @@ impl Display for AvailableSnippet {
 
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePresetSettings);
+
+impl SeedSettings {
+    pub fn into_universe_settings(self) -> Result<UniverseSettings, Error> {
+        let mut settings = UniverseSettings::new("".to_string());
+        self.0.apply(&mut settings, &files::preset_access("")?)?;
+        Ok(settings)
+    }
+}
 
 impl Args for SeedSettings {
     fn group_id() -> Option<clap::Id> {
@@ -746,7 +757,7 @@ impl FromArgMatches for SeedSettings {
         self.0.world_settings = Some(world_settings);
 
         if matches.get_flag("interactive") {
-            interactive::seed_settings(&mut self.0).map_err(interactive_error)?;
+            interactive::seed_settings(&mut self.0)?;
         }
 
         Ok(())
@@ -780,17 +791,18 @@ impl FromArgMatches for SeedWorldSettings {
         };
 
         if matches.get_flag("interactive") {
-            interactive::seed_world_settings(String::new(), &mut self.0)
-                .map_err(interactive_error)?;
+            interactive::seed_world_settings(String::new(), &mut self.0)?;
         }
 
         Ok(())
     }
 }
 
-fn interactive_error(err: Error) -> clap::Error {
-    clap::Error::raw(
-        ErrorKind::ValueValidation,
-        format!("interactive session failed: {err:?}"),
-    )
+impl From<Error> for clap::Error {
+    fn from(value: Error) -> Self {
+        clap::Error::raw(
+            ErrorKind::ValueValidation,
+            format!("interactive session failed: {value:?}"),
+        )
+    }
 }

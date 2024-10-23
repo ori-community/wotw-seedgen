@@ -1,3 +1,23 @@
+use crate::Result;
+use wotw_seedgen::{settings::UniverseSettings, spoiler::SeedSpoiler};
+
+/// Access seed files across stats runs
+///
+/// When generating stats multiple times with the same settings, seeds generated for previous runs can be reused  
+/// These trait methods will be used to store and reuse seeds across stats runs
+pub trait SeedStorageAccess {
+    type Iter: Iterator<Item = Result<SeedSpoiler>>;
+
+    /// fetch seeds that have been previously generated with these settings
+    fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter>;
+    /// write a seed generated from these settings for later use
+    ///
+    /// `key` should be unique, although it is recommended you don't rely on this being true and take it as a hint for what key you could use
+    fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings, key: usize)
+        -> Result<()>;
+    /// clean all seeds that have previously been generated
+    fn clean_all_seeds(&self) -> Result<()>;
+}
 use crate::handle_errors::HandleErrors;
 
 use super::*;
@@ -13,21 +33,26 @@ use rustc_hash::FxHasher;
 
 const SEED_STORAGE_FOLDER: &str = "seed_storage";
 
-/// A [`FileAccess`] implementation storing and fetching seeds using the local filesystem
-pub struct FileSystemAccess;
-impl FileAccess for FileSystemAccess {
+/// A [`SeedStorageAccess`] implementation storing and fetching seeds using the local filesystem
+pub struct FileAccess;
+impl SeedStorageAccess for FileAccess {
     type Iter = ReadSeeds;
 
-    fn read_seeds(settings: &UniverseSettings, limit: usize) -> Result<Self::Iter> {
+    fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter> {
         let path = path_from_settings(settings);
 
         ReadSeeds::new(path, limit)
     }
 
-    fn write_seed(seed: &SeedSpoiler, settings: &UniverseSettings, mut key: usize) -> Result<()> {
+    fn write_seed(
+        &self,
+        seed: &SeedSpoiler,
+        settings: &UniverseSettings,
+        mut key: usize,
+    ) -> Result<()> {
         let bytes = bincode::serialize(seed).expect("Failed to serialize spoiler");
         let base_path = path_from_settings(settings);
-        fs::create_dir_all(&base_path)?;
+        fs::create_dir_all(&base_path).map_err(|err| err.to_string())?;
         loop {
             let mut path = base_path.to_path_buf();
             path.push(key.to_string());
@@ -52,14 +77,8 @@ impl FileAccess for FileSystemAccess {
             }
         }
     }
-    fn clean_seeds(settings: &UniverseSettings) -> Result<()> {
-        let path = path_from_settings(settings);
-        fs::remove_dir_all(path).or_else(|err| match err.kind() {
-            io::ErrorKind::NotFound => Ok(()),
-            _ => Err(format!("Failed to clean seed storage: {err}")),
-        })
-    }
-    fn clean_all_seeds() -> Result<()> {
+
+    fn clean_all_seeds(&self) -> Result<()> {
         fs::remove_dir_all(SEED_STORAGE_FOLDER).or_else(|err| match err.kind() {
             io::ErrorKind::NotFound => Ok(()),
             _ => Err(format!("Failed to clean seed storage: {err}")),
