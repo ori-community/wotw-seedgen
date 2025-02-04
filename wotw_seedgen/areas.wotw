@@ -10308,12 +10308,21 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
   
   state PoolsApproach.UnderwaterWallBroken:
     moki: Water  # bashing to break the wall on the way is much harder than just swimming at it and letting it happen, so didn't make Bash a requirement.
-    kii:  # need enough health in order to exit the water so you can tp out 
-      Damage=180
-      WaterDash, Damage=160
+    kii:  # TP underwater once the projectile broke the wall
+      Damage=160
+      WaterDash, Damage=140
     unsafe:
-      Bash, Damage=160
-      WaterDash, Bash, Damage=140
+      # TP underwater before  the tentacle even shot the projectile
+      Damage=80, Bash OR WaterDash
+      Damage=100
+  state PoolsApproach.MillPathECWall:
+    moki: Water  # again not really a reason to even use Bash
+    kii:  # In order to prevent a TP path here, this alos takes the pickup (tping right after breaking the wall seems unintuitive for that particular pickup to me)
+      Damage=100
+      WaterDash, Damage=60
+    unsafe: Damage=20  # TP before the tentacle shot the projectile
+    # You can break this wall without entering the water but you'll still need to get wet if you want to benefit from that state
+    # so either the dboost or water should account for all possible way to get to the actual pickup
 
   pickup PoolsApproach.MillPathEX:
     moki:
@@ -10337,13 +10346,13 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Combat=SpinCrab+CorruptSlug, Dash  # Dash ramp
       Combat=CorruptSlug, Dash, Grapple  # grapple the right plant, and spam dash to reach the wall where the slime is
   pickup PoolsApproach.MillPathEC:
-    moki: Water  # again not really a reason to even use Bash
-    kii:
-      Damage=120
-      WaterDash, Damage=60
-    unsafe:
-      Damage=80  # TP under water
+    moki, PoolsApproach.MillPathECWall: Water  
+    kii, PoolsApproach.MillPathECWall:
+      Damage=60
       WaterDash, Damage=40
+    unsafe, PoolsApproach.MillPathECWall:
+      Damage=40
+      WaterDash, Damage=20
   pickup PoolsApproach.MillPathHC:  # Paths using clean water originate from PoolsApproach.OnTopOfWheel. Make sure it's not redundant with going to PoolsApproach.MillPathCheckpoint first
     kii: Damage=220, WaterDash
   
@@ -10457,28 +10466,6 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       Spear=1, Damage=80, DoubleJump OR Dash OR Hammer
       Spear=1, Damage=100, Sword
       Spear=1, Damage=120
-      Bash, Damage=180:
-        Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-        Launch, Glide OR DoubleJump OR Dash OR Sword
-        Launch, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-        Launch, Grenade=1
-      Bash, Damage=200:
-        DoubleJump, TripleJump OR Dash
-        DoubleJump, Sword, Hammer
-        Launch
-    unsafe:
-      Spear=1:
-        Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer
-        Launch, Glide OR DoubleJump OR Dash OR Sword
-        Launch, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-        Launch, Bash, Grenade=1
-      Spear=1, Damage=20:
-        DoubleJump, TripleJump OR Dash
-        DoubleJump, Sword, Hammer
-        Launch
-      Spear=1, Damage=40, DoubleJump OR Dash OR Hammer
-      Spear=1, Damage=60, Sword
-      Spear=1, Damage=80
       Bash, Damage=160:
         Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer
         Launch, Glide OR DoubleJump OR Dash OR Sword
@@ -10488,6 +10475,24 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
         DoubleJump, TripleJump OR Dash
         DoubleJump, Sword, Hammer
         Launch
+    unsafe:
+      Spear=1:
+        Launch  # https://youtu.be/bN1zBivkpIE
+        Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+        Damage=20, DoubleJump, TripleJump OR Dash
+        Damage=20, DoubleJump, Sword, Hammer
+        Damage=40, DoubleJump OR Dash OR Hammer
+        Damage=60, Sword
+        Damage=80
+      Bash:
+        Grapple, Damage=100, DoubleJump OR Dash OR Glide OR Sword  # https://youtu.be/9pI2vakfMtc
+        Grapple, Hammer, Damage=80  # https://youtu.be/ZQIemgRuVSU
+        Launch, Sword, Damage=80  # https://youtu.be/gICYeoKagEI
+        Grapple, Sword, DoubleJump, Damage=80
+        Launch, Damage=100
+        DoubleJump, Damage=20, Damage=100, TripleJump OR Dash
+        DoubleJump, Damage=20, Damage=80, Sword OR Hammer        
+      GrenadeRedirect=1, Launch, Damage=120
 
   pickup PoolsApproach.MillPathHC:
     moki, Water:
@@ -10599,23 +10604,39 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       Water, Hammer
       Damage=20, Launch OR Grapple OR DoubleJump OR Hammer OR SentryJump=1 OR PoolsApproach.WheelFreed
     unsafe: Water OR Damage=20
-    
-  state PoolsApproach.WheelFreed:
+  
+  state PoolsApproach.WheelWall:
     moki: Water, Bash
-    unsafe: Spear=1 OR Grenade=2
+    unsafe:
+      Bash, WaterDash, Damage=140
+      Bash, Damage=200
+  state PoolsApproach.WheelFreed:
+    moki, PoolsApproach.WheelWall: Water, Bash
+    unsafe:
+      Spear=1 OR Grenade=2  # GitHub said Sirius is the one to blame for the grenade path. no idea how it works
+      PoolsApproach.WheelWall, WaterDash, Damage=120
   state PoolsApproach.UnderwaterWallBroken:
     moki: Water, Bash
     kii:
       Spear=1, Water OR Damage=180
       Damage=80, WaterDash, Spear=1
-      Damage=220, Bash
+      Damage=200, Bash
       Damage=160, WaterDash, Bash
     unsafe:
-      Damage=180, Bash
-      Damage=160, Spear=1
-      Flap, Water OR Damage=220
-      Flap, WaterDash, Damage=100
+      Damage=140, Bash  # Take an intentionnal death to start further away in the water
+      Damage=120, Spear=1
+      Flap, Water OR Damage=180  # https://youtu.be/rBWc9LKEPL8
+      Flap, WaterDash, Damage=80
       GrenadeRedirect=1, Water OR Damage=180  # grenade redirect
+  state PoolsApproach.MillPathECWall:
+    moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
+    gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash OR Damage=10
+    kii, PoolsApproach.UnderwaterWallBroken:  # In order to prevent a TP path here, this alos takes the pickup (tping right after breaking the wall seems unintuitive for that particular pickup to me)
+      WaterDash, Damage=140
+    unsafe, PoolsApproach.UnderwaterWallBroken:
+      WaterDash, Damage=80  # Take an intentionnal death to start further away in the water
+      Water
+      Bash, Damage=160
   
   pickup PoolsApproach.AboveWheelEX:
     moki:
@@ -10638,17 +10659,17 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       SentryJump=1
   pickup PoolsApproach.MarshPathCurrentEX:
     moki: Water, WaterDash
-    kii: Damage=100, WaterDash
+    kii: Damage=60, WaterDash
     unsafe: Damage=40, WaterDash
   pickup PoolsApproach.MillPathEC:
-    moki, PoolsApproach.UnderwaterWallBroken: Water, Bash, Damage=10
-    gorlek, PoolsApproach.UnderwaterWallBroken: Water, Bash OR Damage=10  # dboost on the tentacle
-    kii, PoolsApproach.UnderwaterWallBroken:
-      WaterDash, Water OR Damage=180
-    unsafe:
-      PoolsApproach.UnderwaterWallBroken, Water
-      PoolsApproach.UnderwaterWallBroken, Bash, Damage=300
-      PoolsApproach.UnderwaterWallBroken, WaterDash, Damage=120
+    moki, PoolsApproach.UnderwaterWallBroken, PoolsApproach.MillPathECWall: Water, Bash, Damage=10
+    gorlek, PoolsApproach.UnderwaterWallBroken, PoolsApproach.MillPathECWall: Water, Bash OR Damage=10  # dboost on the tentacle
+    kii, PoolsApproach.UnderwaterWallBroken, PoolsApproach.MillPathECWall:
+      WaterDash, Water OR Damage=140
+    unsafe, PoolsApproach.UnderwaterWallBroken, PoolsApproach.MillPathECWall:
+      Water
+      Bash, Damage=180
+      WaterDash, Damage=60
   pickup PoolsApproach.MillPathHC:
     moki, Water:
       DoubleJump, Dash, WaterDash, Grapple
