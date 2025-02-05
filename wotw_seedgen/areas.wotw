@@ -3522,12 +3522,12 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     unsafe: Spear=1  # tricky jump over the coals damageless
   pickup GladesTown.AboveCaveEX:
     moki: GladesTown.ClearThorns
-  pickup GladesTown.KeyMokiHutEX:
-    moki: GladesTown.BuildHuts, WoodsEntry.DollQI
   pickup GladesTown.DamageTree:
     moki: TuleyShop.LastTree
 
   conn TwillenShop: free
+  conn GladesTown.KeyMokiHutInside:
+    moki: GladesTown.BuildHuts, WoodsEntry.DollQI
   conn GladesTown.AcornMoki:
     moki: GladesTown.ClearThorns
   conn GladesTown.West:
@@ -3548,6 +3548,11 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     gorlek: SentryJump=1
     kii: Sword OR Hammer OR Spear=1 OR Damage=20
     unsafe: Dash OR Damage=10 OR GlideJump OR GrenadeJump
+
+anchor GladesTown.KeyMokiHutInside at -110, -4571:
+  pickup GladesTown.KeyMokiHutEX: free
+  
+  conn GladesTown.TwillenHome: free
 
 anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twillen
   refill Checkpoint
@@ -3758,15 +3763,6 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       TuleyShop.BlueMoon, Grapple
     gorlek: GladesTown.ClearThorns, Sword OR Hammer
     kii, GladesTown.ClearThorns: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-  pickup GladesTown.BraveMokiHutEX:
-    moki: GladesTown.OnwardsAndUpwards, DoubleJump OR Launch
-    gorlek: GladesTown.OnwardsAndUpwards, SentryJump=1
-    kii, GladesTown.OnwardsAndUpwards:
-      Bash, Grenade=1  # drop through the floor before throwing your grenade
-      Hammer
-    unsafe, GladesTown.OnwardsAndUpwards:
-      Sword OR Spear=1 # upslash+downslash
-      GrenadeJump
   pickup GladesTown.UpperLeftEX:
     moki:
       Bash, Grenade=1
@@ -3800,6 +3796,8 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
 
+  conn GladesTown.InsideThirdHut:
+    moki: GladesTown.OnwardsAndUpwards
   conn GladesTown.MotayHut:  # check for redundancies with GladesTown.West
     moki, GladesTown.BuildHuts:
       DoubleJump OR Dash OR Glide
@@ -3820,54 +3818,24 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     gorlek: Sword OR Hammer
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 
     unsafe: free
-    
+
+anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with the herbs moki
+  pickup GladesTown.BraveMokiHutEX:
+    moki: DoubleJump OR Launch
+    gorlek: SentryJump=1
+    kii:
+      Bash, Grenade=1  # drop through the floor before throwing your grenade
+      Hammer
+    unsafe:
+      Sword OR Spear=1 # upslash+downslash
+      GrenadeJump
+  
+  conn GladesTown.UpperWest: free
+
 anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
   refill Checkpoint:
     unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
-  refill Energy=4:
-    moki: GladesTown.CaveEntrance, BreakCrystal
 
-  quest GladesTown.AcornQI:
-    moki, GladesTown.CaveEntrance:
-      Flash, Water, Glide
-      Flash, Water, DoubleJump, Dash
-      Flash, Bash, Grenade=1
-      Flash, Launch
-    gorlek, GladesTown.CaveEntrance:
-      Flash:
-        Water, DoubleJump OR Dash OR Sword OR Hammer
-        SentryJump=1
-      Bow=4:  # bow refills light
-        Launch
-        Bash, Grenade=1
-        SentryJump=1
-    kii, GladesTown.CaveEntrance:
-      Flash:
-        DoubleJump, TripleJump
-        Water, Shuriken=2 OR Blaze=3 OR Sentry=2
-        Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-        Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That partcular water only deals 4 damage per tic
-        WaterDash, Damage=16, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
-        WaterDash, Damage=26, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-        Damage=42, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-        Water, Damage=10, Damage=10
-        Damage=10, Damage=42
-        WaterDash, Damage=10, Damage=26
-      Bow=4, DoubleJump, TripleJump
-    unsafe, GladesTown.CaveEntrance:
-      Flash:
-        Water # use Flash for mobility as well
-        GrenadeJump
-      Bow=2:
-        Launch
-        Bash, Grenade=1
-        SentryJump=1
-        GrenadeJump
-        DoubleJump, TripleJump  # off the left wall
-        Water, WaterDash, Damage=10 OR DoubleJump OR Glide
-      # Grenade=4  # grenade jumps and light refills, very nasty strat
-      DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
-      DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
   quest GladesTown.MokiAcornQuest:
     moki: GladesTown.AcornQI
 
@@ -3885,7 +3853,9 @@ anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
   pickup GladesTown.CaveBurrowEX:
     moki: Burrow, DoubleJump OR Launch
     gorlek: Burrow  # Burrow Dash out of the sand
-
+  
+  conn GladesTown.AcornCave:
+    moki: GladesTown.CaveEntrance
   conn GladesTown.Teleporter:  # only useful for GladesDone
     moki, GladesTown.ClearThorns:
       Launch OR DoubleJump
@@ -3898,6 +3868,54 @@ anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
     kii, GladesTown.ClearThorns: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.ClearThorns: Dash
 
+anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at the door
+  refill Energy=4:
+    moki: BreakCrystal
+    
+  quest GladesTown.AcornQI:
+    moki:
+      Flash, Water, Glide
+      Flash, Water, DoubleJump, Dash
+      Flash, Bash, Grenade=1
+      Flash, Launch
+      gorlek:
+        Flash:
+          Water, DoubleJump OR Dash OR Sword OR Hammer
+      SentryJump=1
+    Bow=4:  # bow refills light
+      Launch
+      Bash, Grenade=1
+      SentryJump=1
+      kii:
+        Flash:
+          DoubleJump, TripleJump
+          Water, Shuriken=2 OR Blaze=3 OR Sentry=2
+          Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+          Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That partcular water only deals 4 damage per tic
+          WaterDash, Damage=16, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
+          WaterDash, Damage=26, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+          Damage=42, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+          Water, Damage=10, Damage=10
+          Damage=10, Damage=42
+          WaterDash, Damage=10, Damage=26
+          Bow=4, DoubleJump, TripleJump
+          unsafe:
+            Flash:
+              Water # use Flash for mobility as well
+              GrenadeJump
+              Bow=2:
+                Launch
+                Bash, Grenade=1
+                SentryJump=1
+                GrenadeJump
+                DoubleJump, TripleJump  # off the left wall
+                Water, WaterDash, Damage=10 OR DoubleJump OR Glide
+                # Grenade=4  # grenade jumps and light refills, very nasty strat
+                DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
+                DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
+
+  conn GladesTown.AcornMoki: free
+                  
 anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty shard 
   pickup GladesTown.AboveTpEX: free
   pickup GladesTown.BountyShard:
@@ -3991,6 +4009,11 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     kii: GladesTown.TuleySpawned, Blaze=2 OR Sentry=1 OR Flash=1 OR Shuriken=1
     unsafe: GladesTown.TuleySpawned, Spear=2
     # seed paths tbd if ever necessary
+  conn GladesTown.StorageHut:
+    moki: GladesTown.RoofsOverHeads
+
+anchor GladesTown.StorageHut at -119, -4605:
+  conn GladesTown.AboveOpher: free
 
 anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather play
   conn GladesTown.HoleHut:
@@ -4010,13 +4033,6 @@ anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather pl
     # seed paths tbd if ever necessary
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
-  pickup GladesTown.LupoSoupEX: free
-  pickup LupoShop.HCMapIcon:
-    moki: SpiritLight=1200
-  pickup LupoShop.ECMapIcon:
-    moki: SpiritLight=1200
-  pickup LupoShop.ShardMapIcon:
-    moki: SpiritLight=1200
   pickup GladesTown.LupoSwimHC:
     moki: Water, Burrow
   pickup GladesTown.LupoSwimMiddleEX:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
@@ -4024,12 +4040,24 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
       Damage=100 # just wall jump between both walls
       WaterDash, Damage=40
   
+  conn GladesTown.InsideLupoHouse: free
   conn GladesTown.Teleporter:
     moki: Water OR Burrow
     unsafe:
       Damage=180
       WaterDash, Damage=60
-
+    
+anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's house
+  pickup GladesTown.LupoSoupEX: free
+  pickup LupoShop.HCMapIcon:
+    moki: SpiritLight=1200
+  pickup LupoShop.ECMapIcon:
+    moki: SpiritLight=1200
+  pickup LupoShop.ShardMapIcon:
+    moki: SpiritLight=1200
+  
+  conn GladesTown.LupoHouse: free
+  
 anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
   pickup GladesTown.BelowHoleHutEX: free
   pickup GladesTown.UpdraftCeilingEX:
@@ -4076,12 +4104,15 @@ anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup
   refill Checkpoint:
     unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
   
-  pickup GladesTown.HoleHutEX:
-    moki: GladesTown.RoofsOverHeads
-  pickup GladesTown.HoleHutEC:
-    moki: GladesTown.RoofsOverHeads
-  
   conn GladesTown.HoleHut: free
+  conn GladesTown.InsideHoleHut:
+    moki: GladesTown.RoofsOverHeads
+
+anchor GladesTown.InsideHoleHut at -107, -4506:  # Inside the hut with 2 pickups
+  pickup GladesTown.HoleHutEX: free
+  pickup GladesTown.HoleHutEC: free
+
+  conn GladesTown.HoleHutEntrance: free
 
 region WestGlades:
   moki: Danger=20
@@ -6250,6 +6281,30 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
 
 # checkpoint at 525, -4205
 
+anchor WoodsEntry.FamilyHut at 469, -4180: # infront of familiy reunion hut door
+  nospawn
+  refill Checkpoint:
+    unsafe: GladesTown.FamilyReunionKey
+
+  conn WoodsEntry.FamilyHutInside:
+    GladesTown.FamilyReunionKey
+  conn WoodsEntry.FirstMud: free
+  conn WoodsEntry.ShriekMeet:
+    gorlek: free
+  conn WoodsEntry.Teleporter:
+    moki:
+      Grapple, DoubleJump OR Dash
+      Launch
+      Grenade=1, Bash
+    gorlek: Grapple, SentryJump=1
+    kii: DoubleJump, TripleJump
+
+anchor WoodsEntry.FamilyHutInside at 456, -4118: # inside of family reunion hut
+  quest WoodsEntry.DollQI:
+    moki: GladesTown.FamilyReunionKey
+  
+  conn WoodsEntry.FamilyHut: free
+
 anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   refill Checkpoint
 
@@ -6298,8 +6353,6 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   state NonGladesTeleporter: free
 
   quest WoodsEntry.LastTreeBranch: free
-  quest WoodsEntry.DollQI:
-    moki: GladesTown.FamilyReunionKey
   quest WoodsEntry.TreeSeed:
     moki: TuleyShop.LastTreeBranchRejected
 
@@ -6332,10 +6385,9 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
       DoubleJump, Sword
 
   conn Teleporters: free
-  conn WoodsEntry.ShriekMeet:
-    gorlek: free
   conn WoodsEntry.FirstMud: free
   conn WoodsEntry.BelowTeleporter: free
+  conn WoodsEntry.FamilyHut: free
 
 anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone door
   refill Checkpoint
@@ -9062,10 +9114,6 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
   refill Energy=4:  # fast respawning crystal
     moki: BreakCrystal
 
-  quest UpperReach.SpringSeed:
-    moki: Grenade=1
-    gorlek: SentryBurn=1  # Use sentry to light the lantern
-
   pickup UpperReach.LightBurstTree: free
   pickup UpperReach.WellEX: free
   pickup UpperReach.HiddenEX:
@@ -9077,6 +9125,7 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
       Bash, Grenade=1, DoubleJump
       DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Sentry=2  # Climb the right wall
 
+  conn UpperReach.SeedHut: free
   conn UpperReach.TreeRoomLedge:
     moki:
       Bash, Grenade=3
@@ -9090,6 +9139,13 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
       Bash, Grenade=2, DoubleJump  # go up to the ore
       Bash, Grenade=1, DoubleJump, Dash OR Glide OR Sword  # go up to the ore
       Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1  # go up to the ore
+
+anchor UpperReach.SeedHut at -131, -3857: # inside the hut with the seed
+  quest UpperReach.SpringSeed:
+    moki: Grenade=1
+    gorlek: SentryBurn=1  # Use sentry to light the lantern
+  
+  conn UpperReach.TreeRoom: free
 
 region UpperDepths:
   moki: Danger=40, Regenerate
