@@ -24,6 +24,7 @@
 3|0|8|28895|2108|bool|true                  // baursReachGroup.powlTeaseTriggered
 3|0|8|37858|23225|bool|true                 // waterMillStateGroupDescriptor.playedNaruGumoCutaway
 3|0|8|16155|32922|bool|true                 // willowsEndGroup.introPlayed
+3|0|8|31136|3441|bool|true                  // weepingRidgeElevatorFightGroup.willowsEndGateOpened
 3|0|8|7|20|bool|true                        // randoConfig.disableWillowHeartCutscenes
 // Dialogue skips
 3|0|8|48248|5982|bool|true                  // npcsStateGroup.metOpherHubAfterWatermill
