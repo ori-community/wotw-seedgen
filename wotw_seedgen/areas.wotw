@@ -90,7 +90,7 @@ anchor Teleporters:  # teleporter access
     moki: InnerRuinsTP, Burrow, EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
   conn WillowsEnd.InnerTP:
     moki: WillowTP, Burrow
-  conn WillowsEnd.Upper:
+  conn WillowsEnd.ShriekArena:
     moki: ShriekTP, Burrow
 
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
@@ -14158,8 +14158,8 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
   refill Energy=3:
     moki: BreakCrystal
 
-  # state WillowsEnd.BoulderHeart:
-  #   moki: BreakWall=30, Launch, DoubleJump, Dash
+  state WillowsEnd.BoulderHeart:
+    moki: BreakWall=30, Launch, DoubleJump, Dash
 
   pickup WillowsEnd.SpikesOre:
     moki: Launch, Dash OR Glide
@@ -14352,8 +14352,8 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
 anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the first portal used for the puzzle
   refill Checkpoint
 
-  # state WillowsEnd.RedirectHeart:
-  #   moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
+  state WillowsEnd.RedirectHeart:
+    moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
 
   pickup WillowsEnd.RedirectEX:
     moki:
@@ -14394,15 +14394,19 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Dash, Sword  # Pogo the gorlek
       Combat=CrystalMiner, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
 
-  # state WillowsEnd.BurrowHeart:
-  #   moki, BreakWall=30:
-  #     Burrow, DoubleJump, Dash, Bash, Grapple, Glide
-  #     Burrow, Bash, Grapple, Launch, DoubleJump OR Glide
+  state WillowsEnd.BurrowHeart:
+    moki, BreakWall=30, Burrow:
+      Launch, DoubleJump, Dash, Bash, Grapple, Glide
+    gorlek, BreakWall=30, Burrow:
+      DoubleJump, Dash, Bash, Grapple, Glide
+      Bash, Grapple, Launch, DoubleJump OR Glide
+    kii, BreakWall=30, Burrow:
+      Launch, Bash, DoubleJump OR Glide OR Dash
 
-  # conn MiniBossFight:
-  #   moki:
-  #     Launch, DoubleJump
-  #     Launch, Dash, Glide
+  conn WillowsEnd.MiniBossFight:
+    moki: Launch, Dash, Glide OR DoubleJump
+    kii: Launch, Dash
+    unsafe: Launch
   conn WillowsEnd.East:
     moki:
       Combat=CrystalMiner, DoubleJump OR Dash OR Glide
@@ -14434,14 +14438,37 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     unsafe:
       SentryJump=1
       DoubleJump, TripleJump  # tjump on the left wall to start climbing it
+  conn WillowsEnd.ShriekArena:
+    moki: WillowsEnd.GrappleWheelsHeart, WillowsEnd.BoulderHeart, WillowsEnd.RedirectHeart, WillowsEnd.BurrowHeart, WillowsEnd.MinibossHeart, WillowsEnd.SpinLasersHeart, WillowsEnd.GlideHeart, WillowsEnd.SpinPortalsHeart
+
+anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
+  conn WillowsEnd.Upper:
+    moki: Launch, Dash, Glide OR DoubleJump
+    kii: Launch, Dash
+    unsafe: Launch
+
+anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
+  refill Checkpoint
+  refill Health=2
+  
+  state WillowsEnd.MinibossHeart:
+    moki: Combat=ShieldCrystalMiner, Bash, Dash, DoubleJump, Launch
+    gorlek: Combat=ShieldCrystalMiner, Bash, Dash, DoubleJump
+    kii: Combat=ShieldCrystalMiner, Dash, DoubleJump
+    unsafe: Combat=ShieldCrystalMiner, DoubleJump
+  
+  conn WillowsEnd.Upper:
+    moki: Launch, Dash, Glide OR DoubleJump
+    kii: Launch, Dash OR Glide OR DoubleJump
+    unsafe: Launch
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
   refill Energy=4:
     moki: BreakCrystal
 
-  # state WillowsEnd.SpinLasersHeart:
-  #   moki: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
+  state WillowsEnd.SpinLasersHeart:
+    moki: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
 
   conn WillowsEnd.InnerTP:
     moki: BreakWall=20, Combat=MaceMiner OR Bash OR Launch
@@ -14495,8 +14522,8 @@ anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
       Bow=1
     kii: Spear=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1
 
-  # state WillowsEnd.GlideHeart:
-  #   moki: BreakWall=30, DoubleJump, Glide, Launch
+  state WillowsEnd.GlideHeart:
+    moki: BreakWall=30, DoubleJump, Glide, Launch
 
   pickup WillowsEnd.WindSpinOre:
     moki: Glide
