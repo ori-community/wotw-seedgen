@@ -10933,9 +10933,15 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
   state EastPools.BelowEntryLeverBubble:
     moki: Hammer OR Spear=1
     unsafe: Sword, Flap  # You'll love this, I swear https://youtu.be/i5HqEsRt5SI
-  state PoolsApproach.WheelFreed:
+  state PoolsApproach.WheelWall:
     moki: Water, Bash
     unsafe:
+      Bash, WaterDash, Damage=140
+      Bash, Damage=200
+  state PoolsApproach.WheelFreed:
+    moki, PoolsApproach.WheelWall: Water, Bash
+    unsafe:
+      PoolsApproach.WheelWall, WaterDash, Damage=120
       Damage=60, Spear=1
       WaterDash, Damage=40, Spear=1
   
@@ -10943,9 +10949,9 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
   pickup EastPools.TwoCrushersEX:
     moki: Water, WaterDash
-    kii, WaterDash, Damage=80
+    kii, WaterDash, Damage=40
     unsafe:
-      Water OR Damage=200
+      Water OR Damage=100
       WaterDash, Damage=20
   pickup EastPools.RightOre:
     moki:
@@ -10965,8 +10971,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
   pickup EastPools.BubbleCurrentEX:
     moki: Water, WaterDash
-    kii: WaterDash, Damage=80
-    unsafe: WaterDash, Damage=40
+    kii: WaterDash, Damage=40
   pickup EastPools.BelowLeverEX:
     moki:  # kinda dangerous with the spikes? but damage seemed mostly avoidable
       DoubleJump, Bash, Grenade=1
@@ -10983,9 +10988,8 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       SentryJump=1, DoubleJump OR Damage=20  # The tree is swinging a bit. sjump from the left (Ori should almost fall) when the tree is swinging to the left
   pickup PoolsApproach.MarshPathCurrentEX:
     moki: Water, WaterDash
-    kii: WaterDash, Damage=80
+    kii: WaterDash, Damage=40
     unsafe:
-      WaterDash, Damage=40
       Bash, Grenade=1, Water OR Damage=140  # https://youtu.be/JAhGlvPAFj8
 
   conn EastPools.BehindEntryDoor:
@@ -11147,25 +11151,25 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
       Water, Bash
       Water, WaterDash, EastPools.TokkBubblePurpleWall OR Combat=Crab
     kii:
-      Bash, Damage=120
-      Combat=Crab, WaterDash, Damage=80
+      Bash, Damage=100
+      Combat=Crab, WaterDash, Damage=60
       EastPools.TokkBubblePurpleWall, WaterDash, Damage=60
     unsafe:
-      Bash, Damage=65  # dboost on the slug's projectile
-      Combat=Crab, WaterDash, Damage=60
-      EastPools.TokkBubblePurpleWall, WaterDash, Damage=40
+      Bash, Damage=60
+      Combat=Crab, WaterDash, Damage=40
+      EastPools.TokkBubblePurpleWall, WaterDash, Damage=20
       EastPools.TokkBubblePurpleWall, Bow=1 OR Grenade=1
   state EastPools.TokkBubblePurpleWall:
     moki: Water, Bash
     kii:
-      Combat=Crab, Water OR Damage=160  # bait the torpedo into touching the wall
-      Combat=Crab, WaterDash, Damage=120
-      Bash, Damage=140  # snipe the wall so you can leave earlier
-      WaterDash, Bash, Damage=100  # snipe the wall so you can waterdash earlier
+      Combat=Crab, Water OR Damage=120  # bait the torpedo into touching the wall
+      Combat=Crab, WaterDash, Damage=100
+      Bash, Damage=100  # snipe the wall so you can TP earlier
+      WaterDash, Bash, Damage=80
     unsafe:
       Bash  # bash the corrupted slime to blow the wall
-      Combat=Crab, Damage=125  # dboost on the slug's projectile before dropping into the water
-      Damage=130  # dboost on the crab before dropping in the water
+      Combat=Crab, Damage=100
+      Damage=90  # dboost on the crab before dropping in the water
   state EastPools.LowerWaterDrained:  # Puzzle skip
     unsafe: free  # Die in the right water pound. If you have clean water, you can bait a torpedo instead https://youtu.be/rnRBUmY2NN4
 
@@ -11201,7 +11205,7 @@ anchor EastPools.TokkBubble at -1276, -4175:  # Left of the bubble spawner used 
       DoubleJump, Sword OR TripleJump OR Combat=CorruptSlug+Crab  # Pogo the crab or tjump on the wall on the left of the grapple plant or just kill everything and climb the right wall
     # unsafe paths can do puzzle skip and reach BehindEntryDoor from TpArea
   conn EastPools.Teleporter:
-    unsafe: EastPools.LowerWaterDrained  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can die redo the same manipulation to activate the checkpoint (you won't have the cutscene) then QTM/die to respawn on the teleporter
+    unsafe: EastPools.LowerWaterDrained  # Do puzzle skip then reload or die to respawn on the teleporter. This doesn't soflock: even if you already drained the water you can redo the same manipulation to activate the checkpoint (you won't have the cutscene) then QTM/die to respawn on the teleporter
 
 anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
   refill Checkpoint
@@ -11212,11 +11216,7 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
     moki: Water, WaterBreath
     gorlek: Water
     kii: WaterDash, Damage=120
-    unsafe:  # Puzzle Skip. Dirty water swim is redundant with doing puzzle skip which need way less health
-      Glide OR Sword OR Bash OR Shuriken=1 OR Sentry=2  # Even if you want to die to do this, it's important to have non-damage paths because 20 damages does 40 in hard, which can kill you if you only have 30 HP
-      Blaze=1, Damage=10  # hit the slime with blaze and get hit by the explosion to make it across
-      Spear=1, Blaze=2 OR Flash=1  # hitting the slime while hovering can make it explode so kill with Spear beforehand
-      Grenade=1, Blaze=2 OR Flash=1  # hitting the slime while hovering can make it explode so kill with Grenade beforehand
+    # unsafe can just do puzzle skip for free from EastPools.TokkBubble
 
   pickup EastPools.AboveDoorOre:  # Make sure it's not redundant with paths from EastPools.BehindEntryDoor and EastPools.BelowTokk
     moki: Bash, Grenade=1, Dash OR Glide
@@ -11281,21 +11281,27 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   state NonGladesTeleporter: free
   state EastPools.ArenaWall:
     moki, EastPools.LowerWaterDrained: Water, Bash
-    kii, EastPools.LowerWaterDrained: Water, Damage=20
     unsafe, EastPools.LowerWaterDrained:
-      Water, Launch OR Dash
-      Bash, Damage=300
-  
-  pickup EastPools.UltraBashShard:
+      Water, Launch OR Dash OR Damage=14  # bait the torpedo to the surface. Either avoid the explosion with launch/dash or take the dboost
+      Bash, Damage=180  # TP after bashing the torpedo
+  state EastPools.UltraBashWall:
     moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
     gorlek, EastPools.LowerWaterDrained: Water, Bash
-    kii, EastPools.LowerWaterDrained:
-      Water  # move a bit on the side when the torpedo is getting close to the wall
+    kii, EastPools.LowerWaterDrained: 
+      Water
       WaterDash, Damage=180
-      WaterDash, Bash, Damage=140  # snipe the wall so you can start swimming earlier
-    unsafe, EastPools.LowerWaterDrained:
-      Damage=240
-      Bash, Damage=220
+      Bash, Damage=200  # snipe the wall so you can TP earlier
+      Bash, WaterDash, Damage=140
+  
+  pickup EastPools.UltraBashShard:
+    moki, EastPools.LowerWaterDrained, EastPools.UltraBashWall: Water
+    kii, EastPools.LowerWaterDrained, EastPools.UltraBashWall:
+      Damage=160
+      WaterDash, Damage=80
+    unsafe, EastPools.LowerWaterDrained, EastPools.UltraBashWall:
+      WaterDash, Damage=60
+      Bash, Grenade=1, Damage=140  # throw a grenade in the water and bash it to get some iframes
+      
 
   conn Teleporters:
     moki: EastPools.LowerWaterDrained
@@ -11347,6 +11353,8 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
     kii:  # dirty swim 
       Damage=80
       WaterDash, Damage=40
+    unsafe:
+      Bash, Grenade=1, Damage=60  # Throw a grenade in the water and bash it to get some iframe 
   pickup EastPools.PurpleWallHC:  # paths using the slime to break the purple wall
     unsafe:
       Bash, Launch OR SentryJump=1 OR Grenade=1
@@ -11371,17 +11379,23 @@ anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
 anchor EastPools.NextToLupoOre at -1373, -4166:  # Checkpoint between Lupo and the ore
   refill Checkpoint
 
-  pickup EastPools.LupoOre: free
-  pickup EastPools.UltraBashShard:
-    moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
-    gorlek, EastPools.LowerWaterDrained: Water, Bash
-    kii, EastPools.LowerWaterDrained:
-      Water  # move a bit on the side when the torpedo is getting close to the wall
-      WaterDash, Bash, Damage=140  # snipe the wall so you can start swimming earlier
+  state EastPools.UltraBashWall:  # Dirty water path only. Clean Water paths originate from EastPools.Teleporter
+    kii, EastPools.LowerWaterDrained: 
+      WaterDash, Damage=200
+      Bash, Damage=240  # snipe the wall so you can TP earlier
+      Bash, WaterDash, Damage=160
     unsafe, EastPools.LowerWaterDrained:
-      Damage=240
       WaterDash, Damage=180
-      Bash, Damage=220
+      Bash, WaterDash, Damage=140
+      Bash, Damage=200
+
+  pickup EastPools.LupoOre: free
+  pickup EastPools.UltraBashShard:  # Dirty water path only. Clean Water paths originate from EastPools.Teleporter
+    kii, EastPools.LowerWaterDrained, EastPools.UltraBashWall:
+      Damage=200
+      WaterDash, Damage=100  # snipe the wall so you can start swimming earlier
+    unsafe, EastPools.LowerWaterDrained, EastPools.UltraBashWall:
+      WaterDash, Damage=80
 
   conn EastPools.LupoArea:
     gorlek: ShurikenBreak=20
@@ -11415,7 +11429,7 @@ anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
   refill Checkpoint
 
   state EastPools.LupoPurpleFloor:
-    unsafe, EastPools.LowerWaterDrained: Water, Bash, Dash
+    unsafe, EastPools.LowerWaterDrained: BreakWall=20, Water, Bash, Dash
 
   pickup EastPools.LupoEX:
     moki: 
@@ -11511,15 +11525,16 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
     gorlek: Water, Bash
     kii: Water
     unsafe:
+      Damage=240
       Damage=200, Bash
-      Damage=140, Bash, WaterDash
+      Damage=100, Bash, WaterDash
   state EastPools.LupoPurpleFloor:
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
     kii: Water
     unsafe:
-      Damage=300, Bash
-      Damage=200, Bash, WaterDash
+      Damage=220, Bash
+      Damage=160, Bash, WaterDash
 
   pickup EastPools.EnergyHarvestShard:
     moki:
@@ -11542,12 +11557,11 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
     moki: Water, WaterBreath
     gorlek: Water
     kii:
-      EastPools.LupoPurpleFloor, Damage=200  # Go back to safety at lupo instead of the the original anchor
-      EastPools.LupoPurpleFloor, WaterDash, Damage=120  # Go back to safety at lupo instead of the the original anchor
-      WaterDash, Damage=140
-    unsafe:
-      Damage=220
+      Damage=160
       WaterDash, Damage=100
+    unsafe:
+      Damage=140
+      WaterDash, Damage=80
   pickup EastPools.SpiritTrial:
     moki: UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall, Water, DoubleJump, Dash, Glide, Grapple, WaterDash
     kii, UpperPools.TrialActivation, EastPools.CentralRoomPurpleWall:
@@ -11582,16 +11596,17 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
   refill Checkpoint
 
   state EastPools.CentralRoomPurpleWall:  # @Validator Could had moki/gorlek paths if knowing that a tentacle projectile can break the wall isn't too heavy of the knowledge side
-    kii: Water OR Damage=100  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
-    unsafe: WaterDash, Damage=60
+    kii: Water OR Damage=60  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
+    unsafe:
+      Damage=40
+      WaterDash, Damage=20
   state EastPools.CentralRoomBubbleFree:
     moki: Water, Bash OR WaterDash
     kii:
-      Damage=120, Bash
-      Damage=80, WaterDash
+      Damage=100, Bash
+      Damage=40, WaterDash
     unsafe:
-      Bash, Damage=100
-      WaterDash, Damage=60
+      Bash, Damage=80
       Water, Deflector, Sword
       Water, Bow=1
       Water, Grenade=1, Fracture
