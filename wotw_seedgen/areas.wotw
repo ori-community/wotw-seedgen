@@ -4183,12 +4183,12 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
   pickup WestGlades.LowerPoolEX:
     moki: Water
     kii:
-      Damage=80
+      Damage=60
       WaterDash, Damage=40
-      Damage=60, Launch OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      Damage=40, Launch OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
     unsafe:
-      Damage=60, Bash, Bow=1  # aggro the tentacule
-      Damage=60, Flash=1 OR Sentry=1
+      Damage=40
+      Damage=20, WaterDash
 
   conn WestGlades.LowerPool:
     moki:
@@ -4268,9 +4268,18 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
       WaterDash, Damage=60
   pickup WestGlades.LowerPoolEX:  # Only dirty swims. Clean Water is solving through the PastTown connection
     kii:
-      Damage=60, DoubleJump OR Dash OR Glide OR Launch OR Bash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      Damage=80
+      Damage=40, DoubleJump OR Dash OR Glide OR Launch OR Bash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=20, Damage=40
       WaterDash, Damage=40
-
+      Damage=20, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Bash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Damage=60
+      Damage=20, Damage=30  # dboost on a tentacle projectile when on the second platform
+      Damage=30, DoubleJump OR Dash OR Glide OR Launch OR Bash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=10, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Bash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=20, Damage=10, WaterDash 
+    
   conn WestGlades.Center:
     moki:
       Bash, DoubleJump
@@ -4366,8 +4375,8 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
   pickup WestGlades.UpperPoolEX:
     moki: Water
     unsafe:
-      Damage=180
-      WaterDash, Damage=80
+      Damage=90  # one dboost on spikes
+      WaterDash, Damage=40
   pickup WestGlades.RightOre:  # Be carefull it's not redundant with paths from WestGlades.Center
     moki:
       Glide, DoubleJump OR Dash
