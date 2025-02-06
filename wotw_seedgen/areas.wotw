@@ -11823,6 +11823,7 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
   state UpperPools.KeystoneRoomBubbleFree:
     moki: Water, WaterDash OR Bash
     kii:
+      Damage=20, WaterDash
       Grenade=1 OR Spear=1 OR Bow=1 
       Shuriken=1, Water OR Damage=20
       Sentry=1, Water OR Damage=20
