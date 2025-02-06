@@ -113,6 +113,7 @@ UpperPools.UpperWaterDrained, 5377, 29911,
 UpperPools.ButtonDoorAboveTree, 5377, 15402,
 UpperPools.DrainRoomPurpleWall, 20120, 43231,
 UpperPools.BubbleSpamLever, 5377, 6398,
+UpperPools.BubbleSpamWall, 5377, 65413,
 LowerWastes.SandPlatformLever, 20120, 48009,
 LowerWastes.TrialActivation, 44964, 30767, 1
 UpperWastes.KeystoneDoor, 20120, 28786,

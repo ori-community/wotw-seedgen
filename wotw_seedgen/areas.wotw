@@ -12014,8 +12014,8 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
       WaterDash, Damage=20
   state UpperPools.ButtonDoorAboveTree:
     moki: Water, WaterDash
-    kii: WaterDash, Damage=80
-    unsafe: WaterDash, Damage=40  # tp after pushing it
+    kii: WaterDash, Damage=60  # tp after pushing it
+    unsafe: WaterDash, Damage=40
 
   pickup UpperPools.SwimDashTree: free
   pickup UpperPools.SwimDashCurrentEX:
@@ -12082,6 +12082,7 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
   refill Checkpoint
 
   # Be careful because solving that puzzle room is a huuuge negative that has to be taken into account
+  # TODO: optimize water damage with underwater TP
   state UpperPools.UpperWaterDrained:
     moki:
       Water, WaterDash, Grapple, DoubleJump OR Dash
@@ -12196,6 +12197,7 @@ anchor UpperPools.DrainPuzzleRight at -1324, -4060:  # On the ground next to the
      moki: BreakCrystal
   refill Health=1
 
+  # TODO: optimize water damage with underwater TP
   state UpperPools.DrainRoomPurpleWall:
     moki: Bash, Water, WaterDash OR Launch
     gorlek:
@@ -12205,6 +12207,7 @@ anchor UpperPools.DrainPuzzleRight at -1324, -4060:  # On the ground next to the
       Damage=100, Bash
       WaterDash, Damage=80, Bash
     unsafe: Water, Launch
+  # TODO: optimize water damage with underwater TP
   state UpperPools.UpperWaterDrained:
     gorlek: Water, Launch, UpperPools.DrainRoomPurpleWall  # Break the purple wall, do the right side then the left side
     kii: UpperPools.DrainRoomPurpleWall, WaterDash, Bash, Grenade=1, DoubleJump, Water OR Damage=60
@@ -12255,6 +12258,7 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
   # This is inside a rock, but you can just walk out of it so it's not a problem
   # Keep in mind that for all paths involving the puzzle room you have to consider both states of the water being drained or not
 
+  # TODO: optimize water damage with underwater TP
   state UpperPools.DrainRoomPurpleWall:  # Make sure it's not redundant with going to UpperPools.DrainPuzzleRight first
     moki: Bash, Water, WaterDash
     gorlek: Water, Bash
@@ -12319,16 +12323,18 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
     unsafe:
       Sword OR Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR Shuriken=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR FlashSwap OR PauseHover
       Grapple, UltraGrapple  # wait for the bee to go up and then grapple to it
+  state UpperPools.BubbleSpamWall:
+    moki: Water, WaterDash
+    kii: WaterDash, Damage=60
+    unsafe:
+      Grenade=1 OR Bow=2  # https://youtu.be/oKRdNFQxYTQ
+      WaterDash, Damage=40
 
   pickup UpperPools.FishPoolEX:
     moki: Water, Bash OR WaterDash OR Damage=10  # just in case someone's troubled by the fish
     gorlek: Water
-    kii:
-      Damage=40
-      WaterDash, Damage=20
-    unsafe:
-      Damage=25  # dboost on a fish to avoid one water dboost
-      Bash  # You can bash the fishes before entering the water
+    kii: Damage=20
+    unsafe: Bash  # You can bash the fishes before entering the water
   pickup UpperPools.FishPoolOre:
     moki:
       DoubleJump, Bash, Dash OR Glide
@@ -12346,12 +12352,14 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
       GrenadeJump
       HammerJump  # extended hammer jump
       Dash  # walljump on the bubbles by dashing into them
-  pickup UpperPools.RightBubblesEX:  # paths using the torpedo originate from LeftBubbleSpamRoom 
-    moki: Water, WaterDash
-    kii: WaterDash, Damage=100
-    unsafe:
-      Grenade=1, Water OR Damage=80
-      WaterDash, Damage=60
+  pickup UpperPools.RightBubblesEX:
+    moki, UpperPools.BubbleSpamWall: Water
+    kii, UpperPools.BubbleSpamWall:
+      Damage=80
+      WaterDash, Damage=40
+    unsafe, UpperPools.BubbleSpamWall:
+      Damage=60
+      Bash, Grenade=1, Damage=40  # Throw a grenade in the water then bash it to get some iframe
   pickup UpperPools.BubblesEC:
     moki: UpperPools.BubbleSpamLever, DoubleJump OR Dash OR Glide OR Launch
     gorlek: UpperPools.BubbleSpamLever
@@ -12364,24 +12372,36 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
 anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on top of the torpedo  
   refill Checkpoint
   
+  state UpperPools.BubbleSpamWall:  # These paths use the torpedo to break the wall. Paths using another solution for the wall originate from UpperPools.RightBubbleSpamRoom.
+    moki: Water, Bash, WaterBreath, DoubleJump OR Launch
+    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Glide OR Launch
+    kii:  # no water dash paths 
+      # bait the torpedo into the wall
+      Launch, Water OR Damage=200
+      DoubleJump, TripleJump, Water OR Damage=200  # Climb the anemone wall once it's closed again
+      # snipe the wall once you see it
+      Bash, Damage=160, Grenade=1 OR Launch
+      Bash, Damage=160, DoubleJump, TripleJump  # Climb the anemone wall once it's closed again
+      Bash, Damage=220, DoubleJump OR Glide
+    unsafe:
+      # bait the torpedo into the wall. TP so it touches the wall during your TP animation
+      Damage=160, Launch OR GrenadeJump OR SwordSJump=1
+      Damage=160, DoubleJump, Sword OR Hammer OR TripleJump
+      Water, DoubleJump, Sword OR Hammer  # Climb the anemone wall once it's closed again
+      # snipe the wall from the torpedo spawner
+      Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the torpedo and activating the anemone
+      Damage=100, Bash  # 2 dboost to bait the torpedo + 3 to bash the second one. You can regen a single time between activating the torpedo and going for the second torpedo
+      Bash, Damage=60, Grenade=1 OR Launch OR SwordSJump=1
+      Bash, Damage=60, DoubleJump, Sword OR Hammer OR TripleJump
+  
   pickup UpperPools.LeftBubblesEX:  # beautiful autosave placement right there
     moki: Water
     kii:
-      Damage=140
-      WaterDash, Damage=60
-    unsafe:
-      Damage=60
+      Damage=80
       WaterDash, Damage=40
-  pickup UpperPools.RightBubblesEX:  # These paths use the torpedo to break the wall. Paths using another solution for the wall originate from UpperPools.RightBubbleSpamRoom
-    moki: Water, Bash, WaterBreath, DoubleJump OR Launch
-    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
-    kii:  # bait the torpedo into the wall. No dirty swim path because you can't afford to stay in the water
-      Water, Launch
-      Water, DoubleJump, TripleJump  # Climb the anemone wall once it's closed again
-    unsafe:
-      Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the torpedo and activating the anemone
-      Bash, Damage=120, Damage=140, Launch OR SwordSJump=1  # bash the torpedo when it spawns then regen and use the bubbles to return safely to the other side
-      Water, DoubleJump, Sword OR Hammer  # Climb the anemone wall once it's closed again
+    unsafe: 
+      Damage=60
+      Bash, Grenade=1, Damage=40  # Throw a grenade in the water then bash it to get some iframe
   
   conn UpperPools.RightBubbleSpamRoom:
     moki:
@@ -12430,6 +12450,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
     kii: Damage=60, Burrow
+    unsafe: Damage=40, Burrow
   pickup WestPools.BurrowOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
     kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
@@ -12460,8 +12481,6 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
     unsafe: Water, WaterBreath
 
 anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platform where the Kwolok's escape starts
-  tprestriction:
-    moki: WestPools.ForestsStrength
   refill Checkpoint:  # Checkpoint only appears after you defeated Kwolok
     moki: WestPools.ForestsStrength
 
@@ -12484,16 +12503,14 @@ anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platfor
       DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
 
 anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platform where the Kwolok's escape starts
-  tprestriction:
-    moki: WestPools.ForestsStrength
   refill Checkpoint:
     moki: WestPools.ForestsStrength  # Checkpoint only appears after you defeated Kwolok
 
   pickup WestPools.EscapeRevisitEX:
     moki: Water
     kii:
-      Damage=140
-      WaterDash, Damage=80
+      Damage=80
+      WaterDash, Damage=40
     unsafe:
       Damage=60
       WaterDash, Damage=20
