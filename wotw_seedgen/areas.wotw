@@ -3732,7 +3732,7 @@ anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering abov
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover  # grapple the right plant to reach the house above
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump  # grapple the right plant to reach the house above
 
-  conn GladesTown.MotayHutInsinde:
+  conn GladesTown.MotayHutInside:
     GladesTown.BuildHuts
   conn GladesTown.West:
     GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform ffrom the hanging lantern below
@@ -3750,7 +3750,7 @@ anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering abov
       SwordSJump=1, Dash
       TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
 
-anchor GladesTown.MotayHutInsinde at -182, -4589:  # Inside the house hovering above Motay
+anchor GladesTown.MotayHutInside at -182, -4589:  # Inside the house hovering above Motay
 
   pickup GladesTown.MotayHutEX: free
 
@@ -6285,7 +6285,7 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
 
 # checkpoint at 525, -4205
 
-anchor WoodsEntry.FamilyHut at 469, -4180: # infront of familiy reunion hut door
+anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
   nospawn
   refill Checkpoint:
     unsafe: GladesTown.FamilyReunionKey
