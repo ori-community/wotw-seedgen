@@ -477,6 +477,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
     unsafe:
       Bash, Water OR Damage=10  # might be possible without damage if we catch the projectile right?
       Launch, Water OR Damage=10
+      WaterDash, Damage=10
   pickup MarshSpawn.BurrowsApproachLedgeEX:  # Most Bash paths redundant with BeforeBurrows->PoolsBurrowsSignpost->BurrowsApproachLedgeEX
     moki: Launch
     gorlek: SentryJump=1, Damage=10, DoubleJump, TripleJump  # Land in the spikes under the pickup and triple jump to the left platform
@@ -550,7 +551,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
 
   pickup MarshSpawn.DamageTree:
     moki: MarshSpawn.DamageTreeOpen
-  pickup MarshSpawn.CrusherSwimEX:  # clean water paths with waterdash originate from MarshSpawn.BeforeBurrows
+  pickup MarshSpawn.CrusherSwimEX:  # clean water + waterdash and unsafe originate from MarshSpawn.BeforeBurrows
     kii: WaterDash, Damage=20
   
   conn Tokk: free
@@ -3223,6 +3224,11 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
 
   state GladesTown.TuleySpawned:
     moki: InnerWellspring.WaterEscape
+  state EastHollow.SilentSwimWall:
+    moki: Water
+    unsafe:
+      Damage=120, Damage=120, Bash
+      Damage=50, Damage=80, WaterDash  # Take a dboost from the mortar projectile before going in the water
 
   pickup EastHollow.RightKwolokEX:
     moki: Bash OR Launch
@@ -3250,18 +3256,33 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   pickup EastHollow.KwolokSwimOre:
     moki: Water, Bash OR Damage=10  # enemy in the way
     gorlek: Water
+    unsafe:
+      Damage=120
+      WaterDash, Damage=60
+      Bash, Damage=100
+      WaterDash, Bash, Damage=40      
   pickup EastHollow.KwolokSwimLeftEX:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump, TripleJump  # Do a wrap around from the right wall
     kii:
       Water, Bash  # Bash the fish
       Water, DoubleJump, Hammer OR Spear=1  # Djump from the right wall, upswing for extra height. Use left ledge to regain upswing
-    unsafe:
-      Water, DoubleJump  # At left wall, with quick jumps sliding up the wall you can keepp the dj
-      Water, DoubleJump, Sword  # bait the fish and pogo it
+    unsafe:  # Can do way better than that by optimizing damages on spikes/fishes
+      DoubleJump, Water OR Damage=220  # At left wall, with quick jumps sliding up the wall you can keepp the dj
+      # Water, DoubleJump, Sword  # bait the fish and pogo it
       # Water, DoubleJump, Flash=1 OR Sentry=1  # Ability to gain a bit more height. Standig on the left ledge to regain upswing after fail.
+      Damage=200, Launch  # launch in the water at the start to preserve a bit of it's speed
+      Damage=100, WaterDash
+      Damage=200, Bash, DoubleJump
+      Damage=180, Bash, Launch
+      Damage=80, WaterDash, Bash
   pickup EastHollow.KwolokSwimRightEX:
     moki: Water
+    unsafe:
+      Damage=120
+      WaterDash, Damage=60
+      Bash, Damage=80
+      WaterDash, Bash, Damage=40
   pickup EastHollow.SecretRoofEX:  # this path can't get over the big spike wall from the left anchor
     gorlek: DoubleJump, TripleJump, Dash
     kii: DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Shuriken=1 OR Sentry=1
@@ -3285,20 +3306,18 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
     unsafe:
       Bash OR Shuriken=2 OR Damage=10  # friendly spikes
   conn WoodsEntry.ShriekMeet:
-    moki, Combat=Balloon:
+    moki, EastHollow.SilentSwimWall, Combat=Balloon:
       Water, Grapple, DoubleJump, Dash OR Glide
       Water, Grapple, Dash, Glide
       Water, Launch
-    gorlek, Combat=Balloon:
+    gorlek, EastHollow.SilentSwimWall, Combat=Balloon:
       Water, Grapple, DoubleJump, TripleJump OR Sword OR Hammer
       Water, Grapple, Dash  # Eiher jump from the Grapple point and the Dash or use double Dash
       Water, WaterDash, DoubleJump, TripleJump
-      Water, WaterDash, DoubleJump, Dash, Damage=10  # Take boost on the left side
-      # @validator The path above could be using Dash OR Glide OR Sword OR Hammer instead of just Dash
-    kii:
+      Water, WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Sword OR Hammer  # Take boost on the left side
+    kii, EastHollow.SilentSwimWall:
       # Repeat each moki/gorlek path without Combat=Balloon since you can just bait it into taking a swim
-      Water, Launch
-      Water, Grapple, Dash
+      Water, Launch OR Dash
       Water, Grapple, DoubleJump, Glide OR TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Water, WaterDash, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Water, WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -3311,7 +3330,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, WaterDash, Dash, Damage=10, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Water, WaterDash, Hammer, Damage=10, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       Water, WaterDash, Glide, Damage=10, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
+    unsafe, EastHollow.SilentSwimWall:
       Water, Grapple, Sentry=3
       Water, Grapple, Shuriken=2, Combat=Balloon OR Damage=20
       Water, Grapple, DoubleJump  # Cancel grapple with djump
@@ -3319,12 +3338,16 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, WaterDash, Dash, Damage=10  # coyote jump from the ledge under the grappable plant
       Water, WaterDash, Sword  # Pogo the projectile
       Water, SwordSJump=1  # probably doable with hammer as well, but it's much harder
-      # Dirty Swims, probably incomplete. Stand in shallow water on the side of the first air pocket to regen. Teleport out after breaking the wall.
-      WaterDash, Damage=60, Damage=110, Launch
-      WaterDash, Damage=60, Damage=110, Grapple, Sentry=3 OR DoubleJump OR Dash
-      WaterDash, Damage=60, Damage=110, DoubleJump, TripleJump
-      WaterDash, Damage=60, Damage=110, SwordSJump=1
-      WaterDash, Damage=60, Damage=110, Damage=20, Grapple, Sword  # extra damage from the balloon, regen spot below the grapple plant
+      # Dirty Swims, probably incomplete. Stand in shallow water on the side of the first air pocket to regen.
+      Damage=210, Launch
+      Damage=210, Grapple, DoubleJump OR Dash OR Sword OR Sentry=3
+      Damage=210, Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=210, Grapple, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=210, Grapple, Shuriken=2, Combat=Balloon OR Damage=20
+      Damage=210, DoubleJump, TripleJump
+      WaterDash, Damage=50, Damage=100, Launch OR DoubleJump  # https://youtu.be/5efA8BiPqhw
+      WaterDash, Damage=50, Damage=100, Grapple, Dash OR Sword OR Sentry=3
+      WaterDash, Damage=50, Damage=100, SwordSJump=1
       # Water, Grapple, SwordSJump=1  # standing on the ledge below grapple plant. Holding right during SJump. Swordcombo to go right. Lure balloon into water first
       # Water, Grapple, SwordSJump=1, DoubleJump OR Glide  # standing on the ledge below grapple plant. Holding right during SJump
 # checkpoint at -8, -4327
@@ -4595,6 +4618,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
       Damage=80
       WaterDash, Damage=40
       Bash, Damage=60
+      Bash, Grenade=1, Damage=40  # Throw a grenade in the water and bash it to get some iframes
 
   conn OuterWellspring.LifeHarvestEntry:
     moki, OuterWellspring.LifeHarvestWallBroken:
@@ -5325,6 +5349,10 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
 
   state InnerWellspring.ThreeWheels:
     moki: BreakWall=3
+  state InnerWellspring.WaterDashSwitch:
+    moki: Water, WaterDash
+    kii: Damage=40, WaterDash
+    unsafe: Damage=20, WaterDash
 
   pickup InnerWellspring.ThreeWheelsEX:
     moki:
@@ -5339,8 +5367,11 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       DoubleJump, TripleJump
       GrenadeJump
   pickup InnerWellspring.WaterSwitchEX:
-    moki: Water, WaterDash
-    unsafe: WaterDash, Damage=40, Damage=60
+    moki, InnerWellspring.WaterDashSwitch: Water
+    kii, InnerWellspring.WaterDashSwitch:
+      Damage=80
+      WaterDash, Damage=40
+    unsafe, InnerWellspring.WaterDashSwitch: Damage=60
 
   conn OuterWellspring.EntranceDoor: free
   conn InnerWellspring.ThornShardArea:
@@ -6205,6 +6236,20 @@ region WoodsEntry:
 anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through the Hollow connection
   refill Checkpoint
 
+  state EastHollow.SilentSwimWall:
+    gorlek: Water, Bash, Damage=10  # bit hard but important for random spawn
+    kii: Water, Spear=1
+    unsafe:
+      Water, Bash # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc
+      Water, Sword, Deflector
+      Water, GrenadeRedirect=1 OR SentryRedirect=1  # https://youtu.be/AIHaUnHRTF0
+      Damage=90, Spear=1
+      Damage=50, WaterDash, Spear=1  # didn't managed to prevent damage from spikes above the breakable wall
+      Damage=160, Bash
+      Damage=140, WaterDash, Bash
+      Damage=160, Sword, Deflector
+      Damage=140, WaterDash, Sword, Deflector
+
   pickup WoodsEntry.LedgeOre:
     gorlek: Launch
     kii: Bash, Grenade=1, DoubleJump, TripleJump OR Hammer
@@ -6213,13 +6258,11 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
     moki: Combat=Balloon, Combat=Tentacle OR Bash OR Launch
     gorlek: Combat=Tentacle OR Bash OR Launch OR Damage=10
   conn EastHollow.Kwolok:
-    gorlek: Water, Bash, Damage=10  # bit hard but important for random spawn
-    kii: Water, Spear=1
-    unsafe:
-      Water, Bash # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc
-      Water, Sword, Deflector
-      Water, GrenadeRedirect=1 OR SentryRedirect=1  # https://youtu.be/AIHaUnHRTF0
-      
+    moki, EastHollow.SilentSwimWall: Water
+    unsafe, EastHollow.SilentSwimWall:
+      Damage=240, Damage=120
+      Damage=100, Damage=60, WaterDash
+      Damage=210, Damage=120, Bash
 
 anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death mud
   refill Checkpoint
@@ -8664,11 +8707,11 @@ anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four key
       SentryJump=1  # need a decently high one
   pickup UpperReach.SwimEX:  # dirty water paths using the damage advantage over starting from the right
     kii, UpperReach.ThawFurnace:
-      Damage=80, WaterDash
-      Damage=120
-    unsafe, UpperReach.ThawFurnace:
       Damage=40, WaterDash
-      Damage=100
+      Damage=80
+    unsafe, UpperReach.ThawFurnace:
+      Damage=20, WaterDash
+      Damage=60
 
   conn Tokk: free
   conn UpperReach.UpperSoup:  # check for redundancies with OutsideTreeRoom and KeystoneSnapPlant
