@@ -3710,14 +3710,9 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         DoubleJump, TripleJump
         Grapple, DoubleJump, Dash, Glide
 
-anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Motay
-  # IMPORTANT this anchor is INSIDE the hut. It may only be accessed if the player has the BuildHuts state
-  # however we still allow the player to spawn inside the unbuilt hut because that's fun
-  # if you want to use the platform outside, use the BuildHuts state. Paths without it have to assume there is no platform
-  refill Checkpoint:
-    unsafe: GladesTown.BuildHuts  # Exit the house for a checkpoint
+anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering above Motay
+  nospawn
 
-  pickup GladesTown.MotayHutEX: free
   pickup GladesTown.UpperOre:
     moki, GladesTown.BuildHuts:
       Bash, Grenade=2
@@ -3737,7 +3732,10 @@ anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Mo
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover  # grapple the right plant to reach the house above
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump  # grapple the right plant to reach the house above
 
-  conn GladesTown.West: free
+  conn GladesTown.MotayHutInsinde:
+    GladesTown.BuildHuts
+  conn GladesTown.West:
+    GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform ffrom the hanging lantern below
   conn GladesTown.UpperWest:
     moki, GladesTown.BuildHuts:
       Bash, Grenade=2, Dash  # 1 extra grenade if you hit the Lightcatcher
@@ -3751,6 +3749,12 @@ anchor GladesTown.MotayHut at -182, -4589:  # Inside the house hovering above Mo
       GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
       SwordSJump=1, Dash
       TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
+
+anchor GladesTown.MotayHutInsinde at -182, -4589:  # Inside the house hovering above Motay
+
+  pickup GladesTown.MotayHutEX: free
+
+  conn GladesTown.MotayHut: free
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   refill Checkpoint:
