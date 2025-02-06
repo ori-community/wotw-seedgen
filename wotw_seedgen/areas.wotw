@@ -12386,13 +12386,13 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
     unsafe:
       # bait the torpedo into the wall. TP so it touches the wall during your TP animation
       Damage=160, Launch OR GrenadeJump OR SwordSJump=1
-      Damage=160, DoubleJump, Sword OR Hammer OR TripleJump
-      Water, DoubleJump, Sword OR Hammer  # Climb the anemone wall once it's closed again
+      Damage=160, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1
+      Water, DoubleJump, Sword OR Hammer OR Spear=1  # Climb the anemone wall once it's closed again
       # snipe the wall from the torpedo spawner
       Water, Bash  # bait the torpedo, return to the checkpoint and jump from there to catch the torpedo and activating the anemone
-      Damage=100, Bash  # 2 dboost to bait the torpedo + 3 to bash the second one. You can regen a single time between activating the torpedo and going for the second torpedo
+      Damage=100, Bash  # 2 dboost to bait the torpedo + 3 to bash the second one. You can regen a single time between activating the anemone and going for the second torpedo
       Bash, Damage=60, Grenade=1 OR Launch OR SwordSJump=1
-      Bash, Damage=60, DoubleJump, Sword OR Hammer OR TripleJump
+      Bash, Damage=60, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1
   
   pickup UpperPools.LeftBubblesEX:  # beautiful autosave placement right there
     moki: Water
@@ -12405,18 +12405,31 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
   
   conn UpperPools.RightBubbleSpamRoom:
     moki:
-      Water, Bash, WaterBreath, DoubleJump OR Launch
+      Water, Launch
+      Water, Bash, WaterBreath, DoubleJump
       Water, Bash, WaterDash
-    gorlek: Water, Bash, Grenade=1 OR DoubleJump OR Launch
+    gorlek:
+      Water, Bash, Grenade=1 OR DoubleJump OR Glide
+      Water, WaterDash, DoubleJump, TripleJump OR Hammer
     kii:
-      Launch, Water OR Damage=80
-      DoubleJump, TripleJump, Water OR Damage=80
-      Water, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
-      Damage=60, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
+      DoubleJump, TripleJump, Water OR Damage=60
+      DoubleJump, TripleJump, WaterDash, Damage=40
+      WaterDash, DoubleJump, Spear=1, Water OR Damage=60
+      Damage=60, Launch
+      Damage=60, Bash, Grenade=1
+      Damage=160, Bash, DoubleJump OR Glide
+      Damage=60, WaterDash, DoubleJump, Hammer
+      Damage=40, Launch, WaterDash
+      Damage=40, Bash, Grenade=1, WaterDash
+      Damage=100, Bash, WaterDash, DoubleJump OR Glide
     unsafe:
-      WaterDash, Sword, Water OR Damage=120  # Pogo the torpedo
-      Water, Launch OR SwordSJump=1
-      Damage=60, Launch OR SwordSJump=1
+      Bash, Water OR Damage=100  # 2 dboost to bait the torpedo + 3 to exit the area. You can use regen twice between activating the anemone and exiting but can't write it at two separate damage because of hard
+      WaterDash, Sword, Water OR Damage=100  # Pogo the torpedo
+      Water, DoubleJump, Sword OR Hammer OR Spear=1  # Climb the anemone wall once it's closed again
+      Damage=60, DoubleJump, Sword OR Hammer OR Spear=1
+      Damage=40, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
+      SwordSJump=1, Water OR Damage=60
+      Damage=40, SwordSJump=1, WaterDash
 
 # checkpoint at -1386, -4062
 
