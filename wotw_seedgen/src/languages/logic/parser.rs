@@ -47,6 +47,7 @@ pub struct Anchor<'a> {
     pub teleport_restriction: Option<Group<'a>>,
     pub refills: Vec<Refill<'a>>,
     pub connections: Vec<Connection<'a>>,
+    pub door: Option<Door<'a>>,
 }
 #[derive(Debug, Clone)]
 pub struct Refill<'a> {
@@ -58,6 +59,11 @@ pub struct Connection<'a> {
     pub kind: NodeKind,
     pub identifier: &'a str,
     pub requirements: Group<'a>,
+}
+#[derive(Debug, Clone)]
+pub struct Door<'a> {
+    pub door_id: u16,
+    pub requirements: Option<Group<'a>>,
 }
 #[derive(Debug, Clone)]
 pub struct Group<'a> {
@@ -244,6 +250,7 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
     let mut teleport_restriction = None;
     let mut refills = Vec::new();
     let mut connections = Vec::new();
+    let mut door = None;
 
     loop {
         if check_dedent(parser)? {
@@ -267,6 +274,14 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
                 }
                 AnchorContent::Refill(refill) => refills.push(refill),
                 AnchorContent::Connection(connection) => connections.push(connection),
+                AnchorContent::Door(requirement) => {
+                    if door.replace(requirement).is_some() {
+                        let range = start..parser.current_token().range.start;
+                        recover(parser, |kind| matches!(kind, TokenKind::Dedent { .. }));
+                        check_dedent(parser)?;
+                        return Err(parser.error("An anchor may only have one door", range));
+                    }
+                }
             },
             Err(err) => {
                 recover(parser, |kind| matches!(kind, TokenKind::Dedent { .. }));
@@ -283,6 +298,7 @@ fn parse_anchor<'a>(parser: &mut Parser<'a>) -> Result<AreaContent<'a>, ParseErr
         teleport_restriction,
         refills,
         connections,
+        door,
     }))
 }
 fn parse_anchor_position(parser: &mut Parser) -> Result<Option<Position>, ParseError> {
@@ -312,12 +328,14 @@ enum AnchorContentKind {
     Quest,
     Pickup,
     Conn,
+    Door,
 }
 enum AnchorContent<'a> {
     NoSpawn,
     TpRestriction(Group<'a>),
     Refill(Refill<'a>),
     Connection(Connection<'a>),
+    Door(Door<'a>),
 }
 fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>, ParseError> {
     let kind = parse_ident!(parser, Suggestion::AnchorContent)?;
@@ -341,6 +359,7 @@ fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>
         AnchorContentKind::Conn => {
             AnchorContent::Connection(parse_anchor_connection(parser, NodeKind::Anchor)?)
         }
+        AnchorContentKind::Door => AnchorContent::Door(parse_door(parser)?),
     };
     Ok(content)
 }
@@ -400,7 +419,16 @@ fn parse_anchor_connection<'a>(
         requirements,
     })
 }
+fn parse_door<'a>(parser: &mut Parser<'a>) -> Result<Door<'a>, ParseError> {
+    parser.skip(TokenKind::Whitespace);
 
+    let door_id = parse_number!(parser, Suggestion::Integer)?;
+
+    Ok(Door {
+        door_id,
+        requirements: parse_optional_group(parser)?
+    })
+}
 fn parse_group<'a>(parser: &mut Parser<'a>) -> Result<Group<'a>, ParseError> {
     parser.eat(TokenKind::Colon)?;
     parser.skip(TokenKind::Whitespace);
