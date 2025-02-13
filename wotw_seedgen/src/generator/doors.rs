@@ -62,6 +62,8 @@ pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
             // If this is the first time we're entering this group, mark all doors in this group as reachable
             for door_id in &door_groups[group_index] {
                 reachable_doors_without_outgoing_connection.insert(*door_id);
+                
+                #[cfg(feature = "log")]
                 log::trace!("Door {} is now reachable", door_id);
             }
         }
@@ -98,12 +100,16 @@ pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
             )
         );
         header_lines.push(format!("3|0|8|27|{}|int|{}", door, target_door));
+        
+        #[cfg(feature = "log")]
         log::trace!("Connecting door {} → {}", door, target_door);
 
         // Now mark the target group as reachable
         if remaining_groups.remove(&target_group_index) {
             for door_id in &door_groups[target_group_index] {
                 reachable_doors_without_outgoing_connection.insert(*door_id);
+                
+                #[cfg(feature = "log")]
                 log::trace!("Door {} is now reachable", door_id);
             }
         }
