@@ -11,7 +11,8 @@ use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
 
 type DoorId = u16;
 
-pub fn generate_door_states(world: &mut World, rng: &mut StdRng) {
+pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
+    let mut header_lines: Vec<String> = vec![];
     let door_groups: Vec<Vec<DoorId>> = vec![
         vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 32],
         vec![2],
@@ -37,8 +38,6 @@ pub fn generate_door_states(world: &mut World, rng: &mut StdRng) {
             group_index_by_door_id.insert(door_id, group_index.to_owned());
         }
     }
-
-
 
     let mut reachable_doors_without_outgoing_connection: HashSet<DoorId, _> = FxHashSet::default();
 
@@ -98,6 +97,7 @@ pub fn generate_door_states(world: &mut World, rng: &mut StdRng) {
                 UberStateValue::Number((target_door as f32).into()),
             )
         );
+        header_lines.push(format!("3|0|8|27|{}|int|{}", door, target_door));
         log::trace!("Connecting door {} → {}", door, target_door);
 
         // Now mark the target group as reachable
@@ -111,7 +111,7 @@ pub fn generate_door_states(world: &mut World, rng: &mut StdRng) {
         reachable_doors_without_outgoing_connection.remove(&door);
         doors_without_incoming_connection.shift_remove(&target_door);
 
-        if reachable_doors_without_outgoing_connection.is_empty() {
+        if doors_without_incoming_connection.is_empty() {
             break;
         }
 
@@ -130,4 +130,6 @@ pub fn generate_door_states(world: &mut World, rng: &mut StdRng) {
             current_circle_start_group_index = None;
         }
     }
+    
+    header_lines.join("\n")
 }
