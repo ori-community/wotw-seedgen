@@ -14175,6 +14175,10 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
 
   state WillowsEnd.BoulderHeart:
     moki: BreakWall=30, Launch, DoubleJump, Dash
+    kii: BreakWall=30, Launch, DoubleJump OR Dash
+    unsafe, BreakWall=30:
+      Launch
+      DoubleJump, Bash, Grenade=2 # energy refill after collecting checkpoints and dieing
 
   pickup WillowsEnd.SpikesOre:
     moki: Launch, Dash OR Glide
@@ -14369,6 +14373,14 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
 
   state WillowsEnd.RedirectHeart:
     moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
+    kii: 
+      BreakWall=10, BreakWall=30, Launch, Bash, Dash
+    unsafe: 
+      Spear=2
+      BreakWall=10, BreakWall=30, Glide, Bash
+      Grenade=2, Launch, Bash
+      Sword, Launch, Bash
+      Deflector, Sword, Bash, Damage=20
 
   pickup WillowsEnd.RedirectEX:
     moki:
@@ -14419,10 +14431,14 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Bash, Grapple, Launch, DoubleJump OR Glide
     kii, BreakWall=30, Burrow:
       Launch, Bash, DoubleJump OR Glide OR Dash
+    unsafe:
+      BreakWall=30, Burrow, Bash, Glide
+      Burrow, Sword, Launch
 
   conn WillowsEnd.MiniBossFight:
-    moki: Launch, Dash, Glide OR DoubleJump
-    kii: Launch, Dash
+    moki: Launch, Dash, Glide, DoubleJump
+    gorlek: Launch, Dash, Glide OR DoubleJump
+    kii: Launch, DoubleJump OR Dash OR Sword OR Hammer
     unsafe: Launch
   conn WillowsEnd.East:
     moki:
@@ -14471,8 +14487,9 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
     unsafe: Combat=ShieldCrystalMiner, DoubleJump
   
   conn WillowsEnd.Upper:
-    moki: Launch, Dash, Glide OR DoubleJump
-    kii: Launch, Dash OR Glide OR DoubleJump
+    moki: Launch, Dash, Glide, DoubleJump
+    gorlek: Launch, Dash, Glide OR DoubleJump
+    kii: Launch, DoubleJump OR Dash OR Sword OR Hammer
     unsafe: Launch
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
@@ -14482,6 +14499,9 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
 
   state WillowsEnd.SpinLasersHeart:
     moki: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
+    unsafe, BreakWall=30:
+      Launch
+      DoubleJump, Glide OR Dash
 
   conn WillowsEnd.InnerTP:
     moki: BreakWall=20, Combat=MaceMiner OR Bash OR Launch
@@ -14536,7 +14556,8 @@ anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
     kii: Spear=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1
 
   state WillowsEnd.GlideHeart:
-    moki: BreakWall=30, DoubleJump, Glide, Launch
+    moki: BreakWall=30, Glide
+    kii: BreakWall=30, Launch, DoubleJump, Damage=40
 
   pickup WillowsEnd.WindSpinOre:
     moki: Glide
