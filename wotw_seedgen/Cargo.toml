@@ -22,11 +22,11 @@ log = { version = "0.4", optional = true }
 ansi_term = "0.12.1"
 smallvec = { version = "1.6.1", features = ["const_generics"] }
 regex = "1"
-num_enum = "0.5"
+num_enum = "0.7"
 decorum = "0.3"
 partition = "0.1"
 itertools = "0.10"
-indexmap = "2.7.1"
+indexmap = "2.7"
 
 [dev-dependencies]
 criterion = "0.3"
