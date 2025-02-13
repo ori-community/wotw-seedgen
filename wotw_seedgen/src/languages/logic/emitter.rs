@@ -7,6 +7,9 @@ use super::{
 };
 
 use crate::item::Skill;
+use crate::logic::parser::Door;
+use crate::uber_state::{UberIdentifier, UberStateComparator, UberStateCondition, UberStateTrigger};
+use crate::world::graph::Connection;
 use crate::{
     log,
     settings::{Difficulty, Trick, UniverseSettings},
@@ -22,6 +25,11 @@ struct EmitterContext<'a> {
     universe_settings: &'a UniverseSettings,
     node_map: FxHashMap<String, usize>,
     used_states: FxHashSet<&'a str>,
+}
+
+struct DoorAnchor<'a> {
+    identifier: String,
+    door: Door<'a>,
 }
 
 fn build_trick_requirement(
@@ -462,11 +470,12 @@ pub fn build(
         }
     }
 
-    let mut index = 0;
+    let mut next_index = 0;
     let mut nodes = Vec::with_capacity(node_count);
     let mut node_map = FxHashMap::default();
     node_map.reserve(node_count);
 
+    let mut used_states = FxHashSet::default();
     for location in locations {
         let Location {
             name,
@@ -487,14 +496,14 @@ pub fn build(
             Some(map_position)
         };
 
-        add_entry(&mut node_map, &identifier, index)?;
+        add_entry(&mut node_map, &identifier, next_index)?;
         let node = match quests.contains(&identifier[..]) {
             true => Node::Quest(graph::Quest {
                 identifier,
                 position,
                 map_position,
                 zone,
-                index,
+                index: next_index,
                 trigger,
             }),
             false => Node::Pickup(graph::Pickup {
@@ -502,46 +511,68 @@ pub fn build(
                 position,
                 map_position,
                 zone,
-                index,
+                index: next_index,
                 trigger,
             }),
         };
         nodes.push(node);
-        index += 1;
+        next_index += 1;
     }
-    let state_start_index = index;
+    let state_start_index = next_index;
     for state in named_states {
         states.remove(&state.name[..]);
-        add_entry(&mut node_map, &state.name, index)?;
+        add_entry(&mut node_map, &state.name, next_index)?;
         let node = Node::State(graph::State {
             identifier: state.name,
-            index,
+            index: next_index,
             trigger: Some(state.trigger),
         });
         nodes.push(node);
-        index += 1;
+        next_index += 1;
     }
+
+    // Find all door anchors
+    let mut door_anchors = vec![];
+    let mut door_ids: FxHashSet<u16> = FxHashSet::default();
+    for anchor in &anchors {
+        if let Some(door) = &anchor.door {
+            if !door_ids.insert(door.door_id) {
+                return Err(format!("Duplicate door ID {}", door.door_id).to_string());
+            }
+
+            door_anchors.push(DoorAnchor {
+                identifier: anchor.identifier.to_owned(),
+                door: door.to_owned(),
+            });
+        }
+    }
+
+    let doors_count = door_anchors.len();
+    let mut door_state_nodes = Vec::with_capacity(doors_count * doors_count - doors_count);
+
     for identifier in states {
         log::trace!(
             "Couldn't find an entry for {} in the state table",
             identifier
         );
-        add_entry(&mut node_map, identifier, index)?;
+        add_entry(&mut node_map, identifier, next_index)?;
         let node = Node::State(graph::State {
             identifier: identifier.to_string(),
-            index,
+            index: next_index,
             trigger: None,
         });
         nodes.push(node);
-        index += 1;
+        next_index += 1;
     }
-    let state_end_index = index;
-    let mut used_states = FxHashSet::default();
-    used_states.reserve(state_end_index - state_start_index);
+    let state_end_index = next_index;
+    used_states.reserve(state_end_index - state_start_index + doors_count * doors_count - doors_count);
 
     for (anchor_index, anchor) in anchors.iter().enumerate() {
-        add_entry(&mut node_map, anchor.identifier, index + anchor_index)?;
+        add_entry(&mut node_map, anchor.identifier, next_index + anchor_index)?;
     }
+
+    let door_states_start_index = next_index + anchors.len();
+    let mut next_door_index: usize = 0;
 
     let mut context = EmitterContext {
         macros: &macros,
@@ -549,6 +580,7 @@ pub fn build(
         node_map,
         used_states,
     };
+
     for anchor in anchors {
         let region = regions.get(anchor.region());
         let region_requirement =
@@ -561,6 +593,7 @@ pub fn build(
             teleport_restriction,
             refills,
             connections,
+            door,
         } = anchor;
         let identifier = identifier.to_owned();
 
@@ -579,7 +612,7 @@ pub fn build(
             })
             .collect();
 
-        let connections = connections
+        let mut connections = connections
             .into_iter()
             .map(|connection| {
                 let mut requirement =
@@ -608,18 +641,64 @@ pub fn build(
             })
             .collect::<Result<Vec<_>, String>>()?;
 
+        // Generate door connections if this
+        if let Some(door) = door {
+            connections.reserve(doors_count - 1);
+            for target_door_anchor in &door_anchors {
+                // Don't connect door to itself
+                if identifier == target_door_anchor.identifier {
+                    continue;
+                }
+
+                // Create state for this connection
+                let door_state_index = door_states_start_index + next_door_index;
+                let state_name = format!("Door<{}, {}>", &identifier, &target_door_anchor.identifier);
+                add_entry(&mut context.node_map, state_name.as_str(), door_state_index)?;
+
+                let node = Node::State(graph::State {
+                    identifier: state_name.to_owned(),
+                    index: door_state_index,
+                    trigger: Some(UberStateTrigger {
+                        identifier: UberIdentifier {
+                            uber_group: 27,
+                            uber_id: door.door_id,
+                        },
+                        condition: Some(UberStateCondition {
+                            comparator: UberStateComparator::Equals,
+                            value: target_door_anchor.door.door_id as u32
+                        })
+                    }),
+                });
+                door_state_nodes.push(node);
+                next_door_index += 1;
+
+                let to = *context.node_map.get(target_door_anchor.identifier.as_str()).unwrap();
+                connections.push(Connection {
+                    to,
+                    requirement: Requirement::And(vec![
+                        Requirement::State(context.node_map[state_name.as_str()]),
+                        target_door_anchor.door.requirements.to_owned()
+                            .and_then(|r| Some(build_requirement_group(&r, false, &mut context)))
+                            .unwrap_or_else(|| Requirement::Free)
+                    ]),
+                })
+            }
+        }
+
         let node = Node::Anchor(graph::Anchor {
             identifier,
             position,
             can_spawn,
             teleport_restriction,
-            index,
+            index: next_index,
             refills,
             connections,
         });
-        index += 1;
+        next_index += 1;
         nodes.push(node);
     }
+    
+    nodes.append(&mut door_state_nodes);
 
     #[cfg(feature = "log")]
     if validate {
