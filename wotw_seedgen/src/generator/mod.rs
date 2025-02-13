@@ -1,6 +1,7 @@
 mod placement;
 mod seed;
 mod spoiler;
+mod doors;
 
 pub use placement::*;
 pub use seed::*;
@@ -21,6 +22,7 @@ use crate::uber_state::UberStateTrigger;
 use crate::world::{Graph, Pool, World};
 
 use placement::generate_placements;
+use crate::generator::doors::generate_door_states;
 
 pub fn generate_seed<'graph, 'settings>(
     graph: &'graph Graph,
@@ -37,6 +39,8 @@ pub fn generate_seed<'graph, 'settings>(
             let mut world = World::new_spawn(graph, world_settings);
             world.pool = Pool::preset();
 
+            generate_door_states(&mut world, &mut rng);
+            
             let (goals, flags, headers) = parse_headers(&mut world, file_access, &mut rng)?;
             world.goals = goals;
 
