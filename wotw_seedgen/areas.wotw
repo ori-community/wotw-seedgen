@@ -3504,6 +3504,8 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
 # checkpoint at -297, -4139
 
 anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
+  door 9:
+    moki: GladesTown.BuildHuts, WoodsEntry.DollQI
   refill Checkpoint
 
   quest GladesTown.HandToHandLantern:
@@ -3526,8 +3528,6 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     moki: TuleyShop.LastTree
 
   conn TwillenShop: free
-  conn GladesTown.KeyMokiHutInside:
-    moki: GladesTown.BuildHuts, WoodsEntry.DollQI
   conn GladesTown.AcornMoki:
     moki: GladesTown.ClearThorns
   conn GladesTown.West:
@@ -3550,9 +3550,10 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     unsafe: Dash OR Damage=10 OR GlideJump OR GrenadeJump
 
 anchor GladesTown.KeyMokiHutInside at -110, -4571:
+  door 10: free
+
   pickup GladesTown.KeyMokiHutEX: free
   
-  conn GladesTown.TwillenHome: free
 
 anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twillen
   refill Checkpoint
@@ -3712,6 +3713,8 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
 
 anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering above Motay
   nospawn
+  door 5:
+    GladesTown.BuildHuts
 
   pickup GladesTown.UpperOre:
     moki, GladesTown.BuildHuts:
@@ -3732,8 +3735,6 @@ anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering abov
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseHover  # grapple the right plant to reach the house above
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump  # grapple the right plant to reach the house above
 
-  conn GladesTown.MotayHutInside:
-    GladesTown.BuildHuts
   conn GladesTown.West:
     GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform ffrom the hanging lantern below
   conn GladesTown.UpperWest:
@@ -3751,12 +3752,14 @@ anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering abov
       TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
 
 anchor GladesTown.MotayHutInside at -182, -4589:  # Inside the house hovering above Motay
-
+  door 6: free
+  
   pickup GladesTown.MotayHutEX: free
 
-  conn GladesTown.MotayHut: free
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
+  door 3:
+    moki: GladesTown.OnwardsAndUpwards
   refill Checkpoint:
     unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
 
@@ -3800,8 +3803,6 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
 
-  conn GladesTown.InsideThirdHut:
-    moki: GladesTown.OnwardsAndUpwards
   conn GladesTown.MotayHut:  # check for redundancies with GladesTown.West
     moki, GladesTown.BuildHuts:
       DoubleJump OR Dash OR Glide
@@ -3824,6 +3825,8 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     unsafe: free
 
 anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with the herbs moki
+  door 4: free
+
   pickup GladesTown.BraveMokiHutEX:
     moki: DoubleJump OR Launch
     gorlek: SentryJump=1
@@ -3834,9 +3837,10 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
       Sword OR Spear=1 # upslash+downslash
       GrenadeJump
   
-  conn GladesTown.UpperWest: free
 
 anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
+  door 13:
+    moki: GladesTown.CaveEntrance
   refill Checkpoint:
     unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
 
@@ -3858,8 +3862,6 @@ anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
     moki: Burrow, DoubleJump OR Launch
     gorlek: Burrow  # Burrow Dash out of the sand
   
-  conn GladesTown.AcornCave:
-    moki: GladesTown.CaveEntrance
   conn GladesTown.Teleporter:  # only useful for GladesDone
     moki, GladesTown.ClearThorns:
       Launch OR DoubleJump
@@ -3873,6 +3875,7 @@ anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
     unsafe, GladesTown.ClearThorns: Dash
 
 anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at the door
+  door 14: free
   refill Energy=4:
     moki: BreakCrystal
     
@@ -3918,7 +3921,6 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
                 DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
                 DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
 
-  conn GladesTown.AcornMoki: free
                   
 anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty shard 
   pickup GladesTown.AboveTpEX: free
@@ -3984,6 +3986,8 @@ anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to 
     unsafe: Blaze=1
 
 anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
+  door 11:
+    moki: GladesTown.RoofsOverHeads
   refill Checkpoint:
     unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
@@ -4013,11 +4017,9 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     kii: GladesTown.TuleySpawned, Blaze=2 OR Sentry=1 OR Flash=1 OR Shuriken=1
     unsafe: GladesTown.TuleySpawned, Spear=2
     # seed paths tbd if ever necessary
-  conn GladesTown.StorageHut:
-    moki: GladesTown.RoofsOverHeads
 
 anchor GladesTown.StorageHut at -119, -4605:
-  conn GladesTown.AboveOpher: free
+  door 12: free
 
 anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather play
   conn GladesTown.HoleHut:
@@ -4037,6 +4039,8 @@ anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather pl
     # seed paths tbd if ever necessary
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
+  door 1: free
+
   pickup GladesTown.LupoSwimHC:
     moki: Water, Burrow
   pickup GladesTown.LupoSwimMiddleEX:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
@@ -4044,7 +4048,6 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
       Damage=100 # just wall jump between both walls
       WaterDash, Damage=40
   
-  conn GladesTown.InsideLupoHouse: free
   conn GladesTown.Teleporter:
     moki: Water OR Burrow
     unsafe:
@@ -4052,6 +4055,8 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
       WaterDash, Damage=60
     
 anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's house
+  door 2: free
+
   pickup GladesTown.LupoSoupEX: free
   pickup LupoShop.HCMapIcon:
     moki: SpiritLight=1200
@@ -4060,7 +4065,6 @@ anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's h
   pickup LupoShop.ShardMapIcon:
     moki: SpiritLight=1200
   
-  conn GladesTown.LupoHouse: free
   
 anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
   pickup GladesTown.BelowHoleHutEX: free
@@ -4105,18 +4109,19 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
   conn GladesTown.PlayfulMoki: free
   
 anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup house
+  door 7:
+    moki: GladesTown.RoofsOverHeads
   refill Checkpoint:
     unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
   
   conn GladesTown.HoleHut: free
-  conn GladesTown.InsideHoleHut:
-    moki: GladesTown.RoofsOverHeads
 
 anchor GladesTown.InsideHoleHut at -107, -4506:  # Inside the hut with 2 pickups
+  door 8: free
+
   pickup GladesTown.HoleHutEX: free
   pickup GladesTown.HoleHutEC: free
 
-  conn GladesTown.HoleHutEntrance: free
 
 region WestGlades:
   moki: Danger=20
@@ -4575,6 +4580,8 @@ region OuterWellspring:
   unsafe: free
 
 anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where you enter the first room
+  door 15:
+    moki: OuterWellspring.EntranceDoorOpen
   refill Checkpoint
   refill Health=1:
     gorlek: Combat=Slug
@@ -4638,8 +4645,6 @@ anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where yo
     gorlek, OuterWellspring.LifeHarvestWallBroken:
       DoubleJump OR Bash OR Dash OR Combat=Slug+Mantis
     kii: OuterWellspring.LifeHarvestWallBroken
-  conn InnerWellspring.EntranceDoor:
-    moki: OuterWellspring.EntranceDoorOpen
   conn OuterWellspring.Basement:
     moki:
       DoubleJump, Dash OR Glide
@@ -4922,6 +4927,8 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you exit the first room
+  door 17:
+    moki: InnerWellspring.MiddleDoorsOpen
   refill Checkpoint
 
   # the wheel is only a shortcut, at least in moki doesn't open up anything new
@@ -4972,8 +4979,6 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
       Bash, Grenade=1, SentryJump=1, DoubleJump, TripleJump
 
   # this tokk disappears after the needle quest
-  conn InnerWellspring.WestDoor:
-    moki: InnerWellspring.MiddleDoorsOpen
   conn OuterWellspring.EastDoor:  # Grapple / Launch paths are redundant with WestDoor->AboveEntranceDoor->EastDoor
     moki: Bash, Grenade=1, DoubleJump, Dash OR Glide
     gorlek:
@@ -4997,6 +5002,8 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to the spin puzzle
+  door 19:
+    moki: InnerWellspring.MiddleDoorsOpen
   refill Checkpoint
 
   state OuterWellspring.WestDoorBlueMoonFree:
@@ -5030,8 +5037,6 @@ anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to t
       DoubleJump, Shuriken=1 OR Blaze=1
       Bash, Grenade=1, Damage=15
 
-  conn InnerWellspring.EastDoor:
-    moki: InnerWellspring.MiddleDoorsOpen
   conn OuterWellspring.AboveWestDoor:
     moki:
       InnerWellspring.TopDoorOpen, Grapple OR Launch
@@ -5154,6 +5159,8 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
   conn OuterWellspring.AboveEntranceDoor: free
 
 anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to the teleporter
+  door 21:
+    moki: InnerWellspring.TopDoorOpen
   state OuterWellspring.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: Grapple, DoubleJump, Dash OR Glide
     gorlek: Grapple, Dash, Glide
@@ -5180,8 +5187,6 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
       Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
       SentryJump=1  # use the weapon for movement
       GrenadeJump, DoubleJump OR Dash OR PauseHover
-  conn InnerWellspring.Teleporter:
-    moki: InnerWellspring.TopDoorOpen
   conn OuterWellspring.EastDoor: free
   conn OuterWellspring.AboveWestDoor: free
 
@@ -5354,6 +5359,7 @@ region InnerWellspring:
   unsafe: free
 
 anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where you enter the first room
+  door 16: free
   refill Checkpoint
   refill Energy=3:
     moki: BreakCrystal
@@ -5377,7 +5383,6 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
     moki: Water, WaterDash
     unsafe: WaterDash, Damage=40, Damage=60
 
-  conn OuterWellspring.EntranceDoor: free
   conn InnerWellspring.ThornShardArea:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -5862,6 +5867,8 @@ anchor InnerWellspring.AbovePole at -1164, -3874:  # Under InnerWellspring.Upper
     gorlek: free
 
 anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you exit the first room
+  door 18:
+    moki: InnerWellspring.MiddleDoorsOpen
   refill Checkpoint
   refill Health=2
   refill Energy=3:
@@ -5920,11 +5927,10 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
     gorlek: Bash OR Sword OR Hammer
     kii: free
 
-  conn OuterWellspring.WestDoor:
-    moki: InnerWellspring.MiddleDoorsOpen
   conn InnerWellspring.BelowDrainLever: free
 
 anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to the spin puzzle
+  door 20: free
   refill Checkpoint
   refill Health=1
   refill Energy=4:
@@ -5955,7 +5961,6 @@ anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to t
       DoubleJump, TripleJump
     unsafe: DoubleJump
   
-  conn OuterWellspring.EastDoor: free
   conn InnerWellspring.SpinPuzzle:
     moki: InnerWellspring.SpinningRoomOpen
   conn InnerWellspring.TopSecondRoom:
@@ -6125,6 +6130,7 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
       Launch  # There is a small ledge on the ceiling to reset launch
 
 anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
+  door 22: free
   refill Full
   
   state NonGladesTeleporter: free
@@ -6166,7 +6172,6 @@ anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
       WaterDash, Damage=40
 
   conn Teleporters: free
-  conn OuterWellspring.TopDoor: free
   conn OpherShop: free
   conn InnerWellspring.EscapeSequence:
     moki:
@@ -6287,11 +6292,11 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
 
 anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
   nospawn
+  door 25:
+    GladesTown.FamilyReunionKey
   refill Checkpoint:
     unsafe: GladesTown.FamilyReunionKey
 
-  conn WoodsEntry.FamilyHutInside:
-    GladesTown.FamilyReunionKey
   conn WoodsEntry.FirstMud: free
   conn WoodsEntry.ShriekMeet:
     gorlek: free
@@ -6304,10 +6309,10 @@ anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
     kii: DoubleJump, TripleJump
 
 anchor WoodsEntry.FamilyHutInside at 456, -4118: # inside of family reunion hut
+  door 26: free
   quest WoodsEntry.DollQI:
     moki: GladesTown.FamilyReunionKey
   
-  conn WoodsEntry.FamilyHut: free
 
 anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   refill Checkpoint
@@ -9113,6 +9118,7 @@ anchor UpperReach.TreeRoomLedge at -136, -3911:  # On the ledge to the left and 
   # backwards connection can't get through the Icefall
 
 anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
+  door 23: free
   refill Checkpoint:  # the hut door saves
     unsafe: free
   refill Energy=4:  # fast respawning crystal
@@ -9129,7 +9135,6 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
       Bash, Grenade=1, DoubleJump
       DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Sentry=2  # Climb the right wall
 
-  conn UpperReach.SeedHut: free
   conn UpperReach.TreeRoomLedge:
     moki:
       Bash, Grenade=3
@@ -9145,11 +9150,12 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
       Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1  # go up to the ore
 
 anchor UpperReach.SeedHut at -131, -3857: # inside the hut with the seed
+  door 24: free
+
   quest UpperReach.SpringSeed:
     moki: Grenade=1
     gorlek: SentryBurn=1  # Use sentry to light the lantern
   
-  conn UpperReach.TreeRoom: free
 
 region UpperDepths:
   moki: Danger=40, Regenerate
@@ -13601,6 +13607,8 @@ anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of 
     moki: Burrow
 
 anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
+  door 27:
+    moki: EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
   refill Checkpoint
 
   quest UpperWastes.FlowersSeed: free
@@ -13625,8 +13633,6 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       Burrow, DoubleJump OR Sentry=3
       Damage=30, DoubleJump
 
-  conn WindtornRuins.UpperRuinsDoor:
-    moki: EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
   conn UpperWastes.NorthTP:
     moki: Burrow OR Launch OR Bash
     gorlek:
@@ -13647,6 +13653,7 @@ region WindtornRuins:
   unsafe: free
 
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
+  door 28: free
   refill Checkpoint
   refill Energy=3:
     moki: BreakCrystal
@@ -13655,7 +13662,6 @@ anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
     moki: Burrow, BreakWall=6, BreakWall=6
     unsafe: Burrow, Sentry=2 OR Grenade=1 OR Blaze=1
   
-  conn UpperWastes.OutsideRuins: free
   conn WindtornRuins.BrokenMural:
     moki, WindtornRuins.RuinsLever: Burrow
 
@@ -13890,7 +13896,7 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Damage=40, Sword OR Hammer
       Dash, Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
       Bash, DoubleJump, Blaze=1
-  conn WillowsEnd.Entry:
+  conn WeepingRidge.WillowEntranceLedge:
     moki, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump, Dash OR Glide
     gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
     kii, WeepingRidge.ElevatorFightCompleted:
@@ -13967,6 +13973,17 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       Bash, Grenade=2, DoubleJump, TripleJump
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
 
+anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willow entrance
+  door 29: free
+  refill Checkpoint
+  conn WeepingRidge.LaunchArea:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
+    gorlek, WeepingRidge.ElevatorFightCompleted:
+      Glide OR Damage=20
+    kii, WeepingRidge.ElevatorFightCompleted:  # land on top of the second laser 
+      Launch OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
+      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: WeepingRidge.ElevatorFightCompleted
+
 region WillowsEnd:
   moki: Danger=60, Regenerate  # need more than 6 health and Regen to do ANYTHING in willow
   gorlek: Regenerate
@@ -13974,6 +13991,7 @@ region WillowsEnd:
   unsafe: free
 
 anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
+  door 30: free
   refill Checkpoint
   refill Energy=4:
     moki:
@@ -14066,13 +14084,6 @@ anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
       Sword, DoubleJump, Bash, Grenade=1  # djump, pogo the mine, djump+upslash to reach the floating platform
       SentryJump=1, DoubleJump, Damage=20  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
       Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
-  conn WeepingRidge.LaunchArea:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
-    gorlek, WeepingRidge.ElevatorFightCompleted:
-      Glide OR Damage=20
-    kii, WeepingRidge.ElevatorFightCompleted:  # land on top of the second laser 
-      Launch OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
-      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: WeepingRidge.ElevatorFightCompleted
 
 anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
   refill Checkpoint
@@ -14387,6 +14398,8 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
     unsafe: DoubleJump, Sword  # pogo the mine
 
 anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
+  door 31:
+    moki: WillowsEnd.GrappleWheelsHeart, WillowsEnd.BoulderHeart, WillowsEnd.RedirectHeart, WillowsEnd.BurrowHeart, WillowsEnd.MinibossHeart, WillowsEnd.SpinLasersHeart, WillowsEnd.GlideHeart, WillowsEnd.SpinPortalsHeart
   refill Checkpoint
   refill Energy=4:  # on the way to burrow heart
     gorlek, BreakCrystal:
@@ -14442,14 +14455,10 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     unsafe:
       SentryJump=1
       DoubleJump, TripleJump  # tjump on the left wall to start climbing it
-  conn WillowsEnd.ShriekArena:
-    moki: WillowsEnd.GrappleWheelsHeart, WillowsEnd.BoulderHeart, WillowsEnd.RedirectHeart, WillowsEnd.BurrowHeart, WillowsEnd.MinibossHeart, WillowsEnd.SpinLasersHeart, WillowsEnd.GlideHeart, WillowsEnd.SpinPortalsHeart
 
 anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
-  conn WillowsEnd.Upper:
-    moki: Launch, Dash, Glide OR DoubleJump
-    kii: Launch, Dash
-    unsafe: Launch
+  door 32: free
+  conn Teleporters: free
 
 anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
   refill Checkpoint
