@@ -290,14 +290,6 @@ fn build_requirement<'a>(
             Requirement::NonConsumingEnergySkill(Skill::Grenade)
         }
         parser::RequirementValue::BowCancel => Requirement::NonConsumingEnergySkill(Skill::Bow),
-        parser::RequirementValue::HammerJump => build_trick_requirement(
-            Trick::HammerJump,
-            Requirement::And(vec![
-                Requirement::Skill(Skill::Hammer),
-                Requirement::Skill(Skill::DoubleJump),
-            ]),
-            context,
-        ),
         parser::RequirementValue::SwordJump => build_trick_requirement(
             Trick::SwordJump,
             Requirement::And(vec![
@@ -319,12 +311,45 @@ fn build_requirement<'a>(
         parser::RequirementValue::GlideJump => {
             build_trick_requirement(Trick::GlideJump, Requirement::Skill(Skill::Glide), context)
         }
+        parser::RequirementValue::HammerJump => build_trick_requirement(
+            Trick::HammerJump,
+            Requirement::Skill(Skill::Hammer),
+            context,
+        ),
+        parser::RequirementValue::AerialHammerJump => build_trick_requirement(
+            Trick::AerialHammerJump,
+            Requirement::And(vec![
+                Requirement::Skill(Skill::Hammer),
+                Requirement::Skill(Skill::DoubleJump),
+            ]),
+            context,
+        ),
         parser::RequirementValue::GlideHammerJump => build_trick_requirement(
             Trick::GlideHammerJump,
             Requirement::And(vec![
                 Requirement::Skill(Skill::Glide),
                 Requirement::Skill(Skill::Hammer),
             ]),
+            context,
+        ),
+        parser::RequirementValue::CoyoteHammerJump => build_trick_requirement(
+            Trick::CoyoteHammerJump,
+            Requirement::Skill(Skill::Hammer),
+            context,
+        ),
+        parser::RequirementValue::WallHammerJump => build_trick_requirement(
+            Trick::WallHammerJump,
+            Requirement::Skill(Skill::Hammer),
+            context,
+        ),
+        parser::RequirementValue::GroundedHammerJump => build_trick_requirement(
+            Trick::GroundedHammerJump,
+            Requirement::Skill(Skill::Hammer),
+            context,
+        ),
+        parser::RequirementValue::ExtendedHammer => build_trick_requirement(
+            Trick::ExtendedHammer,
+            Requirement::Skill(Skill::Hammer),
             context,
         ),
         parser::RequirementValue::SpearJump(amount) => build_trick_requirement(
