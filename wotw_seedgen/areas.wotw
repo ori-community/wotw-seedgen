@@ -3737,7 +3737,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
 anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering above Motay
   nospawn
   door 5:
-    GladesTown.BuildHuts
+    moki: GladesTown.BuildHuts
 
   pickup GladesTown.UpperOre:
     moki, GladesTown.BuildHuts:
@@ -6345,7 +6345,7 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
 anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
   nospawn
   door 25:
-    GladesTown.FamilyReunionKey
+    moki: GladesTown.FamilyReunionKey
   refill Checkpoint:
     unsafe: GladesTown.FamilyReunionKey
 
