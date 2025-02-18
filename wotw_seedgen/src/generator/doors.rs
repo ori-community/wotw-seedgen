@@ -192,7 +192,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
 pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
     let mut header_lines: Vec<String> = vec![];
     let door_groups: Vec<Vec<DoorId>> = vec![
-        vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 32],
+        vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
         vec![2],
         vec![4],
         vec![6],
@@ -207,6 +207,7 @@ pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
         vec![26],
         vec![28],
         vec![30, 31],
+        vec![32],
     ];
 
     let config = DoorRandomizerConfig::new(2, door_groups);
