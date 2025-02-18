@@ -43,8 +43,8 @@ struct DoorRandomizerState {
     next_door_id: DoorId,
     current_loop_size: u8,
     doors_without_incoming_connection: IndexSet<DoorId>,
-    reachable_doors: HashSet<DoorId>,
-    remaining_groups: HashSet<usize>,
+    reachable_doors: IndexSet<DoorId>,
+    remaining_groups: IndexSet<usize>,
     connections: IndexMap<DoorId, DoorId>,
     recursion_level: u8,
 }
@@ -56,8 +56,8 @@ fn generate_door_connections(config: &DoorRandomizerConfig, rng: &mut StdRng) ->
     let initial_state = DoorRandomizerState {
         next_door_id: initial_door,
         doors_without_incoming_connection: IndexSet::from_iter(config.door_groups.iter().flatten().copied().collect_vec()),
-        reachable_doors: HashSet::from_iter(config.door_groups[initial_door_group].iter().copied()),
-        remaining_groups: HashSet::from_iter((0..config.door_groups.len()).filter(|g| *g != initial_door_group)),
+        reachable_doors: IndexSet::from_iter(config.door_groups[initial_door_group].iter().copied()),
+        remaining_groups: IndexSet::from_iter((0..config.door_groups.len()).filter(|g| *g != initial_door_group)),
         ..DoorRandomizerState::default()
     };
 
@@ -129,7 +129,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
         }
 
         // Mark all doors in same group as reachable
-        state.remaining_groups.remove(&target_door_group_index);
+        state.remaining_groups.shift_remove(&target_door_group_index);
         for door_in_same_group_id in &config.door_groups[target_door_group_index] {
             state.reachable_doors.insert(*door_in_same_group_id);
         }
