@@ -7,7 +7,6 @@ use rand::prelude::IteratorRandom;
 use rand::prelude::StdRng;
 use rand::seq::SliceRandom;
 use rustc_hash::{FxHashMap};
-use std::collections::{HashSet};
 
 type DoorId = u16;
 
