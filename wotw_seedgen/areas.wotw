@@ -4096,12 +4096,12 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
     kii: Sword
 
   conn GladesTown.HoleHutEntrance:
-    moki, GladesTown.RoofsOverHeads:
+    moki:
       Bash, Grenade=1
       TuleyShop.SpringPlants OR DoubleJump OR Dash OR Launch
-    gorlek, GladesTown.RoofsOverHeads: Glide OR Sword OR HammerSJump=1
-    kii, GladesTown.RoofsOverHeads: Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.RoofsOverHeads: GrenadeJump
+    gorlek: Glide OR Sword OR HammerSJump=1
+    kii: Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: GrenadeJump
   conn LowerReach.VeralHome:
   # Sword, Dash, Glide, DoubleJump, Lightcatchers Bash, Grenade, Hammer, Blaze, Shuriken, Sentry, and Flash can all individually get you from branch to reachpath
     moki:
