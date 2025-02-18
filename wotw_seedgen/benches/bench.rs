@@ -1,7 +1,8 @@
 use std::fs;
 
 use criterion::{criterion_group, criterion_main, Criterion};
-
+use rand::prelude::StdRng;
+use rand_seeder::Seeder;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 
@@ -167,6 +168,26 @@ fn reach_checking(c: &mut Criterion) {
     });
 }
 
+fn doors(c: &mut Criterion) {
+    let universe_settings = UniverseSettings::default();
+
+    let areas = fs::read_to_string("areas.wotw").unwrap();
+    let locations = fs::read_to_string("loc_data.csv").unwrap();
+    let states = fs::read_to_string("state_data.csv").unwrap();
+    let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+
+    c.bench_function("door headers", |b| {
+        b.iter(|| {
+            let world_settings = WorldSettings::default();
+            let mut world = World::new_spawn(&graph, &world_settings);
+
+            let mut rng: StdRng = Seeder::from(&universe_settings.seed).make_rng();
+
+            generator::doors::generate_door_headers(&mut world, &mut rng);
+        })
+    });
+}
+
 fn generation(c: &mut Criterion) {
     let mut universe_settings = UniverseSettings::default();
     let mut seed = 0;
@@ -216,9 +237,10 @@ fn generation(c: &mut Criterion) {
     c.bench_function("convert seed to text", |b| b.iter(|| seed.seed_files()));
 }
 
-criterion_group!(all, parsing, requirements, reach_checking, generation);
+criterion_group!(all, parsing, requirements, reach_checking, doors, generation);
 criterion_group!(only_parsing, parsing);
 criterion_group!(only_requirements, requirements);
 criterion_group!(only_reach_checking, reach_checking);
+criterion_group!(only_doors, doors);
 criterion_group!(only_generation, generation);
-criterion_main!(only_generation); // put any of the group names in here
+criterion_main!(only_doors); // put any of the group names in here

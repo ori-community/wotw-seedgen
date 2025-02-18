@@ -1,15 +1,193 @@
-use std::collections::HashSet;
-use rand::prelude::IteratorRandom;
-use indexmap::IndexSet;
-use itertools::Itertools;
-use rand::prelude::StdRng;
-use rustc_hash::{FxHashMap, FxHashSet};
-use crate::{World};
-use rand::seq::SliceRandom;
 use crate::item::{UberStateItem, UberStateValue};
 use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
+use crate::World;
+use indexmap::{IndexMap, IndexSet};
+use itertools::Itertools;
+use rand::prelude::IteratorRandom;
+use rand::prelude::StdRng;
+use rand::seq::SliceRandom;
+use rustc_hash::{FxHashMap};
+use std::collections::{HashSet};
 
 type DoorId = u16;
+
+struct DoorRandomizerConfig {
+    max_loop_size: u8,
+    door_groups: Vec<Vec<DoorId>>,
+    group_index_by_door_id: FxHashMap<DoorId, usize>,
+}
+
+impl DoorRandomizerConfig {
+    pub fn new(max_loop_size: u8, door_groups: Vec<Vec<DoorId>>) -> Self {
+        let mut group_index_by_door_id: FxHashMap<DoorId, usize> = FxHashMap::default();
+
+        for (group_index, door_ids) in door_groups.iter().enumerate() {
+            for door_id in door_ids {
+                group_index_by_door_id.insert(*door_id, group_index.to_owned());
+            }
+        }
+
+        let config = Self {
+            max_loop_size,
+            door_groups,
+            group_index_by_door_id,
+        };
+
+        config
+    }
+}
+
+#[derive(Default, Clone)]
+struct DoorRandomizerState {
+    current_loop_start: Option<DoorId>,
+    next_door_id: DoorId,
+    current_loop_size: u8,
+    doors_without_incoming_connection: IndexSet<DoorId>,
+    reachable_doors: HashSet<DoorId>,
+    remaining_groups: HashSet<usize>,
+    connections: IndexMap<DoorId, DoorId>,
+    recursion_level: u8,
+}
+
+fn generate_door_connections(config: &DoorRandomizerConfig, rng: &mut StdRng) -> Result<DoorRandomizerState, String> {
+    let initial_door = *config.door_groups.iter().flatten().choose(rng).unwrap();
+    let initial_door_group = config.group_index_by_door_id[&initial_door];
+
+    let initial_state = DoorRandomizerState {
+        next_door_id: initial_door,
+        doors_without_incoming_connection: IndexSet::from_iter(config.door_groups.iter().flatten().copied().collect_vec()),
+        reachable_doors: HashSet::from_iter(config.door_groups[initial_door_group].iter().copied()),
+        remaining_groups: HashSet::from_iter((0..config.door_groups.len()).filter(|g| *g != initial_door_group)),
+        ..DoorRandomizerState::default()
+    };
+
+    generate_door_connections_recursively(&initial_state, config, rng)
+}
+
+fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &DoorRandomizerConfig, rng: &mut StdRng) -> Result<DoorRandomizerState, String> {
+    #[cfg(feature = "log")]
+    let log_indent_level = state.recursion_level;
+    #[cfg(feature = "log")]
+    let log_indent = "  ".repeat(log_indent_level as usize);
+
+    let mut state = state.clone();
+    state.recursion_level += 1;
+
+    let door_id = state.next_door_id;
+
+    if state.current_loop_start.is_none() {
+        #[cfg(feature = "log")]
+        log::trace!("{}Started new loop", log_indent);
+        state.current_loop_start = Some(door_id);
+    }
+
+    state.current_loop_size += 1;
+
+    #[cfg(feature = "log")]
+    log::trace!("{}Door: {}, Loop Size: {}", log_indent, door_id, state.current_loop_size);
+
+    let mut possible_target_doors: IndexSet<DoorId> = IndexSet::new();
+
+    if state.current_loop_size >= config.max_loop_size {
+        #[cfg(feature = "log")]
+        log::trace!("{}Force closing loop", log_indent);
+        possible_target_doors.insert(state.current_loop_start.unwrap());
+    } else {
+        let mut shuffled_remaining_groups = state.remaining_groups.iter().collect_vec();
+        shuffled_remaining_groups.shuffle(rng);
+
+        // Add remaining groups first
+        for remaining_group in &shuffled_remaining_groups {
+            for possible_target_door_id in &config.door_groups[**remaining_group] {
+                possible_target_doors.insert(*possible_target_door_id);
+            }
+        }
+
+        let mut other_doors_without_incoming_connections = state.doors_without_incoming_connection.clone();
+        other_doors_without_incoming_connections.shift_remove(&door_id);
+        possible_target_doors.append(&mut other_doors_without_incoming_connections);
+    }
+
+    #[cfg(feature = "log")]
+    log::trace!("{}Possible doors: {}", log_indent, possible_target_doors.iter().map(|d| d.to_string()).join(", "));
+
+    if possible_target_doors.is_empty() {
+        return Err("No possible target door".to_string());
+    }
+
+    for possible_target_door in possible_target_doors {
+        let mut state = state.clone();
+
+        let target_door_id = possible_target_door;
+        let target_door_group_index = config.group_index_by_door_id[&target_door_id];
+
+        state.connections.insert(door_id, target_door_id);
+        state.doors_without_incoming_connection.shift_remove(&target_door_id);
+
+        if state.doors_without_incoming_connection.is_empty() {
+            return Ok(state);
+        }
+
+        // Mark all doors in same group as reachable
+        state.remaining_groups.remove(&target_door_group_index);
+        for door_in_same_group_id in &config.door_groups[target_door_group_index] {
+            state.reachable_doors.insert(*door_in_same_group_id);
+        }
+
+        if state.current_loop_start.unwrap() == target_door_id {
+            #[cfg(feature = "log")]
+            log::trace!("{}Ended loop", log_indent);
+            state.current_loop_start = None;
+            state.current_loop_size = 0;
+
+            let possible_next_doors = state.reachable_doors
+                .iter()
+                .filter(|d| **d != target_door_id)
+                .filter(|d| !state.connections.contains_key(*d))
+                .copied()
+                .collect_vec();
+
+            #[cfg(feature = "log")]
+            for (d1, d2) in &state.connections {
+                log::trace!("{}Conn: {} > {}", log_indent, d1, d2);
+            }
+
+            #[cfg(feature = "log")]
+            log::trace!("{}Possible next doors: {}", log_indent, possible_next_doors.iter().map(|d| d.to_string()).join(", "));
+
+            for possible_next_door_id in possible_next_doors {
+                state.next_door_id = possible_next_door_id;
+
+                #[cfg(feature = "log")]
+                log::trace!("{}Trying {} as next door...", log_indent, possible_next_door_id);
+                if let Ok(state) = generate_door_connections_recursively(&state, config, rng) {
+
+                    #[cfg(feature = "log")]
+                    log::trace!("{}Worked! {} -> {}", log_indent, door_id, target_door_id);
+                    return Ok(state);
+                }
+
+                #[cfg(feature = "log")]
+                log::trace!("{}Failed", log_indent);
+            }
+        } else {
+            state.next_door_id = target_door_id;
+
+            #[cfg(feature = "log")]
+            log::trace!("{}Trying target door as next door: {}", log_indent, target_door_id);
+            if let Ok(state) = generate_door_connections_recursively(&state, config, rng) {
+                #[cfg(feature = "log")]
+                log::trace!("{}Worked! {} -> {}", log_indent, door_id, target_door_id);
+                return Ok(state);
+            }
+
+            #[cfg(feature = "log")]
+            log::trace!("{}Failed", log_indent);
+        }
+    }
+
+    Err("Found no possible solution".to_string())
+}
 
 pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
     let mut header_lines: Vec<String> = vec![];
@@ -31,111 +209,30 @@ pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
         vec![30, 31],
     ];
 
-    // Create group index lookup map
-    let mut group_index_by_door_id = FxHashMap::default();
-    for (group_index, door_ids) in door_groups.iter().enumerate() {
-        for door_id in door_ids {
-            group_index_by_door_id.insert(door_id, group_index.to_owned());
-        }
+    let config = DoorRandomizerConfig::new(2, door_groups);
+    let result = generate_door_connections(&config, rng);
+
+    if result.is_err() {
+        panic!("Door error: {}", result.err().unwrap());
     }
 
-    let mut reachable_doors_without_outgoing_connection: HashSet<DoorId, _> = FxHashSet::default();
-
-    let mut all_door_ids = door_groups.iter().flatten().collect_vec();
-    all_door_ids.shuffle(rng);
-
-    let mut doors_without_incoming_connection: IndexSet<DoorId> = IndexSet::from_iter(all_door_ids.iter().map(|d| **d));
-    let mut remaining_groups = FxHashSet::from_iter(0..door_groups.len());
-
-    let mut door = *doors_without_incoming_connection.first().unwrap();
-    let mut current_circle_start_group_index: Option<usize> = None;
-
-    loop {
-        let group_index = group_index_by_door_id[&door];
-
-        if current_circle_start_group_index.is_none() {
-            current_circle_start_group_index = Some(group_index);
-        }
-
-        // Mark group of door as reachable
-        if remaining_groups.remove(&group_index) {
-            // If this is the first time we're entering this group, mark all doors in this group as reachable
-            for door_id in &door_groups[group_index] {
-                reachable_doors_without_outgoing_connection.insert(*door_id);
-                
-                #[cfg(feature = "log")]
-                log::trace!("Door {} is now reachable", door_id);
-            }
-        }
-
-        // Create an outgoing connection
-
-        // Pick random target door
-        let mut target_door = *doors_without_incoming_connection.iter().filter(|d| **d != door).choose(rng).unwrap();
-        let mut target_group_index = *group_index_by_door_id.get(&target_door).unwrap();
-
-        // If this is the last reachable door without an outgoing connection and there are unreached groups, connect to an unreached group
-        if reachable_doors_without_outgoing_connection.len() <= 1 && remaining_groups.len() > 0 && !remaining_groups.contains(&target_group_index) {
-            // Pick a door from an unreached group
-
-            let mut possible_doors: Vec<DoorId> = vec![];
-            for possible_group_index in &remaining_groups {
-                for possible_door in &door_groups[possible_group_index.to_owned()] {
-                    possible_doors.push(*possible_door);
-                }
-            }
-
-            target_door = possible_doors.choose(rng).unwrap().to_owned();
-            target_group_index = group_index_by_door_id[&target_door].to_owned();
-        }
-
-        let current_circle_is_closed = current_circle_start_group_index.is_some_and(|g| g == target_group_index);
+    for (door_id, target_door_id) in result.unwrap().connections {
+        #[cfg(feature = "log")]
+        log::trace!("Connected door {} → {}", door_id, target_door_id);
 
         world.preplace(
             UberStateTrigger::spawn(),
             UberStateItem::simple_setter(
-                UberIdentifier::new(27, door),
+                UberIdentifier::new(27, door_id),
                 UberType::Int,
-                UberStateValue::Number((target_door as f32).into()),
-            )
+                UberStateValue::Number((target_door_id as f32).into()),
+            ),
         );
-        header_lines.push(format!("3|0|8|27|{}|int|{}", door, target_door));
-        
-        #[cfg(feature = "log")]
-        log::trace!("Connecting door {} → {}", door, target_door);
-
-        // Now mark the target group as reachable
-        if remaining_groups.remove(&target_group_index) {
-            for door_id in &door_groups[target_group_index] {
-                reachable_doors_without_outgoing_connection.insert(*door_id);
-                
-                #[cfg(feature = "log")]
-                log::trace!("Door {} is now reachable", door_id);
-            }
-        }
-
-        reachable_doors_without_outgoing_connection.remove(&door);
-        doors_without_incoming_connection.shift_remove(&target_door);
-
-        if doors_without_incoming_connection.is_empty() {
-            break;
-        }
-
-        // Select next outgoing door that is in the same group as the current target door
-        let mut possible_next_doors: Vec<DoorId> = vec![];
-        for possible_next_door in &reachable_doors_without_outgoing_connection {
-            if current_circle_is_closed || group_index_by_door_id[possible_next_door] == target_group_index {
-                possible_next_doors.push(*possible_next_door);
-            }
-        }
-
-        door = *possible_next_doors.choose(rng).unwrap();
-
-        // Start a new circle if the current circle is closed
-        if current_circle_is_closed {
-            current_circle_start_group_index = None;
-        }
+        header_lines.push(format!("3|0|8|27|{}|int|{}", door_id, target_door_id));
     }
-    
+
+    #[cfg(feature = "log")]
+    log::trace!("Doors generated");
+
     header_lines.join("\n")
 }

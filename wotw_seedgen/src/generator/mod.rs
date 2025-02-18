@@ -1,7 +1,7 @@
 mod placement;
 mod seed;
 mod spoiler;
-mod doors;
+pub mod doors;
 
 pub use placement::*;
 pub use seed::*;
