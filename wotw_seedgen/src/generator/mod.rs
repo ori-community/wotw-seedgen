@@ -40,7 +40,7 @@ pub fn generate_seed<'graph, 'settings>(
             world.pool = Pool::preset();
 
             let mut headers = vec![];
-            headers.push(generate_door_headers(&mut world, &mut rng)?);
+            headers.push(generate_door_headers(graph, world_settings, &mut world, &mut rng)?);
 
             let (goals, flags, file_headers) = parse_headers(&mut world, file_access, &mut rng)?;
             headers.push(file_headers);

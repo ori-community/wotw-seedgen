@@ -1,16 +1,18 @@
+use std::collections::HashMap;
 use arrayvec::ArrayVec;
 use crate::item::{UberStateItem, UberStateValue};
 use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
 use crate::World;
-use indexmap::{IndexMap, IndexSet};
+use indexmap::{IndexSet};
 use itertools::Itertools;
 use rand::prelude::IteratorRandom;
 use rand::prelude::StdRng;
 use rand::seq::SliceRandom;
 use rustc_hash::{FxHashMap};
-use smallvec::{Array, SmallVec};
+use crate::settings::WorldSettings;
+use crate::world::Graph;
 
-type DoorId = u16;
+pub type DoorId = u8;
 type DoorGroups = [ArrayVec<DoorId, 15>; 16];
 
 struct DoorRandomizerConfig {
@@ -47,7 +49,7 @@ struct DoorRandomizerState {
     doors_without_incoming_connection: IndexSet<DoorId>,
     reachable_doors: IndexSet<DoorId>,
     remaining_groups: IndexSet<usize>,
-    connections: IndexMap<DoorId, DoorId>,
+    connections: HashMap<DoorId, DoorId>,
     recursion_level: u8,
 }
 
@@ -192,40 +194,50 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
     Err("Found no possible solution".to_string())
 }
 
-pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> Result<String, String> {
+pub fn generate_door_headers(graph: &Graph, world_settings: &WorldSettings, world: &mut World, rng: &mut StdRng) -> Result<String, String> {
     let mut header_lines: Vec<String> = vec![];
-    let door_groups: DoorGroups = [
-        ArrayVec::from([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]),
-        ArrayVec::from_iter([2]),
-        ArrayVec::from_iter([4]),
-        ArrayVec::from_iter([6]),
-        ArrayVec::from_iter([8]),
-        ArrayVec::from_iter([10]),
-        ArrayVec::from_iter([12]),
-        ArrayVec::from_iter([14]),
-        ArrayVec::from_iter([16, 18]),
-        ArrayVec::from_iter([20]),
-        ArrayVec::from_iter([22]),
-        ArrayVec::from_iter([24]),
-        ArrayVec::from_iter([26]),
-        ArrayVec::from_iter([28]),
-        ArrayVec::from_iter([30, 31]),
-        ArrayVec::from_iter([32]),
-    ];
 
-    let config = DoorRandomizerConfig::new(2, door_groups);
-    let result = generate_door_connections(&config, rng)?;
+    let connections = if world_settings.randomize_doors {
+        #[cfg(feature = "log")]
+        log::trace!("Randomizing door connections");
 
-    for (door_id, target_door_id) in result.connections {
+        let door_groups: DoorGroups = [
+            ArrayVec::from([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]),
+            ArrayVec::from_iter([2]),
+            ArrayVec::from_iter([4]),
+            ArrayVec::from_iter([6]),
+            ArrayVec::from_iter([8]),
+            ArrayVec::from_iter([10]),
+            ArrayVec::from_iter([12]),
+            ArrayVec::from_iter([14]),
+            ArrayVec::from_iter([16, 18]),
+            ArrayVec::from_iter([20]),
+            ArrayVec::from_iter([22]),
+            ArrayVec::from_iter([24]),
+            ArrayVec::from_iter([26]),
+            ArrayVec::from_iter([28]),
+            ArrayVec::from_iter([30, 31]),
+            ArrayVec::from_iter([32]),
+        ];
+
+        let config = DoorRandomizerConfig::new(2, door_groups);
+        &generate_door_connections(&config, rng)?.connections
+    } else {
+        #[cfg(feature = "log")]
+        log::trace!("Using default door connections");
+        &graph.default_door_connections
+    };
+
+    for (door_id, target_door_id) in connections {
         #[cfg(feature = "log")]
         log::trace!("Connected door {} → {}", door_id, target_door_id);
 
         world.preplace(
             UberStateTrigger::spawn(),
             UberStateItem::simple_setter(
-                UberIdentifier::new(27, door_id),
+                UberIdentifier::new(27, (*door_id).into()),
                 UberType::Int,
-                UberStateValue::Number((target_door_id as f32).into()),
+                UberStateValue::Number((*target_door_id as f32).into()),
             ),
         );
         header_lines.push(format!("3|0|8|27|{}|int|{}", door_id, target_door_id));

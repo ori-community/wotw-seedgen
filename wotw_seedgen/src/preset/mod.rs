@@ -162,6 +162,9 @@ pub struct WorldPreset {
     /// Logically assume hard in-game difficulty
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hard: Option<bool>,
+    /// Randomize door connections with a max loop size of n
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub randomize_doors: Option<bool>,
     /// Goal Requirements before finishing the game
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goals: Option<GoalModes>,

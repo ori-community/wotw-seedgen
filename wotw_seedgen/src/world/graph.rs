@@ -1,9 +1,8 @@
+use std::collections::HashMap;
 use std::fmt;
 
-use rustc_hash::{FxHashMap, FxHashSet};
-use smallvec::smallvec;
-
 use super::{player::Player, requirement::Requirement};
+use crate::generator::doors::DoorId;
 use crate::generator::NodeSummary;
 use crate::uber_state::{UberIdentifier, UberStateTrigger};
 use crate::util::{
@@ -11,6 +10,8 @@ use crate::util::{
     orbs::{self, OrbVariants},
     NodeKind, Position, RefillValue, Zone,
 };
+use rustc_hash::{FxHashMap, FxHashSet};
+use smallvec::smallvec;
 
 #[derive(Debug)]
 pub struct Refill {
@@ -177,9 +178,10 @@ impl<'b, 'c> ReachContext<'_, 'b, 'c> {
 pub struct Graph {
     pub nodes: Vec<Node>,
     pub spawn_pickup_node: Node,
+    pub default_door_connections: HashMap<DoorId, DoorId>,
 }
 impl Graph {
-    pub fn new(nodes: Vec<Node>) -> Graph {
+    pub fn new(nodes: Vec<Node>, default_door_connections: HashMap<DoorId, DoorId>) -> Graph {
         let spawn_pickup_node = Node::Pickup(Pickup {
             identifier: String::from("Spawn"),
             zone: Zone::Spawn,
@@ -194,6 +196,7 @@ impl Graph {
         Graph {
             nodes,
             spawn_pickup_node,
+            default_door_connections,
         }
     }
 

@@ -413,6 +413,9 @@ pub struct SeedSettings {
     /// Logically assume hard in-game difficulty
     #[structopt(long)]
     pub hard: Option<Vec<WorldOpt<bool>>>,
+    /// Randomize door connections with a max loop size of n
+    #[structopt(long)]
+    pub randomize_doors: Option<Vec<WorldOpt<bool>>>,
     /// Goal Requirements before finishing the game
     ///
     /// Available goals are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
@@ -464,6 +467,7 @@ impl SeedSettings {
             difficulty,
             tricks,
             hard,
+            randomize_doors,
             goals,
             headers,
             header_config,
@@ -478,6 +482,7 @@ impl SeedSettings {
         let world_difficulties = resolve_nonduplicate_world_opts(difficulty, worlds)?;
         let world_tricks = resolve_world_opts(tricks, worlds)?;
         let world_hard_flags = resolve_flag_world_opts(hard, worlds)?;
+        let world_randomize_doors_flags = resolve_flag_world_opts(randomize_doors, worlds)?;
         let world_goals = resolve_world_opts(goals, worlds)?;
         let world_headers = resolve_world_opts(headers, worlds)?;
         let world_header_configs = resolve_world_opts(header_config, worlds)?;
@@ -496,6 +501,7 @@ impl SeedSettings {
             .zip(world_difficulties)
             .zip(world_tricks)
             .zip(world_hard_flags)
+            .zip(world_randomize_doors_flags)
             .zip(world_goals)
             .zip(world_headers)
             .zip(world_header_configs)
@@ -503,7 +509,7 @@ impl SeedSettings {
             .map(
                 |(
                     (
-                        ((((((world_presets, spawn), difficulty), tricks), hard), goals), headers),
+                        (((((((world_presets, spawn), difficulty), tricks), hard), randomize_doors), goals), headers),
                         header_config,
                     ),
                     inline_headers,
@@ -518,6 +524,7 @@ impl SeedSettings {
                             goals.into_iter().map(GoalsOpt::into_inner).collect(),
                         ),
                         hard,
+                        randomize_doors,
                         headers: slice_in_option(headers).map(FxHashSet::from_iter),
                         header_config: slice_in_option(
                             header_config
@@ -585,6 +592,9 @@ pub struct WorldPresetSettings {
     /// Logically assume hard in-game difficulty
     #[structopt(long)]
     pub hard: bool,
+    /// Randomize door connections with a max loop size of n
+    #[structopt(long)]
+    pub randomize_doors: bool,
     /// Goal Requirements before finishing the game
     ///
     /// Available goals are trees, wisps, quests, relics. Relics can further configure the chance per area to have a relic, default is relics:60%
@@ -614,6 +624,7 @@ impl WorldPresetSettings {
             difficulty,
             tricks,
             hard,
+            randomize_doors,
             goals,
             headers,
             header_config,
@@ -627,6 +638,7 @@ impl WorldPresetSettings {
             difficulty,
             tricks: tricks.map(FxHashSet::from_iter),
             hard: if hard { Some(true) } else { None },
+            randomize_doors: if randomize_doors { Some(true) } else { None },
             goals: goals.map(|goals| goals.into_iter().map(GoalsOpt::into_inner).collect()),
             headers: headers.map(FxHashSet::from_iter),
             header_config: header_config.map(|header_config| {

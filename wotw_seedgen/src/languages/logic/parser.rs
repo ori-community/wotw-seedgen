@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use smallvec::SmallVec;
 use wotw_seedgen_derive::{Display, FromStr};
-
+use crate::generator::doors::DoorId;
 use crate::item;
 use crate::languages::parser::{
     parse_ident, parse_number, parse_value, read_ident, ParseErrorCollection,
@@ -62,8 +62,9 @@ pub struct Connection<'a> {
 }
 #[derive(Debug, Clone)]
 pub struct Door<'a> {
-    pub door_id: u16,
-    pub requirements: Option<Group<'a>>,
+    pub door_id: DoorId,
+    pub target: &'a str,
+    pub enter: Group<'a>,
 }
 #[derive(Debug, Clone)]
 pub struct Group<'a> {
@@ -169,6 +170,7 @@ enum Suggestion {
     Requirement,
     Enemy,
     AnchorContent,
+    DoorContent,
     Refill,
 }
 
@@ -337,6 +339,18 @@ enum AnchorContent<'a> {
     Connection(Connection<'a>),
     Door(Door<'a>),
 }
+#[derive(FromStr)]
+#[ParseFromIdentifier]
+enum DoorContentKind {
+    Id,
+    Target,
+    Enter,
+}
+enum DoorContent<'a> {
+    Id(DoorId),
+    Target(&'a str),
+    Enter(Group<'a>),
+}
 fn parse_anchor_content<'a>(parser: &mut Parser<'a>) -> Result<AnchorContent<'a>, ParseError> {
     let kind = parse_ident!(parser, Suggestion::AnchorContent)?;
     let content = match kind {
@@ -420,15 +434,74 @@ fn parse_anchor_connection<'a>(
     })
 }
 fn parse_door<'a>(parser: &mut Parser<'a>) -> Result<Door<'a>, ParseError> {
+    parser.eat(TokenKind::Colon)?;
     parser.skip(TokenKind::Whitespace);
+    parser.eat(TokenKind::Indent)?;
 
-    let door_id = parse_number!(parser, Suggestion::Integer)?;
+    let mut door_id: Option<DoorId> = None;
+    let mut target: Option<&'a str> = None;
+    let mut enter: Option<Group<'a>> = None;
+    let start = parser.current_token().range.start;
+
+    loop {
+        match parse_door_content(parser)? {
+            DoorContent::Id(id) => door_id = Some(id),
+            DoorContent::Target(t) =>  target = Some(t),
+            DoorContent::Enter(requirements) => enter = Some(requirements),
+        }
+
+        parser.skip(TokenKind::Whitespace);
+
+        if check_dedent(parser)? {
+            break
+        }
+
+        parser.eat(TokenKind::Newline)?;
+    }
+
+    let end = parser.current_token().range.start;
+
+    let door_id = door_id.ok_or_else(|| parser.error(
+        "Door is missing id",
+        start..end,
+    ))?;
+    let target = target.ok_or_else(|| parser.error(
+        "Door is missing default_target: <anchor name>",
+        start..end,
+    ))?;
+    let enter = enter.ok_or_else(|| parser.error(
+        "Door is missing enter requirements (enter: ...)",
+        start..end,
+    ))?;
 
     Ok(Door {
         door_id,
-        requirements: parse_optional_group(parser)?
+        target,
+        enter,
     })
 }
+fn parse_door_content<'a>(parser: &mut Parser<'a>) -> Result<DoorContent<'a>, ParseError> {
+    let kind = parse_ident!(parser, Suggestion::DoorContent)?;
+
+    let content = match kind {
+        DoorContentKind::Id => {
+            parser.eat(TokenKind::Colon)?;
+            parser.skip(TokenKind::Whitespace);
+            DoorContent::Id(parse_number!(parser, Suggestion::Integer)?)
+        }
+        DoorContentKind::Target => {
+            parser.eat(TokenKind::Colon)?;
+            parser.skip(TokenKind::Whitespace);
+            DoorContent::Target(read_ident!(parser, Suggestion::Identifier)?)
+        }
+        DoorContentKind::Enter => {
+            DoorContent::Enter(parse_group(parser)?)
+        }
+    };
+
+    Ok(content)
+}
+
 fn parse_group<'a>(parser: &mut Parser<'a>) -> Result<Group<'a>, ParseError> {
     parser.eat(TokenKind::Colon)?;
     parser.skip(TokenKind::Whitespace);

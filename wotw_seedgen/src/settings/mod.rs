@@ -356,6 +356,8 @@ pub struct WorldSettings {
     pub tricks: FxHashSet<Trick>,
     /// Logically assume hard in-game difficulty
     pub hard: bool,
+    /// Randomize door connections with a max loop size of n
+    pub randomize_doors: bool,
     /// Goal Requirements before finishing the game
     pub goals: GoalModes,
     /// Names of headers to use
@@ -443,6 +445,7 @@ impl WorldSettings {
             goals,
             spawn,
             hard,
+            randomize_doors,
             headers,
             header_config,
             inline_headers,
@@ -470,6 +473,9 @@ impl WorldSettings {
         }
         if let Some(hard) = hard {
             self.hard = hard;
+        }
+        if let Some(randomize_doors) = randomize_doors {
+            self.randomize_doors = randomize_doors;
         }
         if let Some(headers) = headers {
             self.headers.extend(headers);

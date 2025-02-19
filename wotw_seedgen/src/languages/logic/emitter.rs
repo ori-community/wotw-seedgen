@@ -1,4 +1,5 @@
 use rustc_hash::{FxHashMap, FxHashSet};
+use std::collections::{HashMap};
 
 use super::{
     locations::Location,
@@ -6,8 +7,9 @@ use super::{
     states::NamedState,
 };
 
+use crate::generator::doors::DoorId;
 use crate::item::Skill;
-use crate::logic::parser::Door;
+use crate::logic::parser::{Door};
 use crate::uber_state::{UberIdentifier, UberStateComparator, UberStateCondition, UberStateTrigger};
 use crate::world::graph::Connection;
 use crate::{
@@ -532,18 +534,19 @@ pub fn build(
     }
 
     // Find all door anchors
-    let mut door_anchors = vec![];
-    let mut door_ids: FxHashSet<u16> = FxHashSet::default();
+    let mut door_anchors: FxHashMap<&str, DoorAnchor> = FxHashMap::default();
+    let mut door_ids: FxHashSet<DoorId> = FxHashSet::default();
     for anchor in &anchors {
         if let Some(door) = &anchor.door {
             if !door_ids.insert(door.door_id) {
                 return Err(format!("Duplicate door ID {}", door.door_id).to_string());
             }
 
-            door_anchors.push(DoorAnchor {
+            let door_anchor = DoorAnchor {
                 identifier: anchor.identifier.to_owned(),
                 door: door.to_owned(),
-            });
+            };
+            door_anchors.insert(anchor.identifier, door_anchor);
         }
     }
 
@@ -644,7 +647,7 @@ pub fn build(
         // Generate door connections if this
         if let Some(door) = door {
             connections.reserve(doors_count - 1);
-            for target_door_anchor in &door_anchors {
+            for target_door_anchor in door_anchors.values() {
                 // Don't connect door to itself
                 if identifier == target_door_anchor.identifier {
                     continue;
@@ -661,7 +664,7 @@ pub fn build(
                     trigger: Some(UberStateTrigger {
                         identifier: UberIdentifier {
                             uber_group: 27,
-                            uber_id: door.door_id,
+                            uber_id: door.door_id.into(),
                         },
                         condition: Some(UberStateCondition {
                             comparator: UberStateComparator::Equals,
@@ -677,9 +680,7 @@ pub fn build(
                     to,
                     requirement: Requirement::And(vec![
                         Requirement::State(context.node_map[state_name.as_str()]),
-                        door.requirements.to_owned()
-                            .and_then(|r| Some(build_requirement_group(&r, false, &mut context)))
-                            .unwrap_or_else(|| Requirement::Free)
+                        build_requirement_group(&door.enter, false, &mut context),
                     ]),
                 })
             }
@@ -712,7 +713,18 @@ pub fn build(
         }
     }
 
-    Ok(Graph::new(nodes))
+    let mut default_door_connections: HashMap<DoorId, DoorId> = HashMap::new();
+
+    for door_anchor in door_anchors.values() {
+        default_door_connections.insert(
+            door_anchor.door.door_id,
+            door_anchors.get(door_anchor.door.target).ok_or_else(
+                || format!("Door anchor {} connects to unknown door anchor {}", door_anchor.identifier, door_anchor.door.target)
+            )?.door.door_id
+        );
+    }
+    
+    Ok(Graph::new(nodes, default_door_connections))
 }
 
 #[cfg(test)]
