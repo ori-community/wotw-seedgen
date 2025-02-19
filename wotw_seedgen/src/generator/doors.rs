@@ -76,20 +76,20 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
 
     if state.current_loop_start.is_none() {
         #[cfg(feature = "log")]
-        log::trace!("{}Started new loop", log_indent);
+        log::trace!("{log_indent}Started new loop");
         state.current_loop_start = Some(door_id);
     }
 
     state.current_loop_size += 1;
 
     #[cfg(feature = "log")]
-    log::trace!("{}Door: {}, Loop Size: {}", log_indent, door_id, state.current_loop_size);
+    log::trace!("{log_indent}Door: {door_id}, Loop Size: {}", state.current_loop_size);
 
     let mut possible_target_doors: IndexSet<DoorId> = IndexSet::new();
 
     if state.current_loop_size >= config.max_loop_size {
         #[cfg(feature = "log")]
-        log::trace!("{}Force closing loop", log_indent);
+        log::trace!("{log_indent}Reached max loop size, force closing loop");
         possible_target_doors.insert(state.current_loop_start.unwrap());
     } else {
         let mut shuffled_remaining_groups = state.remaining_groups.iter().collect_vec();
@@ -108,7 +108,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
     }
 
     #[cfg(feature = "log")]
-    log::trace!("{}Possible doors: {}", log_indent, possible_target_doors.iter().map(|d| d.to_string()).join(", "));
+    log::trace!("{log_indent}Possible doors: {}", possible_target_doors.iter().map(|d| d.to_string()).join(", "));
 
     if possible_target_doors.is_empty() {
         return Err("No possible target door".to_string());
@@ -135,7 +135,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
 
         if state.current_loop_start.unwrap() == target_door_id {
             #[cfg(feature = "log")]
-            log::trace!("{}Ended loop", log_indent);
+            log::trace!("{log_indent}Ended loop");
             state.current_loop_start = None;
             state.current_loop_size = 0;
 
@@ -146,49 +146,50 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
                 .copied()
                 .collect_vec();
 
-            #[cfg(feature = "log")]
-            for (d1, d2) in &state.connections {
-                log::trace!("{}Conn: {} → {}", log_indent, d1, d2);
+            #[cfg(feature = "log")] {
+                log::trace!("{log_indent}Current connections:");
+                for (from_door, to_door) in &state.connections {
+                    log::trace!("{log_indent}  {from_door} → {to_door}");
+                }
             }
 
             #[cfg(feature = "log")]
-            log::trace!("{}Possible next doors: {}", log_indent, possible_next_doors.iter().map(|d| d.to_string()).join(", "));
+            log::trace!("{log_indent}Possible next doors: {}", possible_next_doors.iter().map(|d| d.to_string()).join(", "));
 
             for possible_next_door_id in possible_next_doors {
                 state.next_door_id = possible_next_door_id;
 
                 #[cfg(feature = "log")]
-                log::trace!("{}Trying {} as next door...", log_indent, possible_next_door_id);
+                log::trace!("{log_indent}Trying {possible_next_door_id} as next door...");
                 if let Ok(state) = generate_door_connections_recursively(&state, config, rng) {
-
                     #[cfg(feature = "log")]
-                    log::trace!("{}Worked! {} → {}", log_indent, door_id, target_door_id);
+                    log::trace!("{log_indent}Worked! {door_id} → {target_door_id}");
                     return Ok(state);
                 }
 
                 #[cfg(feature = "log")]
-                log::trace!("{}Failed", log_indent);
+                log::trace!("{log_indent}Failed");
             }
         } else {
             state.next_door_id = target_door_id;
 
             #[cfg(feature = "log")]
-            log::trace!("{}Trying target door as next door: {}", log_indent, target_door_id);
+            log::trace!("{log_indent}Trying target door as next door: {target_door_id}");
             if let Ok(state) = generate_door_connections_recursively(&state, config, rng) {
                 #[cfg(feature = "log")]
-                log::trace!("{}Worked! {} → {}", log_indent, door_id, target_door_id);
+                log::trace!("{log_indent}Worked! {door_id} → {target_door_id}");
                 return Ok(state);
             }
 
             #[cfg(feature = "log")]
-            log::trace!("{}Failed", log_indent);
+            log::trace!("{log_indent}Failed");
         }
     }
 
     Err("Found no possible solution".to_string())
 }
 
-pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
+pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> Result<String, String> {
     let mut header_lines: Vec<String> = vec![];
     let door_groups: Vec<Vec<DoorId>> = vec![
         vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
@@ -210,13 +211,9 @@ pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
     ];
 
     let config = DoorRandomizerConfig::new(2, door_groups);
-    let result = generate_door_connections(&config, rng);
+    let result = generate_door_connections(&config, rng)?;
 
-    if result.is_err() {
-        panic!("Door error: {}", result.err().unwrap());
-    }
-
-    for (door_id, target_door_id) in result.unwrap().connections {
+    for (door_id, target_door_id) in result.connections {
         #[cfg(feature = "log")]
         log::trace!("Connected door {} → {}", door_id, target_door_id);
 
@@ -234,5 +231,5 @@ pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> String {
     #[cfg(feature = "log")]
     log::trace!("Doors generated");
 
-    header_lines.join("\n")
+    Ok(header_lines.join("\n"))
 }

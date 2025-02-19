@@ -697,7 +697,7 @@ pub fn build(
         next_index += 1;
         nodes.push(node);
     }
-    
+
     nodes.append(&mut door_state_nodes);
 
     #[cfg(feature = "log")]
