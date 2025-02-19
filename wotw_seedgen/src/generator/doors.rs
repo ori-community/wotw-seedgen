@@ -1,3 +1,4 @@
+use arrayvec::ArrayVec;
 use crate::item::{UberStateItem, UberStateValue};
 use crate::uber_state::{UberIdentifier, UberStateTrigger, UberType};
 use crate::World;
@@ -7,17 +8,19 @@ use rand::prelude::IteratorRandom;
 use rand::prelude::StdRng;
 use rand::seq::SliceRandom;
 use rustc_hash::{FxHashMap};
+use smallvec::{Array, SmallVec};
 
 type DoorId = u16;
+type DoorGroups = [ArrayVec<DoorId, 15>; 16];
 
 struct DoorRandomizerConfig {
     max_loop_size: u8,
-    door_groups: Vec<Vec<DoorId>>,
+    door_groups: DoorGroups,
     group_index_by_door_id: FxHashMap<DoorId, usize>,
 }
 
 impl DoorRandomizerConfig {
-    pub fn new(max_loop_size: u8, door_groups: Vec<Vec<DoorId>>) -> Self {
+    pub fn new(max_loop_size: u8, door_groups: DoorGroups) -> Self {
         let mut group_index_by_door_id: FxHashMap<DoorId, usize> = FxHashMap::default();
 
         for (group_index, door_ids) in door_groups.iter().enumerate() {
@@ -191,23 +194,23 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
 
 pub fn generate_door_headers(world: &mut World, rng: &mut StdRng) -> Result<String, String> {
     let mut header_lines: Vec<String> = vec![];
-    let door_groups: Vec<Vec<DoorId>> = vec![
-        vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29],
-        vec![2],
-        vec![4],
-        vec![6],
-        vec![8],
-        vec![10],
-        vec![12],
-        vec![14],
-        vec![16, 18],
-        vec![20],
-        vec![22],
-        vec![24],
-        vec![26],
-        vec![28],
-        vec![30, 31],
-        vec![32],
+    let door_groups: DoorGroups = [
+        ArrayVec::from([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]),
+        ArrayVec::from_iter([2]),
+        ArrayVec::from_iter([4]),
+        ArrayVec::from_iter([6]),
+        ArrayVec::from_iter([8]),
+        ArrayVec::from_iter([10]),
+        ArrayVec::from_iter([12]),
+        ArrayVec::from_iter([14]),
+        ArrayVec::from_iter([16, 18]),
+        ArrayVec::from_iter([20]),
+        ArrayVec::from_iter([22]),
+        ArrayVec::from_iter([24]),
+        ArrayVec::from_iter([26]),
+        ArrayVec::from_iter([28]),
+        ArrayVec::from_iter([30, 31]),
+        ArrayVec::from_iter([32]),
     ];
 
     let config = DoorRandomizerConfig::new(2, door_groups);

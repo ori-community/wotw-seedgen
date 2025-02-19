@@ -27,6 +27,7 @@ decorum = "0.3"
 partition = "0.1"
 itertools = "0.10"
 indexmap = "2.7"
+arrayvec = "0.7.6"
 
 [dev-dependencies]
 criterion = "0.3"

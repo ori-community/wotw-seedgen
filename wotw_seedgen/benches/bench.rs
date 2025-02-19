@@ -181,9 +181,9 @@ fn doors(c: &mut Criterion) {
             let world_settings = WorldSettings::default();
             let mut world = World::new_spawn(&graph, &world_settings);
 
-            let mut rng: StdRng = Seeder::from(&universe_settings.seed).make_rng();
+            let mut rng: StdRng = Seeder::from(&"Test").make_rng();
 
-            generator::doors::generate_door_headers(&mut world, &mut rng);
+            let _ = generator::doors::generate_door_headers(&mut world, &mut rng);
         })
     });
 }
