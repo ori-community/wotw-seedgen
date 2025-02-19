@@ -148,7 +148,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
 
             #[cfg(feature = "log")]
             for (d1, d2) in &state.connections {
-                log::trace!("{}Conn: {} > {}", log_indent, d1, d2);
+                log::trace!("{}Conn: {} → {}", log_indent, d1, d2);
             }
 
             #[cfg(feature = "log")]
@@ -162,7 +162,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
                 if let Ok(state) = generate_door_connections_recursively(&state, config, rng) {
 
                     #[cfg(feature = "log")]
-                    log::trace!("{}Worked! {} -> {}", log_indent, door_id, target_door_id);
+                    log::trace!("{}Worked! {} → {}", log_indent, door_id, target_door_id);
                     return Ok(state);
                 }
 
@@ -176,7 +176,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
             log::trace!("{}Trying target door as next door: {}", log_indent, target_door_id);
             if let Ok(state) = generate_door_connections_recursively(&state, config, rng) {
                 #[cfg(feature = "log")]
-                log::trace!("{}Worked! {} -> {}", log_indent, door_id, target_door_id);
+                log::trace!("{}Worked! {} → {}", log_indent, door_id, target_door_id);
                 return Ok(state);
             }
 
