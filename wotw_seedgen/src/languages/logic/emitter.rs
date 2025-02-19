@@ -677,7 +677,7 @@ pub fn build(
                     to,
                     requirement: Requirement::And(vec![
                         Requirement::State(context.node_map[state_name.as_str()]),
-                        target_door_anchor.door.requirements.to_owned()
+                        door.requirements.to_owned()
                             .and_then(|r| Some(build_requirement_group(&r, false, &mut context)))
                             .unwrap_or_else(|| Requirement::Free)
                     ]),
