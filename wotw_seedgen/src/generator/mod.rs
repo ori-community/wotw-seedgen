@@ -44,7 +44,7 @@ pub fn generate_seed<'graph, 'settings>(
 
             let (goals, flags, file_headers) = parse_headers(&mut world, file_access, &mut rng)?;
             headers.push(file_headers);
-            
+
             world.goals = goals;
 
             Ok((world, (flags, headers.join("\n"))))
@@ -130,6 +130,9 @@ fn parse_headers(
     }
     if world.player.settings.hard {
         flags.push("Hard".to_string());
+    }
+    if world.player.settings.randomize_doors {
+        flags.push("Randomized Doors".to_string());
     }
 
     let header_names = headers
