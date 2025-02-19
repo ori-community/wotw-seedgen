@@ -115,6 +115,11 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
     #[cfg(feature = "log")]
     log::trace!("{log_indent}Possible doors: {}", possible_target_doors.iter().map(|d| d.to_string()).join(", "));
 
+    // Prevent the Moki Father hut connecting to the Teddy hut
+    if door_id == 9 {  // 9 == Moki Father hut entrance
+        possible_target_doors.shift_remove(&26);  // 26 == Teddy hut exit
+    }
+
     if possible_target_doors.is_empty() {
         return Err("No possible target door".to_string());
     }
