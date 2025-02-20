@@ -98,7 +98,7 @@ EastHollow.DepthsExteriorEX, Kwoloks Hollow, SpiritLight, 100, mouldwoodDepthsGr
 GladesTown.HandToHandPouch, Wellspring Glades, Quest, Pouch, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 2, -282, -4155, -285.9, -4153.8
 GladesTown.HandToHandLantern, Wellspring Glades, Quest, Lantern, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 6, -426, -4155, -428.7, -4153.2
 GladesTown.HandToHandCanteen, Wellspring Glades, Quest, Canteen, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 9, -410, -4142, -403.2, -4142
-GladesTown.FamilyReunionKey, Wellspring Glades, Quest, Key, questUberStateGroup, 14019, familyReunionQuest, 27804, 2, -385, -4161, -382, -4155.3
+GladesTown.FamilyReunionKey, Wellspring Glades, Quest, Key, randoState, 6, canOpenMokiFatherHut, 500, , -385, -4161, -382, -4155.3
 GladesTown.AcornQI, Wellspring Glades, Quest, Acorn, questUberStateGroup, 14019, darkCaveQuestItemCollected, 2782, , -10.5, -4549.7, -366, -4183.6
 GladesTown.MokiAcornQuest, Wellspring Glades, Quest, SL500, questUberStateGroup, 14019, darkCaveQuest, 33776, 3, -358, -4185, -360.1, -4183.6
 GladesTown.HoleHutEC, Wellspring Glades, Resource, Energy, hubUberStateGroup, 42178, energyCellA, 52786, , -116.0, -4538.5, -227.72, -4092.33
