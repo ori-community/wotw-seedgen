@@ -644,8 +644,30 @@ pub fn build(
             })
             .collect::<Result<Vec<_>, String>>()?;
 
-        // Generate door connections if this
+        // Generate door connections of this door
         if let Some(door) = door {
+            // Create state for whether this door has been visited
+            let door_visited_state_index = door_states_start_index + next_door_index;
+            let visited_state_name = format!("DoorVisited<{}>", &identifier);
+            add_entry(&mut context.node_map, visited_state_name.as_str(), door_visited_state_index)?;
+
+            let node = Node::State(graph::State {
+                identifier: visited_state_name.to_owned(),
+                index: door_visited_state_index,
+                trigger: Some(UberStateTrigger {
+                    identifier: UberIdentifier {
+                        uber_group: 28,
+                        uber_id: door.door_id.into(),
+                    },
+                    condition: Some(UberStateCondition {
+                        comparator: UberStateComparator::Greater,
+                        value: 1u32
+                    })
+                }),
+            });
+            door_state_nodes.push(node);
+            next_door_index += 1;
+            
             connections.reserve(doors_count - 1);
             for target_door_anchor in door_anchors.values() {
                 // Don't connect door to itself
@@ -654,13 +676,13 @@ pub fn build(
                 }
 
                 // Create state for this connection
-                let door_state_index = door_states_start_index + next_door_index;
-                let state_name = format!("Door<{}, {}>", &identifier, &target_door_anchor.identifier);
-                add_entry(&mut context.node_map, state_name.as_str(), door_state_index)?;
+                let door_connection_state_index = door_states_start_index + next_door_index;
+                let connection_state_name = format!("Door<{}, {}>", &identifier, &target_door_anchor.identifier);
+                add_entry(&mut context.node_map, connection_state_name.as_str(), door_connection_state_index)?;
 
                 let node = Node::State(graph::State {
-                    identifier: state_name.to_owned(),
-                    index: door_state_index,
+                    identifier: connection_state_name.to_owned(),
+                    index: door_connection_state_index,
                     trigger: Some(UberStateTrigger {
                         identifier: UberIdentifier {
                             uber_group: 27,
@@ -679,7 +701,8 @@ pub fn build(
                 connections.push(Connection {
                     to,
                     requirement: Requirement::And(vec![
-                        Requirement::State(context.node_map[state_name.as_str()]),
+                        Requirement::State(context.node_map[connection_state_name.as_str()]),
+                        Requirement::State(context.node_map[visited_state_name.as_str()]),
                         build_requirement_group(&door.enter, false, &mut context),
                     ]),
                 })
