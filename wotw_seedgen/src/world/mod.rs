@@ -267,6 +267,11 @@ mod tests {
         world.player.inventory = Pool::preset().inventory;
         world.player.inventory.grant(Item::SpiritLight(1), 10000);
 
+        for (from_door, to_door) in &graph.default_door_connections {
+            world.set_uber_state(UberIdentifier::new(27, (*from_door).into()), *to_door as f32);
+            world.set_uber_state(UberIdentifier::new(28, (*from_door).into()), 1f32);
+        }
+
         let spawn = world.graph.find_spawn("MarshSpawn.Main").unwrap();
         let reached =
             world
