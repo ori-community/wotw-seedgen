@@ -708,8 +708,6 @@ pub enum Trick {
     WaveDash,
     /// Preserving jump momentum with Grenade
     GrenadeJump,
-    /// Preserving Double Jump momentum with Hammer
-    HammerJump,
     /// Preserving Double Jump momentum with Sword
     SwordJump,
     /// Redirecting projectiles with Grenade
@@ -720,8 +718,20 @@ pub enum Trick {
     PauseHover,
     /// Storing a grounded jump into the air with Glide
     GlideJump,
+    /// Preserving Hammer momentum in a lot of ways
+    HammerJump,
+    /// Hammer Jump with Double Jump
+    AerialHammerJump,
     /// Preserving Glide Jump momentum with Hammer
     GlideHammerJump,
+    /// Hammer Jump with a coyote jump
+    CoyoteHammerJump,
+    /// Hammer Jump with a wall jump
+    WallHammerJump,
+    /// Hammer Jump from a standard jump
+    GroundedHammerJump,
+    /// Extending momentum with Hammer
+    ExtendedHammer,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
 }
