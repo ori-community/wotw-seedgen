@@ -1529,6 +1529,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
     unsafe:
       Bow=2 OR Spear=2 OR Grenade=2:
         Bash, DoubleJump OR Dash OR Sword OR Hammer  # https://youtu.be/LeoIWBsq-s0
+      Bash, ExtendedHammer, Bow=1 OR Spear=1 OR Grenade=1  # Same as above but ExtendedHammer from the jumpad instead of using the first lantern
       Bash, Glide, Bow=1 OR Spear=1 OR Grenade=1 OR Shuriken=1  # https://youtu.be/LJmKEirEloM
       Launch
   conn MarshPastOpher.OpherSkipBranch:  # Make sure it's not redundant with MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch nor MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
@@ -2986,12 +2987,13 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
     unsafe:
       Bash, Grenade=1  # land near the second pole, throw a grenade, jump on the pole and immediatly jump to the grenade. Avoiding spikes damage is a bit hard.
       GrenadeJump  # gjump to grab the pole then extend pole momentum to reach the ledge above the mortar and do the same from the second pole
-      DoubleJump, Hammer, Deflector  # break the wall to GladesApproachOre so you can refresh your upslash without taking a dboost
-      DoubleJump, Damage=10, Sentry=1
+      DoubleJump, Hammer  #  If the ore wall is still present, djump from itm. Otherwise, land near the ore to refresh your upswing
+      DoubleJump, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Sword, Damage=10  # climb the left wall, pogo the mortar
       Damage=20, Hammer  # reset hammer upswings in the spikes
       DoubleJump, Dash  # right wall and some clean movement
       Hammer, Dash, Damage=10  # the 2 above together
+      ExtendedHammer, Damage=10  # reset hammer upswing in the first spikes so you can reach the pole
 
 anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
   state GladesTown.GromsWall:
@@ -8068,7 +8070,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       SentryJump=2
       GrenadeJump, DoubleJump  # grenade wall jump off of the microwall under the spikes
       GlideHammerJump
-      AerialHammerJump, TripleJump OR Glide OR Dash OR Sword Or Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      AerialHammerJump, TripleJump OR Glide OR Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       BlazeSwap=5 OR FlashSwap  # might be doable with less somehow, blaze swaps are hard
 
   conn LowerReach.IceCavern:
@@ -8975,7 +8977,9 @@ anchor UpperReach.UpperSoupPaths at -215, -3877:
       DoubleJump, Bash
       Launch
     gorlek: Bash
-    unsafe: SwordSJump=1, Damage=20, DoubleJump OR Hammer  # dboost in the spike at the right of the enemy and sjump from here
+    unsafe:
+      SwordSJump=1, Damage=20, DoubleJump OR Hammer  # dboost in the spike at the right of the enemy and sjump from here
+      ExtendedHammer  # Up swing to reach the pole then 
   pickup UpperReach.SwingPoleEX:
     moki:
       DoubleJump
@@ -9943,7 +9947,7 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
         DoubleJump, Sword
         SentryJump=1, Damage=10, PauseHover OR Glide
         SentryJump=1, GlideJump
-        AerialHammerJump Or GlideHammerJump
+        AerialHammerJump OR GlideHammerJump
       Launch  # Extremely Precise. Use the bat and the crystal for light.
 
 anchor DepthsShrine at 213, -4515:
