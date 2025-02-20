@@ -660,14 +660,14 @@ pub fn build(
                         uber_id: door.door_id.into(),
                     },
                     condition: Some(UberStateCondition {
-                        comparator: UberStateComparator::Greater,
+                        comparator: UberStateComparator::GreaterOrEquals,
                         value: 1u32
                     })
                 }),
             });
             door_state_nodes.push(node);
             next_door_index += 1;
-            
+
             connections.reserve(doors_count - 1);
             for target_door_anchor in door_anchors.values() {
                 // Don't connect door to itself
@@ -746,7 +746,7 @@ pub fn build(
             )?.door.door_id
         );
     }
-    
+
     Ok(Graph::new(nodes, default_door_connections))
 }
 
