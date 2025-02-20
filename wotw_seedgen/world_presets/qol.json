@@ -6,9 +6,10 @@
   "headers": [
     "progress_helper",
     "better_stomp",
-    "no_cutscenes",
-    "tp_refill",
+    "shriek_escape_healthbar",
+    "autoplants",
     "quest_autoadvance",
-    "shriek_escape_healthbar"
+    "no_cutscenes",
+    "tp_refill"
   ]
 }
