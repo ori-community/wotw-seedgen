@@ -201,6 +201,7 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
 
 pub fn generate_door_headers(graph: &Graph, world_settings: &WorldSettings, world: &mut World, rng: &mut StdRng) -> Result<String, String> {
     let mut header_lines: Vec<String> = vec![];
+    const LOOP_SIZE: u8 = 2;
 
     let connections = if world_settings.randomize_doors {
         #[cfg(feature = "log")]
@@ -228,7 +229,7 @@ pub fn generate_door_headers(graph: &Graph, world_settings: &WorldSettings, worl
         header_lines.push("3|0|8|7|200|bool|true".to_string());
         header_lines.push("3|0|8|7|201|bool|true".to_string());
 
-        let config = DoorRandomizerConfig::new(2, door_groups);
+        let config = DoorRandomizerConfig::new(LOOP_SIZE, door_groups);
         &generate_door_connections(&config, rng)?.connections
     } else {
         #[cfg(feature = "log")]
@@ -261,6 +262,12 @@ pub fn generate_door_headers(graph: &Graph, world_settings: &WorldSettings, worl
         );
 
         header_lines.push(format!("3|0|8|27|{}|int|{}", door_id, target_door_id));
+
+        // If the target door is connecting back to this door, mark
+        // the target door as visited too once we went through this door
+        if connections[target_door_id] == *door_id {
+            header_lines.push(format!("27|{}|8|28|{}|bool|true", door_id, target_door_id));
+        }
     }
 
     #[cfg(feature = "log")]
