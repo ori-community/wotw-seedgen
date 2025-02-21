@@ -1520,7 +1520,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Launch, Bow=2 OR Spear=3  # break corruption blobs and reset your launch everywhere
       Launch, Spear=2, Grenade=1  # same as bove but more energy efficient
       Launch, DoubleJump OR Dash OR Sword OR Hammer  # Sword/Hammer can break the 2nd corruption blob to reset launch. Pass underneath it and refresh launch on the next wall otherwise
-      Launch, Bow=1, Sentry=1 OR Flash=1 OR Shuriken=1  #
+      Launch, Bow=1, Sentry=1 OR Flash=1 OR Shuriken=1
       Launch, Spear=1, Sentry=1 OR Flash=1 OR Shuriken=1
       Bash, DoubleJump, TripleJump, Sword OR Hammer OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1 OR Blaze=1  # sentry doesn't target those blobs so can't use BreakWall
       Spear=3, Bash, DoubleJump, Dash OR Glide OR Hammer OR Sword
@@ -3755,6 +3755,9 @@ anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering abov
     target: GladesTown.MotayHutInside
     enter:
       moki: GladesTown.BuildHuts
+  # This refill does not work in entrance randomizer
+  #refill Checkpoint:
+  #  unsafe: GladesTown.BuildHuts  # Exit the house for a checkpoint
 
   pickup GladesTown.UpperOre:
     moki, GladesTown.BuildHuts:
@@ -3776,7 +3779,7 @@ anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering abov
         TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump  # grapple the right plant to reach the house above
 
   conn GladesTown.West:
-    GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform ffrom the hanging lantern below
+    GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform from the hanging lantern below
   conn GladesTown.UpperWest:
     moki, GladesTown.BuildHuts:
       Bash, Grenade=2, Dash  # 1 extra grenade if you hit the Lightcatcher
@@ -3799,15 +3802,15 @@ anchor GladesTown.MotayHutInside at -182, -4589:  # Inside the house hovering ab
 
   pickup GladesTown.MotayHutEX: free
 
-
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   door:
     id: 3
     target: GladesTown.InsideThirdHut
     enter:
       moki: GladesTown.OnwardsAndUpwards
-  refill Checkpoint:
-    unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
+  # This refill does not work in entrance randomizer
+  #refill Checkpoint:
+  #  unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
 
   pickup GladesTown.ArcingShard:
     moki, GladesTown.ClearThorns:
@@ -3886,15 +3889,15 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
       Sword OR Spear=1 # upslash+downslash
       GrenadeJump
 
-
 anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
   door:
     id: 13
     target: GladesTown.AcornCave
     enter:
       moki: GladesTown.CaveEntrance
-  refill Checkpoint:
-    unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
+  # This refill does not work in entrance randomizer
+  #refill Checkpoint:
+  #  unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
 
   quest GladesTown.MokiAcornQuest:
     moki: GladesTown.AcornQI
@@ -3941,42 +3944,41 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
       Flash, Water, DoubleJump, Dash
       Flash, Bash, Grenade=1
       Flash, Launch
-      gorlek:
-        Flash:
-          Water, DoubleJump OR Dash OR Sword OR Hammer
-      SentryJump=1
-    Bow=4:  # bow refills light
-      Launch
-      Bash, Grenade=1
-      SentryJump=1
-      kii:
-        Flash:
-          DoubleJump, TripleJump
-          Water, Shuriken=2 OR Blaze=3 OR Sentry=2
-          Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-          Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That partcular water only deals 4 damage per tic
-          WaterDash, Damage=16, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
-          WaterDash, Damage=26, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-          Damage=42, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-          Water, Damage=10, Damage=10
-          Damage=10, Damage=42
-          WaterDash, Damage=10, Damage=26
-          Bow=4, DoubleJump, TripleJump
-          unsafe:
-            Flash:
-              Water # use Flash for mobility as well
-              GrenadeJump
-              Bow=2:
-                Launch
-                Bash, Grenade=1
-                SentryJump=1
-                GrenadeJump
-                DoubleJump, TripleJump  # off the left wall
-                Water, WaterDash, Damage=10 OR DoubleJump OR Glide
-                # Grenade=4  # grenade jumps and light refills, very nasty strat
-                DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
-                DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
-
+    gorlek:
+      Flash:
+        Water, DoubleJump OR Dash OR Sword OR Hammer
+        SentryJump=1
+      Bow=4:  # bow refills light
+        Launch
+        Bash, Grenade=1
+        SentryJump=1
+    kii:
+      Flash:
+        DoubleJump, TripleJump
+        Water, Shuriken=2 OR Blaze=3 OR Sentry=2
+        Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+        Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That partcular water only deals 4 damage per tic
+        WaterDash, Damage=16, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
+        WaterDash, Damage=26, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+        Damage=42, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+        Water, Damage=10, Damage=10
+        Damage=10, Damage=42
+        WaterDash, Damage=10, Damage=26
+      Bow=4, DoubleJump, TripleJump
+    unsafe:
+      Flash:
+        Water # use Flash for mobility as well
+        GrenadeJump
+      Bow=2:
+        Launch
+        Bash, Grenade=1
+        SentryJump=1
+        GrenadeJump
+        DoubleJump, TripleJump  # off the left wall
+        Water, WaterDash, Damage=10 OR DoubleJump OR Glide
+      # Grenade=4  # grenade jumps and light refills, very nasty strat
+      DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
+      DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
 
 anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty shard
   pickup GladesTown.AboveTpEX: free
@@ -4047,8 +4049,9 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     target: GladesTown.StorageHut
     enter:
       moki: GladesTown.RoofsOverHeads
-  refill Checkpoint:
-    unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
+  # This refill does not work in entrance randomizer
+  #refill Checkpoint:
+  #  unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
   conn GladesTown.LeftAboveCoals: free
   conn GladesTown.PlayfulMoki:
@@ -4133,7 +4136,6 @@ anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's h
   pickup LupoShop.ShardMapIcon:
     moki: SpiritLight=1200
 
-
 anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
   pickup GladesTown.BelowHoleHutEX: free
   pickup GladesTown.UpdraftCeilingEX:
@@ -4183,8 +4185,9 @@ anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup
     enter:
       moki: GladesTown.RoofsOverHeads
 
-  refill Checkpoint:
-    unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
+  # This refill does not work in entrance randomizer
+  #refill Checkpoint:
+  #  unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
   conn GladesTown.HoleHut: free
 
@@ -6431,20 +6434,26 @@ anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
     target: WoodsEntry.FamilyHutInside
     enter:
       moki: GladesTown.FamilyReunionKey
-
-  refill Checkpoint:
-    unsafe: GladesTown.FamilyReunionKey
+  # This refill does not work in entrance randomizer
+  #refill Checkpoint:
+  #  unsafe: GladesTown.FamilyReunionKey
 
   conn WoodsEntry.FirstMud: free
   conn WoodsEntry.ShriekMeet:
+    moki: Combat=Balloon
     gorlek: free
   conn WoodsEntry.Teleporter:
     moki:
-      Grapple, DoubleJump OR Dash
+      Grapple, DoubleJump OR Dash OR Glide
       Launch
       Grenade=1, Bash
-    gorlek: Grapple, SentryJump=1
+    gorlek:
+      Grapple
+      SentryJump=1
     kii: DoubleJump, TripleJump
+    unsafe:
+      DoubleJump, Hammer OR Spear=1  # With hammer, wall jump on the right
+
 
 anchor WoodsEntry.FamilyHutInside at 456, -4118: # inside of family reunion hut
   door:
@@ -6454,7 +6463,6 @@ anchor WoodsEntry.FamilyHutInside at 456, -4118: # inside of family reunion hut
 
   quest WoodsEntry.DollQI:
     moki: GladesTown.FamilyReunionKey
-
 
 anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   refill Checkpoint
@@ -14375,7 +14383,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
     kii: BreakWall=30, Launch, DoubleJump OR Dash
     unsafe, BreakWall=30:
       Launch
-      DoubleJump, Bash, Grenade=2 # energy refill after collecting checkpoints and dieing
+      DoubleJump, Bash, Grenade=2  # energy refill after collecting checkpoints and dying
 
   pickup WillowsEnd.SpikesOre:
     moki: Launch, Dash OR Glide
@@ -14565,6 +14573,9 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
   conn WillowsEnd.RedirectHeartPuzzle: free
   # most likely there will be non-redundant paths to WillowsEnd.AboveInnerTP here in the future, just right now there aren't any
 
+  state WillowsEnd.RedirectHeart:
+    unsafe: BreakWall=30, Launch, Bash, Dash  # Redirect the projectile from the enemy
+
 anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the first portal used for the puzzle
   refill Checkpoint
 
@@ -14638,9 +14649,9 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
 
   conn WillowsEnd.MiniBossFight:
     moki: Launch, Dash, Glide, DoubleJump
-    gorlek: Launch, Dash, Glide OR DoubleJump
-    kii: Launch, DoubleJump OR Dash OR Sword OR Hammer
-    unsafe: Launch
+    gorlek: Launch, Dash OR Glide OR DoubleJump
+    kii: Launch
+    unsafe: Damage=40, DoubleJump, TripleJump
   conn WillowsEnd.East:
     moki:
       Combat=CrystalMiner, DoubleJump OR Dash OR Glide
@@ -14686,16 +14697,16 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
   refill Health=2
 
   state WillowsEnd.MinibossHeart:
-    moki: Combat=ShieldCrystalMiner, Bash, Dash, DoubleJump, Launch
-    gorlek: Combat=ShieldCrystalMiner, Bash, Dash, DoubleJump
-    kii: Combat=ShieldCrystalMiner, Dash, DoubleJump
-    unsafe: Combat=ShieldCrystalMiner, DoubleJump
+    moki: Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
+    gorlek: Boss=300, Damage=60, Regenerate, Launch, Bash, DoubleJump OR Dash
+    kii: Boss=300, Damage=60, Regenerate, Launch, DoubleJump OR Dash OR Glide
+    unsafe: Boss=300, Launch OR DoubleJump
 
   conn WillowsEnd.Upper:
     moki: Launch, Dash, Glide, DoubleJump
-    gorlek: Launch, Dash, Glide OR DoubleJump
-    kii: Launch, DoubleJump OR Dash OR Sword OR Hammer
-    unsafe: Launch
+    gorlek: Launch, Glide OR DoubleJump OR Dash
+    kii: Launch, Sword OR Hammer OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1
+    unsafe: Launch  # Reset launch on the ceiling
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
@@ -14703,10 +14714,10 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
     moki: BreakCrystal
 
   state WillowsEnd.SpinLasersHeart:
-    moki: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
-    unsafe, BreakWall=30:
-      Launch
-      DoubleJump, Glide OR Dash
+    moki: BreakWall=30, Launch, DoubleJump, Dash, Glide
+    gorlek: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
+    kii: Launch
+    unsafe: BreakWall=30, DoubleJump, Glide OR Dash
 
   conn WillowsEnd.InnerTP:
     moki: BreakWall=20, Combat=MaceMiner OR Bash OR Launch
