@@ -246,8 +246,8 @@ pub fn generate_door_headers(graph: &Graph, world_settings: &WorldSettings, worl
             UberStateTrigger::spawn(),
             UberStateItem::simple_setter(
                 UberIdentifier::new(28, (*door_id).into()),
-                UberType::Int,
-                UberStateValue::Number(1. .into()),
+                UberType::Bool,
+                UberStateValue::Bool(true),
             ),
         );
 
