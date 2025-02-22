@@ -143,6 +143,26 @@ fn reach_checking(c: &mut Criterion) {
     group.bench_function("long", |b| b.iter(|| world.reached()));
 }
 
+fn doors(c: &mut Criterion) {
+    let universe_settings = UniverseSettings::default();
+
+    let areas = fs::read_to_string("areas.wotw").unwrap();
+    let locations = fs::read_to_string("loc_data.csv").unwrap();
+    let states = fs::read_to_string("state_data.csv").unwrap();
+    let graph = parse_logic(&areas, &locations, &states, &universe_settings, false).unwrap();
+
+    c.bench_function("door headers", |b| {
+        b.iter(|| {
+            let world_settings = WorldSettings::default();
+            let mut world = World::new_spawn(&graph, &world_settings);
+
+            let mut rng: StdRng = Seeder::from(&"Test").make_rng();
+
+            let _ = generator::doors::generate_door_headers(&mut world, &mut rng);
+        })
+    });
+}
+
 fn generation(c: &mut Criterion) {
     let mut group = c.benchmark_group("generation");
     group.measurement_time(Duration::from_secs(10));
@@ -287,6 +307,7 @@ criterion_group!(
     logic_parsing,
     requirements,
     reach_checking,
+    doors,
     generation,
     multiworld
 );

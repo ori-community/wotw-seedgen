@@ -25,6 +25,8 @@ ordered-float = "4.2"
 partition = "0.1"
 itertools = "0.13"
 strum = { version = "0.26", features = ["derive"] }
+indexmap = "2.7"
+arrayvec = "0.7.6"
 
 [dev-dependencies]
 criterion = "0.5"

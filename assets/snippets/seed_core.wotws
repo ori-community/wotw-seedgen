@@ -131,3 +131,9 @@ on InnerWellspring.WaterEscape store(kwolokGroupDescriptor.cleanseWellspringQues
 on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 3 store(GladesTown.TuleySpawned, true)
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
 on WillowsEnd.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
+
+on questUberStateGroup.familyReunionQuest == 2 if WoodsEntry.DollQI store(questUberStateGroup.familyReunionQuest, 3)
+on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut == false {
+    if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
+    if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)
+}

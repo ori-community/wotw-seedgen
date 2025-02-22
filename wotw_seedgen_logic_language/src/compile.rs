@@ -297,13 +297,17 @@ struct TrickRequirements {
     blaze_swap: Requirement,
     wave_dash: Requirement,
     grenade_jump: Requirement,
-    hammer_jump: Requirement,
     sword_jump: Requirement,
+    hammer_jump: Requirement,
+    glide_jump: Requirement,
+    glide_hammer_jump: Requirement,
+    coyote_hammer_jump: Requirement,
+    wall_hammer_jump: Requirement,
+    grounded_hammer_jump: Requirement,
+    extended_hammer: Requirement,
     grenade_redirect: Requirement,
     sentry_redirect: Requirement,
     pause_hover: Requirement,
-    glide_jump: Requirement,
-    glide_hammer_jump: Requirement,
     spear_jump: Requirement,
 }
 impl TrickRequirements {
@@ -340,13 +344,17 @@ impl TrickRequirements {
             blaze_swap: build_trick(Trick::BlazeSwap),
             wave_dash: build_trick(Trick::WaveDash),
             grenade_jump: build_trick(Trick::GrenadeJump),
-            hammer_jump: build_trick(Trick::HammerJump),
             sword_jump: build_trick(Trick::SwordJump),
+            hammer_jump: build_trick(Trick::HammerJump),
+            glide_jump: build_trick(Trick::GlideJump),
+            glide_hammer_jump: build_trick(Trick::GlideHammerJump),
+            coyote_hammer_jump: build_trick(Trick::CoyoteHammerJump),
+            wall_hammer_jump: build_trick(Trick::WallHammerJump),
+            grounded_hammer_jump: build_trick(Trick::GroundedHammerJump),
+            extended_hammer: build_trick(Trick::ExtendedHammer),
             grenade_redirect: build_trick(Trick::GrenadeRedirect),
             sentry_redirect: build_trick(Trick::SentryRedirect),
             pause_hover: build_trick(Trick::PauseHover),
-            glide_jump: build_trick(Trick::GlideJump),
-            glide_hammer_jump: build_trick(Trick::GlideHammerJump),
             spear_jump: build_trick(Trick::SpearJump),
         }
     }
@@ -407,15 +415,42 @@ impl TrickRequirements {
                 self.grenade_jump.clone(),
                 Requirement::NonConsumingEnergySkill(Skill::Grenade),
             ]),
-            Trick::HammerJump => build_and([
-                self.hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-                Requirement::Skill(Skill::DoubleJump),
-            ]),
             Trick::SwordJump => build_and([
                 self.sword_jump.clone(),
                 Requirement::Skill(Skill::Sword),
                 Requirement::Skill(Skill::DoubleJump),
+            ]),
+            Trick::HammerJump => {
+                build_and([self.hammer_jump.clone(), Requirement::Skill(Skill::Hammer)])
+            }
+            Trick::AerialHammerJump => build_and([
+                self.hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+                Requirement::Skill(Skill::DoubleJump),
+            ]),
+            Trick::GlideJump => {
+                build_and([self.glide_jump.clone(), Requirement::Skill(Skill::Glide)])
+            }
+            Trick::GlideHammerJump => build_and([
+                self.glide_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+                Requirement::Skill(Skill::Glide),
+            ]),
+            Trick::CoyoteHammerJump => build_and([
+                self.coyote_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::WallHammerJump => build_and([
+                self.wall_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::GroundedHammerJump => build_and([
+                self.grounded_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::ExtendedHammer => build_and([
+                self.extended_hammer.clone(),
+                Requirement::Skill(Skill::Hammer),
             ]),
             Trick::GrenadeRedirect => build_and([
                 self.grenade_redirect.clone(),
@@ -426,14 +461,6 @@ impl TrickRequirements {
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
             ]),
             Trick::PauseHover => self.pause_hover.clone(),
-            Trick::GlideJump => {
-                build_and([self.glide_jump.clone(), Requirement::Skill(Skill::Glide)])
-            }
-            Trick::GlideHammerJump => build_and([
-                self.glide_hammer_jump.clone(),
-                Requirement::Skill(Skill::Glide),
-                Requirement::Skill(Skill::Hammer),
-            ]),
             Trick::SpearJump => build_and([
                 self.spear_jump.clone(),
                 Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),

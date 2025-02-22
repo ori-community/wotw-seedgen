@@ -26,6 +26,7 @@ on spawn {
     store(baursReachGroup.powlTeaseTriggered, true)
     store(waterMillStateGroupDescriptor.playedNaruGumoCutaway, true)
     store(willowsEndGroup.introPlayed, true)
+    store(weepingRidgeElevatorFightGroup.willowsEndGateOpened, true)
     store(randoConfig.disableWillowHeartCutscenes, true)
     // Dialogue skips
     store(npcsStateGroup.metOpherHubAfterWatermill, true)
@@ -74,10 +75,7 @@ on skills.glide store(EastHollow.DepthsOpen, true)
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3)
 // TODO why is this not the wisp pickup?
 on kwolokGroupDescriptor.kwolokNpcState > 0 && UpperDepths.ForestsEyes && LowerReach.ForestsMemory && WestPools.ForestsStrength store(windtornRuinsGroup.openedDesertRuins, true)
-on WindtornRuins.Seir {
-    store(_petrifiedForestGroup.floatZoneState, true)
-    store(_petrifiedForestGroup.petrifiedOwlState, 6)
-}
+on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 
 on hubUberStateGroup.gardenerProjectGrapplePlants > 0 update_tuley()
 on hubUberStateGroup.gardenerProjectGrass > 0 update_tuley()

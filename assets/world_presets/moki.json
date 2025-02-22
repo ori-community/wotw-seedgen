@@ -10,6 +10,7 @@
   "snippets": [
     "no_quests",
     "shrine_hints",
+    "spawn_tuley",
     "no_trials",
     "teleporters",
     "better_mechanics",
@@ -20,7 +21,6 @@
     "spawn_with_sword",
     "spawn_tuley",
     "no_rain",
-    "knowledge_hints",
-    "spawn_tuley"
+    "knowledge_hints"
   ]
 }

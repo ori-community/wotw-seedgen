@@ -1,3 +1,5 @@
+use rustc_hash::{FxHashMap, FxHashSet};
+use smallvec::smallvec;
 use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed_language::output::{
     CommandBoolean, CommandInteger, Comparator, Operation, Trigger,

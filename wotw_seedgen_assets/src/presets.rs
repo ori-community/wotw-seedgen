@@ -406,7 +406,7 @@ impl WorldPresetSettings {
                 "bonus_opher_upgrades" => return err_removed("bonus_opher_upgrades"),
                 "open_mode" => return err_removed("open_mode"),
                 "autoplants" => *snippet = "no_cutscenes".to_string(),
-                "better_stomp" | "fragment_overflow" | "tp_refill" => {
+                "better_stomp" | "fragment_overflow" | "tp_refill" | "shriek_escape_health_bar" => {
                     *snippet = "better_mechanics".to_string()
                 }
                 _ => {}

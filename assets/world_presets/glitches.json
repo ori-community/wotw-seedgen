@@ -19,13 +19,18 @@
     "BlazeSwap",
     "WaveDash",
     "GrenadeJump",
-    "HammerJump",
     "SwordJump",
     "GrenadeRedirect",
     "SentryRedirect",
     "PauseHover",
     "GlideJump",
+    "HammerJump",
+    "AerialHammerJump",
     "GlideHammerJump",
+    "CoyoteHammerJump",
+    "WallHammerJump",
+    "GroundedHammerJump",
+    "ExtendedHammer",
     "SpearJump"
   ]
 }
