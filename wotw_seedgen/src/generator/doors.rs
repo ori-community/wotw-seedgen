@@ -266,7 +266,7 @@ pub fn generate_door_headers(graph: &Graph, world_settings: &WorldSettings, worl
         // If the target door is connecting back to this door, mark
         // the target door as visited too once we went through this door
         if connections[target_door_id] == *door_id {
-            header_lines.push(format!("27|{}|8|28|{}|bool|true", door_id, target_door_id));
+            header_lines.push(format!("28|{}|8|28|{}|bool|true", door_id, target_door_id));
         }
     }
 
