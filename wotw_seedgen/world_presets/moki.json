@@ -11,6 +11,7 @@
   "headers": [
     "no_quests",
     "shrine_hints",
+    "spawn_tuley",
     "no_trials",
     "teleporters",
     "fragment_overflow",
