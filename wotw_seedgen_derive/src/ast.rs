@@ -27,17 +27,9 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
 
     // TODO try out how using the // dbg! macro looks for the debug stuff?
     let debug = attrs.debug.then(|| {
-        let message =
-            format!("parsing `{ident}`. current token is `{{:?}}`. current slice is {{:?}}. upcoming is {{:?}}{{}}");
+        let message = format!("parsing `{ident}`. {{}}");
         quote! {
-            let (token, span) = parser.current();
-            let upcoming = parser.slice(span.start..);
-            let (upcoming, more) = if upcoming.len() > 32 {
-                (&upcoming[..32], "...")
-            } else {
-                (upcoming, "")
-            };
-            eprintln!(#message, token, parser.slice(span.clone()), upcoming, more);
+            eprintln!(#message, parser.debug_state());
         }
     });
 
@@ -221,13 +213,13 @@ fn ast_fields_named(
 
             let value = if outer_attrs.debug {
                 let ident = ident.as_ref().unwrap();
-                let fmt_string_before = format!("parsing field `{outer_ident}.{ident}`");
+                let fmt_string_before = format!("parsing field `{outer_ident}.{ident}` - {{}}");
                 let fmt_string_after =
-                    format!("finished parsing field `{outer_ident}.{ident}` ({{}})");
+                    format!("finished parsing field `{outer_ident}.{ident}` ({{}}) - {{}}");
                 quote! { {
-                    eprintln!(#fmt_string_before);
+                    eprintln!(#fmt_string_before, parser.debug_state());
                     let result = #ast(parser);
-                    eprintln!(#fmt_string_after, if result.is_ok() { "Ok" } else { "Err" });
+                    eprintln!(#fmt_string_after, if result.is_ok() { "Ok" } else { "Err" }, parser.debug_state());
                     result?
                 } }
             } else {
@@ -267,13 +259,13 @@ fn ast_fields_unnamed(
             )?;
 
             let value = if outer_attrs.debug {
-                let fmt_string_before = format!("parsing field `{outer_ident}.{index}`");
+                let fmt_string_before = format!("parsing field `{outer_ident}.{index}` - {{}}");
                 let fmt_string_after =
-                    format!("finished parsing field `{outer_ident}.{index}` ({{}})");
+                    format!("finished parsing field `{outer_ident}.{index}` ({{}}) - {{}}");
                 quote! { {
-                    eprintln!(#fmt_string_before);
+                    eprintln!(#fmt_string_before, parser.debug_state());
                     let result = #ast(parser);
-                    eprintln!(#fmt_string_after, if result.is_ok() { "Ok" } else { "Err" });
+                    eprintln!(#fmt_string_after, if result.is_ok() { "Ok" } else { "Err" }, parser.debug_state());
                     result?
                 } }
             } else {

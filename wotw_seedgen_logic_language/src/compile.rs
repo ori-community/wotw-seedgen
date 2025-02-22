@@ -8,12 +8,14 @@ use std::{
 
 use crate::{
     ast,
-    output::{Anchor, Connection, Enemy, Graph, Node, Refill, RefillValue, Requirement},
+    output::{
+        Anchor, Connection, Door, DoorId, Enemy, Graph, Node, Refill, RefillValue, Requirement,
+    },
     token::Tokenizer,
 };
 use rustc_hash::FxHashMap;
-use wotw_seedgen_assets::{LocData, Source, StateData};
-use wotw_seedgen_data::{Position, Shard, Skill, Teleporter};
+use wotw_seedgen_assets::{LocData, Source, StateData, StateDataEntry};
+use wotw_seedgen_data::{Position, Shard, Skill, Teleporter, UberIdentifier};
 use wotw_seedgen_parse::{
     Error, ErrorKind, Recover, Recoverable, Result, Separated, SeparatedNonEmpty, Span, Spanned,
 };
@@ -46,19 +48,24 @@ impl Graph {
 
         let mut compiler = Compiler::new(&mut areas, &loc_data_nodes, &state_data_nodes, settings);
         areas.contents.compile(&mut compiler);
+        compiler.generate_door_connections();
         let Compiler {
             nodes: compiled_nodes,
+            default_door_connections,
             errors,
             ..
         } = compiler;
 
-        let mut nodes = loc_data_nodes;
+        let mut nodes: Vec<Node> = loc_data_nodes;
         nodes.reserve_exact(state_data_nodes.len() + compiled_nodes.len());
         nodes.extend(state_data_nodes);
         nodes.extend(compiled_nodes);
 
         CompileResult {
-            graph: Graph { nodes },
+            graph: Graph {
+                nodes,
+                default_door_connections,
+            },
             errors,
         }
     }
@@ -101,6 +108,9 @@ impl CompileResult {
 
 struct Compiler<'source> {
     nodes: Vec<Node>,
+    index_offset: usize,
+    door_nodes: Vec<usize>,
+    default_door_connections: FxHashMap<DoorId, DoorId>,
     difficulty_requirements: DifficultyRequirements,
     trick_requirements: TrickRequirements,
     state_map: FxHashMap<Cow<'source, str>, usize>,
@@ -219,6 +229,9 @@ impl<'source> Compiler<'source> {
 
         Self {
             nodes,
+            index_offset: loc_data_nodes.len() + state_data_nodes.len(),
+            door_nodes: vec![],
+            default_door_connections: FxHashMap::default(),
             difficulty_requirements: DifficultyRequirements::new(settings),
             trick_requirements: TrickRequirements::new(settings),
             state_map,
@@ -236,6 +249,63 @@ impl<'source> Compiler<'source> {
 
     fn consume_result<T>(&mut self, result: Result<T>) -> Option<T> {
         result.map_err(|err| self.errors.push(err)).ok()
+    }
+
+    fn generate_door_connections(&mut self) {
+        for index in self.door_nodes.iter().copied() {
+            let anchor = self.nodes[index].expect_anchor();
+            let anchor_identifier = anchor.identifier.clone();
+            let door = anchor.door.as_ref().unwrap();
+            let door_id = door.id;
+            let door_requirement = door.requirement.clone();
+
+            if let Some(target) = self.anchor_map.get(&door.target) {
+                let target_door_id = self.nodes[*target - self.index_offset]
+                    .expect_anchor()
+                    .door
+                    .as_ref()
+                    .unwrap()
+                    .id;
+
+                self.default_door_connections
+                    .insert(door_id, target_door_id);
+            }
+
+            let visited_state_index = self.nodes.len();
+            // TODO during seedgen this should be 1, but start as 0 in the true seed
+            self.nodes.push(Node::State(StateDataEntry {
+                identifier: format!("{}Visited", anchor_identifier),
+                uber_identifier: UberIdentifier::new(28, door_id),
+                value: None,
+            }));
+
+            for target_index in self.door_nodes.iter().copied() {
+                if index == target_index {
+                    continue;
+                }
+
+                let state_index = self.nodes.len();
+                self.nodes[index]
+                    .expect_anchor_mut()
+                    .connections
+                    .push(Connection {
+                        to: self.index_offset + target_index,
+                        requirement: Requirement::And(vec![
+                            Requirement::State(self.index_offset + state_index),
+                            Requirement::State(self.index_offset + visited_state_index),
+                            door_requirement.clone(),
+                        ]),
+                    });
+
+                let target_anchor = self.nodes[target_index].expect_anchor(); // TODO verify while parsing
+
+                self.nodes.push(Node::State(StateDataEntry {
+                    identifier: format!("{} to {}", anchor_identifier, target_anchor.identifier),
+                    uber_identifier: UberIdentifier::new(27, door_id),
+                    value: Some(target_anchor.door.as_ref().unwrap().id), // TODO this should not be treated as strictly incremental
+                }));
+            }
+        }
     }
 }
 struct DifficultyRequirements {
@@ -581,6 +651,7 @@ impl<'source> Compile for ast::Anchor<'source> {
             .position
             .and_then(|position| position.compile(compiler));
 
+        let mut door = None;
         let mut can_spawn = true;
         let mut teleport_restriction = None;
         let mut refills = vec![];
@@ -589,6 +660,15 @@ impl<'source> Compile for ast::Anchor<'source> {
         if let Some(content) = compiler.consume_result(self.content.content.result) {
             for content in content.content {
                 match content {
+                    ast::AnchorContent::Door(keyword, anchor_door) => {
+                        if let Some(anchor_door) = anchor_door.compile(compiler) {
+                            compiler.door_nodes.push(compiler.nodes.len());
+
+                            if mem::replace(&mut door, Some(anchor_door)).is_some() {
+                                compiler.error("duplicate door".to_string(), keyword.span);
+                            }
+                        }
+                    }
                     ast::AnchorContent::NoSpawn(keyword) => {
                         if !mem::take(&mut can_spawn) {
                             compiler.error("duplicate nospawn".to_string(), keyword.span);
@@ -648,11 +728,12 @@ impl<'source> Compile for ast::Anchor<'source> {
         compiler.nodes.push(Node::Anchor(Anchor {
             identifier: self.identifier.data.0.to_string(),
             position,
+            door,
             can_spawn,
             teleport_restriction: teleport_restriction.unwrap_or(Requirement::Free),
             refills,
             connections,
-        }))
+        }));
     }
 }
 impl Compile for ast::AnchorPosition {
@@ -665,6 +746,63 @@ impl Compile for ast::AnchorPosition {
                 x: position.x.data,
                 y: position.y.data,
             })
+    }
+}
+impl<'source> Compile for ast::Door<'source> {
+    type Output = Option<Door>;
+
+    fn compile(self, compiler: &mut Compiler) -> Self::Output {
+        let mut id = None;
+        let mut target = None;
+        let mut requirement = None;
+
+        if let Some(content) = compiler.consume_result(self.content.result) {
+            for content in content.content {
+                match content {
+                    ast::DoorContent::Id(keyword, door_id) => {
+                        if let Some(door_id) = compiler.consume_result(door_id.result) {
+                            if mem::replace(&mut id, Some(door_id.id.data)).is_some() {
+                                compiler.error("duplicate id".to_string(), keyword.span);
+                            }
+                        }
+                    }
+                    ast::DoorContent::Target(keyword, door_target) => {
+                        if let Some(door_target) = compiler.consume_result(door_target.result) {
+                            if compiler.anchor_map.get(door_target.target.data.0).is_none() {
+                                compiler
+                                    .error("unknown anchor".to_string(), door_target.target.span);
+                            }
+
+                            if mem::replace(
+                                &mut target,
+                                Some(door_target.target.data.0.to_string()),
+                            )
+                            .is_some()
+                            {
+                                compiler.error("duplicate target".to_string(), keyword.span);
+                            }
+                        }
+                    }
+                    ast::DoorContent::Enter(keyword, door_requirement) => {
+                        if let Some(door_requirement) = door_requirement.compile(compiler) {
+                            if mem::replace(&mut requirement, Some(door_requirement)).is_some() {
+                                compiler.error("duplicate enter".to_string(), keyword.span);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if let (Some(id), Some(target), Some(requirement)) = (id, target, requirement) {
+            Some(Door {
+                id,
+                target,
+                requirement,
+            })
+        } else {
+            None
+        }
     }
 }
 impl<'source> Compile for ast::Refill<'source> {

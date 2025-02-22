@@ -17,6 +17,7 @@ where
 pub struct Areas<'source> {
     pub contents: Separated<Recoverable<Content<'source>, RecoverDedent>, Newline>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum Content<'source> {
     Requirement(
@@ -32,7 +33,9 @@ pub enum Content<'source> {
         Recoverable<Anchor<'source>, RecoverDedent>,
     ),
 }
+
 pub struct RecoverDedent;
+
 impl<'source> Recover<'source, Tokenizer> for RecoverDedent {
     fn recover(parser: &mut Parser<'source, Tokenizer>) {
         let mut depth = None;
@@ -51,6 +54,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverDedent {
                     if *depth > 1 {
                         *depth -= 1;
                     } else {
+                        parser.step();
                         break;
                     }
                 }
@@ -60,6 +64,17 @@ impl<'source> Recover<'source, Tokenizer> for RecoverDedent {
         }
     }
 }
+
+pub struct RecoverNewline;
+
+impl<'source> Recover<'source, Tokenizer> for RecoverNewline {
+    fn recover(parser: &mut Parser<'source, Tokenizer>) {
+        parser.jump(
+            parser.find(|token, _| matches!(token, Token::Newline | Token::Dedent | Token::Indent)),
+        );
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Requirement)]
 pub struct RequirementKeyword;
@@ -130,6 +145,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverPosition {
 }
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum AnchorContent<'source> {
+    Door(Spanned<DoorKeyword>, Door<'source>),
     NoSpawn(Spanned<NoSpawn>),
     TpRestriction(
         Spanned<TpRestrictionKeyword>,
@@ -144,6 +160,41 @@ pub enum AnchorContent<'source> {
         Recoverable<Connection<'source>, RecoverDedent>,
     ),
 }
+#[derive(Debug, Clone, PartialEq, Ast)]
+#[ast(token = Token::Door)]
+pub struct DoorKeyword;
+pub type Door<'source> = Group<SeparatedNonEmpty<DoorContent<'source>, Newline>>;
+#[derive(Debug, Clone, PartialEq, Ast, Span)]
+pub enum DoorContent<'source> {
+    Id(Spanned<Id>, Recoverable<DoorId, RecoverNewline>),
+    Target(
+        Spanned<Target>,
+        Recoverable<DoorTarget<'source>, RecoverNewline>,
+    ),
+    Enter(
+        Spanned<Enter>,
+        Recoverable<RequirementLineOrGroup<'source>, RecoverNewline>,
+    ),
+}
+#[derive(Debug, Clone, PartialEq, Ast)]
+#[ast(token = Token::Id)]
+pub struct Id;
+#[derive(Debug, Clone, PartialEq, Ast, Span)]
+pub struct DoorId {
+    pub colon: Spanned<Symbol<':'>>,
+    pub id: Spanned<i32>,
+}
+#[derive(Debug, Clone, PartialEq, Ast, Span)]
+pub struct DoorTarget<'source> {
+    pub colon: Spanned<Symbol<':'>>,
+    pub target: Spanned<LogicIdentifier<'source>>,
+}
+#[derive(Debug, Clone, PartialEq, Ast)]
+#[ast(token = Token::Target)]
+pub struct Target;
+#[derive(Debug, Clone, PartialEq, Ast)]
+#[ast(token = Token::Enter)]
+pub struct Enter;
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::NoSpawn)]
 pub struct NoSpawn;

@@ -1,12 +1,16 @@
+use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use strum::EnumString;
 use wotw_seedgen_assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::{Position, Shard, Skill, Teleporter, UberIdentifier, Zone};
 use wotw_seedgen_settings::{Difficulty, Trick};
 
+pub type DoorId = i32;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Graph {
     pub nodes: Vec<Node>,
+    pub default_door_connections: FxHashMap<DoorId, DoorId>,
 }
 impl Graph {
     // TODO could optimize based on the node kind we're looking for? The tag should be faster to compare than our long strings
@@ -47,7 +51,7 @@ impl Node {
             Node::State(state) => Some(state.uber_identifier),
         }
     }
-    pub fn value(&self) -> Option<u8> {
+    pub fn value(&self) -> Option<i32> {
         match self {
             Node::Anchor(_) | Node::LogicalState(_) => None,
             Node::Pickup(pickup) => pickup.value,
@@ -77,11 +81,24 @@ impl Node {
             _ => false,
         }
     }
+    pub fn expect_anchor(&self) -> &Anchor {
+        match self {
+            Node::Anchor(anchor) => anchor,
+            _ => panic!("Called expect_anchor on {self:?}"),
+        }
+    }
+    pub fn expect_anchor_mut(&mut self) -> &mut Anchor {
+        match self {
+            Node::Anchor(anchor) => anchor,
+            _ => panic!("Called expect_anchor_mut on {self:?}"),
+        }
+    }
 }
 #[derive(Debug, Clone)]
 pub struct Anchor {
     pub identifier: String,
     pub position: Option<Position>,
+    pub door: Option<Door>,
     pub can_spawn: bool,
     pub teleport_restriction: Requirement,
     pub refills: Vec<Refill>,
@@ -91,6 +108,12 @@ impl PartialEq for Anchor {
     fn eq(&self, other: &Self) -> bool {
         self.identifier == other.identifier
     }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct Door {
+    pub id: DoorId,
+    pub target: String,
+    pub requirement: Requirement,
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct Connection {

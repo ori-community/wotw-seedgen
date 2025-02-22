@@ -54,7 +54,7 @@ pub struct LocDataEntry {
     /// pickup locations are either stored as booleans or as integers where being above a certain value means the pickup is collected
     pub uber_identifier: UberIdentifier,
     /// `None` if `uber_identifier` holds a boolean value. Otherwise, has the minimum integer value at which this pickup is collected
-    pub value: Option<u8>,
+    pub value: Option<i32>,
     /// World coordinates of this pickup location, if applicable
     pub position: Option<Position>,
     /// Map coordinates of this pickup location, if applicable
@@ -114,7 +114,7 @@ struct LocDataInput<'a> {
     uber_group: i32,
     _uber_id_name: &'a str,
     uber_id: i32,
-    uber_state_value: Option<u8>,
+    uber_state_value: Option<i32>,
     x: Option<f32>,
     y: Option<f32>,
     map_x: Option<f32>,

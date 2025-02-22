@@ -5,6 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "cppvsdbg",
+      "request": "attach",
+      "name": "Attach to CLI (C++)",
+      "processId": "${command:pickProcess}"
+    },
+    {
       "type": "lldb",
       "request": "attach",
       "name": "Attach to CLI",

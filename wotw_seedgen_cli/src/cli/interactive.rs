@@ -1,4 +1,8 @@
-use std::{fmt::Display, num::NonZeroUsize};
+use std::{
+    fmt::Display,
+    num::{NonZeroU8, NonZeroUsize, ParseIntError},
+    str::FromStr,
+};
 
 use clap::builder::styling::Reset;
 use dialoguer::{
@@ -8,7 +12,7 @@ use dialoguer::{
 use itertools::Itertools;
 use rustc_hash::FxHashSet;
 use strum::{Display, VariantArray, VariantNames};
-use wotw_seedgen::settings::{Difficulty, Spawn, Trick};
+use wotw_seedgen::settings::{Difficulty, GreaterOneU8, Spawn, Trick};
 use wotw_seedgen_assets::{UniversePresetSettings, WorldPresetSettings};
 use wotw_seedgen_seed_language::metadata::{ConfigValue, Literal};
 
@@ -56,6 +60,7 @@ pub fn seed_world_settings(
     select_difficulty(&prefix, settings)?;
     select_tricks(&prefix, settings)?;
     select_hard(&prefix, settings)?;
+    select_randomize_doors(&prefix, settings)?;
     select_snippets(&prefix, settings)?;
     select_snippet_config(&prefix, settings)?;
     Ok(())
@@ -202,6 +207,27 @@ fn select_hard(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), E
             .interact_opt()?
         {
             settings.hard = Some(true);
+        }
+    }
+
+    Ok(())
+}
+
+fn select_randomize_doors(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
+    if settings.randomize_doors.is_none() {
+        if let Some(true) = Confirm::new()
+            .with_prompt(format!(
+                "{prefix}Choose whether door connections should be randomized"
+            ))
+            .default(false)
+            .interact_opt()?
+        {
+            let loop_size = Input::new()
+                .with_prompt("Choose the door loop size")
+                .default(GreaterOneU8::new(2).unwrap())
+                .interact_text()?;
+
+            settings.randomize_doors = Some(loop_size);
         }
     }
 

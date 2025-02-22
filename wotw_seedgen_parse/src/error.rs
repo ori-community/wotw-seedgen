@@ -1,9 +1,8 @@
 use itertools::Itertools;
-#[cfg(feature = "ariadne")]
-use std::io;
 use std::{
     error,
     fmt::{self, Display},
+    io,
     ops::Range,
 };
 use wotw_seedgen_assets::Source;
@@ -90,7 +89,6 @@ impl Error {
     /// Write this [`Error`] to an implementor of [`Write`] using the [`ariadne`] crate.
     ///
     /// [`Write`]: io::Write
-    #[cfg(feature = "ariadne")]
     pub fn write_pretty<W: io::Write>(&self, source: &Source, w: W) -> io::Result<()> {
         use ariadne::{Color, Config, Fmt, Label, Report, ReportKind, Source};
         let id = source.id.as_str();

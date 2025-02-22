@@ -7,7 +7,7 @@ use crate::{
     token::{Token, Tokenizer},
 };
 use wotw_seedgen_parse::{
-    Ast, Identifier, Parser, Recoverable, SeparatedNonEmpty, Spanned, Symbol, Tokenize,
+    Ast, Identifier, Parser, Recoverable, SeparatedNonEmpty, Source, Spanned, Symbol, Tokenize,
 };
 use wotw_seedgen_settings::DEFAULT_SPAWN;
 use wotw_seedgen_static_assets::{LOC_DATA, STATE_DATA};
@@ -141,12 +141,18 @@ fn ast() {
 
 #[test]
 fn compile() {
-    let areas = parse(include_str!("../../wotw_seedgen/areas.wotw"))
-        .into_result()
-        .unwrap();
-    let graph = Graph::compile(areas, LOC_DATA.clone(), STATE_DATA.clone(), &[])
-        .into_result()
-        .unwrap();
+    let source = Source::new(
+        "areas.wotw".to_string(),
+        include_str!("../../wotw_seedgen/areas.wotw").to_string(),
+    );
+
+    let areas = parse(&source.content).eprint_errors(&source).unwrap();
+    let (graph, success) =
+        Graph::compile(areas, LOC_DATA.clone(), STATE_DATA.clone(), &[]).eprint_errors(&source);
+    if !success {
+        panic!("Failed to parse areas.wotw");
+    }
+
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
     match &graph.nodes[spawn] {
         Node::Anchor(anchor) => {

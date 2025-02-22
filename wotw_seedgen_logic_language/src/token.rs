@@ -19,6 +19,14 @@ pub enum Token {
     Anchor,
     #[token("at")]
     At,
+    #[token("door")]
+    Door,
+    #[token("id")]
+    Id,
+    #[token("target")]
+    Target,
+    #[token("enter")]
+    Enter,
     #[token("nospawn")]
     NoSpawn,
     #[token("tprestriction")]

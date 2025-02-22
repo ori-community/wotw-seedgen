@@ -20,6 +20,13 @@ lazy_static! {
         parse(include_str!("../areas.wotw")).into_result().unwrap();
 }
 
+pub fn test_logger() {
+    env_logger::Builder::from_env(Env::default().default_filter_or("trace"))
+        .format_timestamp(None)
+        .is_test(true)
+        .init();
+}
+
 #[test]
 fn some_seeds() {
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
@@ -33,12 +40,9 @@ fn some_seeds() {
         .unwrap();
     }
 
-    env_logger::Builder::from_env(Env::default().default_filter_or("trace"))
-        .format_timestamp(None)
-        .is_test(true)
-        .init();
+    test_logger();
 
-    let mut universe_settings = UniverseSettings::new(String::default());
+    let mut universe_settings = UniverseSettings::new("0".to_string());
     let mut graph = Graph::compile(
         AREAS.clone(),
         LOC_DATA.clone(),

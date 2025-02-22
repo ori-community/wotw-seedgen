@@ -48,7 +48,7 @@ pub struct StateDataEntry {
     /// world states are either stored as booleans or as integers where being above a certain value means the world state is completed
     pub uber_identifier: UberIdentifier,
     /// `None` if `uber_identifier` holds a boolean value. Otherwise, has the minimum integer value at which this world state is completed
-    pub value: Option<u8>,
+    pub value: Option<i32>,
 }
 impl PartialEq for StateDataEntry {
     fn eq(&self, other: &Self) -> bool {
@@ -80,5 +80,5 @@ struct StateDataInput {
     node_identifier: String,
     uber_group: i32,
     uber_id: i32,
-    uber_state_value: Option<u8>,
+    uber_state_value: Option<i32>,
 }

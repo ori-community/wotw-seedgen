@@ -40,7 +40,7 @@ pub struct World<'graph, 'settings> {
     // TODO technically the entire inventory is already contained in the uber_states?
     pub(crate) player: Player<'settings>,
     pub(crate) uber_states: UberStates,
-    pub(crate) logic_states: FxHashSet<usize>, // TODO implement
+    pub(crate) logic_states: FxHashSet<usize>,
     logic_state_map: FxHashMap<UberIdentifier, Vec<usize>>,
     variables: Variables,
 }
@@ -56,13 +56,24 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         settings: &'settings WorldSettings,
         uber_states: UberStates,
     ) -> Self {
+        let mut logic_state_map = FxHashMap::<UberIdentifier, Vec<usize>>::default();
+
+        for (index, node) in graph.nodes.iter().enumerate() {
+            if let Some(uber_identifier) = node.uber_identifier() {
+                logic_state_map
+                    .entry(uber_identifier)
+                    .or_default()
+                    .push(index)
+            }
+        }
+
         World {
             graph,
             spawn,
             player: Player::new(settings),
             uber_states,
             logic_states: Default::default(),
-            logic_state_map: Default::default(),
+            logic_state_map,
             variables: Default::default(),
         }
     }

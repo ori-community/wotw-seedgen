@@ -1,5 +1,10 @@
+use wotw_seedgen_assets::Source;
+
 use crate::{Ast, ErrorKind, ParseIdentToken, Parser, Result, Tokenize};
-use std::fmt::{self, Display};
+use std::{
+    fmt::{self, Display},
+    io,
+};
 
 /// [`Ast`] node parsing an identifier
 ///
@@ -183,6 +188,24 @@ pub struct NoTrailingInput<T> {
 impl<T> NoTrailingInput<T> {
     pub fn into_result(self) -> Result<T> {
         self.trailing.and(self.parsed)
+    }
+
+    pub fn eprint_errors(self, source: &Source) -> Option<T> {
+        let mut stderr = io::stderr().lock();
+
+        let value = match self.parsed {
+            Ok(value) => Some(value),
+            Err(err) => {
+                err.write_pretty(source, &mut stderr).unwrap();
+                None
+            }
+        };
+
+        if let Err(err) = self.trailing {
+            err.write_pretty(source, &mut stderr).unwrap();
+        }
+
+        value
     }
 }
 impl<'source, T, V> Ast<'source, T> for NoTrailingInput<V>

@@ -147,7 +147,13 @@ impl Player<'_> {
         states: &FxHashSet<usize>,
         orb_variants: OrbVariants,
     ) {
+        use log::warn;
+
         for solution in solutions {
+            if solution.is_empty() {
+                warn!("`find_solutions` returned empty Inventory");
+            }
+
             let mut solution_player = self.clone();
             let solution_extra_orbs = solution.max_orbs(self.settings.difficulty);
             solution_player.inventory += solution.clone();

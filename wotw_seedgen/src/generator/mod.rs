@@ -1,5 +1,4 @@
-// TODO port door rando
-// pub mod doors;
+pub mod doors;
 pub mod item_pool;
 pub mod spoiler;
 

@@ -65,7 +65,7 @@ pub fn generate_placements(
         !worlds.is_empty(),
         "Need at least one world to generate a seed"
     );
-    let mut context = Context::new(rng, worlds, settings);
+    let mut context = Context::new(rng, worlds, settings)?;
 
     context.preplacements();
 
@@ -77,7 +77,9 @@ pub fn generate_placements(
             context.sort_spoiler_placements();
             break;
         }
-        context.force_keystones();
+        if context.force_keystones() {
+            continue;
+        }
         if !context.place_random() {
             if let Some((target_world_index, progression)) = context.choose_progression()? {
                 context.place_forced(target_world_index, progression);
@@ -89,7 +91,7 @@ pub fn generate_placements(
 }
 
 pub struct Context<'graph, 'settings> {
-    rng: Pcg64Mcg,
+    pub rng: Pcg64Mcg,
     pub worlds: Vec<WorldContext<'graph, 'settings>>,
     settings: &'settings UniverseSettings,
     /// next multiworld uberState id to use
@@ -100,7 +102,7 @@ pub struct Context<'graph, 'settings> {
     spoiler: SeedSpoiler,
 }
 pub struct WorldContext<'graph, 'settings> {
-    rng: Pcg64Mcg,
+    pub rng: Pcg64Mcg,
     pub world: World<'graph, 'settings>,
     pub output: IntermediateOutput,
     /// world index of this world
@@ -139,7 +141,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         rng: &mut Pcg64Mcg,
         worlds: Vec<(World<'graph, 'settings>, IntermediateOutput)>,
         settings: &'settings UniverseSettings,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let multiworld = worlds.len() > 1;
         let worlds = worlds
             .into_iter()
@@ -147,7 +149,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .map(|(index, (world, output))| {
                 WorldContext::new(rng, world, output, index, multiworld)
             })
-            .collect::<Vec<_>>();
+            .collect::<Result<Vec<_>, _>>()?;
         let spawns = worlds
             .iter()
             .map(|world_context| {
@@ -157,14 +159,14 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             })
             .collect();
         let spoiler = SeedSpoiler::new(spawns);
-        Self {
+        Ok(Self {
             rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
             worlds,
             settings,
             multiworld_state_index: 0..,
             step: 0,
             spoiler,
-        }
+        })
     }
 
     fn preplacements(&mut self) {
@@ -225,7 +227,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .all(|world| world.reached_needs_placement.len() == world.needs_placement.len())
     }
 
-    fn force_keystones(&mut self) {
+    fn force_keystones(&mut self) -> bool {
+        let mut new_progressions = false;
+
         for world_index in 0..self.worlds.len() {
             let world_context = &mut self.worlds[world_index];
             let owned_keystones = world_context.world.inventory().keystones;
@@ -248,6 +252,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 continue;
             }
 
+            // If we had fewer than 4 keystones total so far, the forced keystones might open new progressions.
+            // Keystones never get removed from the inventory, so once 4 have been placed doors are always solved.
+            new_progressions = owned_keystones < 4;
+
             let item_pool_keystones = world_context.item_pool.inventory().keystones;
             if item_pool_keystones < missing_keystones {
                 warn!("Need to place {missing_keystones} to avoid keylocks, but the item pool only has {item_pool_keystones} left. Placing regardless");
@@ -265,6 +273,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 self.force_place_command(keystone.clone(), world_index);
             }
         }
+
+        new_progressions
     }
 
     fn place_remaining(&mut self) {
@@ -693,7 +703,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         mut output: IntermediateOutput,
         index: usize,
         multiworld: bool,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let log_index = if multiworld {
             format!("[{index}] ")
         } else {
@@ -720,7 +730,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             }
         });
 
-        Self {
+        let mut world_context = Self {
             rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
             world,
             output,
@@ -738,7 +748,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             spawn_slots: SPAWN_SLOTS,
             unshared_items: UNSHARED_ITEMS,
             price_distribution: Uniform::new_inclusive(0.75, 1.25),
-        }
+        };
+
+        world_context.generate_doors()?;
+
+        Ok(world_context)
     }
 
     fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
@@ -771,6 +785,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         }
     }
 
+    // TODO name change
     fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         let command = compile::spirit_light(CommandInteger::Constant { value: 1 }, &mut self.rng);
         if self.needs_placement.is_empty() {

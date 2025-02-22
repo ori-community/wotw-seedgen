@@ -60,6 +60,7 @@ pub struct UberStateEntry {
     value: UberStateValue,
     triggers: FxHashSet<usize>,
 }
+// TODO bad display implementation
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display)]
 pub enum UberStateValue {
     Boolean(bool),

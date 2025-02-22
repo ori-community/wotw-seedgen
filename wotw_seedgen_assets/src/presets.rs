@@ -1,7 +1,9 @@
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::iter;
-use wotw_seedgen_settings::{Difficulty, Spawn, Trick, UniverseSettings, WorldSettings};
+use wotw_seedgen_settings::{
+    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
+};
 
 /// The current version number for the assets directory.
 /// Presets targetting older versions may throw an error if they're affected by breaking changes.
@@ -45,15 +47,19 @@ pub enum PresetGroup {
 ///
 /// let mut universe_settings = UniverseSettings::new("seed".to_string());
 ///
-/// let preset = UniversePreset::new(None, UniversePresetSettings {
-///     world_settings: Some(vec![
-///         WorldPresetSettings {
-///             spawn: Some(Spawn::Random),
-///             ..Default::default()
-///         }
-///     ]),
-///     ..Default::default()
-/// });
+/// let preset = UniversePreset {
+///     assets_version: 1,
+///     info: None,
+///     settings: UniversePresetSettings {
+///         world_settings: Some(vec![
+///             WorldPresetSettings {
+///                 spawn: Some(Spawn::Random),
+///                 ..Default::default()
+///             }
+///         ]),
+///         ..Default::default()
+///     }
+/// };
 ///
 /// preset.apply(&mut universe_settings, &NoPresetAccess);
 /// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
@@ -248,10 +254,14 @@ fn include_universe_preset<A: PresetAccess>(
 ///
 /// let mut world_settings = WorldSettings::default();
 ///
-/// let world_preset = WorldPreset::new(None, WorldPresetSettings {
-///     spawn: Some(Spawn::Random),
-///     ..Default::default()
-/// });
+/// let world_preset = WorldPreset {
+///     assets_version: 1,
+///     info: None,
+///     settings: WorldPresetSettings {
+///         spawn: Some(Spawn::Random),
+///         ..Default::default()
+///     }
+/// };
 ///
 /// world_preset.apply(&mut world_settings, &NoPresetAccess);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
@@ -332,6 +342,9 @@ pub struct WorldPresetSettings {
     /// Logically assume hard in-game difficulty
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hard: Option<bool>,
+    /// Randomize door connections with the given max loop size
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub randomize_doors: Option<GreaterOneU8>,
     /// Names of snippets to use
     #[serde(skip_serializing_if = "Option::is_none")]
     pub snippets: Option<Vec<String>>,
@@ -362,6 +375,7 @@ impl WorldPresetSettings {
             tricks,
             spawn,
             hard,
+            randomize_doors,
             snippets,
             snippet_config,
         } = self;
@@ -382,6 +396,9 @@ impl WorldPresetSettings {
         }
         if let Some(hard) = hard {
             settings.hard = hard;
+        }
+        if let Some(randomize_doors) = randomize_doors {
+            settings.randomize_doors = Some(randomize_doors);
         }
         if let Some(snippets) = snippets {
             settings.snippets.extend(snippets);

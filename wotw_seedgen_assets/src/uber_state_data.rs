@@ -37,7 +37,7 @@ pub struct UberStateAlias {
     /// represents the minimum value inside the UberState. For instance, all Hand to Hand steps
     /// have individual custom identifier, even though Hand to Hand progress is stored in a single
     /// UberState. The value represents the current step of Hand to Hand.
-    pub value: Option<u8>,
+    pub value: Option<i32>,
 }
 impl Display for UberStateAlias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -137,7 +137,12 @@ impl UberStateData {
         Ok(uber_state_data)
     }
 
-    fn add_rando_name(&mut self, name: String, uber_identifier: UberIdentifier, value: Option<u8>) {
+    fn add_rando_name(
+        &mut self,
+        name: String,
+        uber_identifier: UberIdentifier,
+        value: Option<i32>,
+    ) {
         let (group, member) = name.split_once('.').expect("Invalid UberState name");
         self.name_lookup
             .entry(group.to_string())

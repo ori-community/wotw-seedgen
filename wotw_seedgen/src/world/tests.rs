@@ -1,10 +1,15 @@
 use super::*;
-use crate::{item_pool::ItemPool, tests::AREAS};
+use crate::{
+    item_pool::ItemPool,
+    tests::{test_logger, AREAS},
+};
 use wotw_seedgen_settings::{Difficulty, UniverseSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{LOC_DATA, STATE_DATA, UBER_STATE_DATA};
 
 #[test]
 fn reach_check() {
+    test_logger();
+
     let mut universe_settings = UniverseSettings::new(String::default());
     universe_settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
@@ -26,6 +31,13 @@ fn reach_check() {
         uber_states,
     );
     let output = IntermediateOutput::default();
+
+    // TODO remove if unnecessary; door connections should already be default, visited might be in the future
+    // enable default door connections
+    for (from, to) in &world.graph.default_door_connections {
+        world.set_integer(UberIdentifier::new(27, *from), *to, &output);
+        world.set_boolean(UberIdentifier::new(28, *from), true, &output);
+    }
 
     let mut pool = ItemPool::default();
     for item in pool.drain() {

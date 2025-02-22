@@ -13,6 +13,13 @@
 //! [`FromStr`]: std::str::FromStr
 //! [`VariantNames`]: strum::VariantNames
 
+use std::{
+    fmt::{self, Display},
+    num::NonZeroU8,
+    ops::Deref,
+    str::FromStr,
+};
+
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString, VariantArray, VariantNames};
@@ -72,6 +79,8 @@ pub struct WorldSettings {
     pub tricks: FxHashSet<Trick>,
     /// Logically assume hard in-game difficulty
     pub hard: bool,
+    /// Randomize door connections with the given max loop size
+    pub randomize_doors: Option<GreaterOneU8>,
     /// Names of snippets to use
     pub snippets: Vec<String>,
     /// Configuration to pass to snippets
@@ -207,4 +216,40 @@ pub enum Trick {
     PauseHover,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct GreaterOneU8(NonZeroU8);
+
+impl GreaterOneU8 {
+    pub fn new(n: u8) -> Option<Self> {
+        if n > 1 {
+            NonZeroU8::new(n).map(Self)
+        } else {
+            None
+        }
+    }
+}
+
+impl Deref for GreaterOneU8 {
+    type Target = NonZeroU8;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Display for GreaterOneU8 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl FromStr for GreaterOneU8 {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let n = u8::from_str(s).map_err(|err| err.to_string())?;
+        Self::new(n).ok_or("number would be zero or one for greater-one type".to_string())
+    }
 }

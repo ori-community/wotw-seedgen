@@ -1,6 +1,6 @@
 use crate::common_item::CommonItem;
 
-use super::{uber_states::UberStateValue, World};
+use super::{graph::node_condition_equals, node_condition, uber_states::UberStateValue, World};
 use ordered_float::OrderedFloat;
 use std::ops::{Add, Div, Mul, Sub};
 use wotw_seedgen_data::{UberIdentifier, Zone};
@@ -331,6 +331,7 @@ fn set_uber_state(
     if prevent_uber_state_change(world, uber_identifier, value) {
         return;
     }
+
     if trigger_events {
         let events = world
             .uber_states
@@ -340,6 +341,30 @@ fn set_uber_state(
         process_triggers(world, output, events);
     } else {
         world.uber_states.set(uber_identifier, value);
+    }
+
+    if let Some(logic_states) = world.logic_state_map.get(&uber_identifier) {
+        let check_states = logic_states
+            .iter()
+            .filter(|index| !world.logic_states.contains(&index))
+            .copied()
+            .collect::<Vec<_>>();
+
+        for index in check_states {
+            let node = &world.graph.nodes[index];
+            // TODO less hardcoded solution?
+            let node_condition_f = if node.uber_identifier().unwrap().group == 27 {
+                node_condition_equals
+            } else {
+                node_condition
+            };
+
+            let condition = node_condition_f(node).unwrap();
+
+            if world.simulate(&condition, &output) {
+                world.logic_states.insert(index);
+            }
+        }
     }
 }
 fn process_triggers(world: &mut World, output: &IntermediateOutput, events: Vec<usize>) {

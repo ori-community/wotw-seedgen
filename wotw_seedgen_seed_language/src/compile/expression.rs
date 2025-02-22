@@ -1063,14 +1063,12 @@ impl CompileIntoLiteral for UberIdentifier {
     }
 }
 
-fn create_quest_command(uber_identifier: UberIdentifier, value: u8) -> CommandBoolean {
+fn create_quest_command(uber_identifier: UberIdentifier, value: i32) -> CommandBoolean {
     CommandBoolean::CompareInteger {
         operation: Box::new(Operation {
             left: CommandInteger::FetchInteger { uber_identifier },
             operator: Comparator::GreaterOrEqual,
-            right: CommandInteger::Constant {
-                value: value as i32,
-            },
+            right: CommandInteger::Constant { value },
         }),
     }
 }

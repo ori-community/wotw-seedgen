@@ -1,6 +1,6 @@
 use crate::{Error, ErrorKind, Tokenize};
 use std::{
-    fmt::{self, Debug},
+    fmt::{self, Debug, Display},
     ops::Range,
     slice::SliceIndex,
     str::FromStr,
@@ -434,6 +434,14 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn custom_error(&self, message: String) -> Error {
         Error::custom(message, self.current().1.clone())
     }
+
+    /// Display readable information about the current parser state
+    pub fn debug_state<'parser>(&'parser self) -> DebugState<'parser, 'source, T>
+    where
+        T::Token: Debug,
+    {
+        DebugState::new(self)
+    }
 }
 
 impl<'source, T> Debug for Parser<'source, T>
@@ -457,5 +465,42 @@ where
             .field("position", &self.position)
             .field("eof", &self.eof)
             .finish()
+    }
+}
+
+pub struct DebugState<'parser, 'source, T: Tokenize>
+where
+    T::Token: Debug,
+{
+    parser: &'parser Parser<'source, T>,
+}
+
+impl<'parser, 'source, T: Tokenize> DebugState<'parser, 'source, T>
+where
+    T::Token: Debug,
+{
+    fn new(parser: &'parser Parser<'source, T>) -> Self {
+        Self { parser }
+    }
+}
+
+impl<T: Tokenize> Display for DebugState<'_, '_, T>
+where
+    T::Token: Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let (token, span) = self.parser.current();
+        let slice = self.parser.slice(span.clone());
+        let upcoming = self.parser.slice(span.start..);
+        let (upcoming, more) = if upcoming.len() > 32 {
+            (&upcoming[..32], "...")
+        } else {
+            (upcoming, "")
+        };
+
+        write!(
+            f,
+            "current token is `{token:?}`. current slice is {slice:?}. upcoming is {upcoming:?}{more}"
+        )
     }
 }
