@@ -100,7 +100,7 @@ anchor Teleporters:  # teleporter access
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
   state MarshSpawn.ToOpherBarrier:
     unsafe: HowlsDen.RainLifted  # https://youtu.be/2k1foADHu1E
 
@@ -1173,7 +1173,7 @@ anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the 
 anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   pickup HowlsDen.LaserKS:  # The Lizard at the lever only spawns when you get DoubleJump
     moki:
@@ -1817,7 +1817,7 @@ region MidnightBurrows:
 anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   conn Teleporters: free
   conn MidnightBurrows.BelowLupo:
@@ -2872,7 +2872,7 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
 
   state EastHollow.VoiceDoorOpen:
     moki: EastHollow.ForestsVoice
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   pickup EastHollow.HornBeetleFightEX:  # for future pathfinders: these paths should probably lead through VoiceDoorPlatform?
     kii:
@@ -6260,7 +6260,7 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
 
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   quest InnerWellspring.BlueMoonSeed:
     moki:
@@ -6511,7 +6511,7 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
 anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   quest WoodsEntry.LastTreeBranch: free
   quest WoodsEntry.TreeSeed:
@@ -7171,7 +7171,7 @@ anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (whe
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
   state WoodsMain.LogBlobDestroyed:  # these can break the corruption from behind
     gorlek: Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1
     unsafe:
@@ -7876,7 +7876,7 @@ anchor LowerReach.BelowTokk at -296, -3944:
 anchor LowerReach.Teleporter at -259, -3962:
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   conn Teleporters: free
   conn LowerReach.OutsideTPRoom:
@@ -9623,7 +9623,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
 anchor UpperDepths.Teleporter at 513, -4361:  # The spirit well
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   pickup UpperDepths.TeleporterEX: free  # just a few steps away in the darkness
 
@@ -11505,7 +11505,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   refill Full
 
   state EastPools.LowerWaterDrained: free  # the randomizer drains the water if you aquire the teleporter, and for non-teleporter connections this anchor is strictly locked behind already having the state
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
   state EastPools.ArenaWall:
     moki, EastPools.LowerWaterDrained: Water, Bash
     unsafe, EastPools.LowerWaterDrained:
@@ -12670,7 +12670,7 @@ region WestPools:
 anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   pickup WestPools.TpEX:
     moki:
@@ -12821,7 +12821,7 @@ region LowerWastes:
 anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   pickup LowerWastes.WestTPOre:
     moki: Burrow
@@ -13443,7 +13443,7 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
 anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   pickup LowerWastes.EastTPOre:
     moki, BreakWall=20:
@@ -13709,7 +13709,7 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
 anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
@@ -13928,7 +13928,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
 
   state WindtornRuins.HeartBarrier:  # Barrier next to the teleporter that stops you from getting the Heart.
     moki: BreakWall=16
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   conn Teleporters: free
   conn WindtornRuins.FallenPillar:
@@ -14445,7 +14445,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
 
-  state NonGladesTeleporter: free
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
   state WillowsEnd.PortalShortcut:
     moki, BreakWall=20: DoubleJump OR Dash OR Launch OR Bow=1
     gorlek: BreakWall=20
@@ -14691,6 +14691,8 @@ anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
     id: 32
     target: WillowsEnd.Upper
     enter: free
+
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   conn Teleporters: free
 
