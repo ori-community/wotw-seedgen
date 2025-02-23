@@ -29502,230 +29502,230 @@
       }
     },
     "28": {
-      "name": "doorsVisited",
+      "name": "knownDoorConnections",
       "states": {
         "1": {
           "name": "lupoShopEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "10": {
           "name": "mokiFatherHutExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "11": {
           "name": "hutAboveOpherEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "12": {
           "name": "hutAboveOpherExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "13": {
           "name": "caveEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "14": {
           "name": "caveExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "15": {
           "name": "wellspringFirstFloorEntranceBottom",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "16": {
           "name": "wellspringFirstFloorExitBottom",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "17": {
           "name": "wellspringFirstFloorEntranceTop",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "18": {
           "name": "wellspringFirstFloorExitTop",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "19": {
           "name": "wellspringSecondFloorEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "2": {
           "name": "lupoShopExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "20": {
           "name": "wellspringSecondFloorExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "21": {
           "name": "wellspringThirdFloorEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "22": {
           "name": "wellspringThirdFloorExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "23": {
           "name": "reachSeedHutEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "24": {
           "name": "reachSeedHutExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "25": {
           "name": "teddyHutEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "26": {
           "name": "teddyHutExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "27": {
           "name": "ruinsEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "28": {
           "name": "ruinsExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "29": {
           "name": "willowsEndEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "3": {
           "name": "lastHutEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "30": {
           "name": "willowsEndExitBottom",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "31": {
           "name": "willowsEndExitTop",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "32": {
           "name": "shriekRoomExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "4": {
           "name": "lastHutExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "5": {
           "name": "hutAboveMotayEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "6": {
           "name": "hutAboveMotayExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "7": {
           "name": "holeHutEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "8": {
           "name": "holeHutExit",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         },
         "9": {
           "name": "mokiFatherHutEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 0.0,
+          "value": 1.0,
           "value_type": "Boolean"
         }
       }
@@ -31061,6 +31061,46 @@
           "type": "VirtualUberState",
           "value": 0.0,
           "value_type": "Float"
+        }
+      }
+    },
+    "31": {
+      "name": "randomValueGenerator",
+      "states": {
+        "0": {
+          "name": "seed",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1": {
+          "name": "useSeed",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "10": {
+          "name": "randomInt",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "11": {
+          "name": "randomFloat",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "12": {
+          "name": "randomBoolean",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         }
       }
     },
@@ -37939,13 +37979,6 @@
         },
         "200": {
           "name": "showSmallDoors",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "201": {
-          "name": "markUnvisitedDoors",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,

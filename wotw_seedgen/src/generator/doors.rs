@@ -87,14 +87,16 @@ impl WorldContext<'_, '_> {
                     ArrayVec::from_iter([32]),
                 ];
 
+                // enable randoConfig.showSmallDoors
                 self.output.events.push(Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                     command: set_boolean_value(UberIdentifier::new(7, 200), true),
                 });
-                self.output.events.push(Event {
+                // mark door connections as unknown
+                self.output.events.extend((1..=32).map(|door_id| Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                    command: set_boolean_value(UberIdentifier::new(7, 201), true),
-                });
+                    command: set_boolean_value(UberIdentifier::new(28, door_id), false),
+                }));
 
                 let config = DoorRandomizerConfig::new(loop_size.get(), door_groups)?;
                 let connections = self.generate_door_connections(&config)?;
@@ -112,11 +114,6 @@ impl WorldContext<'_, '_> {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: set_connection,
             });
-
-            // This is only for seedgen simulation to make it think
-            // we have gone through all doors
-            self.world
-                .set_boolean(UberIdentifier::new(28, door_id), true, &self.output);
 
             // If the target door is known to connect back to this door, mark
             // the target door as visited too once we went through this door

@@ -32,13 +32,6 @@ fn reach_check() {
     );
     let output = IntermediateOutput::default();
 
-    // TODO remove if unnecessary; door connections should already be default, visited might be in the future
-    // enable default door connections
-    for (from, to) in &world.graph.default_door_connections {
-        world.set_integer(UberIdentifier::new(27, *from), *to, &output);
-        world.set_boolean(UberIdentifier::new(28, *from), true, &output);
-    }
-
     let mut pool = ItemPool::default();
     for item in pool.drain() {
         // TODO this isn't really how a reach check should be set up, the input represents what the world already has, and all the consequences have happened already

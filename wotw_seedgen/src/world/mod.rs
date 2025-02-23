@@ -4,6 +4,7 @@ mod reached;
 mod simulate;
 mod uber_states;
 
+use graph::node_condition_equals;
 use ordered_float::OrderedFloat;
 pub use player::Player;
 pub use simulate::Simulate;
@@ -56,26 +57,31 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         settings: &'settings WorldSettings,
         uber_states: UberStates,
     ) -> Self {
-        let mut logic_state_map = FxHashMap::<UberIdentifier, Vec<usize>>::default();
-
-        for (index, node) in graph.nodes.iter().enumerate() {
-            if let Some(uber_identifier) = node.uber_identifier() {
-                logic_state_map
-                    .entry(uber_identifier)
-                    .or_default()
-                    .push(index)
-            }
-        }
-
-        World {
+        let mut world = World {
             graph,
             spawn,
             player: Player::new(settings),
             uber_states,
             logic_states: Default::default(),
-            logic_state_map,
+            logic_state_map: Default::default(),
             variables: Default::default(),
+        };
+
+        for (index, node) in graph.nodes.iter().enumerate() {
+            if let Some(uber_identifier) = node.uber_identifier() {
+                world
+                    .logic_state_map
+                    .entry(uber_identifier)
+                    .or_default()
+                    .push(index);
+            }
         }
+
+        for uber_identifier in world.logic_state_map.keys().copied().collect::<Vec<_>>() {
+            world.check_states(uber_identifier);
+        }
+
+        world
     }
     /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
     ///
@@ -306,6 +312,32 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     #[inline]
     pub fn inventory(&self) -> &Inventory {
         &self.player.inventory
+    }
+
+    pub(crate) fn check_states(&mut self, uber_identifier: UberIdentifier) {
+        if let Some(logic_states) = self.logic_state_map.get(&uber_identifier) {
+            let check_states = logic_states
+                .iter()
+                .filter(|index| !self.logic_states.contains(&index))
+                .copied()
+                .collect::<Vec<_>>();
+
+            for index in check_states {
+                let node = &self.graph.nodes[index];
+                // TODO less hardcoded solution?
+                let node_condition_f = if node.uber_identifier().unwrap().group == 27 {
+                    node_condition_equals
+                } else {
+                    node_condition
+                };
+
+                let condition = node_condition_f(node).unwrap();
+
+                if self.simulate(&condition, &IntermediateOutput::default()) {
+                    self.logic_states.insert(index);
+                }
+            }
+        }
     }
 
     // TODO should be possible to use an immutable reference
