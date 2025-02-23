@@ -115,6 +115,13 @@ fn generate_door_connections_recursively(state: &DoorRandomizerState, config: &D
     #[cfg(feature = "log")]
     log::trace!("{log_indent}Possible doors: {}", possible_target_doors.iter().map(|d| d.to_string()).join(", "));
 
+    // TODO: Remove these special cases when there is a mechanism for
+    //       defining required pickups.
+    // Prevent second floor to connecting to third floor in wellspring
+    if door_id == 21 {  // 21 == Wellspring third floor entrance
+        possible_target_doors.shift_remove(&20);  // 20 == Wellspring second floor exit
+    }
+
     // Prevent the Moki Father hut connecting to the Teddy hut
     if door_id == 9 {  // 9 == Moki Father hut entrance
         possible_target_doors.shift_remove(&26);  // 26 == Teddy hut exit
