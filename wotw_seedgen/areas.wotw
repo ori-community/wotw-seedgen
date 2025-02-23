@@ -648,10 +648,14 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
 anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of spawn
   refill Checkpoint
 
-  state PoolsApproach.WheelFreed:  # Make sure it's not redundant with going to PoolsApproach.OnTopOfWheel first
+
+  state PoolsApproach.WheelWall:  # Make sure it's not redundant with going to PoolsApproach.OnTopOfWheel first
     moki: Water, WaterBreath, Bash
     gorlek: Water, Bash
-    # something something waterdash? Unlikely, it looks like bash is hard required for the first wall and if you have bash then you don't need waterdash.
+  state PoolsApproach.WheelFreed:  # Make sure it's not redundant with going to PoolsApproach.OnTopOfWheel first
+    moki, PoolsApproach.WheelWall: Water, WaterBreath, Bash
+    gorlek, PoolsApproach.WheelWall: Water, Bash
+    # something something waterdash? 
 
   pickup MarshSpawn.PoolsPathEX:
     moki:
@@ -1297,8 +1301,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   conn MarshPastOpher.TrialStart: free
   conn MarshSpawn.OpherBarrier:
     moki: MarshSpawn.ToOpherBarrier
-  conn MarshPastOpher.OpherSkipBranch:  # Check for redundancy with
-  # the enemies appear once you have water
+  conn MarshPastOpher.OpherSkipBranch:  # the enemies appear once you have water
     gorlek:
       Launch, Bash, Water OR Grenade=1
       Launch, DoubleJump
@@ -6454,15 +6457,14 @@ anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
     unsafe:
       DoubleJump, Hammer OR Spear=1  # With hammer, wall jump on the right
 
-
-anchor WoodsEntry.FamilyHutInside at 456, -4118: # inside of family reunion hut
+anchor WoodsEntry.FamilyHutInside at 445, -4118: # inside of family reunion hut
   door:
     id: 26
     target: WoodsEntry.FamilyHut
     enter: free
 
   quest WoodsEntry.DollQI:
-    moki: GladesTown.FamilyReunionKey
+    moki: free
 
 anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
   refill Checkpoint
@@ -9130,7 +9132,7 @@ anchor UpperReach.UpperSoupPaths at -215, -3877:
     gorlek: Bash
     unsafe:
       SwordSJump=1, Damage=20, DoubleJump OR Hammer  # dboost in the spike at the right of the enemy and sjump from here
-      ExtendedHammer  # Up swing to reach the pole then
+      ExtendedHammer  # Up swing to reach the pole then extended hmmer to reach the keystone
   pickup UpperReach.SwingPoleEX:
     moki:
       DoubleJump
