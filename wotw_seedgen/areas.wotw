@@ -3327,8 +3327,8 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Sword OR Hammer  # Take boost on the left side
     kii, EastHollow.SilentSwimWall:
       # Repeat each moki/gorlek path without Combat=Balloon since you can just bait it into taking a swim
-      Water, Launch OR Dash
-      Water, Grapple, DoubleJump, Glide OR TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Water, Launch
+      Water, Grapple, DoubleJump, Dash OR Glide OR TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Water, WaterDash, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Water, WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # Completely new paths
