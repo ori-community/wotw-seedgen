@@ -1,15 +1,10 @@
 use super::*;
-use crate::{
-    item_pool::ItemPool,
-    tests::{test_logger, AREAS},
-};
+use crate::{item_pool::ItemPool, tests::AREAS};
 use wotw_seedgen_settings::{Difficulty, UniverseSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{LOC_DATA, STATE_DATA, UBER_STATE_DATA};
 
 #[test]
 fn reach_check() {
-    test_logger();
-
     let mut universe_settings = UniverseSettings::new(String::default());
     universe_settings.world_settings[0].difficulty = Difficulty::Gorlek;
 
