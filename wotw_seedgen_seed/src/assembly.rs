@@ -150,6 +150,8 @@ pub enum Command {
     FreeMessageAlignment(/*id*/ usize, /*alignment*/ Alignment),
     /// Set the `screen_position` of free message `id`
     FreeMessageScreenPosition(/*id*/ usize, /*screen_position*/ ScreenPosition),
+    /// Sets the map message content to String Memory 0
+    SetMapMessage,
     /// Save to disk, like an autosave
     Save,
     /// Save to memory, but not to disk, like a boss fight checkpoint

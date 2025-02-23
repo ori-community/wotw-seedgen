@@ -26,7 +26,10 @@ The Clean Water Hint is on the Wellspring Escape")
 
 !include("progress_helper")
 
-!on_event("progress_helper", write_progress_message, {
+!on_event("progress_helper", write_progress_message, write_hints())
+!on_event("progress_helper", write_map_progress_message, write_hints())
+
+fun write_hints() {
     set_string("tree_hints", "")
     set_boolean("comma", false)
     if MarshSpawn.RegenTree {
@@ -120,7 +123,7 @@ The Clean Water Hint is on the Wellspring Escape")
         set_boolean("comma", true)
     }
     if get_boolean("comma") set_string("progress_message", get_string("progress_message") + "\n" + get_string("tree_hints"))
-})
+}
 fun add_comma() {
     if get_boolean("comma") set_string("tree_hints", get_string("tree_hints") + ", ")
 }

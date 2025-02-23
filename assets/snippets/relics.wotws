@@ -15,7 +15,6 @@
     !tags("Relics (" + relic_count + ")")
 }
 
-// TODO the other goal snippets don't include progress helper directly, why does this one?
 !include("progress_helper")
 !include("goal_mode_core")
 
@@ -274,6 +273,37 @@
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
 
+!on_event("progress_helper", write_map_progress_message, {
+    set_boolean("exists", false)
+    set_boolean("collected", false)
+
+    if current_map_zone() == Zone::Marsh check_marsh_relic()
+    if current_map_zone() == Zone::Hollow check_hollow_relic()
+    if current_map_zone() == Zone::Glades check_glades_relic()
+    if current_map_zone() == Zone::Wellspring check_wellspring_relic()
+    if current_map_zone() == Zone::Woods check_woods_relic()
+    if current_map_zone() == Zone::Reach check_reach_relic()
+    if current_map_zone() == Zone::Depths check_depths_relic()
+    if current_map_zone() == Zone::Pools check_pools_relic()
+    if current_map_zone() == Zone::Wastes check_wastes_relic()
+    if current_map_zone() == Zone::Willow check_willow_relic()
+    if current_map_zone() == Zone::Burrows check_burrows_relic()
+
+    if get_boolean("exists") {
+        if get_boolean("collected") {
+            set_string("relics_message", "$Relic found$")
+        }
+        if get_boolean("collected") == false {
+            set_string("relics_message", "#Relic not found#")
+        }
+    }
+    if get_boolean("exists") == false {
+        set_string("relics_message", "Relicless")
+    }
+
+    set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
+})
+
 !on_event("goal_mode_core", check_goals_completed, {
     count_relics()
     if get_integer("relic_count") < total_relic_count set_boolean("goals_completed", false)
@@ -300,8 +330,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Marsh" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_marsh_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", marsh_relic_collected)
+    }
 }
-!if marsh_relic_exists == false { fun write_marsh_relic() {} }
+!if marsh_relic_exists == false {
+    fun write_marsh_relic() {}
+    fun check_marsh_relic() {}
+}
 !if hollow_relic_exists {
     fun write_hollow_relic() {
         relics_add_comma()
@@ -315,8 +353,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Hollow" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_hollow_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", hollow_relic_collected)
+    }
 }
-!if hollow_relic_exists == false { fun write_hollow_relic() {} }
+!if hollow_relic_exists == false {
+    fun write_hollow_relic() {}
+    fun check_hollow_relic() {}
+}
 !if glades_relic_exists {
     fun write_glades_relic() {
         relics_add_comma()
@@ -330,8 +376,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Glades" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_glades_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", glades_relic_collected)
+    }
 }
-!if glades_relic_exists == false { fun write_glades_relic() {} }
+!if glades_relic_exists == false {
+    fun write_glades_relic() {}
+    fun check_glades_relic() {}
+}
 !if wellspring_relic_exists {
     fun write_wellspring_relic() {
         relics_add_comma()
@@ -345,8 +399,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Wellspring" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_wellspring_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", wellspring_relic_collected)
+    }
 }
-!if wellspring_relic_exists == false { fun write_wellspring_relic() {} }
+!if wellspring_relic_exists == false {
+    fun write_wellspring_relic() {}
+    fun check_wellspring_relic() {}
+}
 !if woods_relic_exists {
     fun write_woods_relic() {
         relics_add_comma()
@@ -360,8 +422,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Woods" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_woods_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", woods_relic_collected)
+    }
 }
-!if woods_relic_exists == false { fun write_woods_relic() {} }
+!if woods_relic_exists == false {
+    fun write_woods_relic() {}
+    fun check_woods_relic() {}
+}
 !if reach_relic_exists {
     fun write_reach_relic() {
         relics_add_comma()
@@ -375,8 +445,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Reach" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_reach_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", reach_relic_collected)
+    }
 }
-!if reach_relic_exists == false { fun write_reach_relic() {} }
+!if reach_relic_exists == false {
+    fun write_reach_relic() {}
+    fun check_reach_relic() {}
+}
 !if depths_relic_exists {
     fun write_depths_relic() {
         relics_add_comma()
@@ -390,8 +468,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Depths" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_depths_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", depths_relic_collected)
+    }
 }
-!if depths_relic_exists == false { fun write_depths_relic() {} }
+!if depths_relic_exists == false {
+    fun write_depths_relic() {}
+    fun check_depths_relic() {}
+}
 !if pools_relic_exists {
     fun write_pools_relic() {
         relics_add_comma()
@@ -402,11 +488,19 @@
         if pools_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "pools" + get_string("color"))
+        set_string("relics_message", get_string("relics_message") + get_string("color") + "Pools" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_pools_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", pools_relic_collected)
+    }
 }
-!if pools_relic_exists == false { fun write_pools_relic() {} }
+!if pools_relic_exists == false {
+    fun write_pools_relic() {}
+    fun check_pools_relic() {}
+}
 !if wastes_relic_exists {
     fun write_wastes_relic() {
         relics_add_comma()
@@ -420,8 +514,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Wastes" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_wastes_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", wastes_relic_collected)
+    }
 }
-!if wastes_relic_exists == false { fun write_wastes_relic() {} }
+!if wastes_relic_exists == false {
+    fun write_wastes_relic() {}
+    fun check_wastes_relic() {}
+}
 !if willow_relic_exists {
     fun write_willow_relic() {
         relics_add_comma()
@@ -435,8 +537,16 @@
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Willow" + get_string("color"))
         set_boolean("comma", true)
     }
+
+    fun check_willow_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", willow_relic_collected)
+    }
 }
-!if willow_relic_exists == false { fun write_willow_relic() {} }
+!if willow_relic_exists == false {
+    fun write_willow_relic() {}
+    fun check_willow_relic() {}
+}
 !if burrows_relic_exists {
     fun write_burrows_relic() {
         relics_add_comma()
@@ -449,8 +559,16 @@
         }
         set_string("relics_message", get_string("relics_message") + get_string("color") + "Burrows" + get_string("color"))
     }
+
+    fun check_burrows_relic() {
+        set_boolean("exists", true)
+        set_boolean("collected", burrows_relic_collected)
+    }
 }
-!if burrows_relic_exists == false { fun write_burrows_relic() {} }
+!if burrows_relic_exists == false {
+    fun write_burrows_relic() {}
+    fun check_burrows_relic() {}
+}
 
 fun count_relics() {
     set_integer("relic_count", 0)
@@ -488,5 +606,5 @@ fun write_relics_message() {
     set_string("relics_message", get_string("relics_message") + get_string("outer_color"))
 }
 fun relics_add_comma() {
-    if get_boolean("comma") set_string("progress_message", get_string("progress_message") + ", ")
+    if get_boolean("comma") set_string("relics_message", get_string("relics_message") + ", ")
 }

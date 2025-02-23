@@ -11,10 +11,12 @@ By default those are bound to
 
 // TODO there's a regression here because previously progress messages were in a consistent order
 // To add a progress message from your header, use the write_progress_message event and append your progress message to the string with id progress_message
+// If you also want to add to the progress displayed over the map, use the write_map_progress_message event and append to the string with id progress_message
 // Usually, you'll want to start with a newline so you have your own line
-// This example shows how to add a line "Fun: 10/10" into the progress message:
+// This example shows how to add a line "Fun: 10/10" into both the progress message and the map:
 // !include("progress_helper")
 // !on_event("progress_helper", write_progress_message, set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
+// !on_event("progress_helper", write_map_progress_message, set_string("map_progress_message", get_string("map_progress_message") + "\nFun: 10/10"))
 
 !builtin_icon(progress_summary_icon, "assets/icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
 !builtin_icon(tree_progress_icon, "assets/icons/wheel/tree_progress.blue.png")
@@ -23,6 +25,7 @@ By default those are bound to
 !builtin_icon(teleporter_icon, "assets/icons/game/teleporter.png")
 
 !event(write_progress_message)
+!event(write_map_progress_message)
 
 !state(disable_keybinds, Boolean)
 !export(disable_keybinds)
@@ -88,9 +91,13 @@ on progress_message {
     // TODO need state for total pickups
     // set_string("progress_message", get_string("progress_message") + "Pickups: " + randoStats.pickupsCollected + "/" + "")
     write_progress_message()
-    item_message(get_string("progress_message"))
+    priority_message(get_string("progress_message"), 4.0)
 }
-// TODO map progress message
+on change player.currentMapArea if player.currentMapArea < 14 {
+    set_string("progress_message", "")
+    write_map_progress_message()
+    set_map_message(get_string("progress_message"))
+}
 
 on binding_1 if disable_keybinds == false {
     write_tree_progress()

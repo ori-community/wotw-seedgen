@@ -10,6 +10,7 @@
 !event(check_goals_completed)
 !event(write_goals_incomplete_message)
 
+// TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
 !on_event("progress_helper", write_progress_message, {
     set_string("goal_progress_message", "")
     set_boolean("comma", false)

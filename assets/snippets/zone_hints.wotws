@@ -9,44 +9,54 @@
 
 !include("progress_helper")
 !on_event("progress_helper", write_progress_message, {
+    set_integer("zone", fetch(player.currentArea))
+    write_hints()
+})
+!on_event("progress_helper", write_map_progress_message, {
+    set_integer("zone", fetch(player.currentMapArea))
+    write_hints()
+})
+
+fun write_hints() {
     set_string("zone_hint", "")
-    if current_zone() == Zone::Marsh {
+    // TODO have to write the zone integers here, no way to pass the zone type around
+    if get_integer("zone") == 0 {
         write_marsh_hint()
     }
-    if current_zone() == Zone::Hollow {
+    if get_integer("zone") == 1 {
         write_hollow_hint()
     }
-    if current_zone() == Zone::Glades {
+    if get_integer("zone") == 2 {
         write_glades_hint()
     }
-    if current_zone() == Zone::Wellspring {
+    if get_integer("zone") == 3 {
         write_wellspring_hint()
     }
-    if current_zone() == Zone::Woods {
+    if get_integer("zone") == 7 {
         write_woods_hint()
     }
-    if current_zone() == Zone::Reach {
+    if get_integer("zone") == 6 {
         write_reach_hint()
     }
-    if current_zone() == Zone::Depths {
+    if get_integer("zone") == 8 {
         write_depths_hint()
     }
-    if current_zone() == Zone::Pools {
+    if get_integer("zone") == 4 {
         write_pools_hint()
     }
-    if current_zone() == Zone::Wastes {
+    if get_integer("zone") == 9 {
         write_wastes_hint()
     }
-    if current_zone() == Zone::Willow {
+    if get_integer("zone") == 11 {
         write_willow_hint()
     }
-    if current_zone() == Zone::Burrows {
+    if get_integer("zone") == 5 {
         write_burrows_hint()
     }
     if get_string("zone_hint") != "" {
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("zone_hint"))
     }
-})
+}
 
 fun write_marsh_hint() {
     if MarshSpawn.LupoMap {

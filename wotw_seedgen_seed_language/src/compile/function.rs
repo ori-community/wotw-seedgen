@@ -206,6 +206,7 @@ pub(crate) enum FunctionIdentifier {
     WeaponUpgradeString,
     RemoveWeaponUpgradeString,
     CurrentZone,
+    CurrentMapZone,
     SpiritLight,
     RemoveSpiritLight,
     GorlekOre,
@@ -240,6 +241,7 @@ pub(crate) enum FunctionIdentifier {
     SetMessagePosition,
     SetMessageAlignment,
     SetMessageScreenPosition,
+    SetMapMessage,
     Store,
     StoreWithoutTriggers,
     SetBoolean,
@@ -467,6 +469,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::String(weapon_upgrade_string(arg(&mut context)?, true))
             }
             FunctionIdentifier::CurrentZone => Command::Zone(CommandZone::CurrentZone {}),
+            FunctionIdentifier::CurrentMapZone => Command::Zone(CommandZone::CurrentMapZone {}),
             FunctionIdentifier::SpiritLight => {
                 Command::Void(spirit_light(arg(&mut context)?, &mut context.compiler.rng))
             }
@@ -633,6 +636,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     screen_position: arg(&mut context)?,
                 })
             }
+            FunctionIdentifier::SetMapMessage => Command::Void(CommandVoid::SetMapMessage {
+                value: arg(&mut context)?,
+            }),
             FunctionIdentifier::Store => store(true, &mut context)?,
             FunctionIdentifier::StoreWithoutTriggers => store(false, &mut context)?,
             FunctionIdentifier::SetBoolean => Command::Void(CommandVoid::SetBoolean {

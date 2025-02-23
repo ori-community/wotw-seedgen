@@ -21,7 +21,10 @@ Twillen tells the zones holding Bow and Bash")
 
 !include("progress_helper")
 
-!on_event("progress_helper", write_progress_message, {
+!on_event("progress_helper", write_progress_message, write_hints())
+!on_event("progress_helper", write_map_progress_message, write_hints())
+
+fun write_hints() {
     if LupoShop.ShardMapIcon > 0 {
         write_lupo_hint()
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("lupo_hint"))
@@ -34,7 +37,7 @@ Twillen tells the zones holding Bow and Bash")
         write_twillen_hint()
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("twillen_hint"))
     }
-})
+}
 
 fun write_lupo_hint() {
     set_string("burrow_color", "")

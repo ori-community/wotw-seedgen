@@ -182,6 +182,10 @@ impl Compile for input::CommandZone {
                 vec![Command::FetchInteger(UberIdentifier::new(5, 50))],
                 MemoryUsed::ZERO,
             ),
+            Self::CurrentMapZone {} => (
+                vec![Command::FetchInteger(UberIdentifier::new(5, 51))],
+                MemoryUsed::ZERO,
+            ),
         }
     }
 }
@@ -247,6 +251,9 @@ impl Compile for input::CommandVoid {
                 vec![Command::FreeMessageScreenPosition(id, screen_position)],
                 MemoryUsed::ZERO,
             ),
+            Self::SetMapMessage { value } => Args::new(command_lookup)
+                .string(0, value)
+                .call(Command::SetMapMessage),
             Self::StoreBoolean {
                 uber_identifier,
                 value,

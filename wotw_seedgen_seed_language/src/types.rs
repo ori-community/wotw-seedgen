@@ -176,7 +176,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::RemoveCleanWaterString
             | FunctionIdentifier::WeaponUpgradeString => Type::String,
             FunctionIdentifier::RemoveWeaponUpgradeString => Type::String,
-            FunctionIdentifier::CurrentZone => Type::Zone,
+            FunctionIdentifier::CurrentZone | FunctionIdentifier::CurrentMapZone => Type::Zone,
             FunctionIdentifier::SpiritLight
             | FunctionIdentifier::RemoveSpiritLight
             | FunctionIdentifier::GorlekOre
@@ -211,6 +211,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetMessagePosition
             | FunctionIdentifier::SetMessageAlignment
             | FunctionIdentifier::SetMessageScreenPosition
+            | FunctionIdentifier::SetMapMessage
             | FunctionIdentifier::Store
             | FunctionIdentifier::StoreWithoutTriggers
             | FunctionIdentifier::SetString

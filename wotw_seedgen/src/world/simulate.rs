@@ -216,7 +216,7 @@ impl Simulate for CommandZone {
                 commands.simulate(world, output);
                 last.simulate(world, output)
             }
-            CommandZone::CurrentZone {} => Zone::Void,
+            CommandZone::CurrentZone {} | CommandZone::CurrentMapZone {} => Zone::Void,
         }
     }
 }
@@ -288,6 +288,7 @@ impl Simulate for CommandVoid {
             | CommandVoid::FreeMessagePosition { .. }
             | CommandVoid::FreeMessageAlignment { .. }
             | CommandVoid::FreeMessageScreenPosition { .. }
+            | CommandVoid::SetMapMessage { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
             | CommandVoid::Lookup { .. }

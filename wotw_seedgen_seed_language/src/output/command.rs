@@ -160,6 +160,8 @@ pub enum CommandZone {
     },
     /// Return the zone Ori is currently in
     CurrentZone {},
+    /// Return the zone currently selected in the map
+    CurrentMapZone {},
 }
 
 /// Command which returns nothing
@@ -225,6 +227,8 @@ pub enum CommandVoid {
         id: usize,
         screen_position: ScreenPosition,
     },
+    /// Sets the map message content to `value`
+    SetMapMessage { value: CommandString },
     /// Store `value` in `uber_identifier` and check if any events are triggered
     StoreBoolean {
         uber_identifier: UberIdentifier,

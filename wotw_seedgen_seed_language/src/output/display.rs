@@ -167,6 +167,7 @@ impl Display for CommandZone {
                 write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
             }
             CommandZone::CurrentZone {} => write!(f, "current_zone()"),
+            CommandZone::CurrentMapZone {} => write!(f, "current_map_zone()"),
         }
     }
 }
@@ -227,6 +228,7 @@ impl Display for CommandVoid {
                 id,
                 screen_position,
             } => write!(f, "set_message_screen_position({id}, {screen_position})"),
+            CommandVoid::SetMapMessage { value } => write!(f, "set_map_message({value})"),
             CommandVoid::StoreBoolean {
                 uber_identifier,
                 value,
