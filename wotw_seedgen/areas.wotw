@@ -3750,7 +3750,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         DoubleJump, TripleJump
         Grapple, DoubleJump, Dash, Glide
 
-anchor GladesTown.MotayHut at -394, -4136: # In front of the house hovering above Motay
+anchor GladesTown.MotayHut at -394, -4135: # In front of the house hovering above Motay
   nospawn
 
   door:
@@ -3892,7 +3892,7 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
       Sword OR Spear=1 # upslash+downslash
       GrenadeJump
 
-anchor GladesTown.AcornMoki at -347, -4182:  # At the moki near the cave
+anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
   door:
     id: 13
     target: GladesTown.AcornCave
@@ -4669,7 +4669,7 @@ region OuterWellspring:
   kii: free
   unsafe: free
 
-anchor OuterWellspring.EntranceDoor at -856, -4058:  # Outside the door where you enter the first room
+anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where you enter the first room
   door:
     id: 15
     target: InnerWellspring.EntranceDoor
@@ -5021,7 +5021,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
     gorlek: Glide
   conn OuterWellspring.EntranceDoor: free
 
-anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you exit the first room
+anchor OuterWellspring.WestDoor at -892, -3991:  # Outside the door where you exit the first room
   door:
     id: 17
     target: InnerWellspring.WestDoor
@@ -5099,7 +5099,7 @@ anchor OuterWellspring.WestDoor at -892, -3992:  # Outside the door where you ex
     unsafe: free  # tap right to avoid the dboost on the wheel then grab the pole while falling
   conn OuterWellspring.EntranceDoor: free
 
-anchor OuterWellspring.EastDoor at -814, -3973:  # Outside the door leading to the spin puzzle
+anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to the spin puzzle
   door:
     id: 19
     target: InnerWellspring.EastDoor
@@ -5983,7 +5983,7 @@ anchor InnerWellspring.AbovePole at -1164, -3874:  # Under InnerWellspring.Upper
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: free
 
-anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you exit the first room
+anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you exit the first room
   door:
     id: 18
     target: OuterWellspring.WestDoor
@@ -6049,7 +6049,7 @@ anchor InnerWellspring.WestDoor at -1216, -3897:  # Inside the door where you ex
 
   conn InnerWellspring.BelowDrainLever: free
 
-anchor InnerWellspring.EastDoor at -1190, -3733:  # Inside the door leading to the spin puzzle
+anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to the spin puzzle
   door:
     id: 20
     target: OuterWellspring.EastDoor
@@ -6252,7 +6252,7 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
     unsafe:
       Launch  # There is a small ledge on the ceiling to reset launch
 
-anchor InnerWellspring.Teleporter at -1308, -3675:  # At the teleporter
+anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
   door:
     id: 22
     target: OuterWellspring.TopDoor
@@ -6429,7 +6429,7 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
 
 # checkpoint at 525, -4205
 
-anchor WoodsEntry.FamilyHut at 469, -4180: # infront of family reunion hut door
+anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
   nospawn
 
   door:
@@ -13847,7 +13847,7 @@ region WindtornRuins:
   kii: Regenerate
   unsafe: free
 
-anchor WindtornRuins.UpperRuinsDoor at 2163, -3835:  # Just inside the door.
+anchor WindtornRuins.UpperRuinsDoor at 2163, -3834:  # Just inside the door.
   door:
     id: 28
     target: UpperWastes.OutsideRuins
@@ -14193,7 +14193,7 @@ region WillowsEnd:
   kii: Regenerate
   unsafe: free
 
-anchor WillowsEnd.Entry at 495, -3951:  # At the lower door
+anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
   door:
     id: 30
     target: WeepingRidge.WillowEntranceLedge
