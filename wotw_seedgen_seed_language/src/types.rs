@@ -244,7 +244,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::DestroyWheelItem
             | FunctionIdentifier::SwitchWheel
             | FunctionIdentifier::SetWheelPinned
-            | FunctionIdentifier::ClearAllWheels => Type::Void,
+            | FunctionIdentifier::ResetAllWheels => Type::Void,
         };
         Some(ty)
     }

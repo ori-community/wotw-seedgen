@@ -364,6 +364,6 @@ pub enum CommandVoid {
         wheel: usize,
         pinned: CommandBoolean,
     },
-    /// Remove all wheel items
-    ClearAllWheels {},
+    /// Reset all wheel items to their default state
+    ResetAllWheels {},
 }

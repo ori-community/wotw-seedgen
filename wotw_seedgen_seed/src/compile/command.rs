@@ -405,7 +405,7 @@ impl Compile for input::CommandVoid {
             Self::SetWheelPinned { wheel, pinned } => Args::new(command_lookup)
                 .boolean(0, pinned)
                 .call(Command::SetWheelPinned(wheel)),
-            Self::ClearAllWheels {} => (vec![Command::ClearAllWheels], MemoryUsed::ZERO),
+            Self::ResetAllWheels {} => (vec![Command::ResetAllWheels], MemoryUsed::ZERO),
         }
     }
 }

@@ -213,6 +213,6 @@ pub enum Command {
     SwitchWheel(/*wheel*/ usize),
     /// Sets whether `wheel` is pinned based on Boolean Memory 0
     SetWheelPinned(/*wheel*/ usize),
-    /// Remove all wheel items
-    ClearAllWheels,
+    /// Reset all wheel items to their default state
+    ResetAllWheels,
 }

@@ -366,7 +366,7 @@ impl Display for CommandVoid {
             CommandVoid::SetWheelPinned { wheel, pinned } => {
                 write!(f, "set_wheel_pinned({wheel}, {pinned})")
             }
-            CommandVoid::ClearAllWheels {} => write!(f, "clear_all_wheels()"),
+            CommandVoid::ResetAllWheels {} => write!(f, "reset_all_wheels()"),
         }
     }
 }

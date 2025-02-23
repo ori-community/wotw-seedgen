@@ -273,7 +273,7 @@ pub(crate) enum FunctionIdentifier {
     DestroyWheelItem,
     SwitchWheel,
     SetWheelPinned,
-    ClearAllWheels,
+    ResetAllWheels,
 }
 
 impl<'source> Compile<'source> for ast::FunctionCall<'source> {
@@ -815,7 +815,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 wheel: wheel_id(&mut context)?,
                 pinned: arg(&mut context)?,
             }),
-            FunctionIdentifier::ClearAllWheels => Command::Void(CommandVoid::ClearAllWheels {}),
+            FunctionIdentifier::ResetAllWheels => Command::Void(CommandVoid::ResetAllWheels {}),
         };
 
         if let Some(excess) = context.parameters.next() {
