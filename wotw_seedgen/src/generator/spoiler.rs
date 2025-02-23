@@ -1,5 +1,6 @@
 use crate::inventory::Inventory;
 use itertools::Itertools;
+use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
 use wotw_seedgen_data::{Position, Zone};
@@ -11,15 +12,20 @@ use wotw_seedgen_seed_language::output::CommandVoid;
 pub struct SeedSpoiler {
     /// Anchor identifier of all the spawn locations
     pub spawns: Vec<String>,
+    /// For each world, all the door connections
+    ///
+    /// If a world's list of door connections is empty, the doors were not randomized
+    pub doors: Vec<Vec<(String, String)>>,
     /// An ordered list describing the preplaced items
     pub preplacements: Vec<SpoilerPlacement>,
     /// Each [`SpoilerGroup`] represents one "step" of placements
     pub groups: Vec<SpoilerGroup>,
 }
 impl SeedSpoiler {
-    pub(super) fn new(spawns: Vec<String>) -> Self {
+    pub(super) fn new(spawns: Vec<String>, doors: Vec<Vec<(String, String)>>) -> Self {
         Self {
             spawns,
+            doors,
             preplacements: vec![],
             groups: vec![],
         }
@@ -92,7 +98,22 @@ impl Display for SeedSpoiler {
             writeln!(f, "Spawn: {spawn}")?;
         }
 
-        write!(f, "\n\n")?;
+        writeln!(f)?;
+
+        // TODO display loops of two more efficiently
+        for (index, doors) in self.doors.iter().enumerate() {
+            if !doors.is_empty() {
+                let longest_door = doors.iter().map(|(from, _)| from.len()).max().unwrap();
+
+                writeln!(f, "[{index}] Doors:")?;
+
+                for (from, to) in doors {
+                    writeln!(f, "  {from:<longest_door$} to {to}")?;
+                }
+            }
+        }
+
+        writeln!(f)?;
 
         if !self.preplacements.is_empty() {
             writeln!(f, "Preplacements")?;

@@ -150,6 +150,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 WorldContext::new(rng, world, output, index, multiworld)
             })
             .collect::<Result<Vec<_>, _>>()?;
+
         let spawns = worlds
             .iter()
             .map(|world_context| {
@@ -158,7 +159,63 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     .to_string()
             })
             .collect();
-        let spoiler = SeedSpoiler::new(spawns);
+        // TODO is this possible earlier to avoid the need to filter through nodes?
+        // otherwise, it would at least be unnecessary if no world has door randomization
+        let door_identifier_map = worlds[0]
+            .world
+            .graph
+            .nodes
+            .iter()
+            .filter_map(|node| {
+                node.get_anchor().and_then(|anchor| {
+                    anchor
+                        .door
+                        .as_ref()
+                        .map(|door| (door.id, &anchor.identifier))
+                })
+            })
+            .collect::<FxHashMap<_, _>>();
+        let doors = worlds
+            .iter()
+            .map(|world_context| {
+                if world_context
+                    .world
+                    .player
+                    .settings
+                    .randomize_doors
+                    .is_some()
+                {
+                    let mut doors = (1..=32)
+                        .map(|door_id| {
+                            let target_door_id = world_context
+                                .world
+                                .uber_states
+                                .get(UberIdentifier::new(27, door_id))
+                                .as_integer();
+
+                            (door_id, target_door_id)
+                        })
+                        .collect::<Vec<_>>();
+
+                    doors.sort_by_key(|(_, target)| *target);
+
+                    doors
+                        .into_iter()
+                        .map(|(from, to)| {
+                            (
+                                door_identifier_map[&from].clone(),
+                                door_identifier_map[&to].clone(),
+                            )
+                        })
+                        .collect()
+                } else {
+                    vec![]
+                }
+            })
+            .collect();
+        // TODO move some of the above logic into SeedSpoiler::new?
+        let spoiler = SeedSpoiler::new(spawns, doors);
+
         Ok(Self {
             rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
             worlds,

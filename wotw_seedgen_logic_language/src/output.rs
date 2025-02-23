@@ -81,6 +81,18 @@ impl Node {
             _ => false,
         }
     }
+    pub fn get_anchor(&self) -> Option<&Anchor> {
+        match self {
+            Node::Anchor(anchor) => Some(anchor),
+            _ => None,
+        }
+    }
+    pub fn get_anchor_mut(&mut self) -> Option<&mut Anchor> {
+        match self {
+            Node::Anchor(anchor) => Some(anchor),
+            _ => None,
+        }
+    }
     pub fn expect_anchor(&self) -> &Anchor {
         match self {
             Node::Anchor(anchor) => anchor,

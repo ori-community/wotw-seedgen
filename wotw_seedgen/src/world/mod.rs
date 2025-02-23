@@ -41,7 +41,7 @@ pub struct World<'graph, 'settings> {
     pub(crate) player: Player<'settings>,
     pub(crate) uber_states: UberStates,
     pub(crate) logic_states: FxHashSet<usize>,
-    logic_state_map: FxHashMap<UberIdentifier, Vec<usize>>,
+    pub(crate) logic_state_map: FxHashMap<UberIdentifier, Vec<usize>>,
     variables: Variables,
 }
 impl<'graph, 'settings> World<'graph, 'settings> {
