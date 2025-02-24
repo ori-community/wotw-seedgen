@@ -4978,8 +4978,10 @@ anchor OuterWellspring.Basement at -939, -4114:  # Next to the corruption openin
       Damage=15, Water, WaterDash OR Bash OR SwordSJump=1  # Use the wheel above BasementEC. walljump after the damage to regrab the wheel and use the iframes to pass the spikes.
       OuterWellspring.EntranceDoorOpen, Bash OR Grapple
       OuterWellspring.EntranceDoorOpen, SwordSJump=1, Water OR Damage=60
-      OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Damage=15, Water OR Damage=20  # Jump from the small ground on the wheels opening
-      OuterWellspring.EntranceDoorOpen, WaterDash, Combat=WeakSlug, Blaze=2, Water OR Damage=20
+      OuterWellspring.EntranceDoorOpen, WaterDash, Water OR Damage=20:  # Jump from the small ground on the wheels opening
+        Damage=15, Combat=WeakSlug
+      OuterWellspring.EntranceDoorOpen, WaterDash, Water OR Damage=20:
+        Blaze=2, Combat=WeakSlug
 
 anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above the entrance door
   refill Energy=3:
@@ -5100,7 +5102,8 @@ anchor OuterWellspring.WestDoor at -892, -3991:  # Outside the door where you ex
       Grapple, DoubleJump  # grapple the plant on the left, hold up to make it appear on screen
       Grapple, OuterWellspring.WestDoorBlueMoonFree, Dash OR Sword
       Grapple, OuterWellspring.WestDoorBlueMoonFree, Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Grapple, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=15
       Grapple, Bash, Grenade=1, Dash OR Glide OR Sword OR Sentry=2
       Bash, Grenade=1, SentryJump=1, DoubleJump, TripleJump
 
@@ -5798,7 +5801,7 @@ anchor InnerWellspring.DrainAreaEX at -1064, -3961:  # At DrainEX
       Dash, DoubleJump OR Sword OR Hammer
     unsafe:
       Dash, Shuriken=1 OR Flash=1 OR Sentry=1
-      Damage=20, Damage=20, Spear=1
+      Damage=20, Spear=1, Damage=20
       DoubleJump
       WaterDash, Damage=20
 
@@ -5851,7 +5854,8 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
         Bash, Grenade=2
         Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, dboost in spikes instead.
       InnerWellspring.DrainLever:
-        Damage=15, Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1 OR Damage=15
+        Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1 OR Damage=15:
+          Damage=15
         Bash, Grenade=2
         Bash, Grenade=1, Damage=15
       Bash, Grenade=1, Damage=80  # dboost in dirty water. If you drained the water, you can dboost in the spikes instead
@@ -6273,7 +6277,8 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
       Damage=85
       Water, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
         Combat=Miner OR Bash OR Damage=10
-      Damage=60, Combat=Miner, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=60, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+        Combat=Miner
       Damage=60, Bash, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=70, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
@@ -6682,12 +6687,14 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
     kii:
       DoubleJump, Sword, Combat=Balloon OR Damage=20  # Pogo the first balloon
       DoubleJump, Combat=2xBalloon, Damage=15, Glide OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Damage=35, TripleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=20, Damage=35, TripleJump OR Glide OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost 1st balloon, dboost in spikes + energy weapon + dboost 2nd balloon
     unsafe:
       DoubleJump, Sword  # Pogo the first balloon, avoid the second one and kill it with a pogo
       DoubleJump, HammerSJump=1  # DoubleJump + full sword combo + up slash from the breakable wall to reach the left platform
       DoubleJump, TripleJump, Combat=2xBalloon OR Damage=20
       DoubleJump, Dash
+      DoubleJump, Combat=2xBalloon, Damage=15
+      DoubleJump, Damage=20, Damage=35  # dboost 1st balloon, dboost in spikes + dboost 2nd balloon
       Launch  # use launch invincibility to avoid dboost from balloons
   conn WoodsMain.AfterKuMeet:
     moki:
@@ -7022,7 +7029,8 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       Sword OR Hammer OR Sentry=3
       Blaze=3, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Damage=15, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+        Damage=15
     unsafe: free  # Friendly spikes truly are the best friends of rando players
 
 # checkpoint at 824, -4068
@@ -8746,7 +8754,7 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
     moki: Glide
     kii:  # TP out after taking the pickup
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=3 OR Damage=20  # sentry where the two bomb slug are, walljump launch, 2 sentries
-      DoubleJump, TripleJump, Damage=20, Combat=BombSlug, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      DoubleJump, TripleJump, Combat=BombSlug, Damage=20, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
     unsafe:
       Launch, Shuriken=1 OR Flash=1 OR Sentry=1  # shuriken/flash/sentry before using launch
       DoubleJump, TripleJump, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # dboost on the flying spikes, which only deal 10 damages
@@ -12875,13 +12883,15 @@ anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
     kii:
       DoubleJump, Hammer OR Sword  # djump+upslash to climb the wall
       Burrow, Dash OR Hammer OR Shuriken=2
-      Burrow, Damage=30, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Burrow, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+        Damage=30
       Burrow, Glide, Sword OR Flash=2 OR Sentry=2
       Burrow, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # upslash then energy weapon to pass over the spikes
       Grapple, Hammer
       Grapple, Sentry=2, Shuriken=1 OR Damage=30
       Grapple, Glide, Sword OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Grapple, Glide, Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+        Damage=30
       Grapple, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=30  # upslash then energy weapon to pass over the spikes
     unsafe:
       DoubleJump  # precise....? This is another rough path. Can turn it to triple jump to make it freeTM, or can add weapons
@@ -13072,7 +13082,8 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
       Bash, Hammer OR Spear=2  # break the slime's shell and bash it
       Dash, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Dash, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Dash, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=30
     unsafe:
       DoubleJump, Spear=1
       Hammer, Spear=1
@@ -13206,7 +13217,8 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Grapple  # Grapple the wheel to avoid combat requirement.
     kii:
       Damage=40  # dboost in the spikes and the gorlek
-      Damage=30, Combat=MaceMiner+Mantis OR Bash
+      Combat=MaceMiner+Mantis OR Bash:
+        Damage=30
       DoubleJump, Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2
       Bash, Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Sentry=2
 
@@ -13762,10 +13774,12 @@ anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of 
       # 2.a Reach the bashable lantern, take a dboost in the spikes under the 2nd sand bag in order to reach it
       # 2.b Use a bashnade in order to land on the ledge above the sand bag and simply djump to the 2nd sand bag
       # Then Bashnade + djump to reach the ore
-      Bash, Grenade=2, DoubleJump, Damage=30, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.a + 2.a
-      Bash, Grenade=2, DoubleJump, Glide, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b (with glide) + 2.a
+      Bash, Damage=30, Grenade=2, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:  # 1.a + 2.a
+        Damage=30
+      Bash, Grenade=2, DoubleJump, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:  # 1.b (with glide) + 2.a
+        Damage=30
       Bash, Grenade=2, DoubleJump, Sentry=3, Damage=30  # 1.b (2 sentries) + 2.a
-      Bash, Grenade=3, DoubleJump, Damage=30  # 1.a + 2.b
+      Bash, Damage=30, Grenade=3, DoubleJump  # 1.a + 2.b
       Bash, Grenade=3, DoubleJump, Glide OR Sentry=2  # 1.b + 2.b
       Bash, Grenade=4, DoubleJump  # 1.b (bashnade near the spikes) + 2.b
 
@@ -13799,16 +13813,16 @@ anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of 
       # 3.a Reach the second lantern and reach OutsideRuins from there
       # 3.b Use a bashnade to land in the spikes above the sand bag and djump from there to OutsideRuins
       Bash, Grenade=1, DoubleJump, Burrow OR TripleJump OR Dash OR Hammer  # 1.b + 2.a (but you can avoid the dboost) + 3.a
-      Bash, Grenade=1, DoubleJump, Damage=30, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # 1.a + 2.a + 3.a
+      Bash, Damage=30, Grenade=1, DoubleJump, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # 1.a + 2.a + 3.a
       Bash, Grenade=1, DoubleJump, Glide, Damage=30, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # 1.b (with glide) + 2.a + 3.a
       Bash, Grenade=1, DoubleJump, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b (with sword) + 2.a (energy to reach the lantern, avoid the dboost with an upslash) + 3.a (upslash to reach the lantern)
       Bash, Grenade=1, DoubleJump, Sentry=4, Damage=30  # 1.b (2 sentries) + 2.a + 3.a
-      Bash, Grenade=2, DoubleJump, Damage=30, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.a + 2.b + 3.a
+      Bash, Damage=30, Grenade=2, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.a + 2.b + 3.a
       Bash, Grenade=2, DoubleJump, Sword  # 1.b + 2.b + 3.a
       Bash, Grenade=2, DoubleJump, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b + 2.b + 3.a
       Bash, Grenade=2, DoubleJump, Sentry=3  # 1.b (2 sentries) + 2.b + 3.a
       Bash, Grenade=3, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # 1.b (bashnade near the spikes) + 2.b + 3.a
-      Bash, Grenade=3, DoubleJump, Damage=30, Damage=30  # 1.a + 2.b + 3.b
+      Bash, Damage=30, Grenade=3, DoubleJump, Damage=30  # 1.a + 2.b + 3.b
       Bash, Grenade=3, DoubleJump, Glide  # 1.b + 2.b + 3.b (but you can avoid the dboost with glide)
       Bash, Grenade=3, DoubleJump, Sentry=2, Damage=30  # 1.b (2 sentries) + 2.b + 3.b
       Bash, Grenade=4, DoubleJump, Damage=30  # 1.b (bashnade near the spikes) + 2.b + 3.b
