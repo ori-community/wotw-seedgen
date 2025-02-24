@@ -13070,16 +13070,16 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
       Grapple, DoubleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=30
       Bash, Grenade=1
       Bash, Hammer OR Spear=2  # break the slime's shell and bash it
-      Dash, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Dash, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+      Dash, Spear=2 OR Flash=2 OR Sentry=2
+      Dash, Glide, Spear=1 OR Flash=1 OR Sentry=1
+      Dash, Spear=1 OR Flash=1 OR Sentry=1:
         Damage=30
     unsafe:
       DoubleJump, Spear=1
       Hammer, Spear=1
       Bash, Spear=1  # break the slime's shell and bash it
       Dash  # Coyote dash from the top of the pot
-      Glide  # climb on the sand pot from the right then hover
+      Glide OR PauseHover  # climb on the sand pot from the right then hover
 
 anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitEX
   refill Checkpoint
