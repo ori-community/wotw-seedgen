@@ -272,7 +272,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     gorlek: ShurikenBreak=16
     unsafe: HammerBreak OR SpearBreak
   state MarshSpawn.CaveFight:
-    Combat=3xLizard  # at day there's two extra lizards
+    moki: Combat=3xLizard  # at day there's two extra lizards
 
   quest MarshSpawn.CaveKS:
     moki:
@@ -363,11 +363,15 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
     kii:
       Burrow, Water, Sword OR Hammer OR Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
       Burrow, Damage=40
-      Burrow, Damage=30, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Burrow, WaterDash, Damage=20, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Burrow, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=30
+      Burrow, WaterDash, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=20
     unsafe:
-      Burrow, WaterDash, Damage=10, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap=1
-      Burrow, Damage=20, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap=1  # burrow as you exit the sand to exit the water before the 2nd water tick
+      Burrow, WaterDash, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap=1:
+        Damage=10
+      Burrow, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseHover OR BlazeSwap=1:  # burrow as you exit the sand to exit the water before the 2nd water tick
+        Damage=20
       Burrow, Water, PauseHover OR BlazeSwap=1
 
 anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the door blocking Life Pact
@@ -422,6 +426,12 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Damage=40
     unsafe:
       DoubleJump, TripleJump  # more hardcore parkour
+      # The following path use a projectile to reach the first lantern
+      Bash, Damage=10 OR Blaze=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR PauseHover
+      # Same path as above, but dboost before the first lantern
+      # Bash, Damage=20  # dboost before the first lantern, and at the end
+      # Bash, Damage=10, Blaze=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1  # dboost before the first lantern
+      # Bash, Shuriken=2 OR Sentry=2 OR Flash=2
 
   conn MarshSpawn.BeforeBurrows:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -436,7 +446,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Launch, DoubleJump, Shuriken=1
       Launch, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # energy stall harder if you bonk into the ceiling inbetween the bashable plant but that actually reset your launch
       Launch, Sword, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Bash, Damage=10, Sword OR Hammer  # use upsalsh inbetween the two lanterns. Not mandatory but players will probably use it there.
+      Bash, Damage=10, Sword OR Hammer  # use upslash inbetween the two lanterns. Not mandatory but players will probably use it there.
       Bash, Damage=10, Shuriken=3 OR Sentry=3  # one before the first lantern, one inbetween the two lantern (not mandatory) and a final one with a bash glide
       Bash, Damage=20, Blaze=3 OR Flash=2  # disable Flash inbetween the two lanterns
       Bash, Spear=3, Damage=30  # two dboost before the first lantern (because spear momentum can screw you up) and one at the end with a bash glide
@@ -444,6 +454,10 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
     unsafe:
       Bash, Sword OR Hammer
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseHover  # use a projectile to reach the first lantern
+      # Same paths as above, but dboost before the first lantern
+      # Bash, Damage=20  # dboost before the first lantern, and at the end
+      # Bash, Damage=10, Blaze=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1  # dboost before the first lantern
+      # Bash, Shuriken=2 OR Sentry=2 OR Flash=2
       Launch  # Enough ledges to regain launch
       DoubleJump, TripleJump  # hardcore parkour
       GrenadeJump, DoubleJump, Bash OR Glide OR Damage=10 OR PauseHover  # Triple Grenade Jump is possible but redundant
@@ -462,7 +476,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Combat=Bat+Slug, Damage=10, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Damage=10, DoubleJump OR Sword OR Hammer  # dboost on the bat's projectile
       Damage=10, Combat=Slug, Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3  # dboost on bat's projectile
-      Damage=10, Damage=10, Combat=Slug, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # dboost on bat's projectile then  in the spikes inbetween the slime and the bat
+      Damage=10, Damage=10, Combat=Slug, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # dboost on bat's projectile then in the spikes inbetween the slime and the bat
       Bash, Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
       Bash, Damage=10, Damage=10 OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe: free  # microledge at the spikes above the slime
@@ -1057,7 +1071,8 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
       Water, WaterDash, HammerSJump=1
     kii:
       Hammer
-      Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+      Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10
       Sentry=3  # two sentries in the air to avoid spikes
       WaterDash, Damage=10, Damage=10
       HowlsDen.RainLifted, Bash, Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
@@ -1124,7 +1139,7 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
       Glide OR Sword OR Hammer OR Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
       Damage=10, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
-          Damage=10
+        Damage=10
       Bash, Shuriken=2 OR Flash=2 OR Sentry=2  # Bash the slug to reach the suspended platform. No Spear because it one shot the slug in easy
       Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
     unsafe:
@@ -3691,13 +3706,17 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Dash, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, TripleJump OR Dash
       Sword, DoubleJump, Damage=10
-      Combat=2xWeakSlug, DoubleJump, Damage=20, Blaze=1 OR Damage=10
-      Combat=2xWeakSlug, DoubleJump, Damage=10, Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Combat=2xWeakSlug, DoubleJump, Damage=10 OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1:
+        Damage=20
+      Combat=2xWeakSlug, DoubleJump, Damage=10 OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1:
+        Damage=10, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer
       Combat=2xWeakSlug, DoubleJump, Glide, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, Damage=20
+      Combat=2xWeakSlug, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10
       SwordSJump=1, Damage=10
       HammerSJump=1, Damage=20
       Dash, Hammer
@@ -3962,8 +3981,10 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
         Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
         Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That partcular water only deals 4 damage per tic
         WaterDash, Damage=16, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
-        WaterDash, Damage=26, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
-        Damage=42, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
+        WaterDash, Damage=10, Shuriken=1 OR Sentry=2 OR Blaze=2:
+          Damage=16
+        Damage=10, Shuriken=1 OR Sentry=2 OR Blaze=2:
+          Damage=32
         Water, Damage=10, Damage=10
         Damage=10, Damage=42
         WaterDash, Damage=10, Damage=26
@@ -4350,7 +4371,10 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
     kii:
       DoubleJump, TripleJump, Bash OR Damage=20  # With Bash, use a tentacle projectile
       DoubleJump, TripleJump, Damage=10, Dash OR Glide OR Sword OR Hammer
-      DoubleJump, Damage=30, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2:
+        Damage=10
+      DoubleJump, Damage=20, Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10
       Grapple, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, DoubleJump
@@ -4429,10 +4453,12 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
       SentryJump=1, Dash
     kii:
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      Combat=Tentacle, Damage=10:
-        DoubleJump, Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
-        DoubleJump, Damage=10, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
-        Damage=40, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+      DoubleJump, Damage=30, Combat=Tentacle, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
+      DoubleJump, Damage=20, Combat=Tentacle, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
+      Damage=50, Combat=Tentacle, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+      # Same paths as above, but extra 10 damage because of the enemy
+      DoubleJump, Damage=40, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
+      DoubleJump, Damage=30, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
     unsafe:
       DoubleJump, Sword, Damage=10
       SentryJump=1  # pogo on tentacle
@@ -4581,7 +4607,8 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       HammerSJump=1, Glide OR Damage=20
     kii:
       Sword
-      Damage=20, Hammer OR Sentry=2 OR Damage=20
+      Hammer OR Sentry=2 OR Damage=20:
+        Damage=20
       Bash, Grenade=1, Hammer OR Sentry=2
       Hammer, Glide OR Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
       Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -4838,7 +4865,8 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
       Bash, Grenade=1, Glide
       Bash, Grenade=2, Sword OR Damage=20
     kii:
-      Damage=20, Bash OR DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Damage=20
+      Bash OR DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Damage=20:
+        Damage=20
       Hammer, DoubleJump OR Dash
       Dash, Glide, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Glide  # Bash glide from the slime on the wooden platform
@@ -11176,7 +11204,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
 
   pickup EastPools.TwoCrushersEX:
     moki: Water, WaterDash
-    kii, WaterDash, Damage=40
+    kii: WaterDash, Damage=40
     unsafe:
       Water OR Damage=100
       WaterDash, Damage=20
@@ -12422,7 +12450,7 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
 
 anchor UpperPools.DrainPuzzleRight at -1324, -4060:  # On the ground next to the energy cristal
   refill Energy=3:
-     moki: BreakCrystal
+    moki: BreakCrystal
   refill Health=1
 
   # TODO: optimize water damage with underwater TP
@@ -12695,7 +12723,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
   pickup WestPools.BurrowOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
     kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
-    unsafe: WestPools.ForestsStrength:
+    unsafe, WestPools.ForestsStrength:
       Water, Burrow
       Damage=80, Damage=60, Damage=80, WaterDash, Burrow
 
