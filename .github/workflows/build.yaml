@@ -1,0 +1,40 @@
+name: build
+
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          rustflags: ""
+
+      - name: Build Seedgen
+        run: cargo build -p wotw_seedgen_cli --release --all-features
+
+      - name: Archive Linux Artifacts
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: seedgen-linux
+          path: ./target/release/seedgen
+          if-no-files-found: error
+
+      - name: Archive Windows Artifacts
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: seedgen-windows
+          path: ./target/release/seedgen.exe
+          if-no-files-found: error
