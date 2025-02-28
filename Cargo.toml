@@ -7,6 +7,7 @@ members = [
     "wotw_seedgen_derive",
     "wotw_seedgen_data",
     "wotw_seedgen_logic_language",
+    "wotw_seedgen_lsp",
     "wotw_seedgen_parse",
     "wotw_seedgen_seed",
     "wotw_seedgen_seed_language",

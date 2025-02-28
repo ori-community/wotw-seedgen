@@ -1,0 +1,13 @@
+[package]
+name = "wotw_seedgen_lsp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dashmap = "5.5.3"
+rand = { version = "0.8.5", default-features = false, features = ["std"] }
+tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread", "io-std"] }
+tower-lsp = "0.20.0"
+wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language" }
+wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["file_access"] }
+wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets", features = ["uber_state_data", "snippets"]}

@@ -18,7 +18,7 @@
 }
 
 !if shriek_escape_health_bar {
-    // TODO enable on spawn store(randoConfig.keepShriekHealthBarDuringEscape, true)
+    on spawn store(randoConfig.keepShriekHealthBarDuringEscape, true)
 }
 
 !if teleport_refill {

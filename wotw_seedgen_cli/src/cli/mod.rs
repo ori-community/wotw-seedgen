@@ -64,6 +64,8 @@ pub enum Cli {
         #[command(flatten)]
         args: RegenerateArgs,
     },
+    /// Start a language server
+    Lsp,
 }
 
 #[cfg(test)]
