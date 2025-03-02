@@ -1,6 +1,6 @@
-pub use crate::output::intermediate::Literal;
+pub use crate::output::Literal;
 
-use crate::ast;
+use crate::ast::{self, CommandArg};
 use rustc_hash::FxHashMap;
 use wotw_seedgen_parse::Recoverable;
 
@@ -93,27 +93,36 @@ impl ExtractMetadata for ast::Annotation<'_> {
 }
 impl ExtractMetadata for ast::Command<'_> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
-        match self {
-            ast::Command::Config(_, args) => {
-                if let Some(config) = extract_args(args) {
-                    let default = match config.default.data {
-                        ast::Literal::Boolean(value) => Literal::Boolean(value),
-                        ast::Literal::Integer(value) => Literal::Integer(value),
-                        ast::Literal::Float(value) => Literal::Float(value),
-                        _ => return,
-                    };
+        let ast::Command::Config(_, args) = self else {
+            return;
+        };
 
-                    let value = ConfigValue {
-                        description: config.description.data.to_string(),
-                        default,
-                    };
-                    metadata
-                        .config
-                        .insert(config.identifier.data.to_string(), value);
-                }
-            }
-            _ => {}
-        }
+        let Some(config) = extract_args(args) else {
+            return;
+        };
+
+        let (Some(default), Some(description)) = (
+            extract_command_arg(&config.default),
+            extract_command_arg(&config.description),
+        ) else {
+            return;
+        };
+
+        let default = match default.data {
+            ast::Literal::Boolean(value) => Literal::Boolean(value),
+            ast::Literal::Integer(value) => Literal::Integer(value),
+            ast::Literal::Float(value) => Literal::Float(value),
+            _ => return,
+        };
+
+        let value = ConfigValue {
+            description: description.data.to_string(),
+            default,
+        };
+
+        metadata
+            .config
+            .insert(config.identifier.data.to_string(), value);
     }
 }
 
@@ -123,4 +132,11 @@ fn extract_args<Args>(args: &ast::CommandArgs<Args>) -> Option<&Args> {
         .and_then(|args| args.content.as_ref())
         .ok()
         .map(|args| &args.0)
+}
+
+fn extract_command_arg<T>(arg: &CommandArg<T>) -> Option<&T> {
+    arg.result
+        .as_ref()
+        .and_then(|(_, arg)| arg.result.as_ref())
+        .ok()
 }

@@ -1,15 +1,19 @@
 use std::{mem, ops::Range};
 use tower_lsp::lsp_types::{SemanticToken, SemanticTokenType, SemanticTokensLegend};
-use wotw_seedgen_seed_language::ast::{
-    Action, ActionCondition, AddArgs, Annotation, BuiltinIconArgs, BundleIconArgs,
-    ChangeItemPoolArgs, Command, CommandIf, CommandRepeat, ConfigArgs, Content, CountInZoneArgs,
-    CountInZoneBinding, Delimited, Event, EventArgs, ExportArgs, Expression, ExpressionValue,
-    FunctionCall, FunctionDefinition, IncludeArgs, ItemDataArgs, ItemDataDescriptionArgs,
-    ItemDataIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-    OnEventArgs, Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs, RandomFromPoolArgs,
-    RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveArgs, Result,
-    Separated, SeparatedNonEmpty, SetLogicStateArgs, Snippet, Span, Spanned, SpawnArgs, StateArgs,
-    TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier, ZoneOfArgs,
+use wotw_seedgen_seed_language::{
+    ast::{
+        Action, ActionCondition, AddArgs, Annotation, BuiltinIconArgs, BundleIconArgs,
+        ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
+        Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event, EventArgs, ExportArgs,
+        Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, ItemDataArgs,
+        ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
+        LetArgs, Literal, OnEventArgs, Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs,
+        RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable,
+        RemoveArgs, Result, Separated, SeparatedNonEmpty, SetLogicStateArgs, Snippet, Span,
+        Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
+        UberStateType, ZoneOfArgs,
+    },
+    types::Type,
 };
 
 use crate::convert;
@@ -93,6 +97,10 @@ impl<'source> TokenBuilder<'source> {
     fn finish(self) -> Vec<SemanticToken> {
         self.tokens
     }
+}
+
+fn command_arg_value<T>(arg: CommandArg<T>) -> Option<T> {
+    arg.result.and_then(|(_, arg)| arg.result).ok()
 }
 
 trait Tokens {
@@ -288,6 +296,13 @@ impl Tokens for FunctionCall<'_> {
         self.parameters.tokens(builder);
     }
 }
+impl<T: Tokens> Tokens for CommandArg<T> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        if let Ok((_, t)) = self.result {
+            t.tokens(builder);
+        }
+    }
+}
 impl Tokens for Command<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -444,7 +459,9 @@ impl Tokens for EventArgs<'_> {
 impl Tokens for OnEventArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.snippet_name.tokens(builder);
-        builder.push_token(self.identifier.span, TokenType::Variable);
+        if let Some(identifier) = command_arg_value(self.identifier) {
+            builder.push_token(identifier.span(), TokenType::Variable);
+        }
         self.action.tokens(builder);
     }
 }
@@ -468,20 +485,32 @@ impl Tokens for ConfigArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.description.tokens(builder);
-        builder.push_token(self.ty.span, TokenType::Type);
+        self.ty.tokens(builder);
         self.default.tokens(builder);
+    }
+}
+impl Tokens for Spanned<ConfigType> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        builder.push_token(self.span, TokenType::Type);
     }
 }
 impl Tokens for StateArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
-        builder.push_token(self.ty.span, TokenType::Type);
+        self.ty.tokens(builder);
+    }
+}
+impl Tokens for Spanned<UberStateType> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        builder.push_token(self.span, TokenType::Type);
     }
 }
 impl Tokens for TimerArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.toggle_identifier.span, TokenType::Variable);
-        builder.push_token(self.timer_identifier.span, TokenType::Variable);
+        if let Some(timer_identifier) = command_arg_value(self.timer_identifier) {
+            builder.push_token(timer_identifier.span, TokenType::Variable);
+        }
     }
 }
 impl Tokens for LetArgs<'_> {
@@ -607,14 +636,21 @@ impl Tokens for RandomNumberArgs<'_> {
 impl Tokens for RandomPoolArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
-        builder.push_token(self.ty.span, TokenType::Type);
+        self.ty.tokens(builder);
         self.values.tokens(builder);
+    }
+}
+impl Tokens for Spanned<Type> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        builder.push_token(self.span, TokenType::Type);
     }
 }
 impl Tokens for RandomFromPoolArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
-        builder.push_token(self.pool_identifier.span, TokenType::Variable);
+        if let Some(pool_identifier) = command_arg_value(self.pool_identifier) {
+            builder.push_token(pool_identifier.span, TokenType::Variable);
+        }
     }
 }
 impl Tokens for FunctionDefinition<'_> {

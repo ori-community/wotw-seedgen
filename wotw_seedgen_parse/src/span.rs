@@ -68,6 +68,16 @@ pub trait Span {
     fn span(&self) -> Range<usize>;
 }
 
+/// Similar to [`Span`], but only determines the start index
+pub trait SpanStart {
+    fn span_start(&self) -> usize;
+}
+
+/// Similar to [`Span`], but only determines the end index
+pub trait SpanEnd {
+    fn span_end(&self) -> usize;
+}
+
 impl Span for Range<usize> {
     #[inline]
     fn span(&self) -> Range<usize> {
@@ -92,6 +102,88 @@ impl<T: Span> Span for Box<T> {
         (**self).span()
     }
 }
+impl<T: Span> Span for Result<T> {
+    #[inline]
+    fn span(&self) -> Range<usize> {
+        match self {
+            Ok(t) => t.span(),
+            Err(err) => err.span.clone(),
+        }
+    }
+}
+
+impl<T: SpanStart> SpanStart for &T {
+    #[inline]
+    fn span_start(&self) -> usize {
+        T::span_start(self)
+    }
+}
+impl<T: SpanStart> SpanStart for &mut T {
+    #[inline]
+    fn span_start(&self) -> usize {
+        T::span_start(self)
+    }
+}
+impl<T: SpanStart> SpanStart for Box<T> {
+    #[inline]
+    fn span_start(&self) -> usize {
+        (**self).span_start()
+    }
+}
+impl<T: SpanStart> SpanStart for Result<T> {
+    #[inline]
+    fn span_start(&self) -> usize {
+        match self {
+            Ok(t) => t.span_start(),
+            Err(err) => err.span.start,
+        }
+    }
+}
+
+impl<T: SpanEnd> SpanEnd for &T {
+    #[inline]
+    fn span_end(&self) -> usize {
+        T::span_end(self)
+    }
+}
+impl<T: SpanEnd> SpanEnd for &mut T {
+    #[inline]
+    fn span_end(&self) -> usize {
+        T::span_end(self)
+    }
+}
+impl<T: SpanEnd> SpanEnd for Box<T> {
+    #[inline]
+    fn span_end(&self) -> usize {
+        (**self).span_end()
+    }
+}
+impl<T: SpanEnd> SpanEnd for Result<T> {
+    #[inline]
+    fn span_end(&self) -> usize {
+        match self {
+            Ok(t) => t.span_end(),
+            Err(err) => err.span.end,
+        }
+    }
+}
+
+impl<T1: SpanStart, T2: SpanEnd> Span for (T1, T2) {
+    #[inline]
+    fn span(&self) -> Range<usize> {
+        self.span_start()..self.span_end()
+    }
+}
+impl<T1: SpanStart, T2> SpanStart for (T1, T2) {
+    fn span_start(&self) -> usize {
+        self.0.span_start()
+    }
+}
+impl<T1, T2: SpanEnd> SpanEnd for (T1, T2) {
+    fn span_end(&self) -> usize {
+        self.1.span_end()
+    }
+}
 
 /// [`Ast`] node storing the span of the parsed content alongside the wrapped content itself
 ///
@@ -113,6 +205,18 @@ impl<T> Span for Spanned<T> {
     #[inline]
     fn span(&self) -> Range<usize> {
         self.span.clone()
+    }
+}
+impl<T> SpanStart for Spanned<T> {
+    #[inline]
+    fn span_start(&self) -> usize {
+        self.span.start
+    }
+}
+impl<T> SpanEnd for Spanned<T> {
+    #[inline]
+    fn span_end(&self) -> usize {
+        self.span.end
     }
 }
 impl<'source, T, V> Ast<'source, T> for Spanned<V>

@@ -1,4 +1,4 @@
-use crate::{Ast, Parser, Result, Span, Tokenize};
+use crate::{Ast, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
 use derivative::Derivative;
 use std::{fmt::Debug, marker::PhantomData, ops::Range};
 
@@ -131,9 +131,22 @@ where
     V: Span,
 {
     fn span(&self) -> Range<usize> {
-        match &self.result {
-            Ok(v) => v.span(),
-            Err(err) => err.span.clone(),
-        }
+        self.result.span()
+    }
+}
+impl<V, R> SpanStart for Recoverable<V, R>
+where
+    V: SpanStart,
+{
+    fn span_start(&self) -> usize {
+        self.result.span_start()
+    }
+}
+impl<V, R> SpanEnd for Recoverable<V, R>
+where
+    V: SpanEnd,
+{
+    fn span_end(&self) -> usize {
+        self.result.span_end()
     }
 }

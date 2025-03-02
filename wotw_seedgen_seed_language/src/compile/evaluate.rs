@@ -2,9 +2,8 @@ use super::{expression::CompileInto, SnippetCompiler};
 use crate::{
     ast,
     output::{
-        intermediate::{Constant, Literal},
         Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone,
-        StringOrPlaceholder,
+        StringOrPlaceholder, {Constant, Literal},
     },
 };
 use ordered_float::OrderedFloat;

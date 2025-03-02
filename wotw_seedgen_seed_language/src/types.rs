@@ -4,16 +4,16 @@ use crate::{
         Operation, Operator, UberStateType,
     },
     compile::{FunctionIdentifier, SnippetCompiler},
-    output::intermediate::{self, ConstantDiscriminants},
+    output::{self, ConstantDiscriminants},
     token::Tokenizer,
 };
 use serde::Deserialize;
-use strum::Display;
+use strum::{Display, VariantArray};
 use wotw_seedgen_assets::{UberStateData, UberStateValue};
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_parse::{Ast, Identifier, Once, Result, Spanned};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Display, Ast)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Display, VariantArray, Ast)]
 pub enum Type {
     UberIdentifier,
     Boolean,
@@ -63,7 +63,7 @@ impl From<UberStateType> for Type {
     }
 }
 
-pub fn uber_state_type(
+pub(crate) fn uber_state_type(
     uber_state_data: &UberStateData,
     uber_identifier: UberIdentifier,
 ) -> Option<UberStateType> {
@@ -265,7 +265,7 @@ impl Expression<'_> {
             }
             Expression::Value(ExpressionValue::Identifier(identifier)) => {
                 match compiler.resolve(identifier)? {
-                    intermediate::Literal::UberIdentifier(uber_state) => match uber_state.value {
+                    output::Literal::UberIdentifier(uber_state) => match uber_state.value {
                         None => {
                             let uber_identifier = uber_state.uber_identifier;
                             compiler.uber_state_type(uber_identifier, identifier)
@@ -321,48 +321,44 @@ impl InferType for Constant<'_> {
 }
 impl InferType for Spanned<Identifier<'_>> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
-        compiler
-            .resolve(self)
-            .map(intermediate::Literal::literal_type)
+        compiler.resolve(self).map(output::Literal::literal_type)
     }
 }
-impl intermediate::Literal {
-    pub fn literal_type(&self) -> Type {
+impl output::Literal {
+    pub(crate) fn literal_type(&self) -> Type {
         match self {
-            intermediate::Literal::UberIdentifier(uber_state) => match uber_state.value {
+            output::Literal::UberIdentifier(uber_state) => match uber_state.value {
                 None => Type::UberIdentifier,
                 Some(_) => Type::Boolean,
             },
-            intermediate::Literal::Boolean(_) => Type::Boolean,
-            intermediate::Literal::Integer(_) => Type::Integer,
-            intermediate::Literal::Float(_) => Type::Float,
-            intermediate::Literal::String(_) => Type::String,
-            intermediate::Literal::Constant(constant) => constant.literal_type(),
-            intermediate::Literal::IconAsset(_) | intermediate::Literal::CustomIcon(_) => {
-                Type::Icon
-            }
+            output::Literal::Boolean(_) => Type::Boolean,
+            output::Literal::Integer(_) => Type::Integer,
+            output::Literal::Float(_) => Type::Float,
+            output::Literal::String(_) => Type::String,
+            output::Literal::Constant(constant) => constant.literal_type(),
+            output::Literal::IconAsset(_) | output::Literal::CustomIcon(_) => Type::Icon,
         }
     }
 }
-impl intermediate::Constant {
-    pub fn literal_type(&self) -> Type {
+impl output::Constant {
+    pub(crate) fn literal_type(&self) -> Type {
         match self {
-            intermediate::Constant::Skill(_) => Type::Skill,
-            intermediate::Constant::Shard(_) => Type::Shard,
-            intermediate::Constant::Teleporter(_) => Type::Teleporter,
-            intermediate::Constant::WeaponUpgrade(_) => Type::WeaponUpgrade,
-            intermediate::Constant::Equipment(_) => Type::Equipment,
-            intermediate::Constant::Zone(_) => Type::Zone,
-            intermediate::Constant::OpherIcon(_) => Type::OpherIcon,
-            intermediate::Constant::LupoIcon(_) => Type::LupoIcon,
-            intermediate::Constant::GromIcon(_) => Type::GromIcon,
-            intermediate::Constant::TuleyIcon(_) => Type::TuleyIcon,
-            intermediate::Constant::MapIcon(_) => Type::MapIcon,
-            intermediate::Constant::EquipSlot(_) => Type::EquipSlot,
-            intermediate::Constant::WheelItemPosition(_) => Type::WheelItemPosition,
-            intermediate::Constant::WheelBind(_) => Type::WheelBind,
-            intermediate::Constant::Alignment(_) => Type::Alignment,
-            intermediate::Constant::ScreenPosition(_) => Type::ScreenPosition,
+            output::Constant::Skill(_) => Type::Skill,
+            output::Constant::Shard(_) => Type::Shard,
+            output::Constant::Teleporter(_) => Type::Teleporter,
+            output::Constant::WeaponUpgrade(_) => Type::WeaponUpgrade,
+            output::Constant::Equipment(_) => Type::Equipment,
+            output::Constant::Zone(_) => Type::Zone,
+            output::Constant::OpherIcon(_) => Type::OpherIcon,
+            output::Constant::LupoIcon(_) => Type::LupoIcon,
+            output::Constant::GromIcon(_) => Type::GromIcon,
+            output::Constant::TuleyIcon(_) => Type::TuleyIcon,
+            output::Constant::MapIcon(_) => Type::MapIcon,
+            output::Constant::EquipSlot(_) => Type::EquipSlot,
+            output::Constant::WheelItemPosition(_) => Type::WheelItemPosition,
+            output::Constant::WheelBind(_) => Type::WheelBind,
+            output::Constant::Alignment(_) => Type::Alignment,
+            output::Constant::ScreenPosition(_) => Type::ScreenPosition,
         }
     }
 }
@@ -375,7 +371,7 @@ impl InferType for Operation<'_> {
     }
 }
 
-pub fn common_type(left: Type, right: Type) -> Option<Type> {
+pub(crate) fn common_type(left: Type, right: Type) -> Option<Type> {
     if left == right {
         return Some(left);
     }

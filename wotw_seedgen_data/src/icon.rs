@@ -1,5 +1,5 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString};
+use strum::{Display, VariantArray, EnumString};
 
 /// Icons used in the Opher shop
 #[derive(
@@ -15,6 +15,7 @@ use strum::{Display, EnumString};
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum OpherIcon {
@@ -45,6 +46,7 @@ pub enum OpherIcon {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum LupoIcon {
@@ -66,6 +68,7 @@ pub enum LupoIcon {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum GromIcon {
@@ -91,6 +94,7 @@ pub enum GromIcon {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum TuleyIcon {
@@ -116,6 +120,7 @@ pub enum TuleyIcon {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum MapIcon {

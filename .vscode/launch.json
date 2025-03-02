@@ -14,7 +14,7 @@
       "type": "lldb",
       "request": "attach",
       "name": "Attach to CLI",
-      "program": "${workspaceFolder}/seedgen.exe"
+      "pid": "${input:pickSeedgenProcess}"
     },
     {
       "type": "lldb",
@@ -24,6 +24,16 @@
         "args": ["test", "--no-run", "--package=wotw_seedgen"]
       },
       "cwd": "${workspaceFolder}/wotw_seedgen"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "pickSeedgenProcess",
+      "type": "command",
+      "command": "lldb.pickProcess",
+      "args": {
+        "filter": "seedgen"
+      }
     }
   ]
 }

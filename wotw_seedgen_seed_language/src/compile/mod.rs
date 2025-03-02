@@ -8,17 +8,15 @@ mod preprocess;
 
 pub use function::{
     clean_water, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot, skill,
-    spirit_light, teleporter, weapon_upgrade,
+    spirit_light, teleporter, weapon_upgrade, FunctionIdentifier,
 };
-
-pub(crate) use function::FunctionIdentifier;
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
     ast::{self, UberStateType},
     output::{
-        intermediate::Literal, ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger,
-        CommandVoid, IntermediateOutput, Operation, SnippetDebugOutput,
+        ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid,
+        IntermediateOutput, Literal, Operation, SnippetDebugOutput,
     },
     token::TOKENIZER,
     types::uber_state_type,

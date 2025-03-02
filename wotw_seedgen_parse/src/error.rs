@@ -56,9 +56,14 @@ impl Error {
     /// Some of the provided `errors` may be discarded in an attempt to improve the resulting error message
     /// if some branches progressed further before failing than others.
     pub fn all_failed(mut errors: Vec<Self>) -> Self {
-        let farthest = errors.iter().map(|err| err.span.start).max().unwrap_or(0);
+        let (earliest, farthest) = errors
+            .iter()
+            .map(|err| err.span.start)
+            .minmax()
+            .into_option()
+            .unwrap();
         errors.retain(|err| err.span.start == farthest);
-        let span = errors[0].span.clone();
+        let span = earliest..errors[0].span.end;
         let mut errors: Vec<ErrorKind> = errors
             .into_iter()
             .flat_map(|err| match err.kind {

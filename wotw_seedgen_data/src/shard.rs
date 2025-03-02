@@ -1,6 +1,6 @@
 use crate::UberIdentifier;
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString, FromRepr};
+use strum::{Display, VariantArray, EnumString, FromRepr};
 
 /// Spirit Shards
 ///
@@ -20,6 +20,7 @@ use strum::{Display, EnumString, FromRepr};
     Display,
     EnumString,
     FromRepr,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum Shard {

@@ -1,5 +1,5 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString};
+use strum::{Display, EnumString, VariantArray};
 
 /// Available slots for [`Equipment`] (the stuff displayed at the bottom between your energy and health)
 #[derive(
@@ -15,6 +15,7 @@ use strum::{Display, EnumString};
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum EquipSlot {
@@ -41,6 +42,7 @@ pub enum EquipSlot {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u16)]
 pub enum Equipment {

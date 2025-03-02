@@ -1,13 +1,13 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
     ast,
-    output::intermediate::{Constant, ConstantDiscriminants, Literal},
+    output::{Constant, ConstantDiscriminants, Literal},
 };
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_parse::{Error, Span};
+use wotw_seedgen_parse::{Error, Identifier, Span, Spanned};
 
 impl<'source> Compile<'source> for ast::Literal<'source> {
     type Output = Option<Literal>;
@@ -55,10 +55,12 @@ impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
 impl ast::UberIdentifier<'_> {
     pub(crate) fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         match self {
-            ast::UberIdentifier::Numeric(numeric) => Some(UberStateAlias {
-                uber_identifier: UberIdentifier::new(numeric.group.data, numeric.member.data),
-                value: None,
-            }),
+            ast::UberIdentifier::Numeric(numeric) => compiler
+                .consume_result(numeric.member.result.clone())
+                .map(|member| UberStateAlias {
+                    uber_identifier: UberIdentifier::new(numeric.group.data, member.data),
+                    value: None,
+                }),
             ast::UberIdentifier::Name(name) => name.resolve(compiler),
         }
     }
@@ -78,23 +80,26 @@ impl ast::UberIdentifierName<'_> {
             );
             compiler.errors.push(error);
         }
+
+        let member = compiler.consume_result(self.member.result.clone());
+
         let group = group?;
-        let ids = group.get(self.member.data.0);
+        let member = member?;
+        let ids = group.get(member.data.0);
         if ids.is_none() {
-            let mut error =
-                Error::custom("Unknown UberState member".to_string(), self.member.span());
+            let mut error = Error::custom("Unknown UberState member".to_string(), member.span());
 
             let other_groups = compiler
                 .global
                 .uber_state_data
                 .name_lookup
                 .iter()
-                .filter(|(_, v)| v.contains_key(self.member.data.0))
-                .map(|(group_name, _)| format!("\"{}.{}\"", group_name, self.member.data.0))
+                .filter(|(_, v)| v.contains_key(member.data.0))
+                .map(|(group_name, _)| format!("\"{}.{}\"", group_name, member.data.0))
                 .collect::<Vec<_>>();
 
             error.help = if other_groups.is_empty() {
-                suggestion(self.member.data.0, group.keys())
+                suggestion(member.data.0, group.keys())
             } else {
                 let help = if other_groups.len() == 1 {
                     format!("It exists in another group: {}", other_groups[0])
@@ -131,76 +136,80 @@ impl<'source> Compile<'source> for ast::Constant<'source> {
                 "Unknown Constant Kind".to_string(), // TODO more helpful pls?
                 self.kind.span,
             )
-        }))?;
-        let variant = self.variant.data.0;
+        }));
+        let variant = compiler.consume_result(self.variant.result);
+
+        let kind = kind?;
+        let Spanned {
+            data: Identifier(variant),
+            span,
+        } = variant?;
 
         // TODO list possible variants on wrong input?
         let constant = match kind {
             ConstantDiscriminants::Skill => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown Skill".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown Skill".to_string(), span))
                 .map(Constant::Skill),
             ConstantDiscriminants::Shard => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown Shard".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown Shard".to_string(), span))
                 .map(Constant::Shard),
             ConstantDiscriminants::Teleporter => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown Teleporter".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown Teleporter".to_string(), span))
                 .map(Constant::Teleporter),
             ConstantDiscriminants::WeaponUpgrade => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown WeaponUpgrade".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown WeaponUpgrade".to_string(), span))
                 .map(Constant::WeaponUpgrade),
             ConstantDiscriminants::Equipment => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown Equipment".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown Equipment".to_string(), span))
                 .map(Constant::Equipment),
             ConstantDiscriminants::Zone => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown Zone".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown Zone".to_string(), span))
                 .map(Constant::Zone),
             ConstantDiscriminants::OpherIcon => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown OpherIcon".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown OpherIcon".to_string(), span))
                 .map(Constant::OpherIcon),
             ConstantDiscriminants::LupoIcon => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown LupoIcon".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown LupoIcon".to_string(), span))
                 .map(Constant::LupoIcon),
             ConstantDiscriminants::GromIcon => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown GromIcon".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown GromIcon".to_string(), span))
                 .map(Constant::GromIcon),
             ConstantDiscriminants::TuleyIcon => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown TuleyIcon".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown TuleyIcon".to_string(), span))
                 .map(Constant::TuleyIcon),
             ConstantDiscriminants::MapIcon => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown MapIcon".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown MapIcon".to_string(), span))
                 .map(Constant::MapIcon),
             ConstantDiscriminants::EquipSlot => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown EquipSlot".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown EquipSlot".to_string(), span))
                 .map(Constant::EquipSlot),
             ConstantDiscriminants::WheelItemPosition => variant
                 .parse()
-                .map_err(|_| {
-                    Error::custom("Unknown WheelItemPosition".to_string(), self.variant.span)
-                })
+                .map_err(|_| Error::custom("Unknown WheelItemPosition".to_string(), span))
                 .map(Constant::WheelItemPosition),
             ConstantDiscriminants::WheelBind => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown WheelBind".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown WheelBind".to_string(), span))
                 .map(Constant::WheelBind),
             ConstantDiscriminants::Alignment => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown Alignment".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown Alignment".to_string(), span))
                 .map(Constant::Alignment),
             ConstantDiscriminants::ScreenPosition => variant
                 .parse()
-                .map_err(|_| Error::custom("Unknown ScreenPosition".to_string(), self.variant.span))
+                .map_err(|_| Error::custom("Unknown ScreenPosition".to_string(), span))
                 .map(Constant::ScreenPosition),
         };
         compiler.consume_result(constant)

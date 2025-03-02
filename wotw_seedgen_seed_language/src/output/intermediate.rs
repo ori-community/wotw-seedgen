@@ -1,7 +1,7 @@
 use super::StringOrPlaceholder;
 use ordered_float::OrderedFloat;
 use std::fmt::{self, Display};
-use strum::{EnumDiscriminants, EnumString};
+use strum::{Display, EnumDiscriminants, EnumString, VariantArray};
 use wotw_seedgen_assets::UberStateAlias;
 
 // TODO is this still used for anything other than variables?
@@ -17,7 +17,7 @@ pub enum Literal {
     CustomIcon(String),
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
-#[strum_discriminants(derive(EnumString))]
+#[strum_discriminants(derive(EnumString, Display, VariantArray))]
 pub enum Constant {
     Skill(wotw_seedgen_data::Skill),
     Shard(wotw_seedgen_data::Shard),

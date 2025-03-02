@@ -1,6 +1,6 @@
 use crate::{Equipment, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString, FromRepr};
+use strum::{Display, EnumString, FromRepr, VariantArray};
 
 /// Skills, sometimes also called Abilities
 ///
@@ -20,6 +20,7 @@ use strum::{Display, EnumString, FromRepr};
     Display,
     EnumString,
     FromRepr,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum Skill {

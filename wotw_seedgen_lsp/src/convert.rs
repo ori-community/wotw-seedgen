@@ -1,27 +1,43 @@
 use std::ops::Range;
 
-use tower_lsp::lsp_types;
+use tower_lsp::{jsonrpc::Result, lsp_types};
 
-pub fn range_from_lsp(range: lsp_types::Range, document: &str) -> Option<Range<usize>> {
+use crate::error;
+
+pub fn range_from_lsp(range: lsp_types::Range, document: &str) -> Result<Range<usize>> {
     // TODO optimization: end > start, we are wasting time going through all the lines up to start twice
     // similar for range_to_lsp
-    Some(position_from_lsp(range.start, document)?..position_from_lsp(range.end, document)?)
+    Ok(position_from_lsp(range.start, document)?..position_from_lsp(range.end, document)?)
 }
 
-pub fn position_from_lsp(position: lsp_types::Position, document: &str) -> Option<usize> {
-    let line = document.lines().nth(position.line as usize)?;
-    let line_position = line.as_ptr() as usize - document.as_ptr() as usize;
+pub fn position_from_lsp(position: lsp_types::Position, document: &str) -> Result<usize> {
+    // If the document ends with a newline and the position is at the end of the document,
+    // position.line will refer to the empty "line" after, which would be out of bounds
+    // when using lines() or split_inclusive('\n').
+    let line_position = if position.line == 0 {
+        0
+    } else {
+        let previous_line_end = document
+            .match_indices('\n')
+            .nth((position.line - 1) as usize)
+            .ok_or_else(|| error::position_out_of_bounds(position, document))?
+            .0;
+        previous_line_end + 1
+    };
+    // We'll return once we reached position.character, so as long as we receive a
+    // well formed position, we won't go past the target line.
+    let line = &document[line_position..];
 
     let mut utf16_offset = position.character as usize;
     for (index, char) in line.char_indices() {
         let len = char.len_utf16();
         if utf16_offset < len {
-            return Some(line_position + index);
+            return Ok(line_position + index);
         }
         utf16_offset -= len;
     }
 
-    Some(line_position + line.len())
+    Ok(line_position + line.len())
 }
 
 pub fn range_to_lsp(range: Range<usize>, document: &str) -> lsp_types::Range {
@@ -56,7 +72,7 @@ fn convert() {
     let multiline = "aaa\nbbb\nccc";
     assert_eq!(
         position_from_lsp(lsp_types::Position::new(1, 1), multiline),
-        Some(5)
+        Ok(5)
     );
     assert_eq!(
         position_to_lsp(5, multiline),
@@ -66,7 +82,7 @@ fn convert() {
     let wide_chars = "🦀🦀🦀";
     assert_eq!(
         position_from_lsp(lsp_types::Position::new(0, 4), wide_chars),
-        Some(8)
+        Ok(8)
     );
     assert_eq!(
         position_to_lsp(8, wide_chars),

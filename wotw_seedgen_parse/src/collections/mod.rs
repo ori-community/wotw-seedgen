@@ -6,8 +6,8 @@ pub use delimited::Delimited;
 pub use punctuated::Punctuated;
 pub use separated::{Separated, SeparatedNonEmpty};
 
-use crate::{Ast, Error, Parser, Result, Tokenize};
-use std::ops::ControlFlow;
+use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
+use std::ops::{ControlFlow, Range};
 
 pub trait AstCollection<'source, T: Tokenize>: AstCollectionInit<'source, T> {
     fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>>;
@@ -60,7 +60,12 @@ where
         match V::ast(parser) {
             Ok(value) => {
                 self.push(value);
-                ControlFlow::Continue(())
+
+                if parser.is_finished() {
+                    ControlFlow::Break(None)
+                } else {
+                    ControlFlow::Continue(())
+                }
             }
             Err(err) => ControlFlow::Break(Some(err)),
         }
@@ -95,5 +100,20 @@ where
 {
     fn ast_item(&mut self, _parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>> {
         ControlFlow::Break(None)
+    }
+}
+impl<V: Span> Span for Once<V> {
+    fn span(&self) -> Range<usize> {
+        self.0.span()
+    }
+}
+impl<V: SpanStart> SpanStart for Once<V> {
+    fn span_start(&self) -> usize {
+        self.0.span_start()
+    }
+}
+impl<V: SpanEnd> SpanEnd for Once<V> {
+    fn span_end(&self) -> usize {
+        self.0.span_end()
     }
 }

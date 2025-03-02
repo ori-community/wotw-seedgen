@@ -1,7 +1,7 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
     ast::{self, TriggerBinding},
-    output::{intermediate::Literal, Command, CommandVoid, Event, Trigger},
+    output::{Command, CommandVoid, Event, Literal, Trigger},
 };
 use wotw_seedgen_parse::{Error, Span};
 
@@ -53,6 +53,8 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
         match self {
             ast::Trigger::ClientEvent(client) => Some(Trigger::ClientEvent(client.data)),
             ast::Trigger::Binding(_, binding) => {
+                let binding = compiler.consume_result(binding.result)?;
+
                 let span = binding.span();
 
                 let uber_state = match binding {

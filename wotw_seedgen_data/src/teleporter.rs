@@ -2,7 +2,7 @@ use std::fmt::{self, Display};
 
 use crate::{uber_identifier::teleporter, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::EnumString;
+use strum::{VariantArray, EnumString};
 
 /// Spirit Wells which exist in the base game
 #[derive(
@@ -17,6 +17,7 @@ use strum::EnumString;
     Deserialize_repr,
     Serialize_repr,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum Teleporter {

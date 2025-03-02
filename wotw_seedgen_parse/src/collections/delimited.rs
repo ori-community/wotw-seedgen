@@ -1,6 +1,7 @@
 use super::AstCollection;
-use crate::{Ast, Error, Parser, Result, Span, Tokenize};
+use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
+    any::type_name,
     ops::{ControlFlow, Range},
     vec,
 };
@@ -20,68 +21,80 @@ where
 {
     fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
         let open = Open::ast(parser)?;
-        let content = (|| {
-            let mut content = Content::ast_first(parser)?;
+
+        let mut content = Content::ast_first(parser);
+
+        let mut close = if let Ok(content) = &mut content {
             loop {
                 match Close::ast(parser) {
-                    Ok(close) => return Ok((content, close)),
+                    Ok(close) => break Ok(close),
                     Err(close_err) => {
                         if let ControlFlow::Break(err) = content.ast_item(parser) {
-                            return match err {
-                                None => Close::ast(parser).map(|close| (content, close)),
+                            match err {
+                                None => break Close::ast(parser),
                                 Some(content_err) => {
-                                    Err(Error::all_failed(vec![close_err, content_err]))
+                                    break Err(Error::all_failed(vec![close_err, content_err]))
                                 }
-                            };
+                            }
+                        } else if parser.is_finished() {
+                            panic!(
+                                "{}::ast_item entered an infinite loop",
+                                type_name::<Content>()
+                            );
                         }
                     }
                 }
             }
-        })();
-        let s = match content {
-            Ok((content, close)) => Self {
-                open,
-                content: Ok(content),
-                close: Ok(close),
-            },
-            Err(err) => {
-                let mut depth: u16 = 1;
-                let close = loop {
-                    match Close::ast(parser) {
-                        Ok(close) => {
-                            depth -= 1;
-                            if depth == 0 {
-                                break Ok(close);
-                            }
-                        }
-                        Err(close_err) => {
-                            if Open::ast(parser).is_ok() {
-                                depth += 1;
-                            } else {
-                                parser.step();
-                            }
-                            if parser.is_finished() {
-                                break Err(close_err);
-                            }
-                        }
-                    }
-                };
-                Self {
-                    open,
-                    content: Err(err),
-                    close,
-                }
-            }
+        } else {
+            Close::ast(parser)
         };
-        Ok(s)
+
+        if close.is_err() {
+            let mut depth: u16 = 1;
+            close = loop {
+                match Close::ast(parser) {
+                    Ok(close) => {
+                        depth -= 1;
+                        if depth == 0 {
+                            break Ok(close);
+                        }
+                    }
+                    Err(close_err) => {
+                        if Open::ast(parser).is_ok() {
+                            depth += 1;
+                        } else {
+                            parser.step();
+                        }
+                        if parser.is_finished() {
+                            break Err(close_err);
+                        }
+                    }
+                }
+            };
+        }
+
+        Ok(Self {
+            open,
+            content,
+            close,
+        })
     }
 }
-impl<Open: Span, Content, Close: Span> Span for Delimited<Open, Content, Close> {
+impl<Open: SpanStart, Content, Close: SpanEnd> Span for Delimited<Open, Content, Close> {
+    #[inline]
     fn span(&self) -> Range<usize> {
-        let open_span = self.open.span();
-        match &self.close {
-            Ok(close) => open_span.start..close.span().end,
-            Err(_) => open_span,
-        }
+        self.span_start()..self.span_end()
+    }
+}
+impl<Open: SpanStart, Content, Close> SpanStart for Delimited<Open, Content, Close> {
+    #[inline]
+    fn span_start(&self) -> usize {
+        self.open.span_start()
+    }
+}
+impl<Open, Content, Close: SpanEnd> SpanEnd for Delimited<Open, Content, Close> {
+    #[inline]
+    fn span_end(&self) -> usize {
+        self.close.span_end()
     }
 }

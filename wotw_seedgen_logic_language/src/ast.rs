@@ -3,7 +3,7 @@ use ordered_float::OrderedFloat;
 use std::ops::Range;
 use wotw_seedgen_parse::{
     parse_ast, Ast, ErrorKind, Identifier, NoTrailingInput, Parser, Recover, Recoverable, Result,
-    Separated, SeparatedNonEmpty, Span, Spanned, Symbol,
+    Separated, SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned, Symbol,
 };
 
 pub fn parse<'source, V>(source: &'source str) -> NoTrailingInput<V>
@@ -211,10 +211,19 @@ pub struct Refill<'source> {
 }
 impl Span for Refill<'_> {
     fn span(&self) -> Range<usize> {
-        let kind_span = &self.value.span;
+        self.span_start()..self.span_end()
+    }
+}
+impl SpanStart for Refill<'_> {
+    fn span_start(&self) -> usize {
+        self.value.span_start()
+    }
+}
+impl SpanEnd for Refill<'_> {
+    fn span_end(&self) -> usize {
         match &self.requirements {
-            None => kind_span.clone(),
-            Some(requirements) => kind_span.start..requirements.span().end,
+            None => self.value.span_end(),
+            Some(requirements) => requirements.span_end(),
         }
     }
 }
@@ -358,15 +367,23 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
 }
 impl Span for RequirementLine<'_> {
     fn span(&self) -> Range<usize> {
-        let start = self.ands.first().map_or_else(
-            || self.ors.first.span().start,
-            |(first, _)| first.span().start,
-        );
-        let end = self
-            .group
-            .as_ref()
-            .map_or_else(|| self.ors.last().span().end, |group| group.span().end);
-        start..end
+        self.span_start()..self.span_end()
+    }
+}
+impl SpanStart for RequirementLine<'_> {
+    fn span_start(&self) -> usize {
+        match self.ands.first() {
+            None => self.ors.span_start(),
+            Some((first, _)) => first.span_start(),
+        }
+    }
+}
+impl SpanEnd for RequirementLine<'_> {
+    fn span_end(&self) -> usize {
+        match &self.group {
+            None => self.ors.span_end(),
+            Some(group) => group.span_end(),
+        }
     }
 }
 
@@ -389,10 +406,19 @@ pub struct PlainRequirement<'source> {
 }
 impl Span for PlainRequirement<'_> {
     fn span(&self) -> Range<usize> {
-        let identifier_span = &self.identifier.span;
+        self.span_start()..self.span_end()
+    }
+}
+impl SpanStart for PlainRequirement<'_> {
+    fn span_start(&self) -> usize {
+        self.identifier.span_start()
+    }
+}
+impl SpanEnd for PlainRequirement<'_> {
+    fn span_end(&self) -> usize {
         match &self.amount {
-            None => identifier_span.clone(),
-            Some(amount) => identifier_span.start..amount.value.span().end,
+            None => self.identifier.span_end(),
+            Some(amount) => amount.span_end(),
         }
     }
 }
@@ -405,11 +431,20 @@ pub struct Enemy<'source> {
 }
 impl Span for Enemy<'_> {
     fn span(&self) -> Range<usize> {
-        let identifier_span = &self.identifier.span;
+        self.span_start()..self.span_end()
+    }
+}
+impl SpanStart for Enemy<'_> {
+    fn span_start(&self) -> usize {
         match &self.amount {
-            None => identifier_span.clone(),
-            Some(amount) => amount.value.span.start..identifier_span.end,
+            None => self.identifier.span_start(),
+            Some(amount) => amount.span_start(),
         }
+    }
+}
+impl SpanEnd for Enemy<'_> {
+    fn span_end(&self) -> usize {
+        self.identifier.span_end()
     }
 }
 #[derive(Debug, Clone, PartialEq, Ast, Span)]

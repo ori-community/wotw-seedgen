@@ -16,7 +16,9 @@ use std::{
     path::{Path, PathBuf},
 };
 use wotw_seedgen_assets::{SnippetAccess, Source};
-use wotw_seedgen_parse::{parse_ast, Delimited, Identifier, Punctuated, Spanned, Symbol};
+use wotw_seedgen_parse::{
+    parse_ast, Delimited, Identifier, Punctuated, Recoverable, Spanned, Symbol,
+};
 use wotw_seedgen_static_assets::UBER_STATE_DATA;
 
 #[test]
@@ -28,10 +30,10 @@ fn uber_identifier() {
             span: 3..6,
         },
         separator: Symbol::<'|'>,
-        member: Spanned {
+        member: Recoverable::new(Ok(Spanned {
             data: 786,
             span: 9..12,
-        },
+        })),
     };
     let uber_identifier = parse_ast(source, TOKENIZER).parsed;
     assert_eq!(uber_identifier, Ok(expected.clone()));
@@ -45,10 +47,10 @@ fn uber_identifier() {
             span: 3..13,
         },
         period: Symbol::<'.'>,
-        member: Spanned {
+        member: Recoverable::new(Ok(Spanned {
             data: Identifier("TuleySpawned"),
             span: 16..28,
-        },
+        })),
     };
     let uber_identifier = parse_ast(source, TOKENIZER).parsed;
     assert_eq!(uber_identifier, Ok(expected.clone()));
@@ -102,10 +104,10 @@ fn function_call() {
                                 span: 4..13,
                             },
                             period: Symbol::<'.'>,
-                            member: Spanned {
+                            member: Recoverable::new(Ok(Spanned {
                                 data: Identifier("BlueMoon"),
                                 span: 14..22,
-                            },
+                            })),
                         })),
                         span: 4..22,
                     })),

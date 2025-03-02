@@ -1,13 +1,14 @@
 mod command;
 mod display;
 mod event;
-pub(crate) mod intermediate;
+mod intermediate;
 mod operation;
 
 pub use command::{
     Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
 };
 pub use event::{ClientEvent, Event, Trigger};
+pub use intermediate::{Constant, ConstantDiscriminants, Literal};
 pub use operation::{ArithmeticOperator, Comparator, EqualityComparator, LogicOperator, Operation};
 
 use rustc_hash::{FxHashMap, FxHashSet};

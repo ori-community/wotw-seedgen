@@ -18,8 +18,7 @@ use wotw_seedgen_static_assets::{
 };
 
 lazy_static! {
-    pub static ref AREAS: Areas<'static> =
-        parse(include_str!("../areas.wotw")).into_result().unwrap();
+    static ref AREAS: Areas<'static> = parse(include_str!("../areas.wotw")).into_result().unwrap();
 }
 
 fn logic_parsing(c: &mut Criterion) {

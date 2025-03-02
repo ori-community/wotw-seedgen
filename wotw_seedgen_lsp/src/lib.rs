@@ -1,27 +1,31 @@
+mod completion;
 mod convert;
+mod error;
 mod folder_access;
 mod semantic_tokens;
 
 use std::fmt::Display;
 
-use dashmap::{mapref::one::Ref, DashMap};
+use completion::Completion;
+use dashmap::{
+    mapref::one::{Ref, RefMut},
+    DashMap,
+};
 use folder_access::{url_to_path, FolderAccess};
 use semantic_tokens::{semantic_tokens, semantic_tokens_legend};
 use tower_lsp::{
-    jsonrpc::{Error, Result},
+    jsonrpc::Result,
     lsp_types::{
-        Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams, DidOpenTextDocumentParams,
-        DidSaveTextDocumentParams, InitializeParams, InitializeResult, MessageType, SemanticTokens,
-        SemanticTokensFullOptions, SemanticTokensOptions, SemanticTokensParams,
-        SemanticTokensResult, SemanticTokensServerCapabilities, ServerCapabilities,
-        TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+        CompletionOptions, CompletionParams, CompletionResponse, Diagnostic, DiagnosticSeverity,
+        DidChangeTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
+        InitializeParams, InitializeResult, MessageType, SemanticTokens, SemanticTokensFullOptions,
+        SemanticTokensOptions, SemanticTokensParams, SemanticTokensResult,
+        SemanticTokensServerCapabilities, ServerCapabilities, ServerInfo, TextDocumentItem,
+        TextDocumentPositionParams, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     },
     Client, LanguageServer, LspService, Server,
 };
-use wotw_seedgen_seed_language::{
-    ast::{self, Snippet},
-    compile::Compiler,
-};
+use wotw_seedgen_seed_language::{ast, compile::Compiler};
 use wotw_seedgen_static_assets::UBER_STATE_DATA;
 
 struct Backend {
@@ -40,16 +44,46 @@ impl Backend {
     fn get_text_document<'s>(&'s self, url: &Url) -> Result<Ref<'s, Url, String>> {
         self.text_documents
             .get(url)
-            .ok_or(Error::invalid_params(format!(
-                "unknown text document \"{url}\""
-            )))
+            .ok_or(error::unknown_text_document(url))
+    }
+
+    fn get_text_document_mut<'s>(&'s self, url: &Url) -> Result<RefMut<'s, Url, String>> {
+        self.text_documents
+            .get_mut(url)
+            .ok_or(error::unknown_text_document(url))
+    }
+
+    fn get_text_document_position<'s>(
+        &'s self,
+        text_document_position: TextDocumentPositionParams,
+    ) -> Result<(Ref<'s, Url, String>, usize)> {
+        let TextDocumentPositionParams {
+            text_document,
+            position,
+        } = text_document_position;
+        let source = self.get_text_document(&text_document.uri)?;
+        let position = convert::position_from_lsp(position, source.value())?;
+
+        Ok((source, position))
+    }
+
+    async fn error<M: Display>(&self, message: M) {
+        self.client.log_message(MessageType::ERROR, message).await;
+    }
+
+    async fn warn<M: Display>(&self, message: M) {
+        self.client.log_message(MessageType::WARNING, message).await;
+    }
+
+    async fn log<M: Display>(&self, message: M) {
+        self.client.log_message(MessageType::INFO, message).await;
     }
 
     async fn consume_result<T, E: Display>(&self, result: std::result::Result<T, E>) -> Option<T> {
         match result {
             Ok(t) => Some(t),
             Err(err) => {
-                self.client.log_message(MessageType::WARNING, err).await;
+                self.error(err).await;
                 None
             }
         }
@@ -111,11 +145,22 @@ impl Backend {
 #[tower_lsp::async_trait]
 impl LanguageServer for Backend {
     async fn initialize(&self, _: InitializeParams) -> Result<InitializeResult> {
+        self.log("received initialize 👋").await;
+
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
                     TextDocumentSyncKind::INCREMENTAL,
                 )),
+                completion_provider: Some(CompletionOptions {
+                    trigger_characters: Some(
+                        ('0'..='9')
+                            .chain(['|', '.', ':', '!', '#'])
+                            .map(|c| c.to_string())
+                            .collect(),
+                    ),
+                    ..Default::default()
+                }),
                 semantic_tokens_provider: Some(
                     SemanticTokensServerCapabilities::SemanticTokensOptions(
                         SemanticTokensOptions {
@@ -127,39 +172,83 @@ impl LanguageServer for Backend {
                 ),
                 ..Default::default()
             },
-            server_info: None,
+            server_info: Some(ServerInfo {
+                name: "wotw_seedgen_lsp".to_string(),
+                version: Some(env!("CARGO_PKG_VERSION").to_string()),
+            }),
         })
     }
 
+    async fn shutdown(&self) -> Result<()> {
+        self.log("received shutdown 😵").await;
+
+        self.text_documents.clear();
+
+        Ok(())
+    }
+
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
-        self.text_documents
-            .insert(params.text_document.uri.clone(), params.text_document.text);
-        self.update_diagnostics(params.text_document.uri).await;
+        let TextDocumentItem { uri, text, .. } = params.text_document;
+
+        self.log(format!("received textDocument/didOpen for \"{uri}\""))
+            .await;
+
+        self.text_documents.insert(uri.clone(), text);
+        self.update_diagnostics(uri).await;
     }
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
-        if let Some(mut text_document) = self.text_documents.get_mut(&params.text_document.uri) {
-            for content_change in params.content_changes {
-                match content_change
-                    .range
-                    .and_then(|range| convert::range_from_lsp(range, &text_document))
-                {
-                    None => *text_document.value_mut() = content_change.text,
-                    Some(range) => text_document.replace_range(range, &content_change.text),
+        let uri = params.text_document.uri;
+
+        self.log(format!("received textDocument/didChange for \"{uri}\""))
+            .await;
+
+        let mut text_document = match self.get_text_document_mut(&uri) {
+            Ok(text_document) => text_document,
+            Err(err) => {
+                self.warn(err).await;
+                return;
+            }
+        };
+
+        for content_change in params.content_changes {
+            match content_change.range {
+                None => *text_document.value_mut() = content_change.text,
+                Some(range) => {
+                    let Some(range) = self
+                        .consume_result(convert::range_from_lsp(range, &text_document))
+                        .await
+                    else {
+                        continue;
+                    };
+
+                    text_document.replace_range(range, &content_change.text)
                 }
             }
         }
     }
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
-        self.update_diagnostics(params.text_document.uri).await;
+        let uri = params.text_document.uri;
+
+        self.log(format!("received textDocument/didSave for \"{uri}\""))
+            .await;
+
+        self.update_diagnostics(uri).await;
     }
 
     async fn semantic_tokens_full(
         &self,
         params: SemanticTokensParams,
     ) -> Result<Option<SemanticTokensResult>> {
-        let source = self.get_text_document(&params.text_document.uri)?;
+        let uri = params.text_document.uri;
 
-        let ast = ast::parse::<Snippet>(source.value());
+        self.log(format!(
+            "received textDocument/semanticTokens/full for \"{uri}\""
+        ))
+        .await;
+
+        let source = self.get_text_document(&uri)?;
+
+        let ast = ast::parse::<ast::Snippet>(source.value());
         let data = semantic_tokens(source.value(), ast.parsed);
 
         Ok(Some(SemanticTokensResult::Tokens(SemanticTokens {
@@ -168,8 +257,24 @@ impl LanguageServer for Backend {
         })))
     }
 
-    async fn shutdown(&self) -> Result<()> {
-        Ok(())
+    async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
+        self.log(format!(
+            "received textDocument/completion for \"{uri}\"",
+            uri = params.text_document_position.text_document.uri
+        ))
+        .await;
+
+        let (source, mut index) = self.get_text_document_position(params.text_document_position)?;
+        // index is the cursor position, we want to offer completions for whatever was typed before.
+        // Since completions are requested after entering something, this shouldn't be 0,
+        // but if it is, we just won't find any completion to provide.
+        index -= 1;
+
+        let ast = ast::parse::<ast::Snippet>(source.value());
+
+        let completion = ast.completion(index);
+
+        Ok(completion.map(CompletionResponse::Array))
     }
 }
 

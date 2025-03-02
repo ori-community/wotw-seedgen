@@ -1,5 +1,5 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString};
+use strum::{Display, VariantArray, EnumString};
 
 /// Positioning in a weapon wheel like menu
 #[derive(
@@ -15,6 +15,7 @@ use strum::{Display, EnumString};
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum WheelItemPosition {
@@ -45,6 +46,7 @@ pub enum WheelItemPosition {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum WheelBind {

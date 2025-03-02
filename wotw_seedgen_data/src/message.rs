@@ -1,5 +1,5 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString};
+use strum::{Display, VariantArray, EnumString};
 
 /// Text alignment in messages
 #[derive(
@@ -15,6 +15,7 @@ use strum::{Display, EnumString};
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum Alignment {
@@ -37,6 +38,7 @@ pub enum Alignment {
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum ScreenPosition {

@@ -10,7 +10,7 @@ use convert_case::{Case, Casing};
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
 use std::ops::Range;
-use strum::EnumString;
+use strum::{Display, EnumString, VariantArray};
 use wotw_seedgen_data::{
     uber_identifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WheelBind,
 };
@@ -171,9 +171,9 @@ fn warp_icon_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.warp_icon_ids.id(id))
 }
 
-#[derive(EnumString)]
+#[derive(EnumString, Display, VariantArray)]
 #[strum(serialize_all = "snake_case")]
-pub(crate) enum FunctionIdentifier {
+pub enum FunctionIdentifier {
     Fetch,
     IsInHitbox,
     GetBoolean,
@@ -289,18 +289,23 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     compiler.errors.push(Error::custom(
                     "parameters for custom functions aren't (yet) supported".to_string(),
                     parameters.first().unwrap().span().start..parameters.last.as_ref().unwrap().span().end,
-                ).with_help("Use set commands for the values you want to pass and get them again in the function".to_string()))
+                ).with_help("Use set functions for the values you want to pass and get them again in the function".to_string()))
                 }
             }
             return Some(Command::Void(CommandVoid::Lookup { index }));
         }
+
         let identifier =
-            compiler.consume_result(self.identifier.data.0.parse().map_err(|_| {
-                Error::custom("Unknown function".to_string(), self.identifier.span)
-            }))?;
+            compiler.consume_result(
+                self.identifier.data.0.parse().map_err(|_| {
+                    Error::custom("Unknown function".to_string(), self.identifier.span)
+                }),
+            );
 
         let span = self.parameters.span();
         let content = compiler.consume_result(self.parameters.content)?;
+
+        let identifier = identifier?;
 
         let span = match &content.last {
             Some(last) => content.first().unwrap().span().start..last.span().end,

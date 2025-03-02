@@ -4,7 +4,7 @@ use crate::{
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
-use strum::Display;
+use strum::{Display, VariantArray};
 use wotw_seedgen_parse::parse_ast;
 
 pub use wotw_seedgen_parse::{
@@ -38,6 +38,24 @@ impl<'source> Recover<'source, Tokenizer> for RecoverContent {
         }
     }
 }
+pub struct RecoverPass;
+impl<'source> Recover<'source, Tokenizer> for RecoverPass {
+    fn recover(_parser: &mut Parser<'source, Tokenizer>) {}
+}
+pub struct RecoverSkipExpression;
+impl<'source> Recover<'source, Tokenizer> for RecoverSkipExpression {
+    fn recover(parser: &mut Parser<'source, Tokenizer>) {
+        let _ = Expression::ast(parser);
+    }
+}
+pub struct RecoverCommandArg;
+impl<'source> Recover<'source, Tokenizer> for RecoverCommandArg {
+    fn recover(parser: &mut Parser<'source, Tokenizer>) {
+        while !(parser.is_finished() || matches!(parser.current_slice(), "," | ")")) {
+            parser.step()
+        }
+    }
+}
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub enum Content<'source> {
     Event(Spanned<On>, Recoverable<Event<'source>, RecoverContent>),
@@ -66,10 +84,15 @@ pub struct Event<'source> {
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub enum Trigger<'source> {
     ClientEvent(Spanned<ClientEvent>),
-    Binding(Spanned<Change>, TriggerBinding<'source>),
+    Binding(
+        Spanned<Change>,
+        Recoverable<TriggerBinding<'source>, RecoverSkipExpression>,
+    ),
     Condition(Expression<'source>),
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, Serialize, Deserialize, VariantArray,
+)]
 #[ast(case = "snake")]
 #[strum(serialize_all = "snake_case")]
 pub enum ClientEvent {
@@ -274,19 +297,19 @@ pub enum UberIdentifier<'source> {
 pub struct UberIdentifierNumeric {
     pub group: Spanned<i32>,
     pub separator: Symbol<'|'>,
-    pub member: Spanned<i32>,
+    pub member: Recoverable<Spanned<i32>, RecoverPass>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct UberIdentifierName<'source> {
     pub group: Spanned<Identifier<'source>>,
     pub period: Symbol<'.'>,
-    pub member: Spanned<Identifier<'source>>,
+    pub member: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct Constant<'source> {
     pub kind: Spanned<Identifier<'source>>,
     pub separator: Variant,
-    pub variant: Spanned<Identifier<'source>>,
+    pub variant: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(token = Token::Variant)]
@@ -313,7 +336,7 @@ pub enum Command<'source> {
     If(Spanned<If>, CommandIf<'source>),
     Repeat(Spanned<Repeat>, CommandRepeat<'source>),
     Add(Spanned<Add>, CommandArgs<AddArgs<'source>>),
-    Remove(Spanned<Remove>, CommandArgs<AddArgs<'source>>),
+    Remove(Spanned<Remove>, CommandArgs<RemoveArgs<'source>>),
     ItemData(Spanned<ItemData>, CommandArgs<ItemDataArgs<'source>>),
     ItemDataName(
         Spanned<ItemDataName>,
@@ -353,6 +376,8 @@ pub enum Command<'source> {
 }
 pub type CommandArgsCollection<Args> = Recoverable<Delimited<'(', Args, ')'>, RecoverContent>;
 pub type CommandArgs<Args> = CommandArgsCollection<Once<Args>>;
+pub type CommandArg<T> =
+    Recoverable<(Symbol<','>, Recoverable<T, RecoverCommandArg>), RecoverCommandArg>;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
 pub struct Include;
@@ -368,8 +393,7 @@ pub struct BundleIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct BundleIconArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub path: Spanned<&'source str>,
+    pub path: CommandArg<Spanned<&'source str>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -377,8 +401,7 @@ pub struct BuiltinIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct BuiltinIconArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub path: Spanned<&'source str>,
+    pub path: CommandArg<Spanned<&'source str>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(rename = "event")]
@@ -391,10 +414,8 @@ pub struct OnEvent;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct OnEventArgs<'source> {
     pub snippet_name: Spanned<&'source str>,
-    pub comma: Symbol<','>,
-    pub identifier: Spanned<Identifier<'source>>,
-    pub comma_2: Symbol<','>,
-    pub action: Action<'source>,
+    pub identifier: CommandArg<Spanned<Identifier<'source>>>,
+    pub action: CommandArg<Action<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -407,8 +428,7 @@ pub struct Spawn;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct SpawnArgs<'source> {
     pub x: Expression<'source>,
-    pub comma: Symbol<','>,
-    pub y: Expression<'source>,
+    pub y: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -421,14 +441,11 @@ pub struct Config;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ConfigArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub description: Spanned<&'source str>,
-    pub comma_2: Symbol<','>,
-    pub ty: Spanned<ConfigType>,
-    pub comma_3: Symbol<','>,
-    pub default: Spanned<Literal<'source>>,
+    pub description: CommandArg<Spanned<&'source str>>,
+    pub ty: CommandArg<Spanned<ConfigType>>,
+    pub default: CommandArg<Spanned<Literal<'source>>>,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, VariantArray)]
 pub enum ConfigType {
     Boolean,
     Integer,
@@ -440,10 +457,9 @@ pub struct State;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct StateArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub ty: Spanned<UberStateType>,
+    pub ty: CommandArg<Spanned<UberStateType>>,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, VariantArray)]
 pub enum UberStateType {
     Boolean,
     Integer,
@@ -455,8 +471,7 @@ pub struct Timer;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct TimerArgs<'source> {
     pub toggle_identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub timer_identifier: Spanned<Identifier<'source>>,
+    pub timer_identifier: CommandArg<Spanned<Identifier<'source>>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -464,8 +479,7 @@ pub struct Let;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct LetArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub value: Expression<'source>,
+    pub value: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CommandIf<'source> {
@@ -493,8 +507,7 @@ pub struct RemoveArgs<'source>(pub ChangeItemPoolArgs<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ChangeItemPoolArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub amount: Expression<'source>,
+    pub amount: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -502,16 +515,11 @@ pub struct ItemData;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub name: Expression<'source>,
-    pub comma_2: Symbol<','>,
-    pub price: Expression<'source>, // TODO why isn't the description after the name?
-    pub comma_3: Symbol<','>,
-    pub description: Expression<'source>,
-    pub comma_4: Symbol<','>,
-    pub icon: Expression<'source>,
-    pub comma_5: Symbol<','>,
-    pub map_icon: Expression<'source>,
+    pub name: CommandArg<Expression<'source>>,
+    pub price: CommandArg<Expression<'source>>, // TODO why isn't the description after the name?
+    pub description: CommandArg<Expression<'source>>,
+    pub icon: CommandArg<Expression<'source>>,
+    pub map_icon: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -519,8 +527,7 @@ pub struct ItemDataName;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataNameArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub name: Expression<'source>,
+    pub name: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -528,8 +535,7 @@ pub struct ItemDataPrice;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataPriceArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub price: Expression<'source>,
+    pub price: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -537,8 +543,7 @@ pub struct ItemDataDescription;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataDescriptionArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub description: Expression<'source>,
+    pub description: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -546,8 +551,7 @@ pub struct ItemDataIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataIconArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub icon: Expression<'source>,
+    pub icon: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -560,8 +564,7 @@ pub struct Preplace;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct PreplaceArgs<'source> {
     pub item: Action<'source>,
-    pub comma: Symbol<','>,
-    pub zone: Expression<'source>,
+    pub zone: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -569,8 +572,7 @@ pub struct ZoneOf;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ZoneOfArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub item: Action<'source>,
+    pub item: CommandArg<Action<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -578,8 +580,7 @@ pub struct ItemOn;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemOnArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub trigger: Trigger<'source>,
+    pub trigger: CommandArg<Trigger<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -591,14 +592,12 @@ pub struct CountInZoneArgs<'source> {
         Punctuated<Delimited<'(', Once<CountInZoneBinding<'source>>, ')'>, ','>,
         ']',
     >,
-    pub comma: Symbol<','>,
-    pub items: Delimited<'[', Punctuated<Action<'source>, ','>, ']'>,
+    pub items: CommandArg<Delimited<'[', Punctuated<Action<'source>, ','>, ']'>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CountInZoneBinding<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub zone: Expression<'source>,
+    pub zone: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -613,10 +612,8 @@ pub struct RandomFloatArgs<'source>(pub RandomNumberArgs<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomNumberArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub min: Expression<'source>,
-    pub comma_2: Symbol<','>,
-    pub max: Expression<'source>,
+    pub min: CommandArg<Expression<'source>>,
+    pub max: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -624,10 +621,8 @@ pub struct RandomPool;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomPoolArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub ty: Spanned<Type>,
-    pub comma_2: Symbol<','>,
-    pub values: Delimited<'[', Punctuated<Expression<'source>, ','>, ']'>,
+    pub ty: CommandArg<Spanned<Type>>,
+    pub values: CommandArg<Delimited<'[', Punctuated<Expression<'source>, ','>, ']'>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]
@@ -635,8 +630,7 @@ pub struct RandomFromPool;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomFromPoolArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub comma: Symbol<','>,
-    pub pool_identifier: Spanned<Identifier<'source>>,
+    pub pool_identifier: CommandArg<Spanned<Identifier<'source>>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]

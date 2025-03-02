@@ -2,10 +2,8 @@
 
 use super::{Compile, ExportedValue, SnippetCompiler};
 use crate::{
-    ast::{self, UberStateType},
-    output::{
-        intermediate::Literal, CommandVoid, Event, ItemMetadataEntry, StringOrPlaceholder, Trigger,
-    },
+    ast::{self, CommandArg, UberStateType},
+    output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder, Trigger},
     types::InferType,
 };
 use ast::ClientEvent;
@@ -14,7 +12,13 @@ use rand::Rng;
 use std::{iter, mem, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
-use wotw_seedgen_parse::{Error, Identifier, Result, Span};
+use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart};
+
+fn consume_command_arg<T>(arg: CommandArg<T>, compiler: &mut SnippetCompiler) -> Option<T> {
+    compiler
+        .consume_result(arg.result)
+        .and_then(|(_, arg)| compiler.consume_result(arg.result))
+}
 
 impl<'source> Compile<'source> for ast::Command<'source> {
     type Output = ();
@@ -165,20 +169,24 @@ impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        let Some(path) = consume_command_arg(self.path, compiler) else {
+            return;
+        };
+
         let content = compiler
             .global
             .snippet_access
-            .read_file(self.path.data.as_ref())
-            .map_err(|err| Error::custom(err, self.path.span()));
+            .read_file(path.data.as_ref())
+            .map_err(|err| Error::custom(err, path.span()));
         if let Some(data) = compiler.consume_result(content) {
             compiler
                 .global
                 .output
                 .icons
-                .push((self.path.data.to_string(), data));
+                .push((path.data.to_string(), data));
             compiler.variables.insert(
                 self.identifier.data,
-                Literal::CustomIcon(self.path.data.to_string()),
+                Literal::CustomIcon(path.data.to_string()),
             );
         }
     }
@@ -187,9 +195,13 @@ impl<'source> Compile<'source> for ast::BuiltinIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        let Some(path) = consume_command_arg(self.path, compiler) else {
+            return;
+        };
+
         compiler.variables.insert(
             self.identifier.data,
-            Literal::IconAsset(self.path.data.to_string()),
+            Literal::IconAsset(path.data.to_string()),
         );
     }
 }
@@ -210,6 +222,9 @@ impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        let identifier = consume_command_arg(self.identifier, compiler);
+        let action = consume_command_arg(self.action, compiler);
+
         if !compiler
             .preprocessed
             .includes
@@ -223,22 +238,25 @@ impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
             return;
         }
 
+        let (Some(identifier), Some(action)) = (identifier, action) else {
+            return;
+        };
+
         let event = compiler
             .global
             .events
             .get(self.snippet_name.data)
-            .and_then(|events| events.get(self.identifier.data.0))
+            .and_then(|events| events.get(identifier.data.0))
             .copied();
         if event.is_none() {
             compiler.errors.push(Error::custom(
                 "Could not find event in snippet".to_string(),
-                self.identifier.span,
+                identifier.span,
             ));
         }
 
-        let span = self.action.span();
-        let action = self
-            .action
+        let span = action.span();
+        let action = action
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
 
@@ -299,13 +317,14 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
                 "Multiple spawn commands".to_string(),
                 self.span(),
             ));
-        } else {
-            let x = self.x.evaluate(compiler);
-            let y = self.y.evaluate(compiler);
-            if let (Some(x), Some(y)) = (x, y) {
-                compiler.global.output.spawn = Some(Position { x, y });
-            }
         }
+
+        let x = self.x.evaluate(compiler);
+        let y = consume_command_arg(self.y, compiler).and_then(|y| y.evaluate(compiler));
+
+        let (Some(x), Some(y)) = (x, y) else { return };
+
+        compiler.global.output.spawn = Some(Position { x, y });
     }
 }
 impl<'source> Compile<'source> for ast::TagsArg<'source> {
@@ -321,11 +340,18 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if self.default.data.infer_type(compiler) != Some(self.ty.data.into()) {
-            compiler.errors.push(Error::custom(
-                format!("expected {}", self.ty.data),
-                self.default.span,
-            ));
+        consume_command_arg(self.description, compiler);
+        let ty = consume_command_arg(self.ty, compiler);
+        let default = consume_command_arg(self.default, compiler);
+
+        let (Some(ty), Some(default)) = (ty, default) else {
+            return;
+        };
+
+        if default.data.infer_type(compiler) != Some(ty.data.into()) {
+            compiler
+                .errors
+                .push(Error::custom(format!("expected {}", ty.data), default.span));
         }
 
         let config = compiler
@@ -334,17 +360,17 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
             .get(&compiler.identifier)
             .and_then(|config| config.get(self.identifier.data.0));
         let value = match config {
-            None => self.default.data.compile(compiler),
+            None => default.data.compile(compiler),
             Some(value) => {
-                let parsed = match self.ty.data {
+                let parsed = match ty.data {
                     ast::ConfigType::Boolean => value.parse().ok().map(Literal::Boolean),
                     ast::ConfigType::Integer => value.parse().ok().map(Literal::Integer),
                     ast::ConfigType::Float => value.parse().ok().map(Literal::Float),
                 };
                 if parsed.is_none() {
                     compiler.errors.push(Error::custom(
-                    format!("failed to parse provided configuration value \"{}\" as a {}, which is the required type for this configuration parameter", value, self.ty.data),
-                    self.ty.span,
+                    format!("failed to parse provided configuration value \"{}\" as a {}, which is the required type for this configuration parameter", value, ty.data),
+                    ty.span,
                 ));
                 }
                 parsed
@@ -359,8 +385,13 @@ impl<'source> Compile<'source> for ast::StateArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let span = self.identifier.span.start..self.ty.span.end;
-        let uber_identifier = match self.ty.data {
+        let span = self.span();
+
+        let Some(ty) = consume_command_arg(self.ty, compiler) else {
+            return;
+        };
+
+        let uber_identifier = match ty.data {
             UberStateType::Boolean => boolean_uber_state(compiler, span),
             UberStateType::Integer => integer_uber_state(compiler, span),
             UberStateType::Float => float_uber_state(compiler, span),
@@ -383,7 +414,11 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let toggle = boolean_uber_state(compiler, self.toggle_identifier.span);
         let toggle = compiler.consume_result(toggle);
-        let timer = float_uber_state(compiler, self.timer_identifier.span);
+
+        let Some(timer_identifier) = consume_command_arg(self.timer_identifier, compiler) else {
+            return;
+        };
+        let timer = float_uber_state(compiler, timer_identifier.span);
         let timer = compiler.consume_result(timer);
 
         if let (Some(toggle), Some(timer)) = (toggle, timer) {
@@ -399,7 +434,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
                 }),
             );
             compiler.variables.insert(
-                self.timer_identifier.data,
+                timer_identifier.data,
                 Literal::UberIdentifier(UberStateAlias {
                     uber_identifier: timer,
                     value: None,
@@ -439,7 +474,9 @@ impl<'source> Compile<'source> for ast::LetArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let Some(value) = self.value.evaluate(compiler) {
+        if let Some(value) =
+            consume_command_arg(self.value, compiler).and_then(|value| value.evaluate(compiler))
+        {
             compiler.variables.insert(self.identifier.data, value);
         }
     }
@@ -505,7 +542,10 @@ fn compile_item_pool_change<'source, const FACTOR: i32>(
         .item
         .compile(compiler)
         .and_then(|command| command.expect_void(compiler, span));
-    let amount = args.amount.evaluate::<i32>(compiler);
+
+    let amount = consume_command_arg(args.amount, compiler)
+        .and_then(|amount| amount.evaluate::<i32>(compiler));
+
     if let (Some(item), Some(amount)) = (item, amount) {
         *compiler
             .global
@@ -526,11 +566,16 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
-        let name = self.name.evaluate(compiler);
-        let price = self.price.compile_into(compiler);
-        let description = self.description.compile_into(compiler);
-        let icon = self.icon.compile_into(compiler);
-        let map_icon = self.map_icon.compile_into(compiler);
+        let name =
+            consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
+        let price = consume_command_arg(self.price, compiler)
+            .and_then(|price| price.compile_into(compiler));
+        let description = consume_command_arg(self.description, compiler)
+            .and_then(|description| description.compile_into(compiler));
+        let icon =
+            consume_command_arg(self.icon, compiler).and_then(|icon| icon.compile_into(compiler));
+        let map_icon = consume_command_arg(self.map_icon, compiler)
+            .and_then(|map_icon| map_icon.compile_into(compiler));
 
         if let Some(item) = item {
             if compiler
@@ -567,7 +612,8 @@ impl<'source> Compile<'source> for ast::ItemDataNameArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
-        let name = self.name.evaluate(compiler);
+        let name =
+            consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
         if let (Some(item), Some(name)) = (item, name) {
             insert_item_data(compiler, item, span, name, "name", |data| &mut data.name);
         }
@@ -582,7 +628,8 @@ impl<'source> Compile<'source> for ast::ItemDataPriceArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
-        let price = self.price.compile_into(compiler);
+        let price = consume_command_arg(self.price, compiler)
+            .and_then(|price| price.compile_into(compiler));
 
         if let (Some(item), Some(price)) = (item, price) {
             insert_item_data(compiler, item, span, price, "price", |data| &mut data.price);
@@ -598,7 +645,8 @@ impl<'source> Compile<'source> for ast::ItemDataDescriptionArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
-        let description = self.description.compile_into(compiler);
+        let description = consume_command_arg(self.description, compiler)
+            .and_then(|description| description.compile_into(compiler));
 
         if let (Some(item), Some(description)) = (item, description) {
             insert_item_data(compiler, item, span, description, "description", |data| {
@@ -616,7 +664,8 @@ impl<'source> Compile<'source> for ast::ItemDataIconArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
-        let icon = self.icon.compile_into(compiler);
+        let icon =
+            consume_command_arg(self.icon, compiler).and_then(|icon| icon.compile_into(compiler));
 
         if let (Some(item), Some(icon)) = (item, icon) {
             insert_item_data(compiler, item, span, icon, "icon", |data| &mut data.icon);
@@ -669,7 +718,8 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
-        let zone = self.zone.evaluate(compiler);
+        let zone =
+            consume_command_arg(self.zone, compiler).and_then(|zone| zone.evaluate(compiler));
 
         if let (Some(item), Some(zone)) = (item, zone) {
             compiler.global.output.preplacements.push((item, zone));
@@ -680,9 +730,12 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let span = self.item.span();
-        let item = self
-            .item
+        let Some(item) = consume_command_arg(self.item, compiler) else {
+            return;
+        };
+
+        let span = item.span();
+        let item = item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
         if let Some(item) = item {
@@ -697,7 +750,9 @@ impl<'source> Compile<'source> for ast::ItemOnArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let Some(trigger) = self.trigger.compile(compiler) {
+        if let Some(trigger) = consume_command_arg(self.trigger, compiler)
+            .and_then(|trigger| trigger.compile(compiler))
+        {
             compiler.variables.insert(
                 self.identifier.data,
                 Literal::String(StringOrPlaceholder::ItemOnPlaceholder(Box::new(trigger))),
@@ -716,8 +771,13 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
             .flatten()
             .flatten()
             .flatten();
+
+        let Some(items) = consume_command_arg(self.items, compiler) else {
+            return;
+        };
+
         let items = compiler
-            .consume_result(self.items.content)
+            .consume_result(items.content)
             .into_iter()
             .flatten()
             .filter_map(|action| {
@@ -743,8 +803,8 @@ impl<'source> Compile<'source> for ast::CountInZoneBinding<'source> {
     type Output = Option<(Identifier<'source>, Zone)>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        self.zone
-            .evaluate(compiler)
+        consume_command_arg(self.zone, compiler)
+            .and_then(|zone| zone.evaluate(compiler))
             .map(|zone| (self.identifier.data, zone))
     }
 }
@@ -752,8 +812,8 @@ impl<'source> Compile<'source> for ast::RandomIntegerArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min = self.0.min.evaluate(compiler);
-        let max = self.0.max.evaluate(compiler);
+        let min = consume_command_arg(self.0.min, compiler).and_then(|min| min.evaluate(compiler));
+        let max = consume_command_arg(self.0.max, compiler).and_then(|max| max.evaluate(compiler));
         if let (Some(min), Some(max)) = (min, max) {
             let value = compiler.rng.gen_range(min..=max);
             compiler
@@ -766,8 +826,10 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min = self.0.min.evaluate::<OrderedFloat<f32>>(compiler);
-        let max = self.0.max.evaluate::<OrderedFloat<f32>>(compiler);
+        let min = consume_command_arg(self.0.min, compiler)
+            .and_then(|min| min.evaluate::<OrderedFloat<f32>>(compiler));
+        let max = consume_command_arg(self.0.max, compiler)
+            .and_then(|max| max.evaluate::<OrderedFloat<f32>>(compiler));
         if let (Some(min), Some(max)) = (min, max) {
             let value: f32 = compiler.rng.gen_range(min.into()..=max.into());
             compiler
@@ -780,8 +842,13 @@ impl<'source> Compile<'source> for ast::RandomPoolArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        consume_command_arg(self.ty, compiler);
+        let Some(values) = consume_command_arg(self.values, compiler) else {
+            return;
+        };
+
         let mut options_iter = compiler
-            .consume_result(self.values.content)
+            .consume_result(values.content)
             .into_iter()
             .flatten()
             .map(|expression| expression.evaluate(compiler));
@@ -803,21 +870,23 @@ impl<'source> Compile<'source> for ast::RandomFromPoolArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let values = match compiler.random_pools.get_mut(self.pool_identifier.data.0) {
-            None => {
-                compiler.errors.push(Error::custom(
-                    "Unknown pool. Use !random_pool first".to_string(),
-                    self.pool_identifier.span,
-                ));
-                return;
-            }
-            Some(values) => values,
+        let Some(pool_identifier) = consume_command_arg(self.pool_identifier, compiler) else {
+            return;
+        };
+
+        let Some(values) = compiler.random_pools.get_mut(pool_identifier.data.0) else {
+            compiler.errors.push(Error::custom(
+                "Unknown pool. Use !random_pool first".to_string(),
+                pool_identifier.span,
+            ));
+            return;
         };
 
         if values.is_empty() {
-            compiler
-                .errors
-                .push(Error::custom("Pool already empty".to_string(), self.span()));
+            compiler.errors.push(Error::custom(
+                "Pool already empty".to_string(),
+                self.identifier.span_start()..pool_identifier.span_end(),
+            ));
             return;
         }
 

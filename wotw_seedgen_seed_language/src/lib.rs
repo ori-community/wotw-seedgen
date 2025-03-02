@@ -6,9 +6,8 @@ pub mod ast;
 pub mod compile;
 pub mod metadata;
 pub mod output;
-
-mod token;
-mod types;
+pub mod token;
+pub mod types;
 
 #[cfg(test)]
 mod tests;

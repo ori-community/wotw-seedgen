@@ -1,5 +1,5 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString};
+use strum::{Display, VariantArray, EnumString};
 
 // TODO should this have a custom PartialOrd implementation?
 /// World zones as indicated on the map
@@ -16,6 +16,7 @@ use strum::{Display, EnumString};
     Serialize_repr,
     Display,
     EnumString,
+    VariantArray,
 )]
 #[repr(u8)]
 pub enum Zone {

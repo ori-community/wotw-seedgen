@@ -1,5 +1,5 @@
 use super::{AstCollection, AstCollectionInit, Collection};
-use crate::{Ast, Error, Parser, Result, Span, Tokenize};
+use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
     iter,
     ops::{ControlFlow, Range},
@@ -185,6 +185,16 @@ impl<Item: Span, Separator> Span for SeparatedNonEmpty<Item, Separator> {
             None => first_span,
             Some((_, last)) => first_span.start..last.span().end,
         }
+    }
+}
+impl<Item: SpanStart, Separator> SpanStart for SeparatedNonEmpty<Item, Separator> {
+    fn span_start(&self) -> usize {
+        self.first.span_start()
+    }
+}
+impl<Item: SpanEnd, Separator> SpanEnd for SeparatedNonEmpty<Item, Separator> {
+    fn span_end(&self) -> usize {
+        self.last().span_end()
     }
 }
 impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {

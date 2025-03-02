@@ -1,39 +1,104 @@
-use crate::{add_bound, find_attributes, Result};
+use crate::{add_bound, Result};
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::spanned::Spanned;
+
+const UNION_MESSAGE: &str = "Cannot implement Span on union";
+const EMPTY_FIELDS_MESSAGE: &str = "Cannot implement Span without any fields";
 
 pub fn span_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
     let syn::DeriveInput {
         ident,
-        mut generics,
+        generics,
         data,
-        attrs,
         ..
     } = input;
-    let attrs = Attributes::find(&attrs)?;
 
-    let implementation = match data {
-        syn::Data::Struct(data) => span_fields::<false>(data.fields),
-        syn::Data::Enum(data) => span_enum(data),
-        syn::Data::Union(union) => Err(syn::Error::new(
-            union.union_token.span(),
-            "Cannot implement Span on union",
-        )),
-    }?;
+    // TODO bounds could be smarter by analyzing which types actually need to implement traits
 
-    add_bound(&mut generics, quote! { wotw_seedgen_parse::Span });
-    let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
+    let span = span_any_impl(
+        &ident,
+        generics.clone(),
+        data.clone(),
+        vec![
+            quote! { wotw_seedgen_parse::Span },
+            quote! { wotw_seedgen_parse::SpanStart },
+            quote! { wotw_seedgen_parse::SpanEnd },
+        ],
+        quote! { wotw_seedgen_parse::Span },
+        quote! { fn span(&self) -> std::ops::Range<usize> },
+        span_fields_named::<false>,
+        span_fields_named::<true>,
+        span_fields_unnamed::<false>,
+        span_fields_unnamed::<true>,
+    )?;
 
-    // TODO instead of providing this bound attribute we could also be a lot smarter about it by looking at the type
-    let bound = attrs.bound.map_or_else(
-        || impl_generics.into_token_stream(),
-        |bound| quote! { < #bound > },
-    );
+    let span_start = span_any_impl(
+        &ident,
+        generics.clone(),
+        data.clone(),
+        vec![quote! { wotw_seedgen_parse::SpanStart }],
+        quote! { wotw_seedgen_parse::SpanStart },
+        quote! { fn span_start(&self) -> usize },
+        span_start_fields_named::<false>,
+        span_start_fields_named::<true>,
+        span_start_fields_unnamed::<false>,
+        span_start_fields_unnamed::<true>,
+    )?;
+
+    let span_end = span_any_impl(
+        &ident,
+        generics,
+        data,
+        vec![quote! { wotw_seedgen_parse::SpanEnd }],
+        quote! { wotw_seedgen_parse::SpanEnd },
+        quote! { fn span_end(&self) -> usize },
+        span_end_fields_named::<false>,
+        span_end_fields_named::<true>,
+        span_end_fields_unnamed::<false>,
+        span_end_fields_unnamed::<true>,
+    )?;
 
     Ok(quote! {
-        impl #bound wotw_seedgen_parse::Span for #ident #type_generics #where_clause {
-            fn span(&self) -> std::ops::Range<usize> {
+        #span
+
+        #span_start
+
+        #span_end
+    }
+    .into())
+}
+
+fn span_any_impl<FN, FNP, FU, FUP>(
+    ident: &syn::Ident,
+    mut generics: syn::Generics,
+    data: syn::Data,
+    bounds: Vec<TokenStream>,
+    span_trait: TokenStream,
+    span_trait_signature: TokenStream,
+    named: FN,
+    named_pattern: FNP,
+    unnamed: FU,
+    unnamed_pattern: FUP,
+) -> Result<TokenStream>
+where
+    FN: Fn(syn::FieldsNamed) -> TokenStream,
+    FNP: Fn(syn::FieldsNamed) -> TokenStream,
+    FU: Fn(syn::FieldsUnnamed) -> TokenStream,
+    FUP: Fn(syn::FieldsUnnamed) -> TokenStream,
+{
+    let implementation =
+        span_any_implementation(data, named, named_pattern, unnamed, unnamed_pattern)?;
+
+    for bound in bounds {
+        add_bound(&mut generics, bound);
+    }
+
+    let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
+
+    Ok(quote! {
+        impl #impl_generics #span_trait for #ident #type_generics #where_clause {
+            #span_trait_signature {
                 #implementation
             }
         }
@@ -41,54 +106,69 @@ pub fn span_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
     .into())
 }
 
-#[derive(Default)]
-struct Attributes {
-    bound: Option<syn::Expr>,
-}
-impl Attributes {
-    fn find(attrs: &[syn::Attribute]) -> Result<Self> {
-        let mut attributes = Self::default();
-
-        for meta in find_attributes(attrs, "span")? {
-            match meta {
-                syn::Meta::NameValue(meta) if meta.path.is_ident("bound") => {
-                    attributes.bound = Some(meta.value);
-                }
-                _ => return Err(syn::Error::new_spanned(meta, "Unrecognized attribute")),
-            }
-        }
-
-        Ok(attributes)
+fn span_any_implementation<FN, FNP, FU, FUP>(
+    data: syn::Data,
+    named: FN,
+    named_pattern: FNP,
+    unnamed: FU,
+    unnamed_pattern: FUP,
+) -> Result<TokenStream>
+where
+    FN: Fn(syn::FieldsNamed) -> TokenStream,
+    FNP: Fn(syn::FieldsNamed) -> TokenStream,
+    FU: Fn(syn::FieldsUnnamed) -> TokenStream,
+    FUP: Fn(syn::FieldsUnnamed) -> TokenStream,
+{
+    match data {
+        syn::Data::Struct(data) => span_fields(data.fields, named, unnamed),
+        syn::Data::Enum(data) => span_enum(data, named_pattern, unnamed_pattern),
+        syn::Data::Union(union) => Err(syn::Error::new(union.union_token.span(), UNION_MESSAGE)),
     }
 }
 
-const EMPTY_FIELDS_MESSAGE: &str = "Cannot implement Span without any fields";
-
-fn span_fields<const IN_PATTERN: bool>(fields: syn::Fields) -> Result<TokenStream> {
+fn span_fields<FN, FU>(fields: syn::Fields, named: FN, unnamed: FU) -> Result<TokenStream>
+where
+    FN: Fn(syn::FieldsNamed) -> TokenStream,
+    FU: Fn(syn::FieldsUnnamed) -> TokenStream,
+{
     if fields.is_empty() {
         return Err(syn::Error::new(fields.span(), EMPTY_FIELDS_MESSAGE));
     }
 
     Ok(match fields {
-        syn::Fields::Named(fields) => span_fields_named::<IN_PATTERN>(fields),
-        syn::Fields::Unnamed(fields) => span_fields_unnamed::<IN_PATTERN>(fields),
+        syn::Fields::Named(fields) => named(fields),
+        syn::Fields::Unnamed(fields) => unnamed(fields),
         syn::Fields::Unit => unreachable!(),
     })
+}
+fn span_any_fields_named<const IN_PATTERN: bool>(
+    field: &syn::Ident,
+    f: TokenStream,
+) -> TokenStream {
+    let binding = IN_PATTERN.then(|| quote! { { #field, .. } => });
+    let prefix = (!IN_PATTERN).then(|| quote! { self. });
+    quote! { #binding wotw_seedgen_parse::#f(& #prefix #field) }
 }
 fn span_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenStream {
     let len = fields.named.len();
     if len == 1 {
         let field = fields.named[0].ident.as_ref().unwrap();
-        let binding = IN_PATTERN.then(|| quote! { { #field } => });
-        let prefix = (!IN_PATTERN).then(|| quote! { self. });
-        quote! { #binding wotw_seedgen_parse::Span::span(& #prefix #field) }
+        span_any_fields_named::<IN_PATTERN>(field, quote! { Span::span })
     } else {
         let first = fields.named[0].ident.as_ref().unwrap();
-        let last = fields.named[len - 1].ident.as_ref().unwrap();
+        let last: &syn::Ident = fields.named[len - 1].ident.as_ref().unwrap();
         let binding = IN_PATTERN.then(|| quote! { { #first, .., #last } => });
         let prefix = (!IN_PATTERN).then(|| quote! { self. });
-        quote! { #binding wotw_seedgen_parse::Span::span(& #prefix #first).start..wotw_seedgen_parse::Span::span(& #prefix #last).end }
+        quote! { #binding wotw_seedgen_parse::SpanStart::span_start(& #prefix #first)..wotw_seedgen_parse::SpanEnd::span_end(& #prefix #last) }
     }
+}
+fn span_start_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenStream {
+    let first = fields.named[0].ident.as_ref().unwrap();
+    span_any_fields_named::<IN_PATTERN>(first, quote! { SpanStart::span_start })
+}
+fn span_end_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenStream {
+    let last = fields.named.last().unwrap().ident.as_ref().unwrap();
+    span_any_fields_named::<IN_PATTERN>(last, quote! { SpanEnd::span_end })
 }
 fn span_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -> TokenStream {
     let len = fields.unnamed.len();
@@ -110,16 +190,41 @@ fn span_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -> To
             (quote! { self.0 }, quote! { self.#last })
         };
 
-        quote! { #binding wotw_seedgen_parse::Span::span(& #first).start..wotw_seedgen_parse::Span::span(& #last).end }
+        quote! { #binding wotw_seedgen_parse::SpanStart::span_start(& #first)..wotw_seedgen_parse::SpanEnd::span_end(& #last) }
     }
 }
-fn span_enum(data: syn::DataEnum) -> Result<TokenStream> {
+fn span_start_fields_unnamed<const IN_PATTERN: bool>(_fields: syn::FieldsUnnamed) -> TokenStream {
+    let binding = IN_PATTERN.then(|| quote! { (first, ..) => });
+    let first = if IN_PATTERN {
+        quote! { first }
+    } else {
+        quote! { self.0 }
+    };
+
+    quote! { #binding wotw_seedgen_parse::SpanStart::span_start(& #first) }
+}
+fn span_end_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -> TokenStream {
+    let binding = IN_PATTERN.then(|| quote! { (.., last) => });
+    let last = if IN_PATTERN {
+        quote! { last }
+    } else {
+        let last = syn::Index::from(fields.unnamed.len() - 1);
+        quote! { self.#last }
+    };
+
+    quote! { #binding wotw_seedgen_parse::SpanEnd::span_end(& #last) }
+}
+fn span_enum<FN, FU>(data: syn::DataEnum, named: FN, unnamed: FU) -> Result<TokenStream>
+where
+    FN: Fn(syn::FieldsNamed) -> TokenStream,
+    FU: Fn(syn::FieldsUnnamed) -> TokenStream,
+{
     let variants = data
         .variants
         .into_iter()
         .map(|variant| {
             let syn::Variant { ident, fields, .. } = variant;
-            let fields = span_fields::<true>(fields)?;
+            let fields = span_fields(fields, &named, &unnamed)?;
 
             Ok(quote! {
                 Self::#ident #fields

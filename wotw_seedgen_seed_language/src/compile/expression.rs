@@ -2,10 +2,9 @@ use super::{Compile, SnippetCompiler};
 use crate::{
     ast::{self, Operator, UberStateType},
     output::{
-        intermediate::{Constant, Literal},
         ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
         CommandVoid, CommandZone, Comparator, EqualityComparator, Icon, LogicOperator, Operation,
-        StringOrPlaceholder,
+        StringOrPlaceholder, {Constant, Literal},
     },
     types::{common_type, InferType, Type},
 };
