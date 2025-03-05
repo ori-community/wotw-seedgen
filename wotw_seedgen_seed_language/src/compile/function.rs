@@ -528,15 +528,15 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::Skill => Command::Void(skill(arg(&mut context)?)),
             FunctionIdentifier::RemoveSkill => {
                 let skill = arg(&mut context)?;
-                Command::Void(CommandVoid::Multi {
-                    commands: vec![
-                        item_message(skill_string(skill, true)),
-                        super::set_boolean_value(skill.uber_identifier(), false),
-                        CommandVoid::Unequip {
-                            equipment: skill.equipment(),
-                        },
-                    ],
-                })
+                let mut commands = vec![
+                    item_message(skill_string(skill, true)),
+                    super::set_boolean_value(skill.uber_identifier(), false),
+                ];
+                if let Some(equipment) = skill.equipment() {
+                    commands.push(CommandVoid::Unequip { equipment });
+                }
+
+                Command::Void(CommandVoid::Multi { commands })
             }
             FunctionIdentifier::Shard => Command::Void(shard(arg(&mut context)?)),
             FunctionIdentifier::RemoveShard => {

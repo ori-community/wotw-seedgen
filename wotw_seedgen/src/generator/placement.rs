@@ -1364,7 +1364,7 @@ fn default_icon(command: &CommandVoid) -> Option<Icon> {
                 Skill::WaterBreath => Some(Icon::Opher(OpherIcon::WaterBreath)),
                 Skill::Grenade => Some(Icon::Equipment(Equipment::Grenade)),
                 Skill::Grapple => Some(Icon::Equipment(Equipment::Grapple)),
-                Skill::Flash => Some(Icon::Equipment(Equipment::Glow)),
+                Skill::Flash => Some(Icon::Equipment(Equipment::Flash)),
                 Skill::Spear => Some(Icon::Opher(OpherIcon::Spear)),
                 Skill::Regenerate => Some(Icon::Equipment(Equipment::Regenerate)),
                 Skill::Bow => Some(Icon::Equipment(Equipment::Bow)),
