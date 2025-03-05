@@ -62,14 +62,20 @@ fn uber_identifier() {
         .parsed
         .unwrap_err();
     assert_eq!(error.to_string(), "expected '|'".to_string());
-    assert_eq!(error.span, 8..8);
+    assert_eq!(error.span, 3..8);
 
     let source = "   GladesTown.  5TuleySpawned  ";
-    let error = parse_ast::<_, UberIdentifier>(source, TOKENIZER)
+    match parse_ast::<_, UberIdentifier>(source, TOKENIZER)
         .parsed
-        .unwrap_err();
-    assert_eq!(error.to_string(), "expected identifier".to_string());
-    assert_eq!(error.span, 16..17);
+        .unwrap()
+    {
+        UberIdentifier::Name(uber_identifier) => {
+            let error = uber_identifier.member.result.unwrap_err();
+            assert_eq!(error.to_string(), "expected identifier".to_string());
+            assert_eq!(error.span, 16..17);
+        }
+        _ => panic!(),
+    }
 
     let source = " $$  ";
     let error = parse_ast::<_, UberIdentifier>(source, TOKENIZER)
