@@ -2,6 +2,7 @@
 #![allow(clippy::module_name_repetitions)]
 
 mod ast;
+mod from_str;
 mod span;
 mod token_display;
 
@@ -45,4 +46,10 @@ pub fn ast_derive(input: TokenStream) -> TokenStream {
 pub fn span_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse_macro_input!(input as syn::DeriveInput);
     span::span_impl(ast).unwrap_or_else(|err| err.into_compile_error().into())
+}
+
+#[proc_macro_derive(FromStr)]
+pub fn from_str_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse_macro_input!(input as syn::DeriveInput);
+    from_str::from_str_impl(ast).unwrap_or_else(|err| err.into_compile_error().into())
 }

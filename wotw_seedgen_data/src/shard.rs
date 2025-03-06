@@ -1,6 +1,7 @@
 use crate::UberIdentifier;
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, VariantArray, EnumString, FromRepr};
+use strum::{Display, FromRepr, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 /// Spirit Shards
 ///
@@ -18,7 +19,7 @@ use strum::{Display, VariantArray, EnumString, FromRepr};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     FromRepr,
     VariantArray,
 )]

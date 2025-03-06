@@ -1,6 +1,7 @@
 use crate::{uber_identifier::weapon_upgrade, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, VariantArray, EnumString, FromRepr};
+use strum::{Display, FromRepr, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 // TODO maybe descriptions should exist for random placements as well? Supposedly these are the weapon upgrade descriptions:
 // "Increases Sentry attack speed"
@@ -21,7 +22,7 @@ use strum::{Display, VariantArray, EnumString, FromRepr};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     FromRepr,
     VariantArray,
 )]

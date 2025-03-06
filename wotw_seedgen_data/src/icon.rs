@@ -1,5 +1,6 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, VariantArray, EnumString};
+use strum::{Display, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 /// Icons used in the Opher shop
 #[derive(
@@ -14,7 +15,7 @@ use strum::{Display, VariantArray, EnumString};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]
@@ -45,7 +46,7 @@ pub enum OpherIcon {
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]
@@ -67,7 +68,7 @@ pub enum LupoIcon {
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]
@@ -93,7 +94,7 @@ pub enum GromIcon {
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]
@@ -119,7 +120,7 @@ pub enum TuleyIcon {
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]

@@ -1,5 +1,6 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, VariantArray, EnumString};
+use strum::{Display, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 /// Text alignment in messages
 #[derive(
@@ -14,7 +15,7 @@ use strum::{Display, VariantArray, EnumString};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]
@@ -37,7 +38,7 @@ pub enum Alignment {
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]

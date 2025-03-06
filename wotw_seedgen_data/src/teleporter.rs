@@ -2,7 +2,8 @@ use std::fmt::{self, Display};
 
 use crate::{uber_identifier::teleporter, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{VariantArray, EnumString};
+use strum::VariantArray;
+use wotw_seedgen_derive::FromStr;
 
 /// Spirit Wells which exist in the base game
 #[derive(
@@ -16,7 +17,7 @@ use strum::{VariantArray, EnumString};
     Hash,
     Deserialize_repr,
     Serialize_repr,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]

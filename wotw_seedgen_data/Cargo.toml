@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+wotw_seedgen_derive = { path = "../wotw_seedgen_derive" }
 serde = { version = "1.0", features = ["derive"] }
 serde_repr = "0.1"
 strum = { version = "0.26", features = ["derive"] }

@@ -1,10 +1,14 @@
+use std::{fmt::Display, ops::Range, str::FromStr};
+
 use super::{Compile, SnippetCompiler};
 use crate::{
     ast,
     output::{Constant, ConstantDiscriminants, Literal},
+    parse::Result,
 };
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
+use strum::VariantArray;
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_parse::{Error, Identifier, Span, Spanned};
@@ -131,12 +135,13 @@ impl<'source> Compile<'source> for ast::Constant<'source> {
     type Output = Option<Constant>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let kind = compiler.consume_result(self.kind.data.0.parse().map_err(|_| {
-            Error::custom(
-                "Unknown Constant Kind".to_string(), // TODO more helpful pls?
-                self.kind.span,
-            )
-        }));
+        let kind = compiler.consume_result(
+            self.kind
+                .data
+                .0
+                .parse()
+                .map_err(|err| Error::custom(err, self.kind.span)),
+        );
         let variant = compiler.consume_result(self.variant.result);
 
         let kind = kind?;
@@ -145,72 +150,40 @@ impl<'source> Compile<'source> for ast::Constant<'source> {
             span,
         } = variant?;
 
-        // TODO list possible variants on wrong input?
+        fn parse_variant<T1, T2, F>(variant: &str, span: Range<usize>, f: F) -> Result<T2>
+        where
+            T1: FromStr<Err = String> + VariantArray + Display,
+            F: FnOnce(T1) -> T2,
+        {
+            variant
+                .parse()
+                .map(f)
+                .map_err(|err| Error::custom(err, span))
+        }
+
         let constant = match kind {
-            ConstantDiscriminants::Skill => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown Skill".to_string(), span))
-                .map(Constant::Skill),
-            ConstantDiscriminants::Shard => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown Shard".to_string(), span))
-                .map(Constant::Shard),
-            ConstantDiscriminants::Teleporter => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown Teleporter".to_string(), span))
-                .map(Constant::Teleporter),
-            ConstantDiscriminants::WeaponUpgrade => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown WeaponUpgrade".to_string(), span))
-                .map(Constant::WeaponUpgrade),
-            ConstantDiscriminants::Equipment => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown Equipment".to_string(), span))
-                .map(Constant::Equipment),
-            ConstantDiscriminants::Zone => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown Zone".to_string(), span))
-                .map(Constant::Zone),
-            ConstantDiscriminants::OpherIcon => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown OpherIcon".to_string(), span))
-                .map(Constant::OpherIcon),
-            ConstantDiscriminants::LupoIcon => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown LupoIcon".to_string(), span))
-                .map(Constant::LupoIcon),
-            ConstantDiscriminants::GromIcon => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown GromIcon".to_string(), span))
-                .map(Constant::GromIcon),
-            ConstantDiscriminants::TuleyIcon => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown TuleyIcon".to_string(), span))
-                .map(Constant::TuleyIcon),
-            ConstantDiscriminants::MapIcon => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown MapIcon".to_string(), span))
-                .map(Constant::MapIcon),
-            ConstantDiscriminants::EquipSlot => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown EquipSlot".to_string(), span))
-                .map(Constant::EquipSlot),
-            ConstantDiscriminants::WheelItemPosition => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown WheelItemPosition".to_string(), span))
-                .map(Constant::WheelItemPosition),
-            ConstantDiscriminants::WheelBind => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown WheelBind".to_string(), span))
-                .map(Constant::WheelBind),
-            ConstantDiscriminants::Alignment => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown Alignment".to_string(), span))
-                .map(Constant::Alignment),
-            ConstantDiscriminants::ScreenPosition => variant
-                .parse()
-                .map_err(|_| Error::custom("Unknown ScreenPosition".to_string(), span))
-                .map(Constant::ScreenPosition),
+            ConstantDiscriminants::Skill => parse_variant(variant, span, Constant::Skill),
+            ConstantDiscriminants::Shard => parse_variant(variant, span, Constant::Shard),
+            ConstantDiscriminants::Teleporter => parse_variant(variant, span, Constant::Teleporter),
+            ConstantDiscriminants::WeaponUpgrade => {
+                parse_variant(variant, span, Constant::WeaponUpgrade)
+            }
+            ConstantDiscriminants::Equipment => parse_variant(variant, span, Constant::Equipment),
+            ConstantDiscriminants::Zone => parse_variant(variant, span, Constant::Zone),
+            ConstantDiscriminants::OpherIcon => parse_variant(variant, span, Constant::OpherIcon),
+            ConstantDiscriminants::LupoIcon => parse_variant(variant, span, Constant::LupoIcon),
+            ConstantDiscriminants::GromIcon => parse_variant(variant, span, Constant::GromIcon),
+            ConstantDiscriminants::TuleyIcon => parse_variant(variant, span, Constant::TuleyIcon),
+            ConstantDiscriminants::MapIcon => parse_variant(variant, span, Constant::MapIcon),
+            ConstantDiscriminants::EquipSlot => parse_variant(variant, span, Constant::EquipSlot),
+            ConstantDiscriminants::WheelItemPosition => {
+                parse_variant(variant, span, Constant::WheelItemPosition)
+            }
+            ConstantDiscriminants::WheelBind => parse_variant(variant, span, Constant::WheelBind),
+            ConstantDiscriminants::Alignment => parse_variant(variant, span, Constant::Alignment),
+            ConstantDiscriminants::ScreenPosition => {
+                parse_variant(variant, span, Constant::ScreenPosition)
+            }
         };
         compiler.consume_result(constant)
     }

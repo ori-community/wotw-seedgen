@@ -1,6 +1,7 @@
 use crate::{Equipment, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString, FromRepr, VariantArray};
+use strum::{Display, FromRepr, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 /// Skills, sometimes also called Abilities
 ///
@@ -18,7 +19,7 @@ use strum::{Display, EnumString, FromRepr, VariantArray};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     FromRepr,
     VariantArray,
 )]

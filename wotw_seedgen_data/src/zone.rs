@@ -1,5 +1,6 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, VariantArray, EnumString};
+use strum::{Display, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 // TODO should this have a custom PartialOrd implementation?
 /// World zones as indicated on the map
@@ -15,7 +16,7 @@ use strum::{Display, VariantArray, EnumString};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]

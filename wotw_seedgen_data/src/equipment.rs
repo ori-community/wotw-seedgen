@@ -1,5 +1,6 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumString, VariantArray};
+use strum::{Display, VariantArray};
+use wotw_seedgen_derive::FromStr;
 
 /// Available slots for [`Equipment`] (the stuff displayed at the bottom between your energy and health)
 #[derive(
@@ -14,7 +15,7 @@ use strum::{Display, EnumString, VariantArray};
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u8)]
@@ -42,7 +43,7 @@ pub enum EquipSlot {
     Deserialize_repr,
     Serialize_repr,
     Display,
-    EnumString,
+    FromStr,
     VariantArray,
 )]
 #[repr(u16)]
