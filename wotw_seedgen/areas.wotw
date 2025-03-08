@@ -13838,6 +13838,17 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
 
   refill Checkpoint
 
+  state UpperWastes.WormEscapeEnd:  # Finishing the escape by touching its ending point from outside Ruins.
+  # Some paths could be in kii but I'm unsure we even want to have this "escape worm escape" in something else than unsafe?
+    unsafe:
+      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # Climb the laft wall all the way up
+      Launch, Bash, Grenade=1
+      Bash, Grenade=1, GrenadeJump, DoubleJump, TripleJump  # tjump to reach your grenade, bash it then waits until it explodes so you can gjump to the ledge
+      SwordSJump=1, DoubleJump, TripleJump, Spear=1  # https://youtu.be/71NiPLGQ2j0
+      HammerSJump=1, DoubleJump, TripleJump
+      LaunchSwap OR FlashSwap OR BlazeSwap=6 OR SentrySwap=6
+      GlideHammerJump, AerialHammerJump
+
   quest UpperWastes.FlowersSeed: free
 
   pickup UpperWastes.WallOre:
@@ -13937,14 +13948,15 @@ anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from th
   conn WindtornRuins.Escape:  # this connection doesn't have to account for the gap in the floor because it only exists after you finished the escape
     moki: WindtornRuins.HeartBarrier
   conn WindtornRuins.LowerRuins:  # connection after the escape is finished
-    # if you completed the escape, there's a gap in the floor that you have to cross, but Burrow alone is enough to do so
+    # if you completed the escape, there's a gap in the floor that you have to cross
+    # Finishing the escape removes the pillar
     # Since Burrow solves this connection, it accounts for all paths to the escape revisit pickup
-    moki, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
+    moki, WindtornRuins.Seir:
       DoubleJump OR Dash OR Glide OR Burrow OR Launch
       Bash, Grenade=1
-    gorlek, WindtornRuins.HeartBarrier, WindtornRuins.Seir: Sword OR Hammer
-    kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: WindtornRuins.HeartBarrier, WindtornRuins.Seir
+    gorlek, WindtornRuins.Seir: Sword OR Hammer
+    kii, WindtornRuins.Seir: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: WindtornRuins.Seir
   conn WindtornRuins.BrokenMural:
     # If the HeartBarrier is not broken, this connection is free, so it is sufficient to test these paths with the HeartBarrier broken
     moki, Burrow OR WindtornRuins.HeartBarrier:  # these account for both situations of having broken the heart or not
@@ -14013,12 +14025,18 @@ anchor WindtornRuins.Escape at 2021, -4026:
       Burrow, Grapple, Damage=30, Sentry=3 OR Shuriken=3  # Sentry=5 / Shuriken=5 path but saving 2 uses by dboosting in the section where you fall down
       Burrow, Grapple, Damage=70, Sentry=2 OR Shuriken=2  # Sentry=5 / Shuriken=5 path but saving the first 3 uses by dboosting
       Burrow, Dash, DoubleJump  # djump at the end of the second sandball+grapple section before dashing in order to avoid the spikes
-    unsafe, WindtornRuins.HeartBarrier:
-      Burrow, Dash, Hammer  # upslash at the end of the second sandball+grapple section before dashing in order to avoid the spikes
-      Burrow, Grapple, Damage=10  # You are allowed to hate me if this is forced progression https://youtu.be/H3UIH4FyU4Q
-      Burrow, Grapple, Blaze=5 OR Flash=5
-      Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
-      Burrow, FlashSwap
+    unsafe:
+      WindtornRuins.HeartBarrier:  # do the escape
+        Burrow, Dash, Hammer  # upslash at the end of the second sandball+grapple section before dashing in order to avoid the spikes
+        Burrow, Grapple, Damage=10  # You are allowed to hate me if this is forced progression https://youtu.be/H3UIH4FyU4Q
+        Burrow, Grapple, Blaze=5 OR Flash=5
+        Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
+        Burrow, FlashSwap
+      UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This need to solve with the pillar destoyed to avoid softlocks
+        Burrow, Launch OR SentryJump=1 OR FlashSwap OR SentrySwap=4 OR BlazeSwap=4
+        Burrow, Bash, Grenade=1, DoubleJump, TripleJump
+        Burrow, AerialHammerJump, TripleJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
+        Burrow, GrenadeJump, DoubleJump, TripleJump
 
 anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
   # requires escape to be done
@@ -14029,18 +14047,18 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
     moki: WindtornRuins.Seir, Burrow
 
   conn WindtornRuins.Escape: free  # walk over the invisible sandworm
-  conn WindtornRuins.FallenPillar:
-    moki, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
+  conn WindtornRuins.FallenPillar:  # Finishing the escape removes the pillar. Doing the escape looks mandatory
+    moki, WindtornRuins.Seir:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
       Launch
-    gorlek, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
+    gorlek, WindtornRuins.Seir:
       DoubleJump, TripleJump OR Sword
       SentryJump=1
-    kii, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
+    kii, WindtornRuins.Seir:
       DoubleJump, Burrow OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
       Dash, Glide OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
-    unsafe, WindtornRuins.HeartBarrier, WindtornRuins.Seir:
+    unsafe, WindtornRuins.Seir:
       Dash OR DoubleJump
   conn LowerWastes.MinesEntranceEnemyPaths:
     moki: Burrow, BreakWall=20
