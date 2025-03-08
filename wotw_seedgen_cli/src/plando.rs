@@ -13,7 +13,7 @@ use wotw_seedgen_assets::file_err;
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
         path,
-        out_name,
+        out,
         generation_args: GenerationArgs { debug, launch },
     } = args;
 
@@ -65,15 +65,17 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let seed = Seed::new(output, debug);
 
-    let mut out = root.join("out");
-    fs::create_dir_all(&out)?;
-    match out_name {
+    let out = match out {
         None => {
+            let mut out = root.join("out");
+            fs::create_dir_all(&out)?;
             out.push(path.file_stem().unwrap_or_else(|| OsStr::new("plando")));
             out.set_extension("wotwr");
+            out
         }
-        Some(name) => out.push(format!("{name}.wotwr")),
-    }
+        Some(out) => out,
+    };
+
     let mut file = File::create(&out).map_err(|err| file_err("create", &out, err))?;
     seed.package(&mut file, !debug)?;
 

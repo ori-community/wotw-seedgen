@@ -10,11 +10,10 @@ pub struct PlandoArgs {
     /// If the path leads to a file, it will be used as entry point.
     /// If it leads to a folder, "main.wotws" in that folder will be used as entry point.
     pub path: PathBuf,
-    /// Filename of the output file
-    ///
-    /// .wotwr will be appended as the file extension
-    #[arg(short = 'n', long, value_name = "STRING")]
-    pub out_name: Option<String>,
+    /// Destination for the compiled seed
+    #[arg(long, value_name = "PATH")]
+    pub out: Option<PathBuf>,
+    // TODO watch functionality?
     #[command(flatten)]
     pub generation_args: GenerationArgs,
 }
