@@ -99,10 +99,12 @@ where
 
 impl<T> Completion for Vec<T>
 where
-    T: Completion,
+    T: Completion + ErrCompletion,
 {
     fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.iter().find_map(|item| item.completion(index))
+        self.iter()
+            .find_map(|item| item.completion(index))
+            .or_else(|| Some(T::err_completion(&Error::custom(String::new(), 0..0))))
     }
 }
 impl<T> ErrCompletion for Vec<T>
