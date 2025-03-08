@@ -8,7 +8,7 @@ mod preprocess;
 
 pub use function::{
     clean_water, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot, skill,
-    spirit_light, teleporter, weapon_upgrade, FunctionIdentifier,
+    spirit_light, teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier, FunctionSignature,
 };
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};

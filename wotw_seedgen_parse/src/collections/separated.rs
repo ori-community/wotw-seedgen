@@ -2,7 +2,7 @@ use super::{AstCollection, AstCollectionInit, Collection};
 use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
     iter,
-    ops::{ControlFlow, Range},
+    ops::{ControlFlow, Index, IndexMut, Range},
     option, slice, vec,
 };
 
@@ -71,6 +71,22 @@ where
     }
 }
 impl<Item, Separator> Separated<Item, Separator> {
+    pub fn get(&self, index: usize) -> Option<&Item> {
+        if index == 0 {
+            self.first.as_ref()
+        } else {
+            self.more.get(index - 1).map(|(_, item)| item)
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut Item> {
+        if index == 0 {
+            self.first.as_mut()
+        } else {
+            self.more.get_mut(index - 1).map(|(_, item)| item)
+        }
+    }
+
     #[inline]
     pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
         self.into_iter()
@@ -137,6 +153,31 @@ impl<'a, Item, Separator> IntoIterator for &'a mut Separated<Item, Separator> {
     }
 }
 
+impl<Item, Separator> Index<usize> for Separated<Item, Separator> {
+    type Output = Item;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match self.get(index) {
+            None => panic!(
+                "index out of bounds: the len is {} but the index is {index}",
+                self.len()
+            ),
+            Some(item) => item,
+        }
+    }
+}
+
+impl<Item, Separator> IndexMut<usize> for Separated<Item, Separator> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let len = self.len();
+
+        match self.get_mut(index) {
+            None => panic!("index out of bounds: the len is {len} but the index is {index}",),
+            Some(item) => item,
+        }
+    }
+}
+
 // TODO PunctuatedNonEmpty? MIN_VALUES const generic?
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SeparatedNonEmpty<Item, Separator> {
@@ -198,6 +239,22 @@ impl<Item: SpanEnd, Separator> SpanEnd for SeparatedNonEmpty<Item, Separator> {
     }
 }
 impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {
+    pub fn get(&self, index: usize) -> Option<&Item> {
+        if index == 0 {
+            Some(&self.first)
+        } else {
+            self.more.get(index - 1).map(|(_, item)| item)
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut Item> {
+        if index == 0 {
+            Some(&mut self.first)
+        } else {
+            self.more.get_mut(index - 1).map(|(_, item)| item)
+        }
+    }
+
     #[inline]
     pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
         self.into_iter()
@@ -258,5 +315,30 @@ impl<'a, Item, Separator> IntoIterator for &'a mut SeparatedNonEmpty<Item, Separ
                 .iter_mut()
                 .map((|(_, item)| item) as fn(&mut (Separator, Item)) -> &mut Item),
         )
+    }
+}
+
+impl<Item, Separator> Index<usize> for SeparatedNonEmpty<Item, Separator> {
+    type Output = Item;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match self.get(index) {
+            None => panic!(
+                "index out of bounds: the len is {} but the index is {index}",
+                self.len()
+            ),
+            Some(item) => item,
+        }
+    }
+}
+
+impl<Item, Separator> IndexMut<usize> for SeparatedNonEmpty<Item, Separator> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let len = self.len();
+
+        match self.get_mut(index) {
+            None => panic!("index out of bounds: the len is {len} but the index is {index}",),
+            Some(item) => item,
+        }
     }
 }

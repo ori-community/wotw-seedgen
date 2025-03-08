@@ -18,14 +18,19 @@ use tower_lsp::{
     lsp_types::{
         CompletionOptions, CompletionParams, CompletionResponse, Diagnostic, DiagnosticSeverity,
         DidChangeTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
-        InitializeParams, InitializeResult, MessageType, SemanticTokens, SemanticTokensFullOptions,
-        SemanticTokensOptions, SemanticTokensParams, SemanticTokensResult,
-        SemanticTokensServerCapabilities, ServerCapabilities, ServerInfo, TextDocumentItem,
-        TextDocumentPositionParams, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+        InitializeParams, InitializeResult, MessageType, ParameterInformation, ParameterLabel,
+        SemanticTokens, SemanticTokensFullOptions, SemanticTokensOptions, SemanticTokensParams,
+        SemanticTokensResult, SemanticTokensServerCapabilities, ServerCapabilities, ServerInfo,
+        SignatureHelp, SignatureHelpOptions, SignatureHelpParams, SignatureInformation,
+        TextDocumentItem, TextDocumentPositionParams, TextDocumentSyncCapability,
+        TextDocumentSyncKind, Url,
     },
     Client, LanguageServer, LspService, Server,
 };
-use wotw_seedgen_seed_language::{ast, compile::Compiler};
+use wotw_seedgen_seed_language::{
+    ast,
+    compile::{Compiler, FunctionIdentifier},
+};
 use wotw_seedgen_static_assets::UBER_STATE_DATA;
 
 struct Backend {
@@ -161,6 +166,10 @@ impl LanguageServer for Backend {
                     ),
                     ..Default::default()
                 }),
+                signature_help_provider: Some(SignatureHelpOptions {
+                    trigger_characters: Some(vec!['('.to_string()]),
+                    ..Default::default()
+                }),
                 semantic_tokens_provider: Some(
                     SemanticTokensServerCapabilities::SemanticTokensOptions(
                         SemanticTokensOptions {
@@ -258,23 +267,59 @@ impl LanguageServer for Backend {
     }
 
     async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
-        self.log(format!(
-            "received textDocument/completion for \"{uri}\"",
-            uri = params.text_document_position.text_document.uri
-        ))
-        .await;
+        self.log("received textDocument/completion").await;
 
-        let (source, mut index) = self.get_text_document_position(params.text_document_position)?;
-        // index is the cursor position, we want to offer completions for whatever was typed before.
-        // Since completions are requested after entering something, this shouldn't be 0,
-        // but if it is, we just won't find any completion to provide.
-        index -= 1;
+        let (source, index) = self.get_text_document_position(params.text_document_position)?;
 
         let ast = ast::parse::<ast::Snippet>(source.value());
 
-        let completion = ast.completion(index);
+        // index is the cursor position, we want to offer completions for whatever was typed before.
+        let completion = ast.completion(index - 1);
 
         Ok(completion.map(CompletionResponse::Array))
+    }
+
+    async fn signature_help(&self, params: SignatureHelpParams) -> Result<Option<SignatureHelp>> {
+        self.log("received textDocument/signatureHelp").await;
+
+        let (source, index) =
+            self.get_text_document_position(params.text_document_position_params)?;
+
+        // index is after the trigger character '(', we want to find the identifier immediately before.
+        let source = &source[..index - 1];
+        let start = source
+            .rfind(|c: char| c.is_ascii_whitespace())
+            .map_or(0, |index| index + 1);
+        let identifier = &source[start..];
+
+        let help = identifier
+            .parse::<FunctionIdentifier>()
+            .ok()
+            .map(|identifier| {
+                let signature = identifier.signature();
+
+                SignatureHelp {
+                    signatures: vec![SignatureInformation {
+                        label: format!("{identifier}{signature}"),
+                        documentation: None,
+                        parameters: Some(
+                            signature
+                                .args
+                                .into_iter()
+                                .map(|arg| ParameterInformation {
+                                    label: ParameterLabel::Simple(arg.to_string()),
+                                    documentation: None,
+                                })
+                                .collect(),
+                        ),
+                        active_parameter: None,
+                    }],
+                    active_signature: None,
+                    active_parameter: None,
+                }
+            });
+
+        Ok(help)
     }
 }
 

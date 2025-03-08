@@ -20,6 +20,7 @@ convert_case = "0.6"
 ordered-float = "4.2"
 derivative = "2.2"
 strum = { version = "0.26", features = ["derive"] }
+arrayvec = "0.7.6"
 
 [dev-dependencies]
 wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets", features = ["loc_data", "state_data", "uber_state_data"] }

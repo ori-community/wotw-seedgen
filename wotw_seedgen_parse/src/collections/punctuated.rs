@@ -1,6 +1,11 @@
 use super::{AstCollection, Collection};
 use crate::{Ast, Error, Parser, Result, Tokenize};
-use std::{iter, ops::ControlFlow, option, slice, vec};
+use std::{
+    cmp::Ordering,
+    iter,
+    ops::{ControlFlow, Index, IndexMut},
+    option, slice, vec,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Punctuated<Item, Punctuation> {
@@ -50,6 +55,22 @@ where
     }
 }
 impl<Item, Punctuation> Punctuated<Item, Punctuation> {
+    pub fn get(&self, index: usize) -> Option<&Item> {
+        match index.cmp(&self.items.len()) {
+            Ordering::Less => Some(&self.items[index].0),
+            Ordering::Equal => self.last.as_ref(),
+            Ordering::Greater => None,
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut Item> {
+        match index.cmp(&self.items.len()) {
+            Ordering::Less => Some(&mut self.items[index].0),
+            Ordering::Equal => self.last.as_mut(),
+            Ordering::Greater => None,
+        }
+    }
+
     #[inline]
     pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
         self.into_iter()
@@ -65,12 +86,6 @@ impl<Item, Punctuation> Punctuated<Item, Punctuation> {
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.items.is_empty() && self.last.is_none()
-    }
-    pub fn first(&self) -> Option<&Item> {
-        self.items
-            .first()
-            .map(|(item, _)| item)
-            .or(self.last.as_ref())
     }
 }
 impl<Item, Punctuation> IntoIterator for Punctuated<Item, Punctuation> {
@@ -116,5 +131,30 @@ impl<'a, Item, Punctuation> IntoIterator for &'a mut Punctuated<Item, Punctuatio
             .iter_mut()
             .map((|(item, _)| item) as fn(&mut (Item, Punctuation)) -> &mut Item)
             .chain(&mut self.last)
+    }
+}
+
+impl<Item, Punctuation> Index<usize> for Punctuated<Item, Punctuation> {
+    type Output = Item;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match self.get(index) {
+            None => panic!(
+                "index out of bounds: the len is {} but the index is {index}",
+                self.len()
+            ),
+            Some(item) => item,
+        }
+    }
+}
+impl<Item, Punctuation> IndexMut<usize> for Punctuated<Item, Punctuation> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        // TODO feels like this shouldn't be necessary on the successful branch (same for other collections)
+        let len = self.len();
+
+        match self.get_mut(index) {
+            None => panic!("index out of bounds: the len is {len} but the index is {index}",),
+            Some(item) => item,
+        }
     }
 }

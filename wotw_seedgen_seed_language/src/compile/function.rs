@@ -6,15 +6,21 @@ use crate::{
         CommandVoid, CommandZone, EqualityComparator, Operation, StringOrPlaceholder,
     },
 };
+use arrayvec::ArrayVec;
 use convert_case::{Case, Casing};
+use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
-use std::ops::Range;
+use std::{
+    cmp::Ordering,
+    fmt::{self, Display},
+    ops::Range,
+};
 use strum::{Display, EnumString, VariantArray};
 use wotw_seedgen_data::{
     uber_identifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WheelBind,
 };
-use wotw_seedgen_parse::{Error, Punctuated, Span, Symbol};
+use wotw_seedgen_parse::{Error, Punctuated, Span, SpanEnd, SpanStart, Symbol};
 
 pub fn spirit_light(amount: CommandInteger, rng: &mut Pcg64Mcg) -> CommandVoid {
     CommandVoid::Multi {
@@ -103,27 +109,14 @@ pub fn weapon_upgrade(weapon_upgrade: WeaponUpgrade) -> CommandVoid {
 }
 
 struct ArgContext<'a, 'compiler, 'source, 'snippets, 'uberstates> {
-    span: Range<usize>,
     parameters: <Punctuated<ast::Expression<'source>, Symbol<','>> as IntoIterator>::IntoIter,
     compiler: &'a mut SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>,
 }
-fn try_next<'source>(
-    context: &mut ArgContext<'_, '_, 'source, '_, '_>,
-) -> Option<ast::Expression<'source>> {
-    let next = context.parameters.next();
-    if next.is_none() {
-        context.compiler.errors.push(Error::custom(
-            "Too few parameters".to_string(), // TODO help would be great here
-            context.span.clone(),
-        ))
-    }
-    next
-}
 fn arg<T: CompileInto>(context: &mut ArgContext) -> Option<T> {
-    try_next(context)?.compile_into(context.compiler)
+    context.parameters.next()?.compile_into(context.compiler)
 }
 fn spanned_arg<T: CompileInto>(context: &mut ArgContext) -> Option<(T, Range<usize>)> {
-    let next = try_next(context)?;
+    let next = context.parameters.next()?;
     let span = next.span();
     let next = next.compile_into(context.compiler)?;
     Some((next, span))
@@ -171,7 +164,7 @@ fn warp_icon_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.warp_icon_ids.id(id))
 }
 
-#[derive(EnumString, Display, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, VariantArray)]
 #[strum(serialize_all = "snake_case")]
 pub enum FunctionIdentifier {
     Fetch,
@@ -278,49 +271,277 @@ pub enum FunctionIdentifier {
     ResetAllWheels,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FunctionSignature {
+    pub args: ArrayVec<FunctionArg, 6>,
+    pub return_ty: Option<&'static str>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FunctionArg {
+    pub name: &'static str,
+    pub ty: &'static str,
+}
+
+macro_rules! function_signatures {
+    (@acc $self:ident [$identifier:ident($($name:ident: $ty:tt),*) -> $return_ty:tt, $($more:tt)*] -> [$($acc:tt)*]) => {
+        function_signatures!(@acc $self [$($more)*] -> [$($acc)*
+            $identifier => FunctionSignature {
+                args: ArrayVec::from_iter([
+                    $(FunctionArg {
+                        name: stringify!($name),
+                        ty: stringify!($ty),
+                    }),*
+                ]),
+                return_ty: Some(stringify!($return_ty)),
+            },
+        ])
+    };
+
+    (@acc $self:ident [$identifier:ident($($name:ident: $ty:tt),*), $($more:tt)*] -> [$($acc:tt)*]) => {
+        function_signatures!(@acc $self [$($more)*] -> [$($acc)*
+            $identifier => FunctionSignature {
+                args: ArrayVec::from_iter([
+                    $(FunctionArg {
+                        name: stringify!($name),
+                        ty: stringify!($ty),
+                    }),*
+                ]),
+                return_ty: None,
+            },
+        ])
+    };
+
+    (@acc $self:ident [] -> [$($acc:tt)*]) => {
+        {
+            use FunctionIdentifier::*;
+
+            match $self {
+                $($acc)*
+            }
+        }
+    };
+
+    ($self:ident, $($items:tt)*) => {
+        function_signatures!(@acc $self [$($items)*] -> [])
+    };
+}
+
+impl FunctionIdentifier {
+    pub fn signature(self) -> FunctionSignature {
+        function_signatures! {
+            self,
+            Fetch(uber_identifier: UberIdentifier) -> ?,
+            IsInHitbox(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
+            GetBoolean(id: String) -> Boolean,
+            GetInteger(id: String) -> Integer,
+            ToInteger(float: Float) -> Integer,
+            GetFloat(id: String) -> Float,
+            ToFloat(integer: Integer) -> Float,
+            GetString(id: String) -> String,
+            ToString(value: ?) -> String,
+            SpiritLightString(amount: Integer) -> String,
+            RemoveSpiritLightString(amount: Integer) -> String,
+            GorlekOreString() -> String,
+            RemoveGorlekOreString() -> String,
+            KeystoneString() -> String,
+            RemoveKeystoneString() -> String,
+            ShardSlotString() -> String,
+            RemoveShardSlotString() -> String,
+            HealthFragmentString() -> String,
+            RemoveHealthFragmentString() -> String,
+            EnergyFragmentString() -> String,
+            RemoveEnergyFragmentString() -> String,
+            SkillString(skill: Skill) -> String,
+            RemoveSkillString(skill: Skill) -> String,
+            ShardString(shard: Shard) -> String,
+            RemoveShardString(shard: Shard) -> String,
+            TeleporterString(teleporter: Teleporter) -> String,
+            RemoveTeleporterString(teleporter: Teleporter) -> String,
+            CleanWaterString() -> String,
+            RemoveCleanWaterString() -> String,
+            WeaponUpgradeString(weapon_upgrade: WeaponUpgrade) -> String,
+            RemoveWeaponUpgradeString(weapon_upgrade: WeaponUpgrade) -> String,
+            CurrentZone() -> Zone,
+            CurrentMapZone() -> Zone,
+            SpiritLight(amount: Integer),
+            RemoveSpiritLight(amount: Integer),
+            GorlekOre(),
+            RemoveGorlekOre(),
+            Keystone(),
+            RemoveKeystone(),
+            ShardSlot(),
+            RemoveShardSlot(),
+            HealthFragment(),
+            RemoveHealthFragment(),
+            EnergyFragment(),
+            RemoveEnergyFragment(),
+            Skill(skill: Skill),
+            RemoveSkill(skill: Skill),
+            Shard(shard: Shard),
+            RemoveShard(shard: Shard),
+            Teleporter(teleporter: Teleporter),
+            RemoveTeleporter(teleporter: Teleporter),
+            CleanWater(),
+            RemoveCleanWater(),
+            WeaponUpgrade(weapon_upgrade: WeaponUpgrade),
+            RemoveWeaponUpgrade(weapon_upgrade: WeaponUpgrade),
+            ItemMessage(message: String),
+            ItemMessageWithTimeout(message: String, timeout: Float),
+            PriorityMessage(message: String, timeout: Float),
+            ControlledPriorityMessage(id: String, message: String, timeout: Float),
+            FreeMessage(id: String, message: String),
+            DestroyMessage(id: String),
+            SetMessageText(id: String, message: String),
+            SetMessageTimeout(id: String, timeout: Float),
+            SetMessageBackground(id: String, background: Boolean),
+            SetMessagePosition(id: String, x: Float, y: Float),
+            SetMessageAlignment(id: String, alignment: Alignment),
+            SetMessageScreenPosition(id: String, screen_position: ScreenPosition),
+            SetMapMessage(message: String),
+            Store(uber_identifier: UberIdentifier, value: ?),
+            StoreWithoutTriggers(uber_identifier: UberIdentifier, value: ?),
+            SetBoolean(id: String, value: Boolean),
+            SetInteger(id: String, value: Integer),
+            SetFloat(id: String, value: Float),
+            SetString(id: String, value: String),
+            Save(),
+            SaveToMemory(),
+            Warp(x: Float, y: Float),
+            Equip(slot: EquipSlot, equipment: Equipment),
+            Unequip(equipment: Equipment),
+            TriggerKeybind(bind: String),
+            EnableServerSync(uber_identifier: UberIdentifier),
+            DisableServerSync(uber_identifier: UberIdentifier),
+            CreateWarpIcon(id: String, x: Float, y: Float),
+            SetWarpIconLabel(id: String, label: String),
+            DestroyWarpIcon(id: String),
+            SetShopItemData(uber_identifier: UberIdentifier, price: Integer, name: String, description: String, icon: Icon),
+            SetShopItemPrice(uber_identifier: UberIdentifier, price: Integer),
+            SetShopItemName(uber_identifier: UberIdentifier, name: String),
+            SetShopItemDescription(uber_identifier: UberIdentifier, description: String),
+            SetShopItemIcon(uber_identifier: UberIdentifier, icon: Icon),
+            SetShopItemHidden(uber_identifier: UberIdentifier, hidden: Boolean),
+            SetShopItemLocked(uber_identifier: UberIdentifier, locked: Boolean),
+            SetWheelItemData(wheel: String, position: WheelItemPosition, name: String, description: String, icon: Icon, action: Action),
+            SetWheelItemName(wheel: String, position: WheelItemPosition, name: String),
+            SetWheelItemDescription(wheel: String, position: WheelItemPosition, description: String),
+            SetWheelItemIcon(wheel: String, position: WheelItemPosition, icon: Icon),
+            SetWheelItemColor(wheel: String, position: WheelItemPosition, red: Integer, green: Integer, blue: Integer, alpha: Integer),
+            SetWheelItemAction(wheel: String, position: WheelItemPosition, bind: WheelBind, action: Action),
+            DestroyWheelItem(wheel: String, position: WheelItemPosition),
+            SwitchWheel(wheel: String),
+            SetWheelPinned(wheel: String, pinned: Boolean),
+            ResetAllWheels(),
+        }
+    }
+
+    // This seems to get optimized cleanly
+    fn arg_count(self) -> usize {
+        self.signature().args.len()
+    }
+}
+
+impl Display for FunctionSignature {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({})", self.args.iter().format(", "))?;
+
+        if let Some(return_ty) = self.return_ty {
+            write!(f, " -> {return_ty}")
+        } else {
+            Ok(())
+        }
+    }
+}
+
+impl Display for FunctionArg {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}: {}", self.name, self.ty)
+    }
+}
+
+impl<'source> ast::FunctionCall<'source> {
+    fn compile_custom_function(&self, compiler: &mut SnippetCompiler) -> Option<Command> {
+        let index = *compiler.function_indices.get(self.identifier.data.0)?;
+
+        // TODO are we dropping a result here?
+        if let Ok(parameters) = &self.parameters.content {
+            if !parameters.is_empty() {
+                compiler.errors.push(Error::custom(
+                    "parameters for custom functions aren't (yet) supported".to_string(),
+                    parameters[0].span().start..parameters.last.as_ref().unwrap().span().end,
+                ).with_help("Use set functions for the values you want to pass and get them again in the function".to_string()))
+            }
+        }
+
+        return Some(Command::Void(CommandVoid::Lookup { index }));
+    }
+
+    fn compile_signature<'a, 'compiler, 'snippets, 'uberstates>(
+        self,
+        compiler: &'a mut SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>,
+    ) -> Option<(
+        FunctionIdentifier,
+        ArgContext<'a, 'compiler, 'source, 'snippets, 'uberstates>,
+    )> {
+        let identifier = compiler.consume_result(
+            self.identifier
+                .data
+                .0
+                .parse::<FunctionIdentifier>()
+                .map_err(|_| Error::custom("Unknown function".to_string(), self.identifier.span)),
+        );
+        let parameters = compiler.consume_result(self.parameters.content);
+
+        let identifier = identifier?;
+        let parameters = parameters?;
+        let arg_count = identifier.arg_count();
+
+        match parameters.len().cmp(&arg_count) {
+            Ordering::Less => {
+                let start = match &parameters.last {
+                    None => self.parameters.open.span_start(),
+                    Some(last) => last.span_end(),
+                };
+                let end = self.parameters.close.span_end();
+
+                compiler
+                    .errors
+                    .push(Error::custom("Too few parameters".to_string(), start..end))
+            }
+            Ordering::Equal => {}
+            Ordering::Greater => {
+                let start = parameters[arg_count].span_start();
+                let end = self.parameters.close.span_end();
+
+                compiler
+                    .errors
+                    .push(Error::custom("Too many parameters".to_string(), start..end))
+            }
+        }
+
+        let context = ArgContext {
+            parameters: parameters.into_iter(),
+            compiler,
+        };
+
+        Some((identifier, context))
+    }
+}
+
 impl<'source> Compile<'source> for ast::FunctionCall<'source> {
     type Output = Option<Command>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let Some(&index) = compiler.function_indices.get(self.identifier.data.0) {
-            // TODO are we dropping a result here?
-            if let Ok(parameters) = &self.parameters.content {
-                if !parameters.is_empty() {
-                    compiler.errors.push(Error::custom(
-                    "parameters for custom functions aren't (yet) supported".to_string(),
-                    parameters.first().unwrap().span().start..parameters.last.as_ref().unwrap().span().end,
-                ).with_help("Use set functions for the values you want to pass and get them again in the function".to_string()))
-                }
-            }
-            return Some(Command::Void(CommandVoid::Lookup { index }));
+        if let custom_function @ Some(_) = self.compile_custom_function(compiler) {
+            return custom_function;
         }
 
-        let identifier =
-            compiler.consume_result(
-                self.identifier.data.0.parse().map_err(|_| {
-                    Error::custom("Unknown function".to_string(), self.identifier.span)
-                }),
-            );
-
-        let span = self.parameters.span();
-        let content = compiler.consume_result(self.parameters.content)?;
-
-        let identifier = identifier?;
-
-        let span = match &content.last {
-            Some(last) => content.first().unwrap().span().start..last.span().end,
-            None => span,
-        };
-
-        let mut context = ArgContext {
-            span,
-            parameters: content.into_iter(),
-            compiler,
-        };
+        let (identifier, mut context) = self.compile_signature(compiler)?;
 
         let action = match identifier {
             FunctionIdentifier::Fetch => {
-                let uber_identifier = try_next(&mut context)?;
+                let uber_identifier = context.parameters.next()?;
                 let span = uber_identifier.span();
                 let uber_identifier =
                     uber_identifier.compile_into::<UberIdentifier>(context.compiler)?;
@@ -336,14 +557,12 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     }
                 }
             }
-            FunctionIdentifier::IsInHitbox => {
-                Command::Boolean(CommandBoolean::IsInHitbox {
-                    x1: boxed_arg(&mut context)?, // TODO we short circuit potential error messages here, but this does avoid duplicate "too few arguments" errors, so we'd need a different approach to begin with
-                    y1: boxed_arg(&mut context)?,
-                    x2: boxed_arg(&mut context)?,
-                    y2: boxed_arg(&mut context)?,
-                })
-            }
+            FunctionIdentifier::IsInHitbox => Command::Boolean(CommandBoolean::IsInHitbox {
+                x1: boxed_arg(&mut context)?,
+                y1: boxed_arg(&mut context)?,
+                x2: boxed_arg(&mut context)?,
+                y2: boxed_arg(&mut context)?,
+            }),
             FunctionIdentifier::GetBoolean => Command::Boolean(CommandBoolean::GetBoolean {
                 id: boolean_id(&mut context)?,
             }),
@@ -1086,6 +1305,7 @@ fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
     Some(Command::Void(command))
 }
 
+// TODO update
 const SPIRIT_LIGHT_NAMES: &[&str] = &[
     "Spirit Light",
     "Gallons",
