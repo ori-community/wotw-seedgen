@@ -64,6 +64,8 @@ pub enum Cli {
         #[command(flatten)]
         args: RegenerateArgs,
     },
+    /// Start a daemon for reach checks
+    Daemon,
     /// Start a language server
     Lsp,
 }

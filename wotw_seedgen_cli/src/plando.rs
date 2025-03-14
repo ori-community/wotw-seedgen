@@ -46,7 +46,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let logic_access = files::logic_access(root)?;
     let uber_state_data =
-        logic_access.uber_state_data(logic_access.loc_data()?, logic_access.state_data()?)?;
+        logic_access.uber_state_data(&logic_access.loc_data()?, &logic_access.state_data()?)?;
 
     let mut rng = rand::thread_rng();
     let snippet_access = files::snippet_access(root)?;

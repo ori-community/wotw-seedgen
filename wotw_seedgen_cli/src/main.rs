@@ -1,4 +1,5 @@
 mod cli;
+mod daemon;
 mod files;
 mod log_config;
 mod plando;
@@ -10,6 +11,7 @@ mod stats;
 use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
+use daemon::daemon;
 use plando::plando;
 use preset::{universe_preset, world_preset};
 use regenerate::regenerate;
@@ -34,6 +36,7 @@ fn main() -> Result<(), Error> {
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
+        Cli::Daemon => daemon(),
         Cli::Lsp => Ok(wotw_seedgen_lsp::start()),
     }
 }

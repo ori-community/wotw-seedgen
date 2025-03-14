@@ -65,6 +65,60 @@ impl UniverseSettings {
     }
 }
 
+pub trait WorldSettingsHelpers {
+    fn lowest_difficulty(&self) -> Difficulty;
+
+    fn highest_difficulty(&self) -> Difficulty;
+
+    fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>>;
+
+    fn all_contain_trick(&self, trick: Trick) -> bool {
+        self.iter_tricks().all(|tricks| tricks.contains(&trick))
+    }
+
+    fn any_contain_trick(&self, trick: Trick) -> bool {
+        self.iter_tricks().any(|tricks| tricks.contains(&trick))
+    }
+
+    fn none_contain_trick(&self, trick: Trick) -> bool {
+        !self.any_contain_trick(trick)
+    }
+}
+
+impl WorldSettingsHelpers for [WorldSettings] {
+    fn lowest_difficulty(&self) -> Difficulty {
+        self.iter()
+            .map(|settings| settings.difficulty)
+            .min()
+            .unwrap_or(Difficulty::Moki)
+    }
+
+    fn highest_difficulty(&self) -> Difficulty {
+        self.iter()
+            .map(|settings| settings.difficulty)
+            .max()
+            .unwrap_or(Difficulty::Unsafe)
+    }
+
+    fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>> {
+        self.iter().map(|settings| &settings.tricks)
+    }
+}
+
+impl WorldSettingsHelpers for UniverseSettings {
+    fn lowest_difficulty(&self) -> Difficulty {
+        self.world_settings.lowest_difficulty()
+    }
+
+    fn highest_difficulty(&self) -> Difficulty {
+        self.world_settings.highest_difficulty()
+    }
+
+    fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>> {
+        self.world_settings.iter_tricks()
+    }
+}
+
 /// Seed settings bound to a specific world of a seed
 ///
 /// See the [Multiplayer wiki page](https://wiki.orirando.com/features/multiplayer) for an explanation of worlds

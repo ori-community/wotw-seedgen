@@ -19,7 +19,7 @@ use wotw_seedgen_data::{Position, Shard, Skill, Teleporter, UberIdentifier};
 use wotw_seedgen_parse::{
     Error, ErrorKind, Recover, Recoverable, Result, Separated, SeparatedNonEmpty, Span, Spanned,
 };
-use wotw_seedgen_settings::{Difficulty, Trick, WorldSettings};
+use wotw_seedgen_settings::{Difficulty, Trick, WorldSettings, WorldSettingsHelpers};
 
 // TODO not really part of compilation but some kind of lints would be nice, like:
 // verify all states were used
@@ -316,16 +316,8 @@ struct DifficultyRequirements {
 }
 impl DifficultyRequirements {
     fn new(settings: &[WorldSettings]) -> Self {
-        let lowest_difficulty = settings
-            .iter()
-            .map(|settings| settings.difficulty)
-            .min()
-            .unwrap_or(Difficulty::Moki);
-        let highest_difficulty = settings
-            .iter()
-            .map(|settings| settings.difficulty)
-            .max()
-            .unwrap_or(Difficulty::Unsafe);
+        let lowest_difficulty = settings.lowest_difficulty();
+        let highest_difficulty = settings.highest_difficulty();
         let build_difficulty = move |difficulty| {
             if highest_difficulty < difficulty {
                 Requirement::Impossible
@@ -385,15 +377,9 @@ impl TrickRequirements {
         let build_trick = move |trick| {
             if settings.is_empty() {
                 Requirement::Trick(trick)
-            } else if settings
-                .iter()
-                .all(|settings| !settings.tricks.contains(&trick))
-            {
+            } else if settings.none_contain_trick(trick) {
                 Requirement::Impossible
-            } else if settings
-                .iter()
-                .all(|settings| settings.tricks.contains(&trick))
-            {
+            } else if settings.all_contain_trick(trick) {
                 Requirement::Free
             } else {
                 Requirement::Trick(trick)

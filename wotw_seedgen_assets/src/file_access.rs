@@ -46,8 +46,8 @@ impl FileAccess {
     #[cfg(feature = "uber_state_data")]
     pub fn uber_state_data(
         &self,
-        loc_data: LocData,
-        state_data: StateData,
+        loc_data: &LocData,
+        state_data: &StateData,
     ) -> Result<UberStateData, String> {
         // TODO rename uber_state_dump -> uber_state_data
         let (path, file) = self.open(Path::new("uber_state_dump.json"))?;

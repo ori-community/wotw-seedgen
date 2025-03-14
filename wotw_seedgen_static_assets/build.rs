@@ -30,8 +30,8 @@ fn main() {
         #[allow(unused_mut)]
         let mut uber_state_data = wotw_seedgen_assets::UberStateData::from_reader(
             include_bytes!("../assets/uber_state_dump.json").as_slice(),
-            loc_data,
-            state_data,
+            &loc_data,
+            &state_data,
         )
         .unwrap();
 

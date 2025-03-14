@@ -11,7 +11,7 @@ use wotw_seedgen::{
     settings::{UniverseSettings, WorldSettings},
     SeedUniverse,
 };
-use wotw_seedgen_assets::UberStateData;
+use wotw_seedgen_assets::{LocData, Source, StateData, UberStateData};
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
@@ -49,21 +49,45 @@ pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse
 }
 
 pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, UberStateData), Error> {
-    let logic_access = files::logic_access("")?;
+    let LogicFiles {
+        loc_data,
+        state_data,
+        areas_source: source,
+        uber_state_data,
+    } = LogicFiles::new()?;
 
-    let loc_data = logic_access.loc_data()?;
-    let state_data = logic_access.state_data()?;
-
-    let source = logic_access.areas()?;
     let areas = ast::parse(&source.content).into_result()?;
 
-    let (graph, success) = Graph::compile(areas, loc_data.clone(), state_data.clone(), settings)
-        .eprint_errors(&source);
+    let (graph, success) =
+        Graph::compile(areas, loc_data, state_data, settings).eprint_errors(&source);
     if !success {
         return Err(Error("failed to compile graph".to_string()));
     }
 
-    let uber_state_data = logic_access.uber_state_data(loc_data, state_data)?;
-
     Ok((graph, uber_state_data))
+}
+
+pub struct LogicFiles {
+    pub loc_data: LocData,
+    pub state_data: StateData,
+    pub areas_source: Source,
+    pub uber_state_data: UberStateData,
+}
+
+impl LogicFiles {
+    pub fn new() -> Result<Self, Error> {
+        let logic_access = files::logic_access("")?;
+
+        let loc_data = logic_access.loc_data()?;
+        let state_data = logic_access.state_data()?;
+        let areas_source = logic_access.areas()?;
+        let uber_state_data = logic_access.uber_state_data(&loc_data, &state_data)?;
+
+        Ok(LogicFiles {
+            loc_data,
+            state_data,
+            areas_source,
+            uber_state_data,
+        })
+    }
 }

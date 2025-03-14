@@ -86,8 +86,8 @@ impl UberStateData {
     /// Information from `loc_data` and `state_data` will be included
     pub fn from_reader<R: Read>(
         reader: R,
-        loc_data: LocData,
-        state_data: StateData,
+        loc_data: &LocData,
+        state_data: &StateData,
     ) -> serde_json::Result<Self> {
         let mut uber_state_data = Self::default();
         let dump: Dump = serde_json::from_reader(reader)?;
@@ -128,11 +128,19 @@ impl UberStateData {
                 );
             }
         }
-        for record in loc_data.entries {
-            uber_state_data.add_rando_name(record.identifier, record.uber_identifier, record.value);
+        for record in &loc_data.entries {
+            uber_state_data.add_rando_name(
+                record.identifier.clone(),
+                record.uber_identifier,
+                record.value,
+            );
         }
-        for record in state_data.entries {
-            uber_state_data.add_rando_name(record.identifier, record.uber_identifier, record.value);
+        for record in &state_data.entries {
+            uber_state_data.add_rando_name(
+                record.identifier.clone(),
+                record.uber_identifier,
+                record.value,
+            );
         }
         Ok(uber_state_data)
     }
