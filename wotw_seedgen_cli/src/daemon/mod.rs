@@ -59,12 +59,14 @@ fn read_message(
     stdin: &mut BufReader<StdinLock>,
     buf: &mut String,
 ) -> Result<Option<Message>, Error> {
+    buf.clear();
     let bytes = stdin.read_line(buf)?;
     if bytes == 0 {
         return Ok(None);
     }
 
-    let message = serde_json::from_str(buf)?;
+    let message =
+        serde_json::from_str(buf).map_err(|err| format!("failed to parse message: {err}"))?;
     Ok(Some(message))
 }
 
