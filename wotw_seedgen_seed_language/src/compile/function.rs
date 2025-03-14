@@ -11,12 +11,15 @@ use convert_case::{Case, Casing};
 use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
+use regex::Regex;
+use rustc_hash::FxHashMap;
 use std::{
     cmp::Ordering,
     fmt::{self, Display},
     ops::Range,
 };
 use strum::{Display, EnumString, VariantArray};
+use wotw_seedgen_assets::UberStateValue;
 use wotw_seedgen_data::{
     uber_identifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WheelBind,
 };
@@ -237,6 +240,8 @@ pub enum FunctionIdentifier {
     SetMapMessage,
     Store,
     StoreWithoutTriggers,
+    StoreDefaults,
+    StoreDefaultsExclude,
     SetBoolean,
     SetInteger,
     SetFloat,
@@ -401,6 +406,8 @@ impl FunctionIdentifier {
             SetMapMessage(message: String),
             Store(uber_identifier: UberIdentifier, value: ?),
             StoreWithoutTriggers(uber_identifier: UberIdentifier, value: ?),
+            StoreDefaults(),
+            StoreDefaultsExclude(regex: String),
             SetBoolean(id: String, value: Boolean),
             SetInteger(id: String, value: Integer),
             SetFloat(id: String, value: Float),
@@ -865,6 +872,21 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }),
             FunctionIdentifier::Store => store(true, &mut context)?,
             FunctionIdentifier::StoreWithoutTriggers => store(false, &mut context)?,
+            FunctionIdentifier::StoreDefaults => {
+                store_defaults("*store_defaults".to_string(), &mut context, |_| true)
+            }
+            FunctionIdentifier::StoreDefaultsExclude => {
+                let (regex, span) = spanned_string_literal(&mut context)?;
+                let identifier = format!("*store_defaults_exclude{regex}");
+                let regex = context.compiler.consume_result(
+                    Regex::new(&regex)
+                        .map_err(|err| Error::custom(format!("Invalid regex: {err}"), span)),
+                )?;
+
+                store_defaults(identifier, &mut context, |uber_identifier| {
+                    !regex.is_match(&uber_identifier.to_string())
+                })
+            }
             FunctionIdentifier::SetBoolean => Command::Void(CommandVoid::SetBoolean {
                 id: boolean_id(&mut context)?,
                 value: arg(&mut context)?,
@@ -1303,6 +1325,57 @@ fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
         ));
     }
     Some(Command::Void(command))
+}
+
+fn store_defaults<F>(identifier: String, context: &mut ArgContext, mut condition: F) -> Command
+where
+    F: FnMut(UberIdentifier) -> bool,
+{
+    lookup_or_insert(
+        identifier,
+        &mut context.compiler.function_indices,
+        &mut context.compiler.global.output.command_lookup,
+        || CommandVoid::Multi {
+            commands: context
+                .compiler
+                .global
+                .uber_state_data
+                .id_lookup
+                .iter()
+                .filter(|(uber_identifier, meta)| !meta.readonly && condition(**uber_identifier))
+                .map(|(uber_identifier, meta)| match &meta.default_value {
+                    UberStateValue::Boolean(value) => {
+                        super::set_boolean_value(*uber_identifier, *value)
+                    }
+                    UberStateValue::Integer(value) => {
+                        super::set_integer_value(*uber_identifier, *value)
+                    }
+                    UberStateValue::Float(value) => {
+                        super::set_float_value(*uber_identifier, (*value).into())
+                    }
+                })
+                .collect(),
+        },
+    )
+}
+
+fn lookup_or_insert<F>(
+    identifier: String,
+    function_indices: &mut FxHashMap<String, usize>,
+    command_lookup: &mut Vec<CommandVoid>,
+    command: F,
+) -> Command
+where
+    F: FnOnce() -> CommandVoid,
+{
+    let index = *function_indices.entry(identifier).or_insert_with(|| {
+        let index = command_lookup.len();
+        command_lookup.push(command());
+
+        index
+    });
+
+    Command::Void(CommandVoid::Lookup { index })
 }
 
 // TODO update

@@ -49,6 +49,7 @@ pub struct Compiler<'snippets, 'uberstates> {
 // TODO how much is needed
 pub const RESERVED_MEMORY: usize = 10;
 
+// TODO set -> store?
 pub const fn set_boolean(uber_identifier: UberIdentifier, value: CommandBoolean) -> CommandVoid {
     CommandVoid::StoreBoolean {
         uber_identifier,

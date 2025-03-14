@@ -214,6 +214,8 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetMapMessage
             | FunctionIdentifier::Store
             | FunctionIdentifier::StoreWithoutTriggers
+            | FunctionIdentifier::StoreDefaults
+            | FunctionIdentifier::StoreDefaultsExclude
             | FunctionIdentifier::SetString
             | FunctionIdentifier::SetBoolean
             | FunctionIdentifier::SetInteger
