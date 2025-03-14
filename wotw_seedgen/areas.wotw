@@ -5467,6 +5467,7 @@ anchor OuterWellspring.TrialStart at -665, -3937:
     moki: OuterWellspring.TrialActivation, DoubleJump, Dash, Grapple
     gorlek: OuterWellspring.TrialActivation, Dash, Grapple, Glide
     kii: OuterWellspring.TrialActivation, Grapple, Glide
+    unsafe: OuterWellspring.TrialActivation, DoubleJump, Glide, Damage=60
 
   conn OuterWellspring.TrialRoom:
     moki:
