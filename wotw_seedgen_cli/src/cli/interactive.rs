@@ -1,8 +1,4 @@
-use std::{
-    fmt::Display,
-    num::{NonZeroU8, NonZeroUsize, ParseIntError},
-    str::FromStr,
-};
+use std::{fmt::Display, num::NonZeroUsize};
 
 use clap::builder::styling::Reset;
 use dialoguer::{

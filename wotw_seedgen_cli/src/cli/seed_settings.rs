@@ -12,7 +12,7 @@ use std::{
     ffi::OsStr,
     fmt::{self, Debug, Display, Write},
     marker::PhantomData,
-    num::{NonZeroU8, NonZeroUsize},
+    num::NonZeroUsize,
     str::FromStr,
 };
 use strum::VariantNames;

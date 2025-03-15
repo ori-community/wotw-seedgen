@@ -97,7 +97,7 @@ impl CompileResult {
         if !success {
             writeln!(
                 &mut stderr,
-                "Failed to compile Snippets with {error_count} errors."
+                "Failed to compile Logic with {error_count} errors."
             )
             .unwrap();
         }

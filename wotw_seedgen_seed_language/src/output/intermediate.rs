@@ -18,16 +18,6 @@ pub enum Literal {
     CustomIcon(String),
 }
 
-mod expand {
-    use super::*;
-
-    #[derive(EnumDiscriminants)]
-    #[strum_discriminants(derive(FromStr))]
-    pub enum Constant {
-        Skill(wotw_seedgen_data::Skill),
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
 #[strum_discriminants(derive(FromStr, Display, VariantArray))]
 pub enum Constant {

@@ -1,6 +1,5 @@
 use crate::inventory::Inventory;
 use itertools::Itertools;
-use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
 use wotw_seedgen_data::{Position, Zone};
