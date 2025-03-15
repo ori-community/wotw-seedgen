@@ -8,29 +8,24 @@ use crate::{
     Error,
 };
 
+#[derive(Default)]
 pub struct LogConfig {
     trace_seedgen: bool,
     trace_placement: bool,
     trace_reached: bool,
+    trace_doors: bool,
 }
 
 impl LogConfig {
-    pub fn new() -> Self {
-        Self {
-            trace_seedgen: false,
-            trace_placement: false,
-            trace_reached: false,
-        }
-    }
-
     pub fn from_args(args: VerboseArgs) -> Self {
-        let mut config = Self::new();
+        let mut config = Self::default();
 
         if let Some(targets) = args.verbose {
             config = config
                 .trace_seedgen(true)
                 .trace_placement(targets.is_empty() || targets.contains(&VerboseTarget::Placement))
                 .trace_reached(targets.contains(&VerboseTarget::Reached))
+                .trace_doors(targets.contains(&VerboseTarget::Doors))
         }
 
         config
@@ -46,6 +41,10 @@ impl LogConfig {
     }
     pub fn trace_reached(mut self, trace_reached: bool) -> Self {
         self.trace_reached = trace_reached;
+        self
+    }
+    pub fn trace_doors(mut self, trace_doors: bool) -> Self {
+        self.trace_doors = trace_doors;
         self
     }
 
@@ -74,6 +73,10 @@ impl LogConfig {
                     .level_for(
                         "wotw_seedgen::world::reached",
                         level_filter(self.trace_reached),
+                    )
+                    .level_for(
+                        "wotw_seedgen::generator::doors",
+                        level_filter(self.trace_doors),
                     )
                     .chain(File::create("seedgen_log.txt")?),
             )

@@ -8,8 +8,6 @@ use wotw_seedgen_logic_language::output::{Connection, Node, RefillValue, Require
 
 pub const TP_ANCHOR: &str = "Teleporters";
 
-const TRACE: bool = false;
-
 #[derive(Debug, Default)]
 pub struct ReachedLocations<'graph> {
     pub reached: Vec<&'graph Node>,
@@ -34,11 +32,11 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             .insert(current_node_index, best_orbs.clone());
         let current_node = &self.graph.nodes[current_node_index];
 
-        if TRACE {
-            let identifier = current_node.identifier();
-            let best_orbs = best_orbs.iter().format(" or ");
-            trace!("[{identifier}] reached with {best_orbs}");
-        }
+        trace!(
+            "[{identifier}] reached with {best_orbs}",
+            identifier = current_node.identifier(),
+            best_orbs = best_orbs.iter().format(" or "),
+        );
 
         match current_node {
             Node::Anchor(anchor) => {
@@ -71,11 +69,11 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                         continue;
                     }
 
-                    if TRACE {
-                        let identifier = current_node.identifier();
-                        let to_identifier = self.graph.nodes[connection.to].identifier();
-                        trace!("[{identifier}] -> [{to_identifier}] attempting to connect");
-                    };
+                    trace!(
+                        "[{identifier}] -> [{to_identifier}] attempting to connect",
+                        identifier = current_node.identifier(),
+                        to_identifier = self.graph.nodes[connection.to].identifier(),
+                    );
 
                     let target_orbs = self.player.is_met(
                         &connection.requirement,
@@ -84,11 +82,11 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                     );
 
                     if target_orbs.is_empty() {
-                        if TRACE {
-                            let identifier = current_node.identifier();
-                            let to_identifier = self.graph.nodes[connection.to].identifier();
-                            trace!("[{identifier}] -> [{to_identifier}] cannot meet requirement");
-                        }
+                        trace!(
+                            "[{identifier}] -> [{to_identifier}] cannot meet requirement",
+                            identifier = current_node.identifier(),
+                            to_identifier = self.graph.nodes[connection.to].identifier(),
+                        );
 
                         let mut states = vec![];
                         contained_states(&connection.requirement, &mut states);
@@ -102,15 +100,14 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                                 });
                             }
                         } else {
-                            if TRACE {
-                                let identifier = current_node.identifier();
-                                let to_identifier = self.graph.nodes[connection.to].identifier();
-                                let states = states
+                            trace!("[{identifier}] -> [{to_identifier}] adding state progressions for {states}",
+                                identifier = current_node.identifier(),
+                                to_identifier = self.graph.nodes[connection.to].identifier(),
+                                states = states
                                     .iter()
                                     .map(|index| self.graph.nodes[*index].identifier())
-                                    .format(", ");
-                                trace!("[{identifier}] -> [{to_identifier}] adding state progressions for {states}");
-                            }
+                                    .format(", "),
+                            );
 
                             for state in states {
                                 context

@@ -12,7 +12,7 @@ use crate::{
     World,
 };
 use itertools::Itertools;
-use log::{trace, warn};
+use log::{log_enabled, trace, warn, Level::Trace};
 use ordered_float::OrderedFloat;
 use rand::{
     distributions::Uniform,
@@ -470,7 +470,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             let world_context = &mut self.worlds[target_world_index];
             if world_context.world.reached().len() > initial_reached[target_world_index] {
                 trace!(
-                    "{}reached additional locations, resuming normal placement loop",
+                    "{}Reached additional locations, resuming normal placement loop",
                     world_context.log_index
                 );
                 return Ok(());
@@ -564,9 +564,13 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         if self.worlds.len() == 1 {
             return target_world_index;
         }
-        if self.worlds[target_world_index].unshared_items > 0 {
-            trace!("[{target_world_index}] is not allowed to share items yet, forcing item placement in own world");
-            self.worlds[target_world_index].unshared_items -= 1;
+        let target_world = &mut self.worlds[target_world_index];
+        if target_world.unshared_items > 0 {
+            trace!(
+                "{}is not allowed to share items yet, forcing item placement in own world",
+                target_world.log_index
+            );
+            target_world.unshared_items -= 1;
             target_world_index
         } else {
             let mut world_indices = (0..self.worlds.len()).collect::<Vec<_>>();
@@ -636,9 +640,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         origin_world_index: usize,
         target_world_index: usize,
     ) {
-        let log_name = self.worlds[target_world_index].log_name(&command);
         trace!(
             "Placing {target_index}{log_name} at {origin_index}{node}",
+            log_name = self.worlds[target_world_index].log_name(&command),
             target_index = self.worlds[target_world_index].log_index,
             origin_index = self.worlds[origin_world_index].log_index,
             node = node.identifier()
@@ -874,10 +878,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .collect();
         self.reached_item_locations = self.reached.iter().filter(|node| node.can_place()).count();
         trace!(
-            "{}{} reached locations that need placements: {}",
-            self.log_index,
-            self.reached_needs_placement.len(),
-            self.reached_needs_placement
+            "{log_index}{amount} reached locations that need placements: {reached_needs_placement}",
+            log_index = self.log_index,
+            amount = self.reached_needs_placement.len(),
+            reached_needs_placement = self
+                .reached_needs_placement
                 .iter()
                 .map(|index| self.needs_placement[*index].identifier())
                 .format(", ")
@@ -922,10 +927,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         self.placeholders.extend(placeholders);
         self.placeholders.shuffle(&mut self.rng);
         trace!(
-            "{}Keeping {} placeholders: {}",
-            self.log_index,
-            self.placeholders.len(),
-            self.placeholders
+            "{log_index}Keeping {amount} placeholders: {placeholders}",
+            log_index = self.log_index,
+            amount = self.placeholders.len(),
+            placeholders = self
+                .placeholders
                 .iter()
                 .map(|node| node.identifier())
                 .format(", ")
@@ -994,21 +1000,22 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         // seedgen output should remain the same whether logging is enabled or not, so we sort even if logging is disabled
         weights.sort_unstable_by(|(_, a), (_, b)| OrderedFloat(*b).cmp(&OrderedFloat(*a)));
-        trace!(
-            "{}{} options for forced progression:\n{}",
-            self.log_index,
-            weights.len(),
-            {
-                let weight_sum = weights.iter().map(|(_, weight)| weight).sum::<f32>();
-                progressions.iter().zip(&weights).format_with(
-                    "\n",
-                    move |(inventory, (_, weight)), f| {
-                        let chance = (*weight / weight_sum) * 100.;
-                        f(&format_args!("- {chance:.1}%: {inventory}"))
-                    },
-                )
-            }
-        );
+        if log_enabled!(Trace) {
+            let log_index = &self.log_index;
+
+            let amount = weights.len();
+
+            let weight_sum = weights.iter().map(|(_, weight)| weight).sum::<f32>();
+            let progressions = progressions.iter().zip(&weights).format_with(
+                "\n",
+                move |(inventory, (_, weight)), f| {
+                    let chance = (*weight / weight_sum) * 100.;
+                    f(&format_args!("- {chance:.1}%: {inventory}"))
+                },
+            );
+
+            trace!("{log_index}{amount} options for forced progression:\n{progressions}");
+        }
 
         let index = weights
             .choose_weighted(&mut self.rng, |(_, weight)| *weight)
