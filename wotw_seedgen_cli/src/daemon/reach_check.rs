@@ -166,10 +166,11 @@ pub fn reach_check(
             .ok_or_else(|| format!("Unknown UberIdentifier {uber_identifier}"))?;
         match &data.default_value {
             UberStateValue::Boolean(_) => world.set_boolean(uber_identifier, *value > 0.5, &output),
+            // unlike set, modify is recognized as a common item and updates the player inventory
             UberStateValue::Integer(_) => {
-                world.set_integer(uber_identifier, (*value) as i32, &output)
+                world.modify_integer(uber_identifier, (*value) as i32, &output)
             }
-            UberStateValue::Float(_) => world.set_float(uber_identifier, value, &output),
+            UberStateValue::Float(_) => world.modify_float(uber_identifier, value, &output),
         }
     }
 

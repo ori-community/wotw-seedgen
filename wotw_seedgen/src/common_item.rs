@@ -60,16 +60,21 @@ impl CommonItem {
                     operator: ArithmeticOperator::Add,
                     right: CommandInteger::Constant { value: amount },
                 } if fetch_identifier == uber_identifier && *amount >= 0 => {
+                    let amount = *amount as usize;
                     match *uber_identifier {
                         uber_identifier::SPIRIT_LIGHT => {
-                            vec![CommonItem::SpiritLight(*amount as usize)]
+                            vec![CommonItem::SpiritLight(amount)]
                         }
-                        uber_identifier::MAX_HEALTH if *amount == 5 => {
-                            vec![CommonItem::HealthFragment]
+                        uber_identifier::MAX_HEALTH => {
+                            vec![CommonItem::HealthFragment; amount / 5]
                         }
-                        uber_identifier::GORLEK_ORE if *amount == 1 => vec![CommonItem::GorlekOre],
-                        uber_identifier::KEYSTONES if *amount == 1 => vec![CommonItem::Keystone],
-                        uber_identifier::SHARD_SLOTS if *amount == 1 => vec![CommonItem::ShardSlot],
+                        uber_identifier::GORLEK_ORE => {
+                            vec![CommonItem::GorlekOre; amount]
+                        }
+                        uber_identifier::KEYSTONES => vec![CommonItem::Keystone; amount],
+                        uber_identifier::SHARD_SLOTS => {
+                            vec![CommonItem::ShardSlot; amount]
+                        }
 
                         _ => vec![],
                     }
@@ -88,7 +93,7 @@ impl CommonItem {
                         },
                     operator: ArithmeticOperator::Add,
                     right: CommandFloat::Constant { value },
-                } if *value == 0.5 => vec![CommonItem::EnergyFragment],
+                } => vec![CommonItem::EnergyFragment; (**value * 2.) as usize],
                 _ => vec![],
             },
             _ => vec![],
