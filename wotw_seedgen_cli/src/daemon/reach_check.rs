@@ -1,3 +1,4 @@
+use log::trace;
 use ordered_float::OrderedFloat;
 use serde::Deserialize;
 use wotw_seedgen::{
@@ -139,7 +140,7 @@ pub fn new_world<'cache>(
         .get(world_index)
         .expect("world_index in seedgen_info out of bounds");
 
-    Ok(World::new_spawn(
+    Ok(World::new(
         &value.graph,
         spawn,
         settings,
@@ -171,6 +172,8 @@ pub fn reach_check(
             UberStateValue::Float(_) => world.set_float(uber_identifier, value, &output),
         }
     }
+
+    trace!("Checking reached with {}", world.inventory());
 
     let reached = world
         .reached()

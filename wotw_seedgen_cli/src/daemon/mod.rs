@@ -6,9 +6,11 @@ use reach_check::{new_world, reach_check, relevant_uber_states, GraphCache, Reac
 use serde::Deserialize;
 use wotw_seedgen::{logic_language::ast, seed::SeedgenInfo, UberStates};
 
-use crate::{seed::LogicFiles, Error};
+use crate::{cli::VerboseArgs, log_config::LogConfig, seed::LogicFiles, Error};
 
-pub fn daemon() -> Result<(), Error> {
+pub fn daemon(args: VerboseArgs) -> Result<(), Error> {
+    LogConfig::from_args(args, "seedgen_daemon_log.txt").apply()?;
+
     let mut daemon = Daemon::new()?;
     let areas = ast::parse(&daemon.logic_files.areas_source.content).into_result()?;
     let uber_states = UberStates::new(&daemon.logic_files.uber_state_data);

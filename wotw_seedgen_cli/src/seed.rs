@@ -20,7 +20,7 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
         verbose_args,
     } = args;
 
-    LogConfig::from_args(verbose_args).apply()?;
+    LogConfig::from_args(verbose_args, "seedgen_log.txt").apply()?;
 
     let mut settings = settings.into_universe_settings()?;
     let name = if settings.seed.is_empty() {

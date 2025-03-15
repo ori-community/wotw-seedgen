@@ -36,7 +36,7 @@ fn main() -> Result<(), Error> {
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
-        Cli::Daemon => daemon(),
+        Cli::Daemon { args } => daemon(args),
         Cli::Lsp => Ok(wotw_seedgen_lsp::start()),
     }
 }

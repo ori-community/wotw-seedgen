@@ -10,7 +10,7 @@ use crate::{cli::RegenerateArgs, log_config::LogConfig, seed::generate, Error};
 pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
     let RegenerateArgs { path, verbose_args } = args;
 
-    LogConfig::from_args(verbose_args).apply()?;
+    LogConfig::from_args(verbose_args, "seedgen_log.txt").apply()?;
 
     let file = File::open(&path).map_err(|err| file_err("open", &path, err))?;
     let mut archive = ZipArchive::new(file).map_err(|err| file_err("read", &path, err))?;

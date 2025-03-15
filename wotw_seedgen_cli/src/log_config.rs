@@ -8,8 +8,9 @@ use crate::{
     Error,
 };
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct LogConfig {
+    path: &'static str,
     trace_seedgen: bool,
     trace_placement: bool,
     trace_reached: bool,
@@ -17,8 +18,18 @@ pub struct LogConfig {
 }
 
 impl LogConfig {
-    pub fn from_args(args: VerboseArgs) -> Self {
-        let mut config = Self::default();
+    pub fn new(path: &'static str) -> Self {
+        Self {
+            path,
+            trace_seedgen: false,
+            trace_placement: false,
+            trace_reached: false,
+            trace_doors: false,
+        }
+    }
+
+    pub fn from_args(args: VerboseArgs, path: &'static str) -> Self {
+        let mut config = Self::new(path);
 
         if let Some(targets) = args.verbose {
             config = config
@@ -78,7 +89,7 @@ impl LogConfig {
                         "wotw_seedgen::generator::doors",
                         level_filter(self.trace_doors),
                     )
-                    .chain(File::create("seedgen_log.txt")?),
+                    .chain(File::create(self.path)?),
             )
         }
 
