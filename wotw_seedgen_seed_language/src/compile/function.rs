@@ -274,6 +274,7 @@ pub enum FunctionIdentifier {
     SwitchWheel,
     SetWheelPinned,
     ResetAllWheels,
+    DebugLog,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -440,6 +441,7 @@ impl FunctionIdentifier {
             SwitchWheel(wheel: String),
             SetWheelPinned(wheel: String, pinned: Boolean),
             ResetAllWheels(),
+            DebugLog(message: String),
         }
     }
 
@@ -1068,6 +1070,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 pinned: arg(&mut context)?,
             }),
             FunctionIdentifier::ResetAllWheels => Command::Void(CommandVoid::ResetAllWheels {}),
+            FunctionIdentifier::DebugLog => Command::Void(CommandVoid::DebugLog {
+                message: arg(&mut context)?,
+            }),
         };
 
         if let Some(excess) = context.parameters.next() {

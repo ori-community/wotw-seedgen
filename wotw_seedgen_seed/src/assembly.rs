@@ -217,4 +217,6 @@ pub enum Command {
     SetWheelPinned(/*wheel*/ usize),
     /// Reset all wheel items to their default state
     ResetAllWheels,
+    /// Write String Memory 0 into the client log
+    DebugLog,
 }

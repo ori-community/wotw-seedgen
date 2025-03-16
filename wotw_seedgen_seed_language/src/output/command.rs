@@ -370,4 +370,6 @@ pub enum CommandVoid {
     },
     /// Reset all wheel items to their default state
     ResetAllWheels {},
+    /// Write `message` into the client log
+    DebugLog { message: CommandString },
 }

@@ -413,6 +413,9 @@ impl Compile for input::CommandVoid {
                 .boolean(0, pinned)
                 .call(Command::SetWheelPinned(wheel)),
             Self::ResetAllWheels {} => (vec![Command::ResetAllWheels], MemoryUsed::ZERO),
+            Self::DebugLog { message } => Args::new(command_lookup)
+                .string(0, message)
+                .call(Command::DebugLog),
         }
     }
 }

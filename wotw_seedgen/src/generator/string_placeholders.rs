@@ -423,7 +423,8 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::SetWheelItemAction { .. }
             | Self::DestroyWheelItem { .. }
             | Self::SwitchWheel { .. }
-            | Self::ResetAllWheels {} => {}
+            | Self::ResetAllWheels {}
+            | Self::DebugLog { .. } => {}
         }
     }
 }

@@ -316,7 +316,8 @@ impl Simulate for CommandVoid {
             | CommandVoid::DestroyWheelItem { .. }
             | CommandVoid::SwitchWheel { .. }
             | CommandVoid::SetWheelPinned { .. }
-            | CommandVoid::ResetAllWheels { .. } => {}
+            | CommandVoid::ResetAllWheels { .. }
+            | CommandVoid::DebugLog { .. } => {}
         }
     }
 }
