@@ -34,7 +34,7 @@ fn json_by_name<T: DeserializeOwned>(
     Ok(serde_json::from_reader(by_name(archive, name)?)?)
 }
 
-fn by_name<'a>(archive: &'a mut ZipArchive<File>, name: &str) -> Result<ZipFile<'a>, Error> {
+fn by_name<'a>(archive: &'a mut ZipArchive<File>, name: &str) -> Result<ZipFile<'a, File>, Error> {
     Ok(archive
         .by_name(name)
         .map_err(|err| format!("failed to read \"{name}\" from seed: {err}"))?)
