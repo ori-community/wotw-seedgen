@@ -1,51 +1,64 @@
-use crate::common_item::CommonItem;
-
 use super::{uber_states::UberStateValue, World};
 use ordered_float::OrderedFloat;
 use std::ops::{Add, Div, Mul, Sub};
 use wotw_seedgen_data::{UberIdentifier, Zone};
-use wotw_seedgen_seed_language::output::{
-    ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Comparator, EqualityComparator, IntermediateOutput, LogicOperator,
-    Operation, StringOrPlaceholder, Trigger,
+use wotw_seedgen_seed_language::{
+    ast::ClientEvent,
+    output::{
+        ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
+        CommandVoid, CommandZone, Comparator, EqualityComparator, Event, LogicOperator, Operation,
+        StringOrPlaceholder, Trigger,
+    },
 };
 
 pub trait Simulate {
     type Return;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return;
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return;
 }
 impl<T: Simulate> Simulate for Vec<T> {
     type Return = ();
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         for t in self {
-            t.simulate(world, output);
+            t.simulate(world, events);
         }
+    }
+}
+impl Simulate for ClientEvent {
+    type Return = ();
+
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
+        events
+            .iter()
+            .filter(|event| event.trigger == Trigger::ClientEvent(*self))
+            .for_each(|event| {
+                event.command.simulate(world, events);
+            })
     }
 }
 impl Simulate for Command {
     type Return = ();
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
             Command::Boolean(command) => {
-                command.simulate(world, output);
+                command.simulate(world, events);
             }
             Command::Integer(command) => {
-                command.simulate(world, output);
+                command.simulate(world, events);
             }
             Command::Float(command) => {
-                command.simulate(world, output);
+                command.simulate(world, events);
             }
             Command::String(command) => {
-                command.simulate(world, output);
+                command.simulate(world, events);
             }
             Command::Zone(command) => {
-                command.simulate(world, output);
+                command.simulate(world, events);
             }
             Command::Void(command) => {
-                command.simulate(world, output);
+                command.simulate(world, events);
             }
         }
     }
@@ -56,9 +69,9 @@ where
 {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
-        let left = self.left.simulate(world, output);
-        let right = self.right.simulate(world, output);
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
+        let left = self.left.simulate(world, events);
+        let right = self.right.simulate(world, events);
         match self.operator {
             EqualityComparator::Equal => left == right,
             EqualityComparator::NotEqual => left != right,
@@ -71,9 +84,9 @@ where
 {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
-        let left = self.left.simulate(world, output);
-        let right = self.right.simulate(world, output);
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
+        let left = self.left.simulate(world, events);
+        let right = self.right.simulate(world, events);
         match self.operator {
             Comparator::Equal => left == right,
             Comparator::NotEqual => left != right,
@@ -87,9 +100,9 @@ where
 impl<Item: Simulate<Return = bool>> Simulate for Operation<Item, LogicOperator> {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
-        let left = self.left.simulate(world, output);
-        let right = self.right.simulate(world, output);
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
+        let left = self.left.simulate(world, events);
+        let right = self.right.simulate(world, events);
         match self.operator {
             LogicOperator::And => left && right,
             LogicOperator::Or => left || right,
@@ -105,9 +118,9 @@ where
 {
     type Return = Item::Return;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
-        let left = self.left.simulate(world, output);
-        let right = self.right.simulate(world, output);
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
+        let left = self.left.simulate(world, events);
+        let right = self.right.simulate(world, events);
         match self.operator {
             ArithmeticOperator::Add => left + right,
             ArithmeticOperator::Subtract => left - right,
@@ -119,19 +132,19 @@ where
 impl Simulate for CommandBoolean {
     type Return = bool;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
             CommandBoolean::Constant { value } => *value,
             CommandBoolean::Multi { commands, last } => {
-                commands.simulate(world, output);
-                last.simulate(world, output)
+                commands.simulate(world, events);
+                last.simulate(world, events)
             }
-            CommandBoolean::CompareBoolean { operation } => operation.simulate(world, output),
-            CommandBoolean::CompareInteger { operation } => operation.simulate(world, output),
-            CommandBoolean::CompareFloat { operation } => operation.simulate(world, output),
-            CommandBoolean::CompareString { operation } => operation.simulate(world, output),
-            CommandBoolean::CompareZone { operation } => operation.simulate(world, output),
-            CommandBoolean::LogicOperation { operation } => operation.simulate(world, output),
+            CommandBoolean::CompareBoolean { operation } => operation.simulate(world, events),
+            CommandBoolean::CompareInteger { operation } => operation.simulate(world, events),
+            CommandBoolean::CompareFloat { operation } => operation.simulate(world, events),
+            CommandBoolean::CompareString { operation } => operation.simulate(world, events),
+            CommandBoolean::CompareZone { operation } => operation.simulate(world, events),
+            CommandBoolean::LogicOperation { operation } => operation.simulate(world, events),
             CommandBoolean::FetchBoolean { uber_identifier } => {
                 world.uber_states.get(*uber_identifier).as_boolean()
             }
@@ -143,20 +156,20 @@ impl Simulate for CommandBoolean {
 impl Simulate for CommandInteger {
     type Return = i32;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
             CommandInteger::Constant { value } => *value,
             CommandInteger::Multi { commands, last } => {
-                commands.simulate(world, output);
-                last.simulate(world, output)
+                commands.simulate(world, events);
+                last.simulate(world, events)
             }
-            CommandInteger::Arithmetic { operation } => operation.simulate(world, output),
+            CommandInteger::Arithmetic { operation } => operation.simulate(world, events),
             CommandInteger::FetchInteger { uber_identifier } => {
                 world.uber_states.get(*uber_identifier).as_integer()
             }
             CommandInteger::GetInteger { id } => world.variables.get_integer(id),
             CommandInteger::FromFloat { float } => {
-                float.simulate(world, output).into_inner().round() as i32
+                float.simulate(world, events).into_inner().round() as i32
             }
         }
     }
@@ -164,20 +177,20 @@ impl Simulate for CommandInteger {
 impl Simulate for CommandFloat {
     type Return = OrderedFloat<f32>;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
             CommandFloat::Constant { value } => *value,
             CommandFloat::Multi { commands, last } => {
-                commands.simulate(world, output);
-                last.simulate(world, output)
+                commands.simulate(world, events);
+                last.simulate(world, events)
             }
-            CommandFloat::Arithmetic { operation } => operation.simulate(world, output),
+            CommandFloat::Arithmetic { operation } => operation.simulate(world, events),
             CommandFloat::FetchFloat { uber_identifier } => {
                 world.uber_states.get(*uber_identifier).as_float()
             }
             CommandFloat::GetFloat { id } => world.variables.get_float(id),
             CommandFloat::FromInteger { integer } => {
-                (integer.simulate(world, output) as f32).into()
+                (integer.simulate(world, events) as f32).into()
             }
         }
     }
@@ -185,36 +198,36 @@ impl Simulate for CommandFloat {
 impl Simulate for CommandString {
     type Return = String;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
             CommandString::Constant { value } => match value {
                 StringOrPlaceholder::Value(value) => value.clone(),
                 _ => Default::default(),
             },
             CommandString::Multi { commands, last } => {
-                commands.simulate(world, output);
-                last.simulate(world, output)
+                commands.simulate(world, events);
+                last.simulate(world, events)
             }
             CommandString::Concatenate { left, right } => {
-                left.simulate(world, output) + &right.simulate(world, output)
+                left.simulate(world, events) + &right.simulate(world, events)
             }
             CommandString::GetString { id } => world.variables.get_string(id),
             CommandString::WorldName { .. } => Default::default(),
-            CommandString::FromBoolean { boolean } => boolean.simulate(world, output).to_string(),
-            CommandString::FromInteger { integer } => integer.simulate(world, output).to_string(),
-            CommandString::FromFloat { float } => float.simulate(world, output).to_string(),
+            CommandString::FromBoolean { boolean } => boolean.simulate(world, events).to_string(),
+            CommandString::FromInteger { integer } => integer.simulate(world, events).to_string(),
+            CommandString::FromFloat { float } => float.simulate(world, events).to_string(),
         }
     }
 }
 impl Simulate for CommandZone {
     type Return = Zone;
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
             CommandZone::Constant { value } => *value,
             CommandZone::Multi { commands, last } => {
-                commands.simulate(world, output);
-                last.simulate(world, output)
+                commands.simulate(world, events);
+                last.simulate(world, events)
             }
             CommandZone::CurrentZone {} | CommandZone::CurrentMapZone {} => Zone::Void,
         }
@@ -223,18 +236,12 @@ impl Simulate for CommandZone {
 impl Simulate for CommandVoid {
     type Return = ();
 
-    fn simulate(&self, world: &mut World, output: &IntermediateOutput) -> Self::Return {
-        if !matches!(self, CommandVoid::Multi { .. }) {
-            for common_item in CommonItem::from_command(self) {
-                common_item.grant(&mut world.player.inventory);
-            }
-        }
-
+    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         match self {
-            CommandVoid::Multi { commands } => commands.simulate(world, output),
+            CommandVoid::Multi { commands } => commands.simulate(world, events),
             CommandVoid::If { condition, command } => {
-                if condition.simulate(world, output) {
-                    command.simulate(world, output)
+                if condition.simulate(world, events) {
+                    command.simulate(world, events)
                 }
             }
             CommandVoid::StoreBoolean {
@@ -242,39 +249,39 @@ impl Simulate for CommandVoid {
                 value,
                 trigger_events,
             } => {
-                let value = UberStateValue::Boolean(value.simulate(world, output));
-                set_uber_state(world, output, *uber_identifier, value, *trigger_events);
+                let value = UberStateValue::Boolean(value.simulate(world, events));
+                set_uber_state(world, events, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::StoreInteger {
                 uber_identifier,
                 value,
                 trigger_events,
             } => {
-                let value = UberStateValue::Integer(value.simulate(world, output));
-                set_uber_state(world, output, *uber_identifier, value, *trigger_events);
+                let value = UberStateValue::Integer(value.simulate(world, events));
+                set_uber_state(world, events, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::StoreFloat {
                 uber_identifier,
                 value,
                 trigger_events,
             } => {
-                let value = UberStateValue::Float(value.simulate(world, output));
-                set_uber_state(world, output, *uber_identifier, value, *trigger_events);
+                let value = UberStateValue::Float(value.simulate(world, events));
+                set_uber_state(world, events, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::SetBoolean { id, value } => {
-                let value = value.simulate(world, output);
+                let value = value.simulate(world, events);
                 world.variables.set_boolean(*id, value);
             }
             CommandVoid::SetInteger { id, value } => {
-                let value = value.simulate(world, output);
+                let value = value.simulate(world, events);
                 world.variables.set_integer(*id, value);
             }
             CommandVoid::SetFloat { id, value } => {
-                let value = value.simulate(world, output);
+                let value = value.simulate(world, events);
                 world.variables.set_float(*id, value);
             }
             CommandVoid::SetString { id, value } => {
-                let value = value.simulate(world, output);
+                let value = value.simulate(world, events);
                 world.variables.set_string(*id, value);
             }
             // TODO simulate more maybe?
@@ -324,7 +331,7 @@ impl Simulate for CommandVoid {
 
 fn set_uber_state(
     world: &mut World,
-    output: &IntermediateOutput,
+    events: &[Event],
     uber_identifier: UberIdentifier,
     value: UberStateValue,
     trigger_events: bool,
@@ -335,27 +342,27 @@ fn set_uber_state(
     }
 
     if trigger_events {
-        let events = world
+        let triggers = world
             .uber_states
             .set_and_return_triggers(uber_identifier, value)
             .collect();
-        uber_state_side_effects(world, output, uber_identifier, value, trigger_events);
-        process_triggers(world, output, events);
+        uber_state_side_effects(world, events, uber_identifier, value, trigger_events);
+        process_triggers(world, events, triggers);
     } else {
         world.uber_states.set(uber_identifier, value);
     }
 
-    world.check_states(uber_identifier);
+    world.update_reached(uber_identifier, events);
 }
-fn process_triggers(world: &mut World, output: &IntermediateOutput, events: Vec<usize>) {
-    for index in events {
-        let event = &output.events[index];
+fn process_triggers(world: &mut World, events: &[Event], triggers: Vec<usize>) {
+    for index in triggers {
+        let event = &events[index];
         if match &event.trigger {
             Trigger::ClientEvent(_) => false,
             Trigger::Binding(_) => true,
-            Trigger::Condition(condition) => condition.simulate(world, output),
+            Trigger::Condition(condition) => condition.simulate(world, events),
         } {
-            event.command.simulate(world, output);
+            event.command.simulate(world, events);
         }
     }
 }
@@ -395,7 +402,7 @@ fn prevent_uber_state_change(
 // TODO isn't most of this in seed core now?
 fn uber_state_side_effects(
     world: &mut World,
-    output: &IntermediateOutput,
+    events: &[Event],
     uber_identifier: UberIdentifier,
     value: UberStateValue,
     trigger_events: bool,
@@ -404,7 +411,7 @@ fn uber_state_side_effects(
         POOLS_FIGHT_ARENA_2 if value == 4 => {
             set_uber_state(
                 world,
-                output,
+                events,
                 POOLS_FIGHT_ARENA_1,
                 UberStateValue::Integer(4),
                 trigger_events,
@@ -413,14 +420,14 @@ fn uber_state_side_effects(
         DIAMOND_IN_THE_ROUGH_CUTSCENE if matches!(value.as_integer(), 1 | 2) => {
             set_uber_state(
                 world,
-                output,
+                events,
                 DIAMOND_IN_THE_ROUGH_CUTSCENE,
                 UberStateValue::Integer(3),
                 trigger_events,
             );
             set_uber_state(
                 world,
-                output,
+                events,
                 DIAMOND_IN_THE_ROUGH_PICKUP,
                 UberStateValue::Boolean(true),
                 trigger_events,
@@ -429,7 +436,7 @@ fn uber_state_side_effects(
         WELLSPRING_ESCAPE_COMPLETE if value == true => {
             set_uber_state(
                 world,
-                output,
+                events,
                 WELLSPRING_QUEST,
                 UberStateValue::Integer(3),
                 trigger_events,
@@ -438,7 +445,7 @@ fn uber_state_side_effects(
         WELLSPRING_QUEST if value >= 3 => {
             set_uber_state(
                 world,
-                output,
+                events,
                 TULEY_IN_GLADES,
                 UberStateValue::Boolean(true),
                 trigger_events,
@@ -447,7 +454,7 @@ fn uber_state_side_effects(
         CAT_AND_MOUSE if value == 7 => {
             set_uber_state(
                 world,
-                output,
+                events,
                 CAT_AND_MOUSE,
                 UberStateValue::Integer(8),
                 trigger_events,
@@ -456,7 +463,7 @@ fn uber_state_side_effects(
         WILLOW_STONE_BOSS_HEART if value == true => {
             set_uber_state(
                 world,
-                output,
+                events,
                 WILLOW_STONE_BOSS_STATE,
                 UberStateValue::Integer(4),
                 trigger_events,
@@ -465,7 +472,7 @@ fn uber_state_side_effects(
         SWORD_TREE if value == true => {
             set_uber_state(
                 world,
-                output,
+                events,
                 RAIN_LIFTED,
                 UberStateValue::Boolean(true),
                 trigger_events,
@@ -473,8 +480,8 @@ fn uber_state_side_effects(
         }
         VOICE | STRENGTH | MEMORY | EYES | HEART if value == true => {
             // TODO not strictly correct but not sure what else to do
-            world.modify_max_health(10, output);
-            world.modify_max_energy(1.0.into(), output);
+            world.modify_max_health(10, events);
+            world.modify_max_energy(1.0.into(), events);
         }
         _ => {}
     }

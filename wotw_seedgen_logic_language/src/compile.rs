@@ -315,6 +315,7 @@ struct DifficultyRequirements {
     notsafe: Requirement,
 }
 impl DifficultyRequirements {
+    // TODO could propagate this all the way up to use WorldSettingsHelpers and improve the interface
     fn new(settings: &[WorldSettings]) -> Self {
         let lowest_difficulty = settings.lowest_difficulty();
         let highest_difficulty = settings.highest_difficulty();

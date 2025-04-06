@@ -8,7 +8,7 @@ const MIN_SPIRIT_LIGHT: f32 = 50.;
 // TODO the last couple spirit light placements are weird
 pub struct SpiritLightProvider {
     rng: Pcg64Mcg,
-    amount: f32,
+    pub amount: f32,
     next_amount: f32,
     noise: Uniform<f32>,
 }
@@ -46,8 +46,9 @@ impl SpiritLightProvider {
         let a = (2. * self.amount / (remaining - 1.) - 2. * self.next_amount)
             / (remaining + 1. - 2. * remaining);
         let b = self.next_amount - a * remaining;
-        let next = (a * (remaining - 1.) + b) * self.rng.sample(self.noise);
+        let mut next = a * (remaining - 1.) + b;
         self.amount -= self.next_amount;
+        next *= self.rng.sample(self.noise);
         mem::replace(&mut self.next_amount, next).round() as usize
     }
 }

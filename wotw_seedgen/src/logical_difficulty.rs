@@ -2,6 +2,8 @@ use smallvec::{smallvec, SmallVec};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_settings::Difficulty;
 
+// TODO make trait and put on Difficulty?
+
 pub const TRIPLE_JUMP: Difficulty = Difficulty::Gorlek;
 pub const RESILIENCE: Difficulty = Difficulty::Gorlek;
 pub const VITALITY: Difficulty = Difficulty::Gorlek;
@@ -13,6 +15,8 @@ pub const ULTRA_BASH: Difficulty = Difficulty::Unsafe;
 pub const OVERFLOW: Difficulty = Difficulty::Unsafe;
 pub const THORN: Difficulty = Difficulty::Unsafe;
 pub const CATALYST: Difficulty = Difficulty::Unsafe;
+
+pub const CHARGE_GRENADE: Difficulty = Difficulty::Unsafe;
 
 // TODO seeing all these hardcoded strings makes me sad
 /// Allowed spawns on this difficulty when using the random spawn setting

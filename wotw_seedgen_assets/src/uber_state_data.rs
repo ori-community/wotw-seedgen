@@ -62,6 +62,12 @@ pub struct UberStateDataEntry {
     /// If `true`, writing to this UberState manually will fail
     pub readonly: bool,
 }
+impl UberStateDataEntry {
+    /// Returns `rando_name` if available, otherwise returns `name`
+    pub fn preferred_name(&self) -> &String {
+        self.rando_name.as_ref().unwrap_or_else(|| &self.name)
+    }
+}
 /// Typed value stored inside an UberState
 ///
 /// The types are simplified since a lot of the used types are similar in nature

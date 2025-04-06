@@ -1,3 +1,5 @@
+use std::sync::Once;
+
 use crate::generate_seed;
 
 use env_logger::Env;
@@ -20,15 +22,21 @@ lazy_static! {
         parse(include_str!("../areas.wotw")).into_result().unwrap();
 }
 
+static LOGGER_INITIALIZED: Once = Once::new();
+
 pub fn test_logger() {
-    env_logger::Builder::from_env(Env::default().default_filter_or("trace"))
-        .format_timestamp(None)
-        .is_test(true)
-        .init();
+    LOGGER_INITIALIZED.call_once(|| {
+        env_logger::Builder::from_env(Env::default().default_filter_or("debug"))
+            .format_timestamp(None)
+            .is_test(true)
+            .init();
+    });
 }
 
 #[test]
 fn some_seeds() {
+    test_logger();
+
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
         generate_seed(
             &graph,
@@ -39,8 +47,6 @@ fn some_seeds() {
         )
         .unwrap();
     }
-
-    test_logger();
 
     let mut universe_settings = UniverseSettings::new("0".to_string());
     let mut graph = Graph::compile(

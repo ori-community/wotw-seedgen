@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use wotw_seedgen_seed_language::assets::settings::UniverseSettings;
+use wotw_seedgen_settings::UniverseSettings;
 
 // TODO direct state sets
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

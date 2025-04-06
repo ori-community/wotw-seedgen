@@ -21,7 +21,7 @@ impl Analyzer for ItemUnlockStats {
                 !group
                     .placements
                     .iter()
-                    .any(|placement| placement.item_name == self.item)
+                    .any(|placement| placement.item.name == self.item)
             })
             .flat_map(|group| group.reachable.iter().map(|reachable| reachable.len()))
             .sum::<usize>();

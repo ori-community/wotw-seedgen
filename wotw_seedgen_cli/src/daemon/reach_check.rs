@@ -2,7 +2,7 @@ use log::trace;
 use ordered_float::OrderedFloat;
 use serde::Deserialize;
 use wotw_seedgen::{
-    data::{uber_identifier, UberIdentifier},
+    data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade},
     logic_language::{
         ast::Areas,
         output::{Graph, Node},
@@ -11,93 +11,92 @@ use wotw_seedgen::{
     UberStates, World,
 };
 use wotw_seedgen_assets::{UberStateData, UberStateValue};
-use wotw_seedgen_seed_language::output::IntermediateOutput;
 
 use crate::{seed::LogicFiles, Error};
 
 pub fn relevant_uber_states(logic_files: &LogicFiles) -> Result<(), Error> {
     const INVENTORY: [UberIdentifier; 81] = [
-        uber_identifier::SPIRIT_LIGHT,
-        uber_identifier::GORLEK_ORE,
-        uber_identifier::KEYSTONES,
-        uber_identifier::SHARD_SLOTS,
-        uber_identifier::CLEAN_WATER,
-        uber_identifier::MAX_HEALTH,
-        uber_identifier::MAX_ENERGY,
-        uber_identifier::skill::BASH,
-        uber_identifier::skill::DOUBLE_JUMP,
-        uber_identifier::skill::LAUNCH,
-        uber_identifier::skill::GLIDE,
-        uber_identifier::skill::WATER_BREATH,
-        uber_identifier::skill::GRENADE,
-        uber_identifier::skill::GRAPPLE,
-        uber_identifier::skill::FLASH,
-        uber_identifier::skill::SPEAR,
-        uber_identifier::skill::REGENERATE,
-        uber_identifier::skill::BOW,
-        uber_identifier::skill::HAMMER,
-        uber_identifier::skill::SWORD,
-        uber_identifier::skill::BURROW,
-        uber_identifier::skill::DASH,
-        uber_identifier::skill::WATER_DASH,
-        uber_identifier::skill::SHURIKEN,
-        uber_identifier::skill::BLAZE,
-        uber_identifier::skill::SENTRY,
-        uber_identifier::skill::FLAP,
-        uber_identifier::skill::GLADES_ANCESTRAL_LIGHT,
-        uber_identifier::skill::MARSH_ANCESTRAL_LIGHT,
-        uber_identifier::shard::OVERCHARGE,
-        uber_identifier::shard::TRIPLE_JUMP,
-        uber_identifier::shard::WINGCLIP,
-        uber_identifier::shard::BOUNTY,
-        uber_identifier::shard::SWAP,
-        uber_identifier::shard::MAGNET,
-        uber_identifier::shard::SPLINTER,
-        uber_identifier::shard::RECKLESS,
-        uber_identifier::shard::QUICKSHOT,
-        uber_identifier::shard::RESILIENCE,
-        uber_identifier::shard::VITALITY,
-        uber_identifier::shard::LIFE_HARVEST,
-        uber_identifier::shard::ENERGY_HARVEST,
-        uber_identifier::shard::ENERGY,
-        uber_identifier::shard::LIFE_PACT,
-        uber_identifier::shard::LAST_STAND,
-        uber_identifier::shard::ULTRA_BASH,
-        uber_identifier::shard::ULTRA_GRAPPLE,
-        uber_identifier::shard::OVERFLOW,
-        uber_identifier::shard::THORN,
-        uber_identifier::shard::CATALYST,
-        uber_identifier::shard::TURMOIL,
-        uber_identifier::shard::STICKY,
-        uber_identifier::shard::FINESSE,
-        uber_identifier::shard::SPIRIT_SURGE,
-        uber_identifier::shard::LIFEFORCE,
-        uber_identifier::shard::DEFLECTOR,
-        uber_identifier::shard::FRACTURE,
-        uber_identifier::shard::ARCING,
-        uber_identifier::teleporter::MARSH,
-        uber_identifier::teleporter::DEN,
-        uber_identifier::teleporter::HOLLOW,
-        uber_identifier::teleporter::GLADES,
-        uber_identifier::teleporter::WELLSPRING,
-        uber_identifier::teleporter::BURROWS,
-        uber_identifier::teleporter::WOODS_ENTRANCE,
-        uber_identifier::teleporter::WOODS_EXIT,
-        uber_identifier::teleporter::REACH,
-        uber_identifier::teleporter::DEPTHS,
-        uber_identifier::teleporter::CENTRAL_POOLS,
-        uber_identifier::teleporter::POOLS_BOSS,
-        uber_identifier::teleporter::FEEDING_GROUNDS,
-        uber_identifier::teleporter::CENTRAL_WASTES,
-        uber_identifier::teleporter::OUTER_RUINS,
-        uber_identifier::teleporter::INNER_RUINS,
-        uber_identifier::teleporter::WILLOW,
-        uber_identifier::teleporter::SHRIEK,
-        uber_identifier::weapon_upgrade::EXPLODING_SPEAR,
-        uber_identifier::weapon_upgrade::SHOCK_HAMMER,
-        uber_identifier::weapon_upgrade::STATIC_SHURIKEN,
-        uber_identifier::weapon_upgrade::CHARGE_BLAZE,
-        uber_identifier::weapon_upgrade::RAPID_SENTRY,
+        UberIdentifier::SPIRIT_LIGHT,
+        UberIdentifier::GORLEK_ORE,
+        UberIdentifier::KEYSTONES,
+        UberIdentifier::SHARD_SLOTS,
+        UberIdentifier::CLEAN_WATER,
+        UberIdentifier::MAX_HEALTH,
+        UberIdentifier::MAX_ENERGY,
+        Skill::BASH_ID,
+        Skill::DOUBLE_JUMP_ID,
+        Skill::LAUNCH_ID,
+        Skill::GLIDE_ID,
+        Skill::WATER_BREATH_ID,
+        Skill::GRENADE_ID,
+        Skill::GRAPPLE_ID,
+        Skill::FLASH_ID,
+        Skill::SPEAR_ID,
+        Skill::REGENERATE_ID,
+        Skill::BOW_ID,
+        Skill::HAMMER_ID,
+        Skill::SWORD_ID,
+        Skill::BURROW_ID,
+        Skill::DASH_ID,
+        Skill::WATER_DASH_ID,
+        Skill::SHURIKEN_ID,
+        Skill::BLAZE_ID,
+        Skill::SENTRY_ID,
+        Skill::FLAP_ID,
+        Skill::GLADES_ANCESTRAL_LIGHT_ID,
+        Skill::MARSH_ANCESTRAL_LIGHT_ID,
+        Shard::OVERCHARGE_ID,
+        Shard::TRIPLE_JUMP_ID,
+        Shard::WINGCLIP_ID,
+        Shard::BOUNTY_ID,
+        Shard::SWAP_ID,
+        Shard::MAGNET_ID,
+        Shard::SPLINTER_ID,
+        Shard::RECKLESS_ID,
+        Shard::QUICKSHOT_ID,
+        Shard::RESILIENCE_ID,
+        Shard::VITALITY_ID,
+        Shard::LIFE_HARVEST_ID,
+        Shard::ENERGY_HARVEST_ID,
+        Shard::ENERGY_ID,
+        Shard::LIFE_PACT_ID,
+        Shard::LAST_STAND_ID,
+        Shard::ULTRA_BASH_ID,
+        Shard::ULTRA_GRAPPLE_ID,
+        Shard::OVERFLOW_ID,
+        Shard::THORN_ID,
+        Shard::CATALYST_ID,
+        Shard::TURMOIL_ID,
+        Shard::STICKY_ID,
+        Shard::FINESSE_ID,
+        Shard::SPIRIT_SURGE_ID,
+        Shard::LIFEFORCE_ID,
+        Shard::DEFLECTOR_ID,
+        Shard::FRACTURE_ID,
+        Shard::ARCING_ID,
+        Teleporter::MARSH_ID,
+        Teleporter::DEN_ID,
+        Teleporter::HOLLOW_ID,
+        Teleporter::GLADES_ID,
+        Teleporter::WELLSPRING_ID,
+        Teleporter::BURROWS_ID,
+        Teleporter::WOODS_ENTRANCE_ID,
+        Teleporter::WOODS_EXIT_ID,
+        Teleporter::REACH_ID,
+        Teleporter::DEPTHS_ID,
+        Teleporter::CENTRAL_POOLS_ID,
+        Teleporter::POOLS_BOSS_ID,
+        Teleporter::FEEDING_GROUNDS_ID,
+        Teleporter::CENTRAL_WASTES_ID,
+        Teleporter::OUTER_RUINS_ID,
+        Teleporter::INNER_RUINS_ID,
+        Teleporter::WILLOW_ID,
+        Teleporter::SHRIEK_ID,
+        WeaponUpgrade::EXPLODING_SPEAR_ID,
+        WeaponUpgrade::SHOCK_HAMMER_ID,
+        WeaponUpgrade::STATIC_SHURIKEN_ID,
+        WeaponUpgrade::CHARGE_BLAZE_ID,
+        WeaponUpgrade::RAPID_SENTRY_ID,
     ];
 
     let loc_data = logic_files
@@ -140,12 +139,11 @@ pub fn new_world<'cache>(
         .get(world_index)
         .expect("world_index in seedgen_info out of bounds");
 
-    Ok(World::new(
-        &value.graph,
-        spawn,
-        settings,
-        uber_states.clone(),
-    ))
+    let mut world = World::new(&value.graph, spawn, settings, uber_states.clone());
+
+    world.traverse_spawn(&[]);
+
+    Ok(world)
 }
 
 pub fn reach_check(
@@ -157,28 +155,22 @@ pub fn reach_check(
         .as_mut()
         .ok_or("Received ReachCheck before SetReachCheckInfo")?;
 
-    let output = IntermediateOutput::default();
-
     for (uber_identifier, value) in message.uber_states {
         let data = uber_state_data
             .id_lookup
             .get(&uber_identifier)
             .ok_or_else(|| format!("Unknown UberIdentifier {uber_identifier}"))?;
         match &data.default_value {
-            UberStateValue::Boolean(_) => world.set_boolean(uber_identifier, *value > 0.5, &output),
-            // unlike set, modify is recognized as a common item and updates the player inventory
-            UberStateValue::Integer(_) => {
-                world.modify_integer(uber_identifier, (*value) as i32, &output)
-            }
-            UberStateValue::Float(_) => world.modify_float(uber_identifier, value, &output),
+            UberStateValue::Boolean(_) => world.set_boolean(uber_identifier, *value > 0.5, &[]),
+            UberStateValue::Integer(_) => world.set_integer(uber_identifier, (*value) as i32, &[]),
+            UberStateValue::Float(_) => world.set_float(uber_identifier, value, &[]),
         }
     }
 
-    trace!("Checking reached with {}", world.inventory());
+    trace!("Checking reached with {}", world.inventory_display());
 
     let reached = world
-        .reached()
-        .iter()
+        .reached_nodes()
         .filter_map(|node| match node {
             Node::State(_) | Node::LogicalState(_) => None,
             _ => Some(node.identifier()),

@@ -60,7 +60,7 @@ struct DoorRandomizerState {
 
 impl WorldContext<'_, '_> {
     pub fn generate_doors(&mut self) -> Result<(), String> {
-        let (connections, loop_size) = match self.world.player.settings.randomize_doors {
+        let (connections, loop_size) = match self.world.settings.randomize_doors {
             None => {
                 log::trace!("Using default door connections");
                 (self.world.graph.default_door_connections.clone(), 2)
@@ -109,7 +109,7 @@ impl WorldContext<'_, '_> {
 
             let set_connection =
                 set_integer_value(UberIdentifier::new(27, door_id), target_door_id);
-            self.world.simulate(&set_connection, &self.output);
+            self.world.simulate(&set_connection, &self.output.events);
             self.output.events.push(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: set_connection,

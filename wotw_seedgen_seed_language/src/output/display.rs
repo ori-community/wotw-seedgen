@@ -1,6 +1,6 @@
 use super::{
     intermediate::Literal, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Event, Icon, Operation, StringOrPlaceholder, Trigger,
+    CommandVoid, CommandZone, Event, Operation, StringOrPlaceholder, Trigger,
 };
 use itertools::Itertools;
 use std::fmt::{self, Display};
@@ -32,20 +32,6 @@ impl Display for StringOrPlaceholder {
                     actions.iter().format(", ")
                 )
             }
-        }
-    }
-}
-impl Display for Icon {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Icon::Shard(shard) => write!(f, "{shard} icon"),
-            Icon::Equipment(equipment) => write!(f, "{equipment} icon"),
-            Icon::Opher(opher_icon) => write!(f, "{opher_icon} icon"),
-            Icon::Lupo(lupo_icon) => write!(f, "{lupo_icon} icon"),
-            Icon::Grom(grom_icon) => write!(f, "{grom_icon} icon"),
-            Icon::Tuley(tuley_icon) => write!(f, "{tuley_icon} icon"),
-            Icon::File(path) => write!(f, "icon at \"{path}\""),
-            Icon::Bundle(path) => write!(f, "bundled icon at \"{path}\""),
         }
     }
 }

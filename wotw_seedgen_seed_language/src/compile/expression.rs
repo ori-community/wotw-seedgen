@@ -3,15 +3,15 @@ use crate::{
     ast::{self, Operator, UberStateType},
     output::{
         ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-        CommandVoid, CommandZone, Comparator, EqualityComparator, Icon, LogicOperator, Operation,
+        CommandVoid, CommandZone, Comparator, EqualityComparator, LogicOperator, Operation,
         StringOrPlaceholder, {Constant, Literal},
     },
     types::{common_type, InferType, Type},
 };
 use ordered_float::OrderedFloat;
-use std::ops::Range;
+use std::{borrow::Cow, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
-use wotw_seedgen_data::UberIdentifier;
+use wotw_seedgen_data::{Icon, UberIdentifier};
 use wotw_seedgen_parse::{Error, Span, Spanned};
 
 impl Command {
@@ -955,7 +955,7 @@ impl CompileIntoLiteral for Icon {
             Literal::Constant(Constant::LupoIcon(value)) => Icon::Lupo(value),
             Literal::Constant(Constant::GromIcon(value)) => Icon::Grom(value),
             Literal::Constant(Constant::TuleyIcon(value)) => Icon::Tuley(value),
-            Literal::IconAsset(path) => Icon::File(path),
+            Literal::IconAsset(path) => Icon::File(Cow::Owned(path)),
             Literal::CustomIcon(path) => Icon::Bundle(path),
             other => {
                 compiler

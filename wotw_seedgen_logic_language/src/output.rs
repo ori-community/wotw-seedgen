@@ -13,6 +13,14 @@ pub struct Graph {
     pub default_door_connections: FxHashMap<DoorId, DoorId>,
 }
 impl Graph {
+    // TODO use more in tests
+    pub fn empty() -> Self {
+        Self {
+            nodes: Vec::new(),
+            default_door_connections: FxHashMap::default(),
+        }
+    }
+
     // TODO could optimize based on the node kind we're looking for? The tag should be faster to compare than our long strings
     pub fn find_node(&self, node: &str) -> Result<usize, String> {
         self.nodes
@@ -154,6 +162,7 @@ pub enum Requirement {
     Skill(Skill),
     EnergySkill(Skill, f32),
     NonConsumingEnergySkill(Skill),
+    // TODO resources as i32?
     SpiritLight(usize),
     GorlekOre(usize),
     Keystone(usize),

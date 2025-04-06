@@ -11,7 +11,8 @@ impl Analyzer for ProgressionStats {
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
         seed.groups
             .iter()
-            .map(|group| group.forced_items.to_string())
+            .flat_map(|group| &group.forced_items)
+            .map(|item| item.name.to_string())
             .collect()
     }
 }

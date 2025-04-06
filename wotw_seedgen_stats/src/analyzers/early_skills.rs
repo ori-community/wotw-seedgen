@@ -1,6 +1,6 @@
 use super::Analyzer;
 use rustc_hash::FxHashSet;
-use wotw_seedgen::{data::Skill, spoiler::SeedSpoiler, CommonItem};
+use wotw_seedgen::{data::Skill, spoiler::SeedSpoiler, CommonItem, ContainedWrites};
 
 /// Analyzes how many skills were placed early on
 pub struct EarlySkillsStats {
@@ -35,7 +35,7 @@ impl Analyzer for EarlySkillsStats {
             .take(relevant_groups.saturating_sub(1))
             .flat_map(|group| group.placements.iter())
             .chain(last)
-            .flat_map(|placement| CommonItem::from_command(&placement.command))
+            .flat_map(|placement| placement.item.command.contained_common_items())
             .filter(|item| match item {
                 CommonItem::Skill(Skill::GladesAncestralLight | Skill::MarshAncestralLight) => {
                     false

@@ -1,4 +1,4 @@
-use crate::{uber_identifier::weapon_upgrade, UberIdentifier};
+use crate::UberIdentifier;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, FromRepr, VariantArray};
 use wotw_seedgen_derive::FromStr;
@@ -35,24 +35,30 @@ pub enum WeaponUpgrade {
     RapidSentry = 4,
 }
 impl WeaponUpgrade {
+    pub const EXPLODING_SPEAR_ID: UberIdentifier = UberIdentifier::new(3440, 5687);
+    pub const SHOCK_HAMMER_ID: UberIdentifier = UberIdentifier::new(3440, 46488);
+    pub const STATIC_SHURIKEN_ID: UberIdentifier = UberIdentifier::new(3440, 10776);
+    pub const CHARGE_BLAZE_ID: UberIdentifier = UberIdentifier::new(3440, 61898);
+    pub const RAPID_SENTRY_ID: UberIdentifier = UberIdentifier::new(3440, 57376);
+
     /// Returns the [`UberIdentifier`] tracking whether the player has this `WeaponUpgrade`
     pub const fn uber_identifier(self) -> UberIdentifier {
         match self {
-            WeaponUpgrade::ExplodingSpear => weapon_upgrade::EXPLODING_SPEAR,
-            WeaponUpgrade::HammerShockwave => weapon_upgrade::SHOCK_HAMMER,
-            WeaponUpgrade::StaticShuriken => weapon_upgrade::STATIC_SHURIKEN,
-            WeaponUpgrade::ChargeBlaze => weapon_upgrade::CHARGE_BLAZE,
-            WeaponUpgrade::RapidSentry => weapon_upgrade::RAPID_SENTRY,
+            Self::ExplodingSpear => Self::EXPLODING_SPEAR_ID,
+            Self::HammerShockwave => Self::SHOCK_HAMMER_ID,
+            Self::StaticShuriken => Self::STATIC_SHURIKEN_ID,
+            Self::ChargeBlaze => Self::CHARGE_BLAZE_ID,
+            Self::RapidSentry => Self::RAPID_SENTRY_ID,
         }
     }
     /// Returns the `WeaponUpgrade` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {
-            weapon_upgrade::EXPLODING_SPEAR => Some(WeaponUpgrade::ExplodingSpear),
-            weapon_upgrade::SHOCK_HAMMER => Some(WeaponUpgrade::HammerShockwave),
-            weapon_upgrade::STATIC_SHURIKEN => Some(WeaponUpgrade::StaticShuriken),
-            weapon_upgrade::CHARGE_BLAZE => Some(WeaponUpgrade::ChargeBlaze),
-            weapon_upgrade::RAPID_SENTRY => Some(WeaponUpgrade::RapidSentry),
+            Self::EXPLODING_SPEAR_ID => Some(Self::ExplodingSpear),
+            Self::SHOCK_HAMMER_ID => Some(Self::HammerShockwave),
+            Self::STATIC_SHURIKEN_ID => Some(Self::StaticShuriken),
+            Self::CHARGE_BLAZE_ID => Some(Self::ChargeBlaze),
+            Self::RAPID_SENTRY_ID => Some(Self::RapidSentry),
             _ => None,
         }
     }

@@ -2,16 +2,15 @@ use std::time::Duration;
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use lazy_static::lazy_static;
-use rustc_hash::FxHashSet;
+use rand_pcg::Pcg64Mcg;
 use smallvec::smallvec;
-use wotw_seedgen::{item_pool::ItemPool, Player, UberStates, World};
+use wotw_seedgen::{item_pool::ItemPool, UberStates, World};
 use wotw_seedgen_assets::{PresetAccess, WorldPreset, WorldPresetSettings};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::{Enemy, Graph, Requirement},
 };
-use wotw_seedgen_seed_language::output::IntermediateOutput;
 use wotw_seedgen_settings::{Difficulty, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{
     LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
@@ -45,16 +44,18 @@ fn requirements(c: &mut Criterion) {
         difficulty: Difficulty::Unsafe,
         ..WorldSettings::default()
     };
-    let mut player = Player::new(&world_settings);
-    let states = FxHashSet::default();
+    let graph = compile_graph(&[]);
+    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
+    let uber_states = UberStates::new(&*UBER_STATE_DATA);
+    let mut world = World::new(&graph, spawn, &world_settings, uber_states);
 
     let req_a = Requirement::EnergySkill(Skill::Blaze, 2.0);
     let req_b = Requirement::Damage(20.0);
     let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let req_d = Requirement::Damage(10.0);
-    player.inventory.skills.insert(Skill::Blaze);
-    player.inventory.health += 20;
-    player.inventory.energy += 2.;
+    world.set_skill(Skill::Blaze, true, &[]);
+    world.modify_max_health(20, &[]);
+    world.modify_max_energy((2.).into(), &[]);
     let requirement = Requirement::And(vec![
         Requirement::Or(vec![req_a.clone(), req_d.clone()]),
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
@@ -62,44 +63,46 @@ fn requirements(c: &mut Criterion) {
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
     ]);
     group.bench_function("nesting", |b| {
-        b.iter(|| player.is_met(&requirement, &states, smallvec![player.max_orbs()]))
+        b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
     });
 
-    player.inventory.skills.insert(Skill::Bow);
-    player.inventory.energy += 10.;
+    world.set_skill(Skill::Bow, true, &[]);
+    world.modify_max_energy((10.).into(), &[]);
     let requirement = Requirement::Combat(smallvec![(Enemy::Lizard, 3),]);
     group.bench_function("short_combat", |b| {
-        b.iter(|| player.is_met(&requirement, &states, smallvec![player.max_orbs()]))
+        b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
     });
-    let requirement = Requirement::And(vec![
-        Requirement::Combat(smallvec![
-            (Enemy::Mantis, 2),
-            (Enemy::Lizard, 2),
-            (Enemy::EnergyRefill, 4),
-            (Enemy::SneezeSlug, 2),
-            (Enemy::Mantis, 1),
-            (Enemy::Skeeto, 1),
-            (Enemy::EnergyRefill, 4),
-            (Enemy::SmallSkeeto, 7),
-            (Enemy::Skeeto, 2),
-            (Enemy::EnergyRefill, 4),
-            (Enemy::Lizard, 2),
-            (Enemy::Mantis, 2),
-        ]),
-        Requirement::Damage(50.0),
-    ]);
-    player.inventory.clear();
-    group.bench_function("long_combat_progression", |b| {
-        b.iter(|| {
-            player.solutions(
-                &requirement,
-                &states,
-                smallvec![player.max_orbs()],
-                1000,
-                1000,
-            )
-        })
-    });
+
+    // TODO reenable if this concept is added again
+    // let requirement = Requirement::And(vec![
+    //     Requirement::Combat(smallvec![
+    //         (Enemy::Mantis, 2),
+    //         (Enemy::Lizard, 2),
+    //         (Enemy::EnergyRefill, 4),
+    //         (Enemy::SneezeSlug, 2),
+    //         (Enemy::Mantis, 1),
+    //         (Enemy::Skeeto, 1),
+    //         (Enemy::EnergyRefill, 4),
+    //         (Enemy::SmallSkeeto, 7),
+    //         (Enemy::Skeeto, 2),
+    //         (Enemy::EnergyRefill, 4),
+    //         (Enemy::Lizard, 2),
+    //         (Enemy::Mantis, 2),
+    //     ]),
+    //     Requirement::Damage(50.0),
+    // ]);
+    // player.inventory.clear();
+    // group.bench_function("long_combat_progression", |b| {
+    //     b.iter(|| {
+    //         player.solutions(
+    //             &requirement,
+    //             &states,
+    //             smallvec![player.max_orbs()],
+    //             1000,
+    //             1000,
+    //         )
+    //     })
+    // });
 
     group.finish();
 }
@@ -107,39 +110,45 @@ fn requirements(c: &mut Criterion) {
 fn reach_checking(c: &mut Criterion) {
     let mut group = c.benchmark_group("reach_check");
 
-    let graph = Graph::compile(AREAS.clone(), LOC_DATA.clone(), STATE_DATA.clone(), &[])
-        .into_result()
-        .unwrap();
+    let graph = compile_graph(&[]);
     let uber_states = UberStates::new(&UBER_STATE_DATA);
+    let world_settings = WorldSettings::default();
+    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
+    let world = World::new(&graph, spawn, &world_settings, uber_states.clone());
 
     group.bench_function("short", |b| {
         b.iter(|| {
-            let output = IntermediateOutput::default();
-            let world_settings = WorldSettings::default();
-            let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
-            let mut world = World::new(&graph, spawn, &world_settings, uber_states.clone());
-            world.set_spirit_light(10000, &output);
-            world.set_max_health(200, &output);
-            world.set_max_energy(20.0.into(), &output);
-            world.set_keystones(34, &output);
-            world.set_gorlek_ore(40, &output);
-            world.set_shard_slots(8, &output);
-            world.set_skill(Skill::Sword, true, &output);
-            world.set_skill(Skill::DoubleJump, true, &output);
-            world.set_skill(Skill::Dash, true, &output);
-            world.reached()
+            let mut world = world.clone();
+            world.traverse_spawn(&[]);
+            world.set_spirit_light(10000, &[]);
+            world.set_max_health(200, &[]);
+            world.set_max_energy(20.0.into(), &[]);
+            world.set_keystones(34, &[]);
+            world.set_gorlek_ore(40, &[]);
+            world.set_shard_slots(8, &[]);
+            world.set_skill(Skill::Sword, true, &[]);
+            world.set_skill(Skill::DoubleJump, true, &[]);
+            world.set_skill(Skill::Dash, true, &[]);
+            world.reached_nodes().for_each(drop);
         })
     });
-    let output = IntermediateOutput::default();
+
     let world_settings = WorldSettings::default();
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
     let uber_states = UberStates::new(&UBER_STATE_DATA);
-    let mut world = World::new_spawn(&graph, spawn, &world_settings, uber_states);
-    let mut pool = ItemPool::default();
-    for item in pool.drain() {
-        world.simulate(&item, &output);
-    }
-    group.bench_function("long", |b| b.iter(|| world.reached()));
+    let world = World::new(&graph, spawn, &world_settings, uber_states);
+    let mut pool = ItemPool::new(&mut Pcg64Mcg::new(0));
+
+    group.bench_function("long", |b| {
+        b.iter(|| {
+            let mut world = world.clone();
+            world.traverse_spawn(&[]);
+            for item in pool.drain(..) {
+                world.simulate(&item, &[]);
+            }
+            world.reached_nodes().for_each(drop);
+        })
+    });
 }
 
 fn generation(c: &mut Criterion) {
@@ -148,14 +157,7 @@ fn generation(c: &mut Criterion) {
 
     let mut universe_settings = UniverseSettings::new(String::default());
     let mut seed = 0..;
-    let graph = Graph::compile(
-        AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
-        &universe_settings.world_settings,
-    )
-    .into_result()
-    .unwrap();
+    let graph = compile_graph(&universe_settings.world_settings);
     let snippet_access = &*SNIPPET_ACCESS;
     let uber_state_data = &*UBER_STATE_DATA;
 
@@ -212,14 +214,7 @@ fn generation(c: &mut Criterion) {
     preset
         .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
         .unwrap();
-    let graph = Graph::compile(
-        AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
-        &universe_settings.world_settings,
-    )
-    .into_result()
-    .unwrap();
+    let graph = compile_graph(&universe_settings.world_settings);
     group.bench_function("unsafe", |b| {
         b.iter(|| {
             universe_settings.seed = seed.next().unwrap().to_string();
@@ -245,14 +240,7 @@ fn multiworld(c: &mut Criterion) {
     preset
         .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
         .unwrap();
-    let graph = Graph::compile(
-        AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
-        &universe_settings.world_settings,
-    )
-    .into_result()
-    .unwrap();
+    let graph = compile_graph(&universe_settings.world_settings);
 
     let snippet_access = &*SNIPPET_ACCESS;
     let uber_state_data = &*UBER_STATE_DATA;
@@ -279,6 +267,17 @@ fn multiworld(c: &mut Criterion) {
     }
 
     group.finish();
+}
+
+fn compile_graph(settings: &[WorldSettings]) -> Graph {
+    Graph::compile(
+        AREAS.clone(),
+        LOC_DATA.clone(),
+        STATE_DATA.clone(),
+        settings,
+    )
+    .into_result()
+    .unwrap()
 }
 
 criterion_group!(

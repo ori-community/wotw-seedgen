@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 wotw_seedgen_data = { path = "../wotw_seedgen_data" }
 wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language" }
+wotw_seedgen_settings = { path = "../wotw_seedgen_settings" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rustc-hash = "2.0"

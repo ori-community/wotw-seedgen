@@ -1,4 +1,3 @@
-use crate::inventory::Inventory;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
@@ -36,8 +35,9 @@ impl SeedSpoiler {
 pub struct SpoilerGroup {
     /// The new reachables for each world
     pub reachable: Vec<Vec<NodeSummary>>,
+    // TODO grouped instead of repeating names?
     /// The set of items that were placed as forced progression, if any
-    pub forced_items: Inventory,
+    pub forced_items: Vec<SpoilerItem>,
     /// An ordered list describing the placed items
     pub placements: Vec<SpoilerPlacement>,
 }
@@ -51,10 +51,16 @@ pub struct SpoilerPlacement {
     pub target_world_index: usize,
     /// The placement location
     pub location: NodeSummary,
+    /// The placed item
+    pub item: SpoilerItem,
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SpoilerItem {
     /// The placed command
     pub command: CommandVoid,
     /// The readable name of the placed item, which usually varies from the `command`s [`Display`] implementation
-    pub item_name: String,
+    pub name: String,
 }
 /// Select data from a [`Node`](crate::logic_language::output::Node)
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -114,50 +120,89 @@ impl Display for SeedSpoiler {
 
         writeln!(f)?;
 
-        if !self.preplacements.is_empty() {
-            writeln!(f, "Preplacements")?;
-            // TODO write preplacements, the code below looks confusing, maybe improve it first
+        type FormattedPlacements<'a> = Vec<(String, String, &'a Option<Position>)>;
+
+        fn format_placements<'a>(
+            placements: &'a [SpoilerPlacement],
+            multiworld: bool,
+            longest_item: &mut usize,
+            longest_location: &mut usize,
+        ) -> FormattedPlacements<'a> {
+            placements
+                .iter()
+                .map(|placement| {
+                    let mut item = String::new();
+
+                    if multiworld {
+                        let _ = write!(item, "[{}] ", placement.target_world_index);
+                    }
+                    let _ = write!(item, "{}", placement.item);
+                    if item.len() > *longest_item {
+                        *longest_item = item.len();
+                    }
+
+                    let mut location = String::new();
+                    if multiworld {
+                        let _ = write!(location, "[{}] ", placement.origin_world_index);
+                    }
+                    let _ = write!(location, "{}", placement.location.identifier);
+                    if location.len() > *longest_location {
+                        *longest_location = location.len();
+                    }
+
+                    (item, location, &placement.location.position)
+                })
+                .collect()
         }
 
-        let mut longest_pickup = 0;
+        fn write_placements(
+            f: &mut fmt::Formatter,
+            placements: FormattedPlacements,
+            longest_item: usize,
+            longest_location: usize,
+        ) -> fmt::Result {
+            if !placements.is_empty() {
+                for (item, location, position) in placements {
+                    write!(f, "    {item:<longest_item$}  ")?;
+                    match position {
+                        Some(position) => writeln!(f, "{location:<longest_location$}  {position}")?,
+                        None => writeln!(f, "{location}")?,
+                    };
+                }
+            }
+
+            Ok(())
+        }
+
+        let mut longest_item = 0;
         let mut longest_location = 0;
+
+        let preplacements = format_placements(
+            &self.preplacements,
+            multiworld,
+            &mut longest_item,
+            &mut longest_location,
+        );
 
         let spoiler_groups = self
             .groups
             .iter()
             .map(|spoiler_group| {
-                let placements = spoiler_group
-                    .placements
-                    .iter()
-                    .map(|placement| {
-                        let mut pickup = String::new();
-                        if multiworld {
-                            write!(pickup, "[{}] ", placement.target_world_index)?;
-                        }
-                        write!(pickup, "{}", placement.item_name)?;
-                        if pickup.len() > longest_pickup {
-                            longest_pickup = pickup.len();
-                        }
-
-                        let mut location = String::new();
-                        if multiworld {
-                            write!(location, "[{}] ", placement.origin_world_index)?;
-                        }
-                        write!(location, "{}", placement.location.identifier)?;
-                        if location.len() > longest_location {
-                            longest_location = location.len();
-                        }
-
-                        Ok((pickup, location, &placement.location.position))
-                    })
-                    .collect::<Result<Vec<_>, _>>()?;
-                Ok((
+                let placements = format_placements(
+                    &spoiler_group.placements,
+                    multiworld,
+                    &mut longest_item,
+                    &mut longest_location,
+                );
+                (
                     &spoiler_group.reachable,
                     &spoiler_group.forced_items,
                     placements,
-                ))
+                )
             })
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Vec<_>>();
+
+        write_placements(f, preplacements, longest_item, longest_location)?;
 
         for (index, (reachable, forced_items, placements)) in spoiler_groups.into_iter().enumerate()
         {
@@ -187,24 +232,21 @@ impl Display for SeedSpoiler {
             }
 
             if !forced_items.is_empty() {
-                writeln!(f, "  Force placed: {forced_items}")?;
+                writeln!(f, "  Force placed: {}", forced_items.iter().format(", "))?;
             }
             writeln!(f)?;
 
-            let placement_count = placements.len();
-            if placement_count > 0 {
-                for (pickup, location, position) in placements {
-                    write!(f, "    {pickup:<longest_pickup$}  ")?;
-                    match position {
-                        Some(position) => writeln!(f, "{location:<longest_location$}  {position}"),
-                        None => writeln!(f, "{location}"),
-                    }?;
-                }
-            }
+            write_placements(f, placements, longest_item, longest_location)?;
 
             writeln!(f)?;
         }
 
         Ok(())
+    }
+}
+
+impl Display for SpoilerItem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.name.fmt(f)
     }
 }

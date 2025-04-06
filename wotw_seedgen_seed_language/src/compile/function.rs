@@ -20,38 +20,40 @@ use std::{
 };
 use strum::{Display, EnumString, VariantArray};
 use wotw_seedgen_assets::UberStateValue;
-use wotw_seedgen_data::{
-    uber_identifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WheelBind,
-};
+use wotw_seedgen_data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WheelBind};
 use wotw_seedgen_parse::{Error, Punctuated, Span, SpanEnd, SpanStart, Symbol};
+
+// TODO could we make these helper functions const if multis used smallvecs?
 
 pub fn spirit_light(amount: CommandInteger, rng: &mut Pcg64Mcg) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(spirit_light_string(amount.clone(), rng, false)),
-            super::add_integer(uber_identifier::SPIRIT_LIGHT, amount),
+            super::add_integer(UberIdentifier::SPIRIT_LIGHT, amount),
         ],
     }
 }
 pub fn gorlek_ore() -> CommandVoid {
-    resource(gorlek_ore_string, uber_identifier::GORLEK_ORE)
+    resource(gorlek_ore_string, UberIdentifier::GORLEK_ORE)
 }
 pub fn keystone() -> CommandVoid {
-    resource(keystone_string, uber_identifier::KEYSTONES)
+    resource(keystone_string, UberIdentifier::KEYSTONES)
 }
 pub fn shard_slot() -> CommandVoid {
-    resource(shard_slot_string, uber_identifier::SHARD_SLOTS)
+    resource(shard_slot_string, UberIdentifier::SHARD_SLOTS)
 }
 pub fn health_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(health_fragment_string(false)),
-            super::add_integer_value(uber_identifier::MAX_HEALTH, 5),
+            super::add_integer_value(UberIdentifier::MAX_HEALTH, 5),
+            // TODO reimplement fragment overflow bug?
+            // TODO but MAX_HEALTH is just the base max health!
             super::set_integer(
-                uber_identifier::HEALTH,
+                UberIdentifier::HEALTH,
                 CommandInteger::FetchInteger {
-                    uber_identifier: uber_identifier::MAX_HEALTH,
-                }, // TODO reimplement fragment overflow bug?
+                    uber_identifier: UberIdentifier::MAX_HEALTH,
+                },
             ),
         ],
     }
@@ -60,11 +62,11 @@ pub fn energy_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(energy_fragment_string(false)),
-            super::add_float_value(uber_identifier::MAX_ENERGY, 0.5.into()),
+            super::add_float_value(UberIdentifier::MAX_ENERGY, 0.5.into()),
             super::set_float(
-                uber_identifier::ENERGY,
+                UberIdentifier::ENERGY,
                 CommandFloat::FetchFloat {
-                    uber_identifier: uber_identifier::MAX_ENERGY,
+                    uber_identifier: UberIdentifier::MAX_ENERGY,
                 }, // TODO reimplement fragment overflow bug?
             ),
         ],
@@ -98,7 +100,7 @@ pub fn clean_water() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(clean_water_string(false)),
-            super::set_boolean_value(uber_identifier::CLEAN_WATER, true),
+            super::set_boolean_value(UberIdentifier::CLEAN_WATER, true),
         ],
     }
 }
@@ -723,34 +725,34 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(spirit_light_string(amount, &mut context.compiler.rng, true)),
-                        super::add_integer(uber_identifier::SPIRIT_LIGHT, negative),
+                        super::add_integer(UberIdentifier::SPIRIT_LIGHT, negative),
                     ],
                 })
             }
             FunctionIdentifier::GorlekOre => Command::Void(gorlek_ore()),
             FunctionIdentifier::RemoveGorlekOre => {
-                remove_resource(gorlek_ore_string, uber_identifier::GORLEK_ORE)
+                remove_resource(gorlek_ore_string, UberIdentifier::GORLEK_ORE)
             }
             FunctionIdentifier::Keystone => Command::Void(keystone()),
             FunctionIdentifier::RemoveKeystone => {
-                remove_resource(keystone_string, uber_identifier::KEYSTONES)
+                remove_resource(keystone_string, UberIdentifier::KEYSTONES)
             }
             FunctionIdentifier::ShardSlot => Command::Void(shard_slot()),
             FunctionIdentifier::RemoveShardSlot => {
-                remove_resource(shard_slot_string, uber_identifier::SHARD_SLOTS)
+                remove_resource(shard_slot_string, UberIdentifier::SHARD_SLOTS)
             }
             FunctionIdentifier::HealthFragment => Command::Void(health_fragment()),
             FunctionIdentifier::RemoveHealthFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(health_fragment_string(true)),
-                    super::add_integer_value(uber_identifier::MAX_HEALTH, -5),
+                    super::add_integer_value(UberIdentifier::MAX_HEALTH, -5),
                 ],
             }),
             FunctionIdentifier::EnergyFragment => Command::Void(energy_fragment()),
             FunctionIdentifier::RemoveEnergyFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(energy_fragment_string(true)),
-                    super::add_float_value(uber_identifier::MAX_ENERGY, (-0.5).into()),
+                    super::add_float_value(UberIdentifier::MAX_ENERGY, (-0.5).into()),
                 ],
             }),
             FunctionIdentifier::Skill => Command::Void(skill(arg(&mut context)?)),
@@ -791,7 +793,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveCleanWater => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(clean_water_string(true)),
-                    super::set_boolean_value(uber_identifier::CLEAN_WATER, false),
+                    super::set_boolean_value(UberIdentifier::CLEAN_WATER, false),
                 ],
             }),
             FunctionIdentifier::WeaponUpgrade => Command::Void(weapon_upgrade(arg(&mut context)?)),

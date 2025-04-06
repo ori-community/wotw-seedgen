@@ -1,6 +1,43 @@
+use std::{
+    borrow::Cow,
+    fmt::{self, Display},
+};
+
+use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, VariantArray};
 use wotw_seedgen_derive::FromStr;
+
+use crate::{Equipment, Shard};
+
+// TODO some default icon?
+/// Icons which can be used in shops or wheels
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum Icon {
+    Shard(Shard),
+    Equipment(Equipment),
+    Opher(OpherIcon),
+    Lupo(LupoIcon),
+    Grom(GromIcon),
+    Tuley(TuleyIcon),
+    File(Cow<'static, str>),
+    Bundle(String),
+}
+
+impl Display for Icon {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Icon::Shard(shard) => write!(f, "{shard} icon"),
+            Icon::Equipment(equipment) => write!(f, "{equipment} icon"),
+            Icon::Opher(opher_icon) => write!(f, "{opher_icon} icon"),
+            Icon::Lupo(lupo_icon) => write!(f, "{lupo_icon} icon"),
+            Icon::Grom(grom_icon) => write!(f, "{grom_icon} icon"),
+            Icon::Tuley(tuley_icon) => write!(f, "{tuley_icon} icon"),
+            Icon::File(path) => write!(f, "icon at \"{path}\""),
+            Icon::Bundle(path) => write!(f, "bundled icon at \"{path}\""),
+        }
+    }
+}
 
 /// Icons used in the Opher shop
 #[derive(
@@ -119,6 +156,7 @@ pub enum TuleyIcon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    Default,
     Display,
     FromStr,
     VariantArray,
@@ -151,6 +189,7 @@ pub enum MapIcon {
     EnergyGateFour = 23,
     SpiritShard = 24,
     NPC = 25,
+    #[default]
     QuestItem = 26,
     ShardSlotUpgrade = 27,
     Teleporter = 28,

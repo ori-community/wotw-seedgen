@@ -13,7 +13,7 @@ impl Analyzer for SpawnItemStats {
             .iter()
             .flat_map(|group| group.placements.iter())
             .filter(|placement| placement.location.identifier == "Spawn")
-            .map(|placement| placement.item_name.clone())
+            .map(|placement| placement.item.name.clone())
             .collect()
     }
 }

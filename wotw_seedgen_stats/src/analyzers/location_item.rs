@@ -15,7 +15,7 @@ impl Analyzer for LocationItemStats {
             .iter()
             .flat_map(|group| group.placements.iter())
             .find(|placement| placement.location.identifier == self.location)
-            .map(|placement| placement.item_name.clone())
+            .map(|placement| placement.item.name.clone())
             .into_iter()
             .collect()
     }

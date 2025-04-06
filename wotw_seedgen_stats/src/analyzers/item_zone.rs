@@ -15,7 +15,7 @@ impl Analyzer for ItemZoneStats {
         seed.groups
             .iter()
             .flat_map(|group| group.placements.iter())
-            .filter(|placement| placement.item_name == self.item)
+            .filter(|placement| placement.item.name == self.item)
             .map(|placement| {
                 placement
                     .location

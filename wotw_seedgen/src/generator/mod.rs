@@ -2,10 +2,10 @@ pub mod doors;
 pub mod item_pool;
 pub mod spoiler;
 
-mod cost;
 mod placement;
 mod spirit_light;
 mod string_placeholders;
+mod weight;
 
 use self::spoiler::SeedSpoiler;
 use crate::{
@@ -17,7 +17,7 @@ use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
 use wotw_seedgen_assets::{SnippetAccess, UberStateData};
-use wotw_seedgen_data::uber_identifier;
+use wotw_seedgen_data::Teleporter;
 use wotw_seedgen_logic_language::output::Graph;
 use wotw_seedgen_seed::Seed;
 use wotw_seedgen_seed_language::{
@@ -81,13 +81,10 @@ pub fn generate_seed<F: SnippetAccess>(
                 if graph.nodes[spawn].identifier() == "EastPools.Teleporter" {
                     output.events.push(Event {
                         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                        command: compile::set_boolean_value(
-                            uber_identifier::teleporter::CENTRAL_POOLS,
-                            true,
-                        ),
+                        command: compile::set_boolean_value(Teleporter::CENTRAL_POOLS_ID, true),
                     })
                 }
-                let world = World::new_spawn(graph, spawn, world_settings, uber_states.clone());
+                let world = World::new(graph, spawn, world_settings, uber_states.clone());
                 Ok((world, output))
             })
             .collect::<Result<Vec<_>, String>>()?;

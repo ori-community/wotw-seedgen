@@ -56,10 +56,6 @@ trait ErrCompletion {
     fn err_completion(err: &Error) -> Vec<CompletionItem>;
 }
 
-fn preferred_name(data: &UberStateDataEntry) -> String {
-    data.rando_name.clone().unwrap_or_else(|| data.name.clone())
-}
-
 fn keyword_completion(keyword: &str) -> CompletionItem {
     CompletionItem {
         label: keyword.to_string(),
@@ -255,7 +251,7 @@ fn uber_identifier_numeric_completion_item(
     CompletionItem {
         label: id.to_string(),
         label_details: Some(CompletionItemLabelDetails {
-            description: Some(preferred_name(data)),
+            description: Some(data.preferred_name().clone()),
             ..Default::default()
         }),
         kind: Some(CompletionItemKind::VALUE),

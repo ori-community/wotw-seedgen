@@ -14,9 +14,7 @@ pub use operation::{ArithmeticOperator, Comparator, EqualityComparator, LogicOpe
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::hash::Hash;
-use wotw_seedgen_data::{
-    Equipment, GromIcon, LupoIcon, MapIcon, OpherIcon, Position, Shard, TuleyIcon,
-};
+use wotw_seedgen_data::{Icon, MapIcon, Position};
 
 // TODO check all the public derives
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -106,17 +104,4 @@ impl From<&str> for StringOrPlaceholder {
     fn from(value: &str) -> Self {
         Self::Value(value.to_string())
     }
-}
-
-/// Descriptor for an icon
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum Icon {
-    Shard(Shard),
-    Equipment(Equipment),
-    Opher(OpherIcon),
-    Lupo(LupoIcon),
-    Grom(GromIcon),
-    Tuley(TuleyIcon),
-    File(String),
-    Bundle(String),
 }
