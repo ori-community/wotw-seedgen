@@ -26,8 +26,8 @@ use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
     compile,
     output::{
-        ClientEvent, CommandInteger, CommandString, CommandVoid, Event, IntermediateOutput,
-        ItemMetadata, StringOrPlaceholder, Trigger,
+        ClientEvent, CommandString, CommandVoid, Event, IntermediateOutput, ItemMetadata,
+        StringOrPlaceholder, Trigger,
     },
 };
 use wotw_seedgen_settings::UniverseSettings;
@@ -363,12 +363,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .take(spirit_light_placements_remaining);
                     (
                         origin_world_index,
-                        compile::spirit_light(
-                            CommandInteger::Constant {
-                                value: batch as i32,
-                            },
-                            &mut self.rng,
-                        ),
+                        compile::spirit_light((batch as i32).into(), &mut self.rng),
                     )
                 } else {
                     let target_world_index = self.choose_target_world_for_random_placement();
@@ -545,15 +540,11 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         if origin_world_index == target_world_index {
             name
         } else {
-            let right = match name {
-                CommandString::Constant {
-                    value: StringOrPlaceholder::Value(value),
-                } => CommandString::Constant {
-                    value: format!("'s {value}").into(),
-                },
-                dynamic => CommandString::Concatenate {
-                    left: Box::new(CommandString::Constant { value: "'s".into() }),
-                    right: Box::new(dynamic),
+            let right = match name.as_constant() {
+                Some(value) => format!("'s {value}").into(),
+                _ => CommandString::Concatenate {
+                    left: Box::new("'s".into()),
+                    right: Box::new(name),
                 },
             };
 
@@ -797,7 +788,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     // TODO name change
     fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         // TODO implement From<{number}> for Constant commands?
-        let command = compile::spirit_light(CommandInteger::Constant { value: 1 }, &mut self.rng);
+        let command = compile::spirit_light(1.into(), &mut self.rng);
         if self.needs_placement.is_empty() {
             let name = self.log_name(&command);
             warn!(
@@ -1125,12 +1116,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 .spirit_light_provider
                 .take(self.spirit_light_placements_remaining());
             amount = amount.saturating_sub(batch);
-            let command = compile::spirit_light(
-                CommandInteger::Constant {
-                    value: batch as i32,
-                },
-                &mut self.rng,
-            );
+            let command = compile::spirit_light((batch as i32).into(), &mut self.rng);
 
             match self.choose_placement_node::<true>() {
                 None => {
@@ -1241,9 +1227,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     ) {
         let (price, description, icon) = self.output.item_metadata.shop_data(command);
 
-        let price = price.unwrap_or_else(|| CommandInteger::Constant {
-            value: self.shop_price(command),
-        });
+        let price = price.unwrap_or_else(|| self.shop_price(command).into());
         let icon = icon.or_else(|| {
             command
                 .contained_common_write_identifiers()
@@ -1316,12 +1300,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 );
                 command
             } else {
-                compile::spirit_light(
-                    CommandInteger::Constant {
-                        value: self.spirit_light_provider.take(1 + placements_remaining) as i32,
-                    },
-                    &mut self.rng,
-                )
+                let amount = self.spirit_light_provider.take(1 + placements_remaining) as i32;
+                compile::spirit_light(amount.into(), &mut self.rng)
             };
             self.place(node, command, placement_spoiler);
         }
@@ -1443,14 +1423,12 @@ fn total_reach_check<'graph>(
 pub fn command_name(command: &CommandVoid, item_metadata: &ItemMetadata) -> CommandString {
     item_metadata
         .name(command)
-        .map(|value| CommandString::Constant { value })
+        .map(CommandString::from)
         .or_else(|| find_message(command).cloned())
         .unwrap_or_else(|| {
             let value = command.to_string();
             warn!("No name specified for custom command: {value}");
-            CommandString::Constant {
-                value: value.into(),
-            }
+            value.into()
         })
 }
 fn find_message(command: &CommandVoid) -> Option<&CommandString> {

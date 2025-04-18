@@ -127,7 +127,7 @@ impl CompileInto for CommandBoolean {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
         let result = match literal {
-            Literal::Boolean(value) => Ok(CommandBoolean::Constant { value }),
+            Literal::Boolean(value) => Ok(value.into()),
             Literal::UberIdentifier(UberStateAlias {
                 uber_identifier,
                 value,
@@ -168,19 +168,16 @@ impl CompileInto for CommandBoolean {
                 let left = operation.left.compile_into(compiler);
                 let operator = operator.compile(compiler);
                 let right = operation.right.compile_into(compiler);
-                Some(match (left?, right?) {
-                    (
-                        CommandBoolean::Constant { value: left },
-                        CommandBoolean::Constant { value: right },
-                    ) => match operator {
-                        LogicOperator::And => CommandBoolean::Constant {
-                            value: left && right,
-                        },
-                        LogicOperator::Or => CommandBoolean::Constant {
-                            value: left || right,
-                        },
+
+                let left: CommandBoolean = left?;
+                let right: CommandBoolean = right?;
+
+                Some(match (left.as_constant(), right.as_constant()) {
+                    (Some(left), Some(right)) => match operator {
+                        LogicOperator::And => (left && right).into(),
+                        LogicOperator::Or => (left || right).into(),
                     },
-                    (left, right) => CommandBoolean::LogicOperation {
+                    _ => CommandBoolean::LogicOperation {
                         operation: Box::new(Operation {
                             left,
                             operator,
@@ -221,19 +218,16 @@ impl CompileInto for CommandBoolean {
                             Type::Boolean => {
                                 let left = operation.left.compile_into(compiler);
                                 let right = operation.right.compile_into(compiler);
-                                match (left?, right?) {
-                                    (
-                                        CommandBoolean::Constant { value: left },
-                                        CommandBoolean::Constant { value: right },
-                                    ) => match operator {
-                                        EqualityComparator::Equal => CommandBoolean::Constant {
-                                            value: left == right,
-                                        },
-                                        EqualityComparator::NotEqual => CommandBoolean::Constant {
-                                            value: left != right,
-                                        },
+
+                                let left: CommandBoolean = left?;
+                                let right: CommandBoolean = right?;
+
+                                match (left.as_constant(), right.as_constant()) {
+                                    (Some(left), Some(right)) => match operator {
+                                        EqualityComparator::Equal => (left == right).into(),
+                                        EqualityComparator::NotEqual => (left != right).into(),
                                     },
-                                    (left, right) => CommandBoolean::CompareBoolean {
+                                    _ => CommandBoolean::CompareBoolean {
                                         operation: Box::new(Operation {
                                             left,
                                             operator,
@@ -245,19 +239,16 @@ impl CompileInto for CommandBoolean {
                             Type::String => {
                                 let left = operation.left.compile_into(compiler);
                                 let right = operation.right.compile_into(compiler);
-                                match (left?, right?) {
-                                    (
-                                        CommandString::Constant { value: left },
-                                        CommandString::Constant { value: right },
-                                    ) => match operator {
-                                        EqualityComparator::Equal => CommandBoolean::Constant {
-                                            value: left == right,
-                                        },
-                                        EqualityComparator::NotEqual => CommandBoolean::Constant {
-                                            value: left != right,
-                                        },
+
+                                let left: CommandString = left?;
+                                let right: CommandString = right?;
+
+                                match (left.as_constant(), right.as_constant()) {
+                                    (Some(left), Some(right)) => match operator {
+                                        EqualityComparator::Equal => (left == right).into(),
+                                        EqualityComparator::NotEqual => (left != right).into(),
                                     },
-                                    (left, right) => CommandBoolean::CompareString {
+                                    _ => CommandBoolean::CompareString {
                                         operation: Box::new(Operation {
                                             left,
                                             operator,
@@ -269,19 +260,16 @@ impl CompileInto for CommandBoolean {
                             Type::Zone => {
                                 let left = operation.left.compile_into(compiler);
                                 let right = operation.right.compile_into(compiler);
-                                match (left?, right?) {
-                                    (
-                                        CommandZone::Constant { value: left },
-                                        CommandZone::Constant { value: right },
-                                    ) => match operator {
-                                        EqualityComparator::Equal => CommandBoolean::Constant {
-                                            value: left == right,
-                                        },
-                                        EqualityComparator::NotEqual => CommandBoolean::Constant {
-                                            value: left != right,
-                                        },
+
+                                let left: CommandZone = left?;
+                                let right: CommandZone = right?;
+
+                                match (left.as_constant(), right.as_constant()) {
+                                    (Some(left), Some(right)) => match operator {
+                                        EqualityComparator::Equal => (left == right).into(),
+                                        EqualityComparator::NotEqual => (left != right).into(),
                                     },
-                                    (left, right) => CommandBoolean::CompareZone {
+                                    _ => CommandBoolean::CompareZone {
                                         operation: Box::new(Operation {
                                             left,
                                             operator,
@@ -296,31 +284,20 @@ impl CompileInto for CommandBoolean {
                     Type::Integer => {
                         let left = operation.left.compile_into(compiler);
                         let right = operation.right.compile_into(compiler);
-                        match (left?, right?) {
-                            (
-                                CommandInteger::Constant { value: left },
-                                CommandInteger::Constant { value: right },
-                            ) => match operator {
-                                Comparator::Equal => CommandBoolean::Constant {
-                                    value: left == right,
-                                },
-                                Comparator::NotEqual => CommandBoolean::Constant {
-                                    value: left != right,
-                                },
-                                Comparator::Less => CommandBoolean::Constant {
-                                    value: left < right,
-                                },
-                                Comparator::LessOrEqual => CommandBoolean::Constant {
-                                    value: left <= right,
-                                },
-                                Comparator::Greater => CommandBoolean::Constant {
-                                    value: left > right,
-                                },
-                                Comparator::GreaterOrEqual => CommandBoolean::Constant {
-                                    value: left >= right,
-                                },
+
+                        let left: CommandInteger = left?;
+                        let right: CommandInteger = right?;
+
+                        match (left.as_constant(), right.as_constant()) {
+                            (Some(left), Some(right)) => match operator {
+                                Comparator::Equal => (left == right).into(),
+                                Comparator::NotEqual => (left != right).into(),
+                                Comparator::Less => (left < right).into(),
+                                Comparator::LessOrEqual => (left <= right).into(),
+                                Comparator::Greater => (left > right).into(),
+                                Comparator::GreaterOrEqual => (left >= right).into(),
                             },
-                            (left, right) => CommandBoolean::CompareInteger {
+                            _ => CommandBoolean::CompareInteger {
                                 operation: Box::new(Operation {
                                     left,
                                     operator,
@@ -332,31 +309,20 @@ impl CompileInto for CommandBoolean {
                     Type::Float => {
                         let left = operation.left.compile_into(compiler);
                         let right = operation.right.compile_into(compiler);
-                        match (left?, right?) {
-                            (
-                                CommandFloat::Constant { value: left },
-                                CommandFloat::Constant { value: right },
-                            ) => match operator {
-                                Comparator::Equal => CommandBoolean::Constant {
-                                    value: left == right,
-                                },
-                                Comparator::NotEqual => CommandBoolean::Constant {
-                                    value: left != right,
-                                },
-                                Comparator::Less => CommandBoolean::Constant {
-                                    value: left < right,
-                                },
-                                Comparator::LessOrEqual => CommandBoolean::Constant {
-                                    value: left <= right,
-                                },
-                                Comparator::Greater => CommandBoolean::Constant {
-                                    value: left > right,
-                                },
-                                Comparator::GreaterOrEqual => CommandBoolean::Constant {
-                                    value: left >= right,
-                                },
+
+                        let left: CommandFloat = left?;
+                        let right: CommandFloat = right?;
+
+                        match (left.as_constant(), right.as_constant()) {
+                            (Some(left), Some(right)) => match operator {
+                                Comparator::Equal => (left == right).into(),
+                                Comparator::NotEqual => (left != right).into(),
+                                Comparator::Less => (left < right).into(),
+                                Comparator::LessOrEqual => (left <= right).into(),
+                                Comparator::Greater => (left > right).into(),
+                                Comparator::GreaterOrEqual => (left >= right).into(),
                             },
-                            (left, right) => CommandBoolean::CompareFloat {
+                            _ => CommandBoolean::CompareFloat {
                                 operation: Box::new(Operation {
                                     left,
                                     operator,
@@ -392,7 +358,7 @@ impl CompileInto for CommandInteger {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
         let result = match literal {
-            Literal::Integer(value) => Ok(CommandInteger::Constant { value }),
+            Literal::Integer(value) => Ok(value.into()),
             Literal::UberIdentifier(UberStateAlias {
                 uber_identifier,
                 value,
@@ -442,25 +408,18 @@ impl CompileInto for CommandInteger {
                 let left = operation.left.compile_into(compiler);
                 let operator = operator.compile(compiler);
                 let right = operation.right.compile_into(compiler);
-                let command = match (left?, right?) {
-                    (
-                        CommandInteger::Constant { value: left },
-                        CommandInteger::Constant { value: right },
-                    ) => match operator {
-                        ArithmeticOperator::Add => CommandInteger::Constant {
-                            value: left + right,
-                        },
-                        ArithmeticOperator::Subtract => CommandInteger::Constant {
-                            value: left - right,
-                        },
-                        ArithmeticOperator::Multiply => CommandInteger::Constant {
-                            value: left * right,
-                        },
-                        ArithmeticOperator::Divide => CommandInteger::Constant {
-                            value: left / right,
-                        },
+
+                let left: CommandInteger = left?;
+                let right: CommandInteger = right?;
+
+                let command = match (left.as_constant(), right.as_constant()) {
+                    (Some(left), Some(right)) => match operator {
+                        ArithmeticOperator::Add => (left + right).into(),
+                        ArithmeticOperator::Subtract => (left - right).into(),
+                        ArithmeticOperator::Multiply => (left * right).into(),
+                        ArithmeticOperator::Divide => (left / right).into(),
                     },
-                    (left, right) => CommandInteger::Arithmetic {
+                    _ => CommandInteger::Arithmetic {
                         operation: Box::new(Operation {
                             left,
                             operator,
@@ -487,10 +446,8 @@ impl CompileInto for CommandFloat {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
         let result = match literal {
-            Literal::Float(value) => Ok(CommandFloat::Constant { value }),
-            Literal::Integer(value) => Ok(CommandFloat::Constant {
-                value: (value as f32).into(),
-            }),
+            Literal::Float(value) => Ok(value.into()),
+            Literal::Integer(value) => Ok((value as f32).into()),
             Literal::UberIdentifier(UberStateAlias {
                 uber_identifier,
                 value,
@@ -541,25 +498,18 @@ impl CompileInto for CommandFloat {
                 let left = operation.left.compile_into(compiler);
                 let operator = operator.compile(compiler);
                 let right = operation.right.compile_into(compiler);
-                let command = match (left?, right?) {
-                    (
-                        CommandFloat::Constant { value: left },
-                        CommandFloat::Constant { value: right },
-                    ) => match operator {
-                        ArithmeticOperator::Add => CommandFloat::Constant {
-                            value: left + right,
-                        },
-                        ArithmeticOperator::Subtract => CommandFloat::Constant {
-                            value: left - right,
-                        },
-                        ArithmeticOperator::Multiply => CommandFloat::Constant {
-                            value: left * right,
-                        },
-                        ArithmeticOperator::Divide => CommandFloat::Constant {
-                            value: left / right,
-                        },
+
+                let left: CommandFloat = left?;
+                let right: CommandFloat = right?;
+
+                let command = match (left.as_constant(), right.as_constant()) {
+                    (Some(left), Some(right)) => match operator {
+                        ArithmeticOperator::Add => (left + right).into(),
+                        ArithmeticOperator::Subtract => (left - right).into(),
+                        ArithmeticOperator::Multiply => (left * right).into(),
+                        ArithmeticOperator::Divide => (left / right).into(),
                     },
-                    (left, right) => CommandFloat::Arithmetic {
+                    _ => CommandFloat::Arithmetic {
                         operation: Box::new(Operation {
                             left,
                             operator,
@@ -605,16 +555,10 @@ impl CompileInto for CommandString {
                     boolean: Box::new(create_quest_command(uber_identifier, value)),
                 }),
             },
-            Literal::Boolean(value) => Ok(CommandString::Constant {
-                value: value.to_string().into(),
-            }),
-            Literal::Integer(value) => Ok(CommandString::Constant {
-                value: value.to_string().into(),
-            }),
-            Literal::Float(value) => Ok(CommandString::Constant {
-                value: value.to_string().into(),
-            }),
-            Literal::String(value) => Ok(CommandString::Constant { value }),
+            Literal::Boolean(value) => Ok(value.to_string().into()),
+            Literal::Integer(value) => Ok(value.to_string().into()),
+            Literal::Float(value) => Ok(value.to_string().into()),
+            Literal::String(value) => Ok(value.into()),
             _ => Err(Error::custom("cannot convert to String".to_string(), span)),
         };
         compiler.consume_result(result)
@@ -627,27 +571,21 @@ impl CompileInto for CommandString {
             ast::Action::Function(function) => {
                 let span = function.span();
                 match function.compile(compiler)? {
-                    Command::Boolean(command) => match command {
-                        CommandBoolean::Constant { value } => Ok(CommandString::Constant {
-                            value: value.to_string().into(),
-                        }),
-                        _ => Ok(CommandString::FromBoolean {
+                    Command::Boolean(command) => match command.as_constant() {
+                        Some(value) => Ok(value.to_string().into()),
+                        None => Ok(CommandString::FromBoolean {
                             boolean: Box::new(command),
                         }),
                     },
-                    Command::Integer(command) => match command {
-                        CommandInteger::Constant { value } => Ok(CommandString::Constant {
-                            value: value.to_string().into(),
-                        }),
-                        _ => Ok(CommandString::FromInteger {
+                    Command::Integer(command) => match command.as_constant() {
+                        Some(value) => Ok(value.to_string().into()),
+                        None => Ok(CommandString::FromInteger {
                             integer: Box::new(command),
                         }),
                     },
-                    Command::Float(command) => match command {
-                        CommandFloat::Constant { value } => Ok(CommandString::Constant {
-                            value: value.to_string().into(),
-                        }),
-                        _ => Ok(CommandString::FromFloat {
+                    Command::Float(command) => match command.as_constant() {
+                        Some(value) => Ok(value.to_string().into()),
+                        None => Ok(CommandString::FromFloat {
                             float: Box::new(command),
                         }),
                     },
@@ -667,18 +605,13 @@ impl CompileInto for CommandString {
             Operator::Arithmetic(ast::ArithmeticOperator::Add) => {
                 let left = operation.left.compile_into(compiler);
                 let right = operation.right.compile_into(compiler);
-                let command = match (left?, right?) {
-                    (
-                        CommandString::Constant {
-                            value: StringOrPlaceholder::Value(left),
-                        },
-                        CommandString::Constant {
-                            value: StringOrPlaceholder::Value(right),
-                        },
-                    ) => CommandString::Constant {
-                        value: (left + &right).into(),
-                    },
-                    (left, right) => CommandString::Concatenate {
+
+                let left: CommandString = left?;
+                let right: CommandString = right?;
+
+                let command = match (left.as_constant(), right.as_constant()) {
+                    (Some(left), Some(right)) => format!("{left}{right}").into(),
+                    _ => CommandString::Concatenate {
                         left: Box::new(left),
                         right: Box::new(right),
                     },
@@ -702,7 +635,7 @@ impl CompileInto for CommandZone {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
         let result = match literal {
-            Literal::Constant(Constant::Zone(value)) => Ok(CommandZone::Constant { value }),
+            Literal::Constant(Constant::Zone(value)) => Ok(value.into()),
             other => Err(type_error(other.literal_type(), Type::Zone, span)),
         };
         compiler.consume_result(result)
@@ -761,10 +694,10 @@ impl CompileInto for Command {
                 }
                 Some(value) => Command::Boolean(create_quest_command(uber_identifier, value)),
             },
-            Literal::Boolean(value) => Command::Boolean(CommandBoolean::Constant { value }),
-            Literal::Integer(value) => Command::Integer(CommandInteger::Constant { value }),
-            Literal::Float(value) => Command::Float(CommandFloat::Constant { value }),
-            Literal::String(value) => Command::String(CommandString::Constant { value }),
+            Literal::Boolean(value) => Command::Boolean(value.into()),
+            Literal::Integer(value) => Command::Integer(value.into()),
+            Literal::Float(value) => Command::Float(value.into()),
+            Literal::String(value) => Command::String(value.into()),
             _ => todo!(),
         };
         Some(command)
@@ -1067,7 +1000,7 @@ fn create_quest_command(uber_identifier: UberIdentifier, value: i32) -> CommandB
         operation: Box::new(Operation {
             left: CommandInteger::FetchInteger { uber_identifier },
             operator: Comparator::GreaterOrEqual,
-            right: CommandInteger::Constant { value },
+            right: value.into(),
         }),
     }
 }

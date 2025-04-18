@@ -75,6 +75,21 @@ pub enum CommandBoolean {
     },
 }
 
+impl CommandBoolean {
+    pub const fn as_constant(&self) -> Option<bool> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl From<bool> for CommandBoolean {
+    fn from(value: bool) -> Self {
+        Self::Constant { value }
+    }
+}
+
 /// Command which returns [`i32`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum CommandInteger {
@@ -98,6 +113,21 @@ pub enum CommandInteger {
     FromFloat { float: Box<CommandFloat> },
 }
 
+impl CommandInteger {
+    pub const fn as_constant(&self) -> Option<i32> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl From<i32> for CommandInteger {
+    fn from(value: i32) -> Self {
+        Self::Constant { value }
+    }
+}
+
 /// Command which returns [`f32`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum CommandFloat {
@@ -118,6 +148,27 @@ pub enum CommandFloat {
     GetFloat { id: usize },
     /// Convert `integer` to `f32`
     FromInteger { integer: Box<CommandInteger> },
+}
+
+impl CommandFloat {
+    pub const fn as_constant(&self) -> Option<OrderedFloat<f32>> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl From<OrderedFloat<f32>> for CommandFloat {
+    fn from(value: OrderedFloat<f32>) -> Self {
+        Self::Constant { value }
+    }
+}
+
+impl From<f32> for CommandFloat {
+    fn from(value: f32) -> Self {
+        OrderedFloat::from(value).into()
+    }
 }
 
 /// Command which returns [`StringOrPlaceholder`]
@@ -148,6 +199,44 @@ pub enum CommandString {
     FromFloat { float: Box<CommandFloat> },
 }
 
+impl CommandString {
+    pub const fn as_constant(&self) -> Option<&String> {
+        match self {
+            Self::Constant {
+                value: StringOrPlaceholder::Value(value),
+            } => Some(value),
+            _ => None,
+        }
+    }
+
+    pub fn into_constant(self) -> Option<String> {
+        match self {
+            Self::Constant {
+                value: StringOrPlaceholder::Value(value),
+            } => Some(value),
+            _ => None,
+        }
+    }
+}
+
+impl From<StringOrPlaceholder> for CommandString {
+    fn from(value: StringOrPlaceholder) -> Self {
+        Self::Constant { value }
+    }
+}
+
+impl From<String> for CommandString {
+    fn from(value: String) -> Self {
+        StringOrPlaceholder::from(value).into()
+    }
+}
+
+impl From<&str> for CommandString {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
+    }
+}
+
 /// Command which returns [`Zone`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum CommandZone {
@@ -162,6 +251,21 @@ pub enum CommandZone {
     CurrentZone {},
     /// Return the zone currently selected in the map
     CurrentMapZone {},
+}
+
+impl CommandZone {
+    pub const fn as_constant(&self) -> Option<Zone> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl From<Zone> for CommandZone {
+    fn from(value: Zone) -> Self {
+        Self::Constant { value }
+    }
 }
 
 /// Command which returns nothing

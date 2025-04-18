@@ -54,15 +54,13 @@ struct ResolveContext<'a> {
 }
 
 fn resolve_zone_of(item: &CommandVoid, context: &ResolveContext) -> CommandString {
-    let value = context
+    context
         .events
         .iter()
         .find(|event| &event.command == item) // TODO there could be multiple
         .and_then(|event| context.node_trigger_map.get(&event.trigger))
-        .map_or_else(|| "Unknown".to_string(), |(_, zone)| zone.to_string());
-    CommandString::Constant {
-        value: value.into(),
-    }
+        .map_or_else(|| "Unknown".to_string(), |(_, zone)| zone.to_string())
+        .into()
 }
 fn resolve_item_on(trigger: &Trigger, context: &ResolveContext) -> CommandString {
     context
@@ -70,9 +68,7 @@ fn resolve_item_on(trigger: &Trigger, context: &ResolveContext) -> CommandString
         .iter()
         .find(|event| &event.trigger == trigger)
         .map_or_else(
-            || CommandString::Constant {
-                value: "Nothing".into(),
-            },
+            || "Nothing".into(),
             |event| command_name(&event.command, context.item_metadata),
         )
 }
@@ -94,19 +90,17 @@ fn resolve_count_in_zone(
         .collect::<Vec<_>>();
 
     if matches.is_empty() {
-        CommandString::Constant {
-            value: "$0/0$".into(),
-        }
+        "$0/0$".into()
     } else {
         CommandString::Multi {
             commands: [
                 CommandVoid::SetInteger {
                     id: 2,
-                    value: CommandInteger::Constant { value: 0 },
+                    value: 0.into(),
                 },
                 CommandVoid::SetString {
                     id: 2,
-                    value: CommandString::Constant { value: "".into() },
+                    value: "".into(),
                 },
             ]
             .into_iter()
@@ -120,7 +114,7 @@ fn resolve_count_in_zone(
                                 operation: Box::new(Operation {
                                     left: CommandInteger::GetInteger { id: 2 },
                                     operator: ArithmeticOperator::Add,
-                                    right: CommandInteger::Constant { value: 1 },
+                                    right: 1.into(),
                                 }),
                             },
                         },
@@ -129,14 +123,14 @@ fn resolve_count_in_zone(
                                 operation: Box::new(Operation {
                                     left: CommandString::GetString { id: 2 },
                                     operator: EqualityComparator::Equal,
-                                    right: CommandString::Constant { value: "".into() },
+                                    right: "".into(),
                                 }),
                             },
                             command: Box::new(CommandVoid::SetString {
                                 id: 2,
                                 value: CommandString::Concatenate {
                                     left: Box::new(CommandString::GetString { id: 2 }),
-                                    right: Box::new(CommandString::Constant { value: ": ".into() }),
+                                    right: Box::new(": ".into()),
                                 },
                             }),
                         },
@@ -145,14 +139,14 @@ fn resolve_count_in_zone(
                                 operation: Box::new(Operation {
                                     left: CommandString::GetString { id: 2 },
                                     operator: EqualityComparator::NotEqual,
-                                    right: CommandString::Constant { value: ": ".into() },
+                                    right: ": ".into(),
                                 }),
                             },
                             command: Box::new(CommandVoid::SetString {
                                 id: 2,
                                 value: CommandString::Concatenate {
                                     left: Box::new(CommandString::GetString { id: 2 }),
-                                    right: Box::new(CommandString::Constant { value: ", ".into() }),
+                                    right: Box::new(", ".into()),
                                 },
                             }),
                         },
@@ -172,21 +166,19 @@ fn resolve_count_in_zone(
             .chain([
                 CommandVoid::SetString {
                     id: 3,
-                    value: CommandString::Constant { value: "".into() },
+                    value: "".into(),
                 },
                 CommandVoid::If {
                     condition: CommandBoolean::CompareInteger {
                         operation: Box::new(Operation {
                             left: CommandInteger::GetInteger { id: 2 },
                             operator: Comparator::Equal,
-                            right: CommandInteger::Constant {
-                                value: matches.len() as i32,
-                            },
+                            right: (matches.len() as i32).into(),
                         }),
                     },
                     command: Box::new(CommandVoid::SetString {
                         id: 3,
-                        value: CommandString::Constant { value: "$".into() },
+                        value: "$".into(),
                     }),
                 },
             ])
@@ -198,9 +190,7 @@ fn resolve_count_in_zone(
                         integer: Box::new(CommandInteger::GetInteger { id: 2 }),
                     }),
                     right: Box::new(CommandString::Concatenate {
-                        left: Box::new(CommandString::Constant {
-                            value: format!("/{}", matches.len()).into(),
-                        }),
+                        left: Box::new(format!("/{}", matches.len()).into()),
                         right: Box::new(CommandString::Concatenate {
                             left: Box::new(CommandString::GetString { id: 3 }),
                             right: Box::new(CommandString::GetString { id: 2 }),

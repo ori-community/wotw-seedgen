@@ -12,7 +12,7 @@ fn node_condition_with_operator(node: &Node, operator: Comparator) -> Option<Com
                 operation: Box::new(Operation {
                     left: CommandInteger::FetchInteger { uber_identifier },
                     operator,
-                    right: CommandInteger::Constant { value },
+                    right: value.into(),
                 }),
             },
         })

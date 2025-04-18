@@ -3,7 +3,7 @@ use crate::{
     ast::{self, UberStateType},
     output::{
         ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-        CommandVoid, CommandZone, EqualityComparator, Operation, StringOrPlaceholder,
+        CommandVoid, CommandZone, EqualityComparator, Operation,
     },
 };
 use arrayvec::ArrayVec;
@@ -72,6 +72,7 @@ pub fn energy_fragment() -> CommandVoid {
         ],
     }
 }
+
 pub fn skill(skill: Skill) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -130,11 +131,9 @@ fn boxed_arg<T: CompileInto>(context: &mut ArgContext) -> Option<Box<T>> {
     arg(context).map(Box::new)
 }
 fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usize>)> {
-    let (arg, span) = spanned_arg(context)?;
-    match arg {
-        CommandString::Constant {
-            value: StringOrPlaceholder::Value(value),
-        } => Some((value, span)),
+    let (arg, span) = spanned_arg::<CommandString>(context)?;
+    match arg.into_constant() {
+        Some(value) => Some((value, span)),
         _ => {
             context.compiler.errors.push(Error::custom(
                 "Only literals are allowed in this position".to_string(),
@@ -581,12 +580,10 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: integer_id(&mut context)?,
             }),
             FunctionIdentifier::ToInteger => {
-                let float = arg(&mut context)?;
-                let command = match float {
-                    CommandFloat::Constant { value } => CommandInteger::Constant {
-                        value: value.round() as i32,
-                    },
-                    _ => CommandInteger::FromFloat {
+                let float = arg::<CommandFloat>(&mut context)?;
+                let command = match float.as_constant() {
+                    Some(value) => (value.round() as i32).into(),
+                    None => CommandInteger::FromFloat {
                         float: Box::new(float),
                     },
                 };
@@ -596,11 +593,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: float_id(&mut context)?,
             }),
             FunctionIdentifier::ToFloat => {
-                let integer = arg(&mut context)?;
-                let command = match integer {
-                    CommandInteger::Constant { value } => CommandFloat::Constant {
-                        value: (value as f32).into(),
-                    },
+                let integer = arg::<CommandInteger>(&mut context)?;
+                let command = match integer.as_constant() {
+                    Some(value) => (value as f32).into(),
                     _ => CommandFloat::FromInteger {
                         integer: Box::new(integer),
                     },
@@ -613,28 +608,22 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::ToString => {
                 let (arg, span) = spanned_arg(&mut context)?;
                 let command = match arg {
-                    Command::Boolean(command) => match command {
-                        CommandBoolean::Constant { value } => CommandString::Constant {
-                            value: value.to_string().into(),
-                        },
-                        other => CommandString::FromBoolean {
-                            boolean: Box::new(other),
+                    Command::Boolean(command) => match command.as_constant() {
+                        Some(value) => value.to_string().into(),
+                        None => CommandString::FromBoolean {
+                            boolean: Box::new(command),
                         },
                     },
-                    Command::Integer(command) => match command {
-                        CommandInteger::Constant { value } => CommandString::Constant {
-                            value: value.to_string().into(),
-                        },
-                        other => CommandString::FromInteger {
-                            integer: Box::new(other),
+                    Command::Integer(command) => match command.as_constant() {
+                        Some(value) => value.to_string().into(),
+                        None => CommandString::FromInteger {
+                            integer: Box::new(command),
                         },
                     },
-                    Command::Float(command) => match command {
-                        CommandFloat::Constant { value } => CommandString::Constant {
-                            value: value.to_string().into(),
-                        },
-                        other => CommandString::FromFloat {
-                            float: Box::new(other),
+                    Command::Float(command) => match command.as_constant() {
+                        Some(value) => value.to_string().into(),
+                        None => CommandString::FromFloat {
+                            float: Box::new(command),
                         },
                     },
                     Command::String(command) => command,
@@ -710,15 +699,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }
             FunctionIdentifier::RemoveSpiritLight => {
                 let amount = arg::<CommandInteger>(&mut context)?;
-                let negative = match amount.clone() {
-                    CommandInteger::Constant { value } => {
-                        CommandInteger::Constant { value: -value }
-                    }
-                    other => CommandInteger::Arithmetic {
+                let negative = match amount.as_constant() {
+                    Some(value) => (-value).into(),
+                    None => CommandInteger::Arithmetic {
                         operation: Box::new(Operation {
-                            left: other,
+                            left: amount.clone(),
                             operator: ArithmeticOperator::Multiply,
-                            right: CommandInteger::Constant { value: -1 },
+                            right: (-1).into(),
                         }),
                     },
                 };
@@ -1116,9 +1103,9 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                 },
                 command: Box::new(CommandVoid::SetString {
                     id: SPIRIT_LIGHT_STRING_ID,
-                    value: CommandString::Constant {
-                        value: (*SPIRIT_LIGHT_NAMES.choose(rng).unwrap()).into(),
-                    },
+                    value: (*SPIRIT_LIGHT_NAMES.choose(rng).unwrap())
+                        .to_string()
+                        .into(),
                 }),
             },
             CommandVoid::If {
@@ -1131,32 +1118,26 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                             },
                         },
                         operator: EqualityComparator::Equal,
-                        right: CommandBoolean::Constant { value: false },
+                        right: false.into(),
                     }),
                 },
                 command: Box::new(CommandVoid::SetString {
                     id: SPIRIT_LIGHT_STRING_ID,
-                    value: CommandString::Constant {
-                        value: "Spirit Light".into(),
-                    },
+                    value: "Spirit Light".into(),
                 }),
             },
         ],
         last: Box::new(if remove {
             CommandString::Concatenate {
-                left: Box::new(match amount {
-                    CommandInteger::Constant { value } => CommandString::Constant {
-                        value: format!("@Remove {value} ").into(),
-                    },
-                    other => CommandString::Concatenate {
-                        left: Box::new(CommandString::Constant {
-                            value: "@Remove ".into(),
-                        }),
+                left: Box::new(match amount.as_constant() {
+                    Some(value) => format!("@Remove {value} ").into(),
+                    None => CommandString::Concatenate {
+                        left: Box::new("@Remove ".into()),
                         right: Box::new(CommandString::Concatenate {
                             left: Box::new(CommandString::FromInteger {
-                                integer: Box::new(other),
+                                integer: Box::new(amount),
                             }),
-                            right: Box::new(CommandString::Constant { value: " ".into() }),
+                            right: Box::new(" ".into()),
                         }),
                     },
                 }),
@@ -1164,20 +1145,18 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                     left: Box::new(CommandString::GetString {
                         id: SPIRIT_LIGHT_STRING_ID,
                     }),
-                    right: Box::new(CommandString::Constant { value: "@".into() }),
+                    right: Box::new("@".into()),
                 }),
             }
         } else {
             CommandString::Concatenate {
-                left: Box::new(match amount {
-                    CommandInteger::Constant { value } => CommandString::Constant {
-                        value: format!("{value} ").into(),
-                    },
-                    other => CommandString::Concatenate {
+                left: Box::new(match amount.as_constant() {
+                    Some(value) => format!("{value} ").into(),
+                    None => CommandString::Concatenate {
                         left: Box::new(CommandString::FromInteger {
-                            integer: Box::new(other),
+                            integer: Box::new(amount),
                         }),
-                        right: Box::new(CommandString::Constant { value: " ".into() }),
+                        right: Box::new(" ".into()),
                     },
                 }),
                 right: Box::new(CommandString::GetString {
@@ -1188,12 +1167,11 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
     }
 }
 fn resource_string(resource: &str, remove: bool) -> CommandString {
-    let value = if remove {
+    if remove {
         format!("@Remove {resource}@").into()
     } else {
         resource.into()
-    };
-    CommandString::Constant { value }
+    }
 }
 fn gorlek_ore_string(remove: bool) -> CommandString {
     resource_string("Gorlek Ore", remove)
@@ -1215,7 +1193,7 @@ fn skill_string(skill: Skill, remove: bool) -> CommandString {
         .to_string()
         .from_case(Case::Pascal)
         .to_case(Case::Title);
-    let value = if remove {
+    if remove {
         format!("@Remove {skill_cased}@")
     } else {
         match skill {
@@ -1225,21 +1203,19 @@ fn skill_string(skill: Skill, remove: bool) -> CommandString {
             _ => format!("*{skill_cased}*"),
         }
     }
-    .into();
-    CommandString::Constant { value }
+    .into()
 }
 fn shard_string(shard: Shard, remove: bool) -> CommandString {
     let shard_cased = shard
         .to_string()
         .from_case(Case::Pascal)
         .to_case(Case::Title);
-    let value = if remove {
+    if remove {
         format!("@Remove {shard_cased}@")
     } else {
         format!("${shard_cased}$")
     }
-    .into();
-    CommandString::Constant { value }
+    .into()
 }
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
     let teleporter = teleporter.to_string();
@@ -1248,35 +1224,33 @@ fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
         .to_string()
         .from_case(Case::Pascal)
         .to_case(Case::Title);
-    let value = if remove {
+    if remove {
         format!("@Remove {teleporter_cased} Teleporter@")
     } else {
         format!("#{teleporter_cased} Teleporter#")
     }
-    .into();
-    CommandString::Constant { value }
+    .into()
 }
 fn clean_water_string(remove: bool) -> CommandString {
-    let value = if remove {
+    if remove {
         "@Remove Clean Water@"
     } else {
         "*Clean Water*"
     }
-    .into();
-    CommandString::Constant { value }
+    .into()
 }
+// TODO remove as const?
 fn weapon_upgrade_string(weapon_upgrade: WeaponUpgrade, remove: bool) -> CommandString {
     let weapon_upgrade_cased = weapon_upgrade
         .to_string()
         .from_case(Case::Pascal)
         .to_case(Case::Title);
-    let value = if remove {
+    if remove {
         format!("@Remove {weapon_upgrade_cased}@")
     } else {
         format!("#{weapon_upgrade_cased}#")
     }
-    .into();
-    CommandString::Constant { value }
+    .into()
 }
 
 fn resource(string_fn: fn(bool) -> CommandString, uber_identifier: UberIdentifier) -> CommandVoid {

@@ -37,42 +37,28 @@ impl EvaluateFrom for bool {
     type From = CommandBoolean;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        match from {
-            Self::From::Constant { value } => Some(value),
-            _ => None,
-        }
+        from.as_constant()
     }
 }
 impl EvaluateFrom for i32 {
     type From = CommandInteger;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        match from {
-            Self::From::Constant { value } => Some(value),
-            _ => None,
-        }
+        from.as_constant()
     }
 }
 impl EvaluateFrom for OrderedFloat<f32> {
     type From = CommandFloat;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        match from {
-            Self::From::Constant { value } => Some(value),
-            _ => None,
-        }
+        from.as_constant()
     }
 }
 impl EvaluateFrom for String {
     type From = CommandString;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        match from {
-            Self::From::Constant {
-                value: StringOrPlaceholder::Value(value),
-            } => Some(value),
-            _ => None,
-        }
+        from.into_constant()
     }
 }
 impl EvaluateFrom for StringOrPlaceholder {
@@ -89,10 +75,7 @@ impl EvaluateFrom for Zone {
     type From = CommandZone;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        match from {
-            Self::From::Constant { value } => Some(value),
-            _ => None,
-        }
+        from.as_constant()
     }
 }
 impl EvaluateFrom for Literal {

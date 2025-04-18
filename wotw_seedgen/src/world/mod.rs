@@ -30,7 +30,7 @@ use smallvec::{smallvec, SmallVec};
 use wotw_seedgen_data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade};
 use wotw_seedgen_logic_language::output::{Graph, RefillValue};
 use wotw_seedgen_seed_language::output::{
-    ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid, Event, Operation,
+    ArithmeticOperator, CommandFloat, CommandInteger, CommandVoid, Event, Operation,
 };
 use wotw_seedgen_settings::{Difficulty, WorldSettings};
 
@@ -83,7 +83,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         self.simulate(
             &CommandVoid::StoreBoolean {
                 uber_identifier,
-                value: CommandBoolean::Constant { value },
+                value: value.into(),
                 trigger_events: true,
             },
             events,
@@ -93,7 +93,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         self.simulate(
             &CommandVoid::StoreInteger {
                 uber_identifier,
-                value: CommandInteger::Constant { value },
+                value: value.into(),
                 trigger_events: true,
             },
             events,
@@ -108,7 +108,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         self.simulate(
             &CommandVoid::StoreFloat {
                 uber_identifier,
-                value: CommandFloat::Constant { value },
+                value: value.into(),
                 trigger_events: true,
             },
             events,
@@ -122,7 +122,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                     operation: Box::new(Operation {
                         left: CommandInteger::FetchInteger { uber_identifier },
                         operator: ArithmeticOperator::Add,
-                        right: CommandInteger::Constant { value: add },
+                        right: add.into(),
                     }),
                 },
                 trigger_events: true,
@@ -143,7 +143,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                     operation: Box::new(Operation {
                         left: CommandFloat::FetchFloat { uber_identifier },
                         operator: ArithmeticOperator::Add,
-                        right: CommandFloat::Constant { value: add },
+                        right: add.into(),
                     }),
                 },
                 trigger_events: true,
