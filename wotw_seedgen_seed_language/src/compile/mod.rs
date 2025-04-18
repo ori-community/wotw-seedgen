@@ -48,6 +48,8 @@ pub struct Compiler<'snippets, 'uberstates> {
 /// How many memory slots to reserve for generated calculations
 // TODO how much is needed
 pub const RESERVED_MEMORY: usize = 10;
+/// Memory slot for hardcoded calculations
+pub const PRIVATE_MEMORY: usize = RESERVED_MEMORY + 1;
 
 // TODO set -> store?
 pub const fn set_boolean(uber_identifier: UberIdentifier, value: CommandBoolean) -> CommandVoid {
@@ -240,10 +242,11 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             snippet_access,
             events: Default::default(),
             exported_values: Default::default(),
-            boolean_ids: IdProvider::new(RESERVED_MEMORY),
-            integer_ids: IdProvider::new(RESERVED_MEMORY),
-            float_ids: IdProvider::new(RESERVED_MEMORY),
-            string_ids: IdProvider::new(RESERVED_MEMORY + 1), // 1 reserved for spirit light strings
+            // 1 additional reserved for hardcoded calculations
+            boolean_ids: IdProvider::new(PRIVATE_MEMORY),
+            integer_ids: IdProvider::new(PRIVATE_MEMORY),
+            float_ids: IdProvider::new(PRIVATE_MEMORY),
+            string_ids: IdProvider::new(PRIVATE_MEMORY),
             boolean_state_id: 100,
             integer_state_id: 0,
             float_state_id: 150,

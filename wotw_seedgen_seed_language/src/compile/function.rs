@@ -1,9 +1,9 @@
-use super::{expression::CompileInto, Compile, SnippetCompiler, RESERVED_MEMORY};
+use super::{expression::CompileInto, Compile, SnippetCompiler, PRIVATE_MEMORY};
 use crate::{
     ast::{self, UberStateType},
     output::{
         ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-        CommandVoid, CommandZone, EqualityComparator, Operation,
+        CommandVoid, CommandZone, Comparator, EqualityComparator, Operation,
     },
 };
 use arrayvec::ArrayVec;
@@ -1090,8 +1090,13 @@ fn item_message(message: CommandString) -> CommandVoid {
     }
 }
 
+fn set_spirit_light_string(value: &str) -> Box<CommandVoid> {
+    Box::new(CommandVoid::SetString {
+        id: PRIVATE_MEMORY,
+        value: value.into(),
+    })
+}
 fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool) -> CommandString {
-    const SPIRIT_LIGHT_STRING_ID: usize = RESERVED_MEMORY + 1;
     CommandString::Multi {
         commands: vec![
             CommandVoid::If {
@@ -1101,12 +1106,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                         member: 0,
                     },
                 },
-                command: Box::new(CommandVoid::SetString {
-                    id: SPIRIT_LIGHT_STRING_ID,
-                    value: (*SPIRIT_LIGHT_NAMES.choose(rng).unwrap())
-                        .to_string()
-                        .into(),
-                }),
+                command: set_random_spirit_light_string(&amount, rng),
             },
             CommandVoid::If {
                 condition: CommandBoolean::CompareBoolean {
@@ -1121,10 +1121,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                         right: false.into(),
                     }),
                 },
-                command: Box::new(CommandVoid::SetString {
-                    id: SPIRIT_LIGHT_STRING_ID,
-                    value: "Spirit Light".into(),
-                }),
+                command: set_spirit_light_string("Spirit Light"),
             },
         ],
         last: Box::new(if remove {
@@ -1142,9 +1139,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                     },
                 }),
                 right: Box::new(CommandString::Concatenate {
-                    left: Box::new(CommandString::GetString {
-                        id: SPIRIT_LIGHT_STRING_ID,
-                    }),
+                    left: Box::new(CommandString::GetString { id: PRIVATE_MEMORY }),
                     right: Box::new("@".into()),
                 }),
             }
@@ -1159,10 +1154,51 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                         right: Box::new(" ".into()),
                     },
                 }),
-                right: Box::new(CommandString::GetString {
-                    id: SPIRIT_LIGHT_STRING_ID,
-                }),
+                right: Box::new(CommandString::GetString { id: PRIVATE_MEMORY }),
             }
+        }),
+    }
+}
+fn set_random_spirit_light_string(amount: &CommandInteger, rng: &mut Pcg64Mcg) -> Box<CommandVoid> {
+    let name = SPIRIT_LIGHT_NAMES.choose(rng).unwrap();
+    let constant_singular = amount.as_constant().map(|amount| matches!(amount, 1 | -1));
+
+    match constant_singular {
+        Some(true) => set_spirit_light_string(name.0),
+        Some(false) => set_spirit_light_string(name.1),
+        None => Box::new(CommandVoid::Multi {
+            commands: vec![
+                CommandVoid::SetBoolean {
+                    id: PRIVATE_MEMORY,
+                    value: CommandBoolean::CompareInteger {
+                        operation: Box::new(Operation {
+                            left: CommandInteger::Arithmetic {
+                                operation: Box::new(Operation {
+                                    left: amount.clone(),
+                                    operator: ArithmeticOperator::Multiply,
+                                    right: amount.clone(),
+                                }),
+                            },
+                            operator: Comparator::Equal,
+                            right: 1.into(),
+                        }),
+                    },
+                },
+                CommandVoid::If {
+                    condition: CommandBoolean::GetBoolean { id: PRIVATE_MEMORY },
+                    command: set_spirit_light_string(name.0),
+                },
+                CommandVoid::If {
+                    condition: CommandBoolean::CompareBoolean {
+                        operation: Box::new(Operation {
+                            left: CommandBoolean::GetBoolean { id: PRIVATE_MEMORY },
+                            operator: EqualityComparator::Equal,
+                            right: false.into(),
+                        }),
+                    },
+                    command: set_spirit_light_string(name.1),
+                },
+            ],
         }),
     }
 }
@@ -1359,91 +1395,91 @@ where
     Command::Void(CommandVoid::Lookup { index })
 }
 
-// TODO update
-const SPIRIT_LIGHT_NAMES: &[&str] = &[
-    "Spirit Light",
-    "Gallons",
-    "Spirit Bucks",
-    "Gold",
-    "Geo",
-    "EXP",
-    "Experience",
-    "XP",
-    "Gil",
-    "GP",
-    "Dollars",
-    "Tokens",
-    "Tickets",
-    "Pounds Sterling",
-    "Brownie Points",
-    "Euros",
-    "Credits",
-    "Bells",
-    "Fish",
-    "Zenny",
-    "Pesos",
-    "Exalted Orbs",
-    "Hryvnia",
-    "Poké",
-    "Glod",
-    "Dollerydoos",
-    "Boonbucks",
-    "Pieces of Eight",
-    "Shillings",
-    "Farthings",
-    "Kalganids",
-    "Quatloos",
-    "Crowns",
-    "Solari",
-    "Widgets",
-    "Ori Money",
-    "Money",
-    "Cash",
-    "Munny",
-    "Nuyen",
-    "Rings",
-    "Rupees",
-    "Coins",
-    "Echoes",
-    "Sovereigns",
-    "Points",
-    "Drams",
-    "Doubloons",
-    "Spheres",
-    "Silver",
-    "Slivers",
-    "Rubies",
-    "Emeralds",
-    "Notes",
-    "Yen",
-    "Złoty",
-    "Likes",
-    "Comments",
-    "Subs",
-    "Bananas",
-    "Sapphires",
-    "Diamonds",
-    "Fun",
-    "Minerals",
-    "Vespene Gas",
-    "Sheep",
-    "Brick",
-    "Wheat",
-    "Wood",
-    "Quills",
-    "Bits",
-    "Bytes",
-    "Nuts",
-    "Bolts",
-    "Souls",
-    "Runes",
-    "Pons",
-    "Boxings",
-    "Stonks",
-    "Leaves",
-    "Marbles",
-    "Stamps",
-    "Hugs",
-    "Nobles",
-    "Socks",
+const SPIRIT_LIGHT_NAMES: [(&str, &str); 86] = [
+    ("Banana", "Bananas"),
+    ("Bell", "Bells"),
+    ("Bit", "Bits"),
+    ("Bolt", "Bolts"),
+    ("Boonbuck", "Boonbucks"),
+    ("Boxing", "Boxings"),
+    ("Brick", "Brick"),
+    ("Brownie Point", "Brownie Points"),
+    ("Byte", "Bytes"),
+    ("Cash", "Cash"),
+    ("Coin", "Coins"),
+    ("Comment", "Comments"),
+    ("Credit", "Credits"),
+    ("Crown", "Crowns"),
+    ("Diamond", "Diamonds"),
+    ("Dollar", "Dollars"),
+    ("Dollerydoo", "Dollerydoos"),
+    ("Doubloon", "Doubloons"),
+    ("Dram", "Drams"),
+    ("Echoe", "Echoes"),
+    ("Emerald", "Emeralds"),
+    ("Euro", "Euros"),
+    ("Exalted Orb", "Exalted Orbs"),
+    ("EXP", "EXP"),
+    ("Experience", "Experience"),
+    ("Farthing", "Farthings"),
+    ("Fish", "Fish"),
+    ("Fun", "Fun"),
+    ("Gallon", "Gallons"),
+    ("Geo", "Geo"),
+    ("Gil", "Gil"),
+    ("Glod", "Glod"),
+    ("Gold", "Gold"),
+    ("GP", "GP"),
+    ("Hryvnia", "Hryvnia"),
+    ("Hug", "Hugs"),
+    ("Kalganid", "Kalganids"),
+    ("Leaf", "Leaves"),
+    ("Like", "Likes"),
+    ("Marble", "Marbles"),
+    ("Mineral", "Minerals"),
+    ("Money", "Money"),
+    ("Munny", "Munny"),
+    ("Noble", "Nobles"),
+    ("Note", "Notes"),
+    ("Nut", "Nuts"),
+    ("Nuyen", "Nuyen"),
+    ("Ori", "Ori Money"),
+    ("Pesos", "Pesos"),
+    ("Piece of Eight", "Pieces of Eight"),
+    ("Point", "Points"),
+    ("Poké", "Poké"),
+    ("Pon", "Pons"),
+    ("Pound Sterling", "Pounds Sterling"),
+    ("Quatloo", "Quatloos"),
+    ("Quill", "Quills"),
+    ("Ring", "Rings"),
+    ("Ruby", "Rubies"),
+    ("Rune", "Runes"),
+    ("Rupee", "Rupees"),
+    ("Sapphire", "Sapphires"),
+    ("Sheep", "Sheep"),
+    ("Shilling", "Shillings"),
+    ("Silver", "Silver"),
+    ("Sliver", "Slivers"),
+    ("Smackerooni", "Smackeroonis"),
+    ("Sock", "Socks"),
+    ("Solari", "Solari"),
+    ("Soul", "Souls"),
+    ("Sovereign", "Sovereigns"),
+    ("Sphere", "Spheres"),
+    ("Spirit Buck", "Spirit Bucks"),
+    ("Spirit", "Spirit Light"),
+    ("Stamp", "Stamps"),
+    ("Stonk", "Stonks"),
+    ("Sub", "Subs"),
+    ("Ticket", "Tickets"),
+    ("Token", "Tokens"),
+    ("Vespine", "Vespine Gas"),
+    ("Wheat", "Wheat"),
+    ("Widget", "Widgets"),
+    ("Wood", "Wood"),
+    ("XP", "XP"),
+    ("Yen", "Yen"),
+    ("Zenny", "Zenny"),
+    ("Złoty", "Złoty"),
 ];
