@@ -3,7 +3,7 @@
 use log::warn;
 use ordered_float::OrderedFloat;
 use rustc_hash::{FxHashMap, FxHashSet};
-use std::{cmp::Ordering, mem};
+use std::{cmp::Ordering, mem, ops::Index};
 use strum::Display;
 use wotw_seedgen_assets::UberStateData;
 use wotw_seedgen_data::UberIdentifier;
@@ -89,6 +89,12 @@ impl UberStateValue {
             }
         }
     }
+    pub fn expect_boolean(self) -> bool {
+        match self {
+            UberStateValue::Boolean(value) => value,
+            _ => panic!("Attempted to access {self} UberState as Boolean"),
+        }
+    }
     pub fn as_integer(self) -> i32 {
         match self {
             UberStateValue::Integer(value) => value,
@@ -98,6 +104,12 @@ impl UberStateValue {
             }
         }
     }
+    pub fn expect_integer(self) -> i32 {
+        match self {
+            UberStateValue::Integer(value) => value,
+            _ => panic!("Attempted to access {self} UberState as Integer"),
+        }
+    }
     pub fn as_float(self) -> OrderedFloat<f32> {
         match self {
             UberStateValue::Float(value) => value,
@@ -105,6 +117,12 @@ impl UberStateValue {
                 warn!("Attempted to access {self} UberState as Float");
                 Default::default()
             }
+        }
+    }
+    pub fn expect_float(self) -> OrderedFloat<f32> {
+        match self {
+            UberStateValue::Float(value) => value,
+            _ => panic!("Attempted to access {self} UberState as Float"),
         }
     }
 }
@@ -189,5 +207,13 @@ impl UberStates {
             }
             Some(entry) => entry.value,
         }
+    }
+}
+
+impl Index<UberIdentifier> for UberStates {
+    type Output = UberStateValue;
+
+    fn index(&self, index: UberIdentifier) -> &Self::Output {
+        &self.states[&index].value
     }
 }

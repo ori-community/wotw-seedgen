@@ -231,35 +231,27 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 
     #[inline]
     pub fn spirit_light(&self) -> i32 {
-        self.uber_states
-            .get(UberIdentifier::SPIRIT_LIGHT)
-            .as_integer()
+        self.uber_states[UberIdentifier::SPIRIT_LIGHT].expect_integer()
     }
 
     #[inline]
     pub fn gorlek_ore(&self) -> i32 {
-        self.uber_states
-            .get(UberIdentifier::GORLEK_ORE)
-            .as_integer()
+        self.uber_states[UberIdentifier::GORLEK_ORE].expect_integer()
     }
 
     #[inline]
     pub fn keystones(&self) -> i32 {
-        self.uber_states.get(UberIdentifier::KEYSTONES).as_integer()
+        self.uber_states[UberIdentifier::KEYSTONES].expect_integer()
     }
 
     #[inline]
     pub fn shard_slots(&self) -> i32 {
-        self.uber_states
-            .get(UberIdentifier::SHARD_SLOTS)
-            .as_integer()
+        self.uber_states[UberIdentifier::SHARD_SLOTS].expect_integer()
     }
 
     #[inline]
     pub fn base_max_health(&self) -> f32 {
-        self.uber_states
-            .get(UberIdentifier::MAX_HEALTH)
-            .as_integer() as f32
+        self.uber_states[UberIdentifier::MAX_HEALTH].expect_integer() as f32
     }
 
     /// Returns the maximum health
@@ -293,7 +285,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 
     #[inline]
     pub fn base_max_energy(&self) -> f32 {
-        *self.uber_states.get(UberIdentifier::MAX_ENERGY).as_float()
+        *self.uber_states[UberIdentifier::MAX_ENERGY].expect_float()
     }
 
     /// Returns the maximum energy
@@ -336,33 +328,27 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 
     #[inline]
     pub fn skill(&self, skill: Skill) -> bool {
-        self.uber_states.get(skill.uber_identifier()).as_boolean()
+        self.uber_states[skill.uber_identifier()].expect_boolean()
     }
 
     #[inline]
     pub fn shard(&self, shard: Shard) -> bool {
-        self.uber_states.get(shard.uber_identifier()).as_boolean()
+        self.uber_states[shard.uber_identifier()].expect_boolean()
     }
 
     #[inline]
     pub fn teleporter(&self, teleporter: Teleporter) -> bool {
-        self.uber_states
-            .get(teleporter.uber_identifier())
-            .as_boolean()
+        self.uber_states[teleporter.uber_identifier()].expect_boolean()
     }
 
     #[inline]
     pub fn clean_water(&self) -> bool {
-        self.uber_states
-            .get(UberIdentifier::CLEAN_WATER)
-            .as_boolean()
+        self.uber_states[UberIdentifier::CLEAN_WATER].expect_boolean()
     }
 
     #[inline]
     pub fn weapon_upgrade(&self, weapon_upgrade: WeaponUpgrade) -> bool {
-        self.uber_states
-            .get(weapon_upgrade.uber_identifier())
-            .as_boolean()
+        self.uber_states[weapon_upgrade.uber_identifier()].expect_boolean()
     }
 
     pub fn inventory_display(&self) -> InventoryDisplay {
