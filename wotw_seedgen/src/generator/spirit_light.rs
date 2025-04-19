@@ -4,8 +4,8 @@ use rand_pcg::Pcg64Mcg;
 use std::mem;
 
 const MIN_SPIRIT_LIGHT: f32 = 50.;
+const NOISE: f32 = 0.25;
 
-// TODO the last couple spirit light placements are weird
 pub struct SpiritLightProvider {
     rng: Pcg64Mcg,
     pub amount: f32,
@@ -18,11 +18,10 @@ impl SpiritLightProvider {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
             amount: amount as f32,
             next_amount: MIN_SPIRIT_LIGHT,
-            noise: Uniform::new_inclusive(0.75, 1.25),
+            noise: Uniform::new_inclusive(1. - NOISE, 1. + NOISE),
         }
     }
 
-    // TODO in a single world seed, the reported spirit_light_placements_remaining have some jumps, not sure that should be the case
     pub fn take(&mut self, spirit_light_placements_remaining: usize) -> usize {
         // For brevity, spirit_light_placements_remaining is referred to as remaining in this comment
         //
@@ -46,9 +45,12 @@ impl SpiritLightProvider {
         let a = (2. * self.amount / (remaining - 1.) - 2. * self.next_amount)
             / (remaining + 1. - 2. * remaining);
         let b = self.next_amount - a * remaining;
-        let mut next = a * (remaining - 1.) + b;
-        self.amount -= self.next_amount;
-        next *= self.rng.sample(self.noise);
-        mem::replace(&mut self.next_amount, next).round() as usize
+        let next = a * (remaining - 1.) + b;
+        let mut amount = mem::replace(&mut self.next_amount, next);
+
+        // Apply random noise after setting the next amount to prevent snowballing
+        amount = (amount * self.rng.sample(self.noise)).round();
+        self.amount -= amount;
+        amount as usize
     }
 }

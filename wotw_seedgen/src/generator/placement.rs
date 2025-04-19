@@ -361,12 +361,20 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     let batch = origin_world
                         .spirit_light_provider
                         .take(spirit_light_placements_remaining);
+
+                    spirit_light_placements_remaining -= 1;
+
                     (
                         origin_world_index,
                         compile::spirit_light((batch as i32).into(), &mut self.rng),
                     )
                 } else {
                     let target_world_index = self.choose_target_world_for_random_placement();
+
+                    if origin_world_index != target_world_index {
+                        spirit_light_placements_remaining -= 1;
+                    }
+
                     (
                         target_world_index,
                         self.worlds[target_world_index]
@@ -380,8 +388,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 self.place_command_at(command, name, node, origin_world_index, target_world_index);
 
                 placements_remaining -= 1;
-                spirit_light_placements_remaining =
-                    spirit_light_placements_remaining.saturating_sub(1);
             }
         }
         any_placed
