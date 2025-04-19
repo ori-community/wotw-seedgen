@@ -226,7 +226,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         value: bool,
         events: &[Event],
     ) {
-        self.set_boolean(weapon_upgrade.uber_identifier(), value, events);
+        self.set_integer(weapon_upgrade.uber_identifier(), i32::from(value), events);
     }
 
     #[inline]
@@ -348,7 +348,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 
     #[inline]
     pub fn weapon_upgrade(&self, weapon_upgrade: WeaponUpgrade) -> bool {
-        self.uber_states[weapon_upgrade.uber_identifier()].expect_boolean()
+        self.uber_states[weapon_upgrade.uber_identifier()].expect_integer() > 0
     }
 
     pub fn inventory_display(&self) -> InventoryDisplay {

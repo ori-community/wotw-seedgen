@@ -109,7 +109,7 @@ pub fn weapon_upgrade(weapon_upgrade: WeaponUpgrade) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(weapon_upgrade_string(weapon_upgrade, false)),
-            super::set_boolean_value(weapon_upgrade.uber_identifier(), true),
+            super::set_integer_value(weapon_upgrade.uber_identifier(), 1),
         ],
     }
 }
@@ -789,7 +789,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(weapon_upgrade_string(weapon_upgrade, true)),
-                        super::set_boolean_value(weapon_upgrade.uber_identifier(), false),
+                        super::set_integer_value(weapon_upgrade.uber_identifier(), 0),
                     ],
                 })
             }
