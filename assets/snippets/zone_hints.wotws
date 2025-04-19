@@ -71,7 +71,7 @@ fun write_hollow_hint() {
     }
 }
 fun write_glades_hint() {
-    if LupoShop.HCMapIcon > 0 {
+    if LupoShop.HCMapIcon {
         write_glades_skill_hint()
         write_glades_teleporter_hint()
     }
@@ -83,7 +83,7 @@ fun write_wellspring_hint() {
     }
 }
 fun write_woods_hint() {
-    if LupoShop.ECMapIcon > 0 {
+    if LupoShop.ECMapIcon {
         write_woods_skill_hint()
         write_woods_teleporter_hint()
     }
@@ -318,14 +318,14 @@ fun write_burrows_hint() {
 
 on reload {
     set_shop_item_data(
-        LupoShop.HCMapIcon,
+        lupoShop.hcMapIcons,
         200,
         "Glades Items Hint",
         "Reveals " + description + " in Glades",
         LupoIcon::HealthFragmentsMap,
     )
     set_shop_item_data(
-        LupoShop.ECMapIcon,
+        lupoShop.ecMapIcons,
         200,
         "Woods Items Hint",
         "Reveals " + description + " in Woods",
@@ -343,7 +343,7 @@ on WestHollow.LupoMap {
     write_hollow_hint()
     item_message(get_string("zone_hint"))
 }
-on LupoShop.HCMapIcon > 0 {
+on LupoShop.HCMapIcon {
     set_string("zone_hint", "")
     write_glades_hint()
     item_message(get_string("zone_hint"))
@@ -353,7 +353,7 @@ on InnerWellspring.LupoMap {
     write_wellspring_hint()
     item_message(get_string("zone_hint"))
 }
-on LupoShop.ECMapIcon > 0 {
+on LupoShop.ECMapIcon {
     set_string("zone_hint", "")
     write_woods_hint()
     item_message(get_string("zone_hint"))

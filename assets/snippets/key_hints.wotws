@@ -25,7 +25,7 @@ Twillen tells the zones holding Bow and Bash")
 !on_event("progress_helper", write_map_progress_message, write_hints())
 
 fun write_hints() {
-    if LupoShop.ShardMapIcon > 0 {
+    if LupoShop.ShardMapIcon {
         write_lupo_hint()
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("lupo_hint"))
     }
@@ -84,7 +84,8 @@ fun write_twillen_hint() {
 
 on reload {
     set_shop_item_data(
-        LupoShop.ShardMapIcon,
+        // TODO non-boolean shop states are not ergonomic
+        lupoShop.shardMapIcons,
         4000,
         "Burrow, Water Dash, Grenade, Flash hint",
         "Costs 500 less for every item you found already",
@@ -124,7 +125,7 @@ fun updateLupoHintPrice() {
     if skills.grenade set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
     if skills.flash set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
     if get_integer("lupo_hint_price") == 2000 set_integer("lupo_hint_price", 0)
-    set_shop_item_price(LupoShop.ShardMapIcon, get_integer("lupo_hint_price"))
+    set_shop_item_price(lupoShop.shardMapIcons, get_integer("lupo_hint_price"))
 }
 fun updateOpherHintPrice() {
     set_integer("opher_hint_price", 2500)
@@ -152,7 +153,7 @@ on skills.glide updateOpherHintPrice()
 on skills.bash updateTwillenHintPrice()
 on skills.bow updateTwillenHintPrice()
 
-on LupoShop.ShardMapIcon > 0 {
+on LupoShop.ShardMapIcon {
     write_lupo_hint()
     item_message(get_string("lupo_hint"))
 }

@@ -14890,6 +14890,7 @@ anchor TwillenShop:
     moki: SpiritLight=1200
 
 anchor OpherShop:  # Opher's offers
+  # TODO rename areas.wotw identifiers
   pickup OpherShop.Spike:
     moki: SpiritLight=1200
   pickup OpherShop.SpiritSmash:

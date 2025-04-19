@@ -365,26 +365,26 @@ WillowsEnd.WindSpinOre, Willows End, Resource, Ore, willowsEndGroup, 16155, gorl
 WillowsEnd.RedirectEX, Willows End, SpiritLight, 200, willowsEndGroup, 16155, xpOrbA, 55446, , 653.6, -3780.1, 653.57104, -3780.0996
 WillowsEnd.UpperLeftEX, Willows End, SpiritLight, 200, corruptedPeakGroup, 36153, expOrbA, 23902, , 433.5, -3639.7, 433.44998, -3639.69
 WillowsEnd.UpperRightEX, Willows End, SpiritLight, 200, corruptedPeakGroup, 36153, expOrbB, 3662, , 540.3, -3655.0, 540.25415, -3654.963
-TwillenShop.Overcharge, Shop, Shop, TwillenShard, twillenShop, 2, Overcharge, 1, , , , ,
-TwillenShop.TripleJump, Shop, Shop, TwillenShard, twillenShop, 2, TripleJump, 2, , , , ,
-TwillenShop.Wingclip, Shop, Shop, TwillenShard, twillenShop, 2, Wingclip, 3, , , , ,
-TwillenShop.Swap, Shop, Shop, TwillenShard, twillenShop, 2, Swap, 5, , , , ,
-TwillenShop.LightHarvest, Shop, Shop, TwillenShard, twillenShop, 2, LightHarvest, 19, , , , ,
-TwillenShop.Vitality, Shop, Shop, TwillenShard, twillenShop, 2, Vitality, 22, , , , ,
-TwillenShop.Energy, Shop, Shop, TwillenShard, twillenShop, 2, Energy, 26, , , , ,
-TwillenShop.Finesse, Shop, Shop, TwillenShard, twillenShop, 2, Finesse, 40, , , , ,
-OpherShop.WaterBreath, Shop, Shop, OpherWeapon, opherShop, 1, WaterBreath, 23, , , , ,
-OpherShop.Spike, Shop, Shop, OpherWeapon, opherShop, 1, Spike, 74, , , , ,
-OpherShop.SpiritSmash, Shop, Shop, OpherWeapon, opherShop, 1, SpiritSmash, 98, , , , ,
-OpherShop.Teleport, Shop, Shop, OpherWeapon, opherShop, 1, Teleport, 105, , , , ,
-OpherShop.SpiritStar, Shop, Shop, OpherWeapon, opherShop, 1, SpiritStar, 106, , , , ,
-OpherShop.Blaze, Shop, Shop, OpherWeapon, opherShop, 1, Blaze, 115, , , , ,
-OpherShop.Sentry, Shop, Shop, OpherWeapon, opherShop, 1, Sentry, 116, , , , ,
-OpherShop.ExplodingSpike, Shop, Shop, OpherWeapon, opherShop, 1, ExplodingSpike, 1074, , , , ,
-OpherShop.ShockSmash, Shop, Shop, OpherWeapon, opherShop, 1, ShockSmash, 1098, , , , ,
-OpherShop.StaticStar, Shop, Shop, OpherWeapon, opherShop, 1, StaticStar, 1106, , , , ,
-OpherShop.ChargeBlaze, Shop, Shop, OpherWeapon, opherShop, 1, ChargeBlaze, 1115, , , , ,
-OpherShop.RapidSentry, Shop, Shop, OpherWeapon, opherShop, 1, RapidSentry, 1116, , , , ,
-LupoShop.HCMapIcon, Shop, Shop, LupoMap, lupoShop, 15, HCMapIcon, 19396, , , , -209, -4162
-LupoShop.ECMapIcon, Shop, Shop, LupoMap, lupoShop, 15, ECMapIcon, 57987, , , , -209, -4162
-LupoShop.ShardMapIcon, Shop, Shop, LupoMap, lupoShop, 15, ShardMapIcon, 41666, , , , -209, -4162
+TwillenShop.Overcharge, Shop, Shop, TwillenShard, twillenShop, 2, overcharge, 1, , , , ,
+TwillenShop.TripleJump, Shop, Shop, TwillenShard, twillenShop, 2, tripleJump, 2, , , , ,
+TwillenShop.Wingclip, Shop, Shop, TwillenShard, twillenShop, 2, wingclip, 3, , , , ,
+TwillenShop.Swap, Shop, Shop, TwillenShard, twillenShop, 2, swap, 5, , , , ,
+TwillenShop.LightHarvest, Shop, Shop, TwillenShard, twillenShop, 2, lightHarvest, 19, , , , ,
+TwillenShop.Vitality, Shop, Shop, TwillenShard, twillenShop, 2, vitality, 22, , , , ,
+TwillenShop.Energy, Shop, Shop, TwillenShard, twillenShop, 2, energy, 26, , , , ,
+TwillenShop.Finesse, Shop, Shop, TwillenShard, twillenShop, 2, finesse, 40, , , , ,
+OpherShop.WaterBreath, Shop, Shop, OpherWeapon, opherShop, 1, waterBreath, 23, , , , ,
+OpherShop.Spike, Shop, Shop, OpherWeapon, opherShop, 1, spear, 74, , , , ,
+OpherShop.SpiritSmash, Shop, Shop, OpherWeapon, opherShop, 1, hammer, 98, , , , ,
+OpherShop.Teleport, Shop, Shop, OpherWeapon, opherShop, 1, fastTravel, 105, , , , ,
+OpherShop.SpiritStar, Shop, Shop, OpherWeapon, opherShop, 1, shuriken, 106, , , , ,
+OpherShop.Blaze, Shop, Shop, OpherWeapon, opherShop, 1, blaze, 115, , , , ,
+OpherShop.Sentry, Shop, Shop, OpherWeapon, opherShop, 1, sentry, 116, , , , ,
+OpherShop.ExplodingSpike, Shop, Shop, OpherWeapon, opherShop, 1, explodingSpear, 1074, , , , ,
+OpherShop.ShockSmash, Shop, Shop, OpherWeapon, opherShop, 1, hammerShockwave, 1098, , , , ,
+OpherShop.StaticStar, Shop, Shop, OpherWeapon, opherShop, 1, staticShuriken, 1106, , , , ,
+OpherShop.ChargeBlaze, Shop, Shop, OpherWeapon, opherShop, 1, chargeBlaze, 1115, , , , ,
+OpherShop.RapidSentry, Shop, Shop, OpherWeapon, opherShop, 1, rapidSentry, 1116, , , , ,
+LupoShop.HCMapIcon, Shop, Shop, LupoMap, lupoShop, 15, hcMapIcons, 19396, 1, , , -209, -4162
+LupoShop.ECMapIcon, Shop, Shop, LupoMap, lupoShop, 15, ecMapIcons, 57987, 1, , , -209, -4162
+LupoShop.ShardMapIcon, Shop, Shop, LupoMap, lupoShop, 15, shardMapIcons, 41666, 1, , , -209, -4162
