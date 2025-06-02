@@ -12817,6 +12817,7 @@ region LowerWastes:
   kii: Regenerate
   unsafe: free
 
+# TODO synchronize teleporter names
 anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
   refill Full
 

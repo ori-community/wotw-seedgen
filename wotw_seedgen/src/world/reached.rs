@@ -64,6 +64,7 @@ impl Reach {
 
     fn clear(&mut self) {
         self.best_orbs.clear();
+        self.tp_reached = false;
         self.uber_state_progressions.clear();
         self.logical_state_progressions.clear();
         self.orb_progression = false;

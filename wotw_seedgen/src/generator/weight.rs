@@ -31,10 +31,9 @@ pub fn cost(uber_identifier: CommonUberIdentifier) -> usize {
     match uber_identifier {
         CommonUberIdentifier::SpiritLight => 1,
         CommonUberIdentifier::GorlekOre => 20, // TODO I wonder why there's so much gorlek ore progression oriLol
-        CommonUberIdentifier::MaxHealth => 24,
+        CommonUberIdentifier::MaxHealth | CommonUberIdentifier::MaxEnergy => 120, // adjust once weighting accounts for the modification amount
         CommonUberIdentifier::Skill(Skill::Regenerate)
         | CommonUberIdentifier::Skill(Skill::WaterBreath) => 200, // Quality-of-Life Skills
-        CommonUberIdentifier::Energy => 240,
         CommonUberIdentifier::Keystones => 320,
         CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::ExplodingSpear)
         | CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::HammerShockwave)

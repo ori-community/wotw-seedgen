@@ -712,6 +712,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             String::new()
         };
 
+        trace!(
+            "{log_index}Spawning on {}",
+            world.graph.nodes[world.spawn].identifier()
+        );
+
         let mut item_pool = ItemPool::new(&mut rng);
 
         for (command, amount) in mem::take(&mut output.item_pool_changes) {
@@ -924,17 +929,26 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn find_progressions(&mut self, slots: usize) -> Vec<WeightedProgression> {
         let spirit_light_slots = self.spirit_light_progression_slots();
 
-        self.world
-            .reach
-            .uber_state_progressions
-            .keys()
-            .copied()
-            .collect::<Vec<_>>()
-            .into_iter()
-            .filter_map(|uber_identifier| {
-                self.find_progression(uber_identifier, slots, spirit_light_slots)
-            })
-            .collect()
+        let mut progressions = if self.world.reach.orb_progression {
+            self.find_orb_progressions(slots)
+        } else {
+            vec![]
+        };
+
+        progressions.extend(
+            self.world
+                .reach
+                .uber_state_progressions
+                .keys()
+                .copied()
+                .collect::<Vec<_>>()
+                .into_iter()
+                .filter_map(|uber_identifier| {
+                    self.find_progression(uber_identifier, slots, spirit_light_slots)
+                }),
+        );
+
+        progressions
     }
 
     fn find_progression(
@@ -1024,7 +1038,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let weight = weight(
                 new_reached,
                 uber_identifier,
-                items.len(),
+                items.len(), // TODO but items modifying the same uberState could modify it by different amounts?
                 items.len(),
                 slots,
             );
@@ -1074,6 +1088,15 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             items: Progression::SpiritLight(amount),
             weight,
         })
+    }
+
+    fn find_orb_progressions(&mut self, slots: usize) -> Vec<WeightedProgression> {
+        // TODO regression: previously combinations of fragments, shards and regenerate were considered
+
+        self.find_integer_progression(UberIdentifier::MAX_HEALTH, slots, 0)
+            .into_iter()
+            .chain(self.find_integer_progression(UberIdentifier::MAX_ENERGY, slots, 0))
+            .collect()
     }
 
     fn log_weights(&mut self, progressions: &[WeightedProgression]) {
