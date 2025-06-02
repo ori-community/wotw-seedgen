@@ -3,12 +3,16 @@ name = "wotw_seedgen_cli"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+stats = ["wotw_seedgen_stats"]
+lsp = ["wotw_seedgen_lsp"]
+
 [dependencies]
 wotw_seedgen = { version = "0.4", path = "../wotw_seedgen" }
 wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language" }
 wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["presets", "file_access"] }
-wotw_seedgen_stats = { version = "0.1", path = "../wotw_seedgen_stats" }
-wotw_seedgen_lsp = { version = "0.1", path = "../wotw_seedgen_lsp" }
+wotw_seedgen_stats = { version = "0.1", path = "../wotw_seedgen_stats", optional = true }
+wotw_seedgen_lsp = { version = "0.1", path = "../wotw_seedgen_lsp", optional = true }
 clap = { version = "4.4", features = ["derive", "string"] }
 itertools = "0.13"
 rand = "0.8"
