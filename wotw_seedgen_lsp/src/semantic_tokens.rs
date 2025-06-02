@@ -9,9 +9,9 @@ use wotw_seedgen_seed_language::{
         ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
         LetArgs, Literal, OnEventArgs, Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs,
         RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable,
-        RemoveArgs, Result, Separated, SeparatedNonEmpty, SetLogicStateArgs, Snippet, Span,
-        Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
-        UberStateType, ZoneOfArgs,
+        RemoveArgs, RemoveLocationArgs, Result, Separated, SeparatedNonEmpty, SetLogicStateArgs,
+        Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
+        UberIdentifier, UberStateType, ZoneOfArgs,
     },
     types::Type,
 };
@@ -390,6 +390,10 @@ impl Tokens for Command<'_> {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
+            Command::RemoveLocation(keyword, args) => {
+                builder.push_token(keyword.span, TokenType::Macro);
+                args.tokens(builder);
+            }
             Command::SetLogicState(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
@@ -579,6 +583,11 @@ impl Tokens for ItemDataIconArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.icon.tokens(builder);
+    }
+}
+impl Tokens for RemoveLocationArgs<'_> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        self.condition.tokens(builder);
     }
 }
 impl Tokens for SetLogicStateArgs<'_> {

@@ -17,9 +17,9 @@ use wotw_seedgen_seed_language::{
         FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
         ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, OnEventArgs, Operation,
         PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-        RemoveArgs, Result, SeparatedNonEmpty, Snippet, Span, SpawnArgs, StateArgs, TagsArg,
-        Trigger, TriggerBinding, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
-        UberStateType, ZoneOfArgs,
+        RemoveArgs, RemoveLocationArgs, Result, SeparatedNonEmpty, Snippet, Span, SpawnArgs,
+        StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+        UberIdentifierNumeric, UberStateType, ZoneOfArgs,
     },
     compile::FunctionIdentifier,
     output::ConstantDiscriminants,
@@ -790,6 +790,7 @@ impl CompletionAfterSpanCheck for Command<'_> {
             Command::ItemDataPrice(_, args) => args.completion(index),
             Command::ItemDataDescription(_, args) => args.completion(index),
             Command::ItemDataIcon(_, args) => args.completion(index),
+            Command::RemoveLocation(_, args) => args.completion(index),
             Command::SetLogicState(_, _) => None,
             Command::Preplace(_, args) => args.completion(index),
             Command::ZoneOf(_, args) => args.completion(index),
@@ -1058,6 +1059,18 @@ impl CompletionAfterSpanCheck for ItemDataIconArgs<'_> {
 impl ErrCompletion for ItemDataIconArgs<'_> {
     fn err_completion(err: &Error) -> Vec<CompletionItem> {
         Action::err_completion(err)
+    }
+}
+
+impl CompletionAfterSpanCheck for RemoveLocationArgs<'_> {
+    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+        self.condition.completion(index)
+    }
+}
+
+impl ErrCompletion for RemoveLocationArgs<'_> {
+    fn err_completion(err: &Error) -> Vec<CompletionItem> {
+        Expression::err_completion(err)
     }
 }
 

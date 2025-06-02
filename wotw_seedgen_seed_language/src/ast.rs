@@ -355,6 +355,10 @@ pub enum Command<'source> {
         CommandArgs<ItemDataIconArgs<'source>>,
     ),
     // TODO ItemDataMapIcon
+    RemoveLocation(
+        Spanned<RemoveLocation>,
+        CommandArgs<RemoveLocationArgs<'source>>,
+    ),
     SetLogicState(
         Spanned<SetLogicState>,
         CommandArgs<SetLogicStateArgs<'source>>,
@@ -552,6 +556,13 @@ pub struct ItemDataIcon;
 pub struct ItemDataIconArgs<'source> {
     pub item: Action<'source>,
     pub icon: CommandArg<Expression<'source>>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake")]
+pub struct RemoveLocation;
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct RemoveLocationArgs<'source> {
+    pub condition: Expression<'source>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]

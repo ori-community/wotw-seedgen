@@ -6,4 +6,5 @@
 
 !tags("Launch from Bingo")
 
+!remove(skill(Skill::Launch), 1)
 on bingoState.lines >= lines if skills.launch == false skill(Skill::Launch)

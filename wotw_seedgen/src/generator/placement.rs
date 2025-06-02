@@ -731,7 +731,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         world.simulate(&ClientEvent::Spawn, &output.events);
         world.simulate(&ClientEvent::Reload, &output.events);
 
-        let needs_placement = total_reach_check(&mut world, &log_index, &output.events, &item_pool);
+        let needs_placement = total_reach_check(&mut world, &log_index, &output, &item_pool);
 
         world.traverse_spawn(&output.events);
 
@@ -1379,15 +1379,15 @@ enum Progression {
 fn total_reach_check<'graph>(
     world: &mut World<'graph, '_>,
     log_index: &str,
-    events: &[Event],
+    output: &IntermediateOutput,
     item_pool: &ItemPool,
 ) -> Vec<&'graph Node> {
     let mut complete_world = world.clone();
     for command in &**item_pool {
-        complete_world.simulate(command, events);
+        complete_world.simulate(command, &output.events);
     }
-    complete_world.modify_spirit_light(TOTAL_SPIRIT_LIGHT, events);
-    complete_world.traverse_spawn(events);
+    complete_world.modify_spirit_light(TOTAL_SPIRIT_LIGHT, &output.events);
+    complete_world.traverse_spawn(&output.events);
 
     let needs_placement = complete_world
         .reached_indices()
@@ -1395,16 +1395,13 @@ fn total_reach_check<'graph>(
         .filter(|node| {
             node.can_place() && {
                 let condition = node_condition(node).unwrap();
-                if world.simulate(&condition, events) {
-                    trace!("Removing {node} from placement locations since the condition was met on spawn", node = node.identifier());
+                if output.removed_locations.contains(&condition) {
+                    trace!("Manually removed {node} from placement locations", node = node.identifier());
                     return false;
                 }
 
-                // TODO maybe optimize based on shape of events, many of which can't possibly be loc_data events
-                if events.iter().any(|event|
-                    matches!(&event.trigger, Trigger::Condition(trigger) if trigger == &condition)
-                ) {
-                    trace!("Removing {node} from placement locations since an item was preplaced", node = node.identifier());
+                if world.simulate(&condition, &output.events) {
+                    trace!("Removing {node} from placement locations since the condition was met on spawn", node = node.identifier());
                     return false;
                 }
 

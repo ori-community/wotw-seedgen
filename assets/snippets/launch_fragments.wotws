@@ -23,6 +23,7 @@ fun launch_fragment() {
 )
 !add(launch_fragment(), total)
 
+!remove(skill(Skill::Launch), 1)
 on collected == required skill(Skill::Launch)
 // TODO how do logical launch later
 fun display() {

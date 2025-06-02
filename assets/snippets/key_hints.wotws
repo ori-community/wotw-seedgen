@@ -153,14 +153,17 @@ on skills.glide updateOpherHintPrice()
 on skills.bash updateTwillenHintPrice()
 on skills.bow updateTwillenHintPrice()
 
+!remove_location(LupoShop.ShardMapIcon)
 on LupoShop.ShardMapIcon {
     write_lupo_hint()
     item_message(get_string("lupo_hint"))
 }
+!remove_location(OpherShop.WaterBreath)
 on OpherShop.WaterBreath {
     write_opher_hint()
     item_message(get_string("opher_hint"))
 }
+!remove_location(TwillenShop.TripleJump)
 on TwillenShop.TripleJump {
     write_twillen_hint()
     item_message(get_string("twillen_hint"))

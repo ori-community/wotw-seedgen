@@ -20,6 +20,7 @@
     }
 })
 
+// TODO on tick? Other places do use on tick
 on is_in_hitbox(520, -3617, 744, -3503) {
     set_boolean("goals_completed", true)
     check_goals_completed()

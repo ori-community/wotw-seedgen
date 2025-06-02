@@ -10,5 +10,5 @@ wotw_seedgen_settings = { path = "../wotw_seedgen_settings" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rustc-hash = "2.0"
-zip = { version = "2.2", default-features = false, features = ["zstd"]}
+zip = { version = "4.0.0", default-features = false, features = ["zstd"] }
 arrayvec = "0.7.4"

@@ -32,4 +32,5 @@ on spawn {
     store(GladesTown.CaveEntrance, true)
     if questUberStateGroup.darkCaveQuest < 1 store(questUberStateGroup.darkCaveQuest, 1)
 }
+// TODO !remove_item?
 !remove(gorlek_ore(), 40)

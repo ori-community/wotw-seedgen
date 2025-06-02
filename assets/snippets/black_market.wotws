@@ -24,6 +24,7 @@ Supply lasts indefinitely, but the price grows with the demand.")
             keystone_icon,
         )
     }
+    !remove_location(OpherShop.Teleport)
     on OpherShop.Teleport {
         store(OpherShop.Teleport, false)
         keystone()
@@ -56,6 +57,7 @@ Supply lasts indefinitely, but the price grows with the demand.")
             ore_icon,
         )
     }
+    !remove_location(TwillenShop.LightHarvest)
     on TwillenShop.LightHarvest {
         store(TwillenShop.LightHarvest, false)
         gorlek_ore()

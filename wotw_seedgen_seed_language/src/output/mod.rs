@@ -26,6 +26,7 @@ pub struct IntermediateOutput {
     pub tags: Vec<String>,
     pub item_pool_changes: FxHashMap<CommandVoid, i32>,
     pub item_metadata: ItemMetadata,
+    pub removed_locations: FxHashSet<CommandBoolean>,
     pub logical_state_sets: FxHashSet<String>,
     pub preplacements: Vec<(CommandVoid, wotw_seedgen_data::Zone)>,
     pub debug: Option<DebugOutput>,

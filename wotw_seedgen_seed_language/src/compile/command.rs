@@ -88,6 +88,9 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::ItemDataIcon(_, command) => {
                 command.compile(compiler);
             }
+            ast::Command::RemoveLocation(_, command) => {
+                command.compile(compiler);
+            }
             ast::Command::SetLogicState(_, command) => {
                 command.compile(compiler);
             }
@@ -696,6 +699,15 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
             format!("Already defined {field} for this item"),
             span,
         ))
+    }
+}
+impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        if let Some(condition) = self.condition.compile_into(compiler) {
+            compiler.global.output.removed_locations.insert(condition);
+        }
     }
 }
 impl<'source> Compile<'source> for ast::SetLogicStateArgs<'source> {
