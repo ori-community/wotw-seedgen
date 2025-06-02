@@ -12,7 +12,7 @@ pub fn weight(
     slots: usize,
 ) -> f32 {
     // TODO default cost?
-    let cost = CommonUberIdentifier::from_uber_identifier(uber_identifier).map_or(0., cost);
+    let cost = CommonUberIdentifier::from_uber_identifier(uber_identifier).map_or(400., cost);
     let mut weight = (new_reached + 1) as f32 / (cost * amount);
 
     debug_assert!(

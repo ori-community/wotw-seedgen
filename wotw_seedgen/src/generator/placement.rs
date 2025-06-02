@@ -1096,6 +1096,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
     fn find_orb_progressions(&mut self, slots: usize) -> Vec<WeightedProgression> {
         // TODO regression: previously combinations of fragments, shards and regenerate were considered
+        // TODO orbs often also need regenerate, preventing this from progressing and instead attempting to place the maximum available fragments
 
         self.find_integer_or_float_progression(UberIdentifier::MAX_HEALTH, slots, 0)
             .into_iter()
