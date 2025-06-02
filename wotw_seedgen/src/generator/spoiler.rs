@@ -202,11 +202,13 @@ impl Display for SeedSpoiler {
             })
             .collect::<Vec<_>>();
 
+        writeln!(f, "Preplacements")?;
         write_placements(f, preplacements, longest_item, longest_location)?;
+        writeln!(f)?;
 
         for (index, (reachable, forced_items, placements)) in spoiler_groups.into_iter().enumerate()
         {
-            writeln!(f, "Step {index}")?;
+            writeln!(f, "Step {}", index + 1)?;
 
             for (world_index, world_reachable) in reachable.iter().enumerate() {
                 if multiworld {
