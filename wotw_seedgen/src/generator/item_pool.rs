@@ -119,11 +119,11 @@ impl ItemPool {
             let cost = command
                 .contained_common_write_identifiers()
                 .map(cost)
-                .sum::<usize>();
-            if cost > 10000 {
-                let reroll_chance = -10000.0 / cost as f64 + 1.0;
+                .sum::<f32>();
+            if cost > 10000. {
+                let reroll_chance = -10000. / cost + 1.;
 
-                if self.rng.gen_bool(reroll_chance) {
+                if self.rng.gen_bool(reroll_chance as f64) {
                     self.items.push(command);
                     continue;
                 }

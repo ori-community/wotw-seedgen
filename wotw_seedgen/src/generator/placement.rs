@@ -962,7 +962,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         match value {
             UberStateValue::Boolean(_) => self.find_boolean_progression(uber_identifier, slots),
             UberStateValue::Integer(_) => {
-                self.find_integer_progression(uber_identifier, slots, spirit_light_slots)
+                self.find_integer_or_float_progression(uber_identifier, slots, spirit_light_slots)
             }
             UberStateValue::Float(_) => {
                 warn!("Attempted to find progression for float UberState {uber_identifier}");
@@ -989,7 +989,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 self.world.simulate(item, &self.output.events);
 
                 let new_reached = self.world.reached_len().saturating_sub(reached);
-                let weight = weight(new_reached, uber_identifier, 1, 1, slots);
+                let weight = weight(new_reached, uber_identifier, 1., 1, slots);
 
                 self.world.restore_snapshot();
 
@@ -1000,7 +1000,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             })
     }
 
-    fn find_integer_progression(
+    fn find_integer_or_float_progression(
         &mut self,
         uber_identifier: UberIdentifier,
         slots: usize,
@@ -1009,6 +1009,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         if uber_identifier == UberIdentifier::SPIRIT_LIGHT {
             self.find_spirit_light_progression(spirit_light_slots)
         } else {
+            let initial_value = self.world.uber_states.get(uber_identifier);
             let initial_reached = self.world.reached_len();
             let mut reached = initial_reached;
 
@@ -1028,6 +1029,15 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 }
             }
 
+            let amount = match self.world.uber_states.get(uber_identifier) {
+                UberStateValue::Boolean(_) => {
+                    warn!("{uber_identifier} was identified as integer or float progression but is actually boolean");
+                    0.
+                }
+                UberStateValue::Integer(value) => (value - initial_value.expect_integer()) as f32,
+                UberStateValue::Float(value) => *value - *initial_value.expect_float(),
+            };
+
             self.world.restore_snapshot();
 
             if items.is_empty() {
@@ -1035,13 +1045,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             }
 
             let new_reached = reached - initial_reached;
-            let weight = weight(
-                new_reached,
-                uber_identifier,
-                items.len(), // TODO but items modifying the same uberState could modify it by different amounts?
-                items.len(),
-                slots,
-            );
+            let weight = weight(new_reached, uber_identifier, amount, items.len(), slots);
 
             Some(WeightedProgression {
                 items: Progression::ItemPool(items),
@@ -1079,7 +1083,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         let weight = weight(
             new_reached,
             UberIdentifier::SPIRIT_LIGHT,
-            amount,
+            amount as f32,
             amount / 50,
             slots,
         );
@@ -1093,9 +1097,9 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn find_orb_progressions(&mut self, slots: usize) -> Vec<WeightedProgression> {
         // TODO regression: previously combinations of fragments, shards and regenerate were considered
 
-        self.find_integer_progression(UberIdentifier::MAX_HEALTH, slots, 0)
+        self.find_integer_or_float_progression(UberIdentifier::MAX_HEALTH, slots, 0)
             .into_iter()
-            .chain(self.find_integer_progression(UberIdentifier::MAX_ENERGY, slots, 0))
+            .chain(self.find_integer_or_float_progression(UberIdentifier::MAX_ENERGY, slots, 0))
             .collect()
     }
 

@@ -7,13 +7,13 @@ const SECONDARY_SPAWN_SLOTS: usize = SPAWN_SLOTS - PREFERRED_SPAWN_SLOTS;
 pub fn weight(
     new_reached: usize,
     uber_identifier: UberIdentifier,
-    amount: usize,
+    amount: f32,
     used_slots: usize,
     slots: usize,
 ) -> f32 {
     // TODO default cost?
-    let cost = CommonUberIdentifier::from_uber_identifier(uber_identifier).map_or(0, cost);
-    let mut weight = (new_reached + 1) as f32 / (cost * amount) as f32;
+    let cost = CommonUberIdentifier::from_uber_identifier(uber_identifier).map_or(0., cost);
+    let mut weight = (new_reached + 1) as f32 / (cost * amount);
 
     debug_assert!(
         weight.is_finite(),
@@ -27,42 +27,45 @@ pub fn weight(
     weight
 }
 
-pub fn cost(uber_identifier: CommonUberIdentifier) -> usize {
+pub fn cost(uber_identifier: CommonUberIdentifier) -> f32 {
     match uber_identifier {
-        CommonUberIdentifier::SpiritLight => 1,
-        CommonUberIdentifier::GorlekOre => 20, // TODO I wonder why there's so much gorlek ore progression oriLol
-        CommonUberIdentifier::MaxHealth | CommonUberIdentifier::MaxEnergy => 120, // adjust once weighting accounts for the modification amount
+        CommonUberIdentifier::SpiritLight => 1.,
+        CommonUberIdentifier::GorlekOre => 20., // TODO I wonder why there's so much gorlek ore progression oriLol
+        CommonUberIdentifier::MaxHealth => 24.,
         CommonUberIdentifier::Skill(Skill::Regenerate)
-        | CommonUberIdentifier::Skill(Skill::WaterBreath) => 200, // Quality-of-Life Skills
-        CommonUberIdentifier::Keystones => 320,
+        | CommonUberIdentifier::Skill(Skill::WaterBreath) => 200., // Quality-of-Life Skills
+        CommonUberIdentifier::MaxEnergy => 240.,
+        CommonUberIdentifier::Keystones => 320.,
         CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::ExplodingSpear)
         | CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::HammerShockwave)
         | CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::StaticShuriken)
         | CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::ChargeBlaze)
-        | CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::RapidSentry) => 400,
-        CommonUberIdentifier::ShardSlots => 480,
+        | CommonUberIdentifier::WeaponUpgrade(WeaponUpgrade::RapidSentry) => 400.,
+        CommonUberIdentifier::ShardSlots => 480.,
         CommonUberIdentifier::Skill(Skill::GladesAncestralLight)
         | CommonUberIdentifier::Skill(Skill::MarshAncestralLight)
-        | CommonUberIdentifier::Shard(_) => 1000,
-        CommonUberIdentifier::Skill(Skill::Dash) | CommonUberIdentifier::Skill(Skill::Flap) => 1200, // Counteracting bias because these unlock rather little
+        | CommonUberIdentifier::Shard(_) => 1000.,
+        CommonUberIdentifier::Skill(Skill::Dash) | CommonUberIdentifier::Skill(Skill::Flap) => {
+            1200.
+        } // Counteracting bias because these unlock rather little
         CommonUberIdentifier::Skill(Skill::Glide) | CommonUberIdentifier::Skill(Skill::Grapple) => {
-            1400
+            1400.
         } // Feel-Good Finds
         CommonUberIdentifier::Skill(Skill::Sword)
         | CommonUberIdentifier::Skill(Skill::Hammer)
         | CommonUberIdentifier::Skill(Skill::Bow)
-        | CommonUberIdentifier::Skill(Skill::Shuriken) => 1600, // Basic Weapons
+        | CommonUberIdentifier::Skill(Skill::Shuriken) => 1600., // Basic Weapons
         CommonUberIdentifier::Skill(Skill::Burrow)
         | CommonUberIdentifier::Skill(Skill::WaterDash)
         | CommonUberIdentifier::Skill(Skill::Grenade)
         | CommonUberIdentifier::Skill(Skill::Flash)
-        | CommonUberIdentifier::CleanWater => 1800, // Key Skills
-        CommonUberIdentifier::Skill(Skill::DoubleJump) => 2000, // Good to find, but this is already biased for by being powerful
+        | CommonUberIdentifier::CleanWater => 1800., // Key Skills
+        CommonUberIdentifier::Skill(Skill::DoubleJump) => 2000., // Good to find, but this is already biased for by being powerful
         CommonUberIdentifier::Skill(Skill::Blaze) | CommonUberIdentifier::Skill(Skill::Sentry) => {
-            2800
+            2800.
         } // Tedious Weapons
-        CommonUberIdentifier::Skill(Skill::Bash) => 3000, // Counteracting bias because Bash unlocks a lot
-        CommonUberIdentifier::Skill(Skill::Spear) => 4000, // Lowering the frequency of slow Spear starts
+        CommonUberIdentifier::Skill(Skill::Bash) => 3000., // Counteracting bias because Bash unlocks a lot
+        CommonUberIdentifier::Skill(Skill::Spear) => 4000., // Lowering the frequency of slow Spear starts
         CommonUberIdentifier::Teleporter(Teleporter::Den)
         | CommonUberIdentifier::Teleporter(Teleporter::Hollow)
         | CommonUberIdentifier::Teleporter(Teleporter::Glades)
@@ -79,9 +82,9 @@ pub fn cost(uber_identifier: CommonUberIdentifier) -> usize {
         | CommonUberIdentifier::Teleporter(Teleporter::OuterRuins)
         | CommonUberIdentifier::Teleporter(Teleporter::InnerRuins)
         | CommonUberIdentifier::Teleporter(Teleporter::Willow)
-        | CommonUberIdentifier::Teleporter(Teleporter::Shriek) => 25000,
-        CommonUberIdentifier::Teleporter(Teleporter::Marsh) => 30000,
-        CommonUberIdentifier::Skill(Skill::Launch) => 40000, // Absolutely Broken
-        _ => 0,
+        | CommonUberIdentifier::Teleporter(Teleporter::Shriek) => 25000.,
+        CommonUberIdentifier::Teleporter(Teleporter::Marsh) => 30000.,
+        CommonUberIdentifier::Skill(Skill::Launch) => 40000., // Absolutely Broken
+        _ => 0.,
     }
 }
