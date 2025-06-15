@@ -11730,6 +11730,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
     unsafe, EastPools.LowerWaterDrained:
       Water, Launch OR Dash OR Damage=14  # bait the torpedo to the surface. Either avoid the explosion with launch/dash or take the dboost
       Bash, Damage=180  # TP after bashing the torpedo
+      Bash, Dash  # https://youtu.be/NNNyAATvOkQ
   state EastPools.UltraBashWall:
     moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
     gorlek, EastPools.LowerWaterDrained: Water, Bash
