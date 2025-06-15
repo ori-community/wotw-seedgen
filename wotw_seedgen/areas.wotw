@@ -182,7 +182,7 @@ anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking 
       HowlsDen.RainLifted, Bash
       Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # Glitched
-      # GlideJump OR GrenadeJump
+      # GlideJump OR GrenadeJump=1
     unsafe:
       Glide OR FlashSwap OR PauseHover
 
@@ -204,7 +204,7 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
     kii:
       HowlsDen.RainLifted, Sword, DoubleJump, TripleJump  # Pogo on the slime
       # Glitched
-      # GrenadeJump, DoubleJump
+      # GrenadeJump=1, DoubleJump OR GlideJump
       # AerialHammerJump, TripleJump OR Dash OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump
     unsafe:
       AerialHammerJump OR GlideHammerJump OR WallHammerJump
@@ -227,7 +227,7 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
       Hammer
       Sword, Glide OR HowlsDen.RainLifted OR Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1  # pogo / Upslash then use energy weapon
       # Glitched
-      # GrenadeJump OR GlideJump
+      # GrenadeJump=1 OR GlideJump
     unsafe, MarshSpawn.LogBroken:
       Sentry=2  # not lenient enough for kii
       GrenadeJump
@@ -261,15 +261,20 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       HowlsDen.RainLifted, DoubleJump, Sword  # Lure the mantis near the door then pogo to reach the wall. Upslash to reach the lever
       # Glitched
       # SentryJump=1 OR AerialHammerJump
-      # DoubleJump, GlideJump, TripleJump OR Sword OR Hammer  # condition to reach the lever from the wall
+      # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer  # condition to reach the lever from the wall
+      # GrenadeJump=1, DoubleJump, TripleJump OR Sword OR Hammer
+      # GrenadeJump=1, GlideJump, DoubleJump   # start jumping from under the grappable plant, goes directly to the lever
       # Bash, DoubleJump, GlideJump
+      # GrenadeJump=1, Bash, Dash OR DoubleJump 
     unsafe:
       SentryJump=1  # max height
       GlideHammerJump
       CoyoteHammerJump, WallHammerJump  # Have to equip hammer on ability 3 
-      DoubleJump, TripleJump OR Hammer OR Spear=1 OR GlideJump
+      DoubleJump, TripleJump OR Hammer OR Spear=1 OR GlideJump OR GrenadeJump
       DoubleJump, Dash, Sword  # coyote dash from under the grappable plant
-      Grapple, Bash  # Swing the plant with Grapple
+      Grapple, Bash OR DoubleJump OR Dash  # Swing the plant with Grapple
+      GlideJump, GrenadeJump, Dash
+      GrenadeJump, Bash
 
   conn MarshSpawn.RegenDoor:
     moki: MarshSpawn.KeystoneDoor
@@ -283,7 +288,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
     kii:
       Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
-      # GlideJump OR GrenadeJump
+      # GlideJump OR GrenadeJump=1
     unsafe:
       Bash  # at night there's a slime that works too
       GlideJump OR GrenadeJump OR PauseHover
@@ -312,7 +317,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       Hammer  # upswing into leftswing
       # Glitched
       # GlideJump
-      # GrenadeJump, Glide
+      # GrenadeJump=1, Glide
     unsafe: GlideJump OR GrenadeJump
   quest MarshSpawn.TokkKeystoneQuest:
     moki: MarshSpawn.CaveKS
@@ -346,7 +351,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       MarshSpawn.CaveFight, Glide, Spear=1
       # Gliched
       # GlideJump
-      # GrenadeJump, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=2, Glide OR MarshSpawn.CaveFight
     unsafe:
       Dash  # dash ramp at the first slime to skip the arena
       MarshSpawn.CaveFight, Spear=1  # not lenient enough for kii
@@ -369,7 +374,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, DoubleJump OR Dash OR Launch
       # could do a sentryjump into bashgrenade, but I heard that kind of thing is unwelcome ;P
     kii:
-      Burrow, Glide OR Hammer OR Sword
+      Burrow, Glide OR Hammer OR Sword OR Damage=20
       Burrow, Damage=10, Shuriken=1
       Burrow, Shuriken=2
       Burrow, Bash, Grenade=1  # bash the first slime past the arena to reach your grenade
@@ -378,7 +383,10 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
   conn MarshSpawn.LifepactLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer OR Damage=10
-    kii: Bash OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
+    kii:
+      Bash OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: free  # small edge on the very right of the spikes
       #Bow=1 OR Grenade=1 OR GrenadeCancel OR PauseHover OR GrenadeJump # Bow and Grenade for cancelling vertical momentum
   conn MarshSpawn.PoolsBurrowsSignpost:
@@ -395,7 +403,7 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
     kii:
       Burrow, Water, Sword OR Hammer OR Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
       Burrow, Damage=40
-      Burrow, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+      Burrow, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR WaterDash:
         Damage=30
       Burrow, WaterDash, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=20
@@ -446,7 +454,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
     kii:
       Hammer OR Spear=1
       # Glitched
-      # GrenadeJump OR GlideJump
+      # GrenadeJump=1 OR GlideJump
     unsafe:
       Bash  # https://youtu.be/1Qo0KvCotvM
       Dash  # Dash ramp
@@ -462,10 +470,11 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between p
       Bash, Damage=40
       # Glitched
       # Damage=20, SwordSJump=1, DoubleJump, TripleJump
+      # GrenadeJump=1, Bash, Damage=30  # Gjump from the spikes to take only one dboost before the first spikes
     unsafe:
       DoubleJump, TripleJump  # more hardcore parkour
       Damage=20, SwordSJump=1, DoubleJump, Dash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      GrenadeJump, Damage=30  # grenade cancel to take first dboost under the first lantern, walljump then second dboost, third dboost to reach the freindly spikes and gjump from there to the pickup
+      GrenadeJump, Damage=30  # grenade cancel to take first dboost under the first lantern, walljump then second dboost, third dboost to reach the friendly spikes and gjump from there to the pickup
 
   conn MarshSpawn.BeforeBurrows:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -541,7 +550,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Bash, Glide, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # same as above but only upsmash and one horizontal attack
       # Glitched
       # AerialHammerJump, TripleJump OR Spear=1 OR GlideJump  # GlideJump/Spear to reach the right wall at the start
-      # GrenadeJump, DoubleJump, TripleJump, Damage=10
+      # GrenadeJump=1, DoubleJump, Damage=10, TripleJump OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
       SentryJump=1, DoubleJump  # Friendly spikes under the pickup and doublejump + upslash to reach the right platform. Hammer upslash is enough to reach the platform, sword upslash the ennemy to refresh your double jump
@@ -569,13 +578,16 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       # SwordSJump=1, DoubleJump OR Dash  # Refresh djump on tentacle
       # HammerSJump=1, Damage=10, Dash
       # AerialHammerJump, TripleJump OR Sword OR GlideJump OR Damage=10  # with Sword, pogo the tentacle
-      # Waterdash, GrenadeJump, Glide, Water OR Damage=20
-      # GrenadeJump, DoubleJump, Damage=10, TripleJump OR Dash
+      # WaterDash, Water OR Damage=20:
+      #   GrenadeJump=1, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      # GrenadeJump=1, Damage=10, DoubleJump, TripleJump OR Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with less but taking a dboost on the tentacle push you into the water
+      # GrenadeJump=1, DoubleJump, Sword  # hit the tentacle to reset djump
     unsafe:
       Sword, DoubleJump  # Pogo purple blob from the projectile, slash tentacle to refresh djump and land in friendly spikes
       Bash  # https://youtu.be/LurSDmDxrVM
       AerialHammerJump OR CoyoteHammerJump OR GlideHammerJump
-      WaterDash, GrenadeJump, Water OR Damage=20
+      WaterDash, GrenadeJump, Water OR Damage=10
+      WaterDash, Hammer, Water OR Damage=10
       GrenadeJump, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # beside djump, everything use the friendly spikes
       GrenadeJump, Damage=10, Spear=1 OR Blaze=2
   conn MarshSpawn.PoolsBurrowsSignpost:
@@ -623,7 +635,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
 
   pickup MarshSpawn.DamageTree:
     moki: MarshSpawn.DamageTreeOpen
-  pickup MarshSpawn.CrusherSwimEX:
+  pickup MarshSpawn.CrusherSwimEX:  # Clean Water path originate from MarshSpawn.BeforeBurrows
     kii: WaterDash, Damage=20
     unsafe: Water OR Damage=10  # TP to safety
 
@@ -642,7 +654,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
       Damage=10, DoubleJump OR Dash OR Hammer  # splash the water if needed
       Water, DoubleJump OR Dash OR Hammer OR Damage=10
     kii:
-      Hammer OR Blaze=5 OR Sentry=3 OR Water OR Damage=20  # Possible with only one dboost in the water but the wall is annoying to climb
+      Dash OR Hammer OR Blaze=4 OR Sentry=2 OR Water OR Damage=20  # Possible with only one dboost in the water but the wall is annoying to climb
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1  # bash glide
     unsafe: free  # friendly spikes where the tentacles spawn into precise wjump on the final platform to avoid a dboost
@@ -693,6 +705,7 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
       Bash, Damage=20, DoubleJump OR Glide
       # Glitched
       # LaunchSwap  # land on the first turret
+      # Launch, Glide, GrenadeJump=1  # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathEX
     unsafe:
       Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
       Launch  # https://youtu.be/ZHr718BCSaA
@@ -745,9 +758,9 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       Bash, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=20
       # Glitched
       # GlideJump
-      # GrenadeJump, Glide
-      # GrenadeJump, Sword, Sentry=2
-      # GrenadeJump, Hammer, Sentry=3
+      # GrenadeJump=1, Glide
+      # GrenadeJump=1, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, Hammer, Sentry=2
       # SwordSJump=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # sword hover as well. Possible without the sjump but then you need to start the path at a specific time to avoid getting hit by a projectile while hovering.
     unsafe:
       Bash OR Dash OR Sword OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 OR PauseHover  # Use friendly spikes in front of turret
@@ -811,8 +824,7 @@ anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
       Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Spear=1, Damage=10  # Damage not mandatory
       # Glitched
-      # GlideJump
-      # GrenadeJump, Glide OR Blaze=3
+      # GlideJump OR GrenadeJump=1
     unsafe:
       Spear=1
       PauseHover  # Pausefloat from the left platform
@@ -836,8 +848,7 @@ anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
     kii:
       Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # upslash to slash left to walljump up
       # Glitched
-      # GlideJump 
-      # GrenadeJump, Dash OR Glide OR Shuriken=1 OR Blaze=1
+      # GlideJump OR GrenadeJump=1
     unsafe: Dash OR PauseHover OR BlazeSwap=1 OR GlideJump OR GrenadeJump
   conn MarshSpawn.MokkTheBrave:
     moki: MarshSpawn.HowlBurnt
@@ -859,7 +870,7 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
       Sword
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
-      # GlideJump OR GrenadeJump
+      # GlideJump OR GrenadeJump=1
     unsafe, MarshSpawn.HowlBurnt:
       BreakWall=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover
       HowlsDen.RainLifted, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseHover OR GlideJump OR GrenadeJump  # https://youtu.be/b31Zd5M4xDg
@@ -879,7 +890,7 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
       HowlsDen.RainLifted, Sword  # upslash for the first gap, then pogo off the mantis for the second gap
       HowlsDen.RainLifted, Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # hop to the first ledge and then bash the mantis
       # Glitched
-      # GlideJump OR GrenadeJump
+      # GlideJump OR GrenadeJump=2
     unsafe, MarshSpawn.HowlBurnt:
       Sword  # upslash then downslash to reach the last platform
       HowlsDen.RainLifted, Bash  # Long distance lure for the first jump, simple lure for second
@@ -899,7 +910,7 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
       HowlsDen.RainLifted, Sword  # Pogo
       HowlsDen.RainLifted, Shuriken=1, Hammer OR Spear=1
       # Glitched
-      # GrenadeJump, HowlsDen.RainLifted OR DoubleJump OR Hammer OR Shuriken=1
+      # GrenadeJump=1, HowlsDen.RainLifted OR DoubleJump OR Hammer OR Shuriken=1
       # HowlsDen.RainLifted, GlideJump, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       HowlsDen.RainLifted, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/txogGlFUCwU
@@ -914,6 +925,9 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       DoubleJump, Dash  # Stick to the ceiling
       Launch
     gorlek: DoubleJump, TripleJump
+    # kii:
+      # Glitched
+      # GrenadeJump=1, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
     unsafe:
       DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump  # djump then second movement option to reach the first wall in the ceiling. Then djump from one side of the wall to the other before going to the next wall with djump
       WaveDash  # Wavedash on the health plant and regen jump
@@ -928,9 +942,12 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       Launch OR DoubleJump OR Dash
       Bash, Grenade=1
     gorlek: Glide OR Sword OR Hammer OR Damage=10  # Dboost the last gap
-    kii: Shuriken=1 OR Flash=1 OR Sentry=1
+    kii:
+      Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1, Spear=1 OR Blaze=1
     unsafe:
-      Spear=1 OR BlazeSwap=1 OR GrenadeJump OR GlideJump OR PauseHover OR FlashSwap
+      Spear=1 OR BlazeSwap=1 OR GrenadeJump OR PauseHover OR FlashSwap
 
 anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
   refill Health=1
@@ -944,7 +961,7 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
      # kii:
       # Glitched
       # AerialHammerJump, TripleJump OR GlideJump
-      # GrenadeJump, DoubleJump OR Hammer 
+      # GrenadeJump=1, DoubleJump OR Hammer 
     unsafe:
       AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR BlazeSwap=2 OR SentrySwap=2
       GrenadeJump, DoubleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -974,6 +991,13 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
       # Glitched
       # SwordSJump=1 OR GlideJump
       # HammerSJump=1, HammerSJump=1 OR Spear=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, Glide OR Sword OR Hammer OR Shuriken=3
+      # Damage=10, GrenadeJump=1, Shuriken=2
+      # Damage=10, GrenadeJump=1, Spear=2 OR Blaze=2 OR Flash=2 OR Sentry=2:  # Gjump into the suspended platform
+      #   Damage=10
+      # GrenadeJump=1, Spear=3 OR Blaze=3 OR Flash=3 OR Sentry=3:  # Gjump into the suspended platform
+      #   Damage=10
+      # GrenadeJump=2, Flash=3 OR Sentry=3  # Gjump to the first suspended platform + from the last supended platform
     unsafe:
       Sword  # upslash then downslash for the last jump
       Hammer
@@ -992,7 +1016,10 @@ anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkEX
   conn MarshSpawn.MokkTheBrave:
     moki, MarshSpawn.HowlBurnt: DoubleJump OR Dash OR Launch OR Glide
     gorlek, MarshSpawn.HowlBurnt: Sword OR Hammer
-    kii, MarshSpawn.HowlBurnt: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # blaze start from the upper platform, the other one from the lower platform
+    kii, MarshSpawn.HowlBurnt:
+      Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # blaze start from the upper platform, the other one from the lower platform
+      # Glitched
+      # GrenadeJump=1
     unsafe: MarshSpawn.HowlBurnt  # precise wjump above the spikes from the lower platform
 
 anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where you exit the loop with right hc
@@ -1013,7 +1040,9 @@ anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where yo
     kii: HowlsDen.UpperLoopExitBarrier, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: HowlsDen.UpperLoopExitBarrier  # tight jump
   conn HowlsDen.AboveBoneBridge:
-    moki: HowlsDen.UpperLoopExitBarrier
+    moki, HowlsDen.UpperLoopExitBarrier: Launch OR Glide OR DoubleJump OR Dash
+    gorlek, HowlsDen.UpperLoopExitBarrier: Sword OR Hammer
+    kii: HowlsDen.UpperLoopExitBarrier
 
 anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through the keydoor
   refill Checkpoint
@@ -1024,10 +1053,12 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
     gorlek:
       DoubleJump, TripleJump
       Bash, Grenade=1
-    kii:  # anything using sword/hammer is redundant with going through the upperloop with just sword or hammer
+    kii:  # anything using sword or hammer is redundant with going through the upperloop
       Bash
       # Glitched
-      # GlideJump, Damage=10, Spear=1
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with just gjump but rather precise
+      # GlideJump, Spear=1, Damage=10
+      # GlideJump, DoubleJump OR Dash
     unsafe:
       DoubleJump, Dash OR GlideJump
       GlideJump, Dash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -1039,24 +1070,30 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
 anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door blocking the loop with the right hc
   refill Checkpoint:
     moki: HowlsDen.UpperLoopEntranceBarrier
-    unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it
 
   state HowlsDen.UpperLoopEntranceBarrier:
     moki: BreakWall=16
+    unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it. Then reload and walk out of the wall
 
   pickup HowlsDen.RightHC:
     moki: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20, Combat=Slug OR Bash OR Launch
     gorlek: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20
 
   conn HowlsDen.BoneBridge: free
-  conn HowlsDen.AboveBoneBridge:
+  conn HowlsDen.AboveBoneBridge:  # If you use sword/hammer, you can take the normal path
     moki:
       Launch
       Bash, Grenade=1
     gorlek:
       DoubleJump, TripleJump
-    unsafe:  # If you use sword/hammer, you can take the normal path
+    # kii :
+      # Glitched
+      # GlideJump, DoubleJump
+      # GrenadeJump=1
+    unsafe:
       DoubleJump  # wall jump on the small wall between the breakable wall and the spikes
+      GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GlideJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   conn HowlsDen.UpperLoopExit:
     moki:
       HowlsDen.UpperLoopEntranceBarrier, Combat=Slug, DoubleJump OR Dash
@@ -1068,7 +1105,7 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
     kii:
       HowlsDen.UpperLoopEntranceBarrier, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
       HowlsDen.UpperLoopEntranceBarrier, WaterDash, Water OR Damage=10
-    unsafe: HowlsDen.UpperLoopEntranceBarrier, Spear=1 OR BlazeSwap=1
+    unsafe: HowlsDen.UpperLoopEntranceBarrier, Spear=1 OR BlazeSwap=1 OR PauseHover
 
 anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's Den
   refill Checkpoint
@@ -1086,6 +1123,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     moki:
       Hammer
       Combat=Mantis+Slug, Spear=1  # spear likes to target the enemies around
+    unsafe: Spear=1  # bait the mantis near the door so spear doesn't target it
   pickup HowlsDen.AboveDoorKS:
     moki: DoubleJump OR Launch
     gorlek:
@@ -1096,29 +1134,43 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Sword OR Hammer OR Flash=3 OR Sentry=3  # Shuriken not in kii because throwing it into the platform can push it back
       Flash=2 OR Sentry=2:
         Damage=10
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
     unsafe:
       Bash
       Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/ESDKKCgALVc
       Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
+      BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       GrenadeJump  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
   pickup HowlsDen.MagnetShard:  # Can use the barrier near Sword tree because if it got broken you can just go the long way around for free
     moki: BreakWall=10, BreakWall=16 OR Launch
-    kii: BreakWall=10, Bash, Grenade=1
-    unsafe: BreakWall=10, DoubleJump
-  pickup HowlsDen.AboveTPEX:
+    kii:
+      BreakWall=10, Bash, Grenade=1
+      # Glitched
+      # GrenadeJump=1, DoubleJump
+    unsafe: BreakWall=10, DoubleJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+  pickup HowlsDen.AboveTPEX:  # Lizard only spawns if you have sword
     moki: HowlsDen.BoneBarrier, BreakWall=10
 
   conn HowlsDen.UpperLoopEntrance:
     gorlek:
       Launch
       Bash, Grenade=1, DoubleJump, TripleJump
+    # kii:
+      # Glitched
+      # HammerSJump=2, DoubleJump
+      # AerialHammerJump, DoubleJump, TripleJump
     unsafe:
-      DoubleJump, Sword OR TripleJump  # Door skip
-      Bash, DoubleJump  # bash chain
+      DoubleJump, TripleJump  # Door skip
+      HowlsDen.RainLifted, DoubleJump, Sword
+      HowlsDen.RainLifted, Bash, DoubleJump  # Bash chain
       GrenadeJump, DoubleJump
       SentryJump=2  # Sword sjump can go up to HowlsDen.AboveBoneBridge but landing here and doing the loop also solves the connection to AboveBoneBridge
       HammerSJump=1, DoubleJump
+      GlideHammerJump OR AerialHammerJump
+      BlazeSwap=4 OR FlashSwap OR SentrySwap=4
   conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
       HowlsDen.RainLifted, Bash, Glide  # Bash chain
@@ -1154,7 +1206,7 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
     kii:
       Bash, Grenade=1
       Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: Blaze=1 OR PauseHover OR Bow=1 OR Grenade=1 OR GrenadeCancel
+    unsafe: Blaze=1 OR PauseHover OR Bow=1 OR Grenade=1 OR GrenadeCancel OR FlashSwap
   conn HowlsDen.MidwayBottomLoop:
     moki:
       Launch
@@ -1162,11 +1214,10 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
       Bash, Grenade=1, Grenade=1 OR Dash OR Glide
     gorlek:
       Dash OR Glide OR Sword
+      Hammer, HammerSJump=1 OR Damage=10
       Bash, Grenade=1, Damage=10
       Water, WaterDash, Bash, Grenade=1
       Water, WaterDash, Damage=10
-      HammerSJump=1, HammerSJump=1 OR Damage=10
-      Water, WaterDash, HammerSJump=1
     kii:
       Hammer
       Shuriken=1 OR Flash=1 OR Sentry=1:
@@ -1175,34 +1226,46 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
       WaterDash, Damage=10, Damage=10
       HowlsDen.RainLifted, Bash, Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
       HowlsDen.RainLifted, WaterDash, Bash, Water OR Damage=10
+      # Glitched
+      # GrenadeJump=1, Damage=10 OR Sentry=2
+      # HowlsDen.RainLifted, Bash, GrenadeJump=1
     unsafe:
+      Shuriken=2
       Sentry=1, SentrySwap=1
       Damage=10, Spear=1 OR BlazeSwap=1  # https://youtu.be/Y5nvYJbEtZg
-      BlazeSwap=2 OR PauseHover
+      BlazeSwap=2 OR FlashSwap OR PauseHover
+      GrenadeJump, Damage=10
+      HowlsDen.RainLifted, GrenadeJump, Bash
+      GrenadeCancel, Blaze=1, BlazeSwap=1 OR Damage=10  # both abilities are for the first jump
+      GrenadeCancel, Blaze=1, HowlsDen.RainLifted, Bash
 
 anchor HowlsDen.MidwayBottomLoop at -492, -4459:  # At the Health refill behind the door
   refill Health=1
 
   conn HowlsDen.OutsideSecretRoom: free
   conn HowlsDen.AboveBoneBridge:
-    moki:
-      BreakWall=16, Launch
-      BreakWall=16, DoubleJump, Combat=Slug OR Bash
-      BreakWall=16, Dash, Combat=Slug OR Bash
-      BreakWall=16, Bash, Grenade=1, Glide
-    gorlek:
-      BreakWall=16, DoubleJump OR Dash
-      BreakWall=16, Bash, Grenade=1, Sword OR Hammer OR Damage=10
-      SentryJump=1  # weapon breaks the wall
-    kii:
-      Hammer
-      Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # The last chunck of spikes can repulse sword movement
-      BreakWall=16, Shuriken=2 OR Flash=2 OR Sentry=2  # bashnade paths are requires the same amount of energy as those
-      BreakWall=16, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Sword
-      BreakWall=16, Spear=1, Spear=1 OR Damage=10  # https://youtu.be/Y5nvYJbEtZg
-      Bash, Grenade=1, BreakWall=16  # https://youtu.be/e9edNsLqE9Y
+    moki, BreakWall=16:
+      Launch
+      DoubleJump, Combat=Slug OR Bash
+      Dash, Combat=Slug OR Bash
+      Bash, Grenade=1, Glide
+    gorlek, BreakWall=16:
+      DoubleJump OR Dash
+      Bash, Grenade=1, Sword OR Hammer OR Damage=10
+      SentryJump=1
+    kii, BreakWall=16:
+      Hammer OR Sword
+      Shuriken=2 OR Flash=2 OR Sentry=2  # bashnade paths requires the same amount of energy as those
+      Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, GrenadeJump=1 OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    unsafe, BreakWall=16:
+      Spear=1, Spear=1 OR Damage=10 OR PauseHover  # https://youtu.be/Y5nvYJbEtZg
+      PauseHover, Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  # https://youtu.be/e9edNsLqE9Y
+      GrenadeJump  # GrenadeCancel to pass above the spikes
 
 anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   refill Checkpoint
@@ -1222,7 +1285,7 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
       WaterDash, Damage=10
       Shuriken=1 OR Flash=1 OR Sentry=1:  # If you jump at the very edge of the blue moss, you'll hit the spikes
         Damage=10
-    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseHover
+    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseHover OR GrenadeCancel
   conn HowlsDen.OutsideSecretRoom:
     moki: HowlsDen.SecretRoomWall
 
@@ -1240,10 +1303,14 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
         Damage=10
       Bash, Shuriken=2 OR Flash=2 OR Sentry=2  # Bash the slug to reach the suspended platform. No Spear because it one shot the slug in easy
       Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      # Glitched
+      # Damage=10, GrenadeJump=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # condition to pass the second spikes
+      # GrenadeJump=1, Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       Bash  # https://youtu.be/EJ9tExwpRjA
       Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseHover OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GrenadeJump
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      GrenadeJump
 
   conn HowlsDen.SecretRoom:
     moki:
@@ -1256,6 +1323,9 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
       Dash, Hammer  # upslash-> hammer to reach the slime's platform
     kii:
       Bash, Sword OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the slug to reach the suspended platform then bash a slug's projectile
+      # Glitched
+      # GlideJump
+      # GrenadeJump=2, Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
       # Paths going back to the moss
       Dash OR Hammer
       Sword, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -1265,7 +1335,8 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
       Bash OR Sword
       Spear=1, Water OR Grapple OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # https://youtu.be/QYShpOZYmZQ
       Damage=20, Spear=1
-      Damage=10, Spear=1, WaterDash OR Glide
+      Damage=10, Spear=1, Glide
+      WaterDash, Water OR Grapple OR Damage=10  # https://youtu.be/C4UVkiBdg9w
 
 # checkpoint at -476, -4441
 
@@ -1293,11 +1364,13 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       DoubleJump OR Launch
       Bash, Grenade=1
     gorlek:
-      Dash OR SentryJump=1
+      SentryJump=1
     kii:
-      Hammer OR Bash OR Shuriken=1
+      Dash OR Hammer OR Bash OR Shuriken=1
       Glide, Flash=1 OR Sentry=1
       Sword, Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1 
     unsafe:
       Sword OR GrenadeJump OR GlideJump
       Glide, Spear=1
@@ -1314,6 +1387,8 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     kii:
       Sword OR Dash OR Spear=1
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
     unsafe: free
   conn HowlsDen.AboveTeleporter:
     moki:
@@ -1323,6 +1398,8 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     kii:
       Sword OR Hammer  # pogo on the slime for sword, upslash for hammer
       Dash, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe: Spear=1 OR Dash OR GrenadeJump OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR GlideJump
 
 anchor HowlsDen.DoubleJumpApproach at -436, -4528:  # Checkpoint inbetween the teleporter and the tree
@@ -1340,6 +1417,8 @@ anchor HowlsDen.DoubleJumpApproach at -436, -4528:  # Checkpoint inbetween the t
     kii:
       Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
       Bash, Grenade=1
+      # Glitched
+      # GrenadeJump=1
     unsafe:
       Bash OR SpearJump=1 OR GrenadeJump OR BlazeSwap=1
   conn HowlsDen.Teleporter: free
@@ -1352,15 +1431,22 @@ anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Doubl
     gorlek: SentryJump=1
     kii:
       Bash  # The exploding enemy won't spawn if you respawned at the anchor, but then you can use the lizard instead
+      # Glitched
+      # GrenadeJump=1 OR AerialHammerJump
+      # GlideJump, DoubleJump
     unsafe:
       DoubleJump, TripleJump  # Triple jump from the right wall
+      GlideJump, Hammer OR Sword OR Spear=1
       SwordJump OR GrenadeJump OR AerialHammerJump
 
   conn HowlsDen.DoubleJumpTreeArea: free
   conn HowlsDen.DoubleJumpApproach:
     moki: DoubleJump OR Launch OR Dash OR Glide
     gorlek: Sword OR Hammer
-    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+    kii:
+      Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: free
 
 anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
@@ -1382,6 +1468,8 @@ anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
     kii:
       Bash OR Sword OR Dash OR Sentry=3
       Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2 OR SpearJump=1 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
   conn MidnightBurrows.DenConnection:
     moki: MidnightBurrows.HowlsDenShortcut
