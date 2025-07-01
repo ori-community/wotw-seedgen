@@ -351,7 +351,7 @@ UpperWastes.SpinLasersLowerEX, Windswept Wastes, SpiritLight, 100, desertAGroup,
 UpperWastes.FlowersSeed, Windswept Wastes, Quest, Seed, questUberStateGroup, 14019, gardenerSeedFlowersCollected, 20601, , 1995.7, -3650.6, 1995.6826, -3650.5928
 UpperWastes.WallOre, Windswept Wastes, Resource, Ore, desertAGroup, 7228, gorlekOre, 8370, , 1951.6, -3615.8, 1951.6055, -3615.8252
 WindtornRuins.EscapeRevisitEC, Windtorn Ruins, Resource, Energy, windtornRuinsGroup, 10289, energyHalfCell, 44555, , 2053.7, -4050.2, 2053.74, -4049.1924
-WindtornRuins.Seir, Windtorn Ruins, Wisp, Seir, windtornRuinsGroup, 10289, wispRewardPickup, 22102, , 2056, -3568, 2056, -3568
+WindtornRuins.Seir, Windtorn Ruins, Wisp, Seir, windtornRuinsGroup, 10289, wispRewardPickup, 22102, , 2151, -3568, 2151, -3568
 WindtornRuins.HandToHandComplete, Windtorn Ruins, Quest, Secrets, questUberStateGroup, 14019, tradeSequenceQuest, 26318, 11, 1969, -4024, 1969, -4024
 WeepingRidge.Ore, Silent Woods, Resource, Ore, corruptedPeakGroup, 36153, gorlekOreA, 3013, , 1305.5, -3732.6, 1305.48, -3732.58
 WeepingRidge.LaunchTree, Silent Woods, Ability, Launch, trees, 0, Launch, 8, , 1363, -3815, 1362.97, -3809.77
