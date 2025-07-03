@@ -11550,6 +11550,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     unsafe:
       Grapple, Flap, Dash OR DoubleJump  # precise jump from the right wall to barely reach the left wall without taking damage. Then wait for the slime to be in a position where you can avoid it
       Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
+      Bash, Dash, Damage=80  # Bash the skeeto on the lever room to where you can wallclimb through the spikes - https://www.twitch.tv/pizzaspren/clip/WanderingMistyIguanaWTRuck-nvcYWuVOknF9q0pG
   pickup EastPools.BubbleCurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=40
@@ -11805,7 +11806,9 @@ anchor EastPools.TPArea at -1297, -4143:  # Where Tokk stands
       Bash, Grenade=1, Damage=20
       Bash, Grenade=2, Sword OR Hammer  # Weapon stall above the spikes after killing the slug
       SentryJump=1, Spear=1 OR Grenade=1 OR Damage=20  # Weapon stall above the spikes after killing the slug or just dboost in the spikes
-    unsafe: Sword, Bash  # Hit slug with sword to make it fall off the ceiling and then bash it
+    unsafe:
+      Sword, Bash  # Hit slug with sword to make it fall off the ceiling and then bash it
+      DoubleJump, Bash  # Bash the slug to the ground right of the spikes and then bash it twice for height
 
   # this Tokk disappears after Kwolok's death
   conn EastPools.Teleporter:
@@ -12033,6 +12036,9 @@ anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
 
   conn EastPools.NextToLupoOre:
     moki: BreakWall=20
+    unsafe: # Fetch torpedo and bash it against the breakable wall
+      EastPools.LupoPurpleFloor, Bash, Water OR Damage=320
+      EastPools.LupoPurpleFloor, Bash, WaterDash, Damage=180
   conn EastPools.MissilePuzzle:
     moki, EastPools.LupoPurpleFloor: Water
     kii, EastPools.LupoPurpleFloor: WaterDash, Damage=80
@@ -12117,6 +12123,10 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
     unsafe:
       Damage=220, Bash
       Damage=160, Bash, WaterDash
+  state EastPools.ArenaWall:
+    unsafe:  # Fetch torpedo, bash it into the arena water and bash it against the wall on the other side
+      Bash, Water OR Damage=320
+      Bash, WaterDash, Damage=140
 
   pickup EastPools.EnergyHarvestShard:
     moki:
@@ -12244,6 +12254,8 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       EastPools.CentralRoomBubbleFree, GrenadeJump, DoubleJump OR Glide  # grenade jump on the bubble, use the other ability to stall, repeat until at the top
       EastPools.CentralRoomBubbleFree, PauseFloat  # Pause float spam is just barely enough stall to gain height. This is just as much fun as it sounds.
       SentryJump=2  # sjump to GrassSeed, sjump from GrassSeed
+      EastPools.CentralRoomBubbleFree, Bash, DoubleJump  # djump onto bubble from the top-right side forcing a walljump on the bubble, djump on top to land
+      EastPools.CentralRoomBubbleFree, Bash, Dash, Damage=60  # dash into bubble from the top-right, dash into left wall with spikes and wait there, dash back into the next bubble
   conn WestPools.Teleporter:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Water, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=20
@@ -12695,6 +12707,10 @@ anchor UpperPools.DrainPuzzleEntrance at -1386, -4062:  # At the right of the do
       Damage=60, WaterDash, Launch
       Damage=60, WaterDash, Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=100, WaterDash, DoubleJump, TripleJump
+  state UpperPools.DrainRoomPurpleWall:
+    unsafe:
+      UpperPools.ButtonDoorAboveTree, Dash, Bash  # Bash-chain the slug on the left to the purple wall
+      DoubleJump, Bash, Grapple  # Unstick the slug from the ceiling with bash, stall with DJ on the way down and bash it to the wall. Movement to the slug is probably redundant with UpperPools.WaterfallEC pickup
 
   pickup UpperPools.WaterfallEC:  # have to solve with and without the water drained so it doesn't softlock
     moki:
@@ -12848,6 +12864,10 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
     kii:
       Damage=100, Bash
       WaterDash, Damage=80, Bash
+  state EastPools.ArenaWall:  # Make sure it's not redundant with EastPools.Teleporter or EastPools.TPArea
+    unsafe:
+      UpperPools.UpperWaterDrained, Bash, Damage=20, EastPools.LowerWaterDrained  # Juggle torpedo next to slug down to the purple wall. Less damage than the intended route - https://www.twitch.tv/pizzaspren/clip/UnusualHilariousGazelleCopyThis-0VqfSFg2Xsu-PGCn
+      UpperPools.UpperWaterDrained, Bash, Damage=80  # Juggle torpedo next to slug down to the purple wall. Less damage than the intended route
 
   pickup EastPools.PurpleWallHC:
     moki, UpperPools.UpperWaterDrained:
