@@ -11417,7 +11417,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     unsafe:
       Grapple, Flap, Dash OR DoubleJump  # precise jump from the right wall to barely reach the left wall without taking damage. Then wait for the slime to be in a position where you can avoid it
       Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
-      Bash, Dash, Damage=80  # Bash the skeeto on the lever room to where you can wallclimb through the spikes - https://www.twitch.tv/pizzaspren/clip/WanderingMistyIguanaWTRuck-nvcYWuVOknF9q0pG
+      Bash, Dash, Damage=80  # Bash-chain the skeeto on the lever room to where you can wallclimb through the spikes - https://youtu.be/l5IhlhMPzDo
   pickup EastPools.BubbleCurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=40
@@ -12733,7 +12733,7 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
       WaterDash, Damage=80, Bash
   state EastPools.ArenaWall:  # Make sure it's not redundant with EastPools.Teleporter or EastPools.TPArea
     unsafe:
-      UpperPools.UpperWaterDrained, Bash, Damage=20, EastPools.LowerWaterDrained  # Juggle torpedo next to slug down to the purple wall. Less damage than the intended route - https://www.twitch.tv/pizzaspren/clip/UnusualHilariousGazelleCopyThis-0VqfSFg2Xsu-PGCn
+      UpperPools.UpperWaterDrained, Bash, Damage=20, EastPools.LowerWaterDrained  # Juggle torpedo next to slug down to the purple wall. Less damage than the intended route - https://youtu.be/tGJ80Zc2K98
       UpperPools.UpperWaterDrained, Bash, Damage=80  # Juggle torpedo next to slug down to the purple wall. Less damage than the intended route
 
   pickup EastPools.PurpleWallHC:
