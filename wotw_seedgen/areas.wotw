@@ -1177,6 +1177,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     unsafe:
       HowlsDen.RainLifted, Bash, Glide  # Bash chain
       HowlsDen.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
+      HowlsDen.RainLifted, Bash, HowlsDen.BoneBarrier  # https://youtu.be/j7sRVpO-s00
   conn HowlsDen.BoneBridgeDoor:
     moki: HowlsDen.KeystoneDoor
   conn HowlsDen.AboveTeleporter:
