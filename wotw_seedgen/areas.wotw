@@ -1150,7 +1150,9 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       BreakWall=10, Bash, Grenade=1
       # Glitched
       # GrenadeJump=1, DoubleJump
-    unsafe: BreakWall=10, DoubleJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+    unsafe:
+      BreakWall=10, DoubleJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      HowlsDen.RainLifted, Bash  # https://youtu.be/jYZ7oOuq18k
   pickup HowlsDen.AboveTPEX:  # Lizard only spawns if you have sword
     moki: HowlsDen.BoneBarrier, BreakWall=10
 
