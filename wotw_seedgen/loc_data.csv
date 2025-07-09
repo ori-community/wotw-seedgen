@@ -91,6 +91,7 @@ EastHollow.RightKwolokEX, Kwoloks Hollow, SpiritLight, 100, _petrifiedForestGrou
 EastHollow.SilentSwimEC, Kwoloks Hollow, Resource, Energy, _petrifiedForestGroup, 58674, energyContainerA, 9583, , 331.9, -4191.3, 331.87, -4190.344
 EastHollow.SplinterShard, Kwoloks Hollow, Shard, Splinter, pickupsGroup, 23987, splinterShardPickup, 62973, , 216.2, -4307.3, 216.17882, -4306.3125
 EastHollow.ForestsVoice, Kwoloks Hollow, Wisp, Voice, kwoloksCavernThroneRoomGroup, 46462, wispRewardPickup, 59806, , 191, -4212, 191, -4212
+EastHollow.WellspringDoneTalk, Kwoloks Hollow, Quest, SL500, kwolokGroupDescriptor, 937, cleanseWellspringQuestUberstate, 34641, 4, 180, -4215, 180.054, -4215.027
 EastHollow.KwolokSwimOre, Kwoloks Hollow, Resource, Ore, kwoloksCavernThroneRoomGroup, 46462, gorlekOreA, 37897, , 243.4, -4223.5, 243.44835, -4223.517
 EastHollow.KwolokSwimLeftEX, Kwoloks Hollow, SpiritLight, 200, kwoloksCavernThroneRoomGroup, 46462, largeExpA, 29054, , 113.0, -4228.5, 113, -4228.5
 EastHollow.KwolokSwimRightEX, Kwoloks Hollow, SpiritLight, 50, kwoloksCavernThroneRoomGroup, 46462, smallExpA, 20780, , 161.5, -4244.8, 161.49835, -4244.7866

@@ -10,6 +10,7 @@ Flags: No Quests
 3|0|8|14019|15983|int|3                     // MarshSpawn.MokkFangQuest
 3|0|8|48248|18458|int|4                     // MarshSpawn.TokkTabletQuest
 3|0|8|14019|50597|int|4                     // EastHollow.KwolokAmuletQuest
+3|0|8|937|36461|int|4                       // EastHollow.WellspringDoneTalk
 3|0|8|14019|20667|int|3                     // OuterWellspring.TheLostCompass
 3|0|8|14019|59708|int|3                     // Tree Keeper (WoodsEntry.LastTreeBranch)
 3|0|8|14019|7470|bool|true                  // WoodsEntry.TreeSeed

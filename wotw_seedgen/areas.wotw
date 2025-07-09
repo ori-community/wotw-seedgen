@@ -3430,6 +3430,8 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
 
   quest EastHollow.ForestsVoice: free
+  quest EastHollow.WellspringDoneTalk:
+    moki: InnerWellspring.WaterEscape
   quest EastHollow.KwolokAmuletQuest:
     moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
 
