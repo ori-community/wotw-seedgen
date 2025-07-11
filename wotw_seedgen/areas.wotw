@@ -10146,6 +10146,8 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
     kii:
       DepthsLight, Grapple, Damage=30, DoubleJump OR Dash OR Glide OR Sword
       DepthsLight, Bash, Damage=30, DoubleJump OR Dash OR Glide OR Sword
+    unsafe:
+      Bash, Dash, Damage=30  # Fancy trick. Chain-bashdash required to position the projectile properly. https://youtu.be/rYawGnDPubc
   conn UpperDepths.SecondKSRoom:
     moki: DepthsLight
   conn UpperDepths.BelowHive:  # many paths would be redundant with going to the teleporter
