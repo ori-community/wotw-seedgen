@@ -9967,6 +9967,7 @@ anchor UpperDepths.SecondKSRoom at 542, -4466:  # The egg of the firefly circlin
     unsafe:
       DepthsLight, Damage=60, Sentry=3 OR Shuriken=3
       Damage=60, Flash=3
+      Bash, Dash, Damage=30  # Take a spiderling with you. Last spikes can be cleared with no damage but it's tight. https://youtu.be/Oq6QhAYvEJM
   conn LowerDepths.East:
     gorlek, ShurikenBreak=20: DepthsLight, Combat=Spiderling, Launch OR DoubleJump OR Dash OR Glide OR Bash OR Sword OR Hammer
     # kii, ShurikenBreak=20: DepthsLight, Combat=Spiderling  # jump from the very edge of the platform above the spikes
