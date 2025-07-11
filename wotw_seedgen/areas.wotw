@@ -9834,6 +9834,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
   conn UpperDepths.Central:  # paths using the firefly have to go from the teleporter
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
     gorlek: DepthsLight
+    unsafe: Bash, Dash  # Extremely tight timing. Use the bat projectile to accelerate downwards. https://youtu.be/gXOM9NRkSI8
   conn UpperDepths.LowerConnection:
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
     gorlek: DepthsLight
