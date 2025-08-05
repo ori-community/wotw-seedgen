@@ -2734,6 +2734,12 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
       Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
       Bow=1, PauseFloat
 
+  # backwards connection blocked by the door
+
+  # note for backwards connection: while the RockPuzzleSolved state can be initially set via header, the rock doesn't appear on top of the
+  # pressure plate until the player is far enough from it. Stepping on the pressure plate before the rock has appeared unsets the state and
+  # can create a softlock
+
 
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
   tprestriction:
@@ -2792,8 +2798,20 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
         Sword  # Pogo the shot of the slug
         HammerSJump=1 OR AerialHammerJump OR CoyoteHammerJump OR GlideHammerJump OR GrenadeJump
 
-  # backwards connection blocked by the door
-  # note for backwards connection: while the RockPuzzleSolved state can be initially set via header, stepping on the pressure plate unsets it and can create a softlock
+    conn WestHollow.PastRockPuzzleDoor: # Keep in mind there is a path going up through the slug+skeeto and a path going down and through the horizontal gate
+      unsafe:
+        WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:  # Paths going above
+          # moki: Combat=Skeeto+Slug
+          Launch
+          Bash, Grenade=1
+          BreakCrystal, DoubleJump, TripleJump  # Break the crystal and jump off the wall. Damage=10 for lower difficulties?
+          # Sword, DoubleJump, TripleJump  # TJump and use the crystal for a reset. Redundant with BreakCrystal
+          SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GroundedHammerJump OR GlideHammerJump OR FlashSwap
+        # WestHollow.FullyDrained: # Paths going through the checkpoint on -356, -4306, but requires the unmapped uberstate (937,57028)
+        #   # moki: Combat=SneezeSlug+SmallSkeeto+2xSkeeto  # SmallSkeeto explodes, not listed in EnemyIndex
+        #   Bow=3, DoubleJump
+        #   Bash  # Off the skeetos
+        #   Sword, DoubleJump
 
 # checkpoint at -356, -4306
 
