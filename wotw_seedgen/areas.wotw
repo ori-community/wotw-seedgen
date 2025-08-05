@@ -2677,22 +2677,11 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.UpperDrainLeverPulled, Damage=40
       WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20
 
-  conn WestHollow.FarLeftRoom:
-    moki, WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Combat=Skeeto+Slug, Bow=1, DoubleJump OR Dash
-      Bash OR Launch  # bashing off the skeeto
-    gorlek, WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Combat=Skeeto+Slug, Bow=1, Glide OR Sword
-      SentryJump=1
-      DoubleJump, Combat=Slug OR Damage=10  # Jump to the left wall and wrap around to the top
-    kii, WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Bow=1, Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump
-      Sword  # Pogo the skeeto
+  conn WestHollow.PastRockPuzzleDoor:
+    moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      WestHollow.RockPuzzleSolved
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Launch  # https://youtu.be/guXiDCKM18I
-      WestHollow.RockPuzzleSolved, Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
-      WestHollow.RockPuzzleSolved, Bow=1, PauseFloat
   conn WestHollow.HollowDrainMiddle:
   # If FullyDrained, this connection originates from SubmergedPlatform instead
   # WestHollow.UpperTongueExtended is a HUGE negative for this connection and you can't retract it unless you have access to SubmergedPlatform
@@ -2723,6 +2712,28 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
   conn WestHollow.Entrance:
     unsafe:
       WestHollow.FullyDrained, Bash  # Place an enemy on HollowDrainMiddle and Bash off of it. There are multiple ways to do this, and none of them are fun. The Skeeto on the left is probably the most cooperative. This kinda looks possible from HollowDrainLower as well, but the Skeetos don't seem to have enough of an attention span to make it work.
+
+anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puzzle door
+  tprestriction:
+    moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
+    gorlek: free
+
+  conn WestHollow.FarLeftRoom:
+    moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Combat=Skeeto+Slug, Bow=1, DoubleJump OR Dash
+      Bash OR Launch  # bashing off the skeeto
+    gorlek, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Combat=Skeeto+Slug, Bow=1, Glide OR Sword
+      SentryJump=1
+      DoubleJump, Combat=Slug OR Damage=10  # Jump to the left wall and wrap around to the top
+    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Bow=1, Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump
+      Sword  # Pogo the skeeto
+    unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
+      Bow=1, PauseFloat
+
 
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
   tprestriction:
@@ -2782,6 +2793,7 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
         HammerSJump=1 OR AerialHammerJump OR CoyoteHammerJump OR GlideHammerJump OR GrenadeJump
 
   # backwards connection blocked by the door
+  # note for backwards connection: while the RockPuzzleSolved state can be initially set via header, stepping on the pressure plate unsets it and can create a softlock
 
 # checkpoint at -356, -4306
 
