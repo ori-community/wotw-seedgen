@@ -2717,6 +2717,7 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
     gorlek: free
+  refill Checkpoint
 
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
