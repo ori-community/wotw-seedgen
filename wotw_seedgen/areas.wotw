@@ -1940,7 +1940,7 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       # WaterDash, DoubleJump, GlideJump, Water OR Damage=10
       # WaterDash, GrenadeJump=2, Water, DoubleJump OR Dash OR Sword OR Hammer OR Damage=10
       # WaterDash, Damage=20, GrenadeJump=2
-   unsafe, MarshPastOpher.PoolsPathFloor:
+    unsafe, MarshPastOpher.PoolsPathFloor:
       DoubleJump, TripleJump OR Dash OR Water OR Sword OR Damage=10  # https://youtu.be/jbkDaPma9ZE
       Hammer, DoubleJump OR Water OR Damage=10  # https://youtu.be/Qt6Jfi3675I
       WaterDash, GlideJump, Water OR Damage=10
@@ -11878,7 +11878,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
     moki, EastPools.LowerWaterDrained, EastPools.UltraBashWall: Water
     kii, EastPools.LowerWaterDrained, EastPools.UltraBashWall:
       Damage=160
-      WaterDash, Damage= 
+      WaterDash, Damage=80
     unsafe, EastPools.LowerWaterDrained, EastPools.UltraBashWall:
       WaterDash, Damage=60
       Bash, Grenade=1, Damage=140  # throw a grenade in the water and bash it to get some iframes
