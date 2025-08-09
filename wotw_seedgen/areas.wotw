@@ -2678,8 +2678,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20
 
   conn WestHollow.PastRockPuzzleDoor:
-    moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      WestHollow.RockPuzzleSolved
+    moki: WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Launch  # https://youtu.be/guXiDCKM18I
   conn WestHollow.HollowDrainMiddle:
@@ -2718,6 +2717,9 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
     gorlek: free
   refill Checkpoint
+
+  state WestHollow.FullyDrained:  # Watch out for redundancy with going to WestHollow.FarLeftRoom first
+    unsafe: WestHollow.UpperDrainLeverPulled, Bash  # Move the skeeto between the semisolid and the spikes - https://youtu.be/HEL2gvKB92A
 
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
@@ -2799,20 +2801,6 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
         Sword  # Pogo the shot of the slug
         HammerSJump=1 OR AerialHammerJump OR CoyoteHammerJump OR GlideHammerJump OR GrenadeJump
 
-    conn WestHollow.PastRockPuzzleDoor: # Keep in mind there is a path going up through the slug+skeeto and a path going down and through the horizontal gate
-      unsafe:
-        WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:  # Paths going above
-          # moki: Combat=Skeeto+Slug
-          Launch
-          Bash, Grenade=1
-          BreakCrystal, DoubleJump, TripleJump  # Break the crystal and jump off the wall. Damage=10 for lower difficulties?
-          # Sword, DoubleJump, TripleJump  # TJump and use the crystal for a reset. Redundant with BreakCrystal
-          SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GroundedHammerJump OR GlideHammerJump OR FlashSwap
-        # WestHollow.FullyDrained: # Paths going through the checkpoint on -356, -4306, but requires the unmapped uberstate (937,57028)
-        #   # moki: Combat=SneezeSlug+SmallSkeeto+2xSkeeto  # SmallSkeeto explodes, not listed in EnemyIndex
-        #   Bow=3, DoubleJump
-        #   Bash  # Off the skeetos
-        #   Sword, DoubleJump
 
 # checkpoint at -356, -4306
 
