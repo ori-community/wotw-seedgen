@@ -2525,18 +2525,6 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       # Bow=1, DoubleJump, Shuriken=1
       # Bow=1, Sword, Hammer
 
-  conn WestHollow.MokiByTwillen:
-    moki: Launch OR Bash  # the slug
-    gorlek:
-      DoubleJump, TripleJump
-      SentryJump=1
-    kii:
-      Sword, DoubleJump OR Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the slime
-      DoubleJump, Hammer
-    unsafe:
-      Sword  # pogo the slime
-      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap=1
-      GrenadeJump
   conn WestHollow.MokiByTwillen:  # Make sure it's not redundant with WestHollow.InFrontPurpleDoorEnemyPaths->WestHollow.Entrance->WestHollow.MokiByTwillen
     moki:
       Bow=1, Combat=Slug OR Bash
@@ -2559,7 +2547,9 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       Bash, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained OR DoubleJump OR Dash OR Glide
     gorlek: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained OR DoubleJump OR Dash OR Glide OR Sword OR Damage=20  # since UpperDrainLeverPulled solves this path on its own, using the dirty water is sound here
     kii: Hammer OR Sentry=2
-    unsafe: Shuriken=1 OR Blaze=3
+    unsafe:
+      Shuriken=1 OR Blaze=3 OR PauseHover
+      GrenadeCancel, Damage=10  # augmented dboost on the spikes at the tongue then use grenade cancel to reach the wall without taking a water damage tick
   conn WestHollow.HollowDrainMiddle:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
     unsafe:
@@ -2571,6 +2561,10 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
 
 anchor WestHollow.InFrontPurpleDoorEnemyPaths at -181, -4240:  # Variant of WestHollow.InFrontPurpleDoorEnemyPaths which are using the slime
   nospawn
+  
+  state WestHollow.UpperDrainLeverPulled:
+    kii: Bash, Grenade=1  # Bash the slime on the floating platform. Throw your grenade and bash the slime again to reach your grenade.
+    unsafe: Bash  # Bash the slime on the floating platform. From here, bash it against the ground and sometimes it flies off with you
 
   conn WestHollow.InFrontPurpleDoor: free
   conn WestHollow.MokiByTwillen:
