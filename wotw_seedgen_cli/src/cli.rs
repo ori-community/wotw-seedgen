@@ -407,7 +407,7 @@ pub struct SeedSettings {
     pub difficulty: Vec<WorldOpt<Difficulty>>,
     /// Logically expected tricks you may have to use
     ///
-    /// Available tricks are "swordsentryjump", "hammersentryjump", "shurikenbreak", "sentrybreak", "hammerbreak", "spearbreak", "sentryburn", "removekillplane", "launchswap", "sentryswap", "flashswap", "blazeswap", "wavedash", "grenadejump", "swordjump", "grenaderedirect", "sentryredirect", "pausefloat", "glidejump", "hammerjump", "aerialhammerjump", "glidehammerjump", "coyotehammerjump", "wallhammerjump", "groundedhammerjump", "extendedhammer", "spearjump"
+    /// Available tricks are "swordsentryjump", "hammersentryjump", "shurikenbreak", "sentrybreak", "hammerbreak", "spearbreak", "sentryburn", "removekillplane", "launchswap", "sentryswap", "flashswap", "blazeswap", "wavedash", "grenadejump", "swordjump", "grenaderedirect", "sentryredirect", "pausefloat", "glidejump", "hammerjump", "aerialhammerjump", "glidehammerjump", "coyotehammerjump", "wallhammerjump", "groundedhammerjump", "hammerextention", "spearjump"
     #[structopt(short, long)]
     pub tricks: Vec<WorldOpt<Trick>>,
     /// Logically assume hard in-game difficulty
