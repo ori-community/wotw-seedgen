@@ -130,7 +130,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
     unsafe:
       Launch  # Launching along the ceiling, starting above the LongSwimEX
       Grapple, Spear=1 OR Blaze=2
-      HowlsDen.RainLifted, Bash, DoubleJump OR Glide   # Chain bash the mantis
+      HowlsDen.RainLifted, DoubleJumpBashChain OR GlideBashChain   # Chain bash the mantis
       # Glitched:
       SentryJump=1, DoubleJump  # walljump on the small wall above the grappable plant. With sword, djump+upslash
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
@@ -938,7 +938,7 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EC
       GlideJump, BlazeSwap=1 OR SentrySwap=1  # same as above
       FlashSwap OR BlazeSwap=2 OR SentrySwap=2
-      HowlsDen.RainLifted, Bash, Glide, Dash  # use the enemy for everything
+      HowlsDen.RainLifted, GlideBashChain, DashBashChain  # use the enemy for everything
 
   conn MarshSpawn.MokkTheBrave: free
   conn MarshSpawn.FangPlatform:
@@ -1171,7 +1171,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     unsafe:
       DoubleJump, TripleJump  # Door skip
       HowlsDen.RainLifted, DoubleJump, Sword
-      HowlsDen.RainLifted, Bash, DoubleJump  # Bash chain
+      HowlsDen.RainLifted, DoubleJumpBashChain  # Bash chain
       GrenadeJump, DoubleJump
       SentryJump=2  # Sword sjump can go up to HowlsDen.AboveBoneBridge but landing here and doing the loop also solves the connection to AboveBoneBridge
       HammerSJump=1, DoubleJump
@@ -1179,7 +1179,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       BlazeSwap=4 OR FlashSwap OR SentrySwap=4
   conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
-      HowlsDen.RainLifted, Bash, Glide  # Bash chain
+      HowlsDen.RainLifted, GlideBashChain  # Bash chain
       HowlsDen.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
       HowlsDen.RainLifted, Bash, HowlsDen.BoneBarrier  # https://youtu.be/j7sRVpO-s00
   conn HowlsDen.BoneBridgeDoor:
@@ -2010,7 +2010,7 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
       DoubleJump, TripleJump, Spear=1
     unsafe:
       DoubleJump, Spear=1, Water
-      Bash, Dash  # https://youtu.be/H0tGcrzQW1o 
+      DashBashChain  # https://youtu.be/H0tGcrzQW1o 
 
   conn MarshPastOpher.PoolsPathOneWayWall:
     moki: Bash OR Launch
@@ -3611,7 +3611,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, Bash  # Bash the fish
       Water, DoubleJump, Hammer OR Spear=1  # Djump from the right wall, upswing for extra height. Use left ledge to regain upswing
     unsafe:  # Can do way better than that by optimizing damages on spikes/fishes
-      DoubleJump, Water OR Damage=220  # At left wall, with quick jumps sliding up the wall you can keepp the dj
+      DoubleJump, Water OR Damage=220  # At left wall, with quick jumps sliding up the wall you can keep the dj
       # Water, DoubleJump, Sword  # bait the fish and pogo it
       # Water, DoubleJump, Flash=1 OR Sentry=1  # Ability to gain a bit more height. Standig on the left ledge to regain upswing after fail.
       Damage=200, Launch  # launch in the water at the start to preserve a bit of it's speed
@@ -4569,7 +4569,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
         Hammer, DoubleJump OR Dash
 
   state GladesTown.GromsWall:
-    unsafe: Bash, Launch  # https://www.youtube.com/watch?v=edSpqN0b4UY
+    unsafe: LaunchBashChain  # https://www.youtube.com/watch?v=edSpqN0b4UY
 
   pickup WestGlades.GrappleEX:
     moki:
@@ -5057,8 +5057,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
       Grapple, Dash, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Grapple, Dash OR Sword
-      Bash, Glide  # bash the mantis upwards and buffer glide (over and over and over)
-      Bash, DoubleJump  # bash the mantis upwards and djump immediately after (over and over and over)
+      GlideBashChain OR DoubleJumpBashChain  # bash the mantis upwards and buffer glide (over and over and over)
       SentryJump=2
       GrenadeJump, DoubleJump, TripleJump OR Dash OR PauseFloat  # Use the wheel on the left.
   pickup OuterWellspring.WheelEX:
@@ -8145,7 +8144,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1  # jump on the tongue, let ori slide down then double jump again and go for the right wall; difficulty varies depending on the method of limiting framerate
       DoubleJump, Damage=20, TripleJump OR Sword  # jump onto the spikes then up to the snaptrap. Jump on the tongue, let ori slide down then double jump again and go for the right wall
       SentryJump=1
-      Bash, Glide  # bash mortar and stack 2 projectiles, bash one upwards and bash both for enough height
+      Bash, Glide  # technically a bash chain? https://youtu.be/3Rg02Qz9CV8
       DoubleJump, TripleJump  # Jump from the snap traps on the way to tokk
       AerialHammerJump OR GlideHammerJump
       # LowerReach.ThawCentralFurnace, Bash, Blaze=1
@@ -10145,7 +10144,7 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
       DepthsLight, Grapple, Damage=30, DoubleJump OR Dash OR Glide OR Sword
       DepthsLight, Bash, Damage=30, DoubleJump OR Dash OR Glide OR Sword
     unsafe:
-      Bash, Dash, Damage=30  # Fancy trick. Chain-dashbash required to position the projectile properly. https://youtu.be/rYawGnDPubc
+      DashBashChain, Damage=30  # Fancy trick. Chain-dashbash required to position the projectile properly. https://youtu.be/rYawGnDPubc
   conn UpperDepths.SecondKSRoom:
     moki: DepthsLight
   conn UpperDepths.BelowHive:  # many paths would be redundant with going to the teleporter
@@ -11866,7 +11865,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
     unsafe, EastPools.LowerWaterDrained:
       Water, Launch OR Dash OR Damage=14  # bait the torpedo to the surface. Either avoid the explosion with launch/dash or take the dboost
       Bash, Damage=180  # TP after bashing the torpedo
-      Bash, Dash  # https://youtu.be/NNNyAATvOkQ
+      DashBashChain  # https://youtu.be/NNNyAATvOkQ
   state EastPools.UltraBashWall:
     moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
     gorlek, EastPools.LowerWaterDrained: Water, Bash
@@ -14956,7 +14955,7 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
   # most likely there will be non-redundant paths to WillowsEnd.AboveInnerTP here in the future, just right now there aren't any
 
   state WillowsEnd.RedirectHeart:
-    unsafe: BreakWall=30, Launch, Bash, Dash  # Redirect the projectile from the enemy
+    unsafe: BreakWall=30, Launch, DashBashChain  # Redirect the projectile from the enemy
 
 anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the first portal used for the puzzle
   refill Checkpoint
