@@ -2167,9 +2167,19 @@ anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
     kii, MarshSpawn.BurrowsOpen:
       Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=3 OR Sentry=4  # Bait shots from the spider
       Bash, Grenade=1, Shuriken=1 OR Sentry=1 OR Flash=1  # bait shots from the spider, land where the mortar is, bait it, grenade, bash the mortar to reach your grenade
+      # Glitched
+      # SentryJump=3
+      # SwordSJump=1, DoubleJump, TripleJump OR Dash  # Pogo 2nd tentacle. Tjump and dash aren't mandatory but adding it because the right wall is hard to climb
+      # HammerSJump=2, DoubleJump, TripleJump OR Dash
+      # AerialHammerJump  # wall jump from the wall under the first tentacle to refresh your djump
+      # GrenadeJump=2, DoubleJump, TripleJump
     unsafe, MarshSpawn.BurrowsOpen:
       # Bash, Grenade=1
       Bash  # using the projectiles efficiently
+      GlideHammerJump OR AerialHammerJump OR WallHammerJump
+      GrenadeJump, DoubleJump
+      SwordSJump=1, DoubleJump OR Damage=1  # https://youtu.be/V_yNos8Oj1Y
+      SentryJump=2  # The micro ledge is important to reset your upslash  https://youtu.be/CaGr026EVJA
 
 anchor MidnightBurrows.BelowLupo at -850, -4579:  # Past the enemies near the teleporter
   pickup MidnightBurrows.LeftKS:
@@ -2193,7 +2203,7 @@ anchor MidnightBurrows.BelowLupo at -850, -4579:  # Past the enemies near the te
       # Blaze=1
       # Grenade=1  # Grenade while in right Teleporter to get to the left ceiling
 
-anchor MidnightBurrows.Central at -781, -4564:  # The ledge left of the big portal room
+anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big portal room
   refill Checkpoint
 
   state MidnightBurrows.Lever:  # paths that can't use the anchor because they only work without the lever already pulled
