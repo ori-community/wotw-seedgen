@@ -715,7 +715,7 @@ pub enum Trick {
     /// Redirecting projectiles with Sentry
     SentryRedirect,
     /// Cancelling falling momentum through the pause menu
-    PauseHover,
+    PauseFloat,
     /// Storing a grounded jump into the air with Glide
     GlideJump,
     /// Preserving Hammer momentum in a lot of ways
