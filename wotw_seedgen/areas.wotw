@@ -2718,7 +2718,7 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
     gorlek: free
   refill Checkpoint
 
-  conn WestHollow.PartRockPuzzleDoorEnemyPaths:
+  conn WestHollow.PastRockPuzzleDoorEnemyPaths:
     unsafe: free  # Die to the spikes to spawn the skeeto
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
