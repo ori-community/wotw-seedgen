@@ -2791,6 +2791,7 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       Dash, DoubleJump OR Hammer OR Spear=1
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat  # precise bash grenade to wall jump on the right wall. Other option to jump to the lever
       Dash, Damage=10, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Sword, Bash  # Precise upslash the slug above to get it down, bash it to get to the wall, sword hover to the lever - https://youtu.be/Y77mEz4gmGE
 
   pickup WestHollow.FarLeftEX:
     moki, WestHollow.FullyDrained:
