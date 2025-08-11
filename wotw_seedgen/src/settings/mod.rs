@@ -731,7 +731,7 @@ pub enum Trick {
     /// Hammer Jump from a standard jump
     GroundedHammerJump,
     /// Extending momentum with Hammer
-    ExtendedHammer,
+    HammerExtention,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
 }
