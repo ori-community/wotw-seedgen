@@ -11417,7 +11417,6 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     unsafe:
       Grapple, Flap, Dash OR DoubleJump  # precise jump from the right wall to barely reach the left wall without taking damage. Then wait for the slime to be in a position where you can avoid it
       Bash, Grenade=1, DoubleJump  # jump on the bubble to reach your grenade
-      Bash, Dash, Damage=80  # Chain-dashbash the skeeto on the lever room to where you can wallclimb through the spikes - https://youtu.be/l5IhlhMPzDo
   pickup EastPools.BubbleCurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=40
