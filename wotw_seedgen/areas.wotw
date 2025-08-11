@@ -2718,8 +2718,6 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
     gorlek: free
   refill Checkpoint
 
-  conn WestHollow.PastRockPuzzleDoorEnemyPaths:
-    unsafe: free  # Die to the spikes to spawn the skeeto
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Combat=Skeeto+Slug, Bow=1, DoubleJump OR Dash
@@ -2734,8 +2732,8 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
       Bow=1, PauseFloat
-      # Bash  # Bash off the slug when it reaches the ledge. It always spawns if you walk to the door, so it shouldn't need to be in PastRockPuzzleDoorEnemyPaths
-      # Sword  # Upslash the slug to make it fall next to you + pogo. It always spawns if you walk to the door, so it shouldn't need to be in PastRockPuzzleDoorEnemyPaths
+      Bash  # Bash off the slug when it reaches the ledge. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
+      Sword  # Upslash the slug to make it fall next to you + pogo. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
 
   # backwards connection blocked by the door
 
