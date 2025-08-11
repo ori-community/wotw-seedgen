@@ -30,6 +30,10 @@
     "WallHammerJump",
     "GroundedHammerJump",
     "HammerExtention",
-    "SpearJump"
+    "SpearJump",
+    "GlideBashChain",
+    "DoubleJumpBashChain",
+    "DashBashChain",
+    "LaunchBashChain"
   ]
 }

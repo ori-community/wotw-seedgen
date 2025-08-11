@@ -130,6 +130,10 @@ pub enum RequirementValue<'a> {
     GroundedHammerJump,
     HammerExtention,
     SpearJump(u32),
+    GlideBashChain,
+    DoubleJumpBashChain,
+    DashBashChain,
+    LaunchBashChain,
 }
 
 impl<'a> Areas<'a> {
@@ -618,6 +622,10 @@ pub enum RequirementKind {
     GroundedHammerJump,
     HammerExtention,
     SpearJump,
+    GlideBashChain,
+    DoubleJumpBashChain,
+    DashBashChain,
+    LaunchBashChain,
 }
 #[derive(Debug, Clone, Copy, FromStr)]
 #[ParseFromIdentifier]
@@ -783,6 +791,10 @@ fn parse_special_requirement<'a>(
         RequirementKind::WallHammerJump => RequirementValue::WallHammerJump,
         RequirementKind::GroundedHammerJump => RequirementValue::GroundedHammerJump,
         RequirementKind::HammerExtention => RequirementValue::HammerExtention,
+        RequirementKind::GlideBashChain => RequirementValue::GlideBashChain,
+        RequirementKind::DoubleJumpBashChain => RequirementValue::DoubleJumpBashChain,
+        RequirementKind::DashBashChain => RequirementValue::DashBashChain,
+        RequirementKind::LaunchBashChain => RequirementValue::LaunchBashChain,
         RequirementKind::Combat => parse_combat_requirement(parser)?,
         _ => {
             let amount = parse_value!(parser, Suggestion::Integer, Suggestion::Requirement)?;

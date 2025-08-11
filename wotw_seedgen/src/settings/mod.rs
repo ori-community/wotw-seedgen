@@ -734,6 +734,14 @@ pub enum Trick {
     HammerExtention,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
+    /// Cancelling Bash momentum by using Glide so you can Bash again the same object
+    GlideBashChain,
+    /// Cancelling Bash momentum by using Double Jump so you can Bash again the same object
+    DoubleJumpBashChain,
+    /// Cancelling Bash momentum by using Dash in the opposite way so you can Bash again the same object
+    DashBashChain,
+    /// Cancelling Bash momentum by using Launch in the opposite way so you can Bash again the same object
+    LaunchBashChain,
 }
 
 /// Enforced Requirement before being allowed to finish the game
