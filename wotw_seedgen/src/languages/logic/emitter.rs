@@ -359,6 +359,38 @@ fn build_requirement<'a>(
             Requirement::EnergySkill(Skill::Spear, *amount as f32),
             context,
         ),
+        parser::RequirementValue::GlideBashChain => build_trick_requirement(
+            Trick::GlideBashChain,
+            Requirement::And(vec![
+                Requirement::Skill(Skill::Glide),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            context,
+        ),
+        parser::RequirementValue::DoubleJumpBashChain => build_trick_requirement(
+            Trick::DoubleJumpBashChain,
+            Requirement::And(vec![
+                Requirement::Skill(Skill::DoubleJump),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            context,
+        ),
+        parser::RequirementValue::DashBashChain => build_trick_requirement(
+            Trick::DashBashChain,
+            Requirement::And(vec![
+                Requirement::Skill(Skill::Dash),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            context,
+        ),
+        parser::RequirementValue::LaunchBashChain => build_trick_requirement(
+            Trick::LaunchBashChain,
+            Requirement::And(vec![
+                Requirement::Skill(Skill::Launch),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            context,
+        ),
     }
 }
 

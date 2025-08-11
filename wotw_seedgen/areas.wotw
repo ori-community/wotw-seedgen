@@ -39,6 +39,10 @@
 # GroundedHammerJump: Extends to Hammer
 # HammerExtention: Extends to Hammer
 # SpearJump=x: Extends to Spear=x
+# GlideBashChain: Extends to Bash, Glide
+# DoubleJumpBashChain: Extends to Bash, DoubleJump
+# DashBashChain: Extends to Bash, Dash
+# LaunchBashChain: Extends to Bash, Launch
 
 # requirement macros. must go at the top of the file!
 
