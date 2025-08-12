@@ -484,7 +484,7 @@ impl<'source> ast::FunctionCall<'source> {
             }
         }
 
-        return Some(Command::Void(CommandVoid::Lookup { index }));
+        Some(Command::Void(CommandVoid::Lookup { index }))
     }
 
     fn compile_signature<'a, 'compiler, 'snippets, 'uberstates>(
@@ -1334,7 +1334,7 @@ fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
         .uber_state_data
         .id_lookup
         .get(&uber_identifier)
-        .map_or(false, |entry| entry.readonly)
+        .is_some_and(|entry| entry.readonly)
     {
         context.compiler.errors.push(Error::custom(
             "this uberState is readonly".to_string(),

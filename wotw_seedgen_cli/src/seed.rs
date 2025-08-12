@@ -43,7 +43,7 @@ pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse
     let (graph, uber_state_data) = logic_assets(&settings.world_settings)?;
     let snippet_access = files::snippet_access("")?;
 
-    let seed_universe = generate_seed(&graph, &uber_state_data, &snippet_access, &settings, debug)?;
+    let seed_universe = generate_seed(&graph, &uber_state_data, &snippet_access, settings, debug)?;
 
     Ok(seed_universe)
 }

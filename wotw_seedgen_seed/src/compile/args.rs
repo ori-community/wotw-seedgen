@@ -99,7 +99,7 @@ impl<'a> Args<'a> {
             if let Some(index) = self
                 .args
                 .iter()
-                .position(|arg| &arg.destination == &overwriting_arg_destination)
+                .position(|arg| arg.destination == overwriting_arg_destination)
             {
                 self.commit_arg(index, call_builder);
             } else if self.args_in_progress.contains(&overwriting_arg_destination) {
@@ -206,10 +206,10 @@ impl ArgDestination {
 
     fn copy_directly(self) -> Option<Command> {
         match self {
-            ArgDestination::Boolean(index) => (index > 0).then(|| Command::CopyBoolean(0, index)),
-            ArgDestination::Integer(index) => (index > 0).then(|| Command::CopyInteger(0, index)),
-            ArgDestination::Float(index) => (index > 0).then(|| Command::CopyFloat(0, index)),
-            ArgDestination::String(index) => (index > 0).then(|| Command::CopyString(0, index)),
+            ArgDestination::Boolean(index) => (index > 0).then_some(Command::CopyBoolean(0, index)),
+            ArgDestination::Integer(index) => (index > 0).then_some(Command::CopyInteger(0, index)),
+            ArgDestination::Float(index) => (index > 0).then_some(Command::CopyFloat(0, index)),
+            ArgDestination::String(index) => (index > 0).then_some(Command::CopyString(0, index)),
         }
     }
 

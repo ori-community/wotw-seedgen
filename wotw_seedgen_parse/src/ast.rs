@@ -25,7 +25,7 @@ use crate::{
 /// - [`Option<T>`] implements `Ast` if `T` does. [`Option::ast`] returns `Ok(Some(T))` if `T` succeeds and `Ok(None)` if `T` fails to parse
 /// - `(T1, T2)` implements `Ast` if `T1` and `T2` do.
 /// - [`Vec<T>`] implements `Ast` if `T` does. [`Vec::ast`] will attempt to keep parsing `T` until the entire source is exhausted.
-/// This can be useful as a top-level Ast node or as [`Delimited<Open, Vec<T>, Close>`][`Delimited`], which will attempt to parse `T` until the delimited content is exhausted.
+///   This can be useful as a top-level Ast node or as [`Delimited<Open, Vec<T>, Close>`][`Delimited`], which will attempt to parse `T` until the delimited content is exhausted.
 ///
 /// ```
 /// # extern crate logos;

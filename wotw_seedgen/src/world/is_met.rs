@@ -245,7 +245,7 @@ impl World<'_, '_> {
         self.uber_state_met(self.skill(skill), skill.uber_identifier())
     }
 
-    fn any_skill_met<'a, T>(&self, skills: T) -> ControlFlow<Missing>
+    fn any_skill_met<T>(&self, skills: T) -> ControlFlow<Missing>
     where
         T: IntoIterator<Item = Skill> + Copy,
     {

@@ -199,9 +199,10 @@ impl UniversePresetSettings {
                         .apply(world_settings, preset_access)?;
                 }
             } else if setting_worlds == 1 {
-                settings.world_settings.extend(
-                    iter::repeat(settings.world_settings[0].clone()).take(preset_worlds - 1),
-                );
+                settings.world_settings.extend(iter::repeat_n(
+                    settings.world_settings[0].clone(),
+                    preset_worlds - 1,
+                ));
                 for (world_settings, preset_world_settings) in settings
                     .world_settings
                     .iter_mut()

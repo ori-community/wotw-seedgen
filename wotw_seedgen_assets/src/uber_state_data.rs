@@ -65,7 +65,7 @@ pub struct UberStateDataEntry {
 impl UberStateDataEntry {
     /// Returns `rando_name` if available, otherwise returns `name`
     pub fn preferred_name(&self) -> &String {
-        self.rando_name.as_ref().unwrap_or_else(|| &self.name)
+        self.rando_name.as_ref().unwrap_or(&self.name)
     }
 }
 /// Typed value stored inside an UberState

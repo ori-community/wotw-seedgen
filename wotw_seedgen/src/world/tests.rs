@@ -355,7 +355,7 @@ fn is_met() {
         ($world:expr, $req:expr, [$world_orbs:expr], [$($orbs:expr),* $(,)?]) => {
             {
                 let mut left: OrbVariants = smallvec![$world_orbs];
-                $world.is_met(&$req, &mut left);
+                let _ = $world.is_met(&$req, &mut left);
                 left.sort_unstable_by_key(|orbs: &Orbs| OrderedFloat(orbs.health));
                 let mut right: OrbVariants = smallvec![$($world_orbs + $orbs),*];
                 right.sort_unstable_by_key(|orbs: &Orbs| OrderedFloat(orbs.health));

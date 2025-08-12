@@ -165,7 +165,7 @@ impl<Item: Tokens, Separator> Tokens for SeparatedNonEmpty<Item, Separator> {
     }
 }
 
-impl<'source> Tokens for Spanned<&'source str> {
+impl Tokens for Spanned<&str> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.span, TokenType::String);
     }

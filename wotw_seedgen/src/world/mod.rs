@@ -919,12 +919,12 @@ impl Display for InventoryDisplay<'_, '_, '_> {
             Ok(())
         }
 
-        fn iter_item<I, T>(f: &mut fmt::Formatter<'_>, first: &mut bool, iter: I) -> fmt::Result
+        fn iter_item<I, T>(f: &mut fmt::Formatter<'_>, first: &mut bool, mut iter: I) -> fmt::Result
         where
             I: Iterator<Item = T>,
             T: Display,
         {
-            iter.map(|name| item(f, first, name)).collect()
+            iter.try_for_each(|name| item(f, first, name))
         }
 
         fn bool_item(

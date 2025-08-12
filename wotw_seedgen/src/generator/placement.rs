@@ -261,7 +261,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 world_context
                     .reached_needs_placement
                     .iter()
-                    .map(|index| NodeSummary::new(&world_context.needs_placement[*index]))
+                    .map(|index| NodeSummary::new(world_context.needs_placement[*index]))
                     .collect()
             })
             .collect();
@@ -1209,7 +1209,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .unwrap_or_else(|| {
                 command
                     .contained_common_write_identifiers()
-                    .into_iter()
                     .next()
                     .map(CommonUberIdentifier::map_icon)
                     .unwrap_or_default()

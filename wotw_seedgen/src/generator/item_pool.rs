@@ -27,12 +27,11 @@ impl ItemPool {
     pub fn new(rng: &mut Pcg64Mcg) -> Self {
         let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
 
-        let items = iter::repeat(compile::gorlek_ore())
-            .take(40)
-            .chain(iter::repeat(compile::keystone()).take(34))
-            .chain(iter::repeat(compile::shard_slot()).take(5))
-            .chain(iter::repeat(compile::health_fragment()).take(24))
-            .chain(iter::repeat(compile::energy_fragment()).take(24))
+        let items = iter::repeat_n(compile::gorlek_ore(), 40)
+            .chain(iter::repeat_n(compile::keystone(), 34))
+            .chain(iter::repeat_n(compile::shard_slot(), 5))
+            .chain(iter::repeat_n(compile::health_fragment(), 24))
+            .chain(iter::repeat_n(compile::energy_fragment(), 24))
             .chain([
                 compile::skill(Skill::Bash),
                 compile::skill(Skill::DoubleJump),

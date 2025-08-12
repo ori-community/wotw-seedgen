@@ -33,7 +33,7 @@ impl Compile for input::Trigger {
     fn compile(self, command_lookup: &mut Vec<Vec<Command>>) -> Self::Output {
         match self {
             Self::ClientEvent(trigger) => Trigger::ClientEvent(trigger),
-            Self::Binding(uber_identifier) => Trigger::Binding(uber_identifier.into()),
+            Self::Binding(uber_identifier) => Trigger::Binding(uber_identifier),
             Self::Condition(command) => {
                 Trigger::Condition(compile_into_lookup(command, command_lookup))
             }

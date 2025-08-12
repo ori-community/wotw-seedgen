@@ -179,7 +179,7 @@ fn snippets() {
         Compiler::new(
             &mut rand::thread_rng(),
             &TestFileAccess,
-            &*UBER_STATE_DATA,
+            &UBER_STATE_DATA,
             config,
             false,
         )

@@ -112,9 +112,8 @@ impl Display for AvailableSnippet {
         let description = self
             .metadata
             .description
-            .as_ref()
-            .map(String::as_str)
-            .unwrap_or_else(|| "(no description provided by snippet)");
+            .as_deref()
+            .unwrap_or("(no description provided by snippet)");
         write!(
             f,
             "{literal}{identifier}{reset}: {description}",
@@ -215,7 +214,7 @@ fn universe_presets_arg() -> Arg {
         .value_name("NAME")
         .num_args(1..)
         .help("Universe presets to include")
-        .long_help(preset_help(&*AVAILABLE_UNIVERSE_PRESETS, "Universe"))
+        .long_help(preset_help(&AVAILABLE_UNIVERSE_PRESETS, "Universe"))
 }
 
 fn worlds_arg() -> Arg {
@@ -278,7 +277,7 @@ fn world_presets_arg(world_scoped: bool) -> Arg {
         .value_name("NAME")
         .num_args(1..)
         .help("World presets to include")
-        .long_help(preset_help(&*AVAILABLE_WORLD_PRESETS, "World"));
+        .long_help(preset_help(&AVAILABLE_WORLD_PRESETS, "World"));
     choose_parser!(arg, world_scoped, String)
 }
 
@@ -382,7 +381,7 @@ fn snippets_arg(world_scoped: bool) -> Arg {
         .value_name("NAME")
         .num_args(1..)
         .help("Snippets to use")
-        .long_help(snippets_help(&*AVAILABLE_SNIPPETS));
+        .long_help(snippets_help(&AVAILABLE_SNIPPETS));
     choose_parser!(arg, world_scoped, String)
 }
 
@@ -394,7 +393,7 @@ fn snippet_config_arg(world_scoped: bool) -> Arg {
         .value_name("SNIPPET.CONFIG=VALUE")
         .num_args(1..)
         .help("Configuration to pass to snippets")
-        .long_help(snippet_config_help(&*AVAILABLE_SNIPPETS));
+        .long_help(snippet_config_help(&AVAILABLE_SNIPPETS));
     choose_parser!(arg, world_scoped, SnippetConfigArg)
 }
 
@@ -586,7 +585,7 @@ where
     }
 
     fn possible_values(&self) -> Option<Box<dyn Iterator<Item = PossibleValue> + '_>> {
-        Some(Box::new(T::VARIANTS.into_iter().map(PossibleValue::new)))
+        Some(Box::new(T::VARIANTS.iter().map(PossibleValue::new)))
     }
 }
 

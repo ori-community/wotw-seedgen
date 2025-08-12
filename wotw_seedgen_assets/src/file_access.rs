@@ -87,13 +87,13 @@ impl FileAccess {
                 Err(err) => return Err(file_err("read", &full_path, err)),
             }
         }
-        return Err(format!(
+        Err(format!(
             "\"{}\" not found at \"{}\"",
             path.display(),
             attempts
                 .into_iter()
                 .format_with("\" or \"", |path, f| f(&path.display()))
-        ));
+        ))
     }
     #[cfg(feature = "snippet_access")]
     fn read(&self, path: &Path) -> Result<(PathBuf, Vec<u8>), String> {

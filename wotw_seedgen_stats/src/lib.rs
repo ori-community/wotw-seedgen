@@ -158,7 +158,7 @@ impl<
     fn analyze_existing_seeds(&self, data: &mut [SeedData]) -> Result<usize> {
         let mut existing = HandleErrors::new_print_errors(
             self.storage_access
-                .read_seeds(&self.settings, self.sample_size)?,
+                .read_seeds(self.settings, self.sample_size)?,
         );
         let mut existing_amount = 0;
 
@@ -213,7 +213,7 @@ impl<
                             settings.seed = rand::random::<u64>().to_string();
 
                             let seed =
-                                self.generate_seed(count, &settings, &errors, &error_messages)?;
+                                self.generate_seed(count, &settings, errors, error_messages)?;
 
                             self.analyze_seed(
                                 &seed,
@@ -276,7 +276,7 @@ impl<
             }
         };
 
-        if let Err(err) = self.storage_access.write_seed(&seed, &settings, count) {
+        if let Err(err) = self.storage_access.write_seed(&seed, settings, count) {
             eprintln!("{err}");
         };
 

@@ -46,7 +46,7 @@ fn requirements(c: &mut Criterion) {
     };
     let graph = compile_graph(&[]);
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
-    let uber_states = UberStates::new(&*UBER_STATE_DATA);
+    let uber_states = UberStates::new(&UBER_STATE_DATA);
     let mut world = World::new(&graph, spawn, &world_settings, uber_states);
 
     let req_a = Requirement::EnergySkill(Skill::Blaze, 2.0);

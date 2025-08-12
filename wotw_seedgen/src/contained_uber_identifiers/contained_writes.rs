@@ -156,7 +156,7 @@ impl CommonWriteCommand {
                 }
                 _ => None,
             },
-            _ => return None,
+            _ => None,
         }
     }
 }

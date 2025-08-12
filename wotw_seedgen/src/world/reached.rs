@@ -1,4 +1,4 @@
-use std::{mem, ops::ControlFlow, usize};
+use std::{mem, ops::ControlFlow};
 
 use super::{graph::node_condition_equals, node_condition, World};
 use crate::{

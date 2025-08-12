@@ -651,7 +651,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                         if let Some(anchor_door) = anchor_door.compile(compiler) {
                             compiler.door_nodes.push(compiler.nodes.len());
 
-                            if mem::replace(&mut door, Some(anchor_door)).is_some() {
+                            if door.replace(anchor_door).is_some() {
                                 compiler.error("duplicate door".to_string(), keyword.span);
                             }
                         }
@@ -665,7 +665,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                         let requirement = requirements
                             .data
                             .map_or(Requirement::Impossible, |group| group.compile(compiler));
-                        if mem::replace(&mut teleport_restriction, Some(requirement)).is_some() {
+                        if teleport_restriction.replace(requirement).is_some() {
                             compiler.error("duplicate tprestriction".to_string(), keyword.span);
                         }
                     }
@@ -748,23 +748,21 @@ impl<'source> Compile for ast::Door<'source> {
                 match content {
                     ast::DoorContent::Id(keyword, door_id) => {
                         if let Some(door_id) = compiler.consume_result(door_id.result) {
-                            if mem::replace(&mut id, Some(door_id.id.data)).is_some() {
+                            if id.replace(door_id.id.data).is_some() {
                                 compiler.error("duplicate id".to_string(), keyword.span);
                             }
                         }
                     }
                     ast::DoorContent::Target(keyword, door_target) => {
                         if let Some(door_target) = compiler.consume_result(door_target.result) {
-                            if compiler.anchor_map.get(door_target.target.data.0).is_none() {
+                            if !compiler.anchor_map.contains_key(door_target.target.data.0) {
                                 compiler
                                     .error("unknown anchor".to_string(), door_target.target.span);
                             }
 
-                            if mem::replace(
-                                &mut target,
-                                Some(door_target.target.data.0.to_string()),
-                            )
-                            .is_some()
+                            if target
+                                .replace(door_target.target.data.0.to_string())
+                                .is_some()
                             {
                                 compiler.error("duplicate target".to_string(), keyword.span);
                             }
@@ -772,7 +770,7 @@ impl<'source> Compile for ast::Door<'source> {
                     }
                     ast::DoorContent::Enter(keyword, door_requirement) => {
                         if let Some(door_requirement) = door_requirement.compile(compiler) {
-                            if mem::replace(&mut requirement, Some(door_requirement)).is_some() {
+                            if requirement.replace(door_requirement).is_some() {
                                 compiler.error("duplicate enter".to_string(), keyword.span);
                             }
                         }

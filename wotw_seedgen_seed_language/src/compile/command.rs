@@ -9,7 +9,7 @@ use crate::{
 use ast::ClientEvent;
 use ordered_float::OrderedFloat;
 use rand::Rng;
-use std::{iter, mem, ops::Range};
+use std::{iter, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
 use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart};
@@ -508,7 +508,7 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
                 return;
             }
 
-            for contents in iter::repeat(self.contents.content).take(repetitions as usize) {
+            for contents in iter::repeat_n(self.contents.content, repetitions as usize) {
                 // short circuit on errors to avoid adding the same errors repeatedly
                 match contents.compile(compiler) {
                     None => break,
@@ -683,16 +683,13 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
     field: &str,
     f: F,
 ) {
-    if mem::replace(
-        f(compiler
+    if f(compiler
             .global
             .output
             .item_metadata
             .0
             .entry(item)
-            .or_default()),
-        Some(value),
-    )
+            .or_default()).replace(value)
     .is_some()
     {
         compiler.errors.push(Error::custom(

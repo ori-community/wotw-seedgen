@@ -123,9 +123,7 @@ impl Tokenize for Tokenizer {
             .last()
             .map_or(0..source.len(), |(_, span)| span.clone());
         tokens.extend(
-            iter::repeat(Token::Dedent)
-                .take(indent_stack.len())
-                .map(|token| (token, span.clone())),
+            iter::repeat_n(Token::Dedent, indent_stack.len()).map(|token| (token, span.clone())),
         );
 
         TokenizeOutput {

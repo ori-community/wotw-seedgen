@@ -714,7 +714,7 @@ impl CompletionAfterSpanCheck for Trigger<'_> {
                 let mut completion = condition.completion(index).unwrap_or_default();
 
                 // If we are returning identifier completions, add relevant non expression completions
-                if completion.first().map_or(false, |item| item.label == "if") {
+                if completion.first().is_some_and(|item| item.label == "if") {
                     completion.append(&mut TRIGGER_NON_EXPRESSION_COMPLETION.clone());
                 }
 

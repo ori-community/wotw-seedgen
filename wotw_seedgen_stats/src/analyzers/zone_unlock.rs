@@ -21,7 +21,7 @@ impl Analyzer for ZoneUnlockStats {
                 .reachable
                 .iter()
                 .flatten()
-                .any(|node| node.zone.map_or(false, |zone| zone == self.zone))
+                .any(|node| node.zone == Some(self.zone))
         });
         let reachable_count = groups_until_unlocked
             .flat_map(|group| group.reachable.iter().map(|reachable| reachable.len()))

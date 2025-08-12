@@ -21,8 +21,7 @@ impl Analyzer for ZoneSpiritLightStats {
             .filter(|placement| {
                 placement
                     .location
-                    .zone
-                    .map_or(false, |zone| zone == self.zone)
+                    .zone == Some(self.zone)
             })
             .flat_map(|placement| placement.item.command.contained_common_items())
             .filter_map(|item| match item {

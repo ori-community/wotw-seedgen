@@ -102,8 +102,7 @@ where
                 #implementation
             }
         }
-    }
-    .into())
+    })
 }
 
 fn span_any_implementation<FN, FNP, FU, FUP>(

@@ -24,7 +24,7 @@ pub fn seed_settings(settings: &mut UniversePresetSettings) -> Result<(), Error>
         "",
         "universe",
         &mut settings.includes,
-        &*AVAILABLE_UNIVERSE_PRESETS,
+        &AVAILABLE_UNIVERSE_PRESETS,
     )?;
 
     let world_settings = settings.world_settings.as_mut().unwrap();
@@ -50,7 +50,7 @@ pub fn seed_world_settings(
         &prefix,
         "world",
         &mut settings.includes,
-        &*AVAILABLE_WORLD_PRESETS,
+        &AVAILABLE_WORLD_PRESETS,
     )?;
     choose_spawn(&prefix, settings)?;
     select_difficulty(&prefix, settings)?;
@@ -128,7 +128,7 @@ fn choose_spawn(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), 
     if settings.spawn.is_none() {
         if let Some(index) = Select::new()
             .with_prompt(format!("{prefix}Select a spawn location"))
-            .items(&SpawnItems::VARIANTS)
+            .items(SpawnItems::VARIANTS)
             .default(0)
             .interact_opt()?
         {
@@ -176,7 +176,7 @@ fn select_tricks(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(),
         query = query.defaults(
             &<Trick as VariantArray>::VARIANTS
                 .iter()
-                .map(|trick| tricks.contains(&trick))
+                .map(|trick| tricks.contains(trick))
                 .collect::<Vec<_>>(),
         )
     }

@@ -1,3 +1,5 @@
+// TODO investigate optimizing type sizes
+
 use crate::{
     token::{Token, Tokenizer, TOKENIZER},
     types::Type,

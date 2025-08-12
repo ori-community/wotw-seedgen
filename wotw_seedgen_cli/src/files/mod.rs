@@ -89,7 +89,7 @@ fn create_unique_file(path: &str) -> Result<(File, String), Error> {
 fn create_unique_dir(path: &str) -> Result<String, Error> {
     create_unique::<_, ()>(path, "", |path| fs::create_dir(path)).map(|(_, path)| path)
 }
-fn create_unique<'a, F, T>(path: &'a str, extension: &str, mut f: F) -> Result<(T, String), Error>
+fn create_unique<F, T>(path: &str, extension: &str, mut f: F) -> Result<(T, String), Error>
 where
     F: FnMut(&str) -> io::Result<T>,
 {
