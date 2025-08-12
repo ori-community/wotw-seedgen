@@ -2269,7 +2269,7 @@ anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big roo
   refill Checkpoint
 
   state MidnightBurrows.Lever:  # paths that can't use the anchor because they only work without the lever already pulled
-    kii: Damage=15, Blaze=1
+    kii: Blaze=1, Damage=15
     unsafe:
       Damage=15  # may need <60 fps?
       Shuriken=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1  # extend corner boost with shuriken
@@ -2294,30 +2294,36 @@ anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big roo
       Damage=15, Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
     unsafe:
       Bash  # Bash the lantern once to the right then bash it again
-      DoubleJump
-  conn MidnightBurrows.BelowUpperKS:  # so far all paths not using MidnightBurrows.Lever would be redundant
+      DoubleJump  # https://youtu.be/ng90hakT_W4
+      Blaze=1, Damage=15
+      BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR PauseFloat
+  conn MidnightBurrows.BelowUpperKS:
+  # Check for redundancy with PortalRoom -> East -> DenConnection -> PortalCorridor -> BelowUpperKS
+  # Also check for redundancy with MidnightBurrows.Lever
     moki: MidnightBurrows.Lever, Launch
-    gorlek: MidnightBurrows.Lever, SentryJump=2, DoubleJump OR Dash OR Glide
-    kii, MidnightBurrows.Lever:
-      DoubleJump, TripleJump, Damage=15
-      DoubleJump, Bash  # use the slime then bait the spider
-    unsafe, MidnightBurrows.Lever:
-      SentryJump=2
-      SentryJump=1, DoubleJump, Damage=15
-      DoubleJump, Sword OR Damage=15
-      Bash
+    # kii, MidnightBurrows.Lever:
+      # Glitched 
+      # SentryJump=2
   conn MidnightBurrows.East:  # check for redundancies with activating the lever
     moki:
       Launch
       MidnightBurrows.Lever, DoubleJump OR Dash OR Glide
-    gorlek, MidnightBurrows.Lever:
-      Sword
-      Bash, Grenade=1  # bash the lantern to reach the lever, grenade bash from there
-      HammerSJump=1
-    kii, MidnightBurrows.Lever:  # you can jump out of the portal above the lever, but it's a bit uncooperative, so it's not considered in kii
-      Hammer OR Shuriken=2 OR Sentry=3
-      Bash, Shuriken=1 OR Sentry=2
-    unsafe: MidnightBurrows.Lever, Bash OR Sentry=1 OR Blaze=1 OR Flash=1 OR Shuriken=1 OR Spear=1
+    gorlek:
+      MidnightBurrows.Lever, Sword
+      MidnightBurrows.Lever, Bash, Grenade=1  # bash the lantern to reach the lever, grenade bash from there
+      MidnightBurrows.Lever, HammerSJump=1
+      SentryJump=3  # First Sjump onto the portal which get lifted. Non softlockable because there's alternative to that path once you activate the lever
+      Bash, Grenade=3  # same as above. Could be 2 grenade with djump but then it's redundant with the lever
+    kii:  # you can jump out of the portal above the lever, but it's a bit uncooperative, so it's not considered in kii
+      MidnightBurrows.Lever, Hammer OR Shuriken=2 OR Sentry=3
+      MidnightBurrows.Lever, Bash, Shuriken=1 OR Sentry=2
+      # Glitched
+      # HammerSJump=2  # works with sword as well but redundant with activating the lever
+      # GrenadeJump=3, DoubleJump OR Hammer
+    unsafe:
+      MidnightBurrows.Lever, Bash OR Sentry=1 OR Blaze=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR GrenadeCancel
+      GrenadeJump, Shuriken=2 OR Flash=2 OR Sentry=2
+      BlazeSwap=4 OR FlashSwap OR SentrySwap=4
   conn MidnightBurrows.Central:
     moki: MidnightBurrows.Lever
     gorlek: Damage=15
