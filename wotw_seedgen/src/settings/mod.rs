@@ -742,6 +742,8 @@ pub enum Trick {
     DashBashChain,
     /// Cancelling Bash momentum by using Launch in the opposite way so you can Bash again the same object
     LaunchBashChain,
+    /// Any specific trick that is unpopular for any reason
+    Unpopular,
 }
 
 /// Enforced Requirement before being allowed to finish the game
