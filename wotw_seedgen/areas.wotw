@@ -2206,12 +2206,6 @@ anchor MidnightBurrows.BelowLupo at -850, -4579:  # Past the enemies near the te
 anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big portal room
   refill Checkpoint
 
-  state MidnightBurrows.Lever:  # paths that can't use the anchor because they only work without the lever already pulled
-    kii: Damage=15, Blaze=1
-    unsafe:
-      Damage=15  # may need <60 fps?
-      Shuriken=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1  # extend corner boost with shuriken
-
   pickup MidnightBurrows.LupoMap:
     moki: SpiritLight=50, DoubleJump OR Dash OR Glide
     gorlek: SpiritLight=50
@@ -2222,14 +2216,16 @@ anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big port
     gorlek, MidnightBurrows.Lever:  # The slug isn't here if you respawn from the checkpoint
       DoubleJump, TripleJump OR Sword OR Hammer
       Dash OR Glide
-    kii, MidnightBurrows.Lever:
-      DoubleJump OR Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
-      Damage=15, Spear=2 OR Blaze=2
+    kii:
+      MidnightBurrows.Lever, DoubleJump OR Sword OR Hammer OR Shuriken=2 OR Sentry=2 OR Flash=2
+      MidnightBurrows.Lever, Damage=15, Spear=2 OR Blaze=2
+      # Glitched
+      # GrenadeJump=1, Damage=30
+      # GrenadeJump=1, DoubleJump, Damage=15
     unsafe:
-      # DoubleJump, Sentry=1, Damage=15
+      # DoubleJump
       # DoubleJump, Sentry=2
-      DoubleJump
-      Dash, Bash
+      GrenadeJump OR CoyoteHammerJump OR WallHammerJump
       MidnightBurrows.Lever, Damage=15
 
   conn MidnightBurrows.BelowLupo: free
@@ -2238,10 +2234,18 @@ anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big port
       Bash, DoubleJump OR Dash OR Glide
       Launch
     gorlek: Bash OR SentryJump=2
-    kii: DoubleJump, TripleJump, Damage=30 OR Sword  # with sword, pogo the mortar
+    kii:
+      DoubleJump, TripleJump, Damage=30 OR Sword  # with sword, pogo the mortar
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump  # upslash first
+      # GlideJump, DoubleJump, Sword
+      # GlideJump, DoubleJump, TripleJump, Damage=15
+      # GrenadeJump=1, DoubleJump
     unsafe:
       DoubleJump, Damage=15, TripleJump OR Sword
-      Grenade=1
+      GrenadeCancel  # https://youtu.be/x7Z7Qzwk-14
+      GlideHammerJump OR CoyoteHammerJump OR WallHammerJump
   conn MidnightBurrows.PortalRoom:  # keep in mind that these paths have to work after the lever has been pulled
     moki: Launch OR Glide OR DoubleJump OR Dash
     gorlek: Sword OR Hammer OR Damage=15
@@ -2264,6 +2268,12 @@ anchor MidnightBurrows.TabletRoom at -824, -4531:  # Before the four keystone do
 anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big room full of portals
   refill Checkpoint
 
+  state MidnightBurrows.Lever:  # paths that can't use the anchor because they only work without the lever already pulled
+    kii: Damage=15, Blaze=1
+    unsafe:
+      Damage=15  # may need <60 fps?
+      Shuriken=1, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1  # extend corner boost with shuriken
+
   conn MidnightBurrows.LeverRoom:
     moki:
       Glide
@@ -2282,7 +2292,9 @@ anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big roo
       Bash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
       Damage=15, Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
-    unsafe: Bash  # Bash the lantern once to the right then bash it again
+    unsafe:
+      Bash  # Bash the lantern once to the right then bash it again
+      DoubleJump
   conn MidnightBurrows.BelowUpperKS:  # so far all paths not using MidnightBurrows.Lever would be redundant
     moki: MidnightBurrows.Lever, Launch
     gorlek: MidnightBurrows.Lever, SentryJump=2, DoubleJump OR Dash OR Glide
