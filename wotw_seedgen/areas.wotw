@@ -2345,10 +2345,13 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       SentryJump=1  # use the weapon for movement as well
     kii:
       Dash OR Sentry=3
-      Damage=15  # boost on the brambles below the keystone
-      DoubleJump, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      Damage=30  # boost on the brambles below the keystone
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
-    unsafe: Sword
+      # Glitched
+      # GrenadeJump=1, DoubleJump OR Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
+    unsafe: Sword OR Damage=15 OR GrenadeJump OR PauseFloat
 
   conn MidnightBurrows.PortalRoom:
     moki:
@@ -2368,17 +2371,28 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       DoubleJump, Damage=60  # dboost then wall jump on wall above the bashable plant
       DoubleJump, Damage=45, Dash OR Glide OR Shuriken=1 OR Sentry=2  # avoid the dboost on the right of the bashable plant
       DoubleJump, Damage=30, TripleJump OR Sword OR Hammer  # less damage because you can jump on the wall above the bashable plant from lower
+      DoubleJump, TripleJump, Glide, Hammer  # use everything to get a wjump to the right of the bashable plant 
       Damage=105  # dboost while going to the left portal
       Damage=75, Dash OR Sword
       Damage=90, Hammer
+      Damage=60, Glide  # go to the left portal
+      # Glitched
+      # SwordSJump=1, Damage=15  # hover to the bashable plant then sjump from the spikes
+      # AerialHammerJump
+      # GlideJump, Bash
+      # GlideJump, Dash, Damage=30
+      # GlideJump, Damage=45
+      # GlideJump, DoubleJump, TripleJump OR Damage=30
+      # GlideHammerJump, DoubleJump, Damage=15, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # use everything to get a wjump to the right of the bashable plant. From there glide to the top of the left spikes the djump to the right portal
     unsafe:
       Bash, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
       Bash, Dash OR Grenade=1
       Bash, Sword, Shuriken=1  # pogo the shuriken
       DoubleJump, TripleJump  # https://youtu.be/OMjOhM767ac
-      DoubleJump, Damage=30
+      Damage=30, DoubleJump OR GlideJump
       Hammer, Damage=60
       Damage=75
+      GlideHammerJump
 
 anchor MidnightBurrows.East at -687, -4553:  # Behind the timed-puzzle door
   refill Checkpoint
