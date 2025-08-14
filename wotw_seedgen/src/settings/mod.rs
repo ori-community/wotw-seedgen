@@ -731,7 +731,7 @@ pub enum Trick {
     /// Hammer Jump from a standard jump
     GroundedHammerJump,
     /// Extending momentum with Hammer
-    HammerExtention,
+    HammerExtension,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
     /// Cancelling Bash momentum by using Glide so you can Bash again the same object

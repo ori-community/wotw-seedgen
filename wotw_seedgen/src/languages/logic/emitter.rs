@@ -349,8 +349,8 @@ fn build_requirement<'a>(
             Requirement::Skill(Skill::Hammer),
             context,
         ),
-        parser::RequirementValue::HammerExtention => build_trick_requirement(
-            Trick::HammerExtention,
+        parser::RequirementValue::HammerExtension => build_trick_requirement(
+            Trick::HammerExtension,
             Requirement::Skill(Skill::Hammer),
             context,
         ),
