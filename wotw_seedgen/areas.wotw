@@ -2505,7 +2505,10 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Bash, Grenade=1
     gorlek, MarshPastOpher.EyestoneDoor:
       Dash OR Glide OR Sword OR Hammer OR Damage=10  # Go through the lower part
-    kii, MarshPastOpher.EyestoneDoor: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    kii, MarshPastOpher.EyestoneDoor:
+      Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: MarshPastOpher.EyestoneDoor  # (free with tight platforming)
   conn WestHollow.MokiByTwillen:
     moki: Launch OR Bash  # the slug
@@ -2515,23 +2518,28 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
     kii:
       Sword, DoubleJump OR Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the slime
       DoubleJump, Hammer
+      # Glitched
+      # GrenadeJump=1
+      # GlideJump, DoubleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Sword  # pogo the slime
-      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap=1
-      GrenadeJump
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GrenadeJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
   conn WestHollow.InFrontPurpleDoorEnemyPaths:  # check for redundancies with MokiByTwillen
     # using the dirty water may be softlockable if you drain the water. Currently draining the water provides no advantage for this connection, so no paths using the water can exist
     moki:
       Combat=2xSlug, Bow=1, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
       DoubleJump, Dash OR Glide
     gorlek:
-      Bow=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=10  # deal with the camera
+      Bow=1, DoubleJump OR Dash OR Sword OR Hammer OR Damage=10  # deal with the camera
       DoubleJump, Sword OR Hammer
     kii:
-      Bow=1, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bow=1, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Dash
       Glide, Sword OR Hammer  # with sword, pogo the slime
+      # Glitched
+      # GlideJump
     unsafe:
       Bow=1, BlazeSwap=1 OR GrenadeCancel
       DoubleJump OR GlideJump
@@ -2552,14 +2560,22 @@ anchor WestHollow.MokiByTwillen at -230, -4229:  # The moki to the upper left of
       Combat=BombSlug, Bow=1
       Combat=BombSlug, DoubleJump, Dash OR Glide
       Launch
-    gorlek: Bow=1 OR DoubleJump OR Dash OR Glide OR Sword  # bait the bombslug
-    kii: Hammer OR Sentry=2
-    unsafe: Shuriken=1 OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR PauseFloat
+    gorlek:
+      Combat=BombSlug, DoubleJump OR Dash OR Glide
+      Damage=10, Bow=1 OR DoubleJump OR Dash OR Glide OR Sword
+    kii:
+      Bow=1 OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2  # bait the slug
+      # Glitched
+      # GrenadeJump=1, Sentry=2
+    unsafe:
+      Shuriken=1 OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR PauseFloat
+      GrenadeJump, Flash=1 OR Sentry=1  # Wall grenade jump for a better angle
 
   conn WestHollow.Entrance: free
   conn WestHollow.InFrontPurpleDoorEnemyPaths:
     moki: Combat=BombSlug OR DoubleJump OR Dash OR Glide OR Launch
-    gorlek: free  # bait the bombslug
+    gorlek: Damage=10
+    kii: free  # bait the bombslug
 
 anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple door, before the TP
 # Paths using the slime originate from WestHollow.InFrontPurpleDoorEnemyPaths because it doesn't appear if you spawned at this anchor
