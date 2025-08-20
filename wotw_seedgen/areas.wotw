@@ -2488,9 +2488,12 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       DoubleJump, TripleJump
       Glide, DoubleJump OR Dash  # Glide from the slime's position
     kii, Bow=1, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Hammer, Dash OR DoubleJump
+      Hammer, Dash OR DoubleJump  # Dash ramp or climb the right wall
       Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # Glide from the slime's position
       Bash  # Bash the slime
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1
     unsafe, Bow=1, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Glide, Blaze=1
       GlideJump
