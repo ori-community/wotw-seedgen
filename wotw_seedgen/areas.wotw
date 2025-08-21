@@ -2666,7 +2666,7 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       Damage=20  # dboost on the water if it's there and on the spikes if not
     kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Sword OR Blaze=6 OR Sentry=3
-      WestHollow.UpperTongueExtended, Bow=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Retrat the tongue with bow
+      WestHollow.UpperTongueExtended, Bow=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Retract the tongue with bow
       Hammer, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Dash  # Either coyote dash or a wall jump at the spikes. Not in kii because the spikes dissuade from doing the coyote dash
@@ -2690,7 +2690,10 @@ anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the 
       Bash, Grenade=1
     gorlek, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Sword OR Hammer  # Hammer is a bit particular; you can use upslash and horizontal slashes instead
-    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained: Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1
     unsafe:
       WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
         BlazeSwap=1 OR GrenadeJump OR PauseFloat
