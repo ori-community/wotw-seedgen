@@ -2729,12 +2729,15 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
         Bow=4  # use the pole on the left in order to reach the floating platform
         Bow=1, DoubleJump, TripleJump, Hammer OR Spear=1 # start from the suspended platform then walljump on the ledge bellow the upper frog statue
         Bow=1, DoubleJump, TripleJump, Dash  # From the ledge above the left frog statue. Either coyote dash (but you can get a down dash) or mid air dash then tjump (dash first to avoid bonking on the ceiling)
+        # Glitched
+        # Bow=1, AerialHammerJump
+        # Bow=1, GlideJump, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       WestHollow.FullyDrained, Bow=1, Bash  # FullyDrained spawns slimes on the way to WestHollow.RockPuzzleEX. Bash one near the energy cristal and bash it twice to reach the rock
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Bow=2  # https://youtu.be/hZ4rYt_N-aU
-      Bow=1, DoubleJump, Sword  # Pogo the skeeto. It's hard to bait it at the right position.
+      Bow=1, DoubleJump  # https://youtu.be/bTH70K2OFaM
       Bow=1, Bash  # bait the skeeto
-      Bow=1, DoubleJump, TripleJump
+      Bow=1, CoyoteHammerJump OR WallHammerJump OR GlideHammerJump
   state WestHollow.UpperTongueExtended:
     unsafe: Bow=1  # TP to avoid touching the water
 
@@ -2758,10 +2761,13 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
     kii, WestHollow.UpperDrainLeverPulled:
       Damage=20, DoubleJump, Hammer OR Spear=2 # wjump on the frog statue if the tongue is retracted, dboost in the water otherwise
       Damage=20, DoubleJump, Spear=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # More energy efficient than 2 spears
+      # Glitched
+      # Damage=20, GlideJump, DoubleJump OR Hammer OR Spear=1
     unsafe:
       WestHollow.UpperDrainLeverPulled, Damage=20, DoubleJump, Sword  # sword combo from the platform->djump->upslash to get a wjump from the frog statue. A bit too precise for kii.
       WestHollow.UpperDrainLeverPulled, Damage=20, DoubleJump, Spear=1  # precise djump from the ledge above the frog statue to avoid the dboost
       WestHollow.UpperDrainLeverPulled, DoubleJump, TripleJump OR Dash  # https://youtu.be/-Ww33y641DY
+      WestHollow.UpperDrainLeverPulled, Damage=20, GlideJump
       WestHollow.FullyDrained, WestHollow.UpperTongueRetracted, Bash  # Assuming this is bashing enemies from the rock puzzle room so it indeed need to originate from here despite using the fully drained state?
       Damage=90:  # Dirty water paths need to also work without the water. dboost on the exploding slime to take a tiny bit less damage
       #Removing dboosts from sub-paths because the damage from the water will cover for all possible dboosts when the water is gone
