@@ -2604,8 +2604,10 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       Dash, Hammer OR Damage=10
       DoubleJump, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Damage=10, Spear=1 OR Blaze=1
+      # Glitched
+      # GlideJump
     unsafe:
-      Dash OR GlideJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+      Dash OR GlideJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR CoyoteHammerJump OR WallHammerJump
       Damage=10, DoubleJump OR PauseFloat
   conn WestHollow.Entrance:  # check for redundancies with MokiByTwillen. Slime don't spawn when strating at this anchor
     moki:
