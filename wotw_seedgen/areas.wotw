@@ -3329,7 +3329,8 @@ anchor BeetleFight at -81, -4243:
 
   state EastHollow.BeetleDefeated:  # Mantis and skeeto don't respawn when dying in the fight
     moki: Boss=250, Regenerate, Damage=45, Dash  # It isn't too difficult to avoid the beetle's attacks without Dash, but this is what the base game taught.
-    gorlek: Boss=250, Regenerate, Damage=35, DoubleJump OR Launch
+    gorlek: Boss=250, Regenerate, Damage=35, Dash OR DoubleJump OR Launch
+    kii: Boss=250, Damage=35, Dash OR DoubleJump OR Launch
     unsafe: Boss=250
 
 # please split the VoiceDoorPlatform and MapMoki paths like this: everything to the right of the VoiceDoor is for VoiceDoorPlatform. everything to the left of it belongs to MapMoki
