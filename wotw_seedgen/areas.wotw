@@ -2793,7 +2793,7 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
   refill Checkpoint
 
   conn WestHollow.PastRockPuzzleDoorEnemyPaths:
-    unsafe: free  # precise walljumps to die on the left and spawn the skeeto https://discord.com/channels/942484331572658196/942484861569105990/1404509488177872937
+    unsafe: free  # precise walljumps to die on the left and spawn the skeeto https://youtu.be/rY7TwMvXK0U. Free because if there's water, it'll kill you without needing to do anything.
 
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
@@ -2806,14 +2806,17 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
     kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Bow=1, Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump
-    unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
-      Bow=1, PauseFloat
-      # below are currently redundant with PastRockPuzzleDoorEnemyPaths
-      # Bash  # Bash off the slug when it reaches the ledge. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
-      # Sword  # Upslash the slug to make it fall next to you + pogo. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
-
-  # backwards connection blocked by the door
+      # Glitched
+      # GrenadeJump=1
+      # GlideJump, Dash OR Sword OR Hammer  # Glide jump from under the frog statue. Could glidejump to climb it but you can bonk on the ceiling, making that option maybe a bit too obscure for kii?
+    unsafe:
+      WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained # same as connection towards PastRockPuzzleDoorEnemyPaths but you don't have to die
+      #WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+      #  Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
+      #  Bow=1, PauseFloat
+      #   below are currently redundant with PastRockPuzzleDoorEnemyPaths
+      #   Bash  # Bash off the slug when it reaches the ledge. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
+      #   Sword  # Upslash the slug to make it fall next to you + pogo. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
 
   # note for backwards connection: while the RockPuzzleSolved state can be initially set via header, the rock doesn't appear on top of the
   # pressure plate until the player is far enough from it. Stepping on the pressure plate before the rock has appeared unsets the state and
@@ -2821,9 +2824,7 @@ anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puz
 
 anchor WestHollow.PastRockPuzzleDoorEnemyPaths at -322, -4276:  # Variant of WestHollow.PastRockPuzzleDoor that uses the Skeeto in the room
   nospawn
-  tprestriction:
-    moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
-    gorlek: free
+  # Because nospawn ensure moki players need to lower the water level to reach that anchor, we don't need to add a tprestiction
   refill Checkpoint
 
   state WestHollow.FullyDrained:  # Watch out for redundancy with going to WestHollow.FarLeftRoom first
@@ -2832,9 +2833,10 @@ anchor WestHollow.PastRockPuzzleDoorEnemyPaths at -322, -4276:  # Variant of Wes
   conn WestHollow.PastRockPuzzleDoor: free
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained: Bash  # The skeeto, or the slug when it reaches the ledge
-    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained: Sword  # Pogo the skeeto or upslash the slug and pogo after a walljump
-    unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Grapple, UltraGrapple  # Bait the skeeto to lunge above the slug, or get lucky with the skeeto movement
+    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained: Sword  # Pogo the skeeto
+    # Unsafe can do that connection for free from the regular anchor so every paths from that anchor would be redundant
+    # unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
+    #  Grapple, UltraGrapple  # Bait the skeeto to lunge above the slug, or get lucky with the skeeto movement
 
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
   tprestriction:
