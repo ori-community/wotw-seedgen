@@ -2864,11 +2864,21 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       WaterDash, Damage=20, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Dash, Damage=10, Hammer
       DoubleJump, TripleJump
+      # Glitched
+      # AerialHammerJump
+      # GlideJump, DoubleJump OR Hammer OR Bow=1 OR Damage=10  # dboost do a second glide jump in the spikes at the lower statue
+      # Bow=1, GrenadeJump=1
     unsafe, WestHollow.UpperDrainLeverPulled:
       Bow=2  # precise walljump to get a wjump of the 2nd frog statue (and not just its tongue)
       Dash, DoubleJump OR Hammer OR Spear=1
+      Bash, Grenade=2  # https://youtu.be/3cD_0gzi5zk
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat  # precise bash grenade to wall jump on the right wall. Other option to jump to the lever
-      Dash, Damage=10, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump  # land on the lower frog statue first
+      DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # thorns bellow the statue are friendly and so is the water
+      Dash, Damage=10  # friendly thorns and water to reach the frog statue then dboost to get a wall jump off the left wall
+      SentryJump=1  # use weapon to reach the friendly water and sjump from there
+      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      PauseFloat, BlazeSwap=1 OR SentrySwap=1 
 
   pickup WestHollow.FarLeftEX:
     moki, WestHollow.FullyDrained:
@@ -2882,18 +2892,20 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bow=1, Glide OR Sword OR Hammer
       Bow=1, Sentry=2, Shuriken=1 OR Flash=1 OR Sentry=1  # Spear is less energy efficient than using a 3rd sentry
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe:
       # dirty water paths need to work both with and without water to avoid a softlock. Using WestHollow.UpperDrainLeverPulled for the water damage reference since it's the most restrictive of the 3 possible states
       WestHollow.FullyDrained OR Damage=50:
         Bash OR Launch OR DoubleJump
         Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
         Sword  # Pogo the shot of the slug
-        HammerSJump=1 OR AerialHammerJump OR CoyoteHammerJump OR GlideHammerJump OR GrenadeJump
+        GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       WaterDash, Damage=30:
         Bash OR Launch OR DoubleJump
         Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
         Sword  # Pogo the shot of the slug
-        HammerSJump=1 OR AerialHammerJump OR CoyoteHammerJump OR GlideHammerJump OR GrenadeJump
+        GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
 
 
 # checkpoint at -356, -4306
