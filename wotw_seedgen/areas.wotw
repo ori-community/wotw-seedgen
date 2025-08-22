@@ -13261,8 +13261,6 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
 
 anchor KwolokEscape at -1650, -4125:
   nospawn
-  tprestriction:
-    moki: WestPools.ForestsStrength  # Necessary so logic doesn't assume a Right/LeftKwolokPlatform->Escape->use teleporter
   refill Full
 
   conn KwolokFight:  # Abilities needed for the escape part
