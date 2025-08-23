@@ -3053,6 +3053,8 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       Sword  # Pogo the slug
       DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1  # possible without glide but added it to the path in case you bonk on the ceiling after jumping from the pole
       Dash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe, SpiritLight=150:
       DoubleJump, Spear=1 OR Flash=1 OR Sentry=1 OR PauseFloat
       Dash, Spear=1 OR PauseFloat
@@ -3073,6 +3075,8 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     kii, WestHollow.FullyDrained:
       Hammer
       Combat=Slug+2xSkeeto, Sentry=2
+      # Glitched
+      # Combat=Slug+2xSkeeto, GrenadeJump=1
     unsafe:
       WestHollow.FullyDrained, Shuriken=2 OR Blaze=3 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
   conn WestHollow.PolesPound:
@@ -3080,8 +3084,9 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     gorlek: Dash
     kii: free
   conn WestHollow.AboveJumppad:
-    moki: Combat=Slug OR Bash
+    moki: Combat=Slug OR Bash OR Launch
     kii: Damage=10
+    unsafe: DoubleJump
   conn WestHollow.HollowDrainMiddle:  # paths which go directly because they need the checkpoint at HollowDrainMiddle for dirty swimming purposes
     unsafe:
       # Dirty Swims. All of the following contain duplicates of other paths for the purposes of softlock prevention. Middle state swim deals the most damage, so calculate damage according to that.
@@ -3129,6 +3134,7 @@ anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle
     unsafe:
       Bash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR BlazeSwap=1 OR PauseFloat # https://youtu.be/HP9uSoPhWUo
       Glide OR Spear=1  # https://youtu.be/g5qAXK3oz6k
+      GrenadeJump  # wall grenade jump
   conn WestHollow.HollowDrainLower:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki: WestHollow.FullyDrained
 
