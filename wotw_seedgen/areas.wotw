@@ -2759,8 +2759,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       Damage=20, Launch  # dboost in dirty water to pass under the upper tongue. If fully drained, solve by going to SubmergedPlatform
       Damage=20, DoubleJump, TripleJump  # if tongue is extended, dboost in dirty water. Else, wjump on the frog statue
     kii, WestHollow.UpperDrainLeverPulled:
-      Damage=20, DoubleJump, Hammer OR Spear=2 # wjump on the frog statue if the tongue is retracted, dboost in the water otherwise
-      Damage=20, DoubleJump, Spear=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # More energy efficient than 2 spears
+      Damage=20, DoubleJump, Hammer # wjump on the frog statue if the tongue is retracted, dboost in the water otherwise
       # Glitched
       # Damage=20, GlideJump, DoubleJump OR Hammer OR Spear=1
     unsafe:
@@ -2906,7 +2905,6 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
         Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
         Sword  # Pogo the shot of the slug
         GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
-
 
 # checkpoint at -356, -4306
 
