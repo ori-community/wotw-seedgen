@@ -3163,6 +3163,8 @@ anchor WestHollow.PolesPound at -123, -4377:  # Checkpoint at the right of the p
     kii:
       DoubleJump, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # Damage=10, GrenadeJump=1 OR SwordSJump=1
     unsafe:
       DoubleJump
       Damage=10, SwordSJump=1
@@ -3192,6 +3194,8 @@ anchor WestHollow.PolesPound at -123, -4377:  # Checkpoint at the right of the p
       WaterDash, Water, Bash, Damage=10
       WaterDash, Combat=Slug, Damage=30, Shuriken=2 OR Flash=2 OR Sentry=2
       WaterDash, Water, Combat=Slug, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
+      # Glitched
+      # GlideJump, Bash OR Combat=Slug
     unsafe:
       DoubleJump OR Dash OR PauseFloat OR GlideJump OR BlazeSwap=2 OR SentrySwap=2 OR FlashSwap  # avoiding slugs is hard and might take patience
       Damage=10, Glide OR Shuriken=2 OR Flash=2 OR Sentry=2
