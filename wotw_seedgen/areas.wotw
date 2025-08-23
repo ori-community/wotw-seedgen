@@ -3021,7 +3021,7 @@ anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad
       SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR WallHammerJump
       DoubleJump, Damage=10, Hammer OR GlideJump  # climb onto the frog
   conn WestHollow.HollowDrainMiddle:
-    unsafe, WestHollow.FullyDrained: WestHollow.UpperTongueExtended, Bash, Grenade=1  # bashnade to reach the tongue then jump in friendly spikes.
+    unsafe, WestHollow.FullyDrained: WestHollow.LowerTongueRetracted, WestHollow.UpperTongueExtended, Bash, Grenade=1  # bashnade to reach the tongue then jump in friendly spikes.
   # This path will become relevant when we pathfind WestHollow.UpperTongueExtended from this anchor (there's something in the likes of snipping the upper tongue after taking 2 dboost in the spikes)
   # But since it would only be used in seeds which spawn you in lower hollow with an header draining the water for you, this is just too much effort to make me pathfind that.
 
