@@ -2958,7 +2958,7 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
       GlideHammerJump OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 # land on the narrow ledge next to the spikes
       WestHollow.UpperTongueExtended, Dash OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
       WestHollow.UpperTongueRetracted, GrenadeJump  # Also works with both tongues extended but since both paths would simplify as Bow=2, GrenadeJump they are redundant despite using different states
-      # Bash, Grenade=2  # I think this softlock? Would work with both tongue extended but then it's redundent with the bashnade paths from gorlek (at least in unsafe)
+      Bash, Grenade=1  # If upper tongue is retracted, just bashnade. If both tongue are extended, jump on the lower one, bashnade to the upper tongue then use friendly spikes. If lower tongue is retracted, you can bashnade from WestHollow.AboveJumppad to reach the upper tongue.
   conn WestHollow.RockPuzzle:
     moki, WestHollow.FullyDrained: DoubleJump OR Dash  # Launch redundant with going to HollowDrainMiddle first
     gorlek, WestHollow.FullyDrained:
@@ -2990,6 +2990,7 @@ anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad
 
   pickup WestHollow.HiddenEC:
     moki: WestHollow.FullyDrained, BreakWall=10
+    # can't break that wall with waterdash because it only works with a single water level state
 
   conn WestHollow.HollowDrainLower:
     moki: WestHollow.FullyDrained
@@ -3004,13 +3005,25 @@ anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad
       Bash, Grenade=1, WestHollow.LowerTongueRetracted  # Precise grenade angle
       WestHollow.LowerTongueExtended, Dash, Hammer OR Flash=1 OR Sentry=1
       WestHollow.LowerTongueExtended, Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the slime to reach the tongue
+      # Glitched
+      # SwordSJump=1  # with tongue extended, running sjump to the left to land on the tongue. Else, running sjump to the right and sword hover directly to the anchor
+      # AerialHammerJump, TripleJump OR Damage=10  # dboost in the spikes on the right
+      # WestHollow.LowerTongueExtended, GlideJump, Hammer OR Spear=1
+      # WestHollow.LowerTongueExtended, GlideJump, Dash OR Shuriken=1 OR Flash=1 OR Sentry=1  # Walljump above the breakable wall after using a glide jump 
+      # WestHollow.LowerTongueExtended, GrenadeJump=1, Glide OR Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+      # WestHollow.LowerTongueExtended, GrenadeJump=1, Blaze=1, Spear=1 OR Damage=10
+      # WestHollow.LowerTongueExtended, GrenadeJump=2, Blaze=1, Bow=1  # Bow is to ensure you can retract the upper tongue. Could add paths for WestHollow.UpperTongueRetracted from this anchor but most path which can jump on the lower tongue can finish the connection directly. Adding a state means that the whole connection would use 3 gjump so it wouldn't even be accurate
     unsafe, WestHollow.FullyDrained:
       DoubleJump, TripleJump  # https://youtu.be/6BwlBv2Y4yM
-      WestHollow.LowerTongueExtended, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Dash OR Bash OR GlideJump OR Damage=10 OR PauseFloat  # this is extremely difficult and not fun if you can't fight the enemies. There's a small safe spot on the left of the spikes under the tongue that is useful for a lot of these paths. If you've already destroyed the rock wall, you'll have to jump on the tongue as it's extending, or do an extremely precise wall jump from below it. The tongue saves its state, so you can shoot it once to close it and then leave to refill energy. The Bash path requires you to get a slime onto the tongue and then lure a Skeeto up to follow.
-      WestHollow.LowerTongueExtended, Glide, Flash=1 OR Sentry=1
-      GrenadeJump, DoubleJump OR Dash OR PauseFloat  # Grenade Jump from next to the spikes
-      SentryJump=1 OR HammerJump
+      WestHollow.LowerTongueExtended, Bash  # Get a slime onto the tongue and then lure a Skeeto up to follow
+      WestHollow.LowerTongueExtended, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR Damage=10 OR PauseFloat  # this is extremely difficult and not fun if you can't fight the enemies. There's a small safe spot on the left of the spikes under the tongue that is useful for a lot of these paths. If you've already destroyed the rock wall, you'll have to jump on the tongue as it's extending, or do an extremely precise wall jump from below it. The tongue saves its state, so you can shoot it once to close it and then leave to refill energy
+      GrenadeJump, WestHollow.LowerTongueExtended OR DoubleJump OR Dash OR PauseFloat  # Grenade Jump from friendly spikes or to the tongue if it's extended
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR WallHammerJump
       DoubleJump, Damage=10, Hammer OR GlideJump  # climb onto the frog
+  conn WestHollow.HollowDrainMiddle:
+    unsafe, WestHollow.FullyDrained: WestHollow.UpperTongueExtended, Bash, Grenade=1  # bashnade to reach the tongue then jump in friendly spikes.
+  # This path will become relevant when we pathfind WestHollow.UpperTongueExtended from this anchor (there's something in the likes of snipping the upper tongue after taking 2 dboost in the spikes)
+  # But since it would only be used in seeds which spawn you in lower hollow with an header draining the water for you, this is just too much effort to make me pathfind that.
 
 anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left of Lupo
   refill Checkpoint
