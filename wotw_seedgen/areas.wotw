@@ -3197,7 +3197,7 @@ anchor WestHollow.PolesPound at -123, -4377:  # Checkpoint at the right of the p
       # Glitched
       # GlideJump, Bash OR Combat=Slug
     unsafe:
-      DoubleJump OR Dash OR PauseFloat OR GlideJump OR BlazeSwap=2 OR SentrySwap=2 OR FlashSwap  # avoiding slugs is hard and might take patience
+      DoubleJump OR Dash OR PauseFloat OR GlideJump OR GrenadeJump OR BlazeSwap=2 OR SentrySwap=2 OR FlashSwap  # avoiding slugs is hard and might take patience
       Damage=10, Glide OR Shuriken=2 OR Flash=2 OR Sentry=2
       Damage=20, Spear=2 OR Blaze=2
       WaterDash, Damage=10, Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -3218,7 +3218,10 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
       Bash, DoubleJump OR Dash OR Grenade=1
       Launch
     gorlek: DoubleJump OR Dash OR Glide OR Sword OR HammerSJump=1
-    kii: Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    kii:
+      Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: free
 
   conn WestHollow.HollowDrainLower:
@@ -3236,9 +3239,17 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
       DoubleJump, Glide OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # bash the mantis
       Dash, Sword OR Hammer OR Shuriken=4 OR Flash=4 OR Sentry=4  # From the starting point, both coyote dash and jumping then dashing works.
+      # Glitched
+      # GlideJump, Dash OR SentryJump=1 OR GrenadeJump=2  # Glide to the slime. With sjump, use weapon to reach the ledge above the slime and sjump from here. With gjump, one to reach the ledge above the slime and gjump+glide to the left wall (also possible to gjump to the pole directly but seems harder)
+      # GlideJump, Damage=10, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1  # Glide jump from spikes to the first pole. Energy weapon to reach the ledge above slime after walljumping from the left wall
+      # GrenadeJump=2, DoubleJump OR Sword
+      # GrenadeJump=3, Dash OR Glide OR Sword OR Hammer  # With hammer, easier to go directly to the pole. Sword could pogo the slime but you can kill it by throwing your grenade its way so not considering it
+      # GrenadeJump=3, Damage=10, Shuriken=4 OR Flash=4 OR Sentry=4  # hjump from the spikes to the first pole. energy weapon after first gjump to the slime + to grab the first pole + to grab the second pole + to reach the anchor (1st pole and anchor aren't mandatory)
+      # GrenadeJump=3, Sentry=6  # gjump to left wall instead of from spikes
     unsafe:
       Dash  # avoiding slugs is hard and might take patience
-      Sword
+      Sword OR GlideJump
+      GrenadeJump  # Precise gjump from the chekpoint itself to get a wjump to the slime, friendly spikes to reach the first pole and you can gjump from this pole to the anchor directly
       Bash, PauseFloat
       DoubleJump, Damage=10 OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Jump into the first spike wall or glide over it and then avoid the slugs
   conn WestHollow.DashArea:
