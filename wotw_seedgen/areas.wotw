@@ -3079,7 +3079,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       # Combat=Slug+2xSkeeto, GrenadeJump=1
     unsafe:
       WestHollow.FullyDrained, Shuriken=2 OR Blaze=3 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
-  conn WestHollow.PolesPound:
+  conn WestHollow.PolesPond:
     moki: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
     gorlek: Dash
     kii: free
@@ -3151,10 +3151,10 @@ anchor WestHollow.TrialStart at -120, -4260:  # At the Spirit Trial start
 
 # checkpoint at -124, -4377
 
-anchor WestHollow.PolesPound at -123, -4377:  # Checkpoint at the right of the pound on the way to dash
+anchor WestHollow.PolesPond at -123, -4377:  # Checkpoint at the right of the pound on the way to dash
   refill Checkpoint
 
-  pickup WestHollow.BelowLupoEX:
+  pickup WestHollow.FallingSlugEX:
     moki:  # All the path options here include a way to get past the enemies
       DoubleJump, Dash
       Launch
@@ -3224,7 +3224,7 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
       # GrenadeJump=1
     unsafe: free
 
-  conn WestHollow.HollowDrainLower:
+  conn WestHollow.PolesPond:
   # Skeeto only spawns if you have Dash.
   # Mantis doesn't spawn if you spawned at this anchor but the trial end point is far enough to make it spawns
     moki:
