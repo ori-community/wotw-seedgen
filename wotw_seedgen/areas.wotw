@@ -3269,8 +3269,12 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
     gorlek: SentryJump=1  # Launch would be redundant with going the long way around
     kii:
       Bash  # Bash the slug twice
-      DoubleJump, TripleJump  # Jump from where the door was. Can wall jump from it if it's still closed
+      DoubleJump, TripleJump, Hammer, Spear=1  # can tjump from where the door was but probably a bit too osbcure for kii
       WestHollow.DoorLever, DoubleJump, Sword  # Lure and pogo the mantis. Doesn't spawn if you spawned here but going under the slime is far enough to make it spawns.
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+      # GlideJump, DoubleJump, TripleJump OR Hammer OR Spear=1
+      # WestHollow.DoorLever, GlideJump, Sword  # Pogo the mantis
 
 anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at dash tree
   refill Checkpoint
