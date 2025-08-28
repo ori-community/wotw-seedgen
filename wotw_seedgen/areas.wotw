@@ -3289,7 +3289,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
   conn WestHollow.DashArea:  # Make sure it's not redundant with AboveDashTree->DashArea
     moki: Dash, Bash, Grenade=1
     gorlek: Dash, SentryJump=1
-    unsafe: HammerSJump=1 OR BlazeSwap=2 OR SentrySwap=2
+    unsafe: HammerSJump=1 OR BlazeSwap=2 OR SentrySwap=2 OR GlideJump  # GlideJump from one of the crushers
   conn WestHollow.DashRoomTopRight:
     moki:
       DoubleJump, Dash
