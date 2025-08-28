@@ -715,6 +715,7 @@ pub enum Trick {
     /// Redirecting projectiles with Sentry
     SentryRedirect,
     /// Cancelling falling momentum through the pause menu
+    #[serde(alias = "PauseHover")]
     PauseFloat,
     /// Storing a grounded jump into the air with Glide
     GlideJump,
@@ -731,6 +732,7 @@ pub enum Trick {
     /// Hammer Jump from a standard jump
     GroundedHammerJump,
     /// Extending momentum with Hammer
+    #[serde(alias = "ExtendedHammer")]
     HammerExtension,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
@@ -863,7 +865,6 @@ pub enum CreateGame {
     /// Create a lockout bingo game, which can optionally be used for co-op and multiworld
     LockoutBingo,
 }
-
 
 /// Configuration parameter for a header
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
