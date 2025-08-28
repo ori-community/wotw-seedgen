@@ -71,7 +71,7 @@ WestHollow.SwimEC, Kwoloks Hollow, Resource, Energy, kwolokGroupDescriptor, 937,
 WestHollow.LupoMap, Kwoloks Hollow, Shop, LupoZoneMap, npcsStateGroup, 48248, hasMapKwoloksHollow, 3638, , -146, -4321, -146, -4321
 WestHollow.TrialHC, Kwoloks Hollow, Resource, Life, kwolokGroupDescriptor, 937, halfHealthCell, 2463, , -122.0, -4268.2, -121.979996, -4267.23
 WestHollow.SpiritTrial, Kwoloks Hollow, SpiritLight, 1000, raceGroup, 44964, kwolokDropRace, 25545, 2, -115, -4259, -175.43, -4440.89
-WestHollow.BelowLupoEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholderA, 48192, , -82.3, -4369.6, -82.32001, -4369.565
+WestHollow.FallingSlugEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholderA, 48192, , -82.3, -4369.6, -82.32001, -4369.565
 WestHollow.AboveDashEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholderC, 61744, , -100.0, -4407.2, -99.98999, -4407.225
 WestHollow.DashRightEX, Kwoloks Hollow, SpiritLight, 50, kwolokGroupDescriptor, 937, smallExpOrbPlaceholder, 37926, , 11.6, -4401.1, 11.600098, -4401.12
 WestHollow.CrusherEX, Kwoloks Hollow, SpiritLight, 200, kwolokGroupDescriptor, 937, xpOrbA, 50176, , -37.5, -4452.6, -37.47986, -4452.6426
