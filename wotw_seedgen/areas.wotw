@@ -3350,9 +3350,16 @@ anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
       DoubleJump, Combat=WeakSlug, Shuriken=1 OR Flash=1 OR Sentry=1
       Dash, Combat=WeakSlug, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, DoubleJump  # Bash glide of the slime. There are position where it's annoying to do but there is enough alternative to make that path work
+      # Glitched
+      # Damage=10, SwordSJump=1  # Running sjump from the spikes
+      # GlideJump, DoubleJump OR Hammer
+      # GlideJump, Dash, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash OR DoubleJump OR Dash OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
       Glide, Combat=WeakSlug, Sentry=2
+      Sword, Shuriken=1 OR Grenade=1  # https://youtu.be/uEI18Q2KR3c
+      GlideJump, GrenadeJump  # grenadeJump from a GlideJump
+      HammerExtension  # From the pole
 
   conn WestHollow.DashCrushers:
     moki: Bash OR Glide OR Launch OR DoubleJump OR Dash
@@ -3376,7 +3383,13 @@ anchor WestHollow.AboveDashSemisolid at -81, -4411:  # the semisolid near WestHo
 
   conn WestHollow.DashArea: free
   conn WestHollow.DashRoomTopRight:  # check for redundancies with DashArea
-    kii: DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from the ledge right next to the spikes
+    kii:
+      DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from the ledge right next to the spikes
+      # Glitched
+      # Damage=10, SwordSJump=1
+      # AerialHammerJump
+      # GlideJump, DoubleJump
+      # Damage=10, GrenadeJump=1, Dash OR DoubleJump OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: WestHollow.DoorLever, Bash  # Bash the slime on the log above, use the mantis to go there too. Precise bash angle to send the slime in the spikes and bash it again after it dies. Also, the skeeto can come in the spikes area, making that path waaaaay easier
 
 region EastHollow:
