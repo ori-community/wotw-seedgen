@@ -3301,7 +3301,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
         SentryJump=1, Dash
         SwordSJump=1, Damage=10
         HammerSJump=1, DoubleJump
-      Combat=Mantis+Lizard, SentryJump=1:  # to reach the right ledge
+      SentryJump=1:  # to reach the right ledge
         SentryJump=1, Dash
         SwordSJump=1, Damage=10
         HammerSJump=1, DoubleJump
@@ -3313,14 +3313,26 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
       DoubleJump, Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, Damage=10, Shuriken=3 OR Flash=3 OR Sentry=3
       DoubleJump, Shuriken=4 OR Flash=4 OR Sentry=4
-      Dash, Sword OR Hammer OR Shuriken=4 OR Flash=4 OR Sentry=4
-      Dash, Damage=10, Shuriken=3 OR Flash=3 OR Sentry=3
+      Dash, Sword OR Hammer OR Shuriken=3 OR Flash=3 OR Sentry=3
+      # Glitched
+      # SentryJump=1 OR Bash OR GlideJump OR GrenadeJump=1:  # Reach the mantis spawning point
+      #   SwordSjump=1  # sjump to the pole then use sword hover
+      #   HammerSJump=1, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      # GlideJump, Bash, Grenade=1 OR Dash OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the mantis to reach the hanging log. Multiple solution to bash the mantis from higher: glide jump before bashing, bash the lizard as well or bait the mantis and return to the anchor coordinates before bashing it (you can also glide jump from the frinedly spikes above the right wall)
+      # GrenadeJump=3, Dash  # possible to reduce number of gjumps by using Spear/Blaze (which wouldn't be redundant with the dash+energy weapons paths) but using a them will always cost the same (or more) energy than a gjump
+      # GrenadeJump=1, Dash, Glide
+      # GrenadeJump=3, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      # GrenadeJump=2, DoubleJump:
+      #   Shuriken=2 OR Flash=2  # djump+energy weapon to the pole. Less energy than 3 gjump
+      #   Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # energy weapon for reaching the pole then dboost to get to the anchor 
     unsafe:
       Dash  # Coyote dash to the mantis spawwn position then coyote dash again from the frinedly spikes
       DoubleJump  # Wjump on the wall on the physic object under the spikes. Might be a ceiling jump?
       Sword  # https://youtu.be/FHBXBf1NP9A
       Bash, Grenade=1  # using the enemies to bash onto the hanging log
-      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
+      GrenadeJump OR BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
+      WallHammerJump OR CoyoteHammerJump  # Also uses HammerExtension from the pole but unsafe hammer jumps implicitly uses it so no need to add the flag 
+      GlideJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
 
 anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
   refill Checkpoint
