@@ -697,7 +697,7 @@ pub fn build(
                     }
                 }
 
-                Ok(graph::Connection { to, requirement })
+                Ok(graph::Connection { to, requirement, implicitly_generated: false })
             })
             .collect::<Result<Vec<_>, String>>()?;
 
@@ -762,6 +762,7 @@ pub fn build(
                         Requirement::State(context.node_map[visited_state_name.as_str()]),
                         build_requirement_group(&door.enter, false, &mut context),
                     ]),
+                    implicitly_generated: true,
                 })
             }
         }
