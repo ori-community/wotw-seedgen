@@ -342,10 +342,10 @@ mod tests {
         assert_eq!(
             reached,
             [
-                "GladesTown.UpdraftCeilingEX",
-                "GladesTown.AboveTpEX",
+                "GladesTown.UpdraftCeilingSL",
+                "GladesTown.AboveTpSL",
                 "GladesTown.BountyShard",
-                "GladesTown.BelowHoleHutEX"
+                "GladesTown.BelowHoleHutSL"
             ]
             .into_iter()
             .collect()
