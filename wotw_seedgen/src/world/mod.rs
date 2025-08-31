@@ -591,6 +591,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     pub fn damage_mod(&self, flying_target: bool, bow: bool) -> f32 {
         let mut damage_mod = 1.0;
 
+        // These all don't account for Spirit Shard upgrades
         if self.settings.difficulty >= logical_difficulty::DAMAGE_BUFFS {
             if self.skill(Skill::GladesAncestralLight) {
                 damage_mod += 0.25;
@@ -611,7 +612,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                 slots -= 1;
             }
             if slots > 0 && self.shard(Shard::SpiritSurge) {
-                damage_mod += self.spirit_light() as f32 * 0.0001; // TODO but this is capped right
+                damage_mod += self.spirit_light().min(3000) as f32 * 0.00005;
                 slots -= 1;
             }
             if slots > 0 && self.shard(Shard::LastStand) {
