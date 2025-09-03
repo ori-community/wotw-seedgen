@@ -595,6 +595,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       WaterDash, Hammer, Water OR Damage=10
       GrenadeJump, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # beside djump, everything use the friendly spikes
       GrenadeJump, Damage=10, Spear=1 OR Blaze=2
+      Water, WaterDash, GlideJump  # Waterdash-Glidejump over the spikes
   conn MarshSpawn.PoolsBurrowsSignpost:
     moki:
       Bash, DoubleJump, Dash
@@ -8114,6 +8115,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
       DoubleJump, TripleJump, Combat=Nest, GlideJump OR Water OR Damage=20
       Combat=Nest, SwordSJump=1, DoubleJump, TripleJump  # running sjump +tjump+upslash
       Combat=Nest, HammerSJump=1, DoubleJump, TripleJump, Dash
+      Water, WaterDash, GlideJump  # Waterdash-Glidejump to the ledge next to the nest
   pickup LowerReach.IcefallEX:
     moki, LowerReach.LeftFurnace:
       DoubleJump, Bash  # bash the enemies
@@ -8913,6 +8915,7 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       SwordSJump=1, DoubleJump, TripleJump OR Dash OR Glide  # double jump from the platform, refill dash/jumps by slashing the energy cristal then sjump on the plant
       SwordSJump=2, DoubleJump OR Glide OR Dash
       AerialHammerJump OR GlideHammerJump
+      LowerReach.ThawEastFurnace, Water, WaterDash, GlideJump  # Waterdash-Glidejump starting from the left side of the muncher. Other ledges are difficult to set up for the grounded wdash.
   conn LowerReach.EastFurnace:
     moki:
       Bash, Grenade=1
@@ -8927,7 +8930,9 @@ anchor LowerReach.SwimmingPool at -44, -4001:  # At the platform in the freezabl
       DoubleJump  # Precise wall jump on the left wall then wjump on the right wall
       LowerReach.ThawEastFurnace, Bash, WaterDash, Water OR Damage=40
       LowerReach.ThawEastFurnace, Bash, Water  # Bash the fish
-    unsafe: LowerReach.ThawEastFurnace, Bash, Damage=100  # Bash the fish
+    unsafe:
+      LowerReach.ThawEastFurnace, Bash, Damage=100  # Bash the fish
+      LowerReach.ThawEastFurnace, Water, WaterDash, GlideJump  # Waterdash-Glidejump
   conn LowerReach.HalfwayIceCavern:
     kii:
       Bash, Grenade=1, DoubleJump, TripleJump
@@ -13234,6 +13239,7 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
       Damage=40, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1
       SwordSJump=1, Water OR Damage=60
       Damage=40, SwordSJump=1, WaterDash
+      Water, WaterDash, GlideJump  # Waterdash-Glidejump to open the anemone
 
 # checkpoint at -1386, -4062
 
@@ -13437,6 +13443,7 @@ anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
       Burrow, Sword OR Sentry=3 OR Shuriken=1
       Grapple, Glide, Spear=2 OR Blaze=2
       Grapple, Shuriken=3 OR Sentry=4
+      Burrow, GlideJump  # Burrow-Glidejump to get up the ledge, GlideJump over the spikes
   conn WoodsMain.FeedingGrounds:
     moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow
@@ -14173,6 +14180,8 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
       Burrow, DoubleJump, Sword  # pogo the torpedo
       SentryJump=1
       Bash, DoubleJump, TripleJump  # Lure the miner on higher ground to the left
+      Bash, GlideJump, Damage=10  # Bash-Glidejump directly from beneath the miner. Needs contact damage.
+      Burrow, GlideJump  # Burrow-Glidejump
   pickup UpperWastes.MissileSpawnEX:
     moki: Burrow
   pickup UpperWastes.KSDoorEX:
