@@ -238,11 +238,17 @@ on binding_5 world_reset()
 fun world_reset() {
     store_defaults_exclude(
         "^("
+        // player
         + "5\|"
+        // skills
         + "|24\|"
+        // shards
         + "|25\|"
+        // water
         + "|6\|2000"
+        // playerUberStateDescriptor
         + "|3440\|"
+        // spirit wells
         + "|21786\|10185"
         + "|11666\|61594"
         + "|937\|26601"
