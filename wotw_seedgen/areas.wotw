@@ -1523,8 +1523,11 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
       # AerialHammerJump, TripleJump
     unsafe:
       SwordJump OR SentryJump=1
-      Water, Bash  # https://youtu.be/9LEokEz5GtA
       DoubleJump, TripleJump
+  conn MarshPastOpher.PoolsPathEast:  # Paths which can't start from MarshPastOpher.OpherSkipBranch (mainly because it uses enemies)
+    unsafe:
+      Water, Bash  # https://youtu.be/9LEokEz5GtA
+      Unpopular, DashBashChain, MarshSpawn.ToOpherBarrier  # Use the slug from MarshSpawn.Main. Normal and above can use the slime from the jump pad but it doesn't spawn in easy.
 
 anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
 # This anchor is a midway for going to MarshPastOpher.PoolsPathEast, since both paths from MarshPastOpher.MillView and MarshPastOpher.BowApproach want to reach that branch
@@ -1542,7 +1545,6 @@ anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
       # SentryJump=1
       # AerialHammerJump, TripleJump
     unsafe:
-      Water, Bash  # Second part of this video https://youtu.be/9LEokEz5GtA (drop down to MillView to actually start the path)
       DoubleJump, TripleJump, Damage=10
       DoubleJump, Damage=20
       Damage=30
@@ -1767,8 +1769,6 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
         Bash, DoubleJump OR Dash OR Sword OR Hammer  # https://youtu.be/LeoIWBsq-s0
       Bash, HammerExtension, Bow=1 OR Spear=1 OR Grenade=1  # Same as above but HammerExtension from the jumpad instead of using the first lantern
       Bash, Glide, Bow=1 OR Spear=1 OR Grenade=1 OR Shuriken=1  # https://youtu.be/LJmKEirEloM
-      Unpopular, DashBashChain  # Normal+ difficulty. Chain bash the slug next to the jumppad. Redundant path with starting from MillView and BowApproach since the slug is between all three
-      # Unpopular, DashBashChain, MarshSpawn.ToOpherBarrier  # Easy+ difficulty. Use the slug from MarshSpawn.Main as replacement.
   conn MarshPastOpher.OpherSkipBranch:  # Make sure it's not redundant with MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch nor MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
     unsafe:
       PauseFloat  # I hope it'll make you regret playing with that trick in logic
@@ -3932,7 +3932,7 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
       Glide, DoubleJump, TripleJump
       Bash, Grenade=1  # Bait the mantis
       GlideBashChain OR DoubleJumpBashChain  # Mantis. Glide bash chain is a lot easier with EastHollow.DepthsOpen
-      DashBashChain  # SneezeSlug projectile
+      DashBashChain  # Mortar projectile
 
   conn UpperDepths.Entry:
     moki: EastHollow.DepthsOpen
@@ -6850,7 +6850,7 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
       Dash, Hammer  # path from the right, tight combos to reach the platform
       Shuriken=2, DoubleJump OR Dash OR Glide
       FlashSwap
-      DashBashChain, Water  # Kelp projectile
+      Bash, Water  # Juggle a fish
   pickup InnerWellspring.SwimOre:
     moki: Water
     unsafe:  # Enemies aren't here if you don't have Clean Water
