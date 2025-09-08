@@ -14170,7 +14170,7 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
     gorlek:
       Burrow, Bash, Glide
       Bash, Grenade=1, DoubleJump
-      Combat=MaceMiner, SentryJump=1, DoubleJump
+      SentryJump=1, DoubleJump  # Kill the miner with sword/hammer
     kii:
       Bash, Grenade=1  # use the miner as well
       DoubleJump, TripleJump, Sword  # tjump->pogo->tjump->upslash
@@ -14180,8 +14180,7 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
       Burrow, DoubleJump, Sword  # pogo the torpedo
       SentryJump=1
       Bash, DoubleJump, TripleJump  # Lure the miner on higher ground to the left
-      Bash, GlideJump, Damage=10  # Bash-Glidejump directly from beneath the miner. Needs contact damage.
-      Burrow, GlideJump  # Burrow-Glidejump
+      Bash, GlideJump  # Bash-Glidejump directly from beneath the miner. Bash it once before to avoid dboost.
   pickup UpperWastes.MissileSpawnEX:
     moki: Burrow
   pickup UpperWastes.KSDoorEX:
