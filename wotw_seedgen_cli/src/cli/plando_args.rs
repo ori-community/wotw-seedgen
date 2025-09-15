@@ -13,7 +13,9 @@ pub struct PlandoArgs {
     /// Destination for the compiled seed
     #[arg(long, value_name = "PATH")]
     pub out: Option<PathBuf>,
-    // TODO watch functionality?
+    /// Recompile when the source changes
+    #[arg(short, long)]
+    pub watch: bool,
     #[command(flatten)]
     pub generation_args: GenerationArgs,
 }
