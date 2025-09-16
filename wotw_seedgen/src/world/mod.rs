@@ -351,7 +351,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         self.uber_states[weapon_upgrade.uber_identifier()].expect_integer() > 0
     }
 
-    pub fn inventory_display(&self) -> InventoryDisplay {
+    pub fn inventory_display(&self) -> InventoryDisplay<'_, '_, '_> {
         InventoryDisplay { world: self }
     }
 

@@ -32,9 +32,11 @@ pub fn seed_settings(settings: &mut UniversePresetSettings) -> Result<(), Error>
 
     let multiworld = world_settings.len() > 1;
     for (index, settings) in world_settings.iter_mut().enumerate() {
-        let prefix = multiworld
-            .then(|| format!("[World {index}] "))
-            .unwrap_or_default();
+        let prefix = if multiworld {
+            format!("[World {index}] ")
+        } else {
+            String::new()
+        };
 
         seed_world_settings(prefix, settings)?;
     }

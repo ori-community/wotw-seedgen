@@ -48,7 +48,7 @@ pub fn stats(args: StatsArgs) -> Result<(), Error> {
 
 fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Error> {
     let settings_json = serde_json::to_string(settings)?;
-    let settings_summary = summarize_settings(&settings);
+    let settings_summary = summarize_settings(settings);
 
     let mut path = PathBuf::from("stats");
 

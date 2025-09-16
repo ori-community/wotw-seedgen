@@ -111,8 +111,8 @@ impl UniversePreset {
     }
 
     fn check_compability(mut self) -> Result<UniversePresetSettings, String> {
-        const CONVERSIONS: [fn(&mut UniversePresetSettings) -> Result<(), String>; 1] =
-            [UniversePresetSettings::check_compability_0_to_1];
+        type Converter = fn(&mut UniversePresetSettings) -> Result<(), String>;
+        const CONVERSIONS: [Converter; 1] = [UniversePresetSettings::check_compability_0_to_1];
 
         for conversion in CONVERSIONS
             .get(self.assets_version as usize..)
@@ -304,8 +304,8 @@ impl WorldPreset {
     }
 
     fn check_compability(mut self) -> Result<WorldPresetSettings, String> {
-        const CONVERSIONS: [fn(&mut WorldPresetSettings) -> Result<(), String>; 1] =
-            [WorldPresetSettings::check_compability_0_to_1];
+        type Converter = fn(&mut WorldPresetSettings) -> Result<(), String>;
+        const CONVERSIONS: [Converter; 1] = [WorldPresetSettings::check_compability_0_to_1];
 
         for conversion in CONVERSIONS
             .get(self.assets_version as usize..)

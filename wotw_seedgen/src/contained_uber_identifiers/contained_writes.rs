@@ -16,7 +16,7 @@ where
 }
 
 pub trait ContainedWrites {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite>;
+    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>>;
 
     fn contained_write_identifiers(&self) -> impl Iterator<Item = UberIdentifier> {
         self.contained_writes().map(|write| write.uber_identifier)
@@ -78,13 +78,13 @@ pub enum CommonItem {
 }
 
 impl<T: ContainedWrites> ContainedWrites for Vec<T> {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite> {
+    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
         self.iter().flat_map(T::contained_writes)
     }
 }
 
 impl ContainedWrites for CommandVoid {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite> {
+    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
         match self {
             CommandVoid::Multi { commands } => nested(commands),
             // TODO Lookup could be relevant both here and in reads

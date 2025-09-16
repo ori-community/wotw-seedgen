@@ -41,7 +41,10 @@ fn main() -> Result<(), Error> {
         Cli::Regenerate { args } => regenerate(args),
         Cli::Daemon { args } => daemon(args),
         #[cfg(feature = "lsp")]
-        Cli::Lsp => Ok(wotw_seedgen_lsp::start()),
+        Cli::Lsp => {
+            wotw_seedgen_lsp::start();
+            Ok(())
+        },
     }
 }
 

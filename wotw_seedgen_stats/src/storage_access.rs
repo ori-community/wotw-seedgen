@@ -88,6 +88,7 @@ impl SeedStorageAccess for FileAccess {
 
 // An Iterator reading stored seeds from the filesystem
 pub struct ReadSeeds {
+    #[allow(clippy::type_complexity)]
     inner: Option<iter::Map<HandleErrorsReadDir, fn(DirEntry) -> Result<SeedSpoiler>>>,
 }
 impl ReadSeeds {

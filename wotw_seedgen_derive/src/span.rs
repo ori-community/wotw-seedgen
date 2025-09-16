@@ -69,6 +69,7 @@ pub fn span_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
     .into())
 }
 
+#[allow(clippy::too_many_arguments)]
 fn span_any_impl<FN, FNP, FU, FUP>(
     ident: &syn::Ident,
     mut generics: syn::Generics,
