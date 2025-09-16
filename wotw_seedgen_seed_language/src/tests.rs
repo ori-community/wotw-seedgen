@@ -161,6 +161,9 @@ fn snippets() {
             full_path.push(path);
             fs::read(full_path).map_err(|err| err.to_string())
         }
+        fn available_snippets(&self) -> Vec<String> {
+            vec![]
+        }
     }
 
     // TODO remove test output

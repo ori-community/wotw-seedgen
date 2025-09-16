@@ -31,4 +31,10 @@ impl PresetAccess for StaticPresetAccess {
             .cloned()
             .ok_or_else(|| format!("unknown world preset \"{identifier}\""))
     }
+    fn available_universe_presets(&self) -> Vec<String> {
+        self.universe_presets.keys().map(String::clone).collect()
+    }
+    fn available_world_presets(&self) -> Vec<String> {
+        self.world_presets.keys().map(String::clone).collect()
+    }
 }

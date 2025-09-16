@@ -60,23 +60,6 @@ impl FileAccess {
         Ok(Source::new(id, content))
     }
 
-    #[cfg(feature = "snippet_access")]
-    pub fn available_snippets(&self) -> Vec<String> {
-        self.files_in_folder("wotws")
-    }
-    #[cfg(feature = "presets")]
-    pub fn available_universe_presets(&self) -> Vec<String> {
-        self.available_presets("universe_presets")
-    }
-    #[cfg(feature = "presets")]
-    pub fn available_world_presets(&self) -> Vec<String> {
-        self.available_presets("world_presets")
-    }
-    #[cfg(feature = "presets")]
-    fn available_presets(&self, folder: &str) -> Vec<String> {
-        FileAccess::new(self.folders.iter().map(|path| path.join(folder))).files_in_folder("json")
-    }
-
     fn open(&self, path: &Path) -> Result<(PathBuf, File), String> {
         let mut attempts = vec![];
         for folder in &self.folders {
@@ -158,6 +141,9 @@ mod snippet_access {
         fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
             self.read(path).map(|(_, content)| content)
         }
+        fn available_snippets(&self) -> Vec<String> {
+            self.files_in_folder("wotws")
+        }
     }
 }
 
@@ -175,6 +161,12 @@ mod presets {
         fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
             self.preset(identifier, "world_presets".into())
         }
+        fn available_universe_presets(&self) -> Vec<String> {
+            self.available_presets("universe_presets")
+        }
+        fn available_world_presets(&self) -> Vec<String> {
+            self.available_presets("world_presets")
+        }
     }
 
     impl FileAccess {
@@ -188,6 +180,11 @@ mod presets {
             let (path, file) = self.open(&path)?;
             serde_json::from_reader(BufReader::new(file))
                 .map_err(|err| file_err("parse", &path, err))
+        }
+
+        fn available_presets(&self, folder: &str) -> Vec<String> {
+            FileAccess::new(self.folders.iter().map(|path| path.join(folder)))
+                .files_in_folder("json")
         }
     }
 }

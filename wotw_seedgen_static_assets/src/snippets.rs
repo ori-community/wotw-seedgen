@@ -25,4 +25,7 @@ impl SnippetAccess for StaticSnippetAccess {
     fn read_file(&self, _path: &Path) -> Result<Vec<u8>, String> {
         Err("cannot read arbitrary files with static file access".to_string())
     }
+    fn available_snippets(&self) -> Vec<String> {
+        self.snippets.keys().map(String::clone).collect()
+    }
 }

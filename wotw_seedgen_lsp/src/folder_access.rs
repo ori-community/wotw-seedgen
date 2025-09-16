@@ -1,5 +1,6 @@
 use std::path::{Path, PathBuf};
 
+use rustc_hash::FxHashSet;
 use tower_lsp::lsp_types::Url;
 use wotw_seedgen_seed_language::assets::{FileAccess, SnippetAccess, Source};
 use wotw_seedgen_static_assets::SNIPPET_ACCESS;
@@ -25,6 +26,17 @@ impl SnippetAccess for FolderAccess {
 
     fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
         self.file_access.read_file(path)
+    }
+
+    fn available_snippets(&self) -> Vec<String> {
+        FxHashSet::from_iter(
+            self.file_access
+                .available_snippets()
+                .into_iter()
+                .chain(SNIPPET_ACCESS.available_snippets()),
+        )
+        .into_iter()
+        .collect()
     }
 }
 

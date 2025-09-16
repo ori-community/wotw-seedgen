@@ -7,6 +7,8 @@ pub trait SnippetAccess {
     fn read_snippet(&self, identifier: &str) -> Result<Source, String>;
     /// Resolve binary includes such as `!bundle_icon(<path>)`
     fn read_file(&self, path: &Path) -> Result<Vec<u8>, String>;
+    /// Return a `Vec` of identifiers which may be passed to [`SnippetAccess::read_snippet`]
+    fn available_snippets(&self) -> Vec<String>;
 }
 
 /// [`SnippetAccess`] implementation that forbids accessing any snippets
@@ -22,5 +24,8 @@ impl SnippetAccess for NoSnippetAccess {
             "Attempted to read \"{}\" while explicitely using NoSnippetAccess",
             path.display()
         );
+    }
+    fn available_snippets(&self) -> Vec<String> {
+        vec![]
     }
 }

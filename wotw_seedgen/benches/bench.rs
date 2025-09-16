@@ -3,14 +3,16 @@ use std::time::Duration;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use lazy_static::lazy_static;
 use rand_pcg::Pcg64Mcg;
+use rustc_hash::FxHashMap;
 use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPool, UberStates, World};
-use wotw_seedgen_assets::{PresetAccess, WorldPreset, WorldPresetSettings};
+use wotw_seedgen_assets::{PresetAccess, SnippetAccess, WorldPreset, WorldPresetSettings};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::{Enemy, Graph, Requirement},
 };
+use wotw_seedgen_seed_language::compile::Compiler;
 use wotw_seedgen_settings::{Difficulty, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{
     LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
@@ -20,8 +22,8 @@ lazy_static! {
     static ref AREAS: Areas<'static> = parse(include_str!("../areas.wotw")).into_result().unwrap();
 }
 
-fn logic_parsing(c: &mut Criterion) {
-    let mut group = c.benchmark_group("parse");
+fn parse_logic(c: &mut Criterion) {
+    let mut group = c.benchmark_group("parse_logic");
 
     group.bench_function("areas", |b| {
         b.iter(|| parse::<Areas>(include_str!("../areas.wotw")))
@@ -35,6 +37,31 @@ fn logic_parsing(c: &mut Criterion) {
     });
 
     group.finish();
+}
+
+fn parse_snippets(c: &mut Criterion) {
+    let mut group = c.benchmark_group("parse_snippets");
+
+    let available_snippets = SNIPPET_ACCESS.available_snippets();
+
+    group.bench_function("all_snippets", |b| {
+        b.iter(|| {
+            let mut rng = Pcg64Mcg::new(0);
+            let mut compiler = Compiler::new(
+                &mut rng,
+                &*SNIPPET_ACCESS,
+                &*UBER_STATE_DATA,
+                FxHashMap::default(),
+                false,
+            );
+
+            for identifier in &available_snippets {
+                compiler.compile_snippet(&identifier).unwrap();
+            }
+
+            compiler.finish()
+        })
+    });
 }
 
 fn requirements(c: &mut Criterion) {
@@ -107,7 +134,7 @@ fn requirements(c: &mut Criterion) {
     group.finish();
 }
 
-fn reach_checking(c: &mut Criterion) {
+fn reach_check(c: &mut Criterion) {
     let mut group = c.benchmark_group("reach_check");
 
     let graph = compile_graph(&[]);
@@ -282,9 +309,10 @@ fn compile_graph(settings: &[WorldSettings]) -> Graph {
 
 criterion_group!(
     all,
-    logic_parsing,
+    parse_logic,
+    parse_snippets,
     requirements,
-    reach_checking,
+    reach_check,
     generation,
     multiworld
 );

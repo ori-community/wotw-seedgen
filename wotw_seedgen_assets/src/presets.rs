@@ -462,6 +462,10 @@ pub trait PresetAccess {
     fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String>;
     /// Returns the [`WorldPreset`] with the given identifier
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String>;
+    /// Return a `Vec` of identifiers which may be passed to [`PresetAccess::universe_preset`]
+    fn available_universe_presets(&self) -> Vec<String>;
+    /// Return a `Vec` of identifiers which may be passed to [`PresetAccess::world_preset`]
+    fn available_world_presets(&self) -> Vec<String>;
 }
 
 /// [`PresetAccess`] implementation that forbids accessing any presets
@@ -474,6 +478,12 @@ impl PresetAccess for NoPresetAccess {
     }
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
         panic!("Attempted to read world preset \"{identifier}\" while explicitely using NoPresetAccess");
+    }
+    fn available_universe_presets(&self) -> Vec<String> {
+        vec![]
+    }
+    fn available_world_presets(&self) -> Vec<String> {
+        vec![]
     }
 }
 
