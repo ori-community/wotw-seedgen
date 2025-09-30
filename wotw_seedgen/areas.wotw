@@ -3401,23 +3401,13 @@ region EastHollow:
   kii: free
   unsafe: free
 
-anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
+anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
   # before writing any paths that use the (left) mantis or the skeeto, please remember they only spawn when the player has bash
   refill Full
 
   state EastHollow.VoiceDoorOpen:
     moki: EastHollow.ForestsVoice
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
-
-  pickup EastHollow.HornBeetleFightEX:  # for future pathfinders: these paths should probably lead through VoiceDoorPlatform?
-    kii:
-      Bash  # baiting the skeeto can be annoying
-    unsafe:
-      HammerJump
-      DoubleJump, Sentry=3  # Use Sentry hops to boost the height
-      GrenadeJump
-      EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear
-      EastHollow.BeetleDefeated, DoubleJump, Sentry=4  # Djump+3 sentries from the vine, ceiling jump + sentry to access to the pickup
 
   conn Teleporters: free
   conn BeetleFight:
@@ -3427,22 +3417,32 @@ anchor EastHollow.Teleporter at -150, -4238:  # the teleporter
     # the enemies in the arena only spawn if you have Bash, which allows you to avoid them
     moki: EastHollow.BeetleDefeated, DoubleJump OR Bash OR Launch
     gorlek:
-      EastHollow.BeetleDefeated OR Launch
-      SentryJump=1, DoubleJump OR Dash OR Glide  # Go down to the pit, do SentryJump and the use Sword or Hammer to get to the rope
-    unsafe: WaveDash, DoubleJump  # wavedash off the teleporter
+      EastHollow.BeetleDefeated, Sword OR Hammer
+      SentryJump=1, DoubleJump OR Dash OR Glide  # Go down to the pit, do a SentryJump and then use Sword or Hammer to get to the rope
+    kii:
+      EastHollow.BeetleDefeated, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # EastHollow.BeetleDefeated, GlideJump OR GrenadeJump=1
+    unsafe:
+      EastHollow.BeetleDefeated  # Grab the vine by jumping from its right. Alternatively, can QtM after defeating the boss to lower the vine which makes grabbing it possible from the left or just under it.
+      SentryJump=1  # sentryjump from the arena to the vine then weapon hover. Sword use horizontal combo + down attack to grab the vine
+      WaveDash, DoubleJump  # wavedash off the teleporter
   conn EastHollow.VoiceDoorPlatform:
-    # for paths where the beetle is still alive, going from here is more advantageous than going from the right side
-    # so paths not using EastHollow.BeetleDefeated originate primarily from here, other paths preferrably use the connection to EastHollow.AfterBeetleFight
+  # paths where the beetle is still alive, going from here is more advantageous than going from EastHollow.AfterBeetleFight
+  # paths using EastHollow.BeetleDefeated originate from EastHollow.AfterBeetleFight instead
     gorlek:
+      Launch
       Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       SentryJump=1, DoubleJump, TripleJump
     kii:
       Bash
+      # Glitched
+      # AerialHammerJump OR SentryJump=1
+      # GrenadeJump=1, DoubleJump
+      # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       SwordJump, TripleJump
-      HammerJump
-      EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear
-      EastHollow.BeetleDefeated, DoubleJump, Sentry=3  # Djump+3 sentries from the vine
+      AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
   conn WestHollow.InFrontPurpleDoorEnemyPaths:
     moki: WestHollow.PurpleDoorOpen
 
@@ -3456,11 +3456,7 @@ anchor BeetleFight at -81, -4243:
     kii: Boss=250, Damage=35, Dash OR DoubleJump OR Launch
     unsafe: Boss=250
 
-# please split the VoiceDoorPlatform and MapMoki paths like this: everything to the right of the VoiceDoor is for VoiceDoorPlatform. everything to the left of it belongs to MapMoki
 anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
-  state EastHollow.VoiceDoorOpen:
-    moki: EastHollow.ForestsVoice
-
   # paths need to be completable with both door states if the state is not a requirement
   pickup EastHollow.HornBeetleFightEX:
     moki:
@@ -3469,30 +3465,47 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
       Launch
     gorlek:
       DoubleJump, TripleJump
+      SentryJump=1
     kii:
       DoubleJump, Hammer  # not too precise
+      Bash
+      # Glitched
+      # GlideJump, DoubleJump
+      # GrenadeJump=1  # can either gjump directly to the pickup or gjump on the wall
     unsafe:
-      SwordJump OR GrenadeJump
-      DoubleJump, Sentry=2  # Use Sentry hops to boost the height
-      EastHollow.BeetleDefeated, DoubleJump, Spear=1
-      EastHollow.BeetleDefeated, DoubleJump, Sentry=1  # ceiling jump + sentry to access to the pickup
+      GrenadeJump OR CoyoteHammerJump OR WallHammerJump
+      GlideJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1
+      GlideJump, Shuriken=1  # https://youtu.be/cqf69njc4xM
+      DoubleJump, Spear=1
+      DoubleJump, Sword OR Flash=1 OR Sentry=1  # ceiling jump then djump+ other ability to reach the wall
+      # DoubleJump, Sentry=2  # sentry -> djump -> sentry
 
   conn EastHollow.MapMoki:
     moki: EastHollow.VoiceDoorOpen
   conn EastHollow.Teleporter:
     moki: DoubleJump OR Dash OR Glide OR Bash OR Launch
-    gorlek: free
+    gorlek: Sword OR Hammer
+    kii: free
   conn EastHollow.AfterBeetleFight:  # make sure it's not redundant with ->teleporter->afterbeetlefight
     moki, EastHollow.BeetleDefeated: Glide
     gorlek:
+      Launch
       Bash, DoubleJump OR Dash OR Glide OR Sword
-      DoubleJump, TripleJump
-      DoubleJump, Dash, Glide OR Sword OR Hammer
+      DoubleJump, TripleJump OR Glide
+      DoubleJump, Dash, Sword OR Hammer
     kii:
       Bash  # need to bait the skeeto all the way on the right which can be annoying
-      Dash, DoubleJump
+      DoubleJump, Dash OR Sword OR Hammer  # hammer climbs the wall then djump on the ceiling
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, DoubleJump OR Glide OR Dash OR Sword
+      # GrenadeJump=1, Hammer, Shuriken=1
     unsafe:
-      HammerJump
+      Glide
+      CoyoteHammerJump OR WallHammerJump  # the hammer stall after the walljump on the ceiling looks veeery precise
+      WaveDash  # both the door and the wall after the moki works
+      DoubleJump, Spear=1 OR Flash=1 OR Sentry=1  # Spear either extends djump or ceiling jump (like flash/sentry)
+      DoubleJump, Shuriken=2  # shuriken -> djump -> shuriken directly to the vine
 
 anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door above beetle fight
   refill Checkpoint
@@ -3640,7 +3653,7 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
       # DoubleJump, Sword, Shuriken=1
   conn EastHollow.VoiceDoorPlatform:
     # for paths where the beetle has to be defeated, going from here is more advantageous than going from the teleporter
-    # so paths using EastHollow.BeetleDefeated originate primarily from here, other paths preferrably use the connection to EastHollow.Teleporter
+    # so paths using EastHollow.BeetleDefeated originate primarily from here, other paths need to check redundancy with going to EastHollow.Teleporter first
     moki, EastHollow.BeetleDefeated:
       Bash, DoubleJump OR Dash OR Glide
       Launch
@@ -3648,6 +3661,9 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
     kii:
       Grapple, DoubleJump, Sword, Dash  # Pogo the mantis
       EastHollow.BeetleDefeated, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear. Couldn't replicate but seems close so I'm gonna call it a skill issue until someone complains about this path
+      EastHollow.BeetleDefeated, DoubleJump, Sentry=3  # Djump+3 sentries from the vine
   conn EastHollow.Kwolok:
     moki:
       Bash, DoubleJump OR Dash OR Glide OR Launch
