@@ -1395,7 +1395,7 @@ where
     Command::Void(CommandVoid::Lookup { index })
 }
 
-const SPIRIT_LIGHT_NAMES: [(&str, &str); 86] = [
+const SPIRIT_LIGHT_NAMES: [(&str, &str); 87] = [
     ("Banana", "Bananas"),
     ("Bell", "Bells"),
     ("Bit", "Bits"),
@@ -1453,6 +1453,7 @@ const SPIRIT_LIGHT_NAMES: [(&str, &str); 86] = [
     ("Quatloo", "Quatloos"),
     ("Quill", "Quills"),
     ("Ring", "Rings"),
+    ("Rosary", "Rosaries"),
     ("Ruby", "Rubies"),
     ("Rune", "Runes"),
     ("Rupee", "Rupees"),
