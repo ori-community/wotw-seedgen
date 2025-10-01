@@ -3442,7 +3442,8 @@ anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
       # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       SwordJump, TripleJump
-      AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      GlideJump, DoubleJump, TripleJump
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
   conn WestHollow.InFrontPurpleDoorEnemyPaths:
     moki: WestHollow.PurpleDoorOpen
 
@@ -3474,7 +3475,7 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
       # GrenadeJump=1  # can either gjump directly to the pickup or gjump on the wall
     unsafe:
       GrenadeJump OR CoyoteHammerJump OR WallHammerJump
-      GlideJump, Sword OR Spear=1 OR Flash=1 OR Sentry=1
+      GlideJump, DoubleJump OR Sword OR Spear=1 OR Flash=1 OR Sentry=1
       GlideJump, Shuriken=1  # https://youtu.be/cqf69njc4xM
       DoubleJump, Spear=1
       DoubleJump, Sword OR Flash=1 OR Sentry=1  # ceiling jump then djump+ other ability to reach the wall
@@ -3506,6 +3507,8 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
       WaveDash  # both the door and the wall after the moki works
       DoubleJump, Spear=1 OR Flash=1 OR Sentry=1  # Spear either extends djump or ceiling jump (like flash/sentry)
       DoubleJump, Shuriken=2  # shuriken -> djump -> shuriken directly to the vine
+      GrenadeJump, DoubleJump OR Dash OR Sword
+      GrenadeJump, Hammer, Shuriken=1
 
 anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door above beetle fight
   refill Checkpoint
