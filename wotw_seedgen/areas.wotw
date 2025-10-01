@@ -3522,9 +3522,15 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
     kii:
       Deflector, Sword, Launch
       Deflector, Sword, DoubleJump, TripleJump OR Hammer OR Spear=1 OR Damage=10  # from the right wall or take a dboost in the left spikes
+      # Glitched
+      # Deflector, Sword, GrenadeJump  # No energy cost because grabing the pole autocancel grenade
     unsafe:
-      Deflector, Hammer, Launch OR DoubleJump
-
+      Deflector, Hammer, Launch OR DoubleJump OR GrenadeJump
+      Deflector, Sword, DoubleJump OR GrenadeJump
+      SentryRedirect=1, Launch OR SentryJump=1 OR GrenadeJump OR FlashSwap OR SentrySwap=1
+      SentryRedirect=1, DoubleJump, Sword OR Hammer  # grab the pole from the right wall
+      SentryRedirect=1, DoubleJump, Damage=10 OR GlideJump  # really precise wall jump to avoid the spikes
+      
   conn EastHollow.VoiceDoorPlatform:
     moki: EastHollow.VoiceDoorOpen
   conn EastHollow.OutsideGlades:
@@ -3539,16 +3545,22 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
       DoubleJump, TripleJump OR Spear=2 OR Damage=20
       DoubleJump, Damage=10, Hammer OR Spear=1  # either take a dboost to reach the first pole or climb from the right wall and take a dboost to refresh hammer's up slash
       Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump
+      # GlideJump, DoubleJump, Spear=2  # glidejump+djump+spear to reach the pole
+      # GlideJump, DoubleJump, Spear=1, Hammer OR Damage=10
     unsafe:
       Bash, Grenade=1  # land near the second pole, throw a grenade, jump on the pole and immediatly jump to the grenade. Avoiding spikes damage is a bit hard.
       GrenadeJump  # gjump to grab the pole then extend pole momentum to reach the ledge above the mortar and do the same from the second pole
-      DoubleJump, Hammer  #  If the ore wall is still present, djump from itm. Otherwise, land near the ore to refresh your upswing
+      DoubleJump, Hammer  #  If the ore wall is still present, djump from there. Otherwise, land near the ore to refresh your upswing
+      DoubleJump, Sword  # https://youtu.be/xYw_1eqUEEo
       DoubleJump, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Sword, Damage=10  # climb the left wall, pogo the mortar
       Damage=20, Hammer  # reset hammer upswings in the spikes
       DoubleJump, Dash  # right wall and some clean movement
       Hammer, Dash, Damage=10  # the 2 above together
       HammerExtension, Damage=10  # reset hammer upswing in the first spikes so you can reach the pole
+      FlashSwap
+      GlideJump, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR Damage=10  # Precise walljump on the left wall to avoid the first spikes
 
 anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
   state GladesTown.GromsWall:
