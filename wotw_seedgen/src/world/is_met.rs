@@ -8,7 +8,7 @@ use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::{Enemy, Requirement};
 use wotw_seedgen_settings::Difficulty;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Missing {
     Impossible,
     UberState(UberIdentifier),
@@ -222,7 +222,11 @@ impl World<'_, '_> {
                                 break;
                             }
                         }
-                        ControlFlow::Break(or_missing) => missing.push(or_missing),
+                        ControlFlow::Break(or_missing) => {
+                            if !missing.contains(&or_missing) {
+                                missing.push(or_missing);
+                            }
+                        }
                     }
                 }
 

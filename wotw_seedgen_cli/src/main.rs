@@ -28,6 +28,7 @@ fn main() -> Result<(), Error> {
     if env::var_os("ATTACH").is_some() {
         eprintln!("waiting for debugger...");
         debugger::wait_until_attached(None).unwrap();
+        eprintln!("debugger attached");
     }
 
     let cli = Cli::parse();
@@ -44,7 +45,7 @@ fn main() -> Result<(), Error> {
         Cli::Lsp => {
             wotw_seedgen_lsp::start();
             Ok(())
-        },
+        }
     }
 }
 

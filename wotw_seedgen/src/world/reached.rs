@@ -8,7 +8,7 @@ use crate::{
 };
 use itertools::Itertools;
 use log::trace;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::smallvec;
 use wotw_seedgen_assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
@@ -32,8 +32,8 @@ pub(crate) struct Progression {
 pub struct Reach {
     best_orbs: FxHashMap<usize, OrbVariants>,
     tp_reached: bool,
-    pub(crate) uber_state_progressions: FxHashMap<UberIdentifier, Vec<Progression>>,
-    pub(crate) logical_state_progressions: FxHashMap<usize, Vec<Progression>>,
+    pub(crate) uber_state_progressions: FxHashMap<UberIdentifier, FxHashSet<Progression>>,
+    pub(crate) logical_state_progressions: FxHashMap<usize, FxHashSet<Progression>>,
     pub(crate) orb_progression: bool,
     pub(super) logic_state_map: FxHashMap<UberIdentifier, Vec<usize>>,
 }
@@ -96,14 +96,14 @@ impl Reach {
         self.uber_state_progressions
             .entry(uber_identifier)
             .or_default()
-            .push(progression);
+            .insert(progression);
     }
 
     fn add_logical_state_progression(&mut self, index: usize, progression: Progression) {
         self.logical_state_progressions
             .entry(index)
             .or_default()
-            .push(progression);
+            .insert(progression);
     }
 }
 
