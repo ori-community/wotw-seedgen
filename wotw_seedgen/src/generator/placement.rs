@@ -19,7 +19,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, iter, mem, ops::RangeFrom};
+use std::{cmp::Ordering, mem, ops::RangeFrom};
 use wotw_seedgen_data::{CommonUberIdentifier, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed::SeedgenInfo;
@@ -309,17 +309,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
             let keystone = compile::keystone();
 
-            let spoiler_item = self.spoiler_item(0, &keystone);
-            self.spoiler.groups[self.step - 1]
-                .forced_items
-                .extend(iter::repeat_with(|| spoiler_item.clone()).take(missing_keystones));
-
             for _ in 0..missing_keystones {
                 let command = self.worlds[world_index].item_pool.remove_command(&keystone).unwrap_or_else(|| {
                     warn!("Not enough keystones in the item pool for forced keystone progression, placing anyway");
                     keystone.clone()
                 });
-                self.force_place_command(command, world_index);
+                self.force_place_command(command, world_index, true);
             }
         }
 
@@ -331,7 +326,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         for target_world_index in 0..self.worlds.len() {
             let items = mem::take(&mut *self.worlds[target_world_index].item_pool);
             for command in items {
-                self.force_place_command(command, target_world_index);
+                self.force_place_command(command, target_world_index, false);
             }
         }
         for world_context in &mut self.worlds {
@@ -385,7 +380,14 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 };
 
                 let name = self.name(&command, origin_world_index, target_world_index);
-                self.place_command_at(command, name, node, origin_world_index, target_world_index);
+                self.place_command_at(
+                    command,
+                    name,
+                    node,
+                    origin_world_index,
+                    target_world_index,
+                    false,
+                );
 
                 placements_remaining -= 1;
             }
@@ -445,7 +447,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             Progression::ItemPool(items) => {
                 for index in items.into_iter().rev() {
                     let command = self.worlds[target_world_index].item_pool.swap_remove(index);
-                    self.force_place_command(command, target_world_index);
+                    self.force_place_command(command, target_world_index, true);
                 }
             }
             Progression::SpiritLight(amount) => self.worlds[target_world_index]
@@ -453,7 +455,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    fn force_place_command(&mut self, command: CommandVoid, target_world_index: usize) {
+    fn force_place_command(
+        &mut self,
+        command: CommandVoid,
+        target_world_index: usize,
+        mark_forced: bool,
+    ) {
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
         let name = self.name(&command, origin_world_index, target_world_index);
         let origin_world = &mut self.worlds[origin_world_index];
@@ -479,6 +486,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     target_world_index,
                     NodeSummary::spawn(),
                     &command,
+                    mark_forced,
                 );
                 self.push_command(
                     Trigger::ClientEvent(ClientEvent::Spawn),
@@ -489,7 +497,14 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 );
             }
             Some(node) => {
-                self.place_command_at(command, name, node, origin_world_index, target_world_index);
+                self.place_command_at(
+                    command,
+                    name,
+                    node,
+                    origin_world_index,
+                    target_world_index,
+                    mark_forced,
+                );
             }
         }
     }
@@ -570,6 +585,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         node: &Node,
         origin_world_index: usize,
         target_world_index: usize,
+        mark_forced: bool,
     ) {
         trace!(
             "Placing {target_index}{log_name} at {origin_index}{node}",
@@ -593,6 +609,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             target_world_index,
             NodeSummary::new(node),
             &command,
+            mark_forced,
         );
         self.push_command(
             node_trigger(node).unwrap(),
@@ -649,17 +666,24 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         target_world_index: usize,
         location: NodeSummary,
         command: &CommandVoid,
+        mark_forced: bool,
     ) {
+        let item = self.spoiler_item(target_world_index, command);
+
+        let group = &mut self.spoiler.groups[self.step - 1];
+
+        if mark_forced {
+            group.forced_items.push(item.clone());
+        }
+
         let placement = SpoilerPlacement {
             origin_world_index,
             target_world_index,
             location,
-            item: self.spoiler_item(target_world_index, command),
+            item,
         };
 
-        self.spoiler.groups[self.step - 1]
-            .placements
-            .push(placement);
+        group.placements.push(placement);
     }
 
     fn spoiler_item(&mut self, target_world_index: usize, command: &CommandVoid) -> SpoilerItem {
