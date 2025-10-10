@@ -3656,7 +3656,7 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
     unsafe:
       EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear. Couldn't replicate but seems close so I'm gonna call it a skill issue until someone complains about this path
       EastHollow.BeetleDefeated, DoubleJump, Sentry=3  # Djump+3 sentries from the vine
-  conn EastHollow.KwolokApproach:
+  conn EastHollow.KwolokPathGrapplePlant:
     moki: Bash OR Launch
     gorlek:
       DoubleJump, TripleJump
@@ -3664,10 +3664,14 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
     kii:
       Grapple  # either hold up or do a walljump to see the grappable plant
       DoubleJump, Sword  # reset djump by hitting the mortar
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+      # GlideJump, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump  # can walljump on the ledge
       GlideJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
       BlazeSwap=1 OR FlashSwap OR BlazeSwap=1
+      AerialHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump
 
 # checkpoint at 21, -4220
 
@@ -3805,10 +3809,10 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
       SwordSJump=5, Dash OR Glide  # The mortar will break the ceiling for you
       SwordSJump=4, DoubleJump  # The mortar will break the ceiling for you
 
-anchor EastHollow.KwolokApproach at 21, -4220:  # Checkpoint at the first mortar on the way to Kwolok
+anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the first mortar on the way to Kwolok
   refill Checkpoint
   
-  pickup EastHollow.SecretRoofEX:
+  pickup EastHollow.SecretRoofEX:  # Check for redundancy with EastHollow.KwolokPathGrapplePlant->EastHollow.KwolokPathLantern->EastHollow.SecretRoofEX
     moki:
       Bash OR Launch
       Grapple, DoubleJump, Dash OR Glide
@@ -3820,29 +3824,60 @@ anchor EastHollow.KwolokApproach at 21, -4220:  # Checkpoint at the first mortar
       Grapple, DoubleJump
       Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       Grapple, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Dash
+      # Glitched
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer
     unsafe:
-      Grapple, Shuriken=2
-      HammerJump
-      DoubleJump, TripleJump
+      GlideHammerJump OR CoyoteHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      GrenadeJump, Sword  # https://youtu.be/hofmOwZ2ffk
+      GrenadeJump, DoubleJump OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR GlideJump
+      
+  conn EastHollow.AfterBeetleFight:
+    moki: Grapple OR Bash OR Launch OR DoubleJump OR Dash
+    gorlek: free
+  conn EastHollow.KwolokPathLantern:
+    moki: Bash OR Launch OR Grapple
+    gorlek: SentryJump=1
+    kii:
+      DoubleJump, TripleJump, Dash
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+      # GlideJump, DoubleJump, TripleJump OR Hammer
+    unsafe:
+      DoubleJump, TripleJump OR GlideJump
+      DoubleJump, Damage=10  # https://youtu.be/oT0RfJ_NBwY
+      AerialHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      
+anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to the first bashable lantern
+  pickup EastHollow.SecretRoofEX:  # these paths can't get over the big spike wall from the left anchor
+    gorlek: DoubleJump, TripleJump, Dash
+    kii:
+      DoubleJump, Dash OR TripleJump OR Sword OR Hammer
+      # Glitched
+      # GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Dash OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   pickup EastHollow.MortarEX:
     moki:
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek: Bash
+    gorlek:
+      Bash
+      Grapple, DoubleJump, TripleJump, Dash, SentryJump=1  # use your upslash to reach the mortar
     kii:
-      DoubleJump, TripleJump, Dash, Sword OR Hammer OR Spear=1 OR Damage=10  # refresh dash on ceiling. Pogo the mortar or dboost on the left wall to get to the pickup
-      Grapple, DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # Grapple, tjump, upslash, one horizontal attack, energy weapon
+      Grapple, DoubleJump, TripleJump, Hammer, Shuriken=1 # Grapple, tjump, upslash, one horizontal attack, shuriken
+      Grapple, DoubleJump, TripleJump, Dash, Sword OR Hammer  # pogo the mortar with sword or tjump + upslash with hammer
+      # Glitched 
+      # AerialHammerJump, TripleJump OR GlideJump
+      # SwordSJump=1, DoubleJump OR SentryJump=1  # running sjump to the mortar
     unsafe:
       DoubleJump, TripleJump, Dash  # using the walls and ceilings
-      DoubleJump, TripleJump, Hammer  # friendly spikes after the grappl section. Tjump+hammer upslash from there
-      SwordJump, TripleJump  # same as above
-      SentryJump=2  # hover to friendly spikes bellow the second mortar and sjump from here
-      Grapple, SentryJump=1
-      
-  conn EastHollow.AfterBeetleFight:
-    moki: Grapple OR Bash OR Launch OR DoubleJump
-    gorlek: free
+      DoubleJump, TripleJump, Sword OR Hammer  # Tjump+upslash from friendly spikes. Sword upslash need to hit the mortar to reset your jumps
+      SentryJump=1  # hover to friendly spikes bellow the second mortar and sjump from here
+      GrenadeJump, DoubleJump
+      AerialHammerJump
+  
+  conn EastHollow.KwolokPathGrapplePlant: free
   conn EastHollow.Kwolok:
     moki:
       Bash, DoubleJump OR Dash OR Glide OR Launch
@@ -3850,21 +3885,26 @@ anchor EastHollow.KwolokApproach at 21, -4220:  # Checkpoint at the first mortar
       Launch, Dash, Glide
     gorlek:
       Bash OR Launch
-      DoubleJump, TripleJump, Damage=10, Grapple OR SentryJump=1  # use the weapon to hover
+      DoubleJump, Damage=10, TripleJump OR Dash
     kii:
-      DoubleJump, TripleJump, Dash
-      DoubleJump, Grapple, Dash OR Glide OR Sword OR Hammer OR Sentry=3
-      DoubleJump, Grapple, Sentry=2, Damage=10
+      DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2
+      DoubleJump, Sentry=2, Damage=10
       Grapple, Glide, Dash
-      Grapple, Glide, Sentry=3, Damage=10
+      # Glitched
+      # SwordSJump=1, Glide OR Dash # running sjump to land near the mortar. Refresh dash into ceiling.
+      # SwordSJump=2, Damage=10
+      # HammerSJump=1, Glide, Dash OR Damage=10
+      # HammerSJump=1, Dash, Damage=10
+      # GrenadeJump=1, Dash, Glide 
+      # GrenadeJump=1, DoubleJump, Damage=10 
+      # GrenadeJump=2, Damage=10, Glide OR Dash OR Shuriken=2 Or Flash=2 OR Sentry=2  # gjump from the spikes
+      # GlideJump, Dash OR Damage=10
     unsafe:
-      Grapple, Dash, Damage=10
-      DoubleJump, Grapple, Shuriken=1
-      DoubleJump, TripleJump
-      DoubleJump, Dash, SentryJump=1
-      SentryJump=1, Glide
-      DoubleJump, Hammer, Damage=10  # dboost on the bottom of the wall so you can djump on the wall without getting knocked back
-      DoubleJump, Damage=10, Damage=10  # https://youtu.be/oT0RfJ_NBwY
+      Dash  # dash to friendly spikes then coyote dash from the friendly spikes on the right
+      Hammer, Glide  # Similar to above
+      DoubleJump, GrenadeCancel  # Similar to above
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Blaze=1 OR Sentry=1 OR Damage=10
+      Sword OR GlideJump
 
 anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
@@ -3905,7 +3945,6 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Water, Damage=10, DoubleJump OR SentryJump=1
       Water, DoubleJump, Hammer, Damage=10  # one extra dboost for kii
       Water, Bash, Damage=20  # Theorically possible with less damage but I don't want to check https://youtu.be/DsYMP004WTs
-
   pickup EastHollow.KwolokSwimOre:
     moki: Water, Bash OR Damage=10  # enemy in the way
     gorlek: Water
@@ -3936,28 +3975,24 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       WaterDash, Damage=60
       Bash, Damage=80
       WaterDash, Bash, Damage=40
-  pickup EastHollow.SecretRoofEX:  # this path can't get over the big spike wall from the left anchor
-    gorlek: DoubleJump, TripleJump, Dash
-    kii: DoubleJump, Dash OR TripleJump OR Sword OR Hammer OR Shuriken=1 OR Sentry=1
-    unsafe: Dash
 
-  conn EastHollow.KwolokApproach:
-    moki:  # since the ability bottleneck is right at the start, most paths to the pickups on the way are covered in this connection
+  conn EastHollow.KwolokPathLantern:
+    moki:
       Bash, DoubleJump OR Dash OR Glide
       DoubleJump, Dash OR Glide
       Dash, Glide, Damage=10
       Launch
     gorlek:
-      Bash, Damage=10 OR Sword OR Hammer
+      Bash, Damage=10 OR Hammer
       DoubleJump OR Dash OR Glide OR Sword
       Hammer, Damage=10
     kii:
       Hammer OR Sentry=3 OR Damage=20
+      Sentry=2, Shuriken=1  # less energy than 3 sentries
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Sentry=2, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1
     unsafe:
-      Bash OR Shuriken=2 OR Damage=10  # friendly spikes
+      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat  # friendly spikes
   conn WoodsEntry.ShriekMeet:
     moki, EastHollow.SilentSwimWall, Combat=Balloon:
       Water, Grapple, DoubleJump, Dash OR Glide
