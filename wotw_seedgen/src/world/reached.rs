@@ -119,13 +119,13 @@ impl World<'_, '_> {
     }
 
     #[inline]
-    pub fn has_reached(&self, index: usize) -> bool {
-        self.reach.best_orbs.contains_key(&index)
+    pub fn reached_pickup_count(&self) -> usize {
+        self.reached_nodes().filter(|node| node.is_pickup()).count()
     }
 
     #[inline]
-    pub fn reached_len(&self) -> usize {
-        self.reach.best_orbs.len()
+    pub fn has_reached(&self, index: usize) -> bool {
+        self.reach.best_orbs.contains_key(&index)
     }
 
     pub fn traverse_spawn(&mut self, events: &[Event]) {
@@ -142,7 +142,7 @@ impl World<'_, '_> {
             .reach
             .best_orbs
             .keys()
-            .filter_map(|node_index| self.graph.nodes[*node_index].get_anchor())
+            .filter_map(|node_index| self.graph.nodes[*node_index].try_as_anchor_ref())
             .collect::<Vec<_>>();
 
         for anchor in reached_anchors {

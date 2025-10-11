@@ -161,7 +161,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .nodes
             .iter()
             .filter_map(|node| {
-                node.get_anchor().and_then(|anchor| {
+                node.try_as_anchor_ref().and_then(|anchor| {
                     anchor
                         .door
                         .as_ref()
@@ -1000,7 +1000,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         uber_identifier: UberIdentifier,
         slots: usize,
     ) -> Option<WeightedProgression> {
-        let reached = self.world.reached_len();
+        let reached = self.world.reached_pickup_count();
 
         self.item_pool
             .progression_for(uber_identifier)
@@ -1012,7 +1012,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
                 self.world.simulate(item, &self.output.events);
 
-                let new_reached = self.world.reached_len().saturating_sub(reached);
+                let new_reached = self.world.reached_pickup_count().saturating_sub(reached);
                 let weight = weight(new_reached, uber_identifier, 1., 1, slots);
 
                 self.world.restore_snapshot();
@@ -1034,7 +1034,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             self.find_spirit_light_progression(spirit_light_slots)
         } else {
             let initial_value = self.world.uber_states.get(uber_identifier);
-            let initial_reached = self.world.reached_len();
+            let initial_reached = self.world.reached_pickup_count();
             let mut reached = initial_reached;
 
             self.world.snapshot();
@@ -1047,7 +1047,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 self.world.simulate(item, &self.output.events);
                 items.push(item_pool_index);
 
-                reached = self.world.reached_len();
+                reached = self.world.reached_pickup_count();
                 if reached > initial_reached {
                     break;
                 }
@@ -1079,7 +1079,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn find_spirit_light_progression(&mut self, slots: usize) -> Option<WeightedProgression> {
-        let initial_reached = self.world.reached_len();
+        let initial_reached = self.world.reached_pickup_count();
         let mut reached = 0;
 
         self.world.snapshot();
@@ -1090,7 +1090,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             self.world.modify_spirit_light(1, &self.output.events);
             amount += 1;
 
-            reached = self.world.reached_len();
+            reached = self.world.reached_pickup_count();
 
             if reached > initial_reached {
                 break;

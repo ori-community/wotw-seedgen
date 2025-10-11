@@ -1,6 +1,6 @@
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
-use strum::EnumString;
+use strum::{EnumIs, EnumString, EnumTryAs};
 use wotw_seedgen_assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::{Position, Shard, Skill, Teleporter, UberIdentifier, Zone};
 use wotw_seedgen_settings::{Difficulty, Trick};
@@ -29,7 +29,7 @@ impl Graph {
             .ok_or_else(|| format!("node \"{node}\" not found"))
     }
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, EnumIs, EnumTryAs)]
 pub enum Node {
     Anchor(Anchor),
     Pickup(LocDataEntry),
@@ -87,18 +87,6 @@ impl Node {
         match self {
             Node::Anchor(anchor) => anchor.position.is_some() && anchor.can_spawn,
             _ => false,
-        }
-    }
-    pub fn get_anchor(&self) -> Option<&Anchor> {
-        match self {
-            Node::Anchor(anchor) => Some(anchor),
-            _ => None,
-        }
-    }
-    pub fn get_anchor_mut(&mut self) -> Option<&mut Anchor> {
-        match self {
-            Node::Anchor(anchor) => Some(anchor),
-            _ => None,
         }
     }
     pub fn expect_anchor(&self) -> &Anchor {
