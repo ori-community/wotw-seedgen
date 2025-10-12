@@ -482,11 +482,12 @@ impl Display for FunctionArg {
 }
 
 impl<'source> ast::FunctionCall<'source> {
-    fn compile_custom_function(&self, compiler: &mut SnippetCompiler) -> Option<Command> {
-        let index = *compiler.function_indices.get(self.identifier.data.0)?;
-
-        // TODO are we dropping a result here?
-        if let Ok(parameters) = &self.parameters.content {
+    fn compile_custom_function(
+        self,
+        index: usize,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Command> {
+        if let Some(parameters) = compiler.consume_delimited(self.parameters) {
             if !parameters.is_empty() {
                 compiler.errors.push(Error::custom(
                     "parameters for custom functions aren't (yet) supported".to_string(),
@@ -541,6 +542,8 @@ impl<'source> ast::FunctionCall<'source> {
             }
         }
 
+        compiler.consume_result(self.parameters.close);
+
         let context = ArgContext {
             parameters: parameters.into_iter(),
             compiler,
@@ -554,8 +557,8 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
     type Output = Option<Command>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let custom_function @ Some(_) = self.compile_custom_function(compiler) {
-            return custom_function;
+        if let Some(index) = compiler.function_indices.get(self.identifier.data.0) {
+            return self.compile_custom_function(*index, compiler);
         }
 
         let (identifier, mut context) = self.compile_signature(compiler)?;

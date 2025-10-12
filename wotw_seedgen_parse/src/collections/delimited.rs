@@ -24,7 +24,7 @@ where
 
         let mut content = Content::ast_first(parser);
 
-        let mut close = if let Ok(content) = &mut content {
+        let close = if let Ok(content) = &mut content {
             loop {
                 match Close::ast(parser) {
                     Ok(close) => break Ok(close),
@@ -51,26 +51,20 @@ where
 
         if close.is_err() {
             let mut depth: u16 = 1;
-            close = loop {
-                match Close::ast(parser) {
-                    Ok(close) => {
-                        depth -= 1;
-                        if depth == 0 {
-                            break Ok(close);
-                        }
+            while !parser.is_finished() {
+                if Close::ast(parser).is_ok() {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
                     }
-                    Err(close_err) => {
-                        if Open::ast(parser).is_ok() {
-                            depth += 1;
-                        } else {
-                            parser.step();
-                        }
-                        if parser.is_finished() {
-                            break Err(close_err);
-                        }
+                } else {
+                    if Open::ast(parser).is_ok() {
+                        depth += 1;
+                    } else {
+                        parser.step();
                     }
                 }
-            };
+            }
         }
 
         Ok(Self {

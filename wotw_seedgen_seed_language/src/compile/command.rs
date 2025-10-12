@@ -508,14 +508,11 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
                 return;
             }
 
-            for contents in iter::repeat_n(self.contents.content, repetitions as usize) {
-                // short circuit on errors to avoid adding the same errors repeatedly
-                match contents.compile(compiler) {
-                    None => break,
-                    Some(nested) => {
-                        if nested.contains(&None) {
-                            break;
-                        }
+            if let Some(contents) = compiler.consume_delimited(self.contents) {
+                for contents in iter::repeat_n(contents, repetitions as usize) {
+                    // short circuit on errors to avoid adding the same errors repeatedly
+                    if contents.compile(compiler).contains(&None) {
+                        break;
                     }
                 }
             }
@@ -684,12 +681,13 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
     f: F,
 ) {
     if f(compiler
-            .global
-            .output
-            .item_metadata
-            .0
-            .entry(item)
-            .or_default()).replace(value)
+        .global
+        .output
+        .item_metadata
+        .0
+        .entry(item)
+        .or_default())
+    .replace(value)
     .is_some()
     {
         compiler.errors.push(Error::custom(
@@ -786,7 +784,7 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
         };
 
         let items = compiler
-            .consume_result(items.content)
+            .consume_delimited(items)
             .into_iter()
             .flatten()
             .filter_map(|action| {
@@ -857,7 +855,7 @@ impl<'source> Compile<'source> for ast::RandomPoolArgs<'source> {
         };
 
         let mut options_iter = compiler
-            .consume_result(values.content)
+            .consume_delimited(values)
             .into_iter()
             .flatten()
             .map(|expression| expression.evaluate(compiler));

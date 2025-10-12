@@ -15,6 +15,7 @@ use wotw_seedgen_data::{Icon, UberIdentifier};
 use wotw_seedgen_parse::{Error, Span, Spanned};
 
 impl Command {
+    // TODO unidiomatic naming
     pub(crate) fn expect_void<S: Span>(
         self,
         compiler: &mut SnippetCompiler<'_, '_, '_, '_>,
@@ -48,10 +49,9 @@ impl<'source> ast::ExpressionValue<'source> {
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<T> {
         match self {
-            ast::ExpressionValue::Group(group) => compiler
-                .consume_result(group.content)?
-                .0
-                .compile_into(compiler),
+            ast::ExpressionValue::Group(group) => {
+                compiler.consume_delimited(group)?.0.compile_into(compiler)
+            }
             ast::ExpressionValue::Action(action) => T::compile_action(action, compiler),
             ast::ExpressionValue::Literal(literal) => T::compile_literal(literal, compiler),
             ast::ExpressionValue::Identifier(identifier) => compiler

@@ -155,13 +155,14 @@ impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
-impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
+impl<'source, Open, Content: Compile<'source>, Close: Debug> Compile<'source>
     for Delimited<Open, Content, Close>
 {
     type Output = Option<Content::Output>;
 
     #[inline]
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        compiler.consume_result(self.close);
         self.content.compile(compiler)
     }
 }
@@ -370,6 +371,14 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
                 None
             }
         }
+    }
+
+    pub(crate) fn consume_delimited<Open, Content, Close>(
+        &mut self,
+        delimited: Delimited<Open, Content, Close>,
+    ) -> Option<Content> {
+        self.consume_result(delimited.close);
+        self.consume_result(delimited.content)
     }
 
     pub(crate) fn uber_state_type<S: Span>(

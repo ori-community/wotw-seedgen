@@ -100,7 +100,7 @@ impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let commands = compiler
-            .consume_result(self.actions.content)
+            .consume_delimited(self.actions)
             .into_iter()
             .flatten()
             .filter_map(|action| {
@@ -126,7 +126,7 @@ impl<'source> Compile<'source> for ast::Action<'source> {
             ast::Action::Condition(_, condition) => condition.compile(compiler),
             ast::Action::Multi(actions) => {
                 let commands = compiler
-                    .consume_result(actions.content)
+                    .consume_delimited(actions)
                     .into_iter()
                     .flatten()
                     .filter_map(|action| {
