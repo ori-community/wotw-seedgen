@@ -32,5 +32,5 @@ ordered-float = { version = "4.2", features = ["serde"] }
 notify = { version = "8.2.0", default-features = false }
 
 [[bin]]
-name = "seedgen"
+name = "wotw-seedgen"
 path = "src/main.rs"
