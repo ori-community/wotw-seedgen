@@ -155,7 +155,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
-impl<'source, Open, Content: Compile<'source>, Close: Debug> Compile<'source>
+impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
     for Delimited<Open, Content, Close>
 {
     type Output = Option<Content::Output>;
