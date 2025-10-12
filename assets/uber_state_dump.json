@@ -32935,6 +32935,13 @@
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
+        },
+        "96": {
+          "name": "flapDamage",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
         }
       }
     },
@@ -35540,6 +35547,20 @@
           "value": 3.0,
           "value_type": "Integer"
         },
+"40": {
+          "name": "playerPositionX",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "41": {
+          "name": "playerPositionY",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
         "50": {
           "name": "currentArea",
           "readonly": true,
@@ -37554,7 +37575,21 @@
           "value_type": "Boolean"
         },
         "300": {
-          "name": "tuleyExists",
+          "name": "spawnTuley",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "301": {
+          "name": "spawnOpherEverywhere",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "302": {
+          "name": "spawnTwillenEverywhere",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -37907,6 +37942,13 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "103": {
+          "name": "allowSpawningEnemiesNearby",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "11": {
           "name": "goodHollow",
           "readonly": false,
@@ -37998,12 +38040,54 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "30": {
+          "name": "useSpawnTuleyRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "301": {
           "name": "forceNoAirDecelerationFlag",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
+        },
+        "31": {
+          "name": "useSpawnOpherEverywhereRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "32": {
+          "name": "useSpawnTwillenEverywhereRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "33": {
+          "name": "useCanOpenMokiFatherHutRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "34": {
+          "name": "useRainLiftedInInkwaterRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "35": {
+          "name": "useRegenTreeDrainedRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         },
         "420": {
           "name": "baurSneezeWithBlaze",
