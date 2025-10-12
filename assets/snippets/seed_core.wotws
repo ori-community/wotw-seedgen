@@ -16,6 +16,11 @@ fun spawn_states() {
     store(randoConfig.usePatch2Kickback, true)
     store(randoConfig.allowTeleportingUnderwater, true)
     store(randoConfig.allowTeleportingDuringCombatShrineFights, true)
+    store(randoConfig.useSpawnOpherEverywhereRandoState, true)
+    store(randoState.spawnOpherEverywhere, true)
+    store(randoConfig.useSpawnTwillenEverywhereRandoState, true)
+    store(randoState.spawnTwillenEverywhere, true)
+    store(randoConfig.useRegenTreeDrainedRandoState, true)
     store(randoState.regenTreeDrained, true)
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     store(gromShop.spiritWellBought, true)
@@ -123,18 +128,33 @@ on gromShop.removeThornsBought store(gladesProjects.removeThornsBuilt, true)
 on gromShop.openCaveBought store(gladesProjects.openCaveBuilt, true)
 on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
 
+// In vanilla, the rain is lifted when getting the ability Sword.
+// In rando, we instead want the rain to be lifted when collecting the Sword tree location.
+on spawn store(randoConfig.useRainLiftedInInkwaterRandoState, true)
 on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true) // TODO rename Inkwater -> Marsh
-on EastPools.FightArenas store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
+// This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
+// This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
+// Hollow, which is usually not possible in vanilla, and then walk into Glades, that cutscene would play otherwise.
 on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneState == 2 {
     store(hubUberStateGroup.craftCutsceneState, 3)
     store(GladesTown.TwillenGemQuest, true)
 }
+// This probably does something important to prevent the quest from softlocking, but who knows.
 on InnerWellspring.WaterEscape store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 3)
-on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 3 store(GladesTown.TuleySpawned, true)
+// No one remembers what this does anymore.
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
+// This is presumed to fix some multiplayer bug but no one really knows.
 on WillowsEnd.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
 
-on questUberStateGroup.familyReunionQuest == 2 if WoodsEntry.DollQI store(questUberStateGroup.familyReunionQuest, 3)
+// In door rando or with warps/oob, collecting the DollQI can skip earlier quest steps and lock you out of obtaining the key.
+on spawn store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
+// When receiving the key, allow opening the hut
+on questUberStateGroup.familyReunionQuest == 2 {
+    store(randoState.canOpenMokiFatherHut, true)
+    // If DollQI is already collected and we have previously reverted this state, skip the DollQI quest step
+    if WoodsEntry.DollQI store(questUberStateGroup.familyReunionQuest, 3)
+}
+// If DollQI is collected without having opened the hut, revert the quest state to its previous value
 on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut == false {
     if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
     if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)
