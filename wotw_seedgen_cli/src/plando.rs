@@ -46,7 +46,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         (root, identifier)
     };
 
-    let logic_access = files::logic_access(root)?;
+    let logic_access = files::logic_access("")?;
     let uber_state_data =
         logic_access.uber_state_data(&logic_access.loc_data()?, &logic_access.state_data()?)?;
 
