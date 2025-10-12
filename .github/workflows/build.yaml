@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: seedgen-linux
-          path: ./target/release/seedgen
+          path: ./target/release/wotw-seedgen
           if-no-files-found: error
 
       - name: Archive Windows Artifacts
@@ -36,5 +36,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: seedgen-windows
-          path: ./target/release/seedgen.exe
+          path: ./target/release/wotw-seedgen.exe
           if-no-files-found: error
