@@ -39,7 +39,10 @@ pub enum Type {
     WheelItemPosition,
     WheelBind,
     Alignment,
+    HorizontalAnchor,
+    VerticalAnchor,
     ScreenPosition,
+    CoordinateSystem,
     Trigger,
     Expression,
     Void,
@@ -210,7 +213,11 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetMessageBackground
             | FunctionIdentifier::SetMessagePosition
             | FunctionIdentifier::SetMessageAlignment
+            | FunctionIdentifier::SetMessageHorizontalAnchor
+            | FunctionIdentifier::SetMessageVerticalAnchor
             | FunctionIdentifier::SetMessageScreenPosition
+            | FunctionIdentifier::SetMessageBoxWidth
+            | FunctionIdentifier::SetMessageCoordinateSystem
             | FunctionIdentifier::SetMapMessage
             | FunctionIdentifier::Store
             | FunctionIdentifier::StoreWithoutTriggers
@@ -318,7 +325,10 @@ impl InferType for Constant<'_> {
                 ConstantDiscriminants::WheelItemPosition => Type::WheelItemPosition,
                 ConstantDiscriminants::WheelBind => Type::WheelBind,
                 ConstantDiscriminants::Alignment => Type::Alignment,
+                ConstantDiscriminants::HorizontalAnchor => Type::HorizontalAnchor,
+                ConstantDiscriminants::VerticalAnchor => Type::VerticalAnchor,
                 ConstantDiscriminants::ScreenPosition => Type::ScreenPosition,
+                ConstantDiscriminants::CoordinateSystem => Type::CoordinateSystem,
             })
     }
 }
@@ -361,7 +371,10 @@ impl output::Constant {
             output::Constant::WheelItemPosition(_) => Type::WheelItemPosition,
             output::Constant::WheelBind(_) => Type::WheelBind,
             output::Constant::Alignment(_) => Type::Alignment,
+            output::Constant::HorizontalAnchor(_) => Type::HorizontalAnchor,
+            output::Constant::VerticalAnchor(_) => Type::VerticalAnchor,
             output::Constant::ScreenPosition(_) => Type::ScreenPosition,
+            output::Constant::CoordinateSystem(_) => Type::CoordinateSystem,
         }
     }
 }

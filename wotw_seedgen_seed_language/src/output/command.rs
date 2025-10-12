@@ -5,8 +5,8 @@ use super::{
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use wotw_seedgen_data::{
-    Alignment, EquipSlot, Equipment, MapIcon, ScreenPosition, UberIdentifier, WheelBind,
-    WheelItemPosition, Zone,
+    Alignment, CoordinateSystem, EquipSlot, Equipment, HorizontalAnchor, MapIcon, UberIdentifier,
+    VerticalAnchor, WheelBind, WheelItemPosition, Zone,
 };
 
 /// A Command, which may be used to affect the world, player or client state
@@ -272,9 +272,13 @@ impl From<Zone> for CommandZone {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum CommandVoid {
     /// Execute `commands`
-    Multi { commands: Vec<CommandVoid> },
+    Multi {
+        commands: Vec<CommandVoid>,
+    },
     /// Lookup and perform the action at `index`
-    Lookup { index: usize },
+    Lookup {
+        index: usize,
+    },
     /// Only perform `command` if `condition` evaluates to true
     If {
         condition: CommandBoolean,
@@ -300,13 +304,24 @@ pub enum CommandVoid {
     // /// Update the `callback` that triggers when queued message `id` is hidden
     // QueuedMessageHiddenCallback { id: usize, callback: usize },
     /// Show `message` immediately independent of the queue
-    FreeMessage { id: usize, message: CommandString },
+    FreeMessage {
+        id: usize,
+        message: CommandString,
+    },
     /// DESTROY message `id`
-    MessageDestroy { id: usize },
+    MessageDestroy {
+        id: usize,
+    },
     /// Update the `message` of message `id`
-    MessageText { id: usize, message: CommandString },
+    MessageText {
+        id: usize,
+        message: CommandString,
+    },
     /// Update the `timeout` of message `id`
-    MessageTimeout { id: usize, timeout: CommandFloat },
+    MessageTimeout {
+        id: usize,
+        timeout: CommandFloat,
+    },
     /// Update whether message `id` has a `background`
     MessageBackground {
         id: usize,
@@ -325,14 +340,32 @@ pub enum CommandVoid {
         y: CommandFloat,
     },
     /// Update the `alignment` of free message `id`
-    FreeMessageAlignment { id: usize, alignment: Alignment },
-    /// Update the `screen_position` of free message `id`
-    FreeMessageScreenPosition {
+    FreeMessageAlignment {
         id: usize,
-        screen_position: ScreenPosition,
+        alignment: Alignment,
+    },
+    /// Set the `horizontal_anchor` of free message `id`
+    FreeMessageHorizontalAnchor {
+        id: usize,
+        horizontal_anchor: HorizontalAnchor,
+    },
+    /// Set the `vertical_anchor` of free message `id`
+    FreeMessageVerticalAnchor {
+        id: usize,
+        vertical_anchor: VerticalAnchor,
+    },
+    FreeMessageBoxWidth {
+        id: usize,
+        width: CommandFloat,
+    },
+    FreeMessageCoordinateSystem {
+        id: usize,
+        coordinate_system: CoordinateSystem,
     },
     /// Sets the map message content to `value`
-    SetMapMessage { value: CommandString },
+    SetMapMessage {
+        value: CommandString,
+    },
     /// Store `value` in `uber_identifier` and check if any events are triggered
     StoreBoolean {
         uber_identifier: UberIdentifier,
@@ -352,32 +385,55 @@ pub enum CommandVoid {
         trigger_events: bool,
     },
     /// Temporarily store `value` under `id`. The value should live at least until the next tick
-    SetBoolean { id: usize, value: CommandBoolean },
+    SetBoolean {
+        id: usize,
+        value: CommandBoolean,
+    },
     /// Temporarily store `value` under `id`. The value should live at least until the next tick
-    SetInteger { id: usize, value: CommandInteger },
+    SetInteger {
+        id: usize,
+        value: CommandInteger,
+    },
     /// Temporarily store `value` under `id`. The value should live at least until the next tick
-    SetFloat { id: usize, value: CommandFloat },
+    SetFloat {
+        id: usize,
+        value: CommandFloat,
+    },
     /// Temporarily store `value` under `id`. The value should live at least until the next tick
-    SetString { id: usize, value: CommandString },
+    SetString {
+        id: usize,
+        value: CommandString,
+    },
     /// Save to disk, like an autosave
     Save {},
     /// Save to memory, but not to disk, like a boss fight checkpoint
     SaveToMemory {},
     /// Warp the player to (`x`, `y`)
-    Warp { x: CommandFloat, y: CommandFloat },
+    Warp {
+        x: CommandFloat,
+        y: CommandFloat,
+    },
     /// Equip `equipment` into `slot`
     Equip {
         slot: EquipSlot,
         equipment: Equipment,
     },
     /// Unequip `equipment` from any slot it may be equipped in
-    Unequip { equipment: Equipment },
+    Unequip {
+        equipment: Equipment,
+    },
     /// Act as though the user would have pressed `bind`
-    TriggerKeybind { bind: String },
+    TriggerKeybind {
+        bind: String,
+    },
     /// Start syncing `uber_identifier` in co-op
-    EnableServerSync { uber_identifier: UberIdentifier },
+    EnableServerSync {
+        uber_identifier: UberIdentifier,
+    },
     /// Stop syncing `uber_identifier` in co-op
-    DisableServerSync { uber_identifier: UberIdentifier },
+    DisableServerSync {
+        uber_identifier: UberIdentifier,
+    },
     /// Set the map icon associated with the `location` identifier from loc_data to `icon`
     SetSpoilerMapIcon {
         location: String,
@@ -391,9 +447,14 @@ pub enum CommandVoid {
         y: CommandFloat,
     },
     /// Set the map label of an existing spirit well icon `id` to `label`
-    SetWarpIconLabel { id: usize, label: CommandString },
+    SetWarpIconLabel {
+        id: usize,
+        label: CommandString,
+    },
     /// DESTROY the spirit well icon `id`
-    DestroyWarpIcon { id: usize },
+    DestroyWarpIcon {
+        id: usize,
+    },
     // TODO would seem more efficient to set these at once to save uber_identifier lookups
     // (same for wheel stuff)
     /// Set the price of the shop item at `uber_identifier` to `price`
@@ -466,7 +527,9 @@ pub enum CommandVoid {
         position: WheelItemPosition,
     },
     /// Switch the active wheel to `wheel`
-    SwitchWheel { wheel: usize },
+    SwitchWheel {
+        wheel: usize,
+    },
     /// If a `wheel` is `pinned`, it should remain the active wheel after closing and reopening the randomizer wheel
     SetWheelPinned {
         wheel: usize,
@@ -475,5 +538,7 @@ pub enum CommandVoid {
     /// Reset all wheel items to their default state
     ResetAllWheels {},
     /// Write `message` into the client log
-    DebugLog { message: CommandString },
+    DebugLog {
+        message: CommandString,
+    },
 }

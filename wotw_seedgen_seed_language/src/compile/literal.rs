@@ -181,8 +181,18 @@ impl<'source> Compile<'source> for ast::Constant<'source> {
             }
             ConstantDiscriminants::WheelBind => parse_variant(variant, span, Constant::WheelBind),
             ConstantDiscriminants::Alignment => parse_variant(variant, span, Constant::Alignment),
+
+            ConstantDiscriminants::HorizontalAnchor => {
+                parse_variant(variant, span, Constant::HorizontalAnchor)
+            }
+            ConstantDiscriminants::VerticalAnchor => {
+                parse_variant(variant, span, Constant::VerticalAnchor)
+            }
             ConstantDiscriminants::ScreenPosition => {
                 parse_variant(variant, span, Constant::ScreenPosition)
+            }
+            ConstantDiscriminants::CoordinateSystem => {
+                parse_variant(variant, span, Constant::CoordinateSystem)
             }
         };
         compiler.consume_result(constant)

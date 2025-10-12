@@ -210,10 +210,27 @@ impl Display for CommandVoid {
             CommandVoid::FreeMessageAlignment { id, alignment } => {
                 write!(f, "set_message_alignment({id}, {alignment})")
             }
-            CommandVoid::FreeMessageScreenPosition {
+            CommandVoid::FreeMessageHorizontalAnchor {
                 id,
-                screen_position,
-            } => write!(f, "set_message_screen_position({id}, {screen_position})"),
+                horizontal_anchor,
+            } => write!(
+                f,
+                "set_message_horizontal_anchor({id}, {horizontal_anchor})"
+            ),
+            CommandVoid::FreeMessageVerticalAnchor {
+                id,
+                vertical_anchor,
+            } => write!(f, "set_message_vertical_anchor({id}, {vertical_anchor})"),
+            CommandVoid::FreeMessageBoxWidth { id, width } => {
+                write!(f, "set_message_box_width({id}, {width})")
+            }
+            CommandVoid::FreeMessageCoordinateSystem {
+                id,
+                coordinate_system,
+            } => write!(
+                f,
+                "set_message_coordinate_system({id}, {coordinate_system})"
+            ),
             CommandVoid::SetMapMessage { value } => write!(f, "set_map_message({value})"),
             CommandVoid::StoreBoolean {
                 uber_identifier,

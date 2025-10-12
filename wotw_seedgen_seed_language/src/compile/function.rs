@@ -20,7 +20,10 @@ use std::{
 };
 use strum::{Display, EnumString, VariantArray};
 use wotw_seedgen_assets::UberStateValue;
-use wotw_seedgen_data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WheelBind};
+use wotw_seedgen_data::{
+    Alignment, HorizontalAnchor, ScreenPosition, Shard, Skill, Teleporter, UberIdentifier,
+    VerticalAnchor, WeaponUpgrade, WheelBind,
+};
 use wotw_seedgen_parse::{Error, Punctuated, Span, SpanEnd, SpanStart, Symbol};
 
 // TODO could we make these helper functions const if multis used smallvecs?
@@ -237,7 +240,11 @@ pub enum FunctionIdentifier {
     SetMessageBackground,
     SetMessagePosition,
     SetMessageAlignment,
+    SetMessageHorizontalAnchor,
+    SetMessageVerticalAnchor,
     SetMessageScreenPosition,
+    SetMessageBoxWidth,
+    SetMessageCoordinateSystem,
     SetMapMessage,
     Store,
     StoreWithoutTriggers,
@@ -404,7 +411,11 @@ impl FunctionIdentifier {
             SetMessageBackground(id: String, background: Boolean),
             SetMessagePosition(id: String, x: Float, y: Float),
             SetMessageAlignment(id: String, alignment: Alignment),
+            SetMessageHorizontalAnchor(id: String, horizontal_anchor: HorizontalAnchor),
+            SetMessageVerticalAnchor(id: String, vertical_anchor: VerticalAnchor),
             SetMessageScreenPosition(id: String, screen_position: ScreenPosition),
+            SetMessageBoxWidth(id: String, width: Float),
+            SetMessageCoordinateSystem(id: String, coordinate_system: CoordinateSystem),
             SetMapMessage(message: String),
             Store(uber_identifier: UberIdentifier, value: ?),
             StoreWithoutTriggers(uber_identifier: UberIdentifier, value: ?),
@@ -852,10 +863,163 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     alignment: arg(&mut context)?,
                 })
             }
-            FunctionIdentifier::SetMessageScreenPosition => {
-                Command::Void(CommandVoid::FreeMessageScreenPosition {
+
+            FunctionIdentifier::SetMessageHorizontalAnchor => {
+                Command::Void(CommandVoid::FreeMessageHorizontalAnchor {
                     id: message_id(&mut context)?,
-                    screen_position: arg(&mut context)?,
+                    horizontal_anchor: arg(&mut context)?,
+                })
+            }
+            FunctionIdentifier::SetMessageVerticalAnchor => {
+                Command::Void(CommandVoid::FreeMessageVerticalAnchor {
+                    id: message_id(&mut context)?,
+                    vertical_anchor: arg(&mut context)?,
+                })
+            }
+            FunctionIdentifier::SetMessageScreenPosition => {
+                let id = message_id(&mut context)?;
+
+                let commands = match arg(&mut context)? {
+                    ScreenPosition::TopLeft => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Left,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Left,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Top,
+                        },
+                    ],
+                    ScreenPosition::TopCenter => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Center,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Center,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Top,
+                        },
+                    ],
+                    ScreenPosition::TopRight => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Right,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Right,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Top,
+                        },
+                    ],
+                    ScreenPosition::MiddleLeft => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Left,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Left,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Middle,
+                        },
+                    ],
+                    ScreenPosition::MiddleCenter => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Center,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Center,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Middle,
+                        },
+                    ],
+                    ScreenPosition::MiddleRight => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Right,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Right,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Middle,
+                        },
+                    ],
+                    ScreenPosition::BottomLeft => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Left,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Left,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Bottom,
+                        },
+                    ],
+                    ScreenPosition::BottomCenter => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Center,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Center,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Bottom,
+                        },
+                    ],
+                    ScreenPosition::BottomRight => vec![
+                        CommandVoid::FreeMessageAlignment {
+                            id,
+                            alignment: Alignment::Right,
+                        },
+                        CommandVoid::FreeMessageHorizontalAnchor {
+                            id,
+                            horizontal_anchor: HorizontalAnchor::Right,
+                        },
+                        CommandVoid::FreeMessageVerticalAnchor {
+                            id,
+                            vertical_anchor: VerticalAnchor::Bottom,
+                        },
+                    ],
+                };
+
+                Command::Void(CommandVoid::Multi { commands })
+            }
+            FunctionIdentifier::SetMessageBoxWidth => {
+                Command::Void(CommandVoid::FreeMessageBoxWidth {
+                    id: message_id(&mut context)?,
+                    width: arg(&mut context)?,
+                })
+            }
+            FunctionIdentifier::SetMessageCoordinateSystem => {
+                Command::Void(CommandVoid::FreeMessageCoordinateSystem {
+                    id: message_id(&mut context)?,
+                    coordinate_system: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetMapMessage => Command::Void(CommandVoid::SetMapMessage {

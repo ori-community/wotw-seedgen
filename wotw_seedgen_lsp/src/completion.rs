@@ -3,9 +3,9 @@ use rustc_hash::FxHashMap;
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
 use wotw_seedgen_assets::{
     data::{
-        self, Alignment, EquipSlot, Equipment, GromIcon, LupoIcon, MapIcon, OpherIcon,
-        ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VariantArray, WeaponUpgrade,
-        WheelBind, WheelItemPosition, Zone,
+        self, Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
+        LupoIcon, MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon,
+        VariantArray, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
     },
     UberStateAlias, UberStateDataEntry,
 };
@@ -439,9 +439,21 @@ lazy_static! {
         enum_member_completion_with_detail(WheelBind::VARIANTS, |wheel_bind| *wheel_bind as u8);
     static ref ALIGNMENT_COMPLETION: Vec<CompletionItem> =
         enum_member_completion_with_detail(Alignment::VARIANTS, |alignment| *alignment as u8);
+    static ref HORIZONTAL_ANCHOR_COMPLETION: Vec<CompletionItem> =
+        enum_member_completion_with_detail(HorizontalAnchor::VARIANTS, |horizontal_anchor| {
+            *horizontal_anchor as u8
+        });
+    static ref VERTICAL_ANCHOR_COMPLETION: Vec<CompletionItem> =
+        enum_member_completion_with_detail(VerticalAnchor::VARIANTS, |vertical_anchor| {
+            *vertical_anchor as u8
+        });
     static ref SCREEN_POSITION_COMPLETION: Vec<CompletionItem> =
         enum_member_completion_with_detail(ScreenPosition::VARIANTS, |screen_position| {
             *screen_position as u8
+        });
+    static ref COORDINATE_SYSTEM_COMPLETION: Vec<CompletionItem> =
+        enum_member_completion_with_detail(CoordinateSystem::VARIANTS, |coordinate_system| {
+            *coordinate_system as u8
         });
 }
 
@@ -462,7 +474,10 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
         ConstantDiscriminants::WheelItemPosition => WHEEL_ITEM_POSITION_COMPLETION.clone(),
         ConstantDiscriminants::WheelBind => WHELL_BIND_COMPLETION.clone(),
         ConstantDiscriminants::Alignment => ALIGNMENT_COMPLETION.clone(),
+        ConstantDiscriminants::HorizontalAnchor => HORIZONTAL_ANCHOR_COMPLETION.clone(),
+        ConstantDiscriminants::VerticalAnchor => VERTICAL_ANCHOR_COMPLETION.clone(),
         ConstantDiscriminants::ScreenPosition => SCREEN_POSITION_COMPLETION.clone(),
+        ConstantDiscriminants::CoordinateSystem => COORDINATE_SYSTEM_COMPLETION.clone(),
     }
 }
 

@@ -18,7 +18,7 @@ mod zone;
 
 pub use equipment::{EquipSlot, Equipment};
 pub use icon::{GromIcon, Icon, LupoIcon, MapIcon, OpherIcon, TuleyIcon};
-pub use message::{Alignment, ScreenPosition};
+pub use message::{Alignment, CoordinateSystem, HorizontalAnchor, ScreenPosition, VerticalAnchor};
 pub use position::Position;
 pub use shard::Shard;
 pub use skill::Skill;

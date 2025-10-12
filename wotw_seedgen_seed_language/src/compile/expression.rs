@@ -935,7 +935,10 @@ impl_constants_coerce_from!(
     TuleyIcon,
     MapIcon,
     Alignment,
+    HorizontalAnchor,
+    VerticalAnchor,
     ScreenPosition,
+    CoordinateSystem,
 );
 impl CompileIntoLiteral for String {
     fn coerce_literal(

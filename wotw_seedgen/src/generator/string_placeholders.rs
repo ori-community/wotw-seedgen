@@ -399,7 +399,10 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::DefineTimer { .. }
             | Self::MessageDestroy { .. }
             | Self::FreeMessageAlignment { .. }
-            | Self::FreeMessageScreenPosition { .. }
+            | Self::FreeMessageHorizontalAnchor { .. }
+            | Self::FreeMessageVerticalAnchor { .. }
+            | Self::FreeMessageBoxWidth { .. }
+            | Self::FreeMessageCoordinateSystem { .. }
             | Self::Save {}
             | Self::SaveToMemory {}
             | Self::Equip { .. }

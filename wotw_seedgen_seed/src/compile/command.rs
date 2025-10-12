@@ -244,11 +244,28 @@ impl Compile for input::CommandVoid {
                 vec![Command::FreeMessageAlignment(id, alignment)],
                 MemoryUsed::ZERO,
             ),
-            Self::FreeMessageScreenPosition {
+            CommandVoid::FreeMessageHorizontalAnchor {
                 id,
-                screen_position,
+                horizontal_anchor,
             } => (
-                vec![Command::FreeMessageScreenPosition(id, screen_position)],
+                vec![Command::FreeMessageHorizontalAnchor(id, horizontal_anchor)],
+                MemoryUsed::ZERO,
+            ),
+            CommandVoid::FreeMessageVerticalAnchor {
+                id,
+                vertical_anchor,
+            } => (
+                vec![Command::FreeMessageVerticalAnchor(id, vertical_anchor)],
+                MemoryUsed::ZERO,
+            ),
+            CommandVoid::FreeMessageBoxWidth { id, width } => Args::new(command_lookup)
+                .float(0, width)
+                .call(Command::FreeMessageBoxWidth(id)),
+            CommandVoid::FreeMessageCoordinateSystem {
+                id,
+                coordinate_system,
+            } => (
+                vec![Command::FreeMessageCoordinateSystem(id, coordinate_system)],
                 MemoryUsed::ZERO,
             ),
             Self::SetMapMessage { value } => Args::new(command_lookup)

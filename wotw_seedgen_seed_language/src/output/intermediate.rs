@@ -36,7 +36,10 @@ pub enum Constant {
     WheelItemPosition(wotw_seedgen_data::WheelItemPosition),
     WheelBind(wotw_seedgen_data::WheelBind),
     Alignment(wotw_seedgen_data::Alignment),
+    HorizontalAnchor(wotw_seedgen_data::HorizontalAnchor),
+    VerticalAnchor(wotw_seedgen_data::VerticalAnchor),
     ScreenPosition(wotw_seedgen_data::ScreenPosition),
+    CoordinateSystem(wotw_seedgen_data::CoordinateSystem),
 }
 impl Display for Constant {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +59,10 @@ impl Display for Constant {
             Constant::WheelItemPosition(value) => write!(f, "WheelItemPosition::{value}"),
             Constant::WheelBind(value) => write!(f, "WheelBind::{value}"),
             Constant::Alignment(value) => write!(f, "Alignment::{value}"),
+            Constant::HorizontalAnchor(value) => write!(f, "HorizontalAnchor::{value}"),
+            Constant::VerticalAnchor(value) => write!(f, "VerticalAnchor::{value}"),
             Constant::ScreenPosition(value) => write!(f, "ScreenPosition::{value}"),
+            Constant::CoordinateSystem(value) => write!(f, "CoordinateSystem::{value}"),
         }
     }
 }

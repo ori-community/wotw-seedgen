@@ -294,7 +294,10 @@ impl Simulate for CommandVoid {
             | CommandVoid::MessageBackground { .. }
             | CommandVoid::FreeMessagePosition { .. }
             | CommandVoid::FreeMessageAlignment { .. }
-            | CommandVoid::FreeMessageScreenPosition { .. }
+            | CommandVoid::FreeMessageHorizontalAnchor { .. }
+            | CommandVoid::FreeMessageVerticalAnchor { .. }
+            | CommandVoid::FreeMessageBoxWidth { .. }
+            | CommandVoid::FreeMessageCoordinateSystem { .. }
             | CommandVoid::SetMapMessage { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }

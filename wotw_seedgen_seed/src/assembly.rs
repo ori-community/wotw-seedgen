@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use wotw_seedgen_data::{
-    Alignment, EquipSlot, Equipment, Icon, MapIcon, ScreenPosition, UberIdentifier, WheelBind,
-    WheelItemPosition,
+    Alignment, CoordinateSystem, EquipSlot, Equipment, HorizontalAnchor, Icon, MapIcon,
+    UberIdentifier, VerticalAnchor, WheelBind, WheelItemPosition,
 };
 use wotw_seedgen_seed_language::output::{
     ArithmeticOperator, ClientEvent, Comparator, EqualityComparator, LogicOperator,
@@ -148,8 +148,20 @@ pub enum Command {
     FreeMessagePosition(/*id*/ usize /*TODO, /*world_cordinates*/ bool*/),
     /// Set the `alignment` of free message `id`
     FreeMessageAlignment(/*id*/ usize, /*alignment*/ Alignment),
-    /// Set the `screen_position` of free message `id`
-    FreeMessageScreenPosition(/*id*/ usize, /*screen_position*/ ScreenPosition),
+    /// Set the `horizontal_anchor` of free message `id`
+    FreeMessageHorizontalAnchor(
+        /*id*/ usize,
+        /*horizontal_anchor*/ HorizontalAnchor,
+    ),
+    /// Set the `vertical_anchor` of free message `id`
+    FreeMessageVerticalAnchor(/*id*/ usize, /*vertical_anchor*/ VerticalAnchor),
+    /// Sets the box width of free message `id` to Float Memory 0
+    FreeMessageBoxWidth(/*id*/ usize),
+    /// Sets the coordinate system of free message `id` to `coordinate_system`
+    FreeMessageCoordinateSystem(
+        /*id*/ usize,
+        /*coordinate_system*/ CoordinateSystem,
+    ),
     /// Sets the map message content to String Memory 0
     SetMapMessage,
     /// Save to disk, like an autosave
