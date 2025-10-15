@@ -3639,23 +3639,42 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
       DoubleJump, Sword, Spear=1  # djump+spear to reach the tp from the beetle arena
       DoubleJump, Hammer, Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump
+      # GlideJump, DoubleJump, Spear=1 OR Blaze=1  # possible with a lot more but that would be redundant with going to VoiceDoorPlatform first
+      # EastHollow.BeetleDefeated, GrenadeJump=1  # It's possible to do without killing hornbug but you either need to know where the trigger is or its redundant with going to EastHollow.VoiceDoorPlatform first
     unsafe:
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump OR GlideJump
       SwordJump
-      # DoubleJump, Sword, Shuriken=1
+      DoubleJump, Sword, Shuriken=1
+      GrenadeJump, EastHollow.BeetleDefeated OR Dash OR DoubleJump OR Glide OR Sword OR Shuriken=2 OR PauseFloat OR BlazeSwap=1 OR SentrySwap=1
+      Sentry=3, GrenadeJump  # https://youtu.be/2TTi0Miz47w Can't be put in the condition above because it would work with 3 energy otherwise.
+      FlashSwap
   conn EastHollow.VoiceDoorPlatform:
     # for paths where the beetle has to be defeated, going from here is more advantageous than going from the teleporter
     # so paths using EastHollow.BeetleDefeated originate primarily from here, other paths need to check redundancy with going to EastHollow.Teleporter first
     moki, EastHollow.BeetleDefeated:
       Bash, DoubleJump OR Dash OR Glide
       Launch
-    gorlek: EastHollow.BeetleDefeated, DoubleJump, TripleJump, Dash OR Glide OR Sword
+    gorlek:
+      EastHollow.BeetleDefeated, DoubleJump, TripleJump, Dash OR Glide OR Sword
+      EastHollow.BeetleDefeated, HammerSJump=1, DoubleJump, TripleJump
     kii:
       Grapple, DoubleJump, Sword, Dash  # Pogo the mantis
       EastHollow.BeetleDefeated, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      EastHollow.BeetleDefeated, DoubleJump, Glide, Hammer OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # EastHollow.BeetleDefeated, SentryJump=1
+      # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # Possible with spear and blaze as well before beating hornbug but not afterwards
+      # SwordSJump=1, Dash OR DoubleJump OR Glide OR Sentry=1 OR Shuriken=1  # energy weapons use upslash to reach the vine then use the energy weapon to reach the platform
+      # GrenadeJump=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+      # GrenadeJump=1, GlideJump, Bash
     unsafe:
       EastHollow.BeetleDefeated, DoubleJump, Dash, Spear=2  # extend your jump momentum with spear. Couldn't replicate but seems close so I'm gonna call it a skill issue until someone complains about this path
       EastHollow.BeetleDefeated, DoubleJump, Sentry=3  # Djump+3 sentries from the vine
+      EastHollow.BeetleDefeated, HammerSJump=1
+      SwordSJump=1  # sjump->horizontal combo->down slash to grab the vine then aerial combo + upslash to reach the platform
+      GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Possible with just djump+glidejump beating hornbug but not afterwards
   conn EastHollow.KwolokPathGrapplePlant:
     moki: Bash OR Launch
     gorlek:
