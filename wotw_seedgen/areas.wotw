@@ -3698,11 +3698,20 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
   state EastHollow.DepthsLever:
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch  # just Bash is treacherous
     gorlek: Bash
-    kii: Deflector, Sword OR Hammer
+    kii:
+      Deflector, Launch, Sword OR Hammer
+      Deflector, Hammer, DoubleJump, TripleJump
+      Deflector, Sword, DoubleJump, TripleJump, Damage=10
+      # Glitchedd
+      # Deflector, AerialHammerJump
+      # Deflector, SentryJump=1
     unsafe:
       Combat=SneezeSlug, SentryRedirect=1 OR GrenadeRedirect=1
       Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
-      Hammer, DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
+      HammerExtension, Deflector OR DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
+      Deflector, Sword  # upslash on the jumpad to get a lot of height
+      GrenadeRedirect=1, GrenadeCancel
+      SentryRedirect=1, Sword OR HammerExtension OR GrenadeCancel OR Launch OR HammerSJump=1
 
   pickup EastHollow.BashEC:
     moki:
@@ -3715,14 +3724,21 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
       SwordSJump=1
       HammerSJump=1, DoubleJump OR Dash OR Glide OR Bash
     kii:
-      Bash, Dash
       DoubleJump, TripleJump OR Hammer OR Spear=1
       DoubleJump, Dash, Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SentryJump=1 OR AerialHammerJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1  # blaze jump from the anchor platform. Others jump from the one under it.
+      # GlideJump, DoubleJump
+      # GlideJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      HammerSJump=1
+      SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GlideHammerJump OR WallHammerJump
       DoubleJump, Dash
       Bash
-      Sword, Shuriken=1, Dash OR Shuriken=1  # shuriken pogo. Probably a lot more possibilities for the condition, such as double jump
+      Sword, Shuriken=1  # wjump -> shuriken -> upslash -> pogo -> horizontal combo
+      GlideJump, DoubleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, BlazeSwap=1 OR SentrySwap=1
+      FlashSwap
       # Bash, Glide
 
   conn EastHollow.BashTreeCheckpoint:
@@ -3745,9 +3761,15 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump
-    kii: DoubleJump
+    # kii:
+      # GrenadeJump=1 OR AerialHammerJump
+      # GlideJump, DoubleJump, Hammer
     unsafe:
+      DoubleJump OR GrenadeJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump
       Sword, Shuriken=1  # shuriken pogo from the right wall (that you reach with sword upslash)
+  conn EastHollow.KwolokPathGrapplePlant:
+    #kii: SentryJump=1
+    unsafe: SentryJump=1
 
 anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
   refill Checkpoint
