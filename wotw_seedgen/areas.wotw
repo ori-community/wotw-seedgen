@@ -3077,7 +3077,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     unsafe, SpiritLight=150:
       DoubleJump, Spear=1 OR Flash=1 OR Sentry=1 OR PauseFloat
       Dash, Spear=1 OR PauseFloat
-      BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump OR GrenadeJump OR HammerJump
+      BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GlideJump OR GrenadeJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
 
   conn WestHollow.TrialApproach:  # middle water state can softlock this, so you have to be able to fully lower the water.
     moki, WestHollow.FullyDrained:
@@ -3110,13 +3110,13 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
   conn WestHollow.HollowDrainMiddle:  # paths which go directly because they need the checkpoint at HollowDrainMiddle for dirty swimming purposes
     unsafe:
       # Dirty Swims. All of the following contain duplicates of other paths for the purposes of softlock prevention. Middle state swim deals the most damage, so calculate damage according to that.
-      Damage=90, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # Use the spikes to gain IFrames.
+      Damage=90, AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # Use the spikes to gain IFrames.
       Damage=90, Bow=1, Bash, Grenade=1  # The tongue saves its state incorrectly if you die while it is extending, so shoot it, die, swim back up, and then climb on it.
       Damage=90, Bow=1, Dash OR GrenadeJump OR PauseFloat
       Damage=90, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
       Damage=90, BlazeSwap=4 OR FlashSwap
       Damage=90, DoubleJump, Bash, TripleJump OR Glide
-      Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # This is doable with just Water Dash, but that could cause softlocks.
+      Damage=40, WaterDash, AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # This is doable with just Water Dash, but that could cause softlocks.
       Damage=40, WaterDash, Bow=1, Bash, Grenade=1
       Damage=40, WaterDash, Bow=1, Dash OR GrenadeJump OR PauseFloat
       Damage=40, WaterDash, Bow=1, Shuriken=1, Blaze OR Spear=1 OR Glide
@@ -3126,8 +3126,8 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
     # for future pathfinders, I'm not sure the extended tongues have to be considered here? You cannot extend the tongues while they are inside water, if you manage to lower the water into extended tongues it seems you're past this point already and headers setting the tongues has not been considered in other places. Would need to think about what warps do to this though
     unsafe:
       Damage=90, Launch  # Use the spikes to gain IFrames.
-      Damage=90, Dash, HammerJump OR SwordSJump=1 OR HammerSJump=1  # the sentry jump paths actually just use the sentries for movement, but sentry jumps are needed to prevent softlocks.  In the initial water state, dash onto SubmergedPlatform before swimming.
-      Damage=40, WaterDash, HammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # the sentry jump paths don't actually use the sentries, but sentry jumps are needed to prevent softlocks.
+      Damage=90, Dash, AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR SwordSJump=1 OR HammerSJump=1  # the sentry jump paths actually just use the sentries for movement, but sentry jumps are needed to prevent softlocks.  In the initial water state, dash onto SubmergedPlatform before swimming.
+      Damage=40, WaterDash, AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR SwordSJump=1 OR HammerSJump=1 OR Launch  # the sentry jump paths don't actually use the sentries, but sentry jumps are needed to prevent softlocks.
       Damage=60, Bow=1, WaterDash
 
 anchor WestHollow.TrialApproach at -155, -4298:  # after getting past the beetle, at the bottom of the shaft next to trial start
@@ -5463,7 +5463,7 @@ anchor WestGlades.ShrineArea at -664, -4026:
       GlideJump, PauseFloat  # Climb the right wall and then glide across.
       GrenadeJump, DoubleJump
       GrenadeJump, PauseFloat, Dash OR Glide  # Grenade Jump from the shrine to maximize height, float left.
-      HammerJump  # Upswing then Hammer Jump.
+      AerialHammerJump OR GlideHammerJump
       DoubleJump, GlideJump  # Climb the right wall and then glide across.
       SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
       Hammer, DoubleJump, SentrySwap=1 OR BlazeSwap=1
