@@ -3897,9 +3897,23 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
     gorlek:
       SentryJump=2, DoubleJump, TripleJump
       SentryJump=3
-    kii: DoubleJump, TripleJump, Hammer, Spear=1 OR Flash=1 OR Sentry=1
+    kii:
+      DoubleJump, TripleJump, Hammer, Spear=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=4
+      # DoubleJump, TripleJump, GrenadeJump=2
+      # SwordSJump=2
+      # SentryJump=1, DoubleJump, TripleJump  # either sjump near the first mortar or climb all the way to sjump from under the pikcup
+      # GlideJump, DoubleJump, TripleJump OR Hammer OR Spear=1
+      # GlideJump, DoubleJump, GrenadeJump=1 OR SentryJump=1
+      # GlideJump, Dash, HammerSJump=1
     unsafe:
-      DoubleJump, TripleJump, Hammer  # Hammer upswing to gain mor hight
+      GrenadeJump OR FlashSwap OR SentryJump=2 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump
+      DoubleJump, Hammer, Damage=10, Damage=10
+      GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1
+      GlideJump, Dash, HammerSJump=1
+      DoubleJump, TripleJump, Hammer  # Hammer upswing to gain more height
+      DoubleJump, TripleJump, Sword  # pogo projectiles
   pickup EastHollow.SplinterShard: free
   pickup EastHollow.DepthsExteriorEX:
     moki: Glide, Launch  # ...what even is intended here?
@@ -3911,22 +3925,25 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
     kii:
       Launch
       Bash, Grenade=1, DoubleJump  # Bait the mantis
+      # Glitched
+      # HammerSJump=1, DoubleJump
+      # SwordSJump=1, DoubleJump, TripleJump OR Dash
+      # AerialHammerJump, Glide OR TripleJump
+      # GlideJump, DoubleJump, TripleJump
     unsafe:
       Glide, DoubleJump, TripleJump
       Bash, Grenade=1  # Bait the mantis
       GlideBashChain OR DoubleJumpBashChain  # Mantis. Glide bash chain is a lot easier with EastHollow.DepthsOpen
       DashBashChain  # Mortar projectile
+      AerialHammerJump OR GlideHammerJump OR HammerSJump=1 OR BlazeSwap=4 OR FlashSwap
+      SwordSJump=1, DoubleJump
 
   conn UpperDepths.Entry:
     moki: EastHollow.DepthsOpen
-  conn EastHollow.BashTreeCheckpoint:
-    moki, EastHollow.DepthsLever: Combat=SneezeSlug OR DoubleJump OR Bash OR Launch
+  conn EastHollow.DepthsLeverDoor:
+    moki, EastHollow.DepthsLever: Combat=SneezeSlug OR Bash
     gorlek, EastHollow.DepthsLever: Damage=5
     kii: EastHollow.DepthsLever
-  conn EastHollow.AboveBash:  # Make sure it's not redundant with paths from EastHollow.BashTreeCheckpoint
-    gorlek, EastHollow.DepthsLever:
-      SwordSJump=5, Dash OR Glide  # The mortar will break the ceiling for you
-      SwordSJump=4, DoubleJump  # The mortar will break the ceiling for you
 
 anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the first mortar on the way to Kwolok
   refill Checkpoint
