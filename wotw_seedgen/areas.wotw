@@ -4064,10 +4064,15 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
     gorlek: SentryJump=1
     kii:
       DoubleJump, Sword, TripleJump OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # pogo the mortar
-      Dash, DoubleJump, TripleJump, Hammer, Sentry=1 OR Flash=1  # Coyote Dash from high point left; Dash, Dash, DoubleJump, TripleJump, HammerUpswing, Sentry/Flash  (you end up on the left wall)
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      # GlideJump, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, Sword  # Pogo the mortar
       DoubleJump, Sword, Shuriken=1  # too precise for kii
+      Dash, DoubleJump, TripleJump, Hammer, Sentry=1 OR Flash=1  # Coyote Dash from high point left; Dash, Dash, DoubleJump, TripleJump, HammerUpswing, Sentry/Flash  (you end up on the left wall)
+      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump
   pickup EastHollow.SilentSwimEC:
     moki: Combat=Balloon, Water, WaterDash OR Launch
     gorlek:
@@ -4077,10 +4082,16 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
     kii:  # Balloon will go for a swim on its own as long as you aggro it
       Water, DoubleJump, TripleJump, Damage=10
       Water, DoubleJump, Hammer, Damage=20
+      # Glitched
+      # Water, AerialHammerJump
+      # Water, Damage=10, SwordSJump=1 OR GrenadeJump=1
+      # Water, Damage=10, GlideJump, DoubleJump
     unsafe:
-      Water, Damage=10, DoubleJump OR SentryJump=1
-      Water, DoubleJump, Hammer, Damage=10  # one extra dboost for kii
+      Water, Damage=10, DoubleJump OR SentryJump=1 OR GrenadeJump
+      Water, DoubleJump, GrenadeJump
       Water, Bash, Damage=20  # Theorically possible with less damage but I don't want to check https://youtu.be/DsYMP004WTs
+      Water, AerialHammerJump OR GlideHammerJump
+      Water, Damage=10, GlideJump  # the ground is a bit higher on the left of the spikes
   pickup EastHollow.KwolokSwimOre:
     moki: Water, Bash OR Damage=10  # enemy in the way
     gorlek: Water
@@ -4128,49 +4139,54 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat  # friendly spikes
+      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1  # friendly spikes
   conn WoodsEntry.ShriekMeet:
-    moki, EastHollow.SilentSwimWall, Combat=Balloon:
-      Water, Grapple, DoubleJump, Dash OR Glide
-      Water, Grapple, Dash, Glide
-      Water, Launch
-    gorlek, EastHollow.SilentSwimWall, Combat=Balloon:
-      Water, Grapple, DoubleJump, TripleJump OR Sword OR Hammer
-      Water, Grapple, Dash  # Eiher jump from the Grapple point and the Dash or use double Dash
-      Water, WaterDash, DoubleJump, TripleJump
-      Water, WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Sword OR Hammer  # Take boost on the left side
-    kii, EastHollow.SilentSwimWall:
+    moki, Water, EastHollow.SilentSwimWall, Combat=Balloon:
+      Grapple, DoubleJump, Dash OR Glide
+      Grapple, Dash, Glide
+      Launch
+    gorlek, Water, EastHollow.SilentSwimWall, Combat=Balloon:
+      Grapple, DoubleJump, TripleJump OR Sword OR Hammer
+      Bash, DoubleJump, TripleJump OR Sword OR Hammer
+      Grapple, Dash  # Eiher jump from the Grapple point and the Dash or use double Dash
+      WaterDash, DoubleJump, TripleJump
+      WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Sword OR Hammer  # Take boost on the left side
+    kii, Water, EastHollow.SilentSwimWall:
       # Repeat each moki/gorlek path without Combat=Balloon since you can just bait it into taking a swim
-      Water, Launch
-      Water, Grapple, DoubleJump, Dash OR Glide OR TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Water, WaterDash, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Water, WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Launch
+      Bash, DoubleJump
+      Grapple, DoubleJump, Dash OR Glide OR TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      WaterDash, DoubleJump, Damage=10, Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # Completely new paths
-      Water, Grapple, Sword
-      Water, Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Water, Grapple, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Water, WaterDash, Bash
-      Water, WaterDash, Sword, Damage=10
-      Water, WaterDash, Dash, Damage=10, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Water, WaterDash, Hammer, Damage=10, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Water, WaterDash, Glide, Damage=10, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Sword
+      Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Grapple, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Bash
+      WaterDash, Sword, Damage=10
+      WaterDash, Dash, Damage=10, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      WaterDash, Hammer, Damage=10, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      WaterDash, Glide, Damage=10, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched  # Probably really lacking. The pathfinder seed doesn't have the balloon here and I got lazy
+      # AerialHammerJump, DoubleJump, TripleJump OR Damage=10
     unsafe, EastHollow.SilentSwimWall:
       Water, Grapple, Sentry=3
       Water, Grapple, Shuriken=2, Combat=Balloon OR Damage=20
       Water, Grapple, DoubleJump  # Cancel grapple with djump
-      Water, DoubleJump, TripleJump
+      Water, DoubleJump, TripleJump OR GlideJump
       Water, WaterDash, Dash, Damage=10  # coyote jump from the ledge under the grappable plant
       Water, WaterDash, Sword  # Pogo the projectile
+      Water, WaterDash, GlideJump
       Water, SwordSJump=1  # probably doable with hammer as well, but it's much harder
-      Water, DashBashChain
+      Water, Bash
       # Dirty Swims, probably incomplete. Stand in shallow water on the side of the first air pocket to regen.
       Damage=210, Launch
       Damage=210, Grapple, DoubleJump OR Dash OR Sword OR Sentry=3
       Damage=210, Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       Damage=210, Grapple, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=210, Grapple, Shuriken=2, Combat=Balloon OR Damage=20
-      Damage=210, DoubleJump, TripleJump
-      WaterDash, Damage=50, Damage=100, Launch OR DoubleJump  # https://youtu.be/5efA8BiPqhw
+      Damage=210, DoubleJump, TripleJump OR GlideJump
+      WaterDash, Damage=50, Damage=100, Launch OR DoubleJump OR GlideJump  # https://youtu.be/5efA8BiPqhw
       WaterDash, Damage=50, Damage=100, Grapple, Dash OR Sword OR Sentry=3
       WaterDash, Damage=50, Damage=100, SwordSJump=1
       # Water, Grapple, SwordSJump=1  # standing on the ledge below grapple plant. Holding right during SJump. Swordcombo to go right. Lure balloon into water first
