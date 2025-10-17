@@ -3695,24 +3695,6 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
 # checkpoint at 21, -4220
 
 anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after the beetle arena
-  state EastHollow.DepthsLever:
-    moki: Bash, DoubleJump OR Dash OR Glide OR Launch  # just Bash is treacherous
-    gorlek: Bash
-    kii:
-      Deflector, Launch, Sword OR Hammer
-      Deflector, Hammer, DoubleJump, TripleJump
-      Deflector, Sword, DoubleJump, TripleJump, Damage=10
-      # Glitchedd
-      # Deflector, AerialHammerJump
-      # Deflector, SentryJump=1
-    unsafe:
-      Combat=SneezeSlug, SentryRedirect=1 OR GrenadeRedirect=1
-      Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
-      HammerExtension, Deflector OR DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
-      Deflector, Sword  # upslash on the jumpad to get a lot of height
-      GrenadeRedirect=1, GrenadeCancel
-      SentryRedirect=1, Sword OR HammerExtension OR GrenadeCancel OR Launch OR HammerSJump=1
-
   pickup EastHollow.BashEC:
     moki:
       Bash, DoubleJump, Dash
@@ -3741,20 +3723,10 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
       FlashSwap
       # Bash, Glide
 
-  conn EastHollow.BashTreeCheckpoint:
-    moki:
-      Combat=2xSneezeSlug, DoubleJump OR Dash
-      Bash, DoubleJump OR Dash  # just Bash is treacherous
-      Glide OR Launch
-    gorlek: DoubleJump OR Dash OR Bash OR Damage=10
+  conn EastHollow.TreeAreaJumppad:
+    moki: DoubleJump OR Dash OR Bash OR Glide OR Launch
+    gorlek: Damage=10
     kii: free
-  conn EastHollow.AboveDepths:
-    moki, EastHollow.DepthsLever:
-      Combat=2xSneezeSlug, DoubleJump OR Dash
-      Bash, DoubleJump OR Dash  # just Bash is treacherous
-      Glide OR Launch
-    gorlek: EastHollow.DepthsLever, DoubleJump OR Dash OR Bash OR Sword OR Hammer OR Damage=10
-    kii: EastHollow.DepthsLever
   conn EastHollow.AfterBeetleFight:  # Mortar break the ceiling for you
     # If you don't collect bash's tree, the camera is stuck. These paths ignore this issue.
     moki: Launch OR Bash
@@ -3771,6 +3743,96 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
     #kii: SentryJump=1
     unsafe: SentryJump=1
 
+anchor EastHollow.TreeAreaJumppad at -15, -4289:  # at the jumppad bellow the depths lever
+  state EastHollow.DepthsLever:
+    moki: Bash
+    kii:
+      Deflector, Launch, Sword OR Hammer
+      Deflector, Hammer, DoubleJump, TripleJump
+      Deflector, Sword, DoubleJump, TripleJump, Damage=10
+      # Glitchedd
+      # Deflector, AerialHammerJump
+      # Deflector, SentryJump=1
+    unsafe:
+      Combat=SneezeSlug, SentryRedirect=1 OR GrenadeRedirect=1
+      Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
+      HammerExtension, Deflector OR DoubleJump OR Dash  # Hammer onto the jumppad when the slug is shooting. DJ or Dash to stay at the ceiling longer
+      Deflector, Sword  # upslash on the jumpad to get a lot of height
+      GrenadeRedirect=1, GrenadeCancel
+      SentryRedirect=1, Sword OR HammerExtension OR GrenadeCancel OR Launch OR HammerSJump=1
+  
+  pickup EastHollow.BashEC:  # check for redundancy with paths going to EastHollow.AboveBash first
+    unsafe: SwordSJump=2
+  
+  conn EastHollow.AboveBash:
+    moki:
+      Bash, Launch OR Dash OR DoubleJump OR Glide OR Grenade=2
+    gorlek:
+      Launch
+      Bash, Sword OR Hammer
+      SwordSJump=4
+      HammerSJump=4, Glide OR Damage=10
+      HammerSJump=3, DoubleJump OR Dash 
+      SwordSJump=2, DoubleJump, TripleJump OR Damage=10
+      HammerSJump=1, DoubleJump, TripleJump, Damage=6  # dboost on a projectile for leniency
+    kii: 
+      Bash
+      # Glitched
+      # AerialHammerJump, TripleJump OR GlideJump
+      # SwordSJump=3
+      # HammerSJump=1, DoubleJump, TripleJump OR Dash OR Damage=10
+      # HammerSJump=2, DoubleJump
+      # HammerSJump=3, Dash OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=3, DoubleJump, TripleJump OR Dash
+      # GrenadeJump=2, DoubleJump, Damage=10, TripleJump OR Dash
+      # DoubleJump, TripleJump, Damage=10, GrenadeJump=1, Damage=10  # tjump into the spikes then gjump, dboost in the spikes and finish with tjump
+    unsafe:
+      DoubleJump, TripleJump, Sword, Deflector OR Spear=1  # sick moves
+      SwordJump, TripleJump
+      HammerSJump=3  # need to do a low sjump at the start and at the end to get a better drift
+      HammerSJump=1, DoubleJump, Glide OR Shuriken=1 OR Flash=1
+      SwordSJump=2  # https://youtu.be/EmrI_yvhzRM
+      AerialHammerJump OR GlideHammerJump
+  conn EastHollow.DepthsLeverDoor:
+    moki:
+      Combat=2xSneezeSlug, DoubleJump OR Dash
+      Bash, DoubleJump OR Dash  # just Bash is treacherous
+      Glide OR Launch
+    gorlek: DoubleJump OR Dash OR Bash OR Sword OR Hammer OR Damage=10
+    kii: free
+
+anchor EastHollow.DepthsLeverDoor at 47, -4302:  # To the left of the lever door blocking Depths access
+  conn EastHollow.AboveDepths:
+    moki: EastHollow.DepthsLever
+  conn EastHollow.BashTreeCheckpoint:
+    moki: DoubleJump OR Dash OR Glide OR Launch OR Bash
+    gorlek: free
+  conn EastHollow.TreeAreaJumppad:
+    moki:
+      Bash, Dash OR DoubleJump OR Launch
+      Launch, DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch
+      Bash, Glide OR Sword OR Damage=10
+      SentryJump=1, Damage=10
+      SwordSJump=1, DoubleJump OR Dash
+      HammerSJump=1, DoubleJump, TripleJump OR Dash OR Glide
+    kii:
+      Bash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1  # throw your grenade and reach it by either bashing the lower lantern or a slug projectile
+      DoubleJump, TripleJump, Damage=10
+      # Glitched
+      # AerialHammerJump, TripleJump OR Dash OR Glide OR Shuriken=1 OR Damage=10  # upslash before hjump
+      # GrenadeJump=1, Damage=10
+      # GrenadeJump=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+      # GlideJump, DoubleJump, Damage=10
+    unsafe:
+      Bash  # Bash the lantern and bait the slug to shoot at you so you can bash its projectile
+      DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
+      GrenadeJump  # friendly spikes. Fairly hard to get the right gjump angle from there but its possible!
+      GlideJump
+      CoyoteHammerJump OR WallHammerJump 
+      
 anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
   refill Checkpoint
 
@@ -3786,25 +3848,41 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
       Bash, Grenade=1 OR Sword OR Hammer OR Glide OR Dash OR Flash=1 OR Sentry=1  # you can bash to the wall without any extra abilities
       DoubleJump, TripleJump
       DoubleJump, Dash, Hammer OR Sentry=2 OR Spear=2
+      # Glitched
+      # AerialHammerJump OR SentryJump=1
+      # GlideJump, DoubleJump
+      # GlideJump, Dash, Hammer
     unsafe:
-      SentryJump=1, DoubleJump OR Dash
+      SentryJump=1
+      AerialHammerJump
+      GlideJump, Hammer OR Spear=2
+      GrenadeJump, DoubleJump
       DoubleJump, Dash OR Hammer
-
-  conn EastHollow.AboveBash:
+      
+  conn EastHollow.DepthsLeverDoor:
     moki:
-      Launch, Bash OR Hammer OR Spear=1
-      Bash, Dash OR DoubleJump OR Glide
+      Launch
+      Bash, DoubleJump OR Glide OR Dash
     gorlek:
-      Launch  # The mortar will break the ceiling for you
-      Bash, Sword
-      Bash, Grenade=1, Damage=10  # Bash the slug to reach the first lantern, dboost in the spikes, grenade bash from the ledge
-    kii:
-      Bash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      Bash, Grenade=1  # Make the slug near the door shoot at you. Bash the projectile to reach your grenade
+      Bash
+      DoubleJump, TripleJump
+      HammerSJump=1, DoubleJump, Dash
+      SentryJump=2, DoubleJump, Dash OR Glide
+    # kii:  # sjump=2, damage=10 is redundant with going to the jumpad
+    #   AerialHammerJump
+    #   SentryJump=1, DoubleJump  # running sjump from the tree. Hammer sjump near the spikes then djump + upslash
+    #   GlideJump, DoubleJump OR Hammer
+    #   GrenadeJump=2, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    #   GrenadeJump=1, DoubleJump, Hammer
     unsafe:
-      Bash  # Bash the lantern next to the door and bait the slug to shoot at you so you can bash its projectile
-      DoubleJump, TripleJump, Sword, Deflector  # sick moves
-      DoubleJump, TripleJump, Dash, Sword, Spear=1  # even sicker moves
+      DoubleJump, Dash OR Hammer OR Sword  # you can walljump on a small wall above the spikes
+      GlideJump, DoubleJump OR Hammer OR Sword OR Spear=1 OR Shuriken=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1
+      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      SwordSJump=1, Dash OR Shuriken=2
+      GrenadeJump
+  conn EastHollow.TreeAreaJumppad:
+    # kii: SwordSJump=2, Damage=10  # sjump in the spikes
+    unsafe: SentryJump=2, Damage=10
 
 anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door blocking Depths access
   refill Checkpoint
