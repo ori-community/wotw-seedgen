@@ -3801,7 +3801,7 @@ anchor EastHollow.TreeAreaJumppad at -15, -4289:  # at the jumppad bellow the de
     gorlek: DoubleJump OR Dash OR Bash OR Sword OR Hammer OR Damage=10
     kii: free
 
-anchor EastHollow.DepthsLeverDoor at 47, -4302:  # To the left of the lever door blocking Depths access
+anchor EastHollow.DepthsLeverDoor at 29, -4302:  # To the left of the lever door blocking Depths access
   conn EastHollow.AboveDepths:
     moki: EastHollow.DepthsLever
   conn EastHollow.BashTreeCheckpoint:
