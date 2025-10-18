@@ -64,14 +64,14 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         Some(out) => out,
     };
 
-    compile(
+    let result = compile(
         &mut rng,
         &snippet_access,
         &uber_state_data,
         entry,
         &out,
         debug,
-    )?;
+    );
 
     if launch {
         launch_seed(&out)?;
@@ -113,7 +113,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         }
     }
 
-    Ok(())
+    result
 }
 
 fn compile(
