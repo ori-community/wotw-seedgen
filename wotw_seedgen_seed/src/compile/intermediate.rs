@@ -1,7 +1,7 @@
 use super::{compile_into_lookup, Compile};
 use crate::assembly::{Command, Event};
-use rustc_hash::FxHashMap;
-use std::collections::hash_map::Entry;
+use indexmap::{map::Entry, IndexMap};
+use rustc_hash::FxBuildHasher;
 use wotw_seedgen_seed_language::output::{CommandVoid, Event as IntermediateEvent};
 
 pub fn compile_command_lookup(intermediate_command_lookup: Vec<CommandVoid>) -> Vec<Vec<Command>> {
@@ -17,7 +17,7 @@ pub fn compile_events(
     intermediate_events: Vec<IntermediateEvent>,
     command_lookup: &mut Vec<Vec<Command>>,
 ) -> Vec<Event> {
-    let mut events = FxHashMap::<_, usize>::default();
+    let mut events = IndexMap::<_, usize, FxBuildHasher>::default();
     events.reserve(intermediate_events.len());
     for event in intermediate_events {
         let trigger = event.trigger.compile(command_lookup);
