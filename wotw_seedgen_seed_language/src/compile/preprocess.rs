@@ -12,8 +12,9 @@ pub(crate) struct Preprocessor {
 }
 #[derive(Default)]
 pub(crate) struct PreprocessorOutput {
-    pub includes: Vec<Spanned<String>>, // TODO can these be references?
-    pub functions: FxHashSet<String>,   // TODO can these be references?
+    pub config_sets: Vec<(String, String, String)>, // TODO can these be references?
+    pub includes: Vec<Spanned<String>>,             // TODO can these be references?
+    pub functions: FxHashSet<String>,               // TODO can these be references?
 }
 impl Preprocessor {
     pub(crate) fn preprocess(ast: &ast::Snippet) -> Self {
@@ -34,12 +35,7 @@ impl Preprocessor {
                             ast::Command::Include(_, command) => {
                                 if let Ok(command) = &command.result {
                                     if let Ok(args) = &command.content {
-                                        if self
-                                            .output
-                                            .includes
-                                            .iter()
-                                            .any(|include| include.data == args.0.path.data)
-                                        {
+                                        if self.output.snippet_included(args.0.path.data) {
                                             self.errors.push(Error::custom(
                                                 "Snippet already included".to_string(),
                                                 args.0.path.span(),
@@ -57,6 +53,27 @@ impl Preprocessor {
                                 if let Ok(command) = &command.result {
                                     if let Ok(args) = &command.content {
                                         self.output.functions.insert(args.0 .0.data.0.to_string());
+                                    }
+                                }
+                            }
+                            ast::Command::SetConfig(_, command) => {
+                                if let Ok(command) = &command.result {
+                                    if let Ok(args) = &command.content {
+                                        let identifier = inspect_command_arg(&args.0.identifier);
+                                        let value = inspect_command_arg(&args.0.value);
+
+                                        if let (Some(identifier), Some(value)) = (identifier, value)
+                                        {
+                                            let snippet_name = args.0.snippet_name.data.to_string();
+                                            let identifier = identifier.data.0.to_string();
+                                            let value = value.data.to_string();
+
+                                            self.output.config_sets.push((
+                                                snippet_name,
+                                                identifier,
+                                                value,
+                                            ));
+                                        }
                                     }
                                 }
                             }
@@ -85,4 +102,19 @@ impl Preprocessor {
             }
         }
     }
+}
+
+impl PreprocessorOutput {
+    pub(crate) fn snippet_included(&self, identifier: &str) -> bool {
+        self.includes
+            .iter()
+            .any(|include| include.data == identifier)
+    }
+}
+
+fn inspect_command_arg<T>(arg: &ast::CommandArg<T>) -> Option<&T> {
+    arg.result
+        .as_ref()
+        .ok()
+        .and_then(|arg| arg.1.result.as_ref().ok())
 }

@@ -9,9 +9,9 @@ use wotw_seedgen_seed_language::{
         ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
         LetArgs, Literal, OnEventArgs, Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs,
         RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable,
-        RemoveArgs, RemoveLocationArgs, Result, Separated, SeparatedNonEmpty, SetLogicStateArgs,
-        Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
-        UberIdentifier, UberStateType, ZoneOfArgs,
+        RemoveArgs, RemoveLocationArgs, Result, Separated, SeparatedNonEmpty, SetConfigArgs,
+        SetLogicStateArgs, Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs,
+        Trigger, TriggerBinding, UberIdentifier, UberStateType, ZoneOfArgs,
     },
     types::Type,
 };
@@ -342,6 +342,10 @@ impl Tokens for Command<'_> {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
+            Command::SetConfig(keyword, args) => {
+                builder.push_token(keyword.span, TokenType::Macro);
+                args.tokens(builder);
+            }
             Command::State(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
@@ -496,6 +500,15 @@ impl Tokens for ConfigArgs<'_> {
 impl Tokens for Spanned<ConfigType> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.span, TokenType::Type);
+    }
+}
+impl Tokens for SetConfigArgs<'_> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        self.snippet_name.tokens(builder);
+        if let Some(identifier) = command_arg_value(self.identifier) {
+            builder.push_token(identifier.span, TokenType::Variable);
+        }
+        self.value.tokens(builder);
     }
 }
 impl Tokens for StateArgs<'_> {

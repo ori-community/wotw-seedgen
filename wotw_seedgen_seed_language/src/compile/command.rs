@@ -52,6 +52,9 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Config(_, command) => {
                 command.compile(compiler);
             }
+            ast::Command::SetConfig(_, command) => {
+                command.compile(compiler);
+            }
             ast::Command::State(_, command) => {
                 command.compile(compiler);
             }
@@ -228,16 +231,7 @@ impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
         let identifier = consume_command_arg(self.identifier, compiler);
         let action = consume_command_arg(self.action, compiler);
 
-        if !compiler
-            .preprocessed
-            .includes
-            .iter()
-            .any(|include| include.data == self.snippet_name.data)
-        {
-            compiler.errors.push(
-                Error::custom("unknown snippet".to_string(), self.snippet_name.span)
-                    .with_help(format!("try !include(\"{}\")", self.snippet_name.data)),
-            );
+        if !compiler.check_snippet_included(&self.snippet_name) {
             return;
         }
 
@@ -382,6 +376,17 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
         if let Some(value) = value {
             compiler.variables.insert(self.identifier.data, value);
         }
+    }
+}
+impl<'source> Compile<'source> for ast::SetConfigArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        // setting the config happens in preprocessor
+        compiler.check_snippet_included(&self.snippet_name);
+        // TODO verify identifier exists?
+        consume_command_arg(self.identifier, compiler);
+        consume_command_arg(self.value, compiler);
     }
 }
 impl<'source> Compile<'source> for ast::StateArgs<'source> {

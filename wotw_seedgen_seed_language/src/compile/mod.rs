@@ -363,6 +363,19 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         literal
     }
 
+    pub(crate) fn check_snippet_included(&mut self, snippet_name: &Spanned<&str>) -> bool {
+        let included = self.preprocessed.snippet_included(snippet_name.data);
+
+        if !included {
+            self.errors.push(
+                Error::custom("unknown snippet".to_string(), snippet_name.span.clone())
+                    .with_help(format!("try !include(\"{}\")", snippet_name.data)),
+            );
+        }
+
+        included
+    }
+
     pub(crate) fn consume_result<T>(&mut self, result: Result<T>) -> Option<T> {
         match result {
             Ok(t) => Some(t),
@@ -435,6 +448,15 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
             Ok(ast) => {
                 let preprocessor = Preprocessor::preprocess(&ast);
                 errors.extend(preprocessor.errors);
+
+                for (path, identifier, value) in &preprocessor.output.config_sets {
+                    // TODO do something if set already?
+                    self.global
+                        .config
+                        .entry(path.clone())
+                        .or_default()
+                        .insert(identifier.clone(), value.clone());
+                }
 
                 for include in &preprocessor.output.includes {
                     if let Err(err) = self.compile_snippet(&include.data) {

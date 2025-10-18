@@ -332,6 +332,7 @@ pub enum Command<'source> {
         CommandArgsCollection<SeparatedNonEmpty<TagsArg<'source>, Symbol<','>>>,
     ),
     Config(Spanned<Config>, CommandArgs<ConfigArgs<'source>>),
+    SetConfig(Spanned<SetConfig>, CommandArgs<SetConfigArgs<'source>>),
     State(Spanned<State>, CommandArgs<StateArgs<'source>>),
     Timer(Spanned<Timer>, CommandArgs<TimerArgs<'source>>),
     Let(Spanned<Let>, CommandArgs<LetArgs<'source>>),
@@ -456,6 +457,16 @@ pub enum ConfigType {
     Boolean,
     Integer,
     Float,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake")]
+pub struct SetConfig;
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct SetConfigArgs<'source> {
+    pub snippet_name: Spanned<&'source str>,
+    pub identifier: CommandArg<Spanned<Identifier<'source>>>,
+    // TODO weird to have a string here, this ties into the whole preprocessing conundrum...
+    pub value: CommandArg<Spanned<&'source str>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake")]

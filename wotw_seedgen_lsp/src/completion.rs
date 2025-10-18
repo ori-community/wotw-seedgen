@@ -17,8 +17,8 @@ use wotw_seedgen_seed_language::{
         FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
         ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, OnEventArgs, Operation,
         PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-        RemoveArgs, RemoveLocationArgs, Result, SeparatedNonEmpty, Snippet, Span, SpawnArgs,
-        StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+        RemoveArgs, RemoveLocationArgs, Result, SeparatedNonEmpty, SetConfigArgs, Snippet, Span,
+        SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
         UberIdentifierNumeric, UberStateType, ZoneOfArgs,
     },
     compile::FunctionIdentifier,
@@ -793,6 +793,7 @@ impl CompletionAfterSpanCheck for Command<'_> {
             Command::Spawn(_, args) => args.completion(index),
             Command::Tags(_, args) => args.completion(index),
             Command::Config(_, args) => args.completion(index),
+            Command::SetConfig(_, args) => args.completion(index),
             Command::State(_, args) => args.completion(index),
             Command::Timer(_, _) => None,
             Command::Let(_, args) => args.completion(index),
@@ -893,6 +894,18 @@ impl Completion for ConfigType {
 impl ErrCompletion for ConfigType {
     fn err_completion(_err: &Error) -> Vec<CompletionItem> {
         CONFIG_TYPE_COMPLETION.clone()
+    }
+}
+
+impl Completion for SetConfigArgs<'_> {
+    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+        None
+    }
+}
+
+impl ErrCompletion for SetConfigArgs<'_> {
+    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+        vec![]
     }
 }
 
