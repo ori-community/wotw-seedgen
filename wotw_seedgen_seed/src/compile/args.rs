@@ -1,5 +1,5 @@
 use super::{command::MemoryUsed, Compile};
-use crate::assembly::Command;
+use crate::{assembly::Command, compile::CompileContext};
 use arrayvec::ArrayVec;
 use wotw_seedgen_seed_language::{
     compile::RESERVED_MEMORY,
@@ -7,14 +7,14 @@ use wotw_seedgen_seed_language::{
 };
 
 pub struct Args<'a> {
-    command_lookup: &'a mut Vec<Vec<Command>>,
+    context: &'a mut CompileContext,
     args: ArrayVec<Arg, 4>,
     args_in_progress: Vec<ArgDestination>,
 }
 impl<'a> Args<'a> {
-    pub fn new(command_lookup: &'a mut Vec<Vec<Command>>) -> Self {
+    pub fn new(context: &'a mut CompileContext) -> Self {
         Self {
-            command_lookup,
+            context,
             args: Default::default(),
             args_in_progress: Default::default(),
         }
@@ -25,23 +25,23 @@ impl<'a> Args<'a> {
         self
     }
     pub fn boolean(self, index: usize, arg: CommandBoolean) -> Self {
-        let arg = arg.compile(self.command_lookup);
+        let arg = arg.compile(self.context);
         self.arg(ArgDestination::Boolean(index), arg)
     }
     pub fn integer(self, index: usize, arg: CommandInteger) -> Self {
-        let arg = arg.compile(self.command_lookup);
+        let arg = arg.compile(self.context);
         self.arg(ArgDestination::Integer(index), arg)
     }
     pub fn float(self, index: usize, arg: CommandFloat) -> Self {
-        let arg = arg.compile(self.command_lookup);
+        let arg = arg.compile(self.context);
         self.arg(ArgDestination::Float(index), arg)
     }
     pub fn string(self, index: usize, arg: CommandString) -> Self {
-        let arg = arg.compile(self.command_lookup);
+        let arg = arg.compile(self.context);
         self.arg(ArgDestination::String(index), arg)
     }
     pub fn zone(self, index: usize, arg: CommandZone) -> Self {
-        let arg = arg.compile(self.command_lookup);
+        let arg = arg.compile(self.context);
         self.arg(ArgDestination::Integer(index), arg)
     }
 

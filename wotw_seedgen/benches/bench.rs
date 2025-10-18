@@ -186,6 +186,7 @@ fn generation(c: &mut Criterion) {
     let mut seed = 0..;
     let graph = compile_graph(&universe_settings.world_settings);
     let snippet_access = &*SNIPPET_ACCESS;
+    let loc_data = &*LOC_DATA;
     let uber_state_data = &*UBER_STATE_DATA;
 
     group.bench_function("default", |b| {
@@ -193,6 +194,7 @@ fn generation(c: &mut Criterion) {
             universe_settings.seed = seed.next().unwrap().to_string();
             wotw_seedgen::generate_seed(
                 &graph,
+                loc_data,
                 uber_state_data,
                 snippet_access,
                 &universe_settings,
@@ -213,6 +215,7 @@ fn generation(c: &mut Criterion) {
             universe_settings.seed = seed.next().unwrap().to_string();
             wotw_seedgen::generate_seed(
                 &graph,
+                loc_data,
                 uber_state_data,
                 snippet_access,
                 &universe_settings,
@@ -247,6 +250,7 @@ fn generation(c: &mut Criterion) {
             universe_settings.seed = seed.next().unwrap().to_string();
             wotw_seedgen::generate_seed(
                 &graph,
+                loc_data,
                 uber_state_data,
                 snippet_access,
                 &universe_settings,
@@ -270,6 +274,7 @@ fn multiworld(c: &mut Criterion) {
     let graph = compile_graph(&universe_settings.world_settings);
 
     let snippet_access = &*SNIPPET_ACCESS;
+    let loc_data = &*LOC_DATA;
     let uber_state_data = &*UBER_STATE_DATA;
 
     let world_settings = universe_settings.world_settings.pop().unwrap();
@@ -283,6 +288,7 @@ fn multiworld(c: &mut Criterion) {
                 universe_settings.seed = seed.next().unwrap().to_string();
                 wotw_seedgen::generate_seed(
                     &graph,
+                    loc_data,
                     uber_state_data,
                     snippet_access,
                     &universe_settings,

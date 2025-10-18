@@ -1,17 +1,76 @@
 mod args;
 mod command;
-pub(crate) mod intermediate;
 
 use self::command::MemoryUsed;
 use crate::assembly::{Command, Event, Trigger};
-use wotw_seedgen_seed_language::output::{self as input, StringOrPlaceholder};
+use indexmap::{map::Entry, IndexMap};
+use rustc_hash::FxBuildHasher;
+use wotw_seedgen_seed_language::{
+    assets::LocData,
+    output::{self as input, IntermediateOutput, StringPlaceholderMap},
+};
 
 // TODO dedup functions?
+
+pub struct CompileContext {
+    pub command_lookup: Vec<Vec<Command>>,
+    string_placeholder_map: StringPlaceholderMap,
+}
+
+impl CompileContext {
+    pub fn new(output: &IntermediateOutput, loc_data: &LocData) -> Self {
+        Self {
+            command_lookup: vec![],
+            string_placeholder_map: output.resolve_placeholders(loc_data),
+        }
+    }
+
+    pub fn compile_command_lookup(&mut self, intermediate_command_lookup: Vec<input::CommandVoid>) {
+        self.command_lookup
+            .resize_with(intermediate_command_lookup.len(), Default::default);
+        for (index, command) in intermediate_command_lookup.into_iter().enumerate() {
+            self.command_lookup[index] = command.compile(self).0;
+        }
+    }
+
+    pub fn compile_events(&mut self, intermediate_events: Vec<input::Event>) -> Vec<Event> {
+        let mut events = IndexMap::<_, usize, FxBuildHasher>::default();
+        events.reserve(intermediate_events.len());
+        for event in intermediate_events {
+            let trigger = event.trigger.compile(self);
+            match events.entry(trigger) {
+                Entry::Occupied(occupied) => {
+                    let (new, _) = event.command.compile(self);
+                    let existing = &mut self.command_lookup[*occupied.get()];
+                    existing.extend(new);
+                }
+                Entry::Vacant(vacant) => {
+                    vacant.insert(self.compile_into_lookup(event.command));
+                }
+            }
+        }
+        events
+            .into_iter()
+            .map(|(trigger, command)| Event(trigger, command))
+            .collect()
+    }
+
+    fn compile_into_lookup<I: Compile<Output = (Vec<Command>, MemoryUsed)>>(
+        &mut self,
+        input: I,
+    ) -> usize {
+        // TODO are we allowed to ignore memoryused here?
+        let (command, _) = input.compile(self);
+        let index = self.command_lookup.len();
+        self.command_lookup.push(command);
+        index
+    }
+}
 
 pub trait Compile {
     type Output;
 
-    fn compile(self, command_lookup: &mut Vec<Vec<Command>>) -> Self::Output;
+    fn compile(self, context: &mut CompileContext) -> Self::Output;
 }
 
 // TODO if the command is just one single execute, we should follow it and insert the execute index directly in the event
@@ -19,10 +78,10 @@ impl Compile for input::Event {
     type Output = Event;
 
     // TODO this is unused
-    fn compile(self, command_lookup: &mut Vec<Vec<Command>>) -> Self::Output {
+    fn compile(self, context: &mut CompileContext) -> Self::Output {
         Event(
-            self.trigger.compile(command_lookup),
-            compile_into_lookup(self.command, command_lookup),
+            self.trigger.compile(context),
+            context.compile_into_lookup(self.command),
         )
     }
 }
@@ -30,31 +89,11 @@ impl Compile for input::Event {
 impl Compile for input::Trigger {
     type Output = Trigger;
 
-    fn compile(self, command_lookup: &mut Vec<Vec<Command>>) -> Self::Output {
+    fn compile(self, context: &mut CompileContext) -> Self::Output {
         match self {
             Self::ClientEvent(trigger) => Trigger::ClientEvent(trigger),
             Self::Binding(uber_identifier) => Trigger::Binding(uber_identifier),
-            Self::Condition(command) => {
-                Trigger::Condition(compile_into_lookup(command, command_lookup))
-            }
+            Self::Condition(command) => Trigger::Condition(context.compile_into_lookup(command)),
         }
-    }
-}
-
-fn compile_into_lookup<I: Compile<Output = (Vec<Command>, MemoryUsed)>>(
-    input: I,
-    command_lookup: &mut Vec<Vec<Command>>,
-) -> usize {
-    // TODO are we allowed to ignore memoryused here?
-    let (command, _) = input.compile(command_lookup);
-    let index = command_lookup.len();
-    command_lookup.push(command);
-    index
-}
-
-fn unwrap_string_placeholder(value: StringOrPlaceholder) -> String {
-    match value {
-        StringOrPlaceholder::Value(value) => value,
-        _ => panic!("Unresolved string placeholder"),
     }
 }

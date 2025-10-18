@@ -24,3 +24,9 @@ pub enum Trigger {
     /// Trigger when the condition changes from `false` to `true`
     Condition(CommandBoolean),
 }
+
+impl Trigger {
+    pub fn loc_data_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
+        Self::Condition(CommandBoolean::loc_data_condition(uber_identifier, value))
+    }
+}

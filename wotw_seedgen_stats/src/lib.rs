@@ -21,7 +21,7 @@ use itertools::Itertools;
 use rustc_hash::FxHashMap;
 use storage_access::SeedStorageAccess;
 use wotw_seedgen::{
-    assets::{SnippetAccess, UberStateData},
+    assets::{LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
     settings::UniverseSettings,
     spoiler::SeedSpoiler,
@@ -32,6 +32,7 @@ pub type Result<T> = std::result::Result<T, String>;
 pub struct StatsGenerator<
     'settings,
     'graph,
+    'locdata,
     'uberstates,
     'snippet_access,
     'storage_access,
@@ -55,6 +56,10 @@ pub struct StatsGenerator<
     ///
     /// You can obtain this from the logic language crate using [`Graph::compile`]
     pub graph: &'graph Graph,
+    /// The [`LocData`] passed to seedgen
+    ///
+    /// TODO how can you obtain this
+    pub loc_data: &'locdata LocData,
     /// The [`UberStateData`] passed to seedgen
     ///
     /// TODO how can you obtain this
@@ -81,18 +86,30 @@ pub type ChainedAnalyzers = Vec<Box<dyn Analyzer>>;
 impl<
         'settings,
         'graph,
+        'locdata,
         'uberstates,
         'snippet_access,
         'storage_access,
         A1: SnippetAccess + Sync,
         A2: SeedStorageAccess + Sync,
-    > StatsGenerator<'settings, 'graph, 'uberstates, 'snippet_access, 'storage_access, A1, A2>
+    >
+    StatsGenerator<
+        'settings,
+        'graph,
+        'locdata,
+        'uberstates,
+        'snippet_access,
+        'storage_access,
+        A1,
+        A2,
+    >
 {
     pub fn new(
         settings: &'settings UniverseSettings,
         graph: &'graph Graph,
         snippet_access: &'snippet_access A1,
         storage_access: &'storage_access A2,
+        loc_data: &'locdata LocData,
         uber_state_data: &'uberstates UberStateData,
     ) -> Self {
         Self {
@@ -102,6 +119,7 @@ impl<
             graph,
             snippet_access,
             storage_access,
+            loc_data,
             uber_state_data,
             tolerated_errors: 4,
             error_message_limit: 10,
@@ -247,6 +265,7 @@ impl<
         let seed = loop {
             match wotw_seedgen::generate_seed(
                 self.graph,
+                self.loc_data,
                 self.uber_state_data,
                 self.snippet_access,
                 settings,

@@ -10,13 +10,14 @@ mod seedgen_info;
 pub use seedgen_info::SeedgenInfo;
 
 use assembly::{Assembly, Command};
-use compile::intermediate::{compile_command_lookup, compile_events};
 use rustc_hash::FxHashMap;
 use seed_language::output::DebugOutput;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use wotw_seedgen_data::Position;
-use wotw_seedgen_seed_language::output::IntermediateOutput;
+use wotw_seedgen_seed_language::{assets::LocData, output::IntermediateOutput};
+
+use crate::compile::CompileContext;
 
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -34,9 +35,12 @@ pub struct Seed {
 }
 
 impl Seed {
-    pub fn new(mut output: IntermediateOutput, debug: bool) -> Self {
-        let mut command_lookup = compile_command_lookup(output.command_lookup);
-        let events = compile_events(output.events, &mut command_lookup);
+    pub fn new(mut output: IntermediateOutput, loc_data: &LocData, debug: bool) -> Self {
+        let mut context = CompileContext::new(&output, loc_data);
+
+        context.compile_command_lookup(output.command_lookup);
+        let events = context.compile_events(output.events);
+
         output.tags.sort();
 
         let mut seed = Self {
@@ -48,7 +52,7 @@ impl Seed {
             },
             assembly: Assembly {
                 events,
-                command_lookup,
+                command_lookup: context.command_lookup,
             },
             seedgen_info: None,
             assets: output.icons.into_iter().collect(), // TODO decide on a consistent data structure

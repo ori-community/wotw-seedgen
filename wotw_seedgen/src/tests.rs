@@ -40,6 +40,7 @@ fn some_seeds() {
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
         generate_seed(
             &graph,
+            &*LOC_DATA,
             &*UBER_STATE_DATA,
             &*SNIPPET_ACCESS,
             universe_settings,

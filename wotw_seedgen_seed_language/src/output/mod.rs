@@ -3,6 +3,7 @@ mod display;
 mod event;
 mod intermediate;
 mod operation;
+mod string_placeholders;
 
 pub use command::{
     Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
@@ -10,6 +11,7 @@ pub use command::{
 pub use event::{ClientEvent, Event, Trigger};
 pub use intermediate::{Constant, ConstantDiscriminants, Literal};
 pub use operation::{ArithmeticOperator, Comparator, EqualityComparator, LogicOperator, Operation};
+pub use string_placeholders::StringPlaceholderMap;
 
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
@@ -59,6 +61,18 @@ impl ItemMetadata {
     pub fn name(&self, command: &CommandVoid) -> Option<StringOrPlaceholder> {
         self.0.get(command).and_then(|entry| entry.name.clone())
     }
+
+    /// Force some kind of name out of `command`.
+    ///
+    /// If nothing is given by [`Self::name`], tries to scan `command` for messages
+    /// or even uses an approximate seedlang representation of it.
+    pub fn force_name(&self, command: &CommandVoid) -> CommandString {
+        self.name(command)
+            .map(CommandString::from)
+            .or_else(|| command.find_message().cloned())
+            .unwrap_or_else(|| command.to_string().into())
+    }
+
     pub fn shop_data(
         &self,
         command: &CommandVoid,

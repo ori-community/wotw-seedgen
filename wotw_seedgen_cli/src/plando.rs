@@ -12,7 +12,7 @@ use std::{
     sync::mpsc,
 };
 use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
-use wotw_seedgen_assets::{file_err, FileAccess, UberStateData};
+use wotw_seedgen_assets::{file_err, FileAccess, LocData, UberStateData};
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
@@ -47,8 +47,8 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     };
 
     let logic_access = files::logic_access("")?;
-    let uber_state_data =
-        logic_access.uber_state_data(&logic_access.loc_data()?, &logic_access.state_data()?)?;
+    let loc_data = logic_access.loc_data()?;
+    let uber_state_data = logic_access.uber_state_data(&loc_data, &logic_access.state_data()?)?;
 
     let mut rng = rand::thread_rng();
     let snippet_access = files::snippet_access(root)?;
@@ -67,6 +67,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let result = compile(
         &mut rng,
         &snippet_access,
+        &loc_data,
         &uber_state_data,
         entry,
         &out,
@@ -104,6 +105,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
                 let _ = compile(
                     &mut rng,
                     &snippet_access,
+                    &loc_data,
                     &uber_state_data,
                     entry,
                     &out,
@@ -119,6 +121,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 fn compile(
     rng: &mut ThreadRng,
     snippet_access: &FileAccess,
+    loc_data: &LocData,
     uber_state_data: &UberStateData,
     entry: &str,
     out: &Path,
@@ -138,7 +141,7 @@ fn compile(
         return Err("compilation failed".into());
     }
 
-    let seed = Seed::new(output, debug);
+    let seed = Seed::new(output, loc_data, debug);
 
     let mut file = File::create(out).map_err(|err| file_err("create", out, err))?;
     seed.package(&mut file, !debug)?;

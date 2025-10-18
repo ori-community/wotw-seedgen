@@ -202,7 +202,7 @@ impl Simulate for CommandString {
         match self {
             CommandString::Constant { value } => match value {
                 StringOrPlaceholder::Value(value) => value.clone(),
-                _ => Default::default(),
+                other => other.to_string(),
             },
             CommandString::Multi { commands, last } => {
                 commands.simulate(world, events);

@@ -1,6 +1,6 @@
 use std::{mem, ops::ControlFlow};
 
-use super::{graph::node_condition_equals, node_condition, World};
+use super::World;
 use crate::{
     logical_difficulty,
     orbs::{self, OrbVariants, Orbs},
@@ -15,7 +15,7 @@ use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::{
     Anchor, Connection, Graph, Node, RefillValue, Requirement,
 };
-use wotw_seedgen_seed_language::output::Event;
+use wotw_seedgen_seed_language::output::{CommandBoolean, Event};
 
 pub const TP_ANCHOR: &str = "Teleporters";
 
@@ -234,13 +234,14 @@ impl World<'_, '_> {
     fn check_states(&mut self, logic_states: Vec<usize>, events: &[Event]) {
         for index in logic_states {
             let node = &self.graph.nodes[index];
+            let uber_identifier = node.uber_identifier().unwrap();
             // TODO less hardcoded solution?
-            let node_condition_f = if node.uber_identifier().unwrap().is_door() {
-                node_condition_equals
+            let node_condition_f = if uber_identifier.is_door() {
+                CommandBoolean::door_condition
             } else {
-                node_condition
+                CommandBoolean::loc_data_condition
             };
-            let condition = node_condition_f(node).unwrap();
+            let condition = node_condition_f(uber_identifier, node.value());
 
             // node conditions don't change UberStates
             if self.simulate(&condition, &[]) {

@@ -4,7 +4,6 @@ pub mod spoiler;
 
 mod placement;
 mod spirit_light;
-mod string_placeholders;
 mod weight;
 
 use self::spoiler::SeedSpoiler;
@@ -16,7 +15,7 @@ use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
-use wotw_seedgen_assets::{SnippetAccess, UberStateData};
+use wotw_seedgen_assets::{LocData, SnippetAccess, UberStateData};
 use wotw_seedgen_data::Teleporter;
 use wotw_seedgen_logic_language::output::Graph;
 use wotw_seedgen_seed::Seed;
@@ -39,6 +38,7 @@ const RETRIES: u16 = 10; // How many retries to allow when generating a seed
 /// Entry point for seed generation
 pub fn generate_seed<F: SnippetAccess>(
     graph: &Graph,
+    loc_data: &LocData,
     uber_state_data: &UberStateData,
     snippet_access: &F,
     settings: &UniverseSettings,
@@ -89,7 +89,7 @@ pub fn generate_seed<F: SnippetAccess>(
             })
             .collect::<Result<Vec<_>, String>>()?;
 
-        match generate_placements(&mut rng, worlds, settings, debug) {
+        match generate_placements(&mut rng, worlds, settings, loc_data, debug) {
             Ok(seed) => {
                 if attempt > 1 {
                     info!(

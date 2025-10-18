@@ -5,8 +5,8 @@ use super::{
 use crate::{
     contained_uber_identifiers::ContainedWrites,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
-    world::{node_condition, node_trigger, UberStateValue},
-    World,
+    world::UberStateValue,
+    Simulate, World,
 };
 use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
@@ -20,14 +20,14 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, mem, ops::RangeFrom};
+use wotw_seedgen_assets::LocData;
 use wotw_seedgen_data::{CommonUberIdentifier, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
     compile,
     output::{
-        ClientEvent, CommandString, CommandVoid, Event, IntermediateOutput, ItemMetadata,
-        StringOrPlaceholder, Trigger,
+        ClientEvent, CommandBoolean, CommandString, CommandVoid, Event, IntermediateOutput, Trigger,
     },
 };
 use wotw_seedgen_settings::UniverseSettings;
@@ -56,6 +56,7 @@ pub fn generate_placements(
     rng: &mut Pcg64Mcg,
     worlds: Vec<(World, IntermediateOutput)>,
     settings: &UniverseSettings,
+    loc_data: &LocData,
     debug: bool,
 ) -> Result<SeedUniverse, String> {
     assert!(
@@ -84,7 +85,7 @@ pub fn generate_placements(
         }
     }
 
-    Ok(context.finish(debug))
+    Ok(context.finish(loc_data, debug))
 }
 
 pub struct Context<'graph, 'settings> {
@@ -612,7 +613,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             mark_forced,
         );
         self.push_command(
-            node_trigger(node).unwrap(),
+            Trigger::loc_data_trigger(uber_identifier, node.value()),
             command,
             name,
             origin_world_index,
@@ -693,9 +694,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    fn finish(mut self, debug: bool) -> SeedUniverse {
-        self.resolve_placeholders();
-
+    fn finish(self, loc_data: &LocData, debug: bool) -> SeedUniverse {
         SeedUniverse {
             worlds: self
                 .worlds
@@ -712,7 +711,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         world_index: world_context.index,
                         spawn_identifier: spawn.identifier().to_string(),
                     };
-                    Seed::new(world_context.output, debug).with_seedgen_info(seedgen_info)
+                    Seed::new(world_context.output, loc_data, debug).with_seedgen_info(seedgen_info)
                 })
                 .collect(),
             spoiler: self.spoiler,
@@ -1246,30 +1245,15 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     pub fn name(&self, command: &CommandVoid) -> CommandString {
-        command_name(command, &self.output.item_metadata)
+        self.output.item_metadata.force_name(command)
     }
 
     fn log_name(&mut self, command: &CommandVoid) -> String {
-        self.output
-            .item_metadata
+        let name = self
             .name(command)
-            .map(|s| match s {
-                StringOrPlaceholder::Value(value) => strip_control_characters(&value),
-                other => other.to_string(),
-            })
-            .or_else(|| {
-                self.simulate_message(command)
-                    .map(|message| strip_control_characters(&message))
-            })
-            .unwrap_or_else(|| {
-                let value = command.to_string();
-                warn!("No name specified for custom command: {value}");
-                value
-            })
-    }
+            .simulate(&mut self.world, &self.output.events);
 
-    fn simulate_message(&mut self, command: &CommandVoid) -> Option<String> {
-        find_message(command).map(|message| self.world.simulate(message, &self.output.events))
+        strip_control_characters(&name)
     }
 
     fn on_load(&mut self, command: CommandVoid) {
@@ -1382,7 +1366,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             self.shop_item_data(&command, uber_identifier, self.name(&command))
         }
         self.write_placement_spoiler(node, &command, placement_spoiler);
-        self.push_command(node_trigger(node).unwrap(), command);
+        self.push_command(
+            Trigger::loc_data_trigger(uber_identifier, node.value()),
+            command,
+        );
     }
 
     fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
@@ -1445,7 +1432,7 @@ fn total_reach_check<'graph>(
         .map(|index| &world.graph.nodes[index])
         .filter(|node| {
             node.can_place() && {
-                let condition = node_condition(node).unwrap();
+                let condition = CommandBoolean::loc_data_condition(node.uber_identifier().unwrap(), node.value());
                 if output.removed_locations.contains(&condition) {
                     trace!("Manually removed {node} from placement locations", node = node.identifier());
                     return false;
@@ -1474,24 +1461,6 @@ fn total_reach_check<'graph>(
     needs_placement
 }
 
-pub fn command_name(command: &CommandVoid, item_metadata: &ItemMetadata) -> CommandString {
-    item_metadata
-        .name(command)
-        .map(CommandString::from)
-        .or_else(|| find_message(command).cloned())
-        .unwrap_or_else(|| {
-            let value = command.to_string();
-            warn!("No name specified for custom command: {value}");
-            value.into()
-        })
-}
-fn find_message(command: &CommandVoid) -> Option<&CommandString> {
-    match command {
-        CommandVoid::Multi { commands } => commands.iter().find_map(find_message),
-        CommandVoid::QueuedMessage { message, .. } => Some(message),
-        _ => None,
-    }
-}
 fn strip_control_characters(s: &str) -> String {
     let mut result = String::new();
     let mut last_end = 0;

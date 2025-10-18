@@ -1,97 +1,100 @@
-use std::iter;
-
-use crate::world::{node_condition, node_trigger};
-
-use super::placement::{command_name, Context};
-use rustc_hash::FxHashMap;
-use wotw_seedgen_data::Zone;
-use wotw_seedgen_logic_language::output::Node;
-use wotw_seedgen_seed_language::output::{
+use super::{
     ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Comparator, EqualityComparator, Event, ItemMetadata, Operation,
-    StringOrPlaceholder, Trigger,
+    CommandVoid, CommandZone, Comparator, EqualityComparator, Event, IntermediateOutput,
+    ItemMetadata, Operation, StringOrPlaceholder, Trigger,
 };
+use rustc_hash::FxHashMap;
+use wotw_seedgen_assets::{LocData, LocDataEntry};
+use wotw_seedgen_data::Zone;
 
-impl Context<'_, '_> {
-    pub fn resolve_placeholders(&mut self) {
-        let node_trigger_map = self.worlds[0]
-            .world
-            .graph
-            .nodes
-            .iter()
-            .flat_map(|node| {
-                iter::zip(node_trigger(node), node.zone())
-                    .map(move |(trigger, zone)| (trigger, (node, zone)))
-            })
-            .collect::<FxHashMap<_, _>>();
+pub type StringPlaceholderMap = FxHashMap<StringOrPlaceholder, CommandString>;
 
-        // TODO prefilter output events to only include things that can succeed a node_trigger_map lookup
+impl IntermediateOutput {
+    pub fn resolve_placeholders(&self, loc_data: &LocData) -> StringPlaceholderMap {
+        let mut string_placeholder_map = FxHashMap::default();
 
-        for world in &mut self.worlds {
-            let events = world
-                .output
-                .events
-                .iter()
-                .filter(|event| node_trigger_map.contains_key(&event.trigger))
-                .cloned()
-                .collect::<Vec<_>>();
-            let context = ResolveContext {
-                events,
-                node_trigger_map: &node_trigger_map,
-                item_metadata: &world.output.item_metadata,
-            };
+        let mut context = ResolveContext::new(self, loc_data, &mut string_placeholder_map);
+        self.resolve(&mut context);
 
-            world.output.events.resolve(&context);
-            world.output.command_lookup.resolve(&context);
-        }
+        string_placeholder_map
     }
 }
 
-struct ResolveContext<'a> {
-    events: Vec<Event>,
-    node_trigger_map: &'a FxHashMap<Trigger, (&'a Node, Zone)>,
-    item_metadata: &'a ItemMetadata,
+struct ResolveContext<'output, 'locdata, 'map> {
+    events: &'output [Event],
+    loc_data_triggers: FxHashMap<Trigger, &'locdata LocDataEntry>,
+    loc_data_events: Vec<&'output Event>,
+    item_metadata: &'output ItemMetadata,
+    string_placeholder_map: &'map mut StringPlaceholderMap,
 }
 
-fn resolve_zone_of(item: &CommandVoid, context: &ResolveContext) -> CommandString {
-    context
-        .events
-        .iter()
-        .find(|event| &event.command == item) // TODO there could be multiple
-        .and_then(|event| context.node_trigger_map.get(&event.trigger))
-        .map_or_else(|| "Unknown".to_string(), |(_, zone)| zone.to_string())
-        .into()
-}
-fn resolve_item_on(trigger: &Trigger, context: &ResolveContext) -> CommandString {
-    context
-        .events
-        .iter()
-        .find(|event| &event.trigger == trigger)
-        .map_or_else(
-            || "Nothing".into(),
-            |event| command_name(&event.command, context.item_metadata),
-        )
-}
-fn resolve_count_in_zone(
-    items: &[CommandVoid],
-    zone: Zone,
-    context: &ResolveContext,
-) -> CommandString {
-    let matches = context
-        .events
-        .iter()
-        .filter_map(|event| {
-            context
-                .node_trigger_map
-                .get(&event.trigger)
-                .map(|entry| (event, entry))
-        })
-        .filter(|(event, (_, z))| *z == zone && items.contains(&event.command))
-        .collect::<Vec<_>>();
+impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
+    fn new(
+        output: &'output IntermediateOutput,
+        loc_data: &'locdata LocData,
+        string_placeholder_map: &'map mut StringPlaceholderMap,
+    ) -> Self {
+        let loc_data_triggers = loc_data
+            .entries
+            .iter()
+            .map(|entry| {
+                (
+                    Trigger::loc_data_trigger(entry.uber_identifier, entry.value),
+                    entry,
+                )
+            })
+            .collect::<FxHashMap<_, _>>();
 
-    if matches.is_empty() {
-        "$0/0$".into()
-    } else {
+        let loc_data_events = output
+            .events
+            .iter()
+            .filter(|event| loc_data_triggers.contains_key(&event.trigger))
+            .collect::<Vec<_>>();
+
+        Self {
+            events: &output.events,
+            loc_data_triggers,
+            loc_data_events,
+            item_metadata: &output.item_metadata,
+            string_placeholder_map,
+        }
+    }
+
+    fn resolve_zone_of(&self, item: &CommandVoid) -> CommandString {
+        self.loc_data_events
+            .iter()
+            .find(|event| &event.command == item) // TODO there could be multiple
+            .and_then(|event| self.loc_data_triggers.get(&event.trigger))
+            .map_or_else(|| "Unknown".to_string(), |entry| entry.zone.to_string())
+            .into()
+    }
+
+    fn resolve_item_on(&self, trigger: &Trigger) -> CommandString {
+        self.events
+            .iter()
+            .find(|event| &event.trigger == trigger)
+            .map_or_else(
+                || "Nothing".into(),
+                |event| self.item_metadata.force_name(&event.command),
+            )
+    }
+
+    fn resolve_count_in_zone(&self, items: &[CommandVoid], zone: Zone) -> CommandString {
+        let matches = self
+            .loc_data_events
+            .iter()
+            .filter_map(|event| {
+                self.loc_data_triggers
+                    .get(&event.trigger)
+                    .map(|entry| (event, entry))
+            })
+            .filter(|(event, entry)| entry.zone == zone && items.contains(&event.command))
+            .collect::<Vec<_>>();
+
+        if matches.is_empty() {
+            return "$0/0$".into();
+        }
+
         CommandString::Multi {
             commands: [
                 CommandVoid::SetInteger {
@@ -104,8 +107,8 @@ fn resolve_count_in_zone(
                 },
             ]
             .into_iter()
-            .chain(matches.iter().map(|(event, (node, _))| CommandVoid::If {
-                condition: node_condition(node).unwrap(),
+            .chain(matches.iter().map(|(event, entry)| CommandVoid::If {
+                condition: CommandBoolean::loc_data_condition(entry.uber_identifier, entry.value),
                 command: Box::new(CommandVoid::Multi {
                     commands: vec![
                         CommandVoid::SetInteger {
@@ -154,10 +157,7 @@ fn resolve_count_in_zone(
                             id: 2,
                             value: CommandString::Concatenate {
                                 left: Box::new(CommandString::GetString { id: 2 }),
-                                right: Box::new(command_name(
-                                    &event.command,
-                                    context.item_metadata,
-                                )), // TODO could this have placeholders again?
+                                right: Box::new(self.item_metadata.force_name(&event.command)), // TODO could this have placeholders again?
                             },
                         },
                     ],
@@ -203,38 +203,49 @@ fn resolve_count_in_zone(
 }
 
 trait ResolvePlaceholders {
-    fn resolve(&mut self, context: &ResolveContext);
+    fn resolve(&self, context: &mut ResolveContext);
 }
 impl<T: ResolvePlaceholders> ResolvePlaceholders for Vec<T> {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         for t in self {
             t.resolve(context);
         }
     }
 }
 impl<T: ResolvePlaceholders> ResolvePlaceholders for Option<T> {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         if let Some(t) = self {
             t.resolve(context);
         }
     }
 }
 impl<Item: ResolvePlaceholders, Operator> ResolvePlaceholders for Operation<Item, Operator> {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         self.left.resolve(context);
         self.right.resolve(context);
     }
 }
+impl ResolvePlaceholders for IntermediateOutput {
+    fn resolve(&self, context: &mut ResolveContext) {
+        self.events.resolve(context);
+        self.command_lookup.resolve(context);
+    }
+}
 impl ResolvePlaceholders for Event {
-    fn resolve(&mut self, context: &ResolveContext) {
-        if let Trigger::Condition(condition) = &mut self.trigger {
-            condition.resolve(context);
-        }
+    fn resolve(&self, context: &mut ResolveContext) {
+        self.trigger.resolve(context);
         self.command.resolve(context);
     }
 }
+impl ResolvePlaceholders for Trigger {
+    fn resolve(&self, context: &mut ResolveContext) {
+        if let Self::Condition(condition) = self {
+            condition.resolve(context);
+        }
+    }
+}
 impl ResolvePlaceholders for Command {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Boolean(command) => command.resolve(context),
             Self::Integer(command) => command.resolve(context),
@@ -246,7 +257,7 @@ impl ResolvePlaceholders for Command {
     }
 }
 impl ResolvePlaceholders for CommandBoolean {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -269,7 +280,7 @@ impl ResolvePlaceholders for CommandBoolean {
     }
 }
 impl ResolvePlaceholders for CommandInteger {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -282,7 +293,7 @@ impl ResolvePlaceholders for CommandInteger {
     }
 }
 impl ResolvePlaceholders for CommandFloat {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -295,19 +306,27 @@ impl ResolvePlaceholders for CommandFloat {
     }
 }
 impl ResolvePlaceholders for CommandString {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Constant { value } => {
-                *self = match value {
+                if context.string_placeholder_map.contains_key(value) {
+                    return;
+                }
+
+                let resolved = match value {
                     StringOrPlaceholder::Value(_) => return,
-                    StringOrPlaceholder::ZoneOfPlaceholder(item) => resolve_zone_of(item, context),
+                    StringOrPlaceholder::ZoneOfPlaceholder(item) => context.resolve_zone_of(item),
                     StringOrPlaceholder::ItemOnPlaceholder(trigger) => {
-                        resolve_item_on(trigger, context)
+                        context.resolve_item_on(trigger)
                     }
                     StringOrPlaceholder::CountInZonePlaceholder(items, zone) => {
-                        resolve_count_in_zone(items, *zone, context)
+                        context.resolve_count_in_zone(items, *zone)
                     }
-                }
+                };
+
+                context
+                    .string_placeholder_map
+                    .insert(value.clone(), resolved);
             }
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -325,7 +344,7 @@ impl ResolvePlaceholders for CommandString {
     }
 }
 impl ResolvePlaceholders for CommandZone {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -336,7 +355,7 @@ impl ResolvePlaceholders for CommandZone {
     }
 }
 impl ResolvePlaceholders for CommandVoid {
-    fn resolve(&mut self, context: &ResolveContext) {
+    fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands } => commands.resolve(context),
             Self::If { condition, command } => {

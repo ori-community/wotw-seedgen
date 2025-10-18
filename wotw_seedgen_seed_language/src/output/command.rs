@@ -82,6 +82,31 @@ impl CommandBoolean {
             _ => None,
         }
     }
+
+    pub fn loc_data_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
+        Self::condition_with_operator(uber_identifier, value, Comparator::GreaterOrEqual)
+    }
+
+    pub fn door_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
+        Self::condition_with_operator(uber_identifier, value, Comparator::Equal)
+    }
+
+    fn condition_with_operator(
+        uber_identifier: UberIdentifier,
+        value: Option<i32>,
+        operator: Comparator,
+    ) -> Self {
+        match value {
+            None => CommandBoolean::FetchBoolean { uber_identifier },
+            Some(value) => CommandBoolean::CompareInteger {
+                operation: Box::new(Operation {
+                    left: CommandInteger::FetchInteger { uber_identifier },
+                    operator,
+                    right: value.into(),
+                }),
+            },
+        }
+    }
 }
 
 impl From<bool> for CommandBoolean {
@@ -541,4 +566,14 @@ pub enum CommandVoid {
     DebugLog {
         message: CommandString,
     },
+}
+
+impl CommandVoid {
+    pub fn find_message(&self) -> Option<&CommandString> {
+        match self {
+            CommandVoid::Multi { commands } => commands.iter().find_map(Self::find_message),
+            CommandVoid::QueuedMessage { message, .. } => Some(message),
+            _ => None,
+        }
+    }
 }

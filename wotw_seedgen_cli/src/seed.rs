@@ -40,15 +40,22 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
 }
 
 pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {
-    let (graph, uber_state_data) = logic_assets(&settings.world_settings)?;
+    let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
     let snippet_access = files::snippet_access("")?;
 
-    let seed_universe = generate_seed(&graph, &uber_state_data, &snippet_access, settings, debug)?;
+    let seed_universe = generate_seed(
+        &graph,
+        &loc_data,
+        &uber_state_data,
+        &snippet_access,
+        settings,
+        debug,
+    )?;
 
     Ok(seed_universe)
 }
 
-pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, UberStateData), Error> {
+pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, LocData, UberStateData), Error> {
     let LogicFiles {
         loc_data,
         state_data,
@@ -59,12 +66,12 @@ pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, UberStateData)
     let areas = ast::parse(&source.content).into_result()?;
 
     let (graph, success) =
-        Graph::compile(areas, loc_data, state_data, settings).eprint_errors(&source);
+        Graph::compile(areas, loc_data.clone(), state_data, settings).eprint_errors(&source);
     if !success {
         return Err(Error("failed to compile graph".to_string()));
     }
 
-    Ok((graph, uber_state_data))
+    Ok((graph, loc_data, uber_state_data))
 }
 
 pub struct LogicFiles {
