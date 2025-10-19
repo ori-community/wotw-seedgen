@@ -3,14 +3,17 @@ use crate::{
     files::{self, launch_seed},
     Error,
 };
-use notify::{EventKind, RecursiveMode, Watcher};
+use notify_debouncer_full::{
+    new_debouncer,
+    notify::{EventKind, RecursiveMode},
+};
 use rand::rngs::ThreadRng;
 use std::{
     ffi::OsStr,
     fs::{self, File},
     path::{Path, PathBuf},
     sync::mpsc,
-    time::Instant,
+    time::{Duration, Instant},
 };
 use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
 use wotw_seedgen_assets::{file_err, FileAccess, LocData, UberStateData};
@@ -80,39 +83,33 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     }
 
     if watch {
-        let (tx, rx) = mpsc::channel::<notify::Result<notify::Event>>();
+        let (tx, rx) = mpsc::channel();
 
-        let mut watcher = notify::recommended_watcher(tx)?;
+        let mut watcher = new_debouncer(Duration::from_millis(10), None, tx)?;
 
         watcher.watch(Path::new(root), RecursiveMode::Recursive)?;
 
-        let canonical_out = out.canonicalize()?;
-
         for res in rx {
-            let event = res?;
+            let events = res.map_err(|mut errors| errors.pop().unwrap())?;
 
-            if event
-                .paths
-                .iter()
-                .all(|path| path.canonicalize().unwrap() == canonical_out)
-            {
+            if !events.into_iter().any(|event| {
+                matches!(
+                    event.event.kind,
+                    EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_)
+                )
+            }) {
                 continue;
             }
 
-            if matches!(
-                event.kind,
-                EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_)
-            ) {
-                let _ = compile(
-                    &mut rng,
-                    &snippet_access,
-                    &loc_data,
-                    &uber_state_data,
-                    entry,
-                    &out,
-                    debug,
-                );
-            }
+            let _ = compile(
+                &mut rng,
+                &snippet_access,
+                &loc_data,
+                &uber_state_data,
+                entry,
+                &out,
+                debug,
+            );
         }
     }
 
