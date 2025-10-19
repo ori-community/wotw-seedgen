@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use crate::{
     cli::{GenerationArgs, SeedArgs},
     files::{self, write_seed},
@@ -20,6 +22,8 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
         verbose_args,
     } = args;
 
+    let start = Instant::now();
+
     LogConfig::from_args(verbose_args, "seedgen_log.txt").apply()?;
 
     let mut settings = settings.into_universe_settings()?;
@@ -36,7 +40,7 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     };
 
     let seed_universe = generate(&settings, debug)?;
-    write_seed(seed_universe, name, debug, launch)
+    write_seed(seed_universe, name, debug, launch, start)
 }
 
 pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {

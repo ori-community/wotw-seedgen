@@ -10,6 +10,7 @@ use std::{
     fs::{self, File},
     path::{Path, PathBuf},
     sync::mpsc,
+    time::Instant,
 };
 use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
 use wotw_seedgen_assets::{file_err, FileAccess, LocData, UberStateData};
@@ -127,6 +128,8 @@ fn compile(
     out: &Path,
     debug: bool,
 ) -> Result<(), Error> {
+    let start = Instant::now();
+
     let mut compiler = Compiler::new(
         rng,
         snippet_access,
@@ -146,7 +149,11 @@ fn compile(
     let mut file = File::create(out).map_err(|err| file_err("create", out, err))?;
     seed.package(&mut file, !debug)?;
 
-    eprintln!("compiled successfully to \"{}\"", out.display());
+    eprintln!(
+        "compiled in {:.1}s to \"{}\"",
+        start.elapsed().as_secs_f32(),
+        out.display()
+    );
 
     Ok(())
 }

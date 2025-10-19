@@ -5,6 +5,7 @@ use std::{
     fs::{self, File},
     io,
     path::{Path, PathBuf},
+    time::Instant,
 };
 use wotw_seedgen::SeedUniverse;
 use wotw_seedgen_assets::{file_err, FileAccess};
@@ -46,15 +47,14 @@ pub fn write_seed(
     name: &str,
     debug: bool,
     launch: bool,
+    start: Instant,
 ) -> Result<(), Error> {
     fs::create_dir_all("seeds")?;
 
-    if seed_universe.worlds.len() == 1 {
+    let path = if seed_universe.worlds.len() == 1 {
         let (mut file, mut path) = create_unique_file(&format!("seeds/{name}"))?;
         let seed = seed_universe.worlds.pop().unwrap();
         seed.package(&mut file, !debug)?;
-
-        eprintln!("Generated seed to \"{path}\"");
 
         if launch {
             launch_seed(&path)?;
@@ -63,7 +63,9 @@ pub fn write_seed(
         path.truncate(path.len() - ".wotwr".len());
         path.push_str("_spoiler.txt");
         fs::write(&path, seed_universe.spoiler.to_string())
-            .map_err(|err| file_err("write", path, err))?;
+            .map_err(|err| file_err("write", &path, err))?;
+
+        path
     } else {
         let path = create_unique_dir(&format!("seeds/{name}"))?;
 
@@ -73,12 +75,17 @@ pub fn write_seed(
             seed.package(&mut file, !debug)?;
         }
 
-        eprintln!("Generated seed to \"{path}\"");
-
         let path = format!("{path}/spoiler.txt");
         fs::write(&path, seed_universe.spoiler.to_string())
-            .map_err(|err| file_err("write", path, err))?;
-    }
+            .map_err(|err| file_err("write", &path, err))?;
+
+        path
+    };
+
+    eprintln!(
+        "Generated seed in {:.1}s to \"{path}\"",
+        start.elapsed().as_secs_f32()
+    );
 
     Ok(())
 }
