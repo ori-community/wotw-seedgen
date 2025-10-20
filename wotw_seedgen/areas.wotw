@@ -14530,7 +14530,7 @@ anchor UpperWastes.SpinLasers at 2037, -3751:  # checkpoint before the laser spi
     unsafe:
       Dash, Burrow
       Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after bashing the mantis a second time
-      Burrow, Sword OR Shuriken=3
+      Burrow, Sword OR Shuriken=3  # https://youtu.be/azMV5hyv64M
       # Burrow, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       SentryJump=1
 
