@@ -115,8 +115,6 @@ pub enum ClientEvent {
     Binding4,
     /// Trigger on keybind
     Binding5,
-    /// Trigger on Teleport
-    Teleport,
     /// Trigger on the Show Progress keybind
     ProgressMessage,
     /// Trigger every frame

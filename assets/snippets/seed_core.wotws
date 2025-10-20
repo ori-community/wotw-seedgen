@@ -13,7 +13,7 @@ fun spawn_states() {
     store(randoConfig.fixTeleporterChainOutOfBounds, true)
     store(randoConfig.fixKwolokBossEscapeUnderwaterSpiritLightSoftlock, true)
     store(randoConfig.fixShopAnywhere, true)
-    store(randoConfig.usePatch2Kickback, true)
+    store(randoConfig.patch2Kickback, true)
     store(randoConfig.allowTeleportingUnderwater, true)
     store(randoConfig.allowTeleportingDuringCombatShrineFights, true)
     store(randoConfig.useSpawnOpherEverywhereRandoState, true)

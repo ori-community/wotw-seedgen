@@ -22,7 +22,7 @@
 }
 
 !if teleport_refill {
-    on teleport {
+    on player.isTeleporting == false {
         store(player.health, 999)
         store(player.energy, 999)
     }
