@@ -1,5 +1,8 @@
 use crate::{add_bound, find_attributes, Result};
-use convert_case::{Case, Casing};
+use heck::{
+    ToKebabCase, ToLowerCamelCase, ToPascalCase, ToShoutyKebabCase, ToShoutySnekCase, ToSnekCase,
+    ToTitleCase, ToTrainCase,
+};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::spanned::Spanned;
@@ -63,7 +66,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
 struct Attributes {
     debug: bool,
     token: Option<syn::Expr>,
-    case: Option<Case>,
+    case: Option<for<'a> fn(&'a str) -> String>,
     rename: Option<syn::LitStr>,
     with: Option<syn::LitStr>,
 }
@@ -83,14 +86,17 @@ impl Attributes {
                             lit: syn::Lit::Str(lit),
                             ..
                         }) => match lit.value().as_str() {
-                            "upper" => Case::Upper,
-                            "lower" => Case::Lower,
-                            "camel" => Case::Camel,
-                            "pascal" => Case::Pascal,
-                            "snake" => Case::Snake,
-                            "upper_snake" => Case::UpperSnake,
-                            "kebab" => Case::Kebab,
-                            "cobol" => Case::Cobol,
+                            "camelCase" => str::to_lower_camel_case,
+                            "PascalCase" => str::to_pascal_case,
+                            "kebab-case" => str::to_kebab_case,
+                            "snake_case" => str::to_snek_case,
+                            "SCREAMING_SNAKE_CASE" => str::TO_SHOUTY_SNEK_CASE,
+                            "SCREAMING-KEBAB-CASE" => str::to_shouty_kebab_case,
+                            "lowercase" => str::to_lowercase,
+                            "UPPERCASE" => str::to_uppercase,
+                            "title_case" => str::to_title_case,
+                            "mixed_case" => str::to_lower_camel_case,
+                            "Train-Case" => str::to_train_case,
                             _ => return Err(syn::Error::new_spanned(lit, "Unsupported case")),
                         },
                         other => {
@@ -309,7 +315,7 @@ fn ast_fields_unit<const IN_ENUM: bool>(
             let mut str = ident.to_string();
             if let Some(case) = attrs.case {
                 // TODO should we make assumptions about the original case?
-                str = str.to_case(case);
+                str = case(&str);
             }
             str
         }

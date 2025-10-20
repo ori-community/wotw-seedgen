@@ -286,7 +286,7 @@ pub enum InlineRequirementOrGroup<'source> {
     Group(GroupContent<SeparatedNonEmpty<RequirementLine<'source>, Newline>>),
 }
 #[derive(Debug, Clone, PartialEq, Ast)]
-#[ast(case = "lower")]
+#[ast(case = "lowercase")]
 pub struct Free;
 pub type RequirementGroup<'source> = Group<SeparatedNonEmpty<RequirementLine<'source>, Newline>>;
 #[derive(Debug, Clone, PartialEq)]

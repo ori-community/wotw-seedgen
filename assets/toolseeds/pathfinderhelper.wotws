@@ -170,14 +170,14 @@ fun give_stuff() {
     store(WillowsEnd.ShriekTeleporterActive, true)
 }
 
-on binding_1 toggle_clean_water()
+on binding1 toggle_clean_water()
 fun toggle_clean_water() {
     if randoState.cleanWater item_message(remove_clean_water_string())
     if randoState.cleanWater == false item_message(clean_water_string())
     store(randoState.cleanWater, randoState.cleanWater == false)
 }
 
-on binding_2 toggle_difficulty()
+on binding2 toggle_difficulty()
 fun toggle_difficulty() {
     store(gameStateGroup.gameDifficultyMode, gameStateGroup.gameDifficultyMode + 1)
     if gameStateGroup.gameDifficultyMode == 3 store(gameStateGroup.gameDifficultyMode, 0)
@@ -190,7 +190,7 @@ fun toggle_difficulty() {
 !state(x, Float)
 !state(y, Float)
 
-on binding_3 {
+on binding3 {
     if get_boolean("choosing_target") == false {
         if x == 0. && y == 0. choose_teleport_target()
         if x != 0. || y != 0. teleport()
@@ -219,7 +219,7 @@ fun update_target_message() {
     set_message_text("target", input.mouseWorldPositionX + ", " + input.mouseWorldPositionY + "\n[Binding3]Confirm")
 }
 
-on binding_4 {
+on binding4 {
     save_game()
     refill()
 }
@@ -234,7 +234,7 @@ fun refill() {
     item_message("Health and Energy restored")
 }
 
-on binding_5 world_reset()
+on binding5 world_reset()
 fun world_reset() {
     store_defaults_exclude(
         "^("

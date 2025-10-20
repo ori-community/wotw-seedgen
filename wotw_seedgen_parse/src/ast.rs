@@ -137,7 +137,7 @@ use crate::{
 /// }
 ///
 /// #[derive(Debug, PartialEq, Ast)]
-/// #[ast(case = "snake")]
+/// #[ast(case = "snake_case")]
 /// struct HappyNoises;
 ///
 /// type Tokenizer = LogosTokenizer<Token>;

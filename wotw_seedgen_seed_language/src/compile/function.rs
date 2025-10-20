@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use arrayvec::ArrayVec;
-use convert_case::{Case, Casing};
+use heck::ToTitleCase;
 use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
@@ -1392,10 +1392,7 @@ fn energy_fragment_string(remove: bool) -> CommandString {
     resource_string("Energy Fragment", remove)
 }
 fn skill_string(skill: Skill, remove: bool) -> CommandString {
-    let skill_cased = skill
-        .to_string()
-        .from_case(Case::Pascal)
-        .to_case(Case::Title);
+    let skill_cased = skill.to_string().to_title_case();
     if remove {
         format!("@Remove {skill_cased}@")
     } else {
@@ -1409,10 +1406,7 @@ fn skill_string(skill: Skill, remove: bool) -> CommandString {
     .into()
 }
 fn shard_string(shard: Shard, remove: bool) -> CommandString {
-    let shard_cased = shard
-        .to_string()
-        .from_case(Case::Pascal)
-        .to_case(Case::Title);
+    let shard_cased = shard.to_string().to_title_case();
     if remove {
         format!("@Remove {shard_cased}@")
     } else {
@@ -1423,10 +1417,7 @@ fn shard_string(shard: Shard, remove: bool) -> CommandString {
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
     let teleporter = teleporter.to_string();
     let teleporter = &teleporter[..teleporter.len() - 2];
-    let teleporter_cased = teleporter
-        .to_string()
-        .from_case(Case::Pascal)
-        .to_case(Case::Title);
+    let teleporter_cased = teleporter.to_string().to_title_case();
     if remove {
         format!("@Remove {teleporter_cased} Teleporter@")
     } else {
@@ -1444,10 +1435,7 @@ fn clean_water_string(remove: bool) -> CommandString {
 }
 // TODO remove as const?
 fn weapon_upgrade_string(weapon_upgrade: WeaponUpgrade, remove: bool) -> CommandString {
-    let weapon_upgrade_cased = weapon_upgrade
-        .to_string()
-        .from_case(Case::Pascal)
-        .to_case(Case::Title);
+    let weapon_upgrade_cased = weapon_upgrade.to_string().to_title_case();
     if remove {
         format!("@Remove {weapon_upgrade_cased}@")
     } else {

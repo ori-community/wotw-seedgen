@@ -95,7 +95,7 @@ pub enum Trigger<'source> {
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, Serialize, Deserialize, VariantArray,
 )]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum ClientEvent {
     /// Trigger when starting a new file
@@ -386,7 +386,7 @@ pub type CommandArgs<Args> = CommandArgsCollection<Once<Args>>;
 pub type CommandArg<T> =
     Recoverable<(Symbol<','>, Recoverable<T, RecoverCommandArg>), RecoverCommandArg>;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Include;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct IncludeArgs<'source> {
@@ -395,7 +395,7 @@ pub struct IncludeArgs<'source> {
 }
 pub type IncludeArgsImports<'source> = Separated<Spanned<Identifier<'source>>, Symbol<','>>;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct BundleIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct BundleIconArgs<'source> {
@@ -403,7 +403,7 @@ pub struct BundleIconArgs<'source> {
     pub path: CommandArg<Spanned<&'source str>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct BuiltinIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct BuiltinIconArgs<'source> {
@@ -416,7 +416,7 @@ pub struct EventIdent;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct EventArgs<'source>(pub Spanned<Identifier<'source>>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct OnEvent;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct OnEventArgs<'source> {
@@ -425,12 +425,12 @@ pub struct OnEventArgs<'source> {
     pub action: CommandArg<Action<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Export;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ExportArgs<'source>(pub Spanned<Identifier<'source>>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Spawn;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct SpawnArgs<'source> {
@@ -438,12 +438,12 @@ pub struct SpawnArgs<'source> {
     pub y: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Tags;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct TagsArg<'source>(pub Expression<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Config;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ConfigArgs<'source> {
@@ -459,7 +459,7 @@ pub enum ConfigType {
     Float,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct SetConfig;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct SetConfigArgs<'source> {
@@ -469,7 +469,7 @@ pub struct SetConfigArgs<'source> {
     pub value: CommandArg<Spanned<&'source str>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct State;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct StateArgs<'source> {
@@ -483,7 +483,7 @@ pub enum UberStateType {
     Float,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Timer;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct TimerArgs<'source> {
@@ -491,7 +491,7 @@ pub struct TimerArgs<'source> {
     pub timer_identifier: CommandArg<Spanned<Identifier<'source>>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Let;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct LetArgs<'source> {
@@ -504,7 +504,7 @@ pub struct CommandIf<'source> {
     pub contents: Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Repeat;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CommandRepeat<'source> {
@@ -512,12 +512,12 @@ pub struct CommandRepeat<'source> {
     pub contents: Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Add;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct AddArgs<'source>(pub ChangeItemPoolArgs<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Remove;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RemoveArgs<'source>(pub ChangeItemPoolArgs<'source>);
@@ -527,7 +527,7 @@ pub struct ChangeItemPoolArgs<'source> {
     pub amount: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ItemData;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataArgs<'source> {
@@ -539,7 +539,7 @@ pub struct ItemDataArgs<'source> {
     pub map_icon: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ItemDataName;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataNameArgs<'source> {
@@ -547,7 +547,7 @@ pub struct ItemDataNameArgs<'source> {
     pub name: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ItemDataPrice;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataPriceArgs<'source> {
@@ -555,7 +555,7 @@ pub struct ItemDataPriceArgs<'source> {
     pub price: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ItemDataDescription;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataDescriptionArgs<'source> {
@@ -563,7 +563,7 @@ pub struct ItemDataDescriptionArgs<'source> {
     pub description: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ItemDataIcon;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemDataIconArgs<'source> {
@@ -571,19 +571,19 @@ pub struct ItemDataIconArgs<'source> {
     pub icon: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct RemoveLocation;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RemoveLocationArgs<'source> {
     pub condition: Expression<'source>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct SetLogicState;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct SetLogicStateArgs<'source>(pub Spanned<&'source str>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Preplace;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct PreplaceArgs<'source> {
@@ -591,7 +591,7 @@ pub struct PreplaceArgs<'source> {
     pub zone: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ZoneOf;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ZoneOfArgs<'source> {
@@ -599,7 +599,7 @@ pub struct ZoneOfArgs<'source> {
     pub item: CommandArg<Action<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct ItemOn;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ItemOnArgs<'source> {
@@ -607,7 +607,7 @@ pub struct ItemOnArgs<'source> {
     pub trigger: CommandArg<Trigger<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct CountInZone;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CountInZoneArgs<'source> {
@@ -624,12 +624,12 @@ pub struct CountInZoneBinding<'source> {
     pub zone: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct RandomInteger;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomIntegerArgs<'source>(pub RandomNumberArgs<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct RandomFloat;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomFloatArgs<'source>(pub RandomNumberArgs<'source>);
@@ -640,7 +640,7 @@ pub struct RandomNumberArgs<'source> {
     pub max: CommandArg<Expression<'source>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct RandomPool;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomPoolArgs<'source> {
@@ -649,7 +649,7 @@ pub struct RandomPoolArgs<'source> {
     pub values: CommandArg<Delimited<'[', Punctuated<Expression<'source>, ','>, ']'>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct RandomFromPool;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RandomFromPoolArgs<'source> {
@@ -665,14 +665,14 @@ pub enum Annotation<'source> {
     Description(Spanned<Description>, CommandArgs<Spanned<&'source str>>),
 }
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Hidden;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Name;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Category;
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(case = "snake")]
+#[ast(case = "snake_case")]
 pub struct Description;

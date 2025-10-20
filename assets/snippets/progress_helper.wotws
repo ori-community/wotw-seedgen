@@ -99,7 +99,7 @@ on change player.currentMapArea if player.currentMapArea < 14 {
     set_map_message(get_string("progress_message"))
 }
 
-on binding_1 if disable_keybinds == false {
+on binding1 if disable_keybinds == false {
     write_tree_progress()
     write_wisp_progress()
     priority_message(
@@ -107,8 +107,8 @@ on binding_1 if disable_keybinds == false {
         4.0
     )
 }
-on binding_2 if disable_keybinds == false show_quest_progress()
-on binding_3 if disable_keybinds == false show_teleporter_progress()
+on binding2 if disable_keybinds == false show_quest_progress()
+on binding3 if disable_keybinds == false show_teleporter_progress()
 
 fun write_tree_progress() {
     // TODO could share the logic between found and remaining
