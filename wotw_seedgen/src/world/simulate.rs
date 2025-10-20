@@ -358,15 +358,20 @@ fn set_uber_state(
     world.update_reached(uber_identifier, events);
 }
 fn process_triggers(world: &mut World, events: &[Event], triggers: Vec<usize>) {
-    for index in triggers {
-        let event = &events[index];
-        if match &event.trigger {
+    // Trigger conditions have to be evaluated ahead of time in case any
+    // triggered commands modify states relevant to the conditions.
+    let triggered_events = triggers
+        .into_iter()
+        .map(|index| &events[index])
+        .filter(|event| match &event.trigger {
             Trigger::ClientEvent(_) => false,
             Trigger::Binding(_) => true,
             Trigger::Condition(condition) => condition.simulate(world, events),
-        } {
-            event.command.simulate(world, events);
-        }
+        })
+        .collect::<Vec<_>>();
+
+    for event in triggered_events {
+        event.command.simulate(world, events);
     }
 }
 
