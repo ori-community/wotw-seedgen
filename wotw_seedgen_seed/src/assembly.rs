@@ -137,7 +137,7 @@ pub enum Command {
     /// Update whether the background of message `id` is enabled based on Boolean Memory 0
     MessageBackground(/*id*/ usize),
     /// If queued message `id` get shown, execute `command`
-    QueuedMessageVisibleCallback(/*id*/ usize, /*command*/ usize),
+    QueuedMessageShownCallback(/*id*/ usize, /*command*/ usize),
     /// If queued message `id` get hidden, execute `command`
     QueuedMessageHiddenCallback(/*id*/ usize, /*command*/ usize),
     /// Show free message `id` and play a sound if Boolean Memory 0 is `true`

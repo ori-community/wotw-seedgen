@@ -325,7 +325,7 @@ pub enum CommandVoid {
     },
     // TODO
     // /// Update the `callback` that triggers when queued message `id` is shown
-    // QueuedMessageVisibleCallback { id: usize, callback: usize },
+    // QueuedMessageShownCallback { id: usize, callback: usize },
     // /// Update the `callback` that triggers when queued message `id` is hidden
     // QueuedMessageHiddenCallback { id: usize, callback: usize },
     /// Show `message` immediately independent of the queue
