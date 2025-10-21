@@ -4231,19 +4231,6 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   quest GladesTown.RebuildTheGlades:
     moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
 
-  pickup GladesTown.ArcingShard:
-    moki, GladesTown.ClearThorns:
-      Bash, Grenade=1
-      Launch
-      TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
-    gorlek, GladesTown.ClearThorns:
-      SentryJump=1, DoubleJump, TripleJump
-      TuleyShop.Lightcatchers, Bash
-    kii, GladesTown.ClearThorns:
-      DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.ClearThorns:
-      GrenadeJump
-      DoubleJump, TripleJump OR Dash
   pickup GladesTown.LupoSwimMiddleEX:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
@@ -4253,12 +4240,14 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   pickup GladesTown.LupoSwimLeftEX:
     moki, GladesTown.ClearThorns: Water, WaterDash OR Launch
     gorlek, GladesTown.ClearThorns: Water, DoubleJump, TripleJump
-    kii, GladesTown.ClearThorns:
-      Water, DoubleJump, Hammer  # wjump+djump+hammer. Possible from both walls
+    # kii, GladesTown.ClearThorns:
+    #  Water, AerialHammerJump
+    #  Water, GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    #  Water, GlideJump, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.ClearThorns:
-      Bash, Grenade=1, Water OR Damage=100  # The grenade has to be launched from the very edge of the platform
-      GrenadeJump, Water OR Damage=100
-      DoubleJump, Water OR Damage=100
+      Water OR Damage=100:
+        Bash, Grenade=1  # The grenade has to be thrown from the very edge of the platform
+        DoubleJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR GlideHammerJump OR CoyoteHammerJump
       WaterDash, Damage=40
   # Disabled for now since seed_core applies a fix by default
   # pickup GladesTown.CaveBurrowEX:
@@ -4266,23 +4255,28 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
 
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
-  conn GladesTown.UpperWest:
+  conn GladesTown.ThornyBranch:
     moki:
-      Launch, DoubleJump OR Dash OR Glide
-      TuleyShop.BlueMoon, Grapple:
-        Bash, Grenade=1
-        Launch
-        TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
-    gorlek:
+      Bash, Grenade=1
       Launch
-      TuleyShop.BlueMoon, Grapple:
-        SentryJump=1
-        TuleyShop.Lightcatchers, Bash
+      TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      SentryJump=1, DoubleJump, TripleJump
+      TuleyShop.Lightcatchers, Bash
+    kii:
+      DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump  # upslash first
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer 
     unsafe:
-      SentryJump=2  # from directly below the bridge
-      TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
-      DoubleJump, TripleJump  # hardcore parkour
-      GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
+      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump
+      DoubleJump, TripleJump OR Dash OR Hammer OR Sword  # https://youtu.be/_FdDy6sOBns
+  conn GladesTown.UpperWest:  # Make sure it's not redundant with going to GladesTown.ThornyBranch first
+    moki: TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
+    gorlek: TuleyShop.BlueMoon, Grapple, SentryJump=1
+    unsafe:
+      SwordSJump=1  # from the swinging platform
+      HammerSJump=2  # from directly below the bridge
   conn GladesTown.BelowBountyShard:  # paths using the right platforms may want to go through AboveOpher first
     moki:
       Launch
@@ -4345,6 +4339,23 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
 
 # checkpoint at -297, -4139
 
+anchor GladesTown.ThornyBranch at -330, -4135:  # Next to GladesTown.ArcingShard
+  pickup GladesTown.ArcingShard:
+    moki: GladesTown.ClearThorns
+    
+  conn GladesTown.Teleporter: free
+  conn GladesTown.UpperWest:
+    moki:
+      Launch, DoubleJump OR Dash OR Glide
+      TuleyShop.BlueMoon, Grapple, Launch OR DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch
+      TuleyShop.BlueMoon, Grapple
+    unsafe:
+      DoubleJump, TripleJump  # hardcore parkour
+      GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
+      TuleyShop.Lightcatchers, Bash, Grenade=1  # https://youtu.be/zb09kz4YhX4
+
 anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
   door:
     id: 9
@@ -4401,7 +4412,6 @@ anchor GladesTown.KeyMokiHutInside at -110, -4571:
     enter: free
 
   pickup GladesTown.KeyMokiHutEX: free
-
 
 anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twillen
   refill Checkpoint
@@ -4629,13 +4639,6 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   # refill Checkpoint:
   #   unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
 
-  pickup GladesTown.ArcingShard:
-    moki, GladesTown.ClearThorns:
-      DoubleJump OR Dash OR Glide OR Launch
-      TuleyShop.Lightcatchers, Bash  # somehow I don't think this path is very relevant
-      TuleyShop.BlueMoon, Grapple
-    gorlek: GladesTown.ClearThorns, Sword OR Hammer
-    kii, GladesTown.ClearThorns: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup GladesTown.UpperLeftEX:
     moki:
       Bash, Grenade=1
@@ -4669,6 +4672,13 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
 
+  conn GladesTown.ThornyBranch:
+    moki:
+      DoubleJump OR Dash OR Glide OR Launch
+      TuleyShop.Lightcatchers, Bash  # somehow I don't think this path is very relevant
+      TuleyShop.BlueMoon, Grapple
+    gorlek: Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn GladesTown.MotayHut:  # check for redundancies with GladesTown.West
     moki, GladesTown.BuildHuts:
       DoubleJump OR Dash OR Glide
