@@ -4267,16 +4267,17 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
       # AerialHammerJump  # upslash first
+      # SentryJump=1
       # GrenadeJump=1, DoubleJump OR Dash OR Hammer 
     unsafe:
-      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump
+      SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump
       DoubleJump, TripleJump OR Dash OR Hammer OR Sword  # https://youtu.be/_FdDy6sOBns
   conn GladesTown.UpperWest:  # Make sure it's not redundant with going to GladesTown.ThornyBranch first
     moki: TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
     gorlek: TuleyShop.BlueMoon, Grapple, SentryJump=1
     unsafe:
       SwordSJump=1  # from the swinging platform
-      HammerSJump=2  # from directly below the bridge
+      HammerSJump=2  # from directly below the bridge. Probably an aerial sjump, which would make it redundant with going to GladesTown.ThornyBranch first but I'm keeping it just in case.
   conn GladesTown.BelowBountyShard:  # paths using the right platforms may want to go through AboveOpher first
     moki:
       Launch
@@ -4290,12 +4291,24 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Bash, Grenade=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # same as above but with bashnade
       Bash, Grenade=2, Dash  # throw your grenade at like 45° and dash to catch it
       TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Dash
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # get on the platform above the tp then djump+other option to rech the wall above
+      # SentryJump=1, DoubleJump
+      # SwordSJump=1, Dash
+      # HammerSJump=1, Dash, Shuriken=1 OR Sentry=1
+      # GlideJump, DoubleJump OR Dash OR Hammer
+      # TuleyShop.Lightcatchers, Bash, GlideJump
     unsafe:
-      DoubleJump, Sword  # equip sword on slot 3 so you can upslash
+      DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR BlazeSwap=1 OR Sentry=1 # equip weapon on slot 3 so you can upslash near the TP. Energy weapon does a ceiling jump above the tp
       Bash, Grenade=2
-      #Bash, Grenade=2, Glide OR Sword OR DoubleJump
-      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
-      SwordSJump=1  # high sjump to reach the wall on the left of the bridge then wall jump and upslash+downslash
+      # Bash, Grenade=2, Glide OR Sword OR DoubleJump
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer OR GlideJump OR PauseFloat OR BlazeSwap=1 OR SentrySwap=1
+      SentryJump=1  # from the tp for sword
+      BlazeSwap=3 OR FlashSwap OR SentrySwap=3 OR WallHammerJump
+      CoyoteHammerJump, Dash OR Flash=1 OR BlazeSwap=1 OR Sentry=1 OR PauseFloat
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      TuleyShop.Lightcatchers, Bash, GlideJump OR GrenadeJump OR CoyoteHammerJump OR BlazeSwap=1 OR SentrySwap=1
       TuleyShop.StickyGrass, Grapple, DoubleJump  # ceiling jump
   conn GladesTown.AboveOpher:  # paths using the platform left above the coals may want to go to GladesTown.LeftAboveCoals first
     moki:
@@ -4308,17 +4321,21 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     kii:
       DoubleJump, Glide OR Dash OR Sword OR Hammer OR Sentry=2  # from where Tuley is. Building the second house makes it harder but still possible
       Dash, Hammer  # coyote dash form where Tuley to the wall, then upslash+dash to reach the platform. Building the second house makes it way harder
-    unsafe:
-      Grenade=1, Sword  # Grenade Pogos. I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
-      GrenadeJump
+      # Glitched
+      # GrenadeJump=2, Glide  # from Tuley to avoid getting stuck by the 2nd hut
+      # GrenadeJump=1, Glide, GlideJump OR Burrow OR Dash OR Sword OR Shuriken=1
+      # GrenadeJump=1, DoubleJump OR Hammer
+    unsafe:  # gjumps goes through GladesTown.LeftAboveCoals because it would softlock with the 2nd hut otherwise
+      # Grenade=1, Sword  # Grenade Pogos. Commented because I'm pretty sure this is impossible once you build the second house
       WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
-      Dash, GlideJump  # coyote dash form where Tuley. Building the second house makes it way harder
-      Dash, Burrow  # I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
+      Dash, GlideJump  # coyote dash from where Tuley. Also possible without a coyote dash once the second hut is built
+      Dash, Burrow  # Pretty sure you need a fake burrow once the 2nd hut is built
   conn GladesTown.LeftAboveCoals:  # check for redundancies with AboveOpher
     moki:
       TuleyShop.BlueMoon, Grapple, DoubleJump
       TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Grapple, Bash
     gorlek: TuleyShop.BlueMoon, Grapple
+    unsafe: GrenadeJump
   conn GladesTown.LupoHouse:
     moki: Burrow OR Water
     unsafe:
@@ -4332,8 +4349,11 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Flap, Glide
       Bash, Grenade=1
     gorlek, GladesTown.TuleySpawned: SentryJump=1 OR Burrow OR Dash
-    kii, GladesTown.TuleySpawned: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.TuleySpawned: GrenadeJump OR GlideJump
+    kii, GladesTown.TuleySpawned:
+      Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
+    unsafe, GladesTown.TuleySpawned: GrenadeJump OR GlideJump OR BlazeSwap=1
   conn EastHollow.OutsideGlades:
     moki: GladesTown.GromsWall
 
@@ -4870,7 +4890,7 @@ anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to 
     moki: DoubleJump
     gorlek: Dash OR Glide
     kii: Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
-    unsafe: Blaze=1
+    unsafe: Blaze=1 OR GrenadeJump
 
 anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
   door:
