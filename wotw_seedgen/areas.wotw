@@ -4419,17 +4419,23 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
       Bash, Grenade=1
       TuleyShop.StickyGrass, Grapple
     gorlek:
-      SentryJump=1
-      TuleyShop.SpringPlants, Sword OR Hammer  # upslash or uphammer
+      Hammer OR SwordSJump=1 
       TuleyShop.Lightcatchers, Bash
-    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: free
+    kii:
+      Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
+    unsafe:  # the springplant is actually a negative here, since it prevent doing a walljump to reach the semisolid
+      GlideJump OR GrenadeJump
   conn GladesTown.Teleporter:
     moki:
       Bash, Grenade=1
       GladesTown.ClearThorns OR DoubleJump OR Launch
     gorlek: SentryJump=1
-    kii: Sword OR Hammer OR Spear=1 OR Damage=20
+    kii:
+      Sword OR Hammer OR Spear=1 OR Damage=20
+      # Glitched
+      # GrenadeJump=1 OR GlideJump
     unsafe: Dash OR Damage=10 OR GlideJump OR GrenadeJump
 
 anchor GladesTown.KeyMokiHutInside at -110, -4571:
