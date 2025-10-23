@@ -4371,9 +4371,16 @@ anchor GladesTown.ThornyBranch at -330, -4135:  # Next to GladesTown.ArcingShard
     gorlek:
       Launch
       TuleyShop.BlueMoon, Grapple
+    # kii:
+    #   AerialHammerJump, TripleJump OR GlideJump
+    #   GrenadeJump=1, DoubleJump, GlideJump OR TripleJump
+    #   GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, TripleJump  # hardcore parkour
-      GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
+      DoubleJump, BlazeSwap=1 OR SentrySwap=1
+      GrenadeJump, DoubleJump
+      AerialHammerJump OR GlideHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      GladesTown.ClearThorns, DoubleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # https://youtu.be/SgMebS4-Aag
       TuleyShop.Lightcatchers, Bash, Grenade=1  # https://youtu.be/zb09kz4YhX4
 
 anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
