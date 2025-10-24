@@ -43,6 +43,8 @@ pub enum Trigger {
 // TODO breakpoint/debug logging toggle command?
 
 /// A Command, which may be used to affect the world, player or client state
+///
+/// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/seed/instructions/save_at.h
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Command {
     /// Execute the commands at `index` in command_lookup
@@ -164,6 +166,8 @@ pub enum Command {
     ),
     /// Sets the map message content to String Memory 0
     SetMapMessage,
+    // TODO missing SetSideMapMessage
+    // TODO out of sync with client
     /// Save to disk, like an autosave
     Save,
     /// Save to memory, but not to disk, like a boss fight checkpoint
@@ -231,4 +235,6 @@ pub enum Command {
     ResetAllWheels,
     /// Write String Memory 0 into the client log
     DebugLog,
+    // TODO missing SetDebuggerTrace
+    // TODO missing SetTextWithId (?)
 }
