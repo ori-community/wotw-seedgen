@@ -3,7 +3,7 @@ mod display;
 mod event;
 mod intermediate;
 mod operation;
-mod string_placeholders;
+mod postprocess;
 
 pub use command::{
     Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
@@ -11,7 +11,7 @@ pub use command::{
 pub use event::{ClientEvent, Event, Trigger};
 pub use intermediate::{Constant, ConstantDiscriminants, Literal};
 pub use operation::{ArithmeticOperator, Comparator, EqualityComparator, LogicOperator, Operation};
-pub use string_placeholders::StringPlaceholderMap;
+pub use postprocess::StringPlaceholderMap;
 
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
