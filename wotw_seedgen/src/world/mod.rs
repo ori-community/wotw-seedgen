@@ -47,6 +47,7 @@ pub struct World<'graph, 'settings> {
     snapshot: Option<Reach>,
     variables: Variables,
 }
+
 impl<'graph, 'settings> World<'graph, 'settings> {
     /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
     ///
@@ -155,69 +156,85 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     pub fn set_spirit_light(&mut self, value: i32, events: &[Event]) {
         self.set_integer(UberIdentifier::SPIRIT_LIGHT, value, events);
     }
+
     #[inline]
     pub fn modify_spirit_light(&mut self, add: i32, events: &[Event]) {
         self.modify_integer(UberIdentifier::SPIRIT_LIGHT, add, events);
     }
+
     #[inline]
     pub fn set_gorlek_ore(&mut self, value: i32, events: &[Event]) {
         self.set_integer(UberIdentifier::GORLEK_ORE, value, events);
     }
+
     #[inline]
     pub fn modify_gorlek_ore(&mut self, add: i32, events: &[Event]) {
         self.modify_integer(UberIdentifier::GORLEK_ORE, add, events);
     }
+
     #[inline]
     pub fn set_keystones(&mut self, value: i32, events: &[Event]) {
         self.set_integer(UberIdentifier::KEYSTONES, value, events);
     }
+
     #[inline]
     pub fn modify_keystones(&mut self, add: i32, events: &[Event]) {
         self.modify_integer(UberIdentifier::KEYSTONES, add, events);
     }
+
     #[inline]
     pub fn set_shard_slots(&mut self, value: i32, events: &[Event]) {
         self.set_integer(UberIdentifier::SHARD_SLOTS, value, events);
     }
+
     #[inline]
     pub fn modify_shard_slots(&mut self, add: i32, events: &[Event]) {
         self.modify_integer(UberIdentifier::SHARD_SLOTS, add, events);
     }
+
     #[inline]
     pub fn set_max_health(&mut self, value: i32, events: &[Event]) {
         self.set_integer(UberIdentifier::MAX_HEALTH, value, events);
     }
+
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
     pub fn modify_max_health(&mut self, add: i32, events: &[Event]) {
         self.modify_integer(UberIdentifier::MAX_HEALTH, add, events);
     }
+
     // TODO but where do I *really* want OrderedFloat
     #[inline]
     pub fn set_max_energy(&mut self, value: OrderedFloat<f32>, events: &[Event]) {
         self.set_float(UberIdentifier::MAX_ENERGY, value, events);
     }
+
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
     pub fn modify_max_energy(&mut self, add: OrderedFloat<f32>, events: &[Event]) {
         self.modify_float(UberIdentifier::MAX_ENERGY, add, events);
     }
+
     #[inline]
     pub fn set_skill(&mut self, skill: Skill, value: bool, events: &[Event]) {
         self.set_boolean(skill.uber_identifier(), value, events);
     }
+
     #[inline]
     pub fn set_shard(&mut self, shard: Shard, value: bool, events: &[Event]) {
         self.set_boolean(shard.uber_identifier(), value, events);
     }
+
     #[inline]
     pub fn set_teleporter(&mut self, teleporter: Teleporter, value: bool, events: &[Event]) {
         self.set_boolean(teleporter.uber_identifier(), value, events);
     }
+
     #[inline]
     pub fn set_clean_water(&mut self, value: bool, events: &[Event]) {
         self.set_boolean(UberIdentifier::CLEAN_WATER, value, events);
     }
+
     #[inline]
     pub fn set_weapon_upgrade(
         &mut self,
@@ -606,29 +623,36 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                 damage_mod += 1.0;
                 slots -= 1;
             }
+
             if slots > 0 && bow && self.shard(Shard::Splinter) {
                 splinter = true;
                 slots -= 1;
             }
+
             if slots > 0 && self.shard(Shard::SpiritSurge) {
                 damage_mod += self.spirit_light().min(3000) as f32 * 0.00005;
                 slots -= 1;
             }
+
             if slots > 0 && self.shard(Shard::LastStand) {
                 damage_mod += 0.2;
                 slots -= 1;
             }
+
             if slots > 0 && self.shard(Shard::Reckless) {
                 damage_mod += 0.15;
                 slots -= 1;
             }
+
             if slots > 0 && self.shard(Shard::Lifeforce) {
                 damage_mod += 0.1;
                 slots -= 1;
             }
+
             if slots > 0 && self.shard(Shard::Finesse) {
                 damage_mod += 0.05;
             }
+
             if splinter {
                 // Splinter stacks multiplicatively where other buffs stack additively
                 damage_mod *= 1.5;
@@ -792,6 +816,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         }
 
         let mut weapons = weapons_fn(self.settings.difficulty);
+
         // TODO check whether creating this map is even worth it
         let dpe_map = weapons
             .iter()
@@ -803,12 +828,14 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             })
             .collect::<FxHashMap<Skill, u16>>();
         weapons.sort_unstable_by_key(|weapon| dpe_map[weapon]);
+
         if let Some((index, weapon)) = weapons
             .iter()
             .enumerate()
             .find(|(_, weapon)| self.skill(**weapon))
         {
             let dpe = dpe_map[weapon];
+
             weapons.truncate(index + 1);
             // maybe there are multiple weapons costing the same and we already skipped over a redundant one
             weapons.swap(index, 0); // if we found something before, there must be at least one element
@@ -819,6 +846,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             weapons.truncate(remove_after + 1);
             weapons.swap(0, remove_after);
         }
+
         weapons
     }
 
@@ -840,28 +868,36 @@ struct Variables {
     floats: FxHashMap<usize, OrderedFloat<f32>>,
     strings: FxHashMap<usize, String>,
 }
+
 impl Variables {
     fn set_boolean(&mut self, id: usize, value: bool) {
         self.booleans.insert(id, value);
     }
+
     fn set_integer(&mut self, id: usize, value: i32) {
         self.integers.insert(id, value);
     }
+
     fn set_float(&mut self, id: usize, value: OrderedFloat<f32>) {
         self.floats.insert(id, value);
     }
+
     fn set_string(&mut self, id: usize, value: String) {
         self.strings.insert(id, value);
     }
+
     fn get_boolean(&self, id: &usize) -> bool {
         self.booleans.get(id).copied().unwrap_or_default()
     }
+
     fn get_integer(&self, id: &usize) -> i32 {
         self.integers.get(id).copied().unwrap_or_default()
     }
+
     fn get_float(&self, id: &usize) -> OrderedFloat<f32> {
         self.floats.get(id).copied().unwrap_or_default()
     }
+
     fn get_string(&self, id: &usize) -> String {
         self.strings.get(id).cloned().unwrap_or_default()
     }

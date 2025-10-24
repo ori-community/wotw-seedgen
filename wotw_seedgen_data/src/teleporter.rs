@@ -41,6 +41,7 @@ pub enum Teleporter {
     Willow = 12,
     Shriek = 15,
 }
+
 impl Display for Teleporter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -66,6 +67,7 @@ impl Display for Teleporter {
         write!(f, "TP")
     }
 }
+
 impl Teleporter {
     pub const MARSH_ID: UberIdentifier = UberIdentifier::new(21786, 10185);
     pub const DEN_ID: UberIdentifier = UberIdentifier::new(11666, 61594);
@@ -109,6 +111,7 @@ impl Teleporter {
             Self::Shriek => Self::SHRIEK_ID,
         }
     }
+
     /// Returns the `Teleporter` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {

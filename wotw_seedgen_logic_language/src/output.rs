@@ -12,6 +12,7 @@ pub struct Graph {
     pub nodes: Vec<Node>,
     pub default_door_connections: FxHashMap<DoorId, DoorId>,
 }
+
 impl Graph {
     // TODO use more in tests
     pub fn empty() -> Self {
@@ -29,6 +30,7 @@ impl Graph {
             .ok_or_else(|| format!("node \"{node}\" not found"))
     }
 }
+
 #[derive(Debug, Clone, PartialEq, EnumIs, EnumTryAs)]
 pub enum Node {
     Anchor(Anchor),
@@ -36,6 +38,7 @@ pub enum Node {
     State(StateDataEntry),
     LogicalState(String),
 }
+
 impl Node {
     pub fn identifier(&self) -> &str {
         match self {
@@ -45,12 +48,14 @@ impl Node {
             Node::LogicalState(identifier) => identifier,
         }
     }
+
     pub fn zone(&self) -> Option<Zone> {
         match self {
             Node::Pickup(pickup) => Some(pickup.zone),
             _ => None,
         }
     }
+
     // TODO check which of these ended up being used
     pub fn uber_identifier(&self) -> Option<UberIdentifier> {
         match self {
@@ -59,6 +64,7 @@ impl Node {
             Node::State(state) => Some(state.uber_identifier),
         }
     }
+
     pub fn value(&self) -> Option<i32> {
         match self {
             Node::Anchor(_) | Node::LogicalState(_) => None,
@@ -66,6 +72,7 @@ impl Node {
             Node::State(state) => state.value,
         }
     }
+
     pub fn position(&self) -> Option<&Position> {
         match self {
             Node::Anchor(anchor) => anchor.position.as_ref(),
@@ -73,6 +80,7 @@ impl Node {
             Node::State(_) | Node::LogicalState(_) => None,
         }
     }
+
     pub fn map_position(&self) -> Option<&Position> {
         match self {
             Node::Anchor(anchor) => anchor.position.as_ref(),
@@ -80,21 +88,25 @@ impl Node {
             Node::State(_) | Node::LogicalState(_) => None,
         }
     }
+
     pub fn can_place(&self) -> bool {
         matches!(self, Node::Pickup(_))
     }
+
     pub fn can_spawn(&self) -> bool {
         match self {
             Node::Anchor(anchor) => anchor.position.is_some() && anchor.can_spawn,
             _ => false,
         }
     }
+
     pub fn expect_anchor(&self) -> &Anchor {
         match self {
             Node::Anchor(anchor) => anchor,
             _ => panic!("Called expect_anchor on {self:?}"),
         }
     }
+
     pub fn expect_anchor_mut(&mut self) -> &mut Anchor {
         match self {
             Node::Anchor(anchor) => anchor,
@@ -102,6 +114,7 @@ impl Node {
         }
     }
 }
+
 #[derive(Debug, Clone)]
 pub struct Anchor {
     pub identifier: String,
@@ -112,27 +125,32 @@ pub struct Anchor {
     pub refills: Vec<Refill>,
     pub connections: Vec<Connection>,
 }
+
 impl PartialEq for Anchor {
     fn eq(&self, other: &Self) -> bool {
         self.identifier == other.identifier
     }
 }
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Door {
     pub id: DoorId,
     pub target: String,
     pub requirement: Requirement,
 }
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Connection {
     pub to: usize,
     pub requirement: Requirement,
 }
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Refill {
     pub value: RefillValue,
     pub requirement: Requirement,
 }
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum RefillValue {
     Full,
@@ -140,6 +158,7 @@ pub enum RefillValue {
     Health(f32),
     Energy(f32),
 }
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Requirement {
     Free,
@@ -168,6 +187,7 @@ pub enum Requirement {
     And(Vec<Requirement>),
     Or(Vec<Requirement>),
 }
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, EnumString)]
 pub enum Enemy {
     Mantis,
@@ -197,6 +217,7 @@ pub enum Enemy {
     Spiderling,
     EnergyRefill,
 }
+
 impl Enemy {
     pub fn health(self) -> f32 {
         match self {

@@ -13,14 +13,17 @@ impl Seed {
         let mut package = Package::new(obj)?;
 
         package.append("preload.json", serde_json::to_vec(&self.preload)?)?;
+
         f(
             &mut package,
             "assembly.json",
             serde_json::to_vec(&self.assembly)?,
         )?;
+
         if let Some(seedgen_info) = &self.seedgen_info {
             package.append("seedgen_info.json", serde_json::to_vec(seedgen_info)?)?;
         }
+
         for (path, data) in &self.assets {
             package.append(format!("assets/{path}"), data)?;
         }
@@ -44,6 +47,7 @@ impl<W: Write + Seek> Package<'_, W> {
 
         let mut package = Self { zip, options };
         package.append("format_version.txt", FORMAT_VERSION)?;
+
         Ok(package)
     }
 

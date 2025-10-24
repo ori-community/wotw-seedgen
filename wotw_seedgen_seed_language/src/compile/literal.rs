@@ -29,16 +29,19 @@ impl<'source> Compile<'source> for ast::Literal<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
     type Output = Option<UberStateAlias>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let uber_state = self.resolve(compiler)?;
+
         if uber_state.uber_identifier.group == 9 {
             compiler.errors.push(Error::custom(
                 "Cannot use group 9 directly. Use !state instead".to_string(),
                 self.span(),
             ));
+
             None
             // TODO why is there an extra check here?
         } else if compiler
@@ -52,10 +55,12 @@ impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
             compiler
                 .errors
                 .push(Error::custom("Unknown UberState".to_string(), self.span()));
+
             None
         }
     }
 }
+
 impl ast::UberIdentifier<'_> {
     pub(crate) fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         match self {
@@ -69,6 +74,7 @@ impl ast::UberIdentifier<'_> {
         }
     }
 }
+
 impl ast::UberIdentifierName<'_> {
     fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         let group = compiler
@@ -76,6 +82,7 @@ impl ast::UberIdentifierName<'_> {
             .uber_state_data
             .name_lookup
             .get(self.group.data.0);
+
         if group.is_none() {
             let mut error = Error::custom("Unknown UberState group".to_string(), self.group.span());
             error.help = suggestion(
@@ -89,6 +96,7 @@ impl ast::UberIdentifierName<'_> {
 
         let group = group?;
         let member = member?;
+
         let ids = group.get(member.data.0);
         if ids.is_none() {
             let mut error = Error::custom("Unknown UberState member".to_string(), member.span());
@@ -113,6 +121,7 @@ impl ast::UberIdentifierName<'_> {
                         other_groups.into_iter().format(", ")
                     )
                 };
+
                 Some(help)
             };
 
@@ -127,10 +136,12 @@ impl ast::UberIdentifierName<'_> {
                 format!("Ambiguous name: matches {}", ids.iter().format(", ")),
                 self.span(),
             ));
+
             None
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::Constant<'source> {
     type Output = Option<Constant>;
 
@@ -142,6 +153,7 @@ impl<'source> Compile<'source> for ast::Constant<'source> {
                 .parse()
                 .map_err(|err| Error::custom(err, self.kind.span)),
         );
+
         let variant = compiler.consume_result(self.variant.result);
 
         let kind = kind?;
@@ -195,6 +207,7 @@ impl<'source> Compile<'source> for ast::Constant<'source> {
                 parse_variant(variant, span, Constant::CoordinateSystem)
             }
         };
+
         compiler.consume_result(constant)
     }
 }
@@ -215,6 +228,7 @@ where
             format!("Did you mean \"{}\"?", distances[0].1.as_ref())
         } else {
             distances.sort_unstable_by(|a, b| OrderedFloat(b.0).cmp(&OrderedFloat(a.0)));
+
             format!(
                 "Did you mean one of these? {}",
                 distances

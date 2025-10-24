@@ -27,6 +27,7 @@ pub enum EquipSlot {
     /// Bottom right equipment slot
     Ability3 = 2,
 }
+
 // TODO try for better error messages than the strum default
 // TODO test equipments and document variants, some don't actually need to be equipped? how does that work
 // Source: https://github.com/ori-community/wotw-rando-client/blob/main/projects/Modloader/app/structs/EquipmentType__Enum.h

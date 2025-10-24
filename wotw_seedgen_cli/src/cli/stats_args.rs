@@ -122,6 +122,7 @@ pub enum Analyzer {
         result_bucket_size: NonZeroUsize,
     },
 }
+
 impl FromStr for ChainedAnalyzers {
     type Err = String;
 

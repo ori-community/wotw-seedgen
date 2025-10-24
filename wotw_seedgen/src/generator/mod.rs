@@ -58,8 +58,10 @@ pub fn generate_seed<F: SnippetAccess>(
                 world_settings.snippet_config.clone(),
                 debug,
             );
+
             // TODO this is inefficient because we probably do a lot of redundant work between the worlds
             let output = parse_snippets(&world_settings.snippets, compiler)?;
+
             Ok((world_settings, output))
         })
         .collect::<Result<Vec<_>, String>>()?;
@@ -76,7 +78,9 @@ pub fn generate_seed<F: SnippetAccess>(
                 if output.spawn.is_some() {
                     warn!("A Snippet attempted to set spawn");
                 }
+
                 let mut output = output.clone();
+
                 // TODO something less specialized?
                 if graph.nodes[spawn].identifier() == "EastPools.Teleporter" {
                     output.events.push(Event {
@@ -84,7 +88,9 @@ pub fn generate_seed<F: SnippetAccess>(
                         command: compile::set_boolean_value(Teleporter::CENTRAL_POOLS_ID, true),
                     })
                 }
+
                 let world = World::new(graph, spawn, world_settings, uber_states.clone());
+
                 Ok((world, output))
             })
             .collect::<Result<Vec<_>, String>>()?;
@@ -136,6 +142,7 @@ fn choose_spawn(
     let spawn = match &world_settings.spawn {
         Spawn::Random => {
             let spawns = logical_difficulty::spawn_locations(world_settings.difficulty);
+
             graph
                 .nodes
                 .iter()
@@ -162,9 +169,11 @@ fn choose_spawn(
                 .enumerate()
                 .find(|(_, node)| node.identifier() == spawn_loc)
                 .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?;
+
             if !node.can_spawn() {
                 return Err(format!("{} is not a valid spawn", spawn_loc));
             }
+
             index
         }
     };

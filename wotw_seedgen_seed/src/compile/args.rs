@@ -11,6 +11,7 @@ pub struct Args<'a> {
     args: ArrayVec<Arg, 4>,
     args_in_progress: Vec<ArgDestination>,
 }
+
 impl<'a> Args<'a> {
     pub fn new(context: &'a mut CompileContext) -> Self {
         Self {
@@ -24,22 +25,27 @@ impl<'a> Args<'a> {
         self.args.push(Arg::new(arg_destination, arg));
         self
     }
+
     pub fn boolean(self, index: usize, arg: CommandBoolean) -> Self {
         let arg = arg.compile(self.context);
         self.arg(ArgDestination::Boolean(index), arg)
     }
+
     pub fn integer(self, index: usize, arg: CommandInteger) -> Self {
         let arg = arg.compile(self.context);
         self.arg(ArgDestination::Integer(index), arg)
     }
+
     pub fn float(self, index: usize, arg: CommandFloat) -> Self {
         let arg = arg.compile(self.context);
         self.arg(ArgDestination::Float(index), arg)
     }
+
     pub fn string(self, index: usize, arg: CommandString) -> Self {
         let arg = arg.compile(self.context);
         self.arg(ArgDestination::String(index), arg)
     }
+
     pub fn zone(self, index: usize, arg: CommandZone) -> Self {
         let arg = arg.compile(self.context);
         self.arg(ArgDestination::Integer(index), arg)

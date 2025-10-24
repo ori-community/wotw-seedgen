@@ -69,6 +69,7 @@ impl Seed {
                     .enumerate()
                     .collect(),
             };
+
             seed.assets.insert(
                 "debug.json".to_string(),
                 serde_json::to_vec_pretty(&debug_data).unwrap(),

@@ -60,6 +60,7 @@ struct TokenBuilder<'source> {
     previous_line: usize,
     previous_offset: usize,
 }
+
 impl<'source> TokenBuilder<'source> {
     fn new(source: &'source str) -> Self {
         Self {
@@ -74,15 +75,18 @@ impl<'source> TokenBuilder<'source> {
         let (line, line_start) = convert::last_line(&self.source[..span.start]);
 
         let delta_line = (line - mem::replace(&mut self.previous_line, line)) as u32;
+
         let previous_offset = if delta_line == 0 {
             self.previous_offset
         } else {
             line_start
         };
         self.previous_offset = span.start;
+
         let delta_start = self.source[previous_offset..span.start]
             .encode_utf16()
             .count() as u32;
+
         let length = self.source[span].encode_utf16().count() as u32;
 
         self.tokens.push(SemanticToken {
@@ -114,11 +118,13 @@ impl<T: Tokens> Tokens for Vec<T> {
         }
     }
 }
+
 impl<T: Tokens> Tokens for Box<T> {
     fn tokens(self, builder: &mut TokenBuilder) {
         (*self).tokens(builder)
     }
 }
+
 impl<T: Tokens> Tokens for Result<T> {
     fn tokens(self, builder: &mut TokenBuilder) {
         if let Ok(t) = self {
@@ -126,11 +132,13 @@ impl<T: Tokens> Tokens for Result<T> {
         }
     }
 }
+
 impl<T: Tokens, R> Tokens for Recoverable<T, R> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.result.tokens(builder);
     }
 }
+
 impl<const OPEN: char, Content: Tokens, const CLOSE: char> Tokens
     for Delimited<OPEN, Content, CLOSE>
 {
@@ -138,11 +146,13 @@ impl<const OPEN: char, Content: Tokens, const CLOSE: char> Tokens
         self.content.tokens(builder);
     }
 }
+
 impl<V: Tokens> Tokens for Once<V> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl<Item: Tokens, const PUNCTUATION: char> Tokens for Punctuated<Item, PUNCTUATION> {
     fn tokens(self, builder: &mut TokenBuilder) {
         for item in self {
@@ -150,6 +160,7 @@ impl<Item: Tokens, const PUNCTUATION: char> Tokens for Punctuated<Item, PUNCTUAT
         }
     }
 }
+
 impl<Item: Tokens, Separator> Tokens for Separated<Item, Separator> {
     fn tokens(self, builder: &mut TokenBuilder) {
         for item in self {
@@ -157,6 +168,7 @@ impl<Item: Tokens, Separator> Tokens for Separated<Item, Separator> {
         }
     }
 }
+
 impl<Item: Tokens, Separator> Tokens for SeparatedNonEmpty<Item, Separator> {
     fn tokens(self, builder: &mut TokenBuilder) {
         for item in self {
@@ -170,11 +182,13 @@ impl Tokens for Spanned<&str> {
         builder.push_token(self.span, TokenType::String);
     }
 }
+
 impl Tokens for UberIdentifier<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.span(), TokenType::Number);
     }
 }
+
 impl Tokens for Expression<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -183,6 +197,7 @@ impl Tokens for Expression<'_> {
         }
     }
 }
+
 impl Tokens for ExpressionValue<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -195,6 +210,7 @@ impl Tokens for ExpressionValue<'_> {
         }
     }
 }
+
 impl Tokens for Spanned<Literal<'_>> {
     fn tokens(self, builder: &mut TokenBuilder) {
         let token_type = match self.data {
@@ -208,6 +224,7 @@ impl Tokens for Spanned<Literal<'_>> {
         builder.push_token(self.span, token_type);
     }
 }
+
 impl Tokens for Operation<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.left.tokens(builder);
@@ -215,11 +232,13 @@ impl Tokens for Operation<'_> {
         self.right.tokens(builder);
     }
 }
+
 impl Tokens for Snippet<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.contents.tokens(builder);
     }
 }
+
 impl Tokens for Content<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -242,12 +261,14 @@ impl Tokens for Content<'_> {
         }
     }
 }
+
 impl Tokens for Event<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.trigger.tokens(builder);
         self.action.tokens(builder);
     }
 }
+
 impl Tokens for Trigger<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -262,6 +283,7 @@ impl Tokens for Trigger<'_> {
         }
     }
 }
+
 impl Tokens for TriggerBinding<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -272,6 +294,7 @@ impl Tokens for TriggerBinding<'_> {
         }
     }
 }
+
 impl Tokens for Action<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -284,18 +307,21 @@ impl Tokens for Action<'_> {
         }
     }
 }
+
 impl Tokens for ActionCondition<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.condition.tokens(builder);
         self.action.tokens(builder);
     }
 }
+
 impl Tokens for FunctionCall<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Function);
         self.parameters.tokens(builder);
     }
 }
+
 impl<T: Tokens> Tokens for CommandArg<T> {
     fn tokens(self, builder: &mut TokenBuilder) {
         if let Ok((_, t)) = self.result {
@@ -303,6 +329,7 @@ impl<T: Tokens> Tokens for CommandArg<T> {
         }
     }
 }
+
 impl Tokens for Command<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {
@@ -437,6 +464,7 @@ impl Tokens for Command<'_> {
         }
     }
 }
+
 impl Tokens for IncludeArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.path.tokens(builder);
@@ -447,23 +475,27 @@ impl Tokens for IncludeArgs<'_> {
         }
     }
 }
+
 impl Tokens for BundleIconArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.path.tokens(builder);
     }
 }
+
 impl Tokens for BuiltinIconArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.path.tokens(builder);
     }
 }
+
 impl Tokens for EventArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.0.span, TokenType::Variable);
     }
 }
+
 impl Tokens for OnEventArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.snippet_name.tokens(builder);
@@ -473,22 +505,26 @@ impl Tokens for OnEventArgs<'_> {
         self.action.tokens(builder);
     }
 }
+
 impl Tokens for ExportArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.0.span, TokenType::Variable);
     }
 }
+
 impl Tokens for SpawnArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.x.tokens(builder);
         self.y.tokens(builder);
     }
 }
+
 impl Tokens for TagsArg<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl Tokens for ConfigArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
@@ -497,11 +533,13 @@ impl Tokens for ConfigArgs<'_> {
         self.default.tokens(builder);
     }
 }
+
 impl Tokens for Spanned<ConfigType> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.span, TokenType::Type);
     }
 }
+
 impl Tokens for SetConfigArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.snippet_name.tokens(builder);
@@ -511,17 +549,20 @@ impl Tokens for SetConfigArgs<'_> {
         self.value.tokens(builder);
     }
 }
+
 impl Tokens for StateArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.ty.tokens(builder);
     }
 }
+
 impl Tokens for Spanned<UberStateType> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.span, TokenType::Type);
     }
 }
+
 impl Tokens for TimerArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.toggle_identifier.span, TokenType::Variable);
@@ -530,40 +571,47 @@ impl Tokens for TimerArgs<'_> {
         }
     }
 }
+
 impl Tokens for LetArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.value.tokens(builder);
     }
 }
+
 impl Tokens for CommandIf<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.condition.tokens(builder);
         self.contents.tokens(builder);
     }
 }
+
 impl Tokens for CommandRepeat<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.amount.tokens(builder);
         self.contents.tokens(builder);
     }
 }
+
 impl Tokens for AddArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl Tokens for RemoveArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl Tokens for ChangeItemPoolArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.amount.tokens(builder);
     }
 }
+
 impl Tokens for ItemDataArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
@@ -574,80 +622,94 @@ impl Tokens for ItemDataArgs<'_> {
         self.map_icon.tokens(builder);
     }
 }
+
 impl Tokens for ItemDataNameArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.name.tokens(builder);
     }
 }
+
 impl Tokens for ItemDataPriceArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.price.tokens(builder);
     }
 }
+
 impl Tokens for ItemDataDescriptionArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.description.tokens(builder);
     }
 }
+
 impl Tokens for ItemDataIconArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.icon.tokens(builder);
     }
 }
+
 impl Tokens for RemoveLocationArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.condition.tokens(builder);
     }
 }
+
 impl Tokens for SetLogicStateArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl Tokens for PreplaceArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.zone.tokens(builder);
     }
 }
+
 impl Tokens for ZoneOfArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.item.tokens(builder);
     }
 }
+
 impl Tokens for ItemOnArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.trigger.tokens(builder);
     }
 }
+
 impl Tokens for CountInZoneArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.zone_bindings.tokens(builder);
         self.items.tokens(builder);
     }
 }
+
 impl Tokens for CountInZoneBinding<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.zone.tokens(builder);
     }
 }
+
 impl Tokens for RandomIntegerArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl Tokens for RandomFloatArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
+
 impl Tokens for RandomNumberArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
@@ -655,6 +717,7 @@ impl Tokens for RandomNumberArgs<'_> {
         self.max.tokens(builder);
     }
 }
+
 impl Tokens for RandomPoolArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
@@ -662,11 +725,13 @@ impl Tokens for RandomPoolArgs<'_> {
         self.values.tokens(builder);
     }
 }
+
 impl Tokens for Spanned<Type> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.span, TokenType::Type);
     }
 }
+
 impl Tokens for RandomFromPoolArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
@@ -675,12 +740,14 @@ impl Tokens for RandomFromPoolArgs<'_> {
         }
     }
 }
+
 impl Tokens for FunctionDefinition<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Function);
         self.actions.tokens(builder);
     }
 }
+
 impl Tokens for Annotation<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         match self {

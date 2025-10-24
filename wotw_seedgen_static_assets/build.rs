@@ -8,9 +8,11 @@ fn main() {
             include_bytes!("../assets/loc_data.csv").as_slice(),
         )
         .unwrap();
+
         write("loc_data", &loc_data);
         loc_data
     };
+
     #[cfg(feature = "state_data")]
     #[allow(unused)]
     let state_data = {
@@ -20,9 +22,11 @@ fn main() {
             include_bytes!("../assets/state_data.csv").as_slice(),
         )
         .unwrap();
+
         write("state_data", &state_data);
         state_data
     };
+
     #[cfg(feature = "uber_state_data")]
     {
         println!("cargo::rerun-if-changed=../assets/uber_state_dump.json");
@@ -37,6 +41,7 @@ fn main() {
 
         write("uber_state_data", &uber_state_data);
     }
+
     #[cfg(feature = "snippets")]
     {
         println!("cargo::rerun-if-changed=../assets/snippets");
@@ -53,9 +58,11 @@ fn main() {
                 if name.extension()? != "wotws" {
                     return None;
                 }
+
                 let id = entry.path();
                 let content = std::fs::read_to_string(entry.path()).unwrap();
                 let identifier = name.file_stem()?.to_string_lossy().to_string();
+
                 Some((identifier, (id.to_string_lossy().to_string(), content)))
             })
             .collect::<Result<FxHashMap<_, _>, _>>()
@@ -63,6 +70,7 @@ fn main() {
 
         write("snippets", &snippets);
     }
+
     #[cfg(feature = "logic")]
     {
         // TODO create logic folder
@@ -88,6 +96,7 @@ fn main() {
 
         write("logic", &logic);
     }
+
     #[cfg(feature = "presets")]
     {
         // cargo will always rerun this build script if told to scan a directory that doesn't exist, so this needs to be inactive as long as there are no universe presets in the assets
@@ -149,6 +158,8 @@ fn read_optional_dir<P: AsRef<std::path::Path>>(path: P) -> Option<std::fs::Read
 ))]
 fn write<T: serde::Serialize>(path: &str, contents: &T) {
     use std::{env, fs::File, path::Path};
+
     let file = File::create(Path::new(&env::var_os("OUT_DIR").unwrap()).join(path)).unwrap();
+
     ciborium::into_writer(contents, file).unwrap();
 }

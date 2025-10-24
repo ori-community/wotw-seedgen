@@ -19,6 +19,7 @@ impl Display for Literal {
         }
     }
 }
+
 impl Display for StringOrPlaceholder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

@@ -100,6 +100,7 @@ pub struct Recoverable<T, R> {
     pub result: Result<T>,
     phantom: PhantomData<R>,
 }
+
 impl<T, R> Recoverable<T, R> {
     #[inline]
     pub fn new(result: Result<T>) -> Self {
@@ -109,6 +110,7 @@ impl<T, R> Recoverable<T, R> {
         }
     }
 }
+
 impl<'source, T, V, R> Ast<'source, T> for Recoverable<V, R>
 where
     T: Tokenize,
@@ -126,6 +128,7 @@ where
         })
     }
 }
+
 impl<V, R> Span for Recoverable<V, R>
 where
     V: Span,
@@ -134,6 +137,7 @@ where
         self.result.span()
     }
 }
+
 impl<V, R> SpanStart for Recoverable<V, R>
 where
     V: SpanStart,
@@ -142,6 +146,7 @@ where
         self.result.span_start()
     }
 }
+
 impl<V, R> SpanEnd for Recoverable<V, R>
 where
     V: SpanEnd,

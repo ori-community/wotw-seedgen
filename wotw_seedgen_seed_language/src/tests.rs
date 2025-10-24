@@ -155,12 +155,14 @@ fn snippets() {
             let content = fs::read_to_string(&id).map_err(|err| err.to_string())?;
             Ok(Source { id, content })
         }
+
         fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
             let mut full_path = PathBuf::from(*WORKDIR);
             full_path.push("assets/snippets");
             full_path.push(path);
             fs::read(full_path).map_err(|err| err.to_string())
         }
+
         fn available_snippets(&self) -> Vec<String> {
             vec![]
         }
@@ -224,6 +226,7 @@ fn snippets() {
 
         write_test_output(identifier, &output);
     }
+
     for identifier in test_with_config.keys() {
         let mut compiler = test_compiler(test_with_config.clone());
 

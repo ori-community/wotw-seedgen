@@ -70,6 +70,7 @@ pub enum OpherIcon {
     WaterBreath = 10,
     FastTravel = 11,
 }
+
 /// Icons used in the Lupo shop
 #[derive(
     Debug,
@@ -92,6 +93,7 @@ pub enum LupoIcon {
     HealthFragmentsMap = 1,
     ShardsMap = 2,
 }
+
 /// Icons used in the Grom shop
 #[derive(
     Debug,
@@ -118,6 +120,7 @@ pub enum GromIcon {
     OnwardsAndUpwards = 5,
     TheGorlekTouch = 6,
 }
+
 /// Icons used in the Tuley shop
 #[derive(
     Debug,
@@ -143,6 +146,7 @@ pub enum TuleyIcon {
     SpringPlants = 4,
     TheLastSeed = 5,
 }
+
 // should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Core/enums/map_icon.h
 /// Icons used in the map
 #[derive(

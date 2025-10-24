@@ -15,6 +15,7 @@ pub struct Orbs {
     pub health: f32,
     pub energy: f32,
 }
+
 impl Add for Orbs {
     type Output = Orbs;
     fn add(self, other: Orbs) -> Orbs {
@@ -24,11 +25,13 @@ impl Add for Orbs {
         }
     }
 }
+
 impl AddAssign for Orbs {
     fn add_assign(&mut self, other: Orbs) {
         *self = *self + other;
     }
 }
+
 impl Sub for Orbs {
     type Output = Orbs;
     fn sub(self, other: Orbs) -> Orbs {
@@ -38,6 +41,7 @@ impl Sub for Orbs {
         }
     }
 }
+
 impl SubAssign for Orbs {
     fn sub_assign(&mut self, other: Orbs) {
         *self = *self - other;
@@ -103,6 +107,7 @@ pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
         sum
     }
 }
+
 /// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns a list of [`Orbs`] that contains the options of both, filtered for any redundancies
 ///
 /// This is an optimization over [`orbs::either`](either) for only one additional option, see [`orbs::either`](either) for further documentation
@@ -122,6 +127,7 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
         sum
     }
 }
+
 /// For two lists of [`Orbs`] representing alternative possible options, returns all possible sums, filtered for any redundancies
 ///
 /// # Examples
@@ -163,6 +169,7 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
         b.to_smallvec()
     } else {
         let mut product = SmallVec::<[Orbs; 3]>::with_capacity(a.len());
+
         for a_ in a {
             for b_ in b {
                 let orbs = *a_ + *b_;
@@ -171,6 +178,7 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
                 }
             }
         }
+
         product
             .iter()
             .filter(|orbs| {
@@ -183,6 +191,7 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
             .collect()
     }
 }
+
 /// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns all possible sums, filtered for any redundancies
 ///
 /// This is an optimization over [`orbs::both`](both) with only one additional option, see [`orbs::both`](both) for further documentation
@@ -192,12 +201,14 @@ pub fn both_single(a: &[Orbs], b: Orbs) -> OrbVariants {
         smallvec![b]
     } else {
         let mut product = SmallVec::<[Orbs; 3]>::with_capacity(a.len());
+
         for a_ in a {
             let orbs = *a_ + b;
             if !product.contains(&orbs) {
                 product.push(orbs);
             }
         }
+
         product
             .iter()
             .filter(|orbs| {

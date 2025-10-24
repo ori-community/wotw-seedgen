@@ -78,14 +78,17 @@ impl<'source> Recover<'source, Tokenizer> for RecoverNewline {
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Requirement)]
 pub struct RequirementKeyword;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct Macro<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub requirements: RequirementGroup<'source>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Region)]
 pub struct RegionKeyword;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct Region<'source> {
     pub identifier: Spanned<Identifier<'source>>,
@@ -95,46 +98,56 @@ pub struct Region<'source> {
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Anchor)]
 pub struct AnchorKeyword;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct Anchor<'source> {
     pub identifier: Spanned<LogicIdentifier<'source>>,
     pub position: Option<AnchorPosition>,
     pub content: Group<SeparatedNonEmpty<AnchorContent<'source>, Newline>>,
 }
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct LogicIdentifier<'source>(pub &'source str);
+
 impl<'source> Ast<'source, Tokenizer> for LogicIdentifier<'source> {
     fn ast(parser: &mut Parser<'source, Tokenizer>) -> Result<Self> {
         let (token, span) = parser.current();
+
         match token {
             Token::LogicIdentifier | Token::Identifier => {
                 let slice = parser.slice(span.clone());
                 parser.step();
+
                 Ok(Self(slice))
             }
             _ => Err(parser.error(ErrorKind::ExpectedToken("LogicIdentifier".to_string()))),
         }
     }
 }
+
 impl<'source> LogicIdentifier<'source> {
     pub fn region(&self) -> Option<&'source str> {
         self.0.split_once('.').map(|(region, _)| region)
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct AnchorPosition {
     pub at: Spanned<At>,
     pub position: Recoverable<Position, RecoverPosition>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::At)]
 pub struct At;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct Position {
     pub x: Spanned<OrderedFloat<f32>>,
     pub comma: Symbol<','>,
     pub y: Spanned<OrderedFloat<f32>>,
 }
+
 pub struct RecoverPosition;
 impl<'source> Recover<'source, Tokenizer> for RecoverPosition {
     fn recover(parser: &mut Parser<'source, Tokenizer>) {
@@ -143,6 +156,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverPosition {
         }));
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum AnchorContent<'source> {
     Door(Spanned<DoorKeyword>, Door<'source>),
@@ -160,10 +174,12 @@ pub enum AnchorContent<'source> {
         Recoverable<Connection<'source>, RecoverDedent>,
     ),
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Door)]
 pub struct DoorKeyword;
 pub type Door<'source> = Group<SeparatedNonEmpty<DoorContent<'source>, Newline>>;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum DoorContent<'source> {
     Id(Spanned<Id>, Recoverable<DoorId, RecoverNewline>),
@@ -176,49 +192,61 @@ pub enum DoorContent<'source> {
         Recoverable<RequirementLineOrGroup<'source>, RecoverNewline>,
     ),
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Id)]
 pub struct Id;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct DoorId {
     pub colon: Spanned<Symbol<':'>>,
     pub id: Spanned<i32>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct DoorTarget<'source> {
     pub colon: Spanned<Symbol<':'>>,
     pub target: Spanned<LogicIdentifier<'source>>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Target)]
 pub struct Target;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Enter)]
 pub struct Enter;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::NoSpawn)]
 pub struct NoSpawn;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::TpRestriction)]
 pub struct TpRestrictionKeyword;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Refill)]
 pub struct RefillKeyword;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Refill<'source> {
     pub value: Spanned<RefillValue>,
     pub requirements: Option<RequirementLineOrGroup<'source>>,
 }
+
 impl Span for Refill<'_> {
     fn span(&self) -> Range<usize> {
         self.span_start()..self.span_end()
     }
 }
+
 impl SpanStart for Refill<'_> {
     fn span_start(&self) -> usize {
         self.value.span_start()
     }
 }
+
 impl SpanEnd for Refill<'_> {
     fn span_end(&self) -> usize {
         match &self.requirements {
@@ -227,6 +255,7 @@ impl SpanEnd for Refill<'_> {
         }
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub enum RefillValue {
     Full,
@@ -234,29 +263,36 @@ pub enum RefillValue {
     Health(RefillHealth),
     Energy(RefillEnergy),
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct RefillHealth {
     pub identifier: Health,
     pub amount: Option<Amount>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Health;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct RefillEnergy {
     pub identifier: Energy,
     pub amount: Option<Amount>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Energy;
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct Amount {
     pub equals: Spanned<Symbol<'='>>,
     pub value: Recoverable<Spanned<usize>, RecoverPass>,
 }
+
 pub struct RecoverPass;
 impl<'source> Recover<'source, Tokenizer> for RecoverPass {
     fn recover(_parser: &mut Parser<'source, Tokenizer>) {}
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub enum ConnectionKeyword {
     #[ast(token = Token::State)]
@@ -269,6 +305,7 @@ pub enum ConnectionKeyword {
     #[ast(token = Token::Connection)]
     Anchor,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct Connection<'source> {
     pub identifier: Spanned<LogicIdentifier<'source>>,
@@ -280,46 +317,58 @@ pub struct RequirementLineOrGroup<'source> {
     pub colon: Spanned<Symbol<':'>>,
     pub requirement: Recoverable<InlineRequirementOrGroup<'source>, RecoverDedent>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum InlineRequirementOrGroup<'source> {
     Inline(Spanned<Free>),
     Group(GroupContent<SeparatedNonEmpty<RequirementLine<'source>, Newline>>),
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(case = "lowercase")]
 pub struct Free;
 pub type RequirementGroup<'source> = Group<SeparatedNonEmpty<RequirementLine<'source>, Newline>>;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct RequirementLine<'source> {
     pub ands: Vec<(Requirement<'source>, And)>,
     pub ors: SeparatedNonEmpty<Requirement<'source>, Or>,
     pub group: Option<Box<RequirementGroup<'source>>>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub enum And {
     Comma(Symbol<','>),
     Colon(Symbol<':'>),
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Or)]
 pub struct Or;
 impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
     fn ast(parser: &mut Parser<'source, Tokenizer>) -> Result<Self> {
         let before = parser.position();
+
         let result = (|| {
             let mut ands = vec![];
+
             loop {
                 let last = Requirement::ast(parser)?;
+
                 if parser.current().0 == Token::Or {
                     let mut more = Vec::with_capacity(1);
+
                     loop {
                         parser.step();
                         more.push((Or, Requirement::ast(parser)?));
+
                         if parser.current().0 != Token::Or {
                             let ors = SeparatedNonEmpty { first: last, more };
+
                             let group = (parser.current_slice() == ":")
                                 .then(|| RequirementGroup::ast(parser).unwrap())
                                 .map(Box::new);
+
                             return Ok(RequirementLine { ands, ors, group });
                         }
                     }
@@ -335,10 +384,12 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                             colon: symbol,
                             content: Ast::ast(parser)?,
                         }));
+
                         let ors = SeparatedNonEmpty {
                             first: last,
                             more: vec![],
                         };
+
                         return Ok(RequirementLine { ands, ors, group });
                     } else {
                         ands.push((last, And::Colon(symbol.data)));
@@ -359,17 +410,21 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                 }
             }
         })();
+
         if result.is_err() {
             parser.jump(before);
         }
+
         result
     }
 }
+
 impl Span for RequirementLine<'_> {
     fn span(&self) -> Range<usize> {
         self.span_start()..self.span_end()
     }
 }
+
 impl SpanStart for RequirementLine<'_> {
     fn span_start(&self) -> usize {
         match self.ands.first() {
@@ -378,6 +433,7 @@ impl SpanStart for RequirementLine<'_> {
         }
     }
 }
+
 impl SpanEnd for RequirementLine<'_> {
     fn span_end(&self) -> usize {
         match &self.group {
@@ -393,27 +449,32 @@ pub enum Requirement<'source> {
     Plain(PlainRequirement<'source>),
     State(Spanned<LogicIdentifier<'source>>),
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct CombatRequirement<'source> {
     pub keyword: Spanned<Combat>,
     pub equals: Symbol<'='>,
     pub enemies: Recoverable<SeparatedNonEmpty<Enemy<'source>, Symbol<'+'>>, RecoverRequirement>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct PlainRequirement<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub amount: Option<Amount>,
 }
+
 impl Span for PlainRequirement<'_> {
     fn span(&self) -> Range<usize> {
         self.span_start()..self.span_end()
     }
 }
+
 impl SpanStart for PlainRequirement<'_> {
     fn span_start(&self) -> usize {
         self.identifier.span_start()
     }
 }
+
 impl SpanEnd for PlainRequirement<'_> {
     fn span_end(&self) -> usize {
         match &self.amount {
@@ -422,18 +483,22 @@ impl SpanEnd for PlainRequirement<'_> {
         }
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Combat;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Enemy<'source> {
     pub amount: Option<EnemyAmount>,
     pub identifier: Spanned<Identifier<'source>>,
 }
+
 impl Span for Enemy<'_> {
     fn span(&self) -> Range<usize> {
         self.span_start()..self.span_end()
     }
 }
+
 impl SpanStart for Enemy<'_> {
     fn span_start(&self) -> usize {
         match &self.amount {
@@ -442,16 +507,19 @@ impl SpanStart for Enemy<'_> {
         }
     }
 }
+
 impl SpanEnd for Enemy<'_> {
     fn span_end(&self) -> usize {
         self.identifier.span_end()
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct EnemyAmount {
     pub value: Spanned<u8>,
     pub times: Spanned<Debug<Symbol<'x'>>>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Debug<T>(T);
 pub struct RecoverRequirement;
@@ -471,18 +539,22 @@ pub struct Group<T> {
     pub colon: Spanned<Symbol<':'>>,
     pub content: Recoverable<GroupContent<T>, RecoverDedent>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub struct GroupContent<T> {
     pub indent: Spanned<Indent>,
     pub content: T,
     pub dedent: Spanned<Dedent>,
 }
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Newline)]
 pub struct Newline;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Indent)]
 pub struct Indent;
+
 #[derive(Debug, Clone, PartialEq, Ast)]
 #[ast(token = Token::Dedent)]
 pub struct Dedent;

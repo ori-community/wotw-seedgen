@@ -60,6 +60,7 @@ where
         }
     }
 }
+
 impl Display for Identifier<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
@@ -132,6 +133,7 @@ where
         }
     }
 }
+
 impl<const CHAR: char> Display for Symbol<CHAR> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "'{CHAR}'")
@@ -185,6 +187,7 @@ pub struct NoTrailingInput<T> {
     pub parsed: Result<T>,
     pub trailing: Result<()>,
 }
+
 impl<T> NoTrailingInput<T> {
     pub fn into_result(self) -> Result<T> {
         self.trailing.and(self.parsed)
@@ -208,6 +211,7 @@ impl<T> NoTrailingInput<T> {
         value
     }
 }
+
 impl<'source, T, V> Ast<'source, T> for NoTrailingInput<V>
 where
     T: Tokenize,

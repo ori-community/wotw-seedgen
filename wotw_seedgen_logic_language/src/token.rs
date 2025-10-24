@@ -62,12 +62,14 @@ impl ParseIntToken for Token {
         matches!(self, Token::Integer)
     }
 }
+
 impl ParseFloatToken for Token {
     #[inline]
     fn is_float(&self) -> bool {
         matches!(self, Token::Float | Token::Integer)
     }
 }
+
 impl ParseIdentToken for Token {
     #[inline]
     fn is_ident(&self) -> bool {

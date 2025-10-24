@@ -37,6 +37,7 @@ pub struct StateData {
     /// List of individual world states
     pub entries: Vec<StateDataEntry>,
 }
+
 // TODO maybe a custom deserialize could eliminate the need for separate input/output structs?
 /// Information about an obtainable world state
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,11 +51,13 @@ pub struct StateDataEntry {
     /// `None` if `uber_identifier` holds a boolean value. Otherwise, has the minimum integer value at which this world state is completed
     pub value: Option<i32>,
 }
+
 impl PartialEq for StateDataEntry {
     fn eq(&self, other: &Self) -> bool {
         self.identifier == other.identifier
     }
 }
+
 impl StateData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
     pub fn from_reader<R: Read>(reader: R) -> Result<Self, String> {

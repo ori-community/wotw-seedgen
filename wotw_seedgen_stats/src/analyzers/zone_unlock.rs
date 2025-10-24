@@ -10,6 +10,7 @@ pub struct ZoneUnlockStats {
     /// How many adjacent result to group together
     pub result_bucket_size: NonZeroUsize,
 }
+
 impl Analyzer for ZoneUnlockStats {
     fn title(&self) -> String {
         format!("Reachables on {} unlock", self.zone)

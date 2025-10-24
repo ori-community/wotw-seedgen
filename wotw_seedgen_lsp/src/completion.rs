@@ -72,6 +72,7 @@ where
         (**self).completion(index)
     }
 }
+
 impl<T> ErrCompletion for Box<T>
 where
     T: ErrCompletion,
@@ -103,6 +104,7 @@ where
             .or_else(|| Some(T::err_completion(&Error::custom(String::new(), 0..0))))
     }
 }
+
 impl<T> ErrCompletion for Vec<T>
 where
     T: ErrCompletion,
@@ -173,6 +175,7 @@ where
         self.0.completion(index)
     }
 }
+
 impl<V> ErrCompletion for Once<V>
 where
     V: ErrCompletion,
@@ -199,6 +202,7 @@ where
         self.result.completion(index)
     }
 }
+
 impl<V, R> ErrCompletion for Recoverable<V, R>
 where
     V: ErrCompletion,
@@ -216,6 +220,7 @@ where
         self.data.completion(index)
     }
 }
+
 impl<T> ErrCompletion for Spanned<T>
 where
     T: ErrCompletion,

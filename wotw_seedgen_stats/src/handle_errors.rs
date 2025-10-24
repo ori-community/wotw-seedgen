@@ -6,6 +6,7 @@ pub(crate) struct HandleErrors<T, E, I: Iterator<Item = std::result::Result<T, E
     pub errors: usize,
     printed_error_count: bool,
 }
+
 impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> HandleErrors<T, E, I, F> {
     pub(crate) fn new(iter: I, handler: F) -> Self {
         Self {
@@ -16,11 +17,13 @@ impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> HandleErr
         }
     }
 }
+
 impl<T, E: Display, I: Iterator<Item = std::result::Result<T, E>>> HandleErrors<T, E, I, fn(E)> {
     pub(crate) fn new_print_errors(iter: I) -> Self {
         Self::new(iter, |err| eprintln!("{err}"))
     }
 }
+
 impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> Iterator
     for HandleErrors<T, E, I, F>
 {

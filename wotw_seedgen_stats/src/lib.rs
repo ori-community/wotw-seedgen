@@ -131,18 +131,22 @@ impl<
         self.sample_size = sample_size;
         self
     }
+
     pub fn tolerated_errors(mut self, tolerated_errors: usize) -> Self {
         self.tolerated_errors = tolerated_errors;
         self
     }
+
     pub fn error_message_limit(mut self, error_message_limit: usize) -> Self {
         self.error_message_limit = error_message_limit;
         self
     }
+
     pub fn overwrite_seed_storage(mut self, overwrite_seed_storage: bool) -> Self {
         self.overwrite_seed_storage = overwrite_seed_storage;
         self
     }
+
     pub fn analyzer(mut self, analyzer: ChainedAnalyzers) -> Self {
         self.analyzers.push(analyzer);
         self
@@ -318,6 +322,7 @@ fn print_feedback_for_unusable_seeds(unusable_amount: usize) {
         );
     }
 }
+
 fn print_feedback_for_generated_seeds(generated: usize, total: usize) {
     let any_reused = generated < total;
     let mut message = format!(
@@ -339,6 +344,7 @@ pub struct Stats {
     analyzers: ChainedAnalyzers,
     pub data: FxHashMap<Vec<Arc<String>>, u32>,
 }
+
 impl Stats {
     pub fn title(&self) -> String {
         self.analyzers

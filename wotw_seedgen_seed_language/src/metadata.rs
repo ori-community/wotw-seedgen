@@ -12,6 +12,7 @@ pub struct Metadata {
     pub description: Option<String>,
     pub config: FxHashMap<String, ConfigValue>,
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfigValue {
     pub description: String,
@@ -45,6 +46,7 @@ impl<T: ExtractMetadata> ExtractMetadata for Vec<T> {
         }
     }
 }
+
 impl<T: ExtractMetadata, R> ExtractMetadata for Recoverable<T, R> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
         if let Ok(t) = &self.result {
@@ -58,6 +60,7 @@ impl ExtractMetadata for ast::Snippet<'_> {
         self.contents.extract_metadata(metadata);
     }
 }
+
 impl ExtractMetadata for ast::Content<'_> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
         match self {
@@ -67,6 +70,7 @@ impl ExtractMetadata for ast::Content<'_> {
         }
     }
 }
+
 impl ExtractMetadata for ast::Annotation<'_> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
         match self {
@@ -91,6 +95,7 @@ impl ExtractMetadata for ast::Annotation<'_> {
         }
     }
 }
+
 impl ExtractMetadata for ast::Command<'_> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
         let ast::Command::Config(_, args) = self else {

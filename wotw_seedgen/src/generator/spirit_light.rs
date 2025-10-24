@@ -12,6 +12,7 @@ pub struct SpiritLightProvider {
     next_amount: f32,
     noise: Uniform<f32>,
 }
+
 impl SpiritLightProvider {
     pub fn new(amount: i32, rng: &mut Pcg64Mcg) -> Self {
         Self {

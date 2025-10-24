@@ -25,6 +25,7 @@ mod logos_tokenizer {
         error_token: Token,
         eof_token: Token,
     }
+
     impl<Token> LogosTokenizer<Token> {
         pub const fn new(error_token: Token, eof_token: Token) -> Self {
             Self {

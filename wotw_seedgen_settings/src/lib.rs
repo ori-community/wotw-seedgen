@@ -158,6 +158,7 @@ pub enum Spawn {
     /// Spawn on any valid anchor from the logic file
     FullyRandom,
 }
+
 pub const DEFAULT_SPAWN: &str = "MarshSpawn.Main";
 impl Default for Spawn {
     fn default() -> Spawn {

@@ -66,6 +66,7 @@ impl Backend {
             text_document,
             position,
         } = text_document_position;
+
         let source = self.get_text_document(&text_document.uri)?;
         let position = convert::position_from_lsp(position, source.value())?;
 
@@ -98,7 +99,9 @@ impl Backend {
         let Some(path) = self.consume_result(url_to_path(&url)).await else {
             return;
         };
+
         let folder_access = FolderAccess::new(&path);
+
         let Some(identifier) = self
             .consume_result(
                 path.file_stem()
@@ -122,6 +125,7 @@ impl Backend {
                 Default::default(),
                 false,
             );
+
             // TODO currently we can only give diagnostics for saved files because we're not using the editors in-memory changes
             // Need to do changes in the language create to improve that
             compiler.compile_snippet(identifier).unwrap(); // TODO have to gracefully exit here, path might be outdated

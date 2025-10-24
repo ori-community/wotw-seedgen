@@ -124,6 +124,7 @@ impl<'source> Compile<'source> for ast::Command<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
     type Output = ();
 
@@ -146,6 +147,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
                                 self.path.data, import.data
                             )),
                     );
+
                     continue;
                 };
 
@@ -155,9 +157,11 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
                             .preprocessed
                             .functions
                             .insert(import.data.0.to_string());
+
                         compiler
                             .function_indices
                             .insert(import.data.0.to_string(), *index);
+
                         // TODO is this still used?
                         compiler
                             .function_imports
@@ -171,6 +175,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
     type Output = ();
 
@@ -184,12 +189,14 @@ impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
             .snippet_access
             .read_file(path.data.as_ref())
             .map_err(|err| Error::custom(err, path.span()));
+
         if let Some(data) = compiler.consume_result(content) {
             compiler
                 .global
                 .output
                 .icons
                 .push((path.data.to_string(), data));
+
             compiler.variables.insert(
                 self.identifier.data,
                 Literal::CustomIcon(path.data.to_string()),
@@ -197,6 +204,7 @@ impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::BuiltinIconArgs<'source> {
     type Output = ();
 
@@ -211,11 +219,13 @@ impl<'source> Compile<'source> for ast::BuiltinIconArgs<'source> {
         );
     }
 }
+
 impl<'source> Compile<'source> for ast::EventArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let index = compiler.function_indices[self.0.data.0];
+
         compiler
             .global
             .events
@@ -224,6 +234,7 @@ impl<'source> Compile<'source> for ast::EventArgs<'source> {
             .insert(self.0.data.0.to_string(), index);
     }
 }
+
 impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
     type Output = ();
 
@@ -245,6 +256,7 @@ impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
             .get(self.snippet_name.data)
             .and_then(|events| events.get(identifier.data.0))
             .copied();
+
         if event.is_none() {
             compiler.errors.push(Error::custom(
                 "Could not find event in snippet".to_string(),
@@ -269,6 +281,7 @@ impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ExportArgs<'source> {
     type Output = ();
 
@@ -305,6 +318,7 @@ impl<'source> Compile<'source> for ast::ExportArgs<'source> {
             .insert(identifier.0.to_string(), value);
     }
 }
+
 impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
     type Output = ();
 
@@ -324,6 +338,7 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
         compiler.global.output.spawn = Some(Position { x, y });
     }
 }
+
 impl<'source> Compile<'source> for ast::TagsArg<'source> {
     type Output = ();
 
@@ -333,6 +348,7 @@ impl<'source> Compile<'source> for ast::TagsArg<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
     type Output = ();
 
@@ -356,6 +372,7 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
             .config
             .get(&compiler.identifier)
             .and_then(|config| config.get(self.identifier.data.0));
+
         let value = match config {
             None => default.data.compile(compiler),
             Some(value) => {
@@ -364,12 +381,14 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
                     ast::ConfigType::Integer => value.parse().ok().map(Literal::Integer),
                     ast::ConfigType::Float => value.parse().ok().map(Literal::Float),
                 };
+
                 if parsed.is_none() {
                     compiler.errors.push(Error::custom(
-                    format!("failed to parse provided configuration value \"{}\" as a {}, which is the required type for this configuration parameter", value, ty.data),
-                    ty.span,
-                ));
+                        format!("failed to parse provided configuration value \"{}\" as a {}, which is the required type for this configuration parameter", value, ty.data),
+                        ty.span,
+                    ));
                 }
+
                 parsed
             }
         };
@@ -378,17 +397,20 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::SetConfigArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         // setting the config happens in preprocessor
         compiler.check_snippet_included(&self.snippet_name);
+
         // TODO verify identifier exists?
         consume_command_arg(self.identifier, compiler);
         consume_command_arg(self.value, compiler);
     }
 }
+
 impl<'source> Compile<'source> for ast::StateArgs<'source> {
     type Output = ();
 
@@ -416,6 +438,7 @@ impl<'source> Compile<'source> for ast::StateArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::TimerArgs<'source> {
     type Output = ();
 
@@ -434,6 +457,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
                 trigger: Trigger::ClientEvent(ClientEvent::Reload),
                 command: CommandVoid::DefineTimer { toggle, timer },
             });
+
             compiler.variables.insert(
                 self.toggle_identifier.data,
                 Literal::UberIdentifier(UberStateAlias {
@@ -441,6 +465,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
                     value: None,
                 }),
             );
+
             compiler.variables.insert(
                 timer_identifier.data,
                 Literal::UberIdentifier(UberStateAlias {
@@ -451,16 +476,20 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
         }
     }
 }
+
 // TODO make internal states this order?
 fn boolean_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
     check_limit(&mut compiler.global.boolean_state_id, 100, 50, span)
 }
+
 fn integer_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
     check_limit(&mut compiler.global.integer_state_id, 0, 100, span)
 }
+
 fn float_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
     check_limit(&mut compiler.global.float_state_id, 150, 25, span)
 }
+
 fn check_limit<S: Span>(
     id: &mut usize,
     offset: usize,
@@ -472,12 +501,15 @@ fn check_limit<S: Span>(
             group: 9,
             member: *id as i32,
         };
+
         *id += 1;
+
         Ok(uber_identifier)
     } else {
         Err(Error::custom(format!("Only {available} UberStates of this type are available (What on earth are you doing?)"), span.span()))
     }
 }
+
 impl<'source> Compile<'source> for ast::LetArgs<'source> {
     type Output = ();
 
@@ -489,6 +521,7 @@ impl<'source> Compile<'source> for ast::LetArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::CommandIf<'source> {
     type Output = ();
 
@@ -498,6 +531,7 @@ impl<'source> Compile<'source> for ast::CommandIf<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
     type Output = ();
 
@@ -510,6 +544,7 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
                     format!("!repeat only allows for positive numbers, but this evaluated to {repetitions}"),
                     span,
                 ));
+
                 return;
             }
 
@@ -524,6 +559,7 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::AddArgs<'source> {
     type Output = ();
 
@@ -531,6 +567,7 @@ impl<'source> Compile<'source> for ast::AddArgs<'source> {
         compile_item_pool_change::<1>(self.0, compiler)
     }
 }
+
 impl<'source> Compile<'source> for ast::RemoveArgs<'source> {
     type Output = ();
 
@@ -538,6 +575,7 @@ impl<'source> Compile<'source> for ast::RemoveArgs<'source> {
         compile_item_pool_change::<-1>(self.0, compiler)
     }
 }
+
 fn compile_item_pool_change<'source, const FACTOR: i32>(
     args: ast::ChangeItemPoolArgs<'source>,
     compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -560,6 +598,7 @@ fn compile_item_pool_change<'source, const FACTOR: i32>(
             .or_default() += amount * FACTOR;
     }
 }
+
 // TODO the practice of writing out the full item everytime seems a little dated now...
 // maybe there could be a better system here that allows you to reference existing items easily, but still reference them by their full form e.g. to rename default pool items
 impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
@@ -571,6 +610,7 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
+
         let name =
             consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
         let price = consume_command_arg(self.price, compiler)
@@ -608,6 +648,7 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ItemDataNameArgs<'source> {
     type Output = ();
 
@@ -617,13 +658,16 @@ impl<'source> Compile<'source> for ast::ItemDataNameArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
+
         let name =
             consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
+
         if let (Some(item), Some(name)) = (item, name) {
             insert_item_data(compiler, item, span, name, "name", |data| &mut data.name);
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ItemDataPriceArgs<'source> {
     type Output = ();
 
@@ -633,6 +677,7 @@ impl<'source> Compile<'source> for ast::ItemDataPriceArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
+
         let price = consume_command_arg(self.price, compiler)
             .and_then(|price| price.compile_into(compiler));
 
@@ -641,6 +686,7 @@ impl<'source> Compile<'source> for ast::ItemDataPriceArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ItemDataDescriptionArgs<'source> {
     type Output = ();
 
@@ -650,6 +696,7 @@ impl<'source> Compile<'source> for ast::ItemDataDescriptionArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
+
         let description = consume_command_arg(self.description, compiler)
             .and_then(|description| description.compile_into(compiler));
 
@@ -660,6 +707,7 @@ impl<'source> Compile<'source> for ast::ItemDataDescriptionArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ItemDataIconArgs<'source> {
     type Output = ();
 
@@ -669,6 +717,7 @@ impl<'source> Compile<'source> for ast::ItemDataIconArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
+
         let icon =
             consume_command_arg(self.icon, compiler).and_then(|icon| icon.compile_into(compiler));
 
@@ -677,6 +726,7 @@ impl<'source> Compile<'source> for ast::ItemDataIconArgs<'source> {
         }
     }
 }
+
 fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
     compiler: &mut SnippetCompiler,
     item: CommandVoid,
@@ -701,6 +751,7 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
         ))
     }
 }
+
 impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
     type Output = ();
 
@@ -710,6 +761,7 @@ impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::SetLogicStateArgs<'source> {
     type Output = ();
 
@@ -721,6 +773,7 @@ impl<'source> Compile<'source> for ast::SetLogicStateArgs<'source> {
             .insert(self.0.data.to_string());
     }
 }
+
 impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
     type Output = ();
 
@@ -730,6 +783,7 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
             .item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
+
         let zone =
             consume_command_arg(self.zone, compiler).and_then(|zone| zone.evaluate(compiler));
 
@@ -738,6 +792,7 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
     type Output = ();
 
@@ -750,6 +805,7 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
         let item = item
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
+
         if let Some(item) = item {
             compiler.variables.insert(
                 self.identifier.data,
@@ -758,6 +814,7 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ItemOnArgs<'source> {
     type Output = ();
 
@@ -772,6 +829,7 @@ impl<'source> Compile<'source> for ast::ItemOnArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
     type Output = ();
 
@@ -811,6 +869,7 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::CountInZoneBinding<'source> {
     type Output = Option<(Identifier<'source>, Zone)>;
 
@@ -820,20 +879,24 @@ impl<'source> Compile<'source> for ast::CountInZoneBinding<'source> {
             .map(|zone| (self.identifier.data, zone))
     }
 }
+
 impl<'source> Compile<'source> for ast::RandomIntegerArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let min = consume_command_arg(self.0.min, compiler).and_then(|min| min.evaluate(compiler));
         let max = consume_command_arg(self.0.max, compiler).and_then(|max| max.evaluate(compiler));
+
         if let (Some(min), Some(max)) = (min, max) {
             let value = compiler.rng.gen_range(min..=max);
+
             compiler
                 .variables
                 .insert(self.0.identifier.data, Literal::Integer(value));
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
     type Output = ();
 
@@ -842,19 +905,23 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
             .and_then(|min| min.evaluate::<OrderedFloat<f32>>(compiler));
         let max = consume_command_arg(self.0.max, compiler)
             .and_then(|max| max.evaluate::<OrderedFloat<f32>>(compiler));
+
         if let (Some(min), Some(max)) = (min, max) {
             let value: f32 = compiler.rng.gen_range(min.into()..=max.into());
+
             compiler
                 .variables
                 .insert(self.0.identifier.data, Literal::Float(value.into()));
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::RandomPoolArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         consume_command_arg(self.ty, compiler);
+
         let Some(values) = consume_command_arg(self.values, compiler) else {
             return;
         };
@@ -878,6 +945,7 @@ impl<'source> Compile<'source> for ast::RandomPoolArgs<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::RandomFromPoolArgs<'source> {
     type Output = ();
 

@@ -36,15 +36,19 @@ pub fn spirit_light(amount: CommandInteger, rng: &mut Pcg64Mcg) -> CommandVoid {
         ],
     }
 }
+
 pub fn gorlek_ore() -> CommandVoid {
     resource(gorlek_ore_string, UberIdentifier::GORLEK_ORE)
 }
+
 pub fn keystone() -> CommandVoid {
     resource(keystone_string, UberIdentifier::KEYSTONES)
 }
+
 pub fn shard_slot() -> CommandVoid {
     resource(shard_slot_string, UberIdentifier::SHARD_SLOTS)
 }
+
 pub fn health_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -61,6 +65,7 @@ pub fn health_fragment() -> CommandVoid {
         ],
     }
 }
+
 pub fn energy_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -84,6 +89,7 @@ pub fn skill(skill: Skill) -> CommandVoid {
         ],
     }
 }
+
 pub fn shard(shard: Shard) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -92,6 +98,7 @@ pub fn shard(shard: Shard) -> CommandVoid {
         ],
     }
 }
+
 pub fn teleporter(teleporter: Teleporter) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -100,6 +107,7 @@ pub fn teleporter(teleporter: Teleporter) -> CommandVoid {
         ],
     }
 }
+
 pub fn clean_water() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -108,6 +116,7 @@ pub fn clean_water() -> CommandVoid {
         ],
     }
 }
+
 pub fn weapon_upgrade(weapon_upgrade: WeaponUpgrade) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
@@ -121,20 +130,26 @@ struct ArgContext<'a, 'compiler, 'source, 'snippets, 'uberstates> {
     parameters: <Punctuated<ast::Expression<'source>, Symbol<','>> as IntoIterator>::IntoIter,
     compiler: &'a mut SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>,
 }
+
 fn arg<T: CompileInto>(context: &mut ArgContext) -> Option<T> {
     context.parameters.next()?.compile_into(context.compiler)
 }
+
 fn spanned_arg<T: CompileInto>(context: &mut ArgContext) -> Option<(T, Range<usize>)> {
     let next = context.parameters.next()?;
     let span = next.span();
     let next = next.compile_into(context.compiler)?;
+
     Some((next, span))
 }
+
 fn boxed_arg<T: CompileInto>(context: &mut ArgContext) -> Option<Box<T>> {
     arg(context).map(Box::new)
 }
+
 fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usize>)> {
     let (arg, span) = spanned_arg::<CommandString>(context)?;
+
     match arg.into_constant() {
         Some(value) => Some((value, span)),
         _ => {
@@ -142,31 +157,40 @@ fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usi
                 "Only literals are allowed in this position".to_string(),
                 span,
             ));
+
             None
         }
     }
 }
+
 fn string_literal(context: &mut ArgContext) -> Option<String> {
     spanned_string_literal(context).map(|(value, _)| value)
 }
+
 fn boolean_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.boolean_ids.id(id))
 }
+
 fn integer_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.integer_ids.id(id))
 }
+
 fn float_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.float_ids.id(id))
 }
+
 fn string_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.string_ids.id(id))
 }
+
 fn message_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.message_ids.id(id))
 }
+
 fn wheel_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.wheel_ids.id(id))
 }
+
 fn warp_icon_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.warp_icon_ids.id(id))
 }
@@ -566,9 +590,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
         let action = match identifier {
             FunctionIdentifier::Fetch => {
                 let uber_identifier = context.parameters.next()?;
+
                 let span = uber_identifier.span();
                 let uber_identifier =
                     uber_identifier.compile_into::<UberIdentifier>(context.compiler)?;
+
                 match context.compiler.uber_state_type(uber_identifier, &span)? {
                     UberStateType::Boolean => {
                         Command::Boolean(CommandBoolean::FetchBoolean { uber_identifier })
@@ -595,12 +621,14 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }),
             FunctionIdentifier::ToInteger => {
                 let float = arg::<CommandFloat>(&mut context)?;
+
                 let command = match float.as_constant() {
                     Some(value) => (value.round() as i32).into(),
                     None => CommandInteger::FromFloat {
                         float: Box::new(float),
                     },
                 };
+
                 Command::Integer(command)
             }
             FunctionIdentifier::GetFloat => Command::Float(CommandFloat::GetFloat {
@@ -608,12 +636,14 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }),
             FunctionIdentifier::ToFloat => {
                 let integer = arg::<CommandInteger>(&mut context)?;
+
                 let command = match integer.as_constant() {
                     Some(value) => (value as f32).into(),
                     _ => CommandFloat::FromInteger {
                         integer: Box::new(integer),
                     },
                 };
+
                 Command::Float(command)
             }
             FunctionIdentifier::GetString => Command::String(CommandString::GetString {
@@ -621,6 +651,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }),
             FunctionIdentifier::ToString => {
                 let (arg, span) = spanned_arg(&mut context)?;
+
                 let command = match arg {
                     Command::Boolean(command) => match command.as_constant() {
                         Some(value) => value.to_string().into(),
@@ -646,6 +677,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             .compiler
                             .errors
                             .push(Error::custom("cannot convert to String".to_string(), span));
+
                         return None;
                     }
                 };
@@ -713,6 +745,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }
             FunctionIdentifier::RemoveSpiritLight => {
                 let amount = arg::<CommandInteger>(&mut context)?;
+
                 let negative = match amount.as_constant() {
                     Some(value) => (-value).into(),
                     None => CommandInteger::Arithmetic {
@@ -723,6 +756,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                         }),
                     },
                 };
+
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(spirit_light_string(amount, &mut context.compiler.rng, true)),
@@ -759,10 +793,12 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::Skill => Command::Void(skill(arg(&mut context)?)),
             FunctionIdentifier::RemoveSkill => {
                 let skill = arg(&mut context)?;
+
                 let mut commands = vec![
                     item_message(skill_string(skill, true)),
                     super::set_boolean_value(skill.uber_identifier(), false),
                 ];
+
                 if let Some(equipment) = skill.equipment() {
                     commands.push(CommandVoid::Unequip { equipment });
                 }
@@ -772,6 +808,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::Shard => Command::Void(shard(arg(&mut context)?)),
             FunctionIdentifier::RemoveShard => {
                 let shard = arg(&mut context)?;
+
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(shard_string(shard, true)),
@@ -782,6 +819,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::Teleporter => Command::Void(teleporter(arg(&mut context)?)),
             FunctionIdentifier::RemoveTeleporter => {
                 let teleporter = arg(&mut context)?;
+
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(teleporter_string(teleporter, true)),
@@ -800,6 +838,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::WeaponUpgrade => Command::Void(weapon_upgrade(arg(&mut context)?)),
             FunctionIdentifier::RemoveWeaponUpgrade => {
                 let weapon_upgrade = arg(&mut context)?;
+
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(weapon_upgrade_string(weapon_upgrade, true)),
@@ -1035,7 +1074,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }
             FunctionIdentifier::StoreDefaultsExclude => {
                 let (regex, span) = spanned_string_literal(&mut context)?;
+
                 let identifier = format!("*store_defaults_exclude{regex}");
+
                 let regex = context.compiler.consume_result(
                     Regex::new(&regex)
                         .map_err(|err| Error::custom(format!("Invalid regex: {err}"), span)),
@@ -1099,6 +1140,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }),
             FunctionIdentifier::SetShopItemData => {
                 let uber_identifier = arg::<UberIdentifier>(&mut context)?;
+
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         CommandVoid::SetShopItemPrice {
@@ -1153,6 +1195,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::SetWheelItemData => {
                 let wheel = wheel_id(&mut context)?;
                 let position = arg(&mut context)?;
+
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         CommandVoid::SetWheelItemName {
@@ -1237,10 +1280,12 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 .parameters
                 .last()
                 .map_or(span.end, |last| last.span().end);
+
             context.compiler.errors.push(Error::custom(
                 "Too many parameters".to_string(),
                 span.start..end,
             ));
+
             return None;
         }
 
@@ -1263,6 +1308,7 @@ fn set_spirit_light_string(value: &str) -> Box<CommandVoid> {
         value: value.into(),
     })
 }
+
 fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool) -> CommandString {
     CommandString::Multi {
         commands: vec![
@@ -1326,6 +1372,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
         }),
     }
 }
+
 fn set_random_spirit_light_string(amount: &CommandInteger, rng: &mut Pcg64Mcg) -> Box<CommandVoid> {
     let name = SPIRIT_LIGHT_NAMES.choose(rng).unwrap();
     let constant_singular = amount.as_constant().map(|amount| matches!(amount, 1 | -1));
@@ -1369,6 +1416,7 @@ fn set_random_spirit_light_string(amount: &CommandInteger, rng: &mut Pcg64Mcg) -
         }),
     }
 }
+
 fn resource_string(resource: &str, remove: bool) -> CommandString {
     if remove {
         format!("@Remove {resource}@").into()
@@ -1376,23 +1424,30 @@ fn resource_string(resource: &str, remove: bool) -> CommandString {
         resource.into()
     }
 }
+
 fn gorlek_ore_string(remove: bool) -> CommandString {
     resource_string("Gorlek Ore", remove)
 }
+
 fn keystone_string(remove: bool) -> CommandString {
     resource_string("Keystone", remove)
 }
+
 fn shard_slot_string(remove: bool) -> CommandString {
     resource_string("Shard Slot", remove)
 }
+
 fn health_fragment_string(remove: bool) -> CommandString {
     resource_string("Health Fragment", remove)
 }
+
 fn energy_fragment_string(remove: bool) -> CommandString {
     resource_string("Energy Fragment", remove)
 }
+
 fn skill_string(skill: Skill, remove: bool) -> CommandString {
     let skill_cased = skill.to_string().to_title_case();
+
     if remove {
         format!("@Remove {skill_cased}@")
     } else {
@@ -1405,8 +1460,10 @@ fn skill_string(skill: Skill, remove: bool) -> CommandString {
     }
     .into()
 }
+
 fn shard_string(shard: Shard, remove: bool) -> CommandString {
     let shard_cased = shard.to_string().to_title_case();
+
     if remove {
         format!("@Remove {shard_cased}@")
     } else {
@@ -1414,10 +1471,12 @@ fn shard_string(shard: Shard, remove: bool) -> CommandString {
     }
     .into()
 }
+
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
     let teleporter = teleporter.to_string();
     let teleporter = &teleporter[..teleporter.len() - 2];
     let teleporter_cased = teleporter.to_string().to_title_case();
+
     if remove {
         format!("@Remove {teleporter_cased} Teleporter@")
     } else {
@@ -1425,6 +1484,7 @@ fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
     }
     .into()
 }
+
 fn clean_water_string(remove: bool) -> CommandString {
     if remove {
         "@Remove Clean Water@"
@@ -1433,9 +1493,11 @@ fn clean_water_string(remove: bool) -> CommandString {
     }
     .into()
 }
+
 // TODO remove as const?
 fn weapon_upgrade_string(weapon_upgrade: WeaponUpgrade, remove: bool) -> CommandString {
     let weapon_upgrade_cased = weapon_upgrade.to_string().to_title_case();
+
     if remove {
         format!("@Remove {weapon_upgrade_cased}@")
     } else {
@@ -1452,6 +1514,7 @@ fn resource(string_fn: fn(bool) -> CommandString, uber_identifier: UberIdentifie
         ],
     }
 }
+
 fn remove_resource(
     string_fn: fn(bool) -> CommandString,
     uber_identifier: UberIdentifier,
@@ -1466,6 +1529,7 @@ fn remove_resource(
 
 fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
     let (uber_identifier, span) = spanned_arg::<UberIdentifier>(context)?;
+
     let command = match context.compiler.uber_state_type(uber_identifier, &span)? {
         UberStateType::Boolean => CommandVoid::StoreBoolean {
             uber_identifier,
@@ -1483,6 +1547,7 @@ fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
             trigger_events,
         },
     };
+
     if context
         .compiler
         .global
@@ -1496,6 +1561,7 @@ fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
             span,
         ));
     }
+
     Some(Command::Void(command))
 }
 

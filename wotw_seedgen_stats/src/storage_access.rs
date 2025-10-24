@@ -18,6 +18,7 @@ pub trait SeedStorageAccess {
     /// clean all seeds that have previously been generated
     fn clean_all_seeds(&self) -> Result<()>;
 }
+
 use crate::handle_errors::HandleErrors;
 
 use super::*;
@@ -91,6 +92,7 @@ pub struct ReadSeeds {
     #[allow(clippy::type_complexity)]
     inner: Option<iter::Map<HandleErrorsReadDir, fn(DirEntry) -> Result<SeedSpoiler>>>,
 }
+
 impl ReadSeeds {
     fn new(path: PathBuf, limit: usize) -> Result<Self> {
         fn format_read_dir_err(err: io::Error, path: &Path) -> String {
@@ -165,6 +167,7 @@ impl ReadSeeds {
         Ok(Self { inner: Some(inner) })
     }
 }
+
 impl Iterator for ReadSeeds {
     type Item = Result<SeedSpoiler>;
 
@@ -172,6 +175,7 @@ impl Iterator for ReadSeeds {
         self.inner.as_mut().and_then(Iterator::next)
     }
 }
+
 type HandleErrorsReadDir = HandleErrors<DirEntry, io::Error, iter::Take<ReadDir>, fn(io::Error)>;
 fn read_dir<P: AsRef<Path>>(path: P, limit: usize) -> io::Result<HandleErrorsReadDir> {
     fs::read_dir(&path).map(|read_dir| {
@@ -188,12 +192,14 @@ fn path_from_settings(settings: &UniverseSettings) -> PathBuf {
     path.push(folder);
     path
 }
+
 fn hash_settings(settings: &UniverseSettings) -> u64 {
     let mut hasher = FxHasher::default();
     let bytes = bincode::serialize(&settings.world_settings).expect("Failed to serialize settings"); // We deliberately ignore the seed
     bytes.hash(&mut hasher);
     hasher.finish()
 }
+
 fn print_feedback_for_existing_seeds(seeds: HandleErrorsReadDir) {
     let modify_timestamps = HandleErrors::new_print_errors(
         HandleErrors::new_print_errors(seeds.map(|entry| {

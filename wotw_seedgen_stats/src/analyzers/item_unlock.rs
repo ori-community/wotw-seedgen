@@ -8,6 +8,7 @@ pub struct ItemUnlockStats {
     /// How many adjacent result to group together
     pub result_bucket_size: NonZeroUsize,
 }
+
 impl Analyzer for ItemUnlockStats {
     fn title(&self) -> String {
         format!("Reachables on {} unlock", self.item)

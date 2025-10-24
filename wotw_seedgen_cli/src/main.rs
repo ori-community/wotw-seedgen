@@ -55,6 +55,7 @@ impl Debug for Error {
         write!(f, "{}", self.0)
     }
 }
+
 impl<T: ToString> From<T> for Error {
     fn from(value: T) -> Self {
         Self(value.to_string())

@@ -16,6 +16,7 @@ pub trait Simulate {
 
     fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return;
 }
+
 impl<T: Simulate> Simulate for Vec<T> {
     type Return = ();
 
@@ -25,6 +26,7 @@ impl<T: Simulate> Simulate for Vec<T> {
         }
     }
 }
+
 impl Simulate for ClientEvent {
     type Return = ();
 
@@ -37,6 +39,7 @@ impl Simulate for ClientEvent {
             })
     }
 }
+
 impl Simulate for Command {
     type Return = ();
 
@@ -63,6 +66,7 @@ impl Simulate for Command {
         }
     }
 }
+
 impl<Item: Simulate> Simulate for Operation<Item, EqualityComparator>
 where
     Item::Return: PartialEq,
@@ -78,6 +82,7 @@ where
         }
     }
 }
+
 impl<Item: Simulate> Simulate for Operation<Item, Comparator>
 where
     Item::Return: PartialEq + PartialOrd,
@@ -97,6 +102,7 @@ where
         }
     }
 }
+
 impl<Item: Simulate<Return = bool>> Simulate for Operation<Item, LogicOperator> {
     type Return = bool;
 
@@ -109,6 +115,7 @@ impl<Item: Simulate<Return = bool>> Simulate for Operation<Item, LogicOperator> 
         }
     }
 }
+
 impl<Item: Simulate> Simulate for Operation<Item, ArithmeticOperator>
 where
     Item::Return: Add<Output = Item::Return>
@@ -129,6 +136,7 @@ where
         }
     }
 }
+
 impl Simulate for CommandBoolean {
     type Return = bool;
 
@@ -153,6 +161,7 @@ impl Simulate for CommandBoolean {
         }
     }
 }
+
 impl Simulate for CommandInteger {
     type Return = i32;
 
@@ -174,6 +183,7 @@ impl Simulate for CommandInteger {
         }
     }
 }
+
 impl Simulate for CommandFloat {
     type Return = OrderedFloat<f32>;
 
@@ -195,6 +205,7 @@ impl Simulate for CommandFloat {
         }
     }
 }
+
 impl Simulate for CommandString {
     type Return = String;
 
@@ -219,6 +230,7 @@ impl Simulate for CommandString {
         }
     }
 }
+
 impl Simulate for CommandZone {
     type Return = Zone;
 
@@ -233,6 +245,7 @@ impl Simulate for CommandZone {
         }
     }
 }
+
 impl Simulate for CommandVoid {
     type Return = ();
 
@@ -357,6 +370,7 @@ fn set_uber_state(
 
     world.update_reached(uber_identifier, events);
 }
+
 fn process_triggers(world: &mut World, events: &[Event], triggers: Vec<usize>) {
     // Trigger conditions have to be evaluated ahead of time in case any
     // triggered commands modify states relevant to the conditions.

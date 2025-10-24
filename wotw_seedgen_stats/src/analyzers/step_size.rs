@@ -7,6 +7,7 @@ pub struct StepSizeStats {
     /// How many adjacent result to group together
     pub result_bucket_size: NonZeroUsize,
 }
+
 impl Analyzer for StepSizeStats {
     fn title(&self) -> String {
         "Size of progression steps".to_string()

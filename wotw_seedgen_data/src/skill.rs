@@ -135,6 +135,7 @@ pub enum Skill {
     GladesAncestralLight = 120,
     MarshAncestralLight = 121,
 }
+
 impl Skill {
     pub const BASH_ID: UberIdentifier = Self::Bash.uber_identifier();
     // pub const CHARGE_FLAME_ID: UberIdentifier = Self::ChargeFlame.uber_identifier();
@@ -252,6 +253,7 @@ impl Skill {
     pub const fn uber_identifier(self) -> UberIdentifier {
         UberIdentifier::new(24, self as i32)
     }
+
     /// Returns the `Skill` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         const MIN: i32 = u8::MIN as i32;
@@ -275,6 +277,7 @@ impl Skill {
             _ => 0.0,
         }
     }
+
     /// Returns the immediate damage dealt when using this `Skill` once
     ///
     /// Does not include any inflicted burn damage, use [`Skill::burn_damage`] for that
@@ -299,6 +302,7 @@ impl Skill {
             _ => 0.0,
         }
     }
+
     /// Returns the total damage inflicted by burn when using this `Skill` once
     pub const fn burn_damage(self) -> f32 {
         match self {
@@ -307,6 +311,7 @@ impl Skill {
             _ => 0.0,
         }
     }
+
     // TODO unmatched equipments: Torch, Shot, Wave, Whirl, SentryDeprecated, DoubleJump, Launch
     /// Returns the [`Equipment`] corresponding to this `Skill`
     pub const fn equipment(self) -> Option<Equipment> {

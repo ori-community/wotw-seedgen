@@ -141,6 +141,7 @@ where
         syn::Fields::Unit => unreachable!(),
     })
 }
+
 fn span_any_fields_named<const IN_PATTERN: bool>(
     field: &syn::Ident,
     f: TokenStream,
@@ -149,6 +150,7 @@ fn span_any_fields_named<const IN_PATTERN: bool>(
     let prefix = (!IN_PATTERN).then(|| quote! { self. });
     quote! { #binding wotw_seedgen_parse::#f(& #prefix #field) }
 }
+
 fn span_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenStream {
     let len = fields.named.len();
     if len == 1 {
@@ -162,14 +164,17 @@ fn span_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenS
         quote! { #binding wotw_seedgen_parse::SpanStart::span_start(& #prefix #first)..wotw_seedgen_parse::SpanEnd::span_end(& #prefix #last) }
     }
 }
+
 fn span_start_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenStream {
     let first = fields.named[0].ident.as_ref().unwrap();
     span_any_fields_named::<IN_PATTERN>(first, quote! { SpanStart::span_start })
 }
+
 fn span_end_fields_named<const IN_PATTERN: bool>(fields: syn::FieldsNamed) -> TokenStream {
     let last = fields.named.last().unwrap().ident.as_ref().unwrap();
     span_any_fields_named::<IN_PATTERN>(last, quote! { SpanEnd::span_end })
 }
+
 fn span_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -> TokenStream {
     let len = fields.unnamed.len();
     if len == 1 {
@@ -193,6 +198,7 @@ fn span_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -> To
         quote! { #binding wotw_seedgen_parse::SpanStart::span_start(& #first)..wotw_seedgen_parse::SpanEnd::span_end(& #last) }
     }
 }
+
 fn span_start_fields_unnamed<const IN_PATTERN: bool>(_fields: syn::FieldsUnnamed) -> TokenStream {
     let binding = IN_PATTERN.then(|| quote! { (first, ..) => });
     let first = if IN_PATTERN {
@@ -203,6 +209,7 @@ fn span_start_fields_unnamed<const IN_PATTERN: bool>(_fields: syn::FieldsUnnamed
 
     quote! { #binding wotw_seedgen_parse::SpanStart::span_start(& #first) }
 }
+
 fn span_end_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -> TokenStream {
     let binding = IN_PATTERN.then(|| quote! { (.., last) => });
     let last = if IN_PATTERN {
@@ -214,6 +221,7 @@ fn span_end_fields_unnamed<const IN_PATTERN: bool>(fields: syn::FieldsUnnamed) -
 
     quote! { #binding wotw_seedgen_parse::SpanEnd::span_end(& #last) }
 }
+
 fn span_enum<FN, FU>(data: syn::DataEnum, named: FN, unnamed: FU) -> Result<TokenStream>
 where
     FN: Fn(syn::FieldsNamed) -> TokenStream,

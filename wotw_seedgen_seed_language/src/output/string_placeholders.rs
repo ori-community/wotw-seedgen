@@ -205,6 +205,7 @@ impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
 trait ResolvePlaceholders {
     fn resolve(&self, context: &mut ResolveContext);
 }
+
 impl<T: ResolvePlaceholders> ResolvePlaceholders for Vec<T> {
     fn resolve(&self, context: &mut ResolveContext) {
         for t in self {
@@ -212,6 +213,7 @@ impl<T: ResolvePlaceholders> ResolvePlaceholders for Vec<T> {
         }
     }
 }
+
 impl<T: ResolvePlaceholders> ResolvePlaceholders for Option<T> {
     fn resolve(&self, context: &mut ResolveContext) {
         if let Some(t) = self {
@@ -219,24 +221,28 @@ impl<T: ResolvePlaceholders> ResolvePlaceholders for Option<T> {
         }
     }
 }
+
 impl<Item: ResolvePlaceholders, Operator> ResolvePlaceholders for Operation<Item, Operator> {
     fn resolve(&self, context: &mut ResolveContext) {
         self.left.resolve(context);
         self.right.resolve(context);
     }
 }
+
 impl ResolvePlaceholders for IntermediateOutput {
     fn resolve(&self, context: &mut ResolveContext) {
         self.events.resolve(context);
         self.command_lookup.resolve(context);
     }
 }
+
 impl ResolvePlaceholders for Event {
     fn resolve(&self, context: &mut ResolveContext) {
         self.trigger.resolve(context);
         self.command.resolve(context);
     }
 }
+
 impl ResolvePlaceholders for Trigger {
     fn resolve(&self, context: &mut ResolveContext) {
         if let Self::Condition(condition) = self {
@@ -244,6 +250,7 @@ impl ResolvePlaceholders for Trigger {
         }
     }
 }
+
 impl ResolvePlaceholders for Command {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
@@ -256,6 +263,7 @@ impl ResolvePlaceholders for Command {
         }
     }
 }
+
 impl ResolvePlaceholders for CommandBoolean {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
@@ -279,6 +287,7 @@ impl ResolvePlaceholders for CommandBoolean {
         }
     }
 }
+
 impl ResolvePlaceholders for CommandInteger {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
@@ -292,6 +301,7 @@ impl ResolvePlaceholders for CommandInteger {
         }
     }
 }
+
 impl ResolvePlaceholders for CommandFloat {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
@@ -305,6 +315,7 @@ impl ResolvePlaceholders for CommandFloat {
         }
     }
 }
+
 impl ResolvePlaceholders for CommandString {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
@@ -343,6 +354,7 @@ impl ResolvePlaceholders for CommandString {
         }
     }
 }
+
 impl ResolvePlaceholders for CommandZone {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
@@ -354,6 +366,7 @@ impl ResolvePlaceholders for CommandZone {
         }
     }
 }
+
 impl ResolvePlaceholders for CommandVoid {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {

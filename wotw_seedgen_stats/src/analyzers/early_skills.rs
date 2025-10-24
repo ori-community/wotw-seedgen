@@ -6,6 +6,7 @@ use wotw_seedgen::{data::Skill, spoiler::SeedSpoiler, CommonItem, ContainedWrite
 pub struct EarlySkillsStats {
     pub reachable_limit: usize,
 }
+
 impl Analyzer for EarlySkillsStats {
     fn title(&self) -> String {
         format!("Skills within {} reachables", self.reachable_limit)

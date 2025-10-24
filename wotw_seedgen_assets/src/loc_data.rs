@@ -41,6 +41,7 @@ pub struct LocData {
     /// List of individual pickup locations
     pub entries: Vec<LocDataEntry>,
 }
+
 // TODO while breaking everything could also just change the loc data format to save this transformation
 /// Information about a pickup location
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,19 +61,23 @@ pub struct LocDataEntry {
     /// Map coordinates of this pickup location, if applicable
     pub map_position: Option<Position>,
 }
+
 impl PartialEq for LocDataEntry {
     fn eq(&self, other: &Self) -> bool {
         self.identifier == other.identifier
     }
 }
+
 impl LocData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
     pub fn from_reader<R: Read>(reader: R) -> Result<Self, String> {
         let mut entries = vec![];
+
         let mut reader = csv::ReaderBuilder::new()
             .trim(csv::Trim::All)
             .from_reader(reader);
         let mut record = csv::StringRecord::new();
+
         while reader
             .read_record(&mut record)
             .map_err(|err| err.to_string())?
@@ -80,14 +85,17 @@ impl LocData {
             let record = record
                 .deserialize::<LocDataInput>(None)
                 .map_err(|err| err.to_string())?;
+
             let position = match (record.x, record.y) {
                 (Some(x), Some(y)) => Some(Position::new(x, y)),
                 _ => None,
             };
+
             let map_position = match (record.map_x, record.map_y) {
                 (Some(x), Some(y)) => Some(Position::new(x, y)),
                 _ => None,
             };
+
             entries.push(LocDataEntry {
                 identifier: record.node_identifier,
                 zone: record.zone,
@@ -120,6 +128,7 @@ struct LocDataInput<'a> {
     map_x: Option<f32>,
     map_y: Option<f32>,
 }
+
 #[derive(Deserialize)]
 #[serde(remote = "Zone")]
 enum LocDataZone {

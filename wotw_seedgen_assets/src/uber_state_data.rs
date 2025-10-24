@@ -26,6 +26,7 @@ pub struct UberStateData {
     /// Query a unique `UberIdentifier` for information about the UberState
     pub id_lookup: FxHashMap<UberIdentifier, UberStateDataEntry>,
 }
+
 /// Successful Resolution of an UberState name
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct UberStateAlias {
@@ -39,6 +40,7 @@ pub struct UberStateAlias {
     /// UberState. The value represents the current step of Hand to Hand.
     pub value: Option<i32>,
 }
+
 impl Display for UberStateAlias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.uber_identifier)?;
@@ -48,6 +50,7 @@ impl Display for UberStateAlias {
         Ok(())
     }
 }
+
 /// Information about an UberState
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UberStateDataEntry {
@@ -62,12 +65,14 @@ pub struct UberStateDataEntry {
     /// If `true`, writing to this UberState manually will fail
     pub readonly: bool,
 }
+
 impl UberStateDataEntry {
     /// Returns `rando_name` if available, otherwise returns `name`
     pub fn preferred_name(&self) -> &String {
         self.rando_name.as_ref().unwrap_or(&self.name)
     }
 }
+
 /// Typed value stored inside an UberState
 ///
 /// The types are simplified since a lot of the used types are similar in nature
@@ -77,6 +82,7 @@ pub enum UberStateValue {
     Integer(i32),
     Float(f32),
 }
+
 impl Display for UberStateValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -86,6 +92,7 @@ impl Display for UberStateValue {
         }
     }
 }
+
 impl UberStateData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
     ///
@@ -96,6 +103,7 @@ impl UberStateData {
         state_data: &StateData,
     ) -> serde_json::Result<Self> {
         let mut uber_state_data = Self::default();
+
         let dump: Dump = serde_json::from_reader(reader)?;
         for (group, dump_group) in dump.groups {
             let group_map = uber_state_data
@@ -134,6 +142,7 @@ impl UberStateData {
                 );
             }
         }
+
         for record in &loc_data.entries {
             uber_state_data.add_rando_name(
                 record.identifier.clone(),
@@ -141,6 +150,7 @@ impl UberStateData {
                 record.value,
             );
         }
+
         for record in &state_data.entries {
             uber_state_data.add_rando_name(
                 record.identifier.clone(),
@@ -148,6 +158,7 @@ impl UberStateData {
                 record.value,
             );
         }
+
         Ok(uber_state_data)
     }
 
@@ -158,6 +169,7 @@ impl UberStateData {
         value: Option<i32>,
     ) {
         let (group, member) = name.split_once('.').expect("Invalid UberState name");
+
         self.name_lookup
             .entry(group.to_string())
             .or_default()
@@ -167,6 +179,7 @@ impl UberStateData {
                 uber_identifier,
                 value,
             });
+
         self.id_lookup.get_mut(&uber_identifier).unwrap().rando_name = Some(name);
     }
 }
@@ -175,11 +188,13 @@ impl UberStateData {
 struct Dump {
     groups: FxHashMap<i32, DumpGroup>,
 }
+
 #[derive(Deserialize)]
 struct DumpGroup {
     name: String,
     states: FxHashMap<i32, DumpMember>,
 }
+
 #[derive(Deserialize)]
 struct DumpMember {
     name: String,
@@ -187,6 +202,7 @@ struct DumpMember {
     value: f32,
     value_type: ValueType,
 }
+
 #[derive(Deserialize)]
 enum ValueType {
     Boolean,

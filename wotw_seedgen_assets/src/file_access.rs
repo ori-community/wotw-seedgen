@@ -23,26 +23,33 @@ pub fn file_err<E: Display, P: AsRef<Path>>(action: &str, path: P, err: E) -> St
 pub struct FileAccess {
     folders: Vec<PathBuf>,
 }
+
 impl FileAccess {
     pub fn new<P: AsRef<Path>, I: IntoIterator<Item = P>>(folders: I) -> Self {
         let folders = folders
             .into_iter()
             .map(|folder| folder.as_ref().to_path_buf())
             .collect::<Vec<_>>();
+
         assert!(!folders.is_empty());
+
         Self { folders }
     }
 
     #[cfg(feature = "loc_data")]
     pub fn loc_data(&self) -> Result<LocData, String> {
         let (path, file) = self.open(Path::new("loc_data.csv"))?;
+
         LocData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
+
     #[cfg(feature = "state_data")]
     pub fn state_data(&self) -> Result<StateData, String> {
         let (path, file) = self.open(Path::new("state_data.csv"))?;
+
         StateData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
+
     #[cfg(feature = "uber_state_data")]
     pub fn uber_state_data(
         &self,
@@ -51,25 +58,30 @@ impl FileAccess {
     ) -> Result<UberStateData, String> {
         // TODO rename uber_state_dump -> uber_state_data
         let (path, file) = self.open(Path::new("uber_state_dump.json"))?;
+
         UberStateData::from_reader(file, loc_data, state_data)
             .map_err(|err| file_err("parse", &path, err))
     }
     pub fn areas(&self) -> Result<Source, String> {
         let (path, content) = self.read_to_string(Path::new("areas.wotw"))?;
+
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))
     }
 
     fn open(&self, path: &Path) -> Result<(PathBuf, File), String> {
         let mut attempts = vec![];
+
         for folder in &self.folders {
             let full_path = folder.join(path);
+
             match File::open(&full_path) {
                 Ok(file) => return Ok((full_path, file)),
                 Err(err) if err.kind() == ErrorKind::NotFound => attempts.push(full_path),
                 Err(err) => return Err(file_err("read", &full_path, err)),
             }
         }
+
         Err(format!(
             "\"{}\" not found at \"{}\"",
             path.display(),
@@ -78,19 +90,25 @@ impl FileAccess {
                 .format_with("\" or \"", |path, f| f(&path.display()))
         ))
     }
+
     #[cfg(feature = "snippet_access")]
     fn read(&self, path: &Path) -> Result<(PathBuf, Vec<u8>), String> {
         let (path, mut file) = self.open(path)?;
+
         let mut buf = vec![];
         file.read_to_end(&mut buf)
             .map_err(|err| file_err("read", &path, err))?;
+
         Ok((path, buf))
     }
+
     fn read_to_string(&self, path: &Path) -> Result<(PathBuf, String), String> {
         let (path, mut file) = self.open(path)?;
+
         let mut buf = String::new();
         file.read_to_string(&mut buf)
             .map_err(|err| file_err("read", &path, err))?;
+
         Ok((path, buf))
     }
 
@@ -114,6 +132,7 @@ impl FileAccess {
                             .to_string()
                     }),
             );
+
             if !files.is_empty() {
                 break;
             }
@@ -134,13 +153,17 @@ mod snippet_access {
         fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
             let mut path = PathBuf::from(identifier);
             path.set_extension("wotws");
+
             let (path, content) = self.read_to_string(&path)?;
+
             let id = path.to_string_lossy().to_string();
             Ok(Source::new(id, content))
         }
+
         fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
             self.read(path).map(|(_, content)| content)
         }
+
         fn available_snippets(&self) -> Vec<String> {
             self.files_in_folder("wotws")
         }
@@ -158,12 +181,15 @@ mod presets {
         fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String> {
             self.preset(identifier, "universe_presets".into())
         }
+
         fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
             self.preset(identifier, "world_presets".into())
         }
+
         fn available_universe_presets(&self) -> Vec<String> {
             self.available_presets("universe_presets")
         }
+
         fn available_world_presets(&self) -> Vec<String> {
             self.available_presets("world_presets")
         }
@@ -177,7 +203,9 @@ mod presets {
         ) -> Result<P, String> {
             path.push(identifier);
             path.set_extension("json");
+
             let (path, file) = self.open(&path)?;
+
             serde_json::from_reader(BufReader::new(file))
                 .map_err(|err| file_err("parse", &path, err))
         }

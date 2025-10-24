@@ -46,6 +46,7 @@ impl<'source> Compile<'source> for ast::Event<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::Trigger<'source> {
     type Output = Option<Trigger>;
 
@@ -113,6 +114,7 @@ impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
             .function_indices
             .get(self.identifier.data.0)
             .unwrap();
+
         compiler.global.output.command_lookup[*index] = CommandVoid::Multi { commands };
     }
 }
@@ -134,11 +136,13 @@ impl<'source> Compile<'source> for ast::Action<'source> {
                         action.compile(compiler)?.expect_void(compiler, span)
                     })
                     .collect();
+
                 Some(Command::Void(CommandVoid::Multi { commands }))
             }
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ActionCondition<'source> {
     type Output = Option<Command>;
 

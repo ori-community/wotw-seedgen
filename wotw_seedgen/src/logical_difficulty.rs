@@ -67,6 +67,7 @@ pub fn weapons<const TARGET_IS_WALL: bool>(difficulty: Difficulty) -> SmallVec<[
     }
     weapons
 }
+
 /// Allowed ranged weapons on this difficulty
 pub fn ranged_weapons(difficulty: Difficulty) -> SmallVec<[Skill; 6]> {
     let mut weapons = smallvec![Skill::Bow, Skill::Spear];
@@ -80,6 +81,7 @@ pub fn ranged_weapons(difficulty: Difficulty) -> SmallVec<[Skill; 6]> {
     }
     weapons
 }
+
 /// Allowed shield weapons
 pub fn shield_weapons() -> SmallVec<[Skill; 4]> {
     smallvec![Skill::Hammer, Skill::Launch, Skill::Grenade, Skill::Spear]

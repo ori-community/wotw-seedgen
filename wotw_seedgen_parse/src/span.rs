@@ -84,24 +84,28 @@ impl Span for Range<usize> {
         self.clone()
     }
 }
+
 impl<T: Span> Span for &T {
     #[inline]
     fn span(&self) -> Range<usize> {
         T::span(self)
     }
 }
+
 impl<T: Span> Span for &mut T {
     #[inline]
     fn span(&self) -> Range<usize> {
         T::span(self)
     }
 }
+
 impl<T: Span> Span for Box<T> {
     #[inline]
     fn span(&self) -> Range<usize> {
         (**self).span()
     }
 }
+
 impl<T: Span> Span for Result<T> {
     #[inline]
     fn span(&self) -> Range<usize> {
@@ -118,18 +122,21 @@ impl<T: SpanStart> SpanStart for &T {
         T::span_start(self)
     }
 }
+
 impl<T: SpanStart> SpanStart for &mut T {
     #[inline]
     fn span_start(&self) -> usize {
         T::span_start(self)
     }
 }
+
 impl<T: SpanStart> SpanStart for Box<T> {
     #[inline]
     fn span_start(&self) -> usize {
         (**self).span_start()
     }
 }
+
 impl<T: SpanStart> SpanStart for Result<T> {
     #[inline]
     fn span_start(&self) -> usize {
@@ -146,18 +153,21 @@ impl<T: SpanEnd> SpanEnd for &T {
         T::span_end(self)
     }
 }
+
 impl<T: SpanEnd> SpanEnd for &mut T {
     #[inline]
     fn span_end(&self) -> usize {
         T::span_end(self)
     }
 }
+
 impl<T: SpanEnd> SpanEnd for Box<T> {
     #[inline]
     fn span_end(&self) -> usize {
         (**self).span_end()
     }
 }
+
 impl<T: SpanEnd> SpanEnd for Result<T> {
     #[inline]
     fn span_end(&self) -> usize {
@@ -174,11 +184,13 @@ impl<T1: SpanStart, T2: SpanEnd> Span for (T1, T2) {
         self.span_start()..self.span_end()
     }
 }
+
 impl<T1: SpanStart, T2> SpanStart for (T1, T2) {
     fn span_start(&self) -> usize {
         self.0.span_start()
     }
 }
+
 impl<T1, T2: SpanEnd> SpanEnd for (T1, T2) {
     fn span_end(&self) -> usize {
         self.1.span_end()
@@ -195,30 +207,35 @@ pub struct Spanned<T> {
     /// Source span corresponding to the parsed content
     pub span: Range<usize>,
 }
+
 impl<T> Spanned<T> {
     #[inline]
     pub fn new(data: T, span: Range<usize>) -> Self {
         Self { data, span }
     }
 }
+
 impl<T> Span for Spanned<T> {
     #[inline]
     fn span(&self) -> Range<usize> {
         self.span.clone()
     }
 }
+
 impl<T> SpanStart for Spanned<T> {
     #[inline]
     fn span_start(&self) -> usize {
         self.span.start
     }
 }
+
 impl<T> SpanEnd for Spanned<T> {
     #[inline]
     fn span_end(&self) -> usize {
         self.span.end
     }
 }
+
 impl<'source, T, V> Ast<'source, T> for Spanned<V>
 where
     T: Tokenize,

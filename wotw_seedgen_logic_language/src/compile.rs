@@ -40,6 +40,7 @@ impl Graph {
             .into_iter()
             .map(Node::Pickup)
             .collect::<Vec<_>>();
+
         let state_data_nodes = state_data
             .entries
             .into_iter()
@@ -47,8 +48,10 @@ impl Graph {
             .collect::<Vec<_>>();
 
         let mut compiler = Compiler::new(&mut areas, &loc_data_nodes, &state_data_nodes, settings);
+
         areas.contents.compile(&mut compiler);
         compiler.generate_door_connections();
+
         let Compiler {
             nodes: compiled_nodes,
             default_door_connections,
@@ -76,6 +79,7 @@ pub struct CompileResult {
     pub graph: Graph,
     pub errors: Vec<Error>,
 }
+
 impl CompileResult {
     pub fn into_result(self) -> Result<Graph> {
         match self.errors.into_iter().next() {
@@ -121,6 +125,7 @@ struct Compiler<'source> {
     regions: FxHashMap<String, Requirement>,
     errors: Vec<Error>,
 }
+
 impl<'source> Compiler<'source> {
     fn new(
         areas: &mut ast::Areas,
@@ -158,6 +163,7 @@ impl<'source> Compiler<'source> {
         // partition
         {
             let mut iter = areas.contents.iter_mut();
+
             while let Some(anchor) =
                 iter.find(|content| matches!(content.result, Ok(ast::Content::Anchor(..))))
             {
@@ -174,6 +180,7 @@ impl<'source> Compiler<'source> {
         }
 
         let mut anchors = Vec::with_capacity(300); // We know more about the needed capacity than collect would
+
         for anchor in areas
             .contents
             .iter()
@@ -308,17 +315,20 @@ impl<'source> Compiler<'source> {
         }
     }
 }
+
 struct DifficultyRequirements {
     moki: Requirement,
     gorlek: Requirement,
     kii: Requirement,
     notsafe: Requirement,
 }
+
 impl DifficultyRequirements {
     // TODO could propagate this all the way up to use WorldSettingsHelpers and improve the interface
     fn new(settings: &[WorldSettings]) -> Self {
         let lowest_difficulty = settings.lowest_difficulty();
         let highest_difficulty = settings.highest_difficulty();
+
         let build_difficulty = move |difficulty| {
             if highest_difficulty < difficulty {
                 Requirement::Impossible
@@ -328,6 +338,7 @@ impl DifficultyRequirements {
                 Requirement::Difficulty(difficulty)
             }
         };
+
         Self {
             moki: build_difficulty(Difficulty::Moki),
             gorlek: build_difficulty(Difficulty::Gorlek),
@@ -335,6 +346,7 @@ impl DifficultyRequirements {
             notsafe: build_difficulty(Difficulty::Unsafe),
         }
     }
+
     fn get(&self, difficulty: Difficulty) -> Requirement {
         match difficulty {
             Difficulty::Moki => self.moki.clone(),
@@ -344,6 +356,7 @@ impl DifficultyRequirements {
         }
     }
 }
+
 // could reduce the memory footprint by using a smaller type than Requirement, but there's just one of these around oriShrug
 struct TrickRequirements {
     sword_sentry_jump: Requirement,
@@ -373,6 +386,7 @@ struct TrickRequirements {
     pause_hover: Requirement,
     spear_jump: Requirement,
 }
+
 impl TrickRequirements {
     fn new(settings: &[WorldSettings]) -> Self {
         let build_trick = move |trick| {
@@ -386,6 +400,7 @@ impl TrickRequirements {
                 Requirement::Trick(trick)
             }
         };
+
         Self {
             sword_sentry_jump: build_trick(Trick::SwordSentryJump),
             hammer_sentry_jump: build_trick(Trick::HammerSentryJump),
@@ -523,6 +538,7 @@ impl TrickRequirements {
                 Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),
             ]),
         };
+
         Some(requirement)
     }
 }
@@ -532,6 +548,7 @@ trait Compile {
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output;
 }
+
 impl<T: Compile> Compile for Vec<T> {
     type Output = Vec<T::Output>;
 
@@ -539,6 +556,7 @@ impl<T: Compile> Compile for Vec<T> {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
+
 impl<'source, T: Compile, R: Recover<'source, Tokenizer>> Compile for Recoverable<T, R> {
     type Output = Option<T::Output>;
 
@@ -548,6 +566,7 @@ impl<'source, T: Compile, R: Recover<'source, Tokenizer>> Compile for Recoverabl
             .map(|t| t.compile(compiler))
     }
 }
+
 impl<T: Compile> Compile for Spanned<T> {
     type Output = T::Output;
 
@@ -555,6 +574,7 @@ impl<T: Compile> Compile for Spanned<T> {
         self.data.compile(compiler)
     }
 }
+
 impl<T: Compile, Separator> Compile for Separated<T, Separator> {
     // TODO is there a merit to returning an iterator here?
     type Output = Vec<T::Output>;
@@ -563,6 +583,7 @@ impl<T: Compile, Separator> Compile for Separated<T, Separator> {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
+
 impl<T: Compile, Separator> Compile for SeparatedNonEmpty<T, Separator> {
     type Output = Vec<T::Output>;
 
@@ -570,6 +591,7 @@ impl<T: Compile, Separator> Compile for SeparatedNonEmpty<T, Separator> {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
+
 impl<T: Compile> Compile for ast::Group<T> {
     type Output = Option<T::Output>;
 
@@ -577,6 +599,7 @@ impl<T: Compile> Compile for ast::Group<T> {
         self.content.compile(compiler)
     }
 }
+
 impl<T: Compile> Compile for ast::GroupContent<T> {
     type Output = T::Output;
 
@@ -596,6 +619,7 @@ impl<'source> Compile for ast::Content<'source> {
         };
     }
 }
+
 impl<'source> Compile for ast::Macro<'source> {
     type Output = ();
 
@@ -607,12 +631,14 @@ impl<'source> Compile for ast::Macro<'source> {
                 .requirements
                 .compile(compiler)
                 .map_or(Requirement::Impossible, build_or);
+
             compiler
                 .macros
                 .insert(self.identifier.data.0.to_string(), requirement);
         }
     }
 }
+
 impl<'source> Compile for ast::Region<'source> {
     type Output = ();
 
@@ -624,12 +650,14 @@ impl<'source> Compile for ast::Region<'source> {
                 .requirements
                 .compile(compiler)
                 .map_or(Requirement::Impossible, build_or);
+
             compiler
                 .regions
                 .insert(self.identifier.data.0.to_string(), requirement);
         }
     }
 }
+
 impl<'source> Compile for ast::Anchor<'source> {
     type Output = ();
 
@@ -665,6 +693,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                         let requirement = requirements
                             .data
                             .map_or(Requirement::Impossible, |group| group.compile(compiler));
+
                         if teleport_restriction.replace(requirement).is_some() {
                             compiler.error("duplicate tprestriction".to_string(), keyword.span);
                         }
@@ -685,6 +714,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                                     compiler.anchor_map.get(connection.identifier.data.0)
                                 }
                             };
+
                             match to {
                                 None => {
                                     compiler.error(
@@ -694,6 +724,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                                 }
                                 Some(&to) => {
                                     let mut requirement = connection.requirements.compile(compiler);
+
                                     if let Some(region_requirement) = self
                                         .identifier
                                         .data
@@ -703,6 +734,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                                         requirement =
                                             build_and([requirement, region_requirement.clone()])
                                     }
+
                                     connections.push(Connection { to, requirement })
                                 }
                             }
@@ -723,6 +755,7 @@ impl<'source> Compile for ast::Anchor<'source> {
         }));
     }
 }
+
 impl Compile for ast::AnchorPosition {
     type Output = Option<Position>;
 
@@ -735,6 +768,7 @@ impl Compile for ast::AnchorPosition {
             })
     }
 }
+
 impl<'source> Compile for ast::Door<'source> {
     type Output = Option<Door>;
 
@@ -790,6 +824,7 @@ impl<'source> Compile for ast::Door<'source> {
         }
     }
 }
+
 impl<'source> Compile for ast::Refill<'source> {
     type Output = Refill;
 
@@ -802,6 +837,7 @@ impl<'source> Compile for ast::Refill<'source> {
         }
     }
 }
+
 impl Compile for ast::RefillValue {
     type Output = RefillValue;
 
@@ -824,6 +860,7 @@ impl Compile for ast::RefillValue {
         }
     }
 }
+
 impl<'source> Compile for ast::RequirementLineOrGroup<'source> {
     type Output = Requirement;
 
@@ -833,6 +870,7 @@ impl<'source> Compile for ast::RequirementLineOrGroup<'source> {
             .unwrap_or(Requirement::Impossible)
     }
 }
+
 impl<'source> Compile for ast::InlineRequirementOrGroup<'source> {
     type Output = Requirement;
 
@@ -843,6 +881,7 @@ impl<'source> Compile for ast::InlineRequirementOrGroup<'source> {
         }
     }
 }
+
 impl<'source> Compile for ast::RequirementLine<'source> {
     type Output = Requirement;
 
@@ -852,6 +891,7 @@ impl<'source> Compile for ast::RequirementLine<'source> {
         // so we build a custom iterator
         let mut ands = self.ands.into_iter();
         let mut ors = Some(self.ors);
+
         build_and(iter::from_fn(|| {
             ands.next()
                 .map(|(and, _)| and.compile(compiler))
@@ -866,6 +906,7 @@ impl<'source> Compile for ast::RequirementLine<'source> {
         }))
     }
 }
+
 impl<'source> Compile for ast::Requirement<'source> {
     type Output = Requirement;
 
@@ -879,6 +920,7 @@ impl<'source> Compile for ast::Requirement<'source> {
         }
     }
 }
+
 fn compile_state(compiler: &mut Compiler, identifier: &str, span: Range<usize>) -> Requirement {
     match compiler
         .state_map
@@ -892,6 +934,7 @@ fn compile_state(compiler: &mut Compiler, identifier: &str, span: Range<usize>) 
         Some(index) => Requirement::State(*index),
     }
 }
+
 impl<'source> Compile for ast::CombatRequirement<'source> {
     type Output = Requirement;
 
@@ -902,6 +945,7 @@ impl<'source> Compile for ast::CombatRequirement<'source> {
             .map_or(Requirement::Impossible, Requirement::Combat)
     }
 }
+
 impl<'source> Compile for ast::Enemy<'source> {
     type Output = Option<(Enemy, u8)>;
 
@@ -920,6 +964,7 @@ impl<'source> Compile for ast::Enemy<'source> {
             })
     }
 }
+
 impl<'source> Compile for ast::PlainRequirement<'source> {
     type Output = Requirement;
 
@@ -943,6 +988,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                         )
                     })
                 };
+
                 let no_amount = || {
                     if amount.is_none() {
                         Ok(())
@@ -974,6 +1020,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                     no_amount().map(|()| compiler.difficulty_requirements.get(difficulty))
                 } else if let Ok(trick) = Trick::from_str(identifier) {
                     let option = compiler.trick_requirements.get(trick, &mut amount);
+
                     if amount.is_some() {
                         Err(Error::custom(
                             "requirement accepts no amount".to_string(),
@@ -1067,6 +1114,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                     }
                 }
             });
+
         compiler
             .consume_result(result)
             .unwrap_or(Requirement::Impossible)
@@ -1091,6 +1139,7 @@ fn build_and<I: IntoIterator<Item = Requirement>>(requirements: I) -> Requiremen
         _ => Requirement::And(filtered),
     }
 }
+
 fn build_or<I: IntoIterator<Item = Requirement>>(requirements: I) -> Requirement {
     let mut filtered = vec![];
 

@@ -5,6 +5,7 @@ use wotw_seedgen::spoiler::SeedSpoiler;
 pub struct LocationItemStats {
     pub location: String,
 }
+
 impl Analyzer for LocationItemStats {
     fn title(&self) -> String {
         format!("Item placed at {}", self.location)

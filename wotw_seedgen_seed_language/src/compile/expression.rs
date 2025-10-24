@@ -28,6 +28,7 @@ impl Command {
                 span.span(),
             )),
         };
+
         compiler.consume_result(result)
     }
 }
@@ -43,6 +44,7 @@ impl<'source> ast::Expression<'source> {
         }
     }
 }
+
 impl<'source> ast::ExpressionValue<'source> {
     pub(crate) fn compile_into<T: CompileInto>(
         self,
@@ -61,6 +63,7 @@ impl<'source> ast::ExpressionValue<'source> {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::ArithmeticOperator {
     type Output = ArithmeticOperator;
 
@@ -73,6 +76,7 @@ impl<'source> Compile<'source> for ast::ArithmeticOperator {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::LogicOperator {
     type Output = LogicOperator;
 
@@ -83,6 +87,7 @@ impl<'source> Compile<'source> for ast::LogicOperator {
         }
     }
 }
+
 impl<'source> Compile<'source> for ast::Comparator {
     type Output = Comparator;
 
@@ -105,14 +110,17 @@ pub(crate) trait CompileInto: Sized {
         span: Range<usize>,
         compiler: &mut SnippetCompiler,
     ) -> Option<Self>;
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self>;
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self>;
+
     fn compile_literal<'source>(
         literal: Spanned<ast::Literal<'source>>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -120,6 +128,7 @@ pub(crate) trait CompileInto: Sized {
         Self::coerce_literal(literal.data.compile(compiler)?, literal.span, compiler)
     }
 }
+
 impl CompileInto for CommandBoolean {
     fn coerce_literal(
         literal: Literal,
@@ -140,8 +149,10 @@ impl CompileInto for CommandBoolean {
             },
             other => Err(type_error(other.literal_type(), Type::Boolean, span)),
         };
+
         compiler.consume_result(result)
     }
+
     // TODO a lot of compile_action implementations are really similar
     fn compile_action<'source>(
         action: ast::Action<'source>,
@@ -157,8 +168,10 @@ impl CompileInto for CommandBoolean {
             }
             _ => Err(return_type_error(Type::Boolean, action.span())),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -190,6 +203,7 @@ impl CompileInto for CommandBoolean {
                 let left = operation.left.infer_type(compiler)?;
                 let operator = operator.compile(compiler);
                 let right = operation.right.infer_type(compiler)?;
+
                 let target = common_type(left, right);
                 if target.is_none() {
                     compiler.errors.push(Error::custom(
@@ -336,6 +350,7 @@ impl CompileInto for CommandBoolean {
                             format!("Cannot compare {other} values"),
                             operation.span(),
                         ));
+
                         return None;
                     }
                 };
@@ -346,11 +361,13 @@ impl CompileInto for CommandBoolean {
                 compiler
                     .errors
                     .push(type_error(found, Type::Boolean, operation.span()));
+
                 None
             }
         }
     }
 }
+
 impl CompileInto for CommandInteger {
     fn coerce_literal(
         literal: Literal,
@@ -381,8 +398,10 @@ impl CompileInto for CommandInteger {
             },
             other => Err(type_error(other.literal_type(), Type::Integer, span)),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -397,8 +416,10 @@ impl CompileInto for CommandInteger {
             }
             _ => Err(return_type_error(Type::Integer, action.span())),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -434,11 +455,13 @@ impl CompileInto for CommandInteger {
                 compiler
                     .errors
                     .push(type_error(found, Type::Integer, operation.span()));
+
                 None
             }
         }
     }
 }
+
 impl CompileInto for CommandFloat {
     fn coerce_literal(
         literal: Literal,
@@ -471,8 +494,10 @@ impl CompileInto for CommandFloat {
             },
             other => Err(type_error(other.literal_type(), Type::Float, span)),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -487,8 +512,10 @@ impl CompileInto for CommandFloat {
             }
             _ => Err(return_type_error(Type::Float, action.span())),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -524,11 +551,13 @@ impl CompileInto for CommandFloat {
                 compiler
                     .errors
                     .push(type_error(found, Type::Float, operation.span()));
+
                 None
             }
         }
     }
 }
+
 impl CompileInto for CommandString {
     fn coerce_literal(
         literal: Literal,
@@ -561,8 +590,10 @@ impl CompileInto for CommandString {
             Literal::String(value) => Ok(value.into()),
             _ => Err(Error::custom("cannot convert to String".to_string(), span)),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -595,8 +626,10 @@ impl CompileInto for CommandString {
             }
             _ => Err(return_type_error(Type::String, action.span())),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -616,6 +649,7 @@ impl CompileInto for CommandString {
                         right: Box::new(right),
                     },
                 };
+
                 Some(command)
             }
             _ => {
@@ -623,11 +657,13 @@ impl CompileInto for CommandString {
                 compiler
                     .errors
                     .push(type_error(found, Type::String, operation.span()));
+
                 None
             }
         }
     }
 }
+
 impl CompileInto for CommandZone {
     fn coerce_literal(
         literal: Literal,
@@ -638,8 +674,10 @@ impl CompileInto for CommandZone {
             Literal::Constant(Constant::Zone(value)) => Ok(value.into()),
             other => Err(type_error(other.literal_type(), Type::Zone, span)),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -654,8 +692,10 @@ impl CompileInto for CommandZone {
             }
             _ => Err(return_type_error(Type::Zone, action.span())),
         };
+
         compiler.consume_result(result)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -664,9 +704,11 @@ impl CompileInto for CommandZone {
         compiler
             .errors
             .push(type_error(found, Type::Zone, operation.span()));
+
         None
     }
 }
+
 impl CompileInto for Command {
     fn coerce_literal(
         literal: Literal,
@@ -700,14 +742,17 @@ impl CompileInto for Command {
             Literal::String(value) => Command::String(value.into()),
             _ => todo!(),
         };
+
         Some(command)
     }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
         action.compile(compiler)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -716,6 +761,7 @@ impl CompileInto for Command {
             Operator::Arithmetic(_) => {
                 let left = operation.left.infer_type(compiler)?;
                 let right = operation.right.infer_type(compiler)?;
+
                 let target = common_type(left, right);
                 if target.is_none() {
                     compiler.errors.push(Error::custom(
@@ -723,6 +769,7 @@ impl CompileInto for Command {
                         operation.span(),
                     ));
                 };
+
                 match target? {
                     Type::Boolean => {
                         CommandBoolean::compile_operation(operation, compiler).map(Self::Boolean)
@@ -744,6 +791,7 @@ impl CompileInto for Command {
                             format!("Cannot perform operation on {left} and {right}"),
                             operation.span(),
                         ));
+
                         None
                     }
                 }
@@ -754,6 +802,7 @@ impl CompileInto for Command {
         }
     }
 }
+
 impl CompileInto for usize {
     fn coerce_literal(
         literal: Literal,
@@ -765,16 +814,20 @@ impl CompileInto for usize {
             .push(type_error(literal.literal_type(), Type::Action, span));
         None
     }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Self> {
         let span = action.span();
         let command = action.compile(compiler)?.expect_void(compiler, span)?;
+
         let index = compiler.global.output.command_lookup.len();
         compiler.global.output.command_lookup.push(command);
+
         Some(index)
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -783,6 +836,7 @@ impl CompileInto for usize {
         compiler
             .errors
             .push(type_error(found, Type::Action, operation.span()));
+
         None
     }
 }
@@ -794,6 +848,7 @@ trait CompileIntoLiteral: Sized {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self>;
 }
+
 impl<T: CompileIntoLiteral> CompileInto for T {
     fn compile_action<'source>(
         action: ast::Action<'source>,
@@ -802,8 +857,10 @@ impl<T: CompileIntoLiteral> CompileInto for T {
         compiler
             .errors
             .push(Error::custom("expected literal".to_string(), action.span()));
+
         None
     }
+
     fn compile_operation<'source>(
         operation: ast::Operation<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
@@ -812,8 +869,10 @@ impl<T: CompileIntoLiteral> CompileInto for T {
             "expected literal".to_string(),
             operation.span(),
         ));
+
         None
     }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -835,11 +894,13 @@ impl CompileIntoLiteral for bool {
                 compiler
                     .errors
                     .push(type_error(other.literal_type(), Type::Boolean, span));
+
                 None
             }
         }
     }
 }
+
 impl CompileIntoLiteral for i32 {
     fn coerce_literal(
         literal: Literal,
@@ -852,11 +913,13 @@ impl CompileIntoLiteral for i32 {
                 compiler
                     .errors
                     .push(type_error(other.literal_type(), Type::Integer, span));
+
                 None
             }
         }
     }
 }
+
 impl CompileIntoLiteral for OrderedFloat<f32> {
     fn coerce_literal(
         literal: Literal,
@@ -870,11 +933,13 @@ impl CompileIntoLiteral for OrderedFloat<f32> {
                 compiler
                     .errors
                     .push(type_error(other.literal_type(), Type::Float, span));
+
                 None
             }
         }
     }
 }
+
 impl CompileIntoLiteral for Icon {
     fn coerce_literal(
         literal: Literal,
@@ -894,12 +959,15 @@ impl CompileIntoLiteral for Icon {
                 compiler
                     .errors
                     .push(type_error(other.literal_type(), Type::Icon, span));
+
                 return None;
             }
         };
+
         Some(icon)
     }
 }
+
 macro_rules! impl_constants_coerce_from {
     ($ident: ident) => {
         impl CompileIntoLiteral for wotw_seedgen_data::$ident {
@@ -919,6 +987,7 @@ macro_rules! impl_constants_coerce_from {
         impl_constants_coerce_from!($($more),+);
     };
 }
+
 impl_constants_coerce_from!(
     Skill,
     Shard,
@@ -940,6 +1009,7 @@ impl_constants_coerce_from!(
     ScreenPosition,
     CoordinateSystem,
 );
+
 impl CompileIntoLiteral for String {
     fn coerce_literal(
         literal: Literal,
@@ -953,9 +1023,11 @@ impl CompileIntoLiteral for String {
             },
             other => Err(type_error(other.literal_type(), Type::String, span)),
         };
+
         compiler.consume_result(result)
     }
 }
+
 impl CompileIntoLiteral for StringOrPlaceholder {
     fn coerce_literal(
         literal: Literal,
@@ -968,11 +1040,13 @@ impl CompileIntoLiteral for StringOrPlaceholder {
                 compiler
                     .errors
                     .push(type_error(other.literal_type(), Type::String, span));
+
                 None
             }
         }
     }
 }
+
 impl CompileIntoLiteral for UberIdentifier {
     fn coerce_literal(
         literal: Literal,
@@ -994,6 +1068,7 @@ impl CompileIntoLiteral for UberIdentifier {
             },
             other => Err(type_error(other.literal_type(), Type::UberIdentifier, span)),
         };
+
         compiler.consume_result(result)
     }
 }
@@ -1013,6 +1088,7 @@ fn create_quest_command(uber_identifier: UberIdentifier, value: i32) -> CommandB
 fn type_error(found: Type, expected: Type, span: Range<usize>) -> Error {
     Error::custom(format!("Expected {expected}, but found {found}"), span)
 }
+
 #[inline]
 fn alias_type_error(
     expected: Type,
@@ -1037,18 +1113,22 @@ fn alias_type_error(
         )),
     }
 }
+
 #[inline]
 fn return_type_error(expected: Type, span: Range<usize>) -> Error {
     Error::custom(format!("expected function returning {expected}"), span)
 }
+
 #[inline]
 fn uber_state_type_error(found: UberStateType, expected: Type, span: Range<usize>) -> Error {
     let mut error = Error::custom(format!("cannot use {found} UberState as {expected}"), span);
+
     if matches!(expected, Type::Boolean) {
         error.help = Some(
             "if you want to trigger on every change of the state, use \"on change <UberIdentifier>\""
                 .to_string(),
         )
     }
+
     error
 }

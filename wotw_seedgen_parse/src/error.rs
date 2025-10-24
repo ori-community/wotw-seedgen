@@ -27,6 +27,7 @@ pub struct Error {
     /// An optional help message
     pub help: Option<String>,
 }
+
 impl Error {
     /// Returns an [`Error`] with the given values.
     #[inline]
@@ -37,12 +38,14 @@ impl Error {
             help: None,
         }
     }
+
     /// Returns an [`Error`] with a custom message.
     /// Convenience wrapper for [`Error::new`] with [`ErrorKind::Other`]
     #[inline]
     pub fn custom(message: String, span: Range<usize>) -> Self {
         Self::new(ErrorKind::Other(message), span)
     }
+
     /// Sets the help message
     #[inline]
     pub fn with_help(self, help: String) -> Self {
@@ -51,6 +54,7 @@ impl Error {
             ..self
         }
     }
+
     /// Returns an [`Error`] representing multiple attempted branches have all failed.
     /// `errors` is the list of all [`Error`]s returned by those failures.
     ///
@@ -89,6 +93,7 @@ impl Error {
             source,
         }
     }
+
     // TODO is there a use for print and eprint functions here like ariadne itself has?
     // I suppose we could lock stderr then to avoid issues when having multiple threads printing errors
     // TODO try some other options like codespan-reporting, there's some rough edges on ariadne
@@ -121,11 +126,13 @@ impl Error {
         }
     }
 }
+
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.kind.fmt(f)
     }
 }
+
 impl error::Error for Error {}
 
 /// Errors that may occur in [`Ast`] implementations, or a custom error message
@@ -140,6 +147,7 @@ pub enum ErrorKind {
     AllFailed(Vec<ErrorKind>),
     Other(String),
 }
+
 impl Display for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -170,6 +178,7 @@ impl Display for ErrorKind {
         }
     }
 }
+
 impl error::Error for ErrorKind {}
 
 /// [`Display`] implementation returned by [`Error::with_source`]
@@ -177,6 +186,7 @@ pub struct ErrorWithSource<'a, 'b> {
     error: &'a Error,
     source: &'b Source,
 }
+
 impl Display for ErrorWithSource<'_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let id = &self.source.id;

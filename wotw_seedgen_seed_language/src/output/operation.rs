@@ -9,6 +9,7 @@ pub struct Operation<Item, Operator> {
     pub operator: Operator,
     pub right: Item,
 }
+
 /// Arithmetic Operations performed on numbers
 // TODO why does this have a duplicate in the ast module?
 #[derive(Debug, Serialize_repr, Deserialize_repr, Clone, Copy, PartialEq, Eq, Hash)]
@@ -23,6 +24,7 @@ pub enum ArithmeticOperator {
     /// `/`
     Divide = 3,
 }
+
 impl Display for ArithmeticOperator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -33,6 +35,7 @@ impl Display for ArithmeticOperator {
         }
     }
 }
+
 /// Logic Operations performed on booleans
 #[derive(Debug, Serialize_repr, Deserialize_repr, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u8)]
@@ -42,6 +45,7 @@ pub enum LogicOperator {
     /// `||`
     Or = 1,
 }
+
 impl Display for LogicOperator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -50,6 +54,7 @@ impl Display for LogicOperator {
         }
     }
 }
+
 /// Comparison Operations performed on strings or booleans
 #[derive(Debug, Serialize_repr, Deserialize_repr, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u8)]
@@ -59,6 +64,7 @@ pub enum EqualityComparator {
     /// `!=`
     NotEqual = 1,
 }
+
 impl Display for EqualityComparator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -67,6 +73,7 @@ impl Display for EqualityComparator {
         }
     }
 }
+
 /// Comparison Operations performed on numbers
 #[derive(Debug, Serialize_repr, Deserialize_repr, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u8)]
@@ -84,6 +91,7 @@ pub enum Comparator {
     /// `>=`
     GreaterOrEqual = 5,
 }
+
 impl Display for Comparator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

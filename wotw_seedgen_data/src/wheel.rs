@@ -33,6 +33,7 @@ pub enum WheelItemPosition {
     LeftTop = 10,
     TopLeft = 11,
 }
+
 /// Possible input configurations for an item in a weapon wheel like menu
 #[derive(
     Debug,

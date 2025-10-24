@@ -18,6 +18,7 @@ pub struct UberStates {
     fallback: UberStateEntry,
     snapshot: Option<FxHashMap<UberIdentifier, UberStateValue>>,
 }
+
 impl UberStates {
     pub fn new(uber_state_data: &UberStateData) -> Self {
         Self {
@@ -71,6 +72,7 @@ struct UberStateEntry {
     value: UberStateValue,
     triggers: FxHashSet<usize>,
 }
+
 // TODO bad display implementation
 // TODO redundant with assets::UberStateValue?
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display)]
@@ -79,6 +81,7 @@ pub enum UberStateValue {
     Integer(i32),
     Float(OrderedFloat<f32>),
 }
+
 impl UberStateValue {
     pub fn as_boolean(self) -> bool {
         match self {
@@ -89,12 +92,14 @@ impl UberStateValue {
             }
         }
     }
+
     pub fn expect_boolean(self) -> bool {
         match self {
             UberStateValue::Boolean(value) => value,
             _ => panic!("Attempted to access {self} UberState as Boolean"),
         }
     }
+
     pub fn as_integer(self) -> i32 {
         match self {
             UberStateValue::Integer(value) => value,
@@ -104,12 +109,14 @@ impl UberStateValue {
             }
         }
     }
+
     pub fn expect_integer(self) -> i32 {
         match self {
             UberStateValue::Integer(value) => value,
             _ => panic!("Attempted to access {self} UberState as Integer"),
         }
     }
+
     pub fn as_float(self) -> OrderedFloat<f32> {
         match self {
             UberStateValue::Float(value) => value,
@@ -119,6 +126,7 @@ impl UberStateValue {
             }
         }
     }
+
     pub fn expect_float(self) -> OrderedFloat<f32> {
         match self {
             UberStateValue::Float(value) => value,
@@ -126,31 +134,37 @@ impl UberStateValue {
         }
     }
 }
+
 impl PartialEq<bool> for UberStateValue {
     fn eq(&self, other: &bool) -> bool {
         self.as_boolean() == *other
     }
 }
+
 impl PartialOrd<bool> for UberStateValue {
     fn partial_cmp(&self, other: &bool) -> Option<Ordering> {
         self.as_boolean().partial_cmp(other)
     }
 }
+
 impl PartialEq<i32> for UberStateValue {
     fn eq(&self, other: &i32) -> bool {
         self.as_integer() == *other
     }
 }
+
 impl PartialOrd<i32> for UberStateValue {
     fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
         self.as_integer().partial_cmp(other)
     }
 }
+
 impl PartialEq<OrderedFloat<f32>> for UberStateValue {
     fn eq(&self, other: &OrderedFloat<f32>) -> bool {
         self.as_float() == *other
     }
 }
+
 impl PartialOrd<OrderedFloat<f32>> for UberStateValue {
     fn partial_cmp(&self, other: &OrderedFloat<f32>) -> Option<Ordering> {
         self.as_float().partial_cmp(other)
@@ -168,12 +182,14 @@ impl UberStates {
                 }
             }
         }
+
         self.registered_triggers += 1;
     }
 
     pub fn set(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) {
         let _ = self.set_and_return_triggers(uber_identifier, value);
     }
+
     pub fn set_and_return_triggers(
         &mut self,
         uber_identifier: UberIdentifier,
@@ -182,6 +198,7 @@ impl UberStates {
         match self.states.get_mut(&uber_identifier) {
             None => {
                 warn!("Attempted to write to unknown UberState {uber_identifier}");
+
                 self.fallback.triggers.iter().copied()
             }
             Some(entry) => {

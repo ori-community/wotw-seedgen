@@ -22,6 +22,7 @@ pub fn position_from_lsp(position: lsp_types::Position, document: &str) -> Resul
             .nth((position.line - 1) as usize)
             .ok_or_else(|| error::position_out_of_bounds(position, document))?
             .0;
+
         previous_line_end + 1
     };
     // We'll return once we reached position.character, so as long as we receive a
@@ -31,9 +32,11 @@ pub fn position_from_lsp(position: lsp_types::Position, document: &str) -> Resul
     let mut utf16_offset = position.character as usize;
     for (index, char) in line.char_indices() {
         let len = char.len_utf16();
+
         if utf16_offset < len {
             return Ok(line_position + index);
         }
+
         utf16_offset -= len;
     }
 
@@ -56,6 +59,7 @@ pub fn position_to_lsp(position: usize, document: &str) -> lsp_types::Position {
 pub fn last_line(source: &str) -> (usize, usize) {
     let mut line = 0;
     let mut line_start = 0;
+
     let mut line_indices = source.rmatch_indices('\n');
     if let Some((index, _)) = line_indices.next() {
         line = 1;

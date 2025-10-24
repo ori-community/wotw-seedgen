@@ -49,6 +49,7 @@ pub struct DebugOutput {
     pub snippets: FxHashMap<String, SnippetDebugOutput>,
     pub events: FxHashMap<String, FxHashMap<String, usize>>,
 }
+
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct SnippetDebugOutput {
     pub variables: FxHashMap<String, String>,
@@ -89,6 +90,7 @@ impl ItemMetadata {
         self.0.get(command).and_then(|entry| entry.map_icon)
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ItemMetadataEntry {
     /// Generic name used when sending the item to another world and in the spoiler
@@ -110,11 +112,13 @@ pub enum StringOrPlaceholder {
     ItemOnPlaceholder(Box<Trigger>),
     CountInZonePlaceholder(Vec<CommandVoid>, wotw_seedgen_data::Zone),
 }
+
 impl From<String> for StringOrPlaceholder {
     fn from(value: String) -> Self {
         Self::Value(value)
     }
 }
+
 impl From<&str> for StringOrPlaceholder {
     fn from(value: &str) -> Self {
         Self::Value(value.to_string())

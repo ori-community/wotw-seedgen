@@ -47,6 +47,7 @@ pub enum Type {
     Expression,
     Void,
 }
+
 impl From<ConfigType> for Type {
     fn from(value: ConfigType) -> Self {
         match value {
@@ -56,6 +57,7 @@ impl From<ConfigType> for Type {
         }
     }
 }
+
 impl From<UberStateType> for Type {
     fn from(value: UberStateType) -> Self {
         match value {
@@ -89,16 +91,19 @@ impl<T: InferType> InferType for Spanned<T> {
         self.data.infer_type(compiler)
     }
 }
+
 impl<T: InferType> InferType for Result<T> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         self.as_ref().ok().and_then(|t| t.infer_type(compiler))
     }
 }
+
 impl<T: InferType> InferType for Box<T> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         (**self).infer_type(compiler)
     }
 }
+
 impl<T: InferType> InferType for Once<T> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         self.0.infer_type(compiler)
@@ -113,6 +118,7 @@ impl InferType for Expression<'_> {
         }
     }
 }
+
 impl InferType for ExpressionValue<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         match self {
@@ -123,6 +129,7 @@ impl InferType for ExpressionValue<'_> {
         }
     }
 }
+
 impl InferType for Action<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         match self {
@@ -131,6 +138,7 @@ impl InferType for Action<'_> {
         }
     }
 }
+
 impl InferType for FunctionCall<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         if compiler
@@ -140,6 +148,7 @@ impl InferType for FunctionCall<'_> {
         {
             return Some(Type::Void);
         }
+
         let identifier = self.identifier.data.0.parse().ok()?;
 
         let ty = match identifier {
@@ -260,6 +269,7 @@ impl InferType for FunctionCall<'_> {
         Some(ty)
     }
 }
+
 impl Expression<'_> {
     pub(crate) fn uber_state_type(&self, compiler: &mut SnippetCompiler) -> Option<UberStateType> {
         match self {
@@ -268,6 +278,7 @@ impl Expression<'_> {
                 ..
             })) => {
                 let uber_state = uber_identifier.resolve(compiler)?;
+
                 match uber_state.value {
                     None => compiler.uber_state_type(uber_state.uber_identifier, uber_identifier),
                     Some(_) => None,
@@ -289,6 +300,7 @@ impl Expression<'_> {
         }
     }
 }
+
 impl InferType for Literal<'_> {
     // TODO unused, not sure any infertype implementation here is used...
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
@@ -302,6 +314,7 @@ impl InferType for Literal<'_> {
         }
     }
 }
+
 impl InferType for Constant<'_> {
     fn infer_type(&self, _compiler: &mut SnippetCompiler) -> Option<Type> {
         self.kind
@@ -332,11 +345,13 @@ impl InferType for Constant<'_> {
             })
     }
 }
+
 impl InferType for Spanned<Identifier<'_>> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         compiler.resolve(self).map(output::Literal::literal_type)
     }
 }
+
 impl output::Literal {
     pub(crate) fn literal_type(&self) -> Type {
         match self {
@@ -353,6 +368,7 @@ impl output::Literal {
         }
     }
 }
+
 impl output::Constant {
     pub(crate) fn literal_type(&self) -> Type {
         match self {
@@ -378,6 +394,7 @@ impl output::Constant {
         }
     }
 }
+
 impl InferType for Operation<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         match self.operator.data {

@@ -10,12 +10,14 @@ pub(crate) struct Preprocessor {
     pub output: PreprocessorOutput,
     pub errors: Vec<Error>,
 }
+
 #[derive(Default)]
 pub(crate) struct PreprocessorOutput {
     pub config_sets: Vec<(String, String, String)>, // TODO can these be references?
     pub includes: Vec<Spanned<String>>,             // TODO can these be references?
     pub functions: FxHashSet<String>,               // TODO can these be references?
 }
+
 impl Preprocessor {
     pub(crate) fn preprocess(ast: &ast::Snippet) -> Self {
         let mut preprocessor = Self::default();

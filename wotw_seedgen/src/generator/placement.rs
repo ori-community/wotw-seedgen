@@ -70,14 +70,18 @@ pub fn generate_placements(
     loop {
         context.next_step();
         context.update_reached();
+
         if context.is_everything_reached() {
             context.place_remaining();
             context.sort_spoiler_placements();
+
             break;
         }
+
         if context.force_keystones() {
             continue;
         }
+
         if !context.place_random() {
             if let Some((target_world_index, progression)) = context.choose_progression()? {
                 context.place_forced(target_world_index, progression);
@@ -99,6 +103,7 @@ pub struct Context<'graph, 'settings> {
     /// spoiler being populated over the course of generation
     spoiler: SeedSpoiler,
 }
+
 pub struct WorldContext<'graph, 'settings> {
     pub rng: Pcg64Mcg,
     pub world: World<'graph, 'settings>,
@@ -138,6 +143,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         settings: &'settings UniverseSettings,
     ) -> Result<Self, String> {
         let multiworld = worlds.len() > 1;
+
         let worlds = worlds
             .into_iter()
             .enumerate()
@@ -154,6 +160,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     .to_string()
             })
             .collect();
+
         // TODO is this possible earlier to avoid the need to filter through nodes?
         // otherwise, it would at least be unnecessary if no world has door randomization
         let door_identifier_map = worlds[0]
@@ -170,6 +177,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 })
             })
             .collect::<FxHashMap<_, _>>();
+
         let doors = worlds
             .iter()
             .map(|world_context| {
@@ -202,6 +210,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 }
             })
             .collect();
+
         // TODO move some of the above logic into SeedSpoiler::new?
         let spoiler = SeedSpoiler::new(spawns, doors);
 
@@ -223,8 +232,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
     fn next_step(&mut self) {
         self.sort_spoiler_placements();
+
         self.step += 1;
         trace!("--- Placement step #{}", self.step);
+
         self.spoiler.groups.push(SpoilerGroup::default());
     }
 
@@ -251,6 +262,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         for world_context in &mut self.worlds {
             world_context.update_reached();
         }
+
         self.write_reachable_spoiler()
     }
 
@@ -279,6 +291,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
         for world_index in 0..self.worlds.len() {
             let world_context = &mut self.worlds[world_index];
+
             let owned_keystones = world_context.world.keystones();
             if owned_keystones < 2 {
                 continue;
@@ -324,12 +337,14 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
     fn place_remaining(&mut self) {
         trace!("All locations reached. Placing remaining items");
+
         for target_world_index in 0..self.worlds.len() {
             let items = mem::take(&mut *self.worlds[target_world_index].item_pool);
             for command in items {
                 self.force_place_command(command, target_world_index, false);
             }
         }
+
         for world_context in &mut self.worlds {
             world_context.update_needs_placement();
             world_context.fill_remaining(&mut self.spoiler.groups[self.step - 1].placements);
@@ -338,16 +353,21 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
     fn place_random(&mut self) -> bool {
         let mut any_placed = false;
+
         for origin_world_index in 0..self.worlds.len() {
             let origin_world = &mut self.worlds[origin_world_index];
+
             let needs_random_placement = origin_world.reserve_placeholders();
             let mut placements_remaining =
                 origin_world.placements_remaining() + needs_random_placement.len();
             let mut spirit_light_placements_remaining =
                 placements_remaining.saturating_sub(origin_world.item_pool.len());
+
             for node in needs_random_placement {
                 any_placed = true; // TODO pull out of loop and skip some more calculations that way
+
                 let origin_world = &mut self.worlds[origin_world_index];
+
                 let should_place_spirit_light = !node.uber_identifier().unwrap().is_shop()
                     && self.rng.gen_bool(
                         spirit_light_placements_remaining as f64 / placements_remaining as f64,
@@ -381,6 +401,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 };
 
                 let name = self.name(&command, origin_world_index, target_world_index);
+
                 self.place_command_at(
                     command,
                     name,
@@ -393,11 +414,13 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 placements_remaining -= 1;
             }
         }
+
         any_placed
     }
 
     fn choose_progression(&mut self) -> Result<Option<(usize, Progression)>, String> {
         let slots = self.progression_slots();
+
         let mut world_indices = (0..self.worlds.len()).collect::<Vec<_>>();
         world_indices.sort_by_key(|index| self.worlds[*index].placements_remaining());
 
@@ -463,12 +486,16 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         mark_forced: bool,
     ) {
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
+
         let name = self.name(&command, origin_world_index, target_world_index);
+
         let origin_world = &mut self.worlds[origin_world_index];
+
         match origin_world.choose_placement_node::<false>() {
             None => {
                 if origin_world.spawn_slots > 0 {
                     origin_world.spawn_slots -= 1;
+
                     trace!(
                         "Placing {target_index}{name} at {origin_index}Spawn",
                         name = self.worlds[target_world_index].log_name(&command),
@@ -482,6 +509,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         target_index = self.worlds[target_world_index].log_index,
                     );
                 }
+
                 self.write_placement_spoiler(
                     origin_world_index,
                     target_world_index,
@@ -489,6 +517,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     &command,
                     mark_forced,
                 );
+
                 self.push_command(
                     Trigger::ClientEvent(ClientEvent::Spawn),
                     command,
@@ -515,17 +544,21 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         if self.worlds.len() == 1 {
             return target_world_index;
         }
+
         let target_world = &mut self.worlds[target_world_index];
+
         if target_world.unshared_items > 0 {
             trace!(
                 "{}is not allowed to share items yet, forcing item placement in own world",
                 target_world.log_index
             );
+
             target_world.unshared_items -= 1;
             target_world_index
         } else {
             let mut world_indices = (0..self.worlds.len()).collect::<Vec<_>>();
             world_indices.shuffle(&mut self.rng);
+
             // TODO we're doing some redundant work here
             // we already figure out whether we have to use the spawn slots here but later we don't use that information
             // and have to recalculate it
@@ -539,6 +572,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .find(|index| self.worlds[*index].spawn_slots > 0)
                 })
                 .unwrap_or(target_world_index); // Overplace spawn slots if there's no other way
+
             origin_world_index
         }
     }
@@ -559,6 +593,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         target_world_index: usize,
     ) -> CommandString {
         let name = self.worlds[target_world_index].name(command);
+
         if origin_world_index == target_world_index {
             name
         } else {
@@ -612,6 +647,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             &command,
             mark_forced,
         );
+
         self.push_command(
             Trigger::loc_data_trigger(uber_identifier, node.value()),
             command,
@@ -633,6 +669,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             self.worlds[origin_world_index].push_command(trigger, command);
         } else {
             let uber_identifier = self.multiworld_state();
+
             self.worlds[origin_world_index].push_command(
                 trigger,
                 CommandVoid::Multi {
@@ -647,6 +684,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     ],
                 },
             );
+
             self.worlds[target_world_index].push_command(
                 Trigger::Binding(uber_identifier), // this is server synced and can't change to false
                 command,
@@ -704,13 +742,16 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         world_context.output.icons.is_empty(),
                         "custom icons in seedgen aren't supported"
                     ); // TODO custom icons in snippets
+
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
                     world_context.output.spawn = Some(*spawn.position().unwrap());
+
                     let seedgen_info = SeedgenInfo {
                         universe_settings: self.settings.clone(),
                         world_index: world_context.index,
                         spawn_identifier: spawn.identifier().to_string(),
                     };
+
                     Seed::new(world_context.output, loc_data, debug).with_seedgen_info(seedgen_info)
                 })
                 .collect(),
@@ -795,6 +836,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         self.hi_sigma(preplacement_spoiler);
 
         let mut zone_needs_placement = FxHashMap::default();
+
         for (command, zone) in mem::take(&mut self.output.preplacements) {
             let nodes = zone_needs_placement.entry(zone).or_insert_with(|| {
                 self.needs_placement
@@ -804,6 +846,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     .map(|(index, _)| index)
                     .collect::<Vec<_>>()
             });
+
             if nodes.is_empty() {
                 let name = self.log_name(&command);
                 warn!(
@@ -811,9 +854,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     self.log_index
                 );
             }
+
             // We prefer generating indices over shuffling the nodes because usually there aren't many zone preplacements (relics)
             let node_index = nodes.swap_remove(self.rng.gen_range(0..nodes.len()));
             let node = self.needs_placement[node_index];
+
             self.place(node, command, preplacement_spoiler);
             self.received_placement.push(node_index);
         }
@@ -823,8 +868,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         // TODO implement From<{number}> for Constant commands?
         let command = compile::spirit_light(1.into(), &mut self.rng);
+
         if self.needs_placement.is_empty() {
             let name = self.log_name(&command);
+
             warn!(
                 "{}Failed to preplace {name} since no free placement location was available",
                 self.log_index
@@ -833,6 +880,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let node = self
                 .needs_placement
                 .swap_remove(self.rng.gen_range(0..self.needs_placement.len()));
+
             self.place(node, command, preplacement_spoiler);
         }
     }
@@ -847,11 +895,13 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .filter(|(_, node)| self.world.reached_nodes().contains(**node))
             .map(|(index, _)| index)
             .collect();
+
         self.reached_item_locations = self
             .world
             .reached_nodes()
             .filter(|node| node.can_place())
             .count();
+
         trace!(
             "{log_index}{amount} reached locations that need placements: {reached_needs_placement}",
             log_index = self.log_index,
@@ -867,6 +917,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn update_needs_placement(&mut self) {
         let mut received_placement = mem::take(&mut self.received_placement);
         received_placement.sort();
+
         for node_index in received_placement.into_iter().rev() {
             self.needs_placement.swap_remove(node_index);
         }
@@ -884,6 +935,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn reserve_placeholders(&mut self) -> Vec<&'graph Node> {
         self.received_placement
             .extend(self.reached_needs_placement.clone());
+
         let desired_placeholders = usize::max(
             usize::max(3, self.placeholders.len()),
             (self.reached_needs_placement.len() + self.placeholders.len()) / 2,
@@ -893,14 +945,17 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             desired_placeholders - new_placeholders,
             self.placeholders.len(),
         );
+
         let released_placeholders = self.placeholders.split_off(kept_placeholders);
         let placeholders = self
             .reached_needs_placement
             .split_off(self.reached_needs_placement.len() - new_placeholders)
             .into_iter()
             .map(|index| self.needs_placement[index]);
+
         self.placeholders.extend(placeholders);
         self.placeholders.shuffle(&mut self.rng);
+
         trace!(
             "{log_index}Keeping {amount} placeholders: {placeholders}",
             log_index = self.log_index,
@@ -911,6 +966,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 .map(|node| node.identifier())
                 .format(", ")
         );
+
         mem::take(&mut self.reached_needs_placement)
             .into_iter()
             .map(|index| self.needs_placement[index])
@@ -1034,6 +1090,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         } else {
             let initial_value = self.world.uber_states.get(uber_identifier);
             let initial_reached = self.world.reached_pickup_count();
+
             let mut reached = initial_reached;
 
             self.world.snapshot();
@@ -1172,6 +1229,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let batch = self
                 .spirit_light_provider
                 .take(self.spirit_light_placements_remaining());
+
             amount = amount.saturating_sub(batch);
             let command = compile::spirit_light((batch as i32).into(), &mut self.rng);
 
@@ -1208,6 +1266,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         .map(|index| {
             let node_index = self.reached_needs_placement.swap_remove(index);
             self.received_placement.push(node_index);
+
             self.needs_placement[node_index]
         })
         .or_else(|| {
@@ -1217,6 +1276,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     .iter()
                     .enumerate()
                     .find(|(_, node)| !node.uber_identifier().unwrap().is_shop())?;
+
                 Some(self.placeholders.swap_remove(index))
             } else {
                 self.placeholders.pop()
@@ -1331,14 +1391,17 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         for (placements_remaining, node) in needs_placement.into_iter().enumerate().rev() {
             let uber_identifier = node.uber_identifier().unwrap();
             let is_shop = uber_identifier.is_shop();
+
             let command = if is_shop {
                 // TODO try to avoid
                 let command = compile::gorlek_ore();
+
                 warn!(
                     "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
                     name = self.log_name(&command),
                     index = self.log_index,
                 );
+
                 command
             } else {
                 let amount = self.spirit_light_provider.take(1 + placements_remaining) as i32;
@@ -1361,11 +1424,15 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             index = self.log_index,
             node = node.identifier()
         );
+
         let uber_identifier = node.uber_identifier().unwrap();
+
         if uber_identifier.is_shop() {
             self.shop_item_data(&command, uber_identifier, self.name(&command))
         }
+
         self.write_placement_spoiler(node, &command, placement_spoiler);
+
         self.push_command(
             Trigger::loc_data_trigger(uber_identifier, node.value()),
             command,
@@ -1375,6 +1442,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
         self.world.uber_states.register_trigger(&trigger); // TODO unnecessary?
         self.world.simulate(&command, &self.output.events);
+
         self.output.events.push(Event { trigger, command });
     }
 
@@ -1385,6 +1453,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         into: &mut Vec<SpoilerPlacement>,
     ) {
         let origin_world_index = self.index;
+
         into.push(SpoilerPlacement {
             origin_world_index,
             target_world_index: origin_world_index,
@@ -1421,10 +1490,12 @@ fn total_reach_check<'graph>(
     item_pool: &ItemPool,
 ) -> Vec<&'graph Node> {
     let mut complete_world = world.clone();
+
     for command in &**item_pool {
         complete_world.simulate(command, &output.events);
     }
     complete_world.modify_spirit_light(TOTAL_SPIRIT_LIGHT, &output.events);
+
     complete_world.traverse_spawn(&output.events);
 
     let needs_placement = complete_world
@@ -1433,6 +1504,7 @@ fn total_reach_check<'graph>(
         .filter(|node| {
             node.can_place() && {
                 let condition = CommandBoolean::loc_data_condition(node.uber_identifier().unwrap(), node.value());
+                
                 if output.removed_locations.contains(&condition) {
                     trace!("Manually removed {node} from placement locations", node = node.identifier());
                     return false;

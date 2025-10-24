@@ -41,6 +41,7 @@ pub enum Constant {
     ScreenPosition(wotw_seedgen_data::ScreenPosition),
     CoordinateSystem(wotw_seedgen_data::CoordinateSystem),
 }
+
 impl Display for Constant {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

@@ -192,6 +192,7 @@ pub struct GraphCache<'source, 'areas, 'logic_files> {
     logic_files: &'logic_files LogicFiles,
     value: Option<GraphCacheValue>,
 }
+
 pub struct GraphCacheValue {
     pub settings: UniverseSettings,
     pub graph: Graph,

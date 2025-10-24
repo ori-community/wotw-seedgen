@@ -6,6 +6,7 @@ use wotw_seedgen::spoiler::SeedSpoiler;
 pub struct ItemZoneStats {
     pub item: String,
 }
+
 impl Analyzer for ItemZoneStats {
     fn title(&self) -> String {
         format!("Zone {} is placed in", self.item)

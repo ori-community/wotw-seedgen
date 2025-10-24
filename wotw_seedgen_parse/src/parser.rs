@@ -48,6 +48,7 @@ pub trait ParseBoolToken {
     /// Should return `Some(bool)` if successful and `None` if this is not a boolean token
     fn bool(&self) -> Option<bool>;
 }
+
 /// Enables integer [`Ast`] implementations for your `Token`
 ///
 /// The only required method is [`ParseIntToken::is_int`]. By default, if it returns `true` the token content
@@ -97,62 +98,74 @@ pub trait ParseIntToken {
     fn parse_u8(slice: &str) -> std::result::Result<u8, String> {
         u8::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`u16`]
     #[inline]
     fn parse_u16(slice: &str) -> std::result::Result<u16, String> {
         u16::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`u32`]
     #[inline]
     fn parse_u32(slice: &str) -> std::result::Result<u32, String> {
         u32::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`u64`]
     #[inline]
     fn parse_u64(slice: &str) -> std::result::Result<u64, String> {
         u64::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`u128`]
     #[inline]
     fn parse_u128(slice: &str) -> std::result::Result<u128, String> {
         u128::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`i8`]
     #[inline]
     fn parse_i8(slice: &str) -> std::result::Result<i8, String> {
         i8::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`i16`]
     #[inline]
     fn parse_i16(slice: &str) -> std::result::Result<i16, String> {
         i16::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`i32`]
     #[inline]
     fn parse_i32(slice: &str) -> std::result::Result<i32, String> {
         i32::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`i64`]
     #[inline]
     fn parse_i64(slice: &str) -> std::result::Result<i64, String> {
         i64::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`i128`]
     #[inline]
     fn parse_i128(slice: &str) -> std::result::Result<i128, String> {
         i128::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`usize`]
     #[inline]
     fn parse_usize(slice: &str) -> std::result::Result<usize, String> {
         usize::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`isize`]
     #[inline]
     fn parse_isize(slice: &str) -> std::result::Result<isize, String> {
         isize::from_str(slice).map_err(|err| err.to_string())
     }
 }
+
 /// Enables float [`Ast`] implementations for your `Token`
 ///
 /// The only required method is [`ParseFloatToken::is_float`]. By default, if it returns `true` the token content
@@ -204,12 +217,14 @@ pub trait ParseFloatToken {
     fn parse_f32(slice: &str) -> std::result::Result<f32, String> {
         f32::from_str(slice).map_err(|err| err.to_string())
     }
+
     /// Attempt to parse `slice` into [`f64`]
     #[inline]
     fn parse_f64(slice: &str) -> std::result::Result<f64, String> {
         f64::from_str(slice).map_err(|err| err.to_string())
     }
 }
+
 /// Enables string [`Ast`] implementations for your `Token`
 ///
 /// The only required method is [`ParseStringToken::is_string`]. By default, if it returns `true` the token content
@@ -258,6 +273,7 @@ pub trait ParseStringToken {
         Ok(&slice[1..slice.len() - 1])
     }
 }
+
 /// Enables parsing identifiers for your `Token`
 ///
 /// This will be used by the [`Ast`] implementation of [`Identifier`], but also any derived [`Ast`] implementations of unit `struct`s or unit `enum` variants;
@@ -322,6 +338,7 @@ pub struct Parser<'source, T: Tokenize> {
     position: usize,
     eof: (T::Token, Range<usize>),
 }
+
 impl<'source, T: Tokenize> Parser<'source, T> {
     /// Tokenizes `source` and constructs a new [`Parser`] to traverse the resulting tokens
     pub fn new(source: &'source str, tokenizer: T) -> Self {
@@ -348,10 +365,12 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn position(&self) -> usize {
         self.position
     }
+
     /// Moves the parser to the next token
     pub fn step(&mut self) {
         self.position += 1;
     }
+
     /// Jumps to any token
     ///
     /// You can use this to backtrack if you called [`Parser::position`] earlier
@@ -359,6 +378,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn jump(&mut self, position: usize) {
         self.position = position
     }
+
     /// The `position` representing the end of the parser
     ///
     /// This is also the amount of tokens received from tokenizing the entire source.
@@ -367,6 +387,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn end(&self) -> usize {
         self.tokens.len()
     }
+
     /// Checks whether there are `Token`s left to parse
     #[inline]
     pub fn is_finished(&self) -> bool {
@@ -383,6 +404,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn token_at(&self, position: usize) -> &(T::Token, Range<usize>) {
         self.tokens.get(position).unwrap_or(&self.eof)
     }
+
     /// A reference to the current `Token` that should be parsed
     #[inline]
     pub fn current(&self) -> &(T::Token, Range<usize>) {
@@ -394,11 +416,13 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn slice<I: SliceIndex<str>>(&self, span: I) -> &'source I::Output {
         &self.source[span]
     }
+
     /// Slice of the current `Token`
     #[inline]
     pub fn current_slice(&self) -> &'source str {
         &self.source[self.current().1.clone()]
     }
+
     /// Remaining input to be parsed after the current `Token`
     #[inline]
     pub fn remainder(&self) -> &'source str {
@@ -429,6 +453,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     pub fn error(&self, kind: ErrorKind) -> Error {
         Error::new(kind, self.current().1.clone())
     }
+
     /// Construct a new [`Error`] with a custom message at the current span
     #[inline]
     pub fn custom_error(&self, message: String) -> Error {

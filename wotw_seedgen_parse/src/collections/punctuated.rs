@@ -12,6 +12,7 @@ pub struct Punctuated<Item, Punctuation> {
     pub items: Vec<(Item, Punctuation)>,
     pub last: Option<Item>,
 }
+
 impl<Item, Punctuation> Default for Punctuated<Item, Punctuation> {
     #[inline]
     fn default() -> Self {
@@ -21,6 +22,7 @@ impl<Item, Punctuation> Default for Punctuated<Item, Punctuation> {
         }
     }
 }
+
 impl<'source, T, Item, Punctuation> AstCollection<'source, T> for Punctuated<Item, Punctuation>
 where
     T: Tokenize,
@@ -43,6 +45,7 @@ where
         }
     }
 }
+
 impl<'source, T, Item, Punctuation> Ast<'source, T> for Punctuated<Item, Punctuation>
 where
     T: Tokenize,
@@ -54,6 +57,7 @@ where
         <Collection<Self>>::ast(parser).map(|c| c.0)
     }
 }
+
 impl<Item, Punctuation> Punctuated<Item, Punctuation> {
     pub fn get(&self, index: usize) -> Option<&Item> {
         match index.cmp(&self.items.len()) {
@@ -75,19 +79,23 @@ impl<Item, Punctuation> Punctuated<Item, Punctuation> {
     pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
+
     #[inline]
     pub fn iter_mut(&mut self) -> <&mut Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
+
     #[inline]
     pub fn len(&self) -> usize {
         self.items.len() + self.last.is_some() as usize
     }
+
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.items.is_empty() && self.last.is_none()
     }
 }
+
 impl<Item, Punctuation> IntoIterator for Punctuated<Item, Punctuation> {
     type Item = Item;
     type IntoIter = iter::Chain<
@@ -102,6 +110,7 @@ impl<Item, Punctuation> IntoIterator for Punctuated<Item, Punctuation> {
             .chain(self.last)
     }
 }
+
 impl<'a, Item, Punctuation> IntoIterator for &'a Punctuated<Item, Punctuation> {
     type Item = &'a Item;
     type IntoIter = iter::Chain<
@@ -116,6 +125,7 @@ impl<'a, Item, Punctuation> IntoIterator for &'a Punctuated<Item, Punctuation> {
             .chain(&self.last)
     }
 }
+
 impl<'a, Item, Punctuation> IntoIterator for &'a mut Punctuated<Item, Punctuation> {
     type Item = &'a mut Item;
     type IntoIter = iter::Chain<
@@ -147,6 +157,7 @@ impl<Item, Punctuation> Index<usize> for Punctuated<Item, Punctuation> {
         }
     }
 }
+
 impl<Item, Punctuation> IndexMut<usize> for Punctuated<Item, Punctuation> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         // TODO feels like this shouldn't be necessary on the successful branch (same for other collections)

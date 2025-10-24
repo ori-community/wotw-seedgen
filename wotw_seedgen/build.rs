@@ -6,6 +6,7 @@ use std::{fs, io::ErrorKind};
 struct PackageMeta {
     git: PackageMetaGit,
 }
+
 #[derive(Deserialize)]
 struct PackageMetaGit {
     sha1: String,

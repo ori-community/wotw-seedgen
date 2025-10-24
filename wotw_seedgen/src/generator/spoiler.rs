@@ -19,6 +19,7 @@ pub struct SeedSpoiler {
     /// Each [`SpoilerGroup`] represents one "step" of placements
     pub groups: Vec<SpoilerGroup>,
 }
+
 impl SeedSpoiler {
     pub(super) fn new(spawns: Vec<String>, doors: Vec<Vec<(String, String)>>) -> Self {
         Self {
@@ -29,6 +30,7 @@ impl SeedSpoiler {
         }
     }
 }
+
 /// One "step" of placements in a [`SeedSpoiler`]
 #[derive(Debug, Default, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -41,6 +43,7 @@ pub struct SpoilerGroup {
     /// An ordered list describing the placed items
     pub placements: Vec<SpoilerPlacement>,
 }
+
 /// One item placed on one location
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -54,6 +57,7 @@ pub struct SpoilerPlacement {
     /// The placed item
     pub item: SpoilerItem,
 }
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerItem {
@@ -62,6 +66,7 @@ pub struct SpoilerItem {
     /// The readable name of the placed item, which usually varies from the `command`s [`Display`] implementation
     pub name: String,
 }
+
 /// Select data from a [`Node`](crate::logic_language::output::Node)
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NodeSummary {
@@ -72,6 +77,7 @@ pub struct NodeSummary {
     /// The [`Zone`], if applicable
     pub zone: Option<Zone>,
 }
+
 impl NodeSummary {
     pub(super) fn new(node: &Node) -> Self {
         Self {
@@ -80,6 +86,7 @@ impl NodeSummary {
             zone: node.zone(),
         }
     }
+
     pub(super) fn spawn() -> Self {
         Self {
             identifier: "Spawn".to_string(),
@@ -137,15 +144,18 @@ impl Display for SeedSpoiler {
                         let _ = write!(item, "[{}] ", placement.target_world_index);
                     }
                     let _ = write!(item, "{}", placement.item);
+
                     if item.len() > *longest_item {
                         *longest_item = item.len();
                     }
 
                     let mut location = String::new();
+
                     if multiworld {
                         let _ = write!(location, "[{}] ", placement.origin_world_index);
                     }
                     let _ = write!(location, "{}", placement.location.identifier);
+
                     if location.len() > *longest_location {
                         *longest_location = location.len();
                     }
@@ -164,6 +174,7 @@ impl Display for SeedSpoiler {
             if !placements.is_empty() {
                 for (item, location, position) in placements {
                     write!(f, "    {item:<longest_item$}  ")?;
+
                     match position {
                         Some(position) => writeln!(f, "{location:<longest_location$}  {position}")?,
                         None => writeln!(f, "{location}")?,
@@ -194,6 +205,7 @@ impl Display for SeedSpoiler {
                     &mut longest_item,
                     &mut longest_location,
                 );
+
                 (
                     &spoiler_group.reachable,
                     &spoiler_group.forced_items,
@@ -225,6 +237,7 @@ impl Display for SeedSpoiler {
                         .map(|node| &node.identifier)
                         .format(", ");
                     let count = world_reachable.len();
+
                     write!(f, "{count} new reachable")?;
                     if count > 1 {
                         write!(f, "s")?;

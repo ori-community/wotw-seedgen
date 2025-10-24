@@ -12,6 +12,7 @@ pub struct MemoryUsed {
     pub float: usize,
     pub string: usize,
 }
+
 impl MemoryUsed {
     pub const ZERO: Self = Self {
         boolean: 0,
@@ -452,6 +453,7 @@ fn multi(commands: Vec<CommandVoid>, context: &mut CompileContext) -> (Vec<Comma
     // these commands don't return values, so we don't have to worry about commands overwriting previous results
     // since multis might be used in arguments, we still have to faithfully return the biggest amount of memory used at any point
     let mut memory_used = MemoryUsed::ZERO;
+
     let commands = commands
         .into_iter()
         .flat_map(|command| {
@@ -460,16 +462,20 @@ fn multi(commands: Vec<CommandVoid>, context: &mut CompileContext) -> (Vec<Comma
             commands
         })
         .collect::<Vec<_>>();
+
     (commands, memory_used)
 }
+
 fn multi_with_return<T: Compile<Output = (Vec<Command>, MemoryUsed)>>(
     commands: Vec<CommandVoid>,
     last: T,
     context: &mut CompileContext,
 ) -> (Vec<Command>, MemoryUsed) {
     let (mut commands, mut memory_used) = multi(commands, context);
+
     let (last, used) = last.compile(context);
     memory_used.combine(used);
     commands.extend(last);
+
     (commands, memory_used)
 }

@@ -24,9 +24,11 @@ lazy_static! {
 pub fn logic_access<P: AsRef<Path>>(root: P) -> Result<FileAccess, String> {
     folder_access(root, "logic")
 }
+
 pub fn snippet_access<P: AsRef<Path>>(root: P) -> Result<FileAccess, String> {
     folder_access(root, "snippets")
 }
+
 pub fn preset_access<P: AsRef<Path>>(root: P) -> Result<FileAccess, String> {
     Ok(FileAccess::new([root.as_ref(), EXECUTABLE_DIR.as_ref()?]))
 }
@@ -93,9 +95,11 @@ pub fn write_seed(
 fn create_unique_file(path: &str) -> Result<(File, String), Error> {
     create_unique::<_, File>(path, ".wotwr", |path| File::create_new(path))
 }
+
 fn create_unique_dir(path: &str) -> Result<String, Error> {
     create_unique::<_, ()>(path, "", |path| fs::create_dir(path)).map(|(_, path)| path)
 }
+
 fn create_unique<F, T>(path: &str, extension: &str, mut f: F) -> Result<(T, String), Error>
 where
     F: FnMut(&str) -> io::Result<T>,

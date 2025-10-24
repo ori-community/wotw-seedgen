@@ -31,6 +31,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
     // TODO try out how using the // dbg! macro looks for the debug stuff?
     let debug = attrs.debug.then(|| {
         let message = format!("parsing `{ident}`. {{}}");
+
         quote! {
             eprintln!(#message, parser.debug_state());
         }
@@ -40,6 +41,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
         &mut generics,
         quote! { wotw_seedgen_parse::Ast<'source, Tokenizer> },
     );
+
     let (mut impl_generics, type_generics, where_clause) = generics.split_for_impl();
     let type_generics = quote! { #type_generics #where_clause };
     if !generics
@@ -70,6 +72,7 @@ struct Attributes {
     rename: Option<syn::LitStr>,
     with: Option<syn::LitStr>,
 }
+
 impl Attributes {
     fn find(attrs: &[syn::Attribute]) -> Result<Self> {
         let mut attributes = Self::default();
@@ -103,6 +106,7 @@ impl Attributes {
                             return Err(syn::Error::new_spanned(other, "Expected string literal"))
                         }
                     };
+
                     attributes.case = Some(case);
                 }
                 syn::Meta::NameValue(meta) if meta.path.is_ident("rename") => {
@@ -115,6 +119,7 @@ impl Attributes {
                             return Err(syn::Error::new_spanned(other, "Expected string literal"))
                         }
                     };
+
                     attributes.rename = Some(rename);
                 }
                 syn::Meta::NameValue(meta) if meta.path.is_ident("with") => {
@@ -127,6 +132,7 @@ impl Attributes {
                             return Err(syn::Error::new_spanned(other, "Expected string literal"))
                         }
                     };
+
                     attributes.with = Some(with);
                 }
                 _ => return Err(syn::Error::new_spanned(meta, "Unrecognized attribute")),
@@ -152,10 +158,12 @@ fn use_with_or_else<F: FnOnce() -> Result<TokenStream>>(
 ) -> Result<TokenStream> {
     with.map_or_else(default, |with| parse_with(&with))
 }
+
 fn parse_with(with: &syn::LitStr) -> Result<TokenStream> {
     let value = with.value();
     let path =
         syn::parse_str::<syn::Path>(&value).map_err(|err| syn::Error::new_spanned(with, err))?;
+
     Ok(quote! {
         #path
     })
@@ -194,6 +202,7 @@ fn ast_fields<const IN_ENUM: bool>(
 
     Ok(result)
 }
+
 fn ast_fields_named(
     outer_ident: &syn::Ident,
     fields: syn::FieldsNamed,
@@ -242,6 +251,7 @@ fn ast_fields_named(
         { #(#fields),* }
     })
 }
+
 fn ast_fields_unnamed(
     outer_ident: &syn::Ident,
     fields: syn::FieldsUnnamed,
@@ -268,6 +278,7 @@ fn ast_fields_unnamed(
                 let fmt_string_before = format!("parsing field `{outer_ident}.{index}` - {{}}");
                 let fmt_string_after =
                     format!("finished parsing field `{outer_ident}.{index}` ({{}}) - {{}}");
+
                 quote! { {
                     eprintln!(#fmt_string_before, parser.debug_state());
                     let result = #ast(parser);
@@ -286,6 +297,7 @@ fn ast_fields_unnamed(
         (#(#field_asts),*)
     })
 }
+
 fn ast_fields_unit<const IN_ENUM: bool>(
     ident: &syn::Ident,
     attrs: &Attributes,
@@ -347,6 +359,7 @@ fn ast_enum(
                 attrs: variant_attrs,
                 ..
             } = variant;
+
             let attrs = attrs.clone().apply(Attributes::find(&variant_attrs)?);
             let fields = ast_fields::<true>(&ident, fields, &attrs)?;
 

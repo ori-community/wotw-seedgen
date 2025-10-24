@@ -11,6 +11,7 @@ pub struct Separated<Item, Separator> {
     pub first: Option<Item>,
     pub more: Vec<(Separator, Item)>,
 }
+
 impl<Item, Separator> Default for Separated<Item, Separator> {
     #[inline]
     fn default() -> Self {
@@ -20,6 +21,7 @@ impl<Item, Separator> Default for Separated<Item, Separator> {
         }
     }
 }
+
 impl<'source, T, Item, Separator> AstCollection<'source, T> for Separated<Item, Separator>
 where
     T: Tokenize,
@@ -39,6 +41,7 @@ where
         }
     }
 }
+
 fn separated_ast_item<'source, T, Item, Separator>(
     items: &mut Vec<(Separator, Item)>,
     parser: &mut Parser<'source, T>,
@@ -59,6 +62,7 @@ where
         Err(_) => ControlFlow::Break(None),
     }
 }
+
 impl<'source, T, Item, Separator> Ast<'source, T> for Separated<Item, Separator>
 where
     T: Tokenize,
@@ -70,6 +74,7 @@ where
         <Collection<Self>>::ast(parser).map(|c| c.0)
     }
 }
+
 impl<Item, Separator> Separated<Item, Separator> {
     pub fn get(&self, index: usize) -> Option<&Item> {
         if index == 0 {
@@ -91,10 +96,12 @@ impl<Item, Separator> Separated<Item, Separator> {
     pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
+
     #[inline]
     pub fn iter_mut(&mut self) -> <&mut Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
+
     #[inline]
     pub fn len(&self) -> usize {
         match self.first {
@@ -102,11 +109,13 @@ impl<Item, Separator> Separated<Item, Separator> {
             Some(_) => 1 + self.more.len(),
         }
     }
+
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.first.is_none()
     }
 }
+
 impl<Item, Separator> IntoIterator for Separated<Item, Separator> {
     type Item = Item;
     type IntoIter = iter::Chain<
@@ -122,6 +131,7 @@ impl<Item, Separator> IntoIterator for Separated<Item, Separator> {
         )
     }
 }
+
 impl<'a, Item, Separator> IntoIterator for &'a Separated<Item, Separator> {
     type Item = &'a Item;
     type IntoIter = iter::Chain<
@@ -137,6 +147,7 @@ impl<'a, Item, Separator> IntoIterator for &'a Separated<Item, Separator> {
         )
     }
 }
+
 impl<'a, Item, Separator> IntoIterator for &'a mut Separated<Item, Separator> {
     type Item = &'a mut Item;
     type IntoIter = iter::Chain<
@@ -184,6 +195,7 @@ pub struct SeparatedNonEmpty<Item, Separator> {
     pub first: Item,
     pub more: Vec<(Separator, Item)>,
 }
+
 impl<'source, T, Item, Separator> AstCollectionInit<'source, T>
     for SeparatedNonEmpty<Item, Separator>
 where
@@ -197,6 +209,7 @@ where
         })
     }
 }
+
 impl<'source, T, Item, Separator> AstCollection<'source, T> for SeparatedNonEmpty<Item, Separator>
 where
     T: Tokenize,
@@ -208,6 +221,7 @@ where
         separated_ast_item(&mut self.more, parser)
     }
 }
+
 impl<'source, T, Item, Separator> Ast<'source, T> for SeparatedNonEmpty<Item, Separator>
 where
     T: Tokenize,
@@ -219,6 +233,7 @@ where
         <Collection<Self>>::ast(parser).map(|c| c.0)
     }
 }
+
 impl<Item: Span, Separator> Span for SeparatedNonEmpty<Item, Separator> {
     fn span(&self) -> Range<usize> {
         let first_span = self.first.span();
@@ -228,16 +243,19 @@ impl<Item: Span, Separator> Span for SeparatedNonEmpty<Item, Separator> {
         }
     }
 }
+
 impl<Item: SpanStart, Separator> SpanStart for SeparatedNonEmpty<Item, Separator> {
     fn span_start(&self) -> usize {
         self.first.span_start()
     }
 }
+
 impl<Item: SpanEnd, Separator> SpanEnd for SeparatedNonEmpty<Item, Separator> {
     fn span_end(&self) -> usize {
         self.last().span_end()
     }
 }
+
 impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {
     pub fn get(&self, index: usize) -> Option<&Item> {
         if index == 0 {
@@ -259,10 +277,12 @@ impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {
     pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
+
     #[inline]
     pub fn iter_mut(&mut self) -> <&mut Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
+
     #[allow(clippy::len_without_is_empty)]
     #[inline]
     pub fn len(&self) -> usize {
@@ -272,6 +292,7 @@ impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {
         self.more.last().map_or(&self.first, |(_, item)| item)
     }
 }
+
 impl<Item, Separator> IntoIterator for SeparatedNonEmpty<Item, Separator> {
     type Item = Item;
     type IntoIter = iter::Chain<
@@ -287,6 +308,7 @@ impl<Item, Separator> IntoIterator for SeparatedNonEmpty<Item, Separator> {
         )
     }
 }
+
 impl<'a, Item, Separator> IntoIterator for &'a SeparatedNonEmpty<Item, Separator> {
     type Item = &'a Item;
     type IntoIter = iter::Chain<
@@ -302,6 +324,7 @@ impl<'a, Item, Separator> IntoIterator for &'a SeparatedNonEmpty<Item, Separator
         )
     }
 }
+
 impl<'a, Item, Separator> IntoIterator for &'a mut SeparatedNonEmpty<Item, Separator> {
     type Item = &'a mut Item;
     type IntoIter = iter::Chain<

@@ -23,12 +23,14 @@ impl<'source> ast::Expression<'source> {
     ) -> Option<T> {
         let span = self.span();
         let value = T::evaluate(self.compile_into(compiler)?);
+
         if value.is_none() {
             compiler.errors.push(Error::custom(
                 "Cannot be statically evaluated".to_string(),
                 span,
             ));
         }
+
         value
     }
 }
@@ -40,6 +42,7 @@ impl EvaluateFrom for bool {
         from.as_constant()
     }
 }
+
 impl EvaluateFrom for i32 {
     type From = CommandInteger;
 
@@ -47,6 +50,7 @@ impl EvaluateFrom for i32 {
         from.as_constant()
     }
 }
+
 impl EvaluateFrom for OrderedFloat<f32> {
     type From = CommandFloat;
 
@@ -54,6 +58,7 @@ impl EvaluateFrom for OrderedFloat<f32> {
         from.as_constant()
     }
 }
+
 impl EvaluateFrom for String {
     type From = CommandString;
 
@@ -61,6 +66,7 @@ impl EvaluateFrom for String {
         from.into_constant()
     }
 }
+
 impl EvaluateFrom for StringOrPlaceholder {
     type From = CommandString;
 
@@ -71,6 +77,7 @@ impl EvaluateFrom for StringOrPlaceholder {
         }
     }
 }
+
 impl EvaluateFrom for Zone {
     type From = CommandZone;
 
@@ -78,6 +85,7 @@ impl EvaluateFrom for Zone {
         from.as_constant()
     }
 }
+
 impl EvaluateFrom for Literal {
     type From = Command;
 

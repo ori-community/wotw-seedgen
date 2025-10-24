@@ -59,9 +59,11 @@ pub const fn set_boolean(uber_identifier: UberIdentifier, value: CommandBoolean)
         trigger_events: true,
     }
 }
+
 pub const fn set_boolean_value(uber_identifier: UberIdentifier, value: bool) -> CommandVoid {
     set_boolean(uber_identifier, CommandBoolean::Constant { value })
 }
+
 pub const fn set_integer(uber_identifier: UberIdentifier, value: CommandInteger) -> CommandVoid {
     CommandVoid::StoreInteger {
         uber_identifier,
@@ -69,9 +71,11 @@ pub const fn set_integer(uber_identifier: UberIdentifier, value: CommandInteger)
         trigger_events: true,
     }
 }
+
 pub const fn set_integer_value(uber_identifier: UberIdentifier, value: i32) -> CommandVoid {
     set_integer(uber_identifier, CommandInteger::Constant { value })
 }
+
 pub fn add_integer(uber_identifier: UberIdentifier, amount: CommandInteger) -> CommandVoid {
     CommandVoid::StoreInteger {
         uber_identifier,
@@ -85,9 +89,11 @@ pub fn add_integer(uber_identifier: UberIdentifier, amount: CommandInteger) -> C
         trigger_events: true,
     }
 }
+
 pub fn add_integer_value(uber_identifier: UberIdentifier, value: i32) -> CommandVoid {
     add_integer(uber_identifier, CommandInteger::Constant { value })
 }
+
 pub const fn set_float(uber_identifier: UberIdentifier, value: CommandFloat) -> CommandVoid {
     CommandVoid::StoreFloat {
         uber_identifier,
@@ -95,12 +101,14 @@ pub const fn set_float(uber_identifier: UberIdentifier, value: CommandFloat) -> 
         trigger_events: true,
     }
 }
+
 pub const fn set_float_value(
     uber_identifier: UberIdentifier,
     value: OrderedFloat<f32>,
 ) -> CommandVoid {
     set_float(uber_identifier, CommandFloat::Constant { value })
 }
+
 pub fn add_float(uber_identifier: UberIdentifier, amount: CommandFloat) -> CommandVoid {
     CommandVoid::StoreFloat {
         uber_identifier,
@@ -114,6 +122,7 @@ pub fn add_float(uber_identifier: UberIdentifier, amount: CommandFloat) -> Comma
         trigger_events: true,
     }
 }
+
 pub fn add_float_value(uber_identifier: UberIdentifier, value: OrderedFloat<f32>) -> CommandVoid {
     add_float(uber_identifier, CommandFloat::Constant { value })
 }
@@ -132,6 +141,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Spanned<T> {
         self.data.compile(compiler)
     }
 }
+
 impl<'source, T: Compile<'source>> Compile<'source> for Result<T> {
     type Output = Option<T::Output>;
 
@@ -140,6 +150,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Result<T> {
         compiler.consume_result(compiled)
     }
 }
+
 impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
     type Output = Option<T::Output>;
 
@@ -148,6 +159,7 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
         self.result.compile(compiler)
     }
 }
+
 impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
     type Output = Vec<T::Output>; // TODO experiment with returning iterators instead of vectors from collection compile implementations
 
@@ -155,6 +167,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
+
 impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
     for Delimited<Open, Content, Close>
 {
@@ -166,6 +179,7 @@ impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
         self.content.compile(compiler)
     }
 }
+
 impl<'source, T: Compile<'source>> Compile<'source> for Once<T> {
     type Output = T::Output;
 
@@ -174,6 +188,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Once<T> {
         self.0.compile(compiler)
     }
 }
+
 impl<'source, Item: Compile<'source>, Punctuation> Compile<'source>
     for Punctuated<Item, Punctuation>
 {
@@ -184,6 +199,7 @@ impl<'source, Item: Compile<'source>, Punctuation> Compile<'source>
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
+
 impl<'source, Item: Compile<'source>, Separator> Compile<'source>
     for SeparatedNonEmpty<Item, Separator>
 {
@@ -194,6 +210,7 @@ impl<'source, Item: Compile<'source>, Separator> Compile<'source>
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
+
 impl<'source> Compile<'source> for ast::Snippet<'source> {
     type Output = ();
 
@@ -225,11 +242,13 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     // TODO could be a reference
     pub config: FxHashMap<String, FxHashMap<String, String>>,
 }
+
 #[derive(Debug)]
 pub(crate) enum ExportedValue {
     Function(usize),
     Literal(Literal),
 }
+
 impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
     pub(crate) fn new(
         uber_state_data: &'uberstates UberStateData,
@@ -261,11 +280,13 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
         }
     }
 }
+
 #[derive(Debug)]
 pub(crate) struct IdProvider {
     offset: usize,
     ids: FxHashMap<String, usize>,
 }
+
 impl IdProvider {
     pub fn new(offset: usize) -> Self {
         Self {
@@ -284,6 +305,7 @@ impl IdProvider {
         }
     }
 }
+
 // TODO not sure if all these fields are used anymore since pulling some stuff out into global
 pub(crate) struct SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates> {
     pub rng: Pcg64Mcg,
@@ -296,6 +318,7 @@ pub(crate) struct SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates> {
     pub random_pools: FxHashMap<String, Vec<Literal>>, // TODO could maybe be a reference too?
     pub errors: Vec<Error>,
 }
+
 const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
 impl<'compiler, 'source, 'snippets, 'uberstates>
     SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>
@@ -314,10 +337,12 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             .cloned()
             .zip(global.output.command_lookup.len()..)
             .collect();
+
         global.output.command_lookup.extend(vec![
             CommandVoid::Multi { commands: vec![] }; // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
             preprocessed.functions.len()
         ]);
+
         let mut compiler = Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
             identifier,
@@ -329,7 +354,9 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             random_pools: Default::default(),
             errors: Default::default(),
         };
+
         ast.compile(&mut compiler);
+
         // TODO feature gate debug?
         if let Some(debug) = &mut compiler.global.output.debug {
             // TODO now it's inefficient that we're returning the whole compiler, could save some clones here
@@ -346,6 +373,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
                 },
             );
         }
+
         compiler
     }
 
@@ -354,12 +382,14 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         identifier: &'a Spanned<Identifier>,
     ) -> Option<&'a Literal> {
         let literal = self.variables.get(&identifier.data);
+
         if literal.is_none() {
             self.errors.push(Error::custom(
                 "unknown identifier".to_string(),
                 identifier.span(),
             ))
         }
+
         literal
     }
 
@@ -400,10 +430,12 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         span: S,
     ) -> Option<UberStateType> {
         let ty = uber_state_type(self.global.uber_state_data, uber_identifier);
+
         if ty.is_none() {
             self.errors
                 .push(Error::custom("Unknown UberState".to_string(), span.span()))
         }
+
         ty
     }
 }
@@ -430,6 +462,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         }
 
         let source = self.global.snippet_access.read_snippet(identifier)?;
+
         self.global
             .events
             .insert(identifier.to_string(), Default::default());
@@ -443,6 +476,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         if let Err(err) = ast.trailing {
             errors.push(err);
         }
+
         match ast.parsed {
             Err(err) => errors.push(err),
             Ok(ast) => {
@@ -501,6 +535,7 @@ pub struct CompileResult {
     pub output: IntermediateOutput,
     pub errors: Vec<(Source, Vec<Error>)>,
 }
+
 impl CompileResult {
     pub fn into_result(self) -> std::result::Result<IntermediateOutput, String> {
         for (source, errors) in self.errors {
@@ -508,6 +543,7 @@ impl CompileResult {
                 return Err(err.with_source(&source).to_string());
             }
         }
+
         Ok(self.output)
     }
 

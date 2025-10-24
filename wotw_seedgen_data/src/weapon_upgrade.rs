@@ -34,6 +34,7 @@ pub enum WeaponUpgrade {
     ChargeBlaze = 3,
     RapidSentry = 4,
 }
+
 impl WeaponUpgrade {
     pub const EXPLODING_SPEAR_ID: UberIdentifier = UberIdentifier::new(3440, 5687);
     pub const SHOCK_HAMMER_ID: UberIdentifier = UberIdentifier::new(3440, 46488);
@@ -51,6 +52,7 @@ impl WeaponUpgrade {
             Self::RapidSentry => Self::RAPID_SENTRY_ID,
         }
     }
+
     /// Returns the `WeaponUpgrade` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         match uber_identifier {

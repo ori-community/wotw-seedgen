@@ -28,6 +28,7 @@ impl CompileContext {
     pub fn compile_command_lookup(&mut self, intermediate_command_lookup: Vec<input::CommandVoid>) {
         self.command_lookup
             .resize_with(intermediate_command_lookup.len(), Default::default);
+
         for (index, command) in intermediate_command_lookup.into_iter().enumerate() {
             self.command_lookup[index] = command.compile(self).0;
         }
@@ -36,11 +37,13 @@ impl CompileContext {
     pub fn compile_events(&mut self, intermediate_events: Vec<input::Event>) -> Vec<Event> {
         let mut events = IndexMap::<_, usize, FxBuildHasher>::default();
         events.reserve(intermediate_events.len());
+
         for event in intermediate_events {
             let trigger = event.trigger.compile(self);
             match events.entry(trigger) {
                 Entry::Occupied(occupied) => {
                     let (new, _) = event.command.compile(self);
+
                     let existing = &mut self.command_lookup[*occupied.get()];
                     existing.extend(new);
                 }
@@ -49,6 +52,7 @@ impl CompileContext {
                 }
             }
         }
+
         events
             .into_iter()
             .map(|(trigger, command)| Event(trigger, command))
@@ -61,8 +65,10 @@ impl CompileContext {
     ) -> usize {
         // TODO are we allowed to ignore memoryused here?
         let (command, _) = input.compile(self);
+
         let index = self.command_lookup.len();
         self.command_lookup.push(command);
+
         index
     }
 }

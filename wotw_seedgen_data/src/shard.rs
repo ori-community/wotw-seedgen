@@ -70,6 +70,7 @@ pub enum Shard {
     Fracture = 46,
     Arcing = 47,
 }
+
 impl Shard {
     pub const OVERCHARGE_ID: UberIdentifier = Self::Overcharge.uber_identifier();
     pub const TRIPLE_JUMP_ID: UberIdentifier = Self::TripleJump.uber_identifier();
@@ -123,6 +124,7 @@ impl Shard {
     pub const fn uber_identifier(self) -> UberIdentifier {
         UberIdentifier::new(25, self as i32)
     }
+
     /// Returns the `Shard` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         const MIN: i32 = u8::MIN as i32;

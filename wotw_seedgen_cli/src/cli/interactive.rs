@@ -31,6 +31,7 @@ pub fn seed_settings(settings: &mut UniversePresetSettings) -> Result<(), Error>
     choose_world_count(world_settings)?;
 
     let multiworld = world_settings.len() > 1;
+
     for (index, settings) in world_settings.iter_mut().enumerate() {
         let prefix = if multiworld {
             format!("[World {index}] ")
@@ -73,10 +74,12 @@ fn select_presets(
     if !available_presets.is_empty() {
         let prompt = format!("{prefix}Select any number of {kind} presets");
         let items = sanitize_items(available_presets);
+
         let mut query = MultiSelect::new()
             .with_prompt(&prompt)
             .items(&items)
             .report(false);
+
         if let Some(includes) = &includes {
             query = query.defaults(
                 &available_presets
@@ -92,6 +95,7 @@ fn select_presets(
             .into_iter()
             .map(|index| available_presets[index].identifier.clone())
             .collect::<Vec<_>>();
+
         multi_select_custom_report(&prompt, &selected);
 
         if !selected.is_empty() {
@@ -109,6 +113,7 @@ fn choose_world_count(world_settings: &mut Vec<WorldPresetSettings>) -> Result<(
             .default(NonZeroUsize::new(1).unwrap())
             .interact_text()?
             .get();
+
         if world_count > 1 {
             *world_settings = vec![world_settings[0].clone(); world_count];
         }
@@ -174,6 +179,7 @@ fn select_tricks(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(),
     let mut query = MultiSelect::new()
         .with_prompt(format!("{prefix}Select any number of tricks"))
         .items(<Trick as VariantNames>::VARIANTS);
+
     if let Some(tricks) = &settings.tricks {
         query = query.defaults(
             &<Trick as VariantArray>::VARIANTS
@@ -182,7 +188,9 @@ fn select_tricks(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(),
                 .collect::<Vec<_>>(),
         )
     }
+
     let indices = query.interact_opt()?.unwrap_or_default();
+
     if !indices.is_empty() {
         settings.tricks = Some(
             indices
@@ -234,13 +242,16 @@ fn select_randomize_doors(prefix: &str, settings: &mut WorldPresetSettings) -> R
 
 fn select_snippets(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
     let available_snippets = &*AVAILABLE_SNIPPETS;
+
     if !available_snippets.is_empty() {
         let prompt = format!("{prefix}Select any number of snippets");
         let items = sanitize_items(available_snippets);
+
         let mut query = MultiSelect::new()
             .with_prompt(&prompt)
             .items(&items)
             .report(false);
+
         if let Some(snippets) = &settings.snippets {
             query = query.defaults(
                 &available_snippets
@@ -256,6 +267,7 @@ fn select_snippets(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(
             .into_iter()
             .map(|index| available_snippets[index].identifier.clone())
             .collect::<Vec<_>>();
+
         multi_select_custom_report(&prompt, &selected);
 
         if !selected.is_empty() {
@@ -269,6 +281,7 @@ fn select_snippets(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(
 fn select_snippet_config(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
     if let Some(snippets) = &mut settings.snippets {
         let mut configurable_snippets = AVAILABLE_SNIPPETS.clone();
+
         configurable_snippets.retain(|snippet| {
             !snippet.metadata.config.is_empty() && snippets.contains(&snippet.identifier)
         });
@@ -286,6 +299,7 @@ fn select_snippet_config(prefix: &str, settings: &mut WorldPresetSettings) -> Re
 
             loop {
                 let prompt = format!("{prefix}Select any snippet you want to configure");
+
                 let selected = Select::new()
                     .with_prompt(&prompt)
                     .item("Finish")
@@ -293,6 +307,7 @@ fn select_snippet_config(prefix: &str, settings: &mut WorldPresetSettings) -> Re
                     .items(&items)
                     .report(false)
                     .interact_opt()?;
+
                 looped_select_custom_report(&prompt, selected, |index| {
                     &configurable_snippets[index - 1].identifier
                 });
@@ -317,6 +332,7 @@ fn select_snippet_config_value(
     snippet: &AvailableSnippet,
 ) -> Result<(), Error> {
     let config = snippet.metadata.config.iter().collect::<Vec<_>>();
+
     let mut current_values = config
         .iter()
         .map(|(identifier, value)| {
@@ -345,6 +361,7 @@ fn select_snippet_config_value(
         let items = sanitize_items(items);
 
         let prompt = format!("{prefix}Select any configuration value to change");
+
         let selected = Select::new()
             .with_prompt(format!("{prefix}Select any configuration value to change"))
             .item("Finish")
@@ -352,6 +369,7 @@ fn select_snippet_config_value(
             .items(&items)
             .report(false)
             .interact_opt()?;
+
         looped_select_custom_report(&prompt, selected, |index| &config[index - 1].0);
 
         let index = selected.unwrap_or_default();
@@ -384,6 +402,7 @@ fn choose_snippet_config_value(
         identifier = value.0,
         description = value.1.description
     );
+
     let choice = match &value.1.default {
         Literal::Boolean(_) => Select::new()
             .with_prompt(prompt)

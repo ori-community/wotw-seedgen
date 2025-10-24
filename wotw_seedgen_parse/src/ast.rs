@@ -358,6 +358,7 @@ macro_rules! impl_ast_number {
         }
     };
 }
+
 macro_rules! impl_ast_integers {
     () => {};
     ($ty:ident $parse:ident $($more:tt)*) => {
@@ -365,6 +366,7 @@ macro_rules! impl_ast_integers {
         impl_ast_integers!($($more)*);
     };
 }
+
 macro_rules! impl_ast_floats {
     () => {};
     ($ty:ident $parse:ident $($more:tt)*) => {
@@ -372,11 +374,13 @@ macro_rules! impl_ast_floats {
         impl_ast_floats!($($more)*);
     };
 }
+
 impl_ast_integers! {
     u8 parse_u8 u16 parse_u16 u32 parse_u32 u64 parse_u64 u128 parse_u128
     i8 parse_i8 i16 parse_i16 i32 parse_i32 i64 parse_i64 i128 parse_i128
     usize parse_usize isize parse_isize
 }
+
 impl_ast_floats! { f32 parse_f32 f64 parse_f64 }
 #[cfg(feature = "ordered_float")]
 mod impl_ordered_float {
@@ -404,6 +408,7 @@ where
         }
     }
 }
+
 impl<'source, T> Ast<'source, T> for String
 where
     T: Tokenize,
@@ -423,6 +428,7 @@ where
         V::ast(parser).map(Box::new)
     }
 }
+
 // TODO error messages aren't great when options are involved because if both the option and the non-option parse fail at the same position, you only get the error for the non-option one
 impl<'source, T, V> Ast<'source, T> for Option<V>
 where
@@ -433,6 +439,7 @@ where
         Ok(V::ast(parser).ok())
     }
 }
+
 impl<'source, T, V1, V2> Ast<'source, T> for (V1, V2)
 where
     T: Tokenize,

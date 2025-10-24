@@ -203,6 +203,7 @@ impl UniversePresetSettings {
                     settings.world_settings[0].clone(),
                     preset_worlds - 1,
                 ));
+
                 for (world_settings, preset_world_settings) in settings
                     .world_settings
                     .iter_mut()
@@ -237,8 +238,10 @@ fn include_universe_preset<A: PresetAccess>(
     if already_applied.contains(&identifier) {
         return Ok(());
     }
+
     let preset = preset_access.universe_preset(&identifier)?;
     already_applied.push(identifier);
+
     preset._apply(settings, already_applied, preset_access)
 }
 
@@ -389,24 +392,31 @@ impl WorldPresetSettings {
         if let Some(difficulty) = difficulty {
             settings.difficulty = difficulty;
         }
+
         if let Some(tricks) = tricks {
             settings.tricks.extend(tricks);
         }
+
         if let Some(spawn) = spawn {
             settings.spawn = spawn;
         }
+
         if let Some(hard) = hard {
             settings.hard = hard;
         }
+
         if let Some(randomize_doors) = randomize_doors {
             settings.randomize_doors = Some(randomize_doors);
         }
+
         if let Some(snippets) = snippets {
             settings.snippets.extend(snippets);
         }
+
         if let Some(snippet_config) = snippet_config {
             for (snippet_name, config) in snippet_config {
                 let entry = settings.snippet_config.entry(snippet_name).or_default();
+
                 for (config_name, value) in config {
                     entry.insert(config_name, value);
                 }
@@ -445,8 +455,10 @@ fn include_world_preset<A: PresetAccess>(
     if already_applied.contains(&identifier) {
         return Ok(());
     }
+
     let preset = preset_access.world_preset(&identifier)?;
     already_applied.push(identifier);
+
     preset._apply(settings, already_applied, preset_access)
 }
 
@@ -460,10 +472,13 @@ fn err_removed(identifier: &str) -> Result<(), String> {
 pub trait PresetAccess {
     /// Returns the [`UniversePreset`] with the given identifier
     fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String>;
+
     /// Returns the [`WorldPreset`] with the given identifier
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String>;
+
     /// Return a `Vec` of identifiers which may be passed to [`PresetAccess::universe_preset`]
     fn available_universe_presets(&self) -> Vec<String>;
+
     /// Return a `Vec` of identifiers which may be passed to [`PresetAccess::world_preset`]
     fn available_world_presets(&self) -> Vec<String>;
 }
@@ -476,12 +491,15 @@ impl PresetAccess for NoPresetAccess {
     fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String> {
         panic!("Attempted to read universe preset \"{identifier}\" while explicitely using NoPresetAccess");
     }
+
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
         panic!("Attempted to read world preset \"{identifier}\" while explicitely using NoPresetAccess");
     }
+
     fn available_universe_presets(&self) -> Vec<String> {
         vec![]
     }
+
     fn available_world_presets(&self) -> Vec<String> {
         vec![]
     }
@@ -501,6 +519,7 @@ mod tests {
                 ..Default::default()
             },
         };
+
         assert_eq!(
             preset.check_compability().map(|_| ()),
             err_removed("util_twillen")
@@ -521,6 +540,7 @@ mod tests {
                 ..Default::default()
             },
         };
+
         assert_eq!(
             preset.check_compability(),
             Ok(WorldPresetSettings {

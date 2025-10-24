@@ -50,6 +50,7 @@ lazy_static! {
     pub static ref AVAILABLE_SNIPPETS: Vec<AvailableSnippet> = {
         let snippet_access =
             files::snippet_access("").unwrap_or_else(|_| FileAccess::new(["", "snippets"]));
+
         let mut available_snippets = snippet_access
             .available_snippets()
             .into_iter()
@@ -65,12 +66,14 @@ lazy_static! {
             })
             .filter(|available_snippet| !available_snippet.metadata.hidden)
             .collect::<Vec<_>>();
+
         available_snippets.sort_unstable_by(|a, b| {
             a.metadata
                 .category
                 .cmp(&b.metadata.category)
                 .then_with(|| a.identifier.cmp(&b.identifier))
         });
+
         available_snippets
     };
 }
@@ -80,6 +83,7 @@ pub struct AvailablePreset {
     pub identifier: String,
     pub info: Result<Option<PresetInfo>, String>,
 }
+
 impl Display for AvailablePreset {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let description = match &self.info {
@@ -92,6 +96,7 @@ impl Display for AvailablePreset {
             },
             Err(err) => format!("failed to read details: {err}"),
         };
+
         write!(
             f,
             "{literal}{identifier}{reset}: {description}",
@@ -107,6 +112,7 @@ pub struct AvailableSnippet {
     pub identifier: String,
     pub metadata: Metadata,
 }
+
 impl Display for AvailableSnippet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let description = self
@@ -114,6 +120,7 @@ impl Display for AvailableSnippet {
             .description
             .as_deref()
             .unwrap_or("(no description provided by snippet)");
+
         write!(
             f,
             "{literal}{identifier}{reset}: {description}",
@@ -278,6 +285,7 @@ fn world_presets_arg(world_scoped: bool) -> Arg {
         .num_args(1..)
         .help("World presets to include")
         .long_help(preset_help(&AVAILABLE_WORLD_PRESETS, "World"));
+
     choose_parser!(arg, world_scoped, String)
 }
 
@@ -294,9 +302,11 @@ fn spawn_arg(world_scoped: bool) -> Arg {
             literal = LITERAL.render(),
             reset = Reset.render(),
         ));
+
     if world_scoped {
         arg = arg.num_args(1..);
     }
+
     choose_parser!(arg, world_scoped, SpawnArg)
 }
 
@@ -316,9 +326,11 @@ fn difficulty_arg(world_scoped: bool) -> Arg {
             link = LINK.render(),
             reset = Reset.render(),
         ));
+
     if world_scoped {
         arg = arg.num_args(1..);
     }
+
     choose_strum_enum_parser!(arg, world_scoped, Difficulty)
 }
 
@@ -337,6 +349,7 @@ fn tricks_arg(world_scoped: bool) -> Arg {
             link = LINK.render(),
             reset = Reset.render(),
         )); // TODO don't think damage boost toggling is actually implemented yet
+
     choose_strum_enum_parser!(arg, world_scoped, Trick)
 }
 
@@ -349,11 +362,13 @@ fn hard_arg(world_scoped: bool) -> Arg {
         .long_help(
             "Logic will account for the player using the hard in-game difficulty, for instance by scaling damage requirements"
         );
+
     let arg = if world_scoped {
         arg.num_args(0..)
     } else {
         arg.action(ArgAction::SetTrue)
     };
+
     choose_parser!(arg, world_scoped, bool)
 }
 
@@ -365,11 +380,13 @@ fn randomize_doors_arg(world_scoped: bool) -> Arg {
         .default_missing_value("2")
         .help("Randomize door connections")
         .long_help("Randomize door connections. Provide a value to set the door loop size");
+
     let arg = if world_scoped {
         arg.num_args(0..)
     } else {
         arg.num_args(0..=1)
     };
+
     choose_parser!(arg, world_scoped, GreaterOneU8)
 }
 
@@ -382,6 +399,7 @@ fn snippets_arg(world_scoped: bool) -> Arg {
         .num_args(1..)
         .help("Snippets to use")
         .long_help(snippets_help(&AVAILABLE_SNIPPETS));
+
     choose_parser!(arg, world_scoped, String)
 }
 
@@ -394,6 +412,7 @@ fn snippet_config_arg(world_scoped: bool) -> Arg {
         .num_args(1..)
         .help("Configuration to pass to snippets")
         .long_help(snippet_config_help(&AVAILABLE_SNIPPETS));
+
     choose_parser!(arg, world_scoped, SnippetConfigArg)
 }
 
@@ -409,6 +428,7 @@ fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
         count = available_presets.len(),
         plural = if available_presets.len() == 1 { " is" } else { "s are" }
     );
+
     if !available_presets.is_empty() {
         write!(
             help,
@@ -424,6 +444,7 @@ fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
         )
         .unwrap();
     }
+
     help
 }
 
@@ -436,6 +457,7 @@ fn snippets_help(available_snippets: &[AvailableSnippet]) -> String {
         available_snippets.len(),
         if available_snippets.len() == 1 { " is" } else { "s are" }
     );
+
     if !available_snippets.is_empty() {
         write!(
             help,
@@ -464,6 +486,7 @@ fn snippets_help(available_snippets: &[AvailableSnippet]) -> String {
         )
         .unwrap();
     }
+
     help
 }
 
@@ -475,6 +498,7 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
         literal = LITERAL.render(),
         reset = Reset.render(),
     );
+
     if !available_snippets.is_empty() {
         let _ = write!(help, "\nCurrently these configurations are available:");
 
@@ -492,6 +516,7 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
             }
         }
     }
+
     help
 }
 
@@ -500,6 +525,7 @@ enum WorldScopedArg<T> {
     WorldScope(usize),
     Arg(T),
 }
+
 impl<T> FromStr for WorldScopedArg<T>
 where
     T: FromStr,
@@ -517,6 +543,7 @@ where
         }
     }
 }
+
 impl<T: VariantNames> VariantNames for WorldScopedArg<T> {
     const VARIANTS: &'static [&'static str] = T::VARIANTS;
 }
@@ -542,6 +569,7 @@ struct SnippetConfigArg {
     config_identifier: String,
     config_value: String,
 }
+
 impl FromStr for SnippetConfigArg {
     type Err = &'static str;
 
@@ -555,6 +583,7 @@ impl FromStr for SnippetConfigArg {
                 });
             }
         }
+
         Err("value format is <snippet>.<config>=<value>")
     }
 }
@@ -566,6 +595,7 @@ impl<T> StrumEnumValueParser<T> {
         Self(PhantomData)
     }
 }
+
 impl<T> TypedValueParser for StrumEnumValueParser<T>
 where
     T: FromStr + VariantNames + Clone + Send + Sync + 'static,
@@ -620,6 +650,7 @@ impl FromArgMatches for SeedSettings {
             if let Some(occurences) = matches.get_occurrences::<WorldScopedArg<T>>(id) {
                 for occurence in occurences {
                     let mut world_scope = None;
+
                     for value in occurence {
                         update_from_world_scoped_occurence(
                             world_settings,
@@ -633,6 +664,7 @@ impl FromArgMatches for SeedSettings {
 
             Ok(())
         }
+
         fn update_from_world_scoped_flag<F>(
             matches: &ArgMatches,
             world_settings: &mut [WorldPresetSettings],
@@ -646,6 +678,7 @@ impl FromArgMatches for SeedSettings {
                 for occurence in occurences {
                     let mut is_empty = true;
                     let mut world_scope = None;
+
                     for value in occurence {
                         is_empty = false;
                         update_from_world_scoped_occurence(
@@ -655,6 +688,7 @@ impl FromArgMatches for SeedSettings {
                             &mut f,
                         )?;
                     }
+
                     if is_empty {
                         for world in &mut *world_settings {
                             f(world, &true);
@@ -665,6 +699,7 @@ impl FromArgMatches for SeedSettings {
 
             Ok(())
         }
+
         fn update_from_world_scoped_occurence<T, F>(
             world_settings: &mut [WorldPresetSettings],
             world_scope: &mut Option<usize>,
@@ -696,6 +731,7 @@ impl FromArgMatches for SeedSettings {
                                         ),
                                     )
                                 })?;
+
                         f(world, t)
                     }
                 },
@@ -714,18 +750,21 @@ impl FromArgMatches for SeedSettings {
                     .insert(preset.to_string());
             },
         )?;
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
             "spawn",
             |world_preset, spawn: &SpawnArg| world_preset.spawn = Some(spawn.0.clone()),
         )?; // TODO error on multiple to the same world?
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
             "difficulty",
             |world_preset, difficulty: &Difficulty| world_preset.difficulty = Some(*difficulty),
         )?;
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
@@ -737,12 +776,14 @@ impl FromArgMatches for SeedSettings {
                     .insert(*trick);
             },
         )?;
+
         update_from_world_scoped_flag(
             matches,
             &mut world_settings,
             "hard",
             |world_preset, hard| world_preset.hard = Some(*hard),
         )?;
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
@@ -751,6 +792,7 @@ impl FromArgMatches for SeedSettings {
                 world_preset.randomize_doors = Some(*randomize_doors)
             },
         )?;
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
@@ -762,6 +804,7 @@ impl FromArgMatches for SeedSettings {
                     .push(snippet.clone());
             },
         )?;
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
