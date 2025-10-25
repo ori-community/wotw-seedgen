@@ -1,4 +1,4 @@
-use crate::{contained_uber_identifiers::ContainedWrites, generator::weight::cost};
+use crate::generator::weight::cost;
 
 use super::SEED_FAILED_MESSAGE;
 use itertools::Itertools;
@@ -12,7 +12,10 @@ use std::{
     ops::{Deref, DerefMut},
 };
 use wotw_seedgen_data::{Shard, Skill, UberIdentifier, WeaponUpgrade};
-use wotw_seedgen_seed_language::{compile, output::CommandVoid};
+use wotw_seedgen_seed_language::{
+    compile,
+    output::{CommandVoid, ContainedWrites},
+};
 
 // TODO don't really think this should be public
 #[derive(Debug, Clone, PartialEq)]

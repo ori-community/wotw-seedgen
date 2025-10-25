@@ -7,9 +7,7 @@ use std::{cmp::Ordering, mem, ops::Index};
 use strum::Display;
 use wotw_seedgen_assets::UberStateData;
 use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_seed_language::output::Trigger;
-
-use crate::contained_uber_identifiers::ContainedReads;
+use wotw_seedgen_seed_language::output::{ContainedReads, Trigger};
 
 #[derive(Debug, Clone)]
 pub struct UberStates {

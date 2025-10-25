@@ -1,6 +1,10 @@
 use super::Analyzer;
 use rustc_hash::FxHashSet;
-use wotw_seedgen::{data::Skill, spoiler::SeedSpoiler, CommonItem, ContainedWrites};
+use wotw_seedgen::{
+    data::Skill,
+    seed_language::output::{CommonItem, ContainedWrites},
+    spoiler::SeedSpoiler,
+};
 
 /// Analyzes how many skills were placed early on
 pub struct EarlySkillsStats {

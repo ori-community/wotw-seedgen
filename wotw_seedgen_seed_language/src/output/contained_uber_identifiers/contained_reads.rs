@@ -1,8 +1,8 @@
-use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_seed_language::output::{
+use crate::output::{
     CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
     Operation, Trigger,
 };
+use wotw_seedgen_data::UberIdentifier;
 
 use super::{none, some};
 

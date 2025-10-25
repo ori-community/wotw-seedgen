@@ -3,6 +3,8 @@ use super::{
     CommandVoid, CommandZone, Comparator, EqualityComparator, Event, IntermediateOutput,
     ItemMetadata, Operation, StringOrPlaceholder, Trigger,
 };
+use rand::distributions::Uniform;
+use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use wotw_seedgen_assets::{LocData, LocDataEntry};
 use wotw_seedgen_data::Zone;
@@ -10,30 +12,76 @@ use wotw_seedgen_data::Zone;
 pub type StringPlaceholderMap = FxHashMap<StringOrPlaceholder, CommandString>;
 
 impl IntermediateOutput {
-    pub fn resolve_placeholders(&self, loc_data: &LocData) -> StringPlaceholderMap {
-        let mut string_placeholder_map = FxHashMap::default();
+    pub fn postprocess(&mut self, loc_data: &LocData, rng: &mut Pcg64Mcg) -> StringPlaceholderMap {
+        let mut postprocessor = Postprocessor::new(self, loc_data);
 
-        let mut context = ResolveContext::new(self, loc_data, &mut string_placeholder_map);
-        self.resolve(&mut context);
+        self.resolve(&mut postprocessor);
+        let string_placeholder_map = postprocessor.string_placeholder_map;
+
+        let mut extra_events = vec![];
+
+        let price_distribution = Uniform::new_inclusive(0.75, 1.25);
+
+        for event in postprocessor.loc_data_events {
+            let location = postprocessor.loc_data_triggers[&event.trigger];
+
+            let metadata = self.item_metadata.get(&event.command);
+
+            let name = metadata.force_name();
+
+            if let Trigger::Condition(CommandBoolean::FetchBoolean { uber_identifier }) =
+                &event.trigger
+            {
+                let uber_identifier = *uber_identifier;
+
+                if uber_identifier.is_shop() {
+                    extra_events.push(Event::on_reload(CommandVoid::SetShopItemPrice {
+                        uber_identifier,
+                        price: metadata.force_shop_price(&price_distribution, rng),
+                    }));
+
+                    extra_events.push(Event::on_reload(CommandVoid::SetShopItemName {
+                        uber_identifier,
+                        name: name.clone(),
+                    }));
+
+                    extra_events.push(Event::on_reload(CommandVoid::SetShopItemDescription {
+                        uber_identifier,
+                        description: metadata.force_description(rng),
+                    }));
+
+                    if let Some(icon) = metadata.force_icon() {
+                        extra_events.push(Event::on_reload(CommandVoid::SetShopItemIcon {
+                            uber_identifier,
+                            icon,
+                        }));
+                    }
+                }
+            }
+
+            extra_events.push(Event::on_reload(CommandVoid::SetSpoilerMapIcon {
+                location: location.identifier.clone(),
+                icon: metadata.force_map_icon(),
+                label: name,
+            }));
+        }
+
+        self.events.splice(0..0, extra_events);
 
         string_placeholder_map
     }
 }
 
-struct ResolveContext<'output, 'locdata, 'map> {
+struct Postprocessor<'output, 'locdata> {
     events: &'output [Event],
     loc_data_triggers: FxHashMap<Trigger, &'locdata LocDataEntry>,
     loc_data_events: Vec<&'output Event>,
     item_metadata: &'output ItemMetadata,
-    string_placeholder_map: &'map mut StringPlaceholderMap,
+    string_placeholder_map: StringPlaceholderMap,
 }
 
-impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
-    fn new(
-        output: &'output IntermediateOutput,
-        loc_data: &'locdata LocData,
-        string_placeholder_map: &'map mut StringPlaceholderMap,
-    ) -> Self {
+impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
+    fn new(output: &'output IntermediateOutput, loc_data: &'locdata LocData) -> Self {
         let loc_data_triggers = loc_data
             .entries
             .iter()
@@ -56,7 +104,7 @@ impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
             loc_data_triggers,
             loc_data_events,
             item_metadata: &output.item_metadata,
-            string_placeholder_map,
+            string_placeholder_map: FxHashMap::default(),
         }
     }
 
@@ -75,7 +123,7 @@ impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
             .find(|event| &event.trigger == trigger)
             .map_or_else(
                 || "Nothing".into(),
-                |event| self.item_metadata.force_name(&event.command),
+                |event| self.item_metadata.get(&event.command).force_name(),
             )
     }
 
@@ -157,7 +205,9 @@ impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
                             id: 2,
                             value: CommandString::Concatenate {
                                 left: Box::new(CommandString::GetString { id: 2 }),
-                                right: Box::new(self.item_metadata.force_name(&event.command)), // TODO could this have placeholders again?
+                                right: Box::new(
+                                    self.item_metadata.get(&event.command).force_name(), // TODO could this have placeholders again?
+                                ),
                             },
                         },
                     ],
@@ -202,12 +252,13 @@ impl<'output, 'locdata, 'map> ResolveContext<'output, 'locdata, 'map> {
     }
 }
 
+// TODO maybe this adds stats tracking?
 trait ResolvePlaceholders {
-    fn resolve(&self, context: &mut ResolveContext);
+    fn resolve(&self, context: &mut Postprocessor);
 }
 
 impl<T: ResolvePlaceholders> ResolvePlaceholders for Vec<T> {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         for t in self {
             t.resolve(context);
         }
@@ -215,7 +266,7 @@ impl<T: ResolvePlaceholders> ResolvePlaceholders for Vec<T> {
 }
 
 impl<T: ResolvePlaceholders> ResolvePlaceholders for Option<T> {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         if let Some(t) = self {
             t.resolve(context);
         }
@@ -223,28 +274,28 @@ impl<T: ResolvePlaceholders> ResolvePlaceholders for Option<T> {
 }
 
 impl<Item: ResolvePlaceholders, Operator> ResolvePlaceholders for Operation<Item, Operator> {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         self.left.resolve(context);
         self.right.resolve(context);
     }
 }
 
 impl ResolvePlaceholders for IntermediateOutput {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         self.events.resolve(context);
         self.command_lookup.resolve(context);
     }
 }
 
 impl ResolvePlaceholders for Event {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         self.trigger.resolve(context);
         self.command.resolve(context);
     }
 }
 
 impl ResolvePlaceholders for Trigger {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         if let Self::Condition(condition) = self {
             condition.resolve(context);
         }
@@ -252,7 +303,7 @@ impl ResolvePlaceholders for Trigger {
 }
 
 impl ResolvePlaceholders for Command {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Boolean(command) => command.resolve(context),
             Self::Integer(command) => command.resolve(context),
@@ -265,7 +316,7 @@ impl ResolvePlaceholders for Command {
 }
 
 impl ResolvePlaceholders for CommandBoolean {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -289,7 +340,7 @@ impl ResolvePlaceholders for CommandBoolean {
 }
 
 impl ResolvePlaceholders for CommandInteger {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -303,7 +354,7 @@ impl ResolvePlaceholders for CommandInteger {
 }
 
 impl ResolvePlaceholders for CommandFloat {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -317,7 +368,7 @@ impl ResolvePlaceholders for CommandFloat {
 }
 
 impl ResolvePlaceholders for CommandString {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Constant { value } => {
                 if context.string_placeholder_map.contains_key(value) {
@@ -356,7 +407,7 @@ impl ResolvePlaceholders for CommandString {
 }
 
 impl ResolvePlaceholders for CommandZone {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
@@ -368,7 +419,7 @@ impl ResolvePlaceholders for CommandZone {
 }
 
 impl ResolvePlaceholders for CommandVoid {
-    fn resolve(&self, context: &mut ResolveContext) {
+    fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Multi { commands } => commands.resolve(context),
             Self::If { condition, command } => {
@@ -427,6 +478,7 @@ impl ResolvePlaceholders for CommandVoid {
                 alpha.resolve(context);
             }
             Self::SetWheelPinned { pinned, .. } => pinned.resolve(context),
+            Self::DebugLog { message } => message.resolve(context),
             Self::Lookup { .. }
             | Self::DefineTimer { .. }
             | Self::MessageDestroy { .. }
@@ -448,8 +500,7 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::SetWheelItemAction { .. }
             | Self::DestroyWheelItem { .. }
             | Self::SwitchWheel { .. }
-            | Self::ResetAllWheels {}
-            | Self::DebugLog { .. } => {}
+            | Self::ResetAllWheels {} => {}
         }
     }
 }

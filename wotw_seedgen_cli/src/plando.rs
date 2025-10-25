@@ -7,7 +7,7 @@ use notify_debouncer_full::{
     new_debouncer,
     notify::{EventKind, RecursiveMode},
 };
-use rand::rngs::ThreadRng;
+use rand_pcg::Pcg64Mcg;
 use std::{
     ffi::OsStr,
     fs::{self, File},
@@ -54,7 +54,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let loc_data = logic_access.loc_data()?;
     let uber_state_data = logic_access.uber_state_data(&loc_data, &logic_access.state_data()?)?;
 
-    let mut rng = rand::thread_rng();
+    let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
     let snippet_access = files::snippet_access(root)?;
 
     let out = match out {
@@ -117,7 +117,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 }
 
 fn compile(
-    rng: &mut ThreadRng,
+    rng: &mut Pcg64Mcg,
     snippet_access: &FileAccess,
     loc_data: &LocData,
     uber_state_data: &UberStateData,
@@ -136,12 +136,14 @@ fn compile(
     );
 
     compiler.compile_snippet(entry)?;
-    let (output, success) = compiler.finish().eprint_errors();
+    let (mut output, success) = compiler.finish().eprint_errors();
     if !success {
         return Err("compilation failed".into());
     }
 
-    let seed = Seed::new(output, loc_data, debug);
+    let string_placeholder_map = output.postprocess(loc_data, rng);
+
+    let seed = Seed::new(output, string_placeholder_map, debug);
 
     let mut file = File::create(out).map_err(|err| file_err("create", out, err))?;
     seed.package(&mut file, !debug)?;

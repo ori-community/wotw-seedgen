@@ -1,5 +1,9 @@
 use super::Analyzer;
-use wotw_seedgen::{data::Skill, spoiler::SeedSpoiler, CommonItem, ContainedWrites};
+use wotw_seedgen::{
+    data::Skill,
+    seed_language::output::{CommonItem, ContainedWrites},
+    spoiler::SeedSpoiler,
+};
 
 /// Analyzes which weapon gets placed first
 pub struct FirstWeaponStats;

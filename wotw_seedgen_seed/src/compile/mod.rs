@@ -5,10 +5,7 @@ use self::command::MemoryUsed;
 use crate::assembly::{Command, Event, Trigger};
 use indexmap::{map::Entry, IndexMap};
 use rustc_hash::FxBuildHasher;
-use wotw_seedgen_seed_language::{
-    assets::LocData,
-    output::{self as input, IntermediateOutput, StringPlaceholderMap},
-};
+use wotw_seedgen_seed_language::output::{self as input, StringPlaceholderMap};
 
 // TODO dedup functions?
 
@@ -18,10 +15,10 @@ pub struct CompileContext {
 }
 
 impl CompileContext {
-    pub fn new(output: &IntermediateOutput, loc_data: &LocData) -> Self {
+    pub fn new(string_placeholder_map: StringPlaceholderMap) -> Self {
         Self {
             command_lookup: vec![],
-            string_placeholder_map: output.resolve_placeholders(loc_data),
+            string_placeholder_map,
         }
     }
 

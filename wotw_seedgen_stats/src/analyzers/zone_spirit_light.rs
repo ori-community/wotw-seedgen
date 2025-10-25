@@ -1,6 +1,10 @@
 use super::Analyzer;
 use std::num::NonZeroUsize;
-use wotw_seedgen::{data::Zone, spoiler::SeedSpoiler, CommonItem, ContainedWrites};
+use wotw_seedgen::{
+    data::Zone,
+    seed_language::output::{CommonItem, ContainedWrites},
+    spoiler::SeedSpoiler,
+};
 
 /// Analyzes how much Spirit Light is in a zone
 pub struct ZoneSpiritLightStats {

@@ -14,6 +14,15 @@ pub struct Event {
     pub command: CommandVoid,
 }
 
+impl Event {
+    pub(crate) fn on_reload(command: CommandVoid) -> Self {
+        Self {
+            trigger: RELOAD,
+            command,
+        }
+    }
+}
+
 /// Trigger for an [`Event`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Trigger {
@@ -24,6 +33,8 @@ pub enum Trigger {
     /// Trigger when the condition changes from `false` to `true`
     Condition(CommandBoolean),
 }
+
+pub(crate) const RELOAD: Trigger = Trigger::ClientEvent(ClientEvent::Reload);
 
 impl Trigger {
     pub fn loc_data_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {

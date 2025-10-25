@@ -54,7 +54,7 @@ pub fn write_seed(
     fs::create_dir_all("seeds")?;
 
     let path = if seed_universe.worlds.len() == 1 {
-        let (mut file, mut path) = create_unique_file(&format!("seeds/{name}"))?;
+        let (mut file, path) = create_unique_file(&format!("seeds/{name}"))?;
         let seed = seed_universe.worlds.pop().unwrap();
         seed.package(&mut file, !debug)?;
 
@@ -62,10 +62,9 @@ pub fn write_seed(
             launch_seed(&path)?;
         }
 
-        path.truncate(path.len() - ".wotwr".len());
-        path.push_str("_spoiler.txt");
-        fs::write(&path, seed_universe.spoiler.to_string())
-            .map_err(|err| file_err("write", &path, err))?;
+        let spoiler_path = format!("{}_spoiler.txt", &path[..path.len() - ".wotwr".len()]);
+        fs::write(&spoiler_path, seed_universe.spoiler.to_string())
+            .map_err(|err| file_err("write", &spoiler_path, err))?;
 
         path
     } else {
@@ -77,9 +76,9 @@ pub fn write_seed(
             seed.package(&mut file, !debug)?;
         }
 
-        let path = format!("{path}/spoiler.txt");
-        fs::write(&path, seed_universe.spoiler.to_string())
-            .map_err(|err| file_err("write", &path, err))?;
+        let spoiler_path = format!("{path}/spoiler.txt");
+        fs::write(&spoiler_path, seed_universe.spoiler.to_string())
+            .map_err(|err| file_err("write", &spoiler_path, err))?;
 
         path
     };

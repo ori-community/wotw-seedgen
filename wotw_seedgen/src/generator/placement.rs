@@ -3,7 +3,6 @@ use super::{
     SEED_FAILED_MESSAGE,
 };
 use crate::{
-    contained_uber_identifiers::ContainedWrites,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
     world::UberStateValue,
     Simulate, World,
@@ -12,7 +11,7 @@ use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
 use ordered_float::OrderedFloat;
 use rand::{
-    distributions::{Uniform, WeightedIndex},
+    distributions::WeightedIndex,
     prelude::Distribution,
     seq::{IteratorRandom, SliceRandom},
     Rng, SeedableRng,
@@ -21,13 +20,13 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, mem, ops::RangeFrom};
 use wotw_seedgen_assets::LocData;
-use wotw_seedgen_data::{CommonUberIdentifier, Skill, UberIdentifier};
+use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
     compile,
     output::{
-        ClientEvent, CommandBoolean, CommandString, CommandVoid, Event, IntermediateOutput, Trigger,
+        ClientEvent, CommandBoolean, CommandString, CommandVoid, ContainedWrites, Event, IntermediateOutput, Trigger
     },
 };
 use wotw_seedgen_settings::UniverseSettings;
@@ -89,7 +88,7 @@ pub fn generate_placements(
         }
     }
 
-    Ok(context.finish(loc_data, debug))
+    Ok(context.finish(loc_data, debug, rng))
 }
 
 pub struct Context<'graph, 'settings> {
@@ -132,8 +131,6 @@ pub struct WorldContext<'graph, 'settings> {
     // TODO is this still needed for multiworld quality?
     /// number of remaining placements that should not be placed outside of the own world
     unshared_items: usize,
-    /// generates random factors to modify shop prices with
-    price_distribution: Uniform<f32>,
 }
 
 impl<'graph, 'settings> Context<'graph, 'settings> {
@@ -631,15 +628,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             node = node.identifier()
         );
 
-        // TODO spoiler icons for snippet-placed items
-        // TODO spoiler icons for plandos?
-        self.worlds[origin_world_index].map_icon(node, &command, name.clone());
-
-        let uber_identifier = node.uber_identifier().unwrap();
-        if uber_identifier.is_shop() {
-            self.worlds[origin_world_index].shop_item_data(&command, uber_identifier, name.clone());
-        }
-
         self.write_placement_spoiler(
             origin_world_index,
             target_world_index,
@@ -648,6 +636,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             mark_forced,
         );
 
+        let uber_identifier = node.uber_identifier().unwrap();
         self.push_command(
             Trigger::loc_data_trigger(uber_identifier, node.value()),
             command,
@@ -732,7 +721,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    fn finish(self, loc_data: &LocData, debug: bool) -> SeedUniverse {
+    fn finish(self, loc_data: &LocData, debug: bool, rng: &mut Pcg64Mcg) -> SeedUniverse {
         SeedUniverse {
             worlds: self
                 .worlds
@@ -752,7 +741,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         spawn_identifier: spawn.identifier().to_string(),
                     };
 
-                    Seed::new(world_context.output, loc_data, debug).with_seedgen_info(seedgen_info)
+                    let string_placeholder_map = world_context.output.postprocess(loc_data, rng);
+
+                    Seed::new(world_context.output, string_placeholder_map, debug).with_seedgen_info(seedgen_info)
                 })
                 .collect(),
             spoiler: self.spoiler,
@@ -822,7 +813,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             reached_item_locations: Default::default(),
             spawn_slots: SPAWN_SLOTS,
             unshared_items: UNSHARED_ITEMS,
-            price_distribution: Uniform::new_inclusive(0.75, 1.25),
         };
 
         world_context.generate_doors()?;
@@ -1284,28 +1274,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         })
     }
 
-    fn map_icon(&mut self, node: &Node, command: &CommandVoid, label: CommandString) {
-        let icon = self
-            .output
-            .item_metadata
-            .map_icon(command)
-            .unwrap_or_else(|| {
-                command
-                    .contained_common_write_identifiers()
-                    .next()
-                    .map(CommonUberIdentifier::map_icon)
-                    .unwrap_or_default()
-            });
-
-        self.on_load(CommandVoid::SetSpoilerMapIcon {
-            location: node.identifier().to_string(),
-            icon,
-            label,
-        });
-    }
-
     pub fn name(&self, command: &CommandVoid) -> CommandString {
-        self.output.item_metadata.force_name(command)
+        self.output.item_metadata.get(command).force_name()
     }
 
     fn log_name(&mut self, command: &CommandVoid) -> String {
@@ -1314,68 +1284,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .simulate(&mut self.world, &self.output.events);
 
         strip_control_characters(&name)
-    }
-
-    fn on_load(&mut self, command: CommandVoid) {
-        self.push_command(Trigger::ClientEvent(ClientEvent::Reload), command);
-    }
-
-    fn shop_item_data(
-        &mut self,
-        command: &CommandVoid,
-        uber_identifier: UberIdentifier,
-        name: CommandString,
-    ) {
-        let (price, description, icon) = self.output.item_metadata.shop_data(command);
-
-        let price = price.unwrap_or_else(|| self.shop_price(command).into());
-        let icon = icon.or_else(|| {
-            command
-                .contained_common_write_identifiers()
-                .next()
-                .and_then(CommonUberIdentifier::icon)
-        });
-
-        let mut commands = vec![
-            CommandVoid::SetShopItemPrice {
-                uber_identifier,
-                price,
-            },
-            CommandVoid::SetShopItemName {
-                uber_identifier,
-                name,
-            },
-        ];
-        if let Some(description) = description {
-            commands.push(CommandVoid::SetShopItemDescription {
-                uber_identifier,
-                description,
-            })
-        }
-        if let Some(icon) = icon {
-            commands.push(CommandVoid::SetShopItemIcon {
-                uber_identifier,
-                icon,
-            })
-        }
-
-        self.on_load(CommandVoid::Multi { commands });
-    }
-
-    fn shop_price(&mut self, command: &CommandVoid) -> i32 {
-        let mut price = command
-            .contained_common_write_identifiers()
-            .map(CommonUberIdentifier::shop_price)
-            .sum::<f32>();
-
-        if price == 0. {
-            price = 200.
-        }
-        if price != CommonUberIdentifier::Skill(Skill::Blaze).shop_price() {
-            price *= self.price_distribution.sample(&mut self.rng);
-        }
-
-        price.round() as i32
     }
 
     fn fill_remaining(&mut self, placement_spoiler: &mut Vec<SpoilerPlacement>) {
@@ -1426,10 +1334,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         );
 
         let uber_identifier = node.uber_identifier().unwrap();
-
-        if uber_identifier.is_shop() {
-            self.shop_item_data(&command, uber_identifier, self.name(&command))
-        }
 
         self.write_placement_spoiler(node, &command, placement_spoiler);
 

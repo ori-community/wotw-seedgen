@@ -15,7 +15,7 @@ use seed_language::output::DebugOutput;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use wotw_seedgen_data::Position;
-use wotw_seedgen_seed_language::{assets::LocData, output::IntermediateOutput};
+use wotw_seedgen_seed_language::output::{IntermediateOutput, StringPlaceholderMap};
 
 use crate::compile::CompileContext;
 
@@ -35,8 +35,12 @@ pub struct Seed {
 }
 
 impl Seed {
-    pub fn new(mut output: IntermediateOutput, loc_data: &LocData, debug: bool) -> Self {
-        let mut context = CompileContext::new(&output, loc_data);
+    pub fn new(
+        mut output: IntermediateOutput,
+        string_placeholder_map: StringPlaceholderMap,
+        debug: bool,
+    ) -> Self {
+        let mut context = CompileContext::new(string_placeholder_map);
 
         context.compile_command_lookup(output.command_lookup);
         let events = context.compile_events(output.events);

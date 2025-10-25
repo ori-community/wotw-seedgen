@@ -3,10 +3,9 @@
 use super::{Compile, ExportedValue, SnippetCompiler};
 use crate::{
     ast::{self, CommandArg, UberStateType},
-    output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder, Trigger},
+    output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
     types::InferType,
 };
-use ast::ClientEvent;
 use ordered_float::OrderedFloat;
 use rand::Rng;
 use std::{iter, ops::Range};
@@ -453,10 +452,11 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
         let timer = compiler.consume_result(timer);
 
         if let (Some(toggle), Some(timer)) = (toggle, timer) {
-            compiler.global.output.events.push(Event {
-                trigger: Trigger::ClientEvent(ClientEvent::Reload),
-                command: CommandVoid::DefineTimer { toggle, timer },
-            });
+            compiler
+                .global
+                .output
+                .events
+                .push(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
 
             compiler.variables.insert(
                 self.toggle_identifier.data,
@@ -613,7 +613,7 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
 
         let name =
             consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
-        let price = consume_command_arg(self.price, compiler)
+        let shop_price = consume_command_arg(self.price, compiler)
             .and_then(|price| price.compile_into(compiler));
         let description = consume_command_arg(self.description, compiler)
             .and_then(|description| description.compile_into(compiler));
@@ -632,7 +632,7 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
                     item,
                     ItemMetadataEntry {
                         name,
-                        price,
+                        shop_price,
                         description,
                         icon,
                         map_icon,
@@ -682,7 +682,9 @@ impl<'source> Compile<'source> for ast::ItemDataPriceArgs<'source> {
             .and_then(|price| price.compile_into(compiler));
 
         if let (Some(item), Some(price)) = (item, price) {
-            insert_item_data(compiler, item, span, price, "price", |data| &mut data.price);
+            insert_item_data(compiler, item, span, price, "price", |data| {
+                &mut data.shop_price
+            });
         }
     }
 }
