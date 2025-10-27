@@ -134,6 +134,24 @@ fn function_call() {
     assert_eq!(function_call, Ok(expected));
 }
 
+struct ExampleFileAccess(&'static str);
+impl SnippetAccess for ExampleFileAccess {
+    fn read_snippet(&self, _identifier: &str) -> Result<Source, String> {
+        Ok(Source {
+            id: String::new(),
+            content: self.0.to_string(),
+        })
+    }
+
+    fn read_file(&self, _path: &Path) -> Result<Vec<u8>, String> {
+        unimplemented!()
+    }
+
+    fn available_snippets(&self) -> Vec<String> {
+        unimplemented!()
+    }
+}
+
 lazy_static! {
     // works while debugging, but doesn't work to jump into code from errors
     // static ref WORKDIR: String = {
@@ -146,28 +164,60 @@ lazy_static! {
     static ref WORKDIR: &'static str = "..";
 }
 
-#[test]
-fn snippets() {
-    struct TestFileAccess;
-    impl SnippetAccess for TestFileAccess {
-        fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
-            let id = format!("{}/assets/snippets/{}.wotws", *WORKDIR, identifier);
-            let content = fs::read_to_string(&id).map_err(|err| err.to_string())?;
-            Ok(Source { id, content })
-        }
-
-        fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-            let mut full_path = PathBuf::from(*WORKDIR);
-            full_path.push("assets/snippets");
-            full_path.push(path);
-            fs::read(full_path).map_err(|err| err.to_string())
-        }
-
-        fn available_snippets(&self) -> Vec<String> {
-            vec![]
-        }
+struct TestFileAccess;
+impl SnippetAccess for TestFileAccess {
+    fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
+        let id = format!("{}/assets/snippets/{}.wotws", *WORKDIR, identifier);
+        let content = fs::read_to_string(&id).map_err(|err| err.to_string())?;
+        Ok(Source { id, content })
     }
 
+    fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
+        let mut full_path = PathBuf::from(*WORKDIR);
+        full_path.push("assets/snippets");
+        full_path.push(path);
+        fs::read(full_path).map_err(|err| err.to_string())
+    }
+
+    fn available_snippets(&self) -> Vec<String> {
+        unimplemented!()
+    }
+}
+
+fn test_compiler<'snippets, F: SnippetAccess>(
+    snippet_access: &'snippets F,
+) -> Compiler<'snippets, 'static> {
+    test_compiler_with_config(snippet_access, Default::default())
+}
+
+fn test_compiler_with_config<'snippets, F: SnippetAccess>(
+    snippet_access: &'snippets F,
+    config: FxHashMap<String, FxHashMap<String, String>>,
+) -> Compiler<'snippets, 'static> {
+    Compiler::new(
+        &mut rand::thread_rng(),
+        snippet_access,
+        &UBER_STATE_DATA,
+        config,
+        false,
+    )
+}
+
+fn test_str(source: &'static str) {
+    let snippet_access = ExampleFileAccess(source);
+    let mut compiler = test_compiler(&snippet_access);
+    compiler.compile_snippet("").unwrap();
+    let (_, success) = compiler.finish().eprint_errors();
+    assert!(success);
+}
+
+#[test]
+fn coersions() {
+    test_str("!state(float, Float)  on float > 5 {}");
+}
+
+#[test]
+fn snippets() {
     // TODO remove test output
     fn write_test_output(filename: impl Display, output: &IntermediateOutput) {
         fs::create_dir_all(format!("{}/target/snippet-test", *WORKDIR)).unwrap();
@@ -176,18 +226,6 @@ fn snippets() {
             format!("{:#?}", output),
         )
         .unwrap();
-    }
-
-    fn test_compiler(
-        config: FxHashMap<String, FxHashMap<String, String>>,
-    ) -> Compiler<'static, 'static> {
-        Compiler::new(
-            &mut rand::thread_rng(),
-            &TestFileAccess,
-            &UBER_STATE_DATA,
-            config,
-            false,
-        )
     }
 
     let test_with_config = [(
@@ -206,7 +244,7 @@ fn snippets() {
         .map(|path| path.file_stem().unwrap().to_string_lossy().to_string())
         .collect::<Vec<_>>();
 
-    let mut compiler = test_compiler(Default::default());
+    let mut compiler = test_compiler(&TestFileAccess);
 
     for identifier in &snippets {
         compiler.compile_snippet(identifier).unwrap();
@@ -217,7 +255,7 @@ fn snippets() {
     write_test_output("_final", &output);
 
     for identifier in &snippets {
-        let mut compiler = test_compiler(Default::default());
+        let mut compiler = test_compiler(&TestFileAccess);
 
         compiler.compile_snippet(identifier).unwrap();
 
@@ -228,7 +266,7 @@ fn snippets() {
     }
 
     for identifier in test_with_config.keys() {
-        let mut compiler = test_compiler(test_with_config.clone());
+        let mut compiler = test_compiler_with_config(&TestFileAccess, test_with_config.clone());
 
         compiler.compile_snippet(identifier).unwrap();
 

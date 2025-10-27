@@ -403,18 +403,3 @@ impl InferType for Operation<'_> {
         }
     }
 }
-
-pub(crate) fn common_type(left: Type, right: Type) -> Option<Type> {
-    if left == right {
-        return Some(left);
-    }
-    match (left, right) {
-        (Type::UberIdentifier, value @ (Type::Boolean | Type::Integer | Type::Float))
-        | (value @ (Type::Boolean | Type::Integer | Type::Float), Type::UberIdentifier) => {
-            Some(value)
-        }
-        (Type::Integer, Type::Float) | (Type::Float, Type::Integer) => Some(Type::Float),
-        (_, Type::String) | (Type::String, _) => Some(Type::String),
-        _ => None,
-    }
-}

@@ -6,7 +6,7 @@ use crate::{
         CommandVoid, CommandZone, Comparator, EqualityComparator, LogicOperator, Operation,
         StringOrPlaceholder, {Constant, Literal},
     },
-    types::{common_type, InferType, Type},
+    types::{InferType, Type},
 };
 use ordered_float::OrderedFloat;
 use std::{borrow::Cow, ops::Range};
@@ -200,18 +200,9 @@ impl CompileInto for CommandBoolean {
                 })
             }
             Operator::Comparator(operator) => {
-                let left = operation.left.infer_type(compiler)?;
                 let operator = operator.compile(compiler);
-                let right = operation.right.infer_type(compiler)?;
 
-                let target = common_type(left, right);
-                if target.is_none() {
-                    compiler.errors.push(Error::custom(
-                        format!("Cannot compare {left} and {right}"),
-                        operation.span(),
-                    ))
-                }
-                let target = target?;
+                let target = compiler.common_type(&operation.left, &operation.right)?;
 
                 let expression = match target {
                     // TODO you may want to compare a lot more than these, especially at compile time, comparing config values or such
@@ -759,16 +750,7 @@ impl CompileInto for Command {
     ) -> Option<Self> {
         match operation.operator.data {
             Operator::Arithmetic(_) => {
-                let left = operation.left.infer_type(compiler)?;
-                let right = operation.right.infer_type(compiler)?;
-
-                let target = common_type(left, right);
-                if target.is_none() {
-                    compiler.errors.push(Error::custom(
-                        format!("Cannot perform operation on {left} and {right}"),
-                        operation.span(),
-                    ));
-                };
+                let target = compiler.common_type(&operation.left, &operation.right);
 
                 match target? {
                     Type::Boolean => {
@@ -786,9 +768,9 @@ impl CompileInto for Command {
                     Type::Zone => {
                         CommandZone::compile_operation(operation, compiler).map(Self::Zone)
                     }
-                    _ => {
+                    other => {
                         compiler.errors.push(Error::custom(
-                            format!("Cannot perform operation on {left} and {right}"),
+                            format!("Cannot perform operation on {other}"),
                             operation.span(),
                         ));
 

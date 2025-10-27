@@ -13,13 +13,13 @@ pub use function::{
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
-    ast::{self, UberStateType},
+    ast::{self, Expression, UberStateType},
     output::{
         ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid,
         IntermediateOutput, Literal, Operation, SnippetDebugOutput,
     },
     token::TOKENIZER,
-    types::uber_state_type,
+    types::{uber_state_type, InferType, Type},
 };
 use derivative::Derivative;
 use ordered_float::OrderedFloat;
@@ -34,7 +34,7 @@ use wotw_seedgen_assets::{SnippetAccess, Source, UberStateData};
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_parse::{
     parse_ast, Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result,
-    SeparatedNonEmpty, Span, Spanned,
+    SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned,
 };
 
 #[derive(Debug)]
@@ -448,6 +448,29 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         }
 
         ty
+    }
+
+    pub(crate) fn common_type(&mut self, left: &Expression, right: &Expression) -> Option<Type> {
+        let left_ty = left.infer_type(self)?;
+        let right_ty = right.infer_type(self)?;
+
+        match (left_ty, right_ty) {
+            (left, right) if left == right => Some(left),
+            (Type::UberIdentifier, ty @ (Type::Boolean | Type::Float))
+            | (ty @ (Type::Boolean | Type::Float), Type::UberIdentifier) => Some(ty),
+            (Type::UberIdentifier, Type::Integer) => left.uber_state_type(self).map(Type::from),
+            (Type::Integer, Type::UberIdentifier) => right.uber_state_type(self).map(Type::from),
+            (Type::Integer, Type::Float) | (Type::Float, Type::Integer) => Some(Type::Float),
+            (_, Type::String) | (Type::String, _) => Some(Type::String),
+            _ => {
+                self.errors.push(Error::custom(
+                    format!("Cannot perform operation on {left_ty} and {right_ty}"),
+                    left.span_start()..right.span_end(),
+                ));
+
+                None
+            }
+        }
     }
 }
 
