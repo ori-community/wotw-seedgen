@@ -15,8 +15,8 @@
     !tags("Relics (" + relic_count + ")")
 }
 
-!include("progress_helper")
-!include("goal_mode_core")
+!include("progress_helper", write_progress_message, write_map_progress_message)
+!include("goal_mode_core", check_goals_completed, write_goals_incomplete_message)
 
 !state(marsh_relic_collected, Boolean)
 !state(hollow_relic_collected, Boolean)
@@ -265,7 +265,7 @@
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 
-!on_event("progress_helper", write_progress_message, {
+!augment_fun(write_progress_message, {
     count_relics()
     set_string("outer_color", "")
     if get_integer("relic_count") == total_relic_count set_string("outer_color", "$")
@@ -273,7 +273,7 @@
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
 
-!on_event("progress_helper", write_map_progress_message, {
+!augment_fun(write_map_progress_message, {
     set_boolean("exists", false)
     set_boolean("collected", false)
 
@@ -304,12 +304,12 @@
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
 
-!on_event("goal_mode_core", check_goals_completed, {
+!augment_fun(check_goals_completed, {
     count_relics()
     if get_integer("relic_count") < total_relic_count set_boolean("goals_completed", false)
 })
 
-!on_event("goal_mode_core", write_goals_incomplete_message, {
+!augment_fun(write_goals_incomplete_message, {
     count_relics()
     if get_integer("relic_count") < total_relic_count {
         set_string("outer_color", "@")

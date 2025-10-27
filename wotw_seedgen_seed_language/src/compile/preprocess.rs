@@ -51,13 +51,6 @@ impl Preprocessor {
                                     }
                                 }
                             }
-                            ast::Command::Event(_, command) => {
-                                if let Ok(command) = &command.result {
-                                    if let Ok(args) = &command.content {
-                                        self.output.functions.insert(args.0 .0.data.0.to_string());
-                                    }
-                                }
-                            }
                             ast::Command::SetConfig(_, command) => {
                                 if let Ok(command) = &command.result {
                                     if let Ok(args) = &command.content {

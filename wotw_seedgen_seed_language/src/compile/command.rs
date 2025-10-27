@@ -8,7 +8,7 @@ use crate::{
 };
 use ordered_float::OrderedFloat;
 use rand::Rng;
-use std::{iter, ops::Range};
+use std::{iter, mem, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
 use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart};
@@ -33,10 +33,7 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::BuiltinIcon(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Event(_, command) => {
-                command.compile(compiler);
-            }
-            ast::Command::OnEvent(_, command) => {
+            ast::Command::AugmentFun(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::Export(_, command) => {
@@ -219,63 +216,44 @@ impl<'source> Compile<'source> for ast::BuiltinIconArgs<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::EventArgs<'source> {
+impl<'source> Compile<'source> for ast::AugmentFunArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let index = compiler.function_indices[self.0.data.0];
-
-        compiler
-            .global
-            .events
-            .entry(compiler.identifier.clone())
-            .or_default()
-            .insert(self.0.data.0.to_string(), index);
-    }
-}
-
-impl<'source> Compile<'source> for ast::OnEventArgs<'source> {
-    type Output = ();
-
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let identifier = consume_command_arg(self.identifier, compiler);
+        let function = compiler.resolve_function(&self.identifier);
         let action = consume_command_arg(self.action, compiler);
 
-        if !compiler.check_snippet_included(&self.snippet_name) {
-            return;
-        }
-
-        let (Some(identifier), Some(action)) = (identifier, action) else {
-            return;
-        };
-
-        let event = compiler
-            .global
-            .events
-            .get(self.snippet_name.data)
-            .and_then(|events| events.get(identifier.data.0))
-            .copied();
-
-        if event.is_none() {
-            compiler.errors.push(Error::custom(
-                "Could not find event in snippet".to_string(),
-                identifier.span,
-            ));
-        }
+        let Some(action) = action else { return };
 
         let span = action.span();
         let action = action
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
 
-        if let (Some(event), Some(action)) = (event, action) {
-            if let CommandVoid::Multi { commands } =
-                &mut compiler.global.output.command_lookup[event]
-            {
-                match action {
-                    CommandVoid::Multi { commands: extend } => commands.extend(extend),
-                    single => commands.push(single),
-                }
+        let (Some(function), Some(action)) = (function, action) else {
+            return;
+        };
+
+        let function = &mut compiler.global.output.command_lookup[function];
+
+        match (function, action) {
+            (CommandVoid::Multi { commands }, CommandVoid::Multi { commands: mut more }) => {
+                commands.append(&mut more)
+            }
+            (CommandVoid::Multi { commands }, action) => commands.push(action),
+            (function, CommandVoid::Multi { mut commands }) => {
+                let head = mem::replace(function, CommandVoid::Multi { commands: vec![] });
+
+                commands.insert(0, head);
+
+                *function = CommandVoid::Multi { commands };
+            }
+            (function, action) => {
+                let head = mem::replace(function, CommandVoid::Multi { commands: vec![] });
+
+                let commands = vec![head, action];
+
+                *function = CommandVoid::Multi { commands };
             }
         }
     }

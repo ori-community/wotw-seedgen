@@ -350,8 +350,7 @@ pub enum Command<'source> {
     Include(Spanned<Include>, CommandArgs<IncludeArgs<'source>>),
     BundleIcon(Spanned<BundleIcon>, CommandArgs<BundleIconArgs<'source>>),
     BuiltinIcon(Spanned<BuiltinIcon>, CommandArgs<BuiltinIconArgs<'source>>),
-    Event(Spanned<EventIdent>, CommandArgs<EventArgs<'source>>),
-    OnEvent(Spanned<OnEvent>, CommandArgs<OnEventArgs<'source>>),
+    AugmentFun(Spanned<AugmentFun>, CommandArgs<AugmentFunArgs<'source>>),
     Export(Spanned<Export>, CommandArgs<ExportArgs<'source>>),
     Spawn(Spanned<Spawn>, CommandArgs<SpawnArgs<'source>>),
     Tags(
@@ -447,20 +446,12 @@ pub struct BuiltinIconArgs<'source> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(rename = "event")]
-pub struct EventIdent;
-
-#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct EventArgs<'source>(pub Spanned<Identifier<'source>>);
-
-#[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct OnEvent;
+pub struct AugmentFun;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct OnEventArgs<'source> {
-    pub snippet_name: Spanned<&'source str>,
-    pub identifier: CommandArg<Spanned<Identifier<'source>>>,
+pub struct AugmentFunArgs<'source> {
+    pub identifier: Spanned<Identifier<'source>>,
     pub action: CommandArg<Action<'source>>,
 }
 

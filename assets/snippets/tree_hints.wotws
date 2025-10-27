@@ -24,10 +24,10 @@ The Clean Water Hint is on the Wellspring Escape")
 !zone_of(burrow_zone, skill(Skill::Burrow))
 !zone_of(launch_zone, skill(Skill::Launch))
 
-!include("progress_helper")
+!include("progress_helper", write_progress_message, write_map_progress_message)
 
-!on_event("progress_helper", write_progress_message, write_hints())
-!on_event("progress_helper", write_map_progress_message, write_hints())
+!augment_fun(write_progress_message, write_hints())
+!augment_fun(write_map_progress_message, write_hints())
 
 fun write_hints() {
     set_string("tree_hints", "")

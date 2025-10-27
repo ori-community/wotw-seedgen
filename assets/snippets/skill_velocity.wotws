@@ -7,14 +7,14 @@
 !state(enabled, Boolean)
 !state(collected, Integer)
 
-!include("bonus_core", update_bonus_wheel)
+!include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
+
+!augment_fun(any_collected, if collected > 0 set_boolean("any_collected", true))
+!augment_fun(any_enabled, if enabled set_boolean("any_enabled", true))
+!augment_fun(enable_all, if enabled == false enable())
+!augment_fun(disable_all, if enabled disable())
 
 !builtin_icon(skill_velocity_icon, "assets/icons/bonus/skillvelocity.png")
-
-!on_event("bonus_core", any_collected, if collected > 0 set_boolean("any_collected", true))
-!on_event("bonus_core", any_enabled, if enabled set_boolean("any_enabled", true))
-!on_event("bonus_core", enable_all, if enabled == false enable())
-!on_event("bonus_core", disable_all, if enabled disable())
 
 fun skill_velocity() {
     item_message("#Skill Velocity x" + (collected + 1) + "#")

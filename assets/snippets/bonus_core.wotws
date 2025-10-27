@@ -9,15 +9,23 @@
 // used to check whether any bonus item is collected
 // if your bonus item is collected, set boolean "any_collected" to true
 // if your bonus item is not collected, do nothing
-!event(any_collected)
+!export(any_collected)
+fun any_collected() {
+    set_boolean("any_collected", false)
+}
 // used to check whether any bonus item is enabled
 // if your bonus item is enabled, set boolean "any_enabled" to true
 // if your bonus item is disabled, do nothing
-!event(any_enabled)
+!export(any_enabled)
+fun any_enabled() {
+    set_boolean("any_enabled", false)
+}
 // used to enable all bonus items
-!event(enable_all)
+fun enable_all() {}
+!export(enable_all)
 // used to disable all bonus items
-!event(disable_all)
+fun disable_all() {}
+!export(disable_all)
 
 on reload {
     set_wheel_item_name("root", WheelItemPosition::LeftTop, "Bonus Toggles")
@@ -28,11 +36,9 @@ on reload {
 on respawn update_bonus_wheel()
 
 fun update_bonus_wheel() {
-    set_boolean("any_collected", false)
     any_collected()
     if get_boolean("any_collected") set_wheel_item_description("root", WheelItemPosition::LeftTop, "[Ability1]Toggle all\n[Ability2]Open menu")
     if get_boolean("any_collected") == false set_wheel_item_description("root", WheelItemPosition::LeftTop, "No Bonus Upgrades collected")
-    set_boolean("any_enabled", false)
     any_enabled()
     if get_boolean("any_enabled") set_wheel_item_icon("root", WheelItemPosition::LeftTop, on_icon)
     if get_boolean("any_enabled") == false {
@@ -44,7 +50,6 @@ fun update_bonus_wheel() {
 !export(update_bonus_wheel)
 
 fun toggle_all() {
-    set_boolean("any_enabled", false)
     any_enabled()
     if get_boolean("any_enabled") disable_all()
     if get_boolean("any_enabled") == false enable_all()

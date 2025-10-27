@@ -11,14 +11,14 @@ use wotw_seedgen_assets::{
 };
 use wotw_seedgen_seed_language::{
     ast::{
-        Action, ActionCondition, AddArgs, Annotation, ChangeItemPoolArgs, ClientEvent, Command,
-        CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType, Constant, Content,
-        CountInZoneArgs, CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
-        FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-        ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, OnEventArgs, Operation,
-        PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-        RemoveArgs, RemoveLocationArgs, Result, SeparatedNonEmpty, SetConfigArgs, Snippet, Span,
-        SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+        Action, ActionCondition, AddArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
+        ClientEvent, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
+        Constant, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression, ExpressionValue,
+        FunctionCall, FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
+        ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Operation, PreplaceArgs,
+        RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, RemoveArgs,
+        RemoveLocationArgs, Result, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
+        StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
         UberIdentifierNumeric, UberStateType, ZoneOfArgs,
     },
     compile::FunctionIdentifier,
@@ -792,8 +792,7 @@ impl CompletionAfterSpanCheck for Command<'_> {
         match self {
             Command::Include(_, _) => None, // TODO completions for files available in the workspace and identifiers contained in imported snippets
             Command::BundleIcon(_, _) | Command::BuiltinIcon(_, _) => None, // TODO identifier and icon path completions
-            Command::Event(_, _) => None,
-            Command::OnEvent(_, args) => args.completion(index),
+            Command::AugmentFun(_, args) => args.completion(index),
             Command::Export(_, _) => None, // TODO identifier completions
             Command::Spawn(_, args) => args.completion(index),
             Command::Tags(_, args) => args.completion(index),
@@ -832,13 +831,13 @@ impl ErrCompletion for Command<'_> {
     }
 }
 
-impl CompletionAfterSpanCheck for OnEventArgs<'_> {
+impl CompletionAfterSpanCheck for AugmentFunArgs<'_> {
     fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
         self.action.completion(index)
     }
 }
 
-impl ErrCompletion for OnEventArgs<'_> {
+impl ErrCompletion for AugmentFunArgs<'_> {
     fn err_completion(_err: &Error) -> Vec<CompletionItem> {
         vec![]
     }

@@ -19,10 +19,10 @@ Twillen tells the zones holding Bow and Bash")
 !zone_of(bash_zone, skill(Skill::Bash))
 !zone_of(bow_zone, skill(Skill::Bow))
 
-!include("progress_helper")
+!include("progress_helper", write_progress_message, write_map_progress_message)
 
-!on_event("progress_helper", write_progress_message, write_hints())
-!on_event("progress_helper", write_map_progress_message, write_hints())
+!augment_fun(write_progress_message, write_hints())
+!augment_fun(write_map_progress_message, write_hints())
 
 fun write_hints() {
     if LupoShop.ShardMapIcon {

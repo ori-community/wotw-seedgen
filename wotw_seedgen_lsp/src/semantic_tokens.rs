@@ -2,16 +2,16 @@ use std::{mem, ops::Range};
 use tower_lsp::lsp_types::{SemanticToken, SemanticTokenType, SemanticTokensLegend};
 use wotw_seedgen_seed_language::{
     ast::{
-        Action, ActionCondition, AddArgs, Annotation, BuiltinIconArgs, BundleIconArgs,
-        ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
-        Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event, EventArgs, ExportArgs,
-        Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, ItemDataArgs,
-        ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
-        LetArgs, Literal, OnEventArgs, Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs,
-        RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable,
-        RemoveArgs, RemoveLocationArgs, Result, Separated, SeparatedNonEmpty, SetConfigArgs,
-        SetLogicStateArgs, Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs,
-        Trigger, TriggerBinding, UberIdentifier, UberStateType, ZoneOfArgs,
+        Action, ActionCondition, AddArgs, Annotation, AugmentFunArgs, BuiltinIconArgs,
+        BundleIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat,
+        ConfigArgs, ConfigType, Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event,
+        ExportArgs, Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs,
+        ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataNameArgs,
+        ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Once, Operation, PreplaceArgs, Punctuated,
+        RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
+        Recoverable, RemoveArgs, RemoveLocationArgs, Result, Separated, SeparatedNonEmpty,
+        SetConfigArgs, SetLogicStateArgs, Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg,
+        TimerArgs, Trigger, TriggerBinding, UberIdentifier, UberStateType, ZoneOfArgs,
     },
     types::Type,
 };
@@ -345,11 +345,7 @@ impl Tokens for Command<'_> {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
-            Command::Event(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::OnEvent(keyword, args) => {
+            Command::AugmentFun(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
@@ -490,18 +486,9 @@ impl Tokens for BuiltinIconArgs<'_> {
     }
 }
 
-impl Tokens for EventArgs<'_> {
+impl Tokens for AugmentFunArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.0.span, TokenType::Variable);
-    }
-}
-
-impl Tokens for OnEventArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.snippet_name.tokens(builder);
-        if let Some(identifier) = command_arg_value(self.identifier) {
-            builder.push_token(identifier.span(), TokenType::Variable);
-        }
+        builder.push_token(self.identifier.span(), TokenType::Variable);
         self.action.tokens(builder);
     }
 }

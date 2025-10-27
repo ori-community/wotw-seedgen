@@ -7,12 +7,14 @@
 !config(skill_hints, "Lupo reveals the amount of skills in an area", Boolean, true)
 !config(teleporter_hints, "Lupo reveals the amount of teleporters in an area", Boolean, true)
 
-!include("progress_helper")
-!on_event("progress_helper", write_progress_message, {
+!include("progress_helper", write_progress_message, write_map_progress_message)
+
+!augment_fun(write_progress_message, {
     set_integer("zone", fetch(player.currentArea))
     write_hints()
 })
-!on_event("progress_helper", write_map_progress_message, {
+
+!augment_fun(write_map_progress_message, {
     set_integer("zone", fetch(player.currentMapArea))
     write_hints()
 })

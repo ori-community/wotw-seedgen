@@ -227,7 +227,6 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     pub uber_state_data: &'uberstates UberStateData,
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
-    pub events: FxHashMap<String, FxHashMap<String, usize>>,
     pub exported_values: FxHashMap<String, FxHashMap<String, ExportedValue>>,
     pub boolean_ids: IdProvider,
     pub integer_ids: IdProvider,
@@ -260,7 +259,6 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             output: IntermediateOutput::new(debug),
             uber_state_data,
             snippet_access,
-            events: Default::default(),
             exported_values: Default::default(),
             // 1 additional reserved for hardcoded calculations
             boolean_ids: IdProvider::new(PRIVATE_MEMORY),
@@ -393,6 +391,19 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         literal
     }
 
+    pub(crate) fn resolve_function(&mut self, identifier: &Spanned<Identifier>) -> Option<usize> {
+        let function = self.function_indices.get(identifier.data.0);
+
+        if function.is_none() {
+            self.errors.push(Error::custom(
+                "unknown function".to_string(),
+                identifier.span(),
+            ))
+        }
+
+        function.copied()
+    }
+
     pub(crate) fn check_snippet_included(&mut self, snippet_name: &Spanned<&str>) -> bool {
         let included = self.preprocessed.snippet_included(snippet_name.data);
 
@@ -464,9 +475,6 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         let source = self.global.snippet_access.read_snippet(identifier)?;
 
         self.global
-            .events
-            .insert(identifier.to_string(), Default::default());
-        self.global
             .exported_values
             .insert(identifier.to_string(), Default::default());
         let mut errors = vec![];
@@ -519,13 +527,8 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
     }
 
     pub fn finish(self) -> CompileResult {
-        let mut output = self.global.output;
-        if let Some(debug) = &mut output.debug {
-            debug.events = self.global.events;
-        }
-
         CompileResult {
-            output,
+            output: self.global.output,
             errors: self.errors,
         }
     }
