@@ -47,8 +47,10 @@ pub struct Compiler<'snippets, 'uberstates> {
 
 /// How many memory slots to reserve for generated calculations
 // TODO how much is needed
-pub const RESERVED_MEMORY: usize = 10;
+pub const RESERVED_MEMORY: usize = 20;
 /// Memory slot for hardcoded calculations
+// TODO are there off by one errors here? RESERVED_MEMORY seems to exclude its value as index,
+// so maybe the PRIVATE_MEMORY index is supposed to be the value of RESERVED_MEMORY itself.
 pub const PRIVATE_MEMORY: usize = RESERVED_MEMORY + 1;
 
 // TODO set -> store?
@@ -451,10 +453,30 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
     }
 
     pub(crate) fn common_type(&mut self, left: &Expression, right: &Expression) -> Option<Type> {
-        let left_ty = left.infer_type(self)?;
-        let right_ty = right.infer_type(self)?;
+        let left_ty = left.infer_type(self);
+        let right_ty = right.infer_type(self);
+
+        let (left_ty, right_ty) = (left_ty?, right_ty?);
 
         match (left_ty, right_ty) {
+            (Type::UberIdentifier, Type::UberIdentifier) => {
+                let left_ty = left.uber_state_type(self);
+                let right_ty = right.uber_state_type(self);
+
+                let (left_ty, right_ty) = (left_ty?.into(), right_ty?.into());
+
+                match (left_ty, right_ty) {
+                    (Type::Boolean, Type::Boolean) => Some(Type::Boolean),
+                    (Type::Float, _) | (_, Type::Float) => Some(Type::Float),
+                    (Type::Integer, Type::Integer) => Some(Type::Integer),
+                    _ => {
+                        self.errors
+                            .push(operand_error(left_ty, right_ty, left, right));
+
+                        None
+                    }
+                }
+            }
             (left, right) if left == right => Some(left),
             (Type::UberIdentifier, ty @ (Type::Boolean | Type::Float))
             | (ty @ (Type::Boolean | Type::Float), Type::UberIdentifier) => Some(ty),
@@ -463,15 +485,20 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             (Type::Integer, Type::Float) | (Type::Float, Type::Integer) => Some(Type::Float),
             (_, Type::String) | (Type::String, _) => Some(Type::String),
             _ => {
-                self.errors.push(Error::custom(
-                    format!("Cannot perform operation on {left_ty} and {right_ty}"),
-                    left.span_start()..right.span_end(),
-                ));
+                self.errors
+                    .push(operand_error(left_ty, right_ty, left, right));
 
                 None
             }
         }
     }
+}
+
+fn operand_error(left_ty: Type, right_ty: Type, left: &Expression, right: &Expression) -> Error {
+    Error::custom(
+        format!("Cannot perform operation on {left_ty} and {right_ty}"),
+        left.span_start()..right.span_end(),
+    )
 }
 
 impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {

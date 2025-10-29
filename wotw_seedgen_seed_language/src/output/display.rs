@@ -136,7 +136,7 @@ impl Display for CommandString {
             CommandString::Multi { commands, last } => {
                 write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
             }
-            CommandString::Concatenate { left, right } => write!(f, "{left} + {right}"),
+            CommandString::Concatenate { operation } => operation.fmt(f),
             CommandString::GetString { id } => write!(f, "get_string({id})"),
             CommandString::WorldName { index } => write!(f, "world_name({index})"),
             CommandString::FromBoolean { boolean } => write!(f, "to_string({boolean})"),

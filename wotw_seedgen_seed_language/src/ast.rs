@@ -6,6 +6,7 @@ use crate::{
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, VariantArray};
 use wotw_seedgen_parse::parse_ast;
 
@@ -232,6 +233,8 @@ impl<'source> Ast<'source, Tokenizer> for Expression<'source> {
                 .more
                 .iter()
                 .enumerate()
+                // TODO this is important for correct a - b - c precedence, but it increases the memory slots required, maybe investigate why
+                .rev()
                 .min_by_key(|(_, (operator, _))| precedence(operator.data))
                 .map(|(index, _)| index);
 
@@ -267,40 +270,58 @@ pub enum Operator {
     Comparator(Comparator),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Ast)]
+/// Arithmetic Operations performed on numbers
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, Ast)]
+#[repr(u8)]
 pub enum ArithmeticOperator {
+    /// `+`
     #[ast(token = Token::Add)]
-    Add,
+    Add = 0,
+    /// `-`
     #[ast(token = Token::Subtract)]
-    Subtract,
+    Subtract = 1,
+    /// `*`
     #[ast(token = Token::Multiply)]
-    Multiply,
+    Multiply = 2,
+    /// `/`
     #[ast(token = Token::Divide)]
-    Divide,
+    Divide = 3,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Ast)]
+/// Logic Operations performed on booleans
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, Ast)]
+#[repr(u8)]
 pub enum LogicOperator {
+    /// `&&`
     #[ast(token = Token::And)]
-    And,
+    And = 0,
+    /// `||`
     #[ast(token = Token::Or)]
-    Or,
+    Or = 1,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Ast)]
+/// Comparison Operations performed on numbers
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, Ast)]
+#[repr(u8)]
 pub enum Comparator {
+    /// `==`
     #[ast(token = Token::Equal)]
-    Equal,
+    Equal = 0,
+    /// `!=`
     #[ast(token = Token::NotEqual)]
-    NotEqual,
+    NotEqual = 1,
+    /// `<`
     #[ast(token = Token::LessOrEqual)]
-    LessOrEqual,
+    Less = 2,
+    /// `<=`
     #[ast(token = Token::Less)]
-    Less,
+    LessOrEqual = 3,
+    /// `>`
     #[ast(token = Token::GreaterOrEqual)]
-    GreaterOrEqual,
+    Greater = 4,
+    /// `>=`
     #[ast(token = Token::Greater)]
-    Greater,
+    GreaterOrEqual = 5,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

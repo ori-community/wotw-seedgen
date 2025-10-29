@@ -2,8 +2,8 @@ use super::{expression::CompileInto, SnippetCompiler};
 use crate::{
     ast,
     output::{
-        Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone,
-        StringOrPlaceholder, {Constant, Literal},
+        AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
+        CommandZone, Constant, Literal, StringOrPlaceholder,
     },
 };
 use ordered_float::OrderedFloat;
@@ -39,7 +39,7 @@ impl EvaluateFrom for bool {
     type From = CommandBoolean;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant()
+        from.as_constant().copied()
     }
 }
 
@@ -47,7 +47,7 @@ impl EvaluateFrom for i32 {
     type From = CommandInteger;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant()
+        from.as_constant().copied()
     }
 }
 
@@ -55,7 +55,7 @@ impl EvaluateFrom for OrderedFloat<f32> {
     type From = CommandFloat;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant()
+        from.as_constant().copied()
     }
 }
 
@@ -63,7 +63,7 @@ impl EvaluateFrom for String {
     type From = CommandString;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        from.into_constant()
+        from.as_constant().cloned()
     }
 }
 
@@ -82,7 +82,7 @@ impl EvaluateFrom for Zone {
     type From = CommandZone;
 
     fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant()
+        from.as_constant().copied()
     }
 }
 

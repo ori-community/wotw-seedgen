@@ -8,7 +8,8 @@ mod operation;
 mod postprocess;
 
 pub use command::{
-    Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
+    AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
+    CommandZone,
 };
 pub use contained_uber_identifiers::{
     CommonItem, CommonUberStateWrite, CommonWriteCommand, ContainedReads, ContainedWrites,
@@ -18,7 +19,10 @@ pub use event::{ClientEvent, Event, Trigger};
 pub use intermediate::{Constant, ConstantDiscriminants, Literal};
 pub(crate) use item_metadata::ItemMetadataEntry;
 pub use item_metadata::{ItemMetadata, ItemMetadataRef};
-pub use operation::{ArithmeticOperator, Comparator, EqualityComparator, LogicOperator, Operation};
+pub use operation::{
+    ArithmeticOperator, Comparator, Concatenator, EqualityComparator, ExecuteOperator,
+    LogicOperator, Operation,
+};
 pub use postprocess::StringPlaceholderMap;
 
 use rustc_hash::{FxHashMap, FxHashSet};

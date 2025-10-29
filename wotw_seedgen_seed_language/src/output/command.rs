@@ -1,3 +1,5 @@
+use crate::output::operation::Concatenator;
+
 use super::{
     ArithmeticOperator, Comparator, EqualityComparator, Icon, LogicOperator, Operation,
     StringOrPlaceholder,
@@ -24,6 +26,12 @@ pub enum Command {
     Zone(CommandZone),
     /// Commands returning nothing
     Void(CommandVoid),
+}
+
+pub trait AsConstant {
+    type Output;
+
+    fn as_constant(&self) -> Option<&Self::Output>;
 }
 
 /// Command which returns [`bool`]
@@ -76,13 +84,6 @@ pub enum CommandBoolean {
 }
 
 impl CommandBoolean {
-    pub const fn as_constant(&self) -> Option<bool> {
-        match self {
-            Self::Constant { value } => Some(*value),
-            _ => None,
-        }
-    }
-
     pub fn loc_data_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
         Self::condition_with_operator(uber_identifier, value, Comparator::GreaterOrEqual)
     }
@@ -105,6 +106,17 @@ impl CommandBoolean {
                     right: value.into(),
                 }),
             },
+        }
+    }
+}
+
+impl AsConstant for CommandBoolean {
+    type Output = bool;
+
+    fn as_constant(&self) -> Option<&Self::Output> {
+        match self {
+            Self::Constant { value } => Some(value),
+            _ => None,
         }
     }
 }
@@ -138,10 +150,12 @@ pub enum CommandInteger {
     FromFloat { float: Box<CommandFloat> },
 }
 
-impl CommandInteger {
-    pub const fn as_constant(&self) -> Option<i32> {
+impl AsConstant for CommandInteger {
+    type Output = i32;
+
+    fn as_constant(&self) -> Option<&Self::Output> {
         match self {
-            Self::Constant { value } => Some(*value),
+            Self::Constant { value } => Some(value),
             _ => None,
         }
     }
@@ -175,10 +189,12 @@ pub enum CommandFloat {
     FromInteger { integer: Box<CommandInteger> },
 }
 
-impl CommandFloat {
-    pub const fn as_constant(&self) -> Option<OrderedFloat<f32>> {
+impl AsConstant for CommandFloat {
+    type Output = OrderedFloat<f32>;
+
+    fn as_constant(&self) -> Option<&Self::Output> {
         match self {
-            Self::Constant { value } => Some(*value),
+            Self::Constant { value } => Some(value),
             _ => None,
         }
     }
@@ -206,11 +222,9 @@ pub enum CommandString {
         commands: Vec<CommandVoid>,
         last: Box<CommandString>,
     },
-    // TODO using Operation here had the clear advantage of only needing one box
     /// Return a String consisting of `left`, then `right`
     Concatenate {
-        left: Box<CommandString>,
-        right: Box<CommandString>,
+        operation: Box<Operation<CommandString, Concatenator>>,
     },
     /// Get the value stored under `id`
     GetString { id: usize },
@@ -224,17 +238,10 @@ pub enum CommandString {
     FromFloat { float: Box<CommandFloat> },
 }
 
-impl CommandString {
-    pub const fn as_constant(&self) -> Option<&String> {
-        match self {
-            Self::Constant {
-                value: StringOrPlaceholder::Value(value),
-            } => Some(value),
-            _ => None,
-        }
-    }
+impl AsConstant for CommandString {
+    type Output = String;
 
-    pub fn into_constant(self) -> Option<String> {
+    fn as_constant(&self) -> Option<&Self::Output> {
         match self {
             Self::Constant {
                 value: StringOrPlaceholder::Value(value),
@@ -278,10 +285,12 @@ pub enum CommandZone {
     CurrentMapZone {},
 }
 
-impl CommandZone {
-    pub const fn as_constant(&self) -> Option<Zone> {
+impl AsConstant for CommandZone {
+    type Output = Zone;
+
+    fn as_constant(&self) -> Option<&Self::Output> {
         match self {
-            Self::Constant { value } => Some(*value),
+            Self::Constant { value } => Some(value),
             _ => None,
         }
     }

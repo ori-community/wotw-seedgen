@@ -1,3 +1,5 @@
+use crate::output::Concatenator;
+
 use super::{
     ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
     CommandVoid, CommandZone, Comparator, EqualityComparator, Event, IntermediateOutput,
@@ -180,8 +182,11 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
                             command: Box::new(CommandVoid::SetString {
                                 id: 2,
                                 value: CommandString::Concatenate {
-                                    left: Box::new(CommandString::GetString { id: 2 }),
-                                    right: Box::new(": ".into()),
+                                    operation: Box::new(Operation {
+                                        left: CommandString::GetString { id: 2 },
+                                        operator: Concatenator::Concat,
+                                        right: ": ".into(),
+                                    }),
                                 },
                             }),
                         },
@@ -196,18 +201,22 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
                             command: Box::new(CommandVoid::SetString {
                                 id: 2,
                                 value: CommandString::Concatenate {
-                                    left: Box::new(CommandString::GetString { id: 2 }),
-                                    right: Box::new(", ".into()),
+                                    operation: Box::new(Operation {
+                                        left: CommandString::GetString { id: 2 },
+                                        operator: Concatenator::Concat,
+                                        right: ", ".into(),
+                                    }),
                                 },
                             }),
                         },
                         CommandVoid::SetString {
                             id: 2,
                             value: CommandString::Concatenate {
-                                left: Box::new(CommandString::GetString { id: 2 }),
-                                right: Box::new(
-                                    self.item_metadata.get(&event.command).force_name(), // TODO could this have placeholders again?
-                                ),
+                                operation: Box::new(Operation {
+                                    left: CommandString::GetString { id: 2 },
+                                    operator: Concatenator::Concat,
+                                    right: self.item_metadata.get(&event.command).force_name(), // TODO could this have placeholders again?
+                                }),
                             },
                         },
                     ],
@@ -234,18 +243,30 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
             ])
             .collect(),
             last: Box::new(CommandString::Concatenate {
-                left: Box::new(CommandString::GetString { id: 3 }),
-                right: Box::new(CommandString::Concatenate {
-                    left: Box::new(CommandString::FromInteger {
-                        integer: Box::new(CommandInteger::GetInteger { id: 2 }),
-                    }),
-                    right: Box::new(CommandString::Concatenate {
-                        left: Box::new(format!("/{}", matches.len()).into()),
-                        right: Box::new(CommandString::Concatenate {
-                            left: Box::new(CommandString::GetString { id: 3 }),
-                            right: Box::new(CommandString::GetString { id: 2 }),
+                operation: Box::new(Operation {
+                    left: CommandString::GetString { id: 3 },
+                    operator: Concatenator::Concat,
+                    right: CommandString::Concatenate {
+                        operation: Box::new(Operation {
+                            left: CommandString::FromInteger {
+                                integer: Box::new(CommandInteger::GetInteger { id: 2 }),
+                            },
+                            operator: Concatenator::Concat,
+                            right: CommandString::Concatenate {
+                                operation: Box::new(Operation {
+                                    left: format!("/{}", matches.len()).into(),
+                                    operator: Concatenator::Concat,
+                                    right: CommandString::Concatenate {
+                                        operation: Box::new(Operation {
+                                            left: CommandString::GetString { id: 3 },
+                                            operator: Concatenator::Concat,
+                                            right: CommandString::GetString { id: 2 },
+                                        }),
+                                    },
+                                }),
+                            },
                         }),
-                    }),
+                    },
                 }),
             }),
         }
@@ -394,9 +415,8 @@ impl ResolvePlaceholders for CommandString {
                 commands.resolve(context);
                 last.resolve(context);
             }
-            Self::Concatenate { left, right } => {
-                left.resolve(context);
-                right.resolve(context);
+            Self::Concatenate { operation } => {
+                operation.resolve(context);
             }
             Self::FromBoolean { boolean } => boolean.resolve(context),
             Self::FromInteger { integer } => integer.resolve(context),

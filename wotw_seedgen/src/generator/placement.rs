@@ -26,7 +26,8 @@ use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
     compile,
     output::{
-        ClientEvent, CommandBoolean, CommandString, CommandVoid, ContainedWrites, Event, IntermediateOutput, Trigger
+        AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid, Concatenator,
+        ContainedWrites, Event, IntermediateOutput, Operation, Trigger,
     },
 };
 use wotw_seedgen_settings::UniverseSettings;
@@ -597,16 +598,22 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             let right = match name.as_constant() {
                 Some(value) => format!("'s {value}").into(),
                 _ => CommandString::Concatenate {
-                    left: Box::new("'s".into()),
-                    right: Box::new(name),
+                    operation: Box::new(Operation {
+                        left: "'s".into(),
+                        operator: Concatenator::Concat,
+                        right: name,
+                    }),
                 },
             };
 
             CommandString::Concatenate {
-                left: Box::new(CommandString::WorldName {
-                    index: target_world_index,
+                operation: Box::new(Operation {
+                    left: CommandString::WorldName {
+                        index: target_world_index,
+                    },
+                    operator: Concatenator::Concat,
+                    right: right,
                 }),
-                right: Box::new(right),
             }
         }
     }
@@ -743,7 +750,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
                     let string_placeholder_map = world_context.output.postprocess(loc_data, rng);
 
-                    Seed::new(world_context.output, string_placeholder_map, debug).with_seedgen_info(seedgen_info)
+                    Seed::new(world_context.output, string_placeholder_map, debug)
+                        .with_seedgen_info(seedgen_info)
                 })
                 .collect(),
             spoiler: self.spoiler,
@@ -1408,7 +1416,7 @@ fn total_reach_check<'graph>(
         .filter(|node| {
             node.can_place() && {
                 let condition = CommandBoolean::loc_data_condition(node.uber_identifier().unwrap(), node.value());
-                
+
                 if output.removed_locations.contains(&condition) {
                     trace!("Manually removed {node} from placement locations", node = node.identifier());
                     return false;

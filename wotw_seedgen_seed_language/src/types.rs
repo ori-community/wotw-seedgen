@@ -395,6 +395,19 @@ impl output::Constant {
     }
 }
 
+impl output::Command {
+    pub(crate) fn command_type(&self) -> Type {
+        match self {
+            Self::Boolean(_) => Type::Boolean,
+            Self::Integer(_) => Type::Integer,
+            Self::Float(_) => Type::Float,
+            Self::String(_) => Type::String,
+            Self::Zone(_) => Type::Zone,
+            Self::Void(_) => Type::Void,
+        }
+    }
+}
+
 impl InferType for Operation<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         match self.operator.data {

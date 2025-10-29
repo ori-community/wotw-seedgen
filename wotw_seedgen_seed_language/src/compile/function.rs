@@ -2,8 +2,9 @@ use super::{expression::CompileInto, Compile, SnippetCompiler, PRIVATE_MEMORY};
 use crate::{
     ast::{self, UberStateType},
     output::{
-        ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-        CommandVoid, CommandZone, Comparator, EqualityComparator, Operation,
+        ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
+        CommandString, CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator,
+        Operation,
     },
 };
 use arrayvec::ArrayVec;
@@ -150,8 +151,8 @@ fn boxed_arg<T: CompileInto>(context: &mut ArgContext) -> Option<Box<T>> {
 fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usize>)> {
     let (arg, span) = spanned_arg::<CommandString>(context)?;
 
-    match arg.into_constant() {
-        Some(value) => Some((value, span)),
+    match arg.as_constant() {
+        Some(value) => Some((value.clone(), span)),
         _ => {
             context.compiler.errors.push(Error::custom(
                 "Only literals are allowed in this position".to_string(),
@@ -638,7 +639,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 let integer = arg::<CommandInteger>(&mut context)?;
 
                 let command = match integer.as_constant() {
-                    Some(value) => (value as f32).into(),
+                    Some(value) => (*value as f32).into(),
                     _ => CommandFloat::FromInteger {
                         integer: Box::new(integer),
                     },
@@ -1339,35 +1340,53 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
         ],
         last: Box::new(if remove {
             CommandString::Concatenate {
-                left: Box::new(match amount.as_constant() {
-                    Some(value) => format!("@Remove {value} ").into(),
-                    None => CommandString::Concatenate {
-                        left: Box::new("@Remove ".into()),
-                        right: Box::new(CommandString::Concatenate {
-                            left: Box::new(CommandString::FromInteger {
-                                integer: Box::new(amount),
+                operation: Box::new(Operation {
+                    left: match amount.as_constant() {
+                        Some(value) => format!("@Remove {value} ").into(),
+                        None => CommandString::Concatenate {
+                            operation: Box::new(Operation {
+                                left: "@Remove ".into(),
+                                operator: Concatenator::Concat,
+                                right: CommandString::Concatenate {
+                                    operation: Box::new(Operation {
+                                        left: CommandString::FromInteger {
+                                            integer: Box::new(amount),
+                                        },
+                                        operator: Concatenator::Concat,
+                                        right: " ".into(),
+                                    }),
+                                },
                             }),
-                            right: Box::new(" ".into()),
+                        },
+                    },
+                    operator: Concatenator::Concat,
+                    right: CommandString::Concatenate {
+                        operation: Box::new(Operation {
+                            left: CommandString::GetString { id: PRIVATE_MEMORY },
+                            operator: Concatenator::Concat,
+                            right: "@".into(),
                         }),
                     },
-                }),
-                right: Box::new(CommandString::Concatenate {
-                    left: Box::new(CommandString::GetString { id: PRIVATE_MEMORY }),
-                    right: Box::new("@".into()),
                 }),
             }
         } else {
             CommandString::Concatenate {
-                left: Box::new(match amount.as_constant() {
-                    Some(value) => format!("{value} ").into(),
-                    None => CommandString::Concatenate {
-                        left: Box::new(CommandString::FromInteger {
-                            integer: Box::new(amount),
-                        }),
-                        right: Box::new(" ".into()),
+                operation: Box::new(Operation {
+                    left: match amount.as_constant() {
+                        Some(value) => format!("{value} ").into(),
+                        None => CommandString::Concatenate {
+                            operation: Box::new(Operation {
+                                left: CommandString::FromInteger {
+                                    integer: Box::new(amount),
+                                },
+                                operator: Concatenator::Concat,
+                                right: " ".into(),
+                            }),
+                        },
                     },
+                    operator: Concatenator::Concat,
+                    right: CommandString::GetString { id: PRIVATE_MEMORY },
                 }),
-                right: Box::new(CommandString::GetString { id: PRIVATE_MEMORY }),
             }
         }),
     }

@@ -99,7 +99,7 @@ impl ContainedReads for CommandString {
     fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
         match self {
             CommandString::Multi { commands, last } => chain(commands, last),
-            CommandString::Concatenate { left, right } => chain(left, right),
+            CommandString::Concatenate { operation } => nested(operation),
             CommandString::FromBoolean { boolean } => nested(boolean),
             CommandString::FromInteger { integer } => nested(integer),
             CommandString::FromFloat { float } => nested(float),

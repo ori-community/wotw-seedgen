@@ -148,9 +148,9 @@ impl Compile for input::CommandString {
         match self {
             Self::Constant { value } => value.compile(context),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
-            Self::Concatenate { left, right } => Args::new(context)
-                .string(0, *left)
-                .string(1, *right)
+            Self::Concatenate { operation } => Args::new(context)
+                .string(0, operation.left)
+                .string(1, operation.right)
                 .call(Command::Concatenate),
             Self::GetString { id } => (vec![Command::CopyString(id, 0)], MemoryUsed::ZERO),
             Self::WorldName { index } => (vec![Command::WorldName(index)], MemoryUsed::ZERO),

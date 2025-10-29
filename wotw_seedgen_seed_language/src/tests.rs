@@ -3,8 +3,8 @@ use crate::{
         Expression, ExpressionValue, FunctionCall, Literal, UberIdentifier, UberIdentifierName,
         UberIdentifierNumeric,
     },
-    compile::Compiler,
-    output::IntermediateOutput,
+    compile::{Compiler, PRIVATE_MEMORY},
+    output::{CommandInteger, CommandVoid, IntermediateOutput},
     token::TOKENIZER,
 };
 use lazy_static::lazy_static;
@@ -134,8 +134,8 @@ fn function_call() {
     assert_eq!(function_call, Ok(expected));
 }
 
-struct ExampleFileAccess(&'static str);
-impl SnippetAccess for ExampleFileAccess {
+struct ExampleFileAccess<'a>(&'a str);
+impl SnippetAccess for ExampleFileAccess<'_> {
     fn read_snippet(&self, _identifier: &str) -> Result<Source, String> {
         Ok(Source {
             id: String::new(),
@@ -203,17 +203,43 @@ fn test_compiler_with_config<'snippets, F: SnippetAccess>(
     )
 }
 
-fn test_str(source: &'static str) {
+fn test_str(source: &str) -> IntermediateOutput {
     let snippet_access = ExampleFileAccess(source);
     let mut compiler = test_compiler(&snippet_access);
+
     compiler.compile_snippet("").unwrap();
-    let (_, success) = compiler.finish().eprint_errors();
+
+    let (output, success) = compiler.finish().eprint_errors();
     assert!(success);
+
+    output
 }
 
 #[test]
 fn coersions() {
+    test_str("on spawn store(player.spiritLight, player.spiritLight + player.spiritLight)");
     test_str("!state(float, Float)  on float > 5 {}");
+    test_str("on spawn item_message(player.spiritLight - 1)");
+    test_str("on spawn item_message((player.spiritLight - player.gorlekOre) + \"SL/Ore\")");
+}
+
+#[test]
+fn operator_precedence() {
+    fn test_precedence(term: &str, value: i32) {
+        let output = test_str(&format!("on spawn set_integer(\"oriLurk\", {term})"));
+        assert_eq!(
+            output.events[0].command,
+            CommandVoid::SetInteger {
+                id: PRIVATE_MEMORY,
+                value: CommandInteger::Constant { value }
+            }
+        );
+    }
+
+    test_precedence("3 - 2 - 1", 0);
+    test_precedence("4 / 2 / 2", 1);
+    test_precedence("4 / 2 + 2", 4);
+    test_precedence("4 / (2 + 2)", 1);
 }
 
 #[test]

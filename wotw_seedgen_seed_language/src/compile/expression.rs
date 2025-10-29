@@ -1,12 +1,13 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
-    ast::{self, Operator, UberStateType},
+    ast::{self, UberStateType},
     output::{
-        ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-        CommandVoid, CommandZone, Comparator, EqualityComparator, LogicOperator, Operation,
-        StringOrPlaceholder, {Constant, Literal},
+        ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
+        CommandString, CommandVoid, CommandZone, Comparator, Concatenator, Constant,
+        EqualityComparator, ExecuteOperator, Literal, LogicOperator, Operation,
+        StringOrPlaceholder,
     },
-    types::{InferType, Type},
+    types::Type,
 };
 use ordered_float::OrderedFloat;
 use std::{borrow::Cow, ops::Range};
@@ -40,7 +41,7 @@ impl<'source> ast::Expression<'source> {
     ) -> Option<T> {
         match self {
             ast::Expression::Value(value) => value.compile_into(compiler),
-            ast::Expression::Operation(operation) => T::compile_operation(*operation, compiler),
+            ast::Expression::Operation(operation) => T::compile_command(*operation, compiler),
         }
     }
 }
@@ -60,6 +61,127 @@ impl<'source> ast::ExpressionValue<'source> {
                 .resolve(&identifier)
                 .cloned()
                 .and_then(|literal| T::coerce_literal(literal, identifier.span, compiler)),
+        }
+    }
+}
+
+impl<'source> Compile<'source> for ast::Operation<'source> {
+    type Output = Option<Command>;
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        match self.operator.data {
+            ast::Operator::Arithmetic(operator) => {
+                let operator = operator.compile(compiler);
+                let target = compiler.common_type(&self.left, &self.right)?;
+
+                let command = match target {
+                    Type::Integer => self
+                        .compile_operation(operator, compiler)
+                        .map(Command::Integer),
+                    Type::Float => self
+                        .compile_operation(operator, compiler)
+                        .map(Command::Float),
+                    Type::String => match Concatenator::try_from(operator) {
+                        Ok(operator) => self
+                            .compile_operation(operator, compiler)
+                            .map(Command::String),
+                        Err(()) => {
+                            compiler.errors.push(operation_error(target, self.span()));
+                            None
+                        }
+                    },
+                    _ => {
+                        compiler.errors.push(operation_error(target, self.span()));
+                        None
+                    }
+                };
+
+                command
+            }
+            ast::Operator::Logic(operator) => {
+                let operator = operator.compile(compiler);
+
+                self.compile_operation(operator, compiler)
+                    .map(Command::Boolean)
+            }
+            ast::Operator::Comparator(operator) => {
+                let operator = operator.compile(compiler);
+                let target = compiler.common_type(&self.left, &self.right)?;
+
+                let command = match target {
+                    Type::Boolean => match EqualityComparator::try_from(operator) {
+                        Ok(operator) => self
+                            .compile_operation::<CommandBoolean, _, _>(operator, compiler)
+                            .map(Command::Boolean),
+                        Err(()) => {
+                            compiler.errors.push(operation_error(target, self.span()));
+                            None
+                        }
+                    },
+                    Type::Integer => self
+                        .compile_operation::<CommandInteger, _, _>(operator, compiler)
+                        .map(Command::Boolean),
+                    Type::Float => self
+                        .compile_operation::<CommandFloat, _, _>(operator, compiler)
+                        .map(Command::Boolean),
+                    Type::String => match operator.try_into() {
+                        Ok(operator) => self
+                            .compile_operation::<CommandString, _, _>(operator, compiler)
+                            .map(Command::Boolean),
+                        Err(()) => {
+                            compiler.errors.push(operation_error(target, self.span()));
+                            None
+                        }
+                    },
+                    Type::Zone => match operator.try_into() {
+                        Ok(operator) => self
+                            .compile_operation::<CommandZone, _, _>(operator, compiler)
+                            .map(Command::Boolean),
+                        Err(()) => {
+                            compiler.errors.push(operation_error(target, self.span()));
+                            None
+                        }
+                    },
+                    _ => {
+                        compiler.errors.push(operation_error(target, self.span()));
+                        None
+                    }
+                };
+
+                command
+            }
+        }
+    }
+}
+
+impl<'source> ast::Operation<'source> {
+    fn compile_operation<Item, Operator, Output>(
+        self,
+        operator: Operator,
+        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+    ) -> Option<Output>
+    where
+        Item: CompileInto + AsConstant,
+        Item::Output: Clone,
+        Operator: ExecuteOperator<Item::Output>,
+        Operator::Output: Into<Output>,
+        Operation<Item, Operator>: Into<Output>,
+    {
+        let left = self.left.compile_into::<Item>(compiler);
+        let right = self.right.compile_into::<Item>(compiler);
+
+        let (left, right) = (left?, right?);
+
+        match (left.as_constant(), right.as_constant()) {
+            (Some(left), Some(right)) => Some(operator.execute(left.clone(), right.clone()).into()),
+            _ => Some(
+                Operation {
+                    left,
+                    operator,
+                    right,
+                }
+                .into(),
+            ),
         }
     }
 }
@@ -104,6 +226,8 @@ impl<'source> Compile<'source> for ast::Comparator {
 }
 
 pub(crate) trait CompileInto: Sized {
+    fn coerce_command(command: Command) -> Result<Self, String>;
+
     // TODO seems like this should be generic over span providers to avoid eagerly generating spans?
     fn coerce_literal(
         literal: Literal,
@@ -114,12 +238,24 @@ pub(crate) trait CompileInto: Sized {
     fn compile_action<'source>(
         action: ast::Action<'source>,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self>;
+    ) -> Option<Self> {
+        Self::compile_command(action, compiler)
+    }
 
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
+    fn compile_command<'source, T>(
+        ast: T,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self>;
+    ) -> Option<Self>
+    where
+        T: Compile<'source, Output = Option<Command>> + Span,
+    {
+        let span = ast.span();
+        let command = ast.compile(compiler)?;
+
+        Self::coerce_command(command)
+            .map_err(|message| compiler.errors.push(Error::custom(message, span)))
+            .ok()
+    }
 
     fn compile_literal<'source>(
         literal: Spanned<ast::Literal<'source>>,
@@ -130,6 +266,13 @@ pub(crate) trait CompileInto: Sized {
 }
 
 impl CompileInto for CommandBoolean {
+    fn coerce_command(command: Command) -> Result<Self, String> {
+        match command {
+            Command::Boolean(command) => Ok(command),
+            other => Err(type_error_message(other.command_type(), Type::Boolean)),
+        }
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -152,214 +295,16 @@ impl CompileInto for CommandBoolean {
 
         compiler.consume_result(result)
     }
-
-    // TODO a lot of compile_action implementations are really similar
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let result = match action {
-            ast::Action::Function(function) => {
-                let span = function.span();
-                match function.compile(compiler)? {
-                    Command::Boolean(function) => Ok(function),
-                    _ => Err(return_type_error(Type::Boolean, span)),
-                }
-            }
-            _ => Err(return_type_error(Type::Boolean, action.span())),
-        };
-
-        compiler.consume_result(result)
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        match operation.operator.data {
-            Operator::Logic(operator) => {
-                let left = operation.left.compile_into(compiler);
-                let operator = operator.compile(compiler);
-                let right = operation.right.compile_into(compiler);
-
-                let left: CommandBoolean = left?;
-                let right: CommandBoolean = right?;
-
-                Some(match (left.as_constant(), right.as_constant()) {
-                    (Some(left), Some(right)) => match operator {
-                        LogicOperator::And => (left && right).into(),
-                        LogicOperator::Or => (left || right).into(),
-                    },
-                    _ => CommandBoolean::LogicOperation {
-                        operation: Box::new(Operation {
-                            left,
-                            operator,
-                            right,
-                        }),
-                    },
-                })
-            }
-            Operator::Comparator(operator) => {
-                let operator = operator.compile(compiler);
-
-                let target = compiler.common_type(&operation.left, &operation.right)?;
-
-                let expression = match target {
-                    // TODO you may want to compare a lot more than these, especially at compile time, comparing config values or such
-                    Type::Boolean | Type::String | Type::Zone => {
-                        let operator = match operator {
-                            Comparator::Equal => EqualityComparator::Equal,
-                            Comparator::NotEqual => EqualityComparator::NotEqual,
-                            other => {
-                                compiler.errors.push(Error::custom(
-                                    format!("Cannot use `{other}` on {target}"),
-                                    operation.span(),
-                                ));
-                                return None;
-                            }
-                        };
-                        match target {
-                            // TODO code repetition much
-                            Type::Boolean => {
-                                let left = operation.left.compile_into(compiler);
-                                let right = operation.right.compile_into(compiler);
-
-                                let left: CommandBoolean = left?;
-                                let right: CommandBoolean = right?;
-
-                                match (left.as_constant(), right.as_constant()) {
-                                    (Some(left), Some(right)) => match operator {
-                                        EqualityComparator::Equal => (left == right).into(),
-                                        EqualityComparator::NotEqual => (left != right).into(),
-                                    },
-                                    _ => CommandBoolean::CompareBoolean {
-                                        operation: Box::new(Operation {
-                                            left,
-                                            operator,
-                                            right,
-                                        }),
-                                    },
-                                }
-                            }
-                            Type::String => {
-                                let left = operation.left.compile_into(compiler);
-                                let right = operation.right.compile_into(compiler);
-
-                                let left: CommandString = left?;
-                                let right: CommandString = right?;
-
-                                match (left.as_constant(), right.as_constant()) {
-                                    (Some(left), Some(right)) => match operator {
-                                        EqualityComparator::Equal => (left == right).into(),
-                                        EqualityComparator::NotEqual => (left != right).into(),
-                                    },
-                                    _ => CommandBoolean::CompareString {
-                                        operation: Box::new(Operation {
-                                            left,
-                                            operator,
-                                            right,
-                                        }),
-                                    },
-                                }
-                            }
-                            Type::Zone => {
-                                let left = operation.left.compile_into(compiler);
-                                let right = operation.right.compile_into(compiler);
-
-                                let left: CommandZone = left?;
-                                let right: CommandZone = right?;
-
-                                match (left.as_constant(), right.as_constant()) {
-                                    (Some(left), Some(right)) => match operator {
-                                        EqualityComparator::Equal => (left == right).into(),
-                                        EqualityComparator::NotEqual => (left != right).into(),
-                                    },
-                                    _ => CommandBoolean::CompareZone {
-                                        operation: Box::new(Operation {
-                                            left,
-                                            operator,
-                                            right,
-                                        }),
-                                    },
-                                }
-                            }
-                            _ => unreachable!(),
-                        }
-                    }
-                    Type::Integer => {
-                        let left = operation.left.compile_into(compiler);
-                        let right = operation.right.compile_into(compiler);
-
-                        let left: CommandInteger = left?;
-                        let right: CommandInteger = right?;
-
-                        match (left.as_constant(), right.as_constant()) {
-                            (Some(left), Some(right)) => match operator {
-                                Comparator::Equal => (left == right).into(),
-                                Comparator::NotEqual => (left != right).into(),
-                                Comparator::Less => (left < right).into(),
-                                Comparator::LessOrEqual => (left <= right).into(),
-                                Comparator::Greater => (left > right).into(),
-                                Comparator::GreaterOrEqual => (left >= right).into(),
-                            },
-                            _ => CommandBoolean::CompareInteger {
-                                operation: Box::new(Operation {
-                                    left,
-                                    operator,
-                                    right,
-                                }),
-                            },
-                        }
-                    }
-                    Type::Float => {
-                        let left = operation.left.compile_into(compiler);
-                        let right = operation.right.compile_into(compiler);
-
-                        let left: CommandFloat = left?;
-                        let right: CommandFloat = right?;
-
-                        match (left.as_constant(), right.as_constant()) {
-                            (Some(left), Some(right)) => match operator {
-                                Comparator::Equal => (left == right).into(),
-                                Comparator::NotEqual => (left != right).into(),
-                                Comparator::Less => (left < right).into(),
-                                Comparator::LessOrEqual => (left <= right).into(),
-                                Comparator::Greater => (left > right).into(),
-                                Comparator::GreaterOrEqual => (left >= right).into(),
-                            },
-                            _ => CommandBoolean::CompareFloat {
-                                operation: Box::new(Operation {
-                                    left,
-                                    operator,
-                                    right,
-                                }),
-                            },
-                        }
-                    }
-                    other => {
-                        compiler.errors.push(Error::custom(
-                            format!("Cannot compare {other} values"),
-                            operation.span(),
-                        ));
-
-                        return None;
-                    }
-                };
-                Some(expression)
-            }
-            _ => {
-                let found = operation.infer_type(compiler)?;
-                compiler
-                    .errors
-                    .push(type_error(found, Type::Boolean, operation.span()));
-
-                None
-            }
-        }
-    }
 }
 
 impl CompileInto for CommandInteger {
+    fn coerce_command(command: Command) -> Result<Self, String> {
+        match command {
+            Command::Integer(command) => Ok(command),
+            other => Err(type_error_message(other.command_type(), Type::Integer)),
+        }
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -392,68 +337,22 @@ impl CompileInto for CommandInteger {
 
         compiler.consume_result(result)
     }
-
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let result = match action {
-            ast::Action::Function(function) => {
-                let span = function.span();
-                match function.compile(compiler)? {
-                    Command::Integer(function) => Ok(function),
-                    _ => Err(return_type_error(Type::Integer, span)),
-                }
-            }
-            _ => Err(return_type_error(Type::Integer, action.span())),
-        };
-
-        compiler.consume_result(result)
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        match operation.operator.data {
-            Operator::Arithmetic(operator) => {
-                let left = operation.left.compile_into(compiler);
-                let operator = operator.compile(compiler);
-                let right = operation.right.compile_into(compiler);
-
-                let left: CommandInteger = left?;
-                let right: CommandInteger = right?;
-
-                let command = match (left.as_constant(), right.as_constant()) {
-                    (Some(left), Some(right)) => match operator {
-                        ArithmeticOperator::Add => (left + right).into(),
-                        ArithmeticOperator::Subtract => (left - right).into(),
-                        ArithmeticOperator::Multiply => (left * right).into(),
-                        ArithmeticOperator::Divide => (left / right).into(),
-                    },
-                    _ => CommandInteger::Arithmetic {
-                        operation: Box::new(Operation {
-                            left,
-                            operator,
-                            right,
-                        }),
-                    },
-                };
-                Some(command)
-            }
-            _ => {
-                let found = operation.infer_type(compiler)?;
-                compiler
-                    .errors
-                    .push(type_error(found, Type::Integer, operation.span()));
-
-                None
-            }
-        }
-    }
 }
 
 impl CompileInto for CommandFloat {
+    fn coerce_command(command: Command) -> Result<Self, String> {
+        match command {
+            Command::Integer(command) => match command.as_constant() {
+                Some(value) => Ok((*value as f32).into()),
+                None => Ok(CommandFloat::FromInteger {
+                    integer: Box::new(command),
+                }),
+            },
+            Command::Float(command) => Ok(command),
+            other => Err(type_error_message(other.command_type(), Type::Float)),
+        }
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -488,68 +387,34 @@ impl CompileInto for CommandFloat {
 
         compiler.consume_result(result)
     }
-
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let result = match action {
-            ast::Action::Function(function) => {
-                let span = function.span();
-                match function.compile(compiler)? {
-                    Command::Float(function) => Ok(function),
-                    _ => Err(return_type_error(Type::Float, span)),
-                }
-            }
-            _ => Err(return_type_error(Type::Float, action.span())),
-        };
-
-        compiler.consume_result(result)
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        match operation.operator.data {
-            Operator::Arithmetic(operator) => {
-                let left = operation.left.compile_into(compiler);
-                let operator = operator.compile(compiler);
-                let right = operation.right.compile_into(compiler);
-
-                let left: CommandFloat = left?;
-                let right: CommandFloat = right?;
-
-                let command = match (left.as_constant(), right.as_constant()) {
-                    (Some(left), Some(right)) => match operator {
-                        ArithmeticOperator::Add => (left + right).into(),
-                        ArithmeticOperator::Subtract => (left - right).into(),
-                        ArithmeticOperator::Multiply => (left * right).into(),
-                        ArithmeticOperator::Divide => (left / right).into(),
-                    },
-                    _ => CommandFloat::Arithmetic {
-                        operation: Box::new(Operation {
-                            left,
-                            operator,
-                            right,
-                        }),
-                    },
-                };
-                Some(command)
-            }
-            _ => {
-                let found = operation.infer_type(compiler)?;
-                compiler
-                    .errors
-                    .push(type_error(found, Type::Float, operation.span()));
-
-                None
-            }
-        }
-    }
 }
 
 impl CompileInto for CommandString {
+    fn coerce_command(command: Command) -> Result<Self, String> {
+        match command {
+            Command::Boolean(command) => match command.as_constant() {
+                Some(value) => Ok(value.to_string().into()),
+                None => Ok(CommandString::FromBoolean {
+                    boolean: Box::new(command),
+                }),
+            },
+            Command::Integer(command) => match command.as_constant() {
+                Some(value) => Ok(value.to_string().into()),
+                None => Ok(CommandString::FromInteger {
+                    integer: Box::new(command),
+                }),
+            },
+            Command::Float(command) => match command.as_constant() {
+                Some(value) => Ok(value.to_string().into()),
+                None => Ok(CommandString::FromFloat {
+                    float: Box::new(command),
+                }),
+            },
+            Command::String(command) => Ok(command),
+            other => Err(type_error_message(other.command_type(), Type::String)),
+        }
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -584,78 +449,16 @@ impl CompileInto for CommandString {
 
         compiler.consume_result(result)
     }
-
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let result = match action {
-            ast::Action::Function(function) => {
-                let span = function.span();
-                match function.compile(compiler)? {
-                    Command::Boolean(command) => match command.as_constant() {
-                        Some(value) => Ok(value.to_string().into()),
-                        None => Ok(CommandString::FromBoolean {
-                            boolean: Box::new(command),
-                        }),
-                    },
-                    Command::Integer(command) => match command.as_constant() {
-                        Some(value) => Ok(value.to_string().into()),
-                        None => Ok(CommandString::FromInteger {
-                            integer: Box::new(command),
-                        }),
-                    },
-                    Command::Float(command) => match command.as_constant() {
-                        Some(value) => Ok(value.to_string().into()),
-                        None => Ok(CommandString::FromFloat {
-                            float: Box::new(command),
-                        }),
-                    },
-                    Command::String(command) => Ok(command),
-                    _ => Err(return_type_error(Type::String, span)),
-                }
-            }
-            _ => Err(return_type_error(Type::String, action.span())),
-        };
-
-        compiler.consume_result(result)
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        match operation.operator.data {
-            Operator::Arithmetic(ast::ArithmeticOperator::Add) => {
-                let left = operation.left.compile_into(compiler);
-                let right = operation.right.compile_into(compiler);
-
-                let left: CommandString = left?;
-                let right: CommandString = right?;
-
-                let command = match (left.as_constant(), right.as_constant()) {
-                    (Some(left), Some(right)) => format!("{left}{right}").into(),
-                    _ => CommandString::Concatenate {
-                        left: Box::new(left),
-                        right: Box::new(right),
-                    },
-                };
-
-                Some(command)
-            }
-            _ => {
-                let found = operation.infer_type(compiler)?;
-                compiler
-                    .errors
-                    .push(type_error(found, Type::String, operation.span()));
-
-                None
-            }
-        }
-    }
 }
 
 impl CompileInto for CommandZone {
+    fn coerce_command(command: Command) -> Result<Self, String> {
+        match command {
+            Command::Zone(command) => Ok(command),
+            other => Err(type_error_message(other.command_type(), Type::Zone)),
+        }
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -668,39 +471,13 @@ impl CompileInto for CommandZone {
 
         compiler.consume_result(result)
     }
-
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let result = match action {
-            ast::Action::Function(function) => {
-                let span = function.span();
-                match function.compile(compiler)? {
-                    Command::Zone(function) => Ok(function),
-                    _ => Err(return_type_error(Type::Zone, span)),
-                }
-            }
-            _ => Err(return_type_error(Type::Zone, action.span())),
-        };
-
-        compiler.consume_result(result)
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let found = operation.infer_type(compiler)?;
-        compiler
-            .errors
-            .push(type_error(found, Type::Zone, operation.span()));
-
-        None
-    }
 }
 
 impl CompileInto for Command {
+    fn coerce_command(command: Command) -> Result<Self, String> {
+        Ok(command)
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -736,56 +513,13 @@ impl CompileInto for Command {
 
         Some(command)
     }
-
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        action.compile(compiler)
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        match operation.operator.data {
-            Operator::Arithmetic(_) => {
-                let target = compiler.common_type(&operation.left, &operation.right);
-
-                match target? {
-                    Type::Boolean => {
-                        CommandBoolean::compile_operation(operation, compiler).map(Self::Boolean)
-                    }
-                    Type::Integer => {
-                        CommandInteger::compile_operation(operation, compiler).map(Self::Integer)
-                    }
-                    Type::Float => {
-                        CommandFloat::compile_operation(operation, compiler).map(Self::Float)
-                    }
-                    Type::String => {
-                        CommandString::compile_operation(operation, compiler).map(Self::String)
-                    }
-                    Type::Zone => {
-                        CommandZone::compile_operation(operation, compiler).map(Self::Zone)
-                    }
-                    other => {
-                        compiler.errors.push(Error::custom(
-                            format!("Cannot perform operation on {other}"),
-                            operation.span(),
-                        ));
-
-                        None
-                    }
-                }
-            }
-            Operator::Logic(_) | Operator::Comparator(_) => {
-                CommandBoolean::compile_operation(operation, compiler).map(Self::Boolean)
-            }
-        }
-    }
 }
 
 impl CompileInto for usize {
+    fn coerce_command(_command: Command) -> Result<Self, String> {
+        unimplemented!()
+    }
+
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
@@ -809,18 +543,6 @@ impl CompileInto for usize {
 
         Some(index)
     }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        let found = operation.infer_type(compiler)?;
-        compiler
-            .errors
-            .push(type_error(found, Type::Action, operation.span()));
-
-        None
-    }
 }
 
 trait CompileIntoLiteral: Sized {
@@ -832,27 +554,8 @@ trait CompileIntoLiteral: Sized {
 }
 
 impl<T: CompileIntoLiteral> CompileInto for T {
-    fn compile_action<'source>(
-        action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        compiler
-            .errors
-            .push(Error::custom("expected literal".to_string(), action.span()));
-
-        None
-    }
-
-    fn compile_operation<'source>(
-        operation: ast::Operation<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<Self> {
-        compiler.errors.push(Error::custom(
-            "expected literal".to_string(),
-            operation.span(),
-        ));
-
-        None
+    fn coerce_command(_command: Command) -> Result<Self, String> {
+        Err("expected literal".to_string())
     }
 
     fn coerce_literal(
@@ -1068,7 +771,12 @@ fn create_quest_command(uber_identifier: UberIdentifier, value: i32) -> CommandB
 // TODO this could accept Option<Type> as found to still provide an error message if type inference fails
 #[inline]
 fn type_error(found: Type, expected: Type, span: Range<usize>) -> Error {
-    Error::custom(format!("Expected {expected}, but found {found}"), span)
+    Error::custom(type_error_message(found, expected), span)
+}
+
+#[inline]
+fn type_error_message(found: Type, expected: Type) -> String {
+    format!("expected {expected}, but found {found}")
 }
 
 #[inline]
@@ -1097,8 +805,13 @@ fn alias_type_error(
 }
 
 #[inline]
-fn return_type_error(expected: Type, span: Range<usize>) -> Error {
-    Error::custom(format!("expected function returning {expected}"), span)
+fn operation_error(target: Type, span: Range<usize>) -> Error {
+    Error::custom(operation_error_message(target), span)
+}
+
+#[inline]
+fn operation_error_message(target: Type) -> String {
+    format!("Cannot perform operation on {target}")
 }
 
 #[inline]

@@ -1,13 +1,11 @@
 use super::{uber_states::UberStateValue, World};
 use ordered_float::OrderedFloat;
-use std::ops::{Add, Div, Mul, Sub};
 use wotw_seedgen_data::{UberIdentifier, Zone};
 use wotw_seedgen_seed_language::{
     ast::ClientEvent,
     output::{
-        ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-        CommandVoid, CommandZone, Comparator, EqualityComparator, Event, LogicOperator, Operation,
-        StringOrPlaceholder, Trigger,
+        Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
+        CommandZone, Event, ExecuteOperator, Operation, StringOrPlaceholder, Trigger,
     },
 };
 
@@ -67,73 +65,18 @@ impl Simulate for Command {
     }
 }
 
-impl<Item: Simulate> Simulate for Operation<Item, EqualityComparator>
+impl<Item, Operator> Simulate for Operation<Item, Operator>
 where
-    Item::Return: PartialEq,
+    Item: Simulate,
+    Operator: Copy + ExecuteOperator<Item::Return>,
 {
-    type Return = bool;
+    type Return = Operator::Output;
 
     fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
         let left = self.left.simulate(world, events);
         let right = self.right.simulate(world, events);
-        match self.operator {
-            EqualityComparator::Equal => left == right,
-            EqualityComparator::NotEqual => left != right,
-        }
-    }
-}
 
-impl<Item: Simulate> Simulate for Operation<Item, Comparator>
-where
-    Item::Return: PartialEq + PartialOrd,
-{
-    type Return = bool;
-
-    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
-        let left = self.left.simulate(world, events);
-        let right = self.right.simulate(world, events);
-        match self.operator {
-            Comparator::Equal => left == right,
-            Comparator::NotEqual => left != right,
-            Comparator::Less => left < right,
-            Comparator::LessOrEqual => left <= right,
-            Comparator::Greater => left > right,
-            Comparator::GreaterOrEqual => left >= right,
-        }
-    }
-}
-
-impl<Item: Simulate<Return = bool>> Simulate for Operation<Item, LogicOperator> {
-    type Return = bool;
-
-    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
-        let left = self.left.simulate(world, events);
-        let right = self.right.simulate(world, events);
-        match self.operator {
-            LogicOperator::And => left && right,
-            LogicOperator::Or => left || right,
-        }
-    }
-}
-
-impl<Item: Simulate> Simulate for Operation<Item, ArithmeticOperator>
-where
-    Item::Return: Add<Output = Item::Return>
-        + Sub<Output = Item::Return>
-        + Mul<Output = Item::Return>
-        + Div<Output = Item::Return>,
-{
-    type Return = Item::Return;
-
-    fn simulate(&self, world: &mut World, events: &[Event]) -> Self::Return {
-        let left = self.left.simulate(world, events);
-        let right = self.right.simulate(world, events);
-        match self.operator {
-            ArithmeticOperator::Add => left + right,
-            ArithmeticOperator::Subtract => left - right,
-            ArithmeticOperator::Multiply => left * right,
-            ArithmeticOperator::Divide => left / right,
-        }
+        self.operator.execute(left, right)
     }
 }
 
@@ -219,9 +162,7 @@ impl Simulate for CommandString {
                 commands.simulate(world, events);
                 last.simulate(world, events)
             }
-            CommandString::Concatenate { left, right } => {
-                left.simulate(world, events) + &right.simulate(world, events)
-            }
+            CommandString::Concatenate { operation } => operation.simulate(world, events),
             CommandString::GetString { id } => world.variables.get_string(id),
             CommandString::WorldName { .. } => Default::default(),
             CommandString::FromBoolean { boolean } => boolean.simulate(world, events).to_string(),
