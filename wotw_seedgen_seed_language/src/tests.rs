@@ -1,7 +1,7 @@
 use crate::{
     ast::{
-        Expression, ExpressionValue, FunctionCall, Literal, UberIdentifier, UberIdentifierName,
-        UberIdentifierNumeric,
+        ConstantDiscriminants, Expression, ExpressionValue, FunctionCall, Literal, UberIdentifier,
+        UberIdentifierName, UberIdentifierNumeric,
     },
     compile::{Compiler, PRIVATE_MEMORY},
     output::{CommandInteger, CommandVoid, IntermediateOutput},
@@ -15,7 +15,13 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
+use strum::VariantArray;
 use wotw_seedgen_assets::{SnippetAccess, Source};
+use wotw_seedgen_data::{
+    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
+    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
+    WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+};
 use wotw_seedgen_parse::{
     parse_ast, Delimited, Identifier, Punctuated, Recoverable, Spanned, Symbol,
 };
@@ -204,6 +210,8 @@ fn test_compiler_with_config<'snippets, F: SnippetAccess>(
 }
 
 fn test_str(source: &str) -> IntermediateOutput {
+    eprintln!("testing snippet:\n{source}");
+
     let snippet_access = ExampleFileAccess(source);
     let mut compiler = test_compiler(&snippet_access);
 
@@ -221,6 +229,93 @@ fn coersions() {
     test_str("!state(float, Float)  on float > 5 {}");
     test_str("on spawn item_message(player.spiritLight - 1)");
     test_str("on spawn item_message((player.spiritLight - player.gorlekOre) + \"SL/Ore\")");
+
+    fn test_variants_with_prefix<T: VariantArray + Display>(prefix: &str, f: fn(&T) -> String) {
+        let variants = T::VARIANTS.iter().map(f).collect::<String>();
+
+        test_str(&format!("{prefix} {{{}}}", variants));
+    }
+
+    fn test_variants<T: VariantArray + Display>(f: fn(&T) -> String) {
+        test_variants_with_prefix("on spawn", f)
+    }
+
+    for kind in ConstantDiscriminants::VARIANTS {
+        match kind {
+            ConstantDiscriminants::Skill => {
+                test_variants::<Skill>(|skill| format!("skill({skill})"))
+            }
+            ConstantDiscriminants::Shard => {
+                test_variants::<Shard>(|shard| format!("shard({shard})"))
+            }
+            ConstantDiscriminants::Teleporter => {
+                // TODO maybe the TP suffix shouldn't be in the Teleporter Display impl
+                test_variants::<Teleporter>(|teleporter| format!("teleporter({teleporter:?})"))
+            }
+            ConstantDiscriminants::WeaponUpgrade => {
+                test_variants::<WeaponUpgrade>(|weapon_upgrade| {
+                    format!("weapon_upgrade({weapon_upgrade})")
+                })
+            }
+            ConstantDiscriminants::Equipment => {
+                test_variants::<Equipment>(|equipment| format!("unequip({equipment})"))
+            }
+            ConstantDiscriminants::Zone => {
+                test_variants::<Zone>(|zone| format!("if current_zone() == {zone} {{}}"))
+            }
+            ConstantDiscriminants::OpherIcon => test_variants::<OpherIcon>(|opher_icon| {
+                format!("set_shop_item_icon(OpherShop.Blaze, {opher_icon})")
+            }),
+            ConstantDiscriminants::LupoIcon => test_variants::<LupoIcon>(|lupo_icon| {
+                format!("set_shop_item_icon(OpherShop.Blaze, {lupo_icon})")
+            }),
+            ConstantDiscriminants::GromIcon => test_variants::<GromIcon>(|grom_icon| {
+                format!("set_shop_item_icon(OpherShop.Blaze, {grom_icon})")
+            }),
+            ConstantDiscriminants::TuleyIcon => test_variants::<TuleyIcon>(|tuley_icon| {
+                format!("set_shop_item_icon(OpherShop.Blaze, {tuley_icon})")
+            }),
+            ConstantDiscriminants::MapIcon => {
+                test_variants_with_prefix::<MapIcon>("!if true", |map_icon| {
+                    format!("!item_data_map_icon(item_message(\"{map_icon}\"), {map_icon})")
+                })
+            }
+            ConstantDiscriminants::EquipSlot => {
+                test_variants::<EquipSlot>(|equip_slot| format!("equip({equip_slot}, Bow)"))
+            }
+            ConstantDiscriminants::WheelItemPosition => {
+                test_variants::<WheelItemPosition>(|wheel_item_position| {
+                    format!("destroy_wheel_item(\"root\", {wheel_item_position})")
+                })
+            }
+            ConstantDiscriminants::WheelBind => test_variants::<WheelBind>(|wheel_bind| {
+                format!("set_wheel_item_action(\"root\", Top, {wheel_bind}, {{}})")
+            }),
+            ConstantDiscriminants::Alignment => test_variants::<Alignment>(|alignment| {
+                format!("set_message_alignment(\"\", {alignment})")
+            }),
+            ConstantDiscriminants::HorizontalAnchor => {
+                test_variants::<HorizontalAnchor>(|horizontal_anchor| {
+                    format!("set_message_horizontal_anchor(\"\", {horizontal_anchor})")
+                })
+            }
+            ConstantDiscriminants::VerticalAnchor => {
+                test_variants::<VerticalAnchor>(|vertical_anchor| {
+                    format!("set_message_vertical_anchor(\"\", {vertical_anchor})")
+                })
+            }
+            ConstantDiscriminants::ScreenPosition => {
+                test_variants::<ScreenPosition>(|screen_position| {
+                    format!("set_message_screen_position(\"\", {screen_position})")
+                })
+            }
+            ConstantDiscriminants::CoordinateSystem => {
+                test_variants::<CoordinateSystem>(|coordinate_system| {
+                    format!("set_message_coordinate_system(\"\", {coordinate_system})")
+                })
+            }
+        }
+    }
 }
 
 #[test]

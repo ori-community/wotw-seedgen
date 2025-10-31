@@ -27,7 +27,7 @@ fun jumpgrade() {
     200,
     "Jump higher",
     jumpgrade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun enable() {
@@ -55,8 +55,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", WheelItemPosition::TopRight, "Toggle Jumpgrades")
-    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::TopRight, jumpgrade_icon)
+    set_wheel_item_name("bonus_upgrade", TopRight, "Toggle Jumpgrades")
+    set_wheel_item_icon("bonus_upgrade", TopRight, jumpgrade_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -65,12 +65,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::TopRight, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::TopRight, 255, 255, 255, 255)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::TopRight, WheelBind::All, disable())
+    set_wheel_item_description("bonus_upgrade", TopRight, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", TopRight, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", TopRight, All, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::TopRight, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::TopRight, 128, 128, 128, 196)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::TopRight, WheelBind::All, enable())
+    set_wheel_item_description("bonus_upgrade", TopRight, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", TopRight, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", TopRight, All, enable())
 }

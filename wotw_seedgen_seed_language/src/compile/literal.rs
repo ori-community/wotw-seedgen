@@ -1,17 +1,10 @@
-use std::{fmt::Display, ops::Range, str::FromStr};
-
 use super::{Compile, SnippetCompiler};
-use crate::{
-    ast,
-    output::{Constant, ConstantDiscriminants, Literal},
-    parse::Result,
-};
+use crate::{ast, output::Literal};
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
-use strum::VariantArray;
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_parse::{Error, Identifier, Span, Spanned};
+use wotw_seedgen_parse::{Error, Span};
 
 impl<'source> Compile<'source> for ast::Literal<'source> {
     type Output = Option<Literal>;
@@ -25,7 +18,7 @@ impl<'source> Compile<'source> for ast::Literal<'source> {
             ast::Literal::Integer(int) => Some(Literal::Integer(int)),
             ast::Literal::Float(float) => Some(Literal::Float(float)),
             ast::Literal::String(string) => Some(Literal::String(string.into())),
-            ast::Literal::Constant(constant) => constant.compile(compiler).map(Literal::Constant),
+            ast::Literal::Constant(constant) => Some(Literal::Constant(constant)),
         }
     }
 }
@@ -139,76 +132,6 @@ impl ast::UberIdentifierName<'_> {
 
             None
         }
-    }
-}
-
-impl<'source> Compile<'source> for ast::Constant<'source> {
-    type Output = Option<Constant>;
-
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let kind = compiler.consume_result(
-            self.kind
-                .data
-                .0
-                .parse()
-                .map_err(|err| Error::custom(err, self.kind.span)),
-        );
-
-        let variant = compiler.consume_result(self.variant.result);
-
-        let kind = kind?;
-        let Spanned {
-            data: Identifier(variant),
-            span,
-        } = variant?;
-
-        fn parse_variant<T1, T2, F>(variant: &str, span: Range<usize>, f: F) -> Result<T2>
-        where
-            T1: FromStr<Err = String> + VariantArray + Display,
-            F: FnOnce(T1) -> T2,
-        {
-            variant
-                .parse()
-                .map(f)
-                .map_err(|err| Error::custom(err, span))
-        }
-
-        let constant = match kind {
-            ConstantDiscriminants::Skill => parse_variant(variant, span, Constant::Skill),
-            ConstantDiscriminants::Shard => parse_variant(variant, span, Constant::Shard),
-            ConstantDiscriminants::Teleporter => parse_variant(variant, span, Constant::Teleporter),
-            ConstantDiscriminants::WeaponUpgrade => {
-                parse_variant(variant, span, Constant::WeaponUpgrade)
-            }
-            ConstantDiscriminants::Equipment => parse_variant(variant, span, Constant::Equipment),
-            ConstantDiscriminants::Zone => parse_variant(variant, span, Constant::Zone),
-            ConstantDiscriminants::OpherIcon => parse_variant(variant, span, Constant::OpherIcon),
-            ConstantDiscriminants::LupoIcon => parse_variant(variant, span, Constant::LupoIcon),
-            ConstantDiscriminants::GromIcon => parse_variant(variant, span, Constant::GromIcon),
-            ConstantDiscriminants::TuleyIcon => parse_variant(variant, span, Constant::TuleyIcon),
-            ConstantDiscriminants::MapIcon => parse_variant(variant, span, Constant::MapIcon),
-            ConstantDiscriminants::EquipSlot => parse_variant(variant, span, Constant::EquipSlot),
-            ConstantDiscriminants::WheelItemPosition => {
-                parse_variant(variant, span, Constant::WheelItemPosition)
-            }
-            ConstantDiscriminants::WheelBind => parse_variant(variant, span, Constant::WheelBind),
-            ConstantDiscriminants::Alignment => parse_variant(variant, span, Constant::Alignment),
-
-            ConstantDiscriminants::HorizontalAnchor => {
-                parse_variant(variant, span, Constant::HorizontalAnchor)
-            }
-            ConstantDiscriminants::VerticalAnchor => {
-                parse_variant(variant, span, Constant::VerticalAnchor)
-            }
-            ConstantDiscriminants::ScreenPosition => {
-                parse_variant(variant, span, Constant::ScreenPosition)
-            }
-            ConstantDiscriminants::CoordinateSystem => {
-                parse_variant(variant, span, Constant::CoordinateSystem)
-            }
-        };
-
-        compiler.consume_result(constant)
     }
 }
 

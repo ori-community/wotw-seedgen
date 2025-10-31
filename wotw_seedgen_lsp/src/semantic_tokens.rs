@@ -6,12 +6,13 @@ use wotw_seedgen_seed_language::{
         BundleIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat,
         ConfigArgs, ConfigType, Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event,
         ExportArgs, Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs,
-        ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataNameArgs,
-        ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Once, Operation, PreplaceArgs, Punctuated,
-        RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-        Recoverable, RemoveArgs, RemoveLocationArgs, Result, Separated, SeparatedNonEmpty,
-        SetConfigArgs, SetLogicStateArgs, Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg,
-        TimerArgs, Trigger, TriggerBinding, UberIdentifier, UberStateType, ZoneOfArgs,
+        ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs,
+        ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Once, Operation,
+        PreplaceArgs, Punctuated, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs,
+        RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveArgs, RemoveLocationArgs, Result,
+        Separated, SeparatedNonEmpty, SetConfigArgs, SetLogicStateArgs, Snippet, Span, Spanned,
+        SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
+        UberStateType, ZoneOfArgs,
     },
     types::Type,
 };
@@ -417,6 +418,10 @@ impl Tokens for Command<'_> {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
+            Command::ItemDataMapIcon(keyword, args) => {
+                builder.push_token(keyword.span, TokenType::Macro);
+                args.tokens(builder);
+            }
             Command::RemoveLocation(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
@@ -635,6 +640,13 @@ impl Tokens for ItemDataIconArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.item.tokens(builder);
         self.icon.tokens(builder);
+    }
+}
+
+impl Tokens for ItemDataMapIconArgs<'_> {
+    fn tokens(self, builder: &mut TokenBuilder) {
+        self.item.tokens(builder);
+        self.map_icon.tokens(builder);
     }
 }
 

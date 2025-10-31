@@ -26,7 +26,7 @@ fun rapid_regenerate() {
     200,
     "Heal faster with Regenerate",
     rapid_regenerate_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun enable() {
@@ -50,8 +50,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", WheelItemPosition::BottomRight, "Toggle Rapid Regenerate")
-    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::BottomRight, rapid_regenerate_icon)
+    set_wheel_item_name("bonus_upgrade", BottomRight, "Toggle Rapid Regenerate")
+    set_wheel_item_icon("bonus_upgrade", BottomRight, rapid_regenerate_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -60,12 +60,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::BottomRight, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::BottomRight, 255, 255, 255, 255)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::BottomRight, WheelBind::All, disable())
+    set_wheel_item_description("bonus_upgrade", BottomRight, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", BottomRight, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", BottomRight, All, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::BottomRight, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::BottomRight, 128, 128, 128, 196)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::BottomRight, WheelBind::All, enable())
+    set_wheel_item_description("bonus_upgrade", BottomRight, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", BottomRight, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", BottomRight, All, enable())
 }

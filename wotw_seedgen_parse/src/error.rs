@@ -67,22 +67,27 @@ impl Error {
             .minmax()
             .into_option()
             .unwrap();
+
         errors.retain(|err| err.span.start == farthest);
         let span = earliest..errors[0].span.end;
-        let mut errors: Vec<ErrorKind> = errors
+
+        let mut errors = errors
             .into_iter()
             .flat_map(|err| match err.kind {
                 ErrorKind::AllFailed(nested) => nested,
                 other => vec![other],
             })
             .collect::<Vec<_>>();
+
         errors.sort_unstable_by_key(ErrorKind::to_string);
         errors.dedup();
+
         let kind = if errors.len() == 1 {
             errors.pop().unwrap()
         } else {
             ErrorKind::AllFailed(errors)
         };
+
         Self::new(kind, span)
     }
 
@@ -102,7 +107,9 @@ impl Error {
     /// [`Write`]: io::Write
     pub fn write_pretty<W: io::Write>(&self, source: &Source, w: W) -> io::Result<()> {
         use ariadne::{Color, Config, Fmt, Label, Report, ReportKind, Source};
+
         let id = source.id.as_str();
+
         if source.content.is_empty() {
             // the error printing library (ariadne) seems to panic in this case
             Report::<(&str, _)>::build(ReportKind::Error, id, 0)
@@ -117,9 +124,11 @@ impl Error {
                         .with_message(self.kind.to_string().fg(Color::Red))
                         .with_color(Color::Red),
                 );
+
             if let Some(help) = &self.help {
                 report.set_help(help);
             }
+
             report
                 .finish()
                 .write((id, Source::from(&source.content)), w)
@@ -165,6 +174,7 @@ impl Display for ErrorKind {
                         _ => None,
                     })
                     .collect::<Option<Vec<_>>>();
+
                 match all_expected {
                     None => write!(
                         f,
@@ -190,13 +200,17 @@ pub struct ErrorWithSource<'a, 'b> {
 impl Display for ErrorWithSource<'_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let id = &self.source.id;
+
         let line_start = self.source.content[..self.error.span.start]
             .rfind('\n')
             .unwrap_or(0);
         let line_number = 1 + self.source.content[..=line_start].matches('\n').count();
         let position = self.error.span.start - line_start;
+
         let slice = &self.source.content[self.error.span.clone()];
+
         let error = &self.error.kind;
+
         write!(f, "[{id}:{line_number}:{position}] at \"{slice}\": {error}")
     }
 }

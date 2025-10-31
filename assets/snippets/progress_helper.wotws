@@ -40,7 +40,7 @@ fun write_map_progress_message() {
 on reload {
     set_wheel_item_data(
         "root",
-        WheelItemPosition::Top,
+        Top,
         "Progress Summary",
         "[Ability1]View Progress",
         progress_summary_icon,
@@ -48,7 +48,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::TopRight,
+        TopRight,
         "Tree Progress",
         "[Ability1]View Progress",
         tree_progress_icon,
@@ -62,7 +62,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::RightTop,
+        RightTop,
         "Wisp Progress",
         "[Ability1]View Progress",
         wisp_progress_icon,
@@ -76,7 +76,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::Right,
+        Right,
         "Quest Progress",
         "[Ability1]View Progress",
         quest_progress_icon,
@@ -84,7 +84,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::RightBottom,
+        RightBottom,
         "Teleporter Progress",
         "[Ability1]View Progress",
         teleporter_icon,

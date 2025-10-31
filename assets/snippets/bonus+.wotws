@@ -59,7 +59,7 @@ fun rapid_grenade() { store(randoUpgrades.grenadeChargeTimeModifier, randoUpgrad
     200,
     "Grenade attacks are faster",
     rapid_grenade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun quickshot_upgrade() { store(randoUpgrades.bowRapidFireMultiplier, randoUpgrades.bowRapidFireMultiplier - 0.4) }
@@ -70,7 +70,7 @@ fun quickshot_upgrade() { store(randoUpgrades.bowRapidFireMultiplier, randoUpgra
     200,
     "Bow attacks with Quickshot are faster",
     quickshot_upgrade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun melting_blaze() { store(randoUpgrades.blazeAsFireSource, true) }
@@ -81,7 +81,7 @@ fun melting_blaze() { store(randoUpgrades.blazeAsFireSource, true) }
     200,
     "Blaze melts ice and ignites lanterns",
     melting_blaze_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun melting_sword() { store(randoUpgrades.swordAsFireSource, true) }
@@ -92,7 +92,7 @@ fun melting_sword() { store(randoUpgrades.swordAsFireSource, true) }
     200,
     "Sword melts ice and ignites lanterns",
     melting_sword_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun melting_shuriken() { store(randoUpgrades.shurikenAsFireSource, true) }
@@ -103,7 +103,7 @@ fun melting_shuriken() { store(randoUpgrades.shurikenAsFireSource, true) }
     200,
     "Shuriken melts ice and ignites lanterns",
     melting_shuriken_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun uncharged_bashnade() { store(randoUpgrades.bashableUnchargedGrenades, true) }
@@ -114,7 +114,7 @@ fun uncharged_bashnade() { store(randoUpgrades.bashableUnchargedGrenades, true) 
     200,
     "Bash your Grenades without charging them first on the ground",
     uncharged_bashnade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun extra_grenade() { store(randoUpgrades.extraGrenades, randoUpgrades.extraGrenades + 1) }
@@ -125,7 +125,7 @@ fun extra_grenade() { store(randoUpgrades.extraGrenades, randoUpgrades.extraGren
     200,
     "Throw multiple Grenades without exploding the prior one",
     extra_grenade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun splinter_grenade() { store(randoUpgrades.grenadeMultishot, randoUpgrades.grenadeMultishot + 1) }
@@ -136,7 +136,7 @@ fun splinter_grenade() { store(randoUpgrades.grenadeMultishot, randoUpgrades.gre
     200,
     "Throw an additional Grenade",
     splinter_grenade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun unlimited_sentries() { store(randoUpgrades.extraSentries, 100) }
@@ -147,7 +147,7 @@ fun unlimited_sentries() { store(randoUpgrades.extraSentries, 100) }
     200,
     "Spawn unlimited Sentries",
     unlimited_sentries_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 // TODO merge burst and fire rate upgrade to make the names less confusing?
@@ -159,7 +159,7 @@ fun sentry_burst_upgrade() { store(randoUpgrades.extraSentries, randoUpgrades.ex
     200,
     "Sentry fires more shots per burst",
     sentry_burst_upgrade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun sentry_fire_rate_upgrade() { store(randoUpgrades.sentryFireRateSpeed, randoUpgrades.sentryFireRateSpeed + 2.5) }
@@ -170,7 +170,7 @@ fun sentry_fire_rate_upgrade() { store(randoUpgrades.sentryFireRateSpeed, randoU
     200,
     "Sentry fires shots even faster",
     sentry_fire_rate_upgrade_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun extra_shuriken() { store(randoUpgrades.extraShurikens, randoUpgrades.extraShurikens + 1) }
@@ -181,7 +181,7 @@ fun extra_shuriken() { store(randoUpgrades.extraShurikens, randoUpgrades.extraSh
     200,
     "Throw multiple Shurikens",
     extra_shuriken_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun splinter_shuriken() {
@@ -195,7 +195,7 @@ fun splinter_shuriken() {
     200,
     "Throw multiple Shurikens at once",
     splinter_shuriken_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun bashable_shuriken() {
@@ -209,5 +209,5 @@ fun bashable_shuriken() {
     200,
     "Bash off your Shuriken",
     bashable_shuriken_icon,
-    MapIcon::BonusItem
+    BonusItem
 )

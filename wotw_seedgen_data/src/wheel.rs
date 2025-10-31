@@ -34,6 +34,7 @@ pub enum WheelItemPosition {
     TopLeft = 11,
 }
 
+// TODO shifting `All` to 3 would allow seemless conversion from `EquipSlot` to `WheelBind`
 /// Possible input configurations for an item in a weapon wheel like menu
 #[derive(
     Debug,

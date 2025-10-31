@@ -73,7 +73,7 @@ pub enum Equipment {
     Shuriken = 2015,         // Spell_Chakram
     Blaze = 2016,            // Spell_Blaze
     Sentry = 2017,           // Spell_Turret
-    Sein = 2018,             // Spell_GoldenSein
+    Seir = 2018,             // Spell_GoldenSein
     Launch = 2019,           // Spell_ChargeJump
     Bash = 3000,             // Ability_Bash
     Grapple = 3001,          // Ability_Leash

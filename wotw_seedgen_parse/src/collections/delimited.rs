@@ -10,7 +10,7 @@ use std::{
 pub struct Delimited<Open, Content, Close> {
     pub open: Open,
     pub content: Result<Content>,
-    pub close: Result<Close>, // TODO this is a newer addition, probably have to adjust compilation to propagate these errors. Maybe make a function on compiler to handle delimited
+    pub close: Result<Close>,
 }
 
 impl<'source, T, Open, Content, Close> Ast<'source, T> for Delimited<Open, Content, Close>

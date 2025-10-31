@@ -13,16 +13,16 @@ use wotw_seedgen_seed_language::{
     ast::{
         Action, ActionCondition, AddArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
         ClientEvent, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
-        Constant, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression, ExpressionValue,
-        FunctionCall, FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-        ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Operation, PreplaceArgs,
-        RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, RemoveArgs,
-        RemoveLocationArgs, Result, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
-        StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
-        UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+        ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
+        ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs,
+        ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
+        LetArgs, Literal, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
+        RandomNumberArgs, RandomPoolArgs, RemoveArgs, RemoveLocationArgs, Result,
+        SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger,
+        TriggerBinding, UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType,
+        ZoneOfArgs,
     },
     compile::FunctionIdentifier,
-    output::ConstantDiscriminants,
     parse::{
         Delimited, Error, ErrorKind, Identifier, NoTrailingInput, Once, Punctuated, Recoverable,
         SpanEnd, SpanStart, Spanned,
@@ -460,6 +460,11 @@ lazy_static! {
         enum_member_completion_with_detail(CoordinateSystem::VARIANTS, |coordinate_system| {
             *coordinate_system as u8
         });
+    static ref CONSTANT_COMPLETION: Vec<CompletionItem> = ConstantDiscriminants::VARIANTS
+        .iter()
+        .copied()
+        .flat_map(constant_member_completion)
+        .collect();
 }
 
 fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem> {
@@ -484,24 +489,6 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
         ConstantDiscriminants::ScreenPosition => SCREEN_POSITION_COMPLETION.clone(),
         ConstantDiscriminants::CoordinateSystem => COORDINATE_SYSTEM_COMPLETION.clone(),
     }
-}
-
-fn constant_completion() -> impl Iterator<Item = CompletionItem> {
-    ConstantDiscriminants::VARIANTS.iter().flat_map(|kind| {
-        let mut member_completion = constant_member_completion(*kind);
-        member_completion
-            .iter_mut()
-            .for_each(|item| item.label = format!("{kind}::{member}", member = item.label));
-
-        let kind_completion = CompletionItem {
-            label: kind.to_string(),
-            kind: Some(CompletionItemKind::FUNCTION),
-            ..Default::default()
-        };
-
-        member_completion.push(kind_completion);
-        member_completion
-    })
 }
 
 lazy_static! {
@@ -531,7 +518,7 @@ lazy_static! {
     static ref LITERAL_COMPLETION: Vec<CompletionItem> = {
         let mut completion = UBER_IDENTIFIER_NUMERIC_COMPLETION.clone();
 
-        completion.extend(constant_completion());
+        completion.append(&mut CONSTANT_COMPLETION.clone());
 
         completion
     };
@@ -615,7 +602,7 @@ impl Completion for Literal<'_> {
         match self {
             Literal::UberIdentifier(uber_identifier) => uber_identifier.completion(index),
             Literal::Integer(_) => Some(UBER_IDENTIFIER_NUMERIC_COMPLETION.clone()),
-            Literal::Constant(constant) => constant.completion(index),
+            Literal::Constant(_) => Some(CONSTANT_COMPLETION.clone()),
             Literal::Boolean(_) | Literal::Float(_) | Literal::String(_) => None,
         }
     }
@@ -624,14 +611,6 @@ impl Completion for Literal<'_> {
 impl ErrCompletion for Literal<'_> {
     fn err_completion(_err: &Error) -> Vec<CompletionItem> {
         LITERAL_COMPLETION.clone()
-    }
-}
-
-impl Completion for Constant<'_> {
-    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
-        let kind = self.kind.data.0.parse().ok()?;
-
-        Some(constant_member_completion(kind))
     }
 }
 
@@ -810,6 +789,7 @@ impl CompletionAfterSpanCheck for Command<'_> {
             Command::ItemDataPrice(_, args) => args.completion(index),
             Command::ItemDataDescription(_, args) => args.completion(index),
             Command::ItemDataIcon(_, args) => args.completion(index),
+            Command::ItemDataMapIcon(_, args) => args.completion(index),
             Command::RemoveLocation(_, args) => args.completion(index),
             Command::SetLogicState(_, _) => None,
             Command::Preplace(_, args) => args.completion(index),
@@ -1089,6 +1069,20 @@ impl CompletionAfterSpanCheck for ItemDataIconArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataIconArgs<'_> {
+    fn err_completion(err: &Error) -> Vec<CompletionItem> {
+        Action::err_completion(err)
+    }
+}
+
+impl CompletionAfterSpanCheck for ItemDataMapIconArgs<'_> {
+    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+        self.item
+            .completion(index)
+            .or_else(|| self.map_icon.completion(index))
+    }
+}
+
+impl ErrCompletion for ItemDataMapIconArgs<'_> {
     fn err_completion(err: &Error) -> Vec<CompletionItem> {
         Action::err_completion(err)
     }

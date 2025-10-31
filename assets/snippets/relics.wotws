@@ -37,7 +37,7 @@
         !preplace({
             item_message("@Marsh Relic@")
             store(marsh_relic_collected, true)
-        }, Zone::Marsh)
+        }, Marsh)
         !let(marsh_relic_exists, true)
     }
     !if marsh_relic > relic_chance {
@@ -48,7 +48,7 @@
         !preplace({
             item_message("@Hollow Relic@")
             store(hollow_relic_collected, true)
-        }, Zone::Hollow)
+        }, Hollow)
         !let(hollow_relic_exists, true)
     }
     !if hollow_relic > relic_chance {
@@ -59,7 +59,7 @@
         !preplace({
             item_message("@Glades Relic@")
             store(glades_relic_collected, true)
-        }, Zone::Glades)
+        }, Glades)
         !let(glades_relic_exists, true)
     }
     !if glades_relic > relic_chance {
@@ -70,7 +70,7 @@
         !preplace({
             item_message("@Wellspring Relic@")
             store(wellspring_relic_collected, true)
-        }, Zone::Wellspring)
+        }, Wellspring)
         !let(wellspring_relic_exists, true)
     }
     !if wellspring_relic > relic_chance {
@@ -81,7 +81,7 @@
         !preplace({
             item_message("@Woods Relic@")
             store(woods_relic_collected, true)
-        }, Zone::Woods)
+        }, Woods)
         !let(woods_relic_exists, true)
     }
     !if woods_relic > relic_chance {
@@ -92,7 +92,7 @@
         !preplace({
             item_message("@Reach Relic@")
             store(reach_relic_collected, true)
-        }, Zone::Reach)
+        }, Reach)
         !let(reach_relic_exists, true)
     }
     !if reach_relic > relic_chance {
@@ -103,7 +103,7 @@
         !preplace({
             item_message("@Depths Relic@")
             store(depths_relic_collected, true)
-        }, Zone::Depths)
+        }, Depths)
         !let(depths_relic_exists, true)
     }
     !if depths_relic > relic_chance {
@@ -114,7 +114,7 @@
         !preplace({
             item_message("@Pools Relic@")
             store(pools_relic_collected, true)
-        }, Zone::Pools)
+        }, Pools)
         !let(pools_relic_exists, true)
     }
     !if pools_relic > relic_chance {
@@ -125,7 +125,7 @@
         !preplace({
             item_message("@Wastes Relic@")
             store(wastes_relic_collected, true)
-        }, Zone::Wastes)
+        }, Wastes)
         !let(wastes_relic_exists, true)
     }
     !if wastes_relic > relic_chance {
@@ -136,7 +136,7 @@
         !preplace({
             item_message("@Willow Relic@")
             store(willow_relic_collected, true)
-        }, Zone::Willow)
+        }, Willow)
         !let(willow_relic_exists, true)
     }
     !if willow_relic > relic_chance {
@@ -147,7 +147,7 @@
         !preplace({
             item_message("@Burrows Relic@")
             store(burrows_relic_collected, true)
-        }, Zone::Burrows)
+        }, Burrows)
         !let(burrows_relic_exists, true)
     }
     !if burrows_relic > relic_chance {
@@ -162,77 +162,77 @@
             !preplace({
                 item_message("@Marsh Relic@")
                 store(marsh_relic_collected, true)
-            }, Zone::Marsh)
+            }, Marsh)
             !let(marsh_relic_exists, true)
         }
         !if relic == "hollow" {
             !preplace({
                 item_message("@Hollow Relic@")
                 store(hollow_relic_collected, true)
-            }, Zone::Hollow)
+            }, Hollow)
             !let(hollow_relic_exists, true)
         }
         !if relic == "glades" {
             !preplace({
                 item_message("@Glades Relic@")
                 store(glades_relic_collected, true)
-            }, Zone::Glades)
+            }, Glades)
             !let(glades_relic_exists, true)
         }
         !if relic == "wellspring" {
             !preplace({
                 item_message("@Wellspring Relic@")
                 store(wellspring_relic_collected, true)
-            }, Zone::Wellspring)
+            }, Wellspring)
             !let(wellspring_relic_exists, true)
         }
         !if relic == "woods" {
             !preplace({
                 item_message("@Woods Relic@")
                 store(woods_relic_collected, true)
-            }, Zone::Woods)
+            }, Woods)
             !let(woods_relic_exists, true)
         }
         !if relic == "reach" {
             !preplace({
                 item_message("@Reach Relic@")
                 store(reach_relic_collected, true)
-            }, Zone::Reach)
+            }, Reach)
             !let(reach_relic_exists, true)
         }
         !if relic == "depths" {
             !preplace({
                 item_message("@Depths Relic@")
                 store(depths_relic_collected, true)
-            }, Zone::Depths)
+            }, Depths)
             !let(depths_relic_exists, true)
         }
         !if relic == "pools" {
             !preplace({
                 item_message("@Pools Relic@")
                 store(pools_relic_collected, true)
-            }, Zone::Pools)
+            }, Pools)
             !let(pools_relic_exists, true)
         }
         !if relic == "wastes" {
             !preplace({
                 item_message("@Wastes Relic@")
                 store(wastes_relic_collected, true)
-            }, Zone::Wastes)
+            }, Wastes)
             !let(wastes_relic_exists, true)
         }
         !if relic == "willow" {
             !preplace({
                 item_message("@Willow Relic@")
                 store(willow_relic_collected, true)
-            }, Zone::Willow)
+            }, Willow)
             !let(willow_relic_exists, true)
         }
         !if relic == "burrows" {
             !preplace({
                 item_message("@Burrows Relic@")
                 store(burrows_relic_collected, true)
-            }, Zone::Burrows)
+            }, Burrows)
             !let(burrows_relic_exists, true)
         }
     }
@@ -277,17 +277,17 @@
     set_boolean("exists", false)
     set_boolean("collected", false)
 
-    if current_map_zone() == Zone::Marsh check_marsh_relic()
-    if current_map_zone() == Zone::Hollow check_hollow_relic()
-    if current_map_zone() == Zone::Glades check_glades_relic()
-    if current_map_zone() == Zone::Wellspring check_wellspring_relic()
-    if current_map_zone() == Zone::Woods check_woods_relic()
-    if current_map_zone() == Zone::Reach check_reach_relic()
-    if current_map_zone() == Zone::Depths check_depths_relic()
-    if current_map_zone() == Zone::Pools check_pools_relic()
-    if current_map_zone() == Zone::Wastes check_wastes_relic()
-    if current_map_zone() == Zone::Willow check_willow_relic()
-    if current_map_zone() == Zone::Burrows check_burrows_relic()
+    if current_map_zone() == Marsh check_marsh_relic()
+    if current_map_zone() == Hollow check_hollow_relic()
+    if current_map_zone() == Glades check_glades_relic()
+    if current_map_zone() == Wellspring check_wellspring_relic()
+    if current_map_zone() == Woods check_woods_relic()
+    if current_map_zone() == Reach check_reach_relic()
+    if current_map_zone() == Depths check_depths_relic()
+    if current_map_zone() == Pools check_pools_relic()
+    if current_map_zone() == Wastes check_wastes_relic()
+    if current_map_zone() == Willow check_willow_relic()
+    if current_map_zone() == Burrows check_burrows_relic()
 
     if get_boolean("exists") {
         if get_boolean("collected") {
@@ -321,7 +321,7 @@
 !if marsh_relic_exists {
     fun write_marsh_relic() {
         set_string("color", "")
-        if current_zone() == Zone::Marsh {
+        if current_zone() == Marsh {
             set_string("color", "#")
         }
         if marsh_relic_collected {
@@ -344,7 +344,7 @@
     fun write_hollow_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Hollow {
+        if current_zone() == Hollow {
             set_string("color", "#")
         }
         if hollow_relic_collected {
@@ -367,7 +367,7 @@
     fun write_glades_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Glades {
+        if current_zone() == Glades {
             set_string("color", "#")
         }
         if glades_relic_collected {
@@ -390,7 +390,7 @@
     fun write_wellspring_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Wellspring {
+        if current_zone() == Wellspring {
             set_string("color", "#")
         }
         if wellspring_relic_collected {
@@ -413,7 +413,7 @@
     fun write_woods_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Woods {
+        if current_zone() == Woods {
             set_string("color", "#")
         }
         if woods_relic_collected {
@@ -436,7 +436,7 @@
     fun write_reach_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Reach {
+        if current_zone() == Reach {
             set_string("color", "#")
         }
         if reach_relic_collected {
@@ -459,7 +459,7 @@
     fun write_depths_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Depths {
+        if current_zone() == Depths {
             set_string("color", "#")
         }
         if depths_relic_collected {
@@ -482,7 +482,7 @@
     fun write_pools_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Pools {
+        if current_zone() == Pools {
             set_string("color", "#")
         }
         if pools_relic_collected {
@@ -505,7 +505,7 @@
     fun write_wastes_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Wastes {
+        if current_zone() == Wastes {
             set_string("color", "#")
         }
         if wastes_relic_collected {
@@ -528,7 +528,7 @@
     fun write_willow_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Willow {
+        if current_zone() == Willow {
             set_string("color", "#")
         }
         if willow_relic_collected {
@@ -551,7 +551,7 @@
     fun write_burrows_relic() {
         relics_add_comma()
         set_string("color", "")
-        if current_zone() == Zone::Burrows {
+        if current_zone() == Burrows {
             set_string("color", "#")
         }
         if burrows_relic_collected {

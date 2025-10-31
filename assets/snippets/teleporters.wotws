@@ -23,21 +23,21 @@
 !config(willow, "Willow Teleporter", Boolean, true)
 !config(shriek, "Shriek Teleporter", Boolean, false)
 
-!if marsh { !add(teleporter(Teleporter::Marsh), 1) }
-!if howls_den { !add(teleporter(Teleporter::Den), 1) }
-!if hollow { !add(teleporter(Teleporter::Hollow), 1) }
-!if glades { !add(teleporter(Teleporter::Glades), 1) }
-!if wellspring { !add(teleporter(Teleporter::Wellspring), 1) }
-!if burrows { !add(teleporter(Teleporter::Burrows), 1) }
-!if woods_entrance { !add(teleporter(Teleporter::WoodsEntrance), 1) }
-!if woods_exit { !add(teleporter(Teleporter::WoodsExit), 1) }
-!if reach { !add(teleporter(Teleporter::Reach), 1) }
-!if depths { !add(teleporter(Teleporter::Depths), 1) }
-!if central_pools { !add(teleporter(Teleporter::CentralPools), 1) }
-!if pools_boss { !add(teleporter(Teleporter::PoolsBoss), 1) }
-!if feeding_grounds { !add(teleporter(Teleporter::FeedingGrounds), 1) }
-!if central_wastes { !add(teleporter(Teleporter::CentralWastes), 1) }
-!if outer_ruins { !add(teleporter(Teleporter::OuterRuins), 1) }
-!if inner_ruins { !add(teleporter(Teleporter::InnerRuins), 1) }
-!if willow { !add(teleporter(Teleporter::Willow), 1) }
-!if shriek { !add(teleporter(Teleporter::Shriek), 1) }
+!if marsh { !add(teleporter(Marsh), 1) }
+!if howls_den { !add(teleporter(Den), 1) }
+!if hollow { !add(teleporter(Hollow), 1) }
+!if glades { !add(teleporter(Glades), 1) }
+!if wellspring { !add(teleporter(Wellspring), 1) }
+!if burrows { !add(teleporter(Burrows), 1) }
+!if woods_entrance { !add(teleporter(WoodsEntrance), 1) }
+!if woods_exit { !add(teleporter(WoodsExit), 1) }
+!if reach { !add(teleporter(Reach), 1) }
+!if depths { !add(teleporter(Depths), 1) }
+!if central_pools { !add(teleporter(CentralPools), 1) }
+!if pools_boss { !add(teleporter(PoolsBoss), 1) }
+!if feeding_grounds { !add(teleporter(FeedingGrounds), 1) }
+!if central_wastes { !add(teleporter(CentralWastes), 1) }
+!if outer_ruins { !add(teleporter(OuterRuins), 1) }
+!if inner_ruins { !add(teleporter(InnerRuins), 1) }
+!if willow { !add(teleporter(Willow), 1) }
+!if shriek { !add(teleporter(Shriek), 1) }

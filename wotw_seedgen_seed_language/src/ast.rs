@@ -1,5 +1,7 @@
 // TODO investigate optimizing type sizes
 
+use std::{fmt::Display, str::FromStr};
+
 use crate::{
     token::{Token, Tokenizer, TOKENIZER},
     types::Type,
@@ -7,8 +9,13 @@ use crate::{
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, VariantArray};
-use wotw_seedgen_parse::parse_ast;
+use strum::{Display, EnumDiscriminants, VariantArray};
+use wotw_seedgen_data::{
+    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
+    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
+    WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+};
+use wotw_seedgen_parse::{parse_ast, Error, ErrorKind};
 
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
@@ -331,7 +338,57 @@ pub enum Literal<'source> {
     Integer(i32),
     Float(OrderedFloat<f32>),
     String(&'source str),
-    Constant(Constant<'source>),
+    Constant(Constant),
+}
+
+// TODO EnumTryAs from strum fails to parse this enum, could otherwise simplify some compile impls
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ast, EnumDiscriminants)]
+#[strum_discriminants(derive(VariantArray))]
+pub enum Constant {
+    Skill(#[ast(with = "constant_ast")] Skill),
+    Shard(#[ast(with = "constant_ast")] Shard),
+    Teleporter(#[ast(with = "constant_ast")] Teleporter),
+    WeaponUpgrade(#[ast(with = "constant_ast")] WeaponUpgrade),
+    Equipment(#[ast(with = "constant_ast")] Equipment),
+    Zone(#[ast(with = "constant_ast")] Zone),
+    OpherIcon(#[ast(with = "constant_ast")] OpherIcon),
+    LupoIcon(#[ast(with = "constant_ast")] LupoIcon),
+    GromIcon(#[ast(with = "constant_ast")] GromIcon),
+    TuleyIcon(#[ast(with = "constant_ast")] TuleyIcon),
+    MapIcon(#[ast(with = "constant_ast")] MapIcon),
+    EquipSlot(#[ast(with = "constant_ast")] EquipSlot),
+    WheelItemPosition(#[ast(with = "constant_ast")] WheelItemPosition),
+    WheelBind(#[ast(with = "constant_ast")] WheelBind),
+    Alignment(#[ast(with = "constant_ast")] Alignment),
+    HorizontalAnchor(#[ast(with = "constant_ast")] HorizontalAnchor),
+    VerticalAnchor(#[ast(with = "constant_ast")] VerticalAnchor),
+    ScreenPosition(#[ast(with = "constant_ast")] ScreenPosition),
+    CoordinateSystem(#[ast(with = "constant_ast")] CoordinateSystem),
+}
+
+fn constant_ast<T>(parser: &mut Parser<Tokenizer>) -> Result<T>
+where
+    T: FromStr<Err = String> + VariantArray + Display,
+{
+    let before = parser.position();
+
+    let identifier = <Spanned<Identifier>>::ast(parser)?;
+
+    identifier.data.0.parse().map_err(|_| {
+        parser.jump(before);
+
+        Error::all_failed(
+            T::VARIANTS
+                .iter()
+                .map(|t| {
+                    Error::new(
+                        ErrorKind::ExpectedToken(t.to_string()),
+                        identifier.span.clone(),
+                    )
+                })
+                .collect(),
+        )
+    })
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
@@ -353,17 +410,6 @@ pub struct UberIdentifierName<'source> {
     pub period: Symbol<'.'>,
     pub member: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
 }
-
-#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct Constant<'source> {
-    pub kind: Spanned<Identifier<'source>>,
-    pub separator: Variant,
-    pub variant: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Ast)]
-#[ast(token = Token::Variant)]
-pub struct Variant;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub enum Command<'source> {
@@ -404,7 +450,10 @@ pub enum Command<'source> {
         Spanned<ItemDataIcon>,
         CommandArgs<ItemDataIconArgs<'source>>,
     ),
-    // TODO ItemDataMapIcon
+    ItemDataMapIcon(
+        Spanned<ItemDataMapIcon>,
+        CommandArgs<ItemDataMapIconArgs<'source>>,
+    ),
     RemoveLocation(
         Spanned<RemoveLocation>,
         CommandArgs<RemoveLocationArgs<'source>>,
@@ -656,6 +705,16 @@ pub struct ItemDataIcon;
 pub struct ItemDataIconArgs<'source> {
     pub item: Action<'source>,
     pub icon: CommandArg<Expression<'source>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct ItemDataMapIcon;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ItemDataMapIconArgs<'source> {
+    pub item: Action<'source>,
+    pub map_icon: CommandArg<Expression<'source>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

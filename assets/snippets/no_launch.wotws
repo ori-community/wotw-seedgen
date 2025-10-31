@@ -2,4 +2,4 @@
 #name("No Launch")
 #description("There is no Launch")
 
-!remove(skill(Skill::Launch), 1)
+!remove(skill(Launch), 1)

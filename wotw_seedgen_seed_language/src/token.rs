@@ -50,8 +50,6 @@ pub enum Token {
     GreaterOrEqual,
     #[token(">")]
     Greater,
-    #[token("::")]
-    Variant,
     #[regex(r".", priority = 0)]
     Symbol,
     Eof,

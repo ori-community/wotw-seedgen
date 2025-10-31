@@ -1,4 +1,4 @@
-use crate::{Equipment, UberIdentifier};
+use crate::{Equipment, OpherIcon, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, FromRepr, VariantArray};
 use wotw_seedgen_derive::FromStr;
@@ -411,7 +411,7 @@ impl Skill {
             // Skill::TeleportSpell => Some(Equipment::Teleport),
             Skill::Shuriken => Some(Equipment::Shuriken),
             // Skill::Drill => Some(Equipment::Drill),
-            Skill::Seir => Some(Equipment::Sein),
+            Skill::Seir => Some(Equipment::Seir),
             Skill::BowCharge => None,
             // Skill::Swordstaff => Some(Equipment::Swordstaff),
             // Skill::Chainsword => Some(Equipment::Chainsword),
@@ -425,6 +425,19 @@ impl Skill {
             Skill::WeaponCharge => Some(Equipment::WeaponCharge),
             Skill::GladesAncestralLight => Some(Equipment::DamageUpgradeA),
             Skill::MarshAncestralLight => Some(Equipment::DamageUpgradeB),
+        }
+    }
+
+    /// If this `Skill` is sold in the vanilla Opher shop, returns the corresponding [`OpherIcon`].
+    pub const fn opher_icon(self) -> Option<OpherIcon> {
+        match self {
+            Skill::Sentry => Some(OpherIcon::Sentry),
+            Skill::Hammer => Some(OpherIcon::Hammer),
+            Skill::Shuriken => Some(OpherIcon::Shuriken),
+            Skill::Spear => Some(OpherIcon::Spear),
+            Skill::Blaze => Some(OpherIcon::Blaze),
+            Skill::WaterBreath => Some(OpherIcon::WaterBreath),
+            _ => None,
         }
     }
 }

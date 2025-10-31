@@ -17,14 +17,14 @@ fun launch_fragment() {
     launch_fragment(),
     "*Launch Fragment*",
     200,
-    "Collect " + required + " *Launch Fragment*s to get " + skill_string(Skill::Launch),
+    "Collect " + required + " *Launch Fragment*s to get " + skill_string(Launch),
     launch_fragment_icon,
-    MapIcon::LaunchFragment
+    LaunchFragment
 )
 !add(launch_fragment(), total)
 
-!remove(skill(Skill::Launch), 1)
-on collected == required skill(Skill::Launch)
+!remove(skill(Launch), 1)
+on collected == required skill(Launch)
 // TODO how do logical launch later
 fun display() {
     if collected < required {

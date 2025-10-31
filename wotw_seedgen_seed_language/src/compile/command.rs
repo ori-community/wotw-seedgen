@@ -4,7 +4,6 @@ use super::{Compile, ExportedValue, SnippetCompiler};
 use crate::{
     ast::{self, CommandArg, UberStateType},
     output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
-    types::InferType,
 };
 use ordered_float::OrderedFloat;
 use rand::Rng;
@@ -85,6 +84,9 @@ impl<'source> Compile<'source> for ast::Command<'source> {
                 command.compile(compiler);
             }
             ast::Command::ItemDataIcon(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::ItemDataMapIcon(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::RemoveLocation(_, command) => {
@@ -338,7 +340,7 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
             return;
         };
 
-        if default.data.infer_type(compiler) != Some(ty.data.into()) {
+        if default.data.literal_type() != ty.data.into() {
             compiler
                 .errors
                 .push(Error::custom(format!("expected {}", ty.data), default.span));
@@ -703,6 +705,28 @@ impl<'source> Compile<'source> for ast::ItemDataIconArgs<'source> {
 
         if let (Some(item), Some(icon)) = (item, icon) {
             insert_item_data(compiler, item, span, icon, "icon", |data| &mut data.icon);
+        }
+    }
+}
+
+// TODO these related impls are pretty similar (same for other impls on those types)
+impl<'source> Compile<'source> for ast::ItemDataMapIconArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        let span = self.item.span();
+        let item = self
+            .item
+            .compile(compiler)
+            .and_then(|command| command.expect_void(compiler, &span));
+
+        let map_icon = consume_command_arg(self.map_icon, compiler)
+            .and_then(|map_icon| map_icon.compile_into(compiler));
+
+        if let (Some(item), Some(map_icon)) = (item, map_icon) {
+            insert_item_data(compiler, item, span, map_icon, "map_icon", |data| {
+                &mut data.map_icon
+            });
         }
     }
 }

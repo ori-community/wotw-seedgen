@@ -9,15 +9,15 @@ Twillen tells the zones holding Bow and Bash")
 !tags("Key Hints")
 
 // TODO have to stringify constant before compilation because they will be turned into numbers otherwise
-!zone_of(burrow_zone, skill(Skill::Burrow))
-!zone_of(water_dash_zone, skill(Skill::WaterDash))
-!zone_of(grenade_zone, skill(Skill::Grenade))
-!zone_of(flash_zone, skill(Skill::Flash))
+!zone_of(burrow_zone, skill(Burrow))
+!zone_of(water_dash_zone, skill(WaterDash))
+!zone_of(grenade_zone, skill(Grenade))
+!zone_of(flash_zone, skill(Flash))
 !zone_of(clean_water_zone, clean_water())
-!zone_of(flap_zone, skill(Skill::Flap))
-!zone_of(glide_zone, skill(Skill::Glide))
-!zone_of(bash_zone, skill(Skill::Bash))
-!zone_of(bow_zone, skill(Skill::Bow))
+!zone_of(flap_zone, skill(Flap))
+!zone_of(glide_zone, skill(Glide))
+!zone_of(bash_zone, skill(Bash))
+!zone_of(bow_zone, skill(Bow))
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
 
@@ -89,14 +89,14 @@ on reload {
         4000,
         "Burrow, Water Dash, Grenade, Flash hint",
         "Costs 500 less for every item you found already",
-        LupoIcon::ShardsMap,
+        ShardsMap,
     )
     set_shop_item_data(
         OpherShop.WaterBreath,
         2500,
         "Clean Water, Flap, Glide hint",
         "Costs 500 less for every item you found already",
-        LupoIcon::ShardsMap,
+        ShardsMap,
     )
     if InnerWellspring.WaterEscape == false {
         set_shop_item_description(OpherShop.WaterBreath, "Complete the Wellspring escape to unlock")
@@ -107,7 +107,7 @@ on reload {
         1500,
         "Bash, Bow hint",
         "Costs 500 less for every item you found already",
-        LupoIcon::ShardsMap,
+        ShardsMap,
     )
     updateLupoHintPrice()
     updateOpherHintPrice()

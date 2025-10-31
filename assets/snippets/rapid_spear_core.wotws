@@ -25,7 +25,7 @@ fun rapid_spear() {
     200,
     "Spear attacks are faster",
     rapid_spear_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun enable() {
@@ -49,8 +49,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", WheelItemPosition::RightBottom, "Toggle Rapid Spear")
-    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::RightBottom, rapid_spear_icon)
+    set_wheel_item_name("bonus_upgrade", RightBottom, "Toggle Rapid Spear")
+    set_wheel_item_icon("bonus_upgrade", RightBottom, rapid_spear_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -59,12 +59,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::RightBottom, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::RightBottom, 255, 255, 255, 255)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::RightBottom, WheelBind::All, disable())
+    set_wheel_item_description("bonus_upgrade", RightBottom, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", RightBottom, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", RightBottom, All, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::RightBottom, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::RightBottom, 128, 128, 128, 196)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::RightBottom, WheelBind::All, enable())
+    set_wheel_item_description("bonus_upgrade", RightBottom, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", RightBottom, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", RightBottom, All, enable())
 }

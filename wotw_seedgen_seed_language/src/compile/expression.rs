@@ -12,7 +12,11 @@ use crate::{
 use ordered_float::OrderedFloat;
 use std::{borrow::Cow, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
-use wotw_seedgen_data::{Icon, UberIdentifier};
+use wotw_seedgen_data::{
+    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, Icon, LupoIcon,
+    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, UberIdentifier,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+};
 use wotw_seedgen_parse::{Error, Span, Spanned};
 
 impl Command {
@@ -464,12 +468,7 @@ impl CompileInto for CommandZone {
         span: Range<usize>,
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
-        let result = match literal {
-            Literal::Constant(Constant::Zone(value)) => Ok(value.into()),
-            other => Err(type_error(other.literal_type(), Type::Zone, span)),
-        };
-
-        compiler.consume_result(result)
+        <Zone as CompileInto>::coerce_literal(literal, span, compiler).map(Self::from)
     }
 }
 
@@ -549,8 +548,8 @@ trait CompileIntoLiteral: Sized {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self>;
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error>;
 }
 
 impl<T: CompileIntoLiteral> CompileInto for T {
@@ -563,7 +562,8 @@ impl<T: CompileIntoLiteral> CompileInto for T {
         span: Range<usize>,
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
-        T::coerce_literal(literal, span, compiler)
+        let result = T::coerce_literal(literal, span, compiler);
+        compiler.consume_result(result)
     }
 }
 
@@ -571,17 +571,11 @@ impl CompileIntoLiteral for bool {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
         match literal {
-            Literal::Boolean(value) => Some(value),
-            other => {
-                compiler
-                    .errors
-                    .push(type_error(other.literal_type(), Type::Boolean, span));
-
-                None
-            }
+            Literal::Boolean(value) => Ok(value),
+            other => Err(type_error(other.literal_type(), Type::Boolean, span)),
         }
     }
 }
@@ -590,17 +584,11 @@ impl CompileIntoLiteral for i32 {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
         match literal {
-            Literal::Integer(value) => Some(value),
-            other => {
-                compiler
-                    .errors
-                    .push(type_error(other.literal_type(), Type::Integer, span));
-
-                None
-            }
+            Literal::Integer(value) => Ok(value),
+            other => Err(type_error(other.literal_type(), Type::Integer, span)),
         }
     }
 }
@@ -609,18 +597,12 @@ impl CompileIntoLiteral for OrderedFloat<f32> {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
         match literal {
-            Literal::Integer(value) => Some((value as f32).into()),
-            Literal::Float(value) => Some(value),
-            other => {
-                compiler
-                    .errors
-                    .push(type_error(other.literal_type(), Type::Float, span));
-
-                None
-            }
+            Literal::Integer(value) => Ok((value as f32).into()),
+            Literal::Float(value) => Ok(value),
+            other => Err(type_error(other.literal_type(), Type::Float, span)),
         }
     }
 }
@@ -629,87 +611,37 @@ impl CompileIntoLiteral for Icon {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
-        let icon = match literal {
-            Literal::Constant(Constant::Shard(value)) => Icon::Shard(value),
-            Literal::Constant(Constant::Equipment(value)) => Icon::Equipment(value),
-            Literal::Constant(Constant::OpherIcon(value)) => Icon::Opher(value),
-            Literal::Constant(Constant::LupoIcon(value)) => Icon::Lupo(value),
-            Literal::Constant(Constant::GromIcon(value)) => Icon::Grom(value),
-            Literal::Constant(Constant::TuleyIcon(value)) => Icon::Tuley(value),
-            Literal::IconAsset(path) => Icon::File(Cow::Owned(path)),
-            Literal::CustomIcon(path) => Icon::Bundle(path),
-            other => {
-                compiler
-                    .errors
-                    .push(type_error(other.literal_type(), Type::Icon, span));
-
-                return None;
-            }
-        };
-
-        Some(icon)
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
+        match literal {
+            Literal::Constant(Constant::Shard(value)) => Ok(Icon::Shard(value)),
+            Literal::Constant(Constant::LupoIcon(value)) => Ok(Icon::Lupo(value)),
+            Literal::Constant(Constant::GromIcon(value)) => Ok(Icon::Grom(value)),
+            Literal::Constant(Constant::TuleyIcon(value)) => Ok(Icon::Tuley(value)),
+            Literal::Constant(constant) => Equipment::coerce_constant(constant)
+                .map(Icon::Equipment)
+                .or_else(|| OpherIcon::coerce_constant(constant).map(Icon::Opher))
+                .ok_or_else(|| type_error(constant.literal_type(), Type::Icon, span)),
+            Literal::IconAsset(path) => Ok(Icon::File(Cow::Owned(path))),
+            Literal::CustomIcon(path) => Ok(Icon::Bundle(path)),
+            other => Err(type_error(other.literal_type(), Type::Icon, span)),
+        }
     }
 }
-
-macro_rules! impl_constants_coerce_from {
-    ($ident: ident) => {
-        impl CompileIntoLiteral for wotw_seedgen_data::$ident {
-            fn coerce_literal(literal: Literal, span: Range<usize>, compiler: &mut SnippetCompiler) -> Option<Self> {
-                match literal {
-                    Literal::Constant(Constant::$ident(value)) => Some(value),
-                    other => {
-                        compiler.errors.push(type_error(other.literal_type(), Type::$ident, span));
-                        None
-                    },
-                }
-            }
-        }
-    };
-    ($ident: ident, $($more: ident),+ $(,)?) => {
-        impl_constants_coerce_from!($ident);
-        impl_constants_coerce_from!($($more),+);
-    };
-}
-
-impl_constants_coerce_from!(
-    Skill,
-    Shard,
-    Teleporter,
-    WeaponUpgrade,
-    Zone,
-    Equipment,
-    EquipSlot,
-    WheelItemPosition,
-    WheelBind,
-    OpherIcon,
-    LupoIcon,
-    GromIcon,
-    TuleyIcon,
-    MapIcon,
-    Alignment,
-    HorizontalAnchor,
-    VerticalAnchor,
-    ScreenPosition,
-    CoordinateSystem,
-);
 
 impl CompileIntoLiteral for String {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
-        let result = match literal {
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
+        match literal {
             Literal::String(value) => match value {
                 StringOrPlaceholder::Value(value) => Ok(value),
                 _ => Err(Error::custom("expected string literal".to_string(), span)),
             },
             other => Err(type_error(other.literal_type(), Type::String, span)),
-        };
-
-        compiler.consume_result(result)
+        }
     }
 }
 
@@ -717,17 +649,11 @@ impl CompileIntoLiteral for StringOrPlaceholder {
     fn coerce_literal(
         literal: Literal,
         span: Range<usize>,
-        compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
         match literal {
-            Literal::String(value) => Some(value),
-            other => {
-                compiler
-                    .errors
-                    .push(type_error(other.literal_type(), Type::String, span));
-
-                None
-            }
+            Literal::String(value) => Ok(value),
+            other => Err(type_error(other.literal_type(), Type::String, span)),
         }
     }
 }
@@ -737,8 +663,8 @@ impl CompileIntoLiteral for UberIdentifier {
         literal: Literal,
         span: Range<usize>,
         compiler: &mut SnippetCompiler,
-    ) -> Option<Self> {
-        let result = match literal {
+    ) -> Result<Self, Error> {
+        match literal {
             Literal::UberIdentifier(UberStateAlias {
                 uber_identifier,
                 value,
@@ -752,9 +678,293 @@ impl CompileIntoLiteral for UberIdentifier {
                 )),
             },
             other => Err(type_error(other.literal_type(), Type::UberIdentifier, span)),
+        }
+    }
+}
+
+trait CompileIntoConstant: Sized {
+    const TYPE: Type;
+
+    fn coerce_constant(constant: Constant) -> Option<Self>;
+}
+
+impl<T: CompileIntoConstant> CompileIntoLiteral for T {
+    fn coerce_literal(
+        literal: Literal,
+        span: Range<usize>,
+        _compiler: &mut SnippetCompiler,
+    ) -> Result<Self, Error> {
+        let t = match &literal {
+            Literal::Constant(constant) => T::coerce_constant(constant.clone()),
+            _ => None,
         };
 
-        compiler.consume_result(result)
+        t.ok_or_else(|| type_error(literal.literal_type(), T::TYPE, span))
+    }
+}
+
+impl CompileIntoConstant for Skill {
+    const TYPE: Type = Type::Skill;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::Skill(skill) => Some(skill),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for Shard {
+    const TYPE: Type = Type::Shard;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::Shard(shard) => Some(shard),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for Teleporter {
+    const TYPE: Type = Type::Teleporter;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::Teleporter(teleporter) => Some(teleporter),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for WeaponUpgrade {
+    const TYPE: Type = Type::WeaponUpgrade;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::WeaponUpgrade(weapon_upgrade) => Some(weapon_upgrade),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for Equipment {
+    const TYPE: Type = Type::Equipment;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::Skill(skill) => skill.equipment(),
+            Constant::Equipment(equipment) => Some(equipment),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for Zone {
+    const TYPE: Type = Type::Zone;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::Teleporter(teleporter) => match teleporter {
+                Teleporter::Marsh => Some(Zone::Marsh),
+                Teleporter::Hollow => Some(Zone::Hollow),
+                Teleporter::Glades => Some(Zone::Glades),
+                Teleporter::Wellspring => Some(Zone::Wellspring),
+                Teleporter::Burrows => Some(Zone::Burrows),
+                Teleporter::Reach => Some(Zone::Reach),
+                Teleporter::Depths => Some(Zone::Depths),
+                Teleporter::Willow => Some(Zone::Willow),
+                Teleporter::Den
+                | Teleporter::WoodsEntrance
+                | Teleporter::WoodsExit
+                | Teleporter::CentralPools
+                | Teleporter::PoolsBoss
+                | Teleporter::FeedingGrounds
+                | Teleporter::CentralWastes
+                | Teleporter::OuterRuins
+                | Teleporter::InnerRuins
+                | Teleporter::Shriek => None,
+            },
+            Constant::Zone(zone) => Some(zone),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for EquipSlot {
+    const TYPE: Type = Type::EquipSlot;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::EquipSlot(equip_slot) => Some(equip_slot),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for WheelItemPosition {
+    const TYPE: Type = Type::WheelItemPosition;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::WheelItemPosition(wheel_item_position) => Some(wheel_item_position),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for WheelBind {
+    const TYPE: Type = Type::WheelBind;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::EquipSlot(equip_slot) => Some(match equip_slot {
+                EquipSlot::Ability1 => WheelBind::Ability1,
+                EquipSlot::Ability2 => WheelBind::Ability2,
+                EquipSlot::Ability3 => WheelBind::Ability3,
+            }),
+            Constant::WheelBind(wheel_bind) => Some(wheel_bind),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for OpherIcon {
+    const TYPE: Type = Type::OpherIcon;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::Skill(skill) => skill.opher_icon(),
+            Constant::WeaponUpgrade(weapon_upgrade) => Some(weapon_upgrade.opher_icon()),
+            Constant::OpherIcon(opher_icon) => Some(opher_icon),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for LupoIcon {
+    const TYPE: Type = Type::LupoIcon;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::LupoIcon(lupo_icon) => Some(lupo_icon),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for GromIcon {
+    const TYPE: Type = Type::GromIcon;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::GromIcon(grom_icon) => Some(grom_icon),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for TuleyIcon {
+    const TYPE: Type = Type::TuleyIcon;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::TuleyIcon(tuley_icon) => Some(tuley_icon),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for MapIcon {
+    const TYPE: Type = Type::MapIcon;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::MapIcon(map_icon) => Some(map_icon),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for Alignment {
+    const TYPE: Type = Type::Alignment;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::WheelItemPosition(wheel_item_position) => match wheel_item_position {
+                WheelItemPosition::Right => Some(Alignment::Right),
+                WheelItemPosition::Left => Some(Alignment::Left),
+                _ => None,
+            },
+            Constant::Alignment(alignment) => Some(alignment),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for HorizontalAnchor {
+    const TYPE: Type = Type::HorizontalAnchor;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::WheelItemPosition(wheel_item_position) => match wheel_item_position {
+                WheelItemPosition::Right => Some(HorizontalAnchor::Right),
+                WheelItemPosition::Left => Some(HorizontalAnchor::Left),
+                _ => None,
+            },
+            Constant::Alignment(alignment) => match alignment {
+                Alignment::Left => Some(HorizontalAnchor::Left),
+                Alignment::Center => Some(HorizontalAnchor::Center),
+                Alignment::Right => Some(HorizontalAnchor::Right),
+                _ => None,
+            },
+            Constant::HorizontalAnchor(horizontal_anchor) => Some(horizontal_anchor),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for VerticalAnchor {
+    const TYPE: Type = Type::VerticalAnchor;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::WheelItemPosition(wheel_item_position) => match wheel_item_position {
+                WheelItemPosition::Top => Some(VerticalAnchor::Top),
+                WheelItemPosition::Bottom => Some(VerticalAnchor::Bottom),
+                _ => None,
+            },
+            Constant::VerticalAnchor(vertical_anchor) => Some(vertical_anchor),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for ScreenPosition {
+    const TYPE: Type = Type::ScreenPosition;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::WheelItemPosition(wheel_item_position) => match wheel_item_position {
+                WheelItemPosition::TopRight => Some(ScreenPosition::TopRight),
+                WheelItemPosition::BottomRight => Some(ScreenPosition::BottomRight),
+                WheelItemPosition::BottomLeft => Some(ScreenPosition::BottomLeft),
+                WheelItemPosition::TopLeft => Some(ScreenPosition::TopLeft),
+                _ => None,
+            },
+            Constant::ScreenPosition(screen_position) => Some(screen_position),
+            _ => None,
+        }
+    }
+}
+
+impl CompileIntoConstant for CoordinateSystem {
+    const TYPE: Type = Type::CoordinateSystem;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::CoordinateSystem(coordinate_system) => Some(coordinate_system),
+            _ => None,
+        }
     }
 }
 

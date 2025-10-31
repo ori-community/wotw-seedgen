@@ -27,7 +27,7 @@ fun skill_velocity() {
     200,
     "Move faster when using abilities such as Dash and Bash",
     skill_velocity_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun enable() {
@@ -61,8 +61,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", WheelItemPosition::Top, "Toggle Skill Velocity")
-    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::Top, skill_velocity_icon)
+    set_wheel_item_name("bonus_upgrade", Top, "Toggle Skill Velocity")
+    set_wheel_item_icon("bonus_upgrade", Top, skill_velocity_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -71,12 +71,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::Top, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::Top, 255, 255, 255, 255)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::Top, WheelBind::All, disable())
+    set_wheel_item_description("bonus_upgrade", Top, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", Top, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", Top, All, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::Top, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::Top, 128, 128, 128, 196)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::Top, WheelBind::All, enable())
+    set_wheel_item_description("bonus_upgrade", Top, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", Top, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", Top, All, enable())
 }

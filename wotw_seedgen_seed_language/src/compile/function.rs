@@ -552,9 +552,10 @@ impl<'source> ast::FunctionCall<'source> {
                 };
                 let end = self.parameters.close.span_end();
 
-                compiler
-                    .errors
-                    .push(Error::custom("Too few parameters".to_string(), start..end))
+                compiler.errors.push(Error::custom(
+                    format!("Too few parameters\n{parameters:#?}"),
+                    start..end,
+                ))
             }
             Ordering::Equal => {}
             Ordering::Greater => {

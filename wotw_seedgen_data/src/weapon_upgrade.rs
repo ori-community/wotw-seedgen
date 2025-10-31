@@ -1,4 +1,4 @@
-use crate::UberIdentifier;
+use crate::{OpherIcon, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, FromRepr, VariantArray};
 use wotw_seedgen_derive::FromStr;
@@ -62,6 +62,17 @@ impl WeaponUpgrade {
             Self::CHARGE_BLAZE_ID => Some(Self::ChargeBlaze),
             Self::RAPID_SENTRY_ID => Some(Self::RapidSentry),
             _ => None,
+        }
+    }
+
+    /// Returns the [`OpherIcon`] corresponding to this `WeaponUpgrade`.
+    pub const fn opher_icon(self) -> OpherIcon {
+        match self {
+            WeaponUpgrade::RapidSentry => OpherIcon::RapidSentry,
+            WeaponUpgrade::HammerShockwave => OpherIcon::HammerShockwave,
+            WeaponUpgrade::StaticShuriken => OpherIcon::StaticShuriken,
+            WeaponUpgrade::ExplodingSpear => OpherIcon::ExplodingSpear,
+            WeaponUpgrade::ChargeBlaze => OpherIcon::ChargeBlaze,
         }
     }
 }

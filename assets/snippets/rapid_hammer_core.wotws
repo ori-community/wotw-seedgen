@@ -25,7 +25,7 @@ fun rapid_hammer() {
     200,
     "Hammer attacks are faster",
     rapid_hammer_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 
 fun enable() {
@@ -49,8 +49,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", WheelItemPosition::RightTop, "Toggle Rapid Hammer")
-    set_wheel_item_icon("bonus_upgrade", WheelItemPosition::RightTop, rapid_hammer_icon)
+    set_wheel_item_name("bonus_upgrade", RightTop, "Toggle Rapid Hammer")
+    set_wheel_item_icon("bonus_upgrade", RightTop, rapid_hammer_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -59,12 +59,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::RightTop, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::RightTop, 255, 255, 255, 255)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::RightTop, WheelBind::All, disable())
+    set_wheel_item_description("bonus_upgrade", RightTop, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", RightTop, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", RightTop, All, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", WheelItemPosition::RightTop, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", WheelItemPosition::RightTop, 128, 128, 128, 196)
-    set_wheel_item_action("bonus_upgrade", WheelItemPosition::RightTop, WheelBind::All, enable())
+    set_wheel_item_description("bonus_upgrade", RightTop, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", RightTop, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", RightTop, All, enable())
 }

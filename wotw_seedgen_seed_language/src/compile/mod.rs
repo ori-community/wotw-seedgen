@@ -483,6 +483,25 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             (Type::UberIdentifier, Type::Integer) => left.uber_state_type(self).map(Type::from),
             (Type::Integer, Type::UberIdentifier) => right.uber_state_type(self).map(Type::from),
             (Type::Integer, Type::Float) | (Type::Float, Type::Integer) => Some(Type::Float),
+            (Type::Skill, Type::Equipment) | (Type::Equipment, Type::Skill) => {
+                Some(Type::Equipment)
+            }
+            (Type::Teleporter, Type::Zone) | (Type::Zone, Type::Teleporter) => Some(Type::Zone),
+            (Type::Skill | Type::WeaponUpgrade, Type::OpherIcon)
+            | (Type::OpherIcon, Type::Skill | Type::WeaponUpgrade) => Some(Type::OpherIcon),
+            (Type::EquipSlot, Type::WheelBind) | (Type::WheelBind, Type::EquipSlot) => {
+                Some(Type::WheelBind)
+            }
+            (Type::WheelItemPosition, Type::Alignment)
+            | (Type::Alignment, Type::WheelItemPosition) => Some(Type::Alignment),
+            (Type::WheelItemPosition | Type::Alignment, Type::HorizontalAnchor)
+            | (Type::HorizontalAnchor, Type::WheelItemPosition | Type::Alignment) => {
+                Some(Type::HorizontalAnchor)
+            }
+            (Type::WheelItemPosition, Type::VerticalAnchor)
+            | (Type::VerticalAnchor, Type::WheelItemPosition) => Some(Type::VerticalAnchor),
+            (Type::WheelItemPosition, Type::ScreenPosition)
+            | (Type::ScreenPosition, Type::WheelItemPosition) => Some(Type::ScreenPosition),
             (_, Type::String) | (Type::String, _) => Some(Type::String),
             _ => {
                 self.errors

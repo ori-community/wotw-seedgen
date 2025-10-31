@@ -4,5 +4,5 @@
 
 on spawn {
     store(skills.sword, true)
-    equip(EquipSlot::Ability1, Equipment::Sword)
+    equip(Ability1, Sword)
 }

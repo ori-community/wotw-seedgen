@@ -24,7 +24,7 @@ fun health_regeneration() {
     200,
     "Passively regenerate health at a slow rate",
     health_regeneration_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(health_regeneration)
 
@@ -37,7 +37,7 @@ fun energy_regeneration() {
     200,
     "Passively regenerate energy at a slow rate",
     energy_regeneration_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(energy_regeneration)
 
@@ -50,7 +50,7 @@ fun extra_double_jump() {
     200,
     "If you have *Double Jump*, get an additional jump in the air",
     extra_double_jump_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(extra_double_jump)
 
@@ -63,7 +63,7 @@ fun extra_air_dash() {
     200,
     "If you have *Dash*, get an additional dash in the air",
     extra_air_dash_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(extra_air_dash)
 
@@ -76,7 +76,7 @@ fun blaze_efficiency() {
     200,
     "Halves the cost of using *Blaze*",
     blaze_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(blaze_efficiency)
 
@@ -89,7 +89,7 @@ fun spear_efficiency() {
     200,
     "Halves the cost of using *Spear*",
     spear_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(spear_efficiency)
 
@@ -102,7 +102,7 @@ fun shuriken_efficiency() {
     200,
     "Halves the cost of using *Shuriken*",
     shuriken_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(shuriken_efficiency)
 
@@ -115,7 +115,7 @@ fun sentry_efficiency() {
     200,
     "Halves the cost of using *Sentry*",
     sentry_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(sentry_efficiency)
 
@@ -128,7 +128,7 @@ fun bow_efficiency() {
     200,
     "Halves the cost of using *Bow*",
     bow_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(bow_efficiency)
 
@@ -141,7 +141,7 @@ fun regenerate_efficiency() {
     200,
     "Halves the cost of using *Regenerate*",
     regenerate_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(regenerate_efficiency)
 
@@ -154,7 +154,7 @@ fun flash_efficiency() {
     200,
     "Halves the cost of using *Flash*",
     flash_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(flash_efficiency)
 
@@ -167,6 +167,6 @@ fun grenade_efficiency() {
     200,
     "Halves the cost of using *Grenade*",
     grenade_efficiency_icon,
-    MapIcon::BonusItem
+    BonusItem
 )
 !export(grenade_efficiency)

@@ -28,22 +28,22 @@ fun disable_all() {}
 !export(disable_all)
 
 on reload {
-    set_wheel_item_name("root", WheelItemPosition::LeftTop, "Bonus Toggles")
-    set_wheel_item_action("root", WheelItemPosition::LeftTop, WheelBind::All, switch_wheel("bonus_upgrades"))
-    set_wheel_item_action("root", WheelItemPosition::LeftTop, WheelBind::Ability1, toggle_all())
+    set_wheel_item_name("root", LeftTop, "Bonus Toggles")
+    set_wheel_item_action("root", LeftTop, All, switch_wheel("bonus_upgrades"))
+    set_wheel_item_action("root", LeftTop, Ability1, toggle_all())
     update_bonus_wheel()
 }
 on respawn update_bonus_wheel()
 
 fun update_bonus_wheel() {
     any_collected()
-    if get_boolean("any_collected") set_wheel_item_description("root", WheelItemPosition::LeftTop, "[Ability1]Toggle all\n[Ability2]Open menu")
-    if get_boolean("any_collected") == false set_wheel_item_description("root", WheelItemPosition::LeftTop, "No Bonus Upgrades collected")
+    if get_boolean("any_collected") set_wheel_item_description("root", LeftTop, "[Ability1]Toggle all\n[Ability2]Open menu")
+    if get_boolean("any_collected") == false set_wheel_item_description("root", LeftTop, "No Bonus Upgrades collected")
     any_enabled()
-    if get_boolean("any_enabled") set_wheel_item_icon("root", WheelItemPosition::LeftTop, on_icon)
+    if get_boolean("any_enabled") set_wheel_item_icon("root", LeftTop, on_icon)
     if get_boolean("any_enabled") == false {
-        set_wheel_item_icon("root", WheelItemPosition::LeftTop, off_icon)
-        set_wheel_item_color("root", WheelItemPosition::LeftTop, 128, 128, 128, 196)
+        set_wheel_item_icon("root", LeftTop, off_icon)
+        set_wheel_item_color("root", LeftTop, 128, 128, 128, 196)
     }
 }
 

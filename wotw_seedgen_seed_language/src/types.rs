@@ -4,7 +4,7 @@ use crate::{
         Operation, Operator, UberStateType,
     },
     compile::{FunctionIdentifier, SnippetCompiler},
-    output::{self, ConstantDiscriminants},
+    output,
     token::Tokenizer,
 };
 use serde::Deserialize;
@@ -124,7 +124,7 @@ impl InferType for ExpressionValue<'_> {
         match self {
             ExpressionValue::Group(group) => group.content.infer_type(compiler),
             ExpressionValue::Action(action) => action.infer_type(compiler),
-            ExpressionValue::Literal(literal) => literal.infer_type(compiler),
+            ExpressionValue::Literal(literal) => Some(literal.data.literal_type()),
             ExpressionValue::Identifier(identifier) => identifier.infer_type(compiler),
         }
     }
@@ -301,54 +301,22 @@ impl Expression<'_> {
     }
 }
 
-impl InferType for Literal<'_> {
-    // TODO unused, not sure any infertype implementation here is used...
-    fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
-        match self {
-            Literal::UberIdentifier(_) => Some(Type::UberIdentifier),
-            Literal::Boolean(_) => Some(Type::Boolean),
-            Literal::Integer(_) => Some(Type::Integer),
-            Literal::Float(_) => Some(Type::Float),
-            Literal::String(_) => Some(Type::String),
-            Literal::Constant(constant) => constant.infer_type(compiler),
-        }
-    }
-}
-
-impl InferType for Constant<'_> {
-    fn infer_type(&self, _compiler: &mut SnippetCompiler) -> Option<Type> {
-        self.kind
-            .data
-            .0
-            .parse()
-            .ok()
-            .map(|discriminant| match discriminant {
-                ConstantDiscriminants::Skill => Type::Skill,
-                ConstantDiscriminants::Shard => Type::Shard,
-                ConstantDiscriminants::Teleporter => Type::Teleporter,
-                ConstantDiscriminants::WeaponUpgrade => Type::WeaponUpgrade,
-                ConstantDiscriminants::Equipment => Type::Equipment,
-                ConstantDiscriminants::Zone => Type::Zone,
-                ConstantDiscriminants::OpherIcon => Type::OpherIcon,
-                ConstantDiscriminants::LupoIcon => Type::LupoIcon,
-                ConstantDiscriminants::GromIcon => Type::GromIcon,
-                ConstantDiscriminants::TuleyIcon => Type::TuleyIcon,
-                ConstantDiscriminants::MapIcon => Type::MapIcon,
-                ConstantDiscriminants::EquipSlot => Type::EquipSlot,
-                ConstantDiscriminants::WheelItemPosition => Type::WheelItemPosition,
-                ConstantDiscriminants::WheelBind => Type::WheelBind,
-                ConstantDiscriminants::Alignment => Type::Alignment,
-                ConstantDiscriminants::HorizontalAnchor => Type::HorizontalAnchor,
-                ConstantDiscriminants::VerticalAnchor => Type::VerticalAnchor,
-                ConstantDiscriminants::ScreenPosition => Type::ScreenPosition,
-                ConstantDiscriminants::CoordinateSystem => Type::CoordinateSystem,
-            })
-    }
-}
-
 impl InferType for Spanned<Identifier<'_>> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         compiler.resolve(self).map(output::Literal::literal_type)
+    }
+}
+
+impl Literal<'_> {
+    pub(crate) fn literal_type(&self) -> Type {
+        match self {
+            Literal::UberIdentifier(_) => Type::UberIdentifier,
+            Literal::Boolean(_) => Type::Boolean,
+            Literal::Integer(_) => Type::Integer,
+            Literal::Float(_) => Type::Float,
+            Literal::String(_) => Type::String,
+            Literal::Constant(constant) => constant.literal_type(),
+        }
     }
 }
 
@@ -369,28 +337,28 @@ impl output::Literal {
     }
 }
 
-impl output::Constant {
+impl Constant {
     pub(crate) fn literal_type(&self) -> Type {
         match self {
-            output::Constant::Skill(_) => Type::Skill,
-            output::Constant::Shard(_) => Type::Shard,
-            output::Constant::Teleporter(_) => Type::Teleporter,
-            output::Constant::WeaponUpgrade(_) => Type::WeaponUpgrade,
-            output::Constant::Equipment(_) => Type::Equipment,
-            output::Constant::Zone(_) => Type::Zone,
-            output::Constant::OpherIcon(_) => Type::OpherIcon,
-            output::Constant::LupoIcon(_) => Type::LupoIcon,
-            output::Constant::GromIcon(_) => Type::GromIcon,
-            output::Constant::TuleyIcon(_) => Type::TuleyIcon,
-            output::Constant::MapIcon(_) => Type::MapIcon,
-            output::Constant::EquipSlot(_) => Type::EquipSlot,
-            output::Constant::WheelItemPosition(_) => Type::WheelItemPosition,
-            output::Constant::WheelBind(_) => Type::WheelBind,
-            output::Constant::Alignment(_) => Type::Alignment,
-            output::Constant::HorizontalAnchor(_) => Type::HorizontalAnchor,
-            output::Constant::VerticalAnchor(_) => Type::VerticalAnchor,
-            output::Constant::ScreenPosition(_) => Type::ScreenPosition,
-            output::Constant::CoordinateSystem(_) => Type::CoordinateSystem,
+            Constant::Skill(_) => Type::Skill,
+            Constant::Shard(_) => Type::Shard,
+            Constant::Teleporter(_) => Type::Teleporter,
+            Constant::WeaponUpgrade(_) => Type::WeaponUpgrade,
+            Constant::Equipment(_) => Type::Equipment,
+            Constant::Zone(_) => Type::Zone,
+            Constant::OpherIcon(_) => Type::OpherIcon,
+            Constant::LupoIcon(_) => Type::LupoIcon,
+            Constant::GromIcon(_) => Type::GromIcon,
+            Constant::TuleyIcon(_) => Type::TuleyIcon,
+            Constant::MapIcon(_) => Type::MapIcon,
+            Constant::EquipSlot(_) => Type::EquipSlot,
+            Constant::WheelItemPosition(_) => Type::WheelItemPosition,
+            Constant::WheelBind(_) => Type::WheelBind,
+            Constant::Alignment(_) => Type::Alignment,
+            Constant::HorizontalAnchor(_) => Type::HorizontalAnchor,
+            Constant::VerticalAnchor(_) => Type::VerticalAnchor,
+            Constant::ScreenPosition(_) => Type::ScreenPosition,
+            Constant::CoordinateSystem(_) => Type::CoordinateSystem,
         }
     }
 }

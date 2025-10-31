@@ -4,6 +4,6 @@
 
 !tags("Launch on Seir")
 
-!remove(skill(Skill::Launch), 1)
+!remove(skill(Launch), 1)
 !remove_location(WindtornRuins.Seir)
-on WindtornRuins.Seir skill(Skill::Launch)
+on WindtornRuins.Seir skill(Launch)

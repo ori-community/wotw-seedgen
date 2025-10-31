@@ -55,49 +55,49 @@ on reload {
         1,
         "Repair the Spirit Well",
         "They say the spirit of old could #warp# from one well to another. Perhaps if we #repaired this well with Gorlek Ore#, returning to the #Wellspring Glades# would be even easier.",
-        GromIcon::RepairTheSpiritWell,
+        RepairTheSpiritWell,
     )
     set_shop_item_data(
         gromShop.housesABought,
         4,
         "Dwelling Repairs",
         "It's a shame how those old Moki dwellings are in shambles. Maybe if we #fixed them up# the Moki could #move back to the Glades#?",
-        GromIcon::DwellingRepairs,
+        DwellingRepairs,
     )
     set_shop_item_data(
         gromShop.housesBBought,
         6,
         "Roofs Over Heads",
         "Time to #build some more housing#! Now on the big tree, by the fire.",
-        GromIcon::RoofsOverHeads,
+        RoofsOverHeads,
     )
     set_shop_item_data(
         gromShop.housesCBought,
         8,
         "Onwards and Upwards",
         "Treehouses seem to be popular with the Moki. How about we add a couple more?",
-        GromIcon::OnwardsAndUpwards,
+        OnwardsAndUpwards,
     )
     set_shop_item_data(
         gromShop.removeThornsBought,
         5,
         "Thorny Situation",
         "Those spikey vines all over the place are quite the nuisance, let me tell you. With some help, I could #clear them out# and #make the Glades safer# for everyone!",
-        GromIcon::ThornySituation,
+        ThornySituation,
     )
     set_shop_item_data(
         gromShop.openCaveBought,
         6,
         "Clear the Cave Entrance",
         "That old cave entrance looks like it's #about to collapse#...but we Gorlek learned a thing or two about tunnelling after fleeing to the mines. With some Ore, I can #repair# it.",
-        GromIcon::ClearTheCaveEntrance,
+        ClearTheCaveEntrance,
     )
     set_shop_item_data(
         gromShop.beautifyBought,
         10,
         "The Gorlek Touch",
         "The Moki are right...building it only half the work. Nothing's quite complete without some #finishing touches# of decoration.",
-        GromIcon::TheGorlekTouch,
+        TheGorlekTouch,
     )
     // TODO Tuley
 }
