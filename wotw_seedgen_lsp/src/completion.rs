@@ -379,7 +379,11 @@ fn function_completion() -> Vec<CompletionItem> {
         .collect()
 }
 
-fn enum_member_completion_with_detail<T, F, D>(variants: &[T], mut detail: F) -> Vec<CompletionItem>
+fn enum_member_completion_with_detail<T, F, D>(
+    variants: &[T],
+    detail: &str,
+    mut description: F,
+) -> Vec<CompletionItem>
 where
     T: ToString,
     F: FnMut(&T) -> D,
@@ -390,8 +394,8 @@ where
         .map(|variant| CompletionItem {
             label: variant.to_string(),
             label_details: Some(CompletionItemLabelDetails {
-                description: Some(detail(variant).to_string()),
-                ..Default::default()
+                detail: Some(format!(" ({detail})")),
+                description: Some(description(variant).to_string()),
             }),
             kind: Some(CompletionItemKind::ENUM_MEMBER),
             ..Default::default()
@@ -411,55 +415,83 @@ where
 
 lazy_static! {
     static ref SKILL_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(Skill::VARIANTS, |skill| *skill as u8);
+        enum_member_completion_with_detail(Skill::VARIANTS, "Skill", |skill| *skill as u8);
     static ref SHARD_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(Shard::VARIANTS, |shard| *shard as u8);
+        enum_member_completion_with_detail(Shard::VARIANTS, "Shard", |shard| *shard as u8);
     static ref TELEPORTER_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(Teleporter::VARIANTS, |teleporter| *teleporter as u8);
+        enum_member_completion_with_detail(Teleporter::VARIANTS, "Teleporter", |teleporter| {
+            *teleporter as u8
+        });
     static ref WEAPON_UPGRADE_COMPLETION: Vec<CompletionItem> = enum_member_completion_with_detail(
         WeaponUpgrade::VARIANTS,
+        "WeaponUpgrade",
         |weapon_upgrade| *weapon_upgrade as u8
     );
-    static ref EQUIPMENT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(Equipment::VARIANTS, |equipment| *equipment as u8);
+    static ref EQUIPMENT_COMPLETION: Vec<CompletionItem> = enum_member_completion_with_detail(
+        Equipment::VARIANTS,
+        "Equipment",
+        |equipment| *equipment as u8
+    );
     static ref ZONE_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(Zone::VARIANTS, |zone| *zone as u8);
+        enum_member_completion_with_detail(Zone::VARIANTS, "Zone", |zone| *zone as u8);
     static ref OPHER_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(OpherIcon::VARIANTS, |opher_icon| *opher_icon as u8);
+        enum_member_completion_with_detail(OpherIcon::VARIANTS, "OpherIcon", |opher_icon| {
+            *opher_icon as u8
+        });
     static ref LUPO_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(LupoIcon::VARIANTS, |lupo_icon| *lupo_icon as u8);
+        enum_member_completion_with_detail(LupoIcon::VARIANTS, "LupoIcon", |lupo_icon| *lupo_icon
+            as u8);
     static ref GROM_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(GromIcon::VARIANTS, |grom_icon| *grom_icon as u8);
+        enum_member_completion_with_detail(GromIcon::VARIANTS, "GromIcon", |grom_icon| *grom_icon
+            as u8);
     static ref TULEY_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(TuleyIcon::VARIANTS, |tuley_icon| *tuley_icon as u8);
+        enum_member_completion_with_detail(TuleyIcon::VARIANTS, "TuleyIcon", |tuley_icon| {
+            *tuley_icon as u8
+        });
     static ref MAP_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(MapIcon::VARIANTS, |map_icon| *map_icon as u8);
+        enum_member_completion_with_detail(MapIcon::VARIANTS, "MapIcon", |map_icon| *map_icon
+            as u8);
     static ref EQUIP_SLOT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(EquipSlot::VARIANTS, |equip_slot| *equip_slot as u8);
+        enum_member_completion_with_detail(EquipSlot::VARIANTS, "EquipSlot", |equip_slot| {
+            *equip_slot as u8
+        });
     static ref WHEEL_ITEM_POSITION_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(WheelItemPosition::VARIANTS, |wheel_item_position| {
-            *wheel_item_position as u8
-        });
+        enum_member_completion_with_detail(
+            WheelItemPosition::VARIANTS,
+            "WheelItemPosition",
+            |wheel_item_position| { *wheel_item_position as u8 }
+        );
     static ref WHELL_BIND_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(WheelBind::VARIANTS, |wheel_bind| *wheel_bind as u8);
-    static ref ALIGNMENT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(Alignment::VARIANTS, |alignment| *alignment as u8);
+        enum_member_completion_with_detail(WheelBind::VARIANTS, "WheelBind", |wheel_bind| {
+            *wheel_bind as u8
+        });
+    static ref ALIGNMENT_COMPLETION: Vec<CompletionItem> = enum_member_completion_with_detail(
+        Alignment::VARIANTS,
+        "Alignment",
+        |alignment| *alignment as u8
+    );
     static ref HORIZONTAL_ANCHOR_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(HorizontalAnchor::VARIANTS, |horizontal_anchor| {
-            *horizontal_anchor as u8
-        });
-    static ref VERTICAL_ANCHOR_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(VerticalAnchor::VARIANTS, |vertical_anchor| {
-            *vertical_anchor as u8
-        });
-    static ref SCREEN_POSITION_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(ScreenPosition::VARIANTS, |screen_position| {
-            *screen_position as u8
-        });
+        enum_member_completion_with_detail(
+            HorizontalAnchor::VARIANTS,
+            "HorizontalAnchor",
+            |horizontal_anchor| { *horizontal_anchor as u8 }
+        );
+    static ref VERTICAL_ANCHOR_COMPLETION: Vec<CompletionItem> = enum_member_completion_with_detail(
+        VerticalAnchor::VARIANTS,
+        "VerticalAnchor",
+        |vertical_anchor| { *vertical_anchor as u8 }
+    );
+    static ref SCREEN_POSITION_COMPLETION: Vec<CompletionItem> = enum_member_completion_with_detail(
+        ScreenPosition::VARIANTS,
+        "ScreenPosition",
+        |screen_position| { *screen_position as u8 }
+    );
     static ref COORDINATE_SYSTEM_COMPLETION: Vec<CompletionItem> =
-        enum_member_completion_with_detail(CoordinateSystem::VARIANTS, |coordinate_system| {
-            *coordinate_system as u8
-        });
+        enum_member_completion_with_detail(
+            CoordinateSystem::VARIANTS,
+            "CoordinateSystem",
+            |coordinate_system| { *coordinate_system as u8 }
+        );
     static ref CONSTANT_COMPLETION: Vec<CompletionItem> = ConstantDiscriminants::VARIANTS
         .iter()
         .copied()
