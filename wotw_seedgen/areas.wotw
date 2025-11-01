@@ -4452,7 +4452,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
   quest GladesTown.HandToHandCanteen:
     moki: EastPools.HandToHandSpyglass
 
-  pickup GladesTown.UpperOre:
+  pickup GladesTown.UpperOre:  # If using GladesTown.BuildHuts, check for redundancy with paths going from GladesTown.MotayHut first
     moki:
       Bash, Grenade=1, Launch
       Launch, DoubleJump  # different ways to solve this, should be fine...
@@ -4462,7 +4462,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, Dash, Glide
         TuleyShop.Lightcatchers, Bash, DoubleJump, Dash
         TuleyShop.Lightcatchers, Bash, Glide
-      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
+      GladesTown.BuildHuts:
         DoubleJump, Bash, Grenade=2
         TuleyShop.StickyGrass:
           DoubleJump, Bash, Grenade=1
@@ -4478,7 +4478,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         DoubleJump, TripleJump, Hammer  # upswing to the moss
         TuleyShop.Lightcatchers, Bash, Grenade=1 OR SentryJump=1  # can still do this with the huts up
         TuleyShop.Lightcatchers, Bash, DoubleJump  # wrap around
-      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
+      GladesTown.BuildHuts:
         Bash, Grenade=2
         SentryJump=2, DoubleJump
         TuleyShop.Lightcatchers, Bash, SentryJump=1
@@ -4494,15 +4494,30 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, Sword, Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1
         TuleyShop.Lightcatchers, Bash, Sword, Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1
         TuleyShop.Lightcatchers, Bash, Hammer, Flash  # Possible with other energy weapons but you need to be careful about not damaging the plant
+      # Glitched
+      # AerialHammerJump
+      # DoubleJump, TripleJump, GlideJump OR GrenadeJump=1
+      # TuleyShop.StickyGrass:
+      #   SentryJump=1
+      #   GlideJump, DoubleJump
+      #   GlideJump, Spear=1, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # GladesTown.BuildHuts:
+      #   SentryJump=2
+      #   GrenadeJump=2, DoubleJump OR Dash OR Hammer
+      #   GrenadeJump=1, TuleyShop.StickyGrass, DoubleJump OR Dash OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       SentryJump=2  # Midairs
+      DoubleJump, TripleJump, Dash OR Glide  # using the ceiling from the left
+      AerialHammerJump OR GlideHammerJump
+      GrenadeJump, DoubleJump
+      TuleyShop.Lightcatchers, Bash, Grenade=1
       GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
         Bash  # use both slimes
         DoubleJump, TripleJump, GlideJump
-      TuleyShop.Lightcatchers, Bash, Grenade=1
-      DoubleJump, TripleJump, Dash OR Glide  # using the ceiling from the left
-      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Hammer OR Sword
-      TuleyShop.StickyGrass, Bash, Grenade=1, Sword
+      TuleyShop.StickyGrass:
+        TuleyShop.Lightcatchers, Bash, Hammer OR Sword
+        Bash, Grenade=1, Sword
+        GlideJump, DoubleJump OR Hammer OR Spear=1
 
   conn GladesTown.MotayHut:
     moki, GladesTown.BuildHuts:
@@ -4519,10 +4534,12 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Hammer, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe, GladesTown.BuildHuts:
-      GrenadeJump
+      GrenadeJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR PauseFloat
       Bash  # slime lure
-      TuleyShop.SpringPlants, Hammer, Dash  # uphammer bounce
+      TuleyShop.SpringPlants, Hammer  # uphammer bounce
       Dash  # late coyote
       Sword  # high jump, full combo, upslash and then downslash (all while holding right)
       # Dash, Glide OR Sword OR Hammer
@@ -4540,7 +4557,6 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
     kii:
       Bash, Sword OR Hammer
       Bash, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
-      Dash, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, TripleJump OR Dash
       Sword, DoubleJump, Damage=10
       Combat=2xWeakSlug, DoubleJump, Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
@@ -4548,6 +4564,16 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer
       Combat=2xWeakSlug, DoubleJump, Glide, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump
+      # SwordSJump=1, Damage=10  # dboost in spikes at the end to sjump to the anchor
+      # Combat=2xWeakSlug, GrenadeJump=1, Damage=10:  # gjump from the spikes to reach the anchor
+      #   Damage=10, DoubleJump OR Dash OR Glide
+      #   DoubleJump, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      #   Dash, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      #   Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Sword, GrenadeJump=1, Damage=10  # same as above
+      # Combat=2xWeakSlug, GlideJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
     unsafe:
       Bash, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
@@ -4555,12 +4581,15 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Combat=2xWeakSlug, PauseFloat, Damage=10
       Combat=2xWeakSlug, DoubleJump, Glide
       SwordSJump=1, Damage=10
-      HammerSJump=1, Damage=20
+      HammerSJump=1, Damage=10, Damage=10 OR HammerSJump=1  #  sjump at the start to avoid a dboost
       Dash, Hammer
       #Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
       Damage=10, Bash OR Sword
       DoubleJump, Dash, Damage=10  # damage for avoiding slimes
       DoubleJump, TripleJump OR Sword OR Hammer
+      GrenadeJump, DoubleJump
+      Combat=2xWeakSlug, GrenadeJump, Shuriken=4, Damage=10
+      GlideHammerJump
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
     moki:
@@ -4568,10 +4597,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       TuleyShop.BlueMoon, Grapple
       TuleyShop.StickyGrass, Grapple, Glide
     gorlek: TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
-    kii:
-      #GladesTown.BuildHuts, Dash, Sword  # Redundant with TwillenHome -> Teleporter
-      GladesTown.BuildHuts, Dash, Glide
-      #GladesTown.BuildHuts, Sword, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # Redundant with TwillenHome -> Teleporter
+    kii: GladesTown.BuildHuts, Dash, Glide
   conn GladesTown.UpperWest:  # paths that use the huts may want to go to MotayHut first; check for redundancies with Teleporter
     moki:
       TuleyShop.StickyGrass, Launch
@@ -4600,6 +4626,10 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       TuleyShop.StickyGrass:
         DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # condition for reaching the bridge
         Grapple, DoubleJump, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # TuleyShop.Lightcatchers, Bash, AerialHammerJump
+      # TuleyShop.StickyGrass, AerialHammerJump, Dash OR Glide OR Sword
+      # TuleyShop.StickyGrass, GlideJump, DoubleJump, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Grenade=2, DoubleJump, Sword  # Midair Grenade Pogo
       TuleyShop.Lightcatchers, Bash  # Use the slimes to reach the plant above Motay then bash glide to the bridge
