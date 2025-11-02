@@ -1,6 +1,7 @@
 use super::{expression::CompileInto, Compile, SnippetCompiler, PRIVATE_MEMORY};
 use crate::{
     ast::{self, UberStateType},
+    compile::{add_float, add_integer, store_boolean, store_float, store_integer},
     output::{
         ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
         CommandString, CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator,
@@ -54,10 +55,10 @@ pub fn health_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(health_fragment_string(false)),
-            super::add_integer_value(UberIdentifier::MAX_HEALTH, 5),
+            add_integer(UberIdentifier::MAX_HEALTH, 5),
             // TODO reimplement fragment overflow bug?
             // TODO but MAX_HEALTH is just the base max health!
-            super::set_integer(
+            store_integer(
                 UberIdentifier::HEALTH,
                 CommandInteger::FetchInteger {
                     uber_identifier: UberIdentifier::MAX_HEALTH,
@@ -71,8 +72,8 @@ pub fn energy_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(energy_fragment_string(false)),
-            super::add_float_value(UberIdentifier::MAX_ENERGY, 0.5.into()),
-            super::set_float(
+            add_float(UberIdentifier::MAX_ENERGY, 0.5),
+            store_float(
                 UberIdentifier::ENERGY,
                 CommandFloat::FetchFloat {
                     uber_identifier: UberIdentifier::MAX_ENERGY,
@@ -86,7 +87,7 @@ pub fn skill(skill: Skill) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(skill_string(skill, false)),
-            super::set_boolean_value(skill.uber_identifier(), true),
+            store_boolean(skill.uber_identifier(), true),
         ],
     }
 }
@@ -95,7 +96,7 @@ pub fn shard(shard: Shard) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(shard_string(shard, false)),
-            super::set_boolean_value(shard.uber_identifier(), true),
+            store_boolean(shard.uber_identifier(), true),
         ],
     }
 }
@@ -104,7 +105,7 @@ pub fn teleporter(teleporter: Teleporter) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(teleporter_string(teleporter, false)),
-            super::set_boolean_value(teleporter.uber_identifier(), true),
+            store_boolean(teleporter.uber_identifier(), true),
         ],
     }
 }
@@ -113,7 +114,7 @@ pub fn clean_water() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(clean_water_string(false)),
-            super::set_boolean_value(UberIdentifier::CLEAN_WATER, true),
+            store_boolean(UberIdentifier::CLEAN_WATER, true),
         ],
     }
 }
@@ -122,7 +123,7 @@ pub fn weapon_upgrade(weapon_upgrade: WeaponUpgrade) -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(weapon_upgrade_string(weapon_upgrade, false)),
-            super::set_integer_value(weapon_upgrade.uber_identifier(), 1),
+            store_integer(weapon_upgrade.uber_identifier(), 1),
         ],
     }
 }
@@ -552,10 +553,9 @@ impl<'source> ast::FunctionCall<'source> {
                 };
                 let end = self.parameters.close.span_end();
 
-                compiler.errors.push(Error::custom(
-                    format!("Too few parameters\n{parameters:#?}"),
-                    start..end,
-                ))
+                compiler
+                    .errors
+                    .push(Error::custom("Too few parameters".to_string(), start..end))
             }
             Ordering::Equal => {}
             Ordering::Greater => {
@@ -782,14 +782,14 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveHealthFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(health_fragment_string(true)),
-                    super::add_integer_value(UberIdentifier::MAX_HEALTH, -5),
+                    add_integer(UberIdentifier::MAX_HEALTH, -5),
                 ],
             }),
             FunctionIdentifier::EnergyFragment => Command::Void(energy_fragment()),
             FunctionIdentifier::RemoveEnergyFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(energy_fragment_string(true)),
-                    super::add_float_value(UberIdentifier::MAX_ENERGY, (-0.5).into()),
+                    add_float(UberIdentifier::MAX_ENERGY, -0.5),
                 ],
             }),
             FunctionIdentifier::Skill => Command::Void(skill(arg(&mut context)?)),
@@ -798,7 +798,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
 
                 let mut commands = vec![
                     item_message(skill_string(skill, true)),
-                    super::set_boolean_value(skill.uber_identifier(), false),
+                    store_boolean(skill.uber_identifier(), false),
                 ];
 
                 if let Some(equipment) = skill.equipment() {
@@ -814,7 +814,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(shard_string(shard, true)),
-                        super::set_boolean_value(shard.uber_identifier(), false),
+                        store_boolean(shard.uber_identifier(), false),
                     ],
                 })
             }
@@ -826,7 +826,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     commands: vec![
                         item_message(teleporter_string(teleporter, true)),
                         // TODO remove map segment?
-                        super::set_boolean_value(teleporter.uber_identifier(), false),
+                        store_boolean(teleporter.uber_identifier(), false),
                     ],
                 })
             }
@@ -834,7 +834,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveCleanWater => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(clean_water_string(true)),
-                    super::set_boolean_value(UberIdentifier::CLEAN_WATER, false),
+                    store_boolean(UberIdentifier::CLEAN_WATER, false),
                 ],
             }),
             FunctionIdentifier::WeaponUpgrade => Command::Void(weapon_upgrade(arg(&mut context)?)),
@@ -844,7 +844,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(weapon_upgrade_string(weapon_upgrade, true)),
-                        super::set_integer_value(weapon_upgrade.uber_identifier(), 0),
+                        store_integer(weapon_upgrade.uber_identifier(), 0),
                     ],
                 })
             }
@@ -1530,7 +1530,7 @@ fn resource(string_fn: fn(bool) -> CommandString, uber_identifier: UberIdentifie
     CommandVoid::Multi {
         commands: vec![
             item_message(string_fn(false)),
-            super::add_integer_value(uber_identifier, 1),
+            add_integer(uber_identifier, 1),
         ],
     }
 }
@@ -1542,7 +1542,7 @@ fn remove_resource(
     Command::Void(CommandVoid::Multi {
         commands: vec![
             item_message(string_fn(true)),
-            super::add_integer_value(uber_identifier, -1),
+            add_integer(uber_identifier, -1),
         ],
     })
 }
@@ -1602,15 +1602,9 @@ where
                 .iter()
                 .filter(|(uber_identifier, meta)| !meta.readonly && condition(**uber_identifier))
                 .map(|(uber_identifier, meta)| match &meta.default_value {
-                    UberStateValue::Boolean(value) => {
-                        super::set_boolean_value(*uber_identifier, *value)
-                    }
-                    UberStateValue::Integer(value) => {
-                        super::set_integer_value(*uber_identifier, *value)
-                    }
-                    UberStateValue::Float(value) => {
-                        super::set_float_value(*uber_identifier, (*value).into())
-                    }
+                    UberStateValue::Boolean(value) => store_boolean(*uber_identifier, *value),
+                    UberStateValue::Integer(value) => store_integer(*uber_identifier, *value),
+                    UberStateValue::Float(value) => store_float(*uber_identifier, *value),
                 })
                 .collect(),
         },

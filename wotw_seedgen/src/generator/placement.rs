@@ -4,8 +4,7 @@ use super::{
 };
 use crate::{
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
-    world::UberStateValue,
-    Simulate, World,
+    World,
 };
 use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
@@ -19,16 +18,17 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, mem, ops::RangeFrom};
-use wotw_seedgen_assets::LocData;
+use wotw_seedgen_assets::{LocData, UberStateValue};
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_logic_language::output::Node;
 use wotw_seedgen_seed::SeedgenInfo;
 use wotw_seedgen_seed_language::{
-    compile,
+    compile::{self, store_boolean},
     output::{
         AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid, Concatenator,
         ContainedWrites, Event, IntermediateOutput, Operation, Trigger,
     },
+    simulate::{Simulate, Simulation},
 };
 use wotw_seedgen_settings::UniverseSettings;
 
@@ -184,9 +184,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .map(|door_id| {
                             let target_door_id = world_context
                                 .world
-                                .uber_states
-                                .get(UberIdentifier::new(27, door_id))
-                                .as_integer();
+                                .fetch_integer(UberIdentifier::new(27, door_id));
 
                             (door_id, target_door_id)
                         })
@@ -612,7 +610,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         index: target_world_index,
                     },
                     operator: Concatenator::Concat,
-                    right: right,
+                    right,
                 }),
             }
         }
@@ -676,7 +674,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                             message: name,
                             timeout: None,
                         },
-                        compile::set_boolean_value(uber_identifier, true),
+                        store_boolean(uber_identifier, true),
                     ],
                 },
             );
@@ -1034,7 +1032,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         slots: usize,
         spirit_light_slots: usize,
     ) -> Option<WeightedProgression> {
-        let value = self.world.uber_states.get(uber_identifier);
+        let value = self.world.fetch(uber_identifier);
 
         match value {
             UberStateValue::Boolean(_) => self.find_boolean_progression(uber_identifier, slots),
@@ -1061,14 +1059,14 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .map(|(item_pool_index, item)| {
                 let progression = Progression::ItemPool(vec![item_pool_index]);
 
-                self.world.snapshot();
+                self.world.snapshot(0);
 
                 self.world.simulate(item, &self.output.events);
 
                 let new_reached = self.world.reached_pickup_count().saturating_sub(reached);
                 let weight = weight(new_reached, uber_identifier, 1., 1, slots);
 
-                self.world.restore_snapshot();
+                self.world.restore_snapshot(0);
 
                 WeightedProgression {
                     items: progression,
@@ -1086,12 +1084,12 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         if uber_identifier == UberIdentifier::SPIRIT_LIGHT {
             self.find_spirit_light_progression(spirit_light_slots)
         } else {
-            let initial_value = self.world.uber_states.get(uber_identifier);
+            let initial_value = self.world.fetch(uber_identifier);
             let initial_reached = self.world.reached_pickup_count();
 
             let mut reached = initial_reached;
 
-            self.world.snapshot();
+            self.world.snapshot(0);
 
             let mut items = vec![];
 
@@ -1107,16 +1105,16 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 }
             }
 
-            let amount = match self.world.uber_states.get(uber_identifier) {
+            let amount = match self.world.fetch(uber_identifier) {
                 UberStateValue::Boolean(_) => {
                     warn!("{uber_identifier} was identified as integer or float progression but is actually boolean");
                     0.
                 }
                 UberStateValue::Integer(value) => (value - initial_value.expect_integer()) as f32,
-                UberStateValue::Float(value) => *value - *initial_value.expect_float(),
+                UberStateValue::Float(value) => value - initial_value.expect_float(),
             };
 
-            self.world.restore_snapshot();
+            self.world.restore_snapshot(0);
 
             if items.is_empty() {
                 return None;
@@ -1136,12 +1134,12 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         let initial_reached = self.world.reached_pickup_count();
         let mut reached = 0;
 
-        self.world.snapshot();
+        self.world.snapshot(0);
 
         let mut amount = 0;
 
         while amount < self.spirit_light_provider.amount as usize {
-            self.world.modify_spirit_light(1, &self.output.events);
+            self.world.add_spirit_light(1, &self.output.events);
             amount += 1;
 
             reached = self.world.reached_pickup_count();
@@ -1151,7 +1149,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             }
         }
 
-        self.world.restore_snapshot();
+        self.world.restore_snapshot(0);
 
         if amount == 0 {
             return None;
@@ -1352,7 +1350,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
-        self.world.uber_states.register_trigger(&trigger); // TODO unnecessary?
+        // TODO not sure what this did and why
+        // self.world.uber_states.register_trigger(&trigger);
         self.world.simulate(&command, &self.output.events);
 
         self.output.events.push(Event { trigger, command });
@@ -1406,7 +1405,7 @@ fn total_reach_check<'graph>(
     for command in &**item_pool {
         complete_world.simulate(command, &output.events);
     }
-    complete_world.modify_spirit_light(TOTAL_SPIRIT_LIGHT, &output.events);
+    complete_world.add_spirit_light(TOTAL_SPIRIT_LIGHT, &output.events);
 
     complete_world.traverse_spawn(&output.events);
 

@@ -7,9 +7,7 @@ mod spirit_light;
 mod weight;
 
 use self::spoiler::SeedSpoiler;
-use crate::{
-    generator::placement::generate_placements, logical_difficulty, world::World, UberStates,
-};
+use crate::{generator::placement::generate_placements, logical_difficulty, world::World};
 use log::{info, trace, warn};
 use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
@@ -20,8 +18,9 @@ use wotw_seedgen_data::Teleporter;
 use wotw_seedgen_logic_language::output::Graph;
 use wotw_seedgen_seed::Seed;
 use wotw_seedgen_seed_language::{
-    compile::{self, Compiler},
+    compile::{store_boolean, Compiler},
     output::{ClientEvent, Event, IntermediateOutput, Trigger},
+    simulate::UberStates,
 };
 use wotw_seedgen_settings::{Spawn, UniverseSettings, WorldSettings};
 
@@ -85,7 +84,7 @@ pub fn generate_seed<F: SnippetAccess>(
                 if graph.nodes[spawn].identifier() == "EastPools.Teleporter" {
                     output.events.push(Event {
                         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                        command: compile::set_boolean_value(Teleporter::CENTRAL_POOLS_ID, true),
+                        command: store_boolean(Teleporter::CENTRAL_POOLS_ID, true),
                     })
                 }
 

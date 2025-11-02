@@ -1,24 +1,32 @@
-use crate::output::Concatenator;
-
 use super::{
     ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Comparator, EqualityComparator, Event, IntermediateOutput,
-    ItemMetadata, Operation, StringOrPlaceholder, Trigger,
+    CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator, Event,
+    IntermediateOutput, ItemMetadata, Operation, StringOrPlaceholder, Trigger,
 };
+
 use rand::distributions::Uniform;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use wotw_seedgen_assets::{LocData, LocDataEntry};
 use wotw_seedgen_data::Zone;
 
-pub type StringPlaceholderMap = FxHashMap<StringOrPlaceholder, CommandString>;
+// TODO maybe zone_of should be a typed zone placeholder?
+#[derive(Debug, Clone, Default)]
+pub struct PlaceholderMap {
+    pub strings: FxHashMap<StringOrPlaceholder, CommandString>,
+}
 
 impl IntermediateOutput {
-    pub fn postprocess(&mut self, loc_data: &LocData, rng: &mut Pcg64Mcg) -> StringPlaceholderMap {
+    /// Inserts additional commands into the output to:
+    ///
+    /// - Set reasonable shop data defaults for items placed in shops
+    /// - Populate the spoiler map
+    ///
+    /// Also returns a [`PlaceholderMap`] which contains resolutions for all contained placeholders.
+    pub fn postprocess(&mut self, loc_data: &LocData, rng: &mut Pcg64Mcg) -> PlaceholderMap {
         let mut postprocessor = Postprocessor::new(self, loc_data);
 
         self.resolve(&mut postprocessor);
-        let string_placeholder_map = postprocessor.string_placeholder_map;
 
         let mut extra_events = vec![];
 
@@ -68,9 +76,11 @@ impl IntermediateOutput {
             }));
         }
 
+        let placeholder_map = postprocessor.placeholder_map;
+
         self.events.splice(0..0, extra_events);
 
-        string_placeholder_map
+        placeholder_map
     }
 }
 
@@ -79,7 +89,7 @@ struct Postprocessor<'output, 'locdata> {
     loc_data_triggers: FxHashMap<Trigger, &'locdata LocDataEntry>,
     loc_data_events: Vec<&'output Event>,
     item_metadata: &'output ItemMetadata,
-    string_placeholder_map: StringPlaceholderMap,
+    placeholder_map: PlaceholderMap,
 }
 
 impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
@@ -106,7 +116,7 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
             loc_data_triggers,
             loc_data_events,
             item_metadata: &output.item_metadata,
-            string_placeholder_map: FxHashMap::default(),
+            placeholder_map: PlaceholderMap::default(),
         }
     }
 
@@ -392,7 +402,7 @@ impl ResolvePlaceholders for CommandString {
     fn resolve(&self, context: &mut Postprocessor) {
         match self {
             Self::Constant { value } => {
-                if context.string_placeholder_map.contains_key(value) {
+                if context.placeholder_map.strings.contains_key(value) {
                     return;
                 }
 
@@ -408,7 +418,8 @@ impl ResolvePlaceholders for CommandString {
                 };
 
                 context
-                    .string_placeholder_map
+                    .placeholder_map
+                    .strings
                     .insert(value.clone(), resolved);
             }
             Self::Multi { commands, last } => {

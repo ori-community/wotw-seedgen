@@ -6,6 +6,7 @@ use crate::orbs::{self, OrbVariants, Orbs};
 use smallvec::SmallVec;
 use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::{Enemy, Requirement};
+use wotw_seedgen_seed_language::simulate::Simulation;
 use wotw_seedgen_settings::Difficulty;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

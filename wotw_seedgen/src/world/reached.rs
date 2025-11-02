@@ -15,7 +15,10 @@ use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::{
     Anchor, Connection, Graph, Node, RefillValue, Requirement,
 };
-use wotw_seedgen_seed_language::output::{CommandBoolean, Event};
+use wotw_seedgen_seed_language::{
+    output::{CommandBoolean, Event},
+    simulate::Simulation,
+};
 
 pub const TP_ANCHOR: &str = "Teleporters";
 
@@ -316,11 +319,11 @@ impl World<'_, '_> {
                 value,
                 ..
             }) => match value {
-                None => self.set_boolean(*uber_identifier, true, events),
+                None => self.store_boolean(*uber_identifier, true, events),
                 Some(value) => {
                     // logical states are incremental
-                    if self.uber_states.get(*uber_identifier).as_integer() < *value {
-                        self.set_integer(*uber_identifier, *value, events);
+                    if self.fetch_integer(*uber_identifier) < *value {
+                        self.store_integer(*uber_identifier, *value, events);
                     }
                 }
             },

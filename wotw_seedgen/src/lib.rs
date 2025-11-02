@@ -34,7 +34,7 @@ mod tests;
 mod world;
 
 pub use generator::{generate_seed, item_pool, spoiler, SeedUniverse};
-pub use world::{Simulate, UberStates, World};
+pub use world::World;
 
 // TODO use this and also set the other metadata: current world, format version, settings
 // TODO look into having the commit hash again

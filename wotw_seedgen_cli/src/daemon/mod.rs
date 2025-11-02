@@ -4,7 +4,7 @@ use std::io::{self, BufRead, BufReader, StdinLock};
 
 use reach_check::{new_world, reach_check, relevant_uber_states, GraphCache, ReachCheckMessage};
 use serde::Deserialize;
-use wotw_seedgen::{logic_language::ast, seed::SeedgenInfo, UberStates};
+use wotw_seedgen::{logic_language::ast, seed::SeedgenInfo, seed_language::simulate::UberStates};
 
 use crate::{cli::VerboseArgs, log_config::LogConfig, seed::LogicFiles, Error};
 

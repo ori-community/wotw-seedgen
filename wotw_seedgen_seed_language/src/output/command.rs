@@ -259,7 +259,7 @@ impl From<StringOrPlaceholder> for CommandString {
 
 impl From<String> for CommandString {
     fn from(value: String) -> Self {
-        StringOrPlaceholder::from(value).into()
+        StringOrPlaceholder::Value(value).into()
     }
 }
 

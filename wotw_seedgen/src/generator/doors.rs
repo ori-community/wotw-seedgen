@@ -8,8 +8,9 @@ use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_logic_language::output::DoorId;
 use wotw_seedgen_seed_language::{
     ast::ClientEvent,
-    compile::{set_boolean_value, set_integer_value},
+    compile::{store_boolean, store_integer},
     output::{CommandBoolean, Event, Trigger},
+    simulate::Simulation,
 };
 
 use super::placement::WorldContext;
@@ -90,12 +91,12 @@ impl WorldContext<'_, '_> {
                 // enable randoConfig.showSmallDoors
                 self.output.events.push(Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                    command: set_boolean_value(UberIdentifier::new(7, 200), true),
+                    command: store_boolean(UberIdentifier::new(7, 200), true),
                 });
                 // mark door connections as unknown
                 self.output.events.extend((1..=32).map(|door_id| Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                    command: set_boolean_value(UberIdentifier::new(28, door_id), false),
+                    command: store_boolean(UberIdentifier::new(28, door_id), false),
                 }));
 
                 let config = DoorRandomizerConfig::new(loop_size.get(), door_groups)?;
@@ -107,8 +108,7 @@ impl WorldContext<'_, '_> {
         for (door_id, target_door_id) in connections {
             log::trace!("Connected door {} → {}", door_id, target_door_id);
 
-            let set_connection =
-                set_integer_value(UberIdentifier::new(27, door_id), target_door_id);
+            let set_connection = store_integer(UberIdentifier::new(27, door_id), target_door_id);
             self.world.simulate(&set_connection, &self.output.events);
             self.output.events.push(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
@@ -122,7 +122,7 @@ impl WorldContext<'_, '_> {
                     trigger: Trigger::Condition(CommandBoolean::FetchBoolean {
                         uber_identifier: UberIdentifier::new(28, door_id),
                     }),
-                    command: set_boolean_value(UberIdentifier::new(28, target_door_id), true),
+                    command: store_boolean(UberIdentifier::new(28, target_door_id), true),
                 });
             }
         }

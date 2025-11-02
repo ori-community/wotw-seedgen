@@ -1,7 +1,5 @@
 mod is_met;
 mod reached;
-mod simulate;
-mod uber_states;
 
 use std::{
     fmt::{self, Display},
@@ -10,11 +8,7 @@ use std::{
 
 use ordered_float::OrderedFloat;
 use reached::Reach;
-pub use simulate::Simulate;
-use strum::VariantArray;
-pub use uber_states::{UberStateValue, UberStates};
-
-// pub(crate) use graph::{node_condition, node_trigger};
+use wotw_seedgen_assets::UberStateValue;
 
 #[cfg(test)]
 mod tests;
@@ -26,10 +20,11 @@ use crate::{
 
 use rustc_hash::FxHashMap;
 use smallvec::{smallvec, SmallVec};
-use wotw_seedgen_data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade};
+use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
 use wotw_seedgen_logic_language::output::{Graph, RefillValue};
-use wotw_seedgen_seed_language::output::{
-    ArithmeticOperator, CommandFloat, CommandInteger, CommandVoid, Event, Operation,
+use wotw_seedgen_seed_language::{
+    output::Event,
+    simulate::{Simulation, UberStates, Variables, WorldState},
 };
 use wotw_seedgen_settings::{Difficulty, WorldSettings};
 
@@ -41,11 +36,10 @@ pub struct World<'graph, 'settings> {
     pub(crate) graph: &'graph Graph,
     pub(crate) spawn: usize,
     pub(crate) settings: &'settings WorldSettings,
-    pub(crate) uber_states: UberStates,
     pub(crate) reach: Reach,
+    state: WorldState,
     updating_reach: bool,
     snapshot: Option<Reach>,
-    variables: Variables,
 }
 
 impl<'graph, 'settings> World<'graph, 'settings> {
@@ -59,14 +53,13 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         uber_states: UberStates,
     ) -> Self {
         Self {
+            state: WorldState::new(uber_states),
             graph,
             spawn,
             settings,
-            uber_states,
             updating_reach: false,
             reach: Reach::new(graph),
             snapshot: None,
-            variables: Default::default(),
         }
     }
 
@@ -74,329 +67,12 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     // TODO it seems like we are returning progressions to nodes that are already reached. Maybe we have to filter that in post since they
     // may have been reached after initially encountering the unmet requirement? This is common for teleporters
 
-    #[inline]
-    pub fn simulate<T: Simulate>(&mut self, t: &T, events: &[Event]) -> T::Return {
-        t.simulate(self, events)
-    }
-
-    pub fn set_boolean(&mut self, uber_identifier: UberIdentifier, value: bool, events: &[Event]) {
-        self.simulate(
-            &CommandVoid::StoreBoolean {
-                uber_identifier,
-                value: value.into(),
-                trigger_events: true,
-            },
-            events,
-        );
-    }
-    pub fn set_integer(&mut self, uber_identifier: UberIdentifier, value: i32, events: &[Event]) {
-        self.simulate(
-            &CommandVoid::StoreInteger {
-                uber_identifier,
-                value: value.into(),
-                trigger_events: true,
-            },
-            events,
-        );
-    }
-    pub fn set_float(
-        &mut self,
-        uber_identifier: UberIdentifier,
-        value: OrderedFloat<f32>,
-        events: &[Event],
-    ) {
-        self.simulate(
-            &CommandVoid::StoreFloat {
-                uber_identifier,
-                value: value.into(),
-                trigger_events: true,
-            },
-            events,
-        );
-    }
-    pub fn modify_integer(&mut self, uber_identifier: UberIdentifier, add: i32, events: &[Event]) {
-        self.simulate(
-            &CommandVoid::StoreInteger {
-                uber_identifier,
-                value: CommandInteger::Arithmetic {
-                    operation: Box::new(Operation {
-                        left: CommandInteger::FetchInteger { uber_identifier },
-                        operator: ArithmeticOperator::Add,
-                        right: add.into(),
-                    }),
-                },
-                trigger_events: true,
-            },
-            events,
-        );
-    }
-    pub fn modify_float(
-        &mut self,
-        uber_identifier: UberIdentifier,
-        add: OrderedFloat<f32>,
-        events: &[Event],
-    ) {
-        self.simulate(
-            &CommandVoid::StoreFloat {
-                uber_identifier,
-                value: CommandFloat::Arithmetic {
-                    operation: Box::new(Operation {
-                        left: CommandFloat::FetchFloat { uber_identifier },
-                        operator: ArithmeticOperator::Add,
-                        right: add.into(),
-                    }),
-                },
-                trigger_events: true,
-            },
-            events,
-        );
-    }
-
-    #[inline]
-    pub fn set_spirit_light(&mut self, value: i32, events: &[Event]) {
-        self.set_integer(UberIdentifier::SPIRIT_LIGHT, value, events);
-    }
-
-    #[inline]
-    pub fn modify_spirit_light(&mut self, add: i32, events: &[Event]) {
-        self.modify_integer(UberIdentifier::SPIRIT_LIGHT, add, events);
-    }
-
-    #[inline]
-    pub fn set_gorlek_ore(&mut self, value: i32, events: &[Event]) {
-        self.set_integer(UberIdentifier::GORLEK_ORE, value, events);
-    }
-
-    #[inline]
-    pub fn modify_gorlek_ore(&mut self, add: i32, events: &[Event]) {
-        self.modify_integer(UberIdentifier::GORLEK_ORE, add, events);
-    }
-
-    #[inline]
-    pub fn set_keystones(&mut self, value: i32, events: &[Event]) {
-        self.set_integer(UberIdentifier::KEYSTONES, value, events);
-    }
-
-    #[inline]
-    pub fn modify_keystones(&mut self, add: i32, events: &[Event]) {
-        self.modify_integer(UberIdentifier::KEYSTONES, add, events);
-    }
-
-    #[inline]
-    pub fn set_shard_slots(&mut self, value: i32, events: &[Event]) {
-        self.set_integer(UberIdentifier::SHARD_SLOTS, value, events);
-    }
-
-    #[inline]
-    pub fn modify_shard_slots(&mut self, add: i32, events: &[Event]) {
-        self.modify_integer(UberIdentifier::SHARD_SLOTS, add, events);
-    }
-
-    #[inline]
-    pub fn set_max_health(&mut self, value: i32, events: &[Event]) {
-        self.set_integer(UberIdentifier::MAX_HEALTH, value, events);
-    }
-
-    // TODO check that uses scaled correctly since they might have used the number of fragments before
-    #[inline]
-    pub fn modify_max_health(&mut self, add: i32, events: &[Event]) {
-        self.modify_integer(UberIdentifier::MAX_HEALTH, add, events);
-    }
-
-    // TODO but where do I *really* want OrderedFloat
-    #[inline]
-    pub fn set_max_energy(&mut self, value: OrderedFloat<f32>, events: &[Event]) {
-        self.set_float(UberIdentifier::MAX_ENERGY, value, events);
-    }
-
-    // TODO check that uses scaled correctly since they might have used the number of fragments before
-    #[inline]
-    pub fn modify_max_energy(&mut self, add: OrderedFloat<f32>, events: &[Event]) {
-        self.modify_float(UberIdentifier::MAX_ENERGY, add, events);
-    }
-
-    #[inline]
-    pub fn set_skill(&mut self, skill: Skill, value: bool, events: &[Event]) {
-        self.set_boolean(skill.uber_identifier(), value, events);
-    }
-
-    #[inline]
-    pub fn set_shard(&mut self, shard: Shard, value: bool, events: &[Event]) {
-        self.set_boolean(shard.uber_identifier(), value, events);
-    }
-
-    #[inline]
-    pub fn set_teleporter(&mut self, teleporter: Teleporter, value: bool, events: &[Event]) {
-        self.set_boolean(teleporter.uber_identifier(), value, events);
-    }
-
-    #[inline]
-    pub fn set_clean_water(&mut self, value: bool, events: &[Event]) {
-        self.set_boolean(UberIdentifier::CLEAN_WATER, value, events);
-    }
-
-    #[inline]
-    pub fn set_weapon_upgrade(
-        &mut self,
-        weapon_upgrade: WeaponUpgrade,
-        value: bool,
-        events: &[Event],
-    ) {
-        self.set_integer(weapon_upgrade.uber_identifier(), i32::from(value), events);
-    }
-
-    #[inline]
-    pub fn spirit_light(&self) -> i32 {
-        self.uber_states[UberIdentifier::SPIRIT_LIGHT].expect_integer()
-    }
-
-    #[inline]
-    pub fn gorlek_ore(&self) -> i32 {
-        self.uber_states[UberIdentifier::GORLEK_ORE].expect_integer()
-    }
-
-    #[inline]
-    pub fn keystones(&self) -> i32 {
-        self.uber_states[UberIdentifier::KEYSTONES].expect_integer()
-    }
-
-    #[inline]
-    pub fn shard_slots(&self) -> i32 {
-        self.uber_states[UberIdentifier::SHARD_SLOTS].expect_integer()
-    }
-
-    #[inline]
-    pub fn base_max_health(&self) -> f32 {
-        self.uber_states[UberIdentifier::MAX_HEALTH].expect_integer() as f32
-    }
-
-    /// Returns the maximum health
-    ///
-    /// One visual orb in the game represents 10 health
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use wotw_seedgen::{World, UberStates};
-    /// # use wotw_seedgen_logic_language::output::Graph;
-    /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
-    /// use wotw_seedgen::settings::WorldSettings;
-    ///
-    /// # let graph = Graph::empty();
-    /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&*UBER_STATE_DATA);
-    /// let world_settings = WorldSettings::default();
-    /// let world = World::new(&graph, spawn, &world_settings, uber_states);
-    /// assert_eq!(world.max_health(), 30.0);
-    /// ```
-    pub fn max_health(&self) -> f32 {
-        let mut health = self.base_max_health();
-
-        if self.settings.difficulty >= logical_difficulty::VITALITY && self.shard(Shard::Vitality) {
-            health += 10.;
-        }
-
-        health
-    }
-
-    #[inline]
-    pub fn base_max_energy(&self) -> f32 {
-        *self.uber_states[UberIdentifier::MAX_ENERGY].expect_float()
-    }
-
-    /// Returns the maximum energy
-    ///
-    /// One visual orb in the game represents 1 energy
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use wotw_seedgen::{World, UberStates};
-    /// # use wotw_seedgen_logic_language::output::Graph;
-    /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
-    /// use wotw_seedgen::settings::WorldSettings;
-    ///
-    /// # let graph = Graph::empty();
-    /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&*UBER_STATE_DATA);
-    /// let world_settings = WorldSettings::default();
-    /// let world = World::new(&graph, spawn, &world_settings, uber_states);
-    /// assert_eq!(world.max_energy(), 3.0);
-    /// ```
-    pub fn max_energy(&self) -> f32 {
-        let mut energy = self.base_max_energy();
-
-        if self.settings.difficulty >= logical_difficulty::ENERGY_SHARD && self.shard(Shard::Energy)
-        {
-            energy += 1.;
-        }
-
-        energy
-    }
-
     /// Returns the maximum health and energy
     pub fn max_orbs(&self) -> Orbs {
         Orbs {
             health: self.max_health(),
             energy: self.max_energy(),
         }
-    }
-
-    #[inline]
-    pub fn skill(&self, skill: Skill) -> bool {
-        self.uber_states[skill.uber_identifier()].expect_boolean()
-    }
-
-    #[inline]
-    pub fn shard(&self, shard: Shard) -> bool {
-        self.uber_states[shard.uber_identifier()].expect_boolean()
-    }
-
-    #[inline]
-    pub fn teleporter(&self, teleporter: Teleporter) -> bool {
-        self.uber_states[teleporter.uber_identifier()].expect_boolean()
-    }
-
-    #[inline]
-    pub fn clean_water(&self) -> bool {
-        self.uber_states[UberIdentifier::CLEAN_WATER].expect_boolean()
-    }
-
-    #[inline]
-    pub fn weapon_upgrade(&self, weapon_upgrade: WeaponUpgrade) -> bool {
-        self.uber_states[weapon_upgrade.uber_identifier()].expect_integer() > 0
-    }
-
-    pub fn inventory_display(&self) -> InventoryDisplay<'_, '_, '_> {
-        InventoryDisplay { world: self }
-    }
-
-    pub fn skills(&self) -> impl Iterator<Item = Skill> + '_ {
-        Skill::VARIANTS
-            .iter()
-            .copied()
-            .filter(|skill| self.skill(*skill))
-    }
-
-    pub fn shards(&self) -> impl Iterator<Item = Shard> + '_ {
-        Shard::VARIANTS
-            .iter()
-            .copied()
-            .filter(|shard| self.shard(*shard))
-    }
-
-    pub fn teleporters(&self) -> impl Iterator<Item = Teleporter> + '_ {
-        Teleporter::VARIANTS
-            .iter()
-            .copied()
-            .filter(|teleporter| self.teleporter(*teleporter))
-    }
-
-    pub fn weapon_upgrades(&self) -> impl Iterator<Item = WeaponUpgrade> + '_ {
-        WeaponUpgrade::VARIANTS
-            .iter()
-            .copied()
-            .filter(|weapon_upgrade| self.weapon_upgrade(*weapon_upgrade))
     }
 
     pub fn cap_health<const CHECKPOINT: bool>(&self, orbs: &mut Orbs) {
@@ -440,7 +116,8 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::{World, UberStates};
+    /// # use wotw_seedgen::World;
+    /// # use wotw_seedgen_seed_language::simulate::UberStates;
     /// # use wotw_seedgen_logic_language::output::Graph;
     /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
     /// use wotw_seedgen::settings::WorldSettings;
@@ -460,12 +137,14 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// `CHECKPOINT` represents whether the Orbs are a result of the player respawning on a checkpoint, in which case special rules apply
     ///
     /// ```
-    /// # use wotw_seedgen::{World, UberStates};
+    /// # use wotw_seedgen::World;
+    /// # use wotw_seedgen_seed_language::simulate::UberStates;
     /// # use wotw_seedgen_logic_language::output::Graph;
     /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
     /// use wotw_seedgen::data::Shard;
     /// use wotw_seedgen::orbs::Orbs;
     /// use wotw_seedgen::settings::{WorldSettings, Difficulty};
+    /// use wotw_seedgen::seed_language::simulate::Simulation;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
@@ -474,7 +153,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
-    /// world.set_shard(Shard::Vitality, true, &events);
+    /// world.store_shard(Shard::Vitality, true, &events);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
     /// world.cap_orbs::<false>(&mut orbs);
@@ -496,11 +175,13 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::{World, UberStates};
+    /// # use wotw_seedgen::World;
+    /// # use wotw_seedgen_seed_language::simulate::UberStates;
     /// # use wotw_seedgen_logic_language::output::Graph;
     /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
     /// use wotw_seedgen::settings::WorldSettings;
     /// use wotw_seedgen::orbs::Orbs;
+    /// use wotw_seedgen::seed_language::simulate::Simulation;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
@@ -511,8 +192,8 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
-    /// world.modify_max_health(110, &events);
-    /// world.modify_max_energy((12.).into(), &events);
+    /// world.add_max_health(110, &events);
+    /// world.add_max_energy((12.).into(), &events);
     /// assert_eq!(world.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
     /// ```
@@ -534,10 +215,12 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # Examples
     ///
     /// ```
-    /// # use wotw_seedgen::{World, UberStates};
+    /// # use wotw_seedgen::World;
+    /// # use wotw_seedgen_seed_language::simulate::UberStates;
     /// # use wotw_seedgen_logic_language::output::Graph;
     /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
     /// use wotw_seedgen::settings::WorldSettings;
+    /// use wotw_seedgen::seed_language::simulate::Simulation;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
@@ -547,10 +230,10 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
-    /// world.modify_max_health(40, &events);
+    /// world.add_max_health(40, &events);
     /// assert_eq!(world.health_plant_drops(), 2.0);
     ///
-    /// world.modify_max_health(90, &events);
+    /// world.add_max_health(90, &events);
     /// assert_eq!(world.health_plant_drops(), 5.0);
     /// ```
     pub fn health_plant_drops(&self) -> f32 {
@@ -561,7 +244,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             clippy::cast_possible_truncation,
             clippy::float_cmp
         )]
-        if value % 1. == 0.5 && value as u8 % 2 == 0 {
+        if value % 1. == 0.5 && (value as u8).is_multiple_of(2) {
             value.floor()
         } else {
             value.round()
@@ -850,56 +533,66 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         weapons
     }
 
-    pub(crate) fn snapshot(&mut self) {
-        self.uber_states.snapshot();
+    pub fn inventory_display(&self) -> InventoryDisplay<'_, '_, '_> {
+        InventoryDisplay { world: self }
+    }
+}
+
+impl Simulation for World<'_, '_> {
+    #[inline]
+    fn uber_states(&self) -> &UberStates {
+        self.state.uber_states()
+    }
+
+    #[inline]
+    fn uber_states_mut(&mut self) -> &mut UberStates {
+        self.state.uber_states_mut()
+    }
+
+    #[inline]
+    fn variables(&self) -> &Variables {
+        self.state.variables()
+    }
+
+    #[inline]
+    fn variables_mut(&mut self) -> &mut Variables {
+        self.state.variables_mut()
+    }
+
+    #[inline]
+    fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
+        self.update_reached(uber_identifier, events);
+    }
+
+    fn max_health(&self) -> f32 {
+        if self.settings.difficulty >= logical_difficulty::VITALITY {
+            WorldState::max_health(&self.state)
+        } else {
+            self.base_max_health()
+        }
+    }
+
+    fn max_energy(&self) -> f32 {
+        if self.settings.difficulty >= logical_difficulty::ENERGY_SHARD {
+            WorldState::max_energy(&self.state)
+        } else {
+            self.base_max_energy()
+        }
+    }
+
+    fn snapshot(&mut self, id: u8) {
+        self.state.snapshot(id);
         self.snapshot = Some(self.reach.clone());
     }
 
-    pub(crate) fn restore_snapshot(&mut self) {
-        self.uber_states.restore_snapshot();
+    fn take_snapshot(&mut self, id: u8) -> FxHashMap<UberIdentifier, UberStateValue> {
+        self.snapshot = None;
+        self.state.take_snapshot(id)
+    }
+
+    fn restore_snapshot(&mut self, id: u8) {
+        self.state.restore_snapshot(id);
         self.reach = mem::take(&mut self.snapshot).unwrap();
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-struct Variables {
-    booleans: FxHashMap<usize, bool>,
-    integers: FxHashMap<usize, i32>,
-    floats: FxHashMap<usize, OrderedFloat<f32>>,
-    strings: FxHashMap<usize, String>,
-}
-
-impl Variables {
-    fn set_boolean(&mut self, id: usize, value: bool) {
-        self.booleans.insert(id, value);
-    }
-
-    fn set_integer(&mut self, id: usize, value: i32) {
-        self.integers.insert(id, value);
-    }
-
-    fn set_float(&mut self, id: usize, value: OrderedFloat<f32>) {
-        self.floats.insert(id, value);
-    }
-
-    fn set_string(&mut self, id: usize, value: String) {
-        self.strings.insert(id, value);
-    }
-
-    fn get_boolean(&self, id: &usize) -> bool {
-        self.booleans.get(id).copied().unwrap_or_default()
-    }
-
-    fn get_integer(&self, id: &usize) -> i32 {
-        self.integers.get(id).copied().unwrap_or_default()
-    }
-
-    fn get_float(&self, id: &usize) -> OrderedFloat<f32> {
-        self.floats.get(id).copied().unwrap_or_default()
-    }
-
-    fn get_string(&self, id: &usize) -> String {
-        self.strings.get(id).cloned().unwrap_or_default()
     }
 }
 

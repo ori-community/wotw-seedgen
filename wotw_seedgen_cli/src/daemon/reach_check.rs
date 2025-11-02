@@ -7,8 +7,9 @@ use wotw_seedgen::{
         ast::Areas,
         output::{Graph, Node},
     },
+    seed_language::simulate::{Simulation, UberStates},
     settings::{UniverseSettings, WorldSettingsHelpers},
-    UberStates, World,
+    World,
 };
 use wotw_seedgen_assets::{UberStateData, UberStateValue};
 
@@ -161,9 +162,11 @@ pub fn reach_check(
             .get(&uber_identifier)
             .ok_or_else(|| format!("Unknown UberIdentifier {uber_identifier}"))?;
         match &data.default_value {
-            UberStateValue::Boolean(_) => world.set_boolean(uber_identifier, *value > 0.5, &[]),
-            UberStateValue::Integer(_) => world.set_integer(uber_identifier, (*value) as i32, &[]),
-            UberStateValue::Float(_) => world.set_float(uber_identifier, value, &[]),
+            UberStateValue::Boolean(_) => world.store_boolean(uber_identifier, *value > 0.5, &[]),
+            UberStateValue::Integer(_) => {
+                world.store_integer(uber_identifier, (*value) as i32, &[])
+            }
+            UberStateValue::Float(_) => world.store_float(uber_identifier, *value, &[]),
         }
     }
 

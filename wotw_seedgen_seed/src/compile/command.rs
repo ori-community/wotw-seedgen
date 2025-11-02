@@ -174,7 +174,8 @@ impl Compile for input::StringOrPlaceholder {
         match self {
             Self::Value(value) => (vec![Command::SetString(value)], MemoryUsed::ZERO),
             other => context
-                .string_placeholder_map
+                .placeholder_map
+                .strings
                 .get(&other)
                 .unwrap_or_else(|| panic!("unresolved string placeholder"))
                 .clone()

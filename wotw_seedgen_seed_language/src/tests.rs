@@ -4,7 +4,7 @@ use crate::{
         UberIdentifierName, UberIdentifierNumeric,
     },
     compile::{Compiler, PRIVATE_MEMORY},
-    output::{CommandInteger, CommandVoid, IntermediateOutput},
+    output::{CommandVoid, IntermediateOutput},
     token::TOKENIZER,
 };
 use lazy_static::lazy_static;
@@ -326,7 +326,7 @@ fn operator_precedence() {
             output.events[0].command,
             CommandVoid::SetInteger {
                 id: PRIVATE_MEMORY,
-                value: CommandInteger::Constant { value }
+                value: value.into()
             }
         );
     }

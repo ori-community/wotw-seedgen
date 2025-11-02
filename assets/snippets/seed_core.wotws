@@ -22,6 +22,8 @@ fun spawn_states() {
     store(randoState.spawnTwillenEverywhere, true)
     store(randoConfig.useRegenTreeDrainedRandoState, true)
     store(randoState.regenTreeDrained, true)
+    store(randoConfig.useRainLiftedInInkwaterRandoState, true)
+    store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     store(gromShop.spiritWellBought, true)
     store(gromShop.beautifyBought, true)
@@ -130,7 +132,6 @@ on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.
-on spawn store(randoConfig.useRainLiftedInInkwaterRandoState, true)
 on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true) // TODO rename Inkwater -> Marsh
 // This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
 // This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
@@ -147,7 +148,6 @@ on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState,
 on WillowsEnd.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
 
 // In door rando or with warps/oob, collecting the DollQI can skip earlier quest steps and lock you out of obtaining the key.
-on spawn store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
 // When receiving the key, allow opening the hut
 on questUberStateGroup.familyReunionQuest == 2 {
     store(randoState.canOpenMokiFatherHut, true)

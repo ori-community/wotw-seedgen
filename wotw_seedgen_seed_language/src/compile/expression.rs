@@ -78,7 +78,7 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                 let operator = operator.compile(compiler);
                 let target = compiler.common_type(&self.left, &self.right)?;
 
-                let command = match target {
+                match target {
                     Type::Integer => self
                         .compile_operation(operator, compiler)
                         .map(Command::Integer),
@@ -98,9 +98,7 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                         compiler.errors.push(operation_error(target, self.span()));
                         None
                     }
-                };
-
-                command
+                }
             }
             ast::Operator::Logic(operator) => {
                 let operator = operator.compile(compiler);
@@ -112,7 +110,7 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                 let operator = operator.compile(compiler);
                 let target = compiler.common_type(&self.left, &self.right)?;
 
-                let command = match target {
+                match target {
                     Type::Boolean => match EqualityComparator::try_from(operator) {
                         Ok(operator) => self
                             .compile_operation::<CommandBoolean, _, _>(operator, compiler)
@@ -150,9 +148,7 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                         compiler.errors.push(operation_error(target, self.span()));
                         None
                     }
-                };
-
-                command
+                }
             }
         }
     }
@@ -695,7 +691,7 @@ impl<T: CompileIntoConstant> CompileIntoLiteral for T {
         _compiler: &mut SnippetCompiler,
     ) -> Result<Self, Error> {
         let t = match &literal {
-            Literal::Constant(constant) => T::coerce_constant(constant.clone()),
+            Literal::Constant(constant) => T::coerce_constant(*constant),
             _ => None,
         };
 

@@ -5,14 +5,17 @@ use lazy_static::lazy_static;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use smallvec::smallvec;
-use wotw_seedgen::{item_pool::ItemPool, UberStates, World};
+use wotw_seedgen::{item_pool::ItemPool, World};
 use wotw_seedgen_assets::{PresetAccess, SnippetAccess, WorldPreset, WorldPresetSettings};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
     ast::{parse, Areas},
     output::{Enemy, Graph, Requirement},
 };
-use wotw_seedgen_seed_language::compile::Compiler;
+use wotw_seedgen_seed_language::{
+    compile::Compiler,
+    simulate::{Simulation, UberStates},
+};
 use wotw_seedgen_settings::{Difficulty, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{
     LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
@@ -80,9 +83,9 @@ fn requirements(c: &mut Criterion) {
     let req_b = Requirement::Damage(20.0);
     let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let req_d = Requirement::Damage(10.0);
-    world.set_skill(Skill::Blaze, true, &[]);
-    world.modify_max_health(20, &[]);
-    world.modify_max_energy((2.).into(), &[]);
+    world.store_skill(Skill::Blaze, true, &[]);
+    world.add_max_health(20, &[]);
+    world.add_max_energy((2.).into(), &[]);
     let requirement = Requirement::And(vec![
         Requirement::Or(vec![req_a.clone(), req_d.clone()]),
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
@@ -93,8 +96,8 @@ fn requirements(c: &mut Criterion) {
         b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
     });
 
-    world.set_skill(Skill::Bow, true, &[]);
-    world.modify_max_energy((10.).into(), &[]);
+    world.store_skill(Skill::Bow, true, &[]);
+    world.add_max_energy((10.).into(), &[]);
     let requirement = Requirement::Combat(smallvec![(Enemy::Lizard, 3),]);
     group.bench_function("short_combat", |b| {
         b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
@@ -147,15 +150,15 @@ fn reach_check(c: &mut Criterion) {
         b.iter(|| {
             let mut world = world.clone();
             world.traverse_spawn(&[]);
-            world.set_spirit_light(10000, &[]);
-            world.set_max_health(200, &[]);
-            world.set_max_energy(20.0.into(), &[]);
-            world.set_keystones(34, &[]);
-            world.set_gorlek_ore(40, &[]);
-            world.set_shard_slots(8, &[]);
-            world.set_skill(Skill::Sword, true, &[]);
-            world.set_skill(Skill::DoubleJump, true, &[]);
-            world.set_skill(Skill::Dash, true, &[]);
+            world.store_spirit_light(10000, &[]);
+            world.store_max_health(200, &[]);
+            world.store_max_energy(20.0.into(), &[]);
+            world.store_keystones(34, &[]);
+            world.store_gorlek_ore(40, &[]);
+            world.store_shard_slots(8, &[]);
+            world.store_skill(Skill::Sword, true, &[]);
+            world.store_skill(Skill::DoubleJump, true, &[]);
+            world.store_skill(Skill::Dash, true, &[]);
             world.reached_nodes().for_each(drop);
         })
     });

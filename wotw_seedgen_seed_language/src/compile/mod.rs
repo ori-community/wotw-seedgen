@@ -3,6 +3,7 @@ mod content;
 mod evaluate;
 mod expression;
 mod function;
+mod helpers;
 mod literal;
 mod preprocess;
 
@@ -10,19 +11,16 @@ pub use function::{
     clean_water, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot, skill,
     spirit_light, teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier, FunctionSignature,
 };
+pub use helpers::{add_float, add_integer, store_boolean, store_float, store_integer};
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
     ast::{self, Expression, UberStateType},
-    output::{
-        ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid,
-        IntermediateOutput, Literal, Operation, SnippetDebugOutput,
-    },
+    output::{CommandVoid, IntermediateOutput, Literal, SnippetDebugOutput},
     token::TOKENIZER,
     types::{uber_state_type, InferType, Type},
 };
 use derivative::Derivative;
-use ordered_float::OrderedFloat;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::{FxHashMap, FxHashSet};
@@ -52,82 +50,6 @@ pub const RESERVED_MEMORY: usize = 20;
 // TODO are there off by one errors here? RESERVED_MEMORY seems to exclude its value as index,
 // so maybe the PRIVATE_MEMORY index is supposed to be the value of RESERVED_MEMORY itself.
 pub const PRIVATE_MEMORY: usize = RESERVED_MEMORY + 1;
-
-// TODO set -> store?
-pub const fn set_boolean(uber_identifier: UberIdentifier, value: CommandBoolean) -> CommandVoid {
-    CommandVoid::StoreBoolean {
-        uber_identifier,
-        value,
-        trigger_events: true,
-    }
-}
-
-pub const fn set_boolean_value(uber_identifier: UberIdentifier, value: bool) -> CommandVoid {
-    set_boolean(uber_identifier, CommandBoolean::Constant { value })
-}
-
-pub const fn set_integer(uber_identifier: UberIdentifier, value: CommandInteger) -> CommandVoid {
-    CommandVoid::StoreInteger {
-        uber_identifier,
-        value,
-        trigger_events: true,
-    }
-}
-
-pub const fn set_integer_value(uber_identifier: UberIdentifier, value: i32) -> CommandVoid {
-    set_integer(uber_identifier, CommandInteger::Constant { value })
-}
-
-pub fn add_integer(uber_identifier: UberIdentifier, amount: CommandInteger) -> CommandVoid {
-    CommandVoid::StoreInteger {
-        uber_identifier,
-        value: CommandInteger::Arithmetic {
-            operation: Box::new(Operation {
-                left: CommandInteger::FetchInteger { uber_identifier },
-                operator: ArithmeticOperator::Add,
-                right: amount,
-            }),
-        },
-        trigger_events: true,
-    }
-}
-
-pub fn add_integer_value(uber_identifier: UberIdentifier, value: i32) -> CommandVoid {
-    add_integer(uber_identifier, CommandInteger::Constant { value })
-}
-
-pub const fn set_float(uber_identifier: UberIdentifier, value: CommandFloat) -> CommandVoid {
-    CommandVoid::StoreFloat {
-        uber_identifier,
-        value,
-        trigger_events: true,
-    }
-}
-
-pub const fn set_float_value(
-    uber_identifier: UberIdentifier,
-    value: OrderedFloat<f32>,
-) -> CommandVoid {
-    set_float(uber_identifier, CommandFloat::Constant { value })
-}
-
-pub fn add_float(uber_identifier: UberIdentifier, amount: CommandFloat) -> CommandVoid {
-    CommandVoid::StoreFloat {
-        uber_identifier,
-        value: CommandFloat::Arithmetic {
-            operation: Box::new(Operation {
-                left: CommandFloat::FetchFloat { uber_identifier },
-                operator: ArithmeticOperator::Add,
-                right: amount,
-            }),
-        },
-        trigger_events: true,
-    }
-}
-
-pub fn add_float_value(uber_identifier: UberIdentifier, value: OrderedFloat<f32>) -> CommandVoid {
-    add_float(uber_identifier, CommandFloat::Constant { value })
-}
 
 pub(crate) trait Compile<'source> {
     type Output;

@@ -58,12 +58,10 @@ where
                     if depth == 0 {
                         break;
                     }
+                } else if Open::ast(parser).is_ok() {
+                    depth += 1;
                 } else {
-                    if Open::ast(parser).is_ok() {
-                        depth += 1;
-                    } else {
-                        parser.step();
-                    }
+                    parser.step();
                 }
             }
         }

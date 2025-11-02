@@ -2,6 +2,7 @@ use crate::{LocData, StateData};
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use std::{
+    cmp::Ordering,
     fmt::{self, Display},
     io::Read,
 };
@@ -76,11 +77,100 @@ impl UberStateDataEntry {
 /// Typed value stored inside an UberState
 ///
 /// The types are simplified since a lot of the used types are similar in nature
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum UberStateValue {
     Boolean(bool),
     Integer(i32),
     Float(f32),
+}
+
+impl UberStateValue {
+    pub fn as_boolean(self) -> bool {
+        match self {
+            UberStateValue::Boolean(value) => value,
+            _ => {
+                eprintln!("Attempted to access {self} UberState as Boolean");
+                Default::default()
+            }
+        }
+    }
+
+    pub fn expect_boolean(self) -> bool {
+        match self {
+            UberStateValue::Boolean(value) => value,
+            _ => panic!("Attempted to access {self} UberState as Boolean"),
+        }
+    }
+
+    pub fn as_integer(self) -> i32 {
+        match self {
+            UberStateValue::Integer(value) => value,
+            _ => {
+                eprintln!("Attempted to access {self} UberState as Integer");
+                Default::default()
+            }
+        }
+    }
+
+    pub fn expect_integer(self) -> i32 {
+        match self {
+            UberStateValue::Integer(value) => value,
+            _ => panic!("Attempted to access {self} UberState as Integer"),
+        }
+    }
+
+    pub fn as_float(self) -> f32 {
+        match self {
+            UberStateValue::Float(value) => value,
+            _ => {
+                eprintln!("Attempted to access {self} UberState as Float");
+                Default::default()
+            }
+        }
+    }
+
+    pub fn expect_float(self) -> f32 {
+        match self {
+            UberStateValue::Float(value) => value,
+            _ => panic!("Attempted to access {self} UberState as Float"),
+        }
+    }
+}
+
+impl PartialEq<bool> for UberStateValue {
+    fn eq(&self, other: &bool) -> bool {
+        self.as_boolean() == *other
+    }
+}
+
+impl PartialOrd<bool> for UberStateValue {
+    fn partial_cmp(&self, other: &bool) -> Option<Ordering> {
+        self.as_boolean().partial_cmp(other)
+    }
+}
+
+impl PartialEq<i32> for UberStateValue {
+    fn eq(&self, other: &i32) -> bool {
+        self.as_integer() == *other
+    }
+}
+
+impl PartialOrd<i32> for UberStateValue {
+    fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
+        self.as_integer().partial_cmp(other)
+    }
+}
+
+impl PartialEq<f32> for UberStateValue {
+    fn eq(&self, other: &f32) -> bool {
+        self.as_float() == *other
+    }
+}
+
+impl PartialOrd<f32> for UberStateValue {
+    fn partial_cmp(&self, other: &f32) -> Option<Ordering> {
+        self.as_float().partial_cmp(other)
+    }
 }
 
 impl Display for UberStateValue {

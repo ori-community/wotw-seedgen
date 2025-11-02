@@ -23,7 +23,7 @@ pub use operation::{
     ArithmeticOperator, Comparator, Concatenator, EqualityComparator, ExecuteOperator,
     LogicOperator, Operation,
 };
-pub use postprocess::StringPlaceholderMap;
+pub use postprocess::PlaceholderMap;
 
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};

@@ -16,6 +16,7 @@ serde_repr = "0.1"
 rand = "0.8"
 rand_pcg = "0.3"
 strsim = "0.11"
+log = "0.4"
 ordered-float = "4.2"
 derivative = "2.2"
 strum = { version = "0.26", features = ["derive"] }

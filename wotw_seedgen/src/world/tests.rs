@@ -34,9 +34,9 @@ fn empty_test_world<'settings>(
 ) -> World<'static, 'settings> {
     let mut world = test_world(settings, spawn);
 
-    world.set_max_health(0, &[]);
-    world.set_max_energy((0.).into(), &[]);
-    world.set_shard_slots(0, &[]);
+    world.store_max_health(0, &[]);
+    world.store_max_energy((0.).into(), &[]);
+    world.store_shard_slots(0, &[]);
 
     world
 }
@@ -62,7 +62,7 @@ fn full_reach_check() {
     for item in pool.drain(..) {
         world.simulate(&item, &[]);
     }
-    world.modify_spirit_light(10000, &[]);
+    world.add_spirit_light(10000, &[]);
 
     world.traverse_spawn(&[]);
 
@@ -149,9 +149,9 @@ fn small_reach_check() {
     let settings = test_settings(Difficulty::Gorlek);
     let mut world = test_world(&settings, "GladesTown.Teleporter");
 
-    world.set_skill(Skill::DoubleJump, true, &[]);
-    world.set_shard(Shard::TripleJump, true, &[]);
-    world.modify_max_health(5, &[]);
+    world.store_skill(Skill::DoubleJump, true, &[]);
+    world.store_shard(Shard::TripleJump, true, &[]);
+    world.add_max_health(5, &[]);
 
     world.traverse_spawn(&[]);
 
@@ -192,7 +192,7 @@ fn weapon_preference() {
         ])
     );
 
-    world.set_skill(Skill::Shuriken, true, &[]);
+    world.store_skill(Skill::Shuriken, true, &[]);
     assert_eq!(
         world.progression_weapons::<false>(),
         SmallVec::from_buf([
@@ -225,8 +225,8 @@ fn max_energy() {
     let mut world = empty_test_world(&settings, DEFAULT_SPAWN);
     assert_eq!(world.max_energy(), 0.0);
 
-    world.modify_max_energy((5.).into(), &[]);
-    world.set_shard(Shard::Energy, true, &[]);
+    world.add_max_energy((5.).into(), &[]);
+    world.store_shard(Shard::Energy, true, &[]);
     assert_eq!(world.max_energy(), 5.0);
 
     let settings = test_settings(Difficulty::Gorlek);
@@ -238,7 +238,7 @@ fn max_energy() {
 fn refill_orbs() {
     let settings = test_settings(Difficulty::Gorlek);
     let mut world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.snapshot();
+    world.snapshot(0);
 
     let expected = [
         0., 5., 10., 15., 20., 25., 30., 35., 40., 40., 40., 40., 40., 40., 40., 40., 40., 40.,
@@ -247,11 +247,11 @@ fn refill_orbs() {
     ];
     for health in expected {
         assert_eq!(world.checkpoint_orbs().health, health);
-        world.modify_max_health(5, &[]);
+        world.add_max_health(5, &[]);
     }
 
-    world.restore_snapshot();
-    world.snapshot();
+    world.restore_snapshot(0);
+    world.snapshot(0);
 
     let expected = [
         0., 0., 0., 0., 1., 1., 1., 1., 1., 2., 2., 2., 2., 2., 2., 2., 3., 3., 3., 3., 3., 4., 4.,
@@ -260,13 +260,13 @@ fn refill_orbs() {
     ];
     for drops in expected {
         assert_eq!(world.health_plant_drops(), drops);
-        world.modify_max_health(5, &[]);
+        world.add_max_health(5, &[]);
     }
 
-    world.restore_snapshot();
+    world.restore_snapshot(0);
 
-    world.set_shard(Shard::Energy, true, &[]);
-    world.set_shard(Shard::Vitality, true, &[]);
+    world.store_shard(Shard::Energy, true, &[]);
+    world.store_shard(Shard::Vitality, true, &[]);
 
     assert_eq!(
         world.checkpoint_orbs(),
@@ -276,7 +276,7 @@ fn refill_orbs() {
         }
     );
 
-    world.modify_max_health(35, &[]);
+    world.add_max_health(35, &[]);
 
     assert_eq!(
         world.checkpoint_orbs(),
@@ -286,7 +286,7 @@ fn refill_orbs() {
         }
     );
 
-    world.modify_max_health(105, &[]);
+    world.add_max_health(105, &[]);
 
     assert_eq!(
         world.checkpoint_orbs(),
@@ -309,28 +309,28 @@ fn destroy_cost() {
     let mut world = empty_test_world(&settings, DEFAULT_SPAWN);
     assert_eq!(world.destroy_cost::<false>(10.0, false), None);
 
-    world.set_skill(Skill::Spear, true, &[]);
+    world.store_skill(Skill::Spear, true, &[]);
     assert_eq!(world.destroy_cost::<false>(10.0, true), Some(4.0));
     assert_eq!(world.destroy_cost::<false>(0.0, false), Some(0.0));
 
-    world.set_skill(Skill::Bow, true, &[]);
+    world.store_skill(Skill::Bow, true, &[]);
     assert_eq!(world.destroy_cost::<false>(10.0, false), Some(1.5));
 
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
-    world.set_skill(Skill::GladesAncestralLight, true, &[]);
-    world.set_skill(Skill::MarshAncestralLight, true, &[]);
-    world.set_shard(Shard::Wingclip, true, &[]);
-    world.modify_shard_slots(1, &[]);
-    world.set_skill(Skill::Bow, false, &[]);
+    world.store_skill(Skill::GladesAncestralLight, true, &[]);
+    world.store_skill(Skill::MarshAncestralLight, true, &[]);
+    world.store_shard(Shard::Wingclip, true, &[]);
+    world.add_shard_slots(1, &[]);
+    world.store_skill(Skill::Bow, false, &[]);
     assert_eq!(world.destroy_cost::<false>(1.0, false), Some(2.0));
 
-    world.set_skill(Skill::Bow, true, &[]);
+    world.store_skill(Skill::Bow, true, &[]);
     assert_eq!(world.destroy_cost::<false>(10.0, true), Some(0.25));
 
     let mut world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Grenade, true, &[]);
-    world.set_skill(Skill::Shuriken, true, &[]);
+    world.store_skill(Skill::Grenade, true, &[]);
+    world.store_skill(Skill::Shuriken, true, &[]);
     assert_eq!(world.destroy_cost::<false>(20.0, false), Some(1.5));
     assert_eq!(world.destroy_cost::<false>(24.0, false), Some(1.5));
     assert_eq!(world.destroy_cost::<false>(34.0, false), Some(2.0));
@@ -376,7 +376,7 @@ fn is_met() {
     let orbs = Orbs::default();
 
     test!(&world, Requirement::Skill(Skill::Blaze), "❌");
-    world.set_skill(Skill::Blaze, true, &[]);
+    world.store_skill(Skill::Blaze, true, &[]);
     test!(&world, Requirement::Skill(Skill::Blaze), "✅");
 
     test!(
@@ -394,7 +394,7 @@ fn is_met() {
     );
 
     test!(&world, Requirement::EnergySkill(Skill::Blaze, 1.0), "❌");
-    world.modify_max_energy((1.).into(), &[]);
+    world.add_max_energy((1.).into(), &[]);
     test!(&world, Requirement::EnergySkill(Skill::Blaze, 1.0), "❌");
 
     let settings = test_settings(Difficulty::Unsafe);
@@ -409,7 +409,7 @@ fn is_met() {
     );
     let settings = test_settings(Difficulty::Moki);
     world.settings = &settings;
-    world.modify_max_energy((1.).into(), &[]);
+    world.add_max_energy((1.).into(), &[]);
     test!(
         &world,
         Requirement::EnergySkill(Skill::Blaze, 1.0),
@@ -421,10 +421,10 @@ fn is_met() {
 
     let settings = test_settings(Difficulty::Unsafe);
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Blaze, true, &[]);
-    world.modify_max_energy((0.5).into(), &[]);
-    world.modify_max_health(15, &[]);
-    world.set_shard(Shard::LifePact, true, &[]);
+    world.store_skill(Skill::Blaze, true, &[]);
+    world.add_max_energy((0.5).into(), &[]);
+    world.add_max_health(15, &[]);
+    world.store_shard(Shard::LifePact, true, &[]);
     test!(
         &world,
         Requirement::EnergySkill(Skill::Blaze, 1.0),
@@ -455,10 +455,10 @@ fn is_met() {
     );
 
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.modify_max_energy((2.).into(), &[]);
-    world.modify_max_health(30, &[]);
+    world.add_max_energy((2.).into(), &[]);
+    world.add_max_health(30, &[]);
     test!(&world, Requirement::Damage(30.0), "❌");
-    world.modify_max_health(5, &[]);
+    world.add_max_health(5, &[]);
     test!(
         &world,
         Requirement::Damage(30.0),
@@ -467,10 +467,10 @@ fn is_met() {
             ..orbs
         }]
     );
-    world.modify_max_energy((1.).into(), &[]);
-    world.set_skill(Skill::Regenerate, true, &[]);
+    world.add_max_energy((1.).into(), &[]);
+    world.store_skill(Skill::Regenerate, true, &[]);
     test!(&world, Requirement::Damage(60.0), "❌");
-    world.modify_max_health(30, &[]);
+    world.add_max_health(30, &[]);
     test!(
         &world,
         Requirement::Damage(60.0),
@@ -511,14 +511,14 @@ fn is_met() {
     let settings = test_settings(Difficulty::Moki);
     world = empty_test_world(&settings, DEFAULT_SPAWN);
     test!(&world, Requirement::BreakWall(12.0), "❌");
-    world.set_skill(Skill::Sword, true, &[]);
+    world.store_skill(Skill::Sword, true, &[]);
     test!(&world, Requirement::BreakWall(12.0), [world.max_orbs()]);
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Grenade, true, &[]);
+    world.store_skill(Skill::Grenade, true, &[]);
     test!(&world, Requirement::BreakWall(12.0), "❌");
-    world.modify_max_energy((1.5).into(), &[]);
+    world.add_max_energy((1.5).into(), &[]);
     test!(&world, Requirement::BreakWall(12.0), "❌");
-    world.modify_max_energy((0.5).into(), &[]);
+    world.add_max_energy((0.5).into(), &[]);
     test!(
         &world,
         Requirement::BreakWall(12.0),
@@ -528,8 +528,8 @@ fn is_met() {
         }]
     );
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Grenade, true, &[]);
-    world.modify_max_energy((1.).into(), &[]);
+    world.store_skill(Skill::Grenade, true, &[]);
+    world.add_max_energy((1.).into(), &[]);
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
     test!(
@@ -542,15 +542,15 @@ fn is_met() {
     );
     let settings = test_settings(Difficulty::Moki);
     world.settings = &settings;
-    world.modify_max_energy((0.5).into(), &[]);
+    world.add_max_energy((0.5).into(), &[]);
     test!(&world, Requirement::BreakWall(12.0), "❌");
 
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Shuriken, true, &[]);
+    world.store_skill(Skill::Shuriken, true, &[]);
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
     test!(&world, Requirement::ShurikenBreak(12.0), "❌");
-    world.modify_max_energy((2.).into(), &[]);
+    world.add_max_energy((2.).into(), &[]);
     test!(
         &world,
         Requirement::ShurikenBreak(12.0),
@@ -559,11 +559,11 @@ fn is_met() {
             ..orbs
         }]
     );
-    world.modify_max_energy((3.).into(), &[]);
+    world.add_max_energy((3.).into(), &[]);
     let settings = test_settings(Difficulty::Moki);
     world.settings = &settings;
     test!(&world, Requirement::ShurikenBreak(12.0), "❌");
-    world.modify_max_energy((1.).into(), &[]);
+    world.add_max_energy((1.).into(), &[]);
     test!(
         &world,
         Requirement::ShurikenBreak(12.0),
@@ -574,7 +574,7 @@ fn is_met() {
     );
 
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Bow, true, &[]);
+    world.store_skill(Skill::Bow, true, &[]);
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
     test!(
@@ -582,7 +582,7 @@ fn is_met() {
         Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
         "❌"
     );
-    world.modify_max_energy((3.5).into(), &[]);
+    world.add_max_energy((3.5).into(), &[]);
     test!(
         &world,
         Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
@@ -591,7 +591,7 @@ fn is_met() {
             ..orbs
         }]
     );
-    world.modify_max_energy((3.).into(), &[]);
+    world.add_max_energy((3.).into(), &[]);
     let settings = test_settings(Difficulty::Moki);
     world.settings = &settings;
     test!(
@@ -599,7 +599,7 @@ fn is_met() {
         Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
         "❌"
     );
-    world.set_skill(Skill::DoubleJump, true, &[]);
+    world.store_skill(Skill::DoubleJump, true, &[]);
     test!(
         &world,
         Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
@@ -617,13 +617,13 @@ fn is_met() {
         (Enemy::EnergyRefill, 1),
         (Enemy::Balloon, 4)
     ]);
-    world.set_skill(Skill::Shuriken, true, &[]);
-    world.set_skill(Skill::Spear, true, &[]);
-    world.modify_max_energy((13.5).into(), &[]);
+    world.store_skill(Skill::Shuriken, true, &[]);
+    world.store_skill(Skill::Spear, true, &[]);
+    world.add_max_energy((13.5).into(), &[]);
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
     test!(&world, &req, "❌");
-    world.modify_max_energy((0.5).into(), &[]);
+    world.add_max_energy((0.5).into(), &[]);
     test!(
         &world,
         &req,
@@ -632,14 +632,14 @@ fn is_met() {
             ..orbs
         }]
     );
-    world.modify_max_energy((18.5).into(), &[]);
-    world.set_skill(Skill::Bash, true, &[]);
-    world.set_skill(Skill::Launch, true, &[]);
-    world.set_skill(Skill::Burrow, true, &[]);
+    world.add_max_energy((18.5).into(), &[]);
+    world.store_skill(Skill::Bash, true, &[]);
+    world.store_skill(Skill::Launch, true, &[]);
+    world.store_skill(Skill::Burrow, true, &[]);
     let settings = test_settings(Difficulty::Moki);
     world.settings = &settings;
     test!(&world, &req, "❌");
-    world.modify_max_energy((0.5).into(), &[]);
+    world.add_max_energy((0.5).into(), &[]);
     test!(
         &world,
         &req,
@@ -649,9 +649,9 @@ fn is_met() {
         }]
     );
     world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.set_skill(Skill::Spear, true, &[]);
-    world.set_skill(Skill::DoubleJump, true, &[]);
-    world.modify_max_energy((2.).into(), &[]);
+    world.store_skill(Skill::Spear, true, &[]);
+    world.store_skill(Skill::DoubleJump, true, &[]);
+    world.add_max_energy((2.).into(), &[]);
     let settings = test_settings(Difficulty::Gorlek);
     world.settings = &settings;
     let settings = test_settings(Difficulty::Unsafe);
@@ -671,13 +671,13 @@ fn is_met() {
         Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
         "❌"
     );
-    world.modify_max_energy((5.5).into(), &[]);
+    world.add_max_energy((5.5).into(), &[]);
     test!(
         &world,
         Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
         "❌"
     );
-    world.modify_max_energy((0.5).into(), &[]);
+    world.add_max_energy((0.5).into(), &[]);
     test!(
         &world,
         Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
@@ -692,9 +692,9 @@ fn is_met() {
     let b = Requirement::Damage(20.0);
     let c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let d = Requirement::Damage(10.0);
-    world.set_skill(Skill::Blaze, true, &[]);
-    world.modify_max_energy((2.).into(), &[]);
-    world.modify_max_health(25, &[]);
+    world.store_skill(Skill::Blaze, true, &[]);
+    world.add_max_energy((2.).into(), &[]);
+    world.add_max_health(25, &[]);
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
     test!(
@@ -753,8 +753,8 @@ fn is_met() {
             health: -10.0
         }]
     );
-    world.modify_max_health(40, &[]);
-    world.modify_max_energy((4.).into(), &[]);
+    world.add_max_health(40, &[]);
+    world.add_max_energy((4.).into(), &[]);
     test!(
         &world,
         Requirement::And(vec![
@@ -800,14 +800,14 @@ fn is_met() {
     world = empty_test_world(&settings, DEFAULT_SPAWN);
     let settings = test_settings(Difficulty::Unsafe);
     world.settings = &settings;
-    world.modify_max_health(35, &[]);
-    world.modify_max_energy((1.).into(), &[]);
+    world.add_max_health(35, &[]);
+    world.add_max_energy((1.).into(), &[]);
     test!(
         &world,
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
         "❌"
     );
-    world.set_skill(Skill::Regenerate, true, &[]);
+    world.store_skill(Skill::Regenerate, true, &[]);
     test!(
         &world,
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
@@ -821,8 +821,8 @@ fn is_met() {
         Requirement::Damage(10.0),
         Requirement::EnergySkill(Skill::Blaze, 1.0),
     ]);
-    world.set_skill(Skill::Blaze, true, &[]);
-    world.modify_max_energy((1.).into(), &[]);
+    world.store_skill(Skill::Blaze, true, &[]);
+    world.add_max_energy((1.).into(), &[]);
     test!(
         &world,
         Requirement::And(vec![req.clone(), req.clone()]),
@@ -1474,7 +1474,7 @@ fn is_met() {
 //             .collect(),
 //         ]
 //     );
-//     world.set_skill(Skill::Bow, true, &[]);
+//     world.store_skill(Skill::Bow, true, &[]);
 //     test!(
 //         &world,
 
@@ -1561,7 +1561,7 @@ fn is_met() {
 //             .collect(),
 //         ]
 //     );
-//     world.set_skill(Skill::Launch, true, &[]);
+//     world.store_skill(Skill::Launch, true, &[]);
 //     test!(
 //         &world,
 
@@ -1620,7 +1620,7 @@ fn is_met() {
 //         ..test_settings(Difficulty::Moki)
 //     };
 //     world.settings = &settings;
-//     world.set_skill(Skill::Bow, true, &[]);
+//     world.store_skill(Skill::Bow, true, &[]);
 //     // 40 + 32 + (20 * 2) + 24 * 2 + 20 * 3 + 32
 //     // 10 + 8 + (10) + 12 + 15 + 8 = 63
 //     test!(
