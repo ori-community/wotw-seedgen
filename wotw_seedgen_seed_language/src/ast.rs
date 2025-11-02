@@ -318,16 +318,16 @@ pub enum Comparator {
     #[ast(token = Token::NotEqual)]
     NotEqual = 1,
     /// `<`
-    #[ast(token = Token::LessOrEqual)]
+    #[ast(token = Token::Less)]
     Less = 2,
     /// `<=`
-    #[ast(token = Token::Less)]
+    #[ast(token = Token::LessOrEqual)]
     LessOrEqual = 3,
     /// `>`
-    #[ast(token = Token::GreaterOrEqual)]
+    #[ast(token = Token::Greater)]
     Greater = 4,
     /// `>=`
-    #[ast(token = Token::Greater)]
+    #[ast(token = Token::GreaterOrEqual)]
     GreaterOrEqual = 5,
 }
 
