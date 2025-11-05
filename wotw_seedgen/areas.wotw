@@ -13392,6 +13392,8 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
         Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.DrainRoomPurpleWall, Damage=60, Damage=20, Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
+# checkpoint at -1576, -4003
+
 anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where all the bubbles rise
   refill Checkpoint
 
@@ -13401,13 +13403,17 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
       Bash, DoubleJump, Dash OR Glide
       Launch, DoubleJump OR Dash OR Glide
     gorlek:
-      Launch OR Bash
       Combat=Bee+Skeeto, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+      Bash, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+      Bash, Dash OR Glide OR Sword  # Bash the mosquitos
+      Bash, Hammer, Damage=20
+      Launch
     kii:
       Combat=Bee+Skeeto, DoubleJump OR Dash
     unsafe:
       Sword OR Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR Shuriken=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR FlashSwap OR PauseFloat
       Grapple, UltraGrapple  # wait for the bee to go up and then grapple to it
+      Unpopular, Bash  # entering the lever room is free with a precise bubble jump
   state UpperPools.BubbleSpamWall:
     moki: Water, WaterDash
     kii: WaterDash, Damage=60
