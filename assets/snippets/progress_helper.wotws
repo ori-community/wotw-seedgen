@@ -195,11 +195,22 @@ on progress_message {
     // TODO priority message shouldn't enter the Alt+T log
     priority_message(get_string("progress_message"), 4.0)
 }
+
+on reload {
+    free_message("map_message", "")
+    set_message_position("map_message", 0.5, 0.84)
+    set_message_vertical_anchor("map_message", Bottom)
+    set_message_background("map_message", false)
+}
+
 // TODO we call this "zone", not "area"
-// TODO shouldn't this be < 12?
-on change player.currentMapArea if player.currentMapArea < 14 {
-    write_map_progress_message()
-    set_map_message(get_string("progress_message"))
+on change player.currentMapArea {
+    if player.currentMapArea < 12 {
+        write_map_progress_message()
+        // TODO are we supposed to use set_map_message? Didn't seem to work...
+        set_message_text("map_message", "<s_0.9><ls_0.8>" + get_string("progress_message") + "</></>")
+    }
+    if player.currentMapArea >= 12 set_message_text("map_message", "")
 }
 
 on binding1 if disable_keybinds == false {
