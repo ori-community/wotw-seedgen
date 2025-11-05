@@ -1,0 +1,1815 @@
+!state(spirit_light_collected, Integer)
+!export(spirit_light_collected)
+
+!state(keystones_collected, Integer)
+!export(keystones_collected)
+
+!state(ore_collected, Integer)
+!export(ore_collected)
+
+// TODO fix burrows interrupting marsh in loc_data
+!let(total_marsh_pickups, 56)
+!export(total_marsh_pickups)
+
+!state(marsh_pickups_collected, Integer)
+!export(marsh_pickups_collected)
+
+!state(marsh_pickups_collected_on_spawn, Integer)
+!export(marsh_pickups_collected_on_spawn)
+
+!state(marsh_pickups_completion, Float)
+!export(marsh_pickups_completion)
+
+!let(total_hollow_pickups, 33)
+!export(total_hollow_pickups)
+
+!state(hollow_pickups_collected, Integer)
+!export(hollow_pickups_collected)
+
+!state(hollow_pickups_collected_on_spawn, Integer)
+!export(hollow_pickups_collected_on_spawn)
+
+!state(hollow_pickups_completion, Float)
+!export(hollow_pickups_completion)
+
+!let(total_glades_pickups, 40)
+!export(total_glades_pickups)
+
+!state(glades_pickups_collected, Integer)
+!export(glades_pickups_collected)
+
+!state(glades_pickups_collected_on_spawn, Integer)
+!export(glades_pickups_collected_on_spawn)
+
+!state(glades_pickups_completion, Float)
+!export(glades_pickups_completion)
+
+!let(total_wellspring_pickups, 38)
+!export(total_wellspring_pickups)
+
+!state(wellspring_pickups_collected, Integer)
+!export(wellspring_pickups_collected)
+
+!state(wellspring_pickups_collected_on_spawn, Integer)
+!export(wellspring_pickups_collected_on_spawn)
+
+!state(wellspring_pickups_completion, Float)
+!export(wellspring_pickups_completion)
+
+// TODO fix pools being early in loc_data
+// TODO fix woods being split in loc_data
+!let(total_woods_pickups, 32)
+!export(total_woods_pickups)
+
+!state(woods_pickups_collected, Integer)
+!export(woods_pickups_collected)
+
+!state(woods_pickups_collected_on_spawn, Integer)
+!export(woods_pickups_collected_on_spawn)
+
+!state(woods_pickups_completion, Float)
+!export(woods_pickups_completion)
+
+!let(total_reach_pickups, 44)
+!export(total_reach_pickups)
+
+!state(reach_pickups_collected, Integer)
+!export(reach_pickups_collected)
+
+!state(reach_pickups_collected_on_spawn, Integer)
+!export(reach_pickups_collected_on_spawn)
+
+!state(reach_pickups_completion, Float)
+!export(reach_pickups_completion)
+
+!let(total_depths_pickups, 25)
+!export(total_depths_pickups)
+
+!state(depths_pickups_collected, Integer)
+!export(depths_pickups_collected)
+
+!state(depths_pickups_collected_on_spawn, Integer)
+!export(depths_pickups_collected_on_spawn)
+
+!state(depths_pickups_completion, Float)
+!export(depths_pickups_completion)
+
+!let(total_pools_pickups, 41)
+!export(total_pools_pickups)
+
+!state(pools_pickups_collected, Integer)
+!export(pools_pickups_collected)
+
+!state(pools_pickups_collected_on_spawn, Integer)
+!export(pools_pickups_collected_on_spawn)
+
+!state(pools_pickups_completion, Float)
+!export(pools_pickups_completion)
+
+!let(total_wastes_pickups, 39)
+!export(total_wastes_pickups)
+
+!state(wastes_pickups_collected, Integer)
+!export(wastes_pickups_collected)
+
+!state(wastes_pickups_collected_on_spawn, Integer)
+!export(wastes_pickups_collected_on_spawn)
+
+!state(wastes_pickups_completion, Float)
+!export(wastes_pickups_completion)
+
+!let(total_ruins_pickups, 3)
+!export(total_ruins_pickups)
+
+!state(ruins_pickups_collected, Integer)
+!export(ruins_pickups_collected)
+
+!state(ruins_pickups_collected_on_spawn, Integer)
+!export(ruins_pickups_collected_on_spawn)
+
+!state(ruins_pickups_completion, Float)
+!export(ruins_pickups_completion)
+
+!let(total_willow_pickups, 8)
+!export(total_willow_pickups)
+
+!state(willow_pickups_collected, Integer)
+!export(willow_pickups_collected)
+
+!state(willow_pickups_collected_on_spawn, Integer)
+!export(willow_pickups_collected_on_spawn)
+
+!state(willow_pickups_completion, Float)
+!export(willow_pickups_completion)
+
+!let(total_burrows_pickups, 7)
+!export(total_burrows_pickups)
+
+!state(burrows_pickups_collected, Integer)
+!export(burrows_pickups_collected)
+
+!state(burrows_pickups_collected_on_spawn, Integer)
+!export(burrows_pickups_collected_on_spawn)
+
+!state(burrows_pickups_completion, Float)
+!export(burrows_pickups_completion)
+
+!let(total_shop_pickups, 23)
+!export(total_shop_pickups)
+
+!state(shop_pickups_collected, Integer)
+!export(shop_pickups_collected)
+
+!state(shop_pickups_collected_on_spawn, Integer)
+!export(shop_pickups_collected_on_spawn)
+
+!state(shop_pickups_completion, Float)
+!export(shop_pickups_completion)
+
+!let(total_pickups,
+    total_marsh_pickups
+    + total_hollow_pickups
+    + total_glades_pickups
+    + total_wellspring_pickups
+    + total_woods_pickups
+    + total_reach_pickups
+    + total_depths_pickups
+    + total_pools_pickups
+    + total_wastes_pickups
+    + total_ruins_pickups
+    + total_willow_pickups
+    + total_burrows_pickups
+    + total_shop_pickups
+)
+!export(total_pickups)
+
+!state(pickups_collected, Integer)
+!export(pickups_collected)
+
+!state(pickups_collected_on_spawn, Integer)
+!export(pickups_collected_on_spawn)
+
+!state(pickups_completion, Float)
+!export(pickups_completion)
+
+!state(previous_spirit_light_collected, Integer)
+
+on change player.spiritLight {
+    set_integer("delta", player.spiritLight - previous_spirit_light_collected)
+
+    if get_integer("delta") > 0 store(spirit_light_collected, spirit_light_collected + get_integer("delta"))
+
+    store(previous_spirit_light_collected, player.spiritLight)
+}
+
+!state(previous_keystones_collected, Integer)
+
+on change player.keystones {
+    set_integer("delta", player.keystones - previous_keystones_collected)
+
+    if get_integer("delta") > 0 store(keystones_collected, keystones_collected + get_integer("delta"))
+
+    store(previous_keystones_collected, player.keystones)
+}
+
+!state(previous_ore_collected, Integer)
+
+on change player.gorlekOre {
+    set_integer("delta", player.gorlekOre - previous_ore_collected)
+
+    if get_integer("delta") > 0 store(ore_collected, ore_collected + get_integer("delta"))
+
+    store(previous_ore_collected, player.gorlekOre)
+}
+
+on change marsh_pickups_collected store(marsh_pickups_completion, (marsh_pickups_collected - marsh_pickups_collected_on_spawn) * (1 / (total_marsh_pickups - marsh_pickups_collected_on_spawn)))
+on change hollow_pickups_collected store(hollow_pickups_completion, (hollow_pickups_collected - hollow_pickups_collected_on_spawn) * (1 / (total_hollow_pickups - hollow_pickups_collected_on_spawn)))
+on change glades_pickups_collected store(glades_pickups_completion, (glades_pickups_collected - glades_pickups_collected_on_spawn) * (1 / (total_glades_pickups - glades_pickups_collected_on_spawn)))
+on change wellspring_pickups_collected store(wellspring_pickups_completion, (wellspring_pickups_collected - wellspring_pickups_collected_on_spawn) * (1 / (total_wellspring_pickups - wellspring_pickups_collected_on_spawn)))
+on change woods_pickups_collected store(woods_pickups_completion, (woods_pickups_collected - woods_pickups_collected_on_spawn) * (1 / (total_woods_pickups - woods_pickups_collected_on_spawn)))
+on change reach_pickups_collected store(reach_pickups_completion, (reach_pickups_collected - reach_pickups_collected_on_spawn) * (1 / (total_reach_pickups - reach_pickups_collected_on_spawn)))
+on change depths_pickups_collected store(depths_pickups_completion, (depths_pickups_collected - depths_pickups_collected_on_spawn) * (1 / (total_depths_pickups - depths_pickups_collected_on_spawn)))
+on change pools_pickups_collected store(pools_pickups_completion, (pools_pickups_collected - pools_pickups_collected_on_spawn) * (1 / (total_pools_pickups - pools_pickups_collected_on_spawn)))
+on change wastes_pickups_collected store(wastes_pickups_completion, (wastes_pickups_collected - wastes_pickups_collected_on_spawn) * (1 / (total_wastes_pickups - wastes_pickups_collected_on_spawn)))
+on change ruins_pickups_collected store(ruins_pickups_completion, (ruins_pickups_collected - ruins_pickups_collected_on_spawn) * (1 / (total_ruins_pickups - ruins_pickups_collected_on_spawn)))
+on change willow_pickups_collected store(willow_pickups_completion, (willow_pickups_collected - willow_pickups_collected_on_spawn) * (1 / (total_willow_pickups - willow_pickups_collected_on_spawn)))
+on change burrows_pickups_collected store(burrows_pickups_completion, (burrows_pickups_collected - burrows_pickups_collected_on_spawn) * (1 / (total_burrows_pickups - burrows_pickups_collected_on_spawn)))
+on change shop_pickups_collected store(shop_pickups_completion, (shop_pickups_collected - shop_pickups_collected_on_spawn) * (1 / (total_shop_pickups - shop_pickups_collected_on_spawn)))
+on change pickups_collected store(pickups_completion, (pickups_collected - pickups_collected_on_spawn) * (1 / (total_pickups - pickups_collected_on_spawn)))
+
+!state(after_spawn, Boolean)
+on change statsUberStateGroup.distanceTravelledStatSettingSerializedFloatUberState store(after_spawn, true)
+on after_spawn {
+    store(marsh_pickups_collected_on_spawn, marsh_pickups_collected)
+    store(hollow_pickups_collected_on_spawn, hollow_pickups_collected)
+    store(glades_pickups_collected_on_spawn, glades_pickups_collected)
+    store(wellspring_pickups_collected_on_spawn, wellspring_pickups_collected)
+    store(woods_pickups_collected_on_spawn, woods_pickups_collected)
+    store(reach_pickups_collected_on_spawn, reach_pickups_collected)
+    store(depths_pickups_collected_on_spawn, depths_pickups_collected)
+    store(pools_pickups_collected_on_spawn, pools_pickups_collected)
+    store(wastes_pickups_collected_on_spawn, wastes_pickups_collected)
+    store(ruins_pickups_collected_on_spawn, ruins_pickups_collected)
+    store(willow_pickups_collected_on_spawn, willow_pickups_collected)
+    store(burrows_pickups_collected_on_spawn, burrows_pickups_collected)
+    store(shop_pickups_collected_on_spawn, shop_pickups_collected)
+    store(pickups_collected_on_spawn, pickups_collected)
+    save()
+}
+
+on MarshSpawn.RockHC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.FirstPickupEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.GrappleHC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.BridgeEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.ResilienceShard {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.ResilienceOre {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.BashEC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.PreLupoEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.LupoMap {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.RegenTree {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.LeverEC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.LeftTokkEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.FightRoomEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.CaveKS {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.TokkKeystoneQuest {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.CaveOre {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.LongSwimEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.BurrowOre {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.LifepactShard {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.BurrowsApproachLedgeEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.CrusherSwimEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.TokkTabletQuest {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.RecklessShard {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.MokkEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.FangEC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.FangQI {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.MokkFangQuest {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.DamageTree {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshSpawn.PoolsPathEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.LeftKS {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.RightKS {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.UpperKS {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.LowerKS {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.LupoMap {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.DeflectorShard {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MidnightBurrows.TabletQI {
+    store(burrows_pickups_collected, burrows_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.RightHC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.LeftHC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.AboveDoorKS {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.MagnetShard {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.SwordTree {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.BoneOre {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.AboveTPEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.LaserKS {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.CombatShrine {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.DoubleJumpEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.StickyShard {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on HowlsDen.DoubleJumpTree {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.TrialLeftEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.TrialOre {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.TrialEC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.TrialHC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.TrialRightEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.SpiritTrial {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.CombatShrine {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.SwingPoleEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.LeftEyestone {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.RightEyestone {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.BowEC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.BowTree {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.CeilingEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.PoolsPathEC {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on MarshPastOpher.PoolsPathEX {
+    store(marsh_pickups_collected, marsh_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.CrusherHC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.FarLeftEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.RockPuzzleEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.HiddenEC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.QuickshotShard {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.SwimEC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.LupoMap {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.TrialHC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.SpiritTrial {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.BelowLupoEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.AboveDashEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.DashRightEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.CrusherEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestHollow.DashTree {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.HandToHandMap {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.GladesApproachOre {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.HornBeetleFightEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.SpikeLanternEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.SecretRoofEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.MortarEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.BashEC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.BashHC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.BashEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.BashTree {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.KwolokAmuletQuest {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.RightKwolokEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.SilentSwimEC {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.SplinterShard {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.ForestsVoice {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.KwolokSwimOre {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.KwolokSwimLeftEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.KwolokSwimRightEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastHollow.DepthsExteriorEX {
+    store(hollow_pickups_collected, hollow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.HandToHandPouch {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.HandToHandLantern {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.HandToHandCanteen {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.FamilyReunionKey {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.AcornQI {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.MokiAcornQuest {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.HoleHutEC {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.AboveGromHC {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.LupoSwimHC {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.UpperOre {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.LowerOre {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.ArcingShard {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.BountyShard {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.LupoSoupEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.BraveMokiHutEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.MotayHutEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.HoleHutEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.UpperLeftEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.LupoSwimMiddleEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.CaveBurrowEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.BelowHoleHutEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.KeyMokiHutEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.AboveTpEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.AboveCaveEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.LupoSwimLeftEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.UpdraftCeilingEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.LeafPileEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.DamageTree {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.RebuildTheGlades {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.TwillenGemQuest {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on GladesTown.RegrowTheGlades {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.GrappleEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.AbovePlantEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.LowerPoolEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.UpperPoolEX {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.SwimEC {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.LeftOre {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.RightOre {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.ShrineHC {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestGlades.CombatShrine {
+    store(glades_pickups_collected, glades_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.RightWallOre {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.RightWallEC {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.RightWallEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.TrialOre {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.SpiritTrial {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.UltraGrappleShard {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.HiddenHC {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.EntranceRoofEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.WheelEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.BasementEC {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.LifeHarvestShard {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.SwimEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.SwimOre {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OuterWellspring.TheLostCompass {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.ThornShard {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.ThornEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.ThreeWheelsEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.WaterSwitchEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.DrainHC {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.DrainEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.LaserOre {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.LeverEC {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.LupoEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.LupoMap {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.ShortcutWheelEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.GrappleTreeEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.GrappleTree {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.AboveSpinArenaEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.HandToHandHerbs {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.RotateRoomEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.RotateRoomOre {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.NeedleQI {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.LibraryEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.AboveTpEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.BlueMoonSeed {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.SwimOre {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.EscapeRevisitEX {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on InnerWellspring.WaterEscape {
+    store(wellspring_pickups_collected, wellspring_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on PoolsApproach.MarshPathCurrentEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on PoolsApproach.AboveWheelEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on PoolsApproach.MillPathHC {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on PoolsApproach.MillPathEC {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on PoolsApproach.MillPathEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.RightOre {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.KwolokAmuletQI {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.TwoCrushersEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.BubbleCurrentEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.BelowLeverEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.AboveDoorOre {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.PurpleWallHC {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.HandToHandSpyglass {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.AboveTpEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.LupoOre {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.UltraBashShard {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.FightRoomHC {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.SpiritTrial {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.EnergyHarvestShard {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.LupoEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.LupoMap {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.BehindCrusherEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on EastPools.GrassSeed {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.LowerKS {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.UpperLeftKS {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.UpperMidKS {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.UpperRightKS {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.FishPoolEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.FishPoolOre {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.BubblesEC {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.RightBubblesEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.LeftBubblesEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.SwimDashTree {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.SwimDashCurrentEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.RoofEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperPools.WaterfallEC {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestPools.BurrowEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestPools.BurrowOre {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestPools.TpEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestPools.EscapeRevisitEX {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WestPools.ForestsStrength {
+    store(pools_pickups_collected, pools_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.LastTreeBranch {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.DollQI {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.TreeSeed {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.MudPitEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.LedgeOre {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.LeafPileEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.TpEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.LowerKS {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsEntry.UpperKS {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.RightKS {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.UpperKS {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.LeftKS {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.LowerKS {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.BehindWallOre {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.LowerLeafPileEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.MiddleLeafPileEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.UpperLeafPileEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.YellowWallEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.HiddenOre {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.HiddenEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.BelowKeystonesEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.BehindDoorRoofEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.PetrifiedHowlEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.SpiritTrial {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.OverflowShard {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.CombatShrine {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.ShrineEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WoodsMain.FeedingGroundsEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.BelowBaurEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.AboveBaurLowerEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.AboveBaurUpperEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.IcefallOre {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.IcefallEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.AboveDoorEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.HiddenOre {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.LupoMap {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.MeltIceEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.BurrowEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.TPLeftEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.BelowLupoEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.BreakWallEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.WindBottomEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.WindHiddenEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.HandToHandHat {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.SnowballHC {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.RoofLeftEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.RoofRightEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.FractureShard {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.EscapeRevisitEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.ForestsMemory {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.RightKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.UpperLeftKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.MiddleLeftKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.BottomLeftKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.TrialEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.SpiritTrial {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.CatalystShard {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerReach.HandToHandSoup {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.LifeForceShard {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.LifeForceEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.LowerKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.UpperKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.MiddleLeftKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.MiddleRightKS {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.SoupOre {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.SwingPoleEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.SwimEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.LightBurstTree {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.TreeOre {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.WellEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.SpringSeed {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperReach.HiddenEX {
+    store(reach_pickups_collected, reach_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.EntrySpikesEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.EntryRoofEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.EntryOre {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.RightEntryKS {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.LeftEntryKS {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.SwimEC {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.TeleporterEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.LeftHealthKS {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.RightHealthKS {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.LightcatcherSeed {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.BossPathEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.KeystoneHC {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.HiveEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperDepths.ForestsEyes {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.RaceStartHC {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.SpiritTrial {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.BelowDoorOre {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.SpiritSurgeShard {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.HandToHandSilk {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.CombatShrine {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.SwimEC {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.LupoMap {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.LeftEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.RightEX {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerDepths.FlashTree {
+    store(depths_pickups_collected, depths_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.WestTPOre {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.PurpleWallEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.SunsetViewEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.SpiritTrial {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.SandBridgeOre {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.EerieGemQI {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.MuncherTunnelEC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.SandPotHC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.SandPotEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.MuncherPitEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.BottomRightEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.BottomRightHC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.LastStandShard {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.LastStandEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.MuncherClimbEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.SkeetoHiveEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.HandToHandMapstone {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.LupoMap {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.BurrowTree {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.BurrowTreeEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.UpperPathEC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.UpperPathEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.UpperPathHiddenEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.UpperPathHC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LowerWastes.EastTPOre {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.LowerKS {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.UpperKS {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.TurmoilShard {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.KSDoorEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.LedgeEC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.MissileSpawnEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.PurpleWallEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.PurpleWallHC {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.RoofEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.SpinLasersRightEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.SpinLasersMiddleEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.SpinLasersLowerEX {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.FlowersSeed {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on UpperWastes.WallOre {
+    store(wastes_pickups_collected, wastes_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WindtornRuins.EscapeRevisitEC {
+    store(ruins_pickups_collected, ruins_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WindtornRuins.Seir {
+    store(ruins_pickups_collected, ruins_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WindtornRuins.HandToHandComplete {
+    store(ruins_pickups_collected, ruins_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WeepingRidge.Ore {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WeepingRidge.LaunchTree {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WeepingRidge.SpikeClimbEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WeepingRidge.PortalEX {
+    store(woods_pickups_collected, woods_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.SpikesOre {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.EntryEX {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.PoisonfallHC {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.LupoMap {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.WindSpinOre {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.RedirectEX {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.UpperLeftEX {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on WillowsEnd.UpperRightEX {
+    store(willow_pickups_collected, willow_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.Overcharge {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.TripleJump {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.Wingclip {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.Swap {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.LightHarvest {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.Vitality {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.Energy {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on TwillenShop.Finesse {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.WaterBreath {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.Spike {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.SpiritSmash {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.Teleport {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.SpiritStar {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.Blaze {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.Sentry {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.ExplodingSpike {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.ShockSmash {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.StaticStar {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.ChargeBlaze {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on OpherShop.RapidSentry {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LupoShop.HCMapIcon {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LupoShop.ECMapIcon {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}
+on LupoShop.ShardMapIcon {
+    store(shop_pickups_collected, shop_pickups_collected + 1)
+    store(pickups_collected, pickups_collected + 1)
+}

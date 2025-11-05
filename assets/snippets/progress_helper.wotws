@@ -18,6 +18,23 @@ By default those are bound to
 // !augment_fun(write_progress_message, set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
 // !augment_fun(write_map_progress_message, set_string("map_progress_message", get_string("map_progress_message") + "\nFun: 10/10"))
 
+!include(
+    "stats",
+    marsh_pickups_collected, marsh_pickups_collected_on_spawn, total_marsh_pickups,
+    hollow_pickups_collected, hollow_pickups_collected_on_spawn, total_hollow_pickups,
+    glades_pickups_collected, glades_pickups_collected_on_spawn, total_glades_pickups,
+    wellspring_pickups_collected, wellspring_pickups_collected_on_spawn, total_wellspring_pickups,
+    woods_pickups_collected, woods_pickups_collected_on_spawn, total_woods_pickups,
+    reach_pickups_collected, reach_pickups_collected_on_spawn, total_reach_pickups,
+    depths_pickups_collected, depths_pickups_collected_on_spawn, total_depths_pickups,
+    pools_pickups_collected, pools_pickups_collected_on_spawn, total_pools_pickups,
+    wastes_pickups_collected, wastes_pickups_collected_on_spawn, total_wastes_pickups,
+    ruins_pickups_collected, ruins_pickups_collected_on_spawn, total_ruins_pickups,
+    willow_pickups_collected, willow_pickups_collected_on_spawn, total_willow_pickups,
+    burrows_pickups_collected, burrows_pickups_collected_on_spawn, total_burrows_pickups,
+    pickups_collected, pickups_collected_on_spawn, total_pickups
+)
+
 !builtin_icon(progress_summary_icon, "assets/icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
 !builtin_icon(tree_progress_icon, "assets/icons/wheel/tree_progress.blue.png")
 !builtin_icon(wisp_progress_icon, "assets/icons/wheel/wisps_progress.png") // TODO why do others have blue and this one not
@@ -26,12 +43,93 @@ By default those are bound to
 
 !export(write_progress_message)
 fun write_progress_message() {
-    set_string("progress_message", "")
+    set_integer("collected", pickups_collected)
+    set_integer("collected_on_spawn", pickups_collected_on_spawn)
+    set_integer("total", total_pickups)
+    pickups_progress()
 }
 
 !export(write_map_progress_message)
 fun write_map_progress_message() {
     set_string("progress_message", "")
+    // TODO this breaks the zone abstraction
+    if player.currentMapArea == 0 {
+        set_integer("collected", marsh_pickups_collected)
+        set_integer("collected_on_spawn", marsh_pickups_collected_on_spawn)
+        set_integer("total", total_marsh_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 1 {
+        set_integer("collected", hollow_pickups_collected)
+        set_integer("collected_on_spawn", hollow_pickups_collected_on_spawn)
+        set_integer("total", total_hollow_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 2 {
+        set_integer("collected", glades_pickups_collected)
+        set_integer("collected_on_spawn", glades_pickups_collected_on_spawn)
+        set_integer("total", total_glades_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 3 {
+        set_integer("collected", wellspring_pickups_collected)
+        set_integer("collected_on_spawn", wellspring_pickups_collected_on_spawn)
+        set_integer("total", total_wellspring_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 7 {
+        set_integer("collected", woods_pickups_collected)
+        set_integer("collected_on_spawn", woods_pickups_collected_on_spawn)
+        set_integer("total", total_woods_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 6 {
+        set_integer("collected", reach_pickups_collected)
+        set_integer("collected_on_spawn", reach_pickups_collected_on_spawn)
+        set_integer("total", total_reach_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 8 {
+        set_integer("collected", depths_pickups_collected)
+        set_integer("collected_on_spawn", depths_pickups_collected_on_spawn)
+        set_integer("total", total_depths_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 4 {
+        set_integer("collected", pools_pickups_collected)
+        set_integer("collected_on_spawn", pools_pickups_collected_on_spawn)
+        set_integer("total", total_pools_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 9 {
+        set_integer("collected", wastes_pickups_collected)
+        set_integer("collected_on_spawn", wastes_pickups_collected_on_spawn)
+        set_integer("total", total_wastes_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 10 {
+        set_integer("collected", ruins_pickups_collected)
+        set_integer("collected_on_spawn", ruins_pickups_collected_on_spawn)
+        set_integer("total", total_ruins_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 11 {
+        set_integer("collected", willow_pickups_collected)
+        set_integer("collected_on_spawn", willow_pickups_collected_on_spawn)
+        set_integer("total", total_willow_pickups)
+        pickups_progress()
+    }
+    if player.currentMapArea == 5 {
+        set_integer("collected", burrows_pickups_collected)
+        set_integer("collected_on_spawn", burrows_pickups_collected_on_spawn)
+        set_integer("total", total_burrows_pickups)
+        pickups_progress()
+    }
+}
+
+fun pickups_progress() {
+    set_string("progress_message", "Pickups: " + (get_integer("collected") - get_integer("collected_on_spawn")) + "/" + (get_integer("total") - get_integer("collected_on_spawn")))
+    if get_integer("collected") >= get_integer("total") set_string("progress_message", "$" + get_string("progress_message") + "$")
 }
 
 !state(disable_keybinds, Boolean)
@@ -93,12 +191,12 @@ on reload {
 }
 
 on progress_message {
-    // TODO can't write randoState.Pickups collected
-    // TODO need state for total pickups
-    // set_string("progress_message", get_string("progress_message") + "Pickups: " + randoStats.pickupsCollected + "/" + "")
     write_progress_message()
+    // TODO priority message shouldn't enter the Alt+T log
     priority_message(get_string("progress_message"), 4.0)
 }
+// TODO we call this "zone", not "area"
+// TODO shouldn't this be < 12?
 on change player.currentMapArea if player.currentMapArea < 14 {
     write_map_progress_message()
     set_map_message(get_string("progress_message"))
