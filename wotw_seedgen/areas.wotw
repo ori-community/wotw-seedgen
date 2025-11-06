@@ -4792,9 +4792,11 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
     kii:
       Bash, Grenade=1  # drop through the floor before throwing your grenade
       Hammer
+      # Glitched
+      # GrenadeJump=1
     unsafe:
-      Sword OR Spear=1 # upslash+downslash
-      GrenadeJump
+      Sword  # upslash+downslash
+      Spear=1 OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
 
 anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
   door:
@@ -4818,8 +4820,11 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       SentryJump=1, Damage=10 OR GladesTown.ClearThorns
       Hammer, Dash
       TuleyShop.SpringPlants
-    kii: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: Dash
+    kii:
+      Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Dash OR Sword OR HammerSJump=1 OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
   pickup GladesTown.CaveBurrowEX:
     moki: Burrow, DoubleJump OR Launch
     gorlek: Burrow  # Burrow Dash out of the sand
@@ -4833,8 +4838,11 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       Bash, Grenade=1
       Hammer, Dash
       SentryJump=1
-    kii, GladesTown.ClearThorns: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.ClearThorns: Dash
+    kii, GladesTown.ClearThorns:
+      Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.ClearThorns: Dash OR Sword OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
 
 anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at the door
   door:
