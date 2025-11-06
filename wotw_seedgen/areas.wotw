@@ -4499,10 +4499,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       DoubleJump, TripleJump, Dash OR Glide  # using the ceiling from the left
       AerialHammerJump OR GlideHammerJump
       GrenadeJump, DoubleJump
-      TuleyShop.Lightcatchers, Bash, Grenade=1
-      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
-        Bash  # use both slimes
-        DoubleJump, TripleJump, GlideJump
+      Bash  # https://youtu.be/WNqAS4gtsz8
       TuleyShop.StickyGrass:
         TuleyShop.Lightcatchers, Bash, Hammer OR Sword
         Bash, Grenade=1, Sword
@@ -4618,7 +4615,9 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # condition for reaching the bridge
         Grapple, DoubleJump, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # Glitched
-      # TuleyShop.Lightcatchers, Bash, AerialHammerJump
+      # TuleyShop.Lightcatchers:
+      #   Bash, AerialHammerJump
+      #   Bash, GlideJump, Sword OR Hammer
       # TuleyShop.StickyGrass, AerialHammerJump, Dash OR Glide OR Sword
       # TuleyShop.StickyGrass, GlideJump, DoubleJump, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
@@ -4647,21 +4646,21 @@ anchor GladesTown.BuiltMotayHut at -394, -4135: # In front of the house hovering
         DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
         Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
-      # GrenadeJump=2
+      # GrenadeJump=2 OR SentryJump=1
       # TuleyShop.BlueMoon, Grapple, GrenadeJump=1:  # grapple the right plant to reach the house above
       #   DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
       #   Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=2 OR Flash=2 OR Sentry=2
     unsafe, GladesTown.BuildHuts:
-      GrenadeJump
+      GrenadeJump OR SentryJump=1
       TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
-      TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat  # grapple the right plant to reach the house above
-      TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump  # grapple the right plant to reach the house above
 
   conn GladesTown.MotayHutDoor:
     GladesTown.BuildHuts
   conn GladesTown.West:
-    GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform from the hanging lantern below
+    moki: GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform from the hanging lantern below
+    unsafe: free
+  conn GladesTown.TwillenHome: free
   conn GladesTown.UpperWest:
     moki, GladesTown.BuildHuts:
       Bash, Grenade=2, Dash  # 1 extra grenade if you hit the Lightcatcher
@@ -4671,16 +4670,23 @@ anchor GladesTown.BuiltMotayHut at -394, -4135: # In front of the house hovering
       Bash, Grenade=1
       SentryJump=1, DoubleJump, TripleJump OR Dash
       TuleyShop.Lightcatchers, Bash, Dash
+    # kii, GladesTown.BuildHuts:
+    #   GlideJump, DoubleJump, TripleJump OR Hammer  # condition to reach the 2nd hut from GladesTown.West
     unsafe, GladesTown.BuildHuts:
       GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
       SwordSJump=1, Dash
       TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
+      GlideJump, DoubleJump, TripleJump OR Hammer OR Sword OR Spear=1 OR BlazeSwap=1 OR SentrySwap=1
+      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
 
 anchor GladesTown.MotayHutDoor at -394, -4135:  # Specifically exiting Motay's hut
 # This anchor is for paths which would only work when exiting Motay's hut.
 # They can't originate from GladesTown.MotayHutInside because it wouldn't work with door randomization
 # They also can't originate from GladesTown.BuiltMotayHut because it wouldn't work out of a teleportation
   nospawn
+  
+#  refill Checkpoint:
+#    unsafe: GladesTown.BuildHuts  # Exiting the hut activates a checkpoint but it doesn't work with door randomization (because entering this door doesn't always connect to an open door)
   
   door:
     id: 5
