@@ -66,7 +66,7 @@ fn ast() {
     let source = "region GorlekMines:\n    moki: GorlekMines.ElevatorFixed OR Shuriken=1\n";
     let mut parser = Parser::new(source, Tokenizer);
     assert_eq!(
-        Content::ast(&mut parser).unwrap(),
+        Content::ast_result(&mut parser).unwrap(),
         Content::Region(
             Spanned {
                 data: RegionKeyword,

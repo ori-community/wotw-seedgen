@@ -1,6 +1,10 @@
-use crate::{Ast, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
+use crate::{Ast, Mode, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
 use derivative::Derivative;
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
+use std::{
+    fmt::Debug,
+    marker::PhantomData,
+    ops::{ControlFlow, Range},
+};
 
 /// Trait responsible for recovering the parser when an [`Ast`] implementation fails
 ///
@@ -117,12 +121,12 @@ where
     V: Ast<'source, T>,
     R: Recover<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        let result = V::ast(parser);
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        let result = V::ast_result(parser);
         if result.is_err() {
             R::recover(parser);
         }
-        Ok(Self {
+        ControlFlow::Continue(Self {
             result,
             phantom: PhantomData,
         })

@@ -1,6 +1,8 @@
+use std::ops::ControlFlow;
+
 use crate::{
-    ErrorKind, NoTrailingInput, ParseBoolToken, ParseFloatToken, ParseIntToken, ParseStringToken,
-    Parser, Result, Tokenize,
+    ErrorKind, Mode, NoTrailingInput, OptionMode, ParseBoolToken, ParseFloatToken, ParseIntToken,
+    ParseStringToken, Parser, Result, ResultMode, Tokenize,
 };
 
 /// Trait responsible for parsing Ast nodes
@@ -303,8 +305,37 @@ use crate::{
 /// [`OrderedFloat<f32>`]: ordered_float::OrderedFloat
 /// [`OrderedFloat<f64>`]: ordered_float::OrderedFloat
 pub trait Ast<'source, T: Tokenize>: Sized {
+    /// Composable parsing implementation
+    ///
+    /// This is the core function when manually implementing `Ast`
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self>;
+
+    #[inline]
     /// Attempt to parse `Self`, only progressing `parser` if successful.
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self>;
+    ///
+    /// Unless when implementing custom parser [`Mode`]s, you probably want to use
+    /// [`Ast::ast_result`] or [`Ast::ast_option`] depending on whether you need errors.
+    fn ast_output<M: Mode>(parser: &mut Parser<'source, T>) -> M::Output<Self> {
+        M::output(Self::ast_impl::<M>(parser))
+    }
+
+    #[inline]
+    /// Attempt to parse `Self`, only progressing `parser` if successful.
+    ///
+    /// If parsing fails, an [`Error`] will be returned
+    ///
+    /// [`Error`]: crate::Error
+    fn ast_result(parser: &mut Parser<'source, T>) -> Result<Self> {
+        Self::ast_output::<ResultMode>(parser)
+    }
+
+    #[inline]
+    /// Attempt to parse `Self`, only progressing `parser` if successful.
+    ///
+    /// If parsing fails, `None` will be returned
+    fn ast_option(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Self::ast_output::<OptionMode>(parser)
+    }
 }
 
 /// Convenience function to parse any type implementing [`Ast`] from a [`&str`](str).
@@ -316,7 +347,7 @@ where
     V: Ast<'source, T>,
 {
     let mut parser = Parser::new(source, tokenizer);
-    NoTrailingInput::ast(&mut parser).unwrap() // NoTrailingInput::ast always returns Ok
+    NoTrailingInput::ast_option(&mut parser).unwrap() // NoTrailingInput parsing never fails
 }
 
 impl<'source, T> Ast<'source, T> for bool
@@ -324,14 +355,14 @@ where
     T: Tokenize,
     T::Token: ParseBoolToken,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        let value = parser
-            .current()
-            .0
-            .bool()
-            .ok_or_else(|| parser.error(ErrorKind::ExpectedToken("boolean".to_string())))?;
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        let value = M::opt(parser.current().0.bool(), || {
+            parser.error(ErrorKind::ExpectedToken("boolean".to_string()))
+        })?;
+
         parser.step();
-        Ok(value)
+
+        ControlFlow::Continue(value)
     }
 }
 
@@ -342,17 +373,23 @@ macro_rules! impl_ast_number {
             T: Tokenize,
             T::Token: $trait,
         {
-            fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+            fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
                 let (token, span) = parser.current();
                 if token.$fn() {
-                    let value = T::Token::$parse(parser.slice(span.clone()))
-                        .and_then(|value| Self::try_from(value).map_err(|err| err.to_string()))
-                        .map_err(|err| parser.error(ErrorKind::InvalidNumber(err)))?;
+                    let value = M::res(T::Token::$parse(parser.slice(span.clone())), |err| {
+                        parser.error(ErrorKind::InvalidNumber(err))
+                    })?;
+                    let value = M::res(Self::try_from(value), |err| {
+                        parser.error(ErrorKind::InvalidNumber(err.to_string()))
+                    })?;
 
                     parser.step();
-                    Ok(value)
+
+                    ControlFlow::Continue(value)
                 } else {
-                    Err(parser.error(ErrorKind::ExpectedToken($expected.to_string())))
+                    ControlFlow::Break(M::err(|| {
+                        parser.error(ErrorKind::ExpectedToken($expected.to_string()))
+                    }))
                 }
             }
         }
@@ -396,15 +433,20 @@ where
     T: Tokenize,
     T::Token: ParseStringToken,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
         let (token, span) = parser.current();
         if token.is_string() {
-            let slice = T::Token::parse_str(parser.slice(span.clone()))
-                .map_err(|err| parser.custom_error(err))?;
+            let slice = M::res(T::Token::parse_str(parser.slice(span.clone())), |err| {
+                parser.custom_error(err)
+            })?;
+
             parser.step();
-            Ok(slice)
+
+            ControlFlow::Continue(slice)
         } else {
-            Err(parser.error(ErrorKind::ExpectedToken("string".to_string())))
+            ControlFlow::Break(M::err(|| {
+                parser.error(ErrorKind::ExpectedToken("string".to_string()))
+            }))
         }
     }
 }
@@ -414,8 +456,9 @@ where
     T: Tokenize,
     T::Token: ParseStringToken,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        <&str>::ast(parser).map(str::to_string)
+    #[inline]
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        <&str>::ast_impl::<M>(parser).map_continue(str::to_string)
     }
 }
 
@@ -424,8 +467,9 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        V::ast(parser).map(Box::new)
+    #[inline]
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        V::ast_impl::<M>(parser).map_continue(Box::new)
     }
 }
 
@@ -435,8 +479,12 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        Ok(V::ast(parser).ok())
+    #[inline]
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        match V::ast_impl::<OptionMode>(parser) {
+            ControlFlow::Continue(v) => ControlFlow::Continue(Some(v)),
+            ControlFlow::Break(()) => ControlFlow::Continue(None),
+        }
     }
 }
 
@@ -446,14 +494,14 @@ where
     V1: Ast<'source, T>,
     V2: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
         let before = parser.position();
-        let a = V1::ast(parser)?;
-        match V2::ast(parser) {
-            Ok(b) => Ok((a, b)),
-            Err(err) => {
+        let a = V1::ast_impl::<M>(parser)?;
+        match V2::ast_impl::<M>(parser) {
+            ControlFlow::Continue(b) => ControlFlow::Continue((a, b)),
+            ControlFlow::Break(err) => {
                 parser.jump(before);
-                Err(err)
+                ControlFlow::Break(err)
             }
         }
     }

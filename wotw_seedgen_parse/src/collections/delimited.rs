@@ -1,5 +1,5 @@
 use super::AstCollection;
-use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
+use crate::{Ast, Error, Mode, Parser, Result, ResultMode, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
     any::type_name,
     ops::{ControlFlow, Range},
@@ -20,21 +20,25 @@ where
     Content: AstCollection<'source, T>,
     Close: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        let open = Open::ast(parser)?;
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        let open = Open::ast_impl::<M>(parser)?;
 
-        let mut content = Content::ast_first(parser);
+        let mut content = Content::ast_first_result(parser);
 
         let close = if let Ok(content) = &mut content {
             loop {
-                match Close::ast(parser) {
-                    Ok(close) => break Ok(close),
-                    Err(close_err) => {
-                        if let ControlFlow::Break(err) = content.ast_item(parser) {
+                match Close::ast_option(parser) {
+                    Some(close) => break Ok(close),
+                    None => {
+                        if let ControlFlow::Break(err) = content.ast_item_impl::<ResultMode>(parser)
+                        {
                             match err {
-                                None => break Close::ast(parser),
+                                None => break Close::ast_result(parser),
                                 Some(content_err) => {
-                                    break Err(Error::all_failed(vec![close_err, content_err]))
+                                    let Err(close_err) = Close::ast_result(parser) else {
+                                        unreachable!()
+                                    };
+                                    break Err(Error::all_failed(vec![close_err, content_err]));
                                 }
                             }
                         } else if parser.is_finished() {
@@ -47,18 +51,18 @@ where
                 }
             }
         } else {
-            Close::ast(parser)
+            Close::ast_result(parser)
         };
 
         if close.is_err() {
             let mut depth: u16 = 1;
             while !parser.is_finished() {
-                if Close::ast(parser).is_ok() {
+                if Close::ast_option(parser).is_some() {
                     depth -= 1;
                     if depth == 0 {
                         break;
                     }
-                } else if Open::ast(parser).is_ok() {
+                } else if Open::ast_option(parser).is_some() {
                     depth += 1;
                 } else {
                     parser.step();
@@ -66,7 +70,7 @@ where
             }
         }
 
-        Ok(Self {
+        ControlFlow::Continue(Self {
             open,
             content,
             close,

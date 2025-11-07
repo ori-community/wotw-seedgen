@@ -1,5 +1,5 @@
 use super::{AstCollection, Collection};
-use crate::{Ast, Error, Parser, Result, Tokenize};
+use crate::{Ast, Mode, Parser, Tokenize};
 use std::{
     cmp::Ordering,
     iter,
@@ -29,19 +29,22 @@ where
     Item: Ast<'source, T>,
     Punctuation: Ast<'source, T>,
 {
-    fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>> {
-        match Item::ast(parser) {
-            Ok(item) => match Punctuation::ast(parser) {
-                Ok(punctuation) => {
+    fn ast_item_impl<M: Mode>(
+        &mut self,
+        parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Option<M::Error>> {
+        match Item::ast_impl::<M>(parser) {
+            ControlFlow::Continue(item) => match Punctuation::ast_option(parser) {
+                Some(punctuation) => {
                     self.items.push((item, punctuation));
                     ControlFlow::Continue(())
                 }
-                Err(_) => {
+                None => {
                     self.last = Some(item);
                     ControlFlow::Break(None)
                 }
             },
-            Err(err) => ControlFlow::Break(Some(err)),
+            ControlFlow::Break(err) => ControlFlow::Break(Some(err)),
         }
     }
 }
@@ -53,8 +56,8 @@ where
     Punctuation: Ast<'source, T>,
 {
     #[inline]
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        <Collection<Self>>::ast(parser).map(|c| c.0)
+    fn ast_impl<M: crate::Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
     }
 }
 

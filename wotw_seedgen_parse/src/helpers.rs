@@ -1,9 +1,10 @@
 use wotw_seedgen_assets::Source;
 
-use crate::{Ast, ErrorKind, ParseIdentToken, Parser, Result, Tokenize};
+use crate::{Ast, ErrorKind, Mode, ParseIdentToken, Parser, Result, Tokenize};
 use std::{
     fmt::{self, Display},
     io,
+    ops::ControlFlow,
 };
 
 /// [`Ast`] node parsing an identifier
@@ -49,14 +50,16 @@ where
     T: Tokenize,
     T::Token: ParseIdentToken,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
         let (token, span) = parser.current();
         if token.is_ident() {
             let slice = parser.slice(span.clone());
             parser.step();
-            Ok(Self(slice))
+            ControlFlow::Continue(Self(slice))
         } else {
-            Err(parser.error(ErrorKind::ExpectedToken("identifier".to_string())))
+            ControlFlow::Break(M::err(|| {
+                parser.error(ErrorKind::ExpectedToken("identifier".to_string()))
+            }))
         }
     }
 }
@@ -123,13 +126,15 @@ impl<'source, T, const CHAR: char> Ast<'source, T> for Symbol<CHAR>
 where
     T: Tokenize,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
         match parser.current_slice().strip_prefix(CHAR) {
             Some("") => {
                 parser.step();
-                Ok(Self)
+                ControlFlow::Continue(Self)
             }
-            _ => Err(parser.error(ErrorKind::ExpectedToken(Self.to_string()))),
+            _ => ControlFlow::Break(M::err(|| {
+                parser.error(ErrorKind::ExpectedToken(Self.to_string()))
+            })),
         }
     }
 }
@@ -217,8 +222,8 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        let parsed = V::ast(parser);
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        let parsed = V::ast_result(parser);
         let trailing = if parser.is_finished() {
             Ok(())
         } else {
@@ -226,6 +231,6 @@ where
             parser.jump(parser.end());
             Err(err)
         };
-        Ok(Self { parsed, trailing })
+        ControlFlow::Continue(Self { parsed, trailing })
     }
 }

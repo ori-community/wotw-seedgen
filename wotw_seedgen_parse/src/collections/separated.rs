@@ -1,5 +1,5 @@
 use super::{AstCollection, AstCollectionInit, Collection};
-use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
+use crate::{Ast, Mode, Parser, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
     iter,
     ops::{ControlFlow, Index, IndexMut, Range},
@@ -28,38 +28,42 @@ where
     Item: Ast<'source, T>,
     Separator: Ast<'source, T>,
 {
-    fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>> {
+    fn ast_item_impl<M: Mode>(
+        &mut self,
+        parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Option<M::Error>> {
         match self.first {
-            None => match Item::ast(parser) {
-                Ok(item) => {
+            None => match Item::ast_option(parser) {
+                Some(item) => {
                     self.first = Some(item);
                     ControlFlow::Continue(())
                 }
-                Err(_) => ControlFlow::Break(None),
+                None => ControlFlow::Break(None),
             },
-            Some(_) => separated_ast_item(&mut self.more, parser),
+            Some(_) => separated_ast_item::<_, M, _, _>(&mut self.more, parser),
         }
     }
 }
 
-fn separated_ast_item<'source, T, Item, Separator>(
+fn separated_ast_item<'source, T, M, Item, Separator>(
     items: &mut Vec<(Separator, Item)>,
     parser: &mut Parser<'source, T>,
-) -> ControlFlow<Option<Error>>
+) -> ControlFlow<Option<M::Error>>
 where
     T: Tokenize,
+    M: Mode,
     Item: Ast<'source, T>,
     Separator: Ast<'source, T>,
 {
-    match Separator::ast(parser) {
-        Ok(separator) => match Item::ast(parser) {
-            Ok(item) => {
+    match Separator::ast_option(parser) {
+        Some(separator) => match Item::ast_impl::<M>(parser) {
+            ControlFlow::Continue(item) => {
                 items.push((separator, item));
                 ControlFlow::Continue(())
             }
-            Err(err) => ControlFlow::Break(Some(err)),
+            ControlFlow::Break(err) => ControlFlow::Break(Some(err)),
         },
-        Err(_) => ControlFlow::Break(None),
+        None => ControlFlow::Break(None),
     }
 }
 
@@ -70,8 +74,8 @@ where
     Separator: Ast<'source, T>,
 {
     #[inline]
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        <Collection<Self>>::ast(parser).map(|c| c.0)
+    fn ast_impl<M: crate::Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
     }
 }
 
@@ -202,9 +206,11 @@ where
     T: Tokenize,
     Item: Ast<'source, T>,
 {
-    fn ast_first(parser: &mut Parser<'source, T>) -> Result<Self> {
-        Ok(Self {
-            first: Item::ast(parser)?,
+    fn ast_first_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        let first = Item::ast_impl::<M>(parser)?;
+
+        ControlFlow::Continue(Self {
+            first,
             more: Default::default(),
         })
     }
@@ -217,8 +223,11 @@ where
     Separator: Ast<'source, T>,
 {
     #[inline]
-    fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>> {
-        separated_ast_item(&mut self.more, parser)
+    fn ast_item_impl<M: Mode>(
+        &mut self,
+        parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Option<M::Error>> {
+        separated_ast_item::<_, M, _, _>(&mut self.more, parser)
     }
 }
 
@@ -229,8 +238,8 @@ where
     Separator: Ast<'source, T>,
 {
     #[inline]
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        <Collection<Self>>::ast(parser).map(|c| c.0)
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
     }
 }
 
@@ -245,12 +254,14 @@ impl<Item: Span, Separator> Span for SeparatedNonEmpty<Item, Separator> {
 }
 
 impl<Item: SpanStart, Separator> SpanStart for SeparatedNonEmpty<Item, Separator> {
+    #[inline]
     fn span_start(&self) -> usize {
         self.first.span_start()
     }
 }
 
 impl<Item: SpanEnd, Separator> SpanEnd for SeparatedNonEmpty<Item, Separator> {
+    #[inline]
     fn span_end(&self) -> usize {
         self.last().span_end()
     }
@@ -288,6 +299,7 @@ impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {
     pub fn len(&self) -> usize {
         1 + self.more.len()
     }
+
     pub fn last(&self) -> &Item {
         self.more.last().map_or(&self.first, |(_, item)| item)
     }

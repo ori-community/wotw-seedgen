@@ -6,15 +6,35 @@ pub use delimited::Delimited;
 pub use punctuated::Punctuated;
 pub use separated::{Separated, SeparatedNonEmpty};
 
-use crate::{Ast, Error, Parser, Result, Span, SpanEnd, SpanStart, Tokenize};
+use crate::{
+    Ast, Mode, OptionMode, Parser, Result, ResultMode, Span, SpanEnd, SpanStart, Tokenize,
+};
 use std::ops::{ControlFlow, Range};
 
 pub trait AstCollection<'source, T: Tokenize>: AstCollectionInit<'source, T> {
-    fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>>;
+    fn ast_item_impl<M: Mode>(
+        &mut self,
+        parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Option<M::Error>>;
 }
 
 pub trait AstCollectionInit<'source, T: Tokenize>: Sized {
-    fn ast_first(parser: &mut Parser<'source, T>) -> Result<Self>;
+    fn ast_first_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self>;
+
+    #[inline]
+    fn ast_first_output<M: Mode>(parser: &mut Parser<'source, T>) -> M::Output<Self> {
+        M::output(Self::ast_first_impl::<M>(parser))
+    }
+
+    #[inline]
+    fn ast_first_result(parser: &mut Parser<'source, T>) -> Result<Self> {
+        Self::ast_first_output::<ResultMode>(parser)
+    }
+
+    #[inline]
+    fn ast_first_option(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Self::ast_first_output::<OptionMode>(parser)
+    }
 }
 
 impl<'source, T, V> AstCollectionInit<'source, T> for V
@@ -23,8 +43,8 @@ where
     V: Default,
 {
     #[inline]
-    fn ast_first(_parser: &mut Parser<'source, T>) -> Result<Self> {
-        Ok(Self::default())
+    fn ast_first_impl<M: Mode>(_parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        ControlFlow::Continue(Self::default())
     }
 }
 
@@ -36,20 +56,20 @@ where
     T: Tokenize,
     V: AstCollection<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
         let before = parser.position();
-        let mut v = V::ast_first(parser)?;
+        let mut v = V::ast_first_impl::<M>(parser)?;
         while !parser.is_finished() {
-            match v.ast_item(parser) {
+            match v.ast_item_impl::<M>(parser) {
                 ControlFlow::Continue(()) => {}
-                ControlFlow::Break(None) => return Ok(Self(v)),
+                ControlFlow::Break(None) => return ControlFlow::Continue(Self(v)),
                 ControlFlow::Break(Some(err)) => {
                     parser.jump(before);
-                    return Err(err);
+                    return ControlFlow::Break(err);
                 }
             }
         }
-        Ok(Self(v))
+        ControlFlow::Continue(Self(v))
     }
 }
 
@@ -58,9 +78,12 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>> {
-        match V::ast(parser) {
-            Ok(value) => {
+    fn ast_item_impl<M: Mode>(
+        &mut self,
+        parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Option<M::Error>> {
+        match V::ast_impl::<M>(parser) {
+            ControlFlow::Continue(value) => {
                 self.push(value);
 
                 if parser.is_finished() {
@@ -69,7 +92,7 @@ where
                     ControlFlow::Continue(())
                 }
             }
-            Err(err) => ControlFlow::Break(Some(err)),
+            ControlFlow::Break(err) => ControlFlow::Break(Some(err)),
         }
     }
 }
@@ -79,8 +102,9 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
-        <Collection<Self>>::ast(parser).map(|c| c.0)
+    #[inline]
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
     }
 }
 
@@ -92,8 +116,9 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast_first(parser: &mut Parser<'source, T>) -> Result<Self> {
-        V::ast(parser).map(Self)
+    #[inline]
+    fn ast_first_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+        V::ast_impl::<M>(parser).map_continue(Self)
     }
 }
 
@@ -102,24 +127,31 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast_item(&mut self, _parser: &mut Parser<'source, T>) -> ControlFlow<Option<Error>> {
+    #[inline]
+    fn ast_item_impl<M: Mode>(
+        &mut self,
+        _parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Option<M::Error>> {
         ControlFlow::Break(None)
     }
 }
 
 impl<V: Span> Span for Once<V> {
+    #[inline]
     fn span(&self) -> Range<usize> {
         self.0.span()
     }
 }
 
 impl<V: SpanStart> SpanStart for Once<V> {
+    #[inline]
     fn span_start(&self) -> usize {
         self.0.span_start()
     }
 }
 
 impl<V: SpanEnd> SpanEnd for Once<V> {
+    #[inline]
     fn span_end(&self) -> usize {
         self.0.span_end()
     }

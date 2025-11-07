@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{add_bound, find_attributes, Result};
 use heck::{
     ToKebabCase, ToLowerCamelCase, ToPascalCase, ToShoutyKebabCase, ToShoutySnekCase, ToSnekCase,
@@ -19,24 +21,6 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
     } = input;
     let attrs = Attributes::find(&attrs)?;
 
-    let implementation = match data {
-        syn::Data::Struct(data) => ast_fields::<false>(&ident, data.fields, &attrs),
-        syn::Data::Enum(data) => ast_enum(&ident, data, &attrs),
-        syn::Data::Union(data) => Err(syn::Error::new(
-            data.union_token.span(),
-            "Deriving Ast on union is not supported",
-        )),
-    }?;
-
-    // TODO try out how using the // dbg! macro looks for the debug stuff?
-    let debug = attrs.debug.then(|| {
-        let message = format!("parsing `{ident}`. {{}}");
-
-        quote! {
-            eprintln!(#message, parser.debug_state());
-        }
-    });
-
     add_bound(
         &mut generics,
         quote! { wotw_seedgen_parse::Ast<'source, Tokenizer> },
@@ -52,11 +36,22 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
         impl_generics = generics.split_for_impl().0;
     }
 
+    let implementation = match data {
+        syn::Data::Struct(data) => ast_fields::<false, false>(&ident, data.fields, &attrs),
+        syn::Data::Enum(data) => ast_enum(&ident, data, &attrs),
+        syn::Data::Union(data) => Err(syn::Error::new(
+            data.union_token.span(),
+            "Deriving Ast on union is not supported",
+        )),
+    }?;
+
+    let implementation =
+        with_debug::<true, _, _>(implementation, attrs.debug, || format!("`{ident}`"));
+
     Ok(quote! {
         impl #impl_generics wotw_seedgen_parse::Ast<'source, Tokenizer> for #ident #type_generics {
-            fn ast(parser: &mut wotw_seedgen_parse::Parser<'source, Tokenizer>) -> wotw_seedgen_parse::Result<Self> {
+            fn ast_impl<M: wotw_seedgen_parse::Mode>(parser: &mut wotw_seedgen_parse::Parser<'source, Tokenizer>) -> std::ops::ControlFlow<M::Error, Self> {
                 use wotw_seedgen_parse::Ast;
-                #debug
                 #implementation
             }
         }
@@ -141,6 +136,7 @@ impl Attributes {
 
         Ok(attributes)
     }
+
     fn apply(self, inner: Self) -> Self {
         Self {
             debug: inner.debug || self.debug,
@@ -152,11 +148,24 @@ impl Attributes {
     }
 }
 
-fn use_with_or_else<F: FnOnce() -> Result<TokenStream>>(
-    default: F,
+fn ast_fn<const FORCE_OPTION_MODE: bool>(
+    ty: syn::Type,
     with: Option<syn::LitStr>,
 ) -> Result<TokenStream> {
-    with.map_or_else(default, |with| parse_with(&with))
+    with.map_or_else(
+        || {
+            let mode = if FORCE_OPTION_MODE {
+                quote! { wotw_seedgen_parse::OptionMode }
+            } else {
+                quote! { M }
+            };
+
+            Ok(quote! {
+                <#ty as wotw_seedgen_parse::Ast<'source, Tokenizer>>::ast_impl::<#mode>
+            })
+        },
+        |with| parse_with(&with),
+    )
 }
 
 fn parse_with(with: &syn::LitStr) -> Result<TokenStream> {
@@ -169,7 +178,8 @@ fn parse_with(with: &syn::LitStr) -> Result<TokenStream> {
     })
 }
 
-fn ast_fields<const IN_ENUM: bool>(
+// TODO use ast_option instead of ast_impl::<OptionMode> in enums
+fn ast_fields<const IN_ENUM: bool, const FORCE_OPTION_MODE: bool>(
     ident: &syn::Ident,
     fields: syn::Fields,
     attrs: &Attributes,
@@ -177,33 +187,37 @@ fn ast_fields<const IN_ENUM: bool>(
     let needs_backup = fields.len() > 1;
 
     let fields = match fields {
-        syn::Fields::Named(fields) => ast_fields_named(ident, fields, attrs),
-        syn::Fields::Unnamed(fields) => ast_fields_unnamed(ident, fields, attrs),
-        syn::Fields::Unit => return ast_fields_unit::<IN_ENUM>(ident, attrs),
+        syn::Fields::Named(fields) => ast_fields_named::<FORCE_OPTION_MODE>(ident, fields, attrs),
+        syn::Fields::Unnamed(fields) => {
+            ast_fields_unnamed::<FORCE_OPTION_MODE>(ident, fields, attrs)
+        }
+        syn::Fields::Unit => return ast_fields_unit::<IN_ENUM, FORCE_OPTION_MODE>(ident, attrs),
     }?;
 
     let variant_construction = IN_ENUM.then(|| quote! { ::#ident });
-    let mut result = quote! {
-        Ok(Self #variant_construction
+    let mut flow = quote! {
+        std::ops::ControlFlow::Continue(Self #variant_construction
             #fields
         )
     };
 
     if needs_backup {
-        result = quote! {
-            let before = parser.position();
-            let result = (|| #result)();
-            if result.is_err() {
-                parser.jump(before);
+        flow = quote! {
+            {
+                let before = parser.position();
+                let flow = (|| #flow)();
+                if flow.is_break() {
+                    parser.jump(before);
+                }
+                flow
             }
-            result
         };
     }
 
-    Ok(result)
+    Ok(flow)
 }
 
-fn ast_fields_named(
+fn ast_fields_named<const FORCE_OPTION_MODE: bool>(
     outer_ident: &syn::Ident,
     fields: syn::FieldsNamed,
     outer_attrs: &Attributes,
@@ -215,35 +229,17 @@ fn ast_fields_named(
             let syn::Field {
                 ident, attrs, ty, ..
             } = field;
+            let ident = ident.as_ref().unwrap();
             let attrs = Attributes::find(&attrs)?;
 
-            let ast = use_with_or_else(
-                || {
-                    Ok(quote! {
-                        <#ty as wotw_seedgen_parse::Ast<'source, Tokenizer>>::ast
-                    })
-                },
-                attrs.with,
-            )?;
+            let ast = ast_fn::<FORCE_OPTION_MODE>(ty, attrs.with)?;
 
-            let value = if outer_attrs.debug {
-                let ident = ident.as_ref().unwrap();
-                let fmt_string_before = format!("parsing field `{outer_ident}.{ident}` - {{}}");
-                let fmt_string_after =
-                    format!("finished parsing field `{outer_ident}.{ident}` ({{}}) - {{}}");
-                quote! { {
-                    eprintln!(#fmt_string_before, parser.debug_state());
-                    let result = #ast(parser);
-                    eprintln!(#fmt_string_after, if result.is_ok() { "Ok" } else { "Err" }, parser.debug_state());
-                    result?
-                } }
-            } else {
-                quote! { #ast(parser)? }
-            };
+            let value =
+                with_debug::<true, _, _>(quote! { #ast(parser) }, outer_attrs.debug, || {
+                    format!("field `{outer_ident}.{ident}`")
+                });
 
-            Ok(quote! {
-                #ident: #value
-            })
+            Ok(quote! { #ident: #value? })
         })
         .collect::<Result<Vec<_>>>()?;
 
@@ -252,7 +248,7 @@ fn ast_fields_named(
     })
 }
 
-fn ast_fields_unnamed(
+fn ast_fields_unnamed<const FORCE_OPTION_MODE: bool>(
     outer_ident: &syn::Ident,
     fields: syn::FieldsUnnamed,
     outer_attrs: &Attributes,
@@ -265,31 +261,14 @@ fn ast_fields_unnamed(
             let syn::Field { ty, attrs, .. } = field;
             let attrs = Attributes::find(&attrs)?;
 
-            let ast = use_with_or_else(
-                || {
-                    Ok(quote! {
-                        <#ty as wotw_seedgen_parse::Ast<'source, Tokenizer>>::ast
-                    })
-                },
-                attrs.with,
-            )?;
+            let ast = ast_fn::<FORCE_OPTION_MODE>(ty, attrs.with)?;
 
-            let value = if outer_attrs.debug {
-                let fmt_string_before = format!("parsing field `{outer_ident}.{index}` - {{}}");
-                let fmt_string_after =
-                    format!("finished parsing field `{outer_ident}.{index}` ({{}}) - {{}}");
+            let value =
+                with_debug::<true, _, _>(quote! { #ast(parser) }, outer_attrs.debug, || {
+                    format!("field `{outer_ident}.{index}`")
+                });
 
-                quote! { {
-                    eprintln!(#fmt_string_before, parser.debug_state());
-                    let result = #ast(parser);
-                    eprintln!(#fmt_string_after, if result.is_ok() { "Ok" } else { "Err" }, parser.debug_state());
-                    result?
-                } }
-            } else {
-                quote! { #ast(parser)? }
-            };
-
-            Ok(value)
+            Ok(quote! { #value? })
         })
         .collect::<Result<Vec<_>>>()?;
 
@@ -298,22 +277,24 @@ fn ast_fields_unnamed(
     })
 }
 
-fn ast_fields_unit<const IN_ENUM: bool>(
+fn ast_fields_unit<const IN_ENUM: bool, const FORCE_OPTION_MODE: bool>(
     ident: &syn::Ident,
     attrs: &Attributes,
 ) -> Result<TokenStream> {
     let variant_construction = IN_ENUM.then(|| quote! { ::#ident });
 
     if let Some(token) = &attrs.token {
+        let err = err::<FORCE_OPTION_MODE>(quote! {
+            M::err(|| parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(#token.to_string())))
+        });
+
         return Ok(quote! {
             match parser.current().0 {
                 #token => {
                     parser.step();
-                    Ok(Self #variant_construction)
+                    std::ops::ControlFlow::Continue(Self #variant_construction)
                 }
-                _ => Err(parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(
-                    #token.to_string()
-                )))
+                _ => std::ops::ControlFlow::Break(#err)
             }
         });
     }
@@ -334,14 +315,26 @@ fn ast_fields_unit<const IN_ENUM: bool>(
         Some(rename) => rename.value(),
     };
 
+    let err = err::<FORCE_OPTION_MODE>(quote! {
+        M::err(|| parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(format!(concat!('"', #str, '"')))))
+    });
+
     Ok(quote! {
         if parser.current_slice() == #str {
             parser.step();
-            Ok(Self #variant_construction)
+            std::ops::ControlFlow::Continue(Self #variant_construction)
         } else {
-            Err(parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(format!(concat!('"', #str, '"')))))
+            std::ops::ControlFlow::Break(#err)
         }
     })
+}
+
+fn err<const FORCE_OPTION_MODE: bool>(gen: TokenStream) -> TokenStream {
+    if FORCE_OPTION_MODE {
+        quote! { () }
+    } else {
+        gen
+    }
 }
 
 fn ast_enum(
@@ -361,36 +354,106 @@ fn ast_enum(
             } = variant;
 
             let attrs = attrs.clone().apply(Attributes::find(&variant_attrs)?);
-            let fields = ast_fields::<true>(&ident, fields, &attrs)?;
 
-            let debug_before = attrs.debug.then(|| {
-                let fmt_string = format!("attempting branch `{outer_ident}::{ident}`");
-                quote! { eprintln!(#fmt_string); }
-            });
-            let debug_after = attrs.debug.then(|| {
-                let fmt_string = format!("finished branch `{outer_ident}::{ident}` ({{}})");
-                quote! { eprintln!(#fmt_string, if result.is_ok() { "Ok" } else { "Err" }); }
-            });
-
-            Ok(quote! {
-                #debug_before
-                let result = (|| { #fields })();
-                #debug_after
-                match result {
-                    Ok(_) => return result,
-                    Err(err) => errors.push(err),
-                }
-            })
+            Ok((ident, fields, attrs))
         })
         .collect::<Result<Vec<_>>>()?;
 
-    let variant_count = variants.len();
+    let happy_variants = enum_variants::<true, _>(&variants, outer_ident, |flow, _| {
+        quote! {
+            if let std::ops::ControlFlow::Continue(value) = #flow {
+                return std::ops::ControlFlow::Continue(value);
+            }
+        }
+    })?;
+
+    let sad_variants = enum_variants::<false, _>(&variants, outer_ident, |flow, description| {
+        let fmt_string =
+            format!("unexpected continue after parse already failed - parsing {description}. {{}}");
+
+        quote! {
+            {
+                match #flow {
+                    std::ops::ControlFlow::Continue(value) => panic!(#fmt_string, parser.debug_state()),
+                    std::ops::ControlFlow::Break(err) => err,
+                }
+            }
+        }
+    })?;
 
     Ok(quote! {
-        let mut errors = Vec::with_capacity(#variant_count);
+        {
+            #(#happy_variants)*
 
-        #(#variants)*
-
-        Err(wotw_seedgen_parse::Error::all_failed(errors))
+            let errors = vec![#(#sad_variants),*];
+            std::ops::ControlFlow::Break(M::combine_errors(errors))
+        }
     })
+}
+
+fn enum_variants<const FORCE_OPTION_MODE: bool, F>(
+    variants: &[(syn::Ident, syn::Fields, Attributes)],
+    outer_ident: &syn::Ident,
+    mut gen: F,
+) -> Result<Vec<TokenStream>>
+where
+    F: FnMut(TokenStream, String) -> TokenStream,
+{
+    variants
+        .iter()
+        .map(|(ident, fields, attrs)| -> Result<_> {
+            let description = format!("branch `{outer_ident}::{ident}`");
+
+            let fields = ast_fields::<true, FORCE_OPTION_MODE>(ident, fields.clone(), attrs)?;
+
+            let flow =
+                with_debug::<false, _, _>(quote! { (|| { #fields })() }, attrs.debug, || {
+                    &description
+                });
+
+            Ok(gen(flow, description))
+        })
+        .collect()
+}
+
+fn with_debug<const WITH_PARSER_STATE: bool, F, D>(
+    statement: TokenStream,
+    debug: bool,
+    description: F,
+) -> TokenStream
+where
+    F: FnOnce() -> D,
+    D: Display,
+{
+    if debug {
+        let description = description();
+
+        let before = {
+            let (fmt_string_suffix, fmt_arg) = if WITH_PARSER_STATE {
+                (" - {}", quote! { , parser.debug_state() })
+            } else {
+                ("", TokenStream::new())
+            };
+
+            let fmt_string = format!("parsing {description}{fmt_string_suffix}");
+
+            quote! { eprintln!(#fmt_string #fmt_arg); }
+        };
+
+        let after = {
+            let fmt_string = format!("finished {description} ({{}})");
+            quote! { eprintln!(#fmt_string, if flow.is_continue() { "Continue" } else { "Break" }); }
+        };
+
+        quote! {
+            {
+                #before
+                let flow = #statement;
+                #after
+                flow
+            }
+        }
+    } else {
+        statement
+    }
 }

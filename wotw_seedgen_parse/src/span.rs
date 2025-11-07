@@ -1,5 +1,5 @@
-use crate::{Ast, Parser, Result, Tokenize};
-use std::ops::Range;
+use crate::{Ast, Mode, Parser, Result, Tokenize};
+use std::ops::{ControlFlow, Range};
 
 /// Trait responsible for providing spans on successfully parsed Ast nodes in the form of [`Range<usize>`]
 ///
@@ -241,11 +241,11 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast(parser: &mut Parser<'source, T>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
         let start = parser.current().1.start;
-        let data = V::ast(parser)?;
+        let data = V::ast_impl::<M>(parser)?;
         let end = parser.token_at(parser.position() - 1).1.end;
         let span = start..end;
-        Ok(Self { data, span })
+        ControlFlow::Continue(Self { data, span })
     }
 }

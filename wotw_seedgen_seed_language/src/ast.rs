@@ -1,6 +1,6 @@
 // TODO investigate optimizing type sizes
 
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, ops::ControlFlow, str::FromStr};
 
 use crate::{
     token::{Token, Tokenizer, TOKENIZER},
@@ -15,7 +15,7 @@ use wotw_seedgen_data::{
     MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
     WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
-use wotw_seedgen_parse::{parse_ast, Error, ErrorKind};
+use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, Mode};
 
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
@@ -58,7 +58,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverPass {
 pub struct RecoverSkipExpression;
 impl<'source> Recover<'source, Tokenizer> for RecoverSkipExpression {
     fn recover(parser: &mut Parser<'source, Tokenizer>) {
-        let _ = Expression::ast(parser);
+        let _ = Expression::ast_option(parser);
     }
 }
 
@@ -221,7 +221,7 @@ pub enum ExpressionValue<'source> {
 
 // Manual implementation to support operator precedence
 impl<'source> Ast<'source, Tokenizer> for Expression<'source> {
-    fn ast(parser: &mut Parser<'source, Tokenizer>) -> Result<Self> {
+    fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
         fn precedence(operator: Operator) -> u8 {
             match operator {
                 Operator::Arithmetic(ArithmeticOperator::Multiply | ArithmeticOperator::Divide) => {
@@ -266,7 +266,7 @@ impl<'source> Ast<'source, Tokenizer> for Expression<'source> {
             }
         }
 
-        SeparatedNonEmpty::ast(parser).map(resolve_precedence)
+        SeparatedNonEmpty::ast_impl::<M>(parser).map_continue(resolve_precedence)
     }
 }
 
@@ -345,38 +345,36 @@ pub enum Literal<'source> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ast, EnumDiscriminants)]
 #[strum_discriminants(derive(VariantArray))]
 pub enum Constant {
-    Skill(#[ast(with = "constant_ast")] Skill),
-    Shard(#[ast(with = "constant_ast")] Shard),
-    Teleporter(#[ast(with = "constant_ast")] Teleporter),
-    WeaponUpgrade(#[ast(with = "constant_ast")] WeaponUpgrade),
-    Equipment(#[ast(with = "constant_ast")] Equipment),
-    Zone(#[ast(with = "constant_ast")] Zone),
-    OpherIcon(#[ast(with = "constant_ast")] OpherIcon),
-    LupoIcon(#[ast(with = "constant_ast")] LupoIcon),
-    GromIcon(#[ast(with = "constant_ast")] GromIcon),
-    TuleyIcon(#[ast(with = "constant_ast")] TuleyIcon),
-    MapIcon(#[ast(with = "constant_ast")] MapIcon),
-    EquipSlot(#[ast(with = "constant_ast")] EquipSlot),
-    WheelItemPosition(#[ast(with = "constant_ast")] WheelItemPosition),
-    WheelBind(#[ast(with = "constant_ast")] WheelBind),
-    Alignment(#[ast(with = "constant_ast")] Alignment),
-    HorizontalAnchor(#[ast(with = "constant_ast")] HorizontalAnchor),
-    VerticalAnchor(#[ast(with = "constant_ast")] VerticalAnchor),
-    ScreenPosition(#[ast(with = "constant_ast")] ScreenPosition),
-    CoordinateSystem(#[ast(with = "constant_ast")] CoordinateSystem),
+    Skill(#[ast(with = "constant_ast::<Skill, M>")] Skill),
+    Shard(#[ast(with = "constant_ast::<Shard, M>")] Shard),
+    Teleporter(#[ast(with = "constant_ast::<Teleporter, M>")] Teleporter),
+    WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, M>")] WeaponUpgrade),
+    Equipment(#[ast(with = "constant_ast::<Equipment, M>")] Equipment),
+    Zone(#[ast(with = "constant_ast::<Zone, M>")] Zone),
+    OpherIcon(#[ast(with = "constant_ast::<OpherIcon, M>")] OpherIcon),
+    LupoIcon(#[ast(with = "constant_ast::<LupoIcon, M>")] LupoIcon),
+    GromIcon(#[ast(with = "constant_ast::<GromIcon, M>")] GromIcon),
+    TuleyIcon(#[ast(with = "constant_ast::<TuleyIcon, M>")] TuleyIcon),
+    MapIcon(#[ast(with = "constant_ast::<MapIcon, M>")] MapIcon),
+    EquipSlot(#[ast(with = "constant_ast::<EquipSlot, M>")] EquipSlot),
+    WheelItemPosition(#[ast(with = "constant_ast::<WheelItemPosition, M>")] WheelItemPosition),
+    WheelBind(#[ast(with = "constant_ast::<WheelBind, M>")] WheelBind),
+    Alignment(#[ast(with = "constant_ast::<Alignment, M>")] Alignment),
+    HorizontalAnchor(#[ast(with = "constant_ast::<HorizontalAnchor, M>")] HorizontalAnchor),
+    VerticalAnchor(#[ast(with = "constant_ast::<VerticalAnchor, M>")] VerticalAnchor),
+    ScreenPosition(#[ast(with = "constant_ast::<ScreenPosition, M>")] ScreenPosition),
+    CoordinateSystem(#[ast(with = "constant_ast::<CoordinateSystem, M>")] CoordinateSystem),
 }
 
-fn constant_ast<T>(parser: &mut Parser<Tokenizer>) -> Result<T>
+fn constant_ast<T, M: Mode>(parser: &mut Parser<Tokenizer>) -> ControlFlow<M::Error, T>
 where
     T: FromStr<Err = String> + VariantArray + Display,
 {
     let before = parser.position();
 
-    let identifier = <Spanned<Identifier>>::ast(parser)?;
+    let identifier = <Spanned<Identifier>>::ast_impl::<M>(parser)?;
 
-    identifier.data.0.parse().map_err(|_| {
-        parser.jump(before);
-
+    let flow = M::res(identifier.data.0.parse(), |_| {
         Error::all_failed(
             T::VARIANTS
                 .iter()
@@ -388,7 +386,13 @@ where
                 })
                 .collect(),
         )
-    })
+    });
+
+    if flow.is_break() {
+        parser.jump(before);
+    }
+
+    flow
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]

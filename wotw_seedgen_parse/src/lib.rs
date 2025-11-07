@@ -36,6 +36,7 @@ mod ast;
 mod collections;
 mod error;
 mod helpers;
+mod mode;
 mod parser;
 mod recover;
 mod span;
@@ -50,6 +51,7 @@ pub use collections::{
 };
 pub use error::{Error, ErrorKind, ErrorWithSource, Result};
 pub use helpers::{Identifier, NoTrailingInput, Symbol};
+pub use mode::{Mode, OptionMode, ResultMode};
 pub use parser::{
     ParseBoolToken, ParseFloatToken, ParseIdentToken, ParseIntToken, ParseStringToken, Parser,
 };
