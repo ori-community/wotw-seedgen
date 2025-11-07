@@ -149,8 +149,8 @@ impl<const CHAR: char> Display for Symbol<CHAR> {
 ///
 /// This usually won't actually be part of your Ast, rather it is returned by [`parse_ast`].
 ///
-/// [`NoTrailingInput::ast`] will never return [`Err`], instead [`NoTrailingInput`] contains [`Result`]s representing the outcome.
-/// After calling [`NoTrailingInput::ast`], the `parser` will always be exhausted.
+/// [`NoTrailingInput::ast_result`] will never return [`Err`], instead [`NoTrailingInput`] contains [`Result`]s representing the outcome.
+/// After calling [`NoTrailingInput::ast_result`], the `parser` will always be exhausted.
 ///
 /// ```
 /// # extern crate logos;

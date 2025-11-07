@@ -24,9 +24,9 @@ use crate::{
 /// - With the `ordered_float` feature, [`OrderedFloat<f32>`] and [`OrderedFloat<f64>`] implement `Ast` if `Token` implements [`ParseFloatToken`]
 /// - [`&str`](str) and [`String`] implement `Ast` if `Token` implements [`ParseStringToken`]
 /// - [`Box<T>`] implements `Ast` if `T` does
-/// - [`Option<T>`] implements `Ast` if `T` does. [`Option::ast`] returns `Ok(Some(T))` if `T` succeeds and `Ok(None)` if `T` fails to parse
+/// - [`Option<T>`] implements `Ast` if `T` does. [`Option::ast_result`] returns `Ok(Some(T))` if `T` succeeds and `Ok(None)` if `T` fails to parse
 /// - `(T1, T2)` implements `Ast` if `T1` and `T2` do.
-/// - [`Vec<T>`] implements `Ast` if `T` does. [`Vec::ast`] will attempt to keep parsing `T` until the entire source is exhausted.
+/// - [`Vec<T>`] implements `Ast` if `T` does. [`Vec::ast_result`] will attempt to keep parsing `T` until the entire source is exhausted.
 ///   This can be useful as a top-level Ast node or as [`Delimited<Open, Vec<T>, Close>`][`Delimited`], which will attempt to parse `T` until the delimited content is exhausted.
 ///
 /// ```
@@ -34,7 +34,7 @@ use crate::{
 /// use logos::Logos;
 /// use wotw_seedgen_parse::{LogosTokenizer, parse_ast, ParseFloatToken, Symbol};
 ///
-/// #[derive(Clone, Copy, Logos)]
+/// #[derive(Debug, Clone, Copy, Logos)]
 /// enum Token {
 ///     #[regex(r"\d+\.?\d*")]
 ///     Number,
@@ -86,7 +86,7 @@ use crate::{
 /// use logos::Logos;
 /// use wotw_seedgen_parse::{Ast, LogosTokenizer, parse_ast, ParseIntToken, Symbol};
 ///
-/// #[derive(Clone, Copy, Logos)]
+/// #[derive(Debug, Clone, Copy, Logos)]
 /// enum Token {
 ///     #[regex(r"\d+")]
 ///     Number,
@@ -130,7 +130,7 @@ use crate::{
 /// use logos::Logos;
 /// use wotw_seedgen_parse::{Ast, LogosTokenizer, parse_ast};
 ///
-/// #[derive(Clone, Copy, Logos)]
+/// #[derive(Debug, Clone, Copy, Logos)]
 /// enum Token {
 ///     #[regex(r"\w+")]
 ///     Identifier,
@@ -161,7 +161,7 @@ use crate::{
 /// use logos::Logos;
 /// use wotw_seedgen_parse::{Ast, LogosTokenizer, parse_ast, TokenDisplay};
 ///
-/// #[derive(Clone, Copy, Logos, TokenDisplay)]
+/// #[derive(Debug, Clone, Copy, Logos, TokenDisplay)]
 /// enum Token {
 ///     #[token("fun")]
 ///     Fun,
@@ -192,7 +192,7 @@ use crate::{
 /// use logos::Logos;
 /// use wotw_seedgen_parse::{Ast, LogosTokenizer, parse_ast, ParseStringToken, TokenDisplay};
 ///
-/// #[derive(Clone, Copy, Logos, TokenDisplay)]
+/// #[derive(Debug, Clone, Copy, Logos, TokenDisplay)]
 /// enum Token {
 ///     #[token("foo")]
 ///     Foo,
@@ -238,10 +238,11 @@ use crate::{
 ///
 /// ```
 /// # extern crate logos;
+/// use std::ops::ControlFlow;
 /// use logos::Logos;
-/// use wotw_seedgen_parse::{Ast, LogosTokenizer, Parser, Result};
+/// use wotw_seedgen_parse::{Ast, LogosTokenizer, Mode, Parser};
 ///
-/// #[derive(Clone, Copy, Logos)]
+/// #[derive(Debug, Clone, Copy, Logos)]
 /// enum Token {
 ///     // Token definitions
 /// }
@@ -250,45 +251,50 @@ use crate::{
 ///
 /// pub struct CustomAst;
 /// impl<'source> Ast<'source, Tokenizer> for CustomAst {
-///     fn ast(parser: &mut Parser<'source, Tokenizer>) -> Result<Self> {
+///     fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
 ///         todo!()
 ///     }
 /// }
 /// ```
 ///
-/// Implementations of [`Ast::ast`] should adhere to the following rules:
+/// Implementations of [`Ast::ast_impl`] should adhere to the following rules:
 ///
-/// If you return `Ok`, progress `parser` using [`Parser::step`] or nested [`Ast::ast`] calls
+/// If you return `Ok`, progress `parser` using [`Parser::step`] or nested [`Ast::ast_impl`] calls
 /// until the `parser` has progressed past the tokens representing this syntax tree node.
 ///
 /// If you return `Err`, `parser` should be in the same position it was in originally.
-/// If you already progressed using [`Parser::step`] or nested [`Ast::ast`] calls and
+/// If you already progressed using [`Parser::step`] or nested [`Ast::ast_impl`] calls and
 /// only later determine parsing should fail, consider using a pattern like:
 ///
-// TODO not sure how to adjust this doctest
 /// ```
 /// # extern crate logos;
+/// use std::ops::ControlFlow;
 /// # use logos::Logos;
-/// # use wotw_seedgen_parse::{Ast, LogosTokenizer, Parser, Result};
-/// # #[derive(Clone, Copy, Logos)]
+/// # use wotw_seedgen_parse::LogosTokenizer;
+/// use wotw_seedgen_parse::{Ast, Mode, Parser};
+///
+/// # #[derive(Debug, Clone, Copy, Logos)]
 /// # enum Token {}
 /// # type Tokenizer = LogosTokenizer<Token>;
-/// # pub struct Example;
-/// # impl<'source> Ast<'source, Tokenizer> for Example {
-/// fn ast(parser: &mut Parser<'source, Tokenizer>) -> Result<Self> {
-///     let before = parser.position();
 ///
-///     let result = {
-///         // attempt at parsing which may consume some tokens before it is certain to be successful
-/// #       Ok(Self)
-///     };
+/// pub struct Example;
 ///
-///     if result.is_err() {
-///         parser.jump(before);
+/// impl<'source> Ast<'source, Tokenizer> for Example {
+///     fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
+///         let before = parser.position();
+///
+///         let flow = {
+///             // attempt at parsing which may consume some tokens before it is certain to be successful
+///     #       ControlFlow::Continue(Self)
+///         };
+///
+///         if flow.is_break() {
+///             parser.jump(before);
+///         }
+///
+///         flow
 ///     }
-///     result
 /// }
-/// # }
 /// ```
 ///
 /// The provided and derived implementations rely on these rules, so if your implementation does not adhere to them, parsing may return useless results.

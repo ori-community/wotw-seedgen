@@ -12,7 +12,7 @@ use std::{
 ///
 /// There are no implementations provided by this crate, this trait is intended for your own specialized recovery strategies.
 /// When `recover` is called, the [`Parser`] will have been backtracked to the position before attempting to parse the [`Ast`] node.
-/// (This is because [`Ast::ast`] has returned an [`Err`] value, in which case it is responsible to backtrack the parser if necessary.)
+/// (This is because [`Ast::ast_result`] has returned an [`Err`] value, in which case it is responsible to backtrack the parser if necessary.)
 ///
 /// Be careful if your recovery strategy may sometimes not progress the parser at all. This can lead to infinite loops if you are parsing into a collection.
 ///
@@ -29,10 +29,10 @@ pub trait Recover<'source, T: Tokenize> {
 ///
 /// `T` should be the wrapped [`Ast`] node, `R` should be a [`Recover`] implementation (usually a zero-sized `struct`).
 ///
-/// [`Recoverable::ast`] will always return [`Ok`] and the actual [`Result`] will be stored within.
+/// [`Recoverable::ast_result`] will always return [`Ok`] and the actual [`Result`] will be stored within.
 ///
 /// Apart from parsing into partial syntax trees to get more useful errors in one run, this can be used as an optimization.
-/// Since [`Recoverable::ast`] always returns [`Ok`] you can use it to commit to an `enum` variant after you're certain there
+/// Since [`Recoverable::ast_result`] always returns [`Ok`] you can use it to commit to an `enum` variant after you're certain there
 /// is no reason to attempt the other variants anymore, for example after encountering a keyword.
 ///
 /// ```
@@ -40,7 +40,7 @@ pub trait Recover<'source, T: Tokenize> {
 /// use logos::Logos;
 /// use wotw_seedgen_parse::{Ast, LogosTokenizer, parse_ast, ParseIntToken, Parser, Recover, Recoverable, TokenDisplay};
 ///
-/// #[derive(Clone, Copy, Logos, TokenDisplay)]
+/// #[derive(Debug, Clone, Copy, Logos, TokenDisplay)]
 /// #[logos(skip r"\s+")]
 /// enum Token {
 ///     #[token("happyness")]
@@ -100,7 +100,7 @@ pub trait Recover<'source, T: Tokenize> {
 )]
 // TODO this T is called V elsewhere
 pub struct Recoverable<T, R> {
-    /// The return value of [`T::ast`](Ast::ast)
+    /// The return value of [`T::ast_result`](Ast::ast_result)
     pub result: Result<T>,
     phantom: PhantomData<R>,
 }
