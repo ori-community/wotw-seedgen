@@ -4684,16 +4684,16 @@ anchor GladesTown.MotayHutDoor at -394, -4135:  # Specifically exiting Motay's h
 # They can't originate from GladesTown.MotayHutInside because it wouldn't work with door randomization
 # They also can't originate from GladesTown.BuiltMotayHut because it wouldn't work out of a teleportation
   nospawn
-  
+
 #  refill Checkpoint:
 #    unsafe: GladesTown.BuildHuts  # Exiting the hut activates a checkpoint but it doesn't work with door randomization (because entering this door doesn't always connect to an open door)
-  
+
   door:
     id: 5
     target: GladesTown.MotayHutInside
     enter:
       moki: GladesTown.BuildHuts
-      
+
   pickup GladesTown.UpperOre:
     unsafe: TuleyShop.StickyGrass, GrenadeJump  # you can Grenadejump as you exit the unbuilt house and grab the moss
 
@@ -4844,7 +4844,7 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.ClearThorns: Dash OR Sword OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
 
-anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at the door
+anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at the door
   door:
     id: 14
     target: GladesTown.AcornMoki
@@ -4854,22 +4854,23 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
     moki: BreakCrystal
 
   quest GladesTown.AcornQI:
+  # Flash=3 do the swim / Flash=2 go above the entrance
     moki:
-      Flash, Water, Glide
-      Flash, Water, DoubleJump, Dash
-      Flash, Bash, Grenade=1
-      Flash, Launch
+      Flash=3:
+        Water, Glide
+        Water, DoubleJump, Dash
+      Flash=2:
+        Bash, Grenade=1
+        Launch
     gorlek:
-      Flash:
-        Water, DoubleJump OR Dash OR Sword OR Hammer
-        SentryJump=1
+      Flash=3, Water, DoubleJump OR Dash OR Sword OR Hammer
+      Flash=2, SentryJump=1
       Bow=4:  # bow refills light
         Launch
         Bash, Grenade=1
         SentryJump=1
     kii:
-      Flash:
-        DoubleJump, TripleJump
+      Flash=3:
         Water, Shuriken=2 OR Blaze=3 OR Sentry=2
         Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
         Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That particular water only deals 4 damage per tic
@@ -4881,19 +4882,21 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
         Water, Damage=10, Damage=10
         Damage=10, Damage=42
         WaterDash, Damage=10, Damage=26
-      Bow=4, DoubleJump, TripleJump
+      DoubleJump, TripleJump, Flash=2 OR Bow=4
+      # Glitched
+      # Bow=4 OR Flash=2:
+      #   AerialHammerJump OR GrenadeJump=1
     unsafe:
-      Flash:
-        Water OR Damage=36  # use Flash for mobility as well
-        GrenadeJump
-      Bow=2:
+      Flash=2, Water OR Damage=32  # use Flash for mobility as well
+      Flash=2, WaterDash, Damage=16
+      BowCancel, Water, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR Damage=10  # Slide the wall to avoid a dboost in the first spikes and let bow cancel itself by entering water. Might be possible without the condition with a good corner boost above the spikes. The best I got touched the spikes just above the water.
+      DoubleJump, GlideJump, Flash=2  # glide jump -> djump -> flash is enough the get a walljump which reset your djump to go above the entrance
+      Bow=2 OR Flash=1 OR BreakCrystal:  # https://youtu.be/n5A8F_-jcbM I haven't tested all the crystal variation but Tjump+spear/sentry and Djump+Hammer work so it's probably fine
         Launch
         Bash, Grenade=1
         SentryJump=1
         GrenadeJump
-        DoubleJump, TripleJump  # off the left wall
-        Water, WaterDash, Damage=10 OR DoubleJump OR Glide
-      # Grenade=4  # grenade jumps and light refills, very nasty strat
+        DoubleJump, TripleJump OR Hammer  # off the left wall
       DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
       DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
 
@@ -5028,6 +5031,9 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
 
   pickup GladesTown.LupoSwimHC:
     moki: Water, Burrow
+    unsafe:
+      Burrow, Damage=80
+      Burrow, WaterDash, Damage=40
   pickup GladesTown.LupoSwimMiddleEX:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
     unsafe:
       Damage=100 # just wall jump between both walls
