@@ -279,25 +279,24 @@ impl Expression<'_> {
             })) => {
                 let uber_state = uber_identifier.resolve(compiler)?;
 
-                match uber_state.value {
-                    None => compiler.uber_state_type(uber_state.uber_identifier, uber_identifier),
-                    Some(_) => None,
+                if uber_state.value.is_none() {
+                    return compiler.uber_state_type(uber_state.uber_identifier, uber_identifier);
                 }
             }
             Expression::Value(ExpressionValue::Identifier(identifier)) => {
-                match compiler.resolve(identifier)? {
-                    output::Literal::UberIdentifier(uber_state) => match uber_state.value {
-                        None => {
-                            let uber_identifier = uber_state.uber_identifier;
-                            compiler.uber_state_type(uber_identifier, identifier)
-                        }
-                        Some(_) => None,
-                    },
-                    _ => None,
+                let literal = compiler.resolve(identifier)?;
+
+                if let output::Literal::UberIdentifier(uber_state) = literal {
+                    if uber_state.value.is_none() {
+                        let uber_identifier = uber_state.uber_identifier;
+                        return compiler.uber_state_type(uber_identifier, identifier);
+                    }
                 }
             }
-            _ => None,
+            _ => {}
         }
+
+        panic!("Cannot determine UberState type of {self:?}")
     }
 }
 
@@ -379,7 +378,7 @@ impl output::Command {
 impl InferType for Operation<'_> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
         match self.operator.data {
-            Operator::Arithmetic(_) => self.left.infer_type(compiler),
+            Operator::Arithmetic(_) => compiler.common_type(&self.left, &self.right),
             Operator::Logic(_) | Operator::Comparator(_) => Some(Type::Boolean),
         }
     }
