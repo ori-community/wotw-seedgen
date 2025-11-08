@@ -4952,6 +4952,8 @@ anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the
       Dash OR Spear=1  # coyote dash or spear under the pickup
       Bash, Grenade=1
       TuleyShop.SpringPlants, Sentry=3
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe:
       Sword OR GrenadeJump OR GlideJump
       TuleyShop.SpringPlants, PauseFloat
@@ -4969,7 +4971,10 @@ anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the
   conn GladesTown.AboveOpher:
     moki: DoubleJump
     gorlek: Dash OR Glide
-    kii: Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
+    kii:
+      Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: Blaze=1 OR GrenadeJump
 
 anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
