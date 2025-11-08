@@ -4330,6 +4330,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
       Dash, GlideJump  # coyote dash from where Tuley. Also possible without a coyote dash once the second hut is built
       Dash, Burrow  # Pretty sure you need a fake burrow once the 2nd hut is built
+      TuleyShop.Lightcatchers, Bash  # https://youtu.be/dPruhdk4jYs
   conn GladesTown.LeftUpdraft:  # check for redundancies with AboveOpher
     moki:
       TuleyShop.BlueMoon, Grapple, DoubleJump
@@ -5013,8 +5014,12 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     moki, GladesTown.TuleySpawned:
       Glide
       GladesTown.RoofsOverHeads, Dash
-    kii: GladesTown.TuleySpawned, Shuriken=1 OR Blaze=2
-    # seed paths tbd if ever necessary    
+    gorlek, GladesTown.TuleySpawned:
+      Sword
+      GladesTown.RoofsOverHeads, Hammer
+    kii, GladesTown.TuleySpawned:
+      Shuriken=1 OR Blaze=2
+      TuleyShop.Lightcatchers, Bash
 
 anchor GladesTown.StorageHut at -119, -4605:
   door:
@@ -5031,12 +5036,14 @@ anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki above the storage h
     gorlek:
       Hammer OR SwordSJump=1
       TuleyShop.BlueMoon, Grapple
-    unsafe: Sword OR Dash OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
+    # kii:
+    #   GrenadeJump=1 OR GlideJump
+    unsafe: Sword OR Dash OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap
   conn GladesTown.AboveOpher: free
   conn TuleyShop:  # check for redundancies with AboveOpher and Teleporter
     moki: GladesTown.TuleySpawned, Dash
-    gorlek: GladesTown.TuleySpawned, Sword OR Hammer
-    kii: GladesTown.TuleySpawned, Blaze=1 OR Spear=1
+    gorlek: GladesTown.TuleySpawned, Hammer
+    kii: GladesTown.TuleySpawned, Blaze=1
     # seed paths tbd if ever necessary
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
