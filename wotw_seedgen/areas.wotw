@@ -5002,17 +5002,19 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     kii:
       Bash, Grenade=1
       TuleyShop.SpringPlants, Spear=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1 OR AerialHammerJump
+      # GlideJump, DoubleJump, Hammer
     unsafe:
-      SwordJump OR GrenadeJump
+      SwordJump OR GrenadeJump OR CoyoteHammerJump OR WallHammerJump
+      DoubleJump, Hammer OR GlideJump
       TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounce
   conn TuleyShop:  # check for redundancies with Teleporter
     moki, GladesTown.TuleySpawned:
       Glide
       GladesTown.RoofsOverHeads, Dash
-    gorlek: GladesTown.TuleySpawned, Dash, Sword OR Hammer
-    kii: GladesTown.TuleySpawned, Blaze=2 OR Sentry=1 OR Flash=1 OR Shuriken=1
-    unsafe: GladesTown.TuleySpawned, Spear=2
-    # seed paths tbd if ever necessary
+    kii: GladesTown.TuleySpawned, Shuriken=1 OR Blaze=2
+    # seed paths tbd if ever necessary    
 
 anchor GladesTown.StorageHut at -119, -4605:
   door:
@@ -5020,7 +5022,7 @@ anchor GladesTown.StorageHut at -119, -4605:
     target: GladesTown.AboveOpher
     enter: free
 
-anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather play
+anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki above the storage hut
   conn GladesTown.HoleHut:
     moki:
       TuleyShop.SpringPlants OR DoubleJump OR Launch
