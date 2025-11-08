@@ -4910,12 +4910,17 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
     gorlek:
       DoubleJump, TripleJump
       SentryJump=1
-      TuleyShop.StickyGrass, DoubleJump OR Grapple
+      TuleyShop.StickyGrass, DoubleJump
+      TuleyShop.StickyGrass, Grapple, Sword OR Hammer
     kii:
-      DoubleJump, Hammer OR Spear=1 OR Sentry=1 OR Flash=1
+      DoubleJump  # From GladesTown.AboveTpEX. Either wrap around the left wall or wall jump to the right wall to reach the platform on the left
+      TuleyShop.StickyGrass, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # The jump to the shard is possible without using any energy weapons but pretty precise
+      # Glitched
+      # GlideJump, DoubleJump
+      # GrenadeJump=1, TuleyShop.StickyGrass OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR GrenadeJump=1
     unsafe:
-      DoubleJump
-      GrenadeJump
+      GrenadeJump OR GlideJump
+      TuleyShop.StickyGrass, Grapple
 
   conn GladesTown.Teleporter: free
   conn GladesTown.LeftUpdraft:
@@ -4925,8 +4930,12 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
       TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
     gorlek:
       DoubleJump OR Dash OR Glide  # Sword is possible but TuleyShop.Lightcatchers makes is awkward
-      TuleyShop.Lightcatchers, Bash
-    kii: Sword OR Hammer OR Sentry=2 OR Blaze=4
+    kii:
+      Sword OR Hammer OR Sentry=2 OR Blaze=4
+      TuleyShop.Lightcatchers, Bash, Shuriken=1 OR Flash=1 OR Sentry=1  # You can still bash the second plant if the first one gets destroyed
+    unsafe:
+      PauseFloat OR Blaze=3 OR BlazeSwap=1 OR SentrySwap=1
+      TuleyShop.Lightcatchers, Bash  # unclear where the drop down ends
 
 anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the left above the coals near Opher
   pickup GladesTown.UpdraftCeilingEX:
