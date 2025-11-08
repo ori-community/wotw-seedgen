@@ -4310,7 +4310,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       TuleyShop.Lightcatchers, Bash, GlideJump OR GrenadeJump OR CoyoteHammerJump OR BlazeSwap=1 OR SentrySwap=1
       TuleyShop.StickyGrass, Grapple, DoubleJump  # ceiling jump
-  conn GladesTown.AboveOpher:  # paths using the platform left above the coals may want to go to GladesTown.LeftAboveCoals first
+  conn GladesTown.AboveOpher:  # paths using the platform left above the coals may want to go to GladesTown.LeftUpdraft first
     moki:
       Launch OR TuleyShop.SpringPlants
       Flap, Glide
@@ -4325,12 +4325,12 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       # GrenadeJump=2, Glide  # from Tuley to avoid getting stuck by the 2nd hut
       # GrenadeJump=1, Glide, GlideJump OR Burrow OR Dash OR Sword OR Shuriken=1
       # GrenadeJump=1, DoubleJump OR Hammer
-    unsafe:  # gjumps goes through GladesTown.LeftAboveCoals because it would softlock with the 2nd hut otherwise
+    unsafe:  # gjumps goes through GladesTown.LeftUpdraft because it would softlock with the 2nd hut otherwise
       # Grenade=1, Sword  # Grenade Pogos. Commented because I'm pretty sure this is impossible once you build the second house
       WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
       Dash, GlideJump  # coyote dash from where Tuley. Also possible without a coyote dash once the second hut is built
       Dash, Burrow  # Pretty sure you need a fake burrow once the 2nd hut is built
-  conn GladesTown.LeftAboveCoals:  # check for redundancies with AboveOpher
+  conn GladesTown.LeftUpdraft:  # check for redundancies with AboveOpher
     moki:
       TuleyShop.BlueMoon, Grapple, DoubleJump
       TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Grapple, Bash
@@ -4918,7 +4918,7 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
       GrenadeJump
 
   conn GladesTown.Teleporter: free
-  conn GladesTown.LeftAboveCoals:
+  conn GladesTown.LeftUpdraft:
     moki:
       Glide
       DoubleJump, Dash
@@ -4928,7 +4928,7 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
       TuleyShop.Lightcatchers, Bash
     kii: Sword OR Hammer OR Sentry=2 OR Blaze=4
 
-anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to the left above the coals near Opher
+anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the left above the coals near Opher
   pickup GladesTown.UpdraftCeilingEX:
     moki:
       DoubleJump OR Launch
@@ -4973,7 +4973,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
   # refill Checkpoint:
   #   unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
-  conn GladesTown.LeftAboveCoals: free
+  conn GladesTown.LeftUpdraft: free
   conn GladesTown.PlayfulMoki:
     moki:
       Launch
