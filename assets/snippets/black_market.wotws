@@ -10,6 +10,8 @@ Supply lasts indefinitely, but the price grows with the demand.")
 !builtin_icon(keystone_icon, "assets/icons/game/keystone.png")
 !builtin_icon(ore_icon, "assets/icons/game/gorlekore.png")
 
+// TODO black market delivery at an increased price?
+
 !if keystones {
     !state(keystones_purchased, Integer)
 

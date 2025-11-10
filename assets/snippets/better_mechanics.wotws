@@ -27,3 +27,5 @@
         store(player.energy, 999)
     }
 }
+
+// TODO more_autosaves for pickups that really should autosave?

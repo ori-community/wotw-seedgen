@@ -522,6 +522,7 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::SaveToMemory {}
             | Self::Equip { .. }
             | Self::Unequip { .. }
+            | Self::TriggerClientEvent { .. }
             | Self::TriggerKeybind { .. }
             | Self::EnableServerSync { .. }
             | Self::DisableServerSync { .. }

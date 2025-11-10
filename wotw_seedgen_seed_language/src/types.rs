@@ -23,6 +23,7 @@ pub enum Type {
     String,
     Action,
     Function,
+    ClientEvent,
     Skill,
     Shard,
     Teleporter,
@@ -186,8 +187,8 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::RemoveTeleporterString
             | FunctionIdentifier::CleanWaterString
             | FunctionIdentifier::RemoveCleanWaterString
-            | FunctionIdentifier::WeaponUpgradeString => Type::String,
-            FunctionIdentifier::RemoveWeaponUpgradeString => Type::String,
+            | FunctionIdentifier::WeaponUpgradeString
+            | FunctionIdentifier::RemoveWeaponUpgradeString => Type::String,
             FunctionIdentifier::CurrentZone | FunctionIdentifier::CurrentMapZone => Type::Zone,
             FunctionIdentifier::SpiritLight
             | FunctionIdentifier::RemoveSpiritLight
@@ -241,6 +242,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::Warp
             | FunctionIdentifier::Equip
             | FunctionIdentifier::Unequip
+            | FunctionIdentifier::TriggerClientEvent
             | FunctionIdentifier::TriggerKeybind
             | FunctionIdentifier::EnableServerSync
             | FunctionIdentifier::DisableServerSync
@@ -339,6 +341,7 @@ impl output::Literal {
 impl Constant {
     pub(crate) fn literal_type(&self) -> Type {
         match self {
+            Constant::ClientEvent(_) => Type::ClientEvent,
             Constant::Skill(_) => Type::Skill,
             Constant::Shard(_) => Type::Shard,
             Constant::Teleporter(_) => Type::Teleporter,

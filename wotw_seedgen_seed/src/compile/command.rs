@@ -1,5 +1,6 @@
 use super::{args::Args, Compile, CompileContext};
-use crate::assembly::Command;
+use crate::assembly::{Command, Trigger};
+use indexmap::map::Entry;
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_seed_language::output::{
     self as input, CommandFloat, CommandVoid, Comparator, EqualityComparator,
@@ -327,6 +328,20 @@ impl Compile for input::CommandVoid {
                 (vec![Command::Equip(slot, equipment)], MemoryUsed::ZERO)
             }
             Self::Unequip { equipment } => (vec![Command::Unequip(equipment)], MemoryUsed::ZERO),
+            Self::TriggerClientEvent { client_event } => {
+                let index = match context.events.entry(Trigger::ClientEvent(client_event)) {
+                    Entry::Occupied(occupied) => *occupied.get(),
+                    Entry::Vacant(vacant) => {
+                        let index = context.command_lookup.len();
+                        context.command_lookup.push(vec![]);
+
+                        vacant.insert(index);
+                        index
+                    }
+                };
+
+                (vec![Command::Execute(index)], MemoryUsed::ZERO)
+            }
             Self::TriggerKeybind { bind } => {
                 (vec![Command::TriggerKeybind(bind)], MemoryUsed::ZERO)
             }

@@ -1,6 +1,6 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
-    ast::{self, UberStateType},
+    ast::{self, ClientEvent, UberStateType},
     output::{
         ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
         CommandString, CommandVoid, CommandZone, Comparator, Concatenator, Constant,
@@ -696,6 +696,17 @@ impl<T: CompileIntoConstant> CompileIntoLiteral for T {
         };
 
         t.ok_or_else(|| type_error(literal.literal_type(), T::TYPE, span))
+    }
+}
+
+impl CompileIntoConstant for ClientEvent {
+    const TYPE: Type = Type::ClientEvent;
+
+    fn coerce_constant(constant: Constant) -> Option<Self> {
+        match constant {
+            Constant::ClientEvent(skill) => Some(skill),
+            _ => None,
+        }
     }
 }
 

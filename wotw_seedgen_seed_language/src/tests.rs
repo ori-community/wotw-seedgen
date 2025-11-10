@@ -1,7 +1,7 @@
 use crate::{
     ast::{
-        ConstantDiscriminants, Expression, ExpressionValue, FunctionCall, Literal, UberIdentifier,
-        UberIdentifierName, UberIdentifierNumeric,
+        ClientEvent, ConstantDiscriminants, Expression, ExpressionValue, FunctionCall, Literal,
+        UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
     },
     compile::{Compiler, PRIVATE_MEMORY},
     output::{CommandVoid, IntermediateOutput},
@@ -242,6 +242,9 @@ fn coersions() {
 
     for kind in ConstantDiscriminants::VARIANTS {
         match kind {
+            ConstantDiscriminants::ClientEvent => test_variants::<ClientEvent>(|client_event| {
+                format!("trigger_client_event({client_event})")
+            }),
             ConstantDiscriminants::Skill => {
                 test_variants::<Skill>(|skill| format!("skill({skill})"))
             }

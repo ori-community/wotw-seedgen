@@ -257,6 +257,9 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 let value = value.simulate(simulation, events);
                 simulation.variables_mut().set_string(*id, value);
             }
+            CommandVoid::TriggerClientEvent { client_event } => {
+                client_event.simulate(simulation, events)
+            }
             // TODO simulate more maybe?
             CommandVoid::DefineTimer { .. }
             | CommandVoid::QueuedMessage { .. }

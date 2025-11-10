@@ -1,6 +1,8 @@
 mod args;
 mod command;
 
+use std::mem;
+
 use self::command::MemoryUsed;
 use crate::assembly::{Command, Event, Trigger};
 use indexmap::{map::Entry, IndexMap};
@@ -10,6 +12,7 @@ use wotw_seedgen_seed_language::output::{self as input, PlaceholderMap};
 // TODO dedup functions?
 
 pub struct CompileContext {
+    events: IndexMap<Trigger, usize, FxBuildHasher>,
     pub command_lookup: Vec<Vec<Command>>,
     placeholder_map: PlaceholderMap,
 }
@@ -17,6 +20,7 @@ pub struct CompileContext {
 impl CompileContext {
     pub fn new(placeholder_map: PlaceholderMap) -> Self {
         Self {
+            events: IndexMap::default(),
             command_lookup: vec![],
             placeholder_map,
         }
@@ -32,25 +36,25 @@ impl CompileContext {
     }
 
     pub fn compile_events(&mut self, intermediate_events: Vec<input::Event>) -> Vec<Event> {
-        let mut events = IndexMap::<_, usize, FxBuildHasher>::default();
-        events.reserve(intermediate_events.len());
+        self.events.reserve(intermediate_events.len());
 
         for event in intermediate_events {
             let trigger = event.trigger.compile(self);
-            match events.entry(trigger) {
-                Entry::Occupied(occupied) => {
-                    let (new, _) = event.command.compile(self);
+            let command = event.command.compile(self).0;
 
+            match self.events.entry(trigger) {
+                Entry::Occupied(occupied) => {
                     let existing = &mut self.command_lookup[*occupied.get()];
-                    existing.extend(new);
+                    existing.extend(command);
                 }
                 Entry::Vacant(vacant) => {
-                    vacant.insert(self.compile_into_lookup(event.command));
+                    vacant.insert(self.command_lookup.len());
+                    self.command_lookup.push(command);
                 }
             }
         }
 
-        events
+        mem::take(&mut self.events)
             .into_iter()
             .map(|(trigger, command)| Event(trigger, command))
             .collect()

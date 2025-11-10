@@ -1,4 +1,4 @@
-use crate::output::operation::Concatenator;
+use crate::{ast::ClientEvent, output::operation::Concatenator};
 
 use super::{
     ArithmeticOperator, Comparator, EqualityComparator, Icon, LogicOperator, Operation,
@@ -456,7 +456,12 @@ pub enum CommandVoid {
     Unequip {
         equipment: Equipment,
     },
+    /// Act as though the client would have sent `client_event`
+    TriggerClientEvent {
+        client_event: ClientEvent,
+    },
     /// Act as though the user would have pressed `bind`
+    // TODO add possible binds to data crate and then simulate
     TriggerKeybind {
         bind: String,
     },

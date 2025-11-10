@@ -1,4 +1,4 @@
-!include("seed_core", spawn_states)
+!include("seed_core")
 
 !builtin_icon(clean_water_icon, "assets/icons/game/water.png")
 !builtin_icon(teleporter_icon, "assets/icons/game/teleporter.png")
@@ -265,7 +265,7 @@ fun world_reset() {
         + "|16155\|(41465|50867)"
         + ")"
     )
-    spawn_states()
+    trigger_client_event(spawn)
     item_message("@World Reset@")
 }
 

@@ -345,6 +345,7 @@ pub enum Literal<'source> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ast, EnumDiscriminants)]
 #[strum_discriminants(derive(VariantArray))]
 pub enum Constant {
+    ClientEvent(ClientEvent),
     Skill(#[ast(with = "constant_ast::<Skill, M>")] Skill),
     Shard(#[ast(with = "constant_ast::<Shard, M>")] Shard),
     Teleporter(#[ast(with = "constant_ast::<Teleporter, M>")] Teleporter),

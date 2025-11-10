@@ -19,33 +19,10 @@ pub enum Literal {
 
 pub use ast::Constant;
 
-// #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
-// #[strum_discriminants(derive(FromStr, Display, VariantArray))]
-// pub enum Constant {
-//     Skill(wotw_seedgen_data::Skill),
-//     Shard(wotw_seedgen_data::Shard),
-//     Teleporter(wotw_seedgen_data::Teleporter),
-//     WeaponUpgrade(wotw_seedgen_data::WeaponUpgrade),
-//     Equipment(wotw_seedgen_data::Equipment),
-//     Zone(wotw_seedgen_data::Zone),
-//     OpherIcon(wotw_seedgen_data::OpherIcon),
-//     LupoIcon(wotw_seedgen_data::LupoIcon),
-//     GromIcon(wotw_seedgen_data::GromIcon),
-//     TuleyIcon(wotw_seedgen_data::TuleyIcon),
-//     MapIcon(wotw_seedgen_data::MapIcon),
-//     EquipSlot(wotw_seedgen_data::EquipSlot),
-//     WheelItemPosition(wotw_seedgen_data::WheelItemPosition),
-//     WheelBind(wotw_seedgen_data::WheelBind),
-//     Alignment(wotw_seedgen_data::Alignment),
-//     HorizontalAnchor(wotw_seedgen_data::HorizontalAnchor),
-//     VerticalAnchor(wotw_seedgen_data::VerticalAnchor),
-//     ScreenPosition(wotw_seedgen_data::ScreenPosition),
-//     CoordinateSystem(wotw_seedgen_data::CoordinateSystem),
-// }
-
 impl Display for Constant {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Constant::ClientEvent(value) => value.fmt(f),
             Constant::Skill(value) => value.fmt(f),
             Constant::Shard(value) => value.fmt(f),
             Constant::Teleporter(value) => value.fmt(f),

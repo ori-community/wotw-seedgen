@@ -5,9 +5,7 @@
 // TODO test
 // TODO check over these, for instance why risingPedestals?
 // TODO add comments
-!export(spawn_states)
-on spawn spawn_states()
-fun spawn_states() {
+on spawn {
     store(randoConfig.inLogicFilterEnabled, true)
     store(randoConfig.fixMeetingKwolokUnderwaterTrigger, true)
     store(randoConfig.fixTeleporterChainOutOfBounds, true)

@@ -281,6 +281,9 @@ impl Display for CommandVoid {
             CommandVoid::Warp { x, y } => write!(f, "warp({x}, {y})"),
             CommandVoid::Equip { slot, equipment } => write!(f, "equip({slot}, {equipment})"),
             CommandVoid::Unequip { equipment } => write!(f, "unequip({equipment})"),
+            CommandVoid::TriggerClientEvent { client_event } => {
+                write!(f, "trigger_client_event({client_event})")
+            }
             CommandVoid::TriggerKeybind { bind } => write!(f, "trigger_keybind({bind})"),
             CommandVoid::EnableServerSync { uber_identifier } => {
                 write!(f, "enable_server_sync({uber_identifier})")

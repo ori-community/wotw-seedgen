@@ -285,6 +285,7 @@ pub enum FunctionIdentifier {
     Warp,
     Equip,
     Unequip,
+    TriggerClientEvent,
     TriggerKeybind,
     EnableServerSync,
     DisableServerSync,
@@ -456,6 +457,7 @@ impl FunctionIdentifier {
             Warp(x: Float, y: Float),
             Equip(slot: EquipSlot, equipment: Equipment),
             Unequip(equipment: Equipment),
+            TriggerClientEvent(client_event: ClientEvent),
             TriggerKeybind(bind: String),
             EnableServerSync(uber_identifier: UberIdentifier),
             DisableServerSync(uber_identifier: UberIdentifier),
@@ -1117,6 +1119,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::Unequip => Command::Void(CommandVoid::Unequip {
                 equipment: arg(&mut context)?,
             }),
+            FunctionIdentifier::TriggerClientEvent => {
+                Command::Void(CommandVoid::TriggerClientEvent {
+                    client_event: arg(&mut context)?,
+                })
+            }
             FunctionIdentifier::TriggerKeybind => Command::Void(CommandVoid::TriggerKeybind {
                 bind: arg(&mut context)?,
             }),
