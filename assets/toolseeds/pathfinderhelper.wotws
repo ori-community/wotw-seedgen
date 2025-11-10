@@ -11,7 +11,7 @@
 on reload {
     set_wheel_item_data(
         "root",
-        WheelItemPosition::Top,
+        Top,
         "Toggle Clean Water",
         "[Ability1]Toggle\nShortcut: [Binding1]",
         clean_water_icon,
@@ -19,7 +19,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::TopRight,
+        TopRight,
         "Toggle Difficulty",
         "[Ability1]Toggle\nShortcut: [Binding2]",
         gears_icon,
@@ -27,7 +27,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::RightTop,
+        RightTop,
         "Choose target for Warp to x/y",
         "[Ability1]Choose\nShortcut: [Binding3]",
         teleporter_icon,
@@ -35,7 +35,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::Right,
+        Right,
         "Warp to x/y",
         "[Ability1]Warp\nShortcut: [Binding3]",
         teleporter_icon,
@@ -43,7 +43,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::RightBottom,
+        RightBottom,
         "Save",
         "[Ability1]Save\nShortcut: [Binding4]",
         save_icon,
@@ -51,7 +51,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::BottomRight,
+        BottomRight,
         "Refill",
         "[Ability1]Refill\nShortcut: [Binding4]",
         save_icon,
@@ -59,7 +59,7 @@ on reload {
     )
     set_wheel_item_data(
         "root",
-        WheelItemPosition::Bottom,
+        Bottom,
         "World Reset",
         "[Ability1]Reset\nShortcut: [Binding5]",
         wall_icon,

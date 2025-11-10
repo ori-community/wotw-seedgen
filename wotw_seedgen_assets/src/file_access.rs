@@ -114,10 +114,11 @@ impl FileAccess {
 
     fn files_in_folder(&self, extension: &str) -> Vec<String> {
         let extension = OsStr::new(extension);
-        let mut files = vec![];
 
-        for folder in &self.folders {
-            files.extend(
+        let mut files = self
+            .folders
+            .iter()
+            .flat_map(|folder| {
                 fs::read_dir(folder)
                     .into_iter()
                     .flatten()
@@ -130,13 +131,9 @@ impl FileAccess {
                             .unwrap_or_default()
                             .to_string_lossy()
                             .to_string()
-                    }),
-            );
-
-            if !files.is_empty() {
-                break;
-            }
-        }
+                    })
+            })
+            .collect::<Vec<_>>();
 
         files.sort_unstable();
 

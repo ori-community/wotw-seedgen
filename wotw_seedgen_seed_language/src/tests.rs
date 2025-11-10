@@ -9,14 +9,9 @@ use crate::{
 };
 use lazy_static::lazy_static;
 use rustc_hash::FxHashMap;
-use std::{
-    ffi::OsStr,
-    fmt::Display,
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fmt::Display, path::Path};
 use strum::VariantArray;
-use wotw_seedgen_assets::{SnippetAccess, Source};
+use wotw_seedgen_assets::{FileAccess, SnippetAccess, Source};
 use wotw_seedgen_data::{
     Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
     MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
@@ -168,26 +163,11 @@ lazy_static! {
 
     // works to jump into code from errors, but doesn't work while debugging
     static ref WORKDIR: &'static str = "..";
-}
 
-struct TestFileAccess;
-impl SnippetAccess for TestFileAccess {
-    fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
-        let id = format!("{}/assets/snippets/{}.wotws", *WORKDIR, identifier);
-        let content = fs::read_to_string(&id).map_err(|err| err.to_string())?;
-        Ok(Source { id, content })
-    }
-
-    fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-        let mut full_path = PathBuf::from(*WORKDIR);
-        full_path.push("assets/snippets");
-        full_path.push(path);
-        fs::read(full_path).map_err(|err| err.to_string())
-    }
-
-    fn available_snippets(&self) -> Vec<String> {
-        unimplemented!()
-    }
+    static ref TEST_FILE_ACCESS: FileAccess = FileAccess::new([
+        format!("{}/assets/snippets", *WORKDIR),
+        format!("{}/assets/toolseeds", *WORKDIR)
+    ]);
 }
 
 fn test_compiler<'snippets, F: SnippetAccess>(
@@ -342,14 +322,24 @@ fn operator_precedence() {
 
 #[test]
 fn snippets() {
-    // TODO remove test output
-    fn write_test_output(filename: impl Display, output: &IntermediateOutput) {
-        fs::create_dir_all(format!("{}/target/snippet-test", *WORKDIR)).unwrap();
-        fs::write(
-            format!("{}/target/snippet-test/{}", *WORKDIR, filename),
-            format!("{:#?}", output),
-        )
-        .unwrap();
+    let snippets = TEST_FILE_ACCESS.available_snippets();
+
+    let mut compiler = test_compiler(&*TEST_FILE_ACCESS);
+
+    for identifier in &snippets {
+        compiler.compile_snippet(identifier).unwrap();
+    }
+
+    let (_, success) = compiler.finish().eprint_errors();
+    assert!(success);
+
+    for identifier in &snippets {
+        let mut compiler = test_compiler(&*TEST_FILE_ACCESS);
+
+        compiler.compile_snippet(identifier).unwrap();
+
+        let (_, success) = compiler.finish().eprint_errors();
+        assert!(success);
     }
 
     let test_with_config = [(
@@ -361,42 +351,12 @@ fn snippets() {
     .into_iter()
     .collect::<FxHashMap<_, _>>();
 
-    let snippets = fs::read_dir(format!("{}/assets/snippets", *WORKDIR))
-        .unwrap()
-        .map(|snippet| snippet.unwrap().path())
-        .filter(|path| path.extension() == Some(OsStr::new("wotws")))
-        .map(|path| path.file_stem().unwrap().to_string_lossy().to_string())
-        .collect::<Vec<_>>();
-
-    let mut compiler = test_compiler(&TestFileAccess);
-
-    for identifier in &snippets {
-        compiler.compile_snippet(identifier).unwrap();
-    }
-    let (output, success) = compiler.finish().eprint_errors();
-    assert!(success);
-
-    write_test_output("_final", &output);
-
-    for identifier in &snippets {
-        let mut compiler = test_compiler(&TestFileAccess);
-
-        compiler.compile_snippet(identifier).unwrap();
-
-        let (output, success) = compiler.finish().eprint_errors();
-        assert!(success);
-
-        write_test_output(identifier, &output);
-    }
-
     for identifier in test_with_config.keys() {
-        let mut compiler = test_compiler_with_config(&TestFileAccess, test_with_config.clone());
+        let mut compiler = test_compiler_with_config(&*TEST_FILE_ACCESS, test_with_config.clone());
 
         compiler.compile_snippet(identifier).unwrap();
 
-        let (output, success) = compiler.finish().eprint_errors();
+        let (_, success) = compiler.finish().eprint_errors();
         assert!(success);
-
-        write_test_output(format!("{identifier} (alternate config)"), &output);
     }
 }
