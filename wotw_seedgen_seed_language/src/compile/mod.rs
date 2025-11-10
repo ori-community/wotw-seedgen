@@ -166,6 +166,14 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     pub config: FxHashMap<String, FxHashMap<String, String>>,
 }
 
+const INTEGERS: usize = 100;
+const BOOLEANS: usize = 100;
+const FLOATS: usize = 25;
+
+const BOOLEAN_OFFSET: usize = INTEGER_OFFSET + INTEGERS;
+const INTEGER_OFFSET: usize = 0;
+const FLOAT_OFFSET: usize = BOOLEAN_OFFSET + BOOLEANS;
+
 #[derive(Debug)]
 pub(crate) enum ExportedValue {
     Function(usize),
@@ -189,9 +197,9 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             integer_ids: IdProvider::new(PRIVATE_MEMORY),
             float_ids: IdProvider::new(PRIVATE_MEMORY),
             string_ids: IdProvider::new(PRIVATE_MEMORY),
-            boolean_state_id: 100,
-            integer_state_id: 0,
-            float_state_id: 150,
+            boolean_state_id: BOOLEAN_OFFSET,
+            integer_state_id: INTEGER_OFFSET,
+            float_state_id: FLOAT_OFFSET,
             message_ids: IdProvider::new(0),
             wheel_ids: IdProvider {
                 offset: 0,

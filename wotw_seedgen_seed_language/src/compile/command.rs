@@ -1,6 +1,9 @@
 // TODO this module name is confusing
 
-use super::{Compile, ExportedValue, SnippetCompiler};
+use super::{
+    Compile, ExportedValue, SnippetCompiler, BOOLEANS, BOOLEAN_OFFSET, FLOATS, FLOAT_OFFSET,
+    INTEGERS, INTEGER_OFFSET,
+};
 use crate::{
     ast::{self, CommandArg, UberStateType},
     output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
@@ -459,15 +462,30 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
 
 // TODO make internal states this order?
 fn boolean_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(&mut compiler.global.boolean_state_id, 100, 100, span)
+    check_limit(
+        &mut compiler.global.boolean_state_id,
+        BOOLEAN_OFFSET,
+        BOOLEANS,
+        span,
+    )
 }
 
 fn integer_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(&mut compiler.global.integer_state_id, 0, 100, span)
+    check_limit(
+        &mut compiler.global.integer_state_id,
+        INTEGER_OFFSET,
+        INTEGERS,
+        span,
+    )
 }
 
 fn float_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(&mut compiler.global.float_state_id, 200, 25, span)
+    check_limit(
+        &mut compiler.global.float_state_id,
+        FLOAT_OFFSET,
+        FLOATS,
+        span,
+    )
 }
 
 fn check_limit<S: Span>(
