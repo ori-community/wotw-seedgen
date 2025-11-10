@@ -1,0 +1,16 @@
+#hidden
+#name("Delta Time")
+#description("Adds a tick function with delta time")
+
+!timer(active, delta)
+!export(delta)
+
+on reload store(active, true)
+
+on tick {
+    tick()
+    store(delta, 0)
+}
+
+!export(tick)
+fun tick() {}

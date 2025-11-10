@@ -44,6 +44,7 @@ on spawn {
     store(_petrifiedForestGroup.petrifiedForestNewTransitionKuVignettePlayed, 2)
     store(questUberStateGroup.lastGlobalEvent, 2)
     store(questUberStateGroup.findKuQuest, 4)
+    // TODO this gets reset when collecting voice, does it need to be reset?
     store(questUberStateGroup.lookForKuQuestUberState, 4)
     store(swampStateGroup.interactedWithOpher, true)
 }

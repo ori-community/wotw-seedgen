@@ -2,6 +2,8 @@
 #name("Bonus Item Core")
 #description("Convenience functions for simple bonus items")
 
+!include("delta_time", tick, delta)
+
 !builtin_icon(health_regeneration_icon, "assets/icons/bonus/healthregeneration.png")
 !builtin_icon(energy_regeneration_icon, "assets/icons/bonus/energyregeneration.png")
 !builtin_icon(extra_double_jump_icon, "assets/icons/bonus/extradoublejump.png")
@@ -14,28 +16,61 @@
 !builtin_icon(regenerate_efficiency_icon, "assets/icons/bonus/regenerateefficiency.png")
 !builtin_icon(flash_efficiency_icon, "assets/icons/bonus/flashefficiency.png")
 !builtin_icon(grenade_efficiency_icon, "assets/icons/bonus/grenadeefficiency.png")
+!builtin_icon(rapid_regenerate_icon, "assets/icons/bonus/rapidregen.png")
+!builtin_icon(rapid_grenade_icon, "assets/icons/bonus/rapidgrenade.png")
+!builtin_icon(quickshot_upgrade_icon, "assets/icons/bonus/rapidquickshot.png")
+!builtin_icon(melting_blaze_icon, "assets/icons/bonus/meltingblaze.png")
+!builtin_icon(melting_sword_icon, "assets/icons/bonus/meltingsword.png")
+!builtin_icon(melting_shuriken_icon, "assets/icons/bonus/meltingshuriken.png")
+!builtin_icon(uncharged_bashnade_icon, "assets/icons/bonus/unchargedbashgrenade.png")
+!builtin_icon(extra_grenade_icon, "assets/icons/bonus/extragrenade.png")
+!builtin_icon(splinter_grenade_icon, "assets/icons/bonus/splintergrenade.png")
+!builtin_icon(unlimited_sentries_icon, "assets/icons/bonus/unlimitedsentries.png")
+!builtin_icon(sentry_burst_upgrade_icon, "assets/icons/bonus/sentryburstupgrade.png")
+!builtin_icon(sentry_fire_rate_upgrade_icon, "assets/icons/bonus/sentryattackspeed.png")
+!builtin_icon(extra_shuriken_icon, "assets/icons/bonus/extrashuriken.png")
+!builtin_icon(splinter_shuriken_icon, "assets/icons/bonus/splintershuriken.png")
+!builtin_icon(bashable_shuriken_icon, "assets/icons/bonus/bashableshuriken.png")
+
+!state(health_per_second, Float)
+!export(health_per_second)
+
+!augment_fun(tick, if health_per_second != 0 store(player.health, player.health + health_per_second * delta))
+
+!state(health_regenerations, Integer)
+!export(health_regenerations)
 
 fun health_regeneration() {
-    store(randoUpgrades.healthRegeneration, randoUpgrades.healthRegeneration + 1)
-    item_message("#Health Regeneration x" + randoUpgrades.healthRegeneration + "#")
+    store(health_regenerations, health_regenerations + 1)
+    item_message("#Health Regeneration x" + health_regenerations + "#")
+    store(health_per_second, health_per_second + 10 / 60)
 }
 !item_data(health_regeneration(),
     "#Health Regeneration#",
     200,
-    "Passively regenerate health at a slow rate",
+    "Passively regenerate one health orb per minute",
     health_regeneration_icon,
     BonusItem
 )
 !export(health_regeneration)
 
+!state(energy_per_second, Float)
+!export(energy_per_second)
+
+!augment_fun(tick, if energy_per_second != 0 store(player.energy, player.energy + energy_per_second * delta))
+
+!state(energy_regenerations, Integer)
+!export(energy_regenerations)
+
 fun energy_regeneration() {
-    store(randoUpgrades.energyRegeneration, randoUpgrades.energyRegeneration + 1)
-    item_message("#Energy Regeneration x" + randoUpgrades.energyRegeneration + "#")
+    store(energy_regenerations, energy_regenerations + 1)
+    item_message("#Energy Regeneration x" + energy_regenerations + "#")
+    store(energy_per_second, energy_per_second + 1 / 60)
 }
 !item_data(energy_regeneration(),
     "#Energy Regeneration#",
     200,
-    "Passively regenerate energy at a slow rate",
+    "Passively regenerate one energy orb per minute",
     energy_regeneration_icon,
     BonusItem
 )
@@ -48,7 +83,7 @@ fun extra_double_jump() {
 !item_data(extra_double_jump(),
     "#Extra Double Jump#",
     200,
-    "If you have *Double Jump*, get an additional jump in the air",
+    "If you have " + skill_string(DoubleJump) + ", get an additional jump in the air",
     extra_double_jump_icon,
     BonusItem
 )
@@ -61,112 +96,364 @@ fun extra_air_dash() {
 !item_data(extra_air_dash(),
     "#Extra Air Dash#",
     200,
-    "If you have *Dash*, get an additional dash in the air",
+    "If you have " + skill_string(Dash) + ", get an additional dash in the air",
     extra_air_dash_icon,
     BonusItem
 )
 !export(extra_air_dash)
 
+!state(blaze_efficiencies, Integer)
+!export(blaze_efficiencies)
+
 fun blaze_efficiency() {
-    store(randoUpgrades.blazeEfficiency, randoUpgrades.blazeEfficiency + 1)
-    item_message("#Blaze Efficiency x" + randoUpgrades.blazeEfficiency + "#")
+    store(blaze_efficiencies, blaze_efficiencies + 1)
+    item_message("#Blaze Efficiency x" + blaze_efficiencies + "#")
+    store(randoUpgrades.blazeCostMultiplier, randoUpgrades.blazeCostMultiplier / 2)
 }
 !item_data(blaze_efficiency(),
     "#Blaze Efficiency#",
     200,
-    "Halves the cost of using *Blaze*",
+    "Halves the cost of using " + skill_string(Blaze),
     blaze_efficiency_icon,
     BonusItem
 )
 !export(blaze_efficiency)
 
+!state(spear_efficiencies, Integer)
+!export(spear_efficiencies)
+
 fun spear_efficiency() {
-    store(randoUpgrades.spearEfficiency, randoUpgrades.spearEfficiency + 1)
-    item_message("#Spear Efficiency x" + randoUpgrades.spearEfficiency + "#")
+    store(spear_efficiencies, spear_efficiencies + 1)
+    item_message("#Spear Efficiency x" + spear_efficiencies + "#")
+    store(randoUpgrades.spearCostMultiplier, randoUpgrades.spearCostMultiplier / 2)
 }
 !item_data(spear_efficiency(),
     "#Spear Efficiency#",
     200,
-    "Halves the cost of using *Spear*",
+    "Halves the cost of using " + skill_string(Spear),
     spear_efficiency_icon,
     BonusItem
 )
 !export(spear_efficiency)
 
+!state(shuriken_efficiencies, Integer)
+!export(shuriken_efficiencies)
+
 fun shuriken_efficiency() {
-    store(randoUpgrades.shurikenEfficiency, randoUpgrades.shurikenEfficiency + 1)
-    item_message("#Shuriken Efficiency x" + randoUpgrades.shurikenEfficiency + "#")
+    store(shuriken_efficiencies, shuriken_efficiencies + 1)
+    item_message("#Shuriken Efficiency x" + shuriken_efficiencies + "#")
+    store(randoUpgrades.shurikenCostMultiplier, randoUpgrades.shurikenCostMultiplier / 2)
 }
 !item_data(shuriken_efficiency(),
     "#Shuriken Efficiency#",
     200,
-    "Halves the cost of using *Shuriken*",
+    "Halves the cost of using " + skill_string(Shuriken),
     shuriken_efficiency_icon,
     BonusItem
 )
 !export(shuriken_efficiency)
 
+!state(sentry_efficiencies, Integer)
+!export(sentry_efficiencies)
+
 fun sentry_efficiency() {
-    store(randoUpgrades.sentryEfficiency, randoUpgrades.sentryEfficiency + 1)
-    item_message("#Sentry Efficiency x" + randoUpgrades.sentryEfficiency + "#")
+    store(sentry_efficiencies, sentry_efficiencies + 1)
+    item_message("#Sentry Efficiency x" + sentry_efficiencies + "#")
+    store(randoUpgrades.sentryCostMultiplier, randoUpgrades.sentryCostMultiplier / 2)
 }
 !item_data(sentry_efficiency(),
     "#Sentry Efficiency#",
     200,
-    "Halves the cost of using *Sentry*",
+    "Halves the cost of using " + skill_string(Sentry),
     sentry_efficiency_icon,
     BonusItem
 )
 !export(sentry_efficiency)
 
+!state(bow_efficiencies, Integer)
+!export(bow_efficiencies)
+
 fun bow_efficiency() {
-    store(randoUpgrades.bowEfficiency, randoUpgrades.bowEfficiency + 1)
-    item_message("#Bow Efficiency x" + randoUpgrades.bowEfficiency + "#")
+    store(bow_efficiencies, bow_efficiencies + 1)
+    item_message("#Bow Efficiency x" + bow_efficiencies + "#")
+    store(randoUpgrades.bowCostMultiplier, randoUpgrades.bowCostMultiplier / 2)
 }
 !item_data(bow_efficiency(),
     "#Bow Efficiency#",
     200,
-    "Halves the cost of using *Bow*",
+    "Halves the cost of using " + skill_string(Bow),
     bow_efficiency_icon,
     BonusItem
 )
 !export(bow_efficiency)
 
+!state(regenerate_efficiencies, Integer)
+!export(regenerate_efficiencies)
+
 fun regenerate_efficiency() {
-    store(randoUpgrades.regenerateEfficiency, randoUpgrades.regenerateEfficiency + 1)
-    item_message("#Regenerate Efficiency x" + randoUpgrades.regenerateEfficiency + "#")
+    store(regenerate_efficiencies, regenerate_efficiencies + 1)
+    item_message("#Regenerate Efficiency x" + regenerate_efficiencies + "#")
+    store(randoUpgrades.regenerationCostMultiplier, randoUpgrades.regenerationCostMultiplier / 2)
 }
 !item_data(regenerate_efficiency(),
     "#Regenerate Efficiency#",
     200,
-    "Halves the cost of using *Regenerate*",
+    "Halves the cost of using " + skill_string(Regenerate),
     regenerate_efficiency_icon,
     BonusItem
 )
 !export(regenerate_efficiency)
 
+!state(flash_efficiencies, Integer)
+!export(flash_efficiencies)
+
 fun flash_efficiency() {
-    store(randoUpgrades.flashEfficiency, randoUpgrades.flashEfficiency + 1)
-    item_message("#Flash Efficiency x" + randoUpgrades.flashEfficiency + "#")
+    store(flash_efficiencies, flash_efficiencies + 1)
+    item_message("#Flash Efficiency x" + flash_efficiencies + "#")
+    store(randoUpgrades.flashCostMultiplier, randoUpgrades.flashCostMultiplier / 2)
 }
 !item_data(flash_efficiency(),
     "#Flash Efficiency#",
     200,
-    "Halves the cost of using *Flash*",
+    "Halves the cost of using " + skill_string(Flash),
     flash_efficiency_icon,
     BonusItem
 )
 !export(flash_efficiency)
 
+!state(grenade_efficiencies, Integer)
+!export(grenade_efficiencies)
+
 fun grenade_efficiency() {
-    store(randoUpgrades.grenadeEfficiency, randoUpgrades.grenadeEfficiency + 1)
-    item_message("#Grenade Efficiency x" + randoUpgrades.grenadeEfficiency + "#")
+    store(grenade_efficiencies, grenade_efficiencies + 1)
+    item_message("#Grenade Efficiency x" + grenade_efficiencies + "#")
+    store(randoUpgrades.grenadeCostMultiplier, randoUpgrades.grenadeCostMultiplier / 2)
 }
 !item_data(grenade_efficiency(),
     "#Grenade Efficiency#",
     200,
-    "Halves the cost of using *Grenade*",
+    "Halves the cost of using " + skill_string(Grenade),
     grenade_efficiency_icon,
     BonusItem
 )
 !export(grenade_efficiency)
+
+// TODO take a look at bonus uberState names
+
+!state(rapid_grenades, Integer)
+!export(rapid_grenades)
+
+fun rapid_grenade() {
+    store(rapid_grenades, rapid_grenades + 1)
+    item_message("#Rapid Grenade x" + rapid_grenades + "#")
+    store(randoUpgrades.grenadeChargeTimeModifier, randoUpgrades.grenadeChargeTimeModifier - 0.5)
+}
+!item_data(
+    rapid_grenade(),
+    "#Rapid Grenade#",
+    200,
+    "Reduces " + skill_string(Grenade) + " charge time by 0.5 seconds",
+    rapid_grenade_icon,
+    BonusItem
+)
+!export(rapid_grenade)
+
+!state(quickshot_upgrades, Integer)
+!export(quickshot_upgrades)
+
+fun quickshot_upgrade() {
+    store(quickshot_upgrades, quickshot_upgrades + 1)
+    item_message("#Quickshot Upgrade x" + quickshot_upgrades + "#")
+    store(randoUpgrades.bowRapidFireMultiplier, randoUpgrades.bowRapidFireMultiplier - 0.4)
+}
+!item_data(
+    quickshot_upgrade(),
+    "#Quickshot Upgrade#",
+    200,
+    "Reduces " + shard_string(Quickshot) + " cooldown by 0.4 seconds",
+    quickshot_upgrade_icon,
+    BonusItem
+)
+!export(quickshot_upgrade)
+
+fun melting_blaze() {
+    item_message("#Melting Blaze#")
+    store(randoUpgrades.blazeAsFireSource, true)
+}
+!item_data(
+    melting_blaze(),
+    "#Melting Blaze#",
+    200,
+    skill_string(Blaze) + " melts ice and ignites lanterns",
+    melting_blaze_icon,
+    BonusItem
+)
+!export(melting_blaze)
+
+fun melting_sword() {
+    item_message("#Melting Sword#")
+    store(randoUpgrades.swordAsFireSource, true)
+}
+!item_data(
+    melting_sword(),
+    "#Melting Sword#",
+    200,
+    skill_string(Sword) + " melts ice and ignites lanterns",
+    melting_sword_icon,
+    BonusItem
+)
+!export(melting_sword)
+
+fun melting_shuriken() {
+    item_message("#Melting Shuriken#")
+    store(randoUpgrades.shurikenAsFireSource, true)
+}
+!item_data(
+    melting_shuriken(),
+    "#Melting Shuriken#",
+    200,
+    skill_string(Shuriken) + " melts ice and ignites lanterns",
+    melting_shuriken_icon,
+    BonusItem
+)
+!export(melting_shuriken)
+
+fun uncharged_bashnade() {
+    item_message("#Uncharged Bashgrenades#")
+    store(randoUpgrades.bashableUnchargedGrenades, true)
+}
+!item_data(
+    uncharged_bashnade(),
+    "#Uncharged Bashgrenades#",
+    200,
+    skill_string(Bash) + " your " + skill_string(Grenade) + " without charging it first on the ground",
+    uncharged_bashnade_icon,
+    BonusItem
+)
+!export(uncharged_bashnade)
+
+fun extra_grenade() {
+    store(randoUpgrades.extraGrenades, randoUpgrades.extraGrenades + 1)
+    item_message("#Extra Grenade x" + randoUpgrades.extraGrenades + "#")
+}
+!item_data(
+    extra_grenade(),
+    "#Extra Grenade#",
+    200,
+    "Throw an additional " + skill_string(Grenade) + " without exploding the previous one",
+    extra_grenade_icon,
+    BonusItem
+)
+!export(extra_grenade)
+
+fun splinter_grenade() {
+    store(randoUpgrades.grenadeMultishot, randoUpgrades.grenadeMultishot + 1)
+    item_message("#Splinter Grenade x" + randoUpgrades.grenadeMultishot + "#")
+}
+!item_data(
+    splinter_grenade(),
+    "#Splinter Grenade#",
+    200,
+    "Spawn an additional " + skill_string(Grenade) + " with each throw",
+    splinter_grenade_icon,
+    BonusItem
+)
+!export(splinter_grenade)
+
+fun unlimited_sentries() {
+    item_message("#Unlimited Sentries#")
+    store(randoUpgrades.extraSentries, 100)
+}
+!item_data(
+    unlimited_sentries(),
+    "#Unlimited Sentries#",
+    200,
+    // TODO skill_string can't plural
+    "Spawn unlimited *Sentries*",
+    unlimited_sentries_icon,
+    BonusItem
+)
+!export(unlimited_sentries)
+
+// TODO merge burst and fire rate upgrade to make the names less confusing?
+// TODO vague descriptions
+
+!state(sentry_burst_upgrades, Integer)
+!export(sentry_burst_upgrades)
+
+fun sentry_burst_upgrade() {
+    store(sentry_burst_upgrades, sentry_burst_upgrades + 1)
+    item_message("#Sentry Burst Upgrade#")
+    store(randoUpgrades.sentryShots, randoUpgrades.sentryShots + 10)
+}
+!item_data(
+    sentry_burst_upgrade(),
+    "#Sentry Burst Upgrade#",
+    200,
+    skill_string(Sentry) + " fires more shots per burst",
+    sentry_burst_upgrade_icon,
+    BonusItem
+)
+!export(sentry_burst_upgrade)
+
+!state(sentry_fire_rate_upgrades, Integer)
+!export(sentry_fire_rate_upgrades)
+
+fun sentry_fire_rate_upgrade() {
+    store(sentry_fire_rate_upgrades, sentry_fire_rate_upgrades + 1)
+    item_message("#Sentry Fire Rate Upgrade#")
+    store(randoUpgrades.sentryFireRateSpeed, randoUpgrades.sentryFireRateSpeed + 2.5)
+}
+!item_data(
+    sentry_fire_rate_upgrade(),
+    "#Sentry Fire Rate Upgrade#",
+    200,
+    skill_string(Sentry) + " fires shots even faster",
+    sentry_fire_rate_upgrade_icon,
+    BonusItem
+)
+!export(sentry_fire_rate_upgrade)
+
+!state(extra_shurikens, Integer)
+!export(extra_shurikens)
+
+fun extra_shuriken() {
+    store(randoUpgrades.extraShurikens, randoUpgrades.extraShurikens + 1)
+    item_message("#Extra Shuriken x" + randoUpgrades.extraShurikens + "#")
+}
+!item_data(
+    extra_shuriken(),
+    "#Extra Shuriken#",
+    200,
+    "Throw an additional " + skill_string(Shuriken) + " without catching the prior one",
+    extra_shuriken_icon,
+    BonusItem
+)
+!export(extra_shuriken)
+
+fun splinter_shuriken() {
+    store(randoUpgrades.shurikenMultishotCount, randoUpgrades.shurikenMultishotCount + 2)
+}
+!item_data(
+    splinter_shuriken(),
+    "#Splinter Shuriken#",
+    200,
+    "Throw two additional " + skill_string(Shuriken) + " with each throw",
+    splinter_shuriken_icon,
+    BonusItem
+)
+!export(splinter_shuriken)
+
+fun bashable_shuriken() {
+    item_message("#Bashable Shuriken#")
+    store(randoUpgrades.shurikenBashable, true)
+}
+!item_data(
+    bashable_shuriken(),
+    "#Bashable Shuriken#",
+    200,
+    "Bash off your Shuriken",
+    bashable_shuriken_icon,
+    BonusItem
+)
+!export(bashable_shuriken)

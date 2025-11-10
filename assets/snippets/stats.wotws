@@ -1,3 +1,7 @@
+#hidden
+#name("Stats")
+#description("Adds pickup stats")
+
 !state(spirit_light_collected, Integer)
 !export(spirit_light_collected)
 
