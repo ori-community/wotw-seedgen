@@ -459,7 +459,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
 
 // TODO make internal states this order?
 fn boolean_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(&mut compiler.global.boolean_state_id, 100, 50, span)
+    check_limit(&mut compiler.global.boolean_state_id, 100, 100, span)
 }
 
 fn integer_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
@@ -467,7 +467,7 @@ fn integer_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Resul
 }
 
 fn float_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(&mut compiler.global.float_state_id, 150, 25, span)
+    check_limit(&mut compiler.global.float_state_id, 200, 25, span)
 }
 
 fn check_limit<S: Span>(
