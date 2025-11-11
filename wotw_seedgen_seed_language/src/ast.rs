@@ -498,7 +498,8 @@ pub struct IncludeArgs<'source> {
     pub imports: Spanned<Option<(Symbol<','>, IncludeArgsImports<'source>)>>,
 }
 
-pub type IncludeArgsImports<'source> = Separated<Spanned<Identifier<'source>>, Symbol<','>>;
+pub type IncludeArgsImports<'source> =
+    Separated<Recoverable<Spanned<Identifier<'source>>, RecoverSkipExpression>, Symbol<','>>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]

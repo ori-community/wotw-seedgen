@@ -4,9 +4,6 @@
 
 !tags("Bonus+")
 
-// TODO confusing error
-// !include("bonus_item_core", rapid_grenade,)
-
 !include("bonus_item_core",
     rapid_grenade,
     quickshot_upgrade,

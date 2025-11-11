@@ -140,36 +140,41 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
 
         if let Some((_, imports)) = self.imports.data {
             for import in imports {
-                let Some(value) = snippet_exported_values.get(import.data.0) else {
-                    compiler.errors.push(
-                        Error::custom("identifier not found in snippet".to_string(), import.span)
+                if let Some(import) = import.result.map_err(|err| compiler.errors.push(err)).ok() {
+                    let Some(value) = snippet_exported_values.get(import.data.0) else {
+                        compiler.errors.push(
+                            Error::custom(
+                                "identifier not found in snippet".to_string(),
+                                import.span,
+                            )
                             .with_help(format!(
                                 "if it exists in {}, you have to export it there: !export({})",
                                 self.path.data, import.data
                             )),
-                    );
+                        );
 
-                    continue;
-                };
+                        continue;
+                    };
 
-                match value {
-                    ExportedValue::Function(index) => {
-                        compiler
-                            .preprocessed
-                            .functions
-                            .insert(import.data.0.to_string());
+                    match value {
+                        ExportedValue::Function(index) => {
+                            compiler
+                                .preprocessed
+                                .functions
+                                .insert(import.data.0.to_string());
 
-                        compiler
-                            .function_indices
-                            .insert(import.data.0.to_string(), *index);
+                            compiler
+                                .function_indices
+                                .insert(import.data.0.to_string(), *index);
 
-                        // TODO is this still used?
-                        compiler
-                            .function_imports
-                            .insert(import.data.0.to_string(), self.path.data.to_string());
-                    }
-                    ExportedValue::Literal(literal) => {
-                        compiler.variables.insert(import.data, literal.clone());
+                            // TODO is this still used?
+                            compiler
+                                .function_imports
+                                .insert(import.data.0.to_string(), self.path.data.to_string());
+                        }
+                        ExportedValue::Literal(literal) => {
+                            compiler.variables.insert(import.data, literal.clone());
+                        }
                     }
                 }
             }

@@ -471,7 +471,9 @@ impl Tokens for IncludeArgs<'_> {
         self.path.tokens(builder);
         if let Some((_, imports)) = self.imports.data {
             for import in imports {
-                builder.push_token(import.span, TokenType::Variable);
+                if let Ok(import) = import.result {
+                    builder.push_token(import.span, TokenType::Variable);
+                }
             }
         }
     }
