@@ -1,0 +1,11 @@
+#category("World Changes")
+#name("No Howl")
+#description("Removes the Howl chase and fight")
+
+!tags("No Howl")
+
+on spawn {
+    store(swampStateGroup.nightCrawlerChaseStarted, true)
+    store(swampStateGroup.nightCrawlerDefeated, true)
+    store(MarshSpawn.HowlBurnt, true)
+}

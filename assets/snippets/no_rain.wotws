@@ -1,13 +1,5 @@
 #category("World Changes")
 #name("No Rain")
-#description("Marsh starts sunny as it usually is after getting the sword tree. Also Howl is dead")
-// TODO split Howl and rain logic?
+#description("Marsh starts sunny as it usually is after getting the sword tree")
 
-!tags("No Rain")
-
-on spawn {
-    store(HowlsDen.RainLifted, true)
-    store(swampStateGroup.nightCrawlerChaseStarted, true)
-    store(swampStateGroup.nightCrawlerDefeated, true)
-    store(MarshSpawn.HowlBurnt, true)
-}
+on spawn store(HowlsDen.RainLifted, true)
