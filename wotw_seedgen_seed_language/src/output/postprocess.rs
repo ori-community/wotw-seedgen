@@ -479,6 +479,10 @@ impl ResolvePlaceholders for CommandVoid {
             Self::SetInteger { value, .. } => value.resolve(context),
             Self::SetFloat { value, .. } => value.resolve(context),
             Self::SetString { value, .. } => value.resolve(context),
+            Self::SaveAt { x, y, .. } => {
+                x.resolve(context);
+                y.resolve(context);
+            }
             Self::Warp { x, y } => {
                 x.resolve(context);
                 y.resolve(context);
@@ -518,8 +522,7 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::FreeMessageVerticalAnchor { .. }
             | Self::FreeMessageBoxWidth { .. }
             | Self::FreeMessageCoordinateSystem { .. }
-            | Self::Save {}
-            | Self::SaveToMemory {}
+            | Self::Save { .. }
             | Self::Equip { .. }
             | Self::Unequip { .. }
             | Self::TriggerClientEvent { .. }

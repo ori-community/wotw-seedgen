@@ -147,7 +147,7 @@ pub enum Command {
     /// Hide free message `id`
     FreeMessageHide(/*id*/ usize),
     /// Set the position of free message `id` to (Float Memory 0, Float Memory 1)
-    FreeMessagePosition(/*id*/ usize /*TODO, /*world_cordinates*/ bool*/),
+    FreeMessagePosition(/*id*/ usize),
     /// Set the `alignment` of free message `id`
     FreeMessageAlignment(/*id*/ usize, /*alignment*/ Alignment),
     /// Set the `horizontal_anchor` of free message `id`
@@ -167,11 +167,10 @@ pub enum Command {
     /// Sets the map message content to String Memory 0
     SetMapMessage,
     // TODO missing SetSideMapMessage
-    // TODO out of sync with client
-    /// Save to disk, like an autosave
+    /// Save the game. Only save to disk if Boolean Memory 0 is `true`.
     Save,
-    /// Save to memory, but not to disk, like a boss fight checkpoint
-    SaveToMemory,
+    /// Save the game, but with the position set to (Float Memory 0, Float Memory 1). Only save to disk if Boolean Memory 0 is `true`.
+    SaveAt,
     // TODO preload area command
     /// Warp the player to (Float Memory 0, Float Memory 1)
     Warp,

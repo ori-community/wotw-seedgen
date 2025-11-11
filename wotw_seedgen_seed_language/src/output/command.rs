@@ -438,10 +438,16 @@ pub enum CommandVoid {
         id: usize,
         value: CommandString,
     },
-    /// Save to disk, like an autosave
-    Save {},
-    /// Save to memory, but not to disk, like a boss fight checkpoint
-    SaveToMemory {},
+    /// Save the game
+    Save {
+        to_disk: bool,
+    },
+    /// Save the game at `position`
+    SaveAt {
+        to_disk: bool,
+        x: CommandFloat,
+        y: CommandFloat,
+    },
     /// Warp the player to (`x`, `y`)
     Warp {
         x: CommandFloat,

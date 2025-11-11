@@ -240,6 +240,8 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetFloat
             | FunctionIdentifier::Save
             | FunctionIdentifier::SaveToMemory
+            | FunctionIdentifier::SaveAt
+            | FunctionIdentifier::SaveToMemoryAt
             | FunctionIdentifier::Warp
             | FunctionIdentifier::Equip
             | FunctionIdentifier::Unequip

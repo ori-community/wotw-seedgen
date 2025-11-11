@@ -279,7 +279,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::DestroyWarpIcon { .. }
             | CommandVoid::Lookup { .. }
             | CommandVoid::Save { .. }
-            | CommandVoid::SaveToMemory { .. }
+            | CommandVoid::SaveAt { .. }
             | CommandVoid::Warp { .. }
             | CommandVoid::Equip { .. }
             | CommandVoid::Unequip { .. }

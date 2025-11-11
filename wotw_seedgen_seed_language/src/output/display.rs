@@ -240,11 +240,7 @@ impl Display for CommandVoid {
             } => write!(
                 f,
                 "store_boolean{}({uber_identifier}, {value})",
-                if *trigger_events {
-                    ""
-                } else {
-                    "_without_triggers"
-                }
+                store_suffix(*trigger_events)
             ),
             CommandVoid::StoreInteger {
                 uber_identifier,
@@ -253,11 +249,7 @@ impl Display for CommandVoid {
             } => write!(
                 f,
                 "store_integer{}({uber_identifier}, {value})",
-                if *trigger_events {
-                    ""
-                } else {
-                    "_without_triggers"
-                }
+                store_suffix(*trigger_events)
             ),
             CommandVoid::StoreFloat {
                 uber_identifier,
@@ -266,18 +258,16 @@ impl Display for CommandVoid {
             } => write!(
                 f,
                 "store_float{}({uber_identifier}, {value})",
-                if *trigger_events {
-                    ""
-                } else {
-                    "_without_triggers"
-                }
+                store_suffix(*trigger_events)
             ),
             CommandVoid::SetBoolean { id, value } => write!(f, "set_boolean({id}, {value})"),
             CommandVoid::SetInteger { id, value } => write!(f, "set_integer({id}, {value})"),
             CommandVoid::SetFloat { id, value } => write!(f, "set_float({id}, {value})"),
             CommandVoid::SetString { id, value } => write!(f, "set_string({id}, {value})"),
-            CommandVoid::Save {} => write!(f, "save()"),
-            CommandVoid::SaveToMemory {} => write!(f, "save_to_memory()"),
+            CommandVoid::Save { to_disk } => write!(f, "save{}()", save_suffix(*to_disk)),
+            CommandVoid::SaveAt { to_disk, x, y } => {
+                write!(f, "save{}_at({x}, {y})", save_suffix(*to_disk))
+            }
             CommandVoid::Warp { x, y } => write!(f, "warp({x}, {y})"),
             CommandVoid::Equip { slot, equipment } => write!(f, "equip({slot}, {equipment})"),
             CommandVoid::Unequip { equipment } => write!(f, "unequip({equipment})"),
@@ -378,5 +368,21 @@ impl Display for CommandVoid {
             CommandVoid::ResetAllWheels {} => write!(f, "reset_all_wheels()"),
             CommandVoid::DebugLog { message } => write!(f, "debug_log({message})"),
         }
+    }
+}
+
+fn store_suffix(trigger_events: bool) -> &'static str {
+    if trigger_events {
+        ""
+    } else {
+        "_without_triggers"
+    }
+}
+
+fn save_suffix(to_disk: bool) -> &'static str {
+    if to_disk {
+        ""
+    } else {
+        "_to_memory"
     }
 }

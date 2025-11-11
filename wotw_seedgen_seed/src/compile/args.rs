@@ -62,6 +62,19 @@ impl<'a> Args<'a> {
         call_builder.finish(command)
     }
 
+    pub fn call_multiple<I>(self, commands: I) -> (Vec<Command>, MemoryUsed)
+    where
+        I: IntoIterator<Item = Command>,
+    {
+        let mut iter = commands.into_iter();
+
+        let mut out = self.call(iter.next().unwrap());
+
+        out.0.extend(iter);
+
+        out
+    }
+
     fn total_memory_used(&self) -> MemoryUsed {
         self.args.iter().fold(MemoryUsed::ZERO, |mut total, arg| {
             total.combine(arg.compile_output.1.clone());

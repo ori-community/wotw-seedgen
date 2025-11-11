@@ -318,8 +318,14 @@ impl Compile for input::CommandVoid {
             Self::SetString { id, value } => Args::new(context)
                 .string(0, value)
                 .call(Command::CopyString(0, id)),
-            Self::Save {} => (vec![Command::Save], MemoryUsed::ZERO),
-            Self::SaveToMemory {} => (vec![Command::SaveToMemory], MemoryUsed::ZERO),
+            Self::Save { to_disk } => (
+                vec![Command::SetBoolean(to_disk), Command::Save],
+                MemoryUsed::ZERO,
+            ),
+            Self::SaveAt { to_disk, x, y } => Args::new(context)
+                .float(0, x)
+                .float(1, y)
+                .call_multiple([Command::SetBoolean(to_disk), Command::SaveAt]),
             Self::Warp { x, y } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
