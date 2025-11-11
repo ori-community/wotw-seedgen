@@ -37,9 +37,6 @@ on is_in_hitbox(520, -3617, 744, -3503) {
     if get_boolean("goals_completed") == false {
         warp(-3540, -407) // TODO get exact location
         write_goals_incomplete_message()
-        priority_message(
-            get_string("goals_incomplete_message"),
-            4,
-        )
+        priority_message(get_string("goals_incomplete_message"))
     }
 }

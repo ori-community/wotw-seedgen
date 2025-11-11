@@ -258,6 +258,7 @@ pub enum FunctionIdentifier {
     ItemMessage,
     ItemMessageWithTimeout,
     PriorityMessage,
+    PriorityMessageWithTimeout,
     ControlledPriorityMessage,
     FreeMessage,
     DestroyMessage,
@@ -429,7 +430,8 @@ impl FunctionIdentifier {
             RemoveWeaponUpgrade(weapon_upgrade: WeaponUpgrade),
             ItemMessage(message: String),
             ItemMessageWithTimeout(message: String, timeout: Float),
-            PriorityMessage(message: String, timeout: Float),
+            PriorityMessage(message: String),
+            PriorityMessageWithTimeout(message: String, timeout: Float),
             ControlledPriorityMessage(id: String, message: String, timeout: Float),
             FreeMessage(id: String, message: String),
             DestroyMessage(id: String),
@@ -863,8 +865,16 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: None,
                 priority: true,
                 message: arg(&mut context)?,
-                timeout: Some(arg(&mut context)?),
+                timeout: None,
             }),
+            FunctionIdentifier::PriorityMessageWithTimeout => {
+                Command::Void(CommandVoid::QueuedMessage {
+                    id: None,
+                    priority: true,
+                    message: arg(&mut context)?,
+                    timeout: Some(arg(&mut context)?),
+                })
+            }
             FunctionIdentifier::ControlledPriorityMessage => {
                 Command::Void(CommandVoid::QueuedMessage {
                     id: Some(message_id(&mut context)?),

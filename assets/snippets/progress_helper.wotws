@@ -152,10 +152,7 @@ on reload {
         tree_progress_icon,
         {
             write_tree_progress()
-            priority_message(
-                get_string("tree_progress"),
-                4.0
-            )
+            priority_message(get_string("tree_progress"))
         },
     )
     set_wheel_item_data(
@@ -166,10 +163,7 @@ on reload {
         wisp_progress_icon,
         {
             write_wisp_progress()
-            priority_message(
-                get_string("wisp_progress"),
-                4.0
-            )
+            priority_message(get_string("wisp_progress"))
         },
     )
     set_wheel_item_data(
@@ -193,7 +187,7 @@ on reload {
 on progress_message {
     write_progress_message()
     // TODO priority message shouldn't enter the Alt+T log
-    priority_message(get_string("progress_message"), 4.0)
+    priority_message(get_string("progress_message"))
 }
 
 on reload {
@@ -216,10 +210,7 @@ on change player.currentMapArea {
 on binding1 if disable_keybinds == false {
     write_tree_progress()
     write_wisp_progress()
-    priority_message(
-        get_string("tree_progress") + "\n" + get_string("wisp_progress"),
-        4.0
-    )
+    priority_message(get_string("tree_progress") + "\n" + get_string("wisp_progress"))
 }
 on binding2 if disable_keybinds == false show_quest_progress()
 on binding3 if disable_keybinds == false show_teleporter_progress()
@@ -533,10 +524,7 @@ fun show_quest_progress() {
     set_string("quest_progress", get_string("quest_progress") + "\n#Regrowing the Glades# - ")
     if GladesTown.RegrowTheGlades == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
     if GladesTown.RegrowTheGlades set_string("quest_progress", get_string("quest_progress") + "$Complete$")
-    priority_message(
-        get_string("quest_progress"),
-        6.0
-    )
+    priority_message_with_timeout(get_string("quest_progress"), 6.0)
 }
 
 fun show_teleporter_progress() {
@@ -634,10 +622,7 @@ fun show_teleporter_progress() {
     if get_boolean("comma") == false {
         set_string("teleporter_progress", get_string("teleporter_progress") + "None")
     }
-    priority_message(
-        get_string("teleporter_progress"),
-        4.0
-    )
+    priority_message(get_string("teleporter_progress"))
 }
 fun teleporters_add_comma() {
     if get_boolean("comma") set_string("teleporter_progress", get_string("teleporter_progress") + ", ")

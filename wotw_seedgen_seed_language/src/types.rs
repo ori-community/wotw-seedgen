@@ -215,6 +215,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::ItemMessage
             | FunctionIdentifier::ItemMessageWithTimeout
             | FunctionIdentifier::PriorityMessage
+            | FunctionIdentifier::PriorityMessageWithTimeout
             | FunctionIdentifier::ControlledPriorityMessage
             | FunctionIdentifier::FreeMessage
             | FunctionIdentifier::DestroyMessage
