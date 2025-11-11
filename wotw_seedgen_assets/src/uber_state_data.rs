@@ -1,10 +1,11 @@
 use crate::{LocData, StateData};
-use rustc_hash::FxHashMap;
-use serde::{Deserialize, Serialize};
+use indexmap::IndexMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
+use serde::{Deserialize, Serialize, Serializer};
 use std::{
     cmp::Ordering,
     fmt::{self, Display},
-    io::Read,
+    hash::Hash,
 };
 use wotw_seedgen_data::UberIdentifier;
 
@@ -18,8 +19,7 @@ pub struct UberStateData {
     /// Every UberState does have a name, but multiple UberStates can have
     /// the same name, which is why this resolves to [`Vec<UberStateAlias>`]
     ///
-    /// With the `loc_data` and/or `state_data` features enabled, this may also include
-    /// the randomizer's custom identifiers, which are generally more intuitive
+    /// This may also include randomizer aliases, which are generally more intuitive.
     ///
     /// If successful, this lookup will yield you the name's corresponding [`UberIdentifier`],
     /// which you can use to query `id_lookup` for additional information
@@ -37,7 +37,7 @@ pub struct UberStateAlias {
     ///
     /// For custom identifiers from the randomizer, an additional value may be associated which
     /// represents the minimum value inside the UberState. For instance, all Hand to Hand steps
-    /// have individual custom identifier, even though Hand to Hand progress is stored in a single
+    /// have individual custom identifiers, even though Hand to Hand progress is stored in a single
     /// UberState. The value represents the current step of Hand to Hand.
     pub value: Option<i32>,
 }
@@ -184,17 +184,9 @@ impl Display for UberStateValue {
 }
 
 impl UberStateData {
-    /// Parse from a [`Read`] implementation, such as a file or byte slice
-    ///
-    /// Information from `loc_data` and `state_data` will be included
-    pub fn from_reader<R: Read>(
-        reader: R,
-        loc_data: &LocData,
-        state_data: &StateData,
-    ) -> serde_json::Result<Self> {
+    pub fn from_parts(dump: UberStateDump, loc_data: &LocData, state_data: &StateData) -> Self {
         let mut uber_state_data = Self::default();
 
-        let dump: Dump = serde_json::from_reader(reader)?;
         for (group, dump_group) in dump.groups {
             let group_map = uber_state_data
                 .name_lookup
@@ -213,12 +205,14 @@ impl UberStateData {
                     });
 
                 let default_value = match dump_member.value_type {
-                    ValueType::Boolean => UberStateValue::Boolean(dump_member.value != 0.),
-                    ValueType::Byte | ValueType::Integer => {
+                    UberStateDumpValueType::Boolean => {
+                        UberStateValue::Boolean(dump_member.value != 0.)
+                    }
+                    UberStateDumpValueType::Byte | UberStateDumpValueType::Integer => {
                         UberStateValue::Integer(dump_member.value as i32)
                     }
-                    ValueType::Float => UberStateValue::Float(dump_member.value),
-                    ValueType::Unknown => continue,
+                    UberStateDumpValueType::Float => UberStateValue::Float(dump_member.value),
+                    UberStateDumpValueType::Unknown => continue,
                 };
 
                 uber_state_data.id_lookup.insert(
@@ -249,7 +243,7 @@ impl UberStateData {
             );
         }
 
-        Ok(uber_state_data)
+        uber_state_data
     }
 
     fn add_rando_name(
@@ -274,30 +268,47 @@ impl UberStateData {
     }
 }
 
-#[derive(Deserialize)]
-struct Dump {
-    groups: FxHashMap<i32, DumpGroup>,
+#[derive(Serialize, Deserialize)]
+pub struct UberStateDump {
+    #[serde(serialize_with = "serialize_sorted_map")]
+    pub groups: FxHashMap<i32, UberStateDumpGroup>,
 }
 
-#[derive(Deserialize)]
-struct DumpGroup {
-    name: String,
-    states: FxHashMap<i32, DumpMember>,
+#[derive(Serialize, Deserialize)]
+pub struct UberStateDumpGroup {
+    pub name: String,
+    #[serde(serialize_with = "serialize_sorted_map")]
+    pub states: FxHashMap<i32, UberStateDumpMember>,
 }
 
-#[derive(Deserialize)]
-struct DumpMember {
-    name: String,
-    readonly: bool,
-    value: f32,
-    value_type: ValueType,
+#[derive(Serialize, Deserialize)]
+pub struct UberStateDumpMember {
+    pub name: String,
+    pub readonly: bool,
+    #[serde(rename = "type")]
+    pub uber_state_type: String,
+    pub value: f32,
+    pub value_type: UberStateDumpValueType,
 }
 
-#[derive(Deserialize)]
-enum ValueType {
+#[derive(Serialize, Deserialize)]
+pub enum UberStateDumpValueType {
     Boolean,
     Byte,
     Integer,
     Float,
     Unknown,
+}
+
+fn serialize_sorted_map<K, V, S>(t: &FxHashMap<K, V>, ser: S) -> Result<S::Ok, S::Error>
+where
+    K: Hash + Eq + Ord + Serialize,
+    V: Serialize,
+    S: Serializer,
+{
+    let mut map = t.into_iter().collect::<IndexMap<_, _, FxBuildHasher>>();
+
+    map.sort_unstable_keys();
+
+    map.serialize(ser)
 }

@@ -30,7 +30,10 @@ pub use state_data::{StateData, StateDataEntry};
 #[cfg(feature = "uber_state_data")]
 mod uber_state_data;
 #[cfg(feature = "uber_state_data")]
-pub use uber_state_data::{UberStateAlias, UberStateData, UberStateDataEntry, UberStateValue};
+pub use uber_state_data::{
+    UberStateAlias, UberStateData, UberStateDataEntry, UberStateDump, UberStateDumpGroup,
+    UberStateDumpMember, UberStateDumpValueType, UberStateValue,
+};
 #[cfg(feature = "snippet_access")]
 mod snippet_access;
 #[cfg(feature = "snippet_access")]

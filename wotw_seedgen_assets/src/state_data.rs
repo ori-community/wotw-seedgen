@@ -60,6 +60,9 @@ impl PartialEq for StateDataEntry {
 
 impl StateData {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
+    ///
+    /// Note that the underlying CSV reader is buffered automatically, so you should not
+    /// wrap `reader` in a buffered reader like `io::BufReader`.
     pub fn from_reader<R: Read>(reader: R) -> Result<Self, String> {
         let entries = csv::ReaderBuilder::new()
             .trim(csv::Trim::All)

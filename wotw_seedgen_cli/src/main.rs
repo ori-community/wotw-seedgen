@@ -6,6 +6,7 @@ mod plando;
 mod preset;
 mod regenerate;
 mod seed;
+mod sort_uber_states;
 #[cfg(feature = "stats")]
 mod stats;
 
@@ -17,6 +18,7 @@ use plando::plando;
 use preset::{universe_preset, world_preset};
 use regenerate::regenerate;
 use seed::seed;
+use sort_uber_states::sort_uber_states;
 #[cfg(feature = "stats")]
 use stats::stats;
 use std::{
@@ -40,6 +42,7 @@ fn main() -> Result<(), Error> {
         #[cfg(feature = "stats")]
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
+        Cli::SortUberStates => sort_uber_states(),
         Cli::Daemon { args } => daemon(args),
         #[cfg(feature = "lsp")]
         Cli::Lsp => {

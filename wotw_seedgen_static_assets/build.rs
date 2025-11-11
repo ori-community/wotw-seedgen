@@ -31,13 +31,12 @@ fn main() {
     {
         println!("cargo::rerun-if-changed=../assets/uber_state_dump.json");
 
-        #[allow(unused_mut)]
-        let mut uber_state_data = wotw_seedgen_assets::UberStateData::from_reader(
-            include_bytes!("../assets/uber_state_dump.json").as_slice(),
-            &loc_data,
-            &state_data,
-        )
-        .unwrap();
+        let dump =
+            serde_json::from_slice(include_bytes!("../assets/uber_state_dump.json").as_slice())
+                .unwrap();
+
+        let uber_state_data =
+            wotw_seedgen_assets::UberStateData::from_parts(dump, &loc_data, &state_data);
 
         write("uber_state_data", &uber_state_data);
     }
@@ -118,10 +117,12 @@ fn main() {
                     if name.extension()? != "json" {
                         return None;
                     }
+
                     let preset: T =
                         serde_json::from_reader(BufReader::new(File::open(entry.path()).unwrap()))
                             .unwrap();
                     let identifier = name.file_stem()?.to_string_lossy().to_string();
+
                     Some((identifier, preset))
                 })
                 .collect::<Result<FxHashMap<_, _>, _>>()

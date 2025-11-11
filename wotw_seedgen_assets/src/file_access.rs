@@ -4,8 +4,10 @@ use crate::Source;
 #[cfg(feature = "state_data")]
 use crate::StateData;
 #[cfg(feature = "uber_state_data")]
-use crate::UberStateData;
+use crate::{UberStateData, UberStateDump};
 use itertools::Itertools;
+#[cfg(feature = "uber_state_data")]
+use std::io::BufReader;
 #[cfg(feature = "snippet_access")]
 use std::io::Read;
 use std::{
@@ -51,17 +53,23 @@ impl FileAccess {
     }
 
     #[cfg(feature = "uber_state_data")]
+    pub fn uber_state_dump(&self) -> Result<UberStateDump, String> {
+        let (path, file) = self.open(Path::new("uber_state_dump.json"))?;
+
+        serde_json::from_reader(BufReader::new(file)).map_err(|err| file_err("parse", &path, err))
+    }
+
+    #[cfg(feature = "uber_state_data")]
     pub fn uber_state_data(
         &self,
         loc_data: &LocData,
         state_data: &StateData,
     ) -> Result<UberStateData, String> {
-        // TODO rename uber_state_dump -> uber_state_data
-        let (path, file) = self.open(Path::new("uber_state_dump.json"))?;
+        let dump = self.uber_state_dump()?;
 
-        UberStateData::from_reader(file, loc_data, state_data)
-            .map_err(|err| file_err("parse", &path, err))
+        Ok(UberStateData::from_parts(dump, loc_data, state_data))
     }
+
     pub fn areas(&self) -> Result<Source, String> {
         let (path, content) = self.read_to_string(Path::new("areas.wotw"))?;
 
