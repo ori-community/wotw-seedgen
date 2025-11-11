@@ -1,0 +1,80 @@
+#hidden
+#name("Skill Velocity Core")
+#description("Adds support for toggleable Skill Velocity")
+
+!state(enabled, Boolean)
+!state(collected, Integer)
+
+!include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
+
+!augment_fun(any_collected, if collected > 0 set_boolean("any_collected", true))
+!augment_fun(any_enabled, if enabled set_boolean("any_enabled", true))
+!augment_fun(enable_all, if enabled == false enable())
+!augment_fun(disable_all, if enabled disable())
+
+!builtin_icon(skill_velocity_icon, "assets/icons/bonus/skillvelocity.png")
+
+fun skill_velocity() {
+    item_message("#Skill Velocity x" + (collected + 1) + "#")
+    store(collected, collected + 1)
+}
+!export(skill_velocity)
+
+!item_data(skill_velocity(),
+    "#Skill Velocity#",
+    200,
+    "Move faster when using abilities such as Dash and Bash",
+    skill_velocity_icon,
+    BonusItem
+)
+
+fun enable() {
+    store(enabled, true)
+    set_wheel_item_disable()
+    update_bonus_wheel()
+    store(randoUpgrades.launchSpeed, collected * 0.16)
+    store(randoUpgrades.dashDistance, collected * 0.16)
+    store(randoUpgrades.bashSpeed, collected * 0.16)
+    store(randoUpgrades.burrowDashSpeed, collected * 0.16)
+    store(randoUpgrades.waterDashSpeed, collected * 0.16)
+    store(randoUpgrades.grappleSpeed, collected * 0.16)
+}
+fun disable() {
+    store(enabled, false)
+    set_wheel_item_enable()
+    update_bonus_wheel()
+    store(randoUpgrades.launchSpeed, 0)
+    store(randoUpgrades.dashDistance, 0)
+    store(randoUpgrades.bashSpeed, 0)
+    store(randoUpgrades.burrowDashSpeed, 0)
+    store(randoUpgrades.waterDashSpeed, 0)
+    store(randoUpgrades.grappleSpeed, 0)
+}
+
+on reload {
+    if collected > 0 {
+        create_wheel_item()
+    }
+}
+on collected == 1 create_wheel_item()
+
+fun create_wheel_item() {
+    set_wheel_item_name("bonus_upgrade", Top, "Toggle Skill Velocity")
+    set_wheel_item_icon("bonus_upgrade", Top, skill_velocity_icon)
+    if enabled {
+        set_wheel_item_disable()
+    }
+    if enabled == false {
+        set_wheel_item_enable()
+    }
+}
+fun set_wheel_item_disable() {
+    set_wheel_item_description("bonus_upgrade", Top, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", Top, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", Top, All, disable())
+}
+fun set_wheel_item_enable() {
+    set_wheel_item_description("bonus_upgrade", Top, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", Top, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", Top, All, enable())
+}

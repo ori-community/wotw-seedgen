@@ -1,0 +1,74 @@
+#hidden
+#name("Jumpgrade Core")
+#description("Adds support for toggleable Jumpgrades")
+
+!state(enabled, Boolean)
+!state(collected, Integer)
+
+!include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
+
+!augment_fun(any_collected, if collected > 0 set_boolean("any_collected", true))
+!augment_fun(any_enabled, if enabled set_boolean("any_enabled", true))
+!augment_fun(enable_all, if enabled == false enable())
+!augment_fun(disable_all, if enabled disable())
+
+!builtin_icon(jumpgrade_icon, "assets/icons/bonus/jumpgrade.png")
+
+fun jumpgrade() {
+    item_message("#Jumpgrade x" + (collected + 1) + "#")
+    store(collected, collected + 1)
+}
+!export(jumpgrade)
+
+!item_data(jumpgrade(),
+    "#Jumpgrade#",
+    200,
+    "Jump higher",
+    jumpgrade_icon,
+    BonusItem
+)
+
+fun enable() {
+    store(enabled, true)
+    set_wheel_item_disable()
+    update_bonus_wheel()
+    store(randoUpgrades.jumpHeight, 1 + collected * 0.33)
+    store(randoUpgrades.wallJumpStrength, 1 + collected * 0.15)
+    store(randoUpgrades.doubleJumpStrength, 1 + collected * 0.15)
+}
+fun disable() {
+    store(enabled, false)
+    set_wheel_item_enable()
+    update_bonus_wheel()
+    store(randoUpgrades.jumpHeight, 0)
+    store(randoUpgrades.wallJumpStrength, 0)
+    store(randoUpgrades.doubleJumpStrength, 0)
+}
+
+on reload {
+    if collected > 0 {
+        create_wheel_item()
+    }
+}
+on collected == 1 create_wheel_item()
+
+fun create_wheel_item() {
+    set_wheel_item_name("bonus_upgrade", TopRight, "Toggle Jumpgrades")
+    set_wheel_item_icon("bonus_upgrade", TopRight, jumpgrade_icon)
+    if enabled {
+        set_wheel_item_disable()
+    }
+    if enabled == false {
+        set_wheel_item_enable()
+    }
+}
+fun set_wheel_item_disable() {
+    set_wheel_item_description("bonus_upgrade", TopRight, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrade", TopRight, 255, 255, 255, 255)
+    set_wheel_item_action("bonus_upgrade", TopRight, All, disable())
+}
+fun set_wheel_item_enable() {
+    set_wheel_item_description("bonus_upgrade", TopRight, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrade", TopRight, 128, 128, 128, 196)
+    set_wheel_item_action("bonus_upgrade", TopRight, All, enable())
+}
