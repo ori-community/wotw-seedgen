@@ -29,7 +29,7 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Include(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::BundleIcon(_, command) => {
+            ast::Command::IncludeIcon(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::BuiltinIcon(_, command) => {
@@ -68,10 +68,10 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Repeat(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Add(_, command) => {
+            ast::Command::AddItem(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Remove(_, command) => {
+            ast::Command::RemoveItem(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::ItemData(_, command) => {
@@ -182,7 +182,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::BundleIconArgs<'source> {
+impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
@@ -563,7 +563,7 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::AddArgs<'source> {
+impl<'source> Compile<'source> for ast::AddItemArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
@@ -571,7 +571,7 @@ impl<'source> Compile<'source> for ast::AddArgs<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::RemoveArgs<'source> {
+impl<'source> Compile<'source> for ast::RemoveItemArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {

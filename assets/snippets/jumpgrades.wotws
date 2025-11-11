@@ -21,7 +21,7 @@ fun jumpgrade() {
     store(collected, collected + 1)
 }
 
-!add(jumpgrade(), count)
+!add_item(jumpgrade(), count)
 !item_data(jumpgrade(),
     "#Jumpgrade#",
     200,

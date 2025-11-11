@@ -2,14 +2,14 @@ use std::{mem, ops::Range};
 use tower_lsp::lsp_types::{SemanticToken, SemanticTokenType, SemanticTokensLegend};
 use wotw_seedgen_seed_language::{
     ast::{
-        Action, ActionCondition, AddArgs, Annotation, AugmentFunArgs, BuiltinIconArgs,
-        BundleIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat,
-        ConfigArgs, ConfigType, Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event,
-        ExportArgs, Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs,
+        Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs, BuiltinIconArgs,
+        ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
+        Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event, ExportArgs, Expression,
+        ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs,
         ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs,
         ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Once, Operation,
         PreplaceArgs, Punctuated, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs,
-        RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveArgs, RemoveLocationArgs, Result,
+        RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveItemArgs, RemoveLocationArgs, Result,
         Separated, SeparatedNonEmpty, SetConfigArgs, SetLogicStateArgs, Snippet, Span, Spanned,
         SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
         UberStateType, ZoneOfArgs,
@@ -338,7 +338,7 @@ impl Tokens for Command<'_> {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
-            Command::BundleIcon(keyword, args) => {
+            Command::IncludeIcon(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
@@ -390,11 +390,11 @@ impl Tokens for Command<'_> {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
-            Command::Add(keyword, args) => {
+            Command::AddItem(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
-            Command::Remove(keyword, args) => {
+            Command::RemoveItem(keyword, args) => {
                 builder.push_token(keyword.span, TokenType::Macro);
                 args.tokens(builder);
             }
@@ -479,7 +479,7 @@ impl Tokens for IncludeArgs<'_> {
     }
 }
 
-impl Tokens for BundleIconArgs<'_> {
+impl Tokens for IncludeIconArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         builder.push_token(self.identifier.span, TokenType::Variable);
         self.path.tokens(builder);
@@ -587,13 +587,13 @@ impl Tokens for CommandRepeat<'_> {
     }
 }
 
-impl Tokens for AddArgs<'_> {
+impl Tokens for AddItemArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }
 }
 
-impl Tokens for RemoveArgs<'_> {
+impl Tokens for RemoveItemArgs<'_> {
     fn tokens(self, builder: &mut TokenBuilder) {
         self.0.tokens(builder);
     }

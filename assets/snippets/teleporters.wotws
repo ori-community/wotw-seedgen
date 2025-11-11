@@ -23,21 +23,21 @@
 !config(willow, "Willow Teleporter", Boolean, true)
 !config(shriek, "Shriek Teleporter", Boolean, false)
 
-!if marsh { !add(teleporter(Marsh), 1) }
-!if howls_den { !add(teleporter(Den), 1) }
-!if hollow { !add(teleporter(Hollow), 1) }
-!if glades { !add(teleporter(Glades), 1) }
-!if wellspring { !add(teleporter(Wellspring), 1) }
-!if burrows { !add(teleporter(Burrows), 1) }
-!if woods_entrance { !add(teleporter(WoodsEntrance), 1) }
-!if woods_exit { !add(teleporter(WoodsExit), 1) }
-!if reach { !add(teleporter(Reach), 1) }
-!if depths { !add(teleporter(Depths), 1) }
-!if central_pools { !add(teleporter(CentralPools), 1) }
-!if pools_boss { !add(teleporter(PoolsBoss), 1) }
-!if feeding_grounds { !add(teleporter(FeedingGrounds), 1) }
-!if central_wastes { !add(teleporter(CentralWastes), 1) }
-!if outer_ruins { !add(teleporter(OuterRuins), 1) }
-!if inner_ruins { !add(teleporter(InnerRuins), 1) }
-!if willow { !add(teleporter(Willow), 1) }
-!if shriek { !add(teleporter(Shriek), 1) }
+!if marsh { !add_item(teleporter(Marsh), 1) }
+!if howls_den { !add_item(teleporter(Den), 1) }
+!if hollow { !add_item(teleporter(Hollow), 1) }
+!if glades { !add_item(teleporter(Glades), 1) }
+!if wellspring { !add_item(teleporter(Wellspring), 1) }
+!if burrows { !add_item(teleporter(Burrows), 1) }
+!if woods_entrance { !add_item(teleporter(WoodsEntrance), 1) }
+!if woods_exit { !add_item(teleporter(WoodsExit), 1) }
+!if reach { !add_item(teleporter(Reach), 1) }
+!if depths { !add_item(teleporter(Depths), 1) }
+!if central_pools { !add_item(teleporter(CentralPools), 1) }
+!if pools_boss { !add_item(teleporter(PoolsBoss), 1) }
+!if feeding_grounds { !add_item(teleporter(FeedingGrounds), 1) }
+!if central_wastes { !add_item(teleporter(CentralWastes), 1) }
+!if outer_ruins { !add_item(teleporter(OuterRuins), 1) }
+!if inner_ruins { !add_item(teleporter(InnerRuins), 1) }
+!if willow { !add_item(teleporter(Willow), 1) }
+!if shriek { !add_item(teleporter(Shriek), 1) }

@@ -11,13 +11,13 @@ use wotw_seedgen_assets::{
 };
 use wotw_seedgen_seed_language::{
     ast::{
-        Action, ActionCondition, AddArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
+        Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
         ClientEvent, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
         ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
         ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs,
         ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
         LetArgs, Literal, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-        RandomNumberArgs, RandomPoolArgs, RemoveArgs, RemoveLocationArgs, Result,
+        RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, Result,
         SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger,
         TriggerBinding, UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType,
         ZoneOfArgs,
@@ -815,7 +815,7 @@ impl CompletionAfterSpanCheck for Command<'_> {
         // TODO need more recoveries inside commands for useful completions
         match self {
             Command::Include(_, _) => None, // TODO completions for files available in the workspace and identifiers contained in imported snippets
-            Command::BundleIcon(_, _) | Command::BuiltinIcon(_, _) => None, // TODO identifier and icon path completions
+            Command::IncludeIcon(_, _) | Command::BuiltinIcon(_, _) => None, // TODO identifier and icon path completions
             Command::AugmentFun(_, args) => args.completion(index),
             Command::Export(_, _) => None, // TODO identifier completions
             Command::Spawn(_, args) => args.completion(index),
@@ -827,8 +827,8 @@ impl CompletionAfterSpanCheck for Command<'_> {
             Command::Let(_, args) => args.completion(index),
             Command::If(_, args) => args.completion(index),
             Command::Repeat(_, args) => args.completion(index),
-            Command::Add(_, args) => args.completion(index),
-            Command::Remove(_, args) => args.completion(index),
+            Command::AddItem(_, args) => args.completion(index),
+            Command::RemoveItem(_, args) => args.completion(index),
             Command::ItemData(_, args) => args.completion(index),
             Command::ItemDataName(_, args) => args.completion(index),
             Command::ItemDataPrice(_, args) => args.completion(index),
@@ -1007,25 +1007,25 @@ impl ErrCompletion for CommandRepeat<'_> {
     }
 }
 
-impl CompletionAfterSpanCheck for AddArgs<'_> {
+impl CompletionAfterSpanCheck for AddItemArgs<'_> {
     fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
         self.0.completion(index)
     }
 }
 
-impl ErrCompletion for AddArgs<'_> {
+impl ErrCompletion for AddItemArgs<'_> {
     fn err_completion(err: &Error) -> Vec<CompletionItem> {
         ChangeItemPoolArgs::err_completion(err)
     }
 }
 
-impl CompletionAfterSpanCheck for RemoveArgs<'_> {
+impl CompletionAfterSpanCheck for RemoveItemArgs<'_> {
     fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
         self.0.completion(index)
     }
 }
 
-impl ErrCompletion for RemoveArgs<'_> {
+impl ErrCompletion for RemoveItemArgs<'_> {
     fn err_completion(err: &Error) -> Vec<CompletionItem> {
         ChangeItemPoolArgs::err_completion(err)
     }

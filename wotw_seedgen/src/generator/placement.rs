@@ -801,7 +801,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         world.traverse_spawn(&output.events);
 
-        // TODO how should !add(spirit_light(100)) behave?
+        // TODO how should !add_item(spirit_light(100)) behave?
         let spirit_light_provider = SpiritLightProvider::new(TOTAL_SPIRIT_LIGHT, &mut rng);
 
         let mut world_context = Self {

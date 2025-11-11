@@ -420,7 +420,7 @@ pub struct UberIdentifierName<'source> {
 pub enum Command<'source> {
     // TODO have include be able to change the default config?
     Include(Spanned<Include>, CommandArgs<IncludeArgs<'source>>),
-    BundleIcon(Spanned<BundleIcon>, CommandArgs<BundleIconArgs<'source>>),
+    IncludeIcon(Spanned<IncludeIcon>, CommandArgs<IncludeIconArgs<'source>>),
     BuiltinIcon(Spanned<BuiltinIcon>, CommandArgs<BuiltinIconArgs<'source>>),
     AugmentFun(Spanned<AugmentFun>, CommandArgs<AugmentFunArgs<'source>>),
     Export(Spanned<Export>, CommandArgs<ExportArgs<'source>>),
@@ -436,8 +436,8 @@ pub enum Command<'source> {
     Let(Spanned<Let>, CommandArgs<LetArgs<'source>>),
     If(Spanned<If>, CommandIf<'source>),
     Repeat(Spanned<Repeat>, CommandRepeat<'source>),
-    Add(Spanned<Add>, CommandArgs<AddArgs<'source>>),
-    Remove(Spanned<Remove>, CommandArgs<RemoveArgs<'source>>),
+    AddItem(Spanned<AddItem>, CommandArgs<AddItemArgs<'source>>),
+    RemoveItem(Spanned<RemoveItem>, CommandArgs<RemoveItemArgs<'source>>),
     ItemData(Spanned<ItemData>, CommandArgs<ItemDataArgs<'source>>),
     ItemDataName(
         Spanned<ItemDataName>,
@@ -503,10 +503,10 @@ pub type IncludeArgsImports<'source> =
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct BundleIcon;
+pub struct IncludeIcon;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct BundleIconArgs<'source> {
+pub struct IncludeIconArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub path: CommandArg<Spanned<&'source str>>,
 }
@@ -641,17 +641,17 @@ pub struct CommandRepeat<'source> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct Add;
+pub struct AddItem;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct AddArgs<'source>(pub ChangeItemPoolArgs<'source>);
+pub struct AddItemArgs<'source>(pub ChangeItemPoolArgs<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct Remove;
+pub struct RemoveItem;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct RemoveArgs<'source>(pub ChangeItemPoolArgs<'source>);
+pub struct RemoveItemArgs<'source>(pub ChangeItemPoolArgs<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ChangeItemPoolArgs<'source> {

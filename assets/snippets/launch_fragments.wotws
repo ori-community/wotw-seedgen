@@ -21,9 +21,9 @@ fun launch_fragment() {
     launch_fragment_icon,
     LaunchFragment
 )
-!add(launch_fragment(), total)
+!add_item(launch_fragment(), total)
 
-!remove(skill(Launch), 1)
+!remove_item(skill(Launch), 1)
 on collected == required skill(Launch)
 // TODO how do logical launch later
 fun display() {

@@ -21,7 +21,7 @@ fun skill_velocity() {
     store(collected, collected + 1)
 }
 
-!add(skill_velocity(), count)
+!add_item(skill_velocity(), count)
 !item_data(skill_velocity(),
     "#Skill Velocity#",
     200,

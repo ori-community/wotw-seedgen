@@ -18,4 +18,4 @@ on spawn {
     store(MarshPastOpher.EyestoneDoor, true)
 }
 
-!remove(keystone(), 34)
+!remove_item(keystone(), 34)
