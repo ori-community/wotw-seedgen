@@ -9,3 +9,4 @@ The changelog starts with version 1, which will release together with the random
 - `vanilla_opher_upgrades`, `bonus_opher_upgrades`, `open_mode` and `util_twillen` are removed
 - `better_stomp`, `fragment_overflow`, `teleport_refill` and `shriek_escape_health_bar` are merged into `better_mechanics`
 - `quest_autoadvance` is merged into `no_cutscenes`
+- `no_rain` is split into `no_rain` and `no_howl`

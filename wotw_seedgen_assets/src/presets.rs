@@ -427,17 +427,23 @@ impl WorldPresetSettings {
     }
 
     fn check_compability_0_to_1(&mut self) -> Result<(), String> {
-        for snippet in self.snippets.iter_mut().flatten() {
-            match &snippet[..] {
-                "util_twillen" => return err_removed("util_twillen"),
-                "vanilla_opher_upgrades" => return err_removed("vanilla_opher_upgrades"),
-                "bonus_opher_upgrades" => return err_removed("bonus_opher_upgrades"),
-                "open_mode" => return err_removed("open_mode"),
-                "autoplants" => *snippet = "no_cutscenes".to_string(),
-                "better_stomp" | "fragment_overflow" | "tp_refill" | "shriek_escape_health_bar" => {
-                    *snippet = "better_mechanics".to_string()
+        if let Some(snippets) = &mut self.snippets {
+            for index in 0..snippets.len() {
+                let snippet = &mut snippets[index];
+
+                match snippet.as_str() {
+                    "util_twillen"
+                    | "vanilla_opher_upgrades"
+                    | "bonus_opher_upgrades"
+                    | "open_mode" => return err_removed(snippet),
+                    "autoplants" => *snippet = "no_cutscenes".to_string(),
+                    "better_stomp"
+                    | "fragment_overflow"
+                    | "tp_refill"
+                    | "shriek_escape_health_bar" => *snippet = "better_mechanics".to_string(),
+                    "no_rain" => snippets.push("no_howl".to_string()),
+                    _ => {}
                 }
-                _ => {}
             }
         }
 
