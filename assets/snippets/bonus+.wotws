@@ -18,7 +18,8 @@
     sentry_fire_rate_upgrade,
     extra_shuriken,
     splinter_shuriken,
-    bashable_shuriken
+    bashable_shuriken,
+    ultra_flap
 )
 !include("rapid_hammer_core", rapid_hammer)
 !include("rapid_sword_core", rapid_sword)
@@ -43,6 +44,7 @@
 !config(extra_shurikens, "How many Extra Shurikens to shuffle in", Integer, 1)
 !config(splinter_shurikens, "How many Splinter Shurikens to shuffle in", Integer, 2)
 !config(bashable_shurikens, "How many Bashable Shurikens to shuffle in", Integer, 1)
+!config(ultra_flaps, "How many Ultra Flaps to shuffle in", Integer, 5)
 
 !add_item(rapid_hammer(), rapid_hammers)
 !add_item(rapid_sword(), rapid_swords)
@@ -62,3 +64,4 @@
 !add_item(extra_shuriken(), extra_shurikens)
 !add_item(splinter_shuriken(), splinter_shurikens)
 !add_item(bashable_shuriken(), bashable_shurikens)
+!add_item(ultra_flap(), ultra_flaps)

@@ -31,6 +31,7 @@
 !builtin_icon(extra_shuriken_icon, "assets/icons/bonus/extrashuriken.png")
 !builtin_icon(splinter_shuriken_icon, "assets/icons/bonus/splintershuriken.png")
 !builtin_icon(bashable_shuriken_icon, "assets/icons/bonus/bashableshuriken.png")
+!builtin_icon(ultra_flap_icon, "assets/icons/bonus/ultraflap.png")
 
 !state(health_per_second, Float)
 !export(health_per_second)
@@ -457,3 +458,16 @@ fun bashable_shuriken() {
     BonusItem
 )
 !export(bashable_shuriken)
+
+fun ultra_flap() {
+    store(randoUpgrades.flapDamage, randoUpgrades.flapDamage + 4)
+}
+!item_data(
+    ultra_flap(),
+    "#Ultra Flap#",
+    200,
+    skill_string(Flap) + " deals damage. Stackable.",
+    ultra_flap_icon,
+    BonusItem
+)
+!export(ultra_flap)
