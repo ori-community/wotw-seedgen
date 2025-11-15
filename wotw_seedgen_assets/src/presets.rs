@@ -1,5 +1,6 @@
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use std::iter;
 use wotw_seedgen_settings::{
     Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
@@ -11,17 +12,15 @@ use wotw_seedgen_settings::{
 pub const CURRENT_ASSETS_VERSION: u8 = 1;
 
 /// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
+#[skip_serializing_none]
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PresetInfo {
     /// Display name
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// Extended description
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     /// Where to present the preset
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<PresetGroup>,
 }
 
@@ -66,6 +65,7 @@ pub enum PresetGroup {
 /// ```
 ///
 /// [`UniverseSettings`]: wotw_seedgen_settings::UniverseSettings
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UniversePreset {
@@ -73,7 +73,6 @@ pub struct UniversePreset {
     #[serde(default)]
     pub assets_version: u8,
     /// User-targetted information about the preset
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
     /// Settings to apply
     #[serde(flatten)]
@@ -129,6 +128,7 @@ impl UniversePreset {
 /// Settings to apply to [`UniverseSettings`]
 ///
 /// Mostly used inside a [`UniversePreset`] which offers compability features
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UniversePresetSettings {
@@ -137,13 +137,10 @@ pub struct UniversePresetSettings {
     /// A [`PresetAccess::universe_preset`] implementation may be used to resolve the identifiers
     ///
     /// [`PresetAccess::universe_preset`]: crate::PresetAccess::universe_preset
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<FxHashSet<String>>,
     /// The seed that determines all randomness
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub seed: Option<String>,
     /// The individual settings for each world of the seed
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub world_settings: Option<Vec<WorldPresetSettings>>,
 }
 
@@ -272,6 +269,7 @@ fn include_universe_preset<A: PresetAccess>(
 /// ```
 ///
 /// [`WorldSettings`]: wotw_seedgen_settings::WorldSettings
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WorldPreset {
@@ -279,7 +277,6 @@ pub struct WorldPreset {
     #[serde(default)]
     pub assets_version: u8,
     /// User-targetted information about the preset
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub info: Option<PresetInfo>,
     /// Settings to apply
     #[serde(flatten)]
@@ -325,6 +322,7 @@ impl WorldPreset {
 /// Settings to apply to [`WorldSettings`]
 ///
 /// Mostly used inside a [`WorldPreset`] which offers compability features
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 // TODO replace hashsets with vecs?
@@ -332,28 +330,20 @@ pub struct WorldPresetSettings {
     /// Names of further [`WorldPreset`]s to use
     ///
     /// A [`PresetAccess::world_preset`] implementation may be used to resolve the identifiers
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub includes: Option<FxHashSet<String>>,
     /// Spawn location
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub spawn: Option<Spawn>,
     /// Logically expected difficulty
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub difficulty: Option<Difficulty>,
     /// Logically expected tricks
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub tricks: Option<FxHashSet<Trick>>,
     /// Logically assume hard in-game difficulty
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub hard: Option<bool>,
     /// Randomize door connections with the given max loop size
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub randomize_doors: Option<GreaterOneU8>,
     /// Names of snippets to use
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub snippets: Option<Vec<String>>,
     /// Configuration to pass to snippets
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub snippet_config: Option<FxHashMap<String, FxHashMap<String, String>>>,
 }
 

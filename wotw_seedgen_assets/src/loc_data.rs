@@ -7,8 +7,8 @@
 //! use wotw_seedgen_assets::data::{UberIdentifier, Position, Zone};
 //!
 //! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberId, UberStateValue, X, Y, MapX, MapY
-//! MarshSpawn.RockHC, Inkwater Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, , -958.6, -4313.2, -958.6199, -4312.245
-//! GladesTown.MotayHutEX, Wellspring Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, , -172.7, -4583.2, -392.8, -4130.6";
+//! MarshSpawn.RockHC, Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, , -958.6, -4313.2, -958.6199, -4312.245
+//! GladesTown.MotayHutEX, Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, , -172.7, -4583.2, -392.8, -4130.6";
 //! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
 //!
 //! assert_eq!(loc_data.entries, vec![
@@ -32,6 +32,7 @@
 //! ```
 
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 use std::io::Read;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
 
@@ -112,11 +113,12 @@ impl LocData {
     }
 }
 
+#[serde_as]
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct LocDataInput<'a> {
     node_identifier: String,
-    #[serde(with = "LocDataZone")]
+    #[serde_as(as = "DisplayFromStr")]
     zone: Zone,
     // TODO this might be cool to have
     _pickup_type: &'a str,
@@ -130,37 +132,4 @@ struct LocDataInput<'a> {
     y: Option<f32>,
     map_x: Option<f32>,
     map_y: Option<f32>,
-}
-
-#[derive(Deserialize)]
-#[serde(remote = "Zone")]
-enum LocDataZone {
-    #[serde(rename = "Inkwater Marsh")]
-    Marsh,
-    #[serde(rename = "Kwoloks Hollow")]
-    Hollow,
-    #[serde(rename = "Wellspring Glades")]
-    Glades,
-    #[serde(rename = "The Wellspring")]
-    Wellspring,
-    #[serde(rename = "Silent Woods")]
-    Woods,
-    #[serde(rename = "Baurs Reach")]
-    Reach,
-    #[serde(rename = "Mouldwood Depths")]
-    Depths,
-    #[serde(rename = "Luma Pools")]
-    Pools,
-    #[serde(rename = "Windswept Wastes")]
-    Wastes,
-    #[serde(rename = "Windtorn Ruins")]
-    Ruins,
-    #[serde(rename = "Willows End")]
-    Willow,
-    #[serde(rename = "Midnight Burrows")]
-    Burrows,
-    #[serde(rename = "Shop")]
-    Shop,
-    #[serde(rename = "Void")]
-    Void,
 }
