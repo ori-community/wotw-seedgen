@@ -6,9 +6,9 @@
 //! use wotw_seedgen_assets::{LocData, LocDataEntry};
 //! use wotw_seedgen_assets::data::{UberIdentifier, Position, Zone};
 //!
-//! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroupName, UberGroup, UberIdName, UberId, UberStateValue, X, Y, MapX, MapY
-//! MarshSpawn.RockHC, Marsh, Resource, Life, swampStateGroup, 21786, healthContainerA, 60210, , -958.6, -4313.2, -958.6199, -4312.245
-//! GladesTown.MotayHutEX, Glades, SpiritLight, 100, hubUberStateGroup, 42178, hutCExpOrb, 57455, , -172.7, -4583.2, -392.8, -4130.6";
+//! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroup, UberId, UberStateValue, X, Y, MapX, MapY
+//! MarshSpawn.RockHC, Marsh, Resource, Life, 21786, 60210, , -958.6, -4313.2, -958.6199, -4312.245
+//! GladesTown.MotayHutEX, Glades, SpiritLight, 100, 42178, 57455, , -172.7, -4583.2, -392.8, -4130.6";
 //! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
 //!
 //! assert_eq!(loc_data.entries, vec![
@@ -123,9 +123,7 @@ struct LocDataInput<'a> {
     // TODO this might be cool to have
     _pickup_type: &'a str,
     _pickup_details: &'a str,
-    _uber_group_name: &'a str,
     uber_group: i32,
-    _uber_id_name: &'a str,
     uber_id: i32,
     uber_state_value: Option<i32>,
     x: Option<f32>,
