@@ -434,6 +434,7 @@ fun extra_shuriken() {
 
 fun splinter_shuriken() {
     store(randoUpgrades.shurikenMultishotCount, randoUpgrades.shurikenMultishotCount + 2)
+    item_message("#Splinter Shuriken x" + randoUpgrades.shurikenMultishotCount / 2 + "#")
 }
 !item_data(
     splinter_shuriken(),
@@ -453,7 +454,7 @@ fun bashable_shuriken() {
     bashable_shuriken(),
     "#Bashable Shuriken#",
     200,
-    "Bash off your Shuriken",
+    skill_string(Bash) + " off your " + skill_string(Shuriken),
     bashable_shuriken_icon,
     BonusItem
 )
@@ -461,6 +462,7 @@ fun bashable_shuriken() {
 
 fun ultra_flap() {
     store(randoUpgrades.flapDamage, randoUpgrades.flapDamage + 4)
+    item_message("#Ultra Flap x" + randoUpgrades.flapDamage / 4 + "#")
 }
 !item_data(
     ultra_flap(),
