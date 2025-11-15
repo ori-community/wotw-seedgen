@@ -268,20 +268,20 @@ impl UberStateData {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UberStateDump {
     #[serde(serialize_with = "serialize_sorted_map")]
     pub groups: FxHashMap<i32, UberStateDumpGroup>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UberStateDumpGroup {
     pub name: String,
     #[serde(serialize_with = "serialize_sorted_map")]
     pub states: FxHashMap<i32, UberStateDumpMember>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UberStateDumpMember {
     pub name: String,
     pub readonly: bool,
@@ -291,7 +291,7 @@ pub struct UberStateDumpMember {
     pub value_type: UberStateDumpValueType,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum UberStateDumpValueType {
     Boolean,
     Byte,

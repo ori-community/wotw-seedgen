@@ -67,8 +67,8 @@ pub enum Cli {
         #[command(flatten)]
         args: RegenerateArgs,
     },
-    /// Sort the UberState dump
-    SortUberStates,
+    /// Import an UberState dump
+    ImportUberStates,
     /// Start a daemon for reach checks
     Daemon {
         #[command(flatten)]

@@ -1,12 +1,12 @@
 mod cli;
 mod daemon;
 mod files;
+mod import_uber_states;
 mod log_config;
 mod plando;
 mod preset;
 mod regenerate;
 mod seed;
-mod sort_uber_states;
 #[cfg(feature = "stats")]
 mod stats;
 
@@ -14,11 +14,11 @@ use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
 use daemon::daemon;
+use import_uber_states::import_uber_states;
 use plando::plando;
 use preset::{universe_preset, world_preset};
 use regenerate::regenerate;
 use seed::seed;
-use sort_uber_states::sort_uber_states;
 #[cfg(feature = "stats")]
 use stats::stats;
 use std::{
@@ -42,7 +42,7 @@ fn main() -> Result<(), Error> {
         #[cfg(feature = "stats")]
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
-        Cli::SortUberStates => sort_uber_states(),
+        Cli::ImportUberStates => import_uber_states(),
         Cli::Daemon { args } => daemon(args),
         #[cfg(feature = "lsp")]
         Cli::Lsp => {
