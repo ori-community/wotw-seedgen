@@ -151,8 +151,8 @@ Flags: Bonus+
 !!mapicon 8|4|95|bool|true BonusItem
 
 // Ultra Flap
-!!add $PARAM(ultraFlap)x 8|4|48|float|+10
-!!name 8|4|48|float|+10 #Ultra Flap#
-!!description 8|4|48|float|+10 Flap deals damage. Stackable.
-!!icon 8|4|48|float|+10 file:assets/icons/bonus/ultraflap.png
-!!mapicon 8|4|48|float|+10 BonusItem
+!!add $PARAM(ultraFlap)x 8|4|96|float|+10
+!!name 8|4|96|float|+10 #Ultra Flap#
+!!description 8|4|96|float|+10 Flap deals damage. Stackable.
+!!icon 8|4|96|float|+10 file:assets/icons/bonus/ultraflap.png
+!!mapicon 8|4|96|float|+10 BonusItem
