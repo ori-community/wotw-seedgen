@@ -24,9 +24,24 @@ impl UberIdentifier {
         Self { group, member }
     }
 
-    /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
+    // /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
     pub const fn is_shop(self) -> bool {
-        matches!(self.group, 1 | 2 | 15)
+        !matches!(self.shop_kind(), ShopKind::None)
+    }
+
+    /// Returns what kind of shop, if any, this `UberIdentifier` corresponds to
+    pub const fn shop_kind(self) -> ShopKind {
+        match self {
+            Self {
+                group: 1 | 2 | 15, ..
+            } => ShopKind::Opherlike,
+            Self { group: 17, .. } => ShopKind::Grom,
+            Self {
+                group: 48248,
+                member: 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045,
+            } => ShopKind::Map,
+            _ => ShopKind::None,
+        }
     }
 
     /// Returns `true` if this `UberIdentifier` corresponds to a door connection state
@@ -55,6 +70,20 @@ impl Debug for UberIdentifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{self}")
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShopKind {
+    /// Not a shop
+    None,
+    /// A shop with multiple items that cost Spirit Light.
+    ///
+    /// This includes the Opher, Twillen and Glades Lupo shops.
+    Opherlike,
+    /// A purchasable map from Lupo
+    Map,
+    /// Grom's Gorlek Ore shop
+    Grom,
 }
 
 /// A helper type to represent common [`UberIdentifier`]s

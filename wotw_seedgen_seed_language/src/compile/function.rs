@@ -23,8 +23,8 @@ use std::{
 use strum::{Display, EnumString, VariantArray};
 use wotw_seedgen_assets::UberStateValue;
 use wotw_seedgen_data::{
-    Alignment, HorizontalAnchor, ScreenPosition, Shard, Skill, Teleporter, UberIdentifier,
-    VerticalAnchor, WeaponUpgrade, WheelBind,
+    Alignment, HorizontalAnchor, ScreenPosition, Shard, ShopKind, Skill, Teleporter,
+    UberIdentifier, VerticalAnchor, WeaponUpgrade, WheelBind,
 };
 use wotw_seedgen_parse::{Error, Punctuated, Span, SpanEnd, SpanStart, Symbol};
 
@@ -1172,7 +1172,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: warp_icon_id(&mut context)?,
             }),
             FunctionIdentifier::SetShopItemData => {
-                let uber_identifier = arg::<UberIdentifier>(&mut context)?;
+                let uber_identifier = ui_shop_identifier_arg(&mut context)?;
 
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
@@ -1196,32 +1196,32 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 })
             }
             FunctionIdentifier::SetShopItemPrice => Command::Void(CommandVoid::SetShopItemPrice {
-                uber_identifier: arg(&mut context)?,
+                uber_identifier: any_shop_identifier_arg(&mut context)?,
                 price: arg(&mut context)?,
             }),
             FunctionIdentifier::SetShopItemName => Command::Void(CommandVoid::SetShopItemName {
-                uber_identifier: arg(&mut context)?,
+                uber_identifier: ui_shop_identifier_arg(&mut context)?,
                 name: arg(&mut context)?,
             }),
             FunctionIdentifier::SetShopItemDescription => {
                 Command::Void(CommandVoid::SetShopItemDescription {
-                    uber_identifier: arg(&mut context)?,
+                    uber_identifier: ui_shop_identifier_arg(&mut context)?,
                     description: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetShopItemIcon => Command::Void(CommandVoid::SetShopItemIcon {
-                uber_identifier: arg(&mut context)?,
+                uber_identifier: ui_shop_identifier_arg(&mut context)?,
                 icon: arg(&mut context)?,
             }),
             FunctionIdentifier::SetShopItemHidden => {
                 Command::Void(CommandVoid::SetShopItemHidden {
-                    uber_identifier: arg(&mut context)?,
+                    uber_identifier: ui_shop_identifier_arg(&mut context)?,
                     hidden: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetShopItemLocked => {
                 Command::Void(CommandVoid::SetShopItemLocked {
-                    uber_identifier: arg(&mut context)?,
+                    uber_identifier: ui_shop_identifier_arg(&mut context)?,
                     locked: arg(&mut context)?,
                 })
             }
@@ -1659,6 +1659,34 @@ where
     });
 
     Command::Void(CommandVoid::Lookup { index })
+}
+
+fn shop_identifier_arg<F>(context: &mut ArgContext, f: F) -> Option<UberIdentifier>
+where
+    F: FnOnce(ShopKind) -> Result<(), &'static str>,
+{
+    let (uber_identifier, span) = spanned_arg::<UberIdentifier>(context)?;
+
+    let kind = uber_identifier.shop_kind();
+    let check_result = f(kind).map_err(|message| Error::custom(message.to_string(), span));
+    context.compiler.consume_result(check_result);
+
+    Some(uber_identifier)
+}
+
+fn any_shop_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
+    shop_identifier_arg(context, |kind| match kind {
+        ShopKind::None => Err("Expected shop item state"),
+        _ => Ok(()),
+    })
+}
+
+fn ui_shop_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
+    shop_identifier_arg(context, |kind| match kind {
+        ShopKind::None => Err("Expected shop item state"),
+        ShopKind::Opherlike | ShopKind::Grom => Ok(()),
+        ShopKind::Map => Err("Only price can be set for lupo maps"),
+    })
 }
 
 const SPIRIT_LIGHT_NAMES: [(&str, &str); 87] = [

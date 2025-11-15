@@ -8,7 +8,7 @@ use rand::distributions::Uniform;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use wotw_seedgen_assets::{LocData, LocDataEntry};
-use wotw_seedgen_data::Zone;
+use wotw_seedgen_data::{ShopKind, Zone};
 
 // TODO maybe zone_of should be a typed zone placeholder?
 #[derive(Debug, Clone, Default)]
@@ -44,7 +44,7 @@ impl IntermediateOutput {
             {
                 let uber_identifier = *uber_identifier;
 
-                if uber_identifier.is_shop() {
+                if uber_identifier.shop_kind() == ShopKind::Opherlike {
                     extra_events.push(Event::on_reload(CommandVoid::SetShopItemPrice {
                         uber_identifier,
                         price: metadata.force_shop_price(&price_distribution, rng),

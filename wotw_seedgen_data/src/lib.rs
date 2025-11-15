@@ -23,7 +23,7 @@ pub use position::Position;
 pub use shard::Shard;
 pub use skill::Skill;
 pub use teleporter::Teleporter;
-pub use uber_identifier::{CommonUberIdentifier, UberIdentifier};
+pub use uber_identifier::{CommonUberIdentifier, ShopKind, UberIdentifier};
 pub use weapon_upgrade::WeaponUpgrade;
 pub use wheel::{WheelBind, WheelItemPosition};
 pub use zone::Zone;
