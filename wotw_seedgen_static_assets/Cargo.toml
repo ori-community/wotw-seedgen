@@ -7,7 +7,7 @@ publish = false # TODO fix by having the assets in the crate
 [features]
 loc_data = ["wotw_seedgen_assets/loc_data"]
 state_data = ["wotw_seedgen_assets/state_data"]
-uber_state_data = ["loc_data", "state_data", "wotw_seedgen_assets/uber_state_data"]
+uber_state_data = ["loc_data", "state_data", "wotw_seedgen_assets/uber_state_data", "serde_json"]
 snippets = ["wotw_seedgen_assets/snippet_access", "rustc-hash", "itertools"]
 presets = ["wotw_seedgen_assets/presets", "serde_json", "rustc-hash", "itertools"]
 
