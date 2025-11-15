@@ -1218,8 +1218,713 @@
         }
       }
     },
+    "8": {
+      "name": "customBooleans",
+      "states": {
+        "0": {
+          "name": "bool0000",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "1": {
+          "name": "bool0001",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "2": {
+          "name": "bool0002",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "3": {
+          "name": "bool0003",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "4": {
+          "name": "bool0004",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "5": {
+          "name": "bool0005",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "6": {
+          "name": "bool0006",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "7": {
+          "name": "bool0007",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "8": {
+          "name": "bool0008",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "9": {
+          "name": "bool0009",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "10": {
+          "name": "bool0010",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "11": {
+          "name": "bool0011",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "12": {
+          "name": "bool0012",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "13": {
+          "name": "bool0013",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "14": {
+          "name": "bool0014",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "15": {
+          "name": "bool0015",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "16": {
+          "name": "bool0016",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "17": {
+          "name": "bool0017",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "18": {
+          "name": "bool0018",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "19": {
+          "name": "bool0019",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "20": {
+          "name": "bool0020",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "21": {
+          "name": "bool0021",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "22": {
+          "name": "bool0022",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "23": {
+          "name": "bool0023",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "24": {
+          "name": "bool0024",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "25": {
+          "name": "bool0025",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "26": {
+          "name": "bool0026",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "27": {
+          "name": "bool0027",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "28": {
+          "name": "bool0028",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "29": {
+          "name": "bool0029",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "30": {
+          "name": "bool0030",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "31": {
+          "name": "bool0031",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "32": {
+          "name": "bool0032",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "33": {
+          "name": "bool0033",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "34": {
+          "name": "bool0034",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "35": {
+          "name": "bool0035",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "36": {
+          "name": "bool0036",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "37": {
+          "name": "bool0037",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "38": {
+          "name": "bool0038",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "39": {
+          "name": "bool0039",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "40": {
+          "name": "bool0040",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "41": {
+          "name": "bool0041",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "42": {
+          "name": "bool0042",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "43": {
+          "name": "bool0043",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "44": {
+          "name": "bool0044",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "45": {
+          "name": "bool0045",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "46": {
+          "name": "bool0046",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "47": {
+          "name": "bool0047",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "48": {
+          "name": "bool0048",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "49": {
+          "name": "bool0049",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "50": {
+          "name": "bool0050",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "51": {
+          "name": "bool0051",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "52": {
+          "name": "bool0052",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "53": {
+          "name": "bool0053",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "54": {
+          "name": "bool0054",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "55": {
+          "name": "bool0055",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "56": {
+          "name": "bool0056",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "57": {
+          "name": "bool0057",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "58": {
+          "name": "bool0058",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "59": {
+          "name": "bool0059",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "60": {
+          "name": "bool0060",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "61": {
+          "name": "bool0061",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "62": {
+          "name": "bool0062",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "63": {
+          "name": "bool0063",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "64": {
+          "name": "bool0064",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "65": {
+          "name": "bool0065",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "66": {
+          "name": "bool0066",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "67": {
+          "name": "bool0067",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "68": {
+          "name": "bool0068",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "69": {
+          "name": "bool0069",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "70": {
+          "name": "bool0070",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "71": {
+          "name": "bool0071",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "72": {
+          "name": "bool0072",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "73": {
+          "name": "bool0073",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "74": {
+          "name": "bool0074",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "75": {
+          "name": "bool0075",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "76": {
+          "name": "bool0076",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "77": {
+          "name": "bool0077",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "78": {
+          "name": "bool0078",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "79": {
+          "name": "bool0079",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "80": {
+          "name": "bool0080",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "81": {
+          "name": "bool0081",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "82": {
+          "name": "bool0082",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "83": {
+          "name": "bool0083",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "84": {
+          "name": "bool0084",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "85": {
+          "name": "bool0085",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "86": {
+          "name": "bool0086",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "87": {
+          "name": "bool0087",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "88": {
+          "name": "bool0088",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "89": {
+          "name": "bool0089",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "90": {
+          "name": "bool0090",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "91": {
+          "name": "bool0091",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "92": {
+          "name": "bool0092",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "93": {
+          "name": "bool0093",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "94": {
+          "name": "bool0094",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "95": {
+          "name": "bool0095",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "96": {
+          "name": "bool0096",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "97": {
+          "name": "bool0097",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "98": {
+          "name": "bool0098",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "99": {
+          "name": "bool0099",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        }
+      }
+    },
     "9": {
-      "name": "custom",
+      "name": "customIntegers",
       "states": {
         "0": {
           "name": "int0000",
@@ -1920,527 +2625,707 @@
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
-        },
-        "100": {
-          "name": "bool0000",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "101": {
-          "name": "bool0001",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "102": {
-          "name": "bool0002",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "103": {
-          "name": "bool0003",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "104": {
-          "name": "bool0004",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "105": {
-          "name": "bool0005",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "106": {
-          "name": "bool0006",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "107": {
-          "name": "bool0007",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "108": {
-          "name": "bool0008",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "109": {
-          "name": "bool0009",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "110": {
-          "name": "bool0010",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "111": {
-          "name": "bool0011",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "112": {
-          "name": "bool0012",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "113": {
-          "name": "bool0013",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "114": {
-          "name": "bool0014",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "115": {
-          "name": "bool0015",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "116": {
-          "name": "bool0016",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "117": {
-          "name": "bool0017",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "118": {
-          "name": "bool0018",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "119": {
-          "name": "bool0019",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "120": {
-          "name": "bool0020",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "121": {
-          "name": "bool0021",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "122": {
-          "name": "bool0022",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "123": {
-          "name": "bool0023",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "124": {
-          "name": "bool0024",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "125": {
-          "name": "bool0025",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "126": {
-          "name": "bool0026",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "127": {
-          "name": "bool0027",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "128": {
-          "name": "bool0028",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "129": {
-          "name": "bool0029",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "130": {
-          "name": "bool0030",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "131": {
-          "name": "bool0031",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "132": {
-          "name": "bool0032",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "133": {
-          "name": "bool0033",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "134": {
-          "name": "bool0034",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "135": {
-          "name": "bool0035",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "136": {
-          "name": "bool0036",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "137": {
-          "name": "bool0037",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "138": {
-          "name": "bool0038",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "139": {
-          "name": "bool0039",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "140": {
-          "name": "bool0040",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "141": {
-          "name": "bool0041",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "142": {
-          "name": "bool0042",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "143": {
-          "name": "bool0043",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "144": {
-          "name": "bool0044",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "145": {
-          "name": "bool0045",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "146": {
-          "name": "bool0046",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "147": {
-          "name": "bool0047",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "148": {
-          "name": "bool0048",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "149": {
-          "name": "bool0049",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
-        "150": {
+        }
+      }
+    },
+    "10": {
+      "name": "customFloats",
+      "states": {
+        "0": {
           "name": "float0000",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "151": {
+        "1": {
           "name": "float0001",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "152": {
+        "2": {
           "name": "float0002",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "153": {
+        "3": {
           "name": "float0003",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "154": {
+        "4": {
           "name": "float0004",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "155": {
+        "5": {
           "name": "float0005",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "156": {
+        "6": {
           "name": "float0006",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "157": {
+        "7": {
           "name": "float0007",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "158": {
+        "8": {
           "name": "float0008",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "159": {
+        "9": {
           "name": "float0009",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "160": {
+        "10": {
           "name": "float0010",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "161": {
+        "11": {
           "name": "float0011",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "162": {
+        "12": {
           "name": "float0012",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "163": {
+        "13": {
           "name": "float0013",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "164": {
+        "14": {
           "name": "float0014",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "165": {
+        "15": {
           "name": "float0015",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "166": {
+        "16": {
           "name": "float0016",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "167": {
+        "17": {
           "name": "float0017",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "168": {
+        "18": {
           "name": "float0018",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "169": {
+        "19": {
           "name": "float0019",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "170": {
+        "20": {
           "name": "float0020",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "171": {
+        "21": {
           "name": "float0021",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "172": {
+        "22": {
           "name": "float0022",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "173": {
+        "23": {
           "name": "float0023",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
         },
-        "174": {
+        "24": {
           "name": "float0024",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "25": {
+          "name": "float0025",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "26": {
+          "name": "float0026",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "27": {
+          "name": "float0027",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "28": {
+          "name": "float0028",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "29": {
+          "name": "float0029",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "30": {
+          "name": "float0030",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "31": {
+          "name": "float0031",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "32": {
+          "name": "float0032",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "33": {
+          "name": "float0033",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "34": {
+          "name": "float0034",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "35": {
+          "name": "float0035",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "36": {
+          "name": "float0036",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "37": {
+          "name": "float0037",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "38": {
+          "name": "float0038",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "39": {
+          "name": "float0039",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "40": {
+          "name": "float0040",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "41": {
+          "name": "float0041",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "42": {
+          "name": "float0042",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "43": {
+          "name": "float0043",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "44": {
+          "name": "float0044",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "45": {
+          "name": "float0045",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "46": {
+          "name": "float0046",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "47": {
+          "name": "float0047",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "48": {
+          "name": "float0048",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "49": {
+          "name": "float0049",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "50": {
+          "name": "float0050",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "51": {
+          "name": "float0051",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "52": {
+          "name": "float0052",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "53": {
+          "name": "float0053",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "54": {
+          "name": "float0054",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "55": {
+          "name": "float0055",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "56": {
+          "name": "float0056",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "57": {
+          "name": "float0057",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "58": {
+          "name": "float0058",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "59": {
+          "name": "float0059",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "60": {
+          "name": "float0060",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "61": {
+          "name": "float0061",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "62": {
+          "name": "float0062",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "63": {
+          "name": "float0063",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "64": {
+          "name": "float0064",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "65": {
+          "name": "float0065",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "66": {
+          "name": "float0066",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "67": {
+          "name": "float0067",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "68": {
+          "name": "float0068",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "69": {
+          "name": "float0069",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "70": {
+          "name": "float0070",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "71": {
+          "name": "float0071",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "72": {
+          "name": "float0072",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "73": {
+          "name": "float0073",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "74": {
+          "name": "float0074",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "75": {
+          "name": "float0075",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "76": {
+          "name": "float0076",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "77": {
+          "name": "float0077",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "78": {
+          "name": "float0078",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "79": {
+          "name": "float0079",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "80": {
+          "name": "float0080",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "81": {
+          "name": "float0081",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "82": {
+          "name": "float0082",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "83": {
+          "name": "float0083",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "84": {
+          "name": "float0084",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "85": {
+          "name": "float0085",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "86": {
+          "name": "float0086",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "87": {
+          "name": "float0087",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "88": {
+          "name": "float0088",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "89": {
+          "name": "float0089",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "90": {
+          "name": "float0090",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "91": {
+          "name": "float0091",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "92": {
+          "name": "float0092",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "93": {
+          "name": "float0093",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "94": {
+          "name": "float0094",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "95": {
+          "name": "float0095",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "96": {
+          "name": "float0096",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "97": {
+          "name": "float0097",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "98": {
+          "name": "float0098",
+          "readonly": false,
+          "type": "SerializedFloatUberState",
+          "value": 0.0,
+          "value_type": "Float"
+        },
+        "99": {
+          "name": "float0099",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 0.0,
@@ -2448,7 +3333,7 @@
         }
       }
     },
-    "10": {
+    "11": {
       "name": "bingoState",
       "states": {
         "0": {

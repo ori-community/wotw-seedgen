@@ -1,9 +1,6 @@
 // TODO this module name is confusing
 
-use super::{
-    Compile, ExportedValue, SnippetCompiler, BOOLEANS, BOOLEAN_OFFSET, FLOATS, FLOAT_OFFSET,
-    INTEGERS, INTEGER_OFFSET,
-};
+use super::{Compile, ExportedValue, SnippetCompiler};
 use crate::{
     ast::{self, CommandArg, UberStateType},
     output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
@@ -465,45 +462,30 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
     }
 }
 
-// TODO make internal states this order?
+const INTEGERS: i32 = 100;
+const BOOLEANS: i32 = 100;
+const FLOATS: i32 = 25;
+
 fn boolean_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(
-        &mut compiler.global.boolean_state_id,
-        BOOLEAN_OFFSET,
-        BOOLEANS,
-        span,
-    )
+    uber_state(8, &mut compiler.global.boolean_state_id, BOOLEANS, span)
 }
 
 fn integer_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(
-        &mut compiler.global.integer_state_id,
-        INTEGER_OFFSET,
-        INTEGERS,
-        span,
-    )
+    uber_state(9, &mut compiler.global.integer_state_id, INTEGERS, span)
 }
 
 fn float_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    check_limit(
-        &mut compiler.global.float_state_id,
-        FLOAT_OFFSET,
-        FLOATS,
-        span,
-    )
+    uber_state(10, &mut compiler.global.float_state_id, FLOATS, span)
 }
 
-fn check_limit<S: Span>(
-    id: &mut usize,
-    offset: usize,
-    available: usize,
+fn uber_state<S: Span>(
+    group: i32,
+    id: &mut i32,
+    available: i32,
     span: S,
 ) -> Result<UberIdentifier> {
-    if *id - offset < available {
-        let uber_identifier = UberIdentifier {
-            group: 9,
-            member: *id as i32,
-        };
+    if *id < available {
+        let uber_identifier = UberIdentifier { group, member: *id };
 
         *id += 1;
 
