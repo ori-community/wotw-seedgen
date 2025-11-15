@@ -43,7 +43,7 @@ Flags: Bonus+
 //// How many Bashable Shurikens to shuffle in
 !!parameter bashableShurikens int:1
 //// How many Ultra Flaps to shuffle in
-!!parameter ultraFlap int:3
+!!parameter ultraFlap int:5
 
 !!add $PARAM(rapidHammers)x 8|4|50|byte|+1       // Rapid Hammers
 !!add $PARAM(rapidSwords)x 8|4|51|byte|+1        // Rapid Swords
@@ -151,8 +151,8 @@ Flags: Bonus+
 !!mapicon 8|4|95|bool|true BonusItem
 
 // Ultra Flap
-!!add $PARAM(ultraFlap)x 8|4|96|float|+10
-!!name 8|4|96|float|+10 #Ultra Flap#
-!!description 8|4|96|float|+10 Flap deals damage. Stackable.
-!!icon 8|4|96|float|+10 file:assets/icons/bonus/ultraflap.png
-!!mapicon 8|4|96|float|+10 BonusItem
+!!add $PARAM(ultraFlap)x 8|4|96|float|+4
+!!name 8|4|96|float|+4 #Ultra Flap#
+!!description 8|4|96|float|+4 Flap deals damage. Stackable.
+!!icon 8|4|96|float|+4 file:assets/icons/bonus/ultraflap.png
+!!mapicon 8|4|96|float|+4 BonusItem
