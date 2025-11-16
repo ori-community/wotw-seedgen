@@ -15,9 +15,16 @@ pub struct Event {
 }
 
 impl Event {
+    pub(crate) fn on_spawn(command: CommandVoid) -> Self {
+        Self {
+            trigger: Trigger::ClientEvent(ClientEvent::Spawn),
+            command,
+        }
+    }
+
     pub(crate) fn on_reload(command: CommandVoid) -> Self {
         Self {
-            trigger: RELOAD,
+            trigger: Trigger::ClientEvent(ClientEvent::Reload),
             command,
         }
     }
@@ -33,8 +40,6 @@ pub enum Trigger {
     /// Trigger when the condition changes from `false` to `true`
     Condition(CommandBoolean),
 }
-
-pub(crate) const RELOAD: Trigger = Trigger::ClientEvent(ClientEvent::Reload);
 
 impl Trigger {
     pub fn loc_data_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {

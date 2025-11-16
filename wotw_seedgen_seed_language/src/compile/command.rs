@@ -435,7 +435,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
                 .global
                 .output
                 .events
-                .push(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
+                .push(Event::on_spawn(CommandVoid::DefineTimer { toggle, timer }));
 
             compiler.variables.insert(
                 self.toggle_identifier.data,
