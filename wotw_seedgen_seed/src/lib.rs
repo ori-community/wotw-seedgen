@@ -1,3 +1,4 @@
+use indexmap::IndexMap;
 pub use wotw_seedgen_data as data;
 pub use wotw_seedgen_seed_language as seed_language;
 
@@ -10,7 +11,7 @@ mod seedgen_info;
 pub use seedgen_info::SeedgenInfo;
 
 use assembly::{Assembly, Command};
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 use seed_language::output::DebugOutput;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
@@ -103,5 +104,5 @@ pub struct Preload {
 #[derive(Serialize)]
 struct DebugData {
     compiler_data: DebugOutput,
-    indexed_lookup: FxHashMap<usize, Vec<Command>>,
+    indexed_lookup: IndexMap<usize, Vec<Command>, FxBuildHasher>,
 }
