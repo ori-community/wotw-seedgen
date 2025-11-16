@@ -43,7 +43,13 @@ impl<W: Write + Seek> Package<'_, W> {
         let zip = ZipWriter::new(obj);
         let options = FileOptions::default()
             .compression_method(CompressionMethod::Zstd)
-            .compression_level(Some(22));
+            // Some candidates from testing on It's Dangerous to go Alone:
+            // - level 22 (max) takes ~1.53s
+            // - level 19 takes ~0.60s but adds ~0.8% assembly size
+            // - level 15 takes ~0.09s but adds ~8.3% assembly size
+            // - level 9 takes ~0.017s but adds ~15% assembly size
+            // - level 4 takes ~0.004s but adds ~47% assembly size
+            .compression_level(Some(9));
 
         let mut package = Self { zip, options };
         package.append("format_version.txt", FORMAT_VERSION)?;

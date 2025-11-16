@@ -149,7 +149,7 @@ fn compile(
     seed.package(&mut file, !debug)?;
 
     eprintln!(
-        "compiled in {:.1}s to \"{}\"",
+        "compiled in {:.2}s to \"{}\"",
         start.elapsed().as_secs_f32(),
         out.display()
     );
