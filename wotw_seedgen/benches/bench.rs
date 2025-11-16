@@ -9,11 +9,11 @@ use wotw_seedgen::{item_pool::ItemPool, World};
 use wotw_seedgen_assets::{PresetAccess, SnippetAccess, WorldPreset, WorldPresetSettings};
 use wotw_seedgen_data::Skill;
 use wotw_seedgen_logic_language::{
-    ast::{parse as parse_logic, Areas},
+    ast::Areas,
     output::{Enemy, Graph, Requirement},
 };
 use wotw_seedgen_seed_language::{
-    ast::{parse as parse_seed, Snippet},
+    ast::Snippet,
     compile::Compiler,
     simulate::{Simulation, UberStates},
 };
@@ -23,16 +23,14 @@ use wotw_seedgen_static_assets::{
 };
 
 lazy_static! {
-    static ref AREAS: Areas<'static> = parse_logic(include_str!("../areas.wotw"))
-        .into_result()
-        .unwrap();
+    static ref AREAS: Areas<'static> = Areas::parse(include_str!("../areas.wotw")).parsed.unwrap();
 }
 
 fn logic_assets(c: &mut Criterion) {
     let mut group = c.benchmark_group("logic_assets");
 
     group.bench_function("areas", |b| {
-        b.iter(|| parse_logic::<Areas>(include_str!("../areas.wotw")))
+        b.iter(|| Areas::parse(include_str!("../areas.wotw")))
     });
 
     let areas = &*AREAS;
@@ -50,9 +48,7 @@ fn snippets(c: &mut Criterion) {
 
     let stats = SNIPPET_ACCESS.read_snippet("stats").unwrap();
 
-    group.bench_function("ast_stats", |b| {
-        b.iter(|| parse_seed::<Snippet>(&stats.content))
-    });
+    group.bench_function("ast_stats", |b| b.iter(|| Snippet::parse(&stats.content)));
 
     let available_snippets = SNIPPET_ACCESS.available_snippets();
     let snippet_sources = available_snippets
@@ -64,7 +60,7 @@ fn snippets(c: &mut Criterion) {
         b.iter(|| {
             snippet_sources
                 .iter()
-                .map(|source| parse_seed::<Snippet>(&source.content))
+                .map(|source| Snippet::parse(&source.content))
                 .collect::<Vec<_>>()
         })
     });
@@ -334,7 +330,7 @@ fn compile_graph(settings: &[WorldSettings]) -> Graph {
         STATE_DATA.clone(),
         settings,
     )
-    .into_result()
+    .parsed
     .unwrap()
 }
 

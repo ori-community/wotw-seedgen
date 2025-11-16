@@ -11,9 +11,12 @@ use wotw_seedgen::{
     settings::{UniverseSettings, WorldSettingsHelpers},
     World,
 };
-use wotw_seedgen_assets::{UberStateData, UberStateValue};
+use wotw_seedgen_assets::{Source, UberStateData, UberStateValue};
 
-use crate::{seed::LogicFiles, Error};
+use crate::{
+    seed::{graph, LogicFiles},
+    Error,
+};
 
 pub fn relevant_uber_states(logic_files: &LogicFiles) -> Result<(), Error> {
     const INVENTORY: [UberIdentifier; 81] = [
@@ -210,17 +213,22 @@ impl<'source, 'areas, 'logic_files> GraphCache<'source, 'areas, 'logic_files> {
         }
     }
 
-    pub fn set_settings(&mut self, universe_settings: UniverseSettings) -> Result<(), Error> {
+    pub fn set_settings(
+        &mut self,
+        source: &Source,
+        universe_settings: UniverseSettings,
+    ) -> Result<(), Error> {
         match &mut self.value {
             None => {
                 self.value = Some(GraphCacheValue::new(
+                    source,
                     self.areas,
                     universe_settings,
                     self.logic_files,
                 )?)
             }
             Some(value) => {
-                value.update_settings(self.areas, universe_settings, self.logic_files)?
+                value.update_settings(source, self.areas, universe_settings, self.logic_files)?
             }
         }
 
@@ -234,29 +242,30 @@ impl<'source, 'areas, 'logic_files> GraphCache<'source, 'areas, 'logic_files> {
 
 impl GraphCacheValue {
     pub fn new(
+        source: &Source,
         areas: &Areas,
         settings: UniverseSettings,
         logic_files: &LogicFiles,
     ) -> Result<Self, Error> {
-        let graph = Graph::compile(
+        graph(
+            source,
             areas.clone(),
             logic_files.loc_data.clone(),
             logic_files.state_data.clone(),
             &settings.world_settings,
         )
-        .into_result()?;
-
-        Ok(Self { settings, graph })
+        .map(|graph| Self { settings, graph })
     }
 
     pub fn update_settings(
         &mut self,
+        source: &Source,
         areas: &Areas,
         settings: UniverseSettings,
         logic_files: &LogicFiles,
     ) -> Result<(), Error> {
         if self.requires_update(&settings) {
-            *self = Self::new(areas, settings, logic_files)?;
+            *self = Self::new(source, areas, settings, logic_files)?;
         }
 
         Ok(())

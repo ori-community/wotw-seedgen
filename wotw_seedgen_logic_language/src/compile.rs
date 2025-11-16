@@ -1,10 +1,4 @@
-use std::{
-    borrow::Cow,
-    io::{self, Write},
-    iter, mem,
-    ops::Range,
-    str::FromStr,
-};
+use std::{borrow::Cow, iter, mem, ops::Range, str::FromStr};
 
 use crate::{
     ast,
@@ -14,10 +8,11 @@ use crate::{
     token::Tokenizer,
 };
 use rustc_hash::FxHashMap;
-use wotw_seedgen_assets::{LocData, Source, StateData, StateDataEntry};
+use wotw_seedgen_assets::{LocData, StateData, StateDataEntry};
 use wotw_seedgen_data::{Position, Shard, Skill, Teleporter, UberIdentifier};
 use wotw_seedgen_parse::{
-    Error, ErrorKind, Recover, Recoverable, Result, Separated, SeparatedNonEmpty, Span, Spanned,
+    Error, ErrorKind, ParseResult, Recover, Recoverable, Result, Separated, SeparatedNonEmpty,
+    Span, Spanned, SpannedOption,
 };
 use wotw_seedgen_settings::{Difficulty, Trick, WorldSettings, WorldSettingsHelpers};
 
@@ -34,7 +29,7 @@ impl Graph {
         loc_data: LocData,
         state_data: StateData,
         settings: &[WorldSettings],
-    ) -> CompileResult {
+    ) -> ParseResult<Graph> {
         let loc_data_nodes = loc_data
             .entries
             .into_iter()
@@ -64,49 +59,13 @@ impl Graph {
         nodes.extend(state_data_nodes);
         nodes.extend(compiled_nodes);
 
-        CompileResult {
-            graph: Graph {
+        ParseResult {
+            parsed: Some(Graph {
                 nodes,
                 default_door_connections,
-            },
+            }),
             errors,
         }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CompileResult {
-    pub graph: Graph,
-    pub errors: Vec<Error>,
-}
-
-impl CompileResult {
-    pub fn into_result(self) -> Result<Graph> {
-        match self.errors.into_iter().next() {
-            None => Ok(self.graph),
-            Some(err) => Err(err),
-        }
-    }
-
-    pub fn eprint_errors(self, source: &Source) -> (Graph, bool) {
-        let mut stderr = io::stderr().lock();
-
-        let error_count = self.errors.len();
-
-        for error in self.errors {
-            error.write_pretty(source, &mut stderr).unwrap();
-        }
-
-        let success = error_count == 0;
-        if !success {
-            writeln!(
-                &mut stderr,
-                "Failed to compile Logic with {error_count} errors."
-            )
-            .unwrap();
-        }
-
-        (self.graph, success)
     }
 }
 
@@ -164,13 +123,15 @@ impl<'source> Compiler<'source> {
         {
             let mut iter = areas.contents.iter_mut();
 
-            while let Some(anchor) =
-                iter.find(|content| matches!(content.result, Ok(ast::Content::Anchor(..))))
-            {
+            while let Some(anchor) = iter.find(|content| {
+                matches!(content.value, SpannedOption::Some(ast::Content::Anchor(..)))
+            }) {
                 match iter.rfind(|content| {
                     matches!(
-                        content.result,
-                        Ok(ast::Content::Requirement(..) | ast::Content::Region(..))
+                        content.value,
+                        SpannedOption::Some(
+                            ast::Content::Requirement(..) | ast::Content::Region(..)
+                        )
                     )
                 }) {
                     None => break,
@@ -184,7 +145,7 @@ impl<'source> Compiler<'source> {
         for anchor in areas
             .contents
             .iter()
-            .flat_map(|content| &content.result)
+            .filter_map(|content| content.value.as_option())
             .filter_map(|content| {
                 if let ast::Content::Anchor(_, anchor) = content {
                     Some(anchor)
@@ -192,13 +153,13 @@ impl<'source> Compiler<'source> {
                     None
                 }
             })
-            .flat_map(|anchor| &anchor.result)
+            .filter_map(|anchor| anchor.value.as_option())
         {
             for connection in anchor
                 .content
                 .content
-                .result
-                .as_ref()
+                .value
+                .as_option()
                 .into_iter()
                 .flat_map(|group| &group.content)
                 .filter_map(|content| match content {
@@ -208,7 +169,7 @@ impl<'source> Compiler<'source> {
                             ..
                         },
                         connection,
-                    ) => connection.result.as_ref().ok(),
+                    ) => connection.value.as_option(),
                     _ => None,
                 })
             {
@@ -561,9 +522,7 @@ impl<'source, T: Compile, R: Recover<'source, Tokenizer>> Compile for Recoverabl
     type Output = Option<T::Output>;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
-        compiler
-            .consume_result(self.result)
-            .map(|t| t.compile(compiler))
+        self.value.into_option().map(|t| t.compile(compiler))
     }
 }
 
@@ -672,7 +631,7 @@ impl<'source> Compile for ast::Anchor<'source> {
         let mut refills = vec![];
         let mut connections = vec![];
 
-        if let Some(content) = compiler.consume_result(self.content.content.result) {
+        if let SpannedOption::Some(content) = self.content.content.value {
             for content in content.content {
                 match content {
                     ast::AnchorContent::Door(keyword, anchor_door) => {
@@ -702,7 +661,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                         refills.extend(refill.compile(compiler))
                     }
                     ast::AnchorContent::Connection(keyword, connection) => {
-                        if let Some(connection) = compiler.consume_result(connection.result) {
+                        if let SpannedOption::Some(connection) = connection.value {
                             let to = match keyword.data {
                                 ast::ConnectionKeyword::State => compiler
                                     .state_map
@@ -759,13 +718,11 @@ impl<'source> Compile for ast::Anchor<'source> {
 impl Compile for ast::AnchorPosition {
     type Output = Option<Position>;
 
-    fn compile(self, compiler: &mut Compiler) -> Self::Output {
-        compiler
-            .consume_result(self.position.result)
-            .map(|position| Position {
-                x: position.x.data,
-                y: position.y.data,
-            })
+    fn compile(self, _compiler: &mut Compiler) -> Self::Output {
+        self.position.value.into_option().map(|position| Position {
+            x: position.x.data,
+            y: position.y.data,
+        })
     }
 }
 
@@ -777,18 +734,18 @@ impl<'source> Compile for ast::Door<'source> {
         let mut target = None;
         let mut requirement = None;
 
-        if let Some(content) = compiler.consume_result(self.content.result) {
+        if let SpannedOption::Some(content) = self.content.value {
             for content in content.content {
                 match content {
                     ast::DoorContent::Id(keyword, door_id) => {
-                        if let Some(door_id) = compiler.consume_result(door_id.result) {
+                        if let SpannedOption::Some(door_id) = door_id.value {
                             if id.replace(door_id.id.data).is_some() {
                                 compiler.error("duplicate id".to_string(), keyword.span);
                             }
                         }
                     }
                     ast::DoorContent::Target(keyword, door_target) => {
-                        if let Some(door_target) = compiler.consume_result(door_target.result) {
+                        if let SpannedOption::Some(door_target) = door_target.value {
                             if !compiler.anchor_map.contains_key(door_target.target.data.0) {
                                 compiler
                                     .error("unknown anchor".to_string(), door_target.target.span);
@@ -841,20 +798,20 @@ impl<'source> Compile for ast::Refill<'source> {
 impl Compile for ast::RefillValue {
     type Output = RefillValue;
 
-    fn compile(self, compiler: &mut Compiler) -> Self::Output {
+    fn compile(self, _compiler: &mut Compiler) -> Self::Output {
         match self {
             ast::RefillValue::Full => RefillValue::Full,
             ast::RefillValue::Checkpoint => RefillValue::Checkpoint,
             ast::RefillValue::Health(amount) => RefillValue::Health(
                 amount
                     .amount
-                    .and_then(|amount| compiler.consume_result(amount.value.result))
+                    .and_then(|amount| amount.value.value.into_option())
                     .map_or(1, |amount| amount.data) as f32,
             ),
             ast::RefillValue::Energy(amount) => RefillValue::Energy(
                 amount
                     .amount
-                    .and_then(|amount| compiler.consume_result(amount.value.result))
+                    .and_then(|amount| amount.value.value.into_option())
                     .map_or(1, |amount| amount.data) as f32,
             ),
         }
@@ -975,145 +932,141 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
             |amount| amount.span(),
         );
 
-        let result = self
+        let mut amount = self
             .amount
-            .map(|amount| amount.value.result.map(|amount| amount.data))
-            .transpose()
-            .and_then(|mut amount| {
-                let get_amount = || {
-                    amount.ok_or_else(|| {
-                        Error::new(
-                            ErrorKind::ExpectedToken("'='".to_string()),
-                            self.identifier.span.end..self.identifier.span.end,
-                        )
-                    })
-                };
+            .and_then(|amount| amount.value.value.into_option().map(|amount| amount.data));
 
-                let no_amount = || {
-                    if amount.is_none() {
-                        Ok(())
-                    } else {
+        let get_amount = || {
+            amount.ok_or_else(|| {
+                Error::new(
+                    ErrorKind::ExpectedToken("'='".to_string()),
+                    self.identifier.span.end..self.identifier.span.end,
+                )
+            })
+        };
+
+        let no_amount = || {
+            if amount.is_none() {
+                Ok(())
+            } else {
+                Err(Error::custom(
+                    "this requirement accepts no amount".to_string(),
+                    amount_span.clone(),
+                ))
+            }
+        };
+
+        let result = if let Some(requirement) = compiler.macros.get(identifier) {
+            Ok(requirement.clone())
+        } else if let Ok(skill) = Skill::from_str(identifier) {
+            match amount {
+                None => Ok(Requirement::Skill(skill)),
+                Some(amount) => {
+                    if skill.energy_cost() == 0. {
                         Err(Error::custom(
-                            "this requirement accepts no amount".to_string(),
-                            amount_span.clone(),
-                        ))
-                    }
-                };
-
-                if let Some(requirement) = compiler.macros.get(identifier) {
-                    Ok(requirement.clone())
-                } else if let Ok(skill) = Skill::from_str(identifier) {
-                    match amount {
-                        None => Ok(Requirement::Skill(skill)),
-                        Some(amount) => {
-                            if skill.energy_cost() == 0. {
-                                Err(Error::custom(
-                                    "this skill accepts no amount".to_string(),
-                                    amount_span,
-                                ))
-                            } else {
-                                Ok(Requirement::EnergySkill(skill, amount as f32))
-                            }
-                        }
-                    }
-                } else if let Ok(difficulty) = Difficulty::from_str(identifier) {
-                    no_amount().map(|()| compiler.difficulty_requirements.get(difficulty))
-                } else if let Ok(trick) = Trick::from_str(identifier) {
-                    let option = compiler.trick_requirements.get(trick, &mut amount);
-
-                    if amount.is_some() {
-                        Err(Error::custom(
-                            "requirement accepts no amount".to_string(),
+                            "this skill accepts no amount".to_string(),
                             amount_span,
                         ))
                     } else {
-                        option.ok_or_else(|| {
-                            Error::new(
-                                ErrorKind::ExpectedToken("'='".to_string()),
-                                self.identifier.span.end..self.identifier.span.end,
-                            )
-                        })
-                    }
-                } else if let Ok(shard) = Shard::from_str(identifier) {
-                    no_amount().map(|()| Requirement::Shard(shard))
-                } else if let Some(teleporter) = identifier
-                    .strip_suffix("TP")
-                    .and_then(|identifier| Teleporter::from_str(identifier).ok())
-                {
-                    no_amount().map(|()| Requirement::Teleporter(teleporter))
-                } else {
-                    match identifier {
-                        "free" => no_amount().map(|()| Requirement::Free),
-                        "Impossible" => no_amount().map(|()| Requirement::Impossible),
-                        "SpiritLight" => get_amount().map(Requirement::SpiritLight),
-                        // TODO remove Ore
-                        "Ore" | "GorlekOre" => get_amount().map(Requirement::GorlekOre),
-                        "Keystone" => get_amount().map(Requirement::Keystone),
-                        "Water" => no_amount().map(|()| Requirement::Water),
-                        "Damage" => get_amount().map(|amount| Requirement::Damage(amount as f32)),
-                        "Danger" => get_amount().map(|amount| Requirement::Danger(amount as f32)),
-                        "Boss" => get_amount().map(|amount| Requirement::Boss(amount as f32)),
-                        "BreakWall" => {
-                            get_amount().map(|amount| Requirement::BreakWall(amount as f32))
-                        }
-                        "BreakCrystal" => no_amount().map(|()| {
-                            build_or(vec![
-                                Requirement::Skill(Skill::Sword),
-                                Requirement::Skill(Skill::Hammer),
-                                Requirement::EnergySkill(Skill::Bow, 1.0),
-                                build_and([
-                                    compiler.difficulty_requirements.get(Difficulty::Gorlek),
-                                    build_or(vec![
-                                        Requirement::EnergySkill(Skill::Shuriken, 1.0),
-                                        Requirement::EnergySkill(Skill::Grenade, 1.0),
-                                    ]),
-                                ]),
-                                build_and([
-                                    compiler.difficulty_requirements.get(Difficulty::Unsafe),
-                                    Requirement::EnergySkill(Skill::Spear, 1.0),
-                                ]),
-                            ])
-                        }),
-                        "SentryJump" => get_amount().map(|amount| {
-                            build_and([
-                                Requirement::EnergySkill(Skill::Sentry, amount as f32),
-                                build_or(vec![
-                                    build_and([
-                                        compiler
-                                            .trick_requirements
-                                            .get(Trick::SwordSentryJump, &mut Some(amount))
-                                            .unwrap(),
-                                        Requirement::Skill(Skill::Sword),
-                                    ]),
-                                    build_and([
-                                        compiler
-                                            .trick_requirements
-                                            .get(Trick::HammerSentryJump, &mut Some(amount))
-                                            .unwrap(),
-                                        Requirement::Skill(Skill::Hammer),
-                                    ]),
-                                ]),
-                            ])
-                        }),
-                        // TODO remove?
-                        "SwordSJump" => compiler
-                            .trick_requirements
-                            .get(Trick::SwordSentryJump, &mut amount)
-                            .ok_or_else(|| todo!()),
-                        // TODO remove?
-                        "HammerSJump" => compiler
-                            .trick_requirements
-                            .get(Trick::HammerSentryJump, &mut amount)
-                            .ok_or_else(|| todo!()),
-                        "GrenadeCancel" => Ok(Requirement::NonConsumingEnergySkill(Skill::Grenade)),
-                        "BowCancel" => Ok(Requirement::NonConsumingEnergySkill(Skill::Bow)),
-                        other => match compile_state(compiler, other, self.identifier.span) {
-                            Requirement::Impossible => Ok(Requirement::Impossible),
-                            state => no_amount().map(|()| state),
-                        },
+                        Ok(Requirement::EnergySkill(skill, amount as f32))
                     }
                 }
-            });
+            }
+        } else if let Ok(difficulty) = Difficulty::from_str(identifier) {
+            no_amount().map(|()| compiler.difficulty_requirements.get(difficulty))
+        } else if let Ok(trick) = Trick::from_str(identifier) {
+            let option = compiler.trick_requirements.get(trick, &mut amount);
+
+            if amount.is_some() {
+                Err(Error::custom(
+                    "requirement accepts no amount".to_string(),
+                    amount_span,
+                ))
+            } else {
+                option.ok_or_else(|| {
+                    Error::new(
+                        ErrorKind::ExpectedToken("'='".to_string()),
+                        self.identifier.span.end..self.identifier.span.end,
+                    )
+                })
+            }
+        } else if let Ok(shard) = Shard::from_str(identifier) {
+            no_amount().map(|()| Requirement::Shard(shard))
+        } else if let Some(teleporter) = identifier
+            .strip_suffix("TP")
+            .and_then(|identifier| Teleporter::from_str(identifier).ok())
+        {
+            no_amount().map(|()| Requirement::Teleporter(teleporter))
+        } else {
+            match identifier {
+                "free" => no_amount().map(|()| Requirement::Free),
+                "Impossible" => no_amount().map(|()| Requirement::Impossible),
+                "SpiritLight" => get_amount().map(Requirement::SpiritLight),
+                // TODO remove Ore
+                "Ore" | "GorlekOre" => get_amount().map(Requirement::GorlekOre),
+                "Keystone" => get_amount().map(Requirement::Keystone),
+                "Water" => no_amount().map(|()| Requirement::Water),
+                "Damage" => get_amount().map(|amount| Requirement::Damage(amount as f32)),
+                "Danger" => get_amount().map(|amount| Requirement::Danger(amount as f32)),
+                "Boss" => get_amount().map(|amount| Requirement::Boss(amount as f32)),
+                "BreakWall" => get_amount().map(|amount| Requirement::BreakWall(amount as f32)),
+                "BreakCrystal" => no_amount().map(|()| {
+                    build_or(vec![
+                        Requirement::Skill(Skill::Sword),
+                        Requirement::Skill(Skill::Hammer),
+                        Requirement::EnergySkill(Skill::Bow, 1.0),
+                        build_and([
+                            compiler.difficulty_requirements.get(Difficulty::Gorlek),
+                            build_or(vec![
+                                Requirement::EnergySkill(Skill::Shuriken, 1.0),
+                                Requirement::EnergySkill(Skill::Grenade, 1.0),
+                            ]),
+                        ]),
+                        build_and([
+                            compiler.difficulty_requirements.get(Difficulty::Unsafe),
+                            Requirement::EnergySkill(Skill::Spear, 1.0),
+                        ]),
+                    ])
+                }),
+                "SentryJump" => get_amount().map(|amount| {
+                    build_and([
+                        Requirement::EnergySkill(Skill::Sentry, amount as f32),
+                        build_or(vec![
+                            build_and([
+                                compiler
+                                    .trick_requirements
+                                    .get(Trick::SwordSentryJump, &mut Some(amount))
+                                    .unwrap(),
+                                Requirement::Skill(Skill::Sword),
+                            ]),
+                            build_and([
+                                compiler
+                                    .trick_requirements
+                                    .get(Trick::HammerSentryJump, &mut Some(amount))
+                                    .unwrap(),
+                                Requirement::Skill(Skill::Hammer),
+                            ]),
+                        ]),
+                    ])
+                }),
+                // TODO remove?
+                "SwordSJump" => compiler
+                    .trick_requirements
+                    .get(Trick::SwordSentryJump, &mut amount)
+                    .ok_or_else(|| todo!()),
+                // TODO remove?
+                "HammerSJump" => compiler
+                    .trick_requirements
+                    .get(Trick::HammerSentryJump, &mut amount)
+                    .ok_or_else(|| todo!()),
+                "GrenadeCancel" => Ok(Requirement::NonConsumingEnergySkill(Skill::Grenade)),
+                "BowCancel" => Ok(Requirement::NonConsumingEnergySkill(Skill::Bow)),
+                other => match compile_state(compiler, other, self.identifier.span) {
+                    Requirement::Impossible => Ok(Requirement::Impossible),
+                    state => no_amount().map(|()| state),
+                },
+            }
+        };
 
         compiler
             .consume_result(result)

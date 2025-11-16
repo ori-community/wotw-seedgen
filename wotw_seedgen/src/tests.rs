@@ -8,10 +8,7 @@ use log::info;
 use wotw_seedgen_assets::{
     PresetAccess, UniversePreset, UniversePresetSettings, WorldPresetSettings,
 };
-use wotw_seedgen_logic_language::{
-    ast::{parse, Areas},
-    output::Graph,
-};
+use wotw_seedgen_logic_language::{ast::Areas, output::Graph};
 use wotw_seedgen_settings::{Difficulty, UniverseSettings};
 use wotw_seedgen_static_assets::{
     LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
@@ -19,7 +16,7 @@ use wotw_seedgen_static_assets::{
 
 lazy_static! {
     pub static ref AREAS: Areas<'static> =
-        parse(include_str!("../areas.wotw")).into_result().unwrap();
+        Areas::parse(include_str!("../areas.wotw")).parsed.unwrap();
 }
 
 static LOGGER_INITIALIZED: Once = Once::new();
@@ -56,7 +53,7 @@ fn some_seeds() {
         STATE_DATA.clone(),
         &universe_settings.world_settings,
     )
-    .into_result()
+    .parsed
     .unwrap();
     info!("Testing Default settings");
     generate_test_seed(&graph, &universe_settings);
@@ -68,7 +65,7 @@ fn some_seeds() {
         STATE_DATA.clone(),
         &universe_settings.world_settings,
     )
-    .into_result()
+    .parsed
     .unwrap();
     info!("Testing Unsafe");
     generate_test_seed(&graph, &universe_settings);

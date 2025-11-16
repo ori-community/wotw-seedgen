@@ -11,7 +11,7 @@ use serde::Deserialize;
 use strum::{Display, VariantArray};
 use wotw_seedgen_assets::{UberStateData, UberStateValue};
 use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_parse::{Ast, Identifier, Once, Result, Spanned};
+use wotw_seedgen_parse::{Ast, Identifier, Once, Spanned};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Display, VariantArray, Ast)]
 pub enum Type {
@@ -93,9 +93,9 @@ impl<T: InferType> InferType for Spanned<T> {
     }
 }
 
-impl<T: InferType> InferType for Result<T> {
+impl<T: InferType> InferType for Option<T> {
     fn infer_type(&self, compiler: &mut SnippetCompiler) -> Option<Type> {
-        self.as_ref().ok().and_then(|t| t.infer_type(compiler))
+        self.as_ref().and_then(|t| t.infer_type(compiler))
     }
 }
 
@@ -156,8 +156,7 @@ impl InferType for FunctionCall<'_> {
             FunctionIdentifier::Fetch => self
                 .parameters
                 .content
-                .as_ref()
-                .ok()?
+                .as_ref()?
                 .iter()
                 .next()
                 .and_then(|arg| arg.uber_state_type(compiler))

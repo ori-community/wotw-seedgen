@@ -12,9 +12,7 @@ use syn::{parse::Parse, punctuated::Punctuated};
 
 type Result<T> = std::result::Result<T, syn::Error>;
 
-fn add_bound(generics: &mut syn::Generics, bound: proc_macro2::TokenStream) {
-    let bound = syn::parse2::<syn::TypeParamBound>(bound).unwrap();
-
+fn add_bound(generics: &mut syn::Generics, bound: syn::TypeParamBound) {
     for type_param in generics.type_params_mut() {
         type_param.bounds.push(bound.clone());
     }

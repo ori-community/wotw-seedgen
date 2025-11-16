@@ -1,6 +1,6 @@
 // TODO investigate optimizing type sizes
 
-use std::{fmt::Display, ops::ControlFlow, str::FromStr};
+use std::{fmt::Display, str::FromStr};
 
 use crate::{
     token::{Token, Tokenizer, TOKENIZER},
@@ -15,7 +15,7 @@ use wotw_seedgen_data::{
     MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
     WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
-use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, Mode};
+use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult};
 
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
@@ -27,7 +27,8 @@ pub type Delimited<const OPEN: char, Content, const CLOSE: char> =
 pub type Punctuated<Item, const PUNCTUATION: char> =
     wotw_seedgen_parse::Punctuated<Item, Symbol<PUNCTUATION>>;
 
-pub fn parse<'source, V>(source: &'source str) -> NoTrailingInput<V>
+#[inline]
+pub fn parse_seed_ast<'source, V>(source: &'source str) -> ParseResult<V>
 where
     V: Ast<'source, Tokenizer>,
 {
@@ -37,6 +38,13 @@ where
 #[derive(Debug, Clone, PartialEq, Eq, Default, Ast)]
 pub struct Snippet<'source> {
     pub contents: Vec<Recoverable<Content<'source>, RecoverContent>>,
+}
+
+impl<'source> Snippet<'source> {
+    #[inline]
+    pub fn parse(source: &'source str) -> ParseResult<Self> {
+        parse_seed_ast(source)
+    }
 }
 
 pub struct RecoverContent;
@@ -58,7 +66,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverPass {
 pub struct RecoverSkipExpression;
 impl<'source> Recover<'source, Tokenizer> for RecoverSkipExpression {
     fn recover(parser: &mut Parser<'source, Tokenizer>) {
-        let _ = Expression::ast_option(parser);
+        Expression::ast_no_errors(parser);
     }
 }
 
@@ -221,7 +229,7 @@ pub enum ExpressionValue<'source> {
 
 // Manual implementation to support operator precedence
 impl<'source> Ast<'source, Tokenizer> for Expression<'source> {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, Tokenizer>) -> Option<Self> {
         fn precedence(operator: Operator) -> u8 {
             match operator {
                 Operator::Arithmetic(ArithmeticOperator::Multiply | ArithmeticOperator::Divide) => {
@@ -266,7 +274,7 @@ impl<'source> Ast<'source, Tokenizer> for Expression<'source> {
             }
         }
 
-        SeparatedNonEmpty::ast_impl::<M>(parser).map_continue(resolve_precedence)
+        SeparatedNonEmpty::ast_impl::<E>(parser).map(resolve_precedence)
     }
 }
 
@@ -346,37 +354,37 @@ pub enum Literal<'source> {
 #[strum_discriminants(derive(VariantArray))]
 pub enum Constant {
     ClientEvent(ClientEvent),
-    Skill(#[ast(with = "constant_ast::<Skill, M>")] Skill),
-    Shard(#[ast(with = "constant_ast::<Shard, M>")] Shard),
-    Teleporter(#[ast(with = "constant_ast::<Teleporter, M>")] Teleporter),
-    WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, M>")] WeaponUpgrade),
-    Equipment(#[ast(with = "constant_ast::<Equipment, M>")] Equipment),
-    Zone(#[ast(with = "constant_ast::<Zone, M>")] Zone),
-    OpherIcon(#[ast(with = "constant_ast::<OpherIcon, M>")] OpherIcon),
-    LupoIcon(#[ast(with = "constant_ast::<LupoIcon, M>")] LupoIcon),
-    GromIcon(#[ast(with = "constant_ast::<GromIcon, M>")] GromIcon),
-    TuleyIcon(#[ast(with = "constant_ast::<TuleyIcon, M>")] TuleyIcon),
-    MapIcon(#[ast(with = "constant_ast::<MapIcon, M>")] MapIcon),
-    EquipSlot(#[ast(with = "constant_ast::<EquipSlot, M>")] EquipSlot),
-    WheelItemPosition(#[ast(with = "constant_ast::<WheelItemPosition, M>")] WheelItemPosition),
-    WheelBind(#[ast(with = "constant_ast::<WheelBind, M>")] WheelBind),
-    Alignment(#[ast(with = "constant_ast::<Alignment, M>")] Alignment),
-    HorizontalAnchor(#[ast(with = "constant_ast::<HorizontalAnchor, M>")] HorizontalAnchor),
-    VerticalAnchor(#[ast(with = "constant_ast::<VerticalAnchor, M>")] VerticalAnchor),
-    ScreenPosition(#[ast(with = "constant_ast::<ScreenPosition, M>")] ScreenPosition),
-    CoordinateSystem(#[ast(with = "constant_ast::<CoordinateSystem, M>")] CoordinateSystem),
+    Skill(#[ast(with = "constant_ast::<Skill, E>")] Skill),
+    Shard(#[ast(with = "constant_ast::<Shard, E>")] Shard),
+    Teleporter(#[ast(with = "constant_ast::<Teleporter, E>")] Teleporter),
+    WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, E>")] WeaponUpgrade),
+    Equipment(#[ast(with = "constant_ast::<Equipment, E>")] Equipment),
+    Zone(#[ast(with = "constant_ast::<Zone, E>")] Zone),
+    OpherIcon(#[ast(with = "constant_ast::<OpherIcon, E>")] OpherIcon),
+    LupoIcon(#[ast(with = "constant_ast::<LupoIcon, E>")] LupoIcon),
+    GromIcon(#[ast(with = "constant_ast::<GromIcon, E>")] GromIcon),
+    TuleyIcon(#[ast(with = "constant_ast::<TuleyIcon, E>")] TuleyIcon),
+    MapIcon(#[ast(with = "constant_ast::<MapIcon, E>")] MapIcon),
+    EquipSlot(#[ast(with = "constant_ast::<EquipSlot, E>")] EquipSlot),
+    WheelItemPosition(#[ast(with = "constant_ast::<WheelItemPosition, E>")] WheelItemPosition),
+    WheelBind(#[ast(with = "constant_ast::<WheelBind, E>")] WheelBind),
+    Alignment(#[ast(with = "constant_ast::<Alignment, E>")] Alignment),
+    HorizontalAnchor(#[ast(with = "constant_ast::<HorizontalAnchor, E>")] HorizontalAnchor),
+    VerticalAnchor(#[ast(with = "constant_ast::<VerticalAnchor, E>")] VerticalAnchor),
+    ScreenPosition(#[ast(with = "constant_ast::<ScreenPosition, E>")] ScreenPosition),
+    CoordinateSystem(#[ast(with = "constant_ast::<CoordinateSystem, E>")] CoordinateSystem),
 }
 
-fn constant_ast<T, M: Mode>(parser: &mut Parser<Tokenizer>) -> ControlFlow<M::Error, T>
+fn constant_ast<T, E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<T>
 where
     T: FromStr<Err = String> + VariantArray + Display,
 {
     let before = parser.position();
 
-    let identifier = <Spanned<Identifier>>::ast_impl::<M>(parser)?;
+    let identifier = <Spanned<Identifier>>::ast_impl::<E>(parser)?;
 
-    let flow = M::res(identifier.data.0.parse(), |_| {
-        Error::all_failed(
+    let option = E::consume_result(identifier.data.0.parse(), |_| {
+        parser.errors.push(Error::all_failed(
             T::VARIANTS
                 .iter()
                 .map(|t| {
@@ -386,14 +394,14 @@ where
                     )
                 })
                 .collect(),
-        )
+        ));
     });
 
-    if flow.is_break() {
+    if option.is_none() {
         parser.jump(before);
     }
 
-    flow
+    option
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
@@ -487,6 +495,18 @@ pub type CommandArgsCollection<Args> = Recoverable<Delimited<'(', Args, ')'>, Re
 pub type CommandArgs<Args> = CommandArgsCollection<Once<Args>>;
 pub type CommandArg<T> =
     Recoverable<(Symbol<','>, Recoverable<T, RecoverCommandArg>), RecoverCommandArg>;
+
+pub fn inspect_command_arg<T>(arg: &CommandArg<T>) -> Option<&T> {
+    arg.value
+        .as_option()
+        .and_then(|arg| arg.1.value.as_option())
+}
+
+pub fn consume_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
+    arg.value
+        .into_option()
+        .and_then(|(_, arg)| arg.value.into_option())
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]

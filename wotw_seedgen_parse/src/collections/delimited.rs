@@ -1,16 +1,15 @@
 use super::AstCollection;
-use crate::{Ast, Error, Mode, Parser, Result, ResultMode, Span, SpanEnd, SpanStart, Tokenize};
+use crate::{span::SpannedOption, Ast, ErrorMode, Parser, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
     any::type_name,
     ops::{ControlFlow, Range},
-    vec,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Delimited<Open, Content, Close> {
     pub open: Open,
-    pub content: Result<Content>,
-    pub close: Result<Close>,
+    pub content: Option<Content>,
+    pub close: SpannedOption<Close>,
 }
 
 impl<'source, T, Open, Content, Close> Ast<'source, T> for Delimited<Open, Content, Close>
@@ -20,49 +19,43 @@ where
     Content: AstCollection<'source, T>,
     Close: Ast<'source, T>,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        let open = Open::ast_impl::<M>(parser)?;
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        let open = Open::ast_impl::<E>(parser)?;
 
-        let mut content = Content::ast_first_result(parser);
+        let mut content = Content::ast_first_spanned(parser);
 
-        let close = if let Ok(content) = &mut content {
-            loop {
-                match Close::ast_option(parser) {
-                    Some(close) => break Ok(close),
-                    None => {
-                        if let ControlFlow::Break(err) = content.ast_item_impl::<ResultMode>(parser)
-                        {
-                            match err {
-                                None => break Close::ast_result(parser),
-                                Some(content_err) => {
-                                    let Err(close_err) = Close::ast_result(parser) else {
-                                        unreachable!()
-                                    };
-                                    break Err(Error::all_failed(vec![close_err, content_err]));
-                                }
+        let close = match &mut content {
+            SpannedOption::Some(content) => loop {
+                match Close::ast_no_errors(parser) {
+                    Some(close) => break SpannedOption::Some(close),
+                    None => match content.ast_item(parser) {
+                        ControlFlow::Continue(()) => {
+                            if parser.is_finished() {
+                                panic!(
+                                    "{}::ast_item entered an infinite loop",
+                                    type_name::<Content>()
+                                );
                             }
-                        } else if parser.is_finished() {
-                            panic!(
-                                "{}::ast_item entered an infinite loop",
-                                type_name::<Content>()
-                            );
                         }
-                    }
+                        ControlFlow::Break(Ok(())) => break Close::ast_spanned(parser),
+                        ControlFlow::Break(Err(())) => {
+                            break SpannedOption::None(parser.last_error_span())
+                        }
+                    },
                 }
-            }
-        } else {
-            Close::ast_result(parser)
+            },
+            SpannedOption::None(span) => SpannedOption::None(span.clone()),
         };
 
-        if close.is_err() {
+        if close.as_option().is_none() {
             let mut depth: u16 = 1;
             while !parser.is_finished() {
-                if Close::ast_option(parser).is_some() {
+                if Close::ast_no_errors(parser).is_some() {
                     depth -= 1;
                     if depth == 0 {
                         break;
                     }
-                } else if Open::ast_option(parser).is_some() {
+                } else if Open::ast_no_errors(parser).is_some() {
                     depth += 1;
                 } else {
                     parser.step();
@@ -70,9 +63,9 @@ where
             }
         }
 
-        ControlFlow::Continue(Self {
+        Some(Self {
             open,
-            content,
+            content: content.into_option(),
             close,
         })
     }

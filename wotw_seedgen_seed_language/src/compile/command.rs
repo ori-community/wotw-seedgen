@@ -2,7 +2,7 @@
 
 use super::{Compile, ExportedValue, SnippetCompiler};
 use crate::{
-    ast::{self, CommandArg, UberStateType},
+    ast::{self, consume_command_arg, UberStateType},
     output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
 };
 use ordered_float::OrderedFloat;
@@ -10,13 +10,7 @@ use rand::Rng;
 use std::{iter, mem, ops::Range};
 use wotw_seedgen_assets::UberStateAlias;
 use wotw_seedgen_data::{Position, UberIdentifier, Zone};
-use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart};
-
-fn consume_command_arg<T>(arg: CommandArg<T>, compiler: &mut SnippetCompiler) -> Option<T> {
-    compiler
-        .consume_result(arg.result)
-        .and_then(|(_, arg)| compiler.consume_result(arg.result))
-}
+use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart, SpannedOption};
 
 impl<'source> Compile<'source> for ast::Command<'source> {
     type Output = ();
@@ -137,7 +131,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
 
         if let Some((_, imports)) = self.imports.data {
             for import in imports {
-                if let Some(import) = import.result.map_err(|err| compiler.errors.push(err)).ok() {
+                if let SpannedOption::Some(import) = import.value {
                     let Some(value) = snippet_exported_values.get(import.data.0) else {
                         compiler.errors.push(
                             Error::custom(
@@ -183,7 +177,7 @@ impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let Some(path) = consume_command_arg(self.path, compiler) else {
+        let Some(path) = consume_command_arg(self.path) else {
             return;
         };
 
@@ -212,7 +206,7 @@ impl<'source> Compile<'source> for ast::BuiltinIconArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let Some(path) = consume_command_arg(self.path, compiler) else {
+        let Some(path) = consume_command_arg(self.path) else {
             return;
         };
 
@@ -228,7 +222,7 @@ impl<'source> Compile<'source> for ast::AugmentFunArgs<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let function = compiler.resolve_function(&self.identifier);
-        let action = consume_command_arg(self.action, compiler);
+        let action = consume_command_arg(self.action);
 
         let Some(action) = action else { return };
 
@@ -315,7 +309,7 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
         }
 
         let x = self.x.evaluate(compiler);
-        let y = consume_command_arg(self.y, compiler).and_then(|y| y.evaluate(compiler));
+        let y = consume_command_arg(self.y).and_then(|y| y.evaluate(compiler));
 
         let (Some(x), Some(y)) = (x, y) else { return };
 
@@ -337,9 +331,9 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        consume_command_arg(self.description, compiler);
-        let ty = consume_command_arg(self.ty, compiler);
-        let default = consume_command_arg(self.default, compiler);
+        consume_command_arg(self.description);
+        let ty = consume_command_arg(self.ty);
+        let default = consume_command_arg(self.default);
 
         let (Some(ty), Some(default)) = (ty, default) else {
             return;
@@ -390,8 +384,8 @@ impl<'source> Compile<'source> for ast::SetConfigArgs<'source> {
         compiler.check_snippet_included(&self.snippet_name);
 
         // TODO verify identifier exists?
-        consume_command_arg(self.identifier, compiler);
-        consume_command_arg(self.value, compiler);
+        consume_command_arg(self.identifier);
+        consume_command_arg(self.value);
     }
 }
 
@@ -401,7 +395,7 @@ impl<'source> Compile<'source> for ast::StateArgs<'source> {
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let span = self.span();
 
-        let Some(ty) = consume_command_arg(self.ty, compiler) else {
+        let Some(ty) = consume_command_arg(self.ty) else {
             return;
         };
 
@@ -430,7 +424,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
         let toggle = boolean_uber_state(compiler, self.toggle_identifier.span);
         let toggle = compiler.consume_result(toggle);
 
-        let Some(timer_identifier) = consume_command_arg(self.timer_identifier, compiler) else {
+        let Some(timer_identifier) = consume_command_arg(self.timer_identifier) else {
             return;
         };
         let timer = float_uber_state(compiler, timer_identifier.span);
@@ -500,7 +494,7 @@ impl<'source> Compile<'source> for ast::LetArgs<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         if let Some(value) =
-            consume_command_arg(self.value, compiler).and_then(|value| value.evaluate(compiler))
+            consume_command_arg(self.value).and_then(|value| value.evaluate(compiler))
         {
             compiler.variables.insert(self.identifier.data, value);
         }
@@ -533,7 +527,7 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
                 return;
             }
 
-            if let Some(contents) = compiler.consume_delimited(self.contents) {
+            if let Some(contents) = self.contents.content {
                 for contents in iter::repeat_n(contents, repetitions as usize) {
                     // short circuit on errors to avoid adding the same errors repeatedly
                     if contents.compile(compiler).contains(&None) {
@@ -571,8 +565,8 @@ fn compile_item_pool_change<'source, const FACTOR: i32>(
         .compile(compiler)
         .and_then(|command| command.expect_void(compiler, span));
 
-    let amount = consume_command_arg(args.amount, compiler)
-        .and_then(|amount| amount.evaluate::<i32>(compiler));
+    let amount =
+        consume_command_arg(args.amount).and_then(|amount| amount.evaluate::<i32>(compiler));
 
     if let (Some(item), Some(amount)) = (item, amount) {
         *compiler
@@ -596,16 +590,14 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
 
-        let name =
-            consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
-        let shop_price = consume_command_arg(self.price, compiler)
-            .and_then(|price| price.compile_into(compiler));
-        let description = consume_command_arg(self.description, compiler)
+        let name = consume_command_arg(self.name).and_then(|name| name.evaluate(compiler));
+        let shop_price =
+            consume_command_arg(self.price).and_then(|price| price.compile_into(compiler));
+        let description = consume_command_arg(self.description)
             .and_then(|description| description.compile_into(compiler));
-        let icon =
-            consume_command_arg(self.icon, compiler).and_then(|icon| icon.compile_into(compiler));
-        let map_icon = consume_command_arg(self.map_icon, compiler)
-            .and_then(|map_icon| map_icon.compile_into(compiler));
+        let icon = consume_command_arg(self.icon).and_then(|icon| icon.compile_into(compiler));
+        let map_icon =
+            consume_command_arg(self.map_icon).and_then(|map_icon| map_icon.compile_into(compiler));
 
         if let Some(item) = item {
             if compiler
@@ -644,8 +636,7 @@ impl<'source> Compile<'source> for ast::ItemDataNameArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
 
-        let name =
-            consume_command_arg(self.name, compiler).and_then(|name| name.evaluate(compiler));
+        let name = consume_command_arg(self.name).and_then(|name| name.evaluate(compiler));
 
         if let (Some(item), Some(name)) = (item, name) {
             insert_item_data(compiler, item, span, name, "name", |data| &mut data.name);
@@ -663,8 +654,7 @@ impl<'source> Compile<'source> for ast::ItemDataPriceArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
 
-        let price = consume_command_arg(self.price, compiler)
-            .and_then(|price| price.compile_into(compiler));
+        let price = consume_command_arg(self.price).and_then(|price| price.compile_into(compiler));
 
         if let (Some(item), Some(price)) = (item, price) {
             insert_item_data(compiler, item, span, price, "price", |data| {
@@ -684,7 +674,7 @@ impl<'source> Compile<'source> for ast::ItemDataDescriptionArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
 
-        let description = consume_command_arg(self.description, compiler)
+        let description = consume_command_arg(self.description)
             .and_then(|description| description.compile_into(compiler));
 
         if let (Some(item), Some(description)) = (item, description) {
@@ -705,8 +695,7 @@ impl<'source> Compile<'source> for ast::ItemDataIconArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
 
-        let icon =
-            consume_command_arg(self.icon, compiler).and_then(|icon| icon.compile_into(compiler));
+        let icon = consume_command_arg(self.icon).and_then(|icon| icon.compile_into(compiler));
 
         if let (Some(item), Some(icon)) = (item, icon) {
             insert_item_data(compiler, item, span, icon, "icon", |data| &mut data.icon);
@@ -725,8 +714,8 @@ impl<'source> Compile<'source> for ast::ItemDataMapIconArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, &span));
 
-        let map_icon = consume_command_arg(self.map_icon, compiler)
-            .and_then(|map_icon| map_icon.compile_into(compiler));
+        let map_icon =
+            consume_command_arg(self.map_icon).and_then(|map_icon| map_icon.compile_into(compiler));
 
         if let (Some(item), Some(map_icon)) = (item, map_icon) {
             insert_item_data(compiler, item, span, map_icon, "map_icon", |data| {
@@ -793,8 +782,7 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
 
-        let zone =
-            consume_command_arg(self.zone, compiler).and_then(|zone| zone.evaluate(compiler));
+        let zone = consume_command_arg(self.zone).and_then(|zone| zone.evaluate(compiler));
 
         if let (Some(item), Some(zone)) = (item, zone) {
             compiler.global.output.preplacements.push((item, zone));
@@ -806,7 +794,7 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let Some(item) = consume_command_arg(self.item, compiler) else {
+        let Some(item) = consume_command_arg(self.item) else {
             return;
         };
 
@@ -828,8 +816,8 @@ impl<'source> Compile<'source> for ast::ItemOnArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let Some(trigger) = consume_command_arg(self.trigger, compiler)
-            .and_then(|trigger| trigger.compile(compiler))
+        if let Some(trigger) =
+            consume_command_arg(self.trigger).and_then(|trigger| trigger.compile(compiler))
         {
             compiler.variables.insert(
                 self.identifier.data,
@@ -851,12 +839,12 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
             .flatten()
             .flatten();
 
-        let Some(items) = consume_command_arg(self.items, compiler) else {
+        let Some(items) = consume_command_arg(self.items) else {
             return;
         };
 
-        let items = compiler
-            .consume_delimited(items)
+        let items = items
+            .content
             .into_iter()
             .flatten()
             .filter_map(|action| {
@@ -883,7 +871,7 @@ impl<'source> Compile<'source> for ast::CountInZoneBinding<'source> {
     type Output = Option<(Identifier<'source>, Zone)>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        consume_command_arg(self.zone, compiler)
+        consume_command_arg(self.zone)
             .and_then(|zone| zone.evaluate(compiler))
             .map(|zone| (self.identifier.data, zone))
     }
@@ -893,8 +881,8 @@ impl<'source> Compile<'source> for ast::RandomIntegerArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min = consume_command_arg(self.0.min, compiler).and_then(|min| min.evaluate(compiler));
-        let max = consume_command_arg(self.0.max, compiler).and_then(|max| max.evaluate(compiler));
+        let min = consume_command_arg(self.0.min).and_then(|min| min.evaluate(compiler));
+        let max = consume_command_arg(self.0.max).and_then(|max| max.evaluate(compiler));
 
         if let (Some(min), Some(max)) = (min, max) {
             let value = compiler.rng.gen_range(min..=max);
@@ -910,9 +898,9 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min = consume_command_arg(self.0.min, compiler)
+        let min = consume_command_arg(self.0.min)
             .and_then(|min| min.evaluate::<OrderedFloat<f32>>(compiler));
-        let max = consume_command_arg(self.0.max, compiler)
+        let max = consume_command_arg(self.0.max)
             .and_then(|max| max.evaluate::<OrderedFloat<f32>>(compiler));
 
         if let (Some(min), Some(max)) = (min, max) {
@@ -929,14 +917,14 @@ impl<'source> Compile<'source> for ast::RandomPoolArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        consume_command_arg(self.ty, compiler);
+        consume_command_arg(self.ty);
 
-        let Some(values) = consume_command_arg(self.values, compiler) else {
+        let Some(values) = consume_command_arg(self.values) else {
             return;
         };
 
-        let mut options_iter = compiler
-            .consume_delimited(values)
+        let mut options_iter = values
+            .content
             .into_iter()
             .flatten()
             .map(|expression| expression.evaluate(compiler));
@@ -959,7 +947,7 @@ impl<'source> Compile<'source> for ast::RandomFromPoolArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let Some(pool_identifier) = consume_command_arg(self.pool_identifier, compiler) else {
+        let Some(pool_identifier) = consume_command_arg(self.pool_identifier) else {
             return;
         };
 

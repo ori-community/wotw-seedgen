@@ -56,9 +56,7 @@ impl<'source> ast::ExpressionValue<'source> {
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<T> {
         match self {
-            ast::ExpressionValue::Group(group) => {
-                compiler.consume_delimited(group)?.0.compile_into(compiler)
-            }
+            ast::ExpressionValue::Group(group) => group.content?.0.compile_into(compiler),
             ast::ExpressionValue::Action(action) => T::compile_action(action, compiler),
             ast::ExpressionValue::Literal(literal) => T::compile_literal(literal, compiler),
             ast::ExpressionValue::Identifier(identifier) => compiler

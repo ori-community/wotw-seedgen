@@ -521,7 +521,7 @@ impl<'source> ast::FunctionCall<'source> {
         index: usize,
         compiler: &mut SnippetCompiler,
     ) -> Option<Command> {
-        if let Some(parameters) = compiler.consume_delimited(self.parameters) {
+        if let Some(parameters) = self.parameters.content {
             if !parameters.is_empty() {
                 compiler.errors.push(Error::custom(
                     "parameters for custom functions aren't (yet) supported".to_string(),
@@ -547,10 +547,9 @@ impl<'source> ast::FunctionCall<'source> {
                 .parse::<FunctionIdentifier>()
                 .map_err(|_| Error::custom("Unknown function".to_string(), self.identifier.span)),
         );
-        let parameters = compiler.consume_result(self.parameters.content);
 
         let identifier = identifier?;
-        let parameters = parameters?;
+        let parameters = self.parameters.content?;
         let arg_count = identifier.arg_count();
 
         match parameters.len().cmp(&arg_count) {
@@ -575,8 +574,6 @@ impl<'source> ast::FunctionCall<'source> {
                     .push(Error::custom("Too many parameters".to_string(), start..end))
             }
         }
-
-        compiler.consume_result(self.parameters.close);
 
         let context = ArgContext {
             parameters: parameters.into_iter(),

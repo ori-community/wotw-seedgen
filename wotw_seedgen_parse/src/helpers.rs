@@ -1,11 +1,5 @@
-use wotw_seedgen_assets::Source;
-
-use crate::{Ast, ErrorKind, Mode, ParseIdentToken, Parser, Result, Tokenize};
-use std::{
-    fmt::{self, Display},
-    io,
-    ops::ControlFlow,
-};
+use crate::{Ast, ErrorKind, ErrorMode, ParseIdentToken, Parser, Tokenize};
+use std::fmt::{self, Display};
 
 /// [`Ast`] node parsing an identifier
 ///
@@ -38,8 +32,8 @@ use std::{
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast("   OriIsAGoodGame   ", tokenizer).into_result(),
-///     Ok(Identifier("OriIsAGoodGame"))
+///     parse_ast("   OriIsAGoodGame   ", tokenizer).parsed,
+///     Some(Identifier("OriIsAGoodGame"))
 /// );
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -50,16 +44,17 @@ where
     T: Tokenize,
     T::Token: ParseIdentToken,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         let (token, span) = parser.current();
+
         if token.is_ident() {
             let slice = parser.slice(span.clone());
+
             parser.step();
-            ControlFlow::Continue(Self(slice))
+
+            Some(Self(slice))
         } else {
-            ControlFlow::Break(M::err(|| {
-                parser.error(ErrorKind::ExpectedToken("identifier".to_string()))
-            }))
+            E::none(|| parser.error(ErrorKind::ExpectedToken("identifier".to_string())))
         }
     }
 }
@@ -109,8 +104,8 @@ impl Display for Identifier<'_> {
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast("2x HugsPlease", tokenizer).into_result(),
-///     Ok(HugsAmount {
+///     parse_ast("2x HugsPlease", tokenizer).parsed,
+///     Some(HugsAmount {
 ///         amount: 2,
 ///         x: Symbol,
 ///         hugs: HugsPlease,
@@ -118,7 +113,7 @@ impl Display for Identifier<'_> {
 /// );
 ///
 /// // "xHugsPlease" will be tokenized as one identifier, so <Symbol<'x'>>::ast fill fail
-/// assert!(parse_ast::<_, HugsAmount>("2xHugsPlease", tokenizer).into_result().is_err());
+/// assert!(parse_ast::<_, HugsAmount>("2xHugsPlease", tokenizer).parsed.is_none());
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Symbol<const CHAR: char>;
@@ -126,15 +121,14 @@ impl<'source, T, const CHAR: char> Ast<'source, T> for Symbol<CHAR>
 where
     T: Tokenize,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         match parser.current_slice().strip_prefix(CHAR) {
             Some("") => {
                 parser.step();
-                ControlFlow::Continue(Self)
+
+                Some(Self)
             }
-            _ => ControlFlow::Break(M::err(|| {
-                parser.error(ErrorKind::ExpectedToken(Self.to_string()))
-            })),
+            _ => E::none(|| parser.error(ErrorKind::ExpectedToken(Self.to_string()))),
         }
     }
 }
@@ -149,8 +143,7 @@ impl<const CHAR: char> Display for Symbol<CHAR> {
 ///
 /// This usually won't actually be part of your Ast, rather it is returned by [`parse_ast`].
 ///
-/// [`NoTrailingInput::ast_result`] will never return [`Err`], instead [`NoTrailingInput`] contains [`Result`]s representing the outcome.
-/// After calling [`NoTrailingInput::ast_result`], the `parser` will always be exhausted.
+/// After calling [`NoTrailingInput::ast`], the `parser` will always be exhausted.
 ///
 /// ```
 /// # extern crate logos;
@@ -176,61 +169,29 @@ impl<const CHAR: char> Display for Symbol<CHAR> {
 /// type Tokenizer = LogosTokenizer<Token>;
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
-/// assert!(matches!(
-///     parse_ast::<_, u8>("5$", tokenizer),
-///     NoTrailingInput {
-///         parsed: Ok(5),
-///         trailing: Err(_)
-///     }
-/// ));
+/// let result = parse_ast::<_, u8>("5$", tokenizer);
+/// assert_eq!(result.parsed, Some(5));
+/// assert!(!result.errors.is_empty());
 /// ```
 ///
 /// [`parse_ast`]: crate::parse_ast
-// TODO I'd rather return a Result<T, Vec<Error>>;
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NoTrailingInput<T> {
-    pub parsed: Result<T>,
-    pub trailing: Result<()>,
-}
-
-impl<T> NoTrailingInput<T> {
-    pub fn into_result(self) -> Result<T> {
-        self.trailing.and(self.parsed)
-    }
-
-    pub fn eprint_errors(self, source: &Source) -> Option<T> {
-        let mut stderr = io::stderr().lock();
-
-        let value = match self.parsed {
-            Ok(value) => Some(value),
-            Err(err) => {
-                err.write_pretty(source, &mut stderr).unwrap();
-                None
-            }
-        };
-
-        if let Err(err) = self.trailing {
-            err.write_pretty(source, &mut stderr).unwrap();
-        }
-
-        value
-    }
-}
+pub struct NoTrailingInput<V>(pub V);
 
 impl<'source, T, V> Ast<'source, T> for NoTrailingInput<V>
 where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        let parsed = V::ast_result(parser);
-        let trailing = if parser.is_finished() {
-            Ok(())
-        } else {
-            let err = parser.error(ErrorKind::ExpectedToken("end of input".to_string()));
-            parser.jump(parser.end());
-            Err(err)
-        };
-        ControlFlow::Continue(Self { parsed, trailing })
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        V::ast_impl::<E>(parser).map(|value| {
+            if !parser.is_finished() {
+                E::err(|| parser.error(ErrorKind::ExpectedToken("end of input".to_string())));
+
+                parser.jump(parser.end());
+            }
+
+            Self(value)
+        })
     }
 }

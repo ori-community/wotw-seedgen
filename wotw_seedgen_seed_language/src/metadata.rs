@@ -1,8 +1,8 @@
 pub use crate::output::Literal;
 
-use crate::ast::{self, CommandArg};
+use crate::ast::{self, inspect_command_arg};
 use rustc_hash::FxHashMap;
-use wotw_seedgen_parse::Recoverable;
+use wotw_seedgen_parse::{Recoverable, SpannedOption};
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Metadata {
@@ -21,9 +21,8 @@ pub struct ConfigValue {
 
 impl Metadata {
     pub fn from_source(source: &str) -> Self {
-        ast::parse::<ast::Snippet>(source)
+        ast::Snippet::parse(source)
             .parsed
-            .ok()
             .as_ref()
             .map_or_else(Self::default, Self::from_ast)
     }
@@ -49,7 +48,7 @@ impl<T: ExtractMetadata> ExtractMetadata for Vec<T> {
 
 impl<T: ExtractMetadata, R> ExtractMetadata for Recoverable<T, R> {
     fn extract_metadata(&self, metadata: &mut Metadata) {
-        if let Ok(t) = &self.result {
+        if let SpannedOption::Some(t) = &self.value {
             t.extract_metadata(metadata);
         }
     }
@@ -107,8 +106,8 @@ impl ExtractMetadata for ast::Command<'_> {
         };
 
         let (Some(default), Some(description)) = (
-            extract_command_arg(&config.default),
-            extract_command_arg(&config.description),
+            inspect_command_arg(&config.default),
+            inspect_command_arg(&config.description),
         ) else {
             return;
         };
@@ -132,16 +131,9 @@ impl ExtractMetadata for ast::Command<'_> {
 }
 
 fn extract_args<Args>(args: &ast::CommandArgs<Args>) -> Option<&Args> {
-    args.result
+    args.value
+        .as_option()
         .as_ref()
         .and_then(|args| args.content.as_ref())
-        .ok()
         .map(|args| &args.0)
-}
-
-fn extract_command_arg<T>(arg: &CommandArg<T>) -> Option<&T> {
-    arg.result
-        .as_ref()
-        .and_then(|(_, arg)| arg.result.as_ref())
-        .ok()
 }

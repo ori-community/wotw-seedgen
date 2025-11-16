@@ -1,6 +1,6 @@
 use crate::{
     ast::{
-        parse, Amount, And, Content, Dedent, GroupContent, Indent, LogicIdentifier, Or,
+        Amount, And, Areas, Content, Dedent, GroupContent, Indent, LogicIdentifier, Or,
         PlainRequirement, Region, RegionKeyword, Requirement, RequirementGroup, RequirementLine,
     },
     output::{Graph, Node},
@@ -66,13 +66,13 @@ fn ast() {
     let source = "region GorlekMines:\n    moki: GorlekMines.ElevatorFixed OR Shuriken=1\n";
     let mut parser = Parser::new(source, Tokenizer);
     assert_eq!(
-        Content::ast_result(&mut parser).unwrap(),
+        Content::ast(&mut parser).unwrap(),
         Content::Region(
             Spanned {
                 data: RegionKeyword,
                 span: 0..6
             },
-            Recoverable::new(Ok(Region {
+            Recoverable::some(Region {
                 identifier: Spanned {
                     data: Identifier("GorlekMines"),
                     span: 7..18
@@ -82,7 +82,7 @@ fn ast() {
                         data: Symbol,
                         span: 18..19
                     },
-                    content: Recoverable::new(Ok(GroupContent {
+                    content: Recoverable::some(GroupContent {
                         indent: Spanned {
                             data: Indent,
                             span: 19..24
@@ -116,10 +116,10 @@ fn ast() {
                                                     data: Symbol,
                                                     span: 67..68
                                                 },
-                                                value: Recoverable::new(Ok(Spanned {
+                                                value: Recoverable::some(Spanned {
                                                     data: 1,
                                                     span: 68..69
-                                                }))
+                                                })
                                             })
                                         })
                                     )]
@@ -132,9 +132,9 @@ fn ast() {
                             data: Dedent,
                             span: 69..source.len()
                         }
-                    })),
+                    }),
                 }
-            })),
+            }),
         ),
     );
 }
@@ -146,12 +146,15 @@ fn compile() {
         include_str!("../../wotw_seedgen/areas.wotw").to_string(),
     );
 
-    let areas = parse(&source.content).eprint_errors(&source).unwrap();
-    let (graph, success) =
-        Graph::compile(areas, LOC_DATA.clone(), STATE_DATA.clone(), &[]).eprint_errors(&source);
-    if !success {
+    let areas = Areas::parse(&source.content)
+        .eprint_errors(&source)
+        .unwrap();
+
+    let Some(graph) =
+        Graph::compile(areas, LOC_DATA.clone(), STATE_DATA.clone(), &[]).eprint_errors(&source)
+    else {
         panic!("Failed to parse areas.wotw");
-    }
+    };
 
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
     match &graph.nodes[spawn] {

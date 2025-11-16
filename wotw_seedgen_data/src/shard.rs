@@ -22,6 +22,8 @@ use wotw_seedgen_derive::FromStr;
 )]
 #[repr(u8)]
 pub enum Shard {
+    // TODO shard:0 is the question mark icon
+    // None = 0,
     Overcharge = 1,
     TripleJump = 2,
     Wingclip = 3,

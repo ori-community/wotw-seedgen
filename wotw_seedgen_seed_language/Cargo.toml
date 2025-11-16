@@ -25,5 +25,6 @@ regex = { version = "1.11.1", default-features = false, features = ["std", "perf
 heck = "0.5.0"
 
 [dev-dependencies]
+wotw_seedgen_assets = { path = "../wotw_seedgen_assets", features = ["file_access"] }
 wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets", features = ["loc_data", "state_data", "uber_state_data"] }
 lazy_static = "1.4"

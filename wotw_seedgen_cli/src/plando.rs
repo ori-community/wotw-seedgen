@@ -136,10 +136,10 @@ fn compile(
     );
 
     compiler.compile_snippet(entry)?;
-    let (mut output, success) = compiler.finish().eprint_errors();
-    if !success {
-        return Err("compilation failed".into());
-    }
+    let mut output = compiler
+        .finish()
+        .eprint_errors()
+        .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
     let string_placeholder_map = output.postprocess(loc_data, rng);
 

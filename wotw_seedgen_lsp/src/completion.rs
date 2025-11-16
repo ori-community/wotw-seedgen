@@ -17,15 +17,14 @@ use wotw_seedgen_seed_language::{
         ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs,
         ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
         LetArgs, Literal, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-        RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, Result,
-        SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger,
-        TriggerBinding, UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType,
-        ZoneOfArgs,
+        RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, SeparatedNonEmpty,
+        SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding,
+        UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType, ZoneOfArgs,
     },
     compile::FunctionIdentifier,
     parse::{
-        Delimited, Error, ErrorKind, Identifier, NoTrailingInput, Once, Punctuated, Recoverable,
-        SpanEnd, SpanStart, Spanned,
+        Delimited, Error, ErrorKind, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart,
+        Spanned, SpannedOption,
     },
     types::Type,
 };
@@ -82,15 +81,21 @@ where
     }
 }
 
-impl<T> Completion for Result<T>
+impl<T> Completion for Option<T>
 where
-    T: Completion + ErrCompletion,
+    T: Completion,
 {
     fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        match self {
-            Ok(t) => t.completion(index),
-            Err(err) => Some(T::err_completion(err)),
-        }
+        self.as_ref().and_then(|t| t.completion(index))
+    }
+}
+
+impl<T> Completion for SpannedOption<T>
+where
+    T: Completion,
+{
+    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
+        self.as_option().and_then(|t| t.completion(index))
     }
 }
 
@@ -185,21 +190,12 @@ where
     }
 }
 
-impl<T> Completion for NoTrailingInput<T>
-where
-    T: Completion + ErrCompletion,
-{
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.parsed.completion(index)
-    }
-}
-
 impl<V, R> CompletionAfterSpanCheck for Recoverable<V, R>
 where
     V: Completion + ErrCompletion + Span,
 {
     fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.result.completion(index)
+        self.value.completion(index)
     }
 }
 
@@ -235,9 +231,8 @@ where
     T: Completion + ErrCompletion + Span,
 {
     fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.result
-            .as_ref()
-            .ok()
+        self.value
+            .as_option()
             .and_then(|(_, t)| t.completion(index))
     }
 }

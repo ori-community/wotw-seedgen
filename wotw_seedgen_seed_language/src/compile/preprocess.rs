@@ -1,6 +1,6 @@
-use crate::ast::{self, RecoverContent};
+use crate::ast::{self, inspect_command_arg, RecoverContent};
 use rustc_hash::FxHashSet;
-use wotw_seedgen_parse::{Error, Recoverable, Span, Spanned};
+use wotw_seedgen_parse::{Error, Recoverable, Span, Spanned, SpannedOption};
 
 // TODO our preprocessing is a bit weird. For instance if you want to use an event
 // from a parent file, it fails to resolve with an odd error message
@@ -28,15 +28,15 @@ impl Preprocessor {
     fn preprocess_contents(&mut self, contents: &[Recoverable<ast::Content, RecoverContent>]) {
         for content in contents
             .iter()
-            .filter_map(|content| content.result.as_ref().ok())
+            .filter_map(|content| content.value.as_option())
         {
             match content {
                 ast::Content::Command(_, content) => {
-                    if let Ok(content) = &content.result {
+                    if let SpannedOption::Some(content) = &content.value {
                         match content {
                             ast::Command::Include(_, command) => {
-                                if let Ok(command) = &command.result {
-                                    if let Ok(args) = &command.content {
+                                if let SpannedOption::Some(command) = &command.value {
+                                    if let Some(args) = &command.content {
                                         if self.output.snippet_included(args.0.path.data) {
                                             self.errors.push(Error::custom(
                                                 "Snippet already included".to_string(),
@@ -52,8 +52,8 @@ impl Preprocessor {
                                 }
                             }
                             ast::Command::SetConfig(_, command) => {
-                                if let Ok(command) = &command.result {
-                                    if let Ok(args) = &command.content {
+                                if let SpannedOption::Some(command) = &command.value {
+                                    if let Some(args) = &command.content {
                                         let identifier = inspect_command_arg(&args.0.identifier);
                                         let value = inspect_command_arg(&args.0.value);
 
@@ -78,7 +78,7 @@ impl Preprocessor {
                             // Knowing the function structure isn't relevant in commands and includes can be handled immediately.
                             // Reassigning identifiers in let commands should be disallowed to avoid confusion where a later let commands influences an earlier function call.
                             ast::Command::If(_, command) => {
-                                if let Ok(contents) = &command.contents.content {
+                                if let Some(contents) = &command.contents.content {
                                     self.preprocess_contents(contents)
                                 }
                             }
@@ -87,7 +87,7 @@ impl Preprocessor {
                     }
                 }
                 ast::Content::Function(_, content) => {
-                    if let Ok(function) = &content.result {
+                    if let SpannedOption::Some(function) = &content.value {
                         self.output
                             .functions
                             .insert(function.identifier.data.0.to_string());
@@ -105,11 +105,4 @@ impl PreprocessorOutput {
             .iter()
             .any(|include| include.data == identifier)
     }
-}
-
-fn inspect_command_arg<T>(arg: &ast::CommandArg<T>) -> Option<&T> {
-    arg.result
-        .as_ref()
-        .ok()
-        .and_then(|arg| arg.1.result.as_ref().ok())
 }

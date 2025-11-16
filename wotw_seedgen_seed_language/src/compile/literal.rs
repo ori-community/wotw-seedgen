@@ -57,12 +57,16 @@ impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
 impl ast::UberIdentifier<'_> {
     pub(crate) fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         match self {
-            ast::UberIdentifier::Numeric(numeric) => compiler
-                .consume_result(numeric.member.result.clone())
-                .map(|member| UberStateAlias {
-                    uber_identifier: UberIdentifier::new(numeric.group.data, member.data),
-                    value: None,
-                }),
+            ast::UberIdentifier::Numeric(numeric) => {
+                numeric
+                    .member
+                    .value
+                    .as_option()
+                    .map(|member| UberStateAlias {
+                        uber_identifier: UberIdentifier::new(numeric.group.data, member.data),
+                        value: None,
+                    })
+            }
             ast::UberIdentifier::Name(name) => name.resolve(compiler),
         }
     }
@@ -85,10 +89,8 @@ impl ast::UberIdentifierName<'_> {
             compiler.errors.push(error);
         }
 
-        let member = compiler.consume_result(self.member.result.clone());
-
         let group = group?;
-        let member = member?;
+        let member = self.member.value.as_option()?;
 
         let ids = group.get(member.data.0);
         if ids.is_none() {

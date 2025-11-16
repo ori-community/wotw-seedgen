@@ -1,12 +1,13 @@
 use crate::token::{Token, Tokenizer};
 use ordered_float::OrderedFloat;
-use std::ops::{ControlFlow, Range};
+use std::ops::Range;
 use wotw_seedgen_parse::{
-    parse_ast, Ast, ErrorKind, Identifier, Mode, NoTrailingInput, Parser, Recover, Recoverable,
+    parse_ast, Ast, ErrorKind, ErrorMode, Identifier, ParseResult, Parser, Recover, Recoverable,
     Separated, SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned, Symbol,
 };
 
-pub fn parse<'source, V>(source: &'source str) -> NoTrailingInput<V>
+#[inline]
+pub fn parse_logic_ast<'source, V>(source: &'source str) -> ParseResult<V>
 where
     V: Ast<'source, Tokenizer>,
 {
@@ -16,6 +17,13 @@ where
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct Areas<'source> {
     pub contents: Separated<Recoverable<Content<'source>, RecoverDedent>, Newline>,
+}
+
+impl<'source> Areas<'source> {
+    #[inline]
+    pub fn parse(source: &'source str) -> ParseResult<Self> {
+        parse_logic_ast(source)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
@@ -110,7 +118,7 @@ pub struct Anchor<'source> {
 pub struct LogicIdentifier<'source>(pub &'source str);
 
 impl<'source> Ast<'source, Tokenizer> for LogicIdentifier<'source> {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, Tokenizer>) -> Option<Self> {
         let (token, span) = parser.current();
 
         match token {
@@ -118,11 +126,9 @@ impl<'source> Ast<'source, Tokenizer> for LogicIdentifier<'source> {
                 let slice = parser.slice(span.clone());
                 parser.step();
 
-                ControlFlow::Continue(Self(slice))
+                Some(Self(slice))
             }
-            _ => ControlFlow::Break(M::err(|| {
-                parser.error(ErrorKind::ExpectedToken("LogicIdentifier".to_string()))
-            })),
+            _ => E::none(|| parser.error(ErrorKind::ExpectedToken("LogicIdentifier".to_string()))),
         }
     }
 }
@@ -348,43 +354,43 @@ pub enum And {
 #[ast(token = Token::Or)]
 pub struct Or;
 impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, Tokenizer>) -> Option<Self> {
         let before = parser.position();
 
         let result = (|| {
             let mut ands = vec![];
 
             loop {
-                let last = Requirement::ast_impl::<M>(parser)?;
+                let last = Requirement::ast_impl::<E>(parser)?;
 
                 if parser.current().0 == Token::Or {
                     let mut more = Vec::with_capacity(1);
 
                     loop {
                         parser.step();
-                        more.push((Or, Requirement::ast_impl::<M>(parser)?));
+                        more.push((Or, Requirement::ast_impl::<E>(parser)?));
 
                         if parser.current().0 != Token::Or {
                             let ors = SeparatedNonEmpty { first: last, more };
 
                             let group = (parser.current_slice() == ":")
-                                .then(|| RequirementGroup::ast_option(parser).unwrap())
+                                .then(|| RequirementGroup::ast_no_errors(parser).unwrap())
                                 .map(Box::new);
 
-                            return ControlFlow::Continue(RequirementLine { ands, ors, group });
+                            return Some(RequirementLine { ands, ors, group });
                         }
                     }
                 } else if parser.current_slice() == "," {
                     parser.step();
                     ands.push((last, And::Comma(Symbol)));
-                } else if let Some(symbol) = <Spanned<Symbol<':'>>>::ast_option(parser) {
+                } else if let Some(symbol) = <Spanned<Symbol<':'>>>::ast_no_errors(parser) {
                     if matches!(
                         parser.current().0,
                         Token::Newline | Token::Indent | Token::Dedent
                     ) {
                         let group = Some(Box::new(RequirementGroup {
                             colon: symbol,
-                            content: Recoverable::ast_impl::<M>(parser)?,
+                            content: Recoverable::ast_impl::<E>(parser)?,
                         }));
 
                         let ors = SeparatedNonEmpty {
@@ -392,12 +398,12 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                             more: vec![],
                         };
 
-                        return ControlFlow::Continue(RequirementLine { ands, ors, group });
+                        return Some(RequirementLine { ands, ors, group });
                     } else {
                         ands.push((last, And::Colon(symbol.data)));
                     }
                 } else if matches!(parser.current().0, Token::Newline | Token::Dedent) {
-                    return ControlFlow::Continue(RequirementLine {
+                    return Some(RequirementLine {
                         ands,
                         ors: SeparatedNonEmpty {
                             first: last,
@@ -406,16 +412,16 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                         group: None,
                     });
                 } else {
-                    return ControlFlow::Break(M::err(|| {
+                    return E::none(|| {
                         parser.error(ErrorKind::ExpectedToken(
                             "',' or \"OR\" or ':' or Newline".to_string(),
                         ))
-                    }));
+                    });
                 }
             }
         })();
 
-        if result.is_break() {
+        if result.is_none() {
             parser.jump(before);
         }
 

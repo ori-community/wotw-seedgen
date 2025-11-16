@@ -1,8 +1,10 @@
-use std::ops::ControlFlow;
+use std::io::{self, Write};
+
+use wotw_seedgen_assets::Source;
 
 use crate::{
-    ErrorKind, Mode, NoTrailingInput, OptionMode, ParseBoolToken, ParseFloatToken, ParseIntToken,
-    ParseStringToken, Parser, Result, ResultMode, Tokenize,
+    Error, ErrorKind, ErrorMode, Errors, NoErrors, NoTrailingInput, ParseBoolToken,
+    ParseFloatToken, ParseIntToken, ParseStringToken, Parser, SpannedOption, Tokenize,
 };
 
 /// Trait responsible for parsing Ast nodes
@@ -24,9 +26,9 @@ use crate::{
 /// - With the `ordered_float` feature, [`OrderedFloat<f32>`] and [`OrderedFloat<f64>`] implement `Ast` if `Token` implements [`ParseFloatToken`]
 /// - [`&str`](str) and [`String`] implement `Ast` if `Token` implements [`ParseStringToken`]
 /// - [`Box<T>`] implements `Ast` if `T` does
-/// - [`Option<T>`] implements `Ast` if `T` does. [`Option::ast_result`] returns `Ok(Some(T))` if `T` succeeds and `Ok(None)` if `T` fails to parse
+/// - [`Option<T>`] implements `Ast` if `T` does. [`Option::ast`] returns `Some(Some(T))` if `T` succeeds and `Some(None)` if `T` fails to parse
 /// - `(T1, T2)` implements `Ast` if `T1` and `T2` do.
-/// - [`Vec<T>`] implements `Ast` if `T` does. [`Vec::ast_result`] will attempt to keep parsing `T` until the entire source is exhausted.
+/// - [`Vec<T>`] implements `Ast` if `T` does. [`Vec::ast`] will attempt to keep parsing `T` until the entire source is exhausted.
 ///   This can be useful as a top-level Ast node or as [`Delimited<Open, Vec<T>, Close>`][`Delimited`], which will attempt to parse `T` until the delimited content is exhausted.
 ///
 /// ```
@@ -54,12 +56,12 @@ use crate::{
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast::<_, (f32, Option<Symbol<'f'>>)>("4.2f", tokenizer).into_result(),
-///     Ok((4.2, Some(Symbol)))
+///     parse_ast::<_, (f32, Option<Symbol<'f'>>)>("4.2f", tokenizer).parsed,
+///     Some((4.2, Some(Symbol)))
 /// );
 /// assert_eq!(
-///     parse_ast::<_, (f32, Option<Symbol<'f'>>)>("4.2", tokenizer).into_result(),
-///     Ok((4.2, None))
+///     parse_ast::<_, (f32, Option<Symbol<'f'>>)>("4.2", tokenizer).parsed,
+///     Some((4.2, None))
 /// );
 /// ```
 ///
@@ -112,8 +114,8 @@ use crate::{
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast("80%", tokenizer).into_result(),
-///     Ok(Percentage {
+///     parse_ast("80%", tokenizer).parsed,
+///     Some(Percentage {
 ///         value: 80,
 ///         percent: Symbol,
 ///     })
@@ -146,8 +148,8 @@ use crate::{
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast("happy_noises", tokenizer).into_result(),
-///     Ok(HappyNoises)
+///     parse_ast("happy_noises", tokenizer).parsed,
+///     Some(HappyNoises)
 /// )
 /// ```
 ///
@@ -177,8 +179,8 @@ use crate::{
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast("fun", tokenizer).into_result(),
-///     Ok(Fun)
+///     parse_ast("fun", tokenizer).parsed,
+///     Some(Fun)
 /// )
 /// ```
 ///
@@ -219,17 +221,17 @@ use crate::{
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// assert_eq!(
-///     parse_ast("foo", tokenizer).into_result(),
-///     Ok(Content::Foo)
+///     parse_ast("foo", tokenizer).parsed,
+///     Some(Content::Foo)
 /// );
 ///
 /// assert_eq!(
-///     parse_ast("\"bar\"", tokenizer).into_result(),
-///     Ok(Content::String("bar"))
+///     parse_ast("\"bar\"", tokenizer).parsed,
+///     Some(Content::String("bar"))
 /// );
 /// ```
 ///
-/// You can avoid excessive backtracking by using [`Recoverable`] or [`Result`] as soon as you want to commit to a branch.
+/// You can avoid excessive backtracking by using [`Recoverable`] as soon as you want to commit to a branch.
 ///
 /// # Implementing manually
 ///
@@ -240,7 +242,7 @@ use crate::{
 /// # extern crate logos;
 /// use std::ops::ControlFlow;
 /// use logos::Logos;
-/// use wotw_seedgen_parse::{Ast, LogosTokenizer, Mode, Parser};
+/// use wotw_seedgen_parse::{Ast, ErrorMode, LogosTokenizer, Parser};
 ///
 /// #[derive(Debug, Clone, Copy, Logos)]
 /// enum Token {
@@ -251,7 +253,7 @@ use crate::{
 ///
 /// pub struct CustomAst;
 /// impl<'source> Ast<'source, Tokenizer> for CustomAst {
-///     fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
+///     fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, Tokenizer>) -> Option<Self> {
 ///         todo!()
 ///     }
 /// }
@@ -271,7 +273,7 @@ use crate::{
 /// use std::ops::ControlFlow;
 /// # use logos::Logos;
 /// # use wotw_seedgen_parse::LogosTokenizer;
-/// use wotw_seedgen_parse::{Ast, Mode, Parser};
+/// use wotw_seedgen_parse::{Ast, ErrorMode, Parser};
 ///
 /// # #[derive(Debug, Clone, Copy, Logos)]
 /// # enum Token {}
@@ -280,19 +282,19 @@ use crate::{
 /// pub struct Example;
 ///
 /// impl<'source> Ast<'source, Tokenizer> for Example {
-///     fn ast_impl<M: Mode>(parser: &mut Parser<'source, Tokenizer>) -> ControlFlow<M::Error, Self> {
+///     fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, Tokenizer>) -> Option<Self> {
 ///         let before = parser.position();
 ///
-///         let flow = {
+///         let option = {
 ///             // attempt at parsing which may consume some tokens before it is certain to be successful
-///     #       ControlFlow::Continue(Self)
+///     #       Some(Self)
 ///         };
 ///
-///         if flow.is_break() {
+///         if option.is_none() {
 ///             parser.jump(before);
 ///         }
 ///
-///         flow
+///         option
 ///     }
 /// }
 /// ```
@@ -314,46 +316,78 @@ pub trait Ast<'source, T: Tokenize>: Sized {
     /// Composable parsing implementation
     ///
     /// This is the core function when manually implementing `Ast`
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self>;
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self>;
 
-    #[inline]
-    /// Attempt to parse `Self`, only progressing `parser` if successful.
-    ///
-    /// Unless when implementing custom parser [`Mode`]s, you probably want to use
-    /// [`Ast::ast_result`] or [`Ast::ast_option`] depending on whether you need errors.
-    fn ast_output<M: Mode>(parser: &mut Parser<'source, T>) -> M::Output<Self> {
-        M::output(Self::ast_impl::<M>(parser))
+    fn ast_impl_spanned<E: ErrorMode>(parser: &mut Parser<'source, T>) -> SpannedOption<Self> {
+        let option = Self::ast_impl::<E>(parser);
+
+        SpannedOption::from_option(option, || parser.last_error_span())
     }
 
-    #[inline]
-    /// Attempt to parse `Self`, only progressing `parser` if successful.
-    ///
-    /// If parsing fails, an [`Error`] will be returned
-    ///
-    /// [`Error`]: crate::Error
-    fn ast_result(parser: &mut Parser<'source, T>) -> Result<Self> {
-        Self::ast_output::<ResultMode>(parser)
+    fn ast(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Self::ast_impl::<Errors>(parser)
     }
 
-    #[inline]
-    /// Attempt to parse `Self`, only progressing `parser` if successful.
-    ///
-    /// If parsing fails, `None` will be returned
-    fn ast_option(parser: &mut Parser<'source, T>) -> Option<Self> {
-        Self::ast_output::<OptionMode>(parser)
+    fn ast_spanned(parser: &mut Parser<'source, T>) -> SpannedOption<Self> {
+        Self::ast_impl_spanned::<Errors>(parser)
+    }
+
+    fn ast_no_errors(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Self::ast_impl::<NoErrors>(parser)
+    }
+
+    fn ast_no_errors_spanned(parser: &mut Parser<'source, T>) -> SpannedOption<Self> {
+        Self::ast_impl_spanned::<NoErrors>(parser)
     }
 }
 
 /// Convenience function to parse any type implementing [`Ast`] from a [`&str`](str).
-// TODO we are not assuming anymore that the library user implements ParseToken no their token.
-#[inline]
-pub fn parse_ast<'source, T, V>(source: &'source str, tokenizer: T) -> NoTrailingInput<V>
+pub fn parse_ast<'source, T, V>(source: &'source str, tokenizer: T) -> ParseResult<V>
 where
     T: Tokenize,
     V: Ast<'source, T>,
 {
     let mut parser = Parser::new(source, tokenizer);
-    NoTrailingInput::ast_option(&mut parser).unwrap() // NoTrailingInput parsing never fails
+
+    let parsed = NoTrailingInput::<V>::ast(&mut parser).map(|v| v.0);
+
+    ParseResult {
+        parsed,
+        errors: parser.errors,
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ParseResult<V> {
+    pub parsed: Option<V>,
+    pub errors: Vec<Error>,
+}
+
+impl<V> ParseResult<V> {
+    pub fn eprint_errors(self, source: &Source) -> Option<V> {
+        let mut stderr = io::stderr().lock();
+
+        let error_count = self.errors.len();
+
+        for error in self.errors {
+            error.write_pretty(source, &mut stderr).unwrap();
+        }
+
+        let success = error_count == 0;
+        if !success {
+            writeln!(
+                &mut stderr,
+                "Failed to compile Logic with {error_count} errors."
+            )
+            .unwrap();
+        }
+
+        if success {
+            self.parsed
+        } else {
+            None
+        }
+    }
 }
 
 impl<'source, T> Ast<'source, T> for bool
@@ -361,14 +395,15 @@ where
     T: Tokenize,
     T::Token: ParseBoolToken,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        let value = M::opt(parser.current().0.bool(), || {
-            parser.error(ErrorKind::ExpectedToken("boolean".to_string()))
-        })?;
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        let value = parser.current().0.bool();
 
-        parser.step();
+        match value {
+            None => E::err(|| parser.error(ErrorKind::ExpectedToken("boolean".to_string()))),
+            Some(_) => parser.step(),
+        }
 
-        ControlFlow::Continue(value)
+        value
     }
 }
 
@@ -379,23 +414,25 @@ macro_rules! impl_ast_number {
             T: Tokenize,
             T::Token: $trait,
         {
-            fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+            fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
                 let (token, span) = parser.current();
+
                 if token.$fn() {
-                    let value = M::res(T::Token::$parse(parser.slice(span.clone())), |err| {
+                    let result = T::Token::$parse(parser.slice(span.clone()));
+                    let value = E::consume_result(result, |err| {
                         parser.error(ErrorKind::InvalidNumber(err))
                     })?;
-                    let value = M::res(Self::try_from(value), |err| {
+
+                    let result = Self::try_from(value);
+                    let value = E::consume_result(result, |err| {
                         parser.error(ErrorKind::InvalidNumber(err.to_string()))
                     })?;
 
                     parser.step();
 
-                    ControlFlow::Continue(value)
+                    Some(value)
                 } else {
-                    ControlFlow::Break(M::err(|| {
-                        parser.error(ErrorKind::ExpectedToken($expected.to_string()))
-                    }))
+                    E::none(|| parser.error(ErrorKind::ExpectedToken($expected.to_string())))
                 }
             }
         }
@@ -439,20 +476,18 @@ where
     T: Tokenize,
     T::Token: ParseStringToken,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         let (token, span) = parser.current();
+
         if token.is_string() {
-            let slice = M::res(T::Token::parse_str(parser.slice(span.clone())), |err| {
-                parser.custom_error(err)
-            })?;
+            let result = T::Token::parse_str(parser.slice(span.clone()));
+            let slice = E::consume_result(result, |err| parser.error(ErrorKind::Other(err)))?;
 
             parser.step();
 
-            ControlFlow::Continue(slice)
+            Some(slice)
         } else {
-            ControlFlow::Break(M::err(|| {
-                parser.error(ErrorKind::ExpectedToken("string".to_string()))
-            }))
+            E::none(|| parser.error(ErrorKind::ExpectedToken("string".to_string())))
         }
     }
 }
@@ -463,8 +498,8 @@ where
     T::Token: ParseStringToken,
 {
     #[inline]
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        <&str>::ast_impl::<M>(parser).map_continue(str::to_string)
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        <&str>::ast_impl::<E>(parser).map(str::to_string)
     }
 }
 
@@ -474,8 +509,8 @@ where
     V: Ast<'source, T>,
 {
     #[inline]
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        V::ast_impl::<M>(parser).map_continue(Box::new)
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        V::ast_impl::<E>(parser).map(Box::new)
     }
 }
 
@@ -486,11 +521,8 @@ where
     V: Ast<'source, T>,
 {
     #[inline]
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        match V::ast_impl::<OptionMode>(parser) {
-            ControlFlow::Continue(v) => ControlFlow::Continue(Some(v)),
-            ControlFlow::Break(()) => ControlFlow::Continue(None),
-        }
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Some(V::ast_no_errors(parser))
     }
 }
 
@@ -500,14 +532,17 @@ where
     V1: Ast<'source, T>,
     V2: Ast<'source, T>,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         let before = parser.position();
-        let a = V1::ast_impl::<M>(parser)?;
-        match V2::ast_impl::<M>(parser) {
-            ControlFlow::Continue(b) => ControlFlow::Continue((a, b)),
-            ControlFlow::Break(err) => {
+
+        let a = V1::ast_impl::<E>(parser)?;
+
+        match V2::ast_impl::<E>(parser) {
+            Some(b) => Some((a, b)),
+            None => {
                 parser.jump(before);
-                ControlFlow::Break(err)
+
+                None
             }
         }
     }

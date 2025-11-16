@@ -1,11 +1,10 @@
 use crate::{
     ast::{
-        ClientEvent, ConstantDiscriminants, Expression, ExpressionValue, FunctionCall, Literal,
-        UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
+        parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
+        FunctionCall, Literal, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
     },
     compile::{Compiler, PRIVATE_MEMORY},
     output::{CommandVoid, IntermediateOutput},
-    token::TOKENIZER,
 };
 use lazy_static::lazy_static;
 use rustc_hash::FxHashMap;
@@ -18,7 +17,7 @@ use wotw_seedgen_data::{
     WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 use wotw_seedgen_parse::{
-    parse_ast, Delimited, Identifier, Punctuated, Recoverable, Spanned, Symbol,
+    Delimited, Identifier, Punctuated, Recoverable, Spanned, SpannedOption, Symbol,
 };
 use wotw_seedgen_static_assets::UBER_STATE_DATA;
 
@@ -31,15 +30,15 @@ fn uber_identifier() {
             span: 3..6,
         },
         separator: Symbol::<'|'>,
-        member: Recoverable::new(Ok(Spanned {
+        member: Recoverable::some(Spanned {
             data: 786,
             span: 9..12,
-        })),
+        }),
     };
-    let uber_identifier = parse_ast(source, TOKENIZER).parsed;
-    assert_eq!(uber_identifier, Ok(expected.clone()));
-    let uber_identifier = parse_ast(source, TOKENIZER).parsed;
-    assert_eq!(uber_identifier, Ok(UberIdentifier::Numeric(expected)));
+    let uber_identifier = parse_seed_ast(source).parsed;
+    assert_eq!(uber_identifier, Some(expected.clone()));
+    let uber_identifier = parse_seed_ast(source).parsed;
+    assert_eq!(uber_identifier, Some(UberIdentifier::Numeric(expected)));
 
     let source = "   GladesTown.  TuleySpawned  ";
     let expected = UberIdentifierName {
@@ -48,40 +47,47 @@ fn uber_identifier() {
             span: 3..13,
         },
         period: Symbol::<'.'>,
-        member: Recoverable::new(Ok(Spanned {
+        member: Recoverable::some(Spanned {
             data: Identifier("TuleySpawned"),
             span: 16..28,
-        })),
+        }),
     };
-    let uber_identifier = parse_ast(source, TOKENIZER).parsed;
-    assert_eq!(uber_identifier, Ok(expected.clone()));
-    let uber_identifier = parse_ast(source, TOKENIZER).parsed;
-    assert_eq!(uber_identifier, Ok(UberIdentifier::Name(expected)));
+    let uber_identifier = parse_seed_ast(source).parsed;
+    assert_eq!(uber_identifier, Some(expected.clone()));
+    let uber_identifier = parse_seed_ast(source).parsed;
+    assert_eq!(uber_identifier, Some(UberIdentifier::Name(expected)));
 
     let source = "   456  ";
-    let error = parse_ast::<_, UberIdentifier>(source, TOKENIZER)
-        .parsed
-        .unwrap_err();
+    let error = parse_seed_ast::<UberIdentifier>(source)
+        .errors
+        .pop()
+        .unwrap();
     assert_eq!(error.to_string(), "expected '|'".to_string());
     assert_eq!(error.span, 3..8);
 
     let source = "   GladesTown.  5TuleySpawned  ";
-    match parse_ast::<_, UberIdentifier>(source, TOKENIZER)
-        .parsed
-        .unwrap()
-    {
-        UberIdentifier::Name(uber_identifier) => {
-            let error = uber_identifier.member.result.unwrap_err();
-            assert_eq!(error.to_string(), "expected identifier".to_string());
-            assert_eq!(error.span, 16..17);
-        }
-        _ => panic!(),
-    }
+    let result = parse_seed_ast::<UberIdentifier>(source);
+    assert_eq!(
+        result.parsed,
+        Some(UberIdentifier::Name(UberIdentifierName {
+            group: Spanned {
+                data: Identifier("GladesTown"),
+                span: 3..13
+            },
+            period: Symbol,
+            member: Recoverable::none(16..17),
+        }))
+    );
+    let error = result.errors.into_iter().next().unwrap();
+    assert_eq!(error.to_string(), "expected identifier".to_string());
+    assert_eq!(error.span, 16..17);
 
     let source = " $$  ";
-    let error = parse_ast::<_, UberIdentifier>(source, TOKENIZER)
-        .parsed
-        .unwrap_err();
+    let error = parse_seed_ast::<UberIdentifier>(source)
+        .errors
+        .into_iter()
+        .next()
+        .unwrap();
     assert_eq!(
         error.to_string(),
         "expected identifier or integer".to_string()
@@ -102,7 +108,7 @@ fn function_call() {
                 data: Symbol::<'('>,
                 span: 3..4,
             },
-            content: Ok(Punctuated {
+            content: Some(Punctuated {
                 items: vec![(
                     Expression::Value(ExpressionValue::Literal(Spanned {
                         data: Literal::UberIdentifier(UberIdentifier::Name(UberIdentifierName {
@@ -111,10 +117,10 @@ fn function_call() {
                                 span: 4..13,
                             },
                             period: Symbol::<'.'>,
-                            member: Recoverable::new(Ok(Spanned {
+                            member: Recoverable::some(Spanned {
                                 data: Identifier("BlueMoon"),
                                 span: 14..22,
-                            })),
+                            }),
                         })),
                         span: 4..22,
                     })),
@@ -125,14 +131,14 @@ fn function_call() {
                     span: 24..25,
                 }))),
             }),
-            close: Ok(Spanned {
+            close: SpannedOption::Some(Spanned {
                 data: Symbol::<')'>,
                 span: 25..26,
             }),
         },
     };
-    let function_call = parse_ast::<_, FunctionCall>(source, TOKENIZER).parsed;
-    assert_eq!(function_call, Ok(expected));
+    let function_call = parse_seed_ast::<FunctionCall>(source).parsed;
+    assert_eq!(function_call, Some(expected));
 }
 
 struct ExampleFileAccess<'a>(&'a str);
@@ -197,8 +203,7 @@ fn test_str(source: &str) -> IntermediateOutput {
 
     compiler.compile_snippet("").unwrap();
 
-    let (output, success) = compiler.finish().eprint_errors();
-    assert!(success);
+    let output = compiler.finish().eprint_errors().unwrap();
 
     output
 }
@@ -330,16 +335,14 @@ fn snippets() {
         compiler.compile_snippet(identifier).unwrap();
     }
 
-    let (_, success) = compiler.finish().eprint_errors();
-    assert!(success);
+    compiler.finish().eprint_errors().unwrap();
 
     for identifier in &snippets {
         let mut compiler = test_compiler(&*TEST_FILE_ACCESS);
 
         compiler.compile_snippet(identifier).unwrap();
 
-        let (_, success) = compiler.finish().eprint_errors();
-        assert!(success);
+        compiler.finish().eprint_errors().unwrap();
     }
 
     let test_with_config = [(
@@ -356,7 +359,6 @@ fn snippets() {
 
         compiler.compile_snippet(identifier).unwrap();
 
-        let (_, success) = compiler.finish().eprint_errors();
-        assert!(success);
+        compiler.finish().eprint_errors().unwrap();
     }
 }

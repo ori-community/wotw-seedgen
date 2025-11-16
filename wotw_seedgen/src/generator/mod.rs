@@ -130,7 +130,10 @@ fn parse_snippets(
             .map_err(|err| format!("Failed to read snippet \"{identifier}\": {err}"))?;
     }
 
-    compiler.finish().into_result()
+    compiler
+        .finish()
+        .eprint_errors()
+        .ok_or_else(|| "failed to compile snippets".to_string())
 }
 
 fn choose_spawn(

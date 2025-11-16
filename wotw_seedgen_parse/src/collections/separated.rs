@@ -1,24 +1,27 @@
+use derivative::Derivative;
+
 use super::{AstCollection, AstCollectionInit, Collection};
-use crate::{Ast, Mode, Parser, Span, SpanEnd, SpanStart, Tokenize};
+use crate::{Ast, ErrorMode, Parser, Span, SpanEnd, SpanStart, Tokenize};
 use std::{
     iter,
     ops::{ControlFlow, Index, IndexMut, Range},
     option, slice, vec,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Derivative)]
+#[derivative(Default(bound = ""))]
 pub struct Separated<Item, Separator> {
     pub first: Option<Item>,
     pub more: Vec<(Separator, Item)>,
 }
 
-impl<Item, Separator> Default for Separated<Item, Separator> {
-    #[inline]
-    fn default() -> Self {
-        Self {
-            first: Default::default(),
-            more: Default::default(),
-        }
+impl<'source, T, Item, Separator> AstCollectionInit<'source, T> for Separated<Item, Separator>
+where
+    T: Tokenize,
+    Item: Ast<'source, T>,
+{
+    fn ast_first_impl<E: ErrorMode>(_parser: &mut Parser<'source, T>) -> Option<Self> {
+        Some(Self::default())
     }
 }
 
@@ -28,42 +31,43 @@ where
     Item: Ast<'source, T>,
     Separator: Ast<'source, T>,
 {
-    fn ast_item_impl<M: Mode>(
+    fn ast_item_impl<E: ErrorMode>(
         &mut self,
         parser: &mut Parser<'source, T>,
-    ) -> ControlFlow<Option<M::Error>> {
+    ) -> ControlFlow<Result<(), ()>> {
         match self.first {
-            None => match Item::ast_option(parser) {
+            None => match Item::ast_no_errors(parser) {
                 Some(item) => {
                     self.first = Some(item);
                     ControlFlow::Continue(())
                 }
-                None => ControlFlow::Break(None),
+                None => ControlFlow::Break(Ok(())),
             },
-            Some(_) => separated_ast_item::<_, M, _, _>(&mut self.more, parser),
+            Some(_) => separated_ast_item::<_, E, _, _>(&mut self.more, parser),
         }
     }
 }
 
-fn separated_ast_item<'source, T, M, Item, Separator>(
+fn separated_ast_item<'source, T, E, Item, Separator>(
     items: &mut Vec<(Separator, Item)>,
     parser: &mut Parser<'source, T>,
-) -> ControlFlow<Option<M::Error>>
+) -> ControlFlow<Result<(), ()>>
 where
     T: Tokenize,
-    M: Mode,
+    E: ErrorMode,
     Item: Ast<'source, T>,
     Separator: Ast<'source, T>,
 {
-    match Separator::ast_option(parser) {
-        Some(separator) => match Item::ast_impl::<M>(parser) {
-            ControlFlow::Continue(item) => {
+    match Separator::ast_no_errors(parser) {
+        Some(separator) => match Item::ast_impl::<E>(parser) {
+            Some(item) => {
                 items.push((separator, item));
+
                 ControlFlow::Continue(())
             }
-            ControlFlow::Break(err) => ControlFlow::Break(Some(err)),
+            None => ControlFlow::Break(Err(())),
         },
-        None => ControlFlow::Break(None),
+        None => ControlFlow::Break(Ok(())),
     }
 }
 
@@ -74,8 +78,8 @@ where
     Separator: Ast<'source, T>,
 {
     #[inline]
-    fn ast_impl<M: crate::Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        <Collection<Self>>::ast_impl::<E>(parser).map(|c| c.0)
     }
 }
 
@@ -206,10 +210,10 @@ where
     T: Tokenize,
     Item: Ast<'source, T>,
 {
-    fn ast_first_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        let first = Item::ast_impl::<M>(parser)?;
+    fn ast_first_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        let first = Item::ast_impl::<E>(parser);
 
-        ControlFlow::Continue(Self {
+        first.map(|first| Self {
             first,
             more: Default::default(),
         })
@@ -223,11 +227,11 @@ where
     Separator: Ast<'source, T>,
 {
     #[inline]
-    fn ast_item_impl<M: Mode>(
+    fn ast_item_impl<E: ErrorMode>(
         &mut self,
         parser: &mut Parser<'source, T>,
-    ) -> ControlFlow<Option<M::Error>> {
-        separated_ast_item::<_, M, _, _>(&mut self.more, parser)
+    ) -> ControlFlow<Result<(), ()>> {
+        separated_ast_item::<_, E, _, _>(&mut self.more, parser)
     }
 }
 
@@ -238,8 +242,8 @@ where
     Separator: Ast<'source, T>,
 {
     #[inline]
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        <Collection<Self>>::ast_impl::<E>(parser).map(|c| c.0)
     }
 }
 

@@ -15,9 +15,8 @@ pub use helpers::{add_float, add_integer, store_boolean, store_float, store_inte
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
-    ast::{self, Expression, UberStateType},
+    ast::{self, Expression, Snippet, UberStateType},
     output::{CommandVoid, IntermediateOutput, Literal, SnippetDebugOutput},
-    token::TOKENIZER,
     types::{uber_state_type, InferType, Type},
 };
 use derivative::Derivative;
@@ -31,8 +30,8 @@ use std::{
 use wotw_seedgen_assets::{SnippetAccess, Source, UberStateData};
 use wotw_seedgen_data::UberIdentifier;
 use wotw_seedgen_parse::{
-    parse_ast, Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result,
-    SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned,
+    Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result, SeparatedNonEmpty, Span,
+    SpanEnd, SpanStart, Spanned, SpannedOption,
 };
 
 #[derive(Debug)]
@@ -66,12 +65,19 @@ impl<'source, T: Compile<'source>> Compile<'source> for Spanned<T> {
     }
 }
 
-impl<'source, T: Compile<'source>> Compile<'source> for Result<T> {
+impl<'source, T: Compile<'source>> Compile<'source> for Option<T> {
     type Output = Option<T::Output>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let compiled = self.map(|t| t.compile(compiler));
-        compiler.consume_result(compiled)
+        self.map(|t| t.compile(compiler))
+    }
+}
+
+impl<'source, T: Compile<'source>> Compile<'source> for SpannedOption<T> {
+    type Output = Option<T::Output>;
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        self.into_option().map(|t| t.compile(compiler))
     }
 }
 
@@ -80,7 +86,7 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
 
     #[inline]
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        self.result.compile(compiler)
+        self.value.compile(compiler)
     }
 }
 
@@ -99,7 +105,6 @@ impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
 
     #[inline]
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        compiler.consume_result(self.close);
         self.content.compile(compiler)
     }
 }
@@ -351,14 +356,6 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         }
     }
 
-    pub(crate) fn consume_delimited<Open, Content, Close>(
-        &mut self,
-        delimited: Delimited<Open, Content, Close>,
-    ) -> Option<Content> {
-        self.consume_result(delimited.close);
-        self.consume_result(delimited.content)
-    }
-
     pub(crate) fn uber_state_type<S: Span>(
         &mut self,
         uber_identifier: UberIdentifier,
@@ -468,48 +465,41 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         self.global
             .exported_values
             .insert(identifier.to_string(), Default::default());
-        let mut errors = vec![];
 
-        let ast = parse_ast(&source.content, TOKENIZER);
-        // TODO this pattern seems inconvenient, maybe a result with multiple errors and then use extend instead?
-        if let Err(err) = ast.trailing {
-            errors.push(err);
-        }
+        let ast = Snippet::parse(&source.content);
+        let mut errors = ast.errors;
 
-        match ast.parsed {
-            Err(err) => errors.push(err),
-            Ok(ast) => {
-                let preprocessor = Preprocessor::preprocess(&ast);
-                errors.extend(preprocessor.errors);
+        if let Some(ast) = ast.parsed {
+            let preprocessor = Preprocessor::preprocess(&ast);
+            errors.extend(preprocessor.errors);
 
-                for (path, identifier, value) in &preprocessor.output.config_sets {
-                    // TODO do something if set already?
-                    self.global
-                        .config
-                        .entry(path.clone())
-                        .or_default()
-                        .insert(identifier.clone(), value.clone());
-                }
-
-                for include in &preprocessor.output.includes {
-                    if let Err(err) = self.compile_snippet(&include.data) {
-                        errors.push(Error::custom(
-                            format!("Failed to read snippet: {err}"),
-                            include.span.clone(),
-                        ));
-                    }
-                }
-
-                let compiler = SnippetCompiler::compile(
-                    ast,
-                    &mut self.rng,
-                    identifier.to_string(),
-                    &mut self.global,
-                    preprocessor.output,
-                );
-
-                errors.extend(compiler.errors);
+            for (path, identifier, value) in &preprocessor.output.config_sets {
+                // TODO do something if set already?
+                self.global
+                    .config
+                    .entry(path.clone())
+                    .or_default()
+                    .insert(identifier.clone(), value.clone());
             }
+
+            for include in &preprocessor.output.includes {
+                if let Err(err) = self.compile_snippet(&include.data) {
+                    errors.push(Error::custom(
+                        format!("Failed to read snippet: {err}"),
+                        include.span.clone(),
+                    ));
+                }
+            }
+
+            let compiler = SnippetCompiler::compile(
+                ast,
+                &mut self.rng,
+                identifier.to_string(),
+                &mut self.global,
+                preprocessor.output,
+            );
+
+            errors.extend(compiler.errors);
         }
 
         self.errors.push((source, errors));
@@ -531,17 +521,7 @@ pub struct CompileResult {
 }
 
 impl CompileResult {
-    pub fn into_result(self) -> std::result::Result<IntermediateOutput, String> {
-        for (source, errors) in self.errors {
-            if let Some(err) = errors.into_iter().next() {
-                return Err(err.with_source(&source).to_string());
-            }
-        }
-
-        Ok(self.output)
-    }
-
-    pub fn eprint_errors(self) -> (IntermediateOutput, bool) {
+    pub fn eprint_errors(self) -> Option<IntermediateOutput> {
         let mut stderr = io::stderr().lock();
 
         let mut error_count = 0;
@@ -562,6 +542,6 @@ impl CompileResult {
             .unwrap();
         }
 
-        (self.output, success)
+        success.then_some(self.output)
     }
 }

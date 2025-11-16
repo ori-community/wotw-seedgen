@@ -54,7 +54,7 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
         match self {
             ast::Trigger::ClientEvent(client) => Some(Trigger::ClientEvent(client.data)),
             ast::Trigger::Binding(_, binding) => {
-                let binding = compiler.consume_result(binding.result)?;
+                let binding = binding.value.into_option()?;
 
                 let span = binding.span();
 
@@ -100,8 +100,9 @@ impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let commands = compiler
-            .consume_delimited(self.actions)
+        let commands = self
+            .actions
+            .content
             .into_iter()
             .flatten()
             .filter_map(|action| {
@@ -127,8 +128,8 @@ impl<'source> Compile<'source> for ast::Action<'source> {
             ast::Action::Function(function_call) => function_call.compile(compiler),
             ast::Action::Condition(_, condition) => condition.compile(compiler),
             ast::Action::Multi(actions) => {
-                let commands = compiler
-                    .consume_delimited(actions)
+                let commands = actions
+                    .content
                     .into_iter()
                     .flatten()
                     .filter_map(|action| {
@@ -161,18 +162,5 @@ impl<'source> Compile<'source> for ast::ActionCondition<'source> {
 impl<'source> Compile<'source> for ast::Annotation<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        match self {
-            ast::Annotation::Hidden(_) => {}
-            ast::Annotation::Name(_, name) => {
-                compiler.consume_result(name.result);
-            }
-            ast::Annotation::Category(_, category) => {
-                compiler.consume_result(category.result);
-            }
-            ast::Annotation::Description(_, description) => {
-                compiler.consume_result(description.result);
-            }
-        }
-    }
+    fn compile(self, _compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {}
 }

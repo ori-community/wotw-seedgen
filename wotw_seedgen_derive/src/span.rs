@@ -1,7 +1,7 @@
 use crate::{add_bound, Result};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::spanned::Spanned;
+use syn::{parse_quote, spanned::Spanned};
 
 const UNION_MESSAGE: &str = "Cannot implement Span on union";
 const EMPTY_FIELDS_MESSAGE: &str = "Cannot implement Span without any fields";
@@ -21,9 +21,9 @@ pub fn span_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
         generics.clone(),
         data.clone(),
         vec![
-            quote! { wotw_seedgen_parse::Span },
-            quote! { wotw_seedgen_parse::SpanStart },
-            quote! { wotw_seedgen_parse::SpanEnd },
+            parse_quote! { wotw_seedgen_parse::Span },
+            parse_quote! { wotw_seedgen_parse::SpanStart },
+            parse_quote! { wotw_seedgen_parse::SpanEnd },
         ],
         quote! { wotw_seedgen_parse::Span },
         quote! { fn span(&self) -> std::ops::Range<usize> },
@@ -37,7 +37,7 @@ pub fn span_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
         &ident,
         generics.clone(),
         data.clone(),
-        vec![quote! { wotw_seedgen_parse::SpanStart }],
+        vec![parse_quote! { wotw_seedgen_parse::SpanStart }],
         quote! { wotw_seedgen_parse::SpanStart },
         quote! { fn span_start(&self) -> usize },
         span_start_fields_named::<false>,
@@ -50,7 +50,7 @@ pub fn span_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
         &ident,
         generics,
         data,
-        vec![quote! { wotw_seedgen_parse::SpanEnd }],
+        vec![parse_quote! { wotw_seedgen_parse::SpanEnd }],
         quote! { wotw_seedgen_parse::SpanEnd },
         quote! { fn span_end(&self) -> usize },
         span_end_fields_named::<false>,
@@ -74,7 +74,7 @@ fn span_any_impl<FN, FNP, FU, FUP>(
     ident: &syn::Ident,
     mut generics: syn::Generics,
     data: syn::Data,
-    bounds: Vec<TokenStream>,
+    bounds: Vec<syn::TypeParamBound>,
     span_trait: TokenStream,
     span_trait_signature: TokenStream,
     named: FN,

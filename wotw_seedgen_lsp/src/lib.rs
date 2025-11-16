@@ -261,7 +261,7 @@ impl LanguageServer for Backend {
 
         let source = self.get_text_document(&uri)?;
 
-        let ast = ast::parse::<ast::Snippet>(source.value());
+        let ast = ast::Snippet::parse(source.value());
         let data = semantic_tokens(source.value(), ast.parsed);
 
         Ok(Some(SemanticTokensResult::Tokens(SemanticTokens {
@@ -275,10 +275,10 @@ impl LanguageServer for Backend {
 
         let (source, index) = self.get_text_document_position(params.text_document_position)?;
 
-        let ast = ast::parse::<ast::Snippet>(source.value());
+        let ast = ast::Snippet::parse(source.value());
 
         // index is the cursor position, we want to offer completions for whatever was typed before.
-        let completion = ast.completion(index - 1);
+        let completion = ast.parsed.completion(index - 1);
 
         Ok(completion.map(CompletionResponse::Array))
     }

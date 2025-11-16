@@ -9,7 +9,7 @@ use crate::{
 use rand::{distributions::Uniform, prelude::Distribution};
 use wotw_seedgen::{
     generate_seed,
-    logic_language::{ast, output::Graph},
+    logic_language::{ast::Areas, output::Graph},
     settings::{UniverseSettings, WorldSettings},
     SeedUniverse,
 };
@@ -59,6 +59,24 @@ pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse
     Ok(seed_universe)
 }
 
+pub fn areas(source: &Source) -> Result<Areas<'_>, Error> {
+    Areas::parse(&source.content)
+        .eprint_errors(&source)
+        .ok_or_else(|| Error("failed to parse areas".to_string()))
+}
+
+pub fn graph(
+    source: &Source,
+    areas: Areas,
+    loc_data: LocData,
+    state_data: StateData,
+    settings: &[WorldSettings],
+) -> Result<Graph, Error> {
+    Graph::compile(areas, loc_data, state_data, settings)
+        .eprint_errors(source)
+        .ok_or_else(|| Error("failed to compile graph".to_string()))
+}
+
 pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, LocData, UberStateData), Error> {
     let LogicFiles {
         loc_data,
@@ -67,13 +85,8 @@ pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, LocData, UberS
         uber_state_data,
     } = LogicFiles::new()?;
 
-    let areas = ast::parse(&source.content).into_result()?;
-
-    let (graph, success) =
-        Graph::compile(areas, loc_data.clone(), state_data, settings).eprint_errors(&source);
-    if !success {
-        return Err(Error("failed to compile graph".to_string()));
-    }
+    let areas = areas(&source)?;
+    let graph = graph(&source, areas, loc_data.clone(), state_data, settings)?;
 
     Ok((graph, loc_data, uber_state_data))
 }

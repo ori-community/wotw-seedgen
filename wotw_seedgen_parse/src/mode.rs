@@ -1,79 +1,44 @@
-use std::ops::ControlFlow;
+pub trait ErrorMode {
+    fn err<O: FnOnce()>(op: O);
 
-use crate::{Error, Result};
+    fn map_err<E, O: FnOnce(E)>(err: E, op: O);
 
-pub trait Mode {
-    type Output<T>;
-    type Error;
-
-    fn output<T>(ctr: ControlFlow<Self::Error, T>) -> Self::Output<T>;
-
-    fn err<E: FnOnce() -> Error>(err: E) -> Self::Error;
-
-    fn map_err<E, O: FnOnce(E) -> Error>(err: E, op: O) -> Self::Error;
-
-    fn combine_errors(errors: Vec<Self::Error>) -> Self::Error;
-
-    fn opt<T, E>(opt: Option<T>, err: E) -> ControlFlow<Self::Error, T>
-    where
-        E: FnOnce() -> Error,
-    {
-        match opt {
-            None => ControlFlow::Break(Self::err(err)),
-            Some(t) => ControlFlow::Continue(t),
-        }
+    fn none<T, E: FnOnce()>(err: E) -> Option<T> {
+        Self::err(err);
+        None
     }
 
-    fn res<T, E, O>(res: std::result::Result<T, E>, op: O) -> ControlFlow<Self::Error, T>
-    where
-        O: FnOnce(E) -> Error,
-    {
+    fn consume_result<T, E, O: FnOnce(E)>(res: Result<T, E>, op: O) -> Option<T> {
         match res {
-            Err(err) => ControlFlow::Break(Self::map_err(err, op)),
-            Ok(t) => ControlFlow::Continue(t),
+            Ok(t) => Some(t),
+            Err(err) => {
+                Self::map_err(err, op);
+                None
+            }
         }
     }
 }
 
-pub struct ResultMode;
+pub struct Errors;
 
-impl Mode for ResultMode {
-    type Output<T> = Result<T>;
-    type Error = Error;
-
-    fn output<T>(ctr: ControlFlow<Self::Error, T>) -> Self::Output<T> {
-        match ctr {
-            ControlFlow::Continue(t) => Ok(t),
-            ControlFlow::Break(err) => Err(err),
-        }
-    }
-
-    fn err<E: FnOnce() -> Error>(err: E) -> Self::Error {
+impl ErrorMode for Errors {
+    #[inline]
+    fn err<E: FnOnce()>(err: E) {
         err()
     }
 
-    fn map_err<E, O: FnOnce(E) -> Error>(err: E, op: O) -> Self::Error {
+    #[inline]
+    fn map_err<E, O: FnOnce(E)>(err: E, op: O) {
         op(err)
-    }
-
-    fn combine_errors(errors: Vec<Self::Error>) -> Self::Error {
-        Error::all_failed(errors)
     }
 }
 
-pub struct OptionMode;
+pub struct NoErrors;
 
-impl Mode for OptionMode {
-    type Output<T> = Option<T>;
-    type Error = ();
+impl ErrorMode for NoErrors {
+    #[inline]
+    fn err<E: FnOnce()>(_err: E) {}
 
-    fn output<T>(ctr: ControlFlow<Self::Error, T>) -> Self::Output<T> {
-        ctr.continue_value()
-    }
-
-    fn err<E: FnOnce() -> Error>(_err: E) -> Self::Error {}
-
-    fn map_err<E, O: FnOnce(E) -> Error>(_err: E, _op: O) -> Self::Error {}
-
-    fn combine_errors(_errors: Vec<Self::Error>) -> Self::Error {}
+    #[inline]
+    fn map_err<E, O: FnOnce(E)>(_err: E, _op: O) {}
 }

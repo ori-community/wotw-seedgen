@@ -1,5 +1,7 @@
+use derivative::Derivative;
+
 use super::{AstCollection, Collection};
-use crate::{Ast, Mode, Parser, Tokenize};
+use crate::{Ast, AstCollectionInit, ErrorMode, Parser, Tokenize};
 use std::{
     cmp::Ordering,
     iter,
@@ -7,19 +9,19 @@ use std::{
     option, slice, vec,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Derivative)]
+#[derivative(Default(bound = ""))]
 pub struct Punctuated<Item, Punctuation> {
     pub items: Vec<(Item, Punctuation)>,
     pub last: Option<Item>,
 }
 
-impl<Item, Punctuation> Default for Punctuated<Item, Punctuation> {
-    #[inline]
-    fn default() -> Self {
-        Self {
-            items: Default::default(),
-            last: Default::default(),
-        }
+impl<'source, T, Item, Punctuation> AstCollectionInit<'source, T> for Punctuated<Item, Punctuation>
+where
+    T: Tokenize,
+{
+    fn ast_first_impl<E: ErrorMode>(_parser: &mut Parser<'source, T>) -> Option<Self> {
+        Some(Self::default())
     }
 }
 
@@ -29,22 +31,24 @@ where
     Item: Ast<'source, T>,
     Punctuation: Ast<'source, T>,
 {
-    fn ast_item_impl<M: Mode>(
+    fn ast_item_impl<E: ErrorMode>(
         &mut self,
         parser: &mut Parser<'source, T>,
-    ) -> ControlFlow<Option<M::Error>> {
-        match Item::ast_impl::<M>(parser) {
-            ControlFlow::Continue(item) => match Punctuation::ast_option(parser) {
+    ) -> ControlFlow<Result<(), ()>> {
+        match Item::ast_impl::<E>(parser) {
+            Some(item) => match Punctuation::ast_no_errors(parser) {
                 Some(punctuation) => {
                     self.items.push((item, punctuation));
+
                     ControlFlow::Continue(())
                 }
                 None => {
                     self.last = Some(item);
-                    ControlFlow::Break(None)
+
+                    ControlFlow::Break(Ok(()))
                 }
             },
-            ControlFlow::Break(err) => ControlFlow::Break(Some(err)),
+            None => ControlFlow::Break(Err(())),
         }
     }
 }
@@ -56,8 +60,8 @@ where
     Punctuation: Ast<'source, T>,
 {
     #[inline]
-    fn ast_impl<M: crate::Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        <Collection<Self>>::ast_impl::<E>(parser).map(|c| c.0)
     }
 }
 

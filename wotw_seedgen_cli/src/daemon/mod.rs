@@ -4,15 +4,21 @@ use std::io::{self, BufRead, BufReader, StdinLock};
 
 use reach_check::{new_world, reach_check, relevant_uber_states, GraphCache, ReachCheckMessage};
 use serde::Deserialize;
-use wotw_seedgen::{logic_language::ast, seed::SeedgenInfo, seed_language::simulate::UberStates};
+use wotw_seedgen::{seed::SeedgenInfo, seed_language::simulate::UberStates};
 
-use crate::{cli::VerboseArgs, log_config::LogConfig, seed::LogicFiles, Error};
+use crate::{
+    cli::VerboseArgs,
+    log_config::LogConfig,
+    seed::{areas, LogicFiles},
+    Error,
+};
 
 pub fn daemon(args: VerboseArgs) -> Result<(), Error> {
     LogConfig::from_args(args, "seedgen_daemon_log.txt").apply()?;
 
     let mut daemon = Daemon::new()?;
-    let areas = ast::parse(&daemon.logic_files.areas_source.content).into_result()?;
+
+    let areas = areas(&daemon.logic_files.areas_source)?;
     let uber_states = UberStates::new(&daemon.logic_files.uber_state_data);
 
     let mut graph_cache = GraphCache::new(&areas, &daemon.logic_files);
@@ -26,7 +32,8 @@ pub fn daemon(args: VerboseArgs) -> Result<(), Error> {
         match message {
             Message::RelevantUberStates => relevant_uber_states(&daemon.logic_files)?,
             Message::SetSeedgenInfo(info) => {
-                graph_cache.set_settings(info.universe_settings)?;
+                graph_cache
+                    .set_settings(&daemon.logic_files.areas_source, info.universe_settings)?;
                 world = Some(new_world(
                     &info.spawn_identifier,
                     info.world_index,

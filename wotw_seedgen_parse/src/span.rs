@@ -1,5 +1,5 @@
-use crate::{Ast, Mode, Parser, Result, Tokenize};
-use std::ops::{ControlFlow, Range};
+use crate::{Ast, ErrorMode, Parser, Tokenize};
+use std::{cell::LazyCell, ops::Range};
 
 /// Trait responsible for providing spans on successfully parsed Ast nodes in the form of [`Range<usize>`]
 ///
@@ -50,7 +50,7 @@ use std::ops::{ControlFlow, Range};
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
 /// let source = "joke \"It's been 5 years\" 10";
-/// let joke: Joke = parse_ast(source, tokenizer).into_result().unwrap();
+/// let joke: Joke = parse_ast(source, tokenizer).parsed.unwrap();
 /// assert_eq!(
 ///     joke.keyword.span(),
 ///     0..4,
@@ -106,13 +106,9 @@ impl<T: Span> Span for Box<T> {
     }
 }
 
-impl<T: Span> Span for Result<T> {
-    #[inline]
+impl<F: FnOnce() -> Range<usize>> Span for LazyCell<Range<usize>, F> {
     fn span(&self) -> Range<usize> {
-        match self {
-            Ok(t) => t.span(),
-            Err(err) => err.span.clone(),
-        }
+        (*self).clone()
     }
 }
 
@@ -137,13 +133,9 @@ impl<T: SpanStart> SpanStart for Box<T> {
     }
 }
 
-impl<T: SpanStart> SpanStart for Result<T> {
-    #[inline]
+impl<F: FnOnce() -> Range<usize>> SpanStart for LazyCell<Range<usize>, F> {
     fn span_start(&self) -> usize {
-        match self {
-            Ok(t) => t.span_start(),
-            Err(err) => err.span.start,
-        }
+        self.start
     }
 }
 
@@ -168,13 +160,9 @@ impl<T: SpanEnd> SpanEnd for Box<T> {
     }
 }
 
-impl<T: SpanEnd> SpanEnd for Result<T> {
-    #[inline]
+impl<F: FnOnce() -> Range<usize>> SpanEnd for LazyCell<Range<usize>, F> {
     fn span_end(&self) -> usize {
-        match self {
-            Ok(t) => t.span_end(),
-            Err(err) => err.span.end,
-        }
+        self.end
     }
 }
 
@@ -241,11 +229,94 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         let start = parser.current().1.start;
-        let data = V::ast_impl::<M>(parser)?;
+
+        let data = V::ast_impl::<E>(parser)?;
+
         let end = parser.token_at(parser.position() - 1).1.end;
         let span = start..end;
-        ControlFlow::Continue(Self { data, span })
+
+        Some(Self { data, span })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SpannedOption<T> {
+    Some(T),
+    None(Range<usize>),
+}
+
+impl<T> SpannedOption<T> {
+    #[inline]
+    pub fn from_option<F: FnOnce() -> Range<usize>>(option: Option<T>, span: F) -> Self {
+        match option {
+            None => Self::None(span()),
+            Some(t) => Self::Some(t),
+        }
+    }
+
+    #[inline]
+    pub fn as_option(&self) -> Option<&T> {
+        match self {
+            Self::Some(t) => Some(t),
+            Self::None(_) => None,
+        }
+    }
+
+    #[inline]
+    pub fn as_option_mut(&mut self) -> Option<&mut T> {
+        match self {
+            Self::Some(t) => Some(t),
+            Self::None(_) => None,
+        }
+    }
+
+    #[inline]
+    pub fn into_option(self) -> Option<T> {
+        match self {
+            Self::Some(t) => Some(t),
+            Self::None(_) => None,
+        }
+    }
+}
+
+impl<T: Span> Span for SpannedOption<T> {
+    #[inline]
+    fn span(&self) -> Range<usize> {
+        match self {
+            Self::Some(t) => t.span(),
+            Self::None(span) => span.clone(),
+        }
+    }
+}
+
+impl<T: SpanStart> SpanStart for SpannedOption<T> {
+    #[inline]
+    fn span_start(&self) -> usize {
+        match self {
+            Self::Some(t) => t.span_start(),
+            Self::None(span) => span.start,
+        }
+    }
+}
+
+impl<T: SpanEnd> SpanEnd for SpannedOption<T> {
+    #[inline]
+    fn span_end(&self) -> usize {
+        match self {
+            Self::Some(t) => t.span_end(),
+            Self::None(span) => span.end,
+        }
+    }
+}
+
+impl<'source, T, V> Ast<'source, T> for SpannedOption<V>
+where
+    T: Tokenize,
+    V: Ast<'source, T>,
+{
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Some(V::ast_impl_spanned::<E>(parser))
     }
 }

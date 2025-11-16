@@ -36,9 +36,9 @@ use std::{
 /// type Tokenizer = LogosTokenizer<Token>;
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
-/// assert_eq!(parse_ast::<_, bool>("true", tokenizer).into_result(), Ok(true));
-/// assert_eq!(parse_ast::<_, bool>("false", tokenizer).into_result(), Ok(false));
-/// assert!(parse_ast::<_, bool>("tralse", tokenizer).into_result().is_err());
+/// assert_eq!(parse_ast::<_, bool>("true", tokenizer).parsed, Some(true));
+/// assert_eq!(parse_ast::<_, bool>("false", tokenizer).parsed, Some(false));
+/// assert!(parse_ast::<_, bool>("tralse", tokenizer).parsed.is_none());
 /// ```
 ///
 /// [`Ast`]: crate::Ast
@@ -83,9 +83,9 @@ pub trait ParseBoolToken {
 /// type Tokenizer = LogosTokenizer<Token>;
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
-/// assert_eq!(parse_ast::<_, i32>("-1000000", tokenizer).into_result(), Ok(-1000000));
-/// assert_eq!(parse_ast::<_, u128>(&u128::MAX.to_string(), tokenizer).into_result(), Ok(u128::MAX));
-/// assert!(parse_ast::<_, u8>("963", tokenizer).into_result().is_err());
+/// assert_eq!(parse_ast::<_, i32>("-1000000", tokenizer).parsed, Some(-1000000));
+/// assert_eq!(parse_ast::<_, u128>(&u128::MAX.to_string(), tokenizer).parsed, Some(u128::MAX));
+/// assert!(parse_ast::<_, u8>("963", tokenizer).parsed.is_none());
 /// ```
 ///
 /// [`Ast`]: crate::Ast
@@ -202,9 +202,9 @@ pub trait ParseIntToken {
 /// type Tokenizer = LogosTokenizer<Token>;
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
-/// assert_eq!(parse_ast::<_, f32>("-3.14", tokenizer).into_result(), Ok(-3.14));
-/// assert_eq!(parse_ast::<_, f64>("2e3", tokenizer).into_result(), Ok(2000.));
-/// assert!(parse_ast::<_, f32>("2,5", tokenizer).trailing.is_err());
+/// assert_eq!(parse_ast::<_, f32>("-3.14", tokenizer).parsed, Some(-3.14));
+/// assert_eq!(parse_ast::<_, f64>("2e3", tokenizer).parsed, Some(2000.));
+/// assert!(parse_ast::<_, f32>("2,5", tokenizer).errors.len() > 0);
 /// ```
 ///
 /// [`Ast`]: crate::Ast
@@ -257,9 +257,9 @@ pub trait ParseFloatToken {
 /// type Tokenizer = LogosTokenizer<Token>;
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
-/// assert_eq!(parse_ast::<_, &str>("\"hi\"", tokenizer).into_result(), Ok("hi"));
-/// assert_eq!(parse_ast::<_, String>("\"oh you.\"", tokenizer).into_result(), Ok("oh you.".to_string()));
-/// assert!(parse_ast::<_, &str>("no", tokenizer).into_result().is_err());
+/// assert_eq!(parse_ast::<_, &str>("\"hi\"", tokenizer).parsed, Some("hi"));
+/// assert_eq!(parse_ast::<_, String>("\"oh you.\"", tokenizer).parsed, Some("oh you.".to_string()));
+/// assert!(parse_ast::<_, &str>("no", tokenizer).parsed.is_none());
 /// ```
 ///
 /// [`Ast`]: crate::Ast
@@ -307,8 +307,8 @@ pub trait ParseStringToken {
 /// type Tokenizer = LogosTokenizer<Token>;
 /// let tokenizer = Tokenizer::new(Token::Error, Token::Eof);
 ///
-/// assert_eq!(parse_ast::<_, Identifier>("thisisanidentifier", tokenizer).into_result(), Ok(Identifier("thisisanidentifier")));
-/// assert!(parse_ast::<_, Identifier>("\"thisisnoidentifier\"", tokenizer).into_result().is_err());
+/// assert_eq!(parse_ast::<_, Identifier>("thisisanidentifier", tokenizer).parsed, Some(Identifier("thisisanidentifier")));
+/// assert!(parse_ast::<_, Identifier>("\"thisisnoidentifier\"", tokenizer).parsed.is_none());
 /// ```
 ///
 /// [`Ast`]: crate::Ast
@@ -337,6 +337,7 @@ pub struct Parser<'source, T: Tokenize> {
     tokens: Vec<(T::Token, Range<usize>)>,
     position: usize,
     eof: (T::Token, Range<usize>),
+    pub errors: Vec<Error>,
 }
 
 impl<'source, T: Tokenize> Parser<'source, T> {
@@ -349,6 +350,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
             tokens: output.tokens,
             position: 0,
             eof: (output.eof_token, eof_span),
+            errors: Vec::new(),
         }
     }
 
@@ -367,6 +369,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     }
 
     /// Moves the parser to the next token
+    #[inline]
     pub fn step(&mut self) {
         self.position += 1;
     }
@@ -447,20 +450,25 @@ impl<'source, T: Tokenize> Parser<'source, T> {
         }
     }
 
-    // TODO do these still make sense?
-    /// Construct a new [`Error`] at the current span
+    /// Push a new [`Error`] at the current span
     #[inline]
-    pub fn error(&self, kind: ErrorKind) -> Error {
-        Error::new(kind, self.current().1.clone())
+    pub fn error(&mut self, kind: ErrorKind) {
+        self.errors.push(Error::new(kind, self.current().1.clone()));
     }
 
-    /// Construct a new [`Error`] with a custom message at the current span
     #[inline]
-    pub fn custom_error(&self, message: String) -> Error {
-        Error::custom(message, self.current().1.clone())
+    pub fn last_error_span(&self) -> Range<usize> {
+        self.errors.last().map_or(0..0, |error| error.span.clone())
+    }
+
+    #[inline]
+    pub fn fold_errors(&mut self, at: usize) {
+        let errors = self.errors.split_off(at);
+        self.errors.push(Error::all_failed(errors));
     }
 
     /// Display readable information about the current parser state
+    #[inline]
     pub fn debug_state<'parser>(&'parser self) -> DebugState<'parser, 'source, T>
     where
         T::Token: Debug,
@@ -504,6 +512,7 @@ impl<'parser, 'source, T: Tokenize> DebugState<'parser, 'source, T>
 where
     T::Token: Debug,
 {
+    #[inline]
     fn new(parser: &'parser Parser<'source, T>) -> Self {
         Self { parser }
     }

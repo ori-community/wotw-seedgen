@@ -7,69 +7,92 @@ pub use punctuated::Punctuated;
 pub use separated::{Separated, SeparatedNonEmpty};
 
 use crate::{
-    Ast, Mode, OptionMode, Parser, Result, ResultMode, Span, SpanEnd, SpanStart, Tokenize,
+    Ast, ErrorMode, Errors, NoErrors, Parser, Span, SpanEnd, SpanStart, SpannedOption, Tokenize,
 };
 use std::ops::{ControlFlow, Range};
 
 pub trait AstCollection<'source, T: Tokenize>: AstCollectionInit<'source, T> {
-    fn ast_item_impl<M: Mode>(
+    fn ast_item_impl<E: ErrorMode>(
         &mut self,
         parser: &mut Parser<'source, T>,
-    ) -> ControlFlow<Option<M::Error>>;
+    ) -> ControlFlow<Result<(), ()>>;
+
+    fn ast_item(&mut self, parser: &mut Parser<'source, T>) -> ControlFlow<Result<(), ()>> {
+        self.ast_item_impl::<Errors>(parser)
+    }
+
+    fn ast_item_no_errors(
+        &mut self,
+        parser: &mut Parser<'source, T>,
+    ) -> ControlFlow<Result<(), ()>> {
+        self.ast_item_impl::<NoErrors>(parser)
+    }
 }
 
 pub trait AstCollectionInit<'source, T: Tokenize>: Sized {
-    fn ast_first_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self>;
+    fn ast_first_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self>;
 
-    #[inline]
-    fn ast_first_output<M: Mode>(parser: &mut Parser<'source, T>) -> M::Output<Self> {
-        M::output(Self::ast_first_impl::<M>(parser))
+    fn ast_first_impl_spanned<E: ErrorMode>(
+        parser: &mut Parser<'source, T>,
+    ) -> SpannedOption<Self> {
+        let option = Self::ast_first_impl::<E>(parser);
+
+        SpannedOption::from_option(option, || parser.last_error_span())
     }
 
-    #[inline]
-    fn ast_first_result(parser: &mut Parser<'source, T>) -> Result<Self> {
-        Self::ast_first_output::<ResultMode>(parser)
+    fn ast_first(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Self::ast_first_impl::<Errors>(parser)
     }
 
-    #[inline]
-    fn ast_first_option(parser: &mut Parser<'source, T>) -> Option<Self> {
-        Self::ast_first_output::<OptionMode>(parser)
+    fn ast_first_spanned(parser: &mut Parser<'source, T>) -> SpannedOption<Self> {
+        Self::ast_first_impl_spanned::<Errors>(parser)
     }
-}
 
-impl<'source, T, V> AstCollectionInit<'source, T> for V
-where
-    T: Tokenize,
-    V: Default,
-{
-    #[inline]
-    fn ast_first_impl<M: Mode>(_parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        ControlFlow::Continue(Self::default())
+    fn ast_first_no_errors(parser: &mut Parser<'source, T>) -> Option<Self> {
+        Self::ast_first_impl::<NoErrors>(parser)
+    }
+
+    fn ast_first_no_errors_spanned(parser: &mut Parser<'source, T>) -> SpannedOption<Self> {
+        Self::ast_first_impl_spanned::<NoErrors>(parser)
     }
 }
 
 #[derive(Default)]
 #[repr(transparent)]
 struct Collection<V>(pub V);
+
 impl<'source, T, V> Ast<'source, T> for Collection<V>
 where
     T: Tokenize,
     V: AstCollection<'source, T>,
 {
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         let before = parser.position();
-        let mut v = V::ast_first_impl::<M>(parser)?;
+
+        let mut v = V::ast_first_impl::<E>(parser)?;
+
         while !parser.is_finished() {
-            match v.ast_item_impl::<M>(parser) {
+            match V::ast_item_impl::<E>(&mut v, parser) {
                 ControlFlow::Continue(()) => {}
-                ControlFlow::Break(None) => return ControlFlow::Continue(Self(v)),
-                ControlFlow::Break(Some(err)) => {
+                ControlFlow::Break(Ok(())) => return Some(Self(v)),
+                ControlFlow::Break(Err(())) => {
                     parser.jump(before);
-                    return ControlFlow::Break(err);
+
+                    return None;
                 }
             }
         }
-        ControlFlow::Continue(Self(v))
+
+        Some(Self(v))
+    }
+}
+
+impl<'source, T, V> AstCollectionInit<'source, T> for Vec<V>
+where
+    T: Tokenize,
+{
+    fn ast_first_impl<E: ErrorMode>(_parser: &mut Parser<'source, T>) -> Option<Self> {
+        Some(Vec::new())
     }
 }
 
@@ -78,21 +101,21 @@ where
     T: Tokenize,
     V: Ast<'source, T>,
 {
-    fn ast_item_impl<M: Mode>(
+    fn ast_item_impl<E: ErrorMode>(
         &mut self,
         parser: &mut Parser<'source, T>,
-    ) -> ControlFlow<Option<M::Error>> {
-        match V::ast_impl::<M>(parser) {
-            ControlFlow::Continue(value) => {
+    ) -> ControlFlow<Result<(), ()>> {
+        match V::ast_impl::<E>(parser) {
+            Some(value) => {
                 self.push(value);
 
                 if parser.is_finished() {
-                    ControlFlow::Break(None)
+                    ControlFlow::Break(Ok(()))
                 } else {
                     ControlFlow::Continue(())
                 }
             }
-            ControlFlow::Break(err) => ControlFlow::Break(Some(err)),
+            None => ControlFlow::Break(Err(())),
         }
     }
 }
@@ -103,8 +126,8 @@ where
     V: Ast<'source, T>,
 {
     #[inline]
-    fn ast_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        <Collection<Self>>::ast_impl::<M>(parser).map_continue(|c| c.0)
+    fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        <Collection<Self>>::ast_impl::<E>(parser).map(|c| c.0)
     }
 }
 
@@ -117,8 +140,8 @@ where
     V: Ast<'source, T>,
 {
     #[inline]
-    fn ast_first_impl<M: Mode>(parser: &mut Parser<'source, T>) -> ControlFlow<M::Error, Self> {
-        V::ast_impl::<M>(parser).map_continue(Self)
+    fn ast_first_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
+        V::ast_impl::<E>(parser).map(|v| Self(v))
     }
 }
 
@@ -128,11 +151,11 @@ where
     V: Ast<'source, T>,
 {
     #[inline]
-    fn ast_item_impl<M: Mode>(
+    fn ast_item_impl<E: ErrorMode>(
         &mut self,
         _parser: &mut Parser<'source, T>,
-    ) -> ControlFlow<Option<M::Error>> {
-        ControlFlow::Break(None)
+    ) -> ControlFlow<Result<(), ()>> {
+        ControlFlow::Break(Ok(()))
     }
 }
 

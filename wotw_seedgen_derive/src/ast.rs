@@ -6,10 +6,8 @@ use heck::{
     ToTitleCase, ToTrainCase,
 };
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::spanned::Spanned;
-
-// TODO just found out about parse_quote
+use quote::{quote, ToTokens};
+use syn::{parse_quote, spanned::Spanned};
 
 pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
     let syn::DeriveInput {
@@ -23,7 +21,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
 
     add_bound(
         &mut generics,
-        quote! { wotw_seedgen_parse::Ast<'source, Tokenizer> },
+        parse_quote! { wotw_seedgen_parse::Ast<'source, Tokenizer> },
     );
 
     let (mut impl_generics, type_generics, where_clause) = generics.split_for_impl();
@@ -32,7 +30,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
         .lifetimes()
         .any(|param| param.lifetime.ident == "source")
     {
-        generics.params.push(syn::parse_quote! { 'source });
+        generics.params.push(parse_quote! { 'source });
         impl_generics = generics.split_for_impl().0;
     }
 
@@ -50,7 +48,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
 
     Ok(quote! {
         impl #impl_generics wotw_seedgen_parse::Ast<'source, Tokenizer> for #ident #type_generics {
-            fn ast_impl<M: wotw_seedgen_parse::Mode>(parser: &mut wotw_seedgen_parse::Parser<'source, Tokenizer>) -> std::ops::ControlFlow<M::Error, Self> {
+            fn ast_impl<E: wotw_seedgen_parse::ErrorMode>(parser: &mut wotw_seedgen_parse::Parser<'source, Tokenizer>) -> Option<Self> {
                 use wotw_seedgen_parse::Ast;
                 #implementation
             }
@@ -148,20 +146,20 @@ impl Attributes {
     }
 }
 
-fn ast_fn<const FORCE_OPTION_MODE: bool>(
+fn ast_fn<const NO_ERRORS_MODE: bool>(
     ty: syn::Type,
     with: Option<syn::LitStr>,
 ) -> Result<TokenStream> {
     with.map_or_else(
         || {
-            let mode = if FORCE_OPTION_MODE {
-                quote! { wotw_seedgen_parse::OptionMode }
+            let ast = if NO_ERRORS_MODE {
+                quote! { ast_no_errors }
             } else {
-                quote! { M }
+                quote! { ast_impl::<E> }
             };
 
             Ok(quote! {
-                <#ty as wotw_seedgen_parse::Ast<'source, Tokenizer>>::ast_impl::<#mode>
+                <#ty as wotw_seedgen_parse::Ast<'source, Tokenizer>>::#ast
             })
         },
         |with| parse_with(&with),
@@ -173,13 +171,10 @@ fn parse_with(with: &syn::LitStr) -> Result<TokenStream> {
     let path =
         syn::parse_str::<syn::Path>(&value).map_err(|err| syn::Error::new_spanned(with, err))?;
 
-    Ok(quote! {
-        #path
-    })
+    Ok(path.into_token_stream())
 }
 
-// TODO use ast_option instead of ast_impl::<OptionMode> in enums
-fn ast_fields<const IN_ENUM: bool, const FORCE_OPTION_MODE: bool>(
+fn ast_fields<const IN_ENUM: bool, const NO_ERRORS_MODE: bool>(
     ident: &syn::Ident,
     fields: syn::Fields,
     attrs: &Attributes,
@@ -187,37 +182,35 @@ fn ast_fields<const IN_ENUM: bool, const FORCE_OPTION_MODE: bool>(
     let needs_backup = fields.len() > 1;
 
     let fields = match fields {
-        syn::Fields::Named(fields) => ast_fields_named::<FORCE_OPTION_MODE>(ident, fields, attrs),
-        syn::Fields::Unnamed(fields) => {
-            ast_fields_unnamed::<FORCE_OPTION_MODE>(ident, fields, attrs)
-        }
-        syn::Fields::Unit => return ast_fields_unit::<IN_ENUM, FORCE_OPTION_MODE>(ident, attrs),
+        syn::Fields::Named(fields) => ast_fields_named::<NO_ERRORS_MODE>(ident, fields, attrs),
+        syn::Fields::Unnamed(fields) => ast_fields_unnamed::<NO_ERRORS_MODE>(ident, fields, attrs),
+        syn::Fields::Unit => return ast_fields_unit::<IN_ENUM, NO_ERRORS_MODE>(ident, attrs),
     }?;
 
     let variant_construction = IN_ENUM.then(|| quote! { ::#ident });
-    let mut flow = quote! {
-        std::ops::ControlFlow::Continue(Self #variant_construction
+    let mut fields = quote! {
+        Some(Self #variant_construction
             #fields
         )
     };
 
     if needs_backup {
-        flow = quote! {
+        fields = quote! {
             {
                 let before = parser.position();
-                let flow = (|| #flow)();
-                if flow.is_break() {
+                let option = (|| #fields)();
+                if option.is_none() {
                     parser.jump(before);
                 }
-                flow
+                option
             }
         };
     }
 
-    Ok(flow)
+    Ok(fields)
 }
 
-fn ast_fields_named<const FORCE_OPTION_MODE: bool>(
+fn ast_fields_named<const NO_ERRORS_MODE: bool>(
     outer_ident: &syn::Ident,
     fields: syn::FieldsNamed,
     outer_attrs: &Attributes,
@@ -232,7 +225,7 @@ fn ast_fields_named<const FORCE_OPTION_MODE: bool>(
             let ident = ident.as_ref().unwrap();
             let attrs = Attributes::find(&attrs)?;
 
-            let ast = ast_fn::<FORCE_OPTION_MODE>(ty, attrs.with)?;
+            let ast = ast_fn::<NO_ERRORS_MODE>(ty, attrs.with)?;
 
             let value =
                 with_debug::<true, _, _>(quote! { #ast(parser) }, outer_attrs.debug, || {
@@ -248,7 +241,7 @@ fn ast_fields_named<const FORCE_OPTION_MODE: bool>(
     })
 }
 
-fn ast_fields_unnamed<const FORCE_OPTION_MODE: bool>(
+fn ast_fields_unnamed<const NO_ERRORS_MODE: bool>(
     outer_ident: &syn::Ident,
     fields: syn::FieldsUnnamed,
     outer_attrs: &Attributes,
@@ -261,7 +254,7 @@ fn ast_fields_unnamed<const FORCE_OPTION_MODE: bool>(
             let syn::Field { ty, attrs, .. } = field;
             let attrs = Attributes::find(&attrs)?;
 
-            let ast = ast_fn::<FORCE_OPTION_MODE>(ty, attrs.with)?;
+            let ast = ast_fn::<NO_ERRORS_MODE>(ty, attrs.with)?;
 
             let value =
                 with_debug::<true, _, _>(quote! { #ast(parser) }, outer_attrs.debug, || {
@@ -277,24 +270,24 @@ fn ast_fields_unnamed<const FORCE_OPTION_MODE: bool>(
     })
 }
 
-fn ast_fields_unit<const IN_ENUM: bool, const FORCE_OPTION_MODE: bool>(
+fn ast_fields_unit<const IN_ENUM: bool, const NO_ERRORS_MODE: bool>(
     ident: &syn::Ident,
     attrs: &Attributes,
 ) -> Result<TokenStream> {
     let variant_construction = IN_ENUM.then(|| quote! { ::#ident });
 
     if let Some(token) = &attrs.token {
-        let err = err::<FORCE_OPTION_MODE>(quote! {
-            M::err(|| parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(#token.to_string())))
+        let err = err::<NO_ERRORS_MODE>(quote! {
+            || parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(#token.to_string()))
         });
 
         return Ok(quote! {
             match parser.current().0 {
                 #token => {
                     parser.step();
-                    std::ops::ControlFlow::Continue(Self #variant_construction)
+                    Some(Self #variant_construction)
                 }
-                _ => std::ops::ControlFlow::Break(#err)
+                _ => #err
             }
         });
     }
@@ -315,25 +308,25 @@ fn ast_fields_unit<const IN_ENUM: bool, const FORCE_OPTION_MODE: bool>(
         Some(rename) => rename.value(),
     };
 
-    let err = err::<FORCE_OPTION_MODE>(quote! {
-        M::err(|| parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(format!(concat!('"', #str, '"')))))
+    let err = err::<NO_ERRORS_MODE>(quote! {
+        || parser.error(wotw_seedgen_parse::ErrorKind::ExpectedToken(format!(concat!('"', #str, '"'))))
     });
 
     Ok(quote! {
         if parser.current_slice() == #str {
             parser.step();
-            std::ops::ControlFlow::Continue(Self #variant_construction)
+            Some(Self #variant_construction)
         } else {
-            std::ops::ControlFlow::Break(#err)
+            #err
         }
     })
 }
 
-fn err<const FORCE_OPTION_MODE: bool>(gen: TokenStream) -> TokenStream {
-    if FORCE_OPTION_MODE {
-        quote! { () }
+fn err<const NO_ERRORS_MODE: bool>(gen: TokenStream) -> TokenStream {
+    if NO_ERRORS_MODE {
+        quote! { None }
     } else {
-        gen
+        quote! { E::none(#gen) }
     }
 }
 
@@ -359,24 +352,27 @@ fn ast_enum(
         })
         .collect::<Result<Vec<_>>>()?;
 
-    let happy_variants = enum_variants::<true, _>(&variants, outer_ident, |flow, _| {
+    let happy_variants = enum_variants::<true, _>(&variants, outer_ident, |option, _| {
         quote! {
-            if let std::ops::ControlFlow::Continue(value) = #flow {
-                return std::ops::ControlFlow::Continue(value);
+            let option = #option;
+            if option.is_some() {
+                return option;
             }
         }
     })?;
 
-    let sad_variants = enum_variants::<false, _>(&variants, outer_ident, |flow, description| {
+    let print_err_branch: Option<TokenStream> = attrs
+        .debug
+        .then(|| quote! { eprintln!("all branches failed, reparsing with errors"); });
+
+    let sad_variants = enum_variants::<false, _>(&variants, outer_ident, |option, description| {
         let fmt_string =
             format!("unexpected continue after parse already failed - parsing {description}. {{}}");
 
         quote! {
-            {
-                match #flow {
-                    std::ops::ControlFlow::Continue(value) => panic!(#fmt_string, parser.debug_state()),
-                    std::ops::ControlFlow::Break(err) => err,
-                }
+            let option = #option;
+            if option.is_some() {
+                panic!(#fmt_string, parser.debug_state());
             }
         }
     })?;
@@ -385,13 +381,17 @@ fn ast_enum(
         {
             #(#happy_variants)*
 
-            let errors = vec![#(#sad_variants),*];
-            std::ops::ControlFlow::Break(M::combine_errors(errors))
+            E::none(|| {
+                #print_err_branch
+                let at = parser.errors.len();
+                #(#sad_variants)*
+                parser.fold_errors(at);
+            })
         }
     })
 }
 
-fn enum_variants<const FORCE_OPTION_MODE: bool, F>(
+fn enum_variants<const NO_ERRORS_MODE: bool, F>(
     variants: &[(syn::Ident, syn::Fields, Attributes)],
     outer_ident: &syn::Ident,
     mut gen: F,
@@ -404,14 +404,14 @@ where
         .map(|(ident, fields, attrs)| -> Result<_> {
             let description = format!("branch `{outer_ident}::{ident}`");
 
-            let fields = ast_fields::<true, FORCE_OPTION_MODE>(ident, fields.clone(), attrs)?;
+            let fields = ast_fields::<true, NO_ERRORS_MODE>(ident, fields.clone(), attrs)?;
 
-            let flow =
+            let option =
                 with_debug::<false, _, _>(quote! { (|| { #fields })() }, attrs.debug, || {
                     &description
                 });
 
-            Ok(gen(flow, description))
+            Ok(gen(option, description))
         })
         .collect()
 }
@@ -442,15 +442,15 @@ where
 
         let after = {
             let fmt_string = format!("finished {description} ({{}})");
-            quote! { eprintln!(#fmt_string, if flow.is_continue() { "Continue" } else { "Break" }); }
+            quote! { eprintln!(#fmt_string, if option.is_some() { "Some" } else { "None" }); }
         };
 
         quote! {
             {
                 #before
-                let flow = #statement;
+                let option = #statement;
                 #after
-                flow
+                option
             }
         }
     } else {

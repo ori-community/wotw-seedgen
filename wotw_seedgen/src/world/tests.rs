@@ -16,8 +16,8 @@ use wotw_seedgen_static_assets::{LOC_DATA, STATE_DATA, UBER_STATE_DATA};
 
 lazy_static! {
     static ref GRAPH: Graph =
-        Graph::compile(AREAS.clone(), LOC_DATA.clone(), STATE_DATA.clone(), &[],)
-            .into_result()
+        Graph::compile(AREAS.clone(), LOC_DATA.clone(), STATE_DATA.clone(), &[])
+            .parsed
             .unwrap();
 }
 

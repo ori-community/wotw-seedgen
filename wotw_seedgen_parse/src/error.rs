@@ -7,7 +7,6 @@ use std::{
 };
 use wotw_seedgen_assets::Source;
 
-// TODO the Error type is pretty big! It seems like Boxing it would reduce type sizes by a lot in the current ASTs.
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// An Error returned from an [`Ast`] implementation, including the span the error originated from.
