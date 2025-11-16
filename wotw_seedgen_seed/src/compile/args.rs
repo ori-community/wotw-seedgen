@@ -51,7 +51,7 @@ impl<'a> Args<'a> {
         self.arg(ArgDestination::Integer(index), arg)
     }
 
-    pub fn call(mut self, command: Command) -> (Vec<Command>, MemoryUsed) {
+    pub fn call(mut self, command: Command, used: MemoryUsed) -> (Vec<Command>, MemoryUsed) {
         self.build_overwrite_relations();
         let mut call_builder = CallBuilder::new(&self);
 
@@ -59,16 +59,16 @@ impl<'a> Args<'a> {
             self.commit_arg(index, &mut call_builder);
         }
 
-        call_builder.finish(command)
+        call_builder.finish(command, used)
     }
 
-    pub fn call_multiple<I>(self, commands: I) -> (Vec<Command>, MemoryUsed)
+    pub fn call_multiple<I>(self, commands: I, used: MemoryUsed) -> (Vec<Command>, MemoryUsed)
     where
         I: IntoIterator<Item = Command>,
     {
         let mut iter = commands.into_iter();
 
-        let mut out = self.call(iter.next().unwrap());
+        let mut out = self.call(iter.next().unwrap(), used);
 
         out.0.extend(iter);
 
@@ -179,9 +179,12 @@ impl CallBuilder {
         self.final_commands.push(copy_back);
     }
 
-    fn finish(mut self, command: Command) -> (Vec<Command>, MemoryUsed) {
+    fn finish(mut self, command: Command, used: MemoryUsed) -> (Vec<Command>, MemoryUsed) {
         self.out.append(&mut self.final_commands);
         self.out.push(command);
+
+        self.total_memory_used.combine(used);
+
         (self.out, self.total_memory_used)
     }
 }
@@ -198,28 +201,26 @@ impl ArgDestination {
     fn reserve(&self, memory_used: &mut MemoryUsed) {
         match self {
             ArgDestination::Boolean(index) => {
-                memory_used.boolean = usize::max(memory_used.boolean, *index)
+                memory_used.boolean = usize::max(memory_used.boolean, *index + 1)
             }
             ArgDestination::Integer(index) => {
-                memory_used.integer = usize::max(memory_used.integer, *index)
+                memory_used.integer = usize::max(memory_used.integer, *index + 1)
             }
             ArgDestination::Float(index) => {
-                memory_used.float = usize::max(memory_used.float, *index)
+                memory_used.float = usize::max(memory_used.float, *index + 1)
             }
             ArgDestination::String(index) => {
-                memory_used.string = usize::max(memory_used.string, *index)
+                memory_used.string = usize::max(memory_used.string, *index + 1)
             }
         }
     }
 
-    // TODO inaccuracy: we don't differentiate whether something overwrites memory zero or overwrites nothing
-    // this might lead to unnecessary copies
     fn gets_overwritten(&self, memory_used: &MemoryUsed) -> bool {
         match self {
-            ArgDestination::Boolean(index) => memory_used.boolean >= *index,
-            ArgDestination::Integer(index) => memory_used.integer >= *index,
-            ArgDestination::Float(index) => memory_used.float >= *index,
-            ArgDestination::String(index) => memory_used.string >= *index,
+            ArgDestination::Boolean(index) => memory_used.boolean > *index,
+            ArgDestination::Integer(index) => memory_used.integer > *index,
+            ArgDestination::Float(index) => memory_used.float > *index,
+            ArgDestination::String(index) => memory_used.string > *index,
         }
     }
 
@@ -247,8 +248,12 @@ impl ArgDestination {
                 (&mut total_memory_used.string, Command::CopyString, index)
             }
         };
-        *used += 1;
+
         debug_assert!(*used < RESERVED_MEMORY);
-        (command(0, *used), command(*used, index))
+        let copies = (command(0, *used), command(*used, index));
+
+        *used += 1;
+
+        copies
     }
 }
