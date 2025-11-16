@@ -67,6 +67,10 @@ impl CompileContext {
         // TODO are we allowed to ignore memoryused here?
         let (command, _) = input.compile(self);
 
+        if let [Command::Execute(index)] = command.as_slice() {
+            return *index;
+        }
+
         let index = self.command_lookup.len();
         self.command_lookup.push(command);
 
