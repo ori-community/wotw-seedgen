@@ -5334,17 +5334,25 @@ anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower po
       DoubleJump, TripleJump, Damage=10, Dash OR Glide OR Sword OR Hammer
       DoubleJump, Damage=30, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
       Grapple, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SwordSJump=1, Damage=10  # sjump from spikes
+      # GlideJump, DoubleJump, TripleJump
+      # AerialHammerJump, TripleJump OR Dash OR GlideJump  # no dboost path because depending on where you land in the spikes a standard hjump won't reach the wall
+      # GrenadeJump=1, Damage=10, DoubleJump OR Dash OR Grapple  # gjump from the spikes. Could work with other skills in the condition but they are much harder tp catch the wall with if you fall into a pit 
     unsafe:
       Bash, DoubleJump
-      Grapple, Spear=1 OR Blaze=1 OR Damage=20
+      Grapple, Spear=1 OR Blaze=1 OR Damage=20 OR GrenadeCancel OR PauseFloat
       Bash, Glide, SwordSJump=1
       DoubleJump, TripleJump, Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
       DoubleJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2:
         Damage=10
       DoubleJump, Damage=20, Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
-      GrenadeJump, DoubleJump OR Dash OR SentryJump=1 OR Damage=10
-      SentryJump=2
+      GrenadeJump, DoubleJump OR Dash OR SwordSJump=1 OR Damage=10
+      SwordSJump=2  # precise sword float to the safe ledge on the very left
+      SentryJump=1, Damage=10
+      GlideJump, DoubleJump
+      AerialHammerJump OR GlideHammerJump OR BlazeSwap=3 OR FlashSwap OR SentrySwap=3
   pickup WestGlades.SwimEC:
     moki: Water
     kii:
@@ -5373,16 +5381,23 @@ anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower po
       Grapple, DoubleJump, TripleJump, Dash, Glide OR Sword
       SentryJump=1, DoubleJump
     kii:
-      Bash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      Bash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # bait a tentacle shot as you bash the lantern to reach the wall above it 
       Grapple, DoubleJump, TripleJump, Dash OR Sword
       Grapple, DoubleJump, TripleJump, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump OR GlideJump
+      # AerialHammerJump, Grapple, Dash OR Glide OR Sword
+      # AerialHammerJump, WaterDash, Water OR Damage=20
+      # GrenadeJump=1, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash OR SwordSJump=1
+      Bash OR SentryJump=1 OR GlideHammerJump
+      AerialHammerJump  # much easier from the central island
+      GrenadeJump, DoubleJump
       DoubleJump, TripleJump, Grapple, Hammer  # Upswing at the end of the glide
       Grapple, DoubleJump, TripleJump, Glide, Spear=1  # too hard for kii
       WaterDash, DoubleJump  # I'm so sorry to whoever have to do it in a real seed https://youtu.be/DI62eNkF18Y
       DoubleJump, TripleJump, Dash  # https://youtu.be/jKOlTG0wecg
-  
   conn WestGlades.RightLowerPool:
     moki:
       Water OR Launch
@@ -5394,8 +5409,15 @@ anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower po
       Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
       Combat=Tentacle OR Damage=10:
-        Damage=40 OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
         Damage=20, WaterDash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=20, Damage=20, Combat=Tentacle
+      Damage=20, Damage=30
+      # Glitched
+      # GrenadeJump=1, Damage=20, Combat=Tentacle OR Damage=10  # gjump inbetween the floating platforms then dboost to reach the island
+    unsafe:
+      GrenadeCancel, Combat=Tentacle OR Damage=10
+      Damage=10, Damage=10, Damage=10 OR Combat=Tentacle OR WaterDash  # dboost on tentacle to avoid water ticks. With waterdash, use iframes to pass under the island and reach the suspended platform
 
 anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper and lower Glades
   refill Checkpoint
