@@ -4531,7 +4531,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Sword  # high jump, full combo, upslash and then downslash (all while holding right)
       # Dash, Glide OR Sword OR Hammer
       Hammer, Glide, Blaze=1 OR Spear=1
-  conn WestGlades.PastTown:
+  conn WestGlades.RightLowerPool:
     moki:
       Bash, DoubleJump OR Dash
       Launch
@@ -5162,23 +5162,25 @@ region WestGlades:
   kii: free
   unsafe: free
 
-anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool in WestGlades
+anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower pool in WestGlades
   refill Checkpoint
   refill Energy=3:
     # paths using energy or health AFTER grabbing the refill would be invalid here because they would misrepresent the resulting health or energy
     moki, BreakCrystal:
       DoubleJump, Dash OR Glide
       Launch
-    gorlek, Bow=1 OR Grenade=1:
+    gorlek, Bow=1 OR Grenade=1 OR Sentry=1:
       Water  # break the crystal from afar and jump into the water to get the energy
       Glide  # break the crystal from afar and use glide to collect the energy midair
       DoubleJump, TripleJump  # break the crystal from afar and use triple jump to collect the energy midair
     kii:
-      Bow=1 OR Shuriken=1 OR Grenade=1:
+      Bow=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1:
         Water OR DoubleJump OR Dash OR Glide OR Hammer OR Sword
       Water OR Glide:
         Sword
         Hammer, DoubleJump OR Dash
+      # Glitched
+      # AerialHammerJump
 
   state GladesTown.GromsWall:
     unsafe: LaunchBashChain  # https://www.youtube.com/watch?v=edSpqN0b4UY
@@ -5197,14 +5199,17 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Bash, WaterDash, Water, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       Bash, WaterDash, Damage=20, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, Hammer
+      # Glitched
+      # GrenadeJump=1
+      # GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       Sword  # https://youtu.be/S9-y-ZoP7sQ
       DoubleJump  # https://youtu.be/Sh6buQ1hfCc
       Bash, Bow=1  # Bow to aggro the tentacle (by hitting its mouth)
       Bash, Water OR Hammer OR Damage=40 OR GlideJump OR PauseFloat
       Bash, Damage=20, WaterDash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      GlideJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+      GlideJump, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR WallHammerJump OR CoyoteHammerJump
   pickup WestGlades.AbovePlantEX:
     moki:
       Bash, DoubleJump, Dash OR Glide
@@ -5223,12 +5228,25 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
       DoubleJump, TripleJump, Sword  # reset jumps with sword
       Combat=Tentacle, DoubleJump, TripleJump, Hammer OR Spear=1
+      # Glitched
+      # GlideJump, Bash
+      # Combat=Tentacle, GlideJump, DoubleJump
+      # AerialHammerJump OR SentryJump=1
+      # Combat=Tentacle, GrenadeJump=1, DoubleJump  # possible with a lot more abilities than djump but the left wall can be really annoying when wjumping from the very top
     unsafe:
       Bash, GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
       DoubleJump, Sword  # Pogo the projectile to pass above the tentacle
-      Combat=Tentacle, SwordSJump=1
+      SentryJump=1 OR GlideHammerJump OR WallHammerJump
       Combat=Tentacle, GlideJump, DoubleJump
+      GlideJump, Hammer, Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # glide jump + upslash to reach the left wall
       Combat=Tentacle, DoubleJump, Spear=2  # extend jumps momentum with spears
+      DoubleJump, Hammer  # https://youtu.be/W4fluh2A7Lo
+      DoubleJump, TripleJump, Dash  # Dash ramp from the wooden platform
+      Combat=Tentacle, GrenadeJump:
+        DoubleJump OR Dash OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Water, WaterDash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Damage=20, WaterDash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        PauseFloat, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # DiveLaunch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Flap OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup WestGlades.LowerPoolEX:
     moki: Water
@@ -5240,7 +5258,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Damage=40
       Damage=20, WaterDash
 
-  conn WestGlades.LowerPool:
+  conn WestGlades.LeftLowerPool:
     moki:
       Water OR Launch
       Combat=Tentacle, DoubleJump, Dash OR Glide
@@ -5248,25 +5266,34 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
     gorlek:
       Bash, DoubleJump OR Dash OR Grenade=1
       DoubleJump, Damage=10 OR Combat=Tentacle
-      Dash, Damage=10 OR Combat=Tentacle
+      Dash, Damage=10 OR Combat=Tentacle OR Bash
       WaterDash, Damage=20, Bash
       SentryJump=1, Glide, Bash OR Damage=10 OR Combat=Tentacle
     kii:
       Damage=80, Damage=40
-      WaterDash, Damage=20, Combat=Tentacle, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      WaterDash, Damage=20, Damage=10, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      WaterDash, Damage=20, Combat=Tentacle OR Damage=10:
+        Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
       Bash OR Combat=Tentacle OR Damage=10:
         Sword OR Hammer
         Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Glide, Damage=20
-      DoubleJump, TripleJump, Sword  # Reset jumps on first tentacle
+      # Glitched
+      # GlideJump, Combat=Tentacle OR Bash OR Damage=10
+      # GrenadeJump=1, Glide, Bash OR Damage=10 OR Combat=Tentacle
+      # GrenadeJump=1, Bash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, Combat=Tentacle OR Damage=10:
+      #   Shuriken=1, Shuriken=1 OR Damage=20  # use a shuriken to pass above the 2nd tentacle (more energy efficient than a 2nd grenade jump)
+      #   GrenadeJump=1, Blaze=2 OR Flash=1 OR Sentry=1  # same as above but sjump inbetween the two log in the water
+      #   Damage=20, Blaze=2 OR Flash=1 OR Sentry=1  # same as above but swim in the poisonous water
     unsafe:
-      Bash
-      DoubleJump, Sword  # Pogo the projectile to pass above the tentacle
-  conn WestGlades.Center:  # Make sure it's not redundant with PastTown->LowerPool->Center
-    unsafe:
-      SwordSJump=2, Damage=20  # defeating the enemy and sword floating
-      DoubleJump, TripleJump, Dash, Water OR Combat=Tentacle
+      Bash, Bow=1  # Bow to aggro the tentacle (by hitting its mouth
+      Bash, Grenade=2  # first grenade break the cristal
+      Bash, PauseFloat OR Damage=40  # jump in the water and bait the tantacle from here
+      WaterDash, Damage=20, Damage=10, Damage=10 OR Combat=Tentacle  #  wdash on the wooden platform to regen, kill/dboost the first tentacle then take a dboost of the 2nd tentacle to avoid a water tick
+      GlideJump, Combat=Tentacle OR Bash OR Damage=10
+      GrenadeJump, Combat=Tentacle OR Bash OR Damage=10:
+        Glide OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
+      GrenadeCancel, Bash, Damage=20  # bait the tentacle from the water
+      PauseFloat, Combat=Tentacle OR Bash OR Damage=10
   conn GladesTown.West:
     moki:
       Bash, DoubleJump OR Dash OR Glide
@@ -5282,16 +5309,19 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Sword, Dash, Spear=1 OR Shuriken=1 OR Damage=10
       Hammer, Damage=10, DoubleJump OR Dash
       Hammer, Glide, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump OR GlideJump  # glidejump from the anchor to the pole directly
+      # HammerSJump=1, Shuriken=1 OR Sentry=1
+      # GrenadeJump, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3  # no energy cost because grabbing the pole will refund your energy
+      # GrenadeJump, Damage=10, Shuriken=1 OR Sentry=2  # dboost in the spikes at the start to preserve a bit of energy
     unsafe:
-      HammerSJump=1
+      HammerSJump=1 OR GlideJump OR CoyoteHammerJump
+      GrenadeJump  # https://youtu.be/Q-nM7alse8o
       DoubleJump, Glide  # verified damageless
-      Glide  # GlideJump
-      # kii paths without the friendly spikes dboosts
       Sword, Dash
-      Hammer, DoubleJump OR Dash
-      Hammer, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, DoubleJump OR Dash OR Glide OR Damage=10  # https://youtu.be/vtrXR8WGl_w
 
-anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool in WestGlades
+anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower pool in WestGlades
   pickup WestGlades.LeftOre:
     moki: Grapple, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
@@ -5347,12 +5377,13 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
       Grapple, DoubleJump, TripleJump, Dash OR Sword
       Grapple, DoubleJump, TripleJump, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash
-      SwordSJump=2, Damage=20  # defeating the enemy and sword floating
+      Bash OR SwordSJump=1
       DoubleJump, TripleJump, Grapple, Hammer  # Upswing at the end of the glide
       Grapple, DoubleJump, TripleJump, Glide, Spear=1  # too hard for kii
       WaterDash, DoubleJump  # I'm so sorry to whoever have to do it in a real seed https://youtu.be/DI62eNkF18Y
-  conn WestGlades.PastTown:
+      DoubleJump, TripleJump, Dash  # https://youtu.be/jKOlTG0wecg
+  
+  conn WestGlades.RightLowerPool:
     moki:
       Water OR Launch
       Combat=Tentacle, DoubleJump OR Dash OR Glide
@@ -5412,11 +5443,11 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
       DoubleJump, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
       Dash, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
       Damage=30, Dash, Sword
-  conn WestGlades.LowerPool:
+  conn WestGlades.LeftLowerPool:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide OR Bash
     gorlek: Sword OR Hammer
     kii: free
-  conn WestGlades.PastTown:  # This connection is strictly because of energy/health management
+  conn WestGlades.RightLowerPool:  # This connection is strictly because of energy/health management
     kii:
       Damage=10 OR Combat=Tentacle:
         Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
