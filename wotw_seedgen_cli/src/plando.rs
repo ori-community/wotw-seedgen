@@ -89,6 +89,8 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
         watcher.watch(Path::new(root), RecursiveMode::Recursive)?;
 
+        let canonical_out = fs::canonicalize(&out)?;
+
         for res in rx {
             let events = res.map_err(|mut errors| errors.pop().unwrap())?;
 
@@ -96,7 +98,12 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
                 matches!(
                     event.event.kind,
                     EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_)
-                )
+                ) && event
+                    .event
+                    .paths
+                    .into_iter()
+                    .flat_map(fs::canonicalize)
+                    .any(|path| path != canonical_out)
             }) {
                 continue;
             }
