@@ -1,8 +1,9 @@
-use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
     fmt::{self, Debug, Display},
 };
+
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::{Icon, MapIcon, OpherIcon, Shard, Skill, Teleporter, WeaponUpgrade};
 
@@ -10,7 +11,7 @@ use crate::{Icon, MapIcon, OpherIcon, Shard, Skill, Teleporter, WeaponUpgrade};
 ///
 /// UberStates make up most of the save file format; every world state is associated with an UberState which may hold data, usually a single boolean or number.
 /// The `UberIdentifier` is the unique identifier for a given UberState
-#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Deserialize, Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct UberIdentifier {
     pub group: i32,
     pub member: i32,
@@ -69,6 +70,24 @@ impl Display for UberIdentifier {
 impl Debug for UberIdentifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{self}")
+    }
+}
+
+impl Serialize for UberIdentifier {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        (self.group, self.member).serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for UberIdentifier {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        <(i32, i32)>::deserialize(deserializer).map(|(group, member)| Self { group, member })
     }
 }
 
