@@ -328,6 +328,7 @@ on reload {
         "Reveals " + description + " in Glades",
         HealthFragmentsMap,
     )
+
     set_shop_item_data(
         lupoShop.ecMapIcons,
         200,
@@ -335,6 +336,16 @@ on reload {
         "Reveals " + description + " in Woods",
         EnergyFragmentsMap,
     )
+
+    set_shop_item_price(MarshSpawn.LupoMap, 200)
+    set_shop_item_price(WestHollow.LupoMap, 150)
+    set_shop_item_price(InnerWellspring.LupoMap, 150)
+    set_shop_item_price(LowerReach.LupoMap, 150)
+    set_shop_item_price(LowerDepths.LupoMap, 150)
+    set_shop_item_price(EastPools.LupoMap, 150)
+    set_shop_item_price(LowerWastes.LupoMap, 150)
+    set_shop_item_price(WillowsEnd.LupoMap, 50)
+    set_shop_item_price(MidnightBurrows.LupoMap, 50)
 }
 
 on MarshSpawn.LupoMap {

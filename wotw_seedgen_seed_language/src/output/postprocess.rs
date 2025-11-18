@@ -17,6 +17,7 @@ pub struct PlaceholderMap {
 }
 
 impl IntermediateOutput {
+    // TODO only set shop data defaults for things that aren't set by the seed?
     /// Inserts additional commands into the output to:
     ///
     /// - Set reasonable shop data defaults for items placed in shops
@@ -44,27 +45,32 @@ impl IntermediateOutput {
             {
                 let uber_identifier = *uber_identifier;
 
-                if uber_identifier.shop_kind() == ShopKind::Opherlike {
+                if matches!(
+                    uber_identifier.shop_kind(),
+                    ShopKind::Opherlike | ShopKind::Map
+                ) {
                     extra_events.push(Event::on_reload(CommandVoid::SetShopItemPrice {
                         uber_identifier,
                         price: metadata.force_shop_price(&price_distribution, rng),
                     }));
 
-                    extra_events.push(Event::on_reload(CommandVoid::SetShopItemName {
-                        uber_identifier,
-                        name: name.clone(),
-                    }));
-
-                    extra_events.push(Event::on_reload(CommandVoid::SetShopItemDescription {
-                        uber_identifier,
-                        description: metadata.force_description(rng),
-                    }));
-
-                    if let Some(icon) = metadata.force_icon() {
-                        extra_events.push(Event::on_reload(CommandVoid::SetShopItemIcon {
+                    if uber_identifier.shop_kind() == ShopKind::Opherlike {
+                        extra_events.push(Event::on_reload(CommandVoid::SetShopItemName {
                             uber_identifier,
-                            icon,
+                            name: name.clone(),
                         }));
+
+                        extra_events.push(Event::on_reload(CommandVoid::SetShopItemDescription {
+                            uber_identifier,
+                            description: metadata.force_description(rng),
+                        }));
+
+                        if let Some(icon) = metadata.force_icon() {
+                            extra_events.push(Event::on_reload(CommandVoid::SetShopItemIcon {
+                                uber_identifier,
+                                icon,
+                            }));
+                        }
                     }
                 }
             }
