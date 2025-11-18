@@ -5343,7 +5343,7 @@ anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower po
       Bash, DoubleJump
       Grapple, Spear=1 OR Blaze=1 OR Damage=20 OR GrenadeCancel OR PauseFloat
       Bash, Glide, SwordSJump=1
-      DoubleJump, TripleJump, Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
+      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
       DoubleJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2:
         Damage=10
       DoubleJump, Damage=20, Shuriken=1 OR Flash=1 OR Sentry=1:
@@ -5429,25 +5429,31 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
     unsafe:
       Glide, Damage=10, SwordSJump=1
       Glide, DoubleJump, Spear=2, Damage=10
-  pickup WestGlades.RightOre:
+      DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # requires a corner boost et the start
+      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1
+  pickup WestGlades.RightOre:  # Be carefull it's not redundant with WestGlades.Center->WestGlades.Upper->WestGlades.RightOre
     moki:
       Bash, DoubleJump OR Dash
       Launch
     gorlek:
-      Bash, Glide OR Sword OR Hammer OR Grenade=1
       SentryJump=1, Dash
+      Bash, Grenade=1, Damage=10
     kii:
-      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      DoubleJump, Damage=30, Combat=Tentacle, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
-      DoubleJump, Damage=20, Combat=Tentacle, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
-      Damage=50, Combat=Tentacle, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+      Bash, Grenade=1
+      DoubleJump, Damage=30, Combat=Tentacle, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=20, Combat=Tentacle, TripleJump OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Damage=50, Combat=Tentacle, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Same paths as above, but extra 10 damage because of the enemy
-      DoubleJump, Damage=40, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
-      DoubleJump, Damage=30, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
+      DoubleJump, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=30, TripleJump OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      # Glitched
+      # AerialHammerJump, Dash OR Sword OR Spear=1 OR Flash=1 OR Sentry=1  # Start with an upslash. No shurken because throwing it at the wooden platform makes it swing
+      # GrenadeJump=1, DoubleJump, TripleJump OR Hammer OR Spear=2 OR Flash=2 OR Sentry=2
+      # GrenadeJump=1, DoubleJump, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # same above but more energy efficient (2 shurikens doesn't work because hitting the platform pushes it away)
+      # GrenadeJump=1, DoubleJump, Spear=1, Blaze=1  # same above but more energy efficient
+      # GrenadeJump=1, Hammer, Dash
     unsafe:
-      DoubleJump, Sword, Damage=10
-      SentryJump=1  # pogo on tentacle
-      Bash, Damage=10
+      HammerSJump=1, Shuriken=1 OR Sentry=1 OR Damage=3  # Probably possible with just sjump but climbing the platform fast enough is really hard https://youtu.be/K6_LoGNbO7c
   pickup WestGlades.LowerPoolEX:  # This path is strictly because of energy/health management
     kii:
       Damage=60
@@ -5459,12 +5465,24 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
     gorlek:
       Bash
       SentryJump=1, DoubleJump
-    kii, Combat=Tentacle, Damage=20:
-      DoubleJump, Dash OR Sword
-      DoubleJump, TripleJump, Flash=1 OR Sentry=1 OR Shuriken=1
-      DoubleJump, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
-      Dash, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
-      Damage=30, Dash, Sword
+    kii:
+      DoubleJump, Sword, Damage=10  # stay out of the spikes when killing the tentacle by reseting your djump
+      Combat=Tentacle, Damage=20:
+        DoubleJump, Dash
+        DoubleJump, TripleJump, Glide OR Flash=1 OR Sentry=1 OR Shuriken=1
+        DoubleJump, Hammer, Glide OR Flash=1 OR Sentry=1 OR Shuriken=1
+        Dash, Hammer, Glide OR Flash=1 OR Sentry=1 OR Shuriken=1
+        Damage=30, Dash, Sword
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump OR GlideJump  # glide jump goes for the suspended platform to refresh djump
+      # GrenadeJump=1, DoubleJump, Dash OR Sword
+      # Combat=Tentacle, Damage=40, GlideJump, DoubleJump
+    unsafe:
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR WallHammerJump
+      GrenadeJump, DoubleJump
+      DoubleJump, TripleJump, Damage=10
+      GlideJump, Damage=10
   conn WestGlades.LeftLowerPool:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide OR Bash
     gorlek: Sword OR Hammer
@@ -5486,24 +5504,29 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     unsafe:
       Damage=90  # one dboost on spikes
       WaterDash, Damage=40
-  pickup WestGlades.RightOre:  # Be carefull it's not redundant with paths from WestGlades.Center
+  pickup WestGlades.RightOre:
     moki:
+      Launch
+      Bash, DoubleJump OR Dash OR Glide
       Glide, DoubleJump OR Dash
       DoubleJump, Dash
     gorlek:
       DoubleJump, TripleJump OR Sword OR Hammer
       Dash, Sword OR Hammer
-      Glide, Combat=Tentacle, SentryJump=1
+      Glide, Sword OR Hammer
     kii:
       Sword OR Dash OR Sentry=6
+      Bash, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
       DoubleJump, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
       Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Hammer, Combat=Tentacle, Shuriken=2 OR Flash=2 OR Sentry=2
+      Hammer, Combat=Tentacle, Flash=2 OR Sentry=2
     unsafe:
       Bash OR GlideJump
       Glide, Spear=1 OR Blaze=1  # too difficult for kii
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-
+      Hammer, Damage=3, Shuriken=1 OR Flash=1 OR Sentry=1  # Probably possible w/o damage but climbing the platform fast enough is really hard https://youtu.be/K6_LoGNbO7c
+      Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
+      
   conn WestGlades.Center: free
   conn LowerReach.Entry:
     moki: LowerReach.BearSneezed
