@@ -5,6 +5,7 @@
 !tags("All Wisps")
 
 !include("goal_mode_core", write_goal_progress_message, check_goals_completed, write_goals_incomplete_message)
+!include("wisp_count", count_wisps)
 
 !augment_fun(write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
@@ -29,18 +30,6 @@
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("wisps_message"))
     }
 })
-
-fun count_wisps() {
-    set_integer("wisp_count", 0)
-    if EastHollow.ForestsVoice increment_wisp_count()
-    if WestPools.ForestsStrength increment_wisp_count()
-    if LowerReach.ForestsMemory increment_wisp_count()
-    if UpperDepths.ForestsEyes increment_wisp_count()
-    if WindtornRuins.Seir increment_wisp_count()
-}
-fun increment_wisp_count() {
-    set_integer("wisp_count", get_integer("wisp_count") + 1)
-}
 
 fun write_wisps_message() {
     set_string("wisps_message", get_string("color") + "Wisps: " + get_integer("wisp_count") + "/17" + get_string("color"))
