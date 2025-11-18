@@ -5517,13 +5517,17 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     kii:
       Sword OR Dash OR Sentry=6
       Bash, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      DoubleJump, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Spear=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Shuriken=1, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # More energy efficient. No shuriken=2 paths because throwing shuriken at the wooden patform makes it swing away
       Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Hammer, Combat=Tentacle, Flash=2 OR Sentry=2
+      # Glitched
+      # GlideJump
     unsafe:
-      Bash OR GlideJump
-      Glide, Spear=1 OR Blaze=1  # too difficult for kii
-      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      PauseFloat
+      Glide  # https://youtu.be/AUJZoNtg_Y0
+      Bash, Damage=10
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel
       Hammer, Damage=3, Shuriken=1 OR Flash=1 OR Sentry=1  # Probably possible w/o damage but climbing the platform fast enough is really hard https://youtu.be/K6_LoGNbO7c
       Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
       
@@ -5543,14 +5547,24 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     kii:
       Dash, DoubleJump, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       Dash, Hammer, Shuriken=1
+      # Glitched
+      # GlideJump, DoubleJump OR Dash OR Hammer
+      # AerialHammerJump OR GrenadeJump=1
     unsafe:
-      GrenadeJump
+      GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       Dash, DoubleJump
+      DoubleJump, Sword  # upslash to hit the mortar and reset your djump
+      Sword, Shuriken=1  # horizontal combo -> shuriken -> upslash -> pogo shuriken
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR  Flash=1 OR Sentry=1 OR PauseFloat
 
 anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room opening up to Wellspring. The loading here is not very smart so we place the coordinates a bit left of the autosave
   refill Checkpoint
   refill Health=1
 
+  pickup WestGlades.UpperPoolEX:  # for dirty water. Clean water path originte from WestGlades.Upper
+    unsafe:
+      Damage=90  # one dboost on spikes
+      WaterDash, Damage=40
   pickup OuterWellspring.SwimOre:
     moki, Water: Grapple OR WaterDash OR Launch
     gorlek, Water:
