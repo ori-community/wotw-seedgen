@@ -130,12 +130,7 @@ impl Compile for input::CommandBoolean {
                 MemoryUsed::ONE_BOOLEAN,
             ),
             Self::GetBoolean { id } => (vec![Command::CopyBoolean(id, 0)], MemoryUsed::ONE_BOOLEAN),
-            Self::IsInHitbox { x1, y1, x2, y2 } => Args::new(context)
-                .float(0, *x1)
-                .float(1, *y1)
-                .float(2, *x2)
-                .float(3, *y2)
-                .call(Command::IsInHitbox, MemoryUsed::ONE_BOOLEAN),
+            Self::IsInBox { id } => (vec![Command::IsInBox(id)], MemoryUsed::ONE_BOOLEAN),
         }
     }
 }
@@ -381,6 +376,23 @@ impl Compile for input::CommandVoid {
             Self::SetString { id, value } => Args::new(context)
                 .string(0, value)
                 .call(Command::CopyString(0, id), MemoryUsed::ZERO),
+            Self::BoxTrigger { id, x1, y1, x2, y2 } => Args::new(context)
+                .float(0, *x1)
+                .float(0, *y1)
+                .float(0, *x2)
+                .float(0, *y2)
+                .call(Command::BoxTrigger(id), MemoryUsed::ZERO),
+            Self::BoxTriggerDestroy { id } => {
+                (vec![Command::BoxTriggerDestroy(id)], MemoryUsed::ZERO)
+            }
+            Self::BoxTriggerEnterCallback { id, action } => (
+                vec![Command::BoxTriggerEnterCallback(id, action)],
+                MemoryUsed::ZERO,
+            ),
+            Self::BoxTriggerLeaveCallback { id, action } => (
+                vec![Command::BoxTriggerLeaveCallback(id, action)],
+                MemoryUsed::ZERO,
+            ),
             Self::Save { to_disk } => (
                 vec![Command::SetBoolean(to_disk), Command::Save],
                 MemoryUsed::ONE_BOOLEAN,

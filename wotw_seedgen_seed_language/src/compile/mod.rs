@@ -165,6 +165,7 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     pub integer_state_id: i32,
     pub float_state_id: i32,
     pub message_ids: IdProvider,
+    pub box_trigger_ids: IdProvider,
     pub wheel_ids: IdProvider,
     pub warp_icon_ids: IdProvider,
     // TODO could be a reference
@@ -198,6 +199,7 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             integer_state_id: 0,
             float_state_id: 0,
             message_ids: IdProvider::new(0),
+            box_trigger_ids: IdProvider::new(0),
             wheel_ids: IdProvider {
                 offset: 0,
                 ids: FxHashMap::from_iter([("root".to_string(), 0)]),

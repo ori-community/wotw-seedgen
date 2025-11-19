@@ -112,7 +112,7 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
                 .fetch(*uber_identifier)
                 .as_boolean(),
             CommandBoolean::GetBoolean { id } => simulation.variables().get_boolean(id),
-            CommandBoolean::IsInHitbox { .. } => false,
+            CommandBoolean::IsInBox { .. } => false,
         }
     }
 }
@@ -278,6 +278,10 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
             | CommandVoid::Lookup { .. }
+            | CommandVoid::BoxTrigger { .. }
+            | CommandVoid::BoxTriggerDestroy { .. }
+            | CommandVoid::BoxTriggerEnterCallback { .. }
+            | CommandVoid::BoxTriggerLeaveCallback { .. }
             | CommandVoid::Save { .. }
             | CommandVoid::SaveAt { .. }
             | CommandVoid::Warp { .. }

@@ -365,13 +365,10 @@ impl ResolvePlaceholders for CommandBoolean {
             Self::CompareString { operation } => operation.resolve(context),
             Self::CompareZone { operation } => operation.resolve(context),
             Self::LogicOperation { operation } => operation.resolve(context),
-            Self::IsInHitbox { x1, y1, x2, y2 } => {
-                x1.resolve(context);
-                y1.resolve(context);
-                x2.resolve(context);
-                y2.resolve(context);
-            }
-            Self::Constant { .. } | Self::FetchBoolean { .. } | Self::GetBoolean { .. } => {}
+            Self::Constant { .. }
+            | Self::FetchBoolean { .. }
+            | Self::GetBoolean { .. }
+            | Self::IsInBox { .. } => {}
         }
     }
 }
@@ -485,6 +482,12 @@ impl ResolvePlaceholders for CommandVoid {
             Self::SetInteger { value, .. } => value.resolve(context),
             Self::SetFloat { value, .. } => value.resolve(context),
             Self::SetString { value, .. } => value.resolve(context),
+            Self::BoxTrigger { x1, y1, x2, y2, .. } => {
+                x1.resolve(context);
+                y1.resolve(context);
+                x2.resolve(context);
+                y2.resolve(context);
+            }
             Self::SaveAt { x, y, .. } => {
                 x.resolve(context);
                 y.resolve(context);
@@ -528,6 +531,9 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::FreeMessageVerticalAnchor { .. }
             | Self::FreeMessageBoxWidth { .. }
             | Self::FreeMessageCoordinateSystem { .. }
+            | Self::BoxTriggerDestroy { .. }
+            | Self::BoxTriggerEnterCallback { .. }
+            | Self::BoxTriggerLeaveCallback { .. }
             | Self::Save { .. }
             | Self::Equip { .. }
             | Self::Unequip { .. }

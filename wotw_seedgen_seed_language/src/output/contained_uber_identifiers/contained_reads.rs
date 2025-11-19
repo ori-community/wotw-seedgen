@@ -66,7 +66,7 @@ impl ContainedReads for CommandBoolean {
             CommandBoolean::FetchBoolean { uber_identifier } => some(*uber_identifier),
             CommandBoolean::Constant { .. }
             | CommandBoolean::GetBoolean { .. }
-            | CommandBoolean::IsInHitbox { .. } => none(),
+            | CommandBoolean::IsInBox { .. } => none(),
         }
     }
 }

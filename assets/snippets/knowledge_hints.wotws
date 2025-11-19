@@ -9,62 +9,80 @@
 // TODO explain key hints?
 
 !if gate_hints {
-    on tick {
-        set_integer("show_message", 0)
-        if is_in_hitbox(127, -4306, 183, -4268) && EastHollow.DepthsOpen == false && skills.glide == false set_integer("show_message", 1)
-        if is_in_hitbox(-527, -4033, -461, -4018) && LowerReach.BearSneezed == false && skills.flap == false set_integer("show_message", 2)
-        if is_in_hitbox(-98, -4245, -60, -4205) && EastHollow.ForestsVoice == false set_integer("show_message", 3)
+    on reload {
+        box_trigger("depths_entrance", 127, -4306, 183, -4268)
+        box_trigger_enter_callback("depths_entrance", if EastHollow.DepthsOpen == false && skills.glide == false
+            item_message("#Motay's Note#\nThe moki will only open the entrance once you find " + skill_string(Glide))
+        )
 
-        if get_integer("show_message") > 0 && get_boolean("showing_message") == false {
-            if get_integer("show_message") == 1 item_message("#Motay's Note#\nThe moki will only open the entrance once you find " + skill_string(Glide))
-            if get_integer("show_message") == 2 item_message("#Motay's Note#\nThe bear will only wake if you use " + skill_string(Flap))
-            if get_integer("show_message") == 3 && (kwolokGroupDescriptor.hornBugBossState < 1 || 3 < kwolokGroupDescriptor.hornBugBossState) {
-                item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok") // TODO placement is still pretty bad, don't have this too close to the vine
-            }
-            set_boolean("showing_message", true)
-        }
-        if get_integer("show_message") == 0 && get_boolean("showing_message") == true {
-            set_boolean("showing_message", false)
-        }
+        box_trigger("baurs_sleep", -527, -4033, -461, -4018)
+        box_trigger_enter_callback("baurs_sleep", if LowerReach.BearSneezed == false && skills.flap == false
+            item_message("#Motay's Note#\nThe bear will only wake if you use " + skill_string(Flap))
+        )
+
+        // TODO placement is still pretty bad, don't have this too close to the vine
+        box_trigger("voice_door", -527, -4033, -461, -4018)
+        box_trigger_enter_callback("voice_door", if EastHollow.ForestsVoice == false
+            item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok")
+        )
+
     }
 }
 
 !if regen_logic_hint {
     !state(regen_message_shown, Boolean)
+
+    on reload box_trigger("wellspring_corner_in_reach", -486, -3773, -476, -3763)
+
     on tick if
-        (
-            current_zone() == Woods
-            || current_zone() == Reach
-            || current_zone() == Depths
-            || current_zone() == Pools
-            || current_zone() == Wastes
-            || current_zone() == Ruins
-            || current_zone() == Willow
-        )
-        && is_in_hitbox(-486, -3773, -476, -3763) == false
-        && skills.regenerate == false
-            store(regen_message_shown, true)
+    (
+        current_zone() == Woods
+        || current_zone() == Reach
+        || current_zone() == Depths
+        || current_zone() == Pools
+        || current_zone() == Wastes
+        || current_zone() == Ruins
+        || current_zone() == Willow
+    )
+    && is_in_box("wellspring_corner_in_reach") == false
+    && skills.regenerate == false {
+        store(regen_message_shown, true)
+    }
+
     on regen_message_shown item_message("#Motay's Note#\nIn Moki and Gorlek, entering zones after #The Wellspring# won't be required until you find " + skill_string(Regenerate))
 }
 
 !if tp_logic_hints {
+    on reload {
+        box_trigger("reach_tp", -284, -3971, -223, -3945)
+        box_trigger("depths_tp", 499, -4381, 561, -4335)
+        box_trigger("central_pools_tp", -1334, -4160, -1280, -4121)
+        box_trigger("pools_boss_tp", -1677, -4175, -1625, -4156)
+        box_trigger("central_wastes_tp", 1946, -3910, 2018, -3857)
+        box_trigger("outer_ruins_tp", 2013, -3690, 2067, -3658)
+        box_trigger("inner_ruins_tp", 2106, -4001, 2142, -3972)
+        box_trigger("willow_tp", 400, 3870, 447, -3847)
+        box_trigger("burrows_tp", -960, -4586, -931, -4564)
+    }
+
+    // TODO adjust teleporter names
     // TODO interface the settings to check the difficulty
-    on LowerReach.TeleporterActive if skills.flap && is_in_hitbox(-284, -3971, -223, -3945) == false
+    on LowerReach.TeleporterActive if skills.flap && is_in_box("reach_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Reach) + " won't be required until you find " + skill_string(Flap))
-    on UpperDepths.TeleporterActive if skills.glide && is_in_hitbox(499, -4381, 561, -4335) == false
+    on UpperDepths.TeleporterActive if skills.glide && is_in_box("depths_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Depths) + " won't be required until you find " + skill_string(Glide))
-    on EastPools.TeleporterActive if randoState.cleanWater && is_in_hitbox(-1334, -4160, -1280, -4121) == false
+    on EastPools.TeleporterActive if randoState.cleanWater && is_in_box("central_pools_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(CentralPools) + " won't be required until you find " + clean_water_string())
-    on WestPools.TeleporterActive if randoState.cleanWater && is_in_hitbox(-1677, -4175, -1625, -4156) == false
+    on WestPools.TeleporterActive if randoState.cleanWater && is_in_box("pools_boss_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(PoolsBoss) + " won't be required until you find " + clean_water_string())
-    on LowerWastes.CentralTeleporterActive if skills.burrow && is_in_hitbox(1946, -3910, 2018, -3857) == false
+    on LowerWastes.CentralTeleporterActive if skills.burrow && is_in_box("central_wastes_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(CentralWastes) + " won't be required until you find " + skill_string(Burrow))
-    on UpperWastes.TeleporterActive if skills.burrow && is_in_hitbox(2013, -3690, 2067, -3658) == false
+    on UpperWastes.TeleporterActive if skills.burrow && is_in_box("outer_ruins_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(OuterRuins) + " won't be required until you find " + skill_string(Burrow))
-    on WindtornRuins.TeleporterActive if skills.burrow && is_in_hitbox(2106, -4001, 2142, -3972) == false
+    on WindtornRuins.TeleporterActive if skills.burrow && is_in_box("inner_ruins_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(InnerRuins) + " won't be required until you find " + skill_string(Burrow))
-    on WillowsEnd.InnerTeleporterActive if skills.burrow && is_in_hitbox(400, 3870, 447, -3847) == false
+    on WillowsEnd.InnerTeleporterActive if skills.burrow && is_in_box("willow_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Willow) + " won't be required until you find " + skill_string(Burrow))
-    on MidnightBurrows.TeleporterActive if skills.bash && is_in_hitbox(-960, -4586, -931, -4564) == false
+    on MidnightBurrows.TeleporterActive if skills.bash && is_in_box("burrows_tp") == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Burrows) + " won't be required until you find " + skill_string(Bash))
 }

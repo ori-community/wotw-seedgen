@@ -74,13 +74,8 @@ pub enum CommandBoolean {
     /// Get the value stored under `id`
     GetBoolean { id: usize },
     // TODO some kind of lint if things like this appear in trigger conditions
-    /// Check if Ori is in the hitbox defined by (`x1`, `y1`) and (`x2`, `y2`)
-    IsInHitbox {
-        x1: Box<CommandFloat>,
-        y1: Box<CommandFloat>,
-        x2: Box<CommandFloat>,
-        y2: Box<CommandFloat>,
-    },
+    /// Check if Ori is in box `id`
+    IsInBox { id: usize },
 }
 
 impl CommandBoolean {
@@ -437,6 +432,28 @@ pub enum CommandVoid {
     SetString {
         id: usize,
         value: CommandString,
+    },
+    /// Create a new box defined by (`x1`, `y1`) and (`x2`, `y2`)
+    BoxTrigger {
+        id: usize,
+        x1: Box<CommandFloat>,
+        y1: Box<CommandFloat>,
+        x2: Box<CommandFloat>,
+        y2: Box<CommandFloat>,
+    },
+    /// DESTROY box `id`
+    BoxTriggerDestroy {
+        id: usize,
+    },
+    /// Register `action` to trigger when Ori enters box `id`
+    BoxTriggerEnterCallback {
+        id: usize,
+        action: usize,
+    },
+    /// Register `action` to trigger when Ori leaves box `id`
+    BoxTriggerLeaveCallback {
+        id: usize,
+        action: usize,
     },
     /// Save the game
     Save {

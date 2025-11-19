@@ -90,8 +90,8 @@ impl Display for CommandBoolean {
                 write!(f, "fetch({uber_identifier})")
             }
             CommandBoolean::GetBoolean { id } => write!(f, "get_boolean({id})"),
-            CommandBoolean::IsInHitbox { x1, y1, x2, y2 } => {
-                write!(f, "is_in_hitbox({x1}, {y1}, {x2}, {y2})")
+            CommandBoolean::IsInBox { id } => {
+                write!(f, "is_in_box({id})")
             }
         }
     }
@@ -264,6 +264,18 @@ impl Display for CommandVoid {
             CommandVoid::SetInteger { id, value } => write!(f, "set_integer({id}, {value})"),
             CommandVoid::SetFloat { id, value } => write!(f, "set_float({id}, {value})"),
             CommandVoid::SetString { id, value } => write!(f, "set_string({id}, {value})"),
+            CommandVoid::BoxTrigger { id, x1, y1, x2, y2 } => {
+                write!(f, "box_trigger({id}, {x1}, {y1}, {x2}, {y2})")
+            }
+            CommandVoid::BoxTriggerDestroy { id } => {
+                write!(f, "box_trigger_destroy({id})")
+            }
+            CommandVoid::BoxTriggerEnterCallback { id, action } => {
+                write!(f, "box_trigger_enter_callback({id}, {action})")
+            }
+            CommandVoid::BoxTriggerLeaveCallback { id, action } => {
+                write!(f, "box_trigger_leave_callback({id}, {action})")
+            }
             CommandVoid::Save { to_disk } => write!(f, "save{}()", save_suffix(*to_disk)),
             CommandVoid::SaveAt { to_disk, x, y } => {
                 write!(f, "save{}_at({x}, {y})", save_suffix(*to_disk))

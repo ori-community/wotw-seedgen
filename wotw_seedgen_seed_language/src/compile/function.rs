@@ -189,6 +189,10 @@ fn message_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.message_ids.id(id))
 }
 
+fn box_trigger_id(context: &mut ArgContext) -> Option<usize> {
+    string_literal(context).map(|id| context.compiler.global.box_trigger_ids.id(id))
+}
+
 fn wheel_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.wheel_ids.id(id))
 }
@@ -201,8 +205,8 @@ fn warp_icon_id(context: &mut ArgContext) -> Option<usize> {
 #[strum(serialize_all = "snake_case")]
 pub enum FunctionIdentifier {
     Fetch,
-    IsInHitbox,
     GetBoolean,
+    IsInBox,
     GetInteger,
     ToInteger,
     GetFloat,
@@ -281,6 +285,10 @@ pub enum FunctionIdentifier {
     SetInteger,
     SetFloat,
     SetString,
+    BoxTrigger,
+    BoxTriggerDestroy,
+    BoxTriggerEnterCallback,
+    BoxTriggerLeaveCallback,
     Save,
     SaveToMemory,
     SaveAt,
@@ -376,8 +384,8 @@ impl FunctionIdentifier {
         function_signatures! {
             self,
             Fetch(uber_identifier: UberIdentifier) -> ?,
-            IsInHitbox(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
             GetBoolean(id: String) -> Boolean,
+            IsInBox(id: String) -> Boolean,
             GetInteger(id: String) -> Integer,
             ToInteger(float: Float) -> Integer,
             GetFloat(id: String) -> Float,
@@ -456,6 +464,10 @@ impl FunctionIdentifier {
             SetInteger(id: String, value: Integer),
             SetFloat(id: String, value: Float),
             SetString(id: String, value: String),
+            BoxTrigger(id: String, x1: Float, y1: Float, x2: Float, y2: Float),
+            BoxTriggerDestroy(id: String),
+            BoxTriggerEnterCallback(id: String, action: Action),
+            BoxTriggerLeaveCallback(id: String, action: Action),
             Save(),
             SaveToMemory(),
             SaveAt(x: Float, y: Float),
@@ -614,14 +626,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     }
                 }
             }
-            FunctionIdentifier::IsInHitbox => Command::Boolean(CommandBoolean::IsInHitbox {
-                x1: boxed_arg(&mut context)?,
-                y1: boxed_arg(&mut context)?,
-                x2: boxed_arg(&mut context)?,
-                y2: boxed_arg(&mut context)?,
-            }),
             FunctionIdentifier::GetBoolean => Command::Boolean(CommandBoolean::GetBoolean {
                 id: boolean_id(&mut context)?,
+            }),
+            FunctionIdentifier::IsInBox => Command::Boolean(CommandBoolean::IsInBox {
+                id: box_trigger_id(&mut context)?,
             }),
             FunctionIdentifier::GetInteger => Command::Integer(CommandInteger::GetInteger {
                 id: integer_id(&mut context)?,
@@ -1117,6 +1126,31 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: string_id(&mut context)?,
                 value: arg(&mut context)?,
             }),
+
+            FunctionIdentifier::BoxTrigger => Command::Void(CommandVoid::BoxTrigger {
+                id: box_trigger_id(&mut context)?,
+                x1: boxed_arg(&mut context)?,
+                y1: boxed_arg(&mut context)?,
+                x2: boxed_arg(&mut context)?,
+                y2: boxed_arg(&mut context)?,
+            }),
+            FunctionIdentifier::BoxTriggerDestroy => {
+                Command::Void(CommandVoid::BoxTriggerDestroy {
+                    id: box_trigger_id(&mut context)?,
+                })
+            }
+            FunctionIdentifier::BoxTriggerEnterCallback => {
+                Command::Void(CommandVoid::BoxTriggerEnterCallback {
+                    id: box_trigger_id(&mut context)?,
+                    action: arg(&mut context)?,
+                })
+            }
+            FunctionIdentifier::BoxTriggerLeaveCallback => {
+                Command::Void(CommandVoid::BoxTriggerLeaveCallback {
+                    id: box_trigger_id(&mut context)?,
+                    action: arg(&mut context)?,
+                })
+            }
             FunctionIdentifier::Save => Command::Void(CommandVoid::Save { to_disk: true }),
             FunctionIdentifier::SaveToMemory => Command::Void(CommandVoid::Save { to_disk: false }),
             FunctionIdentifier::SaveAt => Command::Void(CommandVoid::SaveAt {

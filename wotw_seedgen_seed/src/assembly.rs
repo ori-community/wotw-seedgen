@@ -121,8 +121,6 @@ pub enum Command {
         /*toggle*/ UberIdentifier,
         /*timer*/ UberIdentifier,
     ),
-    /// Check if Ori is in the hitbox defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3) and store the result in Boolean Memory 0
-    IsInHitbox,
     /// Store the name of world number `index` in String Memory 0
     WorldName(/*index*/ usize),
     // TODO control whether messages play sound
@@ -167,6 +165,16 @@ pub enum Command {
     /// Sets the map message content to String Memory 0
     SetMapMessage,
     // TODO missing SetSideMapMessage
+    /// Create a new box defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3)
+    BoxTrigger(/*id*/ usize),
+    /// DESTROY, OBLITERATE and ANNIHILATE box `id`
+    BoxTriggerDestroy(/*id*/ usize),
+    /// Register `action` to trigger when Ori enters box `id`
+    BoxTriggerEnterCallback(/*id*/ usize, /*action*/ usize),
+    /// Register `action` to trigger when Ori leaves box `id`
+    BoxTriggerLeaveCallback(/*id*/ usize, /*action*/ usize),
+    /// Check if Ori is in the hitbox defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3) and store the result in Boolean Memory 0
+    IsInBox(/*id*/ usize),
     /// Save the game. Only save to disk if Boolean Memory 0 is `true`.
     Save,
     /// Save the game, but with the position set to (Float Memory 0, Float Memory 1). Only save to disk if Boolean Memory 0 is `true`.

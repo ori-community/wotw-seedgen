@@ -30,13 +30,14 @@ fun write_goals_incomplete_message() {
     }
 })
 
-// TODO on tick? Other places do use on tick
-// TODO is this needed after adding player position uberStates?
-on is_in_hitbox(520, -3617, 744, -3503) {
-    check_goals_completed()
-    if get_boolean("goals_completed") == false {
-        warp(-3540, -407) // TODO get exact location
-        write_goals_incomplete_message()
-        priority_message(get_string("goals_incomplete_message"))
-    }
+on reload {
+    box_trigger("shriek_room", 520, -3617, 744, -3503)
+    box_trigger_enter_callback("shriek_room", {
+        check_goals_completed()
+        if get_boolean("goals_completed") == false {
+            warp(-3540, -407)
+            write_goals_incomplete_message()
+            priority_message(get_string("goals_incomplete_message"))
+        }
+    })
 }
