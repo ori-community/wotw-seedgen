@@ -144,6 +144,7 @@ on reload {
         progress_summary_icon,
         trigger_keybind("ShowProgressWithHints"),
     )
+
     set_wheel_item_data(
         "root",
         TopRight,
@@ -155,6 +156,7 @@ on reload {
             priority_message(get_string("tree_progress"))
         },
     )
+
     set_wheel_item_data(
         "root",
         RightTop,
@@ -166,6 +168,7 @@ on reload {
             priority_message(get_string("wisp_progress"))
         },
     )
+
     set_wheel_item_data(
         "root",
         Right,
@@ -174,6 +177,7 @@ on reload {
         quest_progress_icon,
         show_quest_progress(),
     )
+
     set_wheel_item_data(
         "root",
         RightBottom,
@@ -216,219 +220,144 @@ on binding2 if disable_keybinds == false show_quest_progress()
 on binding3 if disable_keybinds == false show_teleporter_progress()
 
 fun write_tree_progress() {
-    // TODO could share the logic between found and remaining
     set_string("tree_progress", "#Trees found#: ")
-    set_boolean("comma", false)
-    if MarshSpawn.RegenTree {
-        set_string("tree_progress", get_string("tree_progress") + "Regenerate")
-        set_boolean("comma", true)
-    }
-    if HowlsDen.SwordTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Sword")
-        set_boolean("comma", true)
-    }
-    if HowlsDen.DoubleJumpTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Double Jump")
-        set_boolean("comma", true)
-    }
-    if MarshPastOpher.BowTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Bow")
-        set_boolean("comma", true)
-    }
-    if WestHollow.DashTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Dash")
-        set_boolean("comma", true)
-    }
-    if EastHollow.BashTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Bash")
-        set_boolean("comma", true)
-    }
-    if InnerWellspring.GrappleTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Grapple")
-        set_boolean("comma", true)
-    }
-    if MarshSpawn.DamageTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Marsh Ancestral Light")
-        set_boolean("comma", true)
-    }
-    if GladesTown.DamageTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Glades Ancestral Light")
-        set_boolean("comma", true)
-    }
-    if LowerWastes.BurrowTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Burrow")
-        set_boolean("comma", true)
-    }
-    if UpperReach.LightBurstTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Grenade")
-        set_boolean("comma", true)
-    }
-    if LowerDepths.FlashTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Flash")
-        set_boolean("comma", true)
-    }
-    if UpperPools.SwimDashTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Water Dash")
-        set_boolean("comma", true)
-    }
-    if WeepingRidge.LaunchTree {
-        trees_add_comma()
-        set_string("tree_progress", get_string("tree_progress") + "Launch")
-        set_boolean("comma", true)
-    }
-    if get_boolean("comma") == false {
-        set_string("tree_progress", get_string("tree_progress") + "None")
-    }
+
+    set_boolean("found", true)
+    tree_string()
+
     set_string("tree_progress", get_string("tree_progress") + "\n#Trees remaining#: ")
+
+    set_boolean("found", false)
+    tree_string()
+}
+
+fun tree_string() {
     set_boolean("comma", false)
-    if MarshSpawn.RegenTree == false {
+
+    if MarshSpawn.RegenTree == get_boolean("found") {
         set_string("tree_progress", get_string("tree_progress") + "Regenerate")
         set_boolean("comma", true)
     }
-    if HowlsDen.SwordTree == false {
+    if HowlsDen.SwordTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Sword")
         set_boolean("comma", true)
     }
-    if HowlsDen.DoubleJumpTree == false {
+    if HowlsDen.DoubleJumpTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Double Jump")
         set_boolean("comma", true)
     }
-    if MarshPastOpher.BowTree == false {
+    if MarshPastOpher.BowTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Bow")
         set_boolean("comma", true)
     }
-    if WestHollow.DashTree == false {
+    if WestHollow.DashTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Dash")
         set_boolean("comma", true)
     }
-    if EastHollow.BashTree == false {
+    if EastHollow.BashTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Bash")
         set_boolean("comma", true)
     }
-    if InnerWellspring.GrappleTree == false {
+    if InnerWellspring.GrappleTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Grapple")
         set_boolean("comma", true)
     }
-    if MarshSpawn.DamageTree == false {
+    if MarshSpawn.DamageTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Marsh Ancestral Light")
         set_boolean("comma", true)
     }
-    if GladesTown.DamageTree == false {
+    if GladesTown.DamageTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Glades Ancestral Light")
         set_boolean("comma", true)
     }
-    if LowerWastes.BurrowTree == false {
+    if LowerWastes.BurrowTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Burrow")
         set_boolean("comma", true)
     }
-    if UpperReach.LightBurstTree == false {
+    if UpperReach.LightBurstTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Grenade")
         set_boolean("comma", true)
     }
-    if LowerDepths.FlashTree == false {
+    if LowerDepths.FlashTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Flash")
         set_boolean("comma", true)
     }
-    if UpperPools.SwimDashTree == false {
+    if UpperPools.SwimDashTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Water Dash")
         set_boolean("comma", true)
     }
-    if WeepingRidge.LaunchTree == false {
+    if WeepingRidge.LaunchTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Launch")
         set_boolean("comma", true)
     }
+
     if get_boolean("comma") == false {
         set_string("tree_progress", get_string("tree_progress") + "None")
     }
 }
+
 fun trees_add_comma() {
     if get_boolean("comma") set_string("tree_progress", get_string("tree_progress") + ", ")
 }
+
 fun write_wisp_progress() {
     set_string("wisp_progress", "#Wisps found#: ")
-    set_boolean("comma", false)
-    if EastHollow.ForestsVoice {
-        set_string("wisp_progress", get_string("wisp_progress") + "Voice")
-        set_boolean("comma", true)
-    }
-    if LowerReach.ForestsMemory {
-        wisps_add_comma()
-        set_string("wisp_progress", get_string("wisp_progress") + "Memory")
-        set_boolean("comma", true)
-    }
-    if UpperDepths.ForestsEyes {
-        wisps_add_comma()
-        set_string("wisp_progress", get_string("wisp_progress") + "Eyes")
-        set_boolean("comma", true)
-    }
-    if WestPools.ForestsStrength {
-        wisps_add_comma()
-        set_string("wisp_progress", get_string("wisp_progress") + "Strength")
-        set_boolean("comma", true)
-    }
-    if WindtornRuins.Seir {
-        wisps_add_comma()
-        set_string("wisp_progress", get_string("wisp_progress") + "Heart")
-        set_boolean("comma", true)
-    }
-    if get_boolean("comma") == false {
-        set_string("wisp_progress", get_string("wisp_progress") + "None")
-    }
+
+    set_boolean("found", true)
+    wisp_string()
+
     set_string("wisp_progress", get_string("wisp_progress") + "\n#Wisps remaining#: ")
+
+    set_boolean("found", false)
+    wisp_string()
+}
+
+fun wisp_string() {
     set_boolean("comma", false)
-    if EastHollow.ForestsVoice == false {
+
+    if EastHollow.ForestsVoice == get_boolean("found") {
         set_string("wisp_progress", get_string("wisp_progress") + "Voice")
         set_boolean("comma", true)
     }
-    if LowerReach.ForestsMemory == false {
+    if LowerReach.ForestsMemory == get_boolean("found") {
         wisps_add_comma()
         set_string("wisp_progress", get_string("wisp_progress") + "Memory")
         set_boolean("comma", true)
     }
-    if UpperDepths.ForestsEyes == false {
+    if UpperDepths.ForestsEyes == get_boolean("found") {
         wisps_add_comma()
         set_string("wisp_progress", get_string("wisp_progress") + "Eyes")
         set_boolean("comma", true)
     }
-    if WestPools.ForestsStrength == false {
+    if WestPools.ForestsStrength == get_boolean("found") {
         wisps_add_comma()
         set_string("wisp_progress", get_string("wisp_progress") + "Strength")
         set_boolean("comma", true)
     }
-    if WindtornRuins.Seir == false {
+    if WindtornRuins.Seir == get_boolean("found") {
         wisps_add_comma()
         set_string("wisp_progress", get_string("wisp_progress") + "Heart")
         set_boolean("comma", true)
     }
+
     if get_boolean("comma") == false {
         set_string("wisp_progress", get_string("wisp_progress") + "None")
     }
 }
+
 fun wisps_add_comma() {
     if get_boolean("comma") set_string("wisp_progress", get_string("wisp_progress") + ", ")
 }
@@ -529,7 +458,9 @@ fun show_quest_progress() {
 
 fun show_teleporter_progress() {
     set_string("teleporter_progress", "#Teleporters activated#: ")
+
     set_boolean("comma", false)
+
     if MarshSpawn.TeleporterActive {
         set_string("teleporter_progress", get_string("teleporter_progress") + "Inkwater Marsh")
         set_boolean("comma", true)
@@ -619,11 +550,14 @@ fun show_teleporter_progress() {
         set_string("teleporter_progress", get_string("teleporter_progress") + "Shriek")
         set_boolean("comma", true)
     }
+
     if get_boolean("comma") == false {
         set_string("teleporter_progress", get_string("teleporter_progress") + "None")
     }
+
     priority_message(get_string("teleporter_progress"))
 }
+
 fun teleporters_add_comma() {
     if get_boolean("comma") set_string("teleporter_progress", get_string("teleporter_progress") + ", ")
 }
