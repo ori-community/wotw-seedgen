@@ -5716,19 +5716,24 @@ anchor WestGlades.ShrineArea at -664, -4026:
     kii:
       Bash  # Use the enemies from the shrine
       DoubleJump, TripleJump
-      Grapple, DoubleJump, Hammer OR Sword OR Sentry=2
+      Grapple, DoubleJump, Hammer OR Sword
+      # Glitched
+      # AerialHammerJump  # upslash first
+      # GrenadeJump=1, DoubleJump
+      # DoubleJump, GlideJump  # Climb the right wall and then glide across
+      # GlideJump, Dash, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Grapple, DoubleJump, Shuriken=2
+      Grapple, DoubleJump, Shuriken=2 OR Sentry=2
       Grapple, Hammer, Dash  # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
-      Grapple, Glide, PauseFloat
-      GlideJump, PauseFloat  # Climb the right wall and then glide across.
       GrenadeJump, DoubleJump
       GrenadeJump, PauseFloat, Dash OR Glide  # Grenade Jump from the shrine to maximize height, float left.
       AerialHammerJump OR GlideHammerJump
       DoubleJump, GlideJump  # Climb the right wall and then glide across.
+      GlideJump, Dash, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
       SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
       Hammer, DoubleJump, SentrySwap=1 OR BlazeSwap=1
       Hammer, DoubleJump, Glide  # Climb the right wall and then glide across.
+      DoubleJump, Sword  # use the ennemies from the shrine to refresh your djump
 
   conn GladesShrine: free
   conn WestGlades.MillApproach: free
