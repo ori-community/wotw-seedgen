@@ -52,12 +52,13 @@
 9|23=2|4|17|6|2000|0|8|9|100|bool|false
 9|23=2|4|17|6|2000|0|4|24|-1334|-4160|-1280|-4121|8|9|100|bool|true
 9|23=2|4|17|6|2000|0|4|17|9|100|0|6|f=300|#Motay's Note#\nUsing the $[5|2] won't be required until you find $[9|0].
-// Water for West Luma TP
+// Water and Water Dash for West Luma TP
 945|1370|8|9|24|int|1
 9|150|4|17|9|24|1|8|9|24|int|2
 9|24=2|4|17|6|2000|0|8|9|100|bool|false
 9|24=2|4|17|6|2000|0|4|24|-1677|-4175|-1625|-4156|8|9|100|bool|true
-9|24=2|4|17|6|2000|0|4|17|9|100|0|6|f=300|#Motay's Note#\nUsing the $[5|13] won't be required until you find $[9|0].
+9|24=2|4|17|6|2000|0|4|17|9|100|0|6|f=300|#Motay's Note#\nUsing the $[5|13] won't be required until you find $[9|0] and $[2|104].
+9|24=2|4|17|24|104|0|4|17|9|100|0|6|f=300|#Motay's Note#\nUsing the $[5|13] won't be required until you find $[9|0] and $[2|104].
 // Burrow for East Wastes TP
 20120|49994|8|9|25|int|1
 9|150|4|17|9|25|1|8|9|25|int|2
