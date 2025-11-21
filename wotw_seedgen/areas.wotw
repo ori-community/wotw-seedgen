@@ -5565,17 +5565,26 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     unsafe:
       Damage=90  # one dboost on spikes
       WaterDash, Damage=40
+  pickup OuterWellspring.SwimEX:  # for dirty water. Make sure it's not redundant with going to OuterWellspring.EntranceDoor first.
+    unsafe:
+      Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2 OR BlazeSwap=1 OR SentrySwap=1 OR Damage=20:
+        Damage=90  # take a dboost on the fish to avoid one water tick
+        WaterDash, Damage=40
+      GrenadeJump, Spear=2 OR Shuriken=1 OR Flash=1 OR Blaze=2 OR Sentry=1:
+        Damage=90
+        WaterDash, Damage=40
   pickup OuterWellspring.SwimOre:
     moki, Water: Grapple OR WaterDash OR Launch
     gorlek, Water:
       Bash, Grenade=1  # stand on the spinny wheel and bash-grenade up
       SentryJump=1  # ooooor use a SentryJump
-      DoubleJump, TripleJump  # ooooor just some regular jumps!
-      DoubleJump, Sword OR Hammer  # oooooooooooor double jump then upslash
-    kii, Water: DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump OR Sword OR Hammer
+    kii, Water:
+      DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
     unsafe:
-      Water, DoubleJump  # or just be a madman
-      Water, GlideJump
+      Water, DoubleJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       Water, Bash  # https://youtu.be/nk874rtFxUo
 
   conn WestGlades.ShrineArea:
@@ -5592,13 +5601,17 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     kii:
       Grapple, Hammer OR Shuriken=1 OR Sentry=2
       Bash, Grenade=1  # Bash the mortar so you can reach your grenade from higher
+      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump  # either upslash then hjump twice or wall jump on the left wall first
     unsafe:
       Grapple, BlazeSwap=1 OR SentrySwap=1
       Bash
       DoubleJump, TripleJump, Sword OR Hammer
       SentryJump=1
       GrenadeJump, DoubleJump
-      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
+      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap OR AerialHammerJump OR GlideHammerJump
   conn WestGlades.Upper:
     moki:  # realizing the semisolid not considered for moki
       Bash, DoubleJump OR Dash OR Glide OR Grenade=1
@@ -5612,8 +5625,11 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     kii:
       Bash OR Hammer OR Sentry=2
       Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Spear=2
+      # Glitched
+      # GrenadeJump=1, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      GrenadeJump, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1  # GrenadeJump
+      GrenadeJump  # Barely possible. Gjump from the very end of coyote frames, cancel at the apex and get a walljump riiiiight before getting a water tick damage
+      Damage=10  # take a dboost on the mortar projectile to avoid a water tick
   conn OuterWellspring.EntranceDoor:
     moki:
       Launch OR Water
@@ -5634,11 +5650,16 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       Bash, Grenade=1, Hammer OR Sentry=2
       Hammer, Glide OR Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
       Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Hammer OR Damage=20
+      # Blaze=4 OR Sentry=2:
+      #   GrenadeJump, Shuriken=1 OR Blaze=2 OR Sentry=2
     unsafe:
-      Bash, Grenade=1, Grapple  # requires holding up
-      Sentry=5  # may be kii
-      Glide
-      GrenadeJump, Hammer
+      Sentry=5
+      Shuriken=2, Damage=20  # two shuriken to get to the island then dboost 
+      Glide OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR CoyoteHammerJump OR PauseFloat
+      GrenadeJump, Hammer OR Spear=3 OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Blaze=3
   conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
     kii:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -5649,23 +5670,36 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       Grapple, WaterDash OR Launch
       Launch, DoubleJump, Dash
       Launch, Glide
-    gorlek, Water:  # hopefully didn't go too far for gorlek?
-      Grapple, DoubleJump OR Dash OR Bash OR Damage=15  # non-damage variants pretty risky
+    gorlek, Water:
+      Grapple, Bash
+      Grapple, Damage=15, DoubleJump OR Dash  # non-damage variants pretty risky
+      Damage=15, DoubleJump OR Glide
+      DoubleJump, Glide
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      DoubleJump, Dash, Sword OR Hammer
       WaterDash OR Bash:
         DoubleJump, TripleJump
         Dash OR Glide OR Sword OR Damage=15
       Launch, DoubleJump OR Dash OR Bash OR WaterDash OR Sword OR Hammer OR Damage=15
     kii, Water:
+      Damage=30
+      Grapple, DoubleJump OR Dash OR Damage=15
       WaterDash, Bash
       WaterDash, DoubleJump OR Hammer OR Sentry=2
       Bash, DoubleJump OR Hammer OR Sentry=2
+      DoubleJump, Sword
+      DoubleJump, TripleJump, Shuriken=1 OR Blaze=2 OR Sentry=2
+      DoubleJump, Dash, Shuriken=1 OR Blaze=2 OR Sentry=2
       Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # LaunchSwap
     unsafe:
-      Water, Launch
-      Water, Bash, Hammer OR DoubleJump
-      Water, Grapple, Sword
-      Water, WaterDash, DoubleJump
-      Water, Sword, DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Pogo the tentacle's projectile
+      Water:
+        Launch OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR GlideJump
+        Bash, Hammer OR DoubleJump
+        Grapple, Sword OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1
+        WaterDash, DoubleJump
+        Sword, Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Pogo the tentacle's projectile
 
 anchor WestGlades.ShrineArea at -664, -4026:
   refill Checkpoint
