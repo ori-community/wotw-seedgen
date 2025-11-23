@@ -340,7 +340,7 @@ pub struct FunctionArg {
 macro_rules! function_signatures {
     (@acc $self:ident [$identifier:ident($($name:ident: $ty:tt),*) -> $return_ty:tt, $($more:tt)*] -> [$($acc:tt)*]) => {
         function_signatures!(@acc $self [$($more)*] -> [$($acc)*
-            $identifier => FunctionSignature {
+            FunctionIdentifier::$identifier => FunctionSignature {
                 args: ArrayVec::from_iter([
                     $(FunctionArg {
                         name: stringify!($name),
@@ -354,7 +354,7 @@ macro_rules! function_signatures {
 
     (@acc $self:ident [$identifier:ident($($name:ident: $ty:tt),*), $($more:tt)*] -> [$($acc:tt)*]) => {
         function_signatures!(@acc $self [$($more)*] -> [$($acc)*
-            $identifier => FunctionSignature {
+            FunctionIdentifier::$identifier => FunctionSignature {
                 args: ArrayVec::from_iter([
                     $(FunctionArg {
                         name: stringify!($name),
@@ -368,8 +368,6 @@ macro_rules! function_signatures {
 
     (@acc $self:ident [] -> [$($acc:tt)*]) => {
         {
-            use FunctionIdentifier::*;
-
             match $self {
                 $($acc)*
             }
