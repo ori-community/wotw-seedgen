@@ -320,6 +320,8 @@ pub enum FunctionIdentifier {
     SwitchWheel,
     SetWheelPinned,
     ResetAllWheels,
+    CloseMenu,
+    CloseWeaponWheel,
     DebugLog,
 }
 
@@ -499,6 +501,8 @@ impl FunctionIdentifier {
             SwitchWheel(wheel: String),
             SetWheelPinned(wheel: String, pinned: Boolean),
             ResetAllWheels(),
+            CloseMenu(),
+            CloseWeaponWheel(),
             DebugLog(message: String),
         }
     }
@@ -1336,6 +1340,8 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 pinned: arg(&mut context)?,
             }),
             FunctionIdentifier::ResetAllWheels => Command::Void(CommandVoid::ResetAllWheels {}),
+            FunctionIdentifier::CloseMenu => Command::Void(CommandVoid::CloseMenu {}),
+            FunctionIdentifier::CloseWeaponWheel => Command::Void(CommandVoid::CloseWeaponWheel {}),
             FunctionIdentifier::DebugLog => Command::Void(CommandVoid::DebugLog {
                 message: arg(&mut context)?,
             }),

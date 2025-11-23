@@ -604,6 +604,10 @@ pub enum CommandVoid {
     },
     /// Reset all wheel items to their default state
     ResetAllWheels {},
+    /// Closes any open menu screen
+    CloseMenu {},
+    /// Closes the weapon wheel
+    CloseWeaponWheel {},
     /// Write `message` into the client log
     DebugLog {
         message: CommandString,

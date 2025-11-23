@@ -553,6 +553,8 @@ impl Compile for input::CommandVoid {
                 .boolean(0, pinned)
                 .call(Command::SetWheelPinned(wheel), MemoryUsed::ZERO),
             Self::ResetAllWheels {} => (vec![Command::ResetAllWheels], MemoryUsed::ZERO),
+            Self::CloseMenu {} => (vec![Command::CloseMenu], MemoryUsed::ZERO),
+            Self::CloseWeaponWheel {} => (vec![Command::CloseWeaponWheel], MemoryUsed::ZERO),
             Self::DebugLog { message } => Args::new(context)
                 .string(0, message)
                 .call(Command::DebugLog, MemoryUsed::ZERO),

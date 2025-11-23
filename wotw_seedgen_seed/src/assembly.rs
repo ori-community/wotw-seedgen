@@ -240,6 +240,10 @@ pub enum Command {
     SetWheelPinned(/*wheel*/ usize),
     /// Reset all wheel items to their default state
     ResetAllWheels,
+    /// Closes any visible menu screen
+    CloseMenu,
+    /// Closes the weapon wheel
+    CloseWeaponWheel,
     /// Write String Memory 0 into the client log
     DebugLog,
     // TODO missing SetDebuggerTrace

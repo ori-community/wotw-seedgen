@@ -272,6 +272,8 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SwitchWheel
             | FunctionIdentifier::SetWheelPinned
             | FunctionIdentifier::ResetAllWheels
+            | FunctionIdentifier::CloseMenu
+            | FunctionIdentifier::CloseWeaponWheel
             | FunctionIdentifier::DebugLog => Type::Void,
         };
         Some(ty)
