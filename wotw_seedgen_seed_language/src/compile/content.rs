@@ -80,11 +80,26 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                 match uber_state.value {
                     None => Some(Trigger::Binding(uber_state.uber_identifier)),
                     Some(_) => {
-                        compiler.errors.push(Error::custom(
+                        let mut error = Error::custom(
                             "cannot bind to an alias which resolves to an integer state comparison"
                                 .to_string(),
                             span,
-                        ));
+                        );
+
+                        if let Some(entry) = compiler
+                            .global
+                            .uber_state_data
+                            .id_lookup
+                            .get(&uber_state.uber_identifier)
+                        {
+                            error = error.with_help(format!(
+                                "maybe you could use the underlying quest state {}",
+                                entry.preferred_name()
+                            ))
+                        }
+
+                        compiler.errors.push(error);
+
                         None
                     }
                 }
