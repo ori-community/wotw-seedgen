@@ -385,7 +385,7 @@ impl FunctionIdentifier {
             self,
             Fetch(uber_identifier: UberIdentifier) -> ?,
             GetBoolean(id: String) -> Boolean,
-            IsInBox(id: String) -> Boolean,
+            IsInBox(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
             GetInteger(id: String) -> Integer,
             ToInteger(float: Float) -> Integer,
             GetFloat(id: String) -> Float,
@@ -630,7 +630,10 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: boolean_id(&mut context)?,
             }),
             FunctionIdentifier::IsInBox => Command::Boolean(CommandBoolean::IsInBox {
-                id: box_trigger_id(&mut context)?,
+                x1: boxed_arg(&mut context)?,
+                y1: boxed_arg(&mut context)?,
+                x2: boxed_arg(&mut context)?,
+                y2: boxed_arg(&mut context)?,
             }),
             FunctionIdentifier::GetInteger => Command::Integer(CommandInteger::GetInteger {
                 id: integer_id(&mut context)?,

@@ -75,7 +75,12 @@ pub enum CommandBoolean {
     GetBoolean { id: usize },
     // TODO some kind of lint if things like this appear in trigger conditions
     /// Check if Ori is in box `id`
-    IsInBox { id: usize },
+    IsInBox {
+        x1: Box<CommandFloat>,
+        y1: Box<CommandFloat>,
+        x2: Box<CommandFloat>,
+        y2: Box<CommandFloat>,
+    },
 }
 
 impl CommandBoolean {

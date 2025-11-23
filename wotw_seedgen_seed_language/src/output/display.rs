@@ -90,8 +90,8 @@ impl Display for CommandBoolean {
                 write!(f, "fetch({uber_identifier})")
             }
             CommandBoolean::GetBoolean { id } => write!(f, "get_boolean({id})"),
-            CommandBoolean::IsInBox { id } => {
-                write!(f, "is_in_box({id})")
+            CommandBoolean::IsInBox { x1, y1, x2, y2 } => {
+                write!(f, "is_in_box({x1}, {y1}, {x2}, {y2})")
             }
         }
     }

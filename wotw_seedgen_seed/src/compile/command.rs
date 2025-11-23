@@ -130,7 +130,12 @@ impl Compile for input::CommandBoolean {
                 MemoryUsed::ONE_BOOLEAN,
             ),
             Self::GetBoolean { id } => (vec![Command::CopyBoolean(id, 0)], MemoryUsed::ONE_BOOLEAN),
-            Self::IsInBox { id } => (vec![Command::IsInBox(id)], MemoryUsed::ONE_BOOLEAN),
+            Self::IsInBox { x1, y1, x2, y2 } => Args::new(context)
+                .float(0, *x1)
+                .float(1, *y1)
+                .float(2, *x2)
+                .float(3, *y2)
+                .call(Command::IsInBox, MemoryUsed::ONE_BOOLEAN),
         }
     }
 }
@@ -378,9 +383,9 @@ impl Compile for input::CommandVoid {
                 .call(Command::CopyString(0, id), MemoryUsed::ZERO),
             Self::BoxTrigger { id, x1, y1, x2, y2 } => Args::new(context)
                 .float(0, *x1)
-                .float(0, *y1)
-                .float(0, *x2)
-                .float(0, *y2)
+                .float(1, *y1)
+                .float(2, *x2)
+                .float(3, *y2)
                 .call(Command::BoxTrigger(id), MemoryUsed::ZERO),
             Self::BoxTriggerDestroy { id } => {
                 (vec![Command::BoxTriggerDestroy(id)], MemoryUsed::ZERO)

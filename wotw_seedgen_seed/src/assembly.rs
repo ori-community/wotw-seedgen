@@ -174,7 +174,7 @@ pub enum Command {
     /// Register `action` to trigger when Ori leaves box `id`
     BoxTriggerLeaveCallback(/*id*/ usize, /*action*/ usize),
     /// Check if Ori is in the hitbox defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3) and store the result in Boolean Memory 0
-    IsInBox(/*id*/ usize),
+    IsInBox,
     /// Save the game. Only save to disk if Boolean Memory 0 is `true`.
     Save,
     /// Save the game, but with the position set to (Float Memory 0, Float Memory 1). Only save to disk if Boolean Memory 0 is `true`.
