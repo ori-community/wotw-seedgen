@@ -52,74 +52,73 @@ fun write_progress_message() {
 !export(write_map_progress_message)
 fun write_map_progress_message() {
     set_string("progress_message", "")
-    // TODO this breaks the zone abstraction
-    if player.currentMapArea == 0 {
+    if current_map_zone() == Marsh {
         set_integer("collected", marsh_pickups_collected)
         set_integer("collected_on_spawn", marsh_pickups_collected_on_spawn)
         set_integer("total", total_marsh_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 1 {
+    if current_map_zone() == Hollow {
         set_integer("collected", hollow_pickups_collected)
         set_integer("collected_on_spawn", hollow_pickups_collected_on_spawn)
         set_integer("total", total_hollow_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 2 {
+    if current_map_zone() == Glades {
         set_integer("collected", glades_pickups_collected)
         set_integer("collected_on_spawn", glades_pickups_collected_on_spawn)
         set_integer("total", total_glades_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 3 {
+    if current_map_zone() == Wellspring {
         set_integer("collected", wellspring_pickups_collected)
         set_integer("collected_on_spawn", wellspring_pickups_collected_on_spawn)
         set_integer("total", total_wellspring_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 7 {
+    if current_map_zone() == Woods {
         set_integer("collected", woods_pickups_collected)
         set_integer("collected_on_spawn", woods_pickups_collected_on_spawn)
         set_integer("total", total_woods_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 6 {
+    if current_map_zone() == Reach {
         set_integer("collected", reach_pickups_collected)
         set_integer("collected_on_spawn", reach_pickups_collected_on_spawn)
         set_integer("total", total_reach_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 8 {
+    if current_map_zone() == Depths {
         set_integer("collected", depths_pickups_collected)
         set_integer("collected_on_spawn", depths_pickups_collected_on_spawn)
         set_integer("total", total_depths_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 4 {
+    if current_map_zone() == Pools {
         set_integer("collected", pools_pickups_collected)
         set_integer("collected_on_spawn", pools_pickups_collected_on_spawn)
         set_integer("total", total_pools_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 9 {
+    if current_map_zone() == Wastes {
         set_integer("collected", wastes_pickups_collected)
         set_integer("collected_on_spawn", wastes_pickups_collected_on_spawn)
         set_integer("total", total_wastes_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 10 {
+    if current_map_zone() == Ruins {
         set_integer("collected", ruins_pickups_collected)
         set_integer("collected_on_spawn", ruins_pickups_collected_on_spawn)
         set_integer("total", total_ruins_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 11 {
+    if current_map_zone() == Willow {
         set_integer("collected", willow_pickups_collected)
         set_integer("collected_on_spawn", willow_pickups_collected_on_spawn)
         set_integer("total", total_willow_pickups)
         pickups_progress()
     }
-    if player.currentMapArea == 5 {
+    if current_map_zone() == Burrows {
         set_integer("collected", burrows_pickups_collected)
         set_integer("collected_on_spawn", burrows_pickups_collected_on_spawn)
         set_integer("total", total_burrows_pickups)

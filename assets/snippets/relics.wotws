@@ -2,8 +2,6 @@
 #name("Relics")
 #description("You have to find Relics randomly scattered throughout Niwen before fighting Shriek")
 
-// TODO manage the states for the tracker: "goals.totalRelicCount", "goals.currentRelicCount", "goals.currentAreaHasUncollectedRelic"
-
 // TODO how define the constraints? Some kind of range type?
 !config(relic_chance, "Chance for each individual area of the game to have a relic", Float, 0.6)
 !config(relic_count, "If not zero, overrides relic chance. How many relics to place", Integer, 0)
@@ -43,6 +41,7 @@
     !if marsh_relic > relic_chance {
         !let(marsh_relic_exists, false)
     }
+
     !random_float(hollow_relic, 0, 1)
     !if hollow_relic <= relic_chance {
         !preplace({
@@ -54,6 +53,7 @@
     !if hollow_relic > relic_chance {
         !let(hollow_relic_exists, false)
     }
+
     !random_float(glades_relic, 0, 1)
     !if glades_relic <= relic_chance {
         !preplace({
@@ -65,6 +65,7 @@
     !if glades_relic > relic_chance {
         !let(glades_relic_exists, false)
     }
+
     !random_float(wellspring_relic, 0, 1)
     !if wellspring_relic <= relic_chance {
         !preplace({
@@ -76,6 +77,7 @@
     !if wellspring_relic > relic_chance {
         !let(wellspring_relic_exists, false)
     }
+
     !random_float(woods_relic, 0, 1)
     !if woods_relic <= relic_chance {
         !preplace({
@@ -87,6 +89,7 @@
     !if woods_relic > relic_chance {
         !let(woods_relic_exists, false)
     }
+
     !random_float(reach_relic, 0, 1)
     !if reach_relic <= relic_chance {
         !preplace({
@@ -98,6 +101,7 @@
     !if reach_relic > relic_chance {
         !let(reach_relic_exists, false)
     }
+
     !random_float(depths_relic, 0, 1)
     !if depths_relic <= relic_chance {
         !preplace({
@@ -109,6 +113,7 @@
     !if depths_relic > relic_chance {
         !let(depths_relic_exists, false)
     }
+
     !random_float(pools_relic, 0, 1)
     !if pools_relic <= relic_chance {
         !preplace({
@@ -120,6 +125,7 @@
     !if pools_relic > relic_chance {
         !let(pools_relic_exists, false)
     }
+
     !random_float(wastes_relic, 0, 1)
     !if wastes_relic <= relic_chance {
         !preplace({
@@ -131,6 +137,7 @@
     !if wastes_relic > relic_chance {
         !let(wastes_relic_exists, false)
     }
+
     !random_float(willow_relic, 0, 1)
     !if willow_relic <= relic_chance {
         !preplace({
@@ -142,6 +149,7 @@
     !if willow_relic > relic_chance {
         !let(willow_relic_exists, false)
     }
+
     !random_float(burrows_relic, 0, 1)
     !if burrows_relic <= relic_chance {
         !preplace({
@@ -156,8 +164,10 @@
 }
 !if relic_count > 0 {
     !random_pool(relics, String, ["marsh", "hollow", "glades", "wellspring", "woods", "reach", "depths", "pools", "wastes", "willow", "burrows"])
+
     !repeat relic_count {
         !random_from_pool(relic, relics)
+
         !if relic == "marsh" {
             !preplace({
                 item_message("@Marsh Relic@")
@@ -165,6 +175,7 @@
             }, Marsh)
             !let(marsh_relic_exists, true)
         }
+
         !if relic == "hollow" {
             !preplace({
                 item_message("@Hollow Relic@")
@@ -172,6 +183,7 @@
             }, Hollow)
             !let(hollow_relic_exists, true)
         }
+
         !if relic == "glades" {
             !preplace({
                 item_message("@Glades Relic@")
@@ -179,6 +191,7 @@
             }, Glades)
             !let(glades_relic_exists, true)
         }
+
         !if relic == "wellspring" {
             !preplace({
                 item_message("@Wellspring Relic@")
@@ -186,6 +199,7 @@
             }, Wellspring)
             !let(wellspring_relic_exists, true)
         }
+
         !if relic == "woods" {
             !preplace({
                 item_message("@Woods Relic@")
@@ -193,6 +207,7 @@
             }, Woods)
             !let(woods_relic_exists, true)
         }
+
         !if relic == "reach" {
             !preplace({
                 item_message("@Reach Relic@")
@@ -200,6 +215,7 @@
             }, Reach)
             !let(reach_relic_exists, true)
         }
+
         !if relic == "depths" {
             !preplace({
                 item_message("@Depths Relic@")
@@ -207,6 +223,7 @@
             }, Depths)
             !let(depths_relic_exists, true)
         }
+
         !if relic == "pools" {
             !preplace({
                 item_message("@Pools Relic@")
@@ -214,6 +231,7 @@
             }, Pools)
             !let(pools_relic_exists, true)
         }
+
         !if relic == "wastes" {
             !preplace({
                 item_message("@Wastes Relic@")
@@ -221,6 +239,7 @@
             }, Wastes)
             !let(wastes_relic_exists, true)
         }
+
         !if relic == "willow" {
             !preplace({
                 item_message("@Willow Relic@")
@@ -228,6 +247,7 @@
             }, Willow)
             !let(willow_relic_exists, true)
         }
+
         !if relic == "burrows" {
             !preplace({
                 item_message("@Burrows Relic@")
@@ -236,6 +256,7 @@
             !let(burrows_relic_exists, true)
         }
     }
+
     !repeat 11 - relic_count {
         !random_from_pool(relic, relics)
         !if relic == "marsh" { !let(marsh_relic_exists, false) }
@@ -265,10 +286,53 @@
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 
+on spawn store(goals.totalRelicCount, total_relic_count)
+
+on marsh_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on marsh_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on hollow_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on hollow_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on glades_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on glades_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on wellspring_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on wellspring_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on woods_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on woods_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on reach_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on reach_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on depths_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on depths_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on pools_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on pools_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on wastes_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on wastes_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on willow_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on willow_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on burrows_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
+on burrows_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+
+// TODO don't update inside reach corner in wellspring escape
+
+on reload update_current_area_has_uncollected_relic()
+on change player.currentArea update_current_area_has_uncollected_relic()
+fun update_current_area_has_uncollected_relic() {
+    if current_zone() == Marsh store(goals.currentAreaHasUncollectedRelic, marsh_relic_exists && marsh_relic_collected == false)
+    if current_zone() == Hollow store(goals.currentAreaHasUncollectedRelic, hollow_relic_exists && hollow_relic_collected == false)
+    if current_zone() == Glades store(goals.currentAreaHasUncollectedRelic, glades_relic_exists && glades_relic_collected == false)
+    if current_zone() == Wellspring store(goals.currentAreaHasUncollectedRelic, wellspring_relic_exists && wellspring_relic_collected == false)
+    if current_zone() == Woods store(goals.currentAreaHasUncollectedRelic, woods_relic_exists && woods_relic_collected == false)
+    if current_zone() == Reach store(goals.currentAreaHasUncollectedRelic, reach_relic_exists && reach_relic_collected == false)
+    if current_zone() == Depths store(goals.currentAreaHasUncollectedRelic, depths_relic_exists && depths_relic_collected == false)
+    if current_zone() == Pools store(goals.currentAreaHasUncollectedRelic, pools_relic_exists && pools_relic_collected == false)
+    if current_zone() == Wastes store(goals.currentAreaHasUncollectedRelic, wastes_relic_exists && wastes_relic_collected == false)
+    if current_zone() == Ruins store(goals.currentAreaHasUncollectedRelic, false)
+    if current_zone() == Willow store(goals.currentAreaHasUncollectedRelic, willow_relic_exists && willow_relic_collected == false)
+    if current_zone() == Burrows store(goals.currentAreaHasUncollectedRelic, burrows_relic_exists && burrows_relic_collected == false)
+}
+
 !augment_fun(write_progress_message, {
-    count_relics()
     set_string("outer_color", "")
-    if get_integer("relic_count") == total_relic_count set_string("outer_color", "$")
+    if goals.currentRelicCount == goals.totalRelicCount set_string("outer_color", "$")
     write_relics_message()
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
@@ -305,13 +369,11 @@
 })
 
 !augment_fun(check_goals_completed, {
-    count_relics()
-    if get_integer("relic_count") < total_relic_count set_boolean("goals_completed", false)
+    if goals.currentRelicCount < goals.totalRelicCount set_boolean("goals_completed", false)
 })
 
 !augment_fun(write_goals_incomplete_message, {
-    count_relics()
-    if get_integer("relic_count") < total_relic_count {
+    if goals.currentRelicCount < goals.totalRelicCount {
         set_string("outer_color", "@")
         write_relics_message()
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("relics_message"))
@@ -340,6 +402,7 @@
     fun write_marsh_relic() {}
     fun check_marsh_relic() {}
 }
+
 !if hollow_relic_exists {
     fun write_hollow_relic() {
         relics_add_comma()
@@ -363,6 +426,7 @@
     fun write_hollow_relic() {}
     fun check_hollow_relic() {}
 }
+
 !if glades_relic_exists {
     fun write_glades_relic() {
         relics_add_comma()
@@ -386,6 +450,7 @@
     fun write_glades_relic() {}
     fun check_glades_relic() {}
 }
+
 !if wellspring_relic_exists {
     fun write_wellspring_relic() {
         relics_add_comma()
@@ -409,6 +474,7 @@
     fun write_wellspring_relic() {}
     fun check_wellspring_relic() {}
 }
+
 !if woods_relic_exists {
     fun write_woods_relic() {
         relics_add_comma()
@@ -432,6 +498,7 @@
     fun write_woods_relic() {}
     fun check_woods_relic() {}
 }
+
 !if reach_relic_exists {
     fun write_reach_relic() {
         relics_add_comma()
@@ -455,6 +522,7 @@
     fun write_reach_relic() {}
     fun check_reach_relic() {}
 }
+
 !if depths_relic_exists {
     fun write_depths_relic() {
         relics_add_comma()
@@ -478,6 +546,7 @@
     fun write_depths_relic() {}
     fun check_depths_relic() {}
 }
+
 !if pools_relic_exists {
     fun write_pools_relic() {
         relics_add_comma()
@@ -501,6 +570,7 @@
     fun write_pools_relic() {}
     fun check_pools_relic() {}
 }
+
 !if wastes_relic_exists {
     fun write_wastes_relic() {
         relics_add_comma()
@@ -524,6 +594,7 @@
     fun write_wastes_relic() {}
     fun check_wastes_relic() {}
 }
+
 !if willow_relic_exists {
     fun write_willow_relic() {
         relics_add_comma()
@@ -547,6 +618,7 @@
     fun write_willow_relic() {}
     fun check_willow_relic() {}
 }
+
 !if burrows_relic_exists {
     fun write_burrows_relic() {
         relics_add_comma()
@@ -570,27 +642,8 @@
     fun check_burrows_relic() {}
 }
 
-fun count_relics() {
-    set_integer("relic_count", 0)
-    if marsh_relic_collected increment_relic_count()
-    if hollow_relic_collected increment_relic_count()
-    if glades_relic_collected increment_relic_count()
-    if wellspring_relic_collected increment_relic_count()
-    if woods_relic_collected increment_relic_count()
-    if reach_relic_collected increment_relic_count()
-    if depths_relic_collected increment_relic_count()
-    if pools_relic_collected increment_relic_count()
-    if wastes_relic_collected increment_relic_count()
-    if willow_relic_collected increment_relic_count()
-    if burrows_relic_collected increment_relic_count()
-}
-fun increment_relic_count() {
-    set_integer("relic_count", get_integer("relic_count") + 1)
-}
-
-// TODO some primary area names have changed
 fun write_relics_message() {
-    set_string("relics_message", get_string("outer_color") + "Relics (" + get_integer("relic_count") + "/" + total_relic_count + "): ")
+    set_string("relics_message", get_string("outer_color") + "Relics (" + goals.currentRelicCount + "/" + goals.totalRelicCount + "): ")
     set_boolean("comma", false)
     write_marsh_relic()
     write_hollow_relic()
