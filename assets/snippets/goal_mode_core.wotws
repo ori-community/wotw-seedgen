@@ -2,8 +2,6 @@
 #name("Goal Mode Core")
 #description("Manages access to Shriek")
 
-// TODO manage randoState.shriekBarrier state
-
 !include("progress_helper", write_progress_message)
 
 !export(write_goal_progress_message)
@@ -22,6 +20,12 @@ fun write_goals_incomplete_message() {
     set_string("goals_incomplete_message", "")
 }
 
+!export(update_goals_completed)
+fun update_goals_completed() {
+    check_goals_completed()
+    store(randoState.shriekBarrier, get_boolean("goals_completed"))
+}
+
 // TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
 !augment_fun(write_progress_message, {
     write_goal_progress_message()
@@ -35,7 +39,6 @@ on reload {
     box_trigger_enter_callback("shriek_room", {
         check_goals_completed()
         if get_boolean("goals_completed") == false {
-            warp(-3540, -407)
             write_goals_incomplete_message()
             priority_message(get_string("goals_incomplete_message"))
         }

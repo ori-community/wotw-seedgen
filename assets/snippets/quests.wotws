@@ -4,7 +4,7 @@
 
 !tags("All Side Quests")
 
-!include("goal_mode_core", write_goal_progress_message, check_goals_completed, write_goals_incomplete_message)
+!include("goal_mode_core", write_goal_progress_message, check_goals_completed, write_goals_incomplete_message, update_goals_completed)
 
 !augment_fun(write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
@@ -20,6 +20,19 @@
     count_quests()
     if get_integer("count_quests") < 12 set_boolean("goals_completed", false)
 })
+
+on change npcsStateGroup.marshKeystoneQuest update_goals_completed()
+on change npcsStateGroup.inkwaterWellQuest update_goals_completed()
+on change questUberStateGroup.lostCompassQuest update_goals_completed()
+on change questUberStateGroup.braveMokiQuest update_goals_completed()
+on change questUberStateGroup.familyReunionQuest update_goals_completed()
+on change hubUberStateGroup.gardenerProjectTree update_goals_completed()
+on change questUberStateGroup.desertCogQuest update_goals_completed()
+on change questUberStateGroup.tradeSequenceQuest update_goals_completed()
+on change questUberStateGroup.darkCaveQuest update_goals_completed()
+on change questUberStateGroup.kwoloksWisdomQuest update_goals_completed()
+on change questUberStateGroup.rebuildGladesQuest update_goals_completed()
+on change questUberStateGroup.regrowGladesQuest update_goals_completed()
 
 !augment_fun(write_goals_incomplete_message, {
     count_quests()

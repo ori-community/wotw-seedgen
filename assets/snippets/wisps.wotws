@@ -4,8 +4,8 @@
 
 !tags("All Wisps")
 
-!include("goal_mode_core", write_goal_progress_message, check_goals_completed, write_goals_incomplete_message)
-!include("wisp_count", count_wisps)
+!include("goal_mode_core", write_goal_progress_message, check_goals_completed, write_goals_incomplete_message, update_goals_completed)
+!include("wisp_count", count_wisps, on_change_wisp_count)
 
 !augment_fun(write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
@@ -21,6 +21,8 @@
     count_wisps()
     if get_integer("wisp_count") < 5 set_boolean("goals_completed", false)
 })
+
+!augment_fun(on_change_wisp_count, update_goals_completed())
 
 !augment_fun(write_goals_incomplete_message, {
     count_wisps()

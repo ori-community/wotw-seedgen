@@ -14,7 +14,7 @@
 }
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
-!include("goal_mode_core", check_goals_completed, write_goals_incomplete_message)
+!include("goal_mode_core", check_goals_completed, write_goals_incomplete_message, update_goals_completed)
 
 !state(marsh_relic_collected, Boolean)
 !state(hollow_relic_collected, Boolean)
@@ -371,6 +371,9 @@ fun update_current_area_has_uncollected_relic() {
 !augment_fun(check_goals_completed, {
     if itemTracker.currentRelicCount < itemTracker.totalRelicCount set_boolean("goals_completed", false)
 })
+
+on change itemTracker.currentRelicCount update_goals_completed()
+on change itemTracker.totalRelicCount update_goals_completed()
 
 !augment_fun(write_goals_incomplete_message, {
     if itemTracker.currentRelicCount < itemTracker.totalRelicCount {
