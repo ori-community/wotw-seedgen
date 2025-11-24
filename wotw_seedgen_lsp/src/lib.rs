@@ -138,11 +138,20 @@ impl Backend {
 
             errors
                 .into_iter()
-                .map(|error| Diagnostic {
-                    range: convert::range_to_lsp(error.span, &source.content),
-                    severity: Some(DiagnosticSeverity::ERROR),
-                    message: error.kind.to_string(),
-                    ..Default::default()
+                .map(|error| {
+                    let mut message = error.kind.to_string();
+
+                    if let Some(help) = error.help {
+                        message.push('\n');
+                        message.push_str(&help);
+                    }
+
+                    Diagnostic {
+                        range: convert::range_to_lsp(error.span, &source.content),
+                        severity: Some(DiagnosticSeverity::ERROR),
+                        message,
+                        ..Default::default()
+                    }
                 })
                 .collect()
         };
