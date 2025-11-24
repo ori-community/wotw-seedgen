@@ -32,17 +32,17 @@ fun enable() {
     store(enabled, true)
     set_wheel_item_disable()
     update_bonus_wheel()
-    store(randoUpgrades.jumpHeight, 1 + collected * 0.33)
-    store(randoUpgrades.wallJumpStrength, 1 + collected * 0.15)
-    store(randoUpgrades.doubleJumpStrength, 1 + collected * 0.15)
+    store(randoUpgrades.jumpHeightMultiplier, 1 + collected * 0.33)
+    store(randoUpgrades.wallJumpHeightMultiplier, 1 + collected * 0.15)
+    store(randoUpgrades.doubleJumpHeightMultiplier, 1 + collected * 0.15)
 }
 fun disable() {
     store(enabled, false)
     set_wheel_item_enable()
     update_bonus_wheel()
-    store(randoUpgrades.jumpHeight, 0)
-    store(randoUpgrades.wallJumpStrength, 0)
-    store(randoUpgrades.doubleJumpStrength, 0)
+    store(randoUpgrades.jumpHeightMultiplier, 0)
+    store(randoUpgrades.wallJumpHeightMultiplier, 0)
+    store(randoUpgrades.doubleJumpHeightMultiplier, 0)
 }
 
 on reload {

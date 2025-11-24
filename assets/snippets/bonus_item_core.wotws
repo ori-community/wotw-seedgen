@@ -194,7 +194,7 @@ fun bow_efficiency() {
 fun regenerate_efficiency() {
     store(regenerate_efficiencies, regenerate_efficiencies + 1)
     item_message("#Regenerate Efficiency x" + regenerate_efficiencies + "#")
-    store(randoUpgrades.regenerationCostMultiplier, randoUpgrades.regenerationCostMultiplier / 2)
+    store(randoUpgrades.regenerateCostMultiplier, randoUpgrades.regenerateCostMultiplier / 2)
 }
 !item_data(regenerate_efficiency(),
     "#Regenerate Efficiency#",
@@ -247,7 +247,7 @@ fun grenade_efficiency() {
 fun rapid_grenade() {
     store(rapid_grenades, rapid_grenades + 1)
     item_message("#Rapid Grenade x" + rapid_grenades + "#")
-    store(randoUpgrades.grenadeChargeTimeModifier, randoUpgrades.grenadeChargeTimeModifier - 0.5)
+    store(randoUpgrades.grenadeChargeDurationMultiplier, randoUpgrades.grenadeChargeDurationMultiplier - 0.5)
 }
 !item_data(
     rapid_grenade(),
@@ -265,7 +265,7 @@ fun rapid_grenade() {
 fun quickshot_upgrade() {
     store(quickshot_upgrades, quickshot_upgrades + 1)
     item_message("#Quickshot Upgrade x" + quickshot_upgrades + "#")
-    store(randoUpgrades.bowRapidFireMultiplier, randoUpgrades.bowRapidFireMultiplier - 0.4)
+    store(randoUpgrades.bowRapidFireIntervalDurationMultiplier, randoUpgrades.bowRapidFireIntervalDurationMultiplier - 0.4)
 }
 !item_data(
     quickshot_upgrade(),
@@ -321,7 +321,7 @@ fun melting_shuriken() {
 
 fun uncharged_bashnade() {
     item_message("#Uncharged Bashgrenades#")
-    store(randoUpgrades.bashableUnchargedGrenades, true)
+    store(randoUpgrades.unchargedGrenadesBashable, true)
 }
 !item_data(
     uncharged_bashnade(),
@@ -348,8 +348,8 @@ fun extra_grenade() {
 !export(extra_grenade)
 
 fun splinter_grenade() {
-    store(randoUpgrades.grenadeMultishot, randoUpgrades.grenadeMultishot + 1)
-    item_message("#Splinter Grenade x" + randoUpgrades.grenadeMultishot + "#")
+    store(randoUpgrades.grenadeMultishotCount, randoUpgrades.grenadeMultishotCount + 1)
+    item_message("#Splinter Grenade x" + randoUpgrades.grenadeMultishotCount + "#")
 }
 !item_data(
     splinter_grenade(),

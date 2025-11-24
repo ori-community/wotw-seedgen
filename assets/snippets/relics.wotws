@@ -286,53 +286,53 @@
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 
-on spawn store(goals.totalRelicCount, total_relic_count)
+on spawn store(itemTracker.totalRelicCount, total_relic_count)
 
-on marsh_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on marsh_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on hollow_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on hollow_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on glades_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on glades_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on wellspring_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on wellspring_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on woods_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on woods_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on reach_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on reach_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on depths_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on depths_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on pools_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on pools_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on wastes_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on wastes_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on willow_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on willow_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
-on burrows_relic_collected store(goals.currentRelicCount, goals.currentRelicCount + 1)
-on burrows_relic_collected == false store(goals.currentRelicCount, goals.currentRelicCount - 1)
+on marsh_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on marsh_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on hollow_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on hollow_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on glades_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on glades_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on wellspring_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on wellspring_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on woods_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on woods_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on reach_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on reach_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on depths_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on depths_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on pools_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on pools_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on wastes_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on wastes_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on willow_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on willow_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
+on burrows_relic_collected store(itemTracker.currentRelicCount, itemTracker.currentRelicCount + 1)
+on burrows_relic_collected == false store(itemTracker.currentRelicCount, itemTracker.currentRelicCount - 1)
 
 // TODO don't update inside reach corner in wellspring escape
 
 on reload update_current_area_has_uncollected_relic()
 on change player.currentArea update_current_area_has_uncollected_relic()
 fun update_current_area_has_uncollected_relic() {
-    if current_zone() == Marsh store(goals.currentAreaHasUncollectedRelic, marsh_relic_exists && marsh_relic_collected == false)
-    if current_zone() == Hollow store(goals.currentAreaHasUncollectedRelic, hollow_relic_exists && hollow_relic_collected == false)
-    if current_zone() == Glades store(goals.currentAreaHasUncollectedRelic, glades_relic_exists && glades_relic_collected == false)
-    if current_zone() == Wellspring store(goals.currentAreaHasUncollectedRelic, wellspring_relic_exists && wellspring_relic_collected == false)
-    if current_zone() == Woods store(goals.currentAreaHasUncollectedRelic, woods_relic_exists && woods_relic_collected == false)
-    if current_zone() == Reach store(goals.currentAreaHasUncollectedRelic, reach_relic_exists && reach_relic_collected == false)
-    if current_zone() == Depths store(goals.currentAreaHasUncollectedRelic, depths_relic_exists && depths_relic_collected == false)
-    if current_zone() == Pools store(goals.currentAreaHasUncollectedRelic, pools_relic_exists && pools_relic_collected == false)
-    if current_zone() == Wastes store(goals.currentAreaHasUncollectedRelic, wastes_relic_exists && wastes_relic_collected == false)
-    if current_zone() == Ruins store(goals.currentAreaHasUncollectedRelic, false)
-    if current_zone() == Willow store(goals.currentAreaHasUncollectedRelic, willow_relic_exists && willow_relic_collected == false)
-    if current_zone() == Burrows store(goals.currentAreaHasUncollectedRelic, burrows_relic_exists && burrows_relic_collected == false)
+    if current_zone() == Marsh store(itemTracker.currentAreaHasUncollectedRelic, marsh_relic_exists && marsh_relic_collected == false)
+    if current_zone() == Hollow store(itemTracker.currentAreaHasUncollectedRelic, hollow_relic_exists && hollow_relic_collected == false)
+    if current_zone() == Glades store(itemTracker.currentAreaHasUncollectedRelic, glades_relic_exists && glades_relic_collected == false)
+    if current_zone() == Wellspring store(itemTracker.currentAreaHasUncollectedRelic, wellspring_relic_exists && wellspring_relic_collected == false)
+    if current_zone() == Woods store(itemTracker.currentAreaHasUncollectedRelic, woods_relic_exists && woods_relic_collected == false)
+    if current_zone() == Reach store(itemTracker.currentAreaHasUncollectedRelic, reach_relic_exists && reach_relic_collected == false)
+    if current_zone() == Depths store(itemTracker.currentAreaHasUncollectedRelic, depths_relic_exists && depths_relic_collected == false)
+    if current_zone() == Pools store(itemTracker.currentAreaHasUncollectedRelic, pools_relic_exists && pools_relic_collected == false)
+    if current_zone() == Wastes store(itemTracker.currentAreaHasUncollectedRelic, wastes_relic_exists && wastes_relic_collected == false)
+    if current_zone() == Ruins store(itemTracker.currentAreaHasUncollectedRelic, false)
+    if current_zone() == Willow store(itemTracker.currentAreaHasUncollectedRelic, willow_relic_exists && willow_relic_collected == false)
+    if current_zone() == Burrows store(itemTracker.currentAreaHasUncollectedRelic, burrows_relic_exists && burrows_relic_collected == false)
 }
 
 !augment_fun(write_progress_message, {
     set_string("outer_color", "")
-    if goals.currentRelicCount == goals.totalRelicCount set_string("outer_color", "$")
+    if itemTracker.currentRelicCount == itemTracker.totalRelicCount set_string("outer_color", "$")
     write_relics_message()
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
@@ -369,11 +369,11 @@ fun update_current_area_has_uncollected_relic() {
 })
 
 !augment_fun(check_goals_completed, {
-    if goals.currentRelicCount < goals.totalRelicCount set_boolean("goals_completed", false)
+    if itemTracker.currentRelicCount < itemTracker.totalRelicCount set_boolean("goals_completed", false)
 })
 
 !augment_fun(write_goals_incomplete_message, {
-    if goals.currentRelicCount < goals.totalRelicCount {
+    if itemTracker.currentRelicCount < itemTracker.totalRelicCount {
         set_string("outer_color", "@")
         write_relics_message()
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("relics_message"))
@@ -643,7 +643,7 @@ fun update_current_area_has_uncollected_relic() {
 }
 
 fun write_relics_message() {
-    set_string("relics_message", get_string("outer_color") + "Relics (" + goals.currentRelicCount + "/" + goals.totalRelicCount + "): ")
+    set_string("relics_message", get_string("outer_color") + "Relics (" + itemTracker.currentRelicCount + "/" + itemTracker.totalRelicCount + "): ")
     set_boolean("comma", false)
     write_marsh_relic()
     write_hollow_relic()

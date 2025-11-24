@@ -6,8 +6,8 @@ use wotw_seedgen_assets::{LocData, StateData, UberStateData, UberStateDump};
 use crate::Error;
 
 const OVERRIDES: [(&str, f32); 14] = [
-    ("player.playerPositionX", 0.),
-    ("player.playerPositionY", 0.),
+    ("player.positionX", 0.),
+    ("player.positionY", 0.),
     ("player.currentArea", 13.),
     ("mapSegments.segment12701", 1.),
     ("input.mouseWorldPositionX", 0.),

@@ -13,8 +13,7 @@
 }
 
 !if fragment_overflow {
-    // TODO this probably doesn't do anything anymore?
-    on spawn store(randoUpgrades.overflowPickupUpgrade, true)
+    // TODO implement
 }
 
 !if shriek_escape_health_bar {

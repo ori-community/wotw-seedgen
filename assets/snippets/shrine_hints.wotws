@@ -8,7 +8,7 @@
 !item_on(woods_shrine_item, WoodsMain.CombatShrine)
 !item_on(depths_shrine_item, LowerDepths.CombatShrine)
 
-on shrines.inkwaterWave == 1 item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item) // TODO rename Inkwater -> Marsh
+on shrines.marshWave == 1 item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item)
 on shrines.howlsDenWave == 1 item_message("Complete the Howl's Den Combat Shrine to gain\n" + den_shrine_item)
 on shrines.gladesWave == 1 item_message("Complete the Glades Combat Shrine to gain\n" + glades_shrine_item)
 on shrines.woodsWave == 1 item_message("Complete the Woods Combat Shrine to gain\n" + woods_shrine_item)

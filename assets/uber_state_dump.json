@@ -46,7 +46,7 @@
           "value_type": "Boolean"
         },
         "77": {
-          "name": "regenerateTree",
+          "name": "regenerate",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -95,7 +95,7 @@
           "value_type": "Boolean"
         },
         "121": {
-          "name": "inkwaterAncestralLight",
+          "name": "marshAncestralLight",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -446,7 +446,7 @@
           "value_type": "Float"
         },
         "7": {
-          "name": "regenerationCostMultiplier",
+          "name": "regenerateCostMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
@@ -467,7 +467,7 @@
           "value_type": "Float"
         },
         "10": {
-          "name": "bowRapidFireMultiplier",
+          "name": "bowRapidFireIntervalDurationMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
@@ -481,18 +481,18 @@
           "value_type": "Float"
         },
         "30": {
-          "name": "healthRegeneration",
+          "name": "healthRegenerationPerMinute",
           "readonly": false,
-          "type": "SerializedByteUberState",
+          "type": "SerializedFloatUberState",
           "value": 0.0,
-          "value_type": "Byte"
+          "value_type": "Float"
         },
         "31": {
-          "name": "energyRegeneration",
+          "name": "energyRegenerationPerMinute",
           "readonly": false,
-          "type": "SerializedByteUberState",
+          "type": "SerializedFloatUberState",
           "value": 0.0,
-          "value_type": "Byte"
+          "value_type": "Float"
         },
         "35": {
           "name": "extraDoubleJumps",
@@ -537,7 +537,7 @@
           "value_type": "Boolean"
         },
         "42": {
-          "name": "bashableUnchargedGrenades",
+          "name": "unchargedGrenadesBashable",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -551,14 +551,14 @@
           "value_type": "Boolean"
         },
         "44": {
-          "name": "grenadeChargeTimeModifier",
+          "name": "grenadeChargeDurationMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "45": {
-          "name": "grenadeMultishot",
+          "name": "grenadeMultishotCount",
           "readonly": false,
           "type": "SerializedByteUberState",
           "value": 0.0,
@@ -591,76 +591,6 @@
           "type": "SerializedFloatUberState",
           "value": 35.0,
           "value_type": "Float"
-        },
-        "50": {
-          "name": "hammerSpeed",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "51": {
-          "name": "swordSpeed",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "52": {
-          "name": "blazeEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "53": {
-          "name": "spearEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "54": {
-          "name": "shurikenEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "55": {
-          "name": "sentryEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "56": {
-          "name": "bowEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "57": {
-          "name": "regenerateEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "58": {
-          "name": "flashEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "59": {
-          "name": "grenadeEfficiency",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
         },
         "70": {
           "name": "bowAsFireSource",
@@ -705,84 +635,84 @@
           "value_type": "Boolean"
         },
         "80": {
-          "name": "launchSpeed",
+          "name": "launchSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "81": {
-          "name": "dashDistance",
+          "name": "dashDistanceMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "82": {
-          "name": "bashSpeed",
+          "name": "bashSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "83": {
-          "name": "burrowSpeed",
+          "name": "burrowSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "84": {
-          "name": "burrowDashSpeed",
+          "name": "burrowDashSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "85": {
-          "name": "swimSpeed",
+          "name": "swimSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "86": {
-          "name": "waterDashSpeed",
+          "name": "waterDashSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "87": {
-          "name": "jumpHeight",
+          "name": "jumpHeightMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "88": {
-          "name": "wallJumpStrength",
+          "name": "wallJumpHeightMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "89": {
-          "name": "doubleJumpStrength",
+          "name": "doubleJumpHeightMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "90": {
-          "name": "grappleSpeed",
+          "name": "grappleSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
           "value_type": "Float"
         },
         "91": {
-          "name": "regenerateSpeed",
+          "name": "regenerateSpeedMultiplier",
           "readonly": false,
           "type": "SerializedFloatUberState",
           "value": 1.0,
@@ -822,13 +752,6 @@
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
-        },
-        "150": {
-          "name": "overflowPickupUpgrade",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
         }
       }
     },
@@ -892,14 +815,14 @@
           "value_type": "Float"
         },
         "40": {
-          "name": "playerPositionX",
+          "name": "positionX",
           "readonly": false,
           "type": "VirtualUberState",
           "value": 0.0,
           "value_type": "Float"
         },
         "41": {
-          "name": "playerPositionY",
+          "name": "positionY",
           "readonly": false,
           "type": "VirtualUberState",
           "value": 0.0,
@@ -967,7 +890,7 @@
           "value_type": "Boolean"
         },
         "401": {
-          "name": "rainLiftedInInkwater",
+          "name": "rainLiftedInMarsh",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -982,6 +905,13 @@
         },
         "500": {
           "name": "canOpenMokiFatherHut",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "501": {
+          "name": "allowOpeningEyestoneDoor",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -1007,10 +937,10 @@
           "value_type": "Boolean"
         },
         "6": {
-          "name": "allowOpeningEyestoneDoor",
+          "name": "useAllowOpeningEyestoneDoorState",
           "readonly": false,
           "type": "SerializedBooleanUberState",
-          "value": 1.0,
+          "value": 0.0,
           "value_type": "Boolean"
         },
         "8": {
@@ -1147,7 +1077,7 @@
           "value_type": "Boolean"
         },
         "34": {
-          "name": "useRainLiftedInInkwaterRandoState",
+          "name": "useRainLiftedInMarshRandoState",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -1211,6 +1141,55 @@
         },
         "421": {
           "name": "baurSneezeWithFlash",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "500": {
+          "name": "spiritWellPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "501": {
+          "name": "housesAPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "502": {
+          "name": "housesBPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "503": {
+          "name": "housesCPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "504": {
+          "name": "removeThornsPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "505": {
+          "name": "openCavePlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "506": {
+          "name": "beautifyPlayCutscene",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
@@ -3352,139 +3331,6 @@
         },
         "2": {
           "name": "rank",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10": {
-          "name": "kills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "11": {
-          "name": "swordKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "12": {
-          "name": "hammerKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "13": {
-          "name": "bowKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "14": {
-          "name": "spearKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "15": {
-          "name": "sentryKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "16": {
-          "name": "blazeKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "17": {
-          "name": "grenadeKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "19": {
-          "name": "shurikenKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "20": {
-          "name": "launchKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "21": {
-          "name": "flashKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "22": {
-          "name": "bashKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "23": {
-          "name": "drownedEnemies",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "40": {
-          "name": "minerKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "41": {
-          "name": "flierKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "42": {
-          "name": "tentaKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "43": {
-          "name": "slimeKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "44": {
-          "name": "fishKills",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "45": {
-          "name": "exploderKills",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
@@ -17541,6 +17387,139 @@
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
+        },
+        "10": {
+          "name": "kills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "11": {
+          "name": "swordKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "12": {
+          "name": "hammerKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "13": {
+          "name": "bowKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "14": {
+          "name": "spearKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "15": {
+          "name": "sentryKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "16": {
+          "name": "blazeKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "17": {
+          "name": "grenadeKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "19": {
+          "name": "shurikenKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "20": {
+          "name": "launchKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "21": {
+          "name": "flashKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "22": {
+          "name": "bashKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "23": {
+          "name": "drownedEnemies",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "40": {
+          "name": "minerKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "41": {
+          "name": "flierKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "42": {
+          "name": "tentacleKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "43": {
+          "name": "slimeKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "44": {
+          "name": "fishKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "45": {
+          "name": "exploderKills",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
         }
       }
     },
@@ -17591,74 +17570,6 @@
         }
       }
     },
-    "16": {
-      "name": "lupoMapCosts",
-      "states": {
-        "1": {
-          "name": "inkwater",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 200.0,
-          "value_type": "Integer"
-        },
-        "2": {
-          "name": "hollow",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 150.0,
-          "value_type": "Integer"
-        },
-        "4": {
-          "name": "wellspring",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 150.0,
-          "value_type": "Integer"
-        },
-        "5": {
-          "name": "burrows",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 50.0,
-          "value_type": "Integer"
-        },
-        "7": {
-          "name": "reach",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 150.0,
-          "value_type": "Integer"
-        },
-        "8": {
-          "name": "luma",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 150.0,
-          "value_type": "Integer"
-        },
-        "9": {
-          "name": "depths",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 150.0,
-          "value_type": "Integer"
-        },
-        "11": {
-          "name": "wastes",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 150.0,
-          "value_type": "Integer"
-        },
-        "14": {
-          "name": "willow",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 50.0,
-          "value_type": "Integer"
-        }
-      }
-    },
     "17": {
       "name": "gromShop",
       "states": {
@@ -17676,13 +17587,6 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "15070": {
-          "name": "beautifyPlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
         "16586": {
           "name": "openCaveBought",
           "readonly": false,
@@ -17696,13 +17600,6 @@
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
-        },
-        "16588": {
-          "name": "openCavePlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
         },
         "16825": {
           "name": "spiritWellBought",
@@ -17718,13 +17615,6 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "16827": {
-          "name": "spiritWellPlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
         "18751": {
           "name": "removeThornsBought",
           "readonly": false,
@@ -17738,13 +17628,6 @@
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
-        },
-        "18753": {
-          "name": "removeThornsPlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
         },
         "23607": {
           "name": "housesBBought",
@@ -17760,13 +17643,6 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "23609": {
-          "name": "housesBPlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
         "40448": {
           "name": "housesCBought",
           "readonly": false,
@@ -17781,13 +17657,6 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "40450": {
-          "name": "housesCPlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
         "51230": {
           "name": "housesABought",
           "readonly": false,
@@ -17801,13 +17670,6 @@
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
-        },
-        "51232": {
-          "name": "housesAPlayCutscene",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
         }
       }
     },
@@ -17822,7 +17684,7 @@
           "value_type": "Integer"
         },
         "1": {
-          "name": "inkwaterWave",
+          "name": "marshWave",
           "readonly": false,
           "type": "IntUberState",
           "value": 0.0,
@@ -25532,8 +25394,22 @@
       }
     },
     "23": {
-      "name": "goals",
+      "name": "itemTracker",
       "states": {
+        "1": {
+          "name": "launchFragmentsCount",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "2": {
+          "name": "launchFragmentsRequired",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
         "500": {
           "name": "totalRelicCount",
           "readonly": false,
@@ -25799,7 +25675,7 @@
           "value_type": "Boolean"
         },
         "121": {
-          "name": "inkwaterAncestralLight",
+          "name": "marshAncestralLight",
           "readonly": false,
           "type": "VirtualUberState",
           "value": 0.0,
@@ -26138,25 +26014,6 @@
           "type": "VirtualUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        }
-      }
-    },
-    "26": {
-      "name": "ui",
-      "states": {
-        "1": {
-          "name": "launchFragmentsCount",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "2": {
-          "name": "launchFragmentsRequired",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         }
       }
     },

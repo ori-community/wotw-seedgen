@@ -20,7 +20,7 @@ on spawn {
     store(randoState.spawnTwillenEverywhere, true)
     store(randoConfig.useRegenTreeDrainedRandoState, true)
     store(randoState.regenTreeDrained, true)
-    store(randoConfig.useRainLiftedInInkwaterRandoState, true)
+    store(randoConfig.useRainLiftedInMarshRandoState, true)
     store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     store(gromShop.spiritWellBought, true)
@@ -131,7 +131,7 @@ on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.
-on HowlsDen.SwordTree store(randoState.rainLiftedInInkwater, true) // TODO rename Inkwater -> Marsh
+on HowlsDen.SwordTree store(randoState.rainLiftedInMarsh, true)
 // This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
 // This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
 // Hollow, which is usually not possible in vanilla, and then walk into Glades, that cutscene would play otherwise.
