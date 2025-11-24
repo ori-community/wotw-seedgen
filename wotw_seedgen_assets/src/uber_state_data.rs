@@ -264,7 +264,9 @@ impl UberStateData {
                 value,
             });
 
-        self.id_lookup.get_mut(&uber_identifier).unwrap().rando_name = Some(name);
+        if value.is_none() {
+            self.id_lookup.get_mut(&uber_identifier).unwrap().rando_name = Some(name);
+        }
     }
 }
 
