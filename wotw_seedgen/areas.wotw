@@ -6545,7 +6545,9 @@ anchor OuterWellspring.TrialRoom at -684, -3947:  # checkpoint on the way to tri
       Launch
     gorlek: DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
     kii: Dash OR Glide OR Sword OR Sentry=3
-    unsafe: DoubleJump OR Shuriken=2 OR Sentry=2
+    unsafe:
+      DoubleJump OR Hammer OR Shuriken=2 OR Sentry=2
+      GrenadeJump, Damage=15
   conn OuterWellspring.TrialApproach: free
 
 anchor OuterWellspring.TrialStart at -665, -3937:
@@ -6572,7 +6574,12 @@ anchor OuterWellspring.TrialStart at -665, -3937:
       Dash OR Sword
       Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Damage=30 OR DoubleJump
+      # Glitched
+      # GrenadeJump=1, Damage=15
+    unsafe:
+      Damage=30 OR DoubleJump OR PauseFloat OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      Hammer, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      GrenadeJump
 
 region InnerWellspring:
   moki: Danger=25
