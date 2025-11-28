@@ -5864,14 +5864,18 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
       Water, Damage=15, WaterDash OR Hammer  # dboost on the wheel above OuterWellspring.BasementEC. You can land on the platform without any skills but there's a weird collision so adding another skill
       Damage=55, WaterDash
       Damage=95, Hammer
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Glide OR Sword OR Hammer OR Blaze=4 OR Sentry=2 OR Damage=15
     unsafe:
       # Glide, Spear=1
       # DoubleJump, Spear=1
-      Glide OR Sword OR Shuriken=5
+      Glide OR Sword OR Shuriken=5 OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
       Grapple, Shuriken=2
       Water, Damage=15  # dboost on the wheel above OuterWellspring.BasementEC
       Damage=95  # dboost on the wheel above OuterWellspring.BasementEC
       Damage=75, Hammer # dboost on the wheel above OuterWellspring.BasementEC
+      GrenadeJump, Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2 OR BlazeSwap=1 OR SentrySwap=1 OR Damage=15  # Use a grenade cancel after the wheel
   conn OuterWellspring.AboveEntranceDoor:
     moki: DoubleJump, Grapple  # save all the other ways for gorlek...
     gorlek:
@@ -5895,11 +5899,13 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
     unsafe:
       DoubleJump, TripleJump, Hammer  # Climb the left wall. Hammer to prevent softlock after breaking the wall towards the shard. You have to upslash before jumping
       Bash  # https://youtu.be/IhPJ6NdIu8I
+      BlazeSwap=4 OR FlashSwap OR SentrySwap=4
+      Damage=10, BlazeSwap=3 OR SentrySwap=3
+      Damage=20, BlazeSwap=2 OR SentrySwap=2
       # Bash, Grenade=1, Spear=1 OR Blaze=1  # Use the slime on the way to the basement to reach the slime on the wooden platform. Launch a grenade straight up, bash the slime to reach it.
       # SentryJump=1, Bash, Grenade=1  # Throw the greande, sentry jump to it, then bash off it, on right side (do a small lure on bottom slime to get to platform)
-      SentryJump=1, Damage=15, Dash OR Glide  # Slightly different methods needed for hammer vs sentry, hammer is similar to above, sword goes left side
-      SwordSJump=2
-      HammerSJump=2, Dash OR Glide OR Damage=15
+      SwordSJump=1  # full combo + downslash to reach the right platform. SJump from here.
+      HammerSJump=1, DoubleJump OR Dash OR Sword OR Shuriken=1 OR Sentry=1 OR GlideJump  # Same as above
       OuterWellspring.FallingWheel, GlideJump, Damage=10
       OuterWellspring.FallingWheel, Damage=15, Shuriken=5 OR Sentry=5
       OuterWellspring.FallingWheel, Dash, Sword  # sword hover then dash to pass the spikes
@@ -5941,7 +5947,13 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
       Hammer, DoubleJump OR Dash
       Dash, Glide, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Glide  # Bash glide from the slime on the wooden platform
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Glide
     unsafe:
+      GlideJump
+      Glide, CoyoteHammerJump OR WallHammerJump OR GrenadeJump
+      GrenadeJump, Dash OR Sword OR Hammer
       Dash, Glide OR Sword
       Bash  # https://youtu.be/oKrKsmUBt54
 
