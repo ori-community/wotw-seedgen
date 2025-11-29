@@ -5641,36 +5641,19 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     unsafe:
       GrenadeJump  # Barely possible. Gjump from the very end of coyote frames, cancel at the apex and get a walljump riiiiight before getting a water tick damage
       Damage=10  # take a dboost on the mortar projectile to avoid a water tick
-  conn OuterWellspring.EntranceDoor:
+  conn OuterWellspring.CutsceneIsland:
     moki:
-      Launch OR Water
-      DoubleJump, Grapple
-      DoubleJump, Dash OR Glide
-      Dash, Glide
+      Launch OR Water OR Glide
+      DoubleJump, Dash
     gorlek:
-      DoubleJump OR Dash
-      Damage=20, Glide OR Sword
-      Bash, Grenade=1, Glide OR Sword OR Damage=20
-      Bash, Grenade=2
-      SentryJump=2 OR SwordSJump=1  # Air stall with hammer or sword
-      HammerSJump=1, Glide OR Damage=20
-    kii:
-      Sword
-      Hammer OR Blaze=4 OR Sentry=2 OR Damage=20:
-        Damage=20
-      Bash, Grenade=1, Hammer OR Sentry=2
-      Hammer, Glide OR Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
-      # Glitched
-      # GlideJump
-      # GrenadeJump=1, Hammer OR Damage=20
-      # Blaze=4 OR Sentry=2:
-      #   GrenadeJump, Shuriken=1 OR Blaze=2 OR Sentry=2
+      DoubleJump OR Dash OR Sword OR Damage=20
+      Bash, Grenade=1
+      HammerSJump=1
+    kii: Hammer OR Blaze=4 OR Sentry=2
     unsafe:
-      Sentry=5
-      Shuriken=2, Damage=20  # two shuriken to get to the island then dboost 
-      Glide OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR CoyoteHammerJump OR PauseFloat
-      GrenadeJump, Hammer OR Spear=3 OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Blaze=3
+      Bash  # juggle a mortar projectile
+      Shuriken=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR PauseFloat
+      GrenadeJump, Hammer OR Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
     kii:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -5767,6 +5750,55 @@ region OuterWellspring:
   gorlek: free
   kii: free
   unsafe: free
+
+anchor OuterWellspring.CutsceneIsland at -756, -4071:  # The island on the right of the entrance, where the wellspring cutscene plays out
+  conn OuterWellspring.EntranceDoor:
+    moki:
+      Launch OR Water
+      DoubleJump, Grapple
+      DoubleJump, Dash OR Glide
+      Dash, Glide
+      Bash, Grenade=1, Dash OR Glide OR DoubleJump
+    gorlek:
+      DoubleJump OR Dash OR Damage=20
+      Glide, Sword OR Hammer
+      Bash, Grenade=1
+      SentryJump=1  # Air stall with hammer or sword
+    kii:
+      Sword
+      Hammer, Glide OR Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
+    unsafe:
+      Glide OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR CoyoteHammerJump OR PauseFloat
+      GrenadeJump, Hammer OR Spear=3 OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Blaze=3
+  conn WestGlades.MillApproach:
+    moki:
+      Water OR Launch
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide
+    gorlek:
+      Damage=20, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      DoubleJump, TripleJump OR Dash OR Glide OR Sword
+      DoubleJump, Hammer, Damage=20
+      SwordSJump=1
+      HammerSJump=1, DoubleJump OR Dash OR Glide OR Damage=20
+      Bash, Grenade=1, Sword OR Hammer OR Damage=20
+    kii:
+      Damage=20
+      DoubleJump, Hammer OR Sentry=2
+      Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # Coyote dash
+      Bash, Grenade=1
+      # Glitched
+      # GlideJump OR HammerSJump=1
+      # GrenadeJump=1, Glide OR Dash OR Sword OR Blaze=5 OR Sentry=3
+      # GrenadeJump=1, Hammer, Grapple OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      Glide, CoyoteHammerJump OR WallHammerJump OR GrenadeJump
+      GrenadeJump, Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
+      Dash, Glide
 
 anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where you enter the first room
   door:
@@ -5925,37 +5957,26 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
     unsafe:
       # Bash, DoubleJump, TripleJump  # Bash the mantis from the wooden platformn, then climb
       DoubleJump, Bash OR OuterWellspring.FallingWheel
-  conn WestGlades.MillApproach:
+  conn OuterWellspring.CutsceneIsland:
     moki:
-      DoubleJump, Dash, Glide
-      Bash, Grenade=1, DoubleJump, Dash OR Glide
-      Bash, Grenade=1, Dash, Glide
-      Bash, Grenade=2, DoubleJump OR Dash OR Glide
-      Water OR Launch
+      Water OR Launch OR Glide
+      DoubleJump, Dash
+      Bash, Grenade=1, DoubleJump OR Dash
     gorlek:
-      DoubleJump, TripleJump OR Dash OR Glide OR Sword
-      DoubleJump, Hammer, Damage=20
-      Glide, Damage=20
-      SwordSJump=2
-      HammerSJump=1, Glide
-      HammerSJump=2, DoubleJump OR Dash OR Glide OR Damage=20
-      Bash, Grenade=1, Glide
-      Bash, Grenade=2, Sword OR Damage=20
+      DoubleJump OR Dash OR Sword OR Damage=20
+      HammerSJump=1
+      Bash, Grenade=1
     kii:
-      Bash OR DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Damage=20:
-        Damage=20
-      Hammer, DoubleJump OR Dash
-      Dash, Glide, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Glide  # Bash glide from the slime on the wooden platform
+      Bash OR Hammer OR Sentry=2
       # Glitched
       # GlideJump
-      # GrenadeJump=1, Glide
+      # GrenadeJump=1, Shuriken=1 OR Blaze=2 OR Flash=1
     unsafe:
-      GlideJump
-      Glide, CoyoteHammerJump OR WallHammerJump OR GrenadeJump
-      GrenadeJump, Dash OR Sword OR Hammer
-      Dash, Glide OR Sword
-      Bash  # https://youtu.be/oKrKsmUBt54
+      GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      PauseFloat OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+  conn WestGlades.MillApproach:
+    kii: Bash, Glide  # Bash glide from the slime on the wooden platform
+    unsafe: Bash  # https://youtu.be/oKrKsmUBt54
 
 anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the LifeHarvest Shard
   state OuterWellspring.LifeHarvestLeverPulled:
@@ -6309,8 +6330,8 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Damage=15
   conn OuterWellspring.AboveEntranceDoor: free
-  conn WestGlades.MillApproach:  # check for redundancies with RightWallMidpoint and AboveEntranceDoor
-    gorlek: Damage=20
+  conn OuterWellspring.CutsceneIsland:
+    gorlek: free
 
 anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing over west door
   refill Energy=3:
@@ -6426,23 +6447,18 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
 anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspring.RightWallOre
   pickup OuterWellspring.RightWallOre: free
 
+  conn OuterWellspring.CutsceneIsland: free
   conn WestGlades.MillApproach:
-    moki: Grapple OR Glide  # Others are redundant with EntranceDoor
-    gorlek:
-      Sword OR Damage=20
-      HammerSJump=1, DoubleJump OR Dash
-      Bash, Grenade=1, DoubleJump OR Dash OR Sword
-    kii:
-      DoubleJump OR Dash OR Hammer OR Blaze=2 OR Sentry=2
-      Bash, Grenade=1
+  # Most paths are redundant with CutsceneIsland
+    moki: Glide
+    gorlek: Grapple OR Sword
+    kii: DoubleJump OR Dash OR Hammer OR Blaze=3 OR Sentry=2
+    unsafe: Spear=2 OR Shuriken=2 OR Blaze=2
   conn OuterWellspring.EntranceDoor:
-    moki: Water OR Glide OR Launch  # Grapple paths are redundant with AboveEntranceDoor
-    gorlek:
-      DoubleJump, TripleJump OR Dash OR Sword OR Hammer
-      Dash, Sword OR Hammer
-      Damage=20 OR SentryJump=1
-      Bash, Grenade=1
-    kii: DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
+  # Grapple paths are redundant with AboveEntranceDoor
+  # Most other paths are redundant with CutsceneIsland
+    moki: Glide
+    kii: Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
   conn OuterWellspring.AboveEntranceDoor:
     moki:
       Grapple, DoubleJump OR Dash OR Glide OR Launch
