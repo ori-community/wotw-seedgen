@@ -6444,7 +6444,7 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
 # checkpoint at -969, -3910
 # checkpoint at -902, -3895
 
-anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspring.RightWallOre
+anchor OuterWellspring.RightWallMidpoint at -741, -4018:  # Next to OuterWellspring.RightWallOre
   pickup OuterWellspring.RightWallOre: free
 
   conn OuterWellspring.CutsceneIsland: free
@@ -6474,8 +6474,20 @@ anchor OuterWellspring.RightWallMidpoint at -746, -4019:  # Next to OuterWellspr
     kii:
       DoubleJump, TripleJump, Dash OR Sword
       DoubleJump, TripleJump, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, DoubleJump, Hammer  # coyote dash
       Bash, Grenade=1  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
-    unsafe: DoubleJump, TripleJump, Hammer
+      # Glitched
+      # AerialHammerJump, TripleJump OR Glide OR Sword OR Sentry=3
+      # GlideJump, DoubleJump, TripleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, Glide
+      # GrenadeJump=1, Hammer, DoubleJump, TripleJump  # Possible to do with energy weapons instead of tjump but the bees make it really annoying. And you can't really add a Combat=Bee requirement either because it only starts aggroing you after your gjump
+    unsafe:
+      DoubleJump, TripleJump, Hammer
+      Dash, DoubleJump, Sword
+      AerialHammerJump OR GlideHammerJump
+      GlideJump, DoubleJump OR Dash
+      GrenadeJump, Glide
+      GrenadeJump, Hammer, DoubleJump OR Dash OR Sword OR Shuriken=2 OR Sentry=2
   conn OuterWellspring.EastDoor:  # Most paths from this anchor should be redundant with going to AboveEntranceDoor then EastDoor
     kii: Bash, Grenade=2  # Bash grenade to reach the bee then bash glide from the bee to the platform with a slime
   conn OuterWellspring.TrialApproach:  # no moki path because the camera makes the connection hard to see
