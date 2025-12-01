@@ -6203,6 +6203,8 @@ anchor OuterWellspring.WestDoor at -892, -3991:  # Outside the door where you ex
         DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
         Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
         Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      # Glitched
+      # LaunchSwap
     unsafe:
       Grapple, DoubleJump  # grapple the plant on the left, hold up to make it appear on screen
       Grapple, OuterWellspring.WestDoorBlueMoonFree, Dash OR Sword
@@ -6339,30 +6341,41 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
 
   pickup OuterWellspring.HiddenHC:
     moki:
-      Grapple, DoubleJump, Dash OR Glide
-      Grapple, Dash, Glide
+      Combat=Miner OR Bash:
+        Grapple, DoubleJump, Dash OR Glide
+        Grapple, Dash, Glide
       Launch, DoubleJump OR Dash OR Grapple OR Glide
     gorlek:
-      Grapple, DoubleJump, TripleJump OR Damage=15
-      Grapple, Damage=15, Dash OR Glide
+      Combat=Miner OR Bash OR Damage=10:
+        Grapple, DoubleJump, Damage=15
+        Grapple, Damage=15, Dash
+      Damage=10, Grapple, DoubleJump, Dash OR Glide
+      Damage=10, Grapple, Dash, Glide
+      Grapple, DoubleJump, TripleJump
       DoubleJump, TripleJump, Dash, Glide OR Sword
       DoubleJump, TripleJump, Glide, Damage=15
       Launch, Sword OR Damage=15
     kii:
-      Grapple, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
-      Grapple, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Combat=Miner OR Bash OR Damage=10:
+        Grapple, Hammer, DoubleJump OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
+        Grapple, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Grapple, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Sword  # horizontal sword combo first then tjump then upslash
       DoubleJump, TripleJump, Dash, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
       DoubleJump, TripleJump, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Hammer, Shuriken=1 OR Damage=15
       Bash, Grenade=1, DoubleJump, TripleJump
+      Launch, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump, DoubleJump
+      # GlideJump, Dash, Sword OR Hammer OR Damage=15
     unsafe:
       Grapple, DoubleJump OR Dash OR Sword
-      Grapple, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump OR Dash
-      Bash, Grenade=1, DoubleJump OR Dash  # wall jump on the small wall at the edge of where the pickup is
-      Launch
+      Grapple, Damage=15, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Damage=15  # https://youtu.be/IOvUK9S-ZLw
+      Bash, Grenade=1, DoubleJump OR Dash  # similar to above
+      DoubleJump, TripleJump OR Dash  # similar to above
+      Launch OR AerialHammerJump
 
   conn OuterWellspring.TopDoor:
     moki:
@@ -6372,15 +6385,29 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
       Bash OR SentryJump=1
       InnerWellspring.TopDoorOpen, DoubleJump
     kii:
+      DoubleJump, Sword  # Pogo the gorlek
       InnerWellspring.TopDoorOpen, Dash, Sword OR Hammer
       InnerWellspring.TopDoorOpen, Spear=1
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+      # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer
+      # InnerWellspring.TopDoorOpen, GlideJump
     unsafe:
-      InnerWellspring.TopDoorOpen, Sword OR Dash # Pogo the energy cristal or dash ramp
+      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GlideJump, Sword  # pogo the gorlek
+      InnerWellspring.TopDoorOpen, Sword OR Dash OR GlideJump  # Pogo the energy cristal or dash ramp
   conn OuterWellspring.WestDoor:
-    moki: Combat=Miner OR DoubleJump OR Dash OR Grapple OR Glide OR Launch
-    gorlek: Sword OR Hammer OR Damage=15
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-  conn OuterWellspring.EastDoor:  # paths with top door open seem rather pointless?
+    moki:
+      Combat=Miner, DoubleJump OR Dash OR Grapple OR Glide OR Launch
+      Bash, DoubleJump OR Dash OR Grapple OR Glide OR Launch
+    gorlek:
+      Combat=Miner, Sword OR Hammer
+      Damage=10, DoubleJump OR Dash OR Grapple OR Glide OR Launch
+    kii:
+      Combat=Miner OR Bash OR Damage=10:
+        Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Combat=Miner OR Bash OR Damage=10
+  conn OuterWellspring.EastDoor:  # Be sure its not redundant with paths going to OuterWellspring.TopDoor
     moki:
       DoubleJump, Dash
       Glide
