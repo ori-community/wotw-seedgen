@@ -252,4 +252,6 @@ pub enum MapIcon {
     VerticalDoor = 110,
     HorizontalDoor = 111,
     Lever = 112,
+    Door = 113,
+    DoorUnknown = 114,
 }
