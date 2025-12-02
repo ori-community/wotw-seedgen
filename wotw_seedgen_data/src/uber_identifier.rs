@@ -126,17 +126,17 @@ pub enum CommonUberIdentifier {
 impl CommonUberIdentifier {
     pub const fn map_icon(self) -> MapIcon {
         match self {
-            Self::SpiritLight => MapIcon::Experience,
-            Self::GorlekOre => MapIcon::Ore,
+            Self::SpiritLight => MapIcon::SpiritLight,
+            Self::GorlekOre => MapIcon::GorlekOre,
             Self::Keystones => MapIcon::Keystone,
-            Self::ShardSlots => MapIcon::ShardSlotUpgrade,
+            Self::ShardSlots => MapIcon::ShardSlot,
             Self::CleanWater => MapIcon::CleanWater,
             Self::MaxHealth | Self::Health => MapIcon::HealthFragment,
             Self::MaxEnergy | Self::Energy => MapIcon::EnergyFragment,
             Self::WeaponUpgrade(_) => MapIcon::BonusItem, // TODO is this good?
-            Self::Shard(_) => MapIcon::SpiritShard,
+            Self::Shard(_) => MapIcon::Shard,
             Self::Teleporter(_) => MapIcon::Teleporter,
-            Self::Skill(_) => MapIcon::AbilityPedestal,
+            Self::Skill(_) => MapIcon::Skill,
         }
     }
 

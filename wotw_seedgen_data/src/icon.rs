@@ -177,27 +177,32 @@ pub enum MapIcon {
     EnergyGateOpen = 7,
     KeystoneDoorFour = 8,
     KeystoneDoorOpen = 9,
-    AbilityPedestal = 10,
+    /// AbilityPedestal
+    Skill = 10,
     HealthUpgrade = 11,
     EnergyUpgrade = 12,
     SavePedestal = 13,
     AbilityPoint = 14,
     KeystoneDoorTwo = 15,
     Invisible = 16,
-    Experience = 17,
+    /// Experience
+    SpiritLight = 17,
     MapstonePickup = 18,
     EnergyGateTwelve = 19,
     EnergyGateTen = 20,
     EnergyGateEight = 21,
     EnergyGateSix = 22,
     EnergyGateFour = 23,
-    SpiritShard = 24,
+    /// SpiritShard
+    Shard = 24,
     NPC = 25,
     #[default]
     QuestItem = 26,
-    ShardSlotUpgrade = 27,
+    /// ShardSlotUpgrade
+    ShardSlot = 27,
     Teleporter = 28,
-    Ore = 29,
+    /// Ore
+    GorlekOre = 29,
     QuestStart = 30,
     QuestEnd = 31,
     RaceStart = 32,
@@ -210,16 +215,24 @@ pub enum MapIcon {
     TempleDoor = 41,
     SmallDoor = 42,
     Shrine = 43,
+    // TODO who is this
     Loremaster = 50,
-    Weaponmaster = 51,
-    Gardener = 52,
-    Mapmaker = 53,
-    Shardtrader = 54,
-    Wanderer = 55,
+    /// Weaponmaster
+    Opher = 51,
+    /// Gardener
+    Tuley = 52,
+    /// Mapmaker
+    Lupo = 53,
+    /// Shardtrader
+    Twillen = 54,
+    /// Wanderer
+    Tokk = 55,
     Treekeeper = 56,
-    Builder = 57,
+    /// Builder
+    Grom = 57,
     Kwolok = 58,
-    Statistician = 59,
+    /// Statistician
+    Motay = 59,
     CreepHeart = 60,
     Miner = 61,
     Spiderling = 62,
@@ -254,4 +267,6 @@ pub enum MapIcon {
     Lever = 112,
     Door = 113,
     DoorUnknown = 114,
+    DoorSmall = 115,
+    DoorSmallUnknown = 116,
 }
