@@ -6271,11 +6271,22 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       DoubleJump, Bash OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # With energy weapon, grab the wheel on the right.
       Grapple, Shuriken=1 OR Blaze=2 OR Sentry=2
       Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe, BreakWall=20:
-      Dash
-      DoubleJump, Shuriken=1 OR Blaze=1
+      # Glitched
+      # GrenadeJump=1, Sword
+      # GrenadeJump=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # energy weapons for movement but they'll also damage the wall
+      # GrenadeJump=1, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, DoubleJump, Shuriken=1 OR Blaze=1  # other energy weapons are redundant with grabbing the upper wheel
+      # Shuriken=1 OR Blaze=1 OR Sentry=1:  # land on the lower wheel
+      #   GrenadeJump=1, Blaze=5 OR Sentry=5
+    unsafe, BreakWall=20:  # make sure it's not redundant with going to OuterWellspring.TrialApproach first
+      PauseFloat OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2  # 2nd sentry swap will start damaging the wall
       Bash, Grenade=1, Damage=15
-
+      GrenadeCancel, Bash, Grenade=1
+      GrenadeJump, Shuriken=2 OR Blaze=4 OR Sentry=2  # some will start damaging the wall
+      GrenadeJump, Sword OR Hammer
+      Sword, Shuriken=1 OR Grenade=1  # pogo your projectile
+      # DoubleJump, Blaze=1  # ensure about how this works. It would most likely be redundant with going to OuterWellspring.TrialApproach first.
+      
   conn OuterWellspring.AboveWestDoor:
     moki:
       InnerWellspring.TopDoorOpen, Grapple OR Launch
@@ -6289,13 +6300,27 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
         Bash, Grenade=1, Hammer, Damage=10
       Bash, Grenade=1, DoubleJump, TripleJump
       Bash, Grenade=1, Grapple
+      Launch, SentryJump=1 OR Damage=15
+      Launch, DoubleJump, TripleJump
     kii:
       InnerWellspring.TopDoorOpen, Bash, Grenade=1, Hammer OR Blaze=4 OR Sentry=2
       DoubleJump, Grapple
+      Launch  # climb the right side and reach OuterWellspring.TopDoor but come back to OuterWellspring.AboveWestDoor 
+      # Glitched
+      # SentryJump=1
+      # GlideJump, AerialHammerJump, TripleJump OR InnerWellspring.TopDoorOpen  # also use an upslash before anything hjumps
+      # Bash, Grenade=1, GlideJump, DoubleJump
+      # Bash, Grenade=1, AerialHammerJump
     unsafe:
       InnerWellspring.TopDoorOpen, Bash, Grenade=1, Damage=25
       InnerWellspring.TopDoorOpen, Bash, Grenade=1, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # These aren't kii because it's easy to get stuck in those spikes
-      Grapple, Damage=15
+      Grapple  # https://youtu.be/8B8EIhQmMa8
+      Bash, Grenade=1, DoubleJump, Hammer OR GlideJump
+      HammerExtension, Damage=25
+      AerialHammerJump, TripleJump OR HammerExtension OR Damage=10
+      GlideHammerJump  # from the wheel on the right
+      SentryJump=1 OR BlazeSwap=4 OR FlashSwap  # no sentry swaps because you can't wait for a sentry to explode
+      Damage=15, BlazeSwap=3 OR SentrySwap=3
   conn OuterWellspring.WestDoor:
     moki: DoubleJump OR Dash OR Launch
     gorlek: Glide OR Sword OR Hammer
@@ -6318,19 +6343,25 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       Bash, Grenade=1, Damage=15, Dash OR Glide OR Sword
       Bash, Grenade=1, Damage=30, Sentry=3
       Bash, Grenade=2
+      # Glitched
+      # GlideJump
+      # SentryJump=1, Glide OR Damage=15
     unsafe:
-      DoubleJump, Damage=15, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # Same as the Kii path, but more energy efficient
-      Dash  # There's a little friendly spike area on the very edge of the platform
+      Dash  # Coyote dash to grab the wheel on the right and use friendly spike on the very edge of the platform.
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel  # similar to above
       GlideJump
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # There's a little friendly spike area on the very edge of the platform
       Bash, Grenade=1, Sentry=2, Damage=10
+      BlazeSwap=3 OR FlashSwap OR SentrySwap=3
+      Damage=10, BlazeSwap=2 OR SentrySwap=2
+      SentryJump=1, Glide OR Damage=10
   conn OuterWellspring.RightWallMidpoint:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
       Sword OR Hammer
       Bash, Grenade=1
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Damage=15
+    unsafe: Damage=15 OR GrenadeCancel OR PauseFloat
   conn OuterWellspring.AboveEntranceDoor: free
   conn OuterWellspring.CutsceneIsland:
     gorlek: free
