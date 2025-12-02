@@ -1,5 +1,4 @@
 fn main() {
-    #[cfg(feature = "loc_data")]
     #[allow(unused)]
     let loc_data = {
         println!("cargo::rerun-if-changed=../assets/loc_data.csv");
@@ -13,7 +12,6 @@ fn main() {
         loc_data
     };
 
-    #[cfg(feature = "state_data")]
     #[allow(unused)]
     let state_data = {
         println!("cargo::rerun-if-changed=../assets/state_data.csv");
@@ -27,7 +25,6 @@ fn main() {
         state_data
     };
 
-    #[cfg(feature = "uber_state_data")]
     {
         println!("cargo::rerun-if-changed=../assets/uber_state_dump.json");
 
@@ -41,7 +38,6 @@ fn main() {
         write("uber_state_data", &uber_state_data);
     }
 
-    #[cfg(feature = "snippets")]
     {
         println!("cargo::rerun-if-changed=../assets/snippets");
 
@@ -70,7 +66,6 @@ fn main() {
         write("snippets", &snippets);
     }
 
-    #[cfg(feature = "logic")]
     {
         // TODO create logic folder
         println!("cargo::rerun-if-changed=../assets/logic");
@@ -96,7 +91,6 @@ fn main() {
         write("logic", &logic);
     }
 
-    #[cfg(feature = "presets")]
     {
         // cargo will always rerun this build script if told to scan a directory that doesn't exist, so this needs to be inactive as long as there are no universe presets in the assets
         // println!("cargo::rerun-if-changed=../assets/universe_presets");
@@ -136,7 +130,6 @@ fn main() {
     }
 }
 
-#[cfg(any(feature = "snippets", feature = "presets"))]
 fn read_optional_dir<P: AsRef<std::path::Path>>(path: P) -> Option<std::fs::ReadDir> {
     match std::fs::read_dir(path) {
         Ok(read_dir) => Some(read_dir),
@@ -150,13 +143,6 @@ fn read_optional_dir<P: AsRef<std::path::Path>>(path: P) -> Option<std::fs::Read
     }
 }
 
-#[cfg(any(
-    feature = "loc_data",
-    feature = "state_data",
-    feature = "uber_state_data",
-    feature = "snippets",
-    feature = "presets",
-))]
 fn write<T: serde::Serialize>(path: &str, contents: &T) {
     use std::{env, fs::File, path::Path};
 

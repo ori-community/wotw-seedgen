@@ -1,20 +1,10 @@
-#[cfg(feature = "loc_data")]
-use crate::LocData;
-use crate::Source;
-#[cfg(feature = "state_data")]
-use crate::StateData;
-#[cfg(feature = "uber_state_data")]
-use crate::{UberStateData, UberStateDump};
+use crate::{LocData, Source, StateData, UberStateData, UberStateDump};
 use itertools::Itertools;
-#[cfg(feature = "uber_state_data")]
-use std::io::BufReader;
-#[cfg(feature = "snippet_access")]
-use std::io::Read;
 use std::{
     ffi::OsStr,
     fmt::Display,
     fs::{self, File},
-    io::ErrorKind,
+    io::{BufReader, ErrorKind, Read},
     path::{Path, PathBuf},
 };
 
@@ -38,28 +28,24 @@ impl FileAccess {
         Self { folders }
     }
 
-    #[cfg(feature = "loc_data")]
     pub fn loc_data(&self) -> Result<LocData, String> {
         let (path, file) = self.open(Path::new("loc_data.csv"))?;
 
         LocData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
-    #[cfg(feature = "state_data")]
     pub fn state_data(&self) -> Result<StateData, String> {
         let (path, file) = self.open(Path::new("state_data.csv"))?;
 
         StateData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
-    #[cfg(feature = "uber_state_data")]
     pub fn uber_state_dump(&self) -> Result<UberStateDump, String> {
         let (path, file) = self.open(Path::new("uber_state_dump.json"))?;
 
         serde_json::from_reader(BufReader::new(file)).map_err(|err| file_err("parse", &path, err))
     }
 
-    #[cfg(feature = "uber_state_data")]
     pub fn uber_state_data(
         &self,
         loc_data: &LocData,
@@ -99,7 +85,6 @@ impl FileAccess {
         ))
     }
 
-    #[cfg(feature = "snippet_access")]
     fn read(&self, path: &Path) -> Result<(PathBuf, Vec<u8>), String> {
         let (path, mut file) = self.open(path)?;
 
@@ -149,7 +134,6 @@ impl FileAccess {
     }
 }
 
-#[cfg(feature = "snippet_access")]
 mod snippet_access {
     use super::*;
     use crate::{SnippetAccess, Source};
@@ -175,7 +159,6 @@ mod snippet_access {
     }
 }
 
-#[cfg(feature = "presets")]
 mod presets {
     use super::*;
     use crate::{PresetAccess, UniversePreset, WorldPreset};

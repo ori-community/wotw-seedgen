@@ -8,12 +8,12 @@ repository = "https://github.com/ori-community/wotw-seedgen"
 license = "MIT"
 
 [dependencies]
-wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language", version = "0.1" }
-wotw_seedgen_settings = { path = "../wotw_seedgen_settings", version = "0.1" }
-wotw_seedgen_logic_language = { path = "../wotw_seedgen_logic_language", version = "0.1" }
-wotw_seedgen_seed = { path = "../wotw_seedgen_seed", version = "0.1" }
-wotw_seedgen_data = { path = "../wotw_seedgen_data", version = "0.1" }
-wotw_seedgen_assets = { path = "../wotw_seedgen_assets", version = "0.1", features = ["loc_data", "state_data"] }
+wotw_seedgen_seed_language = { path = "../wotw_seedgen_seed_language" }
+wotw_seedgen_settings = { path = "../wotw_seedgen_settings" }
+wotw_seedgen_logic_language = { path = "../wotw_seedgen_logic_language" }
+wotw_seedgen_seed = { path = "../wotw_seedgen_seed" }
+wotw_seedgen_data = { path = "../wotw_seedgen_data" }
+wotw_seedgen_assets = { path = "../wotw_seedgen_assets" }
 serde = { version = "1.0", features = ["derive"] }
 rustc-hash = "2.0"
 rand = "0.8"
@@ -32,7 +32,7 @@ arrayvec = "0.7.6"
 criterion = "0.5"
 lazy_static = "1.4"
 env_logger = { version = "0.11", default-features = false }
-wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets", version = "0.1", features = ["loc_data", "state_data", "uber_state_data", "snippets", "presets"] }
+wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets" }
 
 [build-dependencies]
 # vergen = { version = "8.2", features = [ "git", "gitoxide" ] } # TODO move into binary?

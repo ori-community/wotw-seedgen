@@ -13,41 +13,27 @@
 //! - `presets`: Parsing and access trait for preset files
 //! - `file_access`: Filesystem-based implementation to access asset files
 
-#[cfg(feature = "wotw_seedgen_data")]
 pub use wotw_seedgen_data as data;
-#[cfg(feature = "wotw_seedgen_settings")]
 pub use wotw_seedgen_settings as settings;
 
-#[cfg(feature = "loc_data")]
 mod loc_data;
 
-#[cfg(feature = "loc_data")]
 pub use loc_data::{LocData, LocDataEntry};
-#[cfg(feature = "state_data")]
 mod state_data;
-#[cfg(feature = "state_data")]
 pub use state_data::{StateData, StateDataEntry};
-#[cfg(feature = "uber_state_data")]
 mod uber_state_data;
-#[cfg(feature = "uber_state_data")]
 pub use uber_state_data::{
     UberStateAlias, UberStateData, UberStateDataEntry, UberStateDump, UberStateDumpGroup,
     UberStateDumpMember, UberStateDumpValueType, UberStateValue,
 };
-#[cfg(feature = "snippet_access")]
 mod snippet_access;
-#[cfg(feature = "snippet_access")]
 pub use snippet_access::{NoSnippetAccess, SnippetAccess};
-#[cfg(feature = "presets")]
 mod presets;
-#[cfg(feature = "presets")]
 pub use presets::{
     NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, UniversePresetSettings,
     WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
 };
-#[cfg(feature = "file_access")]
 mod file_access;
-#[cfg(feature = "file_access")]
 pub use file_access::{file_err, FileAccess};
 
 /// Representation of a source file with the necessary information to display useful error messages.

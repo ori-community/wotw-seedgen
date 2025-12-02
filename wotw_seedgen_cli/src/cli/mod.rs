@@ -4,7 +4,6 @@ mod preset_args;
 mod regenerate_args;
 mod seed_args;
 mod seed_settings;
-#[cfg(feature = "stats")]
 mod stats_args;
 
 pub use plando_args::PlandoArgs;
@@ -15,7 +14,6 @@ pub use seed_settings::{
     SeedSettings, SeedWorldSettings, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
     AVAILABLE_WORLD_PRESETS,
 };
-#[cfg(feature = "stats")]
 pub use stats_args::{Analyzer, ChainedAnalyzers, StatsArgs};
 
 use clap::{
@@ -52,7 +50,6 @@ pub enum Cli {
         #[command(flatten)]
         args: PlandoArgs,
     },
-    #[cfg(feature = "stats")]
     /// Generate seed statistics
     ///
     /// The resulting statistics will be written into a 'stats' folder, you can read them out there
@@ -74,7 +71,6 @@ pub enum Cli {
         #[command(flatten)]
         args: VerboseArgs,
     },
-    #[cfg(feature = "lsp")]
     /// Start a language server
     Lsp,
 }
