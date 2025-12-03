@@ -3,23 +3,15 @@ use std::ops::ControlFlow;
 use super::*;
 use crate::{
     item_pool::ItemPool,
-    tests::{test_logger, AREAS},
+    tests::test_logger,
     world::reached::{Progression, ALL_CONNECTIONS},
 };
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use wotw_seedgen_logic_language::output::{Enemy, Node, Requirement};
 use wotw_seedgen_settings::{Difficulty, DEFAULT_SPAWN};
-use wotw_seedgen_static_assets::{LOC_DATA, STATE_DATA, UBER_STATE_DATA};
-
-lazy_static! {
-    static ref GRAPH: Graph =
-        Graph::compile(AREAS.clone(), LOC_DATA.clone(), STATE_DATA.clone(), &[])
-            .parsed
-            .unwrap();
-}
+use wotw_seedgen_static_assets::{GRAPH, LOC_DATA, UBER_STATE_DATA};
 
 fn test_settings(difficulty: Difficulty) -> WorldSettings {
     WorldSettings {

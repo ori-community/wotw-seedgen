@@ -1,151 +1,91 @@
+use std::{
+    env,
+    ffi::OsStr,
+    fs::{self, File},
+    io::BufReader,
+    path::Path,
+};
+
+use rustc_hash::FxHashMap;
+use serde::Serialize;
+use wotw_seedgen_assets::{LocData, StateData, UberStateData, WorldPreset};
+
 fn main() {
-    #[allow(unused)]
-    let loc_data = {
-        println!("cargo::rerun-if-changed=../assets/loc_data.csv");
+    println!("cargo::rerun-if-changed=../assets");
 
-        let loc_data = wotw_seedgen_assets::LocData::from_reader(
-            include_bytes!("../assets/loc_data.csv").as_slice(),
-        )
-        .unwrap();
+    let loc_data = loc_data();
+    let state_data = state_data();
 
-        write("loc_data", &loc_data);
-        loc_data
-    };
+    uber_state_data(&loc_data, &state_data);
 
-    #[allow(unused)]
-    let state_data = {
-        println!("cargo::rerun-if-changed=../assets/state_data.csv");
+    snippets();
 
-        let state_data = wotw_seedgen_assets::StateData::from_reader(
-            include_bytes!("../assets/state_data.csv").as_slice(),
-        )
-        .unwrap();
-
-        write("state_data", &state_data);
-        state_data
-    };
-
-    {
-        println!("cargo::rerun-if-changed=../assets/uber_state_dump.json");
-
-        let dump =
-            serde_json::from_slice(include_bytes!("../assets/uber_state_dump.json").as_slice())
-                .unwrap();
-
-        let uber_state_data =
-            wotw_seedgen_assets::UberStateData::from_parts(dump, &loc_data, &state_data);
-
-        write("uber_state_data", &uber_state_data);
-    }
-
-    {
-        println!("cargo::rerun-if-changed=../assets/snippets");
-
-        use itertools::Itertools;
-        use rustc_hash::FxHashMap;
-        use std::path::PathBuf;
-
-        let snippets = read_optional_dir("../assets/snippets")
-            .into_iter()
-            .flatten()
-            .filter_map_ok(|entry| {
-                let name = PathBuf::from(entry.file_name());
-                if name.extension()? != "wotws" {
-                    return None;
-                }
-
-                let id = entry.path();
-                let content = std::fs::read_to_string(entry.path()).unwrap();
-                let identifier = name.file_stem()?.to_string_lossy().to_string();
-
-                Some((identifier, (id.to_string_lossy().to_string(), content)))
-            })
-            .collect::<Result<FxHashMap<_, _>, _>>()
-            .unwrap();
-
-        write("snippets", &snippets);
-    }
-
-    {
-        // TODO create logic folder
-        println!("cargo::rerun-if-changed=../assets/logic");
-
-        use itertools::Itertools;
-        use std::path::PathBuf;
-
-        let logic = read_optional_dir("../assets/logic")
-            .into_iter()
-            .flatten()
-            .filter_map_ok(|entry| {
-                let name = PathBuf::from(entry.file_name());
-                if name.extension()? != "wotws" {
-                    return None;
-                }
-                let id = entry.path();
-                let content = std::fs::read_to_string(entry.path()).unwrap();
-                Some((id.to_string_lossy().to_string(), content))
-            })
-            .collect::<Result<Vec<_>, _>>()
-            .unwrap();
-
-        write("logic", &logic);
-    }
-
-    {
-        // cargo will always rerun this build script if told to scan a directory that doesn't exist, so this needs to be inactive as long as there are no universe presets in the assets
-        // println!("cargo::rerun-if-changed=../assets/universe_presets");
-        println!("cargo::rerun-if-changed=../assets/world_presets");
-
-        use itertools::Itertools;
-        use rustc_hash::FxHashMap;
-        use serde::{Deserialize, Serialize};
-        use std::{fs::File, io::BufReader, path::PathBuf};
-        use wotw_seedgen_assets::{UniversePreset, WorldPreset};
-
-        fn process_presets<T: Serialize + for<'de> Deserialize<'de>>(folder: &str) {
-            let presets = read_optional_dir(format!("../assets/{folder}"))
-                .into_iter()
-                .flatten()
-                .filter_map_ok(|entry| {
-                    let name = PathBuf::from(entry.file_name());
-                    if name.extension()? != "json" {
-                        return None;
-                    }
-
-                    let preset: T =
-                        serde_json::from_reader(BufReader::new(File::open(entry.path()).unwrap()))
-                            .unwrap();
-                    let identifier = name.file_stem()?.to_string_lossy().to_string();
-
-                    Some((identifier, preset))
-                })
-                .collect::<Result<FxHashMap<_, _>, _>>()
-                .unwrap();
-
-            write(folder, &presets);
-        }
-
-        process_presets::<UniversePreset>("universe_presets");
-        process_presets::<WorldPreset>("world_presets");
-    }
+    presets();
 }
 
-fn read_optional_dir<P: AsRef<std::path::Path>>(path: P) -> Option<std::fs::ReadDir> {
-    match std::fs::read_dir(path) {
-        Ok(read_dir) => Some(read_dir),
-        Err(err) => {
-            if err.kind() == std::io::ErrorKind::NotFound {
-                None
-            } else {
-                panic!("{err:?}");
-            }
-        }
-    }
+fn loc_data() -> LocData {
+    let loc_data =
+        LocData::from_reader(include_bytes!("../assets/loc_data.csv").as_slice()).unwrap();
+
+    write("loc_data", &loc_data);
+
+    loc_data
 }
 
-fn write<T: serde::Serialize>(path: &str, contents: &T) {
-    use std::{env, fs::File, path::Path};
+fn state_data() -> StateData {
+    let state_data =
+        StateData::from_reader(include_bytes!("../assets/state_data.csv").as_slice()).unwrap();
 
+    write("state_data", &state_data);
+
+    state_data
+}
+
+fn uber_state_data(loc_data: &LocData, state_data: &StateData) {
+    let dump = serde_json::from_slice(include_bytes!("../assets/uber_state_dump.json").as_slice())
+        .unwrap();
+
+    let uber_state_data = UberStateData::from_parts(dump, &loc_data, &state_data);
+
+    write("uber_state_data", &uber_state_data);
+}
+
+fn snippets() {
+    let snippets = fs::read_dir("../assets/snippets")
+        .unwrap()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.extension() == Some(OsStr::new("wotws")))
+        .map(|path| {
+            let identifier = path.file_stem().unwrap().to_str().unwrap().to_string();
+            let content = fs::read_to_string(&path).unwrap();
+
+            (identifier, (path, content))
+        })
+        .collect::<FxHashMap<_, _>>();
+
+    write("snippets", &snippets);
+}
+
+fn presets() {
+    let presets = fs::read_dir(format!("../assets/world_presets"))
+        .unwrap()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.extension() == Some(OsStr::new("json")))
+        .map(|path| {
+            let identifier = path.file_stem().unwrap().to_str().unwrap().to_string();
+            let preset: WorldPreset =
+                serde_json::from_reader(BufReader::new(File::open(&path).unwrap())).unwrap();
+
+            (identifier, preset)
+        })
+        .collect::<FxHashMap<_, _>>();
+
+    write("world_presets", &presets);
+}
+
+fn write<T: Serialize>(path: &str, contents: &T) {
     let file = File::create(Path::new(&env::var_os("OUT_DIR").unwrap()).join(path)).unwrap();
 
     ciborium::into_writer(contents, file).unwrap();

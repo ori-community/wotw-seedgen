@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
-use lazy_static::lazy_static;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use smallvec::smallvec;
@@ -19,12 +18,8 @@ use wotw_seedgen_seed_language::{
 };
 use wotw_seedgen_settings::{Difficulty, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN};
 use wotw_seedgen_static_assets::{
-    LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
+    AREAS, GRAPH, LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
 };
-
-lazy_static! {
-    static ref AREAS: Areas<'static> = Areas::parse(include_str!("../areas.wotw")).parsed.unwrap();
-}
 
 fn logic_assets(c: &mut Criterion) {
     let mut group = c.benchmark_group("logic_assets");
@@ -92,10 +87,9 @@ fn requirements(c: &mut Criterion) {
         difficulty: Difficulty::Unsafe,
         ..WorldSettings::default()
     };
-    let graph = compile_graph(&[]);
-    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
+    let spawn = GRAPH.find_node(DEFAULT_SPAWN).unwrap();
     let uber_states = UberStates::new(&UBER_STATE_DATA);
-    let mut world = World::new(&graph, spawn, &world_settings, uber_states);
+    let mut world = World::new(&*GRAPH, spawn, &world_settings, uber_states);
 
     let req_a = Requirement::EnergySkill(Skill::Blaze, 2.0);
     let req_b = Requirement::Damage(20.0);
@@ -158,11 +152,10 @@ fn requirements(c: &mut Criterion) {
 fn reach_check(c: &mut Criterion) {
     let mut group = c.benchmark_group("reach_check");
 
-    let graph = compile_graph(&[]);
     let uber_states = UberStates::new(&UBER_STATE_DATA);
     let world_settings = WorldSettings::default();
-    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
-    let world = World::new(&graph, spawn, &world_settings, uber_states.clone());
+    let spawn = GRAPH.find_node(DEFAULT_SPAWN).unwrap();
+    let world = World::new(&*GRAPH, spawn, &world_settings, uber_states.clone());
 
     group.bench_function("short", |b| {
         b.iter(|| {
@@ -182,9 +175,9 @@ fn reach_check(c: &mut Criterion) {
     });
 
     let world_settings = WorldSettings::default();
-    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
+    let spawn = GRAPH.find_node(DEFAULT_SPAWN).unwrap();
     let uber_states = UberStates::new(&UBER_STATE_DATA);
-    let world = World::new(&graph, spawn, &world_settings, uber_states);
+    let world = World::new(&*GRAPH, spawn, &world_settings, uber_states);
     let mut pool = ItemPool::new(&mut Pcg64Mcg::new(0));
 
     group.bench_function("long", |b| {

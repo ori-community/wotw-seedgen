@@ -3,21 +3,15 @@ use std::sync::Once;
 use crate::generate_seed;
 
 use env_logger::Env;
-use lazy_static::lazy_static;
 use log::info;
 use wotw_seedgen_assets::{
     PresetAccess, UniversePreset, UniversePresetSettings, WorldPresetSettings,
 };
-use wotw_seedgen_logic_language::{ast::Areas, output::Graph};
+use wotw_seedgen_logic_language::output::Graph;
 use wotw_seedgen_settings::{Difficulty, UniverseSettings};
 use wotw_seedgen_static_assets::{
-    LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
+    AREAS, LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
 };
-
-lazy_static! {
-    pub static ref AREAS: Areas<'static> =
-        Areas::parse(include_str!("../areas.wotw")).parsed.unwrap();
-}
 
 static LOGGER_INITIALIZED: Once = Once::new();
 
