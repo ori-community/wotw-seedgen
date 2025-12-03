@@ -147,6 +147,7 @@ pub enum TuleyIcon {
     TheLastSeed = 5,
 }
 
+// TODO link moved somewhere
 // should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Core/enums/map_icon.h
 /// Icons used in the map
 #[derive(
@@ -268,4 +269,5 @@ pub enum MapIcon {
     DoorUnknown = 114,
     DoorSmall = 115,
     DoorSmallUnknown = 116,
+    Wisp = 117,
 }

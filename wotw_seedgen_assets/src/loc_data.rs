@@ -4,17 +4,19 @@
 //!
 //! ```
 //! use wotw_seedgen_assets::{LocData, LocDataEntry};
-//! use wotw_seedgen_assets::data::{UberIdentifier, Position, Zone};
+//! use wotw_seedgen_assets::data::{MapIcon, Position, UberIdentifier, Zone};
 //!
 //! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroup, UberId, UberStateValue, X, Y, MapX, MapY
-//! MarshSpawn.RockHC, Marsh, Resource, Life, 21786, 60210, , -958.6, -4313.2, -958.6199, -4312.245
+//! MarshSpawn.RockHC, Marsh, HealthFragment, , 21786, 60210, , -958.6, -4313.2, -958.6199, -4312.245
 //! GladesTown.MotayHutEX, Glades, SpiritLight, 100, 42178, 57455, , -172.7, -4583.2, -392.8, -4130.6";
 //! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
 //!
+// TODO excuse me why is this equal?
 //! assert_eq!(loc_data.entries, vec![
 //!     LocDataEntry {
 //!         identifier: "MarshSpawn.RockHC".to_string(),
 //!         zone: Zone::Marsh,
+//!         map_icon: MapIcon::HealthFragment,
 //!         uber_identifier: UberIdentifier::new(21786, 60210),
 //!         value: Some(1),
 //!         position: Some(Position::new(-958., -4313.)),
@@ -23,6 +25,7 @@
 //!     LocDataEntry {
 //!         identifier: "GladesTown.MotayHutEX".to_string(),
 //!         zone: Zone::Glades,
+//!         map_icon: MapIcon::SpiritLight,
 //!         uber_identifier: UberIdentifier::new(42178, 57455),
 //!         value: Some(1),
 //!         position: Some(Position::new(-172., -4584.)),
@@ -34,7 +37,7 @@
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 use std::io::Read;
-use wotw_seedgen_data::{Position, UberIdentifier, Zone};
+use wotw_seedgen_data::{MapIcon, Position, UberIdentifier, Zone};
 
 /// Information about all pickup locations which should be filled by the randomizer
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -51,6 +54,8 @@ pub struct LocDataEntry {
     pub identifier: String,
     /// Map zone containing this pickup location
     pub zone: Zone,
+    /// Vanilla map icon
+    pub map_icon: MapIcon,
     /// `UberIdentifier` where this pickup location's corresponding world state is stored
     ///
     /// pickup locations are either stored as booleans or as integers where being above a certain value means the pickup is collected
@@ -103,6 +108,7 @@ impl LocData {
             entries.push(LocDataEntry {
                 identifier: record.node_identifier,
                 zone: record.zone,
+                map_icon: record.pickup_type,
                 uber_identifier: UberIdentifier::new(record.uber_group, record.uber_id),
                 value: record.uber_state_value,
                 position,
@@ -120,8 +126,8 @@ struct LocDataInput<'a> {
     node_identifier: String,
     #[serde_as(as = "DisplayFromStr")]
     zone: Zone,
-    // TODO this might be cool to have
-    _pickup_type: &'a str,
+    #[serde_as(as = "DisplayFromStr")]
+    pickup_type: MapIcon,
     _pickup_details: &'a str,
     uber_group: i32,
     uber_id: i32,
