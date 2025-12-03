@@ -29,13 +29,13 @@ impl FileAccess {
     }
 
     pub fn loc_data(&self) -> Result<LocData, String> {
-        let (path, file) = self.open(Path::new("loc_data.csv"))?;
+        let (path, file) = self.open(Path::new("logic/loc_data.csv"))?;
 
         LocData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
     pub fn state_data(&self) -> Result<StateData, String> {
-        let (path, file) = self.open(Path::new("state_data.csv"))?;
+        let (path, file) = self.open(Path::new("logic/state_data.csv"))?;
 
         StateData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
@@ -57,7 +57,7 @@ impl FileAccess {
     }
 
     pub fn areas(&self) -> Result<Source, String> {
-        let (path, content) = self.read_to_string(Path::new("areas.wotw"))?;
+        let (path, content) = self.read_to_string(Path::new("logic/areas.wotw"))?;
 
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))

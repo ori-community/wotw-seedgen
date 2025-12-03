@@ -25,7 +25,7 @@ fn main() {
 
 fn loc_data() -> LocData {
     let loc_data =
-        LocData::from_reader(include_bytes!("../assets/loc_data.csv").as_slice()).unwrap();
+        LocData::from_reader(include_bytes!("../assets/logic/loc_data.csv").as_slice()).unwrap();
 
     write("loc_data", &loc_data);
 
@@ -34,7 +34,8 @@ fn loc_data() -> LocData {
 
 fn state_data() -> StateData {
     let state_data =
-        StateData::from_reader(include_bytes!("../assets/state_data.csv").as_slice()).unwrap();
+        StateData::from_reader(include_bytes!("../assets/logic/state_data.csv").as_slice())
+            .unwrap();
 
     write("state_data", &state_data);
 
