@@ -385,6 +385,6 @@ OpherShop.ShockSmash, Shop, Shop, OpherWeapon, 1, 1098, , , , ,
 OpherShop.StaticStar, Shop, Shop, OpherWeapon, 1, 1106, , , , ,
 OpherShop.ChargeBlaze, Shop, Shop, OpherWeapon, 1, 1115, , , , ,
 OpherShop.RapidSentry, Shop, Shop, OpherWeapon, 1, 1116, , , , ,
-LupoShop.HCMapIcon, Shop, Shop, LupoMap, 15, 19396, 1, , , -209, -4162
-LupoShop.ECMapIcon, Shop, Shop, LupoMap, 15, 57987, 1, , , -209, -4162
-LupoShop.ShardMapIcon, Shop, Shop, LupoMap, 15, 41666, 1, , , -209, -4162
+LupoShop.HCMapIcon, Shop, Shop, LupoMap, 15, 19396, 1, , , ,
+LupoShop.ECMapIcon, Shop, Shop, LupoMap, 15, 57987, 1, , , ,
+LupoShop.ShardMapIcon, Shop, Shop, LupoMap, 15, 41666, 1, , , ,
