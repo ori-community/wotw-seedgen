@@ -252,7 +252,7 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
 anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen tree
   refill Checkpoint
 
-  state MarshSpawn.KeystoneDoor:
+  state MarshSpawn.RegenKSDoor:
     moki: Keystone=2
   state MarshSpawn.TokkBarrier:
     moki: BreakWall=16
@@ -294,7 +294,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       GrenadeJump, Bash
 
   conn MarshSpawn.RegenDoor:
-    moki: MarshSpawn.KeystoneDoor
+    moki: MarshSpawn.RegenKSDoor
   conn MarshSpawn.BrokenBridge:
     moki:
       DoubleJump OR Launch
@@ -826,13 +826,13 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       GlideJump
 
 anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
-  state MarshSpawn.KeystoneDoor:
+  state MarshSpawn.RegenKSDoor:
     moki: Keystone=2
 
   pickup MarshSpawn.RegenTree: free
 
   conn MarshSpawn.CaveEntrance:
-    moki: MarshSpawn.KeystoneDoor
+    moki: MarshSpawn.RegenKSDoor
   conn MarshSpawn.HowlApproach:
     moki:
       DoubleJump OR Launch
@@ -1132,7 +1132,7 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
 anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's Den
   refill Checkpoint
 
-  state HowlsDen.KeystoneDoor:
+  state HowlsDen.BoneBridgeKSDoor:
     moki: Keystone=2
   state HowlsDen.RainLifted:
     moki: HowlsDen.SwordTree
@@ -1200,19 +1200,19 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       HowlsDen.RainLifted, GlideBashChain  # Bash chain
       HowlsDen.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
       Unpopular, HowlsDen.RainLifted, Bash, HowlsDen.BoneBarrier  # https://youtu.be/j7sRVpO-s00
-  conn HowlsDen.BoneBridgeDoor:
-    moki: HowlsDen.KeystoneDoor
+  conn HowlsDen.BehindBoneBridgeKSDoor:
+    moki: HowlsDen.BoneBridgeKSDoor
   conn HowlsDen.AboveTeleporter:
     moki: HowlsDen.BoneBarrier
 
-anchor HowlsDen.BoneBridgeDoor at -466, -4490:  # checkpoint once you opened the door skip door
+anchor HowlsDen.BehindBoneBridgeKSDoor at -466, -4490:  # checkpoint once you opened the door skip door
   refill Checkpoint
 
-  state HowlsDen.KeystoneDoor:
+  state HowlsDen.BoneBridgeKSDoor:
     moki: Keystone=2
 
   conn HowlsDen.BoneBridge:
-    moki: HowlsDen.KeystoneDoor
+    moki: HowlsDen.BoneBridgeKSDoor
   conn HowlsDen.OutsideSecretRoom:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer OR Damage=10
@@ -1225,7 +1225,7 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
 
   conn HowlsDen.SecretRoom:
     moki: HowlsDen.SecretRoomWall
-  conn HowlsDen.BoneBridgeDoor:
+  conn HowlsDen.BehindBoneBridgeKSDoor:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer OR Damage=10
     kii:
@@ -2287,11 +2287,11 @@ anchor MidnightBurrows.TabletRoom at -824, -4531:  # Before the four keystone do
   refill Checkpoint
   refill Health=1
 
-  state MidnightBurrows.KeystoneDoor:
+  state MidnightBurrows.TabletKSDoor:
     moki: Keystone=4
 
   quest MidnightBurrows.TabletQI:
-    moki: MidnightBurrows.KeystoneDoor
+    moki: MidnightBurrows.TabletKSDoor
 
   conn MidnightBurrows.Central: free
 
@@ -7650,9 +7650,9 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
 anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone door
   refill Checkpoint
   refill Energy=3:
-    moki: WoodsEntry.KeystoneDoor, BreakCrystal
+    moki: WoodsEntry.MudKSDoor, BreakCrystal
 
-  state WoodsEntry.KeystoneDoor:
+  state WoodsEntry.MudKSDoor:
     moki: Keystone=2
 
   pickup WoodsEntry.LowerKS:
@@ -7667,8 +7667,8 @@ anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone doo
     unsafe: Sword OR Hammer
 
   conn WoodsMain.AfterKuMeet:
-    moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
-    gorlek: WoodsEntry.KeystoneDoor, Damage=10
+    moki: WoodsEntry.MudKSDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
+    gorlek: WoodsEntry.MudKSDoor, Damage=10
   conn WoodsEntry.BelowTeleporter:
     moki: Combat=2xBalloon, DoubleJump OR Glide OR Launch
     gorlek: DoubleJump OR Dash OR Glide OR Sword
@@ -7684,7 +7684,7 @@ region WoodsMain:
 anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to the room after finding Ku
   refill Checkpoint
 
-  state WoodsEntry.KeystoneDoor:
+  state WoodsEntry.MudKSDoor:
     moki: Keystone=2, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: Keystone=2, Damage=10
 
@@ -7718,8 +7718,8 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
       Hammer, DoubleJump  # upslash to protect yourself from projectiles then double jump
       Combat=Tentacle, DoubleJump, Spear=1 OR Blaze=1
   conn WoodsEntry.TwoKeystoneRoom:
-    moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
-    gorlek: WoodsEntry.KeystoneDoor, Damage=10
+    moki: WoodsEntry.MudKSDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
+    gorlek: WoodsEntry.MudKSDoor, Damage=10
   conn WoodsMain.FourKeystoneRoom:
     kii, WoodsMain.KSRoomYellowBarrierBroken:
       Bash, Damage=15, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
@@ -7823,7 +7823,7 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
 anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keystone door
   refill Checkpoint
 
-  state WoodsMain.KeystoneDoor:
+  state WoodsMain.WindRoomKSDoor:
     moki: Keystone=4
   state WoodsMain.KSRoomYellowBarrierBroken:  # Flap being the casual way of breaking the yellow barrier
     moki:  # getting assisting abilities to deal with Skeetos and positioning of Balloon
@@ -7906,7 +7906,7 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       DoubleJump  # get a wall jump after dropping down
 
   conn WoodsMain.GiantSkull:
-    moki: WoodsMain.KeystoneDoor
+    moki: WoodsMain.WindRoomKSDoor
   conn WoodsMain.WallOreLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer
@@ -7917,7 +7917,7 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
 anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
   refill Checkpoint
 
-  state WoodsMain.KeystoneDoor:
+  state WoodsMain.WindRoomKSDoor:
     moki: Keystone=4
 
   pickup WoodsMain.UpperLeafPileSL:
@@ -7958,7 +7958,7 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
       Bash
       Combat=Tentacle, Damage=15
   conn WoodsMain.FourKeystoneRoom:
-    moki: WoodsMain.KeystoneDoor
+    moki: WoodsMain.WindRoomKSDoor
 
 anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you lure a balloon through to break a yellow wall - mostly exists for the lure specifically since paths for it would otherwise be awkward
   refill Checkpoint
@@ -9777,10 +9777,10 @@ anchor LowerReach.TownEntry at -35, -4077:  # Where the wind starts
 anchor LowerReach.TrialStart at 64, -4045:  # At trial start
   refill Checkpoint
 
-  state LowerReach.KeystoneDoor:
+  state LowerReach.TrialKSDoor:
     moki: Keystone=4
   state LowerReach.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
-    moki: LowerReach.KeystoneDoor
+    moki: LowerReach.TrialKSDoor
 
   pickup LowerReach.SpiritTrial:
     moki: LowerReach.TrialActivation, Dash, Glide
@@ -10321,7 +10321,7 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
     kii, UpperReach.ThawFurnace:
       Water, BreakCrystal, Grenade
 
-  state UpperReach.KeystoneDoor:
+  state UpperReach.GrenadeKSDoor:
     moki: Keystone=4
 
   pickup UpperReach.SwimSL:
@@ -10343,11 +10343,11 @@ anchor UpperReach.OutsideTreeRoom at -169, -3911:  # In front of the keystone do
       Bash, Grenade=1, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
     unsafe: UpperReach.ThawFurnace, DoubleJump, Glide
   conn UpperReach.TreeRoomLedge:
-    moki: UpperReach.KeystoneDoor
+    moki: UpperReach.GrenadeKSDoor
   # backwards connection can't get through the Icefall
 
 anchor UpperReach.TreeRoomLedge at -136, -3911:  # On the ledge to the left and above the tree
-  state UpperReach.KeystoneDoor:
+  state UpperReach.GrenadeKSDoor:
     moki: Keystone=4
 
   pickup UpperReach.TreeOre:
@@ -10572,21 +10572,21 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
 
 anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone door
   refill Checkpoint:
-    moki: UpperDepths.EntryKeystoneDoor
+    moki: UpperDepths.EntryKSDoor
 
   state UpperDepths.LightPuzzle:  # breaking the corruption blocking the light
-    moki, UpperDepths.EntryKeystoneDoor, BreakWall=16, BreakWall=16:
+    moki, UpperDepths.EntryKSDoor, BreakWall=16, BreakWall=16:
       DoubleJump, Bash, Grapple
       Bash, Launch
-    gorlek, UpperDepths.EntryKeystoneDoor, BreakWall=16, BreakWall=16:
+    gorlek, UpperDepths.EntryKSDoor, BreakWall=16, BreakWall=16:
       DoubleJump, Grapple, Combat=Spiderling+SneezeSlug
       Bash, DoubleJump, TripleJump
       Bash, DoubleJump, Damage=30, Dash OR Glide OR Sword
       Bash, Grenade=2, Combat=Spiderling+SneezeSlug, DoubleJump OR Dash
       Launch, DoubleJump OR Dash OR Glide OR Sword
-    kii, UpperDepths.EntryKeystoneDoor, BreakWall=16, BreakWall=16:
+    kii, UpperDepths.EntryKSDoor, BreakWall=16, BreakWall=16:
       Launch, Damage=30
-  state UpperDepths.EntryKeystoneDoor:
+  state UpperDepths.EntryKSDoor:
     moki: Keystone=2
 
   conn UpperDepths.FirstKSRoom:
@@ -10608,20 +10608,20 @@ anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone
     unsafe:
       DoubleJump, Sentry=1 OR Flash=1 OR Blaze=3
   conn UpperDepths.BelowHive:  # LightPuzzle spawns another bat above the spikes
-    moki, UpperDepths.EntryKeystoneDoor:
+    moki, UpperDepths.EntryKSDoor:
       UpperDepths.LightPuzzle, Bash, Glide
       UpperDepths.LightPuzzle OR DepthsLight:
         Launch
         Bash, DoubleJump OR Dash
         Combat=2xBat, DoubleJump OR Dash  # Combat=Bat expects a ranged weapon
-    gorlek, UpperDepths.EntryKeystoneDoor:
+    gorlek, UpperDepths.EntryKSDoor:
       UpperDepths.LightPuzzle, Bash
       UpperDepths.LightPuzzle OR DepthsLight:
         Damage=30
         Combat=Bat, DoubleJump OR Dash OR Glide OR Sword  # Combat=Bat expects a ranged weapon
-    kii, UpperDepths.EntryKeystoneDoor, UpperDepths.LightPuzzle OR DepthsLight:
+    kii, UpperDepths.EntryKSDoor, UpperDepths.LightPuzzle OR DepthsLight:
       Combat=Bat, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, UpperDepths.EntryKeystoneDoor:
+    unsafe, UpperDepths.EntryKSDoor:
       Bash  # https://youtu.be/6lg7Yl-ehX8
       Damage=10, UpperDepths.LightPuzzle OR DepthsLight  # dboost on a bat's projectile
 
@@ -10674,7 +10674,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
   refill Energy=3:
     moki: BreakCrystal, DoubleJump OR Launch
 
-  state UpperDepths.EntryKeystoneDoor:  # mirror of connections to keydoor ledge
+  state UpperDepths.EntryKSDoor:  # mirror of connections to keydoor ledge
     moki: Keystone=2, DepthsLight, DoubleJump OR Dash OR Glide OR Launch
     gorlek, Keystone=2:
       DepthsLight, Sword OR Hammer OR Damage=30
@@ -10696,11 +10696,11 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
       DoubleJump, Sword # use sword with double jump to gain height from mosquitos
 
   conn UpperDepths.KeydoorLedge:  # solving the light puzzle can't meaningfully softlock this since it means you can already access the other side
-    moki: UpperDepths.EntryKeystoneDoor, DepthsLight, DoubleJump OR Dash OR Glide OR Launch
-    gorlek, UpperDepths.EntryKeystoneDoor:
+    moki: UpperDepths.EntryKSDoor, DepthsLight, DoubleJump OR Dash OR Glide OR Launch
+    gorlek, UpperDepths.EntryKSDoor:
       DepthsLight, Sword OR Hammer OR Damage=30
       Dash, Launch
-    kii, UpperDepths.EntryKeystoneDoor:
+    kii, UpperDepths.EntryKSDoor:
       DepthsLight, Sentry=1 OR Shuriken=1 OR Spear=1
       Flash=1 # if flash is your lightsource as well you need to turn it off and then turn it on again during your jump
   conn UpperDepths.Teleporter:
@@ -10761,7 +10761,7 @@ anchor UpperDepths.Central at 464, -4484:  # The firefly egg to the right of the
   refill Energy=3:  # in the dark above
     unsafe: BreakCrystal, Launch
 
-  state UpperDepths.CentralKeystoneDoor:
+  state UpperDepths.CentralKSDoor:
     moki: Keystone=2
 
   conn UpperDepths.SecondKSRoom:
@@ -10770,7 +10770,7 @@ anchor UpperDepths.Central at 464, -4484:  # The firefly egg to the right of the
       Bash, DepthsLight OR BreakWall=1
     gorlek: free  # don't look behind oriLurk
   conn UpperDepths.LowerConnection:
-    moki: UpperDepths.CentralKeystoneDoor
+    moki: UpperDepths.CentralKSDoor
   conn UpperDepths.BelowHive:
     moki: DepthsLight, Launch
     gorlek:
@@ -10979,7 +10979,7 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
   refill Checkpoint
   # energy crystal on the way to the trial not considered
 
-  state UpperDepths.CentralKeystoneDoor:
+  state UpperDepths.CentralKSDoor:
     moki: Keystone=2
 
   pickup LowerDepths.BelowDoorOre:
@@ -11024,7 +11024,7 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
     unsafe:
       DepthsLight, Grapple, Sentry=1 OR Shuriken=1 OR Flash=1 OR Damage=10
   conn UpperDepths.Central:
-    moki: UpperDepths.CentralKeystoneDoor
+    moki: UpperDepths.CentralKSDoor
   conn LowerDepths.West:
     moki:
       BreakWall=1, Dash, DoubleJump OR Glide
@@ -13261,7 +13261,7 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek: free
 
-  state UpperPools.KeystoneDoor:
+  state UpperPools.WaterDashKSDoor:
     moki: Keystone=4
   state UpperPools.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: Grapple
@@ -13281,7 +13281,7 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
     unsafe: DoubleJump, Hammer OR Flash=1 OR Sentry=1
 
   conn UpperPools.TreeRoomEntrance:
-    moki: UpperPools.KeystoneDoor
+    moki: UpperPools.WaterDashKSDoor
   conn UpperPools.KeystoneRoom:
     moki: DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek: free
@@ -13310,7 +13310,7 @@ anchor UpperPools.BeforeKeystoneDoor at -1506, -4068:  # In front of the door bl
 anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of Waterdash tree
   refill Checkpoint
 
-  state UpperPools.KeystoneDoor:
+  state UpperPools.WaterDashKSDoor:
     moki: Keystone=4
   state UpperPools.TreeRoomLeftBubbleFree:
     unsafe: Bow=1 OR Grenade=1 OR Spear=1
@@ -13319,7 +13319,7 @@ anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of 
     unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash
 
   conn UpperPools.BeforeKeystoneDoor:
-    moki: UpperPools.KeystoneDoor
+    moki: UpperPools.WaterDashKSDoor
   conn UpperPools.TreeRoom:
     moki: Water OR DoubleJump OR Dash OR Glide
     gorlek: free
@@ -14624,7 +14624,7 @@ region UpperWastes:
 anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone door
   refill Checkpoint
 
-  state UpperWastes.KeystoneDoor:
+  state UpperWastes.SandKSDoor:
     moki, Keystone=2:
       Burrow, Bash, DoubleJump OR Dash OR Glide
       Burrow, Combat=ShieldSlug, DoubleJump OR Dash OR Glide
@@ -14698,21 +14698,21 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     gorlek: Burrow, Sword OR Hammer OR Damage=30
     kii: Burrow
   conn UpperWastes.MissilePuzzleLeft:
-    moki, UpperWastes.KeystoneDoor, Burrow:
+    moki, UpperWastes.SandKSDoor, Burrow:
       Bash, DoubleJump OR Dash OR Glide
       Combat=ShieldSlug, DoubleJump OR Dash OR Glide
       Launch
-    gorlek, UpperWastes.KeystoneDoor, Burrow:
+    gorlek, UpperWastes.SandKSDoor, Burrow:
       DoubleJump OR Dash OR Glide OR Sword OR Hammer
       Bash, Grenade=1  # could be moki with some Combat requirement, the jump to the wooden platform might be hard for Moki
-    kii, UpperWastes.KeystoneDoor, Burrow:
+    kii, UpperWastes.SandKSDoor, Burrow:
       Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe, UpperWastes.KeystoneDoor: Burrow
+    unsafe, UpperWastes.SandKSDoor: Burrow
 
 anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right of the sand after the keystone door
   refill Checkpoint
 
-  state UpperWastes.KeystoneDoor:
+  state UpperWastes.SandKSDoor:
     moki, Keystone=2: Burrow
 
   pickup UpperWastes.LedgeEC:
@@ -14736,10 +14736,10 @@ anchor UpperWastes.MissilePuzzleLeft at 1937, -3794:  # Immediately to the right
   pickup UpperWastes.MissileSpawnSL:
     moki: Burrow
   pickup UpperWastes.KSDoorSL:
-    moki: UpperWastes.KeystoneDoor, Burrow
+    moki: UpperWastes.SandKSDoor, Burrow
 
   conn UpperWastes.KeystoneRoom:
-    moki: UpperWastes.KeystoneDoor, Burrow
+    moki: UpperWastes.SandKSDoor, Burrow
   conn UpperWastes.MissilePuzzleMiddle:
     moki: Burrow
 
