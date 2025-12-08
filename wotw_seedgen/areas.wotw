@@ -64,6 +64,7 @@ anchor HeaderStates:  # States you need to resolve by using the !!set command in
 anchor Teleporters:  # teleporter access
   conn MidnightBurrows.Teleporter:
     moki: BurrowsTP, Bash, Keystone=2
+    unsafe: BurrowsTP, Keystone=2, Unpopular OR Shuriken
     # okay, soooo: this TP frequently unlocks exactly 4 pickups (the vanilla keystones in that area)
     # It also makes a 4 keystone door available! Without the Keystone=2 line here, the seed generator
     # picks this path, unlocking 4 pickups, then immediately fills those with keystones and gets stuck
@@ -83,24 +84,33 @@ anchor Teleporters:  # teleporter access
     moki: EastWoodsTP
   conn LowerReach.Teleporter:
     moki: ReachTP, Flap
+    unsafe: ReachTP, Unpopular
   conn UpperDepths.Teleporter:
     moki: DepthsTP, Glide
+    unsafe: DepthsTP, Unpopular
   conn EastPools.Teleporter:
     moki: EastPoolsTP, Water
+    unsafe: EastPoolsTP, Unpopular
   conn WestPools.Teleporter:
-    moki: WestPoolsTP, Water
+    moki: WestPoolsTP, Water, WaterDash
+    unsafe: WestPoolsTP, Unpopular OR Water
   conn LowerWastes.WestTP:
     moki: WestWastesTP
   conn LowerWastes.EastTP:
     moki: EastWastesTP, Burrow
+    unsafe: EastWastesTP, Unpopular
   conn UpperWastes.NorthTP:
     moki: OuterRuinsTP, Burrow
+    unsafe: OuterRuinsTP, Unpopular
   conn WindtornRuins.RuinsTP:
     moki: InnerRuinsTP, Burrow, EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
+    unsafe: InnerRuinsTP, Unpopular
   conn WillowsEnd.InnerTP:
     moki: WillowTP, Burrow
+    unsafe: WillowTP, Unpopular
   conn WillowsEnd.ShriekArena:
     moki: ShriekTP, Burrow
+    unsafe: ShriekTP, Unpopular
 
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
   refill Full
@@ -4224,19 +4234,6 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   quest GladesTown.RebuildTheGlades:
     moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
 
-  pickup GladesTown.ArcingShard:
-    moki, GladesTown.ClearThorns:
-      Bash, Grenade=1
-      Launch
-      TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
-    gorlek, GladesTown.ClearThorns:
-      SentryJump=1, DoubleJump, TripleJump
-      TuleyShop.Lightcatchers, Bash
-    kii, GladesTown.ClearThorns:
-      DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.ClearThorns:
-      GrenadeJump
-      DoubleJump, TripleJump OR Dash
   pickup GladesTown.LupoSwimMiddleSL:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
@@ -4246,12 +4243,14 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   pickup GladesTown.LupoSwimLeftSL:
     moki, GladesTown.ClearThorns: Water, WaterDash OR Launch
     gorlek, GladesTown.ClearThorns: Water, DoubleJump, TripleJump
-    kii, GladesTown.ClearThorns:
-      Water, DoubleJump, Hammer  # wjump+djump+hammer. Possible from both walls
+    # kii, GladesTown.ClearThorns:
+    #  Water, AerialHammerJump
+    #  Water, GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    #  Water, GlideJump, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, GladesTown.ClearThorns:
-      Bash, Grenade=1, Water OR Damage=100  # The grenade has to be launched from the very edge of the platform
-      GrenadeJump, Water OR Damage=100
-      DoubleJump, Water OR Damage=100
+      Water OR Damage=100:
+        Bash, Grenade=1  # The grenade has to be thrown from the very edge of the platform
+        DoubleJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR GlideHammerJump OR CoyoteHammerJump
       WaterDash, Damage=40
   # Disabled for now since seed_core applies a fix by default
   # pickup GladesTown.CaveBurrowSL:
@@ -4259,23 +4258,29 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
 
   conn Teleporters: free
   conn GladesTown.TwillenHome: free
-  conn GladesTown.UpperWest:
+  conn GladesTown.ThornyBranch:
     moki:
-      Launch, DoubleJump OR Dash OR Glide
-      TuleyShop.BlueMoon, Grapple:
-        Bash, Grenade=1
-        Launch
-        TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
-    gorlek:
+      Bash, Grenade=1
       Launch
-      TuleyShop.BlueMoon, Grapple:
-        SentryJump=1
-        TuleyShop.Lightcatchers, Bash
+      TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      SentryJump=1, DoubleJump, TripleJump
+      TuleyShop.Lightcatchers, Bash
+    kii:
+      DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump  # upslash first
+      # SentryJump=1
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer 
     unsafe:
-      SentryJump=2  # from directly below the bridge
-      TuleyShop.Lightcatchers, Bash, Grenade=1, Grapple  # grenadebash
-      DoubleJump, TripleJump  # hardcore parkour
-      GladesTown.ClearThorns, DoubleJump, Dash  # hardcore parkour 2
+      SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump
+      DoubleJump, TripleJump OR Dash OR Hammer OR Sword  # https://youtu.be/_FdDy6sOBns
+  conn GladesTown.UpperWest:  # Make sure it's not redundant with going to GladesTown.ThornyBranch first
+    moki: TuleyShop.BlueMoon, Grapple, Bash, Grenade=1
+    gorlek: TuleyShop.BlueMoon, Grapple, SentryJump=1
+    unsafe:
+      SwordSJump=1  # from the swinging platform
+      HammerSJump=2  # from directly below the bridge. Probably an aerial sjump, which would make it redundant with going to GladesTown.ThornyBranch first but I'm keeping it just in case.
   conn GladesTown.BelowBountyShard:  # paths using the right platforms may want to go through AboveOpher first
     moki:
       Launch
@@ -4289,14 +4294,27 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Bash, Grenade=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # same as above but with bashnade
       Bash, Grenade=2, Dash  # throw your grenade at like 45° and dash to catch it
       TuleyShop.StickyGrass, Grapple, Bash, Grenade=1, Dash
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1, DoubleJump, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # get on the platform above the tp then djump+other option to rech the wall above
+      # SentryJump=1, DoubleJump
+      # SwordSJump=1, Dash
+      # HammerSJump=1, Dash, Shuriken=1 OR Sentry=1
+      # GlideJump, DoubleJump OR Dash OR Hammer
+      # TuleyShop.Lightcatchers, Bash, GlideJump
     unsafe:
-      DoubleJump, Sword  # equip sword on slot 3 so you can upslash
+      DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR BlazeSwap=1 OR Sentry=1 # equip weapon on slot 3 so you can upslash near the TP. Energy weapon does a ceiling jump above the tp
       Bash, Grenade=2
-      #Bash, Grenade=2, Glide OR Sword OR DoubleJump
-      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer
-      SwordSJump=1  # high sjump to reach the wall on the left of the bridge then wall jump and upslash+downslash
+      # Bash, Grenade=2, Glide OR Sword OR DoubleJump
+      GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer OR GlideJump OR PauseFloat OR BlazeSwap=1 OR SentrySwap=1
+      SentryJump=1  # from the tp for sword
+      BlazeSwap=3 OR FlashSwap OR SentrySwap=3 OR WallHammerJump
+      CoyoteHammerJump, Dash OR Flash=1 OR BlazeSwap=1 OR Sentry=1 OR PauseFloat
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      TuleyShop.Lightcatchers, Bash, GlideJump OR GrenadeJump OR CoyoteHammerJump OR BlazeSwap=1 OR SentrySwap=1
       TuleyShop.StickyGrass, Grapple, DoubleJump  # ceiling jump
-  conn GladesTown.AboveOpher:  # paths using the platform left above the coals may want to go to GladesTown.LeftAboveCoals first
+      DoubleJump  # ceiling jumps
+  conn GladesTown.AboveOpher:  # paths using the platform left above the coals may want to go to GladesTown.LeftUpdraft first
     moki:
       Launch OR TuleyShop.SpringPlants
       Flap, Glide
@@ -4307,17 +4325,22 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     kii:
       DoubleJump, Glide OR Dash OR Sword OR Hammer OR Sentry=2  # from where Tuley is. Building the second house makes it harder but still possible
       Dash, Hammer  # coyote dash form where Tuley to the wall, then upslash+dash to reach the platform. Building the second house makes it way harder
-    unsafe:
-      Grenade=1, Sword  # Grenade Pogos. I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
-      GrenadeJump
+      # Glitched
+      # GrenadeJump=2, Glide  # from Tuley to avoid getting stuck by the 2nd hut
+      # GrenadeJump=1, Glide, GlideJump OR Burrow OR Dash OR Sword OR Shuriken=1
+      # GrenadeJump=1, DoubleJump OR Hammer
+    unsafe:  # gjumps goes through GladesTown.LeftUpdraft because it would softlock with the 2nd hut otherwise
+      # Grenade=1, Sword  # Grenade Pogos. Commented because I'm pretty sure this is impossible once you build the second house
       WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
-      Dash, GlideJump  # coyote dash form where Tuley. Building the second house makes it way harder
-      Dash, Burrow  # I'm pretty sure this is impossible once you build the second house but I won't remove the path because I wasn't the one writting it and it's unsafe
-  conn GladesTown.LeftAboveCoals:  # check for redundancies with AboveOpher
+      Dash, GlideJump  # coyote dash from where Tuley. Also possible without a coyote dash once the second hut is built
+      Dash, Burrow  # Pretty sure you need a fake burrow once the 2nd hut is built
+      TuleyShop.Lightcatchers, Bash  # https://youtu.be/dPruhdk4jYs
+  conn GladesTown.LeftUpdraft:  # check for redundancies with AboveOpher
     moki:
       TuleyShop.BlueMoon, Grapple, DoubleJump
       TuleyShop.BlueMoon, TuleyShop.Lightcatchers, Grapple, Bash
     gorlek: TuleyShop.BlueMoon, Grapple
+    unsafe: GrenadeJump
   conn GladesTown.LupoHouse:
     moki: Burrow OR Water
     unsafe:
@@ -4331,12 +4354,39 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       Flap, Glide
       Bash, Grenade=1
     gorlek, GladesTown.TuleySpawned: SentryJump=1 OR Burrow OR Dash
-    kii, GladesTown.TuleySpawned: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.TuleySpawned: GrenadeJump OR GlideJump
+    kii, GladesTown.TuleySpawned:
+      Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
+    unsafe, GladesTown.TuleySpawned: GrenadeJump OR GlideJump OR BlazeSwap=1
   conn EastHollow.OutsideGlades:
     moki: GladesTown.GromsWall
 
 # checkpoint at -297, -4139
+
+anchor GladesTown.ThornyBranch at -330, -4135:  # Next to GladesTown.ArcingShard
+  pickup GladesTown.ArcingShard:
+    moki: GladesTown.ClearThorns
+    
+  conn GladesTown.Teleporter: free
+  conn GladesTown.UpperWest:
+    moki:
+      Launch, DoubleJump OR Dash OR Glide
+      TuleyShop.BlueMoon, Grapple, Launch OR DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch
+      TuleyShop.BlueMoon, Grapple
+    # kii:
+    #   AerialHammerJump, TripleJump OR GlideJump
+    #   GrenadeJump=1, DoubleJump, GlideJump OR TripleJump
+    #   GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      DoubleJump, TripleJump  # hardcore parkour
+      DoubleJump, BlazeSwap=1 OR SentrySwap=1
+      GrenadeJump, DoubleJump
+      AerialHammerJump OR GlideHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      GladesTown.ClearThorns, DoubleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # https://youtu.be/SgMebS4-Aag
+      TuleyShop.Lightcatchers, Bash, Grenade=1  # https://youtu.be/zb09kz4YhX4
 
 anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
   door:
@@ -4374,17 +4424,23 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
       Bash, Grenade=1
       TuleyShop.StickyGrass, Grapple
     gorlek:
-      SentryJump=1
-      TuleyShop.SpringPlants, Sword OR Hammer  # upslash or uphammer
+      Hammer OR SwordSJump=1 
       TuleyShop.Lightcatchers, Bash
-    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: free
+    kii:
+      Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
+    unsafe:  # the springplant is actually a negative here, since it prevent doing a walljump to reach the semisolid
+      GlideJump OR GrenadeJump
   conn GladesTown.Teleporter:
     moki:
       Bash, Grenade=1
       GladesTown.ClearThorns OR DoubleJump OR Launch
     gorlek: SentryJump=1
-    kii: Sword OR Hammer OR Spear=1 OR Damage=20
+    kii:
+      Sword OR Hammer OR Spear=1 OR Damage=20
+      # Glitched
+      # GrenadeJump=1 OR GlideJump
     unsafe: Dash OR Damage=10 OR GlideJump OR GrenadeJump
 
 anchor GladesTown.KeyMokiHutInside at -110, -4571:
@@ -4395,7 +4451,6 @@ anchor GladesTown.KeyMokiHutInside at -110, -4571:
 
   pickup GladesTown.KeyMokiHutSL: free
 
-
 anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twillen
   refill Checkpoint
 
@@ -4403,6 +4458,9 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
     moki: EastPools.HandToHandSpyglass
 
   pickup GladesTown.UpperOre:
+  # Paths using GladesTown.BuildHuts originate from GladesTown.BuiltMotayHut since if you can reach either hut
+  # you can get access that anchor and building the hut also solves the connection towards GladesTown.West
+  # Paths which still uses that state are here because of energy management
     moki:
       Bash, Grenade=1, Launch
       Launch, DoubleJump  # different ways to solve this, should be fine...
@@ -4412,30 +4470,16 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, Dash, Glide
         TuleyShop.Lightcatchers, Bash, DoubleJump, Dash
         TuleyShop.Lightcatchers, Bash, Glide
-      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
-        DoubleJump, Bash, Grenade=2
-        TuleyShop.StickyGrass:
-          DoubleJump, Bash, Grenade=1
-          TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash
-        TuleyShop.Lightcatchers, Bash, Grenade=1
+      GladesTown.BuildHuts, Bash, Grenade=2, DoubleJump OR Dash OR Glide
     gorlek:
       Launch
       TuleyShop.Lightcatchers, Bash, DoubleJump, TripleJump
       TuleyShop.StickyGrass:
-        Bash, Grenade=1, DoubleJump OR Glide  # glide somehow still a bit precise even though you just hold right
-        SentryJump=1, DoubleJump OR Glide  # glide somehow still a bit precise even though you just hold right
-        SentryJump=1, Dash
+        SentryJump=1, DoubleJump OR Glide OR Dash  # glide somehow still a bit precise even though you just hold right
         DoubleJump, TripleJump, Hammer  # upswing to the moss
-        TuleyShop.Lightcatchers, Bash, Grenade=1 OR SentryJump=1  # can still do this with the huts up
-        TuleyShop.Lightcatchers, Bash, DoubleJump  # wrap around
-      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
+      GladesTown.BuildHuts:
         Bash, Grenade=2
-        SentryJump=2, DoubleJump
-        TuleyShop.Lightcatchers, Bash, SentryJump=1
-        TuleyShop.StickyGrass:
-          Bash, Grenade=1, Dash OR Glide OR Sword  # hammer mildly inconsistent
-          SwordSJump=1  # hammer mildly inconsistent
-          TuleyShop.Lightcatchers, Bash
+        TuleyShop.StickyGrass, Bash, Grenade=1, Dash OR Hammer
     kii:
       TuleyShop.Lightcatchers, Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
       TuleyShop.StickyGrass:
@@ -4444,17 +4488,29 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Bash, Grenade=1, Sword, Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1
         TuleyShop.Lightcatchers, Bash, Sword, Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1
         TuleyShop.Lightcatchers, Bash, Hammer, Flash  # Possible with other energy weapons but you need to be careful about not damaging the plant
+      # Glitched
+      # AerialHammerJump
+      # DoubleJump, TripleJump, GlideJump OR GrenadeJump=1
+      # TuleyShop.StickyGrass:
+      #   SentryJump=1
+      #   GlideJump, DoubleJump
+      #   GlideJump, Spear=1, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # GladesTown.BuildHuts:
+      #   HammerSJump=2  # SwordSJump is redundant with going to GladesTown.BuiltMotayHut first
+      #   GrenadeJump=2, DoubleJump OR Dash OR Hammer
+      #   GrenadeJump=1, TuleyShop.StickyGrass, DoubleJump OR Dash OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       SentryJump=2  # Midairs
-      GladesTown.BuildHuts:  # paths using the right hut's platform may prefer to go to MotayHut
-        Bash  # use both slimes
-        DoubleJump, TripleJump, GlideJump
-      TuleyShop.Lightcatchers, Bash, Grenade=1
       DoubleJump, TripleJump, Dash OR Glide  # using the ceiling from the left
-      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Hammer OR Sword
-      TuleyShop.StickyGrass, Bash, Grenade=1, Sword
+      AerialHammerJump OR GlideHammerJump
+      GrenadeJump, DoubleJump
+      Bash  # https://youtu.be/WNqAS4gtsz8
+      TuleyShop.StickyGrass:
+        TuleyShop.Lightcatchers, Bash, Hammer OR Sword
+        Bash, Grenade=1, Sword
+        GlideJump, DoubleJump OR Hammer OR Spear=1
 
-  conn GladesTown.MotayHut:
+  conn GladesTown.BuiltMotayHut:
     moki, GladesTown.BuildHuts:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
@@ -4469,15 +4525,17 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Hammer, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe, GladesTown.BuildHuts:
-      GrenadeJump
+      GrenadeJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR PauseFloat
       Bash  # slime lure
-      TuleyShop.SpringPlants, Hammer, Dash  # uphammer bounce
+      TuleyShop.SpringPlants, Hammer  # uphammer bounce
       Dash  # late coyote
       Sword  # high jump, full combo, upslash and then downslash (all while holding right)
       # Dash, Glide OR Sword OR Hammer
       Hammer, Glide, Blaze=1 OR Spear=1
-  conn WestGlades.PastTown:
+  conn WestGlades.RightLowerPool:
     moki:
       Bash, DoubleJump OR Dash
       Launch
@@ -4490,7 +4548,6 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
     kii:
       Bash, Sword OR Hammer
       Bash, Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
-      Dash, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, TripleJump OR Dash
       Sword, DoubleJump, Damage=10
       Combat=2xWeakSlug, DoubleJump, Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
@@ -4498,6 +4555,16 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, Damage=10, Glide OR Hammer
       Combat=2xWeakSlug, DoubleJump, Glide, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump
+      # SwordSJump=1, Damage=10  # dboost in spikes at the end to sjump to the anchor
+      # Combat=2xWeakSlug, GrenadeJump=1, Damage=10:  # gjump from the spikes to reach the anchor
+      #   Damage=10, DoubleJump OR Dash OR Glide
+      #   DoubleJump, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      #   Dash, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
+      #   Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Sword, GrenadeJump=1, Damage=10  # same as above
+      # Combat=2xWeakSlug, GlideJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
     unsafe:
       Bash, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
       Combat=2xWeakSlug, DoubleJump, Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
@@ -4505,12 +4572,15 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       Combat=2xWeakSlug, PauseFloat, Damage=10
       Combat=2xWeakSlug, DoubleJump, Glide
       SwordSJump=1, Damage=10
-      HammerSJump=1, Damage=20
+      HammerSJump=1, Damage=10, Damage=10 OR HammerSJump=1  #  sjump at the start to avoid a dboost
       Dash, Hammer
       #Dash, Sword, Damage=30  # damage depending on how often you fail the last jump (10 is minimum)
       Damage=10, Bash OR Sword
       DoubleJump, Dash, Damage=10  # damage for avoiding slimes
       DoubleJump, TripleJump OR Sword OR Hammer
+      GrenadeJump, DoubleJump
+      Combat=2xWeakSlug, GrenadeJump, Shuriken=4, Damage=10
+      GlideHammerJump
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
     moki:
@@ -4518,11 +4588,10 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       TuleyShop.BlueMoon, Grapple
       TuleyShop.StickyGrass, Grapple, Glide
     gorlek: TuleyShop.Lightcatchers, Bash, Dash, Sword OR Hammer
-    kii:
-      #GladesTown.BuildHuts, Dash, Sword  # Redundant with TwillenHome -> Teleporter
-      GladesTown.BuildHuts, Dash, Glide
-      #GladesTown.BuildHuts, Sword, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # Redundant with TwillenHome -> Teleporter
-  conn GladesTown.UpperWest:  # paths that use the huts may want to go to MotayHut first; check for redundancies with Teleporter
+    kii: GladesTown.BuildHuts, Dash, Glide
+  conn GladesTown.UpperWest:
+  # Paths using GladesTown.BuildHuts originate from GladesTown.BuiltMotayHut since if you can reach either hut
+  # you can get access that anchor and building the hut also solves the connection towards GladesTown.West
     moki:
       TuleyShop.StickyGrass, Launch
       TuleyShop.Lightcatchers, Bash:
@@ -4550,6 +4619,12 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       TuleyShop.StickyGrass:
         DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # condition for reaching the bridge
         Grapple, DoubleJump, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # TuleyShop.Lightcatchers:
+      #   Bash, AerialHammerJump
+      #   Bash, GlideJump, Sword OR Hammer
+      # TuleyShop.StickyGrass, AerialHammerJump, Dash OR Glide OR Sword
+      # TuleyShop.StickyGrass, GlideJump, DoubleJump, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Grenade=2, DoubleJump, Sword  # Midair Grenade Pogo
       TuleyShop.Lightcatchers, Bash  # Use the slimes to reach the plant above Motay then bash glide to the bridge
@@ -4557,39 +4632,40 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
         DoubleJump, TripleJump
         Grapple, DoubleJump, Dash, Glide
 
-anchor GladesTown.MotayHut at -394, -4135: # In front of the house hovering above Motay
-  nospawn
-
-  door:
-    id: 5
-    target: GladesTown.MotayHutInside
-    enter:
-      moki: GladesTown.BuildHuts
-  # This refill does not work in entrance randomizer
-  # refill Checkpoint:
-  #   unsafe: GladesTown.BuildHuts  # Exit the house for a checkpoint
-
+anchor GladesTown.BuiltMotayHut at -394, -4135: # In front of the house hovering above Motay
   pickup GladesTown.UpperOre:
     moki, GladesTown.BuildHuts:
       Bash, Grenade=2
+      TuleyShop.StickyGrass:
+        Bash, Grenade=1
+        TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash
+      TuleyShop.Lightcatchers, Bash, Grenade=1
       Launch
     gorlek, GladesTown.BuildHuts:
-      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash, Glide  # holding right works
-      SentryJump=2
-      TuleyShop.StickyGrass, SentryJump=1
-    kii, GladesTown.BuildHuts, TuleyShop.BlueMoon, Grapple, Bash, Grenade=1:  # grapple the right plant to reach the house above
-      DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
-      Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      TuleyShop.StickyGrass, GrenadeJump  # you can Grenadejump as you exit the unbuilt house and grab the moss
-      GladesTown.BuildHuts:
-        GrenadeJump
-        TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, Dash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat  # grapple the right plant to reach the house above
-        TuleyShop.BlueMoon, Grapple, Bash, Grenade=1, DoubleJump  # grapple the right plant to reach the house above
+      TuleyShop.Lightcatchers, Bash, TuleyShop.StickyGrass, Hammer
+      SentryJump=1, SentryJump=1 OR TuleyShop.StickyGrass
+      TuleyShop.Lightcatchers, Bash, SentryJump=1
+    kii, GladesTown.BuildHuts:
+      TuleyShop.StickyGrass, TuleyShop.Lightcatchers, Bash
+      TuleyShop.BlueMoon, Grapple, Bash, Grenade=1:  # grapple the right plant to reach the house above
+        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+        Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=2 OR SentryJump=1
+      # TuleyShop.BlueMoon, Grapple, GrenadeJump=1:  # grapple the right plant to reach the house above
+      #   DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
+      #   Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=2 OR Flash=2 OR Sentry=2
+    unsafe, GladesTown.BuildHuts:
+      GrenadeJump OR SentryJump=1
+      TuleyShop.BlueMoon, Grapple, DoubleJump, TripleJump
 
+  conn GladesTown.MotayHutDoor:
+    GladesTown.BuildHuts
   conn GladesTown.West:
-    GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform from the hanging lantern below
+    moki: GladesTown.BuildHuts OR TuleyShop.Lightcatchers # either the hut platform or the platform from the hanging lantern below
+    unsafe: free
+  conn GladesTown.TwillenHome: free
   conn GladesTown.UpperWest:
     moki, GladesTown.BuildHuts:
       Bash, Grenade=2, Dash  # 1 extra grenade if you hit the Lightcatcher
@@ -4599,15 +4675,39 @@ anchor GladesTown.MotayHut at -394, -4135: # In front of the house hovering abov
       Bash, Grenade=1
       SentryJump=1, DoubleJump, TripleJump OR Dash
       TuleyShop.Lightcatchers, Bash, Dash
+    # kii, GladesTown.BuildHuts:
+    #   GlideJump, DoubleJump, TripleJump OR Hammer  # condition to reach the 2nd hut from GladesTown.West
     unsafe, GladesTown.BuildHuts:
       GrenadeJump, DoubleJump OR Dash  # Midair Grenade Jump with auto-cancel  # dash is much harder
       SwordSJump=1, Dash
       TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
+      GlideJump, DoubleJump, TripleJump OR Hammer OR Sword OR Spear=1 OR BlazeSwap=1 OR SentrySwap=1
+      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+
+anchor GladesTown.MotayHutDoor at -394, -4135:  # Specifically exiting Motay's hut
+# This anchor is for paths which would only work when exiting Motay's hut.
+# They can't originate from GladesTown.MotayHutInside because it wouldn't work with door randomization
+# They also can't originate from GladesTown.BuiltMotayHut because it wouldn't work out of a teleportation
+  nospawn
+
+#  refill Checkpoint:
+#    unsafe: GladesTown.BuildHuts  # Exiting the hut activates a checkpoint but it doesn't work with door randomization (because entering this door doesn't always connect to an open door)
+
+  door:
+    id: 5
+    target: GladesTown.MotayHutInside
+    enter:
+      moki: GladesTown.BuildHuts
+
+  pickup GladesTown.UpperOre:
+    unsafe: TuleyShop.StickyGrass, GrenadeJump  # you can Grenadejump as you exit the unbuilt house and grab the moss
+
+  conn GladesTown.BuiltMotayHut: free
 
 anchor GladesTown.MotayHutInside at -182, -4589:  # Inside the house hovering above Motay
   door:
     id: 6
-    target: GladesTown.MotayHut
+    target: GladesTown.MotayHutDoor
     enter: free
 
   pickup GladesTown.MotayHutSL: free
@@ -4622,13 +4722,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
   # refill Checkpoint:
   #   unsafe: GladesTown.OnwardsAndUpwards  # Enter the house for a checkpoint
 
-  pickup GladesTown.ArcingShard:
-    moki, GladesTown.ClearThorns:
-      DoubleJump OR Dash OR Glide OR Launch
-      TuleyShop.Lightcatchers, Bash  # somehow I don't think this path is very relevant
-      TuleyShop.BlueMoon, Grapple
-    gorlek: GladesTown.ClearThorns, Sword OR Hammer
-    kii, GladesTown.ClearThorns: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+
   pickup GladesTown.UpperLeftSL:
     moki:
       Bash, Grenade=1
@@ -4641,6 +4735,8 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     kii:
       TuleyShop.StickyGrass, Grapple, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # Jump from the branch on the right of the grass
       TuleyShop.BlueMoon, Grapple, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump
     unsafe: free  # https://youtu.be/3rxIf0qIUNc
       #DoubleJump
       #Sword, Grenade=1 OR Shuriken=2  # pogo
@@ -4655,14 +4751,27 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       DoubleJump, SentryJump=1
       DoubleJump, TripleJump
       TuleyShop.BlueMoon, Grapple
-    kii: Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # grenade bash under GladesTown.UpperLeftEX
+    kii:
+      Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # grenade bash under GladesTown.UpperLeftEX
+      # Glitched
+      # AerialHammerJump  # from under GladesTown.UpperLeftEX
+      # SentryJump=1
+      # Bash, Grenade=1, GlideJump
     unsafe:
-      DoubleJump
+      DoubleJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       Bash, Grenade=1
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
 
-  conn GladesTown.MotayHut:  # check for redundancies with GladesTown.West
+  conn GladesTown.ThornyBranch:
+    moki:
+      DoubleJump OR Dash OR Glide OR Launch
+      TuleyShop.Lightcatchers, Bash  # somehow I don't think this path is very relevant
+      TuleyShop.BlueMoon, Grapple
+    gorlek: Sword OR Hammer
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: PauseFloat
+  conn GladesTown.BuiltMotayHut:  # check for redundancies with GladesTown.West
     moki, GladesTown.BuildHuts:
       DoubleJump OR Dash OR Glide
       TuleyShop.BlueMoon, Grapple
@@ -4675,13 +4784,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     gorlek: Sword OR Hammer
   conn GladesTown.TwillenHome: free
   conn GladesTown.Teleporter:
-    moki:
-      Dash OR Glide
-      TuleyShop.Lightcatchers, Bash
-      TuleyShop.BlueMoon, Grapple
-    gorlek: Sword OR Hammer
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: free
+    unsafe: free  # drop down from the right and hold right. Unsafe because it's unclear where the ground becomes solid
 
 anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with the herbs moki
   door:
@@ -4695,9 +4798,11 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
     kii:
       Bash, Grenade=1  # drop through the floor before throwing your grenade
       Hammer
+      # Glitched
+      # GrenadeJump=1
     unsafe:
-      Sword OR Spear=1 # upslash+downslash
-      GrenadeJump
+      Sword  # upslash+downslash
+      Spear=1 OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
 
 anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
   door:
@@ -4721,8 +4826,11 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       SentryJump=1, Damage=10 OR GladesTown.ClearThorns
       Hammer, Dash
       TuleyShop.SpringPlants
-    kii: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: Dash
+    kii:
+      Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Dash OR Sword OR HammerSJump=1 OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
   pickup GladesTown.CaveBurrowSL:
     moki: Burrow, DoubleJump OR Launch
     gorlek: Burrow  # Burrow Dash out of the sand
@@ -4736,10 +4844,13 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       Bash, Grenade=1
       Hammer, Dash
       SentryJump=1
-    kii, GladesTown.ClearThorns: Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.ClearThorns: Dash
+    kii, GladesTown.ClearThorns:
+      Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe, GladesTown.ClearThorns: Dash OR Sword OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
 
-anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at the door
+anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at the door
   door:
     id: 14
     target: GladesTown.AcornMoki
@@ -4749,22 +4860,23 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
     moki: BreakCrystal
 
   quest GladesTown.AcornQI:
+  # Flash=3 do the swim / Flash=2 go above the entrance
     moki:
-      Flash, Water, Glide
-      Flash, Water, DoubleJump, Dash
-      Flash, Bash, Grenade=1
-      Flash, Launch
+      Flash=3:
+        Water, Glide
+        Water, DoubleJump, Dash
+      Flash=2:
+        Bash, Grenade=1
+        Launch
     gorlek:
-      Flash:
-        Water, DoubleJump OR Dash OR Sword OR Hammer
-        SentryJump=1
+      Flash=3, Water, DoubleJump OR Dash OR Sword OR Hammer
+      Flash=2, SentryJump=1
       Bow=4:  # bow refills light
         Launch
         Bash, Grenade=1
         SentryJump=1
     kii:
-      Flash:
-        DoubleJump, TripleJump
+      Flash=3:
         Water, Shuriken=2 OR Blaze=3 OR Sentry=2
         Water, Damage=10, Shuriken=1 OR Blaze=1 OR Sentry=1 OR Spear=1
         Damage=32, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2  # That particular water only deals 4 damage per tic
@@ -4776,19 +4888,21 @@ anchor GladesTown.AcornCave at -50, -4510: # Inside the cave with the acorn at t
         Water, Damage=10, Damage=10
         Damage=10, Damage=42
         WaterDash, Damage=10, Damage=26
-      Bow=4, DoubleJump, TripleJump
+      DoubleJump, TripleJump, Flash=2 OR Bow=4
+      # Glitched
+      # Bow=4 OR Flash=2:
+      #   AerialHammerJump OR GrenadeJump=1
     unsafe:
-      Flash:
-        Water OR Damage=36  # use Flash for mobility as well
-        GrenadeJump
-      Bow=2:
+      Flash=2, Water OR Damage=32  # use Flash for mobility as well
+      Flash=2, WaterDash, Damage=16
+      BowCancel, Water, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR Damage=10  # Slide the wall to avoid a dboost in the first spikes and let bow cancel itself by entering water. Might be possible without the condition with a good corner boost above the spikes. The best I got touched the spikes just above the water.
+      DoubleJump, GlideJump, Flash=2  # glide jump -> djump -> flash is enough the get a walljump which reset your djump to go above the entrance
+      Bow=2 OR Flash=1 OR BreakCrystal:  # https://youtu.be/n5A8F_-jcbM I haven't tested all the crystal variation but Tjump+spear/sentry and Djump+Hammer work so it's probably fine
         Launch
         Bash, Grenade=1
         SentryJump=1
         GrenadeJump
-        DoubleJump, TripleJump  # off the left wall
-        Water, WaterDash, Damage=10 OR DoubleJump OR Glide
-      # Grenade=4  # grenade jumps and light refills, very nasty strat
+        DoubleJump, TripleJump OR Hammer  # off the left wall
       DoubleJump, TripleJump, Grenade=2, Water OR Damage=10  # light refills, NO GRENADE JUMPS, Small Dirty Water Dboost
       DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
 
@@ -4802,25 +4916,34 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
     gorlek:
       DoubleJump, TripleJump
       SentryJump=1
-      TuleyShop.StickyGrass, DoubleJump OR Grapple
+      TuleyShop.StickyGrass, DoubleJump
+      TuleyShop.StickyGrass, Grapple, Sword OR Hammer
     kii:
-      DoubleJump, Hammer OR Spear=1 OR Sentry=1 OR Flash=1
+      DoubleJump  # From GladesTown.AboveTpEX. Either wrap around the left wall or wall jump to the right wall to reach the platform on the left
+      TuleyShop.StickyGrass, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # The jump to the shard is possible without using any energy weapons but pretty precise
+      # Glitched
+      # GlideJump, DoubleJump
+      # GrenadeJump=1, TuleyShop.StickyGrass OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR GrenadeJump=1
     unsafe:
-      DoubleJump
-      GrenadeJump
+      GrenadeJump OR GlideJump
+      TuleyShop.StickyGrass, Grapple
 
   conn GladesTown.Teleporter: free
-  conn GladesTown.LeftAboveCoals:
+  conn GladesTown.LeftUpdraft:
     moki:
       Glide
       DoubleJump, Dash
       TuleyShop.Lightcatchers, Bash, DoubleJump OR Dash OR Glide
     gorlek:
       DoubleJump OR Dash OR Glide  # Sword is possible but TuleyShop.Lightcatchers makes is awkward
-      TuleyShop.Lightcatchers, Bash
-    kii: Sword OR Hammer OR Sentry=2 OR Blaze=4
+    kii:
+      Sword OR Hammer OR Sentry=2 OR Blaze=4
+      TuleyShop.Lightcatchers, Bash, Shuriken=1 OR Flash=1 OR Sentry=1  # You can still bash the second plant if the first one gets destroyed
+    unsafe:
+      PauseFloat OR Blaze=3 OR BlazeSwap=1 OR SentrySwap=1
+      TuleyShop.Lightcatchers, Bash  # unclear where the drop down ends
 
-anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to the left above the coals near Opher
+anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the left above the coals near Opher
   pickup GladesTown.UpdraftCeilingSL:
     moki:
       DoubleJump OR Launch
@@ -4835,6 +4958,8 @@ anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to 
       Dash OR Spear=1  # coyote dash or spear under the pickup
       Bash, Grenade=1
       TuleyShop.SpringPlants, Sentry=3
+      # Glitched
+      # GlideJump OR GrenadeJump=1
     unsafe:
       Sword OR GrenadeJump OR GlideJump
       TuleyShop.SpringPlants, PauseFloat
@@ -4852,8 +4977,11 @@ anchor GladesTown.LeftAboveCoals at -239, -4136:  # On the platform hovering to 
   conn GladesTown.AboveOpher:
     moki: DoubleJump
     gorlek: Dash OR Glide
-    kii: Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
-    unsafe: Blaze=1
+    kii:
+      Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR Flash=1 OR Spear=1
+      # Glitched
+      # GrenadeJump=1
+    unsafe: Blaze=1 OR GrenadeJump
 
 anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
   door:
@@ -4865,7 +4993,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
   # refill Checkpoint:
   #   unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
-  conn GladesTown.LeftAboveCoals: free
+  conn GladesTown.LeftUpdraft: free
   conn GladesTown.PlayfulMoki:
     moki:
       Launch
@@ -4880,17 +5008,23 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
     kii:
       Bash, Grenade=1
       TuleyShop.SpringPlants, Spear=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1 OR AerialHammerJump
+      # GlideJump, DoubleJump, Hammer
     unsafe:
-      SwordJump OR GrenadeJump
+      SwordJump OR GrenadeJump OR CoyoteHammerJump OR WallHammerJump
+      DoubleJump, Hammer OR GlideJump
       TuleyShop.SpringPlants, Grenade=1 OR GrenadeCancel  # increased height bounce
   conn TuleyShop:  # check for redundancies with Teleporter
     moki, GladesTown.TuleySpawned:
       Glide
       GladesTown.RoofsOverHeads, Dash
-    gorlek: GladesTown.TuleySpawned, Dash, Sword OR Hammer
-    kii: GladesTown.TuleySpawned, Blaze=2 OR Sentry=1 OR Flash=1 OR Shuriken=1
-    unsafe: GladesTown.TuleySpawned, Spear=2
-    # seed paths tbd if ever necessary
+    gorlek, GladesTown.TuleySpawned:
+      Sword
+      GladesTown.RoofsOverHeads, Hammer
+    kii, GladesTown.TuleySpawned:
+      Shuriken=1 OR Blaze=2
+      TuleyShop.Lightcatchers, Bash
 
 anchor GladesTown.StorageHut at -119, -4605:
   door:
@@ -4898,8 +5032,12 @@ anchor GladesTown.StorageHut at -119, -4605:
     target: GladesTown.AboveOpher
     enter: free
 
-anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather play
-  conn GladesTown.HoleHut:
+anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki above the storage hut
+  pickup GladesTown.UpdraftCeilingSL:
+    gorlek: Dash OR Glide
+    kii: Sword
+  
+  conn GladesTown.BelowHoleHut:
     moki:
       TuleyShop.SpringPlants OR DoubleJump OR Launch
       Bash, Grenade=1
@@ -4907,12 +5045,14 @@ anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki who would rather pl
     gorlek:
       Hammer OR SwordSJump=1
       TuleyShop.BlueMoon, Grapple
-    unsafe: Sword OR Dash OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump
+    # kii:
+    #   GrenadeJump=1 OR GlideJump
+    unsafe: Sword OR Dash OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap
   conn GladesTown.AboveOpher: free
   conn TuleyShop:  # check for redundancies with AboveOpher and Teleporter
     moki: GladesTown.TuleySpawned, Dash
-    gorlek: GladesTown.TuleySpawned, Sword OR Hammer
-    kii: GladesTown.TuleySpawned, Blaze=1 OR Spear=1
+    gorlek: GladesTown.TuleySpawned, Hammer
+    kii: GladesTown.TuleySpawned, Blaze=1
     # seed paths tbd if ever necessary
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
@@ -4923,6 +5063,9 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
 
   pickup GladesTown.LupoSwimHC:
     moki: Water, Burrow
+    unsafe:
+      Burrow, Damage=80
+      Burrow, WaterDash, Damage=40
   pickup GladesTown.LupoSwimMiddleSL:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
     unsafe:
       Damage=100 # just wall jump between both walls
@@ -4948,19 +5091,19 @@ anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's h
   pickup LupoShop.ShardMapIcon:
     moki: SpiritLight=1200
 
-anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
+anchor GladesTown.BelowHoleHut at -214, -4111:  # The ledge below Hole Hut
   pickup GladesTown.BelowHoleHutSL: free
-  pickup GladesTown.UpdraftCeilingSL:
-    gorlek: Dash OR Glide
-    kii: Sword
 
   conn GladesTown.HoleHutEntrance:
     moki:
       Bash, Grenade=1
       TuleyShop.SpringPlants OR DoubleJump OR Dash OR Launch
     gorlek: Glide OR Sword OR HammerSJump=1
-    kii: Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: GrenadeJump
+    kii:
+      Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1
+    unsafe: GrenadeJump OR Blaze=2 OR BlazeSwap=1 OR FlashSwap OR PauseFloat
   conn LowerReach.VeralHome:
   # Sword, Dash, Glide, DoubleJump, Lightcatchers Bash, Grenade, Hammer, Blaze, Shuriken, Sentry, and Flash can all individually get you from branch to reachpath
     moki:
@@ -4977,16 +5120,21 @@ anchor GladesTown.HoleHut at -214, -4111:  # The ledge below Hole Hut
       SentryJump=1  # Weapon Float, works from a standing sjump on the ledge
       TuleyShop.BlueMoon, Grapple, Glide OR Sword OR Hammer
       TuleyShop.StickyGrass, Grapple, Glide OR Sword
+      TuleyShop.SpringPlants, Bash, Grenade=1, TuleyShop.Lightcatchers OR Grenade=1 OR DoubleJump OR Dash OR Glide OR Sword OR Hammer  # Start from GladesTown.PlayfulMoki. Jump on the spring to reach your grenade
     kii:
       DoubleJump, Hammer
       TuleyShop.BlueMoon, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       TuleyShop.StickyGrass, Grapple, Hammer OR Shuriken=3 OR Flash=3 OR Sentry=3
       TuleyShop.SpringPlants, TuleyShop.StickyGrass, Grapple, Shuriken=2 OR Flash=2 OR Sentry=2
+      # Glitched
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR GrenadeJump=1
+      # GrenadeJump=1, TuleyShop.Lightcatchers, Bash
+      # GlideJump, DoubleJump OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
-      GrenadeJump
+      GrenadeJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
       TuleyShop.BlueMoon, Grapple, Blaze=1
       TuleyShop.SpringPlants, Hammer  # Uphammer Bounce
-      TuleyShop.StickyGrass, Grapple, Sword OR Hammer OR Blaze=1 OR Shuriken=1 OR Sentry=1 OR Flash
+      TuleyShop.StickyGrass, Grapple, Sword OR Hammer # OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  I don't think those are possible?
       DoubleJump, Glide
   conn GladesTown.PlayfulMoki: free
 
@@ -5001,7 +5149,7 @@ anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup
   # refill Checkpoint:
   #   unsafe: GladesTown.RoofsOverHeads  # Enter the house for a checkpoint
 
-  conn GladesTown.HoleHut: free
+  conn GladesTown.BelowHoleHut: free
 
 anchor GladesTown.InsideHoleHut at -107, -4506:  # Inside the hut with 2 pickups
   door:
@@ -5019,23 +5167,25 @@ region WestGlades:
   kii: free
   unsafe: free
 
-anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool in WestGlades
+anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower pool in WestGlades
   refill Checkpoint
   refill Energy=3:
     # paths using energy or health AFTER grabbing the refill would be invalid here because they would misrepresent the resulting health or energy
     moki, BreakCrystal:
       DoubleJump, Dash OR Glide
       Launch
-    gorlek, Bow=1 OR Grenade=1:
+    gorlek, Bow=1 OR Grenade=1 OR Sentry=1:
       Water  # break the crystal from afar and jump into the water to get the energy
       Glide  # break the crystal from afar and use glide to collect the energy midair
       DoubleJump, TripleJump  # break the crystal from afar and use triple jump to collect the energy midair
     kii:
-      Bow=1 OR Shuriken=1 OR Grenade=1:
+      Bow=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1:
         Water OR DoubleJump OR Dash OR Glide OR Hammer OR Sword
       Water OR Glide:
         Sword
         Hammer, DoubleJump OR Dash
+      # Glitched
+      # AerialHammerJump
 
   state GladesTown.GromsWall:
     unsafe: LaunchBashChain  # https://www.youtube.com/watch?v=edSpqN0b4UY
@@ -5054,14 +5204,17 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Bash, WaterDash, Water, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       Bash, WaterDash, Damage=20, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, Hammer
+      # Glitched
+      # GrenadeJump=1
+      # GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
       Sword  # https://youtu.be/S9-y-ZoP7sQ
       DoubleJump  # https://youtu.be/Sh6buQ1hfCc
       Bash, Bow=1  # Bow to aggro the tentacle (by hitting its mouth)
       Bash, Water OR Hammer OR Damage=40 OR GlideJump OR PauseFloat
       Bash, Damage=20, WaterDash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      GlideJump, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+      GlideJump, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR WallHammerJump OR CoyoteHammerJump
   pickup WestGlades.AboveTentacleSL:
     moki:
       Bash, DoubleJump, Dash OR Glide
@@ -5080,12 +5233,25 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
       DoubleJump, TripleJump, Sword  # reset jumps with sword
       Combat=Tentacle, DoubleJump, TripleJump, Hammer OR Spear=1
+      # Glitched
+      # GlideJump, Bash
+      # Combat=Tentacle, GlideJump, DoubleJump
+      # AerialHammerJump OR SentryJump=1
+      # Combat=Tentacle, GrenadeJump=1, DoubleJump  # possible with a lot more abilities than djump but the left wall can be really annoying when wjumping from the very top
     unsafe:
       Bash, GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
       DoubleJump, Sword  # Pogo the projectile to pass above the tentacle
-      Combat=Tentacle, SwordSJump=1
+      SentryJump=1 OR GlideHammerJump OR WallHammerJump
       Combat=Tentacle, GlideJump, DoubleJump
+      GlideJump, Hammer, Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # glide jump + upslash to reach the left wall
       Combat=Tentacle, DoubleJump, Spear=2  # extend jumps momentum with spears
+      DoubleJump, Hammer  # https://youtu.be/W4fluh2A7Lo
+      DoubleJump, TripleJump, Dash  # Dash ramp from the wooden platform
+      Combat=Tentacle, GrenadeJump:
+        DoubleJump OR Dash OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Water, WaterDash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        Damage=20, WaterDash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        PauseFloat, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # DiveLaunch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Flap OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   pickup WestGlades.LowerPoolSL:
     moki: Water
@@ -5097,7 +5263,7 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Damage=40
       Damage=20, WaterDash
 
-  conn WestGlades.LowerPool:
+  conn WestGlades.LeftLowerPool:
     moki:
       Water OR Launch
       Combat=Tentacle, DoubleJump, Dash OR Glide
@@ -5105,25 +5271,34 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
     gorlek:
       Bash, DoubleJump OR Dash OR Grenade=1
       DoubleJump, Damage=10 OR Combat=Tentacle
-      Dash, Damage=10 OR Combat=Tentacle
+      Dash, Damage=10 OR Combat=Tentacle OR Bash
       WaterDash, Damage=20, Bash
       SentryJump=1, Glide, Bash OR Damage=10 OR Combat=Tentacle
     kii:
       Damage=80, Damage=40
-      WaterDash, Damage=20, Combat=Tentacle, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      WaterDash, Damage=20, Damage=10, Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      WaterDash, Damage=20, Combat=Tentacle OR Damage=10:
+        Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
       Bash OR Combat=Tentacle OR Damage=10:
         Sword OR Hammer
         Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Glide, Damage=20
-      DoubleJump, TripleJump, Sword  # Reset jumps on first tentacle
+      # Glitched
+      # GlideJump, Combat=Tentacle OR Bash OR Damage=10
+      # GrenadeJump=1, Glide, Bash OR Damage=10 OR Combat=Tentacle
+      # GrenadeJump=1, Bash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, Combat=Tentacle OR Damage=10:
+      #   Shuriken=1, Shuriken=1 OR Damage=20  # use a shuriken to pass above the 2nd tentacle (more energy efficient than a 2nd grenade jump)
+      #   GrenadeJump=1, Blaze=2 OR Flash=1 OR Sentry=1  # same as above but sjump inbetween the two log in the water
+      #   Damage=20, Blaze=2 OR Flash=1 OR Sentry=1  # same as above but swim in the poisonous water
     unsafe:
-      Bash
-      DoubleJump, Sword  # Pogo the projectile to pass above the tentacle
-  conn WestGlades.Center:  # Make sure it's not redundant with PastTown->LowerPool->Center
-    unsafe:
-      SwordSJump=2, Damage=20  # defeating the enemy and sword floating
-      DoubleJump, TripleJump, Dash, Water OR Combat=Tentacle
+      Bash, Bow=1  # Bow to aggro the tentacle (by hitting its mouth
+      Bash, Grenade=2  # first grenade break the cristal
+      Bash, PauseFloat OR Damage=40  # jump in the water and bait the tantacle from here
+      WaterDash, Damage=20, Damage=10, Damage=10 OR Combat=Tentacle  #  wdash on the wooden platform to regen, kill/dboost the first tentacle then take a dboost of the 2nd tentacle to avoid a water tick
+      GlideJump, Combat=Tentacle OR Bash OR Damage=10
+      GrenadeJump, Combat=Tentacle OR Bash OR Damage=10:
+        Glide OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
+      GrenadeCancel, Bash, Damage=20  # bait the tentacle from the water
+      PauseFloat, Combat=Tentacle OR Bash OR Damage=10
   conn GladesTown.West:
     moki:
       Bash, DoubleJump OR Dash OR Glide
@@ -5139,16 +5314,19 @@ anchor WestGlades.PastTown at -545, -4113:  # The right edge of the lower pool i
       Sword, Dash, Spear=1 OR Shuriken=1 OR Damage=10
       Hammer, Damage=10, DoubleJump OR Dash
       Hammer, Glide, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump OR GlideJump  # glidejump from the anchor to the pole directly
+      # HammerSJump=1, Shuriken=1 OR Sentry=1
+      # GrenadeJump, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3  # no energy cost because grabbing the pole will refund your energy
+      # GrenadeJump, Damage=10, Shuriken=1 OR Sentry=2  # dboost in the spikes at the start to preserve a bit of energy
     unsafe:
-      HammerSJump=1
+      HammerSJump=1 OR GlideJump OR CoyoteHammerJump
+      GrenadeJump  # https://youtu.be/Q-nM7alse8o
       DoubleJump, Glide  # verified damageless
-      Glide  # GlideJump
-      # kii paths without the friendly spikes dboosts
       Sword, Dash
-      Hammer, DoubleJump OR Dash
-      Hammer, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
+      Hammer, DoubleJump OR Dash OR Glide OR Damage=10  # https://youtu.be/vtrXR8WGl_w
 
-anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool in WestGlades
+anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower pool in WestGlades
   pickup WestGlades.LeftOre:
     moki: Grapple, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
@@ -5161,17 +5339,25 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
       DoubleJump, TripleJump, Damage=10, Dash OR Glide OR Sword OR Hammer
       DoubleJump, Damage=30, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
       Grapple, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SwordSJump=1, Damage=10  # sjump from spikes
+      # GlideJump, DoubleJump, TripleJump
+      # AerialHammerJump, TripleJump OR Dash OR GlideJump  # no dboost path because depending on where you land in the spikes a standard hjump won't reach the wall
+      # GrenadeJump=1, Damage=10, DoubleJump OR Dash OR Grapple  # gjump from the spikes. Could work with other skills in the condition but they are much harder tp catch the wall with if you fall into a pit 
     unsafe:
       Bash, DoubleJump
-      Grapple, Spear=1 OR Blaze=1 OR Damage=20
+      Grapple, Spear=1 OR Blaze=1 OR Damage=20 OR GrenadeCancel OR PauseFloat
       Bash, Glide, SwordSJump=1
-      DoubleJump, TripleJump, Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
+      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer OR Damage=10 OR Shuriken=2 OR Sentry=2
       DoubleJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2:
         Damage=10
       DoubleJump, Damage=20, Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
-      GrenadeJump, DoubleJump OR Dash OR SentryJump=1 OR Damage=10
-      SentryJump=2
+      GrenadeJump, DoubleJump OR Dash OR SwordSJump=1 OR Damage=10
+      SwordSJump=2  # precise sword float to the safe ledge on the very left
+      SentryJump=1, Damage=10
+      GlideJump, DoubleJump
+      AerialHammerJump OR GlideHammerJump OR BlazeSwap=3 OR FlashSwap OR SentrySwap=3
   pickup WestGlades.SwimEC:
     moki: Water
     kii:
@@ -5200,16 +5386,24 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
       Grapple, DoubleJump, TripleJump, Dash, Glide OR Sword
       SentryJump=1, DoubleJump
     kii:
-      Bash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      Bash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # bait a tentacle shot as you bash the lantern to reach the wall above it 
       Grapple, DoubleJump, TripleJump, Dash OR Sword
       Grapple, DoubleJump, TripleJump, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump OR GlideJump
+      # AerialHammerJump, Grapple, Dash OR Glide OR Sword
+      # AerialHammerJump, WaterDash, Water OR Damage=20
+      # GrenadeJump=1, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash
-      SwordSJump=2, Damage=20  # defeating the enemy and sword floating
+      Bash OR SentryJump=1 OR GlideHammerJump
+      AerialHammerJump  # much easier from the central island
+      GrenadeJump, DoubleJump
       DoubleJump, TripleJump, Grapple, Hammer  # Upswing at the end of the glide
       Grapple, DoubleJump, TripleJump, Glide, Spear=1  # too hard for kii
       WaterDash, DoubleJump  # I'm so sorry to whoever have to do it in a real seed https://youtu.be/DI62eNkF18Y
-  conn WestGlades.PastTown:
+      DoubleJump, TripleJump, Dash  # https://youtu.be/jKOlTG0wecg
+  conn WestGlades.RightLowerPool:
     moki:
       Water OR Launch
       Combat=Tentacle, DoubleJump OR Dash OR Glide
@@ -5220,8 +5414,15 @@ anchor WestGlades.LowerPool at -642, -4112:  # The left edge of the lower pool i
       Damage=10, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
       Combat=Tentacle OR Damage=10:
-        Damage=40 OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
         Damage=20, WaterDash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=20, Damage=20, Combat=Tentacle
+      Damage=20, Damage=30
+      # Glitched
+      # GrenadeJump=1, Damage=20, Combat=Tentacle OR Damage=10  # gjump inbetween the floating platforms then dboost to reach the island
+    unsafe:
+      GrenadeCancel, Combat=Tentacle OR Damage=10
+      Damage=10, Damage=10, Damage=10 OR Combat=Tentacle OR WaterDash  # dboost on tentacle to avoid water ticks. With waterdash, use iframes to pass under the island and reach the suspended platform
 
 anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper and lower Glades
   refill Checkpoint
@@ -5233,25 +5434,31 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
     unsafe:
       Glide, Damage=10, SwordSJump=1
       Glide, DoubleJump, Spear=2, Damage=10
-  pickup WestGlades.RightOre:
+      DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # requires a corner boost et the start
+      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1
+  pickup WestGlades.RightOre:  # Be carefull it's not redundant with WestGlades.Center->WestGlades.Upper->WestGlades.RightOre
     moki:
       Bash, DoubleJump OR Dash
       Launch
     gorlek:
-      Bash, Glide OR Sword OR Hammer OR Grenade=1
       SentryJump=1, Dash
+      Bash, Grenade=1, Damage=10
     kii:
-      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
-      DoubleJump, Damage=30, Combat=Tentacle, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
-      DoubleJump, Damage=20, Combat=Tentacle, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
-      Damage=50, Combat=Tentacle, Dash, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1
+      Bash, Grenade=1
+      DoubleJump, Damage=30, Combat=Tentacle, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=20, Combat=Tentacle, TripleJump OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Damage=50, Combat=Tentacle, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Same paths as above, but extra 10 damage because of the enemy
-      DoubleJump, Damage=40, Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1
-      DoubleJump, Damage=30, TripleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR Flash=2 OR Shuriken=2 OR Spear=2 OR Blaze=2
+      DoubleJump, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Damage=30, TripleJump OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      # Glitched
+      # AerialHammerJump, Dash OR Sword OR Spear=1 OR Flash=1 OR Sentry=1  # Start with an upslash. No shurken because throwing it at the wooden platform makes it swing
+      # GrenadeJump=1, DoubleJump, TripleJump OR Hammer OR Spear=2 OR Flash=2 OR Sentry=2
+      # GrenadeJump=1, DoubleJump, Shuriken=1, Spear=1 OR Flash=1 OR Sentry=1  # same above but more energy efficient (2 shurikens doesn't work because hitting the platform pushes it away)
+      # GrenadeJump=1, DoubleJump, Spear=1, Blaze=1  # same above but more energy efficient
+      # GrenadeJump=1, Hammer, Dash
     unsafe:
-      DoubleJump, Sword, Damage=10
-      SentryJump=1  # pogo on tentacle
-      Bash, Damage=10
+      HammerSJump=1, Shuriken=1 OR Sentry=1 OR Damage=3  # Probably possible with just sjump but climbing the platform fast enough is really hard https://youtu.be/K6_LoGNbO7c
   pickup WestGlades.LowerPoolSL:  # This path is strictly because of energy/health management
     kii:
       Damage=60
@@ -5263,17 +5470,29 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
     gorlek:
       Bash
       SentryJump=1, DoubleJump
-    kii, Combat=Tentacle, Damage=20:
-      DoubleJump, Dash OR Sword
-      DoubleJump, TripleJump, Flash=1 OR Sentry=1 OR Shuriken=1
-      DoubleJump, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
-      Dash, Hammer, Flash=1 OR Sentry=1 OR Shuriken=1
-      Damage=30, Dash, Sword
-  conn WestGlades.LowerPool:
+    kii:
+      DoubleJump, Sword, Damage=10  # stay out of the spikes when killing the tentacle by reseting your djump
+      Combat=Tentacle, Damage=20:
+        DoubleJump, Dash
+        DoubleJump, TripleJump, Glide OR Flash=1 OR Sentry=1 OR Shuriken=1
+        DoubleJump, Hammer, Glide OR Flash=1 OR Sentry=1 OR Shuriken=1
+        Dash, Hammer, Glide OR Flash=1 OR Sentry=1 OR Shuriken=1
+        Damage=30, Dash, Sword
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump OR GlideJump  # glide jump goes for the suspended platform to refresh djump
+      # GrenadeJump=1, DoubleJump, Dash OR Sword
+      # Combat=Tentacle, Damage=40, GlideJump, DoubleJump
+    unsafe:
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR WallHammerJump
+      GrenadeJump, DoubleJump
+      DoubleJump, TripleJump, Damage=10
+      GlideJump, Damage=10
+  conn WestGlades.LeftLowerPool:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide OR Bash
     gorlek: Sword OR Hammer
     kii: free
-  conn WestGlades.PastTown:  # This connection is strictly because of energy/health management
+  conn WestGlades.RightLowerPool:  # This connection is strictly because of energy/health management
     kii:
       Damage=10 OR Combat=Tentacle:
         Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
@@ -5290,24 +5509,33 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     unsafe:
       Damage=90  # one dboost on spikes
       WaterDash, Damage=40
-  pickup WestGlades.RightOre:  # Be carefull it's not redundant with paths from WestGlades.Center
+  pickup WestGlades.RightOre:
     moki:
+      Launch
+      Bash, DoubleJump OR Dash OR Glide
       Glide, DoubleJump OR Dash
       DoubleJump, Dash
     gorlek:
       DoubleJump, TripleJump OR Sword OR Hammer
       Dash, Sword OR Hammer
-      Glide, Combat=Tentacle, SentryJump=1
+      Glide, Sword OR Hammer
     kii:
       Sword OR Dash OR Sentry=6
-      DoubleJump, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      Bash, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
+      DoubleJump, Spear=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+      DoubleJump, Shuriken=1, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # More energy efficient. No shuriken=2 paths because throwing shuriken at the wooden patform makes it swing away
       Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Hammer, Combat=Tentacle, Shuriken=2 OR Flash=2 OR Sentry=2
+      Hammer, Combat=Tentacle, Flash=2 OR Sentry=2
+      # Glitched
+      # GlideJump
     unsafe:
-      Bash OR GlideJump
-      Glide, Spear=1 OR Blaze=1  # too difficult for kii
-      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-
+      PauseFloat
+      Glide  # https://youtu.be/AUJZoNtg_Y0
+      Bash, Damage=10
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel
+      Hammer, Damage=3, Shuriken=1 OR Flash=1 OR Sentry=1  # Probably possible w/o damage but climbing the platform fast enough is really hard https://youtu.be/K6_LoGNbO7c
+      Hammer, Shuriken=2 OR Flash=2 OR Sentry=2
+      
   conn WestGlades.Center: free
   conn LowerReach.Entry:
     moki: LowerReach.BearSneezed
@@ -5324,25 +5552,44 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     kii:
       Dash, DoubleJump, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       Dash, Hammer, Shuriken=1
+      # Glitched
+      # GlideJump, DoubleJump OR Dash OR Hammer
+      # AerialHammerJump OR GrenadeJump=1
     unsafe:
-      GrenadeJump
+      GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       Dash, DoubleJump
+      DoubleJump, Sword  # upslash to hit the mortar and reset your djump
+      Sword, Shuriken=1  # horizontal combo -> shuriken -> upslash -> pogo shuriken
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR  Flash=1 OR Sentry=1 OR PauseFloat
 
 anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room opening up to Wellspring. The loading here is not very smart so we place the coordinates a bit left of the autosave
   refill Checkpoint
   refill Health=1
 
+  pickup WestGlades.UpperPoolSL:  # for dirty water. Clean water path originte from WestGlades.Upper
+    unsafe:
+      Damage=90  # one dboost on spikes
+      WaterDash, Damage=40
+  pickup OuterWellspring.SwimSL:  # for dirty water. Make sure it's not redundant with going to OuterWellspring.EntranceDoor first.
+    unsafe:
+      Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2 OR BlazeSwap=1 OR SentrySwap=1 OR Damage=20:
+        Damage=90  # take a dboost on the fish to avoid one water tick
+        WaterDash, Damage=40
+      GrenadeJump, Spear=2 OR Shuriken=1 OR Flash=1 OR Blaze=2 OR Sentry=1:
+        Damage=90
+        WaterDash, Damage=40
   pickup OuterWellspring.SwimOre:
     moki, Water: Grapple OR WaterDash OR Launch
     gorlek, Water:
       Bash, Grenade=1  # stand on the spinny wheel and bash-grenade up
       SentryJump=1  # ooooor use a SentryJump
-      DoubleJump, TripleJump  # ooooor just some regular jumps!
-      DoubleJump, Sword OR Hammer  # oooooooooooor double jump then upslash
-    kii, Water: DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump OR Sword OR Hammer
+    kii, Water:
+      DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
     unsafe:
-      Water, DoubleJump  # or just be a madman
-      Water, GlideJump
+      Water, DoubleJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
       Water, Bash  # https://youtu.be/nk874rtFxUo
 
   conn WestGlades.ShrineArea:
@@ -5359,13 +5606,17 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     kii:
       Grapple, Hammer OR Shuriken=1 OR Sentry=2
       Bash, Grenade=1  # Bash the mortar so you can reach your grenade from higher
+      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump  # either upslash then hjump twice or wall jump on the left wall first
     unsafe:
       Grapple, BlazeSwap=1 OR SentrySwap=1
       Bash
       DoubleJump, TripleJump, Sword OR Hammer
       SentryJump=1
       GrenadeJump, DoubleJump
-      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap
+      BlazeSwap=3 OR SentrySwap=3 OR FlashSwap OR AerialHammerJump OR GlideHammerJump
   conn WestGlades.Upper:
     moki:  # realizing the semisolid not considered for moki
       Bash, DoubleJump OR Dash OR Glide OR Grenade=1
@@ -5379,8 +5630,11 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     kii:
       Bash OR Hammer OR Sentry=2
       Grapple, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Spear=2
+      # Glitched
+      # GrenadeJump=1, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      GrenadeJump, Sentry=1 OR Flash=1 OR Blaze=1 OR Shuriken=1  # GrenadeJump
+      GrenadeJump  # Barely possible. Gjump from the very end of coyote frames, cancel at the apex and get a walljump riiiiight before getting a water tick damage
+      Damage=10  # take a dboost on the mortar projectile to avoid a water tick
   conn OuterWellspring.EntranceDoor:
     moki:
       Launch OR Water
@@ -5401,11 +5655,16 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       Bash, Grenade=1, Hammer OR Sentry=2
       Hammer, Glide OR Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
       Glide, Grapple OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Hammer OR Damage=20
+      # Blaze=4 OR Sentry=2:
+      #   GrenadeJump, Shuriken=1 OR Blaze=2 OR Sentry=2
     unsafe:
-      Bash, Grenade=1, Grapple  # requires holding up
-      Sentry=5  # may be kii
-      Glide
-      GrenadeJump, Hammer
+      Sentry=5
+      Shuriken=2, Damage=20  # two shuriken to get to the island then dboost 
+      Glide OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR CoyoteHammerJump OR PauseFloat
+      GrenadeJump, Hammer OR Spear=3 OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Blaze=3
   conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
     kii:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -5416,23 +5675,36 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       Grapple, WaterDash OR Launch
       Launch, DoubleJump, Dash
       Launch, Glide
-    gorlek, Water:  # hopefully didn't go too far for gorlek?
-      Grapple, DoubleJump OR Dash OR Bash OR Damage=15  # non-damage variants pretty risky
+    gorlek, Water:
+      Grapple, Bash
+      Grapple, Damage=15, DoubleJump OR Dash  # non-damage variants pretty risky
+      Damage=15, DoubleJump OR Glide
+      DoubleJump, Glide
+      DoubleJump, TripleJump, Dash OR Sword OR Hammer
+      DoubleJump, Dash, Sword OR Hammer
       WaterDash OR Bash:
         DoubleJump, TripleJump
         Dash OR Glide OR Sword OR Damage=15
       Launch, DoubleJump OR Dash OR Bash OR WaterDash OR Sword OR Hammer OR Damage=15
     kii, Water:
+      Damage=30
+      Grapple, DoubleJump OR Dash OR Damage=15
       WaterDash, Bash
       WaterDash, DoubleJump OR Hammer OR Sentry=2
       Bash, DoubleJump OR Hammer OR Sentry=2
+      DoubleJump, Sword
+      DoubleJump, TripleJump, Shuriken=1 OR Blaze=2 OR Sentry=2
+      DoubleJump, Dash, Shuriken=1 OR Blaze=2 OR Sentry=2
       Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # LaunchSwap
     unsafe:
-      Water, Launch
-      Water, Bash, Hammer OR DoubleJump
-      Water, Grapple, Sword
-      Water, WaterDash, DoubleJump
-      Water, Sword, DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Pogo the tentacle's projectile
+      Water:
+        Launch OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR GlideJump
+        Bash, Hammer OR DoubleJump
+        Grapple, Sword OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1
+        WaterDash, DoubleJump
+        Sword, Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Pogo the tentacle's projectile
 
 anchor WestGlades.ShrineArea at -664, -4026:
   refill Checkpoint
@@ -5448,19 +5720,24 @@ anchor WestGlades.ShrineArea at -664, -4026:
     kii:
       Bash  # Use the enemies from the shrine
       DoubleJump, TripleJump
-      Grapple, DoubleJump, Hammer OR Sword OR Sentry=2
+      Grapple, DoubleJump, Hammer OR Sword
+      # Glitched
+      # AerialHammerJump  # upslash first
+      # GrenadeJump=1, DoubleJump
+      # DoubleJump, GlideJump  # Climb the right wall and then glide across
+      # GlideJump, Dash, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Grapple, DoubleJump, Shuriken=2
+      Grapple, DoubleJump, Shuriken=2 OR Sentry=2
       Grapple, Hammer, Dash  # upswing after grapple plant, regaining dash when dashing into the corner/ceiling
-      Grapple, Glide, PauseFloat
-      GlideJump, PauseFloat  # Climb the right wall and then glide across.
       GrenadeJump, DoubleJump
       GrenadeJump, PauseFloat, Dash OR Glide  # Grenade Jump from the shrine to maximize height, float left.
       AerialHammerJump OR GlideHammerJump
       DoubleJump, GlideJump  # Climb the right wall and then glide across.
+      GlideJump, Dash, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
       SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
       Hammer, DoubleJump, SentrySwap=1 OR BlazeSwap=1
       Hammer, DoubleJump, Glide  # Climb the right wall and then glide across.
+      DoubleJump, Sword  # use the ennemies from the shrine to refresh your djump
 
   conn GladesShrine: free
   conn WestGlades.MillApproach: free
@@ -9456,7 +9733,7 @@ anchor LowerReach.VeralHome at -140, -4096:  # At the soup
       WaterDash, Damage=40, Bash, Flap
       #Water, Flap, Sentry=2  # theoretical double redirect, still in testing
 
-  conn GladesTown.HoleHut:
+  conn GladesTown.BelowHoleHut:
     moki: Dash OR Glide  # check for redundancies with PlayfulMoki
     gorlek: free  # free if you know the whole branch is semisolid, but you probably don't as a moki player
   conn GladesTown.PlayfulMoki: free
@@ -13385,6 +13662,8 @@ anchor UpperPools.DrainPuzzleExit at -1318, -4081:  # After solving the Drain Pu
         Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       UpperPools.DrainRoomPurpleWall, Damage=60, Damage=20, Bash, Grenade=1, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
 
+# checkpoint at -1576, -4003
+
 anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where all the bubbles rise
   refill Checkpoint
 
@@ -13394,13 +13673,17 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
       Bash, DoubleJump, Dash OR Glide
       Launch, DoubleJump OR Dash OR Glide
     gorlek:
-      Launch OR Bash
       Combat=Bee+Skeeto, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+      Bash, DoubleJump, TripleJump OR Sword OR Hammer OR Damage=20
+      Bash, Dash OR Glide OR Sword  # Bash the mosquitos
+      Bash, Hammer, Damage=20
+      Launch
     kii:
       Combat=Bee+Skeeto, DoubleJump OR Dash
     unsafe:
       Sword OR Hammer OR BlazeSwap=1 OR SentrySwap=1 OR Sentry=2 OR Shuriken=1 OR DoubleJump OR Dash OR Glide OR GrenadeJump OR FlashSwap OR PauseFloat
       Grapple, UltraGrapple  # wait for the bee to go up and then grapple to it
+      Unpopular, Bash  # entering the lever room is free with a precise bubble jump
   state UpperPools.BubbleSpamWall:
     moki: Water, WaterDash
     kii: WaterDash, Damage=60
@@ -14523,7 +14806,7 @@ anchor UpperWastes.SpinLasers at 2037, -3751:  # checkpoint before the laser spi
     unsafe:
       Dash, Burrow
       Bash  # Bash the Mantis to reach the wall under the pickup, then get a weird boost on the wall after bashing the mantis a second time
-      Burrow, Sword OR Shuriken=3
+      Burrow, Sword OR Shuriken=3  # https://youtu.be/azMV5hyv64M
       # Burrow, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       SentryJump=1
 
