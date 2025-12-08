@@ -184,7 +184,6 @@ pub enum MapIcon {
     SavePedestal = 13,
     AbilityPoint = 14,
     KeystoneDoorTwo = 15,
-    Invisible = 16,
     /// Experience
     SpiritLight = 17,
     MapstonePickup = 18,
