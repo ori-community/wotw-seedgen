@@ -251,7 +251,7 @@ pub enum MapIcon {
     Siira = 75,
     // Rando Icons
     SavePedestalInactive = 76,
-    RaceStartUnfinished = 77,
+    RaceStartFinished = 77,
     CleanWater = 100,
     BonusItem = 101,
     LaunchFragment = 102,
