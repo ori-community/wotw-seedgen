@@ -1,5 +1,4 @@
 mod cli;
-mod daemon;
 mod import_uber_states;
 mod log_config;
 mod plando;
@@ -11,7 +10,6 @@ mod stats;
 use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
-use daemon::daemon;
 use import_uber_states::import_uber_states;
 use plando::plando;
 use preset::{universe_preset, world_preset};
@@ -39,9 +37,12 @@ fn main() -> Result<(), Error> {
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
         Cli::ImportUberStates => import_uber_states(),
-        Cli::Daemon { args } => daemon(args),
         Cli::Lsp => {
             wotw_seedgen_lsp::start();
+            Ok(())
+        }
+        Cli::HttpServer => {
+            wotw_seedgen_http_server::start()?;
             Ok(())
         }
     }

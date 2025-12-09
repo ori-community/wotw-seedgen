@@ -1,0 +1,2 @@
+[env]
+SWAGGER_UI_DOWNLOAD_URL = "https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.31.0.zip"
