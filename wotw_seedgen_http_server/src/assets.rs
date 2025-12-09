@@ -158,11 +158,14 @@ pub async fn watch_assets(state: RouterState, watcher: Watcher) {
                 let events = res?;
 
                 let mut cache = state.write().await;
-                cache
+
+                let any_changed = cache
                     .update_from_watcher_event(&events)
                     .map_err(Error::ReloadAssets)?;
 
-                eprintln!("Reloaded assets");
+                if any_changed {
+                    eprintln!("Reloaded assets");
+                }
 
                 Ok(())
             })()

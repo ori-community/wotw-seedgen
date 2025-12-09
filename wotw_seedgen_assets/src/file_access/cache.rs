@@ -36,12 +36,14 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
         Ok(())
     }
 
-    pub fn update_from_watcher_event(&mut self, events: &[DebouncedEvent]) -> Result<(), String> {
+    pub fn update_from_watcher_event(&mut self, events: &[DebouncedEvent]) -> Result<bool, String> {
         let mut changed = ChangedAssets::default();
 
         for event in events {
             for path in &event.paths {
-                let path = path.canonicalize().unwrap();
+                let Ok(path) = path.canonicalize() else {
+                    continue;
+                };
 
                 if path.ends_with(F::LOC_DATA_PATH) {
                     changed.loc_data = true;
@@ -78,7 +80,11 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
             }
         }
 
-        self.values.update(&self.file_access, changed)
+        let any_changed = changed != ChangedAssets::default();
+
+        self.values.update(&self.file_access, changed)?;
+
+        Ok(any_changed)
     }
 }
 
@@ -141,7 +147,7 @@ pub trait AssetCacheValues: Sized {
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess;
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct ChangedAssets {
     pub loc_data: bool,
     pub state_data: bool,
