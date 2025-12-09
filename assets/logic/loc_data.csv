@@ -52,7 +52,7 @@ MarshPastOpher.TrialOre, Marsh, GorlekOre, , 9593, 25989, , -501.5, -4340.0, -50
 MarshPastOpher.TrialEC, Marsh, EnergyFragment, , 9593, 27562, , -473.8, -4339.6, -473.83002, -4338.5796
 MarshPastOpher.TrialHC, Marsh, HealthFragment, , 21786, 20194, , -437.7, -4380.8, -437.67, -4379.8403
 MarshPastOpher.TrialRightEX, Marsh, SpiritLight, 100, 21786, 10413, , -344.1, -4356.9, -344.07, -4356.92
-MarshPastOpher.SpiritTrial, Marsh, SpiritLight, 1000, 44964, 45951, 2, -614, -4319, -423.68, -4306.3604
+MarshPastOpher.SpiritTrial, Marsh, RaceStart, 1000, 44964, 45951, 2, -614, -4319, ,
 MarshPastOpher.CombatShrine, Marsh, ShardSlot, , 21786, 18109, , -382.6, -4338.3, -382.63397, -4337.3223
 MarshPastOpher.SwingPoleEX, Marsh, SpiritLight, 50, 9593, 59344, , -492.7, -4261.3, -492.66, -4261.27
 MarshPastOpher.LeftEyestone, Marsh, Keystone, Eyestone, 21786, 27433, , -461.3, -4195.3, -461.27002, -4195.29
@@ -70,7 +70,7 @@ WestHollow.QuickshotShard, Hollow, Shard, Quickshot, 23987, 61017, , -311.2, -43
 WestHollow.SwimEC, Hollow, EnergyFragment, , 937, 24175, , -177.8, -4354.2, -177.8136, -4353.2246
 WestHollow.LupoMap, Hollow, Lupo, Hollow, 48248, 3638, , -146, -4321, -146, -4321
 WestHollow.TrialHC, Hollow, HealthFragment, , 937, 2463, , -122.0, -4268.2, -121.979996, -4267.23
-WestHollow.SpiritTrial, Hollow, SpiritLight, 1000, 44964, 25545, 2, -115, -4259, -175.43, -4440.89
+WestHollow.SpiritTrial, Hollow, RaceStart, 1000, 44964, 25545, 2, -115, -4259, ,
 WestHollow.BelowLupoEX, Hollow, SpiritLight, 50, 937, 48192, , -82.3, -4369.6, -82.32001, -4369.565
 WestHollow.AboveDashEX, Hollow, SpiritLight, 50, 937, 61744, , -100.0, -4407.2, -99.98999, -4407.225
 WestHollow.DashRightEX, Hollow, SpiritLight, 50, 937, 37926, , 11.6, -4401.1, 11.600098, -4401.12
@@ -139,7 +139,7 @@ OuterWellspring.RightWallOre, Wellspring, GorlekOre, , 53632, 25556, , -738.7, -
 OuterWellspring.RightWallEC, Wellspring, EnergyFragment, , 53632, 1911, , -735.3, -3988.3, -735.25366, -3987.25
 OuterWellspring.RightWallEX, Wellspring, SpiritLight, 100, 53632, 51706, , -745.1, -3942.0, -745.0513, -3941.9956
 OuterWellspring.TrialOre, Wellspring, GorlekOre, , 37858, 58286, , -677.7, -3933.2, -677.7317, -3933.1733
-OuterWellspring.SpiritTrial, Wellspring, SpiritLight, 1000, 44964, 11512, 2, -668, -3937, -834.55005, -3893.5503
+OuterWellspring.SpiritTrial, Wellspring, RaceStart, 1000, 44964, 11512, 2, -668, -3937, ,
 OuterWellspring.UltraGrappleShard, Wellspring, Shard, UltraGrapple, 23987, 12104, , -798.7, -3912.2, -798.66003, -3911.1501
 OuterWellspring.HiddenHC, Wellspring, HealthFragment, , 53632, 17403, , -877.8, -3961.0, -877.8399, -3959.99
 OuterWellspring.EntranceRoofEX, Wellspring, SpiritLight, 100, 53632, 42264, , -848.9, -4023.5, -848.91876, -4023.5227
@@ -190,7 +190,7 @@ EastPools.AboveTpEX, Pools, SpiritLight, 100, 5377, 7540, , -1336.2, -4102.9, -1
 EastPools.LupoOre, Pools, GorlekOre, , 5377, 12235, , -1370.0, -4166.2, -1369.9664, -4166.21
 EastPools.UltraBashShard, Pools, Shard, UltraBash, 23987, 25996, , -1284.6, -4196.2, -1284.62, -4195.23
 EastPools.FightRoomHC, Pools, HealthFragment, , 5377, 45774, , -1365.2, -4109.5, -1365.1549, -4108.4673
-EastPools.SpiritTrial, Pools, SpiritLight, 1000, 44964, 54686, 2, -1417, -4126, -1485.9731, -4059.728
+EastPools.SpiritTrial, Pools, RaceStart, 1000, 44964, 54686, 2, -1417, -4126, ,
 EastPools.EnergyHarvestShard, Pools, Shard, EnergyHarvest, 5377, 40328, , -1441.4, -4129.7, -1441.3499, -4128.7153
 EastPools.LupoEX, Pools, SpiritLight, 100, 5377, 35440, , -1414.3, -4154.6, -1414.3197, -4154.631
 EastPools.LupoMap, Pools, Lupo, Pools, 48248, 1557, , -1391, -4167, -1391, -4167
@@ -237,7 +237,7 @@ WoodsMain.HiddenEX, Woods, SpiritLight, 100, 58674, 54516, , 936.3, -4044.2, 936
 WoodsMain.BelowKeystonesEX, Woods, SpiritLight, 50, 58674, 23186, , 941.8, -4185.9, 941.81433, -4185.8574
 WoodsMain.BehindDoorRoofEX, Woods, SpiritLight, 100, 58674, 64057, , 968.6, -4123.3, 968.604, -4123.2627
 WoodsMain.PetrifiedHowlEX, Woods, SpiritLight, 50, 58674, 17974, , 904.7, -4076.7, 904.6666, -4076.6702
-WoodsMain.SpiritTrial, Woods, SpiritLight, 1000, 44964, 22703, 2, 820, -4047, 859.62, -3938.6702
+WoodsMain.SpiritTrial, Woods, RaceStart, 1000, 44964, 22703, 2, 820, -4047, ,
 WoodsMain.OverflowShard, Woods, Shard, Overflow, 23987, 25183, , 826.6, -3940.1, 826.62494, -3939.051
 WoodsMain.CombatShrine, Woods, ShardSlot, , 58674, 29265, , 1361.1, -4064.0, 1361.1, -4063.04
 WoodsMain.ShrineEX, Woods, SpiritLight, 100, 58674, 32647, , 1406.0, -4064.4, 1405.9546, -4064.3982
@@ -269,7 +269,7 @@ LowerReach.UpperLeftKS, Reach, Keystone, , 28895, 10823, , -83.6, -4024.8, -83.5
 LowerReach.MiddleLeftKS, Reach, Keystone, , 28895, 37444, , -80.6, -4040.1, -80.55005, -4040.1401
 LowerReach.BottomLeftKS, Reach, Keystone, , 28895, 18358, , -58.0, -4054.9, -58.03015, -4054.9102
 LowerReach.TrialEX, Reach, SpiritLight, 100, 28895, 22761, , -38.7, -4017.7, -38.670044, -4017.73
-LowerReach.SpiritTrial, Reach, SpiritLight, 1000, 44964, 23661, 2, 75, -4046, 101.933716, -4046.7227
+LowerReach.SpiritTrial, Reach, RaceStart, 1000, 44964, 23661, 2, 75, -4046, ,
 LowerReach.CatalystShard, Reach, Shard, Catalyst, 23987, 897, , -90.2, -4096.5, -90.165726, -4095.3179
 LowerReach.HandToHandSoup, Reach, QuestItem, Soup, 14019, 26318, 4, -110, -4090, -110, -4090
 UpperReach.LifeForceShard, Reach, Shard, Lifeforce, 23987, 19630, , -400.8, -3860.5, -400.7699, -3859.5312
@@ -301,7 +301,7 @@ UpperDepths.KeystoneHC, Depths, HealthFragment, , 18793, 42235, , 530.9, -4451.7
 UpperDepths.HiveEX, Depths, SpiritLight, 100, 18793, 6573, , 425.4, -4384.8, 425.41998, -4384.77
 UpperDepths.ForestsEyes, Depths, Wisp, Eyes, 18793, 63291, , 687, -4386, 687, -4386
 LowerDepths.RaceStartHC, Depths, HealthFragment, , 18793, 62694, , 496.4, -4498.2, 496.37314, -4497.1514
-LowerDepths.SpiritTrial, Depths, SpiritLight, 1000, 44964, 28552, 2, 478, -4517, 573.47345, -4510.134
+LowerDepths.SpiritTrial, Depths, RaceStart, 1000, 44964, 28552, 2, 478, -4517, ,
 LowerDepths.BelowDoorOre, Depths, GorlekOre, , 18793, 836, , 437.0, -4507.1, 436.98193, -4507.07
 LowerDepths.SpiritSurgeShard, Depths, Shard, SpiritSurge, 23987, 986, , 564.2, -4570.2, 564.18604, -4569.2515
 LowerDepths.HandToHandSilk, Depths, QuestItem, Silk, 14019, 26318, 7, 317, -4508, 317, -4508
@@ -314,7 +314,7 @@ LowerDepths.FlashTree, Depths, Skill, Flash, 0, 62, , 776, -4541, 776.4115, -453
 LowerWastes.WestTPOre, Wastes, GorlekOre, , 7228, 54494, , 1504.3, -4007.0, 1504.34, -4006.9902
 LowerWastes.PurpleWallEX, Wastes, SpiritLight, 100, 7228, 56821, , 1534.1, -3996.6, 1534.09, -3996.6396
 LowerWastes.SunsetViewEX, Wastes, SpiritLight, 100, 7228, 52086, , 1607.3, -3974.5, 1607.25, -3974.4702
-LowerWastes.SpiritTrial, Wastes, SpiritLight, 1000, 44964, 30767, 2, 1527, -4009, 1580.71, -3898.5503
+LowerWastes.SpiritTrial, Wastes, RaceStart, 1000, 44964, 30767, 2, 1527, -4009, ,
 LowerWastes.SandBridgeOre, Wastes, GorlekOre, , 20120, 46919, , 1657.9, -3972.7, 1657.88, -3972.6895
 LowerWastes.EerieGemQI, Wastes, QuestItem, Gem, 14019, 58342, , 1640.4, -4004.1, 1640.4, -4004.1
 LowerWastes.MuncherTunnelEC, Wastes, EnergyFragment, , 20120, 11785, , 1652.9, -4014.4, 1652.92, -4013.37
