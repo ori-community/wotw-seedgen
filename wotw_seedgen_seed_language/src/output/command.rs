@@ -501,10 +501,11 @@ pub enum CommandVoid {
     DisableServerSync {
         uber_identifier: UberIdentifier,
     },
-    /// Set the map icon associated with the `location` identifier from loc_data to `icon`
-    SetSpoilerMapIcon {
-        location: String,
+    /// Create `icon` at (`x`, `y`) with the label set to `label`
+    CreateSpoilerMapIcon {
         icon: MapIcon,
+        x: CommandFloat,
+        y: CommandFloat,
         label: CommandString,
     },
     /// Create a spirit well icon that you can warp to on the map at (`x`, `y`)

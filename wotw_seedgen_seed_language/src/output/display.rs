@@ -293,11 +293,9 @@ impl Display for CommandVoid {
             CommandVoid::DisableServerSync { uber_identifier } => {
                 write!(f, "disable_server_sync({uber_identifier})")
             }
-            CommandVoid::SetSpoilerMapIcon {
-                location,
-                icon,
-                label,
-            } => write!(f, "set_map_icon({location}, {icon}, {label})"),
+            CommandVoid::CreateSpoilerMapIcon { icon, x, y, label } => {
+                write!(f, "create_spoiler_map_icon({icon}, {x}, {y}, {label})")
+            }
             CommandVoid::CreateWarpIcon { id, x, y } => {
                 write!(f, "create_warp_icon({id}, {x}, {y})")
             }

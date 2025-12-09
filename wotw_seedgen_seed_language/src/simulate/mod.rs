@@ -290,7 +290,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::TriggerKeybind { .. }
             | CommandVoid::EnableServerSync { .. }
             | CommandVoid::DisableServerSync { .. }
-            | CommandVoid::SetSpoilerMapIcon { .. }
+            | CommandVoid::CreateSpoilerMapIcon { .. }
             | CommandVoid::SetWarpIconLabel { .. }
             | CommandVoid::SetShopItemPrice { .. }
             | CommandVoid::SetShopItemName { .. }

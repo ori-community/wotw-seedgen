@@ -75,11 +75,14 @@ impl IntermediateOutput {
                 }
             }
 
-            extra_events.push(Event::on_reload(CommandVoid::SetSpoilerMapIcon {
-                location: location.identifier.clone(),
-                icon: metadata.force_map_icon(),
-                label: name,
-            }));
+            if let Some(map_position) = location.map_position {
+                extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
+                    icon: metadata.force_map_icon(),
+                    x: map_position.x.into(),
+                    y: map_position.y.into(),
+                    label: name,
+                }));
+            }
         }
 
         let placeholder_map = postprocessor.placeholder_map;
@@ -496,7 +499,11 @@ impl ResolvePlaceholders for CommandVoid {
                 x.resolve(context);
                 y.resolve(context);
             }
-            Self::SetSpoilerMapIcon { label, .. } => label.resolve(context),
+            Self::CreateSpoilerMapIcon { x, y, label, .. } => {
+                x.resolve(context);
+                y.resolve(context);
+                label.resolve(context);
+            }
             Self::CreateWarpIcon { x, y, .. } => {
                 x.resolve(context);
                 y.resolve(context);
@@ -549,7 +556,7 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::SwitchWheel { .. }
             | Self::ResetAllWheels {}
             | Self::CloseMenu {} => {}
-            | Self::CloseWeaponWheel {} => {}
+            Self::CloseWeaponWheel {} => {}
         }
     }
 }
