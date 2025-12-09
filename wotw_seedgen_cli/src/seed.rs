@@ -1,8 +1,13 @@
-use std::time::Instant;
+use std::{
+    ffi::OsStr,
+    fs::{self, File},
+    io,
+    path::Path,
+    time::Instant,
+};
 
 use crate::{
     cli::{GenerationArgs, SeedArgs},
-    files::{self, write_seed},
     log_config::LogConfig,
     Error,
 };
@@ -13,7 +18,9 @@ use wotw_seedgen::{
     settings::{UniverseSettings, WorldSettings},
     SeedUniverse,
 };
-use wotw_seedgen_assets::{LocData, Source, StateData, UberStateData};
+use wotw_seedgen_assets::{
+    file_err, AssetFileAccess, DefaultFileAccess, LocData, Source, StateData, UberStateData,
+};
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
@@ -43,15 +50,94 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     write_seed(seed_universe, name, debug, launch, start)
 }
 
+fn write_seed(
+    mut seed_universe: SeedUniverse,
+    name: &str,
+    debug: bool,
+    launch: bool,
+    start: Instant,
+) -> Result<(), Error> {
+    fs::create_dir_all("seeds")?;
+
+    let path = if seed_universe.worlds.len() == 1 {
+        let (mut file, path) = create_unique_file(&format!("seeds/{name}"))?;
+        let seed = seed_universe.worlds.pop().unwrap();
+        seed.package(&mut file, !debug)?;
+
+        if launch {
+            launch_seed(&path)?;
+        }
+
+        let spoiler_path = format!("{}_spoiler.txt", &path[..path.len() - ".wotwr".len()]);
+        fs::write(&spoiler_path, seed_universe.spoiler.to_string())
+            .map_err(|err| file_err("write", &spoiler_path, err))?;
+
+        path
+    } else {
+        let path = create_unique_dir(&format!("seeds/{name}"))?;
+
+        for (index, seed) in seed_universe.worlds.into_iter().enumerate() {
+            let path = format!("{path}/world_{index}.wotwr");
+            let mut file = File::create(&path).map_err(|err| file_err("create", path, err))?;
+            seed.package(&mut file, !debug)?;
+        }
+
+        let spoiler_path = format!("{path}/spoiler.txt");
+        fs::write(&spoiler_path, seed_universe.spoiler.to_string())
+            .map_err(|err| file_err("write", &spoiler_path, err))?;
+
+        path
+    };
+
+    eprintln!(
+        "Generated seed in {:.1}s to \"{path}\"",
+        start.elapsed().as_secs_f32()
+    );
+
+    Ok(())
+}
+
+fn create_unique_file(path: &str) -> Result<(File, String), Error> {
+    create_unique::<_, File>(path, ".wotwr", |path| File::create_new(path))
+}
+
+fn create_unique_dir(path: &str) -> Result<String, Error> {
+    create_unique::<_, ()>(path, "", |path| fs::create_dir(path)).map(|(_, path)| path)
+}
+
+fn create_unique<F, T>(path: &str, extension: &str, mut f: F) -> Result<(T, String), Error>
+where
+    F: FnMut(&str) -> io::Result<T>,
+{
+    for attempt in 0_u32.. {
+        let path = if attempt == 0 {
+            format!("{path}{extension}")
+        } else {
+            format!("{path}_{attempt}{extension}")
+        };
+
+        match f(&path) {
+            Ok(t) => return Ok((t, path)),
+            Err(err) if err.kind() == io::ErrorKind::AlreadyExists => {}
+            Err(err) => return Err(Error(file_err("create", path, err))),
+        }
+    }
+
+    unreachable!()
+}
+
+pub fn launch_seed<P: AsRef<Path> + AsRef<OsStr>>(path: P) -> Result<(), Error> {
+    Ok(open::that_detached(&path).map_err(|err| file_err("launch", path, err))?)
+}
+
 pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {
     let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
-    let snippet_access = files::snippet_access("")?;
 
     let seed_universe = generate_seed(
         &graph,
         &loc_data,
         &uber_state_data,
-        &snippet_access,
+        &DefaultFileAccess,
         settings,
         debug,
     )?;
@@ -100,12 +186,10 @@ pub struct LogicFiles {
 
 impl LogicFiles {
     pub fn new() -> Result<Self, Error> {
-        let logic_access = files::logic_access("")?;
-
-        let loc_data = logic_access.loc_data()?;
-        let state_data = logic_access.state_data()?;
-        let areas_source = logic_access.areas()?;
-        let uber_state_data = logic_access.uber_state_data(&loc_data, &state_data)?;
+        let loc_data = DefaultFileAccess.loc_data()?;
+        let state_data = DefaultFileAccess.state_data()?;
+        let areas_source = DefaultFileAccess.areas()?;
+        let uber_state_data = DefaultFileAccess.uber_state_data(&loc_data, &state_data)?;
 
         Ok(LogicFiles {
             loc_data,

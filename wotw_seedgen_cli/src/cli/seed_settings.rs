@@ -1,16 +1,21 @@
 use super::{INVALID, LINK, LITERAL};
-use crate::{cli::interactive, files, Error};
+use crate::{
+    cli::{
+        interactive, AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS,
+        AVAILABLE_UNIVERSE_PRESETS, AVAILABLE_WORLD_PRESETS,
+    },
+    Error,
+};
 use clap::{
     builder::{styling::Reset, PossibleValue, StringValueParser, TypedValueParser},
     error::ErrorKind,
     value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches,
 };
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use std::{
     convert::Infallible,
     ffi::OsStr,
-    fmt::{self, Debug, Display, Write},
+    fmt::{Debug, Display, Write},
     marker::PhantomData,
     num::NonZeroUsize,
     str::FromStr,
@@ -18,118 +23,10 @@ use std::{
 use strum::VariantNames;
 use wotw_seedgen::settings::{Difficulty, GreaterOneU8, Spawn, Trick};
 use wotw_seedgen::{
-    assets::{PresetInfo, UniversePresetSettings, WorldPresetSettings},
+    assets::{UniversePresetSettings, WorldPresetSettings},
     settings::UniverseSettings,
 };
-use wotw_seedgen_assets::{FileAccess, PresetAccess, SnippetAccess};
-use wotw_seedgen_seed_language::metadata::Metadata;
-
-lazy_static! {
-    pub static ref PRESET_ACCESS: FileAccess =
-        files::preset_access("").unwrap_or_else(|_| FileAccess::new([""]));
-    pub static ref AVAILABLE_UNIVERSE_PRESETS: Vec<AvailablePreset> = PRESET_ACCESS
-        .available_universe_presets()
-        .into_iter()
-        .map(|identifier| {
-            let info = PRESET_ACCESS
-                .universe_preset(&identifier)
-                .map(|preset| preset.info);
-            AvailablePreset { identifier, info }
-        })
-        .collect();
-    pub static ref AVAILABLE_WORLD_PRESETS: Vec<AvailablePreset> = PRESET_ACCESS
-        .available_world_presets()
-        .into_iter()
-        .map(|identifier| {
-            let info = PRESET_ACCESS
-                .world_preset(&identifier)
-                .map(|preset| preset.info);
-            AvailablePreset { identifier, info }
-        })
-        .collect();
-    pub static ref AVAILABLE_SNIPPETS: Vec<AvailableSnippet> = {
-        let snippet_access =
-            files::snippet_access("").unwrap_or_else(|_| FileAccess::new(["", "snippets"]));
-
-        let mut available_snippets = snippet_access
-            .available_snippets()
-            .into_iter()
-            .map(|identifier| {
-                let metadata = snippet_access
-                    .read_snippet(&identifier)
-                    .map(|source| Metadata::from_source(&source.content))
-                    .unwrap_or_default();
-                AvailableSnippet {
-                    identifier,
-                    metadata,
-                }
-            })
-            .filter(|available_snippet| !available_snippet.metadata.hidden)
-            .collect::<Vec<_>>();
-
-        available_snippets.sort_unstable_by(|a, b| {
-            a.metadata
-                .category
-                .cmp(&b.metadata.category)
-                .then_with(|| a.identifier.cmp(&b.identifier))
-        });
-
-        available_snippets
-    };
-}
-
-#[derive(Debug, Clone)]
-pub struct AvailablePreset {
-    pub identifier: String,
-    pub info: Result<Option<PresetInfo>, String>,
-}
-
-impl Display for AvailablePreset {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let description = match &self.info {
-            Ok(info) => match info {
-                None => "(no details provided by preset)".to_string(),
-                Some(info) => info
-                    .description
-                    .clone()
-                    .unwrap_or_else(|| "(no description provided by preset)".to_string()),
-            },
-            Err(err) => format!("failed to read details: {err}"),
-        };
-
-        write!(
-            f,
-            "{literal}{identifier}{reset}: {description}",
-            literal = LITERAL.render(),
-            identifier = self.identifier,
-            reset = Reset.render(),
-        )
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AvailableSnippet {
-    pub identifier: String,
-    pub metadata: Metadata,
-}
-
-impl Display for AvailableSnippet {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let description = self
-            .metadata
-            .description
-            .as_deref()
-            .unwrap_or("(no description provided by snippet)");
-
-        write!(
-            f,
-            "{literal}{identifier}{reset}: {description}",
-            literal = LITERAL.render(),
-            identifier = self.identifier,
-            reset = Reset.render(),
-        )
-    }
-}
+use wotw_seedgen_assets::DefaultFileAccess;
 
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePresetSettings);
@@ -137,7 +34,7 @@ pub struct SeedSettings(pub UniversePresetSettings);
 impl SeedSettings {
     pub fn into_universe_settings(self) -> Result<UniverseSettings, Error> {
         let mut settings = UniverseSettings::new("".to_string());
-        self.0.apply(&mut settings, &files::preset_access("")?)?;
+        self.0.apply(&mut settings, &DefaultFileAccess)?;
         Ok(settings)
     }
 }

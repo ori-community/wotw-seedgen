@@ -12,11 +12,12 @@ use wotw_seedgen::settings::{Difficulty, GreaterOneU8, Spawn, Trick};
 use wotw_seedgen_assets::{UniversePresetSettings, WorldPresetSettings};
 use wotw_seedgen_seed_language::metadata::{ConfigValue, Literal};
 
-use crate::{cli::LITERAL, Error};
-
-use super::{
-    seed_settings::{AvailablePreset, AvailableSnippet},
-    AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS, AVAILABLE_WORLD_PRESETS,
+use crate::{
+    cli::{
+        AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
+        AVAILABLE_WORLD_PRESETS, LITERAL,
+    },
+    Error,
 };
 
 pub fn seed_settings(settings: &mut UniversePresetSettings) -> Result<(), Error> {

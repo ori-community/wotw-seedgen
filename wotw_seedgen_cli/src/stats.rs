@@ -2,14 +2,13 @@ use std::{fmt::Write, fs, path::PathBuf};
 
 use crate::{
     cli::{self, StatsArgs},
-    files,
     seed::logic_assets,
     Error,
 };
 use itertools::Itertools;
 use sanitize_filename::sanitize;
 use wotw_seedgen::settings::{Spawn, UniverseSettings, DEFAULT_SPAWN};
-use wotw_seedgen_assets::file_err;
+use wotw_seedgen_assets::{file_err, DefaultFileAccess};
 use wotw_seedgen_stats::{
     analyzers::{
         Analyzer, EarlySkillsStats, FirstWeaponStats, ItemLocationStats, ItemUnlockStats,
@@ -29,12 +28,11 @@ pub fn stats(args: StatsArgs) -> Result<(), Error> {
     let settings = settings.into_universe_settings()?;
 
     let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
-    let snippet_access = files::snippet_access("")?;
 
     let mut generator = StatsGenerator::new(
         &settings,
         &graph,
-        &snippet_access,
+        &DefaultFileAccess,
         &storage_access::FileAccess,
         &loc_data,
         &uber_state_data,

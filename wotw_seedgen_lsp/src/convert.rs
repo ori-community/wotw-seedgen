@@ -1,16 +1,25 @@
-use std::ops::Range;
+use std::{ops::Range, path::PathBuf};
 
-use tower_lsp::{jsonrpc::Result, lsp_types};
+use tower_lsp::{jsonrpc, lsp_types};
 
 use crate::error;
 
-pub fn range_from_lsp(range: lsp_types::Range, document: &str) -> Result<Range<usize>> {
+pub fn path_from_lsp(url: &lsp_types::Url) -> Result<PathBuf, String> {
+    if url.scheme() != "file" {
+        Err(format!("invalid url \"{url}\": not a file scheme"))
+    } else {
+        url.to_file_path()
+            .map_err(|()| format!("invalid url \"{url}\""))
+    }
+}
+
+pub fn range_from_lsp(range: lsp_types::Range, document: &str) -> jsonrpc::Result<Range<usize>> {
     // TODO optimization: end > start, we are wasting time going through all the lines up to start twice
     // similar for range_to_lsp
     Ok(position_from_lsp(range.start, document)?..position_from_lsp(range.end, document)?)
 }
 
-pub fn position_from_lsp(position: lsp_types::Position, document: &str) -> Result<usize> {
+pub fn position_from_lsp(position: lsp_types::Position, document: &str) -> jsonrpc::Result<usize> {
     // If the document ends with a newline and the position is at the end of the document,
     // position.line will refer to the empty "line" after, which would be out of bounds
     // when using lines() or split_inclusive('\n').

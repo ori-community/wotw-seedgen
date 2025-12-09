@@ -30,7 +30,6 @@ arrayvec = "0.7.6"
 
 [dev-dependencies]
 criterion = "0.5"
-lazy_static = "1.4"
 env_logger = { version = "0.11", default-features = false }
 wotw_seedgen_static_assets = { path = "../wotw_seedgen_static_assets" }
 

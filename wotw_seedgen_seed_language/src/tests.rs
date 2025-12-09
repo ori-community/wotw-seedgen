@@ -6,11 +6,15 @@ use crate::{
     compile::{Compiler, PRIVATE_MEMORY},
     output::{CommandVoid, IntermediateOutput},
 };
-use lazy_static::lazy_static;
 use rustc_hash::FxHashMap;
-use std::{fmt::Display, path::Path};
+use std::{
+    array,
+    fmt::Display,
+    path::{Path, PathBuf},
+    sync::LazyLock,
+};
 use strum::VariantArray;
-use wotw_seedgen_assets::{FileAccess, SnippetAccess, Source};
+use wotw_seedgen_assets::{SnippetAccess, SnippetFileAccess, Source};
 use wotw_seedgen_data::{
     Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
     MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
@@ -159,21 +163,26 @@ impl SnippetAccess for ExampleFileAccess<'_> {
     }
 }
 
-lazy_static! {
-    // works while debugging, but doesn't work to jump into code from errors
-    // static ref WORKDIR: String = {
-    //     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    //     path.pop();
-    //     path.to_string_lossy().to_string()
-    // };
+// works while debugging, but doesn't work to jump into code from errors
+// static WORKDIR: LazyLock<&Path> =
+//     LazyLock::new(|| Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap());
 
-    // works to jump into code from errors, but doesn't work while debugging
-    static ref WORKDIR: &'static str = "..";
+// works to jump into code from errors, but doesn't work while debugging
+static WORKDIR: LazyLock<&Path> = LazyLock::new(|| Path::new(".."));
 
-    static ref TEST_FILE_ACCESS: FileAccess = FileAccess::new([
-        format!("{}/assets/snippets", *WORKDIR),
-        format!("{}/assets/toolseeds", *WORKDIR)
-    ]);
+struct TestFileAccess;
+
+impl SnippetFileAccess for TestFileAccess {
+    type Folders = array::IntoIter<Self::Path, 2>;
+    type Path = PathBuf;
+
+    fn folders(&self) -> Self::Folders {
+        [
+            WORKDIR.join("assets/snippets"),
+            WORKDIR.join("assets/toolseeds"),
+        ]
+        .into_iter()
+    }
 }
 
 fn test_compiler<'snippets, F: SnippetAccess>(
@@ -327,9 +336,9 @@ fn operator_precedence() {
 
 #[test]
 fn snippets() {
-    let snippets = TEST_FILE_ACCESS.available_snippets();
+    let snippets = TestFileAccess.available_snippets();
 
-    let mut compiler = test_compiler(&*TEST_FILE_ACCESS);
+    let mut compiler = test_compiler(&TestFileAccess);
 
     for identifier in &snippets {
         compiler.compile_snippet(identifier).unwrap();
@@ -338,7 +347,7 @@ fn snippets() {
     compiler.finish().eprint_errors().unwrap();
 
     for identifier in &snippets {
-        let mut compiler = test_compiler(&*TEST_FILE_ACCESS);
+        let mut compiler = test_compiler(&TestFileAccess);
 
         compiler.compile_snippet(identifier).unwrap();
 
@@ -355,7 +364,7 @@ fn snippets() {
     .collect::<FxHashMap<_, _>>();
 
     for identifier in test_with_config.keys() {
-        let mut compiler = test_compiler_with_config(&*TEST_FILE_ACCESS, test_with_config.clone());
+        let mut compiler = test_compiler_with_config(&TestFileAccess, test_with_config.clone());
 
         compiler.compile_snippet(identifier).unwrap();
 

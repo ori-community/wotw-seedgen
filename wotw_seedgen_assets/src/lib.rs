@@ -34,7 +34,11 @@ pub use presets::{
     WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
 };
 mod file_access;
-pub use file_access::{file_err, FileAccess};
+pub use file_access::{
+    file_err, AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets,
+    DefaultAssetCacheValues, DefaultFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
+    WatcherError, CONFIG_DIR, EXECUTABLE_DIR,
+};
 
 /// Representation of a source file with the necessary information to display useful error messages.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

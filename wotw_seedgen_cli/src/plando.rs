@@ -1,22 +1,24 @@
 use crate::{
     cli::{GenerationArgs, PlandoArgs},
-    files::{self, launch_seed},
+    seed::launch_seed,
     Error,
-};
-use notify_debouncer_full::{
-    new_debouncer,
-    notify::{EventKind, RecursiveMode},
 };
 use rand_pcg::Pcg64Mcg;
 use std::{
+    borrow::Cow,
     ffi::OsStr,
     fs::{self, File},
+    iter::{self, Chain, Map, Once},
     path::{Path, PathBuf},
-    sync::mpsc,
     time::{Duration, Instant},
 };
 use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
-use wotw_seedgen_assets::{file_err, FileAccess, LocData, UberStateData};
+use wotw_seedgen_assets::{
+    file_err, AssetCache, AssetFileAccess, DefaultAssetCacheValues, DefaultFileAccess,
+    PresetFileAccess, SnippetFileAccess, Watcher,
+};
+
+type Cache<'a> = AssetCache<PlandoFileAccess<'a>, DefaultAssetCacheValues>;
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
@@ -50,12 +52,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         (root, identifier)
     };
 
-    let logic_access = files::logic_access("")?;
-    let loc_data = logic_access.loc_data()?;
-    let uber_state_data = logic_access.uber_state_data(&loc_data, &logic_access.state_data()?)?;
-
-    let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
-    let snippet_access = files::snippet_access(root)?;
+    let cache = Cache::new(PlandoFileAccess::new(root))?;
 
     let out = match out {
         None => {
@@ -68,55 +65,34 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         Some(out) => out,
     };
 
-    let result = compile(
-        &mut rng,
-        &snippet_access,
-        &loc_data,
-        &uber_state_data,
-        entry,
-        &out,
-        debug,
-    );
+    let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
+
+    let result = compile(&mut rng, &cache, entry, &out, debug);
 
     if launch {
         launch_seed(&out)?;
     }
 
     if watch {
-        let (tx, rx) = mpsc::channel();
+        let mut watcher = Watcher::new(Duration::from_millis(10))?;
 
-        let mut watcher = new_debouncer(Duration::from_millis(10), None, tx)?;
-
-        watcher.watch(Path::new(root), RecursiveMode::Recursive)?;
+        cache.watch(&mut watcher)?;
 
         let canonical_out = fs::canonicalize(&out)?;
 
-        for res in rx {
-            let events = res.map_err(|mut errors| errors.pop().unwrap())?;
-
-            if !events.into_iter().any(|event| {
-                matches!(
-                    event.event.kind,
-                    EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_)
-                ) && event
+        for res in watcher {
+            if res?.into_iter().all(|event| {
+                event
                     .event
                     .paths
                     .into_iter()
                     .flat_map(fs::canonicalize)
-                    .any(|path| path != canonical_out)
+                    .all(|path| path == canonical_out)
             }) {
                 continue;
             }
 
-            let _ = compile(
-                &mut rng,
-                &snippet_access,
-                &loc_data,
-                &uber_state_data,
-                entry,
-                &out,
-                debug,
-            );
+            let _ = compile(&mut rng, &cache, entry, &out, debug);
         }
     }
 
@@ -125,9 +101,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
 fn compile(
     rng: &mut Pcg64Mcg,
-    snippet_access: &FileAccess,
-    loc_data: &LocData,
-    uber_state_data: &UberStateData,
+    cache: &Cache,
     entry: &str,
     out: &Path,
     debug: bool,
@@ -136,8 +110,8 @@ fn compile(
 
     let mut compiler = Compiler::new(
         rng,
-        snippet_access,
-        uber_state_data,
+        cache,
+        &cache.uber_state_data,
         Default::default(),
         debug,
     );
@@ -148,7 +122,7 @@ fn compile(
         .eprint_errors()
         .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
-    let string_placeholder_map = output.postprocess(loc_data, rng);
+    let string_placeholder_map = output.postprocess(&cache.loc_data, rng);
 
     let seed = Seed::new(output, string_placeholder_map, debug);
 
@@ -162,4 +136,49 @@ fn compile(
     );
 
     Ok(())
+}
+
+struct PlandoFileAccess<'a> {
+    root: &'a Path,
+}
+
+impl<'a> PlandoFileAccess<'a> {
+    fn new(root: &'a Path) -> Self {
+        Self { root }
+    }
+}
+
+impl AssetFileAccess for PlandoFileAccess<'_> {
+    type Folders = <DefaultFileAccess as AssetFileAccess>::Folders;
+    type Path = <DefaultFileAccess as AssetFileAccess>::Path;
+
+    fn folders(&self) -> Self::Folders {
+        AssetFileAccess::folders(&DefaultFileAccess)
+    }
+}
+
+impl<'a> SnippetFileAccess for PlandoFileAccess<'a> {
+    type Folders = Chain<
+        Once<Cow<'a, Path>>,
+        Map<<DefaultFileAccess as SnippetFileAccess>::Folders, fn(PathBuf) -> Cow<'a, Path>>,
+    >;
+    type Path = Cow<'a, Path>;
+
+    fn folders(&self) -> Self::Folders {
+        iter::once(Cow::Borrowed(self.root))
+            .chain(SnippetFileAccess::folders(&DefaultFileAccess).map(Cow::Owned as fn(_) -> _))
+    }
+}
+
+impl PresetFileAccess for PlandoFileAccess<'_> {
+    type Folders = <DefaultFileAccess as PresetFileAccess>::Folders;
+    type Path = <DefaultFileAccess as PresetFileAccess>::Path;
+
+    fn universe_folders(&self) -> Self::Folders {
+        DefaultFileAccess.universe_folders()
+    }
+
+    fn world_folders(&self) -> Self::Folders {
+        DefaultFileAccess.world_folders()
+    }
 }

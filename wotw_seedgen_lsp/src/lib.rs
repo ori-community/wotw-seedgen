@@ -1,7 +1,6 @@
 mod completion;
 mod convert;
 mod error;
-mod folder_access;
 mod semantic_tokens;
 
 use std::fmt::Display;
@@ -11,7 +10,6 @@ use dashmap::{
     mapref::one::{Ref, RefMut},
     DashMap,
 };
-use folder_access::{url_to_path, FolderAccess};
 use semantic_tokens::{semantic_tokens, semantic_tokens_legend};
 use tower_lsp::{
     jsonrpc::Result,
@@ -27,11 +25,14 @@ use tower_lsp::{
     },
     Client, LanguageServer, LspService, Server,
 };
+use wotw_seedgen_assets::DefaultFileAccess;
 use wotw_seedgen_seed_language::{
     ast,
     compile::{Compiler, FunctionIdentifier},
 };
 use wotw_seedgen_static_assets::UBER_STATE_DATA;
+
+use crate::convert::path_from_lsp;
 
 struct Backend {
     client: Client,
@@ -96,11 +97,9 @@ impl Backend {
     }
 
     async fn update_diagnostics(&self, url: Url) {
-        let Some(path) = self.consume_result(url_to_path(&url)).await else {
+        let Some(path) = self.consume_result(path_from_lsp(&url)).await else {
             return;
         };
-
-        let folder_access = FolderAccess::new(&path);
 
         let Some(identifier) = self
             .consume_result(
@@ -120,7 +119,7 @@ impl Backend {
         let errors = {
             let mut compiler = Compiler::new(
                 &mut rand::thread_rng(),
-                &folder_access,
+                &DefaultFileAccess,
                 &UBER_STATE_DATA,
                 Default::default(),
                 false,

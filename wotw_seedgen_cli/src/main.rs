@@ -1,6 +1,5 @@
 mod cli;
 mod daemon;
-mod files;
 mod import_uber_states;
 mod log_config;
 mod plando;

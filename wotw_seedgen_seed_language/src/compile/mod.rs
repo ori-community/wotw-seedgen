@@ -445,6 +445,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
     pub fn new<R: Rng, F: SnippetAccess>(
         rng: &mut R,
         snippet_access: &'snippets F,
+        // TODO use asset access instead?
         uber_state_data: &'uberstates UberStateData,
         config: FxHashMap<String, FxHashMap<String, String>>,
         debug: bool,
