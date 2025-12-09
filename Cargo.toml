@@ -6,6 +6,7 @@ members = [
     # TODO maybe not all crates need all derives?
     "wotw_seedgen_derive",
     "wotw_seedgen_data",
+    "wotw_seedgen_http_server",
     "wotw_seedgen_logic_language",
     "wotw_seedgen_lsp",
     "wotw_seedgen_parse",

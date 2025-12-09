@@ -1,0 +1,19 @@
+[package]
+name = "wotw_seedgen_http_server"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+wotw_seedgen = { path = "../wotw_seedgen" }
+axum = { version = "0.8.7", default-features = false, features = ["http1", "http2", "json", "tokio", "tower-log", "tracing"] }
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.37.0", features = ["rt-multi-thread"] }
+utoipa = { version = "5.4.0", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+notify-debouncer-full = { version = "0.6.0", default-features = false }
+dirs = "6.0.0"
+thiserror = "2.0.17"
+constcat = "0.6.1"
+ordered-float = { version = "4.2", features = ["serde"] }
+rustc-hash = "2.1.1"
+serde_json = "1.0.145"

@@ -68,12 +68,9 @@ pub enum Cli {
     },
     /// Import an UberState dump
     ImportUberStates,
-    /// Start a daemon for reach checks
-    Daemon {
-        #[command(flatten)]
-        args: VerboseArgs,
-    },
-    /// Start a language server
+    /// Start the http server
+    HttpServer,
+    /// Start the language server
     Lsp,
 }
 
