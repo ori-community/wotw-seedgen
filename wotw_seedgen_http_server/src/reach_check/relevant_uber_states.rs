@@ -1,42 +1,12 @@
 use std::hash::BuildHasher;
 
-use ordered_float::OrderedFloat;
 use rustc_hash::FxBuildHasher;
-use tokio::sync::RwLockReadGuard;
 use wotw_seedgen::{
-    World,
-    assets::{LocData, StateData, UberStateValue},
+    assets::{LocData, StateData},
     data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade},
-    seed::SeedgenInfo,
-    seed_language::simulate::Simulation,
 };
 
-use crate::{
-    api::reach_check::{MapIcon, MapIcons, RelevantUberStates},
-    assets::Cache,
-    error::{Error, Result},
-};
-
-impl MapIcons {
-    pub fn new(loc_data: &LocData) -> Self {
-        let map_icons = loc_data
-            .entries
-            .iter()
-            .filter_map(|entry| {
-                entry.map_position.as_ref().map(|map_position| MapIcon {
-                    identifier: entry.identifier.clone(),
-                    kind: entry.map_icon,
-                    x: map_position.x,
-                    y: map_position.y,
-                })
-            })
-            .collect();
-
-        let hash = FxBuildHasher.hash_one(&map_icons);
-
-        Self { map_icons, hash }
-    }
-}
+use crate::api::reach_check::RelevantUberStates;
 
 impl RelevantUberStates {
     pub fn new(loc_data: &LocData, state_data: &StateData) -> Self {
@@ -139,52 +109,4 @@ impl RelevantUberStates {
 
         Self { identifiers, hash }
     }
-}
-
-pub fn reachable(
-    cache: &RwLockReadGuard<Cache>,
-    current_uber_states: Vec<(UberIdentifier, OrderedFloat<f32>)>,
-    seedgen_info: SeedgenInfo,
-) -> Result<Vec<usize>> {
-    let spawn = cache
-        .graph
-        .find_node(&seedgen_info.spawn_identifier)
-        .map_err(Error::Custom)?;
-
-    let settings = seedgen_info
-        .universe_settings
-        .world_settings
-        .get(seedgen_info.world_index)
-        .ok_or_else(|| "world_index in seedgen_info out of bounds".to_string())
-        .map_err(Error::Custom)?;
-
-    let uber_states = cache.uber_states.clone();
-
-    let mut world = World::new(&cache.graph, spawn, settings, uber_states);
-
-    for (uber_identifier, value) in current_uber_states {
-        let data = cache
-            .base
-            .uber_state_data
-            .id_lookup
-            .get(&uber_identifier)
-            .ok_or_else(|| Error::Custom(format!("Unknown UberIdentifier {uber_identifier}")))?;
-        match &data.default_value {
-            UberStateValue::Boolean(_) => world.store_boolean(uber_identifier, *value > 0.5, &[]),
-            UberStateValue::Integer(_) => {
-                world.store_integer(uber_identifier, (*value) as i32, &[])
-            }
-            UberStateValue::Float(_) => world.store_float(uber_identifier, *value, &[]),
-        }
-    }
-
-    world.traverse_spawn(&[]);
-
-    let reached = world
-        .reached_indices()
-        .filter_map(|index| cache.node_index_to_map_icon_index.get(&index))
-        .copied()
-        .collect();
-
-    Ok(reached)
 }

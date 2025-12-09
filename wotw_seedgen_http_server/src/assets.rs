@@ -5,6 +5,7 @@ use wotw_seedgen::{
         DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess, Source, StateData,
         UberStateData, Watcher,
     },
+    data,
     logic_language::{ast::Areas, output::Graph},
     seed_language::simulate::UberStates,
 };
@@ -22,11 +23,13 @@ pub struct CacheValues {
     pub graph: Graph,
     pub uber_states: UberStates,
     pub map_icons: MapIcons,
+    pub grom_shop_map_icon_index: usize,
     pub node_index_to_map_icon_index: FxHashMap<usize, usize>,
     pub relevant_uber_states: RelevantUberStates,
 }
 
 impl AssetCacheValues for CacheValues {
+    // TODO custom error types on traits?
     fn new<F>(file_access: &F) -> Result<Self, String>
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
@@ -34,6 +37,7 @@ impl AssetCacheValues for CacheValues {
         let base = DefaultAssetCacheValues::new(file_access)?;
 
         let map_icons = MapIcons::new(&base.loc_data);
+        let grom_shop_map_icon_index = grom_shop_map_icon_index(&map_icons);
         let uber_states = UberStates::new(&base.uber_state_data);
         let relevant_uber_states = RelevantUberStates::new(&base.loc_data, &base.state_data);
 
@@ -46,6 +50,7 @@ impl AssetCacheValues for CacheValues {
             graph,
             uber_states,
             map_icons,
+            grom_shop_map_icon_index,
             node_index_to_map_icon_index,
             relevant_uber_states,
         })
@@ -83,6 +88,7 @@ impl AssetCacheValues for CacheValues {
 
         if changed.loc_data {
             self.map_icons = MapIcons::new(&self.base.loc_data);
+            self.grom_shop_map_icon_index = grom_shop_map_icon_index(&self.map_icons);
         }
 
         if changed.uber_state_dump {
@@ -105,6 +111,14 @@ impl AssetCacheValues for CacheValues {
     }
 }
 
+fn grom_shop_map_icon_index(map_icons: &MapIcons) -> usize {
+    map_icons
+        .map_icons
+        .iter()
+        .position(|map_icon| map_icon.label == "GromShop")
+        .unwrap()
+}
+
 fn graph(source: &Source, loc_data: &LocData, state_data: &StateData) -> Result<Graph, String> {
     let areas = Areas::parse(&source.content)
         .eprint_errors(source)
@@ -121,10 +135,17 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
         .iter()
         .enumerate()
         .filter_map(|(node_index, node)| {
+            let identifier = node.identifier();
+
             map_icons
                 .map_icons
                 .iter()
-                .position(|map_icon| map_icon.identifier == node.identifier())
+                .position(|map_icon| match map_icon.kind {
+                    data::MapIcon::Opher | data::MapIcon::Twillen | data::MapIcon::Lupo => {
+                        identifier.starts_with(&map_icon.label)
+                    }
+                    _ => map_icon.label == identifier,
+                })
                 .map(|map_icon_index| (node_index, map_icon_index))
         })
         .collect()

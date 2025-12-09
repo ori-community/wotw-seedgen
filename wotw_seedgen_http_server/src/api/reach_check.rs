@@ -8,13 +8,14 @@ use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema, schema};
 use wotw_seedgen::{
-    data::{self, UberIdentifier},
+    data::{self, Position, UberIdentifier},
     seed::SeedgenInfo,
+    seed_language::ast::Comparator,
 };
 
 use crate::{
     RouterState,
-    api::schemas::{MapIconSchema, UberIdentifierSchema},
+    api::schemas::{ComparatorSchema, MapIconSchema, PositionSchema, UberIdentifierSchema},
     error::{Error, Result},
     reach_check::reachable,
 };
@@ -39,30 +40,41 @@ pub struct Docs;
 #[utoipa::path(
     get,
     path = MAP_ICONS,
-    responses((status = OK, body = RelevantUberStates)),
+    responses((status = OK, body = MapIcons)),
 )]
 async fn map_icons(State(cache): State<RouterState>) -> Json<MapIcons> {
     Json(cache.read().await.map_icons.clone())
 }
 
 #[derive(Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct MapIcons {
     /// List of logically relevant map icons
-    #[schema(value_type = Vec<UberIdentifierSchema>)]
     pub map_icons: Vec<MapIcon>,
     /// Hash of `map_icons`
     pub hash: u64,
 }
 
 #[derive(Clone, Hash, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct MapIcon {
-    pub identifier: String,
+    pub label: String,
     #[schema(value_type = MapIconSchema)]
     pub kind: data::MapIcon,
+    #[schema(value_type = Vec<PositionSchema>)]
+    pub positions: Vec<Position>,
+    pub visible_if_any: Vec<MapIconCondition>,
+}
+
+#[derive(Clone, Hash, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct MapIconCondition {
+    #[schema(value_type = UberIdentifierSchema)]
+    pub uber_identifier: UberIdentifier,
+    #[schema(value_type = ComparatorSchema)]
+    pub comparator: Comparator,
     #[schema(value_type = f32)]
-    pub x: OrderedFloat<f32>,
-    #[schema(value_type = f32)]
-    pub y: OrderedFloat<f32>,
+    pub value: OrderedFloat<f32>,
 }
 
 /// Get a list of logically relevant UberStates
