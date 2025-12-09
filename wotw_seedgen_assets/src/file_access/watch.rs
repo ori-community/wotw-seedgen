@@ -9,8 +9,8 @@ use std::{
 
 use itertools::Itertools;
 use notify_debouncer_full::{
-    notify::{self, EventKind, INotifyWatcher, RecursiveMode},
-    DebouncedEvent, Debouncer, NoCache,
+    notify::{self, EventKind, RecommendedWatcher, RecursiveMode},
+    DebouncedEvent, Debouncer, RecommendedCache,
 };
 use thiserror::Error;
 
@@ -21,7 +21,7 @@ pub struct Watcher {
 
 type DebouncedEventResult = Result<Vec<DebouncedEvent>, Vec<notify::Error>>;
 
-type WatcherSender = Debouncer<INotifyWatcher, NoCache>;
+type WatcherSender = Debouncer<RecommendedWatcher, RecommendedCache>;
 type WatcherReceiver = FilterMap<
     mpsc::IntoIter<DebouncedEventResult>,
     fn(DebouncedEventResult) -> Option<Result<Vec<DebouncedEvent>, WatcherError>>,
