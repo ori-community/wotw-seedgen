@@ -166,7 +166,7 @@ fun tuley() {
     set_wheel_item_data("tuley", Bottom, "TheLastSeed", "", TheLastSeed, {})
 }
 
-on spawn store(gameStateGroup.gameFinished, true)
+on spawn store(randoState.enableSpoilerFilter, true)
 
 // TODO spoiler map crashes
 !item_data_map_icon(item_message("Keystone"), Keystone)
