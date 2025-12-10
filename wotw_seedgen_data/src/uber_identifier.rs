@@ -135,7 +135,7 @@ impl CommonUberIdentifier {
             Self::MaxEnergy | Self::Energy => MapIcon::EnergyFragment,
             Self::WeaponUpgrade(_) => MapIcon::BonusItem, // TODO is this good?
             Self::Shard(_) => MapIcon::Shard,
-            Self::Teleporter(_) => MapIcon::Teleporter,
+            Self::Teleporter(_) => MapIcon::SpiritWell,
             Self::Skill(_) => MapIcon::Skill,
         }
     }
