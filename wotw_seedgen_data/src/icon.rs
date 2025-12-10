@@ -180,14 +180,19 @@ pub enum MapIcon {
     KeystoneDoorOpen = 9,
     /// AbilityPedestal
     Skill = 10,
-    HealthUpgrade = 11,
-    EnergyUpgrade = 12,
-    SavePedestal = 13,
-    AbilityPoint = 14,
+    /// HealthUpgrade
+    HealthCell = 11,
+    /// EnergyUpgrade
+    EnergyCell = 12,
+    /// SavePedestal
+    SpiritWell = 13,
+    /// AbilityPoint
+    AbilityCell = 14,
     KeystoneDoorTwo = 15,
     /// Experience
     SpiritLight = 17,
-    MapstonePickup = 18,
+    /// MapstonePickup
+    MapstoneFragment = 18,
     EnergyGateTwelve = 19,
     EnergyGateTen = 20,
     EnergyGateEight = 21,
@@ -200,7 +205,8 @@ pub enum MapIcon {
     QuestItem = 26,
     /// ShardSlotUpgrade
     ShardSlot = 27,
-    Teleporter = 28,
+    /// Teleporter
+    SpiritWellDeprecated = 28,
     /// Ore
     GorlekOre = 29,
     QuestStart = 30,
@@ -215,8 +221,9 @@ pub enum MapIcon {
     TempleDoor = 41,
     SmallDoor = 42,
     Shrine = 43,
-    // TODO who is this
-    Loremaster = 50,
+    ShrineFinished = 44,
+    // Loremaster
+    Baur = 50,
     /// Weaponmaster
     Opher = 51,
     /// Gardener
@@ -227,7 +234,8 @@ pub enum MapIcon {
     Twillen = 54,
     /// Wanderer
     Tokk = 55,
-    Treekeeper = 56,
+    /// Treekeeper
+    Kii = 56,
     /// Builder
     Grom = 57,
     Kwolok = 58,
@@ -249,7 +257,6 @@ pub enum MapIcon {
     Ku = 73,
     IceFisher = 74,
     Siira = 75,
-    // Rando Icons
     SavePedestalInactive = 76,
     RaceStartFinished = 77,
     RaceEndFinished = 78,
