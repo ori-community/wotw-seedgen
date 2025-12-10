@@ -103,6 +103,8 @@ on reload {
     // TODO Tuley
 }
 
+on gameStateGroup.gameFinished store(randoState.enableSpoilerFilter, true)
+
 // TODO names are inconsistent with icon names
 // TODO try out storing the shop data in the save file
 on reload update_houses_b_unlocked()

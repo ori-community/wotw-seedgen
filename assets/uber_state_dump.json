@@ -868,6 +868,13 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "100": {
+          "name": "enableSpoilerFilter",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "300": {
           "name": "spawnTuley",
           "readonly": false,
