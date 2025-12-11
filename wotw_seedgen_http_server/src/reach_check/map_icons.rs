@@ -3,78 +3,54 @@ use std::{hash::BuildHasher, sync::LazyLock};
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use wotw_seedgen::{
     assets::{LocData, LocDataEntry},
-    data::{self, Position, UberIdentifier},
+    data::{self, Position, UberIdentifier, Zone},
     seed_language::ast::Comparator,
 };
 
 use crate::api::reach_check::{MapIcon, MapIconCondition, MapIcons};
 
-static SPIRIT_TRIAL_ICONS: LazyLock<FxHashMap<UberIdentifier, (Position, Position)>> =
+static SPIRIT_TRIAL_END_POSITIONS: LazyLock<FxHashMap<UberIdentifier, Position>> =
     LazyLock::new(|| {
         FxHashMap::from_iter([
             // MarshPastOpher.SpiritTrial
             (
                 UberIdentifier::new(44964, 45951),
-                (
-                    Position::new(-614., -4319.),
-                    Position::new(-423.68, -4306.3604),
-                ),
+                Position::new(-423.68, -4306.3604),
             ),
             // WestHollow.SpiritTrial
             (
                 UberIdentifier::new(44964, 25545),
-                (
-                    Position::new(-115., -4259.),
-                    Position::new(-175.43, -4440.89),
-                ),
+                Position::new(-175.43, -4440.89),
             ),
             // OuterWellspring.SpiritTrial
             (
                 UberIdentifier::new(44964, 11512),
-                (
-                    Position::new(-668., -3937.),
-                    Position::new(-834.55005, -3893.5503),
-                ),
+                Position::new(-834.55005, -3893.5503),
             ),
             // EastPools.SpiritTrial
             (
                 UberIdentifier::new(44964, 54686),
-                (
-                    Position::new(-1417., -4126.),
-                    Position::new(-1485.9731, -4059.728),
-                ),
+                Position::new(-1485.9731, -4059.728),
             ),
             // WoodsMain.SpiritTrial
             (
                 UberIdentifier::new(44964, 22703),
-                (
-                    Position::new(820., -4047.),
-                    Position::new(859.62, -3938.6702),
-                ),
+                Position::new(859.62, -3938.6702),
             ),
             // LowerReach.SpiritTrial
             (
                 UberIdentifier::new(44964, 23661),
-                (
-                    Position::new(75., -4046.),
-                    Position::new(101.933716, -4046.7227),
-                ),
+                Position::new(101.933716, -4046.7227),
             ),
             // LowerDepths.SpiritTrial
             (
                 UberIdentifier::new(44964, 28552),
-                (
-                    Position::new(478., -4517.),
-                    Position::new(573.47345, -4510.134),
-                ),
+                Position::new(573.47345, -4510.134),
             ),
             // LowerWastes.SpiritTrial
             (
                 UberIdentifier::new(44964, 30767),
-                (
-                    Position::new(1527., -4009.),
-                    Position::new(1580.71, -3898.5503),
-                ),
+                Position::new(1580.71, -3898.5503),
             ),
         ])
     });
@@ -105,11 +81,12 @@ impl MapIcons {
                 data::MapIcon::Twillen => {
                     twillen_conditions.push(MapIconCondition::new(entry.uber_identifier, None));
                 }
-                data::MapIcon::Lupo => {
+                data::MapIcon::Lupo if entry.zone == Zone::Shop => {
                     lupo_conditions.push(MapIconCondition::new(entry.uber_identifier, None));
                 }
                 data::MapIcon::RaceStart => {
-                    let (start, end) = SPIRIT_TRIAL_ICONS[&entry.uber_identifier];
+                    let start = entry.map_position.unwrap();
+                    let end = SPIRIT_TRIAL_END_POSITIONS[&entry.uber_identifier];
 
                     map_icons.extend([
                         MapIcon::spirit_trial_start(entry, start),
