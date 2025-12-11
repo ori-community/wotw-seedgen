@@ -2,10 +2,13 @@ use std::{array, env, path::PathBuf, sync::LazyLock};
 
 use crate::{AssetFileAccess, PresetFileAccess, SnippetFileAccess};
 
-pub static CONFIG_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
-    let mut config_dir = dirs::config_dir().expect("cannot determine config directory");
-    config_dir.push("Ori and the Will of the Wisps Randomizer/seedgen");
-    config_dir
+pub static CONFIG_DIR: LazyLock<PathBuf> = LazyLock::new(|| match env::var_os("CONFIG_DIR") {
+    None => {
+        let mut config_dir = dirs::config_dir().expect("cannot determine config directory");
+        config_dir.push("Ori and the Will of the Wisps Randomizer/seedgen");
+        config_dir
+    }
+    Some(config_dir) => PathBuf::from(config_dir),
 });
 
 pub static EXECUTABLE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
