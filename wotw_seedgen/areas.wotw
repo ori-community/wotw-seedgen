@@ -5996,6 +5996,13 @@ anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the
       Glide OR Sword OR Hammer OR Dash OR Sentry=4 OR Shuriken=2
       Water, Sentry=2 OR Shuriken=1
       Damage=20, Sentry=2 OR Shuriken=1
+      # Glitched
+      # GrenadeJump=1, Water OR Damage=20
+    unsafe:
+      Shuriken=2 OR Sentry=4 OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      Water OR Damage=20 OR Shuriken=1 OR PauseFloat:
+        BlazeSwap=1 OR SentrySwap=1
+      GrenadeJump, Water OR Damage=20 OR PauseFloat
   state OuterWellspring.LifeHarvestWallBroken:
     gorlek: ShurikenBreak=20
     unsafe: SentryBreak=20
@@ -6008,10 +6015,14 @@ anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the
       Bash, Grenade=1  # this would be in moki if the camera didn’t put ori right at the top of the screen, making it hard to aim/catch the grenade
       OuterWellspring.LifeHarvestLeverPulled, SentryJump=1, DoubleJump OR Dash OR Glide OR Damage=15
       OuterWellspring.LifeHarvestLeverPulled, Bash, Dash  # other options are somewhere on the border between difficulties
-    kii, OuterWellspring.LifeHarvestLeverPulled, Bash:
-      Glide OR Sword OR Hammer OR Sentry=4 OR Shuriken=2
-      Water, Sentry=2 OR Shuriken=1
-      Damage=20, Sentry=2 OR Shuriken=1
+    kii:
+      OuterWellspring.LifeHarvestLeverPulled, Bash:
+        Glide OR Sword OR Hammer OR Sentry=4 OR Shuriken=2
+        Water, Sentry=2 OR Shuriken=1
+        Damage=20, Sentry=2 OR Shuriken=1
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+      # GlideJump, DoubleJump, TripleJump OR Hammer OR Spear=1
     unsafe:
       OuterWellspring.LifeHarvestWallBroken, Bash  # https://youtu.be/Lnv5ggGH69s
       DoubleJump, TripleJump OR GlideJump
