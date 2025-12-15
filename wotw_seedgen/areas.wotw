@@ -5835,10 +5835,13 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
     gorlek:
       Grapple, DoubleJump, TripleJump
       Grapple, Dash, Hammer  # upswing into the pickup
-      Launch, Bash, Grenade=1  # other launch paths are covered from the anchor above
+      Launch, Bash, Grenade=1  # other launch paths are covered from OuterWellspring.AboveEntranceDoor
     kii:
       Grapple, DoubleJump
       Grapple, Dash, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump, Grapple OR HammerSJump=1
+      # AerialHammerJump, TripleJump, Bash, Grenade=1
     unsafe:
       Grapple, Dash OR Sword
       GlideBashChain OR DoubleJumpBashChain  # bash the mantis upwards and buffer glide (over and over and over)
@@ -5928,6 +5931,9 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
       OuterWellspring.FallingWheel, DoubleJump, TripleJump, Glide OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       OuterWellspring.FallingWheel, DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       OuterWellspring.FallingWheel, Dash, Hammer, Glide
+      # Glitched
+      # AerialHammerJump, TripleJump
+      # SentryJump=1, SentryJump=1 OR Bash OR DoubleJump OR Dash OR GlideJump  # sjump from the platform with the slime
     unsafe:
       DoubleJump, TripleJump, Hammer  # Climb the left wall. Hammer to prevent softlock after breaking the wall towards the shard. You have to upslash before jumping
       Bash  # https://youtu.be/IhPJ6NdIu8I
@@ -6104,9 +6110,14 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
   pickup OuterWellspring.EntranceRoofEX:  # Be careful it's not redundant with paths from EntranceDoor
     moki: DoubleJump, Launch, Dash OR Glide
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+    # kii:
+      # Glitched
+      # AerialHammerJump, TripleJump, Dash OR Glide OR Sword
     unsafe:
       Launch
       DashBashChain  # Wasp projectile - https://youtu.be/EM9y0XRhFUc
+      AerialHammerJump OR GlideHammerJump  # https://youtu.be/M54U_B6Quto
+      GlideJump, DoubleJump, TripleJump  # get a walljump at the same spot as the hjump path
   pickup OuterWellspring.RightWallEC:  # Be carefull it's not redundant with AboveEntranceDoor->EastDoor->RightWallEC
     gorlek, BreakWall=20: DoubleJump, TripleJump, Damage=15  # go above the wheel to the right, damage not mandatory
     kii, BreakWall=20:
@@ -6145,7 +6156,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
     kii:  # Grapple paths are covered by doing RightWallMidpoint->TrialApproach->EastDoor
       DoubleJump, TripleJump  # climb the far left wall
       # Glitched
-      # AerialHammerJump  # climb the fat left wall. You need one hammer swing before the hjump to reach it (up or horizontal both work)
+      # AerialHammerJump  # climb the far left wall. You need one hammer swing before the hjump to reach it (up or horizontal both work)
     unsafe:
       # Bash, Grenade=1, DoubleJump  # Djump bash is redundant with paths dropping to EntranceDoor
       DoubleJump, Dash
