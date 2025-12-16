@@ -5567,7 +5567,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       Dash, DoubleJump
       DoubleJump, Sword  # upslash to hit the mortar and reset your djump
       Sword, Shuriken=1  # horizontal combo -> shuriken -> upslash -> pogo shuriken
-      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR  Flash=1 OR Sentry=1 OR PauseFloat
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseFloat
 
 anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room opening up to Wellspring. The loading here is not very smart so we place the coordinates a bit left of the autosave
   refill Checkpoint
