@@ -719,8 +719,6 @@ pub enum Trick {
     PauseFloat,
     /// Storing a grounded jump into the air with Glide
     GlideJump,
-    /// Preserving Hammer momentum in a lot of ways
-    HammerJump,
     /// Hammer Jump with Double Jump
     AerialHammerJump,
     /// Preserving Glide Jump momentum with Hammer

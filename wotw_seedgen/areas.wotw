@@ -23,6 +23,7 @@
 # FlashSwap: Extends to Flash and having energy to use it
 # SentrySwap=x: Extends to Sentry=x
 # BlazeSwap=x: Extends to Blaze=x
+# AbilitySwap=x: Extends to BlazeSwap=x OR FlashSwap OR SentrySwap=x
 # WaveDash: Extends to Dash, Regenerate and having energy to use it
 # GrenadeJump: Extends to Grenade and having energy to use it
 # GrenadeCancel: Extends to Grenade and having energy to use it
@@ -1114,7 +1115,7 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
       # GrenadeJump=1
     unsafe:
       DoubleJump  # wall jump on the small wall between the breakable wall and the spikes
-      GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GrenadeJump OR AbilitySwap=1
       GlideJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   conn HowlsDen.UpperLoopExit:
     moki:
@@ -1164,7 +1165,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/ESDKKCgALVc
       Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
-      GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GlideJump OR AbilitySwap=1
       GrenadeJump  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
   pickup HowlsDen.MagnetShard:  # Can use the barrier near Sword tree because if it got broken you can just go the long way around for free
     moki: BreakWall=10, BreakWall=16 OR Launch
@@ -1173,7 +1174,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       # Glitched
       # BreakWall=10, GrenadeJump=1, DoubleJump
     unsafe:
-      BreakWall=10, DoubleJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      BreakWall=10, DoubleJump OR GrenadeJump OR AbilitySwap=2
       HowlsDen.RainLifted, Bash  # https://youtu.be/jYZ7oOuq18k
   pickup HowlsDen.AboveTPEX:  # Lizard only spawns if you have sword
     moki: HowlsDen.BoneBarrier, BreakWall=10
@@ -1194,7 +1195,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       SentryJump=2  # Sword sjump can go up to HowlsDen.AboveBoneBridge but landing here and doing the loop also solves the connection to AboveBoneBridge
       HammerSJump=1, DoubleJump
       GlideHammerJump OR AerialHammerJump
-      BlazeSwap=4 OR FlashSwap OR SentrySwap=4
+      AbilitySwap=4
   conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
       HowlsDen.RainLifted, GlideBashChain  # Bash chain
@@ -1934,7 +1935,7 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       # Glitched
       # Combat=SpinCrab, GrenadeJump=1
     unsafe:
-      Hammer OR Sentry=2 OR PauseFloat OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR GrenadeJump
+      Hammer OR Sentry=2 OR PauseFloat OR AbilitySwap=1 OR GrenadeJump
 
   conn MarshPastOpher.PoolsPathOneWayWall:
     gorlek, ShurikenBreak=20:
@@ -2328,7 +2329,7 @@ anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big roo
       Bash  # Bash the lantern once to the right then bash it again
       DoubleJump  # https://youtu.be/ng90hakT_W4
       Blaze=1, Damage=15
-      BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR PauseFloat
+      AbilitySwap=2 OR PauseFloat
   conn MidnightBurrows.BelowUpperKS:
   # Check for redundancy with PortalRoom -> East -> DenConnection -> PortalCorridor -> BelowUpperKS
   # Also check for redundancy with MidnightBurrows.Lever
@@ -2355,7 +2356,7 @@ anchor MidnightBurrows.PortalRoom at -706, -4588:  # Bottom right of the big roo
     unsafe:
       MidnightBurrows.Lever, Bash OR Sentry=1 OR Blaze=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR GrenadeCancel
       GrenadeJump, Shuriken=2 OR Flash=2 OR Sentry=2
-      BlazeSwap=4 OR FlashSwap OR SentrySwap=4
+      AbilitySwap=4
   conn MidnightBurrows.Central:
     moki: MidnightBurrows.Lever
     gorlek: Damage=15
@@ -2555,7 +2556,7 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
     unsafe:
       Sword  # pogo the slime
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      GrenadeJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GrenadeJump OR GlideJump OR AbilitySwap=1
   conn WestHollow.InFrontPurpleDoorEnemyPaths:  # check for redundancies with MokiByTwillen
     # using the dirty water may be softlockable if you drain the water. Currently draining the water provides no advantage for this connection, so no paths using the water can exist
     moki:
@@ -2904,7 +2905,7 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
       DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # thorns bellow the statue are friendly and so is the water
       Dash, Damage=10  # friendly thorns and water to reach the frog statue then dboost to get a wall jump off the left wall
       SentryJump=1  # use weapon to reach the friendly water and sjump from there
-      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      AbilitySwap=2
       PauseFloat, BlazeSwap=1 OR SentrySwap=1 
       Bow=1, GrenadeJump
 
@@ -2928,12 +2929,12 @@ anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of
         Bash OR Launch OR DoubleJump
         Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
         Sword  # Pogo the shot of the slug
-        GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+        GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR AbilitySwap=1
       WaterDash, Damage=30:
         Bash OR Launch OR DoubleJump
         Bow=1, Dash OR DoubleJump OR Glide OR Hammer OR Shuriken=3 OR Sentry=3
         Sword  # Pogo the shot of the slug
-        GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+        GlideJump OR HammerSJump=1 OR CoyoteHammerJump OR GrenadeJump OR AbilitySwap=1
 
 # checkpoint at -356, -4306
 
@@ -3473,7 +3474,7 @@ anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
     unsafe:
       SwordJump, TripleJump
       GlideJump, DoubleJump, TripleJump
-      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump OR AbilitySwap=2
   conn WestHollow.InFrontPurpleDoorEnemyPaths:
     moki: WestHollow.PurpleDoorOpen
 
@@ -3638,7 +3639,7 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
       Bash  # use the mortar projectile
       SentryJump=2  # dodge the spikes with the weapon you use to sjump
       SentryJump=1, Damage=10, Hammer  # dboost in the spikes to jump to the side of the ceiling above the lantern then hammer upslash as you slide off to get a wjump on the left side of that ceiling
-      AerialHammerJump OR BlazeSwap=3 OR FlashSwap OR SentrySwap=3
+      AerialHammerJump OR AbilitySwap=3
       Damage=10, GlideHammerJump OR WallHammerJump
       Damage=20, CoyoteHammerJump
       GrenadeJump, DoubleJump OR Dash OR Damage=10  # damage grenade cancel above the right spikes then gjump from the pit of spikes
@@ -3907,7 +3908,7 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
     unsafe:
       DoubleJump, Dash OR Hammer OR Sword  # you can walljump on a small wall above the spikes
       GlideJump, DoubleJump OR Hammer OR Sword OR Spear=1 OR Shuriken=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1
-      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      AbilitySwap=2
       SwordSJump=1, Dash OR Shuriken=2
       GrenadeJump
   conn EastHollow.TreeAreaJumppad:
@@ -3993,7 +3994,7 @@ anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the firs
       # Glitched
       # GrenadeJump=1, DoubleJump OR Dash OR Hammer
     unsafe:
-      GlideHammerJump OR CoyoteHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      GlideHammerJump OR CoyoteHammerJump OR AbilitySwap=2
       GrenadeJump, Sword  # https://youtu.be/hofmOwZ2ffk
       GrenadeJump, DoubleJump OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR GlideJump
       
@@ -4011,7 +4012,7 @@ anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the firs
     unsafe:
       DoubleJump, TripleJump OR GlideJump
       DoubleJump, Damage=10  # https://youtu.be/oT0RfJ_NBwY
-      AerialHammerJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      AerialHammerJump OR GrenadeJump OR AbilitySwap=1
       
 anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to the first bashable lantern
   pickup EastHollow.SecretRoofEX:  # these paths can't get over the big spike wall from the left anchor
@@ -4021,7 +4022,7 @@ anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to 
       # Glitched
       # GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Dash OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      Dash OR GlideJump OR AbilitySwap=1
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   pickup EastHollow.MortarEX:
     moki:
@@ -4169,7 +4170,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1  # friendly spikes
+      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat OR AbilitySwap=1  # friendly spikes
   conn WoodsEntry.ShriekMeet:
     moki, Water, EastHollow.SilentSwimWall, Combat=Balloon:
       Grapple, DoubleJump, Dash OR Glide
@@ -4257,7 +4258,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     unsafe, GladesTown.ClearThorns:
       Water OR Damage=100:
         Bash, Grenade=1  # The grenade has to be thrown from the very edge of the platform
-        DoubleJump OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR GlideHammerJump OR CoyoteHammerJump
+        DoubleJump OR GrenadeJump OR AbilitySwap=1 OR GlideHammerJump OR CoyoteHammerJump
       WaterDash, Damage=40
   # Disabled for now since seed_core applies a fix by default
   # pickup GladesTown.CaveBurrowEX:
@@ -4315,7 +4316,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       # Bash, Grenade=2, Glide OR Sword OR DoubleJump
       GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer OR GlideJump OR PauseFloat OR BlazeSwap=1 OR SentrySwap=1
       SentryJump=1  # from the tp for sword
-      BlazeSwap=3 OR FlashSwap OR SentrySwap=3 OR WallHammerJump
+      AbilitySwap=3 OR WallHammerJump
       CoyoteHammerJump, Dash OR Flash=1 OR BlazeSwap=1 OR Sentry=1 OR PauseFloat
       GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       TuleyShop.Lightcatchers, Bash, GlideJump OR GrenadeJump OR CoyoteHammerJump OR BlazeSwap=1 OR SentrySwap=1
@@ -4391,7 +4392,7 @@ anchor GladesTown.ThornyBranch at -330, -4135:  # Next to GladesTown.ArcingShard
       DoubleJump, TripleJump  # hardcore parkour
       DoubleJump, BlazeSwap=1 OR SentrySwap=1
       GrenadeJump, DoubleJump
-      AerialHammerJump OR GlideHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=2
       GladesTown.ClearThorns, DoubleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 # https://youtu.be/SgMebS4-Aag
       TuleyShop.Lightcatchers, Bash, Grenade=1  # https://youtu.be/zb09kz4YhX4
 
@@ -4535,7 +4536,7 @@ anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twille
       # Glitched
       # GlideJump OR GrenadeJump=1
     unsafe, GladesTown.BuildHuts:
-      GrenadeJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR PauseFloat
+      GrenadeJump OR GlideJump OR AbilitySwap=1 OR PauseFloat
       Bash  # slime lure
       TuleyShop.SpringPlants, Hammer  # uphammer bounce
       Dash  # late coyote
@@ -4689,7 +4690,7 @@ anchor GladesTown.BuiltMotayHut at -394, -4135: # In front of the house hovering
       SwordSJump=1, Dash
       TuleyShop.Lightcatchers, Bash, Glide OR Sword OR Hammer
       GlideJump, DoubleJump, TripleJump OR Hammer OR Sword OR Spear=1 OR BlazeSwap=1 OR SentrySwap=1
-      BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      AbilitySwap=2
 
 anchor GladesTown.MotayHutDoor at -394, -4135:  # Specifically exiting Motay's hut
 # This anchor is for paths which would only work when exiting Motay's hut.
@@ -4764,7 +4765,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
       # SentryJump=1
       # Bash, Grenade=1, GlideJump
     unsafe:
-      DoubleJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      DoubleJump OR AbilitySwap=1
       Bash, Grenade=1
       SentryJump=1
       Sword, Grenade=1 OR Shuriken=2  # pogo
@@ -4808,7 +4809,7 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
       # GrenadeJump=1
     unsafe:
       Sword  # upslash+downslash
-      Spear=1 OR GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      Spear=1 OR GrenadeJump OR AbilitySwap=1
 
 anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
   door:
@@ -4836,7 +4837,7 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
       # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Dash OR Sword OR HammerSJump=1 OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+    unsafe: Dash OR Sword OR HammerSJump=1 OR WallHammerJump OR GlideJump OR AbilitySwap=2
   pickup GladesTown.CaveBurrowEX:
     moki: Burrow, DoubleJump OR Launch
     gorlek: Burrow  # Burrow Dash out of the sand
@@ -4854,7 +4855,7 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
       Hammer, Glide OR Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
       # GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe, GladesTown.ClearThorns: Dash OR Sword OR WallHammerJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+    unsafe, GladesTown.ClearThorns: Dash OR Sword OR WallHammerJump OR GlideJump OR AbilitySwap=2
 
 anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at the door
   door:
@@ -4901,7 +4902,7 @@ anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at 
     unsafe:
       Flash=2, Water OR Damage=32  # use Flash for mobility as well
       Flash=2, WaterDash, Damage=16
-      BowCancel, Water, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR Damage=10  # Slide the wall to avoid a dboost in the first spikes and let bow cancel itself by entering water. Might be possible without the condition with a good corner boost above the spikes. The best I got touched the spikes just above the water.
+      BowCancel, Water, WaterDash, DoubleJump OR Dash OR Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Sentry=2 OR AbilitySwap=1 OR Damage=10  # Slide the wall to avoid a dboost in the first spikes and let bow cancel itself by entering water. Might be possible without the condition with a good corner boost above the spikes. The best I got touched the spikes just above the water.
       DoubleJump, GlideJump, Flash=2  # glide jump -> djump -> flash is enough the get a walljump which reset your djump to go above the entrance
       Bow=2 OR Flash=1 OR BreakCrystal:  # https://youtu.be/n5A8F_-jcbM I haven't tested all the crystal variation but Tjump+spear/sentry and Djump+Hammer work so it's probably fine
         Launch
@@ -5137,7 +5138,7 @@ anchor GladesTown.BelowHoleHut at -214, -4111:  # The ledge below Hole Hut
       # GrenadeJump=1, TuleyShop.Lightcatchers, Bash
       # GlideJump, DoubleJump OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
     unsafe:
-      GrenadeJump OR GlideJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      GrenadeJump OR GlideJump OR AbilitySwap=2
       TuleyShop.BlueMoon, Grapple, Blaze=1
       TuleyShop.SpringPlants, Hammer  # Uphammer Bounce
       TuleyShop.StickyGrass, Grapple, Sword OR Hammer # OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  I don't think those are possible?
@@ -5363,7 +5364,7 @@ anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower po
       SwordSJump=2  # precise sword float to the safe ledge on the very left
       SentryJump=1, Damage=10
       GlideJump, DoubleJump
-      AerialHammerJump OR GlideHammerJump OR BlazeSwap=3 OR FlashSwap OR SentrySwap=3
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
   pickup WestGlades.SwimEC:
     moki: Water
     kii:
@@ -5562,7 +5563,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
       # GlideJump, DoubleJump OR Dash OR Hammer
       # AerialHammerJump OR GrenadeJump=1
     unsafe:
-      GrenadeJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GrenadeJump OR AbilitySwap=1
       Dash, DoubleJump
       DoubleJump, Sword  # upslash to hit the mortar and reset your djump
       Sword, Shuriken=1  # horizontal combo -> shuriken -> upslash -> pogo shuriken
@@ -5595,7 +5596,7 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       # Glitched
       # GlideJump
     unsafe:
-      Water, DoubleJump OR GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      Water, DoubleJump OR GlideJump OR AbilitySwap=1
       Water, Bash  # https://youtu.be/nk874rtFxUo
 
   conn WestGlades.ShrineArea:
@@ -5652,7 +5653,7 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
     kii: Hammer OR Blaze=4 OR Sentry=2
     unsafe:
       Bash  # juggle a mortar projectile
-      Shuriken=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR PauseFloat
+      Shuriken=2 OR AbilitySwap=1 OR PauseFloat
       GrenadeJump, Hammer OR Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn OuterWellspring.RightWallMidpoint:  # Make sure it's not redundant with paths from OuterWellspring.AboveEntranceDoor
     kii:
@@ -5689,7 +5690,7 @@ anchor WestGlades.MillApproach at -705, -4065:  # At the ledge of the room openi
       # LaunchSwap
     unsafe:
       Water:
-        Launch OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2 OR GlideJump
+        Launch OR AbilitySwap=2 OR GlideJump
         Bash, Hammer OR DoubleJump
         Grapple, Sword OR Shuriken=2 OR BlazeSwap=1 OR SentrySwap=1
         WaterDash, DoubleJump
@@ -5772,7 +5773,7 @@ anchor OuterWellspring.CutsceneIsland at -756, -4071:  # The island on the right
       # GlideJump
       # GrenadeJump=1, Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
     unsafe:
-      Glide OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1 OR CoyoteHammerJump OR PauseFloat
+      Glide OR Sentry=2 OR AbilitySwap=1 OR CoyoteHammerJump OR PauseFloat
       GrenadeJump, Hammer OR Spear=3 OR Shuriken=2 OR Flash=2 OR Sentry=2 OR Blaze=3
   conn WestGlades.MillApproach:
     moki:
@@ -5795,7 +5796,7 @@ anchor OuterWellspring.CutsceneIsland at -756, -4071:  # The island on the right
       # GrenadeJump=1, Glide OR Dash OR Sword OR Blaze=5 OR Sentry=3
       # GrenadeJump=1, Hammer, Grapple OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      GlideJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GlideJump OR AbilitySwap=1
       Glide, CoyoteHammerJump OR WallHammerJump OR GrenadeJump
       GrenadeJump, Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Sentry=2
       Dash, Glide
@@ -5905,7 +5906,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
     unsafe:
       # Glide, Spear=1
       # DoubleJump, Spear=1
-      Glide OR Sword OR Shuriken=5 OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      Glide OR Sword OR Shuriken=5 OR AbilitySwap=2
       Grapple, Shuriken=2
       Water, Damage=15  # dboost on the wheel above OuterWellspring.BasementEC
       Damage=95  # dboost on the wheel above OuterWellspring.BasementEC
@@ -5937,7 +5938,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
     unsafe:
       DoubleJump, TripleJump, Hammer  # Climb the left wall. Hammer to prevent softlock after breaking the wall towards the shard. You have to upslash before jumping
       Bash  # https://youtu.be/IhPJ6NdIu8I
-      BlazeSwap=4 OR FlashSwap OR SentrySwap=4
+      AbilitySwap=4
       Damage=10, BlazeSwap=3 OR SentrySwap=3
       Damage=20, BlazeSwap=2 OR SentrySwap=2
       # Bash, Grenade=1, Spear=1 OR Blaze=1  # Use the slime on the way to the basement to reach the slime on the wooden platform. Launch a grenade straight up, bash the slime to reach it.
@@ -5979,7 +5980,7 @@ anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where yo
       # GrenadeJump=1, Shuriken=1 OR Blaze=2 OR Flash=1
     unsafe:
       GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      PauseFloat OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      PauseFloat OR AbilitySwap=1
   conn WestGlades.MillApproach:
     kii: Bash, Glide  # Bash glide from the slime on the wooden platform
     unsafe: Bash  # https://youtu.be/oKrKsmUBt54
@@ -5999,7 +6000,7 @@ anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the
       # Glitched
       # GrenadeJump=1, Water OR Damage=20
     unsafe:
-      Shuriken=2 OR Sentry=4 OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      Shuriken=2 OR Sentry=4 OR AbilitySwap=2
       Water OR Damage=20 OR Shuriken=1 OR PauseFloat:
         BlazeSwap=1 OR SentrySwap=1
       GrenadeJump, Water OR Damage=20 OR PauseFloat
@@ -6152,7 +6153,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       Bash, Grenade=2
       Bash, DoubleJump
       SentryJump=1  # with sword, pogo the cristal https://youtu.be/DEeyQWHDF4M
-      AerialHammerJump OR GlideHammerJump OR BlazeSwap=4 OR FlashSwap OR SentrySwap=4
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=4
       GrenadeJump, Hammer, Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # from the right wheel
       GrenadeJump, Hammer, Damage=10, Dash OR HammerExtension OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # https://youtu.be/TT72Io_dhAg
   conn OuterWellspring.WestDoor:  # going to the left. Make sure its not redundant with going to OuterWellspring.EastDoor first (either directly or by doing RightWallMidpoint->TrialApproach->EastDoor)
@@ -6192,7 +6193,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
       # GlideJump OR AerialHammerJump
     unsafe:
       # Glide  # Wasn't able to get that. It's most likely a GlideJump.
-      GlideJump OR BlazeSwap=3 OR FlashSwap OR SentrySwap=3
+      GlideJump OR AbilitySwap=3
       Bash, Hammer OR Sword OR Spear=1 OR Shuriken=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1  # Bash above the thrid wheel. Condition is for grabbing the first wheel.
       Hammer, DoubleJump OR SpearJump=1 OR BlazeSwap=1 OR SentrySwap=1  # goes above the third wheel . With energy weapon, do the hammer float from there https://youtu.be/DEeyQWHDF4M to grab the third wheel
       Hammer, Dash OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # goes bellow the third wheel. With energy weapon, do the hammer float from there https://youtu.be/DEeyQWHDF4M to grab the third wheel
@@ -6350,7 +6351,7 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       # Shuriken=1 OR Blaze=1 OR Sentry=1:  # land on the lower wheel
       #   GrenadeJump=1, Blaze=5 OR Sentry=5
     unsafe, BreakWall=20:  # make sure it's not redundant with going to OuterWellspring.TrialApproach first
-      PauseFloat OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2  # 2nd sentry swap will start damaging the wall
+      PauseFloat OR AbilitySwap=2  # 2nd sentry swap will start damaging the wall
       Bash, Grenade=1, Damage=15
       GrenadeCancel, Bash, Grenade=1
       GrenadeJump, Shuriken=2 OR Blaze=4 OR Sentry=2  # some will start damaging the wall
@@ -6424,7 +6425,7 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       GlideJump
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # There's a little friendly spike area on the very edge of the platform
       Bash, Grenade=1, Sentry=2, Damage=10
-      BlazeSwap=3 OR FlashSwap OR SentrySwap=3
+      AbilitySwap=3
       Damage=10, BlazeSwap=2 OR SentrySwap=2
       SentryJump=1, Glide OR Damage=10
   conn OuterWellspring.RightWallMidpoint:
@@ -6496,7 +6497,7 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
       # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer
       # InnerWellspring.TopDoorOpen, GlideJump
     unsafe:
-      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR AbilitySwap=1
       GlideJump, Sword  # pogo the gorlek
       InnerWellspring.TopDoorOpen, Sword OR Dash OR GlideJump  # Pogo the energy cristal or dash ramp
   conn OuterWellspring.WestDoor:
@@ -6562,7 +6563,7 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
       Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
       SentryJump=1  # use the weapon for movement
       GrenadeJump, DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseFloat
-      AerialHammerJump OR CoyoteHammerJump OR WallHammerJump OR GlideHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      AerialHammerJump OR CoyoteHammerJump OR WallHammerJump OR GlideHammerJump OR AbilitySwap=2
       GlideJump, DoubleJump, TripleJump OR Hammer
       DoubleJump, TripleJump, Sword, Shuriken=1 OR Grenade=1  # pogo
       DoubleJump, Sword, Deflector, Shuriken=1 OR Grenade=1
@@ -6650,7 +6651,7 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       # AerialHammerJump, TripleJump
     unsafe:
       Grapple  # https://youtu.be/vI511KFMZWI
-      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR BlazeSwap=2 OR FlashSwap OR SentrySwap=2
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR AbilitySwap=2
       GrenadeJump, DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/_9NDzS77mck
   pickup OuterWellspring.RightWallEC:
     moki, BreakWall=20:
@@ -6682,7 +6683,7 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       # GrenadeJump=1, Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # no spear because its so slow its hard to time it too avoid the first spinner
       # GrenadeJump=1, Damage=30, Spear=1
     unsafe:
-      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      GrenadeJump OR AerialHammerJump OR GlideHammerJump OR AbilitySwap=1
       GlideJump, DoubleJump
   conn OuterWellspring.EastDoor:
     moki:
@@ -6759,7 +6760,7 @@ anchor OuterWellspring.TrialStart at -665, -3937:
       # Glitched
       # GrenadeJump=1, Damage=15
     unsafe:
-      Damage=30 OR DoubleJump OR PauseFloat OR Sentry=2 OR BlazeSwap=1 OR FlashSwap OR SentrySwap=1
+      Damage=30 OR DoubleJump OR PauseFloat OR Sentry=2 OR AbilitySwap=1
       Hammer, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
       GrenadeJump
 

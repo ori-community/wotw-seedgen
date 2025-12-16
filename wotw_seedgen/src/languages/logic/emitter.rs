@@ -311,13 +311,12 @@ fn build_requirement<'a>(
             context,
         ),
         parser::RequirementValue::GlideJump => {
-            build_trick_requirement(Trick::GlideJump, Requirement::Skill(Skill::Glide), context)
+            build_trick_requirement(
+                Trick::GlideJump,
+                Requirement::Skill(Skill::Glide),
+                context
+            )
         }
-        parser::RequirementValue::HammerJump => build_trick_requirement(
-            Trick::HammerJump,
-            Requirement::Skill(Skill::Hammer),
-            context,
-        ),
         parser::RequirementValue::AerialHammerJump => build_trick_requirement(
             Trick::AerialHammerJump,
             Requirement::And(vec![
@@ -391,6 +390,32 @@ fn build_requirement<'a>(
             ]),
             context,
         ),
+        parser::RequirementValue::AbilitySwap(amount) => build_or(vec![
+            build_trick_requirement(
+                Trick::BlazeSwap,
+                Requirement::And(vec![
+                    Requirement::EnergySkill(Skill::Blaze, *amount as f32),
+                    Requirement::Or(build_swap_requirement(Skill::Blaze))
+                ]),
+                context,
+            ),
+            build_trick_requirement(
+                Trick::FlashSwap,
+                Requirement::And(vec![
+                    Requirement::NonConsumingEnergySkill(Skill::Flash),
+                    Requirement::Or(build_swap_requirement(Skill::Flash))
+                ]),
+                context,
+            ),
+            build_trick_requirement(
+                Trick::SentrySwap,
+                Requirement::And(vec![
+                    Requirement::EnergySkill(Skill::Sentry, *amount as f32),
+                    Requirement::Or(build_swap_requirement(Skill::Sentry))
+                ]),
+                context,
+            ),
+        ]),
     }
 }
 
