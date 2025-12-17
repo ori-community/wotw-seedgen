@@ -3,18 +3,14 @@ use wotw_seedgen::{
     assets::{
         AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
         DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess, Source, StateData,
-        UberStateData, Watcher,
+        UberStateData,
     },
     data,
     logic_language::{ast::Areas, output::Graph},
     seed_language::simulate::UberStates,
 };
 
-use crate::{
-    RouterState,
-    api::reach_check::{MapIcons, RelevantUberStates},
-    error::Error,
-};
+use crate::api::reach_check::{MapIcons, RelevantUberStates};
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
 
@@ -149,33 +145,4 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
                 .map(|map_icon_index| (node_index, map_icon_index))
         })
         .collect()
-}
-
-pub async fn watch_assets(state: RouterState, watcher: Watcher) {
-    for res in watcher {
-        or_print(
-            (async || {
-                let events = res?;
-
-                let mut cache = state.write().await;
-
-                let any_changed = cache
-                    .update_from_watcher_event(&events)
-                    .map_err(Error::ReloadAssets)?;
-
-                if any_changed {
-                    eprintln!("Reloaded assets");
-                }
-
-                Ok(())
-            })()
-            .await,
-        );
-    }
-}
-
-fn or_print(res: Result<(), Error>) {
-    if let Err(err) = res {
-        eprintln!("error in file watcher: {err}");
-    }
 }

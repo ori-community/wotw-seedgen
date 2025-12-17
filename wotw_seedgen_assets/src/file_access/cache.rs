@@ -13,7 +13,7 @@ use crate::{
 
 pub struct AssetCache<F, V> {
     file_access: F,
-    values: V,
+    pub values: V,
 }
 
 impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheValues>

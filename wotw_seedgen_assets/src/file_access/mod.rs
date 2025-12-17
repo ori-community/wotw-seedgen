@@ -1,9 +1,11 @@
 mod cache;
 mod default_dirs;
+mod plando;
 mod watch;
 
 pub use cache::{AssetCache, AssetCacheValues, ChangedAssets, DefaultAssetCacheValues};
 pub use default_dirs::{DefaultFileAccess, CONFIG_DIR, EXECUTABLE_DIR};
+pub use plando::PlandoFileAccess;
 pub use watch::{Watcher, WatcherError};
 
 use crate::{

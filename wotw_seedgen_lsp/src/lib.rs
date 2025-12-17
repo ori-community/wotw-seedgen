@@ -1,3 +1,4 @@
+mod cache;
 mod completion;
 mod convert;
 mod error;
@@ -25,24 +26,25 @@ use tower_lsp::{
     },
     Client, LanguageServer, LspService, Server,
 };
-use wotw_seedgen_assets::DefaultFileAccess;
+use wotw_seedgen_assets::{AssetCache, DefaultFileAccess, PlandoFileAccess};
 use wotw_seedgen_seed_language::{
     ast,
     compile::{Compiler, FunctionIdentifier},
 };
-use wotw_seedgen_static_assets::UBER_STATE_DATA;
 
-use crate::convert::path_from_lsp;
+use crate::{cache::Cache, convert::path_from_lsp};
 
 struct Backend {
     client: Client,
+    cache: Cache,
     text_documents: DashMap<Url, String>,
 }
 
 impl Backend {
-    fn new(client: Client) -> Self {
+    fn new(client: Client, cache: Cache) -> Self {
         Self {
             client,
+            cache,
             text_documents: Default::default(),
         }
     }
@@ -116,11 +118,24 @@ impl Backend {
             return;
         };
 
+        let Some(root) = self
+            .consume_result(
+                path.parent()
+                    .ok_or_else(|| format!("invalid url \"{url}\": no parent")),
+            )
+            .await
+        else {
+            return;
+        };
+
         let errors = {
+            let snippet_access = PlandoFileAccess::new(root);
+            let cache = self.cache.read().await;
+
             let mut compiler = Compiler::new(
                 &mut rand::thread_rng(),
-                &DefaultFileAccess,
-                &UBER_STATE_DATA,
+                &snippet_access,
+                &cache.uber_state_data,
                 Default::default(),
                 false,
             );
@@ -128,8 +143,11 @@ impl Backend {
             // TODO currently we can only give diagnostics for saved files because we're not using the editors in-memory changes
             // Need to do changes in the language create to improve that
             compiler.compile_snippet(identifier).unwrap(); // TODO have to gracefully exit here, path might be outdated
-            let (source, errors) = compiler
-                .finish()
+            let result = compiler.finish();
+
+            drop(cache);
+
+            let (source, errors) = result
                 .errors
                 .into_iter()
                 .find(|(source, _)| source.id[..source.id.len() - 6].ends_with(identifier))
@@ -285,8 +303,10 @@ impl LanguageServer for Backend {
 
         let ast = ast::Snippet::parse(source.value());
 
+        let cache = self.cache.read().await;
+
         // index is the cursor position, we want to offer completions for whatever was typed before.
-        let completion = ast.parsed.completion(index - 1);
+        let completion = ast.parsed.completion(index - 1, &cache.values);
 
         Ok(completion.map(CompletionResponse::Array))
     }
@@ -336,16 +356,16 @@ impl LanguageServer for Backend {
 }
 
 pub fn start() {
-    tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(async {
-            let stdin = tokio::io::stdin();
-            let stdout = tokio::io::stdout();
+    let cache = AssetCache::new(DefaultFileAccess).unwrap();
 
-            let (service, socket) = LspService::build(Backend::new).finish();
+    let (runtime, cache) = wotw_seedgen_server_shared::start(cache).unwrap();
 
-            Server::new(stdin, stdout, socket).serve(service).await;
-        });
+    runtime.block_on(async {
+        let stdin = tokio::io::stdin();
+        let stdout = tokio::io::stdout();
+
+        let (service, socket) = LspService::build(|client| Backend::new(client, cache)).finish();
+
+        Server::new(stdin, stdout, socket).serve(service).await;
+    });
 }

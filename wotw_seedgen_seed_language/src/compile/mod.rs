@@ -518,6 +518,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct CompileResult {
     pub output: IntermediateOutput,
     pub errors: Vec<(Source, Vec<Error>)>,

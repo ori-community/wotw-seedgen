@@ -12,6 +12,7 @@ members = [
     "wotw_seedgen_parse",
     "wotw_seedgen_seed",
     "wotw_seedgen_seed_language",
+    "wotw_seedgen_server_shared",
     "wotw_seedgen_settings",
     "wotw_seedgen_static_assets", # TODO move into a feature module of assets?
     "wotw_seedgen_stats",

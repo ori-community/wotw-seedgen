@@ -1,13 +1,10 @@
-use lazy_static::lazy_static;
-use rustc_hash::FxHashMap;
+use std::sync::LazyLock;
+
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
-use wotw_seedgen_assets::{
-    data::{
-        self, Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
-        LupoIcon, MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon,
-        VariantArray, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
-    },
-    UberStateAlias, UberStateDataEntry,
+use wotw_seedgen_assets::data::{
+    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
+    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VariantArray,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 use wotw_seedgen_seed_language::{
     ast::{
@@ -28,31 +25,32 @@ use wotw_seedgen_seed_language::{
     },
     types::Type,
 };
-use wotw_seedgen_static_assets::UBER_STATE_DATA;
+
+use crate::cache::CacheValues;
 
 pub trait Completion {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>>;
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>>;
 }
 
-trait CompletionAfterSpanCheck: Span {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>>;
+trait CompletionInSpan: Span {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>>;
 }
 
 impl<T> Completion for T
 where
-    T: CompletionAfterSpanCheck,
+    T: CompletionInSpan,
 {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         if !self.span().contains(&index) {
             return None;
         }
 
-        self.completion_after_span_check(index)
+        self.completion_in_span(index, cache)
     }
 }
 
 trait ErrCompletion {
-    fn err_completion(err: &Error) -> Vec<CompletionItem>;
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem>;
 }
 
 fn keyword_completion(keyword: &str) -> CompletionItem {
@@ -63,12 +61,12 @@ fn keyword_completion(keyword: &str) -> CompletionItem {
     }
 }
 
-impl<T> CompletionAfterSpanCheck for Box<T>
+impl<T> CompletionInSpan for Box<T>
 where
     T: Completion + Span,
 {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        (**self).completion(index)
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        (**self).completion(index, cache)
     }
 }
 
@@ -76,8 +74,8 @@ impl<T> ErrCompletion for Box<T>
 where
     T: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        T::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        T::err_completion(err, cache)
     }
 }
 
@@ -85,8 +83,8 @@ impl<T> Completion for Option<T>
 where
     T: Completion,
 {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.as_ref().and_then(|t| t.completion(index))
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.as_ref().and_then(|t| t.completion(index, cache))
     }
 }
 
@@ -94,8 +92,8 @@ impl<T> Completion for SpannedOption<T>
 where
     T: Completion,
 {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.as_option().and_then(|t| t.completion(index))
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.as_option().and_then(|t| t.completion(index, cache))
     }
 }
 
@@ -103,10 +101,15 @@ impl<T> Completion for Vec<T>
 where
     T: Completion + ErrCompletion,
 {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.iter()
-            .find_map(|item| item.completion(index))
-            .or_else(|| Some(T::err_completion(&Error::custom(String::new(), 0..0))))
+            .find_map(|item| item.completion(index, cache))
+            .or_else(|| {
+                Some(T::err_completion(
+                    &Error::custom(String::new(), 0..0),
+                    cache,
+                ))
+            })
     }
 }
 
@@ -114,24 +117,24 @@ impl<T> ErrCompletion for Vec<T>
 where
     T: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        T::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        T::err_completion(err, cache)
     }
 }
 
-impl<Open, Content, Close> CompletionAfterSpanCheck for Delimited<Open, Content, Close>
+impl<Open, Content, Close> CompletionInSpan for Delimited<Open, Content, Close>
 where
     Open: SpanStart,
     Content: Completion + ErrCompletion,
     Close: SpanEnd,
 {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.content.completion(index)
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.content.completion(index, cache)
     }
 }
 
 impl<Open, Content, Close> ErrCompletion for Delimited<Open, Content, Close> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -140,8 +143,8 @@ impl<Item, Punctuation> Completion for Punctuated<Item, Punctuation>
 where
     Item: Completion,
 {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.iter().find_map(|item| item.completion(index))
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.iter().find_map(|item| item.completion(index, cache))
     }
 }
 
@@ -149,17 +152,17 @@ impl<Item, Punctuation> ErrCompletion for Punctuated<Item, Punctuation>
 where
     Item: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Item::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Item::err_completion(err, cache)
     }
 }
 
-impl<Item, Separator> CompletionAfterSpanCheck for SeparatedNonEmpty<Item, Separator>
+impl<Item, Separator> CompletionInSpan for SeparatedNonEmpty<Item, Separator>
 where
     Item: Completion + Span,
 {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.iter().find_map(|item| item.completion(index))
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.iter().find_map(|item| item.completion(index, cache))
     }
 }
 
@@ -167,17 +170,17 @@ impl<Item, Separator> ErrCompletion for SeparatedNonEmpty<Item, Separator>
 where
     Item: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Item::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Item::err_completion(err, cache)
     }
 }
 
-impl<V> CompletionAfterSpanCheck for Once<V>
+impl<V> CompletionInSpan for Once<V>
 where
     V: Completion + Span,
 {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.0.completion(index)
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
@@ -185,17 +188,17 @@ impl<V> ErrCompletion for Once<V>
 where
     V: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        V::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        V::err_completion(err, cache)
     }
 }
 
-impl<V, R> CompletionAfterSpanCheck for Recoverable<V, R>
+impl<V, R> CompletionInSpan for Recoverable<V, R>
 where
     V: Completion + ErrCompletion + Span,
 {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.value.completion(index)
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.value.completion(index, cache)
     }
 }
 
@@ -203,17 +206,17 @@ impl<V, R> ErrCompletion for Recoverable<V, R>
 where
     V: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        V::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        V::err_completion(err, cache)
     }
 }
 
-impl<T> CompletionAfterSpanCheck for Spanned<T>
+impl<T> CompletionInSpan for Spanned<T>
 where
     T: Completion,
 {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.data.completion(index)
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.data.completion(index, cache)
     }
 }
 
@@ -221,8 +224,8 @@ impl<T> ErrCompletion for Spanned<T>
 where
     T: ErrCompletion,
 {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        T::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        T::err_completion(err, cache)
     }
 }
 
@@ -230,133 +233,54 @@ impl<T> Completion for CommandArg<T>
 where
     T: Completion + ErrCompletion + Span,
 {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.value
             .as_option()
-            .and_then(|(_, t)| t.completion(index))
+            .and_then(|(_, t)| t.completion(index, cache))
     }
 }
 
 impl Completion for Identifier<'_> {
-    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, _index: usize, _cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         // TODO offer identifiers in scope
         None
     }
 }
 
-fn uber_identifier_numeric_completion_item(
-    id: data::UberIdentifier,
-    data: &UberStateDataEntry,
-) -> CompletionItem {
-    CompletionItem {
-        label: id.to_string(),
-        label_details: Some(CompletionItemLabelDetails {
-            description: Some(data.preferred_name().clone()),
-            ..Default::default()
-        }),
-        kind: Some(CompletionItemKind::VALUE),
-        ..Default::default()
-    }
-}
-
-fn uber_identifier_name_completion_item(
-    group: &str,
-    member: &str,
-    alias: &UberStateAlias,
-    ambiguous: bool,
-) -> CompletionItem {
-    CompletionItem {
-        label: format!("{group}.{member}"),
-        label_details: Some(CompletionItemLabelDetails {
-            description: Some(alias.to_string()),
-            detail: ambiguous.then(|| "(ambiguous name)".to_string()),
-        }),
-        kind: Some(CompletionItemKind::VALUE),
-        ..Default::default()
-    }
-}
-
-lazy_static! {
-    static ref UBER_IDENTIFIER_NUMERIC_COMPLETION: Vec<CompletionItem> =
-        UBER_STATE_DATA
-            .id_lookup
-            .iter()
-            .map(|(id, data)| uber_identifier_numeric_completion_item(*id, data))
-            .collect()
-    ;
-    static ref UBER_IDENTIFIER_NUMERIC_MEMBER_COMPLETION: FxHashMap<i32, Vec<CompletionItem>> = {
-        let mut group_map = FxHashMap::<i32, Vec<CompletionItem>>::default();
-
-        for (id, data) in &UBER_STATE_DATA.id_lookup {
-            group_map.entry(id.group).or_default().push(CompletionItem {
-                insert_text: Some(id.member.to_string()),
-                filter_text: Some(id.member.to_string()),
-                ..uber_identifier_numeric_completion_item(*id, data)
-            });
-        }
-
-        group_map
-    };
-    static ref UBER_IDENTIFIER_NAME_COMPLETION: Vec<CompletionItem> =
-        UBER_STATE_DATA
-            .name_lookup
-            .iter()
-            .flat_map(|(group, members)| {
-                members.iter().flat_map(move |(member, aliases)| {
-                    let ambiguous = aliases.len() > 1;
-
-                    aliases.iter().map(move |alias| uber_identifier_name_completion_item(group, member, alias, ambiguous))
-                })
-            })
-            .collect()
-    ;
-    static ref UBER_IDENTIFIER_NAME_MEMBER_COMPLETION: FxHashMap<String, Vec<CompletionItem>> = {
-        UBER_STATE_DATA
-            .name_lookup
-            .iter()
-            .map(|(group, members)| {
-                (
-                    group.clone(),
-                        members
-                            .iter()
-                            .flat_map(|(member, aliases)| {
-                                let ambiguous = aliases.len() > 1;
-
-                                aliases.iter().map(move |alias| CompletionItem {
-                                    insert_text: Some(member.clone()), // TODO edit in numbers on ambiguous names?
-                                    filter_text: Some(member.clone()),
-                                    ..uber_identifier_name_completion_item(group, member, alias, ambiguous)
-                                })
-                            })
-                            .collect(),
-                )
-            })
-            .collect()
-    };
-}
-
-impl CompletionAfterSpanCheck for UberIdentifier<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for UberIdentifier<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
             UberIdentifier::Numeric(uber_identifier_numeric) => {
-                uber_identifier_numeric.completion(index)
+                uber_identifier_numeric.completion(index, cache)
             }
-            UberIdentifier::Name(uber_identifier_name) => uber_identifier_name.completion(index),
+            UberIdentifier::Name(uber_identifier_name) => {
+                uber_identifier_name.completion(index, cache)
+            }
         }
     }
 }
 
-impl CompletionAfterSpanCheck for UberIdentifierNumeric {
-    fn completion_after_span_check(&self, _index: usize) -> Option<Vec<CompletionItem>> {
-        UBER_IDENTIFIER_NUMERIC_MEMBER_COMPLETION
+impl CompletionInSpan for UberIdentifierNumeric {
+    fn completion_in_span(
+        &self,
+        _index: usize,
+        cache: &CacheValues,
+    ) -> Option<Vec<CompletionItem>> {
+        cache
+            .uber_identifier_numeric_member_completion
             .get(&self.group.data)
             .cloned()
     }
 }
 
-impl CompletionAfterSpanCheck for UberIdentifierName<'_> {
-    fn completion_after_span_check(&self, _index: usize) -> Option<Vec<CompletionItem>> {
-        UBER_IDENTIFIER_NAME_MEMBER_COMPLETION
+impl CompletionInSpan for UberIdentifierName<'_> {
+    fn completion_in_span(
+        &self,
+        _index: usize,
+        cache: &CacheValues,
+    ) -> Option<Vec<CompletionItem>> {
+        cache
+            .uber_identifier_name_member_completion
             .get(self.group.data.0)
             .cloned()
     }
@@ -429,82 +353,125 @@ where
         .collect()
 }
 
-lazy_static! {
-    static ref CLIENT_EVENT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_detailed(ClientEvent::VARIANTS, "ClientEvent");
-    static ref SKILL_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(Skill::VARIANTS, "Skill", |skill| *skill as u8);
-    static ref SHARD_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(Shard::VARIANTS, "Shard", |shard| *shard as u8);
-    static ref TELEPORTER_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(Teleporter::VARIANTS, "Teleporter", |teleporter| {
-            *teleporter as u8
-        });
-    static ref WEAPON_UPGRADE_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(WeaponUpgrade::VARIANTS, "WeaponUpgrade", |weapon_upgrade| {
-            *weapon_upgrade as u8
-        });
-    static ref EQUIPMENT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(Equipment::VARIANTS, "Equipment", |equipment| *equipment
-            as u8);
-    static ref ZONE_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(Zone::VARIANTS, "Zone", |zone| *zone as u8);
-    static ref OPHER_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(OpherIcon::VARIANTS, "OpherIcon", |opher_icon| {
-            *opher_icon as u8
-        });
-    static ref LUPO_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(LupoIcon::VARIANTS, "LupoIcon", |lupo_icon| *lupo_icon as u8);
-    static ref GROM_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(GromIcon::VARIANTS, "GromIcon", |grom_icon| *grom_icon as u8);
-    static ref TULEY_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(TuleyIcon::VARIANTS, "TuleyIcon", |tuley_icon| {
-            *tuley_icon as u8
-        });
-    static ref MAP_ICON_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(MapIcon::VARIANTS, "MapIcon", |map_icon| *map_icon as u8);
-    static ref EQUIP_SLOT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(EquipSlot::VARIANTS, "EquipSlot", |equip_slot| {
-            *equip_slot as u8
-        });
-    static ref WHEEL_ITEM_POSITION_COMPLETION: Vec<CompletionItem> = enum_member_completions_full(
+static CLIENT_EVENT_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions_detailed(ClientEvent::VARIANTS, "ClientEvent"));
+
+static SKILL_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions_full(Skill::VARIANTS, "Skill", |skill| *skill as u8));
+
+static SHARD_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions_full(Shard::VARIANTS, "Shard", |shard| *shard as u8));
+
+static TELEPORTER_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(Teleporter::VARIANTS, "Teleporter", |teleporter| {
+        *teleporter as u8
+    })
+});
+
+static WEAPON_UPGRADE_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(WeaponUpgrade::VARIANTS, "WeaponUpgrade", |weapon_upgrade| {
+        *weapon_upgrade as u8
+    })
+});
+
+static EQUIPMENT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(Equipment::VARIANTS, "Equipment", |equipment| {
+        *equipment as u8
+    })
+});
+
+static ZONE_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions_full(Zone::VARIANTS, "Zone", |zone| *zone as u8));
+
+static OPHER_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(OpherIcon::VARIANTS, "OpherIcon", |opher_icon| {
+        *opher_icon as u8
+    })
+});
+
+static LUPO_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(LupoIcon::VARIANTS, "LupoIcon", |lupo_icon| *lupo_icon as u8)
+});
+
+static GROM_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(GromIcon::VARIANTS, "GromIcon", |grom_icon| *grom_icon as u8)
+});
+
+static TULEY_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(TuleyIcon::VARIANTS, "TuleyIcon", |tuley_icon| {
+        *tuley_icon as u8
+    })
+});
+
+static MAP_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(MapIcon::VARIANTS, "MapIcon", |map_icon| *map_icon as u8)
+});
+
+static EQUIP_SLOT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(EquipSlot::VARIANTS, "EquipSlot", |equip_slot| {
+        *equip_slot as u8
+    })
+});
+
+static WHEEL_ITEM_POSITION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(
         WheelItemPosition::VARIANTS,
         "WheelItemPosition",
-        |wheel_item_position| { *wheel_item_position as u8 }
-    );
-    static ref WHELL_BIND_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(WheelBind::VARIANTS, "WheelBind", |wheel_bind| {
-            *wheel_bind as u8
-        });
-    static ref ALIGNMENT_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions_full(Alignment::VARIANTS, "Alignment", |alignment| *alignment
-            as u8);
-    static ref HORIZONTAL_ANCHOR_COMPLETION: Vec<CompletionItem> = enum_member_completions_full(
+        |wheel_item_position| *wheel_item_position as u8,
+    )
+});
+
+static WHELL_BIND_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(WheelBind::VARIANTS, "WheelBind", |wheel_bind| {
+        *wheel_bind as u8
+    })
+});
+
+static ALIGNMENT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(Alignment::VARIANTS, "Alignment", |alignment| {
+        *alignment as u8
+    })
+});
+
+static HORIZONTAL_ANCHOR_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(
         HorizontalAnchor::VARIANTS,
         "HorizontalAnchor",
-        |horizontal_anchor| { *horizontal_anchor as u8 }
-    );
-    static ref VERTICAL_ANCHOR_COMPLETION: Vec<CompletionItem> = enum_member_completions_full(
+        |horizontal_anchor| *horizontal_anchor as u8,
+    )
+});
+
+static VERTICAL_ANCHOR_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(
         VerticalAnchor::VARIANTS,
         "VerticalAnchor",
-        |vertical_anchor| { *vertical_anchor as u8 }
-    );
-    static ref SCREEN_POSITION_COMPLETION: Vec<CompletionItem> = enum_member_completions_full(
+        |vertical_anchor| *vertical_anchor as u8,
+    )
+});
+
+static SCREEN_POSITION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(
         ScreenPosition::VARIANTS,
         "ScreenPosition",
-        |screen_position| { *screen_position as u8 }
-    );
-    static ref COORDINATE_SYSTEM_COMPLETION: Vec<CompletionItem> = enum_member_completions_full(
+        |screen_position| *screen_position as u8,
+    )
+});
+
+static COORDINATE_SYSTEM_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(
         CoordinateSystem::VARIANTS,
         "CoordinateSystem",
-        |coordinate_system| { *coordinate_system as u8 }
-    );
-    static ref CONSTANT_COMPLETION: Vec<CompletionItem> = ConstantDiscriminants::VARIANTS
+        |coordinate_system| *coordinate_system as u8,
+    )
+});
+
+static CONSTANT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    ConstantDiscriminants::VARIANTS
         .iter()
         .copied()
         .flat_map(constant_member_completion)
-        .collect();
-}
+        .collect()
+});
 
 fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem> {
     match kind {
@@ -531,73 +498,70 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
     }
 }
 
-lazy_static! {
-    static ref EXPRESSION_COMPLETION: Vec<CompletionItem> = {
-        // Important: we use the "if" from ACTION_COMPLETION in first position as a marker in Trigger::completion_after_span_check
-        let mut completion = ACTION_COMPLETION.clone();
+static ACTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    // Important: we use this "if" in first position as a marker in Trigger::completion_after_span_check
+    let mut completion = vec![keyword_completion("if")];
 
-        completion.append(&mut LITERAL_COMPLETION.clone());
+    completion.append(&mut FUNCTION_COMPLETION.clone());
 
-        // TODO is this used elsewhere? If not, can save the clone
-        completion.append(&mut UBER_IDENTIFIER_NAME_COMPLETION.clone());
+    completion
+});
 
-        completion
-    };
+static FUNCTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| function_completion());
 
-    static ref ACTION_COMPLETION: Vec<CompletionItem> = {
-        // Important: we use this "if" in first position as a marker in Trigger::completion_after_span_check
-        let mut completion = vec![keyword_completion("if")];
+fn literal_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+    let mut completion = cache.uber_identifier_numeric_completion.clone();
 
-        completion.append(&mut FUNCTION_COMPLETION.clone());
+    completion.append(&mut CONSTANT_COMPLETION.clone());
 
-        completion
-    };
-
-    static ref FUNCTION_COMPLETION: Vec<CompletionItem> = function_completion();
-
-    static ref LITERAL_COMPLETION: Vec<CompletionItem> = {
-        let mut completion = UBER_IDENTIFIER_NUMERIC_COMPLETION.clone();
-
-        completion.append(&mut CONSTANT_COMPLETION.clone());
-
-        completion
-    };
+    completion
 }
 
-impl CompletionAfterSpanCheck for Expression<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+fn expression_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+    // Important: we use the "if" from ACTION_COMPLETION in first position as a marker in Trigger::completion_after_span_check
+    let mut completion = ACTION_COMPLETION.clone();
+
+    completion.append(&mut literal_completion(cache));
+
+    completion.append(&mut cache.uber_identifier_name_completion.clone());
+
+    completion
+}
+
+impl CompletionInSpan for Expression<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            Expression::Value(value) => value.completion(index),
-            Expression::Operation(operation) => operation.completion(index),
+            Expression::Value(value) => value.completion(index, cache),
+            Expression::Operation(operation) => operation.completion(index, cache),
         }
     }
 }
 
 impl ErrCompletion for Expression<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
-        EXPRESSION_COMPLETION.clone()
+    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        expression_completion(cache)
     }
 }
 
-impl CompletionAfterSpanCheck for Operation<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Operation<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.left
-            .completion(index)
-            .or_else(|| self.right.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.right.completion(index, cache))
     }
 }
 
-impl CompletionAfterSpanCheck for ExpressionValue<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ExpressionValue<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            ExpressionValue::Group(group) => group.completion(index),
-            ExpressionValue::Action(action) => action.completion(index),
-            ExpressionValue::Literal(literal) => literal.completion(index),
+            ExpressionValue::Group(group) => group.completion(index, cache),
+            ExpressionValue::Action(action) => action.completion(index, cache),
+            ExpressionValue::Literal(literal) => literal.completion(index, cache),
             ExpressionValue::Identifier(identifier) => {
                 // Important: we use the "if" from EXPRESSION_COMPLETION in first position as a marker in Trigger::completion_after_span_check
-                let mut completion = EXPRESSION_COMPLETION.clone();
+                let mut completion = expression_completion(cache);
 
-                if let Some(mut identifier_completion) = identifier.completion(index) {
+                if let Some(mut identifier_completion) = identifier.completion(index, cache) {
                     completion.append(&mut identifier_completion);
                 }
 
@@ -607,41 +571,41 @@ impl CompletionAfterSpanCheck for ExpressionValue<'_> {
     }
 }
 
-impl CompletionAfterSpanCheck for Action<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Action<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            Action::Condition(_, condition) => condition.completion(index),
-            Action::Function(function_call) => function_call.completion(index),
-            Action::Multi(multi) => multi.completion(index),
+            Action::Condition(_, condition) => condition.completion(index, cache),
+            Action::Function(function_call) => function_call.completion(index, cache),
+            Action::Multi(multi) => multi.completion(index, cache),
         }
     }
 }
 
 impl ErrCompletion for Action<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         ACTION_COMPLETION.clone()
     }
 }
 
-impl CompletionAfterSpanCheck for ActionCondition<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ActionCondition<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.condition
-            .completion(index)
-            .or_else(|| self.action.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.action.completion(index, cache))
     }
 }
 
-impl CompletionAfterSpanCheck for FunctionCall<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.parameters.completion(index)
+impl CompletionInSpan for FunctionCall<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.parameters.completion(index, cache)
     }
 }
 
 impl Completion for Literal<'_> {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            Literal::UberIdentifier(uber_identifier) => uber_identifier.completion(index),
-            Literal::Integer(_) => Some(UBER_IDENTIFIER_NUMERIC_COMPLETION.clone()),
+            Literal::UberIdentifier(uber_identifier) => uber_identifier.completion(index, cache),
+            Literal::Integer(_) => Some(cache.uber_identifier_numeric_completion.clone()),
             Literal::Constant(_) => Some(CONSTANT_COMPLETION.clone()),
             Literal::Boolean(_) | Literal::Float(_) | Literal::String(_) => None,
         }
@@ -649,32 +613,34 @@ impl Completion for Literal<'_> {
 }
 
 impl ErrCompletion for Literal<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
-        LITERAL_COMPLETION.clone()
+    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        literal_completion(cache)
     }
 }
 
 impl Completion for Snippet<'_> {
-    fn completion(&self, index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.contents
             .iter()
-            .find_map(|content| content.completion(index))
+            .find_map(|content| content.completion(index, cache))
     }
 }
 
 impl ErrCompletion for Snippet<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         unreachable!() // Snippet parsing cannot fail
     }
 }
 
-impl CompletionAfterSpanCheck for Content<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Content<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            Content::Event(_, event) => event.completion(index),
-            Content::Function(_, function_definition) => function_definition.completion(index),
-            Content::Command(_, command) => command.completion(index),
-            Content::Annotation(_, annotation) => annotation.completion(index),
+            Content::Event(_, event) => event.completion(index, cache),
+            Content::Function(_, function_definition) => {
+                function_definition.completion(index, cache)
+            }
+            Content::Command(_, command) => command.completion(index, cache),
+            Content::Annotation(_, annotation) => annotation.completion(index, cache),
         }
     }
 }
@@ -708,49 +674,48 @@ fn completion_from_error(err: &Error) -> Vec<CompletionItem> {
 }
 
 impl ErrCompletion for Content<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         completion_from_error(err)
     }
 }
 
-lazy_static! {
-    static ref TRIGGER_NON_EXPRESSION_COMPLETION: Vec<CompletionItem> = {
-        let mut completion = vec![keyword_completion("change")];
+static TRIGGER_NON_EXPRESSION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    let mut completion = vec![keyword_completion("change")];
 
-        completion.append(&mut CLIENT_EVENT_COMPLETION.clone());
+    completion.append(&mut CLIENT_EVENT_COMPLETION.clone());
 
-        completion
-    };
-    static ref TRIGGER_COMPLETION: Vec<CompletionItem> = {
-        let mut completion = TRIGGER_NON_EXPRESSION_COMPLETION.clone();
+    completion
+});
 
-        completion.append(&mut EXPRESSION_COMPLETION.clone());
+fn trigger_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+    let mut completion = TRIGGER_NON_EXPRESSION_COMPLETION.clone();
 
-        completion
-    };
+    completion.append(&mut expression_completion(cache));
+
+    completion
 }
 
-impl CompletionAfterSpanCheck for Event<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Event<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.trigger
-            .completion(index)
-            .or_else(|| self.action.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.action.completion(index, cache))
     }
 }
 
 impl ErrCompletion for Event<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
-        TRIGGER_COMPLETION.clone()
+    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        trigger_completion(cache)
     }
 }
 
-impl CompletionAfterSpanCheck for Trigger<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Trigger<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
             Trigger::ClientEvent(_) => None,
-            Trigger::Binding(_, binding) => binding.completion(index),
+            Trigger::Binding(_, binding) => binding.completion(index, cache),
             Trigger::Condition(condition) => {
-                let mut completion = condition.completion(index).unwrap_or_default();
+                let mut completion = condition.completion(index, cache).unwrap_or_default();
 
                 // If we are returning identifier completions, add relevant non expression completions
                 if completion.first().is_some_and(|item| item.label == "if") {
@@ -764,19 +729,21 @@ impl CompletionAfterSpanCheck for Trigger<'_> {
 }
 
 impl ErrCompletion for Trigger<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
-        TRIGGER_COMPLETION.clone()
+    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        trigger_completion(cache)
     }
 }
 
-impl CompletionAfterSpanCheck for TriggerBinding<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for TriggerBinding<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            TriggerBinding::UberIdentifier(uber_identifier) => uber_identifier.completion(index),
+            TriggerBinding::UberIdentifier(uber_identifier) => {
+                uber_identifier.completion(index, cache)
+            }
             TriggerBinding::Identifier(identifier) => {
-                let mut completion = UBER_IDENTIFIER_NAME_COMPLETION.clone();
+                let mut completion = cache.uber_identifier_name_completion.clone();
 
-                if let Some(mut identifier_completion) = identifier.completion(index) {
+                if let Some(mut identifier_completion) = identifier.completion(index, cache) {
                     completion.append(&mut identifier_completion);
                 }
 
@@ -787,499 +754,498 @@ impl CompletionAfterSpanCheck for TriggerBinding<'_> {
 }
 
 impl ErrCompletion for TriggerBinding<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
         // Failure means there was no identifier, so only numeric completions may be relevant
-        UBER_IDENTIFIER_NUMERIC_COMPLETION.clone()
+        cache.uber_identifier_numeric_completion.clone()
     }
 }
 
-impl CompletionAfterSpanCheck for FunctionDefinition<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.actions.completion(index)
+impl CompletionInSpan for FunctionDefinition<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.actions.completion(index, cache)
     }
 }
 
 impl ErrCompletion for FunctionDefinition<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for Command<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Command<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         // TODO need more recoveries inside commands for useful completions
         match self {
             Command::Include(_, _) => None, // TODO completions for files available in the workspace and identifiers contained in imported snippets
             Command::IncludeIcon(_, _) | Command::BuiltinIcon(_, _) => None, // TODO identifier and icon path completions
-            Command::AugmentFun(_, args) => args.completion(index),
+            Command::AugmentFun(_, args) => args.completion(index, cache),
             Command::Export(_, _) => None, // TODO identifier completions
-            Command::Spawn(_, args) => args.completion(index),
-            Command::Tags(_, args) => args.completion(index),
-            Command::Config(_, args) => args.completion(index),
-            Command::SetConfig(_, args) => args.completion(index),
-            Command::State(_, args) => args.completion(index),
+            Command::Spawn(_, args) => args.completion(index, cache),
+            Command::Tags(_, args) => args.completion(index, cache),
+            Command::Config(_, args) => args.completion(index, cache),
+            Command::SetConfig(_, args) => args.completion(index, cache),
+            Command::State(_, args) => args.completion(index, cache),
             Command::Timer(_, _) => None,
-            Command::Let(_, args) => args.completion(index),
-            Command::If(_, args) => args.completion(index),
-            Command::Repeat(_, args) => args.completion(index),
-            Command::AddItem(_, args) => args.completion(index),
-            Command::RemoveItem(_, args) => args.completion(index),
-            Command::ItemData(_, args) => args.completion(index),
-            Command::ItemDataName(_, args) => args.completion(index),
-            Command::ItemDataPrice(_, args) => args.completion(index),
-            Command::ItemDataDescription(_, args) => args.completion(index),
-            Command::ItemDataIcon(_, args) => args.completion(index),
-            Command::ItemDataMapIcon(_, args) => args.completion(index),
-            Command::RemoveLocation(_, args) => args.completion(index),
+            Command::Let(_, args) => args.completion(index, cache),
+            Command::If(_, args) => args.completion(index, cache),
+            Command::Repeat(_, args) => args.completion(index, cache),
+            Command::AddItem(_, args) => args.completion(index, cache),
+            Command::RemoveItem(_, args) => args.completion(index, cache),
+            Command::ItemData(_, args) => args.completion(index, cache),
+            Command::ItemDataName(_, args) => args.completion(index, cache),
+            Command::ItemDataPrice(_, args) => args.completion(index, cache),
+            Command::ItemDataDescription(_, args) => args.completion(index, cache),
+            Command::ItemDataIcon(_, args) => args.completion(index, cache),
+            Command::ItemDataMapIcon(_, args) => args.completion(index, cache),
+            Command::RemoveLocation(_, args) => args.completion(index, cache),
             Command::SetLogicState(_, _) => None,
-            Command::Preplace(_, args) => args.completion(index),
-            Command::ZoneOf(_, args) => args.completion(index),
-            Command::ItemOn(_, args) => args.completion(index),
-            Command::CountInZone(_, args) => args.completion(index),
-            Command::RandomInteger(_, args) => args.completion(index),
-            Command::RandomFloat(_, args) => args.completion(index),
-            Command::RandomPool(_, args) => args.completion(index),
+            Command::Preplace(_, args) => args.completion(index, cache),
+            Command::ZoneOf(_, args) => args.completion(index, cache),
+            Command::ItemOn(_, args) => args.completion(index, cache),
+            Command::CountInZone(_, args) => args.completion(index, cache),
+            Command::RandomInteger(_, args) => args.completion(index, cache),
+            Command::RandomFloat(_, args) => args.completion(index, cache),
+            Command::RandomPool(_, args) => args.completion(index, cache),
             Command::RandomFromPool(_, _) => None,
         }
     }
 }
 
 impl ErrCompletion for Command<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         // TODO typing ! doesn't give completions
         completion_from_error(err)
     }
 }
 
-impl CompletionAfterSpanCheck for AugmentFunArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.action.completion(index)
+impl CompletionInSpan for AugmentFunArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.action.completion(index, cache)
     }
 }
 
 impl ErrCompletion for AugmentFunArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for SpawnArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for SpawnArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.x
-            .completion(index)
-            .or_else(|| self.y.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.y.completion(index, cache))
     }
 }
 
 impl ErrCompletion for SpawnArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Expression::err_completion(err) // TODO offer spawn identifiers from areas.wotw
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(err, cache) // TODO offer spawn identifiers from areas.wotw
     }
 }
 
-impl CompletionAfterSpanCheck for TagsArg<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.0.completion(index)
+impl CompletionInSpan for TagsArg<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
 impl ErrCompletion for TagsArg<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Expression::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(err, cache)
     }
 }
 
 // TODO identifier completions in lots of places, just search for identifier in the ast...
-impl CompletionAfterSpanCheck for ConfigArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ConfigArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.ty
-            .completion(index)
-            .or_else(|| self.default.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.default.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ConfigArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-lazy_static! {
-    static ref CONFIG_TYPE_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions(ConfigType::VARIANTS);
-}
+static CONFIG_TYPE_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(ConfigType::VARIANTS));
 
 impl Completion for ConfigType {
-    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, _index: usize, _cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         None
     }
 }
 
 impl ErrCompletion for ConfigType {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         CONFIG_TYPE_COMPLETION.clone()
     }
 }
 
 impl Completion for SetConfigArgs<'_> {
-    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, _index: usize, _cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         None
     }
 }
 
 impl ErrCompletion for SetConfigArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for StateArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.ty.completion(index)
+impl CompletionInSpan for StateArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.ty.completion(index, cache)
     }
 }
 
 impl ErrCompletion for StateArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-lazy_static! {
-    static ref UBER_STATE_TYPE_COMPLETION: Vec<CompletionItem> =
-        enum_member_completions(UberStateType::VARIANTS);
-}
+static UBER_STATE_TYPE_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(UberStateType::VARIANTS));
 
 impl Completion for UberStateType {
-    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, _index: usize, _cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         None
     }
 }
 
 impl ErrCompletion for UberStateType {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         UBER_STATE_TYPE_COMPLETION.clone()
     }
 }
 
-impl CompletionAfterSpanCheck for LetArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.value.completion(index)
+impl CompletionInSpan for LetArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.value.completion(index, cache)
     }
 }
 
 impl ErrCompletion for LetArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for CommandIf<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for CommandIf<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.condition
-            .completion(index)
-            .or_else(|| self.contents.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.contents.completion(index, cache))
     }
 }
 
 impl ErrCompletion for CommandIf<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Expression::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for CommandRepeat<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for CommandRepeat<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.amount
-            .completion(index)
-            .or_else(|| self.contents.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.contents.completion(index, cache))
     }
 }
 
 impl ErrCompletion for CommandRepeat<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Expression::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for AddItemArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.0.completion(index)
+impl CompletionInSpan for AddItemArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
 impl ErrCompletion for AddItemArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        ChangeItemPoolArgs::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        ChangeItemPoolArgs::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for RemoveItemArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.0.completion(index)
+impl CompletionInSpan for RemoveItemArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
 impl ErrCompletion for RemoveItemArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        ChangeItemPoolArgs::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        ChangeItemPoolArgs::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ChangeItemPoolArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ChangeItemPoolArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.amount.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.amount.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ChangeItemPoolArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ItemDataArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ItemDataArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.name.completion(index))
-            .or_else(|| self.price.completion(index))
-            .or_else(|| self.description.completion(index))
-            .or_else(|| self.icon.completion(index))
-            .or_else(|| self.map_icon.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.name.completion(index, cache))
+            .or_else(|| self.price.completion(index, cache))
+            .or_else(|| self.description.completion(index, cache))
+            .or_else(|| self.icon.completion(index, cache))
+            .or_else(|| self.map_icon.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ItemDataArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ItemDataNameArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ItemDataNameArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.name.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.name.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ItemDataNameArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ItemDataPriceArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ItemDataPriceArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.price.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.price.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ItemDataPriceArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ItemDataDescriptionArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ItemDataDescriptionArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.description.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.description.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ItemDataDescriptionArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ItemDataIconArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ItemDataIconArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.icon.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.icon.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ItemDataIconArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ItemDataMapIconArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for ItemDataMapIconArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.map_icon.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.map_icon.completion(index, cache))
     }
 }
 
 impl ErrCompletion for ItemDataMapIconArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for RemoveLocationArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.condition.completion(index)
+impl CompletionInSpan for RemoveLocationArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.condition.completion(index, cache)
     }
 }
 
 impl ErrCompletion for RemoveLocationArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Expression::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for PreplaceArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for PreplaceArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
-            .completion(index)
-            .or_else(|| self.zone.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.zone.completion(index, cache))
     }
 }
 
 impl ErrCompletion for PreplaceArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        Action::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for ZoneOfArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.item.completion(index)
+impl CompletionInSpan for ZoneOfArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.item.completion(index, cache)
     }
 }
 
 impl ErrCompletion for ZoneOfArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for ItemOnArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.trigger.completion(index)
+impl CompletionInSpan for ItemOnArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.trigger.completion(index, cache)
     }
 }
 
 impl ErrCompletion for ItemOnArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for CountInZoneArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for CountInZoneArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.zone_bindings
-            .completion(index)
-            .or_else(|| self.items.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.items.completion(index, cache))
     }
 }
 
 impl ErrCompletion for CountInZoneArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for CountInZoneBinding<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.zone.completion(index)
+impl CompletionInSpan for CountInZoneBinding<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.zone.completion(index, cache)
     }
 }
 
 impl ErrCompletion for CountInZoneBinding<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for RandomIntegerArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.0.completion(index)
+impl CompletionInSpan for RandomIntegerArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
 impl ErrCompletion for RandomIntegerArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        RandomNumberArgs::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        RandomNumberArgs::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for RandomFloatArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
-        self.0.completion(index)
+impl CompletionInSpan for RandomFloatArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
 impl ErrCompletion for RandomFloatArgs<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
-        RandomNumberArgs::err_completion(err)
+    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+        RandomNumberArgs::err_completion(err, cache)
     }
 }
 
-impl CompletionAfterSpanCheck for RandomNumberArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for RandomNumberArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.min
-            .completion(index)
-            .or_else(|| self.max.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.max.completion(index, cache))
     }
 }
 
 impl ErrCompletion for RandomNumberArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionAfterSpanCheck for RandomPoolArgs<'_> {
-    fn completion_after_span_check(&self, index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for RandomPoolArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.ty
-            .completion(index)
-            .or_else(|| self.values.completion(index))
+            .completion(index, cache)
+            .or_else(|| self.values.completion(index, cache))
     }
 }
 
 impl ErrCompletion for RandomPoolArgs<'_> {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-lazy_static! {
-    static ref TYPE_COMPLETION: Vec<CompletionItem> = enum_member_completions(Type::VARIANTS);
-}
+static TYPE_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(Type::VARIANTS));
 
 impl Completion for Type {
-    fn completion(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+    fn completion(&self, _index: usize, _cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         None
     }
 }
 
 impl ErrCompletion for Type {
-    fn err_completion(_err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         TYPE_COMPLETION.clone()
     }
 }
 
-impl CompletionAfterSpanCheck for Annotation<'_> {
-    fn completion_after_span_check(&self, _index: usize) -> Option<Vec<CompletionItem>> {
+impl CompletionInSpan for Annotation<'_> {
+    fn completion_in_span(
+        &self,
+        _index: usize,
+        _cache: &CacheValues,
+    ) -> Option<Vec<CompletionItem>> {
         None
     }
 }
 
 impl ErrCompletion for Annotation<'_> {
-    fn err_completion(err: &Error) -> Vec<CompletionItem> {
+    fn err_completion(err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
         // TODO typing # doesn't give completions
         completion_from_error(err)
     }
