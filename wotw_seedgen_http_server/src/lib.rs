@@ -17,7 +17,7 @@ mod api;
 mod assets;
 mod error;
 mod inactivity_timeout;
-mod reach_check;
+mod logic;
 
 pub fn start(inactivity_timeout: Option<Duration>) -> Result<()> {
     let instance =

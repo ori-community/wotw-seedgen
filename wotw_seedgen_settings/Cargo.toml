@@ -7,3 +7,4 @@ edition = "2021"
 rustc-hash = "2.0"
 serde = { version = "1.0", features = ["derive"] }
 strum = { version = "0.26", features = ["derive"] }
+utoipa = "5.4.0"

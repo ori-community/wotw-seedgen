@@ -10,6 +10,7 @@ use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, EnumDiscriminants, VariantArray};
+use utoipa::ToSchema;
 use wotw_seedgen_data::{
     Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
     MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
@@ -316,7 +317,19 @@ pub enum LogicOperator {
 }
 
 /// Comparison Operations performed on numbers
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, Ast)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize_repr,
+    Deserialize_repr,
+    ToSchema,
+    VariantArray,
+    Ast,
+)]
 #[repr(u8)]
 pub enum Comparator {
     /// `==`

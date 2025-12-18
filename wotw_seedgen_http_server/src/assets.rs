@@ -5,12 +5,12 @@ use wotw_seedgen::{
         DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess, Source, StateData,
         UberStateData,
     },
-    data,
+    data::MapIcon,
     logic_language::{ast::Areas, output::Graph},
     seed_language::simulate::UberStates,
 };
 
-use crate::api::reach_check::{MapIcons, RelevantUberStates};
+use crate::api::logic::{MapIcons, RelevantUberStates};
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
 
@@ -136,8 +136,8 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
             map_icons
                 .map_icons
                 .iter()
-                .position(|map_icon| match map_icon.kind {
-                    data::MapIcon::Opher | data::MapIcon::Twillen | data::MapIcon::Lupo => {
+                .position(|map_icon| match map_icon.icon {
+                    MapIcon::Opher | MapIcon::Twillen | MapIcon::Lupo => {
                         identifier.starts_with(&map_icon.label)
                     }
                     _ => map_icon.label == identifier,

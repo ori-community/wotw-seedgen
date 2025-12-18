@@ -6,7 +6,7 @@ use wotw_seedgen::{
     data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade},
 };
 
-use crate::api::reach_check::RelevantUberStates;
+use crate::api::logic::RelevantUberStates;
 
 impl RelevantUberStates {
     pub fn new(loc_data: &LocData, state_data: &StateData) -> Self {

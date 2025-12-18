@@ -1,11 +1,16 @@
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
+use utoipa::ToSchema;
 
 /// `x`/`y` position
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Deserialize, Serialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Deserialize, Serialize, ToSchema,
+)]
 pub struct Position {
+    #[schema(value_type = f32)]
     pub x: OrderedFloat<f32>,
+    #[schema(value_type = f32)]
     pub y: OrderedFloat<f32>,
 }
 

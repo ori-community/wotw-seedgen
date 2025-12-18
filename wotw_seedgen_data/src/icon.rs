@@ -6,6 +6,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, VariantArray};
+use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
 use crate::{Equipment, Shard};
@@ -161,6 +162,7 @@ pub enum TuleyIcon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Default,
     Display,
     FromStr,

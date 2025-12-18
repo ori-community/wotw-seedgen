@@ -3,11 +3,11 @@ use std::{hash::BuildHasher, sync::LazyLock};
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use wotw_seedgen::{
     assets::{LocData, LocDataEntry},
-    data::{self, Position, UberIdentifier, Zone},
+    data::{MapIcon, Position, UberIdentifier, Zone},
     seed_language::ast::Comparator,
 };
 
-use crate::api::reach_check::{MapIcon, MapIconCondition, MapIcons};
+use crate::api::logic::{MapIconCondition, MapIconInfo, MapIcons};
 
 static SPIRIT_TRIAL_END_POSITIONS: LazyLock<FxHashMap<UberIdentifier, Position>> =
     LazyLock::new(|| {
@@ -75,34 +75,34 @@ impl MapIcons {
 
         for entry in &loc_data.entries {
             match entry.map_icon {
-                data::MapIcon::Opher => {
+                MapIcon::Opher => {
                     opher_conditions.push(MapIconCondition::new(entry.uber_identifier, None));
                 }
-                data::MapIcon::Twillen => {
+                MapIcon::Twillen => {
                     twillen_conditions.push(MapIconCondition::new(entry.uber_identifier, None));
                 }
-                data::MapIcon::Lupo if entry.zone == Zone::Shop => {
+                MapIcon::Lupo if entry.zone == Zone::Shop => {
                     lupo_conditions.push(MapIconCondition::new(entry.uber_identifier, None));
                 }
-                data::MapIcon::RaceStart => {
+                MapIcon::RaceStart => {
                     let start = entry.map_position.unwrap();
                     let end = SPIRIT_TRIAL_END_POSITIONS[&entry.uber_identifier];
 
                     map_icons.extend([
-                        MapIcon::spirit_trial_start(entry, start),
-                        MapIcon::spirit_trial_start_finished(entry, start),
-                        MapIcon::spirit_trial_end(entry, end),
-                        MapIcon::spirit_trial_end_finished(entry, end),
+                        MapIconInfo::spirit_trial_start(entry, start),
+                        MapIconInfo::spirit_trial_start_finished(entry, start),
+                        MapIconInfo::spirit_trial_end(entry, end),
+                        MapIconInfo::spirit_trial_end_finished(entry, end),
                     ]);
                 }
-                _ => map_icons.extend(MapIcon::from_entry(entry)),
+                _ => map_icons.extend(MapIconInfo::from_entry(entry)),
             }
         }
 
         map_icons.extend([
-            MapIcon {
+            MapIconInfo {
                 label: "OpherShop".to_string(),
-                kind: data::MapIcon::Opher,
+                icon: MapIcon::Opher,
                 positions: vec![
                     Position::new(-597.1, -4291.3),
                     Position::new(-203.9, -4146.4),
@@ -110,25 +110,25 @@ impl MapIcons {
                 ],
                 visible_if_any: opher_conditions,
             },
-            MapIcon {
+            MapIconInfo {
                 label: "TwillenShop".to_string(),
-                kind: data::MapIcon::Twillen,
+                icon: MapIcon::Twillen,
                 positions: vec![
                     Position::new(-281.3, -4236.4),
                     Position::new(-410.5, -4158.9),
                 ],
                 visible_if_any: twillen_conditions,
             },
-            MapIcon {
+            MapIconInfo {
                 label: "LupoShop".to_string(),
-                kind: data::MapIcon::Lupo,
+                icon: MapIcon::Lupo,
                 positions: vec![Position::new(-212.3, -4158.8)],
                 visible_if_any: lupo_conditions,
             },
             // TODO make from loc_data if that gets grom shop entries
-            MapIcon {
+            MapIconInfo {
                 label: "GromShop".to_string(),
-                kind: data::MapIcon::Grom,
+                icon: MapIcon::Grom,
                 positions: vec![Position::new(-319.1, -4150.1)],
                 visible_if_any: vec![
                     MapIconCondition::new(UberIdentifier::new(17, 15068), None),
@@ -148,20 +148,20 @@ impl MapIcons {
     }
 }
 
-impl MapIcon {
+impl MapIconInfo {
     fn from_entry(entry: &LocDataEntry) -> Option<Self> {
-        entry.map_position.map(|map_position| MapIcon {
+        entry.map_position.map(|map_position| MapIconInfo {
             label: entry.identifier.clone(),
-            kind: entry.map_icon,
+            icon: entry.map_icon,
             positions: vec![map_position],
             visible_if_any: vec![MapIconCondition::new(entry.uber_identifier, entry.value)],
         })
     }
 
     fn spirit_trial_start(entry: &LocDataEntry, position: Position) -> Self {
-        MapIcon {
+        MapIconInfo {
             label: entry.identifier.clone(),
-            kind: data::MapIcon::RaceStart,
+            icon: MapIcon::RaceStart,
             positions: vec![position],
             visible_if_any: vec![MapIconCondition {
                 uber_identifier: entry.uber_identifier,
@@ -172,9 +172,9 @@ impl MapIcon {
     }
 
     fn spirit_trial_start_finished(entry: &LocDataEntry, position: Position) -> Self {
-        MapIcon {
+        MapIconInfo {
             label: entry.identifier.clone(),
-            kind: data::MapIcon::RaceStartFinished,
+            icon: MapIcon::RaceStartFinished,
             positions: vec![position],
             visible_if_any: vec![MapIconCondition {
                 uber_identifier: entry.uber_identifier,
@@ -185,9 +185,9 @@ impl MapIcon {
     }
 
     fn spirit_trial_end(entry: &LocDataEntry, position: Position) -> Self {
-        MapIcon {
+        MapIconInfo {
             label: activation_identifier(&entry.identifier),
-            kind: data::MapIcon::RaceEnd,
+            icon: MapIcon::RaceEnd,
             positions: vec![position],
             visible_if_any: vec![MapIconCondition {
                 uber_identifier: entry.uber_identifier,
@@ -198,9 +198,9 @@ impl MapIcon {
     }
 
     fn spirit_trial_end_finished(entry: &LocDataEntry, position: Position) -> Self {
-        MapIcon {
+        MapIconInfo {
             label: activation_identifier(&entry.identifier),
-            kind: data::MapIcon::RaceEndFinished,
+            icon: MapIcon::RaceEndFinished,
             positions: vec![position],
             visible_if_any: vec![MapIconCondition {
                 uber_identifier: entry.uber_identifier,

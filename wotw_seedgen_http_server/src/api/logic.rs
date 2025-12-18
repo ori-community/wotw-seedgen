@@ -8,22 +8,24 @@ use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema, schema};
 use wotw_seedgen::{
-    data::{self, Position, UberIdentifier},
+    data::{MapIcon, Position, UberIdentifier},
     seed::SeedgenInfo,
     seed_language::ast::Comparator,
 };
 
 use crate::{
     RouterState,
-    api::schemas::{ComparatorSchema, MapIconSchema, PositionSchema, UberIdentifierSchema},
+    api::schemas::UberIdentifierSchema,
     error::{Error, Result},
-    reach_check::reachable,
+    logic::reachable,
 };
 
-const TAG: &str = "reach-check";
-const REACH_CHECK: &str = concat!("/", TAG);
-const MAP_ICONS: &str = concat!(REACH_CHECK, "/map-icons");
-const RELEVANT_UBER_STATES: &str = concat!(REACH_CHECK, "/relevant-uber-states");
+pub const TAG: &str = "logic";
+pub const LOGIC: &str = concat!("/", TAG);
+
+const MAP_ICONS: &str = "/map-icons";
+const RELEVANT_UBER_STATES: &str = "/relevant-uber-states";
+const REACH_CHECK: &str = "/reach-check";
 
 pub fn router() -> Router<RouterState> {
     Router::new()
@@ -33,7 +35,7 @@ pub fn router() -> Router<RouterState> {
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(reach_check, map_icons, relevant_uber_states))]
+#[openapi(paths(map_icons, relevant_uber_states, reach_check))]
 pub struct Docs;
 
 /// Get the list of logically relevant map icons
@@ -50,18 +52,16 @@ async fn map_icons(State(cache): State<RouterState>) -> Json<MapIcons> {
 #[serde(rename_all = "camelCase")]
 pub struct MapIcons {
     /// List of logically relevant map icons
-    pub map_icons: Vec<MapIcon>,
+    pub map_icons: Vec<MapIconInfo>,
     /// Hash of `map_icons`
     pub hash: u64,
 }
 
 #[derive(Clone, Hash, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct MapIcon {
+pub struct MapIconInfo {
     pub label: String,
-    #[schema(value_type = MapIconSchema)]
-    pub kind: data::MapIcon,
-    #[schema(value_type = Vec<PositionSchema>)]
+    pub icon: MapIcon,
     pub positions: Vec<Position>,
     pub visible_if_any: Vec<MapIconCondition>,
 }
@@ -71,7 +71,6 @@ pub struct MapIcon {
 pub struct MapIconCondition {
     #[schema(value_type = UberIdentifierSchema)]
     pub uber_identifier: UberIdentifier,
-    #[schema(value_type = ComparatorSchema)]
     pub comparator: Comparator,
     #[schema(value_type = f32)]
     pub value: OrderedFloat<f32>,
@@ -100,7 +99,11 @@ pub struct RelevantUberStates {
 #[utoipa::path(
     post,
     path = REACH_CHECK,
-    responses((status = OK, body = ReachCheck)),
+    responses(
+        (status = OK, body = ReachCheck),
+        (status = BAD_REQUEST, body = String),
+        (status = INTERNAL_SERVER_ERROR, body = String),
+    ),
 )]
 async fn reach_check(
     State(cache): State<RouterState>,
