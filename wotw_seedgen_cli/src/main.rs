@@ -1,4 +1,5 @@
 mod cli;
+mod http_server;
 mod import_uber_states;
 mod log_config;
 mod plando;
@@ -21,6 +22,8 @@ use std::{
     fmt::{self, Debug},
 };
 
+use crate::http_server::http_server;
+
 fn main() -> Result<(), Error> {
     if env::var_os("ATTACH").is_some() {
         eprintln!("waiting for debugger...");
@@ -37,12 +40,9 @@ fn main() -> Result<(), Error> {
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
         Cli::ImportUberStates => import_uber_states(),
+        Cli::HttpServer { args } => http_server(args),
         Cli::Lsp => {
             wotw_seedgen_lsp::start();
-            Ok(())
-        }
-        Cli::HttpServer => {
-            wotw_seedgen_http_server::start()?;
             Ok(())
         }
     }

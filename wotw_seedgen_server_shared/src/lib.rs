@@ -33,7 +33,9 @@ where
     cache.watch(&mut watcher)?;
 
     let state = Arc::new(RwLock::new(cache));
-    runtime.spawn(watch_assets(state.clone(), watcher));
+
+    let watcher_state = state.clone();
+    runtime.spawn_blocking(move || watch_assets(watcher_state, watcher));
 
     eprintln!("Loaded assets");
 

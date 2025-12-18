@@ -1,4 +1,5 @@
 mod display;
+mod http_server_args;
 mod interactive;
 mod plando_args;
 mod preset_args;
@@ -11,6 +12,7 @@ pub use display::{
     AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
     AVAILABLE_WORLD_PRESETS,
 };
+pub use http_server_args::HttpServerArgs;
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
 pub use regenerate_args::RegenerateArgs;
@@ -69,7 +71,10 @@ pub enum Cli {
     /// Import an UberState dump
     ImportUberStates,
     /// Start the http server
-    HttpServer,
+    HttpServer {
+        #[command(flatten)]
+        args: HttpServerArgs,
+    },
     /// Start the language server
     Lsp,
 }
