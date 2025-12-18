@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use single_instance::error::SingleInstanceError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -11,6 +12,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error(transparent)]
     ServerCore(#[from] wotw_seedgen_server_shared::Error),
+    #[error("failed to enforce single instance: {0}")]
+    SingleInstance(SingleInstanceError),
     #[error("{0}")]
     Custom(String),
     #[error("failed to parse seedgen_info: {0}")]
@@ -24,7 +27,7 @@ impl IntoResponse for Error {
         let status = match self {
             Error::Custom(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::SeedgenInfo(_) => StatusCode::BAD_REQUEST,
-            Error::ServerCore(_) | Error::Serve(_) => unreachable!(),
+            Error::ServerCore(_) | Error::SingleInstance(_) | Error::Serve(_) => unreachable!(),
         };
 
         (status, self.to_string()).into_response()

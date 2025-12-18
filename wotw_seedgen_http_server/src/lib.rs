@@ -1,5 +1,6 @@
 use std::{net::Ipv4Addr, sync::Arc};
 
+use single_instance::SingleInstance;
 use tokio::{net::TcpListener, sync::RwLock};
 use wotw_seedgen::assets::DefaultFileAccess;
 
@@ -14,6 +15,15 @@ mod error;
 mod reach_check;
 
 pub fn start() -> Result<()> {
+    let instance =
+        SingleInstance::new("wotw-seedgen-http-server").map_err(Error::SingleInstance)?;
+
+    if !instance.is_single() {
+        eprintln!("server already seems to be running, exiting");
+
+        return Ok(());
+    }
+
     let cache = Cache::new(DefaultFileAccess)
         .map_err(|err| Error::ServerCore(wotw_seedgen_server_shared::Error::LoadAssets(err)))?;
 
