@@ -182,7 +182,7 @@ fn subfolder_changed(
     ));
 }
 
-impl<F: SnippetFileAccess, V: AssetCacheValues> SnippetAccess for AssetCache<F, V> {
+impl<F: SnippetAccess, V: AssetCacheValues> SnippetAccess for AssetCache<F, V> {
     fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
         self.values.snippet(identifier).cloned()
     }

@@ -9,6 +9,7 @@ use std::{
     str::FromStr,
 };
 
+use rand::{distributions::Bernoulli, seq::SliceRandom, Rng};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumMessage, EnumString, VariantArray, VariantNames};
@@ -16,6 +17,8 @@ use utoipa::{
     openapi::{ObjectBuilder, RefOr, Schema, Type},
     PartialSchema, ToSchema,
 };
+
+use crate::{assets::SnippetAccess, seed_language::metadata::ConfigDefault};
 
 /// A representation of all the relevant settings when generating a seed
 ///
@@ -135,6 +138,56 @@ pub struct WorldSettings {
 }
 
 impl WorldSettings {
+    pub fn random<R: Rng, A: SnippetAccess>(rng: &mut R, snippet_access: &A) -> Self {
+        let difficulty = *<Difficulty as VariantArray>::VARIANTS.choose(rng).unwrap();
+
+        let distr_50 = Bernoulli::new(0.5).unwrap();
+
+        let tricks = <Trick as VariantArray>::VARIANTS
+            .iter()
+            .filter(|trick| difficulty >= trick.min_difficulty() && rng.sample(distr_50))
+            .copied()
+            .collect();
+
+        let mut snippets = snippet_access.available_snippets_metadata();
+        snippets.retain(|(_, metadata)| !metadata.hidden && rng.sample(distr_50));
+
+        let mut snippet_config = FxHashMap::default();
+
+        let snippets = snippets
+            .into_iter()
+            .map(|(identifier, metadata)| {
+                snippet_config.insert(
+                    identifier.clone(),
+                    metadata
+                        .config
+                        .into_iter()
+                        .filter_map(|(identifier, value)| match value.default {
+                            ConfigDefault::Boolean(value) if rng.sample(distr_50) => {
+                                Some((identifier, (!value).to_string()))
+                            }
+                            _ => None,
+                        })
+                        .collect(),
+                );
+
+                identifier
+            })
+            .collect();
+
+        Self {
+            spawn: Spawn::FullyRandom,
+            difficulty,
+            tricks,
+            hard: rng.gen_bool(0.25),
+            randomize_doors: rng
+                .sample(distr_50)
+                .then_some(GreaterOneU8::new(2).unwrap()),
+            snippets,
+            snippet_config,
+        }
+    }
+
     /// Checks whether these settings feature a random spawn location
     pub fn is_random_spawn(&self) -> bool {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)

@@ -16,6 +16,7 @@ dirs = "6.0.0"
 thiserror = "2.0.17"
 constcat = "0.6.1"
 ordered-float = { version = "4.2", features = ["serde"] }
+rand = "0.8"
 rustc-hash = "2.1.1"
 serde_json = "1.0.145"
 single-instance = "0.3.3"
