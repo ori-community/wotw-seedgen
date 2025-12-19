@@ -1,21 +1,23 @@
 use std::{mem, ops::Range};
 use tower_lsp::lsp_types::{SemanticToken, SemanticTokenType, SemanticTokensLegend};
-use wotw_seedgen_seed_language::{
-    ast::{
-        consume_command_arg, Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs,
-        BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat,
-        ConfigArgs, ConfigType, Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event,
-        ExportArgs, Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs,
-        IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-        ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-        Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs, RandomFromPoolArgs,
-        RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveItemArgs,
-        RemoveLocationArgs, Separated, SeparatedNonEmpty, SetConfigArgs, SetLogicStateArgs,
-        Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
-        UberIdentifier, UberStateType, ZoneOfArgs,
-    },
+use wotw_seedgen_data::{
     parse::SpannedOption,
-    types::Type,
+    seed_language::{
+        ast::{
+            consume_command_arg, Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs,
+            BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat,
+            ConfigArgs, ConfigType, Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event,
+            ExportArgs, Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs,
+            IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
+            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
+            Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs, RandomFromPoolArgs,
+            RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveItemArgs,
+            RemoveLocationArgs, Separated, SeparatedNonEmpty, SetConfigArgs, SetLogicStateArgs,
+            Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger,
+            TriggerBinding, UberIdentifier, UberStateType, ZoneOfArgs,
+        },
+        types::Type,
+    },
 };
 
 use crate::convert;

@@ -5,7 +5,8 @@ use std::{
     io,
     ops::Range,
 };
-use wotw_seedgen_assets::Source;
+
+use crate::Source;
 
 pub type Result<T> = std::result::Result<T, Error>;
 

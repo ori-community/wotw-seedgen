@@ -10,14 +10,14 @@ use itertools::Itertools;
 use log::trace;
 use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::smallvec;
-use wotw_seedgen_assets::{LocDataEntry, StateDataEntry};
-use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
-use wotw_seedgen_logic_language::output::{
-    Anchor, Connection, Graph, Node, RefillValue, Requirement,
-};
-use wotw_seedgen_seed_language::{
-    output::{CommandBoolean, Event},
-    simulate::Simulation,
+use wotw_seedgen_data::{
+    assets::{LocDataEntry, StateDataEntry},
+    logic_language::output::{Anchor, Connection, Graph, Node, RefillValue, Requirement},
+    seed_language::{
+        output::{CommandBoolean, Event},
+        simulate::Simulation,
+    },
+    Shard, Skill, UberIdentifier,
 };
 
 pub const TP_ANCHOR: &str = "Teleporters";

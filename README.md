@@ -8,16 +8,14 @@ Seed generator for the [Ori and the Will of the Wisps randomizer](https://wotw.o
 
 - `assets`: not a crate, contains assets which are shipped to users with the randomizer
 - `wotw_seedgen`: high-level interface to generate seeds
-- `wotw_seedgen_assets`: data structures and parsing for simple assets
 - `wotw_seedgen_cli`: command line interface exposing features of the other workspace members
-- `wotw_seedgen_data`: constants and data structures describing the game and randomizer
+- `wotw_seedgen_data`: data structures and asset parsing
 - `wotw_seedgen_derive`: derive macros used throughout the workspace
-- `wotw_seedgen_logic_language`: compiler for areas.wotw
+- `wotw_seedgen_http_server`: http interface, less featured than cli
+- `wotw_seedgen_lsp`: language server implementation
 - `wotw_seedgen_parse`: homebrew parsing library
 - `wotw_seedgen_seed`: generates the seed file format after compilation and/or seed generation
-- `wotw_seedgen_seed_language`: compiler for snippets and plandos
-- `wotw_seedgen_settings`: data structures representing settings for generating seeds
-- `wotw_seedgen_static_assets`: precompiled versions of assets to embed in binaries or tests
+- `wotw_seedgen_server_shared`: shared logic between http and language server
 - `wotw_seedgen_stats`: analyzes huge amounts of seeds
 
 ### Automated testing

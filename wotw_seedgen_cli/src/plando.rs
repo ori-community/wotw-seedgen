@@ -12,10 +12,15 @@ use std::{
     path::{Path, PathBuf},
     time::{Duration, Instant},
 };
-use wotw_seedgen::{seed::Seed, seed_language::compile::Compiler};
-use wotw_seedgen_assets::{
-    file_err, AssetCache, AssetFileAccess, DefaultAssetCacheValues, DefaultFileAccess,
-    PresetFileAccess, SnippetFileAccess, Watcher,
+use wotw_seedgen::{
+    data::{
+        assets::{
+            file_err, AssetCache, AssetFileAccess, DefaultAssetCacheValues, DefaultFileAccess,
+            PresetFileAccess, SnippetFileAccess, Watcher,
+        },
+        seed_language::compile::Compiler,
+    },
+    seed::Seed,
 };
 
 type Cache<'a> = AssetCache<PlandoFileAccess<'a>, DefaultAssetCacheValues>;

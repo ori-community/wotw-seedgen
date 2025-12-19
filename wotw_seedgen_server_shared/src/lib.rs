@@ -1,7 +1,7 @@
 mod error;
 
 use tokio::{runtime::Runtime, sync::RwLock};
-use wotw_seedgen_assets::{
+use wotw_seedgen_data::assets::{
     AssetCache, AssetCacheValues, AssetFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
 };
 

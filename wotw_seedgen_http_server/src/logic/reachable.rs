@@ -1,8 +1,9 @@
 use ordered_float::OrderedFloat;
 use tokio::sync::RwLockReadGuard;
 use wotw_seedgen::{
-    World, assets::UberStateValue, data::UberIdentifier, seed::SeedgenInfo,
-    seed_language::simulate::Simulation,
+    World,
+    data::{UberIdentifier, assets::UberStateValue, seed_language::simulate::Simulation},
+    seed::SeedgenInfo,
 };
 
 use crate::{

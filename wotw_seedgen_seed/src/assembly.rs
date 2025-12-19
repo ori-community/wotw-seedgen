@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 use wotw_seedgen_data::{
+    seed_language::output::{
+        ArithmeticOperator, ClientEvent, Comparator, EqualityComparator, LogicOperator,
+    },
     Alignment, CoordinateSystem, EquipSlot, Equipment, HorizontalAnchor, Icon, MapIcon,
     UberIdentifier, VerticalAnchor, WheelBind, WheelItemPosition,
-};
-use wotw_seedgen_seed_language::output::{
-    ArithmeticOperator, ClientEvent, Comparator, EqualityComparator, LogicOperator,
 };
 
 /// Contains the compiled seedgen output that makes up the seed.

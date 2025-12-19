@@ -1,8 +1,10 @@
 use super::Analyzer;
 use rustc_hash::FxHashSet;
 use wotw_seedgen::{
-    data::Skill,
-    seed_language::output::{CommonItem, ContainedWrites},
+    data::{
+        seed_language::output::{CommonItem, ContainedWrites},
+        Skill,
+    },
     spoiler::SeedSpoiler,
 };
 

@@ -40,7 +40,6 @@ mod recover;
 mod span;
 mod tokenizer;
 
-pub use wotw_seedgen_assets::Source;
 pub use wotw_seedgen_derive::{Ast, Span, TokenDisplay};
 
 pub use ast::{parse_ast, Ast, ParseResult};
@@ -58,3 +57,23 @@ pub use span::{Span, SpanEnd, SpanStart, Spanned, SpannedOption};
 #[cfg(feature = "logos")]
 pub use tokenizer::LogosTokenizer;
 pub use tokenizer::{Tokenize, TokenizeOutput};
+
+/// Representation of a source file with the necessary information to display useful error messages.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Source {
+    /// An identifier to be used in error messages that should allow the reader to determine which file the error originated from.
+    ///
+    /// This might be the file path relative to the workspace root, or just the filename.
+    pub id: String,
+    /// The contents of the file, which will be referenced for better error messages.
+    ///
+    /// This should be the same contents you were parsing, otherwise error messages will reference arbitrary spans in your source and possibly panic.
+    pub content: String, // TODO maybe use &str?
+}
+
+impl Source {
+    /// Creates a new `Source` from its parts
+    pub fn new(id: String, content: String) -> Self {
+        Self { id, content }
+    }
+}

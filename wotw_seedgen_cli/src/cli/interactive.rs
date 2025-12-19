@@ -8,9 +8,11 @@ use dialoguer::{
 use itertools::Itertools;
 use rustc_hash::FxHashSet;
 use strum::{Display, VariantArray, VariantNames};
-use wotw_seedgen::settings::{Difficulty, GreaterOneU8, Spawn, Trick};
-use wotw_seedgen_assets::{UniversePresetSettings, WorldPresetSettings};
-use wotw_seedgen_seed_language::metadata::{ConfigDefault, ConfigValue};
+use wotw_seedgen::data::{
+    assets::{UniversePresetSettings, WorldPresetSettings},
+    seed_language::metadata::{ConfigDefault, ConfigValue},
+    Difficulty, GreaterOneU8, Spawn, Trick,
+};
 
 use crate::{
     cli::{

@@ -6,7 +6,7 @@ use tokio::{
     net::TcpListener,
     sync::{RwLock, mpsc},
 };
-use wotw_seedgen::assets::DefaultFileAccess;
+use wotw_seedgen::data::assets::DefaultFileAccess;
 
 use crate::{
     assets::Cache,

@@ -1,8 +1,10 @@
 use std::fs::File;
 
 use serde::de::DeserializeOwned;
-use wotw_seedgen::seed::{assembly::Assembly, SeedgenInfo};
-use wotw_seedgen_assets::file_err;
+use wotw_seedgen::{
+    data::assets::file_err,
+    seed::{assembly::Assembly, SeedgenInfo},
+};
 use zip::{read::ZipFile, ZipArchive};
 
 use crate::{cli::RegenerateArgs, log_config::LogConfig, seed::generate, Error};

@@ -1,4 +1,4 @@
-use std::ops::ControlFlow;
+use std::{ops::ControlFlow, sync::LazyLock};
 
 use super::*;
 use crate::{
@@ -9,9 +9,14 @@ use crate::{
 use itertools::Itertools;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
-use wotw_seedgen_logic_language::output::{Enemy, Node, Requirement};
-use wotw_seedgen_settings::{Difficulty, DEFAULT_SPAWN};
-use wotw_seedgen_static_assets::{GRAPH, LOC_DATA, UBER_STATE_DATA};
+use wotw_seedgen_data::{
+    assets::{AssetCacheValues, AssetFileAccess, TEST_ASSETS},
+    logic_language::{
+        ast::Areas,
+        output::{Enemy, Node, Requirement},
+    },
+    Difficulty, DEFAULT_SPAWN,
+};
 
 fn test_settings(difficulty: Difficulty) -> WorldSettings {
     WorldSettings {
@@ -33,12 +38,26 @@ fn empty_test_world<'settings>(
     world
 }
 
+static GRAPH: LazyLock<Graph> = LazyLock::new(|| {
+    let source = TEST_ASSETS.values.areas();
+    let areas = Areas::parse(&source.content).eprint_errors(source).unwrap();
+
+    Graph::compile(
+        areas,
+        TEST_ASSETS.loc_data().unwrap(),
+        TEST_ASSETS.state_data().unwrap(),
+        &[],
+    )
+    .eprint_errors(source)
+    .unwrap()
+});
+
 fn test_world<'settings>(
     settings: &'settings WorldSettings,
     spawn: &str,
 ) -> World<'static, 'settings> {
     let spawn = GRAPH.find_node(spawn).unwrap();
-    let uber_states = UberStates::new(&UBER_STATE_DATA);
+    let uber_states = UberStates::new(TEST_ASSETS.values.uber_state_data());
 
     World::new(&*GRAPH, spawn, settings, uber_states)
 }
@@ -66,7 +85,9 @@ fn full_reach_check() {
         })
         .collect();
 
-    let all_locations = LOC_DATA
+    let all_locations = TEST_ASSETS
+        .values
+        .loc_data()
         .entries
         .iter()
         .map(|location| location.identifier.as_str())
@@ -110,7 +131,8 @@ fn full_reach_check() {
                 |(uber_identifier, progressions), f| {
                     f(&format_args!(
                         "{}: {}",
-                        UBER_STATE_DATA.id_lookup[uber_identifier].preferred_name(),
+                        TEST_ASSETS.values.uber_state_data().id_lookup[uber_identifier]
+                            .preferred_name(),
                         format_progressions(*progressions, &world)
                     ))
                 }

@@ -1,6 +1,5 @@
 use smallvec::{smallvec, SmallVec};
-use wotw_seedgen_data::Skill;
-use wotw_seedgen_settings::Difficulty;
+use wotw_seedgen_data::{Difficulty, Skill};
 
 // TODO make trait and put on Difficulty?
 

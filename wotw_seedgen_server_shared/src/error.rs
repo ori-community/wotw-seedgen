@@ -1,6 +1,6 @@
 use std::io;
 
-use wotw_seedgen_assets::WatcherError;
+use wotw_seedgen_data::assets::WatcherError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 

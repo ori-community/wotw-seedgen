@@ -7,8 +7,10 @@ use crate::{
 };
 use itertools::Itertools;
 use sanitize_filename::sanitize;
-use wotw_seedgen::settings::{Spawn, UniverseSettings, DEFAULT_SPAWN};
-use wotw_seedgen_assets::{file_err, DefaultFileAccess};
+use wotw_seedgen::data::{
+    assets::{file_err, DefaultFileAccess},
+    Spawn, UniverseSettings, DEFAULT_SPAWN,
+};
 use wotw_seedgen_stats::{
     analyzers::{
         Analyzer, EarlySkillsStats, FirstWeaponStats, ItemLocationStats, ItemUnlockStats,

@@ -21,12 +21,10 @@ use std::{
     str::FromStr,
 };
 use strum::VariantNames;
-use wotw_seedgen::settings::{Difficulty, GreaterOneU8, Spawn, Trick};
-use wotw_seedgen::{
-    assets::{UniversePresetSettings, WorldPresetSettings},
-    settings::UniverseSettings,
+use wotw_seedgen::data::{
+    assets::{DefaultFileAccess, UniversePresetSettings, WorldPresetSettings},
+    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings,
 };
-use wotw_seedgen_assets::DefaultFileAccess;
 
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePresetSettings);

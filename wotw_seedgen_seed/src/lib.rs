@@ -1,6 +1,4 @@
-use indexmap::IndexMap;
 pub use wotw_seedgen_data as data;
-pub use wotw_seedgen_seed_language as seed_language;
 
 pub mod assembly;
 
@@ -11,12 +9,12 @@ mod seedgen_info;
 pub use seedgen_info::SeedgenInfo;
 
 use assembly::{Assembly, Command};
+use indexmap::IndexMap;
 use rustc_hash::{FxBuildHasher, FxHashMap};
-use seed_language::output::DebugOutput;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+use wotw_seedgen_data::seed_language::output::{DebugOutput, IntermediateOutput, PlaceholderMap};
 use wotw_seedgen_data::Position;
-use wotw_seedgen_seed_language::output::{IntermediateOutput, PlaceholderMap};
 
 use crate::compile::CompileContext;
 

@@ -1,9 +1,9 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
-use wotw_seedgen_data::{Position, Zone};
-use wotw_seedgen_logic_language::output::Node;
-use wotw_seedgen_seed_language::output::CommandVoid;
+use wotw_seedgen_data::{
+    logic_language::output::Node, seed_language::output::CommandVoid, Position, Zone,
+};
 
 /// Complete data to create a logic spoiler for the seed
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -13,13 +13,13 @@ use crate::{
 };
 use rand::{distributions::Uniform, prelude::Distribution};
 use wotw_seedgen::{
-    generate_seed,
-    logic_language::{ast::Areas, output::Graph},
-    settings::{UniverseSettings, WorldSettings},
-    SeedUniverse,
-};
-use wotw_seedgen_assets::{
-    file_err, AssetFileAccess, DefaultFileAccess, LocData, Source, StateData, UberStateData,
+    data::{
+        assets::{file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData},
+        logic_language::{ast::Areas, output::Graph},
+        parse::Source,
+        UniverseSettings, WorldSettings,
+    },
+    generate_seed, SeedUniverse,
 };
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {

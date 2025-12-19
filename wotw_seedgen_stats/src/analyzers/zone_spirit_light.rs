@@ -1,8 +1,10 @@
 use super::Analyzer;
 use std::num::NonZeroUsize;
 use wotw_seedgen::{
-    data::Zone,
-    seed_language::output::{CommonItem, ContainedWrites},
+    data::{
+        seed_language::output::{CommonItem, ContainedWrites},
+        Zone,
+    },
     spoiler::SeedSpoiler,
 };
 

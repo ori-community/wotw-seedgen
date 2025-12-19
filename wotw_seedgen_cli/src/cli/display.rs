@@ -4,8 +4,10 @@ use std::{
 };
 
 use clap::builder::styling::Reset;
-use wotw_seedgen_assets::{DefaultFileAccess, PresetAccess, PresetInfo, SnippetAccess};
-use wotw_seedgen_seed_language::metadata::Metadata;
+use wotw_seedgen::data::{
+    assets::{DefaultFileAccess, PresetAccess, PresetInfo, SnippetAccess},
+    seed_language::metadata::Metadata,
+};
 
 use crate::cli::LITERAL;
 

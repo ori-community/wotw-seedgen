@@ -8,10 +8,11 @@ use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema, schema};
 use wotw_seedgen::{
-    data::{MapIcon, Position, UberIdentifier},
-    logic_language::output::Graph,
+    data::{
+        MapIcon, Position, UberIdentifier, logic_language::output::Graph,
+        seed_language::ast::Comparator,
+    },
     seed::SeedgenInfo,
-    seed_language::ast::Comparator,
 };
 
 use crate::{

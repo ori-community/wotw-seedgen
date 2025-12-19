@@ -1,12 +1,12 @@
 use rustc_hash::FxHashMap;
-use wotw_seedgen::{
+use wotw_seedgen::data::{
+    MapIcon,
     assets::{
         AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-        DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess, Source, StateData,
-        UberStateData,
+        DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess, StateData, UberStateData,
     },
-    data::MapIcon,
     logic_language::{ast::Areas, output::Graph},
+    parse::Source,
     seed_language::{metadata::Metadata, simulate::UberStates},
 };
 

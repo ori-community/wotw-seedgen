@@ -7,7 +7,7 @@ use constcat::concat;
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
 use utoipa::{OpenApi, ToSchema};
-use wotw_seedgen::{assets::WorldPreset, settings::WorldSettings};
+use wotw_seedgen::data::{WorldSettings, assets::WorldPreset};
 
 use crate::{
     RouterState,

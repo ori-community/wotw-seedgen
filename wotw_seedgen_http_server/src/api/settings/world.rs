@@ -1,7 +1,7 @@
 use axum::{Json, Router, routing::get};
 use constcat::concat;
 use utoipa::OpenApi;
-use wotw_seedgen::settings::WorldSettings;
+use wotw_seedgen::data::WorldSettings;
 
 use crate::RouterState;
 

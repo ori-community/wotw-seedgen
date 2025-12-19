@@ -4,13 +4,15 @@ use itertools::Itertools;
 use rand::prelude::IteratorRandom;
 use rand::seq::SliceRandom;
 use rustc_hash::FxHashMap;
-use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_logic_language::output::DoorId;
-use wotw_seedgen_seed_language::{
-    ast::ClientEvent,
-    compile::{store_boolean, store_integer},
-    output::{CommandBoolean, Event, Trigger},
-    simulate::Simulation,
+use wotw_seedgen_data::{
+    logic_language::output::DoorId,
+    seed_language::{
+        ast::ClientEvent,
+        compile::{store_boolean, store_integer},
+        output::{CommandBoolean, Event, Trigger},
+        simulate::Simulation,
+    },
+    UberIdentifier,
 };
 
 use super::placement::WorldContext;

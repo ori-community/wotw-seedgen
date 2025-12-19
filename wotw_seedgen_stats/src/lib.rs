@@ -21,9 +21,11 @@ use itertools::Itertools;
 use rustc_hash::FxHashMap;
 use storage_access::SeedStorageAccess;
 use wotw_seedgen::{
-    assets::{LocData, SnippetAccess, UberStateData},
-    logic_language::output::Graph,
-    settings::UniverseSettings,
+    data::{
+        assets::{LocData, SnippetAccess, UberStateData},
+        logic_language::output::Graph,
+        UniverseSettings,
+    },
     spoiler::SeedSpoiler,
 };
 

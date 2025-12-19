@@ -1,29 +1,30 @@
 use std::sync::LazyLock;
 
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
-use wotw_seedgen_assets::data::{
-    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
-    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VariantArray,
-    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
-};
-use wotw_seedgen_seed_language::{
-    ast::{
-        Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
-        ClientEvent, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
-        ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
-        ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs,
-        ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
-        LetArgs, Literal, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-        RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, SeparatedNonEmpty,
-        SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding,
-        UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType, ZoneOfArgs,
-    },
-    compile::FunctionIdentifier,
+use wotw_seedgen_data::{
     parse::{
         Delimited, Error, ErrorKind, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart,
         Spanned, SpannedOption,
     },
-    types::Type,
+    seed_language::{
+        ast::{
+            Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
+            ClientEvent, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
+            ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
+            ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs,
+            ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
+            ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Operation, PreplaceArgs,
+            RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, RemoveItemArgs,
+            RemoveLocationArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
+            StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+        },
+        compile::FunctionIdentifier,
+        types::Type,
+    },
+    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
+    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VariantArray,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 
 use crate::cache::CacheValues;

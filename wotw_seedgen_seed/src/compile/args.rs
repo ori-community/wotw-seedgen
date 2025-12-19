@@ -1,7 +1,7 @@
 use super::{command::MemoryUsed, Compile};
 use crate::{assembly::Command, compile::CompileContext};
 use arrayvec::ArrayVec;
-use wotw_seedgen_seed_language::{
+use wotw_seedgen_data::seed_language::{
     compile::RESERVED_MEMORY,
     output::{CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone},
 };

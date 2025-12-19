@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-wotw_seedgen_assets = { path = "../wotw_seedgen_assets" }
+wotw_seedgen_data = { path = "../wotw_seedgen_data" }
 thiserror = "2.0.17"
 tokio = { version = "1.37.0", features = ["rt-multi-thread"] }

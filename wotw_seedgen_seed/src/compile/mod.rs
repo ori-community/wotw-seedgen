@@ -7,7 +7,7 @@ use self::command::MemoryUsed;
 use crate::assembly::{Command, Event, Trigger};
 use indexmap::{map::Entry, IndexMap};
 use rustc_hash::FxBuildHasher;
-use wotw_seedgen_seed_language::output::{self as input, PlaceholderMap};
+use wotw_seedgen_data::seed_language::output::{self as input, PlaceholderMap};
 
 // TODO dedup functions?
 

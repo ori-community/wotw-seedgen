@@ -2,10 +2,14 @@ use std::iter;
 
 use rustc_hash::FxHashMap;
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
-use wotw_seedgen_assets::{
-    data::UberIdentifier, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess,
-    LocData, PresetFileAccess, SnippetFileAccess, Source, StateData, UberStateAlias, UberStateData,
-    UberStateDataEntry,
+use wotw_seedgen_data::{
+    assets::{
+        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, LocData,
+        PresetFileAccess, SnippetFileAccess, StateData, UberStateAlias, UberStateData,
+        UberStateDataEntry,
+    },
+    parse::Source,
+    UberIdentifier,
 };
 use wotw_seedgen_server_shared::ServerState;
 

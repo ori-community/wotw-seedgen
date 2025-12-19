@@ -1,7 +1,9 @@
 use super::Analyzer;
 use wotw_seedgen::{
-    data::Skill,
-    seed_language::output::{CommonItem, ContainedWrites},
+    data::{
+        seed_language::output::{CommonItem, ContainedWrites},
+        Skill,
+    },
     spoiler::SeedSpoiler,
 };
 

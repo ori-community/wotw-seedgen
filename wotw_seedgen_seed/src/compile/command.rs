@@ -1,10 +1,10 @@
 use super::{args::Args, Compile, CompileContext};
 use crate::assembly::{Command, Trigger};
 use indexmap::map::Entry;
-use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_seed_language::output::{
+use wotw_seedgen_data::seed_language::output::{
     self as input, CommandFloat, CommandVoid, Comparator, EqualityComparator,
 };
+use wotw_seedgen_data::UberIdentifier;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemoryUsed {

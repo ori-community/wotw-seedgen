@@ -13,16 +13,17 @@ use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
-use wotw_seedgen_assets::{LocData, SnippetAccess, UberStateData};
-use wotw_seedgen_data::Teleporter;
-use wotw_seedgen_logic_language::output::Graph;
-use wotw_seedgen_seed::Seed;
-use wotw_seedgen_seed_language::{
-    compile::{store_boolean, Compiler},
-    output::{ClientEvent, Event, IntermediateOutput, Trigger},
-    simulate::UberStates,
+use wotw_seedgen_data::{
+    assets::{LocData, SnippetAccess, UberStateData},
+    logic_language::output::Graph,
+    seed_language::{
+        compile::{store_boolean, Compiler},
+        output::{ClientEvent, Event, IntermediateOutput, Trigger},
+        simulate::UberStates,
+    },
+    Spawn, Teleporter, UniverseSettings, WorldSettings,
 };
-use wotw_seedgen_settings::{Spawn, UniverseSettings, WorldSettings};
+use wotw_seedgen_seed::Seed;
 
 /// End Result of seed generation
 pub struct SeedUniverse {

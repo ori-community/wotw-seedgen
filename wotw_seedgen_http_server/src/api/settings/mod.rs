@@ -3,10 +3,7 @@ use constcat::concat;
 use serde::Serialize;
 use strum::EnumMessage;
 use utoipa::{OpenApi, ToSchema};
-use wotw_seedgen::{
-    data::VariantArray,
-    settings::{Difficulty, Trick},
-};
+use wotw_seedgen::data::{Difficulty, Trick, VariantArray};
 
 use crate::RouterState;
 

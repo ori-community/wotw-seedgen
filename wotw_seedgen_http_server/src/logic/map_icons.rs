@@ -1,9 +1,9 @@
 use std::{hash::BuildHasher, sync::LazyLock};
 
 use rustc_hash::{FxBuildHasher, FxHashMap};
-use wotw_seedgen::{
+use wotw_seedgen::data::{
+    MapIcon, Position, UberIdentifier, Zone,
     assets::{LocData, LocDataEntry},
-    data::{MapIcon, Position, UberIdentifier, Zone},
     seed_language::ast::Comparator,
 };
 

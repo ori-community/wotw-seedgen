@@ -7,7 +7,7 @@ use constcat::concat;
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
 use utoipa::{OpenApi, ToSchema};
-use wotw_seedgen::{assets::UniversePreset, settings::UniverseSettings};
+use wotw_seedgen::data::{UniverseSettings, assets::UniversePreset};
 
 use crate::{
     RouterState,

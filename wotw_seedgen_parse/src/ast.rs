@@ -1,10 +1,8 @@
 use std::io::{self, Write};
 
-use wotw_seedgen_assets::Source;
-
 use crate::{
     Error, ErrorKind, ErrorMode, Errors, NoErrors, NoTrailingInput, ParseBoolToken,
-    ParseFloatToken, ParseIntToken, ParseStringToken, Parser, SpannedOption, Tokenize,
+    ParseFloatToken, ParseIntToken, ParseStringToken, Parser, Source, SpannedOption, Tokenize,
 };
 
 /// Trait responsible for parsing Ast nodes

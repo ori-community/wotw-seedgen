@@ -1,6 +1,6 @@
 use std::fs;
 
-use wotw_seedgen_assets::{
+use wotw_seedgen::data::assets::{
     PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION,
 };
 

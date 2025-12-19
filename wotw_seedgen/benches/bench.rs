@@ -1,25 +1,31 @@
-use std::time::Duration;
+use std::{sync::LazyLock, time::Duration};
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPool, World};
-use wotw_seedgen_assets::{PresetAccess, SnippetAccess, WorldPreset, WorldPresetSettings};
-use wotw_seedgen_data::Skill;
-use wotw_seedgen_logic_language::{
-    ast::Areas,
-    output::{Enemy, Graph, Requirement},
+use wotw_seedgen_data::{
+    assets::{
+        AssetCacheValues, AssetFileAccess, PresetAccess, SnippetAccess, WorldPreset,
+        WorldPresetSettings, TEST_ASSETS,
+    },
+    logic_language::{
+        ast::Areas,
+        output::{Enemy, Graph, Requirement},
+    },
+    seed_language::{
+        ast::Snippet,
+        compile::Compiler,
+        simulate::{Simulation, UberStates},
+    },
+    Difficulty, Skill, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
-use wotw_seedgen_seed_language::{
-    ast::Snippet,
-    compile::Compiler,
-    simulate::{Simulation, UberStates},
-};
-use wotw_seedgen_settings::{Difficulty, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN};
-use wotw_seedgen_static_assets::{
-    AREAS, GRAPH, LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
-};
+
+static AREAS: LazyLock<Areas> = LazyLock::new(|| {
+    let source = TEST_ASSETS.values.areas();
+    Areas::parse(&source.content).eprint_errors(source).unwrap()
+});
 
 fn logic_assets(c: &mut Criterion) {
     let mut group = c.benchmark_group("logic_assets");
@@ -29,8 +35,9 @@ fn logic_assets(c: &mut Criterion) {
     });
 
     let areas = &*AREAS;
-    let loc_data = &*LOC_DATA;
-    let state_data = &*STATE_DATA;
+    let loc_data = TEST_ASSETS.loc_data().unwrap();
+    let state_data = TEST_ASSETS.state_data().unwrap();
+
     group.bench_function("compile", |b| {
         b.iter(|| Graph::compile(areas.clone(), loc_data.clone(), state_data.clone(), &[]))
     });
@@ -41,14 +48,14 @@ fn logic_assets(c: &mut Criterion) {
 fn snippets(c: &mut Criterion) {
     let mut group = c.benchmark_group("snippets");
 
-    let stats = SNIPPET_ACCESS.read_snippet("stats").unwrap();
+    let stats = TEST_ASSETS.read_snippet("stats").unwrap();
 
     group.bench_function("ast_stats", |b| b.iter(|| Snippet::parse(&stats.content)));
 
-    let available_snippets = SNIPPET_ACCESS.available_snippets();
+    let available_snippets = TEST_ASSETS.available_snippets();
     let snippet_sources = available_snippets
         .iter()
-        .map(|identifier| SNIPPET_ACCESS.read_snippet(identifier).unwrap())
+        .map(|identifier| TEST_ASSETS.read_snippet(identifier).unwrap())
         .collect::<Vec<_>>();
 
     group.bench_function("ast_snippets", |b| {
@@ -65,8 +72,8 @@ fn snippets(c: &mut Criterion) {
             let mut rng = Pcg64Mcg::new(0);
             let mut compiler = Compiler::new(
                 &mut rng,
-                &*SNIPPET_ACCESS,
-                &*UBER_STATE_DATA,
+                &*TEST_ASSETS,
+                TEST_ASSETS.values.uber_state_data(),
                 FxHashMap::default(),
                 false,
             );
@@ -87,9 +94,10 @@ fn requirements(c: &mut Criterion) {
         difficulty: Difficulty::Unsafe,
         ..WorldSettings::default()
     };
-    let spawn = GRAPH.find_node(DEFAULT_SPAWN).unwrap();
-    let uber_states = UberStates::new(&UBER_STATE_DATA);
-    let mut world = World::new(&*GRAPH, spawn, &world_settings, uber_states);
+    let graph = compile_graph(&[]);
+    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
+    let uber_states = UberStates::new(TEST_ASSETS.values.uber_state_data());
+    let mut world = World::new(&graph, spawn, &world_settings, uber_states);
 
     let req_a = Requirement::EnergySkill(Skill::Blaze, 2.0);
     let req_b = Requirement::Damage(20.0);
@@ -152,10 +160,11 @@ fn requirements(c: &mut Criterion) {
 fn reach_check(c: &mut Criterion) {
     let mut group = c.benchmark_group("reach_check");
 
-    let uber_states = UberStates::new(&UBER_STATE_DATA);
+    let uber_states = UberStates::new(TEST_ASSETS.values.uber_state_data());
     let world_settings = WorldSettings::default();
-    let spawn = GRAPH.find_node(DEFAULT_SPAWN).unwrap();
-    let world = World::new(&*GRAPH, spawn, &world_settings, uber_states.clone());
+    let graph = compile_graph(&[]);
+    let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();
+    let world = World::new(&graph, spawn, &world_settings, uber_states.clone());
 
     group.bench_function("short", |b| {
         b.iter(|| {
@@ -174,10 +183,6 @@ fn reach_check(c: &mut Criterion) {
         })
     });
 
-    let world_settings = WorldSettings::default();
-    let spawn = GRAPH.find_node(DEFAULT_SPAWN).unwrap();
-    let uber_states = UberStates::new(&UBER_STATE_DATA);
-    let world = World::new(&*GRAPH, spawn, &world_settings, uber_states);
     let mut pool = ItemPool::new(&mut Pcg64Mcg::new(0));
 
     group.bench_function("long", |b| {
@@ -199,9 +204,9 @@ fn generation(c: &mut Criterion) {
     let mut universe_settings = UniverseSettings::new(String::default());
     let mut seed = 0..;
     let graph = compile_graph(&universe_settings.world_settings);
-    let snippet_access = &*SNIPPET_ACCESS;
-    let loc_data = &*LOC_DATA;
-    let uber_state_data = &*UBER_STATE_DATA;
+    let test_assets = &*TEST_ASSETS;
+    let loc_data = test_assets.values.loc_data();
+    let uber_state_data = test_assets.values.uber_state_data();
 
     group.bench_function("default", |b| {
         b.iter(|| {
@@ -210,7 +215,7 @@ fn generation(c: &mut Criterion) {
                 &graph,
                 loc_data,
                 uber_state_data,
-                snippet_access,
+                test_assets,
                 &universe_settings,
                 false,
             )
@@ -219,9 +224,9 @@ fn generation(c: &mut Criterion) {
     });
 
     seed = 0..;
-    let preset = PRESET_ACCESS.world_preset("moki").unwrap();
+    let preset = TEST_ASSETS.world_preset("moki").unwrap();
     preset
-        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
+        .apply(&mut universe_settings.world_settings[0], &*TEST_ASSETS)
         .unwrap();
 
     group.bench_function("moki", |b| {
@@ -231,7 +236,7 @@ fn generation(c: &mut Criterion) {
                 &graph,
                 loc_data,
                 uber_state_data,
-                snippet_access,
+                test_assets,
                 &universe_settings,
                 false,
             )
@@ -256,7 +261,7 @@ fn generation(c: &mut Criterion) {
         },
     };
     preset
-        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
+        .apply(&mut universe_settings.world_settings[0], &*TEST_ASSETS)
         .unwrap();
     let graph = compile_graph(&universe_settings.world_settings);
     group.bench_function("unsafe", |b| {
@@ -266,7 +271,7 @@ fn generation(c: &mut Criterion) {
                 &graph,
                 loc_data,
                 uber_state_data,
-                snippet_access,
+                test_assets,
                 &universe_settings,
                 false,
             )
@@ -281,15 +286,15 @@ fn multiworld(c: &mut Criterion) {
     let mut group = c.benchmark_group("multiworld");
 
     let mut universe_settings = UniverseSettings::new(String::default());
-    let preset = PRESET_ACCESS.world_preset("gorlek").unwrap();
+    let preset = TEST_ASSETS.world_preset("gorlek").unwrap();
     preset
-        .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
+        .apply(&mut universe_settings.world_settings[0], &*TEST_ASSETS)
         .unwrap();
     let graph = compile_graph(&universe_settings.world_settings);
 
-    let snippet_access = &*SNIPPET_ACCESS;
-    let loc_data = &*LOC_DATA;
-    let uber_state_data = &*UBER_STATE_DATA;
+    let test_assets = &*TEST_ASSETS;
+    let loc_data = test_assets.values.loc_data();
+    let uber_state_data = test_assets.values.uber_state_data();
 
     let world_settings = universe_settings.world_settings.pop().unwrap();
     let mut seed = 0..;
@@ -304,7 +309,7 @@ fn multiworld(c: &mut Criterion) {
                     &graph,
                     loc_data,
                     uber_state_data,
-                    snippet_access,
+                    test_assets,
                     &universe_settings,
                     false,
                 )
@@ -319,8 +324,8 @@ fn multiworld(c: &mut Criterion) {
 fn compile_graph(settings: &[WorldSettings]) -> Graph {
     Graph::compile(
         AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
+        TEST_ASSETS.loc_data().unwrap(),
+        TEST_ASSETS.state_data().unwrap(),
         settings,
     )
     .parsed

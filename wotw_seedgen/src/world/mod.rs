@@ -1,32 +1,30 @@
 mod is_met;
 mod reached;
+#[cfg(test)]
+mod tests;
 
 use std::{
     fmt::{self, Display},
     mem,
 };
 
-use ordered_float::OrderedFloat;
-use reached::Reach;
-use wotw_seedgen_assets::UberStateValue;
-
-#[cfg(test)]
-mod tests;
-
 use crate::{
     logical_difficulty,
     orbs::{self, OrbVariants, Orbs},
 };
-
+use ordered_float::OrderedFloat;
+use reached::Reach;
 use rustc_hash::FxHashMap;
 use smallvec::{smallvec, SmallVec};
-use wotw_seedgen_data::{Shard, Skill, UberIdentifier};
-use wotw_seedgen_logic_language::output::{Graph, RefillValue};
-use wotw_seedgen_seed_language::{
-    output::Event,
-    simulate::{Simulation, UberStates, Variables, WorldState},
+use wotw_seedgen_data::{
+    assets::UberStateValue,
+    logic_language::output::{Graph, RefillValue},
+    seed_language::{
+        output::Event,
+        simulate::{Simulation, UberStates, Variables, WorldState},
+    },
+    Difficulty, Shard, Skill, UberIdentifier, WorldSettings,
 };
-use wotw_seedgen_settings::{Difficulty, WorldSettings};
 
 // TODO A stateful reach check would have some advantages, for instance currently seedgen would not correctly account for "Grant Launch on breaking this Wall"
 
@@ -117,15 +115,15 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_logic_language::output::Graph;
-    /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
-    /// use wotw_seedgen::settings::WorldSettings;
+    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::logic_language::output::Graph;
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// use wotw_seedgen::data::WorldSettings;
     /// use wotw_seedgen::orbs::Orbs;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&*UBER_STATE_DATA);
+    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
     /// let world_settings = WorldSettings::default();
     /// let world = World::new(&graph, spawn, &world_settings, uber_states);
     ///
@@ -138,17 +136,15 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_logic_language::output::Graph;
-    /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
-    /// use wotw_seedgen::data::Shard;
+    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::logic_language::output::Graph;
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// use wotw_seedgen::data::{seed_language::simulate::Simulation, Difficulty, Shard, WorldSettings};
     /// use wotw_seedgen::orbs::Orbs;
-    /// use wotw_seedgen::settings::{WorldSettings, Difficulty};
-    /// use wotw_seedgen::seed_language::simulate::Simulation;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&*UBER_STATE_DATA);
+    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
     /// # let events = [];
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
@@ -176,16 +172,15 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_logic_language::output::Graph;
-    /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
-    /// use wotw_seedgen::settings::WorldSettings;
+    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::logic_language::output::Graph;
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
     /// use wotw_seedgen::orbs::Orbs;
-    /// use wotw_seedgen::seed_language::simulate::Simulation;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&*UBER_STATE_DATA);
+    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
     /// # let events = [];
     /// let world_settings = WorldSettings::default();
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
@@ -216,15 +211,14 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_logic_language::output::Graph;
-    /// # use wotw_seedgen_static_assets::UBER_STATE_DATA;
-    /// use wotw_seedgen::settings::WorldSettings;
-    /// use wotw_seedgen::seed_language::simulate::Simulation;
+    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::logic_language::output::Graph;
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&*UBER_STATE_DATA);
+    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
     /// # let events = [];
     /// let world_settings = WorldSettings::default();
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);

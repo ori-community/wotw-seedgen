@@ -18,19 +18,20 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, mem, ops::RangeFrom};
-use wotw_seedgen_assets::{LocData, UberStateValue};
-use wotw_seedgen_data::UberIdentifier;
-use wotw_seedgen_logic_language::output::Node;
-use wotw_seedgen_seed::SeedgenInfo;
-use wotw_seedgen_seed_language::{
-    compile::{self, store_boolean},
-    output::{
-        AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid, Concatenator,
-        ContainedWrites, Event, IntermediateOutput, Operation, Trigger,
+use wotw_seedgen_data::{
+    assets::{LocData, UberStateValue},
+    logic_language::output::Node,
+    seed_language::{
+        compile::{self, store_boolean},
+        output::{
+            AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid, Concatenator,
+            ContainedWrites, Event, IntermediateOutput, Operation, Trigger,
+        },
+        simulate::{Simulate, Simulation},
     },
-    simulate::{Simulate, Simulation},
+    UberIdentifier, UniverseSettings,
 };
-use wotw_seedgen_settings::UniverseSettings;
+use wotw_seedgen_seed::SeedgenInfo;
 
 const KEYSTONE_DOORS: &[(&str, usize)] = &[
     ("MarshSpawn.KeystoneDoor", 2),

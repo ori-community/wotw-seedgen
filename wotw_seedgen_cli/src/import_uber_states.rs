@@ -1,7 +1,7 @@
 use std::{fs::File, io::Write};
 
 use arboard::Clipboard;
-use wotw_seedgen_assets::{LocData, StateData, UberStateData, UberStateDump};
+use wotw_seedgen::data::assets::{LocData, StateData, UberStateData, UberStateDump};
 
 use crate::Error;
 

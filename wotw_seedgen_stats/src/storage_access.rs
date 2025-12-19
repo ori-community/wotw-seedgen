@@ -1,5 +1,5 @@
 use crate::Result;
-use wotw_seedgen::{settings::UniverseSettings, spoiler::SeedSpoiler};
+use wotw_seedgen::{data::UniverseSettings, spoiler::SeedSpoiler};
 
 /// Access seed files across stats runs
 ///

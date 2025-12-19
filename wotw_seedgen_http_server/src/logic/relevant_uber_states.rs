@@ -1,9 +1,9 @@
 use std::hash::BuildHasher;
 
 use rustc_hash::FxBuildHasher;
-use wotw_seedgen::{
+use wotw_seedgen::data::{
+    Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
     assets::{LocData, StateData},
-    data::{Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade},
 };
 
 use crate::api::logic::RelevantUberStates;

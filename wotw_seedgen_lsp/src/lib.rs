@@ -26,10 +26,12 @@ use tower_lsp::{
     },
     Client, LanguageServer, LspService, Server,
 };
-use wotw_seedgen_assets::{AssetCache, DefaultFileAccess, PlandoFileAccess};
-use wotw_seedgen_seed_language::{
-    ast,
-    compile::{Compiler, FunctionIdentifier},
+use wotw_seedgen_data::{
+    assets::{AssetCache, DefaultFileAccess, PlandoFileAccess},
+    seed_language::{
+        ast,
+        compile::{Compiler, FunctionIdentifier},
+    },
 };
 
 use crate::{cache::Cache, convert::path_from_lsp};

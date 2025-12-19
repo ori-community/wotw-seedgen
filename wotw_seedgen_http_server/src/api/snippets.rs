@@ -2,7 +2,7 @@ use axum::{Json, Router, extract::State, routing::get};
 use constcat::concat;
 use serde::Serialize;
 use utoipa::{OpenApi, ToSchema};
-use wotw_seedgen::seed_language::metadata::Metadata;
+use wotw_seedgen::data::seed_language::metadata::Metadata;
 
 use crate::RouterState;
 

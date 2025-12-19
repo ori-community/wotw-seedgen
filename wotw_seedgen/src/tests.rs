@@ -4,13 +4,13 @@ use crate::generate_seed;
 
 use env_logger::Env;
 use log::info;
-use wotw_seedgen_assets::{
-    PresetAccess, UniversePreset, UniversePresetSettings, WorldPresetSettings,
-};
-use wotw_seedgen_logic_language::output::Graph;
-use wotw_seedgen_settings::{Difficulty, UniverseSettings};
-use wotw_seedgen_static_assets::{
-    AREAS, LOC_DATA, PRESET_ACCESS, SNIPPET_ACCESS, STATE_DATA, UBER_STATE_DATA,
+use wotw_seedgen_data::{
+    assets::{
+        AssetCacheValues, AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings,
+        WorldPresetSettings, TEST_ASSETS,
+    },
+    logic_language::{ast::Areas, output::Graph},
+    Difficulty, UniverseSettings,
 };
 
 static LOGGER_INITIALIZED: Once = Once::new();
@@ -31,20 +31,23 @@ fn some_seeds() {
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
         generate_seed(
             &graph,
-            &*LOC_DATA,
-            &*UBER_STATE_DATA,
-            &*SNIPPET_ACCESS,
+            TEST_ASSETS.values.loc_data(),
+            TEST_ASSETS.values.uber_state_data(),
+            &*TEST_ASSETS,
             universe_settings,
             false,
         )
         .unwrap();
     }
 
+    let source = TEST_ASSETS.values.areas();
+    let areas = Areas::parse(&source.content).eprint_errors(source).unwrap();
+
     let mut universe_settings = UniverseSettings::new("0".to_string());
     let mut graph = Graph::compile(
-        AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
+        areas.clone(),
+        TEST_ASSETS.loc_data().unwrap(),
+        TEST_ASSETS.state_data().unwrap(),
         &universe_settings.world_settings,
     )
     .parsed
@@ -54,9 +57,9 @@ fn some_seeds() {
 
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
     graph = Graph::compile(
-        AREAS.clone(),
-        LOC_DATA.clone(),
-        STATE_DATA.clone(),
+        areas,
+        TEST_ASSETS.loc_data().unwrap(),
+        TEST_ASSETS.state_data().unwrap(),
         &universe_settings.world_settings,
     )
     .parsed
@@ -78,9 +81,9 @@ fn some_seeds() {
     ]);
 
     for preset in ["gorlek", "rspawn", "full_bonus"] {
-        let preset = PRESET_ACCESS.world_preset(preset).unwrap();
+        let preset = TEST_ASSETS.world_preset(preset).unwrap();
         preset
-            .apply(&mut universe_settings.world_settings[0], &*PRESET_ACCESS)
+            .apply(&mut universe_settings.world_settings[0], &*TEST_ASSETS)
             .unwrap();
     }
 
@@ -92,9 +95,7 @@ fn some_seeds() {
             ..UniversePresetSettings::default()
         },
     };
-    preset
-        .apply(&mut universe_settings, &*PRESET_ACCESS)
-        .unwrap();
+    preset.apply(&mut universe_settings, &*TEST_ASSETS).unwrap();
 
     info!("Testing multiworld Gorlek with headers");
     generate_test_seed(&graph, &universe_settings);

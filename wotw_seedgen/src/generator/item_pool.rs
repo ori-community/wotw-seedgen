@@ -11,10 +11,12 @@ use std::{
     iter,
     ops::{Deref, DerefMut},
 };
-use wotw_seedgen_data::{Shard, Skill, UberIdentifier, WeaponUpgrade};
-use wotw_seedgen_seed_language::{
-    compile,
-    output::{CommandVoid, ContainedWrites},
+use wotw_seedgen_data::{
+    seed_language::{
+        compile,
+        output::{CommandVoid, ContainedWrites},
+    },
+    Shard, Skill, UberIdentifier, WeaponUpgrade,
 };
 
 // TODO don't really think this should be public
