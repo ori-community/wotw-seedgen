@@ -20,13 +20,22 @@ pub enum Error {
     SeedgenInfo(serde_json::Error),
     #[error("failed to start server: {0}")]
     Serve(io::Error),
+    #[error("failed to apply preset: {0}")]
+    ApplyPreset(String),
 }
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
-        let status = match self {
+        let status = match &self {
             Error::Custom(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Error::SeedgenInfo(_) => StatusCode::BAD_REQUEST,
+            Error::SeedgenInfo(error) => {
+                if error.is_data() {
+                    StatusCode::UNPROCESSABLE_ENTITY
+                } else {
+                    StatusCode::BAD_REQUEST
+                }
+            }
+            Error::ApplyPreset(_) => StatusCode::UNPROCESSABLE_ENTITY,
             Error::ServerCore(_) | Error::SingleInstance(_) | Error::Serve(_) => unreachable!(),
         };
 

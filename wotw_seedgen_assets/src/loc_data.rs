@@ -37,6 +37,7 @@
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 use std::io::Read;
+use utoipa::ToSchema;
 use wotw_seedgen_data::{MapIcon, Position, UberIdentifier, Zone};
 
 /// Information about all pickup locations which should be filled by the randomizer
@@ -48,7 +49,7 @@ pub struct LocData {
 
 // TODO while breaking everything could also just change the loc data format to save this transformation
 /// Information about a pickup location
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct LocDataEntry {
     /// Unique identifier for this pickup location which is used in `areas.wotw`
     pub identifier: String,

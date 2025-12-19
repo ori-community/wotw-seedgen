@@ -2,6 +2,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::iter;
+use utoipa::ToSchema;
 use wotw_seedgen_settings::{
     Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
 };
@@ -13,7 +14,7 @@ pub const CURRENT_ASSETS_VERSION: u8 = 1;
 
 /// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
 #[skip_serializing_none]
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct PresetInfo {
     /// Display name
@@ -25,7 +26,7 @@ pub struct PresetInfo {
 }
 
 /// Special groups to display a preset in
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub enum PresetGroup {
     /// Generally, only one base preset will be used at a time.
     ///
@@ -66,7 +67,7 @@ pub enum PresetGroup {
 ///
 /// [`UniverseSettings`]: wotw_seedgen_settings::UniverseSettings
 #[skip_serializing_none]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UniversePreset {
     /// Assets version this preset is compatible with
@@ -129,7 +130,7 @@ impl UniversePreset {
 ///
 /// Mostly used inside a [`UniversePreset`] which offers compability features
 #[skip_serializing_none]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UniversePresetSettings {
     /// Names of further [`UniversePreset`]s to use
@@ -270,7 +271,7 @@ fn include_universe_preset<A: PresetAccess>(
 ///
 /// [`WorldSettings`]: wotw_seedgen_settings::WorldSettings
 #[skip_serializing_none]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct WorldPreset {
     /// Assets version this preset is compatible with
@@ -323,7 +324,7 @@ impl WorldPreset {
 ///
 /// Mostly used inside a [`WorldPreset`] which offers compability features
 #[skip_serializing_none]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, Default)]
 #[serde(rename_all = "camelCase")]
 // TODO replace hashsets with vecs?
 pub struct WorldPresetSettings {

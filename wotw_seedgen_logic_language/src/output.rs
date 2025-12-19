@@ -1,13 +1,15 @@
 use rustc_hash::FxHashMap;
+use serde::Serialize;
 use smallvec::SmallVec;
 use strum::{EnumIs, EnumString, EnumTryAs};
+use utoipa::ToSchema;
 use wotw_seedgen_assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::{Position, Shard, Skill, Teleporter, UberIdentifier, Zone};
 use wotw_seedgen_settings::{Difficulty, Trick};
 
 pub type DoorId = i32;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub struct Graph {
     pub nodes: Vec<Node>,
     pub default_door_connections: FxHashMap<DoorId, DoorId>,
@@ -31,7 +33,7 @@ impl Graph {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, EnumIs, EnumTryAs)]
+#[derive(Debug, Clone, PartialEq, Serialize, ToSchema, EnumIs, EnumTryAs)]
 pub enum Node {
     Anchor(Anchor),
     Pickup(LocDataEntry),
@@ -115,7 +117,7 @@ impl Node {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, ToSchema)]
 pub struct Anchor {
     pub identifier: String,
     pub position: Option<Position>,
@@ -132,26 +134,26 @@ impl PartialEq for Anchor {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub struct Door {
     pub id: DoorId,
     pub target: String,
     pub requirement: Requirement,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub struct Connection {
     pub to: usize,
     pub requirement: Requirement,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub struct Refill {
     pub value: RefillValue,
     pub requirement: Requirement,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, ToSchema)]
 pub enum RefillValue {
     Full,
     Checkpoint,
@@ -159,7 +161,7 @@ pub enum RefillValue {
     Energy(f32),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub enum Requirement {
     Free,
     Impossible,
@@ -179,16 +181,20 @@ pub enum Requirement {
     State(usize),
     Damage(f32),
     Danger(f32),
+    // utoipa has a smallvec feature but it doesn't work
+    #[schema(value_type = Vec<(Enemy, u8)>)]
     Combat(SmallVec<[(Enemy, u8); 12]>),
     Boss(f32),
     BreakWall(f32),
     ShurikenBreak(f32),
     SentryBreak(f32),
+    #[schema(no_recursion)]
     And(Vec<Requirement>),
+    #[schema(no_recursion)]
     Or(Vec<Requirement>),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, EnumString)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, ToSchema, EnumString)]
 pub enum Enemy {
     Mantis,
     Slug,

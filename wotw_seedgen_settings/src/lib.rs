@@ -2,6 +2,7 @@
 //!
 //! See the [`UniverseSettings`] struct for more information
 //!
+// TODO search and remove obsolete feature documentation
 //! ## Features
 //!
 //! - `serde`: Enables [`Deserialize`] and [`Serialize`] implementations on all types
@@ -22,7 +23,11 @@ use std::{
 
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
-use strum::{Display, EnumString, VariantArray, VariantNames};
+use strum::{Display, EnumMessage, EnumString, VariantArray, VariantNames};
+use utoipa::{
+    openapi::{ObjectBuilder, RefOr, Schema, Type},
+    PartialSchema, ToSchema,
+};
 
 /// A representation of all the relevant settings when generating a seed
 ///
@@ -40,7 +45,7 @@ use strum::{Display, EnumString, VariantArray, VariantNames};
 /// assert_eq!(universe_settings.world_settings[0], WorldSettings::default());
 /// assert_eq!(universe_settings.seed, "seed");
 /// ```
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UniverseSettings {
     /// The seed that determines all randomness
@@ -122,7 +127,7 @@ impl WorldSettingsHelpers for UniverseSettings {
 /// Seed settings bound to a specific world of a seed
 ///
 /// See the [Multiplayer wiki page](https://wiki.orirando.com/features/multiplayer) for an explanation of worlds
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct WorldSettings {
     /// Spawn destination
@@ -149,7 +154,7 @@ impl WorldSettings {
 }
 
 /// The Spawn location, which may either be fixed or randomly decided during seed generation
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub enum Spawn {
     /// Spawn in a specific location, described by the anchor name from the logic file
     Set(String),
@@ -185,15 +190,21 @@ impl Default for Spawn {
     Deserialize,
     Display,
     EnumString,
+    EnumMessage,
     VariantNames,
     VariantArray,
+    ToSchema,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum Difficulty {
+    /// The default game paths, designed for players who have finished the game at least once.
     #[default]
     Moki,
+    /// Intermediate game paths for more advanced players. More precise utilisation of skills is required.
     Gorlek,
+    /// Advanced game paths for players seeking a challenge.
     Kii,
+    /// Unvalidated game paths. Some paths may be very hard. Many paths are missing. Don't try at home.
     Unsafe,
 }
 
@@ -213,8 +224,10 @@ pub enum Difficulty {
     Deserialize,
     Display,
     EnumString,
+    EnumMessage,
     VariantNames,
     VariantArray,
+    ToSchema,
 )]
 pub enum Trick {
     /// Grounded Sentry Jumps with Sword
@@ -275,6 +288,19 @@ pub enum Trick {
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct GreaterOneU8(NonZeroU8);
+
+impl PartialSchema for GreaterOneU8 {
+    fn schema() -> RefOr<Schema> {
+        RefOr::T(
+            ObjectBuilder::new()
+                .schema_type(Type::Number)
+                .exclusive_minimum(Some(1))
+                .into(),
+        )
+    }
+}
+
+impl ToSchema for GreaterOneU8 {}
 
 impl GreaterOneU8 {
     pub fn new(n: u8) -> Option<Self> {

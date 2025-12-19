@@ -7,10 +7,13 @@ use wotw_seedgen::{
     },
     data::MapIcon,
     logic_language::{ast::Areas, output::Graph},
-    seed_language::simulate::UberStates,
+    seed_language::{metadata::Metadata, simulate::UberStates},
 };
 
-use crate::api::logic::{MapIcons, RelevantUberStates};
+use crate::api::{
+    logic::{MapIcons, RelevantUberStates},
+    snippets::SnippetInfo,
+};
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
 
@@ -22,6 +25,7 @@ pub struct CacheValues {
     pub grom_shop_map_icon_index: usize,
     pub node_index_to_map_icon_index: FxHashMap<usize, usize>,
     pub relevant_uber_states: RelevantUberStates,
+    pub snippet_info: Vec<SnippetInfo>,
 }
 
 impl AssetCacheValues for CacheValues {
@@ -41,6 +45,8 @@ impl AssetCacheValues for CacheValues {
 
         let node_index_to_map_icon_index = node_index_to_map_icon_index(&graph, &map_icons);
 
+        let snippet_info = snippet_info(&base.snippets);
+
         Ok(Self {
             base,
             graph,
@@ -49,6 +55,7 @@ impl AssetCacheValues for CacheValues {
             grom_shop_map_icon_index,
             node_index_to_map_icon_index,
             relevant_uber_states,
+            snippet_info,
         })
     }
 
@@ -103,6 +110,11 @@ impl AssetCacheValues for CacheValues {
                 node_index_to_map_icon_index(&self.graph, &self.map_icons);
         }
 
+        // TODO patch maybe?
+        if !changed.snippets.is_empty() {
+            self.snippet_info = snippet_info(&self.base.snippets);
+        }
+
         Ok(())
     }
 }
@@ -143,6 +155,17 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
                     _ => map_icon.label == identifier,
                 })
                 .map(|map_icon_index| (node_index, map_icon_index))
+        })
+        .collect()
+}
+
+fn snippet_info(snippets: &FxHashMap<String, Source>) -> Vec<SnippetInfo> {
+    snippets
+        .iter()
+        .map(|(identifier, source)| SnippetInfo {
+            identifier: identifier.clone(),
+            // TODO cache asts?
+            metadata: Metadata::from_source(&source.content),
         })
         .collect()
 }

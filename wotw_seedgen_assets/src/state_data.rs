@@ -25,6 +25,7 @@ use std::io::Read;
 
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 use wotw_seedgen_data::UberIdentifier;
 
 /// Information about all world states which are considered by the randomizer logic
@@ -40,7 +41,7 @@ pub struct StateData {
 
 // TODO maybe a custom deserialize could eliminate the need for separate input/output structs?
 /// Information about an obtainable world state
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct StateDataEntry {
     /// Unique identifier for this world state which is used in `areas.wotw`
     pub identifier: String,

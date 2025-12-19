@@ -1,10 +1,15 @@
+use std::fmt::{self, Display};
+
 pub use crate::output::Literal;
 
 use crate::ast::{self, inspect_command_arg};
+use ordered_float::OrderedFloat;
 use rustc_hash::FxHashMap;
+use serde::Serialize;
+use utoipa::ToSchema;
 use wotw_seedgen_parse::{Recoverable, SpannedOption};
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, ToSchema)]
 pub struct Metadata {
     pub hidden: bool,
     pub name: Option<String>,
@@ -13,10 +18,28 @@ pub struct Metadata {
     pub config: FxHashMap<String, ConfigValue>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 pub struct ConfigValue {
     pub description: String,
-    pub default: Literal,
+    pub default: ConfigDefault,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
+pub enum ConfigDefault {
+    Boolean(bool),
+    Integer(i32),
+    #[schema(value_type = f32)]
+    Float(OrderedFloat<f32>),
+}
+
+impl Display for ConfigDefault {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Boolean(value) => value.fmt(f),
+            Self::Integer(value) => value.fmt(f),
+            Self::Float(value) => value.fmt(f),
+        }
+    }
 }
 
 impl Metadata {
@@ -113,9 +136,9 @@ impl ExtractMetadata for ast::Command<'_> {
         };
 
         let default = match default.data {
-            ast::Literal::Boolean(value) => Literal::Boolean(value),
-            ast::Literal::Integer(value) => Literal::Integer(value),
-            ast::Literal::Float(value) => Literal::Float(value),
+            ast::Literal::Boolean(value) => ConfigDefault::Boolean(value),
+            ast::Literal::Integer(value) => ConfigDefault::Integer(value),
+            ast::Literal::Float(value) => ConfigDefault::Float(value),
             _ => return,
         };
 

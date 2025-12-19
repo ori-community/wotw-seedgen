@@ -1,6 +1,7 @@
 use crate::{Equipment, OpherIcon, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, FromRepr, VariantArray};
+use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
 /// Skills, sometimes also called Abilities
@@ -18,6 +19,7 @@ use wotw_seedgen_derive::FromStr;
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     FromRepr,

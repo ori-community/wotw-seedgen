@@ -4,6 +4,10 @@ use std::{
 };
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use utoipa::{
+    openapi::{schema::ArrayItems, ArrayBuilder, RefOr, Schema},
+    PartialSchema, ToSchema,
+};
 
 use crate::{Icon, MapIcon, OpherIcon, Shard, Skill, Teleporter, WeaponUpgrade};
 
@@ -90,6 +94,17 @@ impl<'de> Deserialize<'de> for UberIdentifier {
         <(i32, i32)>::deserialize(deserializer).map(|(group, member)| Self { group, member })
     }
 }
+
+impl PartialSchema for UberIdentifier {
+    fn schema() -> RefOr<Schema> {
+        ArrayBuilder::new()
+            .items(ArrayItems::False)
+            .prefix_items([utoipa::schema!(i32), utoipa::schema!(i32)])
+            .into()
+    }
+}
+
+impl ToSchema for UberIdentifier {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ShopKind {

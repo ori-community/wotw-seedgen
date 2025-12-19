@@ -10,7 +10,7 @@ use rustc_hash::FxHashSet;
 use strum::{Display, VariantArray, VariantNames};
 use wotw_seedgen::settings::{Difficulty, GreaterOneU8, Spawn, Trick};
 use wotw_seedgen_assets::{UniversePresetSettings, WorldPresetSettings};
-use wotw_seedgen_seed_language::metadata::{ConfigValue, Literal};
+use wotw_seedgen_seed_language::metadata::{ConfigDefault, ConfigValue};
 
 use crate::{
     cli::{
@@ -405,7 +405,7 @@ fn choose_snippet_config_value(
     );
 
     let choice = match &value.1.default {
-        Literal::Boolean(_) => Select::new()
+        ConfigDefault::Boolean(_) => Select::new()
             .with_prompt(prompt)
             .items(&[true, false])
             .default((current == "false") as usize)

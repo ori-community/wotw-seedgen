@@ -9,13 +9,13 @@ use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema, schema};
 use wotw_seedgen::{
     data::{MapIcon, Position, UberIdentifier},
+    logic_language::output::Graph,
     seed::SeedgenInfo,
     seed_language::ast::Comparator,
 };
 
 use crate::{
     RouterState,
-    api::schemas::UberIdentifierSchema,
     error::{Error, Result},
     logic::reachable,
 };
@@ -23,22 +23,34 @@ use crate::{
 pub const TAG: &str = "logic";
 pub const LOGIC: &str = concat!("/", TAG);
 
+const GRAPH: &str = "/graph";
 const MAP_ICONS: &str = "/map-icons";
 const RELEVANT_UBER_STATES: &str = "/relevant-uber-states";
 const REACH_CHECK: &str = "/reach-check";
 
 pub fn router() -> Router<RouterState> {
     Router::new()
+        .route(GRAPH, get(graph))
         .route(MAP_ICONS, get(map_icons))
         .route(RELEVANT_UBER_STATES, get(relevant_uber_states))
         .route(REACH_CHECK, post(reach_check))
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(map_icons, relevant_uber_states, reach_check))]
+#[openapi(paths(graph, map_icons, relevant_uber_states, reach_check))]
 pub struct Docs;
 
-/// Get the list of logically relevant map icons
+/// Get the logic graph
+#[utoipa::path(
+    get,
+    path = GRAPH,
+    responses((status = OK, body = Graph)),
+)]
+async fn graph(State(cache): State<RouterState>) -> Json<Graph> {
+    Json(cache.read().await.graph.clone())
+}
+
+/// Get a list of logically relevant map icons
 #[utoipa::path(
     get,
     path = MAP_ICONS,
@@ -69,7 +81,6 @@ pub struct MapIconInfo {
 #[derive(Clone, Hash, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MapIconCondition {
-    #[schema(value_type = UberIdentifierSchema)]
     pub uber_identifier: UberIdentifier,
     pub comparator: Comparator,
     #[schema(value_type = f32)]
@@ -89,7 +100,6 @@ async fn relevant_uber_states(State(cache): State<RouterState>) -> Json<Relevant
 #[derive(Clone, Serialize, ToSchema)]
 pub struct RelevantUberStates {
     /// List of logically relevant UberStates
-    #[schema(value_type = Vec<UberIdentifierSchema>)]
     pub identifiers: Vec<UberIdentifier>,
     /// Hash of `identifiers`
     pub hash: u64,
@@ -102,6 +112,7 @@ pub struct RelevantUberStates {
     responses(
         (status = OK, body = ReachCheck),
         (status = BAD_REQUEST, body = String),
+        (status = UNPROCESSABLE_ENTITY, body = String),
         (status = INTERNAL_SERVER_ERROR, body = String),
     ),
 )]
@@ -126,7 +137,7 @@ async fn reach_check(
 #[derive(Deserialize, ToSchema)]
 pub struct ReachCheckBody {
     /// Current values of logically relevant UberStates
-    #[schema(value_type = Vec<(UberIdentifierSchema, f32)>)]
+    #[schema(value_type = Vec<(UberIdentifier, f32)>)]
     pub uber_states: Vec<(UberIdentifier, OrderedFloat<f32>)>,
     /// seedgen_info.json contents from within the seed
     pub seedgen_info: String,
