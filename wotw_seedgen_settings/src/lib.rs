@@ -202,7 +202,7 @@ pub enum Difficulty {
     Moki,
     /// Intermediate game paths for more advanced players. More precise utilisation of skills is required.
     Gorlek,
-    /// Advanced game paths for players seeking a challenge.
+    /// Advanced game paths for players seeking a challenge. Glitched paths may be incomplete.
     Kii,
     /// Unvalidated game paths. Some paths may be very hard. Many paths are missing. Don't try at home.
     Unsafe,
@@ -284,6 +284,40 @@ pub enum Trick {
     PauseHover,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
+}
+
+impl Trick {
+    // TODO verify usage in logic?
+    pub fn min_difficulty(self) -> Difficulty {
+        match self {
+            Self::SwordSentryJump
+            | Self::HammerSentryJump
+            | Self::ShurikenBreak
+            | Self::SentryBurn
+            | Self::RemoveKillPlane => Difficulty::Gorlek,
+            Self::LaunchSwap | Self::GrenadeJump | Self::AerialHammerJump | Self::GlideJump => {
+                Difficulty::Kii
+            }
+            Self::SentryBreak
+            | Self::HammerBreak
+            | Self::SpearBreak
+            | Self::SentrySwap
+            | Self::FlashSwap
+            | Self::BlazeSwap
+            | Self::WaveDash
+            | Self::SwordJump
+            | Self::HammerJump
+            | Self::GlideHammerJump
+            | Self::CoyoteHammerJump
+            | Self::WallHammerJump
+            | Self::GroundedHammerJump
+            | Self::ExtendedHammer
+            | Self::GrenadeRedirect
+            | Self::SentryRedirect
+            | Self::PauseHover
+            | Self::SpearJump => Difficulty::Unsafe,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]

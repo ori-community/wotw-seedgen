@@ -34,8 +34,6 @@ pub fn router() -> Router<RouterState> {
 )]
 pub struct Docs;
 
-// can't get utoipa to work correctly with generics...
-
 /// Get the list of difficulties
 #[utoipa::path(
     get,
@@ -86,12 +84,18 @@ async fn tricks() -> Json<Vec<TrickInfo>> {
 pub struct TrickInfo {
     pub name: Trick,
     pub description: &'static str,
+    pub min_difficulty: Difficulty,
 }
 
 impl From<Trick> for TrickInfo {
     fn from(name: Trick) -> Self {
         let description = name.get_documentation().unwrap_or_default();
+        let min_difficulty = name.min_difficulty();
 
-        Self { name, description }
+        Self {
+            name,
+            description,
+            min_difficulty,
+        }
     }
 }
