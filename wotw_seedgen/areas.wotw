@@ -7295,7 +7295,7 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
     enter:
       moki: InnerWellspring.MiddleDoorsOpen
   refill Checkpoint
-  refill Health=2
+  refill Health=2  # There are two health plants reachable for free (one on both side of the door)
   refill Energy=3:
     moki: BreakCrystal
 
@@ -16064,7 +16064,7 @@ anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
 
 anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
   refill Checkpoint
-  refill Health=2
+  refill Health=1
 
   state WillowsEnd.MinibossHeart:
     moki: Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
