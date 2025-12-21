@@ -10,7 +10,7 @@ pub use uber_state_data::{
     UberStateDumpMember, UberStateDumpValueType, UberStateValue,
 };
 mod snippet_access;
-pub use snippet_access::{NoSnippetAccess, SnippetAccess};
+pub use snippet_access::{ChainedSnippetAccess, InlineSnippets, NoSnippetAccess, SnippetAccess};
 mod presets;
 pub use presets::{
     NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, UniversePresetSettings,

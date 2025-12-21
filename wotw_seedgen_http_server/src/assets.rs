@@ -1,9 +1,12 @@
-use rustc_hash::FxHashMap;
+use std::{ffi::OsStr, fs, path::Path};
+
+use rustc_hash::{FxHashMap, FxHashSet};
 use wotw_seedgen::data::{
     MapIcon,
     assets::{
-        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-        DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess, StateData, UberStateData,
+        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DATA_DIR,
+        DefaultAssetCacheValues, DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess,
+        StateData, UberStateData,
     },
     logic_language::{ast::Areas, output::Graph},
     parse::Source,
@@ -26,6 +29,7 @@ pub struct CacheValues {
     pub node_index_to_map_icon_index: FxHashMap<usize, usize>,
     pub relevant_uber_states: RelevantUberStates,
     pub snippet_info: Vec<SnippetInfo>,
+    pub data_dir_snippets: FxHashSet<String>,
 }
 
 impl AssetCacheValues for CacheValues {
@@ -46,6 +50,7 @@ impl AssetCacheValues for CacheValues {
         let node_index_to_map_icon_index = node_index_to_map_icon_index(&graph, &map_icons);
 
         let snippet_info = snippet_info(&base.snippets);
+        let data_dir_snippets = data_dir_snippets();
 
         Ok(Self {
             base,
@@ -56,6 +61,7 @@ impl AssetCacheValues for CacheValues {
             node_index_to_map_icon_index,
             relevant_uber_states,
             snippet_info,
+            data_dir_snippets,
         })
     }
 
@@ -113,6 +119,7 @@ impl AssetCacheValues for CacheValues {
         // TODO patch maybe?
         if !changed.snippets.is_empty() {
             self.snippet_info = snippet_info(&self.base.snippets);
+            self.data_dir_snippets = data_dir_snippets();
         }
 
         Ok(())
@@ -166,6 +173,23 @@ fn snippet_info(snippets: &FxHashMap<String, Source>) -> Vec<SnippetInfo> {
             identifier: identifier.clone(),
             // TODO cache asts?
             metadata: Metadata::from_source(&source.content),
+        })
+        .collect()
+}
+
+fn data_dir_snippets() -> FxHashSet<String> {
+    fs::read_dir(DATA_DIR.join("snippets"))
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.file_name())
+        .filter(|file_name| Path::new(file_name).extension() == Some(OsStr::new("wotws")))
+        .map(|file_name| {
+            Path::new(&file_name)
+                .file_stem()
+                .unwrap()
+                .to_string_lossy()
+                .to_string()
         })
         .collect()
 }

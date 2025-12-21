@@ -14,7 +14,7 @@ use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
 use wotw_seedgen_data::{
-    assets::{LocData, SnippetAccess, UberStateData},
+    assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
     seed_language::{
         compile::{store_boolean, Compiler},
@@ -51,9 +51,12 @@ pub fn generate_seed<F: SnippetAccess>(
         .world_settings
         .iter()
         .map(|world_settings| {
+            let snippet_access =
+                ChainedSnippetAccess::new(&world_settings.inline_snippets, snippet_access);
+
             let compiler = Compiler::new(
                 &mut rng,
-                snippet_access,
+                &snippet_access,
                 uber_state_data,
                 world_settings.snippet_config.clone(),
                 debug,

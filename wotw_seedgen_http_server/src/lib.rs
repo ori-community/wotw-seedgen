@@ -19,6 +19,7 @@ mod error;
 mod generate;
 mod inactivity_timeout;
 mod logic;
+mod settings;
 
 pub fn start(inactivity_timeout: Option<Duration>) -> Result<()> {
     let instance =

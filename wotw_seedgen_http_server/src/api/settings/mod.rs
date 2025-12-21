@@ -7,6 +7,7 @@ use wotw_seedgen::data::{Difficulty, Trick, VariantArray};
 
 use crate::RouterState;
 
+pub mod universe;
 pub mod world;
 
 pub const TAG: &str = "settings";
@@ -20,6 +21,7 @@ pub fn router() -> Router<RouterState> {
         .route(DIFFICULTIES, get(difficulties))
         .route(TRICKS, get(tricks))
         .nest(world::WORLD, world::router())
+        .nest(universe::UNIVERSE, universe::router())
 }
 
 #[derive(OpenApi)]
@@ -27,6 +29,7 @@ pub fn router() -> Router<RouterState> {
     paths(difficulties, tricks),
     nest(
         (path = world::WORLD, api = world::Docs, tags = [TAG, world::TAG]),
+        (path = universe::UNIVERSE, api = universe::Docs, tags = [TAG, universe::TAG]),
     )
 )]
 pub struct Docs;

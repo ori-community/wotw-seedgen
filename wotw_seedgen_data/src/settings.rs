@@ -18,7 +18,10 @@ use utoipa::{
     PartialSchema, ToSchema,
 };
 
-use crate::{assets::SnippetAccess, seed_language::metadata::ConfigDefault};
+use crate::{
+    assets::{InlineSnippets, SnippetAccess},
+    seed_language::metadata::ConfigDefault,
+};
 
 /// A representation of all the relevant settings when generating a seed
 ///
@@ -133,6 +136,8 @@ pub struct WorldSettings {
     pub randomize_doors: Option<GreaterOneU8>,
     /// Names of snippets to use
     pub snippets: Vec<String>,
+    /// Additional inline snippets that don't exist on the filesystem
+    pub inline_snippets: InlineSnippets,
     /// Configuration to pass to snippets
     pub snippet_config: FxHashMap<String, FxHashMap<String, String>>,
 }
@@ -184,6 +189,7 @@ impl WorldSettings {
                 .sample(distr_50)
                 .then_some(GreaterOneU8::new(2).unwrap()),
             snippets,
+            inline_snippets: InlineSnippets::default(),
             snippet_config,
         }
     }
