@@ -2,7 +2,7 @@ use std::fs::File;
 
 use serde::de::DeserializeOwned;
 use wotw_seedgen::{
-    data::assets::file_err,
+    data::assets::{self, file_err},
     seed::{assembly::Assembly, SeedgenInfo},
 };
 use zip::{read::ZipFile, ZipArchive};
@@ -12,9 +12,9 @@ use crate::{cli::RegenerateArgs, log_config::LogConfig, seed::generate, Error};
 pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
     let RegenerateArgs { path, verbose_args } = args;
 
-    LogConfig::from_args(verbose_args, "seedgen_log.txt").apply()?;
+    LogConfig::from_args(verbose_args).apply()?;
 
-    let file = File::open(&path).map_err(|err| file_err("open", &path, err))?;
+    let file = assets::file_open(&path)?;
     let mut archive = ZipArchive::new(file).map_err(|err| file_err("read", &path, err))?;
     let seedgen_info = json_by_name::<SeedgenInfo>(&mut archive, "seedgen_info.json")?;
     let assembly = json_by_name::<Assembly>(&mut archive, "assembly.json")?;

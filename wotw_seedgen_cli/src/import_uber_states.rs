@@ -1,7 +1,7 @@
-use std::{fs::File, io::Write};
+use std::io::Write;
 
 use arboard::Clipboard;
-use wotw_seedgen::data::assets::{LocData, StateData, UberStateData, UberStateDump};
+use wotw_seedgen::data::assets::{self, LocData, StateData, UberStateData, UberStateDump};
 
 use crate::Error;
 
@@ -59,7 +59,7 @@ pub fn import_uber_states() -> Result<(), Error> {
         dump_member.value = *value;
     }
 
-    let mut out = File::create("uber_state_dump.json")?;
+    let mut out = assets::file_create("uber_state_dump.json")?;
 
     serde_json::to_writer_pretty(&mut out, &dump)?;
 

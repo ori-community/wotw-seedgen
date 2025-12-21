@@ -1,7 +1,8 @@
-use std::{fs::File, io};
+use std::io;
 
 use fern::{colors::ColoredLevelConfig, Dispatch};
 use log::LevelFilter;
+use wotw_seedgen::data::assets::{self, DATA_DIR};
 
 use crate::{
     cli::{VerboseArgs, VerboseTarget},
@@ -10,7 +11,6 @@ use crate::{
 
 #[derive(Debug, Default)]
 pub struct LogConfig {
-    path: &'static str,
     trace_seedgen: bool,
     trace_placement: bool,
     trace_reached: bool,
@@ -18,18 +18,8 @@ pub struct LogConfig {
 }
 
 impl LogConfig {
-    pub fn new(path: &'static str) -> Self {
-        Self {
-            path,
-            trace_seedgen: false,
-            trace_placement: false,
-            trace_reached: false,
-            trace_doors: false,
-        }
-    }
-
-    pub fn from_args(args: VerboseArgs, path: &'static str) -> Self {
-        let mut config = Self::new(path);
+    pub fn from_args(args: VerboseArgs) -> Self {
+        let mut config = Self::default();
 
         if let Some(targets) = args.verbose {
             config = config
@@ -89,7 +79,7 @@ impl LogConfig {
                         "wotw_seedgen::generator::doors",
                         level_filter(self.trace_doors),
                     )
-                    .chain(File::create(self.path)?),
+                    .chain(assets::file_create(DATA_DIR.join("seedgen_log.txt"))?),
             )
         }
 

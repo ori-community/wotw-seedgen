@@ -15,7 +15,7 @@ use rand::{distributions::Uniform, prelude::Distribution};
 use wotw_seedgen::{
     data::{
         assets::{
-            file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
+            self, file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
             DATA_DIR,
         },
         logic_language::{ast::Areas, output::Graph},
@@ -34,7 +34,7 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
 
     let start = Instant::now();
 
-    LogConfig::from_args(verbose_args, "seedgen_log.txt").apply()?;
+    LogConfig::from_args(verbose_args).apply()?;
 
     let mut settings = settings.into_universe_settings()?;
     let name = if settings.seed.is_empty() {
@@ -61,7 +61,7 @@ fn write_seed(
     start: Instant,
 ) -> Result<(), Error> {
     let seeds_dir = DATA_DIR.join("seeds");
-    fs::create_dir_all(&seeds_dir).map_err(|err| file_err("create", &seeds_dir, err))?;
+    assets::create_dir_all(&seeds_dir)?;
 
     let path = if seed_universe.worlds.len() == 1 {
         let (mut file, path) = create_unique_file(seeds_dir, name, ".wotwr")?;
@@ -74,8 +74,7 @@ fn write_seed(
         }
 
         let spoiler_path = path.with_extension("spoiler.txt");
-        fs::write(&spoiler_path, seed_universe.spoiler.to_string())
-            .map_err(|err| file_err("write", &spoiler_path, err))?;
+        assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
 
         path
     } else {
@@ -83,13 +82,12 @@ fn write_seed(
 
         for (index, seed) in seed_universe.worlds.into_iter().enumerate() {
             let path = path.join(format!("world_{index}.wotwr"));
-            let mut file = File::create(&path).map_err(|err| file_err("create", path, err))?;
+            let mut file = assets::file_create(&path)?;
             seed.package(&mut file, !debug)?;
         }
 
         let spoiler_path = path.join("spoiler.txt");
-        fs::write(&spoiler_path, seed_universe.spoiler.to_string())
-            .map_err(|err| file_err("write", &spoiler_path, err))?;
+        assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
 
         path
     };

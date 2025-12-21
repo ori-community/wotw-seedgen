@@ -1,9 +1,6 @@
-use std::fs;
-
 use serde::Serialize;
 use wotw_seedgen::data::assets::{
-    file_err, PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION,
-    DATA_DIR,
+    self, PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION, DATA_DIR,
 };
 
 use crate::{
@@ -47,10 +44,10 @@ fn write_preset<T: Serialize>(identifier: &str, preset: &T, dir: &str) -> Result
     let contents = serde_json::to_string_pretty(preset)?;
 
     let mut preset_dir = DATA_DIR.join(dir);
-    fs::create_dir_all(&preset_dir).map_err(|err| file_err("create", &preset_dir, err))?;
+    assets::create_dir_all(&preset_dir)?;
 
     preset_dir.push(format!("{identifier}.json"));
-    fs::write(&preset_dir, contents).map_err(|err| file_err("create", preset_dir, err))?;
+    assets::write(&preset_dir, contents)?;
 
     Ok(())
 }

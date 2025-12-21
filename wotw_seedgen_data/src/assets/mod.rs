@@ -18,9 +18,10 @@ pub use presets::{
 };
 mod file_access;
 pub use file_access::{
-    file_err, AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets,
-    DefaultAssetCacheValues, DefaultFileAccess, PlandoFileAccess, PresetFileAccess,
-    SnippetFileAccess, Watcher, WatcherError, DATA_DIR, EXECUTABLE_DIR,
+    canonicalize, create_dir_all, file_create, file_err, file_open, write, AssetCache,
+    AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues, DefaultFileAccess,
+    PlandoFileAccess, PresetFileAccess, SnippetFileAccess, Watcher, WatcherError, DATA_DIR,
+    EXECUTABLE_DIR,
 };
 mod test_access;
 pub use test_access::{TestAccess, TEST_ASSETS};

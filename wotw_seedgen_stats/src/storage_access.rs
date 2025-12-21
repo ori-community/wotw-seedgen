@@ -1,5 +1,11 @@
 use crate::Result;
-use wotw_seedgen::{data::UniverseSettings, spoiler::SeedSpoiler};
+use wotw_seedgen::{
+    data::{
+        assets::{self, DATA_DIR},
+        UniverseSettings,
+    },
+    spoiler::SeedSpoiler,
+};
 
 /// Access seed files across stats runs
 ///
@@ -28,11 +34,12 @@ use std::{
     hash::{Hash, Hasher},
     io::{self, Write},
     path::{Path, PathBuf},
+    sync::LazyLock,
 };
 
 use rustc_hash::FxHasher;
 
-const SEED_STORAGE_FOLDER: &str = "seed_storage";
+static SEED_STORAGE_DIR: LazyLock<PathBuf> = LazyLock::new(|| DATA_DIR.join("seed_storage"));
 
 /// A [`SeedStorageAccess`] implementation storing and fetching seeds using the local filesystem
 pub struct FileAccess;
@@ -53,7 +60,8 @@ impl SeedStorageAccess for FileAccess {
     ) -> Result<()> {
         let bytes = bincode::serialize(seed).expect("Failed to serialize spoiler");
         let base_path = path_from_settings(settings);
-        fs::create_dir_all(&base_path).map_err(|err| err.to_string())?;
+        assets::create_dir_all(&base_path)?;
+
         loop {
             let mut path = base_path.to_path_buf();
             path.push(key.to_string());
@@ -80,7 +88,7 @@ impl SeedStorageAccess for FileAccess {
     }
 
     fn clean_all_seeds(&self) -> Result<()> {
-        fs::remove_dir_all(SEED_STORAGE_FOLDER).or_else(|err| match err.kind() {
+        fs::remove_dir_all(&*SEED_STORAGE_DIR).or_else(|err| match err.kind() {
             io::ErrorKind::NotFound => Ok(()),
             _ => Err(format!("Failed to clean seed storage: {err}")),
         })
@@ -187,10 +195,7 @@ fn read_dir<P: AsRef<Path>>(path: P, limit: usize) -> io::Result<HandleErrorsRea
 }
 
 fn path_from_settings(settings: &UniverseSettings) -> PathBuf {
-    let folder = format!("{:x}", hash_settings(settings));
-    let mut path = PathBuf::from(SEED_STORAGE_FOLDER);
-    path.push(folder);
-    path
+    SEED_STORAGE_DIR.join(format!("{:x}", hash_settings(settings)))
 }
 
 fn hash_settings(settings: &UniverseSettings) -> u64 {

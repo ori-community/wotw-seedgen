@@ -8,7 +8,7 @@ use crate::{
 use itertools::Itertools;
 use sanitize_filename::sanitize;
 use wotw_seedgen::data::{
-    assets::{file_err, DefaultFileAccess, DATA_DIR},
+    assets::{self, DefaultFileAccess, DATA_DIR},
     Spawn, UniverseSettings, DEFAULT_SPAWN,
 };
 use wotw_seedgen_stats::{
@@ -60,7 +60,7 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
         }
 
         path.push(&unique_settings_summary);
-        fs::create_dir_all(&path).map_err(|err| file_err("create", &path, err))?;
+        assets::create_dir_all(&path)?;
 
         let mut settings_path = path.clone();
         settings_path.push("settings.json");
@@ -81,12 +81,12 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
         let csv = stats.csv();
         let mut path = path.clone();
         path.push(format!("{}.csv", sanitize(stats.title())));
-        fs::write(&path, csv).map_err(|err| file_err("write statistics to", &path, err))?;
+        assets::write(&path, csv)?;
         eprintln!("Wrote statistics to \"{}\"", path.display());
     }
 
     path.push("settings.json");
-    fs::write(&path, settings_json).map_err(|err| file_err("write settings to", &path, err))?;
+    assets::write(&path, settings_json)?;
 
     Ok(())
 }

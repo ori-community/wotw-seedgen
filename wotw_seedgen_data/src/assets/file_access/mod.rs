@@ -19,7 +19,7 @@ use std::{
     ffi::OsStr,
     fmt::Display,
     fs::{self, File},
-    io::{BufReader, ErrorKind, Read},
+    io::{self, BufReader, ErrorKind, Read},
     path::{Path, PathBuf},
     vec,
 };
@@ -27,6 +27,41 @@ use wotw_seedgen_parse::Source;
 
 pub fn file_err<E: Display, P: AsRef<Path>>(action: &str, path: P, err: E) -> String {
     format!("failed to {action} \"{}\": {err}", path.as_ref().display())
+}
+
+pub fn file_create<P: AsRef<Path>>(path: P) -> Result<File, String> {
+    create_with(path.as_ref(), File::create)
+}
+
+pub fn file_open<P: AsRef<Path>>(path: P) -> Result<File, String> {
+    action_with("open", path.as_ref(), File::open)
+}
+
+pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), String> {
+    create_with(path.as_ref(), fs::create_dir_all)
+}
+
+pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf, String> {
+    action_with("canonicalize", path.as_ref(), fs::canonicalize)
+}
+
+pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<(), String> {
+    action_with("write", path.as_ref(), |path| fs::write(path, contents))
+}
+
+fn create_with<'p, O, F: FnOnce(&'p Path) -> io::Result<O>>(
+    path: &'p Path,
+    f: F,
+) -> Result<O, String> {
+    action_with("create", path, f)
+}
+
+fn action_with<'p, O, F: FnOnce(&'p Path) -> io::Result<O>>(
+    action: &str,
+    path: &'p Path,
+    f: F,
+) -> Result<O, String> {
+    f(path).map_err(|err| file_err(action, path, err))
 }
 
 // TODO this trait for non-file access?
@@ -149,7 +184,7 @@ fn open(
         match File::open(&full_path) {
             Ok(file) => return Ok((full_path, file)),
             Err(err) if err.kind() == ErrorKind::NotFound => attempts.push(full_path),
-            Err(err) => return Err(file_err("read", &full_path, err)),
+            Err(err) => return Err(file_err("open", &full_path, err)),
         }
     }
 

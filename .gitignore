@@ -1,10 +1,2 @@
 target/*
 Cargo.lock
-seeds/*
-seedgen_log.txt
-seed_storage/*
-stats/*
-assets/seeds/*
-assets/seedgen_log.txt
-assets/seed_storage/*
-assets/stats/*

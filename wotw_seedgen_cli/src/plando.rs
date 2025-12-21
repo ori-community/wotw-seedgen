@@ -7,7 +7,7 @@ use rand_pcg::Pcg64Mcg;
 use std::{
     borrow::Cow,
     ffi::OsStr,
-    fs::{self, File},
+    fs,
     iter::{self, Chain, Map, Once},
     path::{Path, PathBuf},
     time::{Duration, Instant},
@@ -15,7 +15,7 @@ use std::{
 use wotw_seedgen::{
     data::{
         assets::{
-            file_err, AssetCache, AssetFileAccess, DefaultAssetCacheValues, DefaultFileAccess,
+            self, AssetCache, AssetFileAccess, DefaultAssetCacheValues, DefaultFileAccess,
             PresetFileAccess, SnippetFileAccess, Watcher,
         },
         seed_language::compile::Compiler,
@@ -62,7 +62,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let out = match out {
         None => {
             let mut out: PathBuf = root.join("out");
-            fs::create_dir_all(&out)?;
+            assets::create_dir_all(&out)?;
             out.push(path.file_stem().unwrap_or_else(|| OsStr::new("plando")));
             out.set_extension("wotwr");
             out
@@ -83,7 +83,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
         cache.watch(&mut watcher)?;
 
-        let canonical_out = fs::canonicalize(&out)?;
+        let canonical_out = assets::canonicalize(&out)?;
 
         for res in watcher {
             if res?.into_iter().all(|event| {
@@ -131,7 +131,7 @@ fn compile(
 
     let seed = Seed::new(output, string_placeholder_map, debug);
 
-    let mut file = File::create(out).map_err(|err| file_err("create", out, err))?;
+    let mut file = assets::file_create(out)?;
     seed.package(&mut file, !debug)?;
 
     eprintln!(
