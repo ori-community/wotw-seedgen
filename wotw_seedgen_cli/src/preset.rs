@@ -1,7 +1,9 @@
 use std::fs;
 
+use serde::Serialize;
 use wotw_seedgen::data::assets::{
-    PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION,
+    file_err, PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION,
+    DATA_DIR,
 };
 
 use crate::{
@@ -21,12 +23,8 @@ pub fn universe_preset(args: UniversePresetArgs) -> Result<(), Error> {
         info: info_args.into_preset_info(),
         settings,
     };
-    let contents = serde_json::to_string_pretty(&universe_preset)?;
 
-    fs::create_dir_all("universe_presets")?;
-    fs::write(format!("universe_presets/{identifier}.json"), contents)?;
-
-    Ok(())
+    write_preset(&identifier, &universe_preset, "universe_presets")
 }
 
 pub fn world_preset(args: WorldPresetArgs) -> Result<(), Error> {
@@ -41,10 +39,18 @@ pub fn world_preset(args: WorldPresetArgs) -> Result<(), Error> {
         info: info_args.into_preset_info(),
         settings,
     };
-    let contents = serde_json::to_string_pretty(&world_preset)?;
 
-    fs::create_dir_all("world_presets")?;
-    fs::write(format!("world_presets/{identifier}.json"), contents)?;
+    write_preset(&identifier, &world_preset, "world_presets")
+}
+
+fn write_preset<T: Serialize>(identifier: &str, preset: &T, dir: &str) -> Result<(), Error> {
+    let contents = serde_json::to_string_pretty(preset)?;
+
+    let mut preset_dir = DATA_DIR.join(dir);
+    fs::create_dir_all(&preset_dir).map_err(|err| file_err("create", &preset_dir, err))?;
+
+    preset_dir.push(format!("{identifier}.json"));
+    fs::write(&preset_dir, contents).map_err(|err| file_err("create", preset_dir, err))?;
 
     Ok(())
 }

@@ -20,7 +20,7 @@ mod file_access;
 pub use file_access::{
     file_err, AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets,
     DefaultAssetCacheValues, DefaultFileAccess, PlandoFileAccess, PresetFileAccess,
-    SnippetFileAccess, Watcher, WatcherError, CONFIG_DIR, EXECUTABLE_DIR,
+    SnippetFileAccess, Watcher, WatcherError, DATA_DIR, EXECUTABLE_DIR,
 };
 mod test_access;
 pub use test_access::{TestAccess, TEST_ASSETS};

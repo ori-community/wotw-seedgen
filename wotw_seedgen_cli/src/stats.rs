@@ -1,4 +1,4 @@
-use std::{fmt::Write, fs, path::PathBuf};
+use std::{fmt::Write, fs};
 
 use crate::{
     cli::{self, StatsArgs},
@@ -8,7 +8,7 @@ use crate::{
 use itertools::Itertools;
 use sanitize_filename::sanitize;
 use wotw_seedgen::data::{
-    assets::{file_err, DefaultFileAccess},
+    assets::{file_err, DefaultFileAccess, DATA_DIR},
     Spawn, UniverseSettings, DEFAULT_SPAWN,
 };
 use wotw_seedgen_stats::{
@@ -51,7 +51,7 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
     let settings_json = serde_json::to_string(settings)?;
     let settings_summary = summarize_settings(settings);
 
-    let mut path = PathBuf::from("stats");
+    let mut path = DATA_DIR.join("stats");
 
     for index in 0.. {
         let mut unique_settings_summary = settings_summary.clone();
@@ -81,24 +81,12 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
         let csv = stats.csv();
         let mut path = path.clone();
         path.push(format!("{}.csv", sanitize(stats.title())));
-        fs::write(&path, csv).map_err(|err| {
-            format!(
-                "failed to write statistics to \"{}\": {}",
-                path.display(),
-                err
-            )
-        })?;
+        fs::write(&path, csv).map_err(|err| file_err("write statistics to", &path, err))?;
         eprintln!("Wrote statistics to \"{}\"", path.display());
     }
 
     path.push("settings.json");
-    fs::write(&path, settings_json).map_err(|err| {
-        format!(
-            "failed to write settings to \"{}\": {}",
-            path.display(),
-            err
-        )
-    })?;
+    fs::write(&path, settings_json).map_err(|err| file_err("write settings to", &path, err))?;
 
     Ok(())
 }

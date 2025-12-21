@@ -2,7 +2,7 @@ use std::{
     ffi::OsStr,
     fs::{self, File},
     io,
-    path::Path,
+    path::{Path, PathBuf},
     time::Instant,
 };
 
@@ -14,7 +14,10 @@ use crate::{
 use rand::{distributions::Uniform, prelude::Distribution};
 use wotw_seedgen::{
     data::{
-        assets::{file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData},
+        assets::{
+            file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
+            DATA_DIR,
+        },
         logic_language::{ast::Areas, output::Graph},
         parse::Source,
         UniverseSettings, WorldSettings,
@@ -51,38 +54,40 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
 }
 
 fn write_seed(
-    mut seed_universe: SeedUniverse,
+    seed_universe: SeedUniverse,
     name: &str,
     debug: bool,
     launch: bool,
     start: Instant,
 ) -> Result<(), Error> {
-    fs::create_dir_all("seeds")?;
+    let seeds_dir = DATA_DIR.join("seeds");
+    fs::create_dir_all(&seeds_dir).map_err(|err| file_err("create", &seeds_dir, err))?;
 
     let path = if seed_universe.worlds.len() == 1 {
-        let (mut file, path) = create_unique_file(&format!("seeds/{name}"))?;
-        let seed = seed_universe.worlds.pop().unwrap();
+        let (mut file, path) = create_unique_file(seeds_dir, name, ".wotwr")?;
+        let seed = seed_universe.worlds.into_iter().next().unwrap();
+        // TODO BufWriter needed on packages to file?
         seed.package(&mut file, !debug)?;
 
         if launch {
             launch_seed(&path)?;
         }
 
-        let spoiler_path = format!("{}_spoiler.txt", &path[..path.len() - ".wotwr".len()]);
+        let spoiler_path = path.with_extension("spoiler.txt");
         fs::write(&spoiler_path, seed_universe.spoiler.to_string())
             .map_err(|err| file_err("write", &spoiler_path, err))?;
 
         path
     } else {
-        let path = create_unique_dir(&format!("seeds/{name}"))?;
+        let path = create_unique_dir(seeds_dir, name)?;
 
         for (index, seed) in seed_universe.worlds.into_iter().enumerate() {
-            let path = format!("{path}/world_{index}.wotwr");
+            let path = path.join(format!("world_{index}.wotwr"));
             let mut file = File::create(&path).map_err(|err| file_err("create", path, err))?;
             seed.package(&mut file, !debug)?;
         }
 
-        let spoiler_path = format!("{path}/spoiler.txt");
+        let spoiler_path = path.join("spoiler.txt");
         fs::write(&spoiler_path, seed_universe.spoiler.to_string())
             .map_err(|err| file_err("write", &spoiler_path, err))?;
 
@@ -90,37 +95,44 @@ fn write_seed(
     };
 
     eprintln!(
-        "Generated seed in {:.1}s to \"{path}\"",
-        start.elapsed().as_secs_f32()
+        "Generated seed in {:.1}s to \"{}\"",
+        start.elapsed().as_secs_f32(),
+        path.display()
     );
 
     Ok(())
 }
 
-fn create_unique_file(path: &str) -> Result<(File, String), Error> {
-    create_unique::<_, File>(path, ".wotwr", |path| File::create_new(path))
+fn create_unique_file(dir: PathBuf, name: &str, extension: &str) -> Result<(File, PathBuf), Error> {
+    create_unique::<_, File>(dir, name, extension, |path| File::create_new(path))
 }
 
-fn create_unique_dir(path: &str) -> Result<String, Error> {
-    create_unique::<_, ()>(path, "", |path| fs::create_dir(path)).map(|(_, path)| path)
+fn create_unique_dir(dir: PathBuf, name: &str) -> Result<PathBuf, Error> {
+    create_unique::<_, ()>(dir, name, "", |path| fs::create_dir(path)).map(|(_, path)| path)
 }
 
-fn create_unique<F, T>(path: &str, extension: &str, mut f: F) -> Result<(T, String), Error>
+fn create_unique<F, T>(
+    mut dir: PathBuf,
+    name: &str,
+    extension: &str,
+    mut f: F,
+) -> Result<(T, PathBuf), Error>
 where
-    F: FnMut(&str) -> io::Result<T>,
+    F: FnMut(&Path) -> io::Result<T>,
 {
-    for attempt in 0_u32.. {
-        let path = if attempt == 0 {
-            format!("{path}{extension}")
-        } else {
-            format!("{path}_{attempt}{extension}")
-        };
+    dir.push(format!("{name}{extension}"));
 
-        match f(&path) {
-            Ok(t) => return Ok((t, path)),
+    for attempt in 0_u32.. {
+        match f(&dir) {
+            Ok(t) => return Ok((t, dir)),
             Err(err) if err.kind() == io::ErrorKind::AlreadyExists => {}
-            Err(err) => return Err(Error(file_err("create", path, err))),
+            Err(err) => return Err(Error(file_err("create", dir, err))),
         }
+
+        dir.set_file_name(format!(
+            "{name}_{attempt}{extension}",
+            attempt = attempt + 1
+        ));
     }
 
     unreachable!()

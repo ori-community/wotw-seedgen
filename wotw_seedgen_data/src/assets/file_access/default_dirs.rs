@@ -2,13 +2,13 @@ use std::{array, env, path::PathBuf, sync::LazyLock};
 
 use crate::assets::{AssetFileAccess, PresetFileAccess, SnippetFileAccess};
 
-pub static CONFIG_DIR: LazyLock<PathBuf> = LazyLock::new(|| match env::var_os("CONFIG_DIR") {
+pub static DATA_DIR: LazyLock<PathBuf> = LazyLock::new(|| match env::var_os("DATA_DIR") {
     None => {
-        let mut config_dir = dirs::config_dir().expect("cannot determine config directory");
-        config_dir.push("Ori and the Will of the Wisps Randomizer/seedgen");
-        config_dir
+        let mut data_dir = dirs::data_dir().expect("cannot determine data directory");
+        data_dir.push("Ori and the Will of the Wisps Randomizer/seedgen");
+        data_dir
     }
-    Some(config_dir) => PathBuf::from(config_dir),
+    Some(data_dir) => PathBuf::from(data_dir),
 });
 
 pub static EXECUTABLE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
@@ -25,7 +25,7 @@ impl AssetFileAccess for DefaultFileAccess {
     type Path = &'static PathBuf;
 
     fn folders(&self) -> Self::Folders {
-        [&*CONFIG_DIR, &*EXECUTABLE_DIR].into_iter()
+        [&*DATA_DIR, &*EXECUTABLE_DIR].into_iter()
     }
 }
 
@@ -52,5 +52,5 @@ impl PresetFileAccess for DefaultFileAccess {
 }
 
 fn subfolders(prefix: &str) -> array::IntoIter<PathBuf, 2> {
-    [CONFIG_DIR.join(prefix), EXECUTABLE_DIR.join(prefix)].into_iter()
+    [DATA_DIR.join(prefix), EXECUTABLE_DIR.join(prefix)].into_iter()
 }
