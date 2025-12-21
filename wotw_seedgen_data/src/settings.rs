@@ -22,7 +22,7 @@ use crate::{assets::SnippetAccess, seed_language::metadata::ConfigDefault};
 
 /// A representation of all the relevant settings when generating a seed
 ///
-/// Using the same settings will result in generating the same seed (as long as the same seedgen version and headers are used)
+/// Using the same settings will result in generating the same seed (as long as the same seedgen version and snippets are used)
 ///
 /// # Examples
 ///

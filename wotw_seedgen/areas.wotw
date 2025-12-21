@@ -48,6 +48,7 @@ requirement DepthsLight:
   kii: BowCancel  # is this reasonable?
   # unsafe: Grenade=3  # probably enough
 
+# TODO these are called snippets now
 anchor HeaderStates:  # States you need to resolve by using the !!set command in headers and that you can't resolve through playing
   state SkipKwolok:  # Used to logically support skipping Kwolok's fight
     moki: Impossible

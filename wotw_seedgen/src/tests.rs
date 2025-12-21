@@ -97,6 +97,6 @@ fn some_seeds() {
     };
     preset.apply(&mut universe_settings, &*TEST_ASSETS).unwrap();
 
-    info!("Testing multiworld Gorlek with headers");
+    info!("Testing multiworld Gorlek with snippets");
     generate_test_seed(&graph, &universe_settings);
 }
