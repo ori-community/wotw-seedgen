@@ -16,6 +16,7 @@ use crate::{
 mod api;
 mod assets;
 mod error;
+mod generate;
 mod inactivity_timeout;
 mod logic;
 

@@ -22,12 +22,14 @@ pub enum Error {
     Serve(io::Error),
     #[error("failed to apply preset: {0}")]
     ApplyPreset(String),
+    #[error("failed to generate seed: {0}")]
+    Generate(String),
 }
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
         let status = match &self {
-            Error::Custom(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::Custom(_) | Error::Generate(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::SeedgenInfo(error) => {
                 if error.is_data() {
                     StatusCode::UNPROCESSABLE_ENTITY

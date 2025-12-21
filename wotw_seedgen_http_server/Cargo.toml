@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 wotw_seedgen = { path = "../wotw_seedgen" }
 wotw_seedgen_server_shared = { path = "../wotw_seedgen_server_shared" }
-axum = { version = "0.8.7", default-features = false, features = ["http1", "http2", "json", "tokio", "tower-log", "tracing"] }
+axum = { version = "0.8.7", default-features = false, features = ["http1", "http2", "json", "query", "tokio", "tower-log", "tracing"] }
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["rt-multi-thread"] }
 utoipa = { version = "5.4.0", features = ["axum_extras"] }
@@ -21,3 +21,4 @@ rustc-hash = "2.1.1"
 serde_json = "1.0.145"
 single-instance = "0.3.3"
 strum = { version = "0.26", features = ["derive"] }
+ciborium = "0.2.2"
