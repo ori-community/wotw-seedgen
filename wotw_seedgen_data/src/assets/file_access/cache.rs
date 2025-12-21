@@ -1,4 +1,4 @@
-use std::{ffi::OsStr, ops::Deref, path::Path};
+use std::{ffi::OsStr, io, ops::Deref, path::Path};
 
 use notify_debouncer_full::{
     notify::{EventKind, RecursiveMode},
@@ -8,8 +8,9 @@ use rustc_hash::FxHashMap;
 use wotw_seedgen_parse::Source;
 
 use crate::assets::{
-    AssetFileAccess, LocData, PresetAccess, PresetFileAccess, SnippetAccess, SnippetFileAccess,
-    StateData, UberStateData, UniversePreset, Watcher, WatcherError, WorldPreset,
+    file_err, AssetFileAccess, LocData, PresetAccess, PresetFileAccess, SnippetAccess,
+    SnippetFileAccess, StateData, UberStateData, UniversePreset, Watcher, WatcherError,
+    WorldPreset,
 };
 
 pub struct AssetCache<F, V> {
@@ -141,6 +142,8 @@ pub trait AssetCacheValues: Sized {
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String>;
 
+    fn allow_read_file(&self) -> bool;
+
     fn available_snippets(&self) -> impl Iterator<Item = &String>;
 
     fn update<F>(&mut self, file_access: &F, changed: ChangedAssets) -> Result<(), String>
@@ -188,7 +191,18 @@ impl<F: SnippetAccess, V: AssetCacheValues> SnippetAccess for AssetCache<F, V> {
     }
 
     fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-        self.file_access.read_file(path)
+        if self.values.allow_read_file() {
+            self.file_access.read_file(path)
+        } else {
+            Err(file_err(
+                "read",
+                path,
+                io::Error::new(
+                    io::ErrorKind::PermissionDenied,
+                    "file includes are not allowed in this context",
+                ),
+            ))
+        }
     }
 
     fn available_snippets(&self) -> Vec<String> {
@@ -340,6 +354,10 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         self.snippets
             .get(identifier)
             .ok_or_else(|| format!("unknown snippet \"{identifier}\""))
+    }
+
+    fn allow_read_file(&self) -> bool {
+        true
     }
 
     fn available_snippets(&self) -> impl Iterator<Item = &String> {

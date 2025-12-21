@@ -85,6 +85,10 @@ impl AssetCacheValues for CacheValues {
         self.base.snippet(identifier)
     }
 
+    fn allow_read_file(&self) -> bool {
+        false
+    }
+
     fn available_snippets(&self) -> impl Iterator<Item = &String> {
         self.base.available_snippets()
     }

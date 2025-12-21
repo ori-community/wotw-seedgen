@@ -66,6 +66,10 @@ impl AssetCacheValues for CacheValues {
         unimplemented!()
     }
 
+    fn allow_read_file(&self) -> bool {
+        unimplemented!()
+    }
+
     fn available_snippets(&self) -> impl Iterator<Item = &String> {
         #[allow(unreachable_code)]
         iter::once(unimplemented!())
