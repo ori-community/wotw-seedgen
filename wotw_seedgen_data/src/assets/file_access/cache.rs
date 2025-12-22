@@ -1,4 +1,9 @@
-use std::{ffi::OsStr, io, ops::Deref, path::Path};
+use std::{
+    ffi::OsStr,
+    io,
+    ops::Deref,
+    path::{Path, PathBuf},
+};
 
 use notify_debouncer_full::{
     notify::{EventKind, RecursiveMode},
@@ -31,7 +36,46 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
     }
 
     pub fn watch(&self, watcher: &mut Watcher) -> Result<(), WatcherError> {
-        for folder in self.file_access.asset_folders() {
+        fn to_path_buf<P: AsRef<Path>>(path: P) -> PathBuf {
+            path.as_ref().to_path_buf()
+        }
+
+        fn filter_redundancies(folders: &mut Vec<PathBuf>) {
+            folders.sort_by_key(|path| path.components().count());
+
+            for index in 0.. {
+                let Some(other_folders) = folders.get((index + 1)..) else {
+                    break;
+                };
+
+                let folder = &folders[index];
+
+                let remove_indices = other_folders
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, other)| other.starts_with(folder))
+                    .map(|(other_index, _)| index + 1 + other_index)
+                    .rev()
+                    .collect::<Vec<_>>();
+
+                for index in remove_indices {
+                    folders.swap_remove(index);
+                }
+            }
+        }
+
+        let mut folders = self
+            .file_access
+            .asset_folders()
+            .map(to_path_buf)
+            .chain(self.file_access.snippet_folders().map(to_path_buf))
+            .chain(self.file_access.universe_folders().map(to_path_buf))
+            .chain(self.file_access.world_folders().map(to_path_buf))
+            .collect::<Vec<_>>();
+
+        filter_redundancies(&mut folders);
+
+        for folder in folders {
             watcher.watch(folder, RecursiveMode::Recursive)?;
         }
 
