@@ -175,7 +175,7 @@ impl SnippetFileAccess for TestFileAccess {
     type Folders = array::IntoIter<Self::Path, 2>;
     type Path = PathBuf;
 
-    fn folders(&self) -> Self::Folders {
+    fn snippet_folders(&self) -> Self::Folders {
         [
             WORKDIR.join("assets/snippets"),
             WORKDIR.join("assets/toolseeds"),

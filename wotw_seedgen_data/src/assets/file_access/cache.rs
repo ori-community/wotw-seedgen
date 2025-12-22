@@ -31,7 +31,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
     }
 
     pub fn watch(&self, watcher: &mut Watcher) -> Result<(), WatcherError> {
-        for folder in AssetFileAccess::folders(&self.file_access) {
+        for folder in self.file_access.asset_folders() {
             watcher.watch(folder, RecursiveMode::Recursive)?;
         }
 
@@ -58,23 +58,26 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
                 } else if path.ends_with(F::AREAS_PATH) {
                     changed.areas = true;
                 } else {
-                    let folders = SnippetFileAccess::folders(&self.file_access);
-                    subfolder_changed(&mut changed.snippets, &path, folders, "wotws", event.kind);
+                    subfolder_changed(
+                        &mut changed.snippets,
+                        &path,
+                        self.file_access.snippet_folders(),
+                        "wotws",
+                        event.kind,
+                    );
 
-                    let folders = PresetFileAccess::universe_folders(&self.file_access);
                     subfolder_changed(
                         &mut changed.universe_presets,
                         &path,
-                        folders,
+                        self.file_access.universe_folders(),
                         "json",
                         event.kind,
                     );
 
-                    let folders = PresetFileAccess::world_folders(&self.file_access);
                     subfolder_changed(
                         &mut changed.world_presets,
                         &path,
-                        folders,
+                        self.file_access.world_folders(),
                         "json",
                         event.kind,
                     );
@@ -102,8 +105,8 @@ impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, 
     type Folders = F::Folders;
     type Path = F::Path;
 
-    fn folders(&self) -> Self::Folders {
-        self.file_access.folders()
+    fn asset_folders(&self) -> Self::Folders {
+        self.file_access.asset_folders()
     }
 
     fn loc_data(&self) -> Result<LocData, String> {

@@ -24,7 +24,7 @@ impl AssetFileAccess for DefaultFileAccess {
     type Folders = array::IntoIter<Self::Path, 2>;
     type Path = &'static PathBuf;
 
-    fn folders(&self) -> Self::Folders {
+    fn asset_folders(&self) -> Self::Folders {
         [&*DATA_DIR, &*EXECUTABLE_DIR].into_iter()
     }
 }
@@ -33,7 +33,7 @@ impl SnippetFileAccess for DefaultFileAccess {
     type Folders = array::IntoIter<Self::Path, 2>;
     type Path = PathBuf;
 
-    fn folders(&self) -> Self::Folders {
+    fn snippet_folders(&self) -> Self::Folders {
         subfolders("snippets")
     }
 }

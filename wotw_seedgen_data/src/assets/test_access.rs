@@ -21,7 +21,7 @@ impl AssetFileAccess for TestAccess {
     type Folders = Once<Self::Path>;
     type Path = &'static Path;
 
-    fn folders(&self) -> Self::Folders {
+    fn asset_folders(&self) -> Self::Folders {
         iter::once(&Path::new(ASSETS))
     }
 }
@@ -30,7 +30,7 @@ impl SnippetFileAccess for TestAccess {
     type Folders = Once<Self::Path>;
     type Path = &'static Path;
 
-    fn folders(&self) -> Self::Folders {
+    fn snippet_folders(&self) -> Self::Folders {
         iter::once(&Path::new(concat!(ASSETS, "/snippets")))
     }
 }

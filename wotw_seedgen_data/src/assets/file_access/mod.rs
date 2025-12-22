@@ -69,12 +69,12 @@ pub trait AssetFileAccess {
     type Folders: Iterator<Item = Self::Path>;
     type Path: AsRef<Path>;
 
-    fn folders(&self) -> Self::Folders;
+    fn asset_folders(&self) -> Self::Folders;
 
     const LOC_DATA_PATH: &str = "logic/loc_data.csv";
 
     fn loc_data(&self) -> Result<LocData, String> {
-        let (path, file) = open(self.folders(), Path::new(Self::LOC_DATA_PATH))?;
+        let (path, file) = open(self.asset_folders(), Path::new(Self::LOC_DATA_PATH))?;
 
         LocData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
@@ -82,7 +82,7 @@ pub trait AssetFileAccess {
     const STATE_DATA_PATH: &str = "logic/state_data.csv";
 
     fn state_data(&self) -> Result<StateData, String> {
-        let (path, file) = open(self.folders(), Path::new(Self::STATE_DATA_PATH))?;
+        let (path, file) = open(self.asset_folders(), Path::new(Self::STATE_DATA_PATH))?;
 
         StateData::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
@@ -90,7 +90,7 @@ pub trait AssetFileAccess {
     const UBER_STATE_DUMP_PATH: &str = "uber_state_dump.json";
 
     fn uber_state_dump(&self) -> Result<UberStateDump, String> {
-        let (path, file) = open(self.folders(), Path::new(Self::UBER_STATE_DUMP_PATH))?;
+        let (path, file) = open(self.asset_folders(), Path::new(Self::UBER_STATE_DUMP_PATH))?;
 
         serde_json::from_reader(BufReader::new(file)).map_err(|err| file_err("parse", &path, err))
     }
@@ -108,7 +108,7 @@ pub trait AssetFileAccess {
     const AREAS_PATH: &str = "logic/areas.wotw";
 
     fn areas(&self) -> Result<Source, String> {
-        let (path, content) = read_to_string(self.folders(), Path::new(Self::AREAS_PATH))?;
+        let (path, content) = read_to_string(self.asset_folders(), Path::new(Self::AREAS_PATH))?;
 
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))
@@ -119,7 +119,7 @@ pub trait SnippetFileAccess {
     type Folders: Iterator<Item = Self::Path>;
     type Path: AsRef<Path>;
 
-    fn folders(&self) -> Self::Folders;
+    fn snippet_folders(&self) -> Self::Folders;
 }
 
 impl<T: SnippetFileAccess> SnippetAccess for T {
@@ -130,18 +130,18 @@ impl<T: SnippetFileAccess> SnippetAccess for T {
             path.to_mut().set_extension("wotws");
         }
 
-        let (path, content) = read_to_string(self.folders(), &path)?;
+        let (path, content) = read_to_string(self.snippet_folders(), &path)?;
 
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))
     }
 
     fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-        read(self.folders(), path).map(|(_, content)| content)
+        read(self.snippet_folders(), path).map(|(_, content)| content)
     }
 
     fn available_snippets(&self) -> Vec<String> {
-        available_files(self.folders(), "wotws")
+        available_files(self.snippet_folders(), "wotws")
     }
 }
 

@@ -20,8 +20,8 @@ impl AssetFileAccess for PlandoFileAccess<'_> {
     type Folders = <DefaultFileAccess as AssetFileAccess>::Folders;
     type Path = <DefaultFileAccess as AssetFileAccess>::Path;
 
-    fn folders(&self) -> Self::Folders {
-        AssetFileAccess::folders(&DefaultFileAccess)
+    fn asset_folders(&self) -> Self::Folders {
+        DefaultFileAccess.asset_folders()
     }
 }
 
@@ -32,9 +32,10 @@ impl<'a> SnippetFileAccess for PlandoFileAccess<'a> {
     >;
     type Path = Cow<'a, Path>;
 
-    fn folders(&self) -> Self::Folders {
-        iter::once(Cow::Borrowed(self.root))
-            .chain(SnippetFileAccess::folders(&DefaultFileAccess).map(Cow::Owned as fn(_) -> _))
+    fn snippet_folders(&self) -> Self::Folders {
+        iter::once(Cow::Borrowed(self.root)).chain(
+            SnippetFileAccess::snippet_folders(&DefaultFileAccess).map(Cow::Owned as fn(_) -> _),
+        )
     }
 }
 
