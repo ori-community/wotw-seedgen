@@ -14,7 +14,7 @@ use crate::{
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, EnumDiscriminants, VariantArray};
+use strum::{Display, EnumDiscriminants, VariantArray, VariantNames};
 use utoipa::ToSchema;
 use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult};
 
@@ -80,6 +80,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverCommandArg {
     }
 }
 
+// note: has hardcoded completions in lsp
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub enum Content<'source> {
     Event(Spanned<On>, Recoverable<Event<'source>, RecoverContent>),
@@ -437,7 +438,8 @@ pub struct UberIdentifierName<'source> {
     pub member: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+#[derive(Debug, Clone, PartialEq, Eq, VariantNames, Ast, Span)]
+#[strum(serialize_all = "snake_case")]
 pub enum Command<'source> {
     // TODO have include be able to change the default config?
     Include(Spanned<Include>, CommandArgs<IncludeArgs<'source>>),
@@ -864,7 +866,8 @@ pub struct RandomFromPoolArgs<'source> {
     pub pool_identifier: CommandArg<Spanned<Identifier<'source>>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+#[derive(Debug, Clone, PartialEq, Eq, VariantNames, Ast, Span)]
+#[strum(serialize_all = "snake_case")]
 pub enum Annotation<'source> {
     Hidden(Spanned<Hidden>),
     Name(Spanned<Name>, CommandArgs<Spanned<&'source str>>),

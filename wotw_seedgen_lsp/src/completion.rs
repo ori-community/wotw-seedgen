@@ -3,8 +3,8 @@ use std::sync::LazyLock;
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
 use wotw_seedgen_data::{
     parse::{
-        Delimited, Error, ErrorKind, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart,
-        Spanned, SpannedOption,
+        Delimited, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart, Spanned,
+        SpannedOption,
     },
     seed_language::{
         ast::{
@@ -24,7 +24,7 @@ use wotw_seedgen_data::{
     },
     Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
     MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VariantArray,
-    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+    VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 
 use crate::cache::CacheValues;
@@ -51,7 +51,7 @@ where
 }
 
 trait ErrCompletion {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem>;
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem>;
 }
 
 fn keyword_completion(keyword: &str) -> CompletionItem {
@@ -75,8 +75,8 @@ impl<T> ErrCompletion for Box<T>
 where
     T: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        T::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        T::err_completion(cache)
     }
 }
 
@@ -105,12 +105,7 @@ where
     fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.iter()
             .find_map(|item| item.completion(index, cache))
-            .or_else(|| {
-                Some(T::err_completion(
-                    &Error::custom(String::new(), 0..0),
-                    cache,
-                ))
-            })
+            .or_else(|| Some(T::err_completion(cache)))
     }
 }
 
@@ -118,8 +113,8 @@ impl<T> ErrCompletion for Vec<T>
 where
     T: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        T::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        T::err_completion(cache)
     }
 }
 
@@ -135,7 +130,7 @@ where
 }
 
 impl<Open, Content, Close> ErrCompletion for Delimited<Open, Content, Close> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -153,8 +148,8 @@ impl<Item, Punctuation> ErrCompletion for Punctuated<Item, Punctuation>
 where
     Item: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Item::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Item::err_completion(cache)
     }
 }
 
@@ -171,8 +166,8 @@ impl<Item, Separator> ErrCompletion for SeparatedNonEmpty<Item, Separator>
 where
     Item: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Item::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Item::err_completion(cache)
     }
 }
 
@@ -189,8 +184,8 @@ impl<V> ErrCompletion for Once<V>
 where
     V: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        V::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        V::err_completion(cache)
     }
 }
 
@@ -199,7 +194,10 @@ where
     V: Completion + ErrCompletion + Span,
 {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.value.completion(index, cache)
+        match &self.value {
+            SpannedOption::None(_) => Some(V::err_completion(cache)),
+            SpannedOption::Some(value) => value.completion(index, cache),
+        }
     }
 }
 
@@ -207,8 +205,8 @@ impl<V, R> ErrCompletion for Recoverable<V, R>
 where
     V: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        V::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        V::err_completion(cache)
     }
 }
 
@@ -225,8 +223,8 @@ impl<T> ErrCompletion for Spanned<T>
 where
     T: ErrCompletion,
 {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        T::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        T::err_completion(cache)
     }
 }
 
@@ -539,7 +537,7 @@ impl CompletionInSpan for Expression<'_> {
 }
 
 impl ErrCompletion for Expression<'_> {
-    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         expression_completion(cache)
     }
 }
@@ -583,7 +581,7 @@ impl CompletionInSpan for Action<'_> {
 }
 
 impl ErrCompletion for Action<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         ACTION_COMPLETION.clone()
     }
 }
@@ -614,7 +612,7 @@ impl Completion for Literal<'_> {
 }
 
 impl ErrCompletion for Literal<'_> {
-    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         literal_completion(cache)
     }
 }
@@ -628,10 +626,13 @@ impl Completion for Snippet<'_> {
 }
 
 impl ErrCompletion for Snippet<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         unreachable!() // Snippet parsing cannot fail
     }
 }
+
+static CONTENT_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(&["on", "fun"]));
 
 impl CompletionInSpan for Content<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
@@ -646,37 +647,9 @@ impl CompletionInSpan for Content<'_> {
     }
 }
 
-/// Creates a list of [`CompletionItem`]s based on the [`Error`].
-///
-/// It will return a [`CompletionItem`] for every `ErrorKind::ExpectedToken(token)`
-/// where `token` is surrounded by double quotes.
-///
-/// # Panics
-///
-/// Panics if `err.kind` does not match `ErrorKind::AllFailed(_)`.
-fn completion_from_error(err: &Error) -> Vec<CompletionItem> {
-    let ErrorKind::AllFailed(options) = &err.kind else {
-        panic!("Malformed error passed to completion_from_error");
-    };
-
-    options
-        .iter()
-        .filter_map(|option| match option {
-            ErrorKind::ExpectedToken(token) => token
-                .strip_prefix('"')
-                .and_then(|token| token.strip_suffix('"')),
-            _ => None,
-        })
-        .map(|token| CompletionItem {
-            label: token.to_string(),
-            ..Default::default()
-        })
-        .collect()
-}
-
 impl ErrCompletion for Content<'_> {
-    fn err_completion(err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
-        completion_from_error(err)
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        CONTENT_COMPLETION.clone()
     }
 }
 
@@ -705,7 +678,7 @@ impl CompletionInSpan for Event<'_> {
 }
 
 impl ErrCompletion for Event<'_> {
-    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         trigger_completion(cache)
     }
 }
@@ -730,7 +703,7 @@ impl CompletionInSpan for Trigger<'_> {
 }
 
 impl ErrCompletion for Trigger<'_> {
-    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         trigger_completion(cache)
     }
 }
@@ -755,7 +728,7 @@ impl CompletionInSpan for TriggerBinding<'_> {
 }
 
 impl ErrCompletion for TriggerBinding<'_> {
-    fn err_completion(_err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         // Failure means there was no identifier, so only numeric completions may be relevant
         cache.uber_identifier_numeric_completion.clone()
     }
@@ -768,10 +741,13 @@ impl CompletionInSpan for FunctionDefinition<'_> {
 }
 
 impl ErrCompletion for FunctionDefinition<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
+
+static COMMAND_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(Command::VARIANTS));
 
 impl CompletionInSpan for Command<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
@@ -813,9 +789,9 @@ impl CompletionInSpan for Command<'_> {
 }
 
 impl ErrCompletion for Command<'_> {
-    fn err_completion(err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         // TODO typing ! doesn't give completions
-        completion_from_error(err)
+        COMMAND_COMPLETION.clone()
     }
 }
 
@@ -826,7 +802,7 @@ impl CompletionInSpan for AugmentFunArgs<'_> {
 }
 
 impl ErrCompletion for AugmentFunArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -840,8 +816,8 @@ impl CompletionInSpan for SpawnArgs<'_> {
 }
 
 impl ErrCompletion for SpawnArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Expression::err_completion(err, cache) // TODO offer spawn identifiers from areas.wotw
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache) // TODO offer spawn identifiers from areas.wotw
     }
 }
 
@@ -852,8 +828,8 @@ impl CompletionInSpan for TagsArg<'_> {
 }
 
 impl ErrCompletion for TagsArg<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Expression::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache)
     }
 }
 
@@ -867,7 +843,7 @@ impl CompletionInSpan for ConfigArgs<'_> {
 }
 
 impl ErrCompletion for ConfigArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -882,7 +858,7 @@ impl Completion for ConfigType {
 }
 
 impl ErrCompletion for ConfigType {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         CONFIG_TYPE_COMPLETION.clone()
     }
 }
@@ -894,7 +870,7 @@ impl Completion for SetConfigArgs<'_> {
 }
 
 impl ErrCompletion for SetConfigArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -906,7 +882,7 @@ impl CompletionInSpan for StateArgs<'_> {
 }
 
 impl ErrCompletion for StateArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -921,7 +897,7 @@ impl Completion for UberStateType {
 }
 
 impl ErrCompletion for UberStateType {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         UBER_STATE_TYPE_COMPLETION.clone()
     }
 }
@@ -933,7 +909,7 @@ impl CompletionInSpan for LetArgs<'_> {
 }
 
 impl ErrCompletion for LetArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -947,8 +923,8 @@ impl CompletionInSpan for CommandIf<'_> {
 }
 
 impl ErrCompletion for CommandIf<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Expression::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache)
     }
 }
 
@@ -961,8 +937,8 @@ impl CompletionInSpan for CommandRepeat<'_> {
 }
 
 impl ErrCompletion for CommandRepeat<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Expression::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache)
     }
 }
 
@@ -973,8 +949,8 @@ impl CompletionInSpan for AddItemArgs<'_> {
 }
 
 impl ErrCompletion for AddItemArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        ChangeItemPoolArgs::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        ChangeItemPoolArgs::err_completion(cache)
     }
 }
 
@@ -985,8 +961,8 @@ impl CompletionInSpan for RemoveItemArgs<'_> {
 }
 
 impl ErrCompletion for RemoveItemArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        ChangeItemPoolArgs::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        ChangeItemPoolArgs::err_completion(cache)
     }
 }
 
@@ -999,8 +975,8 @@ impl CompletionInSpan for ChangeItemPoolArgs<'_> {
 }
 
 impl ErrCompletion for ChangeItemPoolArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1017,8 +993,8 @@ impl CompletionInSpan for ItemDataArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1031,8 +1007,8 @@ impl CompletionInSpan for ItemDataNameArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataNameArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1045,8 +1021,8 @@ impl CompletionInSpan for ItemDataPriceArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataPriceArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1059,8 +1035,8 @@ impl CompletionInSpan for ItemDataDescriptionArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataDescriptionArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1073,8 +1049,8 @@ impl CompletionInSpan for ItemDataIconArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataIconArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1087,8 +1063,8 @@ impl CompletionInSpan for ItemDataMapIconArgs<'_> {
 }
 
 impl ErrCompletion for ItemDataMapIconArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1099,8 +1075,8 @@ impl CompletionInSpan for RemoveLocationArgs<'_> {
 }
 
 impl ErrCompletion for RemoveLocationArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Expression::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache)
     }
 }
 
@@ -1113,8 +1089,8 @@ impl CompletionInSpan for PreplaceArgs<'_> {
 }
 
 impl ErrCompletion for PreplaceArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        Action::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Action::err_completion(cache)
     }
 }
 
@@ -1125,7 +1101,7 @@ impl CompletionInSpan for ZoneOfArgs<'_> {
 }
 
 impl ErrCompletion for ZoneOfArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -1137,7 +1113,7 @@ impl CompletionInSpan for ItemOnArgs<'_> {
 }
 
 impl ErrCompletion for ItemOnArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -1151,7 +1127,7 @@ impl CompletionInSpan for CountInZoneArgs<'_> {
 }
 
 impl ErrCompletion for CountInZoneArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -1163,7 +1139,7 @@ impl CompletionInSpan for CountInZoneBinding<'_> {
 }
 
 impl ErrCompletion for CountInZoneBinding<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -1175,8 +1151,8 @@ impl CompletionInSpan for RandomIntegerArgs<'_> {
 }
 
 impl ErrCompletion for RandomIntegerArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        RandomNumberArgs::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        RandomNumberArgs::err_completion(cache)
     }
 }
 
@@ -1187,8 +1163,8 @@ impl CompletionInSpan for RandomFloatArgs<'_> {
 }
 
 impl ErrCompletion for RandomFloatArgs<'_> {
-    fn err_completion(err: &Error, cache: &CacheValues) -> Vec<CompletionItem> {
-        RandomNumberArgs::err_completion(err, cache)
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        RandomNumberArgs::err_completion(cache)
     }
 }
 
@@ -1201,7 +1177,7 @@ impl CompletionInSpan for RandomNumberArgs<'_> {
 }
 
 impl ErrCompletion for RandomNumberArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -1215,7 +1191,7 @@ impl CompletionInSpan for RandomPoolArgs<'_> {
 }
 
 impl ErrCompletion for RandomPoolArgs<'_> {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
@@ -1230,10 +1206,13 @@ impl Completion for Type {
 }
 
 impl ErrCompletion for Type {
-    fn err_completion(_err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         TYPE_COMPLETION.clone()
     }
 }
+
+static ANNOTATION_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(Annotation::VARIANTS));
 
 impl CompletionInSpan for Annotation<'_> {
     fn completion_in_span(
@@ -1246,8 +1225,8 @@ impl CompletionInSpan for Annotation<'_> {
 }
 
 impl ErrCompletion for Annotation<'_> {
-    fn err_completion(err: &Error, _cache: &CacheValues) -> Vec<CompletionItem> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         // TODO typing # doesn't give completions
-        completion_from_error(err)
+        ANNOTATION_COMPLETION.clone()
     }
 }

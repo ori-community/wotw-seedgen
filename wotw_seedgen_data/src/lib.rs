@@ -4,7 +4,7 @@
 
 pub use wotw_seedgen_parse as parse;
 
-pub use strum::VariantArray;
+pub use strum::{VariantArray, VariantNames};
 
 pub mod assets;
 mod equipment;
