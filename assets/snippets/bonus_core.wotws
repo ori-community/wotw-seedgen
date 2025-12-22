@@ -2,8 +2,8 @@
 #name("Bonus Core")
 #description("A menu snippets can subscribe to for an interface to toggle something on or off")
 
-!builtin_icon(on_icon, "assets/icons/wheel/bonus_upgrades_on.blue.png")
-!builtin_icon(off_icon, "assets/icons/wheel/bonus_upgrades_off.blue.png")
+!builtin_icon(on_icon, "icons/wheel/bonus_upgrades_on.blue.png")
+!builtin_icon(off_icon, "icons/wheel/bonus_upgrades_off.blue.png")
 
 // TODO put documentation comments on each use of event
 // used to check whether any bonus item is collected

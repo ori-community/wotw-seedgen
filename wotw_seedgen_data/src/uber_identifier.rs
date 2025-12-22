@@ -177,16 +177,16 @@ impl CommonUberIdentifier {
 
     pub const fn icon(self) -> Option<Icon> {
         let icon = match self {
-            Self::SpiritLight => Icon::File(Cow::Borrowed("assets/icons/game/experience.png")),
-            Self::GorlekOre => Icon::File(Cow::Borrowed("assets/icons/game/gorlekore.png")),
-            Self::Keystones => Icon::File(Cow::Borrowed("assets/icons/game/keystone.png")),
-            Self::ShardSlots => Icon::File(Cow::Borrowed("assets/icons/game/shardslot.png")),
-            Self::CleanWater => Icon::File(Cow::Borrowed("assets/icons/game/water.png")),
+            Self::SpiritLight => Icon::File(Cow::Borrowed("icons/game/experience.png")),
+            Self::GorlekOre => Icon::File(Cow::Borrowed("icons/game/gorlekore.png")),
+            Self::Keystones => Icon::File(Cow::Borrowed("icons/game/keystone.png")),
+            Self::ShardSlots => Icon::File(Cow::Borrowed("icons/game/shardslot.png")),
+            Self::CleanWater => Icon::File(Cow::Borrowed("icons/game/water.png")),
             Self::MaxHealth | Self::Health => {
-                Icon::File(Cow::Borrowed("assets/icons/game/healthfragment.png"))
+                Icon::File(Cow::Borrowed("icons/game/healthfragment.png"))
             }
             Self::MaxEnergy | Self::Energy => {
-                Icon::File(Cow::Borrowed("assets/icons/game/energyfragment.png"))
+                Icon::File(Cow::Borrowed("icons/game/energyfragment.png"))
             }
             Self::WeaponUpgrade(weapon_upgrade) => match weapon_upgrade {
                 WeaponUpgrade::ExplodingSpear => Icon::Opher(OpherIcon::ExplodingSpear),
@@ -196,7 +196,7 @@ impl CommonUberIdentifier {
                 WeaponUpgrade::RapidSentry => Icon::Opher(OpherIcon::RapidSentry),
             },
             Self::Shard(shard) => Icon::Shard(shard),
-            Self::Teleporter(_) => Icon::File(Cow::Borrowed("assets/icons/game/teleporter.png")),
+            Self::Teleporter(_) => Icon::File(Cow::Borrowed("icons/game/teleporter.png")),
             Self::Skill(skill) => match skill {
                 // TODO does the equipment not work for these?
                 Skill::WaterBreath => Icon::Opher(OpherIcon::WaterBreath),
@@ -206,10 +206,10 @@ impl CommonUberIdentifier {
                 Skill::Blaze => Icon::Opher(OpherIcon::Blaze),
                 Skill::Sentry => Icon::Opher(OpherIcon::Sentry),
                 Skill::GladesAncestralLight => {
-                    Icon::File(Cow::Borrowed("assets/icons/game/ancestrallight1.png"))
+                    Icon::File(Cow::Borrowed("icons/game/ancestrallight1.png"))
                 }
                 Skill::MarshAncestralLight => {
-                    Icon::File(Cow::Borrowed("assets/icons/game/ancestrallight2.png"))
+                    Icon::File(Cow::Borrowed("icons/game/ancestrallight2.png"))
                 }
                 skill => match skill.equipment() {
                     None => return None,

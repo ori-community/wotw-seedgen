@@ -35,11 +35,11 @@ By default those are bound to
     pickups_collected, pickups_collected_on_spawn, total_pickups
 )
 
-!builtin_icon(progress_summary_icon, "assets/icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
-!builtin_icon(tree_progress_icon, "assets/icons/wheel/tree_progress.blue.png")
-!builtin_icon(wisp_progress_icon, "assets/icons/wheel/wisps_progress.png") // TODO why do others have blue and this one not
-!builtin_icon(quest_progress_icon, "assets/icons/wheel/quests_progress.blue.png") // TODO some filenames are singular, some plural...
-!builtin_icon(teleporter_icon, "assets/icons/game/teleporter.png")
+!builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
+!builtin_icon(tree_progress_icon, "icons/wheel/tree_progress.blue.png")
+!builtin_icon(wisp_progress_icon, "icons/wheel/wisps_progress.png") // TODO why do others have blue and this one not
+!builtin_icon(quest_progress_icon, "icons/wheel/quests_progress.blue.png") // TODO some filenames are singular, some plural...
+!builtin_icon(teleporter_icon, "icons/game/teleporter.png")
 
 !export(write_progress_message)
 fun write_progress_message() {

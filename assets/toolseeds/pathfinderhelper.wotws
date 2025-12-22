@@ -2,13 +2,13 @@
 
 !include("seed_core")
 
-!builtin_icon(clean_water_icon, "assets/icons/game/water.png")
-!builtin_icon(teleporter_icon, "assets/icons/game/teleporter.png")
+!builtin_icon(clean_water_icon, "icons/game/water.png")
+!builtin_icon(teleporter_icon, "icons/game/teleporter.png")
 // TODO add save icon
-!builtin_icon(save_icon, "assets/icons/game/save.png")
-!builtin_icon(health_icon, "assets/icons/game/healthfragment.png")
-!builtin_icon(wall_icon, "assets/map_icons/blocked_wall.png")
-!builtin_icon(gears_icon, "assets/icons/wheel/toggle_debug.png")
+!builtin_icon(save_icon, "icons/game/save.png")
+!builtin_icon(health_icon, "icons/game/healthfragment.png")
+!builtin_icon(wall_icon, "map_icons/blocked_wall.png")
+!builtin_icon(gears_icon, "icons/wheel/toggle_debug.png")
 
 on reload {
     set_wheel_item_data(

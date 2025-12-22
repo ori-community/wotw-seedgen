@@ -12,7 +12,7 @@
 !augment_fun(enable_all, if enabled == false enable())
 !augment_fun(disable_all, if enabled disable())
 
-!builtin_icon(rapid_sword_icon, "assets/icons/bonus/rapidsword.png")
+!builtin_icon(rapid_sword_icon, "icons/bonus/rapidsword.png")
 
 fun rapid_sword() {
     item_message("#Rapid Sword x" + (collected + 1) + "#")

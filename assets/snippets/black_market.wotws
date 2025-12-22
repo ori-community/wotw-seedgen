@@ -7,8 +7,8 @@ Supply lasts indefinitely, but the price grows with the demand.")
 !config(keystones, "Let Opher sell Keystones", Boolean, true)
 !config(ores, "Let Twillen sell Gorlek Ore", Boolean, true)
 
-!builtin_icon(keystone_icon, "assets/icons/game/keystone.png")
-!builtin_icon(ore_icon, "assets/icons/game/gorlekore.png")
+!builtin_icon(keystone_icon, "icons/game/keystone.png")
+!builtin_icon(ore_icon, "icons/game/gorlekore.png")
 
 // TODO black market delivery at an increased price?
 

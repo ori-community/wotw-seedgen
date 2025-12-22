@@ -12,7 +12,7 @@
 !augment_fun(enable_all, if enabled == false enable())
 !augment_fun(disable_all, if enabled disable())
 
-!builtin_icon(rapid_regenerate_icon, "assets/icons/bonus/rapidregenerate.png")
+!builtin_icon(rapid_regenerate_icon, "icons/bonus/rapidregenerate.png")
 
 fun rapid_regenerate() {
     item_message("#Rapid Regenerate x" + (collected + 1) + "#") // TODO I don't think this item message is used in the display

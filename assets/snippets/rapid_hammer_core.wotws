@@ -12,7 +12,7 @@
 !augment_fun(enable_all, if enabled == false enable())
 !augment_fun(disable_all, if enabled disable())
 
-!builtin_icon(rapid_hammer_icon, "assets/icons/bonus/rapidsmash.png")
+!builtin_icon(rapid_hammer_icon, "icons/bonus/rapidsmash.png")
 
 fun rapid_hammer() {
     item_message("#Rapid Hammer x" + (collected + 1) + "#")

@@ -6,7 +6,7 @@
 !config(required, "How many Launch Fragments are required to get Launch", Integer, 3)
 !tags("Launch Fragments (" + required + "/" + total + ")")
 
-!builtin_icon(launch_fragment_icon, "assets/icons/bonus/launchfragment.png")
+!builtin_icon(launch_fragment_icon, "icons/bonus/launchfragment.png")
 
 !state(collected, Integer)
 

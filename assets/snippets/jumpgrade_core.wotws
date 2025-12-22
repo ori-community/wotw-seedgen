@@ -12,7 +12,7 @@
 !augment_fun(enable_all, if enabled == false enable())
 !augment_fun(disable_all, if enabled disable())
 
-!builtin_icon(jumpgrade_icon, "assets/icons/bonus/jumpgrade.png")
+!builtin_icon(jumpgrade_icon, "icons/bonus/jumpgrade.png")
 
 fun jumpgrade() {
     item_message("#Jumpgrade x" + (collected + 1) + "#")
