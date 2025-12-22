@@ -62,6 +62,8 @@ impl LogConfig {
         );
 
         if self.trace_seedgen {
+            assets::create_dir_all(&*DATA_DIR)?;
+
             dispatch = dispatch.chain(
                 Dispatch::new()
                     .format(move |out, message, record| {
