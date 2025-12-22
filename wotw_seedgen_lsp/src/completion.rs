@@ -1,4 +1,4 @@
-use std::sync::LazyLock;
+use std::{ops::Range, sync::LazyLock};
 
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
 use wotw_seedgen_data::{
@@ -35,6 +35,19 @@ pub trait Completion {
 
 trait CompletionInSpan: Span {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>>;
+
+    fn span_checked_completion(
+        &self,
+        span: Range<usize>,
+        index: usize,
+        cache: &CacheValues,
+    ) -> Option<Vec<CompletionItem>> {
+        if span.contains(&index) {
+            self.completion_in_span(index, cache)
+        } else {
+            None
+        }
+    }
 }
 
 impl<T> Completion for T
@@ -42,11 +55,7 @@ where
     T: CompletionInSpan,
 {
     fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        if !self.span().contains(&index) {
-            return None;
-        }
-
-        self.completion_in_span(index, cache)
+        self.span_checked_completion(self.span(), index, cache)
     }
 }
 
@@ -637,12 +646,17 @@ static CONTENT_COMPLETION: LazyLock<Vec<CompletionItem>> =
 impl CompletionInSpan for Content<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
-            Content::Event(_, event) => event.completion(index, cache),
-            Content::Function(_, function_definition) => {
-                function_definition.completion(index, cache)
+            Content::Event(on, event) => {
+                event.span_checked_completion((on, event).span(), index, cache)
             }
-            Content::Command(_, command) => command.completion(index, cache),
-            Content::Annotation(_, annotation) => annotation.completion(index, cache),
+            Content::Function(fun, function_definition) => function_definition
+                .span_checked_completion((fun, function_definition).span(), index, cache),
+            Content::Command(s, command) => {
+                command.span_checked_completion((s, command).span(), index, cache)
+            }
+            Content::Annotation(s, annotation) => {
+                annotation.span_checked_completion((s, annotation).span(), index, cache)
+            }
         }
     }
 }
@@ -687,7 +701,9 @@ impl CompletionInSpan for Trigger<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         match self {
             Trigger::ClientEvent(_) => None,
-            Trigger::Binding(_, binding) => binding.completion(index, cache),
+            Trigger::Binding(change, binding) => {
+                binding.span_checked_completion((change, binding).span(), index, cache)
+            }
             Trigger::Condition(condition) => {
                 let mut completion = condition.completion(index, cache).unwrap_or_default();
 
@@ -755,34 +771,84 @@ impl CompletionInSpan for Command<'_> {
         match self {
             Command::Include(_, _) => None, // TODO completions for files available in the workspace and identifiers contained in imported snippets
             Command::IncludeIcon(_, _) | Command::BuiltinIcon(_, _) => None, // TODO identifier and icon path completions
-            Command::AugmentFun(_, args) => args.completion(index, cache),
+            Command::AugmentFun(augment_fun, args) => {
+                args.span_checked_completion((augment_fun, args).span(), index, cache)
+            }
             Command::Export(_, _) => None, // TODO identifier completions
-            Command::Spawn(_, args) => args.completion(index, cache),
-            Command::Tags(_, args) => args.completion(index, cache),
-            Command::Config(_, args) => args.completion(index, cache),
-            Command::SetConfig(_, args) => args.completion(index, cache),
-            Command::State(_, args) => args.completion(index, cache),
+            Command::Spawn(spawn, args) => {
+                args.span_checked_completion((spawn, args).span(), index, cache)
+            }
+            Command::Tags(tags, args) => {
+                args.span_checked_completion((tags, args).span(), index, cache)
+            }
+            Command::Config(config, args) => {
+                args.span_checked_completion((config, args).span(), index, cache)
+            }
+            Command::SetConfig(set_config, args) => {
+                args.span_checked_completion((set_config, args).span(), index, cache)
+            }
+            Command::State(state, args) => {
+                args.span_checked_completion((state, args).span(), index, cache)
+            }
             Command::Timer(_, _) => None,
-            Command::Let(_, args) => args.completion(index, cache),
-            Command::If(_, args) => args.completion(index, cache),
-            Command::Repeat(_, args) => args.completion(index, cache),
-            Command::AddItem(_, args) => args.completion(index, cache),
-            Command::RemoveItem(_, args) => args.completion(index, cache),
-            Command::ItemData(_, args) => args.completion(index, cache),
-            Command::ItemDataName(_, args) => args.completion(index, cache),
-            Command::ItemDataPrice(_, args) => args.completion(index, cache),
-            Command::ItemDataDescription(_, args) => args.completion(index, cache),
-            Command::ItemDataIcon(_, args) => args.completion(index, cache),
-            Command::ItemDataMapIcon(_, args) => args.completion(index, cache),
-            Command::RemoveLocation(_, args) => args.completion(index, cache),
+            Command::Let(r#let, args) => {
+                args.span_checked_completion((r#let, args).span(), index, cache)
+            }
+            Command::If(r#if, args) => {
+                args.span_checked_completion((r#if, args).span(), index, cache)
+            }
+            Command::Repeat(repeat, args) => {
+                args.span_checked_completion((repeat, args).span(), index, cache)
+            }
+            Command::AddItem(add_item, args) => {
+                args.span_checked_completion((add_item, args).span(), index, cache)
+            }
+            Command::RemoveItem(remove_item, args) => {
+                args.span_checked_completion((remove_item, args).span(), index, cache)
+            }
+            Command::ItemData(item_data, args) => {
+                args.span_checked_completion((item_data, args).span(), index, cache)
+            }
+            Command::ItemDataName(item_data_name, args) => {
+                args.span_checked_completion((item_data_name, args).span(), index, cache)
+            }
+            Command::ItemDataPrice(item_data_price, args) => {
+                args.span_checked_completion((item_data_price, args).span(), index, cache)
+            }
+            Command::ItemDataDescription(item_data_description, args) => {
+                args.span_checked_completion((item_data_description, args).span(), index, cache)
+            }
+            Command::ItemDataIcon(item_data_icon, args) => {
+                args.span_checked_completion((item_data_icon, args).span(), index, cache)
+            }
+            Command::ItemDataMapIcon(item_data_map_icon, args) => {
+                args.span_checked_completion((item_data_map_icon, args).span(), index, cache)
+            }
+            Command::RemoveLocation(remove_location, args) => {
+                args.span_checked_completion((remove_location, args).span(), index, cache)
+            }
             Command::SetLogicState(_, _) => None,
-            Command::Preplace(_, args) => args.completion(index, cache),
-            Command::ZoneOf(_, args) => args.completion(index, cache),
-            Command::ItemOn(_, args) => args.completion(index, cache),
-            Command::CountInZone(_, args) => args.completion(index, cache),
-            Command::RandomInteger(_, args) => args.completion(index, cache),
-            Command::RandomFloat(_, args) => args.completion(index, cache),
-            Command::RandomPool(_, args) => args.completion(index, cache),
+            Command::Preplace(preplace, args) => {
+                args.span_checked_completion((preplace, args).span(), index, cache)
+            }
+            Command::ZoneOf(zone_of, args) => {
+                args.span_checked_completion((zone_of, args).span(), index, cache)
+            }
+            Command::ItemOn(item_on, args) => {
+                args.span_checked_completion((item_on, args).span(), index, cache)
+            }
+            Command::CountInZone(count_in_zone, args) => {
+                args.span_checked_completion((count_in_zone, args).span(), index, cache)
+            }
+            Command::RandomInteger(random_integer, args) => {
+                args.span_checked_completion((random_integer, args).span(), index, cache)
+            }
+            Command::RandomFloat(random_float, args) => {
+                args.span_checked_completion((random_float, args).span(), index, cache)
+            }
+            Command::RandomPool(random_pool, args) => {
+                args.span_checked_completion((random_pool, args).span(), index, cache)
+            }
             Command::RandomFromPool(_, _) => None,
         }
     }
