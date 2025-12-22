@@ -66,6 +66,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverDedent {
                         break;
                     }
                 }
+                Token::Eof => break,
                 _ => {}
             }
             parser.step();
