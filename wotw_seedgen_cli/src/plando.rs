@@ -74,7 +74,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     }
 
     if watch {
-        let mut watcher = Watcher::new(Duration::from_millis(10))?;
+        let mut watcher = Watcher::new(Duration::from_millis(50))?;
 
         cache.watch(&mut watcher)?;
 
