@@ -5,19 +5,14 @@ use crate::{
 };
 use rand_pcg::Pcg64Mcg;
 use std::{
-    borrow::Cow,
     ffi::OsStr,
     fs,
-    iter::{self, Chain, Map, Once},
     path::{Path, PathBuf},
     time::{Duration, Instant},
 };
 use wotw_seedgen::{
     data::{
-        assets::{
-            self, AssetCache, AssetFileAccess, DefaultAssetCacheValues, DefaultFileAccess,
-            PresetFileAccess, SnippetFileAccess, Watcher,
-        },
+        assets::{self, AssetCache, DefaultAssetCacheValues, PlandoFileAccess, Watcher},
         seed_language::compile::Compiler,
     },
     seed::Seed,
@@ -141,52 +136,4 @@ fn compile(
     );
 
     Ok(())
-}
-
-struct PlandoFileAccess<'a> {
-    root: &'a Path,
-}
-
-impl<'a> PlandoFileAccess<'a> {
-    fn new(root: &'a Path) -> Self {
-        Self { root }
-    }
-}
-
-impl AssetFileAccess for PlandoFileAccess<'_> {
-    type Folders = <DefaultFileAccess as AssetFileAccess>::Folders;
-    type Path = <DefaultFileAccess as AssetFileAccess>::Path;
-
-    fn asset_folders(&self) -> Self::Folders {
-        DefaultFileAccess.asset_folders()
-    }
-}
-
-impl<'a> SnippetFileAccess for PlandoFileAccess<'a> {
-    type Folders = Chain<
-        Once<Cow<'a, Path>>,
-        Map<<DefaultFileAccess as SnippetFileAccess>::Folders, fn(PathBuf) -> Cow<'a, Path>>,
-    >;
-    type Path = Cow<'a, Path>;
-
-    fn snippet_folders(&self) -> Self::Folders {
-        iter::once(Cow::Borrowed(self.root)).chain(
-            DefaultFileAccess
-                .snippet_folders()
-                .map(Cow::Owned as fn(_) -> _),
-        )
-    }
-}
-
-impl PresetFileAccess for PlandoFileAccess<'_> {
-    type Folders = <DefaultFileAccess as PresetFileAccess>::Folders;
-    type Path = <DefaultFileAccess as PresetFileAccess>::Path;
-
-    fn universe_folders(&self) -> Self::Folders {
-        DefaultFileAccess.universe_folders()
-    }
-
-    fn world_folders(&self) -> Self::Folders {
-        DefaultFileAccess.world_folders()
-    }
 }

@@ -34,7 +34,9 @@ impl<'a> SnippetFileAccess for PlandoFileAccess<'a> {
 
     fn snippet_folders(&self) -> Self::Folders {
         iter::once(Cow::Borrowed(self.root)).chain(
-            SnippetFileAccess::snippet_folders(&DefaultFileAccess).map(Cow::Owned as fn(_) -> _),
+            DefaultFileAccess
+                .snippet_folders()
+                .map(Cow::Owned as fn(_) -> _),
         )
     }
 }
