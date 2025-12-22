@@ -52,7 +52,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         (root, identifier)
     };
 
-    let cache = Cache::new(PlandoFileAccess::new(root))?;
+    let mut cache = Cache::new(PlandoFileAccess::new(root))?;
 
     let out = match out {
         None => {
@@ -81,16 +81,20 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         let canonical_out = assets::canonicalize(&out)?;
 
         for res in watcher {
-            if res?.into_iter().all(|event| {
+            let events = res?;
+
+            if events.iter().all(|event| {
                 event
                     .event
                     .paths
-                    .into_iter()
+                    .iter()
                     .flat_map(fs::canonicalize)
                     .all(|path| path == canonical_out)
             }) {
                 continue;
             }
+
+            cache.update_from_watcher_event(&events)?;
 
             let _ = compile(&mut rng, &cache, entry, &out, debug);
         }
