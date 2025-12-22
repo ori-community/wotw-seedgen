@@ -1,6 +1,6 @@
 use std::{
     ffi::OsStr,
-    io,
+    fs, io,
     ops::Deref,
     path::{Path, PathBuf},
 };
@@ -220,16 +220,15 @@ fn subfolder_changed(
         return;
     }
 
-    let Some(parent) = path.parent() else { return };
+    let changed = folders
+        .any(|folder| fs::canonicalize(folder).map_or(false, |folder| path.starts_with(folder)));
 
-    if !folders.any(|folder| parent.ends_with(folder)) {
-        return;
+    if changed {
+        identifiers.push((
+            path.file_stem().unwrap().to_str().unwrap().to_string(),
+            kind,
+        ));
     }
-
-    identifiers.push((
-        path.file_stem().unwrap().to_str().unwrap().to_string(),
-        kind,
-    ));
 }
 
 impl<F: SnippetAccess, V: AssetCacheValues> SnippetAccess for AssetCache<F, V> {
