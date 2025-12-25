@@ -27,8 +27,9 @@ use crate::{
 use derivative::Derivative;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 use std::{
+    collections::hash_map::Entry,
     fmt::Debug,
     io::{self, Write},
 };
@@ -41,8 +42,14 @@ use wotw_seedgen_parse::{
 pub struct Compiler<'snippets, 'uberstates> {
     rng: Pcg64Mcg,
     global: GlobalCompilerData<'snippets, 'uberstates>,
-    compiled_snippets: FxHashSet<String>,
+    compiled_snippets: FxHashMap<String, CompileState>,
     errors: Vec<(Source, Vec<Error>)>,
+}
+
+#[derive(Debug)]
+enum CompileState {
+    Started,
+    Finished,
 }
 
 /// How many memory slots to reserve for generated calculations
@@ -462,15 +469,19 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
     }
 
     pub fn compile_snippet(&mut self, identifier: &str) -> std::result::Result<(), String> {
-        if !self.compiled_snippets.insert(identifier.to_string()) {
-            return Ok(());
+        match self.compiled_snippets.entry(identifier.to_string()) {
+            Entry::Occupied(entry) => match entry.get() {
+                CompileState::Started => {
+                    return Err(format!("\"{identifier}\" includes itself in a cycle").to_string())
+                }
+                CompileState::Finished => return Ok(()),
+            },
+            Entry::Vacant(entry) => {
+                entry.insert(CompileState::Started);
+            }
         }
 
         let source = self.global.snippet_access.read_snippet(identifier)?;
-
-        self.global
-            .exported_values
-            .insert(identifier.to_string(), Default::default());
 
         let ast = Snippet::parse(&source.content);
         let mut errors = ast.errors;
@@ -499,6 +510,10 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
                 }
             }
 
+            self.global
+                .exported_values
+                .insert(identifier.to_string(), Default::default());
+
             let compiler = SnippetCompiler::compile(
                 ast,
                 &mut self.rng,
@@ -511,6 +526,8 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         }
 
         self.errors.push((source, errors));
+
+        *self.compiled_snippets.get_mut(identifier).unwrap() = CompileState::Finished;
 
         Ok(())
     }

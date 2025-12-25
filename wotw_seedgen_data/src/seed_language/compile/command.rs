@@ -125,9 +125,6 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         let Some(snippet_exported_values) = compiler.global.exported_values.get(self.path.data)
         else {
-            compiler
-                .errors
-                .push(Error::error("unknown snippet".to_string(), self.path.span));
             return;
         };
 
