@@ -295,16 +295,25 @@ impl Compile for input::CommandVoid {
             Self::FreeMessage { id, message } => {
                 if message.as_constant().map_or(false, String::is_empty) {
                     (
-                        vec![Command::FreeMessage(id), Command::FreeMessageShow(id)],
-                        MemoryUsed::ZERO,
+                        vec![
+                            Command::FreeMessage(id),
+                            Command::SetBoolean(true),
+                            Command::FreeMessageShow(id),
+                        ],
+                        MemoryUsed::ONE_BOOLEAN,
                     )
                 } else {
-                    let mut commands = Args::new(context)
+                    Args::new(context)
                         .string(0, message)
-                        .call(Command::FreeMessage(id), MemoryUsed::ZERO);
-                    commands.0.push(Command::MessageText(id));
-                    commands.0.push(Command::FreeMessageShow(id));
-                    commands
+                        .boolean(0, true.into())
+                        .call_multiple(
+                            [
+                                Command::FreeMessage(id),
+                                Command::MessageText(id),
+                                Command::FreeMessageShow(id),
+                            ],
+                            MemoryUsed::ZERO,
+                        )
                 }
             }
             Self::MessageDestroy { id } => (vec![Command::MessageDestroy(id)], MemoryUsed::ZERO),
