@@ -2,7 +2,7 @@ use super::{args::Args, Compile, CompileContext};
 use crate::assembly::{Command, Trigger};
 use indexmap::map::Entry;
 use wotw_seedgen_data::seed_language::output::{
-    self as input, CommandFloat, CommandVoid, Comparator, EqualityComparator,
+    self as input, AsConstant, CommandFloat, CommandVoid, Comparator, EqualityComparator,
 };
 use wotw_seedgen_data::UberIdentifier;
 
@@ -293,12 +293,19 @@ impl Compile for input::CommandVoid {
                 ) // TODO what's the default timeout
                 .call(Command::QueuedMessage(id, priority), MemoryUsed::ZERO),
             Self::FreeMessage { id, message } => {
-                let mut commands = Args::new(context)
-                    .string(0, message)
-                    .call(Command::FreeMessage(id), MemoryUsed::ZERO);
-                commands.0.push(Command::FreeMessageShow(id));
-                commands.0.push(Command::MessageText(id)); // TODO seems more intuitive the other way around?
-                commands
+                if message.as_constant().map_or(false, String::is_empty) {
+                    (
+                        vec![Command::FreeMessage(id), Command::FreeMessageShow(id)],
+                        MemoryUsed::ZERO,
+                    )
+                } else {
+                    let mut commands = Args::new(context)
+                        .string(0, message)
+                        .call(Command::FreeMessage(id), MemoryUsed::ZERO);
+                    commands.0.push(Command::MessageText(id));
+                    commands.0.push(Command::FreeMessageShow(id));
+                    commands
+                }
             }
             Self::MessageDestroy { id } => (vec![Command::MessageDestroy(id)], MemoryUsed::ZERO),
             Self::MessageText { id, message } => Args::new(context)
