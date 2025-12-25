@@ -1,30 +1,15 @@
 use std::{mem, ops::Range};
 use tower_lsp::lsp_types::{SemanticToken, SemanticTokenType, SemanticTokensLegend};
 use wotw_seedgen_data::{
-    parse::SpannedOption,
-    seed_language::{
-        ast::{
-            consume_command_arg, Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs,
-            BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandIf, CommandRepeat,
-            ConfigArgs, ConfigType, Content, CountInZoneArgs, CountInZoneBinding, Delimited, Event,
-            ExportArgs, Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs,
-            IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-            Once, Operation, PreplaceArgs, Punctuated, RandomFloatArgs, RandomFromPoolArgs,
-            RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, Recoverable, RemoveItemArgs,
-            RemoveLocationArgs, Separated, SeparatedNonEmpty, SetConfigArgs, SetLogicStateArgs,
-            Snippet, Span, Spanned, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger,
-            TriggerBinding, UberIdentifier, UberStateType, ZoneOfArgs,
-        },
-        types::Type,
-    },
+    parse::Identifier,
+    seed_language::ast::{Handler, Snippet, Span, Spanned, Traverse, UberIdentifier},
 };
 
 use crate::convert;
 
 pub fn semantic_tokens(source: &str, ast: Option<Snippet>) -> Vec<SemanticToken> {
     let mut builder = TokenBuilder::new(source);
-    ast.tokens(&mut builder);
+    ast.traverse(&mut builder);
     builder.finish()
 }
 
@@ -107,673 +92,76 @@ impl<'source> TokenBuilder<'source> {
     }
 }
 
-trait Tokens {
-    fn tokens(self, builder: &mut TokenBuilder);
-}
-
-impl<T: Tokens> Tokens for Vec<T> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        for t in self {
-            t.tokens(builder);
-        }
-    }
-}
-
-impl<T: Tokens> Tokens for Box<T> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        (*self).tokens(builder)
-    }
-}
-
-impl<T: Tokens> Tokens for Option<T> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        if let Some(t) = self {
-            t.tokens(builder);
-        }
-    }
-}
-
-impl<T: Tokens> Tokens for SpannedOption<T> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        if let SpannedOption::Some(t) = self {
-            t.tokens(builder);
-        }
-    }
-}
-
-impl<T: Tokens, R> Tokens for Recoverable<T, R> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.value.tokens(builder);
-    }
-}
-
-impl<const OPEN: char, Content: Tokens, const CLOSE: char> Tokens
-    for Delimited<OPEN, Content, CLOSE>
-{
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.content.tokens(builder);
-    }
-}
-
-impl<V: Tokens> Tokens for Once<V> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
-    }
-}
-
-impl<Item: Tokens, const PUNCTUATION: char> Tokens for Punctuated<Item, PUNCTUATION> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        for item in self {
-            item.tokens(builder);
-        }
-    }
-}
-
-impl<Item: Tokens, Separator> Tokens for Separated<Item, Separator> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        for item in self {
-            item.tokens(builder);
-        }
-    }
-}
-
-impl<Item: Tokens, Separator> Tokens for SeparatedNonEmpty<Item, Separator> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        for item in self {
-            item.tokens(builder);
-        }
-    }
-}
-
-impl Tokens for Spanned<&str> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.span, TokenType::String);
-    }
-}
-
-impl Tokens for UberIdentifier<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.span(), TokenType::Number);
-    }
-}
-
-impl Tokens for Expression<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            Expression::Value(value) => value.tokens(builder),
-            Expression::Operation(operation) => operation.tokens(builder),
-        }
-    }
-}
-
-impl Tokens for ExpressionValue<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            ExpressionValue::Group(group) => group.tokens(builder),
-            ExpressionValue::Action(action) => action.tokens(builder),
-            ExpressionValue::Literal(literal) => literal.tokens(builder),
-            ExpressionValue::Identifier(identifier) => {
-                builder.push_token(identifier.span, TokenType::Variable);
-            }
-        }
-    }
-}
-
-impl Tokens for Spanned<Literal<'_>> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        let token_type = match self.data {
-            Literal::UberIdentifier(_) | Literal::Integer(_) | Literal::Float(_) => {
-                TokenType::Number
-            }
-            Literal::Boolean(_) => TokenType::Keyword,
-            Literal::String(_) => TokenType::String,
-            Literal::Constant(_) => TokenType::EnumMember,
-        };
-        builder.push_token(self.span, token_type);
-    }
-}
-
-impl Tokens for Operation<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.left.tokens(builder);
-        builder.push_token(self.operator.span, TokenType::Operator);
-        self.right.tokens(builder);
-    }
-}
-
-impl Tokens for Snippet<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.contents.tokens(builder);
-    }
-}
-
-impl Tokens for Content<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            Content::Event(keyword, event) => {
-                builder.push_token(keyword.span, TokenType::Keyword);
-                event.tokens(builder);
-            }
-            Content::Command(symbol, command) => {
-                builder.push_token(symbol.span, TokenType::Macro);
-                command.tokens(builder);
-            }
-            Content::Function(keyword, function) => {
-                builder.push_token(keyword.span, TokenType::Keyword);
-                function.tokens(builder);
-            }
-            Content::Annotation(symbol, annotation) => {
-                builder.push_token(symbol.span, TokenType::Macro);
-                annotation.tokens(builder);
-            }
-        }
-    }
-}
-
-impl Tokens for Event<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.trigger.tokens(builder);
-        self.action.tokens(builder);
-    }
-}
-
-impl Tokens for Trigger<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            Trigger::ClientEvent(client_event) => {
-                builder.push_token(client_event.span, TokenType::EnumMember);
-            }
-            Trigger::Binding(keyword, binding) => {
-                builder.push_token(keyword.span, TokenType::Keyword);
-                binding.tokens(builder);
-            }
-            Trigger::Condition(expression) => expression.tokens(builder),
-        }
-    }
-}
-
-impl Tokens for TriggerBinding<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            TriggerBinding::UberIdentifier(uber_identifier) => uber_identifier.tokens(builder),
-            TriggerBinding::Identifier(identifier) => {
-                builder.push_token(identifier.span, TokenType::Variable);
-            }
-        }
-    }
-}
-
-impl Tokens for Action<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            Action::Condition(keyword, condition) => {
-                builder.push_token(keyword.span, TokenType::Keyword);
-                condition.tokens(builder);
-            }
-            Action::Function(function) => function.tokens(builder),
-            Action::Multi(multi) => multi.tokens(builder),
-        }
-    }
-}
-
-impl Tokens for ActionCondition<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.condition.tokens(builder);
-        self.action.tokens(builder);
-    }
-}
-
-impl Tokens for FunctionCall<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Function);
-        self.parameters.tokens(builder);
-    }
-}
-
-impl<T: Tokens> Tokens for CommandArg<T> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        if let SpannedOption::Some((_, t)) = self.value {
-            t.tokens(builder);
-        }
-    }
-}
-
-impl Tokens for Command<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            Command::Include(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::IncludeIcon(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::BuiltinIcon(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::AugmentFun(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Export(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Spawn(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Tags(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Config(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::SetConfig(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::State(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Timer(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Let(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::If(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Repeat(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::AddItem(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::RemoveItem(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemData(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemDataName(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemDataPrice(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemDataDescription(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemDataIcon(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemDataMapIcon(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::RemoveLocation(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::SetLogicState(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::Preplace(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ZoneOf(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::ItemOn(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::CountInZone(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::RandomInteger(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::RandomFloat(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::RandomPool(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Command::RandomFromPool(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-        }
-    }
-}
-
-impl Tokens for IncludeArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.path.tokens(builder);
-        if let Some((_, imports)) = self.imports.data {
-            for import in imports {
-                if let SpannedOption::Some(import) = import.value {
-                    builder.push_token(import.span, TokenType::Variable);
-                }
-            }
-        }
-    }
-}
-
-impl Tokens for IncludeIconArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.path.tokens(builder);
-    }
-}
-
-impl Tokens for BuiltinIconArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.path.tokens(builder);
-    }
-}
-
-impl Tokens for AugmentFunArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span(), TokenType::Variable);
-        self.action.tokens(builder);
-    }
-}
-
-impl Tokens for ExportArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.0.span, TokenType::Variable);
-    }
-}
-
-impl Tokens for SpawnArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.x.tokens(builder);
-        self.y.tokens(builder);
-    }
-}
-
-impl Tokens for TagsArg<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
-    }
-}
-
-impl Tokens for ConfigArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.description.tokens(builder);
-        self.ty.tokens(builder);
-        self.default.tokens(builder);
-    }
-}
-
-impl Tokens for Spanned<ConfigType> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.span, TokenType::Type);
-    }
-}
-
-impl Tokens for SetConfigArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.snippet_name.tokens(builder);
-        if let Some(identifier) = consume_command_arg(self.identifier) {
-            builder.push_token(identifier.span, TokenType::Variable);
-        }
-        self.value.tokens(builder);
-    }
-}
-
-impl Tokens for StateArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.ty.tokens(builder);
-    }
-}
-
-impl Tokens for Spanned<UberStateType> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.span, TokenType::Type);
-    }
-}
-
-impl Tokens for TimerArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.toggle_identifier.span, TokenType::Variable);
-        if let Some(timer_identifier) = consume_command_arg(self.timer_identifier) {
-            builder.push_token(timer_identifier.span, TokenType::Variable);
-        }
-    }
-}
-
-impl Tokens for LetArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.value.tokens(builder);
-    }
-}
-
-impl Tokens for CommandIf<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.condition.tokens(builder);
-        self.contents.tokens(builder);
-    }
-}
-
-impl Tokens for CommandRepeat<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.amount.tokens(builder);
-        self.contents.tokens(builder);
-    }
-}
-
-impl Tokens for AddItemArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
-    }
-}
-
-impl Tokens for RemoveItemArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
-    }
-}
-
-impl Tokens for ChangeItemPoolArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.amount.tokens(builder);
-    }
-}
-
-impl Tokens for ItemDataArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.name.tokens(builder);
-        self.price.tokens(builder);
-        self.description.tokens(builder);
-        self.icon.tokens(builder);
-        self.map_icon.tokens(builder);
-    }
-}
-
-impl Tokens for ItemDataNameArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.name.tokens(builder);
-    }
-}
-
-impl Tokens for ItemDataPriceArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.price.tokens(builder);
-    }
-}
-
-impl Tokens for ItemDataDescriptionArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.description.tokens(builder);
+impl Handler for TokenBuilder<'_> {
+    fn keyword(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Keyword);
     }
-}
 
-impl Tokens for ItemDataIconArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.icon.tokens(builder);
+    fn command_keyword(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Macro);
     }
-}
 
-impl Tokens for ItemDataMapIconArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.map_icon.tokens(builder);
+    fn annotation_keyword(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Macro);
     }
-}
 
-impl Tokens for RemoveLocationArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.condition.tokens(builder);
+    fn command_symbol(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Macro);
     }
-}
 
-impl Tokens for SetLogicStateArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
+    fn annotation_symbol(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Macro);
     }
-}
 
-impl Tokens for PreplaceArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.item.tokens(builder);
-        self.zone.tokens(builder);
+    fn operator(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Operator);
     }
-}
 
-impl Tokens for ZoneOfArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.item.tokens(builder);
+    fn boolean(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Keyword);
     }
-}
 
-impl Tokens for ItemOnArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.trigger.tokens(builder);
+    fn integer(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Number);
     }
-}
 
-impl Tokens for CountInZoneArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.zone_bindings.tokens(builder);
-        self.items.tokens(builder);
+    fn float(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Number);
     }
-}
 
-impl Tokens for CountInZoneBinding<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.zone.tokens(builder);
+    fn string(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::String);
     }
-}
 
-impl Tokens for RandomIntegerArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
+    fn constant(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::EnumMember);
     }
-}
 
-impl Tokens for RandomFloatArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        self.0.tokens(builder);
+    fn ty(&mut self, span: &Range<usize>) {
+        self.push_token(span.clone(), TokenType::Type);
     }
-}
 
-impl Tokens for RandomNumberArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.min.tokens(builder);
-        self.max.tokens(builder);
+    fn uber_identifier(&mut self, uber_identifier: &UberIdentifier) {
+        self.push_token(uber_identifier.span(), TokenType::Number);
     }
-}
 
-impl Tokens for RandomPoolArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        self.ty.tokens(builder);
-        self.values.tokens(builder);
+    fn identifier(&mut self, identifier: &Spanned<Identifier>) {
+        self.push_token(identifier.span.clone(), TokenType::Variable);
     }
-}
 
-impl Tokens for Spanned<Type> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.span, TokenType::Type);
+    fn identifier_def(&mut self, identifier: &Spanned<Identifier>) {
+        self.push_token(identifier.span.clone(), TokenType::Variable);
     }
-}
 
-impl Tokens for RandomFromPoolArgs<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Variable);
-        if let Some(pool_identifier) = consume_command_arg(self.pool_identifier) {
-            builder.push_token(pool_identifier.span, TokenType::Variable);
-        }
+    fn identifier_use(&mut self, identifier: &Spanned<Identifier>) {
+        self.push_token(identifier.span.clone(), TokenType::Variable);
     }
-}
 
-impl Tokens for FunctionDefinition<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        builder.push_token(self.identifier.span, TokenType::Function);
-        self.actions.tokens(builder);
+    fn function_def(&mut self, identifier: &Spanned<Identifier>) {
+        self.push_token(identifier.span.clone(), TokenType::Function);
     }
-}
 
-impl Tokens for Annotation<'_> {
-    fn tokens(self, builder: &mut TokenBuilder) {
-        match self {
-            Annotation::Hidden(keyword) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-            }
-            Annotation::Name(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Annotation::Category(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-            Annotation::Description(keyword, args) => {
-                builder.push_token(keyword.span, TokenType::Macro);
-                args.tokens(builder);
-            }
-        }
+    fn function_use(&mut self, identifier: &Spanned<Identifier>) {
+        self.push_token(identifier.span.clone(), TokenType::Function);
     }
 }

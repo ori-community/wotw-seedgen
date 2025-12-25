@@ -1,4 +1,4 @@
-use crate::seed_language::ast::{self, inspect_command_arg, RecoverContent};
+use crate::seed_language::ast::{self, get_command_arg_ref, RecoverContent};
 use rustc_hash::FxHashSet;
 use wotw_seedgen_parse::{Error, Recoverable, Span, Spanned, SpannedOption};
 
@@ -54,8 +54,8 @@ impl Preprocessor {
                             ast::Command::SetConfig(_, command) => {
                                 if let SpannedOption::Some(command) = &command.value {
                                     if let Some(args) = &command.content {
-                                        let identifier = inspect_command_arg(&args.0.identifier);
-                                        let value = inspect_command_arg(&args.0.value);
+                                        let identifier = get_command_arg_ref(&args.0.identifier);
+                                        let value = get_command_arg_ref(&args.0.value);
 
                                         if let (Some(identifier), Some(value)) = (identifier, value)
                                         {

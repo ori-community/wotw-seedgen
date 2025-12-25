@@ -29,6 +29,8 @@ use wotw_seedgen_data::{
 
 use crate::cache::CacheValues;
 
+// TODO add controlflow functionality to handler trait and use it here?
+
 pub trait Completion {
     fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>>;
 }

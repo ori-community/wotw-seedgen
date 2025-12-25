@@ -1,5 +1,12 @@
 // TODO investigate optimizing type sizes
 
+mod traverse;
+
+pub use traverse::{
+    get_command_arg, get_command_arg_ref, get_command_args_ref, inspect_command_arg,
+    inspect_command_args, Handler, Traverse,
+};
+
 use std::{fmt::Display, str::FromStr};
 
 use crate::{
@@ -510,18 +517,6 @@ pub type CommandArgsCollection<Args> = Recoverable<Delimited<'(', Args, ')'>, Re
 pub type CommandArgs<Args> = CommandArgsCollection<Once<Args>>;
 pub type CommandArg<T> =
     Recoverable<(Symbol<','>, Recoverable<T, RecoverCommandArg>), RecoverCommandArg>;
-
-pub fn inspect_command_arg<T>(arg: &CommandArg<T>) -> Option<&T> {
-    arg.value
-        .as_option()
-        .and_then(|arg| arg.1.value.as_option())
-}
-
-pub fn consume_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
-    arg.value
-        .into_option()
-        .and_then(|(_, arg)| arg.value.into_option())
-}
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
