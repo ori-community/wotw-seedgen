@@ -48,7 +48,7 @@ pub use ast::{parse_ast, Ast, ParseResult};
 pub use collections::{
     AstCollection, AstCollectionInit, Delimited, Once, Punctuated, Separated, SeparatedNonEmpty,
 };
-pub use error::{Error, ErrorKind, ErrorWithSource, Result};
+pub use error::{Error, ErrorKind, ErrorWithSource, Result, Severity};
 pub use helpers::{Identifier, NoTrailingInput, Symbol};
 pub use mode::{ErrorMode, Errors, NoErrors};
 pub use parser::{

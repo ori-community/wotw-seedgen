@@ -28,7 +28,7 @@ impl Command {
     ) -> Option<CommandVoid> {
         let result = match self {
             Command::Void(command) => Ok(command),
-            _ => Err(Error::custom(
+            _ => Err(Error::error(
                 "unexpected return value".to_string(),
                 span.span(),
             )),
@@ -251,7 +251,7 @@ pub(crate) trait CompileInto: Sized {
         let command = ast.compile(compiler)?;
 
         Self::coerce_command(command)
-            .map_err(|message| compiler.errors.push(Error::custom(message, span)))
+            .map_err(|message| compiler.errors.push(Error::error(message, span)))
             .ok()
     }
 
@@ -442,7 +442,7 @@ impl CompileInto for CommandString {
             Literal::Integer(value) => Ok(value.to_string().into()),
             Literal::Float(value) => Ok(value.to_string().into()),
             Literal::String(value) => Ok(value.into()),
-            _ => Err(Error::custom("cannot convert to String".to_string(), span)),
+            _ => Err(Error::error("cannot convert to String".to_string(), span)),
         };
 
         compiler.consume_result(result)
@@ -632,7 +632,7 @@ impl CompileIntoLiteral for String {
         match literal {
             Literal::String(value) => match value {
                 StringOrPlaceholder::Value(value) => Ok(value),
-                _ => Err(Error::custom("expected string literal".to_string(), span)),
+                _ => Err(Error::error("expected string literal".to_string(), span)),
             },
             other => Err(type_error(other.literal_type(), Type::String, span)),
         }
@@ -986,7 +986,7 @@ fn create_quest_command(uber_identifier: UberIdentifier, value: i32) -> CommandB
 // TODO this could accept Option<Type> as found to still provide an error message if type inference fails
 #[inline]
 fn type_error(found: Type, expected: Type, span: Range<usize>) -> Error {
-    Error::custom(type_error_message(found, expected), span)
+    Error::error(type_error_message(found, expected), span)
 }
 
 #[inline]
@@ -1007,7 +1007,7 @@ fn alias_type_error(
         .id_lookup
         .get(&uber_identifier)
     {
-        None => Error::custom(
+        None => Error::error(
             "alias doesn't resolve to a valid UberIdentifier".to_string(),
             span,
         )
@@ -1021,7 +1021,7 @@ fn alias_type_error(
 
 #[inline]
 fn operation_error(target: Type, span: Range<usize>) -> Error {
-    Error::custom(operation_error_message(target), span)
+    Error::error(operation_error_message(target), span)
 }
 
 #[inline]
@@ -1031,7 +1031,7 @@ fn operation_error_message(target: Type) -> String {
 
 #[inline]
 fn uber_state_type_error(found: UberStateType, expected: Type, span: Range<usize>) -> Error {
-    let mut error = Error::custom(format!("cannot use {found} UberState as {expected}"), span);
+    let mut error = Error::error(format!("cannot use {found} UberState as {expected}"), span);
 
     if matches!(expected, Type::Boolean) {
         error.help = Some(

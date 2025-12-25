@@ -67,7 +67,7 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                             Literal::UberIdentifier(uber_state) => uber_state.clone(),
                             other => {
                                 let found = other.literal_type();
-                                compiler.errors.push(Error::custom(
+                                compiler.errors.push(Error::error(
                                     format!("Expected UberIdentifier, but found {found}"),
                                     identifier.span,
                                 ));
@@ -80,7 +80,7 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                 match uber_state.value {
                     None => Some(Trigger::Binding(uber_state.uber_identifier)),
                     Some(_) => {
-                        let mut error = Error::custom(
+                        let mut error = Error::error(
                             "cannot bind to an alias which resolves to an integer state comparison"
                                 .to_string(),
                             span,

@@ -38,7 +38,7 @@ impl Preprocessor {
                                 if let SpannedOption::Some(command) = &command.value {
                                     if let Some(args) = &command.content {
                                         if self.output.snippet_included(args.0.path.data) {
-                                            self.errors.push(Error::custom(
+                                            self.errors.push(Error::error(
                                                 "Snippet already included".to_string(),
                                                 args.0.path.span(),
                                             ));

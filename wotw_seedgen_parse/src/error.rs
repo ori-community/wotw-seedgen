@@ -1,3 +1,4 @@
+use ariadne::{Color, Config, Fmt, Label, Report, ReportKind};
 use itertools::Itertools;
 use std::{
     error,
@@ -39,11 +40,18 @@ impl Error {
         }
     }
 
-    /// Returns an [`Error`] with a custom message.
-    /// Convenience wrapper for [`Error::new`] with [`ErrorKind::Other`]
+    /// Returns an [`Error`] with a custom warning message.
+    /// Convenience wrapper for [`Error::new`] with [`ErrorKind::Warning`]
     #[inline]
-    pub fn custom(message: String, span: Range<usize>) -> Self {
-        Self::new(ErrorKind::Other(message), span)
+    pub fn warning(message: String, span: Range<usize>) -> Self {
+        Self::new(ErrorKind::Warning(message), span)
+    }
+
+    /// Returns an [`Error`] with a custom error message.
+    /// Convenience wrapper for [`Error::new`] with [`ErrorKind::Error`]
+    #[inline]
+    pub fn error(message: String, span: Range<usize>) -> Self {
+        Self::new(ErrorKind::Error(message), span)
     }
 
     /// Sets the help message
@@ -106,18 +114,16 @@ impl Error {
     ///
     /// [`Write`]: io::Write
     pub fn write_pretty<W: io::Write>(&self, source: &Source, w: W) -> io::Result<()> {
-        use ariadne::{Color, Config, Fmt, Label, Report, ReportKind, Source};
-
         let id = source.id.as_str();
 
         if source.content.is_empty() {
             // the error printing library (ariadne) seems to panic in this case
-            Report::<(&str, _)>::build(ReportKind::Error, id, 0)
+            Report::<(&str, _)>::build(self.kind.severity().into(), id, 0)
                 .with_message("Empty Input")
                 .finish()
-                .write((id, Source::from("")), w)
+                .write((id, ariadne::Source::from("")), w)
         } else {
-            let mut report = Report::build(ReportKind::Error, id, self.span.start)
+            let mut report = Report::build(self.kind.severity().into(), id, self.span.start)
                 .with_config(Config::default().with_index_type(ariadne::IndexType::Byte))
                 .with_label(
                     Label::new((id, self.span.clone()))
@@ -131,7 +137,7 @@ impl Error {
 
             report
                 .finish()
-                .write((id, Source::from(&source.content)), w)
+                .write((id, ariadne::Source::from(&source.content)), w)
         }
     }
 }
@@ -154,7 +160,32 @@ pub enum ErrorKind {
     InvalidNumber(String),
     ExpectedToken(String),
     AllFailed(Vec<ErrorKind>),
-    Other(String),
+    Warning(String),
+    Error(String),
+}
+
+impl ErrorKind {
+    pub fn severity(&self) -> Severity {
+        match self {
+            Self::Warning(_) => Severity::Warning,
+            _ => Severity::Error,
+        }
+    }
+}
+
+impl Into<ReportKind<'static>> for Severity {
+    fn into(self) -> ReportKind<'static> {
+        match self {
+            Self::Warning => ReportKind::Warning,
+            Self::Error => ReportKind::Error,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Severity {
+    Warning,
+    Error,
 }
 
 impl Display for ErrorKind {
@@ -184,7 +215,8 @@ impl Display for ErrorKind {
                     Some(messages) => write!(f, "expected {}", messages.iter().format(" or ")),
                 }
             }
-            ErrorKind::Other(message) => message.fmt(f),
+            ErrorKind::Warning(message) => message.fmt(f),
+            ErrorKind::Error(message) => message.fmt(f),
         }
     }
 }

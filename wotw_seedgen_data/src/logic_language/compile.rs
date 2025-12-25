@@ -105,7 +105,7 @@ impl<'source> Compiler<'source> {
         for (node, index) in iter::zip(loc_data_nodes, &mut index_iter) {
             let identifier = node.identifier();
             if pickup_map.insert(identifier, index).is_some() {
-                errors.push(Error::custom(
+                errors.push(Error::error(
                     format!("duplicate identifier \"{identifier}\" in loc_data"),
                     0..0,
                 ));
@@ -114,7 +114,7 @@ impl<'source> Compiler<'source> {
         for (node, index) in iter::zip(state_data_nodes, &mut index_iter) {
             let identifier = node.identifier();
             if state_map.insert(Cow::Borrowed(identifier), index).is_some() {
-                errors.push(Error::custom(
+                errors.push(Error::error(
                     format!("duplicate identifier \"{identifier}\" in state_data"),
                     0..0,
                 ));
@@ -188,7 +188,7 @@ impl<'source> Compiler<'source> {
 
         for (index, anchor) in index_iter.zip(anchors) {
             if anchor_map.contains_key(anchor.identifier.data.0) {
-                errors.push(Error::custom(
+                errors.push(Error::error(
                     format!("duplicate identifier \"{}\"", anchor.identifier.data.0),
                     anchor.identifier.span.clone(),
                 ));
@@ -214,7 +214,7 @@ impl<'source> Compiler<'source> {
     }
 
     fn error(&mut self, message: String, span: Range<usize>) {
-        self.errors.push(Error::custom(message, span));
+        self.errors.push(Error::error(message, span));
     }
 
     fn consume_result<T>(&mut self, result: Result<T>) -> Option<T> {
@@ -915,7 +915,7 @@ impl<'source> Compile for ast::Enemy<'source> {
                     .data
                     .0
                     .parse()
-                    .map_err(|_| Error::custom("unknown enemy".to_string(), self.identifier.span)),
+                    .map_err(|_| Error::error("unknown enemy".to_string(), self.identifier.span)),
             )
             .map(|enemy| {
                 let amount = self.amount.map_or(1, |amount| amount.value.data);
@@ -951,7 +951,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
             if amount.is_none() {
                 Ok(())
             } else {
-                Err(Error::custom(
+                Err(Error::error(
                     "this requirement accepts no amount".to_string(),
                     amount_span.clone(),
                 ))
@@ -965,7 +965,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                 None => Ok(Requirement::Skill(skill)),
                 Some(amount) => {
                     if skill.energy_cost() == 0. {
-                        Err(Error::custom(
+                        Err(Error::error(
                             "this skill accepts no amount".to_string(),
                             amount_span,
                         ))
@@ -980,7 +980,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
             let option = compiler.trick_requirements.get(trick, &mut amount);
 
             if amount.is_some() {
-                Err(Error::custom(
+                Err(Error::error(
                     "requirement accepts no amount".to_string(),
                     amount_span,
                 ))

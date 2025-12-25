@@ -16,7 +16,6 @@
 !builtin_icon(regenerate_efficiency_icon, "icons/bonus/regenerateefficiency.png")
 !builtin_icon(flash_efficiency_icon, "icons/bonus/flashefficiency.png")
 !builtin_icon(grenade_efficiency_icon, "icons/bonus/grenadeefficiency.png")
-!builtin_icon(rapid_regenerate_icon, "icons/bonus/rapidregen.png")
 !builtin_icon(rapid_grenade_icon, "icons/bonus/rapidgrenade.png")
 !builtin_icon(quickshot_upgrade_icon, "icons/bonus/rapidquickshot.png")
 !builtin_icon(melting_blaze_icon, "icons/bonus/meltingblaze.png")

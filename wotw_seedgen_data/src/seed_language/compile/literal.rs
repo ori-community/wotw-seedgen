@@ -32,7 +32,7 @@ impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
         let uber_state = self.resolve(compiler)?;
 
         if uber_state.uber_identifier.group == 9 {
-            compiler.errors.push(Error::custom(
+            compiler.errors.push(Error::error(
                 "Cannot use group 9 directly. Use !state instead".to_string(),
                 self.span(),
             ));
@@ -49,7 +49,7 @@ impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
         } else {
             compiler
                 .errors
-                .push(Error::custom("Unknown UberState".to_string(), self.span()));
+                .push(Error::error("Unknown UberState".to_string(), self.span()));
 
             None
         }
@@ -83,7 +83,7 @@ impl ast::UberIdentifierName<'_> {
             .get(self.group.data.0);
 
         if group.is_none() {
-            let mut error = Error::custom("Unknown UberState group".to_string(), self.group.span());
+            let mut error = Error::error("Unknown UberState group".to_string(), self.group.span());
             error.help = suggestion(
                 self.group.data.0,
                 compiler.global.uber_state_data.name_lookup.keys(),
@@ -96,7 +96,7 @@ impl ast::UberIdentifierName<'_> {
 
         let ids = group.get(member.data.0);
         if ids.is_none() {
-            let mut error = Error::custom("Unknown UberState member".to_string(), member.span());
+            let mut error = Error::error("Unknown UberState member".to_string(), member.span());
 
             let other_groups = compiler
                 .global
@@ -129,7 +129,7 @@ impl ast::UberIdentifierName<'_> {
         if ids.len() == 1 {
             ids.first().cloned()
         } else {
-            compiler.errors.push(Error::custom(
+            compiler.errors.push(Error::error(
                 format!("Ambiguous name: matches {}", ids.iter().format(", ")),
                 self.span(),
             ));

@@ -479,7 +479,7 @@ where
 
         if token.is_string() {
             let result = T::Token::parse_str(parser.slice(span.clone()));
-            let slice = E::consume_result(result, |err| parser.error(ErrorKind::Other(err)))?;
+            let slice = E::consume_result(result, |err| parser.error(ErrorKind::Error(err)))?;
 
             parser.step();
 

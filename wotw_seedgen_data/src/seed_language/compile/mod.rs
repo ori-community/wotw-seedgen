@@ -4,6 +4,7 @@ mod evaluate;
 mod expression;
 mod function;
 mod helpers;
+mod lint;
 mod literal;
 mod preprocess;
 
@@ -32,8 +33,8 @@ use std::{
     io::{self, Write},
 };
 use wotw_seedgen_parse::{
-    Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result, SeparatedNonEmpty, Source,
-    Span, SpanEnd, SpanStart, Spanned, SpannedOption,
+    Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result, SeparatedNonEmpty,
+    Severity, Source, Span, SpanEnd, SpanStart, Spanned, SpannedOption,
 };
 
 #[derive(Debug)]
@@ -315,7 +316,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         let literal = self.variables.get(&identifier.data);
 
         if literal.is_none() {
-            self.errors.push(Error::custom(
+            self.errors.push(Error::error(
                 "unknown identifier".to_string(),
                 identifier.span(),
             ))
@@ -328,7 +329,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         let function = self.function_indices.get(identifier.data.0);
 
         if function.is_none() {
-            self.errors.push(Error::custom(
+            self.errors.push(Error::error(
                 "unknown function".to_string(),
                 identifier.span(),
             ))
@@ -342,7 +343,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
 
         if !included {
             self.errors.push(
-                Error::custom("unknown snippet".to_string(), snippet_name.span.clone())
+                Error::error("unknown snippet".to_string(), snippet_name.span.clone())
                     .with_help(format!("try !include(\"{}\")", snippet_name.data)),
             );
         }
@@ -369,7 +370,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
 
         if ty.is_none() {
             self.errors
-                .push(Error::custom("Unknown UberState".to_string(), span.span()))
+                .push(Error::error("Unknown UberState".to_string(), span.span()))
         }
 
         ty
@@ -437,7 +438,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
 }
 
 fn operand_error(left_ty: Type, right_ty: Type, left: &Expression, right: &Expression) -> Error {
-    Error::custom(
+    Error::error(
         format!("Cannot perform operation on {left_ty} and {right_ty}"),
         left.span_start()..right.span_end(),
     )
@@ -475,6 +476,8 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         let mut errors = ast.errors;
 
         if let Some(ast) = ast.parsed {
+            lint::lint(&ast, &mut errors);
+
             let preprocessor = Preprocessor::preprocess(&ast);
             errors.extend(preprocessor.errors);
 
@@ -489,7 +492,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
 
             for include in &preprocessor.output.includes {
                 if let Err(err) = self.compile_snippet(&include.data) {
-                    errors.push(Error::custom(
+                    errors.push(Error::error(
                         format!("Failed to read snippet: {err}"),
                         include.span.clone(),
                     ));
@@ -534,7 +537,10 @@ impl CompileResult {
 
         for (source, errors) in self.errors {
             for error in errors {
-                error_count += 1;
+                if error.kind.severity() == Severity::Error {
+                    error_count += 1;
+                }
+
                 error.write_pretty(&source, &mut stderr).unwrap();
             }
         }

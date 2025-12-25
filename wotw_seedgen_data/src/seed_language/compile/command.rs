@@ -127,7 +127,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
         else {
             compiler
                 .errors
-                .push(Error::custom("unknown snippet".to_string(), self.path.span));
+                .push(Error::error("unknown snippet".to_string(), self.path.span));
             return;
         };
 
@@ -136,7 +136,7 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
                 if let SpannedOption::Some(import) = import.value {
                     let Some(value) = snippet_exported_values.get(import.data.0) else {
                         compiler.errors.push(
-                            Error::custom(
+                            Error::error(
                                 "identifier not found in snippet".to_string(),
                                 import.span,
                             )
@@ -187,7 +187,7 @@ impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
             .global
             .snippet_access
             .read_file(path.data.as_ref())
-            .map_err(|err| Error::custom(err, path.span()));
+            .map_err(|err| Error::error(err, path.span()));
 
         if let Some(data) = compiler.consume_result(content) {
             compiler
@@ -275,14 +275,14 @@ impl<'source> Compile<'source> for ast::ExportArgs<'source> {
             (None, Some(index)) => ExportedValue::Function(*index),
             (Some(var), None) => ExportedValue::Literal(var.clone()),
             (Some(_), Some(_)) => {
-                compiler.errors.push(Error::custom(
+                compiler.errors.push(Error::error(
                     "Could refer to either a function or a variable in the current scope. Consider renaming one of them to resolve the ambiguity".to_string(),
                     self.0.span,
                 ));
                 return;
             }
             (None, None) => {
-                compiler.errors.push(Error::custom(
+                compiler.errors.push(Error::error(
                     "Could not find function or variable in the current scope".to_string(),
                     self.0.span,
                 ));
@@ -304,7 +304,7 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         if compiler.global.output.spawn.is_some() {
-            compiler.errors.push(Error::custom(
+            compiler.errors.push(Error::error(
                 "Multiple spawn commands".to_string(),
                 self.span(),
             ));
@@ -343,7 +343,7 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
         if default.data.literal_type() != ty.data.into() {
             compiler
                 .errors
-                .push(Error::custom(format!("expected {}", ty.data), default.span));
+                .push(Error::error(format!("expected {}", ty.data), default.span));
         }
 
         let config = compiler
@@ -362,7 +362,7 @@ impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
                 };
 
                 if parsed.is_none() {
-                    compiler.errors.push(Error::custom(
+                    compiler.errors.push(Error::error(
                         format!("failed to parse provided configuration value \"{}\" as a {}, which is the required type for this configuration parameter", value, ty.data),
                         ty.span,
                     ));
@@ -484,7 +484,7 @@ fn uber_state<S: Span>(
 
         Ok(uber_identifier)
     } else {
-        Err(Error::custom(format!("Only {available} UberStates of this type are available (What on earth are you doing?)"), span.span()))
+        Err(Error::error(format!("Only {available} UberStates of this type are available (What on earth are you doing?)"), span.span()))
     }
 }
 
@@ -517,7 +517,7 @@ impl<'source> Compile<'source> for ast::CommandRepeat<'source> {
 
         if let Some(repetitions) = self.amount.evaluate::<i32>(compiler) {
             if repetitions < 0 {
-                compiler.errors.push(Error::custom(
+                compiler.errors.push(Error::error(
                     format!("!repeat only allows for positive numbers, but this evaluated to {repetitions}"),
                     span,
                 ));
@@ -613,7 +613,7 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
                 )
                 .is_some()
             {
-                compiler.errors.push(Error::custom(
+                compiler.errors.push(Error::error(
                     "Already defined data for this item".to_string(),
                     span,
                 ));
@@ -739,7 +739,7 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
     .replace(value)
     .is_some()
     {
-        compiler.errors.push(Error::custom(
+        compiler.errors.push(Error::error(
             format!("Already defined {field} for this item"),
             span,
         ))
@@ -946,7 +946,7 @@ impl<'source> Compile<'source> for ast::RandomFromPoolArgs<'source> {
         };
 
         let Some(values) = compiler.random_pools.get_mut(pool_identifier.data.0) else {
-            compiler.errors.push(Error::custom(
+            compiler.errors.push(Error::error(
                 "Unknown pool. Use !random_pool first".to_string(),
                 pool_identifier.span,
             ));
@@ -954,7 +954,7 @@ impl<'source> Compile<'source> for ast::RandomFromPoolArgs<'source> {
         };
 
         if values.is_empty() {
-            compiler.errors.push(Error::custom(
+            compiler.errors.push(Error::error(
                 "Pool already empty".to_string(),
                 self.identifier.span_start()..pool_identifier.span_end(),
             ));

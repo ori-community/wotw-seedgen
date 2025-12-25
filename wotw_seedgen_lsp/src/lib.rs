@@ -28,6 +28,7 @@ use tower_lsp::{
 };
 use wotw_seedgen_data::{
     assets::{AssetCache, DefaultFileAccess, PlandoFileAccess},
+    parse::Severity,
     seed_language::{
         ast,
         compile::{Compiler, FunctionIdentifier},
@@ -158,6 +159,11 @@ impl Backend {
             errors
                 .into_iter()
                 .map(|error| {
+                    let severity = match error.kind.severity() {
+                        Severity::Warning => DiagnosticSeverity::WARNING,
+                        Severity::Error => DiagnosticSeverity::ERROR,
+                    };
+
                     let mut message = error.kind.to_string();
 
                     if let Some(help) = error.help {
@@ -167,7 +173,7 @@ impl Backend {
 
                     Diagnostic {
                         range: convert::range_to_lsp(error.span, &source.content),
-                        severity: Some(DiagnosticSeverity::ERROR),
+                        severity: Some(severity),
                         message,
                         ..Default::default()
                     }

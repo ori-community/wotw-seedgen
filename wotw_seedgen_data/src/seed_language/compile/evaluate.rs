@@ -27,7 +27,7 @@ impl<'source> ast::Expression<'source> {
         let value = T::evaluate(self.compile_into(compiler)?);
 
         if value.is_none() {
-            compiler.errors.push(Error::custom(
+            compiler.errors.push(Error::error(
                 "Cannot be statically evaluated".to_string(),
                 span,
             ));

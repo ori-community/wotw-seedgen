@@ -156,7 +156,7 @@ fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usi
     match arg.as_constant() {
         Some(value) => Some((value.clone(), span)),
         _ => {
-            context.compiler.errors.push(Error::custom(
+            context.compiler.errors.push(Error::error(
                 "Only literals are allowed in this position".to_string(),
                 span,
             ));
@@ -538,7 +538,7 @@ impl<'source> ast::FunctionCall<'source> {
     ) -> Option<Command> {
         if let Some(parameters) = self.parameters.content {
             if !parameters.is_empty() {
-                compiler.errors.push(Error::custom(
+                compiler.errors.push(Error::error(
                     "parameters for custom functions aren't (yet) supported".to_string(),
                     parameters[0].span().start..parameters.last.as_ref().unwrap().span().end,
                 ).with_help("Use set functions for the values you want to pass and get them again in the function".to_string()))
@@ -560,7 +560,7 @@ impl<'source> ast::FunctionCall<'source> {
                 .data
                 .0
                 .parse::<FunctionIdentifier>()
-                .map_err(|_| Error::custom("Unknown function".to_string(), self.identifier.span)),
+                .map_err(|_| Error::error("Unknown function".to_string(), self.identifier.span)),
         );
 
         let identifier = identifier?;
@@ -577,7 +577,7 @@ impl<'source> ast::FunctionCall<'source> {
 
                 compiler
                     .errors
-                    .push(Error::custom("Too few parameters".to_string(), start..end))
+                    .push(Error::error("Too few parameters".to_string(), start..end))
             }
             Ordering::Equal => {}
             Ordering::Greater => {
@@ -586,7 +586,7 @@ impl<'source> ast::FunctionCall<'source> {
 
                 compiler
                     .errors
-                    .push(Error::custom("Too many parameters".to_string(), start..end))
+                    .push(Error::error("Too many parameters".to_string(), start..end))
             }
         }
 
@@ -698,7 +698,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                         context
                             .compiler
                             .errors
-                            .push(Error::custom("cannot convert to String".to_string(), span));
+                            .push(Error::error("cannot convert to String".to_string(), span));
 
                         return None;
                     }
@@ -1109,7 +1109,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
 
                 let regex = context.compiler.consume_result(
                     Regex::new(&regex)
-                        .map_err(|err| Error::custom(format!("Invalid regex: {err}"), span)),
+                        .map_err(|err| Error::error(format!("Invalid regex: {err}"), span)),
                 )?;
 
                 store_defaults(identifier, &mut context, |uber_identifier| {
@@ -1353,7 +1353,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 .last()
                 .map_or(span.end, |last| last.span().end);
 
-            context.compiler.errors.push(Error::custom(
+            context.compiler.errors.push(Error::error(
                 "Too many parameters".to_string(),
                 span.start..end,
             ));
@@ -1646,10 +1646,10 @@ fn store(trigger_events: bool, context: &mut ArgContext) -> Option<Command> {
         .get(&uber_identifier)
         .is_some_and(|entry| entry.readonly)
     {
-        context.compiler.errors.push(Error::custom(
-            "this uberState is readonly".to_string(),
-            span,
-        ));
+        context
+            .compiler
+            .errors
+            .push(Error::error("this uberState is readonly".to_string(), span));
     }
 
     Some(Command::Void(command))
@@ -1707,7 +1707,7 @@ where
     let (uber_identifier, span) = spanned_arg::<UberIdentifier>(context)?;
 
     let kind = uber_identifier.shop_kind();
-    let check_result = f(kind).map_err(|message| Error::custom(message.to_string(), span));
+    let check_result = f(kind).map_err(|message| Error::error(message.to_string(), span));
     context.compiler.consume_result(check_result);
 
     Some(uber_identifier)
