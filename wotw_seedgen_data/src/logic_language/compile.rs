@@ -265,6 +265,7 @@ impl<'source> Compiler<'source> {
                             Requirement::State(self.index_offset + visited_state_index),
                             door_requirement.clone(),
                         ]),
+                        implicitly_generated: true,
                     });
 
                 let target_anchor = self.nodes[target_index].expect_anchor(); // TODO verify while parsing
@@ -337,17 +338,22 @@ struct TrickRequirements {
     wave_dash: Requirement,
     grenade_jump: Requirement,
     sword_jump: Requirement,
-    hammer_jump: Requirement,
     glide_jump: Requirement,
+    aerial_hammer_jump: Requirement,
     glide_hammer_jump: Requirement,
     coyote_hammer_jump: Requirement,
     wall_hammer_jump: Requirement,
     grounded_hammer_jump: Requirement,
-    extended_hammer: Requirement,
+    hammer_extension: Requirement,
     grenade_redirect: Requirement,
     sentry_redirect: Requirement,
-    pause_hover: Requirement,
+    pause_float: Requirement,
     spear_jump: Requirement,
+    glide_bash_chain: Requirement,
+    double_jump_bash_chain: Requirement,
+    dash_bash_chain: Requirement,
+    launch_bash_chain: Requirement,
+    unpopular: Requirement,
 }
 
 impl TrickRequirements {
@@ -380,17 +386,22 @@ impl TrickRequirements {
             wave_dash: build_trick(Trick::WaveDash),
             grenade_jump: build_trick(Trick::GrenadeJump),
             sword_jump: build_trick(Trick::SwordJump),
-            hammer_jump: build_trick(Trick::HammerJump),
             glide_jump: build_trick(Trick::GlideJump),
+            aerial_hammer_jump: build_trick(Trick::AerialHammerJump),
             glide_hammer_jump: build_trick(Trick::GlideHammerJump),
             coyote_hammer_jump: build_trick(Trick::CoyoteHammerJump),
             wall_hammer_jump: build_trick(Trick::WallHammerJump),
             grounded_hammer_jump: build_trick(Trick::GroundedHammerJump),
-            extended_hammer: build_trick(Trick::ExtendedHammer),
+            hammer_extension: build_trick(Trick::HammerExtension),
             grenade_redirect: build_trick(Trick::GrenadeRedirect),
             sentry_redirect: build_trick(Trick::SentryRedirect),
-            pause_hover: build_trick(Trick::PauseHover),
+            pause_float: build_trick(Trick::PauseFloat),
             spear_jump: build_trick(Trick::SpearJump),
+            glide_bash_chain: build_trick(Trick::GlideBashChain),
+            double_jump_bash_chain: build_trick(Trick::DoubleJumpBashChain),
+            dash_bash_chain: build_trick(Trick::DashBashChain),
+            launch_bash_chain: build_trick(Trick::LaunchBashChain),
+            unpopular: build_trick(Trick::Unpopular),
         }
     }
 
@@ -455,17 +466,14 @@ impl TrickRequirements {
                 Requirement::Skill(Skill::Sword),
                 Requirement::Skill(Skill::DoubleJump),
             ]),
-            Trick::HammerJump => {
-                build_and([self.hammer_jump.clone(), Requirement::Skill(Skill::Hammer)])
-            }
-            Trick::AerialHammerJump => build_and([
-                self.hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-                Requirement::Skill(Skill::DoubleJump),
-            ]),
             Trick::GlideJump => {
                 build_and([self.glide_jump.clone(), Requirement::Skill(Skill::Glide)])
             }
+            Trick::AerialHammerJump => build_and([
+                self.aerial_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+                Requirement::Skill(Skill::DoubleJump),
+            ]),
             Trick::GlideHammerJump => build_and([
                 self.glide_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
@@ -483,8 +491,8 @@ impl TrickRequirements {
                 self.grounded_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
             ]),
-            Trick::ExtendedHammer => build_and([
-                self.extended_hammer.clone(),
+            Trick::HammerExtension => build_and([
+                self.hammer_extension.clone(),
                 Requirement::Skill(Skill::Hammer),
             ]),
             Trick::GrenadeRedirect => build_and([
@@ -495,11 +503,32 @@ impl TrickRequirements {
                 self.sentry_redirect.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
             ]),
-            Trick::PauseHover => self.pause_hover.clone(),
+            Trick::PauseFloat => self.pause_float.clone(),
             Trick::SpearJump => build_and([
                 self.spear_jump.clone(),
                 Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),
             ]),
+            Trick::GlideBashChain => build_and([
+                self.glide_bash_chain.clone(),
+                Requirement::Skill(Skill::Glide),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::DoubleJumpBashChain => build_and([
+                self.double_jump_bash_chain.clone(),
+                Requirement::Skill(Skill::DoubleJump),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::DashBashChain => build_and([
+                self.dash_bash_chain.clone(),
+                Requirement::Skill(Skill::Dash),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::LaunchBashChain => build_and([
+                self.launch_bash_chain.clone(),
+                Requirement::Skill(Skill::Launch),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::Unpopular => self.unpopular.clone(),
         };
 
         Some(requirement)
@@ -696,7 +725,11 @@ impl<'source> Compile for ast::Anchor<'source> {
                                             build_and([requirement, region_requirement.clone()])
                                     }
 
-                                    connections.push(Connection { to, requirement })
+                                    connections.push(Connection {
+                                        to,
+                                        requirement,
+                                        implicitly_generated: false,
+                                    })
                                 }
                             }
                         }
@@ -1030,6 +1063,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                         ]),
                     ])
                 }),
+                // TODO this doubles the energy and skill reqs
                 "SentryJump" => get_amount().map(|amount| {
                     build_and([
                         Requirement::EnergySkill(Skill::Sentry, amount as f32),
@@ -1061,6 +1095,22 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                     .trick_requirements
                     .get(Trick::HammerSentryJump, &mut amount)
                     .ok_or_else(|| todo!()),
+                "AbilitySwap" => get_amount().map(|amount| {
+                    build_or([
+                        compiler
+                            .trick_requirements
+                            .get(Trick::SentrySwap, &mut Some(amount))
+                            .unwrap(),
+                        compiler
+                            .trick_requirements
+                            .get(Trick::FlashSwap, &mut Some(amount))
+                            .unwrap(),
+                        compiler
+                            .trick_requirements
+                            .get(Trick::BlazeSwap, &mut Some(amount))
+                            .unwrap(),
+                    ])
+                }),
                 "GrenadeCancel" => Ok(Requirement::NonConsumingEnergySkill(Skill::Grenade)),
                 "BowCancel" => Ok(Requirement::NonConsumingEnergySkill(Skill::Bow)),
                 other => match compile_state(compiler, other, self.identifier.span) {

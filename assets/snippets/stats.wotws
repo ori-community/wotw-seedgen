@@ -549,7 +549,7 @@ on WestHollow.SpiritTrial {
     store(hollow_pickups_collected, hollow_pickups_collected + 1)
     store(pickups_collected, pickups_collected + 1)
 }
-on WestHollow.BelowLupoEX {
+on WestHollow.FallingSlugEX {
     store(hollow_pickups_collected, hollow_pickups_collected + 1)
     store(pickups_collected, pickups_collected + 1)
 }

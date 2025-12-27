@@ -71,7 +71,7 @@ WestHollow.SwimEC, Hollow, EnergyFragment, , 937, 24175, , -177.8, -4354.2, -177
 WestHollow.LupoMap, Hollow, Lupo, Hollow, 48248, 3638, , -146, -4321, -146, -4321
 WestHollow.TrialHC, Hollow, HealthFragment, , 937, 2463, , -122.0, -4268.2, -121.979996, -4267.23
 WestHollow.SpiritTrial, Hollow, RaceStart, 1000, 44964, 25545, 2, -115, -4259, -115, -4257.2
-WestHollow.BelowLupoEX, Hollow, SpiritLight, 50, 937, 48192, , -82.3, -4369.6, -82.32001, -4369.565
+WestHollow.FallingSlugEX, Hollow, SpiritLight, 50, 937, 48192, , -82.3, -4369.6, -82.32001, -4369.565
 WestHollow.AboveDashEX, Hollow, SpiritLight, 50, 937, 61744, , -100.0, -4407.2, -99.98999, -4407.225
 WestHollow.DashRightEX, Hollow, SpiritLight, 50, 937, 37926, , 11.6, -4401.1, 11.600098, -4401.12
 WestHollow.CrusherEX, Hollow, SpiritLight, 200, 937, 50176, , -37.5, -4452.6, -37.47986, -4452.6426
@@ -90,7 +90,8 @@ EastHollow.KwolokAmuletQuest, Hollow, QuestItem, 500 SpiritLight, 14019, 50597, 
 EastHollow.RightKwolokEX, Hollow, SpiritLight, 100, 58674, 20983, , 289.0, -4195.7, 289.0374, -4195.708
 EastHollow.SilentSwimEC, Hollow, EnergyFragment, , 58674, 9583, , 331.9, -4191.3, 331.87, -4190.344
 EastHollow.SplinterShard, Hollow, Shard, Splinter, 23987, 62973, , 216.2, -4307.3, 216.17882, -4306.3125
-EastHollow.ForestsVoice, Hollow, Wisp, Voice, 46462, 59806, , 191, -4212, 191, -4212
+EastHollow.ForestsVoice, Hollow, Wisp, Voice, 46462, 59806, , 186, -4213, 180, -4210
+EastHollow.WellspringDoneTalk, Hollow, QuestItem, 500 SpiritLight, 937, 34641, 4, 191, -4212, 191.054, -4212.027
 EastHollow.KwolokSwimOre, Hollow, GorlekOre, , 46462, 37897, , 243.4, -4223.5, 243.44835, -4223.517
 EastHollow.KwolokSwimLeftEX, Hollow, SpiritLight, 200, 46462, 29054, , 113.0, -4228.5, 113, -4228.5
 EastHollow.KwolokSwimRightEX, Hollow, SpiritLight, 50, 46462, 20780, , 161.5, -4244.8, 161.49835, -4244.7866

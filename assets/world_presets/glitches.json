@@ -22,15 +22,19 @@
     "SwordJump",
     "GrenadeRedirect",
     "SentryRedirect",
-    "PauseHover",
+    "PauseFloat",
     "GlideJump",
-    "HammerJump",
     "AerialHammerJump",
     "GlideHammerJump",
     "CoyoteHammerJump",
     "WallHammerJump",
     "GroundedHammerJump",
-    "ExtendedHammer",
-    "SpearJump"
+    "HammerExtension",
+    "SpearJump",
+    "GlideBashChain",
+    "DoubleJumpBashChain",
+    "DashBashChain",
+    "LaunchBashChain",
+    "Unpopular"
   ]
 }

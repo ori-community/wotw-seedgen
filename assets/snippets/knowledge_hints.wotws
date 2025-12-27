@@ -61,7 +61,7 @@
     on EastPools.TeleporterActive if randoState.cleanWater && is_in_box(-1334, -4160, -1280, -4121) == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(CentralPools) + " won't be required until you find " + clean_water_string())
     on WestPools.TeleporterActive if randoState.cleanWater && is_in_box(-1677, -4175, -1625, -4156) == false
-        item_message("#Motay's Note#\nUsing the " + teleporter_string(PoolsBoss) + " won't be required until you find " + clean_water_string())
+        item_message("#Motay's Note#\nUsing the " + teleporter_string(PoolsBoss) + " won't be required until you find " + clean_water_string() + " and " + skill_string(WaterDash))
     on LowerWastes.CentralTeleporterActive if skills.burrow && is_in_box(1946, -3910, 2018, -3857) == false
         item_message("#Motay's Note#\nUsing the " + teleporter_string(CentralWastes) + " won't be required until you find " + skill_string(Burrow))
     on UpperWastes.TeleporterActive if skills.burrow && is_in_box(2013, -3690, 2067, -3658) == false

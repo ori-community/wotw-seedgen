@@ -307,8 +307,6 @@ pub enum Trick {
     GrenadeJump,
     /// Preserving Double Jump momentum with Sword
     SwordJump,
-    /// Preserving momentum with Hammer
-    HammerJump,
     /// Preserving Glide Jump momentum with Hammer
     AerialHammerJump,
     /// Storing a grounded jump into the air with Glide
@@ -322,15 +320,25 @@ pub enum Trick {
     /// Preserving Jump momentum with Hammer
     GroundedHammerJump,
     /// Swinging Hammer back and forth to preserve movementum longer
-    ExtendedHammer,
+    HammerExtension,
     /// Redirecting projectiles with Grenade
     GrenadeRedirect,
     /// Redirecting projectiles with Sentry
     SentryRedirect,
     /// Cancelling falling momentum through the pause menu
-    PauseHover,
+    PauseFloat,
     /// Storing a grounded jump into the air with Spear
     SpearJump,
+    /// Chaining Bash on the same target by cancelling the momentum with Glide
+    GlideBashChain,
+    /// Chaining Bash on the same target by cancelling the momentum with Double Jump
+    DoubleJumpBashChain,
+    /// Chaining Bash on the same target by cancelling the momentum with Dash
+    DashBashChain,
+    /// Chaining Bash on the same target by cancelling the momentum with Launch
+    LaunchBashChain,
+    /// Any specific trick that is unpopular for any reason
+    Unpopular,
 }
 
 impl Trick {
@@ -353,16 +361,20 @@ impl Trick {
             | Self::BlazeSwap
             | Self::WaveDash
             | Self::SwordJump
-            | Self::HammerJump
             | Self::GlideHammerJump
             | Self::CoyoteHammerJump
             | Self::WallHammerJump
             | Self::GroundedHammerJump
-            | Self::ExtendedHammer
+            | Self::HammerExtension
             | Self::GrenadeRedirect
             | Self::SentryRedirect
-            | Self::PauseHover
-            | Self::SpearJump => Difficulty::Unsafe,
+            | Self::PauseFloat
+            | Self::SpearJump
+            | Self::GlideBashChain
+            | Self::DoubleJumpBashChain
+            | Self::DashBashChain
+            | Self::LaunchBashChain
+            | Self::Unpopular => Difficulty::Unsafe,
         }
     }
 }
