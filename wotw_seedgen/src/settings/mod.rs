@@ -720,6 +720,7 @@ pub enum Trick {
     /// Storing a grounded jump into the air with Glide
     GlideJump,
     /// Hammer Jump with Double Jump
+    #[serde(alias = "HammerJump")]
     AerialHammerJump,
     /// Preserving Glide Jump momentum with Hammer
     GlideHammerJump,
