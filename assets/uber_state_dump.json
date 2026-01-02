@@ -1055,6 +1055,13 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "23": {
+          "name": "catAndMouseSoftlockFixEnabled",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "30": {
           "name": "useSpawnTuleyRandoState",
           "readonly": false,
