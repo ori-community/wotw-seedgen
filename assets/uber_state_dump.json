@@ -1056,7 +1056,7 @@
           "value_type": "Boolean"
         },
         "23": {
-          "name": "catAndMouseSoftlockFixEnabled",
+          "name": "fixCatAndMouseSoftlock",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,

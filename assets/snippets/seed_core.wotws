@@ -11,6 +11,9 @@ on spawn {
     store(randoConfig.fixTeleporterChainOutOfBounds, true)
     // In vanilla you can softlock if you don't trigger the Kwolok fight and swim too far left below the starting trigger
     store(randoConfig.fixKwolokBossEscapeUnderwaterSpiritLightSoftlock, true)
+    // If you leave the cat and mouse sequence without going to Wastes, you can save a state with killplanes locking you out. This adds rocks preventing you from leaving.
+    // It also prevents an accidental OOB when retriggering the cracking bones after respawning in cat and mouse.
+    store(randoConfig.fixCatAndMouseSoftlock, true)
     // Shop anywhere breaks the economy
     store(randoConfig.fixShopAnywhere, true)
     // Patch 2 knockback is generally preferred by high level players and may be assumed in logic
