@@ -6,26 +6,35 @@
 
 on spawn {
     // Static cutscene skips
-    store(howlsDenGRoup.hasOriUsedSavePedestal, true)
-    store(_petrifiedForestGroup.mokiFoulWaterVignetteTriggered, true)
-    store(_petrifiedForestGroup.mokiCleanWaterVignetteTriggered, true)
-    store(lumaPoolsStateGroup.playedMokiVignette, true)
-    store(npcsStateGroup.stenchTease, true)
-    store(lagoonStateGroup.wispSequencePlayedOut, true)
-    store(npcsStateGroup.baurReachWispIntro, true)
-    store(npcsStateGroup.mouldwoodDepthsWisptIntro, true)
-    store(windsweptWastesGroupDescriptor.wispSequencePlayedOut, true)
-    store(howlsOriginGroup.interactedWithTokk, true)
-    store(waterMillStateGroupDescriptor.rescuedOpher, true)
-    store(lumaPoolsStateGroup.talkedToKwolok, true)
-    if questUberStateGroup.findToadQuestUberState < 1 store(questUberStateGroup.findToadQuestUberState, 1)
-    if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
-    store(windtornRuinsGroup.ruinsVisited, true)
-    store(swampStateGroup.powlTeaseTriggered, true)
-    store(baursReachGroup.powlTeaseTriggered, true)
-    store(waterMillStateGroupDescriptor.playedNaruGumoCutaway, true)
-    store(willowsEndGroup.introPlayed, true)
-    store(weepingRidgeElevatorFightGroup.willowsEndGateOpened, true)
+    store(howlsDenGRoup.hasOriUsedSavePedestal, true) // Moki dialogue when finding a Spirit Well
+    store(_petrifiedForestGroup.mokiFoulWaterVignetteTriggered, true) // Kwolok room Moki dialogue with dirty water
+    store(_petrifiedForestGroup.mokiCleanWaterVignetteTriggered, true) // Kwolok room Moki dialogue with clean water (technically still triggered after Wellspring escape)
+    store(_petrifiedForestGroup.petrifiedForestNewTransitionOriVignettePlayed, true) // Woods entrance cutscene
+    store(_petrifiedForestGroup.narratorLineShown, true) // Narrator line before finding Ku
+    store(58674|14539, true) // _petrifiedForestGroup.powlVignettePlayed, cutscene in 4KS room after collecting the bottom keystone
+    store(_petrifiedForestGroup.narratorLineShownHowl, true) // Narrator line when finding petrified Howl
+    store(58674|32369, true) // _petrifiedForestGroup.powlVignettePlayed, Collapsing stone owl sequence
+    store(_petrifiedForestGroup.featherVignettePlayed, true) // Feather floating away cutscene
+    store(_petrifiedForestGroup.petrifiedOwlStalkSequenceCompleted, true) // Short Shriek chase after feather floating away
+    // TODO isn't this logically relevant?
+    store(lumaPoolsStateGroup.playedMokiVignette, true) // Moki dialogue before Kwolok fight
+    store(npcsStateGroup.stenchTease, true) // Voice dialogue before Wellspring escape
+    store(lagoonStateGroup.wispSequencePlayedOut, true) // Voice dialogue at Pools entrance
+    store(npcsStateGroup.baurReachWispIntro, true) // Voice dialogue at Reach entrance
+    store(npcsStateGroup.mouldwoodDepthsWisptIntro, true) // Voice dialogue at Depths entrance
+    store(windsweptWastesGroupDescriptor.wispSequencePlayedOut, true) // Voice dialogue at Wastes entrance
+    store(howlsOriginGroup.interactedWithTokk, true) // Forced Tokk dialogue at bell puzzle
+    store(waterMillStateGroupDescriptor.rescuedOpher, true) // TODO what this?
+    store(lumaPoolsStateGroup.talkedToKwolok, true) // Kwolok dialogue before going up to Water Dash
+    if questUberStateGroup.findToadQuestUberState < 1 store(questUberStateGroup.findToadQuestUberState, 1) // TODO what this?
+    if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2) // Cutscene in front of Wellspring
+    store(windtornRuinsGroup.ruinsVisited, true) // Cinematic when entering Ruins
+    store(swampStateGroup.powlTeaseTriggered, true) // Shriek tease when meeting Opher
+    store(swampStateGroup.interactedWithOpher, true) // probably does nothing, but gets set with the above
+    store(baursReachGroup.powlTeaseTriggered, true) // Shriek tease before Grenade KS room
+    store(waterMillStateGroupDescriptor.playedNaruGumoCutaway, true) // Cinematic when entering Wellspring
+    store(willowsEndGroup.introPlayed, true) // Cutscene when entering Willow's End
+    store(weepingRidgeElevatorFightGroup.willowsEndGateOpened, true) // Seir opening the Willow's End entrance
     store(randoConfig.disableWillowHeartCutscenes, true)
     // Dialogue skips
     store(npcsStateGroup.metOpherHubAfterWatermill, true)

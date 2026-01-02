@@ -2,52 +2,54 @@
 #name("Seed Core")
 #description("Essentials for the randomizer to function")
 
-// TODO test
-// TODO check over these, for instance why risingPedestals?
-// TODO add comments
 on spawn {
+    // For generated seeds, logic filter should always be available
     store(randoConfig.inLogicFilterEnabled, true)
+    // At Voice it's very easy to accidentally clip OOB, we disable this to make the rules easier to follow
     store(randoConfig.fixMeetingKwolokUnderwaterTrigger, true)
+    // Teleporting twice in quick succession can happen easily and may violate no OOB rules and also creates an annoying permanent sound
     store(randoConfig.fixTeleporterChainOutOfBounds, true)
+    // In vanilla you can softlock if you don't trigger the Kwolok fight and swim too far left below the starting trigger
     store(randoConfig.fixKwolokBossEscapeUnderwaterSpiritLightSoftlock, true)
+    // Shop anywhere breaks the economy
     store(randoConfig.fixShopAnywhere, true)
+    // Patch 2 knockback is generally preferred by high level players and may be assumed in logic
     store(randoConfig.patch2Kickback, true)
+    // Being unable to teleport can be very confusing or even softlock
     store(randoConfig.allowTeleportingUnderwater, true)
     store(randoConfig.allowTeleportingDuringCombatShrineFights, true)
+    // Moving npcs cannot be used logically, so we keep them spawned everywhere
     store(randoConfig.useSpawnOpherEverywhereRandoState, true)
     store(randoState.spawnOpherEverywhere, true)
     store(randoConfig.useSpawnTwillenEverywhereRandoState, true)
     store(randoState.spawnTwillenEverywhere, true)
+    // The flooded regen tree room cannot be used logically, so to improve logic intuition we always drain the room
     store(randoConfig.useRegenTreeDrainedRandoState, true)
     store(randoState.regenTreeDrained, true)
-    store(randoConfig.useRainLiftedInMarshRandoState, true)
-    store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
+    // Enemies despawning if you spawn too close causes a lot of logic headaches
     store(randoConfig.allowSpawningEnemiesNearby, true)
+    // Fast travel is necessary to prevent softlocks where you can't return to your spawn
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
+    // We build the glades tp by default so the tp item works without having to go there
     store(gromShop.spiritWellBought, true)
+    // Beautify has no logical advantage but would bring up all other logical ore prices, so we just build it by default instead
     store(gromShop.beautifyBought, true)
+    // Torch cannot be used logically and would also have weird consequences, better it doesn't exist in rando
     store(swampStateGroup.torchHolded, true)
-    store(kwolokGroupDescriptor.risingPedestals, true)
     store(inkwaterMarshStateGroup.mokiTorchPlayed, true)
+    // Opening the kwolok statue would lock you out of pulling the lever above, so we pull the lever to make logic more intuitive
     store(swampStateGroup.leverA, true)
-    store(_petrifiedForestGroup.narratorLineShown, true)
-    store(58674|32369, true) // _petrifiedForestGroup.powlVignettePlayed
-    store(58674|14539, true) // _petrifiedForestGroup.powlVignettePlayed
-    store(_petrifiedForestGroup.skeletonState, true)
-    store(_petrifiedForestGroup.narratorLineShownHowl, true)
-    store(_petrifiedForestGroup.featherVignettePlayed, true)
-    store(_petrifiedForestGroup.petrifiedOwlStalkSequenceCompleted, true)
+    store(npcsStateGroup.tokkKwolokDialogState, 1)
+    // Ku would create a lot of logic problems and is kind of boring (sorry Ku), so goodbye
+    store(_petrifiedForestGroup.petrifiedForestNewTransitionKuVignettePlayed, 2)
+    store(questUberStateGroup.findKuQuest, 4)
+    store(questUberStateGroup.lastGlobalEvent, 2)
     store(questUberStateGroup.winterForestWispQuestUberState, 1)
     store(questUberStateGroup.lagoonWispQuestUberState, 1)
     store(questUberStateGroup.desertWispQuestUberState, 1)
     store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 1)
-    store(_petrifiedForestGroup.petrifiedForestNewTransitionOriVignettePlayed, true)
-    store(_petrifiedForestGroup.petrifiedForestNewTransitionKuVignettePlayed, 2)
-    store(questUberStateGroup.lastGlobalEvent, 2)
-    store(questUberStateGroup.findKuQuest, 4)
-    // TODO this gets reset when collecting voice, does it need to be reset?
-    store(questUberStateGroup.lookForKuQuestUberState, 4)
-    store(swampStateGroup.interactedWithOpher, true)
+    // TODO this gets reset when collecting voice, does it need to be reset? Does this even do something?
+    // store(questUberStateGroup.lookForKuQuestUberState, 4)
 }
 
 // TODO fully support random grom shop and remove this
@@ -134,6 +136,7 @@ on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.
+on spawn store(randoConfig.useRainLiftedInMarshRandoState, true)
 on HowlsDen.SwordTree store(randoState.rainLiftedInMarsh, true)
 // This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
 // This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
@@ -150,6 +153,7 @@ on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState,
 on WillowsEnd.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
 
 // In door rando or with warps/oob, collecting the DollQI can skip earlier quest steps and lock you out of obtaining the key.
+on spawn store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
 // When receiving the key, allow opening the hut
 on questUberStateGroup.familyReunionQuest == 2 {
     store(randoState.canOpenMokiFatherHut, true)
