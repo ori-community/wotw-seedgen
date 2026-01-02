@@ -33,6 +33,8 @@ on spawn {
     store(randoConfig.allowSpawningEnemiesNearby, true)
     // Fast travel is necessary to prevent softlocks where you can't return to your spawn
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
+    // The spawn cutscene pulls you in as soon as it's loaded, which allows warping through walls and such
+    store(swampStateGroup.finishedIntroTop, true)
     // We build the glades tp by default so the tp item works without having to go there
     store(gromShop.spiritWellBought, true)
     // Beautify has no logical advantage but would bring up all other logical ore prices, so we just build it by default instead
