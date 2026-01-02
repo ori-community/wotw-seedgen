@@ -61,7 +61,7 @@ on reload {
         gromShop.spiritWellBought,
         1,
         "Repair the Spirit Well",
-        "They say the spirit of old could #warp# from one well to another. Perhaps if we #repaired this well with Gorlek Ore#, returning to the #Wellspring Glades# would be even easier.",
+        "They say the spirits of old could #warp# from one well to another. Perhaps if we #repaired this well with Gorlek Ore#, returning to the #Wellspring Glades# would be even easier.",
         RepairTheSpiritWell,
     )
     set_shop_item_data(
@@ -103,7 +103,7 @@ on reload {
         gromShop.beautifyBought,
         10,
         "The Gorlek Touch",
-        "The Moki are right...building it only half the work. Nothing's quite complete without some #finishing touches# of decoration.",
+        "The Moki are right...building is only half the work. Nothing's quite complete without some #finishing touches# of decoration.",
         TheGorlekTouch,
     )
     // TODO Tuley
