@@ -54,7 +54,7 @@ on spawn {
     store(questUberStateGroup.desertWispQuestUberState, 1)
     store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 1)
     // Disable the slow walk zone in east woods
-    store(randoConfig.useEastWoodsTrunkSlowWalkZoneEnabledState, 1)
+    store(randoConfig.useEastWoodsTrunkSlowWalkZoneEnabledState, true)
     // TODO this gets reset when collecting voice, does it need to be reset? Does this even do something?
     // store(questUberStateGroup.lookForKuQuestUberState, 4)
 }
