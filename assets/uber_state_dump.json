@@ -868,6 +868,13 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "36": {
+          "name": "eastWoodsTrunkSlowWalkZoneEnabledState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "100": {
           "name": "enableSpoilerFilter",
           "readonly": false,
@@ -1099,6 +1106,13 @@
         },
         "35": {
           "name": "useRegenTreeDrainedRandoState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "36": {
+          "name": "useEastWoodsTrunkSlowWalkZoneEnabledState",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
