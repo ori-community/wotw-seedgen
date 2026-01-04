@@ -2,40 +2,39 @@ mod cache;
 mod completion;
 mod convert;
 mod error;
+mod hover;
 mod semantic_tokens;
 
-use std::fmt::Display;
-
+use crate::{cache::Cache, convert::path_from_lsp, hover::hover};
 use completion::Completion;
 use dashmap::{
     mapref::one::{Ref, RefMut},
     DashMap,
 };
 use semantic_tokens::{semantic_tokens, semantic_tokens_legend};
+use std::fmt::Display;
 use tower_lsp::{
     jsonrpc::Result,
     lsp_types::{
         CompletionOptions, CompletionParams, CompletionResponse, Diagnostic, DiagnosticSeverity,
-        DidChangeTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
-        InitializeParams, InitializeResult, MessageType, ParameterInformation, ParameterLabel,
-        SemanticTokens, SemanticTokensFullOptions, SemanticTokensOptions, SemanticTokensParams,
-        SemanticTokensResult, SemanticTokensServerCapabilities, ServerCapabilities, ServerInfo,
-        SignatureHelp, SignatureHelpOptions, SignatureHelpParams, SignatureInformation,
-        TextDocumentItem, TextDocumentPositionParams, TextDocumentSyncCapability,
-        TextDocumentSyncKind, Url,
+        DidChangeTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams, Hover,
+        HoverParams, HoverProviderCapability, InitializeParams, InitializeResult, MessageType,
+        ParameterInformation, ParameterLabel, SemanticTokens, SemanticTokensFullOptions,
+        SemanticTokensOptions, SemanticTokensParams, SemanticTokensResult,
+        SemanticTokensServerCapabilities, ServerCapabilities, ServerInfo, SignatureHelp,
+        SignatureHelpOptions, SignatureHelpParams, SignatureInformation, TextDocumentItem,
+        TextDocumentPositionParams, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     },
     Client, LanguageServer, LspService, Server,
 };
 use wotw_seedgen_data::{
-    assets::{AssetCache, DefaultFileAccess, PlandoFileAccess},
+    assets::{AssetCache, AssetCacheValues, DefaultFileAccess, PlandoFileAccess},
     parse::Severity,
     seed_language::{
         ast,
         compile::{Compiler, FunctionIdentifier},
     },
 };
-
-use crate::{cache::Cache, convert::path_from_lsp};
 
 struct Backend {
     client: Client,
@@ -217,6 +216,7 @@ impl LanguageServer for Backend {
                         },
                     ),
                 ),
+                hover_provider: Some(HoverProviderCapability::Simple(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -280,6 +280,22 @@ impl LanguageServer for Backend {
             .await;
 
         self.update_diagnostics(uri).await;
+    }
+
+    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+        self.log("received textDocument/hover").await;
+
+        let (source, index) =
+            self.get_text_document_position(params.text_document_position_params)?;
+        let ast = ast::Snippet::parse(source.value());
+        let cache = self.cache.read().await;
+
+        Ok(hover(
+            source.value(),
+            ast.parsed,
+            index,
+            cache.uber_state_data(),
+        ))
     }
 
     async fn semantic_tokens_full(
