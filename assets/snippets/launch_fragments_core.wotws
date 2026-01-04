@@ -1,0 +1,44 @@
+#hidden
+#name("Launch Fragments Core")
+#description("Adds support for Launch Fragments")
+
+!builtin_icon(launch_fragment_icon, "icons/bonus/launchfragment.png")
+
+// TODO shouldn't have to be a state
+!state(required, Integer)
+!export(required)
+!state(collected, Integer)
+
+!include("progress_helper", write_progress_message)
+
+!augment_fun(write_progress_message, {
+    set_integer("amount", collected)
+    write_amount()
+    set_string("progress_message", get_string("progress_message") + "\n*Launch Fragments* " + get_string("amount"))
+})
+
+fun write_amount() {
+    set_string("color", "")
+    if get_integer("amount") >= required set_string("color", "$")
+    set_string("amount", get_string("color") + "(" + get_integer("amount") + "/" + required + ")" + get_string("color"))
+}
+
+fun launch_fragment() {
+    set_integer("amount", collected + 1)
+    write_amount()
+    item_message("*Launch Fragment* " + get_string("amount"))
+    store(collected, get_integer("amount"))
+}
+!export(launch_fragment)
+
+!item_data(
+    launch_fragment(),
+    "*Launch Fragment*",
+    200,
+    "Collect " + required + " *Launch Fragments* to get " + skill_string(Launch),
+    launch_fragment_icon,
+    LaunchFragment
+)
+
+on collected == required skill(Launch)
+// TODO how do logical launch later

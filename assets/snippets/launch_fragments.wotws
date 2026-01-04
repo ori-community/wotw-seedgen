@@ -6,33 +6,10 @@
 !config(required, "How many Launch Fragments are required to get Launch", Integer, 3)
 !tags("Launch Fragments (" + required + "/" + total + ")")
 
-!builtin_icon(launch_fragment_icon, "icons/bonus/launchfragment.png")
+!include("launch_fragments_core", launch_fragment, required as required_state)
 
-!state(collected, Integer)
+on spawn store(required_state, required)
 
-fun launch_fragment() {
-    store(collected, collected + 1)
-}
-!item_data(
-    launch_fragment(),
-    "*Launch Fragment*",
-    200,
-    "Collect " + required + " *Launch Fragment*s to get " + skill_string(Launch),
-    launch_fragment_icon,
-    LaunchFragment
-)
 !add_item(launch_fragment(), total)
 
 !remove_item(skill(Launch), 1)
-on collected == required skill(Launch)
-// TODO how do logical launch later
-fun display() {
-    if collected < required {
-        item_message("*Launch Fragments* (" + collected + "/" + required + ")")
-    }
-    if collected >= required {
-        item_message("*Launch Fragments* $(" + collected + "/" + required + ")$")
-    }
-}
-
-// TODO now this would need communication with the progress helper...
