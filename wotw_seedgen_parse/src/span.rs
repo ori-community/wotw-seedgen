@@ -317,6 +317,6 @@ where
     V: Ast<'source, T>,
 {
     fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
-        Some(V::ast_impl_spanned::<E>(parser))
+        Some(V::ast_no_errors_spanned(parser))
     }
 }
