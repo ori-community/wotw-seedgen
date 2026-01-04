@@ -15,6 +15,8 @@ pub enum Token {
     Fun,
     #[token("if")]
     If,
+    #[token("as")]
+    As,
     #[token("true", |_| true)]
     #[token("false", |_| false)]
     Boolean(bool),

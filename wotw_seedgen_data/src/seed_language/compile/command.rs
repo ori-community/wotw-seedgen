@@ -131,39 +131,44 @@ impl<'source> Compile<'source> for ast::IncludeArgs<'source> {
         if let Some((_, imports)) = self.imports.data {
             for import in imports {
                 if let SpannedOption::Some(import) = import.value {
-                    let Some(value) = snippet_exported_values.get(import.data.0) else {
+                    let Some(value) = snippet_exported_values.get(import.identifier.data.0) else {
                         compiler.errors.push(
                             Error::error(
                                 "identifier not found in snippet".to_string(),
-                                import.span,
+                                import.identifier.span,
                             )
                             .with_help(format!(
                                 "if it exists in {}, you have to export it there: !export({})",
-                                self.path.data, import.data
+                                self.path.data, import.identifier.data
                             )),
                         );
 
                         continue;
                     };
 
+                    let identifier = import
+                        .rename
+                        .into_option()
+                        .map_or(import.identifier, |(_, identifier)| identifier);
+
                     match value {
                         ExportedValue::Function(index) => {
                             compiler
                                 .preprocessed
                                 .functions
-                                .insert(import.data.0.to_string());
+                                .insert(identifier.data.0.to_string());
 
                             compiler
                                 .function_indices
-                                .insert(import.data.0.to_string(), *index);
+                                .insert(identifier.data.0.to_string(), *index);
 
                             // TODO is this still used?
                             compiler
                                 .function_imports
-                                .insert(import.data.0.to_string(), self.path.data.to_string());
+                                .insert(identifier.data.0.to_string(), self.path.data.to_string());
                         }
                         ExportedValue::Literal(literal) => {
-                            compiler.variables.insert(import.data, literal.clone());
+                            compiler.variables.insert(identifier.data, literal.clone());
                         }
                     }
                 }

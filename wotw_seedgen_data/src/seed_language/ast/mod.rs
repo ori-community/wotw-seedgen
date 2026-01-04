@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, EnumDiscriminants, VariantArray, VariantNames};
 use utoipa::ToSchema;
-use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult};
+use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult, SpannedOption};
 
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
@@ -529,7 +529,17 @@ pub struct IncludeArgs<'source> {
 }
 
 pub type IncludeArgsImports<'source> =
-    Separated<Recoverable<Spanned<Identifier<'source>>, RecoverSkipExpression>, Symbol<','>>;
+    Separated<Recoverable<IncludeImport<'source>, RecoverSkipExpression>, Symbol<','>>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct IncludeImport<'source> {
+    pub identifier: Spanned<Identifier<'source>>,
+    pub rename: SpannedOption<(Spanned<As>, Spanned<Identifier<'source>>)>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(token = Token::As)]
+pub struct As;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]

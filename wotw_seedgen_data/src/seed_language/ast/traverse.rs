@@ -427,7 +427,16 @@ impl<H: Handler> Traverse<H> for IncludeArgs<'_> {
         if let Some((_, imports)) = &self.imports.data {
             for import in imports {
                 if let SpannedOption::Some(import) = &import.value {
-                    handler.identifier_def(import);
+                    match &import.rename {
+                        SpannedOption::Some((keyword, identifier)) => {
+                            handler.identifier(&import.identifier);
+                            handler.keyword(&keyword.span);
+                            handler.identifier_def(identifier);
+                        }
+                        SpannedOption::None(_) => {
+                            handler.identifier_def(&import.identifier);
+                        }
+                    }
                 }
             }
         }
