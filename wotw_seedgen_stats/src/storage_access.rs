@@ -1,7 +1,7 @@
 use crate::Result;
 use wotw_seedgen::{
     data::{
-        assets::{self, DATA_DIR},
+        assets::{self, SEEDGEN_USER_DATA_DIR},
         UniverseSettings,
     },
     spoiler::SeedSpoiler,
@@ -9,7 +9,7 @@ use wotw_seedgen::{
 
 /// Access seed files across stats runs
 ///
-/// When generating stats multiple times with the same settings, seeds generated for previous runs can be reused  
+/// When generating stats multiple times with the same settings, seeds generated for previous runs can be reused
 /// These trait methods will be used to store and reuse seeds across stats runs
 pub trait SeedStorageAccess {
     type Iter: Iterator<Item = Result<SeedSpoiler>>;
@@ -39,7 +39,7 @@ use std::{
 
 use rustc_hash::FxHasher;
 
-static SEED_STORAGE_DIR: LazyLock<PathBuf> = LazyLock::new(|| DATA_DIR.join("seed_storage"));
+static SEED_STORAGE_DIR: LazyLock<PathBuf> = LazyLock::new(|| SEEDGEN_USER_DATA_DIR.join("seed_storage"));
 
 /// A [`SeedStorageAccess`] implementation storing and fetching seeds using the local filesystem
 pub struct FileAccess;

@@ -8,7 +8,7 @@ use crate::{
 use itertools::Itertools;
 use sanitize_filename::sanitize;
 use wotw_seedgen::data::{
-    assets::{self, DefaultFileAccess, DATA_DIR},
+    assets::{self, DefaultFileAccess, SEEDGEN_USER_DATA_DIR},
     Spawn, UniverseSettings, DEFAULT_SPAWN,
 };
 use wotw_seedgen_stats::{
@@ -51,7 +51,7 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
     let settings_json = serde_json::to_string(settings)?;
     let settings_summary = summarize_settings(settings);
 
-    let mut path = DATA_DIR.join("stats");
+    let mut path = SEEDGEN_USER_DATA_DIR.join("stats");
 
     for index in 0.. {
         let mut unique_settings_summary = settings_summary.clone();

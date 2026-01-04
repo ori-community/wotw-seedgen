@@ -16,7 +16,7 @@ use wotw_seedgen::{
     data::{
         assets::{
             self, file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
-            DATA_DIR,
+            SEEDGEN_USER_DATA_DIR,
         },
         logic_language::{ast::Areas, output::Graph},
         parse::Source,
@@ -60,7 +60,7 @@ fn write_seed(
     launch: bool,
     start: Instant,
 ) -> Result<(), Error> {
-    let seeds_dir = DATA_DIR.join("seeds");
+    let seeds_dir = SEEDGEN_USER_DATA_DIR.join("seeds");
     assets::create_dir_all(&seeds_dir)?;
 
     let path = if seed_universe.worlds.len() == 1 {

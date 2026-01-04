@@ -4,9 +4,9 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use wotw_seedgen::data::{
     MapIcon,
     assets::{
-        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DATA_DIR,
-        DefaultAssetCacheValues, DefaultFileAccess, LocData, PresetFileAccess, SnippetFileAccess,
-        StateData, UberStateData,
+        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
+        DefaultFileAccess, LocData, PresetFileAccess,
+        SEEDGEN_USER_DATA_DIR, SnippetFileAccess, StateData, UberStateData,
     },
     logic_language::{ast::Areas, output::Graph},
     parse::Source,
@@ -182,7 +182,7 @@ fn snippet_info(snippets: &FxHashMap<String, Source>) -> Vec<SnippetInfo> {
 }
 
 fn data_dir_snippets() -> FxHashSet<String> {
-    fs::read_dir(DATA_DIR.join("snippets"))
+    fs::read_dir(SEEDGEN_USER_DATA_DIR.join("snippets"))
         .into_iter()
         .flatten()
         .flatten()

@@ -2,7 +2,7 @@ use std::io;
 
 use fern::{colors::ColoredLevelConfig, Dispatch};
 use log::LevelFilter;
-use wotw_seedgen::data::assets::{self, DATA_DIR};
+use wotw_seedgen::data::assets::{self, LOG_DATA_DIR};
 
 use crate::{
     cli::{VerboseArgs, VerboseTarget},
@@ -62,7 +62,7 @@ impl LogConfig {
         );
 
         if self.trace_seedgen {
-            assets::create_dir_all(&*DATA_DIR)?;
+            assets::create_dir_all(&*LOG_DATA_DIR)?;
 
             dispatch = dispatch.chain(
                 Dispatch::new()
@@ -81,7 +81,7 @@ impl LogConfig {
                         "wotw_seedgen::generator::doors",
                         level_filter(self.trace_doors),
                     )
-                    .chain(assets::file_create(DATA_DIR.join("seedgen_log.txt"))?),
+                    .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?),
             )
         }
 
