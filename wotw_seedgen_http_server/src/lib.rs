@@ -1,5 +1,5 @@
 use std::{net::Ipv4Addr, sync::Arc, time::Duration};
-
+use std::net::SocketAddrV4;
 use axum::Router;
 use single_instance::SingleInstance;
 use tokio::{
@@ -65,7 +65,12 @@ async fn serve(router: Router) -> Result<()> {
 }
 
 async fn listener() -> TcpListener {
-    TcpListener::bind((Ipv4Addr::LOCALHOST, 51413))
+    let addr = SocketAddrV4::new(Ipv4Addr::LOCALHOST, 51413);
+    let listener = TcpListener::bind(addr)
         .await
-        .unwrap()
+        .unwrap();
+
+    eprintln!("Listening on {addr}");
+
+    listener
 }
