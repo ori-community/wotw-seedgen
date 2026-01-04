@@ -3,7 +3,7 @@ use ordered_float::OrderedFloat;
 use std::ops::Range;
 use wotw_seedgen_parse::{
     parse_ast, Ast, ErrorKind, ErrorMode, Identifier, ParseResult, Parser, Recover, Recoverable,
-    Separated, SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned, Symbol,
+    Separated, SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned, SpannedOption, Symbol,
 };
 
 #[inline]
@@ -172,7 +172,7 @@ pub enum AnchorContent<'source> {
     NoSpawn(Spanned<NoSpawn>),
     TpRestriction(
         Spanned<TpRestrictionKeyword>,
-        Spanned<Option<RequirementLineOrGroup<'source>>>,
+        SpannedOption<RequirementLineOrGroup<'source>>,
     ),
     Refill(
         Spanned<RefillKeyword>,

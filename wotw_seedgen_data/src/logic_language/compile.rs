@@ -681,7 +681,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                     }
                     ast::AnchorContent::TpRestriction(keyword, requirements) => {
                         let requirement = requirements
-                            .data
+                            .into_option()
                             .map_or(Requirement::Impossible, |group| group.compile(compiler));
 
                         if teleport_restriction.replace(requirement).is_some() {
