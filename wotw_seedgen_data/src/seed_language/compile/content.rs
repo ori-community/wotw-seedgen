@@ -81,7 +81,7 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                     None => Some(Trigger::Binding(uber_state.uber_identifier)),
                     Some(_) => {
                         let mut error = Error::error(
-                            "cannot bind to an alias which resolves to an integer state comparison"
+                            "cannot bind to an alias which resolves to an integer comparison"
                                 .to_string(),
                             span,
                         );
@@ -93,7 +93,7 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                             .get(&uber_state.uber_identifier)
                         {
                             error = error.with_help(format!(
-                                "maybe you could use the underlying quest state {}",
+                                "maybe you can use the underlying quest state {}?",
                                 entry.preferred_name()
                             ))
                         }

@@ -1013,7 +1013,7 @@ fn alias_type_error(
         )
         .with_help("check the loc_data or state_data entry that defines this alias".to_string()),
         Some(uber_state) => type_error(Type::Boolean, expected, span).with_help(format!(
-            "did you intend to use the underlying UberIdentifier {}?",
+            "this alias resolves to an integer comparison, maybe you can use the underlying UberIdentifier {}?",
             uber_state.preferred_name()
         )),
     }
