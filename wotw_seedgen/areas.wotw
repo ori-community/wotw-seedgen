@@ -143,7 +143,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
       Launch  # Launching along the ceiling, starting above the LongSwimEX
       Grapple, Spear=1 OR Blaze=2
       HowlsDen.RainLifted, DoubleJumpBashChain OR GlideBashChain   # Chain bash the mantis
-      Unpopular, HowlsDen.RainLifted, DashBashChain  # Chain bash the slime
+      HowlsDen.RainLifted, Unpopular, DashBashChain  # Chain bash the slime
       # Glitched:
       SentryJump=1, DoubleJump  # walljump on the small wall above the grappable plant. With sword, djump+upslash
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
@@ -290,9 +290,9 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       CoyoteHammerJump, WallHammerJump  # Have to equip hammer on ability 3 
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR GlideJump OR GrenadeJump
       DoubleJump, Dash, Sword  # coyote dash from under the grappable plant
-      Grapple, Bash OR DoubleJump OR Dash  # Swing the plant with Grapple
+      Grapple, DoubleJump OR Dash  # Swing the plant with Grapple
       GlideJump, GrenadeJump, Dash
-      GrenadeJump, Bash
+      Bash  # In rain, use a slug. If rain lifted use the kii path
 
   conn MarshSpawn.RegenDoor:
     moki: MarshSpawn.KeystoneDoor
@@ -729,6 +729,7 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
       # Launch, Glide, GrenadeJump=1  # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathEX
     unsafe:
       Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
+      Bash, Water, WaterDash  # https://youtu.be/zUSZakWugmw
       Launch  # https://youtu.be/ZHr718BCSaA
       DoubleJump, Deflector, Sword, Damage=10 OR TripleJump  # https://youtu.be/f-0Q8yuKV_g
       DoubleJump, TripleJump, Deflector, Hammer, Damage=10  # https://youtu.be/_Fz20Cd4WBU
@@ -958,6 +959,7 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       FlashSwap OR BlazeSwap=2 OR SentrySwap=2
       HowlsDen.RainLifted, GlideBashChain, DashBashChain  # use the enemy for everything
       GrenadeJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
+      HowlsDen.RainLifted, GlideBashChain, Bash, GlideJump  # BashGlideJump https://youtu.be/P4cEVJRG1RY
 
   conn MarshSpawn.MokkTheBrave: free
   conn MarshSpawn.FangPlatform:
@@ -1139,6 +1141,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     moki: HowlsDen.SwordTree
   state HowlsDen.BoneBarrier:  # the barrier blocking the lowest part of Howl's Den
     moki: BreakWall=16
+    unsafe: HowlsDen.RainLifted, Unpopular, Bash, UltraBash  # Lure any enemies to the semisolid platform and UltraBash Ori against the wall
 
   quest HowlsDen.SwordTree: free
 
@@ -1200,7 +1203,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     unsafe:
       HowlsDen.RainLifted, GlideBashChain  # Bash chain
       HowlsDen.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
-      Unpopular, HowlsDen.RainLifted, Bash, HowlsDen.BoneBarrier  # https://youtu.be/j7sRVpO-s00
+      HowlsDen.RainLifted, HowlsDen.BoneBarrier, Unpopular, Bash  # https://youtu.be/j7sRVpO-s00
   conn HowlsDen.BoneBridgeDoor:
     moki: HowlsDen.KeystoneDoor
   conn HowlsDen.AboveTeleporter:
@@ -1546,7 +1549,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   conn MarshPastOpher.PoolsPathEast:  # Paths which can't start from MarshPastOpher.OpherSkipBranch (mainly because it uses enemies)
     unsafe:
       Water, Bash  # https://youtu.be/9LEokEz5GtA
-      Unpopular, DashBashChain, MarshSpawn.ToOpherBarrier  # Use the slug from MarshSpawn.Main. Normal and above can use the slime from the jump pad but it doesn't spawn in easy.
+      MarshSpawn.ToOpherBarrier, Unpopular, DashBashChain  # Use the slug from MarshSpawn.Main. Normal and above can use the slime from the jump pad but it doesn't spawn in easy.
 
 anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
 # This anchor is a midway for going to MarshPastOpher.PoolsPathEast, since both paths from MarshPastOpher.MillView and MarshPastOpher.BowApproach want to reach that branch
@@ -1636,6 +1639,7 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
     unsafe:
       Damage=10
       Grenade=1 OR GrenadeCancel # Use grenade before landing on the left bouncepad
+      Unpopular, Bash  # Can place the slug on the lower bouncepad and juggle yourself up. Precise.
   pickup MarshPastOpher.TrialHC:
     moki: Hammer OR Spear=1
     unsafe: free  # the mantis usually jump into spikes
@@ -1884,7 +1888,7 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       AerialHammerJump OR WallHammerJump OR GlideHammerJump OR CoyoteHammerJump
       GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash  # Repositioning the squonkey: squonkey respawns when u jump off to the east and back on the ledge
-      DoubleJump, TripleJump, Hammer  # upslash near the checlpointthen tjump
+      DoubleJump, TripleJump, Hammer  # upslash near the checkpoint then tjump
       DoubleJump, Sword  # Pogo on a bat projectile
 
   conn MarshPastOpher.PoolsPathMiddle:  # the squonkey doesn't reappear if you respawn on this checkpoint
@@ -1901,6 +1905,7 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
     unsafe:
       Launch
       Bash, GrenadeJump OR Grenade=1 OR Hammer OR Flash=1 OR Sentry=1 OR Damage=10  # Would be just bash if the second bat was dropping a bit from time to time
+      Bash, Grapple, UltraGrapple  # Same as above
       DoubleJump, Sword  # https://youtu.be/5DXMPrR-RZo
       DoubleJump, TripleJump, Damage=10  # https://youtu.be/LzSvtNAIQ7I
       GrenadeJump, DoubleJump  # aerial gjump at the second bat to get a wall jump just above that bat
@@ -1974,6 +1979,7 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       Hammer, DoubleJump OR Water OR Damage=10  # https://youtu.be/Qt6Jfi3675I
       WaterDash, GlideJump, Water OR Damage=10
       WaterDash, GrenadeJump, Water OR Damage=10
+      Bash  # Bring the crab
   conn MarshPastOpher.PoolsPathEast:
     moki: Bash
     gorlek:
@@ -2257,7 +2263,7 @@ anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big port
       # DoubleJump
       # DoubleJump, Sentry=2
       GrenadeJump OR CoyoteHammerJump OR WallHammerJump
-      MidnightBurrows.Lever, Damage=15
+      MidnightBurrows.Lever  # Jump into the portals at the bottom and wait until you get enough height. Either go to the wooden platform directly or CoyoteJump from the portal ledge
 
   conn MidnightBurrows.BelowLupo: free
   conn MidnightBurrows.TabletRoom:
@@ -3602,6 +3608,10 @@ anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
 
   conn GladesTown.Teleporter:
     moki: GladesTown.GromsWall
+  conn GladesTown.AboveOpher:
+    unsafe: GladesTown.GromsWall, Unpopular, Bash  # Very precise mortar projectile redirects
+  conn TuleyShop:
+    unsafe: GladesTown.GromsWall, GladesTown.TuleySpawned, Unpopular, Bash  # Very precise mortar projectile redirects
   conn EastHollow.MapMoki: free
 
 anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to Bash tree
@@ -3889,6 +3899,7 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
       GlideJump, Hammer OR Spear=2
       GrenadeJump, DoubleJump
       DoubleJump, Dash OR Hammer
+      Bash  # Bait the SneezeSlug to shoot at you from the ledge and juggle its projectile
       
   conn EastHollow.DepthsLeverDoor:
     moki:
@@ -6653,6 +6664,7 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Grapple  # https://youtu.be/vI511KFMZWI
       SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR AbilitySwap=2
       GrenadeJump, DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/_9NDzS77mck
+      GlideBashChain  # Beetle
   pickup OuterWellspring.RightWallEC:
     moki, BreakWall=20:
       DoubleJump, Dash
@@ -6664,6 +6676,9 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Damage=15, Spear=1 OR Blaze=1
       Damage=15, Bash  #land in the spikes to jump on the wheel then bash glide of the bee
     unsafe, BreakWall=20: Bash OR Spear=1 OR Blaze=1  # land on the friendly spikes, at the very edge of the spikes
+  pickup OuterWellspring.UltraGrappleShard:
+    unsafe:
+      GlideBashChain OR DoubleJumpBashChain  # Beetle
 
   conn OuterWellspring.TrialRoom:
     moki:
@@ -6798,6 +6813,7 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       DoubleJump, TripleJump, Hammer
     unsafe:
       DoubleJump, TripleJump
+      DoubleJump, Dash  # Climb the right wall https://youtu.be/s9TIZXu8pyM
       GrenadeJump
   pickup InnerWellspring.WaterSwitchEX:
     moki, InnerWellspring.WaterDashSwitch: Water
@@ -8182,6 +8198,7 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
     unsafe:
       DoubleJump, Combat=Balloon, Dash OR TripleJump
       Launch  # Use launch invulnerability to protect you from balloon's explosions
+      DoubleJump, Flap  # Damage=10 if you don't want to bait the plant. https://youtu.be/xaUHPg2MUwc
   state WoodsMain.BalloonLureYellowBarrierBroken:
     moki: WoodsMain.BalloonLureBlobDestroyed, Flap, Glide
     gorlek: WoodsMain.BalloonLureBlobDestroyed, Flap, Launch
@@ -8221,6 +8238,8 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
       DoubleJump, Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Damage=15
       Bash, Hammer OR Shuriken=1 OR Sentry=2
       Grenade=1, Bash
+    unsafe:
+      DoubleJump  # Specific bait to jump over the tentacle. You can take 10hp of contact damage instead. https://youtu.be/oE3V_4WgTnY
 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   state WoodsMain.BalloonLureBlobDestroyed:
@@ -8255,7 +8274,7 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
       DoubleJump, Damage=45
       DoubleJump, Damage=15, TripleJump OR Bash  # With bash, bait the skeeto
     unsafe:
-      DoubleJump, Damage=30
+      DoubleJump, Damage=30 OR Bash  # With bash, bait the skeeto
       DoubleJump, Damage=15, Shuriken=2 OR Flash=2 OR Sentry=2
   conn WoodsMain.BalloonLure:
     moki: WoodsMain.BalloonLureBlobDestroyed, Combat=Tentacle OR Bash
@@ -8328,6 +8347,12 @@ anchor WoodsMain.BrokenOwl at 848, -4058:  # At the collapsing petrified Owl
     gorlek: Bash OR Hammer OR SwordSJump=1
     kii: Sword  # Pogo a skeeto
     unsafe: free  # just die/reload
+  conn WoodsMain.TrialEnd:
+    unsafe:
+      Bash, DoubleJump OR Glide  # The skeeto will chase you all the way. Use air stall
+  conn WoodsMain.OrangeTree:
+    unsafe:
+      Bash  # The skeeto will chase you all the way. You can use it to bash over the tree
 
 anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
   refill Checkpoint:  # refill by starting the trial
@@ -10651,6 +10676,10 @@ anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the
       Damage=40, Dash OR Sword OR Shuriken=4
       Glide
       Damage=70, Sentry=4 OR Flash=4
+    unsafe:
+      Unpopular, Bash  # Fake bash the falling slug. https://youtu.be/0yagLd-HEJ8
+      # Bash, Damage=10  # Bash the slug for 10 damage. Always drops a health cell. https://youtu.be/kVYfydMo4js
+      # Bash, DoubleJump  # https://youtu.be/XtPYwbiaFlk
   conn EastHollow.AboveDepths:
     moki: EastHollow.DepthsOpen, Glide
     gorlek, EastHollow.DepthsOpen:
@@ -10924,7 +10953,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
   conn UpperDepths.Central:  # paths using the firefly have to go from the teleporter
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
     gorlek: DepthsLight
-    unsafe: Unpopular, Bash, Dash  # Extremely tight timing. Use the bat projectile to accelerate downwards. https://youtu.be/gXOM9NRkSI8
+    unsafe: Unpopular, Dash, Bash  # Extremely tight timing. Use the bat projectile to accelerate downwards. https://youtu.be/gXOM9NRkSI8
   conn UpperDepths.LowerConnection:
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
     gorlek: DepthsLight
@@ -11036,6 +11065,7 @@ anchor UpperDepths.SecondKSRoom at 542, -4466:  # The egg of the firefly circlin
       DepthsLight, DoubleJump, TripleJump OR Sword  # go around to the right and then jump to the left
     unsafe:
       DepthsLight, DoubleJump, Hammer  # go around to the right and then jump to the left
+      UpperDepths.ForestsEyes, Bash  # Forests eyes toggles enemies and provides light. For this path you need both the sneezeslug and light. Loop around to the right, bash the sneezeslug above to the semisolid and bait its projectiles.
 
   conn UpperDepths.Central:
     moki:
@@ -12863,6 +12893,8 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
       WaterDash, Damage=40
     unsafe, EastPools.LowerWaterDrained:
       Damage=80
+  conn EastPools.FishingPool:  # This path starts here because it's the closest to the torpedo
+    unsafe: EastPools.LowerWaterDrained, Bash  # Juggle the torpedo
 
 anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
   quest EastPools.HandToHandSpyglass:
@@ -13216,6 +13248,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       SentryJump=2  # sjump to GrassSeed, sjump from GrassSeed
       EastPools.CentralRoomBubbleFree, Bash, DoubleJump  # djump onto bubble from the top-right side forcing a walljump on the bubble, djump on top to land
       EastPools.CentralRoomBubbleFree, Bash, Dash, Damage=60  # dash into bubble from the top-right, dash into left wall with spikes and wait there, dash back into the next bubble
+      EastPools.CentralRoomBubbleFree, Water, WaterDash, Bash  # Bait a plant projectile
   conn WestPools.Teleporter:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Water, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=20
@@ -13230,6 +13263,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Water, WaterBreath, DoubleJump, GrenadeJump OR AerialHammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
       Water, WaterBreath, SwordJump, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+      Water, WaterDash  # You can walljump to a higher wall segment that allows you to clear the spikes
   conn EastPools.MissilePuzzle:
     moki, EastPools.CentralRoomPurpleWall: Water
     kii, EastPools.CentralRoomPurpleWall:
@@ -14339,6 +14373,8 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
     kii:
       DoubleJump
       Bash, Hammer OR Spear=1 OR Grenade=1  # Break the slime's shell in order to bash it
+    unsafe:
+      Bash  # Use the mantis to break the slime's shell
   pickup LowerWastes.SandPotEX:
     moki, Burrow:
       Dash, Grapple, DoubleJump OR Glide
@@ -16076,7 +16112,10 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
     moki: Launch, Dash, Glide, DoubleJump
     gorlek: Launch, Glide OR DoubleJump OR Dash
     kii: Launch, Sword OR Hammer OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1
-    unsafe: Launch  # Reset launch on the ceiling
+    unsafe:
+      Launch  # Reset launch on the ceiling
+      DoubleJump, TripleJump  # Safe spot in the goo next to the laser
+      SwordJump  # Safe spot in the goo next to the laser. Tight SwordJump to the wall, then double jump + sword combo + upslash to get to the middle safe platform
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
