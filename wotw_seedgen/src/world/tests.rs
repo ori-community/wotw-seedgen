@@ -4,18 +4,18 @@ use super::*;
 use crate::{
     item_pool::ItemPool,
     tests::test_logger,
-    world::reached::{Progression, ALL_CONNECTIONS},
+    world::reached::{ALL_CONNECTIONS, Progression},
 };
 use itertools::Itertools;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use wotw_seedgen_data::{
+    DEFAULT_SPAWN, Difficulty,
     assets::{AssetCacheValues, AssetFileAccess, TEST_ASSETS},
     logic_language::{
         ast::Areas,
-        output::{Enemy, Node, Requirement},
+        output::{Enemy, Requirement},
     },
-    Difficulty, DEFAULT_SPAWN,
 };
 
 fn test_settings(difficulty: Difficulty) -> WorldSettings {
@@ -78,11 +78,8 @@ fn full_reach_check() {
     world.traverse_spawn(&[]);
 
     let reached = world
-        .reached_nodes()
-        .filter_map(|node| match node {
-            Node::Pickup(_) => Some(node.identifier()),
-            _ => None,
-        })
+        .reached_pickups()
+        .map(|pickup| pickup.identifier.as_str())
         .collect();
 
     let all_locations = TEST_ASSETS
@@ -170,20 +167,17 @@ fn small_reach_check() {
     world.traverse_spawn(&[]);
 
     let reached = world
-        .reached_nodes()
-        .filter(|node| node.can_place())
-        .map(Node::identifier)
+        .reached_pickups()
+        .map(|pickup| pickup.identifier.as_str())
         .collect::<FxHashSet<_>>();
     assert_eq!(
         reached,
-        [
+        FxHashSet::from_iter([
             "GladesTown.UpdraftCeilingEX",
             "GladesTown.AboveTpEX",
             "GladesTown.BountyShard",
             "GladesTown.BelowHoleHutEX"
-        ]
-        .into_iter()
-        .collect()
+        ])
     );
 }
 

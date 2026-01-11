@@ -1,9 +1,7 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
-use wotw_seedgen_data::{
-    logic_language::output::Node, seed_language::output::CommandVoid, Position, Zone,
-};
+use wotw_seedgen_data::{assets::LocDataEntry, seed_language::output::CommandVoid, Position, Zone};
 
 /// Complete data to create a logic spoiler for the seed
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -67,23 +65,23 @@ pub struct SpoilerItem {
     pub name: String,
 }
 
-/// Select data from a [`Node`](crate::logic_language::output::Node)
+/// Select data from a [`LocDataEntry`]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NodeSummary {
     /// The identifier
     pub identifier: String,
     /// The [`Position`], if applicable
     pub position: Option<Position>,
-    /// The [`Zone`], if applicable
-    pub zone: Option<Zone>,
+    /// The [`Zone`]
+    pub zone: Zone,
 }
 
 impl NodeSummary {
-    pub(super) fn new(node: &Node) -> Self {
+    pub(super) fn new(pickup: &LocDataEntry) -> Self {
         Self {
-            identifier: node.identifier().to_string(),
-            position: node.position().copied(),
-            zone: node.zone(),
+            identifier: pickup.identifier.clone(),
+            position: pickup.position,
+            zone: pickup.zone,
         }
     }
 
@@ -91,7 +89,7 @@ impl NodeSummary {
         Self {
             identifier: "Spawn".to_string(),
             position: None,
-            zone: Some(Zone::Spawn),
+            zone: Zone::Spawn,
         }
     }
 }

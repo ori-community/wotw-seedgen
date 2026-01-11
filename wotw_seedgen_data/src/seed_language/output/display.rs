@@ -77,9 +77,7 @@ impl Display for CommandBoolean {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandBoolean::Constant { value } => value.fmt(f),
-            CommandBoolean::Multi { commands, last } => {
-                write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
-            }
+            CommandBoolean::Multi { commands, last } => multi(f, commands, last),
             CommandBoolean::CompareBoolean { operation } => operation.fmt(f),
             CommandBoolean::CompareInteger { operation } => operation.fmt(f),
             CommandBoolean::CompareFloat { operation } => operation.fmt(f),
@@ -101,9 +99,7 @@ impl Display for CommandInteger {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandInteger::Constant { value } => value.fmt(f),
-            CommandInteger::Multi { commands, last } => {
-                write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
-            }
+            CommandInteger::Multi { commands, last } => multi(f, commands, last),
             CommandInteger::Arithmetic { operation } => operation.fmt(f),
             CommandInteger::FetchInteger { uber_identifier } => {
                 write!(f, "fetch({uber_identifier})")
@@ -118,9 +114,7 @@ impl Display for CommandFloat {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandFloat::Constant { value } => value.fmt(f),
-            CommandFloat::Multi { commands, last } => {
-                write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
-            }
+            CommandFloat::Multi { commands, last } => multi(f, commands, last),
             CommandFloat::Arithmetic { operation } => operation.fmt(f),
             CommandFloat::FetchFloat { uber_identifier } => write!(f, "fetch({uber_identifier})"),
             CommandFloat::GetFloat { id } => write!(f, "get_float({id})"),
@@ -133,9 +127,7 @@ impl Display for CommandString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandString::Constant { value } => write!(f, "{value}"),
-            CommandString::Multi { commands, last } => {
-                write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
-            }
+            CommandString::Multi { commands, last } => multi(f, commands, last),
             CommandString::Concatenate { operation } => operation.fmt(f),
             CommandString::GetString { id } => write!(f, "get_string({id})"),
             CommandString::WorldName { index } => write!(f, "world_name({index})"),
@@ -150,9 +142,7 @@ impl Display for CommandZone {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandZone::Constant { value } => value.fmt(f),
-            CommandZone::Multi { commands, last } => {
-                write!(f, "{{ {}, {} }}", commands.iter().format(", "), last)
-            }
+            CommandZone::Multi { commands, last } => multi(f, commands, last),
             CommandZone::CurrentZone {} => write!(f, "current_zone()"),
             CommandZone::CurrentMapZone {} => write!(f, "current_map_zone()"),
         }
@@ -397,4 +387,14 @@ fn save_suffix(to_disk: bool) -> &'static str {
     } else {
         "_to_memory"
     }
+}
+
+fn multi<T: Display>(f: &mut fmt::Formatter, commands: &[CommandVoid], last: T) -> fmt::Result {
+    write!(f, "{{ ")?;
+
+    for command in commands {
+        write!(f, "{command}, ")?;
+    }
+
+    write!(f, "{last} }}")
 }

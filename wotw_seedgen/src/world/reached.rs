@@ -110,20 +110,27 @@ impl Reach {
     }
 }
 
-impl World<'_, '_> {
+impl<'graph> World<'graph, '_> {
     #[inline]
     pub fn reached_indices(&self) -> impl Iterator<Item = usize> + use<'_> {
         self.reach.best_orbs.keys().copied()
     }
 
     #[inline]
-    pub fn reached_nodes(&self) -> impl Iterator<Item = &Node> {
+    pub fn reached_nodes<'s>(&'s self) -> impl Iterator<Item = &'graph Node> + use<'s, 'graph> {
         self.reached_indices().map(|index| &self.graph.nodes[index])
     }
 
     #[inline]
+    pub fn reached_pickups<'s>(
+        &'s self,
+    ) -> impl Iterator<Item = &'graph LocDataEntry> + use<'s, 'graph> {
+        self.reached_nodes().filter_map(Node::try_as_pickup_ref)
+    }
+
+    #[inline]
     pub fn reached_pickup_count(&self) -> usize {
-        self.reached_nodes().filter(|node| node.is_pickup()).count()
+        self.reached_pickups().count()
     }
 
     #[inline]

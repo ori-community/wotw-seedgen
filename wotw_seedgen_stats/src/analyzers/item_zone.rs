@@ -17,12 +17,7 @@ impl Analyzer for ItemZoneStats {
             .iter()
             .flat_map(|group| group.placements.iter())
             .filter(|placement| placement.item.name == self.item)
-            .map(|placement| {
-                placement
-                    .location
-                    .zone
-                    .map_or("Unknown".to_string(), |zone| zone.to_string())
-            })
+            .map(|placement| placement.location.zone.to_string())
             .collect()
     }
 

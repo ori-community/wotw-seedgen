@@ -25,7 +25,7 @@ impl Analyzer for ZoneSpiritLightStats {
             .groups
             .iter()
             .flat_map(|group| group.placements.iter())
-            .filter(|placement| placement.location.zone == Some(self.zone))
+            .filter(|placement| placement.location.zone == self.zone)
             .flat_map(|placement| placement.item.command.contained_common_items())
             .filter_map(|item| match item {
                 CommonItem::SpiritLight(amount) => Some(amount),

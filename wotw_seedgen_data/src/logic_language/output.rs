@@ -92,10 +92,6 @@ impl Node {
         }
     }
 
-    pub fn can_place(&self) -> bool {
-        matches!(self, Node::Pickup(_))
-    }
-
     pub fn can_spawn(&self) -> bool {
         match self {
             Node::Anchor(anchor) => anchor.position.is_some() && anchor.can_spawn,
@@ -245,15 +241,18 @@ impl Enemy {
             Enemy::EnergyRefill => 0.0,
         }
     }
+
     pub fn shielded(self) -> bool {
         matches!(
             self,
             Enemy::Hornbug | Enemy::ShieldSlug | Enemy::ShieldMiner | Enemy::ShieldCrystalMiner
         )
     }
+
     pub fn armored(self) -> bool {
         matches!(self, Enemy::Tentacle)
     }
+
     pub fn aerial(self) -> bool {
         // whether we consider the enemy flying for movement restriction purposes
         matches!(
@@ -266,10 +265,12 @@ impl Enemy {
                 | Enemy::Tentacle
         )
     }
+
     pub fn flying(self) -> bool {
         // whether the game considers the enemy flying for wingclip
         matches!(self, Enemy::Skeeto | Enemy::SmallSkeeto | Enemy::Bee)
     }
+
     pub fn ranged(self) -> bool {
         // whether you need a ranged weapon
         matches!(
@@ -277,6 +278,7 @@ impl Enemy {
             Enemy::BombSlug | Enemy::CorruptSlug | Enemy::Balloon | Enemy::Bat
         )
     }
+
     pub fn dangerous(self) -> bool {
         matches!(
             self,
