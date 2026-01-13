@@ -147,6 +147,8 @@ pub enum CommandInteger {
     GetInteger { id: usize },
     /// Convert `float` to `f32`
     FromFloat { float: Box<CommandFloat> },
+    /// Get the length of `string`
+    StringLength { string: Box<CommandString> },
 }
 
 impl AsConstant for CommandInteger {

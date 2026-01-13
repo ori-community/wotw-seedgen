@@ -90,11 +90,11 @@ pub enum Command {
     ),
     /// Perform `operator` on Boolean Memory 0 and Boolean Memory 1 and store the result in Boolean Memory 0
     CompareBoolean(/*operator*/ EqualityComparator),
-    /// Perform `operator` on Integer Memory 0 and Integer Memory 1 and store the result in Integer Memory 0
+    /// Perform `operator` on Integer Memory 0 and Integer Memory 1 and store the result in Boolean Memory 0
     CompareInteger(/*operator*/ Comparator),
-    /// Perform `operator` on Float Memory 0 and Float Memory 1 and store the result in Float Memory 0
+    /// Perform `operator` on Float Memory 0 and Float Memory 1 and store the result in Boolean Memory 0
     CompareFloat(/*operator*/ Comparator),
-    /// Perform `operator` on String Memory 0 and String Memory 1 and store the result in String Memory 0
+    /// Perform `operator` on String Memory 0 and String Memory 1 and store the result in Boolean Memory 0
     CompareString(/*operator*/ EqualityComparator),
     /// Perform `operator` on Boolean Memory 0 and Boolean Memory 1 and store the result in Boolean Memory 0
     LogicOperation(/*operator*/ LogicOperator),
@@ -116,6 +116,8 @@ pub enum Command {
     IntegerToString,
     /// Convert Float Memory 0 to a string and store it in String Memory 0
     FloatToString,
+    /// Get the length of String Memory 0 and store it in Integer Memory 0
+    StringLength,
     /// Until the next reload, on every tick where `toggle` is `true` increment `timer` by the delta time in seconds
     DefineTimer(
         /*toggle*/ UberIdentifier,

@@ -164,7 +164,9 @@ impl InferType for FunctionCall<'_> {
                 .and_then(|arg| arg.uber_state_type(compiler))
                 .map(Type::from)?,
             FunctionIdentifier::GetBoolean | FunctionIdentifier::IsInBox => Type::Boolean,
-            FunctionIdentifier::GetInteger | FunctionIdentifier::ToInteger => Type::Integer,
+            FunctionIdentifier::GetInteger
+            | FunctionIdentifier::ToInteger
+            | FunctionIdentifier::StringLength => Type::Integer,
             FunctionIdentifier::GetFloat | FunctionIdentifier::ToFloat => Type::Float,
             FunctionIdentifier::GetString
             | FunctionIdentifier::ToString

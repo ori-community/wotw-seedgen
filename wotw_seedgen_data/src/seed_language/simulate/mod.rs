@@ -138,6 +138,9 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
             CommandInteger::FromFloat { float } => {
                 float.simulate(simulation, events).into_inner().round() as i32
             }
+            CommandInteger::StringLength { string } => {
+                string.simulate(simulation, events).len() as i32
+            }
         }
     }
 }

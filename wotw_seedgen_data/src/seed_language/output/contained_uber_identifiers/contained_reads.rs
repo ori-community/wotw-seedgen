@@ -80,6 +80,7 @@ impl ContainedReads for CommandInteger {
             CommandInteger::Arithmetic { operation } => nested(operation),
             CommandInteger::FetchInteger { uber_identifier } => some(*uber_identifier),
             CommandInteger::FromFloat { float } => nested(float),
+            CommandInteger::StringLength { string } => nested(string),
             CommandInteger::Constant { .. } | CommandInteger::GetInteger { .. } => none(),
         }
     }

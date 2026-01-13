@@ -106,6 +106,7 @@ impl Display for CommandInteger {
             }
             CommandInteger::GetInteger { id } => write!(f, "get_integer({id})"),
             CommandInteger::FromFloat { float } => write!(f, "to_integer({float})"),
+            CommandInteger::StringLength { string } => write!(f, "string_length({string})"),
         }
     }
 }

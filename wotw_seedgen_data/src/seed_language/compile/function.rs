@@ -210,6 +210,7 @@ pub enum FunctionIdentifier {
     IsInBox,
     GetInteger,
     ToInteger,
+    StringLength,
     GetFloat,
     ToFloat,
     GetString,
@@ -389,6 +390,7 @@ impl FunctionIdentifier {
             IsInBox(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
             GetInteger(id: String) -> Integer,
             ToInteger(float: Float) -> Integer,
+            StringLength(string: String) -> Integer,
             GetFloat(id: String) -> Float,
             ToFloat(integer: Integer) -> Float,
             GetString(id: String) -> String,
@@ -653,6 +655,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
 
                 Command::Integer(command)
             }
+            FunctionIdentifier::StringLength => Command::Integer(CommandInteger::StringLength {
+                string: boxed_arg(&mut context)?,
+            }),
             FunctionIdentifier::GetFloat => Command::Float(CommandFloat::GetFloat {
                 id: float_id(&mut context)?,
             }),

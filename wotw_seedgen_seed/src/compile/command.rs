@@ -167,6 +167,9 @@ impl Compile for input::CommandInteger {
                 commands.0.push(Command::FloatToInteger);
                 commands
             }
+            Self::StringLength { string } => Args::new(context)
+                .string(0, *string)
+                .call(Command::StringLength, MemoryUsed::ONE_INTEGER),
         }
     }
 }

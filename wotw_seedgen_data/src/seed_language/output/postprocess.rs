@@ -387,6 +387,7 @@ impl ResolvePlaceholders for CommandInteger {
             }
             Self::Arithmetic { operation } => operation.resolve(context),
             Self::FromFloat { float } => float.resolve(context),
+            Self::StringLength { string } => string.resolve(context),
             Self::Constant { .. } | Self::FetchInteger { .. } | Self::GetInteger { .. } => {}
         }
     }
