@@ -75,8 +75,10 @@ pub enum Cli {
         #[command(flatten)]
         args: HttpServerArgs,
     },
-    /// Start the language server
-    Lsp,
+    /// Start the language server for snippets and plandos
+    SeedLsp,
+    /// Start the language server for areas.wotw
+    LogicLsp,
 }
 
 #[cfg(test)]

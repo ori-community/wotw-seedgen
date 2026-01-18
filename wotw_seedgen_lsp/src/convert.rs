@@ -1,6 +1,10 @@
 use std::{ops::Range, path::PathBuf};
 
-use tower_lsp::{jsonrpc, lsp_types};
+use tower_lsp::{
+    jsonrpc,
+    lsp_types::{self, Diagnostic, DiagnosticSeverity},
+};
+use wotw_seedgen_data::parse::{Error, Severity};
 
 use crate::error;
 
@@ -77,6 +81,27 @@ pub fn last_line(source: &str) -> (usize, usize) {
     line += line_indices.count();
 
     (line, line_start)
+}
+
+pub fn error_to_lsp(error: Error, source: &str) -> Diagnostic {
+    let severity = match error.kind.severity() {
+        Severity::Warning => DiagnosticSeverity::WARNING,
+        Severity::Error => DiagnosticSeverity::ERROR,
+    };
+
+    let mut message = error.kind.to_string();
+
+    if let Some(help) = error.help {
+        message.push('\n');
+        message.push_str(&help);
+    }
+
+    Diagnostic {
+        range: range_to_lsp(error.span, source),
+        severity: Some(severity),
+        message,
+        ..Default::default()
+    }
 }
 
 #[cfg(test)]

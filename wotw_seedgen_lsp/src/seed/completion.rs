@@ -27,7 +27,7 @@ use wotw_seedgen_data::{
     VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 
-use crate::cache::CacheValues;
+use crate::seed::cache::CacheValues;
 
 // TODO add controlflow functionality to handler trait and use it here?
 

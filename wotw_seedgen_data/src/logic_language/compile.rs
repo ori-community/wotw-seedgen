@@ -1034,6 +1034,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
             no_amount().map(|()| Requirement::Teleporter(teleporter))
         } else {
             match identifier {
+                // TODO free is lowercase but impossible is uppercase
                 "free" => no_amount().map(|()| Requirement::Free),
                 "Impossible" => no_amount().map(|()| Requirement::Impossible),
                 "SpiritLight" => get_amount().map(Requirement::SpiritLight),

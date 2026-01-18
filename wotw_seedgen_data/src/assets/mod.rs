@@ -18,10 +18,10 @@ pub use presets::{
 };
 mod file_access;
 pub use file_access::{
-    canonicalize, create_dir_all, file_create, file_err, file_open, write, AssetCache,
-    AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues, DefaultFileAccess,
-    PlandoFileAccess, PresetFileAccess, SnippetFileAccess, Watcher, WatcherError, EXECUTABLE_DIR,
-    LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
+    canonicalize, create_dir_all, file_create, file_err, file_open, read_to_string, write,
+    AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
+    DefaultFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
+    WatcherError, EXECUTABLE_DIR, LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
 };
 mod test_access;
 pub use test_access::{TestAccess, TEST_ASSETS};

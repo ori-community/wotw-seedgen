@@ -41,8 +41,12 @@ fn main() -> Result<(), Error> {
         Cli::Regenerate { args } => regenerate(args),
         Cli::ImportUberStates => import_uber_states(),
         Cli::HttpServer { args } => http_server(args),
-        Cli::Lsp => {
-            wotw_seedgen_lsp::start();
+        Cli::SeedLsp => {
+            wotw_seedgen_lsp::start_seed();
+            Ok(())
+        }
+        Cli::LogicLsp => {
+            wotw_seedgen_lsp::start_logic();
             Ok(())
         }
     }

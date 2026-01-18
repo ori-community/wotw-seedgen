@@ -1,4 +1,4 @@
-use crate::convert::range_to_lsp;
+use crate::convert;
 use itertools::Itertools;
 use std::ops::Range;
 use tower_lsp::lsp_types::{Hover, HoverContents, MarkupContent, MarkupKind};
@@ -42,7 +42,7 @@ impl<'a, 'b> HoverHandler<'a, 'b> {
 
     fn set_markdown_output(&mut self, value: String, span: Range<usize>) {
         self.output = Some(Hover {
-            range: Some(range_to_lsp(span, self.document)),
+            range: Some(convert::range_to_lsp(span, self.document)),
             contents: HoverContents::Markup(MarkupContent {
                 kind: MarkupKind::Markdown,
                 value,
