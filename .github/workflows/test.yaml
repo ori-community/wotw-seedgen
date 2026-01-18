@@ -5,12 +5,12 @@ on:
   - pull_request
 
 jobs:
-  test:
+  run_tests:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout 🛎
@@ -26,4 +26,61 @@ jobs:
         with:
           command: test
           args: --all-features
-# TODO maybe a test to check linux and windows generate the same seeds?
+
+  generate_seed_linux:
+    runs-on: ubuntu-latest
+    env:
+      SEEDGEN_USER_DATA_DIR: ./assets
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Generate a seed
+        run: cargo run -- seed --seed ci
+      - name: Archive seed
+        uses: actions/upload-artifact@v6
+        with:
+          name: seed_linux
+          retention-days: 7
+          path: |
+            ./assets/seeds/**/*
+
+  generate_seed_windows:
+    runs-on: windows-latest
+    env:
+      SEEDGEN_USER_DATA_DIR: ./assets
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Generate a seed
+        run: cargo run -- seed --seed ci
+      - name: Archive seed
+        uses: actions/upload-artifact@v6
+        with:
+          name: seed_windows
+          retention-days: 7
+          path: |
+            ./assets/seeds/**/*
+
+  compare_seeds:
+    runs-on: ubuntu-latest
+    needs:
+      - generate_seed_linux
+      - generate_seed_windows
+
+    steps:
+      - name: Download Linux seed
+        uses: actions/download-artifact@v7
+        with:
+          name: seed_linux
+          path: "/tmp/seed_linux"
+      - name: Download Windows seed
+        uses: actions/download-artifact@v7
+        with:
+          name: seed_windows
+          path: "/tmp/seed_windows"
+      - name: Compare seedgen output
+        run: diff -rq /tmp/seed_linux /tmp/seed_windows
