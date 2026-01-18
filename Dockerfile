@@ -11,9 +11,17 @@ FROM alpine
 
 WORKDIR /app
 
+ENV RANDOMIZER_USER_DATA_DIR=/data
+
+RUN mkdir /data && \
+    adduser -H -D -u 1010 seedgen && \
+    chown -R 1010 /data \
+
 COPY --from=build-seedgen /app/assets /app
 # TODO: Remove once areas.wotw resides in the assets/logic directory
 COPY --from=build-seedgen /app/wotw_seedgen/areas.wotw /app/logic/areas.wotw
 COPY --from=build-seedgen /app/build/release/wotw-seedgen /app/wotw-seedgen
+
+USER seedgen
 
 ENTRYPOINT ["/app/wotw-seedgen"]
