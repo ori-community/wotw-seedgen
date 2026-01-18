@@ -34,7 +34,7 @@ pub fn router() -> Router<RouterState> {
 )]
 pub struct Docs;
 
-/// Get the list of difficulties
+/// Get the sorted list of difficulties in ascending order
 #[utoipa::path(
     get,
     path = DIFFICULTIES,
