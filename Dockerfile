@@ -3,7 +3,7 @@ FROM rust:alpine as build-seedgen
 COPY . /app
 WORKDIR /app
 
-RUN apk --no-cache add musl-dev && \
+RUN apk --no-cache add musl-dev curl && \
     cargo build --release --target-dir /app/build
 
 
