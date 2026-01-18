@@ -54,11 +54,13 @@ impl Watcher {
         path: impl AsRef<Path>,
         recursive_mode: RecursiveMode,
     ) -> Result<(), WatcherError> {
-        let _ = fs::create_dir_all(&path);
-
-        self.sender
-            .watch(&path, recursive_mode)
-            .map_err(|err| WatcherError::Watch(err, path.as_ref().to_path_buf()))
+        if fs::create_dir_all(&path).is_ok() {
+            self.sender
+                .watch(&path, recursive_mode)
+                .map_err(|err| WatcherError::Watch(err, path.as_ref().to_path_buf()))
+        } else {
+            Ok(())
+        }
     }
 }
 
