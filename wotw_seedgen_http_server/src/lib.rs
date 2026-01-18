@@ -68,12 +68,15 @@ async fn serve(router: Router, address: Option<SocketAddr>) -> Result<()> {
 async fn listener(address: Option<SocketAddr>) -> TcpListener {
     let address = address.unwrap_or_else(|| SocketAddr::from((Ipv4Addr::LOCALHOST, 51413)));
 
-    let socket = Socket::new(Domain::for_address(address), Type::STREAM, Some(Protocol::TCP)).unwrap();
+    let domain = Domain::for_address(address);
+    let socket = Socket::new(domain, Type::STREAM, Some(Protocol::TCP)).unwrap();
     socket.set_nonblocking(true).unwrap();
 
-    // Explicitly allow IPv6-mapped IPv4 addresses
-    // e.g. access on 127.0.0.1:1234 when listening on [::]:1234
-    socket.set_only_v6(false).unwrap();
+    if domain == Domain::IPV6 {
+        // Explicitly allow IPv6-mapped IPv4 addresses
+        // e.g. access on 127.0.0.1:1234 when listening on [::]:1234
+        socket.set_only_v6(false).unwrap();
+    }
 
     socket.bind(&address.into()).unwrap();
     socket.listen(1024).unwrap();
