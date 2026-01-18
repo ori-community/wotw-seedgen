@@ -4,6 +4,7 @@ use axum::{
     routing::post,
 };
 use serde::Deserialize;
+use tower_http::cors::{Any, CorsLayer};
 use utoipa::{IntoParams, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
@@ -18,12 +19,18 @@ pub mod snippets;
 const GENERATE: &str = "/generate";
 
 pub fn router(cache: RouterState) -> Router {
+    let cors = CorsLayer::new()
+        .allow_headers(Any)
+        .allow_methods(Any)
+        .allow_origin(Any);
+
     Router::new()
         .route(GENERATE, post(generate))
         .nest(logic::LOGIC, logic::router())
         .nest(settings::SETTINGS, settings::router())
         .nest(presets::PRESETS, presets::router())
         .nest(snippets::SNIPPETS, snippets::router())
+        .layer(cors)
         .merge(SwaggerUi::new("/docs").url("/docs/wotw-seedgen-openapi.json", Docs::openapi()))
         .with_state(cache)
 }

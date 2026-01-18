@@ -23,3 +23,4 @@ single-instance = "0.3.3"
 strum = { version = "0.26", features = ["derive"] }
 ciborium = "0.2.2"
 socket2 = "0.6.1"
+tower-http = { version = "0.6.8", features = ["cors"] }
