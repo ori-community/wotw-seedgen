@@ -1,5 +1,6 @@
 use std::{net::Ipv4Addr, sync::Arc, time::Duration};
 use std::net::SocketAddr;
+use std::process::exit;
 use axum::Router;
 use single_instance::SingleInstance;
 use socket2::{Domain, Protocol, Socket, Type};
@@ -28,8 +29,7 @@ pub fn start(inactivity_timeout: Option<Duration>, address: Option<SocketAddr>) 
 
     if !instance.is_single() {
         eprintln!("server already seems to be running, exiting");
-
-        return Ok(());
+        exit(2);
     }
 
     let cache = Cache::new(DefaultFileAccess)
