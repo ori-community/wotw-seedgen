@@ -40,7 +40,8 @@ async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, WorldP
     Json(cache.read().await.base.world_presets.clone())
 }
 
-/// Apply a world preset to world settings
+/// Apply world presets to world settings.
+/// If no settings are given, presets are applied on top of the default world settings.
 #[utoipa::path(
     post,
     path = APPLY,
@@ -51,21 +52,24 @@ async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, WorldP
 )]
 async fn apply(
     State(cache): State<RouterState>,
-    Json(mut body): Json<ApplyBody>,
+    Json(body): Json<ApplyBody>,
 ) -> Result<Json<WorldSettings>> {
     let cache = cache.read().await;
 
-    body.preset
-        .apply(&mut body.settings, &cache.base)
-        .map_err(Error::ApplyPreset)?;
+    let mut settings = body.settings.unwrap_or_default();
 
-    Ok(Json(body.settings))
+    for (index, preset) in body.presets.into_iter().enumerate() {
+        preset.apply(&mut settings, &cache.base).map_err(|err_string| Error::ApplyPreset(format!("preset at index {index}: {err_string}")))?
+    }
+
+    Ok(Json(settings))
 }
 
 #[derive(Deserialize, ToSchema)]
 pub struct ApplyBody {
-    /// Current settings
-    pub settings: WorldSettings,
-    /// Preset to apply
-    pub preset: WorldPreset,
+    /// World settings to apply presets on.
+    /// Omit to use default world settings.
+    pub settings: Option<WorldSettings>,
+    /// Presets to apply
+    pub presets: Vec<WorldPreset>,
 }
