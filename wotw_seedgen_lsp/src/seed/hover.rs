@@ -1,12 +1,11 @@
 use crate::convert;
-use itertools::Itertools;
+use crate::seed::helpers::uber_identifier_info;
 use std::ops::Range;
 use tower_lsp::lsp_types::{Hover, HoverContents, MarkupContent, MarkupKind};
 use wotw_seedgen_data::assets::UberStateData;
-use wotw_seedgen_data::parse::{Span, SpannedOption};
+use wotw_seedgen_data::parse::Span;
 use wotw_seedgen_data::seed_language::ast;
 use wotw_seedgen_data::seed_language::ast::{Handler, Snippet, Traverse};
-use wotw_seedgen_data::UberIdentifier;
 
 pub fn hover(
     document: &str,
@@ -59,50 +58,10 @@ impl Handler for HoverHandler<'_, '_> {
             return;
         }
 
-        match uber_identifier {
-            ast::UberIdentifier::Numeric(numeric) => {
-                let SpannedOption::Some(member) = &numeric.member.value else {
-                    return;
-                };
+        let Some(info) = uber_identifier_info(uber_identifier, self.uber_state_data) else {
+            return;
+        };
 
-                let identifier = UberIdentifier::new(numeric.group.data, member.data);
-                if let Some(uber_state_data) = self.uber_state_data.id_lookup.get(&identifier) {
-                    self.set_markdown_output(
-                        match &uber_state_data.rando_name {
-                            None => format!("Name: `{}`", uber_state_data.name),
-                            Some(rando_name) => {
-                                format!("Name: `{}` ({})", uber_state_data.name, rando_name)
-                            }
-                        },
-                        span,
-                    );
-                }
-            }
-            ast::UberIdentifier::Name(name) => {
-                let Some(group_lookup) = self.uber_state_data.name_lookup.get(name.group.data.0)
-                else {
-                    return;
-                };
-
-                let SpannedOption::Some(member) = &name.member.value else {
-                    return;
-                };
-
-                let Some(member_lookup) = group_lookup.get(member.data.0) else {
-                    return;
-                };
-
-                self.set_markdown_output(
-                    match member_lookup.as_slice() {
-                        [single_element] => single_element.to_string(),
-                        elements => elements
-                            .iter()
-                            .format_with("\n", |alias, f| f(&format_args!("- {alias}")))
-                            .to_string(),
-                    },
-                    span,
-                );
-            }
-        }
+        self.set_markdown_output(info, span);
     }
 }

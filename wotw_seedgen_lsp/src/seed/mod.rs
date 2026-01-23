@@ -1,24 +1,33 @@
 pub mod cache;
+mod command;
 mod completion;
+mod helpers;
 mod hover;
 mod semantic_tokens;
 
 use crate::{
     backend::Backend,
-    seed::{cache::Cache, hover::hover},
+    seed::{
+        cache::Cache,
+        command::{execute_command, Command},
+        hover::hover,
+    },
 };
 use completion::Completion;
 use semantic_tokens::{semantic_tokens, semantic_tokens_legend};
+use serde_json::Value;
+use strum::VariantNames;
 use tower_lsp::{
     jsonrpc::Result,
     lsp_types::{
         CompletionOptions, CompletionParams, CompletionResponse, DidChangeTextDocumentParams,
-        DidOpenTextDocumentParams, DidSaveTextDocumentParams, Hover, HoverParams,
-        HoverProviderCapability, InitializeParams, InitializeResult, ParameterInformation,
-        ParameterLabel, SemanticTokens, SemanticTokensFullOptions, SemanticTokensOptions,
-        SemanticTokensParams, SemanticTokensResult, SemanticTokensServerCapabilities,
-        ServerCapabilities, ServerInfo, SignatureHelp, SignatureHelpOptions, SignatureHelpParams,
-        SignatureInformation, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+        DidOpenTextDocumentParams, DidSaveTextDocumentParams, ExecuteCommandOptions,
+        ExecuteCommandParams, Hover, HoverParams, HoverProviderCapability, InitializeParams,
+        InitializeResult, ParameterInformation, ParameterLabel, SemanticTokens,
+        SemanticTokensFullOptions, SemanticTokensOptions, SemanticTokensParams,
+        SemanticTokensResult, SemanticTokensServerCapabilities, ServerCapabilities, ServerInfo,
+        SignatureHelp, SignatureHelpOptions, SignatureHelpParams, SignatureInformation,
+        TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     },
     LanguageServer,
 };
@@ -51,6 +60,14 @@ impl LanguageServer for Backend<Cache> {
                 }),
                 signature_help_provider: Some(SignatureHelpOptions {
                     trigger_characters: Some(vec!['('.to_string()]),
+                    ..Default::default()
+                }),
+                execute_command_provider: Some(ExecuteCommandOptions {
+                    commands: Command::VARIANTS
+                        .iter()
+                        .copied()
+                        .map(String::from)
+                        .collect(),
                     ..Default::default()
                 }),
                 semantic_tokens_provider: Some(
@@ -174,6 +191,14 @@ impl LanguageServer for Backend<Cache> {
             });
 
         Ok(help)
+    }
+
+    async fn execute_command(&self, params: ExecuteCommandParams) -> Result<Option<Value>> {
+        self.execute_command_base(&params.command).await;
+
+        let cache = self.cache.read().await;
+
+        execute_command(&params.command, params.arguments, &cache.uber_state_data)
     }
 }
 

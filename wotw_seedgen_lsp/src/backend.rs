@@ -225,4 +225,11 @@ impl<C> Backend<C> {
 
         self.client.publish_diagnostics(uri, errors, None).await;
     }
+
+    pub async fn execute_command_base(&self, command: &str) {
+        self.log(format!(
+            "received workspace/execute_command for \"{command}\""
+        ))
+        .await;
+    }
 }
