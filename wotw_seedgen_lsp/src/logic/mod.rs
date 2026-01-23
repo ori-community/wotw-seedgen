@@ -1,21 +1,29 @@
 pub mod cache;
 
+mod definition;
+
 use tower_lsp::{
     jsonrpc::Result,
     lsp_types::{
         DidChangeTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
-        InitializeParams, InitializeResult, ServerCapabilities, ServerInfo,
-        TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+        GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, InitializeResult, OneOf,
+        ServerCapabilities, ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     },
     LanguageServer,
 };
 use wotw_seedgen_data::{
     assets,
-    logic_language::{ast::Areas, output::Graph},
+    logic_language::{
+        ast::{self, Areas},
+        output::Graph,
+    },
     parse::ParseResult,
 };
 
-use crate::{backend::Backend, logic::cache::Cache};
+use crate::{
+    backend::Backend,
+    logic::{cache::Cache, definition::goto_definition},
+};
 
 #[tower_lsp::async_trait]
 impl LanguageServer for Backend<Cache> {
@@ -27,6 +35,7 @@ impl LanguageServer for Backend<Cache> {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
                     TextDocumentSyncKind::INCREMENTAL,
                 )),
+                definition_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -56,6 +65,22 @@ impl LanguageServer for Backend<Cache> {
         let uri = self.did_save_base(params).await;
 
         self.update_diagnostics(uri).await;
+    }
+
+    async fn goto_definition(
+        &self,
+        params: GotoDefinitionParams,
+    ) -> Result<Option<GotoDefinitionResponse>> {
+        let (source, index) = self.goto_definition_base(params).await?;
+
+        let ast = ast::Areas::parse(source.value());
+
+        Ok(goto_definition(
+            ast.parsed,
+            index,
+            source.key(),
+            source.value(),
+        ))
     }
 }
 

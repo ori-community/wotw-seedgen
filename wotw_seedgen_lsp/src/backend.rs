@@ -7,9 +7,9 @@ use tower_lsp::{
     jsonrpc::Result,
     lsp_types::{
         CompletionParams, DidChangeTextDocumentParams, DidOpenTextDocumentParams,
-        DidSaveTextDocumentParams, HoverParams, MessageType, SemanticTokensParams,
-        SignatureHelpParams, TextDocumentContentChangeEvent, TextDocumentItem,
-        TextDocumentPositionParams, Url,
+        DidSaveTextDocumentParams, GotoDefinitionParams, HoverParams, MessageType,
+        SemanticTokensParams, SignatureHelpParams, TextDocumentContentChangeEvent,
+        TextDocumentItem, TextDocumentPositionParams, Url,
     },
     Client,
 };
@@ -166,6 +166,15 @@ impl<C> Backend<C> {
             .await;
 
         uri
+    }
+
+    pub async fn goto_definition_base(
+        &self,
+        params: GotoDefinitionParams,
+    ) -> Result<TextDocumentPosition<'_>> {
+        self.log("received textDocument/definition").await;
+
+        self.get_text_document_position(params.text_document_position_params)
     }
 
     pub async fn hover_base(&self, params: HoverParams) -> Result<TextDocumentPosition<'_>> {

@@ -139,7 +139,7 @@ impl<H: Handler, T: Traverse<H>, Separator> Traverse<H> for SeparatedNonEmpty<T,
 
 impl<H: Handler, T: Traverse<H>, R> Traverse<H> for Recoverable<T, R> {
     fn traverse(&self, handler: &mut H) {
-        self.value.traverse(handler)
+        self.value.traverse(handler);
     }
 }
 

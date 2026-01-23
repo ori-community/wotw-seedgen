@@ -1,3 +1,7 @@
+mod traverse;
+
+pub use traverse::{Handler, Traverse};
+
 use crate::logic_language::token::{Token, Tokenizer};
 use ordered_float::OrderedFloat;
 use std::ops::Range;
@@ -115,7 +119,7 @@ pub struct Anchor<'source> {
     pub content: Group<SeparatedNonEmpty<AnchorContent<'source>, Newline>>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct LogicIdentifier<'source>(pub &'source str);
 
 impl<'source> Ast<'source, Tokenizer> for LogicIdentifier<'source> {
