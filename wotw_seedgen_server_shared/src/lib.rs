@@ -35,7 +35,7 @@ where
     let state = Arc::new(RwLock::new(cache));
 
     let watcher_state = state.clone();
-    runtime.spawn_blocking(move || watch_assets(watcher_state, watcher));
+    runtime.spawn(watch_assets(watcher_state, watcher));
 
     eprintln!("Loaded assets");
 
