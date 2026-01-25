@@ -1,3 +1,7 @@
+#hidden
+#name("Wisp Count")
+#description("Counts the amount of collected Wisps")
+
 !export(count_wisps)
 fun count_wisps() {
     set_integer("wisp_count", 0)
