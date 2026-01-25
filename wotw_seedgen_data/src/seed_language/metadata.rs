@@ -24,6 +24,7 @@ pub struct ConfigValue {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
+#[serde(tag = "type", content = "value")]
 pub enum ConfigDefault {
     Boolean(bool),
     Integer(i32),
