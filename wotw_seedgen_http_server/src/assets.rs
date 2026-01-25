@@ -5,18 +5,15 @@ use wotw_seedgen::data::{
     MapIcon,
     assets::{
         AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-        DefaultFileAccess, LocData, PresetFileAccess,
-        SEEDGEN_USER_DATA_DIR, SnippetFileAccess, StateData, UberStateData,
+        DefaultFileAccess, LocData, PresetFileAccess, SEEDGEN_USER_DATA_DIR, SnippetFileAccess,
+        StateData, UberStateData,
     },
     logic_language::{ast::Areas, output::Graph},
     parse::Source,
     seed_language::{metadata::Metadata, simulate::UberStates},
 };
 
-use crate::api::{
-    logic::{MapIcons, RelevantUberStates},
-    snippets::SnippetInfo,
-};
+use crate::api::logic::{MapIcons, RelevantUberStates};
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
 
@@ -28,7 +25,7 @@ pub struct CacheValues {
     pub grom_shop_map_icon_index: usize,
     pub node_index_to_map_icon_index: FxHashMap<usize, usize>,
     pub relevant_uber_states: RelevantUberStates,
-    pub snippet_info: Vec<SnippetInfo>,
+    pub snippet_info: FxHashMap<String, Metadata>,
     pub data_dir_snippets: FxHashSet<String>,
 }
 
@@ -170,14 +167,11 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
         .collect()
 }
 
-fn snippet_info(snippets: &FxHashMap<String, Source>) -> Vec<SnippetInfo> {
+fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, Metadata> {
+    // TODO cache asts?
     snippets
         .iter()
-        .map(|(identifier, source)| SnippetInfo {
-            identifier: identifier.clone(),
-            // TODO cache asts?
-            metadata: Metadata::from_source(&source.content),
-        })
+        .map(|(identifier, source)| (identifier.clone(), Metadata::from_source(&source.content)))
         .collect()
 }
 
