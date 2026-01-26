@@ -600,7 +600,6 @@ pub struct TagsArg<'source>(pub Expression<'source>);
 pub struct Config;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-#[ast(debug)]
 pub struct ConfigArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub name: CommandArg<Spanned<&'source str>>,
