@@ -1,8 +1,8 @@
 #category("World Changes")
 #name("No Combat")
 #description("
-Skip all combat heavy parts. Shrine have their pickup floating above them before the fight
-all the arenas start as completed and all boss' combat phases are skipped")
+Skip all combat heavy parts. Shrines have their reward available for pickup right away,
+all arenas are completed and all boss combat phases are skipped")
 
 // TODO port https://github.com/SiriusAshling/wotw-seedgen/commit/ce324788abdd79ba7be5b9aa5fedc48ac2ad7dee
 
