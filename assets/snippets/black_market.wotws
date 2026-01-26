@@ -1,7 +1,7 @@
 #category("Placements")
 #name("Black Market")
 #description(
-"Opher sells Keystones from the Black Market. These Keystones are never required to beat the seed.
+"Opher and Twillen sell Keystones and Gorlek Ore respectively. These items are never required to beat the seed.
 Supply lasts indefinitely, but the price grows with the demand.")
 
 !config(keystones, "Let Opher sell Keystones", Boolean, true)
