@@ -19,7 +19,8 @@ pub struct Metadata {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 pub struct ConfigValue {
-    pub description: String,
+    pub name: String,
+    pub description: Option<String>,
     pub default: ConfigDefault,
 }
 
@@ -74,9 +75,9 @@ impl Handler for Metadata {
     }
 
     fn config(&mut self, config: &ast::ConfigArgs) {
-        let (Some(default), Some(description)) = (
+        let (Some(name), Some(default)) = (
+            get_command_arg_ref(&config.name),
             get_command_arg_ref(&config.default),
-            get_command_arg_ref(&config.description),
         ) else {
             return;
         };
@@ -88,8 +89,11 @@ impl Handler for Metadata {
             _ => return,
         };
 
+        let description = config.description.as_ref().map(|d| &d.1);
+
         let value = ConfigValue {
-            description: description.data.to_string(),
+            name: name.data.to_string(),
+            description: description.map(|d| d.data.to_string()),
             default,
         };
 

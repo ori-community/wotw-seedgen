@@ -401,11 +401,15 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
             for (config_identifier, config_value) in &available_snippet.metadata.config {
                 let _ = write!(
                     help,
-                    "\n    {literal}{snippet_identifier}.{config_identifier}{reset}: {description} [default: {default}]",
+                    "\n    {literal}{snippet_identifier}.{config_identifier}{reset}: {name}{description} [default: {default}]",
                     literal = LITERAL.render(),
                     snippet_identifier = available_snippet.identifier,
                     reset = Reset.render(),
-                    description = config_value.description,
+                    name = config_value.name,
+                    description = match &config_value.description {
+                        None => "".to_string(),
+                        Some(description) => format!("; {description}"),
+                    },
                     default = config_value.default,
                 );
             }

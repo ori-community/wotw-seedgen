@@ -3,8 +3,8 @@
 #description("You have to find Relics randomly scattered throughout Niwen before fighting Shriek")
 
 // TODO how define the constraints? Some kind of range type?
-!config(relic_chance, "Chance for each individual area of the game to have a relic", Float, 0.6)
-!config(relic_count, "If not zero, overrides relic chance. How many relics to place", Integer, 0)
+!config(relic_chance, "Relic Chance", "Chance for each individual area of the game to have a relic", Float, 0.6)
+!config(relic_count, "Relic Count", "If not zero, overrides relic chance. How many relics to place", Integer, 0)
 
 !if relic_count == 0 {
     !tags("Relics (" + to_integer(relic_chance * 100) + "%)")

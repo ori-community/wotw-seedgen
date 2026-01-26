@@ -2,9 +2,9 @@
 #name("Knowledge Hints")
 #description("Interactively displays useful hints on niche randomizer knowledge while playing the seed")
 
-!config(gate_hints, "Explain unintuitive gates such as Depths entrance", Boolean, true)
-!config(regen_logic_hint, "Explains zones logically requiring Regenerate", Boolean, true)
-!config(tp_logic_hints, "Explains logical teleporter requirements such as Flap for Reach teleporter", Boolean, true)
+!config(gate_hints, "Unintuitive Gates", "Explain unintuitive gates such as Depths entrance", Boolean, true)
+!config(regen_logic_hint, "Required Regenerate", "Explains zones logically requiring Regenerate", Boolean, true)
+!config(tp_logic_hints, "Teleporter Skill Requirements", "Explains logical teleporter requirements such as Flap for Reach teleporter", Boolean, true)
 
 // TODO explain key hints?
 

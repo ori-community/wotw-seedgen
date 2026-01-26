@@ -355,10 +355,14 @@ fn select_snippet_config_value(
             .zip(&current_values)
             .map(|((identifier, value), current)| {
                 format!(
-                    "{literal}{identifier}{reset} [{current}]: {description}",
+                    "{literal}{identifier}{reset} [{current}]: {name}{description}",
                     literal = LITERAL.render(),
                     reset = Reset.render(),
-                    description = value.description,
+                    name = value.name,
+                    description = match &value.description {
+                        None => "".to_string(),
+                        Some(description) => format!(" ({description})"),
+                    },
                 )
             });
         let items = sanitize_items(items);
@@ -401,9 +405,13 @@ fn choose_snippet_config_value(
     current: &mut String,
 ) -> Result<(), Error> {
     let prompt = format!(
-        "{prefix}Choose a value for {identifier} ({description})",
+        "{prefix}Choose a value for {identifier} ({name}{description})",
         identifier = value.0,
-        description = value.1.description
+        name = value.1.name,
+        description = match &value.1.description {
+            None => "".to_string(),
+            Some(description) => format!("; {description}")
+        }
     );
 
     let choice = match &value.1.default {

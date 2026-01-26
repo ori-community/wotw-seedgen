@@ -488,9 +488,11 @@ impl<H: Handler> Traverse<H> for ConfigArgs<'_> {
         handler.config(self);
 
         handler.identifier_def(&self.identifier);
-        inspect_command_arg(&self.description, |description| {
-            handler.string(&description.span)
-        });
+
+        if let Some(description) = &self.description {
+            handler.string(&description.1.span);
+        }
+        
         inspect_command_arg(&self.ty, |ty| handler.ty(&ty.span));
         inspect_command_arg(&self.default, |default| default.traverse(handler));
     }

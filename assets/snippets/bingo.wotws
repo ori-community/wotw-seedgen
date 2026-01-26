@@ -5,7 +5,7 @@
 (remember to enable netcode in options when rolling the seed)")
 
 !tags("Bingo")
-!config(lines, "How many lines you need to complete the game", Integer, 3)
+!config(lines, "Lines", "How many lines you need to complete the game", Integer, 3)
 !state(bingo_complete, Boolean)
 
 on change bingoState.lines {
