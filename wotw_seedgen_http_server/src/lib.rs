@@ -50,6 +50,8 @@ pub fn start(inactivity_timeout: Option<Duration>, address: Option<SocketAddr>) 
 
             inactive_recv.blocking_recv();
 
+            runtime.shutdown_background();
+
             eprintln!("inactivity deadline reached, exiting");
 
             Ok(())
