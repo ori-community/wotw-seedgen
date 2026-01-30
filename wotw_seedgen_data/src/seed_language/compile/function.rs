@@ -29,6 +29,10 @@ use std::{
 use strum::{Display, EnumString, VariantArray};
 use wotw_seedgen_parse::{Error, Punctuated, Span, SpanEnd, SpanStart, Symbol};
 
+pub const fn empty() -> CommandVoid {
+    CommandVoid::Multi { commands: vec![] }
+}
+
 // TODO could we make these helper functions const if multis used smallvecs?
 
 pub fn spirit_light(amount: CommandInteger, rng: &mut Pcg64Mcg) -> CommandVoid {

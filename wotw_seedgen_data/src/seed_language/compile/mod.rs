@@ -9,8 +9,9 @@ mod literal;
 mod preprocess;
 
 pub use function::{
-    clean_water, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot, skill,
-    spirit_light, teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier, FunctionSignature,
+    clean_water, empty, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot,
+    skill, spirit_light, teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier,
+    FunctionSignature,
 };
 pub use helpers::{add_float, add_integer, store_boolean, store_float, store_integer};
 
@@ -19,7 +20,8 @@ use crate::{
     assets::{SnippetAccess, UberStateData},
     seed_language::{
         ast::{self, Expression, Snippet, UberStateType},
-        output::{CommandVoid, IntermediateOutput, Literal, SnippetDebugOutput},
+        compile,
+        output::{IntermediateOutput, Literal, SnippetDebugOutput},
         types::{uber_state_type, InferType, Type},
     },
     UberIdentifier,
@@ -278,7 +280,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             .collect();
 
         global.output.command_lookup.extend(vec![
-            CommandVoid::Multi { commands: vec![] }; // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
+            compile::empty(); // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
             preprocessed.functions.len()
         ]);
 

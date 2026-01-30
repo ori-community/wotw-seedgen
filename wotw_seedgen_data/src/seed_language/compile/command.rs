@@ -5,6 +5,7 @@ use crate::{
     assets::UberStateAlias,
     seed_language::{
         ast::{self, get_command_arg, UberStateType},
+        compile,
         output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
     },
     Position, UberIdentifier, Zone,
@@ -247,14 +248,14 @@ impl<'source> Compile<'source> for ast::AugmentFunArgs<'source> {
             }
             (CommandVoid::Multi { commands }, action) => commands.push(action),
             (function, CommandVoid::Multi { mut commands }) => {
-                let head = mem::replace(function, CommandVoid::Multi { commands: vec![] });
+                let head = mem::replace(function, compile::empty());
 
                 commands.insert(0, head);
 
                 *function = CommandVoid::Multi { commands };
             }
             (function, action) => {
-                let head = mem::replace(function, CommandVoid::Multi { commands: vec![] });
+                let head = mem::replace(function, compile::empty());
 
                 let commands = vec![head, action];
 
