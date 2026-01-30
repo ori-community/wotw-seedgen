@@ -1,6 +1,9 @@
 use crate::{
-    seed_language::output::{
-        CommandInteger, CommandString, CommandVoid, ContainedWrites, StringOrPlaceholder,
+    seed_language::{
+        output::{
+            CommandInteger, CommandString, CommandVoid, ContainedWrites, Event, StringOrPlaceholder,
+        },
+        simulate::{Simulate, Simulation},
     },
     CommonUberIdentifier, Icon, MapIcon, Skill,
 };
@@ -44,6 +47,16 @@ impl ItemMetadataRef<'_, '_> {
             .map(CommandString::from)
             .or_else(|| self.command.find_message().cloned())
             .unwrap_or_else(|| self.command.to_string().into())
+    }
+
+    /// Force some kind of name for the item that can be used in a log
+    ///
+    /// Similar to [`Self::force_name`], but simulates the result to get a `String`
+    /// and removes characters that wouldn't be rendered in an in-game message
+    pub fn log_name<S: Simulation>(&self, simulation: &mut S, events: &[Event]) -> String {
+        let name = self.force_name().simulate(simulation, events);
+
+        strip_control_characters(&name)
     }
 
     /// Base price used when placed in a shop
@@ -179,3 +192,45 @@ const SHOP_DESCRIPTIONS: [&str; 38] = [
     "This one's good luck",
     "Better than a bowl of Marshclam Soup",
 ];
+
+// TODO why not in place?
+fn strip_control_characters(s: &str) -> String {
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut in_tag = false;
+
+    for (index, byte) in s.as_bytes().iter().enumerate() {
+        match (in_tag, byte) {
+            (_, b'@' | b'#' | b'$' | b'*') => {
+                result.push_str(&s[last_end..index]);
+                last_end = index + 1;
+            }
+            (false, b'<') => {
+                result.push_str(&s[last_end..index]);
+                in_tag = true;
+            }
+            (true, b'>') => {
+                last_end = index + 1;
+                in_tag = false;
+            }
+            _ => {}
+        }
+    }
+    result.push_str(&s[last_end..]);
+
+    result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::strip_control_characters as strip;
+
+    #[test]
+    fn strip_control_characters() {
+        assert_eq!(strip(""), "");
+        assert_eq!(strip("aaa"), "aaa");
+        assert_eq!(strip("@#$"), "");
+        assert_eq!(strip("@@@a@a@@a@"), "aaa");
+        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
+    }
+}

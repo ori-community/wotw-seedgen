@@ -27,7 +27,7 @@ use wotw_seedgen_data::{
             AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid, Concatenator,
             ContainedWrites, Event, IntermediateOutput, Operation, Trigger,
         },
-        simulate::{Simulate, Simulation},
+        simulate::Simulation,
     },
     UberIdentifier, UniverseSettings,
 };
@@ -1196,7 +1196,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                         "{}",
                         items
                             .into_iter()
-                            .map(|index| self.log_name(&self.item_pool[index].clone()))
+                            .map(|index| self
+                                .output
+                                .item_metadata
+                                .get(&self.item_pool[index])
+                                .log_name(&mut self.world, &self.output.events))
                             .format(", ")
                     )),
                     Progression::SpiritLight(amount) => f(&format_args!("{amount} Spirit Light")),
@@ -1274,11 +1278,10 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn log_name(&mut self, command: &CommandVoid) -> String {
-        let name = self
-            .name(command)
-            .simulate(&mut self.world, &self.output.events);
-
-        strip_control_characters(&name)
+        self.output
+            .item_metadata
+            .get(command)
+            .log_name(&mut self.world, &self.output.events)
     }
 
     fn fill_remaining(&mut self, placement_spoiler: &mut Vec<SpoilerPlacement>) {
@@ -1434,45 +1437,4 @@ fn format_pickups<'a, 'graph>(
     pickups: &'a [&'graph LocDataEntry],
 ) -> impl Display + use<'a, 'graph> {
     pickups.iter().map(|pickup| &pickup.identifier).format(", ")
-}
-
-fn strip_control_characters(s: &str) -> String {
-    let mut result = String::new();
-    let mut last_end = 0;
-    let mut in_tag = false;
-
-    for (index, byte) in s.as_bytes().iter().enumerate() {
-        match (in_tag, byte) {
-            (_, b'@' | b'#' | b'$' | b'*') => {
-                result.push_str(&s[last_end..index]);
-                last_end = index + 1;
-            }
-            (false, b'<') => {
-                result.push_str(&s[last_end..index]);
-                in_tag = true;
-            }
-            (true, b'>') => {
-                last_end = index + 1;
-                in_tag = false;
-            }
-            _ => {}
-        }
-    }
-    result.push_str(&s[last_end..]);
-
-    result
-}
-
-#[cfg(test)]
-mod tests {
-    use super::strip_control_characters as strip;
-
-    #[test]
-    fn strip_control_characters() {
-        assert_eq!(strip(""), "");
-        assert_eq!(strip("aaa"), "aaa");
-        assert_eq!(strip("@#$"), "");
-        assert_eq!(strip("@@@a@a@@a@"), "aaa");
-        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
-    }
 }
