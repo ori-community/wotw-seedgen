@@ -3,30 +3,33 @@ use crate::{
     seed_language::{
         compile::{add_float, add_integer, store_boolean, store_float, store_integer},
         output::Event,
-        simulate::{Simulate, UberStates, Variables},
+        simulate::{Simulate, Variables},
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
-use rustc_hash::FxHashMap;
 use strum::VariantArray;
 
 pub trait Simulation: Sized {
-    fn uber_states(&self) -> &UberStates;
+    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue;
 
-    fn uber_states_mut(&mut self) -> &mut UberStates;
-
-    fn variables(&self) -> &Variables;
-
-    fn variables_mut(&mut self) -> &mut Variables;
+    fn store_impl(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: UberStateValue,
+    ) -> impl Iterator<Item = usize> + '_;
 
     fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
         let _ = (uber_identifier, events);
     }
 
-    #[inline]
-    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
-        self.uber_states().fetch(uber_identifier)
-    }
+    fn variables(&self) -> &Variables;
+
+    fn variables_mut(&mut self) -> &mut Variables;
+
+    // TODO return a struct to check it doesn't get dropped unrestored
+    fn snapshot(&mut self);
+
+    fn restore_snapshot(&mut self);
 
     #[inline]
     fn fetch_boolean(&self, uber_identifier: UberIdentifier) -> bool {
@@ -167,37 +170,27 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn spirit_light(&self) -> i32 {
-        self.uber_states()
-            .fetch(UberIdentifier::SPIRIT_LIGHT)
-            .expect_integer()
+        self.fetch(UberIdentifier::SPIRIT_LIGHT).expect_integer()
     }
 
     #[inline]
     fn gorlek_ore(&self) -> i32 {
-        self.uber_states()
-            .fetch(UberIdentifier::GORLEK_ORE)
-            .expect_integer()
+        self.fetch(UberIdentifier::GORLEK_ORE).expect_integer()
     }
 
     #[inline]
     fn keystones(&self) -> i32 {
-        self.uber_states()
-            .fetch(UberIdentifier::KEYSTONES)
-            .expect_integer()
+        self.fetch(UberIdentifier::KEYSTONES).expect_integer()
     }
 
     #[inline]
     fn shard_slots(&self) -> i32 {
-        self.uber_states()
-            .fetch(UberIdentifier::SHARD_SLOTS)
-            .expect_integer()
+        self.fetch(UberIdentifier::SHARD_SLOTS).expect_integer()
     }
 
     #[inline]
     fn base_max_health(&self) -> f32 {
-        self.uber_states()
-            .fetch(UberIdentifier::MAX_HEALTH)
-            .expect_integer() as f32
+        self.fetch(UberIdentifier::MAX_HEALTH).expect_integer() as f32
     }
 
     /// Returns the maximum health
@@ -222,9 +215,7 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn base_max_energy(&self) -> f32 {
-        self.uber_states()
-            .fetch(UberIdentifier::MAX_ENERGY)
-            .expect_float()
+        self.fetch(UberIdentifier::MAX_ENERGY).expect_float()
     }
 
     /// Returns the maximum energy
@@ -249,36 +240,27 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn skill(&self, skill: Skill) -> bool {
-        self.uber_states()
-            .fetch(skill.uber_identifier())
-            .expect_boolean()
+        self.fetch(skill.uber_identifier()).expect_boolean()
     }
 
     #[inline]
     fn shard(&self, shard: Shard) -> bool {
-        self.uber_states()
-            .fetch(shard.uber_identifier())
-            .expect_boolean()
+        self.fetch(shard.uber_identifier()).expect_boolean()
     }
 
     #[inline]
     fn teleporter(&self, teleporter: Teleporter) -> bool {
-        self.uber_states()
-            .fetch(teleporter.uber_identifier())
-            .expect_boolean()
+        self.fetch(teleporter.uber_identifier()).expect_boolean()
     }
 
     #[inline]
     fn clean_water(&self) -> bool {
-        self.uber_states()
-            .fetch(UberIdentifier::CLEAN_WATER)
-            .expect_boolean()
+        self.fetch(UberIdentifier::CLEAN_WATER).expect_boolean()
     }
 
     #[inline]
     fn weapon_upgrade(&self, weapon_upgrade: WeaponUpgrade) -> bool {
-        self.uber_states()
-            .fetch(weapon_upgrade.uber_identifier())
+        self.fetch(weapon_upgrade.uber_identifier())
             .expect_integer()
             > 0
     }
@@ -311,15 +293,15 @@ pub trait Simulation: Sized {
             .filter(|weapon_upgrade| self.weapon_upgrade(*weapon_upgrade))
     }
 
-    fn snapshot(&mut self, id: u8) {
-        self.uber_states_mut().snapshot(id);
-    }
+    // mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/uber_states/uber_state_intercepts.cpp
+    fn should_prevent_store(&self, uber_identifier: UberIdentifier, value: UberStateValue) -> bool {
+        const WELLSPRING_QUEST: UberIdentifier = UberIdentifier::new(937, 34641);
+        const KU_QUEST: UberIdentifier = UberIdentifier::new(14019, 34504);
 
-    fn take_snapshot(&mut self, id: u8) -> FxHashMap<UberIdentifier, UberStateValue> {
-        self.uber_states_mut().take_snapshot(id)
-    }
-
-    fn restore_snapshot(&mut self, id: u8) {
-        self.uber_states_mut().restore_snapshot(id);
+        match uber_identifier {
+            WELLSPRING_QUEST => self.fetch(WELLSPRING_QUEST) >= value.as_integer(),
+            KU_QUEST => value <= 4,
+            _ => false,
+        }
     }
 }

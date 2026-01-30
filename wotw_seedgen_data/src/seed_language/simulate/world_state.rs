@@ -1,4 +1,8 @@
-use crate::seed_language::simulate::{Simulation, UberStates, Variables};
+use crate::{
+    assets::UberStateValue,
+    seed_language::simulate::{Simulation, UberStates, Variables},
+    UberIdentifier,
+};
 
 #[derive(Debug, Clone)]
 pub struct WorldState {
@@ -17,14 +21,16 @@ impl WorldState {
 }
 
 impl Simulation for WorldState {
-    #[inline]
-    fn uber_states(&self) -> &UberStates {
-        &self.uber_states
+    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
+        self.uber_states.fetch(uber_identifier)
     }
 
-    #[inline]
-    fn uber_states_mut(&mut self) -> &mut UberStates {
-        &mut self.uber_states
+    fn store_impl(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: UberStateValue,
+    ) -> impl Iterator<Item = usize> + '_ {
+        self.uber_states.store(uber_identifier, value)
     }
 
     #[inline]
@@ -35,5 +41,13 @@ impl Simulation for WorldState {
     #[inline]
     fn variables_mut(&mut self) -> &mut Variables {
         &mut self.variables
+    }
+
+    fn snapshot(&mut self) {
+        self.uber_states.snapshot();
+    }
+
+    fn restore_snapshot(&mut self) {
+        self.uber_states.restore_snapshot();
     }
 }

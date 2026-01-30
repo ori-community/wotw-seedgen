@@ -1,8 +1,10 @@
+mod cache;
 mod simulation;
 mod uber_states;
 mod variables;
 mod world_state;
 
+pub use cache::SimulationCache;
 pub use simulation::Simulation;
 pub use uber_states::UberStates;
 pub use variables::Variables;
@@ -109,10 +111,9 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
             CommandBoolean::CompareString { operation } => operation.simulate(simulation, events),
             CommandBoolean::CompareZone { operation } => operation.simulate(simulation, events),
             CommandBoolean::LogicOperation { operation } => operation.simulate(simulation, events),
-            CommandBoolean::FetchBoolean { uber_identifier } => simulation
-                .uber_states()
-                .fetch(*uber_identifier)
-                .as_boolean(),
+            CommandBoolean::FetchBoolean { uber_identifier } => {
+                simulation.fetch(*uber_identifier).as_boolean()
+            }
             CommandBoolean::GetBoolean { id } => simulation.variables().get_boolean(id),
             CommandBoolean::IsInBox { .. } => false,
         }
@@ -130,10 +131,9 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
                 last.simulate(simulation, events)
             }
             CommandInteger::Arithmetic { operation } => operation.simulate(simulation, events),
-            CommandInteger::FetchInteger { uber_identifier } => simulation
-                .uber_states()
-                .fetch(*uber_identifier)
-                .as_integer(),
+            CommandInteger::FetchInteger { uber_identifier } => {
+                simulation.fetch(*uber_identifier).as_integer()
+            }
             CommandInteger::GetInteger { id } => simulation.variables().get_integer(id),
             CommandInteger::FromFloat { float } => {
                 float.simulate(simulation, events).into_inner().round() as i32
@@ -156,11 +156,9 @@ impl<S: Simulation> Simulate<S> for CommandFloat {
                 last.simulate(simulation, events)
             }
             CommandFloat::Arithmetic { operation } => operation.simulate(simulation, events),
-            CommandFloat::FetchFloat { uber_identifier } => simulation
-                .uber_states()
-                .fetch(*uber_identifier)
-                .as_float()
-                .into(),
+            CommandFloat::FetchFloat { uber_identifier } => {
+                simulation.fetch(*uber_identifier).as_float().into()
+            }
             CommandFloat::GetFloat { id } => simulation.variables().get_float(id),
             CommandFloat::FromInteger { integer } => {
                 (integer.simulate(simulation, events) as f32).into()
@@ -327,22 +325,16 @@ fn set_uber_state<S: Simulation>(
     trigger_events: bool,
 ) {
     // TODO virtual uberstate simulation?
-    if simulation
-        .uber_states()
-        .prevent_change(uber_identifier, value)
-    {
+    if simulation.should_prevent_store(uber_identifier, value) {
         return;
     }
 
     if trigger_events {
-        let triggers = simulation
-            .uber_states_mut()
-            .set_and_return_triggers(uber_identifier, value)
-            .collect();
+        let triggers = simulation.store_impl(uber_identifier, value).collect();
         side_effects(simulation, events, uber_identifier, value);
         process_triggers(simulation, events, triggers);
     } else {
-        simulation.uber_states_mut().set(uber_identifier, value);
+        let _ = simulation.store_impl(uber_identifier, value);
     }
 
     simulation.on_change(uber_identifier, events);

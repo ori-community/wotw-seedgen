@@ -13,7 +13,7 @@ pub struct UberStates {
     states: FxHashMap<UberIdentifier, UberStateEntry>,
     registered_triggers: usize,
     fallback: UberStateEntry,
-    snapshot: FxHashMap<u8, FxHashMap<UberIdentifier, UberStateValue>>,
+    snapshot: Option<FxHashMap<UberIdentifier, UberStateValue>>,
 }
 
 #[derive(Debug, Clone)]
@@ -49,37 +49,17 @@ impl UberStates {
                 value: UberStateValue::Boolean(false),
                 triggers: Default::default(),
             },
-            snapshot: FxHashMap::default(),
+            snapshot: None,
         }
     }
 
-    pub(crate) fn snapshot(&mut self, id: u8) {
-        self.snapshot.insert(id, FxHashMap::default());
+    pub(crate) fn snapshot(&mut self) {
+        self.snapshot = Some(FxHashMap::default());
     }
 
-    pub(crate) fn take_snapshot(&mut self, id: u8) -> FxHashMap<UberIdentifier, UberStateValue> {
-        self.snapshot.remove(&id).unwrap()
-    }
-
-    pub(crate) fn restore_snapshot(&mut self, id: u8) {
-        for (uber_identifier, value) in self.take_snapshot(id) {
+    pub(crate) fn restore_snapshot(&mut self) {
+        for (uber_identifier, value) in self.snapshot.take().unwrap() {
             self.states.get_mut(&uber_identifier).unwrap().value = value;
-        }
-    }
-
-    // mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/uber_states/uber_state_intercepts.cpp
-    pub(crate) fn prevent_change(
-        &self,
-        uber_identifier: UberIdentifier,
-        value: UberStateValue,
-    ) -> bool {
-        const WELLSPRING_QUEST: UberIdentifier = UberIdentifier::new(937, 34641);
-        const KU_QUEST: UberIdentifier = UberIdentifier::new(14019, 34504);
-
-        match uber_identifier {
-            WELLSPRING_QUEST => self.fetch(WELLSPRING_QUEST) >= value.as_integer(),
-            KU_QUEST => value <= 4,
-            _ => false,
         }
     }
 
@@ -97,11 +77,7 @@ impl UberStates {
         self.registered_triggers += 1;
     }
 
-    pub(crate) fn set(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) {
-        let _ = self.set_and_return_triggers(uber_identifier, value);
-    }
-
-    pub(crate) fn set_and_return_triggers(
+    pub(crate) fn store(
         &mut self,
         uber_identifier: UberIdentifier,
         value: UberStateValue,
@@ -114,7 +90,7 @@ impl UberStates {
             }
             Some(entry) => {
                 if entry.value != value {
-                    for snapshot in self.snapshot.values_mut() {
+                    if let Some(snapshot) = &mut self.snapshot {
                         snapshot.entry(uber_identifier).or_insert(entry.value);
                     }
 

@@ -4,18 +4,18 @@ use super::*;
 use crate::{
     item_pool::ItemPool,
     tests::test_logger,
-    world::reached::{ALL_CONNECTIONS, Progression},
+    world::reached::{Progression, ALL_CONNECTIONS},
 };
 use itertools::Itertools;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use wotw_seedgen_data::{
-    DEFAULT_SPAWN, Difficulty,
     assets::{AssetCacheValues, AssetFileAccess, TEST_ASSETS},
     logic_language::{
         ast::Areas,
         output::{Enemy, Requirement},
     },
+    Difficulty, DEFAULT_SPAWN,
 };
 
 fn test_settings(difficulty: Difficulty) -> WorldSettings {
@@ -246,7 +246,7 @@ fn max_energy() {
 fn refill_orbs() {
     let settings = test_settings(Difficulty::Gorlek);
     let mut world = empty_test_world(&settings, DEFAULT_SPAWN);
-    world.snapshot(0);
+    world.snapshot();
 
     let expected = [
         0., 5., 10., 15., 20., 25., 30., 35., 40., 40., 40., 40., 40., 40., 40., 40., 40., 40.,
@@ -258,8 +258,8 @@ fn refill_orbs() {
         world.add_max_health(5, &[]);
     }
 
-    world.restore_snapshot(0);
-    world.snapshot(0);
+    world.restore_snapshot();
+    world.snapshot();
 
     let expected = [
         0., 0., 0., 0., 1., 1., 1., 1., 1., 2., 2., 2., 2., 2., 2., 2., 3., 3., 3., 3., 3., 4., 4.,
@@ -271,7 +271,7 @@ fn refill_orbs() {
         world.add_max_health(5, &[]);
     }
 
-    world.restore_snapshot(0);
+    world.restore_snapshot();
 
     world.store_shard(Shard::Energy, true, &[]);
     world.store_shard(Shard::Vitality, true, &[]);

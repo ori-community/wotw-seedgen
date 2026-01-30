@@ -21,9 +21,9 @@ use wotw_seedgen_data::{
     logic_language::output::{Graph, RefillValue},
     seed_language::{
         output::Event,
-        simulate::{Simulation, UberStates, Variables, WorldState},
+        simulate::{Simulation, SimulationCache, UberStates, Variables, WorldState},
     },
-    Difficulty, Shard, Skill, UberIdentifier, WorldSettings,
+    Difficulty, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WorldSettings,
 };
 
 // TODO A stateful reach check would have some advantages, for instance currently seedgen would not correctly account for "Grant Launch on breaking this Wall"
@@ -35,7 +35,7 @@ pub struct World<'graph, 'settings> {
     pub(crate) spawn: usize,
     pub(crate) settings: &'settings WorldSettings,
     pub(crate) reach: Reach,
-    state: WorldState,
+    state: SimulationCache<WorldState>,
     updating_reach: bool,
     snapshot: Option<Reach>,
 }
@@ -51,7 +51,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         uber_states: UberStates,
     ) -> Self {
         Self {
-            state: WorldState::new(uber_states),
+            state: SimulationCache::new(WorldState::new(uber_states)),
             graph,
             spawn,
             settings,
@@ -533,14 +533,20 @@ impl<'graph, 'settings> World<'graph, 'settings> {
 }
 
 impl Simulation for World<'_, '_> {
-    #[inline]
-    fn uber_states(&self) -> &UberStates {
-        self.state.uber_states()
+    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
+        self.state.fetch(uber_identifier)
     }
 
-    #[inline]
-    fn uber_states_mut(&mut self) -> &mut UberStates {
-        self.state.uber_states_mut()
+    fn store_impl(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: UberStateValue,
+    ) -> impl Iterator<Item = usize> + '_ {
+        self.state.store_impl(uber_identifier, value)
+    }
+
+    fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
+        self.update_reached(uber_identifier, events);
     }
 
     #[inline]
@@ -553,40 +559,92 @@ impl Simulation for World<'_, '_> {
         self.state.variables_mut()
     }
 
-    #[inline]
-    fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
-        self.update_reached(uber_identifier, events);
+    fn snapshot(&mut self) {
+        self.state.snapshot();
+        self.snapshot = Some(self.reach.clone());
+    }
+
+    fn restore_snapshot(&mut self) {
+        self.state.restore_snapshot();
+        self.reach = self.snapshot.take().unwrap();
+    }
+
+    // Not sure how we could use the cache-efficient specialized stores without invalidating our reach
+
+    fn spirit_light(&self) -> i32 {
+        self.state.spirit_light()
+    }
+
+    fn gorlek_ore(&self) -> i32 {
+        self.state.gorlek_ore()
+    }
+
+    fn keystones(&self) -> i32 {
+        self.state.keystones()
+    }
+
+    fn shard_slots(&self) -> i32 {
+        self.state.shard_slots()
+    }
+
+    fn base_max_health(&self) -> f32 {
+        self.state.base_max_health()
     }
 
     fn max_health(&self) -> f32 {
         if self.settings.difficulty >= logical_difficulty::VITALITY {
-            WorldState::max_health(&self.state)
+            self.state.max_health()
         } else {
             self.base_max_health()
         }
     }
 
+    fn base_max_energy(&self) -> f32 {
+        self.state.base_max_energy()
+    }
+
     fn max_energy(&self) -> f32 {
         if self.settings.difficulty >= logical_difficulty::ENERGY_SHARD {
-            WorldState::max_energy(&self.state)
+            self.state.max_energy()
         } else {
             self.base_max_energy()
         }
     }
 
-    fn snapshot(&mut self, id: u8) {
-        self.state.snapshot(id);
-        self.snapshot = Some(self.reach.clone());
+    fn skill(&self, skill: Skill) -> bool {
+        self.state.skill(skill)
     }
 
-    fn take_snapshot(&mut self, id: u8) -> FxHashMap<UberIdentifier, UberStateValue> {
-        self.snapshot = None;
-        self.state.take_snapshot(id)
+    fn shard(&self, shard: Shard) -> bool {
+        self.state.shard(shard)
     }
 
-    fn restore_snapshot(&mut self, id: u8) {
-        self.state.restore_snapshot(id);
-        self.reach = mem::take(&mut self.snapshot).unwrap();
+    fn teleporter(&self, teleporter: Teleporter) -> bool {
+        self.state.teleporter(teleporter)
+    }
+
+    fn clean_water(&self) -> bool {
+        self.state.clean_water()
+    }
+
+    fn weapon_upgrade(&self, weapon_upgrade: WeaponUpgrade) -> bool {
+        self.state.weapon_upgrade(weapon_upgrade)
+    }
+
+    fn skills(&self) -> impl Iterator<Item = Skill> + '_ {
+        self.state.skills()
+    }
+
+    fn shards(&self) -> impl Iterator<Item = Shard> + '_ {
+        self.state.shards()
+    }
+
+    fn teleporters(&self) -> impl Iterator<Item = Teleporter> + '_ {
+        self.state.teleporters()
+    }
+
+    fn weapon_upgrades(&self) -> impl Iterator<Item = WeaponUpgrade> + '_ {
+        self.state.weapon_upgrades()
     }
 }
 

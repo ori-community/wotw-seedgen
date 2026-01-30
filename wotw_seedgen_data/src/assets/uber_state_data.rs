@@ -91,7 +91,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Boolean(value) => value,
             _ => {
-                eprintln!("Attempted to access {self} UberState as Boolean");
+                eprintln!("Attempted to access {self:?} UberState as Boolean");
                 Default::default()
             }
         }
@@ -100,7 +100,7 @@ impl UberStateValue {
     pub fn expect_boolean(self) -> bool {
         match self {
             UberStateValue::Boolean(value) => value,
-            _ => panic!("Attempted to access {self} UberState as Boolean"),
+            _ => panic!("Attempted to access {self:?} UberState as Boolean"),
         }
     }
 
@@ -108,7 +108,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Integer(value) => value,
             _ => {
-                eprintln!("Attempted to access {self} UberState as Integer");
+                eprintln!("Attempted to access {self:?} UberState as Integer");
                 Default::default()
             }
         }
@@ -117,7 +117,7 @@ impl UberStateValue {
     pub fn expect_integer(self) -> i32 {
         match self {
             UberStateValue::Integer(value) => value,
-            _ => panic!("Attempted to access {self} UberState as Integer"),
+            _ => panic!("Attempted to access {self:?} UberState as Integer"),
         }
     }
 
@@ -125,7 +125,7 @@ impl UberStateValue {
         match self {
             UberStateValue::Float(value) => value,
             _ => {
-                eprintln!("Attempted to access {self} UberState as Float");
+                eprintln!("Attempted to access {self:?} UberState as Float");
                 Default::default()
             }
         }
@@ -134,7 +134,7 @@ impl UberStateValue {
     pub fn expect_float(self) -> f32 {
         match self {
             UberStateValue::Float(value) => value,
-            _ => panic!("Attempted to access {self} UberState as Float"),
+            _ => panic!("Attempted to access {self:?} UberState as Float"),
         }
     }
 }

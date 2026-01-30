@@ -1,25 +1,24 @@
 use super::{
-    SEED_FAILED_MESSAGE, Seed, SeedUniverse, item_pool::ItemPool,
-    spirit_light::SpiritLightProvider, weight::weight,
+    item_pool::ItemPool, spirit_light::SpiritLightProvider, weight::weight, Seed, SeedUniverse,
+    SEED_FAILED_MESSAGE,
 };
 use crate::{
-    World,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
+    World,
 };
 use itertools::Itertools;
-use log::{Level::Trace, log_enabled, trace, warn};
+use log::{log_enabled, trace, warn, Level::Trace};
 use ordered_float::OrderedFloat;
 use rand::{
-    Rng, SeedableRng,
     distributions::WeightedIndex,
     prelude::Distribution,
     seq::{IteratorRandom, SliceRandom},
+    Rng, SeedableRng,
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom};
 use wotw_seedgen_data::{
-    UberIdentifier, UniverseSettings,
     assets::{LocData, LocDataEntry, UberStateValue},
     logic_language::output::Node,
     seed_language::{
@@ -30,6 +29,7 @@ use wotw_seedgen_data::{
         },
         simulate::{Simulate, Simulation},
     },
+    UberIdentifier, UniverseSettings,
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
@@ -1047,14 +1047,14 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .map(|(item_pool_index, item)| {
                 let progression = Progression::ItemPool(vec![item_pool_index]);
 
-                self.world.snapshot(0);
+                self.world.snapshot();
 
                 self.world.simulate(item, &self.output.events);
 
                 let new_reached = self.world.reached_pickup_count().saturating_sub(reached);
                 let weight = weight(new_reached, uber_identifier, 1., 1, slots);
 
-                self.world.restore_snapshot(0);
+                self.world.restore_snapshot();
 
                 WeightedProgression {
                     items: progression,
@@ -1077,7 +1077,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
             let mut reached = initial_reached;
 
-            self.world.snapshot(0);
+            self.world.snapshot();
 
             let mut items = vec![];
 
@@ -1104,7 +1104,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 UberStateValue::Float(value) => value - initial_value.expect_float(),
             };
 
-            self.world.restore_snapshot(0);
+            self.world.restore_snapshot();
 
             if items.is_empty() {
                 return None;
@@ -1124,7 +1124,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         let initial_reached = self.world.reached_pickup_count();
         let mut reached = 0;
 
-        self.world.snapshot(0);
+        self.world.snapshot();
 
         let mut amount = 0;
 
@@ -1139,7 +1139,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             }
         }
 
-        self.world.restore_snapshot(0);
+        self.world.restore_snapshot();
 
         if amount == 0 {
             return None;
