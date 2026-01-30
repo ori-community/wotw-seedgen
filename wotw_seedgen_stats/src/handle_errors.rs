@@ -1,13 +1,13 @@
 use std::fmt::Display;
 
-pub(crate) struct HandleErrors<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> {
+pub(crate) struct HandleErrors<T, E, I: Iterator<Item = Result<T, E>>, F: FnMut(E)> {
     iter: I,
     handler: F,
     pub errors: usize,
     printed_error_count: bool,
 }
 
-impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> HandleErrors<T, E, I, F> {
+impl<T, E, I: Iterator<Item = Result<T, E>>, F: FnMut(E)> HandleErrors<T, E, I, F> {
     pub(crate) fn new(iter: I, handler: F) -> Self {
         Self {
             iter,
@@ -18,15 +18,13 @@ impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> HandleErr
     }
 }
 
-impl<T, E: Display, I: Iterator<Item = std::result::Result<T, E>>> HandleErrors<T, E, I, fn(E)> {
+impl<T, E: Display, I: Iterator<Item = Result<T, E>>> HandleErrors<T, E, I, fn(E)> {
     pub(crate) fn new_print_errors(iter: I) -> Self {
         Self::new(iter, |err| eprintln!("{err}"))
     }
 }
 
-impl<T, E, I: Iterator<Item = std::result::Result<T, E>>, F: FnMut(E)> Iterator
-    for HandleErrors<T, E, I, F>
-{
+impl<T, E, I: Iterator<Item = Result<T, E>>, F: FnMut(E)> Iterator for HandleErrors<T, E, I, F> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {

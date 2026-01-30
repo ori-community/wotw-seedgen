@@ -29,6 +29,8 @@ use wotw_seedgen::{
     spoiler::SeedSpoiler,
 };
 
+// TODO use the assets fs helpers here for better errors
+
 pub type Result<T> = std::result::Result<T, String>;
 
 pub struct StatsGenerator<
@@ -158,6 +160,19 @@ impl<
         if self.overwrite_seed_storage {
             self.storage_access.clean_all_seeds()?;
             eprintln!("Cleaned seed storage for these settings");
+        } else {
+            self.storage_access.check_cache(self.settings, |settings| {
+                wotw_seedgen::generate_seed(
+                    self.graph,
+                    self.loc_data,
+                    self.uber_state_data,
+                    self.snippet_access,
+                    settings,
+                    false,
+                )
+                .ok()
+                .map(|seed| seed.spoiler)
+            })?;
         }
 
         if self.settings.world_count() > 1 {
@@ -225,7 +240,7 @@ impl<
                         let mut settings = self.settings.clone();
 
                         loop {
-                            let count = count.fetch_add(1, Ordering::Relaxed);
+                            let count = count.fetch_add(1, Ordering::Relaxed) + 1;
 
                             if count > self.sample_size {
                                 break;
@@ -236,8 +251,7 @@ impl<
 
                             settings.seed = rand::random::<u64>().to_string();
 
-                            let seed =
-                                self.generate_seed(count, &settings, errors, error_messages)?;
+                            let seed = self.generate_seed(&settings, errors, error_messages)?;
 
                             self.analyze_seed(
                                 &seed,
@@ -263,7 +277,6 @@ impl<
 
     fn generate_seed(
         &self,
-        count: usize,
         settings: &UniverseSettings,
         errors: &AtomicUsize,
         error_messages: &Mutex<Vec<String>>,
@@ -301,7 +314,7 @@ impl<
             }
         };
 
-        if let Err(err) = self.storage_access.write_seed(&seed, settings, count) {
+        if let Err(err) = self.storage_access.write_seed(&seed, settings) {
             eprintln!("{err}");
         };
 

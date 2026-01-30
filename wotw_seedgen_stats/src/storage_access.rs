@@ -14,13 +14,17 @@ use wotw_seedgen::{
 pub trait SeedStorageAccess {
     type Iter: Iterator<Item = Result<SeedSpoiler>>;
 
+    /// check that the cache for `settings` is up to date
+    fn check_cache<F>(&self, settings: &UniverseSettings, f: F) -> Result<()>
+    where
+        F: FnMut(&UniverseSettings) -> Option<SeedSpoiler>;
+
     /// fetch seeds that have been previously generated with these settings
     fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter>;
+
     /// write a seed generated from these settings for later use
-    ///
-    /// `key` should be unique, although it is recommended you don't rely on this being true and take it as a hint for what key you could use
-    fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings, key: usize)
-        -> Result<()>;
+    fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()>;
+
     /// clean all seeds that have previously been generated
     fn clean_all_seeds(&self) -> Result<()>;
 }
@@ -30,7 +34,7 @@ use crate::handle_errors::HandleErrors;
 use super::*;
 
 use std::{
-    fs::{self, DirEntry, ReadDir},
+    fs::{self, DirEntry, File, ReadDir},
     hash::{Hash, Hasher},
     io::{self, Write},
     path::{Path, PathBuf},
@@ -39,52 +43,72 @@ use std::{
 
 use rustc_hash::FxHasher;
 
-static SEED_STORAGE_DIR: LazyLock<PathBuf> = LazyLock::new(|| SEEDGEN_USER_DATA_DIR.join("seed_storage"));
+static SEED_STORAGE_DIR: LazyLock<PathBuf> =
+    LazyLock::new(|| SEEDGEN_USER_DATA_DIR.join("seed_storage"));
 
 /// A [`SeedStorageAccess`] implementation storing and fetching seeds using the local filesystem
 pub struct FileAccess;
 impl SeedStorageAccess for FileAccess {
     type Iter = ReadSeeds;
 
-    fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter> {
-        let path = path_from_settings(settings);
+    fn check_cache<F>(&self, settings: &UniverseSettings, f: F) -> Result<()>
+    where
+        F: FnOnce(&UniverseSettings) -> Option<SeedSpoiler>,
+    {
+        let base_path = path_from_settings(settings);
 
-        ReadSeeds::new(path, limit)
+        let valid = fs::read_dir(&base_path)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .find_map(|entry| {
+                let path = entry.path();
+                let seed = path.file_stem()?.to_str()?.to_owned();
+                let previous: SeedSpoiler =
+                    bincode::deserialize_from(File::open(path).ok()?).ok()?;
+
+                Some((seed, previous))
+            })
+            .map_or(true, |(seed, previous)| {
+                let settings = UniverseSettings {
+                    seed,
+                    world_settings: settings.world_settings.clone(),
+                };
+
+                let current = f(&settings);
+
+                current == Some(previous)
+            });
+
+        if !valid {
+            eprintln!("failed to validate cache for these settings, removing previous seeds");
+            fs::remove_dir_all(&base_path).map_err(|err| format_read_dir_err(err, &base_path))?;
+        }
+
+        Ok(())
     }
 
-    fn write_seed(
-        &self,
-        seed: &SeedSpoiler,
-        settings: &UniverseSettings,
-        mut key: usize,
-    ) -> Result<()> {
+    fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter> {
+        ReadSeeds::new(settings, limit)
+    }
+
+    fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()> {
         let bytes = bincode::serialize(seed).expect("Failed to serialize spoiler");
-        let base_path = path_from_settings(settings);
-        assets::create_dir_all(&base_path)?;
+        let mut path = path_from_settings(settings);
+        assets::create_dir_all(&path)?;
 
-        loop {
-            let mut path = base_path.to_path_buf();
-            path.push(key.to_string());
+        path.push(&settings.seed);
 
-            match fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&path)
-            {
-                Ok(mut file) => {
-                    file.write_all(bytes.as_ref())
-                        .map_err(|err| format!("Failed to write seed to storage: {err}"))?;
-                    return Ok(());
-                }
-                Err(err) => {
-                    if err.kind() == io::ErrorKind::AlreadyExists {
-                        key += 1
-                    } else {
-                        return Err(format!("Failed to write seed to storage: {err}"));
-                    }
-                }
-            }
-        }
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .map_err(|err| format!("Failed to write seed to storage: {err}"))?;
+
+        file.write_all(bytes.as_ref())
+            .map_err(|err| format!("Failed to write seed to storage: {err}"))?;
+
+        Ok(())
     }
 
     fn clean_all_seeds(&self) -> Result<()> {
@@ -102,14 +126,8 @@ pub struct ReadSeeds {
 }
 
 impl ReadSeeds {
-    fn new(path: PathBuf, limit: usize) -> Result<Self> {
-        fn format_read_dir_err(err: io::Error, path: &Path) -> String {
-            format!(
-                "Failed to access seed storage at \"{}\": {}",
-                path.display(),
-                err
-            )
-        }
+    fn new(settings: &UniverseSettings, limit: usize) -> Result<Self> {
+        let path = path_from_settings(settings);
 
         match read_dir(&path, limit) {
             Ok(dir) => print_feedback_for_existing_seeds(dir),
@@ -194,11 +212,20 @@ fn read_dir<P: AsRef<Path>>(path: P, limit: usize) -> io::Result<HandleErrorsRea
     })
 }
 
+fn format_read_dir_err(err: io::Error, path: &Path) -> String {
+    format!(
+        "Failed to access seed storage at \"{}\": {}",
+        path.display(),
+        err
+    )
+}
+
 fn path_from_settings(settings: &UniverseSettings) -> PathBuf {
     SEED_STORAGE_DIR.join(format!("{:x}", hash_settings(settings)))
 }
 
 fn hash_settings(settings: &UniverseSettings) -> u64 {
+    // TODO why not derive Hash on WorldSettings?
     let mut hasher = FxHasher::default();
     let bytes = bincode::serialize(&settings.world_settings).expect("Failed to serialize settings"); // We deliberately ignore the seed
     bytes.hash(&mut hasher);
