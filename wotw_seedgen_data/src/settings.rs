@@ -143,6 +143,13 @@ pub struct WorldSettings {
 }
 
 impl WorldSettings {
+    pub fn difficulty_default(difficulty: Difficulty) -> Self {
+        Self {
+            difficulty,
+            ..Default::default()
+        }
+    }
+
     pub fn random<R: Rng, A: SnippetAccess>(rng: &mut R, snippet_access: &A) -> Self {
         let difficulty = *<Difficulty as VariantArray>::VARIANTS.choose(rng).unwrap();
 

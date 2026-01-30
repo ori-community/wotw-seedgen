@@ -3,11 +3,13 @@ pub mod item_pool;
 pub mod spoiler;
 
 mod placement;
+mod solutions;
 mod spirit_light;
-mod weight;
 
 use self::spoiler::SeedSpoiler;
-use crate::{generator::placement::generate_placements, logical_difficulty, world::World};
+use crate::{
+    generator::placement::generate_placements, logical_difficulty::LogicalDifficulty, world::World,
+};
 use log::{info, trace, warn};
 use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
@@ -147,7 +149,7 @@ fn choose_spawn(
 ) -> Result<usize, String> {
     let spawn = match &world_settings.spawn {
         Spawn::Random => {
-            let spawns = logical_difficulty::spawn_locations(world_settings.difficulty);
+            let spawns = world_settings.difficulty.spawn_locations();
 
             graph
                 .nodes

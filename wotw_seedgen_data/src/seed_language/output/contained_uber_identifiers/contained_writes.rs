@@ -5,6 +5,7 @@ use crate::{
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
 use ordered_float::OrderedFloat;
+use strum::EnumTryAs;
 
 use super::{none, some};
 
@@ -17,6 +18,10 @@ where
 
 pub trait ContainedWrites {
     fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>>;
+
+    fn contained_writes_owned(&self) -> impl Iterator<Item = UberStateWriteOwned> {
+        self.contained_writes().map(UberStateWriteOwned::new)
+    }
 
     fn contained_write_identifiers(&self) -> impl Iterator<Item = UberIdentifier> {
         self.contained_writes().map(|write| write.uber_identifier)
@@ -38,7 +43,7 @@ pub trait ContainedWrites {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UberStateWriteGeneric<U, C> {
     pub uber_identifier: U,
     pub command: C,
@@ -46,11 +51,54 @@ pub struct UberStateWriteGeneric<U, C> {
 
 pub type UberStateWrite<'a> = UberStateWriteGeneric<UberIdentifier, WriteCommand<'a>>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, EnumTryAs)]
 pub enum WriteCommand<'a> {
     Boolean(&'a CommandBoolean),
     Integer(&'a CommandInteger),
     Float(&'a CommandFloat),
+}
+
+pub type UberStateWriteOwned = UberStateWriteGeneric<UberIdentifier, WriteCommandOwned>;
+
+impl UberStateWriteOwned {
+    pub fn new(write: UberStateWrite) -> Self {
+        Self {
+            uber_identifier: write.uber_identifier,
+            command: WriteCommandOwned::new(write.command),
+        }
+    }
+
+    pub fn as_ref(&self) -> UberStateWrite<'_> {
+        UberStateWrite {
+            uber_identifier: self.uber_identifier,
+            command: self.command.as_ref(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, EnumTryAs)]
+pub enum WriteCommandOwned {
+    Boolean(CommandBoolean),
+    Integer(CommandInteger),
+    Float(CommandFloat),
+}
+
+impl WriteCommandOwned {
+    pub fn new(write_command: WriteCommand) -> Self {
+        match write_command {
+            WriteCommand::Boolean(command) => Self::Boolean(command.clone()),
+            WriteCommand::Integer(command) => Self::Integer(command.clone()),
+            WriteCommand::Float(command) => Self::Float(command.clone()),
+        }
+    }
+
+    pub fn as_ref(&self) -> WriteCommand<'_> {
+        match self {
+            Self::Boolean(command) => WriteCommand::Boolean(command),
+            Self::Integer(command) => WriteCommand::Integer(command),
+            Self::Float(command) => WriteCommand::Float(command),
+        }
+    }
 }
 
 pub type CommonUberStateWrite = UberStateWriteGeneric<CommonUberIdentifier, CommonWriteCommand>;
@@ -80,6 +128,12 @@ pub enum CommonItem {
 impl<T: ContainedWrites> ContainedWrites for Vec<T> {
     fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
         self.iter().flat_map(T::contained_writes)
+    }
+}
+
+impl ContainedWrites for Vec<UberStateWriteOwned> {
+    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
+        self.iter().map(UberStateWriteOwned::as_ref)
     }
 }
 

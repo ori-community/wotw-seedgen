@@ -5,7 +5,6 @@ use crate::{
     },
     Zone,
 };
-use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::fmt::{self, Display};
@@ -39,10 +38,10 @@ impl ExecuteOperator<i32> for ArithmeticOperator {
     }
 }
 
-impl ExecuteOperator<OrderedFloat<f32>> for ArithmeticOperator {
-    type Output = OrderedFloat<f32>;
+impl ExecuteOperator<f32> for ArithmeticOperator {
+    type Output = f32;
 
-    fn execute(self, left: OrderedFloat<f32>, right: OrderedFloat<f32>) -> Self::Output {
+    fn execute(self, left: f32, right: f32) -> Self::Output {
         match self {
             Self::Add => left + right,
             Self::Subtract => left - right,
@@ -171,10 +170,10 @@ impl ExecuteOperator<i32> for Comparator {
     }
 }
 
-impl ExecuteOperator<OrderedFloat<f32>> for Comparator {
+impl ExecuteOperator<f32> for Comparator {
     type Output = bool;
 
-    fn execute(self, left: OrderedFloat<f32>, right: OrderedFloat<f32>) -> Self::Output {
+    fn execute(self, left: f32, right: f32) -> Self::Output {
         match self {
             Self::Equal => left == right,
             Self::NotEqual => left != right,

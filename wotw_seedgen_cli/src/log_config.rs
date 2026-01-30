@@ -1,4 +1,7 @@
-use std::io;
+use std::{
+    io,
+    ops::{Index, IndexMut},
+};
 
 use fern::{colors::ColoredLevelConfig, Dispatch};
 use log::LevelFilter;
@@ -9,12 +12,65 @@ use crate::{
     Error,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct LogConfig {
     trace_seedgen: bool,
-    trace_placement: bool,
-    trace_reached: bool,
-    trace_doors: bool,
+    trace_placement: LevelFilter,
+    trace_reached: LevelFilter,
+    trace_is_met: LevelFilter,
+    trace_solutions: LevelFilter,
+    trace_weight: LevelFilter,
+    trace_doors: LevelFilter,
+}
+
+const PLACEMENT_MOD: &str = "wotw_seedgen::generator::placement";
+const ITEM_POOL_MOD: &str = "wotw_seedgen::generator::item_pool";
+const REACHED_MOD: &str = "wotw_seedgen::world::reached";
+const IS_MET_MOD: &str = "wotw_seedgen::world::is_met";
+const SOLUTIONS_MOD: &str = "wotw_seedgen::generator::solutions";
+const WEIGHT_MOD: &str = "wotw_seedgen::generator::solutions::weight";
+const DOORS_MOD: &str = "wotw_seedgen::generator::doors";
+
+impl Default for LogConfig {
+    fn default() -> Self {
+        Self {
+            trace_seedgen: false,
+            trace_placement: LevelFilter::Off,
+            trace_reached: LevelFilter::Off,
+            trace_is_met: LevelFilter::Off,
+            trace_solutions: LevelFilter::Off,
+            trace_weight: LevelFilter::Off,
+            trace_doors: LevelFilter::Off,
+        }
+    }
+}
+
+impl Index<VerboseTarget> for LogConfig {
+    type Output = LevelFilter;
+
+    fn index(&self, index: VerboseTarget) -> &Self::Output {
+        match index {
+            VerboseTarget::Placement => &self.trace_placement,
+            VerboseTarget::Reached => &self.trace_reached,
+            VerboseTarget::IsMet => &self.trace_is_met,
+            VerboseTarget::Solutions => &self.trace_solutions,
+            VerboseTarget::Weight => &self.trace_weight,
+            VerboseTarget::Doors => &self.trace_doors,
+        }
+    }
+}
+
+impl IndexMut<VerboseTarget> for LogConfig {
+    fn index_mut(&mut self, index: VerboseTarget) -> &mut Self::Output {
+        match index {
+            VerboseTarget::Placement => &mut self.trace_placement,
+            VerboseTarget::Reached => &mut self.trace_reached,
+            VerboseTarget::IsMet => &mut self.trace_is_met,
+            VerboseTarget::Solutions => &mut self.trace_solutions,
+            VerboseTarget::Weight => &mut self.trace_weight,
+            VerboseTarget::Doors => &mut self.trace_doors,
+        }
+    }
 }
 
 impl LogConfig {
@@ -22,31 +78,18 @@ impl LogConfig {
         let mut config = Self::default();
 
         if let Some(targets) = args.verbose {
-            config = config
-                .trace_seedgen(true)
-                .trace_placement(targets.is_empty() || targets.contains(&VerboseTarget::Placement))
-                .trace_reached(targets.contains(&VerboseTarget::Reached))
-                .trace_doors(targets.contains(&VerboseTarget::Doors))
+            config.trace_seedgen = true;
+
+            if targets.is_empty() {
+                config.trace_placement = LevelFilter::Trace
+            } else {
+                for target in targets {
+                    config[target] = LevelFilter::Trace;
+                }
+            }
         }
 
         config
-    }
-
-    pub fn trace_seedgen(mut self, trace_seedgen: bool) -> Self {
-        self.trace_seedgen = trace_seedgen;
-        self
-    }
-    pub fn trace_placement(mut self, trace_placement: bool) -> Self {
-        self.trace_placement = trace_placement;
-        self
-    }
-    pub fn trace_reached(mut self, trace_reached: bool) -> Self {
-        self.trace_reached = trace_reached;
-        self
-    }
-    pub fn trace_doors(mut self, trace_doors: bool) -> Self {
-        self.trace_doors = trace_doors;
-        self
     }
 
     pub fn apply(self) -> Result<(), Error> {
@@ -61,7 +104,17 @@ impl LogConfig {
                 .chain(io::stderr()),
         );
 
-        if self.trace_seedgen {
+        let Self {
+            trace_seedgen,
+            trace_placement,
+            trace_reached,
+            trace_is_met,
+            trace_solutions,
+            trace_weight,
+            trace_doors,
+        } = self;
+
+        if trace_seedgen {
             assets::create_dir_all(&*LOG_DATA_DIR)?;
 
             dispatch = dispatch.chain(
@@ -69,18 +122,13 @@ impl LogConfig {
                     .format(move |out, message, record| {
                         out.finish(format_args!("{:<7}{}", record.level(), message))
                     })
-                    .level_for(
-                        "wotw_seedgen::generator::placement",
-                        level_filter(self.trace_placement),
-                    )
-                    .level_for(
-                        "wotw_seedgen::world::reached",
-                        level_filter(self.trace_reached),
-                    )
-                    .level_for(
-                        "wotw_seedgen::generator::doors",
-                        level_filter(self.trace_doors),
-                    )
+                    .level_for(PLACEMENT_MOD, trace_placement)
+                    .level_for(ITEM_POOL_MOD, trace_placement)
+                    .level_for(REACHED_MOD, trace_reached)
+                    .level_for(IS_MET_MOD, trace_is_met)
+                    .level_for(SOLUTIONS_MOD, trace_solutions)
+                    .level_for(WEIGHT_MOD, trace_weight)
+                    .level_for(DOORS_MOD, trace_doors)
                     .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?),
             )
         }
@@ -88,13 +136,5 @@ impl LogConfig {
         dispatch.apply()?;
 
         Ok(())
-    }
-}
-
-fn level_filter(trace: bool) -> LevelFilter {
-    if trace {
-        LevelFilter::Trace
-    } else {
-        LevelFilter::Off
     }
 }

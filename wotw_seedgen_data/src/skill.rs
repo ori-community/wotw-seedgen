@@ -314,6 +314,20 @@ impl Skill {
         }
     }
 
+    /// Returns the total damage including burn damage dealt when using this `Skill` once
+    ///
+    /// `charge_grenade` determines whether to use charged or uncharged grenade damage if this is `Skill::Grenade`
+    pub const fn total_damage(self, charge_grenade: bool) -> f32 {
+        self.damage(charge_grenade) + self.burn_damage()
+    }
+
+    /// Returns the damage per energy when using this `Skill`
+    ///
+    /// `charge_grenade` determines whether to use charged or uncharged grenade damage if this is `Skill::Grenade`
+    pub const fn damage_per_energy(self, charge_grenade: bool) -> f32 {
+        self.total_damage(charge_grenade) / self.energy_cost()
+    }
+
     // TODO unmatched equipments: Torch, Shot, Wave, Whirl, SentryDeprecated, DoubleJump, Launch
     /// Returns the [`Equipment`] corresponding to this `Skill`
     pub const fn equipment(self) -> Option<Equipment> {

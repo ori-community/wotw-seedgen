@@ -1,20 +1,29 @@
 use std::{
+    borrow::Cow,
     iter::{self, Once},
     path::Path,
     sync::LazyLock,
 };
 
 use constcat::concat;
+use wotw_seedgen_parse::Source;
 
-use crate::assets::{
-    AssetCache, AssetFileAccess, DefaultAssetCacheValues, PresetFileAccess, SnippetFileAccess,
+use crate::{
+    assets::{
+        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
+        LocData, PresetAccess, PresetFileAccess, SnippetFileAccess, StateData, UberStateData,
+        UniversePreset, WorldPreset,
+    },
+    logic_language::{ast::Areas, output::Graph},
+    seed_language::simulate::UberStates,
+    Difficulty, WorldSettings,
 };
 
 const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../assets");
 
 pub struct TestAccess;
 
-pub static TEST_ASSETS: LazyLock<AssetCache<TestAccess, DefaultAssetCacheValues>> =
+pub static TEST_ASSETS: LazyLock<AssetCache<TestAccess, TestCacheValues>> =
     LazyLock::new(|| AssetCache::new(TestAccess).unwrap());
 
 impl AssetFileAccess for TestAccess {
@@ -46,4 +55,137 @@ impl PresetFileAccess for TestAccess {
     fn world_folders(&self) -> Self::Folders {
         iter::once(&Path::new(concat!(ASSETS, "/world_presets")))
     }
+}
+
+pub struct TestCacheValues {
+    pub base: DefaultAssetCacheValues,
+    pub uber_states: UberStates,
+    pub graphs: TestCacheGraphs,
+}
+
+pub struct TestCacheGraphs {
+    pub moki: Graph,
+    pub gorlek: Graph,
+    pub r#unsafe: Graph,
+    pub full: Graph,
+}
+
+impl AssetCacheValues for TestCacheValues {
+    fn new<F>(file_access: &F) -> Result<Self, String>
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        let base = DefaultAssetCacheValues::new(file_access)?;
+        let uber_states = UberStates::new(&base.uber_state_data);
+        let graphs = TestCacheGraphs::new(&base);
+
+        Ok(Self {
+            base,
+            uber_states,
+            graphs,
+        })
+    }
+
+    fn loc_data(&self) -> &LocData {
+        &self.base.loc_data
+    }
+
+    fn state_data(&self) -> &StateData {
+        &self.base.state_data
+    }
+
+    fn uber_state_data(&self) -> &UberStateData {
+        &self.base.uber_state_data
+    }
+
+    fn areas(&self) -> &Source {
+        &self.base.areas
+    }
+
+    fn snippet(&self, identifier: &str) -> Result<&Source, String> {
+        self.base.snippet(identifier)
+    }
+
+    fn allow_read_file(&self) -> bool {
+        false
+    }
+
+    fn available_snippets(&self) -> impl Iterator<Item = &String> {
+        self.base.available_snippets()
+    }
+
+    fn update<F>(&mut self, _file_access: &F, _changed: ChangedAssets) -> Result<(), String>
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        Ok(())
+    }
+}
+
+impl PresetAccess for TestCacheValues {
+    fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String> {
+        self.base.universe_preset(identifier)
+    }
+
+    fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
+        self.base.world_preset(identifier)
+    }
+
+    fn available_universe_presets(&self) -> Vec<String> {
+        self.base.available_universe_presets()
+    }
+
+    fn available_world_presets(&self) -> Vec<String> {
+        self.base.available_world_presets()
+    }
+}
+
+impl TestCacheValues {
+    pub fn graph(&self, settings: &[WorldSettings]) -> Cow<'_, Graph> {
+        match settings {
+            [] => Cow::Borrowed(&self.graphs.full),
+            [world] if world == &WorldSettings::default() => Cow::Borrowed(&self.graphs.moki),
+            [world] if world == &WorldSettings::difficulty_default(Difficulty::Gorlek) => {
+                Cow::Borrowed(&self.graphs.moki)
+            }
+            other => Cow::Owned(graph(&self.base, other)),
+        }
+    }
+}
+
+impl TestCacheGraphs {
+    fn new(base: &DefaultAssetCacheValues) -> Self {
+        let moki = graph(base, &[WorldSettings::default()]);
+        let gorlek = graph(
+            base,
+            &[WorldSettings::difficulty_default(Difficulty::Gorlek)],
+        );
+        let r#unsafe = graph(
+            base,
+            &[WorldSettings::difficulty_default(Difficulty::Unsafe)],
+        );
+        let full = graph(base, &[]);
+
+        Self {
+            moki,
+            gorlek,
+            r#unsafe,
+            full,
+        }
+    }
+}
+
+fn graph(base: &DefaultAssetCacheValues, settings: &[WorldSettings]) -> Graph {
+    let areas = Areas::parse(&base.areas.content)
+        .eprint_errors(&base.areas)
+        .unwrap();
+
+    Graph::compile(
+        areas,
+        base.loc_data.clone(),
+        base.state_data.clone(),
+        settings,
+    )
+    .eprint_errors(&base.areas)
+    .unwrap()
 }

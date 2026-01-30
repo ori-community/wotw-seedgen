@@ -10,7 +10,6 @@ use crate::{
     },
     Position, UberIdentifier, Zone,
 };
-use ordered_float::OrderedFloat;
 use rand::Rng;
 use std::{iter, mem, ops::Range};
 use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart, SpannedOption};
@@ -313,12 +312,15 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
             ));
         }
 
-        let x = self.x.evaluate(compiler);
-        let y = get_command_arg(self.y).and_then(|y| y.evaluate(compiler));
+        let x = self.x.evaluate::<f32>(compiler);
+        let y = get_command_arg(self.y).and_then(|y| y.evaluate::<f32>(compiler));
 
         let (Some(x), Some(y)) = (x, y) else { return };
 
-        compiler.global.output.spawn = Some(Position { x, y });
+        compiler.global.output.spawn = Some(Position {
+            x: x.into(),
+            y: y.into(),
+        });
     }
 }
 
@@ -897,10 +899,8 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let min =
-            get_command_arg(self.0.min).and_then(|min| min.evaluate::<OrderedFloat<f32>>(compiler));
-        let max =
-            get_command_arg(self.0.max).and_then(|max| max.evaluate::<OrderedFloat<f32>>(compiler));
+        let min = get_command_arg(self.0.min).and_then(|min| min.evaluate::<f32>(compiler));
+        let max = get_command_arg(self.0.max).and_then(|max| max.evaluate::<f32>(compiler));
 
         if let (Some(min), Some(max)) = (min, max) {
             let value: f32 = compiler.rng.gen_range(min.into()..=max.into());

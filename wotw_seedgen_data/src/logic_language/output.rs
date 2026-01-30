@@ -1,11 +1,14 @@
+use std::fmt::{self, Display};
+
 use crate::{
     assets::{LocDataEntry, StateDataEntry},
     Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, Zone,
 };
+use itertools::Itertools;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use smallvec::SmallVec;
-use strum::{EnumIs, EnumString, EnumTryAs};
+use strum::{Display, EnumIs, EnumString, EnumTryAs};
 use utoipa::ToSchema;
 
 pub type DoorId = i32;
@@ -152,11 +155,13 @@ pub struct Refill {
     pub requirement: Requirement,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, ToSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Display, ToSchema)]
 pub enum RefillValue {
     Full,
     Checkpoint,
+    #[strum(to_string = "Health={0}")]
     Health(f32),
+    #[strum(to_string = "Energy={0}")]
     Energy(f32),
 }
 
@@ -193,7 +198,48 @@ pub enum Requirement {
     Or(Vec<Requirement>),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, ToSchema, EnumString)]
+impl Display for Requirement {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Free => write!(f, "Free"),
+            Self::Impossible => write!(f, "Impossible"),
+            Self::Difficulty(difficulty) => difficulty.fmt(f),
+            Self::NormalGameDifficulty => write!(f, "NormalGameDifficulty"),
+            Self::Trick(trick) => trick.fmt(f),
+            Self::Skill(skill) => skill.fmt(f),
+            Self::EnergySkill(skill, amount) => write!(f, "{skill}={amount}"),
+            Self::NonConsumingEnergySkill(skill) => write!(f, "NonConsuming{skill}"),
+            Self::SpiritLight(amount) => write!(f, "SpiritLight={amount}"),
+            Self::GorlekOre(amount) => write!(f, "GorlekOre={amount}"),
+            Self::Keystone(amount) => write!(f, "Keystone={amount}"),
+            Self::Shard(shard) => shard.fmt(f),
+            Self::Teleporter(teleporter) => teleporter.fmt(f),
+            Self::Water => write!(f, "Water"),
+            Self::State(state) => write!(f, "{{{state}}}"),
+            Self::Damage(amount) => write!(f, "Damage={amount}"),
+            Self::Danger(amount) => write!(f, "Danger={amount}"),
+            Self::Combat(enemies) => write!(
+                f,
+                "Combat={}",
+                enemies
+                    .iter()
+                    .format_with("+", |(enemy, amount), f| if *amount == 1 {
+                        f(&enemy)
+                    } else {
+                        f(&format_args!("{amount}x{enemy}"))
+                    })
+            ),
+            Self::Boss(health) => write!(f, "Boss={health}"),
+            Self::BreakWall(health) => write!(f, "BreakWall={health}"),
+            Self::ShurikenBreak(health) => write!(f, "ShurikenBreak={health}"),
+            Self::SentryBreak(health) => write!(f, "SentryBreak={health}"),
+            Self::And(ands) => write!(f, "({})", ands.iter().format(" & ")),
+            Self::Or(ors) => write!(f, "({})", ors.iter().format(" | ")),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, ToSchema, EnumString, Display)]
 pub enum Enemy {
     Mantis,
     Slug,
@@ -224,7 +270,7 @@ pub enum Enemy {
 }
 
 impl Enemy {
-    pub fn health(self) -> f32 {
+    pub const fn health(self) -> f32 {
         match self {
             Enemy::BombSlug | Enemy::CorruptSlug | Enemy::Balloon => 1.0,
             Enemy::SmallSkeeto => 8.0,
@@ -242,18 +288,18 @@ impl Enemy {
         }
     }
 
-    pub fn shielded(self) -> bool {
+    pub const fn shielded(self) -> bool {
         matches!(
             self,
             Enemy::Hornbug | Enemy::ShieldSlug | Enemy::ShieldMiner | Enemy::ShieldCrystalMiner
         )
     }
 
-    pub fn armored(self) -> bool {
+    pub const fn armored(self) -> bool {
         matches!(self, Enemy::Tentacle)
     }
 
-    pub fn aerial(self) -> bool {
+    pub const fn aerial(self) -> bool {
         // whether we consider the enemy flying for movement restriction purposes
         matches!(
             self,
@@ -266,12 +312,12 @@ impl Enemy {
         )
     }
 
-    pub fn flying(self) -> bool {
+    pub const fn flying(self) -> bool {
         // whether the game considers the enemy flying for wingclip
         matches!(self, Enemy::Skeeto | Enemy::SmallSkeeto | Enemy::Bee)
     }
 
-    pub fn ranged(self) -> bool {
+    pub const fn ranged(self) -> bool {
         // whether you need a ranged weapon
         matches!(
             self,
@@ -279,7 +325,7 @@ impl Enemy {
         )
     }
 
-    pub fn dangerous(self) -> bool {
+    pub const fn dangerous(self) -> bool {
         matches!(
             self,
             Enemy::SneezeSlug

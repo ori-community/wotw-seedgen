@@ -1,4 +1,5 @@
 use std::{
+    cmp::Ordering,
     fmt::{self, Display},
     ops::{Add, AddAssign, Sub, SubAssign},
 };
@@ -48,8 +49,27 @@ impl SubAssign for Orbs {
     }
 }
 
+impl PartialOrd for Orbs {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (
+            self.health.total_cmp(&other.health),
+            self.energy.total_cmp(&other.energy),
+        ) {
+            (Ordering::Equal, Ordering::Equal) => Some(Ordering::Equal),
+            (Ordering::Less | Ordering::Equal, Ordering::Less | Ordering::Equal) => {
+                Some(Ordering::Less)
+            }
+            (Ordering::Greater | Ordering::Equal, Ordering::Greater | Ordering::Equal) => {
+                Some(Ordering::Greater)
+            }
+            (Ordering::Less, Ordering::Greater) | (Ordering::Greater, Ordering::Less) => None,
+        }
+    }
+}
+
 impl Display for Orbs {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // TODO why did I put health left and energy right in this codebase?
         write!(f, "({}/{})", self.health, self.energy)
     }
 }

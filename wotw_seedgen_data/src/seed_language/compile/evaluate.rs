@@ -3,26 +3,29 @@ use crate::{
     seed_language::{
         ast,
         output::{
-            AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-            CommandZone, Constant, Literal, StringOrPlaceholder,
+            Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone,
+            Constant, IntoConstant, Literal, StringOrPlaceholder,
         },
     },
     Zone,
 };
-use ordered_float::OrderedFloat;
 use wotw_seedgen_parse::{Error, Span};
 
 pub(crate) trait EvaluateFrom: Sized {
-    type From: CompileInto;
+    type From;
 
     fn evaluate(from: Self::From) -> Option<Self>;
 }
 
 impl<'source> ast::Expression<'source> {
-    pub(crate) fn evaluate<T: EvaluateFrom>(
+    pub(crate) fn evaluate<T>(
         self,
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
-    ) -> Option<T> {
+    ) -> Option<T>
+    where
+        T: EvaluateFrom,
+        T::From: CompileInto,
+    {
         let span = self.span();
         let value = T::evaluate(self.compile_into(compiler)?);
 
@@ -36,38 +39,30 @@ impl<'source> ast::Expression<'source> {
         value
     }
 }
+macro_rules! evaluate_from_into_constant {
+    (($t:ty, $from:ty) $(,)?) => {
+        impl EvaluateFrom for $t {
+            type From = $from;
 
-impl EvaluateFrom for bool {
-    type From = CommandBoolean;
+            fn evaluate(from: Self::From) -> Option<Self> {
+                from.into_constant().ok()
+            }
+        }
+    };
 
-    fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant().copied()
-    }
+    (($t:ty, $from:ty), $($more:tt)+) => {
+        evaluate_from_into_constant!(($t, $from));
+        evaluate_from_into_constant!($($more)*);
+    };
 }
 
-impl EvaluateFrom for i32 {
-    type From = CommandInteger;
-
-    fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant().copied()
-    }
-}
-
-impl EvaluateFrom for OrderedFloat<f32> {
-    type From = CommandFloat;
-
-    fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant().copied()
-    }
-}
-
-impl EvaluateFrom for String {
-    type From = CommandString;
-
-    fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant().cloned()
-    }
-}
+evaluate_from_into_constant!(
+    (bool, CommandBoolean),
+    (i32, CommandInteger),
+    (f32, CommandFloat),
+    (String, CommandString),
+    (Zone, CommandZone),
+);
 
 impl EvaluateFrom for StringOrPlaceholder {
     type From = CommandString;
@@ -77,14 +72,6 @@ impl EvaluateFrom for StringOrPlaceholder {
             Self::From::Constant { value } => Some(value),
             _ => None,
         }
-    }
-}
-
-impl EvaluateFrom for Zone {
-    type From = CommandZone;
-
-    fn evaluate(from: Self::From) -> Option<Self> {
-        from.as_constant().copied()
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{
     assets::UberStateValue,
-    seed_language::simulate::{Simulation, UberStates, Variables},
+    seed_language::simulate::{Simulation, Snapshot, UberStates, Variables},
     UberIdentifier,
 };
 
@@ -42,7 +42,9 @@ impl Simulation for WorldState {
     fn variables_mut(&mut self) -> &mut Variables {
         &mut self.variables
     }
+}
 
+impl Snapshot for WorldState {
     fn snapshot(&mut self) {
         self.uber_states.snapshot();
     }

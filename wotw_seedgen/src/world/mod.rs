@@ -1,7 +1,11 @@
 mod is_met;
 mod reached;
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
+
+use arrayvec::ArrayVec;
+pub(crate) use is_met::Missing;
+pub(crate) use reached::{ConnectionIndex, ConnectionRefValue};
 
 use std::{
     fmt::{self, Display},
@@ -9,19 +13,17 @@ use std::{
 };
 
 use crate::{
-    logical_difficulty,
-    orbs::{self, OrbVariants, Orbs},
+    logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS},
+    orbs::{OrbVariants, Orbs},
 };
-use ordered_float::OrderedFloat;
 use reached::Reach;
-use rustc_hash::FxHashMap;
-use smallvec::{smallvec, SmallVec};
+use smallvec::smallvec;
 use wotw_seedgen_data::{
     assets::UberStateValue,
     logic_language::output::{Graph, RefillValue},
     seed_language::{
         output::Event,
-        simulate::{Simulation, SimulationCache, UberStates, Variables, WorldState},
+        simulate::{Simulation, SimulationCache, Snapshot, UberStates, Variables, WorldState},
     },
     Difficulty, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WorldSettings,
 };
@@ -29,7 +31,7 @@ use wotw_seedgen_data::{
 // TODO A stateful reach check would have some advantages, for instance currently seedgen would not correctly account for "Grant Launch on breaking this Wall"
 
 // TODO design interfaces instead of spamming pub(crate)?
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct World<'graph, 'settings> {
     pub(crate) graph: &'graph Graph,
     pub(crate) spawn: usize,
@@ -37,7 +39,6 @@ pub struct World<'graph, 'settings> {
     pub(crate) reach: Reach,
     state: SimulationCache<WorldState>,
     updating_reach: bool,
-    snapshot: Option<Reach>,
 }
 
 impl<'graph, 'settings> World<'graph, 'settings> {
@@ -57,7 +58,6 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             settings,
             updating_reach: false,
             reach: Reach::new(graph),
-            snapshot: None,
         }
     }
 
@@ -81,30 +81,35 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             self.max_health()
         };
 
-        if !CHECKPOINT
-            && self.settings.difficulty >= logical_difficulty::OVERFLOW
-            && self.shard(Shard::Overflow)
-            && orbs.health > max_health
-        {
-            orbs.energy += orbs.health - max_health;
+        // TODO helpers for combined setting and inventory checks?
+        if !CHECKPOINT && self.settings.difficulty.overflow() && self.shard(Shard::Overflow) {
+            if orbs.health > max_health {
+                let overflow_energy = (orbs.health - max_health) / 10.;
+                orbs.energy = f32::min(orbs.energy + overflow_energy, self.max_energy());
+                orbs.health = max_health;
+            }
+        } else {
+            orbs.health = f32::min(orbs.health, max_health);
         }
 
-        orbs.health = f32::min(orbs.health, max_health);
+        debug_assert!(orbs.health <= max_health);
     }
 
     pub fn cap_energy<const CHECKPOINT: bool>(&self, orbs: &mut Orbs) {
         // checkpoints do refill energy from the Energy shard
         let max_energy = self.max_energy();
 
-        if !CHECKPOINT
-            && self.settings.difficulty >= logical_difficulty::OVERFLOW
-            && self.shard(Shard::Overflow)
-            && orbs.energy > max_energy
-        {
-            orbs.health += orbs.energy - max_energy
+        if !CHECKPOINT && self.settings.difficulty.overflow() && self.shard(Shard::Overflow) {
+            if orbs.energy > max_energy {
+                let overflow_health = (orbs.energy - max_energy) * 10.;
+                orbs.health = f32::min(orbs.health + overflow_health, self.max_health());
+                orbs.energy = max_energy;
+            }
+        } else {
+            orbs.energy = f32::min(orbs.energy, max_energy);
         }
 
-        orbs.energy = f32::min(orbs.energy, max_energy);
+        debug_assert!(orbs.energy <= max_energy);
     }
 
     /// Reduces the [`Orbs`] to the maximum health and energy of this [`Player`] if they exceed it
@@ -117,13 +122,13 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::WorldSettings;
     /// use wotw_seedgen::orbs::Orbs;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
+    /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// let world_settings = WorldSettings::default();
     /// let world = World::new(&graph, spawn, &world_settings, uber_states);
     ///
@@ -138,13 +143,13 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, Difficulty, Shard, WorldSettings};
     /// use wotw_seedgen::orbs::Orbs;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
+    /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let events = [];
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
@@ -174,13 +179,13 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
     /// use wotw_seedgen::orbs::Orbs;
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
+    /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let events = [];
     /// let world_settings = WorldSettings::default();
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
@@ -213,12 +218,12 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
     ///
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
-    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
+    /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let events = [];
     /// let world_settings = WorldSettings::default();
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
@@ -264,7 +269,12 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         match refill {
             RefillValue::Full => *orb_variants = smallvec![self.max_orbs()],
             RefillValue::Checkpoint => {
-                *orb_variants = orbs::either_single(orb_variants, self.checkpoint_orbs())
+                let checkpoint_orbs = self.checkpoint_orbs();
+
+                for orbs in orb_variants {
+                    orbs.health = f32::max(orbs.health, checkpoint_orbs.health);
+                    orbs.energy = f32::max(orbs.energy, checkpoint_orbs.energy);
+                }
             }
             RefillValue::Health(amount) => {
                 let amount = amount * self.health_plant_drops();
@@ -285,7 +295,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         let mut damage_mod = 1.0;
 
         // These all don't account for Spirit Shard upgrades
-        if self.settings.difficulty >= logical_difficulty::DAMAGE_BUFFS {
+        if self.settings.difficulty.damage_buffs() {
             if self.skill(Skill::GladesAncestralLight) {
                 damage_mod += 0.25;
             }
@@ -342,9 +352,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     pub fn defense_mod(&self) -> f32 {
         let mut defense_mod = 1.;
 
-        if self.settings.difficulty >= logical_difficulty::RESILIENCE
-            && self.shard(Shard::Resilience)
-        {
+        if self.settings.difficulty.resilience() && self.shard(Shard::Resilience) {
             defense_mod *= 0.9;
         }
 
@@ -376,15 +384,17 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         target_health: f32,
         flying_target: bool,
     ) -> Option<f32> {
-        self.destroy_cost_with_any_of(
-            target_health,
-            self.owned_weapons::<TARGET_IS_WALL>(),
-            flying_target,
-        )
+        let mut weapons = self.owned_weapons::<TARGET_IS_WALL>().peekable();
+
+        if weapons.peek()?.energy_cost() == 0.0 {
+            Some(0.0)
+        } else {
+            self.destroy_cost_with_any_of(weapons, target_health, flying_target)
+        }
     }
 
     pub fn destroy_cost_ranged(&self, target_health: f32, flying_target: bool) -> Option<f32> {
-        self.destroy_cost_with_any_of(target_health, self.owned_ranged_weapons(), flying_target)
+        self.destroy_cost_with_any_of(self.owned_ranged_weapons(), target_health, flying_target)
     }
 
     pub fn destroy_cost_with(&self, target_health: f32, weapon: Skill, flying_target: bool) -> f32 {
@@ -395,26 +405,32 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// Returns the energy required to destroy the target with the given combination of weapons, or `None` if `weapons` is empty
     ///
     /// We optimize based on the assumption that `weapons` has energy-less weapons in front
-    fn destroy_cost_with_any_of<const N: usize>(
+    fn destroy_cost_with_any_of<I: Iterator<Item = Skill>>(
         &self,
+        weapons: I,
         mut target_health: f32,
-        weapons: SmallVec<[Skill; N]>,
         flying_target: bool,
     ) -> Option<f32> {
-        if weapons.first()?.energy_cost() == 0.0 {
-            return Some(0.0);
+        let mut weapon_stats = ArrayVec::<_, 9>::new();
+        let mut best_dpe = ((0., 0.), 0.);
+
+        for weapon in weapons {
+            let (damage, cost) = self.weapon_stats(weapon, flying_target);
+
+            let dpe = damage / cost;
+            if dpe > best_dpe.1 {
+                best_dpe = ((damage, cost), dpe);
+            }
+
+            weapon_stats.push((damage, cost));
         }
 
-        let weapon_stats = weapons
-            .into_iter()
-            .map(|weapon| self.weapon_stats(weapon, flying_target))
-            .collect::<SmallVec<[_; 9]>>();
+        if weapon_stats.is_empty() {
+            return None;
+        }
 
-        // Use the best weapon as long as it doesn't "waste" any damage
-        let ((damage, mut cost), _) = weapon_stats
-            .iter()
-            .map(|(damage, cost)| ((*damage, *cost), OrderedFloat(damage / cost)))
-            .max_by(|(_, dpe_a), (_, dpe_b)| dpe_a.cmp(dpe_b))?;
+        let ((damage, mut cost), _) = best_dpe;
+
         let optimal_hits = (target_health / damage).floor();
         target_health -= optimal_hits * damage;
         cost *= optimal_hits;
@@ -422,9 +438,8 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         // Figure out the best weapon to deal the last bit of damage
         cost += weapon_stats
             .into_iter()
-            .map(|(damage, cost)| OrderedFloat((target_health / damage).ceil() * cost))
-            .min()?
-            .into_inner();
+            .map(|(damage, cost)| (target_health / damage).ceil() * cost)
+            .min_by(f32::total_cmp)?;
 
         // On arbitrary energy costs and damage amounts this procedure might choose suboptimal weapons to use, but for the defaults it should be exhaustive
 
@@ -435,96 +450,31 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     fn weapon_stats(&self, weapon: Skill, flying_target: bool) -> (f32, f32) {
         let damage_mod = self.damage_mod(flying_target, matches!(weapon, Skill::Bow));
 
-        let damage = weapon.damage(self.settings.difficulty >= logical_difficulty::CHARGE_GRENADE)
-            * damage_mod
-            + weapon.burn_damage();
+        let damage = weapon.total_damage(self.settings.difficulty.charge_grenade()) * damage_mod;
 
         let cost = self.use_cost(weapon);
 
         (damage, cost)
     }
 
-    pub fn owned_weapons<const TARGET_IS_WALL: bool>(&self) -> SmallVec<[Skill; 9]> {
-        self.owned_weapons_from_fn(logical_difficulty::weapons::<TARGET_IS_WALL>)
+    pub fn owned_weapons<const TARGET_IS_WALL: bool>(&self) -> impl Iterator<Item = Skill> + '_ {
+        self.owned_weapons_from(Difficulty::weapons_iter::<TARGET_IS_WALL>)
     }
 
-    pub fn owned_ranged_weapons(&self) -> SmallVec<[Skill; 6]> {
-        self.owned_weapons_from_fn(logical_difficulty::ranged_weapons)
+    pub fn owned_ranged_weapons(&self) -> impl Iterator<Item = Skill> + '_ {
+        self.owned_weapons_from(Difficulty::ranged_weapons_iter)
     }
 
-    pub fn owned_shield_weapons(&self) -> SmallVec<[Skill; 4]> {
-        self.owned_weapons_from_fn(|_| logical_difficulty::shield_weapons())
+    pub fn owned_shield_weapons(&self) -> impl Iterator<Item = Skill> + '_ {
+        self.owned_weapons_from(|_| SHIELD_WEAPONS.into_iter())
     }
 
-    fn owned_weapons_from_fn<const N: usize, F>(&self, weapons_fn: F) -> SmallVec<[Skill; N]>
+    fn owned_weapons_from<'a, F, I>(&'a self, f: F) -> impl Iterator<Item = Skill> + 'a
     where
-        F: FnOnce(Difficulty) -> SmallVec<[Skill; N]>,
+        F: FnOnce(Difficulty) -> I,
+        I: Iterator<Item = Skill> + 'a,
     {
-        let mut weapons = weapons_fn(self.settings.difficulty);
-        weapons.retain(|weapon| self.skill(*weapon));
-        weapons
-    }
-
-    pub fn progression_weapons<const TARGET_IS_WALL: bool>(&self) -> SmallVec<[Skill; 9]> {
-        self.progression_weapons_from_fn(logical_difficulty::weapons::<TARGET_IS_WALL>)
-    }
-
-    pub fn ranged_progression_weapons(&self) -> SmallVec<[Skill; 6]> {
-        self.progression_weapons_from_fn(logical_difficulty::ranged_weapons)
-    }
-
-    pub fn shield_progression_weapons(&self) -> SmallVec<[Skill; 4]> {
-        self.progression_weapons_from_fn(|_| logical_difficulty::shield_weapons())
-    }
-
-    fn progression_weapons_from_fn<const N: usize, F>(&self, weapons_fn: F) -> SmallVec<[Skill; N]>
-    where
-        F: FnOnce(Difficulty) -> SmallVec<[Skill; N]>,
-    {
-        // TODO I find the name of this function confusing
-        fn damage_per_energy(weapon: Skill, settings: &WorldSettings) -> f32 {
-            // (weapon.damage(unsafe_paths) + weapon.burn_damage()) / weapon.energy_cost()
-            (10.0
-                / (weapon.damage(settings.difficulty >= logical_difficulty::CHARGE_GRENADE)
-                    + weapon.burn_damage()))
-            .ceil()
-                * weapon.energy_cost()
-            // "how much energy do you need to deal 10 damage" leads to a more realistic ordering than pure damage per energy
-        }
-
-        let mut weapons = weapons_fn(self.settings.difficulty);
-
-        // TODO check whether creating this map is even worth it
-        let dpe_map = weapons
-            .iter()
-            .map(|weapon| {
-                (
-                    *weapon,
-                    (damage_per_energy(*weapon, self.settings) * 10.0) as u16,
-                )
-            })
-            .collect::<FxHashMap<Skill, u16>>();
-        weapons.sort_unstable_by_key(|weapon| dpe_map[weapon]);
-
-        if let Some((index, weapon)) = weapons
-            .iter()
-            .enumerate()
-            .find(|(_, weapon)| self.skill(**weapon))
-        {
-            let dpe = dpe_map[weapon];
-
-            weapons.truncate(index + 1);
-            // maybe there are multiple weapons costing the same and we already skipped over a redundant one
-            weapons.swap(index, 0); // if we found something before, there must be at least one element
-            let remove_after = weapons
-                .iter()
-                .rposition(|weapon| dpe_map[weapon] != dpe)
-                .unwrap_or(0);
-            weapons.truncate(remove_after + 1);
-            weapons.swap(0, remove_after);
-        }
-
-        weapons
+        f(self.settings.difficulty).filter(|weapon| self.skill(*weapon))
     }
 
     pub fn inventory_display(&self) -> InventoryDisplay<'_, '_, '_> {
@@ -559,16 +509,6 @@ impl Simulation for World<'_, '_> {
         self.state.variables_mut()
     }
 
-    fn snapshot(&mut self) {
-        self.state.snapshot();
-        self.snapshot = Some(self.reach.clone());
-    }
-
-    fn restore_snapshot(&mut self) {
-        self.state.restore_snapshot();
-        self.reach = self.snapshot.take().unwrap();
-    }
-
     // Not sure how we could use the cache-efficient specialized stores without invalidating our reach
 
     fn spirit_light(&self) -> i32 {
@@ -592,7 +532,7 @@ impl Simulation for World<'_, '_> {
     }
 
     fn max_health(&self) -> f32 {
-        if self.settings.difficulty >= logical_difficulty::VITALITY {
+        if self.settings.difficulty.vitality() {
             self.state.max_health()
         } else {
             self.base_max_health()
@@ -604,7 +544,7 @@ impl Simulation for World<'_, '_> {
     }
 
     fn max_energy(&self) -> f32 {
-        if self.settings.difficulty >= logical_difficulty::ENERGY_SHARD {
+        if self.settings.difficulty.energy_shard() {
             self.state.max_energy()
         } else {
             self.base_max_energy()
@@ -645,6 +585,18 @@ impl Simulation for World<'_, '_> {
 
     fn weapon_upgrades(&self) -> impl Iterator<Item = WeaponUpgrade> + '_ {
         self.state.weapon_upgrades()
+    }
+}
+
+impl Snapshot for World<'_, '_> {
+    fn snapshot(&mut self) {
+        self.state.snapshot();
+        self.reach.snapshot();
+    }
+
+    fn restore_snapshot(&mut self) {
+        self.state.restore_snapshot();
+        self.reach.restore_snapshot();
     }
 }
 

@@ -15,6 +15,8 @@ mod zone_spirit_light;
 mod zone_unlock;
 // TODO idea: progression_location analyzer for which locations get chosen for progression
 
+// TODO use contained_writes for analysis instead of common_items?
+
 use compare::*;
 pub use early_skills::EarlySkillsStats;
 pub use first_weapon::FirstWeaponStats;

@@ -4,9 +4,9 @@ use crate::{
     seed_language::{
         ast::{self, ClientEvent, UberStateType},
         output::{
-            ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
+            ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger,
             CommandString, CommandVoid, CommandZone, Comparator, Concatenator, Constant,
-            EqualityComparator, ExecuteOperator, Literal, LogicOperator, Operation,
+            EqualityComparator, ExecuteOperator, IntoConstant, Literal, LogicOperator, Operation,
             StringOrPlaceholder,
         },
         types::Type,
@@ -159,8 +159,8 @@ impl<'source> ast::Operation<'source> {
         compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
     ) -> Option<Output>
     where
-        Item: CompileInto + AsConstant,
-        Item::Output: Clone,
+        Item: CompileInto + IntoConstant,
+        Item::Output: Into<Item>,
         Operator: ExecuteOperator<Item::Output>,
         Operator::Output: Into<Output>,
         Operation<Item, Operator>: Into<Output>,
@@ -170,17 +170,22 @@ impl<'source> ast::Operation<'source> {
 
         let (left, right) = (left?, right?);
 
-        match (left.as_constant(), right.as_constant()) {
-            (Some(left), Some(right)) => Some(operator.execute(left.clone(), right.clone()).into()),
-            _ => Some(
-                Operation {
-                    left,
-                    operator,
-                    right,
-                }
-                .into(),
-            ),
-        }
+        let (left, right) = match left.into_constant() {
+            Ok(left) => match right.into_constant() {
+                Ok(right) => return Some(operator.execute(left, right).into()),
+                Err(right) => (left.into(), right),
+            },
+            Err(left) => (left, right),
+        };
+
+        Some(
+            Operation {
+                left,
+                operator,
+                right,
+            }
+            .into(),
+        )
     }
 }
 
@@ -340,9 +345,9 @@ impl CompileInto for CommandInteger {
 impl CompileInto for CommandFloat {
     fn coerce_command(command: Command) -> Result<Self, String> {
         match command {
-            Command::Integer(command) => match command.as_constant() {
-                Some(value) => Ok((*value as f32).into()),
-                None => Ok(CommandFloat::FromInteger {
+            Command::Integer(command) => match command.into_constant() {
+                Ok(value) => Ok((value as f32).into()),
+                Err(command) => Ok(CommandFloat::FromInteger {
                     integer: Box::new(command),
                 }),
             },
@@ -390,21 +395,21 @@ impl CompileInto for CommandFloat {
 impl CompileInto for CommandString {
     fn coerce_command(command: Command) -> Result<Self, String> {
         match command {
-            Command::Boolean(command) => match command.as_constant() {
-                Some(value) => Ok(value.to_string().into()),
-                None => Ok(CommandString::FromBoolean {
+            Command::Boolean(command) => match command.into_constant() {
+                Ok(value) => Ok(value.to_string().into()),
+                Err(command) => Ok(CommandString::FromBoolean {
                     boolean: Box::new(command),
                 }),
             },
-            Command::Integer(command) => match command.as_constant() {
-                Some(value) => Ok(value.to_string().into()),
-                None => Ok(CommandString::FromInteger {
+            Command::Integer(command) => match command.into_constant() {
+                Ok(value) => Ok(value.to_string().into()),
+                Err(command) => Ok(CommandString::FromInteger {
                     integer: Box::new(command),
                 }),
             },
-            Command::Float(command) => match command.as_constant() {
-                Some(value) => Ok(value.to_string().into()),
-                None => Ok(CommandString::FromFloat {
+            Command::Float(command) => match command.into_constant() {
+                Ok(value) => Ok(value.to_string().into()),
+                Err(command) => Ok(CommandString::FromFloat {
                     float: Box::new(command),
                 }),
             },

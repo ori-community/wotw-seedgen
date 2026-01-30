@@ -46,5 +46,8 @@ pub struct VerboseArgs {
 pub enum VerboseTarget {
     Placement,
     Reached,
+    IsMet,
+    Solutions,
+    Weight,
     Doors,
 }

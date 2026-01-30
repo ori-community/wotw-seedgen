@@ -1,9 +1,14 @@
+use crate::seed_language::output::AsConstant;
+
 use super::{
     intermediate::Literal, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
     CommandVoid, CommandZone, Event, Operation, StringOrPlaceholder, Trigger,
 };
 use itertools::Itertools;
-use std::fmt::{self, Display};
+use std::{
+    fmt::{self, Display},
+    iter,
+};
 
 impl Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -371,6 +376,93 @@ impl Display for CommandVoid {
             CommandVoid::CloseWeaponWheel {} => write!(f, "close_weapon_wheel()"),
             CommandVoid::DebugLog { message } => write!(f, "debug_log({message})"),
         }
+    }
+}
+
+impl CommandVoid {
+    pub fn log_display(&self) -> CommandVoidLogDisplay<'_> {
+        CommandVoidLogDisplay { command: self }
+    }
+
+    pub fn contained_messages(&self) -> Box<dyn Iterator<Item = &CommandString> + '_> {
+        match self {
+            CommandVoid::Multi { commands } => {
+                Box::new(commands.iter().flat_map(Self::contained_messages))
+            }
+            CommandVoid::QueuedMessage { message, .. }
+            | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),
+            _ => Box::new(iter::empty()),
+        }
+    }
+}
+
+pub struct CommandVoidLogDisplay<'s> {
+    command: &'s CommandVoid,
+}
+
+impl Display for CommandVoidLogDisplay<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut messages = self
+            .command
+            .contained_messages()
+            .filter_map(CommandString::as_constant)
+            .map(String::as_str)
+            .map(strip_control_characters);
+
+        match messages.next() {
+            None => self.command.fmt(f),
+            Some(first) => {
+                first.fmt(f)?;
+
+                for message in messages {
+                    write!(f, ", {message}")?;
+                }
+
+                Ok(())
+            }
+        }
+    }
+}
+
+// TODO why not in place?
+pub fn strip_control_characters(s: &str) -> String {
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut in_tag = false;
+
+    for (index, byte) in s.as_bytes().iter().enumerate() {
+        match (in_tag, byte) {
+            (_, b'@' | b'#' | b'$' | b'*') => {
+                result.push_str(&s[last_end..index]);
+                last_end = index + 1;
+            }
+            (false, b'<') => {
+                result.push_str(&s[last_end..index]);
+                in_tag = true;
+            }
+            (true, b'>') => {
+                last_end = index + 1;
+                in_tag = false;
+            }
+            _ => {}
+        }
+    }
+    result.push_str(&s[last_end..]);
+
+    result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::strip_control_characters as strip;
+
+    #[test]
+    fn strip_control_characters() {
+        assert_eq!(strip(""), "");
+        assert_eq!(strip("aaa"), "aaa");
+        assert_eq!(strip("@#$"), "");
+        assert_eq!(strip("@@@a@a@@a@"), "aaa");
+        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
     }
 }
 

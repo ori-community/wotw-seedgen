@@ -28,9 +28,17 @@ pub enum Command {
 }
 
 pub trait AsConstant {
+    type Output<'a>
+    where
+        Self: 'a;
+
+    fn as_constant(&self) -> Option<Self::Output<'_>>;
+}
+
+pub trait IntoConstant: Sized {
     type Output;
 
-    fn as_constant(&self) -> Option<&Self::Output>;
+    fn into_constant(self) -> Result<Self::Output, Self>;
 }
 
 /// Command which returns [`bool`]
@@ -84,24 +92,12 @@ pub enum CommandBoolean {
 
 impl CommandBoolean {
     pub fn loc_data_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
-        Self::condition_with_operator(uber_identifier, value, Comparator::GreaterOrEqual)
-    }
-
-    pub fn door_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
-        Self::condition_with_operator(uber_identifier, value, Comparator::Equal)
-    }
-
-    fn condition_with_operator(
-        uber_identifier: UberIdentifier,
-        value: Option<i32>,
-        operator: Comparator,
-    ) -> Self {
         match value {
             None => CommandBoolean::FetchBoolean { uber_identifier },
             Some(value) => CommandBoolean::CompareInteger {
                 operation: Box::new(Operation {
                     left: CommandInteger::FetchInteger { uber_identifier },
-                    operator,
+                    operator: Comparator::GreaterOrEqual,
                     right: value.into(),
                 }),
             },
@@ -110,12 +106,23 @@ impl CommandBoolean {
 }
 
 impl AsConstant for CommandBoolean {
+    type Output<'a> = bool;
+
+    fn as_constant(&self) -> Option<Self::Output<'static>> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl IntoConstant for CommandBoolean {
     type Output = bool;
 
-    fn as_constant(&self) -> Option<&Self::Output> {
+    fn into_constant(self) -> Result<Self::Output, Self> {
         match self {
-            Self::Constant { value } => Some(value),
-            _ => None,
+            Self::Constant { value } => Ok(value),
+            other => Err(other),
         }
     }
 }
@@ -152,12 +159,23 @@ pub enum CommandInteger {
 }
 
 impl AsConstant for CommandInteger {
+    type Output<'a> = i32;
+
+    fn as_constant(&self) -> Option<Self::Output<'static>> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl IntoConstant for CommandInteger {
     type Output = i32;
 
-    fn as_constant(&self) -> Option<&Self::Output> {
+    fn into_constant(self) -> Result<Self::Output, Self> {
         match self {
-            Self::Constant { value } => Some(value),
-            _ => None,
+            Self::Constant { value } => Ok(value),
+            other => Err(other),
         }
     }
 }
@@ -191,12 +209,23 @@ pub enum CommandFloat {
 }
 
 impl AsConstant for CommandFloat {
-    type Output = OrderedFloat<f32>;
+    type Output<'a> = OrderedFloat<f32>;
 
-    fn as_constant(&self) -> Option<&Self::Output> {
+    fn as_constant(&self) -> Option<Self::Output<'static>> {
         match self {
-            Self::Constant { value } => Some(value),
+            Self::Constant { value } => Some(*value),
             _ => None,
+        }
+    }
+}
+
+impl IntoConstant for CommandFloat {
+    type Output = f32;
+
+    fn into_constant(self) -> Result<Self::Output, Self> {
+        match self {
+            Self::Constant { value } => Ok(*value),
+            other => Err(other),
         }
     }
 }
@@ -240,14 +269,49 @@ pub enum CommandString {
 }
 
 impl AsConstant for CommandString {
-    type Output = String;
+    type Output<'a> = &'a String;
 
-    fn as_constant(&self) -> Option<&Self::Output> {
+    fn as_constant(&self) -> Option<Self::Output<'_>> {
         match self {
             Self::Constant {
                 value: StringOrPlaceholder::Value(value),
             } => Some(value),
             _ => None,
+        }
+    }
+}
+
+impl IntoConstant for CommandString {
+    type Output = String;
+
+    fn into_constant(self) -> Result<Self::Output, Self> {
+        match self {
+            Self::Constant {
+                value: StringOrPlaceholder::Value(value),
+            } => Ok(value),
+            other => Err(other),
+        }
+    }
+}
+
+impl AsConstant for StringOrPlaceholder {
+    type Output<'a> = &'a String;
+
+    fn as_constant(&self) -> Option<Self::Output<'_>> {
+        match self {
+            Self::Value(value) => Some(value),
+            _ => None,
+        }
+    }
+}
+
+impl IntoConstant for StringOrPlaceholder {
+    type Output = String;
+
+    fn into_constant(self) -> Result<Self::Output, Self> {
+        match self {
+            Self::Value(value) => Ok(value),
+            other => Err(other),
         }
     }
 }
@@ -287,12 +351,23 @@ pub enum CommandZone {
 }
 
 impl AsConstant for CommandZone {
+    type Output<'a> = Zone;
+
+    fn as_constant(&self) -> Option<Self::Output<'static>> {
+        match self {
+            Self::Constant { value } => Some(*value),
+            _ => None,
+        }
+    }
+}
+
+impl IntoConstant for CommandZone {
     type Output = Zone;
 
-    fn as_constant(&self) -> Option<&Self::Output> {
+    fn into_constant(self) -> Result<Self::Output, Self> {
         match self {
-            Self::Constant { value } => Some(value),
-            _ => None,
+            Self::Constant { value } => Ok(value),
+            other => Err(other),
         }
     }
 }
@@ -614,14 +689,4 @@ pub enum CommandVoid {
     DebugLog {
         message: CommandString,
     },
-}
-
-impl CommandVoid {
-    pub fn find_message(&self) -> Option<&CommandString> {
-        match self {
-            CommandVoid::Multi { commands } => commands.iter().find_map(Self::find_message),
-            CommandVoid::QueuedMessage { message, .. } => Some(message),
-            _ => None,
-        }
-    }
 }
