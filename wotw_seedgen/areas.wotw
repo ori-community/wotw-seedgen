@@ -6799,15 +6799,20 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       SentryJump=1
     kii:
       DoubleJump, TripleJump, Hammer
+      # Glitched
+      # GrenadeJump=1 OR AerialHammerJump
+      # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      DoubleJump, TripleJump
-      GrenadeJump
+      DoubleJump, TripleJump OR GlideJump
+      GrenadeJump OR AbilitySwap=1
   pickup InnerWellspring.WaterSwitchEX:
     moki, InnerWellspring.WaterDashSwitch: Water
     kii, InnerWellspring.WaterDashSwitch:
       Damage=80
       WaterDash, Damage=40
-    unsafe, InnerWellspring.WaterDashSwitch: Damage=60
+    unsafe, InnerWellspring.WaterDashSwitch:
+      Damage=60
+      WaterDash, Damage=20
 
   conn InnerWellspring.ThornShardArea:
     moki:
@@ -6819,11 +6824,20 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       Grapple, Sword OR Hammer
       InnerWellspring.ThreeWheels, Sword OR Hammer
       SentryJump=1  # sentry jump on right side, then use sword/hammer to reach platform
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer  # from the 2nd wheel. Hammer can also tjump+upslash from the 1st wheel
     kii:
+      DoubleJump, TripleJump
       Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Bash grenade up right side, climb on the first wheel to reach yourgrenade (whih isn't gorlek), jump to left side vines, use abilities to reach platform
-    unsafe: Bash, Grenade=1  # On the left, bash grenade on the first rotating wheel, jump on the second one and reach your grenade from there
+      # Glitched
+      # AerialHammerJump
+      # DoubleJump, GlideJump OR GrenadeJump=1
+    unsafe:
+      Bash, Grenade=1  # On the left, bash grenade on the first rotating wheel, jump on the second one and reach your grenade from there
+      DoubleJump, Hammer
+      GrenadeJump  # You cn grab the moss from the very right
+      GlideJump  # from the 2nd wheel
+      AbilitySwap=1
   conn InnerWellspring.DrainRoom:
     moki:
       DoubleJump OR Dash OR Glide OR Launch
@@ -6838,22 +6852,30 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       Damage=15, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # possible damageless but InnerWellspring.ThreeWheels makes it way harder
       InnerWellspring.ThreeWheels, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2
+      # Glitched
+      # GrenadeJump=1, GrenadeJump=1 OR Damage=15
     unsafe:
       Bash, Grenade=1
-      InnerWellspring.ThreeWheels
+      InnerWellspring.ThreeWheels OR GrenadeJump OR PauseFloat
   conn InnerWellspring.ShortcutLever:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
       Launch
-    gorlek:
-      DoubleJump, TripleJump, Damage=15  # bit tricky
-      Grapple, Damage=15  # bit tricky
-      Grapple, Sword OR Hammer
-    kii: Grapple
+    gorlek: Grapple, Sword OR Hammer
+    kii:
+      Grapple, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      # Glitched
+      # AerialHammerJump, Damage=15  # either jump in the spikes on the left or upslash first to go directly to the lever
     unsafe:
+      Grapple OR AerialHammerJump
+      DoubleJump, Damage=15, TripleJump OR GlideJump
       InnerWellspring.ThreeWheels, Damage=30, DoubleJump
       InnerWellspring.ThreeWheels, Damage=45, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       InnerWellspring.ThreeWheels, Damage=60, Spear=1 OR Blaze=1
+      SwordSJump=1, Damage=15, InnerWellspring.ThreeWheels OR SentryJump=1  # sjump from the spikes. Technically a lot more possible option but sword also solves the state so I don't want to bother listing them
+      AbilitySwap=2, AbilitySwap=1 OR InnerWellspring.ThreeWheels OR GlideJump OR GrenadeJump
+      AbilitySwap=2, DoubleJump, TripleJump OR Hammer
+      GlideJump, Damage=30
 
 # checkpoint at -1336, -3943
 
@@ -6922,7 +6944,7 @@ anchor InnerWellspring.ShortcutLever at -1264, -3907:  # At the lever on top of 
     kii: Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
     unsafe: free  # grab the right moss for an easier jump onto the left one the
 
-anchor InnerWellspring.DrainRoom at -1167, -3946:  # Left of the water you can drain
+anchor InnerWellspring.DrainRoom at -1169, -3946:  # Left of the water you can drain
   refill Checkpoint
   refill Energy=3:
     moki: BreakCrystal
