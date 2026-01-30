@@ -6903,15 +6903,25 @@ anchor InnerWellspring.ThornShardArea at -1317, -3933:  # on top of the wall at 
       Dash, DoubleJump, TripleJump OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=15
       Dash, Damage=15, Sword OR Hammer  # With hammer, do only two slashes
       Dash, Glide, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump, TripleJump OR Glide OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      # SwordSJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Sentry=1 OR Damage=15
+      # HammerSJump=1, Damage=15, DoubleJump OR Dash 
+      # HammerSJump=1, DoubleJump, TripleJump OR Dash
+      # GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Damage=15
     unsafe:
-      Bash, Grenade=1, Shuriken=1 OR Flash=1 OR Sentry=1  # Use energy to reach the grenade
+      Bash, Grenade=1  # https://youtu.be/en7PQ248xok
       Dash, DoubleJump, Sentry=1 OR Flash=1
-      SwordSJump=1, Damage=15
+      Sword, Shuriken=1  # from the upper platform, jump -> shuriken -> upslash -> pogo -> horizontal combo
       Grapple, Sword
       Dash, Damage=15, Glide OR Shuriken=2 OR Sentry=2
+      SwordSJump=1, Sentry=1 OR Damage=15
+      HammerSJump=1, DoubleJump, Shuriken=1 # Requires a low sjump for a better drift
+      GlideJump OR AbilitySwap=2
+      AbilitySwap=1, Damage=15
 
   conn InnerWellspring.EntranceDoor: free
-  conn InnerWellspring.ShortcutLever:  # for fully respawn. Make sure it's not redundant with paths from EntranceDoor
+  conn InnerWellspring.ShortcutLever:  # Make sure it's not redundant with paths from EntranceDoor
     unsafe:
       Damage=30, DoubleJump
       Damage=45, Dash OR Sword OR Hammer OR Shuriken=3 OR Flash=3 OR Sentry=3
@@ -6937,12 +6947,14 @@ anchor InnerWellspring.ShortcutLever at -1264, -3907:  # At the lever on top of 
       Sword OR Damage=15
       Hammer, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
     unsafe, InnerWellspring.ShortCutWheel:
       Glide OR Hammer OR Sentry=2 OR Shuriken=2  # friendly spikes when you slide off the wheel
   conn InnerWellspring.ThornShardArea:  # Make sure it's not redundant with going to InnerWellspring.EntranceDoor first
     gorlek: DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii: Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
-    unsafe: free  # grab the right moss for an easier jump onto the left one the
+    unsafe: free  # grab the right moss for an easier jump onto the left one
 
 anchor InnerWellspring.DrainRoom at -1169, -3946:  # Left of the water you can drain
   refill Checkpoint
