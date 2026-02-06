@@ -1,3 +1,5 @@
+use axum::http::Response;
+use axum::response::IntoResponse;
 use axum::{
     Json, Router,
     extract::{Query, State},
@@ -105,10 +107,13 @@ async fn generate(
     State(cache): State<RouterState>,
     Query(query): Query<GenerateQuery>,
     Json(body): Json<UniverseSettings>,
-) -> Result<Vec<u8>> {
+) -> Result<impl IntoResponse> {
     let cache = cache.read().await;
 
-    generate::generate(query, &body, cache)
+    Ok((
+        [("Content-Type", "application/cbor")],
+        generate::generate(query, &body, cache)?,
+    ))
 }
 
 #[derive(Deserialize, IntoParams)]
