@@ -1,6 +1,6 @@
 use std::{
     fmt::{self, Display},
-    hash::Hash,
+    hash::{Hash, Hasher},
     mem,
     ops::{ControlFlow, Deref},
 };
@@ -29,13 +29,13 @@ pub const TP_ANCHOR: &str = "Teleporters";
 
 // TODO figuring out how to update existing best_orbs with orb changes is NOT reasonable. Abort this idea.
 #[derive(Debug)]
-pub struct Reach {
-    state: CloneSnapshot<ReachState>,
+pub struct Reach<'graph> {
+    state: CloneSnapshot<ReachState<'graph>>,
     logic_state_map: LogicStateMap,
 }
 
-impl Reach {
-    pub fn new(graph: &Graph) -> Self {
+impl<'graph> Reach<'graph> {
+    pub fn new(graph: &'graph Graph) -> Self {
         Self {
             state: CloneSnapshot::default(),
             logic_state_map: LogicStateMap::new(graph),
@@ -43,7 +43,7 @@ impl Reach {
     }
 }
 
-impl Snapshot for Reach {
+impl Snapshot for Reach<'_> {
     fn snapshot(&mut self) {
         self.state.snapshot();
     }
@@ -54,21 +54,21 @@ impl Snapshot for Reach {
 }
 
 #[derive(Debug, Clone, Default)]
-struct ReachState {
+struct ReachState<'graph> {
     /// All reached nodes and if they are anchors, the best orbs they have been reached with
     best_orbs: FxHashMap<usize, OrbVariants>,
     /// [`TP_ANCHOR`] has been reached
     tp_reached: bool,
     /// All [`ConnectionIndex`] which failed to solve and might be solved by advancing the [`UberIdentifier`]
-    uber_state_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex>>,
+    uber_state_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
     /// All [`ConnectionIndex`] which failed to solve and might be solved by reaching the logical state
-    logical_state_fails: FxHashMap<usize, FxHashSet<ConnectionIndex>>,
+    logical_state_fails: FxHashMap<usize, FxHashSet<ConnectionIndex<'graph>>>,
     /// Some connections failed to solve and might require more health.
     /// Resuming progress along those connections would be very hard because of refill logic,
     /// So we just reset the entire Reach when progressing orbs.
-    health_fails: FxHashSet<ConnectionIndex>,
+    health_fails: FxHashSet<ConnectionIndex<'graph>>,
     /// Same as `health_fail`, but for energy.
-    energy_fails: FxHashSet<ConnectionIndex>,
+    energy_fails: FxHashSet<ConnectionIndex<'graph>>,
 }
 
 // TODO were these capacities good?
@@ -78,7 +78,7 @@ struct ReachState {
 // logical_state_fails: FxHashMap::with_capacity_and_hasher(5, FxBuildHasher),
 // orb_fail: false,
 
-impl ReachState {
+impl<'graph> ReachState<'graph> {
     fn clear(&mut self) {
         self.best_orbs.clear();
         self.tp_reached = false;
@@ -88,7 +88,7 @@ impl ReachState {
         self.energy_fails.clear();
     }
 
-    fn add_fail(&mut self, missing: Missing, connection: ConnectionIndex) {
+    fn add_fail(&mut self, missing: Missing, connection: ConnectionIndex<'graph>) {
         match missing {
             Missing::Impossible => {}
             // TODO optimize by using the missing integer value and skipping reach attempts?
@@ -154,104 +154,100 @@ impl Deref for LogicStateMap {
     }
 }
 
-/// A connection inside the [`Graph`] which may allow further progress in a different state.
-///
-/// You can use [`ConnectionIndex::index_graph`] to find the referenced connection.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) struct ConnectionIndex {
-    /// Index into [`Graph`] `nodes`.
-    /// Should always point to an [`Anchor`].
-    pub node_index: usize,
-    /// Index into [`Anchor`] `connections`, or `refills` if `is_refill`.
-    pub connection_index: usize,
-    /// Whether `connection_index` references a refill instead of a connection.
-    pub is_refill: bool,
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct ConnectionIndex<'graph> {
+    pub anchor: &'graph Anchor,
+    pub connection: ConnectionOrRefill<'graph>,
 }
 
-impl ConnectionIndex {
-    pub(crate) fn connection(node_index: usize, connection_index: usize) -> Self {
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum ConnectionOrRefill<'graph> {
+    Refill(&'graph Refill),
+    Connection(&'graph Connection),
+}
+
+impl<'graph> ConnectionIndex<'graph> {
+    pub(crate) fn connection(anchor: &'graph Anchor, connection: &'graph Connection) -> Self {
         Self {
-            node_index,
-            connection_index,
-            is_refill: false,
+            anchor,
+            connection: ConnectionOrRefill::Connection(connection),
         }
     }
 
-    pub(crate) fn refill(node_index: usize, refill_index: usize) -> Self {
+    pub(crate) fn refill(anchor: &'graph Anchor, refill: &'graph Refill) -> Self {
         Self {
-            node_index,
-            connection_index: refill_index,
-            is_refill: true,
+            anchor,
+            connection: ConnectionOrRefill::Refill(refill),
         }
     }
 
-    pub(crate) fn index_graph<'g>(self, graph: &'g Graph) -> ConnectionRef<'g> {
-        let anchor = graph.nodes[self.node_index].expect_anchor();
-
-        let connection = if self.is_refill {
-            ConnectionRefValue::Refill(&anchor.refills[self.connection_index])
-        } else {
-            ConnectionRefValue::Connection(&anchor.connections[self.connection_index])
-        };
-
-        ConnectionRef { anchor, connection }
+    pub(crate) fn node_index(&self, graph: &'graph Graph) -> usize {
+        ((self.address() - graph.nodes.as_ptr() as isize) / mem::size_of::<Node>() as isize)
+            as usize
     }
 
-    pub(crate) fn display<'g>(self, graph: &'g Graph) -> ConnectionIndexDisplay<'g> {
+    pub(crate) fn display(self, graph: &'graph Graph) -> ConnectionIndexDisplay<'graph> {
         ConnectionIndexDisplay {
             connection: self,
             graph,
         }
     }
-}
 
-#[derive(Debug, Clone, Copy)]
-pub(crate) struct ConnectionRef<'g> {
-    pub anchor: &'g Anchor,
-    pub connection: ConnectionRefValue<'g>,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub(crate) enum ConnectionRefValue<'g> {
-    Refill(&'g Refill),
-    Connection(&'g Connection),
-}
-
-pub(crate) struct ConnectionIndexDisplay<'g> {
-    connection: ConnectionIndex,
-    graph: &'g Graph,
-}
-
-impl Display for ConnectionIndexDisplay<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.connection
-            .index_graph(&self.graph)
-            .display(&self.graph)
-            .fmt(f)
+    fn address(&self) -> isize {
+        self.anchor as *const Anchor as isize
     }
 }
 
-impl<'g> ConnectionRef<'g> {
-    pub(crate) fn display(self, graph: &'g Graph) -> ConnectionRefDisplay<'g> {
-        ConnectionRefDisplay {
-            connection: self,
-            graph,
+impl PartialEq for ConnectionIndex<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.address() == other.address() && self.connection == other.connection
+    }
+}
+
+impl Eq for ConnectionIndex<'_> {}
+
+impl Hash for ConnectionIndex<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.address().hash(state);
+        self.connection.hash(state);
+    }
+}
+
+impl ConnectionOrRefill<'_> {
+    fn address(&self) -> usize {
+        match self {
+            Self::Refill(refill) => (*refill) as *const Refill as usize,
+            Self::Connection(connection) => (*connection) as *const Connection as usize,
         }
     }
 }
 
-pub(crate) struct ConnectionRefDisplay<'g> {
-    connection: ConnectionRef<'g>,
-    graph: &'g Graph,
+impl PartialEq for ConnectionOrRefill<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.address() == other.address()
+    }
 }
 
-impl Display for ConnectionRefDisplay<'_> {
+impl Eq for ConnectionOrRefill<'_> {}
+
+impl Hash for ConnectionOrRefill<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.address().hash(state);
+    }
+}
+
+pub(crate) struct ConnectionIndexDisplay<'graph> {
+    connection: ConnectionIndex<'graph>,
+    graph: &'graph Graph,
+}
+
+impl Display for ConnectionIndexDisplay<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.connection.anchor.identifier.fmt(f)?;
 
         match self.connection.connection {
-            ConnectionRefValue::Refill(refill) => write!(f, " -> {}", refill.value),
-            ConnectionRefValue::Connection(connection) => {
+            ConnectionOrRefill::Refill(refill) => write!(f, " -> {}", refill.value),
+            ConnectionOrRefill::Connection(connection) => {
                 write!(f, " -> {}", self.graph.nodes[connection.to].identifier())
             }
         }
@@ -298,39 +294,37 @@ impl<'graph> World<'graph, '_> {
     // TODO other fails?
     pub(crate) fn uber_state_fails(
         &self,
-    ) -> &FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex>> {
+    ) -> &FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>> {
         &self.reach.state.uber_state_fails
     }
 
-    pub(crate) fn health_fails(&self) -> &FxHashSet<ConnectionIndex> {
+    pub(crate) fn health_fails(&self) -> &FxHashSet<ConnectionIndex<'graph>> {
         &self.reach.state.health_fails
     }
 
-    pub(crate) fn energy_fails(&self) -> &FxHashSet<ConnectionIndex> {
+    pub(crate) fn energy_fails(&self) -> &FxHashSet<ConnectionIndex<'graph>> {
         &self.reach.state.energy_fails
     }
 
     pub(crate) fn get_connection(
         &self,
-        connection: ConnectionIndex,
-    ) -> (ConnectionRef<'graph>, OrbVariants) {
+        connection: ConnectionIndex<'graph>,
+    ) -> (ConnectionOrRefill<'graph>, OrbVariants) {
+        let node_index = connection.node_index(self.graph);
         // TODO this still fails sometimes...
-        assert!(
-            self.reach.state.best_orbs.contains_key(&connection.node_index),
-            "Failed to get connection!\nBacktrace: {}\nInventory: {}\nReached: {}\nTried connection: {}",
-            std::backtrace::Backtrace::force_capture(),
-            self.inventory_display(),
-            self.reached_nodes()
-                .filter_map(Node::try_as_anchor_ref)
-                .map(|anchor| &anchor.identifier)
-                .format(", "),
-            connection.display(self.graph)
-        );
+        let Some(orbs) = self.reach.state.best_orbs.get(&node_index) else {
+            panic!(
+                "Failed to get connection!\nInventory: {}\nReached: {}\nTried connection: {}",
+                self.inventory_display(),
+                self.reached_nodes()
+                    .filter_map(Node::try_as_anchor_ref)
+                    .map(|anchor| &anchor.identifier)
+                    .format(", "),
+                connection.display(self.graph)
+            );
+        };
 
-        (
-            connection.index_graph(self.graph),
-            self.reach.state.best_orbs[&connection.node_index].clone(),
-        )
+        (connection.connection, orbs.clone())
     }
 
     // /// Clean any stale fails
@@ -478,14 +472,15 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn progress(&mut self, connection_index: ConnectionIndex, events: &[Event]) {
-        let (connection_ref, orb_variants) = self.get_connection(connection_index);
+    fn progress(&mut self, connection_index: ConnectionIndex<'graph>, events: &[Event]) {
+        let (connection, orb_variants) = self.get_connection(connection_index);
 
-        match connection_ref.connection {
-            ConnectionRefValue::Refill(_) => {
-                self.traverse(connection_index.node_index, orb_variants, events)
+        match connection {
+            ConnectionOrRefill::Refill(_) => {
+                let node_index = connection_index.node_index(self.graph);
+                self.traverse(node_index, orb_variants, events)
             }
-            ConnectionRefValue::Connection(connection) => {
+            ConnectionOrRefill::Connection(connection) => {
                 self.traverse_connection(connection, orb_variants, connection_index, events)
             }
         }
@@ -518,12 +513,12 @@ impl<'graph> World<'graph, '_> {
 
     fn traverse_anchor(
         &mut self,
-        anchor: &Anchor,
+        anchor: &'graph Anchor,
         node_index: usize,
         mut orb_variants: OrbVariants,
         events: &[Event],
     ) {
-        self.use_refills(anchor, &mut orb_variants, node_index);
+        self.use_refills(anchor, &mut orb_variants);
 
         self.reach
             .state
@@ -532,11 +527,11 @@ impl<'graph> World<'graph, '_> {
 
         self.attempt_teleport(anchor, events);
 
-        for (connection_index, connection) in anchor.connections.iter().enumerate() {
+        for connection in &anchor.connections {
             self.traverse_connection(
                 connection,
                 orb_variants.clone(),
-                ConnectionIndex::connection(node_index, connection_index),
+                ConnectionIndex::connection(anchor, connection),
                 events,
             )
         }
@@ -574,17 +569,17 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn use_refills(&mut self, anchor: &Anchor, orb_variants: &mut OrbVariants, node_index: usize) {
+    fn use_refills(&mut self, anchor: &'graph Anchor, orb_variants: &mut OrbVariants) {
         let max_orbs = self.max_orbs();
         if orb_variants[0] == max_orbs {
             return;
         }
 
-        for (refill_index, refill) in anchor.refills.iter().enumerate() {
+        for refill in &anchor.refills {
             if let Some(mut refill_orbs) = self.attempt_requirement(
                 &refill.requirement,
                 orb_variants.clone(),
-                ConnectionIndex::refill(node_index, refill_index),
+                ConnectionIndex::refill(anchor, refill),
             ) {
                 if matches!(refill.value, RefillValue::Full) {
                     // shortcut
@@ -602,7 +597,7 @@ impl<'graph> World<'graph, '_> {
         &mut self,
         connection: &Connection,
         mut orb_variants: OrbVariants,
-        connection_index: ConnectionIndex,
+        connection_index: ConnectionIndex<'graph>,
         events: &[Event],
     ) {
         let ControlFlow::Continue(revisit) = self.should_visit(connection, &mut orb_variants)
@@ -612,7 +607,7 @@ impl<'graph> World<'graph, '_> {
 
         trace!(
             "{identifier} -> {to_identifier} attempting connection",
-            identifier = self.graph.nodes[connection_index.node_index].identifier(),
+            identifier = connection_index.anchor.identifier,
             to_identifier = self.graph.nodes[connection.to].identifier(),
         );
 
@@ -674,7 +669,7 @@ impl<'graph> World<'graph, '_> {
         &mut self,
         requirement: &Requirement,
         mut orb_variants: OrbVariants,
-        connection: ConnectionIndex,
+        connection: ConnectionIndex<'graph>,
     ) -> Option<OrbVariants> {
         match self.is_met(requirement, &mut orb_variants) {
             ControlFlow::Continue(()) => Some(orb_variants),

@@ -65,7 +65,7 @@ use wotw_seedgen_data::{
 use crate::{
     item_pool::ItemPool,
     orbs::OrbVariants,
-    world::{ConnectionIndex, ConnectionRefValue, Missing},
+    world::{ConnectionIndex, ConnectionOrRefill, Missing},
     World,
 };
 
@@ -88,12 +88,12 @@ impl Solution {
     }
 }
 
-pub trait SolutionLike {
+pub trait SolutionLike<'graph> {
     fn items(&self) -> &SolutionItems;
 
     fn spirit_light(&self) -> i32;
 
-    fn connection(&self) -> Option<ConnectionIndex>;
+    fn connection(&self) -> Option<ConnectionIndex<'graph>>;
 
     fn used_slots(&self) -> usize {
         self.used_spirit_light_slots() + self.items().len()
@@ -108,12 +108,12 @@ pub trait SolutionLike {
         self.items().is_empty() && self.spirit_light() == 0
     }
 
-    fn is_redundant_with<S: SolutionLike>(&self, other: &S) -> bool {
+    fn is_redundant_with<'o, S: SolutionLike<'o>>(&self, other: &S) -> bool {
         other.items().iter().all(|item| self.items().contains(item))
             && other.spirit_light() <= self.spirit_light()
     }
 
-    fn display<'graph, 'pool, 'solution>(
+    fn display<'pool, 'solution>(
         &'solution self,
         item_pool: &'pool ItemPool,
         graph: Option<&'graph Graph>,
@@ -122,7 +122,7 @@ pub trait SolutionLike {
     }
 }
 
-impl SolutionLike for Solution {
+impl<'graph> SolutionLike<'graph> for Solution {
     fn items(&self) -> &SolutionItems {
         &self.items
     }
@@ -131,20 +131,20 @@ impl SolutionLike for Solution {
         self.spirit_light
     }
 
-    fn connection(&self) -> Option<ConnectionIndex> {
+    fn connection(&self) -> Option<ConnectionIndex<'graph>> {
         None
     }
 }
 
 pub struct DisplaySolution<'graph, 'pool, 'solution> {
-    connection: Option<(ConnectionIndex, &'graph Graph)>,
+    connection: Option<(ConnectionIndex<'graph>, &'graph Graph)>,
     items: &'solution SolutionItems,
     spirit_light: i32,
     item_pool: &'pool ItemPool,
 }
 
 impl<'graph, 'pool, 'solution> DisplaySolution<'graph, 'pool, 'solution> {
-    fn new<S: SolutionLike + ?Sized>(
+    fn new<S: SolutionLike<'graph> + ?Sized>(
         solution: &'solution S,
         item_pool: &'pool ItemPool,
         graph: Option<&'graph Graph>,
@@ -247,9 +247,9 @@ impl World<'_, '_> {
 }
 
 #[derive(Debug, Clone)]
-struct PartialSolution {
+struct PartialSolution<'graph> {
     /// The current connection this solution wants to solve
-    connection: ConnectionIndex,
+    connection: ConnectionIndex<'graph>,
     /// Indices into [`ItemPool`] for items used so far
     used_items: SolutionItems,
     /// Indices into [`ItemPool`] for items not used so far, needs to be kept in sync with `used_items`
@@ -261,11 +261,11 @@ struct PartialSolution {
     // other_branches: Vec<MinimalSolution>,
     /// Connections that have already been branched into from a common ancestor,
     /// can be used to avoid entering redundant search paths.
-    new_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex>>,
+    new_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
 }
 
-impl PartialSolution {
-    fn new(connection: ConnectionIndex, item_pool: &ItemPool) -> Self {
+impl<'graph> PartialSolution<'graph> {
+    fn new(connection: ConnectionIndex<'graph>, item_pool: &ItemPool) -> Self {
         Self {
             connection,
             used_items: SmallVec::new(),
@@ -277,7 +277,7 @@ impl PartialSolution {
     }
 }
 
-impl SolutionLike for PartialSolution {
+impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
     fn items(&self) -> &SolutionItems {
         &self.used_items
     }
@@ -286,7 +286,7 @@ impl SolutionLike for PartialSolution {
         self.spirit_light
     }
 
-    fn connection(&self) -> Option<ConnectionIndex> {
+    fn connection(&self) -> Option<ConnectionIndex<'graph>> {
         Some(self.connection)
     }
 }
@@ -327,8 +327,8 @@ struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
     slots: usize,
     spirit_light_slots: usize,
     initial_pickup_count: usize,
-    initial_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex>>,
-    solutions: Vec<PartialSolution>,
+    initial_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
+    solutions: Vec<PartialSolution<'graph>>,
     finished: Vec<Solution>,
 }
 
@@ -361,7 +361,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         }
     }
 
-    fn solve_untouched(&mut self, solution: PartialSolution) {
+    fn solve_untouched(&mut self, solution: PartialSolution<'graph>) {
         trace!("starting solve for {}", self.display_solution(&solution));
 
         self.world.snapshot();
@@ -371,7 +371,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.world.restore_snapshot();
     }
 
-    fn solve_touched(&mut self, solution: PartialSolution) {
+    fn solve_touched(&mut self, solution: PartialSolution<'graph>) {
         trace!("resuming solve for {}", self.display_solution(&solution));
 
         self.world.snapshot();
@@ -393,15 +393,15 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.world.restore_snapshot();
     }
 
-    fn solve_until_progress(&mut self, mut solution: PartialSolution) {
+    fn solve_until_progress(&mut self, mut solution: PartialSolution<'graph>) {
         loop {
-            let (connection_ref, orb_variants) = self.world.get_connection(solution.connection);
+            let (connection, orb_variants) = self.world.get_connection(solution.connection);
 
-            let flow = match connection_ref.connection {
-                ConnectionRefValue::Refill(refill) => {
+            let flow = match connection {
+                ConnectionOrRefill::Refill(refill) => {
                     self.solve_requirement(&refill.requirement, solution, orb_variants)
                 }
-                ConnectionRefValue::Connection(connection) => {
+                ConnectionOrRefill::Connection(connection) => {
                     self.solve_connection(connection, solution, orb_variants)
                 }
             };
@@ -416,9 +416,9 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     fn solve_connection(
         &mut self,
         connection: &Connection,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         orb_variants: OrbVariants,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
             "solving connection {solution}",
             solution = self.display_solution(&solution)
@@ -438,9 +438,9 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     fn solve_requirement(
         &mut self,
         requirement: &Requirement,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         mut orb_variants: OrbVariants,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
             "solving {requirement} for {solution}",
             solution = self.display_solution(&solution)
@@ -458,7 +458,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         }
     }
 
-    fn check_solution(&mut self, solution: PartialSolution) -> ControlFlow<(), PartialSolution> {
+    fn check_solution(
+        &mut self,
+        solution: PartialSolution<'graph>,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         if solution.is_empty() {
             // stale progression, nothing to see here
             return ControlFlow::Break(());
@@ -474,7 +477,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         }
     }
 
-    fn finish_solution(&mut self, solution: PartialSolution, new_reached: usize) {
+    fn finish_solution(&mut self, solution: PartialSolution<'graph>, new_reached: usize) {
         let finished = Solution::new(solution, new_reached);
 
         trace!(
@@ -495,8 +498,8 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn continue_solution(
         &mut self,
-        mut solution: PartialSolution,
-    ) -> ControlFlow<(), PartialSolution> {
+        mut solution: PartialSolution<'graph>,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!("continuing solution {}", self.display_solution(&solution));
 
         // solution.other_branches.clear();
@@ -523,7 +526,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         ControlFlow::Continue(next_solution)
     }
 
-    fn new_fails(&self, solution: &mut PartialSolution) -> FxHashSet<ConnectionIndex> {
+    fn new_fails(
+        &self,
+        solution: &mut PartialSolution<'graph>,
+    ) -> FxHashSet<ConnectionIndex<'graph>> {
         let mut new_fails = FxHashSet::default();
 
         for (current_uber_identifier, current_connections) in self.world.uber_state_fails() {
@@ -533,14 +539,17 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                 self.initial_fails
                     .get(current_uber_identifier)
                     .map(|initial_connections| {
-                        |connection: &ConnectionIndex| !initial_connections.contains(connection)
+                        |connection: &ConnectionIndex<'graph>| {
+                            !initial_connections.contains(connection)
+                        }
                     });
 
             match solution.new_fails.entry(*current_uber_identifier) {
                 Entry::Occupied(mut occupied) => {
                     let solution_connections = occupied.get_mut();
-                    let solution_filter =
-                        |connection: &ConnectionIndex| solution_connections.insert(*connection);
+                    let solution_filter = |connection: &ConnectionIndex<'graph>| {
+                        solution_connections.insert(*connection)
+                    };
 
                     match initial_filter {
                         None => new_fails.extend(current_connections_iter.filter(solution_filter)),
@@ -567,7 +576,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         new_fails
     }
 
-    fn pause_solution(&mut self, solution: PartialSolution) {
+    fn pause_solution(&mut self, solution: PartialSolution<'graph>) {
         // TODO we shouldn't pause if the solution is already finished
         trace!("pausing solution {}", self.display_solution(&solution));
 
@@ -576,10 +585,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve(
         &mut self,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         missing: Missing,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
             "solving {missing} for {solution}",
             solution = self.display_solution(&solution)
@@ -602,9 +611,9 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_health(
         &mut self,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         if self.world.skill(Skill::Regenerate) {
             self.solve_boolean_branches(
                 solution,
@@ -622,9 +631,9 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_energy(
         &mut self,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         self.solve_boolean_branches(solution, self.energy_options(), simulate)
     }
 
@@ -657,10 +666,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_boolean(
         &mut self,
-        mut solution: PartialSolution,
+        mut solution: PartialSolution<'graph>,
         uber_identifier: UberIdentifier,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         self.has_free_slot(&solution)?;
 
         let Some(index) = solution.remaining_items.iter().copied().find(|index| {
@@ -684,11 +693,11 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_integer(
         &mut self,
-        mut solution: PartialSolution,
+        mut solution: PartialSolution<'graph>,
         uber_identifier: UberIdentifier,
         mut amount: i32,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         if uber_identifier == UberIdentifier::SPIRIT_LIGHT {
             return self.solve_spirit_light(solution, amount, simulate);
         }
@@ -762,10 +771,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_spirit_light(
         &mut self,
-        mut solution: PartialSolution,
+        mut solution: PartialSolution<'graph>,
         amount: i32,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         self.add_spirit_light(&mut solution, amount, simulate)?;
 
         if self.spirit_light_slots >= solution.used_spirit_light_slots() {
@@ -779,10 +788,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_any(
         &mut self,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         any: Vec<Missing>,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution> {
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
         // TODO make these unique earlier in the program logic?
         // here they have to be unique so identical branches don't eliminate eachother
         // although, if different missings resolve to the same item pool item, could an issue still arise?
@@ -801,31 +810,33 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         let mut unique = FxHashSet::with_capacity_and_hasher(any.len(), FxBuildHasher);
         unique_missing(any, &mut unique);
 
-        self.solve_branches(
-            solution,
-            unique,
-            simulate,
-            |context, solution, missing, simulate| {
-                context.solve(solution.clone(), missing, simulate)
-            },
-        )
+        fn solve_branch<'graph>(
+            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            solution: PartialSolution<'graph>,
+            missing: Missing,
+            simulate: bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>> {
+            context.solve(solution.clone(), missing, simulate)
+        }
+
+        self.solve_branches(solution, unique, simulate, solve_branch)
     }
 
     fn solve_branches<I, T, F>(
         &mut self,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         branches: I,
         simulate: bool,
         mut solve: F,
-    ) -> ControlFlow<(), PartialSolution>
+    ) -> ControlFlow<(), PartialSolution<'graph>>
     where
         I: IntoIterator<Item = T>,
         F: FnMut(
-            &mut SolutionContext,
-            PartialSolution,
+            &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            PartialSolution<'graph>,
             T,
             bool,
-        ) -> ControlFlow<(), PartialSolution>,
+        ) -> ControlFlow<(), PartialSolution<'graph>>,
     {
         // let start = self.solutions.len();
         let mut branches = branches.into_iter();
@@ -867,19 +878,19 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_boolean_branches<I>(
         &mut self,
-        solution: PartialSolution,
+        solution: PartialSolution<'graph>,
         branches: I,
         simulate: bool,
-    ) -> ControlFlow<(), PartialSolution>
+    ) -> ControlFlow<(), PartialSolution<'graph>>
     where
         I: IntoIterator<Item = UberIdentifier>,
     {
-        fn solve_branch(
-            context: &mut SolutionContext,
-            solution: PartialSolution,
+        fn solve_branch<'graph>(
+            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            solution: PartialSolution<'graph>,
             uber_identifier: UberIdentifier,
             simulate: bool,
-        ) -> ControlFlow<(), PartialSolution> {
+        ) -> ControlFlow<(), PartialSolution<'graph>> {
             context.solve_boolean(solution, uber_identifier, simulate)
         }
 
@@ -942,7 +953,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.finished
     }
 
-    fn display_solution<'context, 'solution, S: SolutionLike>(
+    fn display_solution<'context, 'solution, S: SolutionLike<'graph>>(
         &'context self,
         solution: &'solution S,
     ) -> DisplaySolution<'graph, 'pool, 'solution> {
@@ -950,10 +961,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     }
 }
 
-fn trace_is_redundant_with<S: SolutionLike, O: SolutionLike>(
+fn trace_is_redundant_with<'graph, S: SolutionLike<'graph>, O: SolutionLike<'graph>>(
     solution: &S,
     other: &O,
-    graph: &Graph,
+    graph: &'graph Graph,
     item_pool: &ItemPool,
 ) -> bool {
     let is_redundant = solution.is_redundant_with(other);

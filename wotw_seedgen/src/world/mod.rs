@@ -5,7 +5,7 @@ pub(crate) mod tests;
 
 use arrayvec::ArrayVec;
 pub(crate) use is_met::Missing;
-pub(crate) use reached::{ConnectionIndex, ConnectionRefValue};
+pub(crate) use reached::{ConnectionIndex, ConnectionOrRefill};
 
 use std::{
     fmt::{self, Display},
@@ -36,7 +36,7 @@ pub struct World<'graph, 'settings> {
     pub(crate) graph: &'graph Graph,
     pub(crate) spawn: usize,
     pub(crate) settings: &'settings WorldSettings,
-    pub(crate) reach: Reach,
+    pub(crate) reach: Reach<'graph>,
     state: SimulationCache<WorldState>,
     updating_reach: bool,
 }
