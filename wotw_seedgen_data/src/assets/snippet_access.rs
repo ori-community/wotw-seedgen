@@ -4,7 +4,6 @@ use std::{
     ops::{Deref, DerefMut},
     path::Path,
 };
-use utoipa::ToSchema;
 use wotw_seedgen_parse::Source;
 
 use crate::seed_language::metadata::Metadata;
@@ -37,7 +36,7 @@ pub trait SnippetAccess {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, Default)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct InlineSnippets {
     pub snippets: FxHashMap<String, Source>,

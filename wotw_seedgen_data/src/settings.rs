@@ -20,6 +20,7 @@ use utoipa::{
 
 use crate::{
     assets::{InlineSnippets, SnippetAccess},
+    parse::Source,
     seed_language::metadata::ConfigDefault,
 };
 
@@ -137,6 +138,7 @@ pub struct WorldSettings {
     /// Names of snippets to use
     pub snippets: Vec<String>,
     /// Additional inline snippets that don't exist on the filesystem
+    #[schema(value_type = FxHashMap<String, Source>)]
     pub inline_snippets: InlineSnippets,
     /// Configuration to pass to snippets
     pub snippet_config: FxHashMap<String, FxHashMap<String, String>>,
