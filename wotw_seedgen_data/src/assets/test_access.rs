@@ -146,7 +146,7 @@ impl TestCacheValues {
             [] => Cow::Borrowed(&self.graphs.full),
             [world] if world == &WorldSettings::default() => Cow::Borrowed(&self.graphs.moki),
             [world] if world == &WorldSettings::difficulty_default(Difficulty::Gorlek) => {
-                Cow::Borrowed(&self.graphs.moki)
+                Cow::Borrowed(&self.graphs.gorlek)
             }
             other => Cow::Owned(graph(&self.base, other)),
         }
