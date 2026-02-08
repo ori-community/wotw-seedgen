@@ -15591,11 +15591,12 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       SentryJump=2, Damage=20  # Get hit by the offscreen mine
       SentryJump=1, DoubleJump, TripleJump
     kii:
-      Bash, Grenade=2, Bow=1 OR Grenade=1  # kill the mine with either bow or grenade (bow is more energy efficient) and jump from the left wall to the right one
+      Bash, Grenade=2, Bow=1 OR Shuriken=1 OR Grenade=1  # kill the mine with either bow or grenade (bow/shuriken is more energy efficient) and jump from the left wall to the right one
     unsafe:
       Bash, Grenade=2
       DoubleJump, TripleJump, Damage=20  # dboost an the mine so you can stand on the lava thingy and jump from it to the floating platform
       SwordJump, TripleJump, Dash  # land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
+      GrenadeJump
 
   conn WillowsEnd.InnerTP:
     moki:
@@ -15823,15 +15824,37 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   pickup WillowsEnd.LupoMap:
     moki: SpiritLight=50, DoubleJump OR Dash OR Launch OR Bow=1
     gorlek: SpiritLight=50  # jump to trigger the mine, back off to avoid taking damages
+  pickup WillowsEnd.EntryEX:  # Make sure its not redundant with going to WillowsEnd.Entry first
+    moki: Glide, DoubleJump, Bash, Grenade=1
+    gorlek:
+      Bash, Grenade=1, Dash, DoubleJump OR Glide  # Also possible with sword or hammer but that would be redundant with WillowsEnd.PortalShortcut
+      Bash, Grenade=1, Damage=40, DoubleJump OR Dash
+      DoubleJump, TripleJump, WillowsEnd.PortalShortcut OR Dash OR Glide OR Damage=40
+      WillowsEnd.PortalShortcut, Bash, Grenade=1, DoubleJump OR Sword OR Hammer
+      WillowsEnd.PortalShortcut, SentryJump=1, Damage=20  # Get hit by the offscreen mine
+    kii:
+      WillowsEnd.PortalShortcut, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      WillowsEnd.PortalShortcut, Bash, Grenade=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:  # energy weapon to land on the platform
+        Bow=1 OR Shuriken=1 OR Grenade=1  # kill the mine from the left wall to jumponto the right one
+      Bash, Grenade=1, Dash
+      DoubleJump, TripleJump OR Glide  # Glide goes from the portal to the left wall without landing on the floating platform
+      DoubleJump, Bash OR Dash OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2:  # touch the wall bellow Lupo and land on floating platform
+        Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # djump + energy weapon to reach the left wall
+    unsafe:
+      Bash, Grenade=1
+      DoubleJump, Dash  # either directly when exiting the portal or use a dashramp on the floating platform
+      GlideJump
 
   conn Teleporters: free
   conn WillowsEnd.Entry:
     moki:
-      WillowsEnd.PortalShortcut, DoubleJump OR Dash OR Launch OR Bow=1  # open the portal shortcut
-      DoubleJump, Dash
-      Glide OR Launch
+      Launch, WillowsEnd.PortalShortcut OR DoubleJump OR Dash
+      WillowsEnd.PortalShortcut, DoubleJump OR Dash OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1  # open the portal shortcut
+      Glide
     gorlek:  # No paths using Sword/Hammer because they solve PortalShortcut
       WillowsEnd.PortalShortcut  # jump to trigger the mine, back off to avoid taking damages
+      Launch
+      DoubleJump, Dash
       Bash, Damage=40, DoubleJump OR Dash
       DoubleJump, TripleJump, Damage=40
     kii:
