@@ -1,4 +1,5 @@
 use std::fmt::{self, Display};
+use std::marker::PhantomData;
 use std::ops::ControlFlow;
 
 use super::World;
@@ -17,7 +18,7 @@ use wotw_seedgen_data::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Missing {
+pub enum Missing<'graph> {
     Impossible,
     // UberState(UberIdentifier),
     Boolean(UberIdentifier),
@@ -26,10 +27,15 @@ pub enum Missing {
     Health,
     Energy,
     // TODO if we don't make this type recursive but rather return lists of missing where needed we could try using smallvec
-    Any(Vec<Missing>),
+    Any(Vec<Missing<'graph>>),
+    // Or(
+    //     Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
+    //     EqIgnore<OrbVariants>,
+    // ),
+    Or(Vec<Missing<'graph>>, PhantomData<&'graph ()>),
 }
 
-impl Missing {
+impl Missing<'_> {
     fn uber_state(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
         if uber_identifier.is_door() {
             Self::Impossible
@@ -69,7 +75,7 @@ impl Missing {
     }
 }
 
-impl Display for Missing {
+impl Display for Missing<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Missing::Impossible => "Impossible".fmt(f),
@@ -79,16 +85,21 @@ impl Display for Missing {
             Missing::Health => "Health".fmt(f),
             Missing::Energy => "Energy".fmt(f),
             Missing::Any(any) => any.iter().format(" or ").fmt(f),
+            Missing::Or(ors, _) => ors
+                .iter()
+                // .map(|(missing, _)| missing)
+                .format(" or ")
+                .fmt(f),
         }
     }
 }
 
-impl World<'_, '_> {
+impl<'graph> World<'graph, '_> {
     pub fn is_met(
         &self,
-        requirement: &Requirement,
+        requirement: &'graph Requirement,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         // TODO orbvariants newtype could be cool?
         trace!(
             "checking is_met for {requirement} with {orb_variants}",
@@ -111,9 +122,9 @@ impl World<'_, '_> {
 
     fn is_met_impl(
         &self,
-        requirement: &Requirement,
+        requirement: &'graph Requirement,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         match requirement {
             Requirement::Free => ControlFlow::Continue(()),
             Requirement::Impossible => ControlFlow::Break(Missing::Impossible),
@@ -293,21 +304,26 @@ impl World<'_, '_> {
                             }
                         }
                         ControlFlow::Break(or_missing) => {
-                            if !missing.contains(&or_missing) {
-                                missing.push(or_missing);
-                            }
+                            // missing.push((or_missing, GraphRef(or)));
+                            missing.push(or_missing);
                         }
                     }
                 }
 
-                *orb_variants = cheapest;
-
-                break_if_empty(orb_variants, Missing::Any(missing))
+                if cheapest.is_empty() {
+                    // TODO can we avoid cloning orb variants, for example by checking
+                    // if the orbs are maxed?
+                    // ControlFlow::Break(Missing::Or(missing, EqIgnore(orb_variants.clone())))
+                    ControlFlow::Break(Missing::Or(missing, PhantomData))
+                } else {
+                    *orb_variants = cheapest;
+                    ControlFlow::Continue(())
+                }
             }
         }
     }
 
-    fn setting_met(&self, condition: bool) -> ControlFlow<Missing> {
+    fn setting_met(&self, condition: bool) -> ControlFlow<Missing<'graph>> {
         if condition {
             ControlFlow::Continue(())
         } else {
@@ -315,11 +331,11 @@ impl World<'_, '_> {
         }
     }
 
-    fn skill_met(&self, skill: Skill) -> ControlFlow<Missing> {
+    fn skill_met(&self, skill: Skill) -> ControlFlow<Missing<'graph>> {
         self.boolean_met(self.skill(skill), skill.uber_identifier())
     }
 
-    fn any_skill_met<T>(&self, skills: T) -> ControlFlow<Missing>
+    fn any_skill_met<T>(&self, skills: T) -> ControlFlow<Missing<'graph>>
     where
         T: IntoIterator<Item = Skill> + Copy,
     {
@@ -330,11 +346,11 @@ impl World<'_, '_> {
         }
     }
 
-    fn shard_met(&self, shard: Shard) -> ControlFlow<Missing> {
+    fn shard_met(&self, shard: Shard) -> ControlFlow<Missing<'graph>> {
         self.boolean_met(self.shard(shard), shard.uber_identifier())
     }
 
-    fn teleporter_met(&self, teleporter: Teleporter) -> ControlFlow<Missing> {
+    fn teleporter_met(&self, teleporter: Teleporter) -> ControlFlow<Missing<'graph>> {
         self.boolean_met(self.teleporter(teleporter), teleporter.uber_identifier())
     }
 
@@ -342,7 +358,7 @@ impl World<'_, '_> {
         &self,
         condition: bool,
         uber_identifier: UberIdentifier,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         if condition {
             ControlFlow::Continue(())
         } else {
@@ -355,7 +371,7 @@ impl World<'_, '_> {
         current: i32,
         expected: i32,
         uber_identifier: UberIdentifier,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         let missing = expected - current;
 
         if missing <= 0 {
@@ -366,7 +382,10 @@ impl World<'_, '_> {
     }
 
     // TODO use more arrayvec instead of smallvec
-    fn enemy_movement_met(&self, enemies: &SmallVec<[(Enemy, u8); 12]>) -> ControlFlow<Missing> {
+    fn enemy_movement_met(
+        &self,
+        enemies: &SmallVec<[(Enemy, u8); 12]>,
+    ) -> ControlFlow<Missing<'graph>> {
         if self.settings.difficulty < Difficulty::Unsafe {
             let mut aerial = false;
             let mut dangerous = false;
@@ -394,7 +413,7 @@ impl World<'_, '_> {
     }
 
     // TODO these seem similar in nature to the different weapon arrays which come out of LogicalDifficulty, maybe they should be there?
-    fn aerial_met(&self) -> ControlFlow<Missing> {
+    fn aerial_met(&self) -> ControlFlow<Missing<'graph>> {
         if self.settings.difficulty < Difficulty::Gorlek {
             self.any_skill_met([Skill::DoubleJump, Skill::Launch])
         } else {
@@ -402,7 +421,7 @@ impl World<'_, '_> {
         }
     }
 
-    fn dangerous_met(&self) -> ControlFlow<Missing> {
+    fn dangerous_met(&self) -> ControlFlow<Missing<'graph>> {
         self.any_skill_met([Skill::DoubleJump, Skill::Dash, Skill::Bash, Skill::Launch])
     }
 
@@ -411,7 +430,7 @@ impl World<'_, '_> {
         target_health: f32,
         flying_target: bool,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         let Some(cost) = self.destroy_cost::<TARGET_IS_WALL>(target_health, flying_target) else {
             return ControlFlow::Break(Missing::any_skill(
                 self.settings.difficulty.weapons_iter::<TARGET_IS_WALL>(),
@@ -425,7 +444,7 @@ impl World<'_, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         // TODO while it has improved, this still harms performance heavily in some cases because it generates solutions
         // like Spear + Grenade + Bow etc. trying to suggest better weapons even though those were already covered earlier
         // but it's important for correctness, otherwise destroy requirements that initially try to solve with an energy weapon may never complete
@@ -470,7 +489,7 @@ impl World<'_, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         let mut added_orb_variants = vec![];
 
         orb_variants
@@ -546,7 +565,7 @@ impl World<'_, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing> {
+    ) -> ControlFlow<Missing<'graph>> {
         orb_variants.retain(|orbs| self.orbs_meet_health::<CONSUMING>(cost, orbs));
         break_if_empty(orb_variants, Missing::Health)
     }
@@ -585,7 +604,10 @@ impl World<'_, '_> {
     }
 }
 
-fn break_if_empty(orb_variants: &OrbVariants, missing: Missing) -> ControlFlow<Missing> {
+fn break_if_empty<'graph>(
+    orb_variants: &OrbVariants,
+    missing: Missing<'graph>,
+) -> ControlFlow<Missing<'graph>> {
     if orb_variants.is_empty() {
         ControlFlow::Break(missing)
     } else {

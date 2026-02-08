@@ -35,6 +35,12 @@
 //! to their function as almost entirely removing launch for players doing starved routing while
 //! keeping it for collection happy players.
 
+// TODO I think we need to get a solid baseline performance for destroy requirements before we can really look at other things
+// TODO Adding the specific requirement to `ConnectionIndex` does remove a lot of dead paths, but it also creates a lot more
+// unique ConnectionIndexes that don't get swallowed in the hashsets. We might need to figure out some other things before
+// being able to really look into it.
+// Maybe storing the missing instance would be more fruitful?
+
 #[cfg(test)]
 mod tests;
 mod weight;
@@ -54,7 +60,7 @@ use std::{
 use itertools::Itertools;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
-    logic_language::output::{Connection, Graph, Requirement},
+    logic_language::output::{Connection, Graph},
     seed_language::{
         output::{AsConstant, CommandVoid, ContainedWrites, Event},
         simulate::{Simulate, Simulation, Snapshot},
@@ -64,8 +70,7 @@ use wotw_seedgen_data::{
 
 use crate::{
     item_pool::ItemPool,
-    orbs::OrbVariants,
-    world::{ConnectionIndex, ConnectionOrRefill, Missing},
+    world::{ConnectionIndex, ConnectionOrRefill, Missing, ReachStateFails},
     World,
 };
 
@@ -93,7 +98,7 @@ pub trait SolutionLike<'graph> {
 
     fn spirit_light(&self) -> i32;
 
-    fn connection(&self) -> Option<ConnectionIndex<'graph>>;
+    fn connection(&self) -> Option<&ConnectionIndex<'graph>>;
 
     fn used_slots(&self) -> usize {
         self.used_spirit_light_slots() + self.items().len()
@@ -131,13 +136,13 @@ impl<'graph> SolutionLike<'graph> for Solution {
         self.spirit_light
     }
 
-    fn connection(&self) -> Option<ConnectionIndex<'graph>> {
+    fn connection(&self) -> Option<&ConnectionIndex<'graph>> {
         None
     }
 }
 
 pub struct DisplaySolution<'graph, 'pool, 'solution> {
-    connection: Option<(ConnectionIndex<'graph>, &'graph Graph)>,
+    connection: Option<(&'solution ConnectionIndex<'graph>, &'graph Graph)>,
     items: &'solution SolutionItems,
     spirit_light: i32,
     item_pool: &'pool ItemPool,
@@ -160,7 +165,7 @@ impl<'graph, 'pool, 'solution> DisplaySolution<'graph, 'pool, 'solution> {
 
 impl Display for DisplaySolution<'_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some((connection, graph)) = self.connection {
+        if let Some((connection, graph)) = &self.connection {
             write!(f, "{} / ", connection.display(graph),)?;
         }
 
@@ -204,13 +209,14 @@ impl World<'_, '_> {
         slots: usize,
         spirit_light_slots: usize,
     ) -> Vec<Solution> {
-        let initial_solutions = self
-            .uber_state_fails()
+        let fails = self.fails();
+        let initial_solutions = fails
+            .uber_state
             .values()
             .flatten()
-            .chain(self.health_fails())
-            .chain(self.energy_fails())
-            .map(|fail| PartialSolution::new(*fail, item_pool))
+            .chain(&fails.health)
+            .chain(&fails.energy)
+            .map(|fail| PartialSolution::new(fail.clone(), item_pool))
             .collect::<Vec<_>>();
 
         let mut context = SolutionContext::new(self, events, item_pool, slots, spirit_light_slots);
@@ -261,7 +267,7 @@ struct PartialSolution<'graph> {
     // other_branches: Vec<MinimalSolution>,
     /// Connections that have already been branched into from a common ancestor,
     /// can be used to avoid entering redundant search paths.
-    new_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
+    new_fails: ReachStateFails<'graph>,
 }
 
 impl<'graph> PartialSolution<'graph> {
@@ -272,7 +278,7 @@ impl<'graph> PartialSolution<'graph> {
             remaining_items: (0..item_pool.len()).collect(),
             spirit_light: 0,
             // other_branches: vec![],
-            new_fails: FxHashMap::default(),
+            new_fails: ReachStateFails::default(),
         }
     }
 }
@@ -286,8 +292,8 @@ impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
         self.spirit_light
     }
 
-    fn connection(&self) -> Option<ConnectionIndex<'graph>> {
-        Some(self.connection)
+    fn connection(&self) -> Option<&ConnectionIndex<'graph>> {
+        Some(&self.connection)
     }
 }
 
@@ -327,7 +333,7 @@ struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
     slots: usize,
     spirit_light_slots: usize,
     initial_pickup_count: usize,
-    initial_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
+    initial_fails: ReachStateFails<'graph>,
     solutions: Vec<PartialSolution<'graph>>,
     finished: Vec<Solution>,
 }
@@ -346,7 +352,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         // world.clean_fails();
 
         let initial_pickup_count = world.reached_pickup_count();
-        let initial_fails = world.uber_state_fails().clone();
+        let initial_fails = ReachStateFails {
+            logical_state: FxHashMap::default(),
+            ..world.fails().clone()
+        };
 
         Self {
             world,
@@ -395,14 +404,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_until_progress(&mut self, mut solution: PartialSolution<'graph>) {
         loop {
-            let (connection, orb_variants) = self.world.get_connection(solution.connection);
-
-            let flow = match connection {
-                ConnectionOrRefill::Refill(refill) => {
-                    self.solve_requirement(&refill.requirement, solution, orb_variants)
-                }
+            let flow = match solution.connection.connection {
+                ConnectionOrRefill::Refill(_) => self.solve_requirement(solution),
                 ConnectionOrRefill::Connection(connection) => {
-                    self.solve_connection(connection, solution, orb_variants)
+                    self.solve_connection(connection.0, solution)
                 }
             };
 
@@ -415,9 +420,8 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_connection(
         &mut self,
-        connection: &Connection,
+        connection: &'graph Connection,
         solution: PartialSolution<'graph>,
-        orb_variants: OrbVariants,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
             "solving connection {solution}",
@@ -431,23 +435,22 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         } else {
             // TODO sometimes the requirement is already solved which sounds wrong
             // if the node isn't reached. Is there a logic error in the reach expansion?
-            self.solve_requirement(&connection.requirement, solution, orb_variants)
+            self.solve_requirement(solution)
         }
     }
 
     fn solve_requirement(
         &mut self,
-        requirement: &Requirement,
         solution: PartialSolution<'graph>,
-        mut orb_variants: OrbVariants,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
-            "solving {requirement} for {solution}",
+            "solving {solution}",
             solution = self.display_solution(&solution)
         );
 
-        // TODO one source of inefficiency is that we don't commit to specific ORs in the requirement
-        // maybe we could store an index for that
+        // let requirement = solution.connection.requirement.0;
+        let requirement = solution.connection.connection.requirement();
+        let mut orb_variants = self.world.get_connection_orbs(&solution.connection);
         match self.world.is_met(requirement, &mut orb_variants) {
             ControlFlow::Continue(()) => {
                 trace!("already met");
@@ -532,31 +535,41 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     ) -> FxHashSet<ConnectionIndex<'graph>> {
         let mut new_fails = FxHashSet::default();
 
-        for (current_uber_identifier, current_connections) in self.world.uber_state_fails() {
-            let current_connections_iter = current_connections.iter().copied();
+        let fails = self.world.fails();
 
-            let initial_filter =
-                self.initial_fails
-                    .get(current_uber_identifier)
-                    .map(|initial_connections| {
-                        |connection: &ConnectionIndex<'graph>| {
-                            !initial_connections.contains(connection)
-                        }
-                    });
+        // TODO other fails?
+        for (current_uber_identifier, current_connections) in &fails.uber_state {
+            let current_connections_iter = current_connections.iter();
 
-            match solution.new_fails.entry(*current_uber_identifier) {
+            let initial_filter = self
+                .initial_fails
+                .uber_state
+                .get(current_uber_identifier)
+                .map(|initial_connections| {
+                    |connection: &&ConnectionIndex<'graph>| {
+                        !initial_connections.contains(connection)
+                    }
+                });
+
+            match solution
+                .new_fails
+                .uber_state
+                .entry(*current_uber_identifier)
+            {
                 Entry::Occupied(mut occupied) => {
                     let solution_connections = occupied.get_mut();
-                    let solution_filter = |connection: &ConnectionIndex<'graph>| {
-                        solution_connections.insert(*connection)
+                    let solution_filter = |connection: &&ConnectionIndex<'graph>| {
+                        solution_connections.insert((*connection).clone())
                     };
 
                     match initial_filter {
-                        None => new_fails.extend(current_connections_iter.filter(solution_filter)),
+                        None => new_fails
+                            .extend(current_connections_iter.filter(solution_filter).cloned()),
                         Some(initial_filter) => new_fails.extend(
                             current_connections_iter
                                 .filter(solution_filter)
-                                .filter(initial_filter),
+                                .filter(initial_filter)
+                                .cloned(),
                         ),
                     }
                 }
@@ -564,14 +577,35 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                     vacant.insert(current_connections.clone());
 
                     match initial_filter {
-                        None => new_fails.extend(current_connections_iter),
-                        Some(initial_filter) => {
-                            new_fails.extend(current_connections_iter.filter(initial_filter))
-                        }
+                        None => new_fails.extend(current_connections_iter.cloned()),
+                        Some(initial_filter) => new_fails
+                            .extend(current_connections_iter.filter(initial_filter).cloned()),
                     }
                 }
             }
         }
+
+        new_fails.extend(
+            fails
+                .health
+                .iter()
+                .filter(|fail| {
+                    !self.initial_fails.health.contains(fail)
+                        && solution.new_fails.health.insert((*fail).clone())
+                })
+                .cloned(),
+        );
+
+        new_fails.extend(
+            fails
+                .energy
+                .iter()
+                .filter(|fail| {
+                    !self.initial_fails.energy.contains(fail)
+                        && solution.new_fails.energy.insert((*fail).clone())
+                })
+                .cloned(),
+        );
 
         new_fails
     }
@@ -586,7 +620,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     fn solve(
         &mut self,
         solution: PartialSolution<'graph>,
-        missing: Missing,
+        missing: Missing<'graph>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
@@ -606,6 +640,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             Missing::Health => self.solve_health(solution, simulate),
             Missing::Energy => self.solve_energy(solution, simulate),
             Missing::Any(any) => self.solve_any(solution, any, simulate),
+            Missing::Or(ors, _) => self.solve_or(solution, ors, simulate),
         }
     }
 
@@ -686,7 +721,19 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
         self.add_item(&mut solution, index, simulate)?;
 
-        trace!("solved {}", self.display_solution(&solution));
+        trace!(
+            "progressed {uber_identifier} for {solution}",
+            solution = self.display_solution(&solution),
+        );
+
+        // if self
+        //     .world
+        //     .settings
+        //     .difficulty
+        //     .may_increase_orbs(uber_identifier)
+        // {
+        //     solution.connection.orb_reset();
+        // }
 
         ControlFlow::Continue(solution)
     }
@@ -754,7 +801,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             self.add_item(&mut solution, index, simulate)?;
         }
 
-        trace!("solved {}", self.display_solution(&solution));
+        trace!(
+            "progressed {uber_identifier} for {solution}",
+            solution = self.display_solution(&solution),
+        );
 
         ControlFlow::Continue(solution)
     }
@@ -789,14 +839,17 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     fn solve_any(
         &mut self,
         solution: PartialSolution<'graph>,
-        any: Vec<Missing>,
+        any: Vec<Missing<'graph>>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         // TODO make these unique earlier in the program logic?
         // here they have to be unique so identical branches don't eliminate eachother
         // although, if different missings resolve to the same item pool item, could an issue still arise?
         // TODO also optimize the graph more so we get fewer duplicates here to begin with
-        fn unique_missing(any: Vec<Missing>, unique: &mut FxHashSet<Missing>) {
+        fn unique_missing<'graph>(
+            any: Vec<Missing<'graph>>,
+            unique: &mut FxHashSet<Missing<'graph>>,
+        ) {
             for missing in any {
                 match missing {
                     Missing::Any(any) => unique_missing(any, unique),
@@ -813,13 +866,34 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         fn solve_branch<'graph>(
             context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
             solution: PartialSolution<'graph>,
-            missing: Missing,
+            missing: Missing<'graph>,
             simulate: bool,
         ) -> ControlFlow<(), PartialSolution<'graph>> {
             context.solve(solution.clone(), missing, simulate)
         }
 
         self.solve_branches(solution, unique, simulate, solve_branch)
+    }
+
+    fn solve_or(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        // ors: Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
+        ors: Vec<Missing<'graph>>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        fn solve_branch<'graph>(
+            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            solution: PartialSolution<'graph>,
+            // (missing, _): (Missing<'graph>, GraphRef<'graph, Requirement>),
+            missing: Missing<'graph>,
+            simulate: bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>> {
+            // TODO this does nothing right solution.connection.requirement = requirement;
+            context.solve(solution.clone(), missing, simulate)
+        }
+
+        self.solve_branches(solution, ors, simulate, solve_branch)
     }
 
     fn solve_branches<I, T, F>(

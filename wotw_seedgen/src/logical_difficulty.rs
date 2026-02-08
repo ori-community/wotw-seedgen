@@ -1,6 +1,6 @@
 use std::{iter::Copied, slice};
 
-use wotw_seedgen_data::{Difficulty, Skill};
+use wotw_seedgen_data::{Difficulty, Shard, Skill, UberIdentifier};
 
 pub trait LogicalDifficulty: Sized {
     /// Allow using Triple Jump
@@ -38,6 +38,8 @@ pub trait LogicalDifficulty: Sized {
 
     /// Allow charging Grenade
     fn charge_grenade(self) -> bool;
+
+    fn may_increase_orbs(self, uber_identifier: UberIdentifier) -> bool;
 
     /// Allowed spawns on this difficulty when using the random spawn setting
     fn spawn_locations(self) -> &'static [&'static str];
@@ -106,6 +108,20 @@ impl LogicalDifficulty for Difficulty {
 
     fn charge_grenade(self) -> bool {
         self >= Difficulty::Unsafe
+    }
+
+    fn may_increase_orbs(self, uber_identifier: UberIdentifier) -> bool {
+        match uber_identifier {
+            UberIdentifier::MAX_HEALTH | UberIdentifier::MAX_ENERGY | Skill::REGENERATE_ID => true,
+            Shard::RESILIENCE_ID => self.resilience(),
+            Shard::VITALITY_ID => self.vitality(),
+            Shard::ENERGY_ID => self.energy_shard(),
+            Shard::OVERCHARGE_ID => self.overcharge(),
+            Shard::LIFE_PACT_ID => self.life_pact(),
+            Shard::OVERFLOW_ID => self.overflow(),
+            Shard::CATALYST_ID => self.catalyst(),
+            _ => false,
+        }
     }
 
     // TODO seeing all these hardcoded strings makes me sad

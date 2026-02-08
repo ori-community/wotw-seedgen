@@ -1,6 +1,7 @@
 use std::{
     fmt::{self, Display},
-    hash::{Hash, Hasher},
+    hash::Hash,
+    marker::PhantomData,
     mem,
     ops::{ControlFlow, Deref},
 };
@@ -9,7 +10,7 @@ use super::World;
 use crate::{
     logical_difficulty::LogicalDifficulty,
     orbs::{self, OrbVariants},
-    world::is_met::Missing,
+    world::{GraphRef, Missing},
 };
 use itertools::Itertools;
 use log::trace;
@@ -22,7 +23,7 @@ use wotw_seedgen_data::{
         output::Event,
         simulate::{CloneSnapshot, Simulation, Snapshot},
     },
-    Shard, Skill, UberIdentifier,
+    UberIdentifier,
 };
 
 pub const TP_ANCHOR: &str = "Teleporters";
@@ -59,16 +60,21 @@ struct ReachState<'graph> {
     best_orbs: FxHashMap<usize, OrbVariants>,
     /// [`TP_ANCHOR`] has been reached
     tp_reached: bool,
+    fails: ReachStateFails<'graph>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub(crate) struct ReachStateFails<'graph> {
     /// All [`ConnectionIndex`] which failed to solve and might be solved by advancing the [`UberIdentifier`]
-    uber_state_fails: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
+    pub uber_state: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
     /// All [`ConnectionIndex`] which failed to solve and might be solved by reaching the logical state
-    logical_state_fails: FxHashMap<usize, FxHashSet<ConnectionIndex<'graph>>>,
+    pub logical_state: FxHashMap<usize, FxHashSet<ConnectionIndex<'graph>>>,
     /// Some connections failed to solve and might require more health.
     /// Resuming progress along those connections would be very hard because of refill logic,
     /// So we just reset the entire Reach when progressing orbs.
-    health_fails: FxHashSet<ConnectionIndex<'graph>>,
+    pub health: FxHashSet<ConnectionIndex<'graph>>,
     /// Same as `health_fail`, but for energy.
-    energy_fails: FxHashSet<ConnectionIndex<'graph>>,
+    pub energy: FxHashSet<ConnectionIndex<'graph>>,
 }
 
 // TODO were these capacities good?
@@ -82,46 +88,63 @@ impl<'graph> ReachState<'graph> {
     fn clear(&mut self) {
         self.best_orbs.clear();
         self.tp_reached = false;
-        self.uber_state_fails.clear();
-        self.logical_state_fails.clear();
-        self.health_fails.clear();
-        self.energy_fails.clear();
+        self.fails.clear();
     }
 
-    fn add_fail(&mut self, missing: Missing, connection: ConnectionIndex<'graph>) {
+    fn add_fail(&mut self, missing: Missing<'graph>, connection: ConnectionIndex<'graph>) {
         match missing {
             Missing::Impossible => {}
             // TODO optimize by using the missing integer value and skipping reach attempts?
             Missing::Boolean(uber_identifier) => {
-                add_fail_to(&mut self.uber_state_fails, uber_identifier, connection);
+                add_fail_to(&mut self.fails.uber_state, uber_identifier, connection);
             }
             Missing::Integer(uber_identifier, _) => {
-                add_fail_to(&mut self.uber_state_fails, uber_identifier, connection);
+                add_fail_to(&mut self.fails.uber_state, uber_identifier, connection);
             }
             Missing::LogicalState(index) => {
-                add_fail_to(&mut self.logical_state_fails, index, connection);
+                add_fail_to(&mut self.fails.logical_state, index, connection);
             }
             Missing::Health => {
-                self.health_fails.insert(connection);
+                self.fails.health.insert(connection);
             }
             Missing::Energy => {
-                self.energy_fails.insert(connection);
+                self.fails.energy.insert(connection);
             }
             Missing::Any(options) => {
                 for missing in options {
-                    self.add_fail(missing, connection);
+                    self.add_fail(missing, connection.clone());
+                }
+            }
+            // Missing::Or(ors, EqIgnore(orb_variants)) => {
+            Missing::Or(ors, PhantomData) => {
+                // connection.orb_variants = EqIgnore(Some(orb_variants));
+
+                // for (missing, requirement) in ors {
+                for missing in ors {
+                    // connection.requirement = requirement;
+
+                    self.add_fail(missing, connection.clone());
                 }
             }
         }
     }
 
     fn orb_fail(&self) -> bool {
-        !(self.health_fails.is_empty() && self.energy_fails.is_empty())
+        !(self.fails.health.is_empty() && self.fails.energy.is_empty())
     }
 }
 
 fn add_fail_to<K: Eq + Hash, V: Eq + Hash>(map: &mut FxHashMap<K, FxHashSet<V>>, key: K, value: V) {
     map.entry(key).or_default().insert(value);
+}
+
+impl<'graph> ReachStateFails<'graph> {
+    fn clear(&mut self) {
+        self.uber_state.clear();
+        self.logical_state.clear();
+        self.health.clear();
+        self.energy.clear();
+    }
 }
 
 /// All the logic states which might be solved by advancing the [`UberIdentifier`]
@@ -154,94 +177,66 @@ impl Deref for LogicStateMap {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct ConnectionIndex<'graph> {
-    pub anchor: &'graph Anchor,
+    pub anchor: GraphRef<'graph, Anchor>,
     pub connection: ConnectionOrRefill<'graph>,
+    // TODO I'm not convinved this idea was bad, so I'm keeping it in comments
+    // pub requirement: GraphRef<'graph, Requirement>,
+    // pub orb_variants: EqIgnore<Option<OrbVariants>>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum ConnectionOrRefill<'graph> {
-    Refill(&'graph Refill),
-    Connection(&'graph Connection),
+    Refill(GraphRef<'graph, Refill>),
+    Connection(GraphRef<'graph, Connection>),
 }
 
 impl<'graph> ConnectionIndex<'graph> {
     pub(crate) fn connection(anchor: &'graph Anchor, connection: &'graph Connection) -> Self {
         Self {
-            anchor,
-            connection: ConnectionOrRefill::Connection(connection),
+            anchor: GraphRef(anchor),
+            connection: ConnectionOrRefill::Connection(GraphRef(connection)),
+            // requirement: GraphRef(&connection.requirement),
+            // orb_variants: EqIgnore(None),
         }
     }
 
     pub(crate) fn refill(anchor: &'graph Anchor, refill: &'graph Refill) -> Self {
         Self {
-            anchor,
-            connection: ConnectionOrRefill::Refill(refill),
+            anchor: GraphRef(anchor),
+            connection: ConnectionOrRefill::Refill(GraphRef(refill)),
+            // requirement: GraphRef(&refill.requirement),
+            // orb_variants: EqIgnore(None),
         }
     }
 
     pub(crate) fn node_index(&self, graph: &'graph Graph) -> usize {
-        ((self.address() - graph.nodes.as_ptr() as isize) / mem::size_of::<Node>() as isize)
-            as usize
+        self.anchor.index(&graph.nodes)
     }
 
-    pub(crate) fn display(self, graph: &'graph Graph) -> ConnectionIndexDisplay<'graph> {
+    // pub(crate) fn orb_reset(&mut self) {
+    //     self.requirement = self.connection.requirement();
+    //     self.orb_variants = EqIgnore(None);
+    // }
+
+    pub(crate) fn display<'index>(
+        &'index self,
+        graph: &'graph Graph,
+    ) -> ConnectionIndexDisplay<'index, 'graph> {
         ConnectionIndexDisplay {
             connection: self,
             graph,
         }
     }
-
-    fn address(&self) -> isize {
-        self.anchor as *const Anchor as isize
-    }
 }
 
-impl PartialEq for ConnectionIndex<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.address() == other.address() && self.connection == other.connection
-    }
-}
-
-impl Eq for ConnectionIndex<'_> {}
-
-impl Hash for ConnectionIndex<'_> {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.address().hash(state);
-        self.connection.hash(state);
-    }
-}
-
-impl ConnectionOrRefill<'_> {
-    fn address(&self) -> usize {
-        match self {
-            Self::Refill(refill) => (*refill) as *const Refill as usize,
-            Self::Connection(connection) => (*connection) as *const Connection as usize,
-        }
-    }
-}
-
-impl PartialEq for ConnectionOrRefill<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.address() == other.address()
-    }
-}
-
-impl Eq for ConnectionOrRefill<'_> {}
-
-impl Hash for ConnectionOrRefill<'_> {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.address().hash(state);
-    }
-}
-
-pub(crate) struct ConnectionIndexDisplay<'graph> {
-    connection: ConnectionIndex<'graph>,
+pub(crate) struct ConnectionIndexDisplay<'index, 'graph> {
+    connection: &'index ConnectionIndex<'graph>,
     graph: &'graph Graph,
 }
 
-impl Display for ConnectionIndexDisplay<'_> {
+impl Display for ConnectionIndexDisplay<'_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.connection.anchor.identifier.fmt(f)?;
 
@@ -250,6 +245,17 @@ impl Display for ConnectionIndexDisplay<'_> {
             ConnectionOrRefill::Connection(connection) => {
                 write!(f, " -> {}", self.graph.nodes[connection.to].identifier())
             }
+        }
+
+        // write!(f, " -> {}", self.connection.requirement.0)
+    }
+}
+
+impl<'graph> ConnectionOrRefill<'graph> {
+    pub(crate) fn requirement(&self) -> &'graph Requirement {
+        match self {
+            Self::Refill(refill) => &refill.0.requirement,
+            Self::Connection(connection) => &connection.0.requirement,
         }
     }
 }
@@ -291,29 +297,17 @@ impl<'graph> World<'graph, '_> {
         self.attempt_spawn_teleport(events);
     }
 
-    // TODO other fails?
-    pub(crate) fn uber_state_fails(
-        &self,
-    ) -> &FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>> {
-        &self.reach.state.uber_state_fails
+    pub(crate) fn fails(&self) -> &ReachStateFails<'graph> {
+        &self.reach.state.fails
     }
 
-    pub(crate) fn health_fails(&self) -> &FxHashSet<ConnectionIndex<'graph>> {
-        &self.reach.state.health_fails
-    }
-
-    pub(crate) fn energy_fails(&self) -> &FxHashSet<ConnectionIndex<'graph>> {
-        &self.reach.state.energy_fails
-    }
-
-    pub(crate) fn get_connection(
-        &self,
-        connection: ConnectionIndex<'graph>,
-    ) -> (ConnectionOrRefill<'graph>, OrbVariants) {
+    pub(crate) fn get_connection_orbs(&self, connection: &ConnectionIndex<'graph>) -> OrbVariants {
+        // match &connection.orb_variants.0 {
+        //     None => {
         let node_index = connection.node_index(self.graph);
-        // TODO this still fails sometimes...
-        let Some(orbs) = self.reach.state.best_orbs.get(&node_index) else {
-            panic!(
+
+        match self.reach.state.best_orbs.get(&node_index) {
+            None => panic!(
                 "Failed to get connection!\nInventory: {}\nReached: {}\nTried connection: {}",
                 self.inventory_display(),
                 self.reached_nodes()
@@ -321,10 +315,12 @@ impl<'graph> World<'graph, '_> {
                     .map(|anchor| &anchor.identifier)
                     .format(", "),
                 connection.display(self.graph)
-            );
-        };
-
-        (connection.connection, orbs.clone())
+            ),
+            Some(orbs) => orbs.clone(),
+        }
+        //     }
+        //     Some(orb_variants) => orb_variants.clone(),
+        // }
     }
 
     // /// Clean any stale fails
@@ -387,7 +383,7 @@ impl<'graph> World<'graph, '_> {
 
         self.check_states_for(uber_identifier);
 
-        if let Some(fails) = self.reach.state.uber_state_fails.remove(&uber_identifier) {
+        if let Some(fails) = self.reach.state.fails.uber_state.remove(&uber_identifier) {
             trace!("removed {uber_identifier} from UberState fails");
             for fail in fails {
                 self.progress(fail, events);
@@ -395,7 +391,9 @@ impl<'graph> World<'graph, '_> {
         }
 
         if !was_updating_reach {
-            if self.reach.state.orb_fail() && self.may_increase_orbs(uber_identifier) {
+            if self.reach.state.orb_fail()
+                && self.settings.difficulty.may_increase_orbs(uber_identifier)
+            {
                 self.reach.state.clear();
 
                 self.traverse_spawn(events);
@@ -458,30 +456,16 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn may_increase_orbs(&self, uber_identifier: UberIdentifier) -> bool {
-        match uber_identifier {
-            UberIdentifier::MAX_HEALTH | UberIdentifier::MAX_ENERGY | Skill::REGENERATE_ID => true,
-            Shard::RESILIENCE_ID => self.settings.difficulty.resilience(),
-            Shard::VITALITY_ID => self.settings.difficulty.vitality(),
-            Shard::ENERGY_ID => self.settings.difficulty.energy_shard(),
-            Shard::OVERCHARGE_ID => self.settings.difficulty.overcharge(),
-            Shard::LIFE_PACT_ID => self.settings.difficulty.life_pact(),
-            Shard::OVERFLOW_ID => self.settings.difficulty.overflow(),
-            Shard::CATALYST_ID => self.settings.difficulty.catalyst(),
-            _ => false,
-        }
-    }
-
     fn progress(&mut self, connection_index: ConnectionIndex<'graph>, events: &[Event]) {
-        let (connection, orb_variants) = self.get_connection(connection_index);
+        let orb_variants = self.get_connection_orbs(&connection_index);
 
-        match connection {
+        match &connection_index.connection {
             ConnectionOrRefill::Refill(_) => {
                 let node_index = connection_index.node_index(self.graph);
                 self.traverse(node_index, orb_variants, events)
             }
             ConnectionOrRefill::Connection(connection) => {
-                self.traverse_connection(connection, orb_variants, connection_index, events)
+                self.traverse_connection(connection.0, orb_variants, connection_index, events)
             }
         }
     }
@@ -562,7 +546,7 @@ impl<'graph> World<'graph, '_> {
 
         self.reach.state.best_orbs.insert(index, smallvec![]);
 
-        if let Some(fails) = self.reach.state.logical_state_fails.remove(&index) {
+        if let Some(fails) = self.reach.state.fails.logical_state.remove(&index) {
             for fail in fails {
                 self.progress(fail, events);
             }
@@ -577,7 +561,6 @@ impl<'graph> World<'graph, '_> {
 
         for refill in &anchor.refills {
             if let Some(mut refill_orbs) = self.attempt_requirement(
-                &refill.requirement,
                 orb_variants.clone(),
                 ConnectionIndex::refill(anchor, refill),
             ) {
@@ -595,7 +578,7 @@ impl<'graph> World<'graph, '_> {
 
     fn traverse_connection(
         &mut self,
-        connection: &Connection,
+        connection: &'graph Connection,
         mut orb_variants: OrbVariants,
         connection_index: ConnectionIndex<'graph>,
         events: &[Event],
@@ -606,14 +589,11 @@ impl<'graph> World<'graph, '_> {
         };
 
         trace!(
-            "{identifier} -> {to_identifier} attempting connection",
-            identifier = connection_index.anchor.identifier,
-            to_identifier = self.graph.nodes[connection.to].identifier(),
+            "attempting connection {}",
+            connection_index.display(self.graph)
         );
 
-        if let Some(mut target_orbs) =
-            self.attempt_requirement(&connection.requirement, orb_variants, connection_index)
-        {
+        if let Some(mut target_orbs) = self.attempt_requirement(orb_variants, connection_index) {
             if revisit && !self.should_still_visit(connection, &mut target_orbs) {
                 return;
             }
@@ -667,10 +647,11 @@ impl<'graph> World<'graph, '_> {
 
     fn attempt_requirement(
         &mut self,
-        requirement: &Requirement,
         mut orb_variants: OrbVariants,
         connection: ConnectionIndex<'graph>,
     ) -> Option<OrbVariants> {
+        // let requirement = connection.requirement.0;
+        let requirement = connection.connection.requirement();
         match self.is_met(requirement, &mut orb_variants) {
             ControlFlow::Continue(()) => Some(orb_variants),
             ControlFlow::Break(missing) => {

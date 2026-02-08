@@ -72,10 +72,11 @@ fn full_reach_check() {
         eprintln!(
             "remaining uber state fails:\n{}",
             world
-                .uber_state_fails()
+                .fails()
+                .uber_state
                 .values()
                 .flatten()
-                .copied()
+                .cloned()
                 .collect::<FxHashSet<_>>()
                 .into_iter()
                 .format_with("\n", |connection, f| {
@@ -252,15 +253,17 @@ fn is_met() {
         };
         ($world:expr, $req:expr, [$world_orbs:expr], $f:path) => {
             {
+                let req = $req;
                 let mut orb_variants: OrbVariants = smallvec![$world_orbs];
-                let control_flow = $world.is_met(&$req, &mut orb_variants);
+                let control_flow = $world.is_met(&req, &mut orb_variants);
                 assert!($f(&control_flow));
             }
         };
         ($world:expr, $req:expr, [$world_orbs:expr], [$($orbs:expr),* $(,)?]) => {
             {
+                let req = $req;
                 let mut left: OrbVariants = smallvec![$world_orbs];
-                let _ = $world.is_met(&$req, &mut left);
+                let _ = $world.is_met(&req, &mut left);
                 left.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
                 let mut right: OrbVariants = smallvec![$($world_orbs + $orbs),*];
                 right.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));

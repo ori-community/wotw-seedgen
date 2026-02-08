@@ -1,11 +1,14 @@
+mod graph_ref;
 mod is_met;
 mod reached;
 #[cfg(test)]
 pub(crate) mod tests;
 
 use arrayvec::ArrayVec;
+// pub(crate) use graph_ref::{EqIgnore, GraphRef};
+pub(crate) use graph_ref::GraphRef;
 pub(crate) use is_met::Missing;
-pub(crate) use reached::{ConnectionIndex, ConnectionOrRefill};
+pub(crate) use reached::{ConnectionIndex, ConnectionOrRefill, ReachStateFails};
 
 use std::{
     fmt::{self, Display},
