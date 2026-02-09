@@ -374,6 +374,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .spirit_light_provider
                         .take(spirit_light_placements_remaining);
 
+                    // Placements_remaining has reduced by one, item_pool.len() remained the same.
+                    // If should_place_spirit_light is true, spirit_light_placements_remaining must be
+                    // greater than one, so this branch doesn't need a saturating sub.
                     spirit_light_placements_remaining -= 1;
 
                     (
@@ -384,7 +387,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     let target_world_index = self.choose_target_world_for_random_placement();
 
                     if origin_world_index != target_world_index {
-                        // TODO think again about what this does exactly
+                        // If the item is taken from another item pool, then placements_remaining
+                        // has reduced by one and item_pool.len() remained the same.
+                        // If it's taken from the own item pool, both have reduced by one
+                        // and spirit_light_placements_remaining remains the same
                         spirit_light_placements_remaining =
                             spirit_light_placements_remaining.saturating_sub(1);
                     }
