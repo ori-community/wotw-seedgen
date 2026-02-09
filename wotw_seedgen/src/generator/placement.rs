@@ -384,7 +384,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     let target_world_index = self.choose_target_world_for_random_placement();
 
                     if origin_world_index != target_world_index {
-                        spirit_light_placements_remaining -= 1;
+                        // TODO think again about what this does exactly
+                        spirit_light_placements_remaining =
+                            spirit_light_placements_remaining.saturating_sub(1);
                     }
 
                     (
