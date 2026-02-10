@@ -15574,30 +15574,31 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
     moki:
       BreakCrystal, Launch
       Bow=1
+    kii:
+      BreakCrystal, SentryJump=1
+      BreakCrystal, Bash, Grenade=1
   # a lot of energy crystals not considered, mostly because they are on the way to hearts which aren't currently tracked
 
-  # the paths are kind of inaccurate because the platform above the door has no anchor of its own
+  pickup WillowsEnd.EntryEX:
+    unsafe: SentryJump=1  # Energy optimization by going to the left wall directly
 
-  state WillowsEnd.GrappleWheelsHeart:
-    unsafe: ShurikenBreak=30, Launch
-
-  pickup WillowsEnd.EntryEX:  # Be carefull it's not redundant with Entry->BoulderHeartPath->EntryEX
+  conn WillowsEnd.EntryFloatingPlatform:  # Be careful it's not redundant with Entry->BoulderHeartPath->EntryFloatingPlatform
     moki:
-      DoubleJump, Bash, Grenade=2
+      DoubleJump, Bash, Grenade=1
       Launch
     gorlek:
-      Bash, Grenade=2, Dash OR Sword OR Hammer
-      Bash, Grenade=1, DoubleJump, TripleJump
-      SentryJump=2, Damage=20  # Get hit by the offscreen mine
-      SentryJump=1, DoubleJump, TripleJump
-    kii:
-      Bash, Grenade=2, Bow=1 OR Shuriken=1 OR Grenade=1  # kill the mine with either bow or grenade (bow/shuriken is more energy efficient) and jump from the left wall to the right one
+      Bash, Grenade=1
+      SentryJump=1
+    #kii:
+      # Glitched
+      # AerialHammerJump  # Upswing before AHJ
+      # DoubleJump, GrenadeJump=1
     unsafe:
-      Bash, Grenade=2
-      DoubleJump, TripleJump, Damage=20  # dboost an the mine so you can stand on the lava thingy and jump from it to the floating platform
+      DoubleJump, TripleJump, Damage=20  # dboost on the mine so you can stand on the lava thingy and jump from it to the floating platform
       SwordJump, TripleJump, Dash  # land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
-      GrenadeJump
-
+      AerialHammerJump OR GrenadeJump OR AbilitySwap=1 OR GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump  # CoyoteHammerJump is scary...
+      GlideJump, DoubleJump, TripleJump, Sword OR Hammer  # Either directly or by going to the left platform first
+      Sword, DoubleJump  # djump, pogo the mine, djump+upslash to reach the floating platform
   conn WillowsEnd.InnerTP:
     moki:
       Launch, Bash, DoubleJump OR Dash OR Glide  # mine in the way, but I think it's managable
@@ -15631,37 +15632,79 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       Bash, Grenade=1
       DoubleJump, TripleJump, Dash  # Under the wheel
     unsafe: DoubleJump, TripleJump, Sword OR Hammer  # Under the wheel
+
+anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platform above the entrance
+
+  state WillowsEnd.GrappleWheelsHeart:
+    unsafe: ShurikenBreak=30, Launch
+
+  pickup WillowsEnd.EntryEX:
+    moki:
+      DoubleJump, Bash, Grenade=1
+      Launch
+    gorlek:
+      Bash, Grenade=1, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump
+      SentryJump=1, Damage=20  # Get hit by the offscreen mine
+    kii:
+      Bash, Grenade=1, Bow=1 OR Shuriken=1 OR Grenade=1 OR Damage=20  # kill the mine with either bow or grenade (bow/shuriken is more energy efficient) and jump from the left wall to the right one
+      DoubleJump, Sword OR Hammer
+      # Glitched
+      # DoubleJump, GlideJump
+    unsafe:  # You can climb the left wall to jump to the pickup. Then jump back to the left to avoid the mine
+      Bash, Grenade=1
+      # SentryJump=1  # Bonk on the ceiling beneath the mine to redirect ori or running sjump to the pickup. In unsafe, this is redundant with EntryFloatingPlatform->Entry->EntryEX but more lenient.
+      DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump OR GrenadeJump OR AbilitySwap=1
+
+  conn WillowsEnd.Entry: free
   conn WillowsEnd.GrappleHeartMidPoint:
     moki: Grapple, Launch, DoubleJump OR Dash OR Glide
     gorlek: Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii:
       Launch, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # use energy weapon before touching the wall before the first portal
       Launch, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # same as above but one more energy weapon in order to touch the wall before the last wheel
-      Bash, Grenade=2, DoubleJump, TripleJump, Grapple  # bashnade to reach the floating platform at the entrance, tjump to the second floating platform and bashnade towards the portals
-      Bash, Grenade=1, DoubleJump, TripleJump, Grapple, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1  # same as above but condition instead of second bashnade. Possible with more energy weapons but these are the only which cost less energy than grenade
+      DoubleJump, TripleJump, Grapple:
+        # These requirements are here to reach the wall before the first portal
+        Bash, Grenade=1
+        Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       Launch
-      Bash, Grenade=1, Glide, DoubleJump, TripleJump, Grapple, Damage=20  # land on the floating platform, glide, climb the wall after the first wheel to pass the laser without taking damage. At the wheel next to the chakpoint, wjump on the wall next to the laser. Take a damage boost in the double laser.
-      SentryJump=1, Glide, DoubleJump, TripleJump, Grapple, Damage=20  # Same as above
   conn WillowsEnd.GrappleHeart:
     moki, WillowsEnd.GrappleWheelsHeart:
-      Bash, Grenade=2, DoubleJump, Glide
+      Bash, Grenade=1, DoubleJump, Glide
       Launch
     gorlek, WillowsEnd.GrappleWheelsHeart:
-      SwordSJump=2, DoubleJump  # weapon air stall (Hammer too hard for gorlek)
-      Bash, Grenade=2, Sword, DoubleJump OR Dash
-      Bash, Grenade=2, DoubleJump, Dash
-      Bash, Grenade=3, DoubleJump OR Dash
+      SwordSJump=1, DoubleJump  # sword air stall (Hammer too hard for gorlek)
+      Bash, Grenade=1, Sword, DoubleJump OR Dash
+      Bash, Grenade=1, DoubleJump, Dash
+      Bash, Grenade=2, DoubleJump OR Dash
     kii, WillowsEnd.GrappleWheelsHeart:
-      Bash, Grenade=2, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2
-      Bash, Grenade=3  # bash glide
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2
+      Bash, Grenade=2  # bash glide
+      HammerSJump=1, DoubleJump  # hammer air stall
     unsafe, WillowsEnd.GrappleWheelsHeart:
-      SwordSJump=2, Dash  # weapon air stall
-      SentryJump=2, DoubleJump  # weapon air stall (compatible with hammer)
-      SwordSJump=1, DoubleJump  # djump, pogo the mine, djump+upslash to reach the floating platform
-      Sword, DoubleJump, Bash, Grenade=1  # djump, pogo the mine, djump+upslash to reach the floating platform
-      SentryJump=1, DoubleJump, Damage=20  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
-      Bash, Grenade=1, DoubleJump, Damage=20, Sword OR Hammer  # use the iframes from the mine to use the lava thingy as a platform then djump+weapon combo to the left floating platform
+      SwordSJump=1, Dash  # Dashramp and upswing to cross the gap
+  conn WillowsEnd.InnerTP:
+    moki:
+      Launch, Bash, DoubleJump OR Dash OR Glide  # mine in the way, but I think it's managable
+      Launch, WillowsEnd.PortalShortcut
+    gorlek:
+      Launch, Bash, Sword OR Hammer OR Damage=40
+      Bash, Grenade=2, DoubleJump, TripleJump, Damage=40 OR WillowsEnd.PortalShortcut  # Bash the elemental, tjump, bash its projectiles
+      Bash, Grenade=3, DoubleJump, TripleJump
+    kii:
+      DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer:  # Climb the left wall and use horizontal movement to get into the portal
+        Bash, Grenade=1 OR Damage=40  # Bashnade or dboost the spikes
+        WillowsEnd.PortalShortcut
+      Launch, Sword OR Damage=40  # refresh your launch on the wall under Lupo. With sword, hit the elemental to refresh your launch. Dboost in the spikes otherwise
+      Launch, Bash, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Launch, Bash, Spear=1  # Too precise for Kii, and can kill the elemental
+      LaunchSwap  # Precise Launchswap, turn around to reset under Lupo
+      DoubleJump, TripleJump:  # Climb the left wall. Horizontal movement options are used to reach the elemental without dboost
+        Bash, Grenade=1 OR Damage=40 OR Glide OR Dash OR Sword OR Hammer
+        WillowsEnd.PortalShortcut
 
 anchor WillowsEnd.GrappleHeartMidPoint at 335, -3887:  # Checkpoint on the way to the lower left heart
   refill Checkpoint
@@ -15782,16 +15825,6 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       SentryJump=2, DoubleJump, TripleJump OR Dash  # land on the small floor after the portal then tjump+upslash
       SwordSJump=2, DoubleJump, Glide  # land on the small floor after the portal then tjump+upslash
       HammerSJump=3, DoubleJump, Glide  # land on the small floor after the portal then tjump+upslash
-  pickup WillowsEnd.EntryEX:  # Make sure it's not redundant with paths from WillowsEnd.Entry
-    gorlek:
-      DoubleJump, TripleJump, Grapple, Glide  # use the right wheels then glide to the floating platform
-      DoubleJump, TripleJump, Grapple, Dash, Sword OR Hammer  # use the right wheels then glide to the floating platform
-    kii:
-      DoubleJump, TripleJump, Glide, Damage=40  # dboost on the first wheel
-      DoubleJump, TripleJump, Dash, Damage=40, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost on the first wheel
-      Grapple, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2  # jump from the wall on the left and not the wheel directly
-    unsafe:
-      Grapple, DoubleJump, TripleJump, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
 
   conn WillowsEnd.Entry:
     moki: DoubleJump OR Dash OR Launch
@@ -15802,16 +15835,16 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR Damage=80
       Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Damage=40
-  conn WillowsEnd.InnerTP:
+  conn WillowsEnd.EntryFloatingPlatform:
+    gorlek:
+      DoubleJump, TripleJump, Grapple, Glide  # use the right wheels then glide to the floating platform
+      DoubleJump, TripleJump, Grapple, Dash, Sword OR Hammer  # use the right wheels then glide to the floating platform
     kii:
-      Grapple, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
-      Grapple, DoubleJump, TripleJump, Bash, Grenade=1, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
-      Grapple, DoubleJump, TripleJump, Bash, Damage=40, Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+      DoubleJump, TripleJump, Glide, Damage=40  # dboost on the first wheel
+      DoubleJump, TripleJump, Dash, Damage=40, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost on the first wheel
+      Grapple, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2  # jump from the wall on the left and not the wheel directly
     unsafe:
-      Grapple, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Grapple, DoubleJump, TripleJump, Bash, Grenade=1, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Grapple, DoubleJump, TripleJump, Bash, Damage=40, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Grapple, DoubleJump, TripleJump, Bash, Glide OR Dash OR Sword OR Hammer
+      Grapple, DoubleJump, TripleJump, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
@@ -15824,42 +15857,26 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   pickup WillowsEnd.LupoMap:
     moki: SpiritLight=50, DoubleJump OR Dash OR Launch OR Bow=1
     gorlek: SpiritLight=50  # jump to trigger the mine, back off to avoid taking damages
-  pickup WillowsEnd.EntryEX:  # Make sure its not redundant with going to WillowsEnd.Entry first
-    moki: Glide, DoubleJump, Bash, Grenade=1
-    gorlek:
-      Bash, Grenade=1, Dash, DoubleJump OR Glide  # Also possible with sword or hammer but that would be redundant with WillowsEnd.PortalShortcut
-      Bash, Grenade=1, Damage=40, DoubleJump OR Dash
-      DoubleJump, TripleJump, WillowsEnd.PortalShortcut OR Dash OR Glide OR Damage=40
-      WillowsEnd.PortalShortcut, Bash, Grenade=1, DoubleJump OR Sword OR Hammer
-      WillowsEnd.PortalShortcut, SentryJump=1, Damage=20  # Get hit by the offscreen mine
-    kii:
-      WillowsEnd.PortalShortcut, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      WillowsEnd.PortalShortcut, Bash, Grenade=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:  # energy weapon to land on the platform
-        Bow=1 OR Shuriken=1 OR Grenade=1  # kill the mine from the left wall to jumponto the right one
-      Bash, Grenade=1, Dash
-      DoubleJump, TripleJump OR Glide  # Glide goes from the portal to the left wall without landing on the floating platform
-      DoubleJump, Bash OR Dash OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2:  # touch the wall bellow Lupo and land on floating platform
-        Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # djump + energy weapon to reach the left wall
-    unsafe:
-      Bash, Grenade=1
-      DoubleJump, Dash  # either directly when exiting the portal or use a dashramp on the floating platform
-      GlideJump
 
   conn Teleporters: free
-  conn WillowsEnd.Entry:
+  conn WillowsEnd.Entry:  # Paths that cannot land on WillowsEnd.EntryFloatingPlatform
     moki:
       Launch, WillowsEnd.PortalShortcut OR DoubleJump OR Dash
       WillowsEnd.PortalShortcut, DoubleJump OR Dash OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1  # open the portal shortcut
-      Glide
-    gorlek:  # No paths using Sword/Hammer because they solve PortalShortcut
+    gorlek:
       WillowsEnd.PortalShortcut  # jump to trigger the mine, back off to avoid taking damages
+  conn WillowsEnd.EntryFloatingPlatform:
+    moki: Glide  # Assuming moki will fall down otherwise
+    gorlek:
+      WillowsEnd.PortalShortcut, DoubleJump OR Sword OR Hammer
       Launch
       DoubleJump, Dash
       Bash, Damage=40, DoubleJump OR Dash
       DoubleJump, TripleJump, Damage=40
     kii:
+      WillowsEnd.PortalShortcut  # Defensive difficulty for this path
       Dash  # Reset dash on ceiling
-      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # touch the wall bellow Lupo
+      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # touch the wall below Lupo
       Bash, DoubleJump OR Damage=40
     unsafe: Bash OR DoubleJump
   conn WillowsEnd.AboveInnerTP:
