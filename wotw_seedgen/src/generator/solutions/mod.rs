@@ -640,7 +640,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             Missing::Health => self.solve_health(solution, simulate),
             Missing::Energy => self.solve_energy(solution, simulate),
             Missing::Any(any) => self.solve_any(solution, any, simulate),
-            Missing::Or(ors, _) => self.solve_or(solution, ors, simulate),
+            Missing::Or(ors, _) => self.solve_any(solution, ors, simulate),
         }
     }
 
@@ -875,26 +875,26 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.solve_branches(solution, unique, simulate, solve_branch)
     }
 
-    fn solve_or(
-        &mut self,
-        solution: PartialSolution<'graph>,
-        // ors: Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
-        ors: Vec<Missing<'graph>>,
-        simulate: bool,
-    ) -> ControlFlow<(), PartialSolution<'graph>> {
-        fn solve_branch<'graph>(
-            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
-            solution: PartialSolution<'graph>,
-            // (missing, _): (Missing<'graph>, GraphRef<'graph, Requirement>),
-            missing: Missing<'graph>,
-            simulate: bool,
-        ) -> ControlFlow<(), PartialSolution<'graph>> {
-            // TODO this does nothing right solution.connection.requirement = requirement;
-            context.solve(solution.clone(), missing, simulate)
-        }
+    // fn solve_or(
+    //     &mut self,
+    //     solution: PartialSolution<'graph>,
+    //     // ors: Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
+    //     ors: Vec<Missing<'graph>>,
+    //     simulate: bool,
+    // ) -> ControlFlow<(), PartialSolution<'graph>> {
+    //     fn solve_branch<'graph>(
+    //         context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+    //         solution: PartialSolution<'graph>,
+    //         // (missing, _): (Missing<'graph>, GraphRef<'graph, Requirement>),
+    //         missing: Missing<'graph>,
+    //         simulate: bool,
+    //     ) -> ControlFlow<(), PartialSolution<'graph>> {
+    //         // TODO this does nothing right solution.connection.requirement = requirement;
+    //         context.solve(solution.clone(), missing, simulate)
+    //     }
 
-        self.solve_branches(solution, ors, simulate, solve_branch)
-    }
+    //     self.solve_branches(solution, ors, simulate, solve_branch)
+    // }
 
     fn solve_branches<I, T, F>(
         &mut self,
