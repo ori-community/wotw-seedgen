@@ -35,7 +35,6 @@
 //! to their function as almost entirely removing launch for players doing starved routing while
 //! keeping it for collection happy players.
 
-// TODO I think we need to get a solid baseline performance for destroy requirements before we can really look at other things
 // TODO Adding the specific requirement to `ConnectionIndex` does remove a lot of dead paths, but it also creates a lot more
 // unique ConnectionIndexes that don't get swallowed in the hashsets. We might need to figure out some other things before
 // being able to really look into it.
@@ -53,7 +52,7 @@ use smallvec::SmallVec;
 use std::{
     collections::hash_map::Entry,
     fmt::{self, Display},
-    iter,
+    iter, mem,
     ops::ControlFlow,
 };
 
@@ -70,6 +69,7 @@ use wotw_seedgen_data::{
 
 use crate::{
     item_pool::ItemPool,
+    logical_difficulty::LogicalDifficulty,
     world::{ConnectionIndex, ConnectionOrRefill, Missing, ReachStateFails},
     World,
 };
@@ -268,6 +268,9 @@ struct PartialSolution<'graph> {
     /// Connections that have already been branched into from a common ancestor,
     /// can be used to avoid entering redundant search paths.
     new_fails: ReachStateFails<'graph>,
+    /// Commitments made on the assumption that other branches have commited to other possibilities
+    /// and do not need to be entered again
+    commitments: Commitments,
 }
 
 impl<'graph> PartialSolution<'graph> {
@@ -279,6 +282,7 @@ impl<'graph> PartialSolution<'graph> {
             spirit_light: 0,
             // other_branches: vec![],
             new_fails: ReachStateFails::default(),
+            commitments: Commitments::default(),
         }
     }
 }
@@ -295,6 +299,11 @@ impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
     fn connection(&self) -> Option<&ConnectionIndex<'graph>> {
         Some(&self.connection)
     }
+}
+
+#[derive(Debug, Clone, Default)]
+struct Commitments {
+    better_weapon: bool,
 }
 
 // #[derive(Debug, Clone)]
@@ -639,6 +648,14 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             Missing::LogicalState(_) => ControlFlow::Break(()),
             Missing::Health => self.solve_health(solution, simulate),
             Missing::Energy => self.solve_energy(solution, simulate),
+            Missing::WallWeapon => self.solve_weapon::<true>(solution, simulate),
+            Missing::EnemyWeapon => self.solve_weapon::<false>(solution, simulate),
+            Missing::EnergyOrBetterWallWeapon => {
+                self.solve_energy_or_better_weapon::<true>(solution, simulate)
+            }
+            Missing::EnergyOrBetterEnemyWeapon => {
+                self.solve_energy_or_better_weapon::<false>(solution, simulate)
+            }
             Missing::Any(any) => self.solve_any(solution, any, simulate),
             Missing::Or(ors, _) => self.solve_any(solution, ors, simulate),
         }
@@ -698,6 +715,43 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     //     (self.world.settings.difficulty.energy_shard() && !self.world.shard(Shard::Energy))
     //         .then_some(Shard::ENERGY_ID)
     // }
+
+    fn solve_weapon<const TARGET_IS_WALL: bool>(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        debug_assert!(!solution.commitments.better_weapon);
+        solution.commitments.better_weapon = true;
+
+        let branches = self
+            .world
+            .settings
+            .difficulty
+            .weapons_iter::<TARGET_IS_WALL>()
+            .map(Skill::uber_identifier);
+
+        self.solve_boolean_branches(solution, branches, simulate)
+    }
+
+    fn solve_energy_or_better_weapon<const TARGET_IS_WALL: bool>(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        if mem::replace(&mut solution.commitments.better_weapon, true) {
+            return self.solve_energy(solution, simulate);
+        }
+
+        let branches = self
+            .world
+            .better_weapons::<TARGET_IS_WALL>()
+            .map(Skill::uber_identifier)
+            .chain(self.energy_options())
+            .collect::<Vec<_>>();
+
+        self.solve_boolean_branches(solution, branches, simulate)
+    }
 
     fn solve_boolean(
         &mut self,

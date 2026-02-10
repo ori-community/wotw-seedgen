@@ -26,6 +26,10 @@ pub enum Missing<'graph> {
     LogicalState(usize),
     Health,
     Energy,
+    WallWeapon,
+    EnemyWeapon,
+    EnergyOrBetterWallWeapon,
+    EnergyOrBetterEnemyWeapon,
     // TODO if we don't make this type recursive but rather return lists of missing where needed we could try using smallvec
     Any(Vec<Missing<'graph>>),
     // Or(
@@ -73,6 +77,22 @@ impl Missing<'_> {
     fn any_skill<I: IntoIterator<Item = Skill>>(iter: I) -> Self {
         Self::any_boolean(iter.into_iter().map(Skill::uber_identifier))
     }
+
+    fn any_weapon<const TARGET_IS_WALL: bool>() -> Self {
+        if TARGET_IS_WALL {
+            Self::WallWeapon
+        } else {
+            Self::EnemyWeapon
+        }
+    }
+
+    fn energy_or_better_weapon<const TARGET_IS_WALL: bool>() -> Self {
+        if TARGET_IS_WALL {
+            Self::EnergyOrBetterWallWeapon
+        } else {
+            Self::EnergyOrBetterEnemyWeapon
+        }
+    }
 }
 
 impl Display for Missing<'_> {
@@ -84,6 +104,10 @@ impl Display for Missing<'_> {
             Missing::LogicalState(state) => write!(f, "{{{state}}}"),
             Missing::Health => "Health".fmt(f),
             Missing::Energy => "Energy".fmt(f),
+            Missing::WallWeapon => "WallWeapon".fmt(f),
+            Missing::EnemyWeapon => "EnemyWeapon".fmt(f),
+            Missing::EnergyOrBetterWallWeapon => "EnergyOrBetterWallWeapon".fmt(f),
+            Missing::EnergyOrBetterEnemyWeapon => "EnergyOrBetterEnemyWeapon".fmt(f),
             Missing::Any(any) => any.iter().format(" or ").fmt(f),
             Missing::Or(ors, _) => ors
                 .iter()
@@ -247,7 +271,8 @@ impl<'graph> World<'graph, '_> {
                         let missing = if ranged_weapon {
                             Missing::any_skill(self.settings.difficulty.ranged_weapons_iter())
                         } else {
-                            Missing::any_skill(self.settings.difficulty.weapons_iter::<false>())
+                            // TODO same optimization for ranged / shield weapons?
+                            Missing::any_weapon::<false>()
                         };
 
                         return ControlFlow::Break(missing);
@@ -256,7 +281,8 @@ impl<'graph> World<'graph, '_> {
                     cost += enemy_cost * amount;
                 }
 
-                self.cost_met_or_better_weapons::<true>(cost, orb_variants)
+                // TODO what if what we need is specifically a better shield / ranged weapon?
+                self.cost_met_or_better_weapons::<false>(cost, orb_variants)
             }
             Requirement::ShurikenBreak(health) => {
                 self.skill_met(Skill::Shuriken)?;
@@ -432,9 +458,7 @@ impl<'graph> World<'graph, '_> {
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
         let Some(cost) = self.destroy_cost::<TARGET_IS_WALL>(target_health, flying_target) else {
-            return ControlFlow::Break(Missing::any_skill(
-                self.settings.difficulty.weapons_iter::<TARGET_IS_WALL>(),
-            ));
+            return ControlFlow::Break(Missing::any_weapon::<TARGET_IS_WALL>());
         };
 
         self.cost_met_or_better_weapons::<TARGET_IS_WALL>(cost, orb_variants)
@@ -445,44 +469,11 @@ impl<'graph> World<'graph, '_> {
         cost: f32,
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
-        // TODO while it has improved, this still harms performance heavily in some cases because it generates solutions
-        // like Spear + Grenade + Bow etc. trying to suggest better weapons even though those were already covered earlier
-        // but it's important for correctness, otherwise destroy requirements that initially try to solve with an energy weapon may never complete
-        // maybe it's just more general improvements needed in solutions, or maybe partial solutions should
-        // remember whether they have branched into better weapons already and enable a shortcut to cost_met here
-        self.cost_met::<true>(cost, orb_variants)
-            .map_break(|missing| {
-                let mut missing = vec![missing];
-
-                missing.extend(
-                    self.better_weapons::<TARGET_IS_WALL>()
-                        .map(|weapon| Missing::Boolean(weapon.uber_identifier())),
-                );
-
-                Missing::Any(missing)
-            })
-    }
-
-    fn better_weapons<const TARGET_IS_WALL: bool>(&self) -> impl Iterator<Item = Skill> + '_ {
-        let mut lowest_cost = Skill::Spear.energy_cost();
-        let mut highest_dpe =
-            Skill::Sentry.damage_per_energy(self.settings.difficulty.charge_grenade());
-
-        for owned in self.owned_weapons::<TARGET_IS_WALL>() {
-            let cost = owned.energy_cost();
-            lowest_cost = lowest_cost.min(cost);
-            highest_dpe = highest_dpe
-                .max(owned.total_damage(self.settings.difficulty.charge_grenade()) / cost);
-        }
-
-        self.settings
-            .difficulty
-            .weapons_iter::<TARGET_IS_WALL>()
-            .filter(move |weapon| {
-                weapon.energy_cost() < lowest_cost
-                    || weapon.damage_per_energy(self.settings.difficulty.charge_grenade())
-                        > highest_dpe
-            })
+        self.cost_met_or::<true>(
+            cost,
+            orb_variants,
+            Missing::energy_or_better_weapon::<TARGET_IS_WALL>(),
+        )
     }
 
     fn cost_met<const CONSUMING: bool>(
@@ -490,13 +481,22 @@ impl<'graph> World<'graph, '_> {
         cost: f32,
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
+        self.cost_met_or::<CONSUMING>(cost, orb_variants, Missing::Energy)
+    }
+
+    fn cost_met_or<const CONSUMING: bool>(
+        &self,
+        cost: f32,
+        orb_variants: &mut OrbVariants,
+        missing: Missing<'graph>,
+    ) -> ControlFlow<Missing<'graph>> {
         let mut added_orb_variants = vec![];
 
         orb_variants
             .retain(|orbs| self.orbs_meet_cost::<CONSUMING>(orbs, &mut added_orb_variants, cost));
         orb_variants.extend(added_orb_variants);
 
-        break_if_empty(orb_variants, Missing::Energy)
+        break_if_empty(orb_variants, missing)
     }
 
     fn orbs_meet_cost<const CONSUMING: bool>(

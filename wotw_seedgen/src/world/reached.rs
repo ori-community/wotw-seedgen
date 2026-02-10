@@ -23,7 +23,7 @@ use wotw_seedgen_data::{
         output::Event,
         simulate::{CloneSnapshot, Simulation, Snapshot},
     },
-    UberIdentifier,
+    Skill, UberIdentifier,
 };
 
 pub const TP_ANCHOR: &str = "Teleporters";
@@ -91,51 +91,9 @@ impl<'graph> ReachState<'graph> {
         self.fails.clear();
     }
 
-    fn add_fail(&mut self, missing: Missing<'graph>, connection: ConnectionIndex<'graph>) {
-        match missing {
-            Missing::Impossible => {}
-            // TODO optimize by using the missing integer value and skipping reach attempts?
-            Missing::Boolean(uber_identifier) => {
-                add_fail_to(&mut self.fails.uber_state, uber_identifier, connection);
-            }
-            Missing::Integer(uber_identifier, _) => {
-                add_fail_to(&mut self.fails.uber_state, uber_identifier, connection);
-            }
-            Missing::LogicalState(index) => {
-                add_fail_to(&mut self.fails.logical_state, index, connection);
-            }
-            Missing::Health => {
-                self.fails.health.insert(connection);
-            }
-            Missing::Energy => {
-                self.fails.energy.insert(connection);
-            }
-            Missing::Any(options) => {
-                for missing in options {
-                    self.add_fail(missing, connection.clone());
-                }
-            }
-            // Missing::Or(ors, EqIgnore(orb_variants)) => {
-            Missing::Or(ors, PhantomData) => {
-                // connection.orb_variants = EqIgnore(Some(orb_variants));
-
-                // for (missing, requirement) in ors {
-                for missing in ors {
-                    // connection.requirement = requirement;
-
-                    self.add_fail(missing, connection.clone());
-                }
-            }
-        }
-    }
-
     fn orb_fail(&self) -> bool {
         !(self.fails.health.is_empty() && self.fails.energy.is_empty())
     }
-}
-
-fn add_fail_to<K: Eq + Hash, V: Eq + Hash>(map: &mut FxHashMap<K, FxHashSet<V>>, key: K, value: V) {
-    map.entry(key).or_default().insert(value);
 }
 
 impl<'graph> ReachStateFails<'graph> {
@@ -656,9 +614,118 @@ impl<'graph> World<'graph, '_> {
             ControlFlow::Continue(()) => Some(orb_variants),
             ControlFlow::Break(missing) => {
                 trace!("missing {missing}");
-                self.reach.state.add_fail(missing, connection);
+                self.add_fail(missing, connection);
                 None
             }
         }
     }
+
+    fn add_fail(&mut self, missing: Missing<'graph>, connection: ConnectionIndex<'graph>) {
+        match missing {
+            Missing::Impossible => {}
+            // TODO optimize by using the missing integer value and skipping reach attempts?
+            Missing::Boolean(uber_identifier) | Missing::Integer(uber_identifier, _) => {
+                add_fail_to(
+                    &mut self.reach.state.fails.uber_state,
+                    uber_identifier,
+                    connection,
+                );
+            }
+            Missing::LogicalState(index) => {
+                add_fail_to(&mut self.reach.state.fails.logical_state, index, connection);
+            }
+            Missing::Health => {
+                self.reach.state.fails.health.insert(connection);
+            }
+            Missing::Energy => {
+                self.reach.state.fails.energy.insert(connection);
+            }
+            Missing::WallWeapon => self.add_weapon_fail::<true>(connection),
+            Missing::EnemyWeapon => self.add_weapon_fail::<false>(connection),
+            Missing::EnergyOrBetterWallWeapon => {
+                self.add_energy_or_better_weapon_fail::<true>(connection)
+            }
+            Missing::EnergyOrBetterEnemyWeapon => {
+                self.add_energy_or_better_weapon_fail::<false>(connection)
+            }
+            Missing::Any(options) => {
+                for missing in options {
+                    self.add_fail(missing, connection.clone());
+                }
+            }
+            // Missing::Or(ors, EqIgnore(orb_variants)) => {
+            Missing::Or(ors, PhantomData) => {
+                // connection.orb_variants = EqIgnore(Some(orb_variants));
+
+                // for (missing, requirement) in ors {
+                for missing in ors {
+                    // connection.requirement = requirement;
+
+                    self.add_fail(missing, connection.clone());
+                }
+            }
+        }
+    }
+
+    fn add_weapon_fail<const TARGET_IS_WALL: bool>(&mut self, connection: ConnectionIndex<'graph>) {
+        self.add_any_skill_fail(
+            connection,
+            self.settings.difficulty.weapons_iter::<TARGET_IS_WALL>(),
+        );
+    }
+
+    fn add_energy_or_better_weapon_fail<const TARGET_IS_WALL: bool>(
+        &mut self,
+        connection: ConnectionIndex<'graph>,
+    ) {
+        self.add_any_skill_fail(
+            connection.clone(),
+            // TODO avoidable collect
+            self.better_weapons::<TARGET_IS_WALL>().collect::<Vec<_>>(),
+        );
+
+        self.reach.state.fails.energy.insert(connection);
+    }
+
+    fn add_any_skill_fail<I>(&mut self, connection: ConnectionIndex<'graph>, skills: I)
+    where
+        I: IntoIterator<Item = Skill>,
+    {
+        // TODO avoidable collect
+        for weapon in skills {
+            add_fail_to(
+                &mut self.reach.state.fails.uber_state,
+                weapon.uber_identifier(),
+                connection.clone(),
+            );
+        }
+    }
+
+    pub(crate) fn better_weapons<const TARGET_IS_WALL: bool>(
+        &self,
+    ) -> impl Iterator<Item = Skill> + '_ {
+        let mut lowest_cost = Skill::Spear.energy_cost();
+        let mut highest_dpe =
+            Skill::Sentry.damage_per_energy(self.settings.difficulty.charge_grenade());
+
+        for owned in self.owned_weapons::<TARGET_IS_WALL>() {
+            let cost = owned.energy_cost();
+            lowest_cost = lowest_cost.min(cost);
+            highest_dpe = highest_dpe
+                .max(owned.total_damage(self.settings.difficulty.charge_grenade()) / cost);
+        }
+
+        self.settings
+            .difficulty
+            .weapons_iter::<TARGET_IS_WALL>()
+            .filter(move |weapon| {
+                weapon.energy_cost() < lowest_cost
+                    || weapon.damage_per_energy(self.settings.difficulty.charge_grenade())
+                        > highest_dpe
+            })
+    }
+}
+
+fn add_fail_to<K: Eq + Hash, V: Eq + Hash>(map: &mut FxHashMap<K, FxHashSet<V>>, key: K, value: V) {
+    map.entry(key).or_default().insert(value);
 }
