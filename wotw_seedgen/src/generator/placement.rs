@@ -597,25 +597,15 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         if origin_world_index == target_world_index {
             name
         } else {
-            let right = match name.as_constant() {
-                Some(value) => format!("'s {value}").into(),
+            match name.as_constant() {
+                Some(value) => format!("<world>{target_world_index}</>'s {value}").into(),
                 _ => CommandString::Concatenate {
                     operation: Box::new(Operation {
-                        left: "'s".into(),
+                        left: format!("<world>{target_world_index}</>'s").into(),
                         operator: Concatenator::Concat,
                         right: name,
                     }),
                 },
-            };
-
-            CommandString::Concatenate {
-                operation: Box::new(Operation {
-                    left: CommandString::WorldName {
-                        index: target_world_index,
-                    },
-                    operator: Concatenator::Concat,
-                    right,
-                }),
             }
         }
     }
