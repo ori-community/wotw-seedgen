@@ -181,6 +181,7 @@ impl Display for CommandVoid {
                     }
                 },
             },
+            CommandVoid::QueuedMessageScopedPickupPosition { x, y } => write!(f, "queued_message_scoped_pickup_position({x}, {y})"),
             CommandVoid::FreeMessage { id, message } => {
                 write!(f, "free_message({id}, {message})")
             }

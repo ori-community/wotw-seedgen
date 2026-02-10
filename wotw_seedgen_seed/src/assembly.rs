@@ -128,6 +128,9 @@ pub enum Command {
     // TODO control whether messages play sound
     /// Create a queued message with String Memory 0 as content and Float Memory 0 as timeout
     QueuedMessage(/*index*/ Option<usize>, /*priority*/ bool),
+    /// Sets the pickup position for queued messages to (Float Memory 0, Float Memory 1) until the
+    /// end of the current command scope
+    QueuedMessageScopedPickupPosition,
     /// Create a free message with `id`
     FreeMessage(/*id*/ usize),
     /// DESTROY, OBLITERATE and ANNIHILATE message `id`

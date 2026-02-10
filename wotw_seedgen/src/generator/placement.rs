@@ -18,6 +18,7 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom};
+use wotw_seedgen_data::seed_language::output::CommandFloat;
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry, UberStateValue},
     logic_language::output::Node,
@@ -29,7 +30,7 @@ use wotw_seedgen_data::{
         },
         simulate::Simulation,
     },
-    UberIdentifier, UniverseSettings,
+    Position, UberIdentifier, UniverseSettings,
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
@@ -514,6 +515,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
                 self.push_command(
                     Trigger::ClientEvent(ClientEvent::Spawn),
+                    None,
                     command,
                     origin_world_index,
                     target_world_index,
@@ -578,11 +580,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .unwrap()
     }
 
-    fn origin_name(
-        &self,
-        command: &CommandVoid,
-        target_world_index: usize,
-    ) -> CommandString {
+    fn origin_name(&self, command: &CommandVoid, target_world_index: usize) -> CommandString {
         let name = self.worlds[target_world_index].name(command);
 
         match name.as_constant() {
@@ -597,11 +595,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    fn target_name(
-        &self,
-        command: &CommandVoid,
-        origin_world_index: usize,
-    ) -> CommandString {
+    fn target_name(&self, command: &CommandVoid, origin_world_index: usize) -> CommandString {
         let name = self.worlds[origin_world_index].name(command);
 
         match name.as_constant() {
@@ -642,6 +636,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
         self.push_command(
             Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
+            pickup.position,
             command,
             origin_world_index,
             target_world_index,
@@ -651,28 +646,61 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn push_command(
         &mut self,
         trigger: Trigger,
+        pickup_position: Option<Position>,
         mut command: CommandVoid,
         origin_world_index: usize,
         target_world_index: usize,
     ) {
+        let pickup_position_command =
+            pickup_position.map(
+                |pickup_position| CommandVoid::QueuedMessageScopedPickupPosition {
+                    x: CommandFloat::Constant {
+                        value: pickup_position.x,
+                    },
+                    y: CommandFloat::Constant {
+                        value: pickup_position.y,
+                    },
+                },
+            );
+
         if origin_world_index == target_world_index {
-            self.worlds[origin_world_index].push_command(trigger, command);
+            self.worlds[origin_world_index].push_command(
+                trigger,
+                match pickup_position_command {
+                    None => command,
+                    Some(pickup_position_command) => CommandVoid::Multi {
+                        commands: vec![
+                            pickup_position_command,
+                            command,
+                        ],
+                    },
+                },
+            );
         } else {
             let uber_identifier = self.multiworld_state();
             let message = self.origin_name(&command, target_world_index);
+            let message_command = CommandVoid::QueuedMessage {
+                id: None,
+                priority: false,
+                message,
+                timeout: None,
+            };
+            let store_command = store_boolean(uber_identifier, true);
 
             self.worlds[origin_world_index].push_command(
                 trigger,
                 CommandVoid::Multi {
-                    commands: vec![
-                        CommandVoid::QueuedMessage {
-                            id: None,
-                            priority: false,
-                            message,
-                            timeout: None,
-                        },
-                        store_boolean(uber_identifier, true),
-                    ],
+                    commands: match pickup_position_command {
+                        None => vec![
+                            message_command,
+                            store_command,
+                        ],
+                        Some(pickup_position_command) => vec![
+                            pickup_position_command,
+                            message_command,
+                            store_command,
+                        ],
+                    }
                 },
             );
 

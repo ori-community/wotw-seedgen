@@ -295,6 +295,10 @@ impl Compile for input::CommandVoid {
                     timeout.unwrap_or(CommandFloat::Constant { value: (4.).into() }),
                 ) // TODO what's the default timeout
                 .call(Command::QueuedMessage(id, priority), MemoryUsed::ZERO),
+            Self::QueuedMessageScopedPickupPosition { x, y } => Args::new(context)
+                .float(0, x)
+                .float(1, y)
+                .call(Command::QueuedMessageScopedPickupPosition, MemoryUsed::ZERO),
             Self::FreeMessage { id, message } => {
                 if message.as_constant().map_or(false, String::is_empty) {
                     (

@@ -266,6 +266,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             // TODO simulate more maybe?
             CommandVoid::DefineTimer { .. }
             | CommandVoid::QueuedMessage { .. }
+            | CommandVoid::QueuedMessageScopedPickupPosition { .. }
             | CommandVoid::FreeMessage { .. }
             | CommandVoid::MessageDestroy { .. }
             | CommandVoid::MessageText { .. }

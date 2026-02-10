@@ -472,6 +472,10 @@ impl ResolvePlaceholders for CommandVoid {
                 message.resolve(context);
                 timeout.resolve(context);
             }
+            Self::QueuedMessageScopedPickupPosition { x, y } => {
+                x.resolve(context);
+                y.resolve(context);
+            }
             Self::FreeMessage { message, .. } => message.resolve(context),
             Self::MessageText { message, .. } => message.resolve(context),
             Self::MessageTimeout { timeout, .. } => timeout.resolve(context),
