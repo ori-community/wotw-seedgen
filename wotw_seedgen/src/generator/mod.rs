@@ -13,16 +13,11 @@ use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
-use wotw_seedgen_data::{
-    assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
-    logic_language::output::Graph,
-    seed_language::{
-        compile::{store_boolean, Compiler},
-        output::{ClientEvent, Event, IntermediateOutput, Trigger},
-        simulate::UberStates,
-    },
-    Spawn, Teleporter, UniverseSettings, WorldSettings,
-};
+use wotw_seedgen_data::{assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData}, logic_language::output::Graph, seed_language::{
+    compile::{store_boolean, Compiler},
+    output::{ClientEvent, Event, IntermediateOutput, Trigger},
+    simulate::UberStates,
+}, Spawn, Teleporter, UberIdentifier, UniverseSettings, WorldSettings};
 use wotw_seedgen_seed::Seed;
 
 /// End Result of seed generation
@@ -85,10 +80,11 @@ pub fn generate_seed<F: SnippetAccess>(
                 let mut output = output.clone();
 
                 // TODO something less specialized?
+                // Lower the water at the pools teleporter if we spawn there
                 if graph.nodes[spawn].identifier() == "EastPools.Teleporter" {
                     output.events.push(Event {
                         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                        command: store_boolean(Teleporter::CENTRAL_POOLS_ID, true),
+                        command: store_boolean(UberIdentifier::new(5377, 63173), true),
                     })
                 }
 
