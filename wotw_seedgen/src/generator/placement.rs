@@ -840,7 +840,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         trace!("{}Generating preplacements", self.log_index);
 
-        self.hi_sigma(preplacement_spoiler);
+        self.hi_torin(preplacement_spoiler);
 
         let mut zone_needs_placement = FxHashMap::default();
 
@@ -872,8 +872,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         }
     }
 
-    // TODO name change
-    fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
+    fn hi_torin(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         // TODO implement From<{number}> for Constant commands?
         let command = compile::spirit_light(1.into(), &mut self.rng);
 
