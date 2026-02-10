@@ -15579,7 +15579,7 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       BreakCrystal, Bash, Grenade=1
   # a lot of energy crystals not considered, mostly because they are on the way to hearts which aren't currently tracked
 
-  pickup WillowsEnd.EntryEX:
+  pickup WillowsEnd.EntryEX:  # Paths skipping over WillowsEnd.EntryFloatingPlatform
     unsafe: SentryJump=1  # Energy optimization by going to the left wall directly
 
   conn WillowsEnd.EntryFloatingPlatform:  # Be careful it's not redundant with Entry->BoulderHeartPath->EntryFloatingPlatform
@@ -15599,25 +15599,8 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       AerialHammerJump OR GrenadeJump OR AbilitySwap=1 OR GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump  # CoyoteHammerJump is scary...
       GlideJump, DoubleJump, TripleJump, Sword OR Hammer  # Either directly or by going to the left platform first
       Sword, DoubleJump  # djump, pogo the mine, djump+upslash to reach the floating platform
-  conn WillowsEnd.InnerTP:
-    moki:
-      Launch, Bash, DoubleJump OR Dash OR Glide  # mine in the way, but I think it's managable
-      Launch, WillowsEnd.PortalShortcut
-    gorlek:
-      Launch, Bash, Sword OR Hammer OR Damage=40
-      Bash, Grenade=2, DoubleJump, TripleJump, Damage=40 OR WillowsEnd.PortalShortcut  # Bash the elemental, tjump, bash its projectiles
-      Bash, Grenade=3, DoubleJump, TripleJump
-    kii:
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40, Glide OR Dash OR Sword OR Hammer
-      Bash, Grenade=1, DoubleJump, TripleJump, WillowsEnd.PortalShortcut, Glide OR Dash OR Sword OR Hammer
-      Bash, Grenade=2, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer
-      Launch, Sword OR Damage=40  # refresh your launch on the wall under Lupo. With sword, hit the elemental to refresh your launch. Dboost in the spikes otherwise
-      Launch, Bash, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Launch, Bash, Spear=1  # Too precise for Kii, and can kill the elemental
-      Bash, Grenade=1, DoubleJump, TripleJump, Grenade=1 OR Dash OR WillowsEnd.PortalShortcut OR Damage=40
-      DoubleJump, TripleJump, Damage=20, WillowsEnd.PortalShortcut  # dboost on the mine so you can stand on the lava thingy and jump from it to the floating platform
-      DoubleJump, TripleJump, Bash, Damage=20, Dash OR Grenade=1 OR Damage=40
+  # Paths skipping WillowsEnd.EntryFloatingPlatform
+  # conn WillowsEnd.GrappleHeartMidPoint
   conn WillowsEnd.BoulderHeartPath:
     moki:
       Launch
@@ -15634,7 +15617,6 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
     unsafe: DoubleJump, TripleJump, Sword OR Hammer  # Under the wheel
 
 anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platform above the entrance
-
   state WillowsEnd.GrappleWheelsHeart:
     unsafe: ShurikenBreak=30, Launch
 
@@ -15835,7 +15817,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR Damage=80
       Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Damage=40
-  conn WillowsEnd.EntryFloatingPlatform:
+  conn WillowsEnd.EntryFloatingPlatform:  # Check for redundancies with going to WillowsEnd.Entry first
     gorlek:
       DoubleJump, TripleJump, Grapple, Glide  # use the right wheels then glide to the floating platform
       DoubleJump, TripleJump, Grapple, Dash, Sword OR Hammer  # use the right wheels then glide to the floating platform
