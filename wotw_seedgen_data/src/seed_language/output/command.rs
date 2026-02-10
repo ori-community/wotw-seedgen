@@ -1,3 +1,4 @@
+use std::iter;
 use super::{
     ArithmeticOperator, Comparator, EqualityComparator, Icon, LogicOperator, Operation,
     StringOrPlaceholder,
@@ -622,6 +623,18 @@ impl CommandVoid {
             CommandVoid::Multi { commands } => commands.iter().find_map(Self::find_message),
             CommandVoid::QueuedMessage { message, .. } => Some(message),
             _ => None,
+        }
+    }
+
+    // TODO: Doesn't look into function invocations yet
+    pub fn contained_messages_mut(&mut self) -> Box<dyn Iterator<Item = &mut CommandString> + '_> {
+        match self {
+            CommandVoid::Multi { commands } => {
+                Box::new(commands.iter_mut().flat_map(Self::contained_messages_mut))
+            }
+            CommandVoid::QueuedMessage { message, .. }
+            | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),
+            _ => Box::new(iter::empty()),
         }
     }
 }

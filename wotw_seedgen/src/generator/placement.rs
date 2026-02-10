@@ -404,11 +404,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     )
                 };
 
-                let name = self.name(&command, origin_world_index, target_world_index);
-
                 self.place_command_at(
                     command,
-                    name,
                     pickup,
                     origin_world_index,
                     target_world_index,
@@ -486,9 +483,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         mark_forced: bool,
     ) {
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
-
-        let name = self.name(&command, origin_world_index, target_world_index);
-
         let origin_world = &mut self.worlds[origin_world_index];
 
         match origin_world.choose_location::<false>() {
@@ -521,7 +515,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 self.push_command(
                     Trigger::ClientEvent(ClientEvent::Spawn),
                     command,
-                    name,
                     origin_world_index,
                     target_world_index,
                 );
@@ -529,7 +522,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             Some(pickup) => {
                 self.place_command_at(
                     command,
-                    name,
                     pickup,
                     origin_world_index,
                     target_world_index,
@@ -586,34 +578,47 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .unwrap()
     }
 
-    fn name(
+    fn origin_name(
         &self,
         command: &CommandVoid,
-        origin_world_index: usize,
         target_world_index: usize,
     ) -> CommandString {
         let name = self.worlds[target_world_index].name(command);
 
-        if origin_world_index == target_world_index {
-            name
-        } else {
-            match name.as_constant() {
-                Some(value) => format!("<world>{target_world_index}</>'s {value}").into(),
-                _ => CommandString::Concatenate {
-                    operation: Box::new(Operation {
-                        left: format!("<world>{target_world_index}</>'s").into(),
-                        operator: Concatenator::Concat,
-                        right: name,
-                    }),
-                },
-            }
+        match name.as_constant() {
+            Some(value) => format!("<world>{target_world_index}</>'s {value}").into(),
+            _ => CommandString::Concatenate {
+                operation: Box::new(Operation {
+                    left: format!("<world>{target_world_index}</>'s").into(),
+                    operator: Concatenator::Concat,
+                    right: name,
+                }),
+            },
+        }
+    }
+
+    fn target_name(
+        &self,
+        command: &CommandVoid,
+        origin_world_index: usize,
+    ) -> CommandString {
+        let name = self.worlds[origin_world_index].name(command);
+
+        match name.as_constant() {
+            Some(value) => format!("{value} from <world>{origin_world_index}</>").into(),
+            _ => CommandString::Concatenate {
+                operation: Box::new(Operation {
+                    left: name,
+                    operator: Concatenator::Concat,
+                    right: format!("from <world>{origin_world_index}</>").into(),
+                }),
+            },
         }
     }
 
     fn place_command_at(
         &mut self,
         command: CommandVoid,
-        name: CommandString,
         pickup: &LocDataEntry,
         origin_world_index: usize,
         target_world_index: usize,
@@ -638,7 +643,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         self.push_command(
             Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
             command,
-            name,
             origin_world_index,
             target_world_index,
         );
@@ -647,8 +651,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn push_command(
         &mut self,
         trigger: Trigger,
-        command: CommandVoid,
-        name: CommandString,
+        mut command: CommandVoid,
         origin_world_index: usize,
         target_world_index: usize,
     ) {
@@ -656,6 +659,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             self.worlds[origin_world_index].push_command(trigger, command);
         } else {
             let uber_identifier = self.multiworld_state();
+            let message = self.origin_name(&command, target_world_index);
 
             self.worlds[origin_world_index].push_command(
                 trigger,
@@ -664,13 +668,27 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         CommandVoid::QueuedMessage {
                             id: None,
                             priority: false,
-                            message: name,
+                            message,
                             timeout: None,
                         },
                         store_boolean(uber_identifier, true),
                     ],
                 },
             );
+
+            // Append 'from <world>' to all messages
+            for message in command.contained_messages_mut() {
+                *message = match message.as_constant() {
+                    Some(value) => format!("{value} from <world>{origin_world_index}</>").into(),
+                    _ => CommandString::Concatenate {
+                        operation: Box::new(Operation {
+                            left: message.clone(),
+                            operator: Concatenator::Concat,
+                            right: format!("from <world>{origin_world_index}</>").into(),
+                        }),
+                    },
+                }
+            }
 
             self.worlds[target_world_index].push_command(
                 Trigger::Binding(uber_identifier), // this is server synced and can't change to false
