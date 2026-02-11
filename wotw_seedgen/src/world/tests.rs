@@ -45,7 +45,7 @@ fn full_reach_check() {
     test_logger();
 
     let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    let mut world = test_world(&TEST_ASSETS.graphs.gorlek, &settings, DEFAULT_SPAWN);
 
     let mut pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0)).finish();
     for item in pool.take() {
@@ -102,7 +102,11 @@ fn small_reach_check() {
     test_logger();
 
     let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&TEST_ASSETS.graphs.moki, &settings, "GladesTown.Teleporter");
+    let mut world = test_world(
+        &TEST_ASSETS.graphs.gorlek,
+        &settings,
+        "GladesTown.Teleporter",
+    );
 
     world.store_skill(Skill::DoubleJump, true, &[]);
     world.store_shard(Shard::TripleJump, true, &[]);
