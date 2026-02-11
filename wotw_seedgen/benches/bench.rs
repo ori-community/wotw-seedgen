@@ -7,8 +7,8 @@ use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPoolBuilder, World};
 use wotw_seedgen_data::{
     assets::{
-        AssetCacheValues, AssetFileAccess, PresetAccess, PresetGroup, PresetInfo, SnippetAccess,
-        WorldPreset, WorldPresetSettings, TEST_ASSETS,
+        AssetCacheValues, AssetFileAccess, PresetAccess, SnippetAccess, WorldPreset,
+        WorldPresetSettings, TEST_ASSETS,
     },
     logic_language::{
         ast::Areas,
@@ -294,22 +294,7 @@ fn generation(c: &mut Criterion) {
         .snippets
         .push("trees".to_owned());
 
-    for identifier in TEST_ASSETS.available_world_presets() {
-        let preset = TEST_ASSETS.world_preset(&identifier).unwrap();
-
-        if !matches!(
-            preset,
-            WorldPreset {
-                info: Some(PresetInfo {
-                    group: Some(PresetGroup::Base),
-                    ..
-                }),
-                ..
-            }
-        ) {
-            continue;
-        }
-
+    for (identifier, preset) in TEST_ASSETS.world_base_presets() {
         let mut universe_settings = universe_settings.clone();
         preset
             .apply(&mut universe_settings.world_settings[0], &*TEST_ASSETS)
