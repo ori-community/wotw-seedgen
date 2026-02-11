@@ -669,7 +669,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         if self.world.skill(Skill::Regenerate) {
             self.solve_boolean_branches(
                 solution,
-                self.health_options().chain(self.energy_options()),
+                self.health_options(),
+                // TODO blindly attempting energy options is a huge trap, we'd need to know
+                // more specifically that we are lacking the energy to regenerate
+                // .chain(self.energy_options())
                 simulate,
             )
         } else {
