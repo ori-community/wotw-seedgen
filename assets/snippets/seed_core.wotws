@@ -57,6 +57,9 @@ on spawn {
     store(randoConfig.useEastWoodsTrunkSlowWalkZoneEnabledState, true)
     // TODO this gets reset when collecting voice, does it need to be reset? Does this even do something?
     // store(questUberStateGroup.lookForKuQuestUberState, 4)
+    // Always allow opening the Kwolok Statue door
+    store(randoConfig.useAllowOpeningEyestoneDoorState, true)
+    store(randoState.allowOpeningEyestoneDoor, true)
 }
 
 // TODO fully support random grom shop and remove this
