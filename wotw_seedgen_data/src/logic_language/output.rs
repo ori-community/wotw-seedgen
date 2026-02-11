@@ -128,6 +128,20 @@ pub struct Anchor {
     pub connections: Vec<Connection>,
 }
 
+impl Anchor {
+    pub fn new(identifier: String, connections: Vec<Connection>) -> Self {
+        Self {
+            identifier,
+            position: None,
+            door: None,
+            can_spawn: true,
+            teleport_restriction: Requirement::Free,
+            refills: vec![],
+            connections,
+        }
+    }
+}
+
 impl PartialEq for Anchor {
     fn eq(&self, other: &Self) -> bool {
         self.identifier == other.identifier
@@ -196,6 +210,46 @@ pub enum Requirement {
     And(Vec<Requirement>),
     #[schema(no_recursion)]
     Or(Vec<Requirement>),
+}
+
+impl Requirement {
+    pub fn and<I: IntoIterator<Item = Self>>(requirements: I) -> Self {
+        let mut filtered = vec![];
+
+        for requirement in requirements {
+            match requirement {
+                Self::Free => {}
+                Self::Impossible => return Self::Impossible,
+                Self::And(nested) => filtered.extend(nested),
+                other => filtered.push(other),
+            }
+        }
+
+        match filtered.len() {
+            0 => Self::Free,
+            1 => filtered.pop().unwrap(),
+            _ => Self::And(filtered),
+        }
+    }
+
+    pub fn or<I: IntoIterator<Item = Self>>(requirements: I) -> Self {
+        let mut filtered = vec![];
+
+        for requirement in requirements {
+            match requirement {
+                Self::Free => return Self::Free,
+                Self::Impossible => {}
+                Self::Or(nested) => filtered.extend(nested),
+                other => filtered.push(other),
+            }
+        }
+
+        match filtered.len() {
+            0 => Self::Impossible,
+            1 => filtered.pop().unwrap(),
+            _ => Self::Or(filtered),
+        }
+    }
 }
 
 impl Display for Requirement {

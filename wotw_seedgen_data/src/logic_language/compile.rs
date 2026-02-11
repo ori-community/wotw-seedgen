@@ -4,6 +4,7 @@ use crate::{
     assets::{LocData, StateData, StateDataEntry},
     logic_language::{
         ast,
+        optimize::Optimize,
         output::{
             Anchor, Connection, Door, DoorId, Enemy, Graph, Node, Refill, RefillValue, Requirement,
         },
@@ -61,11 +62,15 @@ impl Graph {
         nodes.extend(state_data_nodes);
         nodes.extend(compiled_nodes);
 
+        let mut graph = Graph {
+            nodes,
+            default_door_connections,
+        };
+
+        graph.optimize();
+
         ParseResult {
-            parsed: Some(Graph {
-                nodes,
-                default_door_connections,
-            }),
+            parsed: Some(graph),
             errors,
         }
     }
@@ -260,7 +265,7 @@ impl<'source> Compiler<'source> {
                     .connections
                     .push(Connection {
                         to: self.index_offset + target_index,
-                        requirement: Requirement::And(vec![
+                        requirement: Requirement::and([
                             Requirement::State(self.index_offset + state_index),
                             Requirement::State(self.index_offset + visited_state_index),
                             door_requirement.clone(),
@@ -407,123 +412,123 @@ impl TrickRequirements {
 
     fn get(&self, trick: Trick, amount: &mut Option<usize>) -> Option<Requirement> {
         let requirement = match trick {
-            Trick::SwordSentryJump => build_and([
+            Trick::SwordSentryJump => Requirement::and([
                 self.sword_sentry_jump.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
                 Requirement::Skill(Skill::Sword),
             ]),
-            Trick::HammerSentryJump => build_and([
+            Trick::HammerSentryJump => Requirement::and([
                 self.hammer_sentry_jump.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
                 Requirement::Skill(Skill::Hammer),
             ]),
-            Trick::ShurikenBreak => build_and([
+            Trick::ShurikenBreak => Requirement::and([
                 self.shuriken_break.clone(),
                 Requirement::ShurikenBreak(amount.take()? as f32),
             ]),
-            Trick::SentryBreak => build_and([
+            Trick::SentryBreak => Requirement::and([
                 self.sentry_break.clone(),
                 Requirement::SentryBreak(amount.take()? as f32),
             ]),
             Trick::HammerBreak => {
-                build_and([self.hammer_break.clone(), Requirement::Skill(Skill::Hammer)])
+                Requirement::and([self.hammer_break.clone(), Requirement::Skill(Skill::Hammer)])
             }
-            Trick::SpearBreak => build_and([
+            Trick::SpearBreak => Requirement::and([
                 self.spear_break.clone(),
                 Requirement::EnergySkill(Skill::Spear, 1.),
             ]),
-            Trick::SentryBurn => build_and([
+            Trick::SentryBurn => Requirement::and([
                 self.sentry_burn.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
             ]),
             Trick::RemoveKillPlane => self.remove_kill_plane.clone(),
             Trick::LaunchSwap => {
-                build_and([self.launch_swap.clone(), Requirement::Skill(Skill::Launch)])
+                Requirement::and([self.launch_swap.clone(), Requirement::Skill(Skill::Launch)])
             }
-            Trick::SentrySwap => build_and([
+            Trick::SentrySwap => Requirement::and([
                 self.sentry_swap.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
             ]),
-            Trick::FlashSwap => build_and([
+            Trick::FlashSwap => Requirement::and([
                 self.flash_swap.clone(),
                 Requirement::NonConsumingEnergySkill(Skill::Flash),
             ]),
-            Trick::BlazeSwap => build_and([
+            Trick::BlazeSwap => Requirement::and([
                 self.blaze_swap.clone(),
                 Requirement::EnergySkill(Skill::Blaze, amount.take()? as f32),
             ]),
-            Trick::WaveDash => build_and([
+            Trick::WaveDash => Requirement::and([
                 self.wave_dash.clone(),
                 Requirement::Skill(Skill::Dash),
                 Requirement::NonConsumingEnergySkill(Skill::Regenerate),
             ]),
-            Trick::GrenadeJump => build_and([
+            Trick::GrenadeJump => Requirement::and([
                 self.grenade_jump.clone(),
                 Requirement::NonConsumingEnergySkill(Skill::Grenade),
             ]),
-            Trick::SwordJump => build_and([
+            Trick::SwordJump => Requirement::and([
                 self.sword_jump.clone(),
                 Requirement::Skill(Skill::Sword),
                 Requirement::Skill(Skill::DoubleJump),
             ]),
             Trick::GlideJump => {
-                build_and([self.glide_jump.clone(), Requirement::Skill(Skill::Glide)])
+                Requirement::and([self.glide_jump.clone(), Requirement::Skill(Skill::Glide)])
             }
-            Trick::AerialHammerJump => build_and([
+            Trick::AerialHammerJump => Requirement::and([
                 self.aerial_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
                 Requirement::Skill(Skill::DoubleJump),
             ]),
-            Trick::GlideHammerJump => build_and([
+            Trick::GlideHammerJump => Requirement::and([
                 self.glide_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
                 Requirement::Skill(Skill::Glide),
             ]),
-            Trick::CoyoteHammerJump => build_and([
+            Trick::CoyoteHammerJump => Requirement::and([
                 self.coyote_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
             ]),
-            Trick::WallHammerJump => build_and([
+            Trick::WallHammerJump => Requirement::and([
                 self.wall_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
             ]),
-            Trick::GroundedHammerJump => build_and([
+            Trick::GroundedHammerJump => Requirement::and([
                 self.grounded_hammer_jump.clone(),
                 Requirement::Skill(Skill::Hammer),
             ]),
-            Trick::HammerExtension => build_and([
+            Trick::HammerExtension => Requirement::and([
                 self.hammer_extension.clone(),
                 Requirement::Skill(Skill::Hammer),
             ]),
-            Trick::GrenadeRedirect => build_and([
+            Trick::GrenadeRedirect => Requirement::and([
                 self.grenade_redirect.clone(),
                 Requirement::EnergySkill(Skill::Grenade, amount.take()? as f32),
             ]),
-            Trick::SentryRedirect => build_and([
+            Trick::SentryRedirect => Requirement::and([
                 self.sentry_redirect.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
             ]),
             Trick::PauseFloat => self.pause_float.clone(),
-            Trick::SpearJump => build_and([
+            Trick::SpearJump => Requirement::and([
                 self.spear_jump.clone(),
                 Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),
             ]),
-            Trick::GlideBashChain => build_and([
+            Trick::GlideBashChain => Requirement::and([
                 self.glide_bash_chain.clone(),
                 Requirement::Skill(Skill::Glide),
                 Requirement::Skill(Skill::Bash),
             ]),
-            Trick::DoubleJumpBashChain => build_and([
+            Trick::DoubleJumpBashChain => Requirement::and([
                 self.double_jump_bash_chain.clone(),
                 Requirement::Skill(Skill::DoubleJump),
                 Requirement::Skill(Skill::Bash),
             ]),
-            Trick::DashBashChain => build_and([
+            Trick::DashBashChain => Requirement::and([
                 self.dash_bash_chain.clone(),
                 Requirement::Skill(Skill::Dash),
                 Requirement::Skill(Skill::Bash),
             ]),
-            Trick::LaunchBashChain => build_and([
+            Trick::LaunchBashChain => Requirement::and([
                 self.launch_bash_chain.clone(),
                 Requirement::Skill(Skill::Launch),
                 Requirement::Skill(Skill::Bash),
@@ -620,7 +625,7 @@ impl<'source> Compile for ast::Macro<'source> {
             let requirement = self
                 .requirements
                 .compile(compiler)
-                .map_or(Requirement::Impossible, build_or);
+                .map_or(Requirement::Impossible, Requirement::or);
 
             compiler
                 .macros
@@ -636,10 +641,13 @@ impl<'source> Compile for ast::Region<'source> {
         if compiler.regions.contains_key(self.identifier.data.0) {
             compiler.error("duplicate identifier".to_string(), self.identifier.span);
         } else {
-            let requirement = self
+            let mut requirement = self
                 .requirements
                 .compile(compiler)
-                .map_or(Requirement::Impossible, build_or);
+                .map_or(Requirement::Impossible, Requirement::or);
+
+            // Region requirements are instantiated often, we'd rather optimize it once here
+            requirement.optimize();
 
             compiler
                 .regions
@@ -721,8 +729,10 @@ impl<'source> Compile for ast::Anchor<'source> {
                                         .region()
                                         .and_then(|region| compiler.regions.get(region))
                                     {
-                                        requirement =
-                                            build_and([requirement, region_requirement.clone()])
+                                        requirement = Requirement::and([
+                                            requirement,
+                                            region_requirement.clone(),
+                                        ])
                                     }
 
                                     connections.push(Connection {
@@ -869,7 +879,7 @@ impl<'source> Compile for ast::InlineRequirementOrGroup<'source> {
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
         match self {
             ast::InlineRequirementOrGroup::Inline(_) => Requirement::Free,
-            ast::InlineRequirementOrGroup::Group(group) => build_or(group.compile(compiler)),
+            ast::InlineRequirementOrGroup::Group(group) => Requirement::or(group.compile(compiler)),
         }
     }
 }
@@ -879,20 +889,20 @@ impl<'source> Compile for ast::RequirementLine<'source> {
 
     fn compile(mut self, compiler: &mut Compiler) -> Self::Output {
         // iter::chain doesn't consider it valid to mutably borrow the compiler in both parts
-        // a vec would lose out on the short-circuiting behaviour of build_and
+        // a vec would lose out on the short-circuiting behaviour of Requirement::and
         // so we build a custom iterator
         let mut ands = self.ands.into_iter();
         let mut ors = Some(self.ors);
 
-        build_and(iter::from_fn(|| {
+        Requirement::and(iter::from_fn(|| {
             ands.next()
                 .map(|(and, _)| and.compile(compiler))
-                .or_else(|| ors.take().map(|ors| build_or(ors.compile(compiler))))
+                .or_else(|| ors.take().map(|ors| Requirement::or(ors.compile(compiler))))
                 .or_else(|| {
                     self.group.take().map(|group| {
                         group
                             .compile(compiler)
-                            .map_or(Requirement::Impossible, build_or)
+                            .map_or(Requirement::Impossible, Requirement::or)
                     })
                 })
         }))
@@ -1047,18 +1057,18 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                 "Boss" => get_amount().map(|amount| Requirement::Boss(amount as f32)),
                 "BreakWall" => get_amount().map(|amount| Requirement::BreakWall(amount as f32)),
                 "BreakCrystal" => no_amount().map(|()| {
-                    build_or(vec![
+                    Requirement::or([
                         Requirement::Skill(Skill::Sword),
                         Requirement::Skill(Skill::Hammer),
                         Requirement::EnergySkill(Skill::Bow, 1.0),
-                        build_and([
+                        Requirement::and([
                             compiler.difficulty_requirements.get(Difficulty::Gorlek),
-                            build_or(vec![
+                            Requirement::or([
                                 Requirement::EnergySkill(Skill::Shuriken, 1.0),
                                 Requirement::EnergySkill(Skill::Grenade, 1.0),
                             ]),
                         ]),
-                        build_and([
+                        Requirement::and([
                             compiler.difficulty_requirements.get(Difficulty::Unsafe),
                             Requirement::EnergySkill(Skill::Spear, 1.0),
                         ]),
@@ -1066,17 +1076,17 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                 }),
                 // TODO this doubles the energy and skill reqs
                 "SentryJump" => get_amount().map(|amount| {
-                    build_and([
+                    Requirement::and([
                         Requirement::EnergySkill(Skill::Sentry, amount as f32),
-                        build_or(vec![
-                            build_and([
+                        Requirement::or([
+                            Requirement::and([
                                 compiler
                                     .trick_requirements
                                     .get(Trick::SwordSentryJump, &mut Some(amount))
                                     .unwrap(),
                                 Requirement::Skill(Skill::Sword),
                             ]),
-                            build_and([
+                            Requirement::and([
                                 compiler
                                     .trick_requirements
                                     .get(Trick::HammerSentryJump, &mut Some(amount))
@@ -1097,7 +1107,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                     .get(Trick::HammerSentryJump, &mut amount)
                     .ok_or_else(|| todo!()),
                 "AbilitySwap" => get_amount().map(|amount| {
-                    build_or([
+                    Requirement::or([
                         compiler
                             .trick_requirements
                             .get(Trick::SentrySwap, &mut Some(amount))
@@ -1124,45 +1134,5 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
         compiler
             .consume_result(result)
             .unwrap_or(Requirement::Impossible)
-    }
-}
-
-fn build_and<I: IntoIterator<Item = Requirement>>(requirements: I) -> Requirement {
-    let mut filtered = vec![];
-
-    for requirement in requirements {
-        match requirement {
-            Requirement::Free => {}
-            Requirement::Impossible => return Requirement::Impossible,
-            Requirement::And(nested) => filtered.extend(nested),
-            other => filtered.push(other),
-        }
-    }
-
-    match filtered.len() {
-        0 => Requirement::Free,
-        1 => filtered.pop().unwrap(),
-        _ => Requirement::And(filtered),
-    }
-}
-
-fn build_or<I: IntoIterator<Item = Requirement>>(requirements: I) -> Requirement {
-    let mut filtered = vec![];
-
-    for requirement in requirements {
-        match requirement {
-            Requirement::Free => return Requirement::Free,
-            Requirement::Impossible => {}
-            Requirement::Or(nested) => filtered.extend(nested),
-            other => filtered.push(other),
-        }
-    }
-
-    // TODO on higher difficulties there can be a lot of redundancy, could optimize those away now?
-
-    match filtered.len() {
-        0 => Requirement::Impossible,
-        1 => filtered.pop().unwrap(),
-        _ => Requirement::Or(filtered),
     }
 }

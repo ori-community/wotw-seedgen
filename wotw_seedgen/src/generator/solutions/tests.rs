@@ -9,74 +9,30 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use smallvec::smallvec;
 use wotw_seedgen_data::{
-    assets::{LocDataEntry, TEST_ASSETS},
-    logic_language::output::{Anchor, Connection, Enemy, Graph, Node, Requirement},
+    assets::TEST_ASSETS,
+    logic_language::output::{Enemy, Graph, Requirement},
     seed_language::{
         compile::{clean_water, energy_fragment, health_fragment, keystone, shard, skill},
         output::{CommandVoid, CommonItem, ContainedWrites},
         simulate::{Simulate, Simulation, UberStates},
     },
-    Difficulty, MapIcon,
+    test_logger, Difficulty,
     Shard::*,
     Skill::*,
-    Teleporter, UberIdentifier, WorldSettings, Zone,
+    Teleporter, WorldSettings,
 };
 
 use crate::{
     item_pool::{ItemPool, ItemPoolBuilder},
-    tests::test_logger,
     world::tests::test_world,
     World,
 };
 
-fn mock_graph() -> Graph {
-    let mut graph = Graph::empty();
-
-    graph.nodes.push(Node::Anchor(mock_anchor(
-        "spawn",
-        vec![Connection {
-            to: 1,
-            requirement: Requirement::Free,
-            implicitly_generated: false,
-        }],
-    )));
-    graph.nodes.push(Node::Pickup(mock_pickup("yummy")));
-
-    graph
-}
-
-fn mock_anchor(identifier: &str, connections: Vec<Connection>) -> Anchor {
-    Anchor {
-        identifier: identifier.to_owned(),
-        position: None,
-        door: None,
-        can_spawn: true,
-        teleport_restriction: Requirement::Free,
-        refills: vec![],
-        connections,
-    }
-}
-
-fn mock_pickup(identifier: &str) -> LocDataEntry {
-    LocDataEntry {
-        identifier: identifier.to_owned(),
-        zone: Zone::Marsh,
-        map_icon: MapIcon::SpiritLight,
-        uber_identifier: UberIdentifier::new(0, 0),
-        value: None,
-        position: None,
-        map_position: None,
-    }
-}
-
 fn mock_world<'graph, 'settings>(
-    graph: &'graph mut Graph,
+    graph: &'graph Graph,
     settings: &'settings WorldSettings,
     uber_states: UberStates,
-    requirement: Requirement,
 ) -> World<'graph, 'settings> {
-    graph.nodes[0].expect_anchor_mut().connections[0].requirement = requirement;
-
     let mut world = World::new(graph, 0, settings, uber_states);
     world.store_max_health(0, &[]);
     world.store_max_energy((0.).into(), &[]);
@@ -211,7 +167,6 @@ fn mock_solutions() {
 
     let uber_states = &TEST_ASSETS.uber_states;
     let mut settings = WorldSettings::default();
-    let mut graph = mock_graph();
 
     let mut item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0xcafef00dd15ea5e5));
     item_pool.add_amount(health_fragment(), 99);
@@ -227,7 +182,8 @@ fn mock_solutions() {
         };
 
         (spawn with [$($items:tt)*], $requirement:expr, $($more:tt)*) => {
-            let mut world = mock_world(&mut graph, &settings, uber_states.clone(), $requirement);
+            let graph = TEST_ASSETS.test_graph($requirement);
+            let mut world = mock_world(&graph, &settings, uber_states.clone());
 
             for item in [$($items)*] {
                 item.simulate(&mut world, &[]);
@@ -237,7 +193,8 @@ fn mock_solutions() {
         };
 
         ($requirement:expr, $($more:tt)*) => {{
-            let mut world = mock_world(&mut graph, &settings, uber_states.clone(), $requirement);
+            let graph = TEST_ASSETS.test_graph($requirement);
+            let mut world = mock_world(&graph, &settings, uber_states.clone());
 
             test!(@test_solutions world, $($more)*);
         }};

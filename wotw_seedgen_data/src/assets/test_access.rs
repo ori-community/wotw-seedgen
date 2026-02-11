@@ -1,6 +1,7 @@
 use std::{
     borrow::Cow,
     iter::{self, Once},
+    ops::{Deref, DerefMut},
     path::Path,
     sync::LazyLock,
 };
@@ -11,12 +12,15 @@ use wotw_seedgen_parse::Source;
 use crate::{
     assets::{
         AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-        LocData, PresetAccess, PresetFileAccess, SnippetFileAccess, StateData, UberStateData,
-        UniversePreset, WorldPreset,
+        LocData, LocDataEntry, PresetAccess, PresetFileAccess, SnippetFileAccess, StateData,
+        UberStateData, UniversePreset, WorldPreset,
     },
-    logic_language::{ast::Areas, output::Graph},
+    logic_language::{
+        ast::Areas,
+        output::{Anchor, Connection, Graph, Node, Requirement},
+    },
     seed_language::simulate::UberStates,
-    Difficulty, WorldSettings,
+    Difficulty, MapIcon, UberIdentifier, WorldSettings, Zone,
 };
 
 const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../assets");
@@ -61,6 +65,7 @@ pub struct TestCacheValues {
     pub base: DefaultAssetCacheValues,
     pub uber_states: UberStates,
     pub graphs: TestCacheGraphs,
+    test_graph: TestGraph,
 }
 
 pub struct TestCacheGraphs {
@@ -78,11 +83,13 @@ impl AssetCacheValues for TestCacheValues {
         let base = DefaultAssetCacheValues::new(file_access)?;
         let uber_states = UberStates::new(&base.uber_state_data);
         let graphs = TestCacheGraphs::new(&base);
+        let test_graph = TestGraph::new();
 
         Ok(Self {
             base,
             uber_states,
             graphs,
+            test_graph,
         })
     }
 
@@ -151,6 +158,12 @@ impl TestCacheValues {
             other => Cow::Owned(graph(&self.base, other)),
         }
     }
+
+    pub fn test_graph(&self, requirement: Requirement) -> TestGraph {
+        let mut graph = self.test_graph.clone();
+        graph.set_requirement(requirement);
+        graph
+    }
 }
 
 impl TestCacheGraphs {
@@ -188,4 +201,57 @@ fn graph(base: &DefaultAssetCacheValues, settings: &[WorldSettings]) -> Graph {
     )
     .eprint_errors(&base.areas)
     .unwrap()
+}
+
+#[derive(Debug, Clone)]
+pub struct TestGraph {
+    pub inner: Graph,
+}
+
+impl TestGraph {
+    pub fn new() -> Self {
+        let mut graph = Graph::empty();
+
+        graph.nodes.push(Node::Anchor(Anchor::new(
+            "spawn".to_owned(),
+            vec![Connection {
+                to: 1,
+                requirement: Requirement::Free,
+                implicitly_generated: false,
+            }],
+        )));
+        graph.nodes.push(Node::Pickup(LocDataEntry {
+            identifier: "yummy".to_owned(),
+            zone: Zone::Marsh,
+            map_icon: MapIcon::SpiritLight,
+            uber_identifier: UberIdentifier::new(0, 0),
+            value: None,
+            position: None,
+            map_position: None,
+        }));
+
+        Self { inner: graph }
+    }
+
+    pub fn set_requirement(&mut self, requirement: Requirement) {
+        self.inner.nodes[0].expect_anchor_mut().connections[0].requirement = requirement;
+    }
+
+    pub fn get_requirement(&self) -> &Requirement {
+        &self.inner.nodes[0].expect_anchor().connections[0].requirement
+    }
+}
+
+impl Deref for TestGraph {
+    type Target = Graph;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl DerefMut for TestGraph {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
 }

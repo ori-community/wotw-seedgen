@@ -3,7 +3,6 @@ use std::ops::ControlFlow;
 use crate::{
     item_pool::ItemPoolBuilder,
     orbs::{OrbVariants, Orbs},
-    tests::test_logger,
     World,
 };
 use itertools::Itertools;
@@ -14,7 +13,7 @@ use wotw_seedgen_data::{
     assets::{AssetCacheValues, TEST_ASSETS},
     logic_language::output::{Enemy, Graph, RefillValue, Requirement},
     seed_language::simulate::{Simulation, Snapshot},
-    Difficulty, Shard, Skill, WorldSettings, DEFAULT_SPAWN,
+    test_logger, Difficulty, Shard, Skill, WorldSettings, DEFAULT_SPAWN,
 };
 
 pub fn empty_test_world<'graph, 'settings>(

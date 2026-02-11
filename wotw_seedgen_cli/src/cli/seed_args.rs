@@ -50,4 +50,5 @@ pub enum VerboseTarget {
     Solutions,
     Weight,
     Doors,
+    OptimizeGraph,
 }

@@ -17,6 +17,8 @@ mod settings;
 mod shard;
 mod skill;
 mod teleporter;
+#[cfg(any(test, feature = "test_helpers"))]
+mod test_logger;
 mod uber_identifier;
 mod weapon_upgrade;
 mod wheel;
@@ -33,6 +35,8 @@ pub use settings::{
 pub use shard::Shard;
 pub use skill::Skill;
 pub use teleporter::Teleporter;
+#[cfg(any(test, feature = "test_helpers"))]
+pub use test_logger::test_logger;
 pub use uber_identifier::{CommonUberIdentifier, ShopKind, UberIdentifier};
 pub use weapon_upgrade::WeaponUpgrade;
 pub use wheel::{WheelBind, WheelItemPosition};

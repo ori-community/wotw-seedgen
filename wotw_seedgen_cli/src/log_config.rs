@@ -21,6 +21,7 @@ pub struct LogConfig {
     trace_solutions: LevelFilter,
     trace_weight: LevelFilter,
     trace_doors: LevelFilter,
+    trace_optimize_graph: LevelFilter,
 }
 
 const PLACEMENT_MOD: &str = "wotw_seedgen::generator::placement";
@@ -30,6 +31,7 @@ const IS_MET_MOD: &str = "wotw_seedgen::world::is_met";
 const SOLUTIONS_MOD: &str = "wotw_seedgen::generator::solutions";
 const WEIGHT_MOD: &str = "wotw_seedgen::generator::solutions::weight";
 const DOORS_MOD: &str = "wotw_seedgen::generator::doors";
+const OPTIMIZE_GRAPH_MOD: &str = "wotw_seedgen_data::logic_language::optimize";
 
 impl Default for LogConfig {
     fn default() -> Self {
@@ -41,6 +43,7 @@ impl Default for LogConfig {
             trace_solutions: LevelFilter::Off,
             trace_weight: LevelFilter::Off,
             trace_doors: LevelFilter::Off,
+            trace_optimize_graph: LevelFilter::Off,
         }
     }
 }
@@ -56,6 +59,7 @@ impl Index<VerboseTarget> for LogConfig {
             VerboseTarget::Solutions => &self.trace_solutions,
             VerboseTarget::Weight => &self.trace_weight,
             VerboseTarget::Doors => &self.trace_doors,
+            VerboseTarget::OptimizeGraph => &self.trace_optimize_graph,
         }
     }
 }
@@ -69,6 +73,7 @@ impl IndexMut<VerboseTarget> for LogConfig {
             VerboseTarget::Solutions => &mut self.trace_solutions,
             VerboseTarget::Weight => &mut self.trace_weight,
             VerboseTarget::Doors => &mut self.trace_doors,
+            VerboseTarget::OptimizeGraph => &mut self.trace_optimize_graph,
         }
     }
 }
@@ -112,6 +117,7 @@ impl LogConfig {
             trace_solutions,
             trace_weight,
             trace_doors,
+            trace_optimize_graph,
         } = self;
 
         if trace_seedgen {
@@ -129,6 +135,7 @@ impl LogConfig {
                     .level_for(SOLUTIONS_MOD, trace_solutions)
                     .level_for(WEIGHT_MOD, trace_weight)
                     .level_for(DOORS_MOD, trace_doors)
+                    .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
                     .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?),
             )
         }
