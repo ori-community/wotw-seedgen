@@ -88,11 +88,16 @@ impl Optimize for Connection {
 impl Optimize for Requirement {
     fn optimize(&mut self) {
         match self {
-            Requirement::And(ands) => {
+            Self::And(ands) => {
                 ands.optimize();
-                *self = Requirement::and(ands.drain(..));
+
+                *self = Self::and(ands.drain(..));
+
+                if let Self::And(ands) = self {
+                    reorder_ands(ands);
+                }
             }
-            Requirement::Or(ors) => {
+            Self::Or(ors) => {
                 ors.optimize();
                 pull_common_factors(self);
             }
@@ -174,17 +179,8 @@ impl Requirement {
                 };
 
                 let mut common_factors = vec![];
-                let mut may_reorder = true;
 
-                for and in &mut *ands {
-                    if !and.is_commutative() {
-                        if !may_reorder {
-                            break;
-                        }
-
-                        may_reorder = false;
-                    }
-
+                for and in ReorderableChunks::new().next(ands).unwrap() {
                     // Our logic breaks down in this nesting and there shouldn't be anything left
                     // to optimize in an or anyway, since this or was entered in recursion before
                     // and if it had common factors, they would live in the surrounding and by now
@@ -233,7 +229,7 @@ impl Requirement {
         }
     }
 
-    fn is_commutative(&self) -> bool {
+    fn changes_orbs(&self) -> bool {
         match self {
             Self::Free
             | Self::Impossible
@@ -247,7 +243,7 @@ impl Requirement {
             | Self::Shard(_)
             | Self::Teleporter(_)
             | Self::Water
-            | Self::State(_) => true,
+            | Self::State(_) => false,
             Self::EnergySkill(_, _)
             | Self::NonConsumingEnergySkill(_)
             | Self::Damage(_)
@@ -256,9 +252,9 @@ impl Requirement {
             | Self::Boss(_)
             | Self::BreakWall(_)
             | Self::ShurikenBreak(_)
-            | Self::SentryBreak(_) => false,
+            | Self::SentryBreak(_) => true,
             Self::And(requirements) | Self::Or(requirements) => {
-                requirements.iter().all(Requirement::is_commutative)
+                requirements.iter().any(Requirement::changes_orbs)
             }
         }
     }
@@ -280,4 +276,117 @@ fn pull_common_factors(requirement: &mut Requirement) {
     *requirement = Requirement::or(ors.drain(..));
 
     trace!("transformed common factors into {requirement}");
+}
+
+fn reorder_ands(ands: &mut [Requirement]) {
+    #[derive(PartialEq, Eq, PartialOrd, Ord)]
+    enum ReorderKey {
+        /// Unsolvable requirements shortcut both reach checks and solutions
+        Unsolvable,
+        /// Simple, cheap to check requirements might be good to place earlier
+        Simple,
+        /// Requirements that change orbs can create lots of branches
+        ChangesOrbs,
+        /// Destroy requirements change orbs and create even more branches for better weapons
+        Destroy,
+    }
+
+    fn reorder_key(requirement: &Requirement) -> ReorderKey {
+        match requirement {
+            Requirement::Free
+            | Requirement::Impossible
+            | Requirement::Difficulty(_)
+            | Requirement::NormalGameDifficulty
+            | Requirement::Trick(_)
+            | Requirement::State(_) => ReorderKey::Unsolvable,
+            Requirement::Skill(_)
+            | Requirement::SpiritLight(_)
+            | Requirement::GorlekOre(_)
+            | Requirement::Keystone(_)
+            | Requirement::Shard(_)
+            | Requirement::Teleporter(_)
+            | Requirement::Water => ReorderKey::Simple,
+            Requirement::EnergySkill(_, _)
+            | Requirement::NonConsumingEnergySkill(_)
+            | Requirement::Damage(_)
+            | Requirement::Danger(_) => ReorderKey::ChangesOrbs,
+            Requirement::Combat(_)
+            | Requirement::Boss(_)
+            | Requirement::BreakWall(_)
+            | Requirement::ShurikenBreak(_)
+            | Requirement::SentryBreak(_) => ReorderKey::Destroy,
+            Requirement::And(requirements) | Requirement::Or(requirements) => {
+                requirements.iter().map(reorder_key).max().unwrap()
+            }
+        }
+    }
+
+    trace!("reordering {}", ands.iter().format(" & "));
+
+    let mut chunks = ReorderableChunks::new();
+    while let Some(chunk) = chunks.next(ands) {
+        trace!("reordering chunk {}", chunk.iter().format(" & "));
+
+        chunk.sort_unstable_by_key(reorder_key);
+    }
+
+    trace!("reordered to {}", ands.iter().format(" & "));
+}
+
+/// Inside an and requirement, we can reorder any continuous chunks of requirements
+/// that don't contain more than one requirement which interacts with orbs.
+/// A chain of ands with multiple such requirements is not generally reorderable
+/// because the orb costs of the requirements interact in nontrivial ways.
+///
+/// We cannot implement this as a proper Iterator with safe rust
+/// because the returned chunks overlap.
+#[derive(Debug)]
+struct ReorderableChunks {
+    last_start: usize,
+    state: ReorderableChunksState,
+}
+
+#[derive(Debug)]
+enum ReorderableChunksState {
+    NotStarted,
+    InProgress,
+    Finished,
+}
+
+impl ReorderableChunks {
+    fn new() -> Self {
+        Self {
+            last_start: 0,
+            state: ReorderableChunksState::NotStarted,
+        }
+    }
+
+    fn next<'a>(&mut self, ands: &'a mut [Requirement]) -> Option<&'a mut [Requirement]> {
+        let offset = self.last_start;
+        let mut orb_changers = ands[offset..]
+            .iter()
+            .enumerate()
+            .filter(|(_, req)| req.changes_orbs())
+            .map(move |(i, _)| offset + i);
+
+        let start = match self.state {
+            ReorderableChunksState::NotStarted => {
+                self.state = ReorderableChunksState::InProgress;
+                0
+            }
+            ReorderableChunksState::InProgress => {
+                let last_start_new_position = orb_changers.next().unwrap();
+                last_start_new_position + 1
+            }
+            ReorderableChunksState::Finished => return None,
+        };
+        self.last_start = start;
+
+        let end = orb_changers.nth(2).unwrap_or_else(|| {
+            self.state = ReorderableChunksState::Finished;
+            ands.len()
+        });
+
+        Some(&mut ands[start..end])
+    }
 }

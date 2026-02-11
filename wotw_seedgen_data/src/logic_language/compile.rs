@@ -87,7 +87,6 @@ struct Compiler<'source> {
     pickup_map: FxHashMap<&'source str, usize>,
     anchor_map: FxHashMap<String, usize>,
     macros: FxHashMap<String, Requirement>,
-    // TODO apply region requirements
     regions: FxHashMap<String, Requirement>,
     errors: Vec<Error>,
 }
@@ -730,8 +729,11 @@ impl<'source> Compile for ast::Anchor<'source> {
                                         .and_then(|region| compiler.regions.get(region))
                                     {
                                         requirement = Requirement::and([
-                                            requirement,
+                                            // TODO the placement of the region requirement has some complex trade-offs
+                                            // For instance, solving the region requirement earlier before there's many branches is nice,
+                                            // but checking whether it's met and then running into an unmet requirement later is bad.
                                             region_requirement.clone(),
+                                            requirement,
                                         ])
                                     }
 

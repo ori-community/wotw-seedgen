@@ -165,7 +165,6 @@ macro_rules! assert_eq_solutions {
 fn mock_solutions() {
     test_logger();
 
-    let uber_states = &TEST_ASSETS.uber_states;
     let mut settings = WorldSettings::default();
 
     let mut item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0xcafef00dd15ea5e5));
@@ -183,7 +182,7 @@ fn mock_solutions() {
 
         (spawn with [$($items:tt)*], $requirement:expr, $($more:tt)*) => {
             let graph = TEST_ASSETS.test_graph($requirement);
-            let mut world = mock_world(&graph, &settings, uber_states.clone());
+            let mut world = mock_world(&graph, &settings, TEST_ASSETS.uber_states.clone());
 
             for item in [$($items)*] {
                 item.simulate(&mut world, &[]);
@@ -194,7 +193,7 @@ fn mock_solutions() {
 
         ($requirement:expr, $($more:tt)*) => {{
             let graph = TEST_ASSETS.test_graph($requirement);
-            let mut world = mock_world(&graph, &settings, uber_states.clone());
+            let mut world = mock_world(&graph, &settings, TEST_ASSETS.uber_states.clone());
 
             test!(@test_solutions world, $($more)*);
         }};

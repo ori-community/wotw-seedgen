@@ -1,5 +1,3 @@
-use log::trace;
-
 use crate::{
     assets::TEST_ASSETS, logic_language::output::Requirement::*, test_logger, Shard::*, Skill::*,
 };
@@ -9,15 +7,12 @@ macro_rules! test {
         let mut graph = TEST_ASSETS.test_graph($before);
         graph.optimize();
 
-        trace!("optimized graph: {graph:#?}");
-
         assert_eq!(graph.get_requirement(), &$after);
     };
 }
 
 #[test]
 fn optimize_graph_region() {
-    let _ = *TEST_ASSETS;
     test_logger();
 
     test!(
@@ -31,7 +26,6 @@ fn optimize_graph_region() {
 
 #[test]
 fn optimize_graph_bashnade() {
-    let _ = *TEST_ASSETS;
     test_logger();
 
     test!(
@@ -60,7 +54,6 @@ fn optimize_graph_bashnade() {
 // EastPools.TPArea -> EastPools.AboveDoorOre
 #[test]
 fn optimize_graph_above_door_ore() {
-    let _ = *TEST_ASSETS;
     test_logger();
 
     test!(
@@ -85,8 +78,8 @@ fn optimize_graph_above_door_ore() {
                 Skill(Glide),
                 Damage(20.),
                 And(vec![
+                    Or(vec![Skill(Sword), Skill(Hammer)]),
                     EnergySkill(Grenade, 1.),
-                    Or(vec![Skill(Sword), Skill(Hammer)])
                 ])
             ])
         ])
@@ -96,7 +89,6 @@ fn optimize_graph_above_door_ore() {
 // EastPools.TPArea -> EastPools.FishingPool
 #[test]
 fn optimize_graph_fishing_pool() {
-    let _ = *TEST_ASSETS;
     test_logger();
 
     test!(
