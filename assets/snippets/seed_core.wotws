@@ -62,6 +62,11 @@ on spawn {
     store(randoState.allowOpeningEyestoneDoor, true)
 }
 
+// Lower water around pools TP when collecting it
+on EastPools.TeleporterActive {
+  store(lumaPoolsStateGroup.waterLowered, true)
+}
+
 // TODO fully support random grom shop and remove this
 on reload {
     set_shop_item_data(
