@@ -1232,7 +1232,7 @@ fn total_reach_check<'graph>(
         // TODO remove by identifier instead?
         if output.removed_locations.contains(&condition) {
             trace!(
-                "Manually removed {pickup} from placement locations",
+                "{log_index}Manually removed {pickup} from placement locations",
                 pickup = pickup.identifier
             );
 
@@ -1241,7 +1241,7 @@ fn total_reach_check<'graph>(
 
         if world.loc_data_condition_met(pickup.uber_identifier, pickup.value) {
             trace!(
-                "Removing {pickup} from placement locations since the condition was met on spawn",
+                "{log_index}Removing {pickup} from placement locations since the condition was met on spawn",
                 pickup = pickup.identifier
             );
 
