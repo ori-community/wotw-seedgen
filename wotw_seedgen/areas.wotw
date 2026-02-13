@@ -15584,23 +15584,23 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
 
   conn WillowsEnd.EntryFloatingPlatform:  # Be careful it's not redundant with Entry->BoulderHeartPath->EntryFloatingPlatform
     moki:
-      DoubleJump, Bash, Grenade=1
+      Bash, Grenade=1
       Launch
     gorlek:
-      Bash, Grenade=1
       SentryJump=1
     #kii:
       # Glitched
       # AerialHammerJump  # Upswing before AHJ
       # DoubleJump, GrenadeJump=1
     unsafe:
-      DoubleJump, TripleJump, Damage=20  # dboost on the mine so you can stand on the lava thingy and jump from it to the floating platform
+      #DoubleJump, Damage=40  # dboost on the lava thingy and jump from it to the floating platform
+      DoubleJump, Damage=20  # same as above but dboost on the mine beforehand
       SwordJump, TripleJump, Dash  # land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
       AerialHammerJump OR GrenadeJump OR AbilitySwap=1 OR GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump  # CoyoteHammerJump is scary...
       GlideJump, DoubleJump, TripleJump, Sword OR Hammer  # Either directly or by going to the left platform first
       Sword, DoubleJump  # djump, pogo the mine, djump+upslash to reach the floating platform
   # Paths skipping WillowsEnd.EntryFloatingPlatform
-  # conn WillowsEnd.GrappleHeartMidPoint
+  # conn WillowsEnd.InnerTP
   conn WillowsEnd.BoulderHeartPath:
     moki:
       Launch
@@ -15615,6 +15615,8 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       Bash, Grenade=1
       DoubleJump, TripleJump, Dash  # Under the wheel
     unsafe: DoubleJump, TripleJump, Sword OR Hammer  # Under the wheel
+  # Paths skipping WillowsEnd.EntryFloatingPlatform
+  # conn WillowsEnd.GrappleHeartMidPoint
 
 anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platform above the entrance
   state WillowsEnd.GrappleWheelsHeart:
@@ -15673,8 +15675,7 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       Launch, WillowsEnd.PortalShortcut
     gorlek:
       Launch, Bash, Sword OR Hammer OR Damage=40
-      Bash, Grenade=2, DoubleJump, TripleJump, Damage=40 OR WillowsEnd.PortalShortcut  # Bash the elemental, tjump, bash its projectiles
-      Bash, Grenade=3, DoubleJump, TripleJump
+      Bash, Grenade=1, DoubleJump, TripleJump, Grenade=1 OR Damage=40 OR WillowsEnd.PortalShortcut  # Bash the elemental, tjump, bash its projectiles
     kii:
       DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer:  # Climb the left wall and use horizontal movement to get into the portal
         Bash, Grenade=1 OR Damage=40  # Bashnade or dboost the spikes
@@ -15753,6 +15754,8 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       WillowsEnd.GrappleWheelsHeart, Blaze=1, Spear=1  # Blaze for the first jump, spear for the second. More energy efficient than 2 spears
       WillowsEnd.GrappleWheelsHeart, Hammer
 
+  # Paths that can reach the floating platform from here, but not from Entry
+  # conn WillowsEnd.EntryFloatingPlatform
   conn WillowsEnd.Entry:  # going backwards without breaking the heart has many weird spots, saving it for later difficulties
     moki, WillowsEnd.GrappleWheelsHeart:
       Glide, DoubleJump OR Dash
@@ -15819,14 +15822,18 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Bash, Grenade=1, Damage=40
   conn WillowsEnd.EntryFloatingPlatform:  # Check for redundancies with going to WillowsEnd.Entry first
     gorlek:
-      DoubleJump, TripleJump, Grapple, Glide  # use the right wheels then glide to the floating platform
-      DoubleJump, TripleJump, Grapple, Dash, Sword OR Hammer  # use the right wheels then glide to the floating platform
+      Grapple, Glide, DoubleJump OR Dash OR Sword OR Hammer  # movement to the bottom wheel, grapple to the top wheel then glide+movement to the floating platform
+      DoubleJump, Grapple, Dash, Sword OR Hammer  # grapple to the top wheel then hover to the floating platform
     kii:
       DoubleJump, TripleJump, Glide, Damage=40  # dboost on the first wheel
       DoubleJump, TripleJump, Dash, Damage=40, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost on the first wheel
       Grapple, DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2  # jump from the wall on the left and not the wheel directly
+      Grapple, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # movement to the bottom wheel, grapple to the top wheel, then glide to the floating platform
     unsafe:
-      Grapple, DoubleJump, TripleJump, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Grapple, Glide  # look up to grapple to the top wheel
+      # DoubleJump, Glide, Damage=80  # dboost on both wheels to reach blue moss, then glide down. Redundant with ->Entry->EntryFloatingPlatform in unsafe
+      # Grapple, DoubleJump, TripleJump, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1  # Needs re-verification after moving from BoulderHeartPath->InnerTP to BoulderHeartPath->EntryFloatingPlatform 
+      
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
