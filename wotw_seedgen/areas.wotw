@@ -6951,6 +6951,7 @@ anchor InnerWellspring.ShortcutLever at -1264, -3907:  # At the lever on top of 
       # GlideJump
     unsafe, InnerWellspring.ShortCutWheel:
       Glide OR Hammer OR Sentry=2 OR Shuriken=2  # friendly spikes when you slide off the wheel
+      PauseFloat OR AbilitySwap=1
   conn InnerWellspring.ThornShardArea:  # Make sure it's not redundant with going to InnerWellspring.EntranceDoor first
     gorlek: DoubleJump OR Dash OR Glide OR Sword OR Hammer
     kii: Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
@@ -6969,58 +6970,37 @@ anchor InnerWellspring.DrainRoom at -1169, -3946:  # Left of the water you can d
       DoubleJump OR Dash OR Grapple OR Glide OR Launch
       Bash, Grenade=1
     gorlek: free
-  conn InnerWellspring.DrainRoomCenter:
+  conn InnerWellspring.DrainRoomCheckpoint:
+  # if you have a non-energy weapon, you can free the wheels without anything else. Redundant paths without the three wheels state were removed.
     moki:
-      DoubleJump, Glide
-      Grapple OR Launch
-      Glide, Bash, Grenade=2
-      InnerWellspring.DrainRoomBottomWheel, DoubleJump
-      InnerWellspring.DrainRoomBottomWheel, Dash, Bash, Grenade=1
-      Water, DoubleJump  # if you drained the water, you can use the bottom of the wheel instead
-      Water, WaterDash, Dash, Bash, Grenade=1  # if you drained the water, you can use the bottom of the wheel instead
+      Grapple OR Launch  # Goes through InnerWellspring.DrainRoomCenter but writting it like that simplify the connection
+      Glide, DoubleJump OR Dash
+      Glide, Bash, Grenade=1
+      InnerWellspring.DrainRoomBottomWheel, DoubleJump OR Dash
+      Water, DoubleJump OR Dash  # if you drained the water, you can use the bottom of the wheel instead
+      InnerWellspring.DrainLever, DoubleJump OR Dash
     gorlek:
-      # if you have a weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
-      DoubleJump, TripleJump OR Dash OR Sword
-      Dash, Glide
-      Glide, Damage=15
-      Bash, Grenade=1, DoubleJump OR Glide
-      SentryJump=1, Glide
+      Glide, Hammer
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash
+      DoubleJump, TripleJump, Dash
       InnerWellspring.DrainRoomBottomWheel:
-        Dash
-        Damage=15, Sword OR Hammer
-        Bash, Grenade=1, Sword OR Hammer
-        SentryJump=1
-      InnerWellspring.DrainLever:
-        DoubleJump
-        Dash, Sword OR Hammer
-      Water, Dash  # if you drained the water, you can use the bottom of the wheel instead
-      Water, Bash, Grenade=4  # if you drained the water, you can use the bottom of the wheel instead
-    kii:
-      DoubleJump, Blaze=5 OR Sentry=3
-      Dash, Blaze=3 OR Sentry=2
-      Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      InnerWellspring.DrainRoomBottomWheel, Sword OR Hammer OR Shuriken=4
+        Dash OR Sword  # No hammer because you can't refresh your upswing to grab the final pole (even tho an horizontal swing works)
+        Bash, Grenade=1, Hammer  # bashnade from bellow the anchor
+        HammerSJump=1  # from bellow the anchor. Sjump from the rotating wheel to InnerWellspring.DrainRoomCenter also works.
       Damage=20, DoubleJump OR Dash  # dboost in dirty water after the wheel. If you drained the water, you can use the bottom of the wheel instead
-      Damage=60, Bash, Grenade=3  # dboost in dirty water. If you drained the water, you can go bellow the wheel instead
-      WaterDash, Damage=40, Bash, Grenade=3  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead (use an extra grenade on the small floor below the wheel)
-      InnerWellspring.DrainLever:
-        Dash
-        Bash, Grenade=3
-      # if you have a non-energy weapon here, you can break the three wheels free. Redundant paths without the three wheels state were removed.
-      # Sword, InnerWellspring.DrainLever OR Dash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      # Hammer, DoubleJump OR Dash OR Sentry=3
-      # Hammer, InnerWellspring.DrainLever, Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      DoubleJump  # climb the right wall
-      Glide
-      Sword, Spear=1 OR Blaze=1
-      Shuriken=2, Dash OR Hammer
-      Damage=15, Dash OR Sword
-      WaterDash, Bash, Grenade=3, BreakWall=10, Water OR Damage=20  # if you drained the water, you can go through through the drained room instead
-      WaterDash, Bash, Grenade=2, Damage=15, BreakWall=10, Water OR Damage=20  # if you drained the water, you can go through through the drained room instead
-      InnerWellspring.DrainRoomBottomWheel, Shuriken=3 OR Blaze=5 OR Flash=3 OR Sentry=3
-      InnerWellspring.DrainRoomBottomWheel, Bash, Grenade=2  # not hard, but grenades can vanish on rotating objects sometimes
-      InnerWellspring.DrainLever, Sword OR Shuriken=3
+      Bash, Grenade=3, InnerWellspring.DrainLever OR Water OR Damage=20  # if you drained the water, you can use the bottom of the wheel instead
+    kii:
+      DoubleJump, Dash OR Blaze=5 OR Sentry=3
+      Dash, Blaze=3 OR Sentry=2
+      Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      InnerWellspring.DrainRoomBottomWheel, Hammer OR Shuriken=3 OR Flash=4 OR Sentry=4
+    unsafe:  # You can trigger the checkpoint without grabbing the last pole
+      DoubleJump  # climb the left wall
+      Glide OR AbilitySwap=3
+      Shuriken=2, Dash
+      Damage=15, Dash  # dboost on rotating wheel instead of the water
+      Bash, Grenade=2, InnerWellspring.DrainRoomBottomWheel OR InnerWellspring.DrainLever OR Water OR Damage=15
+      InnerWellspring.DrainRoomBottomWheel, Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2
   conn InnerWellspring.DrainAreaEntrance:
     moki: InnerWellspring.DrainLever, DoubleJump OR Dash OR Grapple OR Glide OR Launch
     gorlek, InnerWellspring.DrainLever:
@@ -7129,25 +7109,18 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
   refill Checkpoint
 
   conn InnerWellspring.DrainAreaEX: free
-  conn InnerWellspring.DrainRoomCenter:
+  conn InnerWellspring.DrainRoomCheckpoint:
     moki:
-      DoubleJump OR Launch
-      Dash, Bash, Grenade=1
-      Bash, Grenade=2
+      DoubleJump OR Dash OR Launch
+      Bash, Grenade=1
     gorlek:
-      Dash
-      Glide, Grapple OR SentryJump=1 OR Damage=15
-      Sword, Grapple OR SentryJump=1 OR Damage=15
-      Bash, Grenade=1, Grapple OR Glide OR Sword OR Damage=15
-      SentryJump=1, Grapple OR Damage=15
-      SentryJump=2
+      Sword OR HammerSJump=1
+      Glide, Hammer
     kii:
-      Sword OR Hammer OR Spear=3 OR Shuriken=3 OR Sentry=3  # No flash path because you can't cancel it while on the pole
+      Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Bait the skeeto
-    unsafe:
-      Spear=2 OR Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2
       Bash  # Bait the skeeto
+    unsafe: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeCancel OR PauseFloat  # you can trigger the checkpoint without grabbing the 2nd pole
   conn InnerWellspring.DrainRoom:  # Make sure it's not redundant with DrainAreaExit->DrainRoomCenter->DrainRoom
     moki:
       Dash, Glide, Water OR InnerWellspring.DrainRoomBottomWheel
@@ -7175,7 +7148,20 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
       InnerWellspring.DrainLever, Damage=15, Grapple OR Blaze=2  # Grapple is awkward if the wheel is spinning snce you need to jump blindly and you might have jumped before the wheel can be grappled
       InnerWellspring.DrainRoomBottomWheel, Glide
 
-# checkpoint at the anchor below, just hard to reach
+anchor InnerWellspring.DrainRoomCheckpoint at -1096, -3938:  # checkpoint to the right of the room, above the breakable wall
+  refill Checkpoint
+
+  conn InnerWellspring.DrainAreaEntrance:
+    moki: InnerWellspring.DrainLever
+  conn InnerWellspring.DrainAreaExit:
+    gorlek: ShurikenBreak=10
+  conn InnerWellspring.DrainRoomCenter:
+    moki:
+      DoubleJump OR Grapple OR Launch
+      Bash, Grenade=1
+    gorlek: Dash OR Sword OR Hammer OR Damage=15
+    kii: Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # can avoid the dboost if you're playing at 60 fps (:
 
 anchor InnerWellspring.DrainRoomCenter at -1116, -3924:  # Standing on the wheel in the center of the room
   state InnerWellspring.DrainRoomTopWheel:  # breaking the top wheel free; has a state because it can be used to connect from top right to top left
@@ -7184,6 +7170,7 @@ anchor InnerWellspring.DrainRoomCenter at -1116, -3924:  # Standing on the wheel
       Launch, BreakWall=16
     gorlek: BreakWall=16
 
+  conn InnerWellspring.DrainRoomCheckpoint: free
   conn InnerWellspring.DrainRoom:
     moki:
       DoubleJump, Dash
@@ -7200,10 +7187,6 @@ anchor InnerWellspring.DrainRoomCenter at -1116, -3924:  # Standing on the wheel
       InnerWellspring.DrainRoomBottomWheel, Damage=20  # grab the pole on the right to reach the spinning wheel. dboost in water
       InnerWellspring.DrainLever, InnerWellspring.DrainRoomBottomWheel, Shuriken=1  # grab the pole on the right to reach the spinning wheel.
     unsafe: Damage=20  # dboost in water
-  conn InnerWellspring.DrainAreaEntrance:
-    moki: InnerWellspring.DrainLever
-  conn InnerWellspring.DrainAreaExit:
-    gorlek: ShurikenBreak=10
   conn InnerWellspring.DrainRoomTop:
     moki: InnerWellspring.DrainRoomTopWheel OR Grapple OR Launch
     gorlek:
