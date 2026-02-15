@@ -7070,10 +7070,24 @@ anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after d
       Bash, Grenade=1, Sword
       Water, WaterDash, Sword, Glide OR Dash
       Water, WaterDash, Hammer
+      Damage=20, Damage=20, WaterDash, Sword, Glide OR Dash
+      Damage=20, Damage=20, WaterDash, Hammer
+      # Glitched
+      # HammerSJump=1, Water OR Damage=20
+      # SwordSJump=2, Water OR Damage=20
+      # SwordSJump=1, Glide, Water OR Damage=20
+      # SwordSJump=1, Dash, Water OR Damage=20
+      # GlideJump, Combat=WeakSlug, Dash OR Sword OR Hammer
+      # GlideJump, Water OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20:
+      #   Bash
+      #   Combat=WeakSlug, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Sword OR GlideJump  # https://youtu.be/itAPcUkdEec
+      Hammer, Damage=20 OR Water
       Dash, Combat=2xWeakSlug
-      Water, WaterDash, GlideJump  # glide jump from the wheel to the sl container
       Bash, Grenade=1, Shuriken=1
+      AbilitySwap=5
+      AbilitySwap=3, Water OR Damage=40
 
 anchor InnerWellspring.DrainAreaEX at -1064, -3961:  # At DrainEX
   pickup InnerWellspring.DrainEX: free
