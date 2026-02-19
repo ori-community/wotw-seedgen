@@ -37,13 +37,13 @@ impl Default for LogConfig {
     fn default() -> Self {
         Self {
             trace_seedgen: false,
-            trace_placement: LevelFilter::Off,
-            trace_reached: LevelFilter::Off,
-            trace_is_met: LevelFilter::Off,
-            trace_solutions: LevelFilter::Off,
-            trace_weight: LevelFilter::Off,
-            trace_doors: LevelFilter::Off,
-            trace_optimize_graph: LevelFilter::Off,
+            trace_placement: LevelFilter::Info,
+            trace_reached: LevelFilter::Info,
+            trace_is_met: LevelFilter::Info,
+            trace_solutions: LevelFilter::Info,
+            trace_weight: LevelFilter::Info,
+            trace_doors: LevelFilter::Info,
+            trace_optimize_graph: LevelFilter::Info,
         }
     }
 }
