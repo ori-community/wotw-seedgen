@@ -100,7 +100,7 @@ impl Display for Missing<'_> {
         match self {
             Missing::Impossible => "Impossible".fmt(f),
             Missing::Boolean(uber_identifier) => uber_identifier.fmt(f),
-            Missing::Integer(uber_identifier, value) => write!(f, "{uber_identifier}>={value}"),
+            Missing::Integer(uber_identifier, amount) => write!(f, "{uber_identifier}*{amount}"),
             Missing::LogicalState(state) => write!(f, "{{{state}}}"),
             Missing::Health => "Health".fmt(f),
             Missing::Energy => "Energy".fmt(f),
