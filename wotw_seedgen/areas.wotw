@@ -7150,21 +7150,14 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
       InnerWellspring.DrainRoomBottomWheel:
         Glide OR Sentry=4
         Bash, Grenade=2
-        Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, dboost in spikes instead.
       InnerWellspring.DrainLever OR Water:  # Water solves the connection by itself but it needs additional requirement in case you drained it
         Glide  # grab the pole then the bottom of the wheel
         Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1 OR Damage=15:
           Damage=15
         Bash, Grenade=2
-        Bash, Grenade=1, Damage=15
-      Bash, Grenade=1, Damage=80  # dboost in dirty water. If you drained the water, you can dboost in the spikes instead
       Damage=80, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost in dirty water. If you drained the water, you can dboost in the spikes instead
       WaterDash, Damage=40  # dboost in dirty water. If you drained the water, dboost in spikes instead
       Damage=100  # dboost in dirty water. If you drained the water, dboost in spikes instead
-      # Glitched
-      # GrenadeJump, Damage=80  # Grab the pole above to jump into the vertical one. No energy cost because grabbing the pole cancel grenade by itself
-      # InnerWellspring.DrainRoomBottomWheel, GrenadeJump, Damage=20
-      # GrenadeJump, Damage=15, InnerWellspring.DrainLever OR Water
     unsafe:
       InnerWellspring.DrainLever, Damage=15, Grapple OR Blaze=2  # Grapple is awkward if the wheel is spinning since you need to jump blindly and you might have jumped before the wheel can be grappled
       Water, Damage=15, Grapple OR Blaze=2
@@ -7176,6 +7169,12 @@ anchor InnerWellspring.DrainRoomCheckpoint at -1096, -3938:  # checkpoint to the
     moki: InnerWellspring.DrainLever
   conn InnerWellspring.DrainAreaExit:
     gorlek: ShurikenBreak=10
+  conn InnerWellspring.DrainRoom:
+    kii:  # Dboost in water or in spikes if drained
+      Damage=15, InnerWellspring.DrainLever OR Water
+      InnerWellspring.DrainRoomBottomWheel, Damage=20
+      Damage=80
+      InnerWellspring.DrainLever, InnerWellspring.DrainRoomBottomWheel, Shuriken=1 OR Blaze=3 OR Sentry=2
   conn InnerWellspring.DrainRoomCenter:
     moki:
       DoubleJump OR Grapple OR Launch
@@ -7199,21 +7198,18 @@ anchor InnerWellspring.DrainRoomCenter at -1116, -3924:  # Standing on the wheel
     gorlek:
       DoubleJump OR Dash OR Sword
       Hammer, Damage=20  # dboost in water
-      Hammer, Water, Damage=15
+      Hammer, Damage=15, InnerWellspring.DrainLever OR Water
     kii:
       Hammer OR Blaze=3 OR Sentry=2 OR Damage=40  # dboost in Water. Can dboost in spikes if water is drained
       Damage=20, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # dboost in Water. Can dboost in spikes if water is drained
       Bash, Grenade=1
-      InnerWellspring.DrainLever, Damage=15  # grab the pole on the right to reach the bottom of the spinning wheel
-      InnerWellspring.DrainRoomBottomWheel, Damage=20  # grab the pole on the right to reach the spinning wheel. dboost in water
-      InnerWellspring.DrainLever, InnerWellspring.DrainRoomBottomWheel, Shuriken=1  # grab the pole on the right to reach the spinning wheel.
-    unsafe: Damage=20  # dboost in water
+    unsafe: Damage=20 OR AbilitySwap=1 OR PauseFloat  # dboost in water
   conn InnerWellspring.DrainRoomTop:
     moki: InnerWellspring.DrainRoomTopWheel OR Grapple OR Launch
     gorlek:
       DoubleJump OR Dash
       Bash, Grenade=1
-    unsafe: Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap
 
 anchor InnerWellspring.DrainRoomTop at -1086, -3908:  # At the right ledge on top of the drain room
   refill Checkpoint
