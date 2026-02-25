@@ -7134,8 +7134,10 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
       Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash  # Bait the skeeto
-    unsafe: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeCancel OR PauseFloat  # you can trigger the checkpoint without grabbing the 2nd pole
-  conn InnerWellspring.DrainRoom:  # Make sure it's not redundant with DrainAreaExit->DrainRoomCenter->DrainRoom
+      # Glitched
+      # GrenadeJump  # no energy cost because grabbing the pole cancel grenade by itself
+    unsafe: Glide OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeCancel OR PauseFloat  # you can trigger the checkpoint without grabbing the 2nd pole
+  conn InnerWellspring.DrainRoom:  # Make sure it's not redundant with DrainAreaExit->DrainRoomCheckpoint->DrainRoomCenter->DrainRoom
     moki:
       Dash, Glide, Water OR InnerWellspring.DrainRoomBottomWheel
     gorlek:
@@ -7146,21 +7148,26 @@ anchor InnerWellspring.DrainAreaExit at -1093, -3950:  # At the checkpoint in th
       Water, Grapple, Damage=15, Hammer
     kii:
       InnerWellspring.DrainRoomBottomWheel:
-        Sentry=4
-        Glide, Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+        Glide OR Sentry=4
         Bash, Grenade=2
         Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, dboost in spikes instead.
-      InnerWellspring.DrainLever:
+      InnerWellspring.DrainLever OR Water:  # Water solves the connection by itself but it needs additional requirement in case you drained it
+        Glide  # grab the pole then the bottom of the wheel
         Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1 OR Damage=15:
           Damage=15
         Bash, Grenade=2
         Bash, Grenade=1, Damage=15
       Bash, Grenade=1, Damage=80  # dboost in dirty water. If you drained the water, you can dboost in the spikes instead
-      WaterDash, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1  # dboost in dirty water. If you drained the water, dboost in spikes instead
-      WaterDash, Damage=40, Bash, Grenade=1  # dboost in dirty water. If you drained the water, you can use the bottom of the wheel instead
+      Damage=80, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost in dirty water. If you drained the water, you can dboost in the spikes instead
+      WaterDash, Damage=40  # dboost in dirty water. If you drained the water, dboost in spikes instead
+      Damage=100  # dboost in dirty water. If you drained the water, dboost in spikes instead
+      # Glitched
+      # GrenadeJump, Damage=80  # Grab the pole above to jump into the vertical one. No energy cost because grabbing the pole cancel grenade by itself
+      # InnerWellspring.DrainRoomBottomWheel, GrenadeJump, Damage=20
+      # GrenadeJump, Damage=15, InnerWellspring.DrainLever OR Water
     unsafe:
-      InnerWellspring.DrainLever, Damage=15, Grapple OR Blaze=2  # Grapple is awkward if the wheel is spinning snce you need to jump blindly and you might have jumped before the wheel can be grappled
-      InnerWellspring.DrainRoomBottomWheel, Glide
+      InnerWellspring.DrainLever, Damage=15, Grapple OR Blaze=2  # Grapple is awkward if the wheel is spinning since you need to jump blindly and you might have jumped before the wheel can be grappled
+      Water, Damage=15, Grapple OR Blaze=2
 
 anchor InnerWellspring.DrainRoomCheckpoint at -1096, -3938:  # checkpoint to the right of the room, above the breakable wall
   refill Checkpoint
