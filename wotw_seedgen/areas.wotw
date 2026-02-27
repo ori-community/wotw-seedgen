@@ -7372,9 +7372,13 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
     kii:
       Bash, DoubleJump, TripleJump  # bait the mantis. Need to bash it when used its third jump.
       Bash, Grenade=1  # bait the mantis, bash it in order to bash your grenade from higher up
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump OR Bash
     unsafe:
-      Hammer, DoubleJump, TripleJump
-      SentryJump=1
+      DoubleJump, TripleJump  # https://youtu.be/Z9L-TTU0fdw
+      SentryJump=1 OR AbilitySwap=3
+      GrenadeJump, DoubleJump
 
   pickup InnerWellspring.ShortcutWheelEX:
     moki: InnerWellspring.ShortCutWheel
@@ -7389,7 +7393,14 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
     kii, SpiritLight=150:
       DoubleJump, Sword  # pogo the skeeto
       DoubleJump, TripleJump, Hammer OR Spear=1
-    unsafe, SpiritLight=150: DoubleJump  # kind of easy
+      # Glitched
+      # AerialHammerJump
+      # Combat=Skeeto, GrenadeJump=1
+      # GlideJump, DoubleJump, TripleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe, SpiritLight=150:
+      DoubleJump  # kind of easy
+      GrenadeJump OR GlideHammerJump
+      WallHammerJump, Dash OR Glide
   pickup InnerWellspring.GrappleTreeEX:
     moki:
       DoubleJump, Grapple
@@ -7404,9 +7415,11 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
     kii:
       Grapple, Sword OR Hammer OR Shuriken=1
       DoubleJump, Sword OR Spear=1
+      # Glitched
+      # GrenadeJump=1
     unsafe:
       Grapple, Sentry=2
-      Grenade=1
+      GrenadeJump OR AbilitySwap=1
   pickup InnerWellspring.GrappleTree:
     moki:
       DoubleJump OR Dash OR Glide OR Grapple OR Launch
