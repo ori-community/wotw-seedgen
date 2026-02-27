@@ -7498,14 +7498,22 @@ anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking th
     gorlek: Grapple, Glide OR Sword OR Hammer
     kii:
       Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Water, DoubleJump OR Grapple OR Dash OR Hammer OR Damage=30
-      Water, Bash, Grenade=1
-      Water, Damage=15, Sword
       DoubleJump, TripleJump, Damage=15  # Damage boost on the left in 2nd part
+      Water:  # Water removes some lasers, making the 1st and 3rd phase free
+        DoubleJump OR Grapple OR Dash OR Hammer OR Damage=30
+        Bash, Grenade=1
+        Damage=15, Sword
+      # Glitched
+      # Water, GlideJump OR GrenadeJump=1
+      # AerialHammerJump
+      # Grapple, GrenadeJump=1
     unsafe:
-      Grapple
+      Grapple OR SentryJump=1  # jump on top of the rotating wheel and sjump
       DoubleJump, TripleJump
-      Water, Spear=1 OR SentryJump=1 OR Damage=15
+      Water, Spear=1 OR SentryJump=1 OR Damage=15 OR GlideJump OR GrenadeJump
+      FlashSwap  # 3, or 2 flash + one swap
+      Blaze=1, BlazeSwap=2
+      Sentry=2, SentrySwap=1
 
   pickup InnerWellspring.RotateRoomEX:  # after pulling two of the three levers, this pickup is blocked off. Due to that, fully solving the puzzle is the only non-softlockable solution for this pickup
     moki: InnerWellspring.SpinPuzzleSolved
@@ -7515,10 +7523,16 @@ anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking th
   conn InnerWellspring.PastSpinPuzzle:  # while there are abilitysets to get through the spinning room regardless of state, they are more expensive than just solving the puzzle
     moki: InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
     gorlek: InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
-    kii: InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump, Damage=15
-    unsafe:
-      InnerWellspring.SpinPuzzleSolved, Dash, Damage=15
-      InnerWellspring.SpinPuzzleSolved, DoubleJump, TripleJump OR Damage=15
+    kii, InnerWellspring.SpinPuzzleSolved:
+      DoubleJump, TripleJump, Damage=15
+      # Glitched
+      # AerialHammerJump
+    unsafe, InnerWellspring.SpinPuzzleSolved:
+      Damage=15, Dash OR Hammer  # https://youtu.be/xVYFj5jgfxM
+      DoubleJump, TripleJump OR Damage=15
+      HammerSJump=1  # jump on top of the last spinning wheel so you can sjump
+      SwordSJump=1, DoubleJump OR Dash OR Shuriken=1 OR Flash=2 OR Sentry=1 OR Damage=15
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=2
   conn InnerWellspring.EastDoor:
     moki, InnerWellspring.SpinningRoomOpen:
       Grapple OR Launch
@@ -7529,6 +7543,8 @@ anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking th
     kii, InnerWellspring.SpinningRoomOpen:
       DoubleJump
       Dash, Hammer  # wall jump on the arena wall in order to reach the pole
+      # Glitched
+      # GlideJump OR GrenadeJump  # no energy cost because grabbing the pole cancels it automatically
     unsafe: InnerWellspring.SpinningRoomOpen  # precise wall jump to get on the pole
 
 anchor InnerWellspring.PastSpinPuzzle at -1101, -3778:  # Right after exiting the spin puzzle room
