@@ -7613,8 +7613,14 @@ anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the 
       Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
       Launch, DoubleJump, Dash OR Glide OR Sword OR Hammer OR Sentry=3
       WaterDash, Launch, Water OR Damage=20
+      # Glitched
+      # LaunchSwap, Damage=15 OR Water OR Glide OR Dash
+      # LaunchSwap, Sword, Hammer
+      # LaunchSwap, DoubleJump, Bash  # bash glide the Miner
     unsafe:
       Launch  # https://youtu.be/wbz2cLfuFOk
+      Grapple  # grapple the last bulb multiple time to make it swing
+      AbilitySwap=6  # https://youtu.be/hZcM1F_ZN38
   conn InnerWellspring.PastSpinPuzzle:  # Camera doesn't show the lower wheel when you are on the top one, making it difficult to rely on them in lower difficulties
     moki:
       Glide, Combat=2xSlug, DoubleJump OR Launch
