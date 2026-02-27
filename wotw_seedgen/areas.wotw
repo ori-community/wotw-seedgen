@@ -7462,7 +7462,11 @@ anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to t
     kii:
       Grapple, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
       DoubleJump, TripleJump
-    unsafe: DoubleJump
+      # Glitched
+      # Damage=15, GlideJump OR GrenadeJump=1
+      # AerialHammerJump OR SentryJump=1
+    unsafe:
+      DoubleJump OR GlideJump OR AbilitySwap=1 OR Damage=15
 
   conn InnerWellspring.SpinPuzzle:
     moki: InnerWellspring.SpinningRoomOpen
@@ -7476,7 +7480,11 @@ anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to t
       Grapple OR Launch
     kii, InnerWellspring.TopDoorOpen:
       DoubleJump, TripleJump, Hammer OR Spear=1
-    unsafe, InnerWellspring.TopDoorOpen: DoubleJump, TripleJump, Flash=1 OR Sentry=1
+      # Glitched
+      # SentryJump=1 OR AerialHammerJump
+    unsafe, InnerWellspring.TopDoorOpen:
+      DoubleJump, TripleJump
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump
 
 anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking the spin puzzle
   # Having water changes the lasers in the spin puzzle room to the right. Using this is only logically expected in kii and above
@@ -7592,7 +7600,7 @@ anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the 
       Grapple OR Damage=35  # Possible without any damage but this account for the worst case scenario of dbosting on both the laser and the spikes
     unsafe: free
 
-anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption which oppen the third room
+anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption which open the third room
   state InnerWellspring.TopDoorOpen:
     moki: BreakWall=16
 
