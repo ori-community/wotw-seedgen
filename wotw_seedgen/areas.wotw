@@ -7263,37 +7263,20 @@ anchor InnerWellspring.DrainRoomTop at -1086, -3908:  # At the right ledge on to
 anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room below the drain lever
   refill Checkpoint
 
-  state InnerWellspring.DrainLever:
+  conn InnerWellspring.AtDrainLever:
     moki:
-      Bash, Grenade=1  # not softlockable: UpperCorruption solves this
+      Bash, Grenade=1, DoubleJump  # not softlockable: UpperCorruption solves this
       InnerWellspring.UpperCorruption, DoubleJump
       Launch
     gorlek:
       InnerWellspring.UpperCorruption OR SentryJump=1
+      Bash, Grenade=1
     kii:
       DoubleJump, TripleJump, Damage=15  # Damage boost on the left
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer OR Shuriken=1
     unsafe: GrenadeJump
-
-  pickup InnerWellspring.LeverEC:
-    moki:
-      Bash, Grenade=2  # not softlockable: UpperCorruption solves this
-      Bash, Grenade=1, Grapple, DoubleJump OR Dash OR Glide  # not softlockable: UpperCorruption solves this
-      InnerWellspring.UpperCorruption, DoubleJump, Bash, Grenade=1
-      InnerWellspring.UpperCorruption, DoubleJump, Grapple
-      Launch
-    gorlek:
-      DoubleJump, TripleJump, Bash, Grenade=1
-      DoubleJump, TripleJump, InnerWellspring.UpperCorruption OR SentryJump=1
-      Bash, Grenade=1, Grapple
-      SentryJump=2
-      SentryJump=1, Grapple
-      InnerWellspring.UpperCorruption, Bash, Grenade=1
-      InnerWellspring.UpperCorruption, Grapple OR SentryJump=1
-    kii:
-      DoubleJump, TripleJump, Damage=15  # Damage boost on the left
-    unsafe:
-      GrenadeJump
-
   conn InnerWellspring.AbovePole:
     moki:
       DoubleJump, Dash OR Glide
@@ -7323,6 +7306,30 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: free
   conn InnerWellspring.DrainRoomCenter: free
+
+anchor InnerWellspring.AtDrainLever at -1119, -3876:  # Next to the lever which drains the 1st floor
+  state InnerWellspring.DrainLever: free
+
+  pickup InnerWellspring.LeverEC:
+    moki:
+      Bash, Grenade=1
+      DoubleJump, Grapple
+      Launch
+    gorlek:
+      DoubleJump, TripleJump, Sword OR Hammer
+      Grapple, Glide OR Sword OR Hammer
+      SentryJump=1
+    kii:
+      Grapple
+      DoubleJump, TripleJump, Damage=15
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer
+    unsafe:
+      DoubleJump, TripleJump OR Hammer OR Spear=1
+      GrenadeJump OR GlideJump OR AbilitySwap=1
+
+  conn InnerWellspring.BelowDrainLever: free
 
 anchor InnerWellspring.AbovePole at -1164, -3874:  # Under InnerWellspring.UpperCorruption
   state InnerWellspring.UpperCorruption:  # the fourth corruption you see on your way
