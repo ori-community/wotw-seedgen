@@ -7222,10 +7222,15 @@ anchor InnerWellspring.DrainRoomTop at -1086, -3908:  # At the right ledge on to
       Launch
     gorlek:
       DoubleJump OR Dash OR Sword
-      Glide, Combat=Miner OR Bash
-    kii: Combat=Miner, Shuriken=2 OR Blaze=4 OR Sentry=3
+      Glide, Combat=Miner OR Bash  # Possible to dboost through that Miner but most of the time the knockback is too strong to pass through them during your iframes
+    kii:
+      Combat=Miner, Shuriken=2 OR Blaze=4 OR Sentry=3
+      Bash, Shuriken=2 OR Blaze=4 OR Sentry=3
+      # Glitched
+      # GlideJump  # can jump above the Miner but it's much easier to grab the pole and glide over them
+      # GrenadeJump=1, Damage=15, Combat=Miner OR Bash
     unsafe:
-      Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=3 OR Sentry=2 OR Damage=15  # bait the gorlek into falling on the left so you don't have to fight it
+      Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=3 OR Sentry=2 OR Damage=15 OR GrenadeJump OR PauseFloat OR AbilitySwap=1  # bait the gorlek into falling on the left so you don't have to fight it
       Bash, Grenade=1  # there's a safe spot on the left of the laser, where you can charge your grenade safely
 
   conn InnerWellspring.DrainRoomCenter: free
@@ -7236,20 +7241,24 @@ anchor InnerWellspring.DrainRoomTop at -1086, -3908:  # At the right ledge on to
       Launch
     gorlek:
       DoubleJump, TripleJump OR Sword OR Hammer OR Damage=15
-      Dash, Glide OR Sword OR Hammer OR Damage=15
+      Combat=Miner, Dash, Glide OR Sword OR Hammer OR Damage=15
       Grapple, SentryJump=1
       Bash, Grenade=1, DoubleJump OR Dash OR Grapple
       SwordSJump=1, Glide
       InnerWellspring.DrainRoomTopWheel, Bash, Grenade=1
       InnerWellspring.DrainRoomTopWheel, SentryJump=1
     kii:
-      DoubleJump OR Dash
-      Grapple, Glide OR Sword OR Hammer OR Shuriken=1
+      DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash  # dash off the pole then airdash
+      Grapple, Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # jump above the rotating wheel
       Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # InnerWellspring.DrainRoomTopWheel, GrenadeJump=1, DoubleJump OR Hammer
     unsafe:
-      Grapple
-      # Grapple, Flash=1 OR Sentry=1
+      Grapple OR DoubleJump
+      Sword  # https://youtu.be/6mSxAtGVsOM
       Bash, Grenade=1
+      InnerWellspring.DrainRoomTopWheel, GrenadeJump
 
 anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room below the drain lever
   refill Checkpoint
