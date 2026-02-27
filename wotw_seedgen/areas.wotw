@@ -7693,7 +7693,9 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
     kii:
       Dash, Hammer
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # double jump can solve it by itself but the branch you are jumping from can be a bit janky
-    unsafe: Dash OR DoubleJump OR FlashSwap
+      # Glitched
+      # GlideJump OR GrenadeJump=1
+    unsafe: Dash OR DoubleJump OR AbilitySwap=1 OR GlideJump OR GrenadeJump OR WallHammerJump OR CoyoteHammerJump
 
   pickup InnerWellspring.LibraryEX: free
   pickup InnerWellspring.AboveTpEX:
@@ -7702,16 +7704,20 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
       Bash, Grenade=1
       Launch
     gorlek:
-      DoubleJump, TripleJump  # Can be done with just double jump but the first jump is precise
+      DoubleJump, TripleJump
       SentryJump=1
     kii:
       DoubleJump, Sword OR Sentry=3
       Dash, Sword OR Sentry=2
+      # Glitched
+      # AerialHammerJump OR GlideJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # Possible with just gjump but condition is so you can do it from outside the no ability zone from the TP
     unsafe:
-      DoubleJump, Hammer  # uses the wall to the left of tp
+      DoubleJump  # really hard wall jump to the left of tp
       Dash, Hammer  # path from the right, tight combos to reach the platform
       Shuriken=2, DoubleJump OR Dash OR Glide
-      FlashSwap
+      GrenadeJump OR AbilitySwap=1
+      # Blaze=1 OR Flash OR Sentry=1  # Use the no ability zone to ability swap without needing a second ability
       Bash, Water  # Juggle a fish
   pickup InnerWellspring.SwimOre:
     moki: Water
@@ -7736,12 +7742,15 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
     kii:
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Dash, Hammer, Grapple
+      # Glitched
+      # GrenadeJump=2 OR SentryJump=1
+      # GrenadeJump=1, DoubleJump OR Grapple OR GlideJump
     unsafe:
-      Dash OR DoubleJump OR SentryJump=1
-      FlashSwap OR BlazeSwap=2 OR SentrySwap=2 # Jump from the top of the stairs and climb the left wall.
+      Dash OR DoubleJump OR SentryJump=1 OR GlideJump
+      AbilitySwap=2  # Jump from the top of the stairs and climb the left wall.
       BlazeSwap=1 OR SentrySwap=1:
-        Sword OR Hammer OR Shuriken=1 OR Spear=1 OR Glide OR Flash=1 OR PauseFloat # Yep, difficult Blaze/Sentry swap and then Flash hop. Why not.
-      GrenadeJump
+        Sword OR Hammer OR Shuriken=1 OR Glide OR Flash=1 OR PauseFloat # Yep, difficult Blaze/Sentry swap and then Flash hop. Why not.
+      GrenadeJump OR WallHammerJump OR CoyoteHammerJump
 
 # checkpoint at -1249, -3641
 
