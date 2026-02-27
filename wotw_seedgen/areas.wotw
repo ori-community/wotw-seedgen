@@ -7666,8 +7666,11 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
         Damage=60, Combat=Miner OR Bash
         Damage=70
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # Glitched
+      # LaunchSwap
     unsafe:
       Launch  # There is a small ledge on the ceiling to reset launch
+      AerialHammerJump
 
 anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
   door:
