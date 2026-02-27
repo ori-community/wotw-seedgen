@@ -7523,8 +7523,8 @@ anchor InnerWellspring.SpinPuzzle at -1193, -3806:  # After the door blocking th
 
   conn InnerWellspring.PastSpinPuzzle:  # while there are skillsets to get through the spinning room regardless of state, they are more expensive than just solving the puzzle
     moki: InnerWellspring.SpinPuzzleSolved, Grapple OR Launch
-    gorlek: InnerWellspring.SpinPuzzleSolved, Water  # gorlek is fun
     kii, InnerWellspring.SpinPuzzleSolved:
+      Water
       DoubleJump, TripleJump, Damage=15
       # Glitched
       # AerialHammerJump
@@ -7785,7 +7785,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Grapple, Bash, Hammer
       Grapple, DoubleJump
       FlashSwap
-      # Same as Kii paths, but use two different energy weapons for energy management, since flash and shuriken cost less enegy than sentry
+      # Same as Kii paths, but use two different energy weapons for energy management, since flash and shuriken cost less energy than sentry
       Grapple, Bash, WaterDash, Damage=40, Sentry=2, Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
       Grapple, Bash, WaterDash, Damage=20, Sentry=2, Shuriken=2 OR Flash=2  # same as above but use both options
       Grapple, Bash, Sentry=4, Shuriken=2 OR Flash=2  # same as above but use 2 sentries to make the first jump
