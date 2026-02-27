@@ -7276,7 +7276,12 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
       # Glitched
       # AerialHammerJump
       # GrenadeJump=1, DoubleJump OR Dash OR Hammer OR Shuriken=1
-    unsafe: GrenadeJump
+      # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
+    unsafe:  # not listing hammer jumps because hammer is enough to solve InnerWellspring.UpperCorruption on its own
+      GrenadeJump OR AbilitySwap=2
+      GlideJump, DoubleJump  # https://youtu.be/75Ex9f2TwLQ
+      DoubleJump, Damage=15, Hammer
+      DoubleJump, Damage=30  # climb the left wall
   conn InnerWellspring.AbovePole:
     moki:
       DoubleJump, Dash OR Glide
@@ -7298,9 +7303,13 @@ anchor InnerWellspring.BelowDrainLever at -1153, -3895:  # In the first room bel
       SwordSJump=1, DoubleJump
       HammerSJump=1, DoubleJump, Glide
       SentryJump=2
+    # kii:
+    #   SwordSJump=1 OR AerialHammerJump OR GrenadeJump=2
+    #   HammerSJump=1, Damage=15  # dboot in the spikes to grab the wheel from the left 
+    #   GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Grenade=2
-      SentryJump=1, Damage=15
+      GrenadeJump OR SentryJump=1
+      AbilitySwap=2  # jump from the pole
       DoubleJump, Damage=30
   conn InnerWellspring.DrainRoomTop:
     moki: DoubleJump OR Dash OR Glide OR Launch
