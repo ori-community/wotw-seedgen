@@ -257,6 +257,10 @@ pub enum Difficulty {
     Unsafe,
 }
 
+// TODO compability aliases?
+// PauseHover -> PauseFloat
+// HammerJump -> AerialHammerJump
+// ExtendedHammer -> HammerExtension
 /// A Trick that can be logically required
 ///
 /// This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting

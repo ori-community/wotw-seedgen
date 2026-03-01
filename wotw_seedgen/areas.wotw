@@ -62,11 +62,21 @@ anchor HeaderStates:  # States you need to resolve by using the !!set command in
     moki: Impossible
   state SkipMora2:  # Used to logically support skipping Mora's second combat phase
     moki: Impossible
+  state RemoveTPRequirements:  # Used to logically remove the skills requirement for teleporters
+    moki: Impossible
+  state BaurWithBlaze:  # Used to logically support opening Reach with Blaze
+    moki: Impossible
+  state BaurWithFlash:  # Used to logically support opening Reach with Flash
+    moki: Impossible
 
 anchor Teleporters:  # teleporter access
+  state FreeTeleporters:
+    moki: RemoveTPRequirements
+    unsafe: Unpopular
+
   conn MidnightBurrows.Teleporter:
-    moki: BurrowsTP, Bash, Keystone=2
-    unsafe: BurrowsTP, Keystone=2, Unpopular OR Shuriken
+    moki: BurrowsTP, Keystone=2, Bash OR FreeTeleporters
+    unsafe: BurrowsTP, Keystone=2, Shuriken
     # okay, soooo: this TP frequently unlocks exactly 4 pickups (the vanilla keystones in that area)
     # It also makes a 4 keystone door available! Without the Keystone=2 line here, the seed generator
     # picks this path, unlocking 4 pickups, then immediately fills those with keystones and gets stuck
@@ -85,34 +95,33 @@ anchor Teleporters:  # teleporter access
   conn WoodsMain.Teleporter:
     moki: WoodsExitTP
   conn LowerReach.Teleporter:
-    moki: ReachTP, Flap
-    unsafe: ReachTP, Unpopular
+    moki:
+      ReachTP, Flap OR FreeTeleporters
+      ReachTP, BaurWithBlaze, Blaze
+      ReachTP, BaurWithFlash, Flash
   conn UpperDepths.Teleporter:
-    moki: DepthsTP, Glide
-    unsafe: DepthsTP, Unpopular
+    moki: DepthsTP, Glide OR FreeTeleporters
   conn EastPools.Teleporter:
-    moki: CentralPoolsTP, Water
-    unsafe: CentralPoolsTP, Unpopular
+    moki: CentralPoolsTP, Water OR FreeTeleporters
   conn WestPools.Teleporter:
-    moki: PoolsBossTP, Water, WaterDash
-    unsafe: PoolsBossTP, Unpopular OR Water
+    moki:
+      PoolsBossTP, Water, WaterDash
+      PoolsBossTP, FreeTeleporters
+    unsafe: PoolsBossTP, Water
   conn LowerWastes.WestTP:
     moki: FeedingGroundsTP
   conn LowerWastes.EastTP:
-    moki: CentralWastesTP, Burrow
-    unsafe: CentralWastesTP, Unpopular
+    moki: CentralWastesTP, Burrow OR FreeTeleporters
   conn UpperWastes.NorthTP:
-    moki: OuterRuinsTP, Burrow
-    unsafe: OuterRuinsTP, Unpopular
+    moki: OuterRuinsTP, Burrow OR FreeTeleporters
   conn WindtornRuins.RuinsTP:
-    moki: InnerRuinsTP, Burrow, EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
-    unsafe: InnerRuinsTP, Unpopular
+    moki:
+      InnerRuinsTP, Burrow, EastHollow.ForestsVoice, LowerReach.ForestsMemory, UpperDepths.ForestsEyes, WestPools.ForestsStrength
+      InnerRuinsTP, FreeTeleporters
   conn WillowsEnd.InnerTP:
-    moki: WillowTP, Burrow
-    unsafe: WillowTP, Unpopular
+    moki: WillowTP, Burrow OR FreeTeleporters
   conn WillowsEnd.ShriekArena:
-    moki: ShriekTP, Burrow
-    unsafe: ShriekTP, Unpopular
+    moki: ShriekTP, Burrow OR FreeTeleporters
 
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / marsh well
   refill Full
@@ -144,7 +153,7 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / marsh well
       Launch  # Launching along the ceiling, starting above the LongSwimEX
       Grapple, Spear=1 OR Blaze=2
       HowlsDen.RainLifted, DoubleJumpBashChain OR GlideBashChain   # Chain bash the mantis
-      Unpopular, HowlsDen.RainLifted, DashBashChain  # Chain bash the slime
+      HowlsDen.RainLifted, Unpopular, DashBashChain  # Chain bash the slime
       # Glitched:
       SentryJump=1, DoubleJump  # walljump on the small wall above the grappable plant. With sword, djump+upslash
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
@@ -291,9 +300,9 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       CoyoteHammerJump, WallHammerJump  # Have to equip hammer on ability 3 
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR GlideJump OR GrenadeJump
       DoubleJump, Dash, Sword  # coyote dash from under the grappable plant
-      Grapple, Bash OR DoubleJump OR Dash  # Swing the plant with Grapple
+      Grapple, DoubleJump OR Dash  # Swing the plant with Grapple
       GlideJump, GrenadeJump, Dash
-      GrenadeJump, Bash
+      Bash  # In rain, use a slug. If rain lifted use the kii path
 
   conn MarshSpawn.RegenDoor:
     moki: MarshSpawn.KeystoneDoor
@@ -730,6 +739,7 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
       # Launch, Glide, GrenadeJump=1  # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathEX
     unsafe:
       Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
+      Bash, Water, WaterDash  # https://youtu.be/zUSZakWugmw
       Launch  # https://youtu.be/ZHr718BCSaA
       DoubleJump, Deflector, Sword, Damage=10 OR TripleJump  # https://youtu.be/f-0Q8yuKV_g
       DoubleJump, TripleJump, Deflector, Hammer, Damage=10  # https://youtu.be/_Fz20Cd4WBU
@@ -957,8 +967,9 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EC
       GlideJump, BlazeSwap=1 OR SentrySwap=1  # same as above
       FlashSwap OR BlazeSwap=2 OR SentrySwap=2
-      HowlsDen.RainLifted, GlideBashChain, DashBashChain  # use the enemy for everything
       GrenadeJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
+      HowlsDen.RainLifted, GlideBashChain  # Avoid bashing the lizard against the ceiling as it makes it despawn https://youtu.be/BafiLyq5-gk
+      #HowlsDen.RainLifted, GlideBashChain, GlideJump  # BashGlideJump https://youtu.be/P4cEVJRG1RY
 
   conn MarshSpawn.MokkTheBrave: free
   conn MarshSpawn.FangPlatform:
@@ -1140,6 +1151,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     moki: HowlsDen.SwordTree
   state HowlsDen.BoneBarrier:  # the barrier blocking the lowest part of Howl's Den
     moki: BreakWall=16
+    unsafe: HowlsDen.RainLifted, Unpopular, Bash, UltraBash  # Lure any enemies to the semisolid platform and UltraBash Ori against the wall
 
   quest HowlsDen.SwordTree: free
 
@@ -1201,7 +1213,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     unsafe:
       HowlsDen.RainLifted, GlideBashChain  # Bash chain
       HowlsDen.RainLifted, Bash, Grapple, GrenadeCancel OR Grenade=1  # Zoomie off the mantis
-      Unpopular, HowlsDen.RainLifted, Bash, HowlsDen.BoneBarrier  # https://youtu.be/j7sRVpO-s00
+      HowlsDen.RainLifted, HowlsDen.BoneBarrier, Unpopular, Bash  # https://youtu.be/j7sRVpO-s00
   conn HowlsDen.BoneBridgeDoor:
     moki: HowlsDen.KeystoneDoor
   conn HowlsDen.AboveTeleporter:
@@ -1547,7 +1559,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
   conn MarshPastOpher.PoolsPathEast:  # Paths which can't start from MarshPastOpher.OpherSkipBranch (mainly because it uses enemies)
     unsafe:
       Water, Bash  # https://youtu.be/9LEokEz5GtA
-      Unpopular, DashBashChain, MarshSpawn.ToOpherBarrier  # Use the slug from MarshSpawn.Main. Normal and above can use the slime from the jump pad but it doesn't spawn in easy.
+      MarshSpawn.ToOpherBarrier, Unpopular, DashBashChain  # Use the slug from MarshSpawn.Main. Normal and above can use the slime from the jump pad but it doesn't spawn in easy.
 
 anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
 # This anchor is a midway for going to MarshPastOpher.PoolsPathEast, since both paths from MarshPastOpher.MillView and MarshPastOpher.BowApproach want to reach that branch
@@ -1637,6 +1649,7 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
     unsafe:
       Damage=10
       Grenade=1 OR GrenadeCancel # Use grenade before landing on the left bouncepad
+      Unpopular, Bash  # Can place the slug on the lower bouncepad and juggle yourself up. Precise.
   pickup MarshPastOpher.TrialHC:
     moki: Hammer OR Spear=1
     unsafe: free  # the mantis usually jump into spikes
@@ -1885,7 +1898,7 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
       AerialHammerJump OR WallHammerJump OR GlideHammerJump OR CoyoteHammerJump
       GrenadeJump, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash  # Repositioning the squonkey: squonkey respawns when u jump off to the east and back on the ledge
-      DoubleJump, TripleJump, Hammer  # upslash near the checlpointthen tjump
+      DoubleJump, TripleJump, Hammer  # upslash near the checkpoint then tjump
       DoubleJump, Sword  # Pogo on a bat projectile
 
   conn MarshPastOpher.PoolsPathMiddle:  # the squonkey doesn't reappear if you respawn on this checkpoint
@@ -1902,6 +1915,7 @@ anchor MarshPastOpher.PoolsPathEast at -662, -4241:  # On the wood sticking out 
     unsafe:
       Launch
       Bash, GrenadeJump OR Grenade=1 OR Hammer OR Flash=1 OR Sentry=1 OR Damage=10  # Would be just bash if the second bat was dropping a bit from time to time
+      Bash, Grapple, UltraGrapple  # Same as above
       DoubleJump, Sword  # https://youtu.be/5DXMPrR-RZo
       DoubleJump, TripleJump, Damage=10  # https://youtu.be/LzSvtNAIQ7I
       GrenadeJump, DoubleJump  # aerial gjump at the second bat to get a wall jump just above that bat
@@ -1975,6 +1989,7 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       Hammer, DoubleJump OR Water OR Damage=10  # https://youtu.be/Qt6Jfi3675I
       WaterDash, GlideJump, Water OR Damage=10
       WaterDash, GrenadeJump, Water OR Damage=10
+      Bash  # Bring the crab
   conn MarshPastOpher.PoolsPathEast:
     moki: Bash
     gorlek:
@@ -2174,10 +2189,8 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
     gorlek: ShurikenBreak=20
 
 region MidnightBurrows:
-  moki: Danger=25
+  moki: Danger=25  # 10 from enemy projectile + 15 from spikes
   gorlek: free
-  kii: free
-  unsafe: free
 
 anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
   refill Full
@@ -2258,7 +2271,7 @@ anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big port
       # DoubleJump
       # DoubleJump, Sentry=2
       GrenadeJump OR CoyoteHammerJump OR WallHammerJump
-      MidnightBurrows.Lever, Damage=15
+      MidnightBurrows.Lever  # Jump into the portals at the bottom and wait until you get enough height. Either go to the wooden platform directly or CoyoteJump from the portal ledge
 
   conn MidnightBurrows.BelowLupo: free
   conn MidnightBurrows.TabletRoom:
@@ -2495,10 +2508,8 @@ anchor MidnightBurrows.BelowUpperKS at -724, -4524:  # Just below the upper keys
       Damage=150
 
 region WestHollow:
-  moki: Danger=20
+  moki: Danger=20  # 10 from enemies + 10 from spikes
   gorlek: free
-  kii: free
-  unsafe: free
 
 anchor WestHollow.Entrance at -303, -4238:  # At Twillen
   refill Checkpoint
@@ -2770,6 +2781,11 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       Bow=1, AerialHammerJump OR CoyoteHammerJump OR WallHammerJump OR GlideHammerJump
   state WestHollow.UpperTongueExtended:
     unsafe: Bow=1  # TP to avoid touching the water
+  state WestHollow.UpperTongueRetracted:
+    # Paths using FullyDrained originate from SubmergedPlatform, check there for more details on this state.
+    unsafe:
+      WestHollow.UpperDrainLeverPulled  # https://youtu.be/mmNLRbJQMCc. Unverified for other aspect ratios / load times.
+      # WestHollow.UpperDrainLeverPulled, Sword
 
   pickup WestHollow.RockPuzzleEX:
     moki: WestHollow.FullyDrained
@@ -2952,10 +2968,12 @@ anchor WestHollow.SubmergedPlatform at -215, -4288:  # the platform below Hollow
     moki, WestHollow.FullyDrained: Combat=BombSlug, Bow=1  # camera won't show the frog statue unless you kill the slug
     unsafe: Bow=1  #Snipe
   state WestHollow.UpperTongueRetracted:  # This tongue can be a negative for the HollowDrainMiddle connection so we need a state for retracting it to prevent softlocks.
-  # Unlike when coming from above, you can screw yourself here without any stupid headers by extending the tongue and blocking your line of sight to retract it again, so we choose to write paths for this scenario
-    moki, WestHollow.FullyDrained: WestHollow.LowerTongueExtended, Combat=BombSlug, Bow=1
-    gorlek, WestHollow.FullyDrained: WestHollow.LowerTongueExtended, Bow=1
-    unsafe: WestHollow.FullyDrained, Bow=1  # shot midair then teleport back
+    # Unlike when coming from above, you can screw yourself here without any stupid headers by extending the tongue and blocking your line of sight to retract it again, so we choose to write paths for this scenario
+    # Notably, since we are ignoring headers, the tongue can only be extended if the player is able to fire a Bow. Otherwise, it is retracted by default.
+    # This means we don't have to explicitely require the Bow weapon, although if the movement before consumes energy, we'd ideally ensure enough energy is left to use the Bow afterwards.
+    moki: WestHollow.FullyDrained, WestHollow.LowerTongueExtended, Combat=BombSlug OR Dash OR Damage=10  # Some lenience over dodging the BombSlug, although dodging could still be required if the player only has energy for exactly one Bowshot.
+    gorlek: WestHollow.FullyDrained, WestHollow.LowerTongueExtended
+    unsafe: WestHollow.FullyDrained  # shoot midair then teleport back
   state WestHollow.LowerTongueExtended:
     moki, WestHollow.FullyDrained: Combat=BombSlug, Bow=1  # need to kill the slug in order to aim the frog statue
     unsafe, WestHollow.FullyDrained: Bow=1  # waiting long enough on the left of the energy crystal will zoom out the camera and allow to autoaim the statue
@@ -3430,10 +3448,8 @@ anchor WestHollow.AboveDashSemisolid at -81, -4411:  # the semisolid near WestHo
     unsafe: WestHollow.DoorLever, Bash  # Bash the slime on the log above, use the mantis to go there too. Precise bash angle to send the slime in the spikes and bash it again after it dies. Also, the skeeto can come in the spikes area, making that path waaaaay easier
 
 region EastHollow:
-  moki: Danger=20
+  moki: Danger=20  # 10 from spikes + 10 from enemies
   gorlek: free
-  kii: free
-  unsafe: free
 
 anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
   # before writing any paths that use the (left) mantis or the skeeto, please remember they only spawn when the player has bash
@@ -3605,6 +3621,10 @@ anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
 
   conn GladesTown.Teleporter:
     moki: GladesTown.GromsWall
+  conn GladesTown.AboveOpher:
+    unsafe: GladesTown.GromsWall, Unpopular, Bash  # Very precise mortar projectile redirects
+  conn TuleyShop:
+    unsafe: GladesTown.GromsWall, GladesTown.TuleySpawned, Unpopular, Bash  # Very precise mortar projectile redirects
   conn EastHollow.MapMoki: free
 
 anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to Bash tree
@@ -3892,6 +3912,7 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
       GlideJump, Hammer OR Spear=2
       GrenadeJump, DoubleJump
       DoubleJump, Dash OR Hammer
+      Bash  # Bait the SneezeSlug to shoot at you from the ledge and juggle its projectile
       
   conn EastHollow.DepthsLeverDoor:
     moki:
@@ -5172,10 +5193,8 @@ anchor GladesTown.InsideHoleHut at -107, -4506:  # Inside the hut with 2 pickups
 
 
 region WestGlades:
-  moki: Danger=20
+  moki: Danger=30  # 10 from enemies + 20 from poisoned water
   gorlek: free
-  kii: free
-  unsafe: free
 
 anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower pool in WestGlades
   refill Checkpoint
@@ -5512,7 +5531,10 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap
+    moki:
+      Flap
+      BaurWithBlaze, Blaze
+      BaurWithFlash, Flash
 
   pickup WestGlades.UpperPoolEX:
     moki: Water
@@ -5750,10 +5772,8 @@ anchor GladesShrine at -635, -4020:
     moki: WestGlades.CombatShrineCompleted
 
 region OuterWellspring:
-  moki: Danger=25
+  moki: Danger=30  # 20 from poisoned water + 10 from enemies
   gorlek: free
-  kii: free
-  unsafe: free
 
 anchor OuterWellspring.CutsceneIsland at -756, -4071:  # The island on the right of the entrance, where the wellspring cutscene plays out
   conn OuterWellspring.EntranceDoor:
@@ -6656,6 +6676,7 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Grapple  # https://youtu.be/vI511KFMZWI
       SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR AbilitySwap=2
       GrenadeJump, DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 # https://youtu.be/_9NDzS77mck
+      GlideBashChain  # Beetle
   pickup OuterWellspring.RightWallEC:
     moki, BreakWall=20:
       DoubleJump, Dash
@@ -6667,6 +6688,9 @@ anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towar
       Damage=15, Spear=1 OR Blaze=1
       Damage=15, Bash  #land in the spikes to jump on the wheel then bash glide of the bee
     unsafe, BreakWall=20: Bash OR Spear=1 OR Blaze=1  # land on the friendly spikes, at the very edge of the spikes
+  pickup OuterWellspring.UltraGrappleShard:
+    unsafe:
+      GlideBashChain OR DoubleJumpBashChain  # Beetle
 
   conn OuterWellspring.TrialRoom:
     moki:
@@ -6768,10 +6792,8 @@ anchor OuterWellspring.TrialStart at -665, -3937:
       GrenadeJump
 
 region InnerWellspring:
-  moki: Danger=25
+  moki: Danger=30  # 20 from poisoned water or lasers + 10 from enemies
   gorlek: free
-  kii: free
-  unsafe: free
 
 anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where you enter the first room
   door:
@@ -6804,6 +6826,7 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
       # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       DoubleJump, TripleJump OR GlideJump
+      DoubleJump, Dash  # Climb the right wall https://youtu.be/s9TIZXu8pyM
       GrenadeJump OR AbilitySwap=1
   pickup InnerWellspring.WaterSwitchEX:
     moki, InnerWellspring.WaterDashSwitch: Water
@@ -7357,7 +7380,7 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
     enter:
       moki: InnerWellspring.MiddleDoorsOpen
   refill Checkpoint
-  refill Health=2
+  refill Health=2  # There are two health plants reachable for free (one on both side of the door)
   refill Energy=3:
     moki: BreakCrystal
 
@@ -7796,9 +7819,11 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
     moki: InnerWellspring.WaterEscape
 
 region WoodsEntry:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=35, Regenerate  # 20 from balloons + 15 from spikes
+  gorlek:
+    Danger=15, Regenerate  # 15 from spikes
+    Danger=35
+  kii: Danger=15
   unsafe: free
 
 anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through the Hollow connection
@@ -8011,9 +8036,11 @@ anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone doo
     unsafe: Sentry=1 OR Flash=1
 
 region WoodsMain:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=35, Regenerate  # 20 from balloons + 15 from spikes
+  gorlek:
+    Danger=15, Regenerate  # 15 from spikes
+    Danger=35
+  kii: Danger=15
   unsafe: free
 
 anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to the room after finding Ku
@@ -8309,6 +8336,7 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
     unsafe:
       DoubleJump, Combat=Balloon, Dash OR TripleJump
       Launch  # Use launch invulnerability to protect you from balloon's explosions
+      DoubleJump, Flap  # Damage=10 if you don't want to bait the plant. https://youtu.be/xaUHPg2MUwc
   state WoodsMain.BalloonLureYellowBarrierBroken:
     moki: WoodsMain.BalloonLureBlobDestroyed, Flap, Glide
     gorlek: WoodsMain.BalloonLureBlobDestroyed, Flap, Launch
@@ -8348,6 +8376,8 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
       DoubleJump, Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Damage=15
       Bash, Hammer OR Shuriken=1 OR Sentry=2
       Grenade=1, Bash
+    unsafe:
+      DoubleJump  # Specific bait to jump over the tentacle. You can take 10hp of contact damage instead. https://youtu.be/oE3V_4WgTnY
 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   state WoodsMain.BalloonLureBlobDestroyed:
@@ -8382,7 +8412,7 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
       DoubleJump, Damage=45
       DoubleJump, Damage=15, TripleJump OR Bash  # With bash, bait the skeeto
     unsafe:
-      DoubleJump, Damage=30
+      DoubleJump, Damage=30 OR Bash  # With bash, bait the skeeto
       DoubleJump, Damage=15, Shuriken=2 OR Flash=2 OR Sentry=2
   conn WoodsMain.BalloonLure:
     moki: WoodsMain.BalloonLureBlobDestroyed, Combat=Tentacle OR Bash
@@ -8455,6 +8485,12 @@ anchor WoodsMain.BrokenOwl at 848, -4058:  # At the collapsing petrified Owl
     gorlek: Bash OR Hammer OR SwordSJump=1
     kii: Sword  # Pogo a skeeto
     unsafe: free  # just die/reload
+  conn WoodsMain.TrialEnd:
+    unsafe:
+      Bash, DoubleJump OR Glide  # The skeeto will chase you all the way. Use air stall
+  conn WoodsMain.OrangeTree:
+    unsafe:
+      Bash  # The skeeto will chase you all the way. You can use it to bash over the tree
 
 anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
   refill Checkpoint:  # refill by starting the trial
@@ -8783,9 +8819,11 @@ anchor WoodsShrine at 1361, -4068:
     moki: WoodsMain.CombatShrineCompleted
 
 region LowerReach:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=40, Regenerate  # 20 from spikes + 20 from ShieldMiner's hammer attack
+  gorlek:
+    Danger=20, Regenerate  # 20 from spikes
+    Danger=40
+  kii: Danger=20
   unsafe: free
 
 anchor LowerReach.Entry at -390, -4025:  # Behind Baur
@@ -10198,9 +10236,11 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
       FlashSwap
 
 region UpperReach:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=40, Regenerate  # 20 from spikes + 20 from ShieldMiner's hammer attack
+  gorlek:
+    Danger=20, Regenerate  # 20 from spikes
+    Danger=40
+  kii: Danger=20
   unsafe: free
 
 anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
@@ -10756,9 +10796,11 @@ anchor UpperReach.SeedHut at -131, -3857: # inside the hut with the seed
 
 
 region UpperDepths:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=40, Regenerate  # 30 from spikes + 10 from enemies
+  gorlek:
+    Danger=30, Regenerate  # 30 from spikes
+    Danger=40
+  kii: Danger=30
   unsafe: free
 
 anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the entrance
@@ -10778,6 +10820,9 @@ anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the
       Damage=40, Dash OR Sword OR Shuriken=4
       Glide
       Damage=70, Sentry=4 OR Flash=4
+    unsafe:
+      Unpopular, Bash  # Fake bash the falling slug. https://youtu.be/0yagLd-HEJ8
+      Bash, DoubleJump OR Damage=10  # Same as above but either bash the slime or avoid it completely. https://youtu.be/kVYfydMo4js
   conn EastHollow.AboveDepths:
     moki: EastHollow.DepthsOpen, Glide
     gorlek, EastHollow.DepthsOpen:
@@ -11051,7 +11096,7 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
   conn UpperDepths.Central:  # paths using the firefly have to go from the teleporter
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
     gorlek: DepthsLight
-    unsafe: Unpopular, Bash, Dash  # Extremely tight timing. Use the bat projectile to accelerate downwards. https://youtu.be/gXOM9NRkSI8
+    unsafe: Unpopular, Dash, Bash  # Extremely tight timing. Use the bat projectile to accelerate downwards. https://youtu.be/gXOM9NRkSI8
   conn UpperDepths.LowerConnection:
     moki: DepthsLight, DoubleJump OR Dash OR Glide OR Launch  # a bit scary...
     gorlek: DepthsLight
@@ -11163,6 +11208,7 @@ anchor UpperDepths.SecondKSRoom at 542, -4466:  # The egg of the firefly circlin
       DepthsLight, DoubleJump, TripleJump OR Sword  # go around to the right and then jump to the left
     unsafe:
       DepthsLight, DoubleJump, Hammer  # go around to the right and then jump to the left
+      UpperDepths.ForestsEyes, Bash  # Forests eyes toggles enemies and provides light. For this path you need both the sneezeslug and light. Loop around to the right, bash the sneezeslug above to the semisolid and bait its projectiles.
 
   conn UpperDepths.Central:
     moki:
@@ -11407,9 +11453,11 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
       DepthsLight, Damage=90
 
 region LowerDepths:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=40, Regenerate  # 30 from spikes + 10 from enemies
+  gorlek:
+    Danger=30, Regenerate
+    Danger=40
+  kii: Danger=30
   unsafe: free
 
 anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
@@ -11913,9 +11961,11 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
     unsafe: DepthsLight OR LaunchSwap  # Launch Swap: right side of first cocoon -> left side of second cocoon -> all the way across.
 
 region PoolsApproach:
-  moki: Danger=25, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=30, Regenerate  # 20 from spikes + 10 from enemies
+  gorlek:
+    Danger=20, Regenerate  # 20 from spikes
+    Danger=30
+  kii: Danger=20
   unsafe: free
 
 anchor PoolsApproach.MillPathCheckpoint at -826, -4130:  # The checkpoint halfway between Mill Approach and Mill Path (added mostly because the paths through here reached ridiculous complexity otherwise)
@@ -12569,9 +12619,11 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
     unsafe: WaterDash, Damage=180  # 'u'
 
 region EastPools:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=34, Regenerate  # 20 from spikes + 14 from torpedos
+  gorlek:
+    Danger=20, Regenerate  # 20 from spikes
+    Danger=34
+  kii: Danger=20
   unsafe: free
 
 anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
@@ -12990,6 +13042,8 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
       WaterDash, Damage=40
     unsafe, EastPools.LowerWaterDrained:
       Damage=80
+  conn EastPools.FishingPool:  # This path starts here because it's the closest to the torpedo
+    unsafe: EastPools.LowerWaterDrained, Water, Bash  # Juggle the torpedo
 
 anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
   quest EastPools.HandToHandSpyglass:
@@ -13343,6 +13397,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       SentryJump=2  # sjump to GrassSeed, sjump from GrassSeed
       EastPools.CentralRoomBubbleFree, Bash, DoubleJump  # djump onto bubble from the top-right side forcing a walljump on the bubble, djump on top to land
       EastPools.CentralRoomBubbleFree, Bash, Dash, Damage=60  # dash into bubble from the top-right, dash into left wall with spikes and wait there, dash back into the next bubble
+      EastPools.CentralRoomBubbleFree, Water, WaterDash, Bash  # Bait a plant projectile
   conn WestPools.Teleporter:
     moki: Water, WaterBreath, WaterDash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Water, WaterDash, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=20
@@ -13357,6 +13412,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Water, WaterBreath, DoubleJump, GrenadeJump OR AerialHammerJump  # With grenade jumps, start a grenade jump while in the water then use your doublejump
       Water, WaterBreath, DoubleJump, TripleJump, Damage=20
       Water, WaterBreath, SwordJump, Damage=20  # sword jump in the left munchers, walljump then sword jump+ uplash on the right wall
+      Water, WaterDash  # You can walljump to a higher wall segment that allows you to clear the spikes
   conn EastPools.MissilePuzzle:
     moki, EastPools.CentralRoomPurpleWall: Water
     kii, EastPools.CentralRoomPurpleWall:
@@ -13370,9 +13426,11 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
     unsafe, EastPools.CentralRoomPurpleWall, EastPools.LupoPurpleFloor: Damage=180
 
 region UpperPools:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=34, Regenerate  # 20 from spikes + 14 from torpedos
+  gorlek:
+    Danger=20, Regenerate  # 20 from spikes
+    Danger=34
+  kii: Danger=20
   unsafe: free
 
 # checkpoint at -1425, -4144
@@ -14131,9 +14189,11 @@ anchor UpperPools.LeftBubbleSpamRoom at -1634, -4052:  # At the checkpoint on to
 # checkpoint at -1386, -4062
 
 region WestPools:
-  moki: Danger=40, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=30, Regenerate  # 20 from spikes + 10 from enemies (which spawn after defeating Kwolok)
+  gorlek:
+    Danger=20, Regenerate  # 20 from spikes
+    Danger=30
+  kii: Danger=20
   unsafe: free
 
 anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
@@ -14280,9 +14340,11 @@ anchor KwolokFight at -1978, -4135:
     unsafe: Boss=250
 
 region LowerWastes:
-  moki: Danger=50, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=50, Regenerate  # 30 from spikes + 20 from MaceMiner's hammer attack
+  gorlek: 
+    Danger=30, Regenerate  # 30 from spikes
+    Danger=50
+  kii: Danger=30
   unsafe: free
 
 # TODO synchronize teleporter names
@@ -14467,6 +14529,8 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
     kii:
       DoubleJump
       Bash, Hammer OR Spear=1 OR Grenade=1  # Break the slime's shell in order to bash it
+    unsafe:
+      Bash  # Use the mantis to break the slime's shell
   pickup LowerWastes.SandPotEX:
     moki, Burrow:
       Dash, Grapple, DoubleJump OR Glide
@@ -14670,7 +14734,7 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Bash, DoubleJump, TripleJump OR Dash  # Bash glide from the gorlek's projectile
     unsafe:
       Grapple, Glide, Spear=1
-  conn WindtornRuins.LowerRuins:
+  conn WindtornRuins.MapstoneAltar:
     gorlek: ShurikenBreak=20, Burrow
 
 anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the lever
@@ -14952,9 +15016,11 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
     kii: Burrow
 
 region UpperWastes:
-  moki: Danger=50, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=50, Regenerate  # 30 from spikes + 20 from MaceMiner's hammer attack
+  gorlek:
+    Danger=30, Regenerate  # 30 from spikes
+    Danger=50
+  kii: Danger=30
   unsafe: free
 
 anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone door
@@ -15328,12 +15394,6 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
     unsafe: free  # Precise wall jumping required. Lure the mantis onto the platform to get it out of the way.
   # Connecting to RuinsApproach would be redundant because it needs Burrow
 
-region WindtornRuins:
-  moki: Danger=50, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
-  unsafe: free
-
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3834:  # Just inside the door.
   door:
     id: 28
@@ -15360,90 +15420,116 @@ anchor WindtornRuins.BrokenMural at 2108, -3959:  # At the broken mural above th
   conn WindtornRuins.RuinsTP:  # check for redundancies with FallenPillar
     gorlek:
       Burrow, DoubleJump OR Dash OR Glide OR Sword  # Just hold right. Or if you drop down, some can recover jumping from the right wall and burrowing through the sand platform
-      WindtornRuins.HeartBarrier, Glide OR Dash
-      WindtornRuins.HeartBarrier, DoubleJump, TripleJump OR Sword OR Hammer
+      WindtornRuins.TeleporterCorruption, Glide OR Dash
+      WindtornRuins.TeleporterCorruption, DoubleJump, TripleJump OR Sword OR Hammer
     kii:
-      WindtornRuins.HeartBarrier, Hammer OR Sword OR Sentry=2
+      WindtornRuins.TeleporterCorruption, Hammer OR Sword OR Sentry=2
       Burrow, Hammer
-      Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbing platform
-    unsafe: Burrow  # at the pilar, hold up+right and burrow through the crumbing platform
+      Burrow, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbling platform
+    unsafe:
+      Burrow  # slide down the pillar, hold up+right and burrow through the crumbling platform
+      WindtornRuins.TeleporterCorruption, GrenadeJump  # GrenadeCancel to reach the platform, then GrenadeJump https://youtu.be/CzoURpEZPFA
+      WindtornRuins.TeleporterCorruption, SpearJump=1, Spear=2  # Spear to reach the platform, SpearJump off the platform, safety spear to reach the wall
+      WindtornRuins.TeleporterCorruption, PauseFloat OR AbilitySwap=1 OR Shuriken=2 OR DoubleJump  # Starting from a small ledge in the pillar. DJ is too inconsistent for kii
 
 anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from the Broken Mural
-  state WindtornRuins.HeartBarrier:
-    # Most of these paths go to the teleporter and break the corruption heart. But they can't be used as connection to the teleporter anchor because after you broke the heart, you can't go to the teleporter again by using those paths.
-    # While breaking the heart always teleport you near the teleporter afterwards (even when using Shuriken/Sentry breaks, which means you'll be able to teleport there whenever you want), the edgecase of using an header to break this corruption from the start makes those paths not viable as connections to the teleporter.
+  state WindtornRuins.TeleporterCorruption:
+    # Most of these paths go to the teleporter and break the corruption blob. But they can't be used as connection to the teleporter anchor because after you broke the blob, you can't go to the teleporter again by using those paths.
+    # While breaking the blob always teleport you near the teleporter afterwards (even when using Shuriken/Sentry breaks, which means you'll be able to teleport there whenever you want), the edgecase of using a header to break this corruption from the start makes those paths not viable as connections to the teleporter.
     moki, BreakWall=16:
       Burrow, DoubleJump OR Dash OR Glide OR Launch
       Burrow, Bash, Grenade=1
     gorlek: Burrow, BreakWall=16
-    unsafe: ShurikenBreak=16 OR SentryBreak=16
+    unsafe: ShurikenBreak=16 OR SentryBreak=16 OR Blaze=2
 
-  conn WindtornRuins.RuinsTP:  # this accounts for both situations of having broken the heart or not
+  conn WindtornRuins.BrokenMural:
+    # If the corruption blob is not broken, this connection is free. The paths need to solve assuming that the blob is broken
     moki:
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide
+      Launch
+    gorlek:
+      SentryJump=1
+      Bash, Grenade=1
+    kii:
+      DoubleJump, TripleJump, Sword OR Hammer OR Sentry=1 OR Spear=1 OR Flash=1 OR Shuriken=1
+      # Glitched
+      # GlideJump, DoubleJump, Sword OR Hammer OR Sentry=1 OR Spear=1 OR Flash=1 OR Shuriken=1
+      # GrenadeJump=1
+      # AerialHammerJump
+    unsafe:
+      DoubleJump, TripleJump OR GlideJump OR Dash
+      Sword, Shuriken=1, DoubleJump OR GlideJump OR Dash  # Pogo
+      AbilitySwap=1 OR GroundedHammerJump OR WallHammerJump OR GlideHammerJump
+  conn WindtornRuins.RuinsTP:
+    # This accounts for both situations of having broken the corruption blob or not. Check for redundancy with FallenPillar->BrokenMural->RuinsTP
+    # Be careful when using the bottom right wall for pathfinding. The wall is closer and has different geometry if the escape is complete
+    moki:  # This is the only anchor that can reach RuinsTP for moki
       Burrow, DoubleJump, Dash OR Glide
       Burrow, Bash, Grenade=1, Glide
-      Launch, Burrow OR WindtornRuins.HeartBarrier
+      Launch, Burrow OR WindtornRuins.TeleporterCorruption
     gorlek:
       Burrow, Bash, Grenade=1, DoubleJump OR Dash OR Sword OR Hammer OR Damage=40
       Burrow, SentryJump=1
+      Burrow, DoubleJump, TripleJump
     kii:
       Burrow, Bash, Grenade=1
-    unsafe: Burrow  # at the pilar, hold up+right and burrow through the crumbing platform
+      Burrow, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1
+      # Glitched
+      # Burrow, GrenadeJump=1, Damage=40 OR WindtornRuins.TeleporterCorruption  # With the corruption intact, it's a tight jump over the spikes without GrenadeCancel
+      # Burrow, AerialHammerJump  # DJ alone is a bit tight for kii
+      # Burrow, DoubleJump, GlideJump
+    unsafe:
+      Burrow, Sword OR GlideJump OR AbilitySwap=1 OR WallHammerJump OR CoyoteHammerJump OR GroundedHammerJump OR PauseFloat OR DoubleJump OR Dash OR GrenadeJump
+      Burrow, SpearJump=1, Spear=1
   conn WindtornRuins.Escape:  # this connection doesn't have to account for the gap in the floor because it only exists after you finished the escape
-    moki: WindtornRuins.HeartBarrier
-  conn WindtornRuins.LowerRuins:  # connection after the escape is finished
-    # if you completed the escape, there's a gap in the floor that you have to cross
-    # Finishing the escape removes the pillar
-    # Since Burrow solves this connection, it accounts for all paths to the escape revisit pickup
+    moki: WindtornRuins.TeleporterCorruption
+  conn WindtornRuins.MapstoneAltar:  # connection after the escape is finished
+    # If you completed the escape, there's a gap in the floor that you have to cross
+    # Finishing the escape automatically breaks the corruption blob and the wall blocking access
     moki, WindtornRuins.Seir:
       DoubleJump OR Dash OR Glide OR Burrow OR Launch
       Bash, Grenade=1
     gorlek, WindtornRuins.Seir: Sword OR Hammer
-    kii, WindtornRuins.Seir: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    kii, WindtornRuins.Seir:
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GrenadeJump=1
     unsafe: WindtornRuins.Seir
-  conn WindtornRuins.BrokenMural:
-    # If the HeartBarrier is not broken, this connection is free, so it is sufficient to test these paths with the HeartBarrier broken
-    moki, Burrow OR WindtornRuins.HeartBarrier:  # these account for both situations of having broken the heart or not
-      Bash, Grenade=1, DoubleJump OR Dash
-      Glide, DoubleJump OR Dash
-      Launch
-    gorlek, Burrow OR WindtornRuins.HeartBarrier:
-      SentryJump=1
-      Bash, Grenade=1
 
 anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
   refill Full
 
-  state WindtornRuins.HeartBarrier:  # Barrier next to the teleporter that stops you from getting the Heart.
+  state WindtornRuins.TeleporterCorruption:  # Barrier next to the teleporter that stops you from getting to the escape.
     moki: BreakWall=16
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   conn Teleporters: free
   conn WindtornRuins.FallenPillar:
-    moki: WindtornRuins.HeartBarrier OR Burrow
+    moki: WindtornRuins.TeleporterCorruption OR Burrow
   conn WindtornRuins.BrokenMural:  # check for redundancies with FallenPillar
-    # Each path which isn't including WindtornRuins.HeartBarrier is done with this state resolved and is burrowing through the crumbling platform. But since these are also possible with only Burrow before breaking the heart, you don't actually need WindtornRuins.HeartBarrier at all.
-    moki, Burrow OR WindtornRuins.HeartBarrier:  # these account for both situations of having broken the heart or not
+    # Each path which isn't including WindtornRuins.TeleporterCorruption is done with this state resolved and is burrowing through the crumbling platform. But since these are also possible with only Burrow before breaking the blob, you don't actually need WindtornRuins.TeleporterCorruption at all.
+    moki, Burrow OR WindtornRuins.TeleporterCorruption:  # these account for both situations of having broken the blob or not
       Glide, DoubleJump OR Dash
-    gorlek, Burrow OR WindtornRuins.HeartBarrier:
+    gorlek, Burrow OR WindtornRuins.TeleporterCorruption:
       Glide
       Sword, DoubleJump OR Dash
       DoubleJump, Dash, Hammer
     kii:
-      WindtornRuins.HeartBarrier, DoubleJump, TripleJump OR Dash OR Hammer OR Blaze=4 OR Sentry=2
-      WindtornRuins.HeartBarrier, Dash, Hammer OR Sentry=2
-      WindtornRuins.HeartBarrier, Sword, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Hammer
-      WindtornRuins.HeartBarrier, Hammer, Sentry=2
-      Burrow, Sword  # jump on the left side of the crumbing platform and burrow it from underneath. You can slow yourself down with slashes
+      WindtornRuins.TeleporterCorruption, DoubleJump, TripleJump OR Dash OR Hammer OR Blaze=4 OR Sentry=2
+      WindtornRuins.TeleporterCorruption, Dash, Hammer OR Sentry=2
+      WindtornRuins.TeleporterCorruption, Sword, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Hammer
+      WindtornRuins.TeleporterCorruption, Hammer, Sentry=2
+      Burrow, Sword  # jump on the left side of the crumbling platform and burrow it from underneath. You can slow yourself down with slashes
       Burrow, DoubleJump, TripleJump OR Dash OR Hammer OR Blaze=3 OR Sentry=2
-      Burrow, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbing platform from the left side
+      Burrow, Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # burrow the crumbling platform from the left side
       Burrow, Hammer, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      Burrow OR WindtornRuins.HeartBarrier:
-        Sword, Spear=1 OR Blaze=1
-      Burrow, DoubleJump  # right side of the crumbing platform, touch it just before burrowing into it so you get a lot more speed
-      Burrow, Sentry=3
+      Burrow, DoubleJump  # right side of the crumbling platform, touch it just before burrowing into it so you get a lot more speed
+      Burrow, Sentry=3 OR Shuriken=2 OR Blaze=5
       Burrow, Hammer, Spear=1 OR Blaze=1
+      PauseFloat, Burrow OR WindtornRuins.TeleporterCorruption
+      WindtornRuins.TeleporterCorruption, WaveDash OR Shuriken=3  # Sometimes you will bonk on the pillar with wavedash
+      WindtornRuins.TeleporterCorruption, Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Sword  # Ceiling reset on the pillar
 
 anchor WindtornRuins.Escape at 2021, -4026:
   nospawn
@@ -15453,16 +15539,16 @@ anchor WindtornRuins.Escape at 2021, -4026:
   # that would have reached it before completing the escape. That's why this has no outside connections; the paths to here
   # can softlock after achieving the EscapeComplete state, so this anchor is only safe as long as it does nothing else than handling that state.
   quest WindtornRuins.Seir:
-    moki, WindtornRuins.HeartBarrier:
+    moki, WindtornRuins.TeleporterCorruption:
       Burrow, Dash, Grapple, DoubleJump OR Glide
       Burrow, DoubleJump, Glide, Grapple
       Burrow, DoubleJump, Launch, Dash OR Glide
       Burrow, Grapple, Launch, Glide
-    gorlek, WindtornRuins.HeartBarrier:
+    gorlek, WindtornRuins.TeleporterCorruption:
       Burrow, Grapple, DoubleJump, Damage=40, Sword OR Hammer
       Burrow, Grapple, Dash, Damage=40, Sword OR Hammer
       Burrow, Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=40
-    kii, WindtornRuins.HeartBarrier:
+    kii, WindtornRuins.TeleporterCorruption:
       Burrow, Launch
       Burrow, Grapple, Glide OR DoubleJump OR Dash OR Sword OR Hammer
       Burrow, Grapple, Sentry=5 OR Shuriken=5  # Same path, different energy weapon
@@ -15470,20 +15556,20 @@ anchor WindtornRuins.Escape at 2021, -4026:
       Burrow, Grapple, Damage=70, Sentry=2 OR Shuriken=2  # Sentry=5 / Shuriken=5 path but saving the first 3 uses by dboosting
       Burrow, Dash, DoubleJump  # djump at the end of the second sandball+grapple section before dashing in order to avoid the spikes
     unsafe:
-      WindtornRuins.HeartBarrier:  # do the escape
+      WindtornRuins.TeleporterCorruption:  # do the escape
         Burrow, Dash, Hammer  # upslash at the end of the second sandball+grapple section before dashing in order to avoid the spikes
         Burrow, Grapple, Damage=10  # You are allowed to hate me if this is forced progression https://youtu.be/H3UIH4FyU4Q
         Burrow, Grapple, Blaze=5 OR Flash=5
         Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
         Burrow, FlashSwap
+        Burrow, SentryJump=3  # This is pain. Should have jumped over the worm instead
       UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This need to solve with the pillar destoyed to avoid softlocks
         Burrow, Launch OR SentryJump=1 OR FlashSwap OR SentrySwap=4 OR BlazeSwap=4
-        Burrow, Bash, Grenade=1, DoubleJump, TripleJump
+        Burrow, Bash, Grenade=1, DoubleJump  # you should have rolled this path before I got rid of triplejump https://youtu.be/TMWmknRqCIM
         Burrow, AerialHammerJump, TripleJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
         Burrow, GrenadeJump, DoubleJump, TripleJump
 
-anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
-  # requires escape to be done
+anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedestal
   quest WindtornRuins.HandToHandComplete:
     moki: LowerWastes.HandToHandMapstone
 
@@ -15502,15 +15588,21 @@ anchor WindtornRuins.LowerRuins at 1969, -4024:  # At the ancient map pedestal
     kii, WindtornRuins.Seir:
       DoubleJump, Burrow OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
       Dash, Glide OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
+      # Glitched
+      # GrenadeJump=1, Sword OR DoubleJump OR Dash OR Hammer OR Glide
+      # GlideJump
     unsafe, WindtornRuins.Seir:
-      Dash OR DoubleJump
+      Dash OR DoubleJump OR PauseFloat OR AbilitySwap=1 OR Burrow OR Sentry=3
+      Sword, Shuriken=1  # Pogo
   conn LowerWastes.MinesEntranceEnemyPaths:
     moki: Burrow, BreakWall=20
 
 region WeepingRidge:
-  moki: Danger=60, Regenerate
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=60, Regenerate  # 40 from spikes + 20 from ennemies
+  gorlek:
+    Danger=40, Regenerate  # 40 from spikes
+    Danger=60
+  kii: Danger=40
   unsafe: free
 
 anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weeping ridge
@@ -15519,34 +15611,43 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
   refill Energy=3:
     moki: BreakCrystal
 
-  state WeepingRidge.ElevatorFightCompleted:
-    moki, Combat=2xCrystalMiner+2xShieldCrystalMiner:
+  conn WeepingRidge.Elevator:
+    moki:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
       Launch
-    gorlek: Combat=2xCrystalMiner+2xShieldCrystalMiner, DoubleJump OR SentryJump=1
+    gorlek: DoubleJump OR SentryJump=1
     kii:
-      Combat=2xCrystalMiner+2xShieldCrystalMiner, Dash OR Hammer
-      Combat=2xCrystalMiner+2xShieldCrystalMiner, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Combat=2xCrystalMiner+2xShieldCrystalMiner, Sword  # upslash+downslash
-      Combat=2xCrystalMiner+2xShieldCrystalMiner, Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-
-  conn WeepingRidge.LaunchArea:
-    moki, WeepingRidge.ElevatorFightCompleted:
-      DoubleJump, Dash OR Glide
-      Bash, Grenade=1
-      Launch
-    gorlek, WeepingRidge.ElevatorFightCompleted: DoubleJump OR SentryJump=1
-    kii, WeepingRidge.ElevatorFightCompleted:
       Dash OR Hammer
       Sword, Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: WeepingRidge.ElevatorFightCompleted, Glide OR Sword
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Sword  # upslash+downslash
+      Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
+      GlideJump OR GrenadeJump
   conn LowerWastes.WestTP:  # covers connections into woods
     moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
 
-anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of the elevator
+anchor WeepingRidge.Elevator at -1170, -3820:  # Bottom checkpoint next to the elevator
+  refill Checkpoint
+
+  state WeepingRidge.ElevatorFightCompleted:
+    moki: Combat=2xCrystalMiner+2xShieldCrystalMiner
+
+  conn WeepingRidge.TopElevator:
+    moki: WeepingRidge.ElevatorFightCompleted
+  conn WeepingRidge.Bottom:
+    moki: Launch OR DoubleJump OR Dash OR Glide
+    gorlek: Sword OR Hammer
+    kii:
+      Bash, Grenade=1
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # coyote jump
+
+anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top of the elevator
   refill Checkpoint
   refill Health=1
 
@@ -15566,6 +15667,7 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       DoubleJump, TripleJump
       DoubleJump, Sword, Damage=40, Bow=1  # Reset your jump by slashing the elemental, pogo him to reach the wall above the portal, djump + upslash from under the Mine to reach the spikes
       Bash, DoubleJump
+      Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/SecqqWk_hFE
 
   conn WeepingRidge.AboveTree:
     moki:
@@ -15585,10 +15687,18 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Sword, DoubleJump OR Dash  # Use sword on elemental to reset your djump/dash (don't use portal with dash)
       DoubleJump, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      # Glitched
+      # Damage=40, SwordSJump=1  # Full hover twice, Dboost on spikes, SentryJump into the portal
     unsafe:
       Damage=40, Sword OR Hammer
       Dash, Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
-      Bash, DoubleJump, Blaze=1
+      Bash, DoubleJump  # Bashglide to the 2nd elemental. Precise
+      # Bash, DoubleJump, Bow=1  # Bashgliding with bow directly to the platform. Easier than the bowless path.
+      Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/YbaXP2qQv9Y
+      AerialHammerJump  # Refresh DJ against the wall
+      PauseFloat
+      AbilitySwap=3  # https://youtu.be/4Njv3ZjfDoo
+      DoubleJump, TripleJump  # Wrap around the central wall. Too many enemies for kii
   conn WeepingRidge.WillowEntranceLedge:
     moki, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump, Dash OR Glide
     gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
@@ -15596,25 +15706,77 @@ anchor WeepingRidge.LaunchArea at 1189, -3716:  # After the portal at the top of
       Launch, Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
       Launch, Bash, Grenade=1
       Bash, Grenade=3, DoubleJump, TripleJump
+      # Glitched
+      # AerialHammerJump, TripleJump, Dash OR Glide OR Sword
+      # SwordSJump=3, DoubleJump, TripleJump, Dash, Damage=20  # sjump on top of elevator -> sjump + hover from the left wall on top of third laser -> sjump and take a dboost on last laser to reach the wall above -> tjump + dash + upslash to reach the ledge above
+      # HammerSJump=2, DoubleJump, TripleJump, Dash, Shuriken=1 OR Sentry=1  # similar but tjump+upslash to avoid the last sjump. Energy weapon for the final hover
     unsafe, WeepingRidge.ElevatorFightCompleted:
       Launch
       SentryJump=3, DoubleJump, TripleJump, Dash
+      SwordSJump=4 OR HammerSJump=5  # Hammer takes longer to upswing and lasers will stop you
+      HammerSJump=4, DoubleJump OR Dash OR Glide
       Bash, Grenade=3, DoubleJump
-  conn WeepingRidge.Bottom:
+      AerialHammerJump, WallHammerJump OR TripleJump
+      GrenadeJump, GrenadeCancel, DoubleJump
+  conn WeepingRidge.Elevator:
     moki, WeepingRidge.ElevatorFightCompleted:
       Launch
-      Bash, Grenade=1, DoubleJump
+      Bash, Grenade=1
       DoubleJump, Dash, Glide
     gorlek, WeepingRidge.ElevatorFightCompleted:
-      SwordSJump=1
+      SentryJump=1
       DoubleJump, TripleJump OR Dash OR Glide
     kii, WeepingRidge.ElevatorFightCompleted:
       Glide OR Dash OR DoubleJump
       Sword OR Hammer
-      Sentry=5
-      Bash, Grenade=2
+      Sentry=4
+      # Glitched
+      # GrenadeJump=1, Shuriken=2 OR Blaze=6
     unsafe, WeepingRidge.ElevatorFightCompleted:
-      Shuriken=3 OR Sentry=3
+      Shuriken=1 OR Sentry=2 OR AbilitySwap=1 OR PauseFloat  # Towards the left wall. Shuriken: https://youtu.be/jF3Gi90F5Ws.
+      SpearJump=1, Spear=2  # 1 jump + 1 spear might be possible. https://youtu.be/AEiZkRiLQCc
+      GrenadeJump  # Can barely make it to the ledge above the portal
+
+anchor WeepingRidge.AfterElementals at -1303, -3769:  # Ledge next to the spikes, under the portal leeding to the ore
+  pickup WeepingRidge.Ore:
+    moki: Launch, DoubleJump OR Dash OR Bash OR Glide
+    gorlek: Launch
+    kii:
+      Bash, Grenade=1, Damage=20, DoubleJump OR Dash  # Damage for wonky lasers
+      # Glitched
+      # SentryJump=2, Damage=20  # Damage for wonky lasers
+      # AerialHammerJump, SentryJump=1, Damage=20  # Same as above but hjump through the portal
+      # AerialHammerJump, Damage=60  # Easy to hit the mine or the laser, which launch you into the spikes
+    unsafe:  # It is possible to duck left of the portal to wait out the laser
+      DoubleJump, TripleJump  # https://youtu.be/8VSgSO7I_zA
+      Bash, Grenade=1  # https://youtu.be/dOrFj9RT4KE
+      Bash, DoubleJump, Dash OR Glide OR PauseFloat  # bait a projectile instead of using the portal
+      Bash, GlideJump  # bait a projectile instead of using the portal
+      SentryJump=2
+      SentryJump=1, SwordJump OR Bash  # (2a) sjump, (3) Pogo the elemental, reset above portal, swordJump and upslash
+      GrenadeJump, DoubleJump OR Bash
+      AerialHammerJump OR GlideHammerJump
+      WallHammerJump  # Off the ledge, (3) Off the ledge and turnaround off the wall
+
+  conn WeepingRidge.AboveTree: free
+  conn WeepingRidge.TopElevator:
+    moki: Launch, Bash, Glide  # Glide is the only ability that really helps you outwait the laser attack
+    gorlek:
+      Launch, Bash
+      Launch, DoubleJump, Dash  # this gives you good mobility to avoid the enemies
+    kii:
+      Launch, DoubleJump OR Dash OR Damage=20  # dboost on the mine inbetween the two elementals
+      # Glitched
+      # AerialHammerJump, TripleJump, Dash, Damage=60  # dboost on the mine and the spikes after the top portal for leniency
+    unsafe:
+      Launch
+      DoubleJump, TripleJump, Sword, Damage=40
+      DoubleJump, TripleJump, Bash  # Bait elemental projectiles
+      AerialHammerJump, TripleJump, Damage=20  # dboost on the mine
+      AerialHammerJump, Damage=20  # dboost on the mine. Safe spot on the upper portal. Dboost on the spikes
+      GrenadeJump, DoubleJump, Damage=20  # dboost on the mine
+      SwordSJump=5, Damage=20  # Pogo the first elemental, dboost on the mine
+      SwordSJump=4, SwordJump, Damage=20  # Same as above, but swordjump+upslash into the top portal
 
 anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
   refill Checkpoint
@@ -15622,10 +15784,17 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
   pickup WeepingRidge.LaunchTree: free
   pickup WeepingRidge.PortalEX:
     moki: Launch
+    # kii:
+      # Glitched
+      # SentryJump=1, DoubleJump, TripleJump  # Max height
+      # AerialHammerJump, TripleJump OR SentryJump=1  # A bit wonky once you go through the portal
     unsafe:
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=40  # take a dboost in the left spikes
-      SwordSJump=2, Damage=40
+      SwordSJump=2  # Use the micro ledge on the left after entering the portal
       DoubleJump, TripleJump, Damage=40, Damage=80
+      SentryJump=1, DoubleJump  # with sword,need Upswing. With hammer, max height from the right of the portal is enough
+      AerialHammerJump OR GlideHammerJump
+      GrenadeJump, DoubleJump
   pickup WeepingRidge.SpikeClimbEX:
     moki: Launch, DoubleJump, Bow=2
     gorlek:
@@ -15636,35 +15805,39 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       Launch
       Bash, Grenade=2, DoubleJump, TripleJump
       Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump, TripleJump
+      # SwordSJump=3, Damage=40
+      # SentryJump=2, DoubleJump, TripleJump
+      # SentryJump=2, DoubleJump, Dash, Shuriken=1 OR Sentry=1
+      # GrenadeJump=2, DoubleJump, TripleJump
     unsafe:  # may be inaccurate after moving paths to this anchor
-      Bash, Grenade=3, DoubleJump
-      SentryJump=3, DoubleJump, Bash OR Sword OR Damage=40
-      SentryJump=2, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform
+      Bash, Grenade=3  # Walljump beneath the spikes to catch the last grenade higher up
+      SentryJump=3
+      SentryJump=1, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform.
       DoubleJump, TripleJump, Sword, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree | wasn't consistent enough for kii
-  pickup WeepingRidge.Ore:
-    moki: Launch, DoubleJump OR Dash OR Bash OR Glide
-    gorlek: Launch
-    kii:
-      Bash, Grenade=2, Damage=20, DoubleJump OR Dash  # Damage for wonky lasers
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=60  # 20 of the damage for wonky lasers
-    unsafe:
-      DoubleJump, TripleJump, Sword  # pogo the mines
-      DoubleJump, TripleJump, Hammer, Damage=40
-      Bash, Grenade=2, DoubleJump OR Dash
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
+      AerialHammerJump  # Upswing before hjumping every time
+      GrenadeJump, DoubleJump  # Go to the right wall beneath the mine
+      GrenadeJump, GlideJump, Damage=40  # Take a dboost beneath the pickup
 
-  conn WeepingRidge.LaunchArea:
-    moki: Launch, Bash, Glide  # Glide is the only ability that really helps you outwait the laser attack
-    gorlek:
-      Launch, Bash
-      Launch, DoubleJump, Dash  # this gives you good mobility to avoid the enemies
-    kii:
-      Launch, DoubleJump OR Dash OR Damage=20  # dboost on the mine inbetween the two elementals
-    unsafe:
+  conn WeepingRidge.AfterElementals:
+    moki:
       Launch
-      DoubleJump, TripleJump, Sword, Damage=40
-      Bash, Grenade=2, DoubleJump, TripleJump
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
+      Bash, Grenade=1
+    gorlek: SentryJump=1
+    kii:
+      DoubleJump, TripleJump, Damage=40
+      # Glitched
+      # AerialHammerJump OR GrenadeJump
+      # GlideJump, DoubleJump, TripleJump
+    unsafe:
+      DoubleJump, Damage=40, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump, Sword  # pogo the mine on the left to avoid the explosion
+      AerialHammerJump OR GlideHammerJump OR GrenadeJump OR AbilitySwap=2
+      GlideJump, Damage=40, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1  # sword pogo the mine
+      BlazeSwap=1, DoubleJump OR GlideJump
+      SentrySwap=1, DoubleJump OR GlideJump
 
 anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willow entrance
   door:
@@ -15673,7 +15846,7 @@ anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willo
     enter: free
 
   refill Checkpoint
-  conn WeepingRidge.LaunchArea:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
+  conn WeepingRidge.TopElevator:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
     gorlek, WeepingRidge.ElevatorFightCompleted:
       Glide OR Damage=20
     kii, WeepingRidge.ElevatorFightCompleted:  # land on top of the second laser
@@ -15682,9 +15855,11 @@ anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willo
     unsafe: WeepingRidge.ElevatorFightCompleted
 
 region WillowsEnd:
-  moki: Danger=60, Regenerate  # need more than 6 health and Regen to do ANYTHING in willow
-  gorlek: Regenerate
-  kii: Regenerate
+  moki: Danger=60, Regenerate  # 40 from spikes + 20 from ennemies
+  gorlek:
+    Danger=40, Regenerate  # 40 from spikes
+    Danger=60
+  kii: Danger=40
   unsafe: free
 
 anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
@@ -16215,7 +16390,7 @@ anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
 
 anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
   refill Checkpoint
-  refill Health=2
+  refill Health=1
 
   state WillowsEnd.MinibossHeart:
     moki: Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
@@ -16227,7 +16402,10 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
     moki: Launch, Dash, Glide, DoubleJump
     gorlek: Launch, Glide OR DoubleJump OR Dash
     kii: Launch, Sword OR Hammer OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1
-    unsafe: Launch  # Reset launch on the ceiling
+    unsafe:
+      Launch  # Reset launch on the ceiling
+      DoubleJump, TripleJump  # Safe spot in the goo next to the laser
+      SwordJump  # Safe spot in the goo next to the laser. Tight SwordJump to the wall, then double jump + sword combo + upslash to get to the middle safe platform
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
