@@ -7768,7 +7768,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Bash, Grapple, DoubleJump OR Dash OR Glide
       Launch, Dash OR Glide OR Damage=15  # Assumes at least one damage is taken in the final grapple section, probably possible without
     kii:
-      Launch, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1  # condition for the final grapple section
+      Launch, DoubleJump OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1  # condition for the final grapple section
       Grapple, Dash OR Glide  # final wheel is pretty hard, you need to avoid touching it as much as possible (which could be viewed as area specific knowledge?)
       Grapple, DoubleJump, TripleJump OR Sword OR Hammer OR Shuriken=2 OR Blaze=3 OR Flash=2 OR Sentry=2  # condition for before and after the falling wheel. 1 blaze before and 2 after the wheel.
       Grapple, Bash, Sword
@@ -7779,12 +7779,14 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
         Damage=40, Sentry=3  # same as above + either one at the 2nd jump or between the two rotating wheels
         Damage=20, Sentry=4  # same as above but use both options
       Grapple, Bash, Sentry=6  # same as above but use 2 sentries to make the first jump
+      # Glitched
+      # LaunchSwap
     unsafe:
-      Launch
+      Launch OR AerialHammerJump OR GlideHammerJump
       Grapple, Bash, WaterDash, Damage=80
       Grapple, Bash, Hammer
       Grapple, DoubleJump
-      FlashSwap
+      AbilitySwap=13  # 3 before the rolling wheel + 2 before the first grapple wheel + 2 to grab the second one + 3 for the grapple section + 3 for last wheel. A bunch of those can be replaced by using the abilities by themselves.
       # Same as Kii paths, but use two different energy weapons for energy management, since flash and shuriken cost less energy than sentry
       Grapple, Bash, WaterDash, Damage=40, Sentry=2, Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
       Grapple, Bash, WaterDash, Damage=20, Sentry=2, Shuriken=2 OR Flash=2  # same as above but use both options
