@@ -7833,15 +7833,17 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
     gorlek: Water, Bash, Damage=10  # bit hard but important for random spawn
     kii: Water, Spear=1
     unsafe:
-      Water, Bash # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc
-      Water, Sword, Deflector
-      Water, GrenadeRedirect=1 OR SentryRedirect=1  # https://youtu.be/AIHaUnHRTF0
+      Bash, Water OR Damage=130 # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc (or tp after bashing the projectile). You can walljump on the wall while the shot is moving to save some life
+      Bash, WaterDash, Damage=110
+      Sword, Deflector, Water OR Damage=130
+      Sword, Deflector, WaterDash, Damage=110
+      Hammer, Water OR Damage=110  # https://youtu.be/Ow0zrDfm5oY
+      WaterDash, Hammer, Damage=60  # same as above. 10 damage on the spikes at the start then another 10because you'll waterdash into some spikes above the wall
       Damage=90, Spear=1
       Damage=50, WaterDash, Spear=1  # didn't managed to prevent damage from spikes above the breakable wall
-      Damage=160, Bash
-      Damage=140, WaterDash, Bash
-      Damage=160, Sword, Deflector
-      Damage=140, WaterDash, Sword, Deflector
+      GrenadeRedirect=1, Water OR Damage=130
+      GrenadeRedirect=1, WaterDash, Damage=110
+      Water, SentryRedirect=1  # https://youtu.be/AIHaUnHRTF0
 
   pickup WoodsEntry.LedgeOre:
     gorlek: Launch
