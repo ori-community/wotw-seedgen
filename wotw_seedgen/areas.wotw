@@ -7806,6 +7806,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       # LaunchSwap
     unsafe:
       Launch OR AerialHammerJump OR GlideHammerJump
+      NormalGameDifficulty, PauseFloat, Damage=15  # It might be crap but at least it's easier than manual superswim https://youtu.be/6WWEmyyZ044
       Grapple, Bash, WaterDash, Damage=80
       Grapple, Bash, Hammer
       Grapple, DoubleJump
