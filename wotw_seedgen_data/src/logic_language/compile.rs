@@ -78,6 +78,7 @@ struct Compiler<'source> {
     default_door_connections: FxHashMap<DoorId, DoorId>,
     difficulty_requirements: DifficultyRequirements,
     trick_requirements: TrickRequirements,
+    hard_requirement: Requirement,
     state_map: FxHashMap<Cow<'source, str>, usize>,
     pickup_map: FxHashMap<&'source str, usize>,
     anchor_map: FxHashMap<String, usize>,
@@ -94,6 +95,13 @@ impl<'source> Compiler<'source> {
         state_data_nodes: &'source [Node],
         settings: &[WorldSettings],
     ) -> Self {
+        let hard_requirement = setting_requirement(
+            settings,
+            WorldSettingsHelpers::none_play_hard,
+            WorldSettingsHelpers::all_play_hard,
+            Requirement::NormalGameDifficulty,
+        );
+
         let mut errors = vec![];
         let mut nodes = vec![]; // TODO capacity
         let mut state_map = FxHashMap::default();
@@ -204,6 +212,7 @@ impl<'source> Compiler<'source> {
             default_door_connections: FxHashMap::default(),
             difficulty_requirements: DifficultyRequirements::new(settings),
             trick_requirements: TrickRequirements::new(settings),
+            hard_requirement,
             state_map,
             pickup_map,
             anchor_map,
@@ -359,15 +368,12 @@ struct TrickRequirements {
 impl TrickRequirements {
     fn new(settings: &[WorldSettings]) -> Self {
         let build_trick = move |trick| {
-            if settings.is_empty() {
-                Requirement::Trick(trick)
-            } else if settings.none_contain_trick(trick) {
-                Requirement::Impossible
-            } else if settings.all_contain_trick(trick) {
-                Requirement::Free
-            } else {
-                Requirement::Trick(trick)
-            }
+            setting_requirement(
+                settings,
+                |settings| settings.none_contain_trick(trick),
+                |settings| settings.all_contain_trick(trick),
+                Requirement::Trick(trick),
+            )
         };
 
         Self {
@@ -532,6 +538,23 @@ impl TrickRequirements {
         };
 
         Some(requirement)
+    }
+}
+
+fn setting_requirement<S, FN, FA>(settings: &S, none: FN, all: FA, req: Requirement) -> Requirement
+where
+    S: WorldSettingsHelpers + ?Sized,
+    FN: FnOnce(&S) -> bool,
+    FA: FnOnce(&S) -> bool,
+{
+    if settings.is_empty() {
+        req
+    } else if none(settings) {
+        Requirement::Impossible
+    } else if all(settings) {
+        Requirement::Free
+    } else {
+        req
     }
 }
 
@@ -1037,6 +1060,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                 // TODO free is lowercase but impossible is uppercase
                 "free" => no_amount().map(|()| Requirement::Free),
                 "Impossible" => no_amount().map(|()| Requirement::Impossible),
+                "NormalGameDifficulty" => no_amount().map(|()| compiler.hard_requirement.clone()),
                 "SpiritLight" => get_amount().map(Requirement::SpiritLight),
                 // TODO remove Ore
                 "Ore" | "GorlekOre" => get_amount().map(Requirement::GorlekOre),

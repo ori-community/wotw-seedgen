@@ -462,6 +462,7 @@ impl SpanEnd for RequirementLine<'_> {
 pub enum Requirement<'source> {
     Combat(CombatRequirement<'source>),
     Plain(PlainRequirement<'source>),
+    // TODO can this branch even be entered?
     State(Spanned<LogicIdentifier<'source>>),
 }
 

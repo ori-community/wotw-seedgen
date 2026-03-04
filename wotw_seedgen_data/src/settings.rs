@@ -9,6 +9,7 @@ use std::{
     str::FromStr,
 };
 
+use itertools::Itertools;
 use rand::{distributions::Bernoulli, seq::SliceRandom, Rng};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
@@ -66,11 +67,27 @@ impl UniverseSettings {
 }
 
 pub trait WorldSettingsHelpers {
+    fn is_empty(&self) -> bool;
+
     fn lowest_difficulty(&self) -> Difficulty;
 
     fn highest_difficulty(&self) -> Difficulty;
 
     fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>>;
+
+    fn iter_hard(&self) -> impl Iterator<Item = bool>;
+
+    fn all_play_hard(&self) -> bool {
+        !self.iter_hard().contains(&false)
+    }
+
+    fn any_play_hard(&self) -> bool {
+        self.iter_hard().contains(&true)
+    }
+
+    fn none_play_hard(&self) -> bool {
+        !self.any_play_hard()
+    }
 
     fn all_contain_trick(&self, trick: Trick) -> bool {
         self.iter_tricks().all(|tricks| tricks.contains(&trick))
@@ -86,6 +103,10 @@ pub trait WorldSettingsHelpers {
 }
 
 impl WorldSettingsHelpers for [WorldSettings] {
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
+
     fn lowest_difficulty(&self) -> Difficulty {
         self.iter()
             .map(|settings| settings.difficulty)
@@ -103,9 +124,17 @@ impl WorldSettingsHelpers for [WorldSettings] {
     fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>> {
         self.iter().map(|settings| &settings.tricks)
     }
+
+    fn iter_hard(&self) -> impl Iterator<Item = bool> {
+        self.iter().map(|settings| settings.hard)
+    }
 }
 
 impl WorldSettingsHelpers for UniverseSettings {
+    fn is_empty(&self) -> bool {
+        self.world_settings.is_empty()
+    }
+
     fn lowest_difficulty(&self) -> Difficulty {
         self.world_settings.lowest_difficulty()
     }
@@ -116,6 +145,10 @@ impl WorldSettingsHelpers for UniverseSettings {
 
     fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>> {
         self.world_settings.iter_tricks()
+    }
+
+    fn iter_hard(&self) -> impl Iterator<Item = bool> {
+        self.world_settings.iter_hard()
     }
 }
 
