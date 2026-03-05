@@ -7848,19 +7848,30 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
 
   pickup WoodsEntry.LedgeOre:
     gorlek: Launch
-    kii: Bash, Grenade=1, DoubleJump, TripleJump OR Hammer
+    kii:
+      Bash, Grenade=1, DoubleJump, TripleJump OR Hammer
+      # Glitched
+      # AerialHammerJump, TripleJump
+      # HammerSJump=1, DoubleJump
+      # SwordSJump=1, DoubleJump, TripleJump
+    unsafe:
+      AerialHammerJump OR HammerSJump=1 OR AbilitySwap=3
+      SwordSJump=1, DoubleJump
+      GrenadeJump, DoubleJump, TripleJump OR Hammer OR Spear=1
+      Bash, Grenade=1, DoubleJump, Spear=1
+      DoubleJump, TripleJump, Hammer OR Spear=1 OR GlideJump OR SwordJump
 
-  conn WoodsEntry.FirstMud:
+  conn WoodsEntry.BellowHut:
     moki: Combat=Balloon, Combat=Tentacle OR Bash OR Launch
     gorlek: Combat=Tentacle OR Bash OR Launch OR Damage=10
   conn EastHollow.Kwolok:
     moki, EastHollow.SilentSwimWall: Water
     unsafe, EastHollow.SilentSwimWall:
-      Damage=240, Damage=120
-      Damage=100, Damage=60, WaterDash
+      Damage=220, Damage=120
+      Damage=90, Damage=60, WaterDash
       Damage=210, Damage=120, Bash
 
-anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death mud
+anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the family, at the checkpoint next to the mud
   refill Checkpoint
 
   pickup WoodsEntry.MudPitEX:
@@ -7876,66 +7887,46 @@ anchor WoodsEntry.FirstMud at 478, -4205:  # In front of the first instant death
     moki:
       Combat=Balloon, Bash, DoubleJump OR Dash OR Glide
       Combat=Balloon, Launch, DoubleJump OR Dash OR Glide
-    gorlek: DoubleJump OR Dash OR Glide OR Launch  # getting hit by the balloon doesn't matter since you get autosaved and respawn
+    gorlek: Combat=Balloon, DoubleJump OR Dash OR Glide OR Launch
     kii:
-      Sword OR Shuriken=3  # Careful with sword because it can break bubbles
-      Bash, Hammer OR Sentry=2  # Use the tentacle at the end
-    unsafe: Hammer
+      Combat=Balloon, Sword OR Shuriken=3  # Careful with sword because it can break bubbles
+      Combat=Balloon, Bash, Hammer OR Sentry=2  # Use the tentacle at the end
+    unsafe:  # getting hit by the balloon doesn't matter because you'll hit the checkpoint before
+      DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
   conn WoodsEntry.ShriekMeet:
     moki: Combat=Balloon, Combat=Tentacle OR Bash OR Launch
     gorlek: Combat=Tentacle OR Bash OR Launch OR Damage=10
-  conn WoodsEntry.Teleporter:  # Paths that go up directly and aren't redundant with BelowTeleporter
-    unsafe: Bash  # Use the tentacle
+  conn WoodsEntry.FamilyHut:  # Paths that go up directly and aren't redundant with BelowTeleporter
+    gorlek:
+      Launch, DoubleJump OR Dash OR Glide OR Bash
+      Bash, Grenade=1, DoubleJump, TripleJump
+    kii:
+      Bash, Grenade=1  # Bash a mortar projecctile to reach your grenade
+      Launch, Sword OR Hammer
+      # Glitched
+      # SentryJump=1 OR LaunchSwap
+      # AerialHammerJump, TripleJump, Dash OR Glide OR Sword  # works by either going to WoodsEntry.LedgeOre and then going to the hut without using hjumps or by going to WoodsEntry.MudPitEX and use hjump once you're under the hut
+      # AerialHAmmerJump, TripleJump, Bash  # bash a mortar projectile first
+    unsafe: Bash  # Use the mortar
 
 # checkpoint at 525, -4205
 
-anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
-  nospawn
-
-  door:
-    id: 25
-    target: WoodsEntry.FamilyHutInside
-    enter:
-      moki: GladesTown.FamilyReunionKey
-  # This refill does not work in entrance randomizer
-  # refill Checkpoint:
-  #   unsafe: GladesTown.FamilyReunionKey
-
-  conn WoodsEntry.FirstMud: free
-  conn WoodsEntry.ShriekMeet:
-    moki: Combat=Balloon
-    gorlek: free
-  conn WoodsEntry.Teleporter:
-    moki:
-      Grapple, DoubleJump OR Dash OR Glide
-      Launch
-      Grenade=1, Bash
-    gorlek:
-      Grapple
-      SentryJump=1
-    kii: DoubleJump, TripleJump
-    unsafe:
-      DoubleJump, Hammer OR Spear=1  # With hammer, wall jump on the right
-
-anchor WoodsEntry.FamilyHutInside at 445, -4118: # inside of family reunion hut
-  door:
-    id: 26
-    target: WoodsEntry.FamilyHut
-    enter: free
-
-  quest WoodsEntry.DollQI:
-    moki: free
-
-anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
+anchor WoodsEntry.BelowTeleporter at 591, -4198:  # at the checkpoint bellow the teleporter, next to the second mud section
   refill Checkpoint
 
-  conn WoodsEntry.FirstMud:  # check for redundancies with Teleporter
+  conn WoodsEntry.BellowHut:  # check for redundancies with going to WoodsEntry.Teleporter first
     moki: Combat=Balloon, Bash, DoubleJump, Dash OR Glide
-    gorlek: DoubleJump, TripleJump OR Dash OR Glide  # If you struggle with the tentacle and die, it'll despawn
+    gorlek: Combat=Balloon, DoubleJump, TripleJump OR Dash OR Glide  # If you struggle with the tentacle and die, it'll despawn
     kii:
-      DoubleJump, Sword OR Hammer
-      Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1  # You can use a dash refresh on the ceiling for more lenience. Or instead of grabbing the hanging log you can go below and aim for the bubble.
-    unsafe: Glide, Sword OR Hammer  # Jump on the first bubble, glide then up slash near the 2nd bubble (not too close, you can pop the bubble with an upslash)
+      Combat=Balloon, DoubleJump, Sword OR Hammer
+      Combat=Balloon, Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1  # You can use a dash refresh on the ceiling for more lenience. Or instead of grabbing the hanging log you can go below and aim for the bubble.
+      # Glitched
+      # Combat=Balloon, GlideJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Senty=1
+    unsafe:  # getting hit by the balloon doesn't matter because you'll hit the checkpoint before
+      Glide, Sword OR Hammer  # Jump on the first bubble, glide then up slash near the 2nd bubble (not too close, you can pop the bubble with an upslash)
+      GlideJump
+      DoubleJump, Dash OR Glide OR Sword OR Hammer
+      Dash, Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
   conn WoodsEntry.Teleporter:
     moki:
       Grapple, DoubleJump OR Dash OR Glide
@@ -7946,17 +7937,28 @@ anchor WoodsEntry.BelowTeleporter at 591, -4198:  # Read the name
       Grapple, Hammer, Bash, Damage=15  # Bash because the plant can be a bit awkward
       Bash, Grenade=1, Sword OR Damage=15
       SwordSJump=1
-      HammerSJump=1, Bash, Damage=15  # again mildly awkward
+      HammerSJump=1, DoubleJump OR Dash OR Glide OR Sword OR Damage=15
     kii:
       Grapple, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=15
       Grapple, Sentry=2, Damage=15
       Grapple, Sentry=4
       DoubleJump, TripleJump, Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
-      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Damage=15  # Use the tentacle, note that it despawns if you die and respawn on this anchor
+      Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Damage=15  # Use the mortar
+      # Glitched
+      # HammerSJump=1, Shuriken=1 OR Flash=1 OR Sentry=1
+      # AerialHammerJump
+      # GlideJump, DoubleJump OR Hammer
+      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
+      # GrenadeJump=1, Shuriken=1 OR Flash=1 OR Sentry=1:
+      #   Damage=15
     unsafe:
       DoubleJump, TripleJump
       Bash
-      DoubleJump, Hammer  # Double jump to the right wall, upslash to start climbing it (?)
+      Sword  # pogo a projectile 
+      HammerSJump=1 OR GrenadeJump OR AerialHammerJump OR AbilitySwap=2
+      GlideJump, DoubleJump OR Hammer OR Spear=1
+      SpearJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseFloat OR Damage=15 
+      # DoubleJump, Hammer  # Double jump to the right wall, upslash to start climbing it. Looks either FPS dependent or impossible
   conn WoodsEntry.TwoKeystoneRoom:
     moki: Combat=2xBalloon, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Combat=2xBalloon, Sword OR Hammer
@@ -7986,9 +7988,9 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
       Bash, Grenade=1, Glide OR Launch
       DoubleJump, Dash, Launch
     gorlek:
-      Glide, Dash
+      Glide, Dash OR SentryJump=1
       DoubleJump, TripleJump, Dash, Sword OR Hammer
-      SentryJump=1, DoubleJump, Dash  # Dash after the apex of the sjump then sword's full combo + up slash
+      SentryJump=1, DoubleJump, Dash  # Dash after the apex of the sjump then sword's full combo
       Bash, Grenade=1, DoubleJump, TripleJump OR Sword OR Hammer
       Bash, Grenade=1, Dash
       # launch paths from gorlek onwards are redundant with walking below it and launching up
@@ -8001,14 +8003,59 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
       DoubleJump, Dash, Hammer, Shuriken=1 OR Sentry=2
       Bash, Grenade=1, DoubleJump OR Sword
       Bash, Grenade=1, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1
+      # Glitched
+      # GlideJump
+      # Glide, GrenadeJump=1
     unsafe:
-      Glide  # No Glide jump, just start from the higher ground
-      DoubleJump, Sword
+      Glide OR PauseFloat  # No Glide jump, just start from the higher ground
+      GrenadeJump, DoubleJump
+      SwordJump  # https://youtu.be/WWermg8hs8g / was written as Sword, DoubleJump but that's the only solution I managed to get
+      WaveDash  # Also possible with Blaze
 
   conn Teleporters: free
-  conn WoodsEntry.FirstMud: free
   conn WoodsEntry.BelowTeleporter: free
   conn WoodsEntry.FamilyHut: free
+
+anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
+  door:
+    id: 25
+    target: WoodsEntry.FamilyHutInside
+    enter:
+      moki: GladesTown.FamilyReunionKey
+  # This refill does not work in entrance randomizer
+  # refill Checkpoint:
+  #   unsafe: GladesTown.FamilyReunionKey
+
+  conn WoodsEntry.BellowHut: free
+  conn WoodsEntry.ShriekMeet:
+    moki: Combat=Balloon
+    gorlek: free
+  conn WoodsEntry.Teleporter:
+    moki:
+      Grapple, DoubleJump OR Dash OR Glide
+      Launch
+      Grenade=1, Bash
+    gorlek:
+      Grapple
+      SentryJump=1
+    kii:
+      DoubleJump, TripleJump
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+      # GlideJump, DoubleJump OR Hammer OR Spear=1
+    unsafe:
+      DoubleJump  # wall jump on the right
+      Bash  # Drop down and use the mortar projectile
+      GrenadeJump OR GlideJump OR CoyoteHammerJump OR AbilitySwap=1
+
+anchor WoodsEntry.FamilyHutInside at 445, -4118: # inside of family reunion hut
+  door:
+    id: 26
+    target: WoodsEntry.FamilyHut
+    enter: free
+
+  quest WoodsEntry.DollQI:
+    moki: free
 
 anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone door
   refill Checkpoint
@@ -8023,20 +8070,26 @@ anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone doo
     gorlek: Launch OR Sword OR Hammer  # different ways to solve
     kii: free  # It's possible to get back to safety but also you can just teleport out
   pickup WoodsEntry.UpperKS:
-    moki: DoubleJump OR Launch
+    moki: Combat=Balloon, DoubleJump OR Launch
     gorlek:
-      Hammer, Dash
-      Bash, Grenade=1
-    unsafe: Sword OR Hammer
+      Combat=Balloon, Hammer, Dash
+      Combat=Balloon, Bash, Grenade=1
+    # kii:
+    #   Combat=Balloon, GlideJump
+    #   Combat=Balloon, GrenadeJump=1, Dash OR Glide OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
+    #   Combat=Balloon, GrenadeJump=1, Damage=15, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:  # Jump into the balloon while respawning to kill it during your iframes
+      Sword OR Hammer OR GlideJump OR GrenadeJump OR SpearJump=1
 
   conn WoodsMain.AfterKuMeet:
     moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: WoodsEntry.KeystoneDoor, Damage=10
   conn WoodsEntry.BelowTeleporter:
     moki: Combat=2xBalloon, DoubleJump OR Glide OR Launch
-    gorlek: DoubleJump OR Dash OR Glide OR Sword
-    kii: Launch OR Hammer OR Shuriken=1 OR Sentry=2  # If you struggle and die, the first balloon will despawm
-    unsafe: Sentry=1 OR Flash=1
+    gorlek: Combat=2xBalloon, Dash OR Sword
+    kii:  # ignore the second balloon
+      Combat=Balloon, Launch OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+    unsafe: Launch OR DoubleJump OR Glide OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
 
 region WoodsMain:
   moki: Danger=35, Regenerate  # 20 from balloons + 15 from spikes
