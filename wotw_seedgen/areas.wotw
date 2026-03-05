@@ -16000,7 +16000,9 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
     kii:
       BreakCrystal, SentryJump=1
       BreakCrystal, Bash, Grenade=1
-  # a lot of energy crystals not considered, mostly because they are on the way to hearts which aren't currently tracked
+    unsafe:
+      BreakCrystal, AerialHammerJump OR GroundedHammerJump OR GlideHammerJump
+  # A lot of energy crystals not considered, mostly because they are on the way to hearts which aren't currently tracked
 
   pickup WillowsEnd.EntryEX:  # Paths skipping over WillowsEnd.EntryFloatingPlatform
     unsafe: SentryJump=1  # Energy optimization by going to the left wall directly
@@ -16016,14 +16018,24 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       # AerialHammerJump  # Upswing before AHJ
       # DoubleJump, GrenadeJump=1
     unsafe:
-      #DoubleJump, Damage=40  # dboost on the lava thingy and jump from it to the floating platform
-      DoubleJump, Damage=20  # same as above but dboost on the mine beforehand
-      SwordJump, TripleJump, Dash  # land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
+      # DoubleJump, Damage=40  # Dboost on the lava thingy and jump from it to the floating platform
+      DoubleJump, Damage=20  # Same as above but dboost on the mine beforehand
+      SwordJump, TripleJump, Dash  # Land on floating platform otw to GrappleHeart then sword jumps + upslash->dash towards the floating platform at the entrance
       AerialHammerJump OR GrenadeJump OR AbilitySwap=1 OR GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump  # CoyoteHammerJump is scary...
       GlideJump, DoubleJump, TripleJump, Sword OR Hammer  # Either directly or by going to the left platform first
-      Sword, DoubleJump  # djump, pogo the mine, djump+upslash to reach the floating platform
-  # Paths skipping WillowsEnd.EntryFloatingPlatform
-  # conn WillowsEnd.InnerTP
+      Sword, DoubleJump  # Djump, pogo the mine, djump+upslash to reach the floating platform
+  conn WillowsEnd.InnerTP:  # Paths skipping WillowsEnd.EntryFloatingPlatform to save energy. Be careful with redundancies Entry->EntryFloatingPlatform->InnerTP
+    kii, SentryJump=1:  # Max height sjump into the portal
+      WillowsEnd.PortalShortcut:
+        Bash, Grenade=1
+        SentryJump=1, Damage=40  # With the shortcut open, sjumping from the ledge throws you into spikes unless you hold right, get a low sjump, or cancel vertical momentum with a side swing
+        DoubleJump  # Lenient with upswing
+        # Glitched
+        # GrenadeJump=1 OR GlideJump
+    unsafe, SentryJump=1:
+      WillowsEnd.PortalShortcut, SentryJump=1 OR AbilitySwap=1 OR SpearJump=1 OR Damage=40
+      SentryJump=1, Bash  # As part of the sjump you can vault left around the corner. Hover is then enough to reach the elemental
+      Bash, DoubleJump, TripleJump
   conn WillowsEnd.BoulderHeartPath:
     moki:
       Launch
@@ -16036,8 +16048,17 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       SentryJump=1, Damage=40, Dash OR Glide  # float with the weapon if needed
     kii:
       Bash, Grenade=1
-      DoubleJump, TripleJump, Dash  # Under the wheel
-    unsafe: DoubleJump, TripleJump, Sword OR Hammer  # Under the wheel
+      DoubleJump, TripleJump, Dash OR Sword  # Under the wheel
+      SentryJump=1
+      # Glitched
+      # GrenadeJump=1, Dash, DoubleJump
+      # AerialHammerJump, TripleJump
+    unsafe:
+      DoubleJump, TripleJump, Hammer OR Sentry=2 OR Shuriken=2
+      GlideJump, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=1 OR Shuriken=1 OR PauseFloat
+      DoubleJump, Sword, Shuriken=1
+      Dash, AerialHammerJump OR GroundedHammerJump
+      GlideHammerJump
   # Paths skipping WillowsEnd.EntryFloatingPlatform
   # conn WillowsEnd.GrappleHeartMidPoint
 
