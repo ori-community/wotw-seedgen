@@ -7871,7 +7871,7 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
       Damage=90, Damage=60, WaterDash
       Damage=210, Damage=120, Bash
 
-anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the family, at the checkpoint next to the mud
+anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the hut, at the checkpoint next to the mud
   refill Checkpoint
 
   pickup WoodsEntry.MudPitEX:
@@ -7982,7 +7982,7 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   pickup WoodsEntry.TpEX: free
   pickup WoodsEntry.LeafPileEX:
     moki: Flap
-  pickup WoodsEntry.LedgeOre:
+  pickup WoodsEntry.LedgeOre:  # Make sure it's not redundant with paths from WoodsEntry.ShriekMeet
     moki:
       Glide, DoubleJump OR Launch
       Bash, Grenade=1, Glide OR Launch
