@@ -7740,7 +7740,7 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
       Dash, Hammer  # path from the right, tight combos to reach the platform
       Shuriken=2, DoubleJump OR Dash OR Glide
       GrenadeJump OR AbilitySwap=1
-      # Blaze=1 OR Flash OR Sentry=1  # Use the no ability zone to ability swap without needing a second ability
+      # Blaze=1 OR Sentry=1  # Use the no ability zone to ability swap without needing a second ability
       Bash, Water  # Juggle a fish
   pickup InnerWellspring.SwimOre:
     moki: Water
@@ -14268,11 +14268,20 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Water, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       Damage=20, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       DoubleJump, TripleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1 OR Shuriken=1  # jump from the right wall (no climbing it since it is too obscure)
+      # Glitched
+      # GlideJump, DoubleJump, TripleJump OR Hammer OR Spear=1
+      # SentryJump=1 OR AerialHammerJump OR GrenadeJump=1
     unsafe:
-      Bash, Grenade=1  # Stand on the left of the TP, launch the grenade with a curve so it won't touch the ceiling and bash it when it falls down
+      Bash, Grenade=1  # Stand on the left of the TP, launch the grenade with a curve so it doesn't touch the ceiling and bash it when it falls down
       WaterDash, Dash, Hammer, Water OR Damage=20  # Already hard with analog swimming but it's a nightmare on keyboard
-      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # wall jump from the right wall. With weapons, climb the right wall then djump+ upslash.
-      Sentry=2 OR Blaze=2
+      WaterDash, Dash, Sword, Water OR Damage=20  # downslash to grab the pickup
+      DoubleJump  # Climb the right wall
+      SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR AbilitySwap=2
+      Damage=20, BlazeSwap=1 OR SentrySwap=1  # https://youtu.be/OClfrWs1wok
+      # Blaze=2 OR Sentry=2  # Use the no ability zone to ability swap without needing a second ability then use Sentry/Blaze a second time
+      WaterDash, GlideJump, Water OR Damage=20  # waterdash then glidejump. The angle is pretty precise.
+      GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1
+      Sword, Shuriken=1  # wall jump from the right wall then shuriken pogo
   pickup WestPools.BurrowEX:
     moki: Water, Burrow
     kii: Damage=60, Burrow
@@ -14299,7 +14308,8 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
     unsafe:
       Water
       WestPools.ForestsStrength, Bash, Damage=160
-      Damage=200, Burrow, Blaze=1, DoubleJump OR Launch
+      Damage=200, Burrow, Blaze=1, DoubleJump  # underwater walking
+      Damage=180, Burrow, Blaze=1, Launch  # underwater walking
   conn EastPools.CentralRoom:
     moki: Water, WaterBreath, WaterDash
     gorlek: Water, WaterDash
