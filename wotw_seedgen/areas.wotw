@@ -15697,7 +15697,7 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
     moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
 
-anchor WeepingRidge.Elevator at -1170, -3820:  # Bottom checkpoint next to the elevator
+anchor WeepingRidge.Elevator at 1170, -3820:  # Bottom checkpoint next to the elevator
   refill Checkpoint
 
   state WeepingRidge.ElevatorFightCompleted:
@@ -15735,7 +15735,7 @@ anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top o
       Bash, DoubleJump
       Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/SecqqWk_hFE
 
-  conn WeepingRidge.AboveTree:
+  conn WeepingRidge.AfterElementals:
     moki:
       Glide
       Launch, Bash OR DoubleJump OR Dash
@@ -15803,7 +15803,7 @@ anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top o
       SpearJump=1, Spear=2  # 1 jump + 1 spear might be possible. https://youtu.be/AEiZkRiLQCc
       GrenadeJump  # Can barely make it to the ledge above the portal
 
-anchor WeepingRidge.AfterElementals at -1303, -3769:  # Ledge next to the spikes, under the portal leeding to the ore
+anchor WeepingRidge.AfterElementals at 1303, -3769:  # Ledge next to the spikes, under the portal leeding to the ore
   pickup WeepingRidge.Ore:
     moki: Launch, DoubleJump OR Dash OR Bash OR Glide
     gorlek: Launch
