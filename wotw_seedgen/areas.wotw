@@ -4103,11 +4103,37 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   quest EastHollow.ForestsVoice: free
   quest EastHollow.WellspringDoneTalk:
     moki: InnerWellspring.WaterEscape
-  quest EastHollow.KwolokAmuletQuest:
-    moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
 
   state GladesTown.TuleySpawned:
     moki: InnerWellspring.WaterEscape
+
+  # Because of the slowzone, paths coming from Woods can't easily reach that anchor so pickups originate from EastHollow.KwolokShrine instead
+
+  conn EastHollow.KwolokPathLantern:
+    moki:
+      Bash, DoubleJump OR Dash OR Glide
+      DoubleJump, Dash OR Glide
+      Dash, Glide, Damage=10
+      Launch
+    gorlek:
+      Bash, Damage=10 OR Hammer
+      DoubleJump OR Dash OR Glide OR Sword
+      Hammer, Damage=10
+    kii:
+      Hammer OR Sentry=3 OR Damage=20
+      Sentry=2, Shuriken=1  # less energy than 3 sentries
+      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat OR AbilitySwap=1  # friendly spikes
+  conn EastHollow.KwolokShrine: free
+
+anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mortar, after the amulet shrine
+  refill Checkpoint
+
+  quest EastHollow.KwolokAmuletQuest:
+    moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
+
   state EastHollow.SilentSwimWall:
     moki: Water
     unsafe:
@@ -4178,23 +4204,24 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
       Bash, Damage=80
       WaterDash, Bash, Damage=40
 
-  conn EastHollow.KwolokPathLantern:
+  conn EastHollow.Kwolok:  # before getting the wisps, there is a slowzone making the jump towards Kwolok a bit difficult
     moki:
-      Bash, DoubleJump OR Dash OR Glide
-      DoubleJump, Dash OR Glide
-      Dash, Glide, Damage=10
-      Launch
+      DoubleJump OR Dash OR Launch
+      Bash, Grenade=1
+      Water, WaterDash
     gorlek:
-      Bash, Damage=10 OR Hammer
-      DoubleJump OR Dash OR Glide OR Sword
-      Hammer, Damage=10
+      EastHollow.ForestsVoice, Glide OR Sword OR Hammer
+      Damage=20, WaterDash
+      SentryJump=1
     kii:
-      Hammer OR Sentry=3 OR Damage=20
-      Sentry=2, Shuriken=1  # less energy than 3 sentries
-      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Bash OR Shuriken=2 OR Damage=10 OR PauseFloat OR AbilitySwap=1  # friendly spikes
+      Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
+      Water, Bash  # Use a fish. Might want a dboost because you can't see the fish while at the surface?
+      EastHollow.ForestsVoice OR Glide OR Water:
+        Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump
+      # EastHollow.ForestsVoice, GrenadeJump=1
+    unsafe: free  # fairly precise coyote jump followed by a wall jump to avoid touching the water
   conn WoodsEntry.ShriekMeet:
     moki, Water, EastHollow.SilentSwimWall, Combat=Balloon:
       Grapple, DoubleJump, Dash OR Glide
@@ -7860,14 +7887,35 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
       GrenadeJump, DoubleJump, TripleJump OR Hammer OR Spear=1
       Bash, Grenade=1, DoubleJump, Spear=1
       DoubleJump, TripleJump, Hammer OR Spear=1 OR GlideJump OR SwordJump
+  # insert dirty water paths for EastHollow.SilentSwimEC (:
 
   conn WoodsEntry.BellowHut:
     moki: Combat=Balloon, Combat=Tentacle OR Bash OR Launch
     gorlek: Combat=Tentacle OR Bash OR Launch OR Damage=10
-  conn EastHollow.Kwolok:
-    moki, EastHollow.SilentSwimWall: Water
+  conn EastHollow.KwolokShrine:
+    moki, EastHollow.SilentSwimWall: Water, Bash OR Launch
+    gorlek, EastHollow.SilentSwimWall:
+      Water, SentryJump=1
+      Water, DoubleJump, TripleJump, Sword OR Hammer OR Damage=10
+      Water, WaterDash, DoubleJump, TripleJump  # using a 45° angle
+    kii, EastHollow.SilentSwimWall:
+      Water, DoubleJump, Damage=10, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Water, WaterDash, DoubleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # sword is trickier but it can also slash the mortar to reset djump
+      # Glitched
+      # Water, GlideJump, DoubleJump OR Hammer OR Spear=1
+      # Water, AerialHammerJump OR GrenadeJump=1
     unsafe, EastHollow.SilentSwimWall:
-      Damage=220, Damage=120
+      Water:
+        WaterDash  # use the wdash momemtum to wall jump off the left ledge. Really specific angle which is preeetty hard on KBM
+        GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR Damage=10
+        GrenadeJump OR AerialHammerJump OR AbilitySwap=1
+        Damage=10, DoubleJump OR Hammer
+        Damage=10, Sword  # dboost into the spikes and pogo the mortar projectile
+      Damage=220, Damage=120:
+        GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR Damage=10
+        GrenadeJump OR AerialHammerJump OR AbilitySwap=1
+        Damage=10, DoubleJump OR Hammer
+        Damage=10, Sword
       Damage=90, Damage=60, WaterDash
       Damage=210, Damage=120, Bash
 
