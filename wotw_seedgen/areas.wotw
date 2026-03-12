@@ -16233,6 +16233,11 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
     kii:
       BreakCrystal, DoubleJump, TripleJump OR Dash
       Spear=1 OR Shuriken=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump  # Plus upswing to break the crystal
+    unsafe:
+      BreakCrystal, DoubleJump OR GlideJump  # Get as close to the spikes as possible
+      GroundedHammerJump OR WallHammerJump OR CoyoteHammerJump  # You can do these on the side of the health plant
   refill Health=1
 
   state WillowsEnd.GrappleWheelsHeart:
@@ -16249,17 +16254,18 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       WillowsEnd.GrappleWheelsHeart, Bash, Grenade=1
     kii:
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=4
-      Bash, Grenade=1, DoubleJump OR Dash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # bash grenade above the heart to avoid a dboost
+      Bash, Grenade=1, DoubleJump OR Dash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Bash grenade above the heart to avoid a dboost
       WillowsEnd.GrappleWheelsHeart, Sword OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       WillowsEnd.GrappleWheelsHeart, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      DoubleJump
-      WillowsEnd.GrappleWheelsHeart, Blaze=1, Spear=1  # Blaze for the first jump, spear for the second. More energy efficient than 2 spears
-      WillowsEnd.GrappleWheelsHeart, Hammer
+    unsafe:  # You can ceilingjump across the ceiling portal. Left wall is climbable
+      DoubleJump OR GrenadeJump OR AbilitySwap=1 OR Sword  # Skills that can solve with and without the heart
+      Bash, Grenade=1  # You need to throw the grenade from the anchor position
+      WillowsEnd.GrappleWheelsHeart, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat
 
-  # Paths that can reach the floating platform from here, but not from Entry
-  # conn WillowsEnd.EntryFloatingPlatform
-  conn WillowsEnd.Entry:  # going backwards without breaking the heart has many weird spots, saving it for later difficulties
+  conn WillowsEnd.EntryFloatingPlatform: # Paths that can reach the floating platform from here, but not from Entry
+    unsafe, WillowsEnd.GrappleWheelsHeart:
+      GlideJump, DoubleJump, TripleJump  # Prepare GlideJump on the heart ledge and glide right
+  conn WillowsEnd.Entry:
     moki, WillowsEnd.GrappleWheelsHeart:
       Glide, DoubleJump OR Dash
       Launch, DoubleJump OR Dash OR Glide
@@ -16272,10 +16278,22 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Dash, DoubleJump OR Glide OR Sword OR Hammer OR Sentry=2
+      # Glitched
+      # GrenadeJump=1, Glide
+      # GlideJump  # Can help delay on a wrong cycle
     unsafe, WillowsEnd.GrappleWheelsHeart:
       Glide  # Not hard but need to jump on the right lava thingy cycle without seeing them
       Bash, Grenade=1
-      Dash, Damage=40  # Dash on the lava thingy and use it as an elevator
+      Damage=40, Sword OR Hammer OR DoubleJump OR Dash  # Jump to the lava blob and use it as an elevator
+      Dash, Shuriken=1
+      Dash, Blaze=1  # Blaze WaveDash off the floating platform
+  conn WillowsEnd.GrappleHeartMidPoint:  # Connections going backwards without being able to break the heart
+    unsafe:
+      Damage=20, DoubleJump, TripleJump:  # Dboost through the first laser to friendly spikes. Tjump after the 2nd portal to friendly spikes hidden by foreground object
+        Bash, Grenade=1, Damage=40  # Single grenade cannot break the heart
+        Damage=120  # Dboost your way to the 2nd portal
+      Launch, Glide OR DoubleJump OR Damage=60
+      LaunchSwap
 
 anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back from boulder heart
   refill Checkpoint
