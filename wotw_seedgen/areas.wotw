@@ -9410,45 +9410,17 @@ anchor LowerReach.BelowTokk at -296, -3944:
   refill Checkpoint
 
   conn LowerReach.OutsideTPRoom: free
-  conn UpperReach.KeystoneRoom:
+  conn UpperReach.MantisCairn:
     moki:
-      DoubleJump, Dash, Bash  # bash the mantis
-      DoubleJump, Bash, Grenade=1
+      DoubleJump, Dash OR Glide
+      Bash, Grenade=1
       Launch
     gorlek:
-      DoubleJump, TripleJump OR Dash
-      Bash, DoubleJump OR Dash OR Glide OR Sword  # bash the mantis
-      SentryJump=1, DoubleJump
-      SentryJump=2
+      DoubleJump OR Dash
+      SentryJump=1
     kii:
-      Sword  # Pogo the mantis
-      Hammer, DoubleJump OR Dash
-      Bash, Hammer OR Sentry=2  # Bash the mantis, use the other things to get to the mantis
-      Combat=Mantis, DoubleJump, Sentry=2
-      Combat=Mantis, DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1
-      LowerReach.ThawCentralFurnace, Combat=Mantis, DoubleJump, Glide, Spear=1
-      LowerReach.ThawCentralFurnace, Combat=Mantis, Dash, Shuriken=1 OR Sentry=1 OR Flash=1  # coyote dash from the snaptrap
-    unsafe:
-      LowerReach.ThawCentralFurnace, Combat=Mantis, Dash, Spear=1 OR Blaze=1
-  conn UpperReach.BurrowArea:
-    moki:
-      Burrow, DoubleJump, Dash, Bash  # bash the mantis
-      Burrow, DoubleJump, Bash, Grenade=1
-      Burrow, Launch
-    gorlek:
-      Burrow, DoubleJump, TripleJump
-      Burrow, Bash, DoubleJump OR Dash OR Glide OR Sword  # bash the mantis
-      Burrow, SentryJump=1, DoubleJump
-      Burrow, SentryJump=2
-    kii:
-      Burrow, Sword  # Pogo the mantis
-      Burrow, Bash, Hammer OR Sentry=2
-      Burrow, LowerReach.ThawCentralFurnace, DoubleJump, Dash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
-      Burrow, LowerReach.ThawCentralFurnace, Dash, Hammer
-    unsafe:
-      Burrow, DoubleJump, Hammer OR Spear=1  # Hammer early to avoid the fake autotarget near the wall
-      Burrow, DoubleJump, Damage=20
-      Burrow, LowerReach.ThawCentralFurnace, Combat=Mantis, Dash, Spear=1
+      Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
+    unsafe: GrenadeJump OR AbilitySwap=1 OR PauseFloat
 
 anchor LowerReach.Teleporter at -259, -3962:
   refill Full
@@ -10347,8 +10319,47 @@ region UpperReach:
   kii: Danger=20
   unsafe: free
 
+anchor UpperReach.MantisCairn at -315, -3934:  # inbetween Tokk and the burrow aea
+  conn LowerReach.BelowTokk: free
+  conn UpperReach.KeystoneRoom:
+    moki:
+      Launch
+      Bash, Grenade=1 OR Glide OR DoubleJump OR Dash  # with glide, bash the mantis
+      DoubleJump, Dash, Bash  # bash the mantis
+    gorlek:
+      DoubleJump, TripleJump OR Dash
+      Bash, Sword OR Hammer
+      SentryJump=1
+    kii:
+      Bash OR Sword  # pogo the mantis
+      Hammer, DoubleJump OR Dash
+      Combat=Mantis, DoubleJump, Sentry=2
+      Combat=Mantis, DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1
+      LowerReach.ThawCentralFurnace, Combat=Mantis, DoubleJump, Glide, Spear=1
+      LowerReach.ThawCentralFurnace, Combat=Mantis, Dash, Shuriken=1 OR Sentry=1 OR Flash=1  # coyote dash from the snaptrap
+    unsafe:
+      GrenadeJump OR GlideJump OR AbilitySwap=1 OR CoyoteHammerJump OR WallHammerJump
+      LowerReach.ThawCentralFurnace, Dash  # dash ramp on the snaptrap
+  conn UpperReach.BurrowArea:
+    moki, Burrow:
+      Bash, DoubleJump OR Dash OR Glide  # bash the mantis
+      Bash, Grenade=1
+      Launch
+    gorlek, Burrow:
+      Bash OR SentryJump=1
+      DoubleJump, TripleJump
+    kii, Burrow:
+      Sword  # Pogo the mantis
+      LowerReach.ThawCentralFurnace, DoubleJump, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
+      LowerReach.ThawCentralFurnace, Dash, Hammer
+    unsafe, Burrow:
+      AbilitySwap=1 OR GrenadeJump OR GlideJump
+      DoubleJump, Hammer OR Damage=20
+      LowerReach.ThawCentralFurnace, Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dash ramp on the snaptrap
+
 anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
-  # unsafe paths may be incorrect after moving the anchor
+  refill Checkpoint
+
   pickup UpperReach.LifeForceEX:
     moki:
       Burrow, Launch, Bash
@@ -10367,15 +10378,16 @@ anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
       Burrow, Bash, Grenade=1, Damage=20  # grenade from under the pickup, burrow to reach it then land near the pickup. Damage because of the 2nd sand platform
       Burrow, Dash, Glide  # go to UpperReach.LifeForceShard first
     unsafe:
-      Burrow, SwordSJump=2  # Running sjump from under LifeForceEX
-      Burrow, SentryJump=1, Glide OR Damage=20  # sjump to enter the burrow section. There is a small safespot in the right spikes below the sand after the bashable plant. Use weapon to stall in the air.
-      Burrow, SwordSJump=1, Dash  # Need a precise angle to exit the burrow section under LifeForceEX. Use sword for air stalling.
-      Burrow, HammerSJump=1, Dash, Damage=20  # Need a precise angle to exit the burrow section under LifeForceEX. Use sword for air stalling.
+      Burrow, Dash OR Glide OR Sword OR PauseFloat  # https://youtu.be/5dX7rXTLlCY
+      Burrow, DoubleJump OR Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR Damage=20  # https://youtu.be/q73mW_I_HPI
+      Burrow, Bash, Grenade=1
       Burrow, Bash, Damage=20, Spear=2 OR Shuriken=2 OR Blaze=2 OR Sentry=2 OR Flash=2
-      Burrow, Sword, Sentry=2 OR Flash=2  # Pogo the mantis, before the lantern get a good burrow angle then sentry->sword hover->up slash->sentry to reach the crumbling platform. Same with flash but you have to disable flash during your sword hover so you get a second hop.
-      Burrow, DoubleJump, Damage=20  # dboost in the spikes near the mantis to reach the burrow section then precise angle from under UpperReach.LifeForceEX
-      Burrow, DoubleJump, Sentry=1 OR Flash=1 OR Shuriken=1  # Precise djump from the frozen muncher. Can make it easier by standing on the right of the muncher first so the left side is a bit higher.
-      Burrow, Sword, Damage=20  # Pogo the mantis, precise angle to land into the spikes under UpperReach.LifeForceEX, precise walljump into upslash to land next to the pickup. Blame Wolf who made me realize it was possible
+      AbilitySwap=4  # 2 from friendly spikes left of the first platform to reach the big sand pile then 2 to reach the pickup. 2+1 looks close but didn't managed it.
+      AerialHammerJump OR GlideHammerJump OR WallHammerJump
+      GrenadeJump, DoubleJump
+      SentryJump=2  # https://youtu.be/LLItk23xO0I
+      DoubleJump, Damage=20, TripleJump OR GlideJump  # https://youtu.be/xTkQzRajSEw
+      DoubleJump, TripleJump, GlideJump, Hammer OR Spear=1
   pickup UpperReach.LifeForceShard:
     moki:
       Burrow, Launch, Bash
@@ -10392,17 +10404,15 @@ anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
       Burrow, DoubleJump, Sentry=1 OR Flash=1  # precise angle underneath UpperReach.LifeForceEX then land next to the EX pickup, then go to shard
       Burrow, Dash, Glide
     unsafe:
-      Burrow, SwordSJump=2  # Running sjump from under LifeForceEX
-      Burrow, SentryJump=1, Glide OR Damage=20  # sjump to enter the burrow section. There is a small safespot in the right spikes below the sand after the bashable plant. Use weapon to stall in the air.
-      Burrow, SwordSJump=1, Dash  # Need a precise angle to exit the burrow section under LifeForceEX. Use sword for air stalling.
-      Burrow, HammerSJump=1, Dash, Damage=20  # Need a precise angle to exit the burrow section under LifeForceEX. Use sword for air stalling.
-      Burrow, Bash, Damage=20, Spear=2 OR Shuriken=2 OR Blaze=2 OR Sentry=2 OR Flash=2
-      Burrow, Sword, Sentry=2 OR Flash=2  # Pogo the mantis, before the lantern get a good burrow angle then sentry->sword hover->up slash->sentry to reach the crumbling platform. Same with flash but you have to disable flash during your sword hover so you get a second hop.
-      Burrow, DoubleJump, Damage=20  # dboost in the spikes near the mantis to reach the burrow section then precise angle from under UpperReach.LifeForceEX
-      Burrow, DoubleJump, Sentry=1 OR Flash=1 OR Shuriken=1  # Precise djump from the frozen muncher. Can make it easier by standing on the right of the muncher first so the left side is a bit higher.
-      Burrow, Sword, Damage=20  # Pogo the mantis, precise angle to land into the spikes under UpperReach.LifeForceEX, precise walljump into upslash to land next to the pickup. Blame Wolf who made me realize it was possible
-
-  conn LowerReach.BelowTokk:
+      Burrow, Dash OR Glide OR Sword OR PauseFloat OR Damage=20  # dboost require a precise upward burrow from the big pile of sand to walljump on the physic object under the bashable lantern and then landing in the spikes
+      Burrow, Hammer OR DoubleJump OR BlazeSwap=1 OR SentrySwap=1
+      Burrow, Spear=1, Shuriken=1 OR Sentry=2
+      HammerSJump=2 OR SwordSJump=3  # https://youtu.be/VZjyLwh7zmQ
+      AerialHammerJump OR GlideHammerJump OR WallHammerJump OR AbilitySwap=6
+      GrenadeJump, DoubleJump
+      DoubleJump, Damage=20, TripleJump OR GlideJump
+      DoubleJump, TripleJump, GlideJump, Hammer OR Spear=1
+  conn UpperReach.MantisCairn:
     moki: Burrow
 
 anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four keystone room before Grenade tree
@@ -10594,7 +10604,7 @@ anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four key
       Bash, Grapple, Damage=20, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
     unsafe, UpperReach.ThawFurnace:
       Sword, Damage=20
-  conn LowerReach.BelowTokk: free
+  conn UpperReach.MantisCairn: free
 
 # checkpoint at -369, -3917
 # checkpoint at -216, -3895
