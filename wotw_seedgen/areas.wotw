@@ -16433,15 +16433,24 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
     moki:
       BreakCrystal, Launch
       Bow=1, Combat=CrystalMiner OR Bash
+    gorlek:
+      BreakCrystal, Bash
     kii:
       Spear=1 OR Grenade=1 OR Sentry=1
       Shuriken=1, DoubleJump OR Sword OR Hammer
       DoubleJump, Blaze=1, TripleJump OR Hammer
+    unsafe:
+      GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump OR GlideHammerJump
 
-  conn WillowsEnd.InnerTP:
+  conn WillowsEnd.InnerTP:  # Connection is free except for the CrystalMiner on the way
     moki: Combat=CrystalMiner OR Bash OR Launch
-    gorlek: Damage=10  # Dboost on the gorlek.
-    unsafe: free  # reload to despawn the gorlek
+    gorlek: Damage=10 OR DoubleJump  # Dboost on the gorlek.
+    #kii:
+      # Glitched
+      # GlideJump OR GrenadeJump=1
+    unsafe:
+      Sword OR AbilitySwap=1 OR SpearJump=1  # Pogo
+      #free  # reload to despawn the gorlek  # No longer works after the rando changes to spawn mechanics. The gorlek is always there now
   conn WillowsEnd.East:
     moki:
       DoubleJump, Bash, Grenade=1, Dash OR Glide
@@ -16460,10 +16469,11 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
       Bash, Grenade=1
       Bash, DoubleJump OR Glide OR Sword OR Hammer # Bash glide from the gorlek to the elemental
       Bash, Dash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      DoubleJump, TripleJump, Sword, Dash OR Glide  # slash the element to reset your jumps, pogo it then tjump+upslash to reach the wall above it
+      DoubleJump, TripleJump, Sword, Dash OR Glide  # slash the elemental to reset your jumps, pogo it then tjump+upslash to reach the wall above it
     unsafe:
-      Bash, Dash  # Bash glide from the gorlek to the elemental
-      DoubleJump, TripleJump, Sword  # slash the element to reset your jumps, pogo it then tjump + up slash to reach the left wall
+      Bash, Dash OR PauseFloat OR AbilitySwap=1  # Bash glide from the gorlek to the elemental
+      DoubleJump, TripleJump, Sword  # slash the elemental to reset your jumps, pogo it then tjump + up slash to reach the left wall
+      Unpopular, Bash  # https://youtu.be/jNLcgv0oLao
   # So far, connection towards RedirectHeartPath are handled by going to East first
 
 anchor WillowsEnd.East at 547, -3805:  # To the left of the redirect puzzle
