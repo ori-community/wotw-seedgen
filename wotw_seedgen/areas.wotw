@@ -16403,7 +16403,7 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
       Dash  # Reset dash on ceiling
       DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # touch the wall below Lupo
       Bash, DoubleJump OR Damage=40
-    unsafe: Bash OR DoubleJump
+    unsafe: Bash OR DoubleJump OR PauseFloat
   conn WillowsEnd.AboveInnerTP:
     moki:
       DoubleJump, Bash, Grenade=1, Dash OR Glide
@@ -16418,9 +16418,14 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
     kii:
       Launch  # wjump on the shortcut's breakable wall or launch from the the ground next to the portal if the barrier is broken
       Bash, Grenade=1  # wjump on the shortcut's breakable wall or bashnade from the ground next to the portal if the barrier is broken
-    unsafe:
-      SwordSJump=1, Damage=40
-      #DoubleJump, TripleJump, Dash, Damage=40, Combat=CrystalMiner #I don't think this work anymore? # if the shortcut is open, tjump + dash in the spikes
+      # Glitched
+      # GrenadeJump=1, DoubleJump, TripleJump  # TJ is enough when the shortcut isn't open
+      # AerialHammerJump, TripleJump  # TJ is enough when the shortcut isn't open
+    unsafe:  # It's possible to jump over the CrystalMiner if you get up during the right patrol position. You need to jump over it as it's doing an overhead swing, otherwise you will take contact damage
+      SentryJump=1  # Easier with the wall broken. For Hammer, you need a low SJump and wait until the miner is on the right side of the platform so you can jump over
+      DoubleJump, TripleJump, Dash, Damage=40  # Free with the wall intact. Shortcut wall broken: https://youtu.be/0AEuCVF1crA Dash at the same time as you get the dboost to cling to the wall
+      GlideHammerJump OR GroundedHammerJump OR WallHammerJump OR CoyoteHammerJump  # Break the wall. It's possible to reach the right platform directly by correcting swings mid-air
+      Unpopular, DashBashChain  # Elemental projectiles
 
 anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puzzle
   refill Checkpoint
