@@ -16534,12 +16534,14 @@ anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energ
     moki: Launch OR DoubleJump OR Dash OR Glide
     gorlek: Bash OR Sword OR Hammer
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # to slow yourself down before entering the portal
-    unsafe: PauseFloat
+    unsafe:
+      Unpopular  # Jump from the left wall and get a corner boost beneath the top spikes
+      PauseFloat OR Damage=20  # Dboost through the laser or slow yourself down to go into the portal
   conn WillowsEnd.RedirectHeartPuzzle: free
-  # most likely there will be non-redundant paths to WillowsEnd.AboveInnerTP here in the future, just right now there aren't any
+  # Paths to WillowsEnd.AboveInnerTP are fully redundant in unsafe since you can go to East for free
 
   state WillowsEnd.RedirectHeart:
-    unsafe: BreakWall=30, Launch, DashBashChain  # Redirect the projectile from the enemy
+    unsafe: BreakWall=30, DashBashChain OR LaunchBashChain  # Redirect the elemental's projectile
 
 anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the first portal used for the puzzle
   refill Checkpoint
