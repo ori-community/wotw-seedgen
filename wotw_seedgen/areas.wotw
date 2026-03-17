@@ -16487,9 +16487,12 @@ anchor WillowsEnd.East at 547, -3805:  # To the left of the redirect puzzle
       Bash, DoubleJump
       DoubleJump, Dash
       DoubleJump, TripleJump, Sword OR Hammer  # Sword/Hammer/Djump so don't need to add combat requirement
+    kii:
+      Sword, DoubleJump OR Dash  # Pogo the elemental, hover, condition to reach the ledge
     unsafe:
-      DoubleJump, Sword
-      Dash, Bash OR Sword
+      Sword, Shuriken=1 OR Sentry=1  # Pogo the elemental, hover, condition to reach the ledge
+      Bash  # Aim yourself as close to the last ceiling spike as possible
+      PauseFloat OR AbilitySwap=3
   conn WillowsEnd.RedirectHeartPath:
     moki:
       Launch
@@ -16497,16 +16500,26 @@ anchor WillowsEnd.East at 547, -3805:  # To the left of the redirect puzzle
     gorlek:
       Bash
       DoubleJump, TripleJump
-    kii: Damage=20, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost through the laser
-    unsafe: DoubleJump
+    kii:
+      Damage=20, Glide OR DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # dboost through the laser
+      # Glitched
+      # AerialHammerJump
+    unsafe:
+      # If you enter the portal on the left side, you will exit higher up. If you enter going left, you will exit going up.
+      # With a little speed you can almost reach the left wall after exiting the portal
+      DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2 OR AbilitySwap=2 OR GrenadeJump OR GlideJump  # Dash uses dashramp to get height before dropping into the portal
   conn WillowsEnd.Upper:
     moki: Bash, Launch  # some other paths would be possible, but with how far back the last checkpoint is...
     gorlek:
       Launch
       Bash, DoubleJump
+    kii:
+      Bash, SentryJump=1  # SJump to wait out the laser from the 2nd elemental
+      # Glitched
+      # Bash, GrenadeJump=1  # Gjump to wait out the laser from the 2nd elemental
     unsafe:
       Bash
-      SwordSJump=1, DoubleJump, TripleJump, Damage=20  # sjump+ tjump to rech the right wall. dboost in the laser. tjump+ sword combo to reach the right wall. Pogo the elemental+tjump
+      SwordSJump=1, DoubleJump  # https://youtu.be/hNUeZv5ul7I
 
 anchor WillowsEnd.RedirectHeartPath at 584, -3814:  # on the edge near the energy refill on the way to the redirect heart
   refill Health=1
