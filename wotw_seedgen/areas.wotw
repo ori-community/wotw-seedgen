@@ -16300,12 +16300,19 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
   refill Energy=3:
     moki: BreakCrystal
 
-  state WillowsEnd.BoulderHeart:
-    moki: BreakWall=30, Launch, DoubleJump, Dash
-    kii: BreakWall=30, Launch, DoubleJump OR Dash
-    unsafe, BreakWall=30:
-      Launch
-      DoubleJump, Bash, Grenade=2  # energy refill after collecting checkpoints and dying
+  state WillowsEnd.BoulderHeart:  # Boulder blob has 15 hp, one-way wall has 10hp, heart has 30hp
+    # Note that the checkpoint+platform before the boulder disappears once the boulder has been rolled
+    moki: BreakWall=15, BreakWall=10, BreakWall=30, Launch, DoubleJump, Dash  # Moki and Gorlek get chased by the boulder all the way down
+    kii, BreakWall=15, BreakWall=30:  # Kii can hide next to the breakable wall instead of being chased down
+      Launch, DoubleJump OR Dash OR Glide
+      Bash, Grenade=2, DoubleJump, TripleJump  # Bashglide over the spikes before the heart
+      # Glitched
+      # AerialHammerJump, TripleJump
+    unsafe, BreakWall=30:  # Unsafe can go beneath the boulder before it falls. Keep in mind that Sword and Hammer cannot break the blob and go beneath the boulder without Launch or Dash
+      BreakWall=15, Launch
+      DoubleJump, Bash, Grenade=3  # Bashnade over the platform before the boulder. Single grenade to break the boulder blob
+      BreakWall=15, DoubleJump, Damage=40, Dash, TripleJump OR GlideJump  # Friendly spikes before diagonal laser, dboost+tj to get up to the mine. Dash to cover for Sword/Hammer on BreakWall=15
+      Sentry=2, SwordSJump=2  # 2 sentries to break the blob https://youtu.be/5piLqd-7kmg
 
   pickup WillowsEnd.SpikesOre:
     moki: Launch, Dash OR Glide
@@ -16315,22 +16322,26 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       SentryJump=1, Damage=40, DoubleJump, TripleJump, Dash OR Glide  # damage because the maneuver is a bit tricky
       Bash, Grenade=1, Damage=40, DoubleJump, TripleJump, Dash OR Glide  # damage because the maneuver is a bit tricky
     kii:
-      Launch # launch on the wall bellow the spikes in order to reach the second wheel
+      Launch  # launch on the wall below the spikes in order to reach the second wheel
+      # Might want to simplify these paths in the future? Translates to (Grapple OR (Bash, Grenade=1) OR SentryJump=1), (OtherRequirements)
       Grapple, DoubleJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40  # condition in order to reach the portal then land on the ledge when you exit the portal and coyote dash->dash->djump
       Grapple, DoubleJump, TripleJump, Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # land on the ledge when exiting the portal
       Grapple, DoubleJump, TripleJump, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # same as above but land on the wheel to reach the portal
       Bash, Grenade=1, DoubleJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=40  # condition in order to reach the portal then land on the ledge when you exit the portal and coyote dash->dash->djump
       Bash, Grenade=1, DoubleJump, TripleJump, Glide OR Dash OR Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2  # land on the ledge when exiting the portal
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # same as above but land on the wheel to reach the portal
-    unsafe:  # paths may not make sense after moving them from entry
-      Bash, Grenade=1, DoubleJump, Dash, Damage=40  # dboost on the wheel to reach the portal
-      Grapple, DoubleJump, TripleJump, Damage=40
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40
-      SentryJump=1, Grapple, DoubleJump, TripleJump OR Dash  # land on the small floor after the portal then tjump+upslash
-      SwordSJump=1, Grapple, DoubleJump, Glide  # land on the small floor after the portal then tjump+upslash
-      SentryJump=2, DoubleJump, TripleJump OR Dash  # land on the small floor after the portal then tjump+upslash
-      SwordSJump=2, DoubleJump, Glide  # land on the small floor after the portal then tjump+upslash
-      HammerSJump=3, DoubleJump, Glide  # land on the small floor after the portal then tjump+upslash
+      SentryJump=1, DoubleJump, Dash OR TripleJump  # Same conditions as above but simplified because sentryjump requires sword or hammer
+    unsafe:
+      Grapple, DoubleJump, TripleJump OR Glide OR Sword OR Sentry=5  # Grapple to the moss directly from the anchor
+      Grapple, Sword, Shuriken=2  # Grapple to the moss directly from the anchor
+      Bash, Grenade=1, DoubleJump, TripleJump OR Glide OR Sword OR Sentry=5
+      Bash, Grenade=1, Sword, Shuriken=3  # Needs an extra shuriken to reach the moss
+      SentryJump=1, DoubleJump
+      SentryJump=1, Sword, Shuriken=1, Shuriken=1 OR Damage=40  # Dboost on top of the 2nd wheel or sjump to the moss+hover to the wall+pogo across
+      SentryJump=2, Damage=40 OR SentryJump=1  # Dboost on top of the 2nd wheel or use another sjump into the portal
+      Damage=80, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Sentry=5  # Dboost twice to reach the moss
+      DoubleJump, TripleJump, Damage=40  # Wheel core, wall beneath the spikes, dboost, moss
+      AerialHammerJump
 
   conn WillowsEnd.Entry:
     moki: DoubleJump OR Dash OR Launch
@@ -16341,6 +16352,11 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR Damage=80
       Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Damage=40
+      # Glitched
+      # GrenadeJump=1, Damage=40  # Land on top of the bottom wheel and run
+    unsafe:
+      Damage=40, Damage=40  # 2nd dboost is very rude
+      PauseFloat OR GrenadeJump
   conn WillowsEnd.EntryFloatingPlatform:  # Check for redundancies with going to WillowsEnd.Entry first
     gorlek:
       Grapple, Glide, DoubleJump OR Dash OR Sword OR Hammer  # movement to the bottom wheel, grapple to the top wheel then glide+movement to the floating platform
@@ -16352,10 +16368,9 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Grapple, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # movement to the bottom wheel, grapple to the top wheel, then glide to the floating platform
     unsafe:
       Grapple, Glide  # look up to grapple to the top wheel
-      # DoubleJump, Glide, Damage=80  # dboost on both wheels to reach blue moss, then glide down. Redundant with ->Entry->EntryFloatingPlatform in unsafe
+      # DoubleJump, Damage=40, Glide  # Redundant with ->Entry->EntryFloatingPlatform in unsafe
       # Grapple, DoubleJump, TripleJump, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1  # Needs re-verification after moving from BoulderHeartPath->InnerTP to BoulderHeartPath->EntryFloatingPlatform 
       
-
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
 
