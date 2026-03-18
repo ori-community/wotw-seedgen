@@ -117,6 +117,9 @@ region MarshSpawn:
   # This is mirrored in HowlsDen and MarshPastOpher.
   # Marsh spikes and enemies generally deal 10 damage.
   moki: Danger=10  # Vanilla spawns with 30 health including in hard, so this is vanilla-ish
+  # TODO remove duplicates in v5
+  gorlek: Danger=10
+  kii: Danger=10
   unsafe: free
 
 anchor MarshSpawn.Main at -799, -4310:  # spawn location / inkwater well
@@ -1056,6 +1059,8 @@ anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkEX
 region HowlsDen:
   # This is mirrored from MarshSpawn.
   moki: Danger=10  # Vanilla spawns with 30 health including in hard, so this is vanilla-ish
+  gorlek: Danger=10
+  kii: Danger=10
   unsafe: free
 
 anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where you exit the loop with right hc
@@ -1534,6 +1539,8 @@ anchor DenShrine at -328, -4569:
 region MarshPastOpher:
   # This is mirrored from MarshSpawn.
   moki: Danger=10  # Vanilla spawns with 30 health including in hard, so this is vanilla-ish
+  gorlek: Danger=10
+  kii: Danger=10
   unsafe: free
 
 anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, looking at the Millstone
@@ -2198,6 +2205,7 @@ region MidnightBurrows:
   # Burrows spikes deal 15 damage, enemies 10 with either contact or projectile damage.
   moki: Danger=25  # 15 spike + 10 enemy damage
   gorlek: Danger=15  # 15 spike damage
+  kii: Danger=15
   unsafe: free
 
 anchor MidnightBurrows.Teleporter at -945, -4582:  # At the teleporter
@@ -2520,6 +2528,7 @@ region WestHollow:
   # Hollow spikes and enemies generally deal 10 damage.
   # Some areas have poison water dealing 20 damage, the drainable water notably isn't affected by Clean Water.
   moki: Danger=20  # either 2 * 10 general damage or 20 poison water damage
+  gorlek: Danger=20
   kii: Danger=10  # 10 general damage, poison water is considered avoidable in kii
   unsafe: free
 
@@ -3462,6 +3471,7 @@ region EastHollow:
   # While this area doesn't have 20 damage poison water, it is later in the vanilla progression
   # and has more dangerous spikes and projectiles so we keep the same requirements.
   moki: Danger=20  # 2 * 10 general damage
+  gorlek: Danger=20
   kii: Danger=10  # 10 general damage
   unsafe: free
 
@@ -6852,6 +6862,7 @@ region InnerWellspring:
   # Spikes, enemies and water are like in OuterWellspring, but there's also 20 damage lasers.
   moki: Danger=30  # 10 general + 20 laser damage
   gorlek: Danger=20  # 20 laser damage
+  kii: Danger=20
   unsafe: free
 
 anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where you enter the first room
