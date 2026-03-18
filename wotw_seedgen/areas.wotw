@@ -54,7 +54,7 @@ requirement DepthsLight:
   kii: BowCancel  # is this reasonable?
   # unsafe: Grenade=3  # probably enough
 
-anchor HeaderStates:  # States you need to resolve by using the !!set command in headers and that you can't resolve through playing
+anchor ExternalStates:  # States that can't be solved from this file. They are used by headers with !!set or by Archipelago
   state SkipKwolok:  # Used to logically support skipping Kwolok's fight
     moki: Impossible
   state SkipMora1:  # Used to logically support skipping Mora's first combat phase
@@ -62,6 +62,8 @@ anchor HeaderStates:  # States you need to resolve by using the !!set command in
   state SkipMora2:  # Used to logically support skipping Mora's second combat phase
     moki: Impossible
   state RemoveTPLocks:  # Used to logically remove the skills requirement for teleporters
+    moki: Impossible
+  state RemoveRegionRegen:
     moki: Impossible
 
 anchor Teleporters:  # teleporter access
@@ -7754,8 +7756,8 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
 region WoodsEntry:
   # This is mirrored in WoodsMain.
   # Woods spikes deal 15 damage, enemies mostly 10 but there's the balloons dealing 20 damage.
-  moki: Danger=35, Regenerate  # 15 spike + 20 balloon damage
-  gorlek: Danger=20, Regenerate  # 20 balloon damage
+  moki: Danger=35, Regenerate OR RemoveRegionRegen  # 15 spike + 20 balloon damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 balloon damage
   kii: Danger=20  # 20 balloon damage
   unsafe: free
 
@@ -7991,8 +7993,8 @@ anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone doo
 
 region WoodsMain:
   # This is mirrored from WoodsEntry.
-  moki: Danger=35, Regenerate  # 15 spike + 20 balloon damage
-  gorlek: Danger=20, Regenerate  # 20 balloon damage
+  moki: Danger=35, Regenerate OR RemoveRegionRegen  # 15 spike + 20 balloon damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 balloon damage
   kii: Danger=20  # 20 balloon damage
   unsafe: free
 
@@ -8774,8 +8776,8 @@ anchor WoodsShrine at 1361, -4068:
 region LowerReach:
   # This is mirrored in UpperReach.
   # Reach spikes deal 20 damage, enemies generally 10 but the Miners' hammer attack deals 20 damage.
-  moki: Danger=40, Regenerate  # 20 spike + 20 hammer damage
-  gorlek: Danger=20, Regenerate  # 20 spike or 20 hammer damage
+  moki: Danger=40, Regenerate OR RemoveRegionRegen  # 20 spike + 20 hammer damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 spike or 20 hammer damage
   kii: Danger=20  # 20 spike or 20 hammer damage
   unsafe: free
 
@@ -10190,8 +10192,8 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
 
 region UpperReach:
   # This is mirrored from LowerReach.
-  moki: Danger=40, Regenerate  # 20 spike + 20 hammer damage
-  gorlek: Danger=20, Regenerate  # 20 spike or 20 hammer damage
+  moki: Danger=40, Regenerate OR RemoveRegionRegen  # 20 spike + 20 hammer damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 spike or 20 hammer damage
   kii: Danger=20  # 20 spike or 20 hammer damage
   unsafe: free
 
@@ -10750,8 +10752,8 @@ anchor UpperReach.SeedHut at -131, -3857: # inside the hut with the seed
 region UpperDepths:
   # This is mirrored in LowerDepths.
   # Depths spikes deal 30, enemies generally 10 damage.
-  moki: Danger=40, Regenerate  # 30 spike + 10 enemy damage
-  gorlek: Danger=30, Regenerate  # 30 spike damage
+  moki: Danger=40, Regenerate OR RemoveRegionRegen  # 30 spike + 10 enemy damage
+  gorlek: Danger=30, Regenerate OR RemoveRegionRegen  # 30 spike damage
   kii: Danger=30  # 30 spike damage
   unsafe: free
 
@@ -11406,8 +11408,8 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
 
 region LowerDepths:
   # This is mirrored from UpperDepths.
-  moki: Danger=40, Regenerate  # 30 spike + 10 enemy damage
-  gorlek: Danger=30, Regenerate  # 30 spike damage
+  moki: Danger=40, Regenerate OR RemoveRegionRegen  # 30 spike + 10 enemy damage
+  gorlek: Danger=30, Regenerate OR RemoveRegionRegen  # 30 spike damage
   kii: Danger=30  # 30 spike damage
   unsafe: free
 
@@ -11913,8 +11915,8 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
 
 region PoolsApproach:
   # Pools spikes deal 20, enemies generally 10 damage.
-  moki: Danger=30, Regenerate  # 20 spike + 10 enemy damage
-  gorlek: Danger=20, Regenerate  # 20 spike damage
+  moki: Danger=30, Regenerate OR RemoveRegionRegen  # 20 spike + 10 enemy damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 spike damage
   kii: Danger=20  # 20 spike damage
   unsafe: free
 
@@ -12573,8 +12575,8 @@ region EastPools:
   # Pools spikes deal 20 damage, enemies generally 10 but the torpedos deal 14 damage.
   # That makes this less logically dangerous than Woods despite being later in vanilla progression,
   # but that's plausible because Pools is more puzzly and also has the threat of drowning.
-  moki: Danger=34, Regenerate  # 20 spike + 14 torpedo damage
-  gorlek: Danger=20, Regenerate  # 20 spike damage
+  moki: Danger=34, Regenerate OR RemoveRegionRegen  # 20 spike + 14 torpedo damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 spike damage
   kii: Danger=20  # 20 spike damage
   unsafe: free
 
@@ -13379,8 +13381,8 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
 
 region UpperPools:
   # This is mirrored from EastPools.
-  moki: Danger=34, Regenerate  # 20 spike + 14 torpedo damage
-  gorlek: Danger=20, Regenerate  # 20 spike damage
+  moki: Danger=34, Regenerate OR RemoveRegionRegen  # 20 spike + 14 torpedo damage
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen  # 20 spike damage
   kii: Danger=20  # 20 spike damage
   unsafe: free
 
@@ -14143,8 +14145,8 @@ region WestPools:
   # This is mirrored from EastPools.
   # While the area has less threatening spikes and no torpedos, we mirror for logical simplicity
   # and consistency with other small safer areas which aren't handled specially.
-  moki: Danger=34, Regenerate
-  gorlek: Danger=20, Regenerate
+  moki: Danger=34, Regenerate OR RemoveRegionRegen
+  gorlek: Danger=20, Regenerate OR RemoveRegionRegen
   kii: Danger=20
   unsafe: free
 
@@ -14294,8 +14296,8 @@ anchor KwolokFight at -1978, -4135:
 region LowerWastes:
   # This is mirrored in UpperWastes.
   # Wastes spikes deal 30 damage, enemies deal various amounts where the highest is 20 damage from the Miners' hammer attack.
-  moki: Danger=50, Regenerate  # 30 spike + 20 hammer damage
-  gorlek: Danger=30, Regenerate  # 30 spike damage
+  moki: Danger=50, Regenerate OR RemoveRegionRegen  # 30 spike + 20 hammer damage
+  gorlek: Danger=30, Regenerate OR RemoveRegionRegen  # 30 spike damage
   kii: Danger=30  # 30 spike damage
   unsafe: free
 
@@ -14968,8 +14970,8 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
 
 region UpperWastes:
   # This is mirrored from LowerWastes.
-  moki: Danger=50, Regenerate  # 30 spike + 20 hammer damage
-  gorlek: Danger=30, Regenerate  # 30 spike damage
+  moki: Danger=50, Regenerate OR RemoveRegionRegen  # 30 spike + 20 hammer damage
+  gorlek: Danger=30, Regenerate OR RemoveRegionRegen  # 30 spike damage
   kii: Danger=30  # 30 spike damage
   unsafe: free
 
@@ -15551,8 +15553,8 @@ anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedesta
 
 region WeepingRidge:
   # This is mirrored from WillowsEnd.
-  moki: Danger=60, Regenerate  # 40 spike + 20 enemy damage
-  gorlek: Danger=40, Regenerate  # 40 spike damage
+  moki: Danger=60, Regenerate OR RemoveRegionRegen  # 40 spike + 20 enemy damage
+  gorlek: Danger=40, Regenerate OR RemoveRegionRegen  # 40 spike damage
   kii: Danger=40  # 40 spike damage
   unsafe: free
 
@@ -15808,8 +15810,8 @@ anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willo
 region WillowsEnd:
   # This is mirrored in WeepingRidge.
   # Willow spikes deal 40, enemies generally 20 damage.
-  moki: Danger=60, Regenerate  # 40 spike + 20 enemy damage
-  gorlek: Danger=40, Regenerate  # 40 spike damage
+  moki: Danger=60, Regenerate OR RemoveRegionRegen  # 40 spike + 20 enemy damage
+  gorlek: Danger=40, Regenerate OR RemoveRegionRegen  # 40 spike damage
   kii: Danger=40  # 40 spike damage
   unsafe: free
 
