@@ -16859,17 +16859,25 @@ anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
     moki:
       BreakCrystal, Launch OR Glide
       Bow=1
-    kii: Spear=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1
+    kii:
+      Spear=1 OR Shuriken=1 OR Grenade=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump
+    unsafe:
+      GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump
+      BreakCrystal, AbilitySwap=1
 
   state WillowsEnd.GlideHeart:
     moki: BreakWall=30, Glide
     kii: BreakWall=30, Launch, DoubleJump, Damage=40
+    unsafe: BreakWall=30, LaunchSwap  # hehe
 
   pickup WillowsEnd.WindSpinOre:
     moki: Glide
     kii: Launch, DoubleJump, Damage=40, Damage=80  # dboost on the first wheel, dboost twice on the second one
     unsafe:
       Launch, DoubleJump, TripleJump OR Damage=40  # dboost on the 2nd wheel (close to its center), there is a small ledge on the 1st wheel to wait
+      LaunchSwap  # hehe
 
   conn WillowsEnd.GlideHeartPath: free  # :D
 
