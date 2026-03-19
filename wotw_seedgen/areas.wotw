@@ -16548,14 +16548,14 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
 
   state WillowsEnd.RedirectHeart:
     moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
-    kii:
-      BreakWall=10, BreakWall=30, Launch, Bash, Dash
+    kii: BreakWall=10, BreakWall=30, Launch, Bash, Dash OR Glide
     unsafe:
       Spear=2
       BreakWall=10, BreakWall=30, Glide, Bash
       Grenade=2, Launch, Bash
       Sword, Launch, Bash
       Deflector, Sword, Bash, Damage=20
+      BreakWall=30, Damage=60, DashBashChain  # Dboost on spikes then laser, fetch a projectile to open the purple wall
 
   pickup WillowsEnd.RedirectEX:
     moki:
@@ -16570,9 +16570,19 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
       Bash, DoubleJump, TripleJump, BreakWall=10, Glide OR Sword OR Damage=40
       Bash, DoubleJump, TripleJump, BreakWall=10, Dash, Hammer OR Sentry=2 OR Blaze=4
       Bash, Grenade=1, Glide, BreakWall=10 # use a second projectile so you can land on the edge above the double laser then throw a grenade and bash from the 1st projectile in order to reach your grenade
+      Damage=40, SentryJump=1  # Spikes directly under the pickup only deal damage once. Players won't know this but it's simpler for damage calc
+      # Glitched
+      # AerialHammerJump, TripleJump  # Upswing beforehand
+      # GrenadeJump=1, Launch
+      # LaunchSwap  # Directly to the pickup
     unsafe:
       Launch
       Bash, Grenade=1, BreakWall=10, Damage=160
+      AerialHammerJump, GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump OR GlideHammerJump
+      SentryJump=1
+      GlideJump, DoubleJump, TripleJump  # Prepare the glidejump before dropping into the portal, then reset on the wall to the right of the pickup. Must guess the laser cycle
+      Damage=60, DashBashChain  # Dboost on spikes then laser, fetch a projectile
+      AbilitySwap=3
 
   conn WillowsEnd.RedirectHeartPath:
     moki:
@@ -16581,8 +16591,18 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
     gorlek:
       SentryJump=1
       DoubleJump, TripleJump, Damage=40
-    kii: DoubleJump, Damage=40
-    unsafe: DoubleJump, Sword  # pogo the mine
+    kii:
+      DoubleJump, Damage=40
+      Damage=80
+      # Glitched
+      # GlideJump, Damage=40
+      # GrenadeJump=1 OR AerialHammerJump
+    unsafe:
+      #DoubleJump, Sword  # pogo the mine
+      Damage=40 OR AbilitySwap=1 OR GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump
+      #DoubleJump, TripleJump  # Only going left. Too precise for kii because you need to bonk and recover to keep climbing
+      DoubleJump  # Go to the right wall
+      GlideJump, Hammer OR Dash OR Sentry=1 OR Shuriken=1  # Go to the right wall
 
 anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
   door:
