@@ -16884,17 +16884,16 @@ anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
 # checkpoint at 315, -3862
 # checkpoint at 487, -3780
 
-# anchor LaserRockFight:
-#   refill Full
-#   state WillowsEnd.ElementalDefeated:
-#     moki: Combat=smth
-
 anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked by vines
   refill Checkpoint
   refill Energy=4:
     moki:
       BreakCrystal, Launch
       Bow=1
+    kii:
+      Spear=1 OR Grenade=1 OR Sentry=1
+    unsafe:
+      Damage=20, BreakCrystal  # The laser has weird properties. Run up to it and jump for a height boost
 
   pickup WillowsEnd.UpperLeftEX:
     moki: Grapple, Launch, DoubleJump OR Dash OR Glide
@@ -16904,12 +16903,17 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       WillowsEnd.SpinPortalsHeart, Launch, DoubleJump, Glide, Bash
     kii:
       Launch, Damage=80
-      Launch, Damage=40, Bash OR Sword # bash/pogo the elemental, dboost in the spike bellow UpperLeftEX
+      Launch, Damage=40, Bash OR Sword  # bash/pogo the elemental, dboost in the spike below UpperLeftEX
       DoubleJump, TripleJump, Grapple, Damage=60  # dboost on the laser at the second room then dboost on the wheel next to the pickup
       WillowsEnd.SpinPortalsHeart, Launch, Bash  # bash the first elemental then bash one of its projectile in order to reach the 2nd elemental
+      # Glitched
+      # AerialHammerJump, TripleJump, Grapple, Damage=40  # damage for last wheel
     unsafe:
       Launch
+      DoubleJump, TripleJump, Grapple, Damage=40  # Same as kii path, but go beneath the laser instead of dboosting
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard, bash glide from the elemental after that
+      AerialHammerJump, TripleJump, Grapple
+      Grapple, SentryJump=2, SentryJump=1 OR DoubleJump
 
   conn WillowsEnd.Upper: free
   conn WillowsEnd.UpperHeartCheckpoint:
@@ -16936,10 +16940,16 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       DoubleJump, TripleJump, Grapple, Bash, Damage=100  # dboost on the laser before the 2nd wheel (20) then on spikes before the last portal (40). Since it's hard to avoid taking a dboost on the wheel when entering the portal under UpperLeftEX, adding an extra dboost (40)
       WillowsEnd.SpinPortalsHeart, Launch, DoubleJump OR Dash OR Sword OR Hammer
       WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, DoubleJump
+      WillowsEnd.SpinPortalsHeart, SentryJump=1, Bash OR SentryJump=1  # Max height
+      # Glitched
+      # WillowsEnd.SpinPortalsHeart, AerialHammerJump, TripleJump, Bash
+      # WillowsEnd.SpinPortalsHeart, GrenadeJump=1, DoubleJump, TripleJump, Bash
     unsafe:
-      Launch, DoubleJump OR Damage=40
+      Launch
+      #Launch, DoubleJump OR Damage=40
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard
-      WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, Spear=1  # Grenade, then spear jump to bash it from higher
+      WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, SpearJump=1  # Grenade, then spear jump to bash it from higher
+      WillowsEnd.SpinPortalsHeart, AerialHammerJump, TripleJump
 
 anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the upper heart
   refill Checkpoint
@@ -16959,7 +16969,7 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
 
   conn WillowsEnd.UpperHeartPath:
     moki: WillowsEnd.SpinPortalsHeart
-    # backward connection without this state has some weird spot, saving it for higher difficulties
+    # backward connection without this state has some weird spot, saving it for higher difficulties    
 
 anchor Tokk:  # Tokk's talks
   quest GladesTown.HandToHandPouch:
