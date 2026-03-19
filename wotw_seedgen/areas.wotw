@@ -16836,8 +16836,12 @@ anchor WillowsEnd.GlideHeartPath at 374, -3824:  # one room before the first win
       Launch
       DoubleJump, TripleJump
       Combat=Mantis, SentryJump=1, DoubleJump OR Damage=20
-    kii: DoubleJump, Hammer # djump+upslash to land on the platform in the wheel
+    kii:
+      DoubleJump, Hammer # djump+upslash to land on the platform in the wheel
+      # Glitched
+      # GlideJump, DoubleJump
     unsafe: free  # https://youtu.be/rWO35ruudfw
+      # GrenadeJump=2  # Too precise for kii. One to get into the wheel, one to jump over the laser
       # Bash  # stun-lock the mantis by bashing it so it doesn't jump on the wheel
   conn WillowsEnd.West: free  # :D
 
