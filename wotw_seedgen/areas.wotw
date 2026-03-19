@@ -16962,14 +16962,19 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
     kii:
       DoubleJump, TripleJump
       Bash, Grenade=1
+      # Glitched
+      # GrenadeJump=1  # Gives extra height when exiting the portal
     unsafe: DoubleJump
   pickup WillowsEnd.UpperLeftEX:  # So far, paths using WillowsEnd.SpinPortalsHeart are the same as going to UpperHeartPath first
     gorlek: Launch, DoubleJump, Glide, Bash
     kii: Launch, Bash
+    unsafe: Unpopular, Launch, Glide  # Guess the wheel rotation and take 40+ damage if you fail, then use the portal twice
 
   conn WillowsEnd.UpperHeartPath:
     moki: WillowsEnd.SpinPortalsHeart
-    # backward connection without this state has some weird spot, saving it for higher difficulties    
+    unsafe:  # Backward connections without solving the state have some weird spots
+      Unpopular, Launch, Bash OR Glide  # I hate this path
+    
 
 anchor Tokk:  # Tokk's talks
   quest GladesTown.HandToHandPouch:
