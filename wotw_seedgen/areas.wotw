@@ -16059,7 +16059,7 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       DoubleJump, Sword, Shuriken=1
       Dash, AerialHammerJump OR GroundedHammerJump
       GlideHammerJump
-  # Paths skipping WillowsEnd.EntryFloatingPlatform
+  # Could not find any non-redundant paths skipping WillowsEnd.EntryFloatingPlatform
   # conn WillowsEnd.GrappleHeartMidPoint
 
 anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platform above the entrance
