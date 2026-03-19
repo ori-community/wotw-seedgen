@@ -16714,21 +16714,36 @@ anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
 anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
   refill Checkpoint
   refill Health=1
+  refill Energy=4:
+    moki:
+      BreakCrystal, Launch
+      Bow=1, DoubleJump OR Dash OR Glide  # Movement to get the drops before those fall down
+    gorlek: BreakCrystal, DoubleJump
+    kii: BreakCrystal
 
   state WillowsEnd.MinibossHeart:
     moki: Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
     gorlek: Boss=300, Damage=60, Regenerate, Launch, Bash, DoubleJump OR Dash
     kii: Boss=300, Damage=60, Regenerate, Launch, DoubleJump OR Dash OR Glide
-    unsafe: Boss=300, Launch OR DoubleJump
+    unsafe:
+      Boss=300, Launch OR DoubleJump
+      Unpopular, Bash  # Bash the projectiles and loose rocks back at the core. This is not captured in Boss=300 because Bash doesn't deal damage by itself
 
   conn WillowsEnd.Upper:
     moki: Launch, Dash, Glide, DoubleJump
     gorlek: Launch, Glide OR DoubleJump OR Dash
-    kii: Launch, Sword OR Hammer OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1
+    kii:
+      Launch, Sword OR Hammer OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1
+      Bash, Grenade=1, Damage=40, Glide OR DoubleJump OR Dash  # Right side is tricky, 40 damage for good measure
+      # Glitched
+      # AerialHammerJump, Damage=40
+      # GrenadeJump=1, DoubleJump, TripleJump, Damage=40
     unsafe:
       Launch  # Reset launch on the ceiling
       DoubleJump, TripleJump  # Safe spot in the goo next to the laser
-      SwordJump  # Safe spot in the goo next to the laser. Tight SwordJump to the wall, then double jump + sword combo + upslash to get to the middle safe platform
+      SwordJump  # Safe spot in the goo next to the laser. SwordJump+upslash to the wall, then dj+hover to get to the middle safe platform
+      SentryJump=1
+      Bash, Grenade=1, PauseFloat OR Glide OR DoubleJump OR Dash
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
