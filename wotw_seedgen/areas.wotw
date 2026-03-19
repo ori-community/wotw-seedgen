@@ -16378,6 +16378,9 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   state WillowsEnd.PortalShortcut:
     moki, BreakWall=20: DoubleJump OR Dash OR Launch OR Bow=1
     gorlek: BreakWall=20
+  state WillowsEnd.CentralShortcut:  # The one-way wall above Lupo
+    unsafe, Sentry=3:  # https://discord.com/channels/116250700685508615/687990614884876289/1447678253581078629
+      Launch OR SentryJump=3 OR AbilitySwap=9  # Accounting for 3 sentries
 
   pickup WillowsEnd.LupoMap:
     moki: SpiritLight=50, DoubleJump OR Dash OR Launch OR Bow=1
@@ -16426,6 +16429,19 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
       DoubleJump, TripleJump, Dash, Damage=40  # Free with the wall intact. Shortcut wall broken: https://youtu.be/0AEuCVF1crA Dash at the same time as you get the dboost to cling to the wall
       GlideHammerJump OR GroundedHammerJump OR WallHammerJump OR CoyoteHammerJump  # Break the wall. It's possible to reach the right platform directly by correcting swings mid-air
       Unpopular, DashBashChain  # Elemental projectiles
+  conn WillowsEnd.West:  # That checkpoint box is really big so you don't have to bother with the CrystalMiner
+    moki, WillowsEnd.CentralShortcut: Launch
+    gorlek, WillowsEnd.CentralShortcut:
+      Bash, Grenade=1, DoubleJump, TripleJump
+    kii, WillowsEnd.CentralShortcut:
+      SentryJump=1
+      Bash, Grenade=1, DoubleJump
+      # Glitched
+      # AerialSentryJump, TripleJump
+    unsafe, WillowsEnd.CentralShortcut:
+      Bash, Grenade=1  # Very precise when the portal shortcut is broken
+      DoubleJump, WallHammerJump
+      GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump OR AbilitySwap=3
 
 anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puzzle
   refill Checkpoint
@@ -16755,9 +16771,31 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
     gorlek: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
     kii: Launch
     unsafe: BreakWall=30, DoubleJump, Glide OR Dash
+  state WillowsEnd.CentralShortcut:  # The one-way wall above Lupo
+    moki, BreakWall=20: Combat=MaceMiner OR Bash OR Launch
+    gorlek, BreakWall=20:
+      Damage=10 OR SentryJump=1
+      DoubleJump, TripleJump
+    kii, BreakWall=20:
+      Sword, DoubleJump  # Pogo
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1
+    unsafe, BreakWall=20:
+      GlideJump OR DoubleJump OR Dash OR AbilitySwap=1
 
-  conn WillowsEnd.InnerTP:
-    moki: BreakWall=20, Combat=MaceMiner OR Bash OR Launch
+  conn WillowsEnd.InnerTP:  # This duplicates the movement requirements from CentralShortcut only because you need to get past the Gorlek for both
+    moki, WillowsEnd.CentralShortcut: Combat=MaceMiner OR Bash OR Launch
+    gorlek, WillowsEnd.CentralShortcut:
+      Damage=10 OR SentryJump=1
+      DoubleJump, TripleJump
+    kii, WillowsEnd.CentralShortcut:
+      Sword, DoubleJump  # Pogo
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1
+    unsafe, WillowsEnd.CentralShortcut:
+      GlideJump OR DoubleJump OR Dash OR AbilitySwap=1
   conn WillowsEnd.Upper:  # this works because the portal wheel drops if you step below
     moki, BreakWall=10:
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
@@ -16773,6 +16811,9 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
       Bash, Grenade=1 OR Damage=40  # bashnade to avoid dboost on the falling wheel
       Bash, DoubleJump, Hammer  # djump+upslash to avoid dboost on the falling wheel
       DoubleJump, Sword  # Pogo the Crystal Miner then djump+upslash to avoid dboost on the falling wheel
+      # Glitched
+      # AerialHammerJump
+      # Combat=MaceMiner, GrenadeJump=3  # Break, get into the portal, get into the wheel
     unsafe:
       BreakWall=10:
         Combat=MaceMiner, DoubleJump, TripleJump OR Damage=40  # get a wjump on the energy crystal
