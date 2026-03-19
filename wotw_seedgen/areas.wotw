@@ -16621,6 +16621,10 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       DoubleJump, Sword OR Hammer
       Dash, Sword  # Pogo the gorlek
       Combat=CrystalMiner, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # Combat=CrystalMiner, GrenadeJump=1
+    unsafe, BreakCrystal:
+      DoubleJump OR GlideJump OR GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump OR AbilitySwap=1
 
   state WillowsEnd.BurrowHeart:
     moki, BreakWall=30, Burrow:
@@ -16630,21 +16634,38 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Bash, Grapple, Launch, DoubleJump OR Glide
     kii, BreakWall=30, Burrow:
       Launch, Bash, DoubleJump OR Glide OR Dash
-    unsafe:
-      BreakWall=30, Burrow, Bash, Glide
-      Burrow, Sword, Launch
+    unsafe, Burrow:
+      BreakWall=30:
+        Bash, Glide
+        Bash, Dash, Damage=80
+        DashBashChain OR LaunchBashChain
+        LaunchSwap
+      Sword, Launch
 
   conn WillowsEnd.MiniBossFight:
     moki: Launch, Dash, Glide, DoubleJump
     gorlek: Launch, Dash OR Glide OR DoubleJump
-    kii: Launch
-    unsafe: Damage=40, DoubleJump, TripleJump
+    kii:
+      Launch
+      # Glitched
+      # GrenadeJump=1, Damage=40, Damage=40, DoubleJump OR Dash
+      # AerialHammerJump, Damage=40
+    unsafe:
+      Damage=20, GroundedHammerJump
+      Damage=40, DoubleJump, TripleJump OR GlideJump
+      Damage=80, DoubleJump
+      Damage=120, Damage=40  # 3 to reach the center platform, 1 more to get over the mound
+      SwordSJump=2 OR AerialHammerJump
   conn WillowsEnd.East:
     moki:
       Combat=CrystalMiner, DoubleJump OR Dash OR Glide
       Bash OR Launch
     gorlek: Damage=10, DoubleJump OR Dash OR Glide
-    kii: Combat=CrystalMiner, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
+    kii:
+      Combat=CrystalMiner, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
+    unsafe:
+      # Wait for the gorlek to patrol to the left so you can jump over it for free
+      PauseFloat OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn WillowsEnd.West:
     moki: Launch
     gorlek:
@@ -16654,8 +16675,12 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     kii:
       Damage=90, Combat=CrystalMiner
       Bash, Grenade=2
+      # Glitched
+      # Dash, AerialHammerJump
+      # Dash, DoubleJump, GrenadeJump=1, Danger=40  # GJump+DJ+Dash into the portal. If you go in too low you can hit purple goo on the way out
+      # GlideJump, DoubleJump, TripleJump, Hammer OR Sentry=1 OR Flash=1
     unsafe:
-      SwordJump, TripleJump  # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
+      SwordJump, TripleJump OR SentryJump=1 # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
       DoubleJump, TripleJump, Dash  # Dash ramp from the left side + tjump in order to touch a small wall in the ceilling. Then tjump+dash toward the portal
       Damage=90  # That checkpoint box is really big so you don't have to bother with the CrystalMiner
   conn WillowsEnd.UpperHeartPath:
@@ -16666,9 +16691,14 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     gorlek:
       SentryJump=1, DoubleJump
       Bash, Grenade=1, DoubleJump
-    kii: Bash, Grenade=1
+    kii:
+      Bash, Grenade=1
+      SentryJump=1, Danger=20  # off-screen wall mine
+      # Glitched
+      # AerialHammerJump
+      # GrenadeJump=1, DoubleJump, TripleJump, Hammer
     unsafe:
-      SentryJump=1
+      SentryJump=1 OR GlideHammerJump OR GroundedHammerJump OR DashBashChain
       DoubleJump, TripleJump  # tjump on the left wall to start climbing it
 
 anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
