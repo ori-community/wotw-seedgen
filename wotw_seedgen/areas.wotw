@@ -16769,8 +16769,14 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   state WillowsEnd.SpinLasersHeart:
     moki: BreakWall=30, Launch, DoubleJump, Dash, Glide
     gorlek: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
-    kii: Launch
-    unsafe: BreakWall=30, DoubleJump, Glide OR Dash
+    kii, BreakWall=30:
+      Launch
+      DoubleJump, TripleJump:
+        Dash
+        Bash, Grenade=1
+    unsafe, BreakWall=30:
+      DoubleJump, Glide OR Dash
+      AerialHammerJump, TripleJump
   state WillowsEnd.CentralShortcut:  # The one-way wall above Lupo
     moki, BreakWall=20: Combat=MaceMiner OR Bash OR Launch
     gorlek, BreakWall=20:
@@ -16830,6 +16836,8 @@ anchor WillowsEnd.GlideHeartPath at 374, -3824:  # one room before the first win
   refill Checkpoint
   refill Health=1
 
+  state WillowsEnd.SpinLasersHeart:
+    unsafe: SentryBreak=30  # Sentry will target the heart through the wall
   conn WillowsEnd.GlideRooms:
     moki: DoubleJump, Launch
     gorlek:
