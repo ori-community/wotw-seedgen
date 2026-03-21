@@ -246,7 +246,7 @@ fun grenade_efficiency() {
 fun rapid_grenade() {
     store(rapid_grenades, rapid_grenades + 1)
     item_message("#Rapid Grenade x" + rapid_grenades + "#")
-    store(randoUpgrades.grenadeChargeDurationMultiplier, randoUpgrades.grenadeChargeDurationMultiplier - 0.5)
+    store(randoUpgrades.grenadeChargeDurationMultiplier, randoUpgrades.grenadeChargeDurationMultiplier / 2)
 }
 !item_data(
     rapid_grenade(),
@@ -264,7 +264,7 @@ fun rapid_grenade() {
 fun quickshot_upgrade() {
     store(quickshot_upgrades, quickshot_upgrades + 1)
     item_message("#Quickshot Upgrade x" + quickshot_upgrades + "#")
-    store(randoUpgrades.bowRapidFireIntervalDurationMultiplier, randoUpgrades.bowRapidFireIntervalDurationMultiplier - 0.4)
+    store(randoUpgrades.bowRapidFireIntervalDurationMultiplier, randoUpgrades.bowRapidFireIntervalDurationMultiplier / 2)
 }
 !item_data(
     quickshot_upgrade(),
