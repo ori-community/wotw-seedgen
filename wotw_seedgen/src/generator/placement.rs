@@ -598,21 +598,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    fn target_name(&self, command: &CommandVoid, origin_world_index: usize) -> CommandString {
-        let name = self.worlds[origin_world_index].name(command);
-
-        match name.as_constant() {
-            Some(value) => format!("{value} from <world>{origin_world_index}</>").into(),
-            _ => CommandString::Concatenate {
-                operation: Box::new(Operation {
-                    left: name,
-                    operator: Concatenator::Concat,
-                    right: format!("from <world>{origin_world_index}</>").into(),
-                }),
-            },
-        }
-    }
-
     fn place_command_at(
         &mut self,
         command: CommandVoid,
