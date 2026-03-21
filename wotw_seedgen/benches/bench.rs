@@ -155,7 +155,7 @@ fn solutions(c: &mut Criterion) {
         world.traverse_spawn(&[]);
 
         group.bench_function(id, |b| {
-            b.iter(|| world.find_solutions(&item_pool, &[], 7, 7))
+            b.iter(|| world.find_solutions(&item_pool, &[], 7, 7, None))
         });
     }
 

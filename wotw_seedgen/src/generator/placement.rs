@@ -978,6 +978,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             &self.output.events,
             slots,
             self.spirit_light_progression_slots(),
+            None,
         );
 
         if progressions.is_empty() {

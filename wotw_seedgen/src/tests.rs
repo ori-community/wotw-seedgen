@@ -2,7 +2,10 @@ use crate::generate_seed;
 
 use log::info;
 use wotw_seedgen_data::{
-    assets::{AssetCacheValues, AssetFileAccess, PresetAccess, TEST_ASSETS},
+    assets::{
+        AssetCacheValues, AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings,
+        WorldPresetSettings, TEST_ASSETS,
+    },
     logic_language::{ast::Areas, output::Graph},
     test_logger, Difficulty, UniverseSettings,
 };
@@ -68,20 +71,16 @@ fn some_seeds() {
             .unwrap();
     }
 
-    // TODO multiworld seems to have a problem... maybe solutions just can't scale to high amounts of available slots yet?
+    let preset = UniversePreset {
+        assets_version: 1,
+        info: None,
+        settings: UniversePresetSettings {
+            world_settings: Some(vec![WorldPresetSettings::default(); 2]),
+            ..UniversePresetSettings::default()
+        },
+    };
+    preset.apply(&mut universe_settings, &*TEST_ASSETS).unwrap();
 
-    // let preset = UniversePreset {
-    //     assets_version: 1,
-    //     info: None,
-    //     settings: UniversePresetSettings {
-    //         world_settings: Some(vec![WorldPresetSettings::default(); 2]),
-    //         ..UniversePresetSettings::default()
-    //     },
-    // };
-    // preset.apply(&mut universe_settings, &*TEST_ASSETS).unwrap();
-
-    // info!("Testing multiworld Gorlek with snippets");
-
-    info!("Testing Gorlek with snippets");
+    info!("Testing multiworld Gorlek with snippets");
     generate_test_seed(&graph, &universe_settings);
 }

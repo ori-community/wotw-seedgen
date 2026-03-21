@@ -51,9 +51,11 @@ use smallvec::SmallVec;
 
 use std::{
     collections::hash_map::Entry,
+    env,
     fmt::{self, Display},
     iter, mem,
     ops::ControlFlow,
+    sync::LazyLock,
 };
 
 use itertools::Itertools;
@@ -73,6 +75,27 @@ use crate::{
     world::{ConnectionIndex, ConnectionOrRefill, Missing, ReachStateFails},
     World,
 };
+
+/// Maximum radius of connections to solve before aborting a solution.
+///
+/// Lower values reduce search time but also reduce progression quality.
+/// We're currently forced to default to 0 which is pretty bad but also how v4 behaved.
+///
+/// Average `cargo bench solutions` times as of 2026-03-21:
+/// - `MAX_SEARCH_RADIUS=0`: 2.131 ms
+/// - `MAX_SEARCH_RADIUS=1`: 4.177 ms
+/// - `MAX_SEARCH_RADIUS=2`: 7.052 ms
+/// - `MAX_SEARCH_RADIUS=u8::MAX`: 7.097 ms
+///
+/// Average `cargo bench generation/gorlek rspawn` times:
+/// - `MAX_SEARCH_RADIUS=0`: 279.99 ms
+/// - `MAX_SEARCH_RADIUS=1`: Too long to measure :orithump:
+static MAX_SEARCH_RADIUS: LazyLock<u8> = LazyLock::new(|| {
+    env::var("SOLUTION_MAX_SEARCH_RADIUS")
+        .ok()
+        .and_then(|s| s.parse::<u8>().ok())
+        .unwrap_or(0)
+});
 
 pub type SolutionItems = SmallVec<[usize; 8]>;
 
@@ -208,6 +231,7 @@ impl World<'_, '_> {
         events: &[Event],
         slots: usize,
         spirit_light_slots: usize,
+        search_radius: Option<u8>,
     ) -> Vec<Solution> {
         let fails = self.fails();
         let initial_solutions = fails
@@ -216,7 +240,7 @@ impl World<'_, '_> {
             .flatten()
             .chain(&fails.health)
             .chain(&fails.energy)
-            .map(|fail| PartialSolution::new(fail.clone(), item_pool))
+            .map(|fail| PartialSolution::new(fail.clone(), item_pool, search_radius))
             .collect::<Vec<_>>();
 
         let mut context = SolutionContext::new(self, events, item_pool, slots, spirit_light_slots);
@@ -271,10 +295,16 @@ struct PartialSolution<'graph> {
     /// Commitments made on the assumption that other branches have commited to other possibilities
     /// and do not need to be entered again
     commitments: Commitments,
+    /// Remaining radius of connections to solve before aborting
+    search_radius: u8,
 }
 
 impl<'graph> PartialSolution<'graph> {
-    fn new(connection: ConnectionIndex<'graph>, item_pool: &ItemPool) -> Self {
+    fn new(
+        connection: ConnectionIndex<'graph>,
+        item_pool: &ItemPool,
+        search_radius: Option<u8>,
+    ) -> Self {
         Self {
             connection,
             used_items: SmallVec::new(),
@@ -283,6 +313,7 @@ impl<'graph> PartialSolution<'graph> {
             // other_branches: vec![],
             new_fails: ReachStateFails::default(),
             commitments: Commitments::default(),
+            search_radius: search_radius.unwrap_or(*MAX_SEARCH_RADIUS),
         }
     }
 }
@@ -345,6 +376,7 @@ struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
     initial_fails: ReachStateFails<'graph>,
     solutions: Vec<PartialSolution<'graph>>,
     finished: Vec<Solution>,
+    aborted: Vec<Solution>,
 }
 
 impl<'world, 'graph, 'settings, 'events, 'pool>
@@ -376,6 +408,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             initial_fails,
             solutions: vec![],
             finished: vec![],
+            aborted: vec![],
         }
     }
 
@@ -501,6 +534,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             !trace_is_redundant_with(solution, &finished, self.world.graph, self.item_pool)
         });
 
+        self.aborted.retain(|other| {
+            !trace_is_redundant_with(other, &finished, self.world.graph, self.item_pool)
+        });
+
         self.finished.retain(|other| {
             !trace_is_redundant_with(other, &finished, self.world.graph, self.item_pool)
         });
@@ -508,10 +545,32 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.finished.push(finished);
     }
 
+    fn abort_solution(&mut self, solution: PartialSolution<'graph>) {
+        let aborted = Solution::new(solution, 0);
+
+        trace!(
+            "search limit reached, aborting solution {aborted}",
+            aborted = self.display_solution(&aborted),
+        );
+
+        self.aborted.retain(|other| {
+            !trace_is_redundant_with(other, &aborted, self.world.graph, self.item_pool)
+        });
+
+        self.aborted.push(aborted);
+    }
+
     fn continue_solution(
         &mut self,
         mut solution: PartialSolution<'graph>,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
+        if solution.search_radius == 0 {
+            self.abort_solution(solution);
+            return ControlFlow::Break(());
+        }
+
+        solution.search_radius -= 1;
+
         trace!("continuing solution {}", self.display_solution(&solution));
 
         // solution.other_branches.clear();
@@ -1080,7 +1139,8 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         }
     }
 
-    fn finish(self) -> Vec<Solution> {
+    fn finish(mut self) -> Vec<Solution> {
+        self.finished.extend(self.aborted);
         self.finished
     }
 

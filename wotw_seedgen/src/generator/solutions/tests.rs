@@ -48,7 +48,7 @@ fn find_test_solutions(
 ) -> Vec<Vec<(CommandVoid, u32)>> {
     sorted_test_solutions(
         world
-            .find_solutions(&item_pool, &[], slots, 0)
+            .find_solutions(&item_pool, &[], slots, 0, Some(u8::MAX))
             .into_iter()
             .map(|solution| {
                 amounts_from_item_list(
