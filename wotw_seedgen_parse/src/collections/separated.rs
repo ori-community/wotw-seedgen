@@ -272,6 +272,13 @@ impl<Item: SpanEnd, Separator> SpanEnd for SeparatedNonEmpty<Item, Separator> {
 }
 
 impl<Item, Separator> SeparatedNonEmpty<Item, Separator> {
+    pub const fn new(first: Item) -> Self {
+        Self {
+            first,
+            more: vec![],
+        }
+    }
+
     pub fn get(&self, index: usize) -> Option<&Item> {
         if index == 0 {
             Some(&self.first)
