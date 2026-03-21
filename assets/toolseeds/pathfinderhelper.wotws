@@ -128,7 +128,7 @@ fun give_stuff() {
     store(shards.lifePact, true)
     store(shards.lastStand, true)
     store(shards.harvestOfLightDeprecated, true)
-    store(shards.sense, true)
+    store(shards.sense, true) // TODO should we rename some of these to match the Shard enum?
     store(shards.underwaterEfficiencyDeprecated, true)
     store(shards.ultraBash, true)
     store(shards.ultraGrapple, true)
