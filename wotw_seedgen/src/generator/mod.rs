@@ -15,6 +15,7 @@ use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
+use wotw_seedgen_data::seed_language::output::{CommandFloat, CommandVoid};
 use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
@@ -23,7 +24,7 @@ use wotw_seedgen_data::{
         output::{ClientEvent, Event, IntermediateOutput, Trigger},
         simulate::UberStates,
     },
-    Spawn, Teleporter, UniverseSettings, WorldSettings,
+    Spawn, UberIdentifier, UniverseSettings, WorldSettings,
 };
 use wotw_seedgen_seed::Seed;
 
@@ -85,13 +86,50 @@ pub fn generate_seed<F: SnippetAccess>(
                 }
 
                 let mut output = output.clone();
+                let spawn_node = &graph.nodes[spawn];
 
                 // TODO something less specialized?
-                if graph.nodes[spawn].identifier() == "EastPools.Teleporter" {
-                    output.events.push(Event {
-                        trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                        command: store_boolean(Teleporter::CENTRAL_POOLS_ID, true),
-                    })
+                match spawn_node.identifier() {
+                    "EastPools.Teleporter" => {
+                        // Lower the water at the pools teleporter if we spawn there
+                        output.events.push(Event {
+                            trigger: Trigger::ClientEvent(ClientEvent::Spawn),
+                            command: store_boolean(UberIdentifier::new(5377, 63173), true),
+                        })
+                    }
+                    "MidnightBurrows.Teleporter"
+                    | "MarshSpawn.Main"
+                    | "HowlsDen.Teleporter"
+                    | "EastHollow.Teleporter"
+                    | "GladesTown.Teleporter"
+                    | "InnerWellspring.Teleporter"
+                    | "WoodsEntry.Teleporter"
+                    | "WoodsMain.Teleporter"
+                    | "LowerReach.Teleporter"
+                    | "UpperDepths.Teleporter"
+                    | "WestPools.Teleporter"
+                    | "LowerWastes.WestTP"
+                    | "LowerWastes.EastTP"
+                    | "UpperWastes.NorthTP"
+                    | "WindtornRuins.RuinsTP"
+                    | "WillowsEnd.InnerTP"
+                    | "WillowsEnd.ShriekArena" => {}
+                    _ => {
+                        if let Some(spawn_position) = spawn_node.position() {
+                            output.events.push(Event {
+                                trigger: Trigger::ClientEvent(ClientEvent::Spawn),
+                                command: CommandVoid::CreateWarpIcon {
+                                    id: 0,
+                                    x: CommandFloat::Constant {
+                                        value: spawn_position.x,
+                                    },
+                                    y: CommandFloat::Constant {
+                                        value: spawn_position.y,
+                                    },
+                                },
+                            })
+                        }
+                    }
                 }
 
                 let world = World::new(graph, spawn, world_settings, uber_states.clone());

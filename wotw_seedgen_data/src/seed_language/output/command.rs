@@ -9,6 +9,7 @@ use crate::{
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
+use std::iter;
 
 /// A Command, which may be used to affect the world, player or client state
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -407,6 +408,14 @@ pub enum CommandVoid {
         priority: bool,
         message: CommandString,
         timeout: Option<CommandFloat>,
+    },
+    /// Sets the pickup position for queued messages until the end of the
+    /// current command scope.
+    /// The pickup position is used for animating item messages
+    /// from their pickup positions.
+    QueuedMessageScopedPickupPosition {
+        x: CommandFloat,
+        y: CommandFloat,
     },
     // TODO
     // /// Update the `callback` that triggers when queued message `id` is shown

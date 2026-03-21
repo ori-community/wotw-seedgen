@@ -9,6 +9,7 @@ use std::{
     str::FromStr,
 };
 
+use itertools::Itertools;
 use rand::{distributions::Bernoulli, seq::SliceRandom, Rng};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
@@ -20,6 +21,7 @@ use utoipa::{
 
 use crate::{
     assets::{InlineSnippets, SnippetAccess},
+    parse::Source,
     seed_language::metadata::ConfigDefault,
 };
 
@@ -65,11 +67,27 @@ impl UniverseSettings {
 }
 
 pub trait WorldSettingsHelpers {
+    fn is_empty(&self) -> bool;
+
     fn lowest_difficulty(&self) -> Difficulty;
 
     fn highest_difficulty(&self) -> Difficulty;
 
     fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>>;
+
+    fn iter_hard(&self) -> impl Iterator<Item = bool>;
+
+    fn all_play_hard(&self) -> bool {
+        !self.iter_hard().contains(&false)
+    }
+
+    fn any_play_hard(&self) -> bool {
+        self.iter_hard().contains(&true)
+    }
+
+    fn none_play_hard(&self) -> bool {
+        !self.any_play_hard()
+    }
 
     fn all_contain_trick(&self, trick: Trick) -> bool {
         self.iter_tricks().all(|tricks| tricks.contains(&trick))
@@ -85,6 +103,10 @@ pub trait WorldSettingsHelpers {
 }
 
 impl WorldSettingsHelpers for [WorldSettings] {
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
+
     fn lowest_difficulty(&self) -> Difficulty {
         self.iter()
             .map(|settings| settings.difficulty)
@@ -102,9 +124,17 @@ impl WorldSettingsHelpers for [WorldSettings] {
     fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>> {
         self.iter().map(|settings| &settings.tricks)
     }
+
+    fn iter_hard(&self) -> impl Iterator<Item = bool> {
+        self.iter().map(|settings| settings.hard)
+    }
 }
 
 impl WorldSettingsHelpers for UniverseSettings {
+    fn is_empty(&self) -> bool {
+        self.world_settings.is_empty()
+    }
+
     fn lowest_difficulty(&self) -> Difficulty {
         self.world_settings.lowest_difficulty()
     }
@@ -115,6 +145,10 @@ impl WorldSettingsHelpers for UniverseSettings {
 
     fn iter_tricks(&self) -> impl Iterator<Item = &FxHashSet<Trick>> {
         self.world_settings.iter_tricks()
+    }
+
+    fn iter_hard(&self) -> impl Iterator<Item = bool> {
+        self.world_settings.iter_hard()
     }
 }
 
@@ -137,6 +171,7 @@ pub struct WorldSettings {
     /// Names of snippets to use
     pub snippets: Vec<String>,
     /// Additional inline snippets that don't exist on the filesystem
+    #[schema(value_type = FxHashMap<String, Source>)]
     pub inline_snippets: InlineSnippets,
     /// Configuration to pass to snippets
     pub snippet_config: FxHashMap<String, FxHashMap<String, String>>,
@@ -262,6 +297,10 @@ pub enum Difficulty {
     Unsafe,
 }
 
+// TODO compability aliases?
+// PauseHover -> PauseFloat
+// HammerJump -> AerialHammerJump
+// ExtendedHammer -> HammerExtension
 /// A Trick that can be logically required
 ///
 /// This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting

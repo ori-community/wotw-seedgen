@@ -6,7 +6,7 @@ use axum::{
 use constcat::concat;
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
-use utoipa::{OpenApi, ToSchema, schema};
+use utoipa::{OpenApi, ToSchema};
 use wotw_seedgen::{
     data::{
         MapIcon, Position, UberIdentifier, logic_language::output::Graph,

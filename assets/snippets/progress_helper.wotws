@@ -32,7 +32,7 @@ By default those are bound to
     ruins_pickups_collected, ruins_pickups_collected_on_spawn, total_ruins_pickups,
     willow_pickups_collected, willow_pickups_collected_on_spawn, total_willow_pickups,
     burrows_pickups_collected, burrows_pickups_collected_on_spawn, total_burrows_pickups,
-    pickups_collected, pickups_collected_on_spawn, total_pickups
+    pickups_collected_on_spawn, total_pickups
 )
 
 !builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
@@ -43,7 +43,7 @@ By default those are bound to
 
 !export(write_progress_message)
 fun write_progress_message() {
-    set_integer("collected", pickups_collected)
+    set_integer("collected", randoStats.pickupsCollected)
     set_integer("collected_on_spawn", pickups_collected_on_spawn)
     set_integer("total", total_pickups)
     pickups_progress()

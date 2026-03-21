@@ -186,6 +186,9 @@ impl Display for CommandVoid {
                     }
                 },
             },
+            CommandVoid::QueuedMessageScopedPickupPosition { x, y } => {
+                write!(f, "queued_message_scoped_pickup_position({x}, {y})")
+            }
             CommandVoid::FreeMessage { id, message } => {
                 write!(f, "free_message({id}, {message})")
             }
@@ -388,6 +391,18 @@ impl CommandVoid {
         match self {
             CommandVoid::Multi { commands } => {
                 Box::new(commands.iter().flat_map(Self::contained_messages))
+            }
+            CommandVoid::QueuedMessage { message, .. }
+            | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),
+            _ => Box::new(iter::empty()),
+        }
+    }
+
+    // TODO: Doesn't look into function invocations yet
+    pub fn contained_messages_mut(&mut self) -> Box<dyn Iterator<Item = &mut CommandString> + '_> {
+        match self {
+            CommandVoid::Multi { commands } => {
+                Box::new(commands.iter_mut().flat_map(Self::contained_messages_mut))
             }
             CommandVoid::QueuedMessage { message, .. }
             | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),

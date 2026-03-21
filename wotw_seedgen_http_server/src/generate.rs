@@ -12,7 +12,7 @@ use crate::{
 
 #[derive(Serialize)]
 pub struct Universe {
-    pub worlds: Vec<Vec<u8>>,
+    pub worlds: Vec<ciborium::value::Value>,
     pub json_spoiler: Option<String>,
     pub text_spoiler: Option<String>,
 }
@@ -41,7 +41,7 @@ pub fn generate(
             seed.package(&mut bytes, true)
                 .map_err(|err| Error::Generate(err.to_string()))?;
 
-            Ok(bytes.into_inner())
+            Ok(ciborium::value::Value::Bytes(bytes.into_inner()))
         })
         .collect::<Result<Vec<_>>>()?;
 

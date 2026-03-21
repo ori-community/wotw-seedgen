@@ -18,6 +18,10 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom};
+use wotw_seedgen_data::seed_language::{
+    compile::store_boolean,
+    output::{AsConstant, CommandFloat},
+};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     logic_language::output::Node,
@@ -29,7 +33,7 @@ use wotw_seedgen_data::{
         },
         simulate::{Simulate, Simulation, Snapshot},
     },
-    UberIdentifier, UniverseSettings,
+    Position, UberIdentifier, UniverseSettings,
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
@@ -374,6 +378,9 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .spirit_light_provider
                         .take(spirit_light_placements_remaining);
 
+                    // Placements_remaining has reduced by one, item_pool.len() remained the same.
+                    // If should_place_spirit_light is true, spirit_light_placements_remaining must be
+                    // greater than one, so this branch doesn't need a saturating sub.
                     spirit_light_placements_remaining -= 1;
 
                     (
@@ -384,7 +391,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     let target_world_index = self.choose_target_world_for_random_placement();
 
                     if origin_world_index != target_world_index {
-                        spirit_light_placements_remaining -= 1;
+                        // If the item is taken from another item pool, then placements_remaining
+                        // has reduced by one and item_pool.len() remained the same.
+                        // If it's taken from the own item pool, both have reduced by one
+                        // and spirit_light_placements_remaining remains the same
+                        spirit_light_placements_remaining =
+                            spirit_light_placements_remaining.saturating_sub(1);
                     }
 
                     (
@@ -396,11 +408,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     )
                 };
 
-                let name = self.name(&command, origin_world_index, target_world_index);
-
                 self.place_command_at(
                     command,
-                    name,
                     pickup,
                     origin_world_index,
                     target_world_index,
@@ -478,9 +487,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         mark_forced: bool,
     ) {
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
-
-        let name = self.name(&command, origin_world_index, target_world_index);
-
         let origin_world = &mut self.worlds[origin_world_index];
 
         match origin_world.choose_location::<false>() {
@@ -512,8 +518,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
                 self.push_command(
                     Trigger::ClientEvent(ClientEvent::Spawn),
+                    None,
                     command,
-                    name,
                     origin_world_index,
                     target_world_index,
                 );
@@ -521,7 +527,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             Some(pickup) => {
                 self.place_command_at(
                     command,
-                    name,
                     pickup,
                     origin_world_index,
                     target_world_index,
@@ -578,44 +583,39 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .unwrap()
     }
 
-    fn name(
-        &self,
-        command: &CommandVoid,
-        origin_world_index: usize,
-        target_world_index: usize,
-    ) -> CommandString {
+    fn origin_name(&self, command: &CommandVoid, target_world_index: usize) -> CommandString {
         let name = self.worlds[target_world_index].name(command);
 
-        if origin_world_index == target_world_index {
-            name
-        } else {
-            let right = match name.into_constant() {
-                Ok(value) => format!("'s {value}").into(),
-                Err(name) => CommandString::Concatenate {
-                    operation: Box::new(Operation {
-                        left: "'s".into(),
-                        operator: Concatenator::Concat,
-                        right: name,
-                    }),
-                },
-            };
-
-            CommandString::Concatenate {
+        match name.into_constant() {
+            Ok(value) => format!("<world>{target_world_index}</>'s {value}").into(),
+            Err(name) => CommandString::Concatenate {
                 operation: Box::new(Operation {
-                    left: CommandString::WorldName {
-                        index: target_world_index,
-                    },
+                    left: format!("<world>{target_world_index}</>'s").into(),
                     operator: Concatenator::Concat,
-                    right,
+                    right: name,
                 }),
-            }
+            },
+        }
+    }
+
+    fn target_name(&self, command: &CommandVoid, origin_world_index: usize) -> CommandString {
+        let name = self.worlds[origin_world_index].name(command);
+
+        match name.as_constant() {
+            Some(value) => format!("{value} from <world>{origin_world_index}</>").into(),
+            _ => CommandString::Concatenate {
+                operation: Box::new(Operation {
+                    left: name,
+                    operator: Concatenator::Concat,
+                    right: format!("from <world>{origin_world_index}</>").into(),
+                }),
+            },
         }
     }
 
     fn place_command_at(
         &mut self,
         command: CommandVoid,
-        name: CommandString,
         pickup: &LocDataEntry,
         origin_world_index: usize,
         target_world_index: usize,
@@ -639,8 +639,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
         self.push_command(
             Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
+            pickup.position,
             command,
-            name,
             origin_world_index,
             target_world_index,
         );
@@ -649,30 +649,69 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn push_command(
         &mut self,
         trigger: Trigger,
-        command: CommandVoid,
-        name: CommandString,
+        pickup_position: Option<Position>,
+        mut command: CommandVoid,
         origin_world_index: usize,
         target_world_index: usize,
     ) {
+        let pickup_position_command =
+            pickup_position.map(
+                |pickup_position| CommandVoid::QueuedMessageScopedPickupPosition {
+                    x: CommandFloat::Constant {
+                        value: pickup_position.x,
+                    },
+                    y: CommandFloat::Constant {
+                        value: pickup_position.y,
+                    },
+                },
+            );
+
         if origin_world_index == target_world_index {
-            self.worlds[origin_world_index].push_command(trigger, command);
+            self.worlds[origin_world_index].push_command(
+                trigger,
+                match pickup_position_command {
+                    None => command,
+                    Some(pickup_position_command) => CommandVoid::Multi {
+                        commands: vec![pickup_position_command, command],
+                    },
+                },
+            );
         } else {
             let uber_identifier = self.multiworld_state();
+            let message = self.origin_name(&command, target_world_index);
+            let message_command = CommandVoid::QueuedMessage {
+                id: None,
+                priority: false,
+                message,
+                timeout: None,
+            };
+            let store_command = store_boolean(uber_identifier, true);
 
             self.worlds[origin_world_index].push_command(
                 trigger,
                 CommandVoid::Multi {
-                    commands: vec![
-                        CommandVoid::QueuedMessage {
-                            id: None,
-                            priority: false,
-                            message: name,
-                            timeout: None,
-                        },
-                        compile::store_boolean(uber_identifier, true),
-                    ],
+                    commands: match pickup_position_command {
+                        None => vec![message_command, store_command],
+                        Some(pickup_position_command) => {
+                            vec![pickup_position_command, message_command, store_command]
+                        }
+                    },
                 },
             );
+
+            // Append 'from <world>' to all messages
+            for message in command.contained_messages_mut() {
+                *message = match message.as_constant() {
+                    Some(value) => format!("{value} from <world>{origin_world_index}</>").into(),
+                    _ => CommandString::Concatenate {
+                        operation: Box::new(Operation {
+                            left: message.clone(),
+                            operator: Concatenator::Concat,
+                            right: format!("from <world>{origin_world_index}</>").into(),
+                        }),
+                    },
+                }
+            }
 
             self.worlds[target_world_index].push_command(
                 Trigger::Binding(uber_identifier), // this is server synced and can't change to false
@@ -820,7 +859,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         trace!("{}Generating preplacements", self.log_index);
 
-        self.hi_sigma(preplacement_spoiler);
+        self.hi_torin(preplacement_spoiler);
 
         let mut zone_needs_placement = FxHashMap::default();
 
@@ -852,9 +891,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         }
     }
 
-    // TODO name change
     // TODO it looks like the simulated world has the 1 spirit light on spawn for some reason?
-    fn hi_sigma(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
+    fn hi_torin(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         // TODO implement From<{number}> for Constant commands?
         let command = compile::spirit_light(1.into(), &mut self.rng);
 

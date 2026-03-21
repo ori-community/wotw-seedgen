@@ -155,8 +155,8 @@ impl<'graph> World<'graph, '_> {
             Requirement::Difficulty(difficulty) => {
                 self.setting_met(self.settings.difficulty >= *difficulty)
             }
-            Requirement::NormalGameDifficulty => self.setting_met(self.settings.hard),
-            Requirement::Trick(trick) => self.setting_met(!self.settings.tricks.contains(trick)),
+            Requirement::NormalGameDifficulty => self.setting_met(!self.settings.hard),
+            Requirement::Trick(trick) => self.setting_met(self.settings.tricks.contains(trick)),
             Requirement::Skill(skill) => self.skill_met(*skill),
             Requirement::EnergySkill(skill, amount) => {
                 self.skill_met(*skill)?;
