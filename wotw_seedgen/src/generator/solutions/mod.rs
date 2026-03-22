@@ -50,6 +50,7 @@ use log::trace;
 use smallvec::SmallVec;
 
 use std::{
+    cmp::Ordering,
     collections::hash_map::Entry,
     env,
     fmt::{self, Display},
@@ -99,11 +100,56 @@ static MAX_SEARCH_RADIUS: LazyLock<u8> = LazyLock::new(|| {
 
 pub type SolutionItems = SmallVec<[usize; 8]>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct Solution {
     pub items: SolutionItems,
     pub spirit_light: i32,
     pub new_reached: usize,
+}
+
+impl PartialEq for Solution {
+    fn eq(&self, other: &Self) -> bool {
+        // TODO can this be applied elsewhere?
+        // spirit_light can be ignored because finished solutions are non-redundant
+        // and solutions with the same items, but different spirit lights would be redundant.
+        // new_reached can be ignored because it depends on the other two values.
+        let eq = self.items == other.items;
+
+        if cfg!(debug_assertions) {
+            assert!(
+                eq == (eq
+                    && (self.spirit_light == other.spirit_light)
+                    && (self.new_reached == other.new_reached))
+            );
+        }
+
+        eq
+    }
+}
+
+impl Eq for Solution {}
+
+impl PartialOrd for Solution {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Solution {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // see notes on PartialEq impl
+        let ord = self.items.cmp(&other.items);
+
+        if cfg!(debug_assertions) {
+            assert!(
+                ord == ord
+                    .then(self.spirit_light.cmp(&other.spirit_light))
+                    .then(self.new_reached.cmp(&other.new_reached))
+            )
+        }
+
+        ord
+    }
 }
 
 impl Solution {
@@ -1141,6 +1187,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn finish(mut self) -> Vec<Solution> {
         self.finished.extend(self.aborted);
+        // TODO this solution to portable order is still pretty costly, but it was better than IndexMaps...
+        // Maybe we should do this later when it has weights or something? Those would have pretty cheap comparisons
+        // and then we could still fall back on comparing items when weights are equal which is somewhat rare.
+        self.finished.sort_unstable();
         self.finished
     }
 
