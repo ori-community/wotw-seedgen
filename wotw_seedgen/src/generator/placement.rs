@@ -996,7 +996,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     fn choose_progression(&mut self, slots: usize) -> Option<Solution> {
         trace!("{}Attempting forced progression", self.log_index);
 
-        let mut progressions = self.world.find_solutions(
+        let progressions = self.world.find_solutions(
             &self.item_pool,
             &self.output.events,
             slots,
@@ -1010,44 +1010,44 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             return None;
         }
 
-        let weights = self.calculate_weights(&progressions, slots);
+        let mut with_weights = self.calculate_weights(progressions, slots);
 
-        let progression = progressions.swap_remove(weights.sample(&mut self.rng));
+        let weights = WeightedIndex::new(with_weights.iter().map(|(_, weight)| *weight)).unwrap();
+        let (progression, _) = with_weights.swap_remove(weights.sample(&mut self.rng));
 
         Some(progression)
     }
 
-    fn calculate_weights(&mut self, progressions: &[Solution], slots: usize) -> WeightedIndex<f32> {
+    fn calculate_weights(
+        &mut self,
+        progressions: Vec<Solution>,
+        slots: usize,
+    ) -> Vec<(Solution, f32)> {
+        let mut with_weights = progressions
+            .into_iter()
+            .map(|solution| {
+                let weight = solution.weight(&self.item_pool, slots, self.spawn_slots);
+                (solution, weight)
+            })
+            .collect::<Vec<_>>();
+
+        // The order returned by find_solutions is not portable, so we have to sort before our weighted choice.
+        // The weights are a good pick for primary key because they are fast to compare and quite unique;
+        // the backup solution comparison has some minor optimizations as well.
+        // As a bonus, we already have sorted weights for the trace log, which is why we order bigger first.
+        with_weights.sort_unstable_by(|(a, a_weight), (b, b_weight)| {
+            b_weight.total_cmp(a_weight).then_with(|| a.cmp(&b))
+        });
+
         if log_enabled!(Trace) {
-            let progressions = progressions
-                .iter()
-                .map(|solution| {
-                    (
-                        solution,
-                        solution.weight(&self.item_pool, slots, self.spawn_slots),
-                    )
-                })
-                .collect::<Vec<_>>();
-
-            let weighted_index = WeightedIndex::new(progressions.iter().map(|(_, weight)| *weight));
-
-            self.log_weights(progressions);
-
-            weighted_index
-        } else {
-            WeightedIndex::new(
-                progressions
-                    .iter()
-                    .map(|solution| solution.weight(&self.item_pool, slots, self.spawn_slots)),
-            )
+            self.log_weights(&with_weights);
         }
-        .unwrap()
+
+        with_weights
     }
 
     // seedgen output should remain the same whether logging is enabled or not, so we have to sort an owned clone
-    fn log_weights(&mut self, mut progressions: Vec<(&Solution, f32)>) {
-        progressions.sort_unstable_by(|(_, a), (_, b)| a.total_cmp(&b));
-
+    fn log_weights(&mut self, progressions: &[(Solution, f32)]) {
         let total_weight = progressions.iter().map(|(_, weight)| weight).sum::<f32>();
 
         trace!(

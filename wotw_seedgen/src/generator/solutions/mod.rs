@@ -1187,10 +1187,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn finish(mut self) -> Vec<Solution> {
         self.finished.extend(self.aborted);
-        // TODO this solution to portable order is still pretty costly, but it was better than IndexMaps...
-        // Maybe we should do this later when it has weights or something? Those would have pretty cheap comparisons
-        // and then we could still fall back on comparing items when weights are equal which is somewhat rare.
-        self.finished.sort_unstable();
         self.finished
     }
 
