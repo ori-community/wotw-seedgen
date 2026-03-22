@@ -15,7 +15,7 @@ use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
-use wotw_seedgen_data::seed_language::output::{CommandFloat, CommandVoid};
+use wotw_seedgen_data::seed_language::output::CommandVoid;
 use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
@@ -120,12 +120,8 @@ pub fn generate_seed<F: SnippetAccess>(
                                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                                 command: CommandVoid::CreateWarpIcon {
                                     id: 0,
-                                    x: CommandFloat::Constant {
-                                        value: spawn_position.x,
-                                    },
-                                    y: CommandFloat::Constant {
-                                        value: spawn_position.y,
-                                    },
+                                    x: spawn_position.x.into(),
+                                    y: spawn_position.y.into(),
                                 },
                             })
                         }

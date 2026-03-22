@@ -18,10 +18,7 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom};
-use wotw_seedgen_data::seed_language::{
-    compile::store_boolean,
-    output::{AsConstant, CommandFloat},
-};
+use wotw_seedgen_data::seed_language::{compile::store_boolean, output::AsConstant};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     logic_language::output::Node,
@@ -642,12 +639,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         let pickup_position_command =
             pickup_position.map(
                 |pickup_position| CommandVoid::QueuedMessageScopedPickupPosition {
-                    x: CommandFloat::Constant {
-                        value: pickup_position.x,
-                    },
-                    y: CommandFloat::Constant {
-                        value: pickup_position.y,
-                    },
+                    x: pickup_position.x.into(),
+                    y: pickup_position.y.into(),
                 },
             );
 
