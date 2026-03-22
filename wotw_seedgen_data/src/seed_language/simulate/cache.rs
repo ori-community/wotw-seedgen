@@ -60,6 +60,7 @@ struct Cache {
     shard_slots: i32,
     base_max_health: f32,
     base_max_energy: f32,
+    // TODO try out arrays with ids as indices?
     skills: FxHashSet<Skill>,
     shards: FxHashSet<Shard>,
     teleporters: FxHashSet<Teleporter>,

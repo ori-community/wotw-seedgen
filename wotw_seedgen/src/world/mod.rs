@@ -535,6 +535,9 @@ impl Simulation for World<'_, '_> {
     }
 
     fn max_health(&self) -> f32 {
+        // TODO does this get optimized into the branchless variant? Maybe just write it branchless...
+        // Also I guess this could be cached since settings are immutable?
+        // Could store the function pointer for which to invoke...
         if self.settings.difficulty.vitality() {
             self.state.max_health()
         } else {

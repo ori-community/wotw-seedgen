@@ -259,7 +259,7 @@ impl<'graph> World<'graph, '_> {
         &self.reach.state.fails
     }
 
-    pub(crate) fn get_connection_orbs(&self, connection: &ConnectionIndex<'graph>) -> OrbVariants {
+    pub(crate) fn get_connection_orbs(&self, connection: &ConnectionIndex<'graph>) -> &OrbVariants {
         // match &connection.orb_variants.0 {
         //     None => {
         let node_index = connection.node_index(self.graph);
@@ -274,7 +274,7 @@ impl<'graph> World<'graph, '_> {
                     .format(", "),
                 connection.display(self.graph)
             ),
-            Some(orbs) => orbs.clone(),
+            Some(orbs) => orbs,
         }
         //     }
         //     Some(orb_variants) => orb_variants.clone(),
@@ -415,7 +415,7 @@ impl<'graph> World<'graph, '_> {
     }
 
     fn progress(&mut self, connection_index: ConnectionIndex<'graph>, events: &[Event]) {
-        let orb_variants = self.get_connection_orbs(&connection_index);
+        let orb_variants = self.get_connection_orbs(&connection_index).clone();
 
         match &connection_index.connection {
             ConnectionOrRefill::Refill(_) => {

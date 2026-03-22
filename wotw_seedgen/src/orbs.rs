@@ -5,6 +5,7 @@ use std::{
 };
 
 use smallvec::{smallvec, SmallVec, ToSmallVec};
+use wotw_seedgen_data::seed_language::simulate::Simulation;
 
 pub type OrbVariants = SmallVec<[Orbs; 3]>;
 

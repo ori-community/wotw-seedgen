@@ -270,7 +270,7 @@ impl Display for DisplaySolution<'_, '_, '_> {
     }
 }
 
-impl World<'_, '_> {
+impl<'graph> World<'graph, '_> {
     pub fn find_solutions(
         &mut self,
         item_pool: &ItemPool,
@@ -306,18 +306,19 @@ impl World<'_, '_> {
         context.finish()
     }
 
-    fn simulate_solution(
+    fn simulate_solution<S: SolutionLike<'graph>>(
         &mut self,
-        solution: &PartialSolution,
+        solution: &S,
         item_pool: &ItemPool,
         events: &[Event],
     ) {
-        for item in &solution.used_items {
+        for item in solution.items() {
             item_pool[*item].simulate(self, events);
         }
 
-        if solution.spirit_light > 0 {
-            self.add_spirit_light(solution.spirit_light, events);
+        let spirit_light = solution.spirit_light();
+        if spirit_light > 0 {
+            self.add_spirit_light(spirit_light, events);
         }
     }
 }
@@ -378,9 +379,12 @@ impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
     }
 }
 
+// TODO bitflags?
 #[derive(Debug, Clone, Default)]
 struct Commitments {
     better_weapon: bool,
+    damage_regenerate: bool,
+    skip_regenerate_energy: bool,
 }
 
 // #[derive(Debug, Clone)]
@@ -538,7 +542,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
         // let requirement = solution.connection.requirement.0;
         let requirement = solution.connection.connection.requirement();
-        let mut orb_variants = self.world.get_connection_orbs(&solution.connection);
+        let mut orb_variants = self.world.get_connection_orbs(&solution.connection).clone();
         match self.world.is_met(requirement, &mut orb_variants) {
             ControlFlow::Continue(()) => {
                 trace!("already met");
@@ -725,7 +729,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     }
 
     fn pause_solution(&mut self, solution: PartialSolution<'graph>) {
-        // TODO we shouldn't pause if the solution is already finished
+        // TODO we shouldn't pause if the solution is already finished - but can we know if it's finished if it's not currently simulated?
         trace!("pausing solution {}", self.display_solution(&solution));
 
         self.solutions.push(solution);
@@ -768,22 +772,45 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_health(
         &mut self,
-        solution: PartialSolution<'graph>,
+        mut solution: PartialSolution<'graph>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         if self.world.skill(Skill::Regenerate) {
-            self.solve_boolean_branches(
-                solution,
-                self.health_options(),
-                // TODO blindly attempting energy options is a huge trap, we'd need to know
-                // more specifically that we are lacking the energy to regenerate
-                // .chain(self.energy_options())
-                simulate,
-            )
+            if solution.commitments.skip_regenerate_energy {
+                self.solve_boolean_branches(solution, self.health_options(), simulate)
+            } else {
+                let mut health_solution = solution.clone();
+                health_solution.commitments.skip_regenerate_energy = true;
+                let health_flow =
+                    self.solve_boolean_branches(health_solution, self.health_options(), simulate);
+
+                let energy_flow = self.solve_boolean_branches(
+                    solution,
+                    self.energy_options(),
+                    simulate && health_flow.is_break(),
+                );
+
+                match (health_flow, energy_flow) {
+                    (
+                        health_flow @ ControlFlow::Continue(_),
+                        ControlFlow::Continue(energy_solution),
+                    ) => {
+                        self.pause_solution(energy_solution);
+                        health_flow
+                    }
+                    (flow @ ControlFlow::Continue(_), ControlFlow::Break(()))
+                    | (ControlFlow::Break(()), flow) => flow,
+                }
+            }
+        // TODO adding these checks should scale better as complexity increases, but results were inconclusive for now
+        } else if solution.commitments.damage_regenerate {
+            self.solve_boolean_branches(solution, self.health_options(), simulate)
         } else {
+            solution.commitments.damage_regenerate = true;
+
             self.solve_boolean_branches(
                 solution,
-                iter::once(Skill::REGENERATE_ID).chain(self.health_options()),
+                self.health_options().chain(Some(Skill::REGENERATE_ID)),
                 simulate,
             )
         }
@@ -1187,6 +1214,27 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn finish(mut self) -> Vec<Solution> {
         self.finished.extend(self.aborted);
+
+        if cfg!(debug_assertions) {
+            for solution in &self.finished {
+                self.world.snapshot();
+
+                self.world
+                    .simulate_solution(solution, self.item_pool, self.events);
+
+                let new_reached = self.world.reached_pickup_count() - self.initial_pickup_count;
+
+                self.world.restore_snapshot();
+
+                assert_eq!(
+                    new_reached, solution.new_reached,
+                    "solution {solution} reported {solution_new_reached} reachables but actually reaches {new_reached}",
+                    solution = solution.display(self.item_pool, Some(self.world.graph)),
+                    solution_new_reached = solution.new_reached,
+                );
+            }
+        }
+
         self.finished
     }
 

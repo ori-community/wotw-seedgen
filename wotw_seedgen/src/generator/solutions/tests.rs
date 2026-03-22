@@ -236,18 +236,17 @@ fn mock_solutions() {
 
     test!(Requirement::Damage(36.), [[(health_fragment(), 8)]]);
 
-    // TODO doesn't work yet
-    // test!(
-    //     Requirement::And(vec![Requirement::Damage(18.), Requirement::Damage(18.)]),
-    //     [
-    //         [(health_fragment(), 8)],
-    //         [
-    //             (health_fragment(), 4),
-    //             (energy_fragment(), 4),
-    //             skill(Regenerate)
-    //         ]
-    //     ]
-    // );
+    test!(
+        Requirement::And(vec![Requirement::Damage(18.), Requirement::Damage(18.)]),
+        [
+            [(health_fragment(), 8)],
+            [
+                (health_fragment(), 4),
+                (energy_fragment(), 4),
+                skill(Regenerate)
+            ]
+        ]
+    );
 
     test!(
         Requirement::Or(vec![Requirement::Damage(36.), Requirement::Damage(18.)]),
