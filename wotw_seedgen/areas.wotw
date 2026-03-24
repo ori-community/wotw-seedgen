@@ -5244,7 +5244,7 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       # AerialHammerJump
 
   state GladesTown.GromsWall:
-    unsafe: LaunchBashChain  # https://www.youtube.com/watch?v=edSpqN0b4UY
+    unsafe: LaunchBashChain OR DashBashChain  # https://www.youtube.com/watch?v=edSpqN0b4UY
 
   pickup WestGlades.GrappleEX:
     moki:
