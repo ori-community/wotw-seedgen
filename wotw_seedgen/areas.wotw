@@ -16018,7 +16018,7 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       # Glitched
       # AerialHammerJump  # Upswing before AHJ
       # GrenadeJump=1, DoubleJump OR Dash OR Hammer
-      # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # Either directly or by going to the left platform first
+      # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # Either directly or by going to the left platform first. Shuriken is redundant with ->BoulderHeartPath->EntryFloatingPlatform
     unsafe:
       # DoubleJump, Damage=40  # Dboost on the lava thingy and jump from it to the floating platform
       DoubleJump, Damage=20  # Same as above but dboost on the mine beforehand
@@ -16031,13 +16031,14 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
     unsafe, WillowsEnd.GrappleWheelsHeart:
       SwordSJump=2  # Over the platform and hover to the left platform
   conn WillowsEnd.InnerTP:  # Paths skipping WillowsEnd.EntryFloatingPlatform to save energy. Be careful with redundancies Entry->EntryFloatingPlatform->InnerTP
-    kii, SentryJump=1:  # Max height sjump into the portal
-      WillowsEnd.PortalShortcut:
+    kii:
+      WillowsEnd.PortalShortcut, SwordSJump=1, DoubleJump  # SwordSJump needs manual inputs to make it into the portal, nerfed with DJ for kii
+      WillowsEnd.PortalShortcut, HammerSJump=1:  # Max height HammerSJump into the portal
         Bash, Grenade=1
-        SentryJump=1, Damage=40  # With the shortcut open, sjumping from the ledge throws you into spikes unless you hold right, get a low sjump, or cancel vertical momentum with a side swing
-        DoubleJump  # Lenient with upswing
+        DoubleJump OR Damage=40  # Jump to right wall with upswing or dboost then upswing
         # Glitched
-        # GrenadeJump=1 OR GlideJump
+        # GrenadeJump=1, Damage=20  # Grenade can hit the mine
+        # GlideJump
     unsafe, SentryJump=1:
       WillowsEnd.PortalShortcut, SentryJump=1 OR AbilitySwap=1 OR SpearJump=1 OR Damage=40
       SentryJump=1, Bash  # As part of the sjump you can vault left around the corner. Hover is then enough to reach the elemental
@@ -16187,6 +16188,16 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       # Glitched
       # AerialHammerJump, Bash, Grenade=1 OR Damage=40
       # WillowsEnd.PortalShortcut, AerialHammerJump OR GrenadeJump=2
+      # Bash, Grenade=1, GlideJump, WillowsEnd.PortalShortcut OR Grenade=1 OR Damage=40
+      # DoubleJump, GlideJump, Damage=40, Bash, Sword OR Hammer OR Spear=1  # Condition to enter the portal. Then dboost in spikes to reach the elemental 
+      # WillowsEnd.PortalShortcut, DoubleJump, GlideJump, Sword OR Hammer OR Spear=1  # Condition to enter the portal
+      # WillowsEnd.PortalShortcut, GrenadeJump=1, Damage=80  # only need one dboost but the portal can be weird
+      # WillowsEnd.PortalShortcut, GrenadeJump=1, DoubleJump, TripleJump OR Sword OR Hammer OR Flash=1 OR GlideJump OR Damage=40
+      # LaunchSwap, Bash
+      # SwordSentryJump=1:  # Running sjump. Paths with DJ are redundant with dropping down to Entry
+      #   WillowsEnd.PortalShortcut, GlideJump OR GrenadeJump=1 OR Damage=40
+      #   SentryJump=1, Bash, Damage=40 OR Dash
+      #   GlideJump, Damage=40, Bash
     unsafe:
       Launch, Bash, Spear=1  # Too precise for Kii, and can kill the elemental
       LaunchSwap  # Precise Launchswap, turn around to reset under Lupo
