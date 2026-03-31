@@ -40,22 +40,27 @@
 // being able to really look into it.
 // Maybe storing the missing instance would be more fruitful?
 
+// TODO there seems to be some infinite loop condition on the unoptimized shapes of requirements like MarshSpawn.BurrowArena.
+
 #[cfg(test)]
 mod tests;
 mod weight;
 
-pub(crate) use weight::Cost;
+pub(crate) use weight::{solution_weights, Cost};
 
-use log::trace;
+use arrayvec::ArrayVec;
+use indexmap::IndexMap;
+use log::{log_enabled, trace, warn, Level::Trace};
+use ordered_float::{Float, OrderedFloat};
 use smallvec::SmallVec;
 
 use std::{
     cmp::Ordering,
-    collections::hash_map::Entry,
+    collections::{hash_map::Entry, VecDeque},
     env,
     fmt::{self, Display},
-    iter, mem,
-    ops::ControlFlow,
+    mem,
+    ops::{ControlFlow, Sub},
     sync::LazyLock,
 };
 
@@ -64,10 +69,10 @@ use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
     logic_language::output::{Connection, Graph},
     seed_language::{
-        output::{AsConstant, CommandVoid, ContainedWrites, Event},
+        output::{CommandVoid, CommonWriteCommand, ContainedWrites, Event, UberStateWrite},
         simulate::{Simulate, Simulation, Snapshot},
     },
-    Skill, UberIdentifier,
+    Difficulty, Shard, Skill, UberIdentifier,
 };
 
 use crate::{
@@ -80,22 +85,39 @@ use crate::{
 /// Maximum radius of connections to solve before aborting a solution.
 ///
 /// Lower values reduce search time but also reduce progression quality.
-/// We're currently forced to default to 0 which is pretty bad but also how v4 behaved.
+/// We currently default to 0 which is pretty bad but also how v4 behaved.
 ///
-/// Average `cargo bench solutions` times as of 2026-03-21:
+/// `cargo bench solutions` times as of 2026-03-21:
 /// - `MAX_SEARCH_RADIUS=0`: 2.131 ms
 /// - `MAX_SEARCH_RADIUS=1`: 4.177 ms
 /// - `MAX_SEARCH_RADIUS=2`: 7.052 ms
 /// - `MAX_SEARCH_RADIUS=u8::MAX`: 7.097 ms
 ///
-/// Average `cargo bench generation/gorlek rspawn` times:
-/// - `MAX_SEARCH_RADIUS=0`: 279.99 ms
-/// - `MAX_SEARCH_RADIUS=1`: Too long to measure :orithump:
+/// `cargo bench generation/unsafe` times as of 2026-04-10:
+/// - `MAX_SEARCH_RADIUS=0`: 549.56 ms
+/// - `MAX_SEARCH_RADIUS=1`: 868.59 ms
+/// - `MAX_SEARCH_RADIUS=2`: 1.4614 s
 static MAX_SEARCH_RADIUS: LazyLock<u8> = LazyLock::new(|| {
     env::var("SOLUTION_MAX_SEARCH_RADIUS")
         .ok()
-        .and_then(|s| s.parse::<u8>().ok())
+        .and_then(|s| s.parse().ok())
         .unwrap_or(0)
+});
+
+/// Maximum number of progression items in a solution
+///
+/// Lower values reduce search time but also ignore some complex progressions
+///
+/// `cargo bench generation/unsafe` times as of 2026-04-10:
+/// - `SOLUTION_MAX_ITEMS=5`: 230.25 ms
+/// - `SOLUTION_MAX_ITEMS=7`: 556.95 ms
+/// - `SOLUTION_MAX_ITEMS=10`: 933.20 ms
+/// - `SOLUTION_MAX_ITEMS=usize::MAX`: 1.2723 s
+pub static SOLUTION_MAX_ITEMS: LazyLock<usize> = LazyLock::new(|| {
+    env::var("SOLUTION_MAX_ITEMS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(5)
 });
 
 pub type SolutionItems = SmallVec<[usize; 8]>;
@@ -279,6 +301,39 @@ impl<'graph> World<'graph, '_> {
         spirit_light_slots: usize,
         search_radius: Option<u8>,
     ) -> Vec<Solution> {
+        // This really slows down default settings for some reason? But unsafe is much more critical...
+        let capped_slots = usize::min(slots, *SOLUTION_MAX_ITEMS);
+        let mut solutions = self.find_solutions_no_max_items(
+            item_pool,
+            events,
+            capped_slots,
+            spirit_light_slots,
+            search_radius,
+        );
+
+        if solutions.is_empty() && slots > capped_slots {
+            warn!("no solutions found, retrying with uncapped solution size");
+
+            solutions = self.find_solutions_no_max_items(
+                item_pool,
+                events,
+                slots,
+                spirit_light_slots,
+                search_radius,
+            );
+        }
+
+        solutions
+    }
+
+    pub fn find_solutions_no_max_items(
+        &mut self,
+        item_pool: &ItemPool,
+        events: &[Event],
+        slots: usize,
+        spirit_light_slots: usize,
+        search_radius: Option<u8>,
+    ) -> Vec<Solution> {
         let fails = self.fails();
         let initial_solutions = fails
             .uber_state
@@ -286,6 +341,8 @@ impl<'graph> World<'graph, '_> {
             .flatten()
             .chain(&fails.health)
             .chain(&fails.energy)
+            .collect::<FxHashSet<_>>()
+            .into_iter()
             .map(|fail| PartialSolution::new(fail.clone(), item_pool, search_radius))
             .collect::<Vec<_>>();
 
@@ -299,7 +356,10 @@ impl<'graph> World<'graph, '_> {
             context.solve_untouched(solution);
         }
 
-        while let Some(solution) = context.solutions.pop() {
+        // Touched solutions are a queue so that branching paths predictably execute
+        // one variant before the other, allowing us to prioritize paths that are
+        // likely to eliminate redundancies earlier.
+        while let Some(solution) = context.solutions.pop_front() {
             context.solve_touched(solution);
         }
 
@@ -382,9 +442,44 @@ impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
 // TODO bitflags?
 #[derive(Debug, Clone, Default)]
 struct Commitments {
+    // skip_energy_branches: bool,
     better_weapon: bool,
-    damage_regenerate: bool,
-    skip_regenerate_energy: bool,
+    burrow_as_weapon: bool,
+    energy_shard: bool,
+    vitality: bool,
+    resilience: bool,
+    overcharge: bool,
+    life_pact: bool,
+}
+
+impl Commitments {
+    fn commit_better_weapon(&mut self) -> bool {
+        mem::replace(&mut self.better_weapon, true)
+    }
+
+    fn commit_burrow_as_weapon(&mut self) -> bool {
+        mem::replace(&mut self.burrow_as_weapon, true)
+    }
+
+    fn commit_energy_shard(&mut self) -> bool {
+        mem::replace(&mut self.energy_shard, true)
+    }
+
+    fn commit_vitality(&mut self) -> bool {
+        mem::replace(&mut self.vitality, true)
+    }
+
+    fn commit_resilience(&mut self) -> bool {
+        mem::replace(&mut self.resilience, true)
+    }
+
+    fn commit_overcharge(&mut self) -> bool {
+        mem::replace(&mut self.overcharge, true)
+    }
+
+    fn commit_life_pact(&mut self) -> bool {
+        mem::replace(&mut self.life_pact, true)
+    }
 }
 
 // #[derive(Debug, Clone)]
@@ -424,9 +519,10 @@ struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
     spirit_light_slots: usize,
     initial_pickup_count: usize,
     initial_fails: ReachStateFails<'graph>,
-    solutions: Vec<PartialSolution<'graph>>,
+    solutions: VecDeque<PartialSolution<'graph>>,
     finished: Vec<Solution>,
     aborted: Vec<Solution>,
+    perf_counters: IndexMap<usize, u32, FxBuildHasher>,
 }
 
 impl<'world, 'graph, 'settings, 'events, 'pool>
@@ -456,9 +552,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             spirit_light_slots,
             initial_pickup_count,
             initial_fails,
-            solutions: vec![],
+            solutions: VecDeque::new(),
             finished: vec![],
             aborted: vec![],
+            perf_counters: IndexMap::default(),
         }
     }
 
@@ -486,7 +583,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             self.world
                 .reached_nodes()
                 .map(|node| node.identifier())
-                .format(", ")
+                .format(", "),
         );
 
         self.solve_until_progress(solution);
@@ -535,13 +632,20 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         &mut self,
         solution: PartialSolution<'graph>,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        trace!(
-            "solving {solution}",
-            solution = self.display_solution(&solution)
-        );
+        if log_enabled!(target: "perf_counters", Trace) {
+            if let ConnectionOrRefill::Connection(connection) = solution.connection.connection {
+                *self.perf_counters.entry(connection.to).or_default() += 1;
+            }
+        }
 
         // let requirement = solution.connection.requirement.0;
         let requirement = solution.connection.connection.requirement();
+
+        trace!(
+            "solving {requirement} for {solution}",
+            solution = self.display_solution(&solution)
+        );
+
         let mut orb_variants = self.world.get_connection_orbs(&solution.connection).clone();
         match self.world.is_met(requirement, &mut orb_variants) {
             ControlFlow::Continue(()) => {
@@ -732,7 +836,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         // TODO we shouldn't pause if the solution is already finished - but can we know if it's finished if it's not currently simulated?
         trace!("pausing solution {}", self.display_solution(&solution));
 
-        self.solutions.push(solution);
+        self.solutions.push_back(solution);
     }
 
     fn solve(
@@ -755,15 +859,18 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                 self.solve_integer(solution, uber_identifier, amount, simulate)
             }
             Missing::LogicalState(_) => ControlFlow::Break(()),
-            Missing::Health => self.solve_health(solution, simulate),
-            Missing::Energy => self.solve_energy(solution, simulate),
+            Missing::Health(amount) => self.solve_health(solution, *amount.ceil() as i32, simulate),
+            Missing::Energy(amount) => self.solve_energy::<true>(solution, amount, simulate),
             Missing::WallWeapon => self.solve_weapon::<true>(solution, simulate),
             Missing::EnemyWeapon => self.solve_weapon::<false>(solution, simulate),
-            Missing::EnergyOrBetterWallWeapon => {
-                self.solve_energy_or_better_weapon::<true>(solution, simulate)
+            Missing::EnergyOrBetterWallWeapon(amount) => {
+                self.solve_energy_or_better_weapon::<true>(solution, amount, simulate)
             }
-            Missing::EnergyOrBetterEnemyWeapon => {
-                self.solve_energy_or_better_weapon::<false>(solution, simulate)
+            Missing::EnergyOrBetterEnemyWeapon(amount) => {
+                self.solve_energy_or_better_weapon::<false>(solution, amount, simulate)
+            }
+            Missing::EnergyOrBurrowOrBetterEnemyWeapon(amount) => {
+                self.solve_energy_or_burrow_or_better_enemy_weapon(solution, amount, simulate)
             }
             Missing::Any(any) => self.solve_any(solution, any, simulate),
             Missing::Or(ors, _) => self.solve_any(solution, ors, simulate),
@@ -772,84 +879,256 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_health(
         &mut self,
-        mut solution: PartialSolution<'graph>,
+        solution: PartialSolution<'graph>,
+        amount: i32,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        if self.world.skill(Skill::Regenerate) {
-            if solution.commitments.skip_regenerate_energy {
-                self.solve_boolean_branches(solution, self.health_options(), simulate)
-            } else {
-                let mut health_solution = solution.clone();
-                health_solution.commitments.skip_regenerate_energy = true;
-                let health_flow =
-                    self.solve_boolean_branches(health_solution, self.health_options(), simulate);
-
-                let energy_flow = self.solve_boolean_branches(
+        self.solve_shard_branches(
+            solution,
+            simulate,
+            Shard::Vitality,
+            Commitments::commit_vitality,
+            Difficulty::vitality,
+            |this, solution, simulate| {
+                this.solve_shard_branches(
                     solution,
-                    self.energy_options(),
-                    simulate && health_flow.is_break(),
-                );
-
-                match (health_flow, energy_flow) {
-                    (
-                        health_flow @ ControlFlow::Continue(_),
-                        ControlFlow::Continue(energy_solution),
-                    ) => {
-                        self.pause_solution(energy_solution);
-                        health_flow
-                    }
-                    (flow @ ControlFlow::Continue(_), ControlFlow::Break(()))
-                    | (ControlFlow::Break(()), flow) => flow,
-                }
-            }
-        // TODO adding these checks should scale better as complexity increases, but results were inconclusive for now
-        } else if solution.commitments.damage_regenerate {
-            self.solve_boolean_branches(solution, self.health_options(), simulate)
-        } else {
-            solution.commitments.damage_regenerate = true;
-
-            self.solve_boolean_branches(
-                solution,
-                self.health_options().chain(Some(Skill::REGENERATE_ID)),
-                simulate,
-            )
-        }
+                    simulate,
+                    Shard::Resilience,
+                    // TODO we could optimize some branches if we do the other branch first and use information
+                    // from that somehow. For example, if solve_max_health only needs one health-boosting item,
+                    // then we know a resilience branch will always be redundant.
+                    Commitments::commit_resilience,
+                    Difficulty::resilience,
+                    |this, solution, simulate| this.solve_max_health(solution, amount, simulate),
+                )
+            },
+        )
     }
 
-    fn solve_energy(
+    fn solve_max_health(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        amount: i32,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_amount(
+            solution,
+            UberIdentifier::MAX_HEALTH,
+            amount,
+            // health cannot drop to zero
+            |amount| amount < 0,
+            convert_integer_write,
+            simulate,
+        )
+    }
+
+    fn solve_energy<const LIFE_PACT: bool>(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        amount: OrderedFloat<f32>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_shard_branches(
+            solution,
+            simulate,
+            Shard::Energy,
+            Commitments::commit_energy_shard,
+            Difficulty::energy_shard,
+            |this, solution, simulate| {
+                this.solve_shard_branches(
+                    solution,
+                    simulate,
+                    Shard::Overcharge,
+                    Commitments::commit_overcharge,
+                    Difficulty::overcharge,
+                    |this, mut solution, simulate| {
+                        if !LIFE_PACT || !this.world.settings.difficulty.life_pact() {
+                            this.solve_max_energy(solution, amount, simulate)
+                        } else if this.world.shard(Shard::LifePact) {
+                            // is_met communicates if health is missing due to life pact, so we're already branching into those variants.
+                            // But the amount returned is the full missing amount, for a complete set of solutions we need to include
+                            // mixes of health and energy. We can solev this in a non-overlapping way by letting the health branch
+                            // solve its communicated max amount and doing one step of energy here in the energy branch.
+                            // This will iteratively create a tree where energy is solved stepwise and health directly jumps to the leaves,
+                            // which is ideal. We can use solve_boolean for a single step since the UberState type doesn't actually matter.
+                            this.solve_boolean(solution, UberIdentifier::MAX_ENERGY, simulate)
+                            // TODO remove if not needed
+                            // this.solve_orb_tree(
+                            //     solution,
+                            //     simulate,
+                            //     |this, solution, simulate| this.solve_health(solution, 1, simulate),
+                            //     |this, solution, simulate| {
+                            //         this.solve_max_energy(solution, amount, simulate)
+                            //     },
+                            // )
+                        } else if solution.commitments.commit_life_pact() {
+                            this.solve_max_energy(solution, amount, simulate)
+                        } else {
+                            this.solve_simple_branch(
+                                solution,
+                                simulate,
+                                |this, solution, simulate| {
+                                    this.solve_max_energy(solution, amount, simulate)
+                                },
+                                Self::solve_life_pact,
+                            )
+                        }
+                    },
+                )
+            },
+        )
+    }
+
+    fn solve_max_energy(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        amount: OrderedFloat<f32>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_float(solution, UberIdentifier::MAX_ENERGY, amount, simulate)
+    }
+
+    fn solve_life_pact(
         &mut self,
         solution: PartialSolution<'graph>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        self.solve_boolean_branches(solution, self.energy_options(), simulate)
+        self.solve_boolean(solution, Shard::LIFE_PACT_ID, simulate)
     }
 
-    fn health_options(&self) -> impl Iterator<Item = UberIdentifier> {
-        iter::once(UberIdentifier::MAX_HEALTH)
-        // .chain(self.resilience_option())
-        // .chain(self.vitality_option())
+    fn solve_shard_branches<C, D, F>(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        simulate: bool,
+        shard: Shard,
+        commitment: C,
+        difficulty: D,
+        next: F,
+    ) -> ControlFlow<(), PartialSolution<'graph>>
+    where
+        C: FnOnce(&mut Commitments) -> bool,
+        D: FnOnce(Difficulty) -> bool,
+        F: FnOnce(
+            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            PartialSolution<'graph>,
+            bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>>,
+    {
+        if commitment(&mut solution.commitments)
+            || self.world.shard(shard)
+            || !difficulty(self.world.settings.difficulty)
+        {
+            next(self, solution, simulate)
+        } else {
+            self.solve_simple_branch(solution, simulate, next, move |this, solution, simulate| {
+                this.solve_shard(solution, simulate, shard)
+            })
+        }
     }
 
-    // TODO maybe after some optimizations oriShy
-    // fn resilience_option(&self) -> Option<UberIdentifier> {
-    //     (self.world.settings.difficulty.resilience() && !self.world.shard(Shard::Resilience))
-    //         .then_some(Shard::RESILIENCE_ID)
-    // }
-
-    // fn vitality_option(&self) -> Option<UberIdentifier> {
-    //     (self.world.settings.difficulty.vitality() && !self.world.shard(Shard::Vitality))
-    //         .then_some(Shard::VITALITY_ID)
-    // }
-
-    fn energy_options(&self) -> impl Iterator<Item = UberIdentifier> {
-        iter::once(UberIdentifier::MAX_ENERGY)
-        // .chain(self.energy_shard_option())
+    fn solve_shard(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+        shard: Shard,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_boolean(solution, shard.uber_identifier(), simulate)
     }
 
-    // fn energy_shard_option(&self) -> Option<UberIdentifier> {
-    //     (self.world.settings.difficulty.energy_shard() && !self.world.shard(Shard::Energy))
-    //         .then_some(Shard::ENERGY_ID)
+    // fn solve_orb_tree<H, E>(
+    //     &mut self,
+    //     solution: PartialSolution<'graph>,
+    //     simulate: bool,
+    //     solve_health: H,
+    //     solve_energy: E,
+    // ) -> ControlFlow<(), PartialSolution<'graph>>
+    // where
+    //     H: FnOnce(
+    //         &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+    //         PartialSolution<'graph>,
+    //         bool,
+    //     ) -> ControlFlow<(), PartialSolution<'graph>>,
+    //     E: FnOnce(
+    //         &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+    //         PartialSolution<'graph>,
+    //         bool,
+    //     ) -> ControlFlow<(), PartialSolution<'graph>>,
+    // {
+    //     if solution.commitments.skip_energy_branches {
+    //         solve_health(self, solution, simulate)
+    //     } else {
+    //         self.solve_simple_branch(
+    //             solution,
+    //             simulate,
+    //             |this, mut solution, simulate| {
+    //                 // Unlike other commitments, only one branch should commit in this case to keep building a tree
+    //                 solution.commitments.skip_energy_branches = true;
+    //                 solve_health(this, solution, simulate)
+    //             },
+    //             solve_energy,
+    //         )
+    //     }
     // }
+
+    fn solve_simple_branch<L, R>(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+        left: L,
+        right: R,
+    ) -> ControlFlow<(), PartialSolution<'graph>>
+    where
+        L: FnOnce(
+            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            PartialSolution<'graph>,
+            bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>>,
+        R: FnOnce(
+            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            PartialSolution<'graph>,
+            bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>>,
+    {
+        let left_flow = left(self, solution.clone(), simulate);
+        let right_flow = right(self, solution, simulate && left_flow.is_break());
+
+        match (left_flow, right_flow) {
+            (left_flow @ ControlFlow::Continue(_), ControlFlow::Continue(right_solution)) => {
+                self.pause_solution(right_solution);
+                left_flow
+            }
+            (flow @ ControlFlow::Continue(_), ControlFlow::Break(()))
+            | (ControlFlow::Break(()), flow) => flow,
+        }
+    }
+
+    fn solve_committing_branch<C, L, R>(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        simulate: bool,
+        commitment: C,
+        always: L,
+        once: R,
+    ) -> ControlFlow<(), PartialSolution<'graph>>
+    where
+        C: FnOnce(&mut Commitments) -> bool,
+        L: FnOnce(
+            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            PartialSolution<'graph>,
+            bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>>,
+        R: FnOnce(
+            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            PartialSolution<'graph>,
+            bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>>,
+    {
+        if commitment(&mut solution.commitments) {
+            always(self, solution, simulate)
+        } else {
+            self.solve_simple_branch(solution, simulate, always, once)
+        }
+    }
 
     fn solve_weapon<const TARGET_IS_WALL: bool>(
         &mut self,
@@ -866,26 +1145,65 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             .weapons_iter::<TARGET_IS_WALL>()
             .map(Skill::uber_identifier);
 
-        self.solve_boolean_branches(solution, branches, simulate)
+        self.solve_branches(solution, branches, simulate, Self::solve_boolean)
+    }
+
+    fn solve_energy_or_burrow_or_better_enemy_weapon(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        amount: OrderedFloat<f32>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_committing_branch(
+            solution,
+            simulate,
+            Commitments::commit_burrow_as_weapon,
+            |this, solution, simulate| {
+                this.solve_energy_or_better_weapon::<false>(solution, amount, simulate)
+            },
+            Self::solve_burrow,
+        )
+    }
+
+    fn solve_burrow(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_boolean(solution, Skill::BURROW_ID, simulate)
     }
 
     fn solve_energy_or_better_weapon<const TARGET_IS_WALL: bool>(
         &mut self,
-        mut solution: PartialSolution<'graph>,
+        solution: PartialSolution<'graph>,
+        amount: OrderedFloat<f32>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        if mem::replace(&mut solution.commitments.better_weapon, true) {
-            return self.solve_energy(solution, simulate);
-        }
+        self.solve_committing_branch(
+            solution,
+            simulate,
+            Commitments::commit_better_weapon,
+            |this, solution, simulate| this.solve_energy::<true>(solution, amount, simulate),
+            Self::solve_better_weapon::<TARGET_IS_WALL>,
+        )
+    }
 
-        let branches = self
+    fn solve_better_weapon<const TARGET_IS_WALL: bool>(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        // TODO on some branches energyless weapons might be guaranteed redundant.
+        // For example, if we are in an overcharge branch and there is a non-overcharge
+        // alternative, then that other path is going to find the better energyless
+        // weapon solutions. But I don't think we currently store enough info for that.
+        let weapons = self
             .world
             .better_weapons::<TARGET_IS_WALL>()
             .map(Skill::uber_identifier)
-            .chain(self.energy_options())
-            .collect::<Vec<_>>();
+            .collect::<ArrayVec<_, 9>>();
 
-        self.solve_boolean_branches(solution, branches, simulate)
+        self.solve_branches(solution, weapons, simulate, Self::solve_boolean)
     }
 
     fn solve_boolean(
@@ -903,7 +1221,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                 .contains(&uber_identifier)
         }) else {
             // TODO can we remember pointless paths that we know end in this branch?
-            trace!("no items in the pool to solve");
+            trace!("no items in the pool to solve {uber_identifier}");
 
             return ControlFlow::Break(());
         };
@@ -927,23 +1245,90 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         ControlFlow::Continue(solution)
     }
 
+    fn add_item(
+        &mut self,
+        solution: &mut PartialSolution,
+        index: usize,
+        simulate: bool,
+    ) -> ControlFlow<()> {
+        solution.used_items.push(index);
+
+        self.check_redundancy(solution)?;
+
+        solution.remaining_items.remove(&index);
+
+        if simulate {
+            self.item_pool[index].simulate(self.world, self.events);
+        }
+
+        ControlFlow::Continue(())
+    }
+
     fn solve_integer(
         &mut self,
-        mut solution: PartialSolution<'graph>,
+        solution: PartialSolution<'graph>,
         uber_identifier: UberIdentifier,
-        mut amount: i32,
+        amount: i32,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         if uber_identifier == UberIdentifier::SPIRIT_LIGHT {
-            return self.solve_spirit_light(solution, amount, simulate);
+            self.solve_spirit_light(solution, amount, simulate)
+        } else {
+            self.solve_amount(
+                solution,
+                uber_identifier,
+                amount,
+                |amount| amount <= 0,
+                convert_integer_write,
+                simulate,
+            )
+        }
+    }
+
+    fn solve_float(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        uber_identifier: UberIdentifier,
+        amount: OrderedFloat<f32>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        fn convert(write: &UberStateWrite) -> Option<OrderedFloat<f32>> {
+            match CommonWriteCommand::from_write(write) {
+                Some(CommonWriteCommand::AddFloat(amount)) => Some(amount),
+                _ => None,
+            }
         }
 
+        self.solve_amount(
+            solution,
+            uber_identifier,
+            amount,
+            |amount| amount <= (0.).into(),
+            convert,
+            simulate,
+        )
+    }
+
+    fn solve_amount<A, FA, FW>(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        uber_identifier: UberIdentifier,
+        mut amount: A,
+        mut amount_finished: FA,
+        mut amount_from_write: FW,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>>
+    where
+        A: Copy + PartialOrd + Sub<Output = A> + Display,
+        FA: FnMut(A) -> bool,
+        FW: FnMut(&UberStateWrite<'pool>) -> Option<A>,
+    {
         self.has_free_slot(&solution)?;
 
         let mut items = vec![];
         let mut slots = self.slots - solution.used_slots();
 
-        for index in solution.remaining_items.iter().copied() {
+        'outer: for index in solution.remaining_items.iter().copied() {
             let mut item_helps = false;
 
             for write in self.item_pool[index]
@@ -953,12 +1338,17 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             {
                 item_helps = true;
 
-                match write.command.try_as_integer().unwrap().as_constant() {
-                    None => amount = 0,
-                    Some(item_amount) => amount -= item_amount,
+                match amount_from_write(&write) {
+                    None => {
+                        trace!("unable to read into {}, solving stepwise", write.command);
+
+                        items.push(index);
+                        break 'outer;
+                    }
+                    Some(item_amount) => amount = amount - item_amount,
                 }
 
-                if amount <= 0 {
+                if amount_finished(amount) {
                     break;
                 }
             }
@@ -966,14 +1356,14 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             if item_helps {
                 items.push(index);
 
-                if amount <= 0 {
+                if amount_finished(amount) {
                     break;
                 }
 
                 if slots > 1 {
                     slots -= 1;
                 } else {
-                    trace!("not enough slots to solve");
+                    trace!("not enough slots to solve {uber_identifier}*{amount}");
 
                     return ControlFlow::Break(());
                 }
@@ -981,14 +1371,12 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         }
 
         if items.is_empty() {
-            trace!("no items in the pool to solve");
+            trace!("no items in the pool to solve {uber_identifier}*{amount}");
 
             return ControlFlow::Break(());
         }
 
-        for index in items {
-            self.add_item(&mut solution, index, simulate)?;
-        }
+        self.add_items(&mut solution, items, simulate)?;
 
         trace!(
             "progressed {uber_identifier} for {solution}",
@@ -996,6 +1384,30 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         );
 
         ControlFlow::Continue(solution)
+    }
+
+    fn add_items(
+        &mut self,
+        solution: &mut PartialSolution,
+        items: Vec<usize>,
+        simulate: bool,
+    ) -> ControlFlow<()> {
+        solution.used_items.extend(items.iter().copied());
+
+        self.check_redundancy(&solution)?;
+
+        for index in &items {
+            solution.remaining_items.remove(index);
+        }
+
+        if simulate {
+            // TODO maybe queue up changes to have fewer reach refreshes?
+            for index in items {
+                self.item_pool[index].simulate(self.world, self.events);
+            }
+        }
+
+        ControlFlow::Continue(())
     }
 
     fn has_free_slot(&self, solution: &PartialSolution) -> ControlFlow<()> {
@@ -1031,37 +1443,29 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         any: Vec<Missing<'graph>>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        // TODO make these unique earlier in the program logic?
-        // here they have to be unique so identical branches don't eliminate eachother
-        // although, if different missings resolve to the same item pool item, could an issue still arise?
-        // TODO also optimize the graph more so we get fewer duplicates here to begin with
-        fn unique_missing<'graph>(
-            any: Vec<Missing<'graph>>,
-            unique: &mut FxHashSet<Missing<'graph>>,
-        ) {
-            for missing in any {
-                match missing {
-                    Missing::Any(any) => unique_missing(any, unique),
-                    single => {
-                        unique.insert(single);
-                    }
-                }
-            }
-        }
+        // TODO is this irrelevant now?
+        // // TODO make these unique earlier in the program logic?
+        // // here they have to be unique so identical branches don't eliminate eachother
+        // // although, if different missings resolve to the same item pool item, could an issue still arise?
+        // // TODO also optimize the graph more so we get fewer duplicates here to begin with
+        // fn unique_missing<'graph>(
+        //     any: Vec<Missing<'graph>>,
+        //     unique: &mut IndexSet<Missing<'graph>, FxBuildHasher>,
+        // ) {
+        //     for missing in any {
+        //         match missing {
+        //             Missing::Any(any) => unique_missing(any, unique),
+        //             single => {
+        //                 unique.insert(single);
+        //             }
+        //         }
+        //     }
+        // }
 
-        let mut unique = FxHashSet::with_capacity_and_hasher(any.len(), FxBuildHasher);
-        unique_missing(any, &mut unique);
+        // let mut unique = IndexSet::with_capacity_and_hasher(any.len(), FxBuildHasher);
+        // unique_missing(any, &mut unique);
 
-        fn solve_branch<'graph>(
-            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
-            solution: PartialSolution<'graph>,
-            missing: Missing<'graph>,
-            simulate: bool,
-        ) -> ControlFlow<(), PartialSolution<'graph>> {
-            context.solve(solution.clone(), missing, simulate)
-        }
-
-        self.solve_branches(solution, unique, simulate, solve_branch)
+        self.solve_branches(solution, any, simulate, Self::solve)
     }
 
     // fn solve_or(
@@ -1095,7 +1499,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     where
         I: IntoIterator<Item = T>,
         F: FnMut(
-            &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
             PartialSolution<'graph>,
             T,
             bool,
@@ -1137,46 +1541,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         // next_solution.other_branches = other_branches;
 
         ControlFlow::Continue(next_solution)
-    }
-
-    fn solve_boolean_branches<I>(
-        &mut self,
-        solution: PartialSolution<'graph>,
-        branches: I,
-        simulate: bool,
-    ) -> ControlFlow<(), PartialSolution<'graph>>
-    where
-        I: IntoIterator<Item = UberIdentifier>,
-    {
-        fn solve_branch<'graph>(
-            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
-            solution: PartialSolution<'graph>,
-            uber_identifier: UberIdentifier,
-            simulate: bool,
-        ) -> ControlFlow<(), PartialSolution<'graph>> {
-            context.solve_boolean(solution, uber_identifier, simulate)
-        }
-
-        self.solve_branches(solution, branches, simulate, solve_branch)
-    }
-
-    fn add_item(
-        &mut self,
-        solution: &mut PartialSolution,
-        index: usize,
-        simulate: bool,
-    ) -> ControlFlow<()> {
-        solution.used_items.push(index);
-
-        self.check_redundancy(solution)?;
-
-        solution.remaining_items.remove(&index);
-
-        if simulate {
-            self.item_pool[index].simulate(self.world, self.events);
-        }
-
-        ControlFlow::Continue(())
     }
 
     fn add_spirit_light(
@@ -1235,6 +1599,21 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             }
         }
 
+        if log_enabled!(target: "perf_counters", Trace) {
+            self.perf_counters.sort_unstable_by(|_, a, _, b| b.cmp(a));
+
+            trace!(
+                target: "perf_counters",
+                "Solution perf counters:\n{}",
+                self.perf_counters
+                    .iter()
+                    .format_with("\n", |(index, count), f| f(&format_args!(
+                        "{count:04} -> {node}",
+                        node = self.world.graph.nodes[*index].identifier()
+                    )))
+            );
+        }
+
         self.finished
     }
 
@@ -1243,6 +1622,13 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         solution: &'solution S,
     ) -> DisplaySolution<'graph, 'pool, 'solution> {
         solution.display(self.item_pool, Some(self.world.graph))
+    }
+}
+
+fn convert_integer_write(write: &UberStateWrite) -> Option<i32> {
+    match CommonWriteCommand::from_write(write) {
+        Some(CommonWriteCommand::AddInteger(amount)) => Some(amount),
+        _ => None,
     }
 }
 

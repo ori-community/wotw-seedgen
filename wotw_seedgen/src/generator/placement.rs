@@ -2,7 +2,7 @@ use super::{
     item_pool::ItemPool, spirit_light::SpiritLightProvider, Seed, SeedUniverse, SEED_FAILED_MESSAGE,
 };
 use crate::{
-    generator::solutions::{Solution, SolutionLike},
+    generator::solutions::{solution_weights, Solution, SolutionLike, SOLUTION_MAX_ITEMS},
     item_pool::ItemPoolBuilder,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
     World,
@@ -17,7 +17,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom};
+use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::seed_language::{compile::store_boolean, output::AsConstant};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
@@ -51,6 +51,9 @@ const KEYSTONE_DOORS: &[(&str, usize)] = &[
 pub(super) const SPAWN_SLOTS: usize = 7;
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
 const TOTAL_SPIRIT_LIGHT: i32 = 20000;
+
+const MIN_PLACEHOLDERS: usize = 3;
+static MAX_PLACEHOLDERS: LazyLock<usize> = LazyLock::new(|| SOLUTION_MAX_ITEMS.saturating_mul(2));
 
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
@@ -386,23 +389,32 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     )
                 } else {
                     let target_world_index = self.choose_target_world_for_random_placement();
+                    let target_world = &mut self.worlds[target_world_index];
 
-                    if origin_world_index != target_world_index {
-                        // If the item is taken from another item pool, then placements_remaining
-                        // has reduced by one and item_pool.len() remained the same.
-                        // If it's taken from the own item pool, both have reduced by one
-                        // and spirit_light_placements_remaining remains the same
-                        spirit_light_placements_remaining =
-                            spirit_light_placements_remaining.saturating_sub(1);
-                    }
+                    let item = match target_world.item_pool.choose_random() {
+                        None => {
+                            // Since this is not taken from the item pool, placements_remaining
+                            // has reduced by one and item_pool.len() remained the same.
+                            spirit_light_placements_remaining =
+                                spirit_light_placements_remaining.saturating_sub(1);
 
-                    (
-                        target_world_index,
-                        self.worlds[target_world_index]
-                            .item_pool
-                            .choose_random()
-                            .unwrap(),
-                    )
+                            target_world.backup_gorlek_ore()
+                        }
+                        Some(item) => {
+                            if origin_world_index != target_world_index {
+                                // If the item is taken from another item pool, then placements_remaining
+                                // has reduced by one and item_pool.len() remained the same.
+                                // If it's taken from the own item pool, both have reduced by one
+                                // and spirit_light_placements_remaining remains the same
+                                spirit_light_placements_remaining =
+                                    spirit_light_placements_remaining.saturating_sub(1);
+                            }
+
+                            item
+                        }
+                    };
+
+                    (target_world_index, item)
                 };
 
                 self.place_command_at(
@@ -940,8 +952,14 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             .extend(self.reached_needs_placement.clone());
 
         let desired_placeholders = usize::max(
-            usize::max(3, self.placeholders.len()),
-            (self.reached_needs_placement.len() + self.placeholders.len()) / 2,
+            MIN_PLACEHOLDERS,
+            usize::min(
+                *MAX_PLACEHOLDERS,
+                usize::max(
+                    self.placeholders.len(),
+                    (self.reached_needs_placement.len() + self.placeholders.len()) / 2,
+                ),
+            ),
         );
         let new_placeholders = usize::min(desired_placeholders, self.reached_needs_placement.len());
         let kept_placeholders = usize::min(
@@ -1016,13 +1034,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         progressions: Vec<Solution>,
         slots: usize,
     ) -> Vec<(Solution, f32)> {
-        let mut with_weights = progressions
-            .into_iter()
-            .map(|solution| {
-                let weight = solution.weight(&self.item_pool, slots, self.spawn_slots);
-                (solution, weight)
-            })
-            .collect::<Vec<_>>();
+        let mut with_weights =
+            solution_weights(progressions, &self.item_pool, slots, self.spawn_slots);
 
         // The order returned by find_solutions is not portable, so we have to sort before our weighted choice.
         // The weights are a good pick for primary key because they are fast to compare and quite unique;
@@ -1053,7 +1066,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     .into_iter()
                     .format_with("\n", |(solution, weight), f| {
                         f(&format_args!(
-                            "- {chance:.1}% (reaches {new_reached}): {items}",
+                            "- {chance:.2}% (reaches {new_reached}): {items}",
                             chance = (weight / total_weight) * 100.,
                             new_reached = solution.new_reached,
                             items = solution.display(&self.item_pool, None), // TODO this was able to use log_name before
@@ -1151,16 +1164,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let is_shop = pickup.uber_identifier.is_shop();
 
             let command = if is_shop {
-                // TODO try to avoid
-                let command = compile::gorlek_ore();
-
-                warn!(
-                    "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
-                    name = self.log_name(&command),
-                    index = self.log_index,
-                );
-
-                command
+                self.backup_gorlek_ore()
             } else {
                 let amount = self.spirit_light_provider.take(1 + placements_remaining) as i32;
                 compile::spirit_light(amount.into(), &mut self.rng)
@@ -1168,6 +1172,19 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             self.place(pickup, command, placement_spoiler);
         }
         // TODO unreachable items that should be filled
+    }
+
+    fn backup_gorlek_ore(&mut self) -> CommandVoid {
+        // TODO try to avoid
+        let command = compile::gorlek_ore();
+
+        warn!(
+            "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
+            name = self.log_name(&command),
+            index = self.log_index,
+        );
+
+        command
     }
 
     fn place(

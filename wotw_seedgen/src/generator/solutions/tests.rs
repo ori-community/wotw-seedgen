@@ -52,7 +52,7 @@ fn find_test_solutions(
 ) -> Vec<Vec<(CommandVoid, u32)>> {
     sorted_test_solutions(
         world
-            .find_solutions(&item_pool, &[], slots, 0, Some(u8::MAX))
+            .find_solutions_no_max_items(&item_pool, &[], slots, 0, Some(u8::MAX))
             .into_iter()
             .map(|solution| {
                 amounts_from_item_list(
@@ -95,8 +95,8 @@ fn sort_test_solutions(solutions: &mut Vec<Vec<(CommandVoid, u32)>>) {
         .sort_by_cached_key(|solution| solution.iter().map(solution_sort_key).collect::<Vec<_>>());
 }
 
-fn solution_sort_key((item, _): &(CommandVoid, u32)) -> CommonItem {
-    item.contained_common_items().next().unwrap()
+fn solution_sort_key((item, amount): &(CommandVoid, u32)) -> (CommonItem, u32) {
+    (item.contained_common_items().next().unwrap(), *amount)
 }
 
 fn display_test_solutions(solutions: &[Vec<(CommandVoid, u32)>]) -> DisplayTestSolutions<'_> {
@@ -174,6 +174,8 @@ fn mock_solutions() {
     let mut item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0xcafef00dd15ea5e5));
     item_pool.add_amount(health_fragment(), 99);
     item_pool.add_amount(energy_fragment(), 99);
+    item_pool.remove(&shard(Energy));
+    item_pool.remove(&shard(Vitality));
     let item_pool = item_pool.finish();
 
     macro_rules! test {
@@ -305,814 +307,809 @@ fn mock_solutions() {
 
     settings.difficulty = Difficulty::Unsafe;
 
-    // TODO unsafe level solutions
+    test!(
+        Requirement::And(vec![
+            Requirement::Damage(18.),
+            Requirement::Damage(18.),
+            Requirement::Damage(18.),
+        ]),
+        [
+            [(health_fragment(), 11)],
+            [shard(Resilience), (health_fragment(), 10)],
+            [
+                skill(Regenerate),
+                (health_fragment(), 8),
+                (energy_fragment(), 2)
+            ],
+            [
+                skill(Regenerate),
+                (health_fragment(), 4),
+                (energy_fragment(), 4)
+            ],
+            [
+                skill(Regenerate),
+                shard(Resilience),
+                (health_fragment(), 7),
+                (energy_fragment(), 2)
+            ],
+            [
+                skill(Regenerate),
+                shard(Overcharge),
+                (health_fragment(), 4),
+                (energy_fragment(), 3)
+            ],
+        ]
+    );
 
-    // test!(
-    //     Requirement::And(vec![
-    //         Requirement::Damage(18.),
-    //         Requirement::Damage(18.),
-    //         Requirement::Damage(18.),
-    //     ]),
-    //     [
-    //         [(health_fragment(), 11)],
-    //         [shard(Resilience), (health_fragment(), 10)],
-    //         [
-    //             skill(Regenerate),
-    //             (health_fragment(), 8),
-    //             (energy_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Regenerate),
-    //             (health_fragment(), 4),
-    //             (energy_fragment(), 4)
-    //         ],
-    //         [
-    //             skill(Regenerate),
-    //             shard(Resilience),
-    //             (health_fragment(), 7),
-    //             (energy_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Regenerate),
-    //             shard(Overcharge),
-    //             (health_fragment(), 4),
-    //             (energy_fragment(), 3)
-    //         ],
-    //     ]
-    // );
+    test!(
+        spawn with [skill(Bow)],
+        Requirement::BreakWall(12.),
+        [
+           [skill(Sword)],
+           [skill(Hammer)],
+            [(energy_fragment(), 2)],
+            [
+                shard(Overcharge),
+                (energy_fragment(), 1)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 1),
+                (health_fragment(), 1)
+            ],
+            [
+                shard(LifePact),
+                (health_fragment(), 2)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 1)
+            ],
+        ]
+    );
 
-    // test!(
-    //     Requirement::BreakWall(12.),
-    //     [
-    //         [skill(Sword)],
-    //         [skill(Hammer)],
-    //         [skill(Bow), (energy_fragment(), 2)],
-    //         [skill(Bow), shard(Overcharge), energy_fragment()],
-    //         [
-    //             skill(Bow),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             health_fragment()
-    //         ],
-    //         [skill(Bow), shard(LifePact), (health_fragment(), 2)],
-    //         [
-    //             skill(Bow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             health_fragment()
-    //         ],
-    //         [skill(Grenade), (energy_fragment(), 2)],
-    //         [skill(Grenade), shard(Overcharge), energy_fragment()],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [skill(Grenade), shard(LifePact), (health_fragment(), 3)],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [skill(Shuriken), (energy_fragment(), 2)],
-    //         [skill(Shuriken), shard(Overcharge), energy_fragment()],
-    //         [
-    //             skill(Shuriken),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [skill(Shuriken), shard(LifePact), (health_fragment(), 3)],
-    //         [
-    //             skill(Shuriken),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [skill(Blaze), (energy_fragment(), 2)],
-    //         [skill(Blaze), shard(Overcharge), energy_fragment()],
-    //         [
-    //             skill(Blaze),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [skill(Blaze), shard(LifePact), (health_fragment(), 3)],
-    //         [
-    //             skill(Blaze),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [skill(Spear), (energy_fragment(), 4)],
-    //         [skill(Spear), shard(Overcharge), (energy_fragment(), 2)],
-    //         [
-    //             skill(Spear),
-    //             shard(LifePact),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Spear),
-    //             shard(LifePact),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Spear),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [skill(Spear), shard(LifePact), (health_fragment(), 5)],
-    //         [
-    //             skill(Spear),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             energy_fragment(),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Spear),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [skill(Sentry), (energy_fragment(), 4)],
-    //         [skill(Sentry), shard(Overcharge), (energy_fragment(), 2)],
-    //         [
-    //             skill(Sentry),
-    //             shard(LifePact),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Sentry),
-    //             shard(LifePact),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Sentry),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [skill(Sentry), shard(LifePact), (health_fragment(), 5)],
-    //         [
-    //             skill(Sentry),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             energy_fragment(),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Sentry),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 3)
-    //         ],
-    //     ]
-    // );
+    test!(
+        Requirement::BreakWall(12.),
+        [
+            [skill(Sword)],
+            [skill(Hammer)],
+            [skill(Bow), (energy_fragment(), 2)],
+            [skill(Bow), shard(Overcharge), energy_fragment()],
+            [
+                skill(Bow),
+                shard(LifePact),
+                energy_fragment(),
+                health_fragment()
+            ],
+            [skill(Bow), shard(LifePact), (health_fragment(), 2)],
+            [
+                skill(Bow),
+                shard(LifePact),
+                shard(Overcharge),
+                health_fragment()
+            ],
+            [skill(Grenade), (energy_fragment(), 2)],
+            [skill(Grenade), shard(Overcharge), energy_fragment()],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                energy_fragment(),
+                (health_fragment(), 2)
+            ],
+            [skill(Grenade), shard(LifePact), (health_fragment(), 3)],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 2)
+            ],
+            [skill(Shuriken), (energy_fragment(), 2)],
+            [skill(Shuriken), shard(Overcharge), energy_fragment()],
+            [
+                skill(Shuriken),
+                shard(LifePact),
+                energy_fragment(),
+                (health_fragment(), 2)
+            ],
+            [skill(Shuriken), shard(LifePact), (health_fragment(), 3)],
+            [
+                skill(Shuriken),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 2)
+            ],
+            [skill(Blaze), (energy_fragment(), 2)],
+            [skill(Blaze), shard(Overcharge), energy_fragment()],
+            [
+                skill(Blaze),
+                shard(LifePact),
+                energy_fragment(),
+                (health_fragment(), 2)
+            ],
+            [skill(Blaze), shard(LifePact), (health_fragment(), 3)],
+            [
+                skill(Blaze),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 2)
+            ],
+            [skill(Spear), (energy_fragment(), 4)],
+            [skill(Spear), shard(Overcharge), (energy_fragment(), 2)],
+            [
+                skill(Spear),
+                shard(LifePact),
+                (energy_fragment(), 3),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Spear),
+                shard(LifePact),
+                (energy_fragment(), 2),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Spear),
+                shard(LifePact),
+                energy_fragment(),
+                (health_fragment(), 4)
+            ],
+            [skill(Spear), shard(LifePact), (health_fragment(), 5)],
+            [
+                skill(Spear),
+                shard(LifePact),
+                shard(Overcharge),
+                energy_fragment(),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Spear),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 3)
+            ],
+            [skill(Sentry), (energy_fragment(), 4)],
+            [skill(Sentry), shard(Overcharge), (energy_fragment(), 2)],
+            [
+                skill(Sentry),
+                shard(LifePact),
+                (energy_fragment(), 3),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Sentry),
+                shard(LifePact),
+                (energy_fragment(), 2),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Sentry),
+                shard(LifePact),
+                energy_fragment(),
+                (health_fragment(), 4)
+            ],
+            [skill(Sentry), shard(LifePact), (health_fragment(), 5)],
+            [
+                skill(Sentry),
+                shard(LifePact),
+                shard(Overcharge),
+                energy_fragment(),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Sentry),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 3)
+            ],
+        ]
+    );
 
-    // test!(
-    //     spawn with [skill(Bow)],
-    //     Requirement::BreakWall(12.),
-    //     [
-    //        [skill(Sword)],
-    //        [skill(Hammer)],
-    //         [(energy_fragment(), 2)],
-    //         [
-    //             shard(Overcharge),
-    //             (energy_fragment(), 1)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 1),
-    //             (health_fragment(), 1)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 1)
-    //         ],
-    //     ]
-    // );
+    test!(
+        // TODO this should really be equivalent to Requirement::EnergySkill(Grenade, 2.0)
+        Requirement::And(vec![
+            Requirement::EnergySkill(Grenade, 1.),
+            Requirement::EnergySkill(Grenade, 1.)
+        ]),
+        [
+            [skill(Grenade), (energy_fragment(), 4)],
+            [skill(Grenade), shard(Overcharge), (energy_fragment(), 2)],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                (energy_fragment(), 3),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                (energy_fragment(), 2),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                energy_fragment(),
+                (health_fragment(), 4)
+            ],
+            [skill(Grenade), shard(LifePact), (health_fragment(), 5)],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                shard(Overcharge),
+                energy_fragment(),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                shard(Resilience),
+                energy_fragment(),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                shard(Resilience),
+                (health_fragment(), 4)
+            ],
+            [
+                skill(Grenade),
+                shard(LifePact),
+                shard(Overcharge),
+                shard(Resilience),
+                (health_fragment(), 2)
+            ],
+        ]
+    );
 
-    // test!(
-    //     // TODO this should really be equivalent to Requirement::EnergySkill(Grenade, 2.0)
-    //     Requirement::And(vec![
-    //         Requirement::EnergySkill(Grenade, 1.),
-    //         Requirement::EnergySkill(Grenade, 1.)
-    //     ]),
-    //     [
-    //         [skill(Grenade), (energy_fragment(), 4)],
-    //         [skill(Grenade), shard(Overcharge), (energy_fragment(), 2)],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             energy_fragment(),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [skill(Grenade), shard(LifePact), (health_fragment(), 5)],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             energy_fragment(),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             shard(Resilience),
-    //             energy_fragment(),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             shard(Resilience),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             shard(Resilience),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Grenade),
-    //             shard(LifePact),
-    //             skill(Regenerate),
-    //             (energy_fragment(), 2)
-    //         ],
-    //     ]
-    // );
+    // TODO damage upgrades as destroy solution?
 
-    // test!(
-    //     spawn with [skill(Bow)],
-    //     Requirement::Combat(smallvec![
-    //         (Enemy::Hornbug, 1),
-    //         (Enemy::Bat, 1),
-    //         (Enemy::Sandworm, 2),
-    //         (Enemy::Lizard, 2),
-    //         (Enemy::Skeeto, 3),
-    //         (Enemy::SneezeSlug, 1)
-    //     ]),
-    //     [
-    //         [skill(Sword)],
-    //         [skill(Hammer)],
-    //         [(energy_fragment(), 32)],
-    //         [shard(Overcharge), (energy_fragment(), 16)],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 31),
-    //             (health_fragment(), 1)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 30),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 29),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 28),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 27),
-    //             (health_fragment(), 5)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 26),
-    //             (health_fragment(), 6)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 25),
-    //             (health_fragment(), 7)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 24),
-    //             (health_fragment(), 8)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 23),
-    //             (health_fragment(), 9)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 22),
-    //             (health_fragment(), 10)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 21),
-    //             (health_fragment(), 11)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 20),
-    //             (health_fragment(), 12)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 19),
-    //             (health_fragment(), 13)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 18),
-    //             (health_fragment(), 14)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 17),
-    //             (health_fragment(), 15)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 16),
-    //             (health_fragment(), 16)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 15),
-    //             (health_fragment(), 17)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 14),
-    //             (health_fragment(), 18)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 13),
-    //             (health_fragment(), 19)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 12),
-    //             (health_fragment(), 20)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 11),
-    //             (health_fragment(), 21)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 10),
-    //             (health_fragment(), 22)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 9),
-    //             (health_fragment(), 23)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 8),
-    //             (health_fragment(), 24)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 7),
-    //             (health_fragment(), 25)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 6),
-    //             (health_fragment(), 26)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 5),
-    //             (health_fragment(), 27)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 4),
-    //             (health_fragment(), 28)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 29)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 30)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (energy_fragment(), 1),
-    //             (health_fragment(), 31)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             (health_fragment(), 32)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 15),
-    //             (health_fragment(), 1)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 14),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 13),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 12),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 11),
-    //             (health_fragment(), 5)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 10),
-    //             (health_fragment(), 6)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 9),
-    //             (health_fragment(), 7)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 8),
-    //             (health_fragment(), 8)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 7),
-    //             (health_fragment(), 9)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 6),
-    //             (health_fragment(), 10)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 5),
-    //             (health_fragment(), 11)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 4),
-    //             (health_fragment(), 12)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 13)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 14)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 1),
-    //             (health_fragment(), 15)
-    //         ],
-    //         [
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 16)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             (energy_fragment(), 27)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 14)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 26),
-    //             (health_fragment(), 1)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 25),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 24),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 23),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 22),
-    //             (health_fragment(), 5)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 21),
-    //             (health_fragment(), 6)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 20),
-    //             (health_fragment(), 7)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 19),
-    //             (health_fragment(), 8)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 18),
-    //             (health_fragment(), 9)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 17),
-    //             (health_fragment(), 10)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 16),
-    //             (health_fragment(), 11)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 15),
-    //             (health_fragment(), 12)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 14),
-    //             (health_fragment(), 13)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 13),
-    //             (health_fragment(), 14)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 12),
-    //             (health_fragment(), 15)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 11),
-    //             (health_fragment(), 16)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 10),
-    //             (health_fragment(), 17)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 9),
-    //             (health_fragment(), 18)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 8),
-    //             (health_fragment(), 19)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 7),
-    //             (health_fragment(), 20)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 6),
-    //             (health_fragment(), 21)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 5),
-    //             (health_fragment(), 22)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 4),
-    //             (health_fragment(), 23)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 24)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 25)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (energy_fragment(), 1),
-    //             (health_fragment(), 26)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             (health_fragment(), 27)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 13),
-    //             (health_fragment(), 1)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 12),
-    //             (health_fragment(), 2)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 11),
-    //             (health_fragment(), 3)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 10),
-    //             (health_fragment(), 4)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 9),
-    //             (health_fragment(), 5)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 8),
-    //             (health_fragment(), 6)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 7),
-    //             (health_fragment(), 7)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 6),
-    //             (health_fragment(), 8)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 5),
-    //             (health_fragment(), 9)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 4),
-    //             (health_fragment(), 10)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 3),
-    //             (health_fragment(), 11)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 2),
-    //             (health_fragment(), 12)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (energy_fragment(), 1),
-    //             (health_fragment(), 13)
-    //         ],
-    //         [
-    //             skill(Burrow),
-    //             shard(LifePact),
-    //             shard(Overcharge),
-    //             (health_fragment(), 14)
-    //         ],
-    //     ]
-    // );
+    test!(
+        // TODO Launch can kill enemies though?
+        spawn with [skill(Bow), skill(Grenade), skill(Launch)],
+        Requirement::Combat(smallvec![
+            (Enemy::Hornbug, 1),
+            (Enemy::Bat, 1),
+            (Enemy::Sandworm, 2),
+            (Enemy::Lizard, 2),
+            (Enemy::Skeeto, 3),
+            (Enemy::SneezeSlug, 1)
+        ]),
+        [
+            [skill(Sword)],
+            [skill(Hammer)],
+            [(energy_fragment(), 32)],
+            [shard(Overcharge), (energy_fragment(), 16)],
+            [
+                shard(LifePact),
+                (energy_fragment(), 31),
+                (health_fragment(), 1)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 30),
+                (health_fragment(), 2)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 29),
+                (health_fragment(), 3)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 28),
+                (health_fragment(), 4)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 27),
+                (health_fragment(), 5)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 26),
+                (health_fragment(), 6)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 25),
+                (health_fragment(), 7)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 24),
+                (health_fragment(), 8)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 23),
+                (health_fragment(), 9)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 22),
+                (health_fragment(), 10)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 21),
+                (health_fragment(), 11)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 20),
+                (health_fragment(), 12)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 19),
+                (health_fragment(), 13)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 18),
+                (health_fragment(), 14)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 17),
+                (health_fragment(), 15)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 16),
+                (health_fragment(), 16)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 15),
+                (health_fragment(), 17)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 14),
+                (health_fragment(), 18)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 13),
+                (health_fragment(), 19)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 12),
+                (health_fragment(), 20)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 11),
+                (health_fragment(), 21)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 10),
+                (health_fragment(), 22)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 9),
+                (health_fragment(), 23)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 8),
+                (health_fragment(), 24)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 7),
+                (health_fragment(), 25)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 6),
+                (health_fragment(), 26)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 5),
+                (health_fragment(), 27)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 4),
+                (health_fragment(), 28)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 3),
+                (health_fragment(), 29)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 2),
+                (health_fragment(), 30)
+            ],
+            [
+                shard(LifePact),
+                (energy_fragment(), 1),
+                (health_fragment(), 31)
+            ],
+            [
+                shard(LifePact),
+                (health_fragment(), 32)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 15),
+                (health_fragment(), 1)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 14),
+                (health_fragment(), 2)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 13),
+                (health_fragment(), 3)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 12),
+                (health_fragment(), 4)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 11),
+                (health_fragment(), 5)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 10),
+                (health_fragment(), 6)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 9),
+                (health_fragment(), 7)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 8),
+                (health_fragment(), 8)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 7),
+                (health_fragment(), 9)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 6),
+                (health_fragment(), 10)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 5),
+                (health_fragment(), 11)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 4),
+                (health_fragment(), 12)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 3),
+                (health_fragment(), 13)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 2),
+                (health_fragment(), 14)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 1),
+                (health_fragment(), 15)
+            ],
+            [
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 16)
+            ],
+            [
+                skill(Burrow),
+                (energy_fragment(), 27)
+            ],
+            [
+                skill(Burrow),
+                shard(Overcharge),
+                (energy_fragment(), 14)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 26),
+                (health_fragment(), 1)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 25),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 24),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 23),
+                (health_fragment(), 4)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 22),
+                (health_fragment(), 5)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 21),
+                (health_fragment(), 6)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 20),
+                (health_fragment(), 7)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 19),
+                (health_fragment(), 8)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 18),
+                (health_fragment(), 9)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 17),
+                (health_fragment(), 10)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 16),
+                (health_fragment(), 11)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 15),
+                (health_fragment(), 12)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 14),
+                (health_fragment(), 13)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 13),
+                (health_fragment(), 14)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 12),
+                (health_fragment(), 15)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 11),
+                (health_fragment(), 16)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 10),
+                (health_fragment(), 17)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 9),
+                (health_fragment(), 18)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 8),
+                (health_fragment(), 19)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 7),
+                (health_fragment(), 20)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 6),
+                (health_fragment(), 21)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 5),
+                (health_fragment(), 22)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 4),
+                (health_fragment(), 23)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 3),
+                (health_fragment(), 24)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 2),
+                (health_fragment(), 25)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (energy_fragment(), 1),
+                (health_fragment(), 26)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                (health_fragment(), 27)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 13),
+                (health_fragment(), 1)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 12),
+                (health_fragment(), 2)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 11),
+                (health_fragment(), 3)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 10),
+                (health_fragment(), 4)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 9),
+                (health_fragment(), 5)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 8),
+                (health_fragment(), 6)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 7),
+                (health_fragment(), 7)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 6),
+                (health_fragment(), 8)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 5),
+                (health_fragment(), 9)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 4),
+                (health_fragment(), 10)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 3),
+                (health_fragment(), 11)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 2),
+                (health_fragment(), 12)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (energy_fragment(), 1),
+                (health_fragment(), 13)
+            ],
+            [
+                skill(Burrow),
+                shard(LifePact),
+                shard(Overcharge),
+                (health_fragment(), 14)
+            ],
+        ]
+    );
 }
 
 // useful helpers when writing the expected spawn solutions
@@ -1147,6 +1144,9 @@ fn mock_solutions() {
 //     costs_to_destroy(enemy.health())
 // }
 
+static GORLEK_SETTINGS: LazyLock<WorldSettings> =
+    LazyLock::new(|| WorldSettings::difficulty_default(Difficulty::Gorlek));
+
 static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
     let mut areas = Areas::parse(&TEST_ASSETS.base.areas.content)
         .eprint_errors(&TEST_ASSETS.base.areas)
@@ -1157,12 +1157,11 @@ static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
         .more
         .retain(|(_, content)| !matches!(content.value, SpannedOption::Some(Content::Region(..))));
 
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
     Graph::compile(
         areas,
         TEST_ASSETS.base.loc_data.clone(),
         TEST_ASSETS.base.state_data.clone(),
-        slice::from_ref(&settings),
+        slice::from_ref(&*GORLEK_SETTINGS),
     )
     .eprint_errors(&TEST_ASSETS.base.areas)
     .unwrap()
@@ -1172,17 +1171,24 @@ static ITEM_POOL: LazyLock<ItemPool> = LazyLock::new(|| {
     let mut builder = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0));
     // for simplicity
     builder.remove(&shard(Vitality));
+    builder.remove(&shard(Resilience));
     builder.remove(&shard(Energy));
     builder.finish()
 });
 
-#[test]
-fn marsh_spawn_solutions() {
+fn spawn_solutions_prelude(spawn: &str) -> World<'static, 'static> {
+    let graph = &*REGIONLESS_GRAPH;
     test_logger();
 
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "MarshSpawn.Main");
+    let mut world = test_world(graph, &*GORLEK_SETTINGS, spawn);
     world.traverse_spawn(&[]);
+
+    world
+}
+
+#[test]
+fn marsh_spawn_solutions() {
+    let mut world = spawn_solutions_prelude("MarshSpawn.Main");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1213,11 +1219,7 @@ fn marsh_spawn_solutions() {
 
 #[test]
 fn den_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "HowlsDen.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("HowlsDen.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1241,11 +1243,7 @@ fn den_spawn_solutions() {
 
 #[test]
 fn hollow_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "EastHollow.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("EastHollow.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1289,11 +1287,7 @@ fn hollow_spawn_solutions() {
 
 #[test]
 fn glades_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "GladesTown.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("GladesTown.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1386,11 +1380,7 @@ fn glades_spawn_solutions() {
 
 #[test]
 fn wellspring_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "InnerWellspring.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("InnerWellspring.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1412,11 +1402,7 @@ fn wellspring_spawn_solutions() {
 
 #[test]
 fn woods_entrance_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "WoodsEntry.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("WoodsEntry.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1446,11 +1432,7 @@ fn woods_entrance_spawn_solutions() {
 
 #[test]
 fn woods_exit_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "WoodsMain.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("WoodsMain.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1543,12 +1525,8 @@ fn woods_exit_spawn_solutions() {
 
 #[test]
 fn reach_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "LowerReach.Teleporter");
+    let mut world = spawn_solutions_prelude("LowerReach.Teleporter");
     world.store_skill(Grenade, true, &[]);
-    world.traverse_spawn(&[]);
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1580,11 +1558,7 @@ fn reach_spawn_solutions() {
 
 #[test]
 fn depths_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "UpperDepths.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("UpperDepths.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1638,13 +1612,9 @@ fn depths_spawn_solutions() {
 
 #[test]
 fn pools_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "EastPools.Teleporter");
+    let mut world = spawn_solutions_prelude("EastPools.Teleporter");
     world.store_clean_water(true, &[]);
     world.store_boolean(Teleporter::CENTRAL_POOLS_ID, true, &[]);
-    world.traverse_spawn(&[]);
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1667,11 +1637,7 @@ fn pools_spawn_solutions() {
 
 #[test]
 fn feeding_grounds_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "LowerWastes.WestTP");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("LowerWastes.WestTP");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1693,11 +1659,7 @@ fn feeding_grounds_spawn_solutions() {
 
 #[test]
 fn central_wastes_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "LowerWastes.EastTP");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("LowerWastes.EastTP");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1727,11 +1689,7 @@ fn central_wastes_spawn_solutions() {
 
 #[test]
 fn outer_ruins_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "UpperWastes.NorthTP");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("UpperWastes.NorthTP");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1897,11 +1855,7 @@ fn outer_ruins_spawn_solutions() {
 
 #[test]
 fn burrows_spawn_solutions() {
-    test_logger();
-
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "MidnightBurrows.Teleporter");
-    world.traverse_spawn(&[]);
+    let mut world = spawn_solutions_prelude("MidnightBurrows.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),

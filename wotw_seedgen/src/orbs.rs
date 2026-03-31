@@ -5,7 +5,6 @@ use std::{
 };
 
 use smallvec::{smallvec, SmallVec, ToSmallVec};
-use wotw_seedgen_data::seed_language::simulate::Simulation;
 
 pub type OrbVariants = SmallVec<[Orbs; 3]>;
 
@@ -16,6 +15,12 @@ pub type OrbVariants = SmallVec<[Orbs; 3]>;
 pub struct Orbs {
     pub health: f32,
     pub energy: f32,
+}
+
+impl Orbs {
+    pub fn new(health: f32, energy: f32) -> Self {
+        Self { health, energy }
+    }
 }
 
 impl Add for Orbs {
@@ -83,37 +88,38 @@ impl Display for Orbs {
 /// # use wotw_seedgen::orbs::{either, Orbs, OrbVariants};
 /// # use smallvec::smallvec;
 /// #
-/// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b = vec![Orbs { health: 30.0, energy: 0.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
 /// let either_orbs: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }, Orbs { health: 30.0, energy: 0.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 ///
-/// let a = vec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
-/// let b = vec![Orbs { health: 30.0, energy: 0.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
 /// let either_orbs: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 30.0, energy: 0.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 ///
-/// let a = vec![Orbs { health: 30.0, energy: 1.0 }, Orbs { health: 10.0, energy: 3.0 }];
-/// let b = vec![Orbs { health: 30.0, energy: 3.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 30.0, energy: 1.0 }, Orbs { health: 10.0, energy: 3.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 3.0 }];
 /// let either_orbs: OrbVariants = smallvec![Orbs { health: 30.0, energy: 3.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 ///
-/// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b = vec![];
-/// let either_orbs: OrbVariants = smallvec![Orbs::default()];
+/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
+/// let b: OrbVariants = smallvec![];
+/// let either_orbs: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 ///
-/// let a = vec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }];
-/// let b = vec![Orbs { health: 15.0, energy: 1.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 15.0, energy: 1.0 }];
 /// let either_orbs: OrbVariants = smallvec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }, Orbs { health: 15.0, energy: 1.0 }];
 /// assert_eq!(either(&a, &b), either_orbs);
 /// ```
 // TODO optimization idea take ownership
 #[must_use]
 pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
-    if b.is_empty() || a.is_empty() {
-        // TODO whyever are there these is_empty checks?
-        smallvec![Orbs::default()]
+    if b.is_empty() {
+        a.to_smallvec()
+    } else if a.is_empty() {
+        b.to_smallvec()
     } else {
         let mut sum: OrbVariants = a.to_smallvec();
         for b in b {
@@ -135,7 +141,7 @@ pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
 #[must_use]
 pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
     if a.is_empty() {
-        smallvec![Orbs::default()]
+        smallvec![b]
     } else {
         let mut sum: OrbVariants = a.to_smallvec();
         if !sum
@@ -157,18 +163,18 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
 /// # use wotw_seedgen::orbs::{both, Orbs, OrbVariants};
 /// # use smallvec::smallvec;
 /// #
-/// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b = vec![Orbs { health: 30.0, energy: 0.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
 /// let both_orbs: OrbVariants = smallvec![Orbs { health: 30.0, energy: 2.0 }];
 /// assert_eq!(both(&a, &b), both_orbs);
 ///
-/// let a = vec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
-/// let b = vec![Orbs { health: 30.0, energy: 0.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
 /// let both_orbs: OrbVariants = smallvec![Orbs { health: 40.0, energy: 3.0 }, Orbs { health: 50.0, energy: 0.0 }];
 /// assert_eq!(both(&a, &b), both_orbs);
 ///
-/// let a = vec![Orbs { health: 100.0, energy: 30.0 }, Orbs { health: 200.0, energy: 10.0 }];
-/// let b = vec![Orbs { health: 0.0, energy: -10.0 }, Orbs { health: -50.0, energy: -3.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 100.0, energy: 30.0 }, Orbs { health: 200.0, energy: 10.0 }];
+/// let b: OrbVariants = smallvec![Orbs { health: 0.0, energy: -10.0 }, Orbs { health: -50.0, energy: -3.0 }];
 /// let both_orbs: OrbVariants = smallvec![
 ///     Orbs { health: 100.0, energy: 20.0 },
 ///     Orbs { health: 50.0, energy: 27.0 },
@@ -177,17 +183,15 @@ pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
 /// ];
 /// assert_eq!(both(&a, &b), both_orbs);
 ///
-/// let a = vec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b = vec![];
-/// let both_orbs: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
+/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
+/// let b: OrbVariants = smallvec![];
+/// let both_orbs: OrbVariants = smallvec![];
 /// assert_eq!(both(&a, &b), both_orbs);
 /// ```
 #[must_use]
 pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
-    if b.is_empty() {
-        a.to_smallvec()
-    } else if a.is_empty() {
-        b.to_smallvec()
+    if a.is_empty() || b.is_empty() {
+        OrbVariants::default()
     } else {
         let mut product = SmallVec::<[Orbs; 3]>::with_capacity(a.len());
 
@@ -219,7 +223,7 @@ pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
 #[must_use]
 pub fn both_single(a: &[Orbs], b: Orbs) -> OrbVariants {
     if a.is_empty() {
-        smallvec![b]
+        OrbVariants::default()
     } else {
         let mut product = SmallVec::<[Orbs; 3]>::with_capacity(a.len());
 

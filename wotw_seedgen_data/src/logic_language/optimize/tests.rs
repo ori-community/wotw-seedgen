@@ -1,5 +1,11 @@
+use smallvec::smallvec;
+
 use crate::{
-    assets::TEST_ASSETS, logic_language::output::Requirement::*, test_logger, Shard::*, Skill::*,
+    assets::TEST_ASSETS,
+    logic_language::output::{Enemy::*, Requirement::*},
+    test_logger,
+    Shard::*,
+    Skill::*,
 };
 
 macro_rules! test {
@@ -50,6 +56,20 @@ fn optimize_graph_bashnade() {
         ])
     );
 }
+
+// TODO would be nice if this worked
+// #[test]
+// fn optimize_graph_nested_redundancy() {
+//     test_logger();
+
+//     test!(
+//         Or(vec![
+//             And(vec![Skill(Dash), Or(vec![Skill(DoubleJump), Skill(Bash)])]),
+//             Skill(Bash)
+//         ]),
+//         Or(vec![And(vec![Skill(Dash), Skill(DoubleJump)]), Skill(Bash)])
+//     );
+// }
 
 // EastPools.TPArea -> EastPools.AboveDoorOre
 #[test]
@@ -139,4 +159,74 @@ fn optimize_graph_fishing_pool() {
             And(vec![Skill(DoubleJump), Shard(TripleJump), Skill(Dash),]),
         ])
     );
+}
+
+// MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowArena
+#[test]
+fn optimize_graph_burrow_arena() {
+    test_logger();
+
+    let combat = Combat(smallvec![
+        (Hornbug, 1),
+        (Bat, 1),
+        (Sandworm, 2),
+        (Lizard, 2),
+        (Skeeto, 3),
+        (SneezeSlug, 1),
+    ]);
+
+    test!(
+        Or(vec![
+            And(vec![Skill(Regenerate), Damage(40.), combat.clone()]),
+            combat.clone()
+        ]),
+        combat
+    );
+}
+
+// WoodsShrine -> WoodsMain.CombatShrineCompleted
+#[test]
+fn optimize_graph_woods_shrine() {
+    test_logger();
+
+    let combat = Combat(smallvec![
+        (Hornbug, 1),
+        (Lizard, 1),
+        (Skeeto, 4),
+        (EnergyRefill, 4),
+        (CrystalMiner, 2),
+        (Bat, 1),
+        (EnergyRefill, 4),
+        (Balloon, 9),
+        (EnergyRefill, 4),
+        (Mantis, 4),
+        (Bat, 1),
+    ]);
+    let moki = And(vec![
+        Skill(Regenerate),
+        combat.clone(),
+        Or(vec![
+            Damage(80.),
+            And(vec![Damage(65.), Or(vec![Skill(DoubleJump), Skill(Dash)])]),
+            And(vec![Damage(50.), Skill(Launch)]),
+        ]),
+    ]);
+
+    test!(
+        moki.clone(),
+        And(vec![
+            Skill(Regenerate),
+            combat.clone(),
+            Damage(50.),
+            Or(vec![
+                And(vec![
+                    Damage(15.),
+                    Or(vec![Damage(15.), Skill(DoubleJump), Skill(Dash)])
+                ]),
+                Skill(Launch),
+            ]),
+        ])
+    );
+
+    test!(Or(vec![moki, combat.clone()]), combat);
 }

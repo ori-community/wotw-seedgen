@@ -165,6 +165,7 @@ impl LogicalDifficulty for Difficulty {
             Skill::Sentry,
         ];
 
+        // TODO allow sentry?
         const NO_SENTRY: [Skill; WEAPONS.len() - 1] = *WEAPONS.first_chunk().unwrap();
 
         const NO_FLASH: [Skill; WEAPONS.len() - 1] = {
@@ -178,8 +179,8 @@ impl LogicalDifficulty for Difficulty {
         match (self >= Difficulty::Unsafe, TARGET_IS_WALL) {
             (false, false) => &NO_SENTRY,
             (false, true) => &NO_FLASH_OR_SENTRY,
-            (true, false) => &NO_FLASH,
-            (true, true) => &WEAPONS,
+            (true, false) => &WEAPONS,
+            (true, true) => &NO_FLASH,
         }
     }
 

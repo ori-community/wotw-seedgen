@@ -136,6 +136,7 @@ impl LogConfig {
                     .level_for(WEIGHT_MOD, trace_weight)
                     .level_for(DOORS_MOD, trace_doors)
                     .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
+                    .level_for("perf_counters", LevelFilter::Off)
                     .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?),
             )
         }

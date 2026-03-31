@@ -560,6 +560,7 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
+    // TODO slightly incorrect I think, best_orbs is post-refill so it's not a fair comparison with the pre-refill orbs
     fn should_visit(
         &self,
         connection: &Connection,
@@ -634,18 +635,26 @@ impl<'graph> World<'graph, '_> {
             Missing::LogicalState(index) => {
                 add_fail_to(&mut self.reach.state.fails.logical_state, index, connection);
             }
-            Missing::Health => {
+            Missing::Health(_) => {
                 self.reach.state.fails.health.insert(connection);
             }
-            Missing::Energy => {
+            Missing::Energy(_) => {
                 self.reach.state.fails.energy.insert(connection);
             }
             Missing::WallWeapon => self.add_weapon_fail::<true>(connection),
             Missing::EnemyWeapon => self.add_weapon_fail::<false>(connection),
-            Missing::EnergyOrBetterWallWeapon => {
+            Missing::EnergyOrBetterWallWeapon(_) => {
                 self.add_energy_or_better_weapon_fail::<true>(connection)
             }
-            Missing::EnergyOrBetterEnemyWeapon => {
+            Missing::EnergyOrBetterEnemyWeapon(_) => {
+                self.add_energy_or_better_weapon_fail::<false>(connection)
+            }
+            Missing::EnergyOrBurrowOrBetterEnemyWeapon(_) => {
+                add_fail_to(
+                    &mut self.reach.state.fails.uber_state,
+                    Skill::BURROW_ID,
+                    connection.clone(),
+                );
                 self.add_energy_or_better_weapon_fail::<false>(connection)
             }
             Missing::Any(options) => {
@@ -678,13 +687,12 @@ impl<'graph> World<'graph, '_> {
         &mut self,
         connection: ConnectionIndex<'graph>,
     ) {
+        self.reach.state.fails.energy.insert(connection.clone());
         self.add_any_skill_fail(
-            connection.clone(),
+            connection,
             // TODO avoidable collect
             self.better_weapons::<TARGET_IS_WALL>().collect::<Vec<_>>(),
         );
-
-        self.reach.state.fails.energy.insert(connection);
     }
 
     fn add_any_skill_fail<I>(&mut self, connection: ConnectionIndex<'graph>, skills: I)
@@ -705,8 +713,7 @@ impl<'graph> World<'graph, '_> {
         &self,
     ) -> impl Iterator<Item = Skill> + '_ {
         let mut lowest_cost = Skill::Spear.energy_cost();
-        let mut highest_dpe =
-            Skill::Sentry.damage_per_energy(self.settings.difficulty.charge_grenade());
+        let mut highest_dpe = Skill::Sentry.damage_per_energy(false);
 
         for owned in self.owned_weapons::<TARGET_IS_WALL>() {
             let cost = owned.energy_cost();

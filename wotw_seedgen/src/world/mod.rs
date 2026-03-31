@@ -319,6 +319,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
                 slots -= 1;
             }
 
+            // TODO not necessarily the best pick depending on spirit light
             if slots > 0 && self.shard(Shard::SpiritSurge) {
                 damage_mod += self.spirit_light().min(3000) as f32 * 0.00005;
                 slots -= 1;
@@ -387,6 +388,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         target_health: f32,
         flying_target: bool,
     ) -> Option<f32> {
+        // TODO don't repeatedly search the weapon if nothing changed?
         let mut weapons = self.owned_weapons::<TARGET_IS_WALL>().peekable();
 
         if weapons.peek()?.energy_cost() == 0.0 {

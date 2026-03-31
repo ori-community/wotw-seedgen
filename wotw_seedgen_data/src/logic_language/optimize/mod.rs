@@ -108,51 +108,54 @@ impl Optimize for Requirement {
 
 impl Requirement {
     #[must_use]
-    fn remove_common_factor(&mut self, other: &mut Self) -> Option<Self> {
+    fn remove_common_factor<const FRONT: bool>(&mut self, other: &mut Self) -> CommonFactors {
         trace!("searching common factor for {self} and {other}");
 
-        let factor = self.remove_common_factor_impl(other);
+        let factor = self.remove_common_factor_impl::<FRONT>(other);
 
-        match &factor {
-            None => trace!("no factor found in {self} and {other}"),
-            Some(factor) => trace!("removed factor {factor} from {self} and {other}"),
+        if factor.is_none() {
+            trace!("no factor found in {self} and {other}");
+        } else {
+            if let Some(factor) = &factor.front {
+                trace!("removed front factor {factor} from {self} and {other}");
+            }
+            if let Some(factor) = &factor.back {
+                trace!("removed back factor {factor} from {self} and {other}");
+            }
         }
 
         factor
     }
 
     #[must_use]
-    fn remove_common_factor_impl(&mut self, other: &mut Self) -> Option<Self> {
-        fn remove(a: &mut Requirement, b: &mut Requirement) -> Option<Requirement> {
+    fn remove_common_factor_impl<const FRONT: bool>(&mut self, other: &mut Self) -> CommonFactors {
+        fn remove<const FRONT: bool>(a: &mut Requirement, b: &mut Requirement) -> CommonFactors {
             *a = Requirement::Free;
-            Some(mem::replace(b, Requirement::Free))
+            CommonFactors::one::<FRONT>(mem::replace(b, Requirement::Free))
         }
 
-        fn remove_amount<F>(
+        fn remove_amount<const FRONT: bool>(
             a_amount: f32,
             b_amount: f32,
             a: &mut Requirement,
             b: &mut Requirement,
-            f: F,
-        ) -> Option<Requirement>
-        where
-            F: FnOnce(f32) -> Requirement,
-        {
+            f: impl FnOnce(f32) -> Requirement,
+        ) -> CommonFactors {
             match f32::total_cmp(&a_amount, &b_amount) {
                 Ordering::Less => {
                     *b = f(b_amount - a_amount);
-                    Some(mem::replace(a, Requirement::Free))
+                    CommonFactors::one::<FRONT>(mem::replace(a, Requirement::Free))
                 }
-                Ordering::Equal => remove(a, b),
+                Ordering::Equal => remove::<FRONT>(a, b),
                 Ordering::Greater => {
                     *a = f(a_amount - b_amount);
-                    Some(mem::replace(b, Requirement::Free))
+                    CommonFactors::one::<FRONT>(mem::replace(b, Requirement::Free))
                 }
             }
         }
 
         if self == other {
-            return remove(self, other);
+            return remove::<FRONT>(self, other);
         }
 
         match (&mut *self, &mut *other) {
@@ -160,17 +163,17 @@ impl Requirement {
             // similar for other non-consuming amount requirements like spirit light
             (Self::EnergySkill(a, a_amount), Self::EnergySkill(b, b_amount)) if a == b => {
                 let skill = *a;
-                remove_amount(*a_amount, *b_amount, self, other, move |amount| {
+                remove_amount::<FRONT>(*a_amount, *b_amount, self, other, move |amount| {
                     Requirement::EnergySkill(skill, amount)
                 })
             }
             // TODO currently this could change regenerate behaviour, but that's already a problem
             // and regenerate probably cannot be allowed between requirements anyway...
             (Self::Damage(a_amount), Self::Damage(b_amount)) => {
-                remove_amount(*a_amount, *b_amount, self, other, Self::Damage)
+                remove_amount::<FRONT>(*a_amount, *b_amount, self, other, Self::Damage)
             }
             (Self::Danger(a_amount), Self::Danger(b_amount)) => {
-                remove_amount(*a_amount, *b_amount, self, other, Self::Danger)
+                remove_amount::<FRONT>(*a_amount, *b_amount, self, other, Self::Danger)
             }
             // destroy requirements have a lot of gotchas and probably cannot be sanely factored
             (and @ Self::And(_), other) | (other, and @ Self::And(_)) => {
@@ -178,31 +181,34 @@ impl Requirement {
                     unreachable!()
                 };
 
-                let mut common_factors = vec![];
+                let mut common_factors = CommonFactors::NONE;
 
-                for and in ReorderableChunks::new().next(ands).unwrap() {
-                    // Our logic breaks down in this nesting and there shouldn't be anything left
-                    // to optimize in an or anyway, since this or was entered in recursion before
-                    // and if it had common factors, they would live in the surrounding and by now
-                    if matches!(and, Self::Or(_)) {
-                        continue;
-                    }
+                let mut chunks = ReorderableChunks::new();
+                let first_chunk = chunks.next(ands).unwrap();
 
-                    if let Some(factor) = and.remove_common_factor(other) {
-                        common_factors.push(factor);
+                trace!(
+                    "searching common factor in first chunk {}",
+                    first_chunk.iter().format(" & ")
+                );
 
-                        if matches!(other, Requirement::Free) {
-                            break;
-                        }
-                    }
+                pull_common_factors_in_chunk::<true>(&mut common_factors, first_chunk, other);
+
+                if !chunks.is_finished() {
+                    let last_chunk = ReorderableChunksRev::new(ands).next(ands).unwrap();
+
+                    trace!(
+                        "searching common factor in last chunk {}",
+                        last_chunk.iter().format(" & ")
+                    );
+
+                    pull_common_factors_in_chunk::<false>(&mut common_factors, last_chunk, other);
                 }
 
-                if common_factors.is_empty() {
-                    None
-                } else {
+                if common_factors.is_some() {
                     *and = Requirement::and(ands.drain(..));
-                    Some(Requirement::and(common_factors))
                 }
+
+                common_factors
             }
             (or @ Self::Or(_), other) | (other, or @ Self::Or(_)) => {
                 let Self::Or(ors) = &mut *or else {
@@ -213,19 +219,16 @@ impl Requirement {
 
                 pull_common_factors(or);
 
-                None
+                CommonFactors::NONE
             }
-            _ => None,
+            _ => CommonFactors::NONE,
         }
     }
 
     fn remove_common_factor_from_ors(&mut self, ors: &mut [Requirement]) {
         for or in ors {
-            if let Some(factor) = self.remove_common_factor(or) {
-                let a_taken = mem::replace(self, Requirement::Impossible);
-                let b_taken = mem::replace(or, Requirement::Impossible);
-                *self = Requirement::and([factor, Requirement::or([a_taken, b_taken])])
-            }
+            let factor = self.remove_common_factor::<true>(or);
+            factor.apply(self, or);
         }
     }
 
@@ -260,6 +263,80 @@ impl Requirement {
     }
 }
 
+#[derive(PartialEq)]
+struct CommonFactors {
+    front: Option<Requirement>,
+    back: Option<Requirement>,
+}
+
+impl CommonFactors {
+    const NONE: Self = Self {
+        front: None,
+        back: None,
+    };
+
+    const fn front(factor: Requirement) -> Self {
+        Self {
+            front: Some(factor),
+            back: None,
+        }
+    }
+
+    const fn back(factor: Requirement) -> Self {
+        Self {
+            front: None,
+            back: Some(factor),
+        }
+    }
+
+    const fn one<const FRONT: bool>(factor: Requirement) -> Self {
+        if FRONT {
+            Self::front(factor)
+        } else {
+            Self::back(factor)
+        }
+    }
+
+    const fn is_none(&self) -> bool {
+        matches!(self, &Self::NONE)
+    }
+
+    const fn is_some(&self) -> bool {
+        !matches!(self, &Self::NONE)
+    }
+
+    fn merge(&mut self, other: CommonFactors) {
+        fn merge_factor(a: Option<Requirement>, b: Option<Requirement>) -> Option<Requirement> {
+            match (a, b) {
+                (None, None) => None,
+                (factor @ Some(_), None) | (None, factor @ Some(_)) => factor,
+                (Some(a), Some(b)) => Some(Requirement::and([a, b])),
+            }
+        }
+
+        self.front = merge_factor(mem::take(&mut self.front), other.front);
+        self.back = merge_factor(mem::take(&mut self.back), other.back);
+    }
+
+    fn apply(self, a: &mut Requirement, b: &mut Requirement) {
+        if self.is_none() {
+            return;
+        }
+
+        let a_taken = mem::replace(a, Requirement::Impossible);
+        let b_taken = mem::replace(b, Requirement::Impossible);
+
+        *a = match (self.front, self.back) {
+            (None, None) => unreachable!(),
+            (Some(front), None) => Requirement::and([front, Requirement::or([a_taken, b_taken])]),
+            (None, Some(back)) => Requirement::and([Requirement::or([a_taken, b_taken]), back]),
+            (Some(front), Some(back)) => {
+                Requirement::and([front, Requirement::or([a_taken, b_taken]), back])
+            }
+        };
+    }
+}
+
 fn pull_common_factors(requirement: &mut Requirement) {
     let Requirement::Or(ors) = requirement else {
         panic!("pull_common_factors should only be applied to or requirements");
@@ -276,6 +353,31 @@ fn pull_common_factors(requirement: &mut Requirement) {
     *requirement = Requirement::or(ors.drain(..));
 
     trace!("transformed common factors into {requirement}");
+}
+
+fn pull_common_factors_in_chunk<const FRONT: bool>(
+    common_factors: &mut CommonFactors,
+    chunk: &mut [Requirement],
+    other: &mut Requirement,
+) {
+    for and in chunk {
+        // Our logic breaks down in this nesting and there shouldn't be anything left
+        // to optimize in an or anyway, since this or was entered in recursion before
+        // and if it had common factors, they would live in the surrounding and by now
+        if matches!(and, Requirement::Or(_)) {
+            continue;
+        }
+
+        let factor = and.remove_common_factor::<FRONT>(other);
+
+        if factor.is_some() {
+            common_factors.merge(factor);
+
+            if matches!(other, Requirement::Free) {
+                break;
+            }
+        }
+    }
 }
 
 fn reorder_ands(ands: &mut [Requirement]) {
@@ -340,13 +442,11 @@ fn reorder_ands(ands: &mut [Requirement]) {
 ///
 /// We cannot implement this as a proper Iterator with safe rust
 /// because the returned chunks overlap.
-#[derive(Debug)]
 struct ReorderableChunks {
     last_start: usize,
     state: ReorderableChunksState,
 }
 
-#[derive(Debug)]
 enum ReorderableChunksState {
     NotStarted,
     InProgress,
@@ -354,7 +454,7 @@ enum ReorderableChunksState {
 }
 
 impl ReorderableChunks {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             last_start: 0,
             state: ReorderableChunksState::NotStarted,
@@ -382,10 +482,57 @@ impl ReorderableChunks {
         };
         self.last_start = start;
 
-        let end = orb_changers.nth(2).unwrap_or_else(|| {
+        let end = orb_changers.nth(1).unwrap_or_else(|| {
             self.state = ReorderableChunksState::Finished;
             ands.len()
         });
+
+        Some(&mut ands[start..end])
+    }
+
+    fn is_finished(&self) -> bool {
+        matches!(self.state, ReorderableChunksState::Finished)
+    }
+}
+
+/// Like [`ReorderableChunks`], but going in reverse
+struct ReorderableChunksRev {
+    last_end: usize,
+    state: ReorderableChunksState,
+}
+
+impl ReorderableChunksRev {
+    const fn new(ands: &[Requirement]) -> Self {
+        Self {
+            last_end: ands.len(),
+            state: ReorderableChunksState::NotStarted,
+        }
+    }
+
+    fn next<'a>(&mut self, ands: &'a mut [Requirement]) -> Option<&'a mut [Requirement]> {
+        let mut orb_changers = ands[..self.last_end]
+            .iter()
+            .enumerate()
+            .filter(|(_, req)| req.changes_orbs())
+            .map(move |(i, _)| i);
+
+        let end = match self.state {
+            ReorderableChunksState::NotStarted => {
+                self.state = ReorderableChunksState::InProgress;
+                ands.len()
+            }
+            ReorderableChunksState::InProgress => orb_changers.next_back().unwrap(),
+            ReorderableChunksState::Finished => return None,
+        };
+        self.last_end = end;
+
+        let start = match orb_changers.nth_back(1) {
+            None => {
+                self.state = ReorderableChunksState::Finished;
+                0
+            }
+            Some(start) => start + 1,
+        };
 
         Some(&mut ands[start..end])
     }

@@ -7,6 +7,7 @@ use crate::logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS};
 use crate::orbs::{self, OrbVariants, Orbs};
 use itertools::Itertools;
 use log::trace;
+use ordered_float::OrderedFloat;
 use smallvec::SmallVec;
 use wotw_seedgen_data::assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::logic_language::output::Node;
@@ -24,12 +25,16 @@ pub enum Missing<'graph> {
     Boolean(UberIdentifier),
     Integer(UberIdentifier, i32),
     LogicalState(usize),
-    Health,
-    Energy,
+    Health(OrderedFloat<f32>),
+    Energy(OrderedFloat<f32>),
     WallWeapon,
     EnemyWeapon,
-    EnergyOrBetterWallWeapon,
-    EnergyOrBetterEnemyWeapon,
+    // TODO which weapons are better depends on the health of the wall.
+    // Noticed this with Grenade being offered as better than Bow because of DPE
+    // but for common wall health values this is almost always wrong.
+    EnergyOrBetterWallWeapon(OrderedFloat<f32>),
+    EnergyOrBetterEnemyWeapon(OrderedFloat<f32>),
+    EnergyOrBurrowOrBetterEnemyWeapon(OrderedFloat<f32>),
     // TODO if we don't make this type recursive but rather return lists of missing where needed we could try using smallvec
     Any(Vec<Missing<'graph>>),
     // Or(
@@ -78,7 +83,7 @@ impl Missing<'_> {
         Self::any_boolean(iter.into_iter().map(Skill::uber_identifier))
     }
 
-    fn any_weapon<const TARGET_IS_WALL: bool>() -> Self {
+    fn weapon<const TARGET_IS_WALL: bool>() -> Self {
         if TARGET_IS_WALL {
             Self::WallWeapon
         } else {
@@ -86,9 +91,17 @@ impl Missing<'_> {
         }
     }
 
-    fn energy_or_better_weapon<const TARGET_IS_WALL: bool>() -> Self {
+    fn energy_or_better_weapon<const TARGET_IS_WALL: bool>() -> fn(OrderedFloat<f32>) -> Self {
         if TARGET_IS_WALL {
             Self::EnergyOrBetterWallWeapon
+        } else {
+            Self::EnergyOrBetterEnemyWeapon
+        }
+    }
+
+    fn energy_or_better_enemy_weapon(burrow_reduces_cost: bool) -> fn(OrderedFloat<f32>) -> Self {
+        if burrow_reduces_cost {
+            Self::EnergyOrBurrowOrBetterEnemyWeapon
         } else {
             Self::EnergyOrBetterEnemyWeapon
         }
@@ -102,12 +115,19 @@ impl Display for Missing<'_> {
             Missing::Boolean(uber_identifier) => uber_identifier.fmt(f),
             Missing::Integer(uber_identifier, amount) => write!(f, "{uber_identifier}*{amount}"),
             Missing::LogicalState(state) => write!(f, "{{{state}}}"),
-            Missing::Health => "Health".fmt(f),
-            Missing::Energy => "Energy".fmt(f),
+            Missing::Health(amount) => write!(f, "Health*{amount}"),
+            Missing::Energy(amount) => write!(f, "Energy*{amount}"),
             Missing::WallWeapon => "WallWeapon".fmt(f),
             Missing::EnemyWeapon => "EnemyWeapon".fmt(f),
-            Missing::EnergyOrBetterWallWeapon => "EnergyOrBetterWallWeapon".fmt(f),
-            Missing::EnergyOrBetterEnemyWeapon => "EnergyOrBetterEnemyWeapon".fmt(f),
+            Missing::EnergyOrBetterWallWeapon(amount) => {
+                write!(f, "EnergyOrBetterWallWeapon*{amount}")
+            }
+            Missing::EnergyOrBetterEnemyWeapon(amount) => {
+                write!(f, "EnergyOrBetterEnemyWeapon*{amount}")
+            }
+            Missing::EnergyOrBurrowOrBetterEnemyWeapon(amount) => {
+                write!(f, "EnergyOrBurrowOrBetterEnemyWeapon*{amount}")
+            }
             Missing::Any(any) => any.iter().format(" or ").fmt(f),
             Missing::Or(ors, _) => ors
                 .iter()
@@ -214,6 +234,7 @@ impl<'graph> World<'graph, '_> {
 
                 let shield_weapon = self.owned_shield_weapons().next();
                 let mut cost = 0.0;
+                let mut burrow_reduces_cost = false;
 
                 for (enemy, amount) in enemies {
                     let amount = f32::from(*amount);
@@ -222,7 +243,7 @@ impl<'graph> World<'graph, '_> {
                         Enemy::EnergyRefill => {
                             // It is possible for the total cost of a combat requirement to be different across orb variants because some of them may max out during energy refills
                             // However in between energy refills, the cost is always the same
-                            self.cost_met_or_better_weapons::<true>(cost, orb_variants)?;
+                            self.cost_met_or_better_weapon::<true>(cost, orb_variants)?;
 
                             for orbs in &mut *orb_variants {
                                 self.recharge(orbs, amount);
@@ -236,9 +257,9 @@ impl<'graph> World<'graph, '_> {
                                 continue;
                             // TODO put all such comparisons into logical_difficulty?
                             } else if self.settings.difficulty < Difficulty::Unsafe {
-                                return ControlFlow::Break(Missing::Boolean(
-                                    Skill::Burrow.uber_identifier(),
-                                ));
+                                return ControlFlow::Break(Missing::Boolean(Skill::BURROW_ID));
+                            } else {
+                                burrow_reduces_cost = true;
                             }
                         }
                         _ => {}
@@ -272,7 +293,7 @@ impl<'graph> World<'graph, '_> {
                             Missing::any_skill(self.settings.difficulty.ranged_weapons_iter())
                         } else {
                             // TODO same optimization for ranged / shield weapons?
-                            Missing::any_weapon::<false>()
+                            Missing::EnemyWeapon
                         };
 
                         return ControlFlow::Break(missing);
@@ -282,7 +303,11 @@ impl<'graph> World<'graph, '_> {
                 }
 
                 // TODO what if what we need is specifically a better shield / ranged weapon?
-                self.cost_met_or_better_weapons::<false>(cost, orb_variants)
+                self.cost_met_or::<true>(
+                    cost,
+                    orb_variants,
+                    Missing::energy_or_better_enemy_weapon(burrow_reduces_cost),
+                )
             }
             Requirement::ShurikenBreak(health) => {
                 self.skill_met(Skill::Shuriken)?;
@@ -458,13 +483,13 @@ impl<'graph> World<'graph, '_> {
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
         let Some(cost) = self.destroy_cost::<TARGET_IS_WALL>(target_health, flying_target) else {
-            return ControlFlow::Break(Missing::any_weapon::<TARGET_IS_WALL>());
+            return ControlFlow::Break(Missing::weapon::<TARGET_IS_WALL>());
         };
 
-        self.cost_met_or_better_weapons::<TARGET_IS_WALL>(cost, orb_variants)
+        self.cost_met_or_better_weapon::<TARGET_IS_WALL>(cost, orb_variants)
     }
 
-    fn cost_met_or_better_weapons<const TARGET_IS_WALL: bool>(
+    fn cost_met_or_better_weapon<const TARGET_IS_WALL: bool>(
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
@@ -488,76 +513,125 @@ impl<'graph> World<'graph, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-        missing: Missing<'graph>,
+        energy: fn(OrderedFloat<f32>) -> Missing<'graph>,
     ) -> ControlFlow<Missing<'graph>> {
-        let mut added_orb_variants = vec![];
+        let mut missing = MissingOrbStats::new();
 
-        orb_variants
-            .retain(|orbs| self.orbs_meet_cost::<CONSUMING>(orbs, &mut added_orb_variants, cost));
-        orb_variants.extend(added_orb_variants);
+        if CONSUMING
+            && self.settings.difficulty.life_pact()
+            && self.shard(Shard::LifePact)
+            && self.skill(Skill::Regenerate)
+        {
+            let mut new_orb_variants = OrbVariants::new();
+            for orbs in &*orb_variants {
+                self.regenerate_preemptively(*orbs, &mut new_orb_variants, &mut missing);
+            }
 
-        break_if_empty(orb_variants, missing)
+            *orb_variants = orbs::either(orb_variants, &new_orb_variants);
+        }
+
+        orb_variants.retain(|orbs| self.orbs_meet_cost::<CONSUMING>(orbs, cost, &mut missing));
+
+        break_if_empty(orb_variants, || missing.finish(energy))
+    }
+
+    fn regenerate_preemptively(
+        &self,
+        mut orbs: Orbs,
+        new_orb_variants: &mut OrbVariants,
+        missing: &mut MissingOrbStats,
+    ) {
+        // TODO if we fix the incorrect affordability calculations this might want to take the defense mod into account
+        let heal_potential = self.max_health() - orbs.health;
+        // Health is worth more than Energy with Life Pact and if we wait too long we might be unable to Regenerate later
+        let regen_cost = self.use_cost(Skill::Regenerate);
+
+        if heal_potential > regen_cost {
+            let max_heals = ((heal_potential - regen_cost) / 30.).ceil() as u32;
+            let higher_cost = regen_cost.max(Skill::Regenerate.energy_cost());
+
+            for _ in 1..=max_heals {
+                if orbs.energy >= higher_cost {
+                    orbs.energy -= regen_cost;
+                    self.heal(&mut orbs, 30.0);
+                    trace!("adding regenerate option {orbs} to keep life pact enabled");
+                    new_orb_variants.push(orbs);
+                } else {
+                    missing.energy = f32::max(missing.energy, higher_cost - orbs.energy);
+                    break;
+                }
+            }
+        }
     }
 
     fn orbs_meet_cost<const CONSUMING: bool>(
         &self,
         orbs: &mut Orbs,
-        added_orb_variants: &mut Vec<Orbs>,
         cost: f32,
+        missing: &mut MissingOrbStats,
     ) -> bool {
-        trace!("checking orbs_meet_cost for cost {cost} with {orbs}");
+        trace!("checking cost_met for cost {cost} with {orbs}");
 
-        let has_life_pact = self.settings.difficulty.life_pact() && self.shard(Shard::LifePact);
-        if has_life_pact && CONSUMING && self.skill(Skill::Regenerate) {
-            // Health is worth more than Energy with Life Pact and if we wait too long we might be unable to Regenerate later
-            let game_thinks_regen_cost = Skill::Regenerate.energy_cost();
-            let regen_cost = self.use_cost(Skill::Regenerate);
-            let higher_cost = regen_cost.max(game_thinks_regen_cost);
+        let met = orbs.energy >= cost || {
+            missing.energy = f32::max(missing.energy, cost - orbs.energy);
 
-            // TODO if we fix the incorrect affordability calculations this might want to take the defense mod into account
-            if orbs.energy >= higher_cost && self.max_health() - orbs.health > regen_cost {
-                let mut new_orbs = *orbs;
-                new_orbs.energy -= regen_cost;
-                self.heal(&mut new_orbs, 30.0);
-                trace!("adding regenerate option {new_orbs} to keep life pact enabled");
-                if self.orbs_meet_cost::<CONSUMING>(&mut new_orbs, added_orb_variants, cost) {
-                    added_orb_variants.push(new_orbs);
+            self.settings.difficulty.life_pact()
+                && self.shard(Shard::LifePact)
+                && match self.pay_life_pact::<CONSUMING>(orbs, cost) {
+                    Ok(()) => return true,
+                    Err(missing_health) => {
+                        missing.health = f32::max(missing.health, missing_health);
+
+                        if CONSUMING {
+                            // already have paths for preemptive healing
+                            false
+                        } else {
+                            self.max_health() > missing_health && {
+                                if self.skill(Skill::Regenerate) {
+                                    match self
+                                        .regenerate_as_needed(missing_health, orbs)
+                                        .and_then(|()| self.pay_life_pact::<CONSUMING>(orbs, cost))
+                                    {
+                                        Ok(()) => return true,
+                                        Err(_) => false,
+                                    }
+                                } else {
+                                    missing.regen = true;
+                                    false
+                                }
+                            }
+                        }
+                    }
                 }
-            }
+        };
+
+        if CONSUMING {
+            orbs.energy -= cost;
         }
 
-        if orbs.energy >= cost {
+        met
+    }
+
+    fn pay_life_pact<const CONSUMING: bool>(&self, orbs: &mut Orbs, cost: f32) -> Result<(), f32> {
+        let missing_energy = cost - orbs.energy;
+        let game_thinks_health_cost = missing_energy * 10.0; // A health orb is ten times as much as an energy orb, but the game considers orbs equal for Life Pact
+        let health_cost = game_thinks_health_cost * self.defense_mod();
+        // TODO the higher cost only matters on the final use, not the entire cost
+        let higher_cost = health_cost.max(game_thinks_health_cost); // we have to meet both
+
+        if orbs.health > higher_cost {
+            orbs.health -= health_cost;
+
             if CONSUMING {
-                orbs.energy -= cost;
+                orbs.energy = 0.0;
+            } else {
+                // The game doesn't refund the health, it refunds it as energy
+                self.recharge(orbs, missing_energy);
             }
-            true
-        } else if has_life_pact {
-            loop {
-                let missing_energy = cost - orbs.energy;
-                let game_thinks_health_cost = missing_energy * 10.0; // A health orb is ten times as much as an energy orb, but the game considers orbs equal for Life Pact
-                let health_cost = game_thinks_health_cost * self.defense_mod();
-                let higher_cost = health_cost.max(game_thinks_health_cost); // we have to meet both
 
-                if orbs.health > higher_cost {
-                    orbs.health -= health_cost;
-
-                    if CONSUMING {
-                        orbs.energy = 0.0;
-                    } else {
-                        // The game doesn't refund the health, it refunds it as energy
-                        self.recharge(orbs, missing_energy);
-                    }
-
-                    break true;
-                }
-
-                // TODO is this path not redundant with the preemptive regeneration?
-                if !self.regenerate_as_needed(higher_cost, orbs) {
-                    return false;
-                }
-            }
+            Ok(())
         } else {
-            false
+            Err(higher_cost - orbs.health)
         }
     }
 
@@ -566,28 +640,48 @@ impl<'graph> World<'graph, '_> {
         cost: f32,
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
-        orb_variants.retain(|orbs| self.orbs_meet_health::<CONSUMING>(cost, orbs));
-        break_if_empty(orb_variants, Missing::Health)
+        let mut missing = MissingOrbStats::new();
+
+        orb_variants.retain(|orbs| self.orbs_meet_health::<CONSUMING>(cost, orbs, &mut missing));
+
+        break_if_empty(orb_variants, || missing.finish(Missing::Energy))
     }
 
-    fn orbs_meet_health<const CONSUMING: bool>(&self, cost: f32, orbs: &mut Orbs) -> bool {
+    fn orbs_meet_health<const CONSUMING: bool>(
+        &self,
+        cost: f32,
+        orbs: &mut Orbs,
+        missing: &mut MissingOrbStats,
+    ) -> bool {
         trace!("checking health_met for cost {cost} with {orbs}");
 
-        if orbs.health > cost
-            || (self.skill(Skill::Regenerate)
-                && self.max_health() > cost
-                && self.regenerate_as_needed(cost, orbs))
-        {
-            if CONSUMING {
-                orbs.health -= cost
+        let met = orbs.health > cost || {
+            missing.health = f32::max(missing.health, cost - orbs.health);
+
+            self.max_health() > cost && {
+                if self.skill(Skill::Regenerate) {
+                    match self.regenerate_as_needed(cost, orbs) {
+                        Ok(()) => true,
+                        Err(energy) => {
+                            missing.energy = f32::max(missing.energy, energy);
+                            false
+                        }
+                    }
+                } else {
+                    missing.regen = true;
+                    false
+                }
             }
-            true
-        } else {
-            false
+        };
+
+        if CONSUMING {
+            orbs.health -= cost
         }
+
+        met
     }
 
-    fn regenerate_as_needed(&self, cost: f32, orbs: &mut Orbs) -> bool {
+    fn regenerate_as_needed(&self, cost: f32, orbs: &mut Orbs) -> Result<(), f32> {
         trace!("attempting to regenerate to meet cost {cost} with {orbs}");
 
         let mut regens = ((cost - orbs.health) / 30.0).ceil();
@@ -595,22 +689,63 @@ impl<'graph> World<'graph, '_> {
             regens += 1.0
         }
         self.heal(orbs, 30.0 * regens);
-        let game_thinks_regen_cost = Skill::Regenerate.energy_cost();
         let regen_cost = self.use_cost(Skill::Regenerate);
         // Regenerate is special cased to not allow Life Pact, so we don't go through cost_is_met
         orbs.energy -= regen_cost * regens;
-        orbs.energy >= 0.0 && orbs.energy + regen_cost - game_thinks_regen_cost >= 0.0
-        // On the final regenerate we have to make sure the the game is happy with our amount of resources
+
+        let remaining = f32::min(
+            orbs.energy,
+            // On the final regenerate we have to make sure the the game is happy with our amount of resources
+            orbs.energy + regen_cost - Skill::Regenerate.energy_cost(),
+        );
+
+        if remaining >= 0.0 {
+            Ok(())
+        } else {
+            Err(-remaining)
+        }
     }
 }
 
-fn break_if_empty<'graph>(
-    orb_variants: &OrbVariants,
-    missing: Missing<'graph>,
-) -> ControlFlow<Missing<'graph>> {
+fn break_if_empty<'graph, M>(orb_variants: &OrbVariants, missing: M) -> ControlFlow<Missing<'graph>>
+where
+    M: FnOnce() -> Missing<'graph>,
+{
     if orb_variants.is_empty() {
-        ControlFlow::Break(missing)
+        ControlFlow::Break(missing())
     } else {
         ControlFlow::Continue(())
+    }
+}
+
+struct MissingOrbStats {
+    health: f32,
+    energy: f32,
+    regen: bool,
+}
+
+impl MissingOrbStats {
+    fn new() -> Self {
+        Self {
+            health: f32::MIN,
+            energy: f32::MIN,
+            regen: false,
+        }
+    }
+
+    fn finish<'graph>(self, energy: fn(OrderedFloat<f32>) -> Missing<'graph>) -> Missing<'graph> {
+        let mut missing = vec![];
+
+        if self.health > f32::MIN {
+            missing.push(Missing::Health(self.health.into()));
+        }
+        if self.energy > f32::MIN {
+            missing.push(energy(self.energy.into()));
+        }
+        if self.regen {
+            missing.push(Missing::Boolean(Skill::REGENERATE_ID));
+        }
+
+        Missing::Any(missing)
     }
 }

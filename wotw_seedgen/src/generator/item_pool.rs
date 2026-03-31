@@ -170,6 +170,10 @@ impl Item {
             cost,
         }
     }
+
+    pub fn writes(&self) -> &Vec<UberStateWriteOwned> {
+        &self.writes
+    }
 }
 
 impl Deref for Item {

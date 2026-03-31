@@ -1,3 +1,5 @@
+use std::fmt::{self, Display};
+
 use crate::{
     seed_language::output::{
         ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid, Operation,
@@ -58,6 +60,16 @@ pub enum WriteCommand<'a> {
     Float(&'a CommandFloat),
 }
 
+impl Display for WriteCommand<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Boolean(command) => command.fmt(f),
+            Self::Integer(command) => command.fmt(f),
+            Self::Float(command) => command.fmt(f),
+        }
+    }
+}
+
 pub type UberStateWriteOwned = UberStateWriteGeneric<UberIdentifier, WriteCommandOwned>;
 
 impl UberStateWriteOwned {
@@ -81,6 +93,16 @@ pub enum WriteCommandOwned {
     Boolean(CommandBoolean),
     Integer(CommandInteger),
     Float(CommandFloat),
+}
+
+impl Display for WriteCommandOwned {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Boolean(command) => command.fmt(f),
+            Self::Integer(command) => command.fmt(f),
+            Self::Float(command) => command.fmt(f),
+        }
+    }
 }
 
 impl WriteCommandOwned {
@@ -173,9 +195,9 @@ impl ContainedWrites for CommandVoid {
 }
 
 impl CommonUberStateWrite {
-    fn from_write(write: UberStateWrite) -> Option<Self> {
+    pub fn from_write(write: UberStateWrite) -> Option<Self> {
         let uber_identifier = CommonUberIdentifier::from_uber_identifier(write.uber_identifier)?;
-        let command = CommonWriteCommand::from_write(write)?;
+        let command = CommonWriteCommand::from_write(&write)?;
 
         Some(Self {
             uber_identifier,
@@ -185,7 +207,7 @@ impl CommonUberStateWrite {
 }
 
 impl CommonWriteCommand {
-    fn from_write(write: UberStateWrite) -> Option<Self> {
+    pub fn from_write(write: &UberStateWrite) -> Option<Self> {
         match write.command {
             WriteCommand::Boolean(CommandBoolean::Constant { value: true }) => {
                 Some(CommonWriteCommand::SetBooleanTrue)
@@ -216,7 +238,7 @@ impl CommonWriteCommand {
 }
 
 impl CommonItem {
-    fn from_common_write(write: CommonUberStateWrite) -> Option<Self> {
+    pub fn from_common_write(write: CommonUberStateWrite) -> Option<Self> {
         match write {
             CommonUberStateWrite {
                 uber_identifier: CommonUberIdentifier::SpiritLight,

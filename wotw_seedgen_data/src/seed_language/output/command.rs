@@ -9,7 +9,6 @@ use crate::{
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
-use std::iter;
 
 /// A Command, which may be used to affect the world, player or client state
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

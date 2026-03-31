@@ -109,7 +109,7 @@ fn small_reach_check() {
 
     world.store_skill(Skill::DoubleJump, true, &[]);
     world.store_shard(Shard::TripleJump, true, &[]);
-    world.add_max_health(5, &[]);
+    world.store_max_health(5, &[]);
 
     world.traverse_spawn(&[]);
 
@@ -134,7 +134,7 @@ fn max_energy() {
     let mut world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
     assert_eq!(world.max_energy(), 0.0);
 
-    world.add_max_energy((5.).into(), &[]);
+    world.add_max_energy(5., &[]);
     world.store_shard(Shard::Energy, true, &[]);
     assert_eq!(world.max_energy(), 5.0);
 
@@ -176,34 +176,13 @@ fn refill_orbs() {
 
     world.store_shard(Shard::Energy, true, &[]);
     world.store_shard(Shard::Vitality, true, &[]);
+    assert_eq!(world.checkpoint_orbs(), Orbs::new(0.0, 1.0));
 
-    assert_eq!(
-        world.checkpoint_orbs(),
-        Orbs {
-            energy: 1.0,
-            health: 0.0
-        }
-    );
+    world.store_max_health(35, &[]);
+    assert_eq!(world.checkpoint_orbs(), Orbs::new(35.0, 1.0));
 
-    world.add_max_health(35, &[]);
-
-    assert_eq!(
-        world.checkpoint_orbs(),
-        Orbs {
-            health: 35.0,
-            energy: 1.0
-        }
-    );
-
-    world.add_max_health(105, &[]);
-
-    assert_eq!(
-        world.checkpoint_orbs(),
-        Orbs {
-            health: 45.0,
-            energy: 1.0
-        }
-    );
+    world.store_max_health(140, &[]);
+    assert_eq!(world.checkpoint_orbs(), Orbs::new(45.0, 1.0));
 
     let world = test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
 
@@ -247,279 +226,220 @@ fn destroy_cost() {
 
 #[test]
 fn is_met() {
+    let settings = WorldSettings::default();
+    let mut world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    world.snapshot();
+
+    macro_rules! set_difficulty {
+        ($difficulty:expr) => {
+            let settings = WorldSettings::difficulty_default($difficulty);
+            world.settings = &settings;
+        };
+    }
+
     macro_rules! test {
-        ($world:expr, $req:expr, [$world_orbs:expr], "✅") => {
-            test!($world, $req, [$world.max_orbs()], ControlFlow::is_continue);
+        ($req:expr, [$world_orbs:expr], "✅") => {
+            test!($req, [$world_orbs], ControlFlow::is_continue);
         };
-        ($world:expr, $req:expr, [$world_orbs:expr], "❌") => {
-            test!($world, $req, [$world.max_orbs()], ControlFlow::is_break);
+        ($req:expr, [$world_orbs:expr], "❌") => {
+            test!($req, [$world_orbs], ControlFlow::is_break);
         };
-        ($world:expr, $req:expr, [$world_orbs:expr], $f:path) => {
+
+        ($req:expr, [$world_orbs:expr], $f:path) => {
             {
                 let req = $req;
                 let mut orb_variants: OrbVariants = smallvec![$world_orbs];
-                let control_flow = $world.is_met(&req, &mut orb_variants);
+                let control_flow = world.is_met(&req, &mut orb_variants);
                 assert!($f(&control_flow));
             }
         };
-        ($world:expr, $req:expr, [$world_orbs:expr], [$($orbs:expr),* $(,)?]) => {
+
+        ($req:expr, [$world_orbs:expr], [$($orbs:expr),* $(,)?]) => {
             {
                 let req = $req;
                 let mut left: OrbVariants = smallvec![$world_orbs];
-                let _ = $world.is_met(&req, &mut left);
+                let _ = world.is_met(&req, &mut left);
                 left.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
                 let mut right: OrbVariants = smallvec![$($world_orbs + $orbs),*];
                 right.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
                 assert_eq!(left, right);
             }
         };
-        ($world:expr, $req:expr, $symbol:tt) => {
-            test!($world, $req, [$world.max_orbs()], $symbol);
+
+        ($req:expr, $symbol:tt) => {
+            test!($req, [world.max_orbs()], $symbol);
         };
-        ($world:expr, $req:expr, [$($orbs:tt)*]) => {
-            test!($world, $req, [$world.max_orbs()], [$($orbs)*]);
+        ($req:expr, [$($orbs:tt)*]) => {
+            test!($req, [world.max_orbs()], [$($orbs)*]);
         };
     }
 
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    let mut world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    let req = Requirement::Skill(Skill::Blaze);
+    eprintln!("testing {req}");
 
-    let orbs = Orbs::default();
-
-    test!(&world, Requirement::Skill(Skill::Blaze), "❌");
+    test!(&req, "❌");
     world.store_skill(Skill::Blaze, true, &[]);
-    test!(&world, Requirement::Skill(Skill::Blaze), "✅");
+    test!(&req, "✅");
 
-    test!(
-        &world,
-        Requirement::And(vec![Requirement::Skill(Skill::Blaze), Requirement::Free]),
-        "✅"
-    );
-    test!(
-        &world,
-        Requirement::Or(vec![
-            Requirement::Skill(Skill::Blaze),
-            Requirement::Impossible
-        ]),
-        "✅"
-    );
+    test!(Requirement::And(vec![req.clone(), Requirement::Free]), "✅");
+    test!(Requirement::Or(vec![Requirement::Impossible, req]), "✅");
 
-    test!(&world, Requirement::EnergySkill(Skill::Blaze, 1.0), "❌");
-    world.add_max_energy((1.).into(), &[]);
-    test!(&world, Requirement::EnergySkill(Skill::Blaze, 1.0), "❌");
+    let req = Requirement::EnergySkill(Skill::Blaze, 1.0);
+    eprintln!("testing {req}");
 
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    test!(
-        &world,
-        Requirement::EnergySkill(Skill::Blaze, 1.0),
-        [Orbs {
-            energy: -1.0,
-            ..orbs
-        }]
-    );
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world.settings = &settings;
-    world.add_max_energy((1.).into(), &[]);
-    test!(
-        &world,
-        Requirement::EnergySkill(Skill::Blaze, 1.0),
-        [Orbs {
-            energy: -2.0,
-            ..orbs
-        }]
-    );
+    test!(&req, "❌");
+    world.store_max_energy(1., &[]);
+    test!(&req, "❌");
+    world.store_max_energy(2., &[]);
+    test!(&req, [Orbs::new(0., -2.0)]);
 
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    world.store_skill(Skill::Blaze, true, &[]);
-    world.add_max_energy((0.5).into(), &[]);
-    world.add_max_health(15, &[]);
+    set_difficulty!(Difficulty::Gorlek);
+    world.store_max_energy(1., &[]);
+    test!(&req, "❌");
+    world.store_shard(Shard::Energy, true, &[]);
+    test!(&req, [Orbs::new(0., -2.0)]);
+    world.store_shard(Shard::Energy, false, &[]);
+
+    set_difficulty!(Difficulty::Unsafe);
+    test!(&req, [Orbs::new(0., -1.0)]);
+
+    world.store_shard(Shard::Overcharge, true, &[]);
+    test!(&req, [Orbs::new(0., -1.0 * 0.5)]);
+    world.store_shard(Shard::Overcharge, false, &[]);
+
     world.store_shard(Shard::LifePact, true, &[]);
+    world.store_max_energy(0.5, &[]);
+    world.store_max_health(15, &[]);
     test!(
-        &world,
         Requirement::EnergySkill(Skill::Blaze, 1.0),
-        [Orbs {
-            energy: -0.5,
-            health: -5.0
-        }]
+        [Orbs::new(-5.0, -0.5)]
     );
     test!(
-        &world,
         Requirement::NonConsumingEnergySkill(Skill::Blaze),
-        [Orbs {
-            health: -5.0,
-            ..orbs
-        }]
+        [Orbs::new(-5.0, 0.)]
     );
     test!(
-        &world,
         Requirement::NonConsumingEnergySkill(Skill::Blaze),
-        [Orbs {
-            energy: 0.0,
-            health: world.max_health()
-        }],
-        [Orbs {
-            energy: 0.5,
-            health: -10.0
-        }]
+        [Orbs::new(world.max_health(), 0.0)],
+        [Orbs::new(-10.0, 0.5)]
     );
 
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    world.add_max_energy((2.).into(), &[]);
-    world.add_max_health(30, &[]);
-    test!(&world, Requirement::Damage(30.0), "❌");
-    world.add_max_health(5, &[]);
-    test!(
-        &world,
-        Requirement::Damage(30.0),
-        [Orbs {
-            health: -30.0,
-            ..orbs
-        }]
-    );
-    world.add_max_energy((1.).into(), &[]);
+    set_difficulty!(Difficulty::Moki);
+    world.restore_snapshot();
+    world.snapshot();
+
+    eprintln!("testing Damage");
+
+    world.store_max_health(30, &[]);
+    test!(Requirement::Damage(30.0), "❌");
+    world.store_max_health(35, &[]);
+    test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
+
+    set_difficulty!(Difficulty::Gorlek);
+    world.store_max_health(30, &[]);
+    world.store_shard(Shard::Vitality, true, &[]);
+    test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
+    world.store_shard(Shard::Vitality, false, &[]);
+    world.store_shard(Shard::Resilience, true, &[]);
+    test!(Requirement::Damage(30.0), [Orbs::new(-30.0 * 0.9, 0.)]);
+    world.store_shard(Shard::Resilience, false, &[]);
+
+    set_difficulty!(Difficulty::Unsafe);
+    world.store_max_energy(3., &[]);
     world.store_skill(Skill::Regenerate, true, &[]);
-    test!(&world, Requirement::Damage(60.0), "❌");
-    world.add_max_health(30, &[]);
+    test!(Requirement::Damage(60.0), "❌");
+    world.store_max_health(65, &[]);
     test!(
-        &world,
         Requirement::Damage(60.0),
-        [Orbs {
-            health: 30.0,
-            energy: world.max_energy()
-        }],
-        [Orbs {
-            health: -25.0,
-            energy: -2.0
-        }]
+        [Orbs::new(30.0, world.max_energy())],
+        [Orbs::new(-25.0, -2.0)]
     );
     test!(
-        &world,
         Requirement::Danger(30.0),
-        [Orbs {
-            health: 30.0,
-            energy: world.max_energy()
-        }],
-        [Orbs {
-            health: 30.0,
-            energy: -1.0
-        }]
+        [Orbs::new(30.0, world.max_energy())],
+        [Orbs::new(30.0, -1.0)]
     );
     test!(
-        &world,
         Requirement::Danger(60.0),
-        [Orbs {
-            health: 30.0,
-            energy: world.max_energy()
-        }],
-        [Orbs {
-            health: 35.0,
-            energy: -2.0
-        }]
+        [Orbs::new(30.0, world.max_energy())],
+        [Orbs::new(35.0, -2.0)]
     );
 
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    test!(&world, Requirement::BreakWall(12.0), "❌");
+    set_difficulty!(Difficulty::Moki);
+    world.restore_snapshot();
+    world.snapshot();
+
+    let req = Requirement::BreakWall(12.0);
+    eprintln!("testing {req}");
+
+    test!(&req, "❌");
     world.store_skill(Skill::Sword, true, &[]);
-    test!(&world, Requirement::BreakWall(12.0), [world.max_orbs()]);
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    world.store_skill(Skill::Grenade, true, &[]);
-    test!(&world, Requirement::BreakWall(12.0), "❌");
-    world.add_max_energy((1.5).into(), &[]);
-    test!(&world, Requirement::BreakWall(12.0), "❌");
-    world.add_max_energy((0.5).into(), &[]);
-    test!(
-        &world,
-        Requirement::BreakWall(12.0),
-        [Orbs {
-            energy: -2.0,
-            ..orbs
-        }]
-    );
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    world.store_skill(Skill::Grenade, true, &[]);
-    world.add_max_energy((1.).into(), &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    test!(
-        &world,
-        Requirement::BreakWall(16.0),
-        [Orbs {
-            energy: -1.0,
-            ..orbs
-        }]
-    );
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world.settings = &settings;
-    world.add_max_energy((0.5).into(), &[]);
-    test!(&world, Requirement::BreakWall(12.0), "❌");
+    test!(&req, [world.max_orbs()]);
 
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    world.store_skill(Skill::Sword, false, &[]);
+
+    world.store_skill(Skill::Grenade, true, &[]);
+    world.store_max_energy(1.5, &[]);
+    test!(&req, "❌");
+    world.store_max_energy(2., &[]);
+    test!(&req, [Orbs::new(0., -2.0)]);
+
+    set_difficulty!(Difficulty::Unsafe);
+    world.store_max_energy(1., &[]);
+    test!(&req, [Orbs::new(0., -1.0)]);
+    set_difficulty!(Difficulty::Moki);
+    world.store_max_energy(1.5, &[]);
+    test!(&req, "❌");
+
+    world.restore_snapshot();
+    world.snapshot();
+
+    let req = Requirement::ShurikenBreak(12.0);
+    eprintln!("testing {req}");
+
     world.store_skill(Skill::Shuriken, true, &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    test!(&world, Requirement::ShurikenBreak(12.0), "❌");
-    world.add_max_energy((2.).into(), &[]);
-    test!(
-        &world,
-        Requirement::ShurikenBreak(12.0),
-        [Orbs {
-            energy: -2.0,
-            ..orbs
-        }]
-    );
-    world.add_max_energy((3.).into(), &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world.settings = &settings;
-    test!(&world, Requirement::ShurikenBreak(12.0), "❌");
-    world.add_max_energy((1.).into(), &[]);
-    test!(
-        &world,
-        Requirement::ShurikenBreak(12.0),
-        [Orbs {
-            energy: -6.0,
-            ..orbs
-        }]
-    );
+    world.store_max_energy(5., &[]);
+    test!(&req, "❌");
+    world.store_max_energy(6., &[]);
+    test!(&req, [Orbs::new(0., -6.0)]);
+    set_difficulty!(Difficulty::Unsafe);
+    world.store_max_energy(2., &[]);
+    test!(&req, [Orbs::new(0., -2.0)]);
 
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    world.restore_snapshot();
+    world.snapshot();
+
+    // Slug has 13, Skeeto has 20 health
+    let req = Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]);
+    eprintln!("testing {req}");
+
+    // Bow has 4 damage -> 2 * 4 + 5 = 13 shots * 0.25 energy / shot = 3.25 energy
     world.store_skill(Skill::Bow, true, &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
-        "❌"
-    );
-    world.add_max_energy((3.5).into(), &[]);
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
-        [Orbs {
-            energy: -3.25,
-            ..orbs
-        }]
-    );
-    world.add_max_energy((3.).into(), &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world.settings = &settings;
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
-        "❌"
-    );
+    world.store_max_energy(3., &[]);
+    test!(&req, "❌");
+    world.store_max_energy(3.25, &[]);
+    test!(&req, [Orbs::new(0., -3.25)]);
+    // With 5 damage -> 2 * 3 + 4 = 10 shots * 0.25 energy / shot = 2.5 energy
+    world.store_skill(Skill::MarshAncestralLight, true, &[]);
+    test!(&req, [Orbs::new(0., -2.5)]);
+    world.store_shard_slots(3, &[]);
+    // Wingclip stacks additively, increasing the damage to 4 * 2.25 = 9 against Skeeto
+    world.store_shard(Shard::Wingclip, true, &[]);
+    // Splinter has 3 shots of half strength -> 7.5 damage against Slug and 13.5 against Skeeto
+    world.store_shard(Shard::Splinter, true, &[]);
+    // 2 * 2 + 2 = 6 shots * 0.25 energy / shot = 1.5 energy
+    test!(&req, [Orbs::new(0., -1.5)]);
+
+    set_difficulty!(Difficulty::Moki);
+    world.store_max_energy(6.5, &[]);
+    test!(&req, "❌");
     world.store_skill(Skill::DoubleJump, true, &[]);
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Slug, 2), (Enemy::Skeeto, 1)]),
-        [Orbs {
-            energy: -6.5,
-            ..orbs
-        }]
-    );
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    test!(&req, [Orbs::new(0., -6.5)]);
+
+    set_difficulty!(Difficulty::Unsafe);
+    world.restore_snapshot();
+    world.snapshot();
+
     let req = Requirement::Combat(smallvec![
         (Enemy::Sandworm, 1),
         (Enemy::Bat, 1),
@@ -528,110 +448,64 @@ fn is_met() {
         (Enemy::EnergyRefill, 1),
         (Enemy::Balloon, 4)
     ]);
+    eprintln!("testing {req}");
+
     world.store_skill(Skill::Shuriken, true, &[]);
     world.store_skill(Skill::Spear, true, &[]);
-    world.add_max_energy((13.5).into(), &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    test!(&world, &req, "❌");
-    world.add_max_energy((0.5).into(), &[]);
-    test!(
-        &world,
-        &req,
-        [Orbs {
-            energy: -14.0,
-            ..orbs
-        }]
-    );
-    world.add_max_energy((18.5).into(), &[]);
+    world.store_max_energy(13.5, &[]);
+    test!(&req, "❌");
+    world.store_max_energy(14., &[]);
+    test!(&req, [Orbs::new(0., -14.0)]);
+    set_difficulty!(Difficulty::Moki);
+    world.store_max_energy(32.5, &[]);
     world.store_skill(Skill::Bash, true, &[]);
     world.store_skill(Skill::Launch, true, &[]);
     world.store_skill(Skill::Burrow, true, &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world.settings = &settings;
-    test!(&world, &req, "❌");
-    world.add_max_energy((0.5).into(), &[]);
-    test!(
-        &world,
-        &req,
-        [Orbs {
-            energy: -33.0,
-            ..orbs
-        }]
-    );
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    test!(&req, "❌");
+    world.store_max_energy(33., &[]);
+    test!(&req, [Orbs::new(0., -33.0)]);
+
+    set_difficulty!(Difficulty::Unsafe);
+    world.restore_snapshot();
+    world.snapshot();
+
+    let req = Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]);
+    eprintln!("testing {req}");
+
     world.store_skill(Skill::Spear, true, &[]);
     world.store_skill(Skill::DoubleJump, true, &[]);
-    world.add_max_energy((2.).into(), &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
-    world.settings = &settings;
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
-        [Orbs {
-            energy: -2.0,
-            ..orbs
-        }]
-    );
-    let settings = WorldSettings::difficulty_default(Difficulty::Moki);
-    world.settings = &settings;
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
-        "❌"
-    );
-    world.add_max_energy((5.5).into(), &[]);
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
-        "❌"
-    );
-    world.add_max_energy((0.5).into(), &[]);
-    test!(
-        &world,
-        Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]),
-        [Orbs {
-            energy: -8.0,
-            ..orbs
-        }]
-    );
+    world.store_max_energy(2., &[]);
+    test!(&req, [Orbs::new(0., -2.0)]);
+    set_difficulty!(Difficulty::Moki);
+    world.store_max_energy(7.5, &[]);
+    test!(&req, "❌");
+    world.store_max_energy(8., &[]);
+    test!(&req, [Orbs::new(0., -8.0)]);
 
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
+    set_difficulty!(Difficulty::Unsafe);
+    world.restore_snapshot();
+    world.snapshot();
+
+    eprintln!("testing requirement chains");
+
     let a = Requirement::EnergySkill(Skill::Blaze, 2.0);
     let b = Requirement::Damage(20.0);
     let c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let d = Requirement::Damage(10.0);
+
     world.store_skill(Skill::Blaze, true, &[]);
-    world.add_max_energy((2.).into(), &[]);
-    world.add_max_health(25, &[]);
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
+    world.store_max_energy(2., &[]);
+    world.store_max_health(25, &[]);
+
     test!(
-        &world,
         Requirement::And(vec![c.clone(), d.clone()]),
-        [Orbs {
-            health: -10.0,
-            energy: -1.0
-        }]
+        [Orbs::new(-10.0, -1.0)]
     );
     test!(
-        &world,
         Requirement::Or(vec![a.clone(), b.clone()]),
-        [
-            Orbs {
-                energy: -2.0,
-                ..orbs
-            },
-            Orbs {
-                health: -20.0,
-                ..orbs
-            }
-        ]
+        [Orbs::new(0., -2.0), Orbs::new(-20.0, 0.)]
     );
     test!(
-        &world,
         Requirement::Or(vec![
             Requirement::And(vec![a.clone(), b.clone()]),
             Requirement::And(vec![c.clone(), d.clone()]),
@@ -639,35 +513,21 @@ fn is_met() {
             b.clone()
         ]),
         [
-            Orbs {
-                energy: -1.0,
-                health: -10.0
-            },
-            Orbs {
-                energy: -2.0,
-                ..orbs
-            },
-            Orbs {
-                health: -20.0,
-                ..orbs
-            }
+            Orbs::new(-10.0, -1.0),
+            Orbs::new(0., -2.0),
+            Orbs::new(-20.0, 0.)
         ]
     );
     test!(
-        &world,
         Requirement::And(vec![
             Requirement::Or(vec![a.clone(), d.clone()]),
             Requirement::Or(vec![b.clone(), c.clone()])
         ]),
-        [Orbs {
-            energy: -1.0,
-            health: -10.0
-        }]
+        [Orbs::new(-10.0, -1.0)]
     );
-    world.add_max_health(40, &[]);
-    world.add_max_energy((4.).into(), &[]);
+    world.store_max_energy(6., &[]);
+    world.store_max_health(65, &[]);
     test!(
-        &world,
         Requirement::And(vec![
             Requirement::Or(vec![a.clone(), d.clone()]),
             Requirement::Or(vec![b.clone(), c.clone()]),
@@ -675,57 +535,35 @@ fn is_met() {
             Requirement::Or(vec![b.clone(), c.clone()])
         ]),
         [
-            Orbs {
-                energy: -6.0,
-                ..orbs
-            },
-            Orbs {
-                energy: -4.0,
-                health: -10.0
-            },
-            Orbs {
-                health: -60.0,
-                ..orbs
-            },
-            Orbs {
-                energy: -1.0,
-                health: -40.0
-            },
-            Orbs {
-                energy: -2.0,
-                health: -20.0
-            }
+            Orbs::new(0., -6.0),
+            Orbs::new(-10.0, -4.0),
+            Orbs::new(-60.0, 0.),
+            Orbs::new(-40.0, -1.0),
+            Orbs::new(-20.0, -2.0)
         ]
     );
     test!(
-        &world,
         Requirement::Or(vec![Requirement::Free, b.clone()]),
         [Orbs::default()]
     );
     test!(
-        &world,
         Requirement::Or(vec![b.clone(), Requirement::Free]),
         [Orbs::default()]
     );
 
-    world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
-    world.settings = &settings;
-    world.add_max_health(35, &[]);
-    world.add_max_energy((1.).into(), &[]);
+    world.restore_snapshot();
+    world.snapshot();
+
+    world.store_max_health(35, &[]);
+    world.store_max_energy(1., &[]);
     test!(
-        &world,
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
         "❌"
     );
     world.store_skill(Skill::Regenerate, true, &[]);
     test!(
-        &world,
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
-        [Orbs {
-            energy: -1.0,
-            health: -30.0
-        }]
+        [Orbs::new(-30.0, -1.0)]
     );
 
     let req = Requirement::Or(vec![
@@ -733,23 +571,13 @@ fn is_met() {
         Requirement::EnergySkill(Skill::Blaze, 1.0),
     ]);
     world.store_skill(Skill::Blaze, true, &[]);
-    world.add_max_energy((1.).into(), &[]);
+    world.store_max_energy(2., &[]);
     test!(
-        &world,
         Requirement::And(vec![req.clone(), req.clone()]),
         [
-            Orbs {
-                health: -20.0,
-                ..orbs
-            },
-            Orbs {
-                health: -10.0,
-                energy: -1.0
-            },
-            Orbs {
-                energy: -2.0,
-                ..orbs
-            }
+            Orbs::new(-20.0, 0.),
+            Orbs::new(-10.0, -1.0),
+            Orbs::new(0., -2.0)
         ]
     );
 }

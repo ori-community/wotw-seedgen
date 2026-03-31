@@ -260,6 +260,7 @@ pub trait Simulation: Sized {
         self.fetch(skill.uber_identifier()).expect_boolean()
     }
 
+    // TODO support spawning with reduced shard slots?
     #[inline]
     fn shard(&self, shard: Shard) -> bool {
         self.fetch(shard.uber_identifier()).expect_boolean()
