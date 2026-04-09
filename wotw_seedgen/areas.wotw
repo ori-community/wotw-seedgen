@@ -16622,14 +16622,21 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
   refill Checkpoint
 
   state WillowsEnd.RedirectHeart:
-    moki: BreakWall=10, BreakWall=30, DoubleJump, Bash, Launch
-    kii: BreakWall=10, BreakWall=30, Launch, Bash, Dash OR Glide
+    moki:
+      BreakWall=10, BreakWall=30, Launch, Bash, Glide
+      BreakWall=10, BreakWall=30, Launch, Bash, DoubleJump, Dash
+    gorlek: BreakWall=10, BreakWall=30, Launch, Bash, DoubleJump OR Dash OR Sword OR Hammer OR Damage=40
+    kii:
+      BreakWall=10, BreakWall=30, Launch, Bash, Grenade=1 OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      BreakWall=10, BreakWall=30, Bash, DoubleJump, TripleJump, Dash OR Glide OR Sword OR Damage=40
+      Bash, DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # BreakWall=10, BreakWall=30, LaunchSwap, Bash
+      # Bash, AerialHammerJump, TripleJump  # refresh tjump on the wall right to the pickup
     unsafe:
-      Spear=2
+      Spear=2  # Through the purple wall
       BreakWall=10, BreakWall=30, Glide, Bash
-      Grenade=2, Launch, Bash
-      Sword, Launch, Bash
-      Deflector, Sword, Bash, Damage=20
+      Deflector, Sword, Dash, Damage=20, Damage=20  # Dboost on the 2nd laser to reach the elemental, later dboost on the horizontal lasers to go down
       BreakWall=30, Damage=60, DashBashChain  # Dboost on spikes then laser, fetch a projectile to open the purple wall
 
   pickup WillowsEnd.RedirectEX:
@@ -16644,8 +16651,8 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
       # redirect the projectile so it pass under the pickup
       Bash, DoubleJump, TripleJump, BreakWall=10, Glide OR Sword OR Damage=40
       Bash, DoubleJump, TripleJump, BreakWall=10, Dash, Hammer OR Sentry=2 OR Blaze=4
-      Bash, Grenade=1, Glide, BreakWall=10 # use a second projectile so you can land on the edge above the double laser then throw a grenade and bash from the 1st projectile in order to reach your grenade
-      Damage=40, SentryJump=1  # Spikes directly under the pickup only deal damage once. Players won't know this but it's simpler for damage calc
+      Bash, Grenade=1, Glide, BreakWall=10  # use a second projectile so you can land on the edge above the double laser then throw a grenade and bash from the 1st projectile in order to reach your grenade
+      DoubleJump, Damage=40, SentryJump=1  # Sjump from the spikes
       # Glitched
       # AerialHammerJump, TripleJump  # Upswing beforehand
       # GrenadeJump=1, Launch
@@ -16671,6 +16678,7 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
       Damage=80
       # Glitched
       # GlideJump, Damage=40
+      # GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # GrenadeJump=1 OR AerialHammerJump
     unsafe:
       #DoubleJump, Sword  # pogo the mine
@@ -16698,6 +16706,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Combat=CrystalMiner, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
       # Combat=CrystalMiner, GrenadeJump=1
+      # GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, BreakCrystal:
       DoubleJump OR GlideJump OR GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump OR AbilitySwap=1
 
@@ -16706,9 +16715,11 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       Launch, DoubleJump, Dash, Bash, Grapple, Glide
     gorlek, BreakWall=30, Burrow:
       DoubleJump, Dash, Bash, Grapple, Glide
-      Bash, Grapple, Launch, DoubleJump OR Glide
+      Bash, Grapple, Launch, DoubleJump OR Glide OR Damage=40
     kii, BreakWall=30, Burrow:
-      Launch, Bash, DoubleJump OR Glide OR Dash
+      Launch, Bash
+      Launch, Grapple, Damage=40  # Need to delay the launch after the grapple plant so you get more horizontal distance
+      Launch, Grapple, Sword  # Pogo the elemental after the grapple plant to refresh your launch
     unsafe, Burrow:
       BreakWall=30:
         Bash, Glide
@@ -16738,22 +16749,27 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     gorlek: Damage=10, DoubleJump OR Dash OR Glide
     kii:
       Combat=CrystalMiner, Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Sentry=2
+      Damage=10, Shuriken=1 OR Blaze=2 OR Sentry=2
+      # Glitched
+      # GrenadeJump=1, Glide  # GJump over the miner
+      # GlideJump
     unsafe:
       # Wait for the gorlek to patrol to the left so you can jump over it for free
       PauseFloat OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn WillowsEnd.West:
     moki: Launch
     gorlek:
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=20  # damage because the lasers are hard
-      Bash, Grenade=2, DoubleJump, Damage=20
+      Bash, Grenade=1, DoubleJump, Damage=20, TripleJump OR Grenade=1  # damage because the lasers are hard
+      Bash, Grenade=1, DoubleJump, Dash
       SentryJump=1, DoubleJump, TripleJump, Damage=20
+      SentryJump=1, DoubleJump, Dash
     kii:
-      Damage=90, Combat=CrystalMiner
+      Damage=90, Combat=CrystalMiner OR Bash OR Damage=10
       Bash, Grenade=2
       # Glitched
-      # Dash, AerialHammerJump
-      # Dash, DoubleJump, GrenadeJump=1, Danger=40  # GJump+DJ+Dash into the portal. If you go in too low you can hit purple goo on the way out
-      # GlideJump, DoubleJump, TripleJump, Hammer OR Sentry=1 OR Flash=1
+      # AerialHammerJump, Dash OR TripleJump OR GlideJump
+      # GrenadeJump=1, DoubleJump, Dash OR TripleJump OR GlideJump
+      # GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
       SwordJump, TripleJump OR SentryJump=1 # From the left on the laser, sword jumps in order to reset your jump on a small wall then sword jumps+upslash to reach the portal
       DoubleJump, TripleJump, Dash  # Dash ramp from the left side + tjump in order to touch a small wall in the ceilling. Then tjump+dash toward the portal
@@ -16771,7 +16787,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       SentryJump=1, Danger=20  # off-screen wall mine
       # Glitched
       # AerialHammerJump
-      # GrenadeJump=1, DoubleJump, TripleJump, Hammer
+      # GrenadeJump=1, DoubleJump, TripleJump, Sword OR Hammer OR Flash=1 OR Sentry=1
     unsafe:
       SentryJump=1 OR GlideHammerJump OR GroundedHammerJump OR DashBashChain
       DoubleJump, TripleJump  # tjump on the left wall to start climbing it
@@ -16806,19 +16822,42 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
 
   conn WillowsEnd.Upper:
     moki: Launch, Dash, Glide, DoubleJump
-    gorlek: Launch, Glide OR DoubleJump OR Dash
+    gorlek:
+      Launch, Glide OR DoubleJump OR Dash OR Damage=40
+      Bash, Grenade=1:
+        DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
+        Dash, Glide OR Sword OR Hammer
+        Glide, Sword OR Hammer OR Damage=40
     kii:
       Launch, Sword OR Hammer OR Sentry=1 OR Blaze=1 OR Shuriken=1 OR Flash=1
       Bash, Grenade=1, Damage=40, Glide OR DoubleJump OR Dash  # Right side is tricky, 40 damage for good measure
+      DoubleJump, TripleJump, Dash OR Hammer OR Spear=1  # dash uses the wall near the health refill. Other start directly from the ground right of the portal
+      Bash, Grenade=1, Sword OR Hammer OR DoubleJump OR Dash OR Glide
+      Bash, Grenade=1, Damage=40, Damage=80, Grenade=1 OR Shuriken=1  # Bashnade+40 to reach the floating platform, 80 to reach safe ground, energy to cross above the laser
+      Bash, Grenade=1, Damage=40, Damage=40, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:  # Bashnade+40 to reach the floating platform, 40+energy to reach safe ground
+        Grenade=1 OR Shuriken=1  # Energy to cross above the laser
+      Bash, Grenade=1, Damage=40, Shuriken=2 OR Flash=2 OR Sentry=2:  # Bashnade+Energy to reach the floating platform, 40+Energy to reach safe ground
+        Grenade=1 OR Shuriken=1  # Energy to cross above the laser
       # Glitched
       # AerialHammerJump, Damage=40
       # GrenadeJump=1, DoubleJump, TripleJump, Damage=40
+      # GlideJump, DoubleJump  # To the left wall, then dj+glide to clear the path
+      # SwordSJump=1
+      # HammerSJump=1, DoubleJump OR Dash OR Sword
+      # HammerSJump=1, Glide, Damage=40
+      # GrenadeJump=1, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer
+      # GrenadeJump=1, DoubleJump, Shuriken=1 OR Blaze=3 OR Sentry=2 OR Damage=40:  # Reach the floating island
+      #   Shuriken=1 OR Blaze=1 OR Sentry=1 OR Damage=40  # In case you think kii need something else to go from the floating platform to the end
+      # GrenadeJump=1, Dash, Glide OR Sword OR Hammer
+      # GrenadeJump=1, Dash, Shuriken=1 OR Blaze=3 OR Sentry=2 OR Damage=40:
+      #  Shuriken=1 OR Blaze=1 OR Sentry=1 OR Damage=40
+      # GrenadeJump=1, Glide, Sword OR Hammer
     unsafe:
       Launch  # Reset launch on the ceiling
       DoubleJump, TripleJump  # Safe spot in the goo next to the laser
       SwordJump  # Safe spot in the goo next to the laser. SwordJump+upslash to the wall, then dj+hover to get to the middle safe platform
       SentryJump=1
-      Bash, Grenade=1, PauseFloat OR Glide OR DoubleJump OR Dash
+      Bash, Grenade=1, PauseFloat
 
 anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
   refill Checkpoint
@@ -16827,37 +16866,40 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
 
   state WillowsEnd.SpinLasersHeart:
     moki: BreakWall=30, Launch, DoubleJump, Dash, Glide
-    gorlek: BreakWall=30, Launch, DoubleJump OR Dash OR Glide
+    gorlek, BreakWall=30:
+      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=40  # let you afford 2 laser dboost or a dboost in the spikes
     kii, BreakWall=30:
       Launch
       DoubleJump, TripleJump:
-        Dash
+        Dash OR Glide
+        Damage=20, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Dboosting on the laser to be safe but not mandatory
         Bash, Grenade=1
     unsafe, BreakWall=30:
+      DoubleJump, TripleJump, Damage=20
       DoubleJump, Glide OR Dash
       AerialHammerJump, TripleJump
   state WillowsEnd.CentralShortcut:  # The one-way wall above Lupo
-    moki, BreakWall=20: Combat=MaceMiner OR Bash OR Launch
-    gorlek, BreakWall=20:
-      Damage=10 OR SentryJump=1
-      DoubleJump, TripleJump
+    moki: BreakWall=20, Combat=CrystalMiner  # Gorlek keeps attacking while you're breaking the wall, moki probably wants to kill it
+    gorlek:
+      BreakWall=20, Damage=10 OR Bash OR Launch  # Dboost or move around the gorlek while you're breaking the wall
     kii, BreakWall=20:
-      Sword, DoubleJump  # Pogo
+      DoubleJump, TripleJump
       # Glitched
       # AerialHammerJump
+      # GlideJump, DoubleJump
       # GrenadeJump=1
     unsafe, BreakWall=20:
       GlideJump OR DoubleJump OR Dash OR AbilitySwap=1
 
-  conn WillowsEnd.InnerTP:  # This duplicates the movement requirements from CentralShortcut only because you need to get past the Gorlek for both
-    moki, WillowsEnd.CentralShortcut: Combat=MaceMiner OR Bash OR Launch
+  conn WillowsEnd.InnerTP:  # This duplicates most of the movement requirements from CentralShortcut only because you need to get past the Gorlek for both
+    moki, WillowsEnd.CentralShortcut: Combat=CrystalMiner OR Bash OR Launch
     gorlek, WillowsEnd.CentralShortcut:
-      Damage=10 OR SentryJump=1
-      DoubleJump, TripleJump
+      Damage=10
     kii, WillowsEnd.CentralShortcut:
-      Sword, DoubleJump  # Pogo
+      DoubleJump, TripleJump
       # Glitched
       # AerialHammerJump
+      # GlideJump, DoubleJump
       # GrenadeJump=1
     unsafe, WillowsEnd.CentralShortcut:
       GlideJump OR DoubleJump OR Dash OR AbilitySwap=1
@@ -16878,11 +16920,15 @@ anchor WillowsEnd.West at 437, -3840:  # To the left of the one-way above Lupo
       DoubleJump, Sword  # Pogo the Crystal Miner then djump+upslash to avoid dboost on the falling wheel
       # Glitched
       # AerialHammerJump
-      # Combat=MaceMiner, GrenadeJump=3  # Break, get into the portal, get into the wheel
+      # GlideJump, DoubleJump  # works by both going directly toward the portal or by climbing the wall above the one way wall
+      # GlideJump, Bash
+      # Combat=CrystalMiner, GrenadeJump=1, GlideJump OR Damage=40
+      # Combat=CrystalMiner, GrenadeJump=1, DoubleJump, TripleJump OR Hammer
+      # SentryJump=1, SentryJump=1 OR DoubleJump OR GlideJump OR Damage=40  # With djump, also use an upslash
     unsafe:
       BreakWall=10:
-        Combat=MaceMiner, DoubleJump, TripleJump OR Damage=40  # get a wjump on the energy crystal
-      SentryJump=2
+        Combat=CrystalMiner, DoubleJump  # get a wjump on the energy crystal
+        SentryJump=1  # You can walljump + upslash on the the wheel
       Launch
   conn WillowsEnd.GlideHeartPath:
     moki: Launch
@@ -16902,11 +16948,15 @@ anchor WillowsEnd.GlideHeartPath at 374, -3824:  # one room before the first win
     gorlek:
       Launch
       DoubleJump, TripleJump
-      Combat=Mantis, SentryJump=1, DoubleJump OR Damage=20
+      SentryJump=1, Damage=40, DoubleJump  # Extra damage because it's easy to hit the top of the wheel
+      SentryJump=1, Damage=60
     kii:
       DoubleJump, Hammer # djump+upslash to land on the platform in the wheel
+      Damage=60, DoubleJump OR Sword OR Hammer OR Spear=1
       # Glitched
-      # GlideJump, DoubleJump
+      # GlideJump, DoubleJump OR Damage=60 OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1
+      # SentryJump=1  # horizontal slashes to hover above the platform until the horizontal laser has been avoided
+      # GrenadeJump=1, DoubleJump OR Damage=20
     unsafe: free  # https://youtu.be/rWO35ruudfw
       # GrenadeJump=2  # Too precise for kii. One to get into the wheel, one to jump over the laser
       # Bash  # stun-lock the mantis by bashing it so it doesn't jump on the wheel
@@ -16951,6 +17001,12 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       Bow=1
     kii:
       Spear=1 OR Grenade=1 OR Sentry=1
+      DoubleJump, TripleJump, Shuriken=1  # possible with only djump but making it more lenient
+      # Glitched
+      # AerialHammerJump  # upslash first then upslash to break the crystal
+      # GlideJump, DoubleJump, TripleJump, BreakCrystal
+      # GlideJump, Shuriken=1
+      # GlideJump, DoubleJump, Blaze=2
     unsafe:
       Damage=20, BreakCrystal  # The laser has weird properties. Run up to it and jump for a height boost
 
@@ -16999,16 +17055,17 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       DoubleJump, TripleJump, Grapple, Bash, Damage=100  # dboost on the laser before the 2nd wheel (20) then on spikes before the last portal (40). Since it's hard to avoid taking a dboost on the wheel when entering the portal under UpperLeftEX, adding an extra dboost (40)
       WillowsEnd.SpinPortalsHeart, Launch, DoubleJump OR Dash OR Sword OR Hammer
       WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, DoubleJump
-      WillowsEnd.SpinPortalsHeart, SentryJump=1, Bash OR SentryJump=1  # Max height
+      WillowsEnd.SpinPortalsHeart, SentryJump=1, Bash  # Max height then use the elemental
+      WillowsEnd.SpinPortalsHeart, SwordSJump=2, DoubleJump  # Max height then into the portal
       # Glitched
       # WillowsEnd.SpinPortalsHeart, AerialHammerJump, TripleJump, Bash
-      # WillowsEnd.SpinPortalsHeart, GrenadeJump=1, DoubleJump, TripleJump, Bash
     unsafe:
       Launch
       #Launch, DoubleJump OR Damage=40
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard
       WillowsEnd.SpinPortalsHeart, Bash, Grenade=1, SpearJump=1  # Grenade, then spear jump to bash it from higher
       WillowsEnd.SpinPortalsHeart, AerialHammerJump, TripleJump
+      WillowsEnd.SpinPortalsHeart, SentryJump=2  # Into the portal
 
 anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the upper heart
   refill Checkpoint
@@ -17022,8 +17079,10 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
       DoubleJump, TripleJump
       Bash, Grenade=1
       # Glitched
-      # GrenadeJump=1  # Gives extra height when exiting the portal
-    unsafe: DoubleJump
+      # GrenadeJump=1, Damage=40  # Gives extra height when exiting the portal
+      # SentryJump=1, Damage=40
+      # AerialHammerJump
+    unsafe: DoubleJump OR GrenadeJump
   pickup WillowsEnd.UpperLeftEX:  # So far, paths using WillowsEnd.SpinPortalsHeart are the same as going to UpperHeartPath first
     gorlek: Launch, DoubleJump, Glide, Bash
     kii: Launch, Bash
