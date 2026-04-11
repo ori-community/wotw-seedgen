@@ -67,7 +67,7 @@ use std::{
 use itertools::Itertools;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
-    logic_language::output::{Connection, Graph},
+    logic_language::output::{Connection, Graph, Requirement},
     seed_language::{
         output::{CommandVoid, CommonWriteCommand, ContainedWrites, Event, UberStateWrite},
         simulate::{Simulate, Simulation, Snapshot},
@@ -78,7 +78,11 @@ use wotw_seedgen_data::{
 use crate::{
     item_pool::ItemPool,
     logical_difficulty::LogicalDifficulty,
-    world::{ConnectionIndex, ConnectionOrRefill, Missing, ReachStateFails},
+    orbs::OrbVariants,
+    world::{
+        ConnectionIndex, ConnectionOrRefill, ConnectionRequirement, ConnectionRequirementPartial,
+        EqIgnore, GraphRef, Missing, ReachStateFails,
+    },
     World,
 };
 
@@ -257,7 +261,7 @@ impl<'graph, 'pool, 'solution> DisplaySolution<'graph, 'pool, 'solution> {
 impl Display for DisplaySolution<'_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some((connection, graph)) = &self.connection {
-            write!(f, "{} / ", connection.display(graph),)?;
+            write!(f, "{} / ", connection.display(graph))?;
         }
 
         if self.spirit_light > 0 {
@@ -630,7 +634,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_requirement(
         &mut self,
-        solution: PartialSolution<'graph>,
+        mut solution: PartialSolution<'graph>,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         if log_enabled!(target: "perf_counters", Trace) {
             if let ConnectionOrRefill::Connection(connection) = solution.connection.connection {
@@ -638,16 +642,8 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             }
         }
 
-        // let requirement = solution.connection.requirement.0;
-        let requirement = solution.connection.connection.requirement();
-
-        trace!(
-            "solving {requirement} for {solution}",
-            solution = self.display_solution(&solution)
-        );
-
         let mut orb_variants = self.world.get_connection_orbs(&solution.connection).clone();
-        match self.world.is_met(requirement, &mut orb_variants) {
+        match solution.connection.is_met(self.world, &mut orb_variants) {
             ControlFlow::Continue(()) => {
                 trace!("already met");
 
@@ -873,16 +869,18 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                 self.solve_energy_or_burrow_or_better_enemy_weapon(solution, amount, simulate)
             }
             Missing::Any(any) => self.solve_any(solution, any, simulate),
-            Missing::Or(ors, _) => self.solve_any(solution, ors, simulate),
+            Missing::Or(ors, orb_variants) => self.solve_or(solution, ors, orb_variants, simulate),
         }
     }
 
     fn solve_health(
         &mut self,
-        solution: PartialSolution<'graph>,
+        mut solution: PartialSolution<'graph>,
         amount: i32,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
+        solution.connection.orb_reset();
+
         self.solve_shard_branches(
             solution,
             simulate,
@@ -924,10 +922,12 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
     fn solve_energy<const LIFE_PACT: bool>(
         &mut self,
-        solution: PartialSolution<'graph>,
+        mut solution: PartialSolution<'graph>,
         amount: OrderedFloat<f32>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
+        solution.connection.orb_reset();
+
         self.solve_shard_branches(
             solution,
             simulate,
@@ -1226,21 +1226,21 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             return ControlFlow::Break(());
         };
 
+        if self
+            .world
+            .settings
+            .difficulty
+            .may_increase_orbs(uber_identifier)
+        {
+            solution.connection.orb_reset();
+        }
+
         self.add_item(&mut solution, index, simulate)?;
 
         trace!(
             "progressed {uber_identifier} for {solution}",
             solution = self.display_solution(&solution),
         );
-
-        // if self
-        //     .world
-        //     .settings
-        //     .difficulty
-        //     .may_increase_orbs(uber_identifier)
-        // {
-        //     solution.connection.orb_reset();
-        // }
 
         ControlFlow::Continue(solution)
     }
@@ -1468,26 +1468,36 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.solve_branches(solution, any, simulate, Self::solve)
     }
 
-    // fn solve_or(
-    //     &mut self,
-    //     solution: PartialSolution<'graph>,
-    //     // ors: Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
-    //     ors: Vec<Missing<'graph>>,
-    //     simulate: bool,
-    // ) -> ControlFlow<(), PartialSolution<'graph>> {
-    //     fn solve_branch<'graph>(
-    //         context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
-    //         solution: PartialSolution<'graph>,
-    //         // (missing, _): (Missing<'graph>, GraphRef<'graph, Requirement>),
-    //         missing: Missing<'graph>,
-    //         simulate: bool,
-    //     ) -> ControlFlow<(), PartialSolution<'graph>> {
-    //         // TODO this does nothing right solution.connection.requirement = requirement;
-    //         context.solve(solution.clone(), missing, simulate)
-    //     }
+    fn solve_or(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        ors: Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
+        orb_variants: EqIgnore<OrbVariants>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        fn solve_branch<'graph>(
+            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            mut solution: PartialSolution<'graph>,
+            (missing, requirement): (Missing<'graph>, GraphRef<'graph, Requirement>),
+            simulate: bool,
+        ) -> ControlFlow<(), PartialSolution<'graph>> {
+            let ConnectionRequirement::Partial(partial) = &mut solution.connection.requirement
+            else {
+                unreachable!()
+            };
 
-    //     self.solve_branches(solution, ors, simulate, solve_branch)
-    // }
+            partial.requirement = requirement;
+            context.solve(solution, missing, simulate)
+        }
+
+        solution.connection.requirement =
+            ConnectionRequirement::Partial(ConnectionRequirementPartial {
+                requirement: GraphRef(&Requirement::Impossible),
+                orb_variants,
+            });
+
+        self.solve_branches(solution, ors, simulate, solve_branch)
+    }
 
     fn solve_branches<I, T, F>(
         &mut self,

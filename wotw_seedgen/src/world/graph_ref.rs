@@ -51,17 +51,17 @@ impl<'graph, T> Deref for GraphRef<'graph, T> {
     }
 }
 
-// #[derive(Debug, Clone, Copy)]
-// pub struct EqIgnore<T>(pub T);
+#[derive(Debug, Clone, Copy)]
+pub struct EqIgnore<T>(pub T);
 
-// impl<T> PartialEq for EqIgnore<T> {
-//     fn eq(&self, _other: &Self) -> bool {
-//         true
-//     }
-// }
+impl<T> PartialEq for EqIgnore<T> {
+    fn eq(&self, _other: &Self) -> bool {
+        true
+    }
+}
 
-// impl<T> Eq for EqIgnore<T> {}
+impl<T> Eq for EqIgnore<T> {}
 
-// impl<T> Hash for EqIgnore<T> {
-//     fn hash<H: Hasher>(&self, _state: &mut H) {}
-// }
+impl<T> Hash for EqIgnore<T> {
+    fn hash<H: Hasher>(&self, _state: &mut H) {}
+}

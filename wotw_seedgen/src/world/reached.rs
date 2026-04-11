@@ -1,7 +1,6 @@
 use std::{
     fmt::{self, Display},
     hash::Hash,
-    marker::PhantomData,
     mem,
     ops::{ControlFlow, Deref},
 };
@@ -9,8 +8,8 @@ use std::{
 use super::World;
 use crate::{
     logical_difficulty::LogicalDifficulty,
-    orbs::{self, OrbVariants},
-    world::{GraphRef, Missing},
+    orbs::{self, format_orb_variants, OrbVariants},
+    world::{graph_ref::EqIgnore, GraphRef, Missing},
 };
 use itertools::Itertools;
 use log::trace;
@@ -139,9 +138,7 @@ impl Deref for LogicStateMap {
 pub(crate) struct ConnectionIndex<'graph> {
     pub anchor: GraphRef<'graph, Anchor>,
     pub connection: ConnectionOrRefill<'graph>,
-    // TODO I'm not convinved this idea was bad, so I'm keeping it in comments
-    // pub requirement: GraphRef<'graph, Requirement>,
-    // pub orb_variants: EqIgnore<Option<OrbVariants>>,
+    pub requirement: ConnectionRequirement<'graph>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -150,13 +147,24 @@ pub(crate) enum ConnectionOrRefill<'graph> {
     Connection(GraphRef<'graph, Connection>),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub(crate) enum ConnectionRequirement<'graph> {
+    Full(GraphRef<'graph, Requirement>),
+    Partial(ConnectionRequirementPartial<'graph>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub(crate) struct ConnectionRequirementPartial<'graph> {
+    pub requirement: GraphRef<'graph, Requirement>,
+    pub orb_variants: EqIgnore<OrbVariants>,
+}
+
 impl<'graph> ConnectionIndex<'graph> {
     pub(crate) fn connection(anchor: &'graph Anchor, connection: &'graph Connection) -> Self {
         Self {
             anchor: GraphRef(anchor),
             connection: ConnectionOrRefill::Connection(GraphRef(connection)),
-            // requirement: GraphRef(&connection.requirement),
-            // orb_variants: EqIgnore(None),
+            requirement: ConnectionRequirement::Full(GraphRef(&connection.requirement)),
         }
     }
 
@@ -164,8 +172,7 @@ impl<'graph> ConnectionIndex<'graph> {
         Self {
             anchor: GraphRef(anchor),
             connection: ConnectionOrRefill::Refill(GraphRef(refill)),
-            // requirement: GraphRef(&refill.requirement),
-            // orb_variants: EqIgnore(None),
+            requirement: ConnectionRequirement::Full(GraphRef(&refill.requirement)),
         }
     }
 
@@ -173,10 +180,27 @@ impl<'graph> ConnectionIndex<'graph> {
         self.anchor.index(&graph.nodes)
     }
 
-    // pub(crate) fn orb_reset(&mut self) {
-    //     self.requirement = self.connection.requirement();
-    //     self.orb_variants = EqIgnore(None);
-    // }
+    pub(crate) fn orb_reset(&mut self) {
+        self.requirement = ConnectionRequirement::Full(GraphRef(self.connection.requirement()));
+    }
+
+    pub(crate) fn is_met(
+        &mut self,
+        world: &World<'graph, '_>,
+        orb_variants: &mut OrbVariants,
+    ) -> ControlFlow<Missing<'graph>> {
+        if let ConnectionRequirement::Partial(partial) = &self.requirement {
+            world.is_met(partial.requirement.0, &mut partial.orb_variants.0.clone())?;
+
+            self.requirement = ConnectionRequirement::Full(GraphRef(self.connection.requirement()));
+        }
+
+        let ConnectionRequirement::Full(requirement) = self.requirement else {
+            unreachable!()
+        };
+
+        world.is_met(requirement.0, orb_variants)
+    }
 
     pub(crate) fn display<'index>(
         &'index self,
@@ -199,13 +223,33 @@ impl Display for ConnectionIndexDisplay<'_, '_> {
         self.connection.anchor.identifier.fmt(f)?;
 
         match self.connection.connection {
-            ConnectionOrRefill::Refill(refill) => write!(f, " -> {}", refill.value),
+            ConnectionOrRefill::Refill(refill) => write!(f, " -> {}", refill.value)?,
             ConnectionOrRefill::Connection(connection) => {
-                write!(f, " -> {}", self.graph.nodes[connection.to].identifier())
+                write!(f, " -> {}", self.graph.nodes[connection.to].identifier())?
             }
         }
 
-        // write!(f, " -> {}", self.connection.requirement.0)
+        self.connection.requirement.fmt(f)
+    }
+}
+
+impl Display for ConnectionRequirement<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Full(full) => write!(f, " -> {}", full.0),
+            Self::Partial(partial) => partial.fmt(f),
+        }
+    }
+}
+
+impl Display for ConnectionRequirementPartial<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            " -> {requirement} [{orb_variants}]",
+            requirement = self.requirement.0,
+            orb_variants = format_orb_variants(&self.orb_variants.0)
+        )
     }
 }
 
@@ -259,10 +303,11 @@ impl<'graph> World<'graph, '_> {
         &self.reach.state.fails
     }
 
-    pub(crate) fn get_connection_orbs(&self, connection: &ConnectionIndex<'graph>) -> &OrbVariants {
-        // match &connection.orb_variants.0 {
-        //     None => {
-        let node_index = connection.node_index(self.graph);
+    pub(crate) fn get_connection_orbs<'orbs>(
+        &'orbs self,
+        connection_index: &'orbs ConnectionIndex<'graph>,
+    ) -> &'orbs OrbVariants {
+        let node_index = connection_index.node_index(self.graph);
 
         match self.reach.state.best_orbs.get(&node_index) {
             None => panic!(
@@ -272,13 +317,10 @@ impl<'graph> World<'graph, '_> {
                     .filter_map(Node::try_as_anchor_ref)
                     .map(|anchor| &anchor.identifier)
                     .format(", "),
-                connection.display(self.graph)
+                connection_index.display(self.graph)
             ),
-            Some(orbs) => orbs,
+            Some(orb_variants) => orb_variants,
         }
-        //     }
-        //     Some(orb_variants) => orb_variants.clone(),
-        // }
     }
 
     // /// Clean any stale fails
@@ -518,10 +560,11 @@ impl<'graph> World<'graph, '_> {
         }
 
         for refill in &anchor.refills {
-            if let Some(mut refill_orbs) = self.attempt_requirement(
-                orb_variants.clone(),
-                ConnectionIndex::refill(anchor, refill),
-            ) {
+            let connection_index = ConnectionIndex::refill(anchor, refill);
+
+            if let Some(mut refill_orbs) =
+                self.attempt_requirement(orb_variants.clone(), connection_index)
+            {
                 if matches!(refill.value, RefillValue::Full) {
                     // shortcut
                     *orb_variants = smallvec![max_orbs];
@@ -597,8 +640,8 @@ impl<'graph> World<'graph, '_> {
         trace!(
             "revisiting {to_identifier} to improve previous orbs {previous_orbs} with {orbs}",
             to_identifier = self.graph.nodes[connection.to].identifier(),
-            previous_orbs = previous.iter().format(" / "),
-            orbs = orb_variants.iter().format(" / "),
+            previous_orbs = format_orb_variants(previous),
+            orbs = format_orb_variants(orb_variants),
         );
 
         true
@@ -607,11 +650,9 @@ impl<'graph> World<'graph, '_> {
     fn attempt_requirement(
         &mut self,
         mut orb_variants: OrbVariants,
-        connection: ConnectionIndex<'graph>,
+        mut connection: ConnectionIndex<'graph>,
     ) -> Option<OrbVariants> {
-        // let requirement = connection.requirement.0;
-        let requirement = connection.connection.requirement();
-        match self.is_met(requirement, &mut orb_variants) {
+        match connection.is_met(self, &mut orb_variants) {
             ControlFlow::Continue(()) => Some(orb_variants),
             ControlFlow::Break(missing) => {
                 trace!("missing {missing}");
@@ -662,15 +703,17 @@ impl<'graph> World<'graph, '_> {
                     self.add_fail(missing, connection.clone());
                 }
             }
-            // Missing::Or(ors, EqIgnore(orb_variants)) => {
-            Missing::Or(ors, PhantomData) => {
-                // connection.orb_variants = EqIgnore(Some(orb_variants));
+            Missing::Or(ors, orb_variants) => {
+                for (missing, requirement) in ors {
+                    let connection = ConnectionIndex {
+                        requirement: ConnectionRequirement::Partial(ConnectionRequirementPartial {
+                            requirement,
+                            orb_variants: orb_variants.clone(),
+                        }),
+                        ..connection.clone()
+                    };
 
-                // for (missing, requirement) in ors {
-                for missing in ors {
-                    // connection.requirement = requirement;
-
-                    self.add_fail(missing, connection.clone());
+                    self.add_fail(missing, connection);
                 }
             }
         }

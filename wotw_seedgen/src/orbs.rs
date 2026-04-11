@@ -4,6 +4,7 @@ use std::{
     ops::{Add, AddAssign, Sub, SubAssign},
 };
 
+use itertools::Itertools;
 use smallvec::{smallvec, SmallVec, ToSmallVec};
 
 pub type OrbVariants = SmallVec<[Orbs; 3]>;
@@ -245,4 +246,8 @@ pub fn both_single(a: &[Orbs], b: Orbs) -> OrbVariants {
             .copied()
             .collect()
     }
+}
+
+pub fn format_orb_variants(orb_variants: &OrbVariants) -> impl Display + use<'_> {
+    orb_variants.iter().format(" / ")
 }

@@ -1,10 +1,11 @@
 use std::fmt::{self, Display};
-use std::marker::PhantomData;
 use std::ops::ControlFlow;
 
 use super::World;
 use crate::logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS};
-use crate::orbs::{self, OrbVariants, Orbs};
+use crate::orbs::{self, format_orb_variants, OrbVariants, Orbs};
+use crate::world::graph_ref::EqIgnore;
+use crate::world::GraphRef;
 use itertools::Itertools;
 use log::trace;
 use ordered_float::OrderedFloat;
@@ -37,11 +38,10 @@ pub enum Missing<'graph> {
     EnergyOrBurrowOrBetterEnemyWeapon(OrderedFloat<f32>),
     // TODO if we don't make this type recursive but rather return lists of missing where needed we could try using smallvec
     Any(Vec<Missing<'graph>>),
-    // Or(
-    //     Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
-    //     EqIgnore<OrbVariants>,
-    // ),
-    Or(Vec<Missing<'graph>>, PhantomData<&'graph ()>),
+    Or(
+        Vec<(Missing<'graph>, GraphRef<'graph, Requirement>)>,
+        EqIgnore<OrbVariants>,
+    ),
 }
 
 impl Missing<'_> {
@@ -129,11 +129,14 @@ impl Display for Missing<'_> {
                 write!(f, "EnergyOrBurrowOrBetterEnemyWeapon*{amount}")
             }
             Missing::Any(any) => any.iter().format(" or ").fmt(f),
-            Missing::Or(ors, _) => ors
-                .iter()
-                // .map(|(missing, _)| missing)
-                .format(" or ")
-                .fmt(f),
+            Missing::Or(ors, orbs) => write!(
+                f,
+                "{ors} [{orbs}]",
+                ors = ors.iter().format_with(" or ", |(missing, requirement), f| {
+                    f(&format_args!("{missing} -> {}", requirement.0))
+                }),
+                orbs = format_orb_variants(&orbs.0)
+            ),
         }
     }
 }
@@ -355,8 +358,7 @@ impl<'graph> World<'graph, '_> {
                             }
                         }
                         ControlFlow::Break(or_missing) => {
-                            // missing.push((or_missing, GraphRef(or)));
-                            missing.push(or_missing);
+                            missing.push((or_missing, GraphRef(or)));
                         }
                     }
                 }
@@ -364,8 +366,7 @@ impl<'graph> World<'graph, '_> {
                 if cheapest.is_empty() {
                     // TODO can we avoid cloning orb variants, for example by checking
                     // if the orbs are maxed?
-                    // ControlFlow::Break(Missing::Or(missing, EqIgnore(orb_variants.clone())))
-                    ControlFlow::Break(Missing::Or(missing, PhantomData))
+                    ControlFlow::Break(Missing::Or(missing, EqIgnore(orb_variants.clone())))
                 } else {
                     *orb_variants = cheapest;
                     ControlFlow::Continue(())
