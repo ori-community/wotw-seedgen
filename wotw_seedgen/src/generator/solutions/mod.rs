@@ -1,39 +1,4 @@
-//! # Progression notes
-//!
-//! ## Abandoned progressions
-//!
-//! In v4, progression will always get you to a new anchor, even if it required solving multiple requirements.
-//! Currently, a progression only solves a single unsolved requirement. This may unlock nothing and the
-//! next progression may continue elsewhere, which is a major reason the seed quality has become worse.
-//! However, the same quality problem has already existed before in cases where reaching a new anchor
-//! does not unlock any new locations.
-//!
-//! One idea could be to "lock on" a certain connection and ensure consecutive progressions continue
-//! on this same and even sequential connections until new locations are reached. BTW rename pickup -> location?
-//! Implementing this would mean we can keep looking at single requirements as progressions and
-//! simultaneously improve seed quality in the case of anchor progressions with no locations attached.
-//!
-//! ## Shards
-//!
-//! Then, there's the whole complexity around shards. Something like Life Pact has yet to be represented.
-//! Maybe we can reasonably use a similar idea of splitting into smaller progressions. Life Pact could have
-//! a weighted chance to be picked as orb progression, and with Life Pact available health modifying items
-//! could start to be picked from the item pool. We just have to make sure that we remain commited to picking
-//! items from the pool relevant to this progression until we get somewhere. A general problem will be that
-//! we can't necessarily predict whether the item pool even supports our planned form of progression,
-//! so we might need some rollback, but we already have snapshots for that. We're losing the neat lineup
-//! of progressions we can reason about upfront, but that probably doesn't hurt seed quality?
-//!
-//! ## Launch Fragments
-//!
-//! Finally, there's Launch Fragments. v4 didn't really have a solution for this, but it did flush UberState
-//! items from the pool in case of a progression dead end. We can't really do that anymore because now all
-//! logically relevant items are "UberState items". Maybe we could flush all items setting custom states.
-//! But ideally seedgen would figure out the relation of launch fragments to launch and then present
-//! launch fragments as an option when trying to obtain launch as progress. That's a notable shift in
-//! how seeds are shaped though, since in v4 launch fragments never being forced progression contributes
-//! to their function as almost entirely removing launch for players doing starved routing while
-//! keeping it for collection happy players.
+// TODO avoid running into dead-ends with launch fragments?
 
 // TODO Adding the specific requirement to `ConnectionIndex` does remove a lot of dead paths, but it also creates a lot more
 // unique ConnectionIndexes that don't get swallowed in the hashsets. We might need to figure out some other things before
@@ -397,9 +362,6 @@ struct PartialSolution<'graph> {
     remaining_items: FxHashSet<usize>,
     /// Amount of spirit light used so far
     spirit_light: i32,
-    // /// Clones of other branches that are solving the same connection,
-    // /// can be used to filter redundancies even between unfinished solutions.
-    // other_branches: Vec<MinimalSolution>,
     /// Connections that have already been branched into from a common ancestor,
     /// can be used to avoid entering redundant search paths.
     new_fails: ReachStateFails<'graph>,
@@ -421,7 +383,6 @@ impl<'graph> PartialSolution<'graph> {
             used_items: SmallVec::new(),
             remaining_items: (0..item_pool.len()).collect(),
             spirit_light: 0,
-            // other_branches: vec![],
             new_fails: ReachStateFails::default(),
             commitments: Commitments::default(),
             search_radius: search_radius.unwrap_or(*MAX_SEARCH_RADIUS),
@@ -446,7 +407,6 @@ impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
 // TODO bitflags?
 #[derive(Debug, Clone, Default)]
 struct Commitments {
-    // skip_energy_branches: bool,
     better_weapon: bool,
     burrow_as_weapon: bool,
     energy_shard: bool,
@@ -486,35 +446,6 @@ impl Commitments {
     }
 }
 
-// #[derive(Debug, Clone)]
-// struct MinimalSolution {
-//     items: SolutionItems,
-//     spirit_light: i32,
-// }
-
-// impl SolutionLike for MinimalSolution {
-//     fn items(&self) -> &SolutionItems {
-//         &self.items
-//     }
-
-//     fn spirit_light(&self) -> i32 {
-//         self.spirit_light
-//     }
-
-//     fn connection(&self) -> Option<ConnectionIndex> {
-//         None
-//     }
-// }
-
-// impl MinimalSolution {
-//     fn new(solution: &PartialSolution) -> Self {
-//         Self {
-//             items: solution.used_items.clone(),
-//             spirit_light: solution.spirit_light,
-//         }
-//     }
-// }
-
 struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
     world: &'world mut World<'graph, 'settings>,
     events: &'events [Event],
@@ -539,9 +470,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         slots: usize,
         spirit_light_slots: usize,
     ) -> Self {
-        // TODO investigate perf impact, seems to be positive in moki and negative in gorlek - we do have the settings...
-        // world.clean_fails();
-
         let initial_pickup_count = world.reached_pickup_count();
         let initial_fails = ReachStateFails {
             logical_state: FxHashMap::default(),
@@ -723,8 +651,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
         trace!("continuing solution {}", self.display_solution(&solution));
 
-        // solution.other_branches.clear();
-
         let mut new_solutions =
             self.new_fails(&mut solution)
                 .into_iter()
@@ -755,7 +681,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
         let fails = self.world.fails();
 
-        // TODO other fails?
         for (current_uber_identifier, current_connections) in &fails.uber_state {
             let current_connections_iter = current_connections.iter();
 
@@ -829,7 +754,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     }
 
     fn pause_solution(&mut self, solution: PartialSolution<'graph>) {
-        // TODO we shouldn't pause if the solution is already finished - but can we know if it's finished if it's not currently simulated?
         trace!("pausing solution {}", self.display_solution(&solution));
 
         self.solutions.push_back(solution);
@@ -868,7 +792,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             Missing::EnergyOrBurrowOrBetterEnemyWeapon(amount) => {
                 self.solve_energy_or_burrow_or_better_enemy_weapon(solution, amount, simulate)
             }
-            Missing::Any(any) => self.solve_any(solution, any, simulate),
+            Missing::Any(any) => self.solve_branches(solution, any, simulate, Self::solve),
             Missing::Or(ors, orb_variants) => self.solve_or(solution, ors, orb_variants, simulate),
         }
     }
@@ -952,15 +876,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                             // This will iteratively create a tree where energy is solved stepwise and health directly jumps to the leaves,
                             // which is ideal. We can use solve_boolean for a single step since the UberState type doesn't actually matter.
                             this.solve_boolean(solution, UberIdentifier::MAX_ENERGY, simulate)
-                            // TODO remove if not needed
-                            // this.solve_orb_tree(
-                            //     solution,
-                            //     simulate,
-                            //     |this, solution, simulate| this.solve_health(solution, 1, simulate),
-                            //     |this, solution, simulate| {
-                            //         this.solve_max_energy(solution, amount, simulate)
-                            //     },
-                            // )
                         } else if solution.commitments.commit_life_pact() {
                             this.solve_max_energy(solution, amount, simulate)
                         } else {
@@ -1034,41 +949,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         self.solve_boolean(solution, shard.uber_identifier(), simulate)
     }
-
-    // fn solve_orb_tree<H, E>(
-    //     &mut self,
-    //     solution: PartialSolution<'graph>,
-    //     simulate: bool,
-    //     solve_health: H,
-    //     solve_energy: E,
-    // ) -> ControlFlow<(), PartialSolution<'graph>>
-    // where
-    //     H: FnOnce(
-    //         &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
-    //         PartialSolution<'graph>,
-    //         bool,
-    //     ) -> ControlFlow<(), PartialSolution<'graph>>,
-    //     E: FnOnce(
-    //         &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
-    //         PartialSolution<'graph>,
-    //         bool,
-    //     ) -> ControlFlow<(), PartialSolution<'graph>>,
-    // {
-    //     if solution.commitments.skip_energy_branches {
-    //         solve_health(self, solution, simulate)
-    //     } else {
-    //         self.solve_simple_branch(
-    //             solution,
-    //             simulate,
-    //             |this, mut solution, simulate| {
-    //                 // Unlike other commitments, only one branch should commit in this case to keep building a tree
-    //                 solution.commitments.skip_energy_branches = true;
-    //                 solve_health(this, solution, simulate)
-    //             },
-    //             solve_energy,
-    //         )
-    //     }
-    // }
 
     fn solve_simple_branch<L, R>(
         &mut self,
@@ -1437,37 +1317,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         }
     }
 
-    fn solve_any(
-        &mut self,
-        solution: PartialSolution<'graph>,
-        any: Vec<Missing<'graph>>,
-        simulate: bool,
-    ) -> ControlFlow<(), PartialSolution<'graph>> {
-        // TODO is this irrelevant now?
-        // // TODO make these unique earlier in the program logic?
-        // // here they have to be unique so identical branches don't eliminate eachother
-        // // although, if different missings resolve to the same item pool item, could an issue still arise?
-        // // TODO also optimize the graph more so we get fewer duplicates here to begin with
-        // fn unique_missing<'graph>(
-        //     any: Vec<Missing<'graph>>,
-        //     unique: &mut IndexSet<Missing<'graph>, FxBuildHasher>,
-        // ) {
-        //     for missing in any {
-        //         match missing {
-        //             Missing::Any(any) => unique_missing(any, unique),
-        //             single => {
-        //                 unique.insert(single);
-        //             }
-        //         }
-        //     }
-        // }
-
-        // let mut unique = IndexSet::with_capacity_and_hasher(any.len(), FxBuildHasher);
-        // unique_missing(any, &mut unique);
-
-        self.solve_branches(solution, any, simulate, Self::solve)
-    }
-
     fn solve_or(
         &mut self,
         mut solution: PartialSolution<'graph>,
@@ -1515,7 +1364,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
     {
-        // let start = self.solutions.len();
         let mut branches = branches.into_iter();
 
         let Some(next_solution) = branches.find_map(|branch| {
@@ -1530,25 +1378,6 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                 self.pause_solution(solution);
             }
         }
-
-        // let branch_range = start..self.solutions.len();
-
-        // let mut other_branches = Vec::with_capacity(branch_range.len() + 1);
-        // other_branches.extend(
-        //     self.solutions[branch_range.clone()]
-        //         .iter()
-        //         .map(MinimalSolution::new),
-        // );
-        // other_branches.push(MinimalSolution::new(&next_solution));
-
-        // for index in branch_range {
-        //     let mut other_branches = other_branches.clone();
-        //     other_branches.swap_remove(index - start);
-
-        //     self.solutions[index].other_branches.extend(other_branches);
-        // }
-        // other_branches.pop();
-        // next_solution.other_branches = other_branches;
 
         ControlFlow::Continue(next_solution)
     }
@@ -1573,13 +1402,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     fn check_redundancy(&self, solution: &PartialSolution) -> ControlFlow<()> {
         if self.finished.iter().any(|finished| {
             trace_is_redundant_with(solution, finished, self.world.graph, self.item_pool)
-        })
-        // TODO this still eliminates DoubleJump, Grapple when spawning on Feeding Grounds TP
-        // || solution
-        // .other_branches
-        // .iter()
-        // .any(|other| trace_is_redundant_with(solution, other, self.world.graph, self.item_pool))
-        {
+        }) {
             ControlFlow::Break(())
         } else {
             ControlFlow::Continue(())

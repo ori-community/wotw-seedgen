@@ -323,24 +323,6 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    // /// Clean any stale fails
-    // pub(crate) fn clean_fails(&mut self) {
-    //     // TODO other fails?
-    //     for connections in self.reach.state.value.uber_state_fails.values_mut() {
-    //         connections.retain(
-    //             |connection| match connection.index_graph(self.graph).connection {
-    //                 ConnectionRefValue::Refill(_) => true,
-    //                 ConnectionRefValue::Connection(connection) => !self
-    //                     .reach
-    //                     .state
-    //                     .value
-    //                     .best_orbs
-    //                     .contains_key(&connection.to),
-    //             },
-    //         );
-    //     }
-    // }
-
     fn attempt_spawn_teleport(&mut self, events: &[Event]) {
         let reached_anchors = self
             .reach
