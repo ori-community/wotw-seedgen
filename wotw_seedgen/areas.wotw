@@ -14358,6 +14358,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Water, WaterBreath, Bash, DoubleJump OR Dash OR Launch
     gorlek:
       Water, WaterDash
+      # TODO non-WaterBreath path for the second moki path?
       Water, Combat=SpinCrab, Bash OR Damage=3
     kii:
       Water, Bash
@@ -16736,6 +16737,7 @@ anchor OpherShop:  # Opher's offers
   pickup OpherShop.ChargeBlaze:
     moki: SpiritLight=1200
   pickup OpherShop.WaterBreath:
+    # TODO this is snippet dependent though
     moki: InnerWellspring.WaterEscape, SpiritLight=1200
 
 anchor TuleyShop at -173, -4139:

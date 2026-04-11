@@ -1,8 +1,5 @@
-use std::sync::Once;
-
 use crate::generate_seed;
 
-use env_logger::Env;
 use log::info;
 use wotw_seedgen_data::{
     assets::{
@@ -10,19 +7,8 @@ use wotw_seedgen_data::{
         WorldPresetSettings, TEST_ASSETS,
     },
     logic_language::{ast::Areas, output::Graph},
-    Difficulty, UniverseSettings,
+    test_logger, Difficulty, UniverseSettings,
 };
-
-static LOGGER_INITIALIZED: Once = Once::new();
-
-pub fn test_logger() {
-    LOGGER_INITIALIZED.call_once(|| {
-        env_logger::Builder::from_env(Env::default().default_filter_or("debug"))
-            .format_timestamp(None)
-            .is_test(true)
-            .init();
-    });
-}
 
 #[test]
 fn some_seeds() {
@@ -68,10 +54,8 @@ fn some_seeds() {
     generate_test_seed(&graph, &universe_settings);
 
     universe_settings.world_settings[0].snippets.extend([
-        "bingo".to_string(),
         "glades_done".to_string(),
         "launch_fragments".to_string(),
-        "launch_from_bingo".to_string(),
         "no_combat".to_string(),
         "no_ks_doors".to_string(),
         "no_quests".to_string(),

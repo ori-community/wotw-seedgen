@@ -9,11 +9,11 @@ mod postprocess;
 
 pub use command::{
     AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
-    CommandZone,
+    CommandZone, IntoConstant,
 };
 pub use contained_uber_identifiers::{
     CommonItem, CommonUberStateWrite, CommonWriteCommand, ContainedReads, ContainedWrites,
-    UberStateWrite, UberStateWriteGeneric, WriteCommand,
+    UberStateWrite, UberStateWriteGeneric, UberStateWriteOwned, WriteCommand, WriteCommandOwned,
 };
 pub use event::{ClientEvent, Event, Trigger};
 pub use intermediate::{Constant, Literal};

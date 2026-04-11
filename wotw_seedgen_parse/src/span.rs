@@ -1,5 +1,5 @@
 use crate::{Ast, ErrorMode, Parser, Tokenize};
-use std::{cell::LazyCell, ops::Range};
+use std::{cell::LazyCell, ops::Range, option};
 
 /// Trait responsible for providing spans on successfully parsed Ast nodes in the form of [`Range<usize>`]
 ///
@@ -318,5 +318,35 @@ where
 {
     fn ast_impl<E: ErrorMode>(parser: &mut Parser<'source, T>) -> Option<Self> {
         Some(V::ast_no_errors_spanned(parser))
+    }
+}
+
+impl<T> IntoIterator for SpannedOption<T> {
+    type Item = T;
+
+    type IntoIter = option::IntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.into_option().into_iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a SpannedOption<T> {
+    type Item = &'a T;
+
+    type IntoIter = option::IntoIter<&'a T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_option().into_iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut SpannedOption<T> {
+    type Item = &'a mut T;
+
+    type IntoIter = option::IntoIter<&'a mut T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_option_mut().into_iter()
     }
 }

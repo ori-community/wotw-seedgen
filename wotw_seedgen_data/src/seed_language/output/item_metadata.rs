@@ -1,7 +1,8 @@
 use crate::{
     seed_language::{
         output::{
-            CommandInteger, CommandString, CommandVoid, ContainedWrites, Event, StringOrPlaceholder,
+            display::strip_control_characters, CommandInteger, CommandString, CommandVoid,
+            ContainedWrites, Event, StringOrPlaceholder,
         },
         simulate::{Simulate, Simulation},
     },
@@ -10,6 +11,8 @@ use crate::{
 use rand::{distributions::Uniform, prelude::Distribution, seq::SliceRandom};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
+
+// TODO fewer string allocations?
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ItemMetadata(pub(crate) FxHashMap<CommandVoid, ItemMetadataEntry>);
@@ -45,11 +48,11 @@ impl ItemMetadataRef<'_, '_> {
     pub fn force_name(&self) -> CommandString {
         self.name()
             .map(CommandString::from)
-            .or_else(|| self.command.find_message().cloned())
+            .or_else(|| self.command.contained_messages().next().cloned())
             .unwrap_or_else(|| self.command.to_string().into())
     }
 
-    /// Force some kind of name for the item that can be used in a log
+    /// Force some kind of name for the item that can be used in a log.
     ///
     /// Similar to [`Self::force_name`], but simulates the result to get a `String`
     /// and removes characters that wouldn't be rendered in an in-game message
@@ -143,6 +146,7 @@ impl ItemMetadataRef<'_, '_> {
     }
 }
 
+// TODO cache computed metadata
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub(crate) struct ItemMetadataEntry {
     pub name: Option<StringOrPlaceholder>, // TODO why not commandstring
@@ -192,45 +196,3 @@ const SHOP_DESCRIPTIONS: [&str; 38] = [
     "This one's good luck",
     "Better than a bowl of Marshclam Soup",
 ];
-
-// TODO why not in place?
-fn strip_control_characters(s: &str) -> String {
-    let mut result = String::new();
-    let mut last_end = 0;
-    let mut in_tag = false;
-
-    for (index, byte) in s.as_bytes().iter().enumerate() {
-        match (in_tag, byte) {
-            (_, b'@' | b'#' | b'$' | b'*') => {
-                result.push_str(&s[last_end..index]);
-                last_end = index + 1;
-            }
-            (false, b'<') => {
-                result.push_str(&s[last_end..index]);
-                in_tag = true;
-            }
-            (true, b'>') => {
-                last_end = index + 1;
-                in_tag = false;
-            }
-            _ => {}
-        }
-    }
-    result.push_str(&s[last_end..]);
-
-    result
-}
-
-#[cfg(test)]
-mod tests {
-    use super::strip_control_characters as strip;
-
-    #[test]
-    fn strip_control_characters() {
-        assert_eq!(strip(""), "");
-        assert_eq!(strip("aaa"), "aaa");
-        assert_eq!(strip("@#$"), "");
-        assert_eq!(strip("@@@a@a@@a@"), "aaa");
-        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
-    }
-}

@@ -4,7 +4,7 @@ mod contained_writes;
 pub use contained_reads::ContainedReads;
 pub use contained_writes::{
     CommonItem, CommonUberStateWrite, CommonWriteCommand, ContainedWrites, UberStateWrite,
-    UberStateWriteGeneric, WriteCommand,
+    UberStateWriteGeneric, UberStateWriteOwned, WriteCommand, WriteCommandOwned,
 };
 
 use std::iter;

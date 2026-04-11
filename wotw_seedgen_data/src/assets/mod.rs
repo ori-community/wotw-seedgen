@@ -23,5 +23,7 @@ pub use file_access::{
     DefaultFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
     WatcherError, EXECUTABLE_DIR, LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
 };
+#[cfg(any(test, feature = "test_helpers"))]
 mod test_access;
+#[cfg(any(test, feature = "test_helpers"))]
 pub use test_access::{TestAccess, TEST_ASSETS};

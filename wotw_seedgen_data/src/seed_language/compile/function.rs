@@ -8,7 +8,7 @@ use crate::{
         output::{
             ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
             CommandString, CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator,
-            Operation,
+            IntoConstant, Operation,
         },
     },
     Alignment, HorizontalAnchor, ScreenPosition, Shard, ShopKind, Skill, Teleporter,
@@ -157,9 +157,9 @@ fn boxed_arg<T: CompileInto>(context: &mut ArgContext) -> Option<Box<T>> {
 fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usize>)> {
     let (arg, span) = spanned_arg::<CommandString>(context)?;
 
-    match arg.as_constant() {
-        Some(value) => Some((value.clone(), span)),
-        _ => {
+    match arg.into_constant() {
+        Ok(value) => Some((value, span)),
+        Err(_) => {
             context.compiler.errors.push(Error::error(
                 "Only literals are allowed in this position".to_string(),
                 span,
@@ -650,9 +650,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::ToInteger => {
                 let float = arg::<CommandFloat>(&mut context)?;
 
-                let command = match float.as_constant() {
-                    Some(value) => (value.round() as i32).into(),
-                    None => CommandInteger::FromFloat {
+                let command = match float.into_constant() {
+                    Ok(value) => (value.round() as i32).into(),
+                    Err(float) => CommandInteger::FromFloat {
                         float: Box::new(float),
                     },
                 };
@@ -668,9 +668,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::ToFloat => {
                 let integer = arg::<CommandInteger>(&mut context)?;
 
-                let command = match integer.as_constant() {
-                    Some(value) => (*value as f32).into(),
-                    _ => CommandFloat::FromInteger {
+                let command = match integer.into_constant() {
+                    Ok(value) => (value as f32).into(),
+                    Err(integer) => CommandFloat::FromInteger {
                         integer: Box::new(integer),
                     },
                 };
@@ -684,21 +684,21 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 let (arg, span) = spanned_arg(&mut context)?;
 
                 let command = match arg {
-                    Command::Boolean(command) => match command.as_constant() {
-                        Some(value) => value.to_string().into(),
-                        None => CommandString::FromBoolean {
+                    Command::Boolean(command) => match command.into_constant() {
+                        Ok(value) => value.to_string().into(),
+                        Err(command) => CommandString::FromBoolean {
                             boolean: Box::new(command),
                         },
                     },
-                    Command::Integer(command) => match command.as_constant() {
-                        Some(value) => value.to_string().into(),
-                        None => CommandString::FromInteger {
+                    Command::Integer(command) => match command.into_constant() {
+                        Ok(value) => value.to_string().into(),
+                        Err(command) => CommandString::FromInteger {
                             integer: Box::new(command),
                         },
                     },
-                    Command::Float(command) => match command.as_constant() {
-                        Some(value) => value.to_string().into(),
-                        None => CommandString::FromFloat {
+                    Command::Float(command) => match command.into_constant() {
+                        Ok(value) => value.to_string().into(),
+                        Err(command) => CommandString::FromFloat {
                             float: Box::new(command),
                         },
                     },
@@ -777,11 +777,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveSpiritLight => {
                 let amount = arg::<CommandInteger>(&mut context)?;
 
-                let negative = match amount.as_constant() {
-                    Some(value) => (-value).into(),
-                    None => CommandInteger::Arithmetic {
+                let string = spirit_light_string(amount.clone(), &mut context.compiler.rng, true);
+
+                let negative = match amount.into_constant() {
+                    Ok(value) => (-value).into(),
+                    Err(amount) => CommandInteger::Arithmetic {
                         operation: Box::new(Operation {
-                            left: amount.clone(),
+                            left: amount,
                             operator: ArithmeticOperator::Multiply,
                             right: (-1).into(),
                         }),
@@ -790,7 +792,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
 
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
-                        item_message(spirit_light_string(amount, &mut context.compiler.rng, true)),
+                        item_message(string),
                         super::add_integer(UberIdentifier::SPIRIT_LIGHT, negative),
                     ],
                 })
@@ -1421,9 +1423,9 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
         last: Box::new(if remove {
             CommandString::Concatenate {
                 operation: Box::new(Operation {
-                    left: match amount.as_constant() {
-                        Some(value) => format!("@Remove {value} ").into(),
-                        None => CommandString::Concatenate {
+                    left: match amount.into_constant() {
+                        Ok(value) => format!("@Remove {value} ").into(),
+                        Err(amount) => CommandString::Concatenate {
                             operation: Box::new(Operation {
                                 left: "@Remove ".into(),
                                 operator: Concatenator::Concat,
@@ -1452,9 +1454,9 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
         } else {
             CommandString::Concatenate {
                 operation: Box::new(Operation {
-                    left: match amount.as_constant() {
-                        Some(value) => format!("{value} ").into(),
-                        None => CommandString::Concatenate {
+                    left: match amount.into_constant() {
+                        Ok(value) => format!("{value} ").into(),
+                        Err(amount) => CommandString::Concatenate {
                             operation: Box::new(Operation {
                                 left: CommandString::FromInteger {
                                     integer: Box::new(amount),
@@ -1474,11 +1476,10 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
 
 fn set_random_spirit_light_string(amount: &CommandInteger, rng: &mut Pcg64Mcg) -> Box<CommandVoid> {
     let name = SPIRIT_LIGHT_NAMES.choose(rng).unwrap();
-    let constant_singular = amount.as_constant().map(|amount| matches!(amount, 1 | -1));
 
-    match constant_singular {
-        Some(true) => set_spirit_light_string(name.0),
-        Some(false) => set_spirit_light_string(name.1),
+    match amount.as_constant() {
+        Some(1 | -1) => set_spirit_light_string(name.0),
+        Some(_) => set_spirit_light_string(name.1),
         None => Box::new(CommandVoid::Multi {
             commands: vec![
                 CommandVoid::SetBoolean {

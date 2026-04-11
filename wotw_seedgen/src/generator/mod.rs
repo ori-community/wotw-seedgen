@@ -3,17 +3,19 @@ pub mod item_pool;
 pub mod spoiler;
 
 mod placement;
+mod solutions;
 mod spirit_light;
-mod weight;
 
 use self::spoiler::SeedSpoiler;
-use crate::{generator::placement::generate_placements, logical_difficulty, world::World};
+use crate::{
+    generator::placement::generate_placements, logical_difficulty::LogicalDifficulty, world::World,
+};
 use log::{info, trace, warn};
 use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
-use wotw_seedgen_data::seed_language::output::{CommandFloat, CommandVoid};
+use wotw_seedgen_data::seed_language::output::CommandVoid;
 use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
@@ -118,12 +120,8 @@ pub fn generate_seed<F: SnippetAccess>(
                                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                                 command: CommandVoid::CreateWarpIcon {
                                     id: 0,
-                                    x: CommandFloat::Constant {
-                                        value: spawn_position.x,
-                                    },
-                                    y: CommandFloat::Constant {
-                                        value: spawn_position.y,
-                                    },
+                                    x: spawn_position.x.into(),
+                                    y: spawn_position.y.into(),
                                 },
                             })
                         }
@@ -185,7 +183,7 @@ fn choose_spawn(
 ) -> Result<usize, String> {
     let spawn = match &world_settings.spawn {
         Spawn::Random => {
-            let spawns = logical_difficulty::spawn_locations(world_settings.difficulty);
+            let spawns = world_settings.difficulty.spawn_locations();
 
             graph
                 .nodes

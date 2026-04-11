@@ -7,7 +7,7 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::Event,
-        simulate::{Simulation, Variables},
+        simulate::{Simulation, Snapshot, Variables},
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -60,6 +60,7 @@ struct Cache {
     shard_slots: i32,
     base_max_health: f32,
     base_max_energy: f32,
+    // TODO try out arrays with ids as indices?
     skills: FxHashSet<Skill>,
     shards: FxHashSet<Shard>,
     teleporters: FxHashSet<Teleporter>,
@@ -151,17 +152,6 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
 
     fn variables_mut(&mut self) -> &mut Variables {
         self.simulation.variables_mut()
-    }
-
-    // TODO return a struct to check it doesn't get dropped unrestored
-    fn snapshot(&mut self) {
-        self.snapshot = Some(self.cache.clone());
-        self.simulation.snapshot();
-    }
-
-    fn restore_snapshot(&mut self) {
-        self.cache = self.snapshot.take().unwrap();
-        self.simulation.restore_snapshot();
     }
 
     fn store_spirit_light(&mut self, value: i32, events: &[Event]) {
@@ -329,6 +319,18 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
 
     fn weapon_upgrades(&self) -> impl Iterator<Item = WeaponUpgrade> + '_ {
         self.cache.weapon_upgrades.iter().copied()
+    }
+}
+
+impl<S: Snapshot> Snapshot for SimulationCache<S> {
+    fn snapshot(&mut self) {
+        self.snapshot = Some(self.cache.clone());
+        self.simulation.snapshot();
+    }
+
+    fn restore_snapshot(&mut self) {
+        self.cache = self.snapshot.take().unwrap();
+        self.simulation.restore_snapshot();
     }
 }
 

@@ -2,7 +2,10 @@
 
 use crate::{
     assets::{self, UberStateData, UberStateValue},
-    seed_language::output::{ContainedReads, Trigger},
+    seed_language::{
+        output::{ContainedReads, Trigger},
+        simulate::Snapshot,
+    },
     UberIdentifier,
 };
 use log::warn;
@@ -29,6 +32,7 @@ impl UberStates {
                 .id_lookup
                 .iter()
                 .map(|(uber_identifier, data)| {
+                    // TODO these are equivalent types?
                     let value = match data.default_value {
                         assets::UberStateValue::Boolean(value) => UberStateValue::Boolean(value),
                         assets::UberStateValue::Integer(value) => UberStateValue::Integer(value),
@@ -50,16 +54,6 @@ impl UberStates {
                 triggers: Default::default(),
             },
             snapshot: None,
-        }
-    }
-
-    pub(crate) fn snapshot(&mut self) {
-        self.snapshot = Some(FxHashMap::default());
-    }
-
-    pub(crate) fn restore_snapshot(&mut self) {
-        for (uber_identifier, value) in self.snapshot.take().unwrap() {
-            self.states.get_mut(&uber_identifier).unwrap().value = value;
         }
     }
 
@@ -111,6 +105,18 @@ impl UberStates {
                 self.fallback.value
             }
             Some(entry) => entry.value,
+        }
+    }
+}
+
+impl Snapshot for UberStates {
+    fn snapshot(&mut self) {
+        self.snapshot = Some(FxHashMap::default());
+    }
+
+    fn restore_snapshot(&mut self) {
+        for (uber_identifier, value) in self.snapshot.take().unwrap() {
+            self.states.get_mut(&uber_identifier).unwrap().value = value;
         }
     }
 }

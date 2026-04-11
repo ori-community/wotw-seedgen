@@ -139,6 +139,24 @@ impl UberStateValue {
     }
 }
 
+impl From<bool> for UberStateValue {
+    fn from(value: bool) -> Self {
+        Self::Boolean(value)
+    }
+}
+
+impl From<i32> for UberStateValue {
+    fn from(value: i32) -> Self {
+        Self::Integer(value)
+    }
+}
+
+impl From<f32> for UberStateValue {
+    fn from(value: f32) -> Self {
+        Self::Float(value)
+    }
+}
+
 impl PartialEq<bool> for UberStateValue {
     fn eq(&self, other: &bool) -> bool {
         self.as_boolean() == *other

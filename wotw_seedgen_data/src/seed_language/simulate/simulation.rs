@@ -1,9 +1,8 @@
 use crate::{
     assets::UberStateValue,
     seed_language::{
-        compile::{add_float, add_integer, store_boolean, store_float, store_integer},
         output::Event,
-        simulate::{Simulate, Variables},
+        simulate::{set_uber_state, Simulate, Variables},
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -25,11 +24,6 @@ pub trait Simulation: Sized {
     fn variables(&self) -> &Variables;
 
     fn variables_mut(&mut self) -> &mut Variables;
-
-    // TODO return a struct to check it doesn't get dropped unrestored
-    fn snapshot(&mut self);
-
-    fn restore_snapshot(&mut self);
 
     #[inline]
     fn fetch_boolean(&self, uber_identifier: UberIdentifier) -> bool {
@@ -53,27 +47,50 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn store_boolean(&mut self, uber_identifier: UberIdentifier, value: bool, events: &[Event]) {
-        store_boolean(uber_identifier, value).simulate(self, events);
+        set_uber_state(self, events, uber_identifier, value.into(), true);
     }
 
     #[inline]
     fn store_integer(&mut self, uber_identifier: UberIdentifier, value: i32, events: &[Event]) {
-        store_integer(uber_identifier, value).simulate(self, events);
+        set_uber_state(self, events, uber_identifier, value.into(), true);
     }
 
     #[inline]
     fn add_integer(&mut self, uber_identifier: UberIdentifier, add: i32, events: &[Event]) {
-        add_integer(uber_identifier, add).simulate(self, events);
+        self.store_integer(
+            uber_identifier,
+            self.fetch_integer(uber_identifier) + add,
+            events,
+        );
     }
 
     #[inline]
     fn store_float(&mut self, uber_identifier: UberIdentifier, value: f32, events: &[Event]) {
-        store_float(uber_identifier, value).simulate(self, events);
+        set_uber_state(self, events, uber_identifier, value.into(), true);
     }
 
     #[inline]
-    fn add_float(&mut self, uber_identifier: UberIdentifier, value: f32, events: &[Event]) {
-        add_float(uber_identifier, value).simulate(self, events);
+    fn add_float(&mut self, uber_identifier: UberIdentifier, add: f32, events: &[Event]) {
+        // add_float(uber_identifier, add).simulate(self, events);
+        self.store_float(
+            uber_identifier,
+            self.fetch_float(uber_identifier) + add,
+            events,
+        );
+    }
+
+    #[inline]
+    fn loc_data_condition_met(&self, uber_identifier: UberIdentifier, value: Option<i32>) -> bool {
+        match value {
+            None => self.fetch_boolean(uber_identifier),
+            Some(value) => self.fetch_integer(uber_identifier) >= value,
+        }
+    }
+
+    // TODO less hardcoded solution? Doors are not allowed to change anyway, they just have to be set at the start
+    #[inline]
+    fn door_condition_met(&self, uber_identifier: UberIdentifier, value: i32) -> bool {
+        self.fetch_integer(uber_identifier) == value
     }
 
     #[inline]
@@ -201,10 +218,10 @@ pub trait Simulation: Sized {
     ///
     /// ```
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
-    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
+    /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// let world_state = WorldState::new(uber_states);
     /// assert_eq!(world_state.max_health(), 30.0);
     /// ```
@@ -226,10 +243,10 @@ pub trait Simulation: Sized {
     ///
     /// ```
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TestAccess};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
-    /// # let uber_states = UberStates::new(&TestAccess.uber_state_data(&LocData::default(), &StateData::default()).unwrap());
+    /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// let world_state = WorldState::new(uber_states);
     /// assert_eq!(world_state.max_energy(), 3.0);
     /// ```
@@ -243,6 +260,7 @@ pub trait Simulation: Sized {
         self.fetch(skill.uber_identifier()).expect_boolean()
     }
 
+    // TODO support spawning with reduced shard slots?
     #[inline]
     fn shard(&self, shard: Shard) -> bool {
         self.fetch(shard.uber_identifier()).expect_boolean()

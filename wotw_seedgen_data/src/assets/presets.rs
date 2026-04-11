@@ -2,7 +2,7 @@ use crate::{Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSetti
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
-use std::iter;
+use std::{cmp::Ordering, iter};
 use utoipa::ToSchema;
 
 /// The current version number for the assets directory.
@@ -12,7 +12,9 @@ pub const CURRENT_ASSETS_VERSION: u8 = 1;
 
 /// Information for the user about a [`UniversePreset`] or [`WorldPreset`]
 #[skip_serializing_none]
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PresetInfo {
     /// Display name
@@ -24,12 +26,21 @@ pub struct PresetInfo {
 }
 
 /// Special groups to display a preset in
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, ToSchema)]
 pub enum PresetGroup {
     /// Generally, only one base preset will be used at a time.
     ///
     /// The most common form of base presets are the difficulty presets, such as "Moki" and "Gorlek"
     Base,
+}
+
+impl PresetInfo {
+    pub fn is_base_preset(&self) -> bool {
+        self.group.as_ref().map_or(false, |group| {
+            let PresetGroup::Base = group;
+            true
+        })
+    }
 }
 
 /// A collection of settings that can be applied to existing settings
@@ -97,6 +108,14 @@ impl UniversePreset {
         self._apply(settings, &mut vec![], preset_access)
     }
 
+    pub fn is_base_preset(&self) -> bool {
+        self.info.as_ref().map_or(false, PresetInfo::is_base_preset)
+    }
+
+    pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
+        self.settings.difficulty_cmp(&other.settings)
+    }
+
     fn _apply<A: PresetAccess>(
         self,
         settings: &mut UniverseSettings,
@@ -150,6 +169,23 @@ impl UniversePresetSettings {
         preset_access: &A,
     ) -> Result<(), String> {
         self._apply(settings, &mut vec![], preset_access)
+    }
+
+    pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
+        fn max_difficulty(settings: &UniversePresetSettings) -> Option<&WorldPresetSettings> {
+            settings
+                .world_settings
+                .iter()
+                .flatten()
+                .max_by(|a, b| a.difficulty_cmp(b))
+        }
+
+        match (max_difficulty(self), max_difficulty(other)) {
+            (None, None) => Ordering::Equal,
+            (Some(_), None) => Ordering::Greater,
+            (None, Some(_)) => Ordering::Less,
+            (Some(a), Some(b)) => a.difficulty_cmp(b),
+        }
     }
 
     fn _apply<A: PresetAccess>(
@@ -290,6 +326,14 @@ impl WorldPreset {
         self._apply(settings, &mut vec![], preset_access)
     }
 
+    pub fn is_base_preset(&self) -> bool {
+        self.info.as_ref().map_or(false, PresetInfo::is_base_preset)
+    }
+
+    pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
+        self.settings.difficulty_cmp(&other.settings)
+    }
+
     fn _apply<A: PresetAccess>(
         self,
         settings: &mut WorldSettings,
@@ -352,6 +396,18 @@ impl WorldPresetSettings {
         preset_access: &A,
     ) -> Result<(), String> {
         self._apply(settings, &mut vec![], preset_access)
+    }
+
+    pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
+        self.difficulty
+            .cmp(&other.difficulty)
+            .then_with(|| {
+                self.tricks
+                    .as_ref()
+                    .map(FxHashSet::len)
+                    .cmp(&other.tricks.as_ref().map(FxHashSet::len))
+            })
+            .then_with(|| self.hard.cmp(&other.hard))
     }
 
     fn _apply<A: PresetAccess>(
@@ -474,6 +530,46 @@ pub trait PresetAccess {
 
     /// Return a `Vec` of identifiers which may be passed to [`PresetAccess::world_preset`]
     fn available_world_presets(&self) -> Vec<String>;
+
+    fn universe_base_presets(&self) -> Vec<(String, UniversePreset)> {
+        base_presets(
+            self.available_universe_presets(),
+            |identifier| self.universe_preset(identifier).ok(),
+            UniversePreset::is_base_preset,
+            UniversePreset::difficulty_cmp,
+        )
+    }
+
+    fn world_base_presets(&self) -> Vec<(String, WorldPreset)> {
+        base_presets(
+            self.available_world_presets(),
+            |identifier| self.world_preset(identifier).ok(),
+            WorldPreset::is_base_preset,
+            WorldPreset::difficulty_cmp,
+        )
+    }
+}
+
+fn base_presets<T, R, B, C>(
+    available: Vec<String>,
+    mut read: R,
+    mut is_base: B,
+    mut cmp: C,
+) -> Vec<(String, T)>
+where
+    R: FnMut(&str) -> Option<T>,
+    B: FnMut(&T) -> bool,
+    C: FnMut(&T, &T) -> Ordering,
+{
+    let mut universe_base_presets = available
+        .into_iter()
+        .filter_map(|identifier| read(&identifier).map(|preset| (identifier, preset)))
+        .filter(|(_, preset)| is_base(preset))
+        .collect::<Vec<_>>();
+
+    universe_base_presets.sort_unstable_by(|(_, a), (_, b)| cmp(a, b));
+
+    universe_base_presets
 }
 
 /// [`PresetAccess`] implementation that forbids accessing any presets

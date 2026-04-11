@@ -163,3 +163,33 @@ where
         self.value.span_end()
     }
 }
+
+impl<T, R> IntoIterator for Recoverable<T, R> {
+    type Item = T;
+
+    type IntoIter = <SpannedOption<T> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.value.into_iter()
+    }
+}
+
+impl<'a, T, R> IntoIterator for &'a Recoverable<T, R> {
+    type Item = &'a T;
+
+    type IntoIter = <SpannedOption<&'a T> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        (&self.value).into_iter()
+    }
+}
+
+impl<'a, T, R> IntoIterator for &'a mut Recoverable<T, R> {
+    type Item = &'a mut T;
+
+    type IntoIter = <SpannedOption<&'a mut T> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        (&mut self.value).into_iter()
+    }
+}

@@ -1,11 +1,13 @@
 mod cache;
 mod simulation;
+mod snapshot;
 mod uber_states;
 mod variables;
 mod world_state;
 
 pub use cache::SimulationCache;
 pub use simulation::Simulation;
+pub use snapshot::{CloneSnapshot, Snapshot};
 pub use uber_states::UberStates;
 pub use variables::Variables;
 pub use world_state::WorldState;
@@ -21,7 +23,6 @@ use crate::{
     },
     UberIdentifier, Zone,
 };
-use ordered_float::OrderedFloat;
 
 pub trait Simulate<S: Simulation> {
     type Return;
@@ -114,7 +115,7 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
             CommandBoolean::FetchBoolean { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_boolean()
             }
-            CommandBoolean::GetBoolean { id } => simulation.variables().get_boolean(id),
+            CommandBoolean::GetBoolean { id } => simulation.variables().get_boolean(*id),
             CommandBoolean::IsInBox { .. } => false,
         }
     }
@@ -134,9 +135,9 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
             CommandInteger::FetchInteger { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_integer()
             }
-            CommandInteger::GetInteger { id } => simulation.variables().get_integer(id),
+            CommandInteger::GetInteger { id } => simulation.variables().get_integer(*id),
             CommandInteger::FromFloat { float } => {
-                float.simulate(simulation, events).into_inner().round() as i32
+                float.simulate(simulation, events).round() as i32
             }
             CommandInteger::StringLength { string } => {
                 string.simulate(simulation, events).len() as i32
@@ -146,23 +147,21 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
 }
 
 impl<S: Simulation> Simulate<S> for CommandFloat {
-    type Return = OrderedFloat<f32>;
+    type Return = f32;
 
     fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
         match self {
-            CommandFloat::Constant { value } => *value,
+            CommandFloat::Constant { value } => **value,
             CommandFloat::Multi { commands, last } => {
                 commands.simulate(simulation, events);
                 last.simulate(simulation, events)
             }
             CommandFloat::Arithmetic { operation } => operation.simulate(simulation, events),
             CommandFloat::FetchFloat { uber_identifier } => {
-                simulation.fetch(*uber_identifier).as_float().into()
+                simulation.fetch(*uber_identifier).as_float()
             }
-            CommandFloat::GetFloat { id } => simulation.variables().get_float(id),
-            CommandFloat::FromInteger { integer } => {
-                (integer.simulate(simulation, events) as f32).into()
-            }
+            CommandFloat::GetFloat { id } => simulation.variables().get_float(*id),
+            CommandFloat::FromInteger { integer } => integer.simulate(simulation, events) as f32,
         }
     }
 }
@@ -181,7 +180,7 @@ impl<S: Simulation> Simulate<S> for CommandString {
                 last.simulate(simulation, events)
             }
             CommandString::Concatenate { operation } => operation.simulate(simulation, events),
-            CommandString::GetString { id } => simulation.variables().get_string(id),
+            CommandString::GetString { id } => simulation.variables().get_string(*id),
             CommandString::WorldName { .. } => Default::default(),
             CommandString::FromBoolean { boolean } => {
                 boolean.simulate(simulation, events).to_string()
@@ -225,7 +224,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 value,
                 trigger_events,
             } => {
-                let value = UberStateValue::Boolean(value.simulate(simulation, events));
+                let value = value.simulate(simulation, events).into();
                 set_uber_state(simulation, events, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::StoreInteger {
@@ -233,7 +232,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 value,
                 trigger_events,
             } => {
-                let value = UberStateValue::Integer(value.simulate(simulation, events));
+                let value = value.simulate(simulation, events).into();
                 set_uber_state(simulation, events, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::StoreFloat {
@@ -241,7 +240,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 value,
                 trigger_events,
             } => {
-                let value = UberStateValue::Float(*value.simulate(simulation, events));
+                let value = value.simulate(simulation, events).into();
                 set_uber_state(simulation, events, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::SetBoolean { id, value } => {
@@ -281,7 +280,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::SetMapMessage { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
-            | CommandVoid::Lookup { .. }
+            | CommandVoid::Lookup { .. } // TODO we definitely have to simulate the lookup?
             | CommandVoid::BoxTrigger { .. }
             | CommandVoid::BoxTriggerDestroy { .. }
             | CommandVoid::BoxTriggerEnterCallback { .. }
@@ -318,6 +317,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
     }
 }
 
+// TODO is this better than using functions specialized for the UberState types?
 fn set_uber_state<S: Simulation>(
     simulation: &mut S,
     events: &[Event],
@@ -325,6 +325,10 @@ fn set_uber_state<S: Simulation>(
     value: UberStateValue,
     trigger_events: bool,
 ) {
+    if simulation.fetch(uber_identifier) == value {
+        return;
+    }
+
     // TODO virtual uberstate simulation?
     if simulation.should_prevent_store(uber_identifier, value) {
         return;
