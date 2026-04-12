@@ -280,6 +280,7 @@ impl Display for CommandVoid {
                 write!(f, "save{}_at({x}, {y})", save_suffix(*to_disk))
             }
             CommandVoid::Warp { x, y } => write!(f, "warp({x}, {y})"),
+            CommandVoid::InstantWarp { x, y } => write!(f, "instant_warp({x}, {y})"),
             CommandVoid::Equip { slot, equipment } => write!(f, "equip({slot}, {equipment})"),
             CommandVoid::Unequip { equipment } => write!(f, "unequip({equipment})"),
             CommandVoid::TriggerClientEvent { client_event } => {

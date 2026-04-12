@@ -434,7 +434,11 @@ impl Compile for input::CommandVoid {
             Self::Warp { x, y } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
-                .call(Command::Warp, MemoryUsed::ZERO),
+                .call(Command::Warp(false), MemoryUsed::ZERO),
+            Self::InstantWarp { x, y } => Args::new(context)
+                .float(0, x)
+                .float(1, y)
+                .call(Command::Warp(true), MemoryUsed::ZERO),
             Self::Equip { slot, equipment } => {
                 (vec![Command::Equip(slot, equipment)], MemoryUsed::ZERO)
             }

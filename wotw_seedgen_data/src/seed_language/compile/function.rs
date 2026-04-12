@@ -300,6 +300,7 @@ pub enum FunctionIdentifier {
     SaveAt,
     SaveToMemoryAt,
     Warp,
+    InstantWarp,
     Equip,
     Unequip,
     TriggerClientEvent,
@@ -480,6 +481,7 @@ impl FunctionIdentifier {
             SaveAt(x: Float, y: Float),
             SaveToMemoryAt(x: Float, y: Float),
             Warp(x: Float, y: Float),
+            InstantWarp(x: Float, y: Float),
             Equip(slot: EquipSlot, equipment: Equipment),
             Unequip(equipment: Equipment),
             TriggerClientEvent(client_event: ClientEvent),
@@ -1181,6 +1183,10 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 y: arg(&mut context)?,
             }),
             FunctionIdentifier::Warp => Command::Void(CommandVoid::Warp {
+                x: arg(&mut context)?,
+                y: arg(&mut context)?,
+            }),
+            FunctionIdentifier::InstantWarp => Command::Void(CommandVoid::InstantWarp {
                 x: arg(&mut context)?,
                 y: arg(&mut context)?,
             }),

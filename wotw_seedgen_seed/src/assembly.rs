@@ -44,7 +44,7 @@ pub enum Trigger {
 
 /// A Command, which may be used to affect the world, player or client state
 ///
-/// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/seed/instructions/save_at.h
+/// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/seed/instructions
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Command {
     /// Execute the commands at `index` in command_lookup
@@ -186,7 +186,7 @@ pub enum Command {
     SaveAt,
     // TODO preload area command
     /// Warp the player to (Float Memory 0, Float Memory 1)
-    Warp,
+    Warp(/*instant*/ bool),
     /// Equip `equipment` into `slot`
     Equip(/*slot*/ EquipSlot, /*equipment*/ Equipment),
     /// Unequip `equipment` from any slot it may be equipped in

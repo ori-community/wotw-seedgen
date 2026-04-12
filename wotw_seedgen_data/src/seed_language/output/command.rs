@@ -559,6 +559,11 @@ pub enum CommandVoid {
         x: CommandFloat,
         y: CommandFloat,
     },
+    /// Instantly Warp the player to (`x`, `y`)
+    InstantWarp {
+        x: CommandFloat,
+        y: CommandFloat,
+    },
     /// Equip `equipment` into `slot`
     Equip {
         slot: EquipSlot,

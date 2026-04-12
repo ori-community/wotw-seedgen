@@ -288,6 +288,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::Save { .. }
             | CommandVoid::SaveAt { .. }
             | CommandVoid::Warp { .. }
+            | CommandVoid::InstantWarp { .. }
             | CommandVoid::Equip { .. }
             | CommandVoid::Unequip { .. }
             | CommandVoid::TriggerKeybind { .. }

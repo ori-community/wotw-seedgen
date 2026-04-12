@@ -506,6 +506,10 @@ impl ResolvePlaceholders for CommandVoid {
                 x.resolve(context);
                 y.resolve(context);
             }
+            Self::InstantWarp { x, y } => {
+                x.resolve(context);
+                y.resolve(context);
+            }
             Self::CreateSpoilerMapIcon { x, y, label, .. } => {
                 x.resolve(context);
                 y.resolve(context);
