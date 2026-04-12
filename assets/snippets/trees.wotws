@@ -68,5 +68,5 @@ fun increment_tree_count() {
 }
 
 fun write_trees_message() {
-    set_string("trees_message", get_string("color") + "Trees: " + get_integer("tree_count") + "/17" + get_string("color"))
+    set_string("trees_message", get_string("color") + "Trees: " + get_integer("tree_count") + "/14" + get_string("color"))
 }
