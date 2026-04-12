@@ -23,7 +23,7 @@ fun write_goals_incomplete_message() {
 !export(update_goals_completed)
 fun update_goals_completed() {
     check_goals_completed()
-    store(randoState.shriekBarrier, get_boolean("goals_completed"))
+    store(randoState.shriekBarrier, get_boolean("goals_completed") == false)
 }
 
 // TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
