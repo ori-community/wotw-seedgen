@@ -85,6 +85,13 @@ impl<'graph> ReachState<'graph> {
 }
 
 impl<'graph> ReachStateFails<'graph> {
+    fn is_empty(&self) -> bool {
+        self.uber_state.is_empty()
+            && self.logical_state.is_empty()
+            && self.health.is_empty()
+            && self.energy.is_empty()
+    }
+
     fn clear(&mut self) {
         self.uber_state.clear();
         self.logical_state.clear();
@@ -441,7 +448,9 @@ impl<'graph> World<'graph, '_> {
         }
 
         if !was_updating_reach {
-            if self.settings.difficulty.may_increase_orbs(uber_identifier) {
+            if self.settings.difficulty.may_increase_orbs(uber_identifier)
+                && !self.reach.state.fails.is_empty()
+            {
                 self.reach.state.clear();
 
                 self.traverse_spawn(events);
