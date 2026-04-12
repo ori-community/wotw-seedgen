@@ -141,13 +141,36 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
     }
 
     fn resolve_item_on(&self, trigger: &Trigger) -> CommandString {
-        self.events
+        let mut anything = false;
+
+        let mut names = self
+            .events
             .iter()
-            .find(|event| &event.trigger == trigger)
-            .map_or_else(
-                || "Nothing".into(),
-                |event| self.item_metadata.get(&event.command).force_name(),
-            )
+            .filter(|event| &event.trigger == trigger)
+            .filter_map(|event| {
+                anything = true;
+                // TODO check other uses of force_name and also other uses of find where multiple may be found
+                // this is more important than anticipated because of the stats snippet's counters
+                self.item_metadata.get(&event.command).try_force_name()
+            });
+
+        match names.next() {
+            None => if anything { "Unknown" } else { "Nothing" }.into(),
+            Some(first) => names.fold(first, |acc, name| CommandString::Concatenate {
+                // TODO const fold if possible?
+                operation: Box::new(Operation {
+                    left: acc,
+                    operator: Concatenator::Concat,
+                    right: CommandString::Concatenate {
+                        operation: Box::new(Operation {
+                            left: " and ".into(),
+                            operator: Concatenator::Concat,
+                            right: name,
+                        }),
+                    },
+                }),
+            }),
+        }
     }
 
     fn resolve_count_in_zone(&self, items: &[CommandVoid], zone: Zone) -> CommandString {

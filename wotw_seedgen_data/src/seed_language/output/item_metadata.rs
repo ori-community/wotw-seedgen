@@ -8,6 +8,7 @@ use crate::{
     },
     CommonUberIdentifier, Icon, MapIcon, Skill,
 };
+use log::warn;
 use rand::{distributions::Uniform, prelude::Distribution, seq::SliceRandom};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
@@ -41,15 +42,24 @@ impl ItemMetadataRef<'_, '_> {
         self.entry.and_then(|entry| entry.name.clone())
     }
 
-    /// Force some kind of name for the item.
+    /// Try to force some kind of name for the item.
     ///
-    /// If nothing is given by [`Self::name`], tries to scan the item for messages
-    /// or even uses an approximate seedlang representation of it.
-    pub fn force_name(&self) -> CommandString {
+    /// If nothing is given by [`Self::name`], tries to scan the item for messages.
+    pub fn try_force_name(&self) -> Option<CommandString> {
         self.name()
             .map(CommandString::from)
             .or_else(|| self.command.contained_messages().next().cloned())
-            .unwrap_or_else(|| self.command.to_string().into())
+    }
+
+    /// Force some kind of name for the item.
+    ///
+    /// If nothing is given by [`Self::try_force_name`], returns a code representation.
+    pub fn force_name(&self) -> CommandString {
+        self.try_force_name().unwrap_or_else(|| {
+            let code = self.command.to_string();
+            warn!("unable to find readable name for {code}");
+            code.into()
+        })
     }
 
     /// Force some kind of name for the item that can be used in a log.
