@@ -44,7 +44,7 @@ impl Seed {
         context.compile_command_lookup(output.command_lookup);
         let events = context.compile_events(output.events);
 
-        output.tags.sort();
+        output.tags.sort_unstable();
 
         let mut seed = Self {
             format_version: FORMAT_VERSION,

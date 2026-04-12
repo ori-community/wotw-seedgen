@@ -112,7 +112,7 @@ fn summarize_settings(settings: &UniverseSettings) -> String {
         .iter()
         .map(|world_settings| world_settings.difficulty.to_string())
         .collect::<Vec<_>>();
-    difficulties.sort();
+    difficulties.sort_unstable();
     difficulties.dedup();
 
     if difficulties.len() <= 3 {

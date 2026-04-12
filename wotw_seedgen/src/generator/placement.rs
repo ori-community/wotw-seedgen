@@ -10,7 +10,7 @@ use crate::{
 use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
 use rand::{
-    distributions::WeightedIndex,
+    distributions::{Uniform, WeightedIndex},
     prelude::Distribution,
     seq::{IteratorRandom, SliceRandom},
     Rng, SeedableRng,
@@ -99,6 +99,8 @@ pub struct Context<'graph, 'settings> {
     pub rng: Pcg64Mcg,
     pub worlds: Vec<WorldContext<'graph, 'settings>>,
     settings: &'settings UniverseSettings,
+    /// Distribution for random orderings
+    ordering_distribution: OrderingDistribution,
     /// next multiworld uberState id to use
     multiworld_state_index: RangeFrom<i32>,
     /// current placement step
@@ -121,6 +123,8 @@ pub struct WorldContext<'graph, 'settings> {
     spirit_light_provider: SpiritLightProvider,
     /// all remaining pickups which need to be assigned random placements
     needs_placement: Vec<&'graph LocDataEntry>,
+    /// initial length of needs_placement
+    total_pickups: f32,
     /// pickups which have been reached but explicitely haven't been assigned a placement yet to leave space for later progressions
     placeholders: Vec<&'graph LocDataEntry>,
     /// indices into `needs_placement` for pickups that are reachable and may be used for placements in this step
@@ -151,6 +155,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 WorldContext::new(rng, world, output, index, multiworld)
             })
             .collect::<Result<Vec<_>, _>>()?;
+
+        let ordering_distribution = OrderingDistribution::new(rng);
 
         let spawns = worlds
             .iter()
@@ -191,7 +197,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         })
                         .collect::<Vec<_>>();
 
-                    doors.sort_by_key(|(_, target)| *target);
+                    doors.sort_unstable_by_key(|(_, target)| *target);
 
                     doors
                         .into_iter()
@@ -215,6 +221,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
             worlds,
             settings,
+            ordering_distribution,
             multiworld_state_index: 0..,
             step: 0,
             spoiler,
@@ -435,10 +442,35 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn choose_progression(&mut self) -> Result<Option<(usize, Solution)>, String> {
         let slots = self.progression_slots();
 
-        let mut world_indices = (0..self.worlds.len()).collect::<Vec<_>>();
-        world_indices.sort_by_key(|index| self.worlds[*index].placements_remaining());
+        let mut world_indices = (0..self.worlds.len())
+            .map(|index| {
+                let world = &self.worlds[index];
+                let placements_remaining =
+                    world.placements_remaining() as f32 / world.total_pickups;
 
-        for target_world_index in world_indices.into_iter().rev() {
+                trace!(
+                    "{log_index}{placements_remaining:.2}% placements remaining",
+                    log_index = world.log_index,
+                    placements_remaining = placements_remaining * 100.,
+                );
+
+                // Needs to be rolled in advance, otherwise we'd violate the total ordering that the sort expects
+                let random_ordering = self.ordering_distribution.sample();
+
+                (index, (placements_remaining, random_ordering))
+            })
+            .collect::<Vec<_>>();
+
+        world_indices.sort_unstable_by(
+            |(_, (a_placements_remaining, a_random_ordering)),
+             (_, (b_placements_remaining, b_random_ordering))| {
+                b_placements_remaining
+                    .total_cmp(a_placements_remaining)
+                    .then_with(|| a_random_ordering.cmp(b_random_ordering))
+            },
+        );
+
+        for (target_world_index, _) in world_indices {
             if let Some(progression) = self.worlds[target_world_index].choose_progression(slots) {
                 return Ok(Some((target_world_index, progression)));
             }
@@ -818,6 +850,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         world.simulate(&ClientEvent::Reload, &output.events);
 
         let needs_placement = total_reach_check(&mut world, &log_index, &output, &item_pool);
+        let total_pickups = needs_placement.len() as f32;
 
         world.traverse_spawn(&output.events);
 
@@ -833,6 +866,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             item_pool,
             spirit_light_provider,
             needs_placement,
+            total_pickups,
             placeholders: Default::default(),
             reached_needs_placement: Default::default(),
             received_placement: Default::default(),
@@ -931,7 +965,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
     fn update_needs_placement(&mut self) {
         let mut received_placement = mem::take(&mut self.received_placement);
-        received_placement.sort();
+        received_placement.sort_unstable();
 
         for pickup_index in received_placement.into_iter().rev() {
             self.needs_placement.swap_remove(pickup_index);
@@ -949,7 +983,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
     fn reserve_placeholders(&mut self) -> Vec<&'graph LocDataEntry> {
         self.received_placement
-            .extend(self.reached_needs_placement.clone());
+            .extend(self.reached_needs_placement.iter().copied());
 
         let desired_placeholders = usize::max(
             MIN_PLACEHOLDERS,
@@ -1238,6 +1272,29 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         SpoilerItem {
             command: command.clone(),
             name: self.log_name(command),
+        }
+    }
+}
+
+struct OrderingDistribution {
+    rng: Pcg64Mcg,
+    distribution: Uniform<i8>,
+}
+
+impl OrderingDistribution {
+    fn new(rng: &mut Pcg64Mcg) -> Self {
+        let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
+        let distribution = Uniform::new(-1, 2);
+
+        Self { rng, distribution }
+    }
+
+    fn sample(&mut self) -> Ordering {
+        match self.distribution.sample(&mut self.rng) {
+            -1 => Ordering::Less,
+            0 => Ordering::Equal,
+            1 => Ordering::Greater,
+            _ => unreachable!(),
         }
     }
 }

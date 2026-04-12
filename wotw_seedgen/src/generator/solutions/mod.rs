@@ -281,7 +281,7 @@ impl<'graph> World<'graph, '_> {
         );
 
         if solutions.is_empty() && slots > capped_slots {
-            warn!("no solutions found, retrying with uncapped solution size");
+            trace!("no solutions found, retrying with uncapped solution size");
 
             solutions = self.find_solutions_no_max_items(
                 item_pool,
@@ -290,6 +290,16 @@ impl<'graph> World<'graph, '_> {
                 spirit_light_slots,
                 search_radius,
             );
+
+            if let Some(min_solution) = solutions.iter().min_by_key(|solution| solution.items.len())
+            {
+                warn!(
+                    "insufficient solution max items {solution_max_items}, needed at least {min_max_items} for {min_solution}",
+                    solution_max_items = *SOLUTION_MAX_ITEMS,
+                    min_max_items = min_solution.items.len(),
+                    min_solution = min_solution.display(item_pool, None)
+                );
+            }
         }
 
         solutions
