@@ -76,22 +76,11 @@ pub(crate) struct ReachStateFails<'graph> {
     pub energy: FxHashSet<ConnectionIndex<'graph>>,
 }
 
-// TODO were these capacities good?
-// best_orbs: FxHashMap::with_capacity_and_hasher(graph.nodes.len(), FxBuildHasher),
-// tp_reached: false,
-// uber_state_fails: FxHashMap::with_capacity_and_hasher(80, FxBuildHasher),
-// logical_state_fails: FxHashMap::with_capacity_and_hasher(5, FxBuildHasher),
-// orb_fail: false,
-
 impl<'graph> ReachState<'graph> {
     fn clear(&mut self) {
         self.best_orbs.clear();
         self.tp_reached = false;
         self.fails.clear();
-    }
-
-    fn orb_fail(&self) -> bool {
-        !(self.fails.health.is_empty() && self.fails.energy.is_empty())
     }
 }
 
@@ -101,6 +90,85 @@ impl<'graph> ReachStateFails<'graph> {
         self.logical_state.clear();
         self.health.clear();
         self.energy.clear();
+    }
+
+    #[cfg(test)]
+    pub fn display<'fails>(
+        &'fails self,
+        graph: &'graph Graph,
+    ) -> ReachStateFailsDisplay<'fails, 'graph> {
+        ReachStateFailsDisplay { fails: self, graph }
+    }
+}
+
+#[cfg(test)]
+pub struct ReachStateFailsDisplay<'fails, 'graph> {
+    fails: &'fails ReachStateFails<'graph>,
+    graph: &'graph Graph,
+}
+
+#[cfg(test)]
+impl Display for ReachStateFailsDisplay<'_, '_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn format_connections<'fails, 'graph>(
+            connections: &'fails FxHashSet<ConnectionIndex<'graph>>,
+            graph: &'graph Graph,
+        ) -> impl Display + use<'fails, 'graph> {
+            connections
+                .iter()
+                .map(|connection| connection.display(graph))
+                .format(", ")
+        }
+
+        self.fails
+            .uber_state
+            .iter()
+            .format_with(", ", |(uber_identifier, connections), f| {
+                f(&format_args!(
+                    "{uber_identifier} for [{connections}]",
+                    connections = format_connections(connections, self.graph),
+                ))
+            })
+            .fmt(f)?;
+
+        let mut comma = !self.fails.uber_state.is_empty();
+        if comma {
+            write!(f, ", ")?;
+        }
+
+        self.fails
+            .logical_state
+            .iter()
+            .format_with(", ", |(state, connections), f| {
+                f(&format_args!(
+                    "{{{state}}} for [{connections}]",
+                    connections = format_connections(connections, self.graph),
+                ))
+            })
+            .fmt(f)?;
+
+        comma |= !self.fails.logical_state.is_empty();
+        if comma {
+            write!(f, ", ")?;
+        }
+
+        if !self.fails.health.is_empty() {
+            write!(
+                f,
+                "Health for [{connections}]",
+                connections = format_connections(&self.fails.health, self.graph),
+            )?;
+        }
+
+        if !self.fails.energy.is_empty() {
+            write!(
+                f,
+                "Energy for [{connections}]",
+                connections = format_connections(&self.fails.energy, self.graph),
+            )?;
+        }
+
+        Ok(())
     }
 }
 
@@ -236,7 +304,7 @@ impl Display for ConnectionIndexDisplay<'_, '_> {
 impl Display for ConnectionRequirement<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Full(full) => write!(f, " -> {}", full.0),
+            Self::Full(_) => Ok(()),
             Self::Partial(partial) => partial.fmt(f),
         }
     }
@@ -373,9 +441,7 @@ impl<'graph> World<'graph, '_> {
         }
 
         if !was_updating_reach {
-            if self.reach.state.orb_fail()
-                && self.settings.difficulty.may_increase_orbs(uber_identifier)
-            {
+            if self.settings.difficulty.may_increase_orbs(uber_identifier) {
                 self.reach.state.clear();
 
                 self.traverse_spawn(events);
@@ -685,17 +751,9 @@ impl<'graph> World<'graph, '_> {
                     self.add_fail(missing, connection.clone());
                 }
             }
-            Missing::Or(ors, orb_variants) => {
-                for (missing, requirement) in ors {
-                    let connection = ConnectionIndex {
-                        requirement: ConnectionRequirement::Partial(ConnectionRequirementPartial {
-                            requirement,
-                            orb_variants: orb_variants.clone(),
-                        }),
-                        ..connection.clone()
-                    };
-
-                    self.add_fail(missing, connection);
+            Missing::Or(ors, _) => {
+                for (missing, _) in ors {
+                    self.add_fail(missing, connection.clone());
                 }
             }
         }

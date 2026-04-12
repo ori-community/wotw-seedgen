@@ -68,20 +68,7 @@ fn full_reach_check() {
         .collect::<FxHashSet<_>>();
 
     if !(reached == all_locations) {
-        eprintln!(
-            "remaining uber state fails:\n{}",
-            world
-                .fails()
-                .uber_state
-                .values()
-                .flatten()
-                .cloned()
-                .collect::<FxHashSet<_>>()
-                .into_iter()
-                .format_with("\n", |connection, f| {
-                    f(&connection.display(world.graph))
-                })
-        );
+        eprintln!("remaining fails:\n{}", world.fails().display(world.graph));
 
         let mut diff = all_locations.difference(&reached).collect::<Vec<_>>();
         diff.sort_unstable();

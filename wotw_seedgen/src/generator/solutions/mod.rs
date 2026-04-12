@@ -1426,6 +1426,11 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
             for solution in &self.finished {
                 self.world.snapshot();
 
+                trace!(
+                    "verifying solution {solution}",
+                    solution = solution.display(self.item_pool, None)
+                );
+
                 self.world
                     .simulate_solution(solution, self.item_pool, self.events);
 
@@ -1435,9 +1440,10 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
                 assert_eq!(
                     new_reached, solution.new_reached,
-                    "solution {solution} reported {solution_new_reached} reachables but actually reaches {new_reached}",
-                    solution = solution.display(self.item_pool, Some(self.world.graph)),
+                    "solution {solution} reported {solution_new_reached} new reached but actually reaches {new_reached} for world with {world}",
+                    solution = solution.display(self.item_pool, None),
                     solution_new_reached = solution.new_reached,
+                    world = self.world.inventory_display(),
                 );
             }
         }
