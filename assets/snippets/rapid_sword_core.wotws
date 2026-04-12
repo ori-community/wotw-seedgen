@@ -32,13 +32,13 @@ fun enable() {
     store(enabled, true)
     set_wheel_item_disable()
     update_bonus_wheel()
-    store(randoUpgrades.swordSpeedMultiplier, collected * 0.25)
+    store(randoUpgrades.swordSpeedMultiplier, 1 + collected * 0.25)
 }
 fun disable() {
     store(enabled, false)
     set_wheel_item_enable()
     update_bonus_wheel()
-    store(randoUpgrades.swordSpeedMultiplier, 0)
+    store(randoUpgrades.swordSpeedMultiplier, 1)
 }
 
 on reload {

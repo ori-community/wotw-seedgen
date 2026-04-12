@@ -40,9 +40,9 @@ fun disable() {
     store(enabled, false)
     set_wheel_item_enable()
     update_bonus_wheel()
-    store(randoUpgrades.jumpHeightMultiplier, 0)
-    store(randoUpgrades.wallJumpHeightMultiplier, 0)
-    store(randoUpgrades.doubleJumpHeightMultiplier, 0)
+    store(randoUpgrades.jumpHeightMultiplier, 1)
+    store(randoUpgrades.wallJumpHeightMultiplier, 1)
+    store(randoUpgrades.doubleJumpHeightMultiplier, 1)
 }
 
 on reload {
