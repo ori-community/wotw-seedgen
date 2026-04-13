@@ -23,20 +23,27 @@
     if get_integer("tree_count") < max_trees set_boolean("goals_completed", false)
 })
 
-on change MarshSpawn.RegenTree update_goals_completed()
-on change MarshSpawn.DamageTree update_goals_completed()
-on change HowlsDen.SwordTree update_goals_completed()
-on change HowlsDen.DoubleJumpTree update_goals_completed()
-on change MarshPastOpher.BowTree update_goals_completed()
-on change WestHollow.DashTree update_goals_completed()
-on change EastHollow.BashTree update_goals_completed()
-on change GladesTown.DamageTree update_goals_completed()
-on change InnerWellspring.GrappleTree update_goals_completed()
-on change UpperReach.LightBurstTree update_goals_completed()
-on change UpperPools.SwimDashTree update_goals_completed()
-on change LowerDepths.FlashTree update_goals_completed()
-on change LowerWastes.BurrowTree update_goals_completed()
-on change WeepingRidge.LaunchTree update_goals_completed()
+on spawn store(itemTracker.treesRequired, max_trees)
+
+fun on_change_tree_count() {
+  update_goals_completed()
+  store(itemTracker.treesCount, get_integer("tree_count"))
+}
+
+on change MarshSpawn.RegenTree on_change_tree_count()
+on change MarshSpawn.DamageTree on_change_tree_count()
+on change HowlsDen.SwordTree on_change_tree_count()
+on change HowlsDen.DoubleJumpTree on_change_tree_count()
+on change MarshPastOpher.BowTree on_change_tree_count()
+on change WestHollow.DashTree on_change_tree_count()
+on change EastHollow.BashTree on_change_tree_count()
+on change GladesTown.DamageTree on_change_tree_count()
+on change InnerWellspring.GrappleTree on_change_tree_count()
+on change UpperReach.LightBurstTree on_change_tree_count()
+on change UpperPools.SwimDashTree on_change_tree_count()
+on change LowerDepths.FlashTree on_change_tree_count()
+on change LowerWastes.BurrowTree on_change_tree_count()
+on change WeepingRidge.LaunchTree on_change_tree_count()
 
 // TODO maybe do a fancier feedback message pointing out what exactly you are missing?
 !augment_fun(write_goals_incomplete_message, {

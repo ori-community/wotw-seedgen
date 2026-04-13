@@ -23,18 +23,25 @@
     if get_integer("count_quests") < max_quests set_boolean("goals_completed", false)
 })
 
-on change npcsStateGroup.marshKeystoneQuest update_goals_completed()
-on change npcsStateGroup.inkwaterWellQuest update_goals_completed()
-on change questUberStateGroup.lostCompassQuest update_goals_completed()
-on change questUberStateGroup.braveMokiQuest update_goals_completed()
-on change questUberStateGroup.familyReunionQuest update_goals_completed()
-on change hubUberStateGroup.gardenerProjectTree update_goals_completed()
-on change questUberStateGroup.desertCogQuest update_goals_completed()
-on change questUberStateGroup.tradeSequenceQuest update_goals_completed()
-on change questUberStateGroup.darkCaveQuest update_goals_completed()
-on change questUberStateGroup.kwoloksWisdomQuest update_goals_completed()
-on change questUberStateGroup.rebuildGladesQuest update_goals_completed()
-on change questUberStateGroup.regrowGladesQuest update_goals_completed()
+on spawn store(itemTracker.questsRequired, max_quests)
+
+fun on_change_quest_count() {
+  update_goals_completed()
+  store(itemTracker.questsCount, get_integer("quest_count"))
+}
+
+on change npcsStateGroup.marshKeystoneQuest on_change_quest_count()
+on change npcsStateGroup.inkwaterWellQuest on_change_quest_count()
+on change questUberStateGroup.lostCompassQuest on_change_quest_count()
+on change questUberStateGroup.braveMokiQuest on_change_quest_count()
+on change questUberStateGroup.familyReunionQuest on_change_quest_count()
+on change hubUberStateGroup.gardenerProjectTree on_change_quest_count()
+on change questUberStateGroup.desertCogQuest on_change_quest_count()
+on change questUberStateGroup.tradeSequenceQuest on_change_quest_count()
+on change questUberStateGroup.darkCaveQuest on_change_quest_count()
+on change questUberStateGroup.kwoloksWisdomQuest on_change_quest_count()
+on change questUberStateGroup.rebuildGladesQuest on_change_quest_count()
+on change questUberStateGroup.regrowGladesQuest on_change_quest_count()
 
 !augment_fun(write_goals_incomplete_message, {
     count_quests()

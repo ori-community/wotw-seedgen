@@ -25,6 +25,7 @@
 })
 
 !augment_fun(on_change_wisp_count, update_goals_completed())
+!augment_fun(on_change_wisp_count, store(itemTracker.wispsCount, get_integer("wisp_count")))
 
 !augment_fun(write_goals_incomplete_message, {
     count_wisps()
@@ -34,6 +35,8 @@
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("wisps_message"))
     }
 })
+
+on spawn store(itemTracker.wispsRequired, max_wisps)
 
 fun write_wisps_message() {
     set_string("wisps_message", get_string("color") + "Wisps: " + get_integer("wisp_count") + "/" + max_wisps + get_string("color"))
