@@ -6,7 +6,9 @@ use crate::{
     seed_language::{
         ast::{self, get_command_arg, UberStateType},
         compile,
-        output::{CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder},
+        output::{
+            CommandVoid, ContainedWrites, Event, ItemMetadataEntry, Literal, StringOrPlaceholder,
+        },
     },
     Position, UberIdentifier, Zone,
 };
@@ -844,23 +846,25 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
             return;
         };
 
-        let items = items
-            .content
-            .into_iter()
-            .flatten()
-            .filter_map(|action| {
-                let span = action.span();
-                action
-                    .compile(compiler)
-                    .and_then(|command| command.expect_void(compiler, span))
-            })
-            .collect::<Vec<_>>();
+        let items = items.content.into_iter().flatten().filter_map(|action| {
+            let span = action.span();
+            action
+                .compile(compiler)
+                .and_then(|command| command.expect_void(compiler, span))
+        });
+
+        let mut write_identifiers = vec![];
+        for item in items {
+            for uber_identifier in item.contained_write_identifiers() {
+                write_identifiers.push(uber_identifier);
+            }
+        }
 
         for (identifier, zone) in zone_bindings {
             compiler.variables.insert(
                 identifier,
                 Literal::String(StringOrPlaceholder::CountInZonePlaceholder(
-                    items.clone(),
+                    write_identifiers.clone(),
                     zone,
                 )),
             );

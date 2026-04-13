@@ -25,7 +25,7 @@ pub use operation::{
 };
 pub use postprocess::PlaceholderMap;
 
-use crate::{Icon, Position, Zone};
+use crate::{Icon, Position, UberIdentifier, Zone};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::hash::Hash;
@@ -72,7 +72,7 @@ pub enum StringOrPlaceholder {
     Value(String),
     ZoneOfPlaceholder(Box<CommandVoid>),
     ItemOnPlaceholder(Box<Trigger>),
-    CountInZonePlaceholder(Vec<CommandVoid>, Zone),
+    CountInZonePlaceholder(Vec<UberIdentifier>, Zone),
 }
 
 impl From<String> for StringOrPlaceholder {

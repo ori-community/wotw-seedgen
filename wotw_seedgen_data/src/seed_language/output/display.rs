@@ -31,11 +31,11 @@ impl Display for StringOrPlaceholder {
             StringOrPlaceholder::Value(string) => write!(f, "\"{string}\""),
             StringOrPlaceholder::ZoneOfPlaceholder(action) => write!(f, "zone_of({action})"),
             StringOrPlaceholder::ItemOnPlaceholder(trigger) => write!(f, "item_on({trigger})"),
-            StringOrPlaceholder::CountInZonePlaceholder(actions, zone) => {
+            StringOrPlaceholder::CountInZonePlaceholder(uber_identifiers, zone) => {
                 write!(
                     f,
                     "count_in_zone({zone}, [{}])",
-                    actions.iter().format(", ")
+                    uber_identifiers.iter().format(", ")
                 )
             }
         }

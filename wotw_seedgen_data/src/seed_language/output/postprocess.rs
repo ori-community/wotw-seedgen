@@ -12,9 +12,9 @@ use crate::{
         display::strip_control_characters,
         item_metadata::{random_shop_description, DEFAULT_SHOP_PRICE},
         postprocess::price_noise::PriceNoise,
-        IntoConstant,
+        ContainedWrites, IntoConstant,
     },
-    ShopKind, Zone,
+    ShopKind, UberIdentifier, Zone,
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
@@ -225,7 +225,11 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
         multi_name(names)
     }
 
-    fn resolve_count_in_zone(&self, items: &[CommandVoid], zone: Zone) -> CommandString {
+    fn resolve_count_in_zone(
+        &self,
+        uber_identifiers: &[UberIdentifier],
+        zone: Zone,
+    ) -> CommandString {
         let matches = self
             .loc_data_events
             .values()
@@ -235,7 +239,13 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
                     .get(&event.trigger)
                     .map(|entry| (event, entry))
             })
-            .filter(|(event, entry)| entry.zone == zone && items.contains(&event.command))
+            .filter(|(event, entry)| {
+                entry.zone == zone
+                    && event
+                        .command
+                        .contained_write_identifiers()
+                        .any(|uber_identifier| uber_identifiers.contains(&uber_identifier))
+            })
             .collect::<Vec<_>>();
 
         if matches.is_empty() {
@@ -497,8 +507,8 @@ impl ResolvePlaceholders for CommandString {
                     StringOrPlaceholder::ItemOnPlaceholder(trigger) => {
                         context.resolve_item_on(trigger)
                     }
-                    StringOrPlaceholder::CountInZonePlaceholder(items, zone) => {
-                        context.resolve_count_in_zone(items, *zone)
+                    StringOrPlaceholder::CountInZonePlaceholder(uber_identifiers, zone) => {
+                        context.resolve_count_in_zone(uber_identifiers, *zone)
                     }
                 };
 
