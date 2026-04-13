@@ -1,3 +1,5 @@
+mod price_noise;
+
 use super::{
     ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
     CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator, Event,
@@ -6,9 +8,13 @@ use super::{
 
 use crate::{
     assets::{LocData, LocDataEntry},
+    seed_language::output::{
+        item_metadata::{random_shop_description, DEFAULT_SHOP_PRICE},
+        postprocess::price_noise::PriceNoise,
+        IntoConstant,
+    },
     ShopKind, Zone,
 };
-use rand::distributions::Uniform;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 
@@ -32,28 +38,57 @@ impl IntermediateOutput {
         self.resolve(&mut postprocessor);
 
         let mut extra_events = vec![];
+        let price_noise = PriceNoise::new();
 
-        let price_distribution = Uniform::new_inclusive(0.75, 1.25);
+        for (trigger, events) in postprocessor.loc_data_events {
+            let shop_identifier = match trigger {
+                Trigger::Condition(CommandBoolean::FetchBoolean { uber_identifier })
+                    if matches!(
+                        uber_identifier.shop_kind(),
+                        ShopKind::Opherlike | ShopKind::Map
+                    ) =>
+                {
+                    Some(*uber_identifier)
+                }
+                _ => None,
+            };
+            let map_position = &postprocessor.loc_data_triggers[trigger].map_position;
 
-        for event in postprocessor.loc_data_events {
-            let location = postprocessor.loc_data_triggers[&event.trigger];
+            if shop_identifier.is_none() && map_position.is_none() {
+                continue;
+            }
 
-            let metadata = self.item_metadata.get(&event.command);
+            let mut matches = vec![];
 
-            let name = metadata.force_name();
+            let names = events.into_iter().filter_map(|event| {
+                let metadata = self.item_metadata.get(&event.command);
 
-            if let Trigger::Condition(CommandBoolean::FetchBoolean { uber_identifier }) =
-                &event.trigger
-            {
+                let name = metadata.try_force_name()?;
+
+                matches.push(metadata);
+
+                Some(name)
+            });
+
+            let name = multi_name(names);
+
+            if let Trigger::Condition(CommandBoolean::FetchBoolean { uber_identifier }) = trigger {
                 let uber_identifier = *uber_identifier;
 
                 if matches!(
                     uber_identifier.shop_kind(),
                     ShopKind::Opherlike | ShopKind::Map
                 ) {
+                    let prices = matches
+                        .iter()
+                        .filter_map(|metadata| metadata.try_force_shop_price());
+
+                    let mut price = multi_price(prices);
+                    price_noise.add_noise(&mut price, rng);
+
                     extra_events.push(Event::on_reload(CommandVoid::SetShopItemPrice {
                         uber_identifier,
-                        price: metadata.force_shop_price(&price_distribution, rng),
+                        price,
                     }));
 
                     if uber_identifier.shop_kind() == ShopKind::Opherlike {
@@ -62,12 +97,24 @@ impl IntermediateOutput {
                             name: name.clone(),
                         }));
 
+                        let mut descriptions =
+                            matches.iter().filter_map(|metadata| metadata.description());
+
+                        let description = match (descriptions.next(), descriptions.next()) {
+                            (Some(description), None) => description,
+                            _ => random_shop_description(rng).into(),
+                        };
+
                         extra_events.push(Event::on_reload(CommandVoid::SetShopItemDescription {
                             uber_identifier,
-                            description: metadata.force_description(rng),
+                            description,
                         }));
 
-                        if let Some(icon) = metadata.force_icon() {
+                        let icon = matches
+                            .iter()
+                            .find_map(|metadata| metadata.try_force_icon());
+
+                        if let Some(icon) = icon {
                             extra_events.push(Event::on_reload(CommandVoid::SetShopItemIcon {
                                 uber_identifier,
                                 icon,
@@ -77,9 +124,15 @@ impl IntermediateOutput {
                 }
             }
 
+            let location = postprocessor.loc_data_triggers[trigger];
             if let Some(map_position) = location.map_position {
+                let icon = matches
+                    .iter()
+                    .find_map(|metadata| metadata.try_force_map_icon())
+                    .unwrap_or_default();
+
                 extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
-                    icon: metadata.force_map_icon(),
+                    icon,
                     x: map_position.x.into(),
                     y: map_position.y.into(),
                     label: name,
@@ -98,7 +151,7 @@ impl IntermediateOutput {
 struct Postprocessor<'output, 'locdata> {
     events: &'output [Event],
     loc_data_triggers: FxHashMap<Trigger, &'locdata LocDataEntry>,
-    loc_data_events: Vec<&'output Event>,
+    loc_data_events: FxHashMap<&'output Trigger, Vec<&'output Event>>,
     item_metadata: &'output ItemMetadata,
     placeholder_map: PlaceholderMap,
 }
@@ -116,11 +169,18 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
             })
             .collect::<FxHashMap<_, _>>();
 
-        let loc_data_events = output
+        let mut loc_data_events = FxHashMap::<_, Vec<_>>::default();
+
+        for event in output
             .events
             .iter()
             .filter(|event| loc_data_triggers.contains_key(&event.trigger))
-            .collect::<Vec<_>>();
+        {
+            loc_data_events
+                .entry(&event.trigger)
+                .or_default()
+                .push(event);
+        }
 
         Self {
             events: &output.events,
@@ -132,51 +192,38 @@ impl<'output, 'locdata> Postprocessor<'output, 'locdata> {
     }
 
     fn resolve_zone_of(&self, item: &CommandVoid) -> CommandString {
-        self.loc_data_events
-            .iter()
-            .find(|event| &event.command == item) // TODO there could be multiple
-            .and_then(|event| self.loc_data_triggers.get(&event.trigger))
-            .map_or_else(|| "Unknown".to_string(), |entry| entry.zone.to_string())
-            .into()
+        let mut matches = self
+            .loc_data_events
+            .values()
+            .flatten()
+            .filter(|event| &event.command == item)
+            .filter_map(|event| self.loc_data_triggers.get(&event.trigger));
+
+        match matches.next() {
+            None => "Unknown".into(),
+            Some(first) => matches
+                .fold(first.zone.to_string(), |acc, entry| {
+                    format!("{acc} or {}", entry.zone)
+                })
+                .into(),
+        }
     }
 
     fn resolve_item_on(&self, trigger: &Trigger) -> CommandString {
-        let mut anything = false;
-
-        let mut names = self
+        let names = self
             .events
             .iter()
             .filter(|event| &event.trigger == trigger)
-            .filter_map(|event| {
-                anything = true;
-                // TODO check other uses of force_name and also other uses of find where multiple may be found
-                // this is more important than anticipated because of the stats snippet's counters
-                self.item_metadata.get(&event.command).try_force_name()
-            });
+            .filter_map(|event| self.item_metadata.get(&event.command).try_force_name());
 
-        match names.next() {
-            None => if anything { "Unknown" } else { "Nothing" }.into(),
-            Some(first) => names.fold(first, |acc, name| CommandString::Concatenate {
-                // TODO const fold if possible?
-                operation: Box::new(Operation {
-                    left: acc,
-                    operator: Concatenator::Concat,
-                    right: CommandString::Concatenate {
-                        operation: Box::new(Operation {
-                            left: " and ".into(),
-                            operator: Concatenator::Concat,
-                            right: name,
-                        }),
-                    },
-                }),
-            }),
-        }
+        multi_name(names)
     }
 
     fn resolve_count_in_zone(&self, items: &[CommandVoid], zone: Zone) -> CommandString {
         let matches = self
             .loc_data_events
-            .iter()
+            .values()
+            .flatten()
             .filter_map(|event| {
                 self.loc_data_triggers
                     .get(&event.trigger)
@@ -592,5 +639,92 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::CloseMenu {} => {}
             Self::CloseWeaponWheel {} => {}
         }
+    }
+}
+
+pub fn multi_name<I>(names: I) -> CommandString
+where
+    I: IntoIterator<Item = CommandString>,
+{
+    let names = names.into_iter();
+
+    let (acc, const_acc) =
+        names
+            .into_iter()
+            .fold((None, String::new()), |(acc, const_acc), name| {
+                match name.into_constant() {
+                    Ok(name) => {
+                        let const_acc = if const_acc.is_empty() {
+                            name
+                        } else {
+                            format!("{const_acc} and {name}")
+                        };
+
+                        (acc, const_acc)
+                    }
+                    Err(name) => {
+                        let acc = match acc {
+                            None => name,
+                            Some(acc) => CommandString::from(Operation {
+                                left: CommandString::from(Operation {
+                                    left: acc,
+                                    operator: Concatenator::Concat,
+                                    right: " and ".into(),
+                                }),
+                                operator: Concatenator::Concat,
+                                right: name,
+                            }),
+                        };
+
+                        (Some(acc), const_acc)
+                    }
+                }
+            });
+
+    match (acc, const_acc.is_empty()) {
+        (None, false) => const_acc.into(),
+        (None, true) => "Unknown".into(),
+        (Some(acc), false) => CommandString::from(Operation {
+            left: acc,
+            operator: Concatenator::Concat,
+            right: format!(" and {const_acc}").into(),
+        }),
+        (Some(acc), true) => acc,
+    }
+}
+
+pub fn multi_price<I>(prices: I) -> CommandInteger
+where
+    I: IntoIterator<Item = CommandInteger>,
+{
+    let (acc, const_acc) =
+        prices
+            .into_iter()
+            .fold((None, 0), |(acc, const_acc), price| {
+                match price.into_constant() {
+                    Ok(price) => (acc, const_acc + price),
+                    Err(price) => match acc {
+                        None => (Some(price), const_acc),
+                        Some(acc) => (
+                            Some(CommandInteger::from(Operation {
+                                left: acc,
+                                operator: ArithmeticOperator::Add,
+                                right: price,
+                            })),
+                            const_acc,
+                        ),
+                    },
+                }
+            });
+
+    match (acc, const_acc) {
+        (None, 0) => DEFAULT_SHOP_PRICE.into(),
+        (None, const_acc) => const_acc.into(),
+        (Some(acc), 0) => acc,
+        (Some(acc), const_acc) => CommandInteger::from(Operation {
+            left: acc,
+            operator: ArithmeticOperator::Add,
+            right: const_acc.into(),
+        }),
     }
 }

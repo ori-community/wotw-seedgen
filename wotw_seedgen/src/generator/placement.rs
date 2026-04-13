@@ -1284,7 +1284,7 @@ struct OrderingDistribution {
 impl OrderingDistribution {
     fn new(rng: &mut Pcg64Mcg) -> Self {
         let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
-        let distribution = Uniform::new(-1, 2);
+        let distribution = Uniform::new_inclusive(-1, 1);
 
         Self { rng, distribution }
     }

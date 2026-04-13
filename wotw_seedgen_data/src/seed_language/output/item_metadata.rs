@@ -6,10 +6,10 @@ use crate::{
         },
         simulate::{Simulate, Simulation},
     },
-    CommonUberIdentifier, Icon, MapIcon, Skill,
+    CommonUberIdentifier, Icon, MapIcon,
 };
 use log::warn;
-use rand::{distributions::Uniform, prelude::Distribution, seq::SliceRandom};
+use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 
@@ -77,31 +77,28 @@ impl ItemMetadataRef<'_, '_> {
         self.entry.and_then(|entry| entry.shop_price.clone())
     }
 
-    /// Force a shop price for the item.
+    /// Try to force a shop price for the item.
     ///
     /// If nothing is given by [`Self::shop_price`], tries to estimate the item's
-    /// value based on its contents and adds random noise to the result.
-    pub fn force_shop_price(
-        &self,
-        price_distribution: &Uniform<f32>,
-        rng: &mut Pcg64Mcg,
-    ) -> CommandInteger {
-        self.shop_price().unwrap_or_else(|| {
-            let mut price = self
+    /// value based on its contents.
+    pub fn try_force_shop_price(&self) -> Option<CommandInteger> {
+        self.shop_price().or_else(|| {
+            let price = self
                 .command
                 .contained_common_write_identifiers()
                 .map(CommonUberIdentifier::shop_price)
-                .sum::<f32>();
+                .sum::<i32>();
 
-            if price == 0. {
-                price = 200.
-            }
-            if price != CommonUberIdentifier::Skill(Skill::Blaze).shop_price() {
-                price *= price_distribution.sample(rng);
-            }
-
-            (price.round() as i32).into()
+            (price > 0).then(|| price.into())
         })
+    }
+
+    /// Force a shop price for the item.
+    ///
+    /// If nothing is given by [`Self::try_force_shop_price`], defaults to [`DEFAULT_SHOP_PRICE`].
+    pub fn force_shop_price(&self) -> CommandInteger {
+        self.shop_price()
+            .unwrap_or_else(|| DEFAULT_SHOP_PRICE.into())
     }
 
     /// Description used when placed in a shop
@@ -114,7 +111,7 @@ impl ItemMetadataRef<'_, '_> {
     /// If nothing is given by [`Self::description`], returns a random description.
     pub fn force_description(&self, rng: &mut Pcg64Mcg) -> CommandString {
         self.description()
-            .unwrap_or_else(|| (*SHOP_DESCRIPTIONS.choose(rng).unwrap()).into())
+            .unwrap_or_else(|| random_shop_description(rng).into())
     }
 
     /// Icon used when placed in a shop
@@ -122,11 +119,11 @@ impl ItemMetadataRef<'_, '_> {
         self.entry.and_then(|entry| entry.icon.clone())
     }
 
-    /// Force an icon out of the item.
+    /// Try to force an icon out of the item.
     ///
     /// If nothing is given by [`Self::icon`], tries to assign an icon based
     /// on the item's contents. May return `None` for unrecognized items.
-    pub fn force_icon(&self) -> Option<Icon> {
+    pub fn try_force_icon(&self) -> Option<Icon> {
         self.icon().or_else(|| {
             self.command
                 .contained_common_write_identifiers()
@@ -140,19 +137,24 @@ impl ItemMetadataRef<'_, '_> {
         self.entry.and_then(|entry| entry.map_icon)
     }
 
-    /// Force a map icon out of the item.
+    /// Try to force a map icon out of the item.
     ///
     /// If nothing is given by [`Self::map_icon`], tries to assign a map icon based
-    /// on the item's contents, or returns [`MapIcon::default`]
+    /// on the item's contents.
+    pub fn try_force_map_icon(&self) -> Option<MapIcon> {
+        self.map_icon().or_else(|| {
+            self.command
+                .contained_common_write_identifiers()
+                .next()
+                .map(CommonUberIdentifier::map_icon)
+        })
+    }
+
+    /// Force a map icon out of the item.
+    ///
+    /// If nothing is given by [`Self::try_force_map_icon`], returns [`MapIcon::default`]
     pub fn force_map_icon(&self) -> MapIcon {
-        self.map_icon()
-            .or_else(|| {
-                self.command
-                    .contained_common_write_identifiers()
-                    .next()
-                    .map(CommonUberIdentifier::map_icon)
-            })
-            .unwrap_or_default()
+        self.try_force_map_icon().unwrap_or_default()
     }
 }
 
@@ -164,6 +166,10 @@ pub(crate) struct ItemMetadataEntry {
     pub description: Option<CommandString>,
     pub icon: Option<Icon>,
     pub map_icon: Option<MapIcon>,
+}
+
+pub(crate) fn random_shop_description(rng: &mut Pcg64Mcg) -> &str {
+    SHOP_DESCRIPTIONS.choose(rng).unwrap()
 }
 
 const SHOP_DESCRIPTIONS: [&str; 38] = [
@@ -206,3 +212,5 @@ const SHOP_DESCRIPTIONS: [&str; 38] = [
     "This one's good luck",
     "Better than a bowl of Marshclam Soup",
 ];
+
+pub(crate) const DEFAULT_SHOP_PRICE: i32 = 200;

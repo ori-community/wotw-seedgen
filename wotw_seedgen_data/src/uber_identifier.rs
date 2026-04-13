@@ -155,23 +155,23 @@ impl CommonUberIdentifier {
         }
     }
 
-    pub const fn shop_price(self) -> f32 {
+    pub const fn shop_price(self) -> i32 {
         match self {
-            Self::SpiritLight => 200.,
-            Self::GorlekOre | Self::Keystones => 100.,
-            Self::ShardSlots => 250.,
-            Self::CleanWater => 500.,
-            Self::MaxHealth | Self::Health => 200.,
-            Self::MaxEnergy | Self::Energy => 150.,
+            Self::SpiritLight => 200,
+            Self::GorlekOre | Self::Keystones => 100,
+            Self::ShardSlots => 250,
+            Self::CleanWater => 500,
+            Self::MaxHealth | Self::Health => 200,
+            Self::MaxEnergy | Self::Energy => 150,
             Self::Skill(skill) => match skill {
-                Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200.,
-                Skill::GladesAncestralLight | Skill::MarshAncestralLight => 300.,
-                Skill::Blaze => 420.,
-                Skill::Launch => 800.,
-                _ => 500.,
+                Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
+                Skill::GladesAncestralLight | Skill::MarshAncestralLight => 300,
+                Skill::Blaze => 420,
+                Skill::Launch => 800,
+                _ => 500,
             },
-            Self::Shard(_) | Self::Teleporter(_) => 250.,
-            Self::WeaponUpgrade(_) => 200.,
+            Self::Shard(_) | Self::Teleporter(_) => 250,
+            Self::WeaponUpgrade(_) => 200,
         }
     }
 
