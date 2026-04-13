@@ -348,56 +348,67 @@ on reload {
     set_shop_item_price(MidnightBurrows.LupoMap, 50)
 }
 
+!remove_location(MarshSpawn.LupoMap)
 on MarshSpawn.LupoMap {
     set_string("zone_hint", "")
     write_marsh_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(WestHollow.LupoMap)
 on WestHollow.LupoMap {
     set_string("zone_hint", "")
     write_hollow_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(LupoShop.HCMapIcon)
 on LupoShop.HCMapIcon {
     set_string("zone_hint", "")
     write_glades_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(InnerWellspring.LupoMap)
 on InnerWellspring.LupoMap {
     set_string("zone_hint", "")
     write_wellspring_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(LupoShop.ECMapIcon)
 on LupoShop.ECMapIcon {
     set_string("zone_hint", "")
     write_woods_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(LowerReach.LupoMap)
 on LowerReach.LupoMap {
     set_string("zone_hint", "")
     write_reach_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(LowerDepths.LupoMap)
 on LowerDepths.LupoMap {
     set_string("zone_hint", "")
     write_depths_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(EastPools.LupoMap)
 on EastPools.LupoMap {
     set_string("zone_hint", "")
     write_pools_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(LowerWastes.LupoMap)
 on LowerWastes.LupoMap {
     set_string("zone_hint", "")
     write_wastes_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(WillowsEnd.LupoMap)
 on WillowsEnd.LupoMap {
     set_string("zone_hint", "")
     write_willow_hint()
     item_message(get_string("zone_hint"))
 }
+!remove_location(MidnightBurrows.LupoMap)
 on MidnightBurrows.LupoMap {
     set_string("zone_hint", "")
     write_burrows_hint()
