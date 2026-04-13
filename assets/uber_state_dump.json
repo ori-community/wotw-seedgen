@@ -25438,42 +25438,63 @@
           "value": 0.0,
           "value_type": "Integer"
         },
+        "100": {
+          "name": "treesCount",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "101": {
+          "name": "treesRequired",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "102": {
+          "name": "wispsCount",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "103": {
+          "name": "wispsRequired",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "104": {
+          "name": "questsCount",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "105": {
+          "name": "questsRequired",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "106": {
+          "name": "relicsCount",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "107": {
+          "name": "relicsRequired",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
         "500": {
-          "name": "totalRelicCount",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "501": {
-          "name": "currentRelicCount",
-          "readonly": false,
-          "type": "SerializedByteUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "502": {
-          "name": "currentTreeCount",
-          "readonly": true,
-          "type": "VirtualUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "503": {
-          "name": "currentWispCount",
-          "readonly": true,
-          "type": "VirtualUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "504": {
-          "name": "currentQuestCount",
-          "readonly": true,
-          "type": "VirtualUberState",
-          "value": 0.0,
-          "value_type": "Byte"
-        },
-        "505": {
           "name": "currentAreaHasUncollectedRelic",
           "readonly": false,
           "type": "SerializedBooleanUberState",
