@@ -459,9 +459,13 @@ fun bashable_shuriken() {
 )
 !export(bashable_shuriken)
 
+!state(ultra_flaps, Integer)
+!export(ultra_flaps)
+
 fun ultra_flap() {
+    store(ultra_flaps, ultra_flaps + 1)
+    item_message("#Ultra Flap x" + ultra_flaps + "#")
     store(randoUpgrades.flapDamage, randoUpgrades.flapDamage + 4)
-    item_message("#Ultra Flap x" + randoUpgrades.flapDamage / 4 + "#")
 }
 !item_data(
     ultra_flap(),
