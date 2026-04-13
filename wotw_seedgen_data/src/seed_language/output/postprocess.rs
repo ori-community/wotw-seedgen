@@ -9,6 +9,7 @@ use super::{
 use crate::{
     assets::{LocData, LocDataEntry},
     seed_language::output::{
+        display::strip_control_characters,
         item_metadata::{random_shop_description, DEFAULT_SHOP_PRICE},
         postprocess::price_noise::PriceNoise,
         IntoConstant,
@@ -131,11 +132,16 @@ impl IntermediateOutput {
                     .find_map(|metadata| metadata.try_force_map_icon())
                     .unwrap_or_default();
 
+                let label = match name.into_constant() {
+                    Ok(name) => strip_control_characters(&name).into(),
+                    Err(name) => name,
+                };
+
                 extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
                     icon,
                     x: map_position.x.into(),
                     y: map_position.y.into(),
-                    label: name,
+                    label,
                 }));
             }
         }
