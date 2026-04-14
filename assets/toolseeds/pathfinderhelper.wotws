@@ -56,7 +56,7 @@ on reload {
         BottomRight,
         "Refill",
         "[Ability1]Refill\nShortcut: [Binding4]",
-        save_icon,
+        health_icon,
         refill(),
     )
     set_wheel_item_data(
