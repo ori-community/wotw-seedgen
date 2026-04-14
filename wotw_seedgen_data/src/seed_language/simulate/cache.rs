@@ -44,10 +44,9 @@ impl<S: Simulation> SimulationCache<S> {
         self.cache.weapon_upgrades = self.simulation.weapon_upgrades().collect();
         // TODO too lazy to do this better... I don't think doors belong in states because they must not change anyway or things would break
         for (index, door) in self.cache.doors.iter_mut().enumerate() {
-            *door = self.simulation.fetch_integer(UberIdentifier {
-                group: 27,
-                member: index as i32 + 1,
-            });
+            *door = self
+                .simulation
+                .fetch_integer(UberIdentifier::doors(index as i32 + 1));
         }
     }
 }

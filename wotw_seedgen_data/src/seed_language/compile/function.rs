@@ -1403,10 +1403,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
         commands: vec![
             CommandVoid::If {
                 condition: CommandBoolean::FetchBoolean {
-                    uber_identifier: UberIdentifier {
-                        group: 29,
-                        member: 0,
-                    },
+                    uber_identifier: UberIdentifier::RANDOM_SPIRIT_LIGHT,
                 },
                 command: set_random_spirit_light_string(&amount, rng),
             },
@@ -1414,10 +1411,7 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                 condition: CommandBoolean::CompareBoolean {
                     operation: Box::new(Operation {
                         left: CommandBoolean::FetchBoolean {
-                            uber_identifier: UberIdentifier {
-                                group: 29,
-                                member: 0,
-                            },
+                            uber_identifier: UberIdentifier::RANDOM_SPIRIT_LIGHT,
                         },
                         operator: EqualityComparator::Equal,
                         right: false.into(),

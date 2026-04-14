@@ -191,7 +191,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                         .map(|door_id| {
                             let target_door_id = world_context
                                 .world
-                                .fetch_integer(UberIdentifier::new(27, door_id));
+                                .fetch_integer(UberIdentifier::doors(door_id));
 
                             (door_id, target_door_id)
                         })
@@ -743,10 +743,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     }
 
     fn multiworld_state(&mut self) -> UberIdentifier {
-        UberIdentifier {
-            group: 12,
-            member: self.multiworld_state_index.next().unwrap(),
-        }
+        UberIdentifier::multiworld(self.multiworld_state_index.next().unwrap())
     }
 
     fn write_placement_spoiler(

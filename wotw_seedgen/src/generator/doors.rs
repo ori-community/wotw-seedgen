@@ -93,12 +93,12 @@ impl WorldContext<'_, '_> {
                 // enable randoConfig.showSmallDoors
                 self.output.events.push(Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                    command: store_boolean(UberIdentifier::new(7, 200), true),
+                    command: store_boolean(UberIdentifier::rando_config(200), true),
                 });
                 // mark door connections as unknown
                 self.output.events.extend((1..=32).map(|door_id| Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                    command: store_boolean(UberIdentifier::new(28, door_id), false),
+                    command: store_boolean(UberIdentifier::known_door_connections(door_id), false),
                 }));
 
                 let config = DoorRandomizerConfig::new(loop_size.get(), door_groups)?;
@@ -110,7 +110,7 @@ impl WorldContext<'_, '_> {
         for (door_id, target_door_id) in connections {
             log::trace!("Connected door {} → {}", door_id, target_door_id);
 
-            let set_connection = store_integer(UberIdentifier::new(27, door_id), target_door_id);
+            let set_connection = store_integer(UberIdentifier::doors(door_id), target_door_id);
             self.world.simulate(&set_connection, &self.output.events);
             self.output.events.push(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
@@ -122,9 +122,12 @@ impl WorldContext<'_, '_> {
             if loop_size == 2 {
                 self.output.events.push(Event {
                     trigger: Trigger::Condition(CommandBoolean::FetchBoolean {
-                        uber_identifier: UberIdentifier::new(28, door_id),
+                        uber_identifier: UberIdentifier::known_door_connections(door_id),
                     }),
-                    command: store_boolean(UberIdentifier::new(28, target_door_id), true),
+                    command: store_boolean(
+                        UberIdentifier::known_door_connections(target_door_id),
+                        true,
+                    ),
                 });
             }
         }

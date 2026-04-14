@@ -21,12 +21,70 @@ pub struct UberIdentifier {
     pub member: i32,
 }
 
+const PLAYER_GROUP: i32 = 5;
+const RANDO_STATE_GROUP: i32 = 6;
+const RANDO_CONFIG_GROUP: i32 = 7;
+const MULTIWORLD_GROUP: i32 = 12;
+const SKILLS_GROUP: i32 = 24;
+const SHARDS_GROUP: i32 = 25;
+const DOORS_GROUP: i32 = 27;
+const KNOWN_DOOR_CONNECTIONS_GROUP: i32 = 28;
+const SETTINGS_GROUP: i32 = 29;
+
 impl UberIdentifier {
     /// Creates a new `UberIdentifier` from its parts
     ///
     /// See the [`uber_identifier`] module for constants on major `UberIdentifier`s that might make your code more readable
     pub const fn new(group: i32, member: i32) -> Self {
         Self { group, member }
+    }
+
+    pub const fn player(member: i32) -> Self {
+        Self::new(PLAYER_GROUP, member)
+    }
+
+    pub const fn rando_config(member: i32) -> Self {
+        Self::new(RANDO_CONFIG_GROUP, member)
+    }
+
+    pub const fn multiworld(member: i32) -> Self {
+        Self::new(MULTIWORLD_GROUP, member)
+    }
+
+    pub const fn skills(member: i32) -> Self {
+        Self::new(SKILLS_GROUP, member)
+    }
+
+    pub const fn shards(member: i32) -> Self {
+        Self::new(SHARDS_GROUP, member)
+    }
+
+    pub const fn doors(member: i32) -> Self {
+        Self::new(DOORS_GROUP, member)
+    }
+
+    pub const fn known_door_connections(member: i32) -> Self {
+        Self::new(KNOWN_DOOR_CONNECTIONS_GROUP, member)
+    }
+
+    pub const fn as_skills(self) -> Option<i32> {
+        match self {
+            UberIdentifier {
+                group: SKILLS_GROUP,
+                member,
+            } => Some(member),
+            _ => None,
+        }
+    }
+
+    pub const fn as_shards(self) -> Option<i32> {
+        match self {
+            UberIdentifier {
+                group: SHARDS_GROUP,
+                member,
+            } => Some(member),
+            _ => None,
+        }
     }
 
     // /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
@@ -54,15 +112,16 @@ impl UberIdentifier {
         self.group == 27
     }
 
-    pub const SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(5, 0);
-    pub const GORLEK_ORE: UberIdentifier = UberIdentifier::new(5, 1);
-    pub const KEYSTONES: UberIdentifier = UberIdentifier::new(5, 2);
-    pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::new(5, 3); // TODO client needs to add this
-    pub const CLEAN_WATER: UberIdentifier = UberIdentifier::new(6, 2000);
-    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::new(5, 10);
-    pub const HEALTH: UberIdentifier = UberIdentifier::new(5, 11);
-    pub const MAX_ENERGY: UberIdentifier = UberIdentifier::new(5, 12);
-    pub const ENERGY: UberIdentifier = UberIdentifier::new(5, 13);
+    pub const SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 0);
+    pub const GORLEK_ORE: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 1);
+    pub const KEYSTONES: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 2);
+    pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 3); // TODO client needs to add this
+    pub const CLEAN_WATER: UberIdentifier = UberIdentifier::new(RANDO_STATE_GROUP, 2000);
+    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 10);
+    pub const HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 11);
+    pub const MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 12);
+    pub const ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 13);
+    pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(SETTINGS_GROUP, 0);
 }
 
 impl Display for UberIdentifier {

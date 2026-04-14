@@ -256,11 +256,11 @@ impl Compile for input::CommandZone {
             ),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
             Self::CurrentZone {} => (
-                vec![Command::FetchInteger(UberIdentifier::new(5, 50))],
+                vec![Command::FetchInteger(UberIdentifier::player(50))],
                 MemoryUsed::ONE_INTEGER,
             ),
             Self::CurrentMapZone {} => (
-                vec![Command::FetchInteger(UberIdentifier::new(5, 51))],
+                vec![Command::FetchInteger(UberIdentifier::player(51))],
                 MemoryUsed::ONE_INTEGER,
             ),
         }

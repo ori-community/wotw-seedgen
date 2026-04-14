@@ -156,18 +156,15 @@ impl Shard {
 
     /// Returns the [`UberIdentifier`] tracking whether the player has this `Shard`
     pub const fn uber_identifier(self) -> UberIdentifier {
-        UberIdentifier::new(25, self as i32)
+        UberIdentifier::shards(self as i32)
     }
 
     /// Returns the `Shard` corresponsing to the [`UberIdentifier`], if one exists
     pub const fn from_uber_identifier(uber_identifier: UberIdentifier) -> Option<Self> {
         const MIN: i32 = u8::MIN as i32;
         const MAX: i32 = u8::MAX as i32;
-        match uber_identifier {
-            UberIdentifier {
-                group: 25,
-                member: id @ MIN..=MAX,
-            } => Self::from_repr(id as u8),
+        match uber_identifier.as_shards() {
+            Some(id @ MIN..MAX) => Self::from_repr(id as u8),
             _ => None,
         }
     }

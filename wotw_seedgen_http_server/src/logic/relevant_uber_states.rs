@@ -97,7 +97,7 @@ impl RelevantUberStates {
         let loc_data = loc_data.entries.iter().map(|entry| entry.uber_identifier);
         let state_data = state_data.entries.iter().map(|entry| entry.uber_identifier);
 
-        let doors = (1..=32).map(|id| UberIdentifier::new(27, id));
+        let doors = (1..=32).map(UberIdentifier::doors);
 
         let identifiers = loc_data
             .chain(state_data)

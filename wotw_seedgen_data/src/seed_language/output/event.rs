@@ -45,4 +45,8 @@ impl Trigger {
     pub fn loc_data_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
         Self::Condition(CommandBoolean::loc_data_condition(uber_identifier, value))
     }
+
+    pub const fn multiworld(id: i32) -> Self {
+        Self::Binding(UberIdentifier::multiworld(id))
+    }
 }

@@ -258,7 +258,7 @@ impl<'source> Compiler<'source> {
             // TODO during seedgen this should be 1, but start as 0 in the true seed
             self.nodes.push(Node::State(StateDataEntry {
                 identifier: format!("{}Visited", anchor_identifier),
-                uber_identifier: UberIdentifier::new(28, door_id),
+                uber_identifier: UberIdentifier::known_door_connections(door_id),
                 value: None,
             }));
 
@@ -285,7 +285,7 @@ impl<'source> Compiler<'source> {
 
                 self.nodes.push(Node::State(StateDataEntry {
                     identifier: format!("{} to {}", anchor_identifier, target_anchor.identifier),
-                    uber_identifier: UberIdentifier::new(27, door_id),
+                    uber_identifier: UberIdentifier::doors(door_id),
                     value: Some(target_anchor.door.as_ref().unwrap().id), // TODO this should not be treated as strictly incremental
                 }));
             }
