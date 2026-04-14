@@ -1,7 +1,7 @@
 use crate::{
     seed_language::{
         output::{
-            display::strip_control_characters, CommandInteger, CommandString, CommandVoid,
+            display::strip_invisible_characters, CommandInteger, CommandString, CommandVoid,
             ContainedWrites, Event, StringOrPlaceholder,
         },
         simulate::{Simulate, Simulation},
@@ -69,7 +69,7 @@ impl ItemMetadataRef<'_, '_> {
     pub fn log_name<S: Simulation>(&self, simulation: &mut S, events: &[Event]) -> String {
         let name = self.force_name().simulate(simulation, events);
 
-        strip_control_characters(&name)
+        strip_invisible_characters(&name)
     }
 
     /// Base price used when placed in a shop

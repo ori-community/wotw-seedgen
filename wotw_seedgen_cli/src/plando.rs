@@ -13,7 +13,7 @@ use std::{
 use wotw_seedgen::{
     data::{
         assets::{self, AssetCache, DefaultAssetCacheValues, PlandoFileAccess, Watcher},
-        seed_language::compile::Compiler,
+        seed_language::{compile::Compiler, output::postprocess},
     },
     seed::Seed,
 };
@@ -126,9 +126,13 @@ fn compile(
         .eprint_errors()
         .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
-    let string_placeholder_map = output.postprocess(&cache.loc_data, rng);
+    let (placeholder_map, extra_events) = postprocess(Some(&output), &cache.loc_data, rng)
+        .pop()
+        .unwrap();
 
-    let seed = Seed::new(output, string_placeholder_map, debug);
+    output.events.splice(0..0, extra_events);
+
+    let seed = Seed::new(output, placeholder_map, debug);
 
     let mut file = assets::file_create(out)?;
     seed.package(&mut file, !debug)?;

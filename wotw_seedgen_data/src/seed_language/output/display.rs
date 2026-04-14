@@ -5,6 +5,7 @@ use super::{
     CommandVoid, CommandZone, Event, Operation, StringOrPlaceholder, Trigger,
 };
 use itertools::Itertools;
+use logos::Logos;
 use std::{
     fmt::{self, Display},
     iter,
@@ -423,7 +424,7 @@ impl Display for CommandVoidLogDisplay<'_> {
             .contained_messages()
             .filter_map(CommandString::as_constant)
             .map(String::as_str)
-            .map(strip_control_characters);
+            .map(strip_invisible_characters);
 
         match messages.next() {
             None => self.command.fmt(f),
@@ -441,44 +442,49 @@ impl Display for CommandVoidLogDisplay<'_> {
 }
 
 // TODO why not in place?
-pub fn strip_control_characters(s: &str) -> String {
-    let mut result = String::new();
-    let mut last_end = 0;
-    let mut in_tag = false;
+pub fn strip_invisible_characters(s: &str) -> String {
+    #[derive(Logos)]
+    enum Token {
+        #[regex(r"<world>[^<]*<|<icon>[^<]*<|[^@#$*<]")]
+        Visible,
+        #[regex(r"@|#|\$|\*|<[^>]*>")]
+        Invisible,
+    }
 
-    for (index, byte) in s.as_bytes().iter().enumerate() {
-        match (in_tag, byte) {
-            (_, b'@' | b'#' | b'$' | b'*') => {
-                result.push_str(&s[last_end..index]);
-                last_end = index + 1;
+    let mut result = String::new();
+    let mut start = 0;
+
+    for (token, span) in Token::lexer(s).spanned() {
+        match token {
+            Ok(Token::Visible) => {}
+            Ok(Token::Invisible) => {
+                result.push_str(&s[start..span.start]);
+                start = span.end;
             }
-            (false, b'<') => {
-                result.push_str(&s[last_end..index]);
-                in_tag = true;
-            }
-            (true, b'>') => {
-                last_end = index + 1;
-                in_tag = false;
-            }
-            _ => {}
+            Err(()) => unreachable!(),
         }
     }
-    result.push_str(&s[last_end..]);
+
+    result.push_str(&s[start..]);
 
     result
 }
 
 #[cfg(test)]
 mod tests {
-    use super::strip_control_characters as strip;
-
     #[test]
-    fn strip_control_characters() {
+    fn strip_invisible_characters() {
+        use super::strip_invisible_characters as strip;
+
         assert_eq!(strip(""), "");
         assert_eq!(strip("aaa"), "aaa");
         assert_eq!(strip("@#$"), "");
         assert_eq!(strip("@@@a@a@@a@"), "aaa");
         assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
+        assert_eq!(
+            strip(r"<worldn>1<\><world>1<\><nicon>x<\><icon>x<\>"),
+            r"1<world>1<\>x<icon>x<\>"
+        );
     }
 }
 

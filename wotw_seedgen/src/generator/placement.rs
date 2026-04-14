@@ -18,7 +18,10 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom, sync::LazyLock};
-use wotw_seedgen_data::seed_language::{compile::store_boolean, output::AsConstant};
+use wotw_seedgen_data::seed_language::{
+    compile::store_boolean,
+    output::{postprocess, AsConstant},
+};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     logic_language::output::Node,
@@ -780,11 +783,15 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     }
 
     fn finish(self, loc_data: &LocData, debug: bool, rng: &mut Pcg64Mcg) -> SeedUniverse {
+        let postprocessed =
+            postprocess(self.worlds.iter().map(|world| &world.output), loc_data, rng);
+
         SeedUniverse {
             worlds: self
                 .worlds
                 .into_iter()
-                .map(|mut world_context| {
+                .zip(postprocessed)
+                .map(|(mut world_context, (placeholder_map, extra_events))| {
                     assert!(
                         world_context.output.icons.is_empty(),
                         "custom icons in seedgen aren't supported"
@@ -793,15 +800,15 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
                     world_context.output.spawn = Some(*spawn.position().unwrap());
 
+                    world_context.output.events.splice(0..0, extra_events);
+
                     let seedgen_info = SeedgenInfo {
                         universe_settings: self.settings.clone(),
                         world_index: world_context.index,
                         spawn_identifier: spawn.identifier().to_string(),
                     };
 
-                    let string_placeholder_map = world_context.output.postprocess(loc_data, rng);
-
-                    Seed::new(world_context.output, string_placeholder_map, debug)
+                    Seed::new(world_context.output, placeholder_map, debug)
                         .with_seedgen_info(seedgen_info)
                 })
                 .collect(),

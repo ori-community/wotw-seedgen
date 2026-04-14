@@ -49,4 +49,11 @@ impl Trigger {
     pub const fn multiworld(id: i32) -> Self {
         Self::Binding(UberIdentifier::multiworld(id))
     }
+
+    pub const fn as_multiworld(&self) -> Option<i32> {
+        match self {
+            Self::Binding(uber_identifier) => uber_identifier.as_multiworld(),
+            _ => None,
+        }
+    }
 }

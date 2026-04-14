@@ -23,7 +23,7 @@ pub use operation::{
     ArithmeticOperator, Comparator, Concatenator, EqualityComparator, ExecuteOperator,
     LogicOperator, Operation,
 };
-pub use postprocess::PlaceholderMap;
+pub use postprocess::{postprocess, PlaceholderMap, UniversePostprocessor};
 
 use crate::{Icon, Position, UberIdentifier, Zone};
 use rustc_hash::{FxHashMap, FxHashSet};

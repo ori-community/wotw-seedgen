@@ -87,6 +87,16 @@ impl UberIdentifier {
         }
     }
 
+    pub const fn as_multiworld(self) -> Option<i32> {
+        match self {
+            UberIdentifier {
+                group: MULTIWORLD_GROUP,
+                member,
+            } => Some(member),
+            _ => None,
+        }
+    }
+
     // /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
     pub const fn is_shop(self) -> bool {
         !matches!(self.shop_kind(), ShopKind::None)
