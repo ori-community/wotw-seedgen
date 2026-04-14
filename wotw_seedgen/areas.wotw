@@ -16736,15 +16736,25 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     gorlek: Launch, Dash OR Glide OR DoubleJump
     kii:
       Launch
+      DoubleJump, Dash, Damage=80
+      DoubleJump, Dash, Hammer, Damage=40
+      DoubleJump, TripleJump, Damage=40
+      Bash, Grenade=2, DoubleJump, Damage=40
+      Bash, Grenade=1, DoubleJump, TripleJump OR Dash
       # Glitched
-      # GrenadeJump=1, Damage=40, Damage=40, DoubleJump OR Dash
-      # AerialHammerJump, Damage=40
+      # GlideJump, DoubleJump, Damage=40
+      # GlideJump, Dash, Damage=80
+      # DoubleJump, Dash, SwordSJump=1
+      # DoubleJump, Dash, GrenadeJump=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=40
+      # DoubleJump, TripleJump, AerialHammerJump OR GrenadeJump=1
+      # Bash, Grenade=1, AerialHammerJump, Damage=40
+      # AerialHammerJump, Dash, Sword OR Flash=1 OR Sentry=1  # Also works with Shuriken but if you throw it at the floating platform, it's pretty hard to wall jump on it
+      ## GrenadeJump=1, Dash, Damage=40, Sword OR Hammer OR Damage=40
     unsafe:
-      Damage=20, GroundedHammerJump
-      Damage=40, DoubleJump, TripleJump OR GlideJump
-      Damage=80, DoubleJump
-      Damage=120, Damage=40  # 3 to reach the center platform, 1 more to get over the mound
-      SwordSJump=2 OR AerialHammerJump
+      GroundedHammerJump, Damage=20  # Bait the wheel with upswing+hover back. GHJ to the portal ledge and jump over. GHJ to the right wall. Dboost on the first laser. Upswing over the tall purple goo
+      SwordSJump=2, Sentry=1  # Bait the wheel with upswing+hover back. Sjump over the gap. Sjump to the right wall. Sentry+Upswing over the tall purple goo
+      AerialHammerJump
+      Bash, Grenade=2, DoubleJump OR GlideJump  # 2nd grenade before the goo, need to jump up to catch it
   conn WillowsEnd.East:
     moki:
       Combat=CrystalMiner, DoubleJump OR Dash OR Glide
