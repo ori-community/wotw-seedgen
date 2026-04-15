@@ -43,92 +43,119 @@ By default those are bound to
 
 !export(write_progress_message)
 fun write_progress_message() {
+    set_string("progress_message", "")
+    set_string("zone", "")
     set_integer("collected", randoStats.pickupsCollected)
     set_integer("collected_on_spawn", pickups_collected_on_spawn)
     set_integer("total", total_pickups)
-    pickups_progress()
+    write_pickups_progress()
+    set_integer("zone", fetch(player.currentArea))
+    write_zone_pickup_progress()
 }
 
 !export(write_map_progress_message)
 fun write_map_progress_message() {
     set_string("progress_message", "")
-    if current_map_zone() == Marsh {
+    set_integer("zone", fetch(player.currentMapArea))
+    write_zone_pickup_progress()
+}
+
+fun write_zone_pickup_progress() {
+    if get_integer("zone") == 0 {
+        set_string("zone", "Marsh ")
         set_integer("collected", marsh_pickups_collected)
         set_integer("collected_on_spawn", marsh_pickups_collected_on_spawn)
         set_integer("total", total_marsh_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Hollow {
+    if get_integer("zone") == 1 {
+        set_string("zone", "Hollow ")
         set_integer("collected", hollow_pickups_collected)
         set_integer("collected_on_spawn", hollow_pickups_collected_on_spawn)
         set_integer("total", total_hollow_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Glades {
+    if get_integer("zone") == 2 {
+        set_string("zone", "Glades ")
         set_integer("collected", glades_pickups_collected)
         set_integer("collected_on_spawn", glades_pickups_collected_on_spawn)
         set_integer("total", total_glades_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Wellspring {
+    if get_integer("zone") == 3 {
+        set_string("zone", "Wellspring ")
         set_integer("collected", wellspring_pickups_collected)
         set_integer("collected_on_spawn", wellspring_pickups_collected_on_spawn)
         set_integer("total", total_wellspring_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Woods {
+    if get_integer("zone") == 7 {
+        set_string("zone", "Woods ")
         set_integer("collected", woods_pickups_collected)
         set_integer("collected_on_spawn", woods_pickups_collected_on_spawn)
         set_integer("total", total_woods_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Reach {
+    if get_integer("zone") == 6 {
+        set_string("zone", "Reach ")
         set_integer("collected", reach_pickups_collected)
         set_integer("collected_on_spawn", reach_pickups_collected_on_spawn)
         set_integer("total", total_reach_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Depths {
+    if get_integer("zone") == 8 {
+        set_string("zone", "Depths ")
         set_integer("collected", depths_pickups_collected)
         set_integer("collected_on_spawn", depths_pickups_collected_on_spawn)
         set_integer("total", total_depths_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Pools {
+    if get_integer("zone") == 4 {
+        set_string("zone", "Pools ")
         set_integer("collected", pools_pickups_collected)
         set_integer("collected_on_spawn", pools_pickups_collected_on_spawn)
         set_integer("total", total_pools_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Wastes {
+    if get_integer("zone") == 9 {
+        set_string("zone", "Wastes ")
         set_integer("collected", wastes_pickups_collected)
         set_integer("collected_on_spawn", wastes_pickups_collected_on_spawn)
         set_integer("total", total_wastes_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Ruins {
+    if get_integer("zone") == 10 {
+        set_string("zone", "Ruins ")
         set_integer("collected", ruins_pickups_collected)
         set_integer("collected_on_spawn", ruins_pickups_collected_on_spawn)
         set_integer("total", total_ruins_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Willow {
+    if get_integer("zone") == 11 {
+        set_string("zone", "Willow ")
         set_integer("collected", willow_pickups_collected)
         set_integer("collected_on_spawn", willow_pickups_collected_on_spawn)
         set_integer("total", total_willow_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
-    if current_map_zone() == Burrows {
+    if get_integer("zone") == 5 {
+        set_string("zone", "Burrows ")
         set_integer("collected", burrows_pickups_collected)
         set_integer("collected_on_spawn", burrows_pickups_collected_on_spawn)
         set_integer("total", total_burrows_pickups)
-        pickups_progress()
+        write_pickups_progress()
     }
 }
 
-fun pickups_progress() {
-    set_string("progress_message", "Pickups: " + (get_integer("collected") - get_integer("collected_on_spawn")) + "/" + (get_integer("total") - get_integer("collected_on_spawn")))
-    if get_integer("collected") >= get_integer("total") set_string("progress_message", "$" + get_string("progress_message") + "$")
+fun write_pickups_progress() {
+    if get_string("progress_message") != "" {
+        set_string("progress_message", get_string("progress_message") + "\n")
+    }
+
+    set_string("color", "")
+    if get_integer("collected") >= get_integer("total") set_string("color", "$")
+
+    set_string("progress_message", get_string("progress_message") + get_string("color") + get_string("zone") + "Pickups: " + (get_integer("collected") - get_integer("collected_on_spawn")) + "/" + (get_integer("total") - get_integer("collected_on_spawn")) + get_string("color"))
 }
 
 !state(disable_keybinds, Boolean)
