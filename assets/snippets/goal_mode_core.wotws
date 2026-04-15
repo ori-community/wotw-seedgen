@@ -24,6 +24,14 @@ fun write_goals_incomplete_message() {
 fun update_goals_completed() {
     check_goals_completed()
     store(randoState.shriekBarrier, get_boolean("goals_completed") == false)
+
+    // TODO crashes
+    // update_progress_message()
+
+    if get_boolean("in_shriek_room") && get_boolean("goals_completed") == false {
+        write_goals_incomplete_message()
+        set_message_text("goals_incomplete", get_string("goals_incomplete_message"))
+    }
 }
 
 // TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
@@ -37,10 +45,17 @@ fun update_goals_completed() {
 on reload {
     box_trigger("shriek_room", 520, -3617, 744, -3503)
     box_trigger_enter_callback("shriek_room", {
+        set_boolean("in_shriek_room", true)
         check_goals_completed()
         if get_boolean("goals_completed") == false {
             write_goals_incomplete_message()
-            priority_message(get_string("goals_incomplete_message"))
+            free_message("goals_incomplete", get_string("goals_incomplete_message"))
+            set_message_vertical_anchor("goals_incomplete", Bottom)
+            set_message_position("goals_incomplete", 0.5, 0.8)
         }
+    })
+    box_trigger_leave_callback("shriek_room", {
+        set_boolean("in_shriek_room", false)
+        destroy_message("goals_incomplete")
     })
 }
