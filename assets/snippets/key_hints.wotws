@@ -76,7 +76,7 @@ fun write_twillen_hint() {
     set_string("bow_color", "")
     if skills.bow set_string("bow_color", "$")
 
-    set_string("lupo_hint",
+    set_string("twillen_hint",
         get_string("bash_color") + "Bash: " + bash_zone + get_string("bash_color") + ", " +
         get_string("bow_color") + "Bow: " + bow_zone + get_string("bow_color")
     )
