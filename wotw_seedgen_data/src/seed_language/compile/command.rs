@@ -807,9 +807,11 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
             .and_then(|command| command.expect_void(compiler, span));
 
         if let Some(item) = item {
+            let write_identifiers = item.contained_write_identifiers().collect();
+
             compiler.variables.insert(
                 self.identifier.data,
-                Literal::String(StringOrPlaceholder::ZoneOfPlaceholder(Box::new(item))),
+                Literal::String(StringOrPlaceholder::ZoneOfPlaceholder(write_identifiers)),
             );
         }
     }

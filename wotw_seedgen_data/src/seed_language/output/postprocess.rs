@@ -1,6 +1,10 @@
 mod price_noise;
 
-use std::fmt::{self, Display};
+use std::{
+    collections::hash_map::Entry,
+    fmt::{self, Display},
+    ops::Deref,
+};
 
 use super::{
     ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
@@ -47,12 +51,24 @@ pub struct PlaceholderMap {
 pub struct UniversePostprocessor<'output, 'locdata> {
     worlds: Vec<WorldPostprocessor<'output>>,
     loc_data_triggers: FxHashMap<Trigger, &'locdata LocDataEntry>,
-    multiworld_map: FxHashMap<i32, (usize, &'output Event)>,
+    multiworld_lookup: MultiworldLookup<'output>,
 }
 
 struct WorldPostprocessor<'output> {
     output: &'output IntermediateOutput,
     loc_data_events: FxHashMap<&'output Trigger, Vec<&'output Event>>,
+}
+
+#[derive(Default)]
+struct MultiworldLookup<'output> {
+    inner: FxHashMap<i32, MultiworldEvent<'output>>,
+}
+
+struct MultiworldEvent<'output> {
+    origin_world_index: usize,
+    origin_trigger: &'output Trigger,
+    target_world_index: usize,
+    target_command: &'output CommandVoid,
 }
 
 impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
@@ -71,26 +87,16 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             })
             .collect::<FxHashMap<_, _>>();
 
-        let mut multiworld_map = FxHashMap::default();
-
-        let worlds = worlds
-            .into_iter()
-            .enumerate()
-            .map(|(world_index, output)| {
-                for event in &output.events {
-                    if let Some(id) = event.trigger.as_multiworld() {
-                        multiworld_map.insert(id, (world_index, event));
-                    }
-                }
-
-                WorldPostprocessor::new(output, &loc_data_triggers)
-            })
-            .collect::<Vec<_>>();
+        let iter = worlds.into_iter();
+        let mut worlds = Vec::with_capacity(iter.size_hint().1.unwrap_or_default());
+        let multiworld_lookup = MultiworldLookup::new(iter, |output| {
+            worlds.push(WorldPostprocessor::new(output, &loc_data_triggers))
+        });
 
         Self {
             worlds,
             loc_data_triggers,
-            multiworld_map,
+            multiworld_lookup,
         }
     }
 
@@ -115,20 +121,24 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             .map(move |world| self.generate_defaults_for(world, &price_noise, rng))
     }
 
-    fn resolve_zone_of(&self, item: &CommandVoid, target_world_index: usize) -> CommandString {
-        let matches = self.worlds.iter().flat_map(|world| {
-            world
-                .output
-                .events
-                .iter()
-                .filter(|event| &event.command == item)
-                .filter_map(|event| self.zone_of_trigger(&event.trigger, target_world_index))
-                .map(|(origin_world_index, zone)| ZoneOfMatch {
-                    origin_world_index,
-                    target_world_index,
-                    zone,
-                })
-        });
+    fn resolve_zone_of(
+        &self,
+        uber_identifiers: &[UberIdentifier],
+        target_world_index: usize,
+    ) -> CommandString {
+        let target_world = &self.worlds[target_world_index];
+
+        let matches = target_world
+            .output
+            .events
+            .iter()
+            .filter(|event| self.command_writes_any(&event.command, uber_identifiers))
+            .filter_map(|event| self.zone_of_trigger(&event.trigger, target_world_index))
+            .map(|(origin_world_index, zone)| ZoneOfMatch {
+                origin_world_index,
+                target_world_index,
+                zone,
+            });
 
         let message = matches.format(" or ").to_string();
 
@@ -150,10 +160,13 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
 
         if let Some(id) = trigger.as_multiworld() {
             return self
-                .multiworld_map
+                .multiworld_lookup
                 .get(&id)
-                .and_then(|(origin_world_index, event)| {
-                    self.zone_of_trigger(&event.trigger, *origin_world_index)
+                .and_then(|multiworld_event| {
+                    self.zone_of_trigger(
+                        &multiworld_event.origin_trigger,
+                        multiworld_event.origin_world_index,
+                    )
                 });
         }
 
@@ -182,7 +195,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             .flat_map(|(entry, events)| {
                 events
                     .iter()
-                    .filter(|event| self.event_writes_any(event, uber_identifiers))
+                    .filter(|event| self.command_writes_any(&event.command, uber_identifiers))
                     .map(move |event| (*event, *entry))
             })
             .collect::<Vec<_>>();
@@ -190,16 +203,21 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         count_in_zone_message(matches, &origin_world.output.item_metadata)
     }
 
-    fn event_writes_any(&self, event: &Event, uber_identifiers: &[UberIdentifier]) -> bool {
-        event
-            .command
+    fn command_writes_any(
+        &self,
+        command: &CommandVoid,
+        uber_identifiers: &[UberIdentifier],
+    ) -> bool {
+        command
             .contained_write_identifiers()
             .any(|uber_identifier| match uber_identifier.as_multiworld() {
                 None => uber_identifiers.contains(&uber_identifier),
                 Some(id) => self
-                    .multiworld_map
+                    .multiworld_lookup
                     .get(&id)
-                    .is_some_and(|(_, event)| self.event_writes_any(event, uber_identifiers)),
+                    .is_some_and(|multiworld_event| {
+                        self.command_writes_any(multiworld_event.target_command, uber_identifiers)
+                    }),
             })
     }
 
@@ -269,12 +287,12 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                     .command
                     .contained_write_identifiers()
                     .filter_map(UberIdentifier::as_multiworld)
-                    .filter_map(|id| self.multiworld_map.get(&id))
-                    .map(|(target_world_index, event)| {
-                        self.worlds[*target_world_index]
+                    .filter_map(|id| self.multiworld_lookup.get(&id))
+                    .map(|multiworld_event| {
+                        self.worlds[multiworld_event.target_world_index]
                             .output
                             .item_metadata
-                            .get(&event.command)
+                            .get(multiworld_event.target_command)
                     }),
             );
 
@@ -407,6 +425,97 @@ impl<'output> WorldPostprocessor<'output> {
             });
 
         multi_name(names)
+    }
+}
+
+impl<'output> MultiworldLookup<'output> {
+    fn new<I, F>(worlds: I, mut extra: F) -> Self
+    where
+        I: Iterator<Item = &'output IntermediateOutput>,
+        F: FnMut(&'output IntermediateOutput),
+    {
+        let mut multiworld_lookup = Self::default();
+        let mut unmatched_triggers = FxHashMap::default();
+        let mut unmatched_commands = FxHashMap::default();
+
+        for (world_index, output) in worlds.into_iter().enumerate() {
+            extra(output);
+
+            for event in &output.events {
+                if let Some(id) = event.trigger.as_multiworld() {
+                    match unmatched_triggers.entry(id) {
+                        Entry::Occupied(occupied) => {
+                            let (origin_world_index, origin_trigger) = occupied.remove();
+                            multiworld_lookup.inner.insert(
+                                id,
+                                MultiworldEvent {
+                                    origin_world_index,
+                                    origin_trigger,
+                                    target_world_index: world_index,
+                                    target_command: &event.command,
+                                },
+                            );
+                        }
+                        Entry::Vacant(_) => {
+                            unmatched_commands.insert(id, (world_index, &event.command));
+                        }
+                    }
+                } else {
+                    for id in event
+                        .command
+                        .contained_write_identifiers()
+                        .filter_map(UberIdentifier::as_multiworld)
+                    {
+                        match unmatched_commands.entry(id) {
+                            Entry::Occupied(occupied) => {
+                                let (target_world_index, target_command) = occupied.remove();
+                                multiworld_lookup.inner.insert(
+                                    id,
+                                    MultiworldEvent {
+                                        origin_world_index: world_index,
+                                        origin_trigger: &event.trigger,
+                                        target_world_index,
+                                        target_command,
+                                    },
+                                );
+                            }
+                            Entry::Vacant(_) => {
+                                unmatched_triggers.insert(id, (world_index, &event.trigger));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        debug_assert!(
+            unmatched_triggers.is_empty(),
+            "unmatched multiworld triggers: {}",
+            unmatched_triggers
+                .iter()
+                .format_with(", ", |(id, (world_index, trigger)), f| f(&format_args!(
+                    "12|{id}: [{world_index}] {trigger}"
+                )))
+        );
+        debug_assert!(
+            unmatched_commands.is_empty(),
+            "unmatched multiworld commands: {}",
+            unmatched_commands
+                .iter()
+                .format_with(", ", |(id, (world_index, command)), f| f(&format_args!(
+                    "12|{id}: [{world_index}] {command}"
+                )))
+        );
+
+        multiworld_lookup
+    }
+}
+
+impl<'output> Deref for MultiworldLookup<'output> {
+    type Target = FxHashMap<i32, MultiworldEvent<'output>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
     }
 }
 
@@ -552,9 +661,9 @@ impl ResolvePlaceholders for CommandString {
 
                 let resolved = match value {
                     StringOrPlaceholder::Value(_) => return,
-                    StringOrPlaceholder::ZoneOfPlaceholder(item) => context
+                    StringOrPlaceholder::ZoneOfPlaceholder(uber_identifiers) => context
                         .postprocessor
-                        .resolve_zone_of(item, context.world_index),
+                        .resolve_zone_of(uber_identifiers, context.world_index),
                     StringOrPlaceholder::ItemOnPlaceholder(trigger) => context
                         .postprocessor
                         .resolve_item_on(trigger, context.world_index),

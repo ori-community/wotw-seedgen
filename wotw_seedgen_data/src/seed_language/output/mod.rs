@@ -70,7 +70,7 @@ pub struct SnippetDebugOutput {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum StringOrPlaceholder {
     Value(String),
-    ZoneOfPlaceholder(Box<CommandVoid>),
+    ZoneOfPlaceholder(Vec<UberIdentifier>),
     ItemOnPlaceholder(Box<Trigger>),
     CountInZonePlaceholder(Vec<UberIdentifier>, Zone),
 }

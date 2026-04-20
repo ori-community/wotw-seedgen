@@ -30,13 +30,15 @@ impl Display for StringOrPlaceholder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             StringOrPlaceholder::Value(string) => write!(f, "\"{string}\""),
-            StringOrPlaceholder::ZoneOfPlaceholder(action) => write!(f, "zone_of({action})"),
+            StringOrPlaceholder::ZoneOfPlaceholder(uber_identifiers) => {
+                write!(f, "zone_of({})", uber_identifiers.iter().format(", "))
+            }
             StringOrPlaceholder::ItemOnPlaceholder(trigger) => write!(f, "item_on({trigger})"),
             StringOrPlaceholder::CountInZonePlaceholder(uber_identifiers, zone) => {
                 write!(
                     f,
-                    "count_in_zone({zone}, [{}])",
-                    uber_identifiers.iter().format(", ")
+                    "count_in_zone({zone}, [{uber_identifiers}])",
+                    uber_identifiers = uber_identifiers.iter().format(", ")
                 )
             }
         }
@@ -53,8 +55,7 @@ impl Display for Trigger {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Trigger::ClientEvent(client) => client.fmt(f),
-            // TODO not sure I decided on this syntax yet
-            Trigger::Binding(uber_identifier) => write!(f, "[{uber_identifier}]"),
+            Trigger::Binding(uber_identifier) => write!(f, "change {uber_identifier}"),
             Trigger::Condition(condition) => condition.fmt(f),
         }
     }
