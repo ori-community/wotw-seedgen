@@ -50,20 +50,27 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     };
 
     let seed_universe = generate(&settings, debug)?;
-    write_seed(seed_universe, name, debug, launch, start)
+    let path = write_seed(seed_universe, name, debug, launch)?;
+
+    eprintln!(
+        "Generated seed in {:.1}s to \"{}\"",
+        start.elapsed().as_secs_f32(),
+        path.display()
+    );
+
+    Ok(())
 }
 
-fn write_seed(
+pub fn write_seed(
     seed_universe: SeedUniverse,
     name: &str,
     debug: bool,
     launch: bool,
-    start: Instant,
-) -> Result<(), Error> {
+) -> Result<PathBuf, Error> {
     let seeds_dir = SEEDGEN_USER_DATA_DIR.join("seeds");
     assets::create_dir_all(&seeds_dir)?;
 
-    let path = if seed_universe.worlds.len() == 1 {
+    if seed_universe.worlds.len() == 1 {
         let (mut file, path) = create_unique_file(seeds_dir, name, ".wotwr")?;
         let seed = seed_universe.worlds.into_iter().next().unwrap();
         // TODO BufWriter needed on packages to file?
@@ -76,7 +83,7 @@ fn write_seed(
         let spoiler_path = path.with_extension("spoiler.txt");
         assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
 
-        path
+        Ok(path)
     } else {
         let path = create_unique_dir(seeds_dir, name)?;
 
@@ -89,16 +96,8 @@ fn write_seed(
         let spoiler_path = path.join("spoiler.txt");
         assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
 
-        path
-    };
-
-    eprintln!(
-        "Generated seed in {:.1}s to \"{}\"",
-        start.elapsed().as_secs_f32(),
-        path.display()
-    );
-
-    Ok(())
+        Ok(path)
+    }
 }
 
 fn create_unique_file(dir: PathBuf, name: &str, extension: &str) -> Result<(File, PathBuf), Error> {

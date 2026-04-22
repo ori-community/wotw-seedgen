@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::{fs::File, time::Instant};
 
 use serde::de::DeserializeOwned;
 use wotw_seedgen::{
@@ -7,10 +7,21 @@ use wotw_seedgen::{
 };
 use zip::{read::ZipFile, ZipArchive};
 
-use crate::{cli::RegenerateArgs, log_config::LogConfig, seed::generate, Error};
+use crate::{
+    cli::{GenerationArgs, RegenerateArgs},
+    log_config::LogConfig,
+    seed::{generate, write_seed},
+    Error,
+};
 
 pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
-    let RegenerateArgs { path, verbose_args } = args;
+    let RegenerateArgs {
+        path,
+        generation_args: GenerationArgs { debug, launch },
+        verbose_args,
+    } = args;
+
+    let start = Instant::now();
 
     LogConfig::from_args(verbose_args).apply()?;
 
@@ -21,10 +32,26 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
 
     // TODO compare seedgen commit hash
 
-    let seed_universe = generate(&seedgen_info.universe_settings, true)?;
+    let seed_universe = generate(&seedgen_info.universe_settings, debug)?;
     if assembly != seed_universe.worlds[seedgen_info.world_index].assembly {
         return Err(Error("Regenerated seed did not match".to_string()));
     }
+
+    let path = if debug || launch {
+        let name = format!("{}_regenerate", path.file_stem().unwrap().display());
+
+        Some(write_seed(seed_universe, &name, debug, launch)?)
+    } else {
+        None
+    };
+
+    eprint!("Regenerated seed in {:.1}s", start.elapsed().as_secs_f32());
+
+    if let Some(path) = path {
+        eprint!(" to \"{}\"", path.display());
+    }
+
+    eprintln!();
 
     Ok(())
 }
