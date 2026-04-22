@@ -1,4 +1,7 @@
-use std::{fmt::Display, num::NonZeroUsize};
+use std::{
+    fmt::{Display, Write},
+    num::NonZeroUsize,
+};
 
 use clap::builder::styling::Reset;
 use dialoguer::{
@@ -9,9 +12,9 @@ use itertools::Itertools;
 use rustc_hash::FxHashSet;
 use strum::{Display, VariantArray, VariantNames};
 use wotw_seedgen::data::{
-    assets::{UniversePresetSettings, WorldPresetSettings},
+    assets::{DefaultFileAccess, PresetAccess, UniversePresetSettings, WorldPresetSettings},
     seed_language::metadata::{ConfigDefault, ConfigValue},
-    Difficulty, GreaterOneU8, Spawn, Trick,
+    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 
 use crate::{
@@ -33,16 +36,28 @@ pub fn seed_settings(settings: &mut UniversePresetSettings) -> Result<(), Error>
     let world_settings = settings.world_settings.as_mut().unwrap();
     choose_world_count(world_settings)?;
 
+    let mut include_settings = UniverseSettings::new(String::new());
+
+    for identifier in settings.includes.iter().flatten() {
+        DefaultFileAccess
+            .universe_preset(identifier)?
+            .apply(&mut include_settings, &DefaultFileAccess)?;
+    }
+
     let multiworld = world_settings.len() > 1;
 
-    for (index, settings) in world_settings.iter_mut().enumerate() {
+    for (index, (settings, include_settings)) in world_settings
+        .iter_mut()
+        .zip(&mut include_settings.world_settings)
+        .enumerate()
+    {
         let prefix = if multiworld {
             format!("[World {index}] ")
         } else {
             String::new()
         };
 
-        seed_world_settings(prefix, settings)?;
+        seed_world_settings(prefix, settings, include_settings)?;
     }
 
     Ok(())
@@ -51,6 +66,7 @@ pub fn seed_settings(settings: &mut UniversePresetSettings) -> Result<(), Error>
 pub fn seed_world_settings(
     prefix: String,
     settings: &mut WorldPresetSettings,
+    include_settings: &mut WorldSettings,
 ) -> Result<(), Error> {
     select_presets(
         &prefix,
@@ -58,13 +74,20 @@ pub fn seed_world_settings(
         &mut settings.includes,
         &AVAILABLE_WORLD_PRESETS,
     )?;
-    choose_spawn(&prefix, settings)?;
-    select_difficulty(&prefix, settings)?;
-    select_tricks(&prefix, settings)?;
-    select_hard(&prefix, settings)?;
-    select_randomize_doors(&prefix, settings)?;
-    select_snippets(&prefix, settings)?;
-    select_snippet_config(&prefix, settings)?;
+
+    for identifier in settings.includes.iter().flatten() {
+        DefaultFileAccess
+            .world_preset(identifier)?
+            .apply(include_settings, &DefaultFileAccess)?;
+    }
+
+    choose_spawn(&prefix, settings, include_settings)?;
+    select_difficulty(&prefix, settings, include_settings)?;
+    select_tricks(&prefix, settings, include_settings)?;
+    select_hard(&prefix, settings, include_settings)?;
+    select_randomize_doors(&prefix, settings, include_settings)?;
+    select_snippets(&prefix, settings, include_settings)?;
+    select_snippet_config(&prefix, settings, include_settings)?;
     Ok(())
 }
 
@@ -124,7 +147,11 @@ fn choose_world_count(world_settings: &mut Vec<WorldPresetSettings>) -> Result<(
     Ok(())
 }
 
-fn choose_spawn(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
+fn choose_spawn(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
     #[derive(Display, VariantArray)]
     #[strum(serialize_all = "title_case")]
     enum SpawnItems {
@@ -136,10 +163,19 @@ fn choose_spawn(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), 
     }
 
     if settings.spawn.is_none() {
+        let (default, default_anchor) = match &include_settings.spawn {
+            Spawn::Set(anchor) => match anchor.as_str() {
+                DEFAULT_SPAWN => (SpawnItems::Skip as usize, None),
+                other => (SpawnItems::Custom as usize, Some(other)),
+            },
+            Spawn::Random => (SpawnItems::Random as usize, None),
+            Spawn::FullyRandom => (SpawnItems::FullyRandom as usize, None),
+        };
+
         if let Some(index) = Select::new()
             .with_prompt(format!("{prefix}Select a spawn location"))
             .items(SpawnItems::VARIANTS)
-            .default(0)
+            .default(default)
             .interact_opt()?
         {
             settings.spawn = Some(match SpawnItems::VARIANTS[index] {
@@ -148,9 +184,14 @@ fn choose_spawn(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), 
                 SpawnItems::Random => Spawn::Random,
                 SpawnItems::FullyRandom => Spawn::FullyRandom,
                 SpawnItems::Custom => {
-                    let identifier = Input::new()
-                        .with_prompt(format!("{prefix}Choose an areas.wotw identifier as spawn"))
-                        .interact_text()?;
+                    let mut query = Input::new()
+                        .with_prompt(format!("{prefix}Choose an areas.wotw identifier as spawn"));
+
+                    if let Some(anchor) = default_anchor {
+                        query = query.default(anchor.to_owned());
+                    }
+
+                    let identifier = query.interact_text()?;
                     Spawn::Set(identifier)
                 }
             });
@@ -160,13 +201,17 @@ fn choose_spawn(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), 
     Ok(())
 }
 
-fn select_difficulty(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
+fn select_difficulty(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
     if settings.difficulty.is_none() {
         if let Some(index) = Select::new()
             .with_prompt(format!("{prefix}Select a difficulty"))
             .item("Skip")
-            .default(0)
             .items(<Difficulty as VariantNames>::VARIANTS)
+            .default(include_settings.difficulty as usize + 1)
             .interact_opt()?
         {
             if index > 0 {
@@ -178,41 +223,68 @@ fn select_difficulty(prefix: &str, settings: &mut WorldPresetSettings) -> Result
     Ok(())
 }
 
-fn select_tricks(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
-    let mut query = MultiSelect::new()
-        .with_prompt(format!("{prefix}Select any number of tricks"))
-        .items(<Trick as VariantNames>::VARIANTS);
+fn select_tricks(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
+    let mut include_controlled = 0;
 
-    if let Some(tricks) = &settings.tricks {
-        query = query.defaults(
-            &<Trick as VariantArray>::VARIANTS
-                .iter()
-                .map(|trick| tricks.contains(trick))
-                .collect::<Vec<_>>(),
-        )
-    }
+    let items = <Trick as VariantArray>::VARIANTS
+        .iter()
+        .copied()
+        .filter({
+            let difficulty = settings.difficulty.unwrap_or(include_settings.difficulty);
+            move |trick| difficulty >= trick.min_difficulty()
+        })
+        .filter(|trick| {
+            let controlled = include_settings.tricks.contains(trick);
+            include_controlled += controlled as u8;
+            !controlled
+        })
+        .collect::<Vec<_>>();
 
-    let indices = query.interact_opt()?.unwrap_or_default();
+    if !items.is_empty() {
+        let mut prompt = format!("{prefix}Select any number of tricks");
+        if include_controlled > 0 {
+            let _ = write!(
+                &mut prompt,
+                " ({include_controlled} more controlled by included presets)"
+            );
+        }
 
-    if !indices.is_empty() {
-        settings.tricks = Some(
-            indices
-                .into_iter()
-                .map(|index| <Trick as VariantArray>::VARIANTS[index])
-                .collect(),
-        )
+        let mut query = MultiSelect::new().with_prompt(prompt).items(&items);
+
+        if let Some(tricks) = &settings.tricks {
+            query = query.defaults(
+                &items
+                    .iter()
+                    .map(|trick| tricks.contains(trick))
+                    .collect::<Vec<_>>(),
+            )
+        }
+
+        let indices = query.interact_opt()?.unwrap_or_default();
+
+        if !indices.is_empty() {
+            settings.tricks = Some(indices.into_iter().map(|index| items[index]).collect())
+        }
     }
 
     Ok(())
 }
 
-fn select_hard(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
+fn select_hard(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
     if settings.hard.is_none() {
         if let Some(true) = Confirm::new()
             .with_prompt(format!(
                 "{prefix}Choose whether the seed should assume hard in-game difficulty"
             ))
-            .default(false)
+            .default(include_settings.hard)
             .interact_opt()?
         {
             settings.hard = Some(true);
@@ -222,18 +294,26 @@ fn select_hard(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), E
     Ok(())
 }
 
-fn select_randomize_doors(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
+fn select_randomize_doors(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
     if settings.randomize_doors.is_none() {
         if let Some(true) = Confirm::new()
             .with_prompt(format!(
                 "{prefix}Choose whether door connections should be randomized"
             ))
-            .default(false)
+            .default(include_settings.randomize_doors.is_some())
             .interact_opt()?
         {
             let loop_size = Input::new()
                 .with_prompt("Choose the door loop size")
-                .default(GreaterOneU8::new(2).unwrap())
+                .default(
+                    include_settings
+                        .randomize_doors
+                        .unwrap_or(GreaterOneU8::new(2).unwrap()),
+                )
                 .interact_text()?;
 
             settings.randomize_doors = Some(loop_size);
@@ -243,86 +323,118 @@ fn select_randomize_doors(prefix: &str, settings: &mut WorldPresetSettings) -> R
     Ok(())
 }
 
-fn select_snippets(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
-    let available_snippets = &*AVAILABLE_SNIPPETS;
+fn select_snippets(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
+    let mut include_controlled = 0;
 
-    if !available_snippets.is_empty() {
-        let prompt = format!("{prefix}Select any number of snippets");
-        let items = sanitize_items(available_snippets);
+    let available_snippets = AVAILABLE_SNIPPETS
+        .iter()
+        .filter(|snippet| {
+            let controlled = include_settings.snippets.contains(&snippet.identifier);
+            include_controlled += controlled as u32;
+            !controlled
+        })
+        .collect::<Vec<_>>();
 
-        let mut query = MultiSelect::new()
-            .with_prompt(&prompt)
-            .items(&items)
-            .report(false);
+    if available_snippets.is_empty() {
+        return Ok(());
+    }
 
-        if let Some(snippets) = &settings.snippets {
-            query = query.defaults(
-                &available_snippets
-                    .iter()
-                    .map(|available_snippet| snippets.contains(&available_snippet.identifier))
-                    .collect::<Vec<_>>(),
-            )
-        }
+    let mut prompt = format!("{prefix}Select any number of snippets");
+    if include_controlled > 0 {
+        let _ = write!(
+            &mut prompt,
+            " ({include_controlled} more controlled by included presets)"
+        );
+    }
 
-        let selected = query
-            .interact_opt()?
-            .unwrap_or_default()
-            .into_iter()
-            .map(|index| available_snippets[index].identifier.clone())
-            .collect::<Vec<_>>();
+    let items = sanitize_items(&available_snippets);
 
-        multi_select_custom_report(&prompt, &selected);
+    let mut query = MultiSelect::new()
+        .with_prompt(&prompt)
+        .items(&items)
+        .report(false);
 
-        if !selected.is_empty() {
-            settings.snippets = Some(selected.into_iter().collect());
-        }
+    if let Some(snippets) = &settings.snippets {
+        query = query.defaults(
+            &items
+                .iter()
+                .map(|identifier| snippets.contains(identifier))
+                .collect::<Vec<_>>(),
+        )
+    }
+
+    let selected = query
+        .interact_opt()?
+        .unwrap_or_default()
+        .into_iter()
+        .map(|index| available_snippets[index].identifier.clone())
+        .collect::<Vec<_>>();
+
+    multi_select_custom_report(&prompt, &selected);
+
+    if !selected.is_empty() {
+        settings.snippets = Some(selected);
     }
 
     Ok(())
 }
 
-fn select_snippet_config(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
-    if let Some(snippets) = &mut settings.snippets {
-        let mut configurable_snippets = AVAILABLE_SNIPPETS.clone();
+fn select_snippet_config(
+    prefix: &str,
+    settings: &mut WorldPresetSettings,
+    include_settings: &WorldSettings,
+) -> Result<(), Error> {
+    let configurable_snippets = AVAILABLE_SNIPPETS
+        .iter()
+        .filter(|snippet| {
+            !snippet.metadata.config.is_empty()
+                && (include_settings.snippets.contains(&snippet.identifier)
+                    || settings
+                        .snippets
+                        .as_ref()
+                        .is_some_and(|snippets| snippets.contains(&snippet.identifier)))
+        })
+        .collect::<Vec<_>>();
 
-        configurable_snippets.retain(|snippet| {
-            !snippet.metadata.config.is_empty() && snippets.contains(&snippet.identifier)
+    if configurable_snippets.is_empty() {
+        return Ok(());
+    }
+
+    let items = sanitize_items(configurable_snippets.iter().map(|snippet| {
+        format!(
+            "{literal}{identifier}{reset}: {values}",
+            literal = LITERAL.render(),
+            identifier = snippet.identifier,
+            reset = Reset.render(),
+            values = snippet.metadata.config.keys().format(", ")
+        )
+    }));
+
+    loop {
+        let prompt = format!("{prefix}Select any snippet you want to configure");
+
+        let selected = Select::new()
+            .with_prompt(&prompt)
+            .item("Finish")
+            .default(0)
+            .items(&items)
+            .report(false)
+            .interact_opt()?;
+
+        looped_select_custom_report(&prompt, selected, |index| {
+            &configurable_snippets[index - 1].identifier
         });
 
-        if !configurable_snippets.is_empty() {
-            let items = sanitize_items(configurable_snippets.iter().map(|snippet| {
-                format!(
-                    "{literal}{identifier}{reset}: {values}",
-                    literal = LITERAL.render(),
-                    identifier = snippet.identifier,
-                    reset = Reset.render(),
-                    values = snippet.metadata.config.keys().format(", ")
-                )
-            }));
-
-            loop {
-                let prompt = format!("{prefix}Select any snippet you want to configure");
-
-                let selected = Select::new()
-                    .with_prompt(&prompt)
-                    .item("Finish")
-                    .default(0)
-                    .items(&items)
-                    .report(false)
-                    .interact_opt()?;
-
-                looped_select_custom_report(&prompt, selected, |index| {
-                    &configurable_snippets[index - 1].identifier
-                });
-
-                let index = selected.unwrap_or_default();
-                if index == 0 {
-                    break;
-                } else {
-                    let snippet = &configurable_snippets[index - 1];
-                    select_snippet_config_value(prefix, settings, snippet)?;
-                }
-            }
+        let index = selected.unwrap_or_default();
+        if index == 0 {
+            break;
+        } else {
+            let snippet = &configurable_snippets[index - 1];
+            select_snippet_config_value(prefix, settings, snippet, include_settings)?;
         }
     }
 
@@ -333,6 +445,7 @@ fn select_snippet_config_value(
     prefix: &str,
     settings: &mut WorldPresetSettings,
     snippet: &AvailableSnippet,
+    include_settings: &WorldSettings,
 ) -> Result<(), Error> {
     let config = snippet.metadata.config.iter().collect::<Vec<_>>();
 
@@ -342,8 +455,17 @@ fn select_snippet_config_value(
             settings
                 .snippet_config
                 .as_ref()
-                .and_then(|config| config.get(&snippet.identifier))
-                .and_then(|snippet_config| snippet_config.get(*identifier))
+                .and_then(|config| {
+                    config
+                        .get(&snippet.identifier)
+                        .and_then(|snippet_config| snippet_config.get(*identifier))
+                })
+                .or_else(|| {
+                    include_settings
+                        .snippet_config
+                        .get(&snippet.identifier)
+                        .and_then(|snippet_config| snippet_config.get(*identifier))
+                })
                 .cloned()
                 .unwrap_or_else(|| value.default.to_string())
         })
@@ -410,7 +532,7 @@ fn choose_snippet_config_value(
         name = value.1.name,
         description = match &value.1.description {
             None => "".to_string(),
-            Some(description) => format!("; {description}")
+            Some(description) => format!("; {description}"),
         }
     );
 

@@ -23,7 +23,7 @@ use std::{
 use strum::VariantNames;
 use wotw_seedgen::data::{
     assets::{DefaultFileAccess, UniversePresetSettings, WorldPresetSettings},
-    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings,
+    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
 };
 
 #[derive(Debug, Default)]
@@ -759,7 +759,11 @@ impl FromArgMatches for SeedWorldSettings {
         };
 
         if matches.get_flag("interactive") {
-            interactive::seed_world_settings(String::new(), &mut self.0)?;
+            interactive::seed_world_settings(
+                String::new(),
+                &mut self.0,
+                &mut WorldSettings::default(),
+            )?;
         }
 
         Ok(())
