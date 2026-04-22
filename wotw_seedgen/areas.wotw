@@ -16153,7 +16153,7 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       Bash, Grenade=2, DoubleJump OR Dash OR Glide
     kii, WillowsEnd.GrappleWheelsHeart:
       Bash, Grenade=1, Glide  # bashnade to reach the heart from the floating platform
-      Bash, Grenade=1, Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bash, Grenade=1, Sword, Hammer OR Shuriken=1 OR Flash=1
       # Glitched
       # SentryJump=1, Dash OR Glide  # weapon hover helps get across
       # SwordSJump=1, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # sword hover
@@ -16197,7 +16197,7 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       # WillowsEnd.PortalShortcut, GrenadeJump=1, Damage=80  # only need one dboost but the portal can be weird
       # WillowsEnd.PortalShortcut, GrenadeJump=1, DoubleJump, TripleJump OR Sword OR Hammer OR Flash=1 OR GlideJump OR Damage=40
       # LaunchSwap, Bash
-      # SwordSentryJump=1:  # Running sjump. Paths with DJ are redundant with dropping down to Entry
+      # SwordSJump=1:  # Running sjump. Paths with DJ are redundant with dropping down to Entry
       #   WillowsEnd.PortalShortcut, GlideJump OR GrenadeJump=1 OR Damage=40
       #   SentryJump=1, Bash, Damage=40 OR Dash
       #   GlideJump, Damage=40, Bash
@@ -16479,7 +16479,7 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
       Bash, Grenade=1, DoubleJump
       # Glitched
       # SentryJump=1
-      # AerialSentryJump, TripleJump
+      # AerialHammerJump, TripleJump
     unsafe, WillowsEnd.CentralShortcut:
       Bash, Grenade=1  # Very precise when the portal shortcut is broken
       DoubleJump, WallHammerJump
