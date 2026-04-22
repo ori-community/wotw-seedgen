@@ -16190,7 +16190,7 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       # Glitched
       # AerialHammerJump, Bash, Grenade=1 OR Damage=40
       # WillowsEnd.PortalShortcut, AerialHammerJump OR GrenadeJump=2
-      # Bash, Grenade=1, GlideJump, WillowsEnd.PortalShortcut OR Grenade=1
+      # Bash, Grenade=1, GlideJump, WillowsEnd.PortalShortcut OR Grenade=1 OR Damage=80
       # Bash, Grenade=1, DoubleJump, GlideJump, Damage=40
       # DoubleJump, GlideJump, Damage=40, Bash, Sword OR Hammer OR Spear=1  # Condition to enter the portal. Then dboost in spikes to reach the elemental 
       # WillowsEnd.PortalShortcut, DoubleJump, GlideJump, Sword OR Hammer OR Spear=1  # Condition to enter the portal
