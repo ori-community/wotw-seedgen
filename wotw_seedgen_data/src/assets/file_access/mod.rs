@@ -19,7 +19,7 @@ use crate::assets::{
 use std::{
     borrow::Cow,
     fmt::Display,
-    fs::{self, File},
+    fs::{self, File, Metadata},
     io::{self, BufReader},
     path::{Path, PathBuf},
 };
@@ -47,6 +47,10 @@ pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), String> {
 
 pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf, String> {
     action_with("canonicalize", path.as_ref(), fs::canonicalize)
+}
+
+pub fn metadata<P: AsRef<Path>>(path: P) -> Result<Metadata, String> {
+    action_with("read", path.as_ref(), fs::metadata)
 }
 
 pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<(), String> {

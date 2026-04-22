@@ -568,7 +568,8 @@ impl CompileResult {
         if !success {
             writeln!(
                 &mut stderr,
-                "Failed to compile Snippets with {error_count} errors."
+                "Failed to compile Snippets with {error_count} error{}.",
+                if error_count == 1 { "" } else { "s" }
             )
             .unwrap();
         }

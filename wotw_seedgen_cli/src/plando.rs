@@ -28,11 +28,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         generation_args: GenerationArgs { debug, launch },
     } = args;
 
-    let (root, entry) = if path
-        .metadata()
-        .map_err(|err| format!("{err}: {}", path.display()))?
-        .is_dir()
-    {
+    let (root, entry) = if assets::metadata(&path)?.is_dir() {
         (path.as_path(), "main")
     } else {
         if path.extension() != Some(OsStr::new("wotws")) {
@@ -54,7 +50,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let mut cache = Cache::new(PlandoFileAccess::new(root))?;
 
-    let out = match out {
+    let mut out = match out {
         None => {
             let mut out: PathBuf = root.join("out");
             assets::create_dir_all(&out)?;
@@ -63,6 +59,14 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             out
         }
         Some(out) => out,
+    };
+
+    let canonicalize_err = match assets::canonicalize(&out) {
+        Ok(canonical_out) => {
+            out = canonical_out;
+            None
+        }
+        Err(err) => Some(err),
     };
 
     let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
@@ -74,11 +78,17 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     }
 
     if watch {
+        if let Err(err) = &result {
+            err.eprint();
+        }
+
+        if let Some(err) = canonicalize_err {
+            return Err(Error(err));
+        }
+
         let mut watcher = Watcher::new(Duration::from_millis(50))?;
 
         cache.watch(&mut watcher)?;
-
-        let canonical_out = assets::canonicalize(&out)?;
 
         for res in watcher {
             let events = res?;
@@ -89,14 +99,16 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
                     .paths
                     .iter()
                     .flat_map(fs::canonicalize)
-                    .all(|path| path == canonical_out)
+                    .all(|path| path == out)
             }) {
                 continue;
             }
 
             cache.update_from_watcher_event(&events)?;
 
-            let _ = compile(&mut rng, &cache, entry, &out, debug);
+            if let Err(err) = compile(&mut rng, &cache, entry, &out, debug) {
+                err.eprint();
+            }
         }
     }
 

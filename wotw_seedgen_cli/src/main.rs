@@ -53,6 +53,13 @@ fn main() -> Result<(), Error> {
 }
 
 pub struct Error(String);
+
+impl Error {
+    pub fn eprint(&self) {
+        eprintln!("{}", self.0);
+    }
+}
+
 impl Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
