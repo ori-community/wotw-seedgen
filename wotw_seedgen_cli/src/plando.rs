@@ -28,16 +28,11 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         generation_args: GenerationArgs { debug, launch },
     } = args;
 
+    let path = assets::canonicalize(path)?;
+
     let (root, entry) = if assets::metadata(&path)?.is_dir() {
         (path.as_path(), "main")
-    } else {
-        if path.extension() != Some(OsStr::new("wotws")) {
-            return Err(Error(format!(
-                "\"{}\" is not a .wotws file or directory",
-                path.display()
-            )));
-        }
-
+    } else if path.extension() == Some(OsStr::new("wotws")) {
         let file_stem = path.file_stem().unwrap();
         let identifier = file_stem
             .to_str()
@@ -46,11 +41,16 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         let root = path.parent().unwrap();
 
         (root, identifier)
+    } else {
+        return Err(Error(format!(
+            "\"{}\" is not a .wotws file or directory",
+            path.display()
+        )));
     };
 
     let mut cache = Cache::new(PlandoFileAccess::new(root))?;
 
-    let mut out = match out {
+    let out = match out {
         None => {
             let mut out: PathBuf = root.join("out");
             assets::create_dir_all(&out)?;
@@ -58,15 +58,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             out.set_extension("wotwr");
             out
         }
-        Some(out) => out,
-    };
-
-    let canonicalize_err = match assets::canonicalize(&out) {
-        Ok(canonical_out) => {
-            out = canonical_out;
-            None
-        }
-        Err(err) => Some(err),
+        Some(out) => assets::canonicalize(out)?,
     };
 
     let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
@@ -78,12 +70,8 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     }
 
     if watch {
-        if let Err(err) = &result {
+        if let Err(err) = result {
             err.eprint();
-        }
-
-        if let Some(err) = canonicalize_err {
-            return Err(Error(err));
         }
 
         let mut watcher = Watcher::new(Duration::from_millis(50))?;
@@ -110,9 +98,11 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
                 err.eprint();
             }
         }
-    }
 
-    result
+        Ok(())
+    } else {
+        result
+    }
 }
 
 fn compile(
