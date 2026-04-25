@@ -17,7 +17,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, fmt::Display, mem, ops::RangeFrom, sync::LazyLock};
+use std::{cmp::Ordering, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::seed_language::{
     compile::store_boolean,
     output::{postprocess, AsConstant},
@@ -1298,6 +1298,7 @@ fn total_reach_check<'graph>(
     world.traverse_spawn(&output.events);
 
     let mut needs_placement = world.reached_pickups().collect::<Vec<_>>();
+    let mut extra_slots = vec![];
 
     world.restore_snapshot();
 
@@ -1322,8 +1323,30 @@ fn total_reach_check<'graph>(
             return false;
         }
 
+        match output.location_slots.get(&condition) {
+            None | Some(1) => {},
+            Some(0) => {
+                trace!(
+                    "{log_index}Removing {pickup} from placement locations since location slots were set to zero",
+                    pickup = pickup.identifier
+                );
+
+                return false;
+            }
+            Some(slots) => {
+                trace!(
+                    "{log_index}Increasing {pickup} slots to {slots}",
+                    pickup = pickup.identifier
+                );
+
+                extra_slots.extend(iter::repeat(pickup).take((slots - 1) as usize));
+            }
+        }
+
         true
     });
+
+    needs_placement.append(&mut extra_slots);
 
     trace!(
         "{log_index}{amount} total locations that need placements: {needs_placement}",

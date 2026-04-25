@@ -90,6 +90,9 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::RemoveLocation(_, command) => {
                 command.compile(compiler);
             }
+            ast::Command::LocationSlots(_, command) => {
+                command.compile(compiler);
+            }
             ast::Command::SetLogicState(_, command) => {
                 command.compile(compiler);
             }
@@ -759,6 +762,24 @@ impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
         if let Some(condition) = self.condition.compile_into(compiler) {
             compiler.global.output.removed_locations.insert(condition);
+        }
+    }
+}
+
+impl<'source> Compile<'source> for ast::LocationSlotsArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        let location = self.location.compile_into(compiler);
+        let slots =
+            get_command_arg(self.slots).and_then(|slots| slots.compile_into::<i32>(compiler));
+
+        if let (Some(location), Some(slots)) = (location, slots) {
+            compiler
+                .global
+                .output
+                .location_slots
+                .insert(location, slots.try_into().unwrap_or_default());
         }
     }
 }

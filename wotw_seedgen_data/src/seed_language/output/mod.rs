@@ -41,6 +41,7 @@ pub struct IntermediateOutput {
     pub item_pool_changes: FxHashMap<CommandVoid, i32>,
     pub item_metadata: ItemMetadata,
     pub removed_locations: FxHashSet<CommandBoolean>,
+    pub location_slots: FxHashMap<CommandBoolean, u32>,
     pub logical_state_sets: FxHashSet<String>,
     pub preplacements: Vec<(CommandVoid, Zone)>,
     pub debug: Option<DebugOutput>,

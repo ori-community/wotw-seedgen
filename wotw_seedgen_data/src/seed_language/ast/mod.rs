@@ -493,6 +493,10 @@ pub enum Command<'source> {
         Spanned<RemoveLocation>,
         CommandArgs<RemoveLocationArgs<'source>>,
     ),
+    LocationSlots(
+        Spanned<LocationSlots>,
+        CommandArgs<LocationSlotsArgs<'source>>,
+    ),
     SetLogicState(
         Spanned<SetLogicState>,
         CommandArgs<SetLogicStateArgs<'source>>,
@@ -771,6 +775,16 @@ pub struct RemoveLocation;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RemoveLocationArgs<'source> {
     pub condition: Expression<'source>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct LocationSlots;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct LocationSlotsArgs<'source> {
+    pub location: Expression<'source>,
+    pub slots: CommandArg<Expression<'source>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

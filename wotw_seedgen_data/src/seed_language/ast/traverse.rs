@@ -10,10 +10,10 @@ use crate::seed_language::ast::{
     Content, CountInZoneArgs, CountInZoneBinding, Event, ExportArgs, Expression, ExpressionValue,
     FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
     ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
-    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, Operation, PreplaceArgs, RandomFloatArgs,
-    RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, RemoveItemArgs,
-    RemoveLocationArgs, SetConfigArgs, SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg,
-    TimerArgs, Trigger, TriggerBinding, UberIdentifier, ZoneOfArgs,
+    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
+    RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
+    RemoveItemArgs, RemoveLocationArgs, SetConfigArgs, SetLogicStateArgs, Snippet, SpawnArgs,
+    StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier, ZoneOfArgs,
 };
 
 #[must_use]
@@ -381,6 +381,10 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
+            Self::LocationSlots(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
             Self::SetLogicState(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
@@ -492,7 +496,7 @@ impl<H: Handler> Traverse<H> for ConfigArgs<'_> {
         if let Some(description) = &self.description {
             handler.string(&description.1.span);
         }
-        
+
         inspect_command_arg(&self.ty, |ty| handler.ty(&ty.span));
         inspect_command_arg(&self.default, |default| default.traverse(handler));
     }
@@ -617,6 +621,13 @@ impl<H: Handler> Traverse<H> for ItemDataMapIconArgs<'_> {
 impl<H: Handler> Traverse<H> for RemoveLocationArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.condition.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for LocationSlotsArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.location.traverse(handler);
+        inspect_command_arg(&self.slots, |slots| slots.traverse(handler));
     }
 }
 
