@@ -18,22 +18,7 @@ By default those are bound to
 // !augment_fun(write_progress_message, set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
 // !augment_fun(write_map_progress_message, set_string("map_progress_message", get_string("map_progress_message") + "\nFun: 10/10"))
 
-!include(
-    "stats",
-    marsh_pickups_collected, marsh_pickups_collected_on_spawn, total_marsh_pickups,
-    hollow_pickups_collected, hollow_pickups_collected_on_spawn, total_hollow_pickups,
-    glades_pickups_collected, glades_pickups_collected_on_spawn, total_glades_pickups,
-    wellspring_pickups_collected, wellspring_pickups_collected_on_spawn, total_wellspring_pickups,
-    woods_pickups_collected, woods_pickups_collected_on_spawn, total_woods_pickups,
-    reach_pickups_collected, reach_pickups_collected_on_spawn, total_reach_pickups,
-    depths_pickups_collected, depths_pickups_collected_on_spawn, total_depths_pickups,
-    pools_pickups_collected, pools_pickups_collected_on_spawn, total_pools_pickups,
-    wastes_pickups_collected, wastes_pickups_collected_on_spawn, total_wastes_pickups,
-    ruins_pickups_collected, ruins_pickups_collected_on_spawn, total_ruins_pickups,
-    willow_pickups_collected, willow_pickups_collected_on_spawn, total_willow_pickups,
-    burrows_pickups_collected, burrows_pickups_collected_on_spawn, total_burrows_pickups,
-    pickups_collected_on_spawn, total_pickups
-)
+!include("stats")
 
 !builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
 !builtin_icon(tree_progress_icon, "icons/wheel/tree_progress.blue.png")
@@ -46,8 +31,7 @@ fun write_progress_message() {
     set_string("progress_message", "")
     set_string("zone", "")
     set_integer("collected", randoStats.pickupsCollected)
-    set_integer("collected_on_spawn", pickups_collected_on_spawn)
-    set_integer("total", total_pickups)
+    set_integer("total", randoStats.pickupsTotal)
     write_pickups_progress()
     set_integer("zone", fetch(player.currentArea))
     write_zone_pickup_progress()
@@ -63,86 +47,74 @@ fun write_map_progress_message() {
 fun write_zone_pickup_progress() {
     if get_integer("zone") == 0 {
         set_string("zone", "Marsh ")
-        set_integer("collected", marsh_pickups_collected)
-        set_integer("collected_on_spawn", marsh_pickups_collected_on_spawn)
-        set_integer("total", total_marsh_pickups)
+        set_integer("collected", randoStats.pickupsCollectedMarsh)
+        set_integer("total", randoStats.pickupsTotalMarsh)
         write_pickups_progress()
     }
     if get_integer("zone") == 1 {
         set_string("zone", "Hollow ")
-        set_integer("collected", hollow_pickups_collected)
-        set_integer("collected_on_spawn", hollow_pickups_collected_on_spawn)
-        set_integer("total", total_hollow_pickups)
+        set_integer("collected", randoStats.pickupsCollectedHollow)
+        set_integer("total", randoStats.pickupsTotalHollow)
         write_pickups_progress()
     }
     if get_integer("zone") == 2 {
         set_string("zone", "Glades ")
-        set_integer("collected", glades_pickups_collected)
-        set_integer("collected_on_spawn", glades_pickups_collected_on_spawn)
-        set_integer("total", total_glades_pickups)
+        set_integer("collected", randoStats.pickupsCollectedGlades)
+        set_integer("total", randoStats.pickupsTotalGlades)
         write_pickups_progress()
     }
     if get_integer("zone") == 3 {
         set_string("zone", "Wellspring ")
-        set_integer("collected", wellspring_pickups_collected)
-        set_integer("collected_on_spawn", wellspring_pickups_collected_on_spawn)
-        set_integer("total", total_wellspring_pickups)
+        set_integer("collected", randoStats.pickupsCollectedWellspring)
+        set_integer("total", randoStats.pickupsTotalWellspring)
         write_pickups_progress()
     }
     if get_integer("zone") == 7 {
         set_string("zone", "Woods ")
-        set_integer("collected", woods_pickups_collected)
-        set_integer("collected_on_spawn", woods_pickups_collected_on_spawn)
-        set_integer("total", total_woods_pickups)
+        set_integer("collected", randoStats.pickupsCollectedWoods)
+        set_integer("total", randoStats.pickupsTotalWoods)
         write_pickups_progress()
     }
     if get_integer("zone") == 6 {
         set_string("zone", "Reach ")
-        set_integer("collected", reach_pickups_collected)
-        set_integer("collected_on_spawn", reach_pickups_collected_on_spawn)
-        set_integer("total", total_reach_pickups)
+        set_integer("collected", randoStats.pickupsCollectedReach)
+        set_integer("total", randoStats.pickupsTotalReach)
         write_pickups_progress()
     }
     if get_integer("zone") == 8 {
         set_string("zone", "Depths ")
-        set_integer("collected", depths_pickups_collected)
-        set_integer("collected_on_spawn", depths_pickups_collected_on_spawn)
-        set_integer("total", total_depths_pickups)
+        set_integer("collected", randoStats.pickupsCollectedDepths)
+        set_integer("total", randoStats.pickupsTotalDepths)
         write_pickups_progress()
     }
     if get_integer("zone") == 4 {
         set_string("zone", "Pools ")
-        set_integer("collected", pools_pickups_collected)
-        set_integer("collected_on_spawn", pools_pickups_collected_on_spawn)
-        set_integer("total", total_pools_pickups)
+        set_integer("collected", randoStats.pickupsCollectedPools)
+        set_integer("total", randoStats.pickupsTotalPools)
         write_pickups_progress()
     }
     if get_integer("zone") == 9 {
         set_string("zone", "Wastes ")
-        set_integer("collected", wastes_pickups_collected)
-        set_integer("collected_on_spawn", wastes_pickups_collected_on_spawn)
-        set_integer("total", total_wastes_pickups)
+        set_integer("collected", randoStats.pickupsCollectedWastes)
+        set_integer("total", randoStats.pickupsTotalWastes)
         write_pickups_progress()
     }
     if get_integer("zone") == 10 {
         set_string("zone", "Ruins ")
-        set_integer("collected", ruins_pickups_collected)
-        set_integer("collected_on_spawn", ruins_pickups_collected_on_spawn)
-        set_integer("total", total_ruins_pickups)
+        set_integer("collected", randoStats.pickupsCollectedRuins)
+        set_integer("total", randoStats.pickupsTotalRuins)
         write_pickups_progress()
     }
     if get_integer("zone") == 11 {
         set_string("zone", "Willow ")
-        set_integer("collected", willow_pickups_collected)
-        set_integer("collected_on_spawn", willow_pickups_collected_on_spawn)
-        set_integer("total", total_willow_pickups)
+        set_integer("collected", randoStats.pickupsCollectedWillow)
+        set_integer("total", randoStats.pickupsTotalWillow)
         write_pickups_progress()
     }
     if get_integer("zone") == 5 {
         set_string("zone", "Burrows ")
-        set_integer("collected", burrows_pickups_collected)
-        set_integer("collected_on_spawn", burrows_pickups_collected_on_spawn)
-        set_integer("total", total_burrows_pickups)
+        set_integer("collected", randoStats.pickupsCollectedBurrows)
+        set_integer("total", randoStats.pickupsTotalBurrows)
         write_pickups_progress()
     }
 }
@@ -155,7 +127,7 @@ fun write_pickups_progress() {
     set_string("color", "")
     if get_integer("collected") >= get_integer("total") set_string("color", "$")
 
-    set_string("progress_message", get_string("progress_message") + get_string("color") + get_string("zone") + "Pickups: " + (get_integer("collected") - get_integer("collected_on_spawn")) + "/" + (get_integer("total") - get_integer("collected_on_spawn")) + get_string("color"))
+    set_string("progress_message", get_string("progress_message") + get_string("color") + get_string("zone") + "Pickups: " + get_integer("collected") + "/" + get_integer("total") + get_string("color"))
 }
 
 !state(disable_keybinds, Boolean)
