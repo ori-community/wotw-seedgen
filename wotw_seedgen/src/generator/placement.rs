@@ -808,8 +808,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         index: usize,
         multiworld: bool,
     ) -> Result<Self, String> {
-        generate_entrances(&mut world, &mut output.events, rng)?;
-
         let mut rng = Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE);
 
         let log_index = if multiworld {
@@ -837,6 +835,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         world.simulate(&ClientEvent::Spawn, &output.events);
         world.simulate(&ClientEvent::Reload, &output.events);
+
+        // TODO instead of timing this after the spawn simulation to avoid unsettings the known entrance connections,
+        // maybe this could be resolved with whatever mechanism will implement launch fragments behaving differently
+        // between client and simulation?
+        generate_entrances(&mut world, &mut output.events, &mut rng)?;
 
         let needs_placement = total_reach_check(&mut world, &log_index, &output, &item_pool);
         let total_pickups = needs_placement.len() as f32;
