@@ -166,8 +166,8 @@ pub struct WorldSettings {
     pub tricks: FxHashSet<Trick>,
     /// Logically assume hard in-game difficulty
     pub hard: bool,
-    /// Randomize door connections with the given max loop size
-    pub randomize_doors: Option<GreaterOneU8>,
+    /// Randomize entrance connections with the given max loop size
+    pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
     pub snippets: Vec<String>,
     /// Additional inline snippets that don't exist on the filesystem
@@ -227,7 +227,7 @@ impl WorldSettings {
             difficulty,
             tricks,
             hard: rng.gen_bool(0.25),
-            randomize_doors: rng
+            randomize_entrances: rng
                 .sample(distr_50)
                 .then_some(GreaterOneU8::new(2).unwrap()),
             snippets,

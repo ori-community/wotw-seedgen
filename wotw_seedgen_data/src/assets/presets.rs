@@ -380,8 +380,8 @@ pub struct WorldPresetSettings {
     pub tricks: Option<FxHashSet<Trick>>,
     /// Logically assume hard in-game difficulty
     pub hard: Option<bool>,
-    /// Randomize door connections with the given max loop size
-    pub randomize_doors: Option<GreaterOneU8>,
+    /// Randomize entrance connections with the given max loop size
+    pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
     pub snippets: Option<Vec<String>>,
     /// Configuration to pass to snippets
@@ -422,7 +422,7 @@ impl WorldPresetSettings {
             tricks,
             spawn,
             hard,
-            randomize_doors,
+            randomize_entrances,
             snippets,
             snippet_config,
         } = self;
@@ -448,8 +448,8 @@ impl WorldPresetSettings {
             settings.hard = hard;
         }
 
-        if let Some(randomize_doors) = randomize_doors {
-            settings.randomize_doors = Some(randomize_doors);
+        if let Some(randomize_entrances) = randomize_entrances {
+            settings.randomize_entrances = Some(randomize_entrances);
         }
 
         if let Some(snippets) = snippets {

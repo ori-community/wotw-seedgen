@@ -49,6 +49,6 @@ pub enum VerboseTarget {
     IsMet,
     Solutions,
     Weight,
-    Doors,
+    Entrances,
     OptimizeGraph,
 }

@@ -6,7 +6,8 @@ use crate::{
         ast,
         optimize::Optimize,
         output::{
-            Anchor, Connection, Door, DoorId, Enemy, Graph, Node, Refill, RefillValue, Requirement,
+            Anchor, Connection, Enemy, Entrance, EntranceId, Graph, Node, Refill, RefillValue,
+            Requirement,
         },
         token::Tokenizer,
     },
@@ -48,11 +49,11 @@ impl Graph {
         let mut compiler = Compiler::new(&mut areas, &loc_data_nodes, &state_data_nodes, settings);
 
         areas.contents.compile(&mut compiler);
-        compiler.generate_door_connections();
+        compiler.generate_entrance_connections();
 
         let Compiler {
             nodes: compiled_nodes,
-            default_door_connections,
+            default_entrance_connections,
             errors,
             ..
         } = compiler;
@@ -64,7 +65,7 @@ impl Graph {
 
         let mut graph = Graph {
             nodes,
-            default_door_connections,
+            default_entrance_connections,
         };
 
         graph.optimize();
@@ -79,8 +80,8 @@ impl Graph {
 struct Compiler<'source> {
     nodes: Vec<Node>,
     index_offset: usize,
-    door_nodes: Vec<usize>,
-    default_door_connections: FxHashMap<DoorId, DoorId>,
+    entrance_nodes: Vec<usize>,
+    default_entrance_connections: FxHashMap<EntranceId, EntranceId>,
     difficulty_requirements: DifficultyRequirements,
     trick_requirements: TrickRequirements,
     hard_requirement: Requirement,
@@ -212,8 +213,8 @@ impl<'source> Compiler<'source> {
         Self {
             nodes,
             index_offset: loc_data_nodes.len() + state_data_nodes.len(),
-            door_nodes: vec![],
-            default_door_connections: FxHashMap::default(),
+            entrance_nodes: vec![],
+            default_entrance_connections: FxHashMap::default(),
             difficulty_requirements: DifficultyRequirements::new(settings),
             trick_requirements: TrickRequirements::new(settings),
             hard_requirement,
@@ -234,35 +235,35 @@ impl<'source> Compiler<'source> {
         result.map_err(|err| self.errors.push(err)).ok()
     }
 
-    fn generate_door_connections(&mut self) {
-        for index in self.door_nodes.iter().copied() {
+    fn generate_entrance_connections(&mut self) {
+        for index in self.entrance_nodes.iter().copied() {
             let anchor = self.nodes[index].expect_anchor();
             let anchor_identifier = anchor.identifier.clone();
-            let door = anchor.door.as_ref().unwrap();
-            let door_id = door.id;
-            let door_requirement = door.requirement.clone();
+            let entrance = anchor.entrance.as_ref().unwrap();
+            let entrance_id = entrance.id;
+            let entrance_requirement = entrance.requirement.clone();
 
-            if let Some(target) = self.anchor_map.get(&door.target) {
-                let target_door_id = self.nodes[*target - self.index_offset]
+            if let Some(target) = self.anchor_map.get(&entrance.target) {
+                let target_entrance_id = self.nodes[*target - self.index_offset]
                     .expect_anchor()
-                    .door
+                    .entrance
                     .as_ref()
                     .unwrap()
                     .id;
 
-                self.default_door_connections
-                    .insert(door_id, target_door_id);
+                self.default_entrance_connections
+                    .insert(entrance_id, target_entrance_id);
             }
 
             let visited_state_index = self.nodes.len();
             // TODO during seedgen this should be 1, but start as 0 in the true seed
             self.nodes.push(Node::State(StateDataEntry {
                 identifier: format!("{}Visited", anchor_identifier),
-                uber_identifier: UberIdentifier::known_door_connections(door_id),
+                uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
                 value: None,
             }));
 
-            for target_index in self.door_nodes.iter().copied() {
+            for target_index in self.entrance_nodes.iter().copied() {
                 if index == target_index {
                     continue;
                 }
@@ -276,7 +277,7 @@ impl<'source> Compiler<'source> {
                         requirement: Requirement::and([
                             Requirement::State(self.index_offset + state_index),
                             Requirement::State(self.index_offset + visited_state_index),
-                            door_requirement.clone(),
+                            entrance_requirement.clone(),
                         ]),
                         implicitly_generated: true,
                     });
@@ -285,8 +286,8 @@ impl<'source> Compiler<'source> {
 
                 self.nodes.push(Node::State(StateDataEntry {
                     identifier: format!("{} to {}", anchor_identifier, target_anchor.identifier),
-                    uber_identifier: UberIdentifier::doors(door_id),
-                    value: Some(target_anchor.door.as_ref().unwrap().id), // TODO this should not be treated as strictly incremental
+                    uber_identifier: UberIdentifier::entrances(entrance_id),
+                    value: Some(target_anchor.entrance.as_ref().unwrap().id), // TODO this should not be treated as strictly incremental
                 }));
             }
         }
@@ -686,7 +687,7 @@ impl<'source> Compile for ast::Anchor<'source> {
             .position
             .and_then(|position| position.compile(compiler));
 
-        let mut door = None;
+        let mut entrance = None;
         let mut can_spawn = true;
         let mut teleport_restriction = None;
         let mut refills = vec![];
@@ -695,12 +696,12 @@ impl<'source> Compile for ast::Anchor<'source> {
         if let SpannedOption::Some(content) = self.content.content.value {
             for content in content.content {
                 match content {
-                    ast::AnchorContent::Door(keyword, anchor_door) => {
-                        if let Some(anchor_door) = anchor_door.compile(compiler) {
-                            compiler.door_nodes.push(compiler.nodes.len());
+                    ast::AnchorContent::Entrance(keyword, anchor_entrance) => {
+                        if let Some(anchor_entrance) = anchor_entrance.compile(compiler) {
+                            compiler.entrance_nodes.push(compiler.nodes.len());
 
-                            if door.replace(anchor_door).is_some() {
-                                compiler.error("duplicate door".to_string(), keyword.span);
+                            if entrance.replace(anchor_entrance).is_some() {
+                                compiler.error("duplicate entrance".to_string(), keyword.span);
                             }
                         }
                     }
@@ -776,7 +777,7 @@ impl<'source> Compile for ast::Anchor<'source> {
         compiler.nodes.push(Node::Anchor(Anchor {
             identifier: self.identifier.data.0.to_string(),
             position,
-            door,
+            entrance,
             can_spawn,
             teleport_restriction: teleport_restriction.unwrap_or(Requirement::Free),
             refills,
@@ -796,8 +797,8 @@ impl Compile for ast::AnchorPosition {
     }
 }
 
-impl<'source> Compile for ast::Door<'source> {
-    type Output = Option<Door>;
+impl<'source> Compile for ast::Entrance<'source> {
+    type Output = Option<Entrance>;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
         let mut id = None;
@@ -807,31 +808,36 @@ impl<'source> Compile for ast::Door<'source> {
         if let SpannedOption::Some(content) = self.content.value {
             for content in content.content {
                 match content {
-                    ast::DoorContent::Id(keyword, door_id) => {
-                        if let SpannedOption::Some(door_id) = door_id.value {
-                            if id.replace(door_id.id.data).is_some() {
+                    ast::EntranceContent::Id(keyword, entrance_id) => {
+                        if let SpannedOption::Some(entrance_id) = entrance_id.value {
+                            if id.replace(entrance_id.id.data).is_some() {
                                 compiler.error("duplicate id".to_string(), keyword.span);
                             }
                         }
                     }
-                    ast::DoorContent::Target(keyword, door_target) => {
-                        if let SpannedOption::Some(door_target) = door_target.value {
-                            if !compiler.anchor_map.contains_key(door_target.target.data.0) {
-                                compiler
-                                    .error("unknown anchor".to_string(), door_target.target.span);
+                    ast::EntranceContent::Target(keyword, entrance_target) => {
+                        if let SpannedOption::Some(entrance_target) = entrance_target.value {
+                            if !compiler
+                                .anchor_map
+                                .contains_key(entrance_target.target.data.0)
+                            {
+                                compiler.error(
+                                    "unknown anchor".to_string(),
+                                    entrance_target.target.span,
+                                );
                             }
 
                             if target
-                                .replace(door_target.target.data.0.to_string())
+                                .replace(entrance_target.target.data.0.to_string())
                                 .is_some()
                             {
                                 compiler.error("duplicate target".to_string(), keyword.span);
                             }
                         }
                     }
-                    ast::DoorContent::Enter(keyword, door_requirement) => {
-                        if let Some(door_requirement) = door_requirement.compile(compiler) {
-                            if requirement.replace(door_requirement).is_some() {
+                    ast::EntranceContent::Enter(keyword, entrance_requirement) => {
+                        if let Some(entrance_requirement) = entrance_requirement.compile(compiler) {
+                            if requirement.replace(entrance_requirement).is_some() {
                                 compiler.error("duplicate enter".to_string(), keyword.span);
                             }
                         }
@@ -841,7 +847,7 @@ impl<'source> Compile for ast::Door<'source> {
         }
 
         if let (Some(id), Some(target), Some(requirement)) = (id, target, requirement) {
-            Some(Door {
+            Some(Entrance {
                 id,
                 target,
                 requirement,

@@ -4448,7 +4448,7 @@ anchor GladesTown.ThornyBranch at -330, -4135:  # Next to GladesTown.ArcingShard
       TuleyShop.Lightcatchers, Bash, Grenade=1  # https://youtu.be/zb09kz4YhX4
 
 anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
-  door:
+  entrance:
     id: 9
     target: GladesTown.KeyMokiHutInside
     enter:
@@ -4503,7 +4503,7 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     unsafe: Dash OR Damage=10 OR GlideJump OR GrenadeJump
 
 anchor GladesTown.KeyMokiHutInside at -110, -4571:
-  door:
+  entrance:
     id: 10
     target: GladesTown.TwillenHome
     enter: free
@@ -4752,7 +4752,7 @@ anchor GladesTown.MotayHutDoor at -394, -4135:  # Specifically exiting Motay's h
 #  refill Checkpoint:
 #    unsafe: GladesTown.BuildHuts  # Exiting the hut activates a checkpoint but it doesn't work with door randomization (because entering this door doesn't always connect to an open door)
 
-  door:
+  entrance:
     id: 5
     target: GladesTown.MotayHutInside
     enter:
@@ -4764,7 +4764,7 @@ anchor GladesTown.MotayHutDoor at -394, -4135:  # Specifically exiting Motay's h
   conn GladesTown.BuiltMotayHut: free
 
 anchor GladesTown.MotayHutInside at -182, -4589:  # Inside the house hovering above Motay
-  door:
+  entrance:
     id: 6
     target: GladesTown.MotayHutDoor
     enter: free
@@ -4772,7 +4772,7 @@ anchor GladesTown.MotayHutInside at -182, -4589:  # Inside the house hovering ab
   pickup GladesTown.MotayHutEX: free
 
 anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
-  door:
+  entrance:
     id: 3
     target: GladesTown.InsideThirdHut
     enter:
@@ -4845,7 +4845,7 @@ anchor GladesTown.UpperWest at -357, -4126:  # Where Mokk lives
     unsafe: free  # drop down from the right and hold right. Unsafe because it's unclear where the ground becomes solid
 
 anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with the herbs moki
-  door:
+  entrance:
     id: 4
     target: GladesTown.UpperWest
     enter: free
@@ -4863,7 +4863,7 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
       Spear=1 OR GrenadeJump OR AbilitySwap=1
 
 anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
-  door:
+  entrance:
     id: 13
     target: GladesTown.AcornCave
     enter:
@@ -4909,7 +4909,7 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
     unsafe, GladesTown.ClearThorns: Dash OR Sword OR WallHammerJump OR GlideJump OR AbilitySwap=2
 
 anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at the door
-  door:
+  entrance:
     id: 14
     target: GladesTown.AcornMoki
     enter: free
@@ -5042,7 +5042,7 @@ anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the
     unsafe: Blaze=1 OR GrenadeJump
 
 anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
-  door:
+  entrance:
     id: 11
     target: GladesTown.StorageHut
     enter:
@@ -5085,7 +5085,7 @@ anchor GladesTown.AboveOpher at -212, -4133:  # On the platform above Opher
       TuleyShop.Lightcatchers, Bash
 
 anchor GladesTown.StorageHut at -119, -4605:
-  door:
+  entrance:
     id: 12
     target: GladesTown.AboveOpher
     enter: free
@@ -5114,7 +5114,7 @@ anchor GladesTown.PlayfulMoki at -210, -4122:  # At the Moki above the storage h
     # seed paths tbd if ever necessary
 
 anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
-  door:
+  entrance:
     id: 1
     target: GladesTown.InsideLupoHouse
     enter: free
@@ -5136,7 +5136,7 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
       WaterDash, Damage=60
 
 anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's house
-  door:
+  entrance:
     id: 2
     target: GladesTown.LupoHouse
     enter: free
@@ -5197,7 +5197,7 @@ anchor GladesTown.BelowHoleHut at -214, -4111:  # The ledge below Hole Hut
   conn GladesTown.PlayfulMoki: free
 
 anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup house
-  door:
+  entrance:
     id: 7
     target: GladesTown.InsideHoleHut
     enter:
@@ -5210,7 +5210,7 @@ anchor GladesTown.HoleHutEntrance at -229, -4094:  # At the door of the 2 pickup
   conn GladesTown.BelowHoleHut: free
 
 anchor GladesTown.InsideHoleHut at -107, -4506:  # Inside the hut with 2 pickups
-  door:
+  entrance:
     id: 8
     target: GladesTown.HoleHutEntrance
     enter: free
@@ -5852,7 +5852,7 @@ anchor OuterWellspring.CutsceneIsland at -756, -4071:  # The island on the right
       Dash, Glide
 
 anchor OuterWellspring.EntranceDoor at -856, -4057:  # Outside the door where you enter the first room
-  door:
+  entrance:
     id: 15
     target: InnerWellspring.EntranceDoor
     enter:
@@ -6253,7 +6253,7 @@ anchor OuterWellspring.AboveEntranceDoor at -837, -4026:  # at the crystal above
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.WestDoor at -892, -3991:  # Outside the door where you exit the first room
-  door:
+  entrance:
     id: 17
     target: InnerWellspring.WestDoor
     enter:
@@ -6360,7 +6360,7 @@ anchor OuterWellspring.WestDoor at -892, -3991:  # Outside the door where you ex
   conn OuterWellspring.EntranceDoor: free
 
 anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to the spin puzzle
-  door:
+  entrance:
     id: 19
     target: InnerWellspring.EastDoor
     enter:
@@ -6577,7 +6577,7 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
   conn OuterWellspring.AboveEntranceDoor: free
 
 anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to the teleporter
-  door:
+  entrance:
     id: 21
     target: InnerWellspring.Teleporter
     enter:
@@ -6823,7 +6823,7 @@ region InnerWellspring:
   gorlek: free
 
 anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where you enter the first room
-  door:
+  entrance:
     id: 16
     target: OuterWellspring.EntranceDoor
     enter: free
@@ -7401,7 +7401,7 @@ anchor InnerWellspring.AbovePole at -1164, -3874:  # Under InnerWellspring.Upper
     gorlek: free
 
 anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you exit the first room
-  door:
+  entrance:
     id: 18
     target: OuterWellspring.WestDoor
     enter:
@@ -7480,7 +7480,7 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
   conn InnerWellspring.BelowDrainLever: free
 
 anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to the spin puzzle
-  door:
+  entrance:
     id: 20
     target: OuterWellspring.EastDoor
     enter: free
@@ -7723,7 +7723,7 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
       AerialHammerJump
 
 anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
-  door:
+  entrance:
     id: 22
     target: OuterWellspring.TopDoor
     enter: free
@@ -8065,7 +8065,7 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   conn WoodsEntry.FamilyHut: free
 
 anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
-  door:
+  entrance:
     id: 25
     target: WoodsEntry.FamilyHutInside
     enter:
@@ -8097,7 +8097,7 @@ anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
       GrenadeJump OR GlideJump OR CoyoteHammerJump OR AbilitySwap=1
 
 anchor WoodsEntry.FamilyHutInside at 445, -4118: # inside of family reunion hut
-  door:
+  entrance:
     id: 26
     target: WoodsEntry.FamilyHut
     enter: free
@@ -10863,7 +10863,7 @@ anchor UpperReach.TreeRoomLedge at -136, -3911:  # On the ledge to the left and 
   # backwards connection can't get through the Icefall
 
 anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
-  door:
+  entrance:
     id: 23
     target: UpperReach.SeedHut
     enter: free
@@ -10899,7 +10899,7 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
       Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1 OR Sentry=1 OR Flash=1  # go up to the ore
 
 anchor UpperReach.SeedHut at -131, -3857: # inside the hut with the seed
-  door:
+  entrance:
     id: 24
     target: UpperReach.TreeRoom
     enter: free
@@ -15465,7 +15465,7 @@ anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of 
     moki: Burrow
 
 anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
-  door:
+  entrance:
     id: 27
     target: WindtornRuins.UpperRuinsDoor
     enter:
@@ -15520,7 +15520,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
   # Connecting to RuinsApproach would be redundant because it needs Burrow
 
 anchor WindtornRuins.UpperRuinsDoor at 2163, -3834:  # Just inside the door.
-  door:
+  entrance:
     id: 28
     target: UpperWastes.OutsideRuins
     enter: free
@@ -15965,7 +15965,7 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       SentrySwap=1, DoubleJump OR GlideJump
 
 anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willow entrance
-  door:
+  entrance:
     id: 29
     target: WillowsEnd.Entry
     enter: free
@@ -15988,7 +15988,7 @@ region WillowsEnd:
   unsafe: free
 
 anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
-  door:
+  entrance:
     id: 30
     target: WeepingRidge.WillowEntranceLedge
     enter: free
@@ -16437,7 +16437,7 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
     unsafe: DoubleJump, Sword  # pogo the mine
 
 anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
-  door:
+  entrance:
     id: 31
     target: WillowsEnd.ShriekArena
     enter:
@@ -16504,7 +16504,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       DoubleJump, TripleJump  # tjump on the left wall to start climbing it
 
 anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
-  door:
+  entrance:
     id: 32
     target: WillowsEnd.Upper
     enter: free

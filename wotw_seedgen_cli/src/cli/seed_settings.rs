@@ -53,7 +53,7 @@ impl Args for SeedSettings {
             .arg(difficulty_arg(true))
             .arg(tricks_arg(true))
             .arg(hard_arg(true))
-            .arg(randomize_doors_arg(true))
+            .arg(randomize_entrances_arg(true))
             .arg(snippets_arg(true))
             .arg(snippet_config_arg(true))
     }
@@ -79,7 +79,7 @@ impl Args for SeedWorldSettings {
             .arg(difficulty_arg(false))
             .arg(tricks_arg(false))
             .arg(hard_arg(false))
-            .arg(randomize_doors_arg(false))
+            .arg(randomize_entrances_arg(false))
             .arg(snippets_arg(false))
             .arg(snippet_config_arg(false))
     }
@@ -267,14 +267,15 @@ fn hard_arg(world_scoped: bool) -> Arg {
     choose_parser!(arg, world_scoped, bool)
 }
 
-fn randomize_doors_arg(world_scoped: bool) -> Arg {
-    let arg = Arg::new("randomize_doors")
+fn randomize_entrances_arg(world_scoped: bool) -> Arg {
+    let arg = Arg::new("randomize_entrances")
         .group("seed_settings")
-        .long("randomize-doors")
+        .long("randomize-entrances")
+        .short('e')
         .value_name("NUMBER")
         .default_missing_value("2")
-        .help("Randomize door connections")
-        .long_help("Randomize door connections. Provide a value to set the door loop size");
+        .help("Randomize entrance connections")
+        .long_help("Randomize entrance connections. Provide a value to set the entrance loop size");
 
     let arg = if world_scoped {
         arg.num_args(0..)
@@ -686,9 +687,9 @@ impl FromArgMatches for SeedSettings {
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
-            "randomize_doors",
-            |world_preset, randomize_doors: &GreaterOneU8| {
-                world_preset.randomize_doors = Some(*randomize_doors)
+            "randomize_entrances",
+            |world_preset, randomize_entrances: &GreaterOneU8| {
+                world_preset.randomize_entrances = Some(*randomize_entrances)
             },
         )?;
 
@@ -749,7 +750,7 @@ impl FromArgMatches for SeedWorldSettings {
                 .get_many("tricks")
                 .map(|trick| trick.copied().collect()),
             hard: matches.get_flag("hard").then_some(true),
-            randomize_doors: matches.get_one("randomize_doors").cloned(),
+            randomize_entrances: matches.get_one("randomize_entrances").cloned(),
             snippets: matches
                 .get_many("snippets")
                 .map(|snippets| snippets.cloned().collect()),

@@ -3,8 +3,8 @@ use wotw_seedgen_parse::{
 };
 
 use crate::logic_language::ast::{
-    Anchor, AnchorContent, And, Areas, Connection, ConnectionKeyword, Content, DoorContent,
-    DoorTarget, Group, GroupContent, InlineRequirementOrGroup, LogicIdentifier, Macro,
+    Anchor, AnchorContent, And, Areas, Connection, ConnectionKeyword, Content, EntranceContent,
+    EntranceTarget, Group, GroupContent, InlineRequirementOrGroup, LogicIdentifier, Macro,
     PlainRequirement, Refill, Region, Requirement, RequirementLine, RequirementLineOrGroup,
 };
 
@@ -208,7 +208,7 @@ impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H>
 {
     fn traverse(&'ast self, handler: &mut H) {
         match self {
-            Self::Door(_, door) => door.traverse(handler),
+            Self::Entrance(_, entrance) => entrance.traverse(handler),
             Self::NoSpawn(_) => {}
             Self::TpRestriction(_, tprestriction) => tprestriction.traverse(handler),
             Self::Refill(_, refill) => refill.traverse(handler),
@@ -228,7 +228,9 @@ impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H>
     }
 }
 
-impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H> for DoorContent<'source> {
+impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H>
+    for EntranceContent<'source>
+{
     fn traverse(&'ast self, handler: &mut H) {
         match self {
             Self::Id(_, _) => {}
@@ -238,7 +240,9 @@ impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H> for Do
     }
 }
 
-impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H> for DoorTarget<'source> {
+impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H>
+    for EntranceTarget<'source>
+{
     fn traverse(&'ast self, handler: &mut H) {
         handler.anchor_use(&self.target);
     }

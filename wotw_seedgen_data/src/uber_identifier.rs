@@ -27,8 +27,8 @@ const RANDO_CONFIG_GROUP: i32 = 7;
 const MULTIWORLD_GROUP: i32 = 12;
 const SKILLS_GROUP: i32 = 24;
 const SHARDS_GROUP: i32 = 25;
-const DOORS_GROUP: i32 = 27;
-const KNOWN_DOOR_CONNECTIONS_GROUP: i32 = 28;
+const ENTRANCES_GROUP: i32 = 27;
+const KNOWN_ENTRANCE_CONNECTIONS_GROUP: i32 = 28;
 const SETTINGS_GROUP: i32 = 29;
 
 impl UberIdentifier {
@@ -59,12 +59,12 @@ impl UberIdentifier {
         Self::new(SHARDS_GROUP, member)
     }
 
-    pub const fn doors(member: i32) -> Self {
-        Self::new(DOORS_GROUP, member)
+    pub const fn entrances(member: i32) -> Self {
+        Self::new(ENTRANCES_GROUP, member)
     }
 
-    pub const fn known_door_connections(member: i32) -> Self {
-        Self::new(KNOWN_DOOR_CONNECTIONS_GROUP, member)
+    pub const fn known_entrance_connections(member: i32) -> Self {
+        Self::new(KNOWN_ENTRANCE_CONNECTIONS_GROUP, member)
     }
 
     pub const fn as_skills(self) -> Option<i32> {
@@ -117,8 +117,8 @@ impl UberIdentifier {
         }
     }
 
-    /// Returns `true` if this `UberIdentifier` corresponds to a door connection state
-    pub const fn is_door(self) -> bool {
+    /// Returns `true` if this `UberIdentifier` corresponds to a entrance connection state
+    pub const fn is_entrance(self) -> bool {
         self.group == 27
     }
 

@@ -85,7 +85,7 @@ pub fn seed_world_settings(
     select_difficulty(&prefix, settings, include_settings)?;
     select_tricks(&prefix, settings, include_settings)?;
     select_hard(&prefix, settings, include_settings)?;
-    select_randomize_doors(&prefix, settings, include_settings)?;
+    select_randomize_entrances(&prefix, settings, include_settings)?;
     select_snippets(&prefix, settings, include_settings)?;
     select_snippet_config(&prefix, settings, include_settings)?;
     Ok(())
@@ -294,29 +294,29 @@ fn select_hard(
     Ok(())
 }
 
-fn select_randomize_doors(
+fn select_randomize_entrances(
     prefix: &str,
     settings: &mut WorldPresetSettings,
     include_settings: &WorldSettings,
 ) -> Result<(), Error> {
-    if settings.randomize_doors.is_none() {
+    if settings.randomize_entrances.is_none() {
         if let Some(true) = Confirm::new()
             .with_prompt(format!(
-                "{prefix}Choose whether door connections should be randomized"
+                "{prefix}Choose whether entrance connections should be randomized"
             ))
-            .default(include_settings.randomize_doors.is_some())
+            .default(include_settings.randomize_entrances.is_some())
             .interact_opt()?
         {
             let loop_size = Input::new()
-                .with_prompt("Choose the door loop size")
+                .with_prompt("Choose the entrance loop size")
                 .default(
                     include_settings
-                        .randomize_doors
+                        .randomize_entrances
                         .unwrap_or(GreaterOneU8::new(2).unwrap()),
                 )
                 .interact_text()?;
 
-            settings.randomize_doors = Some(loop_size);
+            settings.randomize_entrances = Some(loop_size);
         }
     }
 

@@ -20,7 +20,7 @@ pub struct LogConfig {
     trace_is_met: LevelFilter,
     trace_solutions: LevelFilter,
     trace_weight: LevelFilter,
-    trace_doors: LevelFilter,
+    trace_entrances: LevelFilter,
     trace_optimize_graph: LevelFilter,
 }
 
@@ -30,7 +30,7 @@ const REACHED_MOD: &str = "wotw_seedgen::world::reached";
 const IS_MET_MOD: &str = "wotw_seedgen::world::is_met";
 const SOLUTIONS_MOD: &str = "wotw_seedgen::generator::solutions";
 const WEIGHT_MOD: &str = "wotw_seedgen::generator::solutions::weight";
-const DOORS_MOD: &str = "wotw_seedgen::generator::doors";
+const ENTRANCES_MOD: &str = "wotw_seedgen::generator::entrances";
 const OPTIMIZE_GRAPH_MOD: &str = "wotw_seedgen_data::logic_language::optimize";
 
 impl Default for LogConfig {
@@ -42,7 +42,7 @@ impl Default for LogConfig {
             trace_is_met: LevelFilter::Info,
             trace_solutions: LevelFilter::Info,
             trace_weight: LevelFilter::Info,
-            trace_doors: LevelFilter::Info,
+            trace_entrances: LevelFilter::Info,
             trace_optimize_graph: LevelFilter::Info,
         }
     }
@@ -58,7 +58,7 @@ impl Index<VerboseTarget> for LogConfig {
             VerboseTarget::IsMet => &self.trace_is_met,
             VerboseTarget::Solutions => &self.trace_solutions,
             VerboseTarget::Weight => &self.trace_weight,
-            VerboseTarget::Doors => &self.trace_doors,
+            VerboseTarget::Entrances => &self.trace_entrances,
             VerboseTarget::OptimizeGraph => &self.trace_optimize_graph,
         }
     }
@@ -72,7 +72,7 @@ impl IndexMut<VerboseTarget> for LogConfig {
             VerboseTarget::IsMet => &mut self.trace_is_met,
             VerboseTarget::Solutions => &mut self.trace_solutions,
             VerboseTarget::Weight => &mut self.trace_weight,
-            VerboseTarget::Doors => &mut self.trace_doors,
+            VerboseTarget::Entrances => &mut self.trace_entrances,
             VerboseTarget::OptimizeGraph => &mut self.trace_optimize_graph,
         }
     }
@@ -116,7 +116,7 @@ impl LogConfig {
             trace_is_met,
             trace_solutions,
             trace_weight,
-            trace_doors,
+            trace_entrances,
             trace_optimize_graph,
         } = self;
 
@@ -134,7 +134,7 @@ impl LogConfig {
                     .level_for(IS_MET_MOD, trace_is_met)
                     .level_for(SOLUTIONS_MOD, trace_solutions)
                     .level_for(WEIGHT_MOD, trace_weight)
-                    .level_for(DOORS_MOD, trace_doors)
+                    .level_for(ENTRANCES_MOD, trace_entrances)
                     .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
                     .level_for("perf_counters", LevelFilter::Off)
                     .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?),

@@ -19,8 +19,8 @@ pub enum Token {
     Anchor,
     #[token("at")]
     At,
-    #[token("door")]
-    Door,
+    #[token("entrance")]
+    Entrance,
     #[token("id")]
     Id,
     #[token("target")]

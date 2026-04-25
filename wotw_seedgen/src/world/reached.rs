@@ -501,8 +501,8 @@ impl<'graph> World<'graph, '_> {
             let node = &self.graph.nodes[index];
             let uber_identifier = node.uber_identifier().unwrap();
 
-            let met = if uber_identifier.is_door() {
-                self.door_condition_met(uber_identifier, node.value().unwrap())
+            let met = if uber_identifier.is_entrance() {
+                self.entrance_condition_met(uber_identifier, node.value().unwrap())
             } else {
                 self.loc_data_condition_met(uber_identifier, node.value())
             };

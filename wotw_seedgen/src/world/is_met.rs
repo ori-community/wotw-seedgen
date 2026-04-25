@@ -46,7 +46,7 @@ pub enum Missing<'graph> {
 
 impl Missing<'_> {
     fn uber_state(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
-        if uber_identifier.is_door() {
+        if uber_identifier.is_entrance() {
             Self::Impossible
         } else {
             match value {

@@ -42,11 +42,11 @@ impl<S: Simulation> SimulationCache<S> {
         self.cache.teleporters = self.simulation.teleporters().collect();
         self.cache.clean_water = self.simulation.clean_water();
         self.cache.weapon_upgrades = self.simulation.weapon_upgrades().collect();
-        // TODO too lazy to do this better... I don't think doors belong in states because they must not change anyway or things would break
-        for (index, door) in self.cache.doors.iter_mut().enumerate() {
-            *door = self
+        // TODO too lazy to do this better... I don't think entrances belong in states because they must not change anyway or things would break
+        for (index, entrance) in self.cache.entrances.iter_mut().enumerate() {
+            *entrance = self
                 .simulation
-                .fetch_integer(UberIdentifier::doors(index as i32 + 1));
+                .fetch_integer(UberIdentifier::entrances(index as i32 + 1));
         }
     }
 }
@@ -65,7 +65,7 @@ struct Cache {
     teleporters: FxHashSet<Teleporter>,
     clean_water: bool,
     weapon_upgrades: FxHashSet<WeaponUpgrade>,
-    doors: [i32; 32],
+    entrances: [i32; 32],
 }
 
 impl Default for Cache {
@@ -88,7 +88,7 @@ impl Default for Cache {
                 WeaponUpgrade::VARIANTS.len(),
                 FxBuildHasher,
             ),
-            doors: [0; 32],
+            entrances: [0; 32],
         }
     }
 }

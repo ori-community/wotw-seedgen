@@ -6,7 +6,9 @@ use std::{cmp::Ordering, mem};
 use itertools::Itertools;
 use log::trace;
 
-use crate::logic_language::output::{Anchor, Connection, Door, Graph, Node, Refill, Requirement};
+use crate::logic_language::output::{
+    Anchor, Connection, Entrance, Graph, Node, Refill, Requirement,
+};
 
 impl Graph {
     pub fn optimize(&mut self) {
@@ -47,14 +49,14 @@ impl Optimize for Anchor {
         let Self {
             identifier: _,
             position: _,
-            door,
+            entrance,
             can_spawn: _,
             teleport_restriction,
             refills,
             connections,
         } = self;
 
-        door.optimize();
+        entrance.optimize();
         teleport_restriction.optimize();
 
         refills.optimize();
@@ -67,7 +69,7 @@ impl Optimize for Anchor {
     }
 }
 
-impl Optimize for Door {
+impl Optimize for Entrance {
     fn optimize(&mut self) {
         self.requirement.optimize();
     }

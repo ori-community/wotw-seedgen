@@ -37,7 +37,7 @@ use wotw_seedgen_data::{
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
-const KEYSTONE_DOORS: &[(&str, usize)] = &[
+const KEYSTONE_ENTRANCES: &[(&str, usize)] = &[
     ("MarshSpawn.KeystoneDoor", 2),
     ("HowlsDen.KeystoneDoor", 2),
     ("MarshPastOpher.EyestoneDoor", 2),
@@ -171,8 +171,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .collect();
 
         // TODO is this possible earlier to avoid the need to filter through nodes?
-        // otherwise, it would at least be unnecessary if no world has door randomization
-        let door_identifier_map = worlds[0]
+        // otherwise, it would at least be unnecessary if no world has entrance randomization
+        let entrance_identifier_map = worlds[0]
             .world
             .graph
             .nodes
@@ -180,34 +180,34 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .filter_map(Node::try_as_anchor_ref)
             .filter_map(|anchor| {
                 anchor
-                    .door
+                    .entrance
                     .as_ref()
-                    .map(|door| (door.id, &anchor.identifier))
+                    .map(|entrance| (entrance.id, &anchor.identifier))
             })
             .collect::<FxHashMap<_, _>>();
 
-        let doors = worlds
+        let entrances = worlds
             .iter()
             .map(|world_context| {
-                if world_context.world.settings.randomize_doors.is_some() {
-                    let mut doors = (1..=32)
-                        .map(|door_id| {
-                            let target_door_id = world_context
+                if world_context.world.settings.randomize_entrances.is_some() {
+                    let mut entrances = (1..=32)
+                        .map(|entrance_id| {
+                            let target_entrance_id = world_context
                                 .world
-                                .fetch_integer(UberIdentifier::doors(door_id));
+                                .fetch_integer(UberIdentifier::entrances(entrance_id));
 
-                            (door_id, target_door_id)
+                            (entrance_id, target_entrance_id)
                         })
                         .collect::<Vec<_>>();
 
-                    doors.sort_unstable_by_key(|(_, target)| *target);
+                    entrances.sort_unstable_by_key(|(_, target)| *target);
 
-                    doors
+                    entrances
                         .into_iter()
                         .map(|(from, to)| {
                             (
-                                door_identifier_map[&from].clone(),
-                                door_identifier_map[&to].clone(),
+                                entrance_identifier_map[&from].clone(),
+                                entrance_identifier_map[&to].clone(),
                             )
                         })
                         .collect()
@@ -218,7 +218,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             .collect();
 
         // TODO move some of the above logic into SeedSpoiler::new?
-        let spoiler = SeedSpoiler::new(spawns, doors);
+        let spoiler = SeedSpoiler::new(spawns, entrances);
 
         Ok(Self {
             rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
@@ -304,7 +304,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 continue;
             }
 
-            let required_keystones = KEYSTONE_DOORS
+            let required_keystones = KEYSTONE_ENTRANCES
                 .iter()
                 .filter_map(|(identifier, amount)| {
                     world_context
@@ -858,7 +858,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             unshared_items: UNSHARED_ITEMS,
         };
 
-        world_context.generate_doors()?;
+        world_context.generate_entrances()?;
 
         Ok(world_context)
     }

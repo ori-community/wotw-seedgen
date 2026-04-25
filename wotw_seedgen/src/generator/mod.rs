@@ -1,4 +1,4 @@
-pub mod doors;
+pub mod entrances;
 pub mod item_pool;
 pub mod spoiler;
 

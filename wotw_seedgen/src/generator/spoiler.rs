@@ -8,10 +8,10 @@ use wotw_seedgen_data::{assets::LocDataEntry, seed_language::output::CommandVoid
 pub struct SeedSpoiler {
     /// Anchor identifier of all the spawn locations
     pub spawns: Vec<String>,
-    /// For each world, all the door connections
+    /// For each world, all the entrance connections
     ///
-    /// If a world's list of door connections is empty, the doors were not randomized
-    pub doors: Vec<Vec<(String, String)>>,
+    /// If a world's list of entrance connections is empty, the entrances were not randomized
+    pub entrances: Vec<Vec<(String, String)>>,
     /// An ordered list describing the preplaced items
     pub preplacements: Vec<SpoilerPlacement>,
     /// Each [`SpoilerGroup`] represents one "step" of placements
@@ -19,10 +19,10 @@ pub struct SeedSpoiler {
 }
 
 impl SeedSpoiler {
-    pub(super) fn new(spawns: Vec<String>, doors: Vec<Vec<(String, String)>>) -> Self {
+    pub(super) fn new(spawns: Vec<String>, entrances: Vec<Vec<(String, String)>>) -> Self {
         Self {
             spawns,
-            doors,
+            entrances,
             preplacements: vec![],
             groups: vec![],
         }
@@ -111,14 +111,14 @@ impl Display for SeedSpoiler {
         writeln!(f)?;
 
         // TODO display loops of two more efficiently
-        for (index, doors) in self.doors.iter().enumerate() {
-            if !doors.is_empty() {
-                let longest_door = doors.iter().map(|(from, _)| from.len()).max().unwrap();
+        for (index, entrances) in self.entrances.iter().enumerate() {
+            if !entrances.is_empty() {
+                let longest_entrance = entrances.iter().map(|(from, _)| from.len()).max().unwrap();
 
-                writeln!(f, "[{index}] Doors:")?;
+                writeln!(f, "[{index}] Entrances:")?;
 
-                for (from, to) in doors {
-                    writeln!(f, "  {from:<longest_door$} to {to}")?;
+                for (from, to) in entrances {
+                    writeln!(f, "  {from:<longest_entrance$} to {to}")?;
                 }
             }
         }

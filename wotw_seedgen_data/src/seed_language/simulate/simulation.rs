@@ -87,9 +87,9 @@ pub trait Simulation: Sized {
         }
     }
 
-    // TODO less hardcoded solution? Doors are not allowed to change anyway, they just have to be set at the start
+    // TODO less hardcoded solution? Entrances are not allowed to change anyway, they just have to be set at the start
     #[inline]
-    fn door_condition_met(&self, uber_identifier: UberIdentifier, value: i32) -> bool {
+    fn entrance_condition_met(&self, uber_identifier: UberIdentifier, value: i32) -> bool {
         self.fetch_integer(uber_identifier) == value
     }
 

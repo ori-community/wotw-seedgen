@@ -172,7 +172,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverPosition {
 
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum AnchorContent<'source> {
-    Door(Spanned<DoorKeyword>, Door<'source>),
+    Entrance(Spanned<EntranceKeyword>, Entrance<'source>),
     NoSpawn(Spanned<NoSpawn>),
     TpRestriction(
         Spanned<TpRestrictionKeyword>,
@@ -189,16 +189,16 @@ pub enum AnchorContent<'source> {
 }
 
 #[derive(Debug, Clone, PartialEq, Ast)]
-#[ast(token = Token::Door)]
-pub struct DoorKeyword;
-pub type Door<'source> = Group<SeparatedNonEmpty<DoorContent<'source>, Newline>>;
+#[ast(token = Token::Entrance)]
+pub struct EntranceKeyword;
+pub type Entrance<'source> = Group<SeparatedNonEmpty<EntranceContent<'source>, Newline>>;
 
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
-pub enum DoorContent<'source> {
-    Id(Spanned<Id>, Recoverable<DoorId, RecoverNewline>),
+pub enum EntranceContent<'source> {
+    Id(Spanned<Id>, Recoverable<EntranceId, RecoverNewline>),
     Target(
         Spanned<Target>,
-        Recoverable<DoorTarget<'source>, RecoverNewline>,
+        Recoverable<EntranceTarget<'source>, RecoverNewline>,
     ),
     Enter(
         Spanned<Enter>,
@@ -211,13 +211,13 @@ pub enum DoorContent<'source> {
 pub struct Id;
 
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
-pub struct DoorId {
+pub struct EntranceId {
     pub colon: Spanned<Symbol<':'>>,
     pub id: Spanned<i32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
-pub struct DoorTarget<'source> {
+pub struct EntranceTarget<'source> {
     pub colon: Spanned<Symbol<':'>>,
     pub target: Spanned<LogicIdentifier<'source>>,
 }
