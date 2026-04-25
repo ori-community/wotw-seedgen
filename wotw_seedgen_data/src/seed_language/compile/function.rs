@@ -834,6 +834,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     store_boolean(skill.uber_identifier(), false),
                 ];
 
+                // TODO redundant with client behaviour?
                 if let Some(equipment) = skill.equipment() {
                     commands.push(CommandVoid::Unequip { equipment });
                 }

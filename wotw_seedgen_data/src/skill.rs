@@ -334,7 +334,7 @@ impl Skill {
             Skill::WallJump => None,
             // Skill::Stomp => todo!(),
             Skill::DoubleJump => Some(Equipment::Bounce),
-            Skill::Launch => Some(Equipment::ChargeJump),
+            Skill::Launch => Some(Equipment::Launch),
             // Skill::Magnet => todo!(),
             // Skill::UltraMagnet => todo!(),
             // Skill::Climb => Some(Equipment::Climb),
