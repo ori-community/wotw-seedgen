@@ -128,11 +128,9 @@ fn compile(
         .eprint_errors()
         .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
-    let (placeholder_map, extra_events) = postprocess(Some(&output), &cache.loc_data, rng)
+    let placeholder_map = postprocess(&mut [&mut output], &cache.loc_data, rng)
         .pop()
         .unwrap();
-
-    output.events.splice(0..0, extra_events);
 
     let seed = Seed::new(output, placeholder_map, debug);
 

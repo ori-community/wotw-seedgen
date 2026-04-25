@@ -33,7 +33,7 @@ use wotw_seedgen_data::{
         },
         simulate::{Simulate, Simulation, Snapshot},
     },
-    Position, UberIdentifier, UniverseSettings,
+    UberIdentifier, UniverseSettings,
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
@@ -562,7 +562,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
                 self.push_command(
                     Trigger::ClientEvent(ClientEvent::Spawn),
-                    None,
                     command,
                     origin_world_index,
                     target_world_index,
@@ -668,7 +667,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
         self.push_command(
             Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
-            pickup.position,
             command,
             origin_world_index,
             target_world_index,
@@ -678,29 +676,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     fn push_command(
         &mut self,
         trigger: Trigger,
-        pickup_position: Option<Position>,
         mut command: CommandVoid,
         origin_world_index: usize,
         target_world_index: usize,
     ) {
-        let pickup_position_command =
-            pickup_position.map(
-                |pickup_position| CommandVoid::QueuedMessageScopedPickupPosition {
-                    x: pickup_position.x.into(),
-                    y: pickup_position.y.into(),
-                },
-            );
-
         if origin_world_index == target_world_index {
-            self.worlds[origin_world_index].push_command(
-                trigger,
-                match pickup_position_command {
-                    None => command,
-                    Some(pickup_position_command) => CommandVoid::Multi {
-                        commands: vec![pickup_position_command, command],
-                    },
-                },
-            );
+            self.worlds[origin_world_index].push_command(trigger, command);
         } else {
             let uber_identifier = self.multiworld_state();
             let message = self.origin_name(&command, target_world_index);
@@ -715,12 +696,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             self.worlds[origin_world_index].push_command(
                 trigger,
                 CommandVoid::Multi {
-                    commands: match pickup_position_command {
-                        None => vec![message_command, store_command],
-                        Some(pickup_position_command) => {
-                            vec![pickup_position_command, message_command, store_command]
-                        }
-                    },
+                    commands: vec![message_command, store_command],
                 },
             );
 
@@ -782,16 +758,21 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
     }
 
-    fn finish(self, loc_data: &LocData, debug: bool, rng: &mut Pcg64Mcg) -> SeedUniverse {
-        let postprocessed =
-            postprocess(self.worlds.iter().map(|world| &world.output), loc_data, rng);
+    fn finish(mut self, loc_data: &LocData, debug: bool, rng: &mut Pcg64Mcg) -> SeedUniverse {
+        let mut output = self
+            .worlds
+            .iter_mut()
+            .map(|world| &mut world.output)
+            .collect::<Vec<_>>();
+
+        let placeholder_maps = postprocess(&mut output, loc_data, rng);
 
         SeedUniverse {
             worlds: self
                 .worlds
                 .into_iter()
-                .zip(postprocessed)
-                .map(|(mut world_context, (placeholder_map, extra_events))| {
+                .zip(placeholder_maps)
+                .map(|(mut world_context, placeholder_map)| {
                     assert!(
                         world_context.output.icons.is_empty(),
                         "custom icons in seedgen aren't supported"
@@ -799,8 +780,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
                     world_context.output.spawn = Some(*spawn.position().unwrap());
-
-                    world_context.output.events.splice(0..0, extra_events);
 
                     let seedgen_info = SeedgenInfo {
                         universe_settings: self.settings.clone(),

@@ -3,6 +3,7 @@ mod price_noise;
 use std::{
     collections::hash_map::Entry,
     fmt::{self, Display},
+    mem,
     ops::Deref,
 };
 
@@ -26,20 +27,29 @@ use itertools::Itertools;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 
-pub fn postprocess<'output, I>(
-    worlds: I,
+pub fn postprocess(
+    worlds: &mut [&mut IntermediateOutput],
     loc_data: &LocData,
     rng: &mut Pcg64Mcg,
-) -> Vec<(PlaceholderMap, Vec<Event>)>
-where
-    I: IntoIterator<Item = &'output IntermediateOutput>,
-{
+) -> Vec<PlaceholderMap> {
     let postprocessor = UniversePostprocessor::new(worlds, loc_data);
 
-    let placeholder_maps = postprocessor.resolve_placeholders();
-    let extra_events = postprocessor.generate_defaults(rng);
+    let placeholder_maps = postprocessor.resolve_placeholders().collect::<Vec<_>>();
+    let extra_events = postprocessor.generate_defaults(rng).collect::<Vec<_>>();
 
-    placeholder_maps.zip(extra_events).collect()
+    let UniversePostprocessor {
+        loc_data_triggers, ..
+    } = postprocessor;
+
+    for (output, extra_events) in worlds.iter_mut().zip(extra_events) {
+        // TODO merge events with identical triggers?
+
+        loc_data_triggers.generate_message_origins(&mut output.events);
+
+        output.events.splice(0..0, extra_events);
+    }
+
+    placeholder_maps
 }
 
 // TODO maybe zone_of should be a typed zone placeholder?
@@ -50,13 +60,25 @@ pub struct PlaceholderMap {
 
 pub struct UniversePostprocessor<'output, 'locdata> {
     worlds: Vec<WorldPostprocessor<'output>>,
-    loc_data_triggers: FxHashMap<Trigger, &'locdata LocDataEntry>,
+    loc_data_triggers: LocDataTriggers<'locdata>,
     multiworld_lookup: MultiworldLookup<'output>,
 }
 
 struct WorldPostprocessor<'output> {
     output: &'output IntermediateOutput,
     loc_data_events: FxHashMap<&'output Trigger, Vec<&'output Event>>,
+}
+
+struct LocDataTriggers<'locdata> {
+    inner: FxHashMap<Trigger, &'locdata LocDataEntry>,
+}
+
+impl<'locdata> Deref for LocDataTriggers<'locdata> {
+    type Target = FxHashMap<Trigger, &'locdata LocDataEntry>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
 }
 
 #[derive(Default)]
@@ -72,26 +94,13 @@ struct MultiworldEvent<'output> {
 }
 
 impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
-    pub fn new<I>(worlds: I, loc_data: &'locdata LocData) -> Self
-    where
-        I: IntoIterator<Item = &'output IntermediateOutput>,
-    {
-        let loc_data_triggers = loc_data
-            .entries
+    pub fn new(worlds: &'output [&mut IntermediateOutput], loc_data: &'locdata LocData) -> Self {
+        let loc_data_triggers = LocDataTriggers::new(loc_data);
+        let multiworld_lookup = MultiworldLookup::new(worlds);
+        let worlds = worlds
             .iter()
-            .map(|entry| {
-                (
-                    Trigger::loc_data_trigger(entry.uber_identifier, entry.value),
-                    entry,
-                )
-            })
-            .collect::<FxHashMap<_, _>>();
-
-        let iter = worlds.into_iter();
-        let mut worlds = Vec::with_capacity(iter.size_hint().1.unwrap_or_default());
-        let multiworld_lookup = MultiworldLookup::new(iter, |output| {
-            worlds.push(WorldPostprocessor::new(output, &loc_data_triggers))
-        });
+            .map(|output| WorldPostprocessor::new(output, &loc_data_triggers))
+            .collect();
 
         Self {
             worlds,
@@ -388,10 +397,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
 }
 
 impl<'output> WorldPostprocessor<'output> {
-    fn new(
-        output: &'output IntermediateOutput,
-        loc_data_triggers: &FxHashMap<Trigger, &LocDataEntry>,
-    ) -> Self {
+    fn new(output: &'output IntermediateOutput, loc_data_triggers: &LocDataTriggers) -> Self {
         let mut loc_data_events = FxHashMap::<_, Vec<_>>::default();
 
         for event in output
@@ -428,19 +434,54 @@ impl<'output> WorldPostprocessor<'output> {
     }
 }
 
+impl<'locdata> LocDataTriggers<'locdata> {
+    fn new(loc_data: &'locdata LocData) -> Self {
+        Self {
+            inner: loc_data
+                .entries
+                .iter()
+                .map(|entry| {
+                    (
+                        Trigger::loc_data_trigger(entry.uber_identifier, entry.value),
+                        entry,
+                    )
+                })
+                .collect(),
+        }
+    }
+
+    fn generate_message_origins(&self, events: &mut [Event]) {
+        for event in events {
+            if let Some(map_position) = self
+                .get(&event.trigger)
+                .and_then(|entry| entry.map_position)
+            {
+                let set_position = CommandVoid::QueuedMessageScopedPickupPosition {
+                    x: map_position.x.into(),
+                    y: map_position.y.into(),
+                };
+
+                match &mut event.command {
+                    CommandVoid::Multi { commands } => commands.insert(0, set_position),
+                    other => {
+                        let previous = mem::replace(other, CommandVoid::Multi { commands: vec![] });
+                        *other = CommandVoid::Multi {
+                            commands: vec![set_position, previous],
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 impl<'output> MultiworldLookup<'output> {
-    fn new<I, F>(worlds: I, mut extra: F) -> Self
-    where
-        I: Iterator<Item = &'output IntermediateOutput>,
-        F: FnMut(&'output IntermediateOutput),
-    {
+    fn new(worlds: &'output [&mut IntermediateOutput]) -> Self {
         let mut multiworld_lookup = Self::default();
         let mut unmatched_triggers = FxHashMap::default();
         let mut unmatched_commands = FxHashMap::default();
 
-        for (world_index, output) in worlds.into_iter().enumerate() {
-            extra(output);
-
+        for (world_index, output) in worlds.iter().enumerate() {
             for event in &output.events {
                 if let Some(id) = event.trigger.as_multiworld() {
                     match unmatched_triggers.entry(id) {
