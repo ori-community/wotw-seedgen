@@ -522,7 +522,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             self.force_place_command(command, target_world_index, true);
         }
 
-        self.worlds[target_world_index].place_spirit_light(
+        self.worlds[target_world_index].force_place_spirit_light(
             progression.spirit_light as usize, // TODO why is this not i32
             &mut self.spoiler.groups[self.step - 1].placements,
         )
@@ -898,14 +898,12 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 pickup_indices.swap_remove(self.rng.gen_range(0..pickup_indices.len()));
             let pickup = self.needs_placement[pickup_index];
 
-            self.place(pickup, command, preplacement_spoiler);
+            self.place_without_simulation(pickup, command, preplacement_spoiler);
             self.received_placement.push(pickup_index);
         }
     }
 
-    // TODO it looks like the simulated world has the 1 spirit light on spawn for some reason?
     fn hi_torin(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
-        // TODO implement From<{number}> for Constant commands?
         let command = compile::spirit_light(1.into(), &mut self.rng);
 
         if self.needs_placement.is_empty() {
@@ -920,7 +918,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 .needs_placement
                 .swap_remove(self.rng.gen_range(0..self.needs_placement.len()));
 
-            self.place(pickup, command, preplacement_spoiler);
+            self.place_without_simulation(pickup, command, preplacement_spoiler);
         }
     }
 
@@ -1098,7 +1096,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         );
     }
 
-    fn place_spirit_light(
+    fn force_place_spirit_light(
         &mut self,
         mut amount: usize,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
@@ -1109,17 +1107,13 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 .take(self.spirit_light_placements_remaining());
 
             amount = amount.saturating_sub(batch);
-            let command = compile::spirit_light((batch as i32).into(), &mut self.rng);
 
             match self.choose_location::<true>() {
                 None => {
-                    warn!(
-                        "Not enough space to place {name}, aborting progression",
-                        name = self.log_name(&command)
-                    );
+                    warn!("Not enough space to place spirit light, aborting progression");
                     break;
                 }
-                Some(pickup) => self.place(pickup, command, placement_spoiler),
+                Some(pickup) => self.place_spirit_light(pickup, batch as i32, placement_spoiler),
             }
         }
     }
@@ -1185,13 +1179,18 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         for (placements_remaining, pickup) in needs_placement.into_iter().enumerate().rev() {
             let is_shop = pickup.uber_identifier.is_shop();
 
-            let command = if is_shop {
-                self.backup_gorlek_ore()
+            if is_shop {
+                let command = self.backup_gorlek_ore();
+                self.place_with_simulation(
+                    pickup,
+                    command,
+                    placement_spoiler,
+                    |_, world, events| world.add_gorlek_ore(1, events),
+                );
             } else {
                 let amount = self.spirit_light_provider.take(1 + placements_remaining) as i32;
-                compile::spirit_light(amount.into(), &mut self.rng)
-            };
-            self.place(pickup, command, placement_spoiler);
+                self.place_spirit_light(pickup, amount, placement_spoiler);
+            }
         }
 
         let mut unreachable_count = 0;
@@ -1205,9 +1204,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                         pickup.identifier,
                     );
 
-                    let amount = (self.spirit_light_provider.take_exceed() as i32).into();
-                    let command = compile::spirit_light(amount, &mut self.rng);
-                    self.place(pickup, command, placement_spoiler);
+                    let amount = self.spirit_light_provider.take_exceed() as i32;
+                    self.place_spirit_light(pickup, amount, placement_spoiler);
 
                     unreachable_count += 1;
                 }
@@ -1240,12 +1238,15 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         command
     }
 
-    fn place(
+    fn place_with_simulation<F>(
         &mut self,
         pickup: &LocDataEntry,
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
-    ) {
+        simulate: F,
+    ) where
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &[Event]),
+    {
         trace!(
             "{index}Placing {name} at {pickup}",
             name = self.log_name(&command),
@@ -1255,20 +1256,52 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         self.write_placement_spoiler(pickup, &command, placement_spoiler);
 
-        self.push_command(
+        self.push_command_with_simulation(
             Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
             command,
+            simulate,
         );
     }
 
-    fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
+    fn place_spirit_light(
+        &mut self,
+        pickup: &LocDataEntry,
+        amount: i32,
+        placement_spoiler: &mut Vec<SpoilerPlacement>,
+    ) {
+        let command = compile::spirit_light(amount.into(), &mut self.rng);
+        self.place_with_simulation(pickup, command, placement_spoiler, |_, world, events| {
+            world.add_spirit_light(amount, events)
+        });
+    }
+
+    fn place_without_simulation(
+        &mut self,
+        pickup: &LocDataEntry,
+        command: CommandVoid,
+        placement_spoiler: &mut Vec<SpoilerPlacement>,
+    ) {
+        self.place_with_simulation(pickup, command, placement_spoiler, |_, _, _| {});
+    }
+
+    fn push_command_with_simulation<F>(
+        &mut self,
+        trigger: Trigger,
+        command: CommandVoid,
+        simulate: F,
+    ) where
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &[Event]),
+    {
         // TODO not sure what this did and why
         // self.world.uber_states.register_trigger(&trigger);
 
-        // TODO many paths leading here can do the simulation more efficiently
-        self.world.simulate(&command, &self.output.events);
+        simulate(&command, &mut self.world, &self.output.events);
 
         self.output.events.push(Event { trigger, command });
+    }
+
+    fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
+        self.push_command_with_simulation(trigger, command, CommandVoid::simulate);
     }
 
     fn write_placement_spoiler(
