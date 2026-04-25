@@ -59,6 +59,9 @@ pub trait LogicalDifficulty: Sized {
     fn ranged_weapons_iter<'a>(self) -> Copied<slice::Iter<'a, Skill>> {
         self.ranged_weapons().iter().copied()
     }
+
+    /// Expected unreachable locations
+    fn expected_unreachable(self) -> usize;
 }
 
 impl LogicalDifficulty for Difficulty {
@@ -206,6 +209,13 @@ impl LogicalDifficulty for Difficulty {
             }
         } else {
             &NO_MID_RANGE
+        }
+    }
+
+    fn expected_unreachable(self) -> usize {
+        match self {
+            Difficulty::Moki => 1,
+            _ => 0,
         }
     }
 }

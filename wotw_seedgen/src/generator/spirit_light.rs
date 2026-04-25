@@ -54,4 +54,8 @@ impl SpiritLightProvider {
         self.amount -= amount;
         amount as usize
     }
+
+    pub fn take_exceed(&mut self) -> usize {
+        (200. * self.rng.sample(self.noise)).round() as usize
+    }
 }

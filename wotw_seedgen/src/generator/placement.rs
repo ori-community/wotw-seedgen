@@ -7,6 +7,7 @@ use crate::{
         solutions::{solution_weights, Solution, SolutionLike, SOLUTION_MAX_ITEMS},
     },
     item_pool::ItemPoolBuilder,
+    logical_difficulty::LogicalDifficulty,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
     World,
 };
@@ -1189,7 +1190,38 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             };
             self.place(pickup, command, placement_spoiler);
         }
-        // TODO unreachable items that should be filled
+
+        let mut unreachable_count = 0;
+
+        for (index, node) in self.world.graph.nodes.iter().enumerate() {
+            if let Node::Pickup(pickup) = node {
+                if !self.world.has_reached(index) {
+                    trace!(
+                        "{}Placing extra spirit light in unreachable location {}",
+                        self.log_index,
+                        pickup.identifier,
+                    );
+
+                    let amount = (self.spirit_light_provider.take_exceed() as i32).into();
+                    let command = compile::spirit_light(amount, &mut self.rng);
+                    self.place(pickup, command, placement_spoiler);
+
+                    unreachable_count += 1;
+                }
+            }
+        }
+
+        if unreachable_count != self.world.settings.difficulty.expected_unreachable() {
+            warn!(
+                "{}{unreachable_count} location{} unreachable on these settings!",
+                self.log_index,
+                if unreachable_count == 1 {
+                    " is"
+                } else {
+                    "s are"
+                }
+            );
+        }
     }
 
     fn backup_gorlek_ore(&mut self) -> CommandVoid {
