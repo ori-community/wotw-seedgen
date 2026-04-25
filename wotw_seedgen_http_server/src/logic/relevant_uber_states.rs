@@ -98,10 +98,12 @@ impl RelevantUberStates {
         let state_data = state_data.entries.iter().map(|entry| entry.uber_identifier);
 
         let entrances = (1..=32).map(UberIdentifier::entrances);
+        let known_entrance_connections = (1..=32).map(UberIdentifier::known_entrance_connections);
 
         let identifiers = loc_data
             .chain(state_data)
             .chain(entrances)
+            .chain(known_entrance_connections)
             .chain(INVENTORY)
             .collect();
 
