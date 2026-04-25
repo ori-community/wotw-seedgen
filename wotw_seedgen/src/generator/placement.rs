@@ -2,7 +2,10 @@ use super::{
     item_pool::ItemPool, spirit_light::SpiritLightProvider, Seed, SeedUniverse, SEED_FAILED_MESSAGE,
 };
 use crate::{
-    generator::solutions::{solution_weights, Solution, SolutionLike, SOLUTION_MAX_ITEMS},
+    generator::{
+        entrances::generate_entrances,
+        solutions::{solution_weights, Solution, SolutionLike, SOLUTION_MAX_ITEMS},
+    },
     item_pool::ItemPoolBuilder,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
     World,
@@ -804,6 +807,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         index: usize,
         multiworld: bool,
     ) -> Result<Self, String> {
+        generate_entrances(&mut world, &mut output.events, rng)?;
+
         let mut rng = Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE);
 
         let log_index = if multiworld {
@@ -840,7 +845,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         // TODO how should !add_item(spirit_light(100)) behave?
         let spirit_light_provider = SpiritLightProvider::new(TOTAL_SPIRIT_LIGHT, &mut rng);
 
-        let mut world_context = Self {
+        Ok(Self {
             rng,
             world,
             output,
@@ -856,11 +861,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             reached_item_locations: Default::default(),
             spawn_slots: SPAWN_SLOTS,
             unshared_items: UNSHARED_ITEMS,
-        };
-
-        world_context.generate_entrances()?;
-
-        Ok(world_context)
+        })
     }
 
     fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
