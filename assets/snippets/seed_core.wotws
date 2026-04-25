@@ -36,9 +36,9 @@ on spawn {
     // The spawn cutscene pulls you in as soon as it's loaded, which allows warping through walls and such
     store(swampStateGroup.finishedIntroTop, true)
     // We build the glades tp by default so the tp item works without having to go there
-    store(gromShop.spiritWellBought, true)
+    store(gromShop.repairTheSpiritWell, true)
     // Beautify has no logical advantage but would bring up all other logical ore prices, so we just build it by default instead
-    store(gromShop.beautifyBought, true)
+    store(gromShop.theGorlekTouch, true)
     // Torch cannot be used logically and would also have weird consequences, better it doesn't exist in rando
     store(swampStateGroup.torchHolded, true)
     store(inkwaterMarshStateGroup.mokiTorchPlayed, true)
@@ -70,49 +70,49 @@ on EastPools.TeleporterActive {
 // TODO fully support random grom shop and remove this
 on reload {
     set_shop_item_data(
-        gromShop.spiritWellBought,
+        gromShop.repairTheSpiritWell,
         1,
         "Repair the Spirit Well",
         "They say the spirits of old could #warp# from one well to another. Perhaps if we #repaired this well with Gorlek Ore#, returning to the #Wellspring Glades# would be even easier.",
         RepairTheSpiritWell,
     )
     set_shop_item_data(
-        gromShop.housesABought,
+        gromShop.dwellingRepairs,
         4,
         "Dwelling Repairs",
         "It's a shame how those old Moki dwellings are in shambles. Maybe if we #fixed them up# the Moki could #move back to the Glades#?",
         DwellingRepairs,
     )
     set_shop_item_data(
-        gromShop.housesBBought,
+        gromShop.roofsOverHeads,
         6,
         "Roofs Over Heads",
         "Time to #build some more housing#! Now on the big tree, by the fire.",
         RoofsOverHeads,
     )
     set_shop_item_data(
-        gromShop.housesCBought,
+        gromShop.onwardsAndUpwards,
         8,
         "Onwards and Upwards",
         "Treehouses seem to be popular with the Moki. How about we add a couple more?",
         OnwardsAndUpwards,
     )
     set_shop_item_data(
-        gromShop.removeThornsBought,
+        gromShop.thornySituation,
         5,
         "Thorny Situation",
         "Those spikey vines all over the place are quite the nuisance, let me tell you. With some help, I could #clear them out# and #make the Glades safer# for everyone!",
         ThornySituation,
     )
     set_shop_item_data(
-        gromShop.openCaveBought,
+        gromShop.clearTheCaveEntrance,
         6,
         "Clear the Cave Entrance",
         "That old cave entrance looks like it's #about to collapse#...but we Gorlek learned a thing or two about tunnelling after fleeing to the mines. With some Ore, I can #repair# it.",
         ClearTheCaveEntrance,
     )
     set_shop_item_data(
-        gromShop.beautifyBought,
+        gromShop.theGorlekTouch,
         10,
         "The Gorlek Touch",
         "The Moki are right...building is only half the work. Nothing's quite complete without some #finishing touches# of decoration.",
@@ -126,28 +126,28 @@ on gameStateGroup.gameFinished store(randoState.enableSpoilerFilter, true)
 // TODO names are inconsistent with icon names
 // TODO try out storing the shop data in the save file
 on reload update_houses_b_unlocked()
-on change gromShop.housesABought update_houses_b_unlocked()
+on change gromShop.dwellingRepairs update_houses_b_unlocked()
 fun update_houses_b_unlocked() {
-    set_shop_item_hidden(gromShop.housesBBought, gromShop.housesABought == false)
+    set_shop_item_hidden(gromShop.roofsOverHeads, gromShop.dwellingRepairs == false)
 }
 on reload update_houses_c_unlocked()
-on change gromShop.housesBBought update_houses_c_unlocked()
+on change gromShop.roofsOverHeads update_houses_c_unlocked()
 fun update_houses_c_unlocked() {
-    set_shop_item_hidden(gromShop.housesCBought, gromShop.housesBBought == false)
+    set_shop_item_hidden(gromShop.onwardsAndUpwards, gromShop.roofsOverHeads == false)
 }
 on reload update_cave_unlocked()
-on change gromShop.removeThornsBought update_cave_unlocked()
+on change gromShop.thornySituation update_cave_unlocked()
 fun update_cave_unlocked() {
-    set_shop_item_hidden(gromShop.openCaveBought, gromShop.removeThornsBought == false)
+    set_shop_item_hidden(gromShop.clearTheCaveEntrance, gromShop.thornySituation == false)
 }
 
-on gromShop.spiritWellBought store(gladesProjects.spiritWellBuilt, true)
-on gromShop.housesABought store(gladesProjects.housesABuilt, true)
-on gromShop.housesBBought store(gladesProjects.housesBBuilt, true)
-on gromShop.housesCBought store(gladesProjects.housesCBuilt, true)
-on gromShop.removeThornsBought store(gladesProjects.removeThornsBuilt, true)
-on gromShop.openCaveBought store(gladesProjects.openCaveBuilt, true)
-on gromShop.beautifyBought store(gladesProjects.beautifyBuilt, true)
+on gromShop.repairTheSpiritWell store(gladesProjects.spiritWellBuilt, true)
+on gromShop.dwellingRepairs store(gladesProjects.housesABuilt, true)
+on gromShop.roofsOverHeads store(gladesProjects.housesBBuilt, true)
+on gromShop.onwardsAndUpwards store(gladesProjects.housesCBuilt, true)
+on gromShop.thornySituation store(gladesProjects.removeThornsBuilt, true)
+on gromShop.clearTheCaveEntrance store(gladesProjects.openCaveBuilt, true)
+on gromShop.theGorlekTouch store(gladesProjects.beautifyBuilt, true)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.
