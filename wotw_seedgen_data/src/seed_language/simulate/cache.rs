@@ -7,7 +7,7 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::Event,
-        simulate::{Simulation, Snapshot, Variables},
+        simulate::{condition_values::ConditionValues, Simulation, Snapshot, Variables},
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -132,11 +132,7 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
         self.simulation.fetch(uber_identifier)
     }
 
-    fn store_impl(
-        &mut self,
-        uber_identifier: UberIdentifier,
-        value: UberStateValue,
-    ) -> impl Iterator<Item = usize> + '_ {
+    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
         self.cache.store(uber_identifier, value);
         self.simulation.store_impl(uber_identifier, value)
     }
@@ -151,6 +147,10 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
 
     fn variables_mut(&mut self) -> &mut Variables {
         self.simulation.variables_mut()
+    }
+
+    fn condition_values(&mut self) -> &mut ConditionValues {
+        self.simulation.condition_values()
     }
 
     fn store_spirit_light(&mut self, value: i32, events: &[Event]) {

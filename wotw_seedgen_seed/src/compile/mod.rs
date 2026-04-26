@@ -104,7 +104,15 @@ impl Compile for input::Trigger {
         match self {
             Self::ClientEvent(trigger) => Trigger::ClientEvent(trigger),
             Self::Binding(uber_identifier) => Trigger::Binding(uber_identifier),
-            Self::Condition(command) => Trigger::Condition(context.compile_into_lookup(command)),
+            Self::Condition(command) => Trigger::Condition(command.compile(context)),
         }
+    }
+}
+
+impl Compile for input::TriggerCondition {
+    type Output = usize;
+
+    fn compile(self, context: &mut CompileContext) -> Self::Output {
+        context.compile_into_lookup(self.condition)
     }
 }

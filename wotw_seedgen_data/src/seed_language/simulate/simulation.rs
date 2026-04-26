@@ -1,8 +1,8 @@
 use crate::{
     assets::UberStateValue,
     seed_language::{
-        output::Event,
-        simulate::{set_uber_state, Simulate, Variables},
+        output::{Event, Trigger},
+        simulate::{condition_values::ConditionValues, set_uber_state, Simulate, Variables},
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -11,11 +11,7 @@ use strum::VariantArray;
 pub trait Simulation: Sized {
     fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue;
 
-    fn store_impl(
-        &mut self,
-        uber_identifier: UberIdentifier,
-        value: UberStateValue,
-    ) -> impl Iterator<Item = usize> + '_;
+    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize];
 
     fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
         let _ = (uber_identifier, events);
@@ -24,6 +20,16 @@ pub trait Simulation: Sized {
     fn variables(&self) -> &Variables;
 
     fn variables_mut(&mut self) -> &mut Variables;
+
+    fn condition_values(&mut self) -> &mut ConditionValues;
+
+    fn register_trigger(&mut self, trigger: &mut Trigger) {
+        if let Trigger::Condition(condition) = trigger {
+            let initial_value = condition.condition.simulate(self, &[]);
+            let id = self.condition_values().register(initial_value);
+            condition.id = Some(id);
+        }
+    }
 
     #[inline]
     fn fetch_boolean(&self, uber_identifier: UberIdentifier) -> bool {
@@ -222,7 +228,8 @@ pub trait Simulation: Sized {
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// let world_state = WorldState::new(uber_states);
+    /// # let mut events = [];
+    /// let world_state = WorldState::new(uber_states, &mut events);
     /// assert_eq!(world_state.max_health(), 30.0);
     /// ```
     #[inline]
@@ -247,7 +254,8 @@ pub trait Simulation: Sized {
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// let world_state = WorldState::new(uber_states);
+    /// # let mut events = [];
+    /// let world_state = WorldState::new(uber_states, &mut events);
     /// assert_eq!(world_state.max_energy(), 3.0);
     /// ```
     #[inline]

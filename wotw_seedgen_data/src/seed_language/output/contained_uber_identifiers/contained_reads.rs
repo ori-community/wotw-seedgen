@@ -1,7 +1,7 @@
 use crate::{
     seed_language::output::{
         CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
-        Operation, Trigger,
+        Operation, Trigger, TriggerCondition,
     },
     UberIdentifier,
 };
@@ -52,6 +52,12 @@ impl ContainedReads for Trigger {
             Trigger::Binding(uber_identifier) => some(*uber_identifier),
             Trigger::Condition(condition) => nested(condition),
         }
+    }
+}
+
+impl ContainedReads for TriggerCondition {
+    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+        self.condition.contained_reads()
     }
 }
 

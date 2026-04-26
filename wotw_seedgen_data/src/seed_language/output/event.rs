@@ -38,12 +38,15 @@ pub enum Trigger {
     /// Trigger on every change to an UberIdentifier
     Binding(UberIdentifier),
     /// Trigger when the condition changes from `false` to `true`
-    Condition(CommandBoolean),
+    Condition(TriggerCondition),
 }
 
 impl Trigger {
     pub fn loc_data_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
-        Self::Condition(CommandBoolean::loc_data_condition(uber_identifier, value))
+        Self::Condition(TriggerCondition::new(CommandBoolean::loc_data_condition(
+            uber_identifier,
+            value,
+        )))
     }
 
     pub const fn multiworld(id: i32) -> Self {
@@ -54,6 +57,28 @@ impl Trigger {
         match self {
             Self::Binding(uber_identifier) => uber_identifier.as_multiworld(),
             _ => None,
+        }
+    }
+
+    pub const fn as_condition(&self) -> Option<&CommandBoolean> {
+        match self {
+            Trigger::Condition(TriggerCondition { id: _, condition }) => Some(condition),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct TriggerCondition {
+    pub id: Option<usize>,
+    pub condition: CommandBoolean,
+}
+
+impl TriggerCondition {
+    pub const fn new(condition: CommandBoolean) -> Self {
+        Self {
+            id: None,
+            condition,
         }
     }
 }

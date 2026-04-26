@@ -30,7 +30,7 @@ pub fn reachable(
 
     let uber_states = cache.uber_states.clone();
 
-    let mut world = World::new(&cache.graph, spawn, settings, uber_states);
+    let mut world = World::new(&cache.graph, spawn, settings, uber_states, &mut []);
 
     for (uber_identifier, value) in current_uber_states {
         let data = cache

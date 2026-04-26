@@ -1,11 +1,15 @@
 mod cache;
+mod condition_values;
 mod simulation;
 mod snapshot;
 mod uber_states;
 mod variables;
 mod world_state;
 
+use std::mem;
+
 pub use cache::SimulationCache;
+pub use condition_values::ConditionValues;
 pub use simulation::Simulation;
 pub use snapshot::{CloneSnapshot, Snapshot};
 pub use uber_states::UberStates;
@@ -19,6 +23,7 @@ use crate::{
         output::{
             Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
             CommandZone, Event, ExecuteOperator, Operation, StringOrPlaceholder, Trigger,
+            TriggerCondition,
         },
     },
     UberIdentifier, Zone,
@@ -50,6 +55,17 @@ impl<S: Simulation> Simulate<S> for ClientEvent {
             .for_each(|event| {
                 event.command.simulate(simulation, events);
             })
+    }
+}
+
+impl<S: Simulation> Simulate<S> for TriggerCondition {
+    type Return = bool;
+
+    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+        let value = self.condition.simulate(simulation, events);
+        let previous_value =
+            mem::replace(simulation.condition_values().get(self.id.unwrap()), value);
+        value && previous_value == false
     }
 }
 
@@ -336,7 +352,7 @@ fn set_uber_state<S: Simulation>(
     }
 
     if trigger_events {
-        let triggers = simulation.store_impl(uber_identifier, value).collect();
+        let triggers = simulation.store_impl(uber_identifier, value).to_vec();
         side_effects(simulation, events, uber_identifier, value);
         process_triggers(simulation, events, triggers);
     } else {

@@ -1292,9 +1292,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     ) where
         F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &[Event]),
     {
-        // TODO not sure what this did and why
-        // self.world.uber_states.register_trigger(&trigger);
-
         simulate(&command, &mut self.world, &self.output.events);
 
         self.output.events.push(Event { trigger, command });

@@ -36,7 +36,13 @@ pub fn test_world<'graph, 'settings>(
     spawn: &str,
 ) -> World<'graph, 'settings> {
     let spawn = graph.find_node(spawn).unwrap();
-    World::new(&*graph, spawn, settings, TEST_ASSETS.uber_states.clone())
+    World::new(
+        &*graph,
+        spawn,
+        settings,
+        TEST_ASSETS.uber_states.clone(),
+        &mut [],
+    )
 }
 
 #[test]

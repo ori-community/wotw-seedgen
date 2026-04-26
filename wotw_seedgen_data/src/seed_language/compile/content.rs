@@ -1,7 +1,7 @@
 use super::{Compile, SnippetCompiler};
 use crate::seed_language::{
     ast::{self, TriggerBinding},
-    output::{Command, CommandVoid, Event, Literal, Trigger},
+    output::{Command, CommandVoid, Event, Literal, Trigger, TriggerCondition},
 };
 use wotw_seedgen_parse::{Error, Span};
 
@@ -104,9 +104,10 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                     }
                 }
             }
-            ast::Trigger::Condition(expression) => {
-                expression.compile_into(compiler).map(Trigger::Condition)
-            }
+            ast::Trigger::Condition(expression) => expression
+                .compile_into(compiler)
+                .map(TriggerCondition::new)
+                .map(Trigger::Condition),
         }
     }
 }

@@ -10,7 +10,7 @@ use wotw_seedgen_data::{
     seed_language::{
         ast::ClientEvent,
         compile::{store_boolean, store_integer},
-        output::{CommandBoolean, Event, Trigger},
+        output::{CommandBoolean, Event, Trigger, TriggerCondition},
         simulate::Simulation,
     },
     UberIdentifier,
@@ -135,9 +135,9 @@ pub fn generate_entrances(
         // the target entrance as visited too once we went through this entrance
         if loop_size == 2 {
             events.push(Event {
-                trigger: Trigger::Condition(CommandBoolean::FetchBoolean {
+                trigger: Trigger::Condition(TriggerCondition::new(CommandBoolean::FetchBoolean {
                     uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
-                }),
+                })),
                 command: store_boolean(
                     UberIdentifier::known_entrance_connections(target_entrance_id),
                     true,

@@ -1,4 +1,4 @@
-use crate::seed_language::output::AsConstant;
+use crate::seed_language::output::{AsConstant, TriggerCondition};
 
 use super::{
     intermediate::Literal, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
@@ -58,6 +58,12 @@ impl Display for Trigger {
             Trigger::Binding(uber_identifier) => write!(f, "change {uber_identifier}"),
             Trigger::Condition(condition) => condition.fmt(f),
         }
+    }
+}
+
+impl Display for TriggerCondition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.condition.fmt(f)
     }
 }
 

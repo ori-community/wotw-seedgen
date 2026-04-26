@@ -28,7 +28,10 @@ use wotw_seedgen_data::{
     logic_language::output::{Graph, RefillValue},
     seed_language::{
         output::Event,
-        simulate::{Simulation, SimulationCache, Snapshot, UberStates, Variables, WorldState},
+        simulate::{
+            ConditionValues, Simulation, SimulationCache, Snapshot, UberStates, Variables,
+            WorldState,
+        },
     },
     Difficulty, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WorldSettings,
 };
@@ -55,9 +58,10 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         spawn: usize,
         settings: &'settings WorldSettings,
         uber_states: UberStates,
+        events: &mut [Event],
     ) -> Self {
         Self {
-            state: SimulationCache::new(WorldState::new(uber_states)),
+            state: SimulationCache::new(WorldState::new(uber_states, events)),
             graph,
             spawn,
             settings,
@@ -134,8 +138,9 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
+    /// # let mut events = [];
     /// let world_settings = WorldSettings::default();
-    /// let world = World::new(&graph, spawn, &world_settings, uber_states);
+    /// let world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
     /// world.cap_orbs::<false>(&mut orbs);
@@ -155,10 +160,10 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// # let events = [];
+    /// # let mut events = [];
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     /// world.store_shard(Shard::Vitality, true, &events);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
@@ -191,9 +196,9 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// # let events = [];
+    /// # let mut events = [];
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
@@ -229,9 +234,9 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// # let events = [];
+    /// # let mut events = [];
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
     /// world.add_max_health(40, &events);
@@ -494,11 +499,7 @@ impl Simulation for World<'_, '_> {
         self.state.fetch(uber_identifier)
     }
 
-    fn store_impl(
-        &mut self,
-        uber_identifier: UberIdentifier,
-        value: UberStateValue,
-    ) -> impl Iterator<Item = usize> + '_ {
+    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
         self.state.store_impl(uber_identifier, value)
     }
 
@@ -514,6 +515,10 @@ impl Simulation for World<'_, '_> {
     #[inline]
     fn variables_mut(&mut self) -> &mut Variables {
         self.state.variables_mut()
+    }
+
+    fn condition_values(&mut self) -> &mut ConditionValues {
+        self.state.condition_values()
     }
 
     // Not sure how we could use the cache-efficient specialized stores without invalidating our reach

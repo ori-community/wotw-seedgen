@@ -206,7 +206,7 @@ fn reach_check(c: &mut Criterion) {
 fn simulation(c: &mut Criterion) {
     let mut group = c.benchmark_group("simulation");
 
-    let mut world = WorldState::new(TEST_ASSETS.uber_states.clone());
+    let mut world = WorldState::new(TEST_ASSETS.uber_states.clone(), &mut []);
 
     let uber_identifier = UberIdentifier::GORLEK_ORE;
 
@@ -399,14 +399,26 @@ fn world<'graph, 'settings>(
     spawn: &str,
 ) -> World<'graph, 'settings> {
     let spawn = graph.find_node(spawn).unwrap();
-    World::new(&*graph, spawn, settings, TEST_ASSETS.uber_states.clone())
+    World::new(
+        &*graph,
+        spawn,
+        settings,
+        TEST_ASSETS.uber_states.clone(),
+        &mut [],
+    )
 }
 
 fn spawnless_world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
 ) -> World<'graph, 'settings> {
-    World::new(&*graph, 0, settings, TEST_ASSETS.uber_states.clone())
+    World::new(
+        &*graph,
+        0,
+        settings,
+        TEST_ASSETS.uber_states.clone(),
+        &mut [],
+    )
 }
 
 criterion_group!(

@@ -72,8 +72,6 @@ pub fn generate_seed<F: SnippetAccess>(
         })
         .collect::<Result<Vec<_>, String>>()?;
 
-    let uber_states = UberStates::new(uber_state_data);
-
     for attempt in 1..=RETRIES {
         trace!("Attempt #{attempt} to generate");
 
@@ -128,7 +126,15 @@ pub fn generate_seed<F: SnippetAccess>(
                     }
                 }
 
-                let world = World::new(graph, spawn, world_settings, uber_states.clone());
+                let uber_states = UberStates::new(uber_state_data, &output.events);
+
+                let world = World::new(
+                    graph,
+                    spawn,
+                    world_settings,
+                    uber_states,
+                    &mut output.events,
+                );
 
                 Ok((world, output))
             })

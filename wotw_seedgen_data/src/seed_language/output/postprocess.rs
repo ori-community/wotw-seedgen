@@ -4,7 +4,7 @@ use std::{
     collections::hash_map::Entry,
     fmt::{self, Display},
     mem,
-    ops::Deref,
+    ops::{Deref, Index},
 };
 
 use super::{
@@ -19,7 +19,7 @@ use crate::{
         display::strip_invisible_characters,
         item_metadata::{random_shop_description, DEFAULT_SHOP_PRICE},
         postprocess::price_noise::PriceNoise,
-        ClientEvent, ContainedWrites, IntoConstant, ItemMetadataRef,
+        ClientEvent, ContainedWrites, IntoConstant, ItemMetadataRef, TriggerCondition,
     },
     Position, ShopKind, UberIdentifier, Zone,
 };
@@ -70,15 +70,7 @@ struct WorldPostprocessor<'output> {
 }
 
 struct LocDataTriggers<'locdata> {
-    inner: FxHashMap<Trigger, &'locdata LocDataEntry>,
-}
-
-impl<'locdata> Deref for LocDataTriggers<'locdata> {
-    type Target = FxHashMap<Trigger, &'locdata LocDataEntry>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.inner
-    }
+    inner: FxHashMap<CommandBoolean, &'locdata LocDataEntry>,
 }
 
 #[derive(Default)]
@@ -205,7 +197,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                 events
                     .iter()
                     .filter(|event| self.command_writes_any(&event.command, uber_identifiers))
-                    .map(move |event| (*event, *entry))
+                    .map(move |event| (*event, entry))
             })
             .collect::<Vec<_>>();
 
@@ -239,17 +231,20 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         let mut extra_events = vec![];
 
         for (trigger, events) in &world.loc_data_events {
-            let shop_identifier = match trigger {
-                Trigger::Condition(CommandBoolean::FetchBoolean { uber_identifier })
-                    if matches!(
-                        uber_identifier.shop_kind(),
-                        ShopKind::Opherlike | ShopKind::Map
-                    ) =>
-                {
-                    Some(*uber_identifier)
-                }
-                _ => None,
-            };
+            let shop_identifier = trigger
+                .as_condition()
+                .and_then(|condition| match condition {
+                    CommandBoolean::FetchBoolean { uber_identifier }
+                        if matches!(
+                            uber_identifier.shop_kind(),
+                            ShopKind::Opherlike | ShopKind::Map
+                        ) =>
+                    {
+                        Some(*uber_identifier)
+                    }
+                    _ => None,
+                });
+
             let map_position = self.loc_data_triggers[trigger].map_position;
 
             if shop_identifier.is_none() && map_position.is_none() {
@@ -403,7 +398,7 @@ impl<'output> WorldPostprocessor<'output> {
         for event in output
             .events
             .iter()
-            .filter(|event| loc_data_triggers.contains_key(&event.trigger))
+            .filter(|event| loc_data_triggers.contains(&event.trigger))
         {
             loc_data_events
                 .entry(&event.trigger)
@@ -442,12 +437,22 @@ impl<'locdata> LocDataTriggers<'locdata> {
                 .iter()
                 .map(|entry| {
                     (
-                        Trigger::loc_data_trigger(entry.uber_identifier, entry.value),
+                        CommandBoolean::loc_data_condition(entry.uber_identifier, entry.value),
                         entry,
                     )
                 })
                 .collect(),
         }
+    }
+
+    fn get(&self, trigger: &Trigger) -> Option<&LocDataEntry> {
+        self.inner.get(trigger.as_condition()?).copied()
+    }
+
+    fn contains(&self, trigger: &Trigger) -> bool {
+        trigger
+            .as_condition()
+            .is_some_and(|condition| self.inner.contains_key(condition))
     }
 
     fn generate_message_origins(&self, events: &mut [Event]) {
@@ -472,6 +477,14 @@ impl<'locdata> LocDataTriggers<'locdata> {
                 }
             }
         }
+    }
+}
+
+impl Index<&Trigger> for LocDataTriggers<'_> {
+    type Output = LocDataEntry;
+
+    fn index(&self, index: &Trigger) -> &Self::Output {
+        self.get(index).unwrap()
     }
 }
 
@@ -626,6 +639,12 @@ impl ResolvePlaceholders for Trigger {
         if let Self::Condition(condition) = self {
             condition.resolve(context);
         }
+    }
+}
+
+impl ResolvePlaceholders for TriggerCondition {
+    fn resolve(&self, context: &mut ResolveContext) {
+        self.condition.resolve(context);
     }
 }
 
