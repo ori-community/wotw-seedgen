@@ -16749,7 +16749,8 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
       # DoubleJump, TripleJump, AerialHammerJump OR GrenadeJump=1
       # Bash, Grenade=1, AerialHammerJump, Damage=40
       # AerialHammerJump, Dash, Sword OR Flash=1 OR Sentry=1  # Also works with Shuriken but if you throw it at the floating platform, it's pretty hard to wall jump on it
-      ## GrenadeJump=1, Dash, Damage=40, Sword OR Hammer OR Damage=40
+      # GrenadeJump=1, Dash, Damage=40, Sword OR Hammer
+      # GrenadeJump=2, Dash, Damage=40, Damage=40
     unsafe:
       GroundedHammerJump, Damage=20  # Bait the wheel with upswing+hover back. GHJ to the portal ledge and jump over. GHJ to the right wall. Dboost on the first laser. Upswing over the tall purple goo
       SwordSJump=2, Sentry=1  # Bait the wheel with upswing+hover back. Sjump over the gap. Sjump to the right wall. Sentry+Upswing over the tall purple goo
