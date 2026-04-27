@@ -315,6 +315,7 @@ on burrows_relic_collected == false store(itemTracker.relicsCount, itemTracker.r
 
 on reload update_current_area_has_uncollected_relic()
 on change player.currentArea update_current_area_has_uncollected_relic()
+on change itemTracker.relicsCount update_current_area_has_uncollected_relic()
 fun update_current_area_has_uncollected_relic() {
     if current_zone() == Marsh store(itemTracker.currentAreaHasUncollectedRelic, marsh_relic_exists && marsh_relic_collected == false)
     if current_zone() == Hollow store(itemTracker.currentAreaHasUncollectedRelic, hollow_relic_exists && hollow_relic_collected == false)
