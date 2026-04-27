@@ -170,7 +170,7 @@ InnerWellspring.RotateRoomOre, Wellspring, GorlekOre, , 37858, 47533, , -1178.0,
 InnerWellspring.NeedleQI, Wellspring, QuestItem, Needle, 53632, 41227, , -1185.5, -3696.3, -1185.467, -3696.261
 InnerWellspring.LibraryEX, Wellspring, SpiritLight, 100, 37858, 59022, , -1252.2, -3681.8, -1252.1917, -3681.7656
 InnerWellspring.AboveTpEX, Wellspring, SpiritLight, 50, 37858, 2797, , -1316.6, -3663.6, -1316.5791, -3663.5505
-InnerWellspring.BlueMoonSeed, Wellspring, QuestItem, Seed, 14019, 24142, , -1185.4, -3668.8, -1185.4348, -3668.7515
+InnerWellspring.BlueMoonSeed, Wellspring, Seed, , 14019, 24142, , -1185.4, -3668.8, -1185.4348, -3668.7515
 InnerWellspring.SwimOre, Wellspring, GorlekOre, , 37858, 32932, , -1203.9, -3715.7, -1203.8998, -3715.6865
 InnerWellspring.EscapeRevisitEX, Wellspring, SpiritLight, 100, 37858, 56444, , -1313.1, -3640.1, -1313.1079, -3640.099
 InnerWellspring.WaterEscape, Wellspring, QuestItem, Water, 37858, 12379, , -481, -3763, -1159, -3635
@@ -196,7 +196,7 @@ EastPools.EnergyHarvestShard, Pools, Shard, EnergyHarvest, 5377, 40328, , -1441.
 EastPools.LupoEX, Pools, SpiritLight, 100, 5377, 35440, , -1414.3, -4154.6, -1414.3197, -4154.631
 EastPools.LupoMap, Pools, Lupo, Pools, 48248, 1557, , -1391, -4167, -1391, -4167
 EastPools.BehindCrusherEX, Pools, SpiritLight, 100, 5377, 18345, , -1430.7, -4180.9, -1430.7302, -4180.8726
-EastPools.GrassSeed, Pools, QuestItem, Seed, 14019, 28662, , -1528.0, -4140.0, -1527.96, -4140
+EastPools.GrassSeed, Pools, Seed, , 14019, 28662, , -1528.0, -4140.0, -1527.96, -4140
 UpperPools.LowerKS, Pools, Keystone, , 5377, 46926, , -1576.1, -4125.4, -1576.125, -4125.4326
 UpperPools.UpperLeftKS, Pools, Keystone, , 5377, 35091, , -1547.8, -4080.7, -1547.785, -4080.7402
 UpperPools.UpperMidKS, Pools, Keystone, , 5377, 16426, , -1537.9, -4074.0, -1537.88, -4074.0479
@@ -217,7 +217,7 @@ WestPools.EscapeRevisitEX, Pools, SpiritLight, 100, 5377, 44122, , -1654.7, -414
 WestPools.ForestsStrength, Pools, Wisp, Strength, 945, 49747, , -1928, -4066, -1928, -4066
 WoodsEntry.LastTreeBranch, Woods, QuestItem, Branch, 14019, 59708, 1, 513, -4158, 513, -4158
 WoodsEntry.DollQI, Woods, QuestItem, Doll, 14019, 57399, , 426.7, -4114.9, 469.2, -4178
-WoodsEntry.TreeSeed, Woods, QuestItem, Seed, 14019, 7470, , 513, -4159, 511, -4157
+WoodsEntry.TreeSeed, Woods, Seed, , 14019, 7470, , 513, -4159, 511, -4157
 WoodsEntry.MudPitEX, Woods, SpiritLight, 50, 58674, 8487, , 513.8, -4184.9, 513.7701, -4184.88
 WoodsEntry.LedgeOre, Woods, GorlekOre, , 58674, 28710, , 410.5, -4173.8, 410.37, -4173.6704
 WoodsEntry.LeafPileEX, Woods, SpiritLight, 50, 58674, 22472, , 485.1, -4164.3, 485.1499, -4164.5
@@ -285,7 +285,7 @@ UpperReach.SwimEX, Reach, SpiritLight, 100, 28895, 40242, , -239.4, -3920.6, -23
 UpperReach.LightBurstTree, Reach, Skill, LightBurst, 0, 51, , -106, -3934, -106.45276, -3928.5732
 UpperReach.TreeOre, Reach, GorlekOre, , 28895, 39291, , -86.5, -3903.3, -86.392334, -3902.9707
 UpperReach.WellEX, Reach, SpiritLight, 50, 28895, 7597, , -71.2, -3926.7, -71.150024, -3926.6802
-UpperReach.SpringSeed, Reach, QuestItem, Seed, 14019, 32376, , -103.4, -3857.3, -34, -3924
+UpperReach.SpringSeed, Reach, Seed, , 14019, 32376, , -103.4, -3857.3, -34, -3924
 UpperReach.HiddenEX, Reach, SpiritLight, 200, 28895, 2129, , -172.4, -3928.0, -172.36182, -3927.9844
 UpperDepths.EntrySpikesEX, Depths, SpiritLight, 100, 18793, 19004, , 171.7, -4357.5, 171.74329, -4357.468
 UpperDepths.EntryRoofEX, Depths, SpiritLight, 100, 18793, 15396, , 146.3, -4374.6, 146.26799, -4374.602
@@ -296,7 +296,7 @@ UpperDepths.SwimEC, Depths, EnergyFragment, , 18793, 26618, , 135.1, -4456.0, 13
 UpperDepths.TeleporterEX, Depths, SpiritLight, 100, 18793, 29979, , 480.8, -4380.4, 480.76, -4380.42
 UpperDepths.LeftHealthKS, Depths, Keystone, , 18793, 53953, , 498.3, -4463.2, 498.3457, -4463.235
 UpperDepths.RightHealthKS, Depths, Keystone, , 18793, 23986, , 523.8, -4465.1, 523.7621, -4465.0635
-UpperDepths.LightcatcherSeed, Depths, QuestItem, Seed, 14019, 8192, , 488.0, -4431.6, 488.01028, -4431.5796
+UpperDepths.LightcatcherSeed, Depths, Seed, , 14019, 8192, , 488.0, -4431.6, 488.01028, -4431.5796
 UpperDepths.BossPathEX, Depths, SpiritLight, 200, 18793, 18395, , 567.3, -4443.4, 567.33655, -4443.362
 UpperDepths.KeystoneHC, Depths, HealthFragment, , 18793, 42235, , 530.9, -4451.7, 530.8901, -4450.72
 UpperDepths.HiveEX, Depths, SpiritLight, 100, 18793, 6573, , 425.4, -4384.8, 425.41998, -4384.77
@@ -349,7 +349,7 @@ UpperWastes.RoofEX, Wastes, SpiritLight, 100, 20120, 2013, , 2026.3, -3728.9, 20
 UpperWastes.SpinLasersRightEX, Wastes, SpiritLight, 200, 7228, 54275, , 2006.2, -3725.4, 2006.21, -3725.4
 UpperWastes.SpinLasersMiddleEX, Wastes, SpiritLight, 100, 7228, 48993, , 1947.8, -3729.6, 1947.77, -3729.5498
 UpperWastes.SpinLasersLowerEX, Wastes, SpiritLight, 100, 7228, 61548, , 1935.2, -3755.1, 1935.16, -3755.1
-UpperWastes.FlowersSeed, Wastes, QuestItem, Seed, 14019, 20601, , 1995.7, -3650.6, 1995.6826, -3650.5928
+UpperWastes.FlowersSeed, Wastes, Seed, , 14019, 20601, , 1995.7, -3650.6, 1995.6826, -3650.5928
 UpperWastes.WallOre, Wastes, GorlekOre, , 7228, 8370, , 1951.6, -3615.8, 1951.6055, -3615.8252
 WindtornRuins.EscapeRevisitEC, Ruins, EnergyFragment, , 10289, 44555, , 2053.7, -4050.2, 2053.74, -4049.1924
 WindtornRuins.Seir, Ruins, Wisp, Seir, 10289, 22102, , 2151, -3568, 2151, -3568
