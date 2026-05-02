@@ -151,7 +151,7 @@ on reload {
         tree_progress_icon,
         {
             write_tree_progress()
-            priority_message(get_string("tree_progress"))
+            controlled_priority_message("tree_progress", get_string("tree_progress"), 4)
         },
     )
 
@@ -163,7 +163,7 @@ on reload {
         wisp_progress_icon,
         {
             write_wisp_progress()
-            priority_message(get_string("wisp_progress"))
+            controlled_priority_message("wisp_progress", get_string("wisp_progress"), 4)
         },
     )
 
@@ -188,9 +188,18 @@ on reload {
 
 on progress_message {
     write_progress_message()
-    // TODO priority message shouldn't enter the Alt+T log
-    priority_message(get_string("progress_message"))
+    controlled_priority_message("progress_message", get_string("progress_message"), 4)
 }
+
+!export(update_progress_message)
+fun update_progress_message() {
+    write_progress_message()
+    set_message_text("progress_message", get_string("progress_message"))
+}
+
+on change randoStats.pickupsCollected update_progress_message()
+on change randoStats.pickupsTotal update_progress_message()
+on change player.currentArea update_progress_message()
 
 on reload {
     free_message("map_message", "")
@@ -211,7 +220,7 @@ on change player.currentMapArea {
 on binding1 if disable_keybinds == false {
     write_tree_progress()
     write_wisp_progress()
-    priority_message(get_string("tree_progress") + "\n" + get_string("wisp_progress"))
+    controlled_priority_message("tree_wisp_progress", get_string("tree_progress") + "\n" + get_string("wisp_progress"), 4)
 }
 on binding2 if disable_keybinds == false show_quest_progress()
 on binding3 if disable_keybinds == false show_teleporter_progress()
@@ -226,6 +235,26 @@ fun write_tree_progress() {
 
     set_boolean("found", false)
     tree_string()
+}
+
+on change MarshSpawn.RegenTree update_tree_progress()
+on change HowlsDen.SwordTree update_tree_progress()
+on change HowlsDen.DoubleJumpTree update_tree_progress()
+on change MarshPastOpher.BowTree update_tree_progress()
+on change WestHollow.DashTree update_tree_progress()
+on change EastHollow.BashTree update_tree_progress()
+on change InnerWellspring.GrappleTree update_tree_progress()
+on change MarshSpawn.DamageTree update_tree_progress()
+on change GladesTown.DamageTree update_tree_progress()
+on change LowerWastes.BurrowTree update_tree_progress()
+on change UpperReach.LightBurstTree update_tree_progress()
+on change LowerDepths.FlashTree update_tree_progress()
+on change UpperPools.SwimDashTree update_tree_progress()
+on change WeepingRidge.LaunchTree update_tree_progress()
+fun update_tree_progress() {
+    write_tree_progress()
+    set_message_text("tree_progress", get_string("tree_progress"))
+    set_message_text("tree_wisp_progress", get_string("tree_progress") + "\n" + get_string("wisp_progress"))
 }
 
 fun tree_string() {
@@ -322,6 +351,17 @@ fun write_wisp_progress() {
     wisp_string()
 }
 
+on change EastHollow.ForestsVoice update_wisp_progress()
+on change LowerReach.ForestsMemory update_wisp_progress()
+on change UpperDepths.ForestsEyes update_wisp_progress()
+on change WestPools.ForestsStrength update_wisp_progress()
+on change WindtornRuins.Seir update_wisp_progress()
+fun update_wisp_progress() {
+    write_wisp_progress()
+    set_message_text("wisp_progress", get_string("wisp_progress"))
+    set_message_text("tree_wisp_progress", get_string("tree_progress") + "\n" + get_string("wisp_progress"))
+}
+
 fun wisp_string() {
     set_boolean("comma", false)
 
@@ -360,6 +400,29 @@ fun wisps_add_comma() {
 }
 
 fun show_quest_progress() {
+    write_quest_progress()
+    controlled_priority_message("quest_progress", get_string("quest_progress"), 6.0)
+}
+
+on change kwolokGroupDescriptor.cleanseWellspringQuestUberState update_quest_progress()
+on change npcsStateGroup.marshKeystoneQuest update_quest_progress()
+on change npcsStateGroup.inkwaterWellQuest update_quest_progress()
+on change questUberStateGroup.lostCompassQuest update_quest_progress()
+on change questUberStateGroup.braveMokiQuest update_quest_progress()
+on change questUberStateGroup.familyReunionQuest update_quest_progress()
+on change questUberStateGroup.braveMokiQuest update_quest_progress()
+on change questUberStateGroup.desertCogQuest update_quest_progress()
+on change questUberStateGroup.tradeSequenceQuest update_quest_progress()
+on change questUberStateGroup.darkCaveQuest update_quest_progress()
+on change questUberStateGroup.kwoloksWisdomQuest update_quest_progress()
+on change questUberStateGroup.rebuildGladesQuest update_quest_progress()
+on change questUberStateGroup.regrowGladesQuest update_quest_progress()
+fun update_quest_progress() {
+    write_quest_progress()
+    set_message_text("quest_progress", get_string("quest_progress"))
+}
+
+fun write_quest_progress() {
     // TODO add quest aliases?
     set_string("quest_progress", "#Silent Teeth# - ")
     if kwolokGroupDescriptor.cleanseWellspringQuestUberState == 0 set_string("quest_progress", get_string("quest_progress") + "Meet Kwolok")
@@ -434,10 +497,37 @@ fun show_quest_progress() {
     set_string("quest_progress", get_string("quest_progress") + "\n#Regrowing the Glades# - ")
     if GladesTown.RegrowTheGlades == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
     if GladesTown.RegrowTheGlades set_string("quest_progress", get_string("quest_progress") + "$Complete$")
-    priority_message_with_timeout(get_string("quest_progress"), 6.0)
 }
 
 fun show_teleporter_progress() {
+    write_teleporter_progress()
+    controlled_priority_message("teleporter_progress", get_string("teleporter_progress"), 4)
+}
+
+on change MarshSpawn.TeleporterActive update_teleporter_progress()
+on change HowlsDen.TeleporterActive update_teleporter_progress()
+on change EastHollow.TeleporterActive update_teleporter_progress()
+on change GladesTown.TeleporterActive update_teleporter_progress()
+on change InnerWellspring.TeleporterActive update_teleporter_progress()
+on change MidnightBurrows.TeleporterActive update_teleporter_progress()
+on change WoodsEntry.TeleporterActive update_teleporter_progress()
+on change WoodsMain.TeleporterActive update_teleporter_progress()
+on change LowerReach.TeleporterActive update_teleporter_progress()
+on change UpperDepths.TeleporterActive update_teleporter_progress()
+on change EastPools.TeleporterActive update_teleporter_progress()
+on change WestPools.TeleporterActive update_teleporter_progress()
+on change LowerWastes.FeedingGroundsTeleporterActive update_teleporter_progress()
+on change LowerWastes.CentralTeleporterActive update_teleporter_progress()
+on change UpperWastes.TeleporterActive update_teleporter_progress()
+on change WindtornRuins.TeleporterActive update_teleporter_progress()
+on change WillowsEnd.InnerTeleporterActive update_teleporter_progress()
+on change WillowsEnd.ShriekTeleporterActive update_teleporter_progress()
+fun update_teleporter_progress() {
+    write_teleporter_progress()
+    set_message_text("teleporter_progress", get_string("teleporter_progress"))
+}
+
+fun write_teleporter_progress() {
     set_string("teleporter_progress", "#Teleporters activated#: ")
 
     set_boolean("comma", false)
@@ -535,8 +625,6 @@ fun show_teleporter_progress() {
     if get_boolean("comma") == false {
         set_string("teleporter_progress", get_string("teleporter_progress") + "None")
     }
-
-    priority_message(get_string("teleporter_progress"))
 }
 
 fun teleporters_add_comma() {

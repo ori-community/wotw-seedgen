@@ -2,7 +2,7 @@
 #name("Goal Mode Core")
 #description("Manages access to Shriek")
 
-!include("progress_helper", write_progress_message)
+!include("progress_helper", write_progress_message, update_progress_message)
 
 !export(write_goal_progress_message)
 fun write_goal_progress_message() {
@@ -17,20 +17,27 @@ fun check_goals_completed() {
 
 !export(write_goals_incomplete_message)
 fun write_goals_incomplete_message() {
-    set_string("goals_incomplete_message", "")
+    set_string("goals_incomplete_message", "<s_0.9><ls_0.9>Incomplete Goals:")
 }
+
+on change player.currentArea update_goals_incomplete_message() // Need this because the zone updates 1 frame delayed from the position change
+fun update_goals_incomplete_message() {
+    write_goals_incomplete_message()
+    set_message_text("goals_incomplete", get_string("goals_incomplete_message"))
+}
+
+on player.currentMapArea < 12 free_message_hide("goals_incomplete", false)
+on player.currentMapArea >= 12 free_message_show("goals_incomplete", true, false)
 
 !export(update_goals_completed)
 fun update_goals_completed() {
     check_goals_completed()
     store(randoState.shriekBarrier, get_boolean("goals_completed") == false)
 
-    // TODO crashes
-    // update_progress_message()
+    update_progress_message()
 
     if get_boolean("in_shriek_room") && get_boolean("goals_completed") == false {
-        write_goals_incomplete_message()
-        set_message_text("goals_incomplete", get_string("goals_incomplete_message"))
+        update_goals_incomplete_message()
     }
 }
 
@@ -51,7 +58,7 @@ on reload {
             write_goals_incomplete_message()
             free_message("goals_incomplete", get_string("goals_incomplete_message"))
             set_message_vertical_anchor("goals_incomplete", Bottom)
-            set_message_position("goals_incomplete", 0.5, 0.8)
+            set_message_position("goals_incomplete", 0.5, 0.84)
         }
     })
     box_trigger_leave_callback("shriek_room", {
