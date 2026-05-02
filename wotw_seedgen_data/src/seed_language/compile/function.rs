@@ -11,8 +11,8 @@ use crate::{
             IntoConstant, Operation,
         },
     },
-    Alignment, HorizontalAnchor, ScreenPosition, Shard, ShopKind, Skill, Teleporter,
-    UberIdentifier, VerticalAnchor, WeaponUpgrade, WheelBind,
+    Alignment, Corner, HorizontalAnchor, Shard, ShopKind, Skill, Teleporter, UberIdentifier,
+    VerticalAnchor, WeaponUpgrade, WheelBind,
 };
 use arrayvec::ArrayVec;
 use heck::ToTitleCase;
@@ -279,7 +279,7 @@ pub enum FunctionIdentifier {
     SetMessageAlignment,
     SetMessageHorizontalAnchor,
     SetMessageVerticalAnchor,
-    SetMessageScreenPosition,
+    SetMessageCorner,
     SetMessageBoxWidth,
     SetMessageCoordinateSystem,
     SetMapMessage,
@@ -460,7 +460,7 @@ impl FunctionIdentifier {
             SetMessageAlignment(id: String, alignment: Alignment),
             SetMessageHorizontalAnchor(id: String, horizontal_anchor: HorizontalAnchor),
             SetMessageVerticalAnchor(id: String, vertical_anchor: VerticalAnchor),
-            SetMessageScreenPosition(id: String, screen_position: ScreenPosition),
+            SetMessageCorner(id: String, corner: Corner),
             SetMessageBoxWidth(id: String, width: Float),
             SetMessageCoordinateSystem(id: String, coordinate_system: CoordinateSystem),
             SetMapMessage(message: String),
@@ -962,11 +962,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     vertical_anchor: arg(&mut context)?,
                 })
             }
-            FunctionIdentifier::SetMessageScreenPosition => {
+            FunctionIdentifier::SetMessageCorner => {
                 let id = message_id(&mut context)?;
 
                 let commands = match arg(&mut context)? {
-                    ScreenPosition::TopLeft => vec![
+                    Corner::TopLeft => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Left,
@@ -979,8 +979,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Top,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.01.into(),
+                            y: 0.01.into(),
+                        },
                     ],
-                    ScreenPosition::TopCenter => vec![
+                    Corner::TopCenter => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Center,
@@ -993,8 +998,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Top,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.5.into(),
+                            y: 0.01.into(),
+                        },
                     ],
-                    ScreenPosition::TopRight => vec![
+                    Corner::TopRight => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Right,
@@ -1007,8 +1017,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Top,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.99.into(),
+                            y: 0.01.into(),
+                        },
                     ],
-                    ScreenPosition::MiddleLeft => vec![
+                    Corner::MiddleLeft => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Left,
@@ -1021,8 +1036,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Middle,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.01.into(),
+                            y: 0.5.into(),
+                        },
                     ],
-                    ScreenPosition::MiddleCenter => vec![
+                    Corner::MiddleCenter => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Center,
@@ -1035,8 +1055,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Middle,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.5.into(),
+                            y: 0.5.into(),
+                        },
                     ],
-                    ScreenPosition::MiddleRight => vec![
+                    Corner::MiddleRight => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Right,
@@ -1049,8 +1074,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Middle,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.99.into(),
+                            y: 0.5.into(),
+                        },
                     ],
-                    ScreenPosition::BottomLeft => vec![
+                    Corner::BottomLeft => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Left,
@@ -1063,8 +1093,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Bottom,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.01.into(),
+                            y: 0.99.into(),
+                        },
                     ],
-                    ScreenPosition::BottomCenter => vec![
+                    Corner::BottomCenter => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Center,
@@ -1077,8 +1112,13 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             id,
                             vertical_anchor: VerticalAnchor::Bottom,
                         },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.5.into(),
+                            y: 0.99.into(),
+                        },
                     ],
-                    ScreenPosition::BottomRight => vec![
+                    Corner::BottomRight => vec![
                         CommandVoid::FreeMessageAlignment {
                             id,
                             alignment: Alignment::Right,
@@ -1090,6 +1130,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                         CommandVoid::FreeMessageVerticalAnchor {
                             id,
                             vertical_anchor: VerticalAnchor::Bottom,
+                        },
+                        CommandVoid::FreeMessagePosition {
+                            id,
+                            x: 0.99.into(),
+                            y: 0.99.into(),
                         },
                     ],
                 };

@@ -39,7 +39,7 @@ impl Display for Constant {
             Constant::Alignment(value) => value.fmt(f),
             Constant::HorizontalAnchor(value) => value.fmt(f),
             Constant::VerticalAnchor(value) => value.fmt(f),
-            Constant::ScreenPosition(value) => value.fmt(f),
+            Constant::Corner(value) => value.fmt(f),
             Constant::CoordinateSystem(value) => value.fmt(f),
         }
     }

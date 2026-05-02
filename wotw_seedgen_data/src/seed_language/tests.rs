@@ -8,8 +8,8 @@ use crate::{
         compile::{Compiler, PRIVATE_MEMORY},
         output::{CommandVoid, IntermediateOutput},
     },
-    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
-    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
+    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
+    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
     WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 use rustc_hash::FxHashMap;
@@ -309,10 +309,8 @@ fn coersions() {
                     format!("set_message_vertical_anchor(\"\", {vertical_anchor})")
                 })
             }
-            ConstantDiscriminants::ScreenPosition => {
-                test_variants::<ScreenPosition>(|screen_position| {
-                    format!("set_message_screen_position(\"\", {screen_position})")
-                })
+            ConstantDiscriminants::Corner => {
+                test_variants::<Corner>(|corner| format!("set_message_corner(\"\", {corner})"))
             }
             ConstantDiscriminants::CoordinateSystem => {
                 test_variants::<CoordinateSystem>(|coordinate_system| {

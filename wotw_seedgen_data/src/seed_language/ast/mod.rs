@@ -14,8 +14,8 @@ use crate::{
         token::{Token, Tokenizer, TOKENIZER},
         types::Type,
     },
-    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
-    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
+    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
+    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
     WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 use ordered_float::OrderedFloat;
@@ -392,7 +392,7 @@ pub enum Constant {
     Alignment(#[ast(with = "constant_ast::<Alignment, E>")] Alignment),
     HorizontalAnchor(#[ast(with = "constant_ast::<HorizontalAnchor, E>")] HorizontalAnchor),
     VerticalAnchor(#[ast(with = "constant_ast::<VerticalAnchor, E>")] VerticalAnchor),
-    ScreenPosition(#[ast(with = "constant_ast::<ScreenPosition, E>")] ScreenPosition),
+    Corner(#[ast(with = "constant_ast::<Corner, E>")] Corner),
     CoordinateSystem(#[ast(with = "constant_ast::<CoordinateSystem, E>")] CoordinateSystem),
 }
 

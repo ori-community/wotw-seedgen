@@ -91,24 +91,24 @@ pub enum VerticalAnchor {
     VariantArray,
 )]
 #[repr(u8)]
-pub enum ScreenPosition {
-    /// [`Alignment::Left`], [`HorizontalAnchor::Left`] and [`VerticalAnchor::Top`]
+pub enum Corner {
+    /// [`Alignment::Left`], [`HorizontalAnchor::Left`], [`VerticalAnchor::Top`] and position (0.01, 0.01)
     TopLeft = 0,
-    /// [`Alignment::Center`], [`HorizontalAnchor::Center`] and [`VerticalAnchor::Top`]
+    /// [`Alignment::Center`], [`HorizontalAnchor::Center`], [`VerticalAnchor::Top`] and position (0.5, 0.01)
     TopCenter = 1,
-    /// [`Alignment::Right`], [`HorizontalAnchor::Right`] and [`VerticalAnchor::Top`]
+    /// [`Alignment::Right`], [`HorizontalAnchor::Right`], [`VerticalAnchor::Top`] and position (0.99, 0.01)
     TopRight = 2,
-    /// [`Alignment::Left`], [`HorizontalAnchor::Left`] and [`VerticalAnchor::Middle`]
+    /// [`Alignment::Left`], [`HorizontalAnchor::Left`], [`VerticalAnchor::Middle`] and position (0.01, 0.5)
     MiddleLeft = 3,
-    /// [`Alignment::Center`], [`HorizontalAnchor::Center`] and [`VerticalAnchor::Middle`]
+    /// [`Alignment::Center`], [`HorizontalAnchor::Center`], [`VerticalAnchor::Middle`] and position (0.5, 0.5)
     MiddleCenter = 4,
-    /// [`Alignment::Right`], [`HorizontalAnchor::Right`] and [`VerticalAnchor::Middle`]
+    /// [`Alignment::Right`], [`HorizontalAnchor::Right`], [`VerticalAnchor::Middle`] and position (0.99, 0.5)
     MiddleRight = 5,
-    /// [`Alignment::Left`], [`HorizontalAnchor::Left`] and [`VerticalAnchor::Bottom`]
+    /// [`Alignment::Left`], [`HorizontalAnchor::Left`], [`VerticalAnchor::Bottom`] and position (0.01, 0.99)
     BottomLeft = 6,
-    /// [`Alignment::Center`], [`HorizontalAnchor::Center`] and [`VerticalAnchor::Bottom`]
+    /// [`Alignment::Center`], [`HorizontalAnchor::Center`], [`VerticalAnchor::Bottom`] and position (0.5, 0.99)
     BottomCenter = 7,
-    /// [`Alignment::Right`], [`HorizontalAnchor::Right`] and [`VerticalAnchor::Bottom`]
+    /// [`Alignment::Right`], [`HorizontalAnchor::Right`], [`VerticalAnchor::Bottom`] and position (0.99, 0.99)
     BottomRight = 8,
 }
 

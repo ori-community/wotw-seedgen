@@ -11,8 +11,8 @@ use crate::{
         },
         types::Type,
     },
-    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, Icon, LupoIcon,
-    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, UberIdentifier,
+    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor, Icon,
+    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, UberIdentifier,
     VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 use ordered_float::OrderedFloat;
@@ -949,19 +949,19 @@ impl CompileIntoConstant for VerticalAnchor {
     }
 }
 
-impl CompileIntoConstant for ScreenPosition {
-    const TYPE: Type = Type::ScreenPosition;
+impl CompileIntoConstant for Corner {
+    const TYPE: Type = Type::Corner;
 
     fn coerce_constant(constant: Constant) -> Option<Self> {
         match constant {
             Constant::WheelItemPosition(wheel_item_position) => match wheel_item_position {
-                WheelItemPosition::TopRight => Some(ScreenPosition::TopRight),
-                WheelItemPosition::BottomRight => Some(ScreenPosition::BottomRight),
-                WheelItemPosition::BottomLeft => Some(ScreenPosition::BottomLeft),
-                WheelItemPosition::TopLeft => Some(ScreenPosition::TopLeft),
+                WheelItemPosition::TopRight => Some(Corner::TopRight),
+                WheelItemPosition::BottomRight => Some(Corner::BottomRight),
+                WheelItemPosition::BottomLeft => Some(Corner::BottomLeft),
+                WheelItemPosition::TopLeft => Some(Corner::TopLeft),
                 _ => None,
             },
-            Constant::ScreenPosition(screen_position) => Some(screen_position),
+            Constant::Corner(corner) => Some(corner),
             _ => None,
         }
     }

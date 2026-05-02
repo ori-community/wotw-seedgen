@@ -44,7 +44,7 @@ pub enum Type {
     Alignment,
     HorizontalAnchor,
     VerticalAnchor,
-    ScreenPosition,
+    Corner,
     CoordinateSystem,
     Trigger,
     Expression,
@@ -229,7 +229,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetMessageAlignment
             | FunctionIdentifier::SetMessageHorizontalAnchor
             | FunctionIdentifier::SetMessageVerticalAnchor
-            | FunctionIdentifier::SetMessageScreenPosition
+            | FunctionIdentifier::SetMessageCorner
             | FunctionIdentifier::SetMessageBoxWidth
             | FunctionIdentifier::SetMessageCoordinateSystem
             | FunctionIdentifier::SetMapMessage
@@ -372,7 +372,7 @@ impl Constant {
             Constant::Alignment(_) => Type::Alignment,
             Constant::HorizontalAnchor(_) => Type::HorizontalAnchor,
             Constant::VerticalAnchor(_) => Type::VerticalAnchor,
-            Constant::ScreenPosition(_) => Type::ScreenPosition,
+            Constant::Corner(_) => Type::Corner,
             Constant::CoordinateSystem(_) => Type::CoordinateSystem,
         }
     }

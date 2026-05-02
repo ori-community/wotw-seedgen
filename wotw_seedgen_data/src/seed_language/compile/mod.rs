@@ -433,8 +433,9 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             }
             (Type::WheelItemPosition, Type::VerticalAnchor)
             | (Type::VerticalAnchor, Type::WheelItemPosition) => Some(Type::VerticalAnchor),
-            (Type::WheelItemPosition, Type::ScreenPosition)
-            | (Type::ScreenPosition, Type::WheelItemPosition) => Some(Type::ScreenPosition),
+            (Type::WheelItemPosition, Type::Corner) | (Type::Corner, Type::WheelItemPosition) => {
+                Some(Type::Corner)
+            }
             (_, Type::String) | (Type::String, _) => Some(Type::String),
             _ => {
                 self.errors

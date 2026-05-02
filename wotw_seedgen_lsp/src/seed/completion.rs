@@ -22,9 +22,9 @@ use wotw_seedgen_data::{
         compile::FunctionIdentifier,
         types::Type,
     },
-    Alignment, CoordinateSystem, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon,
-    MapIcon, OpherIcon, ScreenPosition, Shard, Skill, Teleporter, TuleyIcon, VariantArray,
-    VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
+    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VariantArray, VariantNames,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
 };
 
 use crate::seed::cache::CacheValues;
@@ -459,12 +459,8 @@ static VERTICAL_ANCHOR_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new
     )
 });
 
-static SCREEN_POSITION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
-    enum_member_completions_full(
-        ScreenPosition::VARIANTS,
-        "ScreenPosition",
-        |screen_position| *screen_position as u8,
-    )
+static CORNER: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(Corner::VARIANTS, "Corner", |corner| *corner as u8)
 });
 
 static COORDINATE_SYSTEM_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
@@ -503,7 +499,7 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
         ConstantDiscriminants::Alignment => ALIGNMENT_COMPLETION.clone(),
         ConstantDiscriminants::HorizontalAnchor => HORIZONTAL_ANCHOR_COMPLETION.clone(),
         ConstantDiscriminants::VerticalAnchor => VERTICAL_ANCHOR_COMPLETION.clone(),
-        ConstantDiscriminants::ScreenPosition => SCREEN_POSITION_COMPLETION.clone(),
+        ConstantDiscriminants::Corner => CORNER.clone(),
         ConstantDiscriminants::CoordinateSystem => COORDINATE_SYSTEM_COMPLETION.clone(),
     }
 }
