@@ -283,6 +283,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::QueuedMessage { .. }
             | CommandVoid::QueuedMessageScopedPickupPosition { .. }
             | CommandVoid::FreeMessage { .. }
+            | CommandVoid::FreeMessageUninitialized { .. }
             | CommandVoid::MessageDestroy { .. }
             | CommandVoid::MessageText { .. }
             | CommandVoid::MessageTimeout { .. }
@@ -293,6 +294,8 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::FreeMessageVerticalAnchor { .. }
             | CommandVoid::FreeMessageBoxWidth { .. }
             | CommandVoid::FreeMessageCoordinateSystem { .. }
+            | CommandVoid::FreeMessageShow { .. }
+            | CommandVoid::FreeMessageHide { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
             | CommandVoid::Lookup { .. } // TODO we definitely have to simulate the lookup?

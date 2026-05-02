@@ -221,6 +221,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::PriorityMessageWithTimeout
             | FunctionIdentifier::ControlledPriorityMessage
             | FunctionIdentifier::FreeMessage
+            | FunctionIdentifier::FreeMessageUninitialized
             | FunctionIdentifier::DestroyMessage
             | FunctionIdentifier::SetMessageText
             | FunctionIdentifier::SetMessageTimeout
@@ -232,6 +233,8 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetMessageCorner
             | FunctionIdentifier::SetMessageBoxWidth
             | FunctionIdentifier::SetMessageCoordinateSystem
+            | FunctionIdentifier::FreeMessageShow
+            | FunctionIdentifier::FreeMessageHide
             | FunctionIdentifier::Store
             | FunctionIdentifier::StoreWithoutTriggers
             | FunctionIdentifier::StoreDefaults

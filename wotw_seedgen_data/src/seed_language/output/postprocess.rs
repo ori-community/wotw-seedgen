@@ -790,6 +790,11 @@ impl ResolvePlaceholders for CommandVoid {
                 x.resolve(context);
                 y.resolve(context);
             }
+            Self::FreeMessageShow { fade, sound, .. } => {
+                fade.resolve(context);
+                sound.resolve(context);
+            }
+            Self::FreeMessageHide { fade, .. } => fade.resolve(context),
             Self::StoreBoolean { value, .. } => value.resolve(context),
             Self::StoreInteger { value, .. } => value.resolve(context),
             Self::StoreFloat { value, .. } => value.resolve(context),
@@ -848,6 +853,7 @@ impl ResolvePlaceholders for CommandVoid {
             Self::DebugLog { message } => message.resolve(context),
             Self::Lookup { .. }
             | Self::DefineTimer { .. }
+            | Self::FreeMessageUninitialized { .. }
             | Self::MessageDestroy { .. }
             | Self::FreeMessageAlignment { .. }
             | Self::FreeMessageHorizontalAnchor { .. }

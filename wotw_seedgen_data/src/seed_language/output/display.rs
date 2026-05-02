@@ -200,6 +200,7 @@ impl Display for CommandVoid {
             CommandVoid::FreeMessage { id, message } => {
                 write!(f, "free_message({id}, {message})")
             }
+            Self::FreeMessageUninitialized { id } => write!(f, "free_message_uninitialized({id})"),
             CommandVoid::MessageDestroy { id } => {
                 write!(f, "destroy_message({id})")
             }
@@ -239,6 +240,12 @@ impl Display for CommandVoid {
                 f,
                 "set_message_coordinate_system({id}, {coordinate_system})"
             ),
+            CommandVoid::FreeMessageShow { id, fade, sound } => {
+                write!(f, "free_message_show({id}, {fade}, {sound})")
+            }
+            CommandVoid::FreeMessageHide { id, fade } => {
+                write!(f, "free_message_hide({id}, {fade})")
+            }
             CommandVoid::StoreBoolean {
                 uber_identifier,
                 value,

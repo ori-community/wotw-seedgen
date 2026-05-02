@@ -300,14 +300,21 @@ impl Compile for input::CommandVoid {
                 .float(1, y)
                 .call(Command::QueuedMessageScopedPickupPosition, MemoryUsed::ZERO),
             Self::FreeMessage { id, message } => {
+                const USED: MemoryUsed = MemoryUsed {
+                    boolean: 2,
+                    ..MemoryUsed::ZERO
+                };
+
                 if message.as_constant().map_or(false, String::is_empty) {
                     (
                         vec![
                             Command::FreeMessage(id),
                             Command::SetBoolean(true),
+                            Command::CopyBoolean(0, 1),
+                            Command::SetBoolean(true),
                             Command::FreeMessageShow(id),
                         ],
-                        MemoryUsed::ONE_BOOLEAN,
+                        USED,
                     )
                 } else {
                     Args::new(context)
@@ -317,11 +324,17 @@ impl Compile for input::CommandVoid {
                             [
                                 Command::FreeMessage(id),
                                 Command::MessageText(id),
+                                Command::SetBoolean(true),
+                                Command::CopyBoolean(0, 1),
+                                Command::SetBoolean(true),
                                 Command::FreeMessageShow(id),
                             ],
-                            MemoryUsed::ZERO,
+                            USED,
                         )
                 }
+            }
+            Self::FreeMessageUninitialized { id } => {
+                (vec![Command::FreeMessage(id)], MemoryUsed::ZERO)
             }
             Self::MessageDestroy { id } => (vec![Command::MessageDestroy(id)], MemoryUsed::ZERO),
             Self::MessageText { id, message } => Args::new(context)
@@ -365,6 +378,13 @@ impl Compile for input::CommandVoid {
                 vec![Command::FreeMessageCoordinateSystem(id, coordinate_system)],
                 MemoryUsed::ZERO,
             ),
+            CommandVoid::FreeMessageShow { id, fade, sound } => Args::new(context)
+                .boolean(0, fade)
+                .boolean(1, sound)
+                .call(Command::FreeMessageShow(id), MemoryUsed::ZERO),
+            CommandVoid::FreeMessageHide { id, fade } => Args::new(context)
+                .boolean(0, fade)
+                .call(Command::FreeMessageHide(id), MemoryUsed::ZERO),
             Self::StoreBoolean {
                 uber_identifier,
                 value,

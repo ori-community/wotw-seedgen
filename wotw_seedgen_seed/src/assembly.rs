@@ -145,9 +145,9 @@ pub enum Command {
     QueuedMessageShownCallback(/*id*/ usize, /*command*/ usize),
     /// If queued message `id` get hidden, execute `command`
     QueuedMessageHiddenCallback(/*id*/ usize, /*command*/ usize),
-    /// Show free message `id` and play a sound if Boolean Memory 0 is `true`
+    /// Show free message `id`, using a fade animation if Boolean Memory 0 is `true` and playing a sound if Boolean Memory 1 is `true`
     FreeMessageShow(/*id*/ usize),
-    /// Hide free message `id`
+    /// Hide free message `id`, using a fade animation if Boolean Memory 0 is `true`
     FreeMessageHide(/*id*/ usize),
     /// Set the position of free message `id` to (Float Memory 0, Float Memory 1)
     FreeMessagePosition(/*id*/ usize),

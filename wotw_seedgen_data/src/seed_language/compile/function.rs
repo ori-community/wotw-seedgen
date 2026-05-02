@@ -271,6 +271,7 @@ pub enum FunctionIdentifier {
     PriorityMessageWithTimeout,
     ControlledPriorityMessage,
     FreeMessage,
+    FreeMessageUninitialized,
     DestroyMessage,
     SetMessageText,
     SetMessageTimeout,
@@ -282,6 +283,8 @@ pub enum FunctionIdentifier {
     SetMessageCorner,
     SetMessageBoxWidth,
     SetMessageCoordinateSystem,
+    FreeMessageShow,
+    FreeMessageHide,
     Store,
     StoreWithoutTriggers,
     StoreDefaults,
@@ -451,6 +454,7 @@ impl FunctionIdentifier {
             PriorityMessageWithTimeout(message: String, timeout: Float),
             ControlledPriorityMessage(id: String, message: String, timeout: Float),
             FreeMessage(id: String, message: String),
+            FreeMessageUninitialized(id: String),
             DestroyMessage(id: String),
             SetMessageText(id: String, message: String),
             SetMessageTimeout(id: String, timeout: Float),
@@ -462,6 +466,8 @@ impl FunctionIdentifier {
             SetMessageCorner(id: String, corner: Corner),
             SetMessageBoxWidth(id: String, width: Float),
             SetMessageCoordinateSystem(id: String, coordinate_system: CoordinateSystem),
+            FreeMessageShow(id: String, fade: Boolean, sound: Boolean),
+            FreeMessageHide(id: String, fade: Boolean),
             Store(uber_identifier: UberIdentifier, value: ?),
             StoreWithoutTriggers(uber_identifier: UberIdentifier, value: ?),
             StoreDefaults(),
@@ -915,6 +921,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 id: message_id(&mut context)?,
                 message: arg(&mut context)?,
             }),
+            FunctionIdentifier::FreeMessageUninitialized => {
+                Command::Void(CommandVoid::FreeMessageUninitialized {
+                    id: message_id(&mut context)?,
+                })
+            }
             FunctionIdentifier::DestroyMessage => Command::Void(CommandVoid::MessageDestroy {
                 id: message_id(&mut context)?,
             }),
@@ -1151,6 +1162,15 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     coordinate_system: arg(&mut context)?,
                 })
             }
+            FunctionIdentifier::FreeMessageShow => Command::Void(CommandVoid::FreeMessageShow {
+                id: message_id(&mut context)?,
+                fade: arg(&mut context)?,
+                sound: arg(&mut context)?,
+            }),
+            FunctionIdentifier::FreeMessageHide => Command::Void(CommandVoid::FreeMessageHide {
+                id: message_id(&mut context)?,
+                fade: arg(&mut context)?,
+            }),
             FunctionIdentifier::Store => store(true, &mut context)?,
             FunctionIdentifier::StoreWithoutTriggers => store(false, &mut context)?,
             FunctionIdentifier::StoreDefaults => {

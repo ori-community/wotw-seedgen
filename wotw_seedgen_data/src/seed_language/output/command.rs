@@ -426,6 +426,10 @@ pub enum CommandVoid {
         id: usize,
         message: CommandString,
     },
+    /// Register a free message with no text or visibility
+    FreeMessageUninitialized {
+        id: usize,
+    },
     /// DESTROY message `id`
     MessageDestroy {
         id: usize,
@@ -479,6 +483,15 @@ pub enum CommandVoid {
     FreeMessageCoordinateSystem {
         id: usize,
         coordinate_system: CoordinateSystem,
+    },
+    FreeMessageShow {
+        id: usize,
+        fade: CommandBoolean,
+        sound: CommandBoolean,
+    },
+    FreeMessageHide {
+        id: usize,
+        fade: CommandBoolean,
     },
     /// Store `value` in `uber_identifier` and check if any events are triggered
     StoreBoolean {
