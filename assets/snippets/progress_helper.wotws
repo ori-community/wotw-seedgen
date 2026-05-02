@@ -203,7 +203,6 @@ on reload {
 on change player.currentMapArea {
     if player.currentMapArea < 12 {
         write_map_progress_message()
-        // TODO are we supposed to use set_map_message? Didn't seem to work...
         set_message_text("map_message", "<s_0.9><ls_0.8>" + get_string("progress_message") + "</></>")
     }
     if player.currentMapArea >= 12 set_message_text("map_message", "")

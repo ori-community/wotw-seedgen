@@ -790,7 +790,6 @@ impl ResolvePlaceholders for CommandVoid {
                 x.resolve(context);
                 y.resolve(context);
             }
-            Self::SetMapMessage { value } => value.resolve(context),
             Self::StoreBoolean { value, .. } => value.resolve(context),
             Self::StoreInteger { value, .. } => value.resolve(context),
             Self::StoreFloat { value, .. } => value.resolve(context),

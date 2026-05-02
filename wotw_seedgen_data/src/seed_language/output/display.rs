@@ -239,7 +239,6 @@ impl Display for CommandVoid {
                 f,
                 "set_message_coordinate_system({id}, {coordinate_system})"
             ),
-            CommandVoid::SetMapMessage { value } => write!(f, "set_map_message({value})"),
             CommandVoid::StoreBoolean {
                 uber_identifier,
                 value,

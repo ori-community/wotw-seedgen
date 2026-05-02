@@ -232,7 +232,6 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetMessageCorner
             | FunctionIdentifier::SetMessageBoxWidth
             | FunctionIdentifier::SetMessageCoordinateSystem
-            | FunctionIdentifier::SetMapMessage
             | FunctionIdentifier::Store
             | FunctionIdentifier::StoreWithoutTriggers
             | FunctionIdentifier::StoreDefaults

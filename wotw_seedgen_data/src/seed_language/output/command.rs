@@ -480,10 +480,6 @@ pub enum CommandVoid {
         id: usize,
         coordinate_system: CoordinateSystem,
     },
-    /// Sets the map message content to `value`
-    SetMapMessage {
-        value: CommandString,
-    },
     /// Store `value` in `uber_identifier` and check if any events are triggered
     StoreBoolean {
         uber_identifier: UberIdentifier,

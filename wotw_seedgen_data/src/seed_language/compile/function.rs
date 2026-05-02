@@ -282,7 +282,6 @@ pub enum FunctionIdentifier {
     SetMessageCorner,
     SetMessageBoxWidth,
     SetMessageCoordinateSystem,
-    SetMapMessage,
     Store,
     StoreWithoutTriggers,
     StoreDefaults,
@@ -463,7 +462,6 @@ impl FunctionIdentifier {
             SetMessageCorner(id: String, corner: Corner),
             SetMessageBoxWidth(id: String, width: Float),
             SetMessageCoordinateSystem(id: String, coordinate_system: CoordinateSystem),
-            SetMapMessage(message: String),
             Store(uber_identifier: UberIdentifier, value: ?),
             StoreWithoutTriggers(uber_identifier: UberIdentifier, value: ?),
             StoreDefaults(),
@@ -1153,9 +1151,6 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     coordinate_system: arg(&mut context)?,
                 })
             }
-            FunctionIdentifier::SetMapMessage => Command::Void(CommandVoid::SetMapMessage {
-                value: arg(&mut context)?,
-            }),
             FunctionIdentifier::Store => store(true, &mut context)?,
             FunctionIdentifier::StoreWithoutTriggers => store(false, &mut context)?,
             FunctionIdentifier::StoreDefaults => {

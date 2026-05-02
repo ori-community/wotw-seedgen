@@ -293,7 +293,6 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::FreeMessageVerticalAnchor { .. }
             | CommandVoid::FreeMessageBoxWidth { .. }
             | CommandVoid::FreeMessageCoordinateSystem { .. }
-            | CommandVoid::SetMapMessage { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
             | CommandVoid::Lookup { .. } // TODO we definitely have to simulate the lookup?

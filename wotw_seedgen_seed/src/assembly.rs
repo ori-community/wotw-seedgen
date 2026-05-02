@@ -167,8 +167,6 @@ pub enum Command {
         /*id*/ usize,
         /*coordinate_system*/ CoordinateSystem,
     ),
-    /// Sets the map message content to String Memory 0
-    SetMapMessage,
     // TODO missing SetSideMapMessage
     /// Create a new box defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3)
     BoxTrigger(/*id*/ usize),

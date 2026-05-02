@@ -365,9 +365,6 @@ impl Compile for input::CommandVoid {
                 vec![Command::FreeMessageCoordinateSystem(id, coordinate_system)],
                 MemoryUsed::ZERO,
             ),
-            Self::SetMapMessage { value } => Args::new(context)
-                .string(0, value)
-                .call(Command::SetMapMessage, MemoryUsed::ZERO),
             Self::StoreBoolean {
                 uber_identifier,
                 value,
