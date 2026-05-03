@@ -1,61 +1,55 @@
 use super::SEED_FAILED_MESSAGE;
-use rand::{distributions::Uniform, Rng, SeedableRng};
+use rand::{distributions::Uniform, prelude::Distribution, SeedableRng};
 use rand_pcg::Pcg64Mcg;
-use std::mem;
 
 const MIN_SPIRIT_LIGHT: f32 = 50.;
 const NOISE: f32 = 0.25;
 
+/// We want spirit_light(i) = ai² + b (quadratic growth)
+/// And b = MIN_SPIRIT_LIGHT (start above zero) with some random noise
+/// And ₀∫ᵖ spirit_light(i) di = t (place the total amount)
+///
+/// SPIRIT_LIGHT(i) = ai³/3 + bi
+/// ... ₀∫ᵖ spirit_light(i) di = SPIRIT_LIGHT(p) - SPIRIT_LIGHT(0) = t
+/// ... ap³/3 + bp = t
+/// ... a = 3(t - bp)/p³
 pub struct SpiritLightProvider {
     rng: Pcg64Mcg,
-    pub amount: f32,
-    next_amount: f32,
-    noise: Uniform<f32>,
+    a: f32,
+    i: f32,
+    b: Uniform<f32>,
 }
 
 impl SpiritLightProvider {
-    pub fn new(amount: i32, rng: &mut Pcg64Mcg) -> Self {
+    pub fn new(rng: &mut Pcg64Mcg) -> Self {
         Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
-            amount: amount as f32,
-            next_amount: MIN_SPIRIT_LIGHT,
-            noise: Uniform::new_inclusive(1. - NOISE, 1. + NOISE),
+            a: 0.,
+            i: 0.,
+            b: Uniform::new_inclusive(
+                MIN_SPIRIT_LIGHT * (1. - NOISE),
+                MIN_SPIRIT_LIGHT * (1. + NOISE),
+            ),
         }
     }
 
-    pub fn take(&mut self, spirit_light_placements_remaining: usize) -> usize {
-        // For brevity, spirit_light_placements_remaining is referred to as remaining in this comment
-        //
-        // We want spirit_light(remaining) = a * remaining + b (linear growth)
-        // And spirit_light(remaining) = self.next_amount (avoid extreme jumps)
-        // And ∫₁ˢˡᵒᵗˢʳᵉᵐᵃᶦⁿᶦⁿᵍ spirit_light dx = self.amount (aim towards placing the specified total amount)
-        // And next = spirit_light(remaining - 1)
-        //
-        // We have to reevaluate these conditions every time because in multiworld seeds it's not possible to know upfront
-        // across how many placements we need to spread out the spirit light, some worlds may end up with fewer or more spirit light items
-        //
-        // So spirit_light(remaining) = a * remaining + b = self.next_amount
-        // ... b = self.next_amount - a * remaining
-        // And ∫₁ˢˡᵒᵗˢʳᵉᵐᵃᶦⁿᶦⁿᵍ spirit_light dx = 1/2 * (remaining - 1) * (a * remaining + a + 2 * b) = self.amount
-        // ... a * remaining + a + 2 * b = 2 * self.amount / (remaining - 1)
-        // ... a * remaining + a + 2 * self.next_amount - 2 * a * remaining = 2 * self.amount / (remaining - 1)
-        // ... a * (remaining + 1 - 2 * remaining) = 2 * self.amount / (remaining - 1) - 2 * self.next_amount
-        // ... a = (2 * self.amount / (remaining - 1) - 2 * self.next_amount) / (remaining + 1 - 2 * remaining)
-
-        let remaining = spirit_light_placements_remaining as f32;
-        let a = (2. * self.amount / (remaining - 1.) - 2. * self.next_amount)
-            / (remaining + 1. - 2. * remaining);
-        let b = self.next_amount - a * remaining;
-        let next = a * (remaining - 1.) + b;
-        let mut amount = mem::replace(&mut self.next_amount, next);
-
-        // Apply random noise after setting the next amount to prevent snowballing
-        amount = (amount * self.rng.sample(self.noise)).round();
-        self.amount -= amount;
-        amount as usize
+    pub fn init(&mut self, total_spirit_light: i32, total_placements: usize) {
+        let t = total_spirit_light as f32;
+        let p = total_placements as f32;
+        self.a = 3. * (t - MIN_SPIRIT_LIGHT * p) / (p * p * p);
     }
 
-    pub fn take_exceed(&mut self) -> usize {
-        (200. * self.rng.sample(self.noise)).round() as usize
+    pub fn take(&mut self) -> i32 {
+        let amount = self.current_amount();
+        self.i += 1.;
+        amount
+    }
+
+    pub fn take_exceed(&mut self) -> i32 {
+        self.current_amount()
+    }
+
+    fn current_amount(&mut self) -> i32 {
+        (self.a * self.i * self.i + self.b.sample(&mut self.rng)).round() as i32
     }
 }

@@ -132,6 +132,8 @@ pub struct WorldContext<'graph, 'settings> {
     needs_placement: Vec<&'graph LocDataEntry>,
     /// initial length of needs_placement
     total_pickups: f32,
+    /// how many pickups should be assigned spirit light placements
+    spirit_light_placements_remaining: usize,
     /// pickups which have been reached but explicitely haven't been assigned a placement yet to leave space for later progressions
     placeholders: Vec<&'graph LocDataEntry>,
     /// indices into `needs_placement` for pickups that are reachable and may be used for placements in this step
@@ -155,13 +157,39 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     ) -> Result<Self, String> {
         let multiworld = worlds.len() > 1;
 
-        let worlds = worlds
+        let mut worlds = worlds
             .into_iter()
             .enumerate()
             .map(|(index, (world, output))| {
                 WorldContext::new(rng, world, output, index, multiworld)
             })
             .collect::<Result<Vec<_>, _>>()?;
+
+        let mut total_needs_placement = 0;
+        let mut total_item_count = 0;
+
+        for world in &worlds {
+            total_needs_placement += world.needs_placement.len();
+            total_item_count += world.item_pool.len();
+        }
+
+        let mut total_spirit_light_placements = usize::max(
+            total_needs_placement.saturating_sub(total_item_count),
+            worlds.len(),
+        );
+
+        let worlds_remaining = (1..worlds.len() + 1).rev();
+        for (world, worlds_remaining) in worlds.iter_mut().zip(worlds_remaining) {
+            let spirit_light_placements =
+                (total_spirit_light_placements as f32 / worlds_remaining as f32).round() as usize;
+            total_spirit_light_placements -= spirit_light_placements;
+
+            world.spirit_light_placements_remaining = spirit_light_placements;
+            // TODO how should !add_item(spirit_light(100)) behave?
+            world
+                .spirit_light_provider
+                .init(TOTAL_SPIRIT_LIGHT, spirit_light_placements);
+        }
 
         let ordering_distribution = OrderingDistribution::new(rng);
 
@@ -374,8 +402,6 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             let needs_random_placement = origin_world.reserve_placeholders();
             let mut placements_remaining =
                 origin_world.placements_remaining() + needs_random_placement.len();
-            let mut spirit_light_placements_remaining =
-                placements_remaining.saturating_sub(origin_world.item_pool.len());
 
             for pickup in needs_random_placement {
                 any_placed = true; // TODO pull out of loop and skip some more calculations that way
@@ -384,49 +410,26 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
                 let should_place_spirit_light = !pickup.uber_identifier.is_shop()
                     && self.rng.gen_bool(
-                        spirit_light_placements_remaining as f64 / placements_remaining as f64,
+                        origin_world.spirit_light_placements_remaining as f64
+                            / placements_remaining as f64,
                     );
 
                 let (target_world_index, command) = if should_place_spirit_light {
-                    let batch = origin_world
-                        .spirit_light_provider
-                        .take(spirit_light_placements_remaining);
-
-                    // Placements_remaining has reduced by one, item_pool.len() remained the same.
-                    // If should_place_spirit_light is true, spirit_light_placements_remaining must be
-                    // greater than one, so this branch doesn't need a saturating sub.
-                    spirit_light_placements_remaining -= 1;
+                    let batch = origin_world.spirit_light_provider.take();
+                    origin_world.spirit_light_placements_remaining -= 1;
 
                     (
                         origin_world_index,
-                        compile::spirit_light((batch as i32).into(), &mut self.rng),
+                        compile::spirit_light(batch.into(), &mut self.rng),
                     )
                 } else {
                     let target_world_index = self.choose_target_world_for_random_placement();
                     let target_world = &mut self.worlds[target_world_index];
 
-                    let item = match target_world.item_pool.choose_random() {
-                        None => {
-                            // Since this is not taken from the item pool, placements_remaining
-                            // has reduced by one and item_pool.len() remained the same.
-                            spirit_light_placements_remaining =
-                                spirit_light_placements_remaining.saturating_sub(1);
-
-                            target_world.backup_gorlek_ore()
-                        }
-                        Some(item) => {
-                            if origin_world_index != target_world_index {
-                                // If the item is taken from another item pool, then placements_remaining
-                                // has reduced by one and item_pool.len() remained the same.
-                                // If it's taken from the own item pool, both have reduced by one
-                                // and spirit_light_placements_remaining remains the same
-                                spirit_light_placements_remaining =
-                                    spirit_light_placements_remaining.saturating_sub(1);
-                            }
-
-                            item
-                        }
-                    };
+                    let item = target_world
+                        .item_pool
+                        .choose_random()
+                        .unwrap_or_else(|| target_world.backup_gorlek_ore());
 
                     (target_world_index, item)
                 };
@@ -523,7 +526,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         }
 
         self.worlds[target_world_index].force_place_spirit_light(
-            progression.spirit_light as usize, // TODO why is this not i32
+            progression.spirit_light,
             &mut self.spoiler.groups[self.step - 1].placements,
         )
     }
@@ -846,8 +849,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         world.traverse_spawn(&output.events);
 
-        // TODO how should !add_item(spirit_light(100)) behave?
-        let spirit_light_provider = SpiritLightProvider::new(TOTAL_SPIRIT_LIGHT, &mut rng);
+        let spirit_light_provider = SpiritLightProvider::new(&mut rng);
 
         Ok(Self {
             rng,
@@ -859,6 +861,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             spirit_light_provider,
             needs_placement,
             total_pickups,
+            spirit_light_placements_remaining: 0,
             placeholders: Default::default(),
             reached_needs_placement: Default::default(),
             received_placement: Default::default(),
@@ -904,6 +907,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn hi_torin(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
+        self.spirit_light_placements_remaining -= 1;
         let command = compile::spirit_light(1.into(), &mut self.rng);
 
         if self.needs_placement.is_empty() {
@@ -962,11 +966,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         self.needs_placement.len() - self.received_placement.len() + self.placeholders.len()
     }
 
-    fn spirit_light_placements_remaining(&self) -> usize {
-        self.placements_remaining()
-            .saturating_sub(self.item_pool.len())
-    }
-
     fn reserve_placeholders(&mut self) -> Vec<&'graph LocDataEntry> {
         self.received_placement
             .extend(self.reached_needs_placement.iter().copied());
@@ -1012,16 +1011,22 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn progression_slots(&self) -> usize {
-        self.reached_needs_placement.len() + self.placeholders.len() + self.spawn_slots
+        usize::min(
+            self.reached_needs_placement.len() + self.placeholders.len(),
+            self.placements_remaining() - self.spirit_light_placements_remaining,
+        ) + self.spawn_slots
     }
 
     fn spirit_light_progression_slots(&self) -> usize {
-        self.reached_needs_placement
-            .iter()
-            .map(|pickup_index| &self.needs_placement[*pickup_index])
-            .chain(&self.placeholders)
-            .filter(|pickup| !pickup.uber_identifier.is_shop())
-            .count()
+        usize::min(
+            self.reached_needs_placement
+                .iter()
+                .map(|pickup_index| &self.needs_placement[*pickup_index])
+                .chain(&self.placeholders)
+                .filter(|pickup| !pickup.uber_identifier.is_shop())
+                .count(),
+            self.spirit_light_placements_remaining,
+        )
     }
 
     fn choose_progression(&mut self, slots: usize) -> Option<Solution> {
@@ -1098,14 +1103,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
     fn force_place_spirit_light(
         &mut self,
-        mut amount: usize,
+        mut amount: i32,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
         while amount > 0 {
-            let batch = self
-                .spirit_light_provider
-                .take(self.spirit_light_placements_remaining());
-
+            let batch = self.spirit_light_provider.take();
             amount = amount.saturating_sub(batch);
 
             match self.choose_location::<true>() {
@@ -1113,7 +1115,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     warn!("Not enough space to place spirit light, aborting progression");
                     break;
                 }
-                Some(pickup) => self.place_spirit_light(pickup, batch as i32, placement_spoiler),
+                Some(pickup) => self.place_spirit_light(pickup, batch, placement_spoiler),
             }
         }
     }
@@ -1176,7 +1178,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         needs_placement.extend(mem::take(&mut self.placeholders));
         needs_placement.shuffle(&mut self.rng);
 
-        for (placements_remaining, pickup) in needs_placement.into_iter().enumerate().rev() {
+        for pickup in needs_placement {
             let is_shop = pickup.uber_identifier.is_shop();
 
             if is_shop {
@@ -1188,7 +1190,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     |_, world, events| world.add_gorlek_ore(1, events),
                 );
             } else {
-                let amount = self.spirit_light_provider.take(1 + placements_remaining) as i32;
+                let amount = self.spirit_light_provider.take();
                 self.place_spirit_light(pickup, amount, placement_spoiler);
             }
         }
@@ -1204,8 +1206,9 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                         pickup.identifier,
                     );
 
-                    let amount = self.spirit_light_provider.take_exceed() as i32;
-                    self.place_spirit_light(pickup, amount, placement_spoiler);
+                    let amount = self.spirit_light_provider.take_exceed();
+                    let command = compile::spirit_light(amount.into(), &mut self.rng);
+                    self.place_without_simulation(pickup, command, placement_spoiler);
 
                     unreachable_count += 1;
                 }
@@ -1269,6 +1272,9 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         amount: i32,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
+        // TODO not sure this should need a saturating sub, maybe there's a logic error somewhere
+        self.spirit_light_placements_remaining =
+            self.spirit_light_placements_remaining.saturating_sub(1);
         let command = compile::spirit_light(amount.into(), &mut self.rng);
         self.place_with_simulation(pickup, command, placement_spoiler, |_, world, events| {
             world.add_spirit_light(amount, events)
