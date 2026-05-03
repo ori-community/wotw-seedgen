@@ -332,8 +332,8 @@ fun update_current_area_has_uncollected_relic() {
 }
 
 !augment_fun(write_progress_message, {
-    set_string("outer_color", "")
-    if itemTracker.relicsCount == itemTracker.relicsRequired set_string("outer_color", "$")
+    set_string("progress_color", "")
+    if itemTracker.relicsCount == itemTracker.relicsRequired set_string("progress_color", "$")
     write_relics_message()
     set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
@@ -378,7 +378,7 @@ on change itemTracker.relicsRequired update_goals_completed()
 
 !augment_fun(write_goals_incomplete_message, {
     if itemTracker.relicsCount < itemTracker.relicsRequired {
-        set_string("outer_color", "@")
+        set_string("progress_color", "@")
         write_relics_message()
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("relics_message"))
     }
@@ -647,7 +647,7 @@ on change itemTracker.relicsRequired update_goals_completed()
 }
 
 fun write_relics_message() {
-    set_string("relics_message", get_string("outer_color") + "Relics (" + itemTracker.relicsCount + "/" + itemTracker.relicsRequired + "): ")
+    set_string("relics_message", "Relics (" + get_string("progress_color") + itemTracker.relicsCount + "/" + itemTracker.relicsRequired + get_string("progress_color") + "): ")
     set_boolean("comma", false)
     write_marsh_relic()
     write_hollow_relic()
@@ -660,7 +660,6 @@ fun write_relics_message() {
     write_wastes_relic()
     write_willow_relic()
     write_burrows_relic()
-    set_string("relics_message", get_string("relics_message") + get_string("outer_color"))
 }
 fun relics_add_comma() {
     if get_boolean("comma") set_string("relics_message", get_string("relics_message") + ", ")

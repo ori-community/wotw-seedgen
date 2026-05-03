@@ -127,7 +127,7 @@ fun write_pickups_progress() {
     set_string("color", "")
     if get_integer("collected") >= get_integer("total") set_string("color", "$")
 
-    set_string("progress_message", get_string("progress_message") + get_string("color") + get_string("zone") + "Pickups: " + get_integer("collected") + "/" + get_integer("total") + get_string("color"))
+    set_string("progress_message", get_string("progress_message") + get_string("zone") + "Pickups: " + get_string("color") + get_integer("collected") + "/" + get_integer("total") + get_string("color"))
 }
 
 !state(disable_keybinds, Boolean)
