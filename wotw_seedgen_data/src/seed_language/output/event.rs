@@ -1,7 +1,10 @@
 pub use crate::seed_language::ast::ClientEvent;
 
 use super::{CommandBoolean, CommandVoid};
-use crate::UberIdentifier;
+use crate::{
+    seed_language::simulate::{Simulate, Simulation},
+    EqIgnore, UberIdentifier,
+};
 use serde::{Deserialize, Serialize};
 
 /// The main event (:badumtsss:)
@@ -70,15 +73,21 @@ impl Trigger {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TriggerCondition {
-    pub id: Option<usize>,
+    pub id: EqIgnore<Option<usize>>,
     pub condition: CommandBoolean,
 }
 
 impl TriggerCondition {
     pub const fn new(condition: CommandBoolean) -> Self {
         Self {
-            id: None,
+            id: EqIgnore(None),
             condition,
         }
+    }
+
+    pub(crate) fn register<S: Simulation>(&mut self, simulation: &mut S) {
+        let initial_value = self.condition.simulate(simulation, &[]);
+        let id = simulation.condition_values().register(initial_value);
+        self.id = EqIgnore(Some(id));
     }
 }

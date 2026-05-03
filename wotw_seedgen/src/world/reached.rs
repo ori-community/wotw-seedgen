@@ -9,7 +9,7 @@ use super::World;
 use crate::{
     logical_difficulty::LogicalDifficulty,
     orbs::{self, format_orb_variants, OrbVariants},
-    world::{graph_ref::EqIgnore, GraphRef, Missing},
+    world::{GraphRef, Missing},
 };
 use itertools::Itertools;
 use log::trace;
@@ -22,7 +22,7 @@ use wotw_seedgen_data::{
         output::Event,
         simulate::{CloneSnapshot, Simulation, Snapshot},
     },
-    Skill, UberIdentifier,
+    EqIgnore, Skill, UberIdentifier,
 };
 
 pub const TP_ANCHOR: &str = "Teleporters";

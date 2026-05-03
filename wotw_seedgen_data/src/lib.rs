@@ -7,6 +7,7 @@ pub use wotw_seedgen_parse as parse;
 pub use strum::{VariantArray, VariantNames};
 
 pub mod assets;
+mod eq_ignore;
 mod equipment;
 mod icon;
 pub mod logic_language;
@@ -24,6 +25,7 @@ mod weapon_upgrade;
 mod wheel;
 mod zone;
 
+pub use eq_ignore::EqIgnore;
 pub use equipment::{EquipSlot, Equipment};
 pub use icon::{GromIcon, Icon, LupoIcon, MapIcon, OpherIcon, TuleyIcon};
 pub use message::{Alignment, CoordinateSystem, HorizontalAnchor, Corner, VerticalAnchor};

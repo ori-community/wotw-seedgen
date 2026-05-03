@@ -5,7 +5,7 @@ mod reached;
 pub(crate) mod tests;
 
 use arrayvec::ArrayVec;
-pub(crate) use graph_ref::{EqIgnore, GraphRef};
+pub(crate) use graph_ref::GraphRef;
 pub(crate) use is_met::Missing;
 pub(crate) use reached::{
     ConnectionIndex, ConnectionOrRefill, ConnectionRequirement, ConnectionRequirementPartial,

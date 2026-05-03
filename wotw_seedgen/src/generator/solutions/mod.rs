@@ -37,7 +37,7 @@ use wotw_seedgen_data::{
         output::{CommandVoid, CommonWriteCommand, ContainedWrites, Event, UberStateWrite},
         simulate::{Simulate, Simulation, Snapshot},
     },
-    Difficulty, Shard, Skill, UberIdentifier,
+    Difficulty, EqIgnore, Shard, Skill, UberIdentifier,
 };
 
 use crate::{
@@ -46,7 +46,7 @@ use crate::{
     orbs::OrbVariants,
     world::{
         ConnectionIndex, ConnectionOrRefill, ConnectionRequirement, ConnectionRequirementPartial,
-        EqIgnore, GraphRef, Missing, ReachStateFails,
+        GraphRef, Missing, ReachStateFails,
     },
     World,
 };

@@ -25,9 +25,7 @@ pub trait Simulation: Sized {
 
     fn register_trigger(&mut self, trigger: &mut Trigger) {
         if let Trigger::Condition(condition) = trigger {
-            let initial_value = condition.condition.simulate(self, &[]);
-            let id = self.condition_values().register(initial_value);
-            condition.id = Some(id);
+            condition.register(self);
         }
     }
 

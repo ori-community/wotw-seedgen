@@ -4,7 +4,6 @@ use std::ops::ControlFlow;
 use super::World;
 use crate::logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS};
 use crate::orbs::{self, format_orb_variants, OrbVariants, Orbs};
-use crate::world::graph_ref::EqIgnore;
 use crate::world::GraphRef;
 use itertools::Itertools;
 use log::trace;
@@ -16,7 +15,7 @@ use wotw_seedgen_data::Teleporter;
 use wotw_seedgen_data::{
     logic_language::output::{Enemy, Requirement},
     seed_language::simulate::Simulation,
-    Difficulty, Shard, Skill, UberIdentifier,
+    Difficulty, EqIgnore, Shard, Skill, UberIdentifier,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
