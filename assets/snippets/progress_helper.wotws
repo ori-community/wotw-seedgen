@@ -212,7 +212,18 @@ on reload {
 on change player.currentMapArea {
     if player.currentMapArea < 12 {
         write_map_progress_message()
-        set_message_text("map_message", "<s_0.9><ls_0.8>" + get_string("progress_message") + "</></>")
+        set_integer("length", string_length(get_string("progress_message")))
+
+        if get_integer("length") > 125 {
+            if get_integer("length") > 250 {
+                set_string("progress_message", "<s_0.7><ls_0.7>" + get_string("progress_message") + "</></>")
+            }
+            if get_integer("length") <= 250 {
+                set_string("progress_message", "<s_0.85><ls_0.85>" + get_string("progress_message") + "</></>")
+            }
+        }
+
+        set_message_text("map_message", get_string("progress_message"))
     }
     if player.currentMapArea >= 12 set_message_text("map_message", "")
 }
