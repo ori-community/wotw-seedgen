@@ -328,13 +328,13 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             let mut price = multi_price(prices);
             price_noise.add_noise(&mut price, rng);
 
-            extra_events.push(Event::on_reload(CommandVoid::SetShopItemPrice {
+            extra_events.push(Event::on_spawn(CommandVoid::SetShopItemPrice {
                 uber_identifier,
                 price,
             }));
 
             if uber_identifier.shop_kind() == ShopKind::Opherlike {
-                extra_events.push(Event::on_reload(CommandVoid::SetShopItemName {
+                extra_events.push(Event::on_spawn(CommandVoid::SetShopItemName {
                     uber_identifier,
                     name,
                 }));
@@ -346,7 +346,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                     _ => random_shop_description(rng).into(),
                 };
 
-                extra_events.push(Event::on_reload(CommandVoid::SetShopItemDescription {
+                extra_events.push(Event::on_spawn(CommandVoid::SetShopItemDescription {
                     uber_identifier,
                     description,
                 }));
@@ -356,7 +356,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                     .find_map(|metadata| metadata.try_force_icon());
 
                 if let Some(icon) = icon {
-                    extra_events.push(Event::on_reload(CommandVoid::SetShopItemIcon {
+                    extra_events.push(Event::on_spawn(CommandVoid::SetShopItemIcon {
                         uber_identifier,
                         icon,
                     }));
