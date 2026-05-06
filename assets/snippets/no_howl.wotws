@@ -5,7 +5,7 @@
 !tags("No Howl")
 
 on spawn {
+    store(swampStateGroup.nightCrawlerEscaped, true)
     store(swampStateGroup.nightCrawlerChaseStarted, true)
-    store(swampStateGroup.nightCrawlerDefeated, true)
     store(MarshSpawn.HowlBurnt, true)
 }
