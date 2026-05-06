@@ -27,7 +27,7 @@
 !include("rapid_regenerate_core", rapid_regenerate)
 
 !config(rapid_hammers, "Rapid Hammer Count", "Makes Hammer swing faster", Integer, 3)
-!config(rapid_swords, "Rapid Sword Count", "Makes Sword swing faster", Integer, 3)
+!config(rapid_swords, "Rapid Sword Count", "Makes Sword swing faster", Integer, 0)
 !config(rapid_spears, "Rapid Spear Count", "Makes Spear shoot faster", Integer, 2)
 !config(rapid_regenerates, "Rapid Regenerate Count", "Makes Regenerate heal faster", Integer, 1)
 !config(rapid_grenades, "Rapid Grenade Count", "Reduces the cooldown for Grenade", Integer, 2)
@@ -44,7 +44,7 @@
 !config(extra_shurikens, "Extra Shuriken Count", "Allows having multiple Shurikens on screen", Integer, 1)
 !config(splinter_shurikens, "Splinter Shuriken Count", "Throw multiple Shurikens at once", Integer, 2)
 !config(bashable_shurikens, "Bashable Shuriken Count", "Allows bashing Shurikens", Integer, 1)
-!config(ultra_flaps, "Ultra Flap Count", "Makes Flap deal damage", Integer, 5)
+!config(ultra_flaps, "Ultra Flap Count", "Makes Flap deal damage", Integer, 3)
 
 !add_item(rapid_hammer(), rapid_hammers)
 !add_item(rapid_sword(), rapid_swords)
