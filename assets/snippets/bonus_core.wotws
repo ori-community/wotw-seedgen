@@ -29,8 +29,9 @@ fun disable_all() {}
 
 on reload {
     set_wheel_item_name("root", LeftTop, "Bonus Toggles")
-    set_wheel_item_action("root", LeftTop, All, switch_wheel("bonus_upgrades"))
     set_wheel_item_action("root", LeftTop, Ability1, toggle_all())
+    set_wheel_item_action("root", LeftTop, Ability2, switch_wheel("bonus_upgrades"))
+    set_wheel_item_action("root", LeftTop, Ability3, switch_wheel("bonus_upgrades"))
     update_bonus_wheel()
 }
 on respawn update_bonus_wheel()

@@ -140,8 +140,8 @@ on reload {
         "Progress Summary",
         "[Ability1]View Progress",
         progress_summary_icon,
-        trigger_keybind("ShowProgressWithHints"),
     )
+    set_wheel_item_all_actions("root", Top, trigger_keybind("ShowProgressWithHints"))
 
     set_wheel_item_data(
         "root",
@@ -149,11 +149,11 @@ on reload {
         "Tree Progress",
         "[Ability1]View Progress",
         tree_progress_icon,
-        {
-            write_tree_progress()
-            controlled_priority_message("tree_progress", get_string("tree_progress"), 4)
-        },
     )
+    set_wheel_item_all_actions("root", TopRight, {
+        write_tree_progress()
+        controlled_priority_message("tree_progress", get_string("tree_progress"), 4)
+    })
 
     set_wheel_item_data(
         "root",
@@ -161,11 +161,11 @@ on reload {
         "Wisp Progress",
         "[Ability1]View Progress",
         wisp_progress_icon,
-        {
-            write_wisp_progress()
-            controlled_priority_message("wisp_progress", get_string("wisp_progress"), 4)
-        },
     )
+    set_wheel_item_all_actions("root", RightTop, {
+        write_wisp_progress()
+        controlled_priority_message("wisp_progress", get_string("wisp_progress"), 4)
+    })
 
     set_wheel_item_data(
         "root",
@@ -173,8 +173,8 @@ on reload {
         "Quest Progress",
         "[Ability1]View Progress",
         quest_progress_icon,
-        show_quest_progress(),
     )
+    set_wheel_item_all_actions("root", Right, show_quest_progress())
 
     set_wheel_item_data(
         "root",
@@ -182,8 +182,8 @@ on reload {
         "Teleporter Progress",
         "[Ability1]View Progress",
         teleporter_icon,
-        show_teleporter_progress(),
     )
+    set_wheel_item_all_actions("root", RightBottom, show_teleporter_progress())
 }
 
 on progress_message {

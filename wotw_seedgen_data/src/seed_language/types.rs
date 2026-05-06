@@ -275,6 +275,7 @@ impl InferType for FunctionCall<'_> {
             | FunctionIdentifier::SetWheelItemIcon
             | FunctionIdentifier::SetWheelItemColor
             | FunctionIdentifier::SetWheelItemAction
+            | FunctionIdentifier::SetWheelItemAllActions
             | FunctionIdentifier::DestroyWheelItem
             | FunctionIdentifier::SwitchWheel
             | FunctionIdentifier::SetWheelPinned

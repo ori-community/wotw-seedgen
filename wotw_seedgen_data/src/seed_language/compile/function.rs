@@ -325,6 +325,7 @@ pub enum FunctionIdentifier {
     SetWheelItemIcon,
     SetWheelItemColor,
     SetWheelItemAction,
+    SetWheelItemAllActions,
     DestroyWheelItem,
     SwitchWheel,
     SetWheelPinned,
@@ -502,12 +503,13 @@ impl FunctionIdentifier {
             SetShopItemIcon(uber_identifier: UberIdentifier, icon: Icon),
             SetShopItemHidden(uber_identifier: UberIdentifier, hidden: Boolean),
             SetShopItemLocked(uber_identifier: UberIdentifier, locked: Boolean),
-            SetWheelItemData(wheel: String, position: WheelItemPosition, name: String, description: String, icon: Icon, action: Action),
+            SetWheelItemData(wheel: String, position: WheelItemPosition, name: String, description: String, icon: Icon),
             SetWheelItemName(wheel: String, position: WheelItemPosition, name: String),
             SetWheelItemDescription(wheel: String, position: WheelItemPosition, description: String),
             SetWheelItemIcon(wheel: String, position: WheelItemPosition, icon: Icon),
             SetWheelItemColor(wheel: String, position: WheelItemPosition, red: Integer, green: Integer, blue: Integer, alpha: Integer),
             SetWheelItemAction(wheel: String, position: WheelItemPosition, bind: WheelBind, action: Action),
+            SetWheelItemAllActions(wheel: String, position: WheelItemPosition, action: Action),
             DestroyWheelItem(wheel: String, position: WheelItemPosition),
             SwitchWheel(wheel: String),
             SetWheelPinned(wheel: String, pinned: Boolean),
@@ -1361,24 +1363,6 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                             position,
                             icon: arg(&mut context)?,
                         },
-                        CommandVoid::SetWheelItemAction {
-                            wheel,
-                            position,
-                            bind: WheelBind::Ability1,
-                            action: arg(&mut context)?,
-                        },
-                        CommandVoid::SetWheelItemAction {
-                            wheel,
-                            position,
-                            bind: WheelBind::Ability2,
-                            action: arg(&mut context)?,
-                        },
-                        CommandVoid::SetWheelItemAction {
-                            wheel,
-                            position,
-                            bind: WheelBind::Ability3,
-                            action: arg(&mut context)?,
-                        },
                     ],
                 })
             }
@@ -1415,6 +1399,24 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     position: arg(&mut context)?,
                     bind: arg(&mut context)?,
                     action: arg(&mut context)?,
+                })
+            }
+            FunctionIdentifier::SetWheelItemAllActions => {
+                let wheel = wheel_id(&mut context)?;
+                let position = arg(&mut context)?;
+                let action = arg(&mut context)?;
+
+                Command::Void(CommandVoid::Multi {
+                    commands: WheelBind::VARIANTS
+                        .iter()
+                        .copied()
+                        .map(|bind| CommandVoid::SetWheelItemAction {
+                            wheel,
+                            position,
+                            bind,
+                            action,
+                        })
+                        .collect(),
                 })
             }
             FunctionIdentifier::DestroyWheelItem => Command::Void(CommandVoid::DestroyWheelItem {

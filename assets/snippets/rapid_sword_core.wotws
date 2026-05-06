@@ -61,10 +61,10 @@ fun create_wheel_item() {
 fun set_wheel_item_disable() {
     set_wheel_item_description("bonus_upgrade", Right, "[Ability1]Toggle off")
     set_wheel_item_color("bonus_upgrade", Right, 255, 255, 255, 255)
-    set_wheel_item_action("bonus_upgrade", Right, All, disable())
+    set_wheel_item_all_actions("bonus_upgrade", Right, disable())
 }
 fun set_wheel_item_enable() {
     set_wheel_item_description("bonus_upgrade", Right, "[Ability1]Toggle on")
     set_wheel_item_color("bonus_upgrade", Right, 128, 128, 128, 196)
-    set_wheel_item_action("bonus_upgrade", Right, All, enable())
+    set_wheel_item_all_actions("bonus_upgrade", Right, enable())
 }
