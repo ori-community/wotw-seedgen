@@ -41,7 +41,10 @@ fun update_bonus_wheel() {
     if get_boolean("any_collected") set_wheel_item_description("root", LeftTop, "[Ability1]Toggle all\n[Ability2]Open menu")
     if get_boolean("any_collected") == false set_wheel_item_description("root", LeftTop, "No Bonus Upgrades collected")
     any_enabled()
-    if get_boolean("any_enabled") set_wheel_item_icon("root", LeftTop, on_icon)
+    if get_boolean("any_enabled") {
+        set_wheel_item_icon("root", LeftTop, on_icon)
+        set_wheel_item_color("root", LeftTop, 255, 255, 255, 255)
+    }
     if get_boolean("any_enabled") == false {
         set_wheel_item_icon("root", LeftTop, off_icon)
         set_wheel_item_color("root", LeftTop, 128, 128, 128, 196)
@@ -52,6 +55,7 @@ fun update_bonus_wheel() {
 
 fun toggle_all() {
     any_enabled()
-    if get_boolean("any_enabled") disable_all()
-    if get_boolean("any_enabled") == false enable_all()
+    set_boolean("any_were_enabled", get_boolean("any_enabled"))
+    if get_boolean("any_were_enabled") disable_all()
+    if get_boolean("any_were_enabled") == false enable_all()
 }

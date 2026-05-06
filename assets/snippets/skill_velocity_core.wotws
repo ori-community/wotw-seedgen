@@ -59,8 +59,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", Top, "Toggle Skill Velocity")
-    set_wheel_item_icon("bonus_upgrade", Top, skill_velocity_icon)
+    set_wheel_item_name("bonus_upgrades", Top, "Toggle Skill Velocity")
+    set_wheel_item_icon("bonus_upgrades", Top, skill_velocity_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -69,12 +69,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", Top, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", Top, 255, 255, 255, 255)
-    set_wheel_item_all_actions("bonus_upgrade", Top, disable())
+    set_wheel_item_description("bonus_upgrades", Top, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrades", Top, 255, 255, 255, 255)
+    set_wheel_item_all_actions("bonus_upgrades", Top, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", Top, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", Top, 128, 128, 128, 196)
-    set_wheel_item_all_actions("bonus_upgrade", Top, enable())
+    set_wheel_item_description("bonus_upgrades", Top, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrades", Top, 128, 128, 128, 196)
+    set_wheel_item_all_actions("bonus_upgrades", Top, enable())
 }

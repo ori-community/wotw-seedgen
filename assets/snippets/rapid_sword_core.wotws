@@ -49,8 +49,8 @@ on reload {
 on collected == 1 create_wheel_item()
 
 fun create_wheel_item() {
-    set_wheel_item_name("bonus_upgrade", Right, "Toggle Rapid Sword")
-    set_wheel_item_icon("bonus_upgrade", Right, rapid_sword_icon)
+    set_wheel_item_name("bonus_upgrades", Right, "Toggle Rapid Sword")
+    set_wheel_item_icon("bonus_upgrades", Right, rapid_sword_icon)
     if enabled {
         set_wheel_item_disable()
     }
@@ -59,12 +59,12 @@ fun create_wheel_item() {
     }
 }
 fun set_wheel_item_disable() {
-    set_wheel_item_description("bonus_upgrade", Right, "[Ability1]Toggle off")
-    set_wheel_item_color("bonus_upgrade", Right, 255, 255, 255, 255)
-    set_wheel_item_all_actions("bonus_upgrade", Right, disable())
+    set_wheel_item_description("bonus_upgrades", Right, "[Ability1]Toggle off")
+    set_wheel_item_color("bonus_upgrades", Right, 255, 255, 255, 255)
+    set_wheel_item_all_actions("bonus_upgrades", Right, disable())
 }
 fun set_wheel_item_enable() {
-    set_wheel_item_description("bonus_upgrade", Right, "[Ability1]Toggle on")
-    set_wheel_item_color("bonus_upgrade", Right, 128, 128, 128, 196)
-    set_wheel_item_all_actions("bonus_upgrade", Right, enable())
+    set_wheel_item_description("bonus_upgrades", Right, "[Ability1]Toggle on")
+    set_wheel_item_color("bonus_upgrades", Right, 128, 128, 128, 196)
+    set_wheel_item_all_actions("bonus_upgrades", Right, enable())
 }
