@@ -171,9 +171,9 @@ impl Requirement {
             }
             // TODO currently this could change regenerate behaviour, but that's already a problem
             // and regenerate probably cannot be allowed between requirements anyway...
-            (Self::Damage(a_amount), Self::Damage(b_amount)) => {
-                remove_amount::<FRONT>(*a_amount, *b_amount, self, other, Self::Damage)
-            }
+            // (Self::Damage(a_amount), Self::Damage(b_amount)) => {
+            //     remove_amount::<FRONT>(*a_amount, *b_amount, self, other, Self::Damage)
+            // }
             (Self::Danger(a_amount), Self::Danger(b_amount)) => {
                 remove_amount::<FRONT>(*a_amount, *b_amount, self, other, Self::Danger)
             }
