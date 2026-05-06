@@ -246,7 +246,6 @@ on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut
 }
 // Enable the spoiler map on game finished
 // TODO: Move this to a separate snippet to allow for more customization?
-on spawn store(randoConfig.canManuallyEnableSpoilerFilter, true)
 on gameStateGroup.gameFinished {
     store(randoState.enableSpoilerFilter, true)
     store(player.currentMapFilter, 4)

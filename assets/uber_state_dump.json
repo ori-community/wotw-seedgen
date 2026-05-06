@@ -1132,13 +1132,6 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "40": {
-          "name": "canManuallyEnableSpoilerFilter",
-          "readonly": false,
-          "type": "SerializedBooleanUberState",
-          "value": 0.0,
-          "value_type": "Boolean"
-        },
         "100": {
           "name": "removeShriekEscapeSand",
           "readonly": false,
