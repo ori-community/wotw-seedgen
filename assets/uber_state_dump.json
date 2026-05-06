@@ -842,6 +842,13 @@
           "value": 14.0,
           "value_type": "Integer"
         },
+        "52": {
+          "name": "currentMapFilter",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
         "100": {
           "name": "isTeleporting",
           "readonly": true,
@@ -1120,6 +1127,13 @@
         },
         "36": {
           "name": "useEastWoodsTrunkSlowWalkZoneEnabledState",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "40": {
+          "name": "canManuallyEnableSpoilerFilter",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,

@@ -180,3 +180,10 @@ on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut
     if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
     if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)
 }
+// Enable the spoiler map on game finished
+// TODO: Move this to a separate snippet to allow for more customization?
+on gameStateGroup.gameFinished {
+    store(randoConfig.canManuallyEnableSpoilerFilter, true)
+    store(randoState.enableSpoilerFilter, true)
+    store(player.currentMapFilter, 4)
+}
