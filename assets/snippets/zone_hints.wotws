@@ -36,25 +36,25 @@ fun write_hints() {
     if get_integer("zone") == 3 {
         write_wellspring_hint()
     }
-    if get_integer("zone") == 7 {
+    if get_integer("zone") == 4 {
         write_woods_hint()
     }
-    if get_integer("zone") == 6 {
+    if get_integer("zone") == 5 {
         write_reach_hint()
     }
-    if get_integer("zone") == 8 {
+    if get_integer("zone") == 6 {
         write_depths_hint()
     }
-    if get_integer("zone") == 4 {
+    if get_integer("zone") == 7 {
         write_pools_hint()
     }
-    if get_integer("zone") == 9 {
+    if get_integer("zone") == 8 {
         write_wastes_hint()
     }
-    if get_integer("zone") == 11 {
+    if get_integer("zone") == 10 {
         write_willow_hint()
     }
-    if get_integer("zone") == 5 {
+    if get_integer("zone") == 11 {
         write_burrows_hint()
     }
     if get_string("zone_hint") != "" {

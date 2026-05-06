@@ -3,7 +3,6 @@ use strum::{Display, VariantArray};
 use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
-// TODO should this have a custom PartialOrd implementation?
 /// World zones as indicated on the map
 #[derive(
     Debug,
@@ -27,15 +26,15 @@ pub enum Zone {
     Hollow = 1,
     Glades = 2,
     Wellspring = 3,
-    Woods = 7,
-    Reach = 6,
-    Depths = 8,
-    Pools = 4,
-    Wastes = 9,
-    Ruins = 10,
-    Willow = 11,
-    Burrows = 5,
-    Spawn = 14,
+    Woods = 4,
+    Reach = 5,
+    Depths = 6,
+    Pools = 7,
+    Wastes = 8,
+    Ruins = 9,
+    Willow = 10,
+    Burrows = 11,
     Shop = 12,
     Void = 13,
+    Spawn = 14,
 }

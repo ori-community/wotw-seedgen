@@ -69,49 +69,49 @@ fun write_zone_pickup_progress() {
         set_integer("total", randoStats.pickupsTotalWellspring)
         write_pickups_progress()
     }
-    if get_integer("zone") == 7 {
+    if get_integer("zone") == 4 {
         set_string("zone", "Woods ")
         set_integer("collected", randoStats.pickupsCollectedWoods)
         set_integer("total", randoStats.pickupsTotalWoods)
         write_pickups_progress()
     }
-    if get_integer("zone") == 6 {
+    if get_integer("zone") == 5 {
         set_string("zone", "Reach ")
         set_integer("collected", randoStats.pickupsCollectedReach)
         set_integer("total", randoStats.pickupsTotalReach)
         write_pickups_progress()
     }
-    if get_integer("zone") == 8 {
+    if get_integer("zone") == 6 {
         set_string("zone", "Depths ")
         set_integer("collected", randoStats.pickupsCollectedDepths)
         set_integer("total", randoStats.pickupsTotalDepths)
         write_pickups_progress()
     }
-    if get_integer("zone") == 4 {
+    if get_integer("zone") == 7 {
         set_string("zone", "Pools ")
         set_integer("collected", randoStats.pickupsCollectedPools)
         set_integer("total", randoStats.pickupsTotalPools)
         write_pickups_progress()
     }
-    if get_integer("zone") == 9 {
+    if get_integer("zone") == 8 {
         set_string("zone", "Wastes ")
         set_integer("collected", randoStats.pickupsCollectedWastes)
         set_integer("total", randoStats.pickupsTotalWastes)
         write_pickups_progress()
     }
-    if get_integer("zone") == 10 {
+    if get_integer("zone") == 9 {
         set_string("zone", "Ruins ")
         set_integer("collected", randoStats.pickupsCollectedRuins)
         set_integer("total", randoStats.pickupsTotalRuins)
         write_pickups_progress()
     }
-    if get_integer("zone") == 11 {
+    if get_integer("zone") == 10 {
         set_string("zone", "Willow ")
         set_integer("collected", randoStats.pickupsCollectedWillow)
         set_integer("total", randoStats.pickupsTotalWillow)
         write_pickups_progress()
     }
-    if get_integer("zone") == 5 {
+    if get_integer("zone") == 11 {
         set_string("zone", "Burrows ")
         set_integer("collected", randoStats.pickupsCollectedBurrows)
         set_integer("total", randoStats.pickupsTotalBurrows)
