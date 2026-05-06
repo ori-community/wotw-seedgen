@@ -81,40 +81,21 @@ on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petr
 
 !augment_fun(on_change_wisp_count, if get_integer("wisp_count") >= 4 store(windtornRuinsGroup.openedDesertRuins, true))
 
-on hubUberStateGroup.gardenerProjectGrapplePlants > 0 update_tuley()
-on hubUberStateGroup.gardenerProjectGrass > 0 update_tuley()
-on hubUberStateGroup.gardenerProjectSpringPlants > 0 update_tuley()
-on hubUberStateGroup.gardenerProjectBashPlants > 0 update_tuley()
-on hubUberStateGroup.gardenerProjectFlowers > 0 update_tuley()
-on hubUberStateGroup.gardenerProjectTree > 0 update_tuley()
+on UpperDepths.LightcatcherSeed update_tuley()
+on UpperWastes.FlowersSeed update_tuley()
+on InnerWellspring.BlueMoonSeed update_tuley()
+on EastPools.GrassSeed update_tuley()
+on UpperReach.SpringSeed update_tuley()
+on WoodsEntry.TreeSeed update_tuley()
 on GladesTown.TuleySpawned update_tuley()
 
 fun update_tuley() {
     if GladesTown.TuleySpawned {
-        if hubUberStateGroup.gardenerProjectGrapplePlants == 1 { store(hubUberStateGroup.gardenerProjectGrapplePlants, 3) }
-        if hubUberStateGroup.gardenerProjectGrass == 1 { store(hubUberStateGroup.gardenerProjectGrass, 3) }
-        if hubUberStateGroup.gardenerProjectSpringPlants == 1 { store(hubUberStateGroup.gardenerProjectSpringPlants, 3) }
-        if hubUberStateGroup.gardenerProjectBashPlants == 1 { store(hubUberStateGroup.gardenerProjectBashPlants, 3) }
-        if hubUberStateGroup.gardenerProjectFlowers == 1 { store(hubUberStateGroup.gardenerProjectFlowers, 3) }
-        if hubUberStateGroup.gardenerProjectTree == 1 { store(hubUberStateGroup.gardenerProjectTree, 3) }
-        // Fix Regrow Quest triggers
-        if questUberStateGroup.regrowGladesQuest == 0 {
-            if TuleyShop.BlueMoon
-            || TuleyShop.StickyGrass
-            || TuleyShop.SpringPlants
-            || TuleyShop.Lightcatchers
-            || TuleyShop.SelaFlowers
-            || TuleyShop.LastTree {
-                store(questUberStateGroup.regrowGladesQuest, 1)
-            }
-        }
-        if TuleyShop.BlueMoon
-        && TuleyShop.StickyGrass
-        && TuleyShop.SpringPlants
-        && TuleyShop.Lightcatchers
-        && TuleyShop.SelaFlowers 
-        && TuleyShop.LastTree {
-            store(questUberStateGroup.regrowGladesQuest, 2)
-        }
+        store(tuleyShop.lightcatchers, UpperDepths.LightcatcherSeed == true)
+        store(tuleyShop.selaFlowers, UpperWastes.FlowersSeed == true)
+        store(tuleyShop.blueMoon, InnerWellspring.BlueMoonSeed == true)
+        store(tuleyShop.stickyGrass, EastPools.GrassSeed == true)
+        store(tuleyShop.springPlants, UpperReach.SpringSeed == true)
+        store(tuleyShop.lastTree, WoodsEntry.TreeSeed == true)
     }
 }

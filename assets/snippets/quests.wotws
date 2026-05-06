@@ -59,7 +59,7 @@ fun count_quests() {
     if OuterWellspring.TheLostCompass increment_quest_count()
     if MarshSpawn.MokkFangQuest increment_quest_count()
     if questUberStateGroup.familyReunionQuest >= 4 increment_quest_count()
-    if TuleyShop.LastTree increment_quest_count()
+    if GladesTown.LastTree increment_quest_count()
     if questUberStateGroup.desertCogQuest >= 5 increment_quest_count()
     if WindtornRuins.HandToHandComplete increment_quest_count()
     if GladesTown.MokiAcornQuest increment_quest_count()

@@ -1794,7 +1794,7 @@ fn any_shop_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
 fn ui_shop_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
     shop_identifier_arg(context, |kind| match kind {
         ShopKind::None => Err("Expected shop item state"),
-        ShopKind::Opherlike | ShopKind::Grom => Ok(()),
+        ShopKind::Opherlike | ShopKind::Grom | ShopKind::Tuley => Ok(()),
         ShopKind::Map => Err("Only price can be set for lupo maps"),
     })
 }

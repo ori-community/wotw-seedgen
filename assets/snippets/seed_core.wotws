@@ -68,7 +68,7 @@ on EastPools.TeleporterActive {
   store(lumaPoolsStateGroup.waterLowered, true)
 }
 
-// TODO fully support random grom shop and remove this
+// TODO fully support random grom and tuley shop and remove this
 on reload {
     set_shop_item_data(
         gromShop.repairTheSpiritWell,
@@ -119,7 +119,56 @@ on reload {
         "The Moki are right...building is only half the work. Nothing's quite complete without some #finishing touches# of decoration.",
         TheGorlekTouch,
     )
-    // TODO Tuley
+
+    set_shop_item_data(
+        tuleyShop.selaFlowers,
+        0,
+        "Wellspring Wildflowers",
+        "I could never quite get #Sela flowers# to prosper in my old garden. Perhaps they'll do better here?",
+        SelaFlowers,
+    )
+    set_shop_item_data(
+        tuleyShop.stickyGrass,
+        0,
+        "Sticky Situation",
+        "I'm not surprised you found this seed so far away. Feel how sticky it is! Grass seeds hitch rides on passers-by to find fresh soil.",
+        StickyGrass,
+    )
+    set_shop_item_data(
+        tuleyShop.lightcatchers,
+        0,
+        "Firemoth's Delight",
+        "With the days growing darker since the #Decay#, Lightcatchers are finding it harder to collect the light they need for their hanging bulbs.",
+        Lightcatchers,
+    )
+    set_shop_item_data(
+        tuleyShop.blueMoon,
+        0,
+        "Blue Moon",
+        "Unlike their cousins, the #Lightcatchers#, these hanging flowers draw energy from the light of the #moon#, not the sun.",
+        BlueMoon,
+    )
+    set_shop_item_data(
+        tuleyShop.springPlants,
+        0,
+        "Left Behind",
+        "I thought I saved every seed, but it seems one was left behind in the cold, and survived against all odds.",
+        SpringPlants,
+    )
+    set_shop_item_data(
+        tuleyShop.lastTree,
+        0,
+        "The Last Seed",
+        "I recognize this seed. It seems the tree I couldn't save is not completely gone.",
+        TheLastSeed,
+    )
+
+    set_shop_item_hidden(tuleyShop.lightcatchers, UpperDepths.LightcatcherSeed == false)
+    set_shop_item_hidden(tuleyShop.selaFlowers, UpperWastes.FlowersSeed == false)
+    set_shop_item_hidden(tuleyShop.blueMoon, InnerWellspring.BlueMoonSeed == false)
+    set_shop_item_hidden(tuleyShop.stickyGrass, EastPools.GrassSeed == false)
+    set_shop_item_hidden(tuleyShop.springPlants, UpperReach.SpringSeed == false)
+    set_shop_item_hidden(tuleyShop.lastTree, WoodsEntry.TreeSeed == false)
 }
 
 on gameStateGroup.gameFinished store(randoState.enableSpoilerFilter, true)
@@ -149,6 +198,20 @@ on gromShop.onwardsAndUpwards store(gladesProjects.housesCBuilt, true)
 on gromShop.thornySituation store(gladesProjects.removeThornsBuilt, true)
 on gromShop.clearTheCaveEntrance store(gladesProjects.openCaveBuilt, true)
 on gromShop.theGorlekTouch store(gladesProjects.beautifyBuilt, true)
+
+on tuleyShop.lightcatchers store(gladesProjects.lightcatchersPlanted, true)
+on tuleyShop.selaFlowers store(gladesProjects.selaFlowersPlanted, true)
+on tuleyShop.blueMoon store(gladesProjects.blueMoonPlanted, true)
+on tuleyShop.stickyGrass store(gladesProjects.stickyGrassPlanted, true)
+on tuleyShop.springPlants store(gladesProjects.springPlantsPlanted, true)
+on tuleyShop.lastTree store(gladesProjects.lastTreePlanted, true)
+
+on UpperDepths.LightcatcherSeed set_shop_item_hidden(tuleyShop.lightcatchers, false)
+on UpperWastes.FlowersSeed set_shop_item_hidden(tuleyShop.selaFlowers, false)
+on InnerWellspring.BlueMoonSeed set_shop_item_hidden(tuleyShop.blueMoon, false)
+on EastPools.GrassSeed set_shop_item_hidden(tuleyShop.stickyGrass, false)
+on UpperReach.SpringSeed set_shop_item_hidden(tuleyShop.springPlants, false)
+on WoodsEntry.TreeSeed set_shop_item_hidden(tuleyShop.lastTree, false)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.

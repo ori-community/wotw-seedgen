@@ -100,7 +100,7 @@ fn uber_identifier() {
 
 #[test]
 fn function_call() {
-    let source = "set(TuleyShop.BlueMoon, 3)";
+    let source = "set(WestHollow.TrialActivation, 2)";
     let expected = FunctionCall {
         identifier: Spanned {
             data: Identifier("set"),
@@ -116,27 +116,27 @@ fn function_call() {
                     Expression::Value(ExpressionValue::Literal(Spanned {
                         data: Literal::UberIdentifier(UberIdentifier::Name(UberIdentifierName {
                             group: Spanned {
-                                data: Identifier("TuleyShop"),
-                                span: 4..13,
+                                data: Identifier("WestHollow"),
+                                span: 4..14,
                             },
                             period: Symbol::<'.'>,
                             member: Recoverable::some(Spanned {
-                                data: Identifier("BlueMoon"),
-                                span: 14..22,
+                                data: Identifier("TrialActivation"),
+                                span: 15..30,
                             }),
                         })),
-                        span: 4..22,
+                        span: 4..30,
                     })),
                     Symbol::<','>,
                 )],
                 last: Some(Expression::Value(ExpressionValue::Literal(Spanned {
-                    data: Literal::Integer(3),
-                    span: 24..25,
+                    data: Literal::Integer(2),
+                    span: 32..33,
                 }))),
             }),
             close: SpannedOption::Some(Spanned {
                 data: Symbol::<')'>,
-                span: 25..26,
+                span: 33..34,
             }),
         },
     };

@@ -43,14 +43,14 @@ GladesTown.ClearThorns, 21, 18751,
 GladesTown.OnwardsAndUpwards, 21, 40448,
 GladesTown.RoofsOverHeads, 21, 23607,
 GladesTown.TuleySpawned, 6, 300,
+GladesTown.BlueMoon, 21, 33011,
+GladesTown.LastTree, 21, 40006,
+GladesTown.LastTreeBranchRejected, 14019, 59708, 2
+GladesTown.Lightcatchers, 21, 47651,
+GladesTown.SelaFlowers, 21, 16254,
+GladesTown.SpringPlants, 21, 38393,
+GladesTown.StickyGrass, 21, 64583,
 WestGlades.CombatShrineCompleted, 44310, 58796,
-TuleyShop.BlueMoon, 42178, 33011, 3
-TuleyShop.LastTree, 42178, 40006, 3
-TuleyShop.LastTreeBranchRejected, 14019, 59708, 2
-TuleyShop.Lightcatchers, 42178, 47651, 3
-TuleyShop.SelaFlowers, 42178, 16254, 3
-TuleyShop.SpringPlants, 42178, 38393, 3
-TuleyShop.StickyGrass, 42178, 64583, 3
 MidnightBurrows.TeleporterActive, 24922, 42531,
 MidnightBurrows.KeystoneDoor, 18793, 3171,
 MidnightBurrows.Lever, 24922, 16603,

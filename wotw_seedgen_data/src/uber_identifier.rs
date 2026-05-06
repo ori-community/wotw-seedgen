@@ -109,6 +109,7 @@ impl UberIdentifier {
                 group: 1 | 2 | 15, ..
             } => ShopKind::Opherlike,
             Self { group: 17, .. } => ShopKind::Grom,
+            Self { group: 20, .. } => ShopKind::Tuley,
             Self {
                 group: 48248,
                 member: 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045,
@@ -187,6 +188,8 @@ pub enum ShopKind {
     Map,
     /// Grom's Gorlek Ore shop
     Grom,
+    /// Tuley's shop where everything is free
+    Tuley,
 }
 
 /// A helper type to represent common [`UberIdentifier`]s

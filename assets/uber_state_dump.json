@@ -1243,6 +1243,48 @@
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
+        },
+        "510": {
+          "name": "lightcatchersPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "511": {
+          "name": "selaFlowersPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "512": {
+          "name": "blueMoonPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "513": {
+          "name": "stickyGrassPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "514": {
+          "name": "springPlantsPlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
+        "515": {
+          "name": "lastTreePlayCutscene",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         }
       }
     },
@@ -17957,9 +17999,9 @@
         "16254": {
           "name": "selaFlowers",
           "readonly": false,
-          "type": "SerializedIntUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "16255": {
           "name": "selaFlowersCost",
@@ -17968,19 +18010,12 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "16256": {
-          "name": "selaFlowersPlayCutscene",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "33011": {
           "name": "blueMoon",
           "readonly": false,
-          "type": "SerializedIntUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "33012": {
           "name": "blueMoonCost",
@@ -17989,19 +18024,12 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "33013": {
-          "name": "blueMoonPlayCutscene",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "38393": {
           "name": "springPlants",
           "readonly": false,
-          "type": "SerializedIntUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "38394": {
           "name": "springPlantsCost",
@@ -18010,19 +18038,12 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "38395": {
-          "name": "springPlantsPlayCutscene",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "40006": {
           "name": "lastTree",
           "readonly": false,
-          "type": "SerializedIntUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "40007": {
           "name": "lastTreeCost",
@@ -18031,19 +18052,12 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "40008": {
-          "name": "lastTreePlayCutscene",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "47651": {
           "name": "lightcatchers",
           "readonly": false,
-          "type": "SerializedIntUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "47652": {
           "name": "lightcatchersCost",
@@ -18052,29 +18066,15 @@
           "value": 0.0,
           "value_type": "Integer"
         },
-        "47653": {
-          "name": "lightcatchersPlayCutscene",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "64583": {
           "name": "stickyGrass",
           "readonly": false,
-          "type": "SerializedIntUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "64584": {
           "name": "stickyGrassCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "64585": {
-          "name": "stickyGrassPlayCutscene",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
