@@ -1799,7 +1799,7 @@ fn ui_shop_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
     })
 }
 
-const SPIRIT_LIGHT_NAMES: [(&str, &str); 87] = [
+const SPIRIT_LIGHT_NAMES: [(&str, &str); 88] = [
     ("Banana", "Bananas"),
     ("Bell", "Bells"),
     ("Bit", "Bits"),
@@ -1837,6 +1837,7 @@ const SPIRIT_LIGHT_NAMES: [(&str, &str); 87] = [
     ("Hryvnia", "Hryvnia"),
     ("Hug", "Hugs"),
     ("Kalganid", "Kalganids"),
+    ("Lauch", "Lauchs"),
     ("Leaf", "Leaves"),
     ("Like", "Likes"),
     ("Marble", "Marbles"),
