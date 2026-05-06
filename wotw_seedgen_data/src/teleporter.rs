@@ -138,4 +138,56 @@ impl Teleporter {
             _ => None,
         }
     }
+
+    /// Returns the [`UberIdentifier`] of the map segment this `Teleporter` is in
+    pub const fn map_segment(self) -> UberIdentifier {
+        match self {
+            Teleporter::Marsh => UberIdentifier::map_segment(12701),
+            Teleporter::Den => UberIdentifier::map_segment(14298),
+            Teleporter::Hollow => UberIdentifier::map_segment(25414),
+            Teleporter::Glades => UberIdentifier::map_segment(35176),
+            Teleporter::Wellspring => UberIdentifier::map_segment(45947),
+            Teleporter::Burrows => UberIdentifier::map_segment(54817),
+            Teleporter::WoodsEntrance => UberIdentifier::map_segment(67197),
+            Teleporter::WoodsExit => UberIdentifier::map_segment(67388),
+            Teleporter::Reach => UberIdentifier::map_segment(75735),
+            Teleporter::Depths => UberIdentifier::map_segment(95083),
+            Teleporter::CentralPools => UberIdentifier::map_segment(86073),
+            Teleporter::PoolsBoss => UberIdentifier::map_segment(86148),
+            Teleporter::FeedingGrounds => UberIdentifier::map_segment(66967),
+            Teleporter::CentralWastes => UberIdentifier::map_segment(116092),
+            Teleporter::OuterRuins => UberIdentifier::map_segment(116119),
+            Teleporter::InnerRuins => UberIdentifier::map_segment(135448),
+            Teleporter::Willow => UberIdentifier::map_segment(146124),
+            Teleporter::Shriek => UberIdentifier::map_segment(146432),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::assets::{AssetCacheValues, TEST_ASSETS};
+
+    use super::*;
+
+    #[test]
+    fn uber_identifiers() {
+        let uber_state_data = TEST_ASSETS.uber_state_data();
+
+        for teleporter in Teleporter::VARIANTS {
+            assert!(
+                uber_state_data
+                    .id_lookup
+                    .contains_key(&teleporter.uber_identifier()),
+                "invalid UberIdentifier for {teleporter}"
+            );
+
+            assert!(
+                uber_state_data
+                    .id_lookup
+                    .contains_key(&teleporter.map_segment()),
+                "invalid map segment UberIdentifier for {teleporter}"
+            );
+        }
+    }
 }

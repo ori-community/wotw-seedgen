@@ -25,6 +25,7 @@ const PLAYER_GROUP: i32 = 5;
 const RANDO_STATE_GROUP: i32 = 6;
 const RANDO_CONFIG_GROUP: i32 = 7;
 const MULTIWORLD_GROUP: i32 = 12;
+const MAP_SEGMENTS_GROUP: i32 = 22;
 const SKILLS_GROUP: i32 = 24;
 const SHARDS_GROUP: i32 = 25;
 const ENTRANCES_GROUP: i32 = 27;
@@ -49,6 +50,10 @@ impl UberIdentifier {
 
     pub const fn multiworld(member: i32) -> Self {
         Self::new(MULTIWORLD_GROUP, member)
+    }
+
+    pub const fn map_segment(member: i32) -> Self {
+        Self::new(MAP_SEGMENTS_GROUP, member)
     }
 
     pub const fn skills(member: i32) -> Self {

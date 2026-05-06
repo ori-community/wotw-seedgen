@@ -865,7 +865,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Void(CommandVoid::Multi {
                     commands: vec![
                         item_message(teleporter_string(teleporter, true)),
-                        // TODO remove map segment?
+                        store_boolean(teleporter.map_segment(), false),
                         store_boolean(teleporter.uber_identifier(), false),
                     ],
                 })
