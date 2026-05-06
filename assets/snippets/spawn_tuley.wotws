@@ -2,5 +2,4 @@
 #name("Spawn Tuley")
 #description("Tuley is always there in Glades")
 
-on spawn store(randoConfig.useSpawnTuleyRandoState, true)
 on spawn store(GladesTown.TuleySpawned, true)

@@ -26,6 +26,7 @@ on spawn {
     store(randoState.spawnOpherEverywhere, true)
     store(randoConfig.useSpawnTwillenEverywhereRandoState, true)
     store(randoState.spawnTwillenEverywhere, true)
+    store(randoConfig.useSpawnTuleyRandoState, true)
     // The flooded regen tree room cannot be used logically, so to improve logic intuition we always drain the room
     store(randoConfig.useRegenTreeDrainedRandoState, true)
     store(randoState.regenTreeDrained, true)
