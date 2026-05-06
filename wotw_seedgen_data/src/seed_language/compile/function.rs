@@ -1364,7 +1364,19 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                         CommandVoid::SetWheelItemAction {
                             wheel,
                             position,
-                            bind: WheelBind::All,
+                            bind: WheelBind::Ability1,
+                            action: arg(&mut context)?,
+                        },
+                        CommandVoid::SetWheelItemAction {
+                            wheel,
+                            position,
+                            bind: WheelBind::Ability2,
+                            action: arg(&mut context)?,
+                        },
+                        CommandVoid::SetWheelItemAction {
+                            wheel,
+                            position,
+                            bind: WheelBind::Ability3,
                             action: arg(&mut context)?,
                         },
                     ],

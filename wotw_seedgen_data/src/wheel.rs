@@ -53,8 +53,7 @@ pub enum WheelItemPosition {
 )]
 #[repr(u8)]
 pub enum WheelBind {
-    All = 0,
-    Ability1 = 1,
-    Ability2 = 2,
-    Ability3 = 3,
+    Ability1 = 0,
+    Ability2 = 1,
+    Ability3 = 2,
 }
