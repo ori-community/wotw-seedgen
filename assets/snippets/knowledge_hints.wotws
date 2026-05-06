@@ -53,22 +53,22 @@
 !if tp_logic_hints {
     // TODO adjust teleporter names
     // TODO interface the settings to check the difficulty
-    on LowerReach.TeleporterActive if skills.flap == false && is_in_box(-284, -3971, -223, -3945) == false
+    on LowerReach.TeleporterActive if skills.flap == false && mapSegments.segment75735 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Reach) + " won't be required until you find " + skill_string(Flap))
-    on UpperDepths.TeleporterActive if skills.glide == false && is_in_box(499, -4381, 561, -4335) == false
+    on UpperDepths.TeleporterActive if skills.glide == false && mapSegments.segment95083 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Depths) + " won't be required until you find " + skill_string(Glide))
-    on EastPools.TeleporterActive if randoState.cleanWater == false && is_in_box(-1334, -4160, -1280, -4121) == false
+    on EastPools.TeleporterActive if randoState.cleanWater == false && mapSegments.segment86073 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(CentralPools) + " won't be required until you find " + clean_water_string())
-    on WestPools.TeleporterActive if randoState.cleanWater == false && is_in_box(-1677, -4175, -1625, -4156) == false
+    on WestPools.TeleporterActive if randoState.cleanWater == false && mapSegments.segment86148 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(PoolsBoss) + " won't be required until you find " + clean_water_string() + " and " + skill_string(WaterDash))
-    on LowerWastes.CentralTeleporterActive if skills.burrow == false && is_in_box(1946, -3910, 2018, -3857) == false
+    on LowerWastes.CentralTeleporterActive if skills.burrow == false && mapSegments.segment116092 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(CentralWastes) + " won't be required until you find " + skill_string(Burrow))
-    on UpperWastes.TeleporterActive if skills.burrow == false && is_in_box(2013, -3690, 2067, -3658) == false
+    on UpperWastes.TeleporterActive if skills.burrow == false && mapSegments.segment116119 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(OuterRuins) + " won't be required until you find " + skill_string(Burrow))
-    on WindtornRuins.TeleporterActive if skills.burrow == false && is_in_box(2106, -4001, 2142, -3972) == false
+    on WindtornRuins.TeleporterActive if skills.burrow == false && mapSegments.segment135448 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(InnerRuins) + " won't be required until you find " + skill_string(Burrow))
-    on WillowsEnd.InnerTeleporterActive if skills.burrow == false && is_in_box(400, 3870, 447, -3847) == false
+    on WillowsEnd.InnerTeleporterActive if skills.burrow == false && mapSegments.segment146124 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Willow) + " won't be required until you find " + skill_string(Burrow))
-    on MidnightBurrows.TeleporterActive if skills.bash == false && is_in_box(-960, -4586, -920, -4564) == false
+    on MidnightBurrows.TeleporterActive if skills.bash == false && mapSegments.segment54817 < 2
         item_message("#Motay's Note#\nUsing the " + teleporter_string(Burrows) + " won't be required until you find " + skill_string(Bash))
 }
