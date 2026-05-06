@@ -129,7 +129,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
     ) -> CommandString {
         let target_world = &self.worlds[target_world_index];
 
-        let matches = target_world
+        let mut matches = target_world
             .output
             .events
             .iter()
@@ -139,15 +139,20 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                 origin_world_index,
                 target_world_index,
                 zone,
-            });
+            })
+            .collect::<Vec<_>>();
 
-        let message = matches.format(" or ").to_string();
-
-        if message.is_empty() {
-            "Unknown".into()
-        } else {
-            message.into()
+        if matches.is_empty() {
+            return "Unknown".into();
         }
+
+        matches.sort_unstable_by(|a, b| {
+            a.is_multiworld()
+                .cmp(&b.is_multiworld())
+                .then(a.zone.cmp(&b.zone))
+        });
+
+        matches.into_iter().join(" or ").into()
     }
 
     fn zone_of_trigger(
@@ -887,6 +892,12 @@ struct ZoneOfMatch {
     origin_world_index: usize,
     target_world_index: usize,
     zone: Zone,
+}
+
+impl ZoneOfMatch {
+    fn is_multiworld(&self) -> bool {
+        self.origin_world_index != self.target_world_index
+    }
 }
 
 impl Display for ZoneOfMatch {
