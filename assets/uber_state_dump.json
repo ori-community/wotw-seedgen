@@ -1167,6 +1167,13 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "300": {
+          "name": "enableDebugRenderer",
+          "readonly": false,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "301": {
           "name": "forceNoAirDecelerationFlag",
           "readonly": false,
