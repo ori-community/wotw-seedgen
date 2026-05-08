@@ -16510,15 +16510,15 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
 
   state WillowsEnd.CentralShortcut:  # Paths that can save energy by not going to WillowsEnd.InnerTP first
     unsafe, SentryBreak=20:  # https://discord.com/channels/116250700685508615/687990614884876289/1447678253581078629
-      AbilitySwap=7
+      AbilitySwap=7  # 1 to get to the wall the first time then 3 to reach it again from the tp
       SentryJump=2:
         GlideJump
         DoubleJump, TripleJump OR Dash
-        GrenadeJump, Damage=40
       Bash, Grenade=2:
         GlideJump
         DoubleJump, TripleJump OR Dash
-        GrenadeJump, Damage=40
+      Damage=40, GrenadeJump, SentryJump=2  # not in the condition because the ordering matter
+      Damage=40, GrenadeJump, Bash, Grenade=2
 
   conn WillowsEnd.InnerTP:  # Connection is free except for the CrystalMiner on the way
     moki: Combat=CrystalMiner OR Bash OR Launch
