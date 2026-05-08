@@ -16424,6 +16424,8 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   state WillowsEnd.CentralShortcut:  # The one-way wall above Lupo
     unsafe, SentryBreak=20:  # https://discord.com/channels/116250700685508615/687990614884876289/1447678253581078629
       Launch OR SentryJump=3 OR AbilitySwap=9 OR AerialHammerJump  # Accounting for 3 sentries
+      GrenadeJump, DoubleJump
+      Bash, Grenade=3  # https://youtu.be/SFuiqSx7QMU
 
   pickup WillowsEnd.LupoMap:
     moki: SpiritLight=50, DoubleJump OR Dash OR Launch OR Bow=1
@@ -16481,14 +16483,15 @@ anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
       Bash, Grenade=1, DoubleJump, TripleJump
       SentryJump=1, DoubleJump  # From the ledge at the portal. Use weapon to open it.
     kii, WillowsEnd.CentralShortcut:
-      Bash, Grenade=1, DoubleJump
+      Bash, Grenade=1, DoubleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
       # Glitched
       # SentryJump=1
       # AerialHammerJump, TripleJump
     unsafe, WillowsEnd.CentralShortcut:
-      Bash, Grenade=1  # Very precise when the portal shortcut is broken
+      Bash, Grenade=1  # https://youtu.be/SFuiqSx7QMU
+      SentryJump=1
       DoubleJump, WallHammerJump
-      GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump OR AbilitySwap=3
+      AerialHammerJump OR GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump OR AbilitySwap=3
 
 anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puzzle
   refill Checkpoint
@@ -16505,8 +16508,17 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
     unsafe:
       GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump OR GlideHammerJump
 
-  # TODO
-  # state WillowsEnd.CentralShortcut:  # Paths that can save energy by not going to WillowsEnd.InnerTP first
+  state WillowsEnd.CentralShortcut:  # Paths that can save energy by not going to WillowsEnd.InnerTP first
+    unsafe, SentryBreak=20:  # https://discord.com/channels/116250700685508615/687990614884876289/1447678253581078629
+      AbilitySwap=7
+      SentryJump=2:
+        GlideJump
+        DoubleJump, TripleJump OR Dash
+        GrenadeJump, Damage=40
+      Bash, Grenade=2:
+        GlideJump
+        DoubleJump, TripleJump OR Dash
+        GrenadeJump, Damage=40
 
   conn WillowsEnd.InnerTP:  # Connection is free except for the CrystalMiner on the way
     moki: Combat=CrystalMiner OR Bash OR Launch
@@ -16521,15 +16533,30 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
       #free  # reload to despawn the gorlek  # No longer works after the rando changes to spawn mechanics. The gorlek is always there now
   conn WillowsEnd.West:  # Check for redundancies by going to WillowsEnd.InnerTP or looping around the intended way. That connection is free aside from dealing with the miner in the way
     gorlek, WillowsEnd.CentralShortcut:
-      Combat=CrystalMiner, DoubleJump, Dash, TripleJump OR Hammer
+      DoubleJump, TripleJump, Combat=2xCrystalMiner OR Bash
+      DoubleJump, Dash, Hammer, Combat=2xCrystalMiner OR Bash
     kii, WillowsEnd.CentralShortcut:
-      Combat=CrystalMiner, DoubleJump, Dash, Sword OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Dash, Sword  # Sword solves combat requirement
+      Bash, DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Technically, this could use a variation where you fight one CrystalMiner and dboost through the other one
+      Combat=CrystalMiner, DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Combat=CrystalMiner
+      Damage=10, DoubleJump, Dash, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10
       DoubleJump, TripleJump  # Jump over the gorlek
       # Glitched
       # DoubleJump, GlideJump
+      # AerialHammerJump
+      # GrenadeJump=1, Damage=40, Sword OR Hammer  # sword/hammer solvec the combat requirement
+      # Bash, GrenadeJump=1, Damage=40, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Combat=CrystalMiner, Damage=40, GrenadeJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+      #   Combat=CrystalMiner
+      # Damage=50, GrenadeJump=1, Damage=40, GrenadeJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:  # Assuming you can't regen inbetween the miner dboost and the spike one
+      #   Damage=10
     unsafe, WillowsEnd.CentralShortcut:
       DoubleJump, Dash  # too tight for kii
       GlideJump
+      GrenadeJump, Damage=40
   conn WillowsEnd.East:
     moki:
       DoubleJump, Bash, Grenade=1, Dash OR Glide
