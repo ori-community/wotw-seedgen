@@ -208,6 +208,7 @@ fn test_compiler_with_config<'snippets, F: SnippetAccess>(
         snippet_access,
         &*UBER_STATE_DATA,
         config,
+        None,
         false,
     )
 }

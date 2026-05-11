@@ -234,6 +234,7 @@ impl Backend<Cache> {
                     &snippet_access,
                     &cache.uber_state_data,
                     Default::default(),
+                    None,
                     false,
                 );
 

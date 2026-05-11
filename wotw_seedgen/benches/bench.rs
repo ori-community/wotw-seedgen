@@ -76,6 +76,7 @@ fn snippets(c: &mut Criterion) {
                 &*TEST_ASSETS,
                 TEST_ASSETS.values.uber_state_data(),
                 FxHashMap::default(),
+                None,
                 false,
             );
 

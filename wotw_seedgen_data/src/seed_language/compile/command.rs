@@ -5,7 +5,7 @@ use crate::{
     assets::UberStateAlias,
     seed_language::{
         ast::{self, get_command_arg, UberStateType},
-        compile,
+        compile::{self, ids::IdMap},
         output::{
             CommandVoid, ContainedWrites, Event, ItemMetadataEntry, Literal, StringOrPlaceholder,
         },
@@ -409,9 +409,9 @@ impl<'source> Compile<'source> for ast::StateArgs<'source> {
         };
 
         let uber_identifier = match ty.data {
-            UberStateType::Boolean => boolean_uber_state(compiler, span),
-            UberStateType::Integer => integer_uber_state(compiler, span),
-            UberStateType::Float => float_uber_state(compiler, span),
+            UberStateType::Boolean => boolean_uber_state(compiler, self.identifier.data.0, span),
+            UberStateType::Integer => integer_uber_state(compiler, self.identifier.data.0, span),
+            UberStateType::Float => float_uber_state(compiler, self.identifier.data.0, span),
         };
 
         if let Some(uber_identifier) = compiler.consume_result(uber_identifier) {
@@ -430,13 +430,17 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        let toggle = boolean_uber_state(compiler, self.toggle_identifier.span);
+        let toggle = boolean_uber_state(
+            compiler,
+            self.toggle_identifier.data.0,
+            self.toggle_identifier.span,
+        );
         let toggle = compiler.consume_result(toggle);
 
         let Some(timer_identifier) = get_command_arg(self.timer_identifier) else {
             return;
         };
-        let timer = float_uber_state(compiler, timer_identifier.span);
+        let timer = float_uber_state(compiler, timer_identifier.data.0, timer_identifier.span);
         let timer = compiler.consume_result(timer);
 
         if let (Some(toggle), Some(timer)) = (toggle, timer) {
@@ -465,36 +469,60 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
     }
 }
 
-const INTEGERS: i32 = 100;
-const BOOLEANS: i32 = 100;
-const FLOATS: i32 = 25;
-
-fn boolean_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    uber_state(8, &mut compiler.global.boolean_state_id, BOOLEANS, span)
-}
-
-fn integer_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    uber_state(9, &mut compiler.global.integer_state_id, INTEGERS, span)
-}
-
-fn float_uber_state<S: Span>(compiler: &mut SnippetCompiler, span: S) -> Result<UberIdentifier> {
-    uber_state(10, &mut compiler.global.float_state_id, FLOATS, span)
-}
-
-fn uber_state<S: Span>(
-    group: i32,
-    id: &mut i32,
-    available: i32,
+fn boolean_uber_state<S: Span>(
+    compiler: &mut SnippetCompiler,
+    identifier: &str,
     span: S,
 ) -> Result<UberIdentifier> {
-    if *id < available {
-        let uber_identifier = UberIdentifier { group, member: *id };
+    uber_state::<8, 100>(
+        &mut compiler.global.ids.boolean_state,
+        &compiler.identifier,
+        identifier,
+        span,
+    )
+}
 
-        *id += 1;
+fn integer_uber_state<S: Span>(
+    compiler: &mut SnippetCompiler,
+    identifier: &str,
+    span: S,
+) -> Result<UberIdentifier> {
+    uber_state::<9, 100>(
+        &mut compiler.global.ids.integer_state,
+        &compiler.identifier,
+        identifier,
+        span,
+    )
+}
 
-        Ok(uber_identifier)
+fn float_uber_state<S: Span>(
+    compiler: &mut SnippetCompiler,
+    identifier: &str,
+    span: S,
+) -> Result<UberIdentifier> {
+    uber_state::<10, 25>(
+        &mut compiler.global.ids.float_state,
+        &compiler.identifier,
+        identifier,
+        span,
+    )
+}
+
+fn uber_state<const GROUP: i32, const AVAILABLE: usize>(
+    ids: &mut IdMap<0>,
+    snippet_identifier: &str,
+    state_identifier: &str,
+    span: impl Span,
+) -> Result<UberIdentifier> {
+    let id = ids.id(format!("{snippet_identifier}_{state_identifier}"));
+
+    if id < AVAILABLE {
+        Ok(UberIdentifier {
+            group: GROUP,
+            member: id as i32,
+        })
     } else {
-        Err(Error::error(format!("Only {available} UberStates of this type are available (What on earth are you doing?)"), span.span()))
+        Err(Error::error(format!("Only {AVAILABLE} UberStates of this type are available (What on earth are you doing?)"), span.span()))
     }
 }
 

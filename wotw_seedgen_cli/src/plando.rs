@@ -30,8 +30,8 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let path = assets::canonicalize(path)?;
 
-    let (root, entry) = if assets::metadata(&path)?.is_dir() {
-        (path.as_path(), "main")
+    let (root, entry, lockfile) = if assets::metadata(&path)?.is_dir() {
+        (path.as_path(), "main", path.join(".id_lock.json"))
     } else if path.extension() == Some(OsStr::new("wotws")) {
         let file_stem = path.file_stem().unwrap();
         let identifier = file_stem
@@ -40,7 +40,11 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
         let root = path.parent().unwrap();
 
-        (root, identifier)
+        (
+            root,
+            identifier,
+            path.with_file_name(format!(".{identifier}.id_lock.json")),
+        )
     } else {
         return Err(Error(format!(
             "\"{}\" is not a .wotws file or directory",
@@ -63,7 +67,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
 
-    let result = compile(&mut rng, &cache, entry, &out, debug);
+    let result = compile(&mut rng, &cache, entry, &out, lockfile.clone(), debug);
 
     if launch {
         launch_seed(&out)?;
@@ -87,14 +91,14 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
                     .paths
                     .iter()
                     .flat_map(fs::canonicalize)
-                    .all(|path| path == out)
+                    .all(|path| ignore_file_event(&path, &out))
             }) {
                 continue;
             }
 
             cache.update_from_watcher_event(&events)?;
 
-            if let Err(err) = compile(&mut rng, &cache, entry, &out, debug) {
+            if let Err(err) = compile(&mut rng, &cache, entry, &out, lockfile.clone(), debug) {
                 err.eprint();
             }
         }
@@ -110,6 +114,7 @@ fn compile(
     cache: &Cache,
     entry: &str,
     out: &Path,
+    lockfile: PathBuf,
     debug: bool,
 ) -> Result<(), Error> {
     let start = Instant::now();
@@ -119,6 +124,7 @@ fn compile(
         cache,
         &cache.uber_state_data,
         Default::default(),
+        Some(lockfile),
         debug,
     );
 
@@ -144,4 +150,8 @@ fn compile(
     );
 
     Ok(())
+}
+
+fn ignore_file_event(path: &Path, out: &Path) -> bool {
+    path.ends_with(".id_lock.json") || path == out
 }

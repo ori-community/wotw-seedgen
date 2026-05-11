@@ -4,6 +4,7 @@ mod evaluate;
 mod expression;
 mod function;
 mod helpers;
+mod ids;
 mod lint;
 mod literal;
 mod preprocess;
@@ -20,7 +21,7 @@ use crate::{
     assets::{SnippetAccess, UberStateData},
     seed_language::{
         ast::{self, Expression, Snippet, UberStateType},
-        compile,
+        compile::{self, ids::IdResolver},
         output::{IntermediateOutput, Literal, SnippetDebugOutput},
         types::{uber_state_type, InferType, Type},
     },
@@ -34,6 +35,7 @@ use std::{
     collections::hash_map::Entry,
     fmt::Debug,
     io::{self, Write},
+    path::PathBuf,
 };
 use wotw_seedgen_parse::{
     Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result, SeparatedNonEmpty,
@@ -169,17 +171,7 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
     pub exported_values: FxHashMap<String, FxHashMap<String, ExportedValue>>,
-    pub boolean_ids: IdProvider,
-    pub integer_ids: IdProvider,
-    pub float_ids: IdProvider,
-    pub string_ids: IdProvider,
-    pub boolean_state_id: i32,
-    pub integer_state_id: i32,
-    pub float_state_id: i32,
-    pub message_ids: IdProvider,
-    pub box_trigger_ids: IdProvider,
-    pub wheel_ids: IdProvider,
-    pub warp_icon_ids: IdProvider,
+    pub ids: IdResolver,
     // TODO could be a reference
     pub config: FxHashMap<String, FxHashMap<String, String>>,
 }
@@ -195,6 +187,7 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
         uber_state_data: &'uberstates UberStateData,
         snippet_access: &'snippets dyn SnippetAccess,
         config: FxHashMap<String, FxHashMap<String, String>>,
+        lockfile: Option<PathBuf>,
         debug: bool,
     ) -> Self {
         Self {
@@ -202,47 +195,8 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             uber_state_data,
             snippet_access,
             exported_values: Default::default(),
-            // 1 additional reserved for hardcoded calculations
-            boolean_ids: IdProvider::new(PRIVATE_MEMORY),
-            integer_ids: IdProvider::new(PRIVATE_MEMORY),
-            float_ids: IdProvider::new(PRIVATE_MEMORY),
-            string_ids: IdProvider::new(PRIVATE_MEMORY),
-            boolean_state_id: 0,
-            integer_state_id: 0,
-            float_state_id: 0,
-            message_ids: IdProvider::new(0),
-            box_trigger_ids: IdProvider::new(0),
-            wheel_ids: IdProvider {
-                offset: 0,
-                ids: FxHashMap::from_iter([("root".to_string(), 0)]),
-            },
-            warp_icon_ids: IdProvider::new(0),
+            ids: IdResolver::new(lockfile),
             config,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub(crate) struct IdProvider {
-    offset: usize,
-    ids: FxHashMap<String, usize>,
-}
-
-impl IdProvider {
-    pub fn new(offset: usize) -> Self {
-        Self {
-            offset,
-            ids: Default::default(),
-        }
-    }
-    pub fn id(&mut self, id: String) -> usize {
-        match self.ids.get(&id) {
-            None => {
-                let len = self.ids.len() + self.offset;
-                self.ids.insert(id, len);
-                len
-            }
-            Some(id) => *id,
         }
     }
 }
@@ -461,11 +415,18 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         // TODO use asset access instead?
         uber_state_data: &'uberstates UberStateData,
         config: FxHashMap<String, FxHashMap<String, String>>,
+        lockfile: Option<PathBuf>,
         debug: bool,
     ) -> Self {
         Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
-            global: GlobalCompilerData::new(uber_state_data, snippet_access, config, debug),
+            global: GlobalCompilerData::new(
+                uber_state_data,
+                snippet_access,
+                config,
+                lockfile,
+                debug,
+            ),
             compiled_snippets: Default::default(),
             errors: Default::default(),
         }

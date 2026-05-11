@@ -154,6 +154,7 @@ fn boxed_arg<T: CompileInto>(context: &mut ArgContext) -> Option<Box<T>> {
     arg(context).map(Box::new)
 }
 
+// TODO Cowify?
 fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usize>)> {
     let (arg, span) = spanned_arg::<CommandString>(context)?;
 
@@ -175,35 +176,35 @@ fn string_literal(context: &mut ArgContext) -> Option<String> {
 }
 
 fn boolean_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.boolean_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.boolean.id(id))
 }
 
 fn integer_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.integer_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.integer.id(id))
 }
 
 fn float_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.float_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.float.id(id))
 }
 
 fn string_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.string_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.string.id(id))
 }
 
 fn message_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.message_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.message.id(id))
 }
 
 fn box_trigger_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.box_trigger_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.box_trigger.id(id))
 }
 
 fn wheel_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.wheel_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.wheel.id(id))
 }
 
 fn warp_icon_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.warp_icon_ids.id(id))
+    string_literal(context).map(|id| context.compiler.global.ids.warp_icon.id(id))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, VariantArray)]
