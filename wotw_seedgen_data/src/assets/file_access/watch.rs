@@ -35,15 +35,16 @@ impl Watcher {
             sender: notify_debouncer_full::new_debouncer(timeout, None, tx)
                 .map_err(WatcherError::Build)?,
             receiver: rx.into_iter().filter_map(|res| match res {
-                Ok(events) => events
-                    .iter()
-                    .any(|event| {
+                Ok(mut events) => {
+                    events.retain(|event| {
                         matches!(
                             event.event.kind,
                             EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_)
                         )
-                    })
-                    .then_some(Ok(events)),
+                    });
+
+                    (!events.is_empty()).then_some(Ok(events))
+                }
                 Err(err) => Some(Err(WatcherError::Event(err))),
             }),
         })

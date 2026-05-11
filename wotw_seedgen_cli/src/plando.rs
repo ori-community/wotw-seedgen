@@ -83,16 +83,19 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         cache.watch(&mut watcher)?;
 
         for res in watcher {
-            let events = res?;
+            let mut events = res?;
 
-            if events.iter().all(|event| {
-                event
-                    .event
-                    .paths
-                    .iter()
-                    .flat_map(fs::canonicalize)
-                    .all(|path| ignore_file_event(&path, &out))
-            }) {
+            events.retain_mut(|event| {
+                event.event.paths.retain(|path| {
+                    fs::canonicalize(path)
+                        .ok()
+                        .is_some_and(|path| !ignore_file_event(&path, &out))
+                });
+
+                !event.event.paths.is_empty()
+            });
+
+            if events.is_empty() {
                 continue;
             }
 
