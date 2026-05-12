@@ -55,9 +55,13 @@ async fn apply(
 ) -> Result<Json<UniverseSettings>> {
     let cache = cache.read().await;
 
-    body.preset
-        .apply(&mut body.settings, &cache.base)
-        .map_err(Error::ApplyPreset)?;
+    for (index, preset) in body.presets.into_iter().enumerate() {
+        preset
+            .apply(&mut body.settings, &cache.base)
+            .map_err(|err| {
+                Error::ApplyPreset(format!("failed to apply preset at index {index}: {err}"))
+            })?;
+    }
 
     Ok(Json(body.settings))
 }
@@ -66,6 +70,6 @@ async fn apply(
 pub struct ApplyBody {
     /// Current settings
     pub settings: UniverseSettings,
-    /// Preset to apply
-    pub preset: UniversePreset,
+    /// Presets to apply
+    pub presets: Vec<UniversePreset>,
 }
