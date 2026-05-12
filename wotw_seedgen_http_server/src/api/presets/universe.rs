@@ -45,31 +45,51 @@ async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, Univer
     post,
     path = APPLY,
     responses(
-        (status = OK, body = UniverseSettings),
+        (status = OK, body = UniversePresetApplyBody),
         (status = UNPROCESSABLE_ENTITY, body = String),
     ),
 )]
 async fn apply(
     State(cache): State<RouterState>,
-    Json(mut body): Json<ApplyBody>,
+    Json(body): Json<UniversePresetApplyBody>,
 ) -> Result<Json<UniverseSettings>> {
     let cache = cache.read().await;
 
-    for (index, preset) in body.presets.into_iter().enumerate() {
-        preset
-            .apply(&mut body.settings, &cache.base)
-            .map_err(|err| {
-                Error::ApplyPreset(format!("failed to apply preset at index {index}: {err}"))
-            })?;
-    }
+    let mut settings = match body.settings {
+        UniversePresetApplyBodySettings::Full(full) => full.settings,
+        UniversePresetApplyBodySettings::Seed(seed) => UniverseSettings::new(seed.seed),
+    };
 
-    Ok(Json(body.settings))
+    for (index, preset) in body.presets.into_iter().enumerate() {
+        preset.apply(&mut settings, &cache.base).map_err(|err| {
+            Error::ApplyPreset(format!("failed to apply preset at index {index}: {err}"))
+        })?;
+    }
+    Ok(Json(settings))
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct ApplyBody {
+pub struct UniversePresetApplyBody {
     /// Current settings
-    pub settings: UniverseSettings,
+    #[serde(flatten)]
+    pub settings: UniversePresetApplyBodySettings,
     /// Presets to apply
     pub presets: Vec<UniversePreset>,
+}
+
+#[derive(Deserialize, ToSchema)]
+#[serde(untagged)]
+pub enum UniversePresetApplyBodySettings {
+    Full(UniversePresetApplyBodySettingsFull),
+    Seed(UniversePresetApplyBodySettingsSeed),
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct UniversePresetApplyBodySettingsFull {
+    pub settings: UniverseSettings,
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct UniversePresetApplyBodySettingsSeed {
+    pub seed: String,
 }
