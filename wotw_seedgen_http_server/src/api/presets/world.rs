@@ -59,7 +59,9 @@ async fn apply(
     let mut settings = body.settings.unwrap_or_default();
 
     for (index, preset) in body.presets.into_iter().enumerate() {
-        preset.apply(&mut settings, &cache.base).map_err(|err_string| Error::ApplyPreset(format!("preset at index {index}: {err_string}")))?
+        preset
+            .apply(&mut settings, &cache.base)
+            .map_err(|err| Error::ApplyPreset(format!("at index {index}: {err}")))?
     }
 
     Ok(Json(settings))
