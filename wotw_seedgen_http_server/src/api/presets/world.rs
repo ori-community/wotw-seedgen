@@ -52,7 +52,7 @@ async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, WorldP
 )]
 async fn apply(
     State(cache): State<RouterState>,
-    Json(body): Json<ApplyBody>,
+    Json(body): Json<WorldPresetApplyBody>,
 ) -> Result<Json<WorldSettings>> {
     let cache = cache.read().await;
 
@@ -66,7 +66,7 @@ async fn apply(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct ApplyBody {
+pub struct WorldPresetApplyBody {
     /// World settings to apply presets on.
     /// Omit to use default world settings.
     pub settings: Option<WorldSettings>,
