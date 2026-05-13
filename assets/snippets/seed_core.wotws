@@ -191,6 +191,18 @@ fun update_cave_unlocked() {
     set_shop_item_hidden(gromShop.clearTheCaveEntrance, gromShop.thornySituation == false)
 }
 
+fun check_rebuild_glades_completion() {
+  if gladesProjects.spiritWellBuilt &&
+     gladesProjects.housesABuilt &&
+     gladesProjects.housesBBuilt &&
+     gladesProjects.housesCBuilt &&
+     gladesProjects.removeThornsBuilt &&
+     gladesProjects.openCaveBuilt &&
+     gladesProjects.beautifyBuilt {
+     store(questUberStateGroup.rebuildGladesQuest, 2)
+   }
+}
+
 on gromShop.repairTheSpiritWell store(gladesProjects.spiritWellBuilt, true)
 on gromShop.dwellingRepairs store(gladesProjects.housesABuilt, true)
 on gromShop.roofsOverHeads store(gladesProjects.housesBBuilt, true)
@@ -199,12 +211,38 @@ on gromShop.thornySituation store(gladesProjects.removeThornsBuilt, true)
 on gromShop.clearTheCaveEntrance store(gladesProjects.openCaveBuilt, true)
 on gromShop.theGorlekTouch store(gladesProjects.beautifyBuilt, true)
 
+on gladesProjects.spiritWellBuilt check_rebuild_glades_completion()
+on gladesProjects.housesABuilt check_rebuild_glades_completion()
+on gladesProjects.housesBBuilt check_rebuild_glades_completion()
+on gladesProjects.housesCBuilt check_rebuild_glades_completion()
+on gladesProjects.removeThornsBuilt check_rebuild_glades_completion()
+on gladesProjects.openCaveBuilt check_rebuild_glades_completion()
+on gladesProjects.beautifyBuilt check_rebuild_glades_completion()
+
+fun check_regrow_glades_completion() {
+  if gladesProjects.lightcatchersPlanted &&
+     gladesProjects.selaFlowersPlanted &&
+     gladesProjects.blueMoonPlanted &&
+     gladesProjects.stickyGrassPlanted &&
+     gladesProjects.springPlantsPlanted &&
+     gladesProjects.lastTreePlanted {
+     store(questUberStateGroup.regrowGladesQuest, 2)
+   }
+}
+
 on tuleyShop.lightcatchers store(gladesProjects.lightcatchersPlanted, true)
 on tuleyShop.selaFlowers store(gladesProjects.selaFlowersPlanted, true)
 on tuleyShop.blueMoon store(gladesProjects.blueMoonPlanted, true)
 on tuleyShop.stickyGrass store(gladesProjects.stickyGrassPlanted, true)
 on tuleyShop.springPlants store(gladesProjects.springPlantsPlanted, true)
 on tuleyShop.lastTree store(gladesProjects.lastTreePlanted, true)
+
+on gladesProjects.lightcatchersPlanted check_regrow_glades_completion()
+on gladesProjects.selaFlowersPlanted check_regrow_glades_completion()
+on gladesProjects.blueMoonPlanted check_regrow_glades_completion()
+on gladesProjects.stickyGrassPlanted check_regrow_glades_completion()
+on gladesProjects.springPlantsPlanted check_regrow_glades_completion()
+on gladesProjects.lastTreePlanted check_regrow_glades_completion()
 
 on UpperDepths.LightcatcherSeed set_shop_item_hidden(tuleyShop.lightcatchers, false)
 on UpperWastes.FlowersSeed set_shop_item_hidden(tuleyShop.selaFlowers, false)
