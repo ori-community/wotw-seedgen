@@ -20,7 +20,7 @@
 
 !augment_fun(check_goals_completed, {
     count_quests()
-    if get_integer("count_quests") < max_quests set_boolean("goals_completed", false)
+    if get_integer("quest_count") < max_quests set_boolean("goals_completed", false)
 })
 
 on spawn store(itemTracker.questsRequired, max_quests)
@@ -45,7 +45,7 @@ on change questUberStateGroup.regrowGladesQuest on_change_quest_count()
 
 !augment_fun(write_goals_incomplete_message, {
     count_quests()
-    if get_integer("count_quests") < max_quests {
+    if get_integer("quest_count") < max_quests {
         set_string("color", "@")
         write_quests_message()
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("quest_message"))
