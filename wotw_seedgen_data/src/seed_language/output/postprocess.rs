@@ -462,13 +462,13 @@ impl<'locdata> LocDataTriggers<'locdata> {
 
     fn generate_message_origins(&self, events: &mut [Event]) {
         for event in events {
-            if let Some(map_position) = self
+            if let Some(pickup_position) = self
                 .get(&event.trigger)
-                .and_then(|entry| entry.map_position)
+                .and_then(|entry| entry.position)
             {
                 let set_position = CommandVoid::QueuedMessageScopedPickupPosition {
-                    x: map_position.x.into(),
-                    y: map_position.y.into(),
+                    x: pickup_position.x.into(),
+                    y: pickup_position.y.into(),
                 };
 
                 match &mut event.command {
