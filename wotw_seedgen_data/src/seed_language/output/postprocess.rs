@@ -133,7 +133,12 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             .output
             .events
             .iter()
-            .filter(|event| self.command_writes_any(&event.command, uber_identifiers))
+            .filter(|event| {
+                event
+                    .command
+                    .contained_write_identifiers()
+                    .any(|uber_identifier| uber_identifiers.contains(&uber_identifier))
+            })
             .filter_map(|event| self.zone_of_trigger(&event.trigger, target_world_index))
             .map(|(origin_world_index, zone)| ZoneOfMatch {
                 origin_world_index,
@@ -462,9 +467,7 @@ impl<'locdata> LocDataTriggers<'locdata> {
 
     fn generate_message_origins(&self, events: &mut [Event]) {
         for event in events {
-            if let Some(pickup_position) = self
-                .get(&event.trigger)
-                .and_then(|entry| entry.position)
+            if let Some(pickup_position) = self.get(&event.trigger).and_then(|entry| entry.position)
             {
                 let set_position = CommandVoid::QueuedMessageScopedPickupPosition {
                     x: pickup_position.x.into(),
