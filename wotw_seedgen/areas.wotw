@@ -16029,7 +16029,6 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
     kii, WillowsEnd.GrappleWheelsHeart:
       Bash, Grenade=2, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2  # Go to the floating platform below the heart with bashnade + condition
     unsafe, WillowsEnd.GrappleWheelsHeart:
-      Bash, Grenade=2  # Looks wrong? 3 grenade would work but is redundant with going to the floating platform first
       SwordSJump=2  # Over the platform and hover to the left platform
   conn WillowsEnd.InnerTP:  # Paths skipping WillowsEnd.EntryFloatingPlatform to save energy. Be careful with redundancies Entry->EntryFloatingPlatform->InnerTP
     #kii:
@@ -16412,7 +16411,8 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Grapple, Glide  # look up to grapple to the top wheel
       # DoubleJump, Damage=40, Glide  # Redundant with ->Entry->EntryFloatingPlatform in unsafe
       Grapple, DoubleJump, TripleJump, Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Grapple, Dash, DoubleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Reset dash into ceiling
+      # Grapple, Dash, DoubleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Reset dash into ceiling
+      Grapple, Dash  # Reset dash into ceiling twice
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
@@ -16547,7 +16547,7 @@ anchor WillowsEnd.AboveInnerTP at 530, -3844:  # at the lava pit before bash puz
       # Glitched
       # DoubleJump, GlideJump
       # AerialHammerJump
-      # GrenadeJump=1, Damage=40, Sword OR Hammer  # sword/hammer solvec the combat requirement
+      # GrenadeJump=1, Damage=40, Sword OR Hammer  # sword/hammer solves the combat requirement
       # Bash, GrenadeJump=1, Damage=40, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # Combat=CrystalMiner, Damage=40, GrenadeJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
       #   Combat=CrystalMiner
