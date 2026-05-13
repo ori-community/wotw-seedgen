@@ -8,9 +8,9 @@
 !include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
 
 !augment_fun(any_collected, if collected > 0 set_boolean("any_collected", true))
-!augment_fun(any_enabled, if enabled set_boolean("any_enabled", true))
-!augment_fun(enable_all, if enabled == false enable())
-!augment_fun(disable_all, if enabled disable())
+!augment_fun(any_enabled, if collected > 0 && enabled set_boolean("any_enabled", true))
+!augment_fun(enable_all, if enabled == false store(enabled, true))
+!augment_fun(disable_all, if enabled store(enabled, false))
 
 !builtin_icon(skill_velocity_icon, "icons/bonus/skillvelocity.png")
 
@@ -28,8 +28,9 @@ fun skill_velocity() {
     BonusItem
 )
 
-fun enable() {
-    store(enabled, true)
+on spawn store(enabled, true)
+
+on enabled && collected > 0 {
     set_wheel_item_disable()
     update_bonus_wheel()
     store(randoUpgrades.launchSpeedMultiplier, 1 + collected * 0.16)
@@ -39,8 +40,8 @@ fun enable() {
     store(randoUpgrades.waterDashSpeedMultiplier, 1 + collected * 0.16)
     store(randoUpgrades.grappleSpeedMultiplier, 1 + collected * 0.16)
 }
-fun disable() {
-    store(enabled, false)
+
+on enabled == false && collected > 0 {
     set_wheel_item_enable()
     update_bonus_wheel()
     store(randoUpgrades.launchSpeedMultiplier, 1)
@@ -51,30 +52,25 @@ fun disable() {
     store(randoUpgrades.grappleSpeedMultiplier, 1)
 }
 
-on reload {
-    if collected > 0 {
-        create_wheel_item()
-    }
+on reload if collected > 0 {
+    create_wheel_item()
+    if enabled set_wheel_item_disable()
+    if enabled == false set_wheel_item_enable()
 }
-on collected == 1 create_wheel_item()
+on collected > 0 create_wheel_item()
 
 fun create_wheel_item() {
     set_wheel_item_name("bonus_upgrades", Top, "Toggle Skill Velocity")
     set_wheel_item_icon("bonus_upgrades", Top, skill_velocity_icon)
-    if enabled {
-        set_wheel_item_disable()
-    }
-    if enabled == false {
-        set_wheel_item_enable()
-    }
+    set_wheel_item_all_actions("bonus_upgrades", Top, store(enabled, enabled == false))
 }
+
 fun set_wheel_item_disable() {
     set_wheel_item_description("bonus_upgrades", Top, "[Ability1]Toggle off")
     set_wheel_item_color("bonus_upgrades", Top, 255, 255, 255, 255)
-    set_wheel_item_all_actions("bonus_upgrades", Top, disable())
 }
+
 fun set_wheel_item_enable() {
     set_wheel_item_description("bonus_upgrades", Top, "[Ability1]Toggle on")
     set_wheel_item_color("bonus_upgrades", Top, 128, 128, 128, 196)
-    set_wheel_item_all_actions("bonus_upgrades", Top, enable())
 }
