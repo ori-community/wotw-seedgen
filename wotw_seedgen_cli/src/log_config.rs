@@ -4,8 +4,12 @@ use std::{
 };
 
 use fern::{colors::ColoredLevelConfig, Dispatch};
-use log::LevelFilter;
-use wotw_seedgen::data::assets::{self, LOG_DATA_DIR};
+use log::{LevelFilter, Metadata};
+use wotw_seedgen::data::{
+    assets::{self, LOG_DATA_DIR},
+    seed_language::simulate::UBER_STATES_TARGET_PREFIX,
+    UberIdentifier,
+};
 
 use crate::{
     cli::{VerboseArgs, VerboseTarget},
@@ -22,6 +26,7 @@ pub struct LogConfig {
     trace_weight: LevelFilter,
     trace_entrances: LevelFilter,
     trace_optimize_graph: LevelFilter,
+    trace_uber_states: Option<Vec<UberIdentifier>>,
 }
 
 const PLACEMENT_MOD: &str = "wotw_seedgen::generator::placement";
@@ -44,6 +49,7 @@ impl Default for LogConfig {
             trace_weight: LevelFilter::Info,
             trace_entrances: LevelFilter::Info,
             trace_optimize_graph: LevelFilter::Info,
+            trace_uber_states: None,
         }
     }
 }
@@ -80,9 +86,14 @@ impl IndexMut<VerboseTarget> for LogConfig {
 
 impl LogConfig {
     pub fn from_args(args: VerboseArgs) -> Self {
+        let VerboseArgs {
+            verbose,
+            trace_uber_states,
+        } = args;
+
         let mut config = Self::default();
 
-        if let Some(targets) = args.verbose {
+        if let Some(targets) = verbose {
             config.trace_seedgen = true;
 
             if targets.is_empty() {
@@ -92,6 +103,8 @@ impl LogConfig {
                     config[target] = LevelFilter::Trace;
                 }
             }
+
+            config.trace_uber_states = trace_uber_states;
         }
 
         config
@@ -118,31 +131,66 @@ impl LogConfig {
             trace_weight,
             trace_entrances,
             trace_optimize_graph,
+            trace_uber_states,
         } = self;
 
         if trace_seedgen {
             assets::create_dir_all(&*LOG_DATA_DIR)?;
 
-            dispatch = dispatch.chain(
-                Dispatch::new()
-                    .format(move |out, message, record| {
-                        out.finish(format_args!("{:<7}{}", record.level(), message))
-                    })
-                    .level_for(PLACEMENT_MOD, trace_placement)
-                    .level_for(ITEM_POOL_MOD, trace_placement)
-                    .level_for(REACHED_MOD, trace_reached)
-                    .level_for(IS_MET_MOD, trace_is_met)
-                    .level_for(SOLUTIONS_MOD, trace_solutions)
-                    .level_for(WEIGHT_MOD, trace_weight)
-                    .level_for(ENTRANCES_MOD, trace_entrances)
-                    .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
-                    .level_for("perf_counters", LevelFilter::Off)
-                    .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?),
-            )
+            let mut file_dispatch = Dispatch::new()
+                .format(|out, message, record| {
+                    out.finish(format_args!("{:<7}{}", record.level(), message))
+                })
+                .level_for(PLACEMENT_MOD, trace_placement)
+                .level_for(ITEM_POOL_MOD, trace_placement)
+                .level_for(REACHED_MOD, trace_reached)
+                .level_for(IS_MET_MOD, trace_is_met)
+                .level_for(SOLUTIONS_MOD, trace_solutions)
+                .level_for(WEIGHT_MOD, trace_weight)
+                .level_for(ENTRANCES_MOD, trace_entrances)
+                .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
+                .level_for("perf_counters", LevelFilter::Off)
+                .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?);
+
+            match trace_uber_states {
+                None => {
+                    file_dispatch =
+                        file_dispatch.filter(|metadata| !uber_states_level_filter(metadata))
+                }
+                Some(uber_states) if uber_states.is_empty() => {
+                    file_dispatch = file_dispatch.filter(uber_states_level_filter)
+                }
+                Some(uber_states) => {
+                    let filter = FilterUberStates { uber_states };
+                    file_dispatch = file_dispatch.filter(move |metadata| filter.filter(metadata))
+                }
+            }
+
+            dispatch = dispatch.chain(file_dispatch);
         }
 
         dispatch.apply()?;
 
         Ok(())
     }
+}
+
+struct FilterUberStates {
+    uber_states: Vec<UberIdentifier>,
+}
+
+impl FilterUberStates {
+    fn filter(&self, metadata: &Metadata) -> bool {
+        let Some(uber_identifier) = metadata.target().strip_prefix(UBER_STATES_TARGET_PREFIX)
+        else {
+            return true;
+        };
+
+        let uber_identifier = uber_identifier.parse().unwrap();
+        self.uber_states.contains(&uber_identifier)
+    }
+}
+
+fn uber_states_level_filter(metadata: &Metadata) -> bool {
+    metadata.target().starts_with(UBER_STATES_TARGET_PREFIX)
 }

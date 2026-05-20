@@ -6,8 +6,10 @@ use crate::{
     },
     UberIdentifier,
 };
-use log::warn;
+use log::{trace, warn};
 use rustc_hash::FxHashMap;
+
+pub const UBER_STATES_TARGET_PREFIX: &str = "uber_states ";
 
 #[derive(Debug, Clone)]
 pub struct UberStates {
@@ -60,6 +62,13 @@ impl UberStates {
                     if let Some(snapshot) = &mut self.snapshot {
                         snapshot.entry(uber_identifier).or_insert(entry.value);
                     }
+
+                    trace!(
+                        target: format!("{UBER_STATES_TARGET_PREFIX}{uber_identifier}").as_str(),
+                        "{uber_identifier} set {old} -> {new}",
+                        old = entry.value,
+                        new = value,
+                    );
 
                     // TODO type check maybe?
                     entry.value = value;

@@ -12,7 +12,7 @@ pub use cache::SimulationCache;
 pub use condition_values::ConditionValues;
 pub use simulation::Simulation;
 pub use snapshot::{CloneSnapshot, Snapshot};
-pub use uber_states::UberStates;
+pub use uber_states::{UberStates, UBER_STATES_TARGET_PREFIX};
 pub use variables::Variables;
 pub use world_state::WorldState;
 

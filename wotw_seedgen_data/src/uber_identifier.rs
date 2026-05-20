@@ -1,9 +1,12 @@
 use std::{
     borrow::Cow,
     fmt::{self, Debug, Display},
+    num::ParseIntError,
+    str::FromStr,
 };
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use thiserror::Error;
 use utoipa::{
     openapi::{schema::ArrayItems, ArrayBuilder, RefOr, Schema},
     PartialSchema, ToSchema,
@@ -168,6 +171,39 @@ impl<'de> Deserialize<'de> for UberIdentifier {
     {
         <(i32, i32)>::deserialize(deserializer).map(|(group, member)| Self { group, member })
     }
+}
+
+impl FromStr for UberIdentifier {
+    type Err = ParseUberIdentifierError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        fn parse_part(
+            part: &str,
+            error: fn(String, ParseIntError) -> ParseUberIdentifierError,
+        ) -> Result<i32, ParseUberIdentifierError> {
+            let part = part.trim();
+            part.parse().map_err(|err| error(part.to_string(), err))
+        }
+
+        let (group, member) = s
+            .split_once('|')
+            .ok_or(ParseUberIdentifierError::InvalidFormat)?;
+
+        Ok(Self {
+            group: parse_part(group, ParseUberIdentifierError::InvalidGroup)?,
+            member: parse_part(member, ParseUberIdentifierError::InvalidMember)?,
+        })
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum ParseUberIdentifierError {
+    #[error("invalid format")]
+    InvalidFormat,
+    #[error("invalid group {0}: {1}")]
+    InvalidGroup(String, ParseIntError),
+    #[error("invalid member {0}: {1}")]
+    InvalidMember(String, ParseIntError),
 }
 
 impl PartialSchema for UberIdentifier {
