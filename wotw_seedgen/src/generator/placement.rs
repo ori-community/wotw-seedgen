@@ -904,6 +904,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     "{}Failed to preplace {name} in {zone} since no free placement location was available",
                     self.log_index
                 );
+
+                continue;
             }
 
             // We prefer generating indices over shuffling the nodes because usually there aren't many zone preplacements (relics)
