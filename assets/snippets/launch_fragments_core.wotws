@@ -35,7 +35,7 @@ fun launch_fragment() {
     launch_fragment(),
     "*Launch Fragment*",
     200,
-    "Collect " + required + " *Launch Fragments* to get " + skill_string(Launch),
+    "Collect *Launch Fragments* to get " + skill_string(Launch),
     launch_fragment_icon,
     LaunchFragment
 )
