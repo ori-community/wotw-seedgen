@@ -231,7 +231,10 @@ impl ItemPool {
     }
 
     fn log_find_remove_failed(&self, item: &CommandVoid) {
-        warn!("Attempted to remove {item} from the item pool, but it didn't exist");
+        warn!(
+            "Attempted to remove {item} from the item pool, but it didn't exist",
+            item = item.log_display()
+        );
         trace!("Current item pool: {self}");
     }
 
