@@ -621,7 +621,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
             // and have to recalculate it
             let origin_world_index = world_indices
                 .iter()
-                .find(|index| !self.worlds[**index].reached_needs_placement.is_empty())
+                .find(|index| self.worlds[**index].non_spawn_progression_slots() > 0)
                 .copied()
                 .or_else(|| {
                     world_indices
@@ -1008,25 +1008,32 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         self.placeholders.extend(placeholders);
         self.placeholders.shuffle(&mut self.rng);
 
-        trace!(
-            "{log_index}Keeping {amount} placeholders: {placeholders}",
-            log_index = self.log_index,
-            amount = self.placeholders.len(),
-            placeholders = format_pickups(&self.placeholders),
-        );
-
-        mem::take(&mut self.reached_needs_placement)
+        let needs_placement = mem::take(&mut self.reached_needs_placement)
             .into_iter()
             .map(|index| self.needs_placement[index])
             .chain(released_placeholders)
-            .collect()
+            .collect::<Vec<_>>();
+
+        trace!(
+            "{log_index}Keeping {amount}/{total} placeholders: {placeholders}",
+            log_index = self.log_index,
+            amount = self.placeholders.len(),
+            total = self.placeholders.len() + needs_placement.len(),
+            placeholders = format_pickups(&self.placeholders),
+        );
+
+        needs_placement
     }
 
     fn progression_slots(&self) -> usize {
+        self.non_spawn_progression_slots() + self.spawn_slots
+    }
+
+    fn non_spawn_progression_slots(&self) -> usize {
         usize::min(
             self.reached_needs_placement.len() + self.placeholders.len(),
             self.placements_remaining() - self.spirit_light_placements_remaining,
-        ) + self.spawn_slots
+        )
     }
 
     fn spirit_light_progression_slots(&self) -> usize {
@@ -1145,7 +1152,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 .map(|(index, _)| index)
                 .choose(&mut self.rng) // TODO shuffle instead?
         } else {
-            (!self.reached_needs_placement.is_empty())
+            (!self.reached_needs_placement.is_empty()
+                && self.placements_remaining() > self.spirit_light_placements_remaining)
                 .then(|| self.rng.gen_range(0..self.reached_needs_placement.len()))
         }
         .map(|index| {
