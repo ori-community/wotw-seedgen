@@ -2,7 +2,9 @@
 #name("Spawn with Sword")
 #description("Start the seed with Sword as a weapon")
 
+!remove_item(skill(Sword), 1)
+
 on spawn {
-    store(skills.sword, true)
+    skill(Sword)
     equip(Ability1, Sword)
 }
