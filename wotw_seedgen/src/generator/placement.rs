@@ -919,7 +919,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     fn hi_torin(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
-        self.spirit_light_placements_remaining -= 1;
         let command = compile::spirit_light(1.into(), &mut self.rng);
 
         if self.needs_placement.is_empty() {
@@ -929,7 +928,16 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                 "{}Failed to preplace {name} since no free placement location was available",
                 self.log_index
             );
+        } else if self.spirit_light_placements_remaining == 0 {
+            let name = self.log_name(&command);
+
+            warn!(
+                "{}Failed to preplace {name} since no spirit light placement location was available",
+                self.log_index
+            );
         } else {
+            self.spirit_light_placements_remaining -= 1;
+
             let pickup = self
                 .needs_placement
                 .swap_remove(self.rng.gen_range(0..self.needs_placement.len()));
