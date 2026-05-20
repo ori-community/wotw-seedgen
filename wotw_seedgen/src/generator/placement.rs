@@ -176,19 +176,29 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         let mut total_spirit_light_placements = usize::max(
             total_needs_placement.saturating_sub(total_item_count),
             worlds.len(),
-        );
+        ) as f32;
+        let mut total_needs_placement = total_needs_placement as f32;
 
-        let worlds_remaining = (1..worlds.len() + 1).rev();
-        for (world, worlds_remaining) in worlds.iter_mut().zip(worlds_remaining) {
+        for world in &mut worlds {
+            let needs_placement = world.needs_placement.len() as f32;
             let spirit_light_placements =
-                (total_spirit_light_placements as f32 / worlds_remaining as f32).round() as usize;
-            total_spirit_light_placements -= spirit_light_placements;
+                (total_spirit_light_placements * (needs_placement / total_needs_placement)).round();
 
-            world.spirit_light_placements_remaining = spirit_light_placements;
+            total_spirit_light_placements -= spirit_light_placements;
+            total_needs_placement -= needs_placement;
+
+            trace!(
+                "{log_index}Assigned {spirit_light_placements}/{needs_placement} placements for spirit light",
+                log_index = world.log_index,
+            );
+
+            debug_assert!(spirit_light_placements <= needs_placement);
+
+            world.spirit_light_placements_remaining = spirit_light_placements as usize;
             // TODO how should !add_item(spirit_light(100)) behave?
             world
                 .spirit_light_provider
-                .init(TOTAL_SPIRIT_LIGHT, spirit_light_placements);
+                .init(TOTAL_SPIRIT_LIGHT, world.spirit_light_placements_remaining);
         }
 
         let ordering_distribution = OrderingDistribution::new(rng);
