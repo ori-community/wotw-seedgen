@@ -360,6 +360,31 @@ impl<'graph> World<'graph, '_> {
         self.reached_pickups().count()
     }
 
+    pub fn reached_ks_cost(&self) -> usize {
+        let mut keystone_cost = 0;
+
+        for state in self.reached_nodes().filter_map(Node::try_as_state_ref) {
+            match state.identifier.as_str() {
+                // TODO derive from logic? Also maybe don't recompute all the time?
+                "MarshSpawn.KeystoneDoor" => keystone_cost += 2,
+                "HowlsDen.KeystoneDoor" => keystone_cost += 2,
+                "MarshPastOpher.EyestoneDoor" => keystone_cost += 2,
+                "MidnightBurrows.KeystoneDoor" => keystone_cost += 4,
+                "WoodsEntry.KeystoneDoor" => keystone_cost += 2,
+                "WoodsMain.KeystoneDoor" => keystone_cost += 4,
+                "LowerReach.KeystoneDoor" => keystone_cost += 4,
+                "UpperReach.KeystoneDoor" => keystone_cost += 4,
+                "UpperDepths.EntryKeystoneDoor" => keystone_cost += 2,
+                "UpperDepths.CentralKeystoneDoor" => keystone_cost += 2,
+                "UpperPools.KeystoneDoor" => keystone_cost += 4,
+                "UpperWastes.KeystoneDoor" => keystone_cost += 2,
+                _ => {}
+            }
+        }
+
+        keystone_cost
+    }
+
     #[inline]
     pub fn has_reached(&self, index: usize) -> bool {
         self.reach.state.best_orbs.contains_key(&index)

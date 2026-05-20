@@ -41,20 +41,6 @@ use wotw_seedgen_data::{
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
-const KEYSTONE_ENTRANCES: &[(&str, usize)] = &[
-    ("MarshSpawn.KeystoneDoor", 2),
-    ("HowlsDen.KeystoneDoor", 2),
-    ("MarshPastOpher.EyestoneDoor", 2),
-    ("MidnightBurrows.KeystoneDoor", 4),
-    ("WoodsEntry.KeystoneDoor", 2),
-    ("WoodsMain.KeystoneDoor", 4),
-    ("LowerReach.KeystoneDoor", 4),
-    ("UpperReach.KeystoneDoor", 4),
-    ("UpperDepths.EntryKeystoneDoor", 2),
-    ("UpperDepths.CentralKeystoneDoor", 2),
-    ("UpperPools.KeystoneDoor", 4),
-    ("UpperWastes.KeystoneDoor", 2),
-];
 pub(super) const SPAWN_SLOTS: usize = 7;
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
 const TOTAL_SPIRIT_LIGHT: i32 = 20000;
@@ -132,6 +118,8 @@ pub struct WorldContext<'graph, 'settings> {
     needs_placement: Vec<&'graph LocDataEntry>,
     /// initial length of needs_placement
     total_pickups: f32,
+    /// cost of ks doors already opened on spawn, which will be ignored for forced keystones
+    initial_ks_cost: usize,
     /// how many pickups should be assigned spirit light placements
     spirit_light_placements_remaining: usize,
     /// pickups which have been reached but explicitely haven't been assigned a placement yet to leave space for later progressions
@@ -346,17 +334,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 continue;
             }
 
-            let required_keystones = KEYSTONE_ENTRANCES
-                .iter()
-                .filter_map(|(identifier, amount)| {
-                    world_context
-                        .world
-                        .reached_nodes()
-                        .filter_map(Node::try_as_state_ref)
-                        .any(|state| &state.identifier == identifier)
-                        .then_some(*amount)
-                })
-                .sum::<usize>();
+            let required_keystones =
+                world_context.world.reached_ks_cost() - world_context.initial_ks_cost;
             let missing_keystones = required_keystones.saturating_sub(owned_keystones as usize);
             if missing_keystones == 0 {
                 continue;
@@ -849,6 +828,8 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         world.simulate(&ClientEvent::Spawn, &output.events);
         world.simulate(&ClientEvent::Reload, &output.events);
 
+        let initial_ks_cost = world.reached_ks_cost();
+
         // TODO instead of timing this after the spawn simulation to avoid unsettings the known entrance connections,
         // maybe this could be resolved with whatever mechanism will implement launch fragments behaving differently
         // between client and simulation?
@@ -871,6 +852,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             spirit_light_provider,
             needs_placement,
             total_pickups,
+            initial_ks_cost,
             spirit_light_placements_remaining: 0,
             placeholders: Default::default(),
             reached_needs_placement: Default::default(),
