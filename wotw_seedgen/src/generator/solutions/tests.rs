@@ -1637,7 +1637,7 @@ fn pools_spawn_solutions() {
 
 #[test]
 fn feeding_grounds_spawn_solutions() {
-    let mut world = spawn_solutions_prelude("LowerWastes.WestTP");
+    let mut world = spawn_solutions_prelude("LowerWastes.FeedingGroundsTP");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1659,7 +1659,7 @@ fn feeding_grounds_spawn_solutions() {
 
 #[test]
 fn central_wastes_spawn_solutions() {
-    let mut world = spawn_solutions_prelude("LowerWastes.EastTP");
+    let mut world = spawn_solutions_prelude("LowerWastes.CentralTP");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1689,7 +1689,7 @@ fn central_wastes_spawn_solutions() {
 
 #[test]
 fn outer_ruins_spawn_solutions() {
-    let mut world = spawn_solutions_prelude("UpperWastes.NorthTP");
+    let mut world = spawn_solutions_prelude("UpperWastes.OuterRuinsTP");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),

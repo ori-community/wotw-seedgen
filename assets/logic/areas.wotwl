@@ -108,11 +108,11 @@ anchor Teleporters:  # teleporter access
       PoolsBossTP, Water, WaterDash
       PoolsBossTP, FreeTeleporters
     unsafe: PoolsBossTP, Water
-  conn LowerWastes.WestTP:
+  conn LowerWastes.FeedingGroundsTP:
     moki: FeedingGroundsTP
-  conn LowerWastes.EastTP:
+  conn LowerWastes.CentralTP:
     moki: CentralWastesTP, Burrow OR FreeTeleporters
-  conn UpperWastes.NorthTP:
+  conn UpperWastes.OuterRuinsTP:
     moki: OuterRuinsTP, Burrow OR FreeTeleporters
   conn WindtornRuins.RuinsTP:
     moki:
@@ -8846,7 +8846,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
   refill Checkpoint
 
   # having the initial escape completed is a negative, not a positive. The paths going through it are the connections to Wastes.
-  # if you complete the initial escape, rocks fall and block most of the connection paths to WestTP. This is equally true for the base game though and solved by the fact that if you complete the escape, you unlock the teleporter, making these paths not softlockable
+  # if you complete the initial escape, rocks fall and block most of the connection paths to FeedingGroundsTP. This is equally true for the base game though and solved by the fact that if you complete the escape, you unlock the teleporter, making these paths not softlockable
 
   conn WoodsShrine:
     moki:
@@ -8857,7 +8857,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       DoubleJump OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
       Damage=15, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: free
-  conn LowerWastes.WestTP:  # every path needs to be possible while having Seir
+  conn LowerWastes.FeedingGroundsTP:  # every path needs to be possible while having Seir
     moki:
       Grapple, Glide, DoubleJump OR Dash OR Launch  # this solves with Seir as well
       WindtornRuins.Seir:  # these wouldn't solve without Seir
@@ -14473,7 +14473,7 @@ region LowerWastes:
   unsafe: free
 
 # TODO synchronize teleporter names
-anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
+anchor LowerWastes.FeedingGroundsTP at 1456, -3997:  # At the Western Wastes TP
   refill Full
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
@@ -14565,7 +14565,7 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
     moki: LowerWastes.TrialActivation, Burrow, DoubleJump, Dash, Grapple
     gorlek: LowerWastes.TrialActivation, Burrow, Dash, Grapple
 
-  conn LowerWastes.WestTP:
+  conn LowerWastes.FeedingGroundsTP:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Damage=30 OR Sword OR Hammer  # Multiple side slashes, not difficult
     kii:
@@ -14884,7 +14884,7 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
 
   conn LowerWastes.WoodenBridge: free
   conn LowerWastes.BeforeMinesEntrance: free
-  conn LowerWastes.EastTP:
+  conn LowerWastes.CentralTP:
     moki: Burrow
   conn LowerWastes.MuncherClimb:
     moki:
@@ -15096,12 +15096,12 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
 
   conn LowerWastes.SkeetoHive:
     moki: Burrow
-  conn LowerWastes.EastTP:
+  conn LowerWastes.CentralTP:
     moki: Burrow
 
 # checkpoint at no actually just bad refill situation below. Could be solved easily.
 
-anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
+anchor LowerWastes.CentralTP at 1992, -3902:  # Location of the east teleporter
   refill Full
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
@@ -15220,7 +15220,7 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
       DoubleJump, TripleJump, Dash, Sword  # tjump+upslash+dash to climb the right wall
       SwordJump, TripleJump
 
-  conn LowerWastes.EastTP:
+  conn LowerWastes.CentralTP:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow, Sword OR Hammer OR Damage=30
     kii: Burrow
@@ -15365,12 +15365,12 @@ anchor UpperWastes.RuinsApproach at 2002, -3698:  # checkpoint after the laser s
   pickup UpperWastes.SpinLasersLowerSL:
     moki: Burrow
 
-  conn UpperWastes.NorthTP:
+  conn UpperWastes.OuterRuinsTP:
     moki: Burrow
   conn UpperWastes.SpinLasers:
     moki: Burrow
 
-anchor UpperWastes.NorthTP at 2044, -3679:  # Left of the teleporter, on top of the sand
+anchor UpperWastes.OuterRuinsTP at 2044, -3679:  # Left of the teleporter, on top of the sand
   refill Full
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
@@ -15506,7 +15506,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       Burrow, DoubleJump OR Sentry=3
       Damage=30, DoubleJump
 
-  conn UpperWastes.NorthTP:
+  conn UpperWastes.OuterRuinsTP:
     moki: Burrow OR Launch OR Bash
     gorlek:
       Glide
@@ -15752,7 +15752,7 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
       Sword  # upslash+downslash
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
       GlideJump OR GrenadeJump
-  conn LowerWastes.WestTP:  # covers connections into woods
+  conn LowerWastes.FeedingGroundsTP:  # covers connections into woods
     moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
 

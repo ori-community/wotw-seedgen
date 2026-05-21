@@ -107,9 +107,9 @@ pub fn generate_seed<F: SnippetAccess>(
                     | "LowerReach.Teleporter"
                     | "UpperDepths.Teleporter"
                     | "WestPools.Teleporter"
-                    | "LowerWastes.WestTP"
-                    | "LowerWastes.EastTP"
-                    | "UpperWastes.NorthTP"
+                    | "LowerWastes.FeedingGroundsTP"
+                    | "LowerWastes.CentralTP"
+                    | "UpperWastes.OuterRuinsTP"
                     | "WindtornRuins.RuinsTP"
                     | "WillowsEnd.InnerTP"
                     | "WillowsEnd.ShriekArena" => {}

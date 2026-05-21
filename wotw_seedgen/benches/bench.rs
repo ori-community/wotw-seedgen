@@ -145,8 +145,8 @@ fn solutions(c: &mut Criterion) {
         ("reach", "LowerReach.Teleporter"),
         ("depths", "UpperDepths.Teleporter"),
         ("pools", "EastPools.Teleporter"),
-        ("feeding_grounds", "LowerWastes.WestTP"),
-        ("central_wastes", "LowerWastes.EastTP"),
+        ("feeding_grounds", "LowerWastes.FeedingGroundsTP"),
+        ("central_wastes", "LowerWastes.CentralTP"),
         ("willow", "WillowsEnd.InnerTP"),
         ("burrows", "MidnightBurrows.Teleporter"),
     ];

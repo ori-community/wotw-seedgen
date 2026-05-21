@@ -149,8 +149,8 @@ impl LogicalDifficulty for Difficulty {
                 "LowerReach.Teleporter",
                 "UpperDepths.Teleporter",
                 "EastPools.Teleporter",
-                "LowerWastes.WestTP",
-                "LowerWastes.EastTP",
+                "LowerWastes.FeedingGroundsTP",
+                "LowerWastes.CentralTP",
             ],
         }
     }
