@@ -22,10 +22,6 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
-use wotw_seedgen_data::seed_language::{
-    compile::store_boolean,
-    output::{postprocess, AsConstant},
-};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     logic_language::output::Node,
@@ -38,6 +34,13 @@ use wotw_seedgen_data::{
         simulate::{Simulate, Simulation, Snapshot},
     },
     UberIdentifier, UniverseSettings,
+};
+use wotw_seedgen_data::{
+    seed_language::{
+        compile::store_boolean,
+        output::{postprocess, AsConstant},
+    },
+    DEFAULT_SPAWN,
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
@@ -1377,11 +1380,14 @@ fn total_reach_check<'graph>(
     }
     world.add_spirit_light(TOTAL_SPIRIT_LIGHT, &output.events);
 
+    let spawn = world.spawn;
+    world.spawn = world.graph.find_node(DEFAULT_SPAWN).unwrap();
     world.traverse_spawn(&output.events);
 
     let mut needs_placement = world.reached_pickups().collect::<Vec<_>>();
     let mut extra_slots = vec![];
 
+    world.spawn = spawn;
     world.restore_snapshot();
 
     needs_placement.retain(|pickup| {
