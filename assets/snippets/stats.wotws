@@ -922,11 +922,11 @@ on UpperPools.LeftBubblesEX {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperPools.SwimDashTree {
+on UpperPools.WaterDashTree {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperPools.SwimDashCurrentEX {
+on UpperPools.WaterDashCurrentEX {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }

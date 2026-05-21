@@ -206,8 +206,8 @@ UpperPools.FishPoolOre, Pools, GorlekOre, , 5377, 31434, , -1535.3, -4034.0, -15
 UpperPools.BubblesEC, Pools, EnergyFragment, , 5377, 1600, , -1643.0, -4002.7, -1643.001, -4001.6646
 UpperPools.RightBubblesEX, Pools, SpiritLight, 200, 5377, 628, , -1572.3, -4076.9, -1572.3201, -4076.915
 UpperPools.LeftBubblesEX, Pools, SpiritLight, 100, 5377, 21860, , -1645.0, -4083.8, -1645.0286, -4083.81
-UpperPools.SwimDashTree, Pools, Skill, SwimDash, 0, 104, , -1430, -4082, -1429.8096, -4077.332
-UpperPools.SwimDashCurrentEX, Pools, SpiritLight, 100, 5377, 52791, , -1468.1, -4098.2, -1468.1074, -4098.208
+UpperPools.WaterDashTree, Pools, Skill, WaterDash, 0, 104, , -1430, -4082, -1429.8096, -4077.332
+UpperPools.WaterDashCurrentEX, Pools, SpiritLight, 100, 5377, 52791, , -1468.1, -4098.2, -1468.1074, -4098.208
 UpperPools.RoofEX, Pools, SpiritLight, 100, 5377, 33180, , -1449.0, -4036.8, -1449.0184, -4036.8418
 UpperPools.WaterfallEC, Pools, EnergyFragment, , 5377, 32750, , -1389.0, -4039.5, -1388.9896, -4038.5205
 WestPools.BurrowEX, Pools, SpiritLight, 200, 5377, 62180, , -1654.9, -4188.9, -1654.9425, -4188.8804

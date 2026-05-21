@@ -104,7 +104,7 @@ fun write_hints() {
         set_boolean("comma", true)
     }
     // TODO look at renaming some of these
-    if UpperPools.SwimDashTree {
+    if UpperPools.WaterDashTree {
         add_comma()
         write_water_dash_hint()
         set_string("tree_hints", get_string("tree_hints") + get_string("water_dash_hint"))
@@ -177,7 +177,7 @@ on LowerDepths.FlashTree {
     write_flash_hint()
     item_message(get_string("flash_hint"))
 }
-on UpperPools.SwimDashTree {
+on UpperPools.WaterDashTree {
     write_water_dash_hint()
     item_message(get_string("water_dash_hint"))
 }

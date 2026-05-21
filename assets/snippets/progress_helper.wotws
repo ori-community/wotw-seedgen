@@ -260,7 +260,7 @@ on change GladesTown.DamageTree update_tree_progress()
 on change LowerWastes.BurrowTree update_tree_progress()
 on change UpperReach.LightBurstTree update_tree_progress()
 on change LowerDepths.FlashTree update_tree_progress()
-on change UpperPools.SwimDashTree update_tree_progress()
+on change UpperPools.WaterDashTree update_tree_progress()
 on change WeepingRidge.LaunchTree update_tree_progress()
 fun update_tree_progress() {
     write_tree_progress()
@@ -330,7 +330,7 @@ fun tree_string() {
         set_string("tree_progress", get_string("tree_progress") + "Flash")
         set_boolean("comma", true)
     }
-    if UpperPools.SwimDashTree == get_boolean("found") {
+    if UpperPools.WaterDashTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Water Dash")
         set_boolean("comma", true)

@@ -13871,8 +13871,8 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
     kii: WaterDash, Damage=60  # tp after pushing it
     unsafe: WaterDash, Damage=40
 
-  pickup UpperPools.SwimDashTree: free
-  pickup UpperPools.SwimDashCurrentEX:
+  pickup UpperPools.WaterDashTree: free
+  pickup UpperPools.WaterDashCurrentEX:
     moki: Water, WaterDash
     kii: WaterDash, Damage=60
     unsafe: WaterDash, Damage=40
@@ -13912,7 +13912,7 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
       HammerSJump=1
       Bash, Grenade=1, DoubleJump, Sentry=1
 
-anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup above swimdash tree
+anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup above water dash tree
   pickup UpperPools.RoofEX:
     moki:
       Launch
