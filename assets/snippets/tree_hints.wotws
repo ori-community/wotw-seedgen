@@ -91,7 +91,7 @@ fun write_hints() {
         set_string("tree_hints", get_string("tree_hints") + get_string("glide_hint"))
         set_boolean("comma", true)
     }
-    if UpperReach.LightBurstTree {
+    if UpperReach.GrenadeTree {
         add_comma()
         write_grenade_hint()
         set_string("tree_hints", get_string("tree_hints") + get_string("grenade_hint"))
@@ -169,7 +169,7 @@ on MarshSpawn.DamageTree {
     write_glide_hint()
     item_message(get_string("glide_hint"))
 }
-on UpperReach.LightBurstTree {
+on UpperReach.GrenadeTree {
     write_grenade_hint()
     item_message(get_string("grenade_hint"))
 }

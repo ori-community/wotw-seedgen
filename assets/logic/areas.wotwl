@@ -10873,7 +10873,7 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
   refill Energy=4:  # fast respawning crystal
     moki: BreakCrystal
 
-  pickup UpperReach.LightBurstTree: free
+  pickup UpperReach.GrenadeTree: free
   pickup UpperReach.WellEX: free
   pickup UpperReach.HiddenEX:
     moki: Grenade=1

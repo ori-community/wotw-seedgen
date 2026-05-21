@@ -258,7 +258,7 @@ on change InnerWellspring.GrappleTree update_tree_progress()
 on change MarshSpawn.DamageTree update_tree_progress()
 on change GladesTown.DamageTree update_tree_progress()
 on change LowerWastes.BurrowTree update_tree_progress()
-on change UpperReach.LightBurstTree update_tree_progress()
+on change UpperReach.GrenadeTree update_tree_progress()
 on change LowerDepths.FlashTree update_tree_progress()
 on change UpperPools.WaterDashTree update_tree_progress()
 on change WeepingRidge.LaunchTree update_tree_progress()
@@ -320,7 +320,7 @@ fun tree_string() {
         set_string("tree_progress", get_string("tree_progress") + "Burrow")
         set_boolean("comma", true)
     }
-    if UpperReach.LightBurstTree == get_boolean("found") {
+    if UpperReach.GrenadeTree == get_boolean("found") {
         trees_add_comma()
         set_string("tree_progress", get_string("tree_progress") + "Grenade")
         set_boolean("comma", true)

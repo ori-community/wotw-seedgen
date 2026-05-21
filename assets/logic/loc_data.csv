@@ -282,7 +282,7 @@ UpperReach.MiddleRightKS, Reach, Keystone, , 28895, 9949, , -184.3, -3867.7, -18
 UpperReach.SoupOre, Reach, GorlekOre, , 28895, 23795, , -202.6, -3885.4, -202.60999, -3885.4302
 UpperReach.SwingPoleEX, Reach, SpiritLight, 100, 28895, 40089, , -193.7, -3854.4, -193.71997, -3854.3901
 UpperReach.SwimEX, Reach, SpiritLight, 100, 28895, 40242, , -239.4, -3920.6, -239.36255, -3920.6006
-UpperReach.LightBurstTree, Reach, Skill, LightBurst, 0, 51, , -106, -3934, -106.45276, -3928.5732
+UpperReach.GrenadeTree, Reach, Skill, Grenade, 0, 51, , -106, -3934, -106.45276, -3928.5732
 UpperReach.TreeOre, Reach, GorlekOre, , 28895, 39291, , -86.5, -3903.3, -86.392334, -3902.9707
 UpperReach.WellEX, Reach, SpiritLight, 50, 28895, 7597, , -71.2, -3926.7, -71.150024, -3926.6802
 UpperReach.SpringSeed, Reach, Seed, , 14019, 32376, , -103.4, -3857.3, -34, -3924

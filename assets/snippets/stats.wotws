@@ -1226,7 +1226,7 @@ on UpperReach.SwimEX {
     store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperReach.LightBurstTree {
+on UpperReach.GrenadeTree {
     store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
