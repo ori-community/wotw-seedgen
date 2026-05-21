@@ -114,7 +114,7 @@ fn small_reach_check() {
         reached,
         FxHashSet::from_iter([
             "GladesTown.UpdraftCeilingSL",
-            "GladesTown.AboveTpSL",
+            "GladesTown.AboveTPSL",
             "GladesTown.BountyShard",
             "GladesTown.BelowHoleHutSL"
         ])

@@ -1046,7 +1046,7 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
 anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkSL
   pickup MarshSpawn.MokkSL: free
 
-  # There isn't any point to go to HowlsDen.UpperLoopExit from this anchor because it only leads to HowlsDen.RightHC, which is more restricitive than going from UpperLoopEntrance
+  # There isn't any point to go to HowlsDen.UpperLoopExit from this anchor because it only leads to HowlsDen.SlimeLoopHC, which is more restricitive than going from UpperLoopEntrance
   conn HowlsDen.AboveBoneBridge: free
   conn MarshSpawn.MokkTheBrave:
     moki, MarshSpawn.HowlBurnt: DoubleJump OR Dash OR Launch OR Glide
@@ -1065,7 +1065,7 @@ anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where yo
   state HowlsDen.UpperLoopExitBarrier:
     moki: BreakWall=16
 
-  pickup HowlsDen.RightHC:
+  pickup HowlsDen.SlimeLoopHC:
     moki: BreakWall=20, Combat=Slug OR Bash OR Launch
     gorlek: BreakWall=20
 
@@ -1110,7 +1110,7 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
     moki: BreakWall=16
     unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it. Then reload and walk out of the wall
 
-  pickup HowlsDen.RightHC:
+  pickup HowlsDen.SlimeLoopHC:
     moki: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20, Combat=Slug OR Bash OR Launch
     gorlek: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20
 
@@ -1329,8 +1329,8 @@ anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
   conn HowlsDen.OutsideSecretRoom:
     moki: HowlsDen.SecretRoomWall
 
-anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the moss in the hidden room holding HowlsDen.LeftHC
-  pickup HowlsDen.LeftHC:
+anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the moss in the hidden room holding HowlsDen.SecretRoomHC
+  pickup HowlsDen.SecretRoomHC:
     moki:
       Combat=SneezeSlug, DoubleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
@@ -3039,7 +3039,7 @@ anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad
     gorlek, WestHollow.FullyDrained: Bow=1, Combat=Slug OR Bash OR Damage=10
     unsafe, WestHollow.FullyDrained: Bow=1
 
-  pickup WestHollow.HiddenEC:
+  pickup WestHollow.BreakableWallEC:
     moki: WestHollow.FullyDrained, BreakWall=10
     # can't break that wall with waterdash because it only works with a single water level state
 
@@ -3331,7 +3331,7 @@ anchor WestHollow.DashArea at -88, -4423:  # To the right of the lever door
 anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at dash tree
   refill Checkpoint
 
-  pickup WestHollow.CrusherSL:
+  pickup WestHollow.DashCrusherSL:
     moki: Dash
     gorlek: free
   pickup WestHollow.DashTree:
@@ -3391,7 +3391,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
 anchor WestHollow.DashRoomTopRight at -21, -4411:  # Top right of dash tree room
   refill Checkpoint
 
-  pickup WestHollow.DashRightSL:
+  pickup WestHollow.DashVineSL:
     moki:
       DoubleJump, Dash, Combat=WeakSlug OR Bash
       Launch
@@ -3509,7 +3509,7 @@ anchor BeetleFight at -81, -4243:
 
 anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
   # paths need to be completable with both door states if the state is not a requirement
-  pickup EastHollow.HornBeetleFightSL:
+  pickup EastHollow.HornbugArenaSL:
     moki:
       DoubleJump, Dash, Bash
       Bash, Grenade=1
@@ -3749,7 +3749,7 @@ anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to B
 # checkpoint at 21, -4220
 
 anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after the beetle arena
-  pickup EastHollow.BashEC:
+  pickup EastHollow.BashAreaEC:
     moki:
       Bash, DoubleJump, Dash
       Bash, Grenade=1
@@ -3815,7 +3815,7 @@ anchor EastHollow.TreeAreaJumppad at -15, -4289:  # at the jumppad bellow the de
       GrenadeRedirect=1, GrenadeCancel
       SentryRedirect=1, Sword OR HammerExtension OR GrenadeCancel OR Launch OR HammerSJump=1
 
-  pickup EastHollow.BashEC:  # check for redundancy with paths going to EastHollow.AboveBash first
+  pickup EastHollow.BashAreaEC:  # check for redundancy with paths going to EastHollow.AboveBash first
     unsafe: SwordSJump=2
 
   conn EastHollow.AboveBash:
@@ -3891,7 +3891,7 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
   refill Checkpoint
 
   pickup EastHollow.BashTree: free
-  pickup EastHollow.BashSL:
+  pickup EastHollow.AboveBashSL:
     moki:
       DoubleJump, Bash
       Launch
@@ -4003,7 +4003,7 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
 anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the first mortar on the way to Kwolok
   refill Checkpoint
 
-  pickup EastHollow.SecretRoofSL:  # Check for redundancy with EastHollow.KwolokPathGrapplePlant->EastHollow.KwolokPathLantern->EastHollow.SecretRoofSL
+  pickup EastHollow.LeftMortarSL:  # Check for redundancy with EastHollow.KwolokPathGrapplePlant->EastHollow.KwolokPathLantern->EastHollow.LeftMortarSL
     moki:
       Bash OR Launch
       Grapple, DoubleJump, Dash OR Glide
@@ -4039,7 +4039,7 @@ anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the firs
       AerialHammerJump OR GrenadeJump OR AbilitySwap=1
 
 anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to the first bashable lantern
-  pickup EastHollow.SecretRoofSL:  # these paths can't get over the big spike wall from the left anchor
+  pickup EastHollow.LeftMortarSL:  # these paths can't get over the big spike wall from the left anchor
     gorlek: DoubleJump, TripleJump, Dash
     kii:
       DoubleJump, Dash OR TripleJump OR Sword OR Hammer
@@ -4048,7 +4048,7 @@ anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to 
     unsafe:
       Dash OR GlideJump OR AbilitySwap=1
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-  pickup EastHollow.MortarSL:
+  pickup EastHollow.RightMortarSL:
     moki:
       Bash, DoubleJump OR Dash OR Glide
       Launch
@@ -4293,13 +4293,13 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   quest GladesTown.RebuildTheGlades:
     moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
 
-  pickup GladesTown.LupoSwimMiddleSL:
+  pickup GladesTown.LupoSwimSL:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
     unsafe:
       Water OR Damage=60 # just wall jump between both walls
       WaterDash, Damage=40
-  pickup GladesTown.LupoSwimLeftSL:
+  pickup GladesTown.UnderwaterThornsSL:
     moki, GladesTown.ClearThorns: Water, WaterDash OR Launch
     gorlek, GladesTown.ClearThorns: Water, DoubleJump, TripleJump
     # kii, GladesTown.ClearThorns:
@@ -4460,7 +4460,7 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
   quest GladesTown.FamilyReunionKey:
     moki: GladesTown.BuildHuts
 
-  pickup GladesTown.LowerOre:
+  pickup GladesTown.TwillenOre:
     moki, Hammer OR Spear=1:
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=1
@@ -4850,7 +4850,7 @@ anchor GladesTown.InsideThirdHut at -181, -4552: # In the last build hut, with t
     target: GladesTown.UpperWest
     enter: free
 
-  pickup GladesTown.BraveMokiHutSL:
+  pickup GladesTown.LastHutSL:
     moki: DoubleJump OR Launch
     gorlek: SentryJump=1
     kii:
@@ -4965,7 +4965,7 @@ anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at 
       DoubleJump, TripleJump, Grenade=1, Sword, Water OR Damage=10
 
 anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty shard
-  pickup GladesTown.AboveTpSL: free
+  pickup GladesTown.AboveTPSL: free
   pickup GladesTown.BountyShard:
     moki:
       Launch
@@ -4977,7 +4977,7 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
       GladesTown.StickyGrass, DoubleJump
       GladesTown.StickyGrass, Grapple, Sword OR Hammer
     kii:
-      DoubleJump  # From GladesTown.AboveTpSL. Either wrap around the left wall or wall jump to the right wall to reach the platform on the left
+      DoubleJump  # From GladesTown.AboveTPSL. Either wrap around the left wall or wall jump to the right wall to reach the platform on the left
       GladesTown.StickyGrass, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # The jump to the shard is possible without using any energy weapons but pretty precise
       # Glitched
       # GlideJump, DoubleJump
@@ -5124,7 +5124,7 @@ anchor GladesTown.LupoHouse at -207, -4161:  # At the entrance of Lupo's house
     unsafe:
       Burrow, Damage=80
       Burrow, WaterDash, Damage=40
-  pickup GladesTown.LupoSwimMiddleSL:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
+  pickup GladesTown.LupoSwimSL:  # dirty swim only, clean water paths are redundant with going to GladesTown.Teleporter first
     unsafe:
       Damage=100 # just wall jump between both walls
       WaterDash, Damage=40
@@ -5141,7 +5141,7 @@ anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's h
     target: GladesTown.LupoHouse
     enter: free
 
-  pickup GladesTown.LupoSoupSL: free
+  pickup GladesTown.LupoPotSL: free
   pickup LupoShop.HCMapIcon:
     moki: SpiritLight=1200
   pickup LupoShop.ECMapIcon:
@@ -5271,7 +5271,7 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       Bash, Damage=20, WaterDash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       GlideJump, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR WallHammerJump OR CoyoteHammerJump
-  pickup WestGlades.AbovePlantSL:
+  pickup WestGlades.AboveTentacleSL:
     moki:
       Bash, DoubleJump, Dash OR Glide
       Bash, Dash, Glide
@@ -5383,7 +5383,7 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       Hammer, DoubleJump OR Dash OR Glide OR Damage=10  # https://youtu.be/vtrXR8WGl_w
 
 anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower pool in WestGlades
-  pickup WestGlades.LeftOre:
+  pickup WestGlades.GrappleOre:
     moki: Grapple, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
       Grapple, Sword OR Hammer
@@ -5483,7 +5483,7 @@ anchor WestGlades.LeftLowerPool at -642, -4112:  # The left edge of the lower po
 anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper and lower Glades
   refill Checkpoint
 
-  pickup WestGlades.LeftOre:  # be sure it's not redundant with the paths from LowerPool
+  pickup WestGlades.GrappleOre:  # be sure it's not redundant with the paths from LowerPool
     kii:
       Glide, DoubleJump, TripleJump
       Glide, DoubleJump, Damage=10, Dash OR Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2
@@ -5492,7 +5492,7 @@ anchor WestGlades.Center at -612, -4083:  # At the middle room connecting upper 
       Glide, DoubleJump, Spear=2, Damage=10
       DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # requires a corner boost et the start
       GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR BlazeSwap=1 OR Flash=1 OR Sentry=1
-  pickup WestGlades.RightOre:  # Be carefull it's not redundant with WestGlades.Center->WestGlades.Upper->WestGlades.RightOre
+  pickup WestGlades.TentacleOre:  # Be carefull it's not redundant with WestGlades.Center->WestGlades.Upper->WestGlades.TentacleOre
     moki:
       Bash, DoubleJump OR Dash
       Launch
@@ -5568,7 +5568,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
     unsafe:
       Damage=90  # one dboost on spikes
       WaterDash, Damage=40
-  pickup WestGlades.RightOre:
+  pickup WestGlades.TentacleOre:
     moki:
       Launch
       Bash, DoubleJump OR Dash OR Glide
@@ -6281,7 +6281,7 @@ anchor OuterWellspring.WestDoor at -892, -3991:  # Outside the door where you ex
       AerialHammerJump OR GlideHammerJump
       Grapple, Damage=15, Sword OR Hammer # https://youtu.be/6kjkhloXNso
 
-  pickup OuterWellspring.HiddenHC:
+  pickup OuterWellspring.AboveTokkHC:
     moki, OuterWellspring.WestDoorBlueMoonFree:
       Grapple, DoubleJump, Dash OR Glide
       Grapple, Dash, Glide
@@ -6493,7 +6493,7 @@ anchor OuterWellspring.AboveWestDoor at -866, -3949:  # on the platform arcing o
   refill Energy=3:
     moki: BreakCrystal
 
-  pickup OuterWellspring.HiddenHC:
+  pickup OuterWellspring.AboveTokkHC:
     moki:
       Combat=Miner OR Bash:
         Grapple, DoubleJump, Dash OR Glide
@@ -6684,7 +6684,7 @@ anchor OuterWellspring.RightWallMidpoint at -741, -4018:  # Next to OuterWellspr
 anchor OuterWellspring.TrialApproach at -727, -3961:  # at the ledge going towards the trial room
   refill Checkpoint
 
-  pickup OuterWellspring.RightWallSL:
+  pickup OuterWellspring.TrialAreaSL:
     moki:
       Grapple, DoubleJump, Dash OR Glide
       DoubleJump, Bash, Grenade=1
@@ -7394,7 +7394,7 @@ anchor InnerWellspring.AbovePole at -1164, -3874:  # Under InnerWellspring.Upper
   state InnerWellspring.UpperCorruption:  # the fourth corruption you see on your way
     moki: BreakWall=16
 
-  pickup InnerWellspring.LupoSL: free
+  pickup InnerWellspring.HiddenBlobSL: free
 
   conn InnerWellspring.BelowDrainLever:
     moki: DoubleJump OR Dash OR Glide OR Launch
@@ -7748,7 +7748,7 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
     unsafe: Dash OR DoubleJump OR AbilitySwap=1 OR GlideJump OR GrenadeJump OR WallHammerJump OR CoyoteHammerJump
 
   pickup InnerWellspring.LibrarySL: free
-  pickup InnerWellspring.AboveTpSL:
+  pickup InnerWellspring.AboveTPSL:
     moki:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
@@ -7922,7 +7922,7 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
 anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the hut, at the checkpoint next to the mud
   refill Checkpoint
 
-  pickup WoodsEntry.MudPitSL:
+  pickup WoodsEntry.HutRightSL:
     moki:
       DoubleJump OR Dash OR Glide OR Launch
       Bash, Grenade=2
@@ -7953,7 +7953,7 @@ anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the hut, at the checkpoint 
       Launch, Sword OR Hammer
       # Glitched
       # SentryJump=1 OR LaunchSwap
-      # AerialHammerJump, TripleJump, Dash OR Glide OR Sword  # works by either going to WoodsEntry.LedgeOre and then going to the hut without using hjumps or by going to WoodsEntry.MudPitSL and use hjump once you're under the hut
+      # AerialHammerJump, TripleJump, Dash OR Glide OR Sword  # works by either going to WoodsEntry.LedgeOre and then going to the hut without using hjumps or by going to WoodsEntry.HutRightSL and use hjump once you're under the hut
       # AerialHAmmerJump, TripleJump, Bash  # bash a mortar projectile first
     unsafe: Bash  # Use the mortar
 
@@ -8027,7 +8027,7 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   quest WoodsEntry.TreeSeed:
     moki: GladesTown.LastTreeBranchRejected
 
-  pickup WoodsEntry.TpSL: free
+  pickup WoodsEntry.TPSL: free
   pickup WoodsEntry.LeafPileSL:
     moki: Flap
   pickup WoodsEntry.LedgeOre:  # Make sure it's not redundant with paths from WoodsEntry.ShriekMeet
@@ -8197,7 +8197,7 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
 anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile after meeting Ku
   pickup WoodsMain.LowerLeafPileSL:
     moki: Flap
-  pickup WoodsMain.BehindWallOre:
+  pickup WoodsMain.BreakableWallOre:
     kii: Flap, Glide  # Lure the balloon
 
   conn WoodsMain.FourKeystoneRoom:
@@ -8244,7 +8244,7 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       Combat=Tentacle, DoubleJump, TripleJump, Shuriken=2
 
 anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the wall being broken - paths would be complicated otherwise
-  pickup WoodsMain.BehindWallOre:
+  pickup WoodsMain.BreakableWallOre:
     moki: BreakWall=20
   pickup WoodsMain.BelowKeystonesSL:  # Paths that can get to the pickup but can't go to FourKeystoneRoom
     moki:
@@ -8694,7 +8694,7 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
       Burrow, Sword
 
 anchor WoodsMain.AboveHowl at 916, -4046:  # At the semisolid above silenced Howl
-  pickup WoodsMain.HiddenSL: free
+  pickup WoodsMain.CollapsingOwlSL: free
 
   conn WoodsMain.PetrifiedHowl: free
   conn WoodsMain.BrokenOwl: free
@@ -9357,7 +9357,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       PauseFloat
       GrenadeJump
       Bash OR Sentry=2
-  pickup LowerReach.HiddenOre:
+  pickup LowerReach.MortarOre:
     moki:
       Launch
       LowerReach.ThawCentralFurnace, DoubleJump, Bash, Dash OR Glide OR Grenade=1
@@ -9452,7 +9452,7 @@ anchor LowerReach.SecondSoup at -316, -4037:  # Next to the soup below the telep
   pickup LowerReach.BurrowSL:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow  # TP out
-  pickup LowerReach.BelowLupoSL:
+  pickup LowerReach.GorlekFurnaceSL:
     unsafe: Flap, Bash, DoubleJump OR Dash OR Glide OR Sword OR Damage=20
 
   conn LowerReach.CentralEnemyPaths:
@@ -9492,7 +9492,7 @@ anchor LowerReach.BelowLupo at -278, -4031:  # On the platform left of the centr
   state LowerReach.FreezeCentralFurnace:
     moki: Flap  # this path can assume that the furnace is heated, requiring less skills than the connection
 
-  pickup LowerReach.BelowLupoSL:
+  pickup LowerReach.GorlekFurnaceSL:
     moki:
       DoubleJump, Bash, Grenade=1
       Launch
@@ -10449,7 +10449,7 @@ anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four key
   state UpperReach.FreezeFurnace:  # refreezing the waterfall can be valuable
     moki: Flap
 
-  pickup UpperReach.LowerKS:
+  pickup UpperReach.TongueKS:
     moki:
       UpperReach.ThawFurnace, DoubleJump
       UpperReach.ThawFurnace, Bash, Grenade=1
@@ -10658,8 +10658,8 @@ anchor UpperReach.KeystoneSnapPlantThawed at -231, -3865:
 anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
   nospawn
 
-  pickup UpperReach.MiddleLeftKS: free
-  pickup UpperReach.LowerKS:
+  pickup UpperReach.SnaptrapKS: free
+  pickup UpperReach.TongueKS:
     gorlek: DoubleJump, TripleJump
     kii: DoubleJump
     unsafe: Sword
@@ -10672,7 +10672,7 @@ anchor UpperReach.KeystoneSnapPlantPaths at -231, -3865:
 anchor UpperReach.KeystoneSnapPlantThawedPaths at -231, -3865:
   nospawn
 
-  pickup UpperReach.LowerKS:
+  pickup UpperReach.TongueKS:
     moki: Glide
     gorlek:
       Sword
@@ -10708,7 +10708,7 @@ anchor UpperReach.UpperSoupPaths at -215, -3877:
   refill Health=1
 
   pickup UpperReach.SoupOre: free
-  pickup UpperReach.LowerKS:  # check for redundancies with KeystoneSnapPlant
+  pickup UpperReach.TongueKS:  # check for redundancies with KeystoneSnapPlant
     gorlek: DoubleJump, TripleJump, Glide
     kii:
       DoubleJump, TripleJump
@@ -10773,14 +10773,14 @@ anchor UpperReach.UpperSoupThawedPaths at -215, -3877:
   nospawn
   refill Checkpoint
 
-  pickup UpperReach.LowerKS:
+  pickup UpperReach.TongueKS:
     moki: Glide
     gorlek:
       Sword
       Dash, Hammer
     kii: Dash OR Sentry=2 OR Blaze=4
     unsafe: Damage=20, Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=2
-  pickup UpperReach.MiddleRightKS:
+  pickup UpperReach.IcefallKS:
     moki:
       DoubleJump
       Bash, Grenade=1
@@ -10875,7 +10875,7 @@ anchor UpperReach.TreeRoom at -107, -3933:  # At the tree
 
   pickup UpperReach.GrenadeTree: free
   pickup UpperReach.WellSL: free
-  pickup UpperReach.HiddenSL:
+  pickup UpperReach.TreeMeltIceSL:
     moki: Grenade=1
     gorlek: SentryBurn=1  # Use sentry to melt the ice
   pickup UpperReach.TreeOre:
@@ -11310,7 +11310,7 @@ anchor UpperDepths.SecondKSRoom at 542, -4466:  # The egg of the firefly circlin
       Dash, Launch
     kii:
       DepthsLight, DoubleJump, Sword OR Hammer OR Flash=1 OR Blaze=1 OR Sentry=1 OR Shuriken=1 OR Spear=1
-  pickup UpperDepths.BossPathSL:  # saved for later to know redundancies with the new anchor
+  pickup UpperDepths.MoraPathSL:  # saved for later to know redundancies with the new anchor
     moki:
       DepthsLight, DoubleJump, Dash
       DepthsLight, DoubleJump, Bash, Grenade=1
@@ -11480,7 +11480,7 @@ anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left
   pickup LowerDepths.BelowDoorOre:
     moki: DepthsLight  # It's hidden in a dark area, not hard to reach.
     gorlek: free  # the ore is a light source, lots of time to teleport out
-  pickup LowerDepths.LeftSL:
+  pickup LowerDepths.FireflyPathSL:
     moki:
       Glide, BreakWall=1 OR DepthsLight
       Launch, BreakWall=1 OR DepthsLight
@@ -11626,7 +11626,7 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
       Water, UpperDepths.ForestsEyes OR Flash
       WaterDash, UpperDepths.ForestsEyes, Damage=150  # Adding some damage for lenience. No Flash because you can't really see where you're going while water dashing.
     unsafe: WaterDash, Water OR Damage=120  # probably involves too much blind water dashing to be kii
-  pickup LowerDepths.LeftSL:
+  pickup LowerDepths.FireflyPathSL:
     moki:
       DepthsLight, DoubleJump OR Dash OR Glide
       BreakWall=1, DoubleJump OR Dash OR Glide
@@ -12063,7 +12063,7 @@ anchor LowerDepths.TreeArea at 776, -4542:  # The flash tree
     moki: BreakCrystal
 
   pickup LowerDepths.FlashTree: free
-  pickup LowerDepths.RightSL:
+  pickup LowerDepths.TreeSL:
     moki: DepthsLight OR Launch
     gorlek: Bash, Grenade=1
     unsafe: SentryJump=1
@@ -12788,7 +12788,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
     unsafe:
       Water OR Damage=100
       WaterDash, Damage=20
-  pickup EastPools.RightOre:
+  pickup EastPools.EntryOre:
     moki:
       DoubleJump, Grapple, Flap, Combat=CorruptSlug, Dash OR Glide  # Need to flap from the green spot so the bubble don't go too far to the right
       Launch, Grapple
@@ -13188,7 +13188,7 @@ anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
   conn EastPools.TPArea: free
 
 anchor EastPools.AboveFishingPool at -1300, -4102:  # Above the fishing Moki
-  pickup EastPools.AboveTpSL:  # this needs water to not softlock when the player drains the upper water
+  pickup EastPools.AboveTPSL:  # this needs water to not softlock when the player drains the upper water
     moki: Water
     kii:  # dirty swim
       Damage=80
@@ -13281,7 +13281,7 @@ anchor EastPools.LupoArea at -1409, -4163:  # Checkpoint to the left of Lupo
     kii: free
   pickup EastPools.LupoMap:
     moki: SpiritLight=150
-  pickup EastPools.BehindCrusherSL:
+  pickup EastPools.LupoCrusherSL:
     kii, EastPools.LupoPurpleFloor:
       Damage=160
       WaterDash, Damage=80
@@ -13400,7 +13400,7 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
       WaterDash, Sword, Water OR Damage=20
       DoubleJump, TripleJump, Sword  # tjump + upslash from the left wall
       Bash, Water OR Damage=220  # Bash the torpedo out of the water (near the floor so you don't get too much speed), go out of the water and bash it again
-  pickup EastPools.BehindCrusherSL:
+  pickup EastPools.LupoCrusherSL:
     moki: Water, WaterBreath
     gorlek: Water
     kii:
@@ -13822,7 +13822,7 @@ anchor UpperPools.TreeRoomEntrance at -1467, -4075:  # The ledge to the left of 
   state UpperPools.TreeRoomLeftBubbleFree:
     unsafe: Bow=1 OR Grenade=1 OR Spear=1
 
-  pickup UpperPools.RoofSL:  # only for paths using the bubble all the way
+  pickup UpperPools.TreeRoofSL:  # only for paths using the bubble all the way
     unsafe: UpperPools.TreeRoomLeftBubbleFree, Dash
 
   conn UpperPools.BeforeKeystoneDoor:
@@ -13872,7 +13872,7 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
     unsafe: WaterDash, Damage=40
 
   pickup UpperPools.WaterDashTree: free
-  pickup UpperPools.WaterDashCurrentSL:
+  pickup UpperPools.TreeCurrentSL:
     moki: Water, WaterDash
     kii: WaterDash, Damage=60
     unsafe: WaterDash, Damage=40
@@ -13913,7 +13913,7 @@ anchor UpperPools.TreeRoom at -1429, -4081:  # At Waterdash tree
       Bash, Grenade=1, DoubleJump, Sentry=1
 
 anchor UpperPools.AboveTree at -1450, -4053:  # Paths to simplify the xp pickup above water dash tree
-  pickup UpperPools.RoofSL:
+  pickup UpperPools.TreeRoofSL:
     moki:
       Launch
       Water, WaterDash
@@ -14315,7 +14315,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  pickup WestPools.TpSL:
+  pickup WestPools.TPSL:
     moki:
       Water, WaterDash, DoubleJump, Dash  # hard on keyboard, but I guess this is intended, and no other ability would even help
       Launch
@@ -14344,7 +14344,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
     moki: Water, Burrow
     kii: Damage=60, Burrow
     unsafe: Damage=40, Burrow
-  pickup WestPools.BurrowOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
+  pickup WestPools.EscapeRevisitOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
     gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
     kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
     unsafe, WestPools.ForestsStrength:
@@ -14478,7 +14478,7 @@ anchor LowerWastes.WestTP at 1456, -3997:  # At the Western Wastes TP
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  pickup LowerWastes.WestTPOre:
+  pickup LowerWastes.FeedingGroundsTPOre:
     moki: Burrow
   pickup WoodsMain.FeedingGroundsSL:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
@@ -15106,7 +15106,7 @@ anchor LowerWastes.EastTP at 1992, -3902:  # Location of the east teleporter
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  pickup LowerWastes.EastTPOre:
+  pickup LowerWastes.CentralTPOre:
     moki, BreakWall=20:
       Burrow OR Launch
       DoubleJump, Bash, Grenade=1
