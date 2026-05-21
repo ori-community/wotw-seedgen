@@ -1531,7 +1531,7 @@ fn reach_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
         make_test_solutions!([
-            // TODO this is incorrect in areas.wotw, the ice wall next to the teleporter should be a state
+            // TODO this is incorrect in areas.wotwl, the ice wall next to the teleporter should be a state
             // if this was correct, LowerReach.MeltIceEX would be reachable on spawn and not considered here
             // some solution below are commented out because they become redundant as a consequence
             // LowerReach.MeltIceEX
@@ -1563,7 +1563,7 @@ fn depths_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
         make_test_solutions!([
-            // TODO these three are invalid solutions, we don't have `BreakWall with` syntax yet so this cannot be written correctly in areas.wotw
+            // TODO these three are invalid solutions, we don't have `BreakWall with` syntax yet so this cannot be written correctly in areas.wotwl
             [skill(Spear), skill(Hammer)],
             [skill(Spear), skill(Sword)],
             [skill(Spear), skill(Blaze)],

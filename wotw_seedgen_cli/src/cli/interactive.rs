@@ -185,7 +185,7 @@ fn choose_spawn(
                 SpawnItems::FullyRandom => Spawn::FullyRandom,
                 SpawnItems::Custom => {
                     let mut query = Input::new()
-                        .with_prompt(format!("{prefix}Choose an areas.wotw identifier as spawn"));
+                        .with_prompt(format!("{prefix}Choose an areas.wotwl identifier as spawn"));
 
                     if let Some(anchor) = default_anchor {
                         query = query.default(anchor.to_owned());

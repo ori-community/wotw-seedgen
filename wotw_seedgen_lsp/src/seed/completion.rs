@@ -884,7 +884,7 @@ impl CompletionInSpan for SpawnArgs<'_> {
 
 impl ErrCompletion for SpawnArgs<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
-        Expression::err_completion(cache) // TODO offer spawn identifiers from areas.wotw
+        Expression::err_completion(cache) // TODO offer spawn identifiers from areas.wotwl
     }
 }
 

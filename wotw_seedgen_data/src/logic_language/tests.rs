@@ -145,8 +145,8 @@ fn ast() {
 #[test]
 fn compile() {
     let source = Source::new(
-        "areas.wotw".to_string(),
-        include_str!("../../../wotw_seedgen/areas.wotw").to_string(),
+        "areas.wotwl".to_string(),
+        include_str!("../../../assets/logic/areas.wotwl").to_string(),
     );
 
     let areas = Areas::parse(&source.content)
@@ -160,7 +160,7 @@ fn compile() {
         &[],
     )
     .eprint_errors(&source) else {
-        panic!("Failed to parse areas.wotw");
+        panic!("Failed to parse areas.wotwl");
     };
 
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();

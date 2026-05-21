@@ -192,7 +192,7 @@ fn spawn_arg(world_scoped: bool) -> Arg {
         .value_name("IDENTIFIER")
         .help("Spawn location")
         .long_help(format!(
-            "Use any anchor identifier from areas.wotw to spawn on a specific location\n\
+            "Use any anchor identifier from areas.wotwl to spawn on a specific location\n\
             Use '{literal}r{reset}' / '{literal}random{reset}' for a random teleporter or '{literal}f{reset}' / '{literal}fullyrandom{reset}' for a random anchor",
             literal = LITERAL.render(),
             reset = Reset.render(),

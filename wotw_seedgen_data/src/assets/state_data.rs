@@ -42,7 +42,7 @@ pub struct StateData {
 /// Information about an obtainable world state
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct StateDataEntry {
-    /// Unique identifier for this world state which is used in `areas.wotw`
+    /// Unique identifier for this world state which is used in `areas.wotwl`
     pub identifier: String,
     /// `UberIdentifier` where this world state is stored
     ///

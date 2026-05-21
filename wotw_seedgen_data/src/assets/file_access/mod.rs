@@ -114,7 +114,7 @@ pub trait AssetFileAccess {
         Ok(UberStateData::from_parts(dump, loc_data, state_data))
     }
 
-    const AREAS_PATH: &str = "logic/areas.wotw";
+    const AREAS_PATH: &str = "logic/areas.wotwl";
 
     fn areas(&self) -> Result<Source, String> {
         let (path, content) =

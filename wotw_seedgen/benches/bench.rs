@@ -32,7 +32,7 @@ fn logic_assets(c: &mut Criterion) {
     let mut group = c.benchmark_group("logic_assets");
 
     group.bench_function("areas", |b| {
-        b.iter(|| Areas::parse(include_str!("../areas.wotw")))
+        b.iter(|| Areas::parse(include_str!("../../assets/logic/areas.wotwl")))
     });
 
     let areas = &*AREAS;
