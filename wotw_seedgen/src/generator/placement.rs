@@ -780,6 +780,12 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
                     world_context.output.spawn = Some(*spawn.position().unwrap());
 
+                    // Debug variant for the uppercase formatting
+                    world_context
+                        .output
+                        .tags
+                        .push(format!("{:?}", world_context.world.settings.difficulty));
+
                     let seedgen_info = SeedgenInfo {
                         universe_settings: self.settings.clone(),
                         world_index: world_context.index,
