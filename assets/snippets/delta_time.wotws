@@ -7,7 +7,7 @@
 
 on reload store(active, true)
 
-on tick {
+on delta > 0 {
     tick()
     store(delta, 0)
 }
