@@ -12479,7 +12479,6 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       DoubleJump, Hammer, Dash  # djump + upswing then dash to the wall
       DoubleJump, TripleJump OR SentryJump=1 OR PoolsApproach.WheelFreed
       Bash, Grenade=1, DoubleJump  # If the wheel is spinning, this is solved by just using double jump
-      PoolsApproach.WheelFreed, DoubleJump
     kii:
       DoubleJump, Dash, Spear=1
       Bash, Grenade=1, Dash, Hammer  # if the wheel is spinning, it's solving with the path on the next line
