@@ -10,7 +10,7 @@ use zip::{read::ZipFile, ZipArchive};
 use crate::{
     cli::{GenerationArgs, RegenerateArgs},
     log_config::LogConfig,
-    seed::{generate, write_seed},
+    seed::{generate, write_new_game_seed_source, write_seed},
     Error,
 };
 
@@ -37,11 +37,15 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
         return Err(Error("Regenerated seed did not match".to_string()));
     }
 
-    let path = if debug || launch {
+    let path = if debug || launch.launch {
         let name = format!("{}_regenerate", path.file_stem().unwrap().display());
 
         Some(write_seed(seed_universe, &name, debug, launch)?)
     } else {
+        if launch.new_game_seed_source {
+            write_new_game_seed_source(&path)?;
+        }
+
         None
     };
 

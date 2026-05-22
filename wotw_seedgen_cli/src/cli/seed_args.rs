@@ -18,11 +18,20 @@ pub struct GenerationArgs {
     /// Write information useful for debugging into the seed
     #[arg(long)]
     pub debug: bool,
+    #[command(flatten)]
+    pub launch: LaunchArgs,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct LaunchArgs {
     /// Load the seed into the randomizer after finishing
     ///
     /// Ignored when generating multiworld seeds
     #[arg(short, long)]
     pub launch: bool,
+    /// Update .newgameseedsource without trying to launch
+    #[arg(long = "ngss")]
+    pub new_game_seed_source: bool,
 }
 
 const VERBOSE_HELP: &str = "Write a detailed log into seedgen_log.txt";

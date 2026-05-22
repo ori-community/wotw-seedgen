@@ -1,5 +1,4 @@
 use std::{
-    ffi::OsStr,
     fs::{self, File},
     io,
     path::{Path, PathBuf},
@@ -7,7 +6,7 @@ use std::{
 };
 
 use crate::{
-    cli::{GenerationArgs, SeedArgs},
+    cli::{GenerationArgs, LaunchArgs, SeedArgs},
     log_config::LogConfig,
     Error,
 };
@@ -15,8 +14,8 @@ use rand::{distributions::Uniform, prelude::Distribution};
 use wotw_seedgen::{
     data::{
         assets::{
-            self, file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
-            SEEDGEN_USER_DATA_DIR,
+            self, file_err, write, AssetFileAccess, DefaultFileAccess, LocData, StateData,
+            UberStateData, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
         },
         logic_language::{ast::Areas, output::Graph},
         parse::Source,
@@ -65,7 +64,7 @@ pub fn write_seed(
     seed_universe: SeedUniverse,
     name: &str,
     debug: bool,
-    launch: bool,
+    launch: LaunchArgs,
 ) -> Result<PathBuf, Error> {
     let seeds_dir = SEEDGEN_USER_DATA_DIR.join("seeds");
     assets::create_dir_all(&seeds_dir)?;
@@ -76,9 +75,7 @@ pub fn write_seed(
         // TODO BufWriter needed on packages to file?
         seed.package(&mut file, !debug)?;
 
-        if launch {
-            launch_seed(&path)?;
-        }
+        launch_seed(&path, launch)?;
 
         let spoiler_path = path.with_extension("spoiler.txt");
         assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
@@ -135,8 +132,36 @@ where
     unreachable!()
 }
 
-pub fn launch_seed<P: AsRef<Path> + AsRef<OsStr>>(path: P) -> Result<(), Error> {
-    Ok(open::that_detached(&path).map_err(|err| file_err("launch", path, err))?)
+pub fn launch_seed(path: &Path, args: LaunchArgs) -> Result<(), Error> {
+    let LaunchArgs {
+        launch,
+        new_game_seed_source,
+    } = args;
+
+    if new_game_seed_source {
+        write_new_game_seed_source(path)?;
+    }
+
+    if launch {
+        open::that_detached(&path).map_err(|err| file_err("launch", path, err))?;
+    }
+
+    Ok(())
+}
+
+pub fn write_new_game_seed_source(path: &Path) -> Result<(), Error> {
+    let path = path.to_str().ok_or_else(|| {
+        format!(
+            "failed to write newgameseedsource for {}: invalid unicode",
+            path.display()
+        )
+    })?;
+
+    let newgameseedsource = RANDOMIZER_USER_DATA_DIR.join("randomizer/.newgameseedsource");
+
+    write(newgameseedsource, format!("file:{path}"))?;
+
+    Ok(())
 }
 
 pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {

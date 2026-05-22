@@ -69,9 +69,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let result = compile(&mut rng, &cache, entry, &out, lockfile.clone(), debug);
 
-    if launch {
-        launch_seed(&out)?;
-    }
+    launch_seed(&out, launch)?;
 
     if watch {
         if let Err(err) = result {
