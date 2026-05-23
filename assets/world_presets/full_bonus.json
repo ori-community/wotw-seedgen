@@ -7,16 +7,16 @@
   "snippets": ["bonus_items", "jumpgrades", "skill_velocity", "bonus+"],
   "snippetConfig": {
     "bonus_items": {
-      "extraJumps": "4",
-      "extraDashes": "2",
-      "blazeEfficiency": "2",
-      "spikeEfficiency": "2",
-      "shurikenEfficiency": "2",
-      "sentryEfficiency": "2",
-      "bowEfficiency": "2",
-      "regenEfficiency": "2",
-      "flashEfficiency": "2",
-      "grenadeEfficiency": "2"
+      "extra_double_jumps": "4",
+      "extra_air_dashes": "2",
+      "blaze_efficiencies": "2",
+      "spear_efficiencies": "2",
+      "shuriken_efficiencies": "2",
+      "sentry_efficiencies": "2",
+      "bow_efficiencies": "2",
+      "regenerate_efficiencies": "2",
+      "flash_efficiencies": "2",
+      "grenade_efficiencies": "2"
     }
   }
 }
