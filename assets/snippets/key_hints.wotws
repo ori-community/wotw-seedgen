@@ -82,7 +82,7 @@ fun write_twillen_hint() {
     )
 }
 
-on reload {
+on spawn {
     set_shop_item_data(
         // TODO non-boolean shop states are not ergonomic
         lupoShop.shardMapIcons,

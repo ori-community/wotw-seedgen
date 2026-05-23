@@ -320,7 +320,7 @@ fun write_burrows_hint() {
     !let(description, "nothing")
 }
 
-on reload {
+on spawn {
     set_shop_item_data(
         lupoShop.hcMapIcons,
         200,

@@ -13,67 +13,51 @@ Supply lasts indefinitely, but the price grows with the demand.")
 // TODO black market delivery at an increased price?
 
 !if keystones {
-    !state(keystones_purchased, Integer)
+    !state(keystone_price, Integer)
+    !let(base_price, 200)
 
-    on reload {
-        disable_server_sync(OpherShop.FastTravel)
-        keystone_price()
-        set_shop_item_data(
-            OpherShop.FastTravel,
-            get_integer("keystone_price"),
-            "Black Market Keystone",
-            "If anyone asks, you found it in a cave!",
-            keystone_icon,
-        )
-    }
+    on spawn set_shop_item_data(
+        OpherShop.FastTravel,
+        base_price,
+        "Black Market Keystone",
+        "If anyone asks, you found it in a cave!",
+        keystone_icon,
+    )
+
     !remove_location(OpherShop.FastTravel)
+    on reload disable_server_sync(OpherShop.FastTravel)
     on OpherShop.FastTravel {
         store(OpherShop.FastTravel, false)
         keystone()
-        store(keystones_purchased, keystones_purchased + 1)
-        keystone_price()
-        set_shop_item_price(OpherShop.FastTravel, get_integer("keystone_price"))
-    }
 
-    fun keystone_price() {
-        if keystones_purchased <= 3 {
-            set_integer("keystone_price", (keystones_purchased + 1) * 200)
-        }
-        if keystones_purchased > 3 {
-            set_integer("keystone_price", 1000)
+        if keystone_price < 5 * base_price {
+            store(keystone_price, keystone_price + base_price)
+            set_shop_item_price(OpherShop.FastTravel, keystone_price)
         }
     }
 }
 
 !if ores {
-    !state(ores_purchased, Integer)
+    !state(ore_price, Integer)
+    !let(base_price, 200)
 
-    on reload {
-        disable_server_sync(TwillenShop.LightHarvest)
-        ore_price()
-        set_shop_item_data(
-            TwillenShop.LightHarvest,
-            get_integer("ore_price"),
-            "Black Market Ore",
-            "If anyone asks, you found it in the Gorlek Mines!",
-            ore_icon,
-        )
-    }
+    on spawn set_shop_item_data(
+        TwillenShop.LightHarvest,
+        base_price,
+        "Black Market Ore",
+        "If anyone asks, you found it in the Gorlek Mines!",
+        ore_icon,
+    )
+
     !remove_location(TwillenShop.LightHarvest)
+    on reload disable_server_sync(TwillenShop.LightHarvest)
     on TwillenShop.LightHarvest {
         store(TwillenShop.LightHarvest, false)
         gorlek_ore()
-        store(ores_purchased, ores_purchased + 1)
-        ore_price()
-        set_shop_item_price(TwillenShop.LightHarvest, get_integer("ore_price"))
-    }
 
-    fun ore_price() {
-        if ores_purchased <= 3 {
-            set_integer("ore_price", (ores_purchased + 1) * 200)
-        }
-        if ores_purchased > 3 {
-            set_integer("ore_price", 1000)
+        if ore_price < 5 * base_price {
+            store(ore_price, ore_price + base_price)
+            set_shop_item_price(TwillenShop.LightHarvest, ore_price)
         }
     }
 }

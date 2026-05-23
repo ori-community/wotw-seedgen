@@ -70,7 +70,7 @@ on EastPools.TeleporterActive {
 }
 
 // TODO fully support random grom and tuley shop and remove this
-on reload {
+on spawn {
     set_shop_item_data(
         gromShop.repairTheSpiritWell,
         1,
@@ -169,17 +169,17 @@ on gameStateGroup.gameFinished store(randoState.enableSpoilerFilter, true)
 
 // TODO names are inconsistent with icon names
 // TODO try out storing the shop data in the save file
-on reload update_houses_b_unlocked()
+on spawn update_houses_b_unlocked()
 on change gromShop.dwellingRepairs update_houses_b_unlocked()
 fun update_houses_b_unlocked() {
     set_shop_item_hidden(gromShop.roofsOverHeads, gromShop.dwellingRepairs == false)
 }
-on reload update_houses_c_unlocked()
+on spawn update_houses_c_unlocked()
 on change gromShop.roofsOverHeads update_houses_c_unlocked()
 fun update_houses_c_unlocked() {
     set_shop_item_hidden(gromShop.onwardsAndUpwards, gromShop.roofsOverHeads == false)
 }
-on reload update_cave_unlocked()
+on spawn update_cave_unlocked()
 on change gromShop.thornySituation update_cave_unlocked()
 fun update_cave_unlocked() {
     set_shop_item_hidden(gromShop.clearTheCaveEntrance, gromShop.thornySituation == false)

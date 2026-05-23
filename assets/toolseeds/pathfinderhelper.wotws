@@ -271,7 +271,7 @@ fun world_reset() {
     item_message("@World Reset@")
 }
 
-on reload anchor_warps()
+on spawn anchor_warps()
 fun anchor_warps() {
     // Used Regex on paths.wotwl:
     // FIND "(?:.*\n)*?anchor (.*?) at (-?\d+), ?(-?\d+):(?:\n|[^a].*\n)*" REPLACE "    create_warp_icon("$1", $2, $3)\n    set_warp_icon_label("$1", "#$1#")\n"
