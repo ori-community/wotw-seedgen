@@ -58,7 +58,7 @@ impl AssetCacheValues for CacheValues {
         &self.uber_state_data
     }
 
-    fn areas(&self) -> &Source {
+    fn paths(&self) -> &Source {
         unimplemented!()
     }
 

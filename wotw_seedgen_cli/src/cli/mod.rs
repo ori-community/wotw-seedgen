@@ -77,7 +77,7 @@ pub enum Cli {
     },
     /// Start the language server for snippets and plandos
     SeedLsp,
-    /// Start the language server for areas.wotwl
+    /// Start the language server for paths.wotwl
     LogicLsp,
 }
 

@@ -2,7 +2,7 @@ use crate::{
     assets::{AssetFileAccess, TestAccess},
     logic_language::{
         ast::{
-            Amount, And, Areas, Content, Dedent, GroupContent, Indent, LogicIdentifier, Or,
+            Amount, And, Content, Dedent, GroupContent, Indent, LogicIdentifier, Or, Paths,
             PlainRequirement, Region, RegionKeyword, Requirement, RequirementGroup,
             RequirementLine,
         },
@@ -145,22 +145,22 @@ fn ast() {
 #[test]
 fn compile() {
     let source = Source::new(
-        "areas.wotwl".to_string(),
-        include_str!("../../../assets/logic/areas.wotwl").to_string(),
+        "paths.wotwl".to_string(),
+        include_str!("../../../assets/logic/paths.wotwl").to_string(),
     );
 
-    let areas = Areas::parse(&source.content)
+    let paths = Paths::parse(&source.content)
         .eprint_errors(&source)
         .unwrap();
 
     let Some(graph) = Graph::compile(
-        areas,
+        paths,
         TestAccess.loc_data().unwrap(),
         TestAccess.state_data().unwrap(),
         &[],
     )
     .eprint_errors(&source) else {
-        panic!("Failed to parse areas.wotwl");
+        panic!("Failed to parse paths.wotwl");
     };
 
     let spawn = graph.find_node(DEFAULT_SPAWN).unwrap();

@@ -50,7 +50,7 @@ pub struct LocData {
 /// Information about a pickup location
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct LocDataEntry {
-    /// Unique identifier for this pickup location which is used in `areas.wotwl`
+    /// Unique identifier for this pickup location which is used in `paths.wotwl`
     pub identifier: String,
     /// Map zone containing this pickup location
     pub zone: Zone,

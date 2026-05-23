@@ -14,7 +14,7 @@ use tower_lsp::{
 use wotw_seedgen_data::{
     assets,
     logic_language::{
-        ast::{self, Areas},
+        ast::{self, Paths},
         output::Graph,
     },
     parse::ParseResult,
@@ -73,7 +73,7 @@ impl LanguageServer for Backend<Cache> {
     ) -> Result<Option<GotoDefinitionResponse>> {
         let (source, index) = self.goto_definition_base(params).await?;
 
-        let ast = ast::Areas::parse(source.value());
+        let ast = ast::Paths::parse(source.value());
 
         Ok(goto_definition(
             ast.parsed,
@@ -89,13 +89,13 @@ impl Backend<Cache> {
         self.update_diagnostics_with(uri, async |path| {
             let source = self.consume_result(assets::read_to_string(&path)).await?;
 
-            let ParseResult { parsed, mut errors } = Areas::parse(&source);
+            let ParseResult { parsed, mut errors } = Paths::parse(&source);
 
-            if let Some(areas) = parsed {
+            if let Some(paths) = parsed {
                 let mut result = {
                     let cache = self.cache.read().await;
 
-                    Graph::compile(areas, cache.loc_data.clone(), cache.state_data.clone(), &[])
+                    Graph::compile(paths, cache.loc_data.clone(), cache.state_data.clone(), &[])
                 };
 
                 errors.append(&mut result.errors);

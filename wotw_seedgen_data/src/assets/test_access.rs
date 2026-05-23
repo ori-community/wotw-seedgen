@@ -16,7 +16,7 @@ use crate::{
         UberStateData, UniversePreset, WorldPreset,
     },
     logic_language::{
-        ast::Areas,
+        ast::Paths,
         output::{Anchor, Connection, Graph, Node, Requirement},
     },
     seed_language::simulate::UberStates,
@@ -105,8 +105,8 @@ impl AssetCacheValues for TestCacheValues {
         &self.base.uber_state_data
     }
 
-    fn areas(&self) -> &Source {
-        &self.base.areas
+    fn paths(&self) -> &Source {
+        &self.base.paths
     }
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String> {
@@ -189,17 +189,17 @@ impl TestCacheGraphs {
 }
 
 fn graph(base: &DefaultAssetCacheValues, settings: &[WorldSettings]) -> Graph {
-    let areas = Areas::parse(&base.areas.content)
-        .eprint_errors(&base.areas)
+    let paths = Paths::parse(&base.paths.content)
+        .eprint_errors(&base.paths)
         .unwrap();
 
     Graph::compile(
-        areas,
+        paths,
         base.loc_data.clone(),
         base.state_data.clone(),
         settings,
     )
-    .eprint_errors(&base.areas)
+    .eprint_errors(&base.paths)
     .unwrap()
 }
 

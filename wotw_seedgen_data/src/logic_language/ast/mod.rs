@@ -19,11 +19,11 @@ where
 }
 
 #[derive(Debug, Clone, PartialEq, Ast)]
-pub struct Areas<'source> {
+pub struct Paths<'source> {
     pub contents: Separated<Recoverable<Content<'source>, RecoverDedent>, Newline>,
 }
 
-impl<'source> Areas<'source> {
+impl<'source> Paths<'source> {
     #[inline]
     pub fn parse(source: &'source str) -> ParseResult<Self> {
         parse_logic_ast(source)

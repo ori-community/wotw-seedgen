@@ -114,11 +114,11 @@ pub trait AssetFileAccess {
         Ok(UberStateData::from_parts(dump, loc_data, state_data))
     }
 
-    const AREAS_PATH: &str = "logic/areas.wotwl";
+    const PATHS_PATH: &str = "logic/paths.wotwl";
 
-    fn areas(&self) -> Result<Source, String> {
+    fn paths(&self) -> Result<Source, String> {
         let (path, content) =
-            folders::read_to_string(self.asset_folders(), Path::new(Self::AREAS_PATH))?;
+            folders::read_to_string(self.asset_folders(), Path::new(Self::PATHS_PATH))?;
 
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))

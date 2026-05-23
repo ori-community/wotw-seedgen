@@ -1,13 +1,13 @@
 use tower_lsp::lsp_types::{GotoDefinitionResponse, Location, Url};
 use wotw_seedgen_data::{
-    logic_language::ast::{Areas, Handler, LogicIdentifier, PlainRequirement, Traverse},
+    logic_language::ast::{Paths, Handler, LogicIdentifier, PlainRequirement, Traverse},
     parse::{Identifier, Spanned},
 };
 
 use crate::convert;
 
 pub fn goto_definition(
-    ast: Option<Areas>,
+    ast: Option<Paths>,
     index: usize,
     uri: &Url,
     document: &str,

@@ -17,7 +17,7 @@ use wotw_seedgen::{
             self, file_err, write, AssetFileAccess, DefaultFileAccess, LocData, StateData,
             UberStateData, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
         },
-        logic_language::{ast::Areas, output::Graph},
+        logic_language::{ast::Paths, output::Graph},
         parse::Source,
         UniverseSettings, WorldSettings,
     },
@@ -179,20 +179,20 @@ pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse
     Ok(seed_universe)
 }
 
-pub fn areas(source: &Source) -> Result<Areas<'_>, Error> {
-    Areas::parse(&source.content)
+pub fn paths(source: &Source) -> Result<Paths<'_>, Error> {
+    Paths::parse(&source.content)
         .eprint_errors(&source)
-        .ok_or_else(|| Error("failed to parse areas".to_string()))
+        .ok_or_else(|| Error("failed to parse paths".to_string()))
 }
 
 pub fn graph(
     source: &Source,
-    areas: Areas,
+    paths: Paths,
     loc_data: LocData,
     state_data: StateData,
     settings: &[WorldSettings],
 ) -> Result<Graph, Error> {
-    Graph::compile(areas, loc_data, state_data, settings)
+    Graph::compile(paths, loc_data, state_data, settings)
         .eprint_errors(source)
         .ok_or_else(|| Error("failed to compile graph".to_string()))
 }
@@ -201,12 +201,12 @@ pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, LocData, UberS
     let LogicFiles {
         loc_data,
         state_data,
-        areas_source: source,
+        paths_source: source,
         uber_state_data,
     } = LogicFiles::new()?;
 
-    let areas = areas(&source)?;
-    let graph = graph(&source, areas, loc_data.clone(), state_data, settings)?;
+    let paths = paths(&source)?;
+    let graph = graph(&source, paths, loc_data.clone(), state_data, settings)?;
 
     Ok((graph, loc_data, uber_state_data))
 }
@@ -214,7 +214,7 @@ pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, LocData, UberS
 pub struct LogicFiles {
     pub loc_data: LocData,
     pub state_data: StateData,
-    pub areas_source: Source,
+    pub paths_source: Source,
     pub uber_state_data: UberStateData,
 }
 
@@ -222,13 +222,13 @@ impl LogicFiles {
     pub fn new() -> Result<Self, Error> {
         let loc_data = DefaultFileAccess.loc_data()?;
         let state_data = DefaultFileAccess.state_data()?;
-        let areas_source = DefaultFileAccess.areas()?;
+        let paths_source = DefaultFileAccess.paths()?;
         let uber_state_data = DefaultFileAccess.uber_state_data(&loc_data, &state_data)?;
 
         Ok(LogicFiles {
             loc_data,
             state_data,
-            areas_source,
+            paths_source,
             uber_state_data,
         })
     }

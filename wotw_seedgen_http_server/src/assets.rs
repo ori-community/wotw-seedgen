@@ -8,7 +8,7 @@ use wotw_seedgen::data::{
         DefaultFileAccess, LocData, PresetFileAccess, SEEDGEN_USER_DATA_DIR, SnippetFileAccess,
         StateData, UberStateData,
     },
-    logic_language::{ast::Areas, output::Graph},
+    logic_language::{ast::Paths, output::Graph},
     parse::Source,
     seed_language::{metadata::Metadata, simulate::UberStates},
 };
@@ -42,7 +42,7 @@ impl AssetCacheValues for CacheValues {
         let uber_states = UberStates::new(&base.uber_state_data, &[]);
         let relevant_uber_states = RelevantUberStates::new(&base.loc_data, &base.state_data);
 
-        let graph = graph(&base.areas, &base.loc_data, &base.state_data)?;
+        let graph = graph(&base.paths, &base.loc_data, &base.state_data)?;
 
         let node_index_to_map_icon_index = node_index_to_map_icon_index(&graph, &map_icons);
 
@@ -74,8 +74,8 @@ impl AssetCacheValues for CacheValues {
         &self.base.uber_state_data
     }
 
-    fn areas(&self) -> &Source {
-        &self.base.areas
+    fn paths(&self) -> &Source {
+        &self.base.paths
     }
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String> {
@@ -110,8 +110,8 @@ impl AssetCacheValues for CacheValues {
                 RelevantUberStates::new(&self.base.loc_data, &self.base.state_data);
         }
 
-        if changed.loc_data || changed.state_data || changed.areas {
-            self.graph = graph(&self.base.areas, &self.base.loc_data, &self.base.state_data)?;
+        if changed.loc_data || changed.state_data || changed.paths {
+            self.graph = graph(&self.base.paths, &self.base.loc_data, &self.base.state_data)?;
 
             self.node_index_to_map_icon_index =
                 node_index_to_map_icon_index(&self.graph, &self.map_icons);
@@ -136,11 +136,11 @@ fn grom_shop_map_icon_index(map_icons: &MapIcons) -> usize {
 }
 
 fn graph(source: &Source, loc_data: &LocData, state_data: &StateData) -> Result<Graph, String> {
-    let areas = Areas::parse(&source.content)
+    let paths = Paths::parse(&source.content)
         .eprint_errors(source)
         .ok_or(String::new())?;
 
-    Graph::compile(areas, loc_data.clone(), state_data.clone(), &[])
+    Graph::compile(paths, loc_data.clone(), state_data.clone(), &[])
         .eprint_errors(source)
         .ok_or(String::new())
 }

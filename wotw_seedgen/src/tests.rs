@@ -6,7 +6,7 @@ use wotw_seedgen_data::{
         AssetCacheValues, AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings,
         WorldPresetSettings, TEST_ASSETS,
     },
-    logic_language::{ast::Areas, output::Graph},
+    logic_language::{ast::Paths, output::Graph},
     test_logger, Difficulty, UniverseSettings,
 };
 
@@ -26,12 +26,12 @@ fn some_seeds() {
         .unwrap();
     }
 
-    let source = TEST_ASSETS.values.areas();
-    let areas = Areas::parse(&source.content).eprint_errors(source).unwrap();
+    let source = TEST_ASSETS.values.paths();
+    let paths = Paths::parse(&source.content).eprint_errors(source).unwrap();
 
     let mut universe_settings = UniverseSettings::new("0".to_string());
     let mut graph = Graph::compile(
-        areas.clone(),
+        paths.clone(),
         TEST_ASSETS.loc_data().unwrap(),
         TEST_ASSETS.state_data().unwrap(),
         &universe_settings.world_settings,
@@ -43,7 +43,7 @@ fn some_seeds() {
 
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
     graph = Graph::compile(
-        areas,
+        paths,
         TEST_ASSETS.loc_data().unwrap(),
         TEST_ASSETS.state_data().unwrap(),
         &universe_settings.world_settings,

@@ -29,7 +29,7 @@ use wotw_seedgen_parse::{
 impl Graph {
     /// `settings` is used for optimization, you may pass an empty slice if you don't know the settings this `Graph` will be used for
     pub fn compile(
-        mut areas: ast::Areas,
+        mut paths: ast::Paths,
         loc_data: LocData,
         state_data: StateData,
         settings: &[WorldSettings],
@@ -46,9 +46,9 @@ impl Graph {
             .map(Node::State)
             .collect::<Vec<_>>();
 
-        let mut compiler = Compiler::new(&mut areas, &loc_data_nodes, &state_data_nodes, settings);
+        let mut compiler = Compiler::new(&mut paths, &loc_data_nodes, &state_data_nodes, settings);
 
-        areas.contents.compile(&mut compiler);
+        paths.contents.compile(&mut compiler);
         compiler.generate_entrance_connections();
 
         let Compiler {
@@ -95,7 +95,7 @@ struct Compiler<'source> {
 
 impl<'source> Compiler<'source> {
     fn new(
-        areas: &mut ast::Areas,
+        paths: &mut ast::Paths,
         loc_data_nodes: &'source [Node],
         state_data_nodes: &'source [Node],
         settings: &[WorldSettings],
@@ -136,7 +136,7 @@ impl<'source> Compiler<'source> {
 
         // partition
         {
-            let mut iter = areas.contents.iter_mut();
+            let mut iter = paths.contents.iter_mut();
 
             while let Some(anchor) = iter.find(|content| {
                 matches!(content.value, SpannedOption::Some(ast::Content::Anchor(..)))
@@ -157,7 +157,7 @@ impl<'source> Compiler<'source> {
 
         let mut anchors = Vec::with_capacity(300); // We know more about the needed capacity than collect would
 
-        for anchor in areas
+        for anchor in paths
             .contents
             .iter()
             .filter_map(|content| content.value.as_option())

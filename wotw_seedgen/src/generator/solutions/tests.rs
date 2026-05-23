@@ -11,7 +11,7 @@ use smallvec::smallvec;
 use wotw_seedgen_data::{
     assets::TEST_ASSETS,
     logic_language::{
-        ast::{Areas, Content},
+        ast::{Content, Paths},
         output::{Enemy, Graph, Requirement},
     },
     parse::SpannedOption,
@@ -1148,22 +1148,22 @@ static GORLEK_SETTINGS: LazyLock<WorldSettings> =
     LazyLock::new(|| WorldSettings::difficulty_default(Difficulty::Gorlek));
 
 static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
-    let mut areas = Areas::parse(&TEST_ASSETS.base.areas.content)
-        .eprint_errors(&TEST_ASSETS.base.areas)
+    let mut paths = Paths::parse(&TEST_ASSETS.base.paths.content)
+        .eprint_errors(&TEST_ASSETS.base.paths)
         .unwrap();
 
-    areas
+    paths
         .contents
         .more
         .retain(|(_, content)| !matches!(content.value, SpannedOption::Some(Content::Region(..))));
 
     Graph::compile(
-        areas,
+        paths,
         TEST_ASSETS.base.loc_data.clone(),
         TEST_ASSETS.base.state_data.clone(),
         slice::from_ref(&*GORLEK_SETTINGS),
     )
-    .eprint_errors(&TEST_ASSETS.base.areas)
+    .eprint_errors(&TEST_ASSETS.base.paths)
     .unwrap()
 });
 
@@ -1531,7 +1531,7 @@ fn reach_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
         make_test_solutions!([
-            // TODO this is incorrect in areas.wotwl, the ice wall next to the teleporter should be a state
+            // TODO this is incorrect in paths.wotwl, the ice wall next to the teleporter should be a state
             // if this was correct, LowerReach.MeltIceSL would be reachable on spawn and not considered here
             // some solution below are commented out because they become redundant as a consequence
             // LowerReach.MeltIceSL
@@ -1563,7 +1563,7 @@ fn depths_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
         make_test_solutions!([
-            // TODO these three are invalid solutions, we don't have `BreakWall with` syntax yet so this cannot be written correctly in areas.wotwl
+            // TODO these three are invalid solutions, we don't have `BreakWall with` syntax yet so this cannot be written correctly in paths.wotwl
             [skill(Spear), skill(Hammer)],
             [skill(Spear), skill(Sword)],
             [skill(Spear), skill(Blaze)],

@@ -67,8 +67,8 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
                     changed.loc_data = true;
                     changed.state_data = true;
                     changed.uber_state_dump = true;
-                } else if path.ends_with(F::AREAS_PATH) {
-                    changed.areas = true;
+                } else if path.ends_with(F::PATHS_PATH) {
+                    changed.paths = true;
                 } else {
                     subfolder_changed(
                         &mut changed.snippets,
@@ -137,8 +137,8 @@ impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, 
         Ok(self.values.uber_state_data().clone())
     }
 
-    fn areas(&self) -> Result<Source, String> {
-        Ok(self.values.areas().clone())
+    fn paths(&self) -> Result<Source, String> {
+        Ok(self.values.paths().clone())
     }
 }
 
@@ -153,7 +153,7 @@ pub trait AssetCacheValues: Sized {
 
     fn uber_state_data(&self) -> &UberStateData;
 
-    fn areas(&self) -> &Source;
+    fn paths(&self) -> &Source;
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String>;
 
@@ -171,7 +171,7 @@ pub struct ChangedAssets {
     pub loc_data: bool,
     pub state_data: bool,
     pub uber_state_dump: bool,
-    pub areas: bool,
+    pub paths: bool,
     pub snippets: Vec<(String, EventKind)>,
     pub universe_presets: Vec<(String, EventKind)>,
     pub world_presets: Vec<(String, EventKind)>,
@@ -246,7 +246,7 @@ pub struct DefaultAssetCacheValues {
     pub loc_data: LocData,
     pub state_data: StateData,
     pub uber_state_data: UberStateData,
-    pub areas: Source,
+    pub paths: Source,
     pub snippets: FxHashMap<String, Source>,
     pub universe_presets: FxHashMap<String, UniversePreset>,
     pub world_presets: FxHashMap<String, WorldPreset>,
@@ -260,7 +260,7 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         let loc_data = file_access.loc_data()?;
         let state_data = file_access.state_data()?;
         let uber_state_data = file_access.uber_state_data(&loc_data, &state_data)?;
-        let areas = file_access.areas()?;
+        let paths = file_access.paths()?;
 
         let snippets = file_access
             .available_snippets()
@@ -296,7 +296,7 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             loc_data,
             state_data,
             uber_state_data,
-            areas,
+            paths,
             snippets,
             universe_presets,
             world_presets,
@@ -315,8 +315,8 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         &self.uber_state_data
     }
 
-    fn areas(&self) -> &Source {
-        &self.areas
+    fn paths(&self) -> &Source {
+        &self.paths
     }
 
     fn update<F>(&mut self, file_access: &F, changed: ChangedAssets) -> Result<(), String>
@@ -327,7 +327,7 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             loc_data,
             state_data,
             uber_state_dump,
-            areas,
+            paths,
             snippets,
             universe_presets,
             world_presets,
@@ -345,8 +345,8 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             self.uber_state_data = file_access.uber_state_data(&self.loc_data, &self.state_data)?;
         }
 
-        if areas {
-            self.areas = file_access.areas()?;
+        if paths {
+            self.paths = file_access.paths()?;
         }
 
         update_subfolder(snippets, &mut self.snippets, |identifier| {

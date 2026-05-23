@@ -3,7 +3,7 @@ use wotw_seedgen_parse::{
 };
 
 use crate::logic_language::ast::{
-    Anchor, AnchorContent, And, Areas, Connection, ConnectionKeyword, Content, EntranceContent,
+    Anchor, AnchorContent, And, Paths, Connection, ConnectionKeyword, Content, EntranceContent,
     EntranceTarget, Group, GroupContent, InlineRequirementOrGroup, LogicIdentifier, Macro,
     PlainRequirement, Refill, Region, Requirement, RequirementLine, RequirementLineOrGroup,
 };
@@ -167,7 +167,7 @@ impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H> for An
     fn traverse(&'ast self, _handler: &mut H) {}
 }
 
-impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H> for Areas<'source> {
+impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H> for Paths<'source> {
     fn traverse(&'ast self, handler: &mut H) {
         self.contents.traverse(handler);
     }

@@ -42,7 +42,7 @@ impl AssetCacheValues for CacheValues {
         unimplemented!()
     }
 
-    fn areas(&self) -> &Source {
+    fn paths(&self) -> &Source {
         unimplemented!()
     }
 

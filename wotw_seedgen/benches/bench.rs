@@ -11,7 +11,7 @@ use wotw_seedgen_data::{
         WorldPresetSettings, TEST_ASSETS,
     },
     logic_language::{
-        ast::Areas,
+        ast::Paths,
         output::{Enemy, Graph, Requirement},
     },
     seed_language::{
@@ -23,24 +23,24 @@ use wotw_seedgen_data::{
     Difficulty, Skill, Spawn, UberIdentifier, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 
-static AREAS: LazyLock<Areas> = LazyLock::new(|| {
-    let source = TEST_ASSETS.values.areas();
-    Areas::parse(&source.content).eprint_errors(source).unwrap()
+static PATHS: LazyLock<Paths> = LazyLock::new(|| {
+    let source = TEST_ASSETS.values.paths();
+    Paths::parse(&source.content).eprint_errors(source).unwrap()
 });
 
 fn logic_assets(c: &mut Criterion) {
     let mut group = c.benchmark_group("logic_assets");
 
-    group.bench_function("areas", |b| {
-        b.iter(|| Areas::parse(include_str!("../../assets/logic/areas.wotwl")))
+    group.bench_function("paths", |b| {
+        b.iter(|| Paths::parse(include_str!("../../assets/logic/paths.wotwl")))
     });
 
-    let areas = &*AREAS;
+    let paths = &*PATHS;
     let loc_data = TEST_ASSETS.loc_data().unwrap();
     let state_data = TEST_ASSETS.state_data().unwrap();
 
     group.bench_function("compile", |b| {
-        b.iter(|| Graph::compile(areas.clone(), loc_data.clone(), state_data.clone(), &[]))
+        b.iter(|| Graph::compile(paths.clone(), loc_data.clone(), state_data.clone(), &[]))
     });
 
     group.finish();
