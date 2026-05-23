@@ -1598,19 +1598,19 @@ on OpherShop.WaterBreath {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Spike {
+on OpherShop.Spear {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.SpiritSmash {
+on OpherShop.Hammer {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Teleport {
+on OpherShop.FastTravel {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.SpiritStar {
+on OpherShop.Shuriken {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1622,15 +1622,15 @@ on OpherShop.Sentry {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.ExplodingSpike {
+on OpherShop.ExplodingSpear {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.ShockSmash {
+on OpherShop.HammerShockwave {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.StaticStar {
+on OpherShop.StaticShuriken {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }

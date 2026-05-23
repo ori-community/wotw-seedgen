@@ -17169,24 +17169,23 @@ anchor TwillenShop:
     moki: SpiritLight=1200
 
 anchor OpherShop:  # Opher's offers
-  # TODO rename areas.wotwl identifiers
-  pickup OpherShop.Spike:
+  pickup OpherShop.Spear:
     moki: SpiritLight=1200
-  pickup OpherShop.SpiritSmash:
+  pickup OpherShop.Hammer:
     moki: SpiritLight=1200
-  pickup OpherShop.SpiritStar:
+  pickup OpherShop.Shuriken:
     moki: SpiritLight=1200
   pickup OpherShop.Blaze:
     moki: SpiritLight=1200
   pickup OpherShop.Sentry:  # used for keystones if necessary; filtered by gen
     moki: SpiritLight=1200
-  pickup OpherShop.Teleport:
+  pickup OpherShop.FastTravel:
     moki: SpiritLight=1200
-  pickup OpherShop.ShockSmash:
+  pickup OpherShop.HammerShockwave:
     moki: SpiritLight=1200
-  pickup OpherShop.StaticStar:
+  pickup OpherShop.StaticShuriken:
     moki: SpiritLight=1200
-  pickup OpherShop.ExplodingSpike:
+  pickup OpherShop.ExplodingSpear:
     moki: SpiritLight=1200
   pickup OpherShop.RapidSentry:
     moki: SpiritLight=1200
