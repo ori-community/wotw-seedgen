@@ -3,6 +3,7 @@
 #description("Skips several short cutscenes and dialogues")
 
 !include("wisp_count", on_change_wisp_count)
+!include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
 
 on spawn {
     // Static cutscene skips
@@ -81,21 +82,17 @@ on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petr
 
 !augment_fun(on_change_wisp_count, if get_integer("wisp_count") >= 4 store(windtornRuinsGroup.openedDesertRuins, true))
 
-on UpperDepths.LightcatcherSeed update_tuley()
-on UpperWastes.FlowersSeed update_tuley()
-on InnerWellspring.BlueMoonSeed update_tuley()
-on EastPools.GrassSeed update_tuley()
-on UpperReach.SpringSeed update_tuley()
-on WoodsEntry.TreeSeed update_tuley()
-on GladesTown.TuleySpawned update_tuley()
-
-fun update_tuley() {
-    if GladesTown.TuleySpawned {
-        store(tuleyShop.lightcatchers, UpperDepths.LightcatcherSeed == true)
-        store(tuleyShop.selaFlowers, UpperWastes.FlowersSeed == true)
-        store(tuleyShop.blueMoon, InnerWellspring.BlueMoonSeed == true)
-        store(tuleyShop.stickyGrass, EastPools.GrassSeed == true)
-        store(tuleyShop.springPlants, UpperReach.SpringSeed == true)
-        store(tuleyShop.lastTree, WoodsEntry.TreeSeed == true)
-    }
+on lightcatchers if GladesTown.TuleySpawned store(tuleyShop.lightcatchers, true)
+on sela_flowers if GladesTown.TuleySpawned store(tuleyShop.selaFlowers, true)
+on blue_moon if GladesTown.TuleySpawned store(tuleyShop.blueMoon, true)
+on sticky_grass if GladesTown.TuleySpawned store(tuleyShop.stickyGrass, true)
+on spring_plants if GladesTown.TuleySpawned store(tuleyShop.springPlants, true)
+on last_tree if GladesTown.TuleySpawned store(tuleyShop.lastTree, true)
+on GladesTown.TuleySpawned {
+    store(tuleyShop.lightcatchers, lightcatchers)
+    store(tuleyShop.selaFlowers, sela_flowers)
+    store(tuleyShop.blueMoon, blue_moon)
+    store(tuleyShop.stickyGrass, sticky_grass)
+    store(tuleyShop.springPlants, spring_plants)
+    store(tuleyShop.lastTree, last_tree)
 }

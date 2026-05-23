@@ -2,6 +2,8 @@
 #name("Seed Core")
 #description("Essentials for the randomizer to function")
 
+!include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
+
 on spawn {
     // For generated seeds, logic filter should always be available
     store(randoConfig.inLogicFilterEnabled, true)
@@ -161,13 +163,6 @@ on reload {
         "I recognize this seed. It seems the tree I couldn't save is not completely gone.",
         TheLastSeed,
     )
-
-    set_shop_item_hidden(tuleyShop.lightcatchers, UpperDepths.LightcatcherSeed == false)
-    set_shop_item_hidden(tuleyShop.selaFlowers, UpperWastes.FlowersSeed == false)
-    set_shop_item_hidden(tuleyShop.blueMoon, InnerWellspring.BlueMoonSeed == false)
-    set_shop_item_hidden(tuleyShop.stickyGrass, EastPools.GrassSeed == false)
-    set_shop_item_hidden(tuleyShop.springPlants, UpperReach.SpringSeed == false)
-    set_shop_item_hidden(tuleyShop.lastTree, WoodsEntry.TreeSeed == false)
 }
 
 on gameStateGroup.gameFinished store(randoState.enableSpoilerFilter, true)
@@ -243,12 +238,13 @@ on gladesProjects.stickyGrassPlanted check_regrow_glades_completion()
 on gladesProjects.springPlantsPlanted check_regrow_glades_completion()
 on gladesProjects.lastTreePlanted check_regrow_glades_completion()
 
-on UpperDepths.LightcatcherSeed set_shop_item_hidden(tuleyShop.lightcatchers, false)
-on UpperWastes.FlowersSeed set_shop_item_hidden(tuleyShop.selaFlowers, false)
-on InnerWellspring.BlueMoonSeed set_shop_item_hidden(tuleyShop.blueMoon, false)
-on EastPools.GrassSeed set_shop_item_hidden(tuleyShop.stickyGrass, false)
-on UpperReach.SpringSeed set_shop_item_hidden(tuleyShop.springPlants, false)
-on WoodsEntry.TreeSeed set_shop_item_hidden(tuleyShop.lastTree, false)
+// TODO inconsistent naming
+on UpperDepths.LightcatcherSeed store(lightcatchers, true)
+on UpperWastes.FlowersSeed store(sela_flowers, true)
+on InnerWellspring.BlueMoonSeed store(blue_moon, true)
+on EastPools.GrassSeed store(sticky_grass, true)
+on UpperReach.SpringSeed store(spring_plants, true)
+on WoodsEntry.TreeSeed store(last_tree, true)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.
