@@ -1202,7 +1202,7 @@ fn marsh_spawn_solutions() {
             [skill(Hammer)],
             // MarshSpawn.LongSwimSL
             [clean_water()],
-            // MarshSpawn.BashEC
+            // MarshSpawn.BashEF
             [skill(Bash)],
             // MarshSpawn.ResilienceShard
             [skill(Bow)],
@@ -1664,7 +1664,7 @@ fn central_wastes_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
         make_test_solutions!([
-            // LowerWastes.UpperPathHC
+            // LowerWastes.UpperPathHF
             [skill(Burrow)],
             // LowerWastes.CentralTPOre
             [skill(DoubleJump), skill(Sword)],

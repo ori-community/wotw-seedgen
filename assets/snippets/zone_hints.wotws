@@ -75,7 +75,7 @@ fun write_hollow_hint() {
     }
 }
 fun write_glades_hint() {
-    if LupoShop.HCMapIcon {
+    if LupoShop.HFMapIcon {
         write_glades_skill_hint()
         write_glades_teleporter_hint()
     }
@@ -87,7 +87,7 @@ fun write_wellspring_hint() {
     }
 }
 fun write_woods_hint() {
-    if LupoShop.ECMapIcon {
+    if LupoShop.EFMapIcon {
         write_woods_skill_hint()
         write_woods_teleporter_hint()
     }
@@ -360,8 +360,8 @@ on WestHollow.LupoMap {
     write_hollow_hint()
     item_message(get_string("zone_hint"))
 }
-!remove_location(LupoShop.HCMapIcon)
-on LupoShop.HCMapIcon {
+!remove_location(LupoShop.HFMapIcon)
+on LupoShop.HFMapIcon {
     set_string("zone_hint", "")
     write_glades_hint()
     item_message(get_string("zone_hint"))
@@ -372,8 +372,8 @@ on InnerWellspring.LupoMap {
     write_wellspring_hint()
     item_message(get_string("zone_hint"))
 }
-!remove_location(LupoShop.ECMapIcon)
-on LupoShop.ECMapIcon {
+!remove_location(LupoShop.EFMapIcon)
+on LupoShop.EFMapIcon {
     set_string("zone_hint", "")
     write_woods_hint()
     item_message(get_string("zone_hint"))

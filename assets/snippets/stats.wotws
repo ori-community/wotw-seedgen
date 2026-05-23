@@ -98,7 +98,7 @@ on after_spawn {
     save()
 }
 
-on MarshSpawn.RockHC {
+on MarshSpawn.RockHF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -106,7 +106,7 @@ on MarshSpawn.FirstPickupSL {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshSpawn.GrappleHC {
+on MarshSpawn.GrappleHF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -122,7 +122,7 @@ on MarshSpawn.ResilienceOre {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshSpawn.BashEC {
+on MarshSpawn.BashEF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -138,7 +138,7 @@ on MarshSpawn.RegenTree {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshSpawn.LeverEC {
+on MarshSpawn.LeverEF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -194,7 +194,7 @@ on MarshSpawn.MokkSL {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshSpawn.FangEC {
+on MarshSpawn.FangEF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -242,11 +242,11 @@ on MidnightBurrows.TabletQI {
     store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on HowlsDen.SlimeLoopHC {
+on HowlsDen.SlimeLoopHF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on HowlsDen.SecretRoomHC {
+on HowlsDen.SecretRoomHF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -298,11 +298,11 @@ on MarshPastOpher.TrialOre {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshPastOpher.TrialEC {
+on MarshPastOpher.TrialEF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshPastOpher.TrialHC {
+on MarshPastOpher.TrialHF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -330,7 +330,7 @@ on MarshPastOpher.RightEyestone {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshPastOpher.BowEC {
+on MarshPastOpher.BowEF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -342,7 +342,7 @@ on MarshPastOpher.CeilingSL {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on MarshPastOpher.PoolsPathEC {
+on MarshPastOpher.PoolsPathEF {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -350,7 +350,7 @@ on MarshPastOpher.PoolsPathSL {
     store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WestHollow.CrusherHC {
+on WestHollow.CrusherHF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -362,7 +362,7 @@ on WestHollow.RockPuzzleSL {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WestHollow.BreakableWallEC {
+on WestHollow.BreakableWallEF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -370,7 +370,7 @@ on WestHollow.QuickshotShard {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WestHollow.SwimEC {
+on WestHollow.SwimEF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -378,7 +378,7 @@ on WestHollow.LupoMap {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WestHollow.TrialHC {
+on WestHollow.TrialHF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -430,11 +430,11 @@ on EastHollow.RightMortarSL {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on EastHollow.BashAreaEC {
+on EastHollow.BashAreaEF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on EastHollow.BashHC {
+on EastHollow.BashHF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -454,7 +454,7 @@ on EastHollow.RightKwolokSL {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on EastHollow.SilentSwimEC {
+on EastHollow.SilentSwimEF {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -506,15 +506,15 @@ on GladesTown.MokiAcornQuest {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on GladesTown.HoleHutEC {
+on GladesTown.HoleHutEF {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on GladesTown.AboveGromHC {
+on GladesTown.AboveGromHF {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on GladesTown.LupoSwimHC {
+on GladesTown.LupoSwimHF {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -622,7 +622,7 @@ on WestGlades.UpperPoolSL {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WestGlades.SwimEC {
+on WestGlades.SwimEF {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -634,7 +634,7 @@ on WestGlades.TentacleOre {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WestGlades.ShrineHC {
+on WestGlades.ShrineHF {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -646,7 +646,7 @@ on OuterWellspring.RightWallOre {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OuterWellspring.RightWallEC {
+on OuterWellspring.RightWallEF {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -666,7 +666,7 @@ on OuterWellspring.UltraGrappleShard {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OuterWellspring.AboveTokkHC {
+on OuterWellspring.AboveTokkHF {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -678,7 +678,7 @@ on OuterWellspring.WheelSL {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OuterWellspring.BasementEC {
+on OuterWellspring.BasementEF {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -714,7 +714,7 @@ on InnerWellspring.WaterSwitchSL {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on InnerWellspring.DrainHC {
+on InnerWellspring.DrainHF {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -726,7 +726,7 @@ on InnerWellspring.LaserOre {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on InnerWellspring.LeverEC {
+on InnerWellspring.LeverEF {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -802,11 +802,11 @@ on PoolsApproach.AboveWheelSL {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on PoolsApproach.MillPathHC {
+on PoolsApproach.MillPathHF {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on PoolsApproach.MillPathEC {
+on PoolsApproach.MillPathEF {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -838,7 +838,7 @@ on EastPools.AboveDoorOre {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on EastPools.PurpleWallHC {
+on EastPools.PurpleWallHF {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -858,7 +858,7 @@ on EastPools.UltraBashShard {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on EastPools.FightRoomHC {
+on EastPools.FightRoomHF {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -910,7 +910,7 @@ on UpperPools.FishPoolOre {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperPools.BubblesEC {
+on UpperPools.BubblesEF {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -934,7 +934,7 @@ on UpperPools.TreeRoofSL {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperPools.WaterfallEC {
+on UpperPools.WaterfallEF {
     store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1134,7 +1134,7 @@ on LowerReach.HandToHandHat {
     store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerReach.SnowballHC {
+on LowerReach.SnowballHF {
     store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1266,7 +1266,7 @@ on UpperDepths.LeftEntryKS {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperDepths.SwimEC {
+on UpperDepths.SwimEF {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1290,7 +1290,7 @@ on UpperDepths.MoraPathSL {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperDepths.KeystoneHC {
+on UpperDepths.KeystoneHF {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1302,7 +1302,7 @@ on UpperDepths.ForestsEyes {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerDepths.RaceStartHC {
+on LowerDepths.RaceStartHF {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1326,7 +1326,7 @@ on LowerDepths.CombatShrine {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerDepths.SwimEC {
+on LowerDepths.SwimEF {
     store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1370,11 +1370,11 @@ on LowerWastes.EerieGemQI {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerWastes.MuncherTunnelEC {
+on LowerWastes.MuncherTunnelEF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerWastes.SandPotHC {
+on LowerWastes.SandPotHF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1390,7 +1390,7 @@ on LowerWastes.BottomRightSL {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerWastes.BottomRightHC {
+on LowerWastes.BottomRightHF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1426,7 +1426,7 @@ on LowerWastes.BurrowTreeSL {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerWastes.UpperPathEC {
+on LowerWastes.UpperPathEF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1438,7 +1438,7 @@ on LowerWastes.UpperPathHiddenSL {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LowerWastes.UpperPathHC {
+on LowerWastes.UpperPathHF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1462,7 +1462,7 @@ on UpperWastes.KSDoorSL {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperWastes.LedgeEC {
+on UpperWastes.LedgeEF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1474,7 +1474,7 @@ on UpperWastes.PurpleWallSL {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on UpperWastes.PurpleWallHC {
+on UpperWastes.PurpleWallHF {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1502,7 +1502,7 @@ on UpperWastes.WallOre {
     store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WindtornRuins.EscapeRevisitEC {
+on WindtornRuins.EscapeRevisitEF {
     store(randoStats.pickupsCollectedRuins, randoStats.pickupsCollectedRuins + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1538,7 +1538,7 @@ on WillowsEnd.EntrySL {
     store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WillowsEnd.PoisonfallHC {
+on WillowsEnd.PoisonfallHF {
     store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
@@ -1642,11 +1642,11 @@ on OpherShop.RapidSentry {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.HCMapIcon {
+on LupoShop.HFMapIcon {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.ECMapIcon {
+on LupoShop.EFMapIcon {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
