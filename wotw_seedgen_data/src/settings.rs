@@ -2,6 +2,8 @@
 //!
 //! See the [`UniverseSettings`] struct for more information
 
+mod slug;
+
 use std::{
     fmt::{self, Display},
     num::NonZeroU8,
@@ -22,7 +24,7 @@ use utoipa::{
 use crate::{
     assets::{InlineSnippets, SnippetAccess},
     parse::Source,
-    seed_language::metadata::ConfigDefault,
+    seed_language::metadata::{ConfigDefault, Metadata},
 };
 
 /// A representation of all the relevant settings when generating a seed
@@ -186,6 +188,11 @@ impl WorldSettings {
     }
 
     pub fn random<R: Rng, A: SnippetAccess>(rng: &mut R, snippet_access: &A) -> Self {
+        let snippets = snippet_access.available_snippets_metadata();
+        Self::random_with_metadata(rng, &snippets)
+    }
+
+    pub fn random_with_metadata<R: Rng>(rng: &mut R, snippets: &[(String, Metadata)]) -> Self {
         let difficulty = *<Difficulty as VariantArray>::VARIANTS.choose(rng).unwrap();
 
         let distr_50 = Bernoulli::new(0.5).unwrap();
@@ -196,29 +203,30 @@ impl WorldSettings {
             .copied()
             .collect();
 
-        let mut snippets = snippet_access.available_snippets_metadata();
-        snippets.retain(|(_, metadata)| !metadata.hidden && rng.sample(distr_50));
-
         let mut snippet_config = FxHashMap::default();
 
         let snippets = snippets
-            .into_iter()
-            .map(|(identifier, metadata)| {
+            .iter()
+            .filter_map(|(identifier, metadata)| {
+                if metadata.hidden || rng.sample(distr_50) {
+                    return None;
+                }
+
                 snippet_config.insert(
                     identifier.clone(),
                     metadata
                         .config
-                        .into_iter()
+                        .iter()
                         .filter_map(|(identifier, value)| match value.default {
                             ConfigDefault::Boolean(value) if rng.sample(distr_50) => {
-                                Some((identifier, (!value).to_string()))
+                                Some((identifier.clone(), (!value).to_string()))
                             }
                             _ => None,
                         })
                         .collect(),
                 );
 
-                identifier
+                Some(identifier.clone())
             })
             .collect();
 

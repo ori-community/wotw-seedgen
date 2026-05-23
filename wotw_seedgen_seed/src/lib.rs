@@ -48,11 +48,7 @@ impl Seed {
 
         let mut seed = Self {
             format_version: FORMAT_VERSION,
-            preload: Preload {
-                tags: output.tags,
-                spawn: output.spawn.unwrap_or(Position::new(-799., -4310.)),
-                slug: String::new(),
-            },
+            preload: Preload::new(output.tags, output.spawn),
             assembly: Assembly {
                 events,
                 command_lookup: context.command_lookup,
@@ -83,6 +79,7 @@ impl Seed {
     }
 
     pub fn with_seedgen_info(mut self, seedgen_info: SeedgenInfo) -> Self {
+        self.preload.slug = Some(seedgen_info.universe_settings.slugify());
         self.seedgen_info = Some(seedgen_info);
         self
     }
@@ -96,7 +93,17 @@ pub struct Preload {
     /// For preloading before starting the savefile
     pub spawn: Position,
     /// Identical for seeds with the same universe settings (including the rng seed)
-    pub slug: String, // TODO unused
+    pub slug: Option<String>,
+}
+
+impl Preload {
+    fn new(tags: Vec<String>, spawn: Option<Position>) -> Self {
+        Self {
+            tags,
+            spawn: spawn.unwrap_or(Position::new(-799., -4310.)),
+            slug: None,
+        }
+    }
 }
 
 #[derive(Serialize)]
