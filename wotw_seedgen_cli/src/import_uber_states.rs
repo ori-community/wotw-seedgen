@@ -5,10 +5,11 @@ use wotw_seedgen::data::assets::{self, LocData, StateData, UberStateData, UberSt
 
 use crate::Error;
 
-const OVERRIDES: [(&str, f32); 14] = [
+const OVERRIDES: [(&str, f32); 15] = [
     ("player.positionX", 0.),
     ("player.positionY", 0.),
     ("player.currentArea", 13.),
+    ("player.currentMapFilter", 0.),
     ("mapSegments.segment12701", 1.),
     ("input.mouseWorldPositionX", 0.),
     ("input.mouseWorldPositionY", 0.),
