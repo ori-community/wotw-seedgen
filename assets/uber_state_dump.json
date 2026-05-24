@@ -189,90 +189,6 @@
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "10023": {
-          "name": "waterBreathCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10074": {
-          "name": "spearCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10098": {
-          "name": "hammerCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10105": {
-          "name": "fastTravelCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10106": {
-          "name": "shurikenCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10115": {
-          "name": "blazeCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "10116": {
-          "name": "sentryCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "11074": {
-          "name": "explodingSpearCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "11098": {
-          "name": "hammerShockwaveCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "11106": {
-          "name": "staticShurikenCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "11115": {
-          "name": "chargeBlazeCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "11116": {
-          "name": "rapidSentryCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         }
       }
     },
@@ -334,62 +250,6 @@
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "101": {
-          "name": "overchargeCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "102": {
-          "name": "tripleJumpCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "103": {
-          "name": "wingclipCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "105": {
-          "name": "swapCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "119": {
-          "name": "lightHarvestCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "122": {
-          "name": "vitalityCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "126": {
-          "name": "energyCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "140": {
-          "name": "finesseCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         }
       }
     },
@@ -833,7 +693,7 @@
           "readonly": true,
           "type": "VirtualUberState",
           "value": 13.0,
-          "value_type": "Byte"
+          "value_type": "Integer"
         },
         "51": {
           "name": "currentMapArea",
@@ -17655,56 +17515,56 @@
           "value_type": "Integer"
         },
         "1004": {
-          "name": "pickupsCollectedPools",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "1005": {
-          "name": "pickupsCollectedBurrows",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "1006": {
-          "name": "pickupsCollectedReach",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "1007": {
           "name": "pickupsCollectedWoods",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1008": {
+        "1005": {
+          "name": "pickupsCollectedReach",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1006": {
           "name": "pickupsCollectedDepths",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1009": {
+        "1007": {
+          "name": "pickupsCollectedPools",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1008": {
           "name": "pickupsCollectedWastes",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1010": {
+        "1009": {
           "name": "pickupsCollectedRuins",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1011": {
+        "1010": {
           "name": "pickupsCollectedWillow",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1011": {
+          "name": "pickupsCollectedBurrows",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
@@ -17746,56 +17606,56 @@
           "value_type": "Integer"
         },
         "1104": {
-          "name": "pickupsTotalPools",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "1105": {
-          "name": "pickupsTotalBurrows",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "1106": {
-          "name": "pickupsTotalReach",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
-        "1107": {
           "name": "pickupsTotalWoods",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1108": {
+        "1105": {
+          "name": "pickupsTotalReach",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1106": {
           "name": "pickupsTotalDepths",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1109": {
+        "1107": {
+          "name": "pickupsTotalPools",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1108": {
           "name": "pickupsTotalWastes",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1110": {
+        "1109": {
           "name": "pickupsTotalRuins",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
           "value_type": "Integer"
         },
-        "1111": {
+        "1110": {
           "name": "pickupsTotalWillow",
+          "readonly": false,
+          "type": "SerializedIntUberState",
+          "value": 0.0,
+          "value_type": "Integer"
+        },
+        "1111": {
+          "name": "pickupsTotalBurrows",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 0.0,
@@ -17816,44 +17676,23 @@
         "19396": {
           "name": "hcMapIcons",
           "readonly": false,
-          "type": "SerializedByteUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Byte"
-        },
-        "19397": {
-          "name": "hcMapIconsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "41666": {
           "name": "shardMapIcons",
           "readonly": false,
-          "type": "SerializedByteUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Byte"
-        },
-        "41667": {
-          "name": "shardMapIconsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         },
         "57987": {
           "name": "ecMapIcons",
           "readonly": false,
-          "type": "SerializedByteUberState",
+          "type": "SerializedBooleanUberState",
           "value": 0.0,
-          "value_type": "Byte"
-        },
-        "57988": {
-          "name": "ecMapIconsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
+          "value_type": "Boolean"
         }
       }
     },
@@ -17867,26 +17706,12 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "15069": {
-          "name": "theGorlekTouchCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "16586": {
           "name": "clearTheCaveEntrance",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "16587": {
-          "name": "clearTheCaveEntranceCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         },
         "16825": {
           "name": "repairTheSpiritWell",
@@ -17895,26 +17720,12 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "16826": {
-          "name": "repairTheSpiritWellCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "18751": {
           "name": "thornySituation",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "18752": {
-          "name": "thornySituationCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         },
         "23607": {
           "name": "roofsOverHeads",
@@ -17923,13 +17734,6 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "23608": {
-          "name": "roofsOverHeadsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "40448": {
           "name": "onwardsAndUpwards",
           "readonly": false,
@@ -17937,26 +17741,12 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "40449": {
-          "name": "onwardsAndUpwardsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "51230": {
           "name": "dwellingRepairs",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "51231": {
-          "name": "dwellingRepairsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         }
       }
     },
@@ -18010,26 +17800,12 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "16255": {
-          "name": "selaFlowersCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "33011": {
           "name": "blueMoon",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "33012": {
-          "name": "blueMoonCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         },
         "38393": {
           "name": "springPlants",
@@ -18038,26 +17814,12 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "38394": {
-          "name": "springPlantsCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "40006": {
           "name": "lastTree",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "40007": {
-          "name": "lastTreeCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         },
         "47651": {
           "name": "lightcatchers",
@@ -18066,26 +17828,12 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
-        "47652": {
-          "name": "lightcatchersCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
-        },
         "64583": {
           "name": "stickyGrass",
           "readonly": false,
           "type": "SerializedBooleanUberState",
           "value": 0.0,
           "value_type": "Boolean"
-        },
-        "64584": {
-          "name": "stickyGrassCost",
-          "readonly": false,
-          "type": "SerializedIntUberState",
-          "value": 0.0,
-          "value_type": "Integer"
         }
       }
     },
