@@ -26762,6 +26762,13 @@
           "type": "VirtualUberState",
           "value": 0.0,
           "value_type": "Float"
+        },
+        "3": {
+          "name": "wheelOpen",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         }
       }
     },
