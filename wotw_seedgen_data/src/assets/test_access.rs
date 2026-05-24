@@ -255,3 +255,40 @@ impl DerefMut for TestGraph {
         &mut self.inner
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_logic_csvs() {
+        let loc_data = &TEST_ASSETS.base.loc_data;
+        let state_data = &TEST_ASSETS.base.state_data;
+        let uber_state_data = &TEST_ASSETS.base.uber_state_data;
+
+        for (identifier, uber_identifier, value) in loc_data
+            .entries
+            .iter()
+            .map(|entry| (&entry.identifier, entry.uber_identifier, entry.value))
+            .chain(
+                state_data
+                    .entries
+                    .iter()
+                    .map(|entry| (&entry.identifier, entry.uber_identifier, entry.value)),
+            )
+        {
+            eprintln!("checking {identifier}");
+
+            let data = &uber_state_data.id_lookup[&uber_identifier];
+
+            match value {
+                None => {
+                    data.default_value.expect_boolean();
+                }
+                Some(_) => {
+                    data.default_value.expect_integer();
+                }
+            }
+        }
+    }
+}

@@ -322,7 +322,7 @@ fun write_burrows_hint() {
 
 on spawn {
     set_shop_item_data(
-        lupoShop.hcMapIcons,
+        LupoShop.HFMapIcon,
         200,
         "Glades Items Hint",
         "Reveals " + description + " in Glades",
@@ -330,7 +330,7 @@ on spawn {
     )
 
     set_shop_item_data(
-        lupoShop.ecMapIcons,
+        LupoShop.HFMapIcon,
         200,
         "Woods Items Hint",
         "Reveals " + description + " in Woods",
