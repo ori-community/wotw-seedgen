@@ -1642,15 +1642,15 @@ on OpherShop.RapidSentry {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.HFMapIcon {
+on LupoShop.HFMapIcons {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.EFMapIcon {
+on LupoShop.EFMapIcons {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.ShardMapIcon {
+on LupoShop.ShardMapIcons {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }

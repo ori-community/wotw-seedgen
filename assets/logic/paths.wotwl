@@ -5142,11 +5142,11 @@ anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's h
     enter: free
 
   pickup GladesTown.LupoPotSL: free
-  pickup LupoShop.HFMapIcon:
+  pickup LupoShop.HFMapIcons:
     moki: SpiritLight=1200
-  pickup LupoShop.EFMapIcon:
+  pickup LupoShop.EFMapIcons:
     moki: SpiritLight=1200
-  pickup LupoShop.ShardMapIcon:
+  pickup LupoShop.ShardMapIcons:
     moki: SpiritLight=1200
 
 anchor GladesTown.BelowHoleHut at -214, -4111:  # The ledge below Hole Hut

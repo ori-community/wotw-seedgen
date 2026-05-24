@@ -75,7 +75,7 @@ fun write_hollow_hint() {
     }
 }
 fun write_glades_hint() {
-    if LupoShop.HFMapIcon {
+    if LupoShop.HFMapIcons {
         write_glades_skill_hint()
         write_glades_teleporter_hint()
     }
@@ -87,7 +87,7 @@ fun write_wellspring_hint() {
     }
 }
 fun write_woods_hint() {
-    if LupoShop.EFMapIcon {
+    if LupoShop.EFMapIcons {
         write_woods_skill_hint()
         write_woods_teleporter_hint()
     }
@@ -322,7 +322,7 @@ fun write_burrows_hint() {
 
 on spawn {
     set_shop_item_data(
-        LupoShop.HFMapIcon,
+        LupoShop.HFMapIcons,
         200,
         "Glades Items Hint",
         "Reveals " + description + " in Glades",
@@ -330,7 +330,7 @@ on spawn {
     )
 
     set_shop_item_data(
-        LupoShop.HFMapIcon,
+        LupoShop.HFMapIcons,
         200,
         "Woods Items Hint",
         "Reveals " + description + " in Woods",
@@ -360,8 +360,8 @@ on WestHollow.LupoMap {
     write_hollow_hint()
     item_message(get_string("zone_hint"))
 }
-!remove_location(LupoShop.HFMapIcon)
-on LupoShop.HFMapIcon {
+!remove_location(LupoShop.HFMapIcons)
+on LupoShop.HFMapIcons {
     set_string("zone_hint", "")
     write_glades_hint()
     item_message(get_string("zone_hint"))
@@ -372,8 +372,8 @@ on InnerWellspring.LupoMap {
     write_wellspring_hint()
     item_message(get_string("zone_hint"))
 }
-!remove_location(LupoShop.EFMapIcon)
-on LupoShop.EFMapIcon {
+!remove_location(LupoShop.EFMapIcons)
+on LupoShop.EFMapIcons {
     set_string("zone_hint", "")
     write_woods_hint()
     item_message(get_string("zone_hint"))
