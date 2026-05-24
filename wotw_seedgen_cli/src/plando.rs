@@ -160,5 +160,13 @@ fn compile(
 }
 
 fn ignore_file_event(path: &Path, out: &Path) -> bool {
-    path.ends_with(".id_lock.json") || path == out
+    let Ok(path) = fs::canonicalize(path) else {
+        return true;
+    };
+
+    let Some(file_name) = path.file_name() else {
+        return true;
+    };
+
+    file_name.as_encoded_bytes().ends_with(b".id_lock.json") || path == out
 }
