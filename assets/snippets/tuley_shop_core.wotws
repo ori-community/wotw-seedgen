@@ -1,3 +1,7 @@
+#hidden
+#name("Tuley Shop Core")
+#description("Exposes states to control Tuley shop behavior")
+
 !state(lightcatchers, Boolean)
 !export(lightcatchers)
 !state(sela_flowers, Boolean)
