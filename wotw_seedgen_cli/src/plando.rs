@@ -62,7 +62,13 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             out.set_extension("wotwr");
             out
         }
-        Some(out) => assets::canonicalize(out)?,
+        Some(out) => {
+            if let Some(parent) = out.parent() {
+                assets::create_dir_all(parent)?;
+            }
+            assets::file_create(&out)?;
+            assets::canonicalize(out)?
+        }
     };
 
     let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
