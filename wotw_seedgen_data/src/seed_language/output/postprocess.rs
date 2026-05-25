@@ -859,6 +859,12 @@ impl ResolvePlaceholders for CommandVoid {
             }
             Self::SetWheelPinned { pinned, .. } => pinned.resolve(context),
             Self::DebugLog { message } => message.resolve(context),
+            Self::DealEnemyDamage { amount } => {
+                amount.resolve(context)
+            },
+            Self::ForceDealEnemyDamage { amount } => {
+                amount.resolve(context)
+            },
             Self::Lookup { .. }
             | Self::DefineTimer { .. }
             | Self::FreeMessageUninitialized { .. }

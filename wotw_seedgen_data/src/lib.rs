@@ -2,6 +2,9 @@
 //!
 //! Note that some of the contained data is only applicable to the randomizer, not the base game
 
+// This is for the function_signatures! macro
+#![recursion_limit = "256"]
+
 pub use wotw_seedgen_parse as parse;
 
 pub use strum::{VariantArray, VariantNames};

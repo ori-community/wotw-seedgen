@@ -249,6 +249,7 @@ pub enum Command {
     CloseWeaponWheel,
     /// Write String Memory 0 into the client log
     DebugLog,
+    DealEnemyDamage(/*force*/ bool),
     // TODO missing SetDebuggerTrace
     // TODO missing SetTextWithId (?)
 }

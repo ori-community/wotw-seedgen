@@ -331,7 +331,9 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::ResetAllWheels { .. }
             | CommandVoid::CloseMenu { .. }
             | CommandVoid::CloseWeaponWheel { .. }
-            | CommandVoid::DebugLog { .. } => {}
+            | CommandVoid::DebugLog { .. }
+            | CommandVoid::DealEnemyDamage { .. }
+            | CommandVoid::ForceDealEnemyDamage { .. } => {}
         }
     }
 }

@@ -711,4 +711,10 @@ pub enum CommandVoid {
     DebugLog {
         message: CommandString,
     },
+    DealEnemyDamage {
+        amount: CommandFloat,
+    },
+    ForceDealEnemyDamage {
+        amount: CommandFloat,
+    },
 }

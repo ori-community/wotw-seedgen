@@ -334,6 +334,8 @@ pub enum FunctionIdentifier {
     CloseMenu,
     CloseWeaponWheel,
     DebugLog,
+    DealEnemyDamage,
+    ForceDealEnemyDamage,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -518,6 +520,8 @@ impl FunctionIdentifier {
             CloseMenu(),
             CloseWeaponWheel(),
             DebugLog(message: String),
+            DealEnemyDamage(amount: Float),
+            ForceDealEnemyDamage(amount: Float),
         }
     }
 
@@ -1436,6 +1440,12 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::CloseWeaponWheel => Command::Void(CommandVoid::CloseWeaponWheel {}),
             FunctionIdentifier::DebugLog => Command::Void(CommandVoid::DebugLog {
                 message: arg(&mut context)?,
+            }),
+            FunctionIdentifier::DealEnemyDamage => Command::Void(CommandVoid::DealEnemyDamage {
+                amount: arg(&mut context)?,
+            }),
+            FunctionIdentifier::ForceDealEnemyDamage => Command::Void(CommandVoid::ForceDealEnemyDamage {
+                amount: arg(&mut context)?,
             }),
         };
 

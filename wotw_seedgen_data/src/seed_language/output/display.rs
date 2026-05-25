@@ -393,6 +393,8 @@ impl Display for CommandVoid {
             CommandVoid::CloseMenu {} => write!(f, "close_menu()"),
             CommandVoid::CloseWeaponWheel {} => write!(f, "close_weapon_wheel()"),
             CommandVoid::DebugLog { message } => write!(f, "debug_log({message})"),
+            CommandVoid::DealEnemyDamage { amount } => write!(f, "deal_enemy_damage({amount})"),
+            CommandVoid::ForceDealEnemyDamage { amount } => write!(f, "force_deal_enemy_damage({amount})"),
         }
     }
 }

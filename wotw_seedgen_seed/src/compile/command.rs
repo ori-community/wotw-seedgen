@@ -600,6 +600,12 @@ impl Compile for input::CommandVoid {
             Self::DebugLog { message } => Args::new(context)
                 .string(0, message)
                 .call(Command::DebugLog, MemoryUsed::ZERO),
+            Self::DealEnemyDamage { amount } => Args::new(context)
+                .float(0, amount)
+                .call(Command::DealEnemyDamage(false), MemoryUsed::ZERO),
+            Self::ForceDealEnemyDamage { amount } => Args::new(context)
+                .float(0, amount)
+                .call(Command::DealEnemyDamage(true), MemoryUsed::ZERO),
         }
     }
 }
