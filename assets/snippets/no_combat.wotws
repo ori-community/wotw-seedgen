@@ -52,8 +52,6 @@ all arenas are completed and all boss combat phases are skipped")
         store(player.energy, 999)
     }
     on willowsEndGroup.petrifiedOwlBossState == 3 {
-        store(willowsEndGroup.petrifiedOwlBossState, 5)
-        store(gameStateGroup.gameFinished, true)
-        trigger_keybind("WarpCredits")
+        force_deal_enemy_damage(10000)
     }
 }
