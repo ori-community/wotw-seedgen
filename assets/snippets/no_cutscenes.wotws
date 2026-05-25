@@ -7,6 +7,7 @@
 
 on spawn {
     // Static cutscene skips
+    store(kwolokGroupDescriptor.risingPedestals, true) // Pedestals in front of the Kwolok statue
     store(howlsDenGRoup.hasOriUsedSavePedestal, true) // Moki dialogue when finding a Spirit Well
     store(_petrifiedForestGroup.mokiFoulWaterVignetteTriggered, true) // Kwolok room Moki dialogue with dirty water
     store(_petrifiedForestGroup.mokiCleanWaterVignetteTriggered, true) // Kwolok room Moki dialogue with clean water (technically still triggered after Wellspring escape)
