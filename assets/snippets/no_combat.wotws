@@ -23,6 +23,7 @@ all arenas are completed and all boss combat phases are skipped")
         store(inkwaterMarshStateGroup.lizardMultiWaveArenaInt, 3)
         store(WeepingRidge.ElevatorFightCompleted, true)
         store(waterMillStateGroupDescriptor.rotatingEnemyArenaStates, 5)
+        store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
         store(lumaPoolsStateGroup.arenaBByteStateSerialized, 4)
     }
 }
