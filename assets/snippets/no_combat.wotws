@@ -39,7 +39,7 @@ all arenas are completed and all boss combat phases are skipped")
     }
     on lagoonStateGroup.kwolokBossState == 3 {
         store(lagoonStateGroup.kwolokBossState, 6)
-        warp(-1958, -4067)
+        instant_warp(-1958, -4067)
     }
     !set_logic_state("SkipKwolok")
     on mouldwoodDepthsGroup.spiderBossState == 2 store(mouldwoodDepthsGroup.spiderBossState, 4)
