@@ -12,9 +12,11 @@ use itertools::Itertools;
 use rustc_hash::FxHashSet;
 use strum::{Display, VariantArray, VariantNames};
 use wotw_seedgen::data::{
-    assets::{DefaultFileAccess, PresetAccess, UniversePresetSettings, WorldPresetSettings},
+    assets::{
+        DefaultFileAccess, PresetAccess, Tricks, UniversePresetSettings, WorldPresetSettings,
+    },
     seed_language::metadata::{ConfigDefault, ConfigValue},
-    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
+    Difficulty, GreaterOneU8, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 
 use crate::{
@@ -230,13 +232,10 @@ fn select_tricks(
 ) -> Result<(), Error> {
     let mut include_controlled = 0;
 
-    let items = <Trick as VariantArray>::VARIANTS
-        .iter()
-        .copied()
-        .filter({
-            let difficulty = settings.difficulty.unwrap_or(include_settings.difficulty);
-            move |trick| difficulty >= trick.min_difficulty()
-        })
+    let items = settings
+        .difficulty
+        .unwrap_or(include_settings.difficulty)
+        .available_tricks()
         .filter(|trick| {
             let controlled = include_settings.tricks.contains(trick);
             include_controlled += controlled as u8;
@@ -267,7 +266,13 @@ fn select_tricks(
         let indices = query.interact_opt()?.unwrap_or_default();
 
         if !indices.is_empty() {
-            settings.tricks = Some(indices.into_iter().map(|index| items[index]).collect())
+            if indices.len() == items.len() {
+                settings.tricks = Some(Tricks::All);
+            } else {
+                settings.tricks = Some(Tricks::Some(
+                    indices.into_iter().map(|index| items[index]).collect(),
+                ))
+            }
         }
     }
 

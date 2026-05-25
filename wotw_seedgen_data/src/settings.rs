@@ -305,6 +305,15 @@ pub enum Difficulty {
     Unsafe,
 }
 
+impl Difficulty {
+    pub fn available_tricks(self) -> impl Iterator<Item = Trick> {
+        <Trick as VariantArray>::VARIANTS
+            .iter()
+            .copied()
+            .filter(move |trick| self >= trick.min_difficulty())
+    }
+}
+
 // TODO compability aliases?
 // PauseHover -> PauseFloat
 // HammerJump -> AerialHammerJump

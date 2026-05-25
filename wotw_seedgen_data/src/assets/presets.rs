@@ -377,7 +377,7 @@ pub struct WorldPresetSettings {
     /// Logically expected difficulty
     pub difficulty: Option<Difficulty>,
     /// Logically expected tricks
-    pub tricks: Option<FxHashSet<Trick>>,
+    pub tricks: Option<Tricks>,
     /// Logically assume hard in-game difficulty
     pub hard: Option<bool>,
     /// Randomize entrance connections with the given max loop size
@@ -399,13 +399,20 @@ impl WorldPresetSettings {
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
+        fn trick_len(tricks: &Tricks) -> usize {
+            match tricks {
+                Tricks::All => usize::MAX,
+                Tricks::Some(tricks) => tricks.len(),
+            }
+        }
+
         self.difficulty
             .cmp(&other.difficulty)
             .then_with(|| {
                 self.tricks
                     .as_ref()
-                    .map(FxHashSet::len)
-                    .cmp(&other.tricks.as_ref().map(FxHashSet::len))
+                    .map(trick_len)
+                    .cmp(&other.tricks.as_ref().map(trick_len))
             })
             .then_with(|| self.hard.cmp(&other.hard))
     }
@@ -437,7 +444,10 @@ impl WorldPresetSettings {
         }
 
         if let Some(tricks) = tricks {
-            settings.tricks.extend(tricks);
+            match tricks {
+                Tricks::All => settings.tricks = settings.difficulty.available_tricks().collect(),
+                Tricks::Some(tricks) => settings.tricks.extend(tricks),
+            }
         }
 
         if let Some(spawn) = spawn {
@@ -509,6 +519,22 @@ fn include_world_preset<A: PresetAccess>(
     already_applied.push(identifier);
 
     preset._apply(settings, already_applied, preset_access)
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
+pub enum Tricks {
+    All,
+    #[serde(untagged)]
+    Some(FxHashSet<Trick>),
+}
+
+impl Tricks {
+    pub fn contains(&self, trick: &Trick) -> bool {
+        match self {
+            Tricks::All => true,
+            Tricks::Some(tricks) => tricks.contains(trick),
+        }
+    }
 }
 
 fn err_removed(identifier: &str) -> Result<(), String> {

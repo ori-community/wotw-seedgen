@@ -13,8 +13,8 @@ mod snippet_access;
 pub use snippet_access::{ChainedSnippetAccess, InlineSnippets, NoSnippetAccess, SnippetAccess};
 mod presets;
 pub use presets::{
-    NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, UniversePreset, UniversePresetSettings,
-    WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
+    NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, Tricks, UniversePreset,
+    UniversePresetSettings, WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
 };
 mod file_access;
 pub use file_access::{

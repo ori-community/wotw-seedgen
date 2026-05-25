@@ -12,6 +12,7 @@ use clap::{
     value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches,
 };
 use itertools::Itertools;
+use rustc_hash::FxHashSet;
 use std::{
     convert::Infallible,
     ffi::OsStr,
@@ -22,7 +23,7 @@ use std::{
 };
 use strum::VariantNames;
 use wotw_seedgen::data::{
-    assets::{DefaultFileAccess, UniversePresetSettings, WorldPresetSettings},
+    assets::{DefaultFileAccess, Tricks, UniversePresetSettings, WorldPresetSettings},
     Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
 };
 
@@ -52,6 +53,7 @@ impl Args for SeedSettings {
             .arg(spawn_arg(true))
             .arg(difficulty_arg(true))
             .arg(tricks_arg(true))
+            .arg(all_tricks_arg(true))
             .arg(hard_arg(true))
             .arg(randomize_entrances_arg(true))
             .arg(snippets_arg(true))
@@ -78,6 +80,7 @@ impl Args for SeedWorldSettings {
             .arg(spawn_arg(false))
             .arg(difficulty_arg(false))
             .arg(tricks_arg(false))
+            .arg(all_tricks_arg(false))
             .arg(hard_arg(false))
             .arg(randomize_entrances_arg(false))
             .arg(snippets_arg(false))
@@ -246,6 +249,23 @@ fn tricks_arg(world_scoped: bool) -> Arg {
         )); // TODO don't think damage boost toggling is actually implemented yet
 
     choose_strum_enum_parser!(arg, world_scoped, Trick)
+}
+
+fn all_tricks_arg(world_scoped: bool) -> Arg {
+    let arg = Arg::new("all_tricks")
+        .group("seed_settings")
+        .long("all-tricks")
+        .short('T')
+        .value_name("BOOLEAN")
+        .help("Enable all tricks supported in the selected difficulty");
+
+    let arg = if world_scoped {
+        arg.num_args(0..)
+    } else {
+        arg.action(ArgAction::SetTrue)
+    };
+
+    choose_parser!(arg, world_scoped, bool)
 }
 
 fn hard_arg(world_scoped: bool) -> Arg {
@@ -669,11 +689,23 @@ impl FromArgMatches for SeedSettings {
             matches,
             &mut world_settings,
             "tricks",
-            |world_preset, trick: &Trick| {
-                world_preset
-                    .tricks
-                    .get_or_insert_with(Default::default)
-                    .insert(*trick);
+            |world_preset, trick: &Trick| match &mut world_preset.tricks {
+                none @ None => *none = Some(Tricks::Some(FxHashSet::from_iter([*trick]))),
+                Some(Tricks::All) => return,
+                Some(Tricks::Some(tricks)) => {
+                    tricks.insert(*trick);
+                }
+            },
+        )?;
+
+        update_from_world_scoped_flag(
+            matches,
+            &mut world_settings,
+            "all_tricks",
+            |world_preset, all_tricks| {
+                if *all_tricks {
+                    world_preset.tricks = Some(Tricks::All);
+                }
             },
         )?;
 
@@ -746,9 +778,13 @@ impl FromArgMatches for SeedWorldSettings {
                 .map(|world_presets| world_presets.cloned().collect()),
             spawn: matches.get_one("spawn").cloned(),
             difficulty: matches.get_one("difficulty").cloned(),
-            tricks: matches
-                .get_many("tricks")
-                .map(|trick| trick.copied().collect()),
+            tricks: if matches.get_flag("all_tricks") {
+                Some(Tricks::All)
+            } else {
+                matches
+                    .get_many("tricks")
+                    .map(|trick| Tricks::Some(trick.copied().collect()))
+            },
             hard: matches.get_flag("hard").then_some(true),
             randomize_entrances: matches.get_one("randomize_entrances").cloned(),
             snippets: matches
