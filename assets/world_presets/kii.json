@@ -1,0 +1,23 @@
+{
+  "assetsVersion": 1,
+  "info": {
+    "name": "Kii",
+    "description": "For experienced players seeking a challenge. Good choice for competitive races",
+    "group": "Base"
+  },
+  "includes": ["qol"],
+  "difficulty": "Kii",
+  "snippets": [
+    "shrine_hints",
+    "trial_hints",
+    "teleporters",
+    "better_mechanics",
+    "better_wellspring",
+    "key_hints",
+    "black_market",
+    "zone_hints",
+    "spawn_tuley",
+    "no_rain",
+    "no_howl"
+  ]
+}
