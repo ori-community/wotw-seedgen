@@ -27,6 +27,7 @@ pub const LOGIC: &str = concat!("/", TAG);
 const GRAPH: &str = "/graph";
 const MAP_ICONS: &str = "/map-icons";
 const RELEVANT_UBER_STATES: &str = "/relevant-uber-states";
+const SPAWN_ANCHORS: &str = "/spawn-anchors";
 const REACH_CHECK: &str = "/reach-check";
 
 pub fn router() -> Router<RouterState> {
@@ -34,11 +35,12 @@ pub fn router() -> Router<RouterState> {
         .route(GRAPH, get(graph))
         .route(MAP_ICONS, get(map_icons))
         .route(RELEVANT_UBER_STATES, get(relevant_uber_states))
+        .route(SPAWN_ANCHORS, get(spawn_anchors))
         .route(REACH_CHECK, post(reach_check))
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(graph, map_icons, relevant_uber_states, reach_check))]
+#[openapi(paths(graph, map_icons, relevant_uber_states, spawn_anchors, reach_check))]
 pub struct Docs;
 
 /// Get the logic graph
@@ -99,11 +101,33 @@ async fn relevant_uber_states(State(cache): State<RouterState>) -> Json<Relevant
 }
 
 #[derive(Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct RelevantUberStates {
     /// List of logically relevant UberStates
     pub identifiers: Vec<UberIdentifier>,
     /// Hash of `identifiers`
     pub hash: u64,
+}
+
+/// Get a list of spawnable anchor identifiers
+#[utoipa::path(
+    get,
+    path = SPAWN_ANCHORS,
+    responses((status = OK, body = SpawnAnchors)),
+)]
+async fn spawn_anchors(State(cache): State<RouterState>) -> Json<SpawnAnchors> {
+    Json(cache.read().await.spawn_anchors.clone())
+}
+
+#[derive(Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct SpawnAnchors {
+    /// List of spawnable anchor identifiers
+    pub identifiers: Vec<String>,
+    /// Indices into `identifiers` for viable moki random teleporter spawns
+    pub moki_teleporters: Vec<usize>,
+    /// Indices into `identifiers` for viable random teleporter spawns above moki
+    pub teleporters: Vec<usize>,
 }
 
 /// Get a list of reachable nodes

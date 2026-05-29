@@ -30,6 +30,7 @@ mod tests;
 mod world;
 
 pub use generator::{generate_seed, item_pool, spoiler, SeedUniverse};
+pub use logical_difficulty::LogicalDifficulty;
 pub use world::World;
 
 // TODO use this and also set the other metadata: current world, format version, settings

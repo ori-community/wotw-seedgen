@@ -97,7 +97,7 @@ impl Node {
 
     pub fn can_spawn(&self) -> bool {
         match self {
-            Node::Anchor(anchor) => anchor.position.is_some() && anchor.can_spawn,
+            Node::Anchor(anchor) => anchor.can_spawn(),
             _ => false,
         }
     }
@@ -139,6 +139,10 @@ impl Anchor {
             refills: vec![],
             connections,
         }
+    }
+
+    pub fn can_spawn(&self) -> bool {
+        self.position.is_some() && self.can_spawn
     }
 }
 

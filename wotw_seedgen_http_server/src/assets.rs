@@ -13,7 +13,7 @@ use wotw_seedgen::data::{
     seed_language::{metadata::Metadata, simulate::UberStates},
 };
 
-use crate::api::logic::{MapIcons, RelevantUberStates};
+use crate::api::logic::{MapIcons, RelevantUberStates, SpawnAnchors};
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
 
@@ -25,6 +25,7 @@ pub struct CacheValues {
     pub grom_shop_map_icon_index: usize,
     pub node_index_to_map_icon_index: FxHashMap<usize, usize>,
     pub relevant_uber_states: RelevantUberStates,
+    pub spawn_anchors: SpawnAnchors,
     pub snippet_info: FxHashMap<String, Metadata>,
     pub data_dir_snippets: FxHashSet<String>,
 }
@@ -43,6 +44,7 @@ impl AssetCacheValues for CacheValues {
         let relevant_uber_states = RelevantUberStates::new(&base.loc_data, &base.state_data);
 
         let graph = graph(&base.paths, &base.loc_data, &base.state_data)?;
+        let spawn_anchors = SpawnAnchors::new(&graph);
 
         let node_index_to_map_icon_index = node_index_to_map_icon_index(&graph, &map_icons);
 
@@ -57,6 +59,7 @@ impl AssetCacheValues for CacheValues {
             grom_shop_map_icon_index,
             node_index_to_map_icon_index,
             relevant_uber_states,
+            spawn_anchors,
             snippet_info,
             data_dir_snippets,
         })
@@ -112,6 +115,7 @@ impl AssetCacheValues for CacheValues {
 
         if changed.loc_data || changed.state_data || changed.paths {
             self.graph = graph(&self.base.paths, &self.base.loc_data, &self.base.state_data)?;
+            self.spawn_anchors = SpawnAnchors::new(&self.graph);
 
             self.node_index_to_map_icon_index =
                 node_index_to_map_icon_index(&self.graph, &self.map_icons);
