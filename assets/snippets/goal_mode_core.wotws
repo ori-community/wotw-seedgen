@@ -36,8 +36,13 @@ fun update_goals_completed() {
 
     update_progress_message()
 
-    if get_boolean("in_shriek_room") && get_boolean("goals_completed") == false {
-        update_goals_incomplete_message()
+    if get_boolean("in_shriek_room") {
+        if get_boolean("goals_completed") {
+            destroy_message("goals_incomplete")
+        }
+        if get_boolean("goals_completed") == false {
+            update_goals_incomplete_message()
+        }
     }
 }
 
