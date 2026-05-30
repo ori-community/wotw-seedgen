@@ -3,7 +3,8 @@ use crate::{
     seed_language::{
         output::Event,
         simulate::{
-            condition_values::ConditionValues, Simulation, Snapshot, UberStates, Variables,
+            condition_values::ConditionValues, CloneSnapshot, Simulation, Snapshot, UberStates,
+            Variables,
         },
     },
     UberIdentifier,
@@ -13,7 +14,7 @@ use crate::{
 pub struct WorldState {
     pub uber_states: UberStates,
     pub variables: Variables,
-    pub condition_values: ConditionValues,
+    pub condition_values: CloneSnapshot<ConditionValues>,
 }
 
 impl WorldState {
@@ -22,7 +23,7 @@ impl WorldState {
         let mut world_state = Self {
             uber_states,
             variables: Default::default(),
-            condition_values: ConditionValues::default(),
+            condition_values: CloneSnapshot::new(ConditionValues::default()),
         };
 
         for event in events {
@@ -61,9 +62,11 @@ impl Simulation for WorldState {
 impl Snapshot for WorldState {
     fn snapshot(&mut self) {
         self.uber_states.snapshot();
+        self.condition_values.snapshot();
     }
 
     fn restore_snapshot(&mut self) {
         self.uber_states.restore_snapshot();
+        self.condition_values.restore_snapshot();
     }
 }
