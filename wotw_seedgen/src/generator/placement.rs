@@ -49,7 +49,8 @@ const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are g
 const TOTAL_SPIRIT_LIGHT: i32 = 20000;
 
 const MIN_PLACEHOLDERS: usize = 3;
-static MAX_PLACEHOLDERS: LazyLock<usize> = LazyLock::new(|| SOLUTION_MAX_ITEMS.saturating_mul(2));
+static MAX_PLACEHOLDERS: LazyLock<usize> =
+    LazyLock::new(|| 10 + SOLUTION_MAX_ITEMS.saturating_mul(2));
 
 pub fn generate_placements(
     rng: &mut Pcg64Mcg,
